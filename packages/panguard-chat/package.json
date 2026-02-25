@@ -5,6 +5,9 @@
   "description": "AI security assistant via messaging platforms / 透過通訊軟體管理資安的 AI 助手",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "panguard-chat": "./dist/cli/index.js"
+  },
   "scripts": {
     "build": "tsc --build",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
