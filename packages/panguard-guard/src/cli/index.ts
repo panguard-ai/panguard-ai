@@ -2,20 +2,17 @@
  * PanguardGuard CLI
  * PanguardGuard 命令列介面
  *
- * Commands:
- * - start: Start the guard engine / 啟動守護引擎
- * - stop: Stop the guard engine / 停止守護引擎
- * - status: Show engine status / 顯示引擎狀態
- * - install: Install as system service / 安裝為系統服務
- * - uninstall: Remove system service / 移除系統服務
- * - config: Show current configuration / 顯示當前配置
- * - generate-key: Generate a test license key / 產生測試授權金鑰
+ * Uses brand-standard colors and layout from Panguard AI brand system.
+ * Brand: Sage Green #8B9A8E, Cream #F5F1E8, Charcoal #1A1614
  *
  * @module @openclaw/panguard-guard/cli
  */
 
 import { join } from 'node:path';
 import { homedir } from 'node:os';
+import {
+  c, banner, header, box, symbols, divider, statusPanel, spinner,
+} from '@openclaw/core';
 import { GuardEngine } from '../guard-engine.js';
 import { loadConfig, DEFAULT_DATA_DIR } from '../config.js';
 import { PidFile } from '../daemon/index.js';
@@ -24,12 +21,10 @@ import { generateTestLicenseKey } from '../license/index.js';
 import { generateInstallScript } from '../install/index.js';
 
 /** CLI version / CLI 版本 */
-export const CLI_VERSION = '0.1.0';
+export const CLI_VERSION = '0.5.0';
 
 /**
  * Parse and execute CLI commands / 解析並執行 CLI 命令
- *
- * @param args - Command line arguments (process.argv.slice(2)) / 命令列引數
  */
 export async function runCLI(args: string[]): Promise<void> {
   const command = args[0] ?? 'help';
@@ -57,7 +52,7 @@ export async function runCLI(args: string[]): Promise<void> {
     case 'generate-key': {
       const tier = (args[1] ?? 'pro') as 'free' | 'pro' | 'enterprise';
       const key = generateTestLicenseKey(tier);
-      console.log(`Generated ${tier} license key: ${key}`);
+      console.log(`  ${symbols.pass} Generated ${c.bold(tier)} license key: ${c.sage(key)}`);
       break;
     }
     case 'install-script': {
@@ -73,24 +68,22 @@ export async function runCLI(args: string[]): Promise<void> {
   }
 }
 
-/**
- * Start the guard engine / 啟動守護引擎
- */
+/** Start the guard engine / 啟動守護引擎 */
 async function commandStart(dataDir: string): Promise<void> {
-  const pidFile = new PidFile(dataDir);
+  console.log(banner());
 
+  const pidFile = new PidFile(dataDir);
   if (pidFile.isRunning()) {
-    console.log('PanguardGuard is already running / PanguardGuard 已在執行中');
+    console.log(`  ${symbols.warn} PanguardGuard is already running`);
     return;
   }
 
-  console.log('Starting PanguardGuard... / 正在啟動 PanguardGuard...');
+  const sp = spinner('Starting PanguardGuard...');
   const config = loadConfig(dataDir);
   const engine = new GuardEngine(config);
 
-  // Handle shutdown signals / 處理關閉信號
   const shutdown = async () => {
-    console.log('\nShutting down PanguardGuard... / 正在關閉 PanguardGuard...');
+    console.log(`\n  ${symbols.info} Shutting down PanguardGuard...`);
     await engine.stop();
     process.exit(0);
   };
@@ -99,153 +92,170 @@ async function commandStart(dataDir: string): Promise<void> {
   process.on('SIGTERM', () => void shutdown());
 
   await engine.start();
+  sp.succeed('PanguardGuard started');
 
-  console.log(`PanguardGuard started (PID: ${process.pid}) / PanguardGuard 已啟動`);
-  console.log(`Mode: ${config.mode} / 模式: ${config.mode}`);
-  if (config.dashboardEnabled) {
-    console.log(`Dashboard: http://localhost:${config.dashboardPort}`);
-  }
+  // Status box (matching mockup status panel)
+  console.log(statusPanel('PANGUARD AI Guard Active', [
+    { label: 'Status', value: c.safe('PROTECTED'), status: 'safe' },
+    { label: 'PID', value: c.sage(String(process.pid)) },
+    { label: 'Mode', value: c.sage(config.mode) },
+    { label: 'Data Dir', value: c.dim(dataDir) },
+    ...(config.dashboardEnabled
+      ? [{ label: 'Dashboard', value: c.underline(`http://localhost:${config.dashboardPort}`) }]
+      : []),
+  ]));
+
+  console.log(c.dim('  Press Ctrl+C to stop'));
+  console.log('');
 }
 
-/**
- * Stop the guard engine / 停止守護引擎
- */
+/** Stop the guard engine / 停止守護引擎 */
 function commandStop(dataDir: string): void {
   const pidFile = new PidFile(dataDir);
   const pid = pidFile.read();
 
   if (!pid) {
-    console.log('PanguardGuard is not running / PanguardGuard 未在執行中');
+    console.log(`  ${symbols.info} PanguardGuard is not running`);
     return;
   }
 
   if (!pidFile.isRunning()) {
-    console.log('PanguardGuard process not found, cleaning up PID file / 找不到程序，清理 PID 檔案');
+    console.log(`  ${symbols.warn} Process not found, cleaning up PID file`);
     pidFile.remove();
     return;
   }
 
   try {
     process.kill(pid, 'SIGTERM');
-    console.log(`PanguardGuard stopped (PID: ${pid}) / PanguardGuard 已停止`);
+    console.log(`  ${symbols.pass} PanguardGuard stopped ${c.dim(`(PID: ${pid})`)}`);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(`Failed to stop PanguardGuard: ${msg} / 停止失敗: ${msg}`);
+    console.error(`  ${symbols.fail} Failed to stop: ${msg}`);
   }
 }
 
-/**
- * Show engine status / 顯示引擎狀態
- */
+/** Show engine status / 顯示引擎狀態 */
 function commandStatus(dataDir: string): void {
+  console.log(header());
+
   const pidFile = new PidFile(dataDir);
   const pid = pidFile.read();
   const running = pidFile.isRunning();
 
-  console.log('PanguardGuard Status / PanguardGuard 狀態');
-  console.log('================================');
-  console.log(`Running: ${running ? 'Yes' : 'No'} / 執行中: ${running ? '是' : '否'}`);
-  if (pid) {
-    console.log(`PID: ${pid}`);
-  }
-  console.log(`Data Dir: ${dataDir} / 資料目錄: ${dataDir}`);
+  const items = [
+    {
+      label: 'Status',
+      value: running ? c.safe('RUNNING') : c.critical('STOPPED'),
+      status: running ? 'safe' as const : 'critical' as const,
+    },
+    ...(pid ? [{ label: 'PID', value: c.sage(String(pid)) }] : []),
+    { label: 'Data Dir', value: c.dim(dataDir) },
+  ];
 
   try {
     const config = loadConfig(dataDir);
-    console.log(`Mode: ${config.mode} / 模式: ${config.mode}`);
-    console.log(`Dashboard: ${config.dashboardEnabled ? `http://localhost:${config.dashboardPort}` : 'disabled'}`);
-    console.log(`License: ${config.licenseKey ? 'configured' : 'free tier'} / 授權: ${config.licenseKey ? '已配置' : '免費等級'}`);
+    items.push({ label: 'Mode', value: c.sage(config.mode) });
+    items.push({
+      label: 'Dashboard',
+      value: config.dashboardEnabled
+        ? c.underline(`http://localhost:${config.dashboardPort}`)
+        : c.dim('disabled'),
+    });
+    items.push({
+      label: 'License',
+      value: config.licenseKey ? c.safe('configured') : c.caution('free tier'),
+      status: config.licenseKey ? 'safe' as const : 'caution' as const,
+    });
   } catch {
-    console.log('Config: not found / 配置: 未找到');
+    items.push({ label: 'Config', value: c.critical('not found'), status: 'critical' as const });
   }
+
+  console.log(statusPanel('PANGUARD AI Security Status', items));
 }
 
-/**
- * Install as system service / 安裝為系統服務
- */
+/** Install as system service / 安裝為系統服務 */
 async function commandInstall(dataDir: string): Promise<void> {
-  console.log('Installing PanguardGuard as system service... / 正在安裝為系統服務...');
+  const sp = spinner('Installing PanguardGuard as system service...');
   try {
     const execPath = process.argv[1] ?? join(homedir(), '.npm-global', 'bin', 'panguard-guard');
     const result = await installService(execPath, dataDir);
-    console.log(`Service installed: ${result} / 服務已安裝: ${result}`);
+    sp.succeed(`Service installed: ${c.sage(result)}`);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(`Install failed: ${msg} / 安裝失敗: ${msg}`);
-    console.error('You may need to run this command with elevated privileges (sudo/admin).');
+    sp.fail(`Install failed: ${msg}`);
+    console.error(c.dim('  You may need to run with elevated privileges (sudo/admin).'));
   }
 }
 
-/**
- * Uninstall system service / 解除安裝系統服務
- */
+/** Uninstall system service / 解除安裝系統服務 */
 async function commandUninstall(): Promise<void> {
-  console.log('Uninstalling PanguardGuard service... / 正在解除安裝服務...');
+  const sp = spinner('Uninstalling PanguardGuard service...');
   try {
     const result = await uninstallService();
-    console.log(`Service uninstalled: ${result} / 服務已解除安裝: ${result}`);
+    sp.succeed(`Service uninstalled: ${c.sage(result)}`);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(`Uninstall failed: ${msg} / 解除安裝失敗: ${msg}`);
+    sp.fail(`Uninstall failed: ${msg}`);
   }
 }
 
-/**
- * Show current configuration / 顯示當前配置
- */
+/** Show current configuration / 顯示當前配置 */
 function commandConfig(dataDir: string): void {
+  console.log(header('Configuration'));
   try {
     const config = loadConfig(dataDir);
     console.log(JSON.stringify(config, null, 2));
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(`Failed to load config: ${msg} / 載入配置失敗: ${msg}`);
+    console.error(`  ${symbols.fail} Failed to load config: ${msg}`);
   }
 }
 
-/**
- * Print help message / 列印幫助訊息
- */
+/** Print help message / 列印幫助訊息 */
 function printHelp(): void {
-  console.log(`
-PanguardGuard - AI Real-time Endpoint Security
-PanguardGuard - AI 即時端點安全
+  console.log(banner());
 
-Usage: panguard-guard <command> [options]
+  console.log(`  ${c.bold('Usage:')} panguard-guard <command> [options]`);
+  console.log('');
+  console.log(divider('Commands'));
+  console.log('');
 
-Commands:
-  start             Start the guard engine / 啟動守護引擎
-  stop              Stop the guard engine / 停止守護引擎
-  status            Show engine status / 顯示引擎狀態
-  install           Install as system service / 安裝為系統服務
-  uninstall         Remove system service / 移除系統服務
-  config            Show current configuration / 顯示當前配置
-  generate-key      Generate a test license key / 產生測試授權金鑰
-  install-script    Generate install script / 產生安裝腳本
-  help              Show this help / 顯示此說明
+  const commands = [
+    { cmd: 'start', desc: 'Start the guard engine' },
+    { cmd: 'stop', desc: 'Stop the guard engine' },
+    { cmd: 'status', desc: 'Show engine status' },
+    { cmd: 'install', desc: 'Install as system service' },
+    { cmd: 'uninstall', desc: 'Remove system service' },
+    { cmd: 'config', desc: 'Show current configuration' },
+    { cmd: 'generate-key', desc: 'Generate a test license key' },
+    { cmd: 'install-script', desc: 'Generate install script' },
+    { cmd: 'help', desc: 'Show this help' },
+  ];
 
-Options:
-  --data-dir <path>    Data directory (default: ~/.panguard-guard) / 資料目錄
-  --license-key <key>  License key for install-script / 安裝腳本的授權金鑰
+  for (const { cmd, desc } of commands) {
+    console.log(`  ${c.sage(cmd.padEnd(18))} ${desc}`);
+  }
 
-Version: ${CLI_VERSION}
-`);
+  console.log('');
+  console.log(divider('Options'));
+  console.log('');
+  console.log(`  ${c.sage('--data-dir <path>'.padEnd(22))} Data directory ${c.dim('(default: ~/.panguard-guard)')}`);
+  console.log(`  ${c.sage('--license-key <key>'.padEnd(22))} License key for install-script`);
+  console.log('');
+  console.log(c.dim(`  Version: ${CLI_VERSION}`));
+  console.log('');
 }
 
-/**
- * Extract and validate option value from args / 從引數中提取並驗證選項值
- */
+/** Extract and validate option value from args */
 function extractOption(args: string[], option: string): string | undefined {
   const idx = args.indexOf(option);
   if (idx !== -1 && idx + 1 < args.length) {
     const value = args[idx + 1];
     if (value === undefined) return undefined;
-    // Reject values starting with - (likely another flag) / 拒絕以 - 開頭的值
     if (value.startsWith('-')) return undefined;
-    // Sanitize path traversal attempts / 清除路徑遍歷嘗試
     if (option === '--data-dir') {
       if (/\.\.[\\/]/.test(value) || /[;&|`$]/.test(value)) {
-        console.error(`Invalid ${option} value: contains unsafe characters / 不安全的字元`);
+        console.error(`  ${symbols.fail} Invalid ${option} value: unsafe characters`);
         return undefined;
       }
     }
