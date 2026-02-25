@@ -106,6 +106,8 @@ export { OpenAIProvider } from './openai-provider.js';
 // Re-export utilities
 // 重新匯出工具
 export { TokenTracker } from './token-tracker.js';
+export { FunnelRouter } from './funnel-router.js';
+export type { FunnelRouterConfig, FunnelLayerStatus } from './funnel-router.js';
 export { parseAnalysisResponse, parseClassificationResponse } from './response-parser.js';
 
 // Re-export prompts
