@@ -65,5 +65,9 @@ export { AI_VERSION } from './ai/index.js';
 export { ADAPTERS_VERSION, BaseAdapter, mapSeverity, mapEventSource, DefenderAdapter, WazuhAdapter, SyslogAdapter, parseSyslogMessage, AdapterRegistry } from './adapters/index.js';
 export type { AdapterConfig, AdapterAlert, SecurityAdapter, SyslogAlertCallback } from './adapters/index.js';
 
+// CLI utilities / CLI 工具
+export { c, colorSeverity, colorScore, colorGrade, Spinner, spinner, ProgressBar, progressBar, table, box, banner, header, symbols, divider, scoreDisplay, statusPanel, stripAnsi, formatDuration, timeAgo } from './cli/index.js';
+export type { ProgressBarOptions, TableColumn, BoxOptions, StatusItem } from './cli/index.js';
+
 /** Core package version / 核心套件版本 */
 export const CORE_VERSION = '0.1.0';
