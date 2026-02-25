@@ -1,0 +1,28 @@
+# OpenClaw Security Default Configuration
+# OpenClaw 安全平台預設配置
+
+app:
+  name: "OpenClaw Security"
+  version: "0.1.0"
+  language: "zh-TW"
+
+logging:
+  level: "info"
+  format: "json"
+  file: "./logs/openclaw.log"
+
+security:
+  scanInterval: 3600
+  autoResponse: false
+  maxLoginAttempts: 5
+
+ai:
+  provider: "ollama"
+  model: "llama3"
+  endpoint: "http://localhost:11434"
+  fallbackToRules: true
+
+rules:
+  sigmaPath: "./config/sigma-rules"
+  yaraPath: "./config/yara-rules"
+  autoReload: true

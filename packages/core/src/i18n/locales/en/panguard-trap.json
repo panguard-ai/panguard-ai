@@ -1,0 +1,66 @@
+{
+  "engine": {
+    "starting": "Starting PanguardTrap engine",
+    "started": "PanguardTrap engine started with {{count}} services",
+    "stopping": "Stopping PanguardTrap engine",
+    "stopped": "PanguardTrap engine stopped",
+    "error": "PanguardTrap engine error: {{message}}"
+  },
+  "service": {
+    "started": "{{type}} trap started on port {{port}}",
+    "stopped": "{{type}} trap stopped",
+    "error": "{{type}} trap error: {{message}}",
+    "session_new": "New {{type}} session from {{ip}}",
+    "session_end": "Session ended: {{id}} ({{duration}}ms, {{events}} events)"
+  },
+  "profiler": {
+    "updated": "Attacker profile updated: {{id}}",
+    "skill_levels": {
+      "script_kiddie": "Script Kiddie",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "apt": "APT (Advanced Persistent Threat)"
+    },
+    "intents": {
+      "reconnaissance": "Reconnaissance",
+      "credential_harvesting": "Credential Harvesting",
+      "ransomware_deployment": "Ransomware Deployment",
+      "cryptomining": "Cryptomining",
+      "data_theft": "Data Theft",
+      "botnet_recruitment": "Botnet Recruitment",
+      "lateral_movement": "Lateral Movement",
+      "unknown": "Unknown"
+    }
+  },
+  "intel": {
+    "built": "Trap intel built for {{ip}}",
+    "summary": "Intel summary: {{count}} reports from {{ips}} unique IPs",
+    "attack_types": {
+      "brute_force": "Brute Force Attack",
+      "exploit_attempt": "Exploit Attempt",
+      "cryptomining": "Cryptomining",
+      "webshell_upload": "Webshell Upload",
+      "data_destruction": "Data Destruction",
+      "malware_download": "Malware Download",
+      "reconnaissance": "Reconnaissance",
+      "web_attack": "Web Attack",
+      "unknown": "Unknown"
+    }
+  },
+  "cli": {
+    "help_title": "PanguardTrap - Smart Honeypot System",
+    "help_usage": "Usage: panguard-trap <command> [options]",
+    "starting": "Starting PanguardTrap...",
+    "stopping": "Stopping PanguardTrap...",
+    "not_running": "PanguardTrap is not running. Use panguard-trap start to begin.",
+    "no_profiles": "No attacker profiles yet. Start PanguardTrap first.",
+    "no_intel": "No intel reports yet. Start PanguardTrap first.",
+    "status_title": "PanguardTrap Status",
+    "total_sessions": "Total Sessions",
+    "active_sessions": "Active Sessions",
+    "unique_ips": "Unique Source IPs",
+    "cred_attempts": "Credential Attempts",
+    "commands_captured": "Commands Captured",
+    "uptime": "Uptime"
+  }
+}

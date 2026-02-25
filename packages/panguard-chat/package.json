@@ -1,0 +1,22 @@
+{
+  "name": "@openclaw/panguard-chat",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "AI security assistant via messaging platforms / 透過通訊軟體管理資安的 AI 助手",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "tsc --build --watch"
+  },
+  "dependencies": {
+    "@openclaw/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "~5.7.3"
+  }
+}
