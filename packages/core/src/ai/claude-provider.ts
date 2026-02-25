@@ -36,6 +36,7 @@ interface AnthropicClient {
       model: string;
       max_tokens: number;
       temperature?: number;
+      system?: string;
       messages: Array<{ role: 'user'; content: string }>;
     }): Promise<AnthropicMessage>;
   };
@@ -162,11 +163,17 @@ export class ClaudeProvider extends LLMProviderBase {
   protected async sendRequest(prompt: string): Promise<string> {
     const client = await this.getClient();
 
+    const systemMessage =
+      this.config.lang === 'zh-TW'
+        ? '你是一位專業的資安分析師，專精於威脅偵測、事件分析和安全報告撰寫。請以繁體中文回應。'
+        : 'You are a professional cybersecurity analyst specializing in threat detection, incident analysis, and security report writing.';
+
     try {
       const response = await client.messages.create({
         model: this.model,
         max_tokens: this.config.maxTokens,
         temperature: this.config.temperature,
+        system: systemMessage,
         messages: [{ role: 'user', content: prompt }],
       });
 

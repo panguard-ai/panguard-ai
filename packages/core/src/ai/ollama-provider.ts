@@ -101,14 +101,58 @@ export class OllamaProvider extends LLMProviderBase {
       const data = (await response.json()) as OllamaTagsResponse;
       const models = data.models?.map((m) => m.name) ?? [];
 
+      // Check if the configured model is pulled
+      // 檢查配置的模型是否已下載
+      const modelPulled = models.some(
+        (m) => m === this.model || m.startsWith(`${this.model}:`)
+      );
+
+      if (!modelPulled && models.length > 0) {
+        this.logger.warn('Configured model not found in Ollama', {
+          requestedModel: this.model,
+          availableModels: models,
+          hint: `Run: ollama pull ${this.model}`,
+        });
+      }
+
       this.logger.debug('Ollama available', {
         availableModels: models.length,
+        modelPulled,
       });
       return true;
     } catch (error) {
       this.logger.debug('Ollama not available', {
         error: error instanceof Error ? error.message : String(error),
       });
+      return false;
+    }
+  }
+
+  /**
+   * Check if the configured model has been pulled in Ollama
+   * 檢查配置的模型是否已在 Ollama 中下載
+   *
+   * @returns True if model is available locally / 模型在本地可用時回傳 true
+   */
+  async isModelPulled(): Promise<boolean> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5_000);
+
+      const response = await fetch(`${this.endpoint}/api/tags`, {
+        method: 'GET',
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) return false;
+
+      const data = (await response.json()) as OllamaTagsResponse;
+      const models = data.models?.map((m) => m.name) ?? [];
+      return models.some(
+        (m) => m === this.model || m.startsWith(`${this.model}:`)
+      );
+    } catch {
       return false;
     }
   }
