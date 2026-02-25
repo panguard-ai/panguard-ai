@@ -1,0 +1,21 @@
+node_modules
+dist
+.git
+.github
+*.md
+!README.md
+brand-assets
+panguard design
+figma-plugin-*
+openclaw-fork
+packages/web
+packages/panguard-web
+tests
+docs
+skills
+progress.md
+.editorconfig
+.prettierrc
+.prettierignore
+eslint.config.js
+vitest.config.ts
