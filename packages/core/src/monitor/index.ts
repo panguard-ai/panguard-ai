@@ -336,6 +336,9 @@ export { FileMonitor } from './file-monitor.js';
 export { checkThreatIntel, isPrivateIP, addThreatIntelEntry, getThreatIntelEntries } from './threat-intel.js';
 export { normalizeLogEvent, normalizeNetworkEvent, normalizeProcessEvent, normalizeFileEvent } from './event-normalizer.js';
 
+// Re-export threat intel feeds / 重新匯出威脅情報饋送
+export { ThreatIntelFeedManager, type IoC, type FeedSource, type FeedUpdateResult, type FeedManagerConfig } from './threat-intel-feeds.js';
+
 // Re-export types / 重新匯出型別
 export type { MonitorConfig, MonitorStatus, ThreatIntelEntry, FileHashRecord } from './types.js';
 export { DEFAULT_MONITOR_CONFIG } from './types.js';
