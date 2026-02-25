@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-green.svg)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-%3E%3D9-orange.svg)](https://pnpm.io/)
-[![Tests](https://img.shields.io/badge/tests-848%20passed-brightgreen.svg)](#test-coverage)
+[![Tests](https://img.shields.io/badge/tests-1013%20passed-brightgreen.svg)](#test-coverage)
 
 ---
 
@@ -36,6 +36,7 @@ Panguard AI is an open-source cybersecurity platform that brings enterprise-grad
 | **Panguard Chat** | AI security co-pilot (LINE / Telegram / Slack / Email) | P0 |
 | **Panguard Trap** | Smart honeypot system (8 service types) | P1 |
 | **Panguard Report** | AI compliance report generator (TW Cyber Security Act / ISO 27001 / SOC 2) | P1 |
+| **Threat Cloud** | Collective threat intelligence API server | P1 |
 
 ---
 
@@ -54,7 +55,7 @@ git clone https://github.com/openclaw-security/openclaw-security.git
 cd openclaw-security
 pnpm install
 pnpm build
-pnpm test        # 848 tests
+pnpm test        # 1013 tests
 pnpm dev         # start all dev servers
 ```
 
@@ -119,7 +120,7 @@ This monorepo contains 9 packages:
 ```bash
 pnpm install          # Install all dependencies
 pnpm build            # Build all 9 packages
-pnpm test             # Run all 848 tests
+pnpm test             # Run all 1013 tests
 pnpm typecheck        # TypeScript type checking
 pnpm lint             # ESLint + security plugin
 pnpm format:check     # Prettier format check
@@ -178,9 +179,9 @@ openclaw-security/
 
 | Scope | Tests | Files |
 |-------|-------|-------|
-| Unit tests | 686 | 41 |
+| Unit tests | 851 | 52 |
 | Integration tests | 162 | 6 |
-| **Total** | **848** | **47** |
+| **Total** | **1013** | **58** |
 
 All tests pass with zero failures. Run `pnpm test` to verify.
 
@@ -199,6 +200,19 @@ All tests pass with zero failures. Run `pnpm test` to verify.
 3. Make your changes with tests
 4. Ensure all checks pass (`pnpm build && pnpm test && pnpm typecheck && pnpm lint`)
 5. Submit a Pull Request
+
+---
+
+## Documentation
+
+Full documentation is available in the [`docs/`](docs/) directory:
+
+- [Getting Started](docs/getting-started.md) - Install to first scan in 5 minutes
+- [Product Overview](docs/overview.md) - What Panguard AI does and how it works
+- **Concepts**: [Three-Layer AI](docs/concepts/three-layer-ai.md) | [Learning Mode](docs/concepts/learning-mode.md) | [Security Score](docs/concepts/security-score.md) | [Threat Intelligence](docs/concepts/threat-intelligence.md)
+- **Guides**: [Scan](docs/guides/scan.md) | [Guard](docs/guides/guard.md) | [Chat](docs/guides/chat.md) | [Trap](docs/guides/trap.md) | [Report](docs/guides/report.md) | [Threat Cloud](docs/guides/threat-cloud.md) | [System Service](docs/guides/system-service.md)
+- **Reference**: [CLI](docs/reference/cli.md) | [Configuration](docs/reference/configuration.md) | [Sigma Rules](docs/reference/sigma-rules.md) | [YARA Rules](docs/reference/yara-rules.md) | [API](docs/reference/api.md)
+- [Troubleshooting](docs/troubleshooting.md) | [Changelog](docs/changelog.md)
 
 ---
 
