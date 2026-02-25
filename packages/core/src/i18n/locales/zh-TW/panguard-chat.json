@@ -1,0 +1,69 @@
+{
+  "agent": {
+    "initialized": "ChatAgent 已初始化",
+    "alertSent": "告警已發送給用戶",
+    "summarySent": "摘要報告已發送",
+    "learningUpdateSent": "學習進度更新已發送",
+    "peacefulReportSent": "平安報告已發送",
+    "confirmationRequested": "已向用戶請求確認",
+    "confirmationReceived": "已收到用戶確認",
+    "confirmationExpired": "確認已過期",
+    "followUpAnswered": "已回答追問",
+    "noContext": "沒有可用於追問的最近上下文",
+    "channelNotFound": "找不到 {{channel}} 類型的通訊管道"
+  },
+  "channel": {
+    "lineInit": "LINE 管道已初始化",
+    "telegramInit": "Telegram 管道已初始化",
+    "slackInit": "Slack 管道已初始化",
+    "emailInit": "Email 管道已初始化",
+    "webhookInit": "Webhook 管道已初始化",
+    "sendSuccess": "訊息已透過 {{channel}} 發送",
+    "sendFailed": "透過 {{channel}} 發送失敗: {{error}}",
+    "replyReceived": "收到用戶回覆",
+    "fileUploaded": "檔案已透過 {{channel}} 發送: {{filename}}"
+  },
+  "format": {
+    "critical": "嚴重",
+    "warning": "注意",
+    "info": "資訊",
+    "alertPrefix": "安全告警",
+    "summaryTitle": "安全摘要",
+    "learningTitle": "學習進度",
+    "peacefulTitle": "平安",
+    "confirmTitle": "需要您的確認",
+    "conclusion": "結論: {{conclusion}}",
+    "confidence": "信心度: {{score}}%",
+    "recommendation": "建議: {{action}}",
+    "actionsTaken": "已執行動作: {{actions}}",
+    "trend": "趨勢: 較上期{{direction}} {{percent}}%"
+  },
+  "onboarding": {
+    "welcome": "Panguard AI 設定完成!",
+    "chooseChannel": "選擇通知管道",
+    "chooseRole": "你的角色是？",
+    "chooseLanguage": "通知語言",
+    "setupComplete": "設定完成。你的 AI 保鑣已經開始工作了。",
+    "testSent": "測試通知已發送",
+    "learningPeriod": "系統目前處於學習期（7天），學習你的環境正常行為。"
+  },
+  "template": {
+    "sshBruteForce": "有人正在嘗試猜你的密碼登入。已嘗試 {{count}} 次，全部失敗。",
+    "ransomware": "發現一個勒索病毒。已在它加密檔案之前攔截並隔離。",
+    "sqlInjection": "有人試圖透過你的網站竊取資料庫中的資料。已成功阻擋。",
+    "suspiciousOutbound": "你的伺服器正在嘗試連線到一個可疑地址。已阻止此連線。",
+    "encodedCommand": "有個程式試圖在背景執行一段加密的指令。已阻止執行。",
+    "privilegeEscalation": "一個程式試圖取得系統最高權限。已阻止。",
+    "dataExfiltration": "偵測到大量資料正在被傳送到外部。已暫停傳輸。"
+  },
+  "cli": {
+    "description": "PanguardChat - AI 資安通訊助手",
+    "setupDesc": "互動式通知設定",
+    "testDesc": "發送測試通知",
+    "statusDesc": "顯示管道狀態",
+    "configDesc": "顯示當前配置",
+    "channelOption": "管道類型 (line, telegram, slack, email, webhook)",
+    "userTypeOption": "用戶類型 (developer, boss, it_admin)",
+    "langOption": "語言 (en, zh-TW)"
+  }
+}

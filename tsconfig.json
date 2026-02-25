@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022"],
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "incremental": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@openclaw/core": ["./packages/core/src"],
+      "@openclaw/core/*": ["./packages/core/src/*"],
+      "@openclaw/panguard-scan": ["./packages/panguard-scan/src"],
+      "@openclaw/panguard-guard": ["./packages/panguard-guard/src"],
+      "@openclaw/panguard-chat": ["./packages/panguard-chat/src"],
+      "@openclaw/panguard-trap": ["./packages/panguard-trap/src"],
+      "@openclaw/panguard-report": ["./packages/panguard-report/src"],
+      "@openclaw/panguard-web": ["./packages/panguard-web/src"]
+    }
+  },
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/panguard-scan" },
+    { "path": "./packages/panguard-guard" },
+    { "path": "./packages/panguard-chat" },
+    { "path": "./packages/panguard-trap" },
+    { "path": "./packages/panguard-report" },
+    { "path": "./packages/panguard-web" },
+    { "path": "./openclaw-fork" }
+  ],
+  "include": [],
+  "exclude": ["node_modules", "dist"]
+}

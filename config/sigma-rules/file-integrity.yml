@@ -1,0 +1,55 @@
+title: Critical File Integrity Modification
+id: openclaw-005
+status: stable
+description: Detects modification of critical system files including /etc/passwd, /etc/shadow, authorized_keys, crontab, and hosts file
+author: OpenClaw Security
+date: 2026/02/25
+logsource:
+  category: file_modification
+  product: linux
+detection:
+  selection_passwd:
+    category: 'file_modification'
+    metadata_target_file|contains:
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '/etc/gshadow'
+      - '/etc/group'
+  selection_ssh_keys:
+    category: 'file_modification'
+    metadata_target_file|contains:
+      - 'authorized_keys'
+      - 'authorized_keys2'
+      - '.ssh/id_rsa'
+      - '.ssh/id_ed25519'
+      - '.ssh/config'
+  selection_crontab:
+    category: 'file_modification'
+    metadata_target_file|contains:
+      - '/etc/crontab'
+      - '/var/spool/cron'
+      - '/etc/cron.d/'
+      - '/etc/cron.daily/'
+      - '/etc/cron.hourly/'
+      - '/etc/cron.weekly/'
+      - '/etc/cron.monthly/'
+  selection_hosts:
+    category: 'file_modification'
+    metadata_target_file|contains:
+      - '/etc/hosts'
+      - '/etc/resolv.conf'
+      - 'system32\\drivers\\etc\\hosts'
+  condition: selection_passwd OR selection_ssh_keys OR selection_crontab OR selection_hosts
+level: critical
+tags:
+  - attack.persistence
+  - attack.t1098
+  - attack.t1053
+  - attack.defense_evasion
+falsepositives:
+  - Legitimate user management by system administrators
+  - Automated configuration management tools (Ansible, Puppet, Chef)
+  - SSH key rotation procedures
+references:
+  - https://attack.mitre.org/techniques/T1098/
+  - https://attack.mitre.org/techniques/T1053/

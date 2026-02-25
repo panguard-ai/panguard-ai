@@ -1,0 +1,49 @@
+{
+  "name": "openclaw-security",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AI-driven adaptive cybersecurity platform / AI \u9a45\u52d5\u7684\u81ea\u9069\u61c9\u8cc7\u5b89\u9632\u8b77\u5e73\u53f0",
+  "author": "OpenClaw Security Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --stream build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md,yaml}\"",
+    "typecheck": "pnpm -r --stream typecheck",
+    "clean": "pnpm -r --stream clean",
+    "dev": "pnpm -r --parallel --stream dev",
+    "ci:lint": "pnpm run lint && pnpm run format:check",
+    "ci:test": "pnpm run typecheck && pnpm run test",
+    "ci:build": "pnpm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^22.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
+    "@typescript-eslint/parser": "^8.24.0",
+    "@vitest/coverage-v8": "^3.0.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-security": "^3.0.1",
+    "prettier": "^3.5.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.7.3",
+    "typescript-eslint": "^8.24.0",
+    "vitest": "^3.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

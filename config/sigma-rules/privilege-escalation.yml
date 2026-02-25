@@ -1,0 +1,63 @@
+title: Privilege Escalation Attempt
+id: openclaw-004
+status: stable
+description: Detects sudo usage, su to root, new admin user creation, UAC bypass attempts, and suid bit changes
+author: OpenClaw Security
+date: 2026/02/25
+logsource:
+  category: process_creation
+  product: any
+detection:
+  selection_sudo:
+    category: 'process_creation'
+    metadata_command_line|contains:
+      - 'sudo '
+      - 'sudo\t'
+    description|contains:
+      - 'sudo'
+      - 'privilege'
+  selection_su_root:
+    category: 'process_creation'
+    metadata_command_line|contains:
+      - 'su root'
+      - 'su - root'
+      - 'su -l root'
+  selection_admin_create:
+    category: 'process_creation'
+    metadata_command_line|contains:
+      - 'useradd'
+      - 'usermod -aG sudo'
+      - 'usermod -aG wheel'
+      - 'usermod -aG admin'
+      - 'net localgroup administrators'
+      - 'Add-LocalGroupMember'
+  selection_uac_bypass:
+    category: 'process_creation'
+    metadata_command_line|contains:
+      - 'eventvwr.exe'
+      - 'fodhelper.exe'
+      - 'sdclt.exe'
+      - 'slui.exe'
+      - 'computerdefaults.exe'
+    metadata_parent_process|contains:
+      - 'cmd.exe'
+      - 'powershell.exe'
+  selection_suid:
+    category: 'process_creation'
+    metadata_command_line|contains:
+      - 'chmod +s '
+      - 'chmod u+s '
+      - 'chmod 4755 '
+      - 'chmod 2755 '
+  condition: selection_sudo OR selection_su_root OR selection_admin_create OR selection_uac_bypass OR selection_suid
+level: critical
+tags:
+  - attack.privilege_escalation
+  - attack.t1548
+  - attack.t1078
+falsepositives:
+  - Legitimate system administration tasks
+  - Automated deployment scripts with sudo
+references:
+  - https://attack.mitre.org/techniques/T1548/
+  - https://attack.mitre.org/techniques/T1078/

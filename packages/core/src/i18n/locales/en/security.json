@@ -1,0 +1,32 @@
+{
+  "scan": {
+    "title": "Security Scan",
+    "start": "Start Scan",
+    "complete": "Scan Complete",
+    "inProgress": "Scan In Progress",
+    "failed": "Scan Failed"
+  },
+  "monitor": {
+    "title": "Real-time Monitoring",
+    "active": "Monitoring Active",
+    "stopped": "Monitoring Stopped",
+    "eventDetected": "Event Detected"
+  },
+  "threats": {
+    "detected": "Threat Detected",
+    "blocked": "Threat Blocked",
+    "severity": {
+      "info": "Info",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    }
+  },
+  "report": {
+    "title": "Security Report",
+    "generating": "Generating Report",
+    "complete": "Report Generated",
+    "riskScore": "Risk Score"
+  }
+}

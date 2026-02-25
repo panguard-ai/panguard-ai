@@ -1,0 +1,12 @@
+/**
+ * Messaging Channels Module
+ * 通訊管道模組
+ *
+ * @module @openclaw/panguard-chat/channels
+ */
+
+export { LineChannel } from './line.js';
+export { TelegramChannel } from './telegram.js';
+export { SlackChannel } from './slack.js';
+export { EmailChannel } from './email.js';
+export { WebhookChannel } from './webhook.js';
