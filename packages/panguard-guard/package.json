@@ -5,6 +5,9 @@
   "description": "AI real-time endpoint monitoring and auto-response / AI 即時端點監控與自動回應",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "panguard-guard": "./dist/cli/index.js"
+  },
   "scripts": {
     "build": "tsc --build",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
