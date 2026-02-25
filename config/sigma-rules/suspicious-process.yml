@@ -1,0 +1,57 @@
+title: Suspicious Process Execution
+id: openclaw-002
+status: stable
+description: Detects execution of suspicious processes commonly used in attacks, including PowerShell encoded commands, certutil downloads, mshta, and wscript/cscript with URLs
+author: OpenClaw Security
+date: 2026/02/25
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_powershell_encoded:
+    category: 'process_creation'
+    metadata_process_name: 'powershell.exe'
+    metadata_command_line|contains:
+      - '-EncodedCommand'
+      - '-enc '
+      - '-e '
+      - 'FromBase64String'
+      - '-encodedcommand'
+  selection_certutil:
+    category: 'process_creation'
+    metadata_process_name: 'certutil.exe'
+    metadata_command_line|contains:
+      - 'urlcache'
+      - '-decode'
+      - '/decode'
+      - 'download'
+  selection_mshta:
+    category: 'process_creation'
+    metadata_process_name: 'mshta.exe'
+    metadata_command_line|contains:
+      - 'http://'
+      - 'https://'
+      - 'javascript:'
+      - 'vbscript:'
+  selection_wscript:
+    category: 'process_creation'
+    metadata_process_name|contains:
+      - 'wscript'
+      - 'cscript'
+    metadata_command_line|contains:
+      - 'http://'
+      - 'https://'
+      - '\\\\*\\'
+  condition: selection_powershell_encoded OR selection_certutil OR selection_mshta OR selection_wscript
+level: high
+tags:
+  - attack.execution
+  - attack.t1059
+  - attack.defense_evasion
+  - attack.t1218
+falsepositives:
+  - Legitimate administrative scripts
+  - Software deployment tools
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+  - https://attack.mitre.org/techniques/T1218/

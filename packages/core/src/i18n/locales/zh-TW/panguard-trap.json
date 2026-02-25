@@ -1,0 +1,66 @@
+{
+  "engine": {
+    "starting": "啟動 PanguardTrap 引擎",
+    "started": "PanguardTrap 引擎已啟動，{{count}} 個服務",
+    "stopping": "停止 PanguardTrap 引擎",
+    "stopped": "PanguardTrap 引擎已停止",
+    "error": "PanguardTrap 引擎錯誤：{{message}}"
+  },
+  "service": {
+    "started": "{{type}} 蜜罐已啟動於埠 {{port}}",
+    "stopped": "{{type}} 蜜罐已停止",
+    "error": "{{type}} 蜜罐錯誤：{{message}}",
+    "session_new": "來自 {{ip}} 的新 {{type}} 連線",
+    "session_end": "連線結束：{{id}}（{{duration}}ms，{{events}} 個事件）"
+  },
+  "profiler": {
+    "updated": "攻擊者 profile 已更新：{{id}}",
+    "skill_levels": {
+      "script_kiddie": "腳本小子",
+      "intermediate": "中級",
+      "advanced": "高級",
+      "apt": "APT（進階持續性威脅）"
+    },
+    "intents": {
+      "reconnaissance": "偵察",
+      "credential_harvesting": "憑證收割",
+      "ransomware_deployment": "勒索軟體部署",
+      "cryptomining": "挖礦",
+      "data_theft": "資料竊取",
+      "botnet_recruitment": "殭屍網路招募",
+      "lateral_movement": "橫向移動",
+      "unknown": "不明"
+    }
+  },
+  "intel": {
+    "built": "已為 {{ip}} 建立蜜罐情報",
+    "summary": "情報摘要：{{count}} 份報告，來自 {{ips}} 個不重複 IP",
+    "attack_types": {
+      "brute_force": "暴力破解攻擊",
+      "exploit_attempt": "漏洞利用嘗試",
+      "cryptomining": "挖礦",
+      "webshell_upload": "Webshell 上傳",
+      "data_destruction": "資料破壞",
+      "malware_download": "惡意軟體下載",
+      "reconnaissance": "偵察",
+      "web_attack": "網路攻擊",
+      "unknown": "不明"
+    }
+  },
+  "cli": {
+    "help_title": "PanguardTrap — 智慧蜜罐系統",
+    "help_usage": "用法：panguard-trap <命令> [選項]",
+    "starting": "啟動 PanguardTrap...",
+    "stopping": "停止 PanguardTrap...",
+    "not_running": "PanguardTrap 未運行。使用 panguard-trap start 開始。",
+    "no_profiles": "尚無攻擊者 profiles。請先啟動 PanguardTrap。",
+    "no_intel": "尚無情報報告。請先啟動 PanguardTrap。",
+    "status_title": "PanguardTrap 狀態",
+    "total_sessions": "總連線數",
+    "active_sessions": "活動中連線",
+    "unique_ips": "不重複來源 IP",
+    "cred_attempts": "認證嘗試次數",
+    "commands_captured": "捕獲指令數",
+    "uptime": "運作時間"
+  }
+}

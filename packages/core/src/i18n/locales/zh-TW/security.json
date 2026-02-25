@@ -1,0 +1,32 @@
+{
+  "scan": {
+    "title": "安全掃描",
+    "start": "開始掃描",
+    "complete": "掃描完成",
+    "inProgress": "掃描進行中",
+    "failed": "掃描失敗"
+  },
+  "monitor": {
+    "title": "即時監控",
+    "active": "監控運行中",
+    "stopped": "監控已停止",
+    "eventDetected": "偵測到事件"
+  },
+  "threats": {
+    "detected": "偵測到威脅",
+    "blocked": "威脅已阻擋",
+    "severity": {
+      "info": "資訊",
+      "low": "低",
+      "medium": "中",
+      "high": "高",
+      "critical": "嚴重"
+    }
+  },
+  "report": {
+    "title": "安全報告",
+    "generating": "正在產生報告",
+    "complete": "報告產生完成",
+    "riskScore": "風險評分"
+  }
+}

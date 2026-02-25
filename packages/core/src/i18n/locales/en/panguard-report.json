@@ -1,0 +1,59 @@
+{
+  "report": {
+    "title": "Compliance Report",
+    "generating": "Generating compliance report...",
+    "generated": "Report generated successfully",
+    "id": "Report ID: {{id}}",
+    "period": "Report Period: {{start}} ~ {{end}}"
+  },
+  "framework": {
+    "tw_cyber_security_act": "Taiwan Cyber Security Management Act",
+    "iso27001": "ISO/IEC 27001:2022",
+    "soc2": "SOC 2 Trust Services Criteria",
+    "unsupported": "Unsupported framework: {{name}}"
+  },
+  "summary": {
+    "title": "Executive Summary",
+    "overallScore": "Overall Compliance Score: {{score}}%",
+    "controlsPassed": "{{count}} controls passed",
+    "controlsFailed": "{{count}} controls failed",
+    "controlsPartial": "{{count}} controls partially met",
+    "totalFindings": "{{count}} total findings",
+    "criticalFindings": "{{count}} critical findings",
+    "highFindings": "{{count}} high findings",
+    "keyRisks": "Key Risks",
+    "keyAchievements": "Key Achievements"
+  },
+  "control": {
+    "pass": "Pass",
+    "fail": "Fail",
+    "partial": "Partial",
+    "notApplicable": "Not Applicable",
+    "evidence": "Evidence",
+    "remediation": "Remediation"
+  },
+  "recommendation": {
+    "title": "Recommendations",
+    "immediate": "Immediate",
+    "high": "High Priority",
+    "medium": "Medium Priority",
+    "low": "Low Priority",
+    "effort": "Estimated Effort: {{effort}}"
+  },
+  "statistics": {
+    "title": "Compliance Statistics",
+    "byStatus": "By Status",
+    "byCategory": "By Category",
+    "bySeverity": "By Severity",
+    "compliancePercentage": "Compliance: {{percentage}}%"
+  },
+  "cli": {
+    "helpTitle": "PanguardReport - AI Compliance Report Generator",
+    "generate": "Generate a compliance report",
+    "listFrameworks": "List supported compliance frameworks",
+    "validate": "Validate findings input file",
+    "summary": "Show brief compliance summary",
+    "config": "Show current configuration",
+    "help": "Show help message"
+  }
+}

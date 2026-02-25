@@ -1,0 +1,50 @@
+{
+  "brand": {
+    "name": "Panguard AI",
+    "tagline": "AI 驅動的自適應端點防護平台",
+    "cta": "免費掃描你的系統"
+  },
+  "hero": {
+    "headline": "一行指令安裝，AI 全自動保護你的機器。",
+    "subheadline": "有事它會告訴你，沒事你什麼都不用做。",
+    "installHint": "複製貼上就能開始"
+  },
+  "nav": {
+    "home": "首頁",
+    "features": "功能",
+    "pricing": "定價",
+    "docs": "文件",
+    "guide": "立即開始",
+    "about": "關於"
+  },
+  "persona": {
+    "developer": "開發者",
+    "smallBusiness": "小型企業",
+    "midEnterprise": "中型企業",
+    "selectPrompt": "哪一個最符合你的狀況？"
+  },
+  "pricing": {
+    "title": "各種規模都有方案",
+    "free": "免費版",
+    "starter": "入門版",
+    "pro": "專業版",
+    "business": "企業版",
+    "perMonth": "/月",
+    "perEndpoint": "/月/端點",
+    "getStarted": "立即開始"
+  },
+  "guidance": {
+    "title": "找到你的資安方案",
+    "next": "下一步",
+    "back": "上一步",
+    "finish": "完成",
+    "step": "步驟 {{current}} / {{total}}",
+    "recommended": "為你推薦",
+    "installCommand": "安裝指令",
+    "setupTime": "預估設定時間：{{time}}"
+  },
+  "footer": {
+    "copyright": "Panguard AI - AI 驅動的自適應端點防護平台",
+    "builtBy": "由 OpenClaw Security 團隊打造"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "agent": {
+    "initialized": "ChatAgent initialized",
+    "alertSent": "Alert sent to user",
+    "summarySent": "Summary report sent",
+    "learningUpdateSent": "Learning progress update sent",
+    "peacefulReportSent": "Peaceful report sent",
+    "confirmationRequested": "Confirmation requested from user",
+    "confirmationReceived": "User confirmation received",
+    "confirmationExpired": "Confirmation expired",
+    "followUpAnswered": "Follow-up question answered",
+    "noContext": "No recent context available for follow-up",
+    "channelNotFound": "No messaging channel found for type: {{channel}}"
+  },
+  "channel": {
+    "lineInit": "LINE channel initialized",
+    "telegramInit": "Telegram channel initialized",
+    "slackInit": "Slack channel initialized",
+    "emailInit": "Email channel initialized",
+    "webhookInit": "Webhook channel initialized",
+    "sendSuccess": "Message sent via {{channel}}",
+    "sendFailed": "Failed to send via {{channel}}: {{error}}",
+    "replyReceived": "Reply received from user",
+    "fileUploaded": "File sent via {{channel}}: {{filename}}"
+  },
+  "format": {
+    "critical": "Critical",
+    "warning": "Warning",
+    "info": "Info",
+    "alertPrefix": "Security Alert",
+    "summaryTitle": "Security Summary",
+    "learningTitle": "Learning Progress",
+    "peacefulTitle": "All Clear",
+    "confirmTitle": "Your Confirmation Needed",
+    "conclusion": "Conclusion: {{conclusion}}",
+    "confidence": "Confidence: {{score}}%",
+    "recommendation": "Recommendation: {{action}}",
+    "actionsTaken": "Actions taken: {{actions}}",
+    "trend": "Trend: {{direction}} by {{percent}}% compared to previous period"
+  },
+  "onboarding": {
+    "welcome": "Panguard AI setup complete!",
+    "chooseChannel": "Choose Notification Channel",
+    "chooseRole": "What is your role?",
+    "chooseLanguage": "Notification Language",
+    "setupComplete": "Setup complete. Your AI bodyguard is now on duty.",
+    "testSent": "Test notification sent",
+    "learningPeriod": "The system is in learning mode (7 days), learning your normal environment behavior."
+  },
+  "template": {
+    "sshBruteForce": "Someone is trying to guess your login password. {{count}} attempts, all failed.",
+    "ransomware": "A ransomware variant was detected. Intercepted before encrypting files.",
+    "sqlInjection": "Someone attempted to steal data from your database. Successfully blocked.",
+    "suspiciousOutbound": "Your server is trying to connect to a suspicious address. Connection blocked.",
+    "encodedCommand": "A program tried to execute an encoded command. This is typically attacker behavior. Blocked.",
+    "privilegeEscalation": "A program tried to gain administrator privileges. Blocked.",
+    "dataExfiltration": "Large amounts of data were being transmitted externally. Transfer suspended."
+  },
+  "cli": {
+    "description": "PanguardChat - AI Security Communication Assistant",
+    "setupDesc": "Interactive notification setup",
+    "testDesc": "Send a test notification",
+    "statusDesc": "Show channel status",
+    "configDesc": "Show current configuration",
+    "channelOption": "Channel type (line, telegram, slack, email, webhook)",
+    "userTypeOption": "User type (developer, boss, it_admin)",
+    "langOption": "Language (en, zh-TW)"
+  }
+}

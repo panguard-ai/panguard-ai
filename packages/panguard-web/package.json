@@ -1,0 +1,22 @@
+{
+  "name": "@openclaw/panguard-web",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Panguard AI official website engine - scenario-based copy + online guidance / Panguard AI 官網引擎 - 場景化文案 + 線上引導",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "tsc --build --watch"
+  },
+  "dependencies": {
+    "@openclaw/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "~5.7.3"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Panguard AI Design Tokens",
+  "id": "panguard-design-tokens-generator",
+  "api": "1.0.0",
+  "main": "code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "editorType": ["figma"]
+}

@@ -1,0 +1,59 @@
+{
+  "report": {
+    "title": "合規報告",
+    "generating": "正在產生合規報告...",
+    "generated": "報告產生成功",
+    "id": "報告 ID: {{id}}",
+    "period": "報告期間: {{start}} ~ {{end}}"
+  },
+  "framework": {
+    "tw_cyber_security_act": "資通安全管理法",
+    "iso27001": "ISO/IEC 27001:2022",
+    "soc2": "SOC 2 信任服務準則",
+    "unsupported": "不支援的框架: {{name}}"
+  },
+  "summary": {
+    "title": "執行摘要",
+    "overallScore": "整體合規分數: {{score}}%",
+    "controlsPassed": "{{count}} 個控制項通過",
+    "controlsFailed": "{{count}} 個控制項未通過",
+    "controlsPartial": "{{count}} 個控制項部分符合",
+    "totalFindings": "{{count}} 個發現",
+    "criticalFindings": "{{count}} 個嚴重發現",
+    "highFindings": "{{count}} 個高風險發現",
+    "keyRisks": "主要風險",
+    "keyAchievements": "主要成果"
+  },
+  "control": {
+    "pass": "通過",
+    "fail": "未通過",
+    "partial": "部分符合",
+    "notApplicable": "不適用",
+    "evidence": "證據",
+    "remediation": "修復建議"
+  },
+  "recommendation": {
+    "title": "建議",
+    "immediate": "立即處理",
+    "high": "高優先級",
+    "medium": "中優先級",
+    "low": "低優先級",
+    "effort": "預估工作量: {{effort}}"
+  },
+  "statistics": {
+    "title": "合規統計",
+    "byStatus": "依狀態",
+    "byCategory": "依分類",
+    "bySeverity": "依嚴重度",
+    "compliancePercentage": "合規率: {{percentage}}%"
+  },
+  "cli": {
+    "helpTitle": "PanguardReport - AI 合規報告產生器",
+    "generate": "產生合規報告",
+    "listFrameworks": "列出支援的合規框架",
+    "validate": "驗證發現輸入檔案",
+    "summary": "顯示簡短合規摘要",
+    "config": "顯示目前配置",
+    "help": "顯示說明"
+  }
+}

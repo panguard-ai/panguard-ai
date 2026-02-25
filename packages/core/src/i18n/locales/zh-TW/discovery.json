@@ -1,0 +1,97 @@
+{
+  "title": "環境偵察",
+  "scanning": "正在掃描環境...",
+  "complete": "環境偵察完成",
+  "os": {
+    "title": "作業系統資訊",
+    "platform": "平台",
+    "arch": "架構",
+    "hostname": "主機名稱",
+    "uptime": "運行時間",
+    "kernel": "核心版本",
+    "version": "版本"
+  },
+  "network": {
+    "title": "網路資訊",
+    "interfaces": "網路介面",
+    "openPorts": "開放連接埠",
+    "activeConnections": "活動連線",
+    "dnsServers": "DNS 伺服器",
+    "gateway": "預設閘道",
+    "portCount": "共 {{count}} 個開放連接埠"
+  },
+  "services": {
+    "title": "服務偵測",
+    "running": "執行中",
+    "stopped": "已停止",
+    "found": "偵測到 {{count}} 個服務"
+  },
+  "security": {
+    "title": "安全工具偵測",
+    "toolFound": "偵測到 {{name}}",
+    "noTools": "未偵測到安全工具",
+    "firewall": "防火牆狀態",
+    "firewallEnabled": "防火牆已啟用",
+    "firewallDisabled": "防火牆未啟用",
+    "updates": "更新狀態",
+    "pendingUpdates": "有 {{count}} 個待更新項目"
+  },
+  "users": {
+    "title": "使用者稽核",
+    "found": "發現 {{count}} 個使用者帳號",
+    "admin": "管理員",
+    "standard": "標準使用者"
+  },
+  "risk": {
+    "title": "風險評估",
+    "score": "風險評分：{{score}}/100",
+    "level": {
+      "info": "資訊",
+      "low": "低風險",
+      "medium": "中風險",
+      "high": "高風險",
+      "critical": "嚴重風險"
+    },
+    "factors": {
+      "noFirewall": "防火牆未啟用",
+      "tooManyAdmins": "管理員帳號過多",
+      "dangerousPorts": "開放危險連接埠",
+      "noUpdates": "系統更新未啟用",
+      "noSecurityTools": "未安裝安全工具",
+      "defaultPasswords": "偵測到預設密碼",
+      "excessiveServices": "執行過多服務"
+    }
+  },
+  "rules": {
+    "title": "規則引擎",
+    "loaded": "已載入 {{count}} 條規則",
+    "matched": "事件比對到規則「{{title}}」",
+    "noMatch": "無比對結果",
+    "reloaded": "規則已重新載入"
+  },
+  "monitor": {
+    "title": "系統監控",
+    "started": "監控已啟動",
+    "stopped": "監控已停止",
+    "logMonitor": "日誌監控",
+    "networkMonitor": "網路監控",
+    "processMonitor": "程序監控",
+    "fileMonitor": "檔案完整性監控",
+    "threatDetected": "偵測到威脅情報比對"
+  },
+  "ai": {
+    "title": "AI 分析",
+    "analyzing": "AI 正在分析...",
+    "complete": "AI 分析完成",
+    "providerConnected": "已連線到 {{provider}}",
+    "providerUnavailable": "{{provider}} 無法連線",
+    "tokenUsage": "Token 使用量：{{count}}"
+  },
+  "adapters": {
+    "title": "安全工具對接",
+    "connected": "已連線到 {{name}}",
+    "disconnected": "{{name}} 連線中斷",
+    "alertsCollected": "收集到 {{count}} 筆告警",
+    "unavailable": "{{name}} 不可用"
+  }
+}

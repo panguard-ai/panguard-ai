@@ -1,0 +1,51 @@
+title: Anomalous Network Connection
+id: openclaw-003
+status: stable
+description: Detects connections to known malicious ports, TOR exit node patterns, and DNS over HTTPS to unusual providers
+author: OpenClaw Security
+date: 2026/02/25
+logsource:
+  category: network_connection
+  product: any
+detection:
+  selection_malicious_ports:
+    category: 'network_connection'
+    metadata_destination_port:
+      - '4444'
+      - '5555'
+      - '6666'
+      - '8888'
+      - '31337'
+  selection_tor:
+    category: 'network_connection'
+    metadata_destination_ip|contains:
+      - '.onion'
+      - '10.0.0.*'
+    metadata_destination_port:
+      - '9001'
+      - '9030'
+      - '9050'
+      - '9051'
+      - '9150'
+  selection_doh:
+    category: 'network_connection'
+    metadata_destination_host|contains:
+      - 'dns.google'
+      - 'cloudflare-dns.com'
+      - 'doh.opendns.com'
+      - 'dns.quad9.net'
+      - 'doh.cleanbrowsing.org'
+    metadata_destination_port: '443'
+  condition: selection_malicious_ports OR selection_tor OR selection_doh
+level: high
+tags:
+  - attack.command_and_control
+  - attack.t1071
+  - attack.t1573
+falsepositives:
+  - Legitimate VPN or proxy services
+  - Development or testing environments using non-standard ports
+  - Legitimate DNS over HTTPS usage
+references:
+  - https://attack.mitre.org/techniques/T1071/
+  - https://attack.mitre.org/techniques/T1573/

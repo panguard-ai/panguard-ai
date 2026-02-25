@@ -1,0 +1,19 @@
+{
+  "appName": "OpenClaw 安全平台",
+  "welcome": "歡迎使用 OpenClaw Security",
+  "version": "版本",
+  "language": "語言",
+  "settings": "設定",
+  "yes": "是",
+  "no": "否",
+  "ok": "確定",
+  "cancel": "取消",
+  "save": "儲存",
+  "loading": "載入中...",
+  "error": "錯誤",
+  "success": "成功",
+  "warning": "警告",
+  "info": "資訊",
+  "unknown": "未知",
+  "notAvailable": "不適用"
+}
