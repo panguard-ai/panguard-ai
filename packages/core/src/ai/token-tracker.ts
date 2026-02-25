@@ -38,7 +38,11 @@ const PRICING: Record<string, PricingTier> = {
   // Ollama：免費（本地推論）
   'ollama:default': { input: 0, output: 0 },
 
-  // Claude models
+  // Claude models (current generation)
+  'claude:claude-opus-4-6': { input: 15, output: 75 },
+  'claude:claude-sonnet-4-6': { input: 3, output: 15 },
+  'claude:claude-haiku-4-5-20251001': { input: 0.8, output: 4 },
+  // Claude models (previous generation)
   'claude:claude-sonnet-4-20250514': { input: 3, output: 15 },
   'claude:claude-3-5-sonnet-20241022': { input: 3, output: 15 },
   'claude:claude-3-haiku-20240307': { input: 0.25, output: 1.25 },
