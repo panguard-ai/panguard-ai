@@ -1,0 +1,50 @@
+{
+  "brand": {
+    "name": "Panguard AI",
+    "tagline": "AI-Driven Adaptive Endpoint Protection",
+    "cta": "Scan Your System Free"
+  },
+  "hero": {
+    "headline": "One command to install. AI protects your machines.",
+    "subheadline": "It tells you when something happens. You do nothing when all is well.",
+    "installHint": "Copy and paste to get started"
+  },
+  "nav": {
+    "home": "Home",
+    "features": "Features",
+    "pricing": "Pricing",
+    "docs": "Docs",
+    "guide": "Get Started",
+    "about": "About"
+  },
+  "persona": {
+    "developer": "Developer",
+    "smallBusiness": "Small Business",
+    "midEnterprise": "Mid-size Enterprise",
+    "selectPrompt": "Which best describes you?"
+  },
+  "pricing": {
+    "title": "Plans for Every Size",
+    "free": "Free",
+    "starter": "Starter",
+    "pro": "Pro",
+    "business": "Business",
+    "perMonth": "/month",
+    "perEndpoint": "/month per endpoint",
+    "getStarted": "Get Started"
+  },
+  "guidance": {
+    "title": "Find Your Security Solution",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish",
+    "step": "Step {{current}} of {{total}}",
+    "recommended": "Recommended for you",
+    "installCommand": "Installation Command",
+    "setupTime": "Estimated setup time: {{time}}"
+  },
+  "footer": {
+    "copyright": "Panguard AI - AI-Driven Adaptive Endpoint Protection",
+    "builtBy": "Built by the OpenClaw Security team"
+  }
+}

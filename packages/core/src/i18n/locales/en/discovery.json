@@ -1,0 +1,97 @@
+{
+  "title": "Environment Discovery",
+  "scanning": "Scanning environment...",
+  "complete": "Environment discovery complete",
+  "os": {
+    "title": "Operating System Info",
+    "platform": "Platform",
+    "arch": "Architecture",
+    "hostname": "Hostname",
+    "uptime": "Uptime",
+    "kernel": "Kernel Version",
+    "version": "Version"
+  },
+  "network": {
+    "title": "Network Info",
+    "interfaces": "Network Interfaces",
+    "openPorts": "Open Ports",
+    "activeConnections": "Active Connections",
+    "dnsServers": "DNS Servers",
+    "gateway": "Default Gateway",
+    "portCount": "{{count}} open port(s)"
+  },
+  "services": {
+    "title": "Service Detection",
+    "running": "Running",
+    "stopped": "Stopped",
+    "found": "{{count}} service(s) detected"
+  },
+  "security": {
+    "title": "Security Tool Detection",
+    "toolFound": "Detected {{name}}",
+    "noTools": "No security tools detected",
+    "firewall": "Firewall Status",
+    "firewallEnabled": "Firewall enabled",
+    "firewallDisabled": "Firewall not enabled",
+    "updates": "Update Status",
+    "pendingUpdates": "{{count}} pending update(s)"
+  },
+  "users": {
+    "title": "User Audit",
+    "found": "{{count}} user account(s) found",
+    "admin": "Administrator",
+    "standard": "Standard User"
+  },
+  "risk": {
+    "title": "Risk Assessment",
+    "score": "Risk Score: {{score}}/100",
+    "level": {
+      "info": "Info",
+      "low": "Low Risk",
+      "medium": "Medium Risk",
+      "high": "High Risk",
+      "critical": "Critical Risk"
+    },
+    "factors": {
+      "noFirewall": "Firewall not enabled",
+      "tooManyAdmins": "Too many admin accounts",
+      "dangerousPorts": "Dangerous ports open",
+      "noUpdates": "System updates not enabled",
+      "noSecurityTools": "No security tools installed",
+      "defaultPasswords": "Default passwords detected",
+      "excessiveServices": "Too many services running"
+    }
+  },
+  "rules": {
+    "title": "Rule Engine",
+    "loaded": "{{count}} rule(s) loaded",
+    "matched": "Event matched rule \"{{title}}\"",
+    "noMatch": "No match found",
+    "reloaded": "Rules reloaded"
+  },
+  "monitor": {
+    "title": "System Monitor",
+    "started": "Monitor started",
+    "stopped": "Monitor stopped",
+    "logMonitor": "Log Monitor",
+    "networkMonitor": "Network Monitor",
+    "processMonitor": "Process Monitor",
+    "fileMonitor": "File Integrity Monitor",
+    "threatDetected": "Threat intelligence match detected"
+  },
+  "ai": {
+    "title": "AI Analysis",
+    "analyzing": "AI analyzing...",
+    "complete": "AI analysis complete",
+    "providerConnected": "Connected to {{provider}}",
+    "providerUnavailable": "{{provider}} unavailable",
+    "tokenUsage": "Token usage: {{count}}"
+  },
+  "adapters": {
+    "title": "Security Tool Adapters",
+    "connected": "Connected to {{name}}",
+    "disconnected": "{{name}} disconnected",
+    "alertsCollected": "{{count}} alert(s) collected",
+    "unavailable": "{{name}} unavailable"
+  }
+}

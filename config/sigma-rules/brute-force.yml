@@ -1,0 +1,24 @@
+title: Brute Force Login Attempt
+id: openclaw-001
+status: stable
+description: Detects multiple failed login attempts indicating brute force attack
+author: OpenClaw Security
+date: 2026/02/25
+logsource:
+  category: authentication
+  product: any
+detection:
+  selection:
+    category: 'authentication'
+    description|contains:
+      - 'failed login'
+      - 'authentication failure'
+      - 'login failed'
+      - 'invalid password'
+  condition: selection
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1110
+falsepositives:
+  - Legitimate user forgot password
