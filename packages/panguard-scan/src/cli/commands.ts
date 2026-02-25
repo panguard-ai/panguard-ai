@@ -5,7 +5,11 @@
  * @module @openclaw/panguard-scan/cli/commands
  */
 
-import { initI18n, t, createLogger } from '@openclaw/core';
+import {
+  initI18n, t, createLogger,
+  c, colorSeverity, banner, spinner, table, box,
+  scoreDisplay, divider, formatDuration, symbols, statusPanel,
+} from '@openclaw/core';
 import { runScan } from '../scanners/index.js';
 import { generatePdfReport } from '../report/index.js';
 import type { ScanConfig } from '../scanners/types.js';
@@ -17,44 +21,109 @@ const logger = createLogger('panguard-scan:cli');
  * 執行安全掃描並產生報告
  */
 export async function executeScan(config: ScanConfig): Promise<void> {
-  // Initialize i18n
   await initI18n(config.lang);
 
-  // Print scan mode
-  if (config.depth === 'quick') {
-    console.log(t('panguard-scan:cli.quickMode'));
-  } else {
-    console.log(t('panguard-scan:cli.fullMode'));
-  }
+  // Banner
+  console.log(banner());
 
-  // Run scan
+  const mode = config.depth === 'quick'
+    ? t('panguard-scan:cli.quickMode')
+    : t('panguard-scan:cli.fullMode');
+  console.log(`  ${symbols.scan} ${mode}`);
+  console.log('');
+
+  // Scan with spinner
+  const sp = spinner(t('panguard-scan:cli.scanning', { defaultValue: 'Scanning system security...' }));
   const result = await runScan(config);
+  sp.succeed(t('panguard-scan:cli.complete') + ` ${c.dim(`(${formatDuration(result.scanDuration)})`)}`);
 
-  // Print results
-  console.log(t('panguard-scan:cli.complete'));
-  console.log(`${t('panguard-scan:report.riskScore')}: ${result.riskScore}/100 (${t(`panguard-scan:severity.${result.riskLevel}`)})`);
-  console.log(t('panguard-scan:cli.duration', { seconds: (result.scanDuration / 1000).toFixed(1) }));
+  // Security Score
+  const safetyScore = Math.max(0, 100 - result.riskScore);
+  const grade = safetyScore >= 90 ? 'A' : safetyScore >= 75 ? 'B' : safetyScore >= 60 ? 'C' : safetyScore >= 40 ? 'D' : 'F';
+  console.log(scoreDisplay(safetyScore, grade));
 
+  // Status panel (matching mockup "PANGUARD AI Security Status")
+  const riskLabel = t(`panguard-scan:severity.${result.riskLevel}`);
+  console.log(statusPanel('PANGUARD AI Security Status', [
+    {
+      label: 'Status',
+      value: result.riskScore <= 25 ? c.safe('PROTECTED') : result.riskScore <= 50 ? c.caution('AT RISK') : c.critical('VULNERABLE'),
+      status: result.riskScore <= 25 ? 'safe' : result.riskScore <= 50 ? 'caution' : 'critical',
+    },
+    {
+      label: 'Risk Score',
+      value: `${result.riskScore}/100 (${riskLabel})`,
+      status: result.riskScore <= 25 ? 'safe' : result.riskScore <= 50 ? 'caution' : 'critical',
+    },
+    {
+      label: 'Issues Found',
+      value: String(result.findings.length),
+      status: result.findings.length === 0 ? 'safe' : 'caution',
+    },
+    {
+      label: 'Scan Duration',
+      value: formatDuration(result.scanDuration),
+    },
+  ]));
+
+  // Findings table
   if (result.findings.length > 0) {
-    console.log(t('panguard-scan:cli.findingsCount', { count: result.findings.length }));
-    // Show top 3 findings
-    const top3 = result.findings.slice(0, 3);
-    for (const finding of top3) {
-      console.log(`  [${finding.severity.toUpperCase()}] ${finding.title}`);
+    console.log(divider(`${result.findings.length} Finding(s)`));
+    console.log('');
+
+    const columns = [
+      { header: '#', key: 'num', width: 4, align: 'right' as const },
+      { header: 'Severity', key: 'severity', width: 10 },
+      { header: 'Finding', key: 'title', width: 42 },
+      { header: 'Status', key: 'status', width: 8 },
+    ];
+
+    const coloredRows = result.findings.map((finding, i) => ({
+      num: String(i + 1),
+      severity: colorSeverity(finding.severity),
+      title: finding.title,
+      status: finding.fixed ? c.safe('Fixed') : c.critical('Open'),
+    }));
+
+    console.log(table(columns, coloredRows));
+    console.log('');
+
+    // Summary counts
+    const critCount = result.findings.filter(f => f.severity === 'critical').length;
+    const highCount = result.findings.filter(f => f.severity === 'high').length;
+    const medCount = result.findings.filter(f => f.severity === 'medium').length;
+    const lowCount = result.findings.filter(f => f.severity === 'low').length;
+
+    const parts: string[] = [];
+    if (critCount > 0) parts.push(c.critical(`${critCount} Critical`));
+    if (highCount > 0) parts.push(c.alert(`${highCount} High`));
+    if (medCount > 0) parts.push(c.caution(`${medCount} Medium`));
+    if (lowCount > 0) parts.push(c.sage(`${lowCount} Low`));
+
+    if (parts.length > 0) {
+      console.log(`  ${parts.join(c.dim(' | '))}`);
+      console.log('');
     }
   } else {
-    console.log(t('panguard-scan:cli.noFindings'));
+    console.log(box(
+      `${symbols.pass} ${t('panguard-scan:cli.noFindings', { defaultValue: 'No security issues found!' })}`,
+      { borderColor: c.safe, title: 'All Clear' }
+    ));
+    console.log('');
   }
 
-  // Generate PDF report
+  // PDF report
   if (config.output) {
-    console.log(t('panguard-scan:cli.generating'));
+    const reportSp = spinner(t('panguard-scan:cli.generating', { defaultValue: 'Generating PDF report...' }));
     try {
       await generatePdfReport(result, config.output, config.lang);
-      console.log(t('panguard-scan:cli.reportSaved', { path: config.output }));
+      reportSp.succeed(t('panguard-scan:cli.reportSaved', { path: config.output, defaultValue: `Report saved: ${config.output}` }));
     } catch (err) {
+      reportSp.fail(`Error generating report: ${err instanceof Error ? err.message : err}`);
       logger.error('Failed to generate PDF report', { error: err instanceof Error ? err.message : String(err) });
-      console.error(`Error generating report: ${err instanceof Error ? err.message : err}`);
     }
   }
+
+  console.log(c.dim(`  Scan completed at ${new Date().toLocaleString()}`));
+  console.log('');
 }
