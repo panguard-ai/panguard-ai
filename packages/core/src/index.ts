@@ -47,12 +47,16 @@ export type {
 } from './discovery/index.js';
 
 // Rules engine / 規則引擎
-export { RULES_VERSION, RuleEngine, parseSigmaYaml, parseSigmaFile, matchEvent, matchEventAgainstRules, loadRulesFromDirectory, watchRulesDirectory } from './rules/index.js';
-export type { SigmaLogSource, SigmaDetection, SigmaRule, RuleMatch, RuleEngineConfig } from './rules/index.js';
+export { RULES_VERSION, RuleEngine, parseSigmaYaml, parseSigmaFile, matchEvent, matchEventAgainstRules, loadRulesFromDirectory, watchRulesDirectory, YaraScanner } from './rules/index.js';
+export type { SigmaLogSource, SigmaDetection, SigmaRule, RuleMatch, RuleEngineConfig, YaraMatch, YaraScanResult } from './rules/index.js';
 
 // Monitor engine / 監控引擎
-export { MONITOR_VERSION, MonitorEngine, LogMonitor, NetworkMonitor, ProcessMonitor, FileMonitor, checkThreatIntel, isPrivateIP, addThreatIntelEntry, getThreatIntelEntries, normalizeLogEvent, normalizeNetworkEvent, normalizeProcessEvent, normalizeFileEvent, DEFAULT_MONITOR_CONFIG } from './monitor/index.js';
-export type { MonitorConfig, MonitorStatus, ThreatIntelEntry, FileHashRecord, ProcessListEntry } from './monitor/index.js';
+export { MONITOR_VERSION, MonitorEngine, LogMonitor, NetworkMonitor, ProcessMonitor, FileMonitor, checkThreatIntel, isPrivateIP, addThreatIntelEntry, getThreatIntelEntries, normalizeLogEvent, normalizeNetworkEvent, normalizeProcessEvent, normalizeFileEvent, DEFAULT_MONITOR_CONFIG, ThreatIntelFeedManager } from './monitor/index.js';
+export type { MonitorConfig, MonitorStatus, ThreatIntelEntry, FileHashRecord, ProcessListEntry, IoC, FeedSource, FeedUpdateResult, FeedManagerConfig } from './monitor/index.js';
+
+// Scoring / 安全分數
+export { calculateSecurityScore, scoreToGrade, scoreToColor, generateScoreSummary, AchievementTracker, ACHIEVEMENTS } from './scoring/index.js';
+export type { ScoreFactor, SecurityScoreSnapshot, ScoreInput, Achievement, AchievementStats, EarnedAchievement } from './scoring/index.js';
 
 // AI / LLM interface / AI/LLM 介面
 export { AI_VERSION } from './ai/index.js';
