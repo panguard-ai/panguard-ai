@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  panguard-guard:
+    build: .
+    container_name: panguard-guard
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    volumes:
+      - panguard-data:/data
+      - ./config:/app/config:ro
+    environment:
+      - PANGUARD_DATA_DIR=/data
+      - OLLAMA_ENDPOINT=http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - panguard-net
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3100/').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: panguard-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    networks:
+      - panguard-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  panguard-data:
+  ollama-models:
+
+networks:
+  panguard-net:
+    driver: bridge
