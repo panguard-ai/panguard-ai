@@ -13,3 +13,7 @@ logs/
 Thumbs.db
 *.db
 brand-assets/output/
+
+# Next.js
+.next/
+.vercel/

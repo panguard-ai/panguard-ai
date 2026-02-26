@@ -26,7 +26,10 @@
     "ci:test": "pnpm run typecheck && pnpm run test",
     "ci:build": "pnpm run build",
     "panguard": "node packages/panguard/dist/cli/index.js",
-    "cli": "node packages/panguard/dist/cli/index.js"
+    "cli": "node packages/panguard/dist/cli/index.js",
+    "website:dev": "pnpm --filter @openclaw/website dev",
+    "website:build": "pnpm --filter @openclaw/website build",
+    "website:start": "pnpm --filter @openclaw/website start"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",

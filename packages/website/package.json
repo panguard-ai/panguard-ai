@@ -1,0 +1,32 @@
+{
+  "name": "@openclaw/website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Panguard AI official website - Next.js 14 with bilingual support (EN/ZH)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "framer-motion": "^12.34.3",
+    "lucide-react": "^0.575.0",
+    "next": "14.2.35",
+    "next-intl": "^4.8.3",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "~5.7.3"
+  }
+}

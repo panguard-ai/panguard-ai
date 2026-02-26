@@ -7,9 +7,11 @@ dist
 brand-assets
 panguard design
 figma-plugin-*
-openclaw-fork
-packages/web
-packages/panguard-web
+packages/website
+.next
+.vercel
+*.tsbuildinfo
+coverage
 tests
 docs
 skills
@@ -19,3 +21,4 @@ progress.md
 .prettierignore
 eslint.config.js
 vitest.config.ts
+Dockerfile.bak
