@@ -6,7 +6,7 @@
  * @module @openclaw/panguard/cli/menu
  */
 
-import { c, symbols, stripAnsi } from '@openclaw/core';
+import { c, symbols, stripAnsi, visLen } from '@openclaw/core';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -28,33 +28,6 @@ const CORNER_BR = '\u256F'; // ╯
 
 function hLine(n: number): string {
   return LINE_H.repeat(n);
-}
-
-/**
- * Pad a string (accounting for ANSI + CJK width) to fill `width` visible columns.
- */
-function visLen(s: string): number {
-  const plain = stripAnsi(s);
-  let len = 0;
-  for (const ch of plain) {
-    const code = ch.codePointAt(0) ?? 0;
-    // CJK Unified Ideographs, CJK Symbols, Fullwidth Forms, etc.
-    if (
-      (code >= 0x2E80 && code <= 0x9FFF) ||
-      (code >= 0xF900 && code <= 0xFAFF) ||
-      (code >= 0xFE30 && code <= 0xFE4F) ||
-      (code >= 0xFF01 && code <= 0xFF60) ||
-      (code >= 0xFFE0 && code <= 0xFFE6) ||
-      (code >= 0x20000 && code <= 0x2FA1F) ||
-      (code >= 0x3000 && code <= 0x303F) ||
-      (code >= 0x3040 && code <= 0x30FF)
-    ) {
-      len += 2;
-    } else {
-      len += 1;
-    }
-  }
-  return len;
 }
 
 function padRight(s: string, width: number): string {

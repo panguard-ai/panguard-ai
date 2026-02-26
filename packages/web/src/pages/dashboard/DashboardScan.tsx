@@ -33,7 +33,9 @@ export default function DashboardScan() {
     setScanResult(null);
     setScanError(null);
 
-    const source = new EventSource('/api/scan/start');
+    const token = localStorage.getItem('panguard_token');
+    const scanUrl = token ? `/api/scan/start?token=${encodeURIComponent(token)}` : '/api/scan/start';
+    const source = new EventSource(scanUrl);
 
     source.onmessage = (event) => {
       try {

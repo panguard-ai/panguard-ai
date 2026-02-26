@@ -57,7 +57,7 @@ Guard 靜默觀察並記錄：
 ## 查看學習進度
 
 ```bash
-panguard-guard status
+panguard guard status
 ```
 
 輸出範例（學習期間）：
@@ -94,9 +94,9 @@ panguard-guard status
 如果你的系統環境有重大變更（換了伺服器、大量部署新服務），可以重置學習：
 
 ```bash
-panguard-guard stop
+panguard guard stop
 # 清除資料目錄中的基線檔案
-panguard-guard start
+panguard guard start
 ```
 
 Guard 會重新進入 7 天學習模式。

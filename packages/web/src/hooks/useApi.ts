@@ -20,8 +20,19 @@ export function useApi<T>(url: string): ApiState<T> {
     setLoading(true);
     setError(null);
 
-    fetch(url)
+    const headers: Record<string, string> = {};
+    const token = localStorage.getItem('panguard_token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    fetch(url, { headers })
       .then(res => {
+        if (res.status === 401) {
+          // Token expired or invalid - clear and redirect to login
+          localStorage.removeItem('panguard_token');
+          localStorage.removeItem('panguard_email');
+          window.location.href = '/login';
+          throw new Error('Session expired');
+        }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })

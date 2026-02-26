@@ -10,6 +10,24 @@
  */
 
 import type { ThreatIntelEntry } from './types.js';
+import type { ThreatIntelFeedManager } from './threat-intel-feeds.js';
+
+/** Optional live feed manager (set by GuardEngine at startup) */
+let feedManager: ThreatIntelFeedManager | null = null;
+
+/**
+ * Register a live feed manager for real-time threat intel lookups.
+ * When set, `checkThreatIntel()` queries the feed manager first,
+ * then falls back to the hardcoded list.
+ */
+export function setFeedManager(manager: ThreatIntelFeedManager | null): void {
+  feedManager = manager;
+}
+
+/** Get the currently registered feed manager (for tests/status). */
+export function getFeedManager(): ThreatIntelFeedManager | null {
+  return feedManager;
+}
 
 /**
  * Built-in known malicious IP ranges for MVP
@@ -132,6 +150,16 @@ function ipMatchesPattern(ip: string, pattern: string): boolean {
  * ```
  */
 export function checkThreatIntel(ip: string): ThreatIntelEntry | null {
+  // Check live feed manager first (if registered)
+  if (feedManager) {
+    const ioc = feedManager.checkIP(ip);
+    if (ioc) {
+      const entry = feedManager.toThreatIntelEntry(ioc);
+      if (entry) return entry;
+    }
+  }
+
+  // Fall back to hardcoded list
   for (const entry of threatIntelEntries) {
     if (ipMatchesPattern(ip, entry.ip)) {
       return entry;
