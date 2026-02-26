@@ -141,7 +141,16 @@ export class PanguardDashboardServer {
 
     // Security headers
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'",
+    );
+    if (process.env['NODE_ENV'] === 'production') {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
 
     // CORS whitelist
     const origin = req.headers.origin;
@@ -197,8 +206,14 @@ export class PanguardDashboardServer {
 
     try {
       switch (path) {
+        case '/api/health':
+          // Unauthenticated healthcheck — returns only { ok: true }
+          res.writeHead(200);
+          res.end(JSON.stringify({ ok: true }));
+          return;
+
         case '/api/status':
-          // No auth required — used for healthcheck
+          if (!this.requireAuth(req, res)) return;
           await handleStatus(req, res);
           return;
 
@@ -324,11 +339,10 @@ export class PanguardDashboardServer {
           res.end(JSON.stringify({ ok: false, error: 'Not found' }));
       }
     } catch (err) {
+      // SECURITY: Log error internally but never expose err.message to clients
+      console.error(`[API Error] ${path}:`, err);
       res.writeHead(500);
-      res.end(JSON.stringify({
-        ok: false,
-        error: err instanceof Error ? err.message : 'Internal server error',
-      }));
+      res.end(JSON.stringify({ ok: false, error: 'Internal server error' }));
     }
   }
 
