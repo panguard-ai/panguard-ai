@@ -1,0 +1,31 @@
+{
+  "name": "@openclaw/panguard",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Panguard AI - Unified security CLI and dashboard",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "panguard": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc --build --watch"
+  },
+  "dependencies": {
+    "@openclaw/core": "workspace:*",
+    "@openclaw/panguard-scan": "workspace:*",
+    "@openclaw/panguard-guard": "workspace:*",
+    "@openclaw/panguard-report": "workspace:*",
+    "@openclaw/panguard-chat": "workspace:*",
+    "@openclaw/panguard-trap": "workspace:*",
+    "@openclaw/threat-cloud": "workspace:*",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "~5.7.3"
+  }
+}

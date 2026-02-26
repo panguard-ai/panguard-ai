@@ -1,0 +1,83 @@
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
+
+const navItems = [
+  { path: '/dashboard', labelEn: 'Overview', labelZh: '總覽', icon: 'grid' },
+  { path: '/dashboard/scan', labelEn: 'Scan', labelZh: '掃描', icon: 'shield' },
+  { path: '/dashboard/report', labelEn: 'Reports', labelZh: '報告', icon: 'file' },
+  { path: '/dashboard/threat', labelEn: 'Threats', labelZh: '威脅', icon: 'alert' },
+];
+
+const iconMap: Record<string, string> = {
+  grid: 'M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z',
+  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  file: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8',
+  alert: 'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z M12 9v4 M12 17h.01',
+};
+
+export default function DashboardLayout() {
+  const { language, toggleLanguage, t } = useLanguage();
+  const location = useLocation();
+
+  return (
+    <div className="flex min-h-screen bg-brand-dark">
+      {/* Sidebar */}
+      <aside className="flex w-60 flex-col border-r border-brand-border bg-brand-card/50">
+        {/* Logo */}
+        <div className="border-b border-brand-border p-4">
+          <Link to="/" className="flex items-center gap-2 text-lg font-bold">
+            <span className="text-brand-cyan">&gt;_</span>
+            <span>Panguard AI</span>
+          </Link>
+          <div className="mt-1 text-xs text-brand-muted">
+            {t('Security Dashboard', '安全儀表板')}
+          </div>
+        </div>
+
+        {/* Nav items */}
+        <nav className="flex-1 p-3">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                  isActive
+                    ? 'bg-brand-cyan/10 text-brand-cyan'
+                    : 'text-brand-muted hover:bg-brand-card hover:text-brand-text'
+                }`}
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={iconMap[item.icon] ?? ''} />
+                </svg>
+                {language === 'en' ? item.labelEn : item.labelZh}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Bottom controls */}
+        <div className="border-t border-brand-border p-3">
+          <button
+            onClick={toggleLanguage}
+            className="w-full rounded-lg border border-brand-border px-3 py-2 text-xs text-brand-muted transition-colors hover:border-brand-cyan hover:text-brand-cyan"
+          >
+            {language === 'zh-TW' ? 'EN' : 'ZH'}
+          </button>
+          <Link
+            to="/"
+            className="mt-2 block text-center text-xs text-brand-muted hover:text-brand-cyan"
+          >
+            {t('Back to Website', '回到官網')}
+          </Link>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="flex-1 overflow-auto">
+        <Outlet />
+      </main>
+    </div>
+  );
+}

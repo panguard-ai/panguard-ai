@@ -32,6 +32,12 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link
+            to="/dashboard"
+            className="rounded-md border border-brand-cyan/30 bg-brand-cyan/10 px-3 py-1.5 text-xs text-brand-cyan transition-colors hover:bg-brand-cyan/20"
+          >
+            Dashboard
+          </Link>
           <button
             onClick={toggleLanguage}
             className="rounded-md border border-brand-border px-3 py-1.5 text-xs text-brand-muted transition-colors hover:border-brand-cyan hover:text-brand-cyan"
