@@ -21,6 +21,11 @@ export interface AuthCheckResult {
  * Check if the current CLI user is authenticated and has the required tier.
  */
 export function requireAuth(requiredTier: RequiredTier = 'free'): AuthCheckResult {
+  // Free tier requires no authentication — allow anonymous usage
+  if (requiredTier === 'free') {
+    return { authenticated: true, authorized: true, credentials: null };
+  }
+
   const creds = loadCredentials();
 
   if (!creds || isTokenExpired(creds)) {
