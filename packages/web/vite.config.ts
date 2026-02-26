@@ -9,4 +9,9 @@ export default defineConfig({
       '@openclaw/panguard-web': resolve(__dirname, '../panguard-web/src'),
     },
   },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
+  },
 });
