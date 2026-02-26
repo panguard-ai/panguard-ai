@@ -9,7 +9,7 @@
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { join, extname } from 'node:path';
+import { join, extname, resolve } from 'node:path';
 import { readFile, stat } from 'node:fs/promises';
 import { handleStatus } from './api/status.js';
 import { handleScanStart, handleScanLatest } from './api/scan.js';
@@ -17,7 +17,7 @@ import { handleReportFrameworks, handleReportGenerate } from './api/report.js';
 import { handleThreatStats } from './api/threat.js';
 import { handleGuardStatus } from './api/guard.js';
 import { handleTrapStatus } from './api/trap.js';
-import { AuthDB, createAuthHandlers } from '@openclaw/panguard-auth';
+import { AuthDB, createAuthHandlers, authenticateRequest } from '@openclaw/panguard-auth';
 
 /** MIME type mapping / MIME 類型映射 */
 const MIME_TYPES: Record<string, string> = {
@@ -44,20 +44,35 @@ const MIME_TYPES: Record<string, string> = {
  */
 export class PanguardDashboardServer {
   private server: ReturnType<typeof createServer> | null = null;
+  private sessionCleanupTimer: ReturnType<typeof setInterval> | null = null;
   private readonly port: number;
   private readonly webDistPath: string;
+  private readonly resolvedWebDistPath: string;
   private readonly authDB: AuthDB;
   private readonly authHandlers: ReturnType<typeof createAuthHandlers>;
+  private readonly allowedOrigins: Set<string>;
 
   constructor(port: number, webDistPath: string, dbPath?: string) {
     this.port = port;
     this.webDistPath = webDistPath;
+    this.resolvedWebDistPath = resolve(webDistPath);
     const authDbPath = dbPath ?? join(webDistPath, '..', 'panguard-auth.db');
     this.authDB = new AuthDB(authDbPath);
     const baseUrl = process.env['PANGUARD_BASE_URL'] ?? `http://localhost:${port}`;
     this.authHandlers = createAuthHandlers({
       db: this.authDB,
       baseUrl,
+      // SMTP (optional - only enabled if env vars are set)
+      smtp: process.env['SMTP_HOST'] ? {
+        host: process.env['SMTP_HOST'],
+        port: parseInt(process.env['SMTP_PORT'] ?? '587', 10),
+        secure: process.env['SMTP_SECURE'] === 'true',
+        from: process.env['SMTP_FROM'] ?? 'noreply@panguard.ai',
+        auth: {
+          user: process.env['SMTP_USER'] ?? '',
+          pass: process.env['SMTP_PASS'] ?? '',
+        },
+      } : undefined,
       // Google OAuth (optional - only enabled if env vars are set)
       google: process.env['GOOGLE_CLIENT_ID'] ? {
         clientId: process.env['GOOGLE_CLIENT_ID'],
@@ -71,29 +86,48 @@ export class PanguardDashboardServer {
         privateKey: (process.env['GOOGLE_SERVICE_ACCOUNT_KEY'] ?? '').replace(/\\n/g, '\n'),
       } : undefined,
     });
+
+    // CORS whitelist: env var or default to localhost only
+    const corsEnv = process.env['PANGUARD_CORS_ORIGINS'];
+    const origins = corsEnv
+      ? corsEnv.split(',').map(o => o.trim()).filter(Boolean)
+      : [`http://localhost:${port}`, `http://127.0.0.1:${port}`];
+    this.allowedOrigins = new Set(origins);
   }
 
   /** Start the server / 啟動伺服器 */
   async start(): Promise<void> {
-    return new Promise((resolve) => {
+    // Clean expired sessions on startup, then every hour
+    this.authDB.cleanExpiredSessions();
+    this.sessionCleanupTimer = setInterval(() => {
+      this.authDB.cleanExpiredSessions();
+    }, 60 * 60 * 1000);
+    if (this.sessionCleanupTimer.unref) this.sessionCleanupTimer.unref();
+
+    return new Promise((resolvePromise) => {
       this.server = createServer((req, res) => {
         void this.handleRequest(req, res);
       });
 
-      this.server.listen(this.port, '127.0.0.1', () => {
-        resolve();
+      const host = process.env['NODE_ENV'] === 'production' ? '0.0.0.0' : '127.0.0.1';
+      this.server.listen(this.port, host, () => {
+        resolvePromise();
       });
     });
   }
 
   /** Stop the server / 停止伺服器 */
   async stop(): Promise<void> {
+    if (this.sessionCleanupTimer) {
+      clearInterval(this.sessionCleanupTimer);
+      this.sessionCleanupTimer = null;
+    }
     this.authDB.close();
-    return new Promise((resolve) => {
+    return new Promise((resolvePromise) => {
       if (this.server) {
-        this.server.close(() => resolve());
+        this.server.close(() => resolvePromise());
       } else {
-        resolve();
+        resolvePromise();
       }
     });
   }
@@ -108,13 +142,17 @@ export class PanguardDashboardServer {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 
-    // CORS for development
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    // CORS whitelist
+    const origin = req.headers.origin;
+    if (origin && this.allowedOrigins.has(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.setHeader('Vary', 'Origin');
+    }
 
     if (req.method === 'OPTIONS') {
-      res.writeHead(204);
+      res.writeHead(origin && this.allowedOrigins.has(origin) ? 204 : 403);
       res.end();
       return;
     }
@@ -129,6 +167,29 @@ export class PanguardDashboardServer {
     await this.serveStatic(path, res);
   }
 
+  /** Check if request has valid session. Supports Bearer header or ?token= query param (for SSE). */
+  private requireAuth(req: IncomingMessage, res: ServerResponse): boolean {
+    // Try Authorization header first
+    let user = authenticateRequest(req, this.authDB);
+
+    // Fallback: check ?token= query param (needed for EventSource which can't set headers)
+    if (!user) {
+      const urlObj = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+      const queryToken = urlObj.searchParams.get('token');
+      if (queryToken) {
+        const fakeReq = { headers: { authorization: `Bearer ${queryToken}` } } as IncomingMessage;
+        user = authenticateRequest(fakeReq, this.authDB);
+      }
+    }
+
+    if (!user) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: 'Authentication required' }));
+      return false;
+    }
+    return true;
+  }
+
   /** Handle API routes / 處理 API 路由 */
   private async handleApi(path: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
     res.setHeader('Content-Type', 'application/json');
@@ -136,10 +197,12 @@ export class PanguardDashboardServer {
     try {
       switch (path) {
         case '/api/status':
+          // No auth required — used for healthcheck
           handleStatus(req, res);
           return;
 
         case '/api/scan/start':
+          if (!this.requireAuth(req, res)) return;
           if (req.method === 'GET' || req.method === 'POST') {
             await handleScanStart(req, res);
           } else {
@@ -148,14 +211,17 @@ export class PanguardDashboardServer {
           return;
 
         case '/api/scan/latest':
+          if (!this.requireAuth(req, res)) return;
           handleScanLatest(req, res);
           return;
 
         case '/api/report/frameworks':
+          if (!this.requireAuth(req, res)) return;
           handleReportFrameworks(req, res);
           return;
 
         case '/api/report/generate':
+          if (!this.requireAuth(req, res)) return;
           if (req.method === 'POST') {
             await handleReportGenerate(req, res);
           } else {
@@ -164,14 +230,17 @@ export class PanguardDashboardServer {
           return;
 
         case '/api/threat/stats':
+          if (!this.requireAuth(req, res)) return;
           handleThreatStats(req, res);
           return;
 
         case '/api/guard/status':
+          if (!this.requireAuth(req, res)) return;
           handleGuardStatus(req, res);
           return;
 
         case '/api/trap/status':
+          if (!this.requireAuth(req, res)) return;
           await handleTrapStatus(req, res);
           return;
 
@@ -208,6 +277,14 @@ export class PanguardDashboardServer {
           this.authHandlers.handleGoogleAuth(req, res);
           return;
 
+        case '/api/auth/cli':
+          this.authHandlers.handleCliAuth(req, res);
+          return;
+
+        case '/api/auth/cli/exchange':
+          await this.authHandlers.handleCliExchange(req, res);
+          return;
+
         default:
           // Handle /api/waitlist/verify/:token pattern
           if (path.startsWith('/api/waitlist/verify/')) {
@@ -215,12 +292,13 @@ export class PanguardDashboardServer {
             this.authHandlers.handleWaitlistVerify(req, res, token);
             return;
           }
-          // Handle /api/auth/google/callback?code=xxx pattern
+          // Handle /api/auth/google/callback?code=xxx&state=xxx pattern
           if (path === '/api/auth/google/callback') {
             const urlObj = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
             const code = urlObj.searchParams.get('code');
+            const state = urlObj.searchParams.get('state');
             if (code) {
-              await this.authHandlers.handleGoogleCallback(req, res, code);
+              await this.authHandlers.handleGoogleCallback(req, res, code, state);
             } else {
               res.writeHead(400);
               res.end(JSON.stringify({ ok: false, error: 'Missing code parameter' }));
@@ -241,6 +319,14 @@ export class PanguardDashboardServer {
 
   /** Serve static files with SPA fallback / 提供靜態檔案（含 SPA 回退） */
   private async serveStatic(pathname: string, res: ServerResponse): Promise<void> {
+    // Path traversal protection
+    const resolved = resolve(this.resolvedWebDistPath, '.' + pathname);
+    if (!resolved.startsWith(this.resolvedWebDistPath)) {
+      res.writeHead(403, { 'Content-Type': 'text/plain' });
+      res.end('Forbidden');
+      return;
+    }
+
     let filePath = join(this.webDistPath, pathname === '/' ? 'index.html' : pathname);
 
     try {

@@ -111,7 +111,7 @@ AbuseIPDB     依查詢即時取得
 ### Guard 狀態
 
 ```bash
-panguard-guard status
+panguard guard status
 ```
 
 會顯示最近的威脅情報匹配：

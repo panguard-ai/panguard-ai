@@ -267,6 +267,12 @@ export interface WebhookConfig {
 // Chat Agent 配置
 // ---------------------------------------------------------------------------
 
+/** LLM provider interface for chat follow-up (optional). */
+export interface ChatLLMProvider {
+  analyze(prompt: string, context?: string): Promise<{ summary: string }>;
+  isAvailable(): Promise<boolean>;
+}
+
 /** Full PanguardChat configuration.
  *  完整 PanguardChat 配置。 */
 export interface ChatConfig {
@@ -274,6 +280,7 @@ export interface ChatConfig {
   readonly channels: ChannelConfigs;
   readonly maxFollowUpTokens: number;
   readonly systemPromptOverride?: string;
+  readonly llmProvider?: ChatLLMProvider;
 }
 
 /** Per-channel configuration.

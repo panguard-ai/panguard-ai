@@ -14,6 +14,7 @@ import DashboardThreat from './pages/dashboard/DashboardThreat';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import WaitlistVerify from './pages/WaitlistVerify';
+import CliAuthSuccess from './pages/CliAuthSuccess';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/waitlist/verify/:token" element={<WaitlistVerify />} />
+        <Route path="/cli/auth-success" element={<CliAuthSuccess />} />
       </Route>
 
       {/* Dashboard */}

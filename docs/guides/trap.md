@@ -1,6 +1,8 @@
-# Panguard Trap / 蜜罐指南
+# Panguard Trap / 蜜罐指南 `[PRO]`
 
 > 部署假服務引誘攻擊者，收集情報，了解誰在攻擊你。
+>
+> 啟動和停止蜜罐服務需要 **Pro** 以上方案。狀態查詢、設定檢視和情報查看為 Free。
 
 ---
 
@@ -15,17 +17,20 @@ Panguard Trap 不只記錄連線，還會分析攻擊者的行為，判斷他的
 ## 快速開始
 
 ```bash
-# 啟動蜜罐（SSH + HTTP）
-panguard-trap start --services ssh,http
+# 登入（如果還沒有）
+panguard login
 
-# 查看狀態
-panguard-trap status
+# 啟動蜜罐（SSH + HTTP）（需要 Pro）
+panguard trap start --services ssh,http
 
-# 查看攻擊者側寫
-panguard-trap profiles
+# 查看狀態（Free）
+panguard trap status
 
-# 查看威脅情報
-panguard-trap intel
+# 查看攻擊者側寫（Free）
+panguard trap profiles
+
+# 查看威脅情報（Free）
+panguard trap intel
 ```
 
 ---
@@ -47,13 +52,13 @@ panguard-trap intel
 
 ```bash
 # 只啟動 SSH 和 HTTP 蜜罐
-panguard-trap start --services ssh,http
+panguard trap start --services ssh,http
 
 # 啟動所有蜜罐
-panguard-trap start --services ssh,http,ftp,smb,mysql,rdp,telnet,redis
+panguard trap start --services ssh,http,ftp,smb,mysql,rdp,telnet,redis
 
 # 自訂 port
-panguard-trap start --services ssh --port 22222
+panguard trap start --services ssh --port 22222
 ```
 
 ---
@@ -84,7 +89,7 @@ Trap 會分析攻擊者的行為模式來推測其意圖：
 ### 查看側寫報告
 
 ```bash
-panguard-trap profiles
+panguard trap profiles
 ```
 
 ```
@@ -158,10 +163,10 @@ Trap 收集的情報可匿名上傳到 Threat Cloud：
 
 ```bash
 # 啟用 Threat Cloud 上傳
-panguard-trap start --services ssh,http
+panguard trap start --services ssh,http
 
 # 停用 Threat Cloud 上傳
-panguard-trap start --services ssh,http --no-cloud
+panguard trap start --services ssh,http --no-cloud
 ```
 
 ---
@@ -177,24 +182,20 @@ panguard-trap start --services ssh,http --no-cloud
 ## CLI 選項
 
 ```
-panguard-trap <command> [options]
+panguard trap <command> [options]
 
 Commands:
-  start              啟動蜜罐服務
-  stop               停止蜜罐服務
-  status             顯示狀態和統計
-  deploy             部署特定蜜罐服務
-  profiles           顯示攻擊者側寫
-  intel              顯示威脅情報摘要
-  config             顯示目前設定
-  help               顯示說明
+  start              啟動蜜罐服務（Pro）
+  stop               停止蜜罐服務（Pro）
+  status             顯示狀態和統計（Free）
+  config             顯示目前設定（Free）
+  profiles           顯示攻擊者側寫（Free）
+  intel              顯示威脅情報摘要（Free）
 
 Options:
   --services <types>     服務類型（逗號分隔：ssh,http,ftp,...）
-  --port <number>        自訂 port
   --data-dir <path>      資料目錄
   --no-cloud             停用 Threat Cloud 上傳
-  --verbose, -v          詳細輸出
 ```
 
 完整 CLI 參考見 [CLI 指令參考](../reference/cli.md)。

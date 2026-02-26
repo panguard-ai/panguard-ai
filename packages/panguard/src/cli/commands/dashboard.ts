@@ -8,13 +8,14 @@ import { resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { c, spinner, statusPanel, symbols, banner } from '@openclaw/core';
 import { PanguardDashboardServer } from '../../server/index.js';
+import { withAuth } from '../auth-guard.js';
 
 export function dashboardCommand(): Command {
   return new Command('dashboard')
-    .description('Start the dashboard web UI / 啟動儀表板 Web 介面')
-    .option('--port <number>', 'Server port / 伺服器埠', '3000')
-    .option('--no-open', 'Do not auto-open browser / 不自動開啟瀏覽器')
-    .action(async (opts: { port: string; open: boolean }) => {
+    .description('Start the dashboard web UI / \u555F\u52D5\u5100\u8868\u677F Web \u4ECB\u9762')
+    .option('--port <number>', 'Server port / \u4F3A\u670D\u5668\u57E0', process.env['PORT'] ?? '3000')
+    .option('--no-open', 'Do not auto-open browser / \u4E0D\u81EA\u52D5\u958B\u555F\u700F\u89BD\u5668')
+    .action(withAuth('pro', async (opts: { port: string; open: boolean }) => {
       const port = parseInt(opts.port, 10);
 
       console.log(banner());
@@ -65,5 +66,5 @@ export function dashboardCommand(): Command {
 
       // Keep process alive
       await new Promise(() => {});
-    });
+    }));
 }

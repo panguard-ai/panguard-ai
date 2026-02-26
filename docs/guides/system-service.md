@@ -8,10 +8,10 @@
 
 ```bash
 # 安裝為系統服務
-panguard-guard install
+panguard guard install
 
 # 移除系統服務
-panguard-guard uninstall
+panguard guard uninstall
 ```
 
 ---
@@ -29,7 +29,7 @@ Guard 會建立 LaunchDaemon plist 檔案：
 安裝後行為：
 - 開機自動啟動
 - 異常退出自動重啟
-- 日誌寫入 `/var/log/panguard-guard.log`
+- 日誌寫入 `/var/log/panguard guard.log`
 
 管理指令：
 
@@ -49,7 +49,7 @@ sudo launchctl unload /Library/LaunchDaemons/ai.panguard.guard.plist
 Guard 會建立 systemd service 單元檔案：
 
 ```
-/etc/systemd/system/panguard-guard.service
+/etc/systemd/system/panguard guard.service
 ```
 
 安裝後行為：
@@ -61,14 +61,14 @@ Guard 會建立 systemd service 單元檔案：
 
 ```bash
 # 查看服務狀態
-systemctl status panguard-guard
+systemctl status panguard guard
 
 # 手動啟動/停止
-sudo systemctl start panguard-guard
-sudo systemctl stop panguard-guard
+sudo systemctl start panguard guard
+sudo systemctl stop panguard guard
 
 # 查看日誌
-journalctl -u panguard-guard -f
+journalctl -u panguard guard -f
 ```
 
 ### Windows — sc.exe
@@ -104,17 +104,17 @@ sc.exe stop PanguardGuard
 
 ```bash
 # 產生安裝腳本
-panguard-guard install-script --license-key your-key
+panguard guard install-script
 
 # 輸出的腳本可直接在目標機器執行
+# 目標機器需要各自執行 panguard login 完成認證
 ```
 
 安裝腳本會自動：
 1. 下載 Panguard AI
 2. 安裝依賴
-3. 設定授權金鑰
-4. 安裝為系統服務
-5. 啟動 Guard
+3. 安裝為系統服務
+4. 啟動 Guard（使用者需先完成 `panguard login`）
 
 ---
 
@@ -134,7 +134,7 @@ Guard 的系統服務包含 Watchdog 機制：
 Guard 使用 PID 檔案管理程序狀態：
 
 ```
-~/.panguard-guard/guard.pid
+~/.panguard guard/guard.pid
 ```
 
 - 啟動時寫入 PID
@@ -150,14 +150,14 @@ Guard 使用 PID 檔案管理程序狀態：
 
 | 平台 | 預設路徑 |
 |------|---------|
-| macOS | `~/.panguard-guard/` |
-| Linux | `~/.panguard-guard/` |
-| Windows | `%APPDATA%\panguard-guard\` |
+| macOS | `~/.panguard guard/` |
+| Linux | `~/.panguard guard/` |
+| Windows | `%APPDATA%\panguard guard\` |
 
 可透過 `--data-dir` 自訂：
 
 ```bash
-panguard-guard start --data-dir /opt/panguard/data
+panguard guard start --data-dir /opt/panguard/data
 ```
 
 資料目錄包含：

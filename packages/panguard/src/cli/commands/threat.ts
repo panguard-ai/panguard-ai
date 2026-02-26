@@ -7,17 +7,18 @@ import { Command } from 'commander';
 import { ThreatCloudServer } from '@openclaw/threat-cloud';
 import type { ServerConfig } from '@openclaw/threat-cloud';
 import { c, spinner, statusPanel, symbols } from '@openclaw/core';
+import { withAuth } from '../auth-guard.js';
 
 export function threatCommand(): Command {
   const cmd = new Command('threat')
-    .description('Threat intelligence API management / 威脅情報 API 管理');
+    .description('Threat intelligence API management / \u5A01\u8105\u60C5\u5831 API \u7BA1\u7406');
 
   cmd.command('start')
-    .description('Start the Threat Cloud API server / 啟動威脅雲 API 伺服器')
-    .option('--port <number>', 'Listen port / 監聽埠', '8080')
-    .option('--host <string>', 'Listen host / 監聽主機', '127.0.0.1')
-    .option('--db <path>', 'SQLite database path / 資料庫路徑', './threat-cloud.db')
-    .action(async (opts: { port: string; host: string; db: string }) => {
+    .description('Start the Threat Cloud API server / \u555F\u52D5\u5A01\u8105\u96F2 API \u4F3A\u670D\u5668')
+    .option('--port <number>', 'Listen port / \u76E3\u807D\u57E0', '8080')
+    .option('--host <string>', 'Listen host / \u76E3\u807D\u4E3B\u6A5F', '127.0.0.1')
+    .option('--db <path>', 'SQLite database path / \u8CC7\u6599\u5EAB\u8DEF\u5F91', './threat-cloud.db')
+    .action(withAuth('enterprise', async (opts: { port: string; host: string; db: string }) => {
       const config: ServerConfig = {
         port: parseInt(opts.port, 10),
         host: opts.host,
@@ -54,7 +55,7 @@ export function threatCommand(): Command {
 
       // Keep process alive
       await new Promise(() => {});
-    });
+    }));
 
   return cmd;
 }

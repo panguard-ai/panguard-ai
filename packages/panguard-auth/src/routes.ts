@@ -6,32 +6,61 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { AuthDB } from './database.js';
-import { hashPassword, verifyPassword, generateSessionToken, generateVerifyToken, sessionExpiry } from './auth.js';
+import { hashPassword, verifyPassword, generateSessionToken, generateVerifyToken, sessionExpiry, hashToken } from './auth.js';
 import { authenticateRequest, requireAdmin } from './middleware.js';
 import type { SmtpConfig } from './email-verify.js';
 import { sendVerificationEmail } from './email-verify.js';
 import type { GoogleOAuthConfig } from './google-oauth.js';
-import { getGoogleAuthUrl, exchangeCodeForTokens, getGoogleUserInfo } from './google-oauth.js';
+import {
+  getGoogleAuthUrl, exchangeCodeForTokens, getGoogleUserInfo,
+  generateCodeVerifier, generateCodeChallenge, generateOAuthState,
+} from './google-oauth.js';
 import type { GoogleSheetsConfig } from './google-sheets.js';
 import { syncWaitlistEntry, ensureSheetHeaders } from './google-sheets.js';
+import { RateLimiter } from './rate-limiter.js';
 import type { UserPublic } from './types.js';
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
-function readBody(req: IncomingMessage): Promise<Record<string, unknown> | null> {
+const MAX_BODY_SIZE = 1024 * 1024; // 1 MB
+
+type ReadBodyResult =
+  | { ok: true; data: Record<string, unknown> }
+  | { ok: false; status: 400 | 413 };
+
+function readBody(req: IncomingMessage): Promise<ReadBodyResult> {
   return new Promise((resolve) => {
     const chunks: Buffer[] = [];
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    let totalSize = 0;
+    let aborted = false;
+
+    req.on('data', (chunk: Buffer) => {
+      totalSize += chunk.length;
+      if (totalSize > MAX_BODY_SIZE) {
+        aborted = true;
+        req.destroy();
+        resolve({ ok: false, status: 413 });
+        return;
+      }
+      chunks.push(chunk);
+    });
     req.on('end', () => {
+      if (aborted) return;
       try {
         const raw = Buffer.concat(chunks).toString('utf-8');
-        resolve(JSON.parse(raw) as Record<string, unknown>);
+        resolve({ ok: true, data: JSON.parse(raw) as Record<string, unknown> });
       } catch {
-        resolve(null);
+        resolve({ ok: false, status: 400 });
       }
     });
-    req.on('error', () => resolve(null));
+    req.on('error', () => {
+      if (!aborted) resolve({ ok: false, status: 400 });
+    });
   });
+}
+
+function getClientIP(req: IncomingMessage): string {
+  return req.socket.remoteAddress ?? '127.0.0.1';
 }
 
 function json(res: ServerResponse, status: number, data: unknown): void {
@@ -64,6 +93,27 @@ export interface AuthRouteConfig {
 export function createAuthHandlers(config: AuthRouteConfig) {
   const { db } = config;
 
+  // Rate limiters
+  const loginLimiter = new RateLimiter({ windowMs: 15 * 60 * 1000, maxRequests: 10 });
+  const registerLimiter = new RateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 5 });
+
+  // Pending OAuth flows: state -> { codeVerifier, createdAt }
+  const pendingOAuthFlows = new Map<string, { codeVerifier: string; createdAt: number }>();
+  // Pending CLI auth flows: state -> { callbackUrl, createdAt }
+  const pendingCliFlows = new Map<string, { callbackUrl: string; createdAt: number }>();
+
+  // Cleanup stale flows every 5 minutes
+  const oauthCleanupTimer = setInterval(() => {
+    const cutoff = Date.now() - 10 * 60 * 1000; // 10 min TTL
+    for (const [state, flow] of pendingOAuthFlows) {
+      if (flow.createdAt < cutoff) pendingOAuthFlows.delete(state);
+    }
+    for (const [state, flow] of pendingCliFlows) {
+      if (flow.createdAt < cutoff) pendingCliFlows.delete(state);
+    }
+  }, 5 * 60 * 1000);
+  if (oauthCleanupTimer.unref) oauthCleanupTimer.unref();
+
   // ── Waitlist ─────────────────────────────────────────────────────
 
   async function handleWaitlistJoin(req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -72,11 +122,12 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       return;
     }
 
-    const body = await readBody(req);
-    if (!body) {
-      json(res, 400, { ok: false, error: 'Invalid JSON body' });
+    const result = await readBody(req);
+    if (!result.ok) {
+      json(res, result.status, { ok: false, error: result.status === 413 ? 'Payload too large' : 'Invalid JSON body' });
       return;
     }
+    const body = result.data;
 
     const { email, name, company, role, source } = body;
     if (!isValidEmail(email)) {
@@ -188,11 +239,21 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       return;
     }
 
-    const body = await readBody(req);
-    if (!body) {
-      json(res, 400, { ok: false, error: 'Invalid JSON body' });
+    // Rate limit
+    const ip = getClientIP(req);
+    const rl = registerLimiter.check(ip);
+    if (!rl.allowed) {
+      res.setHeader('Retry-After', String(Math.ceil(rl.retryAfterMs / 1000)));
+      json(res, 429, { ok: false, error: 'Too many requests. Try again later.' });
       return;
     }
+
+    const result = await readBody(req);
+    if (!result.ok) {
+      json(res, result.status, { ok: false, error: result.status === 413 ? 'Payload too large' : 'Invalid JSON body' });
+      return;
+    }
+    const body = result.data;
 
     const { email, name, password } = body;
     if (!isValidEmail(email)) {
@@ -236,11 +297,21 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       return;
     }
 
-    const body = await readBody(req);
-    if (!body) {
-      json(res, 400, { ok: false, error: 'Invalid JSON body' });
+    // Rate limit
+    const ip = getClientIP(req);
+    const rl = loginLimiter.check(ip);
+    if (!rl.allowed) {
+      res.setHeader('Retry-After', String(Math.ceil(rl.retryAfterMs / 1000)));
+      json(res, 429, { ok: false, error: 'Too many requests. Try again later.' });
       return;
     }
+
+    const result = await readBody(req);
+    if (!result.ok) {
+      json(res, result.status, { ok: false, error: result.status === 413 ? 'Payload too large' : 'Invalid JSON body' });
+      return;
+    }
+    const body = result.data;
 
     const { email, password } = body;
     if (!isValidEmail(email) || typeof password !== 'string') {
@@ -310,19 +381,35 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       json(res, 501, { ok: false, error: 'Google OAuth not configured' });
       return;
     }
-    const url = getGoogleAuthUrl(config.google);
+    const state = generateOAuthState();
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = generateCodeChallenge(codeVerifier);
+    pendingOAuthFlows.set(state, { codeVerifier, createdAt: Date.now() });
+    const url = getGoogleAuthUrl(config.google, state, codeChallenge);
     res.writeHead(302, { Location: url });
     res.end();
   }
 
-  async function handleGoogleCallback(req: IncomingMessage, res: ServerResponse, code: string): Promise<void> {
+  async function handleGoogleCallback(req: IncomingMessage, res: ServerResponse, code: string, state: string | null): Promise<void> {
     if (!config.google) {
       json(res, 501, { ok: false, error: 'Google OAuth not configured' });
       return;
     }
 
+    // Validate state parameter (CSRF protection)
+    if (!state) {
+      json(res, 400, { ok: false, error: 'Missing state parameter' });
+      return;
+    }
+    const flow = pendingOAuthFlows.get(state);
+    if (!flow) {
+      json(res, 403, { ok: false, error: 'Invalid or expired OAuth state' });
+      return;
+    }
+    pendingOAuthFlows.delete(state);
+
     try {
-      const tokens = await exchangeCodeForTokens(config.google, code);
+      const tokens = await exchangeCodeForTokens(config.google, code, flow.codeVerifier);
       const googleUser = await getGoogleUserInfo(tokens.access_token);
 
       if (!googleUser.email) {
@@ -348,7 +435,7 @@ export function createAuthHandlers(config: AuthRouteConfig) {
 
       // Redirect to frontend with token
       const baseUrl = config.baseUrl ?? '';
-      const redirectUrl = `${baseUrl}/login?token=${session.token}&expires=${encodeURIComponent(session.expiresAt)}`;
+      const redirectUrl = `${baseUrl}/login?token=${sessionToken}&expires=${encodeURIComponent(session.expiresAt)}`;
       res.writeHead(302, { Location: redirectUrl });
       res.end();
     } catch (err) {
@@ -357,6 +444,103 @@ export function createAuthHandlers(config: AuthRouteConfig) {
         error: err instanceof Error ? err.message : 'Google OAuth failed',
       });
     }
+  }
+
+  // ── CLI Auth ─────────────────────────────────────────────────────
+
+  /**
+   * GET /api/auth/cli
+   * Initiates CLI auth flow: validates callback URL and redirects to web login.
+   */
+  function handleCliAuth(req: IncomingMessage, res: ServerResponse): void {
+    const urlObj = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+    const callbackUrl = urlObj.searchParams.get('callback');
+    const state = urlObj.searchParams.get('state');
+
+    if (!callbackUrl || !state) {
+      json(res, 400, { ok: false, error: 'Missing callback or state parameter' });
+      return;
+    }
+
+    // Security: callback must be localhost
+    try {
+      const callbackParsed = new URL(callbackUrl);
+      if (!['localhost', '127.0.0.1', '[::1]'].includes(callbackParsed.hostname)) {
+        json(res, 400, { ok: false, error: 'Callback must be localhost' });
+        return;
+      }
+    } catch {
+      json(res, 400, { ok: false, error: 'Invalid callback URL' });
+      return;
+    }
+
+    pendingCliFlows.set(state, { callbackUrl, createdAt: Date.now() });
+
+    // Redirect to web login page with cli_state
+    const baseUrl = config.baseUrl ?? '';
+    const loginUrl = `${baseUrl}/login?cli_state=${encodeURIComponent(state)}`;
+    res.writeHead(302, { Location: loginUrl });
+    res.end();
+  }
+
+  /**
+   * POST /api/auth/cli/exchange
+   * Exchanges a web session token for a long-lived CLI session.
+   * Returns the CLI callback redirect URL.
+   */
+  async function handleCliExchange(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    if (req.method !== 'POST') {
+      json(res, 405, { ok: false, error: 'Method not allowed' });
+      return;
+    }
+
+    const result = await readBody(req);
+    if (!result.ok) {
+      json(res, result.status, { ok: false, error: result.status === 413 ? 'Payload too large' : 'Invalid JSON body' });
+      return;
+    }
+    const body = result.data;
+
+    const { token, state } = body;
+    if (typeof token !== 'string' || typeof state !== 'string') {
+      json(res, 400, { ok: false, error: 'Token and state are required' });
+      return;
+    }
+
+    // Validate web session
+    const user = authenticateRequest(
+      { headers: { authorization: `Bearer ${token}` } } as IncomingMessage,
+      db,
+    );
+    if (!user) {
+      json(res, 401, { ok: false, error: 'Invalid session token' });
+      return;
+    }
+
+    // Look up pending CLI flow
+    const flow = pendingCliFlows.get(state);
+    if (!flow) {
+      json(res, 403, { ok: false, error: 'Invalid or expired CLI state' });
+      return;
+    }
+    pendingCliFlows.delete(state);
+
+    // Create long-lived CLI session (30 days)
+    const cliToken = generateSessionToken();
+    const cliSession = db.createSession(user.id, cliToken, sessionExpiry(24 * 30));
+
+    // Build redirect URL back to CLI callback
+    const params = new URLSearchParams({
+      token: cliSession.token,
+      expires: cliSession.expiresAt,
+      email: user.email,
+      name: user.name,
+      tier: user.tier,
+      state,
+    });
+    const redirectUrl = `${flow.callbackUrl}?${params.toString()}`;
+
+    json(res, 200, { ok: true, data: { redirectUrl } });
   }
 
   // ── Init Google Sheets headers ──────────────────────────────────
@@ -378,5 +562,7 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     handleMe,
     handleGoogleAuth,
     handleGoogleCallback,
+    handleCliAuth,
+    handleCliExchange,
   };
 }

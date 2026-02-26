@@ -31,3 +31,7 @@ export { ThreatCloudServer, ThreatCloudDB } from '@openclaw/threat-cloud';
 
 // Dashboard Server
 export { PanguardDashboardServer } from './server/index.js';
+
+// Init / Config
+export { runInitWizard, buildPanguardConfig, writeConfig, readConfig } from './init/index.js';
+export type { WizardAnswers, PanguardConfig, Lang } from './init/types.js';

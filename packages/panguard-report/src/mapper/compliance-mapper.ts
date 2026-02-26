@@ -21,20 +21,73 @@ import type {
 
 const logger = createLogger('panguard-report:mapper');
 
+/** Relevance score threshold: findings must score at least this to be mapped */
+const RELEVANCE_THRESHOLD = 5;
+
 /**
- * Map findings to compliance controls and evaluate each control's status
- * 將發現映射到合規控制項並評估每個控制項的狀態
+ * Calculate a relevance score between a finding and a control.
+ * Multi-signal scoring replaces the previous `.includes()` approach.
+ *
+ * Signals:
+ * - Exact category match: 10 points
+ * - Partial category match (substring): 3 points
+ * - Control description keyword match: 2 points
+ * - CVE finding + vulnerability_management control: 5 points
+ */
+function calculateRelevance(control: ComplianceControl, finding: ComplianceFinding): number {
+  let score = 0;
+  const findingCatLower = finding.category.toLowerCase();
+
+  for (const cat of control.relatedCategories) {
+    const catLower = cat.toLowerCase();
+    if (findingCatLower === catLower) {
+      score += 10; // Exact match
+    } else if (findingCatLower.includes(catLower) || catLower.includes(findingCatLower)) {
+      score += 3; // Partial match
+    }
+  }
+
+  // Check control description keywords against finding title/description
+  const controlKeywords = extractKeywords(control.descriptionEn);
+  const findingText = `${finding.title} ${finding.description}`.toLowerCase();
+  for (const keyword of controlKeywords) {
+    if (findingText.includes(keyword)) {
+      score += 2;
+      break; // Only count once to avoid over-scoring
+    }
+  }
+
+  // CVE findings + vulnerability management controls get a boost
+  if (finding.findingId.startsWith('CVE-') && control.relatedCategories.some(c =>
+    c.toLowerCase().includes('vulnerability') || c.toLowerCase().includes('patch'))) {
+    score += 5;
+  }
+
+  return score;
+}
+
+/** Extract meaningful keywords from a description (>3 chars, lowercase) */
+function extractKeywords(text: string): string[] {
+  const stopWords = new Set(['the', 'and', 'for', 'are', 'this', 'that', 'with', 'from', 'shall', 'should', 'must', 'have', 'been', 'will']);
+  return text.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !stopWords.has(w))
+    .slice(0, 10); // Limit to avoid excessive processing
+}
+
+/**
+ * Map findings to compliance controls and evaluate each control's status.
+ * Uses multi-signal relevance scoring instead of simple substring matching.
  */
 export function evaluateControls(
   controls: ComplianceControl[],
   findings: ComplianceFinding[],
 ): EvaluatedControl[] {
   return controls.map((control) => {
-    // Find related findings
+    // Find related findings using relevance scoring
     const relatedFindings = findings.filter((finding) =>
-      control.relatedCategories.some((cat) =>
-        finding.category.toLowerCase().includes(cat.toLowerCase()),
-      ),
+      calculateRelevance(control, finding) >= RELEVANCE_THRESHOLD,
     );
 
     // Determine status

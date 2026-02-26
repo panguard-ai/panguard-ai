@@ -4,12 +4,17 @@
  */
 
 export { AuthDB } from './database.js';
-export { hashPassword, verifyPassword, generateSessionToken, generateVerifyToken, sessionExpiry } from './auth.js';
+export { hashPassword, verifyPassword, generateSessionToken, generateVerifyToken, sessionExpiry, hashToken } from './auth.js';
 export { extractToken, authenticateRequest, requireAdmin } from './middleware.js';
 export { createAuthHandlers } from './routes.js';
+export { RateLimiter } from './rate-limiter.js';
+export type { RateLimitConfig, RateLimitResult } from './rate-limiter.js';
 export { sendVerificationEmail, sendWelcomeEmail } from './email-verify.js';
 export type { SmtpConfig } from './email-verify.js';
-export { getGoogleAuthUrl, exchangeCodeForTokens, getGoogleUserInfo } from './google-oauth.js';
+export {
+  getGoogleAuthUrl, exchangeCodeForTokens, getGoogleUserInfo,
+  generateCodeVerifier, generateCodeChallenge, generateOAuthState,
+} from './google-oauth.js';
 export type { GoogleOAuthConfig, GoogleUserInfo } from './google-oauth.js';
 export { syncWaitlistEntry, appendRow, ensureSheetHeaders } from './google-sheets.js';
 export type { GoogleSheetsConfig } from './google-sheets.js';

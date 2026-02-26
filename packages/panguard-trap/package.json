@@ -18,6 +18,9 @@
   "dependencies": {
     "@openclaw/core": "workspace:*"
   },
+  "optionalDependencies": {
+    "ssh2": "^1.16.0"
+  },
   "devDependencies": {
     "@types/node": "^22.14.0",
     "typescript": "~5.7.3"

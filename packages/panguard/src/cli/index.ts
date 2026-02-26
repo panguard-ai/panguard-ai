@@ -19,6 +19,12 @@ import { trapCommand } from './commands/trap.js';
 import { threatCommand } from './commands/threat.js';
 import { dashboardCommand } from './commands/dashboard.js';
 import { demoCommand } from './commands/demo.js';
+import { initCommand } from './commands/init.js';
+import { deployCommand } from './commands/deploy.js';
+import { statusCommand } from './commands/status.js';
+import { loginCommand } from './commands/login.js';
+import { logoutCommand } from './commands/logout.js';
+import { whoamiCommand } from './commands/whoami.js';
 import { startInteractive } from './interactive.js';
 
 const program = new Command();
@@ -36,6 +42,12 @@ program.addCommand(trapCommand());
 program.addCommand(threatCommand());
 program.addCommand(dashboardCommand());
 program.addCommand(demoCommand());
+program.addCommand(initCommand());
+program.addCommand(deployCommand());
+program.addCommand(statusCommand());
+program.addCommand(loginCommand());
+program.addCommand(logoutCommand());
+program.addCommand(whoamiCommand());
 
 // If no subcommand given (just `panguard` or `panguard --lang zh-TW`),
 // launch interactive mode. Check before commander parses so that

@@ -29,6 +29,15 @@ let currentLang: Lang = 'zh-TW';
 
 const MAIN_MENU_ITEMS: MenuItem[] = [
   {
+    key: '0',
+    icon: symbols.arrow,
+    label: { 'zh-TW': '\u521D\u59CB\u8A2D\u5B9A', en: 'Setup Wizard' },
+    description: {
+      'zh-TW': '\u554F\u5377\u5F0F\u5F15\u5C0E\uFF0C\u81EA\u52D5\u914D\u7F6E\u6240\u6709\u6A21\u7D44',
+      en: 'Guided questionnaire to configure all modules',
+    },
+  },
+  {
     key: '1',
     icon: symbols.scan,
     label: { 'zh-TW': '\u5B89\u5168\u6383\u63CF', en: 'Security Scan' },
@@ -40,7 +49,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   {
     key: '2',
     icon: symbols.shield,
-    label: { 'zh-TW': '\u5408\u898F\u5831\u544A', en: 'Compliance Report' },
+    label: { 'zh-TW': '\u5408\u898F\u5831\u544A [PRO]', en: 'Compliance Report [PRO]' },
     description: {
       'zh-TW': '\u7522\u751F ISO 27001\u3001SOC 2\u3001\u8CC7\u901A\u5B89\u5168\u7BA1\u7406\u6CD5\u5831\u544A',
       en: 'Generate ISO 27001, SOC 2, or TW Cyber Security Act reports',
@@ -49,7 +58,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   {
     key: '3',
     icon: symbols.pass,
-    label: { 'zh-TW': '\u5B88\u8B77\u5F15\u64CE', en: 'Guard Engine' },
+    label: { 'zh-TW': '\u5B88\u8B77\u5F15\u64CE [STARTER]', en: 'Guard Engine [STARTER]' },
     description: {
       'zh-TW': '\u5373\u6642\u76E3\u63A7\u8207\u9632\u8B77\u7CFB\u7D71',
       en: 'Real-time monitoring and protection system',
@@ -57,7 +66,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   },
   {
     key: '4',
-    label: { 'zh-TW': '\u871C\u7F50\u7CFB\u7D71', en: 'Honeypot System' },
+    label: { 'zh-TW': '\u871C\u7F50\u7CFB\u7D71 [PRO]', en: 'Honeypot System [PRO]' },
     description: {
       'zh-TW': '\u90E8\u7F72\u871C\u7F50\u670D\u52D9\uFF0C\u5206\u6790\u653B\u64CA\u8005\u884C\u70BA',
       en: 'Deploy honeypot services for attacker profiling',
@@ -65,7 +74,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   },
   {
     key: '5',
-    label: { 'zh-TW': '\u901A\u77E5\u7CFB\u7D71', en: 'Notifications' },
+    label: { 'zh-TW': '\u901A\u77E5\u7CFB\u7D71 [STARTER]', en: 'Notifications [STARTER]' },
     description: {
       'zh-TW': 'LINE\u3001Telegram\u3001Slack\u3001Email\u3001Webhook \u901A\u77E5\u7BA1\u9053',
       en: 'Notification channels: LINE, Telegram, Slack, Email, Webhook',
@@ -73,7 +82,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   },
   {
     key: '6',
-    label: { 'zh-TW': '\u5A01\u8105\u60C5\u5831', en: 'Threat Cloud' },
+    label: { 'zh-TW': '\u5A01\u8105\u60C5\u5831 [ENT]', en: 'Threat Cloud [ENT]' },
     description: {
       'zh-TW': '\u5A01\u8105\u60C5\u5831 REST API \u4F3A\u670D\u5668',
       en: 'Threat intelligence REST API server',
@@ -173,6 +182,7 @@ export async function startInteractive(lang?: string): Promise<void> {
     console.clear();
     try {
       switch (choice.key) {
+        case '0': await actionInit(); break;
         case '1': await actionScan(); break;
         case '2': await actionReport(); break;
         case '3': await actionGuard(); break;
@@ -194,6 +204,15 @@ export async function startInteractive(lang?: string): Promise<void> {
     console.log(banner());
     console.log('');
   }
+}
+
+// ---------------------------------------------------------------------------
+// 0. Setup Wizard
+// ---------------------------------------------------------------------------
+
+async function actionInit(): Promise<void> {
+  const { runInitWizard } = await import('../init/index.js');
+  await runInitWizard(currentLang);
 }
 
 // ---------------------------------------------------------------------------

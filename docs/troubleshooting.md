@@ -4,6 +4,60 @@
 
 ---
 
+## 認證問題
+
+### panguard login 瀏覽器沒開啟
+
+**可能原因：** 你在 SSH / headless 環境中。
+
+```bash
+# 使用 --no-browser 模式
+panguard login --no-browser
+# 複製印出的 URL 到其他裝置的瀏覽器開啟
+```
+
+### panguard login 逾時
+
+**可能原因：** 認證流程超過 10 分鐘。
+
+```bash
+# 重新執行
+panguard login
+```
+
+### 「未登入」但已經登入過
+
+**可能原因：** Token 已過期（30 天到期）。
+
+```bash
+# 檢查狀態
+panguard whoami
+
+# 重新登入
+panguard login
+```
+
+### 「等級不足」錯誤
+
+**可能原因：** 你的訂閱方案不支援該功能。
+
+```bash
+# 查看目前方案
+panguard whoami
+
+# 到網站升級
+# https://panguard.ai/pricing
+```
+
+### credentials.json 權限錯誤
+
+```bash
+# 修正權限
+chmod 600 ~/.panguard/credentials.json
+```
+
+---
+
 ## 安裝問題
 
 ### pnpm install 失敗
@@ -47,10 +101,10 @@ pnpm build
 
 ```bash
 # 使用 --quick 跳過耗時的檢查
-panguard-scan --quick
+panguard scan --quick
 
 # 或加 --verbose 看是卡在哪一步
-panguard-scan --verbose
+panguard scan --verbose
 ```
 
 ### PDF 報告產生失敗
@@ -59,7 +113,7 @@ panguard-scan --verbose
 
 ```bash
 # 確認路徑可寫入
-panguard-scan --output ~/Desktop/report.pdf
+panguard scan --output ~/Desktop/report.pdf
 ```
 
 ### 掃描結果全部是 INFO
@@ -68,7 +122,7 @@ panguard-scan --output ~/Desktop/report.pdf
 
 ```bash
 # 試試完整掃描
-panguard-scan --verbose
+panguard scan --verbose
 ```
 
 ---
@@ -81,13 +135,13 @@ panguard-scan --verbose
 
 ```bash
 # 先停止現有實例
-panguard-guard stop
+panguard guard stop
 
 # 如果 stop 也失敗，手動清除 PID 檔案
 rm ~/.panguard-guard/guard.pid
 
 # 重新啟動
-panguard-guard start
+panguard guard start
 ```
 
 **錯誤：** `Permission denied`
@@ -95,10 +149,10 @@ panguard-guard start
 ```bash
 # Guard 需要權限監控系統事件
 # macOS / Linux：用 sudo
-sudo panguard-guard start
+sudo panguard guard start
 
 # 或安裝為系統服務（自動取得權限）
-sudo panguard-guard install
+sudo panguard guard install
 ```
 
 ### Guard 記憶體使用過高
@@ -107,7 +161,7 @@ sudo panguard-guard install
 
 ```bash
 # 查看狀態中的資源使用
-panguard-guard status
+panguard guard status
 
 # 限制 Sigma 規則數量
 # 移除不需要的規則檔案
@@ -126,15 +180,14 @@ ls ~/.panguard-guard/rules/sigma/
 ### 自動回應沒有執行
 
 **可能原因：**
-1. 你可能使用 Free 版（不支援自動回應）
+1. 你可能使用 Free 版（不支援自動回應，需要 Starter 以上）
 2. 信心度低於 90%，需要你確認
 
 ```bash
-# 檢查授權等級
-panguard-guard config
+# 檢查登入狀態和訂閱等級
+panguard whoami
 
-# 產生 Pro 測試金鑰
-panguard-guard generate-key pro
+# 如果需要升級，到 panguard.ai/pricing
 ```
 
 ---
@@ -147,13 +200,13 @@ panguard-guard generate-key pro
 
 ```bash
 # 1. 檢查管道設定
-panguard-chat status
+panguard chat status
 
 # 2. 發送測試通知
-panguard-chat test
+panguard chat test
 
 # 3. 重新設定
-panguard-chat setup --channel line
+panguard chat setup --channel line
 ```
 
 **LINE 特定問題：**
@@ -173,7 +226,7 @@ panguard-chat setup --channel line
 
 ```bash
 # 重新設定語言
-panguard-chat setup --channel line --lang zh-TW
+panguard chat setup --channel line --lang zh-TW
 ```
 
 ---
@@ -189,7 +242,7 @@ panguard-chat setup --channel line --lang zh-TW
 lsof -i :2222
 
 # 使用不同 port
-panguard-trap start --services ssh --port 22222
+panguard trap start --services ssh --port 22222
 ```
 
 ### 沒有攻擊者連入
@@ -208,7 +261,7 @@ panguard-trap start --services ssh --port 22222
 
 ```bash
 # 改用其他 port
-threat-cloud --port 8081
+panguard threat start --port 8081
 ```
 
 **錯誤：** `SQLITE_CANTOPEN`
@@ -216,7 +269,7 @@ threat-cloud --port 8081
 ```bash
 # 確認資料庫目錄存在且可寫入
 mkdir -p /var/lib/threat-cloud
-threat-cloud --db /var/lib/threat-cloud/data.db
+panguard threat start --db /var/lib/threat-cloud/data.db
 ```
 
 ### API 回傳 401
@@ -265,14 +318,18 @@ pnpm build
 ### 如何完全移除？
 
 ```bash
-# 1. 停止並移除系統服務
-panguard-guard uninstall
+# 1. 登出
+panguard logout
 
-# 2. 刪除資料目錄
+# 2. 停止並移除系統服務
+panguard guard uninstall
+
+# 3. 刪除資料目錄
+rm -rf ~/.panguard
 rm -rf ~/.panguard-guard
 rm -rf ~/.panguard-chat
 
-# 3. 移除安裝
+# 4. 移除安裝
 # 依你的安裝方式而定
 ```
 

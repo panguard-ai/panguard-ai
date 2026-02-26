@@ -605,3 +605,12 @@ export function timeAgo(date: Date | string): string {
   if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
   return `${Math.floor(diff / 86400000)}d ago`;
 }
+
+// ============================================================
+// Re-exports from prompt and wizard modules
+// ============================================================
+
+export { visLen, promptSelect, promptText, promptConfirm } from './prompts.js';
+export type { SelectOption, SelectConfig, TextConfig, ConfirmConfig } from './prompts.js';
+export { WizardEngine } from './wizard.js';
+export type { WizardStep, WizardAnswers } from './wizard.js';

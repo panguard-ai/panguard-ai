@@ -1,6 +1,8 @@
-# Panguard Scan / 安全掃描指南
+# Panguard Scan / 安全掃描指南 `[FREE / STARTER]`
 
 > 60 秒掃描你的系統，找出安全弱點，產生修復建議。
+>
+> 快速掃描（`--quick`）為 **Free**，完整掃描需要 **Starter** 以上。
 
 ---
 
@@ -8,16 +10,16 @@
 
 ```bash
 # 快速掃描（~30 秒）
-panguard-scan --quick
+panguard scan --quick
 
 # 完整掃描（~60 秒）
-panguard-scan
+panguard scan
 
 # 產生 PDF 報告
-panguard-scan --output report.pdf
+panguard scan --output report.pdf
 
 # 繁體中文模式
-panguard-scan --lang zh-TW
+panguard scan --lang zh-TW
 ```
 
 ---
@@ -126,7 +128,7 @@ panguard-scan --lang zh-TW
 ## PDF 報告
 
 ```bash
-panguard-scan --output my-report.pdf
+panguard scan --output my-report.pdf
 ```
 
 報告內容：
@@ -161,15 +163,15 @@ panguard-scan --output my-report.pdf
 
 ```bash
 # 1. 先掃描一次
-panguard-scan --output baseline.pdf
+panguard scan --output baseline.pdf
 
 # 2. 根據結果修復問題
 
 # 3. 啟動持續保護
-panguard-guard start
+panguard guard start
 
 # 4. 定期重新掃描確認改善
-panguard-scan --output weekly-check.pdf
+panguard scan --output weekly-check.pdf
 ```
 
 ### Scan + Report
@@ -178,7 +180,7 @@ panguard-scan --output weekly-check.pdf
 
 ```bash
 # 掃描結果自動作為合規報告的輸入
-panguard-scan --output scan-result.pdf
+panguard scan --output scan-result.pdf
 ```
 
 ---
@@ -186,11 +188,11 @@ panguard-scan --output scan-result.pdf
 ## CLI 選項
 
 ```
-panguard-scan [options]
+panguard scan [options]
 
 Options:
   --quick              快速模式（~30 秒）
-  --output <path>      PDF 報告輸出路徑（預設：panguard-scan-report.pdf）
+  --output <path>      PDF 報告輸出路徑（預設：panguard scan-report.pdf）
   --lang <en|zh-TW>    語言（預設：en）
   --verbose            詳細輸出
 ```
