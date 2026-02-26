@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Panguard AI CLI wrapper
+# Usage: ./bin/panguard <command> [options]
+#
+# This wrapper resolves the built CLI entry point relative to this script,
+# so it works regardless of your current working directory.
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec node "${SCRIPT_DIR}/../packages/panguard/dist/cli/index.js" "$@"

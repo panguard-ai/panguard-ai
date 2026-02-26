@@ -6,7 +6,7 @@
  */
 
 import {
-  initI18n, t, createLogger,
+  initI18n, t, createLogger, setLogLevel,
   c, colorSeverity, banner, spinner, table, box,
   scoreDisplay, divider, formatDuration, symbols, statusPanel,
 } from '@openclaw/core';
@@ -21,6 +21,11 @@ const logger = createLogger('panguard-scan:cli');
  * 執行安全掃描並產生報告
  */
 export async function executeScan(config: ScanConfig): Promise<void> {
+  // Suppress structured JSON logs unless verbose mode
+  if (!config.verbose) {
+    setLogLevel('silent');
+  }
+
   await initI18n(config.lang);
 
   // Banner
