@@ -6,9 +6,9 @@ import { useLanguage } from '../context/LanguageContext';
 /** Read auth state from localStorage */
 function getAuthState(): { token: string; email: string } | null {
   const token = localStorage.getItem('panguard_token');
-  const email = localStorage.getItem('panguard_email');
-  if (token && email) return { token, email };
-  return null;
+  if (!token) return null;
+  const email = localStorage.getItem('panguard_email') ?? '';
+  return { token, email };
 }
 
 export default function Navbar() {
@@ -20,7 +20,20 @@ export default function Navbar() {
 
   // Re-check auth on route change (e.g. after login redirect)
   useEffect(() => {
-    setAuth(getAuthState());
+    const state = getAuthState();
+    setAuth(state);
+    // If logged in but no email cached, fetch from server
+    if (state && !state.email) {
+      fetch('/api/auth/me', { headers: { Authorization: `Bearer ${state.token}` } })
+        .then(r => r.json())
+        .then(data => {
+          if (data.ok && data.data?.user?.email) {
+            localStorage.setItem('panguard_email', data.data.user.email);
+            setAuth({ token: state.token, email: data.data.user.email });
+          }
+        })
+        .catch(() => {});
+    }
   }, [location.pathname]);
 
   const handleLogout = useCallback(async () => {

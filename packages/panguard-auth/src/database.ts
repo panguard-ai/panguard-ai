@@ -5,6 +5,7 @@
 
 import Database from 'better-sqlite3';
 import type { WaitlistEntry, WaitlistInput, WaitlistStats, User, RegisterInput, Session } from './types.js';
+import { hashToken } from './auth.js';
 
 export class AuthDB {
   private readonly db: Database.Database;
@@ -57,14 +58,21 @@ export class AuthDB {
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
       CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
     `);
+
+    // Migration: add verify_token_expires_at column (safe to re-run)
+    try {
+      this.db.exec(`ALTER TABLE waitlist ADD COLUMN verify_token_expires_at TEXT`);
+    } catch {
+      // Column already exists — ignore
+    }
   }
 
   // ── Waitlist ───────────────────────────────────────────────────────
 
   addToWaitlist(input: WaitlistInput, verifyToken: string): WaitlistEntry {
     const stmt = this.db.prepare(`
-      INSERT INTO waitlist (email, name, company, role, source, verify_token)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO waitlist (email, name, company, role, source, verify_token, verify_token_expires_at)
+      VALUES (?, ?, ?, ?, ?, ?, datetime('now', '+24 hours'))
     `);
     const result = stmt.run(
       input.email.toLowerCase().trim(),
@@ -98,6 +106,7 @@ export class AuthDB {
       SELECT id, email, name, company, role, source, status, verified,
              verify_token as verifyToken, created_at as createdAt, updated_at as updatedAt
       FROM waitlist WHERE verify_token = ?
+        AND (verify_token_expires_at IS NULL OR verify_token_expires_at > datetime('now'))
     `).get(token) as WaitlistEntry | undefined;
 
     if (entry) {
@@ -162,22 +171,26 @@ export class AuthDB {
   // ── Sessions ───────────────────────────────────────────────────────
 
   createSession(userId: number, token: string, expiresAt: string): Session {
+    const hashed = hashToken(token);
     const stmt = this.db.prepare(`
       INSERT INTO sessions (user_id, token, expires_at)
       VALUES (?, ?, ?)
     `);
-    const result = stmt.run(userId, token, expiresAt);
-    return this.db.prepare(`
+    const result = stmt.run(userId, hashed, expiresAt);
+    const row = this.db.prepare(`
       SELECT id, user_id as userId, token, expires_at as expiresAt, created_at as createdAt
       FROM sessions WHERE id = ?
     `).get(Number(result.lastInsertRowid)) as Session;
+    // Return plaintext token to caller (client needs it); DB stores the hash
+    return { ...row, token };
   }
 
   getSession(token: string): (Session & { user: User }) | undefined {
+    const hashed = hashToken(token);
     const session = this.db.prepare(`
       SELECT id, user_id as userId, token, expires_at as expiresAt, created_at as createdAt
       FROM sessions WHERE token = ? AND expires_at > datetime('now')
-    `).get(token) as Session | undefined;
+    `).get(hashed) as Session | undefined;
 
     if (!session) return undefined;
 
@@ -188,7 +201,8 @@ export class AuthDB {
   }
 
   deleteSession(token: string): void {
-    this.db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+    const hashed = hashToken(token);
+    this.db.prepare('DELETE FROM sessions WHERE token = ?').run(hashed);
   }
 
   cleanExpiredSessions(): number {

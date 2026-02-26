@@ -10,6 +10,7 @@ import {
   colorSeverity, table, box, symbols, formatDuration,
 } from '@openclaw/core';
 import { runScan } from '@openclaw/panguard-scan';
+import { requireAuth } from '../auth-guard.js';
 
 export function scanCommand(): Command {
   return new Command('scan')
@@ -19,6 +20,14 @@ export function scanCommand(): Command {
     .option('--lang <language>', 'Language: en or zh-TW / 語言', 'en')
     .option('--verbose', 'Verbose output / 詳細輸出', false)
     .action(async (options: { quick: boolean; output?: string; lang: string; verbose: boolean }) => {
+      // Auth: quick scan = free, full scan = starter
+      const tier = options.quick ? 'free' : 'starter';
+      const check = requireAuth(tier);
+      if (!check.authenticated || !check.authorized) {
+        const { withAuth } = await import('../auth-guard.js');
+        await withAuth(tier, async () => {})(options);
+        return;
+      }
       const lang: Language = options.lang === 'zh-TW' ? 'zh-TW' : 'en';
 
       console.log(banner());

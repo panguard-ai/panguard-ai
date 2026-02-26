@@ -20,6 +20,7 @@ import { checkUnnecessaryPorts } from './open-ports.js';
 import { checkSslCertificates } from './ssl-checker.js';
 import { checkScheduledTasks } from './scheduled-tasks.js';
 import { checkSharedFolders } from './shared-folders.js';
+import { checkCVEs } from './cve-checker.js';
 import type { ScanConfig, ScanResult, Finding } from './types.js';
 import { sortBySeverity } from './types.js';
 
@@ -224,6 +225,13 @@ export async function runScan(config: ScanConfig): Promise<ScanResult> {
     const shareFindings = await checkSharedFolders();
     logger.info(`Shared folders check: ${shareFindings.length} finding(s)`);
     additionalFindings.push(...shareFindings);
+
+    // CVE/NVD check (uses detected services from discovery)
+    // CVE/NVD 檢查（使用偵察發現的服務）
+    logger.info('Phase 6: Checking known CVEs via NVD API');
+    const cveFindings = await checkCVEs(discovery.openPorts);
+    logger.info(`CVE check: ${cveFindings.length} finding(s)`);
+    additionalFindings.push(...cveFindings);
   } else {
     logger.info('Skipping full-depth checks in quick mode');
   }
@@ -279,5 +287,6 @@ export { checkUnnecessaryPorts } from './open-ports.js';
 export { checkSslCertificates } from './ssl-checker.js';
 export { checkScheduledTasks } from './scheduled-tasks.js';
 export { checkSharedFolders } from './shared-folders.js';
+export { checkCVEs } from './cve-checker.js';
 export type { ScanConfig, ScanResult, Finding } from './types.js';
 export { sortBySeverity, SEVERITY_ORDER } from './types.js';

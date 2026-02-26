@@ -2,22 +2,77 @@ import { useState, useCallback, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
+/**
+ * Complete the CLI auth flow by exchanging the web token for a CLI session
+ * and redirecting the browser to the CLI's local callback server.
+ */
+async function completeCliAuth(webToken: string, cliState: string): Promise<string> {
+  const res = await fetch('/api/auth/cli/exchange', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: webToken, state: cliState }),
+  });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error ?? 'CLI auth exchange failed');
+  return data.data.redirectUrl;
+}
+
 export default function LoginPage() {
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'cli-done'>('idle');
   const [error, setError] = useState('');
+
+  const cliState = searchParams.get('cli_state');
 
   // Handle Google OAuth redirect with ?token=xxx
   useEffect(() => {
     const token = searchParams.get('token');
-    if (token) {
+    if (!token) return;
+
+    if (cliState) {
+      // CLI auth flow: exchange web token for CLI session and redirect
+      completeCliAuth(token, cliState).then((redirectUrl) => {
+        window.location.href = redirectUrl;
+      }).catch(() => {
+        // Fallback: store token and go to CLI success page
+        localStorage.setItem('panguard_token', token);
+        window.location.href = '/cli/auth-success';
+      });
+    } else {
+      // Normal web login - store token and fetch user email
       localStorage.setItem('panguard_token', token);
+      fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(data => {
+          if (data.ok && data.data?.user?.email) {
+            localStorage.setItem('panguard_email', data.data.user.email);
+          }
+        })
+        .catch(() => {})
+        .finally(() => { window.location.href = '/dashboard'; });
+    }
+  }, [searchParams, cliState]);
+
+  const handleLoginSuccess = useCallback(async (webToken: string, userEmail?: string) => {
+    if (cliState) {
+      // CLI auth flow
+      try {
+        const redirectUrl = await completeCliAuth(webToken, cliState);
+        setStatus('cli-done');
+        window.location.href = redirectUrl;
+      } catch {
+        setStatus('error');
+        setError(t('CLI authentication failed.', 'CLI \u8A8D\u8B49\u5931\u6557\u3002'));
+      }
+    } else {
+      localStorage.setItem('panguard_token', webToken);
+      if (userEmail) localStorage.setItem('panguard_email', userEmail);
       window.location.href = '/dashboard';
     }
-  }, [searchParams]);
+  }, [cliState, t]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +88,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (data.ok) {
-        localStorage.setItem('panguard_token', data.data.token);
-        window.location.href = '/dashboard';
+        await handleLoginSuccess(data.data.token, data.data.user?.email ?? email);
       } else {
         setStatus('error');
         setError(data.error ?? t('Login failed.', '\u767B\u5165\u5931\u6557\u3002'));
@@ -43,11 +97,38 @@ export default function LoginPage() {
       setStatus('error');
       setError(t('Network error.', '\u7DB2\u8DEF\u932F\u8AA4\u3002'));
     }
-  }, [email, password, t]);
+  }, [email, password, t, handleLoginSuccess]);
+
+  if (status === 'cli-done') {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-xl border border-brand-cyan/50 bg-brand-card p-8 text-center">
+          <div className="mb-4 text-4xl text-brand-cyan">&gt;_</div>
+          <h2 className="mb-3 text-xl font-bold text-brand-text">
+            {t('CLI Authentication Complete', 'CLI \u8A8D\u8B49\u5B8C\u6210')}
+          </h2>
+          <p className="text-brand-muted">
+            {t(
+              'You can close this tab and return to your terminal.',
+              '\u53EF\u4EE5\u95DC\u9589\u6B64\u5206\u9801\u4E26\u56DE\u5230\u7D42\u7AEF\u6A5F\u3002',
+            )}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="w-full max-w-md rounded-xl border border-brand-border bg-brand-card p-8">
+        {cliState && (
+          <div className="mb-4 rounded-lg border border-brand-cyan/30 bg-brand-cyan/5 px-4 py-3 text-center text-sm text-brand-cyan">
+            {t(
+              'Signing in for Panguard CLI',
+              '\u6B63\u5728\u70BA Panguard CLI \u767B\u5165',
+            )}
+          </div>
+        )}
         <h2 className="mb-6 text-center text-2xl font-bold text-brand-text">
           {t('Sign In', '\u767B\u5165')}
         </h2>

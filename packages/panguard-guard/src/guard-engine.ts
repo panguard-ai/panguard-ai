@@ -18,7 +18,7 @@
  */
 
 import { join } from 'node:path';
-import { createLogger, RuleEngine, MonitorEngine } from '@openclaw/core';
+import { createLogger, RuleEngine, MonitorEngine, ThreatIntelFeedManager, setFeedManager } from '@openclaw/core';
 import type { SecurityEvent } from '@openclaw/core';
 import type {
   GuardConfig,
@@ -28,6 +28,8 @@ import type {
   ThreatVerdict,
   ResponseResult,
   AnalyzeLLM,
+  LLMAnalysisResult,
+  LLMClassificationResult,
 } from './types.js';
 
 import { DetectAgent, AnalyzeAgent, RespondAgent, ReportAgent } from './agent/index.js';
@@ -40,6 +42,75 @@ import { PidFile, Watchdog } from './daemon/index.js';
 import { validateLicense, hasFeature } from './license/index.js';
 
 const logger = createLogger('panguard-guard:engine');
+
+/**
+ * Attempt to auto-detect and create an LLM provider from environment variables.
+ * Falls back to null if no provider is available (graceful degradation).
+ */
+async function autoDetectLLM(): Promise<AnalyzeLLM | null> {
+  try {
+    // Dynamic import to avoid requiring @openclaw/core/ai at load time
+    const { createLLM } = await import('@openclaw/core');
+    type LLMProviderType = 'ollama' | 'claude' | 'openai';
+
+    let provider: LLMProviderType | null = null;
+    let apiKey: string | undefined;
+    let model: string | undefined;
+
+    if (process.env['ANTHROPIC_API_KEY']) {
+      provider = 'claude';
+      apiKey = process.env['ANTHROPIC_API_KEY'];
+      model = process.env['PANGUARD_LLM_MODEL'] ?? 'claude-sonnet-4-20250514';
+    } else if (process.env['OPENAI_API_KEY']) {
+      provider = 'openai';
+      apiKey = process.env['OPENAI_API_KEY'];
+      model = process.env['PANGUARD_LLM_MODEL'] ?? 'gpt-4o';
+    } else {
+      // Try Ollama (local, no API key needed)
+      provider = 'ollama';
+      model = process.env['PANGUARD_LLM_MODEL'] ?? 'llama3';
+    }
+
+    const llmProvider = createLLM({ provider, model, apiKey, lang: 'en' });
+    const available = await llmProvider.isAvailable();
+    if (!available) {
+      logger.info(`LLM provider '${provider}' not available, running without AI`);
+      return null;
+    }
+
+    logger.info(`LLM provider '${provider}' (model: ${model}) connected`);
+
+    // Adapt LLMProvider to AnalyzeLLM interface
+    const adapter: AnalyzeLLM = {
+      async analyze(prompt: string, context?: string): Promise<LLMAnalysisResult> {
+        const result = await llmProvider.analyze(prompt, context);
+        return {
+          summary: result.summary,
+          severity: result.severity,
+          confidence: result.confidence,
+          recommendations: result.recommendations,
+        };
+      },
+      async classify(event: SecurityEvent): Promise<LLMClassificationResult> {
+        const result = await llmProvider.classify(event);
+        return {
+          technique: result.technique,
+          severity: result.severity,
+          confidence: result.confidence,
+          description: result.description,
+        };
+      },
+      async isAvailable(): Promise<boolean> {
+        return llmProvider.isAvailable();
+      },
+    };
+
+    return adapter;
+  } catch (err) {
+    logger.info(`LLM auto-detect failed, running without AI: ${err instanceof Error ? err.message : String(err)}`);
+    return null;
+  }
+}
 
 /**
  * GuardEngine is the central orchestrator for all PanguardGuard functionality
@@ -61,6 +132,7 @@ export class GuardEngine {
 
   // Infrastructure / 基礎設施
   private readonly threatCloud: ThreatCloudClient;
+  private readonly feedManager: ThreatIntelFeedManager;
   private dashboard: DashboardServer | null = null;
   private readonly pidFile: PidFile;
   private watchdog: Watchdog | null = null;
@@ -116,10 +188,25 @@ export class GuardEngine {
       config.dataDir,
     );
 
+    // Initialize threat intel feed manager
+    this.feedManager = new ThreatIntelFeedManager({
+      abuseIPDBKey: process.env['ABUSEIPDB_KEY'],
+    });
+    setFeedManager(this.feedManager);
+
     // PID file / PID 檔案
     this.pidFile = new PidFile(config.dataDir);
 
     logger.info('GuardEngine initialized / GuardEngine 已初始化');
+  }
+
+  /**
+   * Create a GuardEngine with auto-detected LLM provider.
+   * Checks env vars for ANTHROPIC_API_KEY, OPENAI_API_KEY, or tries Ollama.
+   */
+  static async create(config: GuardConfig): Promise<GuardEngine> {
+    const llm = await autoDetectLLM();
+    return new GuardEngine(config, llm);
   }
 
   /**
@@ -135,6 +222,13 @@ export class GuardEngine {
 
     // Write PID file / 寫入 PID 檔案
     this.pidFile.write();
+
+    // Start threat intel feeds (non-blocking, best-effort)
+    this.feedManager.start().then(() => {
+      logger.info(`Threat intel feeds loaded: ${this.feedManager.getIoCCount()} IoCs, ${this.feedManager.getIPCount()} IPs indexed`);
+    }).catch((err: unknown) => {
+      logger.warn(`Threat intel feed start failed (using hardcoded list): ${err instanceof Error ? err.message : String(err)}`);
+    });
 
     // Load rules / 載入規則
     await this.ruleEngine.loadRules();
@@ -210,6 +304,8 @@ export class GuardEngine {
     if (this.learningCheckTimer) { clearInterval(this.learningCheckTimer); this.learningCheckTimer = null; }
 
     // Stop components / 停止元件
+    this.feedManager.stop();
+    setFeedManager(null);
     if (this.monitorEngine) this.monitorEngine.stop();
     if (this.dashboard) await this.dashboard.stop();
     if (this.watchdog) this.watchdog.stop();
