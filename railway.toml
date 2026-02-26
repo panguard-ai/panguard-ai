@@ -4,7 +4,7 @@ buildCommand = "pnpm install --frozen-lockfile && pnpm -r run build"
 
 [deploy]
 startCommand = "node packages/panguard/dist/cli/index.js dashboard --no-open"
-healthcheckPath = "/api/status"
+healthcheckPath = "/api/health"
 healthcheckTimeout = 10
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3

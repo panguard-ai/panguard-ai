@@ -86,11 +86,27 @@ export function handleChatStatus(_req: IncomingMessage, res: ServerResponse): vo
  * POST /api/chat/test - Send a test notification to a channel
  */
 export async function handleChatTest(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  const body = await new Promise<string>((resolve) => {
-    let data = '';
-    req.on('data', (chunk: Buffer) => { data += chunk.toString(); });
-    req.on('end', () => resolve(data));
+  // SECURITY: Enforce body size limit to prevent heap exhaustion DoS
+  const MAX_BODY = 4 * 1024; // 4 KB
+  const body = await new Promise<string>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let total = 0;
+    req.on('data', (chunk: Buffer) => {
+      total += chunk.length;
+      if (total > MAX_BODY) { req.destroy(); reject(new Error('413')); return; }
+      chunks.push(chunk);
+    });
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+    req.on('error', reject);
+  }).catch((err) => {
+    if (err instanceof Error && err.message === '413') {
+      res.writeHead(413);
+      res.end(JSON.stringify({ ok: false, error: 'Payload too large' }));
+    }
+    return null;
   });
+
+  if (body === null) return;
 
   let parsed: { channel?: string } = {};
   try {
@@ -102,16 +118,18 @@ export async function handleChatTest(req: IncomingMessage, res: ServerResponse):
   }
 
   const { channel } = parsed;
-  if (!channel) {
+  // SECURITY: Validate channel type and length before use
+  if (typeof channel !== 'string' || channel.length === 0 || channel.length > 64) {
     res.writeHead(400);
-    res.end(JSON.stringify({ ok: false, error: 'Missing "channel" field' }));
+    res.end(JSON.stringify({ ok: false, error: 'Invalid channel value' }));
     return;
   }
 
   const def = CHANNEL_DEFINITIONS.find(c => c.type === channel);
   if (!def) {
     res.writeHead(400);
-    res.end(JSON.stringify({ ok: false, error: `Unknown channel type: ${channel}` }));
+    // SECURITY: Don't reflect user input in error — use generic message
+    res.end(JSON.stringify({ ok: false, error: 'Unknown channel type' }));
     return;
   }
 
@@ -119,7 +137,7 @@ export async function handleChatTest(req: IncomingMessage, res: ServerResponse):
     res.writeHead(400);
     res.end(JSON.stringify({
       ok: false,
-      error: `Channel "${channel}" is not configured. Required: ${def.envHint}`,
+      error: `Channel "${def.label}" is not configured. Set the required environment variables.`,
     }));
     return;
   }
