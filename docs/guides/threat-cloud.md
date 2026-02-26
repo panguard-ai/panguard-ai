@@ -1,6 +1,8 @@
-# Threat Cloud / 集體威脅情報部署指南
+# Threat Cloud / 集體威脅情報部署指南 `[ENTERPRISE]`
 
 > 你的 Panguard 偵測到的威脅，自動保護所有 Panguard 用戶。
+>
+> 啟動 Threat Cloud API 伺服器需要 **Enterprise** 方案。
 
 ---
 
@@ -24,10 +26,10 @@ Threat Cloud 是一個集體威脅情報平台。每個 Panguard Guard 偵測到
 
 ```bash
 # 啟動伺服器
-threat-cloud --port 8080 --api-key your-secret-key
+panguard threat start --port 8080 --api-key your-secret-key
 
 # 指定資料庫路徑
-threat-cloud --port 8080 --db /var/lib/threat-cloud/data.db --api-key key1,key2
+panguard threat start --port 8080 --db /var/lib/threat-cloud/data.db --api-key key1,key2
 ```
 
 ---
@@ -37,13 +39,13 @@ threat-cloud --port 8080 --db /var/lib/threat-cloud/data.db --api-key key1,key2
 ### 基本啟動
 
 ```bash
-threat-cloud --port 8080
+panguard threat start --port 8080
 ```
 
 預設綁定 `127.0.0.1`（僅本機存取）。要對外服務：
 
 ```bash
-threat-cloud --host 0.0.0.0 --port 8080 --api-key your-api-key
+panguard threat start --host 0.0.0.0 --port 8080 --api-key your-api-key
 ```
 
 ### API Key 認證
@@ -52,10 +54,10 @@ threat-cloud --host 0.0.0.0 --port 8080 --api-key your-api-key
 
 ```bash
 # 單一 API Key
-threat-cloud --api-key my-secret-key
+panguard threat start --api-key my-secret-key
 
 # 多個 API Key（給不同用戶端）
-threat-cloud --api-key key-team-a,key-team-b,key-team-c
+panguard threat start --api-key key-team-a,key-team-b,key-team-c
 ```
 
 用戶端請求需在 Header 帶上：
@@ -70,7 +72,7 @@ Threat Cloud 使用 SQLite，輕量且零維護：
 
 ```bash
 # 自訂資料庫路徑
-threat-cloud --db /var/lib/threat-cloud/data.db
+panguard threat start --db /var/lib/threat-cloud/data.db
 ```
 
 ---
@@ -135,14 +137,14 @@ GET /api/v1/health
 
 ```bash
 # 直接在現有伺服器上跑
-threat-cloud --port 8080 --api-key your-key
+panguard threat start --port 8080 --api-key your-key
 ```
 
 ### 中型部署（50-500 個端點）
 
 ```bash
 # 專用伺服器 + systemd 管理
-threat-cloud --host 0.0.0.0 --port 8080 \
+panguard threat start --host 0.0.0.0 --port 8080 \
   --db /var/lib/threat-cloud/data.db \
   --api-key team-key-1,team-key-2
 ```
@@ -187,14 +189,12 @@ threat-cloud --host 0.0.0.0 --port 8080 \
 ## CLI 選項
 
 ```
-threat-cloud [options]
+panguard threat start [options]
 
 Options:
   --port <number>     監聽 port（預設：8080）
   --host <string>     監聽位址（預設：127.0.0.1）
   --db <path>         SQLite 資料庫路徑（預設：./threat-cloud.db）
-  --api-key <keys>    API 金鑰（逗號分隔，啟用認證）
-  --help              顯示說明
 ```
 
 完整 CLI 參考見 [CLI 指令參考](../reference/cli.md)。

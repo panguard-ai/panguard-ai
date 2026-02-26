@@ -50,8 +50,7 @@ Guard 的設定檔位於資料目錄中：
     "userType": "boss",
     "language": "zh-TW"
   },
-  "license": {
-    "key": "",
+  "auth": {
     "tier": "free"
   }
 }
@@ -109,7 +108,7 @@ Guard 的設定檔位於資料目錄中：
 Chat 的設定（含加密認證資訊）位於：
 
 ```
-~/.panguard-chat/config.json
+~/.panguard chat/config.json
 ```
 
 ### LINE 設定
@@ -193,8 +192,71 @@ Chat 設定中的敏感欄位（token、密碼、webhook URL）使用 AES-256-GC
 
 - 加密金鑰衍生自機器特徵
 - 設定檔中以 `encrypted:...` 前綴表示
-- 用 `panguard-chat setup` 設定時自動加密
+- 用 `panguard chat setup` 設定時自動加密
 - 不要手動編輯加密欄位
+
+---
+
+## 認證憑證
+
+CLI 登入後的憑證檔案：
+
+```
+~/.panguard/credentials.json
+```
+
+檔案權限為 `0o600`（僅擁有者可讀寫）。由 `panguard login` 自動建立，不要手動編輯。
+
+### 格式
+
+```json
+{
+  "token": "session-token-string",
+  "expiresAt": "2026-04-27T00:00:00.000Z",
+  "email": "user@example.com",
+  "tier": "pro",
+  "name": "User Name",
+  "savedAt": "2026-02-26T12:00:00.000Z",
+  "apiUrl": "https://panguard.ai"
+}
+```
+
+### 欄位說明
+
+| 欄位 | 類型 | 說明 |
+|------|------|------|
+| `token` | string | Bearer session token |
+| `expiresAt` | string | ISO 到期時間（登入後 30 天） |
+| `email` | string | 帳號 email |
+| `tier` | string | 訂閱等級：`free` / `starter` / `pro` / `enterprise` |
+| `name` | string | 使用者名稱 |
+| `savedAt` | string | 儲存時間 |
+| `apiUrl` | string | 認證伺服器 URL |
+
+### 管理指令
+
+```bash
+# 建立（透過登入）
+panguard login
+
+# 查看
+panguard whoami
+
+# 刪除（透過登出）
+panguard logout
+```
+
+---
+
+## Panguard 設定檔
+
+`panguard init` 產生的統一設定檔：
+
+```
+~/.panguard/config.json
+```
+
+包含所有模組（Guard、Scan、Trap、Chat 等）的設定。由設定精靈自動產生。
 
 ---
 

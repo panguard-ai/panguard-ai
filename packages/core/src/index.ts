@@ -54,7 +54,7 @@ export { RULES_VERSION, RuleEngine, parseSigmaYaml, parseSigmaFile, matchEvent, 
 export type { SigmaLogSource, SigmaDetection, SigmaRule, RuleMatch, RuleEngineConfig, YaraMatch, YaraScanResult } from './rules/index.js';
 
 // Monitor engine / 監控引擎
-export { MONITOR_VERSION, MonitorEngine, LogMonitor, NetworkMonitor, ProcessMonitor, FileMonitor, checkThreatIntel, isPrivateIP, addThreatIntelEntry, getThreatIntelEntries, normalizeLogEvent, normalizeNetworkEvent, normalizeProcessEvent, normalizeFileEvent, DEFAULT_MONITOR_CONFIG, ThreatIntelFeedManager } from './monitor/index.js';
+export { MONITOR_VERSION, MonitorEngine, LogMonitor, NetworkMonitor, ProcessMonitor, FileMonitor, checkThreatIntel, isPrivateIP, addThreatIntelEntry, getThreatIntelEntries, setFeedManager, getFeedManager, normalizeLogEvent, normalizeNetworkEvent, normalizeProcessEvent, normalizeFileEvent, DEFAULT_MONITOR_CONFIG, ThreatIntelFeedManager } from './monitor/index.js';
 export type { MonitorConfig, MonitorStatus, ThreatIntelEntry, FileHashRecord, ProcessListEntry, IoC, FeedSource, FeedUpdateResult, FeedManagerConfig } from './monitor/index.js';
 
 // Scoring / 安全分數
@@ -62,15 +62,16 @@ export { calculateSecurityScore, scoreToGrade, scoreToColor, generateScoreSummar
 export type { ScoreFactor, SecurityScoreSnapshot, ScoreInput, Achievement, AchievementStats, EarnedAchievement } from './scoring/index.js';
 
 // AI / LLM interface / AI/LLM 介面
-export { AI_VERSION } from './ai/index.js';
+export { AI_VERSION, createLLM } from './ai/index.js';
+export type { LLMConfig, LLMProvider, LLMProviderType, AnalysisResult, ThreatClassification } from './ai/index.js';
 
 // Adapters / 對接器
 export { ADAPTERS_VERSION, BaseAdapter, mapSeverity, mapEventSource, DefenderAdapter, WazuhAdapter, SyslogAdapter, parseSyslogMessage, AdapterRegistry } from './adapters/index.js';
 export type { AdapterConfig, AdapterAlert, SecurityAdapter, SyslogAlertCallback } from './adapters/index.js';
 
 // CLI utilities / CLI 工具
-export { c, colorSeverity, colorScore, colorGrade, Spinner, spinner, ProgressBar, progressBar, table, box, banner, header, symbols, divider, scoreDisplay, statusPanel, stripAnsi, formatDuration, timeAgo } from './cli/index.js';
-export type { ProgressBarOptions, TableColumn, BoxOptions, StatusItem } from './cli/index.js';
+export { c, colorSeverity, colorScore, colorGrade, Spinner, spinner, ProgressBar, progressBar, table, box, banner, header, symbols, divider, scoreDisplay, statusPanel, stripAnsi, formatDuration, timeAgo, visLen, promptSelect, promptText, promptConfirm, WizardEngine } from './cli/index.js';
+export type { ProgressBarOptions, TableColumn, BoxOptions, StatusItem, SelectOption, SelectConfig, TextConfig, ConfirmConfig, WizardStep, WizardAnswers } from './cli/index.js';
 
 /** Core package version / 核心套件版本 */
 export const CORE_VERSION = '0.1.0';

@@ -61,7 +61,7 @@ POST /api/v1/ioc
   "type": "ip",
   "value": "203.0.113.50",
   "confidence": 95,
-  "source": "panguard-guard",
+  "source": "panguard guard",
   "tags": ["c2", "botnet"],
   "description": "Known C2 server detected by behavioral analysis"
 }

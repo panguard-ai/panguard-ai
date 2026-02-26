@@ -4,7 +4,7 @@
  * @module @openclaw/panguard-auth/auth
  */
 
-import { scrypt, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
+import { scrypt, randomBytes, randomUUID, timingSafeEqual, createHash } from 'node:crypto';
 
 const SCRYPT_KEYLEN = 64;
 const SCRYPT_COST = 16384; // N
@@ -53,6 +53,14 @@ export function generateSessionToken(): string {
  */
 export function generateVerifyToken(): string {
   return randomUUID();
+}
+
+/**
+ * Hash a session token with SHA-256 for secure storage.
+ * The plaintext token is sent to the client; only the hash is stored in DB.
+ */
+export function hashToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
 }
 
 /**

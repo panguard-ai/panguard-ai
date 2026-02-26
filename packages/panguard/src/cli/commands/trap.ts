@@ -5,29 +5,30 @@
 
 import { Command } from 'commander';
 import { executeCli } from '@openclaw/panguard-trap';
+import { withAuth } from '../auth-guard.js';
 
 export function trapCommand(): Command {
   const cmd = new Command('trap')
-    .description('Honeypot system management / 蜜罐系統管理');
+    .description('Honeypot system management / \u871C\u7F50\u7CFB\u7D71\u7BA1\u7406');
 
   cmd.command('start')
-    .description('Start honeypot services / 啟動蜜罐服務')
+    .description('Start honeypot services / \u555F\u52D5\u871C\u7F50\u670D\u52D9')
     .option('--services <types>', 'Comma-separated service types (ssh,http,ftp,...)')
-    .option('--data-dir <path>', 'Data directory / 資料目錄')
+    .option('--data-dir <path>', 'Data directory / \u8CC7\u6599\u76EE\u9304')
     .option('--no-cloud', 'Disable Threat Cloud upload')
-    .action(async (opts: Record<string, string | undefined>) => {
+    .action(withAuth('pro', async (opts: Record<string, string | undefined>) => {
       const args = ['start'];
       if (opts['services']) args.push('--services', opts['services']);
       if (opts['dataDir']) args.push('--data-dir', opts['dataDir']);
       if (opts['cloud'] === 'false') args.push('--no-cloud');
       await executeCli(args);
-    });
+    }));
 
   cmd.command('stop')
-    .description('Stop honeypot services / 停止蜜罐服務')
-    .action(async () => {
+    .description('Stop honeypot services / \u505C\u6B62\u871C\u7F50\u670D\u52D9')
+    .action(withAuth('pro', async () => {
       await executeCli(['stop']);
-    });
+    }));
 
   cmd.command('status')
     .description('Show current status / 顯示目前狀態')

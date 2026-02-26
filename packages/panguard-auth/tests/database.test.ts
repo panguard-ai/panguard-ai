@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { AuthDB } from '../src/database.js';
+import { hashToken } from '../src/auth.js';
 import { join } from 'node:path';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -160,12 +161,15 @@ describe('AuthDB', () => {
       expect(session.token).toBe('token-abc');
     });
 
-    it('should get session with user', () => {
+    it('should get session with user (token is hashed in DB)', () => {
       const future = new Date(Date.now() + 86400000).toISOString().replace('T', ' ').slice(0, 19);
-      db.createSession(userId, 'token-get', future);
+      const session = db.createSession(userId, 'token-get', future);
+      // createSession returns plaintext token for the client
+      expect(session.token).toBe('token-get');
+      // getSession accepts plaintext, hashes internally, returns DB row (hash)
       const result = db.getSession('token-get');
       expect(result).toBeDefined();
-      expect(result!.token).toBe('token-get');
+      expect(result!.token).toBe(hashToken('token-get'));
       expect(result!.user.email).toBe('sess@test.com');
     });
 

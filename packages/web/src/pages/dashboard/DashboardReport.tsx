@@ -29,9 +29,13 @@ export default function DashboardReport() {
     setResult(null);
 
     try {
+      const token = localStorage.getItem('panguard_token');
       const res = await fetch('/api/report/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ framework: selectedFramework, language: selectedLang }),
       });
       const json = await res.json() as { ok: boolean; data?: ReportResult; error?: string };

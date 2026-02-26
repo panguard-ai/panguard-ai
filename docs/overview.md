@@ -9,7 +9,15 @@
 
 Panguard AI 是一個開源的網路安全平台，專為沒有資安團隊的中小企業和個人開發者設計。
 
-核心理念很簡單：**安裝一行指令，AI 全自動保護你的機器。有事它會告訴你，沒事你什麼都不用做。**
+核心理念很簡單：**在網站註冊帳號，在 CLI 登入，AI 全自動保護你的機器。有事它會告訴你，沒事你什麼都不用做。**
+
+### 使用體驗
+
+像 Claude / Claude Code 一樣：
+
+1. **網站** — 瀏覽方案、註冊帳號、管理訂閱
+2. **CLI** — `panguard login` 開瀏覽器完成認證 → token 存在本地
+3. **使用** — 依訂閱等級使用 CLI 功能，零日常操作
 
 ### 為什麼需要 Panguard AI？
 
@@ -38,7 +46,7 @@ Panguard AI 包含 6 個產品，各自獨立但可以協同運作：
 一次性安全掃描，產生風險評分和 PDF 報告。
 
 ```bash
-panguard-scan --quick
+panguard scan --quick
 ```
 
 - 系統環境偵察（OS、網路、port、服務）
@@ -53,12 +61,12 @@ panguard-scan --quick
 
 ---
 
-### Panguard Guard — AI 即時監控
+### Panguard Guard — AI 即時監控 `[STARTER]`
 
 持續運行的 AI 守護引擎，自動偵測和回應威脅。
 
 ```bash
-panguard-guard start
+panguard guard start
 ```
 
 - 5 個 AI Agent 管線：Detect -> Analyze -> Respond -> Report -> Investigation
@@ -74,12 +82,12 @@ panguard-guard start
 
 ---
 
-### Panguard Chat — AI 資安通知
+### Panguard Chat — AI 資安通知 `[STARTER]`
 
 將技術性安全告警翻譯成人話，透過你偏好的管道通知。
 
 ```bash
-panguard-chat setup --channel line --user-type boss
+panguard chat setup --channel line --user-type boss
 ```
 
 - 5 個通知管道：LINE、Telegram、Slack（Block Kit）、Email（SMTP HTML）、Webhook（mTLS）
@@ -95,7 +103,7 @@ panguard-chat setup --channel line --user-type boss
 
 ---
 
-### Panguard Trap — 智慧蜜罐
+### Panguard Trap — 智慧蜜罐 `[PRO]`
 
 部署假服務引誘攻擊者，收集情報並分析其行為。
 
@@ -111,7 +119,7 @@ panguard-chat setup --channel line --user-type boss
 
 ---
 
-### Panguard Report — 合規報告
+### Panguard Report — 合規報告 `[PRO]`
 
 自動產生符合法規框架的安全合規報告。
 
@@ -127,18 +135,18 @@ panguard-chat setup --channel line --user-type boss
 
 ---
 
-### Threat Cloud — 集體威脅情報
+### Threat Cloud — 集體威脅情報 `[ENTERPRISE]`
 
 匿名化的威脅情報共享平台，所有 Panguard 用戶共同建構防護網。
 
 ```bash
-threat-cloud --port 8080 --api-key your-key
+panguard threat start --port 8080
 ```
 
 - RESTful API 伺服器
 - SQLite 後端，輕量部署
 - IoC（入侵指標）提交和查詢
-- API Key 認證
+- 速率限制
 - 自動過期清理
 
 適合：企業私有部署、社群共享威脅情報。
@@ -150,10 +158,13 @@ threat-cloud --port 8080 --api-key your-key
 ## 架構概覽
 
 ```
-                         用戶
+                         使用者
                           |
-                    [Panguard Chat]
-                   LINE / Telegram / Slack
+                    [panguard.ai]
+                   註冊 / 登入 / 管理訂閱
+                          |
+                    [panguard login]
+                   CLI 本地認證
                           |
     +---------------------+---------------------+
     |                     |                     |
@@ -189,26 +200,35 @@ Panguard Guard 使用三層架構處理安全事件，在效率和準確度之�
 | 語言 | TypeScript 5.7（strict mode） |
 | 執行環境 | Node.js 20+ |
 | 套件管理 | pnpm 10（workspace monorepo） |
-| 測試 | Vitest 3（1013 tests, 58 files） |
+| 測試 | Vitest 3（1068 tests） |
 | 規則引擎 | Sigma + YARA |
 | 威脅情報 | abuse.ch / GreyNoise / AbuseIPDB |
+| 認證 | Google OAuth (PKCE) + scrypt 密碼雜湊 |
 | i18n | i18next（English + 繁體中文） |
 | 加密 | AES-256-GCM |
 
 ---
 
-## 授權等級
+## 訂閱等級
 
-| 功能 | Free | Pro | Enterprise |
-|------|------|-----|-----------|
-| Panguard Scan | v | v | v |
-| 基本偵測 + 通知 | v | v | v |
-| AI 深度分析 | - | v | v |
-| 自動回應 | - | v | v |
-| Dashboard | - | v | v |
-| Threat Cloud | - | - | v |
-| 進階調查引擎 | - | - | v |
-| 優先支援 | - | - | v |
+| 功能 | Free | Starter | Pro | Enterprise |
+|------|------|---------|-----|-----------|
+| 快速掃描 | v | v | v | v |
+| 狀態查詢 | v | v | v | v |
+| 完整掃描 | - | v | v | v |
+| 即時防護（Guard） | - | v | v | v |
+| 通知管道（Chat） | - | v | v | v |
+| 部署服務 | - | v | v | v |
+| AI 深度分析 | - | v | v | v |
+| 自動回應 | - | v | v | v |
+| 合規報告 | - | - | v | v |
+| Dashboard | - | - | v | v |
+| 蜜罐系統（Trap） | - | - | v | v |
+| 威脅情報 API | - | - | - | v |
+| 進階調查引擎 | - | - | - | v |
+| 優先支援 | - | - | - | v |
+
+管理訂閱：[panguard.ai/pricing](https://panguard.ai/pricing)
 
 ---
 

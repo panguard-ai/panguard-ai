@@ -7,7 +7,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error' | 'success'>('idle');
   const [error, setError] = useState('');
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
@@ -25,7 +25,8 @@ export default function RegisterPage() {
 
       if (data.ok) {
         localStorage.setItem('panguard_token', data.data.token);
-        window.location.href = '/dashboard';
+        if (data.data.user?.email) localStorage.setItem('panguard_email', data.data.user.email);
+        setStatus('success');
       } else {
         setStatus('error');
         setError(data.error ?? t('Registration failed.', '\u8A3B\u518A\u5931\u6557\u3002'));
@@ -35,6 +36,52 @@ export default function RegisterPage() {
       setError(t('Network error.', '\u7DB2\u8DEF\u932F\u8AA4\u3002'));
     }
   }, [email, name, password, t]);
+
+  if (status === 'success') {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="w-full max-w-lg rounded-xl border border-brand-cyan/50 bg-brand-card p-8">
+          <h2 className="mb-4 text-center text-2xl font-bold text-brand-text">
+            {t('Account Created!', '\u5E33\u865F\u5EFA\u7ACB\u6210\u529F\uFF01')}
+          </h2>
+          <p className="mb-6 text-center text-brand-muted">
+            {t(
+              'Install the CLI and log in to start protecting your systems.',
+              '\u5B89\u88DD CLI \u4E26\u767B\u5165\u4F86\u958B\u59CB\u4FDD\u8B77\u4F60\u7684\u7CFB\u7D71\u3002',
+            )}
+          </p>
+          <div className="space-y-4">
+            <div>
+              <p className="mb-1 text-xs text-brand-muted">1. {t('Install CLI', '\u5B89\u88DD CLI')}</p>
+              <div className="rounded-lg bg-brand-dark px-4 py-3 font-mono text-sm text-brand-cyan">
+                npm install -g @openclaw/panguard
+              </div>
+            </div>
+            <div>
+              <p className="mb-1 text-xs text-brand-muted">2. {t('Log in', '\u767B\u5165')}</p>
+              <div className="rounded-lg bg-brand-dark px-4 py-3 font-mono text-sm text-brand-cyan">
+                panguard login
+              </div>
+            </div>
+            <div>
+              <p className="mb-1 text-xs text-brand-muted">3. {t('Run your first scan', '\u57F7\u884C\u7B2C\u4E00\u6B21\u6383\u63CF')}</p>
+              <div className="rounded-lg bg-brand-dark px-4 py-3 font-mono text-sm text-brand-cyan">
+                panguard scan --quick
+              </div>
+            </div>
+          </div>
+          <div className="mt-6 flex gap-3">
+            <Link to="/dashboard" className="btn-primary flex-1 py-2 text-center text-sm">
+              {t('Go to Dashboard', '\u524D\u5F80\u5100\u8868\u677F')}
+            </Link>
+            <Link to="/guide" className="flex-1 rounded-lg border border-brand-border px-4 py-2 text-center text-sm text-brand-muted transition hover:border-brand-cyan hover:text-brand-cyan">
+              {t('Setup Guide', '\u8A2D\u5B9A\u6307\u5357')}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">

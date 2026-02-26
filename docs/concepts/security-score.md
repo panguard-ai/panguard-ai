@@ -68,7 +68,7 @@
 每次掃描結束都會顯示：
 
 ```bash
-panguard-scan
+panguard scan
 ```
 
 ```
@@ -93,7 +93,7 @@ panguard-scan
 Guard 持續計算即時分數，可透過 `status` 查看：
 
 ```bash
-panguard-guard status
+panguard guard status
 ```
 
 ### Dashboard

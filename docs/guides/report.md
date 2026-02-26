@@ -1,6 +1,8 @@
-# Panguard Report / 合規報告指南
+# Panguard Report / 合規報告指南 `[PRO]`
 
 > 自動產生符合法規框架的安全合規報告，讓稽核不再痛苦。
+>
+> 產生報告和摘要需要 **Pro** 以上方案。
 
 ---
 
@@ -8,16 +10,16 @@
 
 ```bash
 # 產生台灣資安法合規報告
-panguard-report generate --framework tw_cyber_security_act --language zh-TW
+panguard report generate --framework tw_cyber_security_act --language zh-TW
 
 # 產生 ISO 27001 報告
-panguard-report generate --framework iso27001
+panguard report generate --framework iso27001
 
 # 產生 SOC 2 報告
-panguard-report generate --framework soc2
+panguard report generate --framework soc2
 
 # 查看支援的合規框架
-panguard-report list-frameworks
+panguard report list-frameworks
 ```
 
 ---
@@ -27,7 +29,7 @@ panguard-report list-frameworks
 ### 台灣資通安全管理法
 
 ```bash
-panguard-report generate --framework tw_cyber_security_act --language zh-TW
+panguard report generate --framework tw_cyber_security_act --language zh-TW
 ```
 
 10 個控制項：
@@ -48,7 +50,7 @@ panguard-report generate --framework tw_cyber_security_act --language zh-TW
 ### ISO 27001
 
 ```bash
-panguard-report generate --framework iso27001
+panguard report generate --framework iso27001
 ```
 
 12 個控制項，涵蓋資訊安全管理系統（ISMS）核心要求。
@@ -56,7 +58,7 @@ panguard-report generate --framework iso27001
 ### SOC 2
 
 ```bash
-panguard-report generate --framework soc2
+panguard report generate --framework soc2
 ```
 
 10 個控制項，涵蓋 Trust Services Criteria（安全性、可用性、處理完整性、機密性、隱私）。
@@ -68,7 +70,7 @@ panguard-report generate --framework soc2
 ### JSON 格式（預設）
 
 ```bash
-panguard-report generate --framework iso27001 --format json --output-dir ./reports
+panguard report generate --framework iso27001 --format json --output-dir ./reports
 ```
 
 適合程式化處理和自動化整合。
@@ -76,7 +78,7 @@ panguard-report generate --framework iso27001 --format json --output-dir ./repor
 ### PDF 格式
 
 ```bash
-panguard-report generate --framework iso27001 --format pdf --output-dir ./reports
+panguard report generate --framework iso27001 --format pdf --output-dir ./reports
 ```
 
 適合提交給稽核人員。
@@ -106,10 +108,10 @@ Scan 的掃描結果可以作為 Report 的輸入：
 
 ```bash
 # 1. 先掃描收集安全發現
-panguard-scan --output scan-findings.pdf
+panguard scan --output scan-findings.pdf
 
 # 2. 用發現產生合規報告
-panguard-report generate \
+panguard report generate \
   --framework tw_cyber_security_act \
   --input findings.json \
   --org "你的公司名稱" \
@@ -122,7 +124,7 @@ panguard-report generate \
 ## 驗證輸入檔案
 
 ```bash
-panguard-report validate --input findings.json
+panguard report validate --input findings.json
 ```
 
 驗證輸入的 findings JSON 檔案格式是否正確。
@@ -134,7 +136,7 @@ panguard-report validate --input findings.json
 不需要完整報告，只想看合規狀態：
 
 ```bash
-panguard-report summary --framework iso27001
+panguard report summary --framework iso27001
 ```
 
 ```
@@ -155,7 +157,7 @@ panguard-report summary --framework iso27001
 ## CLI 選項
 
 ```
-panguard-report <command> [options]
+panguard report <command> [options]
 
 Commands:
   generate           產生合規報告

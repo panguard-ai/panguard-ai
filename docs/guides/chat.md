@@ -1,6 +1,8 @@
-# Panguard Chat / 通知設定指南
+# Panguard Chat / 通知設定指南 `[STARTER]`
 
 > 讓 AI 用你習慣的方式通知你安全事件。老闆看人話，工程師看技術細節。
+>
+> 設定和測試通知管道需要 **Starter** 以上方案。
 
 ---
 
@@ -8,16 +10,16 @@
 
 ```bash
 # 互動式設定
-panguard-chat setup
+panguard chat setup
 
 # 直接指定管道和角色
-panguard-chat setup --channel line --user-type boss --lang zh-TW
+panguard chat setup --channel line --user-type boss --lang zh-TW
 
 # 測試通知
-panguard-chat test
+panguard chat test
 
 # 查看狀態
-panguard-chat status
+panguard chat status
 ```
 
 ---
@@ -39,7 +41,7 @@ panguard-chat status
 ### LINE
 
 ```bash
-panguard-chat setup --channel line
+panguard chat setup --channel line
 ```
 
 設定精靈會要求：
@@ -48,7 +50,7 @@ panguard-chat setup --channel line
 ### Telegram
 
 ```bash
-panguard-chat setup --channel telegram
+panguard chat setup --channel telegram
 ```
 
 設定精靈會要求：
@@ -58,7 +60,7 @@ panguard-chat setup --channel telegram
 ### Slack
 
 ```bash
-panguard-chat setup --channel slack
+panguard chat setup --channel slack
 ```
 
 設定精靈會要求：
@@ -69,7 +71,7 @@ Slack 通知使用 Block Kit 格式，包含結構化的嚴重等級標示和操
 ### Email
 
 ```bash
-panguard-chat setup --channel email
+panguard chat setup --channel email
 ```
 
 設定精靈會要求：
@@ -85,7 +87,7 @@ Email 使用 HTML 格式，包含品牌配色的告警模板。
 ### Webhook
 
 ```bash
-panguard-chat setup --channel webhook
+panguard chat setup --channel webhook
 ```
 
 設定精靈會要求：
@@ -150,7 +152,7 @@ Timeline:
 1. 檢查程序 curl (PID 5678) 是否為合法操作
 2. 如果不是，終止程序：kill -9 5678
 3. 檢查是否有其他程序連線到同一 IP
-4. 掃描系統是否有後門：panguard-scan
+4. 掃描系統是否有後門：panguard scan
 5. 如果確認入侵，執行完整調查
 ```
 
@@ -176,10 +178,10 @@ Chat 會發送以下類型的通知：
 
 ```bash
 # 繁體中文通知
-panguard-chat setup --channel line --lang zh-TW
+panguard chat setup --channel line --lang zh-TW
 
 # 英文通知
-panguard-chat setup --channel line --lang en
+panguard chat setup --channel line --lang en
 ```
 
 所有通知模板都有 English 和繁體中文兩個版本。
@@ -195,7 +197,7 @@ Chat 的管道認證資訊（Token、密碼等）使用 AES-256-GCM 加密儲存
 ## CLI 選項
 
 ```
-panguard-chat <command> [options]
+panguard chat <command> [options]
 
 Commands:
   setup              互動式設定精靈

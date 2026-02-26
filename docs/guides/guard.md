@@ -1,20 +1,25 @@
-# Panguard Guard / AI 即時監控指南
+# Panguard Guard / AI 即時監控指南 `[STARTER]`
 
 > 5 個 AI Agent 24/7 守護你的系統。學習你的環境，偵測異常，自動回應威脅。
+>
+> 啟動和停止 Guard 需要 **Starter** 以上方案。狀態查詢和設定檢視為 Free。
 
 ---
 
 ## 快速開始
 
 ```bash
-# 啟動 Guard
-panguard-guard start
+# 登入（如果還沒有）
+panguard login
 
-# 查看狀態
-panguard-guard status
+# 啟動 Guard（需要 Starter）
+panguard guard start
+
+# 查看狀態（Free）
+panguard guard status
 
 # 停止 Guard
-panguard-guard stop
+panguard guard stop
 ```
 
 ---
@@ -139,7 +144,7 @@ Guard 的核心是 5 個串聯的 AI Agent，形成完整的偵測-分析-回應
 ## 查看狀態
 
 ```bash
-panguard-guard status
+panguard guard status
 ```
 
 ```
@@ -244,29 +249,24 @@ Pro 和 Enterprise 用戶可啟用 WebSocket Dashboard：
 
 ---
 
-## 授權等級
+## 訂閱等級
 
-| 功能 | Free | Pro | Enterprise |
-|------|------|-----|-----------|
-| 基本偵測 | v | v | v |
-| Sigma 規則 | v | v | v |
-| Chat 通知 | v | v | v |
-| AI 深度分析 | - | v | v |
-| 自動回應 | - | v | v |
-| Dashboard | - | v | v |
-| YARA 掃描 | - | v | v |
-| Threat Cloud | - | - | v |
-| Investigation | - | - | v |
+Guard 功能依訂閱等級分級：
 
-### 產生測試授權金鑰
+| 功能 | Free | Starter | Pro | Enterprise |
+|------|------|---------|-----|-----------|
+| 狀態查詢 | v | v | v | v |
+| 基本偵測 | - | v | v | v |
+| Sigma 規則 | - | v | v | v |
+| Chat 通知 | - | v | v | v |
+| AI 深度分析 | - | v | v | v |
+| 自動回應 | - | v | v | v |
+| Dashboard | - | - | v | v |
+| YARA 掃描 | - | v | v | v |
+| Threat Cloud | - | - | - | v |
+| Investigation | - | - | - | v |
 
-```bash
-# 產生 Pro 測試金鑰
-panguard-guard generate-key pro
-
-# 產生 Enterprise 測試金鑰
-panguard-guard generate-key enterprise
-```
+管理訂閱：[panguard.ai/pricing](https://panguard.ai/pricing)
 
 ---
 
@@ -275,7 +275,7 @@ panguard-guard generate-key enterprise
 將 Guard 安裝為開機自動啟動的系統服務：
 
 ```bash
-panguard-guard install
+panguard guard install
 ```
 
 詳見 [系統服務安裝指南](system-service.md)。
@@ -285,22 +285,19 @@ panguard-guard install
 ## CLI 選項
 
 ```
-panguard-guard <command> [options]
+panguard guard <command> [options]
 
 Commands:
-  start              啟動 Guard 引擎
-  stop               停止 Guard 引擎
-  status             顯示狀態
-  install            安裝為系統服務
-  uninstall          移除系統服務
-  config             顯示目前設定
-  generate-key       產生測試授權金鑰
-  install-script     產生安裝腳本
+  start              啟動 Guard 引擎（Starter）
+  stop               停止 Guard 引擎（Starter）
+  status             顯示狀態（Free）
+  install            安裝為系統服務（Starter）
+  uninstall          移除系統服務（Starter）
+  config             顯示目前設定（Free）
   help               顯示說明
 
 Options:
   --data-dir <path>      資料目錄（預設：~/.panguard-guard）
-  --license-key <key>    授權金鑰
 ```
 
 完整 CLI 參考見 [CLI 指令參考](../reference/cli.md)。

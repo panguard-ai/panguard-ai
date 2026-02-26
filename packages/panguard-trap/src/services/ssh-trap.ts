@@ -56,7 +56,10 @@ const FAKE_RESPONSES: Record<string, string> = {
  */
 export class SSHTrapService extends BaseTrapService {
   private server: ReturnType<typeof import('node:net').createServer> | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private ssh2Server: any = null;
   private readonly sshBanner: string;
+  private usingSsh2 = false;
 
   constructor(config: TrapServiceConfig) {
     super({ ...config, type: 'ssh' });
@@ -64,6 +67,15 @@ export class SSHTrapService extends BaseTrapService {
   }
 
   protected async doStart(): Promise<void> {
+    // Try ssh2 module first for real SSH-2.0 protocol support
+    if (await this.tryStartSsh2()) {
+      this.usingSsh2 = true;
+      logger.info('SSH honeypot using ssh2 module (full SSH-2.0 protocol)');
+      return;
+    }
+
+    // Fallback to basic TCP
+    logger.info('SSH honeypot using TCP fallback (ssh2 not available)');
     const net = await import('node:net');
     this.server = net.createServer((socket) => {
       this.handleConnection(socket);
@@ -77,9 +89,192 @@ export class SSHTrapService extends BaseTrapService {
     });
   }
 
+  /**
+   * Try to start with ssh2 module for proper SSH-2.0 handshake.
+   * Returns true if successful, false if ssh2 is not installed.
+   */
+  private async tryStartSsh2(): Promise<boolean> {
+    try {
+      // Dynamic import wrapped to avoid TypeScript module resolution errors
+      // ssh2 is an optional dependency - may not be installed
+      const moduleName = 'ssh2';
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ssh2Module = await import(/* webpackIgnore: true */ moduleName) as any;
+      const { generateKeyPairSync } = await import('node:crypto');
+
+      // Generate RSA host key
+      const { privateKey } = generateKeyPairSync('rsa', {
+        modulusLength: 2048,
+        privateKeyEncoding: { type: 'pkcs1', format: 'pem' },
+        publicKeyEncoding: { type: 'pkcs1', format: 'pem' },
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ServerClass = ssh2Module.Server ?? (ssh2Module as any).default?.Server;
+      if (!ServerClass) return false;
+
+      this.ssh2Server = new ServerClass(
+        {
+          hostKeys: [privateKey],
+          banner: this.sshBanner.replace('SSH-2.0-', ''),
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (client: any) => {
+          this.handleSsh2Client(client);
+        },
+      );
+
+      return new Promise((resolve) => {
+        this.ssh2Server.listen(this.config.port, () => {
+          resolve(true);
+        });
+        this.ssh2Server.on('error', () => {
+          resolve(false);
+        });
+      });
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Handle a real SSH-2.0 client connection via ssh2 module.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private handleSsh2Client(client: any): void {
+    const remoteIP = client._sock?.remoteAddress ?? 'unknown';
+    const remotePort = client._sock?.remotePort ?? 0;
+    const session = this.createSession(remoteIP, remotePort);
+    this.addMitreTechnique(session.sessionId, 'T1110');
+
+    let authAttempts = 0;
+    const maxAuthBeforeGrant = 3;
+
+    client.on('authentication', (ctx: { method: string; username: string; password?: string; accept: () => void; reject: () => void }) => {
+      authAttempts++;
+      const username = ctx.username ?? '';
+      const password = ctx.password ?? '';
+
+      if (ctx.method === 'password' && password) {
+        const shouldGrant = authAttempts >= maxAuthBeforeGrant;
+        this.recordCredential(session.sessionId, username, password, shouldGrant);
+
+        if (shouldGrant) {
+          this.addMitreTechnique(session.sessionId, 'T1078');
+          ctx.accept();
+        } else {
+          ctx.reject();
+        }
+      } else if (ctx.method === 'none') {
+        ctx.reject();
+      } else {
+        ctx.reject();
+      }
+    });
+
+    client.on('ready', () => {
+      logger.info(`SSH2 client authenticated: ${session.sessionId}`);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      client.on('session', (accept: () => any) => {
+        const sshSession = accept();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sshSession.on('shell', (accept: () => any) => {
+          const stream = accept();
+          stream.write('admin@web-server-01:~$ ');
+
+          let inputBuffer = '';
+          stream.on('data', (data: Buffer) => {
+            const char = data.toString();
+            // Echo back
+            stream.write(char);
+
+            if (char === '\r' || char === '\n') {
+              const command = inputBuffer.trim();
+              inputBuffer = '';
+
+              if (!command) {
+                stream.write('\r\nadmin@web-server-01:~$ ');
+                return;
+              }
+
+              if (command === 'exit' || command === 'quit' || command === 'logout') {
+                stream.write('\r\n');
+                stream.close();
+                client.end();
+                return;
+              }
+
+              this.recordCommand(session.sessionId, command);
+              this.addMitreTechnique(session.sessionId, 'T1059');
+
+              // Check for suspicious commands
+              for (const sus of SUSPICIOUS_COMMANDS) {
+                if (sus.pattern.test(command)) {
+                  this.addMitreTechnique(session.sessionId, sus.technique);
+                  this.recordEvent(session.sessionId, 'exploit_attempt', command, {
+                    technique: sus.technique,
+                    description: sus.description,
+                  });
+                }
+              }
+
+              const response = this.getFakeResponse(command);
+              stream.write(`\r\n${response}\r\nadmin@web-server-01:~$ `);
+            } else {
+              inputBuffer += char;
+            }
+          });
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sshSession.on('exec', (accept: () => any, _reject: () => void, info: { command: string }) => {
+          const stream = accept();
+          const command = info.command;
+          this.recordCommand(session.sessionId, command);
+          this.addMitreTechnique(session.sessionId, 'T1059');
+
+          for (const sus of SUSPICIOUS_COMMANDS) {
+            if (sus.pattern.test(command)) {
+              this.addMitreTechnique(session.sessionId, sus.technique);
+              this.recordEvent(session.sessionId, 'exploit_attempt', command, {
+                technique: sus.technique,
+                description: sus.description,
+              });
+            }
+          }
+
+          const response = this.getFakeResponse(command);
+          stream.write(response + '\r\n');
+          stream.exit(0);
+          stream.close();
+        });
+      });
+    });
+
+    client.on('close', () => {
+      this.endSession(session.sessionId);
+    });
+
+    client.on('error', (err: Error) => {
+      logger.debug(`SSH2 client error: ${err.message}`);
+      this.endSession(session.sessionId);
+    });
+
+    // Timeout
+    const timeout = this.config.sessionTimeoutMs ?? 30_000;
+    setTimeout(() => {
+      try { client.end(); } catch { /* ignore */ }
+    }, timeout);
+  }
+
   protected async doStop(): Promise<void> {
     return new Promise((resolve) => {
-      if (this.server) {
+      if (this.ssh2Server) {
+        this.ssh2Server.close(() => resolve());
+        this.ssh2Server = null;
+      } else if (this.server) {
         this.server.close(() => resolve());
       } else {
         resolve();

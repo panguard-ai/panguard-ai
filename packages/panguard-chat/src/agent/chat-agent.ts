@@ -336,10 +336,14 @@ export class ChatAgent {
     };
     const history = [...context.conversationHistory, turn];
 
-    // Generate a simple contextual answer based on the original alert
-    // In production, this would call an LLM with the context + system prompt
-    // 在正式環境中，這會帶著上下文和系統提示詞呼叫 LLM
-    const answer = this.generateFollowUpAnswer(context.originalAlert, question, lang);
+    // Try LLM first, then fall back to pattern matching
+    let answer: string;
+    const llmAnswer = await this.tryLLMFollowUp(context, question, lang);
+    if (llmAnswer) {
+      answer = llmAnswer;
+    } else {
+      answer = this.generateFollowUpAnswer(context.originalAlert, question, lang);
+    }
 
     // Add answer to history
     const answerTurn: ConversationTurn = {
@@ -361,6 +365,47 @@ export class ChatAgent {
     );
 
     return answer;
+  }
+
+  /**
+   * Try to answer a follow-up question using the LLM provider.
+   * Returns null if LLM is not available or fails.
+   */
+  private async tryLLMFollowUp(
+    context: FollowUpContext & { expiresAt: number },
+    question: string,
+    lang: string,
+  ): Promise<string | null> {
+    const llm = this.config.llmProvider;
+    if (!llm) return null;
+
+    try {
+      const available = await llm.isAvailable();
+      if (!available) return null;
+
+      const alert = context.originalAlert;
+      const prompt = [
+        this.systemPrompt,
+        '',
+        `Alert: ${alert.eventDescription}`,
+        `Severity: ${alert.severity}, Conclusion: ${alert.conclusion}`,
+        `Summary: ${alert.humanSummary}`,
+        `Recommended action: ${alert.recommendedAction}`,
+        '',
+        `User question (respond in ${lang === 'zh-TW' ? 'Traditional Chinese' : 'English'}):`,
+        question,
+      ].join('\n');
+
+      const result = await llm.analyze(prompt);
+      if (result.summary) {
+        logger.info('Follow-up answered via LLM');
+        return result.summary;
+      }
+      return null;
+    } catch (err) {
+      logger.warn(`LLM follow-up failed, falling back to pattern matching: ${err instanceof Error ? err.message : String(err)}`);
+      return null;
+    }
   }
 
   /**
