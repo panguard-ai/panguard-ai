@@ -6,7 +6,7 @@ import SectionTitle from "../ui/SectionTitle";
 import FadeInUp from "../FadeInUp";
 
 const rows = [
-  { feature: "Price", cs: "$59.99/device/yr", def: "Included in M365", pg: "From $49/mo" },
+  { feature: "Price", cs: "$59.99/device/yr", def: "Included in M365", pg: "From $9/mo" },
   { feature: "Setup", cs: "Dashboard configuration", def: "Azure Console", pg: "One command, zero config" },
   { feature: "Interface", cs: "Professional dashboard", def: "Azure portal", pg: "AI Chat in plain language" },
   { feature: "After detection", cs: "Shows alert \u2192 you handle", def: "Shows alert \u2192 you handle", pg: "Auto-responds + explains" },

@@ -243,7 +243,7 @@ export default function BlogContent() {
             </p>
           )}
           <p className="text-xs text-text-muted text-center mt-3">
-            Join 2,000+ security-conscious engineers. Unsubscribe anytime.
+            Get weekly security insights delivered to your inbox. Unsubscribe anytime.
           </p>
         </FadeInUp>
       </SectionWrapper>

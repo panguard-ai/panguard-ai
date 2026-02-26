@@ -152,6 +152,60 @@ export default function SMBPage() {
           </div>
         </section>
 
+        {/* Pricing Context */}
+        <section className="px-6 lg:px-[120px] py-16 border-t border-border bg-surface-1">
+          <FadeInUp>
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-2xl font-bold text-text-primary mb-3">
+                Predictable pricing that scales with your team
+              </h2>
+              <p className="text-text-secondary mb-8">
+                No hidden fees, no per-user licensing surprises. Just simple per-endpoint pricing.
+              </p>
+              <div className="bg-surface-0 rounded-2xl p-8 border border-brand-sage card-glow max-w-sm mx-auto text-center">
+                <p className="text-xs uppercase tracking-wider text-brand-sage font-semibold mb-2">Team Plan</p>
+                <p className="text-3xl font-extrabold text-text-primary">$14<span className="text-sm text-text-tertiary font-normal">/endpoint/mo</span></p>
+                <p className="text-sm text-text-tertiary mt-2">5-50 endpoints. All products included.</p>
+                <ul className="mt-4 space-y-1.5 text-left inline-block">
+                  {["Guard + Chat + Scan + Report + Trap", "Slack / LINE / Telegram / Email alerts", "Team dashboard & 30-day logs"].map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-xs text-text-secondary">
+                      <CheckIcon size={14} className="text-brand-sage mt-0.5 shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-1 text-sm text-brand-sage hover:text-brand-sage-light font-medium mt-6"
+              >
+                See all plans <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </FadeInUp>
+        </section>
+
+        {/* Integrations */}
+        <section className="px-6 lg:px-[120px] py-12 border-t border-border">
+          <FadeInUp>
+            <div className="max-w-3xl mx-auto text-center">
+              <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-6">
+                Integrations your team already uses
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {["Slack", "LINE", "Telegram", "Email", "Microsoft Teams", "Webhooks"].map((tool) => (
+                  <span
+                    key={tool}
+                    className="bg-surface-1 border border-border rounded-full px-4 py-2 text-sm text-text-secondary"
+                  >
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </FadeInUp>
+        </section>
+
         {/* CTA */}
         <section className="px-6 lg:px-[120px] py-16 border-t border-border">
           <FadeInUp>

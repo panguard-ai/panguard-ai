@@ -11,6 +11,7 @@ const columns = [
       { label: "Chat", href: "/product/chat" },
       { label: "Trap", href: "/product/trap" },
       { label: "Report", href: "/product/report" },
+      { label: "Compliance", href: "/compliance" },
       { label: "Integrations", href: "/integrations" },
     ],
   },
@@ -117,11 +118,9 @@ export default function Footer() {
             &copy; 2026 Panguard AI, Inc. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-xs text-text-muted">
-            <span>SOC 2</span>
+            <span>SOC 2 In Progress</span>
             <span>&middot;</span>
-            <span>ISO 27001</span>
-            <span>&middot;</span>
-            <span>GDPR</span>
+            <span>GDPR Compliant</span>
           </div>
         </div>
       </div>

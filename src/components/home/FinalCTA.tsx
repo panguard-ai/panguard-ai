@@ -12,7 +12,7 @@ import {
 import FadeInUp from "../FadeInUp";
 
 const badges = [
-  { badge: CertifiedSecureBadge, label: "ISO 27001" },
+  { badge: CertifiedSecureBadge, label: "ISO 27001 Ready" },
   { badge: CertifiedSecureBadge, label: "SOC 2 Ready" },
   { badge: ProtectedByBadge, label: "GDPR Ready" },
   { badge: ZeroTrustBadge, label: "Zero Trust" },

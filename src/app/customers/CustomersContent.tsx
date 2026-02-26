@@ -24,9 +24,9 @@ export default function CustomersContent() {
       {/* ── Hero ── */}
       <SectionWrapper spacing="spacious">
         <SectionTitle
-          overline="Customer Stories"
-          title="Trusted by Growing Teams"
-          subtitle="Real companies, real results. See how startups and scaling teams use Panguard AI to secure their infrastructure, achieve compliance, and stop threats before they cause damage."
+          overline="Use Case Scenarios"
+          title="How Teams Use Panguard"
+          subtitle="Based on common security challenges faced by startups and scaling teams. These scenarios illustrate how Panguard AI solves real infrastructure, compliance, and threat detection problems."
         />
       </SectionWrapper>
 
@@ -52,7 +52,7 @@ export default function CustomersContent() {
       <SectionWrapper>
         <FadeInUp>
           <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-6">
-            Featured Story
+            Featured Scenario
           </p>
         </FadeInUp>
         <FadeInUp delay={0.05}>
@@ -97,7 +97,7 @@ export default function CustomersContent() {
                 href={`/customers/${featured.slug}`}
                 className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
               >
-                Read Full Story <ArrowRight className="w-4 h-4" />
+                Read Full Scenario <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
@@ -107,9 +107,9 @@ export default function CustomersContent() {
       {/* ── All Case Studies Grid ── */}
       <SectionWrapper dark>
         <SectionTitle
-          overline="All Stories"
-          title="More customer results."
-          subtitle="Every deployment is different. Every result speaks for itself."
+          overline="All Scenarios"
+          title="More use cases."
+          subtitle="Every deployment is different. These scenarios illustrate common security challenges and how Panguard addresses them."
         />
         <div className="grid md:grid-cols-2 gap-6 mt-14">
           {remaining.map((cs, i) => (
@@ -148,7 +148,7 @@ export default function CustomersContent() {
                 </div>
 
                 <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-sage mt-4 group-hover:gap-2.5 transition-all">
-                  Read Story{" "}
+                  Read Scenario{" "}
                   <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </Link>
@@ -157,38 +157,17 @@ export default function CustomersContent() {
         </div>
       </SectionWrapper>
 
-      {/* ── Logo Cloud ── */}
-      <SectionWrapper spacing="tight">
-        <FadeInUp>
-          <p className="text-[11px] uppercase tracking-[0.12em] text-text-muted font-semibold text-center mb-8">
-            Trusted by teams at
-          </p>
-        </FadeInUp>
-        <FadeInUp delay={0.05}>
-          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4">
-            {caseStudies.map((cs) => (
-              <span
-                key={cs.company}
-                className="text-lg font-bold text-text-tertiary tracking-tight"
-              >
-                {cs.company}
-              </span>
-            ))}
-          </div>
-        </FadeInUp>
-      </SectionWrapper>
-
       {/* ── CTA ── */}
       <SectionWrapper dark>
         <div className="text-center">
           <FadeInUp>
             <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary">
-              See How Panguard Can Help Your Team
+              Ready to Secure Your Infrastructure?
             </h2>
             <p className="text-text-secondary mt-4 max-w-xl mx-auto leading-relaxed">
-              Join the growing list of companies that trust Panguard AI to
-              protect their infrastructure, simplify compliance, and stop
-              threats before they cause damage.
+              Start with a free security scan and see how Panguard AI can
+              protect your endpoints, simplify compliance, and stop threats
+              before they cause damage.
             </p>
           </FadeInUp>
           <FadeInUp delay={0.1}>

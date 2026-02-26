@@ -114,29 +114,77 @@ export default function BlogPostPage({
               </div>
             </FadeInUp>
 
-            {/* ───────────── Coming Soon Notice ───────────── */}
-            <FadeInUp delay={0.2}>
-              <div className="mt-12 bg-surface-1 rounded-2xl border border-border p-8 text-center">
-                <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-3">
-                  Coming Soon
-                </p>
-                <h2 className="text-xl font-bold text-text-primary">
-                  Full article in progress
-                </h2>
-                <p className="text-sm text-text-secondary mt-3 max-w-md mx-auto leading-relaxed">
-                  This article is currently being finalized by the Panguard AI
-                  team. Subscribe to our newsletter to be notified when it
-                  publishes.
-                </p>
-                <Link
-                  href="/blog"
-                  className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-6 py-3 mt-6 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Browse All Posts
-                </Link>
-              </div>
-            </FadeInUp>
+            {/* ───────────── Article Content or Coming Soon ───────────── */}
+            {post.content ? (
+              <FadeInUp delay={0.2}>
+                <div className="mt-12 prose-panguard space-y-5">
+                  {post.content.map((block, i) => {
+                    if (block.startsWith("## ")) {
+                      return (
+                        <h2
+                          key={i}
+                          className="text-xl font-bold text-text-primary mt-10 mb-3"
+                        >
+                          {block.replace("## ", "")}
+                        </h2>
+                      );
+                    }
+                    if (block.startsWith("**") && block.includes(".**")) {
+                      const parts = block.match(/^\*\*(.+?)\.\*\*\s*(.*)$/);
+                      if (parts) {
+                        return (
+                          <p key={i} className="text-text-secondary leading-relaxed">
+                            <strong className="text-text-primary">{parts[1]}.</strong>{" "}
+                            {parts[2]}
+                          </p>
+                        );
+                      }
+                    }
+                    if (block.startsWith("```")) {
+                      const code = block.replace(/^```\n?/, "").replace(/\n?```$/, "");
+                      return (
+                        <pre
+                          key={i}
+                          className="bg-surface-1 border border-border rounded-xl p-4 overflow-x-auto"
+                        >
+                          <code className="text-sm text-text-secondary font-mono">
+                            {code}
+                          </code>
+                        </pre>
+                      );
+                    }
+                    return (
+                      <p key={i} className="text-text-secondary leading-relaxed">
+                        {block}
+                      </p>
+                    );
+                  })}
+                </div>
+              </FadeInUp>
+            ) : (
+              <FadeInUp delay={0.2}>
+                <div className="mt-12 bg-surface-1 rounded-2xl border border-border p-8 text-center">
+                  <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-3">
+                    Coming Soon
+                  </p>
+                  <h2 className="text-xl font-bold text-text-primary">
+                    Full article in progress
+                  </h2>
+                  <p className="text-sm text-text-secondary mt-3 max-w-md mx-auto leading-relaxed">
+                    This article is currently being finalized by the Panguard AI
+                    team. Subscribe to our newsletter to be notified when it
+                    publishes.
+                  </p>
+                  <Link
+                    href="/blog"
+                    className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-6 py-3 mt-6 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Browse All Posts
+                  </Link>
+                </div>
+              </FadeInUp>
+            )}
           </div>
         </SectionWrapper>
       </main>

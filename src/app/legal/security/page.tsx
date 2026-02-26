@@ -281,12 +281,12 @@ export default function SecurityWhitepaperPage() {
             </div>
             <div className="p-3 bg-surface-1 border border-border rounded-lg">
               <p className="font-medium text-text-primary">
-                Taiwan PDPA
+                Taiwan Cyber Security Act
               </p>
               <p className="mt-1 text-text-tertiary">
-                Compliance with Taiwan&apos;s Personal Data Protection Act,
-                including registration, notification, and data handling
-                requirements.
+                Compliance with Taiwan&apos;s Cyber Security Management Act,
+                including security monitoring, incident reporting, and
+                infrastructure protection requirements.
               </p>
             </div>
           </div>

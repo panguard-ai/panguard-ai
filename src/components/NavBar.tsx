@@ -15,6 +15,7 @@ const productLinks = [
   { href: "/product/chat", icon: TerminalIcon, label: "Panguard Chat", desc: "AI security copilot" },
   { href: "/product/trap", icon: NetworkIcon, label: "Panguard Trap", desc: "Intelligent honeypots" },
   { href: "/product/report", icon: AnalyticsIcon, label: "Panguard Report", desc: "AI compliance reports" },
+  { href: "/compliance", icon: CheckIcon, label: "Compliance", desc: "ISO 27001, SOC 2, TCSA" },
   { href: "/integrations", icon: IntegrationIcon, label: "Integrations", desc: "Connect your tools" },
 ];
 

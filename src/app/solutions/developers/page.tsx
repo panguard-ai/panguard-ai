@@ -125,6 +125,59 @@ export default function DevelopersPage() {
           </div>
         </section>
 
+        {/* Pricing Context */}
+        <section className="px-6 lg:px-[120px] py-16 border-t border-border bg-surface-1">
+          <FadeInUp>
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-2xl font-bold text-text-primary mb-3">
+                Priced for developers, not enterprises
+              </h2>
+              <p className="text-text-secondary mb-8">
+                Start free with Panguard Scan. Upgrade to Solo for full protection.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
+                <div className="bg-surface-0 rounded-2xl p-6 border border-border text-center">
+                  <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-2">Free Scan</p>
+                  <p className="text-3xl font-extrabold text-text-primary">$0</p>
+                  <p className="text-sm text-text-tertiary mt-2">1 endpoint, basic scan + PDF report</p>
+                </div>
+                <div className="bg-surface-0 rounded-2xl p-6 border border-brand-sage card-glow text-center">
+                  <p className="text-xs uppercase tracking-wider text-brand-sage font-semibold mb-2">Solo</p>
+                  <p className="text-3xl font-extrabold text-text-primary">$9<span className="text-sm text-text-tertiary font-normal">/mo</span></p>
+                  <p className="text-sm text-text-tertiary mt-2">Guard + Chat + Scan, LINE/Telegram alerts</p>
+                </div>
+              </div>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-1 text-sm text-brand-sage hover:text-brand-sage-light font-medium mt-6"
+              >
+                See all plans <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </FadeInUp>
+        </section>
+
+        {/* Integrations */}
+        <section className="px-6 lg:px-[120px] py-12 border-t border-border">
+          <FadeInUp>
+            <div className="max-w-3xl mx-auto text-center">
+              <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-6">
+                Fits your workflow
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"].map((tool) => (
+                  <span
+                    key={tool}
+                    className="bg-surface-1 border border-border rounded-full px-4 py-2 text-sm text-text-secondary"
+                  >
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </FadeInUp>
+        </section>
+
         {/* CTA */}
         <section className="px-6 lg:px-[120px] py-16 border-t border-border">
           <FadeInUp>

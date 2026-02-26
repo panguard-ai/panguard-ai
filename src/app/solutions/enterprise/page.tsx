@@ -30,7 +30,7 @@ const benefits = [
     icon: AnalyticsIcon,
     title: "Automated Compliance Reporting",
     description:
-      "Generate audit-ready reports for SOC 2, ISO 27001, GDPR, and Taiwan PDPA at the click of a button. Schedule recurring reports and share them with auditors, investors, and partners.",
+      "Generate audit-ready reports for SOC 2, ISO 27001, and Taiwan Cyber Security Act (TCSA) at the click of a button. Schedule recurring reports and share them with auditors, investors, and partners.",
   },
   {
     icon: LockIcon,
@@ -157,6 +157,52 @@ export default function EnterprisePage() {
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Pricing Context */}
+        <section className="px-6 lg:px-[120px] py-16 border-t border-border bg-surface-1">
+          <FadeInUp>
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-2xl font-bold text-text-primary mb-3">
+                Custom pricing for your organization
+              </h2>
+              <p className="text-text-secondary mb-8 max-w-xl mx-auto">
+                500+ endpoints, custom AI models, dedicated support, on-premise deployment options, and SLA guarantees tailored to your requirements.
+              </p>
+              <div className="bg-surface-0 rounded-2xl p-8 border border-border max-w-sm mx-auto text-center">
+                <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-2">Enterprise</p>
+                <p className="text-3xl font-extrabold text-text-primary">Custom</p>
+                <p className="text-sm text-text-tertiary mt-2">Volume discounts starting at 500 endpoints</p>
+                <Link
+                  href="/contact"
+                  className="mt-5 block text-center bg-brand-sage text-surface-0 font-semibold rounded-full px-5 py-3 text-sm hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
+                >
+                  Talk to Sales
+                </Link>
+              </div>
+            </div>
+          </FadeInUp>
+        </section>
+
+        {/* Integrations */}
+        <section className="px-6 lg:px-[120px] py-12 border-t border-border">
+          <FadeInUp>
+            <div className="max-w-3xl mx-auto text-center">
+              <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-6">
+                Enterprise integrations
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {["SIEM", "SSO (SAML/OIDC)", "PagerDuty", "Jira", "Slack", "Microsoft Teams", "REST API", "Webhooks"].map((tool) => (
+                  <span
+                    key={tool}
+                    className="bg-surface-1 border border-border rounded-full px-4 py-2 text-sm text-text-secondary"
+                  >
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </FadeInUp>
         </section>
 
         {/* CTA */}
