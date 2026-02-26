@@ -6,6 +6,9 @@ const navItems = [
   { path: '/dashboard/scan', labelEn: 'Scan', labelZh: '掃描', icon: 'shield' },
   { path: '/dashboard/report', labelEn: 'Reports', labelZh: '報告', icon: 'file' },
   { path: '/dashboard/threat', labelEn: 'Threats', labelZh: '威脅', icon: 'alert' },
+  { path: '/dashboard/guard', labelEn: 'Guard', labelZh: '守護', icon: 'eye' },
+  { path: '/dashboard/trap', labelEn: 'Trap', labelZh: '蜜罐', icon: 'target' },
+  { path: '/dashboard/chat', labelEn: 'Notify', labelZh: '通知', icon: 'bell' },
 ];
 
 const iconMap: Record<string, string> = {
@@ -13,6 +16,9 @@ const iconMap: Record<string, string> = {
   shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
   file: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8',
   alert: 'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z M12 9v4 M12 17h.01',
+  eye: 'M1 12s4-8 11-8 11 8-4 8-11 8-11-8z M12 9a3 3 0 100 6 3 3 0 000-6z',
+  target: 'M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z M12 18a6 6 0 100-12 6 6 0 000 12z M12 14a2 2 0 100-4 2 2 0 000 4z',
+  bell: 'M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 01-3.46 0',
 };
 
 export default function DashboardLayout() {
