@@ -21,6 +21,14 @@ export function demoCommand(): Command {
       console.log(`  ${c.dim('Running through all security modules...')}`);
       console.log('');
 
+      const moduleStatus: Record<string, 'safe' | 'caution' | 'critical'> = {
+        'Security Scan': 'critical',
+        'Compliance Report': 'critical',
+        'Guard Engine': 'critical',
+        'Honeypot System': 'critical',
+        'Notification System': 'critical',
+      };
+
       // ---------------------------------------------------------------
       // 1. Security Scan
       // ---------------------------------------------------------------
@@ -48,6 +56,7 @@ export function demoCommand(): Command {
             status: result.findings.length === 0 ? 'safe' : 'caution',
           },
         ]));
+        moduleStatus['Security Scan'] = 'safe';
       } catch (err) {
         scanSp.fail(`Scan failed: ${err instanceof Error ? err.message : err}`);
       }
@@ -95,6 +104,7 @@ export function demoCommand(): Command {
         }
         console.log(`  ${c.dim('...')}`);
         console.log('');
+        moduleStatus['Compliance Report'] = 'safe';
       } catch (err) {
         reportSp.fail(`Report failed: ${err instanceof Error ? err.message : err}`);
       }
@@ -108,8 +118,10 @@ export function demoCommand(): Command {
       try {
         const { runCLI: guardCLI } = await import('@openclaw/panguard-guard');
         await guardCLI(['status']);
-      } catch (err) {
+        moduleStatus['Guard Engine'] = 'safe';
+      } catch {
         console.log(`  ${symbols.info} Guard engine: ${c.dim('not running (normal for demo)')}`);
+        moduleStatus['Guard Engine'] = 'caution';
       }
       console.log('');
 
@@ -122,6 +134,7 @@ export function demoCommand(): Command {
       try {
         const { executeCli: trapCLI } = await import('@openclaw/panguard-trap');
         await trapCLI(['config', '--services', 'ssh,http']);
+        moduleStatus['Honeypot System'] = 'safe';
       } catch (err) {
         console.log(`  ${symbols.fail} Trap config failed: ${err instanceof Error ? err.message : err}`);
       }
@@ -136,6 +149,7 @@ export function demoCommand(): Command {
       try {
         const { runCLI: chatCLI } = await import('@openclaw/panguard-chat');
         await chatCLI(['status']);
+        moduleStatus['Notification System'] = 'safe';
       } catch (err) {
         console.log(`  ${symbols.fail} Chat status failed: ${err instanceof Error ? err.message : err}`);
       }
@@ -147,13 +161,19 @@ export function demoCommand(): Command {
       console.log(divider('Demo Complete'));
       console.log('');
 
-      console.log(statusPanel('PANGUARD AI - Demo Summary', [
-        { label: 'Security Scan', value: c.safe('OK'), status: 'safe' },
-        { label: 'Compliance Report', value: c.safe('OK'), status: 'safe' },
-        { label: 'Guard Engine', value: c.safe('OK'), status: 'safe' },
-        { label: 'Honeypot System', value: c.safe('OK'), status: 'safe' },
-        { label: 'Notification System', value: c.safe('OK'), status: 'safe' },
-      ]));
+      const statusLabel = (s: 'safe' | 'caution' | 'critical') =>
+        s === 'safe' ? c.safe('PASS') : s === 'caution' ? c.caution('WARN') : c.critical('FAIL');
+
+      const passed = Object.values(moduleStatus).filter((s) => s === 'safe').length;
+      const total = Object.keys(moduleStatus).length;
+
+      console.log(statusPanel(`PANGUARD AI - Demo Summary (${passed}/${total} passed)`,
+        Object.entries(moduleStatus).map(([label, status]) => ({
+          label,
+          value: statusLabel(status),
+          status,
+        }))
+      ));
 
       console.log(`  ${c.dim('Next steps:')}`);
       console.log(`    ${c.sage('panguard')}             ${c.dim('Interactive mode')}`);
