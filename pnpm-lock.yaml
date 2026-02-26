@@ -92,6 +92,40 @@ importers:
         specifier: ~5.7.3
         version: 5.7.3
 
+  packages/panguard:
+    dependencies:
+      '@openclaw/core':
+        specifier: workspace:*
+        version: link:../core
+      '@openclaw/panguard-chat':
+        specifier: workspace:*
+        version: link:../panguard-chat
+      '@openclaw/panguard-guard':
+        specifier: workspace:*
+        version: link:../panguard-guard
+      '@openclaw/panguard-report':
+        specifier: workspace:*
+        version: link:../panguard-report
+      '@openclaw/panguard-scan':
+        specifier: workspace:*
+        version: link:../panguard-scan
+      '@openclaw/panguard-trap':
+        specifier: workspace:*
+        version: link:../panguard-trap
+      '@openclaw/threat-cloud':
+        specifier: workspace:*
+        version: link:../threat-cloud
+      commander:
+        specifier: ^12.0.0
+        version: 12.1.0
+    devDependencies:
+      '@types/node':
+        specifier: ^22.14.0
+        version: 22.19.11
+      typescript:
+        specifier: ~5.7.3
+        version: 5.7.3
+
   packages/panguard-chat:
     dependencies:
       '@openclaw/core':

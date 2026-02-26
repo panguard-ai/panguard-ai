@@ -24,7 +24,9 @@
     "dev": "pnpm -r --parallel --stream dev",
     "ci:lint": "pnpm run lint && pnpm run format:check",
     "ci:test": "pnpm run typecheck && pnpm run test",
-    "ci:build": "pnpm run build"
+    "ci:build": "pnpm run build",
+    "panguard": "node packages/panguard/dist/cli/index.js",
+    "dashboard": "node packages/panguard/dist/cli/index.js dashboard"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
