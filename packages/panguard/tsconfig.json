@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "composite": true
+  },
+  "references": [
+    { "path": "../core" },
+    { "path": "../panguard-scan" },
+    { "path": "../panguard-guard" },
+    { "path": "../panguard-report" },
+    { "path": "../panguard-chat" },
+    { "path": "../panguard-trap" },
+    { "path": "../threat-cloud" }
+  ],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

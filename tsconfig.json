@@ -29,7 +29,8 @@
       "@openclaw/panguard-chat": ["./packages/panguard-chat/src"],
       "@openclaw/panguard-trap": ["./packages/panguard-trap/src"],
       "@openclaw/panguard-report": ["./packages/panguard-report/src"],
-      "@openclaw/panguard-web": ["./packages/panguard-web/src"]
+      "@openclaw/panguard-web": ["./packages/panguard-web/src"],
+      "@openclaw/panguard": ["./packages/panguard/src"]
     }
   },
   "references": [
@@ -40,6 +41,7 @@
     { "path": "./packages/panguard-trap" },
     { "path": "./packages/panguard-report" },
     { "path": "./packages/panguard-web" },
+    { "path": "./packages/panguard" },
     { "path": "./openclaw-fork" }
   ],
   "include": [],
