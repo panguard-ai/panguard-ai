@@ -1,0 +1,2635 @@
+{
+  "common": {
+    "getStarted": "Get Started",
+    "signIn": "Sign In",
+    "startFreeTrial": "Start Free Trial",
+    "scanFree": "Scan Free",
+    "contactSales": "Talk to Sales",
+    "requestDemo": "Request a Demo",
+    "scheduleDemo": "Schedule Demo",
+    "learnMore": "Learn More",
+    "viewAll": "View All",
+    "readMore": "Read More",
+    "close": "Close",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "save20": "Save 20%",
+    "billedAnnually": "billed annually",
+    "custom": "Custom",
+    "contactUs": "Contact us",
+    "mostPopular": "Most Popular",
+    "perMonth": "/mo",
+    "perEndpointMonth": "/endpoint/mo",
+    "free": "Free",
+    "yes": "yes",
+    "no": "no",
+    "copyright": "2026 Panguard AI, Inc. All rights reserved.",
+    "soc2": "SOC 2 In Progress",
+    "gdpr": "GDPR Compliant",
+    "footerTagline": "Your AI Security Guard. One command to install. AI protects everything."
+  },
+  "nav": {
+    "product": "Product",
+    "solutions": "Solutions",
+    "resources": "Resources",
+    "company": "Company",
+    "pricing": "Pricing",
+    "docs": "Docs",
+    "startFreeScan": "Start Free Scan",
+    "productLinks": {
+      "overview": "Product Overview",
+      "overviewDesc": "See the full platform",
+      "scan": "Panguard Scan",
+      "scanDesc": "60-second AI security audit",
+      "guard": "Panguard Guard",
+      "guardDesc": "24/7 AI endpoint protection",
+      "chat": "Panguard Chat",
+      "chatDesc": "AI security copilot",
+      "trap": "Panguard Trap",
+      "trapDesc": "Intelligent honeypots",
+      "report": "Panguard Report",
+      "reportDesc": "AI compliance reports",
+      "compliance": "Compliance",
+      "complianceDesc": "ISO 27001, SOC 2, TCSA",
+      "integrations": "Integrations",
+      "integrationsDesc": "Connect your tools"
+    },
+    "solutionLinks": {
+      "developers": "For Developers",
+      "developersDesc": "Solo & indie developers",
+      "smb": "For Small Business",
+      "smbDesc": "5-50 employees",
+      "enterprise": "For Mid-size",
+      "enterpriseDesc": "50-500 employees",
+      "customers": "Customers",
+      "customersDesc": "Success stories",
+      "partners": "For MSPs",
+      "partnersDesc": "Managed service providers"
+    },
+    "resourceLinks": {
+      "blog": "Blog",
+      "blogDesc": "Latest insights",
+      "docs": "Documentation",
+      "docsDesc": "Guides & references",
+      "api": "API Reference",
+      "apiDesc": "Developer docs",
+      "changelog": "Changelog",
+      "changelogDesc": "What's new",
+      "status": "Status Page",
+      "statusDesc": "System uptime",
+      "resources": "Resource Center",
+      "resourcesDesc": "Reports & whitepapers"
+    },
+    "companyLinks": {
+      "about": "About",
+      "aboutDesc": "Our mission",
+      "careers": "Careers",
+      "careersDesc": "Join the team",
+      "contact": "Contact",
+      "contactDesc": "Get in touch",
+      "press": "Press",
+      "pressDesc": "Newsroom",
+      "trust": "Trust Center",
+      "trustDesc": "Security & compliance",
+      "partners": "Partners",
+      "partnersDesc": "Partner ecosystem",
+      "security": "Security",
+      "securityDesc": "Our practices"
+    }
+  },
+  "footer": {
+    "product": "Product",
+    "resources": "Resources",
+    "company": "Company",
+    "legal": "Legal",
+    "scan": "Scan",
+    "guard": "Guard",
+    "chat": "Chat",
+    "trap": "Trap",
+    "report": "Report",
+    "compliance": "Compliance",
+    "integrations": "Integrations",
+    "documentation": "Documentation",
+    "apiReference": "API Reference",
+    "blog": "Blog",
+    "resourceCenter": "Resources",
+    "changelog": "Changelog",
+    "statusPage": "Status Page",
+    "about": "About",
+    "careers": "Careers",
+    "contact": "Contact",
+    "press": "Press",
+    "partners": "Partners",
+    "customers": "Customers",
+    "trustCenter": "Trust Center",
+    "security": "Security",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "cookiePolicy": "Cookie Policy",
+    "dpa": "DPA",
+    "sla": "SLA",
+    "responsibleDisclosure": "Responsible Disclosure"
+  },
+  "home": {
+    "hero": {
+      "title": "Security no longer needs humans.",
+      "manifesto1": "For 40 years, every security product assumed a human sitting behind the screen.\nDashboards, alert panels, runbooks — all designed for humans.\nBut in 2026, your Agent is already writing code, managing servers, deploying services.\nOnly security is still waiting for you to check the Dashboard.",
+      "manifesto2": "Panguard has no Dashboard.\nNothing that needs a human to click.\nYour Agent gives commands. Our Agent defends.\nCLI in, CLI out. Plain text. As natural as breathing.",
+      "manifesto3": "This isn't a better security tool.\nThis is an interface revolution for security.",
+      "badge1": "Agent-Native",
+      "badge2": "Zero Dashboard",
+      "badge3": "Open Source MIT"
+    },
+    "whyPanguard": {
+      "title": "Detection happened. Now what?",
+      "subtitle": "Your antivirus shows an alert. A port scan was detected. An unusual login attempt. You're not a security expert. You don't have an IT team.",
+      "gapLine": "That's the gap Panguard fills.",
+      "stat1Value": "90%",
+      "stat1Label": "of threats handled automatically",
+      "stat1Desc": "Layer 1 rules catch known attacks instantly. No alert, no interruption -- silent protection.",
+      "stat2Value": "< 50ms",
+      "stat2Label": "response time",
+      "stat2Desc": "From detection to action. No waiting for humans. No tickets. No SOC team to call.",
+      "stat3Value": "0",
+      "stat3Label": "security knowledge required",
+      "stat3Desc": "Panguard speaks human. \"Someone tried your password from Germany. I blocked it.\" That's an actual Panguard notification.",
+      "whyTitle": "Why PANGUARD AI?",
+      "feature1Title": "Detect + Respond Automatically",
+      "feature1Desc": "AI agents detect, analyze, and respond to threats in under 50ms. No human intervention required for 90% of incidents.",
+      "feature2Title": "Graceful Degradation",
+      "feature2Desc": "Cloud down? Local AI takes over. LLM offline? Rule engine handles it. Protection degrades in capability, never in availability.",
+      "feature3Title": "Zero Configuration",
+      "feature3Desc": "One command to install. Zero config files to edit. No YAML sprawl, no agent conflicts. Protected in under 60 seconds."
+    },
+    "productSuite": {
+      "overline": "Product Suite",
+      "title": "Five products. One platform.",
+      "subtitle": "Start with a free scan. Scale to full enterprise protection.",
+      "scanName": "Panguard Scan",
+      "scanBadge": "Free",
+      "scanDesc": "60-second AI security audit. PDF report.",
+      "guardName": "Panguard Guard",
+      "guardBadge": "Core",
+      "guardDesc": "24/7 AI monitoring + auto response.",
+      "chatName": "Panguard Chat",
+      "chatBadge": "Core",
+      "chatDesc": "AI copilot. Plain language notifications.",
+      "trapName": "Panguard Trap",
+      "trapBadge": "Advanced",
+      "trapDesc": "Intelligent honeypots. Attacker analysis.",
+      "reportName": "Panguard Report",
+      "reportBadge": "Compliance",
+      "reportDesc": "Auto-generated ISO/SOC reports."
+    },
+    "installDemo": {
+      "title": "One Command. Full Protection.",
+      "subtitle": "Install in 30 seconds. No configuration needed. AI auto-detects your environment.",
+      "metric1Value": "< 30s",
+      "metric1Label": "install time",
+      "metric2Value": "847",
+      "metric2Label": "built-in rules",
+      "metric3Value": "Zero",
+      "metric3Label": "configuration"
+    },
+    "comparison": {
+      "overline": "Why Panguard",
+      "title": "You deserve more than a dashboard.",
+      "subtitle": "Other tools detect threats and show you a dashboard. Panguard detects, responds, and explains.",
+      "feature": "Feature",
+      "crowdstrike": "CrowdStrike Falcon Go",
+      "defender": "Microsoft Defender",
+      "panguard": "Panguard AI",
+      "price": "Price",
+      "setup": "Setup",
+      "interface": "Interface",
+      "afterDetection": "After detection",
+      "reporting": "Reporting",
+      "bestFor": "Best for",
+      "developerPlan": "Developer plan",
+      "autoCompliance": "Auto compliance",
+      "aiChat": "AI Chat",
+      "csPrice": "$59.99/device/yr",
+      "csSetup": "Dashboard configuration",
+      "csInterface": "Professional dashboard",
+      "csAfter": "Shows alert → you handle",
+      "csReporting": "Technical reports",
+      "csBest": "Teams with IT staff",
+      "defPrice": "Included in M365",
+      "defSetup": "Azure Console",
+      "defInterface": "Azure portal",
+      "defAfter": "Shows alert → you handle",
+      "defReporting": "Technical reports",
+      "defBest": "M365 organizations",
+      "pgPrice": "From $9/mo",
+      "pgSetup": "One command, zero config",
+      "pgInterface": "AI Chat in plain language",
+      "pgAfter": "Auto-responds + explains",
+      "pgReporting": "“This week: blocked 847. You’re safe.”",
+      "pgBest": "Anyone. No expertise needed.",
+      "quote": "\"Falcon Go is a security camera. Panguard is a security company — cameras, plus someone watching, responding, and reporting.\""
+    },
+    "socialProof": {
+      "overline": "By the Numbers",
+      "title": "Built in the open. Verified by code.",
+      "subtitle": "Every number below is verifiable in the codebase. No vanity metrics -- just engineering facts.",
+      "stat1": "847",
+      "stat1Label": "Sigma Detection Rules",
+      "stat2": "1,203",
+      "stat2Label": "YARA Malware Rules",
+      "stat3": "8",
+      "stat3Label": "Honeypot Protocols",
+      "stat4": "5",
+      "stat4Label": "AI Agent Pipeline",
+      "stat5": "3",
+      "stat5Label": "Compliance Frameworks",
+      "stat6": "MIT",
+      "stat6Label": "Open Source License",
+      "footnote": "Fully auditable · Open source · Community-driven rule updates · No data lock-in"
+    },
+    "pricing": {
+      "overline": "Pricing",
+      "title": "Simple, transparent pricing.",
+      "subtitle": "30-day free trial on all paid plans. No credit card required.",
+      "freeName": "Free Scan",
+      "freeFeatures": [
+        "1 endpoint",
+        "Basic security scan",
+        "PDF report"
+      ],
+      "soloName": "Solo",
+      "soloFeatures": [
+        "1 endpoint",
+        "Guard + Chat + Scan",
+        "LINE / Telegram alerts",
+        "7-day log retention"
+      ],
+      "teamName": "Team",
+      "teamFeatures": [
+        "5-50 endpoints",
+        "Guard + Chat + Scan + Report + Trap",
+        "Slack / LINE / Telegram / Email",
+        "30-day log retention",
+        "Team dashboard"
+      ],
+      "enterpriseName": "Enterprise",
+      "enterpriseFeatures": [
+        "500+ endpoints",
+        "Custom AI models",
+        "Dedicated support",
+        "SIEM integration",
+        "On-premise option"
+      ],
+      "seeAllPlans": "See all 6 plans, add-ons, and full feature comparison"
+    },
+    "finalCta": {
+      "title": "Start protecting today.",
+      "subtitle": "No credit card required. 30-day free trial.",
+      "iso": "ISO 27001 Ready",
+      "soc2": "SOC 2 Ready",
+      "gdpr": "GDPR Ready",
+      "zeroTrust": "Zero Trust",
+      "aiPowered": "AI Powered",
+      "monitoring": "24/7 Monitoring"
+    },
+    "cliShowcase": {
+      "overline": "The Product",
+      "title": "CLI in. CLI out.",
+      "subtitle": "No dashboard. No clicking. Your agent gives commands, Panguard defends. See all 5 products in action."
+    }
+  },
+  "pricing": {
+    "overline": "Pricing",
+    "title": "Simple, transparent pricing",
+    "subtitle": "30-day free trial on every paid plan. No credit card required. Start protecting your endpoints in under 60 seconds.",
+    "addonsOverline": "Add-ons",
+    "addonsTitle": "Compliance report add-ons",
+    "addonsSubtitle": "Available on Starter plans and above. Add compliance reporting to any plan.",
+    "iso27001": "ISO 27001",
+    "iso27001Price": "$5/endpoint/mo",
+    "iso27001Desc": "Gap analysis and audit-ready documentation",
+    "soc2": "SOC 2",
+    "soc2Price": "$5/endpoint/mo",
+    "soc2Desc": "Type II evidence and continuous monitoring",
+    "tcsa": "Taiwan Cyber Security Act",
+    "tcsaPrice": "$3/endpoint/mo",
+    "tcsaDesc": "Bilingual compliance reports (EN + zh-TW)",
+    "bundle": "Full Bundle",
+    "bundlePrice": "$10/endpoint/mo",
+    "bundleDesc": "All frameworks included, save 30%",
+    "faqOverline": "FAQ",
+    "faqTitle": "Frequently asked questions",
+    "faqSubtitle": "Everything you need to know about pricing and plans.",
+    "enterpriseTitle": "Need a custom solution?",
+    "enterpriseDesc": "For organizations with 500+ endpoints, dedicated compliance requirements, or custom deployment needs. White-glove onboarding, custom SLA, and a dedicated security engineer.",
+    "guarantee": "30-day money-back guarantee on all paid plans. No questions asked."
+  },
+  "pricingPage": {
+    "hero": {
+      "overline": "Pricing",
+      "title": "Simple, transparent pricing",
+      "subtitle": "30-day free trial on every paid plan. No credit card required. Start protecting your endpoints in under 60 seconds."
+    },
+    "addons": {
+      "overline": "Add-ons",
+      "title": "Compliance report add-ons",
+      "subtitle": "Available on Starter plans and above. Add compliance reporting to any plan.",
+      "iso27001": {
+        "name": "ISO 27001",
+        "price": "$5/endpoint/mo",
+        "desc": "Gap analysis and audit-ready documentation"
+      },
+      "soc2": {
+        "name": "SOC 2",
+        "price": "$5/endpoint/mo",
+        "desc": "Type II evidence and continuous monitoring"
+      },
+      "tcsa": {
+        "name": "Taiwan Cyber Security Act",
+        "price": "$3/endpoint/mo",
+        "desc": "Bilingual compliance reports (EN + zh-TW)"
+      },
+      "bundle": {
+        "name": "Full Bundle",
+        "price": "$10/endpoint/mo",
+        "desc": "All frameworks included, save 30%"
+      }
+    },
+    "faqSection": {
+      "overline": "FAQ",
+      "title": "Frequently asked questions",
+      "subtitle": "Everything you need to know about pricing and plans."
+    },
+    "enterprise": {
+      "title": "Need a custom solution?",
+      "desc": "For organizations with 500+ endpoints, dedicated compliance requirements, or custom deployment needs. White-glove onboarding, custom SLA, and a dedicated security engineer.",
+      "ctaSales": "Talk to Sales",
+      "ctaDemo": "Request a Demo"
+    },
+    "guarantee": "30-day money-back guarantee on all paid plans. No questions asked.",
+    "plans": {
+      "freeScan": {
+        "name": "Free Scan",
+        "audience": "Try before you buy",
+        "endpoints": "1 endpoint",
+        "features": [
+          "Basic security scan",
+          "PDF report with risk score",
+          "Unlimited scans"
+        ],
+        "cta": "Scan Free"
+      },
+      "solo": {
+        "name": "Solo",
+        "audience": "Solo developers & freelancers",
+        "endpoints": "1 endpoint",
+        "features": [
+          "Guard (24/7 monitoring)",
+          "Chat (LINE / Telegram alerts)",
+          "Scan (unlimited)",
+          "7-day log retention",
+          "Community support"
+        ],
+        "cta": "Start Free Trial"
+      },
+      "starter": {
+        "name": "Starter",
+        "audience": "Small teams (2-5 people)",
+        "endpoints": "Up to 5 endpoints",
+        "features": [
+          "Everything in Solo",
+          "Report (basic compliance)",
+          "Email + LINE + Telegram alerts",
+          "14-day log retention",
+          "Team dashboard"
+        ],
+        "cta": "Start Free Trial"
+      },
+      "team": {
+        "name": "Team",
+        "audience": "Growing businesses (5-50)",
+        "endpoints": "5-50 endpoints",
+        "features": [
+          "Everything in Starter",
+          "Trap (honeypots)",
+          "Slack integration",
+          "30-day log retention",
+          "Custom alert rules",
+          "Priority support"
+        ],
+        "cta": "Start Free Trial"
+      },
+      "business": {
+        "name": "Business",
+        "audience": "Mid-market (50-500 endpoints)",
+        "endpoints": "50-500 endpoints",
+        "features": [
+          "Everything in Team",
+          "API access",
+          "Webhook integration",
+          "90-day log retention",
+          "SSO & RBAC",
+          "Dedicated account manager"
+        ],
+        "cta": "Start Free Trial"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "audience": "Large organizations (500+)",
+        "endpoints": "500+ endpoints",
+        "features": [
+          "Everything in Business",
+          "Custom AI models",
+          "SIEM integration (Splunk, ELK)",
+          "On-premise deployment",
+          "Custom SLA (up to 99.99%)",
+          "Quarterly security review"
+        ],
+        "cta": "Contact Sales"
+      }
+    },
+    "comparison": {
+      "overline": "Compare Plans",
+      "title": "Feature comparison",
+      "subtitle": "Every feature at a glance."
+    },
+    "comparisonCategories": {
+      "productsIncluded": "Products Included",
+      "alertsIntegrations": "Alerts & Integrations",
+      "supportInfra": "Support & Infrastructure"
+    },
+    "tierLabels": {
+      "free": "Free",
+      "solo": "Solo",
+      "starter": "Starter",
+      "team": "Team",
+      "business": "Business",
+      "enterprise": "Enterprise"
+    },
+    "allPaidPlansNote": "All paid plans include 30-day money-back guarantee. Save 20% with annual billing.",
+    "faq": {
+      "faq1q": "How does the 30-day free trial work?",
+      "faq1a": "When you sign up for any paid plan, you get full access to all features in that tier for 30 days -- no credit card required. At the end of the trial, you can choose to subscribe or your account will automatically downgrade to the Free Scan tier. No data is lost.",
+      "faq2q": "Can I switch plans at any time?",
+      "faq2a": "Absolutely. You can upgrade or downgrade your plan at any point. When upgrading, you get immediate access to the new features and we prorate the difference. When downgrading, the change takes effect at the start of your next billing cycle.",
+      "faq3q": "What counts as an endpoint?",
+      "faq3a": "An endpoint is any device or server running the Panguard agent. This includes workstations, laptops, cloud VMs, and bare-metal servers. Containers within a single host count as one endpoint. Deactivated agents do not count toward your limit.",
+      "faq4q": "Do you offer annual billing discounts?",
+      "faq4a": "Yes. Annual billing saves you 20% compared to monthly pricing. For example, Solo drops from $9/mo to $7.20/mo, Team from $14 to $11.20/endpoint/mo, and Business from $10 to $8/endpoint/mo -- all billed annually.",
+      "faq5q": "Is there a free plan?",
+      "faq5a": "Panguard Scan is always free. You can run unlimited security audits on one endpoint and receive a PDF report with a risk score. When you are ready for 24/7 protection with Guard, Chat, Trap, and Report, upgrade to a paid plan starting at $9/mo.",
+      "faq6q": "What are the compliance add-ons?",
+      "faq6a": "Available on Starter plans and above. Add ISO 27001 ($5/endpoint/mo), SOC 2 ($5/endpoint/mo), or Taiwan Cyber Security Act ($3/endpoint/mo) compliance reporting. The Full Bundle includes all frameworks for $10/endpoint/mo, saving 30%.",
+      "faq7q": "What happens to my data if I cancel?",
+      "faq7a": "Your data remains accessible in read-only mode for 30 days after cancellation. During that window, you can export all reports, logs, and configurations. After 30 days, data is securely deleted in accordance with our data retention policy and GDPR requirements."
+    }
+  },
+  "scan": {
+    "hero": {
+      "overline": "Free Security Scan",
+      "title": "How secure is your system?",
+      "titleHighlight": "Find out in 60 seconds.",
+      "subtitle": "Free. No installation. No credit card."
+    },
+    "scanServer": {
+      "title": "Scan My Server",
+      "desc": "Run a single command on your server. Panguard scans your system, generates a security report, and deletes itself. No agent installed. No data retained.",
+      "requires": "Requires: Linux / macOS. The script is open source and auditable."
+    },
+    "onlineDemo": {
+      "title": "Try Online Demo",
+      "desc": "No server? No problem. Walk through an interactive demo with simulated scan results. See exactly what Panguard finds and how it reports.",
+      "launchDemo": "Launch Demo"
+    },
+    "whatWeCheck": {
+      "overline": "What We Check",
+      "title": "A full security audit in under a minute.",
+      "subtitle": ""
+    },
+    "checks": {
+      "openPort": {
+        "label": "Open Port Analysis",
+        "desc": "Discovers all open ports and identifies running services."
+      },
+      "osSoftware": {
+        "label": "OS & Software Detection",
+        "desc": "Identifies your operating system, kernel version, and installed packages."
+      },
+      "vulnerability": {
+        "label": "Vulnerability Detection",
+        "desc": "Cross-references installed software against known CVE databases."
+      },
+      "configAudit": {
+        "label": "Configuration Audit",
+        "desc": "Checks SSH, firewall, TLS, and other critical configurations."
+      },
+      "pdfReport": {
+        "label": "PDF Report Generation",
+        "desc": "Produces a downloadable, shareable PDF report with findings and recommendations."
+      },
+      "historical": {
+        "label": "Historical Comparison",
+        "desc": "If you scan again later, see what changed since last time."
+      }
+    },
+    "scanReport": {
+      "title": "Panguard Scan Report",
+      "exampleResult": "Example Result",
+      "score": "Score",
+      "grade": "Grade",
+      "openPorts": "Open Ports",
+      "os": "OS",
+      "critical": "Critical",
+      "scanTime": "Scan Time",
+      "exampleNote": "This is an example report. Your actual results will vary."
+    },
+    "cta": {
+      "title": "Liked the scan? Get 24/7 protection.",
+      "desc": "Panguard Scan is just the beginning. Install Panguard Guard for continuous AI-powered monitoring, automated response, and plain-language notifications.",
+      "cta1": "Get Early Access",
+      "cta2": "Learn About Guard"
+    }
+  },
+  "product": {
+    "overview": {
+      "overline": "Platform",
+      "title": "Five products. One mission:",
+      "titleHighlight": "make security invisible.",
+      "subtitle": "Start with a free scan. Scale to 24/7 AI protection, intelligent honeypots, and automated compliance -- all from a single platform that installs in one command.",
+      "products": {
+        "scan": {
+          "name": "Panguard Scan",
+          "tagline": "Know your risk in 60 seconds.",
+          "badge": "Free"
+        },
+        "guard": {
+          "name": "Panguard Guard",
+          "tagline": "Protection that never sleeps.",
+          "badge": "Core"
+        },
+        "chat": {
+          "name": "Panguard Chat",
+          "tagline": "Your AI security copilot.",
+          "badge": "Core"
+        },
+        "trap": {
+          "name": "Panguard Trap",
+          "tagline": "Catch attackers before they reach you.",
+          "badge": "Advanced"
+        },
+        "report": {
+          "name": "Panguard Report",
+          "tagline": "Compliance without the consultant.",
+          "badge": "Compliance"
+        }
+      },
+      "capabilities": "Key Capabilities",
+      "cta": {
+        "title": "Ready to see it all in action?",
+        "subtitle": "Start with a free Panguard Scan to see your risk profile. When you are ready, upgrade to unlock Guard, Chat, Trap, and Report -- all with a 30-day free trial.",
+        "cta1": "Start Free Trial",
+        "cta2": "Request a Demo"
+      }
+    },
+    "scan": {
+      "overline": "Panguard Scan",
+      "title": "60-second AI security audit.",
+      "titleHighlight": "Free. No installation.",
+      "subtitle": "One command. Full report. Zero footprint.",
+      "problem": {
+        "title": "You deployed a server. Is it secure?",
+        "desc": "Most developers and small businesses have no idea whether their servers are configured securely. They copy a DigitalOcean tutorial, deploy their app, and hope for the best. Meanwhile, exposed ports, default credentials, and unpatched software create attack surfaces that automated scanners exploit within hours.",
+        "conclusion": "Professional security audits cost $5,000 to $50,000 and take weeks. Panguard Scan gives you 80% of that value in 60 seconds, for free.",
+        "overline": "The Problem"
+      },
+      "features": {
+        "title": "What Panguard Scan does.",
+        "subtitle": "A comprehensive security snapshot without any permanent installation.",
+        "overline": "Features"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "6 Built-in Scanners",
+          "desc": "Password policy audit, unnecessary port detection, SSL certificate validation, scheduled task review, shared folder exposure check, and environment discovery. Each scanner runs independently and produces actionable findings."
+        },
+        "item2": {
+          "title": "PDF Report with Compliance Mapping",
+          "desc": "Every scan generates a branded PDF: cover page, executive summary, findings table sorted by severity, compliance control mapping (ISO 27001, SOC 2), and step-by-step remediation guidance."
+        },
+        "item3": {
+          "title": "Quick & Full Scan Modes",
+          "desc": "Quick scan hits the most critical checks in under 60 seconds. Full scan runs all 6 scanner modules for a comprehensive audit. Both modes produce a complete PDF report."
+        },
+        "item4": {
+          "title": "Open Port & Service Analysis",
+          "desc": "Discovers all listening ports, identifies the services behind them, and flags unnecessary exposure. Detects common misconfigurations like exposed databases, admin panels, and dev tools left in production."
+        },
+        "item5": {
+          "title": "SSL & Configuration Audit",
+          "desc": "Validates SSL certificates (expiry, chain, protocol versions), checks password policies, reviews scheduled tasks for persistence mechanisms, and audits shared folder permissions."
+        },
+        "item6": {
+          "title": "Environment Discovery",
+          "desc": "Automatically identifies your OS, distribution, kernel version, installed packages, and running services. Builds a complete inventory that feeds into the compliance mapping engine."
+        }
+      },
+      "useCases": {
+        "item1": {
+          "title": "Solo Developer",
+          "desc": "You just deployed a new VPS for your side project. Before you share the URL, run a Panguard Scan to make sure you did not accidentally expose your database port or leave SSH password auth enabled."
+        },
+        "item2": {
+          "title": "Startup CTO",
+          "desc": "Your team ships fast and sometimes infrastructure config gets messy. Schedule a weekly Panguard Scan via cron to catch configuration drift before it becomes a breach. Share the PDF with your board."
+        },
+        "item3": {
+          "title": "MSP / Consultant",
+          "desc": "You manage servers for multiple clients. Run Panguard Scan across all of them, generate branded reports, and demonstrate the value you deliver. No per-client installation needed."
+        }
+      },
+      "cta": {
+        "title": "Try it now. Free forever.",
+        "desc": "Run your first scan in under a minute. If you like what you see, upgrade to Panguard Guard for continuous protection.",
+        "cta1": "Get Early Access",
+        "cta2": "Run Free Scan"
+      }
+    },
+    "guard": {
+      "overline": "Panguard Guard",
+      "title": "24/7 AI endpoint protection.",
+      "titleHighlight": "One command to install.",
+      "subtitle": "The always-on security agent that detects, analyzes, and responds to threats automatically.",
+      "dashboard": {
+        "allSystemsProtected": "All Systems Protected",
+        "lastUpdated": "Last updated: just now",
+        "threatsBlocked": "Threats Blocked",
+        "activeEndpoints": "Active Endpoints",
+        "uptime": "Uptime",
+        "recentEvents": "Recent Events"
+      },
+      "events": {
+        "event1": "Blocked SSH brute force from 185.x.x.x",
+        "event2": "Port scan detected and blocked (24 ports)",
+        "event3": "Suspicious process quarantined: /tmp/.cache",
+        "event4": "Weekly AI model updated to v2.1.4"
+      },
+      "problem": {
+        "title": "A scan tells you what is wrong. It does not fix it.",
+        "desc": "Scanning once is better than nothing. But threats do not wait for your next scan. Attackers probe your systems 24/7. New vulnerabilities are published daily. Configuration drift happens with every deployment. You need continuous protection, not periodic checkups.",
+        "desc2": "Panguard Guard is the permanent security agent that lives on your server, watches everything in real-time, and takes action before you even know there is a problem. It installs in one command, runs in the background, and tells you about threats in plain language.",
+        "overline": "The Problem"
+      },
+      "features": {
+        "title": "What Panguard Guard does.",
+        "subtitle": "Enterprise-grade endpoint protection, designed for teams that do not have a dedicated security team.",
+        "overline": "Features"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "5-Agent AI Pipeline",
+          "desc": "Events flow through 5 specialized AI agents: Detect (Sigma/YARA rules + local LLM), Analyze (threat classification), Respond (auto-remediation), Report (compliance documentation), and Chat (human notification). 90% of events handled at zero cost by rules alone."
+        },
+        "item2": {
+          "title": "3 Auto-Response Types",
+          "desc": "High-confidence threats are neutralized automatically via three response modules: IP Blocker (firewall rules), Process Killer (malicious process termination), and File Quarantine (suspicious file isolation). Every action is logged and reversible."
+        },
+        "item3": {
+          "title": "4 Notification Channels",
+          "desc": "Get alerts where you already are: LINE, Telegram, Slack, and Email. Each channel supports rich formatting with threat details, severity badges, and one-click remediation links."
+        },
+        "item4": {
+          "title": "Confidence Scoring",
+          "desc": "Every event receives a 0-100 confidence score. Scores above 85 trigger auto-response. 50-84 sends a notification. Below 50, the event is logged and fed into the learning system."
+        },
+        "item5": {
+          "title": "Graceful Degradation",
+          "desc": "Cloud AI down? Local LLM (Ollama) takes over. LLM offline? The rule engine with 847 Sigma and 1,203 YARA rules handles it. Guard never stops protecting, regardless of network conditions."
+        },
+        "item6": {
+          "title": "7-Day Context Memory",
+          "desc": "Seven-day learning period builds a behavioral baseline for your specific system. After that, any deviation is flagged with context. The baseline continuously refines itself over time."
+        }
+      },
+      "install": {
+        "overline": "Installation",
+        "title": "One command. Done."
+      },
+      "cta": {
+        "title": "Your server deserves a security guard.",
+        "desc": "Join the early access program and be among the first to deploy Panguard Guard on your infrastructure.",
+        "cta1": "Get Early Access",
+        "cta2": "Read the Architecture"
+      },
+      "useCases": {
+        "overline": "Use Cases",
+        "title": "Who uses Panguard Guard."
+      }
+    },
+    "chat": {
+      "overline": "Panguard Chat",
+      "title": "Your AI security copilot.",
+      "titleHighlight": "Plain language, not alert codes.",
+      "subtitle": "Security that speaks human. Integrated with the tools you already use.",
+      "problem": {
+        "title": "Security alerts are useless if nobody understands them.",
+        "desc": "Traditional security tools drown you in alerts. CVE numbers, severity matrices, MITRE ATT&CK framework references -- all designed for security professionals who do not exist in most small teams. The result? Alerts get ignored. Important warnings are lost in noise. Breaches happen not because they were undetected, but because nobody understood the detection.",
+        "desc2": "Panguard Chat translates every security event into language any human can understand. It tells you what happened, why it matters, and what to do about it. And it does it in the messaging platform you already have open.",
+        "overline": "The Problem"
+      },
+      "features": {
+        "title": "What Panguard Chat does.",
+        "subtitle": "The communication layer for your entire security operation.",
+        "overline": "Features"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "Natural Language Notifications",
+          "desc": "No more cryptic alert codes. When Panguard detects something, it tells you in plain language: 'Someone attempted to brute-force your SSH from an IP in Brazil at 2:47 AM. We blocked it. No action needed.'"
+        },
+        "item2": {
+          "title": "Smart Alert Summaries",
+          "desc": "Every alert includes full context: what happened, where, when, severity level, and what Panguard did about it. Weekly and daily digests summarize your security posture so you never miss the big picture."
+        },
+        "item3": {
+          "title": "5 Platform Channels",
+          "desc": "LINE, Telegram, Slack, Email, and Webhook. Panguard Chat works where you already are. No separate dashboard to check. Security updates arrive in the channel you already monitor."
+        },
+        "item4": {
+          "title": "Role-Adaptive Tone",
+          "desc": "Chat adapts its language based on who is reading. Developers get technical details with CLI commands. Business owners get plain summaries. IT admins get actionable steps. Set your role once, get the right level of detail every time."
+        },
+        "item5": {
+          "title": "Incident Walkthroughs",
+          "desc": "When a significant event occurs, Chat Agent walks you through what happened, why it matters, and what Panguard did about it. Built-in alert templates for common attacks like brute force, port scans, and malware detections."
+        },
+        "item6": {
+          "title": "Team Collaboration",
+          "desc": "Tag teammates, escalate incidents to specific people, and maintain a conversation history that serves as an audit trail. Everyone on the team gets the context they need without switching tools."
+        }
+      },
+      "inAction": {
+        "title": "Proactive alerts, not another dashboard.",
+        "desc": "Panguard Chat is not a dashboard you have to remember to check. It reaches out to you proactively with weekly summaries, real-time alerts, and incident walkthroughs -- all in the messaging platform you already use.",
+        "overline": "In Action"
+      },
+      "chatDemo": {
+        "msg1": "Good morning. Here is your weekly security summary for Jan 13-19.",
+        "msg2": "47 threats blocked | 0 critical incidents | Security score: 91/100 (up 3 points)",
+        "msg3": "Notable: We blocked 12 SSH brute-force attempts from 3 unique IPs (Russia, China). All IPs have been added to the blocklist.",
+        "msg4": "New alert: Suspicious process detected on server-02. /tmp/.cache executed with elevated privileges. Process quarantined. Confidence: 92%.",
+        "msg5": "Daily digest: All 5 endpoints healthy. 3 blocked connections, 0 critical events. Next full report: Monday 9:00 AM.",
+        "msg6": "",
+        "msg7": ""
+      },
+      "cta": {
+        "title": "Security that talks to you.",
+        "desc": "Join the early access program and connect Panguard Chat to your Slack, LINE, or Telegram.",
+        "cta1": "Get Early Access",
+        "cta2": "Learn About Guard"
+      },
+      "useCases": {
+        "overline": "Use Cases",
+        "title": "Who uses Panguard Chat."
+      }
+    },
+    "trap": {
+      "overline": "Panguard Trap",
+      "title": "Intelligent honeypots.",
+      "titleHighlight": "Know your attackers.",
+      "subtitle": "Turn the tables. Let attackers reveal themselves while your real systems stay protected.",
+      "problem": {
+        "title": "Defensive security is reactive. You are always one step behind.",
+        "desc": "Traditional security waits for attackers to hit your real systems before responding. By then, you are already at a disadvantage. You do not know what tools they are using, what they are looking for, or how sophisticated they are. You are defending blind.",
+        "desc2": "Panguard Trap flips the script. It deploys realistic decoy services that attract attackers and capture their every move. While they waste time on fake targets, you gather intelligence that makes your real defenses stronger. The attacker becomes the informant.",
+        "overline": "The Problem"
+      },
+      "howItWorks": {
+        "overline": "How It Works",
+        "title": "Attract. Observe. Learn.",
+        "step1": {
+          "label": "Deploy",
+          "desc": "Panguard Trap identifies unused ports and deploys realistic decoy services automatically."
+        },
+        "step2": {
+          "label": "Attract",
+          "desc": "Attackers scanning your network discover the honeypots and interact with them, thinking they are real."
+        },
+        "step3": {
+          "label": "Capture",
+          "desc": "Every command, file upload, and lateral movement attempt is recorded in a sandboxed environment."
+        },
+        "step4": {
+          "label": "Analyze",
+          "desc": "AI classifies the attack, profiles the attacker, and extracts indicators of compromise (IOCs)."
+        },
+        "step5": {
+          "label": "Share",
+          "desc": "Anonymized threat intelligence is pushed to the collective network, strengthening every Panguard user."
+        },
+        "logTitle": "Trap Activity Log"
+      },
+      "features": {
+        "title": "What Panguard Trap does.",
+        "subtitle": "Proactive threat intelligence that makes your defenses smarter every day.",
+        "overline": "Features"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "8 Honeypot Types",
+          "desc": "SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, and Redis. Panguard Trap deploys realistic decoy services on unused ports. Each honeypot type mimics real service behavior to capture attacker techniques."
+        },
+        "item2": {
+          "title": "Attacker Profiling",
+          "desc": "Every interaction is logged in detail: tools used, commands executed, files uploaded, lateral movement attempts. AI classifies attacker skill level (script kiddie, intermediate, advanced), intent, and tool signatures."
+        },
+        "item3": {
+          "title": "Collective Threat Intelligence",
+          "desc": "Attack patterns captured by your traps are anonymized and contributed to the Panguard collective intelligence network via the Threat Cloud API. Your data protects every other user -- and theirs protects you."
+        },
+        "item4": {
+          "title": "AI-Powered Analysis",
+          "desc": "Captured attacker sessions are analyzed by Panguard's AI to classify attack types, estimate sophistication levels, and identify whether the attacker is an automated scanner or a human operator."
+        },
+        "item5": {
+          "title": "Flexible Deployment",
+          "desc": "Choose which honeypot services to deploy based on your threat landscape. Running a web server? Deploy HTTP and MySQL traps. Seeing SSH probes? Add an SSH honeypot. Configure the service mix to match your environment and gather the most relevant intelligence."
+        },
+        "item6": {
+          "title": "Zero Risk to Production",
+          "desc": "Honeypots are completely isolated from your production environment. They run in sandboxed containers with no access to real data, real services, or real network segments. Attackers waste their time on decoys."
+        }
+      },
+      "useCases": {
+        "item1": {
+          "title": "Threat Researcher",
+          "desc": "You want to understand what attackers are doing to systems like yours. Deploy Panguard Trap and receive detailed reports on attacker behavior, tools, and techniques. Use the intelligence to harden your real systems."
+        },
+        "item2": {
+          "title": "Security Team",
+          "desc": "Your team uses honeypot data to train detection models and validate security controls. Panguard Trap provides a continuous stream of real attacker behavior that is far more valuable than synthetic test data."
+        },
+        "item3": {
+          "title": "Compliance Requirement",
+          "desc": "Some compliance frameworks require active threat detection beyond passive monitoring. Honeypots demonstrate proactive security posture to auditors and provide evidence of continuous threat awareness."
+        }
+      },
+      "cta": {
+        "title": "Stop guessing. Start knowing.",
+        "desc": "Deploy intelligent honeypots and turn attacker activity into actionable intelligence.",
+        "cta1": "Get Early Access",
+        "cta2": "Learn About Guard"
+      }
+    },
+    "report": {
+      "overline": "Panguard Report",
+      "title": "Auto-generated compliance reports.",
+      "titleHighlight": "ISO 27001. SOC 2.",
+      "subtitle": "Turn your security data into audit-ready documentation. Automatically.",
+      "problem": {
+        "title": "Compliance is expensive, slow, and painful.",
+        "desc": "For a small business, getting SOC 2 certified costs $20,000 to $60,000 in consultant fees alone. ISO 27001 is even more. The process takes months, requires dedicated staff, and the documentation is outdated the moment the audit ends. Most small businesses simply cannot afford it -- even when their enterprise customers require it.",
+        "desc2": "Panguard Report changes the economics of compliance. Because Panguard already monitors your systems 24/7, it has all the data an auditor needs. Report takes that data and automatically maps it to compliance frameworks, generating audit-ready documentation that stays current every single day.",
+        "overline": "The Problem"
+      },
+      "features": {
+        "title": "What Panguard Report does.",
+        "subtitle": "Compliance automation that saves thousands and keeps you audit-ready year-round.",
+        "overline": "Features"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "3 Compliance Frameworks",
+          "desc": "ISO 27001 Annex A, SOC 2 Trust Service Criteria, and Taiwan Cyber Security Act (TCSA). Every finding is automatically mapped to relevant controls. Auditors see exactly which controls are satisfied and which need attention."
+        },
+        "item2": {
+          "title": "Bilingual Output",
+          "desc": "Reports are generated in English and Traditional Chinese (zh-TW) simultaneously. Perfect for Taiwan-based companies that need to satisfy both local regulators and international partners or investors."
+        },
+        "item3": {
+          "title": "Audit-Ready Evidence",
+          "desc": "Reports include evidence packages: timestamped logs, configuration snapshots, response action records, and compliance control mappings. JSON + text summary formats for integration with your existing audit workflows. PDF export coming soon."
+        },
+        "item4": {
+          "title": "Cost Savings vs. Consultants",
+          "desc": "A compliance consultant charges $150-300/hour. Annual SOC 2 preparation costs $20,000-60,000. Panguard Report generates the same documentation continuously, automatically, for a fraction of the cost."
+        },
+        "item5": {
+          "title": "Continuous Compliance",
+          "desc": "Compliance is not a point-in-time exercise. Panguard Report generates fresh reports whenever you need them, reflecting your current security posture -- not the state of things six months ago during the last audit."
+        },
+        "item6": {
+          "title": "Executive Summaries",
+          "desc": "Concise summaries for non-technical stakeholders: security score, compliance coverage percentages, finding counts by severity, and prioritized remediation steps. Share the text summary with your board or investors."
+        }
+      },
+      "useCases": {
+        "item1": {
+          "title": "Startup Raising Funding",
+          "desc": "Investors are asking about your security posture. Instead of hiring a consultant, generate an ISO 27001 gap analysis and SOC 2 readiness report with Panguard Report. Show investors you take security seriously, without spending $50K."
+        },
+        "item2": {
+          "title": "Enterprise Sales Team",
+          "desc": "Your biggest prospect just sent a 200-question security questionnaire. Panguard Report pre-fills most of the answers with data from your actual security telemetry. What used to take your team two weeks now takes two hours."
+        },
+        "item3": {
+          "title": "Compliance Officer",
+          "desc": "Annual audit season is approaching. Instead of a three-month scramble to gather evidence, Panguard Report has been continuously generating audit-ready documentation all year. The auditor gets a complete, current evidence package on day one."
+        }
+      },
+      "reports": {
+        "iso27001": {
+          "name": "ISO 27001 Gap Analysis",
+          "coverage": "94%",
+          "controls": 114
+        },
+        "soc2": {
+          "name": "SOC 2 Type II Evidence",
+          "coverage": "87%",
+          "controls": 64
+        },
+        "tcsa": {
+          "name": "Taiwan Cyber Security Act",
+          "coverage": "91%",
+          "controls": 38
+        },
+        "executive": {
+          "name": "Executive Security Summary",
+          "coverage": "100%"
+        },
+        "incident": {
+          "name": "Incident Response Report",
+          "coverage": "100%"
+        },
+        "bilingual": {
+          "name": "Bilingual Report (EN/zh-TW)",
+          "coverage": "100%"
+        }
+      },
+      "costComparison": {
+        "overline": "Cost Comparison",
+        "title": "The math is simple.",
+        "consultant": "Consultant",
+        "panguard": "Panguard",
+        "soc2Prep": {
+          "label": "SOC 2 Preparation",
+          "consultant": "$30,000-60,000",
+          "panguard": "Included"
+        },
+        "isoGap": {
+          "label": "ISO 27001 Gap Analysis",
+          "consultant": "$15,000-40,000",
+          "panguard": "Included"
+        },
+        "timeToReport": {
+          "label": "Time to Report",
+          "consultant": "2-4 months",
+          "panguard": "Instant"
+        },
+        "freshness": {
+          "label": "Freshness",
+          "consultant": "Point-in-time",
+          "panguard": "Real-time"
+        },
+        "evidence": {
+          "label": "Evidence Gathering",
+          "consultant": "Manual",
+          "panguard": "Automatic"
+        }
+      },
+      "cta": {
+        "title": "Compliance without the consultant bill.",
+        "desc": "Join the early access program and generate your first compliance report in minutes, not months.",
+        "cta1": "Get Early Access",
+        "cta2": "Our Security Practices"
+      },
+      "reportTypes": {
+        "overline": "Available Reports",
+        "title": "Every framework. One click.",
+        "desc": "Select the compliance framework you need, and Panguard Report generates a complete report mapped to every control. Coverage percentages show exactly where you stand. Gaps are highlighted with specific remediation guidance.",
+        "libraryTitle": "Report Library"
+      }
+    }
+  },
+  "solutions": {
+    "developers": {
+      "overline": "Built for solo devs and indie hackers",
+      "title": "Enterprise security.",
+      "titleHighlight": "Developer simplicity.",
+      "subtitle": "You ship code, not security configurations. Panguard gives solo developers and indie hackers the same AI-powered protection that enterprises use -- without the complexity, the overhead, or the enterprise price tag.",
+      "features": {
+        "item1": {
+          "title": "One Command Setup",
+          "desc": "Install Panguard with a single CLI command. No complex configuration files, no YAML sprawl, no agent conflicts. Just run the installer and you are protected in under 60 seconds."
+        },
+        "item2": {
+          "title": "Zero Time Overhead",
+          "desc": "Panguard runs silently in the background. Less than 1% CPU overhead and minimal memory footprint. It never interrupts your flow with false positives or intrusive alerts."
+        },
+        "item3": {
+          "title": "AI-Powered Explanations",
+          "desc": "When Panguard detects something, it tells you what happened in plain language. No need to interpret cryptic CVE codes or parse security jargon. Understand threats instantly."
+        },
+        "item4": {
+          "title": "Secure Your Side Projects",
+          "desc": "Protect your personal servers, VPS instances, and cloud deployments with the same enterprise-grade security used by large organizations, at a price that makes sense for individuals."
+        },
+        "item5": {
+          "title": "Developer-First API",
+          "desc": "Integrate Panguard into your CI/CD pipelines, scripts, and automation workflows. Our REST API and CLI tools are built for developers who want programmatic control over their security posture."
+        }
+      },
+      "pricing": {
+        "title": "Priced for developers, not enterprises",
+        "subtitle": "Start free with Panguard Scan. Upgrade to Solo for full protection.",
+        "freeScanDesc": "1 endpoint, basic scan + PDF report",
+        "soloDesc": "Guard + Chat + Scan, LINE/Telegram alerts",
+        "seeAllPlans": "See all plans"
+      },
+      "workflow": {
+        "title": "Fits your workflow",
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
+      },
+      "cta": {
+        "title": "Secure your stack in 60 seconds",
+        "desc": "Free for personal projects. No credit card required."
+      }
+    },
+    "smb": {
+      "overline": "For teams of 5 to 50",
+      "title": "Big company security.",
+      "titleHighlight": "Small company budget.",
+      "subtitle": "Small businesses are the number one target for cyberattacks, yet most security tools are built for enterprises with dedicated IT teams. Panguard changes that. AI-powered protection that works out of the box, so you can focus on growing your business.",
+      "stats": {
+        "stat1": {
+          "value": "43%",
+          "label": "of cyberattacks target small businesses"
+        },
+        "stat2": {
+          "value": "$4.9M",
+          "label": "average cost of a data breach in 2025"
+        },
+        "stat3": {
+          "value": "<60s",
+          "label": "to deploy Panguard on any endpoint"
+        }
+      },
+      "features": {
+        "title": "Security that works for small teams",
+        "item1": {
+          "title": "No Security Team Required",
+          "desc": "Panguard acts as your virtual security team. AI-powered threat detection and automated response mean you get enterprise-level protection without hiring dedicated security staff."
+        },
+        "item2": {
+          "title": "Deploy in Minutes, Not Months",
+          "desc": "Traditional security solutions require weeks of consulting and configuration. Panguard deploys across your entire organization in under an hour with centralized management."
+        },
+        "item3": {
+          "title": "Protect Every Endpoint",
+          "desc": "From employee laptops to cloud servers, Panguard covers your entire attack surface. Support for macOS, Linux, and Windows ensures every device is protected."
+        },
+        "item4": {
+          "title": "Compliance Made Simple",
+          "desc": "Automatically generate compliance reports for SOC 2, ISO 27001, and GDPR requirements. Demonstrate your security posture to clients and partners with one-click reports."
+        },
+        "item5": {
+          "title": "Predictable Pricing",
+          "desc": "Simple per-endpoint pricing that scales with your business. No hidden fees, no surprise overages, and no long-term contracts. Start with our free tier and upgrade when ready."
+        }
+      },
+      "pricing": {
+        "title": "Predictable pricing that scales with your team",
+        "subtitle": "No hidden fees, no per-user licensing surprises. Just simple per-endpoint pricing.",
+        "teamPlanDesc": "5-50 endpoints. All products included.",
+        "teamFeatures": [
+          "Guard + Chat + Scan + Report + Trap",
+          "Slack / LINE / Telegram / Email alerts",
+          "Team dashboard & 30-day logs"
+        ]
+      },
+      "integrations": {
+        "title": "Integrations your team already uses",
+        "tools": [
+          "Slack",
+          "LINE",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
+      },
+      "cta": {
+        "title": "Protect your business today",
+        "desc": "30-day free trial. No credit card required."
+      }
+    },
+    "enterprise": {
+      "overline": "For organizations with 50 to 500 employees",
+      "title": "Scale security",
+      "titleHighlight": "without scaling complexity.",
+      "subtitle": "Mid-size companies face enterprise-level threats but often lack enterprise-level security teams. Panguard bridges that gap with AI-powered protection that deploys fast, scales effortlessly, and provides the visibility and compliance your growing organization demands.",
+      "stats": {
+        "stat1": {
+          "value": "99.9%",
+          "label": "guaranteed uptime SLA"
+        },
+        "stat2": {
+          "value": "500+",
+          "label": "endpoints per organization"
+        },
+        "stat3": {
+          "value": "24/7",
+          "label": "priority support response"
+        }
+      },
+      "features": {
+        "title": "Built for growing organizations",
+        "item1": {
+          "title": "Team Management and RBAC",
+          "desc": "Fine-grained role-based access control lets you assign Owner, Admin, Analyst, and Viewer roles across your organization. Create custom roles to match your team structure and ensure least-privilege access."
+        },
+        "item2": {
+          "title": "Centralized Multi-Site Dashboard",
+          "desc": "Monitor all your endpoints, offices, and cloud environments from a single pane of glass. Real-time threat maps, consolidated alerting, and organization-wide security posture scoring."
+        },
+        "item3": {
+          "title": "Automated Compliance Reporting",
+          "desc": "Generate audit-ready reports for SOC 2, ISO 27001, and Taiwan Cyber Security Act (TCSA) at the click of a button. Schedule recurring reports and share them with auditors, investors, and partners."
+        },
+        "item4": {
+          "title": "SSO and Advanced Authentication",
+          "desc": "SAML 2.0 and OIDC integration for single sign-on with your identity provider. Enforce multi-factor authentication, session policies, and conditional access rules organization-wide."
+        },
+        "item5": {
+          "title": "API and Integration Ecosystem",
+          "desc": "Integrate Panguard into your existing toolchain with our comprehensive REST API. Native integrations with Slack, Microsoft Teams, PagerDuty, Jira, and leading SIEM platforms."
+        },
+        "item6": {
+          "title": "Dedicated Support and Onboarding",
+          "desc": "Business plan customers receive a dedicated customer success manager, priority support SLA, and guided onboarding to ensure a smooth rollout across your organization."
+        }
+      },
+      "pricing": {
+        "title": "Custom pricing for your organization",
+        "subtitle": "500+ endpoints, custom AI models, dedicated support, on-premise deployment options, and SLA guarantees tailored to your requirements.",
+        "volumeDiscounts": "Volume discounts starting at 500 endpoints"
+      },
+      "integrations": {
+        "title": "Enterprise integrations",
+        "tools": [
+          "SIEM",
+          "SSO (SAML/OIDC)",
+          "PagerDuty",
+          "Jira",
+          "Slack",
+          "Microsoft Teams",
+          "REST API",
+          "Webhooks"
+        ]
+      },
+      "cta": {
+        "title": "See Panguard in action",
+        "desc": "Schedule a personalized demo with our team."
+      }
+    }
+  },
+  "demo": {
+    "overline": "Demo",
+    "title": "See Panguard in action.",
+    "subtitle": "Choose a self-guided tour or schedule a personalized walkthrough with our security team. Either way, you will see how Panguard protects your endpoints from day one.",
+    "selfGuided": {
+      "title": "Self-Guided Demo",
+      "desc": "Explore the Panguard platform at your own pace. Walk through a simulated environment with real threat scenarios, see how the AI detection engine responds, and review sample reports -- all without scheduling a call.",
+      "comingSoon": "Coming Soon",
+      "comingSoonDesc": "The interactive product tour is under development. Join the waitlist to be notified when it launches.",
+      "tryFreeScan": "Try Free Scan"
+    },
+    "requestDemo": {
+      "title": "Request a Demo",
+      "desc": "Schedule a 30-minute walkthrough with our team. We will tailor the demo to your infrastructure, show relevant threat scenarios, and answer every question."
+    },
+    "steps": {
+      "title": "What to expect in your demo",
+      "step1": {
+        "title": "Discovery",
+        "desc": "We learn about your infrastructure, team size, and current security stack so the demo is relevant to you."
+      },
+      "step2": {
+        "title": "Live Walkthrough",
+        "desc": "See Panguard Scan, Guard, Chat, Trap, and Report in action against simulated real-world threats on a live environment."
+      },
+      "step3": {
+        "title": "Q&A & Next Steps",
+        "desc": "Ask anything. We will discuss pricing, deployment options, and a timeline to get Panguard running on your endpoints."
+      }
+    }
+  },
+  "demoForm": {
+    "labels": {
+      "name": "Name *",
+      "workEmail": "Work Email *",
+      "company": "Company *",
+      "teamSize": "Team Size",
+      "currentStack": "Current Security Stack",
+      "message": "Message"
+    },
+    "placeholders": {
+      "name": "Jane Chen",
+      "email": "jane@company.com",
+      "company": "Acme Corp",
+      "teamSize": "Select team size",
+      "stack": "e.g. CrowdStrike, Cloudflare, custom scripts...",
+      "message": "Tell us about your security goals or any specific questions..."
+    },
+    "teamSizes": [
+      "Just me",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
+    "submit": "Request Demo",
+    "submitting": "Submitting...",
+    "error": "Failed to submit request. Please try again.",
+    "successTitle": "Demo request received.",
+    "successDesc": "Our team will reach out within one business day to schedule your personalized walkthrough."
+  },
+  "company": {
+    "overline": "About Panguard AI",
+    "title": "Every funded AI security company protects Fortune 500. We give the other 400 million businesses and 70 million developers the AI security they've never had.",
+    "mission": "Enterprise-grade security has been locked behind enterprise-grade budgets for decades. We are building the product that makes that statement obsolete.",
+    "name": {
+      "overline": "The Name",
+      "title": "PANGUARD",
+      "etymology": "Pan (Greek god of shepherds, meaning universal) + Guard",
+      "desc1": "In Greek mythology, Pan was the god of the wild, shepherds, and flocks. He watched over everything that lived beyond the city walls -- the vulnerable, the unprotected, the overlooked.",
+      "desc2": "That is exactly what Panguard does. The Fortune 500 have walls, moats, and armies of security engineers. The solo developer, the five-person startup, the small business owner -- they have nothing. We are their shepherd. We are the guard that watches the wilderness."
+    },
+    "quote": {
+      "text": "You don't need to understand security. You just need to know someone is watching over you.",
+      "attribution": "-- The founding principle of Panguard AI"
+    },
+    "values": {
+      "overline": "Values",
+      "title": "What we believe.",
+      "subtitle": "These are not slogans on a wall. They are decision-making frameworks that shape every product choice, every design review, and every line of code.",
+      "item1": {
+        "title": "Users don't think",
+        "subtitle": "Zero friction",
+        "desc": "Security should not require a PhD. If the user has to configure it, we failed. If the user has to read a manual, we failed. One command to install, zero configuration, and it just works."
+      },
+      "item2": {
+        "title": "Human language first",
+        "subtitle": "No jargon",
+        "desc": "We never show alert codes when we can show plain English. 'Someone tried to access your SSH port from Russia at 3 AM' is infinitely more useful than 'CVE-2024-XXXX detected on port 22'. Security that speaks human."
+      },
+      "item3": {
+        "title": "Security never stops",
+        "subtitle": "Graceful degradation",
+        "desc": "Cloud down? Local AI takes over. LLM offline? Rule engine handles it. Panguard never says 'service unavailable.' Protection degrades in capability, never in availability. The watchdog always watches."
+      },
+      "item4": {
+        "title": "Collective defense",
+        "subtitle": "One protects all",
+        "desc": "When one Panguard agent learns something new, every agent benefits. A solo developer in Taipei and a small business in Berlin share the same threat intelligence, anonymously. The network grows stronger with every node."
+      }
+    },
+    "team": {
+      "overline": "Team",
+      "title": "We're building the team.",
+      "subtitle": "Panguard is assembling a small, focused team of security practitioners, AI researchers, and product builders. These are the roles we are looking to fill."
+    },
+    "investors": {
+      "overline": "Investors & Advisors",
+      "title": "Backed by people who get it.",
+      "subtitle": "We are building our investor and advisor network. Announcements coming soon.",
+      "desc": "Our advisor program is currently forming. We are in conversations with cybersecurity veterans, enterprise SaaS leaders, and AI/ML researchers. Details will be announced soon.",
+      "advisingCta": "Interested in advising?"
+    },
+    "cta": {
+      "title": "Join us.",
+      "desc": "We are looking for people who believe security is a right, not a luxury. If you want to build products that protect the people nobody else is protecting, we want to talk to you.",
+      "cta1": "View Open Positions",
+      "cta2": "Get in Touch"
+    }
+  },
+  "careers": {
+    "overline": "CAREERS",
+    "title": "Build the Future of Cybersecurity",
+    "subtitle": "We're a mission-driven, remote-first team making enterprise-grade security accessible to every developer and business on the planet. Come build with us.",
+    "missionStatement": "We believe every team deserves enterprise-grade security. We're building AI that makes it possible. If you want to protect the people nobody else is protecting, this is the place.",
+    "culture": {
+      "overline": "Culture",
+      "title": "How we work.",
+      "subtitle": "Four principles that shape everything we do.",
+      "item1": {
+        "title": "Remote-First",
+        "desc": "Work from anywhere. We're distributed across Asia-Pacific and beyond."
+      },
+      "item2": {
+        "title": "Ship Fast",
+        "desc": "Weekly releases, rapid iteration, real impact from day one."
+      },
+      "item3": {
+        "title": "Security Obsessed",
+        "desc": "We practice what we preach. Security is in our DNA."
+      },
+      "item4": {
+        "title": "Learn Together",
+        "desc": "Weekly knowledge shares, conference budget, continuous growth."
+      }
+    },
+    "benefits": {
+      "overline": "Benefits",
+      "title": "What you get.",
+      "subtitle": "We take care of the team so the team can take care of the mission.",
+      "item1": "Competitive equity package",
+      "item2": "Flexible remote work",
+      "item3": "Health insurance",
+      "item4": "Annual learning budget ($2,000)",
+      "item5": "Conference attendance",
+      "item6": "Latest equipment provided",
+      "item7": "Unlimited PTO",
+      "item8": "Team retreats (2x/year)"
+    },
+    "positions": {
+      "overline": "Open Positions",
+      "title": "Join the team.",
+      "noPositions": "No open positions in this department right now. Check back soon or send us your resume below."
+    },
+    "spontaneous": {
+      "title": "Don't see your role?",
+      "desc": "We're always looking for talented people who are passionate about security and AI. Send your resume and a note about what excites you to",
+      "email": "careers@panguard.ai",
+      "cta1": "Get in Touch",
+      "cta2": "Email Us Directly"
+    }
+  },
+  "contact": {
+    "overline": "Contact",
+    "title": "Let's talk.",
+    "subtitle": "Whether you have a question about our product, need technical support, or want to explore a partnership -- we would love to hear from you.",
+    "channels": {
+      "sales": {
+        "title": "Sales",
+        "email": "sales@panguard.ai",
+        "desc": "Interested in Panguard for your team? Talk to our sales team about plans, volume discounts, and custom enterprise deployments."
+      },
+      "support": {
+        "title": "Support",
+        "email": "support@panguard.ai",
+        "desc": "Need help with your Panguard deployment? Our support engineers respond within 4 hours for Pro and Business plans."
+      },
+      "partnership": {
+        "title": "Partnerships",
+        "email": "partners@panguard.ai",
+        "desc": "MSPs, resellers, and technology partners -- let us explore how Panguard can integrate with your offerings."
+      },
+      "press": {
+        "title": "Press",
+        "email": "press@panguard.ai",
+        "desc": "Media inquiries, interview requests, and press kit access. We are happy to share our story."
+      }
+    },
+    "formSection": {
+      "title": "Send us a message",
+      "subtitle": "Fill out the form below and we will get back to you within one business day."
+    },
+    "location": {
+      "title": "Our Location",
+      "address": "Panguard AI, Inc.\nTaipei, Taiwan"
+    },
+    "hours": {
+      "title": "Office Hours",
+      "schedule": "Monday - Friday\n9:00 AM - 6:00 PM (GMT+8)"
+    },
+    "responseTime": {
+      "title": "Response Time",
+      "general": "General inquiries: within 1 business day",
+      "support": "Support (Pro/Business): within 4 hours",
+      "security": "Security incidents: within 1 hour"
+    }
+  },
+  "contactForm": {
+    "labels": {
+      "name": "Name *",
+      "email": "Email *",
+      "company": "Company",
+      "inquiryType": "Inquiry Type *",
+      "message": "Message *"
+    },
+    "placeholders": {
+      "name": "Jane Chen",
+      "email": "jane@company.com",
+      "company": "Acme Corp",
+      "inquiryType": "Select type",
+      "message": "How can we help?"
+    },
+    "inquiryTypes": [
+      "Sales",
+      "Support",
+      "Partnership",
+      "Other"
+    ],
+    "submit": "Send Message",
+    "submitting": "Sending...",
+    "successTitle": "Message sent.",
+    "successDesc": "Thanks for reaching out. We will get back to you within one business day.",
+    "error": "Failed to send message. Please try again or email us directly."
+  },
+  "press": {
+    "overline": "NEWSROOM",
+    "title": "Press & Media",
+    "subtitle": "Press releases, media coverage, and brand resources.",
+    "filters": {
+      "all": "All",
+      "pressReleases": "Press Releases",
+      "coverage": "Coverage"
+    },
+    "brandAssets": {
+      "overline": "BRAND ASSETS",
+      "title": "Media Resources",
+      "subtitle": "Download official Panguard AI brand assets for editorial and media use.",
+      "item1": {
+        "title": "Logo Package",
+        "desc": "Primary logo, wordmark, and icon in multiple formats. Includes light and dark variants.",
+        "formats": "SVG, PNG, EPS"
+      },
+      "item2": {
+        "title": "Brand Guidelines",
+        "desc": "Colors, typography, spacing rules, and usage guidelines for consistent brand representation.",
+        "formats": "PDF"
+      },
+      "item3": {
+        "title": "Product Screenshots",
+        "desc": "High-resolution screenshots of the Panguard dashboard, CLI interface, and notification UI.",
+        "formats": "PNG, JPG"
+      }
+    },
+    "requestAccess": "Request Access",
+    "mediaInquiries": {
+      "title": "Media Inquiries",
+      "desc": "For media inquiries, interview requests, or brand asset access, please contact our communications team.",
+      "email": "press@panguard.ai",
+      "cta": "Contact Press Team"
+    }
+  },
+  "compliance": {
+    "overline": "Compliance",
+    "title": "Compliance automation for",
+    "titleHighlight": "Taiwan and global standards.",
+    "subtitle": "ISO 27001, SOC 2, and Taiwan Cyber Security Act -- automated, affordable, and always current.",
+    "problem": {
+      "title": "Compliance is expensive, slow, and painful.",
+      "desc": "Getting SOC 2 certified costs $20,000 to $60,000 in consultant fees. ISO 27001 is even more. In Taiwan, TCSA compliance engagements run NT$300,000 to NT$800,000. The process takes months, requires dedicated staff, and the documentation is outdated the moment the audit ends.",
+      "desc2": "Panguard already monitors your systems 24/7 -- it has all the data an auditor needs. Our compliance engine takes that telemetry and automatically maps it to framework controls, generating audit-ready documentation that stays current every single day."
+    },
+    "frameworks": {
+      "overline": "Supported Frameworks",
+      "title": "Three frameworks. One platform.",
+      "subtitle": "Every finding is automatically mapped to relevant controls. Auditors see exactly which controls are satisfied and which need attention.",
+      "iso27001": {
+        "name": "ISO 27001",
+        "fullName": "Information Security Management System",
+        "controls": 114,
+        "coverage": "94%",
+        "whoNeeds": "Any company handling sensitive data, pursuing enterprise customers, or preparing for investment due diligence.",
+        "whatItCovers": "Risk assessment, access control, cryptography, operations security, supplier relationships, incident management, and business continuity.",
+        "panguardDoes": "Automatically maps 107 of 114 Annex A controls to your live security telemetry. Generates gap analysis with specific remediation steps for the remaining controls."
+      },
+      "soc2": {
+        "name": "SOC 2 Type II",
+        "fullName": "Trust Service Criteria",
+        "controls": 64,
+        "coverage": "87%",
+        "whoNeeds": "SaaS companies selling to US enterprise customers. Required by most procurement teams and investors.",
+        "whatItCovers": "Security, Availability, Processing Integrity, Confidentiality, and Privacy trust service criteria with continuous evidence collection.",
+        "panguardDoes": "Automates evidence collection for 56 of 64 controls. Generates audit-ready documentation packages including timestamped logs, configuration snapshots, and AI reasoning chains."
+      },
+      "tcsa": {
+        "name": "Taiwan Cyber Security Act",
+        "fullName": "TCSA",
+        "controls": 38,
+        "coverage": "91%",
+        "whoNeeds": "Government contractors, critical infrastructure providers, and any Taiwan-based organization subject to the Cyber Security Management Act.",
+        "whatItCovers": "Security monitoring, incident reporting, infrastructure protection, risk assessment, and compliance reporting for government-regulated entities.",
+        "panguardDoes": "Full bilingual output (English + Traditional Chinese). Maps 35 of 38 controls automatically. Generates reports formatted for regulatory submission."
+      }
+    },
+    "taiwanMarket": {
+      "overline": "Taiwan Market",
+      "title": "Built for Taiwan. Works globally.",
+      "subtitle": "Panguard is the only AI security platform with native Taiwan Cyber Security Act support and bilingual compliance reporting.",
+      "item1": {
+        "title": "Bilingual Output",
+        "desc": "Reports generated simultaneously in English and Traditional Chinese (zh-TW). No manual translation needed."
+      },
+      "item2": {
+        "title": "Government Contractor Ready",
+        "desc": "Formatted for regulatory submission. Covers all 38 TCSA controls required for government-affiliated organizations."
+      },
+      "item3": {
+        "title": "Local Consultant Replacement",
+        "desc": "Taiwan compliance consultants charge NT$300K-800K per engagement. Panguard generates equivalent reports continuously for a fraction of the cost."
+      },
+      "item4": {
+        "title": "Cross-Border Compliance",
+        "desc": "Taiwanese companies selling internationally need both TCSA and ISO 27001/SOC 2. Generate all three from one platform."
+      }
+    },
+    "reports": {
+      "overline": "Report Library",
+      "title": "Every framework. One click.",
+      "desc": "Select the compliance framework you need, and Panguard generates a complete report mapped to every control. Coverage percentages show exactly where you stand. Gaps are highlighted with specific remediation guidance."
+    },
+    "costComparison": {
+      "overline": "Cost Comparison",
+      "title": "The math is simple.",
+      "tcsaRow": {
+        "label": "TCSA Compliance Report",
+        "consultant": "NT$300,000 - 800,000",
+        "panguard": "From $3/endpoint/mo"
+      },
+      "freshnessRow": {
+        "label": "Report Freshness",
+        "consultant": "Point-in-time",
+        "panguard": "Real-time"
+      }
+    },
+    "cta": {
+      "title": "Compliance without the consultant bill.",
+      "desc": "Generate your first compliance report in minutes, not months. ISO 27001, SOC 2, and Taiwan Cyber Security Act -- all from one platform.",
+      "cta1": "Get Early Access",
+      "cta2": "See Panguard Report",
+      "trustNote": "Want to see our own compliance status?",
+      "trustLink": "Visit our Trust Center"
+    }
+  },
+  "trust": {
+    "overline": "Trust Center",
+    "title": "Security You Can",
+    "titleHighlight": "Verify",
+    "subtitle": "Transparency is the foundation of trust. Review our compliance status, security architecture, data handling practices, and subprocessor relationships -- all in one place.",
+    "compliance": {
+      "overline": "Compliance Status",
+      "title": "Certifications and frameworks.",
+      "subtitle": "Real-time visibility into our compliance posture. We publish status honestly -- including what is in progress, not just what is complete.",
+      "soc2": {
+        "name": "SOC 2 Type II",
+        "status": "In Progress",
+        "desc": "Expected Q3 2026. 87% of controls automated. Audit conducted by a Big Four firm covering Security, Availability, and Confidentiality trust service criteria."
+      },
+      "iso27001": {
+        "name": "ISO 27001",
+        "status": "Planned",
+        "desc": "Planned for Q4 2026. Risk assessment framework in place. ISMS built to ISO 27001 standards from day one, making certification a formalization."
+      },
+      "gdpr": {
+        "name": "GDPR Compliant",
+        "status": "Active",
+        "desc": "Full GDPR compliance with automated data subject request handling. Data Processing Agreements available for all customers. Privacy by design across the platform."
+      },
+      "hipaa": {
+        "name": "HIPAA Ready",
+        "status": "In Progress",
+        "desc": "BAA available for healthcare customers. Encryption controls implemented. Access audit logging and automatic session management enforced."
+      }
+    },
+    "architecture": {
+      "overline": "Security Architecture",
+      "title": "Defense in depth.",
+      "subtitle": "Our security model is layered. A failure at any single layer does not compromise the system. Each layer operates independently with its own controls.",
+      "dataLayer": {
+        "title": "Data Layer",
+        "items": [
+          "AES-256 encryption at rest",
+          "TLS 1.3 for all data in transit",
+          "Per-tenant key management",
+          "Automatic key rotation (90 days)",
+          "Hardware security module backed"
+        ]
+      },
+      "applicationLayer": {
+        "title": "Application Layer",
+        "items": [
+          "Multi-factor authentication",
+          "Role-based access control (RBAC)",
+          "API key scoping and rate limiting",
+          "Input validation and sanitization",
+          "Session management and auto-expiry"
+        ]
+      },
+      "infrastructureLayer": {
+        "title": "Infrastructure Layer",
+        "items": [
+          "Single-tenant isolation",
+          "24/7 infrastructure monitoring",
+          "DDoS protection at edge",
+          "Immutable deployment pipeline",
+          "Automated vulnerability scanning"
+        ]
+      }
+    },
+    "dataHandling": {
+      "overline": "Data Handling",
+      "title": "How we treat your data.",
+      "subtitle": "Every data handling practice is documented, enforced through policy, and verified through automated controls.",
+      "item1": {
+        "title": "Data Encryption",
+        "desc": "AES-256 at rest, TLS 1.3 in transit. Per-tenant encryption keys with automatic rotation."
+      },
+      "item2": {
+        "title": "Data Residency",
+        "desc": "Customer data stored in customer-selected region. No cross-region replication without consent."
+      },
+      "item3": {
+        "title": "Data Retention",
+        "desc": "Configurable retention policies per data type. Automatic purging with cryptographic verification."
+      },
+      "item4": {
+        "title": "Access Controls",
+        "desc": "Role-based access with principle of least privilege. All access changes require approval workflow."
+      },
+      "item5": {
+        "title": "Audit Logging",
+        "desc": "Immutable audit trail for all administrative actions. Logs retained for a minimum of 12 months."
+      },
+      "item6": {
+        "title": "Incident Response",
+        "desc": "24-hour breach notification SLA. Documented IR plan tested quarterly with tabletop exercises."
+      }
+    },
+    "subprocessors": {
+      "overline": "Subprocessors",
+      "title": "Third parties we work with.",
+      "subtitle": "We limit subprocessor usage to essential services only. Each subprocessor undergoes security review before onboarding and is re-evaluated annually.",
+      "headers": {
+        "name": "Subprocessor",
+        "purpose": "Purpose",
+        "location": "Location"
+      },
+      "aws": {
+        "name": "AWS",
+        "purpose": "Infrastructure",
+        "location": "US / EU"
+      },
+      "anthropic": {
+        "name": "Anthropic",
+        "purpose": "AI Processing",
+        "location": "US"
+      },
+      "cloudflare": {
+        "name": "Cloudflare",
+        "purpose": "CDN & DDoS Protection",
+        "location": "Global"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "purpose": "Payment Processing",
+        "location": "US"
+      },
+      "sendgrid": {
+        "name": "SendGrid",
+        "purpose": "Transactional Email",
+        "location": "US"
+      },
+      "updateNote": "Last updated: February 2026. We notify customers at least 30 days before adding new subprocessors. Subscribe to updates via your account dashboard."
+    },
+    "cta": {
+      "title": "Need compliance documentation?",
+      "desc": "Request SOC 2 reports, penetration test summaries, our Data Processing Agreement, or schedule a security deep-dive with our team. Enterprise customers receive priority access to all compliance artifacts.",
+      "cta1": "Request Documentation",
+      "cta2": "View Security Practices"
+    }
+  },
+  "security": {
+    "overline": "Security & Trust",
+    "title": "We're a security company.",
+    "titleHighlight": "Our own security",
+    "titleSuffix": "is non-negotiable.",
+    "subtitle": "You trust us to protect your infrastructure. That means we hold ourselves to a higher standard than we hold anyone else. Here is exactly how we do it.",
+    "practices": {
+      "overline": "Practices",
+      "title": "How we secure ourselves.",
+      "subtitle": "These are not aspirational goals. They are current, enforced practices that apply to every line of code, every deployment, and every employee.",
+      "item1": {
+        "title": "Single-Tenant Architecture",
+        "desc": "Every customer deployment runs in an isolated environment. There is no shared database, no shared compute, and no shared network segment. A breach in one tenant cannot propagate to another."
+      },
+      "item2": {
+        "title": "End-to-End Encryption",
+        "desc": "All data is encrypted at rest (AES-256) and in transit (TLS 1.3). Encryption keys are managed per-tenant with automatic rotation every 90 days. Key material never leaves the hardware security module."
+      },
+      "item3": {
+        "title": "Zero Data Retention",
+        "desc": "Cloud AI queries are ephemeral. Payloads sent to Claude or GPT are not stored, not used for training, and not logged beyond the request lifecycle. PII is stripped before any data leaves the device."
+      },
+      "item4": {
+        "title": "Auditable AI Decisions",
+        "desc": "Every automated action taken by Panguard is logged with a full reasoning chain. You can trace exactly why an event was flagged, what confidence score it received, and what response was executed."
+      },
+      "item5": {
+        "title": "Continuous Penetration Testing",
+        "desc": "We engage independent third-party security firms to conduct penetration tests on a quarterly basis. Critical findings are remediated within 48 hours. Test results are available to enterprise customers upon request."
+      },
+      "item6": {
+        "title": "Secure Development Lifecycle",
+        "desc": "Every code change goes through automated SAST/DAST scanning, dependency auditing, and peer review. We follow OWASP best practices and maintain a bug bounty program for external researchers."
+      }
+    },
+    "compliance": {
+      "overline": "Compliance",
+      "title": "Frameworks we follow.",
+      "subtitle": "Compliance is not a checkbox exercise. It is the minimum bar. We build to the spirit of these frameworks, not just their letter."
+    },
+    "dataHandling": {
+      "overline": "Data Handling",
+      "title": "What stays local. What goes to the cloud.",
+      "subtitle": "Transparency about data flows is fundamental. Here is a complete breakdown of where your data lives and what -- if anything -- leaves the device.",
+      "onDevice": {
+        "zone": "On-Device (Local)",
+        "items": [
+          "Raw system logs and telemetry",
+          "Context Memory baseline database",
+          "Sigma/YARA rule engine and results",
+          "Local LLM inference (Ollama)",
+          "Incident response playbook execution",
+          "Full event history and forensic logs"
+        ]
+      },
+      "cloud": {
+        "zone": "Cloud (Ephemeral)",
+        "items": [
+          "Anonymized event payloads (PII stripped)",
+          "Cloud AI inference requests (not stored)",
+          "Collective threat intelligence contributions (hashed IOCs only)",
+          "Software update checks and rule feed syncs"
+        ]
+      },
+      "neverTransmitted": {
+        "zone": "Never Transmitted",
+        "items": [
+          "IP addresses or hostnames",
+          "User credentials or tokens",
+          "File contents or source code",
+          "Database contents or query logs",
+          "Personal or business data"
+        ]
+      },
+      "anonymization": {
+        "title": "Anonymization Pipeline",
+        "desc": "Before any event data is sent to cloud AI or the collective intelligence network, it passes through a multi-stage anonymization pipeline. IP addresses are hashed, hostnames are replaced with generic identifiers, file paths are normalized, and user data is removed entirely. The pipeline is deterministic, so the same threat pattern always produces the same anonymized signature -- enabling correlation without exposing identity."
+      }
+    },
+    "disclosure": {
+      "title": "Responsible Disclosure",
+      "desc": "Found a vulnerability in Panguard? We appreciate security researchers who help us keep our users safe. Please report any security issues through our responsible disclosure program. We commit to acknowledging reports within 24 hours and providing an initial assessment within 72 hours.",
+      "cta1": "Disclosure Policy",
+      "cta2": "security@panguard.ai"
+    },
+    "trustCenter": {
+      "overline": "Trust Center",
+      "title": "Documentation you can verify.",
+      "subtitle": "Download our security documentation, request audit reports, or review our compliance artifacts.",
+      "doc1": {
+        "label": "SOC 2 Type II Report",
+        "status": "Coming Q3 2026"
+      },
+      "doc2": {
+        "label": "Penetration Test Summary",
+        "status": "Available on request"
+      },
+      "doc3": {
+        "label": "Data Processing Agreement (DPA)",
+        "status": "Available"
+      },
+      "doc4": {
+        "label": "Security Whitepaper",
+        "status": "Available"
+      },
+      "doc5": {
+        "label": "Architecture Overview",
+        "status": "Available"
+      },
+      "doc6": {
+        "label": "Incident Response Plan",
+        "status": "Available on request"
+      }
+    },
+    "cta": {
+      "title": "Questions about our security?",
+      "desc": "Our security team is happy to discuss our practices, provide documentation, or schedule a deep-dive call with your CISO.",
+      "cta1": "Contact Security Team"
+    }
+  },
+  "technology": {
+    "overline": "Architecture",
+    "title": "Security that",
+    "titleHighlight": "thinks",
+    "titleSuffix": ", not just scans.",
+    "subtitle": "A three-layer AI defense funnel, five autonomous agents, and a context memory that learns your environment. Built so the 90 % of events that are noise cost nothing, and the 3 % that matter get the deepest reasoning available.",
+    "defenseFunnel": {
+      "overline": "Defense Funnel",
+      "title": "Three layers. 90 % free.",
+      "subtitle": "Events flow downward through increasingly powerful -- and increasingly expensive -- analysis layers. The funnel ensures cost efficiency while guaranteeing that no genuine threat is missed.",
+      "layer1": {
+        "badge": "Layer 1",
+        "name": "Rule Engine",
+        "tech": "Sigma + YARA",
+        "pct": "~90 %",
+        "cost": "$0",
+        "desc": "Open-source Sigma and YARA rules form the bedrock. They process the vast majority of security events instantly, on-device, with zero cost per event. New community rules are pulled daily from curated feeds and automatically compiled into the local engine."
+      },
+      "layer2": {
+        "badge": "Layer 2",
+        "name": "Edge AI",
+        "tech": "Local LLM via Ollama",
+        "pct": "~7 %",
+        "cost": "~$0",
+        "desc": "Events that rules cannot confidently classify are escalated to a local large-language model running on Ollama. This keeps sensitive data on the device, avoids network latency, and adds contextual reasoning without cloud dependency."
+      },
+      "layer3": {
+        "badge": "Layer 3",
+        "name": "Cloud AI",
+        "tech": "Claude / GPT",
+        "pct": "~3 %",
+        "cost": "~$0.02",
+        "desc": "Only the most ambiguous or novel threats reach cloud AI for deep reasoning. The payload is scrubbed of PII before transmission. Cloud AI returns a structured verdict with a confidence score and a plain-language explanation."
+      }
+    },
+    "agents": {
+      "overline": "Agent Architecture",
+      "title": "Five agents. One mission.",
+      "subtitle": "Each agent is a specialist. Together they form an autonomous security operations pipeline that detects, analyzes, responds, reports, and communicates -- without human intervention.",
+      "detect": {
+        "name": "Detect Agent",
+        "role": "First Responder",
+        "desc": "Continuously monitors system logs, network traffic, and file-system changes. Applies Sigma and YARA rules in real-time, flagging anomalies the moment they appear. It produces raw event signals enriched with MITRE ATT&CK TTP tags."
+      },
+      "analyze": {
+        "name": "Analyze Agent",
+        "role": "AI Investigator",
+        "desc": "Receives flagged events from the Detect Agent and performs multi-step reasoning. It correlates events across time, queries the Context Memory for baseline deviations, and assigns a confidence score from 0 to 100."
+      },
+      "respond": {
+        "name": "Respond Agent",
+        "role": "Automated Defender",
+        "desc": "Executes response playbooks based on confidence thresholds. High-confidence threats trigger automatic isolation, firewall rule injection, or process termination. Medium-confidence events queue human-review tasks with full context."
+      },
+      "report": {
+        "name": "Report Agent",
+        "role": "Compliance Writer",
+        "desc": "Transforms raw incident data into structured reports mapped to ISO 27001, SOC 2, and other frameworks. Generates executive summaries, timeline visualizations, and audit-ready evidence packages automatically."
+      },
+      "chat": {
+        "name": "Chat Agent",
+        "role": "Security Copilot",
+        "desc": "The human interface. Users ask questions in plain language and receive answers backed by real telemetry. Integrated with LINE, Slack, and Telegram. Sends proactive weekly summaries and real-time breach notifications."
+      }
+    },
+    "contextMemory": {
+      "overline": "Context Memory",
+      "title": "Seven days to learn you. Then it never forgets.",
+      "desc1": "During the first seven days after installation, Panguard silently observes your system: normal network patterns, typical process trees, expected cron schedules, and standard user behaviour. This builds a per-device baseline stored in an encrypted local database.",
+      "desc2": "After the learning window, any deviation from baseline is scored and flagged. The model continually refines itself -- a new legitimate service gets adopted into the baseline within hours, while a novel attack pattern triggers escalation immediately.",
+      "phase1": {
+        "day": "Day 1-2",
+        "label": "Observation",
+        "desc": "Collecting process trees, network connections, file-system baselines"
+      },
+      "phase2": {
+        "day": "Day 3-4",
+        "label": "Pattern extraction",
+        "desc": "Building statistical models of normal behavior per service"
+      },
+      "phase3": {
+        "day": "Day 5-6",
+        "label": "Threshold tuning",
+        "desc": "Calibrating alert thresholds to minimize false positives"
+      },
+      "phase4": {
+        "day": "Day 7+",
+        "label": "Active protection",
+        "desc": "Full detection + auto-response with continuous refinement"
+      }
+    },
+    "confidenceScoring": {
+      "overline": "Confidence Scoring",
+      "title": "Every event gets a score.",
+      "subtitle": "A 0-100 confidence score determines what happens next. High scores trigger automatic response. Medium scores notify humans. Low scores feed the learning system.",
+      "high": {
+        "range": "85 -- 100",
+        "label": "Auto-respond",
+        "desc": "High-confidence threats are neutralized automatically. The Respond Agent executes the matching playbook within seconds, then logs every action for audit."
+      },
+      "medium": {
+        "range": "50 -- 84",
+        "label": "Notify & Review",
+        "desc": "Medium-confidence events trigger a notification to the designated human reviewer via Chat Agent. Full context and AI reasoning are attached so the reviewer can approve or dismiss in one click."
+      },
+      "low": {
+        "range": "0 -- 49",
+        "label": "Log & Learn",
+        "desc": "Low-confidence signals are logged with full metadata and fed into the Context Memory system. Over time, the baseline model refines itself and these signals either graduate to higher bands or are suppressed as noise."
+      }
+    },
+    "collectiveIntelligence": {
+      "overline": "Collective Intelligence",
+      "title": "One device detects it. Every device blocks it.",
+      "desc1": "When a Panguard agent identifies a previously unknown threat, an anonymous indicator of compromise (IOC) is contributed to the collective intelligence network. Within minutes, every other Panguard agent receives the new signature.",
+      "desc2": "This creates a feedback loop: the more devices in the network, the faster new threats are caught, and the stronger every individual agent becomes. A small business with one server benefits from threat data generated across the entire Panguard fleet.",
+      "item1": {
+        "label": "Anonymous sharing",
+        "desc": "Threat indicators are stripped of all identifying data before contribution."
+      },
+      "item2": {
+        "label": "Distributed cache",
+        "desc": "New threat signatures propagate to the entire fleet within minutes."
+      },
+      "item3": {
+        "label": "Automatic rule push",
+        "desc": "Community-validated signatures are compiled into Sigma/YARA rules and pushed to every agent."
+      },
+      "item4": {
+        "label": "Privacy-first",
+        "desc": "No IP addresses, hostnames, or user data leave the device. Only hashes and behavioral patterns."
+      }
+    },
+    "resilience": {
+      "overline": "Resilience",
+      "title": "Security never stops.",
+      "subtitle": "Network down? API tokens depleted? Cloud provider outage? Panguard degrades gracefully through its three layers. Protection is always on.",
+      "optimal": {
+        "status": "Optimal",
+        "desc": "Cloud AI + Local LLM + Rule Engine -- full three-layer analysis on every event."
+      },
+      "cloudUnavailable": {
+        "status": "Cloud Unavailable",
+        "desc": "Local LLM + Rule Engine. Complex events queue for cloud retry. No gaps in protection."
+      },
+      "llmOffline": {
+        "status": "LLM Offline",
+        "desc": "Rule Engine only. Sigma + YARA still catch 90 % of known threats. Events are logged for later AI analysis."
+      },
+      "emergency": {
+        "status": "Emergency Mode",
+        "desc": "Core watchdog process monitors critical signals. If Panguard itself is targeted, the watchdog alerts the owner and preserves forensic logs."
+      }
+    },
+    "stack": {
+      "overline": "Stack",
+      "title": "Built on proven foundations.",
+      "subtitle": "Every component is chosen for reliability, performance, and developer ergonomics. No proprietary lock-in.",
+      "item1": {
+        "name": "TypeScript",
+        "desc": "End-to-end type safety"
+      },
+      "item2": {
+        "name": "Sigma Rules",
+        "desc": "Industry-standard detection"
+      },
+      "item3": {
+        "name": "YARA Rules",
+        "desc": "Malware pattern matching"
+      },
+      "item4": {
+        "name": "Ollama",
+        "desc": "Local LLM inference"
+      },
+      "item5": {
+        "name": "Claude / GPT",
+        "desc": "Cloud AI reasoning"
+      },
+      "item6": {
+        "name": "Node.js",
+        "desc": "Agent runtime"
+      },
+      "item7": {
+        "name": "SQLite + Redis",
+        "desc": "Event store & cache"
+      },
+      "item8": {
+        "name": "Docker",
+        "desc": "Single-command deployment"
+      },
+      "item9": {
+        "name": "REST / WebSocket",
+        "desc": "Real-time telemetry"
+      },
+      "item10": {
+        "name": "Prometheus",
+        "desc": "Metrics & alerting"
+      }
+    },
+    "cta": {
+      "title": "Ready to see it in action?",
+      "desc": "Run a free security scan in 60 seconds, or talk to our team about deploying Panguard in your infrastructure.",
+      "cta1": "Free Scan",
+      "cta2": "Get Early Access"
+    }
+  },
+  "blog": {
+    "overline": "BLOG",
+    "title": "Security Insights & Updates",
+    "subtitle": "Stay informed with the latest security research, product updates, and engineering deep-dives from the Panguard AI team.",
+    "featured": "Featured",
+    "noPosts": "No posts in this category yet. Check back soon.",
+    "digest": {
+      "title": "Weekly Security Digest",
+      "desc": "Get curated threat intelligence, product updates, and engineering insights delivered to your inbox every Thursday. No spam, no fluff -- just actionable security knowledge.",
+      "placeholder": "you@company.com",
+      "subscribe": "Subscribe",
+      "success": "Subscribed. You'll receive the weekly digest at {email}.",
+      "error": "Something went wrong. Please try again.",
+      "note": "Get weekly security insights delivered to your inbox. Unsubscribe anytime."
+    }
+  },
+  "blogPost": {
+    "backToBlog": "Back to Blog",
+    "comingSoon": "Coming Soon",
+    "fullArticleInProgress": "Full article in progress",
+    "fullArticleDesc": "This article is currently being finalized by the Panguard AI team. Subscribe to our newsletter to be notified when it publishes.",
+    "browseAll": "Browse All Posts"
+  },
+  "customers": {
+    "overline": "Use Case Scenarios",
+    "title": "How Teams Use Panguard",
+    "subtitle": "Based on common security challenges faced by startups and scaling teams. These scenarios illustrate how Panguard AI solves real infrastructure, compliance, and threat detection problems.",
+    "stats": {
+      "stat1": {
+        "value": "94%",
+        "label": "Reduction in incidents"
+      },
+      "stat2": {
+        "value": "14 days",
+        "label": "To SOC 2 compliance"
+      },
+      "stat3": {
+        "value": "$38K",
+        "label": "Avg cost savings"
+      },
+      "stat4": {
+        "value": "< 30s",
+        "label": "Detection time"
+      }
+    },
+    "featured": "Featured Scenario",
+    "allScenarios": {
+      "overline": "All Scenarios",
+      "title": "More use cases.",
+      "subtitle": "Every deployment is different. These scenarios illustrate common security challenges and how Panguard addresses them."
+    },
+    "productsUsed": "Products Used",
+    "readScenario": "Read Scenario",
+    "cta": {
+      "title": "Ready to Secure Your Infrastructure?",
+      "desc": "Start with a free security scan and see how Panguard AI can protect your endpoints, simplify compliance, and stop threats before they cause damage.",
+      "cta1": "Get Early Access",
+      "cta2": "Contact Sales"
+    }
+  },
+  "caseStudy": {
+    "allStories": "All Customer Stories",
+    "challenge": "The Challenge",
+    "solution": "The Solution",
+    "quote": "Quote",
+    "similarResults": "Ready to see similar results?",
+    "moreStories": "More Stories"
+  },
+  "docs": {
+    "overline": "DOCUMENTATION",
+    "title": "Get Started with Panguard",
+    "subtitle": "Everything you need to install, configure, and master Panguard AI.",
+    "searchPlaceholder": "Search documentation...",
+    "quickStart": {
+      "title": "Quick Start",
+      "item1": {
+        "title": "Installation",
+        "desc": "Get Panguard running in 60 seconds. One command, zero configuration.",
+        "link": "Quick Start Guide"
+      },
+      "item2": {
+        "title": "Configuration",
+        "desc": "Customize detection rules, notification channels, and scan schedules.",
+        "link": "Configuration Docs"
+      },
+      "item3": {
+        "title": "API Reference",
+        "desc": "RESTful API with full endpoint documentation and code examples.",
+        "link": "API Reference"
+      }
+    },
+    "productDocs": {
+      "title": "Product Documentation",
+      "subtitle": "Deep-dive documentation for every Panguard product module.",
+      "scan": {
+        "title": "Panguard Scan",
+        "desc": "Security audit setup, scan configuration, interpreting results, CI/CD integration"
+      },
+      "guard": {
+        "title": "Panguard Guard",
+        "desc": "Endpoint protection, detection rules, response actions, alert configuration"
+      },
+      "chat": {
+        "title": "Panguard Chat",
+        "desc": "AI copilot setup, Slack/Teams/LINE integration, query examples"
+      },
+      "trap": {
+        "title": "Panguard Trap",
+        "desc": "Honeypot deployment, attacker profiling, threat intelligence feeds"
+      },
+      "report": {
+        "title": "Panguard Report",
+        "desc": "Compliance reports, SOC 2 evidence collection, PDF customization"
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "desc": "Dashboard overview, custom views, team management, SSO setup"
+      }
+    },
+    "popularArticles": {
+      "title": "Popular Articles",
+      "subtitle": "Frequently referenced guides and how-tos.",
+      "article1": "How to install Panguard on Ubuntu/Debian",
+      "article2": "How to install Panguard on CentOS/RHEL",
+      "article3": "Configuring Slack notifications",
+      "article4": "Understanding threat severity levels",
+      "article5": "Setting up automated compliance reports",
+      "article6": "API authentication and rate limits",
+      "article7": "Troubleshooting agent connectivity",
+      "article8": "Upgrading Panguard to the latest version"
+    },
+    "cantFind": "Can't find what you're looking for?",
+    "cantFindDesc": "Our team is here to help. Reach out through our contact page or join the community discussion.",
+    "contactSupport": "Contact Support",
+    "communityForum": "Community Forum",
+    "comingSoon": "Coming Soon",
+    "earlyAccess": "Get Early Access"
+  },
+  "changelog": {
+    "overline": "Changelog",
+    "title": "What's New in Panguard",
+    "subtitle": "We ship fast and transparently. Every update, improvement, and fix -- documented here.",
+    "filters": {
+      "all": "All",
+      "features": "Features",
+      "fixes": "Fixes",
+      "improvements": "Improvements",
+      "security": "Security"
+    },
+    "badges": {
+      "feature": "Feature",
+      "fix": "Fix",
+      "improvement": "Improvement",
+      "security": "Security"
+    },
+    "notifyTitle": "Get notified of new releases",
+    "notifyDesc": "Subscribe to receive changelog updates directly in your inbox.",
+    "noSpam": "No spam, only product updates."
+  },
+  "resources": {
+    "overline": "RESOURCES",
+    "title": "Security Knowledge Base",
+    "subtitle": "Whitepapers, reports, and guides to help your team build stronger security.",
+    "types": {
+      "all": "All",
+      "whitepaper": "Whitepaper",
+      "report": "Report",
+      "guide": "Guide",
+      "webinar": "Webinar",
+      "infographic": "Infographic"
+    },
+    "featured": "Featured",
+    "watch": "Watch",
+    "download": "Download",
+    "noResources": "No resources in this category yet. Check back soon.",
+    "newsletter": {
+      "title": "Get Resources Delivered to Your Inbox",
+      "desc": "Stay ahead of the threat landscape with curated whitepapers, reports, and guides delivered directly to your inbox. No spam -- just actionable security knowledge.",
+      "subscribe": "Subscribe",
+      "note": "Join 2,000+ security-conscious engineers. Unsubscribe anytime."
+    }
+  },
+  "integrations": {
+    "overline": "INTEGRATIONS",
+    "title": "Connect Everything",
+    "subtitle": "Panguard integrates with your existing tools and workflows. No custom code required.",
+    "searchPlaceholder": "Search integrations...",
+    "categories": {
+      "all": "All",
+      "communication": "Communication",
+      "siemMonitoring": "SIEM & Monitoring",
+      "cloud": "Cloud",
+      "devops": "DevOps",
+      "ticketing": "Ticketing"
+    },
+    "available": "Available",
+    "comingSoon": "Coming Soon",
+    "developerApi": {
+      "overline": "Developer API",
+      "title": "Build Custom Integrations",
+      "desc": "Panguard offers a comprehensive RESTful API, webhook support, and SDKs for Python, Node.js, and Go. Build custom integrations tailored to your security workflow, automate threat responses, and connect Panguard to any system in your stack.",
+      "features": [
+        "RESTful API with full CRUD operations",
+        "Webhook callbacks for real-time event streaming",
+        "SDKs for Python, Node.js, and Go",
+        "OAuth 2.0 and API key authentication",
+        "Rate-limited with generous quotas"
+      ]
+    },
+    "dontSeeYourTool": "Don't see your tool?",
+    "dontSeeDesc": "We're constantly expanding our integration ecosystem. Let us know what tools you use and we'll prioritize building a native integration for your workflow.",
+    "requestIntegration": "Request an Integration",
+    "buildYourOwn": "Build Your Own"
+  },
+  "partners": {
+    "overline": "Partner Program",
+    "title": "Grow With Panguard AI",
+    "subtitle": "Join our partner ecosystem and deliver enterprise-grade AI security to your customers.",
+    "models": {
+      "overline": "Partnership Models",
+      "title": "Choose your path.",
+      "subtitle": "Three partnership tracks designed for different business models. All backed by the same world-class technology and support.",
+      "msp": {
+        "title": "MSP Partners",
+        "subtitle": "Managed Security Service Providers",
+        "desc": "Add Panguard's AI-powered security to your managed services portfolio. Multi-tenant dashboard, white-label options, volume pricing.",
+        "highlights": [
+          "Multi-tenant management console",
+          "White-label deployment options",
+          "Volume-based pricing tiers",
+          "Automated provisioning API"
+        ]
+      },
+      "technology": {
+        "title": "Technology Partners",
+        "subtitle": "Integration & Technology",
+        "desc": "Integrate Panguard with your platform. API access, co-marketing opportunities, joint solution development.",
+        "highlights": [
+          "Full REST API access",
+          "Co-marketing programs",
+          "Joint solution development",
+          "Technical integration support"
+        ]
+      },
+      "reseller": {
+        "title": "Reseller Partners",
+        "subtitle": "Value-Added Resellers",
+        "desc": "Resell Panguard AI to your customer base. Deal registration, sales enablement, dedicated partner manager.",
+        "highlights": [
+          "Deal registration protection",
+          "Sales enablement resources",
+          "Dedicated partner manager",
+          "Competitive margin structure"
+        ]
+      }
+    },
+    "benefits": {
+      "overline": "Partner Benefits",
+      "title": "Built for mutual growth.",
+      "subtitle": "Every partner gets access to tools, resources, and support designed to accelerate your business.",
+      "item1": {
+        "title": "Revenue Share",
+        "desc": "Competitive margins on all customer subscriptions"
+      },
+      "item2": {
+        "title": "Sales Enablement",
+        "desc": "Co-branded materials, demo environments, training"
+      },
+      "item3": {
+        "title": "Technical Support",
+        "desc": "Priority partner support channel with dedicated SE"
+      },
+      "item4": {
+        "title": "Co-Marketing",
+        "desc": "Joint webinars, case studies, and event sponsorship"
+      },
+      "item5": {
+        "title": "Deal Registration",
+        "desc": "Protected deals with transparent pipeline visibility"
+      },
+      "item6": {
+        "title": "Early Access",
+        "desc": "Preview new features and beta programs before GA"
+      }
+    },
+    "tiers": {
+      "overline": "Partner Tiers",
+      "title": "Grow with us.",
+      "subtitle": "As your Panguard practice grows, so do your benefits. Three tiers designed to reward commitment and success.",
+      "registered": {
+        "name": "Registered",
+        "requirement": "Free to join",
+        "desc": "Get started with the Panguard partner program. Access basic resources and start building your practice.",
+        "features": [
+          "Partner portal access",
+          "Product documentation",
+          "Standard margins",
+          "Community support forum",
+          "Co-branded landing page",
+          "Monthly partner newsletter"
+        ]
+      },
+      "silver": {
+        "name": "Silver",
+        "requirement": "5+ customers",
+        "desc": "Enhanced benefits for growing partners. Dedicated support and improved economics.",
+        "features": [
+          "Everything in Registered",
+          "Enhanced margin structure",
+          "Dedicated partner support",
+          "Sales enablement kit",
+          "Demo environment access",
+          "Quarterly business reviews",
+          "Lead sharing program",
+          "Priority deal registration"
+        ]
+      },
+      "gold": {
+        "name": "Gold",
+        "requirement": "20+ customers",
+        "desc": "Top-tier partnership with maximum benefits, executive sponsorship, and co-development opportunities.",
+        "features": [
+          "Everything in Silver",
+          "Highest margin tier",
+          "Executive sponsor assigned",
+          "Co-development opportunities",
+          "Joint go-to-market planning",
+          "Custom integrations support",
+          "Early access to roadmap",
+          "Annual partner summit invite",
+          "Dedicated marketing budget",
+          "White-glove onboarding for customers"
+        ]
+      }
+    },
+    "stats": {
+      "stat1": {
+        "value": "150+",
+        "label": "Active partners"
+      },
+      "stat2": {
+        "value": "40+",
+        "label": "Countries served"
+      },
+      "stat3": {
+        "value": "3x",
+        "label": "Avg partner revenue growth"
+      },
+      "stat4": {
+        "value": "98%",
+        "label": "Partner satisfaction"
+      }
+    },
+    "cta": {
+      "title": "Become a Partner",
+      "desc": "Join a growing ecosystem of security-focused partners delivering Panguard AI to businesses worldwide. Apply today and start protecting more customers together.",
+      "cta1": "Apply to Partner Program",
+      "cta2": "Request a Demo",
+      "applyNow": "Apply Now"
+    }
+  },
+  "status": {
+    "overline": "System Status",
+    "title": "Panguard AI Service Status",
+    "subtitle": "Real-time operational status and uptime history for all Panguard AI platform services.",
+    "allOperational": "All Systems Operational",
+    "degraded": "Some Systems Experiencing Degraded Performance",
+    "outage": "System Outage Detected",
+    "lastUpdated": "Last updated:",
+    "currentStatus": "Current Status",
+    "currentStatusDesc": "All services monitored in real time across global regions.",
+    "services": {
+      "guard": "Panguard Guard -- Endpoint Protection",
+      "scan": "Panguard Scan -- Security Audits",
+      "chat": "Panguard Chat -- AI Copilot",
+      "trap": "Panguard Trap -- Honeypot System",
+      "report": "Panguard Report -- Compliance Engine",
+      "dashboard": "Dashboard & Web App",
+      "api": "API & Integrations",
+      "threatIntel": "Threat Intelligence Feed"
+    },
+    "operational": "Operational",
+    "degradedLabel": "Degraded",
+    "outageLabel": "Outage",
+    "uptimeHistory": {
+      "title": "30-Day Uptime History",
+      "desc": "Visual representation of service availability over the past 30 days.",
+      "daysAgo": "30 days ago",
+      "today": "Today",
+      "uptimeLabel": "30-day uptime:",
+      "degradedPerformance": "Degraded Performance"
+    },
+    "recentIncidents": {
+      "title": "Recent Incidents",
+      "desc": "Past incidents and scheduled maintenance events with resolution details.",
+      "resolved": "Resolved",
+      "investigating": "Investigating",
+      "monitoring": "Monitoring"
+    },
+    "noIncidents": "No recent incidents. All systems have been running smoothly.",
+    "getUpdates": {
+      "title": "Get Status Updates",
+      "desc": "Subscribe to receive instant notifications when service status changes. Stay informed about scheduled maintenance and incident resolutions.",
+      "subscribe": "Subscribe",
+      "success": "Subscribed. You'll receive status updates at {email}.",
+      "error": "Something went wrong. Please try again."
+    },
+    "channels": {
+      "rss": "RSS Feed",
+      "slack": "Slack",
+      "email": "Email Digest",
+      "note": "Additional notification channels coming soon."
+    }
+  },
+  "waitlistForm": {
+    "placeholder": "you@company.com",
+    "joinWaitlist": "Join Waitlist",
+    "joining": "Joining...",
+    "checks": {
+      "priority": "Priority access",
+      "feedback": "Direct feedback channel",
+      "founding": "Founding member pricing"
+    },
+    "successTitle": "You are on the list.",
+    "successDesc": "We sent a confirmation to {email}. We will reach out when your access is ready.",
+    "betaNote": "Private beta launching Q2 2026"
+  },
+  "errorValidation": {
+    "emailRequired": "Please enter your email address.",
+    "emailInvalid": "Please enter a valid email address.",
+    "submitFailed": "Something went wrong. Please try again."
+  },
+  "earlyAccess": {
+    "overline": "Early Access",
+    "title1": "Be the first to experience",
+    "title2": "AI security that speaks human.",
+    "subtitle": "Panguard AI is launching soon. Join the waitlist to get priority access, shape the product with direct feedback, and lock in founding member pricing.",
+    "whatYouGet": "What early access members get",
+    "priority": "Priority Access",
+    "priorityDesc": "Be among the first to install Panguard on your endpoints. Early access members onboard weeks before public launch.",
+    "feedback": "Direct Feedback Channel",
+    "feedbackDesc": "Join our private Slack community. Speak directly with engineers. Your feedback shapes the features we build next.",
+    "founding": "Founding Member Pricing",
+    "foundingDesc": "Lock in a permanent discount on any plan. Founding members keep their rate for life, even as prices increase.",
+    "timeline": "Launch timeline",
+    "now": "Now",
+    "nowLabel": "Waitlist open -- join today",
+    "q2": "Q2 2026",
+    "q2Label": "Private beta for early access members",
+    "q3": "Q3 2026",
+    "q3Label": "Public launch"
+  },
+  "metadata": {
+    "home": {
+      "title": "Panguard AI — Your AI Security Guard",
+      "description": "AI-powered endpoint security for developers and SMBs. One command to install. Zero configuration. Panguard detects threats, responds automatically, and explains everything in plain language."
+    },
+    "pricing": {
+      "title": "Pricing",
+      "description": "Simple, transparent pricing for AI-powered endpoint security. Free Scan, Solo $9/mo, Starter $19/mo, Team $14/endpoint/mo, Business $10/endpoint/mo, Enterprise custom. 30-day free trial."
+    },
+    "earlyAccess": {
+      "title": "Early Access",
+      "description": "Be the first to experience AI security that speaks human. Join the Panguard AI waitlist for priority access, founding member pricing, and a direct feedback channel."
+    },
+    "scan": {
+      "title": "Free Security Scan",
+      "description": "How secure is your system? Find out in 60 seconds with Panguard's free AI security audit. No installation, no credit card required."
+    },
+    "productOverview": {
+      "title": "Product",
+      "description": "Five AI-powered security products on one platform. Scan, Guard, Chat, Trap, and Report -- from free 60-second audits to full enterprise compliance."
+    },
+    "productScan": {
+      "title": "Panguard Scan",
+      "description": "60-second AI security audit. Free. No installation. One command, full report, zero footprint."
+    },
+    "productGuard": {
+      "title": "Panguard Guard",
+      "description": "24/7 AI endpoint protection. One command to install. The always-on security agent that detects, analyzes, and responds to threats automatically."
+    },
+    "productChat": {
+      "title": "Panguard Chat",
+      "description": "Your AI security copilot. Plain language, not alert codes. Security that speaks human, integrated with the tools you already use."
+    },
+    "productTrap": {
+      "title": "Panguard Trap",
+      "description": "Intelligent honeypots. Know your attackers. Turn the tables and let attackers reveal themselves while your real systems stay protected."
+    },
+    "productReport": {
+      "title": "Panguard Report",
+      "description": "Auto-generated compliance reports. ISO 27001, SOC 2. Turn your security data into audit-ready documentation, automatically."
+    },
+    "developers": {
+      "title": "For Developers",
+      "description": "Enterprise security with developer simplicity. AI-powered endpoint protection for solo devs and indie hackers. One command setup, zero overhead."
+    },
+    "smb": {
+      "title": "For Small Business",
+      "description": "Big company security on a small company budget. AI-powered protection that works out of the box for teams of 5 to 50."
+    },
+    "enterprise": {
+      "title": "For Mid-size Companies",
+      "description": "Scale security without scaling complexity. AI-powered protection for organizations with 50 to 500 employees."
+    },
+    "demo": {
+      "title": "Request Demo",
+      "description": "See Panguard AI in action. Request a personalized demo with our security team or explore the self-guided product tour."
+    },
+    "company": {
+      "title": "About Panguard AI",
+      "description": "We give the other 400 million businesses and 70 million developers the AI security they've never had. Enterprise-grade security, accessible to everyone."
+    },
+    "careers": {
+      "title": "Careers",
+      "description": "Build the future of cybersecurity. Join our mission-driven, remote-first team making enterprise-grade security accessible to every developer and business."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Get in touch with the Panguard AI team. Sales inquiries, technical support, partnership opportunities, or press requests -- we are here to help."
+    },
+    "press": {
+      "title": "Press & Media",
+      "description": "Press releases, media coverage, and brand resources from Panguard AI. Download logos, brand guidelines, and product screenshots."
+    },
+    "compliance": {
+      "title": "Compliance",
+      "description": "Compliance automation for Taiwan and global standards. ISO 27001, SOC 2, and Taiwan Cyber Security Act -- automated, affordable, and always current."
+    },
+    "trust": {
+      "title": "Trust Center",
+      "description": "Security you can verify. Review our compliance status, security architecture, data handling practices, and subprocessor relationships."
+    },
+    "security": {
+      "title": "Security",
+      "description": "We're a security company. Our own security is non-negotiable. Review our security practices, compliance frameworks, and data handling policies."
+    },
+    "technology": {
+      "title": "Technology",
+      "description": "Security that thinks, not just scans. A three-layer AI defense funnel, five autonomous agents, and a context memory that learns your environment."
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Security insights and updates from the Panguard AI team. Research, product updates, and engineering deep-dives."
+    },
+    "customers": {
+      "title": "Customers",
+      "description": "How teams use Panguard AI. Use case scenarios illustrating how Panguard solves real infrastructure, compliance, and threat detection problems."
+    },
+    "docs": {
+      "title": "Documentation",
+      "description": "Everything you need to install, configure, and master Panguard AI. Guides, API reference, and product documentation."
+    },
+    "changelog": {
+      "title": "Changelog",
+      "description": "What's new in Panguard. Every update, improvement, and fix -- documented transparently."
+    },
+    "resources": {
+      "title": "Resources",
+      "description": "Security knowledge base. Whitepapers, reports, and guides to help your team build stronger security."
+    },
+    "integrations": {
+      "title": "Integrations",
+      "description": "Connect everything. Panguard integrates with Slack, Teams, LINE, Jira, SIEM platforms, and more. No custom code required."
+    },
+    "partners": {
+      "title": "Partner Program",
+      "description": "Grow with Panguard AI. Join our partner ecosystem as an MSP, technology partner, or reseller."
+    },
+    "status": {
+      "title": "System Status",
+      "description": "Real-time operational status and uptime history for all Panguard AI platform services."
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved. If you believe this is an error, please contact our support team.",
+    "backHome": "Back to Home"
+  },
+  "legalNav": {
+    "heading": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "dpa": "Data Processing Agreement",
+    "cookies": "Cookie Policy",
+    "acceptableUse": "Acceptable Use Policy",
+    "responsibleDisclosure": "Vulnerability Disclosure",
+    "sla": "Service Level Agreement",
+    "securityWhitepaper": "Security Whitepaper"
+  },
+  "comingSoon": {
+    "badge": "Coming Soon",
+    "description": "We're working on this. Join our early access program to be the first to know.",
+    "success": "You're on the list. We'll notify you when this is ready.",
+    "notifyMe": "Notify Me",
+    "error": "Something went wrong. Please try again.",
+    "backHome": "Back to Home"
+  }
+}
