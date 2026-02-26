@@ -26,21 +26,21 @@ const features = [
   },
   {
     icon: NetworkIcon,
-    title: "Multi-Platform Support",
+    title: "5 Platform Channels",
     description:
-      "Panguard Chat works where you already are. Slack, LINE, Telegram, and Discord integrations are available out of the box. No separate dashboard to check. Security updates arrive in the channel you already monitor.",
+      "LINE, Telegram, Slack, Email, and Webhook. Panguard Chat works where you already are. No separate dashboard to check. Security updates arrive in the channel you already monitor.",
   },
   {
     icon: AnalyticsIcon,
-    title: "Weekly Summaries",
+    title: "Role-Adaptive Tone",
     description:
-      "Every Monday morning, receive an automated weekly security digest: threats blocked, new vulnerabilities patched, configuration changes detected, and an overall security score trend. Share it with your team or board.",
+      "Chat adapts its language based on who is reading. Developers get technical details with CLI commands. Business owners get plain summaries. IT admins get actionable steps. Set your role once, get the right level of detail every time.",
   },
   {
     icon: DeployIcon,
     title: "Incident Walkthroughs",
     description:
-      "When a significant event occurs, Chat Agent walks you through what happened, why it matters, and what Panguard did about it. You can ask follow-up questions and drill into the details, all in conversation form.",
+      "When a significant event occurs, Chat Agent walks you through what happened, why it matters, and what Panguard did about it. Built-in alert templates for common attacks like brute force, port scans, and malware detections.",
   },
   {
     icon: TeamIcon,

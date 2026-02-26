@@ -4,15 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Copy, Check } from "lucide-react";
 import FadeInUp from "../FadeInUp";
-
-/* Brand logo paths (3D cube-shield) - viewBox 0 0 48 52 */
-const logoPaths = {
-  body: "M12 22 L36 22 L36 38 L24 48 L12 38 Z",
-  leftPillar: "M12 22 L12 12",
-  rightPillar: "M36 22 L36 12",
-  topBridge: "M12 12 L24 4 L36 12",
-  innerFace: "M12 22 L24 14 L36 22",
-};
+import { BRAND_LOGO_PATHS, BRAND_LOGO_VIEWBOX } from "../ui/BrandLogo";
 
 /* Node positions for the network graph */
 const nodes = [
@@ -97,13 +89,13 @@ function ShieldNetworkSVG() {
           />
         ))}
 
-        {/* Brand logo nodes (3D cube-shield) */}
+        {/* Brand logo nodes (real 3D cube-shield) */}
         {nodes.map((node, i) => {
           const s = node.scale;
+          const logoSize = 28 * s;
           return (
             <motion.g
               key={`n-${i}`}
-              transform={`translate(${node.x - 24 * s}, ${node.y - 26 * s}) scale(${s})`}
               animate={{ opacity: [0.6, 1, 0.6] }}
               transition={{
                 duration: 3 + i * 0.5,
@@ -115,8 +107,8 @@ function ShieldNetworkSVG() {
               {/* Glow circle behind center node */}
               {i === 0 && (
                 <motion.circle
-                  cx={24}
-                  cy={26}
+                  cx={node.x}
+                  cy={node.y}
                   r={30}
                   fill="#8B9A8E"
                   fillOpacity={0.08}
@@ -126,19 +118,20 @@ function ShieldNetworkSVG() {
               )}
               {/* Subtle glow behind satellite nodes */}
               {i > 0 && (
-                <circle cx={24} cy={26} r={20} fill="#8B9A8E" fillOpacity={0.04} />
+                <circle cx={node.x} cy={node.y} r={20} fill="#8B9A8E" fillOpacity={0.04} />
               )}
-              {Object.values(logoPaths).map((d, j) => (
-                <path
-                  key={j}
-                  d={d}
-                  stroke="#8B9A8E"
-                  strokeWidth={i === 0 ? 2.5 : 2}
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-              ))}
+              <svg
+                x={node.x - logoSize / 2}
+                y={node.y - logoSize / 2}
+                width={logoSize}
+                height={logoSize}
+                viewBox={BRAND_LOGO_VIEWBOX}
+                fill="none"
+              >
+                {BRAND_LOGO_PATHS.filter(p => p.role === "fg").map((p, j) => (
+                  <path key={j} fill="#8B9A8E" d={p.d} />
+                ))}
+              </svg>
             </motion.g>
           );
         })}
@@ -206,7 +199,7 @@ export default function Hero() {
               <br />
               Security Guard.
               <br />
-              <span className="text-brand-sage font-sans not-italic font-bold text-[clamp(24px,3.5vw,36px)]">Starting at $49/month.</span>
+              <span className="text-brand-sage font-sans not-italic font-bold text-[clamp(24px,3.5vw,36px)]">Starting at $9/month.</span>
             </h1>
           </FadeInUp>
 

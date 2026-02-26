@@ -1,12 +1,16 @@
 "use client";
 
-const logoPaths = {
-  body: "M12 22 L36 22 L36 38 L24 48 L12 38 Z",
-  leftPillar: "M12 22 L12 12",
-  rightPillar: "M36 22 L36 12",
-  topBridge: "M12 12 L24 4 L36 12",
-  innerFace: "M12 22 L24 14 L36 22",
-};
+import { BRAND_LOGO_PATHS, BRAND_LOGO_VIEWBOX } from "./BrandLogo";
+
+function BrandShieldSVG({ width, height }: { width: number; height: number }) {
+  return (
+    <svg width={width} height={height} viewBox={BRAND_LOGO_VIEWBOX} fill="none">
+      {BRAND_LOGO_PATHS.filter(p => p.role === "fg").map((p, i) => (
+        <path key={i} fill="#8B9A8E" d={p.d} />
+      ))}
+    </svg>
+  );
+}
 
 export function ShieldSpinner({
   size = 48,
@@ -36,26 +40,10 @@ export function ShieldSpinner({
           opacity="0.4"
         />
       </svg>
-      {/* Shield mark */}
-      <svg
-        width={size * 0.6}
-        height={size * 0.65}
-        viewBox="0 0 48 52"
-        fill="none"
-        className="animate-[breathe_3s_ease-in-out_infinite]"
-      >
-        {Object.values(logoPaths).map((d, i) => (
-          <path
-            key={i}
-            d={d}
-            stroke="#8B9A8E"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            fill="none"
-          />
-        ))}
-      </svg>
+      {/* Brand shield mark */}
+      <div className="animate-[breathe_3s_ease-in-out_infinite]">
+        <BrandShieldSVG width={size * 0.6} height={size * 0.65} />
+      </div>
     </div>
   );
 }
@@ -79,24 +67,7 @@ export function PulseLoader({
         style={{ width: size * 0.7, height: size * 0.7 }}
       />
       {/* Center shield */}
-      <svg
-        width={size * 0.4}
-        height={size * 0.43}
-        viewBox="0 0 48 52"
-        fill="none"
-      >
-        {Object.values(logoPaths).map((d, i) => (
-          <path
-            key={i}
-            d={d}
-            stroke="#8B9A8E"
-            strokeWidth="3"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            fill="none"
-          />
-        ))}
-      </svg>
+      <BrandShieldSVG width={size * 0.4} height={size * 0.43} />
     </div>
   );
 }
@@ -114,24 +85,7 @@ export function ScanLoader({
       style={{ width: size, height: size }}
     >
       {/* Shield */}
-      <svg
-        width={size * 0.6}
-        height={size * 0.65}
-        viewBox="0 0 48 52"
-        fill="none"
-      >
-        {Object.values(logoPaths).map((d, i) => (
-          <path
-            key={i}
-            d={d}
-            stroke="#8B9A8E"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            fill="none"
-          />
-        ))}
-      </svg>
+      <BrandShieldSVG width={size * 0.6} height={size * 0.65} />
       {/* Scan line overlay */}
       <div
         className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-sage to-transparent animate-[scan-line_2s_ease-in-out_infinite]"

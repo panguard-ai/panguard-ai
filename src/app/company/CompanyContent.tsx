@@ -4,7 +4,7 @@ import FadeInUp from "@/components/FadeInUp";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import SectionTitle from "@/components/ui/SectionTitle";
 import Link from "next/link";
-import { ArrowRight, Linkedin, Twitter } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import {
   ShieldIcon, TeamIcon, TerminalIcon,
   HistoryIcon, EnterpriseIcon, ResponseIcon,
@@ -42,39 +42,32 @@ const values = [
   },
 ];
 
-/* ─── Team ─── */
-const team = [
+/* ─── Open Roles ─── */
+const openRoles = [
   {
-    name: "Coming Soon",
-    role: "Founder & CEO",
-    bio: "Security practitioner and serial entrepreneur. Previously built security tools used by Fortune 500 companies. Believes the other 400 million businesses deserve the same protection.",
-    placeholder: "FC",
+    title: "Founder & CEO",
+    type: "Leadership",
+    description:
+      "Security practitioner and serial entrepreneur to lead the company vision. Build the team, shape the product, and bring enterprise-grade security to the other 400 million businesses.",
   },
   {
-    name: "Coming Soon",
-    role: "CTO",
-    bio: "Former principal engineer at a leading cloud security vendor. Deep expertise in AI/ML systems, distributed architectures, and threat detection. Open-source contributor.",
-    placeholder: "CT",
+    title: "CTO",
+    type: "Leadership",
+    description:
+      "Principal-level engineer with deep expertise in AI/ML systems, distributed architectures, and threat detection. Lead the technical vision and open-source strategy.",
   },
   {
-    name: "Coming Soon",
-    role: "Head of AI",
-    bio: "PhD in machine learning with a focus on anomaly detection. Led AI research teams at cybersecurity startups. Published in top-tier security and ML conferences.",
-    placeholder: "HA",
+    title: "Head of AI",
+    type: "Engineering",
+    description:
+      "ML researcher focused on anomaly detection to lead AI research and build the next generation of autonomous threat detection agents.",
   },
   {
-    name: "Coming Soon",
-    role: "Head of Product",
-    bio: "Product leader with a track record of building developer tools that people actually love. Obsessed with reducing friction and making complex systems feel simple.",
-    placeholder: "HP",
+    title: "Head of Product",
+    type: "Product",
+    description:
+      "Product leader obsessed with reducing friction. Make complex security systems feel simple for developers and small business owners.",
   },
-];
-
-/* ─── Investors/Advisors ─── */
-const advisors = [
-  { name: "Advisor Placeholder", role: "Cybersecurity Industry Veteran", org: "To be announced" },
-  { name: "Advisor Placeholder", role: "Enterprise SaaS Advisor", org: "To be announced" },
-  { name: "Advisor Placeholder", role: "AI/ML Research Advisor", org: "To be announced" },
 ];
 
 export default function CompanyContent() {
@@ -179,40 +172,32 @@ export default function CompanyContent() {
         </div>
       </SectionWrapper>
 
-      {/* ── Team ── */}
+      {/* ── We're Hiring ── */}
       <SectionWrapper>
         <SectionTitle
           overline="Team"
-          title="The people behind the shield."
-          subtitle="A small, focused team of security practitioners, AI researchers, and product builders. We have shipped before. We are shipping again."
+          title="We're building the team."
+          subtitle="Panguard is assembling a small, focused team of security practitioners, AI researchers, and product builders. These are the roles we are looking to fill."
         />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14">
-          {team.map((member, i) => (
-            <FadeInUp key={member.role} delay={i * 0.08}>
-              <div className="bg-surface-1 rounded-xl border border-border p-6 text-center h-full flex flex-col">
-                {/* Placeholder avatar */}
-                <div className="w-16 h-16 rounded-full bg-surface-3 border border-border flex items-center justify-center mx-auto mb-4">
-                  <span className="text-lg font-bold text-text-tertiary">
-                    {member.placeholder}
-                  </span>
-                </div>
-                <p className="text-sm font-bold text-text-primary">
-                  {member.name}
+        <div className="grid sm:grid-cols-2 gap-6 mt-14">
+          {openRoles.map((role, i) => (
+            <FadeInUp key={role.title} delay={i * 0.08}>
+              <div className="bg-surface-1 rounded-xl border border-border p-6 h-full flex flex-col">
+                <p className="text-[11px] uppercase tracking-wider text-brand-sage font-semibold mb-2">
+                  {role.type}
                 </p>
-                <p className="text-[11px] uppercase tracking-wider text-brand-sage font-semibold mt-1 mb-3">
-                  {member.role}
+                <h3 className="text-lg font-bold text-text-primary mb-3">
+                  {role.title}
+                </h3>
+                <p className="text-sm text-text-secondary leading-relaxed flex-1">
+                  {role.description}
                 </p>
-                <p className="text-xs text-text-secondary leading-relaxed flex-1">
-                  {member.bio}
-                </p>
-                <div className="flex justify-center gap-3 mt-4">
-                  <span className="text-text-muted hover:text-text-secondary transition-colors cursor-pointer">
-                    <Linkedin className="w-4 h-4" />
-                  </span>
-                  <span className="text-text-muted hover:text-text-secondary transition-colors cursor-pointer">
-                    <Twitter className="w-4 h-4" />
-                  </span>
-                </div>
+                <Link
+                  href="/careers"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-brand-sage mt-4 hover:gap-3 transition-all duration-200"
+                >
+                  Learn More <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </FadeInUp>
           ))}
@@ -226,22 +211,22 @@ export default function CompanyContent() {
           title="Backed by people who get it."
           subtitle="We are building our investor and advisor network. Announcements coming soon."
         />
-        <div className="grid sm:grid-cols-3 gap-4 mt-14 max-w-3xl mx-auto">
-          {advisors.map((a, i) => (
-            <FadeInUp key={a.role} delay={i * 0.08}>
-              <div className="bg-surface-2 rounded-xl border border-border p-5 text-center">
-                <div className="w-12 h-12 rounded-full bg-surface-3 border border-border flex items-center justify-center mx-auto mb-3">
-                  <TeamIcon className="w-5 h-5 text-text-muted" />
-                </div>
-                <p className="text-sm font-semibold text-text-primary">
-                  {a.name}
-                </p>
-                <p className="text-xs text-text-tertiary mt-1">{a.role}</p>
-                <p className="text-[11px] text-text-muted mt-0.5">{a.org}</p>
-              </div>
-            </FadeInUp>
-          ))}
-        </div>
+        <FadeInUp>
+          <div className="max-w-xl mx-auto mt-10 bg-surface-2 rounded-xl border border-border p-8 text-center">
+            <TeamIcon className="w-8 h-8 text-brand-sage mx-auto mb-4" />
+            <p className="text-text-secondary text-sm leading-relaxed">
+              Our advisor program is currently forming. We are in conversations
+              with cybersecurity veterans, enterprise SaaS leaders, and AI/ML
+              researchers. Details will be announced soon.
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-brand-sage mt-4 hover:gap-3 transition-all duration-200"
+            >
+              Interested in advising? <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </FadeInUp>
       </SectionWrapper>
 
       {/* ── Careers CTA ── */}

@@ -7,7 +7,7 @@ import FadeInUp from "@/components/FadeInUp";
 const faqs = [
   {
     q: "How does the 30-day free trial work?",
-    a: "When you sign up for any plan, you get full access to all features in that tier for 30 days -- no credit card required. At the end of the trial, you can choose to subscribe or your account will automatically downgrade to the free Scan-only tier. No data is lost.",
+    a: "When you sign up for any paid plan, you get full access to all features in that tier for 30 days -- no credit card required. At the end of the trial, you can choose to subscribe or your account will automatically downgrade to the Free Scan tier. No data is lost.",
   },
   {
     q: "Can I switch plans at any time?",
@@ -19,11 +19,15 @@ const faqs = [
   },
   {
     q: "Do you offer annual billing discounts?",
-    a: "Yes. Annual billing saves you 20% compared to monthly pricing. That brings Starter to $15/mo, Pro to $39/mo, and Business to $79/mo -- billed annually. Contact our sales team for multi-year agreements with additional discounts.",
+    a: "Yes. Annual billing saves you 20% compared to monthly pricing. For example, Solo drops from $9/mo to $7.20/mo, Team from $14 to $11.20/endpoint/mo, and Business from $10 to $8/endpoint/mo -- all billed annually.",
   },
   {
     q: "Is there a free plan?",
-    a: "Panguard Scan is always free. You can run unlimited security audits on your endpoints and receive a PDF report with every scan. When you are ready for 24/7 protection, automated responses, and AI-powered reporting, upgrade to a paid plan.",
+    a: "Panguard Scan is always free. You can run unlimited security audits on one endpoint and receive a PDF report with a risk score. When you are ready for 24/7 protection with Guard, Chat, Trap, and Report, upgrade to a paid plan starting at $9/mo.",
+  },
+  {
+    q: "What are the compliance add-ons?",
+    a: "Available on Starter plans and above. Add ISO 27001 ($5/endpoint/mo), SOC 2 ($5/endpoint/mo), or Taiwan Cyber Security Act ($3/endpoint/mo) compliance reporting. The Full Bundle includes all frameworks for $10/endpoint/mo, saving 30%.",
   },
   {
     q: "What happens to my data if I cancel?",

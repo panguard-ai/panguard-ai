@@ -302,6 +302,7 @@ function IncidentCard({
 
 export default function StatusContent() {
   const [email, setEmail] = useState("");
+  const [subStatus, setSubStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const overallStatus = getOverallStatus(services);
 
   const topServices = services.slice(0, 4);
@@ -427,50 +428,72 @@ export default function StatusContent() {
               resolutions.
             </p>
 
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
-            >
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                aria-label="Email address"
-                className="w-full sm:w-auto sm:min-w-[280px] rounded-full border border-border bg-surface-1 px-5 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors"
-              />
-              <button
-                type="submit"
-                className="bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3 text-sm hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] whitespace-nowrap"
+            {subStatus === "success" ? (
+              <p className="mt-8 text-sm text-status-safe font-medium">
+                Subscribed. You&apos;ll receive status updates at {email}.
+              </p>
+            ) : (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!email) return;
+                  setSubStatus("loading");
+                  try {
+                    const res = await fetch("/api/waitlist", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email, source: "status-updates" }),
+                    });
+                    if (!res.ok) throw new Error("fail");
+                    setSubStatus("success");
+                  } catch {
+                    setSubStatus("error");
+                  }
+                }}
+                className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
               >
-                Subscribe
-              </button>
-            </form>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  aria-label="Email address"
+                  className="w-full sm:w-auto sm:min-w-[280px] rounded-full border border-border bg-surface-1 px-5 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={subStatus === "loading"}
+                  className="bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3 text-sm hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] whitespace-nowrap disabled:opacity-60"
+                >
+                  {subStatus === "loading" ? "..." : "Subscribe"}
+                </button>
+              </form>
+            )}
+            {subStatus === "error" && (
+              <p className="mt-3 text-sm text-status-alert">
+                Something went wrong. Please try again.
+              </p>
+            )}
 
-            {/* Additional notification channels */}
+            {/* Notification channels */}
             <div className="flex items-center justify-center gap-6 mt-8">
-              <a
-                href="#"
-                className="flex items-center gap-2 text-text-tertiary hover:text-brand-sage transition-colors text-sm"
-              >
+              <span className="flex items-center gap-2 text-text-muted text-sm">
                 <Rss size={16} />
                 <span>RSS Feed</span>
-              </a>
-              <a
-                href="#"
-                className="flex items-center gap-2 text-text-tertiary hover:text-brand-sage transition-colors text-sm"
-              >
+              </span>
+              <span className="flex items-center gap-2 text-text-muted text-sm">
                 <MessageSquare size={16} />
-                <span>Slack Notifications</span>
-              </a>
-              <a
-                href="#"
-                className="flex items-center gap-2 text-text-tertiary hover:text-brand-sage transition-colors text-sm"
-              >
+                <span>Slack</span>
+              </span>
+              <span className="flex items-center gap-2 text-text-muted text-sm">
                 <Mail size={16} />
                 <span>Email Digest</span>
-              </a>
+              </span>
             </div>
+            <p className="text-[11px] text-text-muted mt-2">
+              Additional notification channels coming soon.
+            </p>
           </div>
         </FadeInUp>
       </SectionWrapper>

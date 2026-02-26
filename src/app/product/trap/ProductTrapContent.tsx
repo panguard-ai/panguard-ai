@@ -14,21 +14,21 @@ import {
 const features = [
   {
     icon: NetworkIcon,
-    title: "Auto-Deployed Honeypots",
+    title: "8 Honeypot Types",
     description:
-      "Panguard Trap automatically deploys realistic decoy services on unused ports. Fake SSH servers, simulated databases, and mock admin panels that look real to attackers but are designed to capture their every move.",
+      "SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, and Redis. Panguard Trap deploys realistic decoy services on unused ports. Each honeypot type mimics real service behavior to capture attacker techniques.",
   },
   {
     icon: ScanIcon,
     title: "Attacker Profiling",
     description:
-      "Every interaction with a honeypot is logged in detail: tools used, commands executed, files uploaded, lateral movement attempts. Panguard builds a profile of the attacker's techniques, tactics, and procedures (TTPs).",
+      "Every interaction is logged in detail: tools used, commands executed, files uploaded, lateral movement attempts. AI classifies attacker skill level (script kiddie, intermediate, advanced), intent, and tool signatures.",
   },
   {
     icon: GlobalIcon,
-    title: "Threat Intelligence Contribution",
+    title: "Collective Threat Intelligence",
     description:
-      "Attack patterns captured by your traps are anonymized and contributed to the Panguard collective intelligence network. Your honeypot data helps protect every other Panguard user -- and theirs protects you.",
+      "Attack patterns captured by your traps are anonymized and contributed to the Panguard collective intelligence network via the Threat Cloud API. Your data protects every other user -- and theirs protects you.",
   },
   {
     icon: SettingsIcon,

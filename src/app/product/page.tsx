@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import {
   ScanIcon, ShieldIcon, TerminalIcon, NetworkIcon, AnalyticsIcon,
 } from "@/components/ui/BrandIcons";
+import BrandLogo from "@/components/ui/BrandLogo";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import FadeInUp from "@/components/FadeInUp";
@@ -144,26 +145,13 @@ export default function ProductPage() {
                 <div className="rounded-[28px] bg-surface-0 overflow-hidden pt-6">
                   {/* Status bar */}
                   <div className="flex items-center justify-center gap-1.5 px-4 py-2">
-                    <svg width="14" height="14" viewBox="0 0 48 52" fill="none" className="text-brand-sage">
-                      <path d="M12 22 L36 22 L36 38 L24 48 L12 38 Z" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
-                      <path d="M12 22 L12 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                      <path d="M36 22 L36 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                      <path d="M12 12 L24 4 L36 12" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round"/>
-                      <path d="M12 22 L24 14 L36 22" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
-                    </svg>
+                    <BrandLogo size={14} className="text-brand-sage" />
                     <span className="text-[10px] font-semibold text-text-primary">PANGUARD</span>
                   </div>
                   {/* Protected badge */}
                   <div className="px-4 py-3 text-center">
                     <div className="w-10 h-10 rounded-full bg-status-safe/10 flex items-center justify-center mx-auto">
-                      <svg width="18" height="18" viewBox="0 0 48 52" fill="none" className="text-status-safe">
-                        <path d="M12 22 L36 22 L36 38 L24 48 L12 38 Z" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
-                        <path d="M12 22 L12 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                        <path d="M36 22 L36 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-                        <path d="M12 12 L24 4 L36 12" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round"/>
-                        <path d="M12 22 L24 14 L36 22" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
-                        <path d="M9 30l6 6 10-10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      <BrandLogo size={18} className="text-status-safe" />
                     </div>
                     <p className="text-xs font-semibold text-status-safe mt-2">Protected</p>
                     <p className="text-[9px] text-text-muted mt-0.5">3 endpoints active</p>

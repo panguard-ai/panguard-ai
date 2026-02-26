@@ -14,21 +14,21 @@ import {
 const features = [
   {
     icon: NetworkIcon,
-    title: "Three-Layer AI Defense",
+    title: "5-Agent AI Pipeline",
     description:
-      "Events are filtered through Sigma/YARA rules, then a local LLM, then cloud AI. 90% of events are handled instantly by rules at zero cost. Only the most complex 3% reach cloud AI for deep reasoning.",
+      "Events flow through 5 specialized AI agents: Detect (Sigma/YARA rules + local LLM), Analyze (threat classification), Respond (auto-remediation), Report (compliance documentation), and Chat (human notification). 90% of events handled at zero cost by rules alone.",
   },
   {
     icon: ResponseIcon,
-    title: "Automatic Response",
+    title: "3 Auto-Response Types",
     description:
-      "High-confidence threats are neutralized automatically: suspicious processes killed, malicious IPs blocked, compromised files quarantined. Every action is logged and reversible.",
+      "High-confidence threats are neutralized automatically via three response modules: IP Blocker (firewall rules), Process Killer (malicious process termination), and File Quarantine (suspicious file isolation). Every action is logged and reversible.",
   },
   {
     icon: AnalyticsIcon,
-    title: "Real-Time Monitoring",
+    title: "4 Notification Channels",
     description:
-      "Continuous monitoring of system logs, network connections, file integrity, process trees, and user activity. Every event is analyzed in real-time, not batch-processed hours later.",
+      "Get alerts where you already are: LINE, Telegram, Slack, and Email. Each channel supports rich formatting with threat details, severity badges, and one-click remediation links.",
   },
   {
     icon: SettingsIcon,
@@ -40,13 +40,13 @@ const features = [
     icon: HistoryIcon,
     title: "Graceful Degradation",
     description:
-      "Cloud down? Local LLM takes over. LLM offline? Rule engine handles it. Panguard Guard never stops protecting your system, regardless of network conditions or API availability.",
+      "Cloud AI down? Local LLM (Ollama) takes over. LLM offline? The rule engine with 847 Sigma and 1,203 YARA rules handles it. Guard never stops protecting, regardless of network conditions.",
   },
   {
     icon: HistoryIcon,
-    title: "Context Memory",
+    title: "7-Day Context Memory",
     description:
-      "Seven-day learning period builds a baseline of normal behavior for your specific system. After that, any deviation is flagged. The baseline continuously refines itself over time.",
+      "Seven-day learning period builds a behavioral baseline for your specific system. After that, any deviation is flagged with context. The baseline continuously refines itself over time.",
   },
 ];
 

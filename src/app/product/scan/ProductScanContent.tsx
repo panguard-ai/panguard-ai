@@ -14,39 +14,39 @@ import {
 const features = [
   {
     icon: ResponseIcon,
-    title: "Instant Scan",
+    title: "6 Built-in Scanners",
     description:
-      "One curl command. No agent to install, no account to create, no configuration to write. The scanner runs, produces a report, and removes itself from your system. Under 60 seconds from start to finish.",
+      "Password policy audit, unnecessary port detection, SSL certificate validation, scheduled task review, shared folder exposure check, and environment discovery. Each scanner runs independently and produces actionable findings.",
   },
   {
     icon: AnalyticsIcon,
-    title: "PDF Report",
+    title: "PDF Report with Compliance Mapping",
     description:
-      "Every scan generates a downloadable PDF report with an executive summary, a security score, detailed findings sorted by severity, and actionable remediation steps for each issue found.",
+      "Every scan generates a branded PDF: cover page, executive summary, findings table sorted by severity, compliance control mapping (ISO 27001, SOC 2), and step-by-step remediation guidance.",
   },
   {
     icon: ShieldIcon,
-    title: "Vulnerability Detection",
+    title: "Quick & Full Scan Modes",
     description:
-      "Cross-references your installed packages, kernel version, and running services against the National Vulnerability Database (NVD). Known CVEs are flagged with severity ratings and patch guidance.",
+      "Quick scan hits the most critical checks in under 60 seconds. Full scan runs all 6 scanner modules for a comprehensive audit. Both modes produce a complete PDF report.",
   },
   {
     icon: NetworkIcon,
-    title: "OS Detection",
+    title: "Open Port & Service Analysis",
     description:
-      "Automatically identifies your operating system, distribution, kernel version, and installed package manager. Checks whether you are running a supported release with active security updates.",
+      "Discovers all listening ports, identifies the services behind them, and flags unnecessary exposure. Detects common misconfigurations like exposed databases, admin panels, and dev tools left in production.",
   },
   {
     icon: NetworkIcon,
-    title: "Open Port Analysis",
+    title: "SSL & Configuration Audit",
     description:
-      "Discovers all listening ports, identifies the services behind them, and flags any that should not be publicly accessible. Detects common misconfigurations like exposed databases or admin panels.",
+      "Validates SSL certificates (expiry, chain, protocol versions), checks password policies, reviews scheduled tasks for persistence mechanisms, and audits shared folder permissions.",
   },
   {
     icon: HistoryIcon,
-    title: "Historical Comparison",
+    title: "Environment Discovery",
     description:
-      "Run the scan again next week and see what changed. New ports opened, new vulnerabilities introduced, old issues fixed. Track your security posture over time without installing anything permanently.",
+      "Automatically identifies your OS, distribution, kernel version, installed packages, and running services. Builds a complete inventory that feeds into the compliance mapping engine.",
   },
 ];
 

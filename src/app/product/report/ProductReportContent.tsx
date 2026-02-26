@@ -14,21 +14,21 @@ import {
 const features = [
   {
     icon: AnalyticsIcon,
-    title: "Automated Report Generation",
+    title: "3 Compliance Frameworks",
     description:
-      "Panguard Report transforms raw security telemetry into structured, readable compliance reports. No manual data gathering, no spreadsheet wrangling, no copy-pasting from dashboards. Reports are generated on-demand or on a schedule.",
+      "ISO 27001 Annex A, SOC 2 Trust Service Criteria, and Taiwan Cyber Security Act (TCSA). Every finding is automatically mapped to relevant controls. Auditors see exactly which controls are satisfied and which need attention.",
   },
   {
     icon: CheckIcon,
-    title: "Compliance Mapping",
+    title: "Bilingual Output",
     description:
-      "Every finding is automatically mapped to relevant compliance controls. ISO 27001 Annex A, SOC 2 Trust Service Criteria, GDPR articles, NIST CSF categories. Auditors see exactly which controls are satisfied and which need attention.",
+      "Reports are generated in English and Traditional Chinese (zh-TW) simultaneously. Perfect for Taiwan-based companies that need to satisfy both local regulators and international partners or investors.",
   },
   {
     icon: ShieldIcon,
-    title: "Audit-Ready Output",
+    title: "Audit-Ready Evidence",
     description:
-      "Reports include evidence packages: timestamped logs, configuration snapshots, response action records, and AI reasoning chains. Auditors get the artifacts they need without you scrambling to produce them.",
+      "Reports include evidence packages: timestamped logs, configuration snapshots, response action records, and AI reasoning chains. JSON + text output formats for integration with your existing audit workflows.",
   },
   {
     icon: AnalyticsIcon,
@@ -76,10 +76,10 @@ const useCases = [
 const reportTypes = [
   { name: "ISO 27001 Gap Analysis", coverage: "94%", controls: 114, status: "Ready" },
   { name: "SOC 2 Type II Evidence", coverage: "87%", controls: 64, status: "Ready" },
-  { name: "GDPR Compliance Report", coverage: "96%", controls: 42, status: "Ready" },
-  { name: "NIST CSF Assessment", coverage: "82%", controls: 108, status: "Ready" },
+  { name: "Taiwan Cyber Security Act", coverage: "91%", controls: 38, status: "Ready" },
   { name: "Executive Security Summary", coverage: "100%", controls: null, status: "Ready" },
   { name: "Incident Response Report", coverage: "100%", controls: null, status: "Ready" },
+  { name: "Bilingual Report (EN/zh-TW)", coverage: "100%", controls: null, status: "Ready" },
 ];
 
 export default function ProductReportContent() {

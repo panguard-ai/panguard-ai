@@ -33,6 +33,8 @@ function CategoryBadge({ category }: { category: string }) {
 
 export default function BlogContent() {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [nlEmail, setNlEmail] = useState("");
+  const [nlStatus, setNlStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   const featuredPost = blogPosts[0];
   const remainingPosts = blogPosts.slice(1);
@@ -193,24 +195,53 @@ export default function BlogContent() {
           </div>
         </FadeInUp>
         <FadeInUp delay={0.1}>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col sm:flex-row items-center gap-3 mt-8 max-w-md mx-auto"
-          >
-            <input
-              type="email"
-              placeholder="you@company.com"
-              className="w-full sm:flex-1 bg-surface-2 border border-border rounded-full px-5 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors"
-              required
-            />
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-6 py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] shrink-0"
+          {nlStatus === "success" ? (
+            <p className="mt-8 text-sm text-status-safe font-medium text-center">
+              Subscribed. You&apos;ll receive the weekly digest at {nlEmail}.
+            </p>
+          ) : (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!nlEmail) return;
+                setNlStatus("loading");
+                try {
+                  const res = await fetch("/api/waitlist", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: nlEmail, source: "blog-newsletter" }),
+                  });
+                  if (!res.ok) throw new Error("fail");
+                  setNlStatus("success");
+                } catch {
+                  setNlStatus("error");
+                }
+              }}
+              className="flex flex-col sm:flex-row items-center gap-3 mt-8 max-w-md mx-auto"
             >
-              Subscribe
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
+              <input
+                type="email"
+                placeholder="you@company.com"
+                value={nlEmail}
+                onChange={(e) => setNlEmail(e.target.value)}
+                className="w-full sm:flex-1 bg-surface-2 border border-border rounded-full px-5 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors"
+                required
+              />
+              <button
+                type="submit"
+                disabled={nlStatus === "loading"}
+                className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-6 py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] shrink-0 disabled:opacity-60"
+              >
+                {nlStatus === "loading" ? "..." : "Subscribe"}
+                <Send className="w-4 h-4" />
+              </button>
+            </form>
+          )}
+          {nlStatus === "error" && (
+            <p className="text-sm text-status-alert text-center mt-3">
+              Something went wrong. Please try again.
+            </p>
+          )}
           <p className="text-xs text-text-muted text-center mt-3">
             Join 2,000+ security-conscious engineers. Unsubscribe anytime.
           </p>

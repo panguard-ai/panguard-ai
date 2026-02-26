@@ -11,6 +11,7 @@ const inputStyles =
 
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -28,6 +29,7 @@ export default function ContactForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -37,8 +39,7 @@ export default function ContactForm() {
       if (!res.ok) throw new Error("Submit failed");
       setSubmitted(true);
     } catch {
-      // Still show success UI to not block user
-      setSubmitted(true);
+      setError("Failed to send message. Please try again or email us directly.");
     } finally {
       setLoading(false);
     }
@@ -130,6 +131,10 @@ export default function ContactForm() {
               className={`${inputStyles} resize-none`}
             />
           </div>
+
+          {error && (
+            <p className="text-sm text-status-alert">{error}</p>
+          )}
 
           <button
             type="submit"

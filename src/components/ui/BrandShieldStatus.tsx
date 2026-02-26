@@ -1,12 +1,13 @@
 /**
  * Panguard AI Shield with Status Overlay
  *
- * Brand shield mark with status indicators:
+ * Real brand shield mark with status indicators:
  * Safe (green check), Warning (yellow !), Alert (orange triangle),
  * Critical (red X), Loading (spinner), Disabled (dimmed)
  *
  * Ref: brand-assets/02-logo-icons/PANGUARD_AI_Icon_Variations.png
  */
+import { BRAND_LOGO_PATHS, BRAND_LOGO_VIEWBOX } from "./BrandLogo";
 
 type Status = "safe" | "warning" | "alert" | "critical" | "loading" | "disabled";
 
@@ -39,12 +40,12 @@ export default function BrandShieldStatus({
       fill="none"
       className={className}
     >
-      {/* Base shield */}
-      <path d="M12 22 L36 22 L36 38 L24 48 L12 38 Z" stroke={shieldColor} strokeWidth="3" strokeLinejoin="round" />
-      <path d="M12 22 L12 12" stroke={shieldColor} strokeWidth="3" strokeLinecap="round" />
-      <path d="M36 22 L36 12" stroke={shieldColor} strokeWidth="3" strokeLinecap="round" />
-      <path d="M12 12 L24 4 L36 12" stroke={shieldColor} strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-      <path d="M12 22 L24 14 L36 22" stroke={shieldColor} strokeWidth="3" strokeLinejoin="round" />
+      {/* Real brand shield logo */}
+      <svg x="2" y="2" width="44" height="44" viewBox={BRAND_LOGO_VIEWBOX} fill="none">
+        {BRAND_LOGO_PATHS.filter(p => p.role === "fg").map((p, i) => (
+          <path key={i} fill={shieldColor} d={p.d} />
+        ))}
+      </svg>
 
       {/* Status overlay */}
       {status === "safe" && (

@@ -4,28 +4,32 @@
  * 6 branded trust/certification badges recreated from:
  * brand-assets/01-brand-identity/PANGUARD_AI_Product_Badges.png
  *
- * All SVG + CSS, sage green stroke on dark.
+ * All SVG + CSS, sage green on dark. Uses real brand logo paths.
  */
+import { BRAND_LOGO_PATHS, BRAND_LOGO_VIEWBOX } from "./BrandLogo";
 
 type BadgeProps = { size?: number; className?: string };
 
 const sage = "#8B9A8E";
 
-/* ── Protected By Panguard AI — circular badge ──────────────────── */
+/* Shared: mini brand shield rendered inside badges */
+function BadgeShield({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
+  return (
+    <svg x={x} y={y} width={w} height={h} viewBox={BRAND_LOGO_VIEWBOX} fill="none">
+      {BRAND_LOGO_PATHS.filter(p => p.role === "fg").map((p, i) => (
+        <path key={i} fill={sage} d={p.d} />
+      ))}
+    </svg>
+  );
+}
+
+/* ── Protected By Panguard AI -- circular badge ──────────────────── */
 export function ProtectedByBadge({ size = 80, className = "" }: BadgeProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" className={className}>
       <circle cx="40" cy="40" r="38" stroke={sage} strokeWidth="1.5" />
       <circle cx="40" cy="40" r="34" stroke={sage} strokeWidth="0.5" strokeOpacity="0.3" />
-      {/* Shield mark */}
-      <g transform="translate(28, 24) scale(0.5)">
-        <path d="M12 22 L36 22 L36 38 L24 48 L12 38 Z" stroke={sage} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M12 22 L12 12" stroke={sage} strokeWidth="3" strokeLinecap="round" />
-        <path d="M36 22 L36 12" stroke={sage} strokeWidth="3" strokeLinecap="round" />
-        <path d="M12 12 L24 4 L36 12" stroke={sage} strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-        <path d="M12 22 L24 14 L36 22" stroke={sage} strokeWidth="3" strokeLinejoin="round" />
-      </g>
-      {/* Curved text */}
+      <BadgeShield x={28} y={22} w={24} h={26} />
       <text fill={sage} fontSize="5" fontFamily="system-ui" fontWeight="600" letterSpacing="0.8" textAnchor="middle">
         <textPath href="#protArc">PROTECTED BY PANGUARD AI</textPath>
       </text>
@@ -36,17 +40,12 @@ export function ProtectedByBadge({ size = 80, className = "" }: BadgeProps) {
   );
 }
 
-/* ── Certified Secure — hexagonal badge ─────────────────────────── */
+/* ── Certified Secure -- hexagonal badge ─────────────────────────── */
 export function CertifiedSecureBadge({ size = 80, className = "" }: BadgeProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" className={className}>
       <polygon points="40,4 72,22 72,58 40,76 8,58 8,22" stroke={sage} strokeWidth="1.5" />
-      {/* Shield + checkmark */}
-      <g transform="translate(28, 20) scale(0.5)">
-        <path d="M12 22 L36 22 L36 38 L24 48 L12 38 Z" stroke={sage} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M12 12 L24 4 L36 12" stroke={sage} strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-        <path d="M12 22 L24 14 L36 22" stroke={sage} strokeWidth="3" strokeLinejoin="round" />
-      </g>
+      <BadgeShield x={28} y={18} w={24} h={26} />
       <path d="M34 39L38 43L46 35" stroke="#2ED573" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <text x="40" y="62" fill={sage} fontSize="5.5" fontFamily="system-ui" fontWeight="700" textAnchor="middle" letterSpacing="1">CERTIFIED SECURE</text>
       <text x="40" y="69" fill={sage} fontSize="4.5" fontFamily="system-ui" fontWeight="400" textAnchor="middle">2026</text>
@@ -54,17 +53,12 @@ export function CertifiedSecureBadge({ size = 80, className = "" }: BadgeProps) 
   );
 }
 
-/* ── AI Powered Security — rectangular badge ────────────────────── */
+/* ── AI Powered Security -- rectangular badge ────────────────────── */
 export function AIPoweredBadge({ size = 80, className = "" }: BadgeProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" className={className}>
       <rect x="4" y="10" width="72" height="60" rx="4" stroke={sage} strokeWidth="1.5" />
-      {/* Shield with circuit lines */}
-      <g transform="translate(28, 16) scale(0.5)">
-        <path d="M12 22 L36 22 L36 38 L24 48 L12 38 Z" stroke={sage} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M12 12 L24 4 L36 12" stroke={sage} strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-        <path d="M12 22 L24 14 L36 22" stroke={sage} strokeWidth="3" strokeLinejoin="round" />
-      </g>
+      <BadgeShield x={28} y={14} w={24} h={26} />
       {/* Circuit nodes */}
       <circle cx="22" cy="30" r="1.5" fill={sage} />
       <circle cx="58" cy="30" r="1.5" fill={sage} />
@@ -80,25 +74,19 @@ export function AIPoweredBadge({ size = 80, className = "" }: BadgeProps) {
   );
 }
 
-/* ── Enterprise Grade — shield-shaped badge ─────────────────────── */
+/* ── Enterprise Grade -- shield-shaped badge ─────────────────────── */
 export function EnterpriseGradeBadge({ size = 80, className = "" }: BadgeProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" className={className}>
-      {/* Outer shield shape */}
       <path d="M40 4L8 18V48L40 76L72 48V18L40 4z" stroke={sage} strokeWidth="1.5" strokeLinejoin="round" />
-      {/* Inner shield mark */}
-      <g transform="translate(28, 18) scale(0.5)">
-        <path d="M12 22 L36 22 L36 38 L24 48 L12 38 Z" stroke={sage} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M12 12 L24 4 L36 12" stroke={sage} strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
-        <path d="M12 22 L24 14 L36 22" stroke={sage} strokeWidth="3" strokeLinejoin="round" />
-      </g>
+      <BadgeShield x={28} y={16} w={24} h={26} />
       <text x="40" y="56" fill={sage} fontSize="5" fontFamily="system-ui" fontWeight="700" textAnchor="middle" letterSpacing="0.8">ENTERPRISE</text>
       <text x="40" y="63" fill={sage} fontSize="4.5" fontFamily="system-ui" fontWeight="500" textAnchor="middle" letterSpacing="0.5">GRADE</text>
     </svg>
   );
 }
 
-/* ── 24/7 Monitoring — circular with arrows ─────────────────────── */
+/* ── 24/7 Monitoring -- circular with arrows ─────────────────────── */
 export function MonitoringBadge({ size = 80, className = "" }: BadgeProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" className={className}>
@@ -108,19 +96,14 @@ export function MonitoringBadge({ size = 80, className = "" }: BadgeProps) {
       <path d="M58 22l2-6-6 1" stroke={sage} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M40 66a26 26 0 01-18-8" stroke={sage} strokeWidth="1.5" strokeLinecap="round" />
       <path d="M22 58l-2 6 6-1" stroke={sage} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Shield mark center */}
-      <g transform="translate(30, 26) scale(0.4)">
-        <path d="M12 22 L36 22 L36 38 L24 48 L12 38 Z" stroke={sage} strokeWidth="3.5" strokeLinejoin="round" />
-        <path d="M12 12 L24 4 L36 12" stroke={sage} strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round" />
-        <path d="M12 22 L24 14 L36 22" stroke={sage} strokeWidth="3.5" strokeLinejoin="round" />
-      </g>
+      <BadgeShield x={30} y={24} w={20} h={22} />
       <text x="40" y="58" fill={sage} fontSize="6" fontFamily="system-ui" fontWeight="700" textAnchor="middle" letterSpacing="1">24/7</text>
       <text x="40" y="65" fill={sage} fontSize="4" fontFamily="system-ui" fontWeight="500" textAnchor="middle" letterSpacing="0.5">MONITORING</text>
     </svg>
   );
 }
 
-/* ── Zero Trust — rectangular with lock ─────────────────────────── */
+/* ── Zero Trust -- rectangular with lock ─────────────────────────── */
 export function ZeroTrustBadge({ size = 80, className = "" }: BadgeProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none" className={className}>

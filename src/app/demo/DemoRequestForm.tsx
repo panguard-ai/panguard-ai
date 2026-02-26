@@ -18,6 +18,7 @@ const inputStyles =
 
 export default function DemoRequestForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -36,6 +37,7 @@ export default function DemoRequestForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/demo", {
         method: "POST",
@@ -45,7 +47,7 @@ export default function DemoRequestForm() {
       if (!res.ok) throw new Error("Submit failed");
       setSubmitted(true);
     } catch {
-      setSubmitted(true);
+      setError("Failed to submit request. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -149,6 +151,10 @@ export default function DemoRequestForm() {
               className={`${inputStyles} resize-none`}
             />
           </div>
+
+          {error && (
+            <p className="text-sm text-status-alert">{error}</p>
+          )}
 
           <button
             type="submit"

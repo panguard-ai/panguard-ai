@@ -63,12 +63,12 @@ export default function DemoPage() {
                     waitlist to be notified when it launches.
                   </p>
                 </div>
-                <button
-                  disabled
-                  className="mt-6 block w-full text-center font-semibold rounded-full px-6 py-3 border border-border text-text-muted cursor-not-allowed"
+                <a
+                  href="/product/scan"
+                  className="mt-6 block w-full text-center font-semibold rounded-full px-6 py-3 border border-border text-text-secondary hover:border-brand-sage hover:text-text-primary transition-all duration-200"
                 >
-                  Coming Soon
-                </button>
+                  Try Free Scan
+                </a>
               </div>
             </FadeInUp>
 

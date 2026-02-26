@@ -3,14 +3,6 @@ import { motion } from "framer-motion";
 import BrandLogo from "./BrandLogo";
 import { BlockIcon, NetworkIcon, CheckIcon } from "./BrandIcons";
 
-const logoPaths = {
-  body: "M12 22 L36 22 L36 38 L24 48 L12 38 Z",
-  leftPillar: "M12 22 L12 12",
-  rightPillar: "M36 22 L36 12",
-  topBridge: "M12 12 L24 4 L36 12",
-  innerFace: "M12 22 L24 14 L36 22",
-};
-
 const events = [
   { label: "Port scan detected and blocked", badge: "Safe", color: "text-status-safe", bg: "bg-status-safe/10", time: "2m" },
   { label: "Unusual login attempt", badge: "Caution", color: "text-status-caution", bg: "bg-status-caution/10", time: "15m" },
@@ -21,16 +13,6 @@ const events = [
 /* SVG area chart path for threat timeline */
 const chartPath = "M0,80 C30,75 50,60 80,65 C110,70 130,40 160,45 C190,50 210,30 240,35 C270,40 290,55 320,50 C350,45 370,60 400,55";
 const chartFill = "M0,80 C30,75 50,60 80,65 C110,70 130,40 160,45 C190,50 210,30 240,35 C270,40 290,55 320,50 C350,45 370,60 400,55 L400,100 L0,100 Z";
-
-function MiniShield({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 48 52" fill="none" className={className}>
-      {Object.values(logoPaths).map((d, i) => (
-        <path key={i} d={d} stroke="currentColor" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-      ))}
-    </svg>
-  );
-}
 
 export default function DashboardMockup() {
   return (
@@ -75,7 +57,7 @@ export default function DashboardMockup() {
               className="bg-surface-1 rounded-xl border border-border p-4"
             >
               <div className="flex items-center gap-3">
-                <MiniShield className="w-10 h-10 text-brand-sage" />
+                <BrandLogo size={40} className="text-brand-sage" />
                 <div>
                   <p className="text-sm font-bold text-text-primary">All Systems Normal</p>
                   <div className="flex items-center gap-1.5">
