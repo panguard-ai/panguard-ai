@@ -8,6 +8,7 @@ import type { Language } from '@openclaw/core';
 import {
   c, banner, spinner, statusPanel, divider, scoreDisplay,
   colorSeverity, table, box, symbols, formatDuration,
+  setLogLevel,
 } from '@openclaw/core';
 import { runScan } from '@openclaw/panguard-scan';
 import { requireAuth } from '../auth-guard.js';
@@ -29,6 +30,11 @@ export function scanCommand(): Command {
         return;
       }
       const lang: Language = options.lang === 'zh-TW' ? 'zh-TW' : 'en';
+
+      // Suppress structured JSON logs unless --verbose
+      if (!options.verbose) {
+        setLogLevel('silent');
+      }
 
       console.log(banner());
       const mode = options.quick ? 'Quick Scan' : 'Full Scan';

@@ -13,6 +13,19 @@
 | 磁碟空間 | 200 MB |
 | 記憶體 | 512 MB（Guard 運行時建議 1 GB） |
 
+### 跨平台支援狀態
+
+| 功能 | macOS | Linux | Windows |
+|------|-------|-------|---------|
+| **Scan** 掃描 | 完整（lsof, socketfilterfw） | 完整（ss, ufw/iptables） | 部分（netstat，無防火牆偵測） |
+| **Guard** 防護 | 輪詢監控（5 秒間隔） | 輪詢監控（5 秒間隔） | 輪詢監控（5 秒間隔） |
+| **Trap** 蜜罐 | TCP 端口蜜罐 | TCP 端口蜜罐 | TCP 端口蜜罐 |
+| **Chat** 通知 | LINE / Telegram / Slack | LINE / Telegram / Slack | LINE / Telegram / Slack |
+| **Report** 報告 | 完整（3 框架） | 完整（3 框架） | 完整（3 框架） |
+| 系統更新偵測 | softwareupdate | apt / yum | 尚未支援 |
+
+> macOS 和 Linux 為主要支援平台。Windows 可執行基礎功能，但部分 OS 層級偵測尚未完善。
+
 ---
 
 ## 步驟 1：建立帳號
@@ -24,12 +37,14 @@
 
 | 方案 | 月費 | 包含功能 |
 |------|------|---------|
-| **Free** | $0 | 快速掃描、狀態查看 |
-| **Starter** | $9 | 即時防護、通知、部署 |
-| **Pro** | $29 | 蜜罐、儀表板、合規報告 |
-| **Enterprise** | $59 | 威脅情報 API、優先支援 |
+| **Scan** | $0 | 快速掃描、了解安全狀況 |
+| **Solo** | $9 | 即時防護、1 通知管道、1 端點 |
+| **Starter** | $19 | 防護 + 3 通知管道、最多 5 端點 |
+| **Team** | $14/端點 | 全功能含蜜罐、5-50 端點 |
+| **Business** | $10/端點 | 全功能 + 基礎合規報告、50-500 端點 |
+| **Enterprise** | 聯繫我們 | 500+ 端點、專屬支援 |
 
-Free 方案即可開始使用。
+Scan 方案即可開始使用。合規報告為獨立加價購，任何付費方案皆可購買。
 
 ---
 
@@ -47,22 +62,27 @@ curl -fsSL https://get.panguard.ai | sh
 npm install -g @openclaw/panguard
 ```
 
-### 手動安裝（開發者）
+### 從原始碼安裝（開發者，目前推薦）
 
 ```bash
 git clone https://github.com/openclaw-security/openclaw-security.git
 cd openclaw-security
 pnpm install
 pnpm build
-pnpm test
+
+# 使用 CLI（以下兩種方式皆可）
+./bin/panguard --help
+pnpm cli -- --help
 ```
+
+> npm 套件尚未發佈，目前請使用從原始碼安裝的方式。
 
 ---
 
 ## 步驟 3：CLI 登入
 
 ```bash
-panguard login
+./bin/panguard login
 ```
 
 瀏覽器自動開啟，完成登入後回到終端機：
@@ -74,7 +94,7 @@ panguard login
 
   Email     user@example.com
   名稱      User Name
-  方案      Starter
+  方案      Solo
   到期      2026-04-27
 
   登入成功！
@@ -118,7 +138,7 @@ panguard scan --quick
   3. Enforce password complexity requirements
 ```
 
-`--quick` 模式大約 30 秒完成基礎檢查。移除 `--quick` 可執行完整掃描（約 60 秒，需要 Starter 以上），包含 SSL 憑證驗證、排程任務稽核和共享資料夾安全檢查。
+`--quick` 模式大約 30 秒完成基礎檢查。移除 `--quick` 可執行完整掃描（約 60 秒，需要 Solo 以上），包含 SSL 憑證驗證、排程任務稽核和共享資料夾安全檢查。
 
 ### 產生 PDF 報告
 
@@ -134,7 +154,7 @@ panguard scan --lang zh-TW
 
 ---
 
-## 步驟 5：啟動即時防護 `[STARTER]`
+## 步驟 5：啟動即時防護 `[SOLO]`
 
 掃描只是一次性檢查。要持續保護系統，啟動 Guard：
 
@@ -169,7 +189,7 @@ Guard 的運作方式：
 
 ---
 
-## 步驟 6：設定通知 `[STARTER]`
+## 步驟 6：設定通知 `[SOLO]`
 
 讓 Panguard 在偵測到威脅時通知你：
 
@@ -219,9 +239,10 @@ panguard chat test
 |---------|------|------|
 | 了解認證架構 | - | [概念：認證架構](concepts/authentication.md) |
 | 了解 AI 三層漏斗架構 | - | [概念：三層 AI 架構](concepts/three-layer-ai.md) |
-| 深入了解 Guard 的 5 個 AI Agent | Starter | [指南：Panguard Guard](guides/guard.md) |
-| 設定蜜罐捕捉攻擊者 | Pro | [指南：Panguard Trap](guides/trap.md) |
-| 產生合規報告 | Pro | [指南：Panguard Report](guides/report.md) |
-| 部署集體威脅情報 | Enterprise | [指南：Threat Cloud](guides/threat-cloud.md) |
+| 深入了解 Guard 的 5 個 AI Agent | Solo | [指南：Panguard Guard](guides/guard.md) |
+| 設定蜜罐捕捉攻擊者 | Team | [指南：Panguard Trap](guides/trap.md) |
+| 產生合規報告 | 加價購 | [指南：Panguard Report](guides/report.md) |
+| 部署集體威脅情報 | Business | [指南：Threat Cloud](guides/threat-cloud.md) |
+| 完整使用手冊 | - | [快速使用手冊](guides/quickstart-guide.md) |
 | 查看所有 CLI 指令 | - | [參考：CLI 完整指令](reference/cli.md) |
 | 撰寫自訂 Sigma 規則 | - | [參考：Sigma 規則](reference/sigma-rules.md) |

@@ -3,6 +3,13 @@
 # Usage: curl -fsSL https://get.panguard.ai | sh
 #        or: bash install.sh [--scan-only] [--guard] [--all]
 #
+# NOTE: npm packages are NOT YET published. This script will fail
+# until packages are available on the npm registry.
+# For now, install from source instead:
+#   git clone https://github.com/openclaw-security/openclaw-security.git
+#   cd openclaw-security && pnpm install && pnpm build
+#   ./bin/panguard --help
+#
 # This script installs PanguardGuard security tools via npm.
 # Supports macOS (arm64/x64), Linux (x64/arm64), and Windows (WSL).
 

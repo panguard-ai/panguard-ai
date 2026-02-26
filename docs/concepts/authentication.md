@@ -79,7 +79,7 @@ CLI 會印出認證 URL，你可以複製到有瀏覽器的裝置開啟：
   "token": "session-token-string",
   "expiresAt": "2026-04-27T00:00:00.000Z",
   "email": "user@example.com",
-  "tier": "pro",
+  "tier": "team",
   "name": "User Name",
   "savedAt": "2026-02-26T12:00:00.000Z",
   "apiUrl": "https://panguard.ai"
@@ -96,14 +96,16 @@ CLI 會印出認證 URL，你可以複製到有瀏覽器的裝置開啟：
 
 ## 功能分級
 
-### 4 個訂閱等級
+### 6 個訂閱等級
 
 | 等級 | 月費 | 定位 |
 |------|------|------|
-| **Free** | $0 | 掃描體驗 + 狀態查看（轉換入口） |
-| **Starter** | $9 | 基本防護 + 通知 + 部署（個人/小團隊） |
-| **Pro** | $29 | 完整功能含蜜罐 + 儀表板 + 合規報告（中型企業） |
-| **Enterprise** | $59 | 威脅情報 API + 多節點 + 優先支援（大型組織） |
+| **Scan** | $0 | 快速掃描、了解安全狀況（轉換入口） |
+| **Solo** | $9 | 防護 + 1 通知管道（個人開發者） |
+| **Starter** | $19 | 防護 + 3 通知管道（小團隊、最多 5 端點） |
+| **Team** | $14/端點 | 全功能含蜜罐（中型團隊、5-50 端點） |
+| **Business** | $10/端點 | 全功能 + 基礎合規報告（企業、50-500 端點） |
+| **Enterprise** | 聯繫我們 | 500+ 端點 + 專屬支援 |
 
 ### CLI 功能對照
 
@@ -111,17 +113,17 @@ CLI 會印出認證 URL，你可以複製到有瀏覽器的裝置開啟：
 |------|---------|------|
 | `panguard init` | 無需登入 | 設定精靈 |
 | `panguard login / logout / whoami` | 無需等級 | 認證指令 |
-| `panguard status` | Free | 狀態查詢 |
-| `panguard demo` | Free | 功能展示 |
-| `panguard scan --quick` | Free | 快速掃描 |
-| `panguard scan` | Starter | 完整掃描 |
-| `panguard guard start` | Starter | 即時防護 |
-| `panguard chat setup` | Starter | 通知設定 |
-| `panguard deploy` | Starter | 部署服務 |
-| `panguard report` | Pro | 合規報告 |
-| `panguard dashboard` | Pro | Web 儀表板 |
-| `panguard trap` | Pro | 蜜罐系統 |
-| `panguard threat` | Enterprise | 威脅情報 API |
+| `panguard status` | Scan | 狀態查詢 |
+| `panguard demo` | Scan | 功能展示 |
+| `panguard scan --quick` | Scan | 快速掃描 |
+| `panguard scan` | Solo | 完整掃描 |
+| `panguard guard start` | Solo | 即時防護 |
+| `panguard chat setup` | Solo | 通知設定 |
+| `panguard deploy` | Solo | 部署服務 |
+| `panguard dashboard` | Solo | Web 儀表板 |
+| `panguard trap` | Team | 蜜罐系統 |
+| `panguard report` | Team | 合規報告（需加價購或 Business 方案） |
+| `panguard threat` | Business | 威脅情報 API |
 
 ### 等級檢查機制
 
