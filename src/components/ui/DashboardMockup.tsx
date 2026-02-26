@@ -38,9 +38,9 @@ export default function DashboardMockup() {
       {/* Browser chrome */}
       <div className="bg-surface-2 rounded-t-xl border border-border border-b-0 px-4 py-3 flex items-center gap-3">
         <div className="flex gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-text-muted/40" />
-          <div className="w-2.5 h-2.5 rounded-full bg-text-muted/40" />
-          <div className="w-2.5 h-2.5 rounded-full bg-text-muted/40" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#FBBF24]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#2ED573]" />
         </div>
         <div className="flex-1 bg-surface-1 rounded-md px-3 py-1 text-[10px] text-text-muted font-mono text-center">
           app.panguard.ai/dashboard

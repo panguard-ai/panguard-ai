@@ -91,7 +91,11 @@ export default function ProductChatContent() {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative text-center w-full">
           <FadeInUp>
-            <TerminalIcon className="w-10 h-10 text-brand-sage mx-auto mb-4" />
+            <div className="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full border border-brand-sage/20 animate-[spin_12s_linear_infinite]" />
+              <div className="absolute inset-2 rounded-full border border-brand-sage/10 animate-[spin_8s_linear_infinite_reverse]" />
+              <TerminalIcon className="w-10 h-10 text-brand-sage relative" />
+            </div>
           </FadeInUp>
           <FadeInUp delay={0.05}>
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4">

@@ -34,10 +34,48 @@ const edges: [number, number][] = [
 function ShieldNetworkSVG() {
   return (
     <div className="relative w-full aspect-square max-w-[420px]">
-      {/* Outer glow */}
-      <div className="absolute inset-0 bg-brand-sage/5 rounded-full blur-[80px]" />
+      {/* Multi-layer glow (brand hero reference) */}
+      <div className="absolute inset-0 bg-brand-sage/8 rounded-full blur-[100px]" />
+      <div className="absolute inset-[15%] bg-brand-sage/5 rounded-full blur-[60px]" />
 
       <svg viewBox="0 0 400 400" fill="none" className="w-full h-full relative">
+        <defs>
+          {/* Radial glow behind center node */}
+          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#8B9A8E" stopOpacity="0.12" />
+            <stop offset="60%" stopColor="#8B9A8E" stopOpacity="0.04" />
+            <stop offset="100%" stopColor="#8B9A8E" stopOpacity="0" />
+          </radialGradient>
+          {/* Edge glow filter */}
+          <filter id="edgeGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+          </filter>
+        </defs>
+
+        {/* Center radial glow */}
+        <circle cx={nodes[0].x} cy={nodes[0].y} r="100" fill="url(#centerGlow)" />
+
+        {/* Connection glow layer (behind main lines) */}
+        {edges.map(([a, b], i) => (
+          <motion.line
+            key={`eg-${i}`}
+            x1={nodes[a].x}
+            y1={nodes[a].y}
+            x2={nodes[b].x}
+            y2={nodes[b].y}
+            stroke="#8B9A8E"
+            strokeWidth={2.5}
+            filter="url(#edgeGlow)"
+            animate={{ strokeOpacity: [0.05, 0.15, 0.05] }}
+            transition={{
+              duration: 3 + i * 0.4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 0.3,
+            }}
+          />
+        ))}
+
         {/* Connection lines */}
         {edges.map(([a, b], i) => (
           <motion.line
@@ -49,7 +87,7 @@ function ShieldNetworkSVG() {
             stroke="#8B9A8E"
             strokeWidth={0.8}
             strokeOpacity={0.2}
-            animate={{ strokeOpacity: [0.15, 0.35, 0.15] }}
+            animate={{ strokeOpacity: [0.15, 0.4, 0.15] }}
             transition={{
               duration: 3 + i * 0.4,
               repeat: Infinity,
@@ -82,9 +120,13 @@ function ShieldNetworkSVG() {
                   r={30}
                   fill="#8B9A8E"
                   fillOpacity={0.08}
-                  animate={{ r: [28, 36, 28], fillOpacity: [0.05, 0.12, 0.05] }}
+                  animate={{ r: [28, 40, 28], fillOpacity: [0.06, 0.15, 0.06] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 />
+              )}
+              {/* Subtle glow behind satellite nodes */}
+              {i > 0 && (
+                <circle cx={24} cy={26} r={20} fill="#8B9A8E" fillOpacity={0.04} />
               )}
               {Object.values(logoPaths).map((d, j) => (
                 <path
@@ -101,25 +143,25 @@ function ShieldNetworkSVG() {
           );
         })}
 
-        {/* Floating dots on some edges */}
-        {[0, 2, 4].map((edgeIdx) => {
+        {/* Floating data particles on edges */}
+        {[0, 2, 4, 7, 9].map((edgeIdx) => {
           const [a, b] = edges[edgeIdx];
           return (
             <motion.circle
               key={`dot-${edgeIdx}`}
-              r={2}
+              r={edgeIdx === 0 ? 2.5 : 1.8}
               fill="#8B9A8E"
-              fillOpacity={0.5}
+              fillOpacity={0.6}
               animate={{
                 cx: [nodes[a].x, nodes[b].x],
                 cy: [nodes[a].y, nodes[b].y],
               }}
               transition={{
-                duration: 4 + edgeIdx,
+                duration: 3.5 + edgeIdx * 0.5,
                 repeat: Infinity,
                 repeatType: "reverse",
                 ease: "linear",
-                delay: edgeIdx * 0.8,
+                delay: edgeIdx * 0.6,
               }}
             />
           );

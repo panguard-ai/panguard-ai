@@ -55,14 +55,14 @@ export default function InstallDemo() {
 
       <div ref={ref} className="max-w-2xl mx-auto mt-12">
         <div className="bg-surface-0 rounded-2xl border border-border overflow-hidden shadow-2xl">
-          <div className="flex items-center gap-2 px-4 h-11 bg-surface-2 border-b border-border">
-            <div className="w-3 h-3 rounded-full bg-status-danger" />
-            <div className="w-3 h-3 rounded-full bg-status-caution" />
-            <div className="w-3 h-3 rounded-full bg-status-safe" />
-            <span className="ml-3 text-xs text-text-tertiary">Terminal &mdash; panguard</span>
+          <div className="flex items-center gap-2 px-4 h-11 bg-[#1C1814] border-b border-border">
+            <div className="w-3 h-3 rounded-full bg-[#EF4444]" />
+            <div className="w-3 h-3 rounded-full bg-[#FBBF24]" />
+            <div className="w-3 h-3 rounded-full bg-[#2ED573]" />
+            <span className="ml-3 text-xs text-text-tertiary font-mono">panguard &mdash; zsh &mdash; 80x24</span>
           </div>
 
-          <div className="p-6 font-mono text-[13px] leading-[1.8] min-h-[320px]">
+          <div className="p-6 font-mono text-[13px] leading-[1.8] min-h-[320px] bg-[#1A1614]">
             {lines.map((line, i) => {
               if (i > visibleLines) return null;
               const isCurrent = i === visibleLines;

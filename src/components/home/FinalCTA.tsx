@@ -2,14 +2,22 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ShieldIcon } from "@/components/ui/BrandIcons";
-import { CertifiedSecureBadge, ZeroTrustBadge, ProtectedByBadge } from "@/components/ui/BrandBadges";
+import {
+  CertifiedSecureBadge,
+  ZeroTrustBadge,
+  ProtectedByBadge,
+  AIPoweredBadge,
+  MonitoringBadge,
+} from "@/components/ui/BrandBadges";
 import FadeInUp from "../FadeInUp";
 
 const badges = [
   { badge: CertifiedSecureBadge, label: "ISO 27001" },
   { badge: CertifiedSecureBadge, label: "SOC 2 Ready" },
   { badge: ProtectedByBadge, label: "GDPR Ready" },
-  { badge: ZeroTrustBadge, label: "Encrypted" },
+  { badge: ZeroTrustBadge, label: "Zero Trust" },
+  { badge: AIPoweredBadge, label: "AI Powered" },
+  { badge: MonitoringBadge, label: "24/7 Monitoring" },
 ];
 
 export default function FinalCTA() {

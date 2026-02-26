@@ -17,6 +17,11 @@ import {
   MonitorIcon,
   HistoryIcon,
 } from "@/components/ui/BrandIcons";
+import {
+  CertifiedSecureBadge,
+  ProtectedByBadge,
+  EnterpriseGradeBadge,
+} from "@/components/ui/BrandBadges";
 
 /* ─── Types ─── */
 type StatusVariant = "active" | "in-progress" | "planned";
@@ -26,6 +31,7 @@ interface ComplianceCard {
   status: string;
   variant: StatusVariant;
   description: string;
+  badge?: React.ComponentType<{ size?: number; className?: string }>;
 }
 
 interface SecurityLayer {
@@ -59,6 +65,7 @@ const complianceCards: readonly ComplianceCard[] = [
     name: "SOC 2 Type II",
     status: "In Progress",
     variant: "in-progress",
+    badge: CertifiedSecureBadge,
     description:
       "Expected Q3 2026. 87% of controls automated. Audit conducted by a Big Four firm covering Security, Availability, and Confidentiality trust service criteria.",
   },
@@ -66,6 +73,7 @@ const complianceCards: readonly ComplianceCard[] = [
     name: "ISO 27001",
     status: "Planned",
     variant: "planned",
+    badge: CertifiedSecureBadge,
     description:
       "Planned for Q4 2026. Risk assessment framework in place. ISMS built to ISO 27001 standards from day one, making certification a formalization.",
   },
@@ -73,6 +81,7 @@ const complianceCards: readonly ComplianceCard[] = [
     name: "GDPR Compliant",
     status: "Active",
     variant: "active",
+    badge: ProtectedByBadge,
     description:
       "Full GDPR compliance with automated data subject request handling. Data Processing Agreements available for all customers. Privacy by design across the platform.",
   },
@@ -80,6 +89,7 @@ const complianceCards: readonly ComplianceCard[] = [
     name: "HIPAA Ready",
     status: "In Progress",
     variant: "in-progress",
+    badge: EnterpriseGradeBadge,
     description:
       "BAA available for healthcare customers. Encryption controls implemented. Access audit logging and automatic session management enforced.",
   },
@@ -208,7 +218,13 @@ export default function TrustContent() {
             <FadeInUp key={card.name} delay={i * 0.08}>
               <div className="bg-surface-1 rounded-xl border border-border p-6 h-full">
                 <div className="flex items-start gap-4">
-                  <ComplianceIcon className="w-5 h-5 text-brand-sage shrink-0 mt-0.5" />
+                  <div className="shrink-0">
+                    {card.badge ? (
+                      <card.badge size={36} className="opacity-50" />
+                    ) : (
+                      <ComplianceIcon className="w-5 h-5 text-brand-sage mt-0.5" />
+                    )}
+                  </div>
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
                       <span className="text-sm font-bold text-text-primary">

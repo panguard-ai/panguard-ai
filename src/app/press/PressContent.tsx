@@ -10,6 +10,8 @@ import {
   Palette,
   Monitor,
 } from "lucide-react";
+import BrandLogo from "@/components/ui/BrandLogo";
+import { CertifiedSecureBadge, AIPoweredBadge } from "@/components/ui/BrandBadges";
 import FadeInUp from "@/components/FadeInUp";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import SectionTitle from "@/components/ui/SectionTitle";
@@ -155,6 +157,33 @@ function BrandAssetCard({ asset, index }: { asset: BrandAsset; index: number }) 
       <div className="bg-surface-1 border border-border rounded-2xl p-6 hover:border-brand-sage/40 transition-all duration-200 card-glow h-full flex flex-col">
         <div className="w-10 h-10 rounded-lg bg-brand-sage/10 flex items-center justify-center mb-4">
           <IconComponent className="w-5 h-5 text-brand-sage" />
+        </div>
+
+        {/* Brand asset preview */}
+        <div className="flex items-center justify-center gap-4 py-4 mb-4 bg-surface-0 rounded-xl border border-border/50">
+          {index === 0 && (
+            <>
+              <BrandLogo size={32} className="text-brand-sage" />
+              <BrandLogo size={24} className="text-text-tertiary" />
+              <BrandLogo size={16} className="text-text-muted" />
+            </>
+          )}
+          {index === 1 && (
+            <div className="flex gap-3">
+              <div className="w-6 h-6 rounded bg-brand-sage" />
+              <div className="w-6 h-6 rounded bg-[#1A1614]" />
+              <div className="w-6 h-6 rounded bg-[#F5F1E8]" />
+              <div className="w-6 h-6 rounded bg-[#2ED573]" />
+              <div className="w-6 h-6 rounded bg-[#FBBF24]" />
+              <div className="w-6 h-6 rounded bg-[#EF4444]" />
+            </div>
+          )}
+          {index === 2 && (
+            <div className="flex gap-3">
+              <CertifiedSecureBadge size={36} className="opacity-50" />
+              <AIPoweredBadge size={36} className="opacity-50" />
+            </div>
+          )}
         </div>
 
         <h3 className="text-lg font-semibold text-text-primary">{asset.title}</h3>

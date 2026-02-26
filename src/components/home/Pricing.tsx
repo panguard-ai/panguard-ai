@@ -76,9 +76,9 @@ export default function Pricing() {
                   : "border-border"
               }`}
             >
-              <span className={`inline-block text-[11px] font-bold uppercase tracking-wider px-4 py-1 rounded-sm mb-5 ${
+              <span className={`inline-block text-[11px] font-bold uppercase tracking-wider px-4 py-1.5 rounded-sm mb-5 ${
                 plan.popular
-                  ? "bg-surface-2 border border-brand-sage text-text-primary"
+                  ? "bg-[#41523E]/20 border border-brand-sage text-brand-sage"
                   : "bg-surface-2 border border-border text-text-secondary"
               }`}>
                 {plan.label}
