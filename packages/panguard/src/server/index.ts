@@ -17,6 +17,7 @@ import { handleReportFrameworks, handleReportGenerate } from './api/report.js';
 import { handleThreatStats } from './api/threat.js';
 import { handleGuardStatus } from './api/guard.js';
 import { handleTrapStatus } from './api/trap.js';
+import { handleChatStatus, handleChatTest } from './api/chat.js';
 import { AuthDB, createAuthHandlers, authenticateRequest } from '@openclaw/panguard-auth';
 
 /** MIME type mapping / MIME 類型映射 */
@@ -198,7 +199,7 @@ export class PanguardDashboardServer {
       switch (path) {
         case '/api/status':
           // No auth required — used for healthcheck
-          handleStatus(req, res);
+          await handleStatus(req, res);
           return;
 
         case '/api/scan/start':
@@ -242,6 +243,20 @@ export class PanguardDashboardServer {
         case '/api/trap/status':
           if (!this.requireAuth(req, res)) return;
           await handleTrapStatus(req, res);
+          return;
+
+        case '/api/chat/status':
+          if (!this.requireAuth(req, res)) return;
+          handleChatStatus(req, res);
+          return;
+
+        case '/api/chat/test':
+          if (!this.requireAuth(req, res)) return;
+          if (req.method === 'POST') {
+            await handleChatTest(req, res);
+          } else {
+            this.methodNotAllowed(res);
+          }
           return;
 
         // ── Auth & Waitlist routes ────────────────────────────────
