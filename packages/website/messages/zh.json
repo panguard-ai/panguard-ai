@@ -1,0 +1,2635 @@
+{
+  "common": {
+    "getStarted": "立即開始",
+    "signIn": "登入",
+    "startFreeTrial": "免費試用",
+    "scanFree": "免費掃描",
+    "contactSales": "聯繫業務",
+    "requestDemo": "預約示範",
+    "scheduleDemo": "預約示範",
+    "learnMore": "了解更多",
+    "viewAll": "查看全部",
+    "readMore": "閱讀更多",
+    "close": "關閉",
+    "monthly": "月繳",
+    "annual": "年繳",
+    "save20": "省 20%",
+    "billedAnnually": "按年計費",
+    "custom": "客製化",
+    "contactUs": "聯繫我們",
+    "mostPopular": "最受歡迎",
+    "perMonth": "/月",
+    "perEndpointMonth": "/端點/月",
+    "free": "免費",
+    "yes": "yes",
+    "no": "no",
+    "copyright": "2026 Panguard AI, Inc. 版權所有。",
+    "soc2": "SOC 2 準備中",
+    "gdpr": "符合 GDPR",
+    "footerTagline": "你的 AI 資安守衛。一行指令安裝，AI 全面防護。"
+  },
+  "nav": {
+    "product": "產品",
+    "solutions": "解決方案",
+    "resources": "資源",
+    "company": "關於我們",
+    "pricing": "價格",
+    "docs": "文件",
+    "startFreeScan": "免費掃描",
+    "productLinks": {
+      "overview": "產品總覽",
+      "overviewDesc": "查看完整平台",
+      "scan": "Panguard Scan",
+      "scanDesc": "60 秒 AI 資安掃描",
+      "guard": "Panguard Guard",
+      "guardDesc": "24/7 AI 端點防護",
+      "chat": "Panguard Chat",
+      "chatDesc": "AI 資安助手",
+      "trap": "Panguard Trap",
+      "trapDesc": "智慧蜜罐系統",
+      "report": "Panguard Report",
+      "reportDesc": "AI 合規報告",
+      "compliance": "合規管理",
+      "complianceDesc": "ISO 27001、SOC 2、TCSA",
+      "integrations": "整合串接",
+      "integrationsDesc": "連接你的工具"
+    },
+    "solutionLinks": {
+      "developers": "開發者方案",
+      "developersDesc": "獨立與個人開發者",
+      "smb": "中小企業方案",
+      "smbDesc": "5-50 名員工",
+      "enterprise": "中型企業方案",
+      "enterpriseDesc": "50-500 名員工",
+      "customers": "客戶案例",
+      "customersDesc": "成功故事",
+      "partners": "MSP 合作夥伴",
+      "partnersDesc": "託管服務供應商"
+    },
+    "resourceLinks": {
+      "blog": "部落格",
+      "blogDesc": "最新洞察",
+      "docs": "技術文件",
+      "docsDesc": "指南與參考",
+      "api": "API 文件",
+      "apiDesc": "開發者文件",
+      "changelog": "更新日誌",
+      "changelogDesc": "最新功能",
+      "status": "系統狀態",
+      "statusDesc": "服務運行狀態",
+      "resources": "資源中心",
+      "resourcesDesc": "報告與白皮書"
+    },
+    "companyLinks": {
+      "about": "關於我們",
+      "aboutDesc": "我們的使命",
+      "careers": "加入團隊",
+      "careersDesc": "職缺機會",
+      "contact": "聯繫我們",
+      "contactDesc": "與我們聯繫",
+      "press": "新聞中心",
+      "pressDesc": "媒體報導",
+      "trust": "信任中心",
+      "trustDesc": "安全與合規",
+      "partners": "合作夥伴",
+      "partnersDesc": "夥伴生態系",
+      "security": "安全性",
+      "securityDesc": "我們的實踐"
+    }
+  },
+  "footer": {
+    "product": "產品",
+    "resources": "資源",
+    "company": "關於我們",
+    "legal": "法律條款",
+    "scan": "Scan 掃描",
+    "guard": "Guard 防護",
+    "chat": "Chat 助手",
+    "trap": "Trap 蜜罐",
+    "report": "Report 報告",
+    "compliance": "合規管理",
+    "integrations": "整合串接",
+    "documentation": "技術文件",
+    "apiReference": "API 文件",
+    "blog": "部落格",
+    "resourceCenter": "資源中心",
+    "changelog": "更新日誌",
+    "statusPage": "系統狀態",
+    "about": "關於我們",
+    "careers": "加入團隊",
+    "contact": "聯繫我們",
+    "press": "新聞中心",
+    "partners": "合作夥伴",
+    "customers": "客戶案例",
+    "trustCenter": "信任中心",
+    "security": "安全性",
+    "privacyPolicy": "隱私政策",
+    "termsOfService": "服務條款",
+    "cookiePolicy": "Cookie 政策",
+    "dpa": "資料處理協議",
+    "sla": "服務等級協議",
+    "responsibleDisclosure": "漏洞揭露政策"
+  },
+  "home": {
+    "hero": {
+      "title": "資安，不再需要人類。",
+      "manifesto1": "40 年來，每一個資安產品都假設螢幕前面坐著一個人。\nDashboard、告警面板、操作手冊 — 全部為人類設計。\n但 2026 年，你的 Agent 已經在幫你寫程式、管伺服器、部署服務。\n唯獨資安，還在等你自己去看 Dashboard。",
+      "manifesto2": "Panguard 沒有 Dashboard。\n沒有需要人類去點的東西。\n你的 Agent 下指令，我們的 Agent 防禦。\nCLI 進、CLI 出。純文字。像呼吸一樣自然。",
+      "manifesto3": "這不是一個更好的資安工具。\n這是資安的介面革命。",
+      "badge1": "Agent-Native",
+      "badge2": "零 Dashboard",
+      "badge3": "開源 MIT"
+    },
+    "whyPanguard": {
+      "title": "偵測到了威脅。然後呢？",
+      "subtitle": "你的防毒軟體跳出警報。偵測到連接埠掃描。異常登入嘗試。你不是資安專家，也沒有 IT 團隊。",
+      "gapLine": "這就是 Panguard 填補的空白。",
+      "stat1Value": "90%",
+      "stat1Label": "威脅自動處理",
+      "stat1Desc": "第一層規則即時攔截已知攻擊。無警報、無中斷 -- 靜默防護。",
+      "stat2Value": "< 50ms",
+      "stat2Label": "回應時間",
+      "stat2Desc": "從偵測到行動。不需等待人工處理、不需開工單、不需呼叫 SOC 團隊。",
+      "stat3Value": "0",
+      "stat3Label": "需要的資安知識",
+      "stat3Desc": "Panguard 說人話。「有人從德國嘗試你的密碼。我已阻擋。」這就是實際的 Panguard 通知。",
+      "whyTitle": "為什麼選擇 PANGUARD AI？",
+      "feature1Title": "自動偵測 + 自動回應",
+      "feature1Desc": "AI 代理在 50ms 內偵測、分析、回應威脅。90% 的事件無需人工介入。",
+      "feature2Title": "優雅降級",
+      "feature2Desc": "雲端斷線？本地 AI 接手。LLM 離線？規則引擎處理。防護能力可降級，服務永不中斷。",
+      "feature3Title": "零設定",
+      "feature3Desc": "一行指令安裝。零設定檔案需要編輯。沒有 YAML 氾濫、沒有代理衝突。60 秒內完成防護。"
+    },
+    "productSuite": {
+      "overline": "產品套件",
+      "title": "五大產品，一個平台。",
+      "subtitle": "從免費掃描開始，擴展至企業級全面防護。",
+      "scanName": "Panguard Scan",
+      "scanBadge": "免費",
+      "scanDesc": "60 秒 AI 資安掃描，PDF 報告。",
+      "guardName": "Panguard Guard",
+      "guardBadge": "核心",
+      "guardDesc": "24/7 AI 監控 + 自動回應。",
+      "chatName": "Panguard Chat",
+      "chatBadge": "核心",
+      "chatDesc": "AI 助手，用人話發通知。",
+      "trapName": "Panguard Trap",
+      "trapBadge": "進階",
+      "trapDesc": "智慧蜜罐，攻擊者分析。",
+      "reportName": "Panguard Report",
+      "reportBadge": "合規",
+      "reportDesc": "自動生成 ISO/SOC 報告。"
+    },
+    "installDemo": {
+      "title": "一行指令，全面防護。",
+      "subtitle": "30 秒安裝。無需任何設定。AI 自動偵測你的環境。",
+      "metric1Value": "< 30s",
+      "metric1Label": "安裝時間",
+      "metric2Value": "847",
+      "metric2Label": "內建規則",
+      "metric3Value": "零",
+      "metric3Label": "設定需求"
+    },
+    "comparison": {
+      "overline": "為什麼選 Panguard",
+      "title": "你值得的不只是一個儀表板。",
+      "subtitle": "其他工具偵測威脅後給你一個儀表板。Panguard 偵測、回應、還跟你解釋。",
+      "feature": "功能",
+      "crowdstrike": "CrowdStrike Falcon Go",
+      "defender": "Microsoft Defender",
+      "panguard": "Panguard AI",
+      "price": "價格",
+      "setup": "設定方式",
+      "interface": "介面",
+      "afterDetection": "偵測之後",
+      "reporting": "報告",
+      "bestFor": "最適合",
+      "developerPlan": "開發者方案",
+      "autoCompliance": "自動合規",
+      "aiChat": "AI 對話",
+      "csPrice": "$59.99/裝置/年",
+      "csSetup": "後台設定",
+      "csInterface": "專業儀表板",
+      "csAfter": "顯示警報 → 自行處理",
+      "csReporting": "技術報告",
+      "csBest": "有 IT 團隊的企業",
+      "defPrice": "M365 內含",
+      "defSetup": "Azure 主控台",
+      "defInterface": "Azure 入口",
+      "defAfter": "顯示警報 → 自行處理",
+      "defReporting": "技術報告",
+      "defBest": "M365 組織",
+      "pgPrice": "每月 $9 起",
+      "pgSetup": "一行指令，零設定",
+      "pgInterface": "AI 對話，說人話",
+      "pgAfter": "自動回應 + 解釋",
+      "pgReporting": "「本週：阻擋 847 次。你很安全。」",
+      "pgBest": "任何人。不需專業知識。",
+      "quote": "「Falcon Go 是監視器。Panguard 是保全公司 -- 有監視器、有人在看、有人在處理、還有人在報告。」"
+    },
+    "socialProof": {
+      "overline": "數據說話",
+      "title": "公開打造，程式碼可驗證。",
+      "subtitle": "以下每個數字都可以在原始碼中驗證。沒有虛榮指標 -- 只有工程事實。",
+      "stat1": "847",
+      "stat1Label": "Sigma 偵測規則",
+      "stat2": "1,203",
+      "stat2Label": "YARA 惡意程式規則",
+      "stat3": "8",
+      "stat3Label": "蜜罐協定",
+      "stat4": "5",
+      "stat4Label": "AI 代理管線",
+      "stat5": "3",
+      "stat5Label": "合規框架",
+      "stat6": "MIT",
+      "stat6Label": "開源授權",
+      "footnote": "完全可稽核 · 開源 · 社群驅動規則更新 · 無數據鎖定"
+    },
+    "pricing": {
+      "overline": "價格方案",
+      "title": "簡單透明的定價。",
+      "subtitle": "所有付費方案提供 30 天免費試用。無需信用卡。",
+      "freeName": "免費掃描",
+      "freeFeatures": [
+        "1 端點",
+        "基本安全掃描",
+        "PDF 報告"
+      ],
+      "soloName": "Solo 個人版",
+      "soloFeatures": [
+        "1 端點",
+        "Guard + Chat + Scan",
+        "LINE / Telegram 通知",
+        "7 天日誌保留"
+      ],
+      "teamName": "Team 團隊版",
+      "teamFeatures": [
+        "5-50 端點",
+        "Guard + Chat + Scan + Report + Trap",
+        "Slack / LINE / Telegram / Email",
+        "30 天日誌保留",
+        "團隊儀表板"
+      ],
+      "enterpriseName": "Enterprise 企業版",
+      "enterpriseFeatures": [
+        "500+ 端點",
+        "客製 AI 模型",
+        "專屬技術支援",
+        "SIEM 整合",
+        "本地部署選項"
+      ],
+      "seeAllPlans": "查看全部 6 種方案、附加功能及完整功能比較"
+    },
+    "finalCta": {
+      "title": "今天就開始防護。",
+      "subtitle": "無需信用卡。30 天免費試用。",
+      "iso": "ISO 27001 就緒",
+      "soc2": "SOC 2 就緒",
+      "gdpr": "GDPR 就緒",
+      "zeroTrust": "零信任",
+      "aiPowered": "AI 驅動",
+      "monitoring": "24/7 全天候監控"
+    },
+    "cliShowcase": {
+      "overline": "產品展示",
+      "title": "CLI 進，CLI 出。",
+      "subtitle": "沒有 Dashboard。不需要點擊。你的 Agent 下指令，Panguard 防禦。看看 5 大產品實際運作。"
+    }
+  },
+  "pricing": {
+    "overline": "價格方案",
+    "title": "簡單透明的定價",
+    "subtitle": "所有付費方案提供 30 天免費試用。無需信用卡。60 秒內開始保護你的端點。",
+    "addonsOverline": "附加功能",
+    "addonsTitle": "合規報告附加功能",
+    "addonsSubtitle": "Starter 方案以上可用。為任何方案加入合規報告功能。",
+    "iso27001": "ISO 27001",
+    "iso27001Price": "$5/端點/月",
+    "iso27001Desc": "差距分析與稽核就緒文件",
+    "soc2": "SOC 2",
+    "soc2Price": "$5/端點/月",
+    "soc2Desc": "Type II 證據與持續監控",
+    "tcsa": "台灣資通安全管理法",
+    "tcsaPrice": "$3/端點/月",
+    "tcsaDesc": "雙語合規報告 (EN + zh-TW)",
+    "bundle": "完整套裝",
+    "bundlePrice": "$10/端點/月",
+    "bundleDesc": "包含所有框架，省 30%",
+    "faqOverline": "常見問題",
+    "faqTitle": "常見問題",
+    "faqSubtitle": "關於價格與方案，你需要知道的一切。",
+    "enterpriseTitle": "需要客製化方案？",
+    "enterpriseDesc": "適用於 500+ 端點、專屬合規需求或客製部署的組織。提供白手套式導入、客製 SLA 及專屬資安工程師。",
+    "guarantee": "所有付費方案提供 30 天無條件退款保證。"
+  },
+  "earlyAccess": {
+    "overline": "搶先體驗",
+    "title1": "搶先體驗",
+    "title2": "會說人話的 AI 資安防護。",
+    "subtitle": "Panguard AI 即將上線。加入候補名單，取得優先使用權、直接回饋管道，並鎖定創始會員定價。",
+    "whatYouGet": "搶先體驗會員專屬權益",
+    "priority": "優先使用權",
+    "priorityDesc": "成為最早在端點安裝 Panguard 的使用者。搶先體驗會員比公開上線提前數週開始使用。",
+    "feedback": "直接回饋管道",
+    "feedbackDesc": "加入我們的私人 Slack 社群。直接與工程師對話。你的回饋決定我們下一步開發什麼功能。",
+    "founding": "創始會員定價",
+    "foundingDesc": "鎖定任何方案的永久折扣。創始會員的費率終身不變，即使未來調漲價格。",
+    "timeline": "上線時程",
+    "now": "現在",
+    "nowLabel": "候補名單已開放 -- 立即加入",
+    "q2": "2026 Q2",
+    "q2Label": "搶先體驗會員私人測試",
+    "q3": "2026 Q3",
+    "q3Label": "正式公開上線"
+  },
+  "metadata": {
+    "home": {
+      "title": "Panguard AI -- 你的 AI 資安守衛",
+      "description": "專為開發者和中小企業打造的 AI 端點安全防護。一行指令安裝、零設定。Panguard 自動偵測威脅、自動回應、用人話跟你解釋一切。"
+    },
+    "pricing": {
+      "title": "價格方案",
+      "description": "AI 端點安全防護的透明定價。免費掃描、Solo 每月 $9、Starter 每月 $19、Team 每端點每月 $14、Business 每端點每月 $10、Enterprise 客製。30 天免費試用。"
+    },
+    "earlyAccess": {
+      "title": "搶先體驗",
+      "description": "搶先體驗會說人話的 AI 資安防護。加入 Panguard AI 候補名單，取得優先使用權、創始會員定價及直接回饋管道。"
+    },
+    "scan": {
+      "title": "免費安全掃描",
+      "description": "你的系統安全嗎？用 Panguard 的免費 AI 安全稽核在 60 秒內找出答案。無需安裝、無需信用卡。"
+    },
+    "productOverview": {
+      "title": "產品總覽",
+      "description": "五大 AI 安全產品，一個平台。Scan、Guard、Chat、Trap 和 Report -- 從免費 60 秒稽核到完整企業合規。"
+    },
+    "productScan": {
+      "title": "Panguard Scan",
+      "description": "60 秒 AI 安全稽核。免費。無需安裝。一行指令、完整報告、零痕跡。"
+    },
+    "productGuard": {
+      "title": "Panguard Guard",
+      "description": "24/7 AI 端點防護。一行指令安裝。永不休息的安全代理，自動偵測、分析和回應威脅。"
+    },
+    "productChat": {
+      "title": "Panguard Chat",
+      "description": "你的 AI 資安副駕。說人話，不是警報代碼。會說人話的安全防護，整合你已在使用的工具。"
+    },
+    "productTrap": {
+      "title": "Panguard Trap",
+      "description": "智慧蜜罐系統。認識你的攻擊者。反守為攻，讓攻擊者暴露自己，同時你的真實系統安然無恙。"
+    },
+    "productReport": {
+      "title": "Panguard Report",
+      "description": "自動生成合規報告。ISO 27001、SOC 2。將你的安全資料轉化為稽核就緒文件，自動化。"
+    },
+    "developers": {
+      "title": "開發者方案",
+      "description": "企業級安全，開發者的簡單。為個人開發者和獨立黑客打造的 AI 端點防護。一行指令設定、零負擔。"
+    },
+    "smb": {
+      "title": "中小企業方案",
+      "description": "大公司的安全，小公司的預算。為 5 到 50 人團隊打造的開箱即用 AI 防護。"
+    },
+    "enterprise": {
+      "title": "中型企業方案",
+      "description": "擴展安全不增加複雜性。為 50 到 500 名員工的組織打造的 AI 防護。"
+    },
+    "demo": {
+      "title": "預約示範",
+      "description": "看 Panguard AI 實際運作。預約與我們資安團隊的個人化示範，或探索自助產品導覽。"
+    },
+    "company": {
+      "title": "關於 Panguard AI",
+      "description": "我們讓其他 4 億家企業和 7000 萬開發者獲得他們從未擁有的 AI 安全防護。企業級安全，人人可及。"
+    },
+    "careers": {
+      "title": "加入團隊",
+      "description": "打造網路安全的未來。加入我們以使命驅動、遠端優先的團隊，讓企業級安全惠及每一個開發者和企業。"
+    },
+    "contact": {
+      "title": "聯繫我們",
+      "description": "與 Panguard AI 團隊聯繫。業務諮詢、技術支援、合作機會或媒體請求 -- 我們隨時為你服務。"
+    },
+    "press": {
+      "title": "新聞與媒體",
+      "description": "Panguard AI 的新聞稿、媒體報導和品牌資源。下載 Logo、品牌指南和產品截圖。"
+    },
+    "compliance": {
+      "title": "合規管理",
+      "description": "台灣與全球標準的合規自動化。ISO 27001、SOC 2 和台灣資通安全管理法 -- 自動化、平價且永遠最新。"
+    },
+    "trust": {
+      "title": "信任中心",
+      "description": "可驗證的安全。查看我們的合規狀態、安全架構、資料處理實踐和次處理者關係。"
+    },
+    "security": {
+      "title": "安全性",
+      "description": "我們是一家安全公司。我們自身的安全不容妥協。查看我們的安全實踐、合規框架和資料處理政策。"
+    },
+    "technology": {
+      "title": "技術架構",
+      "description": "安全不只掃描，更會思考。三層 AI 防禦漏斗、五個自主代理和學習你環境的情境記憶。"
+    },
+    "blog": {
+      "title": "部落格",
+      "description": "Panguard AI 團隊的安全洞察與更新。研究、產品更新和工程深度探討。"
+    },
+    "customers": {
+      "title": "客戶案例",
+      "description": "團隊如何使用 Panguard AI。使用案例情境說明 Panguard 如何解決實際的基礎設施、合規和威脅偵測問題。"
+    },
+    "docs": {
+      "title": "技術文件",
+      "description": "安裝、設定和精通 Panguard AI 所需的一切。指南、API 文件和產品文件。"
+    },
+    "changelog": {
+      "title": "更新日誌",
+      "description": "Panguard 最新動態。每一次更新、改進和修復 -- 透明記錄。"
+    },
+    "resources": {
+      "title": "資源中心",
+      "description": "安全知識庫。白皮書、報告和指南，幫助你的團隊建立更強大的安全。"
+    },
+    "integrations": {
+      "title": "整合串接",
+      "description": "連接一切。Panguard 整合 Slack、Teams、LINE、Jira、SIEM 平台等。無需自訂程式碼。"
+    },
+    "partners": {
+      "title": "合作夥伴計畫",
+      "description": "與 Panguard AI 一起成長。加入我們的合作夥伴生態系，成為 MSP、技術合作夥伴或經銷商。"
+    },
+    "status": {
+      "title": "系統狀態",
+      "description": "所有 Panguard AI 平台服務的即時運營狀態和正常運行歷史。"
+    }
+  },
+  "pricingPage": {
+    "hero": {
+      "overline": "方案價格",
+      "title": "簡單透明的定價",
+      "subtitle": "每個付費方案享 30 天免費試用，無需信用卡。60 秒內開始保護你的端點。"
+    },
+    "addons": {
+      "overline": "附加模組",
+      "title": "合規報告附加模組",
+      "subtitle": "適用於 Starter 方案及以上。為任何方案加入合規報告功能。",
+      "iso27001": {
+        "name": "ISO 27001",
+        "price": "$5/端點/月",
+        "desc": "差距分析與稽核準備文件"
+      },
+      "soc2": {
+        "name": "SOC 2",
+        "price": "$5/端點/月",
+        "desc": "Type II 證據與持續監控"
+      },
+      "tcsa": {
+        "name": "資通安全管理法",
+        "price": "$3/端點/月",
+        "desc": "雙語合規報告 (EN + zh-TW)"
+      },
+      "bundle": {
+        "name": "全套組合",
+        "price": "$10/端點/月",
+        "desc": "包含所有框架，省 30%"
+      }
+    },
+    "faqSection": {
+      "overline": "常見問題",
+      "title": "常見問題",
+      "subtitle": "關於方案與定價，你需要知道的一切。"
+    },
+    "enterprise": {
+      "title": "需要客製化方案？",
+      "desc": "適用於擁有 500+ 端點、專屬合規需求或客製部署需求的組織。白手套式引導、客製 SLA 及專屬資安工程師。",
+      "ctaSales": "聯繫業務",
+      "ctaDemo": "預約 Demo"
+    },
+    "guarantee": "所有付費方案享 30 天無條件退款保證。",
+    "plans": {
+      "freeScan": {
+        "name": "免費掃描",
+        "audience": "先試再買",
+        "endpoints": "1 端點",
+        "features": [
+          "基礎安全掃描",
+          "PDF 報告含風險評分",
+          "無限次掃描"
+        ],
+        "cta": "免費掃描"
+      },
+      "solo": {
+        "name": "Solo 個人版",
+        "audience": "個人開發者與自由工作者",
+        "endpoints": "1 端點",
+        "features": [
+          "Guard（24/7 監控）",
+          "Chat（LINE / Telegram 通知）",
+          "Scan（無限次）",
+          "7 天日誌保留",
+          "社群支援"
+        ],
+        "cta": "免費試用"
+      },
+      "starter": {
+        "name": "Starter 入門版",
+        "audience": "小型團隊（2-5 人）",
+        "endpoints": "最多 5 端點",
+        "features": [
+          "Solo 所有功能",
+          "Report（基礎合規）",
+          "Email + LINE + Telegram 通知",
+          "14 天日誌保留",
+          "團隊儀表板"
+        ],
+        "cta": "免費試用"
+      },
+      "team": {
+        "name": "Team 團隊版",
+        "audience": "成長中的企業（5-50 人）",
+        "endpoints": "5-50 端點",
+        "features": [
+          "Starter 所有功能",
+          "Trap（蜜罐系統）",
+          "Slack 整合",
+          "30 天日誌保留",
+          "自訂警報規則",
+          "優先支援"
+        ],
+        "cta": "免費試用"
+      },
+      "business": {
+        "name": "Business 商務版",
+        "audience": "中型企業（50-500 端點）",
+        "endpoints": "50-500 端點",
+        "features": [
+          "Team 所有功能",
+          "API 存取",
+          "Webhook 整合",
+          "90 天日誌保留",
+          "SSO 及 RBAC",
+          "專屬客戶經理"
+        ],
+        "cta": "免費試用"
+      },
+      "enterprise": {
+        "name": "Enterprise 企業版",
+        "audience": "大型組織（500+）",
+        "endpoints": "500+ 端點",
+        "features": [
+          "Business 所有功能",
+          "客製 AI 模型",
+          "SIEM 整合（Splunk、ELK）",
+          "本地部署",
+          "客製 SLA（最高 99.99%）",
+          "每季安全檢視"
+        ],
+        "cta": "聯繫業務"
+      }
+    },
+    "comparison": {
+      "overline": "方案比較",
+      "title": "功能比較",
+      "subtitle": "所有功能一覽。"
+    },
+    "comparisonCategories": {
+      "productsIncluded": "包含產品",
+      "alertsIntegrations": "通知與整合",
+      "supportInfra": "支援與基礎設施"
+    },
+    "tierLabels": {
+      "free": "免費",
+      "solo": "Solo",
+      "starter": "Starter",
+      "team": "Team",
+      "business": "Business",
+      "enterprise": "Enterprise"
+    },
+    "allPaidPlansNote": "所有付費方案享 30 天無條件退款保證。年繳省 20%。",
+    "faq": {
+      "faq1q": "30 天免費試用如何運作？",
+      "faq1a": "註冊任何付費方案後，即可在 30 天內完整使用該方案所有功能，無需信用卡。試用結束後，可選擇訂閱或自動降級至免費掃描方案。不會遺失任何資料。",
+      "faq2q": "可以隨時更換方案嗎？",
+      "faq2a": "當然可以。升級後立即使用新功能，費用按比例計算。降級則在下個帳單週期生效。",
+      "faq3q": "什麼算一個端點？",
+      "faq3a": "端點是指任何執行 Panguard 代理的裝置或伺服器，包括工作站、筆電、雲端 VM 和實體伺服器。單一主機內的容器算一個端點。停用的代理不計入限額。",
+      "faq4q": "年繳有折扣嗎？",
+      "faq4a": "有。年繳比月繳省 20%。例如 Solo 從 /月降至 .20/月，Team 從  降至 .20/端點/月，Business 從  降至 /端點/月。",
+      "faq5q": "有免費方案嗎？",
+      "faq5a": "Panguard Scan 永久免費。可在一個端點上執行無限次安全稽核並取得 PDF 報告。當你準備好使用 Guard、Chat、Trap 和 Report 的 24/7 防護時，升級至每月  起的付費方案。",
+      "faq6q": "什麼是合規附加功能？",
+      "faq6a": "Starter 方案以上可用。可加購 ISO 27001（/端點/月）、SOC 2（/端點/月）或台灣資通安全管理法（/端點/月）合規報告。完整套裝含所有框架 /端點/月，省 30%。",
+      "faq7q": "取消後資料怎麼辦？",
+      "faq7a": "取消後 30 天內，資料以唯讀模式保留。期間可匯出所有報告、日誌和設定。30 天後，資料將依資料保留政策及 GDPR 規範安全刪除。"
+    }
+  },
+  "scan": {
+    "hero": {
+      "overline": "免費安全掃描",
+      "title": "你的系統安全嗎？",
+      "titleHighlight": "60 秒找出答案。",
+      "subtitle": "免費。無需安裝。無需信用卡。"
+    },
+    "scanServer": {
+      "title": "掃描我的伺服器",
+      "desc": "在伺服器上執行一行指令。Panguard 掃描系統、生成安全報告、然後自動刪除。不安裝代理。不保留資料。",
+      "requires": "需求：Linux / macOS。腳本開源且可稽核。"
+    },
+    "onlineDemo": {
+      "title": "試試線上示範",
+      "desc": "沒有伺服器？沒問題。透過模擬掃描結果的互動式示範，看看 Panguard 能發現什麼、如何報告。",
+      "launchDemo": "啟動示範"
+    },
+    "whatWeCheck": {
+      "overline": "檢查項目",
+      "title": "不到一分鐘，完成完整安全稽核。",
+      "subtitle": ""
+    },
+    "checks": {
+      "openPort": {
+        "label": "開放連接埠分析",
+        "desc": "發現所有開放連接埠並識別執行中的服務。"
+      },
+      "osSoftware": {
+        "label": "作業系統與軟體偵測",
+        "desc": "識別作業系統、核心版本和已安裝套件。"
+      },
+      "vulnerability": {
+        "label": "弱點偵測",
+        "desc": "比對已安裝軟體與已知 CVE 資料庫。"
+      },
+      "configAudit": {
+        "label": "組態稽核",
+        "desc": "檢查 SSH、防火牆、TLS 和其他關鍵組態。"
+      },
+      "pdfReport": {
+        "label": "PDF 報告生成",
+        "desc": "生成可下載、可分享的 PDF 報告，含發現與建議。"
+      },
+      "historical": {
+        "label": "歷史比較",
+        "desc": "再次掃描時，查看上次以來的變化。"
+      }
+    },
+    "scanReport": {
+      "title": "Panguard 掃描報告",
+      "exampleResult": "範例結果",
+      "score": "分數",
+      "grade": "等級",
+      "openPorts": "開放連接埠",
+      "os": "作業系統",
+      "critical": "嚴重",
+      "scanTime": "掃描時間",
+      "exampleNote": "此為範例報告。實際結果因環境而異。"
+    },
+    "cta": {
+      "title": "喜歡掃描結果？升級 24/7 防護。",
+      "desc": "Panguard Scan 只是開始。安裝 Panguard Guard 獲得持續 AI 監控、自動回應和人話通知。",
+      "cta1": "搶先體驗",
+      "cta2": "了解 Guard"
+    }
+  },
+  "product": {
+    "overview": {
+      "overline": "平台",
+      "title": "五大產品，一個使命：",
+      "titleHighlight": "讓安全變得無形。",
+      "subtitle": "從免費掃描開始，擴展至 24/7 AI 防護、智慧蜜罐和自動合規 -- 全部透過一行指令安裝的單一平台。",
+      "products": {
+        "scan": {
+          "name": "Panguard Scan",
+          "tagline": "60 秒掌握風險。",
+          "badge": "免費"
+        },
+        "guard": {
+          "name": "Panguard Guard",
+          "tagline": "永不休息的防護。",
+          "badge": "核心"
+        },
+        "chat": {
+          "name": "Panguard Chat",
+          "tagline": "你的 AI 資安副駕。",
+          "badge": "核心"
+        },
+        "trap": {
+          "name": "Panguard Trap",
+          "tagline": "在攻擊者觸及你之前攔截。",
+          "badge": "進階"
+        },
+        "report": {
+          "name": "Panguard Report",
+          "tagline": "免顧問的合規報告。",
+          "badge": "合規"
+        }
+      },
+      "capabilities": "核心能力",
+      "cta": {
+        "title": "準備好看它實際運作了嗎？",
+        "subtitle": "從免費 Panguard Scan 開始，查看你的風險概況。準備好後，升級解鎖 Guard、Chat、Trap 和 Report -- 全部享 30 天免費試用。",
+        "cta1": "免費試用",
+        "cta2": "預約示範"
+      }
+    },
+    "scan": {
+      "overline": "Panguard Scan",
+      "title": "60 秒 AI 安全稽核。",
+      "titleHighlight": "免費。無需安裝。",
+      "subtitle": "一行指令。完整報告。零痕跡。",
+      "problem": {
+        "title": "你部署了伺服器。它安全嗎？",
+        "desc": "大多數開發者和中小企業完全不知道他們的伺服器組態是否安全。他們照著 DigitalOcean 教學部署應用程式，然後抱著僥倖心理。與此同時，暴露的連接埠、預設憑證和未修補的軟體，在數小時內就會被自動化掃描器利用。",
+        "conclusion": "專業安全稽核要價 ,000 到 ,000，耗時數週。Panguard Scan 在 60 秒內免費提供 80% 的價值。",
+        "overline": "問題所在"
+      },
+      "features": {
+        "title": "Panguard Scan 的功能。",
+        "subtitle": "無需永久安裝的全面安全快照。",
+        "overline": "功能特色"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "6 大內建掃描器",
+          "desc": "密碼策略稽核、不必要連接埠偵測、SSL 憑證驗證、排程任務檢視、共享資料夾暴露檢查和環境探索。每個掃描器獨立運行並產出可操作的發現。"
+        },
+        "item2": {
+          "title": "PDF 報告含合規對應",
+          "desc": "每次掃描生成品牌化 PDF：封面頁、執行摘要、按嚴重性排序的發現表、合規控制對應（ISO 27001、SOC 2）和逐步修復指南。"
+        },
+        "item3": {
+          "title": "快速與完整掃描模式",
+          "desc": "快速掃描在 60 秒內完成最關鍵的檢查。完整掃描執行所有 6 個掃描模組進行全面稽核。兩種模式都生成完整 PDF 報告。"
+        },
+        "item4": {
+          "title": "開放連接埠與服務分析",
+          "desc": "發現所有監聽連接埠、識別背後服務，並標記不必要的暴露。偵測常見錯誤組態，如暴露的資料庫、管理面板和留在正式環境的開發工具。"
+        },
+        "item5": {
+          "title": "SSL 與組態稽核",
+          "desc": "驗證 SSL 憑證（到期、憑證鏈、協定版本），檢查密碼策略，審視排程任務的持久化機制，並稽核共享資料夾權限。"
+        },
+        "item6": {
+          "title": "環境探索",
+          "desc": "自動識別作業系統、發行版、核心版本、已安裝套件和執行中的服務。建立完整清單，輸入合規對應引擎。"
+        }
+      },
+      "useCases": {
+        "item1": {
+          "title": "個人開發者",
+          "desc": "你剛為副專案部署了一台新 VPS。在分享網址之前，執行 Panguard Scan 確保沒有意外暴露資料庫連接埠或留下 SSH 密碼認證。"
+        },
+        "item2": {
+          "title": "新創 CTO",
+          "desc": "你的團隊快速交付，有時基礎設施組態會混亂。透過 cron 排程每週 Panguard Scan，在組態漂移成為漏洞之前捕獲。將 PDF 分享給董事會。"
+        },
+        "item3": {
+          "title": "MSP / 顧問",
+          "desc": "你為多個客戶管理伺服器。在所有伺服器上執行 Panguard Scan，生成品牌化報告，展示你提供的價值。無需逐客戶安裝。"
+        }
+      },
+      "cta": {
+        "title": "立即試用。永久免費。",
+        "desc": "不到一分鐘完成你的首次掃描。如果滿意，升級至 Panguard Guard 獲得持續防護。",
+        "cta1": "搶先體驗",
+        "cta2": "免費掃描"
+      }
+    },
+    "guard": {
+      "overline": "Panguard Guard",
+      "title": "24/7 AI 端點防護。",
+      "titleHighlight": "一行指令安裝。",
+      "subtitle": "永不休息的安全代理，自動偵測、分析和回應威脅。",
+      "dashboard": {
+        "allSystemsProtected": "所有系統已受保護",
+        "lastUpdated": "最後更新：剛才",
+        "threatsBlocked": "已攔截威脅",
+        "activeEndpoints": "活躍端點",
+        "uptime": "運行時間",
+        "recentEvents": "近期事件"
+      },
+      "events": {
+        "event1": "已阻擋來自 185.x.x.x 的 SSH 暴力破解",
+        "event2": "偵測並阻擋連接埠掃描（24 個連接埠）",
+        "event3": "已隔離可疑程序：/tmp/.cache",
+        "event4": "每週 AI 模型已更新至 v2.1.4"
+      },
+      "problem": {
+        "title": "掃描告訴你問題在哪。但它不會修復。",
+        "desc": "掃描一次總比沒有好。但威脅不會等你下次掃描。攻擊者 24/7 探測你的系統。新弱點每天都在公布。每次部署都可能造成組態漂移。你需要持續防護，不是定期檢查。",
+        "desc2": "Panguard Guard 是駐守在你伺服器上的永久安全代理，即時監控一切，在你察覺問題之前就採取行動。一行指令安裝、在背景執行、用人話告訴你威脅。",
+        "overline": "問題所在"
+      },
+      "features": {
+        "title": "Panguard Guard 的功能。",
+        "subtitle": "企業級端點防護，為沒有專職資安團隊的團隊設計。",
+        "overline": "功能特色"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "5 代理 AI 管線",
+          "desc": "事件流經 5 個專業 AI 代理：偵測（Sigma/YARA 規則 + 本地 LLM）、分析（威脅分類）、回應（自動修復）、報告（合規文件）和聊天（人工通知）。90% 的事件僅由規則處理，零成本。"
+        },
+        "item2": {
+          "title": "3 種自動回應類型",
+          "desc": "高信心威脅透過三個回應模組自動處理：IP 封鎖器（防火牆規則）、程序終止器（惡意程序終止）和檔案隔離（可疑檔案隔離）。每個動作都有日誌且可逆。"
+        },
+        "item3": {
+          "title": "4 種通知頻道",
+          "desc": "在你已經使用的地方接收通知：LINE、Telegram、Slack 和 Email。每個頻道支援豐富格式，含威脅詳情、嚴重性標籤和一鍵修復連結。"
+        },
+        "item4": {
+          "title": "信心評分",
+          "desc": "每個事件獲得 0-100 信心分數。85 分以上觸發自動回應。50-84 分發送通知。50 分以下記錄並輸入學習系統。"
+        },
+        "item5": {
+          "title": "優雅降級",
+          "desc": "雲端 AI 斷線？本地 LLM（Ollama）接手。LLM 離線？847 條 Sigma 和 1,203 條 YARA 規則的規則引擎處理。Guard 永不停止保護，不受網路狀況影響。"
+        },
+        "item6": {
+          "title": "7 天情境記憶",
+          "desc": "七天學習期為你的特定系統建立行為基線。之後，任何偏差都會帶情境標記。基線持續自我優化。"
+        }
+      },
+      "install": {
+        "overline": "安裝方式",
+        "title": "一行指令。完成。"
+      },
+      "cta": {
+        "title": "你的伺服器值得一個安全守衛。",
+        "desc": "加入搶先體驗計畫，成為最早在基礎設施上部署 Panguard Guard 的使用者。",
+        "cta1": "搶先體驗",
+        "cta2": "閱讀架構文件"
+      },
+      "useCases": {
+        "overline": "應用場景",
+        "title": "誰在使用 Panguard Guard。"
+      }
+    },
+    "chat": {
+      "overline": "Panguard Chat",
+      "title": "你的 AI 資安副駕。",
+      "titleHighlight": "說人話，不是警報代碼。",
+      "subtitle": "會說人話的資安防護。整合你已在使用的工具。",
+      "problem": {
+        "title": "沒人看得懂的安全警報等於沒有。",
+        "desc": "傳統安全工具用警報淹沒你。CVE 編號、嚴重性矩陣、MITRE ATT&CK 框架引用 -- 全是為大多數小團隊中不存在的資安專家設計的。結果？警報被忽略。重要警告淹沒在雜訊中。資安事件發生不是因為未被偵測，而是因為沒人看懂偵測結果。",
+        "desc2": "Panguard Chat 將每個安全事件翻譯成任何人都能理解的語言。它告訴你發生了什麼、為什麼重要、以及該怎麼做。而且就在你已經打開的通訊平台上。",
+        "overline": "問題所在"
+      },
+      "features": {
+        "title": "Panguard Chat 的功能。",
+        "subtitle": "你整個安全運營的通訊層。",
+        "overline": "功能特色"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "自然語言通知",
+          "desc": "不再有難懂的警報代碼。當 Panguard 偵測到異常，它用人話告訴你：「有人在凌晨 2:47 從巴西的 IP 嘗試暴力破解你的 SSH。我們已封鎖。不需採取行動。」"
+        },
+        "item2": {
+          "title": "智慧警報摘要",
+          "desc": "每個警報都包含完整脈絡：發生了什麼、在哪裡、何時、嚴重程度、以及 Panguard 做了什麼處理。每週和每日摘要總結你的安全態勢，讓你不會遺漏重要資訊。"
+        },
+        "item3": {
+          "title": "5 大平台頻道",
+          "desc": "LINE、Telegram、Slack、Email 和 Webhook。Panguard Chat 在你已經使用的地方運作。不需另外檢查儀表板。安全更新直接送到你已在監控的頻道。"
+        },
+        "item4": {
+          "title": "角色自適應語調",
+          "desc": "Chat 根據閱讀者調整語言。開發者獲得技術細節和 CLI 指令。業主獲得簡明摘要。IT 管理員獲得可操作步驟。設定一次角色，每次獲得合適的詳細程度。"
+        },
+        "item5": {
+          "title": "事件導覽",
+          "desc": "重要事件發生時，Chat Agent 引導你了解發生了什麼、為什麼重要、以及 Panguard 做了什麼。內建常見攻擊的通知模板，如暴力破解、連接埠掃描和惡意程式偵測。"
+        },
+        "item6": {
+          "title": "團隊協作",
+          "desc": "標記隊友、將事件升級給特定人員，並維護兼具稽核軌跡的對話紀錄。團隊中的每個人都能獲得所需情境，無需切換工具。"
+        }
+      },
+      "inAction": {
+        "title": "主動通知，不是另一個儀表板。",
+        "desc": "Panguard Chat 不是你需要記得去看的儀表板。它主動聯繫你，提供每週摘要、即時警報和事件導覽 -- 全部在你已經使用的通訊平台上。",
+        "overline": "實際應用"
+      },
+      "chatDemo": {
+        "msg1": "早安。這是你 1 月 13-19 日的每週安全摘要。",
+        "msg2": "已攔截 47 個威脅 | 0 個嚴重事件 | 安全分數：91/100（上升 3 分）",
+        "msg3": "值得注意：我們攔截了來自 3 個不同 IP（俄羅斯、中國）的 12 次 SSH 暴力破解嘗試。所有 IP 已加入封鎖名單。",
+        "msg4": "新警報：在 server-02 偵測到可疑進程。/tmp/.cache 以提權方式執行。已隔離處理。信心度：92%。",
+        "msg5": "每日摘要：5 個端點全部健康。3 個已攔截連線，0 個嚴重事件。下次完整報告：週一 9:00 AM。",
+        "msg6": "",
+        "msg7": ""
+      },
+      "cta": {
+        "title": "會跟你說話的資安防護。",
+        "desc": "加入搶先體驗計畫，將 Panguard Chat 連接到你的 Slack、LINE 或 Telegram。",
+        "cta1": "搶先體驗",
+        "cta2": "了解 Guard"
+      },
+      "useCases": {
+        "overline": "應用場景",
+        "title": "誰在使用 Panguard Chat。"
+      }
+    },
+    "trap": {
+      "overline": "Panguard Trap",
+      "title": "智慧蜜罐系統。",
+      "titleHighlight": "認識你的攻擊者。",
+      "subtitle": "反守為攻。讓攻擊者暴露自己，同時你的真實系統安然無恙。",
+      "problem": {
+        "title": "防禦型安全是被動的。你永遠慢一步。",
+        "desc": "傳統安全等攻擊者打到你的真實系統才回應。那時你已經處於劣勢。你不知道他們用什麼工具、在找什麼、有多高明。你在盲目防禦。",
+        "desc2": "Panguard Trap 反轉局勢。它部署逼真的誘餌服務吸引攻擊者，捕獲他們的每一步動作。當他們在假目標上浪費時間，你收集的情報讓真實防禦更強大。攻擊者變成了線人。",
+        "overline": "問題所在"
+      },
+      "howItWorks": {
+        "overline": "運作方式",
+        "title": "吸引。觀察。學習。",
+        "step1": {
+          "label": "部署",
+          "desc": "Panguard Trap 識別未使用的連接埠，自動部署逼真的誘餌服務。"
+        },
+        "step2": {
+          "label": "吸引",
+          "desc": "掃描你網路的攻擊者發現蜜罐並與之互動，以為它們是真的。"
+        },
+        "step3": {
+          "label": "捕獲",
+          "desc": "每個指令、檔案上傳和橫向移動嘗試都在沙箱環境中記錄。"
+        },
+        "step4": {
+          "label": "分析",
+          "desc": "AI 分類攻擊、分析攻擊者，並提取入侵指標（IOC）。"
+        },
+        "step5": {
+          "label": "分享",
+          "desc": "匿名化的威脅情報推送到集體網路，強化每個 Panguard 使用者。"
+        },
+        "logTitle": "陷阱活動記錄"
+      },
+      "features": {
+        "title": "Panguard Trap 的功能。",
+        "subtitle": "主動式威脅情報，讓你的防禦每天都更聰明。",
+        "overline": "功能特色"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "8 種蜜罐類型",
+          "desc": "SSH、HTTP、FTP、SMB、MySQL、RDP、Telnet 和 Redis。Panguard Trap 在未使用的連接埠部署逼真的誘餌服務。每種蜜罐模擬真實服務行為以捕獲攻擊技術。"
+        },
+        "item2": {
+          "title": "攻擊者分析",
+          "desc": "每次互動都有詳細記錄：使用的工具、執行的指令、上傳的檔案、橫向移動嘗試。AI 分類攻擊者技術等級（腳本小子、中級、進階）、意圖和工具特徵。"
+        },
+        "item3": {
+          "title": "集體威脅情報",
+          "desc": "你的蜜罐捕獲的攻擊模式經匿名化後貢獻到 Panguard 集體情報網路。你的資料保護其他使用者 -- 他們的也保護你。"
+        },
+        "item4": {
+          "title": "AI 分析",
+          "desc": "捕獲的攻擊者工作階段由 Panguard AI 分析，分類攻擊類型、估計複雜度，並識別攻擊者是自動化掃描器還是人工操作者。"
+        },
+        "item5": {
+          "title": "彈性部署",
+          "desc": "根據你的威脅態勢選擇部署哪些蜜罐服務。跑 Web 伺服器？部署 HTTP 和 MySQL 陷阱。看到 SSH 探測？加上 SSH 蜜罐。配置服務組合以匹配你的環境，收集最相關的情報。"
+        },
+        "item6": {
+          "title": "零生產風險",
+          "desc": "蜜罐與你的生產環境完全隔離。它們在沙箱容器中運行，無法存取真實資料、真實服務或真實網路區段。攻擊者在誘餌上浪費時間。"
+        }
+      },
+      "useCases": {
+        "item1": {
+          "title": "威脅研究員",
+          "desc": "你想了解攻擊者對類似系統做了什麼。部署 Panguard Trap，接收關於攻擊者行為、工具和技術的詳細報告。利用情報強化你的真實系統。"
+        },
+        "item2": {
+          "title": "資安團隊",
+          "desc": "你的團隊使用蜜罐資料訓練偵測模型並驗證安全控制。Panguard Trap 提供持續的真實攻擊者行為串流，遠比合成測試資料更有價值。"
+        },
+        "item3": {
+          "title": "合規需求",
+          "desc": "某些合規框架要求超越被動監控的主動威脅偵測。蜜罐向稽核員展示主動安全態勢，並提供持續威脅感知的證據。"
+        }
+      },
+      "cta": {
+        "title": "別再猜測。開始掌握。",
+        "desc": "部署智慧蜜罐，將攻擊者活動轉化為可操作的情報。",
+        "cta1": "搶先體驗",
+        "cta2": "了解 Guard"
+      }
+    },
+    "report": {
+      "overline": "Panguard Report",
+      "title": "自動生成合規報告。",
+      "titleHighlight": "ISO 27001。SOC 2。",
+      "subtitle": "將你的安全資料轉化為稽核就緒文件。自動化。",
+      "problem": {
+        "title": "合規昂貴、緩慢、痛苦。",
+        "desc": "對中小企業來說，僅 SOC 2 認證的顧問費就要 ,000 到 ,000。ISO 27001 更貴。這個過程耗時數月、需要專職人員，而且文件在稽核結束那一刻就過時了。大多數中小企業根本負擔不起 -- 即使他們的企業客戶要求。",
+        "desc2": "Panguard Report 改變了合規的經濟學。因為 Panguard 已經 24/7 監控你的系統，它擁有稽核員所需的所有資料。Report 將這些資料自動對應到合規框架，生成每天都保持最新的稽核就緒文件。",
+        "overline": "問題所在"
+      },
+      "features": {
+        "title": "Panguard Report 的功能。",
+        "subtitle": "省下數千元的合規自動化，讓你全年隨時可稽核。",
+        "overline": "功能特色"
+      },
+      "featuresList": {
+        "item1": {
+          "title": "3 大合規框架",
+          "desc": "ISO 27001 附錄 A、SOC 2 信任服務準則和台灣資通安全管理法（TCSA）。每個發現自動對應到相關控制。稽核員清楚看到哪些控制已滿足、哪些需要關注。"
+        },
+        "item2": {
+          "title": "雙語輸出",
+          "desc": "報告同時生成英文和繁體中文（zh-TW）。適合需要同時滿足本地監管機構和國際合作夥伴或投資人的台灣公司。"
+        },
+        "item3": {
+          "title": "稽核就緒證據",
+          "desc": "報告包含證據包：時間戳日誌、組態快照、回應動作記錄和合規控制對照。JSON + 文字摘要格式，可整合你現有的稽核工作流程。PDF 匯出即將推出。"
+        },
+        "item4": {
+          "title": "顧問費用對比",
+          "desc": "合規顧問收費 -300/小時。年度 SOC 2 準備費用 ,000-60,000。Panguard Report 以極低成本持續自動生成相同文件。"
+        },
+        "item5": {
+          "title": "持續合規",
+          "desc": "合規不是一次性的事。Panguard Report 在你需要時隨時生成最新報告，反映你當前的安全態勢 -- 不是六個月前上次稽核的狀態。"
+        },
+        "item6": {
+          "title": "高管摘要",
+          "desc": "為非技術利害關係人的簡潔摘要：安全分數、合規覆蓋百分比、各嚴重度的發現數量和優先補救步驟。將文字摘要分享給董事會或投資人。"
+        }
+      },
+      "useCases": {
+        "item1": {
+          "title": "正在募資的新創",
+          "desc": "投資人在問你的安全態勢。不用花錢請顧問，用 Panguard Report 生成 ISO 27001 差距分析和 SOC 2 準備度報告。向投資人展示你重視安全，無需花 K。"
+        },
+        "item2": {
+          "title": "企業銷售團隊",
+          "desc": "你最大的潛在客戶剛發來 200 題的安全問卷。Panguard Report 用你實際的安全遙測資料預先填寫大部分答案。原本要兩週的工作現在只需兩小時。"
+        },
+        "item3": {
+          "title": "合規官",
+          "desc": "年度稽核季即將到來。不用三個月的瘋狂收集證據，Panguard Report 全年持續生成稽核就緒文件。稽核員在第一天就能獲得完整、最新的證據包。"
+        }
+      },
+      "reports": {
+        "iso27001": {
+          "name": "ISO 27001 差距分析",
+          "coverage": "94%",
+          "controls": 114
+        },
+        "soc2": {
+          "name": "SOC 2 Type II 證據",
+          "coverage": "87%",
+          "controls": 64
+        },
+        "tcsa": {
+          "name": "台灣資通安全管理法",
+          "coverage": "91%",
+          "controls": 38
+        },
+        "executive": {
+          "name": "高管安全摘要",
+          "coverage": "100%"
+        },
+        "incident": {
+          "name": "事件回應報告",
+          "coverage": "100%"
+        },
+        "bilingual": {
+          "name": "雙語報告（EN/zh-TW）",
+          "coverage": "100%"
+        }
+      },
+      "costComparison": {
+        "overline": "成本比較",
+        "title": "算術很簡單。",
+        "consultant": "顧問",
+        "panguard": "Panguard",
+        "soc2Prep": {
+          "label": "SOC 2 準備",
+          "consultant": "$30,000-60,000",
+          "panguard": "已包含"
+        },
+        "isoGap": {
+          "label": "ISO 27001 差距分析",
+          "consultant": "$15,000-40,000",
+          "panguard": "已包含"
+        },
+        "timeToReport": {
+          "label": "報告生成時間",
+          "consultant": "2-4 個月",
+          "panguard": "即時"
+        },
+        "freshness": {
+          "label": "報告時效性",
+          "consultant": "時間點快照",
+          "panguard": "即時更新"
+        },
+        "evidence": {
+          "label": "證據收集",
+          "consultant": "人工",
+          "panguard": "自動化"
+        }
+      },
+      "cta": {
+        "title": "免顧問費的合規。",
+        "desc": "加入搶先體驗計畫，在幾分鐘內生成你的第一份合規報告，而不是幾個月。",
+        "cta1": "搶先體驗",
+        "cta2": "我們的安全實踐"
+      },
+      "reportTypes": {
+        "overline": "可用報告",
+        "title": "所有框架，一鍵搞定。",
+        "desc": "選擇你需要的合規框架，Panguard Report 自動生成對應每項控制措施的完整報告。覆蓋率百分比清楚顯示你目前的狀況。差距會以具體的修正建議標示出來。",
+        "libraryTitle": "報告庫"
+      }
+    }
+  },
+  "solutions": {
+    "developers": {
+      "overline": "為個人開發者和獨立黑客而生",
+      "title": "企業級安全。",
+      "titleHighlight": "開發者的簡單。",
+      "subtitle": "你寫程式，不寫安全組態。Panguard 讓個人開發者和獨立黑客獲得企業級的 AI 防護 -- 沒有複雜性、沒有負擔、沒有企業價格。",
+      "features": {
+        "item1": {
+          "title": "一行指令設定",
+          "desc": "用一行 CLI 指令安裝 Panguard。沒有複雜的設定檔、沒有 YAML 氾濫、沒有代理衝突。執行安裝程式，60 秒內受到保護。"
+        },
+        "item2": {
+          "title": "零時間成本",
+          "desc": "Panguard 在背景靜默運行。CPU 佔用不到 1%，記憶體佔用極低。它永遠不會用誤報或侵入性警報打斷你的工作流。"
+        },
+        "item3": {
+          "title": "AI 說明",
+          "desc": "當 Panguard 偵測到異常，它用人話告訴你發生了什麼。不需解讀難懂的 CVE 代碼或資安術語。立即理解威脅。"
+        },
+        "item4": {
+          "title": "保護你的副專案",
+          "desc": "用大型組織使用的相同企業級安全保護你的個人伺服器、VPS 和雲端部署，價格合理。"
+        },
+        "item5": {
+          "title": "開發者優先 API",
+          "desc": "將 Panguard 整合到你的 CI/CD 管線、腳本和自動化工作流。我們的 REST API 和 CLI 工具為想要程式化控制安全態勢的開發者而生。"
+        }
+      },
+      "pricing": {
+        "title": "為開發者定價，不是企業",
+        "subtitle": "從免費的 Panguard Scan 開始。升級至 Solo 獲得完整防護。",
+        "freeScanDesc": "1 端點，基礎掃描 + PDF 報告",
+        "soloDesc": "Guard + Chat + Scan，LINE/Telegram 通知",
+        "seeAllPlans": "查看全部方案"
+      },
+      "workflow": {
+        "title": "適合你的工作流",
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
+      },
+      "cta": {
+        "title": "60 秒保護你的技術棧",
+        "desc": "個人專案免費。無需信用卡。"
+      }
+    },
+    "smb": {
+      "overline": "適合 5 到 50 人的團隊",
+      "title": "大公司的安全。",
+      "titleHighlight": "小公司的預算。",
+      "subtitle": "中小企業是網路攻擊的首要目標，但大多數安全工具是為擁有專職 IT 團隊的企業設計的。Panguard 改變了這一切。開箱即用的 AI 防護，讓你專注於業務成長。",
+      "stats": {
+        "stat1": {
+          "value": "43%",
+          "label": "的網路攻擊以中小企業為目標"
+        },
+        "stat2": {
+          "value": ".9M",
+          "label": "2025 年資料外洩平均成本"
+        },
+        "stat3": {
+          "value": "<60s",
+          "label": "在任何端點部署 Panguard"
+        }
+      },
+      "features": {
+        "title": "適合小團隊的安全",
+        "item1": {
+          "title": "不需要資安團隊",
+          "desc": "Panguard 就是你的虛擬資安團隊。AI 威脅偵測和自動回應意味著你獲得企業級防護，無需聘請專職資安人員。"
+        },
+        "item2": {
+          "title": "分鐘內部署，不是數月",
+          "desc": "傳統安全方案需要數週的顧問和組態。Panguard 在不到一小時內集中管理部署到你的整個組織。"
+        },
+        "item3": {
+          "title": "保護每個端點",
+          "desc": "從員工筆電到雲端伺服器，Panguard 覆蓋你的整個攻擊面。支援 macOS、Linux 和 Windows，確保每台裝置都受保護。"
+        },
+        "item4": {
+          "title": "合規變簡單",
+          "desc": "自動生成 SOC 2、ISO 27001 和 GDPR 的合規報告。一鍵報告向客戶和合作夥伴展示你的安全態勢。"
+        },
+        "item5": {
+          "title": "可預測定價",
+          "desc": "簡單的每端點定價，隨你的業務擴展。無隱藏費用、無意外超支、無長期合約。從免費方案開始，準備好再升級。"
+        }
+      },
+      "pricing": {
+        "title": "隨團隊擴展的可預測定價",
+        "subtitle": "無隱藏費用，無每用戶授權的意外。簡單的每端點定價。",
+        "teamPlanDesc": "5-50 端點。所有產品包含。",
+        "teamFeatures": [
+          "Guard + Chat + Scan + Report + Trap",
+          "Slack / LINE / Telegram / Email 通知",
+          "團隊儀表板 & 30 天日誌"
+        ]
+      },
+      "integrations": {
+        "title": "你團隊已在使用的整合",
+        "tools": [
+          "Slack",
+          "LINE",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
+      },
+      "cta": {
+        "title": "今天就保護你的企業",
+        "desc": "30 天免費試用。無需信用卡。"
+      }
+    },
+    "enterprise": {
+      "overline": "適合 50 到 500 名員工的組織",
+      "title": "擴展安全",
+      "titleHighlight": "不增加複雜性。",
+      "subtitle": "中型企業面臨企業級威脅，但往往缺乏企業級資安團隊。Panguard 以 AI 防護彌補這個落差，部署快速、輕鬆擴展，提供成長中組織所需的可見性和合規。",
+      "stats": {
+        "stat1": {
+          "value": "99.9%",
+          "label": "保證正常運行 SLA"
+        },
+        "stat2": {
+          "value": "500+",
+          "label": "每組織端點"
+        },
+        "stat3": {
+          "value": "24/7",
+          "label": "優先支援回應"
+        }
+      },
+      "features": {
+        "title": "為成長中的組織打造",
+        "item1": {
+          "title": "團隊管理與 RBAC",
+          "desc": "細緻的角色存取控制讓你在組織中指派擁有者、管理員、分析師和檢視者角色。建立自訂角色以匹配你的團隊結構，確保最小權限存取。"
+        },
+        "item2": {
+          "title": "集中式多站儀表板",
+          "desc": "從單一介面監控所有端點、辦公室和雲端環境。即時威脅地圖、整合警報和全組織安全態勢評分。"
+        },
+        "item3": {
+          "title": "自動合規報告",
+          "desc": "一鍵生成 SOC 2、ISO 27001 和台灣資通安全管理法（TCSA）的稽核就緒報告。排程定期報告並分享給稽核員、投資人和合作夥伴。"
+        },
+        "item4": {
+          "title": "SSO 與進階認證",
+          "desc": "SAML 2.0 和 OIDC 整合，與你的身分提供者進行單一登入。在全組織範圍強制執行多因素認證、工作階段策略和條件式存取規則。"
+        },
+        "item5": {
+          "title": "API 與整合生態系",
+          "desc": "透過我們全面的 REST API 將 Panguard 整合到你現有的工具鏈。原生整合 Slack、Microsoft Teams、PagerDuty、Jira 和主流 SIEM 平台。"
+        },
+        "item6": {
+          "title": "專屬支援與導入",
+          "desc": "Business 方案客戶享有專屬客戶成功經理、優先支援 SLA，以及指導式導入，確保在你的組織中順利推行。"
+        }
+      },
+      "pricing": {
+        "title": "為你的組織客製定價",
+        "subtitle": "500+ 端點、客製 AI 模型、專屬支援、本地部署選項，以及量身定制的 SLA 保證。",
+        "volumeDiscounts": "500 端點起享量價折扣"
+      },
+      "integrations": {
+        "title": "企業整合",
+        "tools": [
+          "SIEM",
+          "SSO (SAML/OIDC)",
+          "PagerDuty",
+          "Jira",
+          "Slack",
+          "Microsoft Teams",
+          "REST API",
+          "Webhooks"
+        ]
+      },
+      "cta": {
+        "title": "看 Panguard 實際運作",
+        "desc": "與我們團隊預約個人化示範。"
+      }
+    }
+  },
+  "demo": {
+    "overline": "產品示範",
+    "title": "看 Panguard 實際運作。",
+    "subtitle": "選擇自助導覽或預約與我們資安團隊的個人化導覽。無論哪種方式，你都能看到 Panguard 如何從第一天起保護你的端點。",
+    "selfGuided": {
+      "title": "自助示範",
+      "desc": "按自己的節奏探索 Panguard 平台。走過模擬的真實威脅情境環境，看 AI 偵測引擎如何回應，並查看範例報告 -- 無需預約通話。",
+      "comingSoon": "即將推出",
+      "comingSoonDesc": "互動式產品導覽正在開發中。加入候補名單，在推出時收到通知。",
+      "tryFreeScan": "試試免費掃描"
+    },
+    "requestDemo": {
+      "title": "預約示範",
+      "desc": "與我們團隊預約 30 分鐘導覽。我們會根據你的基礎設施量身定制示範，展示相關威脅情境，並回答每一個問題。"
+    },
+    "steps": {
+      "title": "你的示範會是什麼樣的",
+      "step1": {
+        "title": "了解需求",
+        "desc": "我們了解你的基礎設施、團隊規模和現有安全工具，讓示範與你相關。"
+      },
+      "step2": {
+        "title": "實際展示",
+        "desc": "在真實環境中觀看 Panguard Scan、Guard、Chat、Trap 和 Report 如何應對模擬的真實世界威脅。"
+      },
+      "step3": {
+        "title": "問答與後續",
+        "desc": "盡管提問。我們將討論定價、部署方案，以及讓 Panguard 在你的端點上運行的時間表。"
+      }
+    }
+  },
+  "demoForm": {
+    "labels": {
+      "name": "姓名 *",
+      "workEmail": "工作信箱 *",
+      "company": "公司 *",
+      "teamSize": "團隊規模",
+      "currentStack": "現有安全工具",
+      "message": "訊息"
+    },
+    "placeholders": {
+      "name": "陳小明",
+      "email": "ming@company.com",
+      "company": "Acme Corp",
+      "teamSize": "選擇團隊規模",
+      "stack": "例如 CrowdStrike、Cloudflare、自訂腳本...",
+      "message": "告訴我們你的安全目標或任何具體問題..."
+    },
+    "teamSizes": [
+      "只有我",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
+    "submit": "預約示範",
+    "submitting": "提交中...",
+    "error": "提交失敗，請再試一次。",
+    "successTitle": "示範請求已收到。",
+    "successDesc": "我們的團隊將在一個工作天內聯繫你，安排你的個人化導覽。"
+  },
+  "company": {
+    "overline": "關於 Panguard AI",
+    "title": "每家獲得資金的 AI 資安公司都在保護財富 500 強。我們讓其他 4 億家企業和 7000 萬開發者獲得他們從未擁有的 AI 安全防護。",
+    "mission": "企業級安全幾十年來一直被鎖在企業級預算後面。我們正在打造讓這句話過時的產品。",
+    "name": {
+      "overline": "名字的由來",
+      "title": "PANGUARD",
+      "etymology": "Pan（希臘牧神，意為「全面」）+ Guard（守衛）",
+      "desc1": "在希臘神話中，Pan 是荒野、牧羊人和羊群之神。他守護著城牆外的一切 -- 脆弱的、未受保護的、被忽視的。",
+      "desc2": "這正是 Panguard 在做的事。財富 500 強有城牆、護城河和資安工程師大軍。個人開發者、五人新創、小企業主 -- 他們什麼都沒有。我們是他們的牧羊人。我們是守護荒野的衛士。"
+    },
+    "quote": {
+      "text": "你不需要懂安全。你只需要知道有人在守護你。",
+      "attribution": "-- Panguard AI 的創立原則"
+    },
+    "values": {
+      "overline": "核心價值",
+      "title": "我們相信什麼。",
+      "subtitle": "這些不是牆上的標語。它們是決策框架，形塑每一個產品決策、每一次設計評審、每一行程式碼。",
+      "item1": {
+        "title": "使用者不用想",
+        "subtitle": "零摩擦",
+        "desc": "安全不該需要博士學位。如果使用者需要設定，我們失敗了。如果使用者需要讀手冊，我們失敗了。一行指令安裝、零設定、直接能用。"
+      },
+      "item2": {
+        "title": "人話優先",
+        "subtitle": "零術語",
+        "desc": "能用人話就不顯示警報代碼。「有人在凌晨 3 點從俄羅斯嘗試連接你的 SSH 連接埠」遠比「在連接埠 22 偵測到 CVE-2024-XXXX」有用得多。會說人話的安全。"
+      },
+      "item3": {
+        "title": "安全永不中斷",
+        "subtitle": "優雅降級",
+        "desc": "雲端斷線？本地 AI 接手。LLM 離線？規則引擎處理。Panguard 永遠不說「服務不可用」。防護能力可降級，服務永不中斷。看門狗永遠在看。"
+      },
+      "item4": {
+        "title": "集體防禦",
+        "subtitle": "一人防護眾人",
+        "desc": "當一個 Panguard 代理學到新東西，每個代理都受益。台北的個人開發者和柏林的小企業匿名共享相同的威脅情報。網路隨每個節點變得更強。"
+      }
+    },
+    "team": {
+      "overline": "團隊",
+      "title": "我們正在組建團隊。",
+      "subtitle": "Panguard 正在組建一支小而精的團隊，由資安從業者、AI 研究員和產品打造者組成。以下是我們正在招募的職位。"
+    },
+    "investors": {
+      "overline": "投資人與顧問",
+      "title": "由懂的人支持。",
+      "subtitle": "我們正在建立投資人和顧問網路。公告即將發布。",
+      "desc": "我們的顧問計畫正在成形。我們正在與網路安全資深人士、企業 SaaS 領袖和 AI/ML 研究員洽談。詳情即將公布。",
+      "advisingCta": "有興趣擔任顧問嗎？"
+    },
+    "cta": {
+      "title": "加入我們。",
+      "desc": "我們在尋找相信安全是權利而非奢侈的人。如果你想打造保護那些沒人在保護的人的產品，我們想和你聊聊。",
+      "cta1": "查看開放職位",
+      "cta2": "聯繫我們"
+    }
+  },
+  "careers": {
+    "overline": "加入團隊",
+    "title": "打造網路安全的未來",
+    "subtitle": "我們是一個以使命驅動、遠端優先的團隊，讓企業級安全惠及地球上的每一個開發者和企業。來和我們一起打造。",
+    "missionStatement": "我們相信每個團隊都值得擁有企業級安全。我們正在打造實現這一切的 AI。如果你想保護那些沒人在保護的人，這就是你的地方。",
+    "culture": {
+      "overline": "文化",
+      "title": "我們的工作方式。",
+      "subtitle": "形塑一切的四個原則。",
+      "item1": {
+        "title": "遠端優先",
+        "desc": "隨地工作。我們分布在亞太地區及更遠的地方。"
+      },
+      "item2": {
+        "title": "快速交付",
+        "desc": "每週發布、快速迭代、第一天就有真正的影響力。"
+      },
+      "item3": {
+        "title": "安全至上",
+        "desc": "我們言行一致。安全在我們的 DNA 中。"
+      },
+      "item4": {
+        "title": "共同學習",
+        "desc": "每週知識分享、研討會預算、持續成長。"
+      }
+    },
+    "benefits": {
+      "overline": "福利",
+      "title": "你將獲得什麼。",
+      "subtitle": "我們照顧團隊，讓團隊可以專注使命。",
+      "item1": "具競爭力的股權配套",
+      "item2": "彈性遠端工作",
+      "item3": "健康保險",
+      "item4": "年度學習預算（$2,000）",
+      "item5": "研討會參加",
+      "item6": "提供最新設備",
+      "item7": "無限休假",
+      "item8": "團隊聚會（每年 2 次）"
+    },
+    "positions": {
+      "overline": "開放職位",
+      "title": "加入團隊。",
+      "noPositions": "此部門目前沒有開放職位。請稍後再查看或將你的履歷發送給我們。"
+    },
+    "spontaneous": {
+      "title": "沒看到你的角色？",
+      "desc": "我們一直在尋找對安全和 AI 充滿熱情的人才。將你的履歷和讓你興奮的事情寄到",
+      "email": "careers@panguard.ai",
+      "cta1": "聯繫我們",
+      "cta2": "直接寄信"
+    }
+  },
+  "contact": {
+    "overline": "聯繫我們",
+    "title": "讓我們聊聊。",
+    "subtitle": "無論你對我們的產品有疑問、需要技術支援，或想探索合作關係 -- 我們都很樂意聽到你的聲音。",
+    "channels": {
+      "sales": {
+        "title": "業務",
+        "email": "sales@panguard.ai",
+        "desc": "對為你的團隊導入 Panguard 感興趣？與我們的業務團隊談談方案、量價折扣和客製企業部署。"
+      },
+      "support": {
+        "title": "技術支援",
+        "email": "support@panguard.ai",
+        "desc": "你的 Panguard 部署需要協助？我們的支援工程師在 Pro 和 Business 方案中 4 小時內回應。"
+      },
+      "partnership": {
+        "title": "合作夥伴",
+        "email": "partners@panguard.ai",
+        "desc": "MSP、經銷商和技術合作夥伴 -- 讓我們探索 Panguard 如何整合到你的產品中。"
+      },
+      "press": {
+        "title": "新聞媒體",
+        "email": "press@panguard.ai",
+        "desc": "媒體詢問、採訪請求和品牌素材取得。我們很樂意分享我們的故事。"
+      }
+    },
+    "formSection": {
+      "title": "發送訊息給我們",
+      "subtitle": "填寫下方表單，我們將在一個工作天內回覆。"
+    },
+    "location": {
+      "title": "我們的位置",
+      "address": "Panguard AI, Inc.\n台北，台灣"
+    },
+    "hours": {
+      "title": "辦公時間",
+      "schedule": "週一至週五\n上午 9:00 - 下午 6:00（GMT+8）"
+    },
+    "responseTime": {
+      "title": "回應時間",
+      "general": "一般詢問：1 個工作天內",
+      "support": "技術支援（Pro/Business）：4 小時內",
+      "security": "安全事件：1 小時內"
+    }
+  },
+  "contactForm": {
+    "labels": {
+      "name": "姓名 *",
+      "email": "電子郵件 *",
+      "company": "公司",
+      "inquiryType": "詢問類型 *",
+      "message": "訊息 *"
+    },
+    "placeholders": {
+      "name": "陳小明",
+      "email": "ming@company.com",
+      "company": "Acme Corp",
+      "inquiryType": "選擇類型",
+      "message": "我們能如何幫助你？"
+    },
+    "inquiryTypes": [
+      "業務",
+      "技術支援",
+      "合作夥伴",
+      "其他"
+    ],
+    "submit": "發送訊息",
+    "submitting": "發送中...",
+    "successTitle": "訊息已發送。",
+    "successDesc": "感謝你的來信。我們將在一個工作天內回覆。",
+    "error": "訊息發送失敗。請重試或直接寄信給我們。"
+  },
+  "press": {
+    "overline": "新聞中心",
+    "title": "新聞與媒體",
+    "subtitle": "新聞稿、媒體報導和品牌資源。",
+    "filters": {
+      "all": "全部",
+      "pressReleases": "新聞稿",
+      "coverage": "媒體報導"
+    },
+    "brandAssets": {
+      "overline": "品牌資產",
+      "title": "媒體資源",
+      "subtitle": "下載官方 Panguard AI 品牌素材供編輯和媒體使用。",
+      "item1": {
+        "title": "Logo 包",
+        "desc": "主 Logo、文字商標和圖示，提供多種格式。包含亮色和暗色版本。",
+        "formats": "SVG, PNG, EPS"
+      },
+      "item2": {
+        "title": "品牌指南",
+        "desc": "色彩、字體、間距規則和使用指南，確保品牌呈現一致性。",
+        "formats": "PDF"
+      },
+      "item3": {
+        "title": "產品截圖",
+        "desc": "Panguard 儀表板、CLI 介面和通知 UI 的高解析度截圖。",
+        "formats": "PNG, JPG"
+      }
+    },
+    "requestAccess": "申請存取",
+    "mediaInquiries": {
+      "title": "媒體詢問",
+      "desc": "媒體詢問、採訪請求或品牌素材取得，請聯繫我們的傳播團隊。",
+      "email": "press@panguard.ai",
+      "cta": "聯繫新聞團隊"
+    }
+  },
+  "compliance": {
+    "overline": "合規管理",
+    "title": "合規自動化，適用於",
+    "titleHighlight": "台灣與全球標準。",
+    "subtitle": "ISO 27001、SOC 2 和台灣資通安全管理法 -- 自動化、平價且永遠最新。",
+    "problem": {
+      "title": "合規昂貴、緩慢、痛苦。",
+      "desc": "取得 SOC 2 認證僅顧問費就要 $20,000 到 $60,000。ISO 27001 更貴。在台灣，TCSA 合規顧問費用約 NT$300,000 到 NT$800,000。過程耗時數月、需要專職人員，文件在稽核結束那一刻就過時。",
+      "desc2": "Panguard 已 24/7 監控你的系統 -- 它擁有稽核員所需的所有資料。我們的合規引擎將遙測資料自動對應到框架控制，生成每天都保持最新的稽核就緒文件。"
+    },
+    "frameworks": {
+      "overline": "支援框架",
+      "title": "三個框架。一個平台。",
+      "subtitle": "每個發現自動對應到相關控制。稽核員清楚看到哪些控制已滿足、哪些需要關注。",
+      "iso27001": {
+        "name": "ISO 27001",
+        "fullName": "資訊安全管理系統",
+        "controls": 114,
+        "coverage": "94%",
+        "whoNeeds": "任何處理敏感資料、追求企業客戶或準備投資盡職調查的公司。",
+        "whatItCovers": "風險評估、存取控制、密碼學、營運安全、供應商關係、事件管理和業務持續。",
+        "panguardDoes": "自動將 114 個附錄 A 控制中的 107 個對應到你的即時安全遙測。為剩餘控制生成差距分析和具體修復步驟。"
+      },
+      "soc2": {
+        "name": "SOC 2 Type II",
+        "fullName": "信任服務準則",
+        "controls": 64,
+        "coverage": "87%",
+        "whoNeeds": "向美國企業客戶銷售的 SaaS 公司。大多數採購團隊和投資人要求。",
+        "whatItCovers": "安全、可用性、處理完整性、保密性和隱私信任服務準則，配合持續證據收集。",
+        "panguardDoes": "自動化 64 個控制中 56 個的證據收集。生成稽核就緒文件包，包含時間戳日誌、組態快照和 AI 推理鏈。"
+      },
+      "tcsa": {
+        "name": "台灣資通安全管理法",
+        "fullName": "TCSA",
+        "controls": 38,
+        "coverage": "91%",
+        "whoNeeds": "政府承包商、關鍵基礎設施供應商，以及任何受資通安全管理法規範的台灣組織。",
+        "whatItCovers": "安全監控、事件通報、基礎設施保護、風險評估和政府監管實體的合規報告。",
+        "panguardDoes": "完整雙語輸出（英文 + 繁體中文）。自動對應 38 個控制中的 35 個。生成符合監管提交格式的報告。"
+      }
+    },
+    "taiwanMarket": {
+      "overline": "台灣市場",
+      "title": "為台灣打造。全球適用。",
+      "subtitle": "Panguard 是唯一原生支援台灣資通安全管理法和雙語合規報告的 AI 安全平台。",
+      "item1": {
+        "title": "雙語輸出",
+        "desc": "報告同時生成英文和繁體中文（zh-TW）。無需人工翻譯。"
+      },
+      "item2": {
+        "title": "政府承包商就緒",
+        "desc": "符合監管提交格式。涵蓋政府關聯組織所需的全部 38 項 TCSA 控制。"
+      },
+      "item3": {
+        "title": "取代本地顧問",
+        "desc": "台灣合規顧問每次約 NT$300K-800K。Panguard 以極低成本持續生成等效報告。"
+      },
+      "item4": {
+        "title": "跨境合規",
+        "desc": "在國際銷售的台灣公司需要 TCSA 和 ISO 27001/SOC 2。從一個平台生成全部三份報告。"
+      }
+    },
+    "reports": {
+      "overline": "報告庫",
+      "title": "每個框架。一鍵生成。",
+      "desc": "選擇你需要的合規框架，Panguard 生成對應每個控制的完整報告。覆蓋率百分比顯示你確切的狀態。差距以具體修復指南標記。"
+    },
+    "costComparison": {
+      "overline": "成本比較",
+      "title": "算術很簡單。",
+      "tcsaRow": {
+        "label": "TCSA 合規報告",
+        "consultant": "NT$300,000 - 800,000",
+        "panguard": "$3/端點/月起"
+      },
+      "freshnessRow": {
+        "label": "報告時效性",
+        "consultant": "時間點快照",
+        "panguard": "即時更新"
+      }
+    },
+    "cta": {
+      "title": "免顧問費的合規。",
+      "desc": "在幾分鐘內生成你的第一份合規報告，而不是幾個月。ISO 27001、SOC 2 和台灣資通安全管理法 -- 全在一個平台。",
+      "cta1": "搶先體驗",
+      "cta2": "查看 Panguard Report",
+      "trustNote": "想看我們自己的合規狀態嗎？",
+      "trustLink": "前往信任中心"
+    }
+  },
+  "trust": {
+    "overline": "信任中心",
+    "title": "可以",
+    "titleHighlight": "驗證",
+    "subtitle": "透明是信任的基礎。查看我們的合規狀態、安全架構、資料處理實踐和次處理者關係 -- 全在一處。",
+    "compliance": {
+      "overline": "合規狀態",
+      "title": "認證與框架。",
+      "subtitle": "即時可見我們的合規態勢。我們誠實公布狀態 -- 包括進行中的，不只是已完成的。",
+      "soc2": {
+        "name": "SOC 2 Type II",
+        "status": "進行中",
+        "desc": "預計 2026 Q3。87% 控制已自動化。由四大會計師事務所進行稽核，涵蓋安全、可用性和保密性信任服務準則。"
+      },
+      "iso27001": {
+        "name": "ISO 27001",
+        "status": "規劃中",
+        "desc": "預計 2026 Q4。風險評估框架已就緒。ISMS 從第一天起按 ISO 27001 標準建立，認證只是正式化。"
+      },
+      "gdpr": {
+        "name": "GDPR 合規",
+        "status": "生效中",
+        "desc": "完整 GDPR 合規，含自動化資料主體請求處理。所有客戶可取得資料處理協議。平台全面落實隱私設計。"
+      },
+      "hipaa": {
+        "name": "HIPAA 就緒",
+        "status": "進行中",
+        "desc": "醫療客戶可取得 BAA。加密控制已實施。存取稽核日誌和自動工作階段管理已強制執行。"
+      }
+    },
+    "architecture": {
+      "overline": "安全架構",
+      "title": "縱深防禦。",
+      "subtitle": "我們的安全模型是分層的。任何單一層的失敗不會危及系統。每一層獨立運行，有自己的控制。",
+      "dataLayer": {
+        "title": "資料層",
+        "items": [
+          "AES-256 靜態加密",
+          "TLS 1.3 傳輸加密",
+          "每租戶金鑰管理",
+          "自動金鑰輪替（90 天）",
+          "硬體安全模組支援"
+        ]
+      },
+      "applicationLayer": {
+        "title": "應用層",
+        "items": [
+          "多因素認證",
+          "角色存取控制（RBAC）",
+          "API 金鑰範圍和速率限制",
+          "輸入驗證和消毒",
+          "工作階段管理和自動過期"
+        ]
+      },
+      "infrastructureLayer": {
+        "title": "基礎設施層",
+        "items": [
+          "單租戶隔離",
+          "24/7 基礎設施監控",
+          "邊緣 DDoS 防護",
+          "不可變部署管線",
+          "自動弱點掃描"
+        ]
+      }
+    },
+    "dataHandling": {
+      "overline": "資料處理",
+      "title": "我們如何對待你的資料。",
+      "subtitle": "每一項資料處理實踐都有文件記錄、透過政策強制執行，並透過自動化控制驗證。",
+      "item1": {
+        "title": "資料加密",
+        "desc": "AES-256 靜態加密，TLS 1.3 傳輸加密。每租戶加密金鑰，自動輪替。"
+      },
+      "item2": {
+        "title": "資料駐留",
+        "desc": "客戶資料儲存在客戶選擇的區域。未經同意不進行跨區域複製。"
+      },
+      "item3": {
+        "title": "資料保留",
+        "desc": "可按資料類型配置保留政策。自動清除並進行密碼學驗證。"
+      },
+      "item4": {
+        "title": "存取控制",
+        "desc": "基於角色的存取控制，遵循最小權限原則。所有存取變更需經審批工作流。"
+      },
+      "item5": {
+        "title": "稽核日誌",
+        "desc": "所有管理操作的不可變稽核軌跡。日誌至少保留 12 個月。"
+      },
+      "item6": {
+        "title": "事件回應",
+        "desc": "24 小時資料外洩通知 SLA。有文件記錄的 IR 計畫，每季以桌上演練測試。"
+      }
+    },
+    "subprocessors": {
+      "overline": "次處理者",
+      "title": "我們合作的第三方。",
+      "subtitle": "我們將次處理者的使用限制在必要服務。每個次處理者在加入前都經過安全審查，並每年重新評估。",
+      "headers": {
+        "name": "次處理者",
+        "purpose": "用途",
+        "location": "位置"
+      },
+      "aws": {
+        "name": "AWS",
+        "purpose": "基礎設施",
+        "location": "美國 / 歐盟"
+      },
+      "anthropic": {
+        "name": "Anthropic",
+        "purpose": "AI 處理",
+        "location": "美國"
+      },
+      "cloudflare": {
+        "name": "Cloudflare",
+        "purpose": "CDN 及 DDoS 防護",
+        "location": "全球"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "purpose": "支付處理",
+        "location": "美國"
+      },
+      "sendgrid": {
+        "name": "SendGrid",
+        "purpose": "交易郵件",
+        "location": "美國"
+      },
+      "updateNote": "最後更新：2026 年 2 月。我們在新增次處理者前至少 30 天通知客戶。透過你的帳戶儀表板訂閱更新。"
+    },
+    "cta": {
+      "title": "需要合規文件？",
+      "desc": "申請 SOC 2 報告、滲透測試摘要、資料處理協議，或與我們團隊安排安全深度交流。企業客戶優先取得所有合規文件。",
+      "cta1": "申請文件",
+      "cta2": "查看安全實踐"
+    }
+  },
+  "security": {
+    "overline": "安全與信任",
+    "title": "我們是一家安全公司。",
+    "titleHighlight": "我們自身的安全",
+    "titleSuffix": "不容妥協。",
+    "subtitle": "你信任我們保護你的基礎設施。這意味著我們對自己的標準比對任何人都高。以下是我們的具體做法。",
+    "practices": {
+      "overline": "實踐",
+      "title": "我們如何保護自己。",
+      "subtitle": "這些不是願景目標。它們是當前強制執行的實踐，適用於每一行程式碼、每一次部署和每一位員工。",
+      "item1": {
+        "title": "單租戶架構",
+        "desc": "每個客戶部署在隔離環境中運行。沒有共享資料庫、沒有共享計算、沒有共享網路區段。一個租戶的洩露無法傳播到另一個。"
+      },
+      "item2": {
+        "title": "端到端加密",
+        "desc": "所有資料靜態加密（AES-256）和傳輸加密（TLS 1.3）。每租戶管理加密金鑰，每 90 天自動輪替。金鑰材料永不離開硬體安全模組。"
+      },
+      "item3": {
+        "title": "零資料保留",
+        "desc": "雲端 AI 查詢是暫時的。發送給 Claude 或 GPT 的有效負載不會被儲存、不會用於訓練、不會超出請求生命週期記錄。PII 在任何資料離開裝置前被移除。"
+      },
+      "item4": {
+        "title": "可稽核 AI 決策",
+        "desc": "Panguard 採取的每個自動行動都帶有完整推理鏈記錄。你可以追蹤為什麼一個事件被標記、它收到什麼信心分數、以及執行了什麼回應。"
+      },
+      "item5": {
+        "title": "持續滲透測試",
+        "desc": "我們聘請獨立第三方安全公司每季進行滲透測試。嚴重發現在 48 小時內修復。測試結果可應企業客戶要求提供。"
+      },
+      "item6": {
+        "title": "安全開發生命週期",
+        "desc": "每次程式碼變更都經過自動 SAST/DAST 掃描、依賴項稽核和同儕審查。我們遵循 OWASP 最佳實踐，並為外部研究員維護漏洞獎勵計畫。"
+      }
+    },
+    "compliance": {
+      "overline": "合規",
+      "title": "我們遵循的框架。",
+      "subtitle": "合規不是勾選框的練習。它是最低標準。我們建構的是這些框架的精神，不只是字面。"
+    },
+    "dataHandling": {
+      "overline": "資料處理",
+      "title": "什麼留在本地。什麼上雲端。",
+      "subtitle": "資料流的透明是根本。以下是你的資料在哪裡以及什麼（如果有的話）離開裝置的完整說明。",
+      "onDevice": {
+        "zone": "裝置端（本地）",
+        "items": [
+          "原始系統日誌和遙測",
+          "情境記憶基線資料庫",
+          "Sigma/YARA 規則引擎和結果",
+          "本地 LLM 推論（Ollama）",
+          "事件回應腳本執行",
+          "完整事件歷史和鑑識日誌"
+        ]
+      },
+      "cloud": {
+        "zone": "雲端（暫時）",
+        "items": [
+          "匿名化事件負載（已移除 PII）",
+          "雲端 AI 推論請求（不儲存）",
+          "集體威脅情報貢獻（僅雜湊 IOC）",
+          "軟體更新檢查和規則同步"
+        ]
+      },
+      "neverTransmitted": {
+        "zone": "永不傳輸",
+        "items": [
+          "IP 位址或主機名稱",
+          "用戶憑證或令牌",
+          "檔案內容或原始碼",
+          "資料庫內容或查詢日誌",
+          "個人或商業資料"
+        ]
+      },
+      "anonymization": {
+        "title": "匿名化管線",
+        "desc": "在任何事件資料發送到雲端 AI 或集體情報網路之前，它會經過多階段匿名化管線。IP 位址被雜湊、主機名稱被替換為通用識別符、檔案路徑被正規化、用戶資料被完全移除。管線是確定性的，相同的威脅模式總是產生相同的匿名化簽名 -- 實現關聯而不暴露身份。"
+      }
+    },
+    "disclosure": {
+      "title": "負責任揭露",
+      "desc": "發現 Panguard 的弱點？我們感謝幫助我們保護用戶安全的安全研究員。請透過我們的負責任揭露計畫回報任何安全問題。我們承諾在 24 小時內確認收到報告，72 小時內提供初步評估。",
+      "cta1": "揭露政策",
+      "cta2": "security@panguard.ai"
+    },
+    "trustCenter": {
+      "overline": "信任中心",
+      "title": "可驗證的文件。",
+      "subtitle": "下載我們的安全文件、申請稽核報告，或查看我們的合規文件。",
+      "doc1": {
+        "label": "SOC 2 Type II 報告",
+        "status": "2026 Q3 推出"
+      },
+      "doc2": {
+        "label": "滲透測試摘要",
+        "status": "可應要求提供"
+      },
+      "doc3": {
+        "label": "資料處理協議（DPA）",
+        "status": "可用"
+      },
+      "doc4": {
+        "label": "安全白皮書",
+        "status": "可用"
+      },
+      "doc5": {
+        "label": "架構概覽",
+        "status": "可用"
+      },
+      "doc6": {
+        "label": "事件回應計畫",
+        "status": "可應要求提供"
+      }
+    },
+    "cta": {
+      "title": "對我們的安全有疑問？",
+      "desc": "我們的安全團隊樂於討論我們的實踐、提供文件，或與你的 CISO 安排深度交流。",
+      "cta1": "聯繫安全團隊"
+    }
+  },
+  "technology": {
+    "overline": "技術架構",
+    "title": "安全不只掃描，",
+    "titleHighlight": "更會思考",
+    "titleSuffix": "。",
+    "subtitle": "三層 AI 防禦漏斗、五個自主代理和學習你環境的情境記憶。90% 的雜訊事件零成本，3% 的關鍵事件獲得最深層推理。",
+    "defenseFunnel": {
+      "overline": "防禦漏斗",
+      "title": "三層。90% 免費。",
+      "subtitle": "事件從上往下流經越來越強大 -- 也越來越昂貴 -- 的分析層。漏斗確保成本效率，同時保證不遺漏任何真正威脅。",
+      "layer1": {
+        "badge": "第一層",
+        "name": "規則引擎",
+        "tech": "Sigma + YARA",
+        "pct": "~90%",
+        "cost": "$0",
+        "desc": "開源 Sigma 和 YARA 規則構成基石。它們在裝置端即時處理絕大多數安全事件，每事件零成本。新的社群規則每天從精選來源拉取，自動編譯到本地引擎。"
+      },
+      "layer2": {
+        "badge": "第二層",
+        "name": "邊緣 AI",
+        "tech": "本地 LLM via Ollama",
+        "pct": "~7%",
+        "cost": "~$0",
+        "desc": "規則無法自信分類的事件升級到本地大語言模型（Ollama）。這讓敏感資料留在裝置、避免網路延遲，並在不依賴雲端的情況下增加情境推理。"
+      },
+      "layer3": {
+        "badge": "第三層",
+        "name": "雲端 AI",
+        "tech": "Claude / GPT",
+        "pct": "~3%",
+        "cost": "~$0.02",
+        "desc": "只有最模糊或最新穎的威脅才會到達雲端 AI 進行深度推理。有效負載在傳輸前已清除 PII。雲端 AI 返回帶有信心分數和人話解釋的結構化判決。"
+      }
+    },
+    "agents": {
+      "overline": "代理架構",
+      "title": "五個代理。一個使命。",
+      "subtitle": "每個代理都是專家。它們共同組成自主安全運營管線：偵測、分析、回應、報告和溝通 -- 無需人工介入。",
+      "detect": {
+        "name": "偵測代理",
+        "role": "第一線反應者",
+        "desc": "持續監控系統日誌、網路流量和檔案系統變化。即時應用 Sigma 和 YARA 規則，在異常出現的瞬間標記。產出附帶 MITRE ATT&CK TTP 標籤的原始事件信號。"
+      },
+      "analyze": {
+        "name": "分析代理",
+        "role": "AI 調查員",
+        "desc": "接收偵測代理標記的事件並進行多步推理。跨時間關聯事件、查詢情境記憶中的基線偏差，並給出 0 到 100 的信心分數。"
+      },
+      "respond": {
+        "name": "回應代理",
+        "role": "自動化防禦者",
+        "desc": "根據信心閾值執行回應劇本。高信心威脅觸發自動隔離、防火牆規則注入或程序終止。中等信心事件排入帶完整情境的人工審查任務。"
+      },
+      "report": {
+        "name": "報告代理",
+        "role": "合規撰寫者",
+        "desc": "將原始事件資料轉換為對應 ISO 27001、SOC 2 等框架的結構化報告。自動生成高管摘要、時間線視覺化和稽核就緒證據包。"
+      },
+      "chat": {
+        "name": "聊天代理",
+        "role": "資安副駕",
+        "desc": "人機介面。用戶用人話提問，獲得以真實遙測為依據的回答。整合 LINE、Slack 和 Telegram。主動發送每週摘要和即時入侵通知。"
+      }
+    },
+    "contextMemory": {
+      "overline": "情境記憶",
+      "title": "七天學習你。然後永不遺忘。",
+      "desc1": "安裝後前七天，Panguard 靜默觀察你的系統：正常網路模式、典型程序樹、預期 cron 排程和標準用戶行為。這在加密的本地資料庫中建立每裝置基線。",
+      "desc2": "學習窗口之後，任何偏離基線的情況都會被評分和標記。模型持續自我優化 -- 新的合法服務在數小時內被納入基線，而新穎攻擊模式立即觸發升級。",
+      "phase1": {
+        "day": "第 1-2 天",
+        "label": "觀察",
+        "desc": "收集程序樹、網路連接、檔案系統基線"
+      },
+      "phase2": {
+        "day": "第 3-4 天",
+        "label": "模式提取",
+        "desc": "為每個服務建立正常行為的統計模型"
+      },
+      "phase3": {
+        "day": "第 5-6 天",
+        "label": "閾值調校",
+        "desc": "校準警報閾值以最小化誤報"
+      },
+      "phase4": {
+        "day": "第 7 天+",
+        "label": "主動防護",
+        "desc": "完整偵測 + 自動回應，持續優化"
+      }
+    },
+    "confidenceScoring": {
+      "overline": "信心評分",
+      "title": "每個事件都有分數。",
+      "subtitle": "0-100 的信心分數決定後續行動。高分觸發自動回應。中分通知人工。低分輸入學習系統。",
+      "high": {
+        "range": "85 -- 100",
+        "label": "自動回應",
+        "desc": "高信心威脅自動處理。回應代理在數秒內執行匹配劇本，然後記錄每個動作供稽核。"
+      },
+      "medium": {
+        "range": "50 -- 84",
+        "label": "通知與審查",
+        "desc": "中等信心事件透過聊天代理向指定人工審查員發送通知。附帶完整情境和 AI 推理，審查員可一鍵批准或駁回。"
+      },
+      "low": {
+        "range": "0 -- 49",
+        "label": "記錄與學習",
+        "desc": "低信心信號帶完整元資料記錄，並輸入情境記憶系統。隨時間推移，基線模型自我優化，這些信號要麼升級到更高等級，要麼被抑制為雜訊。"
+      }
+    },
+    "collectiveIntelligence": {
+      "overline": "集體情報",
+      "title": "一台裝置偵測。所有裝置封鎖。",
+      "desc1": "當 Panguard 代理識別出之前未知的威脅，匿名入侵指標（IOC）會貢獻到集體情報網路。幾分鐘內，其他所有 Panguard 代理都收到新簽名。",
+      "desc2": "這創造了正向迴圈：網路中的裝置越多，新威脅被捕獲得越快，每個個體代理就越強大。一台伺服器的小企業受益於整個 Panguard 艦隊產生的威脅資料。",
+      "item1": {
+        "label": "匿名分享",
+        "desc": "威脅指標在貢獻前移除所有識別資料。"
+      },
+      "item2": {
+        "label": "分散式快取",
+        "desc": "新威脅簽名在幾分鐘內傳播到整個艦隊。"
+      },
+      "item3": {
+        "label": "自動規則推送",
+        "desc": "社群驗證的簽名被編譯成 Sigma/YARA 規則並推送到每個代理。"
+      },
+      "item4": {
+        "label": "隱私優先",
+        "desc": "沒有 IP 位址、主機名稱或用戶資料離開裝置。只有雜湊和行為模式。"
+      }
+    },
+    "resilience": {
+      "overline": "韌性",
+      "title": "安全永不中斷。",
+      "subtitle": "網路斷線？API 額度用盡？雲端供應商故障？Panguard 透過三層優雅降級。防護永遠開啟。",
+      "optimal": {
+        "status": "最佳",
+        "desc": "雲端 AI + 本地 LLM + 規則引擎 -- 每個事件完整三層分析。"
+      },
+      "cloudUnavailable": {
+        "status": "雲端不可用",
+        "desc": "本地 LLM + 規則引擎。複雜事件排隊等待雲端重試。防護無間斷。"
+      },
+      "llmOffline": {
+        "status": "LLM 離線",
+        "desc": "僅規則引擎。Sigma + YARA 仍捕獲 90% 的已知威脅。事件記錄供稍後 AI 分析。"
+      },
+      "emergency": {
+        "status": "緊急模式",
+        "desc": "核心看門狗程序監控關鍵信號。如果 Panguard 本身被攻擊，看門狗通知擁有者並保留鑑識日誌。"
+      }
+    },
+    "stack": {
+      "overline": "技術棧",
+      "title": "建立在經過驗證的基礎上。",
+      "subtitle": "每個元件都因可靠性、效能和開發者體驗而被選擇。無專有鎖定。",
+      "item1": {
+        "name": "TypeScript",
+        "desc": "端到端型別安全"
+      },
+      "item2": {
+        "name": "Sigma Rules",
+        "desc": "產業標準偵測"
+      },
+      "item3": {
+        "name": "YARA Rules",
+        "desc": "惡意程式模式匹配"
+      },
+      "item4": {
+        "name": "Ollama",
+        "desc": "本地 LLM 推論"
+      },
+      "item5": {
+        "name": "Claude / GPT",
+        "desc": "雲端 AI 推理"
+      },
+      "item6": {
+        "name": "Node.js",
+        "desc": "代理運行環境"
+      },
+      "item7": {
+        "name": "SQLite + Redis",
+        "desc": "事件儲存與快取"
+      },
+      "item8": {
+        "name": "Docker",
+        "desc": "一行指令部署"
+      },
+      "item9": {
+        "name": "REST / WebSocket",
+        "desc": "即時遙測"
+      },
+      "item10": {
+        "name": "Prometheus",
+        "desc": "指標與警報"
+      }
+    },
+    "cta": {
+      "title": "準備好看它實際運作了嗎？",
+      "desc": "60 秒內執行免費安全掃描，或與我們團隊談談在你的基礎設施部署 Panguard。",
+      "cta1": "免費掃描",
+      "cta2": "搶先體驗"
+    }
+  },
+  "blog": {
+    "overline": "部落格",
+    "title": "安全洞察與更新",
+    "subtitle": "掌握 Panguard AI 團隊的最新安全研究、產品更新和工程深度探討。",
+    "featured": "精選",
+    "noPosts": "此分類尚無文章。請稍後再來。",
+    "digest": {
+      "title": "每週安全摘要",
+      "desc": "獲得精選的威脅情報、產品更新和工程洞察，每週四直送你的收件匣。無垃圾郵件、無廢話 -- 只有可操作的安全知識。",
+      "placeholder": "you@company.com",
+      "subscribe": "訂閱",
+      "success": "已訂閱。你將在 {email} 收到每週摘要。",
+      "error": "出了點問題。請重試。",
+      "note": "獲取每週安全洞察直送你的收件匣。隨時退訂。"
+    }
+  },
+  "blogPost": {
+    "backToBlog": "返回部落格",
+    "comingSoon": "即將推出",
+    "fullArticleInProgress": "全文撰寫中",
+    "fullArticleDesc": "本文正由 Panguard AI 團隊最終審定。訂閱我們的電子報，在文章發布時收到通知。",
+    "browseAll": "瀏覽所有文章"
+  },
+  "customers": {
+    "overline": "使用案例情境",
+    "title": "團隊如何使用 Panguard",
+    "subtitle": "基於新創團隊和擴展中團隊面臨的常見安全挑戰。這些情境說明 Panguard AI 如何解決實際的基礎設施、合規和威脅偵測問題。",
+    "stats": {
+      "stat1": {
+        "value": "94%",
+        "label": "事件減少"
+      },
+      "stat2": {
+        "value": "14 天",
+        "label": "達成 SOC 2 合規"
+      },
+      "stat3": {
+        "value": "$38K",
+        "label": "平均成本節省"
+      },
+      "stat4": {
+        "value": "< 30s",
+        "label": "偵測時間"
+      }
+    },
+    "featured": "精選情境",
+    "allScenarios": {
+      "overline": "所有情境",
+      "title": "更多使用案例。",
+      "subtitle": "每次部署都不同。這些情境說明常見的安全挑戰以及 Panguard 如何應對。"
+    },
+    "productsUsed": "使用產品",
+    "readScenario": "閱讀情境",
+    "cta": {
+      "title": "準備好保護你的基礎設施了嗎？",
+      "desc": "從免費安全掃描開始，看看 Panguard AI 如何保護你的端點、簡化合規、在威脅造成損害之前阻止它們。",
+      "cta1": "搶先體驗",
+      "cta2": "聯繫業務"
+    }
+  },
+  "caseStudy": {
+    "allStories": "所有客戶故事",
+    "challenge": "挑戰",
+    "solution": "解決方案",
+    "quote": "引言",
+    "similarResults": "準備好看到類似的成果嗎？",
+    "moreStories": "更多故事"
+  },
+  "docs": {
+    "overline": "技術文件",
+    "title": "開始使用 Panguard",
+    "subtitle": "安裝、設定和精通 Panguard AI 所需的一切。",
+    "searchPlaceholder": "搜尋文件...",
+    "quickStart": {
+      "title": "快速入門",
+      "item1": {
+        "title": "安裝",
+        "desc": "60 秒內啟動 Panguard。一行指令，零設定。",
+        "link": "快速入門指南"
+      },
+      "item2": {
+        "title": "設定",
+        "desc": "自訂偵測規則、通知頻道和掃描排程。",
+        "link": "設定文件"
+      },
+      "item3": {
+        "title": "API 文件",
+        "desc": "RESTful API，附完整端點文件和程式碼範例。",
+        "link": "API 文件"
+      }
+    },
+    "productDocs": {
+      "title": "產品文件",
+      "subtitle": "每個 Panguard 產品模組的深度文件。",
+      "scan": {
+        "title": "Panguard Scan",
+        "desc": "安全稽核設定、掃描組態、結果解讀、CI/CD 整合"
+      },
+      "guard": {
+        "title": "Panguard Guard",
+        "desc": "端點防護、偵測規則、回應動作、警報組態"
+      },
+      "chat": {
+        "title": "Panguard Chat",
+        "desc": "AI 副駕設定、Slack/Teams/LINE 整合、查詢範例"
+      },
+      "trap": {
+        "title": "Panguard Trap",
+        "desc": "蜜罐部署、攻擊者分析、威脅情報來源"
+      },
+      "report": {
+        "title": "Panguard Report",
+        "desc": "合規報告、SOC 2 證據收集、PDF 自訂"
+      },
+      "dashboard": {
+        "title": "儀表板",
+        "desc": "儀表板概覽、自訂檢視、團隊管理、SSO 設定"
+      }
+    },
+    "popularArticles": {
+      "title": "熱門文章",
+      "subtitle": "經常被參考的指南和教學。",
+      "article1": "如何在 Ubuntu/Debian 安裝 Panguard",
+      "article2": "如何在 CentOS/RHEL 安裝 Panguard",
+      "article3": "設定 Slack 通知",
+      "article4": "了解威脅嚴重性等級",
+      "article5": "設定自動合規報告",
+      "article6": "API 認證和速率限制",
+      "article7": "代理連線故障排除",
+      "article8": "升級 Panguard 到最新版本"
+    },
+    "cantFind": "找不到你要的？",
+    "cantFindDesc": "我們的團隊隨時為你提供幫助。透過聯繫頁面聯繫我們或加入社群討論。",
+    "contactSupport": "聯繫支援",
+    "communityForum": "社群論壇",
+    "comingSoon": "即將推出",
+    "earlyAccess": "搶先體驗"
+  },
+  "changelog": {
+    "overline": "更新日誌",
+    "title": "Panguard 最新動態",
+    "subtitle": "我們快速且透明地交付。每一次更新、改進和修復 -- 都記錄在這裡。",
+    "filters": {
+      "all": "全部",
+      "features": "功能",
+      "fixes": "修復",
+      "improvements": "改進",
+      "security": "安全"
+    },
+    "badges": {
+      "feature": "功能",
+      "fix": "修復",
+      "improvement": "改進",
+      "security": "安全"
+    },
+    "notifyTitle": "接收新版本通知",
+    "notifyDesc": "訂閱以在你的收件匣直接接收更新日誌通知。",
+    "noSpam": "無垃圾郵件，僅產品更新。"
+  },
+  "resources": {
+    "overline": "資源中心",
+    "title": "安全知識庫",
+    "subtitle": "白皮書、報告和指南，幫助你的團隊建立更強大的安全。",
+    "types": {
+      "all": "全部",
+      "whitepaper": "白皮書",
+      "report": "報告",
+      "guide": "指南",
+      "webinar": "線上研討會",
+      "infographic": "資訊圖表"
+    },
+    "featured": "精選",
+    "watch": "觀看",
+    "download": "下載",
+    "noResources": "此分類尚無資源。請稍後再來。",
+    "newsletter": {
+      "title": "資源直送你的收件匣",
+      "desc": "以精選的白皮書、報告和指南掌握威脅態勢最新資訊，直接送到你的收件匣。無垃圾郵件 -- 只有可操作的安全知識。",
+      "subscribe": "訂閱",
+      "note": "加入 2,000+ 位注重安全的工程師。隨時退訂。"
+    }
+  },
+  "integrations": {
+    "overline": "整合串接",
+    "title": "連接一切",
+    "subtitle": "Panguard 整合你現有的工具和工作流程。無需自訂程式碼。",
+    "searchPlaceholder": "搜尋整合...",
+    "categories": {
+      "all": "全部",
+      "communication": "通訊",
+      "siemMonitoring": "SIEM 與監控",
+      "cloud": "雲端",
+      "devops": "DevOps",
+      "ticketing": "工單"
+    },
+    "available": "可用",
+    "comingSoon": "即將推出",
+    "developerApi": {
+      "overline": "開發者 API",
+      "title": "建立自訂整合",
+      "desc": "Panguard 提供全面的 RESTful API、Webhook 支援和 Python、Node.js、Go SDK。建立針對你安全工作流程的自訂整合，自動化威脅回應，並將 Panguard 連接到你技術棧中的任何系統。",
+      "features": [
+        "RESTful API 完整 CRUD 操作",
+        "Webhook 回調即時事件串流",
+        "Python、Node.js 和 Go SDK",
+        "OAuth 2.0 和 API 金鑰認證",
+        "速率限制，配額寬裕"
+      ]
+    },
+    "dontSeeYourTool": "沒看到你的工具？",
+    "dontSeeDesc": "我們持續擴展整合生態系。告訴我們你使用什麼工具，我們會優先為你的工作流建立原生整合。",
+    "requestIntegration": "申請整合",
+    "buildYourOwn": "自行建立"
+  },
+  "partners": {
+    "overline": "合作夥伴計畫",
+    "title": "與 Panguard AI 一起成長",
+    "subtitle": "加入我們的合作夥伴生態系，為你的客戶提供企業級 AI 安全防護。",
+    "models": {
+      "overline": "合作模式",
+      "title": "選擇你的路徑。",
+      "subtitle": "三種為不同商業模式設計的合作路徑。全部由相同的世界級技術和支援支撐。",
+      "msp": {
+        "title": "MSP 合作夥伴",
+        "subtitle": "託管安全服務供應商",
+        "desc": "將 Panguard 的 AI 安全防護加入你的託管服務組合。多租戶儀表板、白標選項、量價定價。",
+        "highlights": [
+          "多租戶管理主控台",
+          "白標部署選項",
+          "量價定價層級",
+          "自動化佈建 API"
+        ]
+      },
+      "technology": {
+        "title": "技術合作夥伴",
+        "subtitle": "整合與技術",
+        "desc": "將 Panguard 與你的平台整合。API 存取、共同行銷機會、聯合解決方案開發。",
+        "highlights": [
+          "完整 REST API 存取",
+          "共同行銷計畫",
+          "聯合解決方案開發",
+          "技術整合支援"
+        ]
+      },
+      "reseller": {
+        "title": "經銷合作夥伴",
+        "subtitle": "增值經銷商",
+        "desc": "向你的客戶群經銷 Panguard AI。交易登記、銷售賦能、專屬合作夥伴經理。",
+        "highlights": [
+          "交易登記保護",
+          "銷售賦能資源",
+          "專屬合作夥伴經理",
+          "具競爭力的利潤結構"
+        ]
+      }
+    },
+    "benefits": {
+      "overline": "合作夥伴福利",
+      "title": "為共同成長而生。",
+      "subtitle": "每位合作夥伴都能取得加速業務的工具、資源和支援。",
+      "item1": {
+        "title": "收入分成",
+        "desc": "所有客戶訂閱的具競爭力利潤"
+      },
+      "item2": {
+        "title": "銷售賦能",
+        "desc": "聯名素材、示範環境、培訓"
+      },
+      "item3": {
+        "title": "技術支援",
+        "desc": "專屬 SE 的優先合作夥伴支援頻道"
+      },
+      "item4": {
+        "title": "共同行銷",
+        "desc": "聯合線上研討會、案例研究和活動贊助"
+      },
+      "item5": {
+        "title": "交易登記",
+        "desc": "受保護的交易和透明的管線可見性"
+      },
+      "item6": {
+        "title": "搶先體驗",
+        "desc": "GA 前預覽新功能和 Beta 計畫"
+      }
+    },
+    "tiers": {
+      "overline": "合作夥伴層級",
+      "title": "與我們一起成長。",
+      "subtitle": "隨著你的 Panguard 業務成長，你的福利也隨之增加。三個層級，旨在獎勵承諾和成功。",
+      "registered": {
+        "name": "註冊",
+        "requirement": "免費加入",
+        "desc": "開始 Panguard 合作夥伴計畫。取得基礎資源並開始建立你的業務。",
+        "features": [
+          "合作夥伴入口存取",
+          "產品文件",
+          "標準利潤",
+          "社群支援論壇",
+          "聯名登陸頁",
+          "每月合作夥伴電子報"
+        ]
+      },
+      "silver": {
+        "name": "銀牌",
+        "requirement": "5+ 客戶",
+        "desc": "為成長中合作夥伴的增強福利。專屬支援和改善的經濟條件。",
+        "features": [
+          "註冊層所有內容",
+          "增強利潤結構",
+          "專屬合作夥伴支援",
+          "銷售賦能套件",
+          "示範環境存取",
+          "每季業務審查",
+          "潛在客戶分享計畫",
+          "優先交易登記"
+        ]
+      },
+      "gold": {
+        "name": "金牌",
+        "requirement": "20+ 客戶",
+        "desc": "最高層級合作夥伴關係，最大福利、高管贊助和共同開發機會。",
+        "features": [
+          "銀牌層所有內容",
+          "最高利潤層級",
+          "指定高管贊助人",
+          "共同開發機會",
+          "聯合市場進入規劃",
+          "客製整合支援",
+          "產品路線圖搶先體驗",
+          "年度合作夥伴峰會邀請",
+          "專屬行銷預算",
+          "客戶白手套導入"
+        ]
+      }
+    },
+    "stats": {
+      "stat1": {
+        "value": "150+",
+        "label": "活躍合作夥伴"
+      },
+      "stat2": {
+        "value": "40+",
+        "label": "服務國家"
+      },
+      "stat3": {
+        "value": "3x",
+        "label": "平均合作夥伴收入成長"
+      },
+      "stat4": {
+        "value": "98%",
+        "label": "合作夥伴滿意度"
+      }
+    },
+    "cta": {
+      "title": "成為合作夥伴",
+      "desc": "加入持續成長的安全導向合作夥伴生態系，共同向全球企業提供 Panguard AI。立即申請，一起保護更多客戶。",
+      "cta1": "申請合作夥伴計畫",
+      "cta2": "預約示範",
+      "applyNow": "立即申請"
+    }
+  },
+  "status": {
+    "overline": "系統狀態",
+    "title": "Panguard AI 服務狀態",
+    "subtitle": "所有 Panguard AI 平台服務的即時運營狀態和正常運行歷史。",
+    "allOperational": "所有系統正常運行",
+    "degraded": "部分系統效能下降",
+    "outage": "偵測到系統中斷",
+    "lastUpdated": "最後更新：",
+    "currentStatus": "當前狀態",
+    "currentStatusDesc": "所有服務在全球區域即時監控。",
+    "services": {
+      "guard": "Panguard Guard -- 端點防護",
+      "scan": "Panguard Scan -- 安全稽核",
+      "chat": "Panguard Chat -- AI 副駕",
+      "trap": "Panguard Trap -- 蜜罐系統",
+      "report": "Panguard Report -- 合規引擎",
+      "dashboard": "儀表板 & 網頁應用",
+      "api": "API & 整合",
+      "threatIntel": "威脅情報來源"
+    },
+    "operational": "正常運行",
+    "degradedLabel": "效能下降",
+    "outageLabel": "中斷",
+    "uptimeHistory": {
+      "title": "30 天正常運行歷史",
+      "desc": "過去 30 天服務可用性的視覺化呈現。",
+      "daysAgo": "30 天前",
+      "today": "今天",
+      "uptimeLabel": "30 天正常運行率：",
+      "degradedPerformance": "效能下降"
+    },
+    "recentIncidents": {
+      "title": "近期事件",
+      "desc": "過去的事件和計畫維護，附解決詳情。",
+      "resolved": "已解決",
+      "investigating": "調查中",
+      "monitoring": "監控中"
+    },
+    "noIncidents": "沒有近期事件。所有系統一直穩定運行。",
+    "getUpdates": {
+      "title": "取得狀態更新",
+      "desc": "訂閱以在服務狀態變化時立即接收通知。掌握計畫維護和事件解決的最新資訊。",
+      "subscribe": "訂閱",
+      "success": "已訂閱。你將在 {email} 收到狀態更新。",
+      "error": "出了點問題。請重試。"
+    },
+    "channels": {
+      "rss": "RSS 訂閱",
+      "slack": "Slack",
+      "email": "Email 摘要",
+      "note": "更多通知頻道即將推出。"
+    }
+  },
+  "waitlistForm": {
+    "placeholder": "you@company.com",
+    "joinWaitlist": "加入候補名單",
+    "joining": "加入中...",
+    "checks": {
+      "priority": "優先使用權",
+      "feedback": "直接回饋管道",
+      "founding": "創始會員定價"
+    },
+    "successTitle": "你已在名單中。",
+    "successDesc": "我們已發送確認信至 {email}。我們會在你的存取準備好時聯繫你。",
+    "betaNote": "私人測試 2026 Q2 啟動"
+  },
+  "errorValidation": {
+    "emailRequired": "請輸入你的電子郵件地址。",
+    "emailInvalid": "請輸入有效的電子郵件地址。",
+    "submitFailed": "出了點問題。請重試。"
+  },
+  "notFound": {
+    "title": "找不到頁面",
+    "description": "你尋找的頁面不存在或已被移動。如果你認為這是錯誤，請聯繫我們的支援團隊。",
+    "backHome": "返回首頁"
+  },
+  "legalNav": {
+    "heading": "法律條款",
+    "privacy": "隱私政策",
+    "terms": "服務條款",
+    "dpa": "資料處理協議",
+    "cookies": "Cookie 政策",
+    "acceptableUse": "合理使用政策",
+    "responsibleDisclosure": "弱點揭露政策",
+    "sla": "服務等級協議",
+    "securityWhitepaper": "安全白皮書"
+  },
+  "comingSoon": {
+    "badge": "即將推出",
+    "description": "我們正在開發中。加入搶先體驗計畫，成為第一個知道的人。",
+    "success": "你已在名單中。準備好時我們會通知你。",
+    "notifyMe": "通知我",
+    "error": "出了點問題。請重試。",
+    "backHome": "返回首頁"
+  }
+}

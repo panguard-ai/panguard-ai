@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://panguard.ai/sitemap.xml
