@@ -1,5 +1,7 @@
-FROM node:22-slim AS base
-RUN npm install -g pnpm@9
+FROM node:22 AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 WORKDIR /app
 
@@ -30,9 +32,9 @@ COPY tsconfig.json ./
 RUN pnpm -r run build
 
 # Production image
-FROM node:22-slim AS production
+FROM node:22-alpine AS production
 
-RUN groupadd -r panguard && useradd -r -g panguard panguard
+RUN addgroup -S panguard && adduser -S -G panguard panguard
 
 WORKDIR /app
 
