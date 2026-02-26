@@ -11,6 +11,9 @@ import DashboardOverview from './pages/dashboard/DashboardOverview';
 import DashboardScan from './pages/dashboard/DashboardScan';
 import DashboardReport from './pages/dashboard/DashboardReport';
 import DashboardThreat from './pages/dashboard/DashboardThreat';
+import DashboardGuard from './pages/dashboard/DashboardGuard';
+import DashboardTrap from './pages/dashboard/DashboardTrap';
+import DashboardChat from './pages/dashboard/DashboardChat';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import WaitlistVerify from './pages/WaitlistVerify';
@@ -39,6 +42,9 @@ export default function App() {
         <Route path="scan" element={<DashboardScan />} />
         <Route path="report" element={<DashboardReport />} />
         <Route path="threat" element={<DashboardThreat />} />
+        <Route path="guard" element={<DashboardGuard />} />
+        <Route path="trap" element={<DashboardTrap />} />
+        <Route path="chat" element={<DashboardChat />} />
       </Route>
     </Routes>
   );
