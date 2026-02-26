@@ -2,26 +2,123 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: #F5F1E8;
+  background: #1A1614;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+::selection {
+  background: rgba(139, 154, 142, 0.3);
+  color: #F5F1E8;
+}
+
+/* Subtle grid background for hero */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(139, 154, 142, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 154, 142, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Breathing animation for ComingSoon shield */
+@keyframes breathe {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
   }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* Sage glow card effect */
+.card-glow {
+  box-shadow: 0 0 0 1px rgba(139, 154, 142, 0.15),
+              0 4px 24px rgba(139, 154, 142, 0.06);
+}
+
+.card-glow:hover {
+  box-shadow: 0 0 0 1px rgba(139, 154, 142, 0.3),
+              0 8px 32px rgba(139, 154, 142, 0.1);
+}
+
+/* Cursor-following spotlight effect for cards */
+.card-spotlight {
+  position: relative;
+  overflow: hidden;
+}
+.card-spotlight::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(139, 154, 142, 0.08), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  top: var(--mouse-y, 50%);
+  left: var(--mouse-x, 50%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.card-spotlight:hover::before {
+  opacity: 1;
+}
+
+/* Underline reveal animation for links */
+.link-reveal {
+  background-image: linear-gradient(#8B9A8E, #8B9A8E);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease;
+}
+.link-reveal:hover {
+  background-size: 100% 1px;
+}
+
+/* Section gradient transitions (replaces hard border-b) */
+.section-fade::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 154, 142, 0.2) 30%,
+    rgba(139, 154, 142, 0.2) 70%,
+    transparent
+  );
+}
+
+/* Shield spinner animation */
+@keyframes shield-spin {
+  0% { transform: rotate(0deg); opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { transform: rotate(360deg); opacity: 0.6; }
+}
+
+/* Pulse animation */
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0; }
+  100% { transform: scale(0.8); opacity: 0.5; }
+}
+
+/* Scan line animation */
+@keyframes scan-line {
+  0% { top: 0; }
+  50% { top: 100%; }
+  100% { top: 0; }
+}
+
+/* Infinite scroll for logo bars */
+@keyframes scroll-x {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
