@@ -37,6 +37,7 @@
     "docs": "Docs",
     "useCases": "Use Cases",
     "startFreeScan": "Start Free Scan",
+    "getStarted": "Get Started",
     "productLinks": {
       "overview": "Product Overview",
       "overviewDesc": "See the full platform",
@@ -138,6 +139,7 @@
       "subtitle2": "So we built security that doesn't need a screen.",
       "subtitle3": "API for your agent. CLI for you. Dashboard for no one.",
       "freeScan": "Free Scan",
+      "getStarted": "Get Started",
       "github": "GitHub",
       "badges": {
         "mit": "MIT Open Source",
@@ -250,7 +252,8 @@
       "badge3": "Made in Taiwan",
       "btnGithub": "GitHub",
       "btnDocs": "Documentation",
-      "btnScan": "Free Scan"
+      "btnScan": "Free Scan",
+      "btnEarlyAccess": "Get Early Access"
     },
     "techReveal": {
       "overline": "Under the Hood",
