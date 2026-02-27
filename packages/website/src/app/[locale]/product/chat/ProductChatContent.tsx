@@ -16,23 +16,7 @@ const featureIcons = [AlertIcon, ScanIcon, NetworkIcon, AnalyticsIcon, DeployIco
 const featureKeys = ["item1", "item2", "item3", "item4", "item5", "item6"] as const;
 
 const useCaseIcons = [TerminalIcon, TeamIcon, EnterpriseIcon];
-const useCaseData = [
-  {
-    title: "Solo Developer",
-    description:
-      "You are in a LINE group with your Panguard Chat bot. At 3 AM, it messages you: 'Unusual outbound traffic from your API server. Blocked a data exfiltration attempt. Details attached.' You go back to sleep.",
-  },
-  {
-    title: "Engineering Team",
-    description:
-      "Your team's Slack #security channel gets real-time updates. When a developer accidentally exposes an internal service, Panguard Chat notifies the channel immediately and suggests a fix. The developer patches it in minutes.",
-  },
-  {
-    title: "Business Owner",
-    description:
-      "You do not speak security. You just want to know if your business is safe. Every week, Panguard Chat sends a simple summary: 'Everything normal. 47 threats blocked. No action required.' When something needs your attention, it tells you exactly what to do.",
-  },
-];
+const useCaseKeys = ["item1", "item2", "item3"] as const;
 
 /* ─── Chat demo message keys (all from Panguard — notification flow) ─── */
 const chatMessageKeys = ["msg1", "msg2", "msg3", "msg4", "msg5"] as const;
@@ -171,17 +155,17 @@ export default function ProductChatContent() {
           title={t("useCases.title")}
         />
         <div className="grid sm:grid-cols-3 gap-6 mt-14">
-          {useCaseData.map((uc, i) => {
+          {useCaseKeys.map((key, i) => {
             const Icon = useCaseIcons[i];
             return (
-              <FadeInUp key={uc.title} delay={i * 0.1}>
+              <FadeInUp key={key} delay={i * 0.1}>
                 <div className="bg-surface-2 rounded-xl border border-border p-6 h-full card-glow">
                   <Icon className="w-6 h-6 text-brand-sage mb-4" />
                   <p className="text-sm font-bold text-text-primary mb-2">
-                    {uc.title}
+                    {t(`useCases.${key}.title`)}
                   </p>
                   <p className="text-xs text-text-secondary leading-relaxed">
-                    {uc.description}
+                    {t(`useCases.${key}.desc`)}
                   </p>
                 </div>
               </FadeInUp>

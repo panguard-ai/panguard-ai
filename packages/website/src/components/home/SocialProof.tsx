@@ -43,7 +43,15 @@ export default function SocialProof() {
 
       <FadeInUp delay={0.4}>
         <p className="text-xs text-text-muted text-center mt-8 max-w-xl mx-auto leading-relaxed">
-          {t("footnote")}
+          {t("footnote")}{" "}
+          <a
+            href="https://github.com/eeee2345/openclaw-security"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-sage hover:underline"
+          >
+            {t("githubLink")}
+          </a>
         </p>
       </FadeInUp>
     </SectionWrapper>

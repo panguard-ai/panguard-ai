@@ -4,7 +4,7 @@ import { Link } from "@/navigation";
 import BrandLogo from "./ui/BrandLogo";
 
 const socials = [
-  { icon: Github, href: "https://github.com/panguard", label: "GitHub" },
+  { icon: Github, href: "https://github.com/eeee2345/openclaw-security", label: "GitHub" },
   { icon: Twitter, href: "https://x.com/panguard_ai", label: "Twitter" },
   { icon: Linkedin, href: "https://linkedin.com/company/panguard-ai", label: "LinkedIn" },
 ];
@@ -32,32 +32,13 @@ export default function Footer() {
         { label: t("chat"), href: "/product/chat" },
         { label: t("trap"), href: "/product/trap" },
         { label: t("report"), href: "/product/report" },
-        { label: t("compliance"), href: "/compliance" },
-        { label: t("integrations"), href: "/integrations" },
       ],
     },
     {
       title: t("resources"),
       links: [
         { label: t("documentation"), href: "/docs" },
-        { label: t("apiReference"), href: "/docs/api" },
-        { label: t("blog"), href: "/blog" },
-        { label: t("resourceCenter"), href: "/resources" },
-        { label: t("changelog"), href: "/changelog" },
-        { label: t("statusPage"), href: "/status" },
-      ],
-    },
-    {
-      title: t("company"),
-      links: [
-        { label: t("about"), href: "/company" },
-        { label: t("careers"), href: "/careers" },
-        { label: t("contact"), href: "/contact" },
-        { label: t("press"), href: "/press" },
-        { label: t("partners"), href: "/partners" },
-        { label: t("customers"), href: "/customers" },
-        { label: t("trustCenter"), href: "/trust" },
-        { label: t("security"), href: "/security" },
+        { label: "GitHub", href: "https://github.com/eeee2345/openclaw-security", external: true },
       ],
     },
     {
@@ -65,10 +46,6 @@ export default function Footer() {
       links: [
         { label: t("privacyPolicy"), href: "/legal/privacy" },
         { label: t("termsOfService"), href: "/legal/terms" },
-        { label: t("cookiePolicy"), href: "/legal/cookies" },
-        { label: t("dpa"), href: "/legal/dpa" },
-        { label: t("sla"), href: "/legal/sla" },
-        { label: t("responsibleDisclosure"), href: "/legal/responsible-disclosure" },
       ],
     },
   ];
@@ -76,7 +53,7 @@ export default function Footer() {
   return (
     <footer className="bg-surface-1 border-t border-border py-12 sm:py-16 px-6 lg:px-[120px]">
       <div className="max-w-[1200px] mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
           <div className="col-span-2 md:col-span-1">
             <FooterLogo />
             <p className="text-sm text-text-tertiary mt-3 leading-relaxed">
@@ -87,6 +64,8 @@ export default function Footer() {
                 <a
                   key={s.label}
                   href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={s.label}
                   className="text-text-muted hover:text-text-secondary transition-colors"
                 >
@@ -104,12 +83,23 @@ export default function Footer() {
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-text-secondary hover:text-text-primary transition-colors duration-200"
-                    >
-                      {link.label}
-                    </Link>
+                    {"external" in link && link.external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-text-secondary hover:text-text-primary transition-colors duration-200"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-sm text-text-secondary hover:text-text-primary transition-colors duration-200"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -121,11 +111,6 @@ export default function Footer() {
           <p className="text-xs text-text-muted">
             &copy; {tc("copyright")}
           </p>
-          <div className="flex items-center gap-4 text-xs text-text-muted">
-            <span>{tc("soc2")}</span>
-            <span>&middot;</span>
-            <span>{tc("gdpr")}</span>
-          </div>
         </div>
       </div>
     </footer>
