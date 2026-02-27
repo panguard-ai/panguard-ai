@@ -179,6 +179,135 @@ export default function GettingStartedContent() {
         </div>
       </SectionWrapper>
 
+      {/* Step 5: Understanding Scan Results */}
+      <SectionWrapper dark>
+        <div className="max-w-3xl mx-auto">
+          <FadeInUp>
+            <h2 className="text-xl font-bold text-text-primary mb-2">
+              {t("step5Title")}
+            </h2>
+            <p className="text-text-secondary mb-6">{t("step5Desc")}</p>
+            <div className="space-y-3">
+              <div className="bg-surface-1 border border-border rounded-xl p-4">
+                <p className="text-text-secondary text-sm leading-relaxed">
+                  <span className="font-semibold text-text-primary">Score: </span>
+                  {t("step5Score")}
+                </p>
+              </div>
+              <div className="bg-surface-1 border border-border rounded-xl p-4">
+                <p className="text-text-secondary text-sm leading-relaxed">
+                  <span className="font-semibold text-text-primary">Grade: </span>
+                  {t("step5Grade")}
+                </p>
+              </div>
+              <div className="bg-surface-1 border border-border rounded-xl p-4">
+                <p className="text-text-secondary text-sm leading-relaxed">
+                  <span className="font-semibold text-text-primary">Findings: </span>
+                  {t("step5Findings")}
+                </p>
+              </div>
+            </div>
+          </FadeInUp>
+        </div>
+      </SectionWrapper>
+
+      {/* Step 6: JSON Output for AI Agents */}
+      <SectionWrapper>
+        <div className="max-w-3xl mx-auto">
+          <FadeInUp>
+            <h2 className="text-xl font-bold text-text-primary mb-2">
+              {t("step6Title")}
+            </h2>
+            <p className="text-text-secondary mb-6">{t("step6Desc")}</p>
+            <CodeBlock code="panguard scan --json" label="Terminal" />
+            <p className="text-xs text-text-muted mt-3 mb-4">{t("step6Note")}</p>
+            <p className="text-text-secondary text-sm mb-3">{t("step6Output")}</p>
+            <CodeBlock
+              code={`{
+  "version": "0.5.0",
+  "target": "localhost",
+  "risk_score": 35,
+  "grade": "C",
+  "findings_count": 8,
+  "findings": [ ... ],
+  "agent_friendly": true
+}`}
+              label="JSON"
+            />
+            <p className="text-text-secondary text-sm mt-4">{t("step6Integration")}</p>
+          </FadeInUp>
+        </div>
+      </SectionWrapper>
+
+      {/* Step 7: Remote Scanning */}
+      <SectionWrapper dark>
+        <div className="max-w-3xl mx-auto">
+          <FadeInUp>
+            <h2 className="text-xl font-bold text-text-primary mb-2">
+              {t("step7Title")}
+            </h2>
+            <p className="text-text-secondary mb-6">{t("step7Desc")}</p>
+            <CodeBlock
+              code={`panguard scan --target example.com\npanguard scan --target 1.2.3.4 --json`}
+              label="Terminal"
+            />
+            <p className="text-xs text-text-muted mt-3">{t("step7Note")}</p>
+          </FadeInUp>
+        </div>
+      </SectionWrapper>
+
+      {/* Step 8: Compliance Reports */}
+      <SectionWrapper>
+        <div className="max-w-3xl mx-auto">
+          <FadeInUp>
+            <h2 className="text-xl font-bold text-text-primary mb-2">
+              {t("step8Title")}
+            </h2>
+            <p className="text-text-secondary mb-6">{t("step8Desc")}</p>
+            <CodeBlock
+              code={`panguard report generate --framework iso27001\npanguard report generate --framework soc2\npanguard report generate --framework tcsa`}
+              label="Terminal"
+            />
+            <p className="text-text-secondary text-sm mt-4 mb-2">{t("step8Frameworks")}</p>
+            <p className="text-xs text-text-muted">{t("step8Note")}</p>
+          </FadeInUp>
+        </div>
+      </SectionWrapper>
+
+      {/* Step 9: More CLI Commands */}
+      <SectionWrapper dark>
+        <div className="max-w-3xl mx-auto">
+          <FadeInUp>
+            <h2 className="text-xl font-bold text-text-primary mb-2">
+              {t("step9Title")}
+            </h2>
+            <p className="text-text-secondary mb-6">{t("step9Desc")}</p>
+            <div className="space-y-4">
+              <div>
+                <p className="text-text-secondary text-sm mb-2">{t("step9Whoami")}</p>
+                <CodeBlock code="panguard whoami" label="Terminal" />
+              </div>
+              <div>
+                <p className="text-text-secondary text-sm mb-2">{t("step9Chat")}</p>
+                <CodeBlock code="panguard chat config" label="Terminal" />
+              </div>
+              <div>
+                <p className="text-text-secondary text-sm mb-2">{t("step9Trap")}</p>
+                <CodeBlock code="panguard trap deploy --services ssh,http" label="Terminal" />
+              </div>
+              <div>
+                <p className="text-text-secondary text-sm mb-2">{t("step9Report")}</p>
+                <CodeBlock code="panguard report list" label="Terminal" />
+              </div>
+              <div>
+                <p className="text-text-secondary text-sm mb-2">{t("step9Status")}</p>
+                <CodeBlock code="panguard guard status" label="Terminal" />
+              </div>
+            </div>
+          </FadeInUp>
+        </div>
+      </SectionWrapper>
+
       {/* Next steps CTA */}
       <SectionWrapper dark>
         <div className="max-w-3xl mx-auto text-center">
