@@ -16,7 +16,7 @@ export function trapCommand(): Command {
     .option('--services <types>', 'Comma-separated service types (ssh,http,ftp,...)')
     .option('--data-dir <path>', 'Data directory / \u8CC7\u6599\u76EE\u9304')
     .option('--no-cloud', 'Disable Threat Cloud upload')
-    .action(withAuth('team', async (opts: Record<string, string | undefined>) => {
+    .action(withAuth('pro', async (opts: Record<string, string | undefined>) => {
       const args = ['start'];
       if (opts['services']) args.push('--services', opts['services']);
       if (opts['dataDir']) args.push('--data-dir', opts['dataDir']);
@@ -26,7 +26,7 @@ export function trapCommand(): Command {
 
   cmd.command('stop')
     .description('Stop honeypot services / \u505C\u6B62\u871C\u7F50\u670D\u52D9')
-    .action(withAuth('team', async () => {
+    .action(withAuth('pro', async () => {
       await executeCli(['stop']);
     }));
 

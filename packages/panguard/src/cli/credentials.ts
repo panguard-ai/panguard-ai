@@ -12,14 +12,15 @@ import { homedir } from 'node:os';
 export const CREDENTIALS_DIR = join(homedir(), '.panguard');
 export const CREDENTIALS_PATH = join(CREDENTIALS_DIR, 'credentials.json');
 
-export type Tier = 'free' | 'solo' | 'starter' | 'team' | 'business' | 'enterprise';
+export type Tier = 'free' | 'solo' | 'pro' | 'enterprise' | 'starter' | 'team' | 'business';
 
 export const TIER_LEVEL: Record<Tier, number> = {
   free: 0,
   solo: 1,
-  starter: 2,
-  team: 3,
-  business: 4,
+  starter: 2,  // legacy
+  pro: 2,
+  team: 3,     // legacy alias
+  business: 4, // legacy
   enterprise: 5,
 };
 
@@ -94,12 +95,13 @@ export function isTokenExpired(creds: StoredCredentials): boolean {
  */
 export function tierDisplayName(tier: Tier): string {
   const names: Record<Tier, string> = {
-    free: 'Scan (Free)',
+    free: 'Free',
     solo: 'Solo',
-    starter: 'Starter',
-    team: 'Team',
-    business: 'Business',
+    pro: 'Pro',
     enterprise: 'Enterprise',
+    starter: 'Starter',  // legacy
+    team: 'Pro',          // legacy → Pro
+    business: 'Pro',      // legacy → Pro
   };
   return names[tier] ?? tier;
 }
