@@ -12,8 +12,17 @@ logs/
 .DS_Store
 Thumbs.db
 *.db
-brand-assets/output/
+
+# Design assets (stored separately)
+brand-assets/
+figma-plugin-components/
+figma-plugin-dashboard/
+figma-plugin-design-tokens/
+figma-plugin-mobile/
+figma-plugin-website/
+panguard design/
 
 # Next.js
+packages/website/.next/
 .next/
 .vercel/

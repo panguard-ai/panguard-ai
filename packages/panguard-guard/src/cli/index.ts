@@ -13,6 +13,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import {
   c, banner, header, box, symbols, divider, statusPanel, spinner,
+  setLogLevel,
 } from '@openclaw/core';
 import type { StatusItem } from '@openclaw/core';
 import { GuardEngine } from '../guard-engine.js';
@@ -31,10 +32,11 @@ export const CLI_VERSION = '0.5.0';
 export async function runCLI(args: string[]): Promise<void> {
   const command = args[0] ?? 'help';
   const dataDir = extractOption(args, '--data-dir') ?? DEFAULT_DATA_DIR;
+  const verbose = args.includes('--verbose');
 
   switch (command) {
     case 'start':
-      await commandStart(dataDir);
+      await commandStart(dataDir, verbose);
       break;
     case 'stop':
       commandStop(dataDir);
@@ -71,7 +73,12 @@ export async function runCLI(args: string[]): Promise<void> {
 }
 
 /** Start the guard engine / 啟動守護引擎 */
-async function commandStart(dataDir: string): Promise<void> {
+async function commandStart(dataDir: string, verbose = false): Promise<void> {
+  // Default quiet mode: suppress structured JSON logs
+  if (!verbose) {
+    setLogLevel('silent');
+  }
+
   console.log(banner());
 
   const pidFile = new PidFile(dataDir);
@@ -96,16 +103,46 @@ async function commandStart(dataDir: string): Promise<void> {
   await engine.start();
   sp.succeed('PanguardGuard started');
 
-  // Status box (matching mockup status panel)
+  // Status box
   console.log(statusPanel('PANGUARD AI Guard Active', [
     { label: 'Status', value: c.safe('PROTECTED'), status: 'safe' },
     { label: 'PID', value: c.sage(String(process.pid)) },
     { label: 'Mode', value: c.sage(config.mode) },
     { label: 'Data Dir', value: c.dim(dataDir) },
-    ...(config.dashboardEnabled
-      ? [{ label: 'Dashboard', value: c.underline(`http://localhost:${config.dashboardPort}`) }]
-      : []),
   ]));
+
+  // Threat intelligence sharing transparency message
+  console.log(`  ${symbols.info} Threat intelligence sharing: ${c.safe('enabled')}`);
+  console.log(`  ${c.dim('  Detected threats are anonymously uploaded to Panguard Threat Cloud')}`);
+  console.log(`  ${c.dim('  Disable: panguard config set threat-cloud.upload false')}`);
+  console.log('');
+
+  // Quiet mode: register human-friendly event callback
+  if (!verbose) {
+    let lastStatusLine = '';
+    engine.setEventCallback((type, data) => {
+      if (type === 'status') {
+        const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+        const events = Number(data['eventsProcessed'] ?? 0);
+        const threats = Number(data['threatsDetected'] ?? 0);
+        const uploaded = Number(data['uploaded'] ?? 0);
+        const line = `  [${time}] Events: ${events.toLocaleString()} | Threats: ${threats} | Uploaded: ${uploaded}`;
+        if (line !== lastStatusLine) {
+          console.log(c.dim(line));
+          lastStatusLine = line;
+        }
+      } else if (type === 'threat') {
+        const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+        console.log('');
+        console.log(`  ${symbols.warn} ${c.caution(`[${time}]`)} Threat detected`);
+        console.log(`      Type: ${c.bold(String(data['category'] ?? 'unknown'))}`);
+        console.log(`      Source: ${c.sage(String(data['sourceIP'] ?? 'unknown'))}`);
+        console.log(`      Confidence: ${data['confidence']}%`);
+        console.log(`      Action: ${data['action']}`);
+        console.log('');
+      }
+    });
+  }
 
   console.log(c.dim('  Press Ctrl+C to stop'));
   console.log('');
@@ -242,6 +279,7 @@ function printHelp(): void {
   console.log(divider('Options'));
   console.log('');
   console.log(`  ${c.sage('--data-dir <path>'.padEnd(22))} Data directory ${c.dim('(default: ~/.panguard-guard)')}`);
+  console.log(`  ${c.sage('--verbose'.padEnd(22))} Show all event logs ${c.dim('(default: quiet mode)')}`);
   console.log(`  ${c.sage('--license-key <key>'.padEnd(22))} License key for install-script`);
   console.log('');
   console.log(c.dim(`  Version: ${CLI_VERSION}`));
