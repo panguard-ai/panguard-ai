@@ -17,13 +17,9 @@ export default function Comparison() {
 
   const rows = [
     { feature: t("price"), cs: t("csPrice"), def: t("defPrice"), pg: t("pgPrice") },
-    { feature: t("setup"), cs: t("csSetup"), def: t("defSetup"), pg: t("pgSetup") },
-    { feature: t("interface"), cs: t("csInterface"), def: t("defInterface"), pg: t("pgInterface") },
     { feature: t("afterDetection"), cs: t("csAfter"), def: t("defAfter"), pg: t("pgAfter") },
     { feature: t("reporting"), cs: t("csReporting"), def: t("defReporting"), pg: t("pgReporting") },
-    { feature: t("bestFor"), cs: t("csBest"), def: t("defBest"), pg: t("pgBest") },
     { feature: t("developerPlan"), cs: "no", def: "no", pg: "yes" },
-    { feature: t("autoCompliance"), cs: "no", def: "no", pg: "yes" },
     { feature: t("aiChat"), cs: "no", def: "no", pg: "yes" },
   ];
 

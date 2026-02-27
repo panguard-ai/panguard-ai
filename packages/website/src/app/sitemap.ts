@@ -59,9 +59,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return 0.6;
   };
 
+  // English = no prefix (as-needed), Chinese = /zh prefix
+  const localeUrl = (locale: string, path: string) => {
+    const suffix = path === "/" ? "" : path;
+    return locale === "en" ? `${base}${suffix}` : `${base}/${locale}${suffix}`;
+  };
+
   return locales.flatMap((locale) =>
     pages.map((path) => ({
-      url: `${base}/${locale}${path === "/" ? "" : path}`,
+      url: localeUrl(locale, path),
       lastModified: now,
       changeFrequency: getFrequency(path),
       priority: getPriority(path),
@@ -69,7 +75,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         languages: Object.fromEntries(
           locales.map((l) => [
             l === "zh" ? "zh-TW" : l,
-            `${base}/${l}${path === "/" ? "" : path}`,
+            localeUrl(l, path),
           ])
         ),
       },
