@@ -1,11 +1,11 @@
 #!/bin/bash
-# OpenClaw Security - Linux Build Script
-# OpenClaw 安全平台 - Linux 建置腳本
+# Panguard Security - Linux Build Script
+# Panguard 安全平台 - Linux 建置腳本
 
 set -euo pipefail
 
 echo "================================"
-echo "OpenClaw Security - Linux Build"
+echo "Panguard Security - Linux Build"
 echo "================================"
 echo ""
 

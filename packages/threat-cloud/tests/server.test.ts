@@ -24,7 +24,7 @@ describe('ThreatCloudDB', () => {
       attackSourceIP: '192.168.1.0',
       attackType: 'brute_force',
       mitreTechnique: 'T1110',
-      sigmaRuleMatched: 'openclaw-001',
+      sigmaRuleMatched: 'panguard-001',
       timestamp: '2026-02-25T10:00:00Z',
       industry: 'finance',
       region: 'TW',

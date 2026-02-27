@@ -8,7 +8,7 @@
 
 | 工具 | GitHub | 用途 | 怎麼用在我們的專案 |
 |------|--------|------|-------------------|
-| **centminmod/explain-openclaw** | https://github.com/centminmod/explain-openclaw | 已有人做過 Panguard 安全稽核文件，含 5 個 AI 模型的交叉分析 | **直接參考**。裡面有完整的安全漏洞清單、加固步驟、Cloudflare WAF 規則。省掉你自己做安全稽核的時間 |
+| **centminmod/explain-panguard** | https://github.com/centminmod/explain-panguard | 已有人做過 Panguard 安全稽核文件，含 5 個 AI 模型的交叉分析 | **直接參考**。裡面有完整的安全漏洞清單、加固步驟、Cloudflare WAF 規則。省掉你自己做安全稽核的時間 |
 | **keytar** (npm) | https://github.com/nicedoc/keytar | 跨平台系統憑證管理（Win Credential Manager / macOS Keychain / Linux libsecret） | 取代 Panguard 的明文憑證儲存。`npm install keytar` 直接用 |
 
 ---
@@ -109,7 +109,7 @@
 2. **⭐ SigmaHQ/sigma** — 3000+ 條現成偵測規則。不用自己寫偵測邏輯。
 3. **⭐ systeminformation** — Node.js 系統資訊收集。Discovery 引擎的基礎。
 4. **⭐ SwiftOnSecurity/sysmon-config** — Windows 該監控什麼事件的標準答案。
-5. **⭐ centminmod/explain-openclaw** — Panguard 安全稽核文件。Phase 1 直接用。
+5. **⭐ centminmod/explain-panguard** — Panguard 安全稽核文件。Phase 1 直接用。
 
 ---
 
