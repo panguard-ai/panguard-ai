@@ -60,6 +60,7 @@ import {
   logAuditEvent,
   SyslogAdapter,
 } from '@panguard-ai/security-hardening';
+import { FalcoMonitor } from './monitors/falco-monitor.js';
 
 const logger = createLogger('panguard-guard:engine');
 
@@ -160,6 +161,7 @@ export class GuardEngine {
   private watchdog: Watchdog | null = null;
   private monitorEngine: MonitorEngine | null = null;
   private syslogAdapter: SyslogAdapter | null = null;
+  private falcoMonitor: FalcoMonitor | null = null;
 
   // State / 狀態
   private running = false;
@@ -339,6 +341,16 @@ export class GuardEngine {
 
     this.monitorEngine.start();
 
+    // Start Falco eBPF monitor (optional, graceful degradation)
+    // 啟動 Falco eBPF 監控（可選，優雅降級）
+    this.falcoMonitor = new FalcoMonitor();
+    const falcoAvailable = await this.falcoMonitor.checkAvailability();
+    if (falcoAvailable) {
+      this.falcoMonitor.on('event', (event) => void this.processEvent(event));
+      await this.falcoMonitor.start();
+      logger.info('Falco eBPF kernel-level monitoring active');
+    }
+
     // Start dashboard if enabled / 啟動儀表板（如已啟用）
     const license = validateLicense(this.config.licenseKey);
     if (this.config.dashboardEnabled && hasFeature(license, 'dashboard')) {
@@ -405,6 +417,10 @@ export class GuardEngine {
     if (this.dashboard) await this.dashboard.stop();
     if (this.watchdog) this.watchdog.stop();
     if (this.syslogAdapter) this.syslogAdapter = null;
+    if (this.falcoMonitor) {
+      this.falcoMonitor.stop();
+      this.falcoMonitor = null;
+    }
 
     // Save baseline / 儲存基線
     saveBaseline(this.baselinePath, this.baseline);
