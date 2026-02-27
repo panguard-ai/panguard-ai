@@ -9,6 +9,7 @@
 
 import { c, stripAnsi, visLen } from '@panguard-ai/core';
 import type { Tier } from './credentials.js';
+import { TIER_LEVEL } from './credentials.js';
 
 // ── Brand ASCII Block Letter Logo ─────────────────────────────────────
 // Half-block character style for modern terminal rendering.
@@ -56,9 +57,9 @@ const TIER_COLORS: Record<string, (s: string) => string> = {
   enterprise: c.critical,
 };
 
-/** Tier badge for menu display (e.g. "Free", "Solo 🔒", "Pro 🔒") */
-export function tierLabel(tier: Tier | string): string {
-  const colorFn = TIER_COLORS[tier] ?? c.dim;
+/** Tier badge for menu display. Shows lock only when user tier is insufficient. */
+export function tierLabel(requiredTier: Tier | string, userTier?: Tier | string): string {
+  const colorFn = TIER_COLORS[requiredTier] ?? c.dim;
   const names: Record<string, string> = {
     free: 'Free',
     solo: 'Solo',
@@ -68,8 +69,11 @@ export function tierLabel(tier: Tier | string): string {
     business: 'Pro',
     enterprise: 'Ent',
   };
-  const name = names[tier] ?? tier;
-  if (tier === 'free') return colorFn(name);
+  const name = names[requiredTier] ?? requiredTier;
+  if (requiredTier === 'free') return colorFn(name);
+  const userLevel = TIER_LEVEL[userTier as Tier] ?? 0;
+  const requiredLevel = TIER_LEVEL[requiredTier as Tier] ?? 0;
+  if (userLevel >= requiredLevel) return colorFn(name);
   return colorFn(name) + ' ' + c.dim('\uD83D\uDD12');
 }
 
