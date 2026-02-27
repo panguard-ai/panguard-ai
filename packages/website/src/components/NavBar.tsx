@@ -115,10 +115,10 @@ export default function NavBar() {
       <div className="hidden lg:flex items-center gap-4">
         <LocaleSwitcher />
         <Link
-          href="/scan"
+          href="/early-access"
           className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-2.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
         >
-          {t("startFreeScan")}
+          {t("getStarted")}
         </Link>
       </div>
 
@@ -170,11 +170,11 @@ export default function NavBar() {
             </a>
             <div className="pt-4 border-t border-border">
               <Link
-                href="/scan"
+                href="/early-access"
                 className="block text-center bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-3"
                 onClick={() => setMobileOpen(false)}
               >
-                {t("startFreeScan")}
+                {t("getStarted")}
               </Link>
             </div>
           </div>

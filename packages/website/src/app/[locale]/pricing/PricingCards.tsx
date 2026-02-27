@@ -20,7 +20,7 @@ interface PlanMeta {
 }
 
 const planMeta: Record<(typeof planKeys)[number], PlanMeta> = {
-  free: { price: 0, unit: "", ctaHref: "/scan", popular: false },
+  free: { price: 0, unit: "", ctaHref: "/early-access", popular: false },
   solo: { price: 9, unit: "/mo", ctaHref: "/early-access", popular: false },
   pro: { price: 19, unit: "/endpoint/mo", ctaHref: "/early-access", popular: true },
   enterprise: { price: null, unit: "", ctaHref: "/contact", popular: false },

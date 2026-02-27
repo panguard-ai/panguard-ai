@@ -146,7 +146,7 @@ export default function ProductScanContent() {
                 {t("cta.cta1")} <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/scan"
+                href="/docs"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t("cta.cta2")}
