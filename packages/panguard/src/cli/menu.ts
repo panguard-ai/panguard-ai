@@ -10,6 +10,7 @@
 import { c, visLen, stripAnsi } from '@panguard-ai/core';
 import { tierLabel } from './theme.js';
 import type { Tier } from './credentials.js';
+import { getLicense } from './auth-guard.js';
 
 export type Lang = 'en' | 'zh-TW';
 
@@ -93,7 +94,7 @@ export function waitForKey(): Promise<string> {
 
 // ── Menu rendering ────────────────────────────────────────────────────
 
-function renderMenuLine(item: MenuItem, selected: boolean): string {
+function renderMenuLine(item: MenuItem, selected: boolean, userTier?: Tier | string): string {
   if (item.separator) {
     return `    ${c.dim(SEP_LINE)}`;
   }
@@ -104,7 +105,7 @@ function renderMenuLine(item: MenuItem, selected: boolean): string {
   // Build right-aligned tier badge
   let badge = '';
   if (item.tier) {
-    badge = tierLabel(item.tier as Tier);
+    badge = tierLabel(item.tier as Tier, userTier);
   }
 
   // Calculate padding for right-alignment
@@ -117,10 +118,10 @@ function renderMenuLine(item: MenuItem, selected: boolean): string {
 }
 
 /** Render the full menu to stdout */
-function drawMenu(items: MenuItem[], selectedIndex: number, footer: string): void {
+function drawMenu(items: MenuItem[], selectedIndex: number, footer: string, userTier?: Tier | string): void {
   for (let i = 0; i < items.length; i++) {
     clearLine();
-    console.log(renderMenuLine(items[i]!, i === selectedIndex));
+    console.log(renderMenuLine(items[i]!, i === selectedIndex, userTier));
   }
   // Footer
   clearLine();
@@ -165,6 +166,8 @@ export async function runArrowMenu(
     selectedIndex = selectableIndices[0]!;
   }
 
+  const { tier: userTier } = getLicense();
+
   const footerText = opts.lang === 'zh-TW'
     ? '\u2191\u2193 \u5C0E\u822A  \u23CE \u9078\u64C7  q \u9000\u51FA  l \u4E2D/EN'
     : '\u2191\u2193 Navigate  \u23CE Select  q Quit  l \u4E2D/EN';
@@ -172,7 +175,7 @@ export async function runArrowMenu(
   hideCursor();
 
   // Initial draw
-  drawMenu(items, selectedIndex, footerText);
+  drawMenu(items, selectedIndex, footerText, userTier);
 
   try {
     while (true) {
@@ -217,7 +220,7 @@ export async function runArrowMenu(
         // Move cursor back up and redraw
         const totalLines = menuLineCount(items);
         cursorUp(totalLines);
-        drawMenu(items, selectedIndex, footerText);
+        drawMenu(items, selectedIndex, footerText, userTier);
       }
     }
   } catch {
