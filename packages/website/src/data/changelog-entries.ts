@@ -104,7 +104,7 @@ export const changelogEntries: ChangelogEntry[] = [
       { type: "feature", text: "Panguard Guard: 24/7 three-layer AI endpoint protection" },
       { type: "feature", text: "Panguard Chat: AI security copilot with Slack integration" },
       { type: "feature", text: "Panguard Report: auto-generated compliance reports" },
-      { type: "feature", text: "847 Sigma detection rules" },
+      { type: "feature", text: "3,155+ Sigma detection rules (45 Panguard original + 3,110 SigmaHQ community)" },
       { type: "feature", text: "Context memory learning system" },
     ],
   },

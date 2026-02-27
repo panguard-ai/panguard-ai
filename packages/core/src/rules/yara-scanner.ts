@@ -43,6 +43,7 @@ interface YaraRuleFile {
   path: string;
   name: string;
   content: string;
+  source?: 'custom' | 'community';
 }
 
 /**
@@ -58,7 +59,7 @@ export class YaraScanner {
   private compiledPatterns: CompiledPattern[] = [];
   private yaraAvailable = false;
 
-  /** Load YARA rules from a directory / 從目錄載入 YARA 規則 */
+  /** Load YARA rules from a directory (non-recursive) / 從目錄載入 YARA 規則（非遞迴） */
   async loadRules(rulesDir: string): Promise<number> {
     const resolvedDir = resolve(rulesDir);
     this.ruleFiles = [];
@@ -86,6 +87,115 @@ export class YaraScanner {
 
     logger.info(`Loaded ${this.ruleFiles.length} YARA rule files (native YARA: ${this.yaraAvailable ? 'available' : 'fallback mode'})`);
     return this.ruleFiles.length;
+  }
+
+  /**
+   * Recursively load YARA rules from a directory tree
+   * 從目錄樹遞迴載入 YARA 規則
+   *
+   * @param rulesDir - Root directory to scan / 要掃描的根目錄
+   * @param source - Source tag for loaded rules / 載入規則的來源標記
+   * @returns Number of rule files loaded / 載入的規則檔數量
+   */
+  async loadRulesRecursive(rulesDir: string, source?: 'custom' | 'community'): Promise<number> {
+    const resolvedDir = resolve(rulesDir);
+    const files: YaraRuleFile[] = [];
+
+    const walk = async (dir: string): Promise<void> => {
+      let entries: Awaited<ReturnType<typeof readdir>>;
+      try {
+        entries = await readdir(dir, { withFileTypes: true });
+      } catch {
+        return;
+      }
+      for (const entry of entries) {
+        const fullPath = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          await walk(fullPath);
+        } else if (entry.isFile()) {
+          const ext = extname(entry.name).toLowerCase();
+          if (ext !== '.yar' && ext !== '.yara') continue;
+          try {
+            const content = await readFile(fullPath, 'utf-8');
+            files.push({ path: fullPath, name: entry.name, content, source });
+          } catch {
+            // Skip unreadable files
+          }
+        }
+      }
+    };
+
+    try {
+      await walk(resolvedDir);
+    } catch (err) {
+      logger.warn(`Failed to recursively load YARA rules from ${rulesDir}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+
+    logger.info(`Recursively loaded ${files.length} YARA rule files from ${rulesDir} (source: ${source ?? 'unset'})`);
+    return files.length;
+  }
+
+  /**
+   * Load rules from both custom and community directories
+   * 從自訂和社群目錄載入規則
+   *
+   * @param customDir - Custom rules directory / 自訂規則目錄
+   * @param communityDir - Optional community rules directory / 可選的社群規則目錄
+   * @returns Total number of rule files loaded / 載入的規則檔總數
+   */
+  async loadAllRules(customDir: string, communityDir?: string): Promise<number> {
+    this.ruleFiles = [];
+    this.compiledPatterns = [];
+
+    // Load custom rules recursively / 遞迴載入自訂規則
+    await this.loadFromDirRecursive(customDir, 'custom');
+
+    // Load community rules if directory exists / 如果目錄存在則載入社群規則
+    if (communityDir !== undefined) {
+      await this.loadFromDirRecursive(communityDir, 'community');
+    }
+
+    // Initialize scanning engine / 初始化掃描引擎
+    this.yaraAvailable = await this.checkNativeYara();
+    this.compiledPatterns = this.compilePatterns();
+
+    logger.info(`Loaded ${this.ruleFiles.length} total YARA rule files (native YARA: ${this.yaraAvailable ? 'available' : 'fallback mode'})`);
+    return this.ruleFiles.length;
+  }
+
+  /** Recursively collect .yar/.yara files and append to this.ruleFiles */
+  private async loadFromDirRecursive(dir: string, source: 'custom' | 'community'): Promise<void> {
+    const resolvedDir = resolve(dir);
+
+    const walk = async (currentDir: string): Promise<void> => {
+      let entries: Awaited<ReturnType<typeof readdir>>;
+      try {
+        entries = await readdir(currentDir, { withFileTypes: true });
+      } catch {
+        return;
+      }
+      for (const entry of entries) {
+        const fullPath = join(currentDir, entry.name);
+        if (entry.isDirectory()) {
+          await walk(fullPath);
+        } else if (entry.isFile()) {
+          const ext = extname(entry.name).toLowerCase();
+          if (ext !== '.yar' && ext !== '.yara') continue;
+          try {
+            const content = await readFile(fullPath, 'utf-8');
+            this.ruleFiles.push({ path: fullPath, name: entry.name, content, source });
+          } catch {
+            // Skip unreadable files
+          }
+        }
+      }
+    };
+
+    try {
+      await walk(resolvedDir);
+    } catch (err) {
+      logger.warn(`Failed to load YARA rules from ${dir}: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   /** Get number of loaded rule files / 取得已載入的規則檔數量 */
@@ -148,6 +258,10 @@ export class YaraScanner {
     const severity = this.inferSeverity(topMatch);
     const mitreTechnique = topMatch.meta['mitre'] ?? topMatch.meta['mitre_attack'] ?? undefined;
 
+    // Determine source from the rule file that produced the top match / 從產生最高比對的規則檔判斷來源
+    const matchedRuleFile = this.ruleFiles.find(rf => rf.name === topMatch.namespace);
+    const ruleSource = matchedRuleFile?.source;
+
     return {
       id: `yara-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       timestamp: new Date(result.scannedAt),
@@ -163,6 +277,7 @@ export class YaraScanner {
         yaraRules: result.matches.map(m => m.rule),
         tags: result.matches.flatMap(m => m.tags),
         mitreTechnique,
+        ruleSource,
       },
       metadata: {},
     };
