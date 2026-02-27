@@ -11,10 +11,10 @@
  * - T1595: Active Scanning
  * - T1083: File and Directory Discovery
  *
- * @module @openclaw/panguard-trap/services/http-trap
+ * @module @panguard-ai/panguard-trap/services/http-trap
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { TrapServiceConfig } from '../types.js';
 import { BaseTrapService } from './base-service.js';
 

@@ -1,8 +1,8 @@
 title: Container Escape Attempt
-id: openclaw-023
+id: panguard-023
 status: stable
 description: Detects container breakout attempts including namespace manipulation, privileged container abuse, and host filesystem access from within containers
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

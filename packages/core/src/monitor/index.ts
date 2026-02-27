@@ -9,7 +9,7 @@
  * 即時監控系統事件，包括日誌監控、網路連線、程序活動和檔案完整性。
  * 將所有子監控器彙整到單一 MonitorEngine，具備統一事件發送和威脅情報關聯。
  *
- * @module @openclaw/core/monitor
+ * @module @panguard-ai/core/monitor
  */
 
 import { EventEmitter } from 'node:events';

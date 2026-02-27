@@ -2,7 +2,7 @@
  * Init Wizard Types
  * 初始設定精靈型別
  *
- * @module @openclaw/panguard/init/types
+ * @module @panguard-ai/panguard/init/types
  */
 
 export type Lang = 'en' | 'zh-TW';

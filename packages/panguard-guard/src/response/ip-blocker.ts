@@ -8,12 +8,12 @@
  * - Persistent whitelist
  * - Block manifest tracking
  *
- * @module @openclaw/panguard-guard/response/ip-blocker
+ * @module @panguard-ai/panguard-guard/response/ip-blocker
  */
 
 import { execFile } from 'node:child_process';
 import { platform } from 'node:os';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-guard:ip-blocker');
 

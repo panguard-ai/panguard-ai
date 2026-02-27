@@ -8,7 +8,7 @@
  * 透過 REST API 與 Wazuh SIEM/XDR 平台整合，進行告警取得和安全事件關聯。
  * 處理認證、連線失敗和告警正規化。
  *
- * @module @openclaw/core/adapters/wazuh-adapter
+ * @module @panguard-ai/core/adapters/wazuh-adapter
  */
 
 import { randomUUID } from 'node:crypto';

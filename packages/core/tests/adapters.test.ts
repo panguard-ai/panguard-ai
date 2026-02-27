@@ -5,7 +5,7 @@ import {
   DefenderAdapter,
   WazuhAdapter,
   parseSyslogMessage,
-} from '@openclaw/core/adapters/index.js';
+} from '@panguard-ai/core/adapters/index.js';
 
 // Suppress stderr output from logger during tests
 const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);

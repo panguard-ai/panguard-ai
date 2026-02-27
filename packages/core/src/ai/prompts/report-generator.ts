@@ -6,7 +6,7 @@
  * into structured security reports.
  * 產生將多個安全事件摘要為結構化安全報告的提示詞。
  *
- * @module @openclaw/core/ai/prompts/report-generator
+ * @module @panguard-ai/core/ai/prompts/report-generator
  */
 
 import type { Language, SecurityEvent } from '../../types.js';

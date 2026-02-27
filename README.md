@@ -3,7 +3,7 @@
 > **AI-Driven Adaptive Endpoint Protection**
 > **AI 驅動的自適應端點防護平台**
 
-[![CI](https://github.com/openclaw-security/openclaw-security/actions/workflows/ci.yml/badge.svg)](https://github.com/openclaw-security/openclaw-security/actions/workflows/ci.yml)
+[![CI](https://github.com/panguard-ai/panguard-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/panguard-ai/panguard-ai/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-green.svg)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-%3E%3D9-orange.svg)](https://pnpm.io/)
@@ -62,8 +62,8 @@ panguard guard start
 ### For Contributors
 
 ```bash
-git clone https://github.com/openclaw-security/openclaw-security.git
-cd openclaw-security
+git clone https://github.com/panguard-ai/panguard-ai.git
+cd panguard-ai
 pnpm install
 pnpm build
 pnpm test        # 1068 tests
@@ -107,16 +107,16 @@ This monorepo contains 12 packages:
 
 | Package | Description |
 |---------|-------------|
-| [`@openclaw/core`](packages/core) | Core engine: environment discovery, Sigma rules, system monitoring, AI interfaces, security tool adapters |
-| [`@openclaw/panguard-scan`](packages/panguard-scan) | Security scanner: password audit, port detection, SSL check, PDF report generation |
-| [`@openclaw/panguard-guard`](packages/panguard-guard) | AI monitoring: 5 agents (Detect/Analyze/Respond/Report/Chat), investigation engine, dashboard, licensing, daemon |
-| [`@openclaw/panguard-chat`](packages/panguard-chat) | Notification system: 5 channels (LINE/Telegram/Slack/Email/Webhook), tone adaptation per user role, alert templates |
-| [`@openclaw/panguard-trap`](packages/panguard-trap) | Honeypot system: 8 service types (SSH/HTTP/FTP/SMB/MySQL/RDP/Telnet/Redis), attacker profiling, threat intelligence |
-| [`@openclaw/panguard-report`](packages/panguard-report) | Compliance reports: Taiwan Cyber Security Act (10 controls), ISO 27001 (12 controls), SOC 2 (10 controls) |
-| [`@openclaw/panguard-auth`](packages/panguard-auth) | Authentication: Google OAuth (PKCE), scrypt password hashing, session management, SQLite, rate limiting |
-| [`@openclaw/panguard`](packages/panguard) | Unified CLI: 13 commands (login/scan/guard/trap/report/threat/...), interactive menu, setup wizard |
-| [`@openclaw/panguard-web`](packages/panguard-web) | Website content engine: personas, pricing, guidance wizard, HTML templates |
-| [`openclaw-fork`](openclaw-fork) | Security hardening: WebSocket security, credential storage, sandbox, permissions, audit logging |
+| [`@panguard-ai/core`](packages/core) | Core engine: environment discovery, Sigma rules, system monitoring, AI interfaces, security tool adapters |
+| [`@panguard-ai/panguard-scan`](packages/panguard-scan) | Security scanner: password audit, port detection, SSL check, PDF report generation |
+| [`@panguard-ai/panguard-guard`](packages/panguard-guard) | AI monitoring: 5 agents (Detect/Analyze/Respond/Report/Chat), investigation engine, dashboard, licensing, daemon |
+| [`@panguard-ai/panguard-chat`](packages/panguard-chat) | Notification system: 5 channels (LINE/Telegram/Slack/Email/Webhook), tone adaptation per user role, alert templates |
+| [`@panguard-ai/panguard-trap`](packages/panguard-trap) | Honeypot system: 8 service types (SSH/HTTP/FTP/SMB/MySQL/RDP/Telnet/Redis), attacker profiling, threat intelligence |
+| [`@panguard-ai/panguard-report`](packages/panguard-report) | Compliance reports: Taiwan Cyber Security Act (10 controls), ISO 27001 (12 controls), SOC 2 (10 controls) |
+| [`@panguard-ai/panguard-auth`](packages/panguard-auth) | Authentication: Google OAuth (PKCE), scrypt password hashing, session management, SQLite, rate limiting |
+| [`@panguard-ai/panguard`](packages/panguard) | Unified CLI: 13 commands (login/scan/guard/trap/report/threat/...), interactive menu, setup wizard |
+| [`@panguard-ai/panguard-web`](packages/panguard-web) | Website content engine: personas, pricing, guidance wizard, HTML templates |
+| [`security-hardening`](security-hardening) | Security hardening: WebSocket security, credential storage, sandbox, permissions, audit logging |
 
 ---
 
@@ -146,13 +146,13 @@ pnpm dev              # Start all dev servers in parallel
 cd packages/web && pnpm dev
 
 # Run a specific package's tests
-pnpm --filter @openclaw/core test
+pnpm --filter @panguard-ai/core test
 ```
 
 ### Project Structure
 
 ```
-openclaw-security/
+panguard-ai/
   packages/
     core/              # Shared core engine
     panguard/          # Unified CLI (14 commands, interactive menu)
@@ -164,7 +164,7 @@ openclaw-security/
     panguard-report/   # Compliance report generator
     panguard-web/      # Website content engine
     web/               # React frontend (Vite + TailwindCSS)
-  openclaw-fork/       # Security hardening module
+  security-hardening/       # Security hardening module
   tests/
     integration/       # Cross-package integration tests
   SPEC.md              # Full technical specification (Chinese)
@@ -232,8 +232,8 @@ Full documentation is available in the [`docs/`](docs/) directory:
 
 ## About
 
-**Panguard AI** is developed by **OpenClaw Security**, a cybersecurity company focused on making professional-grade security accessible to small and medium businesses across Asia-Pacific.
+**Panguard AI** is developed by **Panguard AI**, a cybersecurity company focused on making professional-grade security accessible to small and medium businesses across Asia-Pacific.
 
 - Website: [panguard.ai](https://panguard.ai)
-- GitHub: [github.com/openclaw-security](https://github.com/openclaw-security)
+- GitHub: [github.com/panguard-ai](https://github.com/panguard-ai)
 - Location: Taipei, Taiwan

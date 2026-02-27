@@ -5,7 +5,7 @@
  * Supports macOS (log stream), Linux (tail -F), and Windows (wevtutil).
  * 支援 macOS (log stream)、Linux (tail -F) 和 Windows (wevtutil)。
  *
- * @module @openclaw/core/monitor/log-monitor
+ * @module @panguard-ai/core/monitor/log-monitor
  */
 
 import { EventEmitter } from 'node:events';

@@ -1,6 +1,6 @@
 /**
  * Panguard Auth - Authentication and waitlist system
- * @module @openclaw/panguard-auth
+ * @module @panguard-ai/panguard-auth
  */
 
 export { AuthDB } from './database.js';
@@ -30,4 +30,7 @@ export type {
   LoginInput,
   Session,
   AuthResult,
+  UserAdmin,
+  SessionAdmin,
+  ActivityItem,
 } from './types.js';

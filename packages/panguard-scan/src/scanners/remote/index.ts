@@ -2,10 +2,10 @@
  * Remote scan orchestrator.
  * Runs port scan, SSL check, HTTP headers check, and DNS check against a remote target.
  *
- * @module @openclaw/panguard-scan/scanners/remote
+ * @module @panguard-ai/panguard-scan/scanners/remote
  */
 
-import type { Language } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
 import type { Finding, ScanResult } from '../types.js';
 import { SEVERITY_ORDER } from '../types.js';
 import { scanPorts } from './port-scanner.js';

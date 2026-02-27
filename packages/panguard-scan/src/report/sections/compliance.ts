@@ -6,10 +6,10 @@
  * compliance mapping table with status indicators and related findings.
  * 渲染台灣資通安全管理法（ISMS）合規對照表，包含狀態指標和相關發現。
  *
- * @module @openclaw/panguard-scan/report/sections/compliance
+ * @module @panguard-ai/panguard-scan/report/sections/compliance
  */
 
-import type { Language } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
 import type { ScanResult } from '../../scanners/types.js';
 import { COLORS, FONTS, LAYOUT } from '../styles.js';
 import { mapFindingsToCompliance } from '../compliance-map.js';

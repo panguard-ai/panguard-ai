@@ -2,7 +2,7 @@
  * PanguardChat Type Definitions
  * PanguardChat 型別定義
  *
- * @module @openclaw/panguard-chat
+ * @module @panguard-ai/panguard-chat
  */
 
 // ---------------------------------------------------------------------------

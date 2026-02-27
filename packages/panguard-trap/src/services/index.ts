@@ -5,7 +5,7 @@
  * Factory function to create trap services based on service type.
  * 根據服務類型建立蜜罐服務的工廠函式。
  *
- * @module @openclaw/panguard-trap/services
+ * @module @panguard-ai/panguard-trap/services
  */
 
 import type { TrapServiceConfig, TrapService, TrapServiceType } from '../types.js';

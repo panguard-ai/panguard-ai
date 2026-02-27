@@ -1,7 +1,7 @@
 /**
  * PanguardReport type definitions
  * PanguardReport 型別定義
- * @module @openclaw/panguard-report/types
+ * @module @panguard-ai/panguard-report/types
  */
 
 // ---------------------------------------------------------------------------

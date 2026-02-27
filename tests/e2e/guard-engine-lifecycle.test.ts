@@ -6,9 +6,9 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { join } from 'node:path';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { GuardEngine } from '@openclaw/panguard-guard/guard-engine.js';
-import type { GuardConfig } from '@openclaw/panguard-guard/types.js';
-import { DEFAULT_ACTION_POLICY } from '@openclaw/panguard-guard/types.js';
+import { GuardEngine } from '@panguard-ai/panguard-guard/guard-engine.js';
+import type { GuardConfig } from '@panguard-ai/panguard-guard/types.js';
+import { DEFAULT_ACTION_POLICY } from '@panguard-ai/panguard-guard/types.js';
 
 // Suppress logger output during tests
 vi.spyOn(process.stderr, 'write').mockImplementation(() => true);

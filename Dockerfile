@@ -18,7 +18,7 @@ COPY packages/panguard-trap/package.json packages/panguard-trap/
 COPY packages/panguard-web/package.json packages/panguard-web/
 COPY packages/website/package.json packages/website/
 COPY packages/threat-cloud/package.json packages/threat-cloud/
-COPY openclaw-fork/package.json openclaw-fork/
+COPY security-hardening/package.json security-hardening/
 
 RUN pnpm install --frozen-lockfile --prod=false
 
@@ -33,12 +33,12 @@ COPY packages/panguard-report/ packages/panguard-report/
 COPY packages/panguard-trap/ packages/panguard-trap/
 COPY packages/panguard-web/ packages/panguard-web/
 COPY packages/threat-cloud/ packages/threat-cloud/
-COPY openclaw-fork/ openclaw-fork/
+COPY security-hardening/ security-hardening/
 COPY config/ config/
 COPY tsconfig.json ./
 
 # Build backend packages only (skip website)
-RUN pnpm --filter '!@openclaw/website' -r run build
+RUN pnpm --filter '!@panguard-ai/website' -r run build
 
 # Production image
 FROM node:22-alpine AS production

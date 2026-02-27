@@ -1,5 +1,5 @@
 {
-  "name": "@openclaw/panguard-auth",
+  "name": "@panguard-ai/panguard-auth",
   "version": "0.1.0",
   "type": "module",
   "description": "Authentication and waitlist system for Panguard AI",

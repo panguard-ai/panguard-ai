@@ -233,4 +233,4 @@ Panguard Guard 使用三層架構處理安全事件，在效率和準確度之�
 
 ## 開源授權
 
-Panguard AI 以 [MIT License](https://github.com/openclaw-security/openclaw-security/blob/main/LICENSE) 釋出。
+Panguard AI 以 [MIT License](https://github.com/panguard-ai/panguard-ai/blob/main/LICENSE) 釋出。

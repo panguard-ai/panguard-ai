@@ -14,19 +14,19 @@
  * - Windows: sc.exe 服務
  * 包含 PID 檔案管理和看門狗功能。
  *
- * @module @openclaw/panguard-guard/daemon
+ * @module @panguard-ai/panguard-guard/daemon
  */
 
 import { writeFileSync, readFileSync, unlinkSync, existsSync, mkdirSync } from 'node:fs';
 import { execFile } from 'node:child_process';
 import { platform, homedir } from 'node:os';
 import { join, dirname } from 'node:path';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-guard:daemon');
 
 /** Service name constants / 服務名稱常數 */
-const SERVICE_NAME = 'com.openclaw.panguard-guard';
+const SERVICE_NAME = 'com.panguard.panguard-guard';
 const SERVICE_DISPLAY_NAME = 'PanguardGuard Security Monitor';
 
 /**

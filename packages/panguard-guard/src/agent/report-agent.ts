@@ -8,13 +8,13 @@
  * 多代理管線的第四也是最後一個階段。將所有事件記錄到 JSONL，
  * 在學習模式下更新基線，並產生匿名化威脅數據用於集體威脅情報分享。
  *
- * @module @openclaw/panguard-guard/agent/report-agent
+ * @module @panguard-ai/panguard-guard/agent/report-agent
  */
 
 import { appendFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { createLogger } from '@openclaw/core';
-import type { SecurityEvent } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
+import type { SecurityEvent } from '@panguard-ai/core';
 import type {
   ThreatVerdict,
   ResponseResult,

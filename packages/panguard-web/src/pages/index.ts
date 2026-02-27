@@ -2,7 +2,7 @@
  * Website page definitions and metadata
  * 網站頁面定義與元資料
  *
- * @module @openclaw/panguard-web/pages
+ * @module @panguard-ai/panguard-web/pages
  */
 
 import type { PageId, PageMeta, WebLanguage } from '../types.js';

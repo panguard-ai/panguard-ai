@@ -6,7 +6,7 @@
  * self-serve EDR ($2-8/ep) and enterprise AI SOC ($36K+/yr).
  * "AI watches for you, at self-serve prices."
  *
- * @module @openclaw/panguard-web/content/pricing
+ * @module @panguard-ai/panguard-web/content/pricing
  */
 
 import type { PricingPlanDetails, PricingPlan, PlanFeature, ReportAddon } from '../types.js';

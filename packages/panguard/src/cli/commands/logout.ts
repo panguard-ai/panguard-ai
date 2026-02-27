@@ -4,11 +4,11 @@
  *
  * Deletes local credentials and optionally invalidates the server session.
  *
- * @module @openclaw/panguard/cli/commands/logout
+ * @module @panguard-ai/panguard/cli/commands/logout
  */
 
 import { Command } from 'commander';
-import { c, symbols } from '@openclaw/core';
+import { c, symbols } from '@panguard-ai/core';
 import { loadCredentials, deleteCredentials } from '../credentials.js';
 
 export function logoutCommand(): Command {

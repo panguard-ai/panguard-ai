@@ -9,11 +9,11 @@
  * 將偵察、密碼策略、開放埠、SSL 憑證、排程任務和共用資料夾檢查的發現
  * 彙總為統一的 ScanResult。
  *
- * @module @openclaw/panguard-scan/scanners
+ * @module @panguard-ai/panguard-scan/scanners
  */
 
-import { createLogger, getRiskLevel } from '@openclaw/core';
-import type { RiskFactor } from '@openclaw/core';
+import { createLogger, getRiskLevel } from '@panguard-ai/core';
+import type { RiskFactor } from '@panguard-ai/core';
 import { discover } from './discovery-scanner.js';
 import { checkPasswordPolicy } from './password-policy.js';
 import { checkUnnecessaryPorts } from './open-ports.js';

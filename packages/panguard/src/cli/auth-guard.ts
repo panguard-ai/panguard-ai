@@ -2,13 +2,13 @@
  * CLI feature gating based on authenticated user tier.
  * CLI 功能控制 - 基於已驗證用戶的訂閱等級
  *
- * @module @openclaw/panguard/cli/auth-guard
+ * @module @panguard-ai/panguard/cli/auth-guard
  */
 
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { c, symbols, box } from '@openclaw/core';
+import { c, symbols, box } from '@panguard-ai/core';
 import { loadCredentials, isTokenExpired, tierDisplayName, TIER_LEVEL } from './credentials.js';
 import type { StoredCredentials, Tier } from './credentials.js';
 

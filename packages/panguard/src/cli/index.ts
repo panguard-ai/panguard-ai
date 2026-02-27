@@ -6,7 +6,7 @@
  * Single entry point for all Panguard security tools.
  * 所有 Panguard 資安工具的統一入口。
  *
- * @module @openclaw/panguard/cli
+ * @module @panguard-ai/panguard/cli
  */
 
 import { Command } from 'commander';

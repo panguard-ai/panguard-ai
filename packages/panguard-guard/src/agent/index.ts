@@ -5,7 +5,7 @@
  * Exports the four-agent pipeline: Detect -> Analyze -> Respond -> Report.
  * 匯出四代理管線：偵測 -> 分析 -> 回應 -> 報告。
  *
- * @module @openclaw/panguard-guard/agent
+ * @module @panguard-ai/panguard-guard/agent
  */
 
 export { DetectAgent } from './detect-agent.js';

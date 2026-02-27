@@ -12,13 +12,13 @@
  * Uses only Node.js built-in http module with native WebSocket handshake.
  * 僅使用 Node.js 內建 http 模組搭配原生 WebSocket 交握。
  *
- * @module @openclaw/panguard-guard/dashboard
+ * @module @panguard-ai/panguard-guard/dashboard
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createHash, randomBytes } from 'node:crypto';
 import type { Socket } from 'node:net';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   DashboardStatus,
   DashboardEvent,
@@ -461,7 +461,7 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
     <div class="event-list" id="event-list"></div>
   </div>
 
-  <div class="footer">PanguardGuard Security - OpenClaw Platform</div>
+  <div class="footer">PanguardGuard Security - Panguard Platform</div>
 
   <script>
     var i18n = {

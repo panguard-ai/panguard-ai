@@ -15,8 +15,8 @@ describe('i18n', () => {
 
   it('should translate common terms in English', async () => {
     await initI18n('en');
-    expect(t('welcome')).toBe('Welcome to OpenClaw Security');
-    expect(t('appName')).toBe('OpenClaw Security Platform');
+    expect(t('welcome')).toBe('Welcome to Panguard AI');
+    expect(t('appName')).toBe('Panguard AI Platform');
   });
 
   it('should initialize with Traditional Chinese', async () => {
@@ -27,8 +27,8 @@ describe('i18n', () => {
 
   it('should translate common terms in Traditional Chinese', async () => {
     await initI18n('zh-TW');
-    expect(t('welcome')).toContain('OpenClaw Security');
-    expect(t('appName')).toBe('OpenClaw 安全平台');
+    expect(t('welcome')).toContain('Panguard AI');
+    expect(t('appName')).toBe('Panguard 安全平台');
   });
 
   it('should switch language from English to Chinese', async () => {

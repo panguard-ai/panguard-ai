@@ -5,12 +5,12 @@
  * Provides a single HTTP endpoint that routes incoming webhooks
  * to the appropriate channel handler.
  *
- * @module @openclaw/panguard-chat/server/webhook-server
+ * @module @panguard-ai/panguard-chat/server/webhook-server
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createHmac } from 'node:crypto';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-chat:webhook-server');
 

@@ -1,7 +1,7 @@
 /**
  * Verification email sender using raw SMTP (node:net / node:tls).
  * Follows the same pattern as panguard-chat email channel.
- * @module @openclaw/panguard-auth/email-verify
+ * @module @panguard-ai/panguard-auth/email-verify
  */
 
 import * as net from 'node:net';

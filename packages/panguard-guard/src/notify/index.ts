@@ -7,10 +7,10 @@
  * 將威脅警報派發至已配置的通知通道：
  * LINE Notify、Telegram Bot、Slack Webhook、Email SMTP。
  *
- * @module @openclaw/panguard-guard/notify
+ * @module @panguard-ai/panguard-guard/notify
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { NotificationConfig, NotificationResult, ThreatVerdict } from '../types.js';
 import { sendLineNotify } from './line-notify.js';
 import { sendTelegramNotify } from './telegram.js';

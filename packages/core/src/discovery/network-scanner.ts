@@ -6,7 +6,7 @@
  * gateway, and DNS configuration across macOS, Linux, and Windows.
  * 掃描跨 macOS、Linux 和 Windows 的網路介面、開放埠、活躍連線、閘道和 DNS 配置。
  *
- * @module @openclaw/core/discovery/network-scanner
+ * @module @panguard-ai/core/discovery/network-scanner
  */
 
 import { execFile } from 'child_process';

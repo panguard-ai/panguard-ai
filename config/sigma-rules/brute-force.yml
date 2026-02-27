@@ -1,8 +1,8 @@
 title: Brute Force Login Attempt
-id: openclaw-001
+id: panguard-001
 status: stable
 description: Detects multiple failed login attempts indicating brute force attack
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: authentication

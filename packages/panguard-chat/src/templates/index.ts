@@ -2,7 +2,7 @@
  * Message Templates Module
  * 訊息模板模組
  *
- * @module @openclaw/panguard-chat/templates
+ * @module @panguard-ai/panguard-chat/templates
  */
 
 export {

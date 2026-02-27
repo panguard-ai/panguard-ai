@@ -1,8 +1,8 @@
 title: DNS Zone Transfer Attempt
-id: openclaw-041
+id: panguard-041
 status: stable
 description: Detects DNS zone transfer (AXFR) attempts which can be used by attackers to enumerate all DNS records for a domain, revealing internal hostnames, IP addresses, and network architecture.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: dns_server

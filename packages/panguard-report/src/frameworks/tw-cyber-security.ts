@@ -6,7 +6,7 @@
  * and its enforcement rules.
  * 基於資通安全管理法及其施行細則。
  *
- * @module @openclaw/panguard-report/frameworks/tw-cyber-security
+ * @module @panguard-ai/panguard-report/frameworks/tw-cyber-security
  */
 
 import type { ComplianceControl } from '../types.js';

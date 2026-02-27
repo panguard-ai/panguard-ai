@@ -1,8 +1,8 @@
 title: Privilege Escalation Attempt
-id: openclaw-004
+id: panguard-004
 status: stable
 description: Detects sudo usage, su to root, new admin user creation, UAC bypass attempts, and suid bit changes
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

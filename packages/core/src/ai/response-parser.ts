@@ -7,7 +7,7 @@
  * 將原始 LLM 文字回應解析為結構化資料物件。
  * 支援從 Markdown 程式碼區塊提取 JSON 以及純文字回退。
  *
- * @module @openclaw/core/ai/response-parser
+ * @module @panguard-ai/core/ai/response-parser
  */
 
 import type { Severity } from '../types.js';

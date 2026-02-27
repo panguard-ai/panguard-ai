@@ -6,14 +6,14 @@
  * missing policies. Supports macOS, Linux, and Windows.
  * 檢查系統的密碼策略配置以識別弱或缺失的策略。支援 macOS、Linux 和 Windows。
  *
- * @module @openclaw/panguard-scan/scanners/password-policy
+ * @module @panguard-ai/panguard-scan/scanners/password-policy
  */
 
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { readFile } from 'fs/promises';
 import { platform as osPlatform } from 'os';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { Finding } from './types.js';
 
 const execFileAsync = promisify(execFile);

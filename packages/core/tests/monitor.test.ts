@@ -12,7 +12,7 @@ import {
   checkThreatIntel,
   isPrivateIP,
   MonitorEngine,
-} from '@openclaw/core/monitor/index.js';
+} from '@panguard-ai/core/monitor/index.js';
 
 // Suppress stderr output from logger during tests
 const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);

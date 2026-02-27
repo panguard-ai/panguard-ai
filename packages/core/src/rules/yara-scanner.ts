@@ -8,7 +8,7 @@
  * - Converts results to SecurityEvent format for unified pipeline
  * - Gracefully degrades when YARA native bindings are not available
  *
- * @module @openclaw/core/rules/yara-scanner
+ * @module @panguard-ai/core/rules/yara-scanner
  */
 
 import { readdir, stat, readFile } from 'node:fs/promises';

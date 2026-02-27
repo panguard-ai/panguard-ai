@@ -12,7 +12,7 @@
  * - Compliance progress (10%)
  * - Response speed (10%)
  *
- * @module @openclaw/core/scoring/security-score
+ * @module @panguard-ai/core/scoring/security-score
  */
 
 import { createLogger } from '../utils/logger.js';

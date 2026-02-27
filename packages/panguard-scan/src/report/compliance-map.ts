@@ -6,7 +6,7 @@
  * (Information Security Management System) framework.
  * 將安全發現對應到台灣資通安全管理法（ISMS）框架的相關條文。
  *
- * @module @openclaw/panguard-scan/report/compliance-map
+ * @module @panguard-ai/panguard-scan/report/compliance-map
  */
 
 import type { Finding } from '../scanners/types.js';

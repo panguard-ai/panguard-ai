@@ -1,8 +1,8 @@
 {
-  "name": "@openclaw/core",
+  "name": "@panguard-ai/core",
   "version": "0.1.0",
   "type": "module",
-  "description": "Core shared modules for OpenClaw Security / OpenClaw 安全平台核心共用模組",
+  "description": "Core shared modules for Panguard AI / Panguard 安全平台核心共用模組",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

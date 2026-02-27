@@ -59,14 +59,14 @@ curl -fsSL https://get.panguard.ai | sh
 ### 使用 npm
 
 ```bash
-npm install -g @openclaw/panguard
+npm install -g @panguard-ai/panguard
 ```
 
 ### 從原始碼安裝（開發者，目前推薦）
 
 ```bash
-git clone https://github.com/openclaw-security/openclaw-security.git
-cd openclaw-security
+git clone https://github.com/panguard-ai/panguard-ai.git
+cd panguard-ai
 pnpm install
 pnpm build
 

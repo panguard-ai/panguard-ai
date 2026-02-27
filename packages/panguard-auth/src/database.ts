@@ -1,10 +1,10 @@
 /**
  * SQLite database layer for Panguard Auth
- * @module @openclaw/panguard-auth/database
+ * @module @panguard-ai/panguard-auth/database
  */
 
 import Database from 'better-sqlite3';
-import type { WaitlistEntry, WaitlistInput, WaitlistStats, User, RegisterInput, Session } from './types.js';
+import type { WaitlistEntry, WaitlistInput, WaitlistStats, User, RegisterInput, Session, UserAdmin, SessionAdmin, ActivityItem } from './types.js';
 import { hashToken } from './auth.js';
 
 export class AuthDB {
@@ -133,11 +133,19 @@ export class AuthDB {
     const total = (this.db.prepare('SELECT COUNT(*) as c FROM waitlist').get() as { c: number }).c;
     const pending = (this.db.prepare("SELECT COUNT(*) as c FROM waitlist WHERE status = 'pending'").get() as { c: number }).c;
     const approved = (this.db.prepare("SELECT COUNT(*) as c FROM waitlist WHERE status = 'approved'").get() as { c: number }).c;
+    const rejected = (this.db.prepare("SELECT COUNT(*) as c FROM waitlist WHERE status = 'rejected'").get() as { c: number }).c;
     const verified = (this.db.prepare('SELECT COUNT(*) as c FROM waitlist WHERE verified = 1').get() as { c: number }).c;
     const todaySignups = (this.db.prepare(
       "SELECT COUNT(*) as c FROM waitlist WHERE created_at > datetime('now', '-1 day')"
     ).get() as { c: number }).c;
-    return { total, pending, approved, verified, todaySignups };
+
+    const sourceRows = this.db.prepare(
+      'SELECT source, COUNT(*) as c FROM waitlist GROUP BY source'
+    ).all() as { source: string; c: number }[];
+    const bySource: Record<string, number> = {};
+    for (const row of sourceRows) bySource[row.source] = row.c;
+
+    return { total, pending, approved, rejected, verified, todaySignups, bySource };
   }
 
   getAllWaitlist(): WaitlistEntry[] {
@@ -256,6 +264,85 @@ export class AuthDB {
         AND (expires_at IS NULL OR expires_at > datetime('now'))
     `).get(userId, addonId) as { c: number };
     return row.c > 0;
+  }
+
+  // ── Admin: Enhanced Queries ─────────────────────────────────────
+
+  getAllUsersAdmin(): UserAdmin[] {
+    return this.db.prepare(`
+      SELECT id, email, name, role, tier, verified,
+             created_at as createdAt, last_login as lastLogin
+      FROM users ORDER BY created_at DESC
+    `).all() as UserAdmin[];
+  }
+
+  searchUsers(query: string): UserAdmin[] {
+    const pattern = `%${query}%`;
+    return this.db.prepare(`
+      SELECT id, email, name, role, tier, verified,
+             created_at as createdAt, last_login as lastLogin
+      FROM users WHERE email LIKE ? OR name LIKE ?
+      ORDER BY created_at DESC
+    `).all(pattern, pattern) as UserAdmin[];
+  }
+
+  getActiveSessions(): SessionAdmin[] {
+    return this.db.prepare(`
+      SELECT s.id, s.user_id as userId, u.email as userEmail, u.name as userName,
+             s.expires_at as expiresAt, s.created_at as createdAt
+      FROM sessions s JOIN users u ON s.user_id = u.id
+      WHERE s.expires_at > datetime('now')
+      ORDER BY s.created_at DESC
+    `).all() as SessionAdmin[];
+  }
+
+  deleteSessionById(sessionId: number): boolean {
+    const result = this.db.prepare('DELETE FROM sessions WHERE id = ?').run(sessionId);
+    return result.changes > 0;
+  }
+
+  getRecentActivity(limit: number = 20): ActivityItem[] {
+    return this.db.prepare(`
+      SELECT * FROM (
+        SELECT 'user_registered' as type, email as description, created_at as timestamp FROM users
+        UNION ALL
+        SELECT 'waitlist_joined' as type, email as description, created_at as timestamp FROM waitlist
+      ) combined
+      ORDER BY timestamp DESC LIMIT ?
+    `).all(Math.min(limit, 50)) as ActivityItem[];
+  }
+
+  getAdminDashboardStats(): {
+    users: { total: number; byTier: Record<string, number>; byRole: Record<string, number>; recentSignups: number; verifiedCount: number; signupsByDay: Array<{ date: string; count: number }> };
+    waitlist: WaitlistStats & { signupsByDay: Array<{ date: string; count: number }> };
+    sessions: { active: number; total: number };
+    reportPurchases: { total: number; active: number };
+  } {
+    const userStats = this.getUserStats();
+    const verifiedCount = (this.db.prepare('SELECT COUNT(*) as c FROM users WHERE verified = 1').get() as { c: number }).c;
+    const userSignupsByDay = this.db.prepare(
+      "SELECT date(created_at) as date, COUNT(*) as count FROM users WHERE created_at > datetime('now', '-30 day') GROUP BY date(created_at) ORDER BY date ASC"
+    ).all() as Array<{ date: string; count: number }>;
+
+    const waitlistStats = this.getWaitlistStats();
+    const waitlistSignupsByDay = this.db.prepare(
+      "SELECT date(created_at) as date, COUNT(*) as count FROM waitlist WHERE created_at > datetime('now', '-30 day') GROUP BY date(created_at) ORDER BY date ASC"
+    ).all() as Array<{ date: string; count: number }>;
+
+    const activeSessions = (this.db.prepare("SELECT COUNT(*) as c FROM sessions WHERE expires_at > datetime('now')").get() as { c: number }).c;
+    const totalSessions = (this.db.prepare('SELECT COUNT(*) as c FROM sessions').get() as { c: number }).c;
+
+    const activeReportPurchases = (this.db.prepare(
+      "SELECT COUNT(*) as c FROM report_purchases WHERE status = 'active' AND (expires_at IS NULL OR expires_at > datetime('now'))"
+    ).get() as { c: number }).c;
+    const totalReportPurchases = (this.db.prepare('SELECT COUNT(*) as c FROM report_purchases').get() as { c: number }).c;
+
+    return {
+      users: { ...userStats, verifiedCount, signupsByDay: userSignupsByDay },
+      waitlist: { ...waitlistStats, signupsByDay: waitlistSignupsByDay },
+      sessions: { active: activeSessions, total: totalSessions },
+      reportPurchases: { total: totalReportPurchases, active: activeReportPurchases },
+    };
   }
 
   // ── Admin: User Management ──────────────────────────────────────

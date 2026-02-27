@@ -6,7 +6,7 @@
  * estimated costs based on provider-specific pricing.
  * 追蹤跨 LLM 請求的累計 Token 使用量，並根據供應商定價計算估算費用。
  *
- * @module @openclaw/core/ai/token-tracker
+ * @module @panguard-ai/core/ai/token-tracker
  */
 
 import type { LLMProviderType, TokenUsage } from './types.js';

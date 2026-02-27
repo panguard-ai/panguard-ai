@@ -11,11 +11,11 @@
 import { describe, it, expect } from 'vitest';
 
 // Core
-import { CORE_VERSION } from '@openclaw/core';
+import { CORE_VERSION } from '@panguard-ai/core';
 
 // PanguardScan
-import { PANGUARD_SCAN_VERSION, sortBySeverity, SEVERITY_ORDER } from '@openclaw/panguard-scan';
-import type { Finding } from '@openclaw/panguard-scan';
+import { PANGUARD_SCAN_VERSION, sortBySeverity, SEVERITY_ORDER } from '@panguard-ai/panguard-scan';
+import type { Finding } from '@panguard-ai/panguard-scan';
 
 // PanguardGuard
 import {
@@ -26,20 +26,20 @@ import {
   validateLicense,
   generateTestLicenseKey,
   hasFeature,
-} from '@openclaw/panguard-guard';
-import type { ThreatVerdict } from '@openclaw/panguard-guard';
+} from '@panguard-ai/panguard-guard';
+import type { ThreatVerdict } from '@panguard-ai/panguard-guard';
 
 // PanguardChat
-import { PANGUARD_CHAT_VERSION, formatAlert, ALERT_TEMPLATES } from '@openclaw/panguard-chat';
-import type { ThreatAlert, UserType } from '@openclaw/panguard-chat';
+import { PANGUARD_CHAT_VERSION, formatAlert, ALERT_TEMPLATES } from '@panguard-ai/panguard-chat';
+import type { ThreatAlert, UserType } from '@panguard-ai/panguard-chat';
 
 // PanguardTrap
 import {
   PANGUARD_TRAP_VERSION,
   buildTrapIntel,
   DEFAULT_SERVICE_CONFIGS,
-} from '@openclaw/panguard-trap';
-import type { TrapSession } from '@openclaw/panguard-trap';
+} from '@panguard-ai/panguard-trap';
+import type { TrapSession } from '@panguard-ai/panguard-trap';
 
 // PanguardReport
 import {
@@ -52,8 +52,8 @@ import {
   generateComplianceReport,
   reportToJSON,
   generateSummaryText,
-} from '@openclaw/panguard-report';
-import type { ComplianceFinding } from '@openclaw/panguard-report';
+} from '@panguard-ai/panguard-report';
+import type { ComplianceFinding } from '@panguard-ai/panguard-report';
 
 // Panguard Web
 import {
@@ -64,8 +64,8 @@ import {
   getAllPricingPlans,
   PRODUCT_FEATURES,
   getProductFeature,
-} from '@openclaw/panguard-web';
-import type { GuidanceAnswers } from '@openclaw/panguard-web';
+} from '@panguard-ai/panguard-web';
+import type { GuidanceAnswers } from '@panguard-ai/panguard-web';
 
 // ---------------------------------------------------------------------------
 // Tests

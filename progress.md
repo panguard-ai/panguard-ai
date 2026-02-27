@@ -29,7 +29,7 @@
 ##### 全品牌重命名：Phalanx AI → Panguard AI
 - [x] 產品名稱 — PhalanxScan/ClawScan → Panguard Scan, PhalanxGuard/ClawGuard → Panguard Guard, PhalanxChat/ClawChat → Panguard Chat, PhalanxTrap/ClawTrap → Panguard Trap, PhalanxReport/ClawReport → Panguard Report
 - [x] 品牌名稱 — Phalanx AI → Panguard AI, phalanx.ai → panguard.ai, Phalanx Threat Cloud → Panguard Threat Cloud
-- [x] npm 套件名 — @openclaw/clawscan → @openclaw/panguard-scan, @openclaw/clawguard → @openclaw/panguard-guard, @openclaw/clawchat → @openclaw/panguard-chat, @openclaw/clawtrap → @openclaw/panguard-trap, @openclaw/clawreport → @openclaw/panguard-report, @openclaw/phalanx-web → @openclaw/panguard-web
+- [x] npm 套件名 — @panguard-ai/clawscan → @panguard-ai/panguard-scan, @panguard-ai/clawguard → @panguard-ai/panguard-guard, @panguard-ai/clawchat → @panguard-ai/panguard-chat, @panguard-ai/clawtrap → @panguard-ai/panguard-trap, @panguard-ai/clawreport → @panguard-ai/panguard-report, @panguard-ai/phalanx-web → @panguard-ai/panguard-web
 - [x] 版本常數 — CLAWSCAN_VERSION → PANGUARD_SCAN_VERSION, CLAWGUARD_VERSION → PANGUARD_GUARD_VERSION, CLAWCHAT_VERSION → PANGUARD_CHAT_VERSION, CLAWTRAP_VERSION → PANGUARD_TRAP_VERSION, CLAWREPORT_VERSION → PANGUARD_REPORT_VERSION, PHALANX_WEB_VERSION → PANGUARD_WEB_VERSION
 - [x] 程式碼識別碼 — ClawScan → PanguardScan, ClawGuard → PanguardGuard, ClawChat → PanguardChat, ClawTrap → PanguardTrap, ClawReport → PanguardReport
 - [x] 目錄重命名 — packages/clawscan → panguard-scan, clawguard → panguard-guard, clawchat → panguard-chat, clawtrap → panguard-trap, clawreport → panguard-report, phalanx-web → panguard-web
@@ -78,7 +78,7 @@
 ##### 專案建置 (`packages/web/`)
 - [x] Vite 6 + React 19 + TypeScript 5.7 + TailwindCSS 3.4
 - [x] PostCSS + Autoprefixer 配置
-- [x] Vite 路徑別名 — @openclaw/panguard-web → ../panguard-web/src
+- [x] Vite 路徑別名 — @panguard-ai/panguard-web → ../panguard-web/src
 - [x] TailwindCSS 自訂品牌色彩 — dark (#0a0f1e), card (#1a1f2e), cyan (#00d4ff), purple (#7c3aed)
 - [x] 自訂 CSS 元件類別 — btn-primary, btn-secondary, card, card-highlighted, gradient-text, code-block, section-title, grid-bg
 
@@ -87,7 +87,7 @@
 - [x] LanguageContext — en/zh-TW 語言切換，t() 輔助函式
 - [x] Layout 元件 — Navbar + Outlet + Footer 統一佈局
 - [x] Navbar — 品牌 Logo + 頁面連結 + 語言切換 (EN/ZH) + Get Started CTA
-- [x] Footer — 品牌名稱 + 標語 + OpenClaw Security 署名
+- [x] Footer — 品牌名稱 + 標語 + Panguard AI 署名
 
 ##### 首頁 (`/`)
 - [x] Hero 區塊 — 漸變標題 + 安裝指令 (curl) + 雙 CTA 按鈕
@@ -126,7 +126,7 @@
 ##### 關於頁 (`/about`)
 - [x] 使命 — 為中小企業提供企業級 AI 資安防護
 - [x] 技術 — 4 項技術說明 (基準線學習/多層偵測/適應性通訊/威脅情報網路)
-- [x] OpenClaw Security — 公司介紹 + 平台版本顯示
+- [x] Panguard AI — 公司介紹 + 平台版本顯示
 - [x] 聯繫方式 — Email/GitHub/Location
 
 ##### 共用元件
@@ -184,7 +184,7 @@ packages/web/
 - [x] 6 個頁面路由全部正確渲染
 - [x] 語言切換切換所有內容 (en/zh-TW)
 - [x] 引導精靈完整 7 步流程 (角色選擇→環境評估→產品推薦→通知管道→安裝指令→完成)
-- [x] 所有內容來自 @openclaw/panguard-web（零硬編碼產品資料）
+- [x] 所有內容來自 @panguard-ai/panguard-web（零硬編碼產品資料）
 - [x] 暗色主題 cybersecurity 風格
 - [x] Vite build 成功 (< 300 kB JS gzip)
 - [x] `pnpm build` / `pnpm test` / `pnpm typecheck` / `pnpm lint` 全過
@@ -241,7 +241,7 @@ packages/web/
 - [x] 套件載入 — 7 個套件全部可匯入且有版本常數
 - [x] 匯出完整性 — core (discovery/rules/monitor/adapters), panguard-guard (agents/investigation/threat-cloud/dashboard/daemon), panguard-chat (channels/ChatAgent), panguard-trap (services/profiler/engine), panguard-report (frameworks), panguard-web (content data)
 - [x] 預設配置 — ActionPolicy/Preferences/WebConfig/ReportConfig/TrapConfig 一致
-- [x] 品牌一致 — "Panguard AI" 跨所有範本、"OpenClaw Security" 署名、產品名稱 Panguard 前綴
+- [x] 品牌一致 — "Panguard AI" 跨所有範本、"Panguard AI" 署名、產品名稱 Panguard 前綴
 - [x] i18n — 初始化無錯誤、語言切換
 - [x] 安全覆蓋 — 8 種蜜罐、3 框架、7 告警模板、Sigma 規則
 
@@ -314,7 +314,7 @@ packages/web/
 - [x] generateHero — 標語 + 安裝指令 (curl) + CTA 按鈕
 - [x] generateFeatureCard — 產品標籤 + 標題 + 說明 + highlights 列表
 - [x] generatePricingCard — 方案名稱/價格/功能 (included/not-included)，Pro highlighted
-- [x] generateFooter — 品牌 + OpenClaw Security 署名
+- [x] generateFooter — 品牌 + Panguard AI 署名
 
 ##### i18n 擴充
 - [x] 新增 `panguardweb` 命名空間 — en/zh-TW 各 ~30 翻譯鍵
@@ -796,10 +796,10 @@ packages/web/
 
 ---
 
-### Phase 1：OpenClaw Fork - 安全強化 (完成於 2026-02-25)
+### Phase 1：Panguard Fork - 安全強化 (完成於 2026-02-25)
 
 #### 已完成
-- [x] 建立 `@openclaw/security-hardening` 套件結構 — 2026-02-25
+- [x] 建立 `@panguard-ai/security-hardening` 套件結構 — 2026-02-25
 - [x] 定義安全相關型別系統（SecurityPolicy, CsrfToken, AuditEvent 等）— 2026-02-25
 - [x] WebSocket 安全模組（CVE-2026-25253 修復）— 2026-02-25
 - [x] 憑證安全儲存 — 2026-02-25
@@ -833,7 +833,7 @@ packages/web/
 ---
 
 ### 下一步
-1. npm 發布 — @openclaw/* 套件發布到 npm registry
+1. npm 發布 — @panguard-ai/* 套件發布到 npm registry
 2. 官網部署 — Vercel/Netlify 部署 packages/web
 3. E2E 測試 — Playwright/Cypress 端到端測試
 4. 外部 API 整合 — LINE/Telegram/Slack/Ollama 實際連線測試

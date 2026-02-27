@@ -2,7 +2,7 @@
  * Compliance Mapping Engine
  * 合規映射引擎
  *
- * @module @openclaw/panguard-report/mapper
+ * @module @panguard-ai/panguard-report/mapper
  */
 
 export {

@@ -6,7 +6,7 @@
  * for newly started or stopped processes.
  * 定期輪詢系統程序列表，並為新啟動或停止的程序發出事件。
  *
- * @module @openclaw/core/monitor/process-monitor
+ * @module @panguard-ai/core/monitor/process-monitor
  */
 
 import { EventEmitter } from 'node:events';

@@ -1,8 +1,8 @@
 title: Suspicious DNS Activity
-id: openclaw-009
+id: panguard-009
 status: stable
 description: Detects DNS queries to known malicious TLDs, unusually long subdomains indicating DNS tunneling, and queries to suspicious dynamic DNS providers
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: dns_query

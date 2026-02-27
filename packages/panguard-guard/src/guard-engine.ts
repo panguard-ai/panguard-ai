@@ -14,12 +14,12 @@
  * 3. 管理 Context Memory 基線學習和防護轉換
  * 4. 協調通知、威脅雲和儀表板更新
  *
- * @module @openclaw/panguard-guard/guard-engine
+ * @module @panguard-ai/panguard-guard/guard-engine
  */
 
 import { join } from 'node:path';
-import { createLogger, RuleEngine, MonitorEngine, ThreatIntelFeedManager, setFeedManager } from '@openclaw/core';
-import type { SecurityEvent } from '@openclaw/core';
+import { createLogger, RuleEngine, MonitorEngine, ThreatIntelFeedManager, setFeedManager } from '@panguard-ai/core';
+import type { SecurityEvent } from '@panguard-ai/core';
 import type {
   GuardConfig,
   GuardStatus,
@@ -51,8 +51,8 @@ const logger = createLogger('panguard-guard:engine');
  */
 async function autoDetectLLM(): Promise<AnalyzeLLM | null> {
   try {
-    // Dynamic import to avoid requiring @openclaw/core/ai at load time
-    const { createLLM } = await import('@openclaw/core');
+    // Dynamic import to avoid requiring @panguard-ai/core/ai at load time
+    const { createLLM } = await import('@panguard-ai/core');
     type LLMProviderType = 'ollama' | 'claude' | 'openai';
 
     let provider: LLMProviderType | null = null;
@@ -270,7 +270,7 @@ export class GuardEngine {
     const cloudRules = await this.threatCloud.fetchRules();
     for (const rule of cloudRules) {
       try {
-        const parsed = JSON.parse(rule.ruleContent) as import('@openclaw/core').SigmaRule;
+        const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/core').SigmaRule;
         if (parsed.id && parsed.title && parsed.detection) {
           this.ruleEngine.addRule(parsed);
         }

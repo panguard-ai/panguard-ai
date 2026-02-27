@@ -1,8 +1,8 @@
 title: Reverse Shell Execution
-id: openclaw-007
+id: panguard-007
 status: stable
 description: Detects common reverse shell patterns including bash, netcat, python, perl, ruby, and PHP-based reverse shells
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

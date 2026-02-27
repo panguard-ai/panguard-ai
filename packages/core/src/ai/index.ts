@@ -9,11 +9,11 @@
  * 提供多個 LLM 供應商的統一介面，包括 Ollama（本地）、Claude API 和 OpenAI API。
  * 工廠函式 `createLLM()` 根據配置實例化適當的供應商。
  *
- * @module @openclaw/core/ai
+ * @module @panguard-ai/core/ai
  *
  * @example
  * ```typescript
- * import { createLLM } from '@openclaw/core/ai';
+ * import { createLLM } from '@panguard-ai/core/ai';
  *
  * // Local Ollama provider (no API key needed)
  * const ollama = createLLM({

@@ -1,8 +1,8 @@
 title: Email-Based Data Exfiltration Indicators
-id: openclaw-042
+id: panguard-042
 status: stable
 description: Detects unusual email sending patterns, large attachment transmissions, and use of command-line email utilities that may indicate data exfiltration through email channels.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

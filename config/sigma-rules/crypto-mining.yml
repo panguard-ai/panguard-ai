@@ -1,8 +1,8 @@
 title: Cryptocurrency Mining Activity
-id: openclaw-022
+id: panguard-022
 status: stable
 description: Detects cryptocurrency mining indicators including known miner process names, mining pool connections, and suspicious CPU-intensive processes
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

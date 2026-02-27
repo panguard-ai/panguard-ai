@@ -7,7 +7,7 @@
  * Panguard Chat AI 助手的系統提示詞。
  * 定義角色、語言規則和格式指南。
  *
- * @module @openclaw/panguard-chat/agent/prompts
+ * @module @panguard-ai/panguard-chat/agent/prompts
  */
 
 import type { UserType, MessageLanguage } from '../types.js';

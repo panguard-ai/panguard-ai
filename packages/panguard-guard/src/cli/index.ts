@@ -6,7 +6,7 @@
  * Uses brand-standard colors and layout from Panguard AI brand system.
  * Brand: Sage Green #8B9A8E, Cream #F5F1E8, Charcoal #1A1614
  *
- * @module @openclaw/panguard-guard/cli
+ * @module @panguard-ai/panguard-guard/cli
  */
 
 import { join } from 'node:path';
@@ -14,8 +14,8 @@ import { homedir } from 'node:os';
 import {
   c, banner, header, box, symbols, divider, statusPanel, spinner,
   setLogLevel,
-} from '@openclaw/core';
-import type { StatusItem } from '@openclaw/core';
+} from '@panguard-ai/core';
+import type { StatusItem } from '@panguard-ai/core';
 import { GuardEngine } from '../guard-engine.js';
 import { loadConfig, DEFAULT_DATA_DIR } from '../config.js';
 import { PidFile } from '../daemon/index.js';

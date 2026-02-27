@@ -10,10 +10,10 @@
  * Designed for integrating with SIEM systems and ticketing systems.
  * 設計用於與 SIEM 系統和工單系統整合。
  *
- * @module @openclaw/panguard-chat/channels/webhook
+ * @module @panguard-ai/panguard-chat/channels/webhook
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   MessagingChannel,
   ChannelResult,

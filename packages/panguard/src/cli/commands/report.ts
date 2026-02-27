@@ -4,7 +4,7 @@
  */
 
 import { Command } from 'commander';
-import { executeCli } from '@openclaw/panguard-report';
+import { executeCli } from '@panguard-ai/panguard-report';
 import { withAuth } from '../auth-guard.js';
 
 export function reportCommand(): Command {

@@ -3,12 +3,12 @@
  * PanguardScan CLI Entry Point
  * PanguardScan 命令列介面進入點
  *
- * @module @openclaw/panguard-scan/cli
+ * @module @panguard-ai/panguard-scan/cli
  */
 
 import { Command } from 'commander';
-import type { Language } from '@openclaw/core';
-import { setLogLevel } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
+import { setLogLevel } from '@panguard-ai/core';
 import { PANGUARD_SCAN_VERSION } from '../index.js';
 import { executeScan } from './commands.js';
 import { runRemoteScan } from '../scanners/remote/index.js';
@@ -59,7 +59,7 @@ program
       } else {
         // Human-friendly remote output delegated to executeScan is not available here;
         // print a simple summary
-        const { banner, scoreDisplay, symbols, c, formatDuration } = await import('@openclaw/core');
+        const { banner, scoreDisplay, symbols, c, formatDuration } = await import('@panguard-ai/core');
         console.log(banner());
         console.log(`  ${symbols.scan} Remote Scan: ${c.bold(options.target)}`);
         console.log(scoreDisplay(safetyScore, grade));

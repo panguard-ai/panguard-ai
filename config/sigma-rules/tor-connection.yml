@@ -1,8 +1,8 @@
 title: Tor Network Connection
-id: openclaw-021
+id: panguard-021
 status: stable
 description: Detects connections to known Tor entry and exit nodes, Tor browser execution, and Tor-related network traffic patterns
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: network_connection

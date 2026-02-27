@@ -1,8 +1,8 @@
 title: Directory Traversal Attempt Detected
-id: openclaw-028
+id: panguard-028
 status: stable
 description: Detects path traversal attempts in web server logs by matching encoded and unencoded directory traversal sequences used to access files outside the web root.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: webserver

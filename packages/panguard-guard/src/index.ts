@@ -6,7 +6,7 @@
  * Exports all public modules for programmatic use.
  * PanguardGuard 套件的主要入口點。匯出所有公開模組供程式化使用。
  *
- * @module @openclaw/panguard-guard
+ * @module @panguard-ai/panguard-guard
  */
 
 /** Package version / 套件版本 */

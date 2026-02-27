@@ -1,13 +1,13 @@
 /**
  * GuardConfig loader and defaults
  * GuardConfig 載入器與預設值
- * @module @openclaw/panguard-guard/config
+ * @module @panguard-ai/panguard-guard/config
  */
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { GuardConfig } from './types.js';
 import { DEFAULT_ACTION_POLICY } from './types.js';
 

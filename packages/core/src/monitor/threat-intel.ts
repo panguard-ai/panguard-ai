@@ -6,7 +6,7 @@
  * CIDR range matching for efficient IP lookups.
  * 為 MVP 提供內建威脅情報資料庫，並支援 CIDR 範圍比對以進行高效 IP 查詢。
  *
- * @module @openclaw/core/monitor/threat-intel
+ * @module @panguard-ai/core/monitor/threat-intel
  */
 
 import type { ThreatIntelEntry } from './types.js';

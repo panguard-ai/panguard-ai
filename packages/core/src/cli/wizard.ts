@@ -5,7 +5,7 @@
  * Orchestrates a sequence of WizardSteps, rendering progress indicators,
  * handling back-navigation, conditional steps, and auto-detection.
  *
- * @module @openclaw/core/cli/wizard
+ * @module @panguard-ai/core/cli/wizard
  */
 
 import { c, divider, symbols } from './index.js';

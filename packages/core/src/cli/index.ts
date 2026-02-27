@@ -6,7 +6,7 @@
  * Brand colors: Sage Green #8B9A8E, Cream #F5F1E8, Charcoal #1A1614
  * Status: Safe #2ED573, Caution #FBBF24, Alert #FF6B35, Critical #EF4444
  *
- * @module @openclaw/core/cli
+ * @module @panguard-ai/core/cli
  */
 
 // ============================================================

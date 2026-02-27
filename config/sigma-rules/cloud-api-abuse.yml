@@ -1,8 +1,8 @@
 title: Cloud API Abuse Detection
-id: openclaw-025
+id: panguard-025
 status: stable
 description: Detects unusual cloud API calls including unauthorized IAM modifications, suspicious S3 operations, security group changes, and access from unknown locations
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: cloud

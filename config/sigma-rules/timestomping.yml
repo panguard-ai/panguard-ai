@@ -1,8 +1,8 @@
 title: File Timestamp Modification (Timestomping)
-id: openclaw-038
+id: panguard-038
 status: stable
 description: Detects attempts to modify file timestamps to evade forensic analysis. Attackers use timestomping to make malicious files appear as if they were created or modified at a different time.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

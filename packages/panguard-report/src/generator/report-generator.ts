@@ -7,10 +7,10 @@
  * 產生 JSON 格式的合規報告。
  * （PDF 產生使用現有的 PanguardScan PDF 模組模式。）
  *
- * @module @openclaw/panguard-report/generator/report-generator
+ * @module @panguard-ai/panguard-report/generator/report-generator
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   ComplianceFinding,
   ComplianceFramework,

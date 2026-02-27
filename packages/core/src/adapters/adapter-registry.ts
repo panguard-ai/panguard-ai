@@ -8,7 +8,7 @@
  * 提供安全工具對接器的集中管理，包括手動註冊、從偵察結果自動偵測，
  * 以及跨所有已註冊對接器的統一告警收集。
  *
- * @module @openclaw/core/adapters/adapter-registry
+ * @module @panguard-ai/core/adapters/adapter-registry
  */
 
 import { createLogger } from '../utils/logger.js';

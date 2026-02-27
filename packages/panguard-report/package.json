@@ -1,5 +1,5 @@
 {
-  "name": "@openclaw/panguard-report",
+  "name": "@panguard-ai/panguard-report",
   "version": "0.1.0",
   "type": "module",
   "description": "AI-powered security incident report generator / AI 自動產生資安事件報告",
@@ -16,7 +16,7 @@
     "dev": "tsc --build --watch"
   },
   "dependencies": {
-    "@openclaw/core": "workspace:*"
+    "@panguard-ai/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

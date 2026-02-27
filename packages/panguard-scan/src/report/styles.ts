@@ -6,7 +6,7 @@
  * the PDF report generation process.
  * 定義在整個 PDF 報告產生過程中使用的顏色、字型和版面尺寸。
  *
- * @module @openclaw/panguard-scan/report/styles
+ * @module @panguard-ai/panguard-scan/report/styles
  */
 
 /**

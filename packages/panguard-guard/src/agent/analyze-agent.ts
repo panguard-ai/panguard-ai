@@ -8,10 +8,10 @@
  * 多代理管線的第二階段。接收偵測結果，使用規則證據、基線比較和
  * 可選的 AI 推理進行深度分析，然後產生威脅判決。
  *
- * @module @openclaw/panguard-guard/agent/analyze-agent
+ * @module @panguard-ai/panguard-guard/agent/analyze-agent
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   DetectionResult,
   ThreatVerdict,

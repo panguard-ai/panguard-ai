@@ -1,5 +1,5 @@
 {
-  "name": "@openclaw/panguard-scan",
+  "name": "@panguard-ai/panguard-scan",
   "version": "0.1.0",
   "type": "module",
   "description": "60-second security scanning CLI tool / 60 秒資安健檢工具",
@@ -16,7 +16,7 @@
     "dev": "tsc --build --watch"
   },
   "dependencies": {
-    "@openclaw/core": "workspace:*",
+    "@panguard-ai/core": "workspace:*",
     "commander": "^12.0.0",
     "pdfkit": "^0.15.0"
   },

@@ -1,8 +1,8 @@
 title: SSH Key Theft or Unauthorized Key Modification
-id: openclaw-031
+id: panguard-031
 status: stable
 description: Detects attempts to access SSH private keys, read authorized_keys files, or modify SSH authentication configuration, which may indicate credential theft or unauthorized persistence.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

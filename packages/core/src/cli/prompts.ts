@@ -6,7 +6,7 @@
  * interactive CLI wizards. Uses raw mode stdin for keypresses and
  * readline for text input. Brand-styled with Panguard AI colors.
  *
- * @module @openclaw/core/cli/prompts
+ * @module @panguard-ai/core/cli/prompts
  */
 
 import * as readline from 'node:readline';

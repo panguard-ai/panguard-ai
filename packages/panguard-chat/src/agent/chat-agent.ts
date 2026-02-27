@@ -7,10 +7,10 @@
  * Chat Agent 將技術安全事件翻譯為人類可讀的訊息，
  * 處理用戶追問，並管理用戶確認流程。
  *
- * @module @openclaw/panguard-chat/agent/chat-agent
+ * @module @panguard-ai/panguard-chat/agent/chat-agent
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   UserProfile,
   MessageLanguage,
