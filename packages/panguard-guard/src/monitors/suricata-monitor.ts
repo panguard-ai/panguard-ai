@@ -115,9 +115,7 @@ export function parseSuricataEvent(raw: SuricataEveAlert): SecurityEvent | null 
     source: 'suricata',
     severity: mapSuricataSeverity(alert.severity),
     category: mapSuricataCategory(alert.category, alert.signature),
-    description:
-      alert.signature ??
-      `Suricata alert: SID ${alert.signature_id ?? 'unknown'}`,
+    description: alert.signature ?? `Suricata alert: SID ${alert.signature_id ?? 'unknown'}`,
     raw,
     host: raw.host ?? 'unknown',
     metadata: {
@@ -185,7 +183,7 @@ export class SuricataMonitor extends EventEmitter {
 
     if (hasBinary) {
       logger.warn(
-        'Suricata binary found but no EVE log file. Ensure Suricata is running with eve-log enabled',
+        'Suricata binary found but no EVE log file. Ensure Suricata is running with eve-log enabled'
       );
       return false;
     }
@@ -261,7 +259,9 @@ export class SuricataMonitor extends EventEmitter {
         this.fileOffset = stats.size;
       });
     } catch (err: unknown) {
-      logger.error(`Error reading Suricata EVE log: ${err instanceof Error ? err.message : String(err)}`);
+      logger.error(
+        `Error reading Suricata EVE log: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
   }
 

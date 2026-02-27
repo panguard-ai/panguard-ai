@@ -155,7 +155,7 @@ export class FalcoMonitor extends EventEmitter {
 
     if (hasBinary) {
       logger.warn(
-        'Falco binary found but no alert file. Ensure Falco is running with json_output=true',
+        'Falco binary found but no alert file. Ensure Falco is running with json_output=true'
       );
       return false;
     }
@@ -231,7 +231,9 @@ export class FalcoMonitor extends EventEmitter {
         this.fileOffset = stats.size;
       });
     } catch (err: unknown) {
-      logger.error(`Error reading Falco alerts: ${err instanceof Error ? err.message : String(err)}`);
+      logger.error(
+        `Error reading Falco alerts: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
   }
 

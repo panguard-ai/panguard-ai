@@ -6,14 +6,7 @@
  */
 
 import { Command } from 'commander';
-import {
-  c,
-  symbols,
-  table,
-  box,
-  divider,
-  header,
-} from '@panguard-ai/core';
+import { c, symbols, table, box, divider, header } from '@panguard-ai/core';
 import type { TableColumn } from '@panguard-ai/core';
 import {
   runSecurityAudit,
@@ -39,8 +32,7 @@ function severityColor(severity: string, text: string): string {
 }
 
 export function hardeningCommand(): Command {
-  const cmd = new Command('hardening')
-    .description('Security hardening tools / 安全強化工具');
+  const cmd = new Command('hardening').description('Security hardening tools / 安全強化工具');
 
   cmd
     .command('audit')
@@ -60,11 +52,7 @@ export function hardeningCommand(): Command {
 
       // Risk score
       const scoreColor =
-        report.riskScore === 0
-          ? c.safe
-          : report.riskScore <= 50
-            ? c.caution
-            : c.critical;
+        report.riskScore === 0 ? c.safe : report.riskScore <= 50 ? c.caution : c.critical;
       console.log(
         `  Risk Score: ${scoreColor(`${report.riskScore}/100`)}` +
           `  ${c.dim(`(${report.findings.length} checks, ${report.findings.filter((f: VulnerabilityFinding) => !f.fixed).length} unfixed)`)}`
@@ -131,9 +119,7 @@ export function hardeningCommand(): Command {
       const report = await migrateCredentials(store, undefined, opts.dryRun);
 
       if (report.scanned === 0) {
-        console.log(
-          `${symbols.pass} No plaintext credentials found. Nothing to migrate.`
-        );
+        console.log(`${symbols.pass} No plaintext credentials found. Nothing to migrate.`);
         return;
       }
 
