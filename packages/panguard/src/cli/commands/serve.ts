@@ -6,9 +6,10 @@
 
 import { Command } from 'commander';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
+import { fileURLToPath } from 'node:url';
 import { c, banner } from '@openclaw/core';
 import { AuthDB, createAuthHandlers } from '@openclaw/panguard-auth';
 import type { AuthRouteConfig, SmtpConfig, GoogleOAuthConfig, GoogleSheetsConfig } from '@openclaw/panguard-auth';
@@ -61,9 +62,10 @@ export function serveCommand(): Command {
 
       // Resolve admin static directory
       // Try multiple locations: sibling package, or relative to CWD
+      const thisDir = dirname(fileURLToPath(import.meta.url));
       const adminDirs = [
         join(process.cwd(), 'packages', 'admin'),
-        join(__dirname, '..', '..', '..', '..', 'admin'),
+        join(thisDir, '..', '..', '..', '..', 'admin'),
       ];
       const adminDir = adminDirs.find(d => existsSync(d));
 
