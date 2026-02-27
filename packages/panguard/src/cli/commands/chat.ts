@@ -16,7 +16,7 @@ export function chatCommand(): Command {
     .option('--lang <lang>', 'Language: en or zh-TW / \u8A9E\u8A00', 'zh-TW')
     .option('--channel <type>', 'Channel type (line, telegram, slack, email, webhook)')
     .option('--user-type <type>', 'User type (developer, boss, it_admin)')
-    .action(withAuth('starter', async (opts: Record<string, string | undefined>) => {
+    .action(withAuth('solo', async (opts: Record<string, string | undefined>) => {
       const args = ['setup'];
       if (opts['lang']) args.push('--lang', opts['lang']);
       if (opts['channel']) args.push('--channel', opts['channel']);
@@ -29,7 +29,7 @@ export function chatCommand(): Command {
     .option('--channel <type>', 'Channel type', 'webhook')
     .option('--url <url>', 'Webhook URL')
     .option('--lang <lang>', 'Language', 'zh-TW')
-    .action(withAuth('starter', async (opts: Record<string, string | undefined>) => {
+    .action(withAuth('solo', async (opts: Record<string, string | undefined>) => {
       const args = ['test'];
       if (opts['channel']) args.push('--channel', opts['channel']);
       if (opts['url']) args.push('--url', opts['url']);
@@ -55,7 +55,7 @@ export function chatCommand(): Command {
     .option('--daily <on|off>', 'Daily summary / 每日摘要')
     .option('--weekly <on|off>', 'Weekly summary / 每週摘要')
     .option('--peaceful <on|off>', 'Peaceful report / 平安報告')
-    .action(withAuth('starter', async (opts: Record<string, string | undefined>) => {
+    .action(withAuth('solo', async (opts: Record<string, string | undefined>) => {
       const args = ['prefs'];
       if (opts['critical']) args.push('--critical', opts['critical']);
       if (opts['daily']) args.push('--daily', opts['daily']);

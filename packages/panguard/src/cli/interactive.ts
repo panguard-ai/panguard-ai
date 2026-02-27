@@ -18,7 +18,7 @@ import {
   waitForChoice, pressAnyKey, showHelp, cleanupTerminal,
 } from './menu.js';
 import type { MenuItem } from './menu.js';
-import { checkAccess, showUpgradePrompt } from './auth-guard.js';
+import { checkFeatureAccess, showUpgradePrompt } from './auth-guard.js';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -50,7 +50,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   {
     key: '2',
     icon: symbols.shield,
-    label: { 'zh-TW': '\u5408\u898F\u5831\u544A [TEAM]', en: 'Compliance Report [TEAM]' },
+    label: { 'zh-TW': '\u5408\u898F\u5831\u544A [PRO]', en: 'Compliance Report [PRO]' },
     description: {
       'zh-TW': '\u7522\u751F ISO 27001\u3001SOC 2\u3001\u8CC7\u901A\u5B89\u5168\u7BA1\u7406\u6CD5\u5831\u544A',
       en: 'Generate ISO 27001, SOC 2, or TW Cyber Security Act reports',
@@ -67,7 +67,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   },
   {
     key: '4',
-    label: { 'zh-TW': '\u871C\u7F50\u7CFB\u7D71 [TEAM]', en: 'Honeypot System [TEAM]' },
+    label: { 'zh-TW': '\u871C\u7F50\u7CFB\u7D71 [PRO]', en: 'Honeypot System [PRO]' },
     description: {
       'zh-TW': '\u90E8\u7F72\u871C\u7F50\u670D\u52D9\uFF0C\u5206\u6790\u653B\u64CA\u8005\u884C\u70BA',
       en: 'Deploy honeypot services for attacker profiling',
@@ -186,20 +186,20 @@ export async function startInteractive(lang?: string): Promise<void> {
         case '0': await actionInit(); break;
         case '1': await actionScan(); break;
         case '2':
-          if (!checkAccess('team')) { showUpgradePrompt('Compliance Report', 'team'); break; }
+          if (!checkFeatureAccess('report')) { showUpgradePrompt('Compliance Report'); break; }
           await actionReport();
           break;
         case '3': await actionGuard(); break;
         case '4':
-          if (!checkAccess('team')) { showUpgradePrompt('Honeypot System', 'team'); break; }
+          if (!checkFeatureAccess('trap')) { showUpgradePrompt('Honeypot System'); break; }
           await actionTrap();
           break;
         case '5':
-          if (!checkAccess('solo')) { showUpgradePrompt('Notifications', 'solo'); break; }
+          if (!checkFeatureAccess('notifications')) { showUpgradePrompt('Notifications'); break; }
           await actionChat();
           break;
         case '6':
-          if (!checkAccess('enterprise')) { showUpgradePrompt('Threat Cloud', 'enterprise'); break; }
+          if (!checkFeatureAccess('threat-cloud')) { showUpgradePrompt('Threat Cloud'); break; }
           await actionThreat();
           break;
         case '7': await actionDemo(); break;
@@ -491,13 +491,13 @@ async function actionGuard(): Promise<void> {
   switch (choice.key) {
     case '1': await runCLI(['status']); break;
     case '2': {
-      if (!checkAccess('solo')) {
+      if (!checkFeatureAccess('notifications')) {
         console.log(`  ${symbols.info} ${currentLang === 'zh-TW'
-          ? 'Free \u7248\u50C5\u542B Layer 1 \u898F\u5247\u5F15\u64CE\u5075\u6E2C\uFF08\u7121 AI \u5206\u6790\u3001\u7121\u81EA\u52D5\u56DE\u61C9\u3001\u7121\u901A\u77E5\uFF09'
-          : 'Free tier: Layer 1 rule engine only (no AI, no auto-response, no notifications)'}`);
+          ? '\u514D\u8CBB\u7248 Guard\uFF1A\u50C5\u555F\u7528 Layer 1 \u898F\u5247\u5F15\u64CE\u5075\u6E2C\u3002'
+          : 'Free Guard: Layer 1 rule engine detection only.'}`);
         console.log(`  ${c.dim(currentLang === 'zh-TW'
-          ? '\u5347\u7D1A\u81F3 Solo \u65B9\u6848\u4EE5\u89E3\u9396\u5B8C\u6574\u529F\u80FD: panguard login'
-          : 'Upgrade to Solo for full features: panguard login')}`);
+          ? '\u5347\u7D1A\u5230 Solo ($9/\u6708) \u89E3\u9396\u5B8C\u6574\u4E09\u5C64\u9632\u79A6 + \u81EA\u52D5\u56DE\u61C9\u3002'
+          : 'Upgrade to Solo ($9/mo) for full 3-layer defense + auto-response.')}`);
         console.log('');
       }
       await runCLI(['start']);

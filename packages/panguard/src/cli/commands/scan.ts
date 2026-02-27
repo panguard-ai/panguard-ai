@@ -24,7 +24,7 @@ export function scanCommand(): Command {
     .option('--target <host>', 'Remote target (IP or domain) / 遠端目標')
     .action(async (options: { quick: boolean; output?: string; lang: string; verbose: boolean; json: boolean; target?: string }) => {
       // Auth: quick scan = free, full scan = starter, remote scan = solo
-      const tier = options.target ? 'solo' : options.quick ? 'free' : 'starter';
+      const tier = options.target ? 'solo' : options.quick ? 'free' : 'solo';
       const check = requireAuth(tier);
       if (!check.authenticated || !check.authorized) {
         const { withAuth } = await import('../auth-guard.js');
