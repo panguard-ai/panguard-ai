@@ -278,6 +278,44 @@ body {
   animation-delay: 1.5s;
 }
 
+/* ─── Ambient Logo Float ─── */
+
+@keyframes ambient-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.metallic-logo-float {
+  animation: ambient-float 6s ease-in-out infinite;
+  filter: drop-shadow(0 8px 24px rgba(139, 154, 142, 0.08));
+}
+
+/* ─── Security Radar Visualization ─── */
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.scanning-radar {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(139, 154, 142, 0.06) 25deg,
+    transparent 55deg
+  );
+  animation: radar-sweep 6s linear infinite;
+}
+
+@keyframes shield-ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: 0.5; }
+}
+
+.shield-inner-pulse {
+  animation: shield-ring-pulse 4s ease-in-out infinite;
+}
+
 /* Metallic floor reflection */
 .metallic-reflection {
   background: linear-gradient(
