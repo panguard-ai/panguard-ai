@@ -2,13 +2,13 @@
  * `panguard deploy` - Deploy configured services
  * `panguard deploy` - 部署已配置的服務
  *
- * @module @openclaw/panguard/cli/commands/deploy
+ * @module @panguard-ai/panguard/cli/commands/deploy
  */
 
 import { Command } from 'commander';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { c, symbols, spinner, box, statusPanel, divider } from '@openclaw/core';
+import { c, symbols, spinner, box, statusPanel, divider } from '@panguard-ai/core';
 import { readConfig } from '../../init/config-writer.js';
 import type { PanguardConfig, Lang } from '../../init/types.js';
 import { withAuth } from '../auth-guard.js';
@@ -147,7 +147,7 @@ async function runDeploy(opts: { config?: string; dryRun?: boolean; lang?: strin
   if (config.modules.scan) {
     const scanSp = spinner(`[${step}/${totalSteps}] ${lang === 'zh-TW' ? '\u57F7\u884C\u521D\u59CB\u6383\u63CF...' : 'Running initial scan...'}`);
     try {
-      const { runScan } = await import('@openclaw/panguard-scan');
+      const { runScan } = await import('@panguard-ai/panguard-scan');
       const result = await runScan({ depth: 'quick', lang });
       scanSp.succeed(`[${step}/${totalSteps}] ${lang === 'zh-TW'
         ? `\u6383\u63CF\u5B8C\u6210\uFF01\u98A8\u96AA: ${result.riskScore}/100`

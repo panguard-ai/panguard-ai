@@ -7,12 +7,12 @@
  * 透過原始 SMTP 發送威脅警報，不使用外部相依套件。
  * 使用 Node.js net/tls 模組進行直接 SMTP 通訊。
  *
- * @module @openclaw/panguard-guard/notify/email
+ * @module @panguard-ai/panguard-guard/notify/email
  */
 
 import * as net from 'node:net';
 import * as tls from 'node:tls';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { EmailConfig, NotificationResult, ThreatVerdict } from '../types.js';
 
 const logger = createLogger('panguard-guard:notify:email');

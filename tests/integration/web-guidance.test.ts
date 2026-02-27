@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { PersonaType, PricingPlan, GuidanceAnswers } from '@openclaw/panguard-web';
+import type { PersonaType, PricingPlan, GuidanceAnswers } from '@panguard-ai/panguard-web';
 import {
   getPersona,
   getAllPersonas,
@@ -33,7 +33,7 @@ import {
   generateFeatureCard,
   generatePricingCard,
   generateFooter,
-} from '@openclaw/panguard-web';
+} from '@panguard-ai/panguard-web';
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -316,7 +316,7 @@ describe('Panguard Web Guidance -> Product Recommendation Pipeline', () => {
 
       expect(enFooter).toContain('Panguard AI');
       expect(zhFooter).toContain('Panguard AI');
-      expect(enFooter).toContain('OpenClaw Security');
+      expect(enFooter).toContain('Panguard AI');
     });
   });
 

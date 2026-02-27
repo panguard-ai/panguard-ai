@@ -1,8 +1,8 @@
 title: Memory Dump Tool Execution
-id: openclaw-045
+id: panguard-045
 status: stable
 description: Detects execution of memory dumping tools that can be used to extract credentials, encryption keys, and other sensitive data from process memory or system RAM.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

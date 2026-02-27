@@ -8,14 +8,14 @@
  * - Quarantine manifest (JSON) for tracking
  * - Restore functionality to return files to original location
  *
- * @module @openclaw/panguard-guard/response/file-quarantine
+ * @module @panguard-ai/panguard-guard/response/file-quarantine
  */
 
 import { createHash } from 'node:crypto';
 import { readFile, rename, mkdir, chmod, writeFile, readdir, stat } from 'node:fs/promises';
 import { join, basename, resolve, normalize } from 'node:path';
 import { homedir, platform } from 'node:os';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-guard:file-quarantine');
 

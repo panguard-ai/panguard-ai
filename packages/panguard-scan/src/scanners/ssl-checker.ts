@@ -8,11 +8,11 @@
  * 檢查具有 HTTPS 功能的埠上的 SSL/TLS 憑證是否有到期和有效性問題。
  * 連線到 localhost 上已識別的埠以檢查呈現的憑證。
  *
- * @module @openclaw/panguard-scan/scanners/ssl-checker
+ * @module @panguard-ai/panguard-scan/scanners/ssl-checker
  */
 
 import tls from 'node:tls';
-import { createLogger, type PortInfo } from '@openclaw/core';
+import { createLogger, type PortInfo } from '@panguard-ai/core';
 import type { Finding } from './types.js';
 
 const logger = createLogger('panguard-scan:ssl-checker');

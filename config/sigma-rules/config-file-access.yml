@@ -1,8 +1,8 @@
 title: Sensitive Configuration File Access Attempt
-id: openclaw-030
+id: panguard-030
 status: stable
 description: Detects attempts to access sensitive configuration files through web requests that may expose credentials, database connection strings, API keys, or other secrets.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: webserver

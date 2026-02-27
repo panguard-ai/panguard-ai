@@ -8,7 +8,7 @@
  * 提供 RuleEngine 類別，用於載入、管理和比對 Sigma 規則與安全事件。
  * 支援檔案系統載入、熱載入和自訂規則注入。
  *
- * @module @openclaw/core/rules
+ * @module @panguard-ai/core/rules
  */
 
 import { createLogger } from '../utils/logger.js';

@@ -9,14 +9,14 @@
  * 這些可能表示持久化機制或惡意活動。
  * 支援 macOS (launchctl)、Linux (crontab/cron.d) 和 Windows (schtasks)。
  *
- * @module @openclaw/panguard-scan/scanners/scheduled-tasks
+ * @module @panguard-ai/panguard-scan/scanners/scheduled-tasks
  */
 
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { readdir, readFile } from 'fs/promises';
 import { platform as osPlatform } from 'os';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { Finding } from './types.js';
 
 const execFileAsync = promisify(execFile);

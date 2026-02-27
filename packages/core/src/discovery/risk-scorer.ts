@@ -8,7 +8,7 @@
  * 根據已發現的環境因素計算總體風險評分（0-100），包括防火牆狀態、管理員帳號、
  * 開放埠、更新狀態、安全工具存在狀況和服務數量。
  *
- * @module @openclaw/core/discovery/risk-scorer
+ * @module @panguard-ai/core/discovery/risk-scorer
  */
 
 import { createLogger } from '../utils/logger.js';

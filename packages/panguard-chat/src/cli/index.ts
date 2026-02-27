@@ -9,7 +9,7 @@
  * - status: Show channel status / 顯示管道狀態
  * - config: Show current configuration / 顯示當前配置
  *
- * @module @openclaw/panguard-chat/cli
+ * @module @panguard-ai/panguard-chat/cli
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';

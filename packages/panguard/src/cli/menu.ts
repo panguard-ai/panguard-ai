@@ -4,10 +4,10 @@
  *
  * Uses ANSI cursor control for flicker-free re-rendering.
  *
- * @module @openclaw/panguard/cli/menu
+ * @module @panguard-ai/panguard/cli/menu
  */
 
-import { c, visLen, stripAnsi } from '@openclaw/core';
+import { c, visLen, stripAnsi } from '@panguard-ai/core';
 import { tierLabel } from './theme.js';
 import type { Tier } from './credentials.js';
 

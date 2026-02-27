@@ -5,11 +5,11 @@
  * Sends threat alerts to Telegram chats via Bot API.
  * 透過 Bot API 將威脅警報發送至 Telegram 聊天。
  *
- * @module @openclaw/panguard-guard/notify/telegram
+ * @module @panguard-ai/panguard-guard/notify/telegram
  */
 
 import { request } from 'node:https';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { TelegramConfig, NotificationResult, ThreatVerdict } from '../types.js';
 
 const logger = createLogger('panguard-guard:notify:telegram');

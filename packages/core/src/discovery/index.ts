@@ -6,7 +6,7 @@
  * network scanning, service enumeration, and security tool detection.
  * 提供系統偵察功能，包括作業系統偵測、網路掃描、服務列舉和安全工具偵測。
  *
- * @module @openclaw/core/discovery
+ * @module @panguard-ai/core/discovery
  */
 
 /** Discovery engine version / 偵察引擎版本 */

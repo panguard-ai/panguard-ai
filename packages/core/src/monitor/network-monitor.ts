@@ -6,7 +6,7 @@
  * for newly established or closed connections.
  * 定期輪詢活躍網路連線，並為新建立或關閉的連線發出事件。
  *
- * @module @openclaw/core/monitor/network-monitor
+ * @module @panguard-ai/core/monitor/network-monitor
  */
 
 import { EventEmitter } from 'node:events';

@@ -1,10 +1,10 @@
 /**
  * PanguardGuard type definitions
  * PanguardGuard 型別定義
- * @module @openclaw/panguard-guard/types
+ * @module @panguard-ai/panguard-guard/types
  */
 
-import type { Language, Severity, SecurityEvent } from '@openclaw/core';
+import type { Language, Severity, SecurityEvent } from '@panguard-ai/core';
 
 // ===== Investigation / Dynamic Reasoning =====
 

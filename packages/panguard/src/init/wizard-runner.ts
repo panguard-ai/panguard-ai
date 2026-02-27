@@ -2,14 +2,14 @@
  * Init Wizard Runner - Orchestrates the full onboarding flow
  * 初始設定精靈執行器 - 編排完整的設定流程
  *
- * @module @openclaw/panguard/init/wizard-runner
+ * @module @panguard-ai/panguard/init/wizard-runner
  */
 
 import {
   banner, box, c, symbols, statusPanel, divider, spinner,
   WizardEngine, promptConfirm, promptText,
-} from '@openclaw/core';
-import type { WizardAnswers as CoreWizardAnswers } from '@openclaw/core';
+} from '@panguard-ai/core';
+import type { WizardAnswers as CoreWizardAnswers } from '@panguard-ai/core';
 import { getWizardSteps } from './steps.js';
 import { hasExistingConfig, getEnvironmentInfo } from './environment.js';
 import { buildPanguardConfig, writeConfig } from './config-writer.js';
@@ -161,7 +161,7 @@ export async function runInitWizard(langOverride?: string): Promise<string | nul
     console.log('');
     const scanSp = spinner(lang === 'zh-TW' ? '\u6383\u63CF\u4E2D...' : 'Scanning...');
     try {
-      const { runScan: execScan } = await import('@openclaw/panguard-scan');
+      const { runScan: execScan } = await import('@panguard-ai/panguard-scan');
       const result = await execScan({ depth: 'quick', lang });
       scanSp.succeed(
         lang === 'zh-TW'

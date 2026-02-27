@@ -1,15 +1,15 @@
-# OpenClaw Security Default Configuration
-# OpenClaw 安全平台預設配置
+# Panguard AI Default Configuration
+# Panguard 安全平台預設配置
 
 app:
-  name: "OpenClaw Security"
+  name: "Panguard AI"
   version: "0.1.0"
   language: "zh-TW"
 
 logging:
   level: "info"
   format: "json"
-  file: "./logs/openclaw.log"
+  file: "./logs/panguard.log"
 
 security:
   scanInterval: 3600

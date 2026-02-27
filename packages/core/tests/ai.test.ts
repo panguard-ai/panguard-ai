@@ -10,9 +10,9 @@ import {
   parseAnalysisResponse,
   parseClassificationResponse,
   TokenTracker,
-} from '@openclaw/core/ai/index.js';
+} from '@panguard-ai/core/ai/index.js';
 
-import type { SecurityEvent } from '@openclaw/core/types.js';
+import type { SecurityEvent } from '@panguard-ai/core/types.js';
 
 // Suppress stderr output from logger during tests
 const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);

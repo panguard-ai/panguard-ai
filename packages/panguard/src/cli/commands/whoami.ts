@@ -2,12 +2,12 @@
  * `panguard whoami` - Show current user info
  * `panguard whoami` - 顯示目前用戶資訊
  *
- * @module @openclaw/panguard/cli/commands/whoami
+ * @module @panguard-ai/panguard/cli/commands/whoami
  */
 
 import { Command } from 'commander';
-import { c, symbols, statusPanel, timeAgo } from '@openclaw/core';
-import type { StatusItem } from '@openclaw/core';
+import { c, symbols, statusPanel, timeAgo } from '@panguard-ai/core';
+import type { StatusItem } from '@panguard-ai/core';
 import { loadCredentials, isTokenExpired, tierDisplayName } from '../credentials.js';
 
 export function whoamiCommand(): Command {

@@ -10,9 +10,9 @@ import { join, dirname } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { c, banner } from '@openclaw/core';
-import { AuthDB, createAuthHandlers } from '@openclaw/panguard-auth';
-import type { AuthRouteConfig, SmtpConfig, GoogleOAuthConfig, GoogleSheetsConfig } from '@openclaw/panguard-auth';
+import { c, banner } from '@panguard-ai/core';
+import { AuthDB, createAuthHandlers } from '@panguard-ai/panguard-auth';
+import type { AuthRouteConfig, SmtpConfig, GoogleOAuthConfig, GoogleSheetsConfig } from '@panguard-ai/panguard-auth';
 
 export function serveCommand(): Command {
   return new Command('serve')
@@ -194,12 +194,39 @@ async function handleRequest(
     }
 
     // Admin API routes
+    if (pathname === '/api/admin/dashboard') {
+      handlers.handleAdminDashboard(req, res);
+      return;
+    }
+    if (pathname === '/api/admin/users/search') {
+      handlers.handleAdminUsersSearch(req, res);
+      return;
+    }
     if (pathname === '/api/admin/users') {
       handlers.handleAdminUsers(req, res);
       return;
     }
     if (pathname === '/api/admin/stats') {
       handlers.handleAdminStats(req, res);
+      return;
+    }
+    if (pathname === '/api/admin/sessions') {
+      if (req.method === 'GET') {
+        handlers.handleAdminSessions(req, res);
+      } else {
+        sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+      }
+      return;
+    }
+    if (pathname === '/api/admin/activity') {
+      handlers.handleAdminActivity(req, res);
+      return;
+    }
+
+    // /api/admin/sessions/:id (DELETE)
+    const sessionRevokeMatch = pathname.match(/^\/api\/admin\/sessions\/(\d+)$/);
+    if (sessionRevokeMatch) {
+      handlers.handleAdminSessionRevoke(req, res, sessionRevokeMatch[1]!);
       return;
     }
 

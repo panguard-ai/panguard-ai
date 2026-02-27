@@ -6,10 +6,10 @@
  * for upload to Panguard Threat Cloud.
  * 將蜜罐連線轉換為匿名化情報資料，用於上傳到 Panguard Threat Cloud。
  *
- * @module @openclaw/panguard-trap/intel
+ * @module @panguard-ai/panguard-trap/intel
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   TrapSession,
   TrapIntelligence,

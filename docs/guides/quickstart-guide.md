@@ -9,8 +9,8 @@
 ### 從原始碼安裝（目前推薦）
 
 ```bash
-git clone https://github.com/openclaw-security/openclaw-security.git
-cd openclaw-security
+git clone https://github.com/panguard-ai/panguard-ai.git
+cd panguard-ai
 pnpm install
 pnpm build
 ```

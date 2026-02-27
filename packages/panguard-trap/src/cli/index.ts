@@ -3,7 +3,7 @@
  * PanguardTrap CLI
  * PanguardTrap 命令列介面
  *
- * @module @openclaw/panguard-trap/cli
+ * @module @panguard-ai/panguard-trap/cli
  */
 
 import type { TrapConfig, TrapServiceType, TrapStatistics } from '../types.js';

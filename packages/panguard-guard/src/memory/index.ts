@@ -8,12 +8,12 @@
  * 環境行為基線管理，支援學習期。在學習模式中追蹤正常系統行為，
  * 進入防護模式後偵測偏離。
  *
- * @module @openclaw/panguard-guard/memory
+ * @module @panguard-ai/panguard-guard/memory
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { EnvironmentBaseline } from '../types.js';
 import { createEmptyBaseline } from './baseline.js';
 

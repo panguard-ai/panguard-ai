@@ -16,10 +16,10 @@
  * 4. 設定語言偏好
  * 5. 發送測試通知
  *
- * @module @openclaw/panguard-chat/onboarding/setup-flow
+ * @module @panguard-ai/panguard-chat/onboarding/setup-flow
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   UserType,
   ChannelType,

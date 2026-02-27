@@ -6,10 +6,10 @@
  * De-duplicates similar remediation recommendations within each group.
  * 按優先級分組發現並呈現編號的修復步驟。在每個分組中去除重複的修復建議。
  *
- * @module @openclaw/panguard-scan/report/sections/remediation
+ * @module @panguard-ai/panguard-scan/report/sections/remediation
  */
 
-import type { Language, Severity } from '@openclaw/core';
+import type { Language, Severity } from '@panguard-ai/core';
 import type { Finding, ScanResult } from '../../scanners/types.js';
 import { sortBySeverity } from '../../scanners/types.js';
 import { COLORS, FONTS, LAYOUT } from '../styles.js';

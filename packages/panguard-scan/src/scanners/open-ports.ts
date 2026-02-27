@@ -6,10 +6,10 @@
  * ports and generates findings for each match.
  * 將開放埠列表與已知的風險或不必要埠集合進行比對，並為每個匹配產生發現。
  *
- * @module @openclaw/panguard-scan/scanners/open-ports
+ * @module @panguard-ai/panguard-scan/scanners/open-ports
  */
 
-import { createLogger, type PortInfo } from '@openclaw/core';
+import { createLogger, type PortInfo } from '@panguard-ai/core';
 import type { Finding } from './types.js';
 
 const logger = createLogger('panguard-scan:open-ports');

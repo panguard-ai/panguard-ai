@@ -5,7 +5,7 @@
  * Based on README TA: individual developers, small businesses (5-50), mid enterprises (50-500)
  * 根據 README TA：個人開發者、小型企業 (5-50 人)、中型企業 (50-500 人)
  *
- * @module @openclaw/panguard-web/content/personas
+ * @module @panguard-ai/panguard-web/content/personas
  */
 
 import type { PersonaProfile, ScenarioStory } from '../types.js';

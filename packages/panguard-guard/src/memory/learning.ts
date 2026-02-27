@@ -1,10 +1,10 @@
 /**
  * Learning period management for Context Memory
  * Context Memory 的學習期管理
- * @module @openclaw/panguard-guard/memory/learning
+ * @module @panguard-ai/panguard-guard/memory/learning
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { EnvironmentBaseline } from '../types.js';
 
 const logger = createLogger('panguard-guard:learning');

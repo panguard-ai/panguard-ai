@@ -16,10 +16,10 @@
  * - 認證模式分析
  * - MITRE ATT&CK 技術映射
  *
- * @module @openclaw/panguard-trap/profiler/attacker-profiler
+ * @module @panguard-ai/panguard-trap/profiler/attacker-profiler
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   TrapSession,
   AttackerProfile,

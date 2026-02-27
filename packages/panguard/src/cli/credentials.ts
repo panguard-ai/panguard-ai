@@ -2,7 +2,7 @@
  * Local credential store for CLI authentication.
  * Stores session token at ~/.panguard/credentials.json with 0600 permissions.
  *
- * @module @openclaw/panguard/cli/credentials
+ * @module @panguard-ai/panguard/cli/credentials
  */
 
 import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync, chmodSync } from 'node:fs';

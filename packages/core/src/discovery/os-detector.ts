@@ -6,7 +6,7 @@
  * architecture, kernel, and patch level across macOS, Linux, and Windows.
  * 偵測作業系統資訊，包括跨 macOS、Linux 和 Windows 的發行版、版本、架構、核心和修補等級。
  *
- * @module @openclaw/core/discovery/os-detector
+ * @module @panguard-ai/core/discovery/os-detector
  */
 
 import { execFile } from 'child_process';

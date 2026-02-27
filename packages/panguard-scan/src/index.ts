@@ -5,7 +5,7 @@
  * Performs comprehensive security scans and generates PDF reports.
  * 執行全面的安全掃描並產生 PDF 報告。
  *
- * @module @openclaw/panguard-scan
+ * @module @panguard-ai/panguard-scan
  */
 
 /** PanguardScan version / PanguardScan 版本 */

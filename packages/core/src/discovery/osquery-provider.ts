@@ -6,7 +6,7 @@
  * fallback to the existing shell-based discovery methods.
  * 當 osquery 可用時提供系統偵察，否則優雅降級到現有的 shell 指令方式。
  *
- * @module @openclaw/core/discovery/osquery-provider
+ * @module @panguard-ai/core/discovery/osquery-provider
  */
 
 import { execFile } from 'node:child_process';
