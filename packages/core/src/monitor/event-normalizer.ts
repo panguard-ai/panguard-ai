@@ -2,7 +2,7 @@
  * Event normalizer - converts raw events to SecurityEvent format
  * 事件正規化器 - 將原始事件轉換為 SecurityEvent 格式
  *
- * @module @openclaw/core/monitor/event-normalizer
+ * @module @panguard-ai/core/monitor/event-normalizer
  */
 
 import { randomUUID } from 'node:crypto';

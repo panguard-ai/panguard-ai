@@ -2,7 +2,7 @@
  * `panguard status` - Enhanced system status dashboard
  * `panguard status` - 增強版系統狀態儀表板
  *
- * @module @openclaw/panguard/cli/commands/status
+ * @module @panguard-ai/panguard/cli/commands/status
  */
 
 import { Command } from 'commander';
@@ -12,8 +12,8 @@ import { homedir } from 'node:os';
 import {
   c, symbols, banner, divider, statusPanel, scoreDisplay, table,
   formatDuration, timeAgo, header,
-} from '@openclaw/core';
-import type { StatusItem, TableColumn } from '@openclaw/core';
+} from '@panguard-ai/core';
+import type { StatusItem, TableColumn } from '@panguard-ai/core';
 import { readConfig } from '../../init/config-writer.js';
 import type { Lang } from '../../init/types.js';
 

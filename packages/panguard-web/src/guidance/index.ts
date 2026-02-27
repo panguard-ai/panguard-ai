@@ -6,7 +6,7 @@
  * find the right security solution based on their profile.
  * 實作互動式引導流程，幫助用戶根據自身條件找到合適的資安方案。
  *
- * @module @openclaw/panguard-web/guidance
+ * @module @panguard-ai/panguard-web/guidance
  */
 
 import type {

@@ -7,9 +7,9 @@ import { Command } from 'commander';
 import {
   c, banner, spinner, statusPanel, divider, scoreDisplay,
   symbols, formatDuration,
-} from '@openclaw/core';
-import { runScan } from '@openclaw/panguard-scan';
-import { generateComplianceReport, generateSummaryText } from '@openclaw/panguard-report';
+} from '@panguard-ai/core';
+import { runScan } from '@panguard-ai/panguard-scan';
+import { generateComplianceReport, generateSummaryText } from '@panguard-ai/panguard-report';
 
 export function demoCommand(): Command {
   return new Command('demo')
@@ -116,7 +116,7 @@ export function demoCommand(): Command {
       console.log('');
 
       try {
-        const { runCLI: guardCLI } = await import('@openclaw/panguard-guard');
+        const { runCLI: guardCLI } = await import('@panguard-ai/panguard-guard');
         await guardCLI(['status']);
         moduleStatus['Guard Engine'] = 'safe';
       } catch {
@@ -132,7 +132,7 @@ export function demoCommand(): Command {
       console.log('');
 
       try {
-        const { executeCli: trapCLI } = await import('@openclaw/panguard-trap');
+        const { executeCli: trapCLI } = await import('@panguard-ai/panguard-trap');
         await trapCLI(['config', '--services', 'ssh,http']);
         moduleStatus['Honeypot System'] = 'safe';
       } catch (err) {
@@ -147,7 +147,7 @@ export function demoCommand(): Command {
       console.log('');
 
       try {
-        const { runCLI: chatCLI } = await import('@openclaw/panguard-chat');
+        const { runCLI: chatCLI } = await import('@panguard-ai/panguard-chat');
         await chatCLI(['status']);
         moduleStatus['Notification System'] = 'safe';
       } catch (err) {

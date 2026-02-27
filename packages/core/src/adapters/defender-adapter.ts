@@ -9,7 +9,7 @@
  * Microsoft Defender Antivirus 整合，進行威脅偵測和掃描。
  * 在非 Windows 平台上優雅地處理並回傳空結果。
  *
- * @module @openclaw/core/adapters/defender-adapter
+ * @module @panguard-ai/core/adapters/defender-adapter
  */
 
 import { execFile } from 'node:child_process';

@@ -1,8 +1,8 @@
 title: Firewall Disabled or Rules Flushed
-id: openclaw-032
+id: panguard-032
 status: stable
 description: Detects attempts to disable host firewalls, flush firewall rules, or stop firewall services, which is a common defense evasion technique used by attackers to enable unrestricted network communication.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

@@ -4,7 +4,7 @@
  */
 
 import { Command } from 'commander';
-import { executeCli } from '@openclaw/panguard-trap';
+import { executeCli } from '@panguard-ai/panguard-trap';
 import { withAuth } from '../auth-guard.js';
 
 export function trapCommand(): Command {

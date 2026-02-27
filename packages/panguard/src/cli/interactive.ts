@@ -4,7 +4,7 @@
  * Minimalist arrow-key menu interface inspired by Claude Code / Vercel CLI.
  * Single-language display, no box borders, brand sage green theme.
  *
- * @module @openclaw/panguard/cli/interactive
+ * @module @panguard-ai/panguard/cli/interactive
  */
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -12,8 +12,8 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import {
   c, spinner, scoreDisplay, colorSeverity, divider, formatDuration,
-} from '@openclaw/core';
-import type { TableColumn, StatusItem } from '@openclaw/core';
+} from '@panguard-ai/core';
+import type { TableColumn, StatusItem } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../index.js';
 import { renderLogo, theme } from './theme.js';
 import {
@@ -251,7 +251,7 @@ async function actionScan(): Promise<void> {
   const depth = choice.key === '1' ? 'quick' : 'full';
   console.log('');
 
-  const { runScan } = await import('@openclaw/panguard-scan');
+  const { runScan } = await import('@panguard-ai/panguard-scan');
   const sp = spinner(currentLang === 'zh-TW'
     ? '\u6B63\u5728\u6383\u63CF\u7CFB\u7D71\u5B89\u5168...'
     : 'Scanning system...');
@@ -360,7 +360,7 @@ async function actionReport(): Promise<void> {
   const reportLang = langChoice.key === '1' ? 'zh-TW' : 'en';
   console.log('');
 
-  const { executeCli } = await import('@openclaw/panguard-report');
+  const { executeCli } = await import('@panguard-ai/panguard-report');
   await executeCli(['generate', '--framework', framework, '--language', reportLang]);
 }
 
@@ -389,7 +389,7 @@ async function actionGuard(): Promise<void> {
   if (!choice) return;
 
   console.log('');
-  const { runCLI } = await import('@openclaw/panguard-guard');
+  const { runCLI } = await import('@panguard-ai/panguard-guard');
 
   switch (choice.key) {
     case '1': await runCLI(['status']); break;
@@ -444,7 +444,7 @@ async function actionTrap(): Promise<void> {
   if (!choice) return;
 
   console.log('');
-  const { executeCli } = await import('@openclaw/panguard-trap');
+  const { executeCli } = await import('@panguard-ai/panguard-trap');
 
   switch (choice.key) {
     case '1': await executeCli(['config', '--services', 'ssh,http']); break;
@@ -477,7 +477,7 @@ async function actionChat(): Promise<void> {
   if (!choice) return;
 
   console.log('');
-  const { runCLI } = await import('@openclaw/panguard-chat');
+  const { runCLI } = await import('@panguard-ai/panguard-chat');
 
   switch (choice.key) {
     case '1': await runCLI(['setup', '--lang', currentLang]); break;
@@ -500,7 +500,7 @@ async function actionThreat(): Promise<void> {
     : '  Starting Threat Cloud REST API server (port 8080)...'));
   console.log('');
 
-  const { ThreatCloudServer } = await import('@openclaw/threat-cloud');
+  const { ThreatCloudServer } = await import('@panguard-ai/threat-cloud');
   const sp = spinner(currentLang === 'zh-TW'
     ? '\u6B63\u5728\u555F\u52D5 Threat Cloud API...'
     : 'Starting Threat Cloud API server...');
@@ -545,8 +545,8 @@ async function actionThreat(): Promise<void> {
 // ---------------------------------------------------------------------------
 
 async function actionDemo(): Promise<void> {
-  const { runScan } = await import('@openclaw/panguard-scan');
-  const { generateComplianceReport, generateSummaryText } = await import('@openclaw/panguard-report');
+  const { runScan } = await import('@panguard-ai/panguard-scan');
+  const { generateComplianceReport, generateSummaryText } = await import('@panguard-ai/panguard-report');
 
   const title = currentLang === 'zh-TW' ? '\u529F\u80FD\u5C55\u793A' : 'Feature Demo';
   console.log(`  ${theme.brandBold(title)}`);
@@ -626,7 +626,7 @@ async function actionDemo(): Promise<void> {
   console.log('');
 
   try {
-    const { runCLI: guardCLI } = await import('@openclaw/panguard-guard');
+    const { runCLI: guardCLI } = await import('@panguard-ai/panguard-guard');
     await guardCLI(['status']);
   } catch {
     console.log(c.dim(currentLang === 'zh-TW'
@@ -640,7 +640,7 @@ async function actionDemo(): Promise<void> {
   console.log('');
 
   try {
-    const { executeCli: trapCLI } = await import('@openclaw/panguard-trap');
+    const { executeCli: trapCLI } = await import('@panguard-ai/panguard-trap');
     await trapCLI(['config', '--services', 'ssh,http']);
   } catch (err) {
     console.log(`  ${c.critical(err instanceof Error ? err.message : String(err))}`);
@@ -652,7 +652,7 @@ async function actionDemo(): Promise<void> {
   console.log('');
 
   try {
-    const { runCLI: chatCLI } = await import('@openclaw/panguard-chat');
+    const { runCLI: chatCLI } = await import('@panguard-ai/panguard-chat');
     await chatCLI(['status']);
   } catch {
     console.log(c.dim(currentLang === 'zh-TW'

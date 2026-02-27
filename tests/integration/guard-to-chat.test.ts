@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { ThreatVerdict } from '@openclaw/panguard-guard';
+import type { ThreatVerdict } from '@panguard-ai/panguard-guard';
 import {
   DEFAULT_ACTION_POLICY,
   createEmptyBaseline,
@@ -19,8 +19,8 @@ import {
   validateLicense,
   hasFeature,
   generateTestLicenseKey,
-} from '@openclaw/panguard-guard';
-import type { ThreatAlert, UserProfile, UserType } from '@openclaw/panguard-chat';
+} from '@panguard-ai/panguard-guard';
+import type { ThreatAlert, UserProfile, UserType } from '@panguard-ai/panguard-chat';
 import {
   formatAlert,
   formatConfirmation,
@@ -30,7 +30,7 @@ import {
   getHumanSummary,
   ALERT_TEMPLATES,
   DEFAULT_PREFERENCES,
-} from '@openclaw/panguard-chat';
+} from '@panguard-ai/panguard-chat';
 
 // ---------------------------------------------------------------------------
 // Helpers: Convert ThreatVerdict to ThreatAlert

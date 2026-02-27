@@ -5,11 +5,11 @@
  * Tracks normal system behavior patterns and detects deviations.
  * 追蹤正常系統行為模式並偵測偏離。
  *
- * @module @openclaw/panguard-guard/memory/baseline
+ * @module @panguard-ai/panguard-guard/memory/baseline
  */
 
-import { createLogger } from '@openclaw/core';
-import type { SecurityEvent } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
+import type { SecurityEvent } from '@panguard-ai/core';
 import type {
   EnvironmentBaseline,
   DeviationResult,

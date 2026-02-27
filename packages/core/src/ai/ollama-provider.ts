@@ -7,7 +7,7 @@
  * 透過 HTTP API 與本地 Ollama 實例通訊。
  * 使用原生 fetch（Node 18+），無需外部相依。
  *
- * @module @openclaw/core/ai/ollama-provider
+ * @module @panguard-ai/core/ai/ollama-provider
  */
 
 import type { LLMConfig } from './types.js';

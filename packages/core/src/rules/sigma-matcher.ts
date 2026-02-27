@@ -8,7 +8,7 @@
  * 將 SecurityEvent 實例與 Sigma 規則比對，透過評估偵測選擇項和條件表達式。
  * 支援萬用字元（*）、|contains 修飾符，以及簡單的 AND/OR/NOT 邏輯。
  *
- * @module @openclaw/core/rules/sigma-matcher
+ * @module @panguard-ai/core/rules/sigma-matcher
  */
 
 import { createLogger } from '../utils/logger.js';

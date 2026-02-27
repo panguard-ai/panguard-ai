@@ -9,52 +9,52 @@
 import { describe, it, expect } from 'vitest';
 
 // All package imports to verify they load correctly
-import * as core from '@openclaw/core';
-import * as panguardScan from '@openclaw/panguard-scan';
-import * as panguardGuard from '@openclaw/panguard-guard';
-import * as panguardChat from '@openclaw/panguard-chat';
-import * as panguardTrap from '@openclaw/panguard-trap';
-import * as panguardReport from '@openclaw/panguard-report';
-import * as panguardWeb from '@openclaw/panguard-web';
+import * as core from '@panguard-ai/core';
+import * as panguardScan from '@panguard-ai/panguard-scan';
+import * as panguardGuard from '@panguard-ai/panguard-guard';
+import * as panguardChat from '@panguard-ai/panguard-chat';
+import * as panguardTrap from '@panguard-ai/panguard-trap';
+import * as panguardReport from '@panguard-ai/panguard-report';
+import * as panguardWeb from '@panguard-ai/panguard-web';
 
 describe('Platform Integrity', () => {
   describe('Package Loading', () => {
-    it('should load @openclaw/core', () => {
+    it('should load @panguard-ai/core', () => {
       expect(core.CORE_VERSION).toBeDefined();
       expect(typeof core.createLogger).toBe('function');
       expect(typeof core.initI18n).toBe('function');
     });
 
-    it('should load @openclaw/panguard-scan', () => {
+    it('should load @panguard-ai/panguard-scan', () => {
       expect(panguardScan.PANGUARD_SCAN_VERSION).toBeDefined();
       expect(typeof panguardScan.sortBySeverity).toBe('function');
     });
 
-    it('should load @openclaw/panguard-guard', () => {
+    it('should load @panguard-ai/panguard-guard', () => {
       expect(panguardGuard.PANGUARD_GUARD_VERSION).toBeDefined();
       expect(typeof panguardGuard.createEmptyBaseline).toBe('function');
       expect(typeof panguardGuard.validateLicense).toBe('function');
     });
 
-    it('should load @openclaw/panguard-chat', () => {
+    it('should load @panguard-ai/panguard-chat', () => {
       expect(panguardChat.PANGUARD_CHAT_VERSION).toBeDefined();
       expect(typeof panguardChat.formatAlert).toBe('function');
       expect(typeof panguardChat.buildSystemPrompt).toBe('function');
     });
 
-    it('should load @openclaw/panguard-trap', () => {
+    it('should load @panguard-ai/panguard-trap', () => {
       expect(panguardTrap.PANGUARD_TRAP_VERSION).toBeDefined();
       expect(typeof panguardTrap.buildTrapIntel).toBe('function');
       expect(typeof panguardTrap.estimateSkillLevel).toBe('function');
     });
 
-    it('should load @openclaw/panguard-report', () => {
+    it('should load @panguard-ai/panguard-report', () => {
       expect(panguardReport.PANGUARD_REPORT_VERSION).toBeDefined();
       expect(typeof panguardReport.generateComplianceReport).toBe('function');
       expect(typeof panguardReport.getSupportedFrameworks).toBe('function');
     });
 
-    it('should load @openclaw/panguard-web', () => {
+    it('should load @panguard-ai/panguard-web', () => {
       expect(panguardWeb.PANGUARD_WEB_VERSION).toBeDefined();
       expect(typeof panguardWeb.generateGuidanceResult).toBe('function');
       expect(typeof panguardWeb.generateHead).toBe('function');
@@ -205,9 +205,9 @@ describe('Platform Integrity', () => {
       expect(footer).toContain('Panguard AI');
     });
 
-    it('should use "OpenClaw Security" in footer attribution', () => {
+    it('should use "Panguard AI" in footer attribution', () => {
       const footer = panguardWeb.generateFooter('en');
-      expect(footer).toContain('OpenClaw Security');
+      expect(footer).toContain('Panguard AI');
     });
 
     it('should use "Panguard" in product names', () => {

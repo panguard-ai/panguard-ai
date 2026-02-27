@@ -8,7 +8,7 @@
  * 與現有資安工具整合，如 Windows Defender、Wazuh 和基於 syslog 的系統。
  * 提供統一的對接器介面、自動偵測註冊表和標準告警到 SecurityEvent 的轉換。
  *
- * @module @openclaw/core/adapters
+ * @module @panguard-ai/core/adapters
  */
 
 /** Adapters module version / 對接器模組版本 */

@@ -1,11 +1,11 @@
 /**
  * Remote port scanner using TCP connect.
- * @module @openclaw/panguard-scan/scanners/remote/port-scanner
+ * @module @panguard-ai/panguard-scan/scanners/remote/port-scanner
  */
 
 import { createConnection } from 'node:net';
 import type { Finding } from '../types.js';
-import type { Language } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
 
 /** Common ports to check */
 const TARGET_PORTS = [22, 80, 443, 3306, 5432, 6379, 8080, 27017];

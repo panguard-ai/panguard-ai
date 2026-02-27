@@ -5,10 +5,10 @@
  * Maps security findings to compliance controls and evaluates status.
  * 將資安發現映射到合規控制項並評估狀態。
  *
- * @module @openclaw/panguard-report/mapper/compliance-mapper
+ * @module @panguard-ai/panguard-report/mapper/compliance-mapper
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   ComplianceControl,
   ComplianceFinding,

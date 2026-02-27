@@ -2,7 +2,7 @@
  * Input validation utilities using Zod
  * 使用 Zod 的輸入驗證工具
  *
- * @module @openclaw/core/utils/validation
+ * @module @panguard-ai/core/utils/validation
  */
 
 import { z } from 'zod';

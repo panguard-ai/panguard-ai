@@ -10,10 +10,10 @@
  * 透過攻擊者分析器處理連線，
  * 並產生情報回饋 Threat Cloud。
  *
- * @module @openclaw/panguard-trap/trap-engine
+ * @module @panguard-ai/panguard-trap/trap-engine
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   TrapConfig,
   TrapEngineStatus,

@@ -1,12 +1,12 @@
 /**
  * Remote HTTP security headers checker.
- * @module @openclaw/panguard-scan/scanners/remote/http-headers
+ * @module @panguard-ai/panguard-scan/scanners/remote/http-headers
  */
 
 import { get as httpsGet } from 'node:https';
 import { get as httpGet } from 'node:http';
 import type { Finding } from '../types.js';
-import type { Language } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
 
 /** Security headers to check */
 const SECURITY_HEADERS: Array<{

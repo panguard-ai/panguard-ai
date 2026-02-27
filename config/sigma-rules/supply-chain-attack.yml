@@ -1,8 +1,8 @@
 title: Supply Chain Attack Indicators
-id: openclaw-024
+id: panguard-024
 status: stable
 description: Detects suspicious package installations, dependency confusion attacks, typosquatting indicators, and malicious build scripts in package managers
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

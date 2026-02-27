@@ -6,7 +6,7 @@
  * threat classifications, and token usage tracking.
  * 定義所有 LLM 供應商、分析結果、威脅分類和 Token 使用追蹤的契約。
  *
- * @module @openclaw/core/ai/types
+ * @module @panguard-ai/core/ai/types
  */
 
 import type { Language, Severity, SecurityEvent } from '../types.js';

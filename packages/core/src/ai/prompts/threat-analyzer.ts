@@ -6,7 +6,7 @@
  * Supports bilingual output (English and Traditional Chinese).
  * 產生 AI 驅動的安全威脅分析提示詞。支援雙語輸出（英文和繁體中文）。
  *
- * @module @openclaw/core/ai/prompts/threat-analyzer
+ * @module @panguard-ai/core/ai/prompts/threat-analyzer
  */
 
 import type { Language } from '../../types.js';

@@ -4,9 +4,9 @@
  */
 
 import { Command } from 'commander';
-import { ThreatCloudServer, ThreatCloudDB } from '@openclaw/threat-cloud';
-import type { ServerConfig } from '@openclaw/threat-cloud';
-import { c, spinner, statusPanel, divider, table, symbols } from '@openclaw/core';
+import { ThreatCloudServer, ThreatCloudDB } from '@panguard-ai/threat-cloud';
+import type { ServerConfig } from '@panguard-ai/threat-cloud';
+import { c, spinner, statusPanel, divider, table, symbols } from '@panguard-ai/core';
 import { withAuth } from '../auth-guard.js';
 
 export function threatCommand(): Command {

@@ -10,14 +10,14 @@
  * 來統籌建立完整的 PDF 安全報告文件。處理繁體中文輸出的 CJK 字型偵測
  * 和頁尾渲染。
  *
- * @module @openclaw/panguard-scan/report/pdf-generator
+ * @module @panguard-ai/panguard-scan/report/pdf-generator
  */
 
 import PDFDocument from 'pdfkit';
 import { createWriteStream } from 'node:fs';
 import { access, constants } from 'node:fs/promises';
-import { createLogger } from '@openclaw/core';
-import type { Language } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
+import type { Language } from '@panguard-ai/core';
 import type { ScanResult } from '../scanners/types.js';
 import { COLORS, FONTS, LAYOUT } from './styles.js';
 import { renderCoverPage } from './sections/cover.js';
@@ -126,7 +126,7 @@ function addPageFooter(doc: PDFKit.PDFDocument, pageNumber: number): void {
     .font(FONTS.body)
     .fontSize(7)
     .fillColor(COLORS.lightText)
-    .text('OpenClaw Security', LAYOUT.margin, footerY - 4, {
+    .text('Panguard AI', LAYOUT.margin, footerY - 4, {
       width: LAYOUT.contentWidth / 2,
       align: 'left',
     });
@@ -178,8 +178,8 @@ export async function generatePdfReport(
   logger.info('Starting PDF report generation', { outputPath, lang });
 
   const reportTitle = lang === 'zh-TW'
-    ? 'OpenClaw Security - 資安健檢報告'
-    : 'OpenClaw Security - Health Check Report';
+    ? 'Panguard AI - 資安健檢報告'
+    : 'Panguard AI - Health Check Report';
 
   // Create the PDF document
   const doc = new PDFDocument({
@@ -192,7 +192,7 @@ export async function generatePdfReport(
     },
     info: {
       Title: reportTitle,
-      Author: 'OpenClaw Security',
+      Author: 'Panguard AI',
       Creator: 'PanguardScan PDF Generator',
       Producer: 'PDFKit',
     },

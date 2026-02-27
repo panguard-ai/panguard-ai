@@ -5,7 +5,7 @@
  * Defines all types used by the Sigma rule parser, matcher, and engine.
  * 定義 Sigma 規則解析器、比對器和引擎使用的所有型別。
  *
- * @module @openclaw/core/rules/types
+ * @module @panguard-ai/core/rules/types
  */
 
 import type { Severity, SecurityEvent } from '../types.js';

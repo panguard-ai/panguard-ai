@@ -2,13 +2,13 @@
  * Config Writer - Generates PanguardConfig from wizard answers
  * 配置產生器 - 從精靈答案產生 PanguardConfig
  *
- * @module @openclaw/panguard/init/config-writer
+ * @module @panguard-ai/panguard/init/config-writer
  */
 
 import { mkdirSync, writeFileSync, chmodSync } from 'node:fs';
 import * as os from 'node:os';
 import { join } from 'node:path';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { WizardAnswers, PanguardConfig, ProtectionLevel, AiPreference, OrgSize, DeployEnv } from './types.js';
 
 const logger = createLogger('panguard:init:config');

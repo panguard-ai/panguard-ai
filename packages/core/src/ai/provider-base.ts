@@ -6,7 +6,7 @@
  * construction, response parsing, and token tracking.
  * 實作所有 LLM 供應商的共用邏輯，包括提示詞建構、回應解析和 Token 追蹤。
  *
- * @module @openclaw/core/ai/provider-base
+ * @module @panguard-ai/core/ai/provider-base
  */
 
 import type { SecurityEvent } from '../types.js';

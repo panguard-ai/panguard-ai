@@ -6,8 +6,8 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   checkUnnecessaryPorts,
   SEVERITY_ORDER,
-} from '@openclaw/panguard-scan/scanners/index.js';
-import type { PortInfo } from '@openclaw/core';
+} from '@panguard-ai/panguard-scan/scanners/index.js';
+import type { PortInfo } from '@panguard-ai/core';
 
 // Suppress logger output during tests
 vi.spyOn(process.stderr, 'write').mockImplementation(() => true);

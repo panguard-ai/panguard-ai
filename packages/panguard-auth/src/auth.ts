@@ -1,7 +1,7 @@
 /**
  * Authentication utilities: password hashing and token generation.
  * Uses only node:crypto — zero external dependencies.
- * @module @openclaw/panguard-auth/auth
+ * @module @panguard-ai/panguard-auth/auth
  */
 
 import { scrypt, randomBytes, randomUUID, timingSafeEqual, createHash } from 'node:crypto';

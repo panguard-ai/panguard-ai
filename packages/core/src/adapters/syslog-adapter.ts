@@ -8,7 +8,7 @@
  * 透過 UDP 接收 syslog 訊息，解析 RFC 5424 格式，並將其轉換為
  * 標準化的 AdapterAlert。支援緩衝告警取得和基於回呼的即時告警通知。
  *
- * @module @openclaw/core/adapters/syslog-adapter
+ * @module @panguard-ai/core/adapters/syslog-adapter
  */
 
 import dgram from 'node:dgram';

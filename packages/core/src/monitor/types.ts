@@ -2,7 +2,7 @@
  * System monitoring engine type definitions
  * 系統監控引擎型別定義
  *
- * @module @openclaw/core/monitor/types
+ * @module @panguard-ai/core/monitor/types
  */
 
 /**

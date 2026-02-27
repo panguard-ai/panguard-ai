@@ -1,8 +1,8 @@
 title: Network Reconnaissance Tool Execution
-id: openclaw-035
+id: panguard-035
 status: stable
 description: Detects execution of network scanning and reconnaissance tools that may indicate an attacker performing network discovery, port scanning, or lateral movement preparation.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

@@ -1,8 +1,8 @@
 title: Log Tampering and Clearing
-id: openclaw-015
+id: panguard-015
 status: stable
 description: Detects clearing of system logs, stopping of logging services, and log file deletion or truncation indicating evidence destruction
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

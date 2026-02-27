@@ -1,8 +1,8 @@
 title: Download from Suspicious Source
-id: openclaw-039
+id: panguard-039
 status: stable
 description: Detects file downloads from known paste sites, file sharing services, and other suspicious sources commonly used by attackers to host malicious payloads.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

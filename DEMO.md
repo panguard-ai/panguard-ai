@@ -8,7 +8,7 @@
 ## 前置準備 / Prerequisites
 
 ```bash
-cd /Users/user/Downloads/openclaw-security
+cd /Users/user/Downloads/panguard-ai
 pnpm install && pnpm build
 
 # 安裝全域指令（只需要做一次）/ Install global command (only once):

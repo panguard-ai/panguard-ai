@@ -5,15 +5,15 @@
  * Opens a browser for authentication, receives callback on localhost,
  * then stores the session token locally.
  *
- * @module @openclaw/panguard/cli/commands/login
+ * @module @panguard-ai/panguard/cli/commands/login
  */
 
 import { Command } from 'commander';
 import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
 import { exec } from 'node:child_process';
-import { c, symbols, box, statusPanel, spinner } from '@openclaw/core';
-import type { StatusItem } from '@openclaw/core';
+import { c, symbols, box, statusPanel, spinner } from '@panguard-ai/core';
+import type { StatusItem } from '@panguard-ai/core';
 import {
   saveCredentials, loadCredentials, isTokenExpired,
   tierDisplayName, CREDENTIALS_PATH,

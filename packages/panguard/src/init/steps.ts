@@ -4,10 +4,10 @@
  *
  * All steps are bilingual (en + zh-TW).
  *
- * @module @openclaw/panguard/init/steps
+ * @module @panguard-ai/panguard/init/steps
  */
 
-import type { WizardStep } from '@openclaw/core';
+import type { WizardStep } from '@panguard-ai/core';
 import { detectEnvironment } from './environment.js';
 
 /**

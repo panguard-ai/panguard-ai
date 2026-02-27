@@ -1,11 +1,11 @@
 /**
  * Remote DNS security record checker (SPF, DMARC, DKIM).
- * @module @openclaw/panguard-scan/scanners/remote/dns-checker
+ * @module @panguard-ai/panguard-scan/scanners/remote/dns-checker
  */
 
 import { resolveTxt } from 'node:dns/promises';
 import type { Finding } from '../types.js';
-import type { Language } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
 
 export interface DNSCheckResult {
   hasSPF: boolean;

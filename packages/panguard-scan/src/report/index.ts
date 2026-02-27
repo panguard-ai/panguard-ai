@@ -6,7 +6,7 @@
  * compliance mapping against the Taiwan ISMS framework.
  * 提供從掃描結果產生 PDF 報告的功能，包括台灣資通安全管理法框架的合規對照。
  *
- * @module @openclaw/panguard-scan/report
+ * @module @panguard-ai/panguard-scan/report
  */
 
 export { generatePdfReport } from './pdf-generator.js';

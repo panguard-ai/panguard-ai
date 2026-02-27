@@ -1,11 +1,11 @@
 /**
  * Remote SSL/TLS certificate checker.
- * @module @openclaw/panguard-scan/scanners/remote/ssl-checker
+ * @module @panguard-ai/panguard-scan/scanners/remote/ssl-checker
  */
 
 import { connect } from 'node:tls';
 import type { Finding } from '../types.js';
-import type { Language } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
 
 export interface SSLResult {
   valid: boolean;
@@ -48,8 +48,8 @@ export async function checkSSL(
 
         resolve({
           valid: now >= validFrom && now <= validTo,
-          issuer: cert.issuer?.O ?? cert.issuer?.CN ?? 'unknown',
-          subject: cert.subject?.CN ?? 'unknown',
+          issuer: String(Array.isArray(cert.issuer?.O) ? cert.issuer.O[0] : (cert.issuer?.O ?? cert.issuer?.CN ?? 'unknown')),
+          subject: String(Array.isArray(cert.subject?.CN) ? cert.subject.CN[0] : (cert.subject?.CN ?? 'unknown')),
           validFrom: validFrom.toISOString(),
           validTo: validTo.toISOString(),
           daysUntilExpiry,

@@ -1,7 +1,7 @@
 /**
  * HTTP route handlers for auth and waitlist API.
  * Designed to plug into the existing raw node:http server.
- * @module @openclaw/panguard-auth/routes
+ * @module @panguard-ai/panguard-auth/routes
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -557,7 +557,7 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       return;
     }
 
-    const users = db.getAllUsers().map(u => toPublicUser(u));
+    const users = db.getAllUsersAdmin();
     json(res, 200, { ok: true, data: users });
   }
 
@@ -693,6 +693,53 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     json(res, 200, { ok: true, data: { id: entry.id, status: 'rejected' } });
   }
 
+  // ── Admin: Enhanced Endpoints ───────────────────────────────────
+
+  function handleAdminDashboard(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method !== 'GET') { json(res, 405, { ok: false, error: 'Method not allowed' }); return; }
+    const user = authenticateRequest(req, db);
+    if (!requireAdmin(user)) { json(res, 403, { ok: false, error: 'Admin access required' }); return; }
+    const stats = db.getAdminDashboardStats();
+    json(res, 200, { ok: true, data: stats });
+  }
+
+  function handleAdminUsersSearch(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method !== 'GET') { json(res, 405, { ok: false, error: 'Method not allowed' }); return; }
+    const user = authenticateRequest(req, db);
+    if (!requireAdmin(user)) { json(res, 403, { ok: false, error: 'Admin access required' }); return; }
+    const urlObj = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+    const q = urlObj.searchParams.get('q') ?? '';
+    const users = q ? db.searchUsers(q) : db.getAllUsersAdmin();
+    json(res, 200, { ok: true, data: users });
+  }
+
+  function handleAdminSessions(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method !== 'GET') { json(res, 405, { ok: false, error: 'Method not allowed' }); return; }
+    const user = authenticateRequest(req, db);
+    if (!requireAdmin(user)) { json(res, 403, { ok: false, error: 'Admin access required' }); return; }
+    const sessions = db.getActiveSessions();
+    json(res, 200, { ok: true, data: sessions });
+  }
+
+  function handleAdminSessionRevoke(req: IncomingMessage, res: ServerResponse, sessionId: string): void {
+    if (req.method !== 'DELETE') { json(res, 405, { ok: false, error: 'Method not allowed' }); return; }
+    const user = authenticateRequest(req, db);
+    if (!requireAdmin(user)) { json(res, 403, { ok: false, error: 'Admin access required' }); return; }
+    const deleted = db.deleteSessionById(Number(sessionId));
+    if (!deleted) { json(res, 404, { ok: false, error: 'Session not found' }); return; }
+    json(res, 200, { ok: true, data: { revoked: true } });
+  }
+
+  function handleAdminActivity(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method !== 'GET') { json(res, 405, { ok: false, error: 'Method not allowed' }); return; }
+    const user = authenticateRequest(req, db);
+    if (!requireAdmin(user)) { json(res, 403, { ok: false, error: 'Admin access required' }); return; }
+    const urlObj = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+    const limit = Math.min(parseInt(urlObj.searchParams.get('limit') ?? '20', 10) || 20, 50);
+    const activity = db.getRecentActivity(limit);
+    json(res, 200, { ok: true, data: activity });
+  }
+
   // ── Init Google Sheets headers ──────────────────────────────────
 
   if (config.sheets) {
@@ -721,5 +768,10 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     handleAdminStats,
     handleAdminWaitlistApprove,
     handleAdminWaitlistReject,
+    handleAdminDashboard,
+    handleAdminUsersSearch,
+    handleAdminSessions,
+    handleAdminSessionRevoke,
+    handleAdminActivity,
   };
 }

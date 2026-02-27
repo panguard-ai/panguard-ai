@@ -8,12 +8,12 @@
  * - SIGTERM first, SIGKILL after timeout
  * - Cross-platform support
  *
- * @module @openclaw/panguard-guard/response/process-killer
+ * @module @panguard-ai/panguard-guard/response/process-killer
  */
 
 import { execFile } from 'node:child_process';
 import { platform } from 'node:os';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-guard:process-killer');
 

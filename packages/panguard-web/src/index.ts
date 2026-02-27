@@ -9,7 +9,7 @@
  * 提供場景化文案、線上引導精靈、定價方案和 HTML 範本產生器，
  * 用於 Panguard AI 行銷官網。
  *
- * @module @openclaw/panguard-web
+ * @module @panguard-ai/panguard-web
  */
 
 export const PANGUARD_WEB_VERSION = '0.1.0';

@@ -1,8 +1,8 @@
 /**
- * Core type definitions for OpenClaw Security platform
- * OpenClaw 安全平台核心類型定義
+ * Core type definitions for Panguard AI platform
+ * Panguard 安全平台核心類型定義
  *
- * @module @openclaw/core/types
+ * @module @panguard-ai/core/types
  */
 
 /**

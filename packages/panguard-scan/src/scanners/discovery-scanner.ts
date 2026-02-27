@@ -2,11 +2,11 @@
  * Discovery scanner - orchestrates all core discovery functions
  * 偵察掃描器 - 編排所有核心偵察功能
  *
- * Calls all discovery functions from @openclaw/core sequentially to build
+ * Calls all discovery functions from @panguard-ai/core sequentially to build
  * a complete DiscoveryResult representing the current system's security posture.
- * 依序呼叫 @openclaw/core 中的所有偵察功能，建構代表目前系統安全態勢的完整 DiscoveryResult。
+ * 依序呼叫 @panguard-ai/core 中的所有偵察功能，建構代表目前系統安全態勢的完整 DiscoveryResult。
  *
- * @module @openclaw/panguard-scan/scanners/discovery-scanner
+ * @module @panguard-ai/panguard-scan/scanners/discovery-scanner
  */
 
 import { execSync } from 'node:child_process';
@@ -25,7 +25,7 @@ import {
   createLogger,
   type DiscoveryResult,
   type DiscoveryConfig,
-} from '@openclaw/core';
+} from '@panguard-ai/core';
 
 const logger = createLogger('panguard-scan:discovery');
 

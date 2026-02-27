@@ -7,13 +7,13 @@
  * 提供匿名化威脅數據上傳和社群規則分發。
  * 支援 HTTP 雲端後端和離線模式的本地檔案備援。
  *
- * @module @openclaw/panguard-guard/threat-cloud
+ * @module @panguard-ai/panguard-guard/threat-cloud
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { request } from 'node:https';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   AnonymizedThreatData,
   ThreatCloudUpdate,

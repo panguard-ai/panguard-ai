@@ -1,5 +1,5 @@
 {
-  "name": "@openclaw/panguard-guard",
+  "name": "@panguard-ai/panguard-guard",
   "version": "0.1.0",
   "type": "module",
   "description": "AI real-time endpoint monitoring and auto-response / AI 即時端點監控與自動回應",
@@ -16,7 +16,7 @@
     "dev": "tsc --build --watch"
   },
   "dependencies": {
-    "@openclaw/core": "workspace:*"
+    "@panguard-ai/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

@@ -10,7 +10,7 @@
  *
  * All feeds are free and require no registration (except AbuseIPDB which is optional).
  *
- * @module @openclaw/core/monitor/threat-intel-feeds
+ * @module @panguard-ai/core/monitor/threat-intel-feeds
  */
 
 import { createLogger } from '../utils/logger.js';

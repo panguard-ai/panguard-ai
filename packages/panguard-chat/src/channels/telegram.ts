@@ -12,10 +12,10 @@
  * 注意：企業/合規方案不建議使用 Telegram，因為 Telegram
  * 預設不加密、伺服器端持有金鑰，可能不符合 ISO 27001 / 資通安全管理法。
  *
- * @module @openclaw/panguard-chat/channels/telegram
+ * @module @panguard-ai/panguard-chat/channels/telegram
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   MessagingChannel,
   ChannelResult,

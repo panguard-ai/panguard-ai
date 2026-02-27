@@ -8,7 +8,7 @@
  * 透過檢查執行中的行程、已知服務名稱和常見安裝路徑，偵測已安裝和執行中的安全工具
  * （防毒、EDR、防火牆、IDS、SIEM）。
  *
- * @module @openclaw/core/discovery/security-tools
+ * @module @panguard-ai/core/discovery/security-tools
  */
 
 import { execFile } from 'child_process';

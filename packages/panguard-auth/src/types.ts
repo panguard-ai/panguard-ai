@@ -1,6 +1,6 @@
 /**
  * Type definitions for Panguard Auth
- * @module @openclaw/panguard-auth/types
+ * @module @panguard-ai/panguard-auth/types
  */
 
 export interface WaitlistEntry {
@@ -69,8 +69,36 @@ export interface WaitlistStats {
   total: number;
   pending: number;
   approved: number;
+  rejected: number;
   verified: number;
   todaySignups: number;
+  bySource: Record<string, number>;
+}
+
+export interface UserAdmin {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+  tier: string;
+  verified: number;
+  createdAt: string;
+  lastLogin: string | null;
+}
+
+export interface SessionAdmin {
+  id: number;
+  userId: number;
+  userEmail: string;
+  userName: string;
+  expiresAt: string;
+  createdAt: string;
+}
+
+export interface ActivityItem {
+  type: string;
+  description: string;
+  timestamp: string;
 }
 
 export interface AuthResult {

@@ -337,5 +337,5 @@ rm -rf ~/.panguard-chat
 
 ## 取得幫助
 
-- GitHub Issues: [github.com/openclaw-security/openclaw-security/issues](https://github.com/openclaw-security/openclaw-security/issues)
+- GitHub Issues: [github.com/panguard-ai/panguard-ai/issues](https://github.com/panguard-ai/panguard-ai/issues)
 - 文件: [panguard.ai/docs](https://panguard.ai/docs)

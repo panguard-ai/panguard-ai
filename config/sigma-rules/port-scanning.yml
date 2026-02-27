@@ -1,8 +1,8 @@
 title: Internal Port Scanning Detection
-id: openclaw-017
+id: panguard-017
 status: stable
 description: Detects port scanning activity from internal network hosts, including use of common scanning tools and rapid connection attempts to multiple ports
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: network_connection

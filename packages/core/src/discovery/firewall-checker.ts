@@ -6,7 +6,7 @@
  * and Windows using platform-specific firewall management commands.
  * 使用平台特定的防火牆管理命令，跨 macOS、Linux 和 Windows 檢查防火牆狀態並擷取啟用規則。
  *
- * @module @openclaw/core/discovery/firewall-checker
+ * @module @panguard-ai/core/discovery/firewall-checker
  */
 
 import { execFile } from 'child_process';

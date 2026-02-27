@@ -5,7 +5,7 @@
  * Based on AICPA SOC 2 Trust Services Criteria.
  * 基於 AICPA SOC 2 信任服務準則。
  *
- * @module @openclaw/panguard-report/frameworks/soc2
+ * @module @panguard-ai/panguard-report/frameworks/soc2
  */
 
 import type { ComplianceControl } from '../types.js';

@@ -4,7 +4,7 @@
  *
  * Stores anonymized threat data and community rules using better-sqlite3.
  *
- * @module @openclaw/threat-cloud/database
+ * @module @panguard-ai/threat-cloud/database
  */
 
 import Database from 'better-sqlite3';

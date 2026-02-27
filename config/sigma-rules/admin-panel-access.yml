@@ -1,8 +1,8 @@
 title: Unauthorized Admin Panel Access Attempt
-id: openclaw-040
+id: panguard-040
 status: stable
 description: Detects attempts to access administrative panels, dashboards, and management interfaces that are commonly targeted by attackers for unauthorized access.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: webserver

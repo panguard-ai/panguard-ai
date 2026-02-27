@@ -1,8 +1,8 @@
 title: Cross-Site Scripting Attempt Detected
-id: openclaw-027
+id: panguard-027
 status: stable
 description: Detects cross-site scripting (XSS) attempts in web server logs by identifying common XSS payloads including script tags, javascript protocol handlers, and event handler injections.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: webserver

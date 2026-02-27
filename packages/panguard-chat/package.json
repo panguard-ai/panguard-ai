@@ -1,5 +1,5 @@
 {
-  "name": "@openclaw/panguard-chat",
+  "name": "@panguard-ai/panguard-chat",
   "version": "0.1.0",
   "type": "module",
   "description": "AI security assistant via messaging platforms / 透過通訊軟體管理資安的 AI 助手",
@@ -16,7 +16,7 @@
     "dev": "tsc --build --watch"
   },
   "dependencies": {
-    "@openclaw/core": "workspace:*"
+    "@panguard-ai/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

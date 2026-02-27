@@ -7,7 +7,7 @@
  * 將 Sigma 規則從 YAML 格式解析為型別化的 SigmaRule 物件。
  * 驗證必要欄位並對缺少的可選欄位記錄警告。
  *
- * @module @openclaw/core/rules/sigma-parser
+ * @module @panguard-ai/core/rules/sigma-parser
  */
 
 import fs from 'node:fs';

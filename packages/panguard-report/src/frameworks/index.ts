@@ -2,7 +2,7 @@
  * Compliance Frameworks Registry
  * 合規框架註冊表
  *
- * @module @openclaw/panguard-report/frameworks
+ * @module @panguard-ai/panguard-report/frameworks
  */
 
 import type { ComplianceControl, ComplianceFramework } from '../types.js';

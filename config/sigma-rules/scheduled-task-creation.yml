@@ -1,8 +1,8 @@
 title: Suspicious Scheduled Task Creation
-id: openclaw-033
+id: panguard-033
 status: stable
 description: Detects creation of scheduled tasks via schtasks or cron that may be used by attackers to establish persistence or execute malicious payloads at regular intervals.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

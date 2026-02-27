@@ -2,12 +2,12 @@
  * `panguard init` - Interactive setup wizard
  * `panguard init` - 互動式設定精靈
  *
- * @module @openclaw/panguard/cli/commands/init
+ * @module @panguard-ai/panguard/cli/commands/init
  */
 
 import { Command } from 'commander';
 import { readFileSync } from 'node:fs';
-import { c, symbols, spinner } from '@openclaw/core';
+import { c, symbols, spinner } from '@panguard-ai/core';
 import { runInitWizard, writeConfig } from '../../init/index.js';
 import type { PanguardConfig } from '../../init/types.js';
 

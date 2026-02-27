@@ -2,7 +2,7 @@
  * i18n configuration and initialization
  * 國際化配置與初始化
  *
- * @module @openclaw/core/i18n
+ * @module @panguard-ai/core/i18n
  */
 
 import i18next, { type i18n } from 'i18next';

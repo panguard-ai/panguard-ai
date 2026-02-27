@@ -2,7 +2,7 @@
  * Attacker Profiling Engine
  * 攻擊者分析引擎
  *
- * @module @openclaw/panguard-trap/profiler
+ * @module @panguard-ai/panguard-trap/profiler
  */
 
 export {

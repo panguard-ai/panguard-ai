@@ -2,7 +2,7 @@
  * Messaging Channels Module
  * 通訊管道模組
  *
- * @module @openclaw/panguard-chat/channels
+ * @module @panguard-ai/panguard-chat/channels
  */
 
 export { LineChannel } from './line.js';

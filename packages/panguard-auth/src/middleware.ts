@@ -1,7 +1,7 @@
 /**
  * Authentication middleware for raw node:http server.
  * Validates Bearer token from Authorization header.
- * @module @openclaw/panguard-auth/middleware
+ * @module @panguard-ai/panguard-auth/middleware
  */
 
 import type { IncomingMessage } from 'node:http';

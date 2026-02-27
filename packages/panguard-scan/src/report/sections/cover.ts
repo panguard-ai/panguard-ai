@@ -6,10 +6,10 @@
  * metadata, risk score, and confidentiality notice.
  * 渲染報告的第一頁，包括品牌標識、掃描中繼資料、風險評分和機密性聲明。
  *
- * @module @openclaw/panguard-scan/report/sections/cover
+ * @module @panguard-ai/panguard-scan/report/sections/cover
  */
 
-import type { Language } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
 import type { ScanResult } from '../../scanners/types.js';
 import { COLORS, FONTS, LAYOUT, severityColor } from '../styles.js';
 
@@ -34,7 +34,7 @@ export function renderCoverPage(
     .font(FONTS.heading)
     .fontSize(28)
     .fillColor(COLORS.primary)
-    .text('OPENCLAW SECURITY', LAYOUT.margin, 120, {
+    .text('PANGUARD AI', LAYOUT.margin, 120, {
       width: LAYOUT.contentWidth,
       align: 'center',
     });

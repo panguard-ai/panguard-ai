@@ -9,7 +9,7 @@
  * Each layer catches failures and falls back to the next available layer.
  * 每層捕捉失敗並降級到下一個可用層。
  *
- * @module @openclaw/core/ai/funnel-router
+ * @module @panguard-ai/core/ai/funnel-router
  */
 
 import { createLogger } from '../utils/logger.js';

@@ -1,5 +1,5 @@
 {
-  "name": "@openclaw/panguard-trap",
+  "name": "@panguard-ai/panguard-trap",
   "version": "0.1.0",
   "type": "module",
   "description": "Smart honeypot for attacker profiling / 智慧蜜罐，誘捕並分析攻擊者",
@@ -16,7 +16,7 @@
     "dev": "tsc --build --watch"
   },
   "dependencies": {
-    "@openclaw/core": "workspace:*"
+    "@panguard-ai/core": "workspace:*"
   },
   "optionalDependencies": {
     "ssh2": "^1.16.0"

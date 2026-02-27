@@ -1,5 +1,5 @@
 {
-  "name": "@openclaw/threat-cloud",
+  "name": "@panguard-ai/threat-cloud",
   "version": "0.1.0",
   "type": "module",
   "description": "Threat Cloud backend API for collective threat intelligence / 威脅雲後端 API",

@@ -3,7 +3,7 @@
  * Reads or creates a UUID at ~/.panguard/client-id.
  * Not associated with any user account or email.
  *
- * @module @openclaw/panguard-guard/threat-cloud/client-id
+ * @module @panguard-ai/panguard-guard/threat-cloud/client-id
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';

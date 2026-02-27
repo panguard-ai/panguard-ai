@@ -8,10 +8,10 @@
  * 渲染每個安全發現，包含嚴重度標記、描述、修復建議和合規參照。
  * 當內容接近頁面底部邊距時自動處理分頁。
  *
- * @module @openclaw/panguard-scan/report/sections/findings-table
+ * @module @panguard-ai/panguard-scan/report/sections/findings-table
  */
 
-import type { Language } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
 import type { Finding, ScanResult } from '../../scanners/types.js';
 import { sortBySeverity } from '../../scanners/types.js';
 import { COLORS, FONTS, LAYOUT, severityColor } from '../styles.js';

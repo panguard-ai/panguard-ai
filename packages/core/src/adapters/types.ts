@@ -7,7 +7,7 @@
  * 定義資安工具對接器所使用的所有介面，用於與外部安全系統整合
  * （Defender、Wazuh、Syslog 等）。
  *
- * @module @openclaw/core/adapters/types
+ * @module @panguard-ai/core/adapters/types
  */
 
 import type { SecurityEvent } from '../types.js';

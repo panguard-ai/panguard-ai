@@ -5,11 +5,11 @@
  * Sends threat alerts to LINE Notify service via HTTP POST.
  * 透過 HTTP POST 將威脅警報發送至 LINE Notify 服務。
  *
- * @module @openclaw/panguard-guard/notify/line-notify
+ * @module @panguard-ai/panguard-guard/notify/line-notify
  */
 
 import { request } from 'node:https';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { LineNotifyConfig, NotificationResult, ThreatVerdict } from '../types.js';
 
 const logger = createLogger('panguard-guard:notify:line');

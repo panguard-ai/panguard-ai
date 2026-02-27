@@ -7,7 +7,7 @@
  * 為所有對接器提供共用功能，包括配置管理、日誌記錄和標準
  * 告警到 SecurityEvent 的轉換。
  *
- * @module @openclaw/core/adapters/base-adapter
+ * @module @panguard-ai/core/adapters/base-adapter
  */
 
 import { randomUUID } from 'node:crypto';
@@ -23,9 +23,9 @@ import type { AdapterConfig, AdapterAlert, SecurityAdapter } from './types.js';
  * 將嚴重等級字串映射為標準 Severity 型別
  *
  * Handles common severity labels from various security tools and normalizes
- * them into the five-level Severity scale used throughout OpenClaw.
+ * them into the five-level Severity scale used throughout Panguard.
  * 處理來自各種安全工具的常見嚴重等級標籤，並將其正規化為
- * OpenClaw 中使用的五級 Severity 量表。
+ * Panguard 中使用的五級 Severity 量表。
  *
  * @param severity - Raw severity string from the adapter / 來自對接器的原始嚴重等級字串
  * @returns Normalized Severity value / 正規化的 Severity 值

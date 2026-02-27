@@ -3,7 +3,7 @@
  * PanguardReport CLI
  * PanguardReport 命令列介面
  *
- * @module @openclaw/panguard-report/cli
+ * @module @panguard-ai/panguard-report/cli
  */
 
 import type {

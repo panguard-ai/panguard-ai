@@ -5,7 +5,7 @@
  * Loads Sigma rules from directories and supports watching for changes.
  * 從目錄載入 Sigma 規則並支援監視變更。
  *
- * @module @openclaw/core/rules/rule-loader
+ * @module @panguard-ai/core/rules/rule-loader
  */
 
 import fs from 'node:fs';

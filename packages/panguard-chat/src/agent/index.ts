@@ -2,7 +2,7 @@
  * Chat Agent Module
  * Chat Agent 模組
  *
- * @module @openclaw/panguard-chat/agent
+ * @module @panguard-ai/panguard-chat/agent
  */
 
 export { ChatAgent } from './chat-agent.js';

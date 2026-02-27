@@ -8,7 +8,7 @@
  * Panguard Chat - Panguard AI 的用戶端通訊層。
  * 將技術安全事件翻譯為人話，並透過通訊平台管理雙向通訊。
  *
- * @module @openclaw/panguard-chat
+ * @module @panguard-ai/panguard-chat
  */
 
 /** Package version / 套件版本 */

@@ -6,7 +6,7 @@
  * and compliance mapping logic.
  * 測試掃描器型別、開放埠檢查器、掃描器編排器匯出和合規對照邏輯。
  *
- * @module @openclaw/panguard-scan/tests/scanners
+ * @module @panguard-ai/panguard-scan/tests/scanners
  */
 
 import { describe, it, expect } from 'vitest';
@@ -15,7 +15,7 @@ import type { Finding } from '../src/scanners/types.js';
 import { checkUnnecessaryPorts } from '../src/scanners/open-ports.js';
 import { SCANNERS_VERSION, checkUnnecessaryPorts as reExportedCheckPorts } from '../src/scanners/index.js';
 import { getComplianceEntries, mapFindingsToCompliance } from '../src/report/compliance-map.js';
-import type { PortInfo } from '@openclaw/core';
+import type { PortInfo } from '@panguard-ai/core';
 
 // ---------------------------------------------------------------------------
 // Helper: create a minimal Finding for testing

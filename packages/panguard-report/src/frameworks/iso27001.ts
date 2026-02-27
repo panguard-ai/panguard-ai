@@ -5,7 +5,7 @@
  * Based on ISO/IEC 27001:2022 Annex A controls.
  * 基於 ISO/IEC 27001:2022 附錄 A 控制項。
  *
- * @module @openclaw/panguard-report/frameworks/iso27001
+ * @module @panguard-ai/panguard-report/frameworks/iso27001
  */
 
 import type { ComplianceControl } from '../types.js';

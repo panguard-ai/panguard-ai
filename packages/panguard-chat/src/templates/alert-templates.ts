@@ -7,7 +7,7 @@
  * 常見安全告警場景的預建模板。
  * 每個模板提供常見攻擊的人性化描述。
  *
- * @module @openclaw/panguard-chat/templates/alert-templates
+ * @module @panguard-ai/panguard-chat/templates/alert-templates
  */
 
 import type { MessageLanguage } from '../types.js';

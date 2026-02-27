@@ -9,7 +9,7 @@
  * - GET  /api/stats        Get threat statistics
  * - GET  /health           Health check
  *
- * @module @openclaw/threat-cloud/server
+ * @module @panguard-ai/threat-cloud/server
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';

@@ -2,7 +2,7 @@
  * Utility module exports
  * 工具模組匯出
  *
- * @module @openclaw/core/utils
+ * @module @panguard-ai/core/utils
  */
 
 export { createLogger, setLogLevel } from './logger.js';

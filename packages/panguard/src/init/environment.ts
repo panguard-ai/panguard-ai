@@ -4,7 +4,7 @@
  *
  * Detects OS, hostname, and architecture for the setup wizard.
  *
- * @module @openclaw/panguard/init/environment
+ * @module @panguard-ai/panguard/init/environment
  */
 
 import * as os from 'node:os';

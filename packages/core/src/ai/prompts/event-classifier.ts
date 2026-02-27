@@ -6,7 +6,7 @@
  * the MITRE ATT&CK framework. Supports bilingual output.
  * 產生使用 MITRE ATT&CK 框架分類安全事件的提示詞。支援雙語輸出。
  *
- * @module @openclaw/core/ai/prompts/event-classifier
+ * @module @panguard-ai/core/ai/prompts/event-classifier
  */
 
 import type { Language, SecurityEvent } from '../../types.js';

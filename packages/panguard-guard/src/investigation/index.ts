@@ -8,11 +8,11 @@
  * 使用多種檢查工具對可疑事件進行多步驟調查。每個工具貢獻風險數據，
  * 並可能根據發現觸發額外的調查步驟。
  *
- * @module @openclaw/panguard-guard/investigation
+ * @module @panguard-ai/panguard-guard/investigation
  */
 
-import { createLogger, checkThreatIntel } from '@openclaw/core';
-import type { SecurityEvent } from '@openclaw/core';
+import { createLogger, checkThreatIntel } from '@panguard-ai/core';
+import type { SecurityEvent } from '@panguard-ai/core';
 import type {
   InvestigationTool,
   InvestigationStep,

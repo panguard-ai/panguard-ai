@@ -6,7 +6,7 @@
  * creation, modification, and deletion events.
  * 定期計算受監控檔案的 SHA-256 雜湊值，並偵測建立、修改和刪除事件。
  *
- * @module @openclaw/core/monitor/file-monitor
+ * @module @panguard-ai/core/monitor/file-monitor
  */
 
 import { EventEmitter } from 'node:events';

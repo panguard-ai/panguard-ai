@@ -8,9 +8,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { Finding } from '@openclaw/panguard-scan';
-import { sortBySeverity } from '@openclaw/panguard-scan';
-import type { ComplianceFinding, ComplianceFramework } from '@openclaw/panguard-report';
+import type { Finding } from '@panguard-ai/panguard-scan';
+import { sortBySeverity } from '@panguard-ai/panguard-scan';
+import type { ComplianceFinding, ComplianceFramework } from '@panguard-ai/panguard-report';
 import {
   getFrameworkControls,
   getFrameworkName,
@@ -23,7 +23,7 @@ import {
   reportToJSON,
   generateSummaryText,
   getSectionLabels,
-} from '@openclaw/panguard-report';
+} from '@panguard-ai/panguard-report';
 
 // ---------------------------------------------------------------------------
 // Helpers: Convert PanguardScan findings to PanguardReport ComplianceFinding

@@ -5,7 +5,7 @@
  * Generates complete HTML pages for the Panguard AI website.
  * 為 Panguard AI 官網產生完整的 HTML 頁面。
  *
- * @module @openclaw/panguard-web/templates
+ * @module @panguard-ai/panguard-web/templates
  */
 
 import type { WebLanguage, WebConfig, PageMeta } from '../types.js';
@@ -178,8 +178,8 @@ export function generateFooter(language: WebLanguage, config: WebConfig = DEFAUL
     ? `${config.brandName} - ${config.taglineZh}`
     : `${config.brandName} - ${config.taglineEn}`;
   const builtWith = isZh
-    ? '由 OpenClaw Security 團隊打造'
-    : 'Built by the OpenClaw Security team';
+    ? '由 Panguard AI 團隊打造'
+    : 'Built by the Panguard AI team';
 
   return `<footer>
   <p>${copyright}</p>

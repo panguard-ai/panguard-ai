@@ -11,10 +11,10 @@
  * - T1078: Valid Accounts
  * - T1059: Command and Scripting Interpreter
  *
- * @module @openclaw/panguard-trap/services/ssh-trap
+ * @module @panguard-ai/panguard-trap/services/ssh-trap
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { TrapServiceConfig } from '../types.js';
 import { BaseTrapService } from './base-service.js';
 

@@ -1,8 +1,8 @@
 /**
- * Structured JSON logger for OpenClaw Security
- * OpenClaw 安全平台結構化 JSON 日誌記錄器
+ * Structured JSON logger for Panguard AI
+ * Panguard 安全平台結構化 JSON 日誌記錄器
  *
- * @module @openclaw/core/utils/logger
+ * @module @panguard-ai/core/utils/logger
  */
 
 import type { LogEntry } from '../types.js';

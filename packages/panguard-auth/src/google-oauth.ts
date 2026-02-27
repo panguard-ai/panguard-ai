@@ -1,7 +1,7 @@
 /**
  * Google OAuth 2.0 login flow with PKCE (zero external dependencies).
  * Handles redirect URL generation, code-to-token exchange, and user info retrieval.
- * @module @openclaw/panguard-auth/google-oauth
+ * @module @panguard-ai/panguard-auth/google-oauth
  */
 
 import { randomBytes, createHash } from 'node:crypto';

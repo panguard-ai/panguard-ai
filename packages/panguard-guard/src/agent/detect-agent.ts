@@ -8,11 +8,11 @@
  * 多代理管線的第一階段。接收原始安全事件，透過 Sigma 規則引擎和
  * 威脅情報來源進行比對，為符合條件的事件產生偵測結果。
  *
- * @module @openclaw/panguard-guard/agent/detect-agent
+ * @module @panguard-ai/panguard-guard/agent/detect-agent
  */
 
-import { createLogger, checkThreatIntel } from '@openclaw/core';
-import type { SecurityEvent, RuleMatch, RuleEngine } from '@openclaw/core';
+import { createLogger, checkThreatIntel } from '@panguard-ai/core';
+import type { SecurityEvent, RuleMatch, RuleEngine } from '@panguard-ai/core';
 import type { DetectionResult } from '../types.js';
 
 const logger = createLogger('panguard-guard:detect-agent');

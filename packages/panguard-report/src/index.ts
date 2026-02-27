@@ -7,7 +7,7 @@
  * - ISO/IEC 27001:2022
  * - SOC 2 Trust Services Criteria
  *
- * @module @openclaw/panguard-report
+ * @module @panguard-ai/panguard-report
  */
 
 export const PANGUARD_REPORT_VERSION = '0.1.0';

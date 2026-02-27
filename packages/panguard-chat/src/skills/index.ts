@@ -1,8 +1,8 @@
 /**
- * OpenClaw Skill Definitions for PanguardChat
- * PanguardChat 的 OpenClaw Skill 定義
+ * Panguard Skill Definitions for PanguardChat
+ * PanguardChat 的 Panguard Skill 定義
  *
- * @module @openclaw/panguard-chat/skills
+ * @module @panguard-ai/panguard-chat/skills
  */
 
 // Placeholder - Implementation in Phase 5

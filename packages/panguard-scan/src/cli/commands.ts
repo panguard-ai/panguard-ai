@@ -2,14 +2,14 @@
  * PanguardScan CLI command implementations
  * PanguardScan CLI 指令實作
  *
- * @module @openclaw/panguard-scan/cli/commands
+ * @module @panguard-ai/panguard-scan/cli/commands
  */
 
 import {
   initI18n, t, createLogger, setLogLevel,
   c, colorSeverity, banner, spinner, table, box,
   scoreDisplay, divider, formatDuration, symbols, statusPanel,
-} from '@openclaw/core';
+} from '@panguard-ai/core';
 import { runScan } from '../scanners/index.js';
 import { generatePdfReport } from '../report/index.js';
 import type { ScanConfig } from '../scanners/types.js';

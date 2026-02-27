@@ -2,7 +2,7 @@
  * Report Generator Module
  * 報告產生器模組
  *
- * @module @openclaw/panguard-report/generator
+ * @module @panguard-ai/panguard-report/generator
  */
 
 export {

@@ -7,7 +7,7 @@
  * 透過動態匯入使用 openai 套件以避免硬性相依。
  * 使用者必須另外安裝 SDK。
  *
- * @module @openclaw/core/ai/openai-provider
+ * @module @panguard-ai/core/ai/openai-provider
  */
 
 import type { LLMConfig } from './types.js';

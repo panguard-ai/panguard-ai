@@ -12,12 +12,12 @@
  * command injection vulnerabilities.
  * 所有系統命令使用 execFile（絕不使用 exec）以防止命令注入漏洞。
  *
- * @module @openclaw/panguard-guard/agent/respond-agent
+ * @module @panguard-ai/panguard-guard/agent/respond-agent
  */
 
 import { execFile } from 'node:child_process';
 import { platform } from 'node:os';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   ThreatVerdict,
   ActionPolicy,

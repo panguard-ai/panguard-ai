@@ -6,10 +6,10 @@
  * severity distribution, system overview, and top critical findings.
  * 渲染執行摘要頁面，包括風險評分說明、嚴重度分佈、系統概覽和最關鍵的發現。
  *
- * @module @openclaw/panguard-scan/report/sections/executive-summary
+ * @module @panguard-ai/panguard-scan/report/sections/executive-summary
  */
 
-import type { Language, Severity } from '@openclaw/core';
+import type { Language, Severity } from '@panguard-ai/core';
 import type { ScanResult } from '../../scanners/types.js';
 import { COLORS, FONTS, LAYOUT, severityColor } from '../styles.js';
 

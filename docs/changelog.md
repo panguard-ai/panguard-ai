@@ -132,7 +132,7 @@
 
 ### Phase 1-2: 核心基礎
 
-**@openclaw/core**
+**@panguard-ai/core**
 - TypeScript monorepo 架構
 - i18n 雙語支援（en + zh-TW）
 - Sigma 規則引擎

@@ -1,13 +1,13 @@
 /**
  * Panguard CLI Theme — Minimalist brand styling system
  *
- * Wraps @openclaw/core color system with semantic theme API.
+ * Wraps @panguard-ai/core color system with semantic theme API.
  * Brand color: Sage Green #8B9878
  *
- * @module @openclaw/panguard/cli/theme
+ * @module @panguard-ai/panguard/cli/theme
  */
 
-import { c, stripAnsi, visLen } from '@openclaw/core';
+import { c, stripAnsi, visLen } from '@panguard-ai/core';
 import type { Tier } from './credentials.js';
 
 // ── Brand ASCII Block Letter Logo ─────────────────────────────────────

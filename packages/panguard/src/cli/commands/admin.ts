@@ -10,8 +10,8 @@ import { createInterface } from 'node:readline';
 import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { c, banner } from '@openclaw/core';
-import { AuthDB, hashPassword } from '@openclaw/panguard-auth';
+import { c, banner } from '@panguard-ai/core';
+import { AuthDB, hashPassword } from '@panguard-ai/panguard-auth';
 
 function prompt(rl: ReturnType<typeof createInterface>, question: string): Promise<string> {
   return new Promise((resolve) => {

@@ -5,11 +5,11 @@
  * Sends threat alerts to Slack channels via Incoming Webhooks.
  * 透過 Incoming Webhooks 將威脅警報發送至 Slack 頻道。
  *
- * @module @openclaw/panguard-guard/notify/slack
+ * @module @panguard-ai/panguard-guard/notify/slack
  */
 
 import { request } from 'node:https';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { SlackConfig, NotificationResult, ThreatVerdict } from '../types.js';
 
 const logger = createLogger('panguard-guard:notify:slack');
