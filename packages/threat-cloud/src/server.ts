@@ -14,7 +14,7 @@
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { ThreatCloudDB } from './database.js';
-import type { ServerConfig, ApiResponse, AnonymizedThreatData, ThreatCloudRule } from './types.js';
+import type { ServerConfig, AnonymizedThreatData, ThreatCloudRule } from './types.js';
 
 /** Rate limiter state / 速率限制狀態 */
 interface RateLimitEntry {
