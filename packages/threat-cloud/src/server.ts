@@ -91,7 +91,9 @@ export class ThreatCloudServer {
     }
 
     // CORS — restrict to known origins
-    const allowedOrigins = (process.env['CORS_ALLOWED_ORIGINS'] ?? 'https://panguard.ai,https://www.panguard.ai').split(',');
+    const allowedOrigins = (
+      process.env['CORS_ALLOWED_ORIGINS'] ?? 'https://panguard.ai,https://www.panguard.ai'
+    ).split(',');
     const origin = req.headers.origin ?? '';
     if (allowedOrigins.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin);
@@ -108,7 +110,10 @@ export class ThreatCloudServer {
     try {
       switch (pathname) {
         case '/health':
-          this.sendJson(res, 200, { ok: true, data: { status: 'healthy', uptime: process.uptime() } });
+          this.sendJson(res, 200, {
+            ok: true,
+            data: { status: 'healthy', uptime: process.uptime() },
+          });
           break;
 
         case '/api/threats':
@@ -152,8 +157,19 @@ export class ThreatCloudServer {
     const data = JSON.parse(body) as AnonymizedThreatData;
 
     // Validate required fields
-    if (!data.attackSourceIP || !data.attackType || !data.mitreTechnique || !data.sigmaRuleMatched || !data.timestamp || !data.region) {
-      this.sendJson(res, 400, { ok: false, error: 'Missing required fields: attackSourceIP, attackType, mitreTechnique, sigmaRuleMatched, timestamp, region' });
+    if (
+      !data.attackSourceIP ||
+      !data.attackType ||
+      !data.mitreTechnique ||
+      !data.sigmaRuleMatched ||
+      !data.timestamp ||
+      !data.region
+    ) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error:
+          'Missing required fields: attackSourceIP, attackType, mitreTechnique, sigmaRuleMatched, timestamp, region',
+      });
       return;
     }
 
@@ -180,7 +196,10 @@ export class ThreatCloudServer {
     const rule = JSON.parse(body) as ThreatCloudRule;
 
     if (!rule.ruleId || !rule.ruleContent || !rule.source) {
-      this.sendJson(res, 400, { ok: false, error: 'Missing required fields: ruleId, ruleContent, source' });
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'Missing required fields: ruleId, ruleContent, source',
+      });
       return;
     }
 

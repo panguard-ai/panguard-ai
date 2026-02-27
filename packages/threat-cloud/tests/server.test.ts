@@ -16,7 +16,11 @@ describe('ThreatCloudDB', () => {
 
   afterEach(() => {
     db.close();
-    try { rmSync(tempDir, { recursive: true, force: true }); } catch { /* ignore */ }
+    try {
+      rmSync(tempDir, { recursive: true, force: true });
+    } catch {
+      /* ignore */
+    }
   });
 
   describe('Threat Data', () => {

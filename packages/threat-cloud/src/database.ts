@@ -68,7 +68,7 @@ export class ThreatCloudDB {
       data.sigmaRuleMatched,
       data.timestamp,
       data.industry ?? null,
-      data.region,
+      data.region
     );
   }
 
@@ -109,28 +109,44 @@ export class ThreatCloudDB {
 
   /** Get threat statistics / 取得威脅統計 */
   getStats(): ThreatStats {
-    const totalThreats = (this.db.prepare('SELECT COUNT(*) as count FROM threats').get() as { count: number }).count;
-    const totalRules = (this.db.prepare('SELECT COUNT(*) as count FROM rules').get() as { count: number }).count;
+    const totalThreats = (
+      this.db.prepare('SELECT COUNT(*) as count FROM threats').get() as { count: number }
+    ).count;
+    const totalRules = (
+      this.db.prepare('SELECT COUNT(*) as count FROM rules').get() as { count: number }
+    ).count;
 
-    const last24h = (this.db.prepare(
-      "SELECT COUNT(*) as count FROM threats WHERE received_at > datetime('now', '-1 day')"
-    ).get() as { count: number }).count;
+    const last24h = (
+      this.db
+        .prepare(
+          "SELECT COUNT(*) as count FROM threats WHERE received_at > datetime('now', '-1 day')"
+        )
+        .get() as { count: number }
+    ).count;
 
-    const topAttackTypes = this.db.prepare(`
+    const topAttackTypes = this.db
+      .prepare(
+        `
       SELECT attack_type as type, COUNT(*) as count
       FROM threats
       GROUP BY attack_type
       ORDER BY count DESC
       LIMIT 10
-    `).all() as Array<{ type: string; count: number }>;
+    `
+      )
+      .all() as Array<{ type: string; count: number }>;
 
-    const topMitreTechniques = this.db.prepare(`
+    const topMitreTechniques = this.db
+      .prepare(
+        `
       SELECT mitre_technique as technique, COUNT(*) as count
       FROM threats
       GROUP BY mitre_technique
       ORDER BY count DESC
       LIMIT 10
-    `).all() as Array<{ technique: string; count: number }>;
+    `
+      )
+      .all() as Array<{ technique: string; count: number }>;
 
     return {
       totalThreats,
