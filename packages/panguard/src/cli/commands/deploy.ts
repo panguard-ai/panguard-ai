@@ -19,7 +19,7 @@ export function deployCommand(): Command {
     .option('--config <path>', 'Config path', join(homedir(), '.panguard', 'config.json'))
     .option('--dry-run', 'Show deployment plan without executing')
     .option('--lang <language>', 'Language override')
-    .action(withAuth('starter', async (opts: { config?: string; dryRun?: boolean; lang?: string }) => {
+    .action(withAuth('solo', async (opts: { config?: string; dryRun?: boolean; lang?: string }) => {
       await runDeploy(opts);
     }));
 }
