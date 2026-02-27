@@ -18,7 +18,14 @@ export type Severity = 'info' | 'low' | 'medium' | 'high' | 'critical';
 /**
  * Security event source types / 安全事件來源類型
  */
-export type EventSource = 'windows_event' | 'syslog' | 'network' | 'process' | 'file';
+export type EventSource =
+  | 'windows_event'
+  | 'syslog'
+  | 'network'
+  | 'process'
+  | 'file'
+  | 'falco'
+  | 'suricata';
 
 /**
  * Base application configuration / 基礎應用程式配置
