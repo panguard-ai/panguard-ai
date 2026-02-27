@@ -10,7 +10,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { c, spinner, colorSeverity } from '@panguard-ai/core';
+import { c, spinner, colorSeverity, formatDuration } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../index.js';
 import { renderLogo, theme } from './theme.js';
 import {
