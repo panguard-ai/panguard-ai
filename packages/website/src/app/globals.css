@@ -189,3 +189,81 @@ body {
 .text-glow-sage {
   text-shadow: 0 0 20px rgba(139,154,142,0.4), 0 0 40px rgba(139,154,142,0.2);
 }
+
+/* ─── Metallic Logo Animation ─── */
+
+@keyframes metallic-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes metallic-shine-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+@keyframes metallic-rotate {
+  0%, 100% {
+    transform: perspective(800px) rotateY(-6deg) rotateX(2deg);
+  }
+  50% {
+    transform: perspective(800px) rotateY(6deg) rotateX(-2deg);
+  }
+}
+
+.metallic-logo-wrapper {
+  animation: metallic-float 6s ease-in-out infinite;
+  filter: drop-shadow(0 20px 40px rgba(139,154,142,0.15))
+          drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+}
+
+.metallic-logo-inner {
+  animation: metallic-rotate 8s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+/* Shine sweep overlay */
+.metallic-shine {
+  position: relative;
+  overflow: hidden;
+}
+.metallic-shine::after {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 40%;
+  height: 120%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.06) 30%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,255,255,0.06) 70%,
+    transparent
+  );
+  animation: metallic-shine-sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Metallic floor reflection */
+.metallic-reflection {
+  background: linear-gradient(
+    to bottom,
+    rgba(139,154,142,0.08),
+    transparent 80%
+  );
+  filter: blur(8px);
+  transform: scaleY(-0.3) translateY(-20%);
+  opacity: 0.4;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
+}
