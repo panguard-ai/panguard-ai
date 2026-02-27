@@ -5,6 +5,9 @@
  * @module @openclaw/panguard/cli/auth-guard
  */
 
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
 import { c, symbols, box } from '@openclaw/core';
 import { loadCredentials, isTokenExpired, tierDisplayName, TIER_LEVEL } from './credentials.js';
 import type { StoredCredentials, Tier } from './credentials.js';
@@ -16,6 +19,19 @@ export interface AuthCheckResult {
   authorized: boolean;
   credentials: StoredCredentials | null;
 }
+
+/* ── Feature → Tier mapping ── */
+
+export const FEATURE_TIER: Record<string, Tier> = {
+  setup: 'free',
+  scan: 'free',
+  report: 'pro',
+  guard: 'free',
+  trap: 'pro',
+  notifications: 'solo',
+  'threat-cloud': 'enterprise',
+  demo: 'free',
+};
 
 /**
  * Check if the current CLI user is authenticated and has the required tier.
@@ -117,21 +133,42 @@ export function tierBadge(tier: RequiredTier): string {
   if (tier === 'free') return '';
   const names: Record<string, string> = {
     solo: '[SOLO]',
-    starter: '[STARTER]',
-    team: '[TEAM]',
-    business: '[BIZ]',
+    pro: '[PRO]',
     enterprise: '[ENT]',
+    // legacy
+    starter: '[PRO]',
+    team: '[PRO]',
+    business: '[PRO]',
   };
   return c.dim(names[tier] ?? '');
 }
 
 /**
- * Get current license/tier from stored credentials.
+ * Get current license/tier from stored credentials or license file.
+ * Checks credentials.json first, then falls back to ~/.panguard/license.
  */
 export function getLicense(): { tier: Tier; email?: string } {
+  // 1. Try credentials.json (logged-in users)
   const creds = loadCredentials();
-  if (!creds || isTokenExpired(creds)) return { tier: 'free' };
-  return { tier: creds.tier, email: creds.email };
+  if (creds && !isTokenExpired(creds)) {
+    return { tier: creds.tier, email: creds.email };
+  }
+
+  // 2. Fallback: ~/.panguard/license file (offline license keys)
+  const licensePath = join(homedir(), '.panguard', 'license');
+  if (existsSync(licensePath)) {
+    try {
+      const content = readFileSync(licensePath, 'utf-8').trim();
+      const data = JSON.parse(content);
+      if (data.tier && TIER_LEVEL[data.tier as Tier] !== undefined) {
+        return { tier: data.tier as Tier, email: data.email };
+      }
+    } catch {
+      // Invalid license file — fall through to free
+    }
+  }
+
+  return { tier: 'free' };
 }
 
 /**
@@ -143,23 +180,41 @@ export function checkAccess(requiredTier: Tier): boolean {
 }
 
 /**
+ * Check if current user has access to a feature by name.
+ * Uses FEATURE_TIER mapping to resolve the required tier.
+ */
+export function checkFeatureAccess(feature: string): boolean {
+  const requiredTier = FEATURE_TIER[feature] ?? 'free';
+  return checkAccess(requiredTier);
+}
+
+/**
  * Display a branded upgrade prompt for a locked feature.
  */
-export function showUpgradePrompt(feature: string, requiredTier: Tier): void {
-  const { tier } = getLicense();
-  const price = PRICING_TIERS[requiredTier]?.price ?? 'custom';
+export function showUpgradePrompt(feature: string, requiredTier?: Tier): void {
+  const tier = requiredTier ?? FEATURE_TIER[feature] ?? 'free';
+  const { tier: userTier } = getLicense();
+  const tierName = tierDisplayName(tier);
+  const pricing = PRICING_TIERS[tier];
+  const priceStr = pricing
+    ? (pricing.price === 'custom' ? '\u5BA2\u88FD\u5316\u5831\u50F9' : `$${pricing.price}${pricing.unit}`)
+    : '';
+
   console.log('');
   console.log(box(
     [
-      `${symbols.warn} "${feature}" ${tierDisplayName(requiredTier)} tier required`,
+      `${symbols.warn} \u6B64\u529F\u80FD\u9700\u8981 ${tierName} \u65B9\u6848${priceStr ? ` (${priceStr})` : ''}`,
+      `   This feature requires ${tierName} plan`,
       '',
-      `  Current: ${c.sage(tierDisplayName(tier))}`,
-      `  Required: ${c.sage(tierDisplayName(requiredTier))}${price !== 'custom' ? ` ($${price}/mo)` : ''}`,
+      `  \u76EE\u524D\u65B9\u6848: ${c.sage(tierDisplayName(userTier))}`,
+      `  \u9700\u8981\u65B9\u6848: ${c.sage(tierName)}`,
       '',
-      `  Upgrade: ${c.underline('https://panguard.ai/pricing')}`,
-      `  Or run: ${c.sage('panguard login')}`,
+      `  \u5347\u7D1A\u65B9\u6848: ${c.underline('https://panguard.ai/pricing')}`,
+      `  \u6216\u57F7\u884C:   ${c.sage('panguard activate <license-key>')}`,
+      '',
+      `  \u6240\u6709\u4ED8\u8CBB\u65B9\u6848\u4EAB 30 \u5929\u514D\u8CBB\u8A66\u7528`,
     ].join('\n'),
-    { borderColor: c.caution, title: 'Upgrade Required' },
+    { borderColor: c.caution, title: '\u9700\u8981\u5347\u7D1A / Upgrade Required' },
   ));
   console.log('');
 }
