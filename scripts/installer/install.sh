@@ -6,8 +6,8 @@
 # NOTE: npm packages are NOT YET published. This script will fail
 # until packages are available on the npm registry.
 # For now, install from source instead:
-#   git clone https://github.com/openclaw-security/openclaw-security.git
-#   cd openclaw-security && pnpm install && pnpm build
+#   git clone https://github.com/eeee2345/panguard-ai.git
+#   cd panguard-ai && pnpm install && pnpm build
 #   ./bin/panguard --help
 #
 # This script installs PanguardGuard security tools via npm.
@@ -23,7 +23,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Config
-PACKAGE_SCOPE="@openclaw"
+PACKAGE_SCOPE="@panguard-ai"
 MIN_NODE_VERSION=18
 INSTALL_MODE="${1:---all}"
 
