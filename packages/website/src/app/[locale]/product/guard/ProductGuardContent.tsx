@@ -16,23 +16,7 @@ const featureIcons = [NetworkIcon, ResponseIcon, AnalyticsIcon, SettingsIcon, Hi
 const featureKeys = ["item1", "item2", "item3", "item4", "item5", "item6"] as const;
 
 const useCaseIcons = [TerminalIcon, TeamIcon, EnterpriseIcon];
-const useCaseData = [
-  {
-    title: "Production Server",
-    description:
-      "You are running a SaaS product on a $20/month VPS. You cannot afford a SOC team, but you also cannot afford a breach. Panguard Guard gives you enterprise-grade monitoring for a fraction of the cost of a single security analyst.",
-  },
-  {
-    title: "Development Team",
-    description:
-      "Your team of 10 developers pushes code daily. Panguard Guard monitors your staging and production environments, catches misconfigurations before they become vulnerabilities, and reports everything in Slack.",
-  },
-  {
-    title: "Multi-Server Fleet",
-    description:
-      "You manage 50 servers across multiple cloud providers. Install Panguard Guard once per server and get a unified security view. Collective intelligence means a threat seen on one server protects all of them.",
-  },
-];
+const useCaseKeys = ["item1", "item2", "item3"] as const;
 
 export default function ProductGuardContent() {
   const t = useTranslations("product.guard");
@@ -213,17 +197,17 @@ export default function ProductGuardContent() {
           title={t("useCases.title")}
         />
         <div className="grid sm:grid-cols-3 gap-6 mt-14">
-          {useCaseData.map((uc, i) => {
+          {useCaseKeys.map((key, i) => {
             const Icon = useCaseIcons[i];
             return (
-              <FadeInUp key={uc.title} delay={i * 0.1}>
+              <FadeInUp key={key} delay={i * 0.1}>
                 <div className="bg-surface-2 rounded-xl border border-border p-6 h-full card-glow">
                   <Icon className="w-6 h-6 text-brand-sage mb-4" />
                   <p className="text-sm font-bold text-text-primary mb-2">
-                    {uc.title}
+                    {t(`useCases.${key}.title`)}
                   </p>
                   <p className="text-xs text-text-secondary leading-relaxed">
-                    {uc.description}
+                    {t(`useCases.${key}.desc`)}
                   </p>
                 </div>
               </FadeInUp>

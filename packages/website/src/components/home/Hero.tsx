@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Copy, Check } from "lucide-react";
-import { BRAND_LOGO_PATHS, BRAND_LOGO_VIEWBOX } from "../ui/BrandLogo";
+import { Copy, Check, ArrowRight } from "lucide-react";
+import { Link } from "@/navigation";
 
 /* ─── Install Command (never translated) ─── */
 const installCmd = "curl -fsSL https://get.panguard.ai | sh";
@@ -61,60 +61,29 @@ export default function Hero() {
 
       {/* ── Content ── */}
       <div className="relative z-10 text-center px-6 py-24 max-w-4xl mx-auto">
-        {/* Shield logo -- single entry animation, then static */}
-        <motion.div
-          className="flex justify-center mb-10"
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="relative">
-            {/* Glow ring -- CSS pulse */}
-            <div className="absolute inset-[-50%] rounded-full hero-glow-ring" />
-            <svg
-              width={120}
-              height={120}
-              viewBox={BRAND_LOGO_VIEWBOX}
-              fill="none"
-              className="relative"
-            >
-              {BRAND_LOGO_PATHS.map((p, i) => (
-                <path
-                  key={i}
-                  fill={p.role === "fg" ? "#8B9A8E" : "#1A1614"}
-                  d={p.d}
-                />
-              ))}
-            </svg>
-          </div>
-        </motion.div>
-
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <h1 className="text-[clamp(36px,6vw,72px)] font-bold leading-[1.1] tracking-tight text-text-primary">
+          <h1 className="text-[clamp(48px,8vw,96px)] font-extrabold leading-[1.05] tracking-tight text-text-primary">
             {t("title")}
           </h1>
         </motion.div>
 
-        {/* Manifesto */}
+        {/* Subtitle */}
         <motion.div
-          className="mt-8 max-w-2xl mx-auto space-y-6"
+          className="mt-6 max-w-xl mx-auto"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <p className="text-base lg:text-lg text-text-secondary leading-relaxed whitespace-pre-line">
-            {t("manifesto1")}
+          <p className="text-xl lg:text-2xl text-text-secondary leading-relaxed">
+            {t("subtitle1")}
           </p>
-          <p className="text-base lg:text-lg text-text-primary font-medium leading-relaxed whitespace-pre-line">
-            {t("manifesto2")}
-          </p>
-          <p className="text-base lg:text-lg text-brand-sage font-semibold leading-relaxed whitespace-pre-line">
-            {t("manifesto3")}
+          <p className="text-xl lg:text-2xl text-text-secondary leading-relaxed mt-1">
+            {t("subtitle2")}
           </p>
         </motion.div>
 
@@ -123,26 +92,32 @@ export default function Hero() {
           className="mt-10"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <InstallBar />
         </motion.div>
 
-        {/* Badges */}
+        {/* Buttons */}
         <motion.div
-          className="flex flex-wrap gap-4 justify-center mt-8"
+          className="flex flex-wrap gap-3 justify-center mt-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.65 }}
+          transition={{ duration: 0.4, delay: 0.55 }}
         >
-          {(["badge1", "badge2", "badge3"] as const).map((key) => (
-            <span
-              key={key}
-              className="text-sm font-medium text-brand-sage bg-brand-sage/10 px-4 py-1.5 rounded-full"
-            >
-              {t(key)}
-            </span>
-          ))}
+          <Link
+            href="/scan"
+            className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
+          >
+            {t("freeScan")} <ArrowRight className="w-4 h-4" />
+          </Link>
+          <a
+            href="https://github.com/eeee2345/openclaw-security"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
+          >
+            {t("github")}
+          </a>
         </motion.div>
       </div>
 
