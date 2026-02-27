@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/navigation";
 import { ArrowRight, Clock, User, Mail, Send } from "lucide-react";
 import FadeInUp from "@/components/FadeInUp";
@@ -11,9 +11,9 @@ import { blogPosts, categories } from "@/data/blog-posts";
 
 /* ─── Helpers ─── */
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: string): string {
   const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale === "zh" ? "zh-TW" : "en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -35,6 +35,7 @@ function CategoryBadge({ category }: { category: string }) {
 export default function BlogContent() {
   const t = useTranslations("blog");
   const tc = useTranslations("common");
+  const locale = useLocale();
 
   const [activeCategory, setActiveCategory] = useState("All");
   const [nlEmail, setNlEmail] = useState("");
@@ -90,7 +91,7 @@ export default function BlogContent() {
                     <Clock className="w-3.5 h-3.5" />
                     {featuredPost.readingTime} read
                   </span>
-                  <span>{formatDate(featuredPost.date)}</span>
+                  <span>{formatDate(featuredPost.date, locale)}</span>
                 </div>
               </div>
 
@@ -147,7 +148,7 @@ export default function BlogContent() {
                     <div className="flex items-center gap-3 mb-3">
                       <CategoryBadge category={post.category} />
                       <span className="text-xs text-text-muted">
-                        {formatDate(post.date)}
+                        {formatDate(post.date, locale)}
                       </span>
                     </div>
 

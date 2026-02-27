@@ -2460,7 +2460,11 @@
     },
     "notifyTitle": "接收新版本通知",
     "notifyDesc": "訂閱以在你的收件匣直接接收更新日誌通知。",
-    "noSpam": "無垃圾郵件，僅產品更新。"
+    "noSpam": "無垃圾郵件，僅產品更新。",
+    "subscribe": "訂閱",
+    "emailPlaceholder": "you@company.com",
+    "emailAriaLabel": "電子郵件地址",
+    "emptyFilter": "沒有符合所選篩選條件的項目。"
   },
   "resources": {
     "overline": "資源中心",
@@ -2482,6 +2486,8 @@
       "title": "資源直送你的收件匣",
       "desc": "以精選的白皮書、報告和指南掌握威脅態勢最新資訊，直接送到你的收件匣。無垃圾郵件 -- 只有可操作的安全知識。",
       "subscribe": "訂閱",
+      "emailPlaceholder": "you@company.com",
+      "emailAriaLabel": "電子郵件地址",
       "note": "加入 2,000+ 位注重安全的工程師。隨時退訂。"
     }
   },
@@ -2707,6 +2713,8 @@
       "title": "取得狀態更新",
       "desc": "訂閱以在服務狀態變化時立即接收通知。掌握計畫維護和事件解決的最新資訊。",
       "subscribe": "訂閱",
+      "emailPlaceholder": "you@company.com",
+      "emailAriaLabel": "電子郵件地址",
       "success": "已訂閱。你將在 {email} 收到狀態更新。",
       "error": "出了點問題。請重試。"
     },
@@ -2757,6 +2765,7 @@
     "success": "你已在名單中。準備好時我們會通知你。",
     "notifyMe": "通知我",
     "error": "出了點問題。請重試。",
+    "emailPlaceholder": "you@company.com",
     "backHome": "返回首頁"
   }
 }
