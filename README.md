@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20-green.svg)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-%3E%3D9-orange.svg)](https://pnpm.io/)
-[![Tests](https://img.shields.io/badge/tests-1068%20passed-brightgreen.svg)](#test-coverage)
+[![Tests](https://img.shields.io/badge/tests-1107%20passed-brightgreen.svg)](#test-coverage)
 
 ---
 
@@ -66,7 +66,7 @@ git clone https://github.com/panguard-ai/panguard-ai.git
 cd panguard-ai
 pnpm install
 pnpm build
-pnpm test        # 1068 tests
+pnpm test        # 1107 tests
 pnpm dev         # start all dev servers
 ```
 
@@ -132,7 +132,7 @@ This monorepo contains 12 packages:
 ```bash
 pnpm install          # Install all dependencies
 pnpm build            # Build all 9 packages
-pnpm test             # Run all 1013 tests
+pnpm test             # Run all 1107 tests
 pnpm typecheck        # TypeScript type checking
 pnpm lint             # ESLint + security plugin
 pnpm format:check     # Prettier format check
@@ -195,7 +195,7 @@ panguard-ai/
 |-------|-------|-------|
 | Unit tests | 906 | 57 |
 | Integration tests | 162 | 6 |
-| **Total** | **1068** | **63** |
+| **Total** | **1107** | **64** |
 
 All tests pass with zero failures. Run `pnpm test` to verify.
 

@@ -34,9 +34,9 @@ export async function generateMetadata({
 
 /* ─── Helper ─── */
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: string): string {
   const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale === "zh" ? "zh-TW" : "en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -99,7 +99,7 @@ export default async function BlogPostPage({
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
-                  {formatDate(post.date)}
+                  {formatDate(post.date, params.locale)}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />

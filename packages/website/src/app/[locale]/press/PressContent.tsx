@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   ArrowRight,
   ExternalLink,
@@ -20,9 +20,9 @@ import { pressItems, type PressItem } from "@/data/press-items";
 
 /* ─── Helpers ─── */
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: string): string {
   const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale === "zh" ? "zh-TW" : "en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -46,13 +46,13 @@ function TypeBadge({ type }: { type: PressItem["type"] }) {
 
 /* ─── Press Release Card ─── */
 
-function PressReleaseCard({ item, index }: { item: PressItem; index: number }) {
+function PressReleaseCard({ item, index, locale }: { item: PressItem; index: number; locale: string }) {
   return (
     <FadeInUp delay={index * 0.06}>
       <div className="bg-surface-1 border border-border rounded-2xl p-6 hover:border-brand-sage/40 transition-all duration-200 card-glow h-full flex flex-col group">
         <div className="flex items-center gap-3 mb-3">
           <TypeBadge type={item.type} />
-          <span className="text-xs text-text-muted">{formatDate(item.date)}</span>
+          <span className="text-xs text-text-muted">{formatDate(item.date, locale)}</span>
         </div>
 
         <h3 className="text-lg font-semibold text-text-primary leading-snug group-hover:text-brand-sage transition-colors duration-200">
@@ -76,13 +76,13 @@ function PressReleaseCard({ item, index }: { item: PressItem; index: number }) {
 
 /* ─── Coverage Card ─── */
 
-function CoverageCard({ item, index }: { item: PressItem; index: number }) {
+function CoverageCard({ item, index, locale }: { item: PressItem; index: number; locale: string }) {
   return (
     <FadeInUp delay={index * 0.06}>
       <div className="bg-surface-1 border border-border rounded-2xl p-6 hover:border-brand-sage/40 transition-all duration-200 card-glow h-full flex flex-col group">
         <div className="flex items-center gap-3 mb-3">
           <TypeBadge type={item.type} />
-          <span className="text-xs text-text-muted">{formatDate(item.date)}</span>
+          <span className="text-xs text-text-muted">{formatDate(item.date, locale)}</span>
         </div>
 
         {item.source && (
@@ -176,6 +176,7 @@ function BrandAssetCard({ assetKey, icon: IconComponent, index, t }: { assetKey:
 
 export default function PressContent() {
   const t = useTranslations("press");
+  const locale = useLocale();
 
   const [activeTab, setActiveTab] = useState<FilterTab>("All");
 
@@ -237,7 +238,7 @@ export default function PressContent() {
           </FadeInUp>
           <div className="grid md:grid-cols-2 gap-6">
             {pressReleases.map((item, i) => (
-              <PressReleaseCard key={item.slug} item={item} index={i} />
+              <PressReleaseCard key={item.slug} item={item} index={i} locale={locale} />
             ))}
           </div>
         </SectionWrapper>
@@ -253,7 +254,7 @@ export default function PressContent() {
           </FadeInUp>
           <div className="grid md:grid-cols-2 gap-6">
             {coverage.map((item, i) => (
-              <CoverageCard key={item.slug} item={item} index={i} />
+              <CoverageCard key={item.slug} item={item} index={i} locale={locale} />
             ))}
           </div>
         </SectionWrapper>
