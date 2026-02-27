@@ -116,9 +116,49 @@ export function withAuth<T>(
 export function tierBadge(tier: RequiredTier): string {
   if (tier === 'free') return '';
   const names: Record<string, string> = {
+    solo: '[SOLO]',
     starter: '[STARTER]',
-    pro: '[PRO]',
+    team: '[TEAM]',
+    business: '[BIZ]',
     enterprise: '[ENT]',
   };
   return c.dim(names[tier] ?? '');
+}
+
+/**
+ * Get current license/tier from stored credentials.
+ */
+export function getLicense(): { tier: Tier; email?: string } {
+  const creds = loadCredentials();
+  if (!creds || isTokenExpired(creds)) return { tier: 'free' };
+  return { tier: creds.tier, email: creds.email };
+}
+
+/**
+ * Check if current user has access to a given tier level.
+ */
+export function checkAccess(requiredTier: Tier): boolean {
+  const { tier } = getLicense();
+  return (TIER_LEVEL[tier] ?? 0) >= (TIER_LEVEL[requiredTier] ?? 0);
+}
+
+/**
+ * Display a branded upgrade prompt for a locked feature.
+ */
+export function showUpgradePrompt(feature: string, requiredTier: Tier): void {
+  const { tier } = getLicense();
+  console.log('');
+  console.log(box(
+    [
+      `${symbols.warn} "${feature}" ${tierDisplayName(requiredTier)} tier required`,
+      '',
+      `  Current: ${c.sage(tierDisplayName(tier))}`,
+      `  Required: ${c.sage(tierDisplayName(requiredTier))}`,
+      '',
+      `  Upgrade: ${c.underline('https://panguard.ai/pricing')}`,
+      `  Or run: ${c.sage('panguard login')}`,
+    ].join('\n'),
+    { borderColor: c.caution, title: 'Upgrade Required' },
+  ));
+  console.log('');
 }

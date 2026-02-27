@@ -5,7 +5,6 @@
 
 import { Command } from 'commander';
 import { runCLI } from '@openclaw/panguard-guard';
-import { withAuth } from '../auth-guard.js';
 
 export function guardCommand(): Command {
   const cmd = new Command('guard')
@@ -14,20 +13,22 @@ export function guardCommand(): Command {
   cmd.command('start')
     .description('Start the guard engine / \u555F\u52D5\u5B88\u8B77\u5F15\u64CE')
     .option('--data-dir <path>', 'Data directory / \u8CC7\u6599\u76EE\u9304')
-    .action(withAuth('starter', async (opts: { dataDir?: string }) => {
+    .option('--verbose', 'Verbose output (show all event logs) / \u8A73\u7D30\u8F38\u51FA', false)
+    .action(async (opts: { dataDir?: string; verbose: boolean }) => {
       const args = ['start'];
       if (opts.dataDir) args.push('--data-dir', opts.dataDir);
+      if (opts.verbose) args.push('--verbose');
       await runCLI(args);
-    }));
+    });
 
   cmd.command('stop')
     .description('Stop the guard engine / \u505C\u6B62\u5B88\u8B77\u5F15\u64CE')
     .option('--data-dir <path>', 'Data directory / \u8CC7\u6599\u76EE\u9304')
-    .action(withAuth('starter', async (opts: { dataDir?: string }) => {
+    .action(async (opts: { dataDir?: string }) => {
       const args = ['stop'];
       if (opts.dataDir) args.push('--data-dir', opts.dataDir);
       await runCLI(args);
-    }));
+    });
 
   cmd.command('status')
     .description('Show engine status / 顯示引擎狀態')
