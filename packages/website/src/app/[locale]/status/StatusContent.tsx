@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Rss, Mail, MessageSquare } from "lucide-react";
 import FadeInUp from "@/components/FadeInUp";
 import SectionWrapper from "@/components/ui/SectionWrapper";
@@ -147,8 +147,8 @@ function getOverallStatus(svcs: Service[]): ServiceStatus {
   return "operational";
 }
 
-function formatTimestamp(): string {
-  return new Date().toLocaleString("en-US", {
+function formatTimestamp(locale: string): string {
+  return new Date().toLocaleString(locale === "zh" ? "zh-TW" : "en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -160,7 +160,7 @@ function formatTimestamp(): string {
 
 /* ════════════════════════  Sub-components  ═══════════════════════ */
 
-function OverallBanner({ status, t }: { status: ServiceStatus; t: ReturnType<typeof useTranslations> }) {
+function OverallBanner({ status, t, locale }: { status: ServiceStatus; t: ReturnType<typeof useTranslations>; locale: string }) {
   const isAllGood = status === "operational";
 
   const bannerBg = isAllGood
@@ -191,7 +191,7 @@ function OverallBanner({ status, t }: { status: ServiceStatus; t: ReturnType<typ
           </h2>
         </div>
         <p className="text-text-tertiary text-sm">
-          {t("lastUpdated")} {formatTimestamp()}
+          {t("lastUpdated")} {formatTimestamp(locale)}
         </p>
       </div>
     </FadeInUp>
@@ -302,6 +302,7 @@ function IncidentCard({
 
 export default function StatusContent() {
   const t = useTranslations("status");
+  const locale = useLocale();
 
   const [email, setEmail] = useState("");
   const [subStatus, setSubStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -328,7 +329,7 @@ export default function StatusContent() {
 
       {/* ───────────── Overall Status Banner ───────────── */}
       <SectionWrapper spacing="tight">
-        <OverallBanner status={overallStatus} t={t} />
+        <OverallBanner status={overallStatus} t={t} locale={locale} />
       </SectionWrapper>
 
       {/* ───────────── Service Status List ───────────── */}
@@ -468,8 +469,8 @@ export default function StatusContent() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@company.com"
-                  aria-label="Email address"
+                  placeholder={t("getUpdates.emailPlaceholder")}
+                  aria-label={t("getUpdates.emailAriaLabel")}
                   className="w-full sm:w-auto sm:min-w-[280px] rounded-full border border-border bg-surface-1 px-5 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors"
                 />
                 <button

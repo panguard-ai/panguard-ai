@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Rss } from "lucide-react";
 import FadeInUp from "@/components/FadeInUp";
 import SectionWrapper from "@/components/ui/SectionWrapper";
@@ -28,9 +28,9 @@ const badgeStyles: Record<ChangeType, string> = {
 
 /* ─── Helpers ─── */
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string, locale: string): string {
   const date = new Date(dateStr + "T00:00:00");
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale === "zh" ? "zh-TW" : "en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -65,6 +65,7 @@ const filterKeys: { key: FilterKey; labelKey: string }[] = [
 
 export default function ChangelogContent() {
   const t = useTranslations("changelog");
+  const locale = useLocale();
 
   const [activeFilter, setActiveFilter] = useState<FilterKey>("all");
 
@@ -128,7 +129,7 @@ export default function ChangelogContent() {
                       v{entry.version}
                     </span>
                     <p className="text-text-tertiary text-xs mt-1">
-                      {formatDate(entry.date)}
+                      {formatDate(entry.date, locale)}
                     </p>
                   </div>
 
@@ -177,7 +178,7 @@ export default function ChangelogContent() {
             <FadeInUp>
               <div className="text-center py-16">
                 <p className="text-text-tertiary text-sm">
-                  No entries match the selected filter.
+                  {t("emptyFilter")}
                 </p>
               </div>
             </FadeInUp>
@@ -204,15 +205,15 @@ export default function ChangelogContent() {
             >
               <input
                 type="email"
-                placeholder="you@company.com"
-                aria-label="Email address"
+                placeholder={t("emailPlaceholder")}
+                aria-label={t("emailAriaLabel")}
                 className="w-full sm:w-auto sm:min-w-[280px] rounded-full border border-border bg-surface-1 px-5 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors"
               />
               <button
                 type="submit"
                 className="bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3 text-sm hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] whitespace-nowrap"
               >
-                Subscribe
+                {t("subscribe")}
               </button>
             </form>
           </div>
