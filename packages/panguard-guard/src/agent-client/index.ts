@@ -56,7 +56,7 @@ async function jsonRequest<T>(
   url: string,
   method: string,
   body?: unknown,
-  token?: string,
+  token?: string
 ): Promise<T> {
   const { request: httpRequest } = url.startsWith('https')
     ? await import('node:https')
@@ -94,7 +94,7 @@ async function jsonRequest<T>(
             reject(new Error(`HTTP ${res.statusCode}: ${data}`));
           }
         });
-      },
+      }
     );
 
     req.on('error', reject);
@@ -141,7 +141,7 @@ export class PanguardAgentClient {
     const response = await jsonRequest<AgentRegistrationResponse>(
       `${this.managerUrl}/api/agents/register`,
       'POST',
-      registration,
+      registration
     );
 
     this.agentId = response.agentId;
@@ -163,7 +163,7 @@ export class PanguardAgentClient {
       `${this.managerUrl}/api/agents/${this.agentId}/heartbeat`,
       'POST',
       status,
-      this.token,
+      this.token
     );
   }
 
@@ -179,7 +179,7 @@ export class PanguardAgentClient {
       `${this.managerUrl}/api/agents/${this.agentId}/events`,
       'POST',
       report,
-      this.token,
+      this.token
     );
   }
 
@@ -195,7 +195,7 @@ export class PanguardAgentClient {
       `${this.managerUrl}/api/rules/latest`,
       'GET',
       undefined,
-      this.token,
+      this.token
     );
 
     return response.rules ?? [];
@@ -209,9 +209,7 @@ export class PanguardAgentClient {
 
     this.heartbeatTimer = setInterval(() => {
       this.heartbeat(statusGetter()).catch((err: unknown) => {
-        logger.warn(
-          `Heartbeat failed: ${err instanceof Error ? err.message : String(err)}`,
-        );
+        logger.warn(`Heartbeat failed: ${err instanceof Error ? err.message : String(err)}`);
       });
     }, this.heartbeatInterval);
 
