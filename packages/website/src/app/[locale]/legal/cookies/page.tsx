@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LEGAL_LAST_UPDATED } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Cookie Policy",
@@ -12,7 +13,7 @@ export default function CookiePolicyPage() {
           Cookie Policy
         </h1>
         <p className="text-sm text-text-tertiary">
-          Last updated: February 2026
+          Last updated: {LEGAL_LAST_UPDATED}
         </p>
       </header>
 
@@ -188,10 +189,10 @@ export default function CookiePolicyPage() {
               refer to your browser&apos;s help documentation for instructions.
             </li>
             <li>
-              <strong className="text-text-primary">Cookie Banner:</strong> When
-              you first visit our website, you will be presented with a cookie
-              consent banner that allows you to accept or decline non-essential
-              cookies.
+              <strong className="text-text-primary">Cookie Banner:</strong> Where
+              required by applicable law, our website displays a cookie consent
+              banner that allows you to accept or decline non-essential cookies
+              before they are set.
             </li>
             <li>
               <strong className="text-text-primary">Opt-Out:</strong> You may
