@@ -2,7 +2,7 @@ rule WebShell_PHP_Generic {
     meta:
         id = "yara-001"
         description = "Detects common PHP web shell patterns"
-        author = "OpenClaw Security"
+        author = "Panguard Security"
         date = "2026-02-25"
         severity = "critical"
         mitre_attack = "T1505.003"
@@ -29,7 +29,7 @@ rule WebShell_JSP_Generic {
     meta:
         id = "yara-002"
         description = "Detects common JSP web shell patterns"
-        author = "OpenClaw Security"
+        author = "Panguard Security"
         date = "2026-02-25"
         severity = "critical"
         mitre_attack = "T1505.003"
@@ -46,7 +46,7 @@ rule WebShell_ASPX_Generic {
     meta:
         id = "yara-003"
         description = "Detects common ASPX web shell patterns"
-        author = "OpenClaw Security"
+        author = "Panguard Security"
         date = "2026-02-25"
         severity = "critical"
         mitre_attack = "T1505.003"

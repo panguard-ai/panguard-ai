@@ -2,7 +2,7 @@ rule Suspicious_Bash_Script {
     meta:
         id = "yara-008"
         description = "Detects suspicious bash scripts with evasion or attack patterns"
-        author = "OpenClaw Security"
+        author = "Panguard Security"
         date = "2026-02-25"
         severity = "high"
         mitre_attack = "T1059.004"
@@ -28,7 +28,7 @@ rule Suspicious_Python_Script {
     meta:
         id = "yara-009"
         description = "Detects suspicious Python scripts with attack/exfil patterns"
-        author = "OpenClaw Security"
+        author = "Panguard Security"
         date = "2026-02-25"
         severity = "high"
         mitre_attack = "T1059.006"
@@ -52,7 +52,7 @@ rule Obfuscated_JavaScript {
     meta:
         id = "yara-010"
         description = "Detects obfuscated JavaScript commonly used in attacks"
-        author = "OpenClaw Security"
+        author = "Panguard Security"
         date = "2026-02-25"
         severity = "medium"
         mitre_attack = "T1027"

@@ -1,10 +1,10 @@
-# OpenClaw Security - Windows Build Script
-# OpenClaw 安全平台 - Windows 建置腳本
+# Panguard Security - Windows Build Script
+# Panguard 安全平台 - Windows 建置腳本
 
 $ErrorActionPreference = "Stop"
 
 Write-Host "================================"
-Write-Host "OpenClaw Security - Windows Build"
+Write-Host "Panguard Security - Windows Build"
 Write-Host "================================"
 Write-Host ""
 
