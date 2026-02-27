@@ -102,7 +102,7 @@ describe('ProcessMonitor', () => {
 
 describe('FileMonitor', () => {
   it('should compute hash of a file', async () => {
-    const tempFile = join(tmpdir(), `openclaw-test-${Date.now()}.txt`);
+    const tempFile = join(tmpdir(), `panguard-test-${Date.now()}.txt`);
 
     try {
       await writeFile(tempFile, 'test content for hashing');

@@ -278,7 +278,7 @@ describe('Rule Loader', () => {
   });
 
   it('should handle non-existent directory', () => {
-    const rules = loadRulesFromDirectory('/tmp/openclaw-nonexistent-rules-dir-12345');
+    const rules = loadRulesFromDirectory('/tmp/panguard-nonexistent-rules-dir-12345');
     expect(Array.isArray(rules)).toBe(true);
     expect(rules.length).toBe(0);
   });
