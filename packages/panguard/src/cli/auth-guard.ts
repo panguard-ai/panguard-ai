@@ -70,19 +70,16 @@ export function withAuth<T>(
   handler: (options: T, credentials: StoredCredentials) => Promise<void>,
 ): (options: T) => Promise<void> {
   return async (options: T) => {
-    // In server/production mode (e.g. Railway), skip CLI auth check.
+    // In server mode, require a valid service token from environment.
     // The server has its own session-based auth for API routes.
-    if (process.env['PANGUARD_SERVER_MODE'] === '1' || process.env['NODE_ENV'] === 'production') {
+    if (process.env['PANGUARD_SERVER_MODE'] === '1') {
       const creds = loadCredentials();
-      await handler(options, creds ?? {
-        token: 'server-mode',
-        expiresAt: new Date(Date.now() + 365 * 86400000).toISOString(),
-        email: 'server@panguard.ai',
-        tier: 'enterprise' as Tier,
-        name: 'Panguard Server',
-        savedAt: new Date().toISOString(),
-        apiUrl: process.env['PANGUARD_BASE_URL'] ?? 'http://localhost:3000',
-      });
+      if (!creds || isTokenExpired(creds)) {
+        console.error('Server mode requires valid credentials. Run `panguard login` first.');
+        process.exitCode = 1;
+        return;
+      }
+      await handler(options, creds);
       return;
     }
 

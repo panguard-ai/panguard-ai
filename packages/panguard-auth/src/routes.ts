@@ -68,8 +68,8 @@ function json(res: ServerResponse, status: number, data: unknown): void {
   res.end(JSON.stringify(data));
 }
 
-function toPublicUser(u: { id: number; email: string; name: string; role: string; tier: string; createdAt: string }): UserPublic {
-  return { id: u.id, email: u.email, name: u.name, role: u.role, tier: u.tier, createdAt: u.createdAt };
+function toPublicUser(u: { id: number; email: string; name: string; role: string; tier: string; createdAt: string; planExpiresAt?: string | null }): UserPublic {
+  return { id: u.id, email: u.email, name: u.name, role: u.role, tier: u.tier, createdAt: u.createdAt, planExpiresAt: u.planExpiresAt };
 }
 
 function isValidEmail(email: unknown): email is string {
@@ -592,7 +592,15 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       return;
     }
 
+    const oldTier = target.tier;
     db.updateUserTier(target.id, tier);
+
+    // Audit log
+    db.addAuditLog('tier_change', user!.id, target.id, JSON.stringify({ from: oldTier, to: tier }));
+
+    // Invalidate all sessions for this user so they pick up the new tier
+    db.deleteSessionsByUserId(target.id);
+
     const updated = db.getUserById(target.id)!;
     json(res, 200, { ok: true, data: toPublicUser(updated) });
   }
@@ -627,7 +635,12 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       return;
     }
 
+    const oldRole = target.role;
     db.updateUserRole(target.id, role);
+
+    // Audit log
+    db.addAuditLog('role_change', user!.id, target.id, JSON.stringify({ from: oldRole, to: role }));
+
     const updated = db.getUserById(target.id)!;
     json(res, 200, { ok: true, data: toPublicUser(updated) });
   }
