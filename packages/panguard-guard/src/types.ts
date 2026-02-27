@@ -230,6 +230,20 @@ export interface AnonymizedThreatData {
   timestamp: string;
   industry?: string;
   region: string;
+  /** Unique event identifier / 唯一事件識別碼 */
+  eventId?: string;
+  /** SHA-256 hash of threat pattern / 威脅模式的 SHA-256 雜湊 */
+  patternHash?: string;
+  /** Confidence score 0-100 / 信心分數 */
+  confidence?: number;
+  /** Severity level / 嚴重等級 */
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+  /** Auto-response action taken / 自動回應動作 */
+  autoResponseTaken?: string;
+  /** Panguard client version / Panguard 客戶端版本 */
+  panguardVersion?: string;
+  /** OS type (darwin/linux/windows) / 作業系統類型 */
+  osType?: string;
 }
 
 /** Threat cloud rule update / 威脅雲規則更新 */
@@ -260,9 +274,9 @@ export interface LicenseInfo {
 
 /** Feature gates per tier / 各等級功能閘 */
 export const TIER_FEATURES: Record<LicenseTier, string[]> = {
-  free: ['basic_monitoring', 'rule_matching', 'log_only'],
-  pro: ['basic_monitoring', 'rule_matching', 'ai_analysis', 'auto_respond', 'notifications', 'context_memory'],
-  enterprise: ['basic_monitoring', 'rule_matching', 'ai_analysis', 'auto_respond', 'notifications', 'context_memory', 'threat_cloud', 'dashboard', 'multi_endpoint', 'priority_support'],
+  free: ['basic_monitoring', 'rule_matching', 'log_only', 'threat_cloud_upload'],
+  pro: ['basic_monitoring', 'rule_matching', 'ai_analysis', 'auto_respond', 'notifications', 'context_memory', 'threat_cloud_upload'],
+  enterprise: ['basic_monitoring', 'rule_matching', 'ai_analysis', 'auto_respond', 'notifications', 'context_memory', 'threat_cloud', 'threat_cloud_upload', 'multi_endpoint', 'priority_support'],
 };
 
 // ===== LLM interface for PanguardGuard =====
@@ -347,6 +361,8 @@ export interface GuardConfig {
   dataDir: string;
   threatCloudEndpoint?: string;
   licenseKey?: string;
+  /** CLI tier from panguard credentials (overrides key-based license) */
+  cliTier?: string;
   dashboardPort: number;
   dashboardEnabled: boolean;
   verbose: boolean;

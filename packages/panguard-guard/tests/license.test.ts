@@ -65,7 +65,7 @@ describe('license', () => {
     const entKey = generateTestLicenseKey('enterprise');
     const license = validateLicense(entKey);
     expect(hasFeature(license, 'threat_cloud')).toBe(true);
-    expect(hasFeature(license, 'dashboard')).toBe(true);
+    expect(hasFeature(license, 'threat_cloud_upload')).toBe(true);
     expect(hasFeature(license, 'multi_endpoint')).toBe(true);
   });
 

@@ -19,5 +19,9 @@ export { runScan } from './scanners/index.js';
 export type { ScanConfig, ScanResult, Finding } from './scanners/types.js';
 export { sortBySeverity, SEVERITY_ORDER } from './scanners/types.js';
 
+// Remote scanner exports / 遠端掃描器匯出
+export { runRemoteScan } from './scanners/remote/index.js';
+export type { RemoteScanConfig } from './scanners/remote/index.js';
+
 // Report exports / 報告匯出
 export { generatePdfReport } from './report/index.js';

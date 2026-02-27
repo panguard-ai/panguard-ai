@@ -24,6 +24,7 @@ import type {
   GuardConfig,
   GuardStatus,
   GuardMode,
+  LicenseTier,
   EnvironmentBaseline,
   ThreatVerdict,
   ResponseResult,
@@ -31,6 +32,7 @@ import type {
   LLMAnalysisResult,
   LLMClassificationResult,
 } from './types.js';
+import { TIER_FEATURES } from './types.js';
 
 import { DetectAgent, AnalyzeAgent, RespondAgent, ReportAgent } from './agent/index.js';
 import { loadBaseline, saveBaseline, isLearningComplete, getLearningProgress, switchToProtectionMode } from './memory/index.js';
@@ -144,8 +146,10 @@ export class GuardEngine {
   private eventsProcessed = 0;
   private threatsDetected = 0;
   private actionsExecuted = 0;
+  private threatCloudUploaded = 0;
   private statusTimer: ReturnType<typeof setInterval> | null = null;
   private learningCheckTimer: ReturnType<typeof setInterval> | null = null;
+  private eventCallback?: (type: string, data: Record<string, unknown>) => void;
 
   constructor(config: GuardConfig, llm: AnalyzeLLM | null = null) {
     this.config = config;
@@ -156,7 +160,35 @@ export class GuardEngine {
     this.baseline = loadBaseline(this.baselinePath);
 
     // Validate license / 驗證授權
-    const license = validateLicense(config.licenseKey);
+    let license = validateLicense(config.licenseKey);
+
+    // If CLI tier is provided, map it to Guard's internal LicenseTier
+    // CLI tiers: free/solo/starter/team/business/enterprise
+    // Guard tiers: free/pro/enterprise
+    if (config.cliTier) {
+      const cliTierMap: Record<string, LicenseTier> = {
+        free: 'free',
+        solo: 'pro',
+        starter: 'pro',
+        team: 'enterprise',
+        business: 'enterprise',
+        enterprise: 'enterprise',
+      };
+      const mappedTier = cliTierMap[config.cliTier] ?? 'free';
+      const keyTierLevel = { free: 0, pro: 1, enterprise: 2 }[license.tier] ?? 0;
+      const cliTierLevel = { free: 0, pro: 1, enterprise: 2 }[mappedTier] ?? 0;
+
+      // Use whichever tier is higher
+      if (cliTierLevel > keyTierLevel) {
+        license = {
+          ...license,
+          tier: mappedTier,
+          features: TIER_FEATURES[mappedTier],
+          isValid: true,
+        };
+      }
+    }
+
     logger.info(
       `License: ${license.tier} tier (valid: ${license.isValid}) / ` +
       `授權: ${license.tier} 等級 (有效: ${license.isValid})`,
@@ -182,9 +214,10 @@ export class GuardEngine {
     // Initialize investigation engine / 初始化調查引擎
     this.investigationEngine = new InvestigationEngine(this.baseline);
 
-    // Initialize threat cloud / 初始化威脅雲
+    // Initialize threat cloud - always enable upload for all tiers
+    // Full threat cloud API access (rule fetching, stats) gated by enterprise
     this.threatCloud = new ThreatCloudClient(
-      hasFeature(license, 'threat_cloud') ? config.threatCloudEndpoint : undefined,
+      config.threatCloudEndpoint,
       config.dataDir,
     );
 
@@ -277,6 +310,14 @@ export class GuardEngine {
     // Periodic status update / 定期狀態更新
     this.statusTimer = setInterval(() => {
       this.updateDashboardStatus();
+      this.eventCallback?.('status', {
+        eventsProcessed: this.eventsProcessed,
+        threatsDetected: this.threatsDetected,
+        actionsExecuted: this.actionsExecuted,
+        uploaded: this.threatCloudUploaded,
+        mode: this.mode,
+        uptime: Date.now() - this.startTime,
+      });
       if (this.watchdog) this.watchdog.heartbeat();
     }, 5000);
 
@@ -313,7 +354,7 @@ export class GuardEngine {
     // Save baseline / 儲存基線
     saveBaseline(this.baselinePath, this.baseline);
 
-    // Flush threat cloud queue / 清空威脅雲佇列
+    // Flush threat cloud buffer and queue / 清空威脅雲緩衝和佇列
     await this.threatCloud.flushQueue();
 
     // Clean up / 清理
@@ -388,7 +429,19 @@ export class GuardEngine {
       // Upload to threat cloud / 上傳至威脅雲
       if (anonymizedData) {
         await this.threatCloud.upload(anonymizedData);
+        this.threatCloudUploaded++;
       }
+
+      // Notify event callback (for CLI quiet mode display)
+      this.eventCallback?.('threat', {
+        category: event.category,
+        description: event.description,
+        conclusion: verdict.conclusion,
+        confidence: verdict.confidence,
+        action: response.action,
+        sourceIP: (event.metadata?.['sourceIP'] as string) ??
+                  (event.metadata?.['remoteAddress'] as string) ?? 'unknown',
+      });
 
       // Update dashboard / 更新儀表板
       if (this.dashboard) {
@@ -466,6 +519,14 @@ export class GuardEngine {
       memoryUsageMB: Math.round(memUsage.heapUsed / 1024 / 1024 * 10) / 10,
       cpuPercent: 0, // CPU tracking would need os.cpus()
     });
+  }
+
+  /**
+   * Register event callback for external consumers (e.g. CLI quiet mode).
+   * 註冊事件回調給外部消費者（如 CLI 安靜模式）。
+   */
+  setEventCallback(cb: (type: string, data: Record<string, unknown>) => void): void {
+    this.eventCallback = cb;
   }
 
   /**
