@@ -171,4 +171,78 @@ rule Suspicious_Base64 {
     // node_modules should be skipped, so evil.php won't be found
     expect(results.every(r => !r.filePath.includes('node_modules'))).toBe(true);
   });
+
+  it('should loadAllRules from custom and community dirs', async () => {
+    const communityDir = join(tempDir, 'community-rules');
+    mkdirSync(communityDir, { recursive: true });
+
+    writeFileSync(join(communityDir, 'community.yar'), `
+rule Community_Ransomware {
+  meta:
+    description = "Community ransomware detection"
+    severity = "critical"
+  strings:
+    $ransom = "Your files have been encrypted"
+    $bitcoin = "bitcoin"
+  condition:
+    any of them
+}
+`);
+
+    const total = await scanner.loadAllRules(rulesDir, communityDir);
+    expect(total).toBe(2); // 1 custom + 1 community
+    expect(scanner.getRuleCount()).toBe(2);
+  });
+
+  it('should loadAllRules with nested community subdirectories', async () => {
+    const communityDir = join(tempDir, 'community-nested');
+    mkdirSync(join(communityDir, 'apt'), { recursive: true });
+    mkdirSync(join(communityDir, 'malware'), { recursive: true });
+
+    writeFileSync(join(communityDir, 'apt', 'apt.yar'), `
+rule APT_Tool {
+  meta:
+    description = "APT tool detection"
+    severity = "critical"
+  strings:
+    $tool = "mimikatz"
+  condition:
+    any of them
+}
+`);
+
+    writeFileSync(join(communityDir, 'malware', 'trojan.yar'), `
+rule Trojan_Generic {
+  meta:
+    description = "Trojan detection"
+    severity = "high"
+  strings:
+    $trojan = "CreateRemoteThread"
+  condition:
+    any of them
+}
+`);
+
+    const total = await scanner.loadAllRules(rulesDir, communityDir);
+    expect(total).toBe(3); // 1 custom + 2 community
+  });
+
+  it('should gracefully handle missing community directory in loadAllRules', async () => {
+    const total = await scanner.loadAllRules(rulesDir, join(tempDir, 'nonexistent'));
+    expect(total).toBe(1); // Only custom rules loaded
+  });
+
+  it('should include ruleSource in SecurityEvent from loadAllRules', async () => {
+    const total = await scanner.loadAllRules(rulesDir);
+    expect(total).toBe(1);
+
+    const malFile = join(testFilesDir, 'mal.php');
+    writeFileSync(malFile, '<?php system("cat /etc/passwd"); ?>');
+
+    const result = await scanner.scanFile(malFile);
+    const event = scanner.toSecurityEvent(result);
+    expect(event).not.toBeNull();
+    const rawData = event!.raw as Record<string, unknown>;
+    expect(rawData?.ruleSource).toBe('custom');
+  });
 });

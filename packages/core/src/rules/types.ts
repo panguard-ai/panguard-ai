@@ -76,6 +76,8 @@ export interface SigmaRule {
   falsepositives?: string[];
   /** External reference URLs / 外部參考連結 */
   references?: string[];
+  /** Rule source: custom (Panguard original) or community (SigmaHQ etc.) / 規則來源 */
+  source?: 'custom' | 'community';
 }
 
 /**
@@ -104,8 +106,10 @@ export interface RuleMatch {
  * 控制規則引擎如何載入和管理規則。
  */
 export interface RuleEngineConfig {
-  /** Directory containing Sigma rule YAML files / 包含 Sigma 規則 YAML 檔案的目錄 */
+  /** Directory containing custom Sigma rule YAML files / 包含自訂 Sigma 規則 YAML 檔案的目錄 */
   rulesDir?: string;
+  /** Directory containing community Sigma rules (e.g., SigmaHQ) / 包含社群 Sigma 規則的目錄 */
+  communityRulesDir?: string;
   /** Enable hot-reloading of rules when files change / 啟用檔案變更時的規則熱載入 */
   hotReload?: boolean;
   /** Pre-loaded custom rules / 預載入的自訂規則 */

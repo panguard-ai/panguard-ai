@@ -15,7 +15,7 @@ import { createLogger } from '../utils/logger.js';
 import type { SecurityEvent } from '../types.js';
 import type { SigmaRule, RuleMatch, RuleEngineConfig } from './types.js';
 import { matchEventAgainstRules } from './sigma-matcher.js';
-import { loadRulesFromDirectory, watchRulesDirectory } from './rule-loader.js';
+import { loadRulesFromDirectory, loadRulesRecursive, watchRulesDirectory } from './rule-loader.js';
 
 const logger = createLogger('rule-engine');
 
@@ -80,24 +80,40 @@ export class RuleEngine {
    * @returns Promise that resolves when rules are loaded / 規則載入完成後 resolve 的 Promise
    */
   async loadRules(): Promise<void> {
-    if (this.config.rulesDir === undefined) {
-      logger.warn('No rulesDir configured, skipping directory load / 未配置 rulesDir，跳過目錄載入');
-      return;
+    const existingIds = new Set(this.rules.map((r) => r.id));
+
+    // Load custom rules from rulesDir / 從 rulesDir 載入自訂規則
+    if (this.config.rulesDir !== undefined) {
+      const customDirRules = loadRulesRecursive(this.config.rulesDir, 'custom');
+      for (const rule of customDirRules) {
+        if (!existingIds.has(rule.id)) {
+          this.rules.push(rule);
+          existingIds.add(rule.id);
+        } else {
+          logger.warn(
+            `Skipping duplicate rule id "${rule.id}" from custom directory / 跳過自訂目錄中重複的規則 id "${rule.id}"`,
+          );
+        }
+      }
     }
 
-    const dirRules = loadRulesFromDirectory(this.config.rulesDir);
-
-    // Merge directory rules with custom rules (avoid duplicates by id) / 合併目錄規則與自訂規則（依 id 避免重複）
-    const existingIds = new Set(this.rules.map((r) => r.id));
-    for (const rule of dirRules) {
-      if (!existingIds.has(rule.id)) {
-        this.rules.push(rule);
-        existingIds.add(rule.id);
-      } else {
-        logger.warn(
-          `Skipping duplicate rule id "${rule.id}" from directory / 跳過目錄中重複的規則 id "${rule.id}"`,
-        );
+    // Load community rules from communityRulesDir / 從 communityRulesDir 載入社群規則
+    if (this.config.communityRulesDir !== undefined) {
+      const communityRules = loadRulesRecursive(this.config.communityRulesDir, 'community');
+      for (const rule of communityRules) {
+        if (!existingIds.has(rule.id)) {
+          this.rules.push(rule);
+          existingIds.add(rule.id);
+        } else {
+          logger.warn(
+            `Skipping duplicate rule id "${rule.id}" from community directory / 跳過社群目錄中重複的規則 id "${rule.id}"`,
+          );
+        }
       }
+    }
+
+    if (this.config.rulesDir === undefined && this.config.communityRulesDir === undefined) {
+      logger.warn('No rulesDir or communityRulesDir configured, skipping directory load / 未配置規則目錄，跳過載入');
     }
 
     logger.info(
@@ -106,14 +122,11 @@ export class RuleEngine {
 
     // Set up hot-reload watcher if configured / 如果配置了熱載入，設定監視器
     if (this.config.hotReload && this.config.rulesDir !== undefined) {
-      // Clean up any existing watcher / 清除任何現有的監視器
       if (this.cleanupWatcher !== undefined) {
         this.cleanupWatcher();
       }
 
       this.cleanupWatcher = watchRulesDirectory(this.config.rulesDir, (updatedRules) => {
-        // Replace directory-loaded rules while preserving custom rules
-        // 替換目錄載入的規則，同時保留自訂規則
         const customRules = this.config.customRules ?? [];
         const customIds = new Set(customRules.map((r) => r.id));
 
@@ -124,6 +137,17 @@ export class RuleEngine {
           if (!loadedIds.has(rule.id)) {
             this.rules.push(rule);
             loadedIds.add(rule.id);
+          }
+        }
+
+        // Re-load community rules after hot-reload / 熱載入後重新載入社群規則
+        if (this.config.communityRulesDir !== undefined) {
+          const communityRules = loadRulesRecursive(this.config.communityRulesDir, 'community');
+          for (const rule of communityRules) {
+            if (!loadedIds.has(rule.id)) {
+              this.rules.push(rule);
+              loadedIds.add(rule.id);
+            }
           }
         }
 
@@ -207,12 +231,21 @@ export class RuleEngine {
 
     // Reset to custom rules only / 重設為僅有自訂規則
     this.rules = this.config.customRules ? [...this.config.customRules] : [];
+    const existingIds = new Set(this.rules.map((r) => r.id));
 
     if (this.config.rulesDir !== undefined) {
-      const dirRules = loadRulesFromDirectory(this.config.rulesDir);
-      const existingIds = new Set(this.rules.map((r) => r.id));
+      const customDirRules = loadRulesRecursive(this.config.rulesDir, 'custom');
+      for (const rule of customDirRules) {
+        if (!existingIds.has(rule.id)) {
+          this.rules.push(rule);
+          existingIds.add(rule.id);
+        }
+      }
+    }
 
-      for (const rule of dirRules) {
+    if (this.config.communityRulesDir !== undefined) {
+      const communityRules = loadRulesRecursive(this.config.communityRulesDir, 'community');
+      for (const rule of communityRules) {
         if (!existingIds.has(rule.id)) {
           this.rules.push(rule);
           existingIds.add(rule.id);
@@ -258,7 +291,7 @@ export { parseSigmaYaml, parseSigmaFile } from './sigma-parser.js';
 export { matchEvent, matchEventAgainstRules } from './sigma-matcher.js';
 
 // Re-export loader functions / 重新匯出載入器函式
-export { loadRulesFromDirectory, watchRulesDirectory } from './rule-loader.js';
+export { loadRulesFromDirectory, loadRulesRecursive, watchRulesDirectory } from './rule-loader.js';
 
 // Re-export YARA scanner / 重新匯出 YARA 掃描器
 export { YaraScanner, type YaraMatch, type YaraScanResult } from './yara-scanner.js';

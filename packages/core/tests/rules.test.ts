@@ -1,13 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { existsSync } from 'fs';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { existsSync, mkdirSync, writeFileSync, rmSync, mkdtempSync } from 'fs';
 import { join } from 'path';
+import { tmpdir } from 'os';
 
 // Test sigma parser
 import { parseSigmaYaml } from '../src/rules/sigma-parser.js';
 // Test sigma matcher
 import { matchEvent } from '../src/rules/sigma-matcher.js';
 // Test rule loader
-import { loadRulesFromDirectory } from '../src/rules/rule-loader.js';
+import { loadRulesFromDirectory, loadRulesRecursive } from '../src/rules/rule-loader.js';
 // Test RuleEngine
 import { RuleEngine } from '../src/rules/index.js';
 
@@ -259,9 +260,10 @@ describe('Rule Loader', () => {
       process.cwd(),
       'config',
       'sigma-rules',
+      'custom',
     );
 
-    // The config/sigma-rules directory should exist in the project
+    // The config/sigma-rules/custom directory should exist in the project
     if (existsSync(rulesDir)) {
       const rules = loadRulesFromDirectory(rulesDir);
       expect(Array.isArray(rules)).toBe(true);
@@ -281,6 +283,76 @@ describe('Rule Loader', () => {
     const rules = loadRulesFromDirectory('/tmp/panguard-nonexistent-rules-dir-12345');
     expect(Array.isArray(rules)).toBe(true);
     expect(rules.length).toBe(0);
+  });
+});
+
+describe('Recursive Rule Loader', () => {
+  let tempDir: string;
+
+  beforeEach(() => {
+    tempDir = mkdtempSync(join(tmpdir(), 'sigma-recursive-'));
+  });
+
+  afterEach(() => {
+    try { rmSync(tempDir, { recursive: true, force: true }); } catch { /* ignore */ }
+  });
+
+  function writeRuleFile(dir: string, filename: string, id: string, title: string): void {
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, filename), `
+title: ${title}
+id: ${id}
+status: stable
+description: Test rule
+logsource:
+  category: authentication
+  product: any
+detection:
+  selection:
+    category: 'authentication'
+  condition: selection
+level: medium
+`.trim());
+  }
+
+  it('should load rules recursively from nested directories', () => {
+    writeRuleFile(join(tempDir, 'linux', 'auth'), 'brute.yml', 'rec-001', 'Linux Brute Force');
+    writeRuleFile(join(tempDir, 'windows', 'process'), 'proc.yml', 'rec-002', 'Windows Process');
+    writeRuleFile(tempDir, 'root.yml', 'rec-003', 'Root Level Rule');
+
+    const rules = loadRulesRecursive(tempDir);
+    expect(rules.length).toBe(3);
+  });
+
+  it('should tag rules with custom source', () => {
+    writeRuleFile(tempDir, 'rule.yml', 'src-001', 'Custom Rule');
+
+    const rules = loadRulesRecursive(tempDir, 'custom');
+    expect(rules.length).toBe(1);
+    expect(rules[0]!.source).toBe('custom');
+  });
+
+  it('should tag rules with community source', () => {
+    writeRuleFile(tempDir, 'rule.yml', 'comm-001', 'Community Rule');
+
+    const rules = loadRulesRecursive(tempDir, 'community');
+    expect(rules.length).toBe(1);
+    expect(rules[0]!.source).toBe('community');
+  });
+
+  it('should return empty array for non-existent directory', () => {
+    const rules = loadRulesRecursive(join(tempDir, 'nonexistent'));
+    expect(Array.isArray(rules)).toBe(true);
+    expect(rules.length).toBe(0);
+  });
+
+  it('should skip non-yaml files', () => {
+    writeRuleFile(tempDir, 'rule.yml', 'skip-001', 'Valid Rule');
+    writeFileSync(join(tempDir, 'readme.md'), '# Not a rule');
+    writeFileSync(join(tempDir, 'data.json'), '{}');
+
+    const rules = loadRulesRecursive(tempDir);
+    expect(rules.length).toBe(1);
   });
 });
 
@@ -316,5 +388,91 @@ describe('Rule Engine', () => {
     // Cleanup
     engine.destroy();
     expect(engine.getRules().length).toBe(0);
+  });
+
+  it('should load from both rulesDir and communityRulesDir', async () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'engine-dual-'));
+    const customDir = join(tempDir, 'custom');
+    const communityDir = join(tempDir, 'community');
+
+    mkdirSync(customDir, { recursive: true });
+    mkdirSync(communityDir, { recursive: true });
+
+    writeFileSync(join(customDir, 'custom-rule.yml'), `
+title: Custom Rule
+id: engine-custom-001
+status: stable
+description: A custom detection rule
+logsource:
+  category: authentication
+  product: any
+detection:
+  selection:
+    category: 'authentication'
+  condition: selection
+level: high
+`.trim());
+
+    writeFileSync(join(communityDir, 'community-rule.yml'), `
+title: Community Rule
+id: engine-community-001
+status: stable
+description: A community detection rule
+logsource:
+  category: process_creation
+  product: any
+detection:
+  selection:
+    category: 'process_creation'
+  condition: selection
+level: medium
+`.trim());
+
+    const engine = new RuleEngine({
+      rulesDir: customDir,
+      communityRulesDir: communityDir,
+    });
+    await engine.loadRules();
+
+    const rules = engine.getRules();
+    expect(rules.length).toBe(2);
+    expect(rules.find(r => r.id === 'engine-custom-001')?.source).toBe('custom');
+    expect(rules.find(r => r.id === 'engine-community-001')?.source).toBe('community');
+
+    engine.destroy();
+    try { rmSync(tempDir, { recursive: true, force: true }); } catch { /* ignore */ }
+  });
+
+  it('should gracefully handle missing communityRulesDir', async () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'engine-nocomm-'));
+    const customDir = join(tempDir, 'custom');
+    mkdirSync(customDir, { recursive: true });
+
+    writeFileSync(join(customDir, 'rule.yml'), `
+title: Solo Custom Rule
+id: solo-001
+status: stable
+description: Only custom
+logsource:
+  category: authentication
+  product: any
+detection:
+  selection:
+    category: 'authentication'
+  condition: selection
+level: low
+`.trim());
+
+    const engine = new RuleEngine({
+      rulesDir: customDir,
+      communityRulesDir: join(tempDir, 'nonexistent-community'),
+    });
+
+    // Should not throw
+    await engine.loadRules();
+    expect(engine.getRules().length).toBe(1);
+
+    engine.destroy();
+    try { rmSync(tempDir, { recursive: true, force: true }); } catch { /* ignore */ }
   });
 });

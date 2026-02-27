@@ -74,6 +74,62 @@ export function loadRulesFromDirectory(dir: string): SigmaRule[] {
 }
 
 /**
+ * Recursively load Sigma rules from a directory tree
+ * 從目錄樹遞迴載入 Sigma 規則
+ *
+ * Walks subdirectories to find all .yml/.yaml files.
+ * Optionally tags each rule with a source label.
+ * 遍歷子目錄尋找所有 .yml/.yaml 檔案。
+ * 可選擇性地為每條規則標記來源標籤。
+ *
+ * @param dir - Root directory to scan recursively / 要遞迴掃描的根目錄
+ * @param source - Optional source tag for loaded rules / 可選的規則來源標記
+ * @returns Array of successfully parsed Sigma rules / 成功解析的 Sigma 規則陣列
+ */
+export function loadRulesRecursive(dir: string, source?: SigmaRule['source']): SigmaRule[] {
+  if (!fs.existsSync(dir)) {
+    logger.warn(`Rules directory does not exist, skipping: ${dir} / 規則目錄不存在，跳過: ${dir}`);
+    return [];
+  }
+
+  const rules: SigmaRule[] = [];
+
+  function walk(currentDir: string): void {
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(currentDir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      const fullPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (entry.isFile()) {
+        const ext = path.extname(entry.name).toLowerCase();
+        if (!SIGMA_EXTENSIONS.has(ext)) continue;
+        const rule = parseSigmaFile(fullPath);
+        if (rule !== null) {
+          if (source !== undefined) {
+            rule.source = source;
+          }
+          rules.push(rule);
+        }
+      }
+    }
+  }
+
+  walk(dir);
+
+  logger.info(
+    `Loaded ${rules.length} rules recursively from: ${dir} (source: ${source ?? 'unset'}) / 從 ${dir} 遞迴載入 ${rules.length} 條規則`,
+  );
+
+  return rules;
+}
+
+/**
  * Watch a directory for Sigma rule file changes
  * 監視目錄中的 Sigma 規則檔案變更
  *
