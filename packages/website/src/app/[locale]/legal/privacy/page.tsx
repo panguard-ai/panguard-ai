@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LEGAL_LAST_UPDATED } from "@/lib/constants";
 
 export async function generateMetadata({
   params: { locale },
@@ -22,7 +23,7 @@ export default function PrivacyPolicyPage({
           Privacy Policy
         </h1>
         <p className="text-sm text-text-tertiary">
-          Last updated: February 2026
+          Last updated: {LEGAL_LAST_UPDATED}
         </p>
         {locale === "zh" && (
           <p className="mt-3 text-sm text-text-muted border border-border rounded-lg px-4 py-3 bg-surface-1">

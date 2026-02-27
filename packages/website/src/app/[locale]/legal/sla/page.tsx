@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LEGAL_LAST_UPDATED } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Service Level Agreement",
@@ -12,7 +13,7 @@ export default function SLAPage() {
           Service Level Agreement
         </h1>
         <p className="text-sm text-text-tertiary">
-          Last updated: February 2026
+          Last updated: {LEGAL_LAST_UPDATED}
         </p>
       </header>
 
