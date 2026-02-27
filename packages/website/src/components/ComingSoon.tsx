@@ -66,7 +66,7 @@ export default function ComingSoon({ title }: { title: string }) {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
+                placeholder={t("emailPlaceholder")}
                 className="flex-1 bg-surface-1 border border-border rounded-full px-4 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage/50 focus:ring-1 focus:ring-brand-sage/25 transition-colors"
               />
               <button

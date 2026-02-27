@@ -20,7 +20,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 const baseClasses =
-  "inline-flex items-center justify-center gap-2 rounded-full transition-all duration-200 whitespace-nowrap";
+  "inline-flex items-center justify-center gap-2 rounded-full transition-all duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-sage focus-visible:ring-offset-2 focus-visible:ring-offset-surface-0";
 
 interface ButtonProps {
   variant?: ButtonVariant;

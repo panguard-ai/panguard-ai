@@ -1,18 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
 import { RefreshCw, ArrowLeft } from "lucide-react";
 
 export default function Error({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error("[page-error]", error);
-  }, [error]);
 
   return (
     <div className="min-h-screen bg-surface-0 flex items-center justify-center px-6">

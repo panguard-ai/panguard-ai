@@ -2318,7 +2318,11 @@
     },
     "notifyTitle": "Get notified of new releases",
     "notifyDesc": "Subscribe to receive changelog updates directly in your inbox.",
-    "noSpam": "No spam, only product updates."
+    "noSpam": "No spam, only product updates.",
+    "subscribe": "Subscribe",
+    "emailPlaceholder": "you@company.com",
+    "emailAriaLabel": "Email address",
+    "emptyFilter": "No entries match the selected filter."
   },
   "resources": {
     "overline": "RESOURCES",
@@ -2340,6 +2344,8 @@
       "title": "Get Resources Delivered to Your Inbox",
       "desc": "Stay ahead of the threat landscape with curated whitepapers, reports, and guides delivered directly to your inbox. No spam -- just actionable security knowledge.",
       "subscribe": "Subscribe",
+      "emailPlaceholder": "you@company.com",
+      "emailAriaLabel": "Email address",
       "note": "Join 2,000+ security-conscious engineers. Unsubscribe anytime."
     }
   },
@@ -2565,6 +2571,8 @@
       "title": "Get Status Updates",
       "desc": "Subscribe to receive instant notifications when service status changes. Stay informed about scheduled maintenance and incident resolutions.",
       "subscribe": "Subscribe",
+      "emailPlaceholder": "you@company.com",
+      "emailAriaLabel": "Email address",
       "success": "Subscribed. You'll receive status updates at {email}.",
       "error": "Something went wrong. Please try again."
     },
@@ -2757,6 +2765,7 @@
     "success": "You're on the list. We'll notify you when this is ready.",
     "notifyMe": "Notify Me",
     "error": "Something went wrong. Please try again.",
+    "emailPlaceholder": "you@company.com",
     "backHome": "Back to Home"
   }
 }

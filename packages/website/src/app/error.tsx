@@ -1,17 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-
 export default function RootError({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error("[root-error]", error);
-  }, [error]);
 
   return (
     <html lang="en">
