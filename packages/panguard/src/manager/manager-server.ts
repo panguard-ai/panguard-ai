@@ -149,7 +149,8 @@ export class ManagerServer {
         return;
       }
 
-      if (method === 'POST' && action === 'heartbeat') return this.handleHeartbeat(agentId, req, res);
+      if (method === 'POST' && action === 'heartbeat')
+        return this.handleHeartbeat(agentId, req, res);
       if (method === 'POST' && action === 'events') return this.handleEvent(agentId, req, res);
       if (method === 'GET' && action === 'status') return this.handleAgentStatus(agentId, res);
       if (method === 'POST' && action === 'scan') return this.handleScan(agentId, res);
@@ -252,7 +253,7 @@ export class ManagerServer {
   private async handleHeartbeat(
     agentId: string,
     req: IncomingMessage,
-    res: ServerResponse,
+    res: ServerResponse
   ): Promise<void> {
     const body = await this.parseBody<{
       eventsProcessed: number;
@@ -286,7 +287,7 @@ export class ManagerServer {
 
     // Check for pending scan commands
     const pendingScans = this.scanQueue.filter(
-      (s) => s.agentId === agentId && s.status === 'pending',
+      (s) => s.agentId === agentId && s.status === 'pending'
     );
     for (const scan of pendingScans) {
       scan.status = 'acknowledged';
@@ -301,7 +302,7 @@ export class ManagerServer {
   private async handleEvent(
     agentId: string,
     req: IncomingMessage,
-    res: ServerResponse,
+    res: ServerResponse
   ): Promise<void> {
     const body = await this.parseBody<{
       event: unknown;
@@ -337,6 +338,7 @@ export class ManagerServer {
     }
 
     // Return agent info without token
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { token: _token, ...safeAgent } = agent;
     this.json(res, 200, safeAgent);
   }

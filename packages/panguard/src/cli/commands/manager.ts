@@ -7,7 +7,7 @@ import { Command } from 'commander';
 
 export function managerCommand(): Command {
   const cmd = new Command('manager').description(
-    'Manager server for distributed agents / 分散式 Agent 管理伺服器',
+    'Manager server for distributed agents / 分散式 Agent 管理伺服器'
   );
 
   cmd
@@ -75,7 +75,7 @@ export function managerCommand(): Command {
             'Mode'.padEnd(12) +
             'Events'.padEnd(10) +
             'Threats'.padEnd(10) +
-            'Last Seen',
+            'Last Seen'
         );
         console.log('-'.repeat(130));
 
@@ -91,12 +91,12 @@ export function managerCommand(): Command {
               agent.mode.padEnd(12) +
               String(agent.eventsProcessed).padEnd(10) +
               String(agent.threatsDetected).padEnd(10) +
-              agent.lastSeen,
+              agent.lastSeen
           );
         }
       } catch (err: unknown) {
         console.error(
-          `Failed to connect to manager: ${err instanceof Error ? err.message : String(err)}`,
+          `Failed to connect to manager: ${err instanceof Error ? err.message : String(err)}`
         );
         process.exit(1);
       }
@@ -123,7 +123,7 @@ export function managerCommand(): Command {
         console.log(data.message ?? 'Scan command queued');
       } catch (err: unknown) {
         console.error(
-          `Failed to connect to manager: ${err instanceof Error ? err.message : String(err)}`,
+          `Failed to connect to manager: ${err instanceof Error ? err.message : String(err)}`
         );
         process.exit(1);
       }

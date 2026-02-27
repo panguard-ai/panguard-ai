@@ -229,11 +229,26 @@ export async function runScan(config: ScanConfig): Promise<ScanResult> {
   const scanAllowedDirs = ['/etc', '/var/log', '/tmp', '/usr', '/home', '/root', '/opt'];
   const scanAllowedCommands = [
     ...DEFAULT_ALLOWED_COMMANDS,
-    'softwareupdate', 'apt', 'yum', 'dnf',
-    'systemctl', 'defaults', 'crontab', 'schtasks',
-    'sharing', 'net', 'smbclient', 'openssl',
-    'netstat', 'ss', 'lsof', 'ip', 'ifconfig',
-    'launchctl', 'dscl', 'id',
+    'softwareupdate',
+    'apt',
+    'yum',
+    'dnf',
+    'systemctl',
+    'defaults',
+    'crontab',
+    'schtasks',
+    'sharing',
+    'net',
+    'smbclient',
+    'openssl',
+    'netstat',
+    'ss',
+    'lsof',
+    'ip',
+    'ifconfig',
+    'launchctl',
+    'dscl',
+    'id',
   ] as const;
   const filesystemGuard = createFilesystemGuard(scanAllowedDirs);
   const commandValidator = createCommandValidator(scanAllowedCommands);

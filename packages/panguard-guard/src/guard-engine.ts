@@ -374,17 +374,19 @@ export class GuardEngine {
         const reg = await this.agentClient.register('1.0.0');
         logger.info(`Agent mode active: registered as ${reg.agentId}`);
 
-        this.agentClient.startHeartbeat((): AgentHeartbeat => ({
-          eventsProcessed: this.eventsProcessed,
-          threatsDetected: this.threatsDetected,
-          actionsExecuted: this.actionsExecuted,
-          mode: this.mode,
-          uptime: Date.now() - this.startTime,
-          memoryUsageMB: Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10,
-        }));
+        this.agentClient.startHeartbeat(
+          (): AgentHeartbeat => ({
+            eventsProcessed: this.eventsProcessed,
+            threatsDetected: this.threatsDetected,
+            actionsExecuted: this.actionsExecuted,
+            mode: this.mode,
+            uptime: Date.now() - this.startTime,
+            memoryUsageMB: Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10,
+          })
+        );
       } catch (err: unknown) {
         logger.warn(
-          `Agent registration failed (standalone mode): ${err instanceof Error ? err.message : String(err)}`,
+          `Agent registration failed (standalone mode): ${err instanceof Error ? err.message : String(err)}`
         );
         this.agentClient = null;
       }
@@ -562,16 +564,20 @@ export class GuardEngine {
 
       // Report to Manager if in agent mode / 在 Agent 模式下回報給 Manager
       if (this.agentClient?.isRegistered()) {
-        this.agentClient.reportEvent({
-          event,
-          verdict: {
-            conclusion: verdict.conclusion,
-            confidence: verdict.confidence,
-            action: response.action,
-          },
-        }).catch((err: unknown) => {
-          logger.warn(`Agent event report failed: ${err instanceof Error ? err.message : String(err)}`);
-        });
+        this.agentClient
+          .reportEvent({
+            event,
+            verdict: {
+              conclusion: verdict.conclusion,
+              confidence: verdict.confidence,
+              action: response.action,
+            },
+          })
+          .catch((err: unknown) => {
+            logger.warn(
+              `Agent event report failed: ${err instanceof Error ? err.message : String(err)}`
+            );
+          });
       }
 
       // Upload to threat cloud / 上傳至威脅雲

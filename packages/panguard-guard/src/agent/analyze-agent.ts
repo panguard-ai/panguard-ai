@@ -215,7 +215,7 @@ function calculateFinalConfidence(evidence: Evidence[], hasAI: boolean): number 
   const aiConfidence = maxConfidence(bySource['ai_analysis']);
   const ebpfConfidence = Math.max(
     maxConfidence(bySource['falco']),
-    maxConfidence(bySource['suricata']),
+    maxConfidence(bySource['suricata'])
   );
 
   // Use max of rule match and threat intel for the "rule" weight
@@ -226,7 +226,7 @@ function calculateFinalConfidence(evidence: Evidence[], hasAI: boolean): number 
   if (hasEbpf && hasAI) {
     // eBPF + AI: 20% eBPF, 30% rule, 20% baseline, 30% AI
     return Math.round(
-      ebpfConfidence * 0.2 + ruleScore * 0.3 + baselineConfidence * 0.2 + aiConfidence * 0.3,
+      ebpfConfidence * 0.2 + ruleScore * 0.3 + baselineConfidence * 0.2 + aiConfidence * 0.3
     );
   }
 
