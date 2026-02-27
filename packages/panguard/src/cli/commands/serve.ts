@@ -6,7 +6,7 @@
 
 import { Command } from 'commander';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -115,11 +115,14 @@ async function handleRequest(
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 
-  // CORS
-  const allowedOrigins = (process.env['CORS_ALLOWED_ORIGINS'] ?? '*').split(',');
+  // CORS — default to same-origin only; set CORS_ALLOWED_ORIGINS to allow cross-origin
+  const corsEnv = process.env['CORS_ALLOWED_ORIGINS'] ?? '';
+  const allowedOrigins = corsEnv ? corsEnv.split(',').map(o => o.trim()) : [];
   const origin = req.headers.origin ?? '';
-  if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+  if (allowedOrigins.includes('*')) {
     res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  } else if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -278,21 +281,28 @@ function serveStaticFile(
   pathname: string,
 ): void {
   // Map /admin -> /admin/index.html
+  const resolvedAdminDir = resolve(adminDir);
   let filePath: string;
   if (pathname === '/admin' || pathname === '/admin/') {
-    filePath = join(adminDir, 'index.html');
+    filePath = join(resolvedAdminDir, 'index.html');
   } else {
     // Strip /admin prefix
     const relative = pathname.slice('/admin'.length);
-    filePath = join(adminDir, relative);
+    filePath = resolve(resolvedAdminDir, relative);
 
     // If no extension, try .html
     if (!relative.includes('.')) {
-      filePath = join(adminDir, relative + '.html');
+      filePath = resolve(resolvedAdminDir, relative + '.html');
       if (!existsSync(filePath)) {
-        filePath = join(adminDir, relative, 'index.html');
+        filePath = resolve(resolvedAdminDir, relative, 'index.html');
       }
     }
+  }
+
+  // Prevent path traversal: resolved path must be within admin directory
+  if (!filePath.startsWith(resolvedAdminDir)) {
+    sendJson(res, 403, { ok: false, error: 'Forbidden' });
+    return;
   }
 
   if (!existsSync(filePath)) {

@@ -35,6 +35,7 @@ export interface User {
   verified: number;
   createdAt: string;
   lastLogin: string | null;
+  planExpiresAt: string | null;
 }
 
 export interface UserPublic {
@@ -44,6 +45,7 @@ export interface UserPublic {
   role: string;
   tier: string;
   createdAt: string;
+  planExpiresAt?: string | null;
 }
 
 export interface RegisterInput {
@@ -84,6 +86,7 @@ export interface UserAdmin {
   verified: number;
   createdAt: string;
   lastLogin: string | null;
+  planExpiresAt: string | null;
 }
 
 export interface SessionAdmin {

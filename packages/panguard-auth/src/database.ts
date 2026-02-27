@@ -63,16 +63,34 @@ export class AuthDB {
         expires_at TEXT
       );
 
+      CREATE TABLE IF NOT EXISTS audit_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        action TEXT NOT NULL,
+        actor_id INTEGER,
+        target_id INTEGER,
+        details TEXT,
+        created_at TEXT DEFAULT (datetime('now'))
+      );
+
       CREATE INDEX IF NOT EXISTS idx_waitlist_email ON waitlist(email);
       CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist(status);
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
       CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
       CREATE INDEX IF NOT EXISTS idx_report_purchases_user ON report_purchases(user_id);
+      CREATE INDEX IF NOT EXISTS idx_audit_log_action ON audit_log(action);
+      CREATE INDEX IF NOT EXISTS idx_audit_log_actor ON audit_log(actor_id);
     `);
 
     // Migration: add verify_token_expires_at column (safe to re-run)
     try {
       this.db.exec(`ALTER TABLE waitlist ADD COLUMN verify_token_expires_at TEXT`);
+    } catch {
+      // Column already exists — ignore
+    }
+
+    // Migration: add plan_expires_at column to users
+    try {
+      this.db.exec(`ALTER TABLE users ADD COLUMN plan_expires_at TEXT`);
     } catch {
       // Column already exists — ignore
     }
@@ -170,7 +188,7 @@ export class AuthDB {
   getUserByEmail(email: string): User | undefined {
     return this.db.prepare(`
       SELECT id, email, name, password_hash as passwordHash, role, tier, verified,
-             created_at as createdAt, last_login as lastLogin
+             created_at as createdAt, last_login as lastLogin, plan_expires_at as planExpiresAt
       FROM users WHERE email = ?
     `).get(email.toLowerCase().trim()) as User | undefined;
   }
@@ -178,7 +196,7 @@ export class AuthDB {
   getUserById(id: number): User | undefined {
     return this.db.prepare(`
       SELECT id, email, name, password_hash as passwordHash, role, tier, verified,
-             created_at as createdAt, last_login as lastLogin
+             created_at as createdAt, last_login as lastLogin, plan_expires_at as planExpiresAt
       FROM users WHERE id = ?
     `).get(id) as User | undefined;
   }
@@ -271,7 +289,7 @@ export class AuthDB {
   getAllUsersAdmin(): UserAdmin[] {
     return this.db.prepare(`
       SELECT id, email, name, role, tier, verified,
-             created_at as createdAt, last_login as lastLogin
+             created_at as createdAt, last_login as lastLogin, plan_expires_at as planExpiresAt
       FROM users ORDER BY created_at DESC
     `).all() as UserAdmin[];
   }
@@ -280,7 +298,7 @@ export class AuthDB {
     const pattern = `%${query}%`;
     return this.db.prepare(`
       SELECT id, email, name, role, tier, verified,
-             created_at as createdAt, last_login as lastLogin
+             created_at as createdAt, last_login as lastLogin, plan_expires_at as planExpiresAt
       FROM users WHERE email LIKE ? OR name LIKE ?
       ORDER BY created_at DESC
     `).all(pattern, pattern) as UserAdmin[];
@@ -350,13 +368,14 @@ export class AuthDB {
   getAllUsers(): User[] {
     return this.db.prepare(`
       SELECT id, email, name, password_hash as passwordHash, role, tier, verified,
-             created_at as createdAt, last_login as lastLogin
+             created_at as createdAt, last_login as lastLogin, plan_expires_at as planExpiresAt
       FROM users ORDER BY created_at DESC
     `).all() as User[];
   }
 
-  updateUserTier(userId: number, tier: string): void {
-    this.db.prepare('UPDATE users SET tier = ? WHERE id = ?').run(tier, userId);
+  updateUserTier(userId: number, tier: string, planExpiresAt?: string): void {
+    this.db.prepare('UPDATE users SET tier = ?, plan_expires_at = ? WHERE id = ?')
+      .run(tier, planExpiresAt ?? null, userId);
   }
 
   updateUserRole(userId: number, role: string): void {
@@ -398,6 +417,30 @@ export class AuthDB {
     ).run(id);
   }
 
+  // ── Audit Log ──────────────────────────────────────────────────
+
+  addAuditLog(action: string, actorId: number | null, targetId: number | null, details?: string): void {
+    this.db.prepare(`
+      INSERT INTO audit_log (action, actor_id, target_id, details)
+      VALUES (?, ?, ?, ?)
+    `).run(action, actorId, targetId, details ?? null);
+  }
+
+  getAuditLog(limit: number = 50): AuditLogEntry[] {
+    return this.db.prepare(`
+      SELECT id, action, actor_id as actorId, target_id as targetId,
+             details, created_at as createdAt
+      FROM audit_log ORDER BY created_at DESC LIMIT ?
+    `).all(Math.min(limit, 200)) as AuditLogEntry[];
+  }
+
+  // ── Session Management ────────────────────────────────────────
+
+  deleteSessionsByUserId(userId: number): number {
+    const result = this.db.prepare('DELETE FROM sessions WHERE user_id = ?').run(userId);
+    return result.changes;
+  }
+
   close(): void {
     this.db.close();
   }
@@ -411,4 +454,13 @@ export interface ReportPurchase {
   status: string;
   purchasedAt: string;
   expiresAt: string | null;
+}
+
+export interface AuditLogEntry {
+  id: number;
+  action: string;
+  actorId: number | null;
+  targetId: number | null;
+  details: string | null;
+  createdAt: string;
 }
