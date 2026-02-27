@@ -28,7 +28,7 @@ describe('PanguardAgentClient', () => {
         mode: 'learning',
         uptime: 0,
         memoryUsageMB: 0,
-      }),
+      })
     ).rejects.toThrow('Agent not registered');
   });
 
@@ -46,7 +46,7 @@ describe('PanguardAgentClient', () => {
           raw: {},
           host: 'localhost',
         },
-      }),
+      })
     ).rejects.toThrow('Agent not registered');
   });
 
