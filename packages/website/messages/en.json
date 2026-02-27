@@ -180,11 +180,11 @@
       "subtitle": "Every number below is verifiable in the codebase. No vanity metrics -- just engineering facts.",
       "stat1": "1,068",
       "stat1Label": "Tests Passing",
-      "stat2": "847",
+      "stat2": "3,155",
       "stat2Label": "Sigma Detection Rules",
       "stat3": "8",
       "stat3Label": "Honeypot Protocols",
-      "stat4": "1,203",
+      "stat4": "313",
       "stat4Label": "YARA Malware Rules",
       "stat5": "5",
       "stat5Label": "AI Agent Pipeline",
@@ -214,7 +214,7 @@
       "defReporting": "Technical reports",
       "pgPrice": "From $9/mo",
       "pgAfter": "Auto-responds + explains",
-      "pgReporting": "\"This week: blocked 847. You're safe.\"",
+      "pgReporting": "\"This week: blocked 3,155. You're safe.\"",
       "quote": "\"Falcon Go is a security camera. Panguard is a security company -- cameras, plus someone watching, responding, and reporting.\""
     },
     "cta": {
@@ -261,9 +261,9 @@
       "subtitle": "Fully transparent. Every line of code is auditable on GitHub.",
       "detection": {
         "title": "Detection Engine",
-        "sigma": "847 Sigma Rules",
+        "sigma": "3,155 Sigma Rules",
         "sigmaDesc": "Industry-standard threat detection language",
-        "yara": "1,203 YARA Rules",
+        "yara": "313 YARA Rules",
         "yaraDesc": "Malware fingerprint matching",
         "cve": "CVE Database",
         "cveDesc": "Real-time sync with NVD vulnerability data"
@@ -787,7 +787,7 @@
         },
         "item5": {
           "title": "Graceful Degradation",
-          "desc": "Cloud AI down? Local LLM (Ollama) takes over. LLM offline? The rule engine with 847 Sigma and 1,203 YARA rules handles it. Guard never stops protecting, regardless of network conditions."
+          "desc": "Cloud AI down? Local LLM (Ollama) takes over. LLM offline? The rule engine with 3,155 Sigma and 313 YARA rules handles it. Guard never stops protecting, regardless of network conditions."
         },
         "item6": {
           "title": "7-Day Context Memory",
