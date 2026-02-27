@@ -17,9 +17,9 @@ export default function ThreeSteps() {
   const [activeTab, setActiveTab] = useState<TabKey>("website");
 
   const ctaHrefs: Record<TabKey, string> = {
-    website: "/scan",
+    website: "/early-access",
     developer: "/docs",
-    business: "/scan",
+    business: "/early-access",
   };
 
   return (

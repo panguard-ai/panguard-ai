@@ -37,6 +37,7 @@
     "docs": "文件",
     "useCases": "使用場景",
     "startFreeScan": "免費掃描",
+    "getStarted": "立即開始",
     "productLinks": {
       "overview": "產品總覽",
       "overviewDesc": "查看完整平台",
@@ -138,6 +139,7 @@
       "subtitle2": "所以我們打造了不需要螢幕的資安。",
       "subtitle3": "API 給你的 Agent。CLI 給你。Dashboard 不需要。",
       "freeScan": "免費掃描",
+      "getStarted": "立即開始",
       "github": "GitHub",
       "badges": {
         "mit": "MIT 開源",
@@ -250,7 +252,8 @@
       "badge3": "台灣製造",
       "btnGithub": "GitHub",
       "btnDocs": "技術文件",
-      "btnScan": "免費掃描"
+      "btnScan": "免費掃描",
+      "btnEarlyAccess": "搶先體驗"
     },
     "techReveal": {
       "overline": "技術揭露",

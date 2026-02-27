@@ -73,10 +73,10 @@ export default function Vision() {
               {t("btnDocs")}
             </Link>
             <Link
-              href="/scan"
+              href="/early-access"
               className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
             >
-              {t("btnScan")}
+              {t("btnEarlyAccess")}
             </Link>
           </div>
         </FadeInUp>

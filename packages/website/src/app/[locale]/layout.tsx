@@ -61,7 +61,14 @@ export async function generateMetadata({
       images: ["/og-image.png"],
     },
     robots: { index: true, follow: true },
-    icons: { icon: "/favicon.png" },
+    icons: {
+      icon: [
+        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+        { url: "/favicon.png", sizes: "1024x1024", type: "image/png" },
+      ],
+      apple: "/apple-touch-icon.png",
+    },
     alternates: {
       canonical: `https://panguard.ai/${locale}`,
       languages: {

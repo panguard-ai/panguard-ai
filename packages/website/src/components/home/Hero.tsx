@@ -17,25 +17,27 @@ function InstallBar() {
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <div className="relative flex items-center gap-3 bg-surface-1/80 backdrop-blur-sm border border-border rounded-xl px-5 py-3.5 font-mono text-sm max-w-md mx-auto">
-      <span className="text-brand-sage select-none">$</span>
-      <code className="text-text-secondary flex-1 select-all truncate">{installCmd}</code>
-      <button
-        onClick={handleCopy}
-        className="text-text-muted hover:text-text-secondary transition-colors p-1 shrink-0"
-        aria-label="Copy install command"
-      >
-        {copied ? (
-          <Check className="w-4 h-4 text-status-safe" />
-        ) : (
-          <Copy className="w-4 h-4" />
+    <div className="max-w-md mx-auto">
+      <div className="relative flex items-center gap-3 bg-surface-1/80 backdrop-blur-sm border border-border rounded-xl px-5 py-3.5 font-mono text-sm">
+        <span className="text-brand-sage select-none">$</span>
+        <code className="text-text-secondary flex-1 select-all truncate">{installCmd}</code>
+        <button
+          onClick={handleCopy}
+          className="text-text-muted hover:text-text-secondary transition-colors p-1 shrink-0"
+          aria-label="Copy install command"
+        >
+          {copied ? (
+            <Check className="w-4 h-4 text-status-safe" />
+          ) : (
+            <Copy className="w-4 h-4" />
+          )}
+        </button>
+        {copied && (
+          <span className="toast-copied absolute -top-8 left-1/2 -translate-x-1/2 text-xs text-status-safe bg-surface-1 border border-border rounded px-2 py-1">
+            {t("copied")}
+          </span>
         )}
-      </button>
-      {copied && (
-        <span className="toast-copied absolute -top-8 left-1/2 -translate-x-1/2 text-xs text-status-safe bg-surface-1 border border-border rounded px-2 py-1">
-          {t("copied")}
-        </span>
-      )}
+      </div>
     </div>
   );
 }
@@ -114,10 +116,10 @@ export default function Hero() {
           transition={{ duration: 0.4, delay: 0.55 }}
         >
           <Link
-            href="/scan"
+            href="/early-access"
             className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
           >
-            {t("freeScan")} <ArrowRight className="w-4 h-4" />
+            {t("getStarted")} <ArrowRight className="w-4 h-4" />
           </Link>
           <a
             href="https://github.com/panguard-ai/panguard-ai"

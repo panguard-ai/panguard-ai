@@ -59,7 +59,7 @@ export default function DemoContent() {
                   </p>
                 </div>
                 <a
-                  href="/product/scan"
+                  href="/early-access"
                   className="mt-6 block w-full text-center font-semibold rounded-full px-6 py-3 border border-border text-text-secondary hover:border-brand-sage hover:text-text-primary transition-all duration-200"
                 >
                   {t("selfGuided.tryFreeScan")}
