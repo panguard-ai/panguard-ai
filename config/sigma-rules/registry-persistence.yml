@@ -1,8 +1,8 @@
 title: Windows Registry Run Key Persistence
-id: openclaw-034
+id: panguard-034
 status: stable
 description: Detects modifications to Windows registry Run and RunOnce keys commonly used by malware to achieve persistence across system reboots.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

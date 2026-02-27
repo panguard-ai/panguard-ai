@@ -6,7 +6,7 @@
  * recording their tools, techniques, and intentions.
  * 部署假服務來誘捕並分析攻擊者，記錄其工具、技術和意圖。
  *
- * @module @openclaw/panguard-trap
+ * @module @panguard-ai/panguard-trap
  */
 
 export const PANGUARD_TRAP_VERSION = '0.1.0';

@@ -5,7 +5,7 @@
  * Tracks user progress and awards achievements for security best practices.
  * Designed to encourage continuous security improvement.
  *
- * @module @openclaw/core/scoring/achievements
+ * @module @panguard-ai/core/scoring/achievements
  */
 
 import { createLogger } from '../utils/logger.js';

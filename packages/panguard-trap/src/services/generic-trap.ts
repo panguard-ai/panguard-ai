@@ -7,10 +7,10 @@
  * 處理 FTP、Telnet、MySQL、Redis、SMB 和 RDP 協定，
  * 提供協定專屬橫幅和基本互動模擬。
  *
- * @module @openclaw/panguard-trap/services/generic-trap
+ * @module @panguard-ai/panguard-trap/services/generic-trap
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { TrapServiceConfig, TrapServiceType } from '../types.js';
 import { BaseTrapService } from './base-service.js';
 

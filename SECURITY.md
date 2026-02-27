@@ -5,7 +5,7 @@
 If you discover a security vulnerability, please report it responsibly.
 如果您發現安全漏洞，請負責任地回報。
 
-Email: security@openclaw-security.io
+Email: security@panguard-ai.io
 
 ## Code Security Rules / 程式碼安全規則
 

@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { SecurityEvent } from '@openclaw/core';
+import type { SecurityEvent } from '@panguard-ai/core';
 import type { EnvironmentBaseline } from '../src/types.js';
 import {
   createEmptyBaseline,

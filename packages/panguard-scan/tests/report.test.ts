@@ -8,7 +8,7 @@
  * 驗證樣式常數、嚴重度顏色對應、合規框架輔助函式，以及報告模組匯出。
  * 不會產生實際的 PDF 文件（pdfkit 需要可寫入串流）。
  *
- * @module @openclaw/panguard-scan/tests/report
+ * @module @panguard-ai/panguard-scan/tests/report
  */
 
 import { describe, it, expect } from 'vitest';

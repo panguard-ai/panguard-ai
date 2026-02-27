@@ -10,10 +10,10 @@
  * Recommended for Pro/Business plans.
  * 推薦 Pro/Business 方案使用。
  *
- * @module @openclaw/panguard-chat/channels/slack
+ * @module @panguard-ai/panguard-chat/channels/slack
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   MessagingChannel,
   ChannelResult,

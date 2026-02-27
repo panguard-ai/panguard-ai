@@ -1,7 +1,7 @@
 /**
  * Panguard Web type definitions
  * Panguard Web 型別定義
- * @module @openclaw/panguard-web/types
+ * @module @panguard-ai/panguard-web/types
  */
 
 // ---------------------------------------------------------------------------

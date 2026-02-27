@@ -1,8 +1,8 @@
 title: VPN Connection from Unusual Location
-id: openclaw-043
+id: panguard-043
 status: stable
 description: Detects VPN connection attempts from unusual geographic locations or through anonymization services that may indicate compromised credentials or unauthorized remote access.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: network_connection

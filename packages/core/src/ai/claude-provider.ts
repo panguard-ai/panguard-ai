@@ -7,7 +7,7 @@
  * 透過動態匯入使用 @anthropic-ai/sdk 套件以避免硬性相依。
  * 使用者必須另外安裝 SDK。
  *
- * @module @openclaw/core/ai/claude-provider
+ * @module @panguard-ai/core/ai/claude-provider
  */
 
 import type { LLMConfig } from './types.js';

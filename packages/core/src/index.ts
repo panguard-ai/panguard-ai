@@ -1,12 +1,12 @@
 /**
- * OpenClaw Security - Core Package
- * OpenClaw 安全平台 - 核心套件
+ * Panguard AI - Core Package
+ * Panguard 安全平台 - 核心套件
  *
- * Core shared modules for the OpenClaw Security platform.
+ * Core shared modules for the Panguard AI platform.
  * Provides types, i18n, utilities, discovery, monitoring, rules, AI, and adapters.
  * 核心共用模組，提供類型、國際化、工具函式、偵察、監控、規則、AI 和對接器。
  *
- * @module @openclaw/core
+ * @module @panguard-ai/core
  */
 
 // Types / 型別

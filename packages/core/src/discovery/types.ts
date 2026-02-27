@@ -6,7 +6,7 @@
  * system scanning, risk assessment, and security posture evaluation.
  * 定義環境偵察引擎所使用的所有介面，用於系統掃描、風險評估和安全態勢評估。
  *
- * @module @openclaw/core/discovery/types
+ * @module @panguard-ai/core/discovery/types
  */
 
 import type { Language, Severity } from '../types.js';

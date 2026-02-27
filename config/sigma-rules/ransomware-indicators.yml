@@ -1,8 +1,8 @@
 title: Ransomware Activity Indicators
-id: openclaw-014
+id: panguard-014
 status: stable
 description: Detects file rename patterns associated with ransomware encryption, ransom note file creation, volume shadow copy deletion, and known ransomware process names
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

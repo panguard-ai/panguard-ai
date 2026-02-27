@@ -1,8 +1,8 @@
 title: Process Injection Indicators Detected
-id: openclaw-037
+id: panguard-037
 status: stable
 description: Detects indicators of process injection techniques including ptrace-based injection, proc filesystem memory access, and use of common injection tools and APIs that may indicate code injection into running processes.
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

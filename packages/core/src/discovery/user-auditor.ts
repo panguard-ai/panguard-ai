@@ -6,7 +6,7 @@
  * and other user-related security concerns across macOS, Linux, and Windows.
  * 稽核本地使用者帳號以識別管理員、非活躍帳號和其他跨 macOS、Linux 和 Windows 的使用者相關安全問題。
  *
- * @module @openclaw/core/discovery/user-auditor
+ * @module @panguard-ai/core/discovery/user-auditor
  */
 
 import { execFile } from 'child_process';

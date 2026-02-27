@@ -7,10 +7,10 @@
  * 驗證格式為 CLAW-TIER-XXXX-XXXX-XXXX 的授權金鑰，
  * 判定等級（Free/Pro/Enterprise），並據此控制功能閘。
  *
- * @module @openclaw/panguard-guard/license
+ * @module @panguard-ai/panguard-guard/license
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { LicenseTier, LicenseInfo } from '../types.js';
 import { TIER_FEATURES } from '../types.js';
 

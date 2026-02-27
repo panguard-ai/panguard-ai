@@ -1,7 +1,7 @@
 /**
  * Google Sheets API integration for waitlist sync.
  * Uses service account JWT auth with raw node:crypto (zero external deps).
- * @module @openclaw/panguard-auth/google-sheets
+ * @module @panguard-ai/panguard-auth/google-sheets
  */
 
 import { createSign } from 'node:crypto';

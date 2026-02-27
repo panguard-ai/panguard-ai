@@ -1,7 +1,7 @@
 /**
  * PanguardTrap type definitions
  * PanguardTrap 型別定義
- * @module @openclaw/panguard-trap/types
+ * @module @panguard-ai/panguard-trap/types
  */
 
 // ---------------------------------------------------------------------------

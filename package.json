@@ -1,10 +1,10 @@
 {
-  "name": "openclaw-security",
+  "name": "panguard-ai",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "description": "AI-driven adaptive cybersecurity platform / AI \u9a45\u52d5\u7684\u81ea\u9069\u61c9\u8cc7\u5b89\u9632\u8b77\u5e73\u53f0",
-  "author": "OpenClaw Security Team",
+  "author": "Panguard AI Team",
   "license": "MIT",
   "engines": {
     "node": ">=20.0.0",
@@ -27,9 +27,9 @@
     "ci:build": "pnpm run build",
     "panguard": "node packages/panguard/dist/cli/index.js",
     "cli": "node packages/panguard/dist/cli/index.js",
-    "website:dev": "pnpm --filter @openclaw/website dev",
-    "website:build": "pnpm --filter @openclaw/website build",
-    "website:start": "pnpm --filter @openclaw/website start"
+    "website:dev": "pnpm --filter @panguard-ai/website dev",
+    "website:build": "pnpm --filter @panguard-ai/website build",
+    "website:start": "pnpm --filter @panguard-ai/website start"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",

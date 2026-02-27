@@ -4,7 +4,7 @@
  */
 
 import { Command } from 'commander';
-import { runCLI } from '@openclaw/panguard-chat';
+import { runCLI } from '@panguard-ai/panguard-chat';
 import { withAuth } from '../auth-guard.js';
 
 export function chatCommand(): Command {

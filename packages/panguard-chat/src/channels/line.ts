@@ -9,10 +9,10 @@
  * 與 PanguardGuard 的單向 LINE Notify 不同，這使用 Messaging API
  * 進行互動對話（追問、確認）。
  *
- * @module @openclaw/panguard-chat/channels/line
+ * @module @panguard-ai/panguard-chat/channels/line
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   MessagingChannel,
   ChannelResult,

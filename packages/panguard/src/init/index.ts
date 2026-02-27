@@ -2,7 +2,7 @@
  * Init Module - Onboarding wizard for Panguard AI
  * 初始設定模組 - Panguard AI 安裝引導精靈
  *
- * @module @openclaw/panguard/init
+ * @module @panguard-ai/panguard/init
  */
 
 export { runInitWizard } from './wizard-runner.js';

@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { SecurityEvent } from '@openclaw/core';
-import { RuleEngine } from '@openclaw/core';
+import type { SecurityEvent } from '@panguard-ai/core';
+import { RuleEngine } from '@panguard-ai/core';
 import type { EnvironmentBaseline, ThreatVerdict, DetectionResult } from '../src/types.js';
 import { DEFAULT_ACTION_POLICY } from '../src/types.js';
 import { join } from 'node:path';

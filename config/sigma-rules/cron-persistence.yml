@@ -1,8 +1,8 @@
 title: Cron Job Persistence
-id: openclaw-011
+id: panguard-011
 status: stable
 description: Detects suspicious crontab modifications and creation of cron jobs that may indicate persistence mechanisms
-author: OpenClaw Security
+author: Panguard AI
 date: 2026/02/25
 logsource:
   category: process_creation

@@ -6,7 +6,7 @@
  * using platform-specific service management commands.
  * 使用平台特定的服務管理命令，跨 macOS、Linux 和 Windows 偵測並列舉執行中的服務。
  *
- * @module @openclaw/core/discovery/service-detector
+ * @module @panguard-ai/core/discovery/service-detector
  */
 
 import { execFile } from 'child_process';

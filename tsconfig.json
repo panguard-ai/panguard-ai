@@ -22,16 +22,16 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@openclaw/core": ["./packages/core/src"],
-      "@openclaw/core/*": ["./packages/core/src/*"],
-      "@openclaw/panguard-scan": ["./packages/panguard-scan/src"],
-      "@openclaw/panguard-guard": ["./packages/panguard-guard/src"],
-      "@openclaw/panguard-chat": ["./packages/panguard-chat/src"],
-      "@openclaw/panguard-trap": ["./packages/panguard-trap/src"],
-      "@openclaw/panguard-report": ["./packages/panguard-report/src"],
-      "@openclaw/panguard-web": ["./packages/panguard-web/src"],
-      "@openclaw/panguard": ["./packages/panguard/src"],
-      "@openclaw/panguard-auth": ["./packages/panguard-auth/src"]
+      "@panguard-ai/core": ["./packages/core/src"],
+      "@panguard-ai/core/*": ["./packages/core/src/*"],
+      "@panguard-ai/panguard-scan": ["./packages/panguard-scan/src"],
+      "@panguard-ai/panguard-guard": ["./packages/panguard-guard/src"],
+      "@panguard-ai/panguard-chat": ["./packages/panguard-chat/src"],
+      "@panguard-ai/panguard-trap": ["./packages/panguard-trap/src"],
+      "@panguard-ai/panguard-report": ["./packages/panguard-report/src"],
+      "@panguard-ai/panguard-web": ["./packages/panguard-web/src"],
+      "@panguard-ai/panguard": ["./packages/panguard/src"],
+      "@panguard-ai/panguard-auth": ["./packages/panguard-auth/src"]
     }
   },
   "references": [
@@ -44,7 +44,7 @@
     { "path": "./packages/panguard-web" },
     { "path": "./packages/panguard" },
     { "path": "./packages/panguard-auth" },
-    { "path": "./openclaw-fork" }
+    { "path": "./security-hardening" }
   ],
   "include": [],
   "exclude": ["node_modules", "dist"]

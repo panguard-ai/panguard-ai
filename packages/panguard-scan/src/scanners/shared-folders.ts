@@ -8,14 +8,14 @@
  * 檢查可能將敏感資料暴露給未授權使用者的共用網路資料夾。
  * 支援 macOS (sharing)、Linux (Samba) 和 Windows (net share)。
  *
- * @module @openclaw/panguard-scan/scanners/shared-folders
+ * @module @panguard-ai/panguard-scan/scanners/shared-folders
  */
 
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { readFile } from 'fs/promises';
 import { platform as osPlatform } from 'os';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type { Finding } from './types.js';
 
 const execFileAsync = promisify(execFile);

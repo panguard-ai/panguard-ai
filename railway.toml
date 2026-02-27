@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "pnpm install --frozen-lockfile && pnpm --filter '!@openclaw/website' -r run build"
+buildCommand = "pnpm install --frozen-lockfile && pnpm --filter '!@panguard-ai/website' -r run build"
 
 [deploy]
 startCommand = "node packages/panguard/dist/cli/index.js threat start --port $PORT"

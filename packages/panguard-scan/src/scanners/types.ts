@@ -2,10 +2,10 @@
  * PanguardScan scanner type definitions
  * PanguardScan 掃描器型別定義
  *
- * @module @openclaw/panguard-scan/scanners/types
+ * @module @panguard-ai/panguard-scan/scanners/types
  */
 
-import type { DiscoveryResult, Severity, Language } from '@openclaw/core';
+import type { DiscoveryResult, Severity, Language } from '@panguard-ai/core';
 
 /**
  * Scan configuration options

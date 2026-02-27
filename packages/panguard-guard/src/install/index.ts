@@ -6,11 +6,11 @@
  * - macOS/Linux: Bash script
  * - Windows: PowerShell script
  *
- * @module @openclaw/panguard-guard/install
+ * @module @panguard-ai/panguard-guard/install
  */
 
 import { platform } from 'node:os';
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-guard:install');
 
@@ -90,8 +90,8 @@ mkdir -p "$DATA_DIR/logs"
 echo "Data directory: $DATA_DIR"
 
 # Install PanguardGuard / 安裝 PanguardGuard
-echo "Installing @openclaw/panguard-guard..."
-$PKG_MGR install -g @openclaw/panguard-guard
+echo "Installing @panguard-ai/panguard-guard..."
+$PKG_MGR install -g @panguard-ai/panguard-guard
 
 # Create default config / 建立預設配置
 CONFIG_FILE="$DATA_DIR/config.json"
@@ -180,8 +180,8 @@ New-Item -ItemType Directory -Force -Path "$dataDir\\logs" | Out-Null
 Write-Host "Data directory: $dataDir"
 
 # Install PanguardGuard / 安裝 PanguardGuard
-Write-Host "Installing @openclaw/panguard-guard..."
-npm install -g @openclaw/panguard-guard
+Write-Host "Installing @panguard-ai/panguard-guard..."
+npm install -g @panguard-ai/panguard-guard
 
 # Create default config / 建立預設配置
 $configFile = "$dataDir\\config.json"

@@ -12,7 +12,7 @@ import type {
   TrapSession,
   AttackerProfile,
   TrapServiceType,
-} from '@openclaw/panguard-trap';
+} from '@panguard-ai/panguard-trap';
 import {
   buildTrapIntel,
   buildBatchIntel,
@@ -21,13 +21,13 @@ import {
   classifyIntent,
   detectTools,
   DEFAULT_SERVICE_CONFIGS,
-} from '@openclaw/panguard-trap';
-import type { ComplianceFinding } from '@openclaw/panguard-report';
+} from '@panguard-ai/panguard-trap';
+import type { ComplianceFinding } from '@panguard-ai/panguard-report';
 import {
   evaluateControls,
   getFrameworkControls,
   generateExecutiveSummary,
-} from '@openclaw/panguard-report';
+} from '@panguard-ai/panguard-report';
 
 // ---------------------------------------------------------------------------
 // Helpers

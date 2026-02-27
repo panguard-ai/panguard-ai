@@ -2,7 +2,7 @@
  * Onboarding Module
  * 安裝引導模組
  *
- * @module @openclaw/panguard-chat/onboarding
+ * @module @panguard-ai/panguard-chat/onboarding
  */
 
 export {

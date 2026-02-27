@@ -4,7 +4,7 @@
  */
 
 import { Command } from 'commander';
-import { runCLI } from '@openclaw/panguard-guard';
+import { runCLI } from '@panguard-ai/panguard-guard';
 
 export function guardCommand(): Command {
   const cmd = new Command('guard')

@@ -4,7 +4,7 @@
  *
  * Zero external dependencies. Uses a Map with automatic cleanup.
  *
- * @module @openclaw/panguard-auth/rate-limiter
+ * @module @panguard-ai/panguard-auth/rate-limiter
  */
 
 /** Rate limiter configuration */

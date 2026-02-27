@@ -4,13 +4,13 @@
  */
 
 import { Command } from 'commander';
-import type { Language } from '@openclaw/core';
+import type { Language } from '@panguard-ai/core';
 import {
   c, banner, spinner, statusPanel, divider, scoreDisplay,
   colorSeverity, table, box, symbols, formatDuration,
   setLogLevel,
-} from '@openclaw/core';
-import { runScan, runRemoteScan } from '@openclaw/panguard-scan';
+} from '@panguard-ai/core';
+import { runScan, runRemoteScan } from '@panguard-ai/panguard-scan';
 import { requireAuth } from '../auth-guard.js';
 
 export function scanCommand(): Command {
@@ -256,7 +256,7 @@ export function scanCommand(): Command {
 
       // PDF report
       if (options.output) {
-        const { generatePdfReport } = await import('@openclaw/panguard-scan');
+        const { generatePdfReport } = await import('@panguard-ai/panguard-scan');
         const reportSp = spinner('Generating PDF report...');
         try {
           await generatePdfReport(result, options.output, lang);

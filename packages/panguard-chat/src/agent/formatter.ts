@@ -7,7 +7,7 @@
  * 根據用戶類型（開發者/老闆/IT管理者）將技術安全判決
  * 轉換為人類可讀的訊息。
  *
- * @module @openclaw/panguard-chat/agent/formatter
+ * @module @panguard-ai/panguard-chat/agent/formatter
  */
 
 import type {

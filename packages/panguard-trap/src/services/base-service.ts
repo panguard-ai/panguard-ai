@@ -11,10 +11,10 @@
  * - 連線管理
  * - 事件記錄
  *
- * @module @openclaw/panguard-trap/services/base-service
+ * @module @panguard-ai/panguard-trap/services/base-service
  */
 
-import { createLogger } from '@openclaw/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
   TrapServiceType,
   TrapServiceStatus,

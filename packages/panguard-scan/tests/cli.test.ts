@@ -7,7 +7,7 @@
  * 驗證套件匯出、常數值、型別結構，以及嚴重度排序工具函式，
  * 不會實際執行 CLI。
  *
- * @module @openclaw/panguard-scan/tests/cli
+ * @module @panguard-ai/panguard-scan/tests/cli
  */
 
 import { describe, it, expect } from 'vitest';

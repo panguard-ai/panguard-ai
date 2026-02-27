@@ -198,7 +198,7 @@ describe('HTML Templates', () => {
 
     it('should include built-by text', () => {
       const html = generateFooter('en');
-      expect(html).toContain('OpenClaw Security');
+      expect(html).toContain('Panguard AI');
     });
 
     it('should use Chinese text for zh-TW', () => {
