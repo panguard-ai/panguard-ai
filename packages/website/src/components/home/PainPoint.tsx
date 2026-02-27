@@ -1,51 +1,34 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
 import FadeInUp from "../FadeInUp";
 import SectionWrapper from "../ui/SectionWrapper";
-import { BRAND_LOGO_PATHS, BRAND_LOGO_VIEWBOX } from "../ui/BrandLogo";
+import BrandLogo from "../ui/BrandLogo";
 
-/** Large ambient background logo — faded, blurred, part of the atmosphere */
-function BackgroundLogo() {
+/** Refined ambient brand logo — metallic 3D shield with subtle glow */
+function AmbientLogo() {
   return (
-    <div
-      className="absolute right-[-5%] top-1/2 -translate-y-1/2 pointer-events-none select-none hidden md:block"
+    <motion.div
+      className="relative hidden lg:flex items-center justify-center w-[280px] h-[320px]"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 1.2, delay: 0.3 }}
       aria-hidden="true"
     >
-      <div className="metallic-logo-wrapper opacity-[0.07]">
-        <div className="metallic-logo-inner">
-          <svg
-            width="500"
-            height="500"
-            viewBox={BRAND_LOGO_VIEWBOX}
-            fill="none"
-            className="lg:w-[600px] lg:h-[600px]"
-          >
-            <defs>
-              <linearGradient id="bg-metallic" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#6B7B6E" />
-                <stop offset="30%" stopColor="#B8C4BA" />
-                <stop offset="50%" stopColor="#D4DDD6" />
-                <stop offset="70%" stopColor="#9BA99E" />
-                <stop offset="100%" stopColor="#7A8A7D" />
-              </linearGradient>
-              <filter id="bg-blur" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
-              </filter>
-            </defs>
-            <g filter="url(#bg-blur)">
-              {BRAND_LOGO_PATHS.map((p, i) => (
-                <path
-                  key={i}
-                  d={p.d}
-                  fill={p.role === "bg" ? "none" : "url(#bg-metallic)"}
-                />
-              ))}
-            </g>
-          </svg>
-        </div>
+      {/* Layered glow backdrop */}
+      <div className="absolute w-[180px] h-[180px] rounded-full bg-brand-sage/[0.03] blur-[50px]" />
+      <div className="absolute w-[120px] h-[120px] rounded-full bg-brand-sage/[0.05] blur-[30px]" />
+
+      {/* Outer subtle ring */}
+      <div className="absolute w-[240px] h-[240px] rounded-full border border-brand-sage/[0.06]" />
+
+      {/* The shield logo — large, with metallic feel */}
+      <div className="relative metallic-logo-float">
+        <BrandLogo size={140} className="text-brand-sage/[0.14]" bg="transparent" />
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -54,38 +37,38 @@ export default function PainPoint() {
 
   return (
     <SectionWrapper>
-      <div className="relative">
-        {/* Background ambient logo */}
-        <BackgroundLogo />
-
-        {/* Foreground text */}
-        <div className="relative z-10 max-w-2xl">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 lg:gap-12 items-center">
+        {/* Text content */}
+        <div className="max-w-2xl tracking-tight">
           <FadeInUp>
             <p className="text-lg lg:text-xl text-text-secondary leading-relaxed">
               {t("line1")}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="text-lg lg:text-xl text-text-secondary leading-relaxed mt-6">
+            <p className="text-lg lg:text-xl text-text-secondary leading-relaxed mt-5">
               {t("line2")}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.2}>
-            <p className="text-lg lg:text-xl text-text-secondary leading-relaxed mt-6">
+            <p className="text-lg lg:text-xl text-text-secondary leading-relaxed mt-5">
               {t("line3")}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.3}>
-            <p className="text-lg lg:text-xl text-text-secondary leading-relaxed mt-6">
+            <p className="text-lg lg:text-xl text-text-secondary leading-relaxed mt-5">
               {t("line4")}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.4}>
-            <p className="text-lg lg:text-xl text-status-alert font-semibold leading-relaxed mt-6">
+            <p className="text-lg lg:text-xl text-status-alert font-semibold leading-relaxed mt-5">
               {t("line5")}
             </p>
           </FadeInUp>
         </div>
+
+        {/* Ambient brand logo */}
+        <AmbientLogo />
       </div>
     </SectionWrapper>
   );
