@@ -213,10 +213,27 @@ function calculateFinalConfidence(evidence: Evidence[], hasAI: boolean): number 
   const baselineConfidence = maxConfidence(bySource['baseline_deviation']);
   const threatIntelConfidence = maxConfidence(bySource['threat_intel']);
   const aiConfidence = maxConfidence(bySource['ai_analysis']);
+  const ebpfConfidence = Math.max(
+    maxConfidence(bySource['falco']),
+    maxConfidence(bySource['suricata']),
+  );
 
   // Use max of rule match and threat intel for the "rule" weight
   // 使用規則比對和威脅情報的最大值作為「規則」權重
   const ruleScore = Math.max(ruleConfidence, threatIntelConfidence);
+  const hasEbpf = ebpfConfidence > 0;
+
+  if (hasEbpf && hasAI) {
+    // eBPF + AI: 20% eBPF, 30% rule, 20% baseline, 30% AI
+    return Math.round(
+      ebpfConfidence * 0.2 + ruleScore * 0.3 + baselineConfidence * 0.2 + aiConfidence * 0.3,
+    );
+  }
+
+  if (hasEbpf) {
+    // eBPF without AI: 25% eBPF, 40% rule, 35% baseline
+    return Math.round(ebpfConfidence * 0.25 + ruleScore * 0.4 + baselineConfidence * 0.35);
+  }
 
   if (hasAI) {
     // With AI: 40% rule, 30% baseline, 30% AI
@@ -268,8 +285,10 @@ function determineAction(confidence: number, detection: DetectionResult): Respon
   if (confidence >= 85 || (hasCritical && confidence >= 70)) {
     // High confidence: take source-appropriate action
     // 高信心度：採取與來源適當的動作
-    if (detection.event.source === 'network') return 'block_ip';
-    if (detection.event.source === 'process') return 'kill_process';
+    if (detection.event.source === 'network' || detection.event.source === 'suricata')
+      return 'block_ip';
+    if (detection.event.source === 'process' || detection.event.source === 'falco')
+      return 'kill_process';
     return 'notify';
   }
 

@@ -1,0 +1,120 @@
+# Panguard AI - Custom Falco Rules
+# eBPF kernel-level detection rules for common attack patterns
+#
+# These rules complement the Sigma + YARA detection layers
+# with real-time syscall-level monitoring via Falco eBPF.
+#
+# Install: Copy to /etc/falco/rules.d/panguard-custom.yaml
+# Reload:  sudo systemctl reload falco
+
+# ─── Reverse Shell Detection ──────────────────────────────────────────
+- rule: Panguard Reverse Shell via Network Socket
+  desc: >
+    Detect processes that spawn a shell and redirect stdin/stdout
+    to a network socket, indicating a reverse shell connection.
+  condition: >
+    spawned_process and
+    (proc.name in (bash, sh, zsh, dash, csh, ksh, fish)) and
+    (fd.type = ipv4 or fd.type = ipv6) and
+    fd.sip != "127.0.0.1" and
+    fd.sip != "::1"
+  output: >
+    Reverse shell detected (user=%user.name command=%proc.cmdline
+    connection=%fd.name container=%container.name pid=%proc.pid)
+  priority: CRITICAL
+  tags: [shell, network, mitre_execution, mitre_command_and_control, panguard]
+
+# ─── Cryptomining Detection ──────────────────────────────────────────
+- rule: Panguard Cryptomining Activity
+  desc: >
+    Detect processes communicating on known cryptomining ports
+    or using stratum protocol indicators.
+  condition: >
+    (fd.sport in (3333, 4444, 5555, 8333, 9999, 14444, 45700)) or
+    (proc.name in (xmrig, minerd, minergate, cpuminer, cgminer, bfgminer, ethminer))
+  output: >
+    Cryptomining activity detected (user=%user.name process=%proc.name
+    port=%fd.sport pid=%proc.pid container=%container.name)
+  priority: CRITICAL
+  tags: [crypto, mining, mitre_resource_hijacking, panguard]
+
+# ─── SSH Key Theft Detection ─────────────────────────────────────────
+- rule: Panguard SSH Key File Access
+  desc: >
+    Detect unauthorized reading of SSH private keys, which may
+    indicate credential theft or lateral movement preparation.
+  condition: >
+    open_read and
+    (fd.name startswith /home and fd.name contains /.ssh/id_) and
+    not proc.name in (ssh, scp, sftp, ssh-agent, ssh-add, sshd, git)
+  output: >
+    SSH key file accessed by unexpected process (user=%user.name
+    file=%fd.name process=%proc.name pid=%proc.pid)
+  priority: ERROR
+  tags: [credential, ssh, mitre_credential_access, panguard]
+
+# ─── Sensitive File Modification ─────────────────────────────────────
+- rule: Panguard Sensitive File Write
+  desc: >
+    Detect writes to critical system files that could indicate
+    privilege escalation or persistence mechanisms.
+  condition: >
+    open_write and
+    fd.name in (/etc/shadow, /etc/passwd, /etc/sudoers, /etc/crontab,
+                /etc/ssh/sshd_config, /etc/pam.d/common-auth,
+                /root/.ssh/authorized_keys) and
+    not proc.name in (useradd, usermod, passwd, chpasswd, visudo, vipw)
+  output: >
+    Sensitive file modified (user=%user.name file=%fd.name
+    process=%proc.name pid=%proc.pid)
+  priority: ERROR
+  tags: [file, sensitive, mitre_persistence, mitre_privilege_escalation, panguard]
+
+# ─── Container Escape Detection ──────────────────────────────────────
+- rule: Panguard Container Escape Attempt
+  desc: >
+    Detect patterns commonly associated with container escape
+    attempts including nsenter, mount of host filesystem,
+    and access to Docker socket from within containers.
+  condition: >
+    container and
+    (proc.name = nsenter or
+     (proc.cmdline contains "mount" and proc.cmdline contains "/host") or
+     (open_read and fd.name = /var/run/docker.sock) or
+     (proc.name = chroot and proc.cmdline contains "/host"))
+  output: >
+    Container escape attempt (user=%user.name command=%proc.cmdline
+    container=%container.name image=%container.image.repository pid=%proc.pid)
+  priority: CRITICAL
+  tags: [container, escape, mitre_privilege_escalation, panguard]
+
+# ─── Suspicious Process Execution ────────────────────────────────────
+- rule: Panguard Suspicious Binary Execution
+  desc: >
+    Detect execution of binaries commonly used in attacks, such as
+    netcat, socat, nmap, and similar reconnaissance/exploitation tools.
+  condition: >
+    spawned_process and
+    proc.name in (nc, ncat, netcat, socat, nmap, masscan, hping3,
+                  curl, wget, base64, python, perl, ruby, lua) and
+    container
+  output: >
+    Suspicious binary executed in container (user=%user.name
+    process=%proc.name command=%proc.cmdline
+    container=%container.name pid=%proc.pid)
+  priority: WARNING
+  tags: [process, suspicious, mitre_execution, mitre_discovery, panguard]
+
+# ─── Privilege Escalation Detection ──────────────────────────────────
+- rule: Panguard Setuid Binary Creation
+  desc: >
+    Detect creation of setuid/setgid binaries which could be
+    used for privilege escalation.
+  condition: >
+    evt.type in (chmod, fchmod, fchmodat) and
+    evt.arg.mode contains "S_ISUID"
+  output: >
+    Setuid binary created (user=%user.name file=%fd.name
+    process=%proc.name pid=%proc.pid)
+  priority: ERROR
+  tags: [file, privilege_escalation, mitre_privilege_escalation, panguard]
