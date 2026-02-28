@@ -117,6 +117,13 @@ function readRawBody(req: IncomingMessage): Promise<ReadRawBodyResult> {
 }
 
 function getClientIP(req: IncomingMessage): string {
+  if (process.env['TRUST_PROXY'] === '1') {
+    const forwarded = req.headers['x-forwarded-for'];
+    if (typeof forwarded === 'string') {
+      const first = forwarded.split(',')[0]?.trim();
+      if (first) return first;
+    }
+  }
   return req.socket.remoteAddress ?? '127.0.0.1';
 }
 
@@ -171,11 +178,17 @@ export function createAuthHandlers(config: AuthRouteConfig) {
   const loginLimiter = new RateLimiter({ windowMs: 15 * 60 * 1000, maxRequests: 10 });
   const registerLimiter = new RateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 5 });
   const resetLimiter = new RateLimiter({ windowMs: 15 * 60 * 1000, maxRequests: 5 });
+  const waitlistLimiter = new RateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 5 });
 
   // Pending OAuth flows: state -> { codeVerifier, createdAt }
   const pendingOAuthFlows = new Map<string, { codeVerifier: string; createdAt: number }>();
   // Pending CLI auth flows: state -> { callbackUrl, createdAt }
   const pendingCliFlows = new Map<string, { callbackUrl: string; createdAt: number }>();
+  // One-time OAuth exchange codes: code -> { sessionToken, expiresAt, createdAt }
+  const oauthExchangeCodes = new Map<
+    string,
+    { sessionToken: string; expiresAt: string; createdAt: number }
+  >();
 
   // Cleanup stale flows every 5 minutes
   const oauthCleanupTimer = setInterval(
@@ -187,6 +200,10 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       for (const [state, flow] of pendingCliFlows) {
         if (flow.createdAt < cutoff) pendingCliFlows.delete(state);
       }
+      const codeCutoff = Date.now() - 5 * 60 * 1000; // 5 min TTL for exchange codes
+      for (const [code, data] of oauthExchangeCodes) {
+        if (data.createdAt < codeCutoff) oauthExchangeCodes.delete(code);
+      }
     },
     5 * 60 * 1000
   );
@@ -197,6 +214,14 @@ export function createAuthHandlers(config: AuthRouteConfig) {
   async function handleWaitlistJoin(req: IncomingMessage, res: ServerResponse): Promise<void> {
     if (req.method !== 'POST') {
       json(res, 405, { ok: false, error: 'Method not allowed' });
+      return;
+    }
+
+    const ip = getClientIP(req);
+    const rl = waitlistLimiter.check(ip);
+    if (!rl.allowed) {
+      res.setHeader('Retry-After', String(Math.ceil((rl.retryAfterMs ?? 60000) / 1000)));
+      json(res, 429, { ok: false, error: 'Too many requests. Please try again later.' });
       return;
     }
 
@@ -227,10 +252,10 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     const entry = db.addToWaitlist(
       {
         email,
-        name: typeof name === 'string' ? name : undefined,
-        company: typeof company === 'string' ? company : undefined,
-        role: typeof role === 'string' ? role : undefined,
-        source: typeof source === 'string' ? source : undefined,
+        name: typeof name === 'string' ? name.slice(0, 200) : undefined,
+        company: typeof company === 'string' ? company.slice(0, 200) : undefined,
+        role: typeof role === 'string' ? role.slice(0, 200) : undefined,
+        source: typeof source === 'string' ? source.slice(0, 200) : undefined,
       },
       verifyToken
     );
@@ -732,15 +757,22 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       const sessionToken = generateSessionToken();
       const session = db.createSession(user.id, sessionToken, sessionExpiry());
 
-      // Redirect to frontend with token
+      // Use one-time exchange code instead of putting token in URL
+      const exchangeCode = generateVerifyToken(); // UUID v4
+      oauthExchangeCodes.set(exchangeCode, {
+        sessionToken,
+        expiresAt: session.expiresAt,
+        createdAt: Date.now(),
+      });
+
       const baseUrl = config.baseUrl ?? '';
-      const redirectUrl = `${baseUrl}/login?token=${sessionToken}&expires=${encodeURIComponent(session.expiresAt)}`;
+      const redirectUrl = `${baseUrl}/login?code=${exchangeCode}`;
       res.writeHead(302, { Location: redirectUrl });
       res.end();
     } catch (err) {
       json(res, 500, {
         ok: false,
-        error: err instanceof Error ? err.message : 'Google OAuth failed',
+        error: 'Google OAuth failed',
       });
     }
   }
@@ -2043,11 +2075,19 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       return;
     }
 
+    const VALID_RESOURCES: readonly string[] = [
+      'scan',
+      'guard_endpoints',
+      'reports',
+      'api_calls',
+      'notifications',
+      'trap_instances',
+    ];
     const resource = body.data['resource'] as MeterableResource;
     const count = typeof body.data['count'] === 'number' ? body.data['count'] : 1;
 
-    if (!resource) {
-      json(res, 400, { ok: false, error: 'resource is required' });
+    if (!resource || !VALID_RESOURCES.includes(resource)) {
+      json(res, 400, { ok: false, error: 'Invalid or missing resource type' });
       return;
     }
 
@@ -2066,6 +2106,45 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     json(res, 200, { ok: true, data: { recorded: count, resource } });
   }
 
+  // ── OAuth Exchange ───────────────────────────────────────────────
+
+  /**
+   * POST /api/auth/oauth/exchange
+   * Exchange a one-time code for a session token (keeps tokens out of URLs).
+   */
+  async function handleOAuthExchange(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    if (req.method !== 'POST') {
+      json(res, 405, { ok: false, error: 'Method not allowed' });
+      return;
+    }
+
+    const body = await readBody(req);
+    if (!body.ok) {
+      json(res, body.status, { ok: false, error: 'Invalid request body' });
+      return;
+    }
+
+    const code = body.data['code'];
+    if (typeof code !== 'string' || !code) {
+      json(res, 400, { ok: false, error: 'code is required' });
+      return;
+    }
+
+    const data = oauthExchangeCodes.get(code);
+    if (!data) {
+      json(res, 400, { ok: false, error: 'Invalid or expired code' });
+      return;
+    }
+
+    // One-time use — delete immediately
+    oauthExchangeCodes.delete(code);
+
+    json(res, 200, {
+      ok: true,
+      data: { token: data.sessionToken, expiresAt: data.expiresAt },
+    });
+  }
+
   return {
     handleWaitlistJoin,
     handleWaitlistVerify,
@@ -2079,6 +2158,7 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     handleResetPassword,
     handleGoogleAuth,
     handleGoogleCallback,
+    handleOAuthExchange,
     handleCliAuth,
     handleCliExchange,
     // Admin

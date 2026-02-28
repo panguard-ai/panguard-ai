@@ -10,7 +10,7 @@ import Card from '../ui/Card';
 const columns = [
   { key: 'openSource', icon: Lock, href: 'https://github.com/panguard-ai/panguard-ai' },
   { key: 'security', icon: Shield, href: 'https://github.com/panguard-ai/panguard-ai/actions' },
-  { key: 'privacy', icon: Eye, href: '/privacy' },
+  { key: 'privacy', icon: Eye, href: '/legal/privacy' },
 ] as const;
 
 export default function TrustLayer() {

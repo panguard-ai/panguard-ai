@@ -55,7 +55,7 @@ export default function AccountSettings() {
         const data = (await res.json()) as { ok: boolean; data?: { enabled: boolean } };
         if (data.ok) setTotpEnabled(data.data?.enabled ?? false);
       } catch {
-        // ignore
+        setTotpError('Unable to check 2FA status');
       } finally {
         setTotpLoading(false);
       }

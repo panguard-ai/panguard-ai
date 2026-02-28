@@ -205,12 +205,18 @@ async function handleRequest(
   // Security headers
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('X-XSS-Protection', '0');
+  if (process.env['NODE_ENV'] === 'production') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  }
 
   // CORS — default to same-origin only; set CORS_ALLOWED_ORIGINS to allow cross-origin
   const corsEnv = process.env['CORS_ALLOWED_ORIGINS'] ?? '';
   const allowedOrigins = corsEnv ? corsEnv.split(',').map((o) => o.trim()) : [];
   const origin = req.headers.origin ?? '';
-  if (allowedOrigins.includes('*')) {
+  if (allowedOrigins.includes('*') && process.env['NODE_ENV'] !== 'production') {
     res.setHeader('Access-Control-Allow-Origin', origin || '*');
   } else if (origin && allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -243,9 +249,20 @@ async function handleRequest(
       return;
     }
 
-    // Health check
+    // Health check (with DB probe)
     if (pathname === '/health') {
-      sendJson(res, 200, { ok: true, data: { status: 'healthy', uptime: process.uptime() } });
+      try {
+        _db.healthCheck();
+        sendJson(res, 200, {
+          ok: true,
+          data: { status: 'healthy', uptime: process.uptime(), db: 'connected' },
+        });
+      } catch {
+        sendJson(res, 503, {
+          ok: false,
+          data: { status: 'unhealthy', uptime: process.uptime(), db: 'disconnected' },
+        });
+      }
       return;
     }
 
@@ -307,6 +324,10 @@ async function handleRequest(
       const code = urlObj.searchParams.get('code') ?? '';
       const state = urlObj.searchParams.get('state');
       await handlers.handleGoogleCallback(req, res, code, state);
+      return;
+    }
+    if (pathname === '/api/auth/oauth/exchange') {
+      await handlers.handleOAuthExchange(req, res);
       return;
     }
     if (pathname === '/api/auth/cli') {

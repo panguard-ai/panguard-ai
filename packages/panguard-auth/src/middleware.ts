@@ -30,6 +30,9 @@ export function authenticateRequest(req: IncomingMessage, db: AuthDB): User | nu
   const session = db.getSession(token);
   if (!session) return null;
 
+  // Reject suspended users
+  if (session.user.suspended) return null;
+
   return session.user;
 }
 

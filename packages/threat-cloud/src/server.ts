@@ -231,10 +231,18 @@ export class ThreatCloudServer {
     try {
       // Route matching
       if (pathname === '/health') {
-        this.sendJson(res, 200, {
-          ok: true,
-          data: { status: 'healthy', uptime: process.uptime() },
-        });
+        try {
+          this.db.getDB().prepare('SELECT 1').get();
+          this.sendJson(res, 200, {
+            ok: true,
+            data: { status: 'healthy', uptime: process.uptime(), db: 'connected' },
+          });
+        } catch {
+          this.sendJson(res, 503, {
+            ok: false,
+            data: { status: 'unhealthy', uptime: process.uptime(), db: 'disconnected' },
+          });
+        }
         return;
       }
 
