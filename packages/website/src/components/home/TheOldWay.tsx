@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ArrowRight, Check, X, Minus } from 'lucide-react';
 import { Link } from '@/navigation';
@@ -25,7 +25,7 @@ const rows = [
 function CellIcon({ value }: { value: string }) {
   if (value === 'yes') return <Check className="w-4 h-4 text-status-safe inline" />;
   if (value === 'no') return <X className="w-4 h-4 text-status-danger inline" />;
-  if (value === 'partial') return <Minus className="w-4 h-4 text-status-warning inline" />;
+  if (value === 'partial') return <Minus className="w-4 h-4 text-status-caution inline" />;
   return <span className="text-text-secondary text-sm">{value}</span>;
 }
 
@@ -58,8 +58,8 @@ export default function TheOldWay() {
 
             {/* Data rows */}
             {rows.map((row) => (
-              <>
-                <div key={`label-${row}`} className="p-4 text-sm text-text-secondary border-b border-border/50 bg-surface-0">
+              <Fragment key={row}>
+                <div className="p-4 text-sm text-text-secondary border-b border-border/50 bg-surface-0">
                   {t(`rows.${row}.label`)}
                 </div>
                 {approaches.map((a) => (
@@ -72,7 +72,7 @@ export default function TheOldWay() {
                     <CellIcon value={t(`rows.${row}.${a}`)} />
                   </div>
                 ))}
-              </>
+              </Fragment>
             ))}
           </div>
         </div>
