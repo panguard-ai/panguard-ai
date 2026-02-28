@@ -1,20 +1,20 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import FadeInUp from '../FadeInUp';
 import SectionWrapper from '../ui/SectionWrapper';
 import BrandLogo from '../ui/BrandLogo';
 
-/** Refined ambient brand logo — metallic 3D shield with subtle glow */
+/** Refined ambient brand logo -- metallic 3D shield with subtle glow */
 function AmbientLogo() {
+  const ref = useScrollReveal();
+
   return (
-    <motion.div
-      className="relative hidden lg:flex items-center justify-center w-[280px] h-[320px]"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 1.2, delay: 0.3 }}
+    <div
+      ref={ref}
+      className="animate-on-scroll from-none relative hidden lg:flex items-center justify-center w-[280px] h-[320px]"
+      style={{ transitionDuration: '1.2s', transitionDelay: '0.3s' }}
       aria-hidden="true"
     >
       {/* Layered glow backdrop */}
@@ -24,11 +24,11 @@ function AmbientLogo() {
       {/* Outer subtle ring */}
       <div className="absolute w-[240px] h-[240px] rounded-full border border-brand-sage/[0.06]" />
 
-      {/* The shield logo — large, with metallic feel */}
+      {/* The shield logo -- large, with metallic feel */}
       <div className="relative metallic-logo-float">
         <BrandLogo size={140} className="text-brand-sage/[0.14]" bg="transparent" />
       </div>
-    </motion.div>
+    </div>
   );
 }
 

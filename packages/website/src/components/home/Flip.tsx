@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 import FadeInUp from '../FadeInUp';
 import SectionWrapper from '../ui/SectionWrapper';
 import BrandLogo from '../ui/BrandLogo';
@@ -50,6 +50,8 @@ function FlipVisual({ t }: { t: ReturnType<typeof useTranslations> }) {
 
 /** Compact radar visualization */
 function AgentProtection({ t }: { t: ReturnType<typeof useTranslations> }) {
+  const ref = useScrollReveal({ margin: '-60px' });
+
   const orbitDots = [
     { left: '88%', top: '14%' },
     { left: '8%', top: '10%' },
@@ -60,12 +62,10 @@ function AgentProtection({ t }: { t: ReturnType<typeof useTranslations> }) {
   ];
 
   return (
-    <motion.div
-      className="relative w-[260px] h-[260px] shrink-0"
-      initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.8, delay: 0.3 }}
+    <div
+      ref={ref}
+      className="animate-on-scroll from-none relative w-[260px] h-[260px] shrink-0"
+      style={{ transitionDuration: '0.8s', transitionDelay: '0.3s' }}
       aria-hidden="true"
     >
       {/* Glow */}
@@ -146,7 +146,7 @@ function AgentProtection({ t }: { t: ReturnType<typeof useTranslations> }) {
         </div>
         <span className="text-[9px] text-text-muted">{t('yourAgent')}</span>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

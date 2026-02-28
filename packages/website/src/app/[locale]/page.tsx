@@ -1,13 +1,12 @@
 import NavBar from '@/components/NavBar';
 import Hero from '@/components/home/Hero';
-import EraContext from '@/components/home/EraContext';
-import PainPoint from '@/components/home/PainPoint';
-import ProductGrid from '@/components/home/ProductGrid';
-import ThreeSteps from '@/components/home/ThreeSteps';
+import WakeUpCall from '@/components/home/WakeUpCall';
+import TheOldWay from '@/components/home/TheOldWay';
+import TheShift from '@/components/home/TheShift';
+import The3AMStory from '@/components/home/The3AMStory';
+import SixLayers from '@/components/home/SixLayers';
 import UseCases from '@/components/home/UseCases';
-import SocialProof from '@/components/home/SocialProof';
-import TimeComparison from '@/components/home/TimeComparison';
-import TrustLayer from '@/components/home/TrustLayer';
+import TheEvidence from '@/components/home/TheEvidence';
 import HomePricing from '@/components/home/HomePricing';
 import FinalCTA from '@/components/home/FinalCTA';
 import Footer from '@/components/Footer';
@@ -17,27 +16,25 @@ export default function Home() {
     <>
       <NavBar />
       <main>
-        {/* 1. Hero — See threats. Respond automatically. Deploy in one line. */}
+        {/* 1. Hero */}
         <Hero />
-        {/* 2. Era Context — AI deploys, who protects? */}
-        <EraContext />
-        {/* 3. Pain Point — Your server is being scanned. Now. */}
-        <PainPoint />
-        {/* 4. Product Grid — One platform. Six layers of defense. */}
-        <ProductGrid />
-        {/* 5. Three Steps — Install, Scan, Guard */}
-        <ThreeSteps />
-        {/* 6. Use Cases — 4 persona scenarios */}
+        {/* 2. WakeUpCall — The reality of cyber threats */}
+        <WakeUpCall />
+        {/* 3. TheOldWay — DIY vs Outsource vs Panguard */}
+        <TheOldWay />
+        {/* 4. TheShift — Philosophy + Architecture */}
+        <TheShift />
+        {/* 5. The3AMStory — Without vs With Panguard */}
+        <The3AMStory />
+        {/* 6. SixLayers — 6 product cards */}
+        <SixLayers />
+        {/* 7. UseCases — 4 persona scenarios */}
         <UseCases />
-        {/* 7. Stats Wall — 3,158 / 425 / 8 / 1,107 / 5 / 3 / 6 / MIT */}
-        <SocialProof />
-        {/* 8. Time Comparison — Without vs With Panguard */}
-        <TimeComparison />
-        {/* 9. Trust Layer — Open Source, Security, Privacy */}
-        <TrustLayer />
-        {/* 10. Pricing — Community / Solo / Pro / Business */}
+        {/* 8. TheEvidence — Stats + Trust */}
+        <TheEvidence />
+        {/* 9. Pricing */}
         <HomePricing />
-        {/* 11. Final CTA — 60 seconds. Free. No account needed. */}
+        {/* 10. FinalCTA */}
         <FinalCTA />
       </main>
       <Footer />

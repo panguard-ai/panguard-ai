@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { useInView } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useInViewport } from '@/hooks/useInViewport';
 
 export default function CountUp({
   target,
@@ -15,8 +15,7 @@ export default function CountUp({
   duration?: number;
   className?: string;
 }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-50px' });
+  const [ref, inView] = useInViewport({ once: true, margin: '-50px' });
   const [val, setVal] = useState(0);
 
   useEffect(() => {

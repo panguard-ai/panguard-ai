@@ -144,7 +144,6 @@
       "badges": {
         "mit": "MIT Open Source",
         "tests": "1,107 Tests Passing",
-        "typescript": "3,158 Detection Rules",
         "taiwan": "Built in Taiwan"
       }
     },
@@ -335,7 +334,10 @@
       "manifesto3": "You deploy. We defend.",
       "btnGetStarted": "Free Server Scan",
       "btnGithub": "GitHub",
-      "btnDocs": "Documentation"
+      "btnDocs": "Documentation",
+      "badge1": "MIT Open Source",
+      "badge2": "1,107 Tests Passing",
+      "badge3": "Built in Taiwan"
     },
     "techReveal": {
       "overline": "Under the Hood",
@@ -452,6 +454,125 @@
         "title": "Privacy Protection",
         "desc": "Threat Cloud only collects anonymized threat data. No IP addresses. No hostnames. No personally identifiable information.\n\nYou can disable data uploads anytime:\npanguard config set threat-cloud false",
         "link": "Read privacy policy"
+      }
+    },
+    "wakeUpCall": {
+      "title": "This isn't hypothetical. It's happening right now.",
+      "subtitle": "Every 39 seconds, a cyberattack targets a business somewhere in the world.",
+      "ransomware": {
+        "title": "Ransomware Attack",
+        "description": "A small e-commerce company discovers all their database files encrypted at 3 AM. No backups. The attacker demands 2 BTC. They have 72 hours."
+      },
+      "dataBreach": {
+        "title": "Data Breach",
+        "description": "A developer pushes API keys to a public repo. Within minutes, attackers spin up cloud instances costing $47,000 in compute charges."
+      },
+      "stat1": { "label": "Average time between cyberattacks" },
+      "stat2": { "label": "SMBs close within 6 months of an attack" },
+      "stat3": { "label": "Average days to detect a breach" },
+      "stat4": { "label": "Average cost of a data breach" },
+      "closing": "Most small businesses can't afford a security team. But they also can't afford to be unprotected."
+    },
+    "theOldWay": {
+      "title": "You have three options. Two of them don't work.",
+      "subtitle": "Here's why existing approaches fail for small and medium businesses.",
+      "columns": {
+        "diy": "Do It Yourself",
+        "outsource": "Outsource to MSSP",
+        "panguard": "Panguard AI"
+      },
+      "rows": {
+        "setup": { "label": "Setup time", "diy": "Weeks", "outsource": "Days", "panguard": "60 seconds" },
+        "cost": { "label": "Monthly cost", "diy": "$0 (your time)", "outsource": "$2,000+", "panguard": "From $0" },
+        "detection": { "label": "Threat detection", "diy": "partial", "outsource": "yes", "panguard": "yes" },
+        "response": { "label": "Auto response", "diy": "no", "outsource": "partial", "panguard": "yes" },
+        "learning": { "label": "Learns your env", "diy": "no", "outsource": "no", "panguard": "yes" },
+        "reporting": { "label": "Compliance reports", "diy": "no", "outsource": "partial", "panguard": "yes" },
+        "maintenance": { "label": "Ongoing maintenance", "diy": "High", "outsource": "Low", "panguard": "Zero" },
+        "scalability": { "label": "Scales with you", "diy": "no", "outsource": "partial", "panguard": "yes" }
+      },
+      "cta": "Try the 60-second setup"
+    },
+    "theShift": {
+      "cursor": "rethinking security",
+      "title": "Security shouldn't require a security team.",
+      "philosophy": "We built Panguard on a simple belief: enterprise-grade protection should be as easy to deploy as a single command. No dashboards to watch. No alerts to triage. No rules to write. AI handles the boring work so you can focus on building.",
+      "architectureTitle": "Five layers of defense",
+      "layer1": { "title": "Environment Discovery", "desc": "Automatically maps your infrastructure: OS, services, open ports, installed packages." },
+      "layer2": { "title": "Rules Engine", "desc": "3,155 Sigma rules + 5,767 YARA rules detect known attack patterns instantly." },
+      "layer3": { "title": "Behavioral Baseline", "desc": "7-day learning period builds a model of your normal system behavior." },
+      "layer4": { "title": "AI Analysis", "desc": "Three-layer AI funnel: local rules, local AI (Ollama), cloud AI for the hardest threats." },
+      "layer5": { "title": "Automated Response", "desc": "6 response actions: block IP, kill process, quarantine file, alert, snapshot, escalate." },
+      "funnelTitle": "Three-layer AI Funnel",
+      "funnel1": { "percent": "90%", "title": "Rules Engine", "desc": "Instant pattern matching" },
+      "funnel2": { "percent": "7%", "title": "Local AI", "desc": "On-device deep analysis" },
+      "funnel3": { "percent": "3%", "title": "Cloud AI", "desc": "Dynamic reasoning" },
+      "collectiveTitle": "Collective Defense (Threat Cloud)",
+      "collectiveDesc": "Every Panguard instance shares anonymized threat intelligence. When one user detects a new attack, all users are protected. The network gets smarter with every deployment.",
+      "closing": "Install once. Protected forever."
+    },
+    "the3amStory": {
+      "title": "3 AM. Your server is under attack.",
+      "subtitle": "Same attack. Two very different outcomes.",
+      "leftTitle": "Without Panguard",
+      "rightTitle": "With Panguard",
+      "left1": { "time": "3:00 AM", "text": "SSH brute-force attack begins from 103.xx.xx.xx" },
+      "left2": { "time": "3:02 AM", "text": "Attacker gains access using a weak password" },
+      "left3": { "time": "3:05 AM", "text": "Lateral movement begins. Privileges escalated." },
+      "left4": { "time": "3:15 AM", "text": "Data exfiltration starts. Customer database copied." },
+      "left5": { "time": "3:30 AM", "text": "Ransomware deployed. Files encrypted." },
+      "left6": { "time": "7:00 AM", "text": "You wake up. Check Slack. Nothing unusual." },
+      "left7": { "time": "9:00 AM", "text": "Customer calls: \"I can't log in.\" You discover the breach." },
+      "leftOutcome": "6 hours undetected. 50,000 customer records exposed. $4.35M average breach cost.",
+      "right1": { "time": "3:00 AM", "text": "SSH brute-force detected by Layer 1 (Sigma rule match)" },
+      "right2": { "time": "3:00 AM", "text": "IP blocked automatically. Threat Cloud notified." },
+      "right3": { "time": "3:01 AM", "text": "Attack pattern shared across all Panguard users globally" },
+      "right4": { "time": "3:01 AM", "text": "LINE notification sent to you with full incident summary" },
+      "right5": { "time": "3:02 AM", "text": "Incident documented. Evidence snapshot saved." },
+      "lineLabel": "Panguard AI via LINE",
+      "lineMessage": "Blocked SSH brute-force from 103.xx.xx.xx. IP banned. No data accessed. All clear.",
+      "stillSleeping": "You're still sleeping."
+    },
+    "sixLayers": {
+      "overline": "Product Suite",
+      "title": "One platform. Six layers of defense.",
+      "coreLabel": "Core",
+      "scan": { "title": "Panguard Scan", "desc": "60-second AI security audit with PDF report. Find vulnerabilities before attackers do." },
+      "guard": { "title": "Panguard Guard", "desc": "24/7 AI endpoint monitoring with automated response. 4 AI agents working around the clock." },
+      "chat": { "title": "Panguard Chat", "desc": "AI security copilot via LINE, Telegram, Slack, or Email. Ask questions in plain language." },
+      "trap": { "title": "Panguard Trap", "desc": "Smart honeypot system with 8 protocols. Detect attackers before they reach real systems." },
+      "report": { "title": "Panguard Report", "desc": "AI compliance report generator for ISO 27001, SOC 2, and Taiwan Cyber Security Act." },
+      "threatCloud": { "title": "Threat Cloud", "desc": "Collective threat intelligence. Every user makes every other user safer." },
+      "learnMore": "Learn more",
+      "subtitle": "All products work together. Install what you need, add more as you grow."
+    },
+    "theEvidence": {
+      "title": "Don't take our word for it. Read the code.",
+      "subtitle": "Every number below is verifiable in our open-source repository.",
+      "stats": {
+        "sigmaRules": "Sigma detection rules",
+        "yaraRules": "YARA malware rules",
+        "controls": "Compliance controls",
+        "tests": "Tests passing",
+        "layers": "Detection layers",
+        "actions": "Response actions",
+        "protocols": "Honeypot protocols",
+        "mit": "Open source license"
+      },
+      "githubCta": "Verify on GitHub",
+      "trust": {
+        "openSource": {
+          "title": "100% Open Source",
+          "desc": "MIT licensed. Full source code on GitHub. Audit every line. No black boxes. No vendor lock-in."
+        },
+        "security": {
+          "title": "Security First",
+          "desc": "1,107 tests. Strict TypeScript. ESLint security plugin. Credential storage encryption. Sandboxed execution."
+        },
+        "privacy": {
+          "title": "Privacy by Design",
+          "desc": "Your data stays on your machine. Only anonymized threat signatures are shared via Threat Cloud. Zero telemetry."
+        }
       }
     },
     "homePricing": {

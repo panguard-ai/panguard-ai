@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { useInView } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useInViewport } from '@/hooks/useInViewport';
 import { useTranslations } from 'next-intl';
 import SectionWrapper from '../ui/SectionWrapper';
 import SectionTitle from '../ui/SectionTitle';
@@ -25,8 +25,7 @@ const lines = [
 
 export default function InstallDemo() {
   const t = useTranslations('home.installDemo');
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const [ref, isInView] = useInViewport({ once: true, margin: '-100px' });
   const [visibleLines, setVisibleLines] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [done, setDone] = useState(false);
