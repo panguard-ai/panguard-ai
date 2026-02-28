@@ -66,15 +66,27 @@ export default function HomePricing() {
       </div>
 
       <FadeInUp delay={0.3}>
-        <div className="mt-12 bg-surface-1 border border-border rounded-2xl p-8 text-center max-w-2xl mx-auto">
-          <h3 className="text-lg font-bold text-text-primary">{t('reportTitle')}</h3>
-          <p className="text-sm text-text-secondary mt-2">{t('reportDesc')}</p>
-          <Link
-            href="/compliance"
-            className="inline-flex items-center gap-2 text-brand-sage font-medium mt-4 hover:gap-3 transition-all text-sm"
-          >
-            {t('reportCta')} <ArrowRight className="w-4 h-4" />
-          </Link>
+        <div className="mt-12 bg-surface-1 border border-border rounded-2xl p-8 max-w-3xl mx-auto">
+          <h3 className="text-lg font-bold text-text-primary text-center">{t('reportTitle')}</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="text-center sm:text-left">
+                <p className="text-sm font-semibold text-text-primary">{t(`reports.${i}.name`)}</p>
+                <p className="text-xs text-text-muted mt-1">{t(`reports.${i}.controls`)}</p>
+                <p className="text-xl font-extrabold text-brand-sage mt-2">{t(`reports.${i}.price`)}</p>
+                <p className="text-[10px] text-text-muted mt-0.5 line-through opacity-60">{t(`reports.${i}.market`)}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-text-tertiary text-center mt-4">{t('reportNote')}</p>
+          <div className="text-center mt-4">
+            <Link
+              href="/compliance"
+              className="inline-flex items-center gap-2 text-brand-sage font-medium hover:gap-3 transition-all text-sm"
+            >
+              {t('reportCta')} <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </FadeInUp>
 
