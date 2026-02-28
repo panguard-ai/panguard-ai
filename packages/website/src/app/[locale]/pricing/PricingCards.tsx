@@ -188,20 +188,26 @@ export default function PricingCards() {
   const handleCheckout = useCallback(async (tier: string) => {
     setLoading(tier);
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('panguard_token') : null;
+      if (!token) {
+        window.location.href = `/login?redirect=/pricing`;
+        return;
+      }
+
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ tier }),
-        credentials: 'include',
       });
       const data = await res.json();
       if (data.ok && data.data?.url) {
         window.location.href = data.data.url;
       } else if (res.status === 401) {
-        // Not logged in — redirect to login, then come back
         window.location.href = `/login?redirect=/pricing`;
       } else {
-        // Fallback to early access
         window.location.href = '/early-access';
       }
     } catch {
