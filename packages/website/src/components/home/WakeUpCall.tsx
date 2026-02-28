@@ -54,7 +54,7 @@ export default function WakeUpCall() {
         {stats.map((s, i) => (
           <FadeInUp key={s.key} delay={0.2 + i * 0.08}>
             <div className="text-center">
-              <div className="text-3xl lg:text-4xl font-extrabold text-text-primary">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-text-primary whitespace-nowrap">
                 {s.prefix && <span>{s.prefix}</span>}
                 <CountUp target={s.target} suffix={s.suffix} />
               </div>
