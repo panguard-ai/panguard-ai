@@ -14,7 +14,7 @@ export default function SectionWrapper({
   id,
   dark = false,
   spacing = 'default',
-  fadeBorder = false,
+  fadeBorder = true,
 }: {
   children: ReactNode;
   className?: string;

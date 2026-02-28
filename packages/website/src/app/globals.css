@@ -544,21 +544,29 @@ body {
 /* ─── Chinese Typography ─── */
 
 :lang(zh) {
-  word-break: break-all;
+  overflow-wrap: break-word;
+  word-break: normal;
   font-feature-settings: "palt";
 }
 
 :lang(zh) p,
 :lang(zh) li,
-:lang(zh) dd {
-  line-height: 1.8;
+:lang(zh) dd,
+:lang(zh) span {
+  line-height: 1.85;
 }
 
 :lang(zh) h1,
 :lang(zh) h2,
 :lang(zh) h3,
 :lang(zh) h4 {
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+/* Tighter max-width for CJK prose readability (35–40 chars/line ideal) */
+:lang(zh) .prose-zh {
+  max-width: 640px;
 }
 
 /* ─── Pulse Danger Animation ─── */
