@@ -1,0 +1,83 @@
+# -------------------------------------------------------
+# Threat Cloud - Production Docker Compose
+# 威脅雲 - 生產環境 Docker Compose
+#
+# Usage:
+#   docker compose up -d          # Start
+#   docker compose logs -f tc     # View logs
+#   docker compose down           # Stop
+#
+# First-time seed:
+#   docker compose run --rm seed
+#
+# Architecture:
+#   Caddy (443/80) → Threat Cloud API (8080)
+# -------------------------------------------------------
+
+services:
+  # ----- Threat Cloud API -----
+  tc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: threat-cloud
+    restart: unless-stopped
+    environment:
+      - TC_PORT=8080
+      - TC_HOST=0.0.0.0
+      - TC_DB_PATH=/data/threat-cloud.db
+      - TC_API_KEYS=${TC_API_KEYS:-}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-https://panguard.ai,https://www.panguard.ai}
+    volumes:
+      - tc-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    networks:
+      - tc-net
+
+  # ----- Caddy Reverse Proxy (Auto HTTPS) -----
+  caddy:
+    image: caddy:2-alpine
+    container_name: tc-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      tc:
+        condition: service_healthy
+    networks:
+      - tc-net
+
+  # ----- Seed Runner (one-time) -----
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile.seed
+    container_name: tc-seed
+    volumes:
+      - tc-data:/data
+    profiles:
+      - seed
+    networks:
+      - tc-net
+
+volumes:
+  tc-data:
+    driver: local
+  caddy-data:
+    driver: local
+  caddy-config:
+    driver: local
+
+networks:
+  tc-net:
+    driver: bridge

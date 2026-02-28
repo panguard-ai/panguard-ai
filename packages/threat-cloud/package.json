@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "dev": "tsc --build --watch",
-    "start": "node dist/cli.js"
+    "start": "node dist/cli.js",
+    "seed": "npx tsx scripts/seed.ts"
   },
   "dependencies": {
     "better-sqlite3": "^11.0.0"

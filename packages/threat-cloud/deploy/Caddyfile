@@ -1,0 +1,28 @@
+# -------------------------------------------------------
+# Caddy Reverse Proxy for Threat Cloud
+#
+# Replace {$TC_DOMAIN} with your actual domain, e.g.:
+#   TC_DOMAIN=tc.panguard.ai docker compose up -d
+#
+# Caddy auto-obtains Let's Encrypt HTTPS certificates.
+# -------------------------------------------------------
+
+{$TC_DOMAIN:tc.panguard.ai} {
+	# Reverse proxy to Threat Cloud API
+	reverse_proxy tc:8080
+
+	# Security headers
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Access log
+	log {
+		output stdout
+		format json
+	}
+}

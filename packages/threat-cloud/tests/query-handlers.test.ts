@@ -65,8 +65,8 @@ describe('QueryHandlers', () => {
   });
 
   it('should filter by attack type', () => {
-    insertEvents(3, { attackType: 'brute_force' });
-    insertEvents(2, { attackType: 'scan' });
+    insertEvents(3, { attackType: 'brute_force', ip: '10.5.0.1' });
+    insertEvents(2, { attackType: 'scan', ip: '10.6.0.1' });
 
     const result = handlers.getTimeSeries('day', undefined, 'scan');
     const totalCount = result.reduce((sum, r) => sum + r.count, 0);
@@ -78,8 +78,8 @@ describe('QueryHandlers', () => {
   // -------------------------------------------------------------------------
 
   it('should return geo distribution', () => {
-    insertEvents(3, { region: 'TW' });
-    insertEvents(2, { region: 'JP' });
+    insertEvents(3, { region: 'TW', ip: '10.1.0.1' });
+    insertEvents(2, { region: 'JP', ip: '10.2.0.1' });
 
     const result = handlers.getGeoDistribution();
     expect(result.length).toBe(2);
@@ -108,8 +108,8 @@ describe('QueryHandlers', () => {
   // -------------------------------------------------------------------------
 
   it('should return MITRE heatmap', () => {
-    insertEvents(3, { technique: 'T1110' });
-    insertEvents(2, { technique: 'T1046' });
+    insertEvents(3, { technique: 'T1110', ip: '10.3.0.1' });
+    insertEvents(2, { technique: 'T1046', ip: '10.4.0.1' });
 
     const result = handlers.getMitreHeatmap();
     expect(result.length).toBe(2);
