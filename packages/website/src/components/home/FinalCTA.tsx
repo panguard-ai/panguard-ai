@@ -7,11 +7,11 @@ import { Link } from '@/navigation';
 import FadeInUp from '../FadeInUp';
 import SectionWrapper from '../ui/SectionWrapper';
 import { CheckIcon } from '@/components/ui/BrandIcons';
-
-const installCmd = 'curl -fsSL https://get.panguard.ai | bash';
+import { useOS } from '@/hooks/useOS';
 
 export default function FinalCTA() {
   const t = useTranslations('home.finalCta');
+  const { installCmd, prompt } = useOS();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -32,7 +32,7 @@ export default function FinalCTA() {
         {/* Install command */}
         <FadeInUp delay={0.1}>
           <div className="relative flex items-center gap-3 bg-surface-0 border border-border rounded-xl px-5 py-3.5 font-mono text-sm max-w-md mx-auto mt-10">
-            <span className="text-brand-sage select-none">$</span>
+            <span className="text-brand-sage select-none">{prompt}</span>
             <code className="text-text-secondary flex-1 select-all truncate text-left">
               {installCmd}
             </code>
