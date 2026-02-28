@@ -66,7 +66,7 @@ export default function WakeUpCall() {
 
       {/* Closing statement */}
       <FadeInUp delay={0.4}>
-        <p className="text-xl text-text-secondary text-center mt-14 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xl text-status-danger text-center mt-14 max-w-2xl mx-auto leading-relaxed font-semibold animate-pulse-danger">
           {t('closing')}
         </p>
       </FadeInUp>

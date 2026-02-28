@@ -24,7 +24,7 @@ export default function HomePricing() {
               <div
                 className={`rounded-2xl border p-6 h-full flex flex-col ${
                   isRecommended
-                    ? 'border-brand-sage bg-surface-1 ring-1 ring-brand-sage/20'
+                    ? 'border-brand-sage bg-surface-1 ring-1 ring-brand-sage/20 card-glow-pulse'
                     : 'border-border bg-surface-1'
                 }`}
               >
