@@ -1,11 +1,12 @@
 /**
- * Verification email sender using raw SMTP (node:net / node:tls).
- * Follows the same pattern as panguard-chat email channel.
+ * Email sender with Resend API (preferred) and raw SMTP fallback.
  * @module @panguard-ai/panguard-auth/email-verify
  */
 
 import * as net from 'node:net';
 import * as tls from 'node:tls';
+
+// ── Config Types ────────────────────────────────────────────────────
 
 export interface SmtpConfig {
   host: string;
@@ -15,9 +16,63 @@ export interface SmtpConfig {
   auth: { user: string; pass: string };
 }
 
-/**
- * Build a simple MIME message for verification emails.
- */
+export interface ResendConfig {
+  apiKey: string;
+  from: string;
+}
+
+export type EmailConfig = SmtpConfig | ResendConfig;
+
+function isResendConfig(config: EmailConfig): config is ResendConfig {
+  return 'apiKey' in config && !('host' in config);
+}
+
+// ── Unified Send ────────────────────────────────────────────────────
+
+async function sendEmail(
+  config: EmailConfig,
+  to: string,
+  subject: string,
+  html: string
+): Promise<void> {
+  if (isResendConfig(config)) {
+    await sendViaResend(config, to, subject, html);
+  } else {
+    const mime = buildMime(config.from, to, subject, html);
+    await sendSmtp(config, to, mime);
+  }
+}
+
+// ── Resend HTTP API ─────────────────────────────────────────────────
+
+async function sendViaResend(
+  config: ResendConfig,
+  to: string,
+  subject: string,
+  html: string
+): Promise<void> {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${config.apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: config.from,
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend API error (${res.status}): ${body}`);
+  }
+}
+
+// ── Raw SMTP (fallback) ─────────────────────────────────────────────
+
 function buildMime(from: string, to: string, subject: string, bodyHtml: string): string {
   const boundary = `----MIMEBoundary${Date.now()}`;
   const lines = [
@@ -44,9 +99,6 @@ function buildMime(from: string, to: string, subject: string, bodyHtml: string):
   return lines.join('\r\n');
 }
 
-/**
- * Send an email via raw SMTP.
- */
 function sendSmtp(config: SmtpConfig, to: string, mime: string): Promise<void> {
   return new Promise((resolve, reject) => {
     let commandIndex = -1;
@@ -81,17 +133,14 @@ function sendSmtp(config: SmtpConfig, to: string, mime: string): Promise<void> {
         return;
       }
 
-      // After EHLO, attempt STARTTLS if not already secure and server supports it
       if (!config.secure && !starttlsUpgraded && response.includes('STARTTLS')) {
         starttlsUpgraded = true;
         socket.write('STARTTLS\r\n');
         return;
       }
 
-      // Handle STARTTLS 220 response: upgrade to TLS
       if (starttlsUpgraded && code === 220 && response.includes('TLS')) {
         const tlsSocket = tls.connect({ socket, host: config.host }, () => {
-          // Re-EHLO after TLS upgrade
           tlsSocket.write('EHLO localhost\r\n');
         });
         tlsSocket.on('data', onData);
@@ -113,14 +162,11 @@ function sendSmtp(config: SmtpConfig, to: string, mime: string): Promise<void> {
     };
 
     if (config.secure) {
-      // Direct TLS connection (port 465)
       socket = tls.connect({ host: config.host, port: config.port }, () => {});
     } else {
-      // Plain connection (port 587) with STARTTLS upgrade
       socket = net.connect({ host: config.host, port: config.port }, () => {});
     }
 
-    // Send initial EHLO after connection greeting
     socket.once('data', (greeting: Buffer) => {
       const code = parseInt(greeting.toString().slice(0, 3), 10);
       if (code >= 400) {
@@ -140,11 +186,10 @@ function sendSmtp(config: SmtpConfig, to: string, mime: string): Promise<void> {
   });
 }
 
-/**
- * Send a waitlist verification email.
- */
+// ── Email Templates ─────────────────────────────────────────────────
+
 export async function sendVerificationEmail(
-  config: SmtpConfig,
+  config: EmailConfig,
   to: string,
   verifyToken: string,
   baseUrl: string
@@ -170,16 +215,11 @@ export async function sendVerificationEmail(
       </p>
     </div>
   `;
-
-  const mime = buildMime(config.from, to, subject, html);
-  await sendSmtp(config, to, mime);
+  await sendEmail(config, to, subject, html);
 }
 
-/**
- * Send a subscription expiration warning email.
- */
 export async function sendExpirationWarningEmail(
-  config: SmtpConfig,
+  config: EmailConfig,
   to: string,
   name: string,
   tier: string,
@@ -211,16 +251,11 @@ export async function sendExpirationWarningEmail(
       </p>
     </div>
   `;
-
-  const mime = buildMime(config.from, to, subject, html);
-  await sendSmtp(config, to, mime);
+  await sendEmail(config, to, subject, html);
 }
 
-/**
- * Send a password reset email with a one-time token link.
- */
 export async function sendResetEmail(
-  config: SmtpConfig,
+  config: EmailConfig,
   to: string,
   resetToken: string,
   baseUrl: string
@@ -247,16 +282,11 @@ export async function sendResetEmail(
       </p>
     </div>
   `;
-
-  const mime = buildMime(config.from, to, subject, html);
-  await sendSmtp(config, to, mime);
+  await sendEmail(config, to, subject, html);
 }
 
-/**
- * Send a welcome email after waitlist approval.
- */
 export async function sendWelcomeEmail(
-  config: SmtpConfig,
+  config: EmailConfig,
   to: string,
   name: string,
   baseUrl: string
@@ -279,7 +309,5 @@ export async function sendWelcomeEmail(
       </p>
     </div>
   `;
-
-  const mime = buildMime(config.from, to, subject, html);
-  await sendSmtp(config, to, mime);
+  await sendEmail(config, to, subject, html);
 }

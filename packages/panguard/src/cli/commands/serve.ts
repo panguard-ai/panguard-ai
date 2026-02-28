@@ -22,7 +22,7 @@ import {
 } from '@panguard-ai/panguard-auth';
 import type {
   AuthRouteConfig,
-  SmtpConfig,
+  EmailConfig,
   GoogleOAuthConfig,
   GoogleSheetsConfig,
   LemonSqueezyConfig,
@@ -49,18 +49,24 @@ export function serveCommand(): Command {
       const db = new AuthDB(options.db);
 
       // Build config from environment
-      const smtp: SmtpConfig | undefined = process.env['SMTP_HOST']
+      // Prefer Resend API when RESEND_API_KEY is set; fall back to raw SMTP
+      const emailConfig: EmailConfig | undefined = process.env['RESEND_API_KEY']
         ? {
-            host: process.env['SMTP_HOST'],
-            port: parseInt(process.env['SMTP_PORT'] ?? '587', 10),
-            secure: process.env['SMTP_SECURE'] === 'true',
-            from: process.env['SMTP_FROM'] ?? 'noreply@panguard.ai',
-            auth: {
-              user: process.env['SMTP_USER'] ?? '',
-              pass: process.env['SMTP_PASS'] ?? '',
-            },
+            apiKey: process.env['RESEND_API_KEY'],
+            from: process.env['RESEND_FROM'] ?? process.env['SMTP_FROM'] ?? 'Panguard AI <noreply@panguard.ai>',
           }
-        : undefined;
+        : process.env['SMTP_HOST']
+          ? {
+              host: process.env['SMTP_HOST'],
+              port: parseInt(process.env['SMTP_PORT'] ?? '587', 10),
+              secure: process.env['SMTP_SECURE'] === 'true',
+              from: process.env['SMTP_FROM'] ?? 'noreply@panguard.ai',
+              auth: {
+                user: process.env['SMTP_USER'] ?? '',
+                pass: process.env['SMTP_PASS'] ?? '',
+              },
+            }
+          : undefined;
 
       const google: GoogleOAuthConfig | undefined = process.env['GOOGLE_CLIENT_ID']
         ? {
@@ -94,7 +100,7 @@ export function serveCommand(): Command {
 
       const baseUrl = process.env['PANGUARD_BASE_URL'] ?? `http://${host}:${port}`;
 
-      const authConfig: AuthRouteConfig = { db, smtp, baseUrl, google, sheets, lemonsqueezy };
+      const authConfig: AuthRouteConfig = { db, smtp: emailConfig, baseUrl, google, sheets, lemonsqueezy };
       const handlers = createAuthHandlers(authConfig);
 
       // Resolve admin static directory
@@ -131,6 +137,12 @@ export function serveCommand(): Command {
         console.log(`    ${c.dim('/openapi.json')}    OpenAPI 3.0 Spec`);
         console.log(`    ${c.dim('/health')}         Health check`);
         console.log('');
+        console.log(`  Services:`);
+        console.log(`    Email:   ${emailConfig ? ('apiKey' in emailConfig ? c.safe('Resend API') : c.safe('SMTP')) : c.caution('Not configured')}`);
+        console.log(`    OAuth:   ${google ? c.safe('Google') : c.dim('Not configured')}`);
+        console.log(`    Billing: ${lemonsqueezy ? c.safe('Lemon Squeezy') : c.dim('Not configured')}`);
+        console.log(`    Sheets:  ${sheets ? c.safe('Google Sheets') : c.dim('Not configured')}`);
+        console.log('');
       });
 
       // Subscription lifecycle: check expired plans hourly
@@ -141,11 +153,11 @@ export function serveCommand(): Command {
         }
 
         // Send warning emails for plans expiring in 3 days
-        if (smtp) {
+        if (emailConfig) {
           const expiring = db.getExpiringPlans(3);
           for (const user of expiring) {
             sendExpirationWarningEmail(
-              smtp,
+              emailConfig,
               user.email,
               user.name,
               user.tier,
