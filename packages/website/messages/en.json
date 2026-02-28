@@ -569,6 +569,9 @@
       "funnel3": { "percent": "3%", "title": "Cloud AI", "desc": "Dynamic reasoning", "tooltip": "Claude Haiku, ~$0.008 per analysis. Only called when local rules and local AI can't determine the threat." },
       "collectiveTitle": "One gets attacked. Everyone learns to defend.",
       "collectiveDesc": "Every Panguard instance shares anonymized threat intelligence. When one user detects a new attack, all users are protected. The network gets smarter with every deployment.",
+      "step1": "Detect Threat",
+      "step2": "Generate Rule",
+      "step3": "Distribute Network-wide",
       "closing": "Install once. Protected forever."
     },
     "the3amStory": {
