@@ -443,28 +443,28 @@ body {
 
 /* ─── Scroll-Reveal Animation System (replaces Framer Motion) ─── */
 
-/* Base: fade-up on scroll */
-.animate-on-scroll {
+/* Base: fade-up on scroll (scoped to .js-ready to prevent SSR flash of invisible content) */
+.js-ready .animate-on-scroll {
   opacity: 0;
   transform: translateY(12px);
   transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
               transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
-.animate-on-scroll.is-visible {
+.js-ready .animate-on-scroll.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
 /* Directional variants */
-.animate-on-scroll.from-down { transform: translateY(-24px); }
-.animate-on-scroll.from-left { transform: translateX(24px); }
-.animate-on-scroll.from-right { transform: translateX(-24px); }
-.animate-on-scroll.from-none { transform: none; opacity: 0; }
+.js-ready .animate-on-scroll.from-down { transform: translateY(-24px); }
+.js-ready .animate-on-scroll.from-left { transform: translateX(24px); }
+.js-ready .animate-on-scroll.from-right { transform: translateX(-24px); }
+.js-ready .animate-on-scroll.from-none { transform: none; opacity: 0; }
 
-.animate-on-scroll.from-down.is-visible,
-.animate-on-scroll.from-left.is-visible,
-.animate-on-scroll.from-right.is-visible,
-.animate-on-scroll.from-none.is-visible {
+.js-ready .animate-on-scroll.from-down.is-visible,
+.js-ready .animate-on-scroll.from-left.is-visible,
+.js-ready .animate-on-scroll.from-right.is-visible,
+.js-ready .animate-on-scroll.from-none.is-visible {
   opacity: 1;
   transform: none;
 }
@@ -521,22 +521,22 @@ body {
 }
 
 /* Reveal text word animation */
-.reveal-word {
+.js-ready .reveal-word {
   opacity: 0;
   transform: translateY(12px);
   transition: opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
               transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
-.reveal-text-container.is-visible .reveal-word {
+.js-ready .reveal-text-container.is-visible .reveal-word {
   opacity: 1;
   transform: translateY(0);
 }
 
 /* Stagger group: children animate when parent is visible */
-.stagger-group > .animate-on-scroll {
+.js-ready .stagger-group .animate-on-scroll {
   transition-delay: calc(var(--stagger-index, 0) * 0.08s + 0.1s);
 }
-.stagger-group.is-visible > .animate-on-scroll {
+.js-ready .stagger-group.is-visible .animate-on-scroll {
   opacity: 1;
   transform: translateY(0);
 }

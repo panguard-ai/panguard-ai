@@ -67,7 +67,7 @@ export default function TheShift() {
           <h3 className="text-xl font-bold text-text-primary mb-4">{t('funnelTitle')}</h3>
           <div className="grid grid-cols-3 gap-4">
             {(['funnel1', 'funnel2', 'funnel3'] as const).map((key) => (
-              <div key={key} className="bg-surface-1/50 rounded-xl p-4 border border-border text-center">
+              <div key={key} className="bg-surface-0 rounded-xl p-4 border border-border text-center">
                 <p className="text-2xl font-extrabold text-brand-sage">{t(`${key}.percent`)}</p>
                 <p className="text-sm font-semibold text-text-primary mt-1">{t(`${key}.title`)}</p>
                 <p className="text-xs text-text-tertiary mt-1">{t(`${key}.desc`)}</p>
