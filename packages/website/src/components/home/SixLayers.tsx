@@ -33,7 +33,7 @@ export default function SixLayers() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-12 max-w-5xl mx-auto">
         {products.map((p, i) => (
-          <FadeInUp key={p.key} delay={i * 0.06}>
+          <FadeInUp key={p.key} delay={i * 0.06} className="h-full">
             <Link
               href={p.href}
               className="group block bg-surface-0 rounded-xl p-6 border border-border hover:-translate-y-1 hover:border-brand-sage/40 transition-all duration-300 card-glow h-full"
