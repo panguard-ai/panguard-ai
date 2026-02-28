@@ -140,6 +140,8 @@ export default async function LocaleLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} ${notoSansTC.variable}`}
     >
       <head>
+        {/* Enable scroll-reveal animations only after JS is ready (prevents FOIC) */}
+        <script dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js-ready")' }} />
         {/* jsonLd is a static constant — never include user-supplied values */}
         <script
           type="application/ld+json"
