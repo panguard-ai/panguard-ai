@@ -1,8 +1,122 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { Shield, EyeOff, Share2 } from 'lucide-react';
 import SectionWrapper from '../ui/SectionWrapper';
 import FadeInUp from '../FadeInUp';
+import { useInViewport } from '@/hooks/useInViewport';
+
+function FunnelBars() {
+  const t = useTranslations('home.theShift');
+  const [ref, inView] = useInViewport({ once: true, margin: '-80px' });
+
+  const items = [
+    { key: 'funnel1' as const, width: 90 },
+    { key: 'funnel2' as const, width: 7 },
+    { key: 'funnel3' as const, width: 3 },
+  ];
+
+  return (
+    <div ref={ref} className="space-y-5">
+      {items.map((item, i) => (
+        <div key={item.key}>
+          <div className="flex justify-between items-baseline mb-2">
+            <div>
+              <span className="text-sm font-semibold text-text-primary">
+                {t(`${item.key}.title`)}
+              </span>
+              <span className="text-xs text-text-tertiary ml-2">
+                {t(`${item.key}.desc`)}
+              </span>
+            </div>
+            <span className="text-lg font-extrabold text-brand-sage">
+              {t(`${item.key}.percent`)}
+            </span>
+          </div>
+          <div className="h-3 bg-surface-2 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-brand-sage rounded-full"
+              style={{
+                width: inView ? `${Math.max(item.width, 4)}%` : '0%',
+                transition: `width 1.2s cubic-bezier(0.25, 0.1, 0.25, 1) ${i * 0.2}s`,
+              }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ThreatCloudFlow() {
+  const t = useTranslations('home.theShift');
+
+  const steps = [
+    { icon: Shield, label: 'Detect' },
+    { icon: EyeOff, label: 'Anonymize' },
+    { icon: Share2, label: 'Share' },
+  ];
+
+  return (
+    <div>
+      <h3 className="text-xl font-bold text-text-primary mb-3">{t('collectiveTitle')}</h3>
+      <p className="text-text-secondary leading-relaxed mb-8">{t('collectiveDesc')}</p>
+
+      {/* Flow diagram */}
+      <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0">
+        {steps.map((step, i) => (
+          <div key={step.label} className="flex flex-col md:flex-row items-center">
+            {/* Node */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 rounded-full bg-brand-sage/10 border-2 border-brand-sage/30 flex items-center justify-center">
+                <step.icon className="w-7 h-7 text-brand-sage" />
+              </div>
+              <span className="text-sm font-semibold text-text-primary">{step.label}</span>
+            </div>
+
+            {/* Connector (not after last) */}
+            {i < steps.length - 1 && (
+              <>
+                {/* Desktop: horizontal dashed line */}
+                <div className="hidden md:block w-16 lg:w-24 mx-2">
+                  <svg width="100%" height="20" viewBox="0 0 100 20" preserveAspectRatio="none">
+                    <line
+                      x1="0" y1="10" x2="80" y2="10"
+                      stroke="rgba(139,154,142,0.4)"
+                      strokeWidth="2"
+                      strokeDasharray="6 4"
+                      className="flow-line-dash"
+                    />
+                    <polygon
+                      points="80,5 90,10 80,15"
+                      fill="rgba(139,154,142,0.5)"
+                    />
+                  </svg>
+                </div>
+                {/* Mobile: vertical dashed line */}
+                <div className="md:hidden h-8 my-1">
+                  <svg width="20" height="32" viewBox="0 0 20 32">
+                    <line
+                      x1="10" y1="0" x2="10" y2="24"
+                      stroke="rgba(139,154,142,0.4)"
+                      strokeWidth="2"
+                      strokeDasharray="6 4"
+                      className="flow-line-dash"
+                    />
+                    <polygon
+                      points="5,24 10,32 15,24"
+                      fill="rgba(139,154,142,0.5)"
+                    />
+                  </svg>
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function TheShift() {
   const t = useTranslations('home.theShift');
@@ -61,27 +175,18 @@ export default function TheShift() {
         </div>
       </FadeInUp>
 
-      {/* AI funnel concept */}
+      {/* AI funnel — animated bars */}
       <FadeInUp delay={0.3}>
         <div className="mt-12 max-w-3xl">
-          <h3 className="text-xl font-bold text-text-primary mb-4">{t('funnelTitle')}</h3>
-          <div className="grid grid-cols-3 gap-4">
-            {(['funnel1', 'funnel2', 'funnel3'] as const).map((key) => (
-              <div key={key} className="bg-surface-0 rounded-xl p-4 border border-border text-center">
-                <p className="text-2xl font-extrabold text-brand-sage">{t(`${key}.percent`)}</p>
-                <p className="text-sm font-semibold text-text-primary mt-1">{t(`${key}.title`)}</p>
-                <p className="text-xs text-text-tertiary mt-1">{t(`${key}.desc`)}</p>
-              </div>
-            ))}
-          </div>
+          <h3 className="text-xl font-bold text-text-primary mb-6">{t('funnelTitle')}</h3>
+          <FunnelBars />
         </div>
       </FadeInUp>
 
-      {/* Collective defense */}
+      {/* Collective defense — flow diagram */}
       <FadeInUp delay={0.35}>
         <div className="mt-12 max-w-3xl">
-          <h3 className="text-xl font-bold text-text-primary mb-3">{t('collectiveTitle')}</h3>
-          <p className="text-text-secondary leading-relaxed">{t('collectiveDesc')}</p>
+          <ThreatCloudFlow />
         </div>
       </FadeInUp>
 
