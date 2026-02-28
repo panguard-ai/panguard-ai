@@ -31,6 +31,12 @@ import { syncWaitlistEntry, ensureSheetHeaders } from './google-sheets.js';
 import { RateLimiter } from './rate-limiter.js';
 import type { UserPublic } from './types.js';
 import { logAuditEvent } from '@panguard-ai/security-hardening';
+import {
+  generateTotpSecret,
+  generateBackupCodes,
+  buildOtpauthUri,
+  verifyTotp,
+} from './totp.js';
 import type { LemonSqueezyConfig } from './lemonsqueezy.js';
 import {
   verifyWebhookSignature,
@@ -425,6 +431,45 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       return;
     }
 
+    // Check 2FA requirement
+    const totpSecret = db.getTotpSecret(user.id);
+    if (totpSecret?.enabled) {
+      const { totpCode, backupCode } = body;
+
+      if (!totpCode && !backupCode) {
+        // Password is correct but 2FA is needed — tell the client
+        json(res, 200, {
+          ok: true,
+          data: {
+            requiresTwoFactor: true,
+            message: 'Two-factor authentication required. Send totpCode or backupCode.',
+          },
+        });
+        return;
+      }
+
+      // Verify TOTP code
+      if (typeof totpCode === 'string') {
+        if (!verifyTotp(totpSecret.encryptedSecret, totpCode)) {
+          logAuditEvent({
+            level: 'warn',
+            action: 'credential_access',
+            target: email,
+            result: 'failure',
+            context: { details: 'Invalid TOTP code' },
+          });
+          json(res, 401, { ok: false, error: 'Invalid two-factor code' });
+          return;
+        }
+      } else if (typeof backupCode === 'string') {
+        // Verify backup code
+        if (!db.consumeBackupCode(user.id, backupCode)) {
+          json(res, 401, { ok: false, error: 'Invalid backup code' });
+          return;
+        }
+      }
+    }
+
     db.updateLastLogin(user.id);
     const token = generateSessionToken();
     const session = db.createSession(user.id, token, sessionExpiry());
@@ -596,7 +641,7 @@ export function createAuthHandlers(config: AuthRouteConfig) {
 
     // Audit log
     const user = db.getUserById(userId);
-    db.addAuditLog('password_reset_complete', null, userId, null);
+    db.addAuditLog('password_reset_complete', null, userId, undefined);
     logAuditEvent({
       level: 'info',
       action: 'credential_access',
@@ -790,6 +835,276 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     const redirectUrl = `${flow.callbackUrl}?${params.toString()}`;
 
     json(res, 200, { ok: true, data: { redirectUrl } });
+  }
+
+  // ── GDPR: Account Deletion + Data Export ───────────────────────
+
+  /**
+   * DELETE /api/auth/delete-account
+   * Permanently delete the authenticated user's account and all data.
+   */
+  async function handleDeleteAccount(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    if (req.method !== 'DELETE') {
+      json(res, 405, { ok: false, error: 'Method not allowed' });
+      return;
+    }
+
+    const user = authenticateRequest(req, db);
+    if (!user) {
+      json(res, 401, { ok: false, error: 'Not authenticated' });
+      return;
+    }
+
+    // Require password confirmation
+    const body = await readBody(req);
+    if (!body.ok) {
+      json(res, body.status, { ok: false, error: 'Invalid request body' });
+      return;
+    }
+
+    const { password } = body.data;
+    if (typeof password !== 'string') {
+      json(res, 400, { ok: false, error: 'Password confirmation is required' });
+      return;
+    }
+
+    const valid = await verifyPassword(password, user.passwordHash);
+    if (!valid) {
+      json(res, 401, { ok: false, error: 'Invalid password' });
+      return;
+    }
+
+    // Prevent admin self-deletion if they're the only admin
+    if (user.role === 'admin') {
+      const allUsers = db.getAllUsers();
+      const adminCount = allUsers.filter((u) => u.role === 'admin').length;
+      if (adminCount <= 1) {
+        json(res, 409, { ok: false, error: 'Cannot delete the only admin account' });
+        return;
+      }
+    }
+
+    const result = db.deleteUser(user.id);
+
+    logAuditEvent({
+      level: 'info',
+      action: 'credential_access',
+      target: user.email,
+      result: 'success',
+      context: { details: `Account deleted (GDPR). Tables: ${result.tablesAffected.join(', ')}` },
+    });
+
+    json(res, 200, {
+      ok: true,
+      data: {
+        message: 'Account permanently deleted.',
+        tablesAffected: result.tablesAffected,
+      },
+    });
+  }
+
+  /**
+   * GET /api/auth/export-data
+   * Export all data belonging to the authenticated user (GDPR portability).
+   */
+  function handleExportData(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method !== 'GET') {
+      json(res, 405, { ok: false, error: 'Method not allowed' });
+      return;
+    }
+
+    const user = authenticateRequest(req, db);
+    if (!user) {
+      json(res, 401, { ok: false, error: 'Not authenticated' });
+      return;
+    }
+
+    const data = db.exportUserData(user.id);
+    if (!data) {
+      json(res, 404, { ok: false, error: 'User not found' });
+      return;
+    }
+
+    db.addAuditLog('data_export', user.id, user.id, undefined);
+
+    // Return as downloadable JSON
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="panguard-data-export-${user.id}.json"`,
+    });
+    res.end(JSON.stringify(data, null, 2));
+  }
+
+  // ── TOTP (Two-Factor Authentication) ──────────────────────────
+
+  /**
+   * POST /api/auth/totp/setup
+   * Generate a new TOTP secret and backup codes. Returns otpauth URI for QR code.
+   */
+  function handleTotpSetup(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method !== 'POST') {
+      json(res, 405, { ok: false, error: 'Method not allowed' });
+      return;
+    }
+
+    const user = authenticateRequest(req, db);
+    if (!user) {
+      json(res, 401, { ok: false, error: 'Not authenticated' });
+      return;
+    }
+
+    // Check if already enabled
+    const existing = db.getTotpSecret(user.id);
+    if (existing?.enabled) {
+      json(res, 409, { ok: false, error: '2FA is already enabled. Disable it first to re-setup.' });
+      return;
+    }
+
+    const secret = generateTotpSecret();
+    const backupCodes = generateBackupCodes();
+    const otpauthUri = buildOtpauthUri(secret, user.email);
+
+    // Store (not yet enabled — user must verify first)
+    db.saveTotpSecret(user.id, secret, JSON.stringify(backupCodes));
+
+    json(res, 200, {
+      ok: true,
+      data: {
+        secret,
+        otpauthUri,
+        backupCodes,
+        message: 'Scan the QR code with your authenticator app, then verify with /api/auth/totp/verify.',
+      },
+    });
+  }
+
+  /**
+   * POST /api/auth/totp/verify
+   * Verify a TOTP code to enable 2FA. Body: { code: "123456" }
+   */
+  async function handleTotpVerify(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    if (req.method !== 'POST') {
+      json(res, 405, { ok: false, error: 'Method not allowed' });
+      return;
+    }
+
+    const user = authenticateRequest(req, db);
+    if (!user) {
+      json(res, 401, { ok: false, error: 'Not authenticated' });
+      return;
+    }
+
+    const body = await readBody(req);
+    if (!body.ok) {
+      json(res, body.status, { ok: false, error: 'Invalid request body' });
+      return;
+    }
+
+    const { code } = body.data;
+    if (typeof code !== 'string' || code.length !== 6) {
+      json(res, 400, { ok: false, error: 'A 6-digit code is required' });
+      return;
+    }
+
+    const totpSecret = db.getTotpSecret(user.id);
+    if (!totpSecret) {
+      json(res, 404, { ok: false, error: 'No TOTP setup found. Call /api/auth/totp/setup first.' });
+      return;
+    }
+
+    if (!verifyTotp(totpSecret.encryptedSecret, code)) {
+      json(res, 401, { ok: false, error: 'Invalid TOTP code' });
+      return;
+    }
+
+    db.enableTotp(user.id);
+
+    db.addAuditLog('totp_enabled', user.id, user.id, undefined);
+    logAuditEvent({
+      level: 'info',
+      action: 'credential_access',
+      target: user.email,
+      result: 'success',
+      context: { details: '2FA enabled' },
+    });
+
+    json(res, 200, { ok: true, data: { message: '2FA has been enabled.' } });
+  }
+
+  /**
+   * POST /api/auth/totp/disable
+   * Disable 2FA. Requires password confirmation. Body: { password: "..." }
+   */
+  async function handleTotpDisable(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    if (req.method !== 'POST') {
+      json(res, 405, { ok: false, error: 'Method not allowed' });
+      return;
+    }
+
+    const user = authenticateRequest(req, db);
+    if (!user) {
+      json(res, 401, { ok: false, error: 'Not authenticated' });
+      return;
+    }
+
+    const body = await readBody(req);
+    if (!body.ok) {
+      json(res, body.status, { ok: false, error: 'Invalid request body' });
+      return;
+    }
+
+    const { password } = body.data;
+    if (typeof password !== 'string') {
+      json(res, 400, { ok: false, error: 'Password is required to disable 2FA' });
+      return;
+    }
+
+    const valid = await verifyPassword(password, user.passwordHash);
+    if (!valid) {
+      json(res, 401, { ok: false, error: 'Invalid password' });
+      return;
+    }
+
+    db.disableTotp(user.id);
+
+    db.addAuditLog('totp_disabled', user.id, user.id, undefined);
+    logAuditEvent({
+      level: 'info',
+      action: 'credential_access',
+      target: user.email,
+      result: 'success',
+      context: { details: '2FA disabled' },
+    });
+
+    json(res, 200, { ok: true, data: { message: '2FA has been disabled.' } });
+  }
+
+  /**
+   * GET /api/auth/totp/status
+   * Check if 2FA is enabled for the authenticated user.
+   */
+  function handleTotpStatus(req: IncomingMessage, res: ServerResponse): void {
+    if (req.method !== 'GET') {
+      json(res, 405, { ok: false, error: 'Method not allowed' });
+      return;
+    }
+
+    const user = authenticateRequest(req, db);
+    if (!user) {
+      json(res, 401, { ok: false, error: 'Not authenticated' });
+      return;
+    }
+
+    const totpSecret = db.getTotpSecret(user.id);
+    json(res, 200, {
+      ok: true,
+      data: {
+        enabled: totpSecret?.enabled === 1,
+        backupCodesRemaining: totpSecret
+          ? (JSON.parse(totpSecret.backupCodes) as string[]).length
+          : 0,
+      },
+    });
   }
 
   // ── Lemon Squeezy (Billing) ─────────────────────────────────────
@@ -1269,6 +1584,14 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     handleAdminSessions,
     handleAdminSessionRevoke,
     handleAdminActivity,
+    // GDPR
+    handleDeleteAccount,
+    handleExportData,
+    // TOTP (2FA)
+    handleTotpSetup,
+    handleTotpVerify,
+    handleTotpDisable,
+    handleTotpStatus,
     // Billing (Lemon Squeezy)
     handleBillingWebhook,
     handleBillingCheckout,
