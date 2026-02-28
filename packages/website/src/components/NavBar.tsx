@@ -72,12 +72,16 @@ export default function NavBar() {
 
   return (
     <nav
-      className={`sticky top-0 z-50 h-16 flex items-center justify-between px-6 lg:px-[120px] transition-all duration-300 ${
+      className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
           ? 'bg-surface-0/80 backdrop-blur-xl border-b border-border'
           : 'bg-transparent border-b border-transparent'
       }`}
     >
+      {/* Brand accent line */}
+      <div className="h-[2px] bg-gradient-to-r from-transparent via-brand-sage/60 to-transparent" />
+
+      <div className="h-16 flex items-center justify-between px-6 lg:px-[120px]">
       <Logo />
 
       {/* Desktop nav */}
@@ -130,10 +134,11 @@ export default function NavBar() {
       >
         {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
+      </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="fixed inset-0 top-16 bg-surface-0/98 backdrop-blur-xl z-40 overflow-y-auto lg:hidden">
+        <div className="fixed inset-0 top-[66px] bg-surface-0/98 backdrop-blur-xl z-40 overflow-y-auto lg:hidden">
           <div className="p-6 space-y-4">
             <div className="flex justify-center">
               <LocaleSwitcher />
