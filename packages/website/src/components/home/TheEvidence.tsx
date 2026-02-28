@@ -24,14 +24,14 @@ export default function TheEvidence() {
   const t = useTranslations('home.theEvidence');
 
   return (
-    <SectionWrapper>
+    <SectionWrapper dark>
       <SectionTitle title={t('title')} subtitle={t('subtitle')} />
 
       {/* Part A: Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-4xl mx-auto">
         {statsGrid.map((s, i) => (
           <FadeInUp key={s.key} delay={i * 0.05}>
-            <div className="bg-surface-1 rounded-xl p-5 border border-border text-center">
+            <div className="bg-surface-0 rounded-xl p-5 border border-border text-center">
               <div className="text-2xl lg:text-3xl font-extrabold text-text-primary">
                 {s.isMIT ? (
                   <span>MIT</span>
@@ -63,7 +63,7 @@ export default function TheEvidence() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-14 max-w-4xl mx-auto">
         {trustCards.map((key, i) => (
           <FadeInUp key={key} delay={0.1 + i * 0.08}>
-            <div className="bg-surface-1 rounded-xl p-6 border border-border card-glow">
+            <div className="bg-surface-0 rounded-xl p-6 border border-border card-glow">
               <h3 className="text-base font-bold text-text-primary mb-2">
                 {t(`trust.${key}.title`)}
               </h3>
