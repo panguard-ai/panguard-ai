@@ -28,6 +28,8 @@ export default function Footer() {
       title: t('product'),
       links: [
         { label: t('guard'), href: '/product/guard' },
+        { label: t('scan'), href: '/product/scan' },
+        { label: t('threatCloud'), href: '/product/threat-cloud' },
         { label: t('chat'), href: '/product/chat' },
         { label: t('trap'), href: '/product/trap' },
         { label: t('report'), href: '/product/report' },
