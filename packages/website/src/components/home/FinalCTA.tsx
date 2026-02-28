@@ -21,7 +21,7 @@ export default function FinalCTA() {
   };
 
   return (
-    <SectionWrapper dark spacing="spacious" className="bg-gradient-to-b from-[#1F1C19] to-[#1B261F]">
+    <SectionWrapper dark spacing="spacious">
       <div className="max-w-3xl mx-auto text-center">
         {/* Title */}
         <FadeInUp>

@@ -31,7 +31,7 @@ const nextConfig = {
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains',
+            value: 'max-age=31536000; includeSubDomains; preload',
           },
           {
             key: 'Permissions-Policy',
@@ -41,11 +41,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' https://plausible.io",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://api.panguard.ai https://*.vercel-insights.com https://*.vercel-analytics.com",
+              "connect-src 'self' https://api.panguard.ai https://*.vercel-insights.com https://*.vercel-analytics.com https://plausible.io",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",

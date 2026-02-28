@@ -30,6 +30,7 @@ export default function BillingContent() {
   const router = useRouter();
   const [billing, setBilling] = useState<BillingData | null>(null);
   const [billingLoading, setBillingLoading] = useState(true);
+  const [billingError, setBillingError] = useState('');
   const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function BillingContent() {
           setBilling(data.data);
         }
       } catch {
-        // ignore
+        setBillingError('Unable to load billing data. Please refresh.');
       } finally {
         setBillingLoading(false);
       }
@@ -134,6 +135,8 @@ export default function BillingContent() {
 
           {billingLoading ? (
             <Loader2 className="w-4 h-4 text-text-tertiary animate-spin" />
+          ) : billingError ? (
+            <p className="text-sm text-status-caution">{billingError}</p>
           ) : (
             <div className="space-y-4">
               <div className="flex items-baseline gap-3">

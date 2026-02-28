@@ -103,17 +103,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [token]);
 
   useEffect(() => {
-    // Check for token in URL (from OAuth callback)
+    // Check for OAuth exchange code in URL
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      const urlToken = params.get('token');
-      if (urlToken) {
-        storeToken(urlToken);
-        setToken(urlToken);
-        // Clean URL
+      const code = params.get('code');
+      if (code) {
+        // Clean URL immediately
         const url = new URL(window.location.href);
-        url.searchParams.delete('token');
+        url.searchParams.delete('code');
         window.history.replaceState({}, '', url.toString());
+
+        // Exchange code for token
+        fetch(`${API_URL}/api/auth/oauth/exchange`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        })
+          .then((res) => res.json() as Promise<{ ok: boolean; data?: { token: string } }>)
+          .then((data) => {
+            if (data.ok && data.data?.token) {
+              storeToken(data.data.token);
+              setToken(data.data.token);
+            }
+          })
+          .catch(() => {
+            // Exchange failed — user can log in manually
+          })
+          .finally(() => void refresh());
+        return;
       }
     }
     void refresh();
