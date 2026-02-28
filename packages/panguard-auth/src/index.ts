@@ -4,7 +4,15 @@
  */
 
 export { AuthDB } from './database.js';
-export type { ReportPurchase, AuditLogEntry, Subscription } from './database.js';
+export type { ReportPurchase, AuditLogEntry, Subscription, TotpSecret } from './database.js';
+export {
+  generateTotpSecret,
+  generateBackupCodes,
+  buildOtpauthUri,
+  verifyTotp,
+  base32Encode,
+  base32Decode,
+} from './totp.js';
 export {
   hashPassword,
   verifyPassword,

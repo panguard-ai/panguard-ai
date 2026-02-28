@@ -175,7 +175,7 @@ export function refreshTierInBackground(): void {
     .then((body) => {
       if (!body?.data?.user?.tier) return;
       const serverTier = body.data.user.tier as Tier;
-      const serverPlanExpires = (body.data.user as Record<string, unknown>).planExpiresAt as
+      const serverPlanExpires = (body.data.user as Record<string, unknown>)['planExpiresAt'] as
         | string
         | null
         | undefined;
