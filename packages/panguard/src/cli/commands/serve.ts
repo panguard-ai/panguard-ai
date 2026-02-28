@@ -219,6 +219,30 @@ async function handleRequest(
       handlers.handleMe(req, res);
       return;
     }
+    if (pathname === '/api/auth/delete-account') {
+      await handlers.handleDeleteAccount(req, res);
+      return;
+    }
+    if (pathname === '/api/auth/export-data') {
+      handlers.handleExportData(req, res);
+      return;
+    }
+    if (pathname === '/api/auth/totp/setup') {
+      handlers.handleTotpSetup(req, res);
+      return;
+    }
+    if (pathname === '/api/auth/totp/verify') {
+      await handlers.handleTotpVerify(req, res);
+      return;
+    }
+    if (pathname === '/api/auth/totp/disable') {
+      await handlers.handleTotpDisable(req, res);
+      return;
+    }
+    if (pathname === '/api/auth/totp/status') {
+      handlers.handleTotpStatus(req, res);
+      return;
+    }
     if (pathname === '/api/auth/forgot-password') {
       await handlers.handleForgotPassword(req, res);
       return;
