@@ -47,16 +47,25 @@ function decryptData(encryptedStr: string): string {
   return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
 }
 
-export type Tier = 'free' | 'solo' | 'pro' | 'enterprise' | 'starter' | 'team' | 'business';
+export type Tier =
+  | 'free'
+  | 'community'
+  | 'solo'
+  | 'pro'
+  | 'business'
+  | 'enterprise'
+  | 'starter'
+  | 'team';
 
 export const TIER_LEVEL: Record<Tier, number> = {
   free: 0,
+  community: 0, // alias for free
   solo: 1,
   starter: 2, // legacy
   pro: 2,
   team: 3, // legacy alias
-  business: 4, // legacy
-  enterprise: 5,
+  business: 3,
+  enterprise: 5, // legacy
 };
 
 export interface StoredCredentials {
@@ -173,13 +182,14 @@ export function isTokenExpired(creds: StoredCredentials): boolean {
  */
 export function tierDisplayName(tier: Tier): string {
   const names: Record<Tier, string> = {
-    free: 'Free',
+    free: 'Community',
+    community: 'Community',
     solo: 'Solo',
     pro: 'Pro',
-    enterprise: 'Enterprise',
-    starter: 'Starter', // legacy
+    business: 'Business',
+    enterprise: 'Business', // legacy → Business
+    starter: 'Solo', // legacy → Solo
     team: 'Pro', // legacy → Pro
-    business: 'Pro', // legacy → Pro
   };
   return names[tier] ?? tier;
 }
