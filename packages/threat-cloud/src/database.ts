@@ -330,7 +330,12 @@ export class ThreatCloudDB {
     return result.changes > 0 ? Number(result.lastInsertRowid) : null;
   }
 
-  /** Insert trap credential records / 插入 Trap 憑證記錄 */
+  /**
+   * Insert trap credential records.
+   * Usernames are hashed (SHA-256, truncated to 16 hex chars) before storage
+   * to avoid storing PII from attacker-attempted credentials.
+   * 插入 Trap 憑證記錄（使用者名稱先雜湊化以避免 PII 洩漏）
+   */
   insertTrapCredentials(
     enrichedThreatId: number,
     credentials: Array<{ username: string; count: number }>
@@ -340,7 +345,8 @@ export class ThreatCloudDB {
     );
     const insertAll = this.db.transaction((creds: typeof credentials) => {
       for (const c of creds) {
-        stmt.run(enrichedThreatId, c.username, c.count);
+        const hashedUsername = createHash('sha256').update(c.username).digest('hex').slice(0, 16);
+        stmt.run(enrichedThreatId, hashedUsername, c.count);
       }
     });
     insertAll(credentials);

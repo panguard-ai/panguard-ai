@@ -87,6 +87,12 @@ export class ThreatCloudServer {
 
       this.server.listen(this.config.port, this.config.host, () => {
         console.log(`Threat Cloud server started on ${this.config.host}:${this.config.port}`);
+        if (this.hashedApiKeys.length === 0) {
+          console.warn(
+            'WARNING: No API keys configured. Write endpoints and sensitive data will return 503.'
+          );
+          console.warn('Set TC_API_KEYS=key1,key2 or use --api-key to enable full access.');
+        }
         this.scheduler.start();
         resolve();
       });
@@ -139,12 +145,29 @@ export class ThreatCloudServer {
       return;
     }
 
-    // API key verification (skip for health check)
+    // API key verification
     const url = req.url ?? '/';
     const pathname = url.split('?')[0] ?? '/';
     let apiKeyHash = '';
 
-    if (pathname !== '/health' && this.config.apiKeyRequired) {
+    // Determine if this endpoint requires authentication
+    const isHealthCheck = pathname === '/health';
+    const isWriteOrSensitive =
+      req.method === 'POST' ||
+      pathname === '/api/audit-log' ||
+      pathname === '/api/sightings';
+    // Write and sensitive endpoints ALWAYS require auth (even if apiKeyRequired is false)
+    const requiresAuth = !isHealthCheck && (this.config.apiKeyRequired || isWriteOrSensitive);
+
+    if (requiresAuth) {
+      if (this.hashedApiKeys.length === 0) {
+        this.sendJson(res, 503, {
+          ok: false,
+          error: 'Server not configured with API keys. Set TC_API_KEYS environment variable.',
+        });
+        return;
+      }
+
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.startsWith('Bearer ')
         ? authHeader.slice(7)
@@ -188,8 +211,8 @@ export class ThreatCloudServer {
       }
     }
 
-    // Attach audit context to this request
-    const auditCtx = { actorHash: apiKeyHash, ipAddress: clientIP };
+    // Attach audit context to this request (anonymize client IP for privacy)
+    const auditCtx = { actorHash: apiKeyHash, ipAddress: this.anonymizeIP(clientIP) };
 
     try {
       // Route matching
@@ -571,7 +594,29 @@ export class ThreatCloudServer {
       return;
     }
 
+    // Validate ruleContent size and format
+    const MAX_RULE_CONTENT_SIZE = 65_536; // 64KB max
+    if (rule.ruleContent.length > MAX_RULE_CONTENT_SIZE) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: `ruleContent exceeds maximum size of ${MAX_RULE_CONTENT_SIZE} bytes`,
+      });
+      return;
+    }
+
+    // Basic Sigma YAML validation: must look like YAML (has title: or detection:)
+    const looksLikeYaml =
+      rule.ruleContent.includes('title:') || rule.ruleContent.includes('detection:');
+    if (!looksLikeYaml) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'ruleContent must be valid Sigma YAML (missing title: or detection:)',
+      });
+      return;
+    }
+
     rule.ruleId = this.sanitizeString(rule.ruleId, 200);
+    rule.ruleContent = this.sanitizeString(rule.ruleContent, MAX_RULE_CONTENT_SIZE);
     rule.source = this.sanitizeString(rule.source, 100);
     rule.publishedAt = rule.publishedAt || new Date().toISOString();
     this.db.upsertRule(rule);
@@ -627,7 +672,13 @@ export class ThreatCloudServer {
 
   private handleTimeSeries(url: string, res: ServerResponse): void {
     const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
-    const granularity = (params.get('granularity') as 'hour' | 'day' | 'week') || 'day';
+    const rawGranularity = params.get('granularity') ?? 'day';
+    const ALLOWED_GRANULARITIES = ['hour', 'day', 'week'] as const;
+    if (!ALLOWED_GRANULARITIES.includes(rawGranularity as typeof ALLOWED_GRANULARITIES[number])) {
+      this.sendJson(res, 400, { ok: false, error: 'granularity must be one of: hour, day, week' });
+      return;
+    }
+    const granularity = rawGranularity as 'hour' | 'day' | 'week';
     const result = this.queryHandlers.getTimeSeries(
       granularity,
       params.get('since') || undefined,
@@ -783,19 +834,28 @@ export class ThreatCloudServer {
   // Utility methods / 工具方法
   // -------------------------------------------------------------------------
 
-  /** Anonymize IP by zeroing last octet / 匿名化 IP */
+  /**
+   * Anonymize IP by zeroing last two octets (/16 for IPv4).
+   * GDPR-compliant: /16 masking prevents re-identification.
+   * 匿名化 IP（IPv4 遮蔽最後兩個八位元組，符合 GDPR）
+   */
   private anonymizeIP(ip: string): string {
     if (ip.includes('.')) {
       const parts = ip.split('.');
       if (parts.length === 4) {
+        parts[2] = '0';
         parts[3] = '0';
         return parts.join('.');
       }
     }
     if (ip.includes(':')) {
       const parts = ip.split(':');
-      parts[parts.length - 1] = '0';
-      return parts.join(':');
+      // Zero last two groups for IPv6
+      if (parts.length >= 2) {
+        parts[parts.length - 1] = '0';
+        parts[parts.length - 2] = '0';
+        return parts.join(':');
+      }
     }
     return ip;
   }

@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { useInView } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useInViewport } from '@/hooks/useInViewport';
 import { useTranslations } from 'next-intl';
 import {
   ShieldIcon,
@@ -13,10 +13,9 @@ import SectionWrapper from '../ui/SectionWrapper';
 import SectionTitle from '../ui/SectionTitle';
 import FadeInUp from '../FadeInUp';
 
-/* ─── Animated Counter ─── */
+/* --- Animated Counter --- */
 function Counter({ target, suffix = '' }: { target: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-50px' });
+  const [ref, inView] = useInViewport({ once: true, margin: '-50px' });
   const [val, setVal] = useState(0);
   useEffect(() => {
     if (!inView) return;
@@ -40,7 +39,7 @@ function Counter({ target, suffix = '' }: { target: number; suffix?: string }) {
 export default function WhyPanguard() {
   const t = useTranslations('home.whyPanguard');
 
-  /* ─── Stats Cards ─── */
+  /* --- Stats Cards --- */
   const stats = [
     {
       icon: ShieldIcon,
@@ -69,7 +68,7 @@ export default function WhyPanguard() {
     },
   ];
 
-  /* ─── Feature Cards ─── */
+  /* --- Feature Cards --- */
   const features = [
     {
       icon: ShieldIcon,
@@ -90,7 +89,7 @@ export default function WhyPanguard() {
 
   return (
     <>
-      {/* ── Problem + Stats ── */}
+      {/* -- Problem + Stats -- */}
       <SectionWrapper>
         <SectionTitle title={t('title')} subtitle={t('subtitle')} />
         <FadeInUp delay={0.1}>
@@ -114,7 +113,7 @@ export default function WhyPanguard() {
         </div>
       </SectionWrapper>
 
-      {/* ── Why Panguard ── */}
+      {/* -- Why Panguard -- */}
       <SectionWrapper dark>
         <SectionTitle title={t('whyTitle')} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-14">

@@ -395,7 +395,9 @@ describe('IoCStore', () => {
         .all(id) as Array<{ username: string; attempt_count: number }>;
 
       expect(creds.length).toBe(2);
-      expect(creds[0].username).toBe('root');
+      // Usernames are now hashed for privacy (SHA-256, 16 hex chars)
+      expect(creds[0].username).toHaveLength(16);
+      expect(creds[0].username).toMatch(/^[0-9a-f]{16}$/);
       expect(creds[0].attempt_count).toBe(50);
     });
 

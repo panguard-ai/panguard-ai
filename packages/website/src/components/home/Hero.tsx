@@ -1,11 +1,10 @@
 'use client';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
 import { Copy, Check, ArrowRight, CheckCircle } from 'lucide-react';
 import { Link } from '@/navigation';
 
-/* ─── Install Command (never translated) ─── */
+/* --- Install Command (never translated) --- */
 const installCmd = 'curl -fsSL https://get.panguard.ai | bash';
 
 function InstallBar() {
@@ -38,14 +37,14 @@ function InstallBar() {
   );
 }
 
-/* ═══════════════════════  Hero Component  ═══════════════════════ */
+/* ===========================  Hero Component  =========================== */
 
 export default function Hero() {
   const t = useTranslations('home.hero');
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* ── Background: pure CSS, no JS animation overhead ── */}
+      {/* -- Background: pure CSS, no JS animation overhead -- */}
 
       {/* Grid */}
       <div
@@ -63,26 +62,17 @@ export default function Hero() {
       {/* Scan line -- CSS animation */}
       <div className="absolute left-0 right-0 pointer-events-none hero-scanline" />
 
-      {/* ── Content ── */}
+      {/* -- Content -- */}
       <div className="relative z-10 text-center px-6 py-24 max-w-4xl mx-auto">
         {/* Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        >
+        <div className="hero-entrance" style={{ animationDelay: '0s' }}>
           <h1 className="text-[clamp(48px,8vw,96px)] font-extrabold leading-[1.05] tracking-tight text-text-primary">
             {t('title')}
           </h1>
-        </motion.div>
+        </div>
 
         {/* Subtitle */}
-        <motion.div
-          className="mt-6 max-w-xl mx-auto"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
+        <div className="mt-6 max-w-xl mx-auto hero-entrance" style={{ animationDelay: '0.2s' }}>
           <p className="text-xl lg:text-2xl text-text-secondary leading-relaxed">
             {t('subtitle1')}
           </p>
@@ -92,24 +82,17 @@ export default function Hero() {
           <p className="text-base lg:text-lg text-text-tertiary leading-relaxed mt-3 font-mono">
             {t('subtitle3')}
           </p>
-        </motion.div>
+        </div>
 
         {/* Install command */}
-        <motion.div
-          className="mt-10"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
+        <div className="mt-10 hero-entrance" style={{ animationDelay: '0.4s' }}>
           <InstallBar />
-        </motion.div>
+        </div>
 
         {/* Buttons */}
-        <motion.div
-          className="flex flex-wrap gap-3 justify-center mt-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.55 }}
+        <div
+          className="flex flex-wrap gap-3 justify-center mt-8 hero-entrance-fade"
+          style={{ animationDelay: '0.55s' }}
         >
           <Link
             href="/early-access"
@@ -125,16 +108,14 @@ export default function Hero() {
           >
             {t('github')}
           </a>
-        </motion.div>
+        </div>
 
         {/* Social proof badges */}
-        <motion.div
-          className="flex flex-wrap gap-3 justify-center mt-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.7 }}
+        <div
+          className="flex flex-wrap gap-3 justify-center mt-6 hero-entrance-fade"
+          style={{ animationDelay: '0.7s' }}
         >
-          {(['mit', 'tests', 'typescript', 'taiwan'] as const).map((key) => (
+          {(['mit', 'tests', 'taiwan'] as const).map((key) => (
             <span
               key={key}
               className="inline-flex items-center gap-1.5 text-xs text-text-tertiary bg-surface-1/50 border border-border/50 rounded-full px-3 py-1.5"
@@ -143,7 +124,7 @@ export default function Hero() {
               {t(`badges.${key}`)}
             </span>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* Bottom gradient fade */}

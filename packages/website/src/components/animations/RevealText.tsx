@@ -1,5 +1,5 @@
 'use client';
-import { motion } from 'framer-motion';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 export default function RevealText({
   text,
@@ -10,35 +10,20 @@ export default function RevealText({
   className?: string;
   delay?: number;
 }) {
+  const ref = useScrollReveal({ margin: '-60px' });
   const words = text.split(' ');
 
   return (
-    <motion.span
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: '-60px' }}
-      className={className}
-    >
+    <span ref={ref} className={`reveal-text-container ${className}`}>
       {words.map((word, i) => (
-        <motion.span
+        <span
           key={`${word}-${i}`}
-          className="inline-block mr-[0.3em]"
-          variants={{
-            hidden: { opacity: 0, y: 12 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: {
-                duration: 0.4,
-                delay: delay + i * 0.05,
-                ease: [0.25, 0.1, 0.25, 1.0],
-              },
-            },
-          }}
+          className="inline-block mr-[0.3em] reveal-word"
+          style={{ transitionDelay: `${delay + i * 0.05}s` }}
         >
           {word}
-        </motion.span>
+        </span>
       ))}
-    </motion.span>
+    </span>
   );
 }

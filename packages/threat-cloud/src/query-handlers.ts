@@ -30,17 +30,13 @@ export class QueryHandlers {
   ): TimeSeriesPoint[] {
     const sinceDate = since ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-    let format: string;
-    switch (granularity) {
-      case 'hour':
-        format = '%Y-%m-%dT%H:00:00Z';
-        break;
-      case 'week':
-        format = '%Y-W%W';
-        break;
-      default:
-        format = '%Y-%m-%d';
-    }
+    // Whitelist granularity → strftime format to prevent SQL injection
+    const GRANULARITY_FORMATS: Record<string, string> = {
+      hour: '%Y-%m-%dT%H:00:00Z',
+      week: '%Y-W%W',
+      day: '%Y-%m-%d',
+    };
+    const format = GRANULARITY_FORMATS[granularity] ?? GRANULARITY_FORMATS['day']!;
 
     const conditions = ['timestamp > ?'];
     const params: unknown[] = [sinceDate];

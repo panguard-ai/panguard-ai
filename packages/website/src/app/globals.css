@@ -440,3 +440,103 @@ body {
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent);
   -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent);
 }
+
+/* ─── Scroll-Reveal Animation System (replaces Framer Motion) ─── */
+
+/* Base: fade-up on scroll */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.animate-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Directional variants */
+.animate-on-scroll.from-down { transform: translateY(-24px); }
+.animate-on-scroll.from-left { transform: translateX(24px); }
+.animate-on-scroll.from-right { transform: translateX(-24px); }
+.animate-on-scroll.from-none { transform: none; opacity: 0; }
+
+.animate-on-scroll.from-down.is-visible,
+.animate-on-scroll.from-left.is-visible,
+.animate-on-scroll.from-right.is-visible,
+.animate-on-scroll.from-none.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stagger delay classes */
+.stagger-1 { transition-delay: 0.08s; }
+.stagger-2 { transition-delay: 0.16s; }
+.stagger-3 { transition-delay: 0.24s; }
+.stagger-4 { transition-delay: 0.32s; }
+.stagger-5 { transition-delay: 0.40s; }
+.stagger-6 { transition-delay: 0.48s; }
+.stagger-7 { transition-delay: 0.56s; }
+.stagger-8 { transition-delay: 0.64s; }
+.stagger-9 { transition-delay: 0.72s; }
+.stagger-10 { transition-delay: 0.80s; }
+.stagger-11 { transition-delay: 0.88s; }
+.stagger-12 { transition-delay: 0.96s; }
+
+/* Hero entrance keyframes (page-load, not scroll-triggered) */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.hero-entrance {
+  opacity: 0;
+  animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.hero-entrance-fade {
+  opacity: 0;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Tab content cross-fade */
+.tab-content-enter {
+  animation: tabFadeIn 0.2s ease-out forwards;
+}
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form state transition */
+.form-state-enter {
+  animation: formFadeIn 0.4s ease-out forwards;
+}
+@keyframes formFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reveal text word animation */
+.reveal-word {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.reveal-text-container.is-visible .reveal-word {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger group: children animate when parent is visible */
+.stagger-group > .animate-on-scroll {
+  transition-delay: calc(var(--stagger-index, 0) * 0.08s + 0.1s);
+}
+.stagger-group.is-visible > .animate-on-scroll {
+  opacity: 1;
+  transform: translateY(0);
+}
