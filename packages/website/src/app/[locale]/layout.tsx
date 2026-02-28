@@ -141,12 +141,22 @@ export default async function LocaleLayout({
     >
       <head>
         {/* Enable scroll-reveal animations only after JS is ready (prevents FOIC) */}
-        <script dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js-ready")' }} />
+        <script
+          dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js-ready")' }}
+        />
         {/* jsonLd is a static constant — never include user-supplied values */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* Plausible Analytics — privacy-friendly, no cookies, GDPR compliant */}
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <script
+            defer
+            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.js"
+          />
+        )}
       </head>
       <body className="font-sans antialiased">
         <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
