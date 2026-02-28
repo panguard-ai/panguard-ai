@@ -22,14 +22,25 @@ services:
       dockerfile: Dockerfile
     container_name: threat-cloud
     restart: unless-stopped
+    stop_grace_period: 30s
     environment:
       - TC_PORT=8080
       - TC_HOST=0.0.0.0
       - TC_DB_PATH=/data/threat-cloud.db
-      - TC_API_KEYS=${TC_API_KEYS:-}
+      - TC_API_KEYS=${TC_API_KEYS:?TC_API_KEYS is required}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-https://panguard.ai,https://www.panguard.ai}
+      - NODE_ENV=production
     volumes:
       - tc-data:/data
+      - tc-backups:/backups
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/health"]
       interval: 30s
@@ -44,6 +55,7 @@ services:
     image: caddy:2-alpine
     container_name: tc-caddy
     restart: unless-stopped
+    stop_grace_period: 15s
     ports:
       - "80:80"
       - "443:443"
@@ -51,6 +63,20 @@ services:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
     depends_on:
       tc:
         condition: service_healthy
@@ -72,6 +98,8 @@ services:
 
 volumes:
   tc-data:
+    driver: local
+  tc-backups:
     driver: local
   caddy-data:
     driver: local

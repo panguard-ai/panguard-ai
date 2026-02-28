@@ -8,6 +8,8 @@
  * @module @panguard-ai/threat-cloud/scheduler
  */
 
+import { existsSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
+import { join, basename } from 'node:path';
 import type Database from 'better-sqlite3';
 import { ReputationEngine } from './reputation-engine.js';
 import { CorrelationEngine } from './correlation-engine.js';
@@ -105,7 +107,7 @@ export class Scheduler {
   }
 
   /** Run data lifecycle cleanup */
-  runLifecycle(): { expired: number; purged: number; vacuumed: boolean } {
+  runLifecycle(): { expired: number; purged: number; vacuumed: boolean; auditPurged: number } {
     const expireCutoff = new Date(
       Date.now() - this.config.iocRetentionDays * 24 * 60 * 60 * 1000
     ).toISOString();
@@ -126,6 +128,13 @@ export class Scheduler {
       .prepare('DELETE FROM enriched_threats WHERE received_at < ? AND campaign_id IS NULL')
       .run(threatCutoff);
 
+    // Purge old audit log entries (180 days retention)
+    const auditCutoff = new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString();
+    const auditResult = this.db
+      .prepare('DELETE FROM audit_log WHERE created_at < ?')
+      .run(auditCutoff);
+    const auditPurged = auditResult.changes;
+
     // WAL checkpoint
     let vacuumed = false;
     try {
@@ -135,6 +144,36 @@ export class Scheduler {
       /* ignore checkpoint errors */
     }
 
-    return { expired, purged, vacuumed };
+    return { expired, purged, vacuumed, auditPurged };
+  }
+
+  /** Run database backup / 執行資料庫備份 */
+  runBackup(backupDir: string, maxBackups = 30): string | null {
+    try {
+      if (!existsSync(backupDir)) {
+        mkdirSync(backupDir, { recursive: true });
+      }
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const dest = join(backupDir, `threat-cloud-${timestamp}.db`);
+      this.db.exec(`VACUUM INTO '${dest.replace(/'/g, "''")}'`);
+
+      // Rotate: remove oldest backups beyond maxBackups
+      const backups = readdirSync(backupDir)
+        .filter((f) => f.startsWith('threat-cloud-') && f.endsWith('.db'))
+        .sort();
+      while (backups.length > maxBackups) {
+        const oldest = backups.shift();
+        if (oldest) {
+          try {
+            unlinkSync(join(backupDir, oldest));
+          } catch {
+            /* best effort */
+          }
+        }
+      }
+      return dest;
+    } catch {
+      return null;
+    }
   }
 }

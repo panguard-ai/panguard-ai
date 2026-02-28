@@ -9,7 +9,10 @@
 
 {$TC_DOMAIN:tc.panguard.ai} {
 	# Reverse proxy to Threat Cloud API
-	reverse_proxy tc:8080
+	reverse_proxy tc:8080 {
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
+	}
 
 	# Security headers
 	header {
@@ -17,7 +20,19 @@
 		X-Frame-Options "DENY"
 		X-XSS-Protection "1; mode=block"
 		Referrer-Policy "strict-origin-when-cross-origin"
+		Content-Security-Policy "default-src 'none'; frame-ancestors 'none'"
+		Permissions-Policy "geolocation=(), microphone=(), camera=(), usb=()"
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
 		-Server
+	}
+
+	# Rate limiting (global: 60 req/s burst 120)
+	rate_limit {
+		zone global {
+			key {remote_host}
+			events 60
+			window 1s
+		}
 	}
 
 	# Access log

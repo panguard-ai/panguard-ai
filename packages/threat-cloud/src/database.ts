@@ -28,9 +28,19 @@ export class ThreatCloudDB {
     this.db = new Database(dbPath);
     this.db.pragma('journal_mode = WAL');
     this.db.pragma('foreign_keys = ON');
-    this.db.pragma('busy_timeout = 5000');
+    this.db.pragma('busy_timeout = 15000');
+    this.db.pragma('synchronous = NORMAL');
+    this.db.pragma('cache_size = -64000');
+    this.db.pragma('temp_store = MEMORY');
+    this.db.pragma('wal_autocheckpoint = 1000');
+    this.db.pragma('journal_size_limit = 104857600');
     this.initialize();
     this.runMigrations();
+  }
+
+  /** Create a backup of the database / 建立資料庫備份 */
+  backup(destPath: string): void {
+    this.db.backup(destPath);
   }
 
   /** Expose underlying db for sub-modules (IoCStore, etc.) / 暴露底層 DB 給子模組 */

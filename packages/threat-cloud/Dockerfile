@@ -41,11 +41,12 @@ COPY --from=builder /build/node_modules ./node_modules
 COPY --from=builder /build/package.json ./
 COPY --from=builder /build/scripts ./scripts
 
-# Data directory
-RUN mkdir -p /data && chown panguard:panguard /data
+# Data + backup directories
+RUN mkdir -p /data /backups && chown panguard:panguard /data /backups
 
 ENV NODE_ENV=production
 ENV TC_DB_PATH=/data/threat-cloud.db
+ENV TC_BACKUP_DIR=/backups
 ENV TC_PORT=8080
 ENV TC_HOST=0.0.0.0
 
@@ -57,4 +58,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://127.0.0.1:${TC_PORT}/health || exit 1
 
 ENTRYPOINT ["tini", "--"]
-CMD ["node", "dist/cli.js", "--port", "8080", "--host", "0.0.0.0", "--db", "/data/threat-cloud.db"]
+CMD ["node", "dist/cli.js", "--port", "8080", "--host", "0.0.0.0", "--db", "/data/threat-cloud.db", "--backup-dir", "/backups"]

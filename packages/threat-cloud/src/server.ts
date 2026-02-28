@@ -99,14 +99,23 @@ export class ThreatCloudServer {
     });
   }
 
-  /** Stop the server / 停止伺服器 */
+  /** Stop the server gracefully / 優雅停止伺服器 */
   async stop(): Promise<void> {
     this.scheduler.stop();
     return new Promise((resolve) => {
-      this.db.close();
       if (this.server) {
-        this.server.close(() => resolve());
+        // Stop accepting new connections, wait for in-flight requests
+        this.server.close(() => {
+          this.db.close();
+          resolve();
+        });
+        // Force close after 25s if requests haven't drained
+        setTimeout(() => {
+          this.db.close();
+          resolve();
+        }, 25_000);
       } else {
+        this.db.close();
         resolve();
       }
     });
@@ -120,6 +129,11 @@ export class ThreatCloudServer {
   /** Expose IoC store for testing / 暴露 IoCStore 供測試使用 */
   getIoCStore(): IoCStore {
     return this.iocStore;
+  }
+
+  /** Expose scheduler for backup management / 暴露排程器供備份管理 */
+  getScheduler(): Scheduler {
+    return this.scheduler;
   }
 
   private async handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -190,7 +204,7 @@ export class ThreatCloudServer {
       process.env['CORS_ALLOWED_ORIGINS'] ?? 'https://panguard.ai,https://www.panguard.ai'
     ).split(',');
     const origin = req.headers.origin ?? '';
-    if (allowedOrigins.includes(origin)) {
+    if (origin && allowedOrigins.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin);
     }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -881,6 +895,12 @@ export class ThreatCloudServer {
     const entry = this.rateLimits.get(key);
     if (!entry || now > entry.resetAt) {
       this.rateLimits.set(key, { count: 1, resetAt: now + 60_000 });
+      // Periodic cleanup: remove expired entries every ~500 checks
+      if (this.rateLimits.size > 500) {
+        for (const [k, v] of this.rateLimits) {
+          if (now > v.resetAt) this.rateLimits.delete(k);
+        }
+      }
       return true;
     }
     entry.count++;
@@ -902,10 +922,14 @@ export class ThreatCloudServer {
     return false;
   }
 
-  /** Validate ISO timestamp / 驗證 ISO 時間戳格式 */
+  /** Validate ISO timestamp with reasonable bounds / 驗證 ISO 時間戳格式 */
   private isValidTimestamp(ts: string): boolean {
     const d = new Date(ts);
-    return !isNaN(d.getTime());
+    if (isNaN(d.getTime())) return false;
+    const now = Date.now();
+    const oneHourAhead = now + 3_600_000;
+    const oneYearAgo = now - 365 * 24 * 3_600_000;
+    return d.getTime() >= oneYearAgo && d.getTime() <= oneHourAhead;
   }
 
   /** Sanitize string input: truncate and strip control characters / 清理字串輸入 */
