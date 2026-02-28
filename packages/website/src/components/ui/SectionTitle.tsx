@@ -17,9 +17,12 @@ export default function SectionTitle({
   return (
     <FadeInUp className={`max-w-2xl ${align}`}>
       {overline && (
-        <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
-          {overline}
-        </p>
+        <div className={`mb-4 ${center ? 'flex flex-col items-center' : ''}`}>
+          <div className="w-8 h-[2px] bg-brand-sage rounded-full mb-3" />
+          <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold">
+            {overline}
+          </p>
+        </div>
       )}
       <h2
         className={`text-[clamp(36px,4vw,48px)] text-text-primary leading-[1.1] ${
