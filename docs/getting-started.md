@@ -53,7 +53,7 @@ Scan 方案即可開始使用。合規報告為獨立加價購，任何付費方
 ### 一行指令安裝（推薦）
 
 ```bash
-curl -fsSL https://get.panguard.ai | sh
+curl -fsSL https://get.panguard.ai | bash
 ```
 
 ### 使用 npm

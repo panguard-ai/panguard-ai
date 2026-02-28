@@ -89,7 +89,7 @@ export default function ThreeSteps() {
                 )}
                 {activeTab === 'developer' && (
                   <div className="space-y-2 text-text-secondary">
-                    <p className="text-brand-sage">$ curl -fsSL https://get.panguard.ai | sh</p>
+                    <p className="text-brand-sage">$ curl -fsSL https://get.panguard.ai | bash</p>
                     <p className="text-[#2ED573]">Installed in 12s</p>
                     <p className="text-brand-sage mt-2">$ panguard scan --deep</p>
                     <p>Scanning... 5 issues found</p>

@@ -143,10 +143,10 @@ if (-not (Test-Path $BinDir)) {
 }
 
 $wrapperPath = Join-Path $BinDir "panguard.cmd"
-$binSource = Join-Path $InstallDir "bin\panguard"
+$jsEntry = Join-Path $InstallDir "packages\panguard\dist\cli\index.js"
 @"
 @echo off
-node "$binSource" %*
+node "$jsEntry" %*
 "@ | Set-Content -Path $wrapperPath -Encoding ASCII
 
 # Add to user PATH if not already present

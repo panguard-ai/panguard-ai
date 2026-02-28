@@ -312,7 +312,7 @@ curl -H "Authorization: Bearer your-api-key" \
 
 ```bash
 # 如果用一行指令安裝
-curl -fsSL https://get.panguard.ai | sh
+curl -fsSL https://get.panguard.ai | bash
 
 # 如果從原始碼安裝
 git pull

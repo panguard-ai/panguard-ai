@@ -101,7 +101,7 @@ export function generateHero(
     ? '一行指令安裝，AI 全自動保護你的機器。有事它會告訴你，沒事你什麼都不用做。'
     : 'One command to install. AI protects your machines automatically. It tells you when something happens. You do nothing when all is well.';
   const ctaText = isZh ? '免費掃描你的系統' : 'Scan Your System Free';
-  const installCmd = 'curl -fsSL https://get.panguard.ai | sh';
+  const installCmd = 'curl -fsSL https://get.panguard.ai | bash';
 
   return `<section class="hero">
   <h1>${headline}</h1>
