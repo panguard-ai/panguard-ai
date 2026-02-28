@@ -93,13 +93,13 @@ export default function FinalCTA() {
         {/* Trust badges */}
         <FadeInUp delay={0.4}>
           <div className="flex flex-wrap justify-center gap-3 mt-8">
-            {['MIT Open Source', '1,107 Tests Passing', 'Built in Taiwan'].map((badge) => (
+            {(['badge1', 'badge2', 'badge3'] as const).map((key) => (
               <span
-                key={badge}
+                key={key}
                 className="flex items-center gap-2 text-xs text-text-tertiary bg-surface-2 border border-border rounded-full px-3 py-1.5"
               >
                 <CheckIcon className="w-3 h-3 text-brand-sage" />
-                {badge}
+                {t(key)}
               </span>
             ))}
           </div>

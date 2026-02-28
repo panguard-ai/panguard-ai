@@ -1,15 +1,15 @@
 'use client';
-import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 type Direction = 'up' | 'down' | 'left' | 'right' | 'none';
 
-const offsets: Record<Direction, { x: number; y: number }> = {
-  up: { x: 0, y: 24 },
-  down: { x: 0, y: -24 },
-  left: { x: 24, y: 0 },
-  right: { x: -24, y: 0 },
-  none: { x: 0, y: 0 },
+const directionClasses: Record<Direction, string> = {
+  up: '',
+  down: 'from-down',
+  left: 'from-left',
+  right: 'from-right',
+  none: 'from-none',
 };
 
 export default function FadeIn({
@@ -25,16 +25,19 @@ export default function FadeIn({
   duration?: number;
   className?: string;
 }) {
-  const offset = offsets[direction];
+  const ref = useScrollReveal();
+  const dirClass = directionClasses[direction];
+
   return (
-    <motion.div
-      initial={{ opacity: 0, x: offset.x, y: offset.y }}
-      whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration, delay, ease: [0.25, 0.1, 0.25, 1.0] }}
-      className={className}
+    <div
+      ref={ref}
+      className={`animate-on-scroll ${dirClass} ${className}`}
+      style={{
+        ...(delay > 0 ? { transitionDelay: `${delay}s` } : {}),
+        ...(duration !== 0.6 ? { transitionDuration: `${duration}s` } : {}),
+      }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
