@@ -3,12 +3,11 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Copy, Check, ArrowRight, CheckCircle } from 'lucide-react';
 import { Link } from '@/navigation';
-
-/* --- Install Command (never translated) --- */
-const installCmd = 'curl -fsSL https://get.panguard.ai | bash';
+import { useOS } from '@/hooks/useOS';
 
 function InstallBar() {
   const t = useTranslations('home.hero');
+  const { installCmd, prompt } = useOS();
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
     navigator.clipboard.writeText(installCmd);
@@ -18,7 +17,7 @@ function InstallBar() {
   return (
     <div className="max-w-md mx-auto">
       <div className="relative flex items-center gap-3 bg-surface-1/80 backdrop-blur-sm border border-border rounded-xl px-5 py-3.5 font-mono text-sm">
-        <span className="text-brand-sage select-none">$</span>
+        <span className="text-brand-sage select-none">{prompt}</span>
         <code className="text-text-secondary flex-1 select-all truncate">{installCmd}</code>
         <button
           onClick={handleCopy}
