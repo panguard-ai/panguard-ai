@@ -517,6 +517,9 @@
       "funnel3": { "percent": "3%", "title": "雲端 AI", "desc": "動態推理", "tooltip": "Claude Haiku，每次分析約 $0.008。只在本地規則和本地 AI 無法判斷時才調用。" },
       "collectiveTitle": "一個人被攻擊，所有人學會防禦。",
       "collectiveDesc": "每個 Panguard 實例都會分享匿名化的威脅情報。當一個用戶偵測到新攻擊，所有用戶都受到保護。網路隨著每次部署變得更聰明。",
+      "step1": "偵測威脅",
+      "step2": "產生規則",
+      "step3": "全網分發",
       "closing": "安裝一次，永遠受保護。"
     },
     "the3amStory": {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Shield, EyeOff, Share2 } from 'lucide-react';
+import { Search, Zap, Globe } from 'lucide-react';
 import SectionWrapper from '../ui/SectionWrapper';
 import FadeInUp from '../FadeInUp';
 import { useInViewport } from '@/hooks/useInViewport';
@@ -29,7 +29,7 @@ function FunnelBars() {
                 {t(`${item.key}.desc`)}
               </span>
             </div>
-            <span className="text-lg font-extrabold text-brand-sage">
+            <span className="text-lg font-extrabold text-brand-sage whitespace-nowrap shrink-0 ml-4">
               {t(`${item.key}.percent`)}
             </span>
           </div>
@@ -55,9 +55,9 @@ function ThreatCloudFlow() {
   const t = useTranslations('home.theShift');
 
   const steps = [
-    { icon: Shield, label: 'Detect' },
-    { icon: EyeOff, label: 'Anonymize' },
-    { icon: Share2, label: 'Share' },
+    { icon: Search, key: 'step1' as const },
+    { icon: Zap, key: 'step2' as const },
+    { icon: Globe, key: 'step3' as const },
   ];
 
   return (
@@ -68,13 +68,13 @@ function ThreatCloudFlow() {
       {/* Flow diagram */}
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0">
         {steps.map((step, i) => (
-          <div key={step.label} className="flex flex-col md:flex-row items-center">
+          <div key={step.key} className="flex flex-col md:flex-row items-center">
             {/* Node */}
             <div className="flex flex-col items-center gap-2">
               <div className="w-16 h-16 rounded-full bg-brand-sage/10 border-2 border-brand-sage/30 flex items-center justify-center">
                 <step.icon className="w-7 h-7 text-brand-sage" />
               </div>
-              <span className="text-sm font-semibold text-text-primary">{step.label}</span>
+              <span className="text-sm font-semibold text-text-primary">{t(step.key)}</span>
             </div>
 
             {/* Connector (not after last) */}
