@@ -540,3 +540,47 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ─── Chinese Typography ─── */
+
+:lang(zh) {
+  word-break: break-all;
+  font-feature-settings: "palt";
+}
+
+:lang(zh) p,
+:lang(zh) li,
+:lang(zh) dd {
+  line-height: 1.8;
+}
+
+:lang(zh) h1,
+:lang(zh) h2,
+:lang(zh) h3,
+:lang(zh) h4 {
+  letter-spacing: 0.02em;
+}
+
+/* ─── Pulse Danger Animation ─── */
+
+@keyframes pulse-danger {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; text-shadow: 0 0 12px rgba(220, 38, 38, 0.3); }
+}
+.animate-pulse-danger {
+  animation: pulse-danger 2.5s ease-in-out infinite;
+}
+
+/* ─── Pricing Card Glow Pulse ─── */
+
+.card-glow-pulse {
+  animation: card-glow-breathe 3s ease-in-out infinite;
+}
+@keyframes card-glow-breathe {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(139,154,142,0.15), 0 4px 24px rgba(139,154,142,0.06);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(139,154,142,0.35), 0 8px 40px rgba(139,154,142,0.15);
+  }
+}

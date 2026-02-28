@@ -17,6 +17,8 @@ import {
   sendExpirationWarningEmail,
   initErrorTracking,
   captureRequestError,
+  generateOpenApiSpec,
+  generateSwaggerHtml,
 } from '@panguard-ai/panguard-auth';
 import type {
   AuthRouteConfig,
@@ -83,7 +85,10 @@ export function serveCommand(): Command {
             apiKey: process.env['LEMON_SQUEEZY_API_KEY'],
             storeId: process.env['LEMON_SQUEEZY_STORE_ID'] ?? '',
             webhookSecret: process.env['LEMON_SQUEEZY_WEBHOOK_SECRET'] ?? '',
-            variantTierMap: JSON.parse(process.env['LEMON_SQUEEZY_VARIANT_MAP'] ?? '{}') as Record<string, string>,
+            variantTierMap: JSON.parse(process.env['LEMON_SQUEEZY_VARIANT_MAP'] ?? '{}') as Record<
+              string,
+              string
+            >,
           }
         : undefined;
 
@@ -122,6 +127,8 @@ export function serveCommand(): Command {
             `    ${c.dim('/admin')}          ${c.caution('Not found')} (packages/admin/ missing)`
           );
         }
+        console.log(`    ${c.dim('/docs/api')}        API Documentation (Swagger UI)`);
+        console.log(`    ${c.dim('/openapi.json')}    OpenAPI 3.0 Spec`);
         console.log(`    ${c.dim('/health')}         Health check`);
         console.log('');
       });
@@ -206,6 +213,24 @@ async function handleRequest(
   }
 
   try {
+    // OpenAPI spec (JSON)
+    if (pathname === '/openapi.json') {
+      const spec = generateOpenApiSpec(
+        process.env['PANGUARD_BASE_URL'] ?? `http://${req.headers.host ?? 'localhost'}`
+      );
+      sendJson(res, 200, spec);
+      return;
+    }
+
+    // Swagger UI
+    if (pathname === '/docs/api' || pathname === '/docs/api/') {
+      const specUrl = '/openapi.json';
+      const html = generateSwaggerHtml(specUrl);
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(html);
+      return;
+    }
+
     // Health check
     if (pathname === '/health') {
       sendJson(res, 200, { ok: true, data: { status: 'healthy', uptime: process.uptime() } });
