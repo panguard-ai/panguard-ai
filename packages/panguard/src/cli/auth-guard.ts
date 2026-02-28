@@ -31,13 +31,13 @@ export interface AuthCheckResult {
 export const FEATURE_TIER: Record<string, Tier> = {
   setup: 'free',
   scan: 'free',
-  report: 'pro',
   guard: 'free',
-  trap: 'pro',
+  'threat-cloud': 'free',
+  demo: 'free',
   notifications: 'solo',
   notify: 'solo',
-  'threat-cloud': 'enterprise',
-  demo: 'free',
+  trap: 'solo',
+  report: 'business',
 };
 
 /**
@@ -138,15 +138,15 @@ export function withAuth<T>(
  * Tier badge string for display in menus.
  */
 export function tierBadge(tier: RequiredTier): string {
-  if (tier === 'free') return '';
+  if (tier === 'free' || tier === 'community') return '';
   const names: Record<string, string> = {
     solo: '[SOLO]',
     pro: '[PRO]',
-    enterprise: '[ENT]',
+    business: '[BIZ]',
     // legacy
-    starter: '[PRO]',
+    enterprise: '[BIZ]',
+    starter: '[SOLO]',
     team: '[PRO]',
-    business: '[PRO]',
   };
   return c.dim(names[tier] ?? '');
 }
@@ -257,73 +257,49 @@ export function showUpgradePrompt(feature: string, lang: string = 'en'): void {
   const tierName = tierDisplayName(tier);
   const userTierName = tierDisplayName(userTier);
   const pricing = PRICING_TIERS[tier];
-  const priceStr = pricing
-    ? pricing.price === 'custom'
-      ? lang === 'zh-TW'
-        ? '\u5BA2\u88FD\u5316\u5831\u50F9'
-        : 'Custom pricing'
-      : `$${pricing.price}${pricing.unit}`
-    : '';
+  const priceStr = pricing && pricing.price > 0 ? `$${pricing.price}${pricing.unit}` : '';
+  const machinesStr = pricing ? pricing.machines : '';
   const featureName =
     FEATURE_DISPLAY[feature]?.[lang] ?? FEATURE_DISPLAY[feature]?.['en'] ?? feature;
-
-  // Minimalist upgrade prompt with brand-colored border
-  const W = 53;
-  const H = '\u2500'; // ─
-  const TL = '\u250C'; // ┌
-  const TR = '\u2510'; // ┐
-  const BL = '\u2514'; // └
-  const BR = '\u2518'; // ┘
-  const V = '\u2502'; // │
-
-  const pad = (s: string, w: number) => {
-    // eslint-disable-next-line no-control-regex
-    const len = s.replace(/\x1b\[[0-9;]*m/g, '').length;
-    return s + ' '.repeat(Math.max(0, w - len));
-  };
 
   const lines: string[] =
     lang === 'zh-TW'
       ? [
-          `  \uD83D\uDD12  \u300C${featureName}\u300D\u9700\u8981 ${tierName} \u65B9\u6848`,
-          priceStr ? `      ${priceStr}` : '',
+          `\u300C${featureName}\u300D\u9700\u8981 ${tierName} \u65B9\u6848`,
+          priceStr ? `${priceStr} | ${machinesStr} \u53F0\u6A5F\u5668` : '',
           '',
-          `  \u76EE\u524D\u65B9\u6848:  ${c.sage(userTierName)}`,
-          `  \u9700\u8981\u65B9\u6848:  ${c.sage(tierName)}`,
+          `\u76EE\u524D\u65B9\u6848:  ${c.sage(userTierName)}`,
+          `\u9700\u8981\u65B9\u6848:  ${c.sage(tierName)}`,
           '',
-          `  \u2192 ${c.underline('https://panguard.ai/pricing')}`,
-          `  \u2192 ${c.sage('panguard activate <license-key>')}`,
+          `\u2192 ${c.underline('https://panguard.ai/pricing')}`,
+          `\u2192 ${c.sage('panguard activate <license-key>')}`,
           '',
           c.dim(
-            '  \u6240\u6709\u4ED8\u8CBB\u65B9\u6848\u4EAB 30 \u5929\u514D\u8CBB\u8A66\u7528\u3002'
+            '\u6240\u6709\u4ED8\u8CBB\u65B9\u6848\u4EAB 30 \u5929\u514D\u8CBB\u8A66\u7528\u3002'
           ),
         ]
       : [
-          `  \uD83D\uDD12  ${featureName} requires ${tierName} plan`,
-          priceStr ? `      ${priceStr}` : '',
+          `${featureName} requires ${tierName} plan`,
+          priceStr ? `${priceStr} | ${machinesStr} machine(s)` : '',
           '',
-          `  Current:   ${c.sage(userTierName)}`,
-          `  Required:  ${c.sage(tierName)}`,
+          `Current:   ${c.sage(userTierName)}`,
+          `Required:  ${c.sage(tierName)}`,
           '',
-          `  \u2192 ${c.underline('https://panguard.ai/pricing')}`,
-          `  \u2192 ${c.sage('panguard activate <license-key>')}`,
+          `\u2192 ${c.underline('https://panguard.ai/pricing')}`,
+          `\u2192 ${c.sage('panguard activate <license-key>')}`,
           '',
-          c.dim('  All paid plans include 30-day free trial.'),
+          c.dim('All paid plans include 30-day free trial.'),
         ];
 
-  // Filter empty lines only if priceStr is empty
-  const content = lines.filter((l) => l !== '' || priceStr !== '');
+  const content = lines.filter((l) => l !== '');
 
   console.log('');
-  console.log(`  ${c.sage(TL + H.repeat(W) + TR)}`);
-  for (const line of content) {
-    if (line === '') {
-      console.log(`  ${c.sage(V)}${' '.repeat(W)}${c.sage(V)}`);
-    } else {
-      console.log(`  ${c.sage(V)}${pad(line, W)}${c.sage(V)}`);
-    }
-  }
-  console.log(`  ${c.sage(BL + H.repeat(W) + BR)}`);
+  console.log(
+    box(content.join('\n'), {
+      borderColor: c.sage,
+      title: lang === 'zh-TW' ? '\u9700\u8981\u5347\u7D1A' : 'Upgrade Required',
+    })
+  );
   console.log('');
 }
 
@@ -332,35 +308,20 @@ export function showUpgradePrompt(feature: string, lang: string = 'en'): void {
  * Used after scan results when fixable issues are found.
  */
 export function showScanUpgradeHint(fixableCount: number, lang: string = 'en'): void {
-  const W = 49;
-  const TL = '\u250C';
-  const TR = '\u2510';
-  const BL = '\u2514';
-  const BR = '\u2518';
-  const H = '\u2500';
-  const V = '\u2502';
+  const lines =
+    lang === 'zh-TW'
+      ? [
+          `\u767C\u73FE ${fixableCount} \u500B\u53EF\u81EA\u52D5\u4FEE\u5FA9\u7684\u554F\u984C\u3002`,
+          `\u5347\u7D1A\u5230 Solo ($9/\u6708) \u5373\u53EF\u4E00\u9375\u4FEE\u5FA9\uFF1A`,
+          `$ panguard scan --fix`,
+        ]
+      : [
+          `${fixableCount} issue(s) can be auto-fixed.`,
+          `Upgrade to Solo ($9/mo) for one-click fix:`,
+          `$ panguard scan --fix`,
+        ];
   console.log('');
-  console.log(`  ${c.sage(TL + H.repeat(W) + TR)}`);
-  if (lang === 'zh-TW') {
-    const l1 = `  \u26A1 \u767C\u73FE ${fixableCount} \u500B\u53EF\u81EA\u52D5\u4FEE\u5FA9\u7684\u554F\u984C\u3002`;
-    const l2 = `     \u5347\u7D1A\u5230 Solo ($9/\u6708) \u5373\u53EF\u4E00\u9375\u4FEE\u5FA9\uFF1A`;
-    const l3 = `     $ panguard scan --fix`;
-    for (const l of [l1, l2, l3]) {
-      // eslint-disable-next-line no-control-regex
-      const vLen = l.replace(/\x1b\[[0-9;]*m/g, '').length;
-      console.log(`  ${c.sage(V)}${l}${' '.repeat(Math.max(0, W - vLen))}${c.sage(V)}`);
-    }
-  } else {
-    const l1 = `  \u26A1 ${fixableCount} issue(s) can be auto-fixed.`;
-    const l2 = `     Upgrade to Solo ($9/mo) for one-click fix:`;
-    const l3 = `     $ panguard scan --fix`;
-    for (const l of [l1, l2, l3]) {
-      // eslint-disable-next-line no-control-regex
-      const vLen = l.replace(/\x1b\[[0-9;]*m/g, '').length;
-      console.log(`  ${c.sage(V)}${l}${' '.repeat(Math.max(0, W - vLen))}${c.sage(V)}`);
-    }
-  }
-  console.log(`  ${c.sage(BL + H.repeat(W) + BR)}`);
+  console.log(box(lines.join('\n'), { borderColor: c.sage }));
 }
 
 /**
@@ -397,17 +358,45 @@ export function showGuardAIHint(threatType: string, confidence: number, lang: st
 
 /* ── Pricing Constants ── */
 
-export const PRICING_TIERS: Record<
-  string,
-  { price: number | 'custom'; unit: string; endpoints: string }
-> = {
-  free: { price: 0, unit: '', endpoints: '1 endpoint' },
-  solo: { price: 9, unit: '/mo', endpoints: '1 endpoint' },
-  pro: { price: 19, unit: '/endpoint/mo', endpoints: 'Up to 50 endpoints' },
-  enterprise: { price: 'custom', unit: '', endpoints: 'Unlimited' },
+export const PRICING_TIERS: Record<string, { price: number; unit: string; machines: string }> = {
+  free: { price: 0, unit: '', machines: '1' },
+  community: { price: 0, unit: '', machines: '1' },
+  solo: { price: 9, unit: '/mo', machines: '3' },
+  pro: { price: 29, unit: '/mo', machines: '10' },
+  business: { price: 79, unit: '/mo', machines: '25' },
 };
 
-export const COMPLIANCE_PRICING = {
-  assessment: { price: 499, originalPrice: 999, unit: 'one-time' },
-  monitoring: { price: 99, originalPrice: 199, unit: '/mo' },
-} as const;
+export const COMPLIANCE_PRICING: Record<
+  string,
+  { price: number; unit: string; name: Record<string, string> }
+> = {
+  tw_cyber_security: {
+    price: 299,
+    unit: 'one-time',
+    name: {
+      en: 'TW Cyber Security Act',
+      'zh-TW': '\u8CC7\u5B89\u6CD5\u6E96\u5099\u5EA6\u8A55\u4F30',
+    },
+  },
+  iso27001: {
+    price: 499,
+    unit: 'one-time',
+    name: { en: 'ISO 27001 Readiness', 'zh-TW': 'ISO 27001 \u6E96\u5099\u5EA6\u8A55\u4F30' },
+  },
+  soc2: {
+    price: 699,
+    unit: 'one-time',
+    name: { en: 'SOC 2 Readiness', 'zh-TW': 'SOC 2 \u6E96\u5099\u5EA6\u8A55\u4F30' },
+  },
+  bundle: {
+    price: 999,
+    unit: 'one-time',
+    name: {
+      en: 'Compliance Bundle (All 3)',
+      'zh-TW': '\u5408\u898F\u7D44\u5408\u5305 (3 \u9805\u5168\u542B)',
+    },
+  },
+};
+
+/** Business subscribers get 50% off additional reports */
+export const BUSINESS_REPORT_DISCOUNT = 0.5;

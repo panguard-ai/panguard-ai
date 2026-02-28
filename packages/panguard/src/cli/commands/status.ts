@@ -18,6 +18,7 @@ import {
   table,
   timeAgo,
   header,
+  scoreToGrade,
 } from '@panguard-ai/core';
 import type { StatusItem, TableColumn } from '@panguard-ai/core';
 import { readConfig } from '../../init/config-writer.js';
@@ -297,10 +298,5 @@ function collectStatus(config: ReturnType<typeof readConfig>): SystemStatus {
   };
 }
 
-function scoreToGrade(score: number): string {
-  if (score >= 90) return 'A';
-  if (score >= 80) return 'B';
-  if (score >= 70) return 'C';
-  if (score >= 60) return 'D';
-  return 'F';
-}
+// scoreToGrade imported from @panguard-ai/core
+// Uses canonical thresholds: A>=90, B>=75, C>=60, D>=40, F<40
