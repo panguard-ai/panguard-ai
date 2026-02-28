@@ -134,10 +134,12 @@
   },
   "home": {
     "hero": {
-      "title": "See threats. Respond automatically. Deploy in one line.",
-      "subtitle1": "開源 AI 資安平台",
-      "subtitle2": "為沒有資安團隊的團隊打造。",
-      "subtitle3": "一行指令安裝。AI 負責其餘一切。",
+      "eyebrow": "AI 時代的資安防護。",
+      "title": "企業級資安防護，從來不是為你打造的。",
+      "titleLine2": "我們來改變這件事。",
+      "subtitle1": "Panguard 是開源 AI 資安平台。無論你是獨立開發者、成長中的新創，還是百人企業——都能擁有過去只有大型組織才負擔得起的防護能力。",
+      "subtitle2": "一行指令安裝。四個 AI Agent 自主偵測、分析、回應威脅，一秒內完成。",
+      "subtitle3": "不需要資安團隊。不需要六位數合約。安裝即防護。",
       "getStarted": "免費掃描伺服器",
       "github": "GitHub",
       "copied": "已複製！",
@@ -184,8 +186,8 @@
       "stat3Label": "蜜罐協定",
       "stat4": "1,107",
       "stat4Label": "測試通過",
-      "stat5": "5",
-      "stat5Label": "AI Agent",
+      "stat5": "4+1",
+      "stat5Label": "AI Agent + 調查引擎",
       "stat6": "3",
       "stat6Label": "AI 分析層",
       "stat7": "6",
@@ -282,7 +284,7 @@
       },
       "pipeline": {
         "title": "AI 分析管線",
-        "subtitle": "5 個專業 Agent",
+        "subtitle": "4 個專業 Agent + 調查引擎",
         "agents": ["偵測 Agent", "分析 Agent", "回應 Agent", "報告 Agent", "對話 Agent"],
         "desc": "每個 Agent 專注一件事。協同運作，自動決策。"
       },
@@ -329,28 +331,28 @@
       "title": "他們為什麼用 Panguard。",
       "cases": {
         "saas": {
-          "persona": "SaaS 新創",
-          "quote": "大客戶要我們提供 SOC 2 報告。請顧問要 $20,000 和六個月。Panguard：$499，60 秒。",
-          "used": "Scan + Report",
-          "saved": "省了 $19,500 和 6 個月"
+          "persona": "SaaS 新創，12 人團隊",
+          "quote": "最大的客戶寄來一份 200 題的資安問卷。我們慌了。顧問公司報價兩萬美金、要六個月。我們用 Panguard Scan 跑了 60 秒，產出 ISO 27001 差距分析，寄回一份 40 頁的 PDF 附證據包。客戶當週就簽約了。",
+          "used": "Scan + Report（NT$14,970）",
+          "saved": "拿下價值 $180K ARR 的合約"
         },
         "ecommerce": {
-          "persona": "電商公司",
-          "quote": "客戶問我們網站安全嗎，我不知道怎麼回答。",
-          "used": "Scan（免費）",
-          "saved": "花了：$0"
+          "persona": "電商公司，一人創辦",
+          "quote": "凌晨兩點，Panguard Guard 偵測到三個不同 IP 的 SSH 暴力攻擊。它自動封鎖了全部三個 IP、透過 LINE 通知我，AI 代理用白話解釋了發生什麼事。我吃早餐時才看到。以前的話，要等到客戶投訴才會發現。",
+          "used": "Guard + Chat（NT$270/月）",
+          "saved": "安裝後零停機事件"
         },
         "taiwan": {
-          "persona": "台灣軟體公司",
-          "quote": "要申請政府標案，需要符合資通安全管理法。外面的顧問報價 30 萬台幣。",
+          "persona": "台灣軟體公司，30 人",
+          "quote": "要投標政府案子，需要符合資通安全管理法。顧問公司報價 30 萬台幣、要 3 個月。我們裝了 Panguard，跑合規掃描，拿到一份對應台灣資安法 50 項控制措施的稽核報告。標案順利通過。總花費：NT$8,970。",
           "used": "Report（資安法框架）",
-          "saved": "省了約 $9,500 USD"
+          "saved": "省了 NT$291,000 和 3 個月"
         },
         "freelance": {
-          "persona": "Freelance 開發者",
-          "quote": "我幫客戶管 5 台伺服器，但沒辦法 24 小時盯著看。",
-          "used": "Guard + Chat ($9/月)",
-          "saved": "半夜不用起來看伺服器"
+          "persona": "Freelance DevOps，管 8 台伺服器",
+          "quote": "以前每天早上要一台一台 SSH 進去看 log。現在 Panguard Guard 監控全部 8 台伺服器，AI 代理每天在 Telegram 上摘要威脅，蜜罐在攻擊者碰到真實服務之前就先攔住。上個月它在部署後 4 分鐘就抓到一個挖礦程式。那時候我在睡覺。",
+          "used": "Guard + Trap + Chat（NT$870/月）",
+          "saved": "每週省回 15 小時"
         }
       }
     },
@@ -393,7 +395,7 @@
         },
         "1": {
           "name": "Guard",
-          "desc": "24/7 自動監控與回應。5 個 AI Agent、三層分析、7 天學習期。"
+          "desc": "24/7 自動監控與回應。4 個 AI Agent + 調查引擎、三層分析、7 天學習期。"
         },
         "2": {
           "name": "Chat",
@@ -471,7 +473,7 @@
       "philosophy": "我們建立 Panguard 基於一個簡單的信念：企業級防護應該像一行指令一樣簡單。不用盯著儀表板。不用分類警報。不用寫規則。AI 處理無聊的工作，讓你專注在產品開發。",
       "architectureTitle": "五層防禦架構",
       "layer1": { "title": "環境探索", "desc": "自動掃描你的基礎設施：作業系統、服務、開放 port、已安裝套件。" },
-      "layer2": { "title": "規則引擎", "desc": "3,155 條 Sigma 規則 + 5,767 條 YARA 規則，即時偵測已知攻擊模式。" },
+      "layer2": { "title": "規則引擎", "desc": "3,158 條 Sigma 規則 + 425 條 YARA 規則，即時偵測已知攻擊模式。" },
       "layer3": { "title": "行為基線", "desc": "7 天學習期建立你系統正常行為的模型。" },
       "layer4": { "title": "AI 分析", "desc": "三層 AI 漏斗：本地規則、本地 AI（Ollama）、雲端 AI 處理最困難的威脅。" },
       "layer5": { "title": "自動回應", "desc": "6 種回應動作：封鎖 IP、終止程序、隔離檔案、發送警報、快照、升級處理。" },
@@ -514,7 +516,7 @@
       "chat": { "title": "Panguard Chat", "desc": "透過 LINE、Telegram、Slack 或 Email 的 AI 資安助手。用白話問問題。" },
       "trap": { "title": "Panguard Trap", "desc": "8 種協定的智慧蜜罐系統。在攻擊者接觸真實系統前就偵測到。" },
       "report": { "title": "Panguard Report", "desc": "AI 合規報告產生器，支援 ISO 27001、SOC 2 和台灣資安法。" },
-      "threatCloud": { "title": "Threat Cloud", "desc": "集體威脅情報。每個用戶都讓其他用戶更安全。" },
+      "threatCloud": { "title": "Threat Cloud", "desc": "集體智慧。持續進化的防禦。每一個 Panguard 安裝節點都會匿名回報威脅數據。Threat Cloud 關聯攻擊模式、聚類可疑 IP 行為，並從社群的真實攻擊中自動產生新的 Sigma 偵測規則。參與的節點越多，所有人的防護越強。隱私優先，開源架構。一行指令即可退出。" },
       "learnMore": "了解更多",
       "subtitle": "所有產品協同運作。安裝你需要的，隨時擴充。"
     },
@@ -608,7 +610,33 @@
         }
       },
       "reportTitle": "合規報告 — 單次購買",
-      "reportDesc": "台灣資安法 NT$8,970 | ISO 27001 NT$14,970 | SOC 2 NT$20,970 | 組合包 NT$29,970",
+      "reports": {
+        "0": {
+          "name": "台灣資通安全管理法",
+          "controls": "50 項控制措施",
+          "price": "NT$8,970",
+          "market": "市場行情：約 NT$90,000+"
+        },
+        "1": {
+          "name": "ISO 27001",
+          "controls": "93 項控制措施",
+          "price": "NT$14,970",
+          "market": "市場行情：約 NT$240,000+"
+        },
+        "2": {
+          "name": "SOC 2",
+          "controls": "64 項控制措施",
+          "price": "NT$20,970",
+          "market": "市場行情：約 NT$450,000+"
+        },
+        "3": {
+          "name": "組合包（全部 3 份）",
+          "controls": "207 項控制措施",
+          "price": "NT$29,970",
+          "market": "市場行情：約 NT$750,000+"
+        }
+      },
+      "reportNote": "單次購買。60 秒產出。PDF + 證據包。",
       "reportCta": "查看合規方案",
       "disclaimer": "所有價格為新台幣（TWD）。USD 定價請參閱英文版。"
     },
@@ -1146,7 +1174,7 @@
       "featuresList": {
         "item1": {
           "title": "5 代理 AI 管線",
-          "desc": "事件流經 5 個專業 AI 代理：偵測（Sigma/YARA 規則 + 本地 LLM）、分析（威脅分類）、回應（自動修復）、報告（合規文件）和聊天（人工通知）。90% 的事件僅由規則處理，零成本。"
+          "desc": "事件流經 4 個專業 AI 代理 + 調查引擎：偵測（Sigma/YARA 規則 + 本地 LLM）、分析（威脅分類）、回應（自動修復）、報告（合規文件）和調查引擎（深度事件分析）。90% 的事件僅由規則處理，零成本。"
         },
         "item2": {
           "title": "3 種自動回應類型",

@@ -64,22 +64,32 @@ export default function Hero() {
 
       {/* -- Content -- */}
       <div className="relative z-10 text-center px-6 py-24 max-w-4xl mx-auto">
-        {/* Title */}
+        {/* Eyebrow */}
         <div className="hero-entrance" style={{ animationDelay: '0s' }}>
-          <h1 className="text-[clamp(48px,8vw,96px)] font-extrabold leading-[1.05] tracking-tight text-text-primary">
+          <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-6">
+            {t('eyebrow')}
+          </p>
+        </div>
+
+        {/* Title */}
+        <div className="hero-entrance" style={{ animationDelay: '0.1s' }}>
+          <h1 className="text-[clamp(36px,6vw,72px)] font-extrabold leading-[1.1] tracking-tight text-text-primary">
             {t('title')}
           </h1>
+          <p className="text-[clamp(36px,6vw,72px)] font-extrabold leading-[1.1] tracking-tight text-brand-sage mt-2">
+            {t('titleLine2')}
+          </p>
         </div>
 
         {/* Subtitle */}
-        <div className="mt-6 max-w-xl mx-auto hero-entrance" style={{ animationDelay: '0.2s' }}>
-          <p className="text-xl lg:text-2xl text-text-secondary leading-relaxed">
+        <div className="mt-8 max-w-2xl mx-auto hero-entrance" style={{ animationDelay: '0.25s' }}>
+          <p className="text-lg lg:text-xl text-text-secondary leading-relaxed">
             {t('subtitle1')}
           </p>
-          <p className="text-xl lg:text-2xl text-text-secondary leading-relaxed mt-1">
+          <p className="text-lg lg:text-xl text-text-secondary leading-relaxed mt-4">
             {t('subtitle2')}
           </p>
-          <p className="text-base lg:text-lg text-text-tertiary leading-relaxed mt-3 font-mono">
+          <p className="text-base lg:text-lg text-text-primary leading-relaxed mt-4 font-semibold">
             {t('subtitle3')}
           </p>
         </div>
