@@ -144,7 +144,6 @@
       "badges": {
         "mit": "MIT 開源授權",
         "tests": "1,107 項測試通過",
-        "typescript": "3,158 偵測規則",
         "taiwan": "台灣製造"
       }
     },
@@ -429,6 +428,125 @@
       "source": "* IBM Cost of a Data Breach Report 2024",
       "bottomLine": "你的時間應該花在做產品，不是查 log。"
     },
+    "wakeUpCall": {
+      "title": "這不是假設。正在發生。",
+      "subtitle": "全球每 39 秒就有一家企業遭受網路攻擊。",
+      "ransomware": {
+        "title": "勒索軟體攻擊",
+        "description": "一家小型電商公司在凌晨 3 點發現所有資料庫檔案被加密。沒有備份。攻擊者要求 2 BTC。他們有 72 小時。"
+      },
+      "dataBreach": {
+        "title": "資料外洩",
+        "description": "一名開發者把 API 金鑰推送到公開 repo。幾分鐘內，攻擊者就開了雲端主機，造成 $47,000 美元的運算費用。"
+      },
+      "stat1": { "label": "網路攻擊的平均間隔" },
+      "stat2": { "label": "中小企業在遭受攻擊後 6 個月內倒閉" },
+      "stat3": { "label": "平均發現漏洞的天數" },
+      "stat4": { "label": "資料外洩的平均成本" },
+      "closing": "大多數中小企業請不起資安團隊。但他們也承受不起沒有防護的後果。"
+    },
+    "theOldWay": {
+      "title": "你有三個選擇。其中兩個行不通。",
+      "subtitle": "現有方案為何對中小企業不管用。",
+      "columns": {
+        "diy": "自己來",
+        "outsource": "外包給 MSSP",
+        "panguard": "Panguard AI"
+      },
+      "rows": {
+        "setup": { "label": "設定時間", "diy": "數週", "outsource": "數天", "panguard": "60 秒" },
+        "cost": { "label": "月費", "diy": "$0（你的時間）", "outsource": "$2,000+", "panguard": "從 $0 起" },
+        "detection": { "label": "威脅偵測", "diy": "partial", "outsource": "yes", "panguard": "yes" },
+        "response": { "label": "自動回應", "diy": "no", "outsource": "partial", "panguard": "yes" },
+        "learning": { "label": "學習你的環境", "diy": "no", "outsource": "no", "panguard": "yes" },
+        "reporting": { "label": "合規報告", "diy": "no", "outsource": "partial", "panguard": "yes" },
+        "maintenance": { "label": "持續維護", "diy": "高", "outsource": "低", "panguard": "零" },
+        "scalability": { "label": "跟你一起擴展", "diy": "no", "outsource": "partial", "panguard": "yes" }
+      },
+      "cta": "試試 60 秒安裝"
+    },
+    "theShift": {
+      "cursor": "重新思考資安",
+      "title": "資安不應該需要資安團隊。",
+      "philosophy": "我們建立 Panguard 基於一個簡單的信念：企業級防護應該像一行指令一樣簡單。不用盯著儀表板。不用分類警報。不用寫規則。AI 處理無聊的工作，讓你專注在產品開發。",
+      "architectureTitle": "五層防禦架構",
+      "layer1": { "title": "環境探索", "desc": "自動掃描你的基礎設施：作業系統、服務、開放 port、已安裝套件。" },
+      "layer2": { "title": "規則引擎", "desc": "3,155 條 Sigma 規則 + 5,767 條 YARA 規則，即時偵測已知攻擊模式。" },
+      "layer3": { "title": "行為基線", "desc": "7 天學習期建立你系統正常行為的模型。" },
+      "layer4": { "title": "AI 分析", "desc": "三層 AI 漏斗：本地規則、本地 AI（Ollama）、雲端 AI 處理最困難的威脅。" },
+      "layer5": { "title": "自動回應", "desc": "6 種回應動作：封鎖 IP、終止程序、隔離檔案、發送警報、快照、升級處理。" },
+      "funnelTitle": "三層 AI 漏斗",
+      "funnel1": { "percent": "90%", "title": "規則引擎", "desc": "即時模式比對" },
+      "funnel2": { "percent": "7%", "title": "本地 AI", "desc": "裝置端深度分析" },
+      "funnel3": { "percent": "3%", "title": "雲端 AI", "desc": "動態推理" },
+      "collectiveTitle": "集體防禦（Threat Cloud）",
+      "collectiveDesc": "每個 Panguard 實例都會分享匿名化的威脅情報。當一個用戶偵測到新攻擊，所有用戶都受到保護。網路隨著每次部署變得更聰明。",
+      "closing": "安裝一次，永遠受保護。"
+    },
+    "the3amStory": {
+      "title": "凌晨 3 點。你的伺服器正在被攻擊。",
+      "subtitle": "同樣的攻擊。兩種截然不同的結果。",
+      "leftTitle": "沒有 Panguard",
+      "rightTitle": "有 Panguard",
+      "left1": { "time": "3:00 AM", "text": "SSH 暴力破解攻擊從 103.xx.xx.xx 開始" },
+      "left2": { "time": "3:02 AM", "text": "攻擊者利用弱密碼成功登入" },
+      "left3": { "time": "3:05 AM", "text": "橫向移動開始。權限提升。" },
+      "left4": { "time": "3:15 AM", "text": "資料外洩開始。客戶資料庫被複製。" },
+      "left5": { "time": "3:30 AM", "text": "勒索軟體部署。檔案加密。" },
+      "left6": { "time": "7:00 AM", "text": "你醒來。查看 Slack。沒有異常。" },
+      "left7": { "time": "9:00 AM", "text": "客戶打來：「我登不進去。」你才發現被入侵了。" },
+      "leftOutcome": "6 小時未被發現。50,000 筆客戶資料外洩。平均損失 $4.35M 美元。",
+      "right1": { "time": "3:00 AM", "text": "Layer 1 偵測到 SSH 暴力破解（Sigma 規則比對）" },
+      "right2": { "time": "3:00 AM", "text": "IP 自動封鎖。Threat Cloud 已通知。" },
+      "right3": { "time": "3:01 AM", "text": "攻擊模式已分享給全球所有 Panguard 用戶" },
+      "right4": { "time": "3:01 AM", "text": "LINE 通知已發送，附完整事件摘要" },
+      "right5": { "time": "3:02 AM", "text": "事件已記錄。證據快照已保存。" },
+      "lineLabel": "Panguard AI 透過 LINE",
+      "lineMessage": "已封鎖來自 103.xx.xx.xx 的 SSH 暴力破解。IP 已封禁。未存取任何資料。一切安全。",
+      "stillSleeping": "你還在睡。"
+    },
+    "sixLayers": {
+      "overline": "產品套件",
+      "title": "一個平台。六層防禦。",
+      "coreLabel": "核心",
+      "scan": { "title": "Panguard Scan", "desc": "60 秒 AI 資安掃描，附 PDF 報告。在攻擊者之前找到漏洞。" },
+      "guard": { "title": "Panguard Guard", "desc": "24/7 AI 端點監控，自動回應。4 個 AI 代理全天候運作。" },
+      "chat": { "title": "Panguard Chat", "desc": "透過 LINE、Telegram、Slack 或 Email 的 AI 資安助手。用白話問問題。" },
+      "trap": { "title": "Panguard Trap", "desc": "8 種協定的智慧蜜罐系統。在攻擊者接觸真實系統前就偵測到。" },
+      "report": { "title": "Panguard Report", "desc": "AI 合規報告產生器，支援 ISO 27001、SOC 2 和台灣資安法。" },
+      "threatCloud": { "title": "Threat Cloud", "desc": "集體威脅情報。每個用戶都讓其他用戶更安全。" },
+      "learnMore": "了解更多",
+      "subtitle": "所有產品協同運作。安裝你需要的，隨時擴充。"
+    },
+    "theEvidence": {
+      "title": "不要相信我們說的。去看程式碼。",
+      "subtitle": "以下每個數字都可以在我們的開源 repo 中驗證。",
+      "stats": {
+        "sigmaRules": "Sigma 偵測規則",
+        "yaraRules": "YARA 惡意軟體規則",
+        "controls": "合規控制項",
+        "tests": "測試通過",
+        "layers": "偵測層級",
+        "actions": "回應動作",
+        "protocols": "蜜罐協定",
+        "mit": "開源授權"
+      },
+      "githubCta": "在 GitHub 上驗證",
+      "trust": {
+        "openSource": {
+          "title": "100% 開源",
+          "desc": "MIT 授權。完整原始碼在 GitHub 上。審查每一行。沒有黑箱。沒有供應商鎖定。"
+        },
+        "security": {
+          "title": "安全優先",
+          "desc": "1,107 項測試。嚴格 TypeScript。ESLint 安全外掛。憑證加密儲存。沙箱執行。"
+        },
+        "privacy": {
+          "title": "隱私設計",
+          "desc": "你的資料留在你的機器上。只有匿名化的威脅特徵透過 Threat Cloud 分享。零遙測。"
+        }
+      }
+    },
     "homePricing": {
       "overline": "定價方案",
       "title": "符合你預算的資安防護。",
@@ -502,7 +620,10 @@
       "manifesto3": "你部署。我們防禦。",
       "btnGetStarted": "免費掃描伺服器",
       "btnGithub": "GitHub",
-      "btnDocs": "技術文件"
+      "btnDocs": "技術文件",
+      "badge1": "MIT 開源授權",
+      "badge2": "1,107 項測試通過",
+      "badge3": "台灣製造"
     }
   },
   "pricing": {

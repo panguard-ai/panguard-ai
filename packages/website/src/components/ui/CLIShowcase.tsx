@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import BrandLogo from './BrandLogo';
 
-/* ─── Tab definitions ─── */
+/* --- Tab definitions --- */
 
 const tabs = [
   { id: 'scan', label: 'Scan' },
@@ -14,7 +13,7 @@ const tabs = [
 
 type TabId = (typeof tabs)[number]['id'];
 
-/* ─── Line types for structured rendering ─── */
+/* --- Line types for structured rendering --- */
 
 interface Line {
   text: string;
@@ -33,7 +32,7 @@ const c = {
   sage: 'text-brand-sage',
 };
 
-/* ─── CLI content for each tab ─── */
+/* --- CLI content for each tab --- */
 
 const tabContent: Record<TabId, Line[]> = {
   scan: [
@@ -92,7 +91,7 @@ const tabContent: Record<TabId, Line[]> = {
   ],
 };
 
-/* ═══════════════════════  Component  ═══════════════════════ */
+/* ===========================  Component  =========================== */
 
 export default function CLIShowcase() {
   const [activeTab, setActiveTab] = useState<TabId>('scan');
@@ -131,11 +130,7 @@ export default function CLIShowcase() {
             >
               {tab.label}
               {isActive && (
-                <motion.div
-                  layoutId="cli-tab-indicator"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand-sage"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand-sage transition-all duration-200" />
               )}
             </button>
           );
@@ -144,24 +139,16 @@ export default function CLIShowcase() {
 
       {/* Terminal body */}
       <div className="bg-[#1A1614] rounded-b-xl border border-border border-t-0 p-5 sm:p-6 font-mono text-[12px] sm:text-[13px] leading-[1.7] min-h-[380px] overflow-x-auto">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.15 }}
-          >
-            {tabContent[activeTab].map((line, i) => {
-              if (!line.text) return <div key={i} className="h-3" />;
-              return (
-                <div key={i} className={`${line.color || c.base} whitespace-pre`}>
-                  {line.text}
-                </div>
-              );
-            })}
-          </motion.div>
-        </AnimatePresence>
+        <div key={activeTab} className="tab-content-enter">
+          {tabContent[activeTab].map((line, i) => {
+            if (!line.text) return <div key={i} className="h-3" />;
+            return (
+              <div key={i} className={`${line.color || c.base} whitespace-pre`}>
+                {line.text}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Ambient glow */}
