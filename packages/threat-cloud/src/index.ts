@@ -6,6 +6,8 @@ export { CorrelationEngine } from './correlation-engine.js';
 export { RuleGenerator } from './rule-generator.js';
 export { QueryHandlers } from './query-handlers.js';
 export { FeedDistributor } from './feed-distributor.js';
+export { SightingStore } from './sighting-store.js';
+export { AuditLogger } from './audit-logger.js';
 export { Scheduler } from './scheduler.js';
 export type {
   AnonymizedThreatData,
@@ -39,4 +41,13 @@ export type {
   IoCFeedResponse,
   AgentUpdatePackage,
   SchedulerConfig,
+  SourceReliability,
+  SightingType,
+  SightingInput,
+  SightingRecord,
+  AuditAction,
+  AuditLogEntry,
+  AuditLogQuery,
+  FeedLicense,
+  FeedSourceConfig,
 } from './types.js';

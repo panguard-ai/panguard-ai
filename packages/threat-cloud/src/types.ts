@@ -325,3 +325,83 @@ export interface SchedulerConfig {
   iocRetentionDays: number;
   aggregationIntervalMs: number;
 }
+
+// ---------------------------------------------------------------------------
+// Phase A: Audit + Provenance + Security / 審計 + 溯源 + 資安強化
+// ---------------------------------------------------------------------------
+
+/**
+ * Admiralty Scale source reliability rating.
+ * A = Completely reliable, B = Usually reliable, C = Fairly reliable,
+ * D = Not usually reliable, E = Unreliable, F = Cannot be judged
+ */
+export type SourceReliability = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+
+/** Sighting type / 觀測類型 */
+export type SightingType = 'positive' | 'negative' | 'false_positive';
+
+/** Sighting input / 觀測輸入 */
+export interface SightingInput {
+  iocId: number;
+  type: SightingType;
+  source: string;
+  confidence?: number;
+  details?: string;
+}
+
+/** Stored sighting record / 儲存的觀測記錄 */
+export interface SightingRecord {
+  id: number;
+  iocId: number;
+  type: SightingType;
+  source: string;
+  confidence: number;
+  details: string;
+  actorHash: string;
+  createdAt: string;
+}
+
+/** Audit log action / 稽核日誌動作 */
+export type AuditAction =
+  | 'ioc_create'
+  | 'ioc_update'
+  | 'ioc_revoke'
+  | 'sighting_create'
+  | 'threat_upload'
+  | 'trap_intel_upload'
+  | 'rule_publish'
+  | 'rule_generate'
+  | 'campaign_create'
+  | 'feed_access';
+
+/** Audit log entry / 稽核日誌項目 */
+export interface AuditLogEntry {
+  id: number;
+  action: AuditAction;
+  entityType: string;
+  entityId: string;
+  actorHash: string;
+  ipAddress: string;
+  details: string;
+  createdAt: string;
+}
+
+/** Audit log query params / 稽核日誌查詢參數 */
+export interface AuditLogQuery {
+  action?: AuditAction;
+  entityType?: string;
+  entityId?: string;
+  since?: string;
+  limit?: number;
+}
+
+/** Feed license info for compliance / Feed 授權資訊 */
+export type FeedLicense = 'public_domain' | 'cc0' | 'fair_use' | 'commercial_restricted' | 'unknown';
+
+/** Source reliability mapping for known feeds / 已知 feed 的來源可靠度對映 */
+export interface FeedSourceConfig {
+  name: string;
+  reliability: SourceReliability;
+  license: FeedLicense;
+  redistributable: boolean;
+}

@@ -20,7 +20,8 @@ export class FeedDistributor {
 
   /**
    * Generate IP blocklist as plain text (one IP per line).
-   * 產生 IP 封鎖清單（純文字，每行一個 IP）
+   * Only includes redistributable IoCs to comply with feed licenses.
+   * 產生 IP 封鎖清單（僅包含可轉散佈的 IoC，遵守授權）
    */
   getIPBlocklist(minReputation: number = 70): string {
     const rows = this.db
@@ -28,6 +29,9 @@ export class FeedDistributor {
         `SELECT normalized_value
          FROM iocs
          WHERE type = 'ip' AND status = 'active' AND reputation_score >= ?
+           AND (json_extract(metadata, '$.redistributable') != 'false'
+                OR json_extract(metadata, '$.redistributable') IS NULL
+                OR source NOT LIKE 'feed:%')
          ORDER BY reputation_score DESC`
       )
       .all(minReputation) as Array<{ normalized_value: string }>;
@@ -45,6 +49,9 @@ export class FeedDistributor {
         `SELECT normalized_value
          FROM iocs
          WHERE type = 'domain' AND status = 'active' AND reputation_score >= ?
+           AND (json_extract(metadata, '$.redistributable') != 'false'
+                OR json_extract(metadata, '$.redistributable') IS NULL
+                OR source NOT LIKE 'feed:%')
          ORDER BY reputation_score DESC`
       )
       .all(minReputation) as Array<{ normalized_value: string }>;

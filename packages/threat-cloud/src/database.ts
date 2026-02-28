@@ -209,6 +209,53 @@ export class ThreatCloudDB {
           CREATE INDEX IF NOT EXISTS idx_daily_agg_type ON daily_aggregates(attack_type);
         `,
       },
+      {
+        version: 6,
+        name: 'create_sightings_table',
+        sql: `
+          CREATE TABLE IF NOT EXISTS sightings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ioc_id INTEGER NOT NULL REFERENCES iocs(id) ON DELETE CASCADE,
+            type TEXT NOT NULL CHECK(type IN ('positive','negative','false_positive')),
+            source TEXT NOT NULL,
+            confidence INTEGER NOT NULL DEFAULT 50 CHECK(confidence BETWEEN 0 AND 100),
+            details TEXT NOT NULL DEFAULT '',
+            actor_hash TEXT NOT NULL DEFAULT '',
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+          );
+          CREATE INDEX IF NOT EXISTS idx_sightings_ioc ON sightings(ioc_id);
+          CREATE INDEX IF NOT EXISTS idx_sightings_type ON sightings(type);
+          CREATE INDEX IF NOT EXISTS idx_sightings_created ON sightings(created_at);
+        `,
+      },
+      {
+        version: 7,
+        name: 'create_audit_log_table',
+        sql: `
+          CREATE TABLE IF NOT EXISTS audit_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            action TEXT NOT NULL,
+            entity_type TEXT NOT NULL,
+            entity_id TEXT NOT NULL,
+            actor_hash TEXT NOT NULL DEFAULT '',
+            ip_address TEXT NOT NULL DEFAULT '',
+            details TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL DEFAULT (datetime('now'))
+          );
+          CREATE INDEX IF NOT EXISTS idx_audit_action ON audit_log(action);
+          CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity_type, entity_id);
+          CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_log(created_at);
+          CREATE INDEX IF NOT EXISTS idx_audit_actor ON audit_log(actor_hash);
+        `,
+      },
+      {
+        version: 8,
+        name: 'add_source_reliability_to_iocs',
+        sql: `
+          ALTER TABLE iocs ADD COLUMN source_reliability TEXT NOT NULL DEFAULT 'F'
+            CHECK(source_reliability IN ('A','B','C','D','E','F'));
+        `,
+      },
     ];
 
     const insertMigration = this.db.prepare(

@@ -10,13 +10,13 @@
  *   npx tsx scripts/seed.ts [--db ./threat-cloud.db] [--feeds all]
  *   npx tsx scripts/seed.ts --feeds ipsum,feodo,blocklist
  *
- * Available feeds:
- *   ipsum       - IPsum aggregated malicious IPs (~50,000 IPs)
- *   feodo       - Feodo Tracker C2 IPs (~300 IPs)
- *   blocklist   - Blocklist.de attack IPs (~20,000 IPs)
- *   spamhaus    - Spamhaus DROP netblocks (~1,000 ranges)
- *   urlhaus     - URLhaus malicious URLs (~10,000 URLs)
- *   threatfox   - ThreatFox IoCs via API (~5,000 IoCs)
+ * Available feeds (all free, no auth required):
+ *   ipsum       - IPsum aggregated malicious IPs (score >= 3)
+ *   feodo       - Feodo Tracker botnet C2 IPs
+ *   blocklist   - Blocklist.de attack IPs (SSH/FTP/Web)
+ *   spamhaus    - Spamhaus DROP + EDROP hijacked netblocks
+ *   cins        - CINS Army bad actor IPs
+ *   urlhaus     - URLhaus malicious URLs
  *   all         - All of the above (default)
  */
 
@@ -24,7 +24,7 @@ import { ThreatCloudDB } from '../src/database.js';
 import { IoCStore } from '../src/ioc-store.js';
 
 // ---------------------------------------------------------------------------
-// Feed definitions
+// Types
 // ---------------------------------------------------------------------------
 
 interface FeedConfig {
@@ -33,8 +33,36 @@ interface FeedConfig {
   type: 'ip' | 'domain' | 'url' | 'hash_sha256' | 'hash_md5';
   threatType: string;
   confidence: number;
+  /** Admiralty Scale: A=completely reliable .. F=cannot be judged */
+  sourceReliability: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+  /** License type for compliance tracking */
+  license: 'public_domain' | 'cc0' | 'fair_use' | 'commercial_restricted' | 'unknown';
+  /** Can be included in public/commercial feeds? */
+  redistributable: boolean;
   parser: (text: string) => Array<{ value: string; tags?: string[]; metadata?: Record<string, string> }>;
 }
+
+/** Plain text IP list parser (skip comments starting with # or ;) */
+function plainIPParser(
+  tagName: string,
+  commentChar = '#'
+): FeedConfig['parser'] {
+  return (text) => {
+    const results: Array<{ value: string; tags: string[] }> = [];
+    for (const line of text.split('\n')) {
+      if (line.startsWith(commentChar) || !line.trim()) continue;
+      const ip = line.trim().split(/\s+/)[0] ?? '';
+      if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
+        results.push({ value: ip, tags: [tagName] });
+      }
+    }
+    return results;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Feed definitions (all free, no auth)
+// ---------------------------------------------------------------------------
 
 const FEEDS: Record<string, FeedConfig> = {
   ipsum: {
@@ -43,19 +71,18 @@ const FEEDS: Record<string, FeedConfig> = {
     type: 'ip',
     threatType: 'malicious',
     confidence: 70,
+    sourceReliability: 'C',
+    license: 'public_domain',
+    redistributable: true,
     parser: (text) => {
-      const lines = text.split('\n');
       const results: Array<{ value: string; tags: string[] }> = [];
-      for (const line of lines) {
+      for (const line of text.split('\n')) {
         if (line.startsWith('#') || !line.trim()) continue;
         const parts = line.trim().split(/\s+/);
-        const ip = parts[0];
+        const ip = parts[0] ?? '';
         const score = Number(parts[1] ?? '1');
-        if (ip && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
-          // Only import IPs seen in 3+ blocklists (higher confidence)
-          if (score >= 3) {
-            results.push({ value: ip, tags: [`ipsum-score:${score}`] });
-          }
+        if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip) && score >= 3) {
+          results.push({ value: ip, tags: [`ipsum-score:${score}`] });
         }
       }
       return results;
@@ -63,19 +90,22 @@ const FEEDS: Record<string, FeedConfig> = {
   },
 
   feodo: {
-    name: 'Feodo Tracker (C2 IPs)',
-    url: 'https://feodotracker.abuse.ch/downloads/ipblocklist_recommended.txt',
+    name: 'Feodo Tracker (Botnet C2 IPs)',
+    url: 'https://feodotracker.abuse.ch/downloads/ipblocklist.txt',
     type: 'ip',
     threatType: 'c2',
-    confidence: 90,
+    confidence: 95,
+    sourceReliability: 'A',
+    license: 'cc0',
+    redistributable: true,
     parser: (text) => {
-      const lines = text.split('\n');
+      // Feodo format: lines starting with # are comments, "DstIP" is header
       const results: Array<{ value: string; tags: string[] }> = [];
-      for (const line of lines) {
-        if (line.startsWith('#') || !line.trim()) continue;
-        const ip = line.trim();
-        if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
-          results.push({ value: ip, tags: ['feodo-tracker', 'botnet'] });
+      for (const line of text.split('\n')) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#') || trimmed === 'DstIP') continue;
+        if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(trimmed)) {
+          results.push({ value: trimmed, tags: ['feodo-tracker', 'botnet-c2'] });
         }
       }
       return results;
@@ -88,49 +118,51 @@ const FEEDS: Record<string, FeedConfig> = {
     type: 'ip',
     threatType: 'scanner',
     confidence: 60,
+    sourceReliability: 'D',
+    license: 'unknown',
+    redistributable: false,
+    parser: plainIPParser('blocklist-de'),
+  },
+
+  spamhaus: {
+    name: 'Spamhaus DROP + EDROP',
+    url: 'https://www.spamhaus.org/drop/drop.txt',
+    type: 'ip',
+    threatType: 'malicious',
+    confidence: 95,
+    sourceReliability: 'A',
+    license: 'commercial_restricted',
+    redistributable: false,
     parser: (text) => {
-      const lines = text.split('\n');
-      const results: Array<{ value: string; tags: string[] }> = [];
-      for (const line of lines) {
-        if (line.startsWith('#') || !line.trim()) continue;
-        const ip = line.trim();
+      const results: Array<{ value: string; tags: string[]; metadata: Record<string, string> }> = [];
+      for (const line of text.split('\n')) {
+        if (line.startsWith(';') || !line.trim()) continue;
+        const parts = line.split(';');
+        const cidr = parts[0]?.trim() ?? '';
+        const sbl = parts[1]?.trim() ?? '';
+        const ip = cidr.split('/')[0] ?? '';
         if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
-          results.push({ value: ip, tags: ['blocklist-de'] });
+          results.push({
+            value: ip,
+            tags: ['spamhaus-drop', sbl].filter(Boolean),
+            metadata: { cidr, sblRef: sbl },
+          });
         }
       }
       return results;
     },
   },
 
-  spamhaus: {
-    name: 'Spamhaus DROP (Hijacked Netblocks)',
-    url: 'https://www.spamhaus.org/drop/drop.txt',
+  cins: {
+    name: 'CINS Army (Bad Actor IPs)',
+    url: 'https://cinsscore.com/list/ci-badguys.txt',
     type: 'ip',
-    threatType: 'malicious',
-    confidence: 95,
-    parser: (text) => {
-      const lines = text.split('\n');
-      const results: Array<{ value: string; tags: string[]; metadata: Record<string, string> }> = [];
-      for (const line of lines) {
-        if (line.startsWith(';') || !line.trim()) continue;
-        // Format: "x.x.x.x/xx ; SBLxxxxx"
-        const parts = line.split(';');
-        const cidr = parts[0]?.trim();
-        const sbl = parts[1]?.trim() ?? '';
-        if (cidr) {
-          // Extract the network address from CIDR
-          const ip = cidr.split('/')[0];
-          if (ip && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)) {
-            results.push({
-              value: ip,
-              tags: ['spamhaus-drop', sbl].filter(Boolean),
-              metadata: { cidr, sblRef: sbl },
-            });
-          }
-        }
-      }
-      return results;
-    },
+    threatType: 'scanner',
+    confidence: 65,
+    sourceReliability: 'C',
+    license: 'unknown',
+    redistributable: false,
+    parser: plainIPParser('cins-army'),
   },
 
   urlhaus: {
@@ -139,10 +171,12 @@ const FEEDS: Record<string, FeedConfig> = {
     type: 'url',
     threatType: 'malware_distribution',
     confidence: 80,
+    sourceReliability: 'B',
+    license: 'fair_use',
+    redistributable: false,
     parser: (text) => {
-      const lines = text.split('\n');
       const results: Array<{ value: string; tags: string[] }> = [];
-      for (const line of lines) {
+      for (const line of text.split('\n')) {
         if (line.startsWith('#') || !line.trim()) continue;
         const url = line.trim();
         if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -152,65 +186,24 @@ const FEEDS: Record<string, FeedConfig> = {
       return results;
     },
   },
-
-  threatfox: {
-    name: 'ThreatFox (Mixed IoCs via API)',
-    url: 'https://threatfox-api.abuse.ch/api/v1/',
-    type: 'ip', // will be overridden per entry
-    threatType: 'malware',
-    confidence: 85,
-    parser: (text) => {
-      try {
-        const json = JSON.parse(text) as {
-          query_status: string;
-          data?: Array<{
-            ioc: string;
-            ioc_type: string;
-            threat_type: string;
-            malware: string;
-            tags: string[] | null;
-          }>;
-        };
-        if (json.query_status !== 'ok' || !json.data) return [];
-
-        const results: Array<{ value: string; tags: string[] }> = [];
-        for (const entry of json.data.slice(0, 5000)) {
-          const tags = [...(entry.tags ?? []), entry.malware].filter(Boolean);
-          results.push({ value: entry.ioc, tags });
-        }
-        return results;
-      } catch {
-        return [];
-      }
-    },
-  },
 };
+
+// Also fetch Spamhaus EDROP as a second request under the 'spamhaus' umbrella
+const SPAMHAUS_EDROP_URL = 'https://www.spamhaus.org/drop/edrop.txt';
 
 // ---------------------------------------------------------------------------
 // Fetching
 // ---------------------------------------------------------------------------
 
-async function fetchFeed(feed: FeedConfig): Promise<string> {
+async function fetchText(url: string, timeoutMs = 60_000): Promise<string> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30_000);
-
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const options: RequestInit = { signal: controller.signal };
-
-    // ThreatFox requires POST with JSON body
-    if (feed.url.includes('threatfox-api')) {
-      options.method = 'POST';
-      options.headers = { 'Content-Type': 'application/json' };
-      options.body = JSON.stringify({ query: 'get_iocs', days: 7 });
-    }
-
-    const res = await fetch(feed.url, options);
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    }
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     return await res.text();
   } finally {
-    clearTimeout(timeout);
+    clearTimeout(timer);
   }
 }
 
@@ -218,7 +211,7 @@ async function fetchFeed(feed: FeedConfig): Promise<string> {
 // Import logic
 // ---------------------------------------------------------------------------
 
-function importFeed(
+function importEntries(
   store: IoCStore,
   feed: FeedConfig,
   entries: Array<{ value: string; tags?: string[]; metadata?: Record<string, string> }>
@@ -229,27 +222,23 @@ function importFeed(
 
   for (const entry of entries) {
     try {
-      // Auto-detect type for ThreatFox entries
-      let iocType = feed.type;
-      if (feed.url.includes('threatfox')) {
-        iocType = store.detectType(entry.value);
-      }
-
       const result = store.upsertIoC({
-        type: iocType,
+        type: feed.type,
         value: entry.value,
         threatType: feed.threatType,
-        source: `feed:${feed.name.split(' ')[0]?.toLowerCase()}`,
+        source: `feed:${feed.name.split('(')[0]?.trim().toLowerCase().replace(/\s+/g, '-')}`,
         confidence: feed.confidence,
         tags: entry.tags,
-        metadata: entry.metadata,
+        metadata: {
+          ...entry.metadata,
+          sourceReliability: feed.sourceReliability,
+          license: feed.license,
+          redistributable: String(feed.redistributable),
+        },
       });
 
-      if (result.sightings === 1) {
-        imported++;
-      } else {
-        duplicates++;
-      }
+      if (result.sightings === 1) imported++;
+      else duplicates++;
     } catch {
       errors++;
     }
@@ -326,18 +315,39 @@ async function main(): Promise<void> {
     process.stdout.write(`[*] ${feed.name}... `);
 
     try {
-      const text = await fetchFeed(feed);
+      const text = await fetchText(feed.url);
       const entries = feed.parser(text);
-      process.stdout.write(`${entries.length} entries parsed, `);
+      process.stdout.write(`${entries.length} entries, `);
 
-      const result = importFeed(store, feed, entries);
+      const result = importEntries(store, feed, entries);
       totalImported += result.imported;
       totalDuplicates += result.duplicates;
       totalErrors += result.errors;
 
       console.log(
-        `${result.imported} imported, ${result.duplicates} merged, ${result.errors} errors`
+        `${result.imported} new, ${result.duplicates} merged, ${result.errors} errors`
       );
+
+      // Special: also fetch EDROP for spamhaus feed
+      if (feed.name.includes('Spamhaus')) {
+        process.stdout.write(`    + Spamhaus EDROP... `);
+        try {
+          const edropText = await fetchText(SPAMHAUS_EDROP_URL);
+          const edropEntries = feed.parser(edropText);
+          // Re-tag as edrop
+          for (const e of edropEntries) {
+            if (e.tags) e.tags = e.tags.map((t) => t === 'spamhaus-drop' ? 'spamhaus-edrop' : t);
+          }
+          process.stdout.write(`${edropEntries.length} entries, `);
+          const edropResult = importEntries(store, feed, edropEntries);
+          totalImported += edropResult.imported;
+          totalDuplicates += edropResult.duplicates;
+          console.log(`${edropResult.imported} new, ${edropResult.duplicates} merged`);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.log(`FAILED: ${msg}`);
+        }
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.log(`FAILED: ${msg}`);
@@ -345,15 +355,23 @@ async function main(): Promise<void> {
     }
   }
 
+  // -------------------------------------------------------------------------
+  // Post-seed: run reputation + correlation
+  // -------------------------------------------------------------------------
+  console.log('\n[*] Running reputation scoring...');
+  const { ReputationEngine } = await import('../src/reputation-engine.js');
+  const rep = new ReputationEngine(dbWrapper.getDB());
+  const repResult = rep.recalculateAll();
+  console.log(`    ${repResult.updated} IoCs scored in ${repResult.duration}ms`);
+
   console.log('\n=== Summary ===');
   console.log(`Total imported:   ${totalImported}`);
   console.log(`Total merged:     ${totalDuplicates}`);
   console.log(`Total errors:     ${totalErrors}`);
 
-  // Show final counts
   const counts = store.getIoCCountsByType();
   const totalActive = store.getTotalActiveCount();
-  console.log(`\nDatabase totals: ${totalActive} active IoCs`);
+  console.log(`\nDatabase: ${totalActive} active IoCs`);
   for (const [type, count] of Object.entries(counts)) {
     console.log(`  ${type}: ${count}`);
   }

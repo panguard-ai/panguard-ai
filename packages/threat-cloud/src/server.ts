@@ -16,11 +16,14 @@
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { ThreatCloudDB } from './database.js';
 import { IoCStore } from './ioc-store.js';
 import { CorrelationEngine } from './correlation-engine.js';
 import { QueryHandlers } from './query-handlers.js';
 import { FeedDistributor } from './feed-distributor.js';
+import { SightingStore } from './sighting-store.js';
+import { AuditLogger } from './audit-logger.js';
 import { Scheduler } from './scheduler.js';
 import type {
   ServerConfig,
@@ -29,6 +32,8 @@ import type {
   TrapIntelligencePayload,
   IoCType,
   IoCStatus,
+  SightingInput,
+  AuditLogQuery,
 } from './types.js';
 
 /** Rate limiter state / 速率限制狀態 */
@@ -48,9 +53,13 @@ export class ThreatCloudServer {
   private readonly correlation: CorrelationEngine;
   private readonly queryHandlers: QueryHandlers;
   private readonly feedDistributor: FeedDistributor;
+  private readonly sightingStore: SightingStore;
+  private readonly auditLogger: AuditLogger;
   private readonly scheduler: Scheduler;
   private readonly config: ServerConfig;
   private rateLimits: Map<string, RateLimitEntry> = new Map();
+  /** Pre-hashed API keys for constant-time comparison */
+  private readonly hashedApiKeys: Buffer[];
 
   constructor(config: ServerConfig) {
     this.config = config;
@@ -60,7 +69,13 @@ export class ThreatCloudServer {
     this.correlation = new CorrelationEngine(rawDb);
     this.queryHandlers = new QueryHandlers(rawDb);
     this.feedDistributor = new FeedDistributor(rawDb);
+    this.sightingStore = new SightingStore(rawDb);
+    this.auditLogger = new AuditLogger(rawDb);
     this.scheduler = new Scheduler(rawDb);
+    // Pre-hash API keys for constant-time comparison
+    this.hashedApiKeys = config.apiKeys.map(
+      (k) => createHash('sha256').update(k).digest()
+    );
   }
 
   /** Start the server / 啟動伺服器 */
@@ -105,11 +120,20 @@ export class ThreatCloudServer {
     // Security headers
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'none'; frame-ancestors 'none'"
+    );
+    if (process.env['NODE_ENV'] === 'production') {
+      res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+    }
     res.setHeader('Content-Type', 'application/json');
 
     const clientIP = req.socket.remoteAddress ?? 'unknown';
 
-    // Rate limiting
+    // Rate limiting (per client IP)
     if (!this.checkRateLimit(clientIP)) {
       this.sendJson(res, 429, { ok: false, error: 'Rate limit exceeded' });
       return;
@@ -118,12 +142,22 @@ export class ThreatCloudServer {
     // API key verification (skip for health check)
     const url = req.url ?? '/';
     const pathname = url.split('?')[0] ?? '/';
+    let apiKeyHash = '';
 
     if (pathname !== '/health' && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
-      const token = authHeader.replace('Bearer ', '');
-      if (!this.config.apiKeys.includes(token)) {
-        this.sendJson(res, 401, { ok: false, error: 'Invalid API key' });
+      const token = authHeader.startsWith('Bearer ')
+        ? authHeader.slice(7)
+        : '';
+      if (!token || !this.verifyApiKey(token)) {
+        this.sendJson(res, 401, { ok: false, error: 'Unauthorized' });
+        return;
+      }
+      apiKeyHash = AuditLogger.hashApiKey(token);
+
+      // Per-API-key rate limiting (stricter for write ops)
+      if (req.method === 'POST' && !this.checkRateLimit(`key:${apiKeyHash}`, 30)) {
+        this.sendJson(res, 429, { ok: false, error: 'Rate limit exceeded' });
         return;
       }
     }
@@ -145,6 +179,18 @@ export class ThreatCloudServer {
       return;
     }
 
+    // Strict Content-Type for POST requests
+    if (req.method === 'POST') {
+      const contentType = req.headers['content-type'] ?? '';
+      if (!contentType.includes('application/json')) {
+        this.sendJson(res, 415, { ok: false, error: 'Content-Type must be application/json' });
+        return;
+      }
+    }
+
+    // Attach audit context to this request
+    const auditCtx = { actorHash: apiKeyHash, ipAddress: clientIP };
+
     try {
       // Route matching
       if (pathname === '/health') {
@@ -156,12 +202,28 @@ export class ThreatCloudServer {
       }
 
       if (pathname === '/api/threats' && req.method === 'POST') {
-        await this.handlePostThreat(req, res);
+        await this.handlePostThreat(req, res, auditCtx);
         return;
       }
 
       if (pathname === '/api/trap-intel' && req.method === 'POST') {
-        await this.handlePostTrapIntel(req, res);
+        await this.handlePostTrapIntel(req, res, auditCtx);
+        return;
+      }
+
+      // Sighting endpoints
+      if (pathname === '/api/sightings' && req.method === 'POST') {
+        await this.handlePostSighting(req, res, auditCtx);
+        return;
+      }
+      if (pathname === '/api/sightings' && req.method === 'GET') {
+        this.handleGetSightings(url, res);
+        return;
+      }
+
+      // Audit log endpoint
+      if (pathname === '/api/audit-log' && req.method === 'GET') {
+        this.handleGetAuditLog(url, res);
         return;
       }
 
@@ -169,7 +231,7 @@ export class ThreatCloudServer {
         if (req.method === 'GET') {
           this.handleGetRules(url, res);
         } else if (req.method === 'POST') {
-          await this.handlePostRule(req, res);
+          await this.handlePostRule(req, res, auditCtx);
         } else {
           this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
         }
@@ -247,18 +309,30 @@ export class ThreatCloudServer {
 
       this.sendJson(res, 404, { ok: false, error: 'Not found' });
     } catch (err) {
+      // Never leak stack traces or internal details in production
+      if (err instanceof SyntaxError) {
+        this.sendJson(res, 400, { ok: false, error: 'Invalid JSON in request body' });
+        return;
+      }
+      const isDev = process.env['NODE_ENV'] !== 'production';
+      const message = isDev && err instanceof Error ? err.message : 'Internal server error';
       console.error('Request error:', err);
-      this.sendJson(res, 500, { ok: false, error: 'Internal server error' });
+      this.sendJson(res, 500, { ok: false, error: message });
     }
   }
 
   // -------------------------------------------------------------------------
   // POST /api/threats - Upload anonymized threat data (enhanced: also creates IoC)
   // -------------------------------------------------------------------------
-  private async handlePostThreat(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  private async handlePostThreat(
+    req: IncomingMessage,
+    res: ServerResponse,
+    auditCtx: { actorHash: string; ipAddress: string }
+  ): Promise<void> {
     const body = await this.readBody(req);
     const data = JSON.parse(body) as AnonymizedThreatData;
 
+    // Input validation
     if (
       !data.attackSourceIP ||
       !data.attackType ||
@@ -275,6 +349,23 @@ export class ThreatCloudServer {
       return;
     }
 
+    if (!this.isValidIP(data.attackSourceIP)) {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid IP address format' });
+      return;
+    }
+
+    if (!this.isValidTimestamp(data.timestamp)) {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid timestamp format' });
+      return;
+    }
+
+    // Sanitize string fields
+    data.attackType = this.sanitizeString(data.attackType, 100);
+    data.mitreTechnique = this.sanitizeString(data.mitreTechnique, 50);
+    data.sigmaRuleMatched = this.sanitizeString(data.sigmaRuleMatched, 200);
+    data.region = this.sanitizeString(data.region, 10);
+    if (data.industry) data.industry = this.sanitizeString(data.industry, 50);
+
     // Anonymize IP
     data.attackSourceIP = this.anonymizeIP(data.attackSourceIP);
 
@@ -285,9 +376,9 @@ export class ThreatCloudServer {
     const enriched = ThreatCloudDB.guardToEnriched(data);
     const enrichedId = this.db.insertEnrichedThreat(enriched);
 
-    // Extract IP as IoC
+    // Extract IP as IoC + auto-sighting (learning)
     if (data.attackSourceIP && data.attackSourceIP !== 'unknown') {
-      this.iocStore.upsertIoC({
+      const ioc = this.iocStore.upsertIoC({
         type: 'ip',
         value: data.attackSourceIP,
         threatType: data.attackType,
@@ -295,7 +386,20 @@ export class ThreatCloudServer {
         confidence: 50,
         tags: [data.mitreTechnique],
       });
+
+      // Auto-sighting: agent reported this IP → positive sighting
+      if (ioc.sightings > 1) {
+        this.sightingStore.recordAgentMatch(ioc.id, 'guard', auditCtx.actorHash);
+        // Check for cross-source correlation
+        this.sightingStore.recordCrossSourceMatch(ioc.id, auditCtx.actorHash);
+      }
     }
+
+    // Audit log
+    this.auditLogger.log('threat_upload', 'enriched_threat', String(enrichedId ?? 'dup'), {
+      ...auditCtx,
+      details: { attackType: data.attackType, region: data.region },
+    });
 
     this.sendJson(res, 201, {
       ok: true,
@@ -309,10 +413,19 @@ export class ThreatCloudServer {
   // -------------------------------------------------------------------------
   // POST /api/trap-intel - Upload trap intelligence
   // -------------------------------------------------------------------------
-  private async handlePostTrapIntel(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  private async handlePostTrapIntel(
+    req: IncomingMessage,
+    res: ServerResponse,
+    auditCtx: { actorHash: string; ipAddress: string }
+  ): Promise<void> {
     const body = await this.readBody(req);
     const parsed = JSON.parse(body) as TrapIntelligencePayload | TrapIntelligencePayload[];
     const items = Array.isArray(parsed) ? parsed : [parsed];
+
+    if (items.length > 100) {
+      this.sendJson(res, 400, { ok: false, error: 'Batch size exceeds maximum of 100' });
+      return;
+    }
 
     let accepted = 0;
     let duplicates = 0;
@@ -322,6 +435,12 @@ export class ThreatCloudServer {
       if (!data.sourceIP || !data.attackType || !data.timestamp || !data.mitreTechniques) {
         continue;
       }
+
+      if (!this.isValidIP(data.sourceIP)) continue;
+
+      // Sanitize
+      data.attackType = this.sanitizeString(data.attackType, 100);
+      if (data.region) data.region = this.sanitizeString(data.region, 10);
 
       // Anonymize IP
       data.sourceIP = this.anonymizeIP(data.sourceIP);
@@ -333,32 +452,48 @@ export class ThreatCloudServer {
       if (enrichedId !== null) {
         accepted++;
 
-        // Insert trap credentials
+        // Insert trap credentials (sanitize usernames)
         if (data.topCredentials && data.topCredentials.length > 0) {
-          this.db.insertTrapCredentials(enrichedId, data.topCredentials);
+          const safeCreds = data.topCredentials.slice(0, 50).map((c) => ({
+            username: this.sanitizeString(c.username, 200),
+            count: Math.max(0, Math.min(1_000_000, c.count)),
+          }));
+          this.db.insertTrapCredentials(enrichedId, safeCreds);
         }
 
-        // Extract IP as IoC
+        // Extract IP as IoC + auto-sighting (learning)
         if (data.sourceIP && data.sourceIP !== 'unknown') {
           const techniques = data.mitreTechniques ?? [];
-          this.iocStore.upsertIoC({
+          const ioc = this.iocStore.upsertIoC({
             type: 'ip',
             value: data.sourceIP,
             threatType: data.attackType,
             source: 'trap',
             confidence: 60,
-            tags: techniques,
+            tags: techniques.map((t) => this.sanitizeString(t, 50)),
             metadata: {
               serviceType: data.serviceType,
               skillLevel: data.skillLevel,
               intent: data.intent,
             },
           });
+
+          // Auto-sighting: trap agent confirmed this IP
+          if (ioc.sightings > 1) {
+            this.sightingStore.recordAgentMatch(ioc.id, 'trap', auditCtx.actorHash);
+            this.sightingStore.recordCrossSourceMatch(ioc.id, auditCtx.actorHash);
+          }
         }
       } else {
         duplicates++;
       }
     }
+
+    // Audit log
+    this.auditLogger.log('trap_intel_upload', 'trap_intel', 'batch', {
+      ...auditCtx,
+      details: { accepted, duplicates, batchSize: items.length },
+    });
 
     this.sendJson(res, 201, {
       ok: true,
@@ -420,7 +555,11 @@ export class ThreatCloudServer {
   }
 
   /** POST /api/rules */
-  private async handlePostRule(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  private async handlePostRule(
+    req: IncomingMessage,
+    res: ServerResponse,
+    auditCtx: { actorHash: string; ipAddress: string }
+  ): Promise<void> {
     const body = await this.readBody(req);
     const rule = JSON.parse(body) as ThreatCloudRule;
 
@@ -432,8 +571,16 @@ export class ThreatCloudServer {
       return;
     }
 
+    rule.ruleId = this.sanitizeString(rule.ruleId, 200);
+    rule.source = this.sanitizeString(rule.source, 100);
     rule.publishedAt = rule.publishedAt || new Date().toISOString();
     this.db.upsertRule(rule);
+
+    this.auditLogger.log('rule_publish', 'rule', rule.ruleId, {
+      ...auditCtx,
+      details: { source: rule.source },
+    });
+
     this.sendJson(res, 201, { ok: true, data: { message: 'Rule published', ruleId: rule.ruleId } });
   }
 
@@ -550,6 +697,92 @@ export class ThreatCloudServer {
   // Utility methods / 工具方法
   // -------------------------------------------------------------------------
 
+  // -------------------------------------------------------------------------
+  // Sighting + Audit handlers
+  // -------------------------------------------------------------------------
+
+  private async handlePostSighting(
+    req: IncomingMessage,
+    res: ServerResponse,
+    auditCtx: { actorHash: string; ipAddress: string }
+  ): Promise<void> {
+    const body = await this.readBody(req);
+    const input = JSON.parse(body) as SightingInput;
+
+    if (!input.iocId || !input.type || !input.source) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'Missing required fields: iocId, type, source',
+      });
+      return;
+    }
+
+    if (!['positive', 'negative', 'false_positive'].includes(input.type)) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'type must be one of: positive, negative, false_positive',
+      });
+      return;
+    }
+
+    // Verify IoC exists
+    const ioc = this.iocStore.getIoCById(input.iocId);
+    if (!ioc) {
+      this.sendJson(res, 404, { ok: false, error: 'IoC not found' });
+      return;
+    }
+
+    input.source = this.sanitizeString(input.source, 200);
+    if (input.details) input.details = this.sanitizeString(input.details, 1000);
+
+    const sighting = this.sightingStore.createSighting(input, auditCtx.actorHash);
+
+    this.auditLogger.log('sighting_create', 'sighting', String(sighting.id), {
+      ...auditCtx,
+      details: { iocId: input.iocId, type: input.type, source: input.source },
+    });
+
+    this.sendJson(res, 201, { ok: true, data: sighting });
+  }
+
+  private handleGetSightings(url: string, res: ServerResponse): void {
+    const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
+    const iocId = Number(params.get('iocId') ?? '0');
+
+    if (!iocId) {
+      this.sendJson(res, 400, { ok: false, error: 'iocId query parameter required' });
+      return;
+    }
+
+    const result = this.sightingStore.getSightingsForIoC(iocId, {
+      page: Number(params.get('page') ?? '1'),
+      limit: Number(params.get('limit') ?? '50'),
+    });
+
+    const summary = this.sightingStore.getSightingSummary(iocId);
+
+    this.sendJson(res, 200, { ok: true, data: { ...result, summary } });
+  }
+
+  private handleGetAuditLog(url: string, res: ServerResponse): void {
+    const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
+
+    const query: AuditLogQuery = {
+      action: (params.get('action') as AuditLogQuery['action']) || undefined,
+      entityType: params.get('entityType') || undefined,
+      entityId: params.get('entityId') || undefined,
+      since: params.get('since') || undefined,
+      limit: Number(params.get('limit') ?? '50'),
+    };
+
+    const result = this.auditLogger.query(query);
+    this.sendJson(res, 200, { ok: true, data: result });
+  }
+
+  // -------------------------------------------------------------------------
+  // Utility methods / 工具方法
+  // -------------------------------------------------------------------------
+
   /** Anonymize IP by zeroing last octet / 匿名化 IP */
   private anonymizeIP(ip: string): string {
     if (ip.includes('.')) {
@@ -567,16 +800,58 @@ export class ThreatCloudServer {
     return ip;
   }
 
-  /** Rate limit check / 速率限制檢查 */
-  private checkRateLimit(ip: string): boolean {
+  /**
+   * Verify API key using constant-time comparison to prevent timing attacks.
+   * 使用常數時間比較驗證 API key 以防止計時攻擊
+   */
+  private verifyApiKey(token: string): boolean {
+    const tokenHash = createHash('sha256').update(token).digest();
+    for (const keyHash of this.hashedApiKeys) {
+      if (tokenHash.length === keyHash.length && timingSafeEqual(tokenHash, keyHash)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Rate limit check (supports per-IP and per-key) / 速率限制檢查 */
+  private checkRateLimit(key: string, maxPerMinute?: number): boolean {
+    const limit = maxPerMinute ?? this.config.rateLimitPerMinute;
     const now = Date.now();
-    const entry = this.rateLimits.get(ip);
+    const entry = this.rateLimits.get(key);
     if (!entry || now > entry.resetAt) {
-      this.rateLimits.set(ip, { count: 1, resetAt: now + 60_000 });
+      this.rateLimits.set(key, { count: 1, resetAt: now + 60_000 });
       return true;
     }
     entry.count++;
-    return entry.count <= this.config.rateLimitPerMinute;
+    return entry.count <= limit;
+  }
+
+  /** Validate IPv4 or IPv6 format / 驗證 IP 格式 */
+  private isValidIP(ip: string): boolean {
+    // IPv4
+    if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(ip)) {
+      const parts = ip.replace(/:\d+$/, '').split('.');
+      return parts.every((p) => {
+        const n = Number(p);
+        return n >= 0 && n <= 255;
+      });
+    }
+    // IPv6
+    if (ip.includes(':') && /^[0-9a-fA-F:]+$/.test(ip)) return true;
+    return false;
+  }
+
+  /** Validate ISO timestamp / 驗證 ISO 時間戳格式 */
+  private isValidTimestamp(ts: string): boolean {
+    const d = new Date(ts);
+    return !isNaN(d.getTime());
+  }
+
+  /** Sanitize string input: truncate and strip control characters / 清理字串輸入 */
+  private sanitizeString(input: string, maxLength: number): string {
+    // eslint-disable-next-line no-control-regex
+    return input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').slice(0, maxLength);
   }
 
   /** Read request body with size limit / 讀取請求主體 */
