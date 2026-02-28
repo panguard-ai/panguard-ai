@@ -8,6 +8,10 @@
   "bin": {
     "threat-cloud": "./dist/cli.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": ["dist", "package.json", "README.md"],
   "scripts": {
     "build": "tsc --build",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
@@ -15,7 +19,8 @@
     "test": "vitest run",
     "dev": "tsc --build --watch",
     "start": "node dist/cli.js",
-    "seed": "npx tsx scripts/seed.ts"
+    "seed": "npx tsx scripts/seed.ts",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "better-sqlite3": "^11.0.0"
