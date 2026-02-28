@@ -6,7 +6,7 @@ import { Copy, Check, ArrowRight, CheckCircle } from 'lucide-react';
 import { Link } from '@/navigation';
 
 /* ─── Install Command (never translated) ─── */
-const installCmd = 'curl -fsSL https://get.panguard.ai | sh';
+const installCmd = 'curl -fsSL https://get.panguard.ai | bash';
 
 function InstallBar() {
   const t = useTranslations('home.hero');

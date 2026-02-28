@@ -139,7 +139,7 @@ export default function GettingStartedContent() {
             <PlatformTabs selected={platform} onChange={setPlatform} />
             {platform === 'unix' ? (
               <CodeBlock
-                code="curl -fsSL https://get.panguard.ai | sh"
+                code="curl -fsSL https://get.panguard.ai | bash"
                 label="Terminal (macOS / Linux)"
               />
             ) : (

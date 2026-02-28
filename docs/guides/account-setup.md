@@ -34,7 +34,7 @@ Scan 方案可直接使用，付費方案透過 CLI 或網站升級。合規報�
 ### 一行指令安裝（推薦）
 
 ```bash
-curl -fsSL https://get.panguard.ai | sh
+curl -fsSL https://get.panguard.ai | bash
 ```
 
 ### 使用 npm 安裝
