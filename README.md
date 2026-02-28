@@ -19,7 +19,7 @@ Panguard AI is an open-source cybersecurity platform that brings enterprise-grad
 
 ### Core Principles
 
-- **One-command install** - `curl -fsSL https://get.panguard.ai | sh`
+- **One-command install** - `curl -fsSL https://get.panguard.ai | bash`
 - **Claude Code-style auth** - Sign up on web, `panguard login` opens browser, features gated by subscription tier
 - **7-day learning period** - AI builds a behavioral baseline before alerting
 - **Plain language alerts** - No Sigma / YARA / MITRE jargon for non-technical users
@@ -47,7 +47,7 @@ Panguard AI is an open-source cybersecurity platform that brings enterprise-grad
 
 ```bash
 # 1. Install
-curl -fsSL https://get.panguard.ai | sh
+curl -fsSL https://get.panguard.ai | bash
 
 # 2. Sign up at panguard.ai, then log in from CLI
 panguard login

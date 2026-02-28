@@ -7,7 +7,7 @@ import { Link } from '@/navigation';
 import FadeInUp from '../FadeInUp';
 import SectionWrapper from '../ui/SectionWrapper';
 
-const installCmd = 'curl -fsSL https://get.panguard.ai | sh';
+const installCmd = 'curl -fsSL https://get.panguard.ai | bash';
 
 export default function CallToAction() {
   const t = useTranslations('home.cta');

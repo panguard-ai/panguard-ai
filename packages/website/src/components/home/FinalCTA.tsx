@@ -8,7 +8,7 @@ import FadeInUp from '../FadeInUp';
 import SectionWrapper from '../ui/SectionWrapper';
 import { CheckIcon } from '@/components/ui/BrandIcons';
 
-const installCmd = 'curl -fsSL https://get.panguard.ai | sh';
+const installCmd = 'curl -fsSL https://get.panguard.ai | bash';
 
 export default function FinalCTA() {
   const t = useTranslations('home.finalCta');

@@ -387,7 +387,7 @@
       },
       "developer": {
         "step1Title": "Install",
-        "step1Desc": "curl -fsSL https://get.panguard.ai | sh\n30 seconds. Zero config.",
+        "step1Desc": "curl -fsSL https://get.panguard.ai | bash\n30 seconds. Zero config.",
         "step2Title": "Scan + start protection",
         "step2Desc": "panguard scan → see all vulnerabilities\npanguard guard start → real-time protection",
         "step3Title": "Connect your agent",

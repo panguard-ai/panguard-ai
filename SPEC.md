@@ -1085,7 +1085,7 @@ function generateThreatPatternHash(event: SecurityEvent): string {
 
 ```bash
 # 方式 1: 一行安裝（自動驗證 GPG 簽章）
-curl -fsSL https://get.panguard.ai | sh
+curl -fsSL https://get.panguard.ai | bash
 
 # 安裝腳本會自動：
 # 1. 下載二進位檔 + GPG 簽章檔
@@ -1129,7 +1129,7 @@ irm https://get.panguard.ai/win | iex
 
 ```bash
 #!/bin/bash
-# curl -fsSL https://get.panguard.ai | sh
+# curl -fsSL https://get.panguard.ai | bash
 
 set -e
 

@@ -308,7 +308,7 @@
       },
       "developer": {
         "step1Title": "安裝",
-        "step1Desc": "curl -fsSL https://get.panguard.ai | sh\n30 秒完成，零設定。",
+        "step1Desc": "curl -fsSL https://get.panguard.ai | bash\n30 秒完成，零設定。",
         "step2Title": "掃描 + 啟動防護",
         "step2Desc": "panguard scan → 看到所有漏洞\npanguard guard start → 開始即時防護",
         "step3Title": "接上你的 Agent",
