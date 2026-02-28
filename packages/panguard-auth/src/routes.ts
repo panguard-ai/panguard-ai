@@ -16,7 +16,7 @@ import {
 } from './auth.js';
 import { authenticateRequest, requireAdmin } from './middleware.js';
 import type { SmtpConfig } from './email-verify.js';
-import { sendVerificationEmail, sendResetEmail } from './email-verify.js';
+import { sendVerificationEmail, sendResetEmail, sendWelcomeEmail } from './email-verify.js';
 import type { GoogleOAuthConfig } from './google-oauth.js';
 import {
   getGoogleAuthUrl,
@@ -1462,6 +1462,14 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     }
 
     db.approveWaitlistEntry(entry.id);
+
+    // Send welcome email with registration link
+    if (config.smtp && config.baseUrl) {
+      sendWelcomeEmail(config.smtp, entry.email, entry.name || 'there', config.baseUrl).catch(() => {
+        // Best-effort delivery
+      });
+    }
+
     json(res, 200, { ok: true, data: { id: entry.id, status: 'approved' } });
   }
 
