@@ -31,7 +31,7 @@ export {
   sendResetEmail,
   sendExpirationWarningEmail,
 } from './email-verify.js';
-export type { SmtpConfig } from './email-verify.js';
+export type { SmtpConfig, ResendConfig, EmailConfig } from './email-verify.js';
 export {
   getGoogleAuthUrl,
   exchangeCodeForTokens,

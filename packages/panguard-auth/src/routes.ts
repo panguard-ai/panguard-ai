@@ -15,7 +15,7 @@ import {
   sessionExpiry,
 } from './auth.js';
 import { authenticateRequest, requireAdmin } from './middleware.js';
-import type { SmtpConfig } from './email-verify.js';
+import type { EmailConfig } from './email-verify.js';
 import { sendVerificationEmail, sendResetEmail, sendWelcomeEmail } from './email-verify.js';
 import type { GoogleOAuthConfig } from './google-oauth.js';
 import {
@@ -154,7 +154,7 @@ function isValidEmail(email: unknown): email is string {
 
 export interface AuthRouteConfig {
   db: AuthDB;
-  smtp?: SmtpConfig;
+  smtp?: EmailConfig;
   baseUrl?: string;
   google?: GoogleOAuthConfig;
   sheets?: GoogleSheetsConfig;
