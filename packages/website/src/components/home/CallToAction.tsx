@@ -6,12 +6,12 @@ import { Copy, Check, ArrowRight } from 'lucide-react';
 import { Link } from '@/navigation';
 import FadeInUp from '../FadeInUp';
 import SectionWrapper from '../ui/SectionWrapper';
-
-const installCmd = 'curl -fsSL https://get.panguard.ai | bash';
+import { useOS } from '@/hooks/useOS';
 
 export default function CallToAction() {
   const t = useTranslations('home.cta');
   const tc = useTranslations('common');
+  const { installCmd, prompt } = useOS();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -34,7 +34,7 @@ export default function CallToAction() {
             {t('curlLabel')}
           </p>
           <div className="relative flex items-center gap-3 bg-surface-1 border border-border rounded-xl px-5 py-3.5 font-mono text-sm">
-            <span className="text-brand-sage select-none">$</span>
+            <span className="text-brand-sage select-none">{prompt}</span>
             <code className="text-text-secondary flex-1 select-all truncate text-left">
               {installCmd}
             </code>
