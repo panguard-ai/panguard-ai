@@ -256,12 +256,12 @@ function generateInstallCommand(answers: GuidanceAnswers): string {
   const plan = determinePlan(answers.persona);
 
   if (plan === 'free') {
-    return 'curl -fsSL https://get.panguard.ai | sh';
+    return 'curl -fsSL https://get.panguard.ai | bash';
   }
 
   const channelFlag = answers.notificationChannel ? ` --notify ${answers.notificationChannel}` : '';
 
-  return `curl -fsSL https://get.panguard.ai | sh -s -- --plan ${plan}${channelFlag}`;
+  return `curl -fsSL https://get.panguard.ai | bash -s -- --plan ${plan}${channelFlag}`;
 }
 
 /**

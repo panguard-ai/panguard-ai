@@ -7,7 +7,7 @@ import SectionTitle from '../ui/SectionTitle';
 
 /* Terminal lines stay in English (CLI/code output never translated) */
 const lines = [
-  { text: '$ curl -sSL panguard.ai/install | sh', color: 'text-brand-sage' },
+  { text: '$ curl -sSL panguard.ai/install | bash', color: 'text-brand-sage' },
   { text: 'Downloading Panguard AI v2.1.0...', color: 'text-text-secondary', prefix: true },
   { text: 'Detecting environment... Ubuntu 24.04 LTS', color: 'text-text-secondary', prefix: true },
   { text: 'Installing security agents...', color: 'text-text-secondary', prefix: true },
