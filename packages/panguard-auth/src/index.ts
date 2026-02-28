@@ -61,6 +61,7 @@ export {
 } from './usage-meter.js';
 export type { MeterableResource, QuotaCheck, UsageSummary } from './usage-meter.js';
 export { initErrorTracking, captureException, captureRequestError } from './error-tracker.js';
+export { generateOpenApiSpec, generateSwaggerHtml } from './openapi.js';
 export type {
   WaitlistEntry,
   WaitlistInput,
