@@ -322,6 +322,16 @@ export default function StatusContent() {
         <SectionTitle overline={t('overline')} title={t('title')} subtitle={t('subtitle')} />
       </SectionWrapper>
 
+      {/* ───────────── Disclaimer ───────────── */}
+      <SectionWrapper spacing="tight">
+        <p className="text-center text-xs text-text-tertiary bg-surface-1 border border-border rounded-lg px-4 py-2 max-w-xl mx-auto">
+          Status data is manually updated. For real-time monitoring, contact{' '}
+          <a href="mailto:support@panguard.ai" className="text-brand-sage hover:underline">
+            support@panguard.ai
+          </a>
+        </p>
+      </SectionWrapper>
+
       {/* ───────────── Overall Status Banner ───────────── */}
       <SectionWrapper spacing="tight">
         <OverallBanner status={overallStatus} t={t} locale={locale} />

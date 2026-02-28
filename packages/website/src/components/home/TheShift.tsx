@@ -133,7 +133,7 @@ export default function TheShift() {
   ];
 
   return (
-    <SectionWrapper dark className="bg-gradient-to-b from-[#1F1C19] via-[#1D211C] to-[#1B261F]">
+    <SectionWrapper dark>
       {/* Blinking cursor top */}
       <FadeInUp>
         <div className="flex items-center gap-2 text-brand-sage font-mono text-sm mb-8">

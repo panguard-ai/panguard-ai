@@ -39,6 +39,7 @@ export default function DashboardContent() {
   const router = useRouter();
   const [usage, setUsage] = useState<UsageItem[]>([]);
   const [usageLoading, setUsageLoading] = useState(true);
+  const [usageError, setUsageError] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -58,7 +59,7 @@ export default function DashboardContent() {
           setUsage(data.data.usage);
         }
       } catch {
-        // Best effort
+        setUsageError('Unable to load usage data. Please refresh.');
       } finally {
         setUsageLoading(false);
       }
@@ -155,6 +156,8 @@ export default function DashboardContent() {
             <div className="flex items-center justify-center py-8">
               <Loader2 className="w-5 h-5 text-text-tertiary animate-spin" />
             </div>
+          ) : usageError ? (
+            <p className="text-sm text-status-caution py-4">{usageError}</p>
           ) : usage.length === 0 ? (
             <p className="text-sm text-text-tertiary py-4">No usage data available.</p>
           ) : (

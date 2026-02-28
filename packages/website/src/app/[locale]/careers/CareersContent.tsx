@@ -38,8 +38,8 @@ const benefitKeys = [
 
 function JobCard({ job }: { job: JobListing }) {
   return (
-    <Link
-      href={`/careers/${job.id}`}
+    <a
+      href={`mailto:careers@panguard.ai?subject=Application: ${encodeURIComponent(job.title)}`}
       className="bg-surface-1 border border-border rounded-xl p-5 hover:border-brand-sage/40 transition-all flex items-center justify-between group"
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -53,7 +53,7 @@ function JobCard({ job }: { job: JobListing }) {
         </div>
       </div>
       <ArrowRight className="w-4 h-4 text-text-muted group-hover:text-brand-sage transition-colors shrink-0 ml-4" />
-    </Link>
+    </a>
   );
 }
 
