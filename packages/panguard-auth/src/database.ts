@@ -124,6 +124,20 @@ export class AuthDB {
       CREATE INDEX IF NOT EXISTS idx_subscriptions_ls_id ON subscriptions(ls_subscription_id);
     `);
 
+    // Migration: totp_secrets table (2FA)
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS totp_secrets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
+        encrypted_secret TEXT NOT NULL,
+        backup_codes TEXT NOT NULL DEFAULT '[]',
+        enabled INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_totp_user ON totp_secrets(user_id);
+    `);
+
     // Migration: password_reset_tokens table
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -796,6 +810,180 @@ export class AuthDB {
     return result.changes;
   }
 
+  // ── GDPR: Account Deletion + Data Export ────────────────────
+
+  /**
+   * Delete a user and ALL associated data (GDPR right to erasure).
+   * Uses a transaction to ensure atomicity.
+   */
+  deleteUser(userId: number): { deleted: boolean; tablesAffected: string[] } {
+    const user = this.getUserById(userId);
+    if (!user) return { deleted: false, tablesAffected: [] };
+
+    const tablesAffected: string[] = [];
+
+    const txn = this.db.transaction(() => {
+      // Delete in dependency order (foreign keys)
+      const sessions = this.db.prepare('DELETE FROM sessions WHERE user_id = ?').run(userId);
+      if (sessions.changes > 0) tablesAffected.push('sessions');
+
+      const resets = this.db.prepare('DELETE FROM password_reset_tokens WHERE user_id = ?').run(userId);
+      if (resets.changes > 0) tablesAffected.push('password_reset_tokens');
+
+      const subs = this.db.prepare('DELETE FROM subscriptions WHERE user_id = ?').run(userId);
+      if (subs.changes > 0) tablesAffected.push('subscriptions');
+
+      const purchases = this.db.prepare('DELETE FROM report_purchases WHERE user_id = ?').run(userId);
+      if (purchases.changes > 0) tablesAffected.push('report_purchases');
+
+      // Anonymize audit log entries (keep for compliance, remove PII)
+      const audits = this.db
+        .prepare('UPDATE audit_log SET details = NULL WHERE actor_id = ? OR target_id = ?')
+        .run(userId, userId);
+      if (audits.changes > 0) tablesAffected.push('audit_log');
+
+      // Delete TOTP secrets if table exists
+      try {
+        const totp = this.db.prepare('DELETE FROM totp_secrets WHERE user_id = ?').run(userId);
+        if (totp.changes > 0) tablesAffected.push('totp_secrets');
+      } catch {
+        // Table may not exist yet
+      }
+
+      // Delete the user
+      this.db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+      tablesAffected.push('users');
+    });
+
+    txn();
+    return { deleted: true, tablesAffected };
+  }
+
+  /**
+   * Export all user data (GDPR right to data portability).
+   * Returns a structured object with all data belonging to the user.
+   */
+  exportUserData(userId: number): Record<string, unknown> | null {
+    const user = this.getUserById(userId);
+    if (!user) return null;
+
+    const sessions = this.db
+      .prepare(
+        `SELECT id, expires_at as expiresAt, created_at as createdAt
+         FROM sessions WHERE user_id = ?`
+      )
+      .all(userId);
+
+    const purchases = this.db
+      .prepare(
+        `SELECT id, addon_id as addonId, pricing_model as pricingModel,
+                status, purchased_at as purchasedAt, expires_at as expiresAt
+         FROM report_purchases WHERE user_id = ?`
+      )
+      .all(userId);
+
+    const subscriptions = this.db
+      .prepare(
+        `SELECT id, tier, status, renews_at as renewsAt, ends_at as endsAt,
+                created_at as createdAt, updated_at as updatedAt
+         FROM subscriptions WHERE user_id = ?`
+      )
+      .all(userId);
+
+    const auditLogs = this.db
+      .prepare(
+        `SELECT id, action, details, created_at as createdAt
+         FROM audit_log WHERE actor_id = ? OR target_id = ?`
+      )
+      .all(userId, userId);
+
+    return {
+      exportedAt: new Date().toISOString(),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        tier: user.tier,
+        verified: user.verified,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+        planExpiresAt: user.planExpiresAt,
+      },
+      sessions,
+      subscriptions,
+      reportPurchases: purchases,
+      auditLogs,
+    };
+  }
+
+  // ── TOTP (Two-Factor Auth) ─────────────────────────────────
+
+  /**
+   * Store TOTP secret and backup codes for a user.
+   */
+  saveTotpSecret(userId: number, encryptedSecret: string, backupCodes: string): void {
+    this.db
+      .prepare(
+        `INSERT INTO totp_secrets (user_id, encrypted_secret, backup_codes, enabled)
+         VALUES (?, ?, ?, 0)
+         ON CONFLICT(user_id) DO UPDATE SET
+           encrypted_secret = excluded.encrypted_secret,
+           backup_codes = excluded.backup_codes,
+           enabled = 0,
+           updated_at = datetime('now')`
+      )
+      .run(userId, encryptedSecret, backupCodes);
+  }
+
+  /**
+   * Enable TOTP for a user (after they verify it works).
+   */
+  enableTotp(userId: number): void {
+    this.db
+      .prepare("UPDATE totp_secrets SET enabled = 1, updated_at = datetime('now') WHERE user_id = ?")
+      .run(userId);
+  }
+
+  /**
+   * Disable and remove TOTP for a user.
+   */
+  disableTotp(userId: number): void {
+    this.db.prepare('DELETE FROM totp_secrets WHERE user_id = ?').run(userId);
+  }
+
+  /**
+   * Get TOTP secret for a user.
+   */
+  getTotpSecret(userId: number): TotpSecret | undefined {
+    return this.db
+      .prepare(
+        `SELECT id, user_id as userId, encrypted_secret as encryptedSecret,
+                backup_codes as backupCodes, enabled,
+                created_at as createdAt, updated_at as updatedAt
+         FROM totp_secrets WHERE user_id = ?`
+      )
+      .get(userId) as TotpSecret | undefined;
+  }
+
+  /**
+   * Consume a backup code. Returns true if the code was valid and consumed.
+   */
+  consumeBackupCode(userId: number, code: string): boolean {
+    const secret = this.getTotpSecret(userId);
+    if (!secret) return false;
+
+    const codes: string[] = JSON.parse(secret.backupCodes);
+    const index = codes.indexOf(code);
+    if (index === -1) return false;
+
+    const remaining = [...codes.slice(0, index), ...codes.slice(index + 1)];
+    this.db
+      .prepare("UPDATE totp_secrets SET backup_codes = ?, updated_at = datetime('now') WHERE user_id = ?")
+      .run(JSON.stringify(remaining), userId);
+    return true;
+  }
+
   close(): void {
     this.db.close();
   }
@@ -821,6 +1009,16 @@ export interface Subscription {
   status: string;
   renewsAt: string | null;
   endsAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TotpSecret {
+  id: number;
+  userId: number;
+  encryptedSecret: string;
+  backupCodes: string;
+  enabled: number;
   createdAt: string;
   updatedAt: string;
 }

@@ -24,6 +24,7 @@ export const DEFAULT_GUARD_CONFIG: GuardConfig = {
   actionPolicy: DEFAULT_ACTION_POLICY,
   notifications: {},
   dataDir: DEFAULT_DATA_DIR,
+  yaraRulesDir: join(DEFAULT_DATA_DIR, 'yara-rules'),
   dashboardPort: 3100,
   dashboardEnabled: true,
   verbose: false,
