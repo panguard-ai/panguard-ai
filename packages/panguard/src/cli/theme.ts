@@ -49,25 +49,27 @@ export const theme = {
 
 const TIER_COLORS: Record<string, (s: string) => string> = {
   free: c.safe,
+  community: c.safe,
   solo: c.caution,
-  starter: c.caution,
+  starter: c.caution, // legacy
   pro: c.alert,
-  team: c.alert,
-  business: c.alert,
-  enterprise: c.critical,
+  team: c.alert, // legacy
+  business: c.critical,
+  enterprise: c.critical, // legacy
 };
 
 /** Tier badge for menu display. Shows lock only when user tier is insufficient. */
 export function tierLabel(requiredTier: Tier | string, userTier?: Tier | string): string {
   const colorFn = TIER_COLORS[requiredTier] ?? c.dim;
   const names: Record<string, string> = {
-    free: 'Free',
+    free: 'Community',
+    community: 'Community',
     solo: 'Solo',
-    starter: 'Solo',
+    starter: 'Solo', // legacy
     pro: 'Pro',
-    team: 'Pro',
-    business: 'Pro',
-    enterprise: 'Ent',
+    team: 'Pro', // legacy
+    business: 'Business',
+    enterprise: 'Business', // legacy
   };
   const name = names[requiredTier] ?? requiredTier;
   if (requiredTier === 'free') return colorFn(name);

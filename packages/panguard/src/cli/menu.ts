@@ -130,7 +130,7 @@ function renderMenuLine(item: MenuItem, selected: boolean, userTier?: Tier | str
   }
 
   // Calculate padding for right-alignment
-  const leftPart = `  ${pointer} ${item.key.padEnd(15)} ${label}`;
+  const leftPart = `  ${pointer} ${label}`;
   const leftLen = visLen(leftPart);
   const badgeLen = visLen(badge);
   const gap = Math.max(1, MENU_WIDTH - leftLen - badgeLen);
@@ -288,7 +288,8 @@ export async function waitForCompactChoice(
 
   console.log(`  ${c.dim(`[b] ${backText}`)}`);
   console.log('');
-  process.stdout.write(`  ${c.sage('>')} `);
+  const promptLabel = lang === 'zh-TW' ? '\u9078\u64C7' : 'Select';
+  process.stdout.write(`  ${c.sage(promptLabel + ' >')} `);
 
   while (true) {
     const key = await waitForKey();
