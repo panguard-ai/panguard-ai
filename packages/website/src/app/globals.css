@@ -486,3 +486,38 @@ body {
     box-shadow: 0 0 0 1px rgba(139,154,142,0.35), 0 8px 40px rgba(139,154,142,0.15);
   }
 }
+
+/* ─── Blog Prose Styling ─── */
+
+.prose-panguard {
+  max-width: 720px;
+}
+
+.prose-panguard h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.prose-panguard p + h2 {
+  margin-top: 3rem;
+}
+
+.prose-panguard pre {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.prose-panguard p {
+  margin-bottom: 0.25rem;
+}
+
+.prose-panguard ul,
+.prose-panguard ol {
+  padding-left: 1.5rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-panguard li {
+  margin-bottom: 0.5rem;
+}

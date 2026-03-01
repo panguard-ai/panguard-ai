@@ -1,236 +1,265 @@
-# Product Overview / 產品概覽
+# Product Overview
 
 > AI-Driven Adaptive Endpoint Protection
-> AI 驅動的自適應端點防護平台
 
 ---
 
 ## What is Panguard AI?
 
-Panguard AI 是一個開源的網路安全平台，專為沒有資安團隊的中小企業和個人開發者設計。
+Panguard AI is an open-source cybersecurity platform designed for developers and small businesses who don't have a security team.
 
-核心理念很簡單：**在網站註冊帳號，在 CLI 登入，AI 全自動保護你的機器。有事它會告訴你，沒事你什麼都不用做。**
+The core idea is simple: **sign up on the website, log in from CLI, and AI protects your machines automatically. It tells you when something happens. When nothing happens, you do nothing.**
 
-### 使用體驗
+### User Experience
 
-像 Claude / Claude Code 一樣：
+Like Claude Code:
 
-1. **網站** — 瀏覽方案、註冊帳號、管理訂閱
-2. **CLI** — `panguard login` 開瀏覽器完成認證 → token 存在本地
-3. **使用** — 依訂閱等級使用 CLI 功能，零日常操作
+1. **Website** - Browse plans, sign up, manage subscriptions
+2. **CLI** - `panguard login` opens browser for auth, token stored locally
+3. **Usage** - Features gated by subscription tier, zero daily operation
 
-### 為什麼需要 Panguard AI？
+### Why Panguard AI?
 
-傳統資安工具的問題：
+Traditional security tools:
 
-- 需要專業知識才能安裝和設定
-- 介面充滿 Sigma、YARA、IOC、MITRE ATT&CK 等術語
-- 產生大量告警，不知道哪些重要
-- 企業級工具太貴，免費工具太難用
+- Require expertise to install and configure
+- Interfaces full of Sigma, YARA, IOC, MITRE ATT&CK jargon
+- Generate thousands of alerts with no prioritization
+- Enterprise tools cost six figures; free tools are unusable
 
-Panguard AI 的做法：
+Panguard AI:
 
-- **一行指令安裝**，零設定
-- **用人話通知你**，透過你已經在用的 LINE / Telegram / Slack
-- **AI 自動判斷**嚴重程度並執行回應
-- **越用越準**，從你的環境持續學習
+- **One command install**, zero configuration
+- **Plain language notifications** via LINE / Telegram / Slack
+- **AI auto-judges** severity and executes responses
+- **Gets smarter over time**, learning from your environment
 
 ---
 
-## 產品線
+## Product Suite
 
-Panguard AI 包含 6 個產品，各自獨立但可以協同運作：
+Panguard AI includes 6 products. Each works independently, but together they form a complete SOC in one command.
 
-### Panguard Scan — 60 秒安全健檢
+### Panguard Scan - 60-Second Security Audit
 
-一次性安全掃描，產生風險評分和 PDF 報告。
+One-time security scan that produces a risk score and PDF report.
 
 ```bash
 panguard scan --quick
 ```
 
-- 系統環境偵察（OS、網路、port、服務）
-- 密碼政策檢查
-- 防火牆狀態
-- 風險評分 0-100（A-F 等級）
-- PDF 報告（含修復建議 + 合規對應）
+- System discovery (OS, network, ports, services)
+- Password policy audit
+- Firewall status check
+- SSL/TLS certificate validation
+- Risk score 0-100 (grades A-F)
+- PDF report with remediation + compliance mapping
 
-適合：初次評估、定期健檢、合規稽核前準備。
+Best for: initial assessment, periodic health checks, pre-audit preparation.
 
-[詳細指南 ->](guides/scan.md)
+[Guide ->](guides/scan.md)
 
 ---
 
-### Panguard Guard — AI 即時監控 `[STARTER]`
+### Panguard Guard - AI Real-Time Monitoring
 
-持續運行的 AI 守護引擎，自動偵測和回應威脅。
+Always-on AI protection engine that detects and responds to threats automatically.
 
 ```bash
 panguard guard start
 ```
 
-- 5 個 AI Agent 管線：Detect -> Analyze -> Respond -> Report -> Investigation
-- 7 天學習期建立行為基線
-- 42 條 Sigma 規則 + YARA 掃描
-- 即時威脅情報（ThreatFox / URLhaus / GreyNoise）
-- 自動回應：IP 封鎖、檔案隔離、程序終止
-- 安全分數引擎 + 成就系統
+- 4-agent AI pipeline: Detect -> Analyze -> Respond -> Report
+- 7-day learning period builds behavioral baseline
+- 3,149 Sigma rules + 494 YARA rules
+- Real-time threat intelligence (ThreatFox / URLhaus / GreyNoise)
+- Auto-response: IP blocking, file quarantine, process termination
+- Investigation engine for root cause analysis
 
-適合：伺服器長期防護、VPS 保護、辦公室端點監控。
+Best for: server protection, VPS, office endpoint monitoring.
 
-[詳細指南 ->](guides/guard.md)
+[Guide ->](guides/guard.md)
 
 ---
 
-### Panguard Chat — AI 資安通知 `[STARTER]`
+### Panguard Chat - AI Security Notifications
 
-將技術性安全告警翻譯成人話，透過你偏好的管道通知。
+Translates technical security alerts into plain language and delivers them through your preferred channel.
 
 ```bash
 panguard chat setup --channel line --user-type boss
 ```
 
-- 5 個通知管道：LINE、Telegram、Slack（Block Kit）、Email（SMTP HTML）、Webhook（mTLS）
-- 3 種角色格式：
-  - **boss** — 影響摘要，人話描述
-  - **developer** — 技術細節，指令碼和日誌
-  - **it_admin** — 修復步驟，逐步操作指引
-- 雙語模板（English / 繁體中文）
+- 5 notification channels: LINE, Telegram, Slack (Block Kit), Email (SMTP/HTML), Webhook (mTLS)
+- 3 tone modes:
+  - **boss** - Impact summary, plain language
+  - **developer** - Technical details, CLI commands and logs
+  - **it_admin** - Remediation steps, step-by-step instructions
+- Bilingual templates (English / Traditional Chinese)
 
-適合：所有人。Guard 偵測到威脅後透過 Chat 通知你。
+Best for: everyone. Guard detects threats, Chat tells you about them.
 
-[詳細指南 ->](guides/chat.md)
-
----
-
-### Panguard Trap — 智慧蜜罐 `[PRO]`
-
-部署假服務引誘攻擊者，收集情報並分析其行為。
-
-- 8 種蜜罐服務：SSH、HTTP、FTP、SMB、MySQL、RDP、Telnet、Redis
-- 攻擊者側寫：技術等級分類（腳本小子 / 進階攻擊者 / APT）
-- 憑證收集與指令記錄
-- 攻擊意圖分析
-- 威脅情報報告
-
-適合：想了解誰在攻擊你、攻擊者的意圖和技術水準。
-
-[詳細指南 ->](guides/trap.md)
+[Guide ->](guides/chat.md)
 
 ---
 
-### Panguard Report — 合規報告 `[PRO]`
+### Panguard Trap - Smart Honeypots
 
-自動產生符合法規框架的安全合規報告。
+Deploy decoy services to lure attackers, collect intelligence, and profile their behavior.
 
-- 台灣資通安全管理法（10 個控制項）
-- ISO 27001（12 個控制項）
-- SOC 2（10 個控制項）
-- JSON 和 PDF 格式
-- 雙語輸出
+- 8 honeypot services: SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, Redis
+- Attacker profiling: skill level classification (script kiddie / intermediate / APT)
+- Credential collection and command logging
+- Intent analysis
+- Threat intelligence reports
+- All honeypots fully isolated from production
 
-適合：需要合規報告的中型企業、稽核準備。
+Best for: understanding who's attacking you, their intent and skill level.
 
-[詳細指南 ->](guides/report.md)
+[Guide ->](guides/trap.md)
 
 ---
 
-### Threat Cloud — 集體威脅情報 `[ENTERPRISE]`
+### Panguard Report - Compliance Reports
 
-匿名化的威脅情報共享平台，所有 Panguard 用戶共同建構防護網。
+Auto-generate audit-ready compliance reports in 60 seconds.
+
+```bash
+panguard report --framework iso27001
+```
+
+| Framework | Controls | Languages |
+|-----------|----------|-----------|
+| Taiwan Cyber Security Act (TCSA) | 50 controls | EN + zh-TW |
+| ISO/IEC 27001:2022 | 93 controls | EN + zh-TW |
+| SOC 2 Trust Services | 64 controls | EN |
+
+- Executive summary with security score
+- Control-by-control assessment
+- Evidence packages with timestamps
+- Remediation recommendations
+- JSON, Markdown, and PDF output
+
+> Reports assess readiness, not certification. They prepare you for formal audits.
+
+Best for: mid-size companies needing compliance, audit preparation, enterprise sales.
+
+[Guide ->](guides/report.md)
+
+---
+
+### Threat Cloud - Collective Threat Intelligence
+
+Anonymized threat intelligence sharing. Every Panguard user strengthens the network.
 
 ```bash
 panguard threat start --port 8080
 ```
 
-- RESTful API 伺服器
-- SQLite 後端，輕量部署
-- IoC（入侵指標）提交和查詢
-- 速率限制
-- 自動過期清理
+- RESTful API server with SQLite backend
+- IoC (Indicator of Compromise) submission and queries
+- Automatic Sigma rule generation from real attacks
+- IP/domain reputation scoring
+- Rate limiting and API key authentication
+- Encrypted transport (TLS 1.3)
 
-適合：企業私有部署、社群共享威脅情報。
+Privacy: only anonymized threat signatures leave your machine. Zero raw data. Zero telemetry. Can be turned off anytime. Community tier works fully offline.
 
-[詳細指南 ->](guides/threat-cloud.md)
+Best for: private enterprise deployment, community threat intelligence sharing.
+
+[Guide ->](guides/threat-cloud.md)
 
 ---
 
-## 架構概覽
+## Architecture
 
 ```
-                         使用者
+                         User
                           |
                     [panguard.ai]
-                   註冊 / 登入 / 管理訂閱
+                 Sign up / Manage
                           |
                     [panguard login]
-                   CLI 本地認證
+                      CLI auth
                           |
     +---------------------+---------------------+
     |                     |                     |
 [Panguard Scan]    [Panguard Guard]      [Panguard Report]
- 60s 健檢          AI 即時監控           合規報告
+  60s audit        AI monitoring          Compliance
     |              |         |                |
-    |         [5 AI Agents] [Context Memory]  |
-    |              |                          |
-    +------[Panguard Trap]------+              |
-           蜜罐系統                           |
+    |         [4 Agents] [Baseline]          |
+    |              |                         |
+    +------[Panguard Trap]------+             |
+           Honeypots                         |
                 |                            |
-           [Threat Cloud] ------ 集體威脅情報
+           [Threat Cloud] ------ Collective Intelligence
 ```
 
-### 三層 AI 漏斗
+### Three-Layer AI Funnel
 
-Panguard Guard 使用三層架構處理安全事件，在效率和準確度之間取得平衡：
+| Layer | Technology | Handles | Latency | Cost |
+|-------|-----------|---------|---------|------|
+| Layer 1 | Sigma/YARA rules engine | 90% | < 50ms | $0 |
+| Layer 2 | Local AI (Ollama) | 7% | ~2s | $0 |
+| Layer 3 | Cloud AI | 3% | ~5s | $0.008/call |
 
-| 層級    | 技術                | 處理比例 | 延遲  | 成本           |
-| ------- | ------------------- | -------- | ----- | -------------- |
-| Layer 1 | Sigma/YARA 規則引擎 | 90%      | < 1ms | 零             |
-| Layer 2 | 本地 AI（Ollama）   | 7%       | < 5s  | 零（本機運算） |
-| Layer 3 | 雲端 AI             | 3%       | < 30s | 極低           |
+Cloud down? Local AI takes over. Local AI down? Rules engine keeps running. Protection never stops.
 
-[了解更多 ->](concepts/three-layer-ai.md)
-
----
-
-## 技術堆疊
-
-| 類別     | 技術                                  |
-| -------- | ------------------------------------- |
-| 語言     | TypeScript 5.7（strict mode）         |
-| 執行環境 | Node.js 20+                           |
-| 套件管理 | pnpm 10（workspace monorepo）         |
-| 測試     | Vitest 3（1068 tests）                |
-| 規則引擎 | Sigma + YARA                          |
-| 威脅情報 | abuse.ch / GreyNoise / AbuseIPDB      |
-| 認證     | Google OAuth (PKCE) + scrypt 密碼雜湊 |
-| i18n     | i18next（English + 繁體中文）         |
-| 加密     | AES-256-GCM                           |
+[Learn more ->](concepts/three-layer-ai.md)
 
 ---
 
-## 訂閱等級
+## Tech Stack
 
-| 功能              | Free | Starter | Pro | Enterprise |
-| ----------------- | ---- | ------- | --- | ---------- |
-| 快速掃描          | v    | v       | v   | v          |
-| 狀態查詢          | v    | v       | v   | v          |
-| 完整掃描          | -    | v       | v   | v          |
-| 即時防護（Guard） | -    | v       | v   | v          |
-| 通知管道（Chat）  | -    | v       | v   | v          |
-| 部署服務          | -    | v       | v   | v          |
-| AI 深度分析       | -    | v       | v   | v          |
-| 自動回應          | -    | v       | v   | v          |
-| 合規報告          | -    | -       | v   | v          |
-| 蜜罐系統（Trap）  | -    | -       | v   | v          |
-| 威脅情報 API      | -    | -       | -   | v          |
-| 進階調查引擎      | -    | -       | -   | v          |
-| 優先支援          | -    | -       | -   | v          |
-
-管理訂閱：[panguard.ai/pricing](https://panguard.ai/pricing)
+| Category | Technology |
+|----------|-----------|
+| Language | TypeScript 5.7 (strict mode) |
+| Runtime | Node.js 20+ |
+| Monorepo | pnpm 10 workspaces |
+| Testing | Vitest 3 (1,107 tests) |
+| Rules | Sigma (3,149) + YARA (494) + Suricata + Falco |
+| AI | Ollama (local) + Claude / OpenAI (cloud) |
+| Auth | Google OAuth (PKCE) + scrypt hashing |
+| i18n | English + Traditional Chinese |
+| Encryption | AES-256-GCM |
 
 ---
 
-## 開源授權
+## Subscription Tiers
 
-Panguard AI 以 [MIT License](https://github.com/panguard-ai/panguard-ai/blob/main/LICENSE) 釋出。
+| Feature | Community | Solo | Pro | Business |
+|---------|-----------|------|-----|----------|
+| Price | Free | $9/mo | $29/mo | $79/mo |
+| Machines | 1 | 3 | 10 | 25 |
+| Scan (unlimited) | v | v | v | v |
+| Guard (Layer 1) | v | v | v | v |
+| Guard (Full 3-layer) | - | v | v | v |
+| Chat notifications | - | v | v | v |
+| Local AI (Ollama) | - | v | v | v |
+| Cloud AI analysis | - | - | v | v |
+| Trap (8 honeypots) | - | - | v | v |
+| Compliance reports | - | - | v | v |
+| SIEM integration | - | - | - | v |
+| SSO & RBAC | - | - | - | v |
+| Dedicated support | - | - | - | v |
+
+**Compliance reports** available as one-time purchase on Pro+ plans:
+
+| Report | Price | Controls |
+|--------|-------|----------|
+| Taiwan TCSA | $299 | 50 |
+| ISO 27001 | $499 | 93 |
+| SOC 2 | $699 | 64 |
+| Bundle (all 3) | $999 | 207 |
+
+Annual billing: 20% discount on all plans.
+
+Manage subscription: [panguard.ai/pricing](https://panguard.ai/pricing)
+
+---
+
+## Open Source
+
+Panguard AI is released under the [MIT License](https://github.com/panguard-ai/panguard-ai/blob/main/LICENSE).
+
+Full source code. Zero black boxes. Every line auditable.
