@@ -58,7 +58,7 @@ export function createAdminRoutes(ctx: RouteContext) {
     }
 
     const { tier } = result.data;
-    const validTiers = ['free', 'solo', 'starter', 'pro', 'team', 'business', 'enterprise'];
+    const validTiers = ['community', 'solo', 'pro', 'business', 'enterprise'];
     if (typeof tier !== 'string' || !validTiers.includes(tier)) {
       json(res, 400, {
         ok: false,
@@ -522,7 +522,7 @@ export function createAdminRoutes(ctx: RouteContext) {
       return;
     }
 
-    const validTiers = ['free', 'solo', 'starter', 'team', 'business', 'enterprise'];
+    const validTiers = ['community', 'solo', 'pro', 'business', 'enterprise'];
     const validRoles = ['user', 'admin'];
 
     if (action === 'change_tier' && (!value || !validTiers.includes(value))) {

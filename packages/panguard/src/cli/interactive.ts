@@ -76,13 +76,13 @@ interface MenuDef {
 }
 
 const MENU_DEFS: MenuDef[] = [
-  { key: 'scan', en: 'Security scan', zh: '\u5B89\u5168\u6383\u63CF', tier: 'free' },
-  { key: 'guard', en: 'Real-time protection', zh: '\u5373\u6642\u9632\u8B77', tier: 'free' },
+  { key: 'scan', en: 'Security scan', zh: '\u5B89\u5168\u6383\u63CF', tier: 'community' },
+  { key: 'guard', en: 'Real-time protection', zh: '\u5373\u6642\u9632\u8B77', tier: 'community' },
   {
     key: 'threat-cloud',
     en: 'Threat intelligence API',
     zh: '\u5A01\u8105\u60C5\u5831 API',
-    tier: 'free',
+    tier: 'community',
   },
   {
     key: 'notify',
@@ -98,9 +98,9 @@ const MENU_DEFS: MenuDef[] = [
     tier: 'business',
   },
   { key: '__sep__', en: '', zh: '', tier: '' },
-  { key: 'setup', en: 'Initial configuration', zh: '\u521D\u59CB\u8A2D\u5B9A', tier: 'free' },
-  { key: 'demo', en: 'Feature demo', zh: '\u529F\u80FD\u5C55\u793A', tier: 'free' },
-  { key: 'upgrade', en: 'Upgrade plan', zh: '\u5347\u7D1A\u65B9\u6848', tier: 'free' },
+  { key: 'setup', en: 'Initial configuration', zh: '\u521D\u59CB\u8A2D\u5B9A', tier: 'community' },
+  { key: 'demo', en: 'Feature demo', zh: '\u529F\u80FD\u5C55\u793A', tier: 'community' },
+  { key: 'upgrade', en: 'Upgrade plan', zh: '\u5347\u7D1A\u65B9\u6848', tier: 'community' },
 ];
 
 function buildMenuItems(lang: Lang): MenuItem[] {
@@ -141,7 +141,7 @@ function renderStartup(): void {
   // Status info
   const { tier } = getLicense();
   const tierName = tierDisplayName(tier);
-  const tierColor = tier === 'free' ? c.caution : c.safe;
+  const tierColor = tier === 'community' ? c.caution : c.safe;
 
   const statusLabel = currentLang === 'zh-TW' ? '\u72C0\u614B' : 'Status';
   const licenseLabel = currentLang === 'zh-TW' ? '\u6388\u6B0A' : 'License';
@@ -345,7 +345,7 @@ async function actionScan(): Promise<void> {
       console.log(`  ${sev} ${f.title}`);
 
       // Show manual fix commands for free tier
-      if (tier === 'free' && f.manualFix && f.manualFix.length > 0) {
+      if (tier === 'community' && f.manualFix && f.manualFix.length > 0) {
         const fixLabel = currentLang === 'zh-TW' ? '\u624B\u52D5\u4FEE\u5FA9:' : 'Manual fix:';
         console.log(c.dim(`          ${fixLabel}`));
         for (const cmd of f.manualFix) {
@@ -363,7 +363,7 @@ async function actionScan(): Promise<void> {
     console.log(c.dim(`  ${issuesText}`));
 
     // Upgrade prompt for free tier
-    if (tier === 'free' && fixableCount > 0) {
+    if (tier === 'community' && fixableCount > 0) {
       const upgradeLines =
         currentLang === 'zh-TW'
           ? [
@@ -528,7 +528,7 @@ async function actionGuard(): Promise<void> {
     case '2': {
       // Free tier — show positive capabilities first, then dimmed upgrade hints
       const { tier } = getLicense();
-      if (tier === 'free' || tier === 'community') {
+      if (tier === 'community') {
         console.log(`  ${c.sage('\u25C6')} Guard active${' '.repeat(30)}Layer 1 \u00B7 Community`);
         console.log('');
         if (currentLang === 'zh-TW') {

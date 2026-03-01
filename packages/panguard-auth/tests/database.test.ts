@@ -111,7 +111,7 @@ describe('AuthDB', () => {
       expect(user.name).toBe('Test User');
       expect(user.passwordHash).toBe('hashed_pw');
       expect(user.role).toBe('user');
-      expect(user.tier).toBe('free');
+      expect(user.tier).toBe('community');
     });
 
     it('should normalize user email', () => {

@@ -82,8 +82,7 @@ export function whoamiCommand(): Command {
           status:
             creds.tier === 'enterprise' ||
             creds.tier === 'pro' ||
-            creds.tier === 'business' ||
-            creds.tier === 'team'
+            creds.tier === 'business'
               ? 'safe'
               : undefined,
         },

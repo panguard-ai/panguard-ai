@@ -37,14 +37,6 @@ export interface UsageSummary {
 
 /** Quota limits per tier. -1 means unlimited. */
 const TIER_QUOTAS: Record<string, Record<MeterableResource, number>> = {
-  free: {
-    scan: 100,
-    guard_endpoints: 1,
-    reports: 0,
-    api_calls: 1000,
-    notifications: 0,
-    trap_instances: 0,
-  },
   community: {
     scan: 100,
     guard_endpoints: 1,
@@ -61,28 +53,12 @@ const TIER_QUOTAS: Record<string, Record<MeterableResource, number>> = {
     notifications: 1,
     trap_instances: 1,
   },
-  starter: {
-    scan: -1,
-    guard_endpoints: 5,
-    reports: 0,
-    api_calls: 10000,
-    notifications: 3,
-    trap_instances: 1,
-  },
   pro: {
     scan: -1,
     guard_endpoints: 10,
     reports: 5,
     api_calls: 50000,
     notifications: 3,
-    trap_instances: 3,
-  },
-  team: {
-    scan: -1,
-    guard_endpoints: 10,
-    reports: 5,
-    api_calls: 50000,
-    notifications: -1,
     trap_instances: 3,
   },
   business: {
@@ -128,7 +104,7 @@ export function checkQuota(
   tier: string,
   resource: MeterableResource
 ): QuotaCheck {
-  const quotas = TIER_QUOTAS[tier] ?? TIER_QUOTAS['free']!;
+  const quotas = TIER_QUOTAS[tier] ?? TIER_QUOTAS['community']!;
   const limit = quotas[resource] ?? 0;
   const period = getPeriod(resource);
   const current = db.getUsage(userId, resource, period);
@@ -177,7 +153,7 @@ export function setUsage(
  * Get usage summary for all resources for a user.
  */
 export function getUsageSummary(db: AuthDB, userId: number, tier: string): UsageSummary[] {
-  const quotas = TIER_QUOTAS[tier] ?? TIER_QUOTAS['free']!;
+  const quotas = TIER_QUOTAS[tier] ?? TIER_QUOTAS['community']!;
   const resources = Object.keys(quotas) as MeterableResource[];
 
   return resources.map((resource) => {
@@ -201,5 +177,5 @@ export function getUsageSummary(db: AuthDB, userId: number, tier: string): Usage
  * Get quota limits for a tier (for display purposes).
  */
 export function getQuotaLimits(tier: string): Record<MeterableResource, number> {
-  return { ...(TIER_QUOTAS[tier] ?? TIER_QUOTAS['free']!) };
+  return { ...(TIER_QUOTAS[tier] ?? TIER_QUOTAS['community']!) };
 }

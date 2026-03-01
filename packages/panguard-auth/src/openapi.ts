@@ -54,7 +54,7 @@ export function generateOpenApiSpec(baseUrl: string): Record<string, unknown> {
             email: { type: 'string', format: 'email' },
             name: { type: 'string' },
             role: { type: 'string', enum: ['user', 'admin'] },
-            tier: { type: 'string', enum: ['free', 'solo', 'pro', 'business'] },
+            tier: { type: 'string', enum: ['community', 'solo', 'pro', 'business', 'enterprise'] },
             createdAt: { type: 'string', format: 'date-time' },
             planExpiresAt: { type: 'string', format: 'date-time', nullable: true },
           },
