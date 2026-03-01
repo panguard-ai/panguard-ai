@@ -20,7 +20,7 @@
 
 Panguard AI is an open-source cybersecurity platform that gives every developer and small business the same protection that Fortune 500 companies pay six figures for.
 
-One command installs six security tools. AI learns your environment in 7 days. Threats get blocked automatically. You get notified in plain language through LINE, Telegram, or Slack.
+One command installs six security tools. AI learns your environment in 7 days. Threats get blocked automatically. You get notified in plain language through Telegram or Slack.
 
 ```bash
 curl -fsSL https://get.panguard.ai | bash
@@ -34,7 +34,7 @@ curl -fsSL https://get.panguard.ai | bash
 |---------|-------------|---------------|
 | **Scan** | 60-second security audit with PDF report | Community (Free) |
 | **Guard** | 24/7 AI monitoring with auto-response | Solo ($9/mo) |
-| **Chat** | Plain-language alerts via LINE / Telegram / Slack / Email | Solo ($9/mo) |
+| **Chat** | Plain-language alerts via Telegram / Slack / Email | Solo ($9/mo) |
 | **Trap** | 8 honeypot services for attacker profiling | Pro ($29/mo) |
 | **Report** | Compliance reports: ISO 27001, SOC 2, Taiwan TCSA | Pro ($29/mo) |
 | **Threat Cloud** | Collective threat intelligence from all Panguard users | All plans |
@@ -184,13 +184,13 @@ Security alerts in plain language, delivered where you already work.
 
 ```bash
 panguard chat setup                          # Interactive wizard
-panguard chat setup --channel line           # LINE
+panguard chat setup --channel telegram       # Telegram
 panguard chat setup --channel slack          # Slack
 panguard chat setup --channel telegram       # Telegram
 panguard chat test                           # Send test notification
 ```
 
-**5 channels:** LINE Notify, Telegram, Slack (Block Kit), Email (SMTP/Resend), Webhooks
+**4 channels:** Telegram, Slack (Block Kit), Email (SMTP/Resend), Webhooks
 
 **3 tone modes:**
 - `boss` - Impact summary in plain language

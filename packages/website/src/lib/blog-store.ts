@@ -28,8 +28,6 @@ export async function getJsonPosts(): Promise<BlogPost[]> {
 /** Get all posts: static TS + dynamic JSON, sorted by date descending */
 export async function getAllPosts(): Promise<BlogPost[]> {
   const jsonPosts = await readJsonPosts();
-  const staticSlugs = new Set(staticPosts.map((p) => p.slug));
-
   // JSON posts override static posts with the same slug
   const merged = [
     ...jsonPosts,
