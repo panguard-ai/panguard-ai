@@ -107,37 +107,37 @@
   "footer": {
     "product": "產品",
     "resources": "資源",
-    "company": "關於我們",
-    "legal": "法律條款",
-    "scan": "Scan 掃描",
-    "threatCloud": "Threat Cloud 威脅雲",
-    "guard": "Guard 防護",
-    "chat": "Chat 助手",
-    "trap": "Trap 蜜罐",
-    "report": "Report 報告",
-    "compliance": "合規管理",
-    "integrations": "整合串接",
+    "company": "關於",
+    "legal": "法律",
+    "scan": "Scan",
+    "threatCloud": "Threat Cloud",
+    "guard": "Guard",
+    "chat": "Chat",
+    "trap": "Trap",
+    "report": "Report",
+    "compliance": "合規",
+    "integrations": "整合",
     "documentation": "技術文件",
     "apiReference": "API 文件",
     "blog": "部落格",
     "resourceCenter": "資源中心",
-    "changelog": "更新日誌",
+    "changelog": "更新紀錄",
     "statusPage": "系統狀態",
     "about": "關於我們",
     "careers": "加入團隊",
     "contact": "聯繫我們",
-    "press": "新聞中心",
+    "press": "媒體",
     "partners": "合作夥伴",
     "customers": "客戶案例",
-    "openSource": "開放原始碼",
+    "openSource": "開源",
     "trustCenter": "信任中心",
-    "security": "安全性",
+    "security": "安全",
     "privacyPolicy": "隱私政策",
     "termsOfService": "服務條款",
     "cookiePolicy": "Cookie 政策",
     "dpa": "資料處理協議",
-    "sla": "服務等級協議",
-    "responsibleDisclosure": "漏洞揭露政策"
+    "sla": "SLA",
+    "responsibleDisclosure": "漏洞揭露"
   },
   "home": {
     "hero": {
@@ -480,8 +480,8 @@
       "learnMore": "了解更多"
     },
     "numbersWall": {
-      "title": "不要聽我們說的。去看 code。",
-      "subtitle": "下面每一個數字都能在 GitHub 上驗證。零黑箱。",
+      "title": "別信我們說的，自己去看 code。",
+      "subtitle": "下面每個數字都能在 GitHub 上驗證，零黑箱。",
       "stats": {
         "sigmaRules": "Sigma 偵測規則",
         "yaraRules": "YARA 惡意程式規則",
@@ -489,28 +489,28 @@
         "tests": "測試通過",
         "layers": "偵測層",
         "actions": "回應動作",
-        "protocols": "蜂罐協定",
+        "protocols": "蜜罐協定",
         "mit": "開源授權"
       },
-      "githubCta": "在 GitHub 驗證",
+      "githubCta": "去 GitHub 驗證",
       "trust": {
         "openSource": {
           "title": "100% 開源",
-          "desc": "MIT 授權。完整原始碼在 GitHub。審查每一行。零黑箱。零供應商鎖定。"
+          "desc": "MIT 授權，完整原始碼在 GitHub。每一行都能審查，零黑箱、零供應商鎖定。"
         },
         "security": {
           "title": "安全優先",
-          "desc": "1,326 項測試。Strict TypeScript。ESLint 安全插件。憑證加密儲存。沙箱執行。"
+          "desc": "1,446 項測試通過。Strict TypeScript。ESLint 安全插件。憑證加密儲存。沙箱執行。"
         },
         "privacy": {
-          "title": "隱私優先設計",
-          "desc": "你的資料留在你的機器上。只有匿名化威脅特徵通過 Threat Cloud 分享。零遙測。"
+          "title": "隱私優先",
+          "desc": "你的資料留在你的機器上，只有匿名化威脅特徵透過 Threat Cloud 共享。零遙測。"
         }
       }
     },
     "homePricing": {
-      "overline": "定價",
-      "title": "你負擔得起的資安。",
+      "overline": "方案價格",
+      "title": "你負擔得起的資安",
       "subtitle": "免費開始，準備好再升級。",
       "recommended": "最受歡迎",
       "plans": {
@@ -535,7 +535,7 @@
             "0": "Community 全部功能",
             "1": "完整自動回應",
             "2": "Slack / Telegram / Email",
-            "3": "SSH + HTTP 蜂罐 + Ollama AI"
+            "3": "SSH + HTTP 蜜罐 + Ollama AI"
           },
           "cta": "開始 Solo"
         },
@@ -547,7 +547,7 @@
           "features": {
             "0": "Solo 全部功能",
             "1": "雲端 AI 深度分析",
-            "2": "全部 8 種蜂罐協定",
+            "2": "全部 8 種蜜罐協定",
             "3": "儀表板",
             "4": "Webhook 整合"
           },
@@ -603,13 +603,13 @@
     },
     "finalCta": {
       "title": "你部署，我們防守。",
-      "subtitle": "60 秒安裝。免費版包含完整掃描。不用帳號、不用信用卡、不用跟業務講電話。",
-      "manifesto": "我們做 Panguard，是因為資安不應該需要六位數預算或一整支團隊。它應該只需要一行指令。",
-      "btnGetStarted": "免費伺服器掃描",
+      "subtitle": "60 秒安裝，免費版就有完整掃描。不用帳號、不用信用卡、不用跟業務講電話。",
+      "manifesto": "我們做 Panguard，是因為資安不該需要六位數預算或一整支團隊。一行指令就夠了。",
+      "btnGetStarted": "免費掃描我的伺服器",
       "btnGithub": "GitHub",
-      "btnDocs": "文件",
+      "btnDocs": "技術文件",
       "badge1": "MIT 開源授權",
-      "badge2": "1,326 測試通過",
+      "badge2": "1,446 測試通過",
       "badge3": "台灣製造"
     }
   },
@@ -1046,7 +1046,7 @@
       "title": "嚴謹打造",
       "stats": [
         {
-          "value": "1,326",
+          "value": "1,446",
           "label": "測試通過"
         },
         {
@@ -1176,7 +1176,7 @@
           "核心平台（Scan + Guard + Chat + Trap + Report）",
           "Threat Cloud v1",
           "3,149 條 Sigma + 4,326 條 YARA 規則",
-          "1,326 個自動化測試"
+          "1,446 個自動化測試"
         ]
       },
       "inProgress": {
