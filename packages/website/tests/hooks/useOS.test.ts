@@ -27,7 +27,7 @@ describe('useOS', () => {
     const { result } = renderHook(() => useOS());
     expect(result.current.os).toBe('mac');
     expect(result.current.prompt).toBe('$');
-    expect(result.current.installCmd).toContain('curl');
+    expect(result.current.installCmd).toContain('npm install');
   });
 
   it('detects Windows', async () => {
@@ -36,7 +36,7 @@ describe('useOS', () => {
     const { result } = renderHook(() => useOS());
     expect(result.current.os).toBe('windows');
     expect(result.current.prompt).toBe('>');
-    expect(result.current.installCmd).toContain('irm');
+    expect(result.current.installCmd).toContain('npm install');
   });
 
   it('defaults to linux for unknown UA', async () => {

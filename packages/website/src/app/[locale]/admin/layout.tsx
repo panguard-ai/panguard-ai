@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { Link } from '@/navigation';
 import BrandLogo from '@/components/ui/BrandLogo';
 import { useAuth } from '@/lib/auth';
@@ -16,6 +16,7 @@ import {
   X,
   ChevronLeft,
   Loader2,
+  ShieldOff,
 } from 'lucide-react';
 
 interface NavItem {
@@ -45,14 +46,37 @@ function getActiveNavId(pathname: string): string {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const activeId = getActiveNavId(pathname);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, loading, logout } = useAuth();
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) {
+      router.replace('/login');
+      return;
+    }
+    if (user.role !== 'admin') {
+      router.replace('/dashboard');
+    }
+  }, [user, loading, router]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-surface-0 flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-brand-sage animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-surface-0 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <ShieldOff className="w-8 h-8 text-text-tertiary mx-auto" />
+          <p className="text-sm text-text-tertiary">Access denied</p>
+        </div>
       </div>
     );
   }
