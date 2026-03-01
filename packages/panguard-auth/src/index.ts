@@ -30,8 +30,9 @@ export {
   sendWelcomeEmail,
   sendResetEmail,
   sendExpirationWarningEmail,
+  detectLocale,
 } from './email-verify.js';
-export type { SmtpConfig, ResendConfig, EmailConfig } from './email-verify.js';
+export type { SmtpConfig, ResendConfig, EmailConfig, EmailLocale } from './email-verify.js';
 export {
   getGoogleAuthUrl,
   exchangeCodeForTokens,
