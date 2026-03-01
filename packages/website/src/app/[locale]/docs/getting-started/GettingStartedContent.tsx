@@ -152,6 +152,16 @@ export default function GettingStartedContent() {
             <h2 className="text-xl font-bold text-text-primary mb-2">{t('step1Title')}</h2>
             <p className="text-text-secondary mb-6">{t('step1Desc')}</p>
             <PlatformTabs selected={platform} onChange={setPlatform} />
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
+              {t('step1Npm')}
+            </p>
+            <CodeBlock
+              code="npm install -g @panguard-ai/panguard"
+              label="npm"
+            />
+            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mt-5 mb-2">
+              {t('step1Alt')}
+            </p>
             {platform === 'unix' ? (
               <CodeBlock
                 code="curl -fsSL https://get.panguard.ai | bash"
@@ -166,7 +176,7 @@ export default function GettingStartedContent() {
             <p className="text-xs text-text-muted mt-3">{t('step1Note')}</p>
             <TerminalOutput
               lines={[
-                '[OK] Panguard v1.0.0 installed',
+                '[OK] Panguard v0.1.0 installed',
                 '[OK] Rule engine loaded (3,155 Sigma + 5,895 YARA rules)',
                 '[OK] Local LLM ready (Ollama)',
                 '[OK] Monitoring started. Learning period: 7 days.',
@@ -264,7 +274,7 @@ export default function GettingStartedContent() {
             <p className="text-text-secondary text-sm mb-3">{t('step6Output')}</p>
             <CodeBlock
               code={`{
-  "version": "0.5.0",
+  "version": "0.1.0",
   "target": "localhost",
   "risk_score": 35,
   "grade": "C",
