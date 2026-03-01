@@ -29,6 +29,7 @@ import { adminCommand } from './commands/admin.js';
 import { hardeningCommand } from './commands/hardening.js';
 import { managerCommand } from './commands/manager.js';
 import { upgradeCommand } from './commands/upgrade.js';
+import { configCommand } from './commands/config.js';
 import { startInteractive } from './interactive.js';
 import { refreshTierInBackground } from './auth-guard.js';
 
@@ -57,6 +58,7 @@ program.addCommand(adminCommand());
 program.addCommand(hardeningCommand());
 program.addCommand(managerCommand());
 program.addCommand(upgradeCommand());
+program.addCommand(configCommand());
 
 // If no subcommand given (just `panguard` or `panguard --lang zh-TW`),
 // launch interactive mode. Check before commander parses so that
