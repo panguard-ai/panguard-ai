@@ -331,6 +331,12 @@
     <script>
       if (!PG.requireAuth()) throw new Error('Not authenticated');
 
+      // Verify admin role via API before rendering any content
+      (async () => {
+        const admin = await PG.requireAdminRole();
+        if (!admin) return; // Redirected to login
+      })();
+
       // ── Render Nav ──
       document.getElementById('nav').innerHTML = PG.renderNav('dashboard');
 
