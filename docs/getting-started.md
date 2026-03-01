@@ -1,68 +1,65 @@
-# Getting Started / 快速開始
+# Getting Started
 
-> 從註冊到看到第一份安全報告，只需要 5 分鐘。
-
----
-
-## 系統需求
-
-| 項目     | 最低要求                              |
-| -------- | ------------------------------------- |
-| 作業系統 | macOS 12+、Ubuntu 20.04+、Windows 10+ |
-| Node.js  | >= 20.0.0                             |
-| 磁碟空間 | 200 MB                                |
-| 記憶體   | 512 MB（Guard 運行時建議 1 GB）       |
-
-### 跨平台支援狀態
-
-| 功能            | macOS                        | Linux                    | Windows                       |
-| --------------- | ---------------------------- | ------------------------ | ----------------------------- |
-| **Scan** 掃描   | 完整（lsof, socketfilterfw） | 完整（ss, ufw/iptables） | 部分（netstat，無防火牆偵測） |
-| **Guard** 防護  | 輪詢監控（5 秒間隔）         | 輪詢監控（5 秒間隔）     | 輪詢監控（5 秒間隔）          |
-| **Trap** 蜜罐   | TCP 端口蜜罐                 | TCP 端口蜜罐             | TCP 端口蜜罐                  |
-| **Chat** 通知   | LINE / Telegram / Slack      | LINE / Telegram / Slack  | LINE / Telegram / Slack       |
-| **Report** 報告 | 完整（3 框架）               | 完整（3 框架）           | 完整（3 框架）                |
-| 系統更新偵測    | softwareupdate               | apt / yum                | 尚未支援                      |
-
-> macOS 和 Linux 為主要支援平台。Windows 可執行基礎功能，但部分 OS 層級偵測尚未完善。
+> From sign-up to your first security report in 5 minutes.
 
 ---
 
-## 步驟 1：建立帳號
+## System Requirements
 
-前往 [panguard.ai](https://panguard.ai) 註冊帳號：
+| Item | Minimum |
+|------|---------|
+| OS | macOS 12+, Ubuntu 20.04+, Windows 10+ |
+| Node.js | >= 20.0.0 |
+| Disk | 200 MB |
+| Memory | 512 MB (1 GB recommended for Guard) |
 
-1. 點擊「註冊」，使用 Google 帳號或 Email + 密碼
-2. 在 [Pricing](https://panguard.ai/pricing) 頁面瀏覽方案
+### Platform Support
 
-| 方案           | 月費     | 包含功能                           |
-| -------------- | -------- | ---------------------------------- |
-| **Scan**       | $0       | 快速掃描、了解安全狀況             |
-| **Solo**       | $9       | 即時防護、1 通知管道、1 端點       |
-| **Starter**    | $19      | 防護 + 3 通知管道、最多 5 端點     |
-| **Team**       | $14/端點 | 全功能含蜜罐、5-50 端點            |
-| **Business**   | $10/端點 | 全功能 + 基礎合規報告、50-500 端點 |
-| **Enterprise** | 聯繫我們 | 500+ 端點、專屬支援                |
+| Feature | macOS | Linux | Windows |
+|---------|-------|-------|---------|
+| **Scan** | Full (lsof, socketfilterfw) | Full (ss, ufw/iptables) | Partial (netstat, no firewall) |
+| **Guard** | Poll monitoring (5s) | Poll monitoring (5s) | Poll monitoring (5s) |
+| **Trap** | TCP honeypots | TCP honeypots | TCP honeypots |
+| **Chat** | LINE / Telegram / Slack / Email | LINE / Telegram / Slack / Email | LINE / Telegram / Slack / Email |
+| **Report** | Full (3 frameworks) | Full (3 frameworks) | Full (3 frameworks) |
 
-Scan 方案即可開始使用。合規報告為獨立加價購，任何付費方案皆可購買。
+> macOS and Linux are primary platforms. Windows supports core features; some OS-level detection is limited.
 
 ---
 
-## 步驟 2：安裝
+## Step 1: Create Account
 
-### 一行指令安裝（推薦）
+Go to [panguard.ai](https://panguard.ai) and sign up:
+
+1. Click "Sign Up" - use Google or Email + Password
+2. Browse plans at [Pricing](https://panguard.ai/pricing)
+
+| Plan | Price | Includes |
+|------|-------|----------|
+| **Community** | Free | Scan (unlimited) + Guard (Layer 1) + Threat Cloud |
+| **Solo** | $9/mo | + Full Guard (3 layers) + Chat + Local AI, up to 3 machines |
+| **Pro** | $29/mo | + Trap + Cloud AI + Compliance reports, up to 10 machines |
+| **Business** | $79/mo | + SIEM + SSO + Dedicated support, up to 25 machines |
+
+Community plan is enough to get started. Compliance reports available as add-on purchases on Pro+ plans.
+
+---
+
+## Step 2: Install
+
+### One-Command Install (Recommended)
 
 ```bash
 curl -fsSL https://get.panguard.ai | bash
 ```
 
-### 使用 npm
+### Using npm
 
 ```bash
 npm install -g @panguard-ai/panguard
 ```
 
-### 從原始碼安裝（開發者，目前推薦）
+### From Source (Development)
 
 ```bash
 git clone https://github.com/panguard-ai/panguard-ai.git
@@ -70,55 +67,51 @@ cd panguard-ai
 pnpm install
 pnpm build
 
-# 使用 CLI（以下兩種方式皆可）
+# Run CLI
 ./bin/panguard --help
-pnpm cli -- --help
 ```
 
-> npm 套件尚未發佈，目前請使用從原始碼安裝的方式。
+> npm package not yet published. Use source install for now.
 
 ---
 
-## 步驟 3：CLI 登入
+## Step 3: CLI Login
 
 ```bash
-./bin/panguard login
+panguard login
 ```
 
-瀏覽器自動開啟，完成登入後回到終端機：
+Browser opens automatically. After login, return to terminal:
 
 ```
-  PANGUARD [#] AI
+  PANGUARD AI
 
-  -- 登入資訊 ----------------------------------------
+  -- Login Info ----------------------------------------
 
   Email     user@example.com
-  名稱      User Name
-  方案      Solo
-  到期      2026-04-27
+  Name      User Name
+  Plan      Solo
+  Expires   2026-04-27
 
-  登入成功！
+  Login successful!
 ```
 
-> 在 SSH / 無頭伺服器上？用 `panguard login --no-browser`，複製 URL 到其他裝置。
+> On SSH / headless servers: use `panguard login --no-browser`, copy URL to another device.
 
 ---
 
-## 步驟 4：第一次掃描
+## Step 4: First Scan
 
 ```bash
 panguard scan --quick
 ```
 
-你會看到品牌配色的終端輸出：
+Terminal output:
 
 ```
-  +======================================+
-  |       PANGUARD [#] AI               |
-  |       Security Scanner              |
-  +======================================+
+  PANGUARD AI - Security Scanner
 
-  [#] Scanning system environment...
+  Scanning system environment...
 
   -- Security Findings ----------------------
 
@@ -138,15 +131,15 @@ panguard scan --quick
   3. Enforce password complexity requirements
 ```
 
-`--quick` 模式大約 30 秒完成基礎檢查。移除 `--quick` 可執行完整掃描（約 60 秒，需要 Solo 以上），包含 SSL 憑證驗證、排程任務稽核和共享資料夾安全檢查。
+`--quick` runs basic checks in ~30 seconds. Remove `--quick` for full scan (~60 seconds) including SSL certificate validation, scheduled task audit, and shared folder checks.
 
-### 產生 PDF 報告
+### Generate PDF Report
 
 ```bash
 panguard scan --output my-report.pdf
 ```
 
-### 繁體中文模式
+### Traditional Chinese
 
 ```bash
 panguard scan --lang zh-TW
@@ -154,27 +147,24 @@ panguard scan --lang zh-TW
 
 ---
 
-## 步驟 5：啟動即時防護 `[SOLO]`
+## Step 5: Start Real-Time Protection
 
-掃描只是一次性檢查。要持續保護系統，啟動 Guard：
+Scan is a one-time check. For continuous protection, start Guard:
 
 ```bash
 panguard guard start
 ```
 
 ```
-  +======================================+
-  |       PANGUARD [#] AI               |
-  |       Guard Engine                  |
-  +======================================+
+  PANGUARD AI - Guard Engine
 
-  [#] Guard engine starting...
+  Guard engine starting...
 
   -- Status ---------------------------------
 
   Mode:       Learning (Day 1/7)
   Monitoring: processes, network, files
-  Rules:      42 Sigma rules loaded
+  Rules:      3,149 Sigma rules loaded
   Score:      --/100 (building baseline)
 
   Guard is now protecting your system.
@@ -182,22 +172,22 @@ panguard guard start
   Protection mode activates automatically after 7 days.
 ```
 
-Guard 的運作方式：
+How Guard works:
 
-1. **前 7 天（學習模式）**：AI 觀察系統正常行為，建立基線。不會產生誤報。
-2. **第 8 天起（保護模式）**：自動偵測異常，執行回應動作，透過通知管道告訴你。
+1. **Days 1-7 (Learning mode)**: AI observes normal system behavior and builds a baseline. No false positives.
+2. **Day 8+ (Protection mode)**: Automatically detects anomalies, executes responses, notifies you.
 
 ---
 
-## 步驟 6：設定通知 `[SOLO]`
+## Step 6: Set Up Notifications
 
-讓 Panguard 在偵測到威脅時通知你：
+Let Panguard notify you when threats are detected:
 
 ```bash
 panguard chat setup
 ```
 
-互動式設定精靈會引導你完成：
+Interactive wizard guides you:
 
 ```
 ? Select notification channel:
@@ -213,17 +203,17 @@ panguard chat setup
     it_admin (remediation steps)
 ```
 
-或直接指定：
+Or specify directly:
 
 ```bash
-# LINE 通知，老闆模式（人話摘要）
+# LINE notifications, boss mode (plain language)
 panguard chat setup --channel line --user-type boss
 
-# Slack 通知，IT 管理員模式（修復步驟）
+# Slack notifications, IT admin mode (remediation steps)
 panguard chat setup --channel slack --user-type it_admin
 ```
 
-設定完成後測試：
+Test your setup:
 
 ```bash
 panguard chat test
@@ -231,18 +221,45 @@ panguard chat test
 
 ---
 
-## 下一步
+## Step 7: Deploy Honeypots (Pro)
 
-你已經完成基本設定。以下是進階功能：
+Catch attackers with decoy services:
 
-| 想做什麼                        | 等級     | 閱讀                                             |
-| ------------------------------- | -------- | ------------------------------------------------ |
-| 了解認證架構                    | -        | [概念：認證架構](concepts/authentication.md)     |
-| 了解 AI 三層漏斗架構            | -        | [概念：三層 AI 架構](concepts/three-layer-ai.md) |
-| 深入了解 Guard 的 5 個 AI Agent | Solo     | [指南：Panguard Guard](guides/guard.md)          |
-| 設定蜜罐捕捉攻擊者              | Team     | [指南：Panguard Trap](guides/trap.md)            |
-| 產生合規報告                    | 加價購   | [指南：Panguard Report](guides/report.md)        |
-| 部署集體威脅情報                | Business | [指南：Threat Cloud](guides/threat-cloud.md)     |
-| 完整使用手冊                    | -        | [快速使用手冊](guides/quickstart-guide.md)       |
-| 查看所有 CLI 指令               | -        | [參考：CLI 完整指令](reference/cli.md)           |
-| 撰寫自訂 Sigma 規則             | -        | [參考：Sigma 規則](reference/sigma-rules.md)     |
+```bash
+panguard trap start --services ssh,http,mysql
+```
+
+8 honeypot types available: SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, Redis.
+
+All fully isolated from production. Zero risk to real data.
+
+---
+
+## Step 8: Generate Compliance Report (Pro)
+
+```bash
+panguard report --framework iso27001 --output iso-report.pdf
+```
+
+Available frameworks:
+
+| Framework | Controls | Command |
+|-----------|----------|---------|
+| Taiwan TCSA | 50 | `--framework tcsa` |
+| ISO 27001 | 93 | `--framework iso27001` |
+| SOC 2 | 64 | `--framework soc2` |
+
+---
+
+## Next Steps
+
+| Want to... | Plan | Read |
+|-----------|------|------|
+| Understand the 3-layer AI architecture | - | [Concept: Three-Layer AI](concepts/three-layer-ai.md) |
+| Deep dive into Guard's 4 AI agents | Solo | [Guide: Guard](guides/guard.md) |
+| Set up honeypots to catch attackers | Pro | [Guide: Trap](guides/trap.md) |
+| Generate compliance reports | Pro | [Guide: Report](guides/report.md) |
+| Deploy collective threat intelligence | All | [Guide: Threat Cloud](guides/threat-cloud.md) |
+| View all CLI commands | - | [Reference: CLI](reference/cli.md) |
+| Write custom Sigma rules | - | [Reference: Sigma Rules](reference/sigma-rules.md) |
+| Troubleshoot issues | - | [Troubleshooting](troubleshooting.md) |
