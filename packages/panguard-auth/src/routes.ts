@@ -16,7 +16,7 @@ import {
 } from './auth.js';
 import { authenticateRequest, requireAdmin } from './middleware.js';
 import type { EmailConfig } from './email-verify.js';
-import { sendVerificationEmail, sendResetEmail, sendWelcomeEmail } from './email-verify.js';
+import { sendVerificationEmail, sendResetEmail, sendWelcomeEmail, detectLocale } from './email-verify.js';
 import type { GoogleOAuthConfig } from './google-oauth.js';
 import {
   getGoogleAuthUrl,
@@ -262,7 +262,8 @@ export function createAuthHandlers(config: AuthRouteConfig) {
 
     // Send verification email (non-blocking, don't fail the request)
     if (config.smtp && config.baseUrl) {
-      sendVerificationEmail(config.smtp, email, verifyToken, config.baseUrl).catch(() => {
+      const locale = detectLocale(req.headers['accept-language']);
+      sendVerificationEmail(config.smtp, email, verifyToken, config.baseUrl, locale).catch(() => {
         // Log but don't fail - email delivery is best-effort
       });
     }
@@ -616,7 +617,8 @@ export function createAuthHandlers(config: AuthRouteConfig) {
 
     // Send reset email (non-blocking)
     if (config.smtp && config.baseUrl) {
-      sendResetEmail(config.smtp, email, resetToken, config.baseUrl).catch(() => {
+      const locale = detectLocale(req.headers['accept-language']);
+      sendResetEmail(config.smtp, email, resetToken, config.baseUrl, locale).catch(() => {
         // Best-effort email delivery
       });
     }
@@ -1497,7 +1499,8 @@ export function createAuthHandlers(config: AuthRouteConfig) {
 
     // Send welcome email with registration link
     if (config.smtp && config.baseUrl) {
-      sendWelcomeEmail(config.smtp, entry.email, entry.name || 'there', config.baseUrl).catch(() => {
+      const locale = detectLocale(req.headers['accept-language']);
+      sendWelcomeEmail(config.smtp, entry.email, entry.name || 'there', config.baseUrl, locale).catch(() => {
         // Best-effort delivery
       });
     }
