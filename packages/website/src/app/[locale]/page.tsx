@@ -1,17 +1,20 @@
+import dynamic from 'next/dynamic';
 import NavBar from '@/components/NavBar';
 import Hero from '@/components/home/Hero';
 import IndustryProblem from '@/components/home/IndustryProblem';
 import ThreeRoads from '@/components/home/ThreeRoads';
-import Redefine from '@/components/home/Redefine';
-import ShowMuscle from '@/components/home/ShowMuscle';
-import ThreatCloudSection from '@/components/home/ThreatCloudSection';
-import The3AMStory from '@/components/home/The3AMStory';
-import UseCases from '@/components/home/UseCases';
-import ProductOverview from '@/components/home/ProductOverview';
-import NumbersWall from '@/components/home/NumbersWall';
-import HomePricing from '@/components/home/HomePricing';
-import FinalCTA from '@/components/home/FinalCTA';
 import Footer from '@/components/Footer';
+
+// Below-the-fold sections loaded lazily to reduce initial bundle
+const Redefine = dynamic(() => import('@/components/home/Redefine'));
+const ShowMuscle = dynamic(() => import('@/components/home/ShowMuscle'));
+const ThreatCloudSection = dynamic(() => import('@/components/home/ThreatCloudSection'));
+const The3AMStory = dynamic(() => import('@/components/home/The3AMStory'));
+const UseCases = dynamic(() => import('@/components/home/UseCases'));
+const ProductOverview = dynamic(() => import('@/components/home/ProductOverview'));
+const NumbersWall = dynamic(() => import('@/components/home/NumbersWall'));
+const HomePricing = dynamic(() => import('@/components/home/HomePricing'));
+const FinalCTA = dynamic(() => import('@/components/home/FinalCTA'));
 
 export default function Home() {
   return (
