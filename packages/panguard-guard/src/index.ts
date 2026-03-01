@@ -32,7 +32,6 @@ export type {
   DeviationResult,
   DetectionResult,
   ResponseResult,
-  LineNotifyConfig,
   TelegramConfig,
   SlackConfig,
   EmailConfig,
@@ -92,7 +91,6 @@ export { InvestigationEngine } from './investigation/index.js';
 // Notifications / 通知
 export {
   sendNotifications,
-  sendLineNotify,
   sendTelegramNotify,
   sendSlackNotify,
   sendEmailNotify,
