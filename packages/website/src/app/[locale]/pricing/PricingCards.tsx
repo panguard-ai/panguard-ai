@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/navigation';
 import { X } from 'lucide-react';
 import { CheckIcon } from '@/components/ui/BrandIcons';
+import { useAuth } from '@/lib/auth';
 import FadeInUp from '@/components/FadeInUp';
 import SectionTitle from '@/components/ui/SectionTitle';
 
@@ -176,6 +177,7 @@ function ComparisonCell({ value }: { value: FeatureValue }) {
 export default function PricingCards() {
   const t = useTranslations('pricingPage');
   const tc = useTranslations('common');
+  const { token: authToken } = useAuth();
   const [annual, setAnnual] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -190,8 +192,7 @@ export default function PricingCards() {
     setLoading(tier);
     setCheckoutError(null);
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('panguard_token') : null;
-      if (!token) {
+      if (!authToken) {
         window.location.href = `/login?redirect=/pricing`;
         return;
       }
@@ -200,7 +201,7 @@ export default function PricingCards() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({ tier }),
       });
@@ -217,7 +218,7 @@ export default function PricingCards() {
     } finally {
       setLoading(null);
     }
-  }, []);
+  }, [authToken]);
 
   return (
     <>
