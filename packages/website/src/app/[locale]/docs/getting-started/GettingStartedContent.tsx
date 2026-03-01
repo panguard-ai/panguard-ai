@@ -8,16 +8,48 @@ import SectionWrapper from '@/components/ui/SectionWrapper';
 import { Link } from '@/navigation';
 import { CheckIcon as BrandCheck } from '@/components/ui/BrandIcons';
 
-type Platform = 'unix' | 'windows';
+type Platform = 'macos' | 'ubuntu' | 'centos' | 'windows';
 
-/** Auto-detect visitor OS and map to platform tab */
+const PLATFORM_LABELS: Record<Platform, string> = {
+  macos: 'macOS',
+  ubuntu: 'Ubuntu / Debian',
+  centos: 'CentOS / RHEL',
+  windows: 'Windows',
+};
+
+/** Auto-detect visitor OS */
 function useDetectedPlatform(): Platform {
-  const [platform, setPlatform] = useState<Platform>('unix');
+  const [platform, setPlatform] = useState<Platform>('macos');
   useEffect(() => {
-    if (/Win/.test(navigator.userAgent)) setPlatform('windows');
+    const ua = navigator.userAgent;
+    if (/Win/.test(ua)) setPlatform('windows');
+    else if (/Linux/.test(ua)) setPlatform('ubuntu');
   }, []);
   return platform;
 }
+
+const INSTALL_STEPS: Record<Platform, { prereq: string; install: string; verify: string }> = {
+  macos: {
+    prereq: '# Step 1: Install Node.js (skip if already installed)\nbrew install node\n\n# Or download from https://nodejs.org (v20+)',
+    install: '# Step 2: Install Panguard AI\ncurl -fsSL https://get.panguard.ai | bash',
+    verify: '# Step 3: Verify\npanguard --version\npanguard scan',
+  },
+  ubuntu: {
+    prereq: '# Step 1: Install Node.js 20\ncurl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -\nsudo apt-get install -y nodejs',
+    install: '# Step 2: Install Panguard AI\ncurl -fsSL https://get.panguard.ai | bash',
+    verify: '# Step 3: Verify\npanguard --version\npanguard scan',
+  },
+  centos: {
+    prereq: '# Step 1: Install Node.js 20\ncurl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -\nsudo yum install -y nodejs',
+    install: '# Step 2: Install Panguard AI\ncurl -fsSL https://get.panguard.ai | bash',
+    verify: '# Step 3: Verify\npanguard --version\npanguard scan',
+  },
+  windows: {
+    prereq: '# Step 1: Install Node.js\n# Download from https://nodejs.org (v20+ LTS)\n# Or via winget:\nwinget install OpenJS.NodeJS.LTS',
+    install: '# Step 2: Install Panguard AI (PowerShell)\nnpm install -g @panguard-ai/panguard',
+    verify: '# Step 3: Verify\npanguard --version\npanguard scan',
+  },
+};
 
 function CodeBlock({ code, label }: { code: string; label?: string }) {
   const [copied, setCopied] = useState(false);
@@ -45,7 +77,7 @@ function CodeBlock({ code, label }: { code: string; label?: string }) {
           </button>
         </div>
       )}
-      <pre className="p-4 text-sm font-mono text-text-secondary overflow-x-auto leading-relaxed">
+      <pre className="p-4 text-sm font-mono text-text-secondary overflow-x-auto leading-relaxed whitespace-pre-wrap">
         {code}
       </pre>
     </div>
@@ -59,23 +91,20 @@ function PlatformTabs({
   selected: Platform;
   onChange: (p: Platform) => void;
 }) {
-  const tabs: { id: Platform; label: string }[] = [
-    { id: 'unix', label: 'macOS / Linux' },
-    { id: 'windows', label: 'Windows' },
-  ];
+  const platforms: Platform[] = ['macos', 'ubuntu', 'centos', 'windows'];
   return (
-    <div className="flex gap-1 bg-surface-1 border border-border rounded-lg p-1 w-fit mb-4">
-      {tabs.map((tab) => (
+    <div className="flex flex-wrap gap-1 bg-surface-1 border border-border rounded-lg p-1 w-fit mb-6">
+      {platforms.map((p) => (
         <button
-          key={tab.id}
-          onClick={() => onChange(tab.id)}
-          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
-            selected === tab.id
+          key={p}
+          onClick={() => onChange(p)}
+          className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 ${
+            selected === p
               ? 'bg-brand-sage text-white'
               : 'text-text-muted hover:text-text-secondary'
           }`}
         >
-          {tab.label}
+          {PLATFORM_LABELS[p]}
         </button>
       ))}
     </div>
@@ -100,13 +129,13 @@ function TerminalOutput({ lines }: { lines: string[] }) {
 export default function GettingStartedContent() {
   const t = useTranslations('docs.gettingStarted');
   const detectedPlatform = useDetectedPlatform();
-  const [platform, setPlatform] = useState<Platform>('unix');
+  const [platform, setPlatform] = useState<Platform>('macos');
 
-  // Sync with auto-detected OS on mount
   useEffect(() => {
     setPlatform(detectedPlatform);
   }, [detectedPlatform]);
 
+  const steps = INSTALL_STEPS[platform];
   const requirements = [t('req1'), t('req2'), t('req3')];
 
   return (
@@ -145,43 +174,31 @@ export default function GettingStartedContent() {
         </div>
       </SectionWrapper>
 
-      {/* Step 1: Install */}
+      {/* Step 1: Install — per-platform */}
       <SectionWrapper dark>
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
             <h2 className="text-xl font-bold text-text-primary mb-2">{t('step1Title')}</h2>
             <p className="text-text-secondary mb-6">{t('step1Desc')}</p>
             <PlatformTabs selected={platform} onChange={setPlatform} />
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
-              {t('step1Npm')}
-            </p>
-            <CodeBlock
-              code="npm install -g @panguard-ai/panguard"
-              label="npm"
-            />
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mt-5 mb-2">
-              {t('step1Alt')}
-            </p>
-            {platform === 'unix' ? (
-              <CodeBlock
-                code="curl -fsSL https://get.panguard.ai | bash"
-                label="Terminal (macOS / Linux)"
-              />
-            ) : (
-              <CodeBlock
-                code="irm https://get.panguard.ai/windows | iex"
-                label="PowerShell (Windows)"
-              />
-            )}
+
+            <div className="space-y-4">
+              <CodeBlock code={steps.prereq} label={`${PLATFORM_LABELS[platform]} — Prerequisites`} />
+              <CodeBlock code={steps.install} label={`${PLATFORM_LABELS[platform]} — Install`} />
+              <CodeBlock code={steps.verify} label="Verify" />
+            </div>
+
             <p className="text-xs text-text-muted mt-3">{t('step1Note')}</p>
-            <TerminalOutput
-              lines={[
-                '[OK] Panguard v0.1.0 installed',
-                '[OK] Rule engine loaded (3,155 Sigma + 5,895 YARA rules)',
-                '[OK] Local LLM ready (Ollama)',
-                '[OK] Monitoring started. Learning period: 7 days.',
-              ]}
-            />
+            <div className="mt-4">
+              <TerminalOutput
+                lines={[
+                  '[OK] Panguard v1.1.0 installed',
+                  '[OK] Rule engine loaded (3,155 Sigma + 5,895 YARA rules)',
+                  '[OK] Local LLM ready (Ollama)',
+                  '[OK] Monitoring started. Learning period: 7 days.',
+                ]}
+              />
+            </div>
           </FadeInUp>
         </div>
       </SectionWrapper>
@@ -226,7 +243,7 @@ export default function GettingStartedContent() {
             <h2 className="text-xl font-bold text-text-primary mb-2">{t('step4Title')}</h2>
             <p className="text-text-secondary mb-6">{t('step4Desc')}</p>
             <CodeBlock
-              code={`panguard chat config\n# Follow the prompts to connect Slack or Telegram`}
+              code={`panguard chat config\n# Follow the prompts to connect LINE, Slack, or Telegram`}
               label="Terminal"
             />
           </FadeInUp>
@@ -274,7 +291,7 @@ export default function GettingStartedContent() {
             <p className="text-text-secondary text-sm mb-3">{t('step6Output')}</p>
             <CodeBlock
               code={`{
-  "version": "0.1.0",
+  "version": "1.1.0",
   "target": "localhost",
   "risk_score": 35,
   "grade": "C",

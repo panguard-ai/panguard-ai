@@ -16,8 +16,6 @@ jobs:
         include:
           - os: macos-14
             platform: darwin-arm64
-          - os: macos-13
-            platform: darwin-x64
           - os: ubuntu-latest
             platform: linux-x64
 
