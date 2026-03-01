@@ -75,8 +75,18 @@ export function createAuthRoutes(ctx: RouteContext) {
 
     const passwordHash = await hashPassword(password);
     const user = db.createUser({ email, name: name.trim(), password }, passwordHash);
+
+    // Activate 14-day Solo trial for all new users
+    const trialExpiry = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .replace('T', ' ')
+      .split('.')[0]!;
+    db.updateUserTier(user.id, 'solo', trialExpiry);
+    // Re-fetch user to reflect trial tier in the response
+    const trialUser = db.getUserById(user.id)!;
+
     const token = generateSessionToken();
-    const session = db.createSession(user.id, token, sessionExpiry());
+    const session = db.createSession(trialUser.id, token, sessionExpiry());
 
     logAuditEvent({
       level: 'info',
@@ -89,7 +99,7 @@ export function createAuthRoutes(ctx: RouteContext) {
     json(res, 201, {
       ok: true,
       data: {
-        user: toPublicUser(user),
+        user: toPublicUser(trialUser),
         token: session.token,
         expiresAt: session.expiresAt,
       },

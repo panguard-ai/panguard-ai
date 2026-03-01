@@ -187,7 +187,7 @@ export function serveCommand(): Command {
       const runPlanCheck = () => {
         const expired = db.checkExpiredPlans();
         if (expired.length > 0) {
-          console.log(`  [Plan] Downgraded ${expired.length} expired plan(s) to free tier`);
+          console.log(`  [Plan] Downgraded ${expired.length} expired plan(s) to community tier`);
         }
 
         // Send warning emails for plans expiring in 3 days

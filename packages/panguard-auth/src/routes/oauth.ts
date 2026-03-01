@@ -86,6 +86,14 @@ export function createOAuthRoutes(ctx: RouteContext) {
           },
           pwHash
         );
+
+        // Activate 14-day Solo trial for new OAuth users
+        const trialExpiry = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .replace('T', ' ')
+          .split('.')[0]!;
+        db.updateUserTier(user.id, 'solo', trialExpiry);
+        user = db.getUserById(user.id)!;
       }
 
       db.updateLastLogin(user.id);
