@@ -111,19 +111,6 @@ Chat 的設定（含加密認證資訊）位於：
 ~/.panguard chat/config.json
 ```
 
-### LINE 設定
-
-```json
-{
-  "channel": "line",
-  "userType": "boss",
-  "language": "zh-TW",
-  "line": {
-    "token": "encrypted:..."
-  }
-}
-```
-
 ### Telegram 設定
 
 ```json

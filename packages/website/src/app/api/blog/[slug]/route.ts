@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getJsonPosts, savePost, deletePost, isStaticPost } from '@/lib/blog-store';
+import { savePost, deletePost, isStaticPost } from '@/lib/blog-store';
 import type { BlogPost } from '@/data/blog-posts';
 
 const AUTH_API = process.env.NEXT_PUBLIC_API_URL ?? '';
