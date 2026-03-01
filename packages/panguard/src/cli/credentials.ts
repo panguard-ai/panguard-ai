@@ -171,6 +171,69 @@ export function isTokenExpired(creds: StoredCredentials): boolean {
   return expiry.getTime() <= Date.now();
 }
 
+// ── LLM API Key Storage ───────────────────────────────────────────
+
+const LLM_CONFIG_PATH = join(CREDENTIALS_DIR, 'llm.enc');
+
+export interface LlmConfig {
+  /** LLM provider: 'claude' | 'openai' | 'ollama' */
+  provider: string;
+  /** API key (for claude/openai) */
+  apiKey?: string;
+  /** Model override */
+  model?: string;
+  /** Endpoint override (for ollama) */
+  endpoint?: string;
+  /** When config was saved */
+  savedAt: string;
+}
+
+/**
+ * Save LLM configuration to disk with AES-256-GCM encryption.
+ */
+export function saveLlmConfig(config: LlmConfig): void {
+  if (!existsSync(CREDENTIALS_DIR)) {
+    mkdirSync(CREDENTIALS_DIR, { recursive: true, mode: 0o700 });
+  }
+  const json = JSON.stringify(config);
+  const encrypted = encryptData(json);
+  writeFileSync(LLM_CONFIG_PATH, encrypted, { encoding: 'utf-8', mode: 0o600 });
+  try {
+    chmodSync(LLM_CONFIG_PATH, 0o600);
+  } catch {
+    /* best-effort */
+  }
+}
+
+/**
+ * Load LLM configuration from disk.
+ */
+export function loadLlmConfig(): LlmConfig | null {
+  if (!existsSync(LLM_CONFIG_PATH)) return null;
+  try {
+    const encrypted = readFileSync(LLM_CONFIG_PATH, 'utf-8');
+    const json = decryptData(encrypted);
+    const data = JSON.parse(json) as LlmConfig;
+    if (!data.provider) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Delete stored LLM configuration.
+ */
+export function deleteLlmConfig(): boolean {
+  if (!existsSync(LLM_CONFIG_PATH)) return false;
+  try {
+    unlinkSync(LLM_CONFIG_PATH);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Get a human-readable tier display name.
  */
