@@ -43,7 +43,7 @@ describe('Panguard Web Guidance -> Product Recommendation Pipeline', () => {
   describe('Persona to Plan Mapping Consistency', () => {
     const personaPlanMap: Record<PersonaType, PricingPlan> = {
       developer: 'solo',
-      small_business: 'team',
+      small_business: 'pro',
       mid_enterprise: 'business',
     };
 
@@ -59,9 +59,9 @@ describe('Panguard Web Guidance -> Product Recommendation Pipeline', () => {
       });
     }
 
-    it('should recommend free plan when no persona selected', () => {
+    it('should recommend community plan when no persona selected', () => {
       const result = generateGuidanceResult({});
-      expect(result.recommendedPlan).toBe('free');
+      expect(result.recommendedPlan).toBe('community');
     });
   });
 
@@ -132,7 +132,7 @@ describe('Panguard Web Guidance -> Product Recommendation Pipeline', () => {
     it('should include plan flag for paid plans', () => {
       const plans: [PersonaType, string][] = [
         ['developer', 'solo'],
-        ['small_business', 'team'],
+        ['small_business', 'pro'],
         ['mid_enterprise', 'business'],
       ];
 
@@ -232,11 +232,11 @@ describe('Panguard Web Guidance -> Product Recommendation Pipeline', () => {
   });
 
   describe('Pricing Plan Consistency', () => {
-    it('should have free plan at $0 and all paid plans above $0', () => {
+    it('should have community plan at $0 and all paid plans above $0', () => {
       const plans = getAllPricingPlans();
-      const freePlan = plans.find((p) => p.plan === 'free');
-      expect(freePlan!.priceUsd).toBe(0);
-      const paidPlans = plans.filter((p) => p.plan !== 'free');
+      const communityPlan = plans.find((p) => p.plan === 'community');
+      expect(communityPlan!.priceUsd).toBe(0);
+      const paidPlans = plans.filter((p) => p.plan !== 'community');
       for (const plan of paidPlans) {
         expect(plan.priceUsd).toBeGreaterThan(0);
       }
@@ -245,7 +245,7 @@ describe('Panguard Web Guidance -> Product Recommendation Pipeline', () => {
     it('should have highlighted plan matching small_business recommendation', () => {
       const highlighted = getAllPricingPlans().find((p) => p.highlighted);
       expect(highlighted).toBeDefined();
-      expect(highlighted!.plan).toBe('team');
+      expect(highlighted!.plan).toBe('pro');
 
       const sbRec = getRecommendedPlan('small_business');
       expect(sbRec!.plan).toBe(highlighted!.plan);
