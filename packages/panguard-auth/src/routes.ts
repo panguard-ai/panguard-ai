@@ -374,15 +374,17 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       json(res, 400, { ok: false, error: 'Name is required' });
       return;
     }
-    if (typeof password !== 'string' || password.length < 8) {
-      json(res, 400, { ok: false, error: 'Password must be at least 8 characters' });
+    if (typeof password !== 'string' || password.length < 8 || password.length > 128) {
+      json(res, 400, { ok: false, error: 'Password must be between 8 and 128 characters' });
       return;
     }
 
-    // Check if email already registered
+    // Check if email already registered (prevent account enumeration)
     const existing = db.getUserByEmail(email);
     if (existing) {
-      json(res, 409, { ok: false, error: 'Email already registered' });
+      // Match timing of password hashing to prevent timing-based enumeration
+      await hashPassword('timing-safe-dummy');
+      json(res, 200, { ok: true, message: 'If this email is not already registered, your account has been created.' });
       return;
     }
 
@@ -658,8 +660,8 @@ export function createAuthHandlers(config: AuthRouteConfig) {
       json(res, 400, { ok: false, error: 'Reset token is required' });
       return;
     }
-    if (typeof password !== 'string' || password.length < 8) {
-      json(res, 400, { ok: false, error: 'Password must be at least 8 characters' });
+    if (typeof password !== 'string' || password.length < 8 || password.length > 128) {
+      json(res, 400, { ok: false, error: 'Password must be between 8 and 128 characters' });
       return;
     }
 
@@ -738,6 +740,11 @@ export function createAuthHandlers(config: AuthRouteConfig) {
 
       if (!googleUser.email) {
         json(res, 400, { ok: false, error: 'No email from Google account' });
+        return;
+      }
+
+      if (!googleUser.email_verified) {
+        json(res, 403, { ok: false, error: 'Email not verified with Google' });
         return;
       }
 

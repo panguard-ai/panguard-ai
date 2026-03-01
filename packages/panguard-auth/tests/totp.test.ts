@@ -127,49 +127,58 @@ describe('TOTP', () => {
   });
 
   describe('verifyTotp', () => {
-    it('should verify a valid code for the current time step', () => {
+    it('should return matched step for a valid code', () => {
       const secret = generateTotpSecret();
       const currentStep = Math.floor(Date.now() / 1000 / 30);
       const code = generateTotp(secret, currentStep);
-      expect(verifyTotp(secret, code)).toBe(true);
+      expect(verifyTotp(secret, code)).toBe(currentStep);
     });
 
     it('should allow 1 step drift (previous step)', () => {
       const secret = generateTotpSecret();
       const currentStep = Math.floor(Date.now() / 1000 / 30);
       const code = generateTotp(secret, currentStep - 1);
-      expect(verifyTotp(secret, code)).toBe(true);
+      expect(verifyTotp(secret, code)).toBe(currentStep - 1);
     });
 
     it('should allow 1 step drift (next step)', () => {
       const secret = generateTotpSecret();
       const currentStep = Math.floor(Date.now() / 1000 / 30);
       const code = generateTotp(secret, currentStep + 1);
-      expect(verifyTotp(secret, code)).toBe(true);
+      expect(verifyTotp(secret, code)).toBe(currentStep + 1);
     });
 
     it('should reject code from 2 steps ago', () => {
       const secret = generateTotpSecret();
       const currentStep = Math.floor(Date.now() / 1000 / 30);
       const code = generateTotp(secret, currentStep - 2);
-      expect(verifyTotp(secret, code)).toBe(false);
+      expect(verifyTotp(secret, code)).toBe(-1);
     });
 
     it('should reject invalid format', () => {
       const secret = generateTotpSecret();
-      expect(verifyTotp(secret, '12345')).toBe(false); // 5 digits
-      expect(verifyTotp(secret, '1234567')).toBe(false); // 7 digits
-      expect(verifyTotp(secret, 'abcdef')).toBe(false); // non-numeric
-      expect(verifyTotp(secret, '')).toBe(false);
+      expect(verifyTotp(secret, '12345')).toBe(-1); // 5 digits
+      expect(verifyTotp(secret, '1234567')).toBe(-1); // 7 digits
+      expect(verifyTotp(secret, 'abcdef')).toBe(-1); // non-numeric
+      expect(verifyTotp(secret, '')).toBe(-1);
     });
 
     it('should reject wrong code', () => {
       const secret = generateTotpSecret();
-      // Generate valid code, then modify it
       const currentStep = Math.floor(Date.now() / 1000 / 30);
       const code = generateTotp(secret, currentStep);
       const wrongCode = String((parseInt(code, 10) + 1) % 1000000).padStart(6, '0');
-      expect(verifyTotp(secret, wrongCode)).toBe(false);
+      expect(verifyTotp(secret, wrongCode)).toBe(-1);
+    });
+
+    it('should enforce replay protection via lastUsedStep', () => {
+      const secret = generateTotpSecret();
+      const currentStep = Math.floor(Date.now() / 1000 / 30);
+      const code = generateTotp(secret, currentStep);
+      // First use succeeds
+      expect(verifyTotp(secret, code)).toBe(currentStep);
+      // Replay with same step blocked
+      expect(verifyTotp(secret, code, currentStep)).toBe(-1);
     });
   });
 
