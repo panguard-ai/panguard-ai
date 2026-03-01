@@ -166,12 +166,16 @@ export class ThreatCloudServer {
 
     // Determine if this endpoint requires authentication
     const isHealthCheck = pathname === '/health';
+    const allowAnonymousUpload = process.env['ALLOW_ANONYMOUS_UPLOAD'] === 'true';
+    const isAnonymousThreatUpload = allowAnonymousUpload &&
+      req.method === 'POST' && pathname === '/api/threats';
     const isWriteOrSensitive =
       req.method === 'POST' ||
       pathname === '/api/audit-log' ||
       pathname === '/api/sightings';
-    // Write and sensitive endpoints ALWAYS require auth (even if apiKeyRequired is false)
-    const requiresAuth = !isHealthCheck && (this.config.apiKeyRequired || isWriteOrSensitive);
+    // Write and sensitive endpoints ALWAYS require auth, except anonymous threat uploads
+    const requiresAuth = !isHealthCheck && !isAnonymousThreatUpload &&
+      (this.config.apiKeyRequired || isWriteOrSensitive);
 
     if (requiresAuth) {
       if (this.hashedApiKeys.length === 0) {

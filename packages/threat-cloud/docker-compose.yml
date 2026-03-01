@@ -29,6 +29,7 @@ services:
       - TC_DB_PATH=/data/threat-cloud.db
       - TC_API_KEYS=${TC_API_KEYS:?TC_API_KEYS is required}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-https://panguard.ai,https://www.panguard.ai}
+      - ALLOW_ANONYMOUS_UPLOAD=${ALLOW_ANONYMOUS_UPLOAD:-true}
       - NODE_ENV=production
     volumes:
       - tc-data:/data
