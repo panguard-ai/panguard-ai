@@ -1124,7 +1124,7 @@ export class AuthDB {
       conditions.push('action = ?');
       params.push(filter.action);
     }
-    if (filter.actorId != null) {
+    if (filter.actorId !== null && filter.actorId !== undefined) {
       conditions.push('actor_id = ?');
       params.push(filter.actorId);
     }
