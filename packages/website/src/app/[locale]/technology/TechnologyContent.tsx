@@ -156,7 +156,7 @@ export default function TechnologyContent() {
         </div>
       </SectionWrapper>
 
-      {/* -- Five Agent Architecture -- */}
+      {/* -- Four Agent Architecture -- */}
       <SectionWrapper dark>
         <SectionTitle
           overline={t('agents.overline')}
