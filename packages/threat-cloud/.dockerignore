@@ -6,3 +6,6 @@ tests
 *.db
 *.db-wal
 *.db-shm
+backups
+deploy
+seed-test.db
