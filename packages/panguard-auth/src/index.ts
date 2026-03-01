@@ -22,7 +22,7 @@ export {
   hashToken,
 } from './auth.js';
 export { extractToken, authenticateRequest, requireAdmin } from './middleware.js';
-export { createAuthHandlers } from './routes.js';
+export { createAuthHandlers } from './routes/index.js';
 export { RateLimiter } from './rate-limiter.js';
 export type { RateLimitConfig, RateLimitResult } from './rate-limiter.js';
 export {
@@ -44,7 +44,7 @@ export {
 export type { GoogleOAuthConfig, GoogleUserInfo } from './google-oauth.js';
 export { syncWaitlistEntry, appendRow, ensureSheetHeaders } from './google-sheets.js';
 export type { GoogleSheetsConfig } from './google-sheets.js';
-export type { AuthRouteConfig } from './routes.js';
+export type { AuthRouteConfig } from './routes/index.js';
 export {
   verifyWebhookSignature,
   handleWebhookEvent,
