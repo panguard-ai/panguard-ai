@@ -42,6 +42,39 @@ window.PG = (() => {
     return true;
   }
 
+  /**
+   * Verify the current token belongs to an admin user via API call.
+   * Redirects to login if not authenticated or not admin.
+   * Returns the user object on success.
+   */
+  async function requireAdminRole() {
+    const token = getToken();
+    if (!token) {
+      window.location.href = '/admin/login';
+      return null;
+    }
+    try {
+      const res = await fetch(`${API}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        logout();
+        return null;
+      }
+      const data = await res.json();
+      if (!data.ok || !data.data?.user || data.data.user.role !== 'admin') {
+        localStorage.removeItem('panguard_admin_token');
+        localStorage.removeItem('panguard_admin_user');
+        window.location.href = '/admin/login';
+        return null;
+      }
+      return data.data.user;
+    } catch {
+      logout();
+      return null;
+    }
+  }
+
   // ── API ──────────────────────────────────────────────────────────
 
   async function apiFetch(path) {
@@ -390,6 +423,7 @@ window.PG = (() => {
     getUser,
     logout,
     requireAuth,
+    requireAdminRole,
     // API
     apiFetch,
     apiPost,

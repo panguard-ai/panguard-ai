@@ -3041,7 +3041,7 @@
       "founding": "Founding member pricing"
     },
     "successTitle": "You are on the list.",
-    "successDesc": "We sent a confirmation to {email}. We will reach out when your access is ready.",
+    "successDesc": "We sent a confirmation to {email}. Our team reviews applications within 24 hours. Once approved, you will receive an email with a link to create your account and start your 14-day free trial.",
     "betaNote": "Private beta launching Q2 2026"
   },
   "errorValidation": {
