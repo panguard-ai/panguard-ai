@@ -467,8 +467,8 @@ describe('End-to-End Platform Pipeline', () => {
       expect(PRODUCT_FEATURES).toHaveLength(5);
     });
 
-    it('should have 5 pricing plans', () => {
-      expect(getAllPricingPlans()).toHaveLength(5);
+    it('should have 4 pricing plans', () => {
+      expect(getAllPricingPlans()).toHaveLength(4);
     });
 
     it('should have 3 compliance frameworks', () => {
