@@ -207,11 +207,17 @@
     <script>
       if (!PG.requireAuth()) throw new Error('Not authenticated');
 
+      // Verify admin role via API before rendering any content
+      (async () => {
+        const admin = await PG.requireAdminRole();
+        if (!admin) return; // Redirected to login
+      })();
+
       document.getElementById('nav').innerHTML = PG.renderNav('users');
       document.getElementById('pageIcon').innerHTML = Icons.users(20, '#8B9A8E');
       document.getElementById('searchIcon').innerHTML = Icons.search(16);
 
-      const TIERS = ['free', 'solo', 'starter', 'pro', 'team', 'business', 'enterprise'];
+      const TIERS = ['community', 'solo', 'pro', 'business', 'enterprise'];
       const ROLES = ['user', 'admin'];
 
       let allUsers = [];
