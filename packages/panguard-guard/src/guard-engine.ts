@@ -197,14 +197,13 @@ export class GuardEngine {
     let license = validateLicense(config.licenseKey);
 
     // If CLI tier is provided, map it to Guard's internal LicenseTier
-    // CLI tiers: free/solo/starter/team/business/enterprise
+    // CLI tiers: community/solo/pro/business/enterprise
     // Guard tiers: free/pro/enterprise
     if (config.cliTier) {
       const cliTierMap: Record<string, LicenseTier> = {
-        free: 'free',
+        community: 'free',
         solo: 'pro',
-        starter: 'pro',
-        team: 'enterprise',
+        pro: 'pro',
         business: 'enterprise',
         enterprise: 'enterprise',
       };

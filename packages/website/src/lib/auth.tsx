@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import type { ReactNode } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
+const REQUEST_TIMEOUT = 15_000;
 
 export interface AuthUser {
   id: number;
@@ -76,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const res = await fetch(`${API_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${stored}` },
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT),
       });
       if (res.ok) {
         const data = (await res.json()) as { ok: boolean; data?: { user: AuthUser } };
@@ -146,6 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT),
         });
 
         const data = (await res.json()) as {
@@ -184,6 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, name, password }),
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT),
         });
 
         const data = (await res.json()) as { ok: boolean; error?: string };
@@ -202,6 +206,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await fetch(`${API_URL}/api/auth/logout`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${stored}` },
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT),
         });
       } catch {
         // Best effort

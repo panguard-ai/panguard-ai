@@ -205,9 +205,9 @@ export function handleWebhookEvent(
     }
 
     case 'subscription_expired': {
-      // Subscription fully ended: downgrade to free
+      // Subscription fully ended: downgrade to community
       db.updateSubscriptionStatus(lsSubscriptionId, 'expired', endsAt);
-      db.updateUserTier(userId, 'free');
+      db.updateUserTier(userId, 'community');
 
       // Invalidate sessions
       db.deleteSessionsByUserId(userId);
@@ -227,10 +227,10 @@ export function handleWebhookEvent(
         action: 'policy_check',
         target: user.email,
         result: 'success',
-        context: { details: `Subscription expired, downgraded to free` },
+        context: { details: `Subscription expired, downgraded to community` },
       });
 
-      return { handled: true, event: eventName, userId, tier: 'free' };
+      return { handled: true, event: eventName, userId, tier: 'community' };
     }
 
     case 'subscription_paused': {

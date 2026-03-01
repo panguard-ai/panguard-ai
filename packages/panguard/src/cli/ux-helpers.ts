@@ -58,7 +58,7 @@ export function moduleCountDisplay(lang: Lang): string {
   }
   const total = ALL_MODULES.length;
 
-  if (tier === 'free' || tier === 'community') {
+  if (tier === 'community') {
     return lang === 'zh-TW'
       ? `${unlocked}/${total} \u5DF2\u89E3\u9396`
       : `${unlocked}/${total} unlocked`;
