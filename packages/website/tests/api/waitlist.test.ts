@@ -9,6 +9,10 @@ vi.mock('@/lib/rate-limit', () => ({
   getClientIP: vi.fn(() => '127.0.0.1'),
 }));
 
+// Mock global fetch so backend API calls don't hit real network
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
+
 import { POST } from '../../src/app/api/waitlist/route';
 import { appendToSheet } from '@/lib/sheets';
 import { checkRateLimit } from '@/lib/rate-limit';
@@ -25,6 +29,12 @@ describe('POST /api/waitlist', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(checkRateLimit).mockReturnValue(true);
+    // Default: backend API reachable and returns success
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, data: { id: 1 } }),
+    });
   });
 
   it('returns 200 for valid email', async () => {
@@ -34,7 +44,8 @@ describe('POST /api/waitlist', () => {
     expect(json.ok).toBe(true);
   });
 
-  it('falls back to sheet storage', async () => {
+  it('falls back to sheet storage when backend is unreachable', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('connection refused'));
     const res = await POST(makeRequest({ email: 'test@example.com' }));
     expect(res.status).toBe(200);
     expect(appendToSheet).toHaveBeenCalledWith(
@@ -60,6 +71,8 @@ describe('POST /api/waitlist', () => {
   });
 
   it('returns 500 on server error', async () => {
+    // Backend unreachable AND sheet fallback fails → 500
+    mockFetch.mockRejectedValueOnce(new Error('connection refused'));
     vi.mocked(appendToSheet).mockRejectedValueOnce(new Error('fail'));
     const res = await POST(makeRequest({ email: 'test@example.com' }));
     expect(res.status).toBe(500);
