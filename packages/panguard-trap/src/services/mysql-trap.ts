@@ -193,7 +193,7 @@ function parseHandshakeResponse(data: Buffer): { username: string } | null {
 
   try {
     // Skip: capabilities(4) + max_packet(4) + charset(1) + reserved(23) = 32
-    let pos = 32;
+    const pos = 32;
 
     // Read null-terminated username
     const nullIdx = data.indexOf(0x00, pos);

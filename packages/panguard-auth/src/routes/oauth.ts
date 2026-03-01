@@ -109,7 +109,7 @@ export function createOAuthRoutes(ctx: RouteContext) {
       const redirectUrl = `${baseUrl}/login?code=${exchangeCode}`;
       res.writeHead(302, { Location: redirectUrl });
       res.end();
-    } catch (_err) {
+    } catch {
       json(res, 500, {
         ok: false,
         error: 'Google OAuth failed',

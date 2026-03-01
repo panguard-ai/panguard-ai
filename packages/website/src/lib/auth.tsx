@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     void refresh();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line
 
   const login = useCallback(
     async (email: string, password: string, totpCode?: string): Promise<LoginResult> => {

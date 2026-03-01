@@ -695,7 +695,7 @@ async function actionThreat(): Promise<void> {
   // Port availability check
   const port = 8080;
   const portAvailable = await new Promise<boolean>((resolve) => {
-    const net = require('node:net') as typeof import('node:net');
+    const net = await import('node:net');
     const tester = net.createServer();
     tester.once('error', () => resolve(false));
     tester.once('listening', () => {

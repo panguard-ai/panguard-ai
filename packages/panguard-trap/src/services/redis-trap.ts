@@ -164,7 +164,6 @@ export class RedisTrapService extends BaseTrapService {
 
     this.addMitreTechnique(session.sessionId, 'T1190'); // Exploit public-facing
 
-    let authenticated = false;
     let authAttempts = 0;
 
     const timeout = this.config.sessionTimeoutMs ?? 30_000;
@@ -205,7 +204,6 @@ export class RedisTrapService extends BaseTrapService {
           this.recordCredential(session.sessionId, 'default', password, authAttempts >= 3);
 
           if (authAttempts >= 3) {
-            authenticated = true;
             this.addMitreTechnique(session.sessionId, 'T1078');
             respond(respSimple('OK'));
           } else {
