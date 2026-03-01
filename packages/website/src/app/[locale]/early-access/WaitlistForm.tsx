@@ -52,7 +52,9 @@ export default function WaitlistForm() {
         {!submitted ? (
           <div>
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+              <label htmlFor="waitlist-email" className="sr-only">Email address</label>
               <input
+                id="waitlist-email"
                 type="email"
                 value={email}
                 onChange={(e) => {
@@ -60,7 +62,6 @@ export default function WaitlistForm() {
                   if (error) setError('');
                 }}
                 placeholder={t('placeholder')}
-                aria-label="Email address"
                 className="flex-1 bg-surface-1 border border-border rounded-full px-5 py-3.5 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors text-sm"
                 autoFocus
               />
