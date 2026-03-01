@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resources, resourceTypes, type Resource } from '../../src/data/resources';
+import { resources, resourceTypes } from '../../src/data/resources';
 
 describe('resources data', () => {
   it('exports a non-empty array', () => {

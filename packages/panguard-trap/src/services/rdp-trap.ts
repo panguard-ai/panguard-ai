@@ -141,7 +141,7 @@ function parseConnectionRequest(data: Buffer): {
   if (data.length < 11) return result;
 
   // Skip TPKT (4 bytes) + X.224 length indicator (1) + CR code (1) + DST-REF (2) + SRC-REF (2) + class (1)
-  let pos = 4 + 1 + 1 + 2 + 2 + 1; // = 11
+  const pos = 4 + 1 + 1 + 2 + 2 + 1; // = 11
 
   // Look for cookie and RDP Neg Req in the remaining data
   const remaining = data.subarray(pos);
