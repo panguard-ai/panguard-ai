@@ -142,6 +142,10 @@ export default async function LocaleLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} ${notoSansTC.variable}`}
     >
       <head>
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="https://plausible.io" />
         {/* Enable scroll-reveal animations only after JS is ready (prevents FOIC) */}
         <script
           dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js-ready")' }}
