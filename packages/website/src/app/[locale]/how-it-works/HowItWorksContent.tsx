@@ -24,31 +24,31 @@ const layerConfigs = [
   {
     key: 'layer1' as const,
     color: 'bg-brand-sage/10 text-brand-sage',
-    width: '100%',
+    mdClass: '',
     icon: ScanIcon,
   },
   {
     key: 'layer2' as const,
     color: 'bg-brand-sage/10 text-brand-sage',
-    width: '90%',
+    mdClass: 'md:max-w-[90%]',
     icon: ShieldIcon,
   },
   {
     key: 'layer3' as const,
     color: 'bg-[#60a5fa]/10 text-[#60a5fa]',
-    width: '75%',
+    mdClass: 'md:max-w-[75%]',
     icon: AnalyticsIcon,
   },
   {
     key: 'layer4' as const,
     color: 'bg-[#f59e0b]/10 text-[#f59e0b]',
-    width: '55%',
+    mdClass: 'md:max-w-[55%]',
     icon: SettingsIcon,
   },
   {
     key: 'layer5' as const,
     color: 'bg-[#ef4444]/10 text-[#ef4444]',
-    width: '40%',
+    mdClass: 'md:max-w-[40%]',
     icon: ResponseIcon,
   },
 ];
@@ -146,8 +146,7 @@ export default function HowItWorksContent() {
             return (
               <FadeInUp key={l.key} delay={i * 0.08}>
                 <div
-                  className="bg-surface-2 rounded-xl p-6 border border-border mx-auto"
-                  style={{ maxWidth: l.width }}
+                  className={`bg-surface-2 rounded-xl p-4 sm:p-6 border border-border md:mx-auto ${l.mdClass}`}
                 >
                   <div className="flex items-start gap-4">
                     <div className="shrink-0">

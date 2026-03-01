@@ -100,7 +100,7 @@ export default function ThreeRoads() {
               className="bg-surface-1/50 border border-border rounded-xl p-4"
             >
               <p className="text-xs text-gray-500 font-medium mb-2">{t(`rows.${key}.label`)}</p>
-              <div className="grid grid-cols-3 gap-2 text-sm">
+              <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-sm">
                 <div className="text-center">
                   <p className="text-[11px] sm:text-xs text-gray-600 mb-1">{t('columns.diy')}</p>
                   <p className="text-gray-500">
