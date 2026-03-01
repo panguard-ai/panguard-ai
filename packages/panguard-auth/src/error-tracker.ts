@@ -31,6 +31,7 @@ export async function initErrorTracking(): Promise<void> {
   if (dsn) {
     try {
       // Dynamic import — only loads if @sentry/node is installed
+      // @ts-expect-error Optional dependency, may not be installed
       const sentryModule = (await import('@sentry/node')) as unknown as SentryLike;
       sentryModule.init({
         dsn,

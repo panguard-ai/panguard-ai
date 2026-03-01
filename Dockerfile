@@ -1,4 +1,4 @@
-FROM node:22 AS base
+FROM node:22-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -16,7 +16,6 @@ COPY packages/panguard-chat/package.json packages/panguard-chat/
 COPY packages/panguard-report/package.json packages/panguard-report/
 COPY packages/panguard-trap/package.json packages/panguard-trap/
 COPY packages/panguard-web/package.json packages/panguard-web/
-COPY packages/website/package.json packages/website/
 COPY packages/threat-cloud/package.json packages/threat-cloud/
 COPY security-hardening/package.json security-hardening/
 
@@ -40,51 +39,12 @@ COPY tsconfig.json ./
 # Build backend packages only (skip website)
 RUN pnpm --filter '!@panguard-ai/website' -r run build
 
-# Production image
-FROM node:22-alpine AS production
+# Prune dev dependencies to reduce image size
+RUN pnpm prune --prod
 
-RUN addgroup -S panguard && adduser -S -G panguard panguard
-
-WORKDIR /app
-
-# Copy node_modules and built packages
-COPY --from=base /app/node_modules ./node_modules
-COPY --from=base /app/package.json ./
-COPY --from=base /app/pnpm-workspace.yaml ./
-
-# Core
-COPY --from=base /app/packages/core/dist ./packages/core/dist
-COPY --from=base /app/packages/core/package.json ./packages/core/
-
-# Panguard CLI
-COPY --from=base /app/packages/panguard/dist ./packages/panguard/dist
-COPY --from=base /app/packages/panguard/package.json ./packages/panguard/
-
-# Auth (SQLite + OAuth + sessions)
-COPY --from=base /app/packages/panguard-auth/dist ./packages/panguard-auth/dist
-COPY --from=base /app/packages/panguard-auth/package.json ./packages/panguard-auth/
-
-# Scan, Guard, Chat, Report, Trap, Threat Cloud, Panguard Web
-COPY --from=base /app/packages/panguard-scan/dist ./packages/panguard-scan/dist
-COPY --from=base /app/packages/panguard-scan/package.json ./packages/panguard-scan/
-COPY --from=base /app/packages/panguard-guard/dist ./packages/panguard-guard/dist
-COPY --from=base /app/packages/panguard-guard/package.json ./packages/panguard-guard/
-COPY --from=base /app/packages/panguard-chat/dist ./packages/panguard-chat/dist
-COPY --from=base /app/packages/panguard-chat/package.json ./packages/panguard-chat/
-COPY --from=base /app/packages/panguard-report/dist ./packages/panguard-report/dist
-COPY --from=base /app/packages/panguard-report/package.json ./packages/panguard-report/
-COPY --from=base /app/packages/panguard-trap/dist ./packages/panguard-trap/dist
-COPY --from=base /app/packages/panguard-trap/package.json ./packages/panguard-trap/
-COPY --from=base /app/packages/threat-cloud/dist ./packages/threat-cloud/dist
-COPY --from=base /app/packages/threat-cloud/package.json ./packages/threat-cloud/
-COPY --from=base /app/packages/panguard-web/dist ./packages/panguard-web/dist
-COPY --from=base /app/packages/panguard-web/package.json ./packages/panguard-web/
-
-# Config files (Sigma rules, YARA rules)
-COPY --from=base /app/config ./config
-
-# Data directories
-RUN mkdir -p /data && chown panguard:panguard /data
+# Create non-root user and data directory
+RUN groupadd --system panguard && useradd --system --gid panguard panguard \
+    && mkdir -p /data && chown panguard:panguard /data
 
 USER panguard
 
@@ -94,8 +54,5 @@ ENV PANGUARD_PORT=3000
 
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:3000/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
-
-ENTRYPOINT ["node", "packages/panguard/dist/cli/index.js"]
-CMD ["serve", "--port", "3000", "--host", "0.0.0.0", "--db", "/data/auth.db"]
+# No Docker HEALTHCHECK — Railway handles healthchecks natively
+CMD ["node", "packages/panguard/dist/cli/index.js", "serve", "--port", "3000", "--host", "0.0.0.0", "--db", "/data/auth.db"]
