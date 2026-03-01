@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createServer, type Server } from 'node:http';
 import { AuthDB } from '../src/database.js';
-import { createAuthHandlers } from '../src/routes.js';
+import { createAuthHandlers } from '../src/routes/index.js';
 import { hashPassword } from '../src/auth.js';
 import { join } from 'node:path';
 import { mkdtempSync, rmSync } from 'node:fs';
