@@ -3,23 +3,21 @@
  * 通知系統
  *
  * Dispatches threat alerts to configured notification channels:
- * LINE Notify, Telegram Bot, Slack Webhook, Email SMTP.
+ * Telegram Bot, Slack Webhook, Email SMTP.
  * 將威脅警報派發至已配置的通知通道：
- * LINE Notify、Telegram Bot、Slack Webhook、Email SMTP。
+ * Telegram Bot、Slack Webhook、Email SMTP。
  *
  * @module @panguard-ai/panguard-guard/notify
  */
 
 import { createLogger } from '@panguard-ai/core';
 import type { NotificationConfig, NotificationResult, ThreatVerdict } from '../types.js';
-import { sendLineNotify } from './line-notify.js';
 import { sendTelegramNotify } from './telegram.js';
 import { sendSlackNotify } from './slack.js';
 import { sendEmailNotify } from './email.js';
 
 const logger = createLogger('panguard-guard:notify');
 
-export { sendLineNotify } from './line-notify.js';
 export { sendTelegramNotify } from './telegram.js';
 export { sendSlackNotify } from './slack.js';
 export { sendEmailNotify } from './email.js';
@@ -45,9 +43,6 @@ export async function sendNotifications(
 ): Promise<NotificationResult[]> {
   const promises: Promise<NotificationResult>[] = [];
 
-  if (config.line) {
-    promises.push(sendLineNotify(config.line, verdict, eventDescription));
-  }
   if (config.telegram) {
     promises.push(sendTelegramNotify(config.telegram, verdict, eventDescription));
   }
@@ -73,7 +68,7 @@ export async function sendNotifications(
       const msg = result.reason instanceof Error ? result.reason.message : String(result.reason);
       logger.error(`Notification failed: ${msg} / 通知失敗: ${msg}`);
       notificationResults.push({
-        channel: 'line', // fallback channel name
+        channel: 'telegram', // fallback channel name
         success: false,
         error: msg,
       });

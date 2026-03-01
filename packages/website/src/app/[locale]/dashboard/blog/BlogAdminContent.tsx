@@ -214,7 +214,7 @@ export default function BlogAdminContent() {
             </Link>
             <span className="text-text-muted">/</span>
             <Link
-              href={'/dashboard' as '/dashboard'}
+              href={'/dashboard' as const}
               className="text-sm text-text-tertiary hover:text-text-secondary transition-colors"
             >
               Dashboard

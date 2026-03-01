@@ -30,7 +30,7 @@ Traditional security tools:
 Panguard AI:
 
 - **One command install**, zero configuration
-- **Plain language notifications** via LINE / Telegram / Slack
+- **Plain language notifications** via Telegram / Slack
 - **AI auto-judges** severity and executes responses
 - **Gets smarter over time**, learning from your environment
 
@@ -90,7 +90,7 @@ Translates technical security alerts into plain language and delivers them throu
 panguard chat setup --channel line --user-type boss
 ```
 
-- 5 notification channels: LINE, Telegram, Slack (Block Kit), Email (SMTP/HTML), Webhook (mTLS)
+- 4 notification channels: Telegram, Slack (Block Kit), Email (SMTP/HTML), Webhook (mTLS)
 - 3 tone modes:
   - **boss** - Impact summary, plain language
   - **developer** - Technical details, CLI commands and logs

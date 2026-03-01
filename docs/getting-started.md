@@ -20,7 +20,7 @@
 | **Scan** | Full (lsof, socketfilterfw) | Full (ss, ufw/iptables) | Partial (netstat, no firewall) |
 | **Guard** | Poll monitoring (5s) | Poll monitoring (5s) | Poll monitoring (5s) |
 | **Trap** | TCP honeypots | TCP honeypots | TCP honeypots |
-| **Chat** | LINE / Telegram / Slack / Email | LINE / Telegram / Slack / Email | LINE / Telegram / Slack / Email |
+| **Chat** | Telegram / Slack / Email | Telegram / Slack / Email | Telegram / Slack / Email |
 | **Report** | Full (3 frameworks) | Full (3 frameworks) | Full (3 frameworks) |
 
 > macOS and Linux are primary platforms. Windows supports core features; some OS-level detection is limited.
@@ -191,8 +191,7 @@ Interactive wizard guides you:
 
 ```
 ? Select notification channel:
-  > LINE
-    Telegram
+  > Telegram
     Slack
     Email
     Webhook
@@ -206,8 +205,8 @@ Interactive wizard guides you:
 Or specify directly:
 
 ```bash
-# LINE notifications, boss mode (plain language)
-panguard chat setup --channel line --user-type boss
+# Telegram notifications, boss mode (plain language)
+panguard chat setup --channel telegram --user-type boss
 
 # Slack notifications, IT admin mode (remediation steps)
 panguard chat setup --channel slack --user-type it_admin
