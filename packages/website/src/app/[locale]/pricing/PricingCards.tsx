@@ -11,6 +11,8 @@ import SectionTitle from '@/components/ui/SectionTitle';
 
 /* ── Plan keys and pricing data (4 tiers) ── */
 
+const CHECKOUT_ENABLED = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED === 'true';
+
 const planKeys = ['community', 'solo', 'pro', 'business'] as const;
 
 type PlanKey = (typeof planKeys)[number];
@@ -21,7 +23,7 @@ interface PlanMeta {
   ctaHref: string;
   popular: boolean;
   machines: string;
-  /** If set, clicking CTA triggers checkout for this tier */
+  /** If set and checkout is enabled, clicking CTA triggers checkout for this tier */
   checkoutTier?: string;
 }
 
@@ -29,7 +31,7 @@ const planMeta: Record<PlanKey, PlanMeta> = {
   community: {
     price: 0,
     unit: '',
-    ctaHref: '/docs/getting-started',
+    ctaHref: '/register',
     popular: false,
     machines: '1',
   },
@@ -338,7 +340,7 @@ export default function PricingCards() {
                   ))}
                 </ul>
 
-                {meta.checkoutTier ? (
+                {meta.checkoutTier && CHECKOUT_ENABLED ? (
                   <button
                     onClick={() => handleCheckout(meta.checkoutTier!)}
                     disabled={loading === meta.checkoutTier}
