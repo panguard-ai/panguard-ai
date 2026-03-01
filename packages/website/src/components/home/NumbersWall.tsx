@@ -96,7 +96,7 @@ export default function NumbersWall() {
         </FadeInUp>
 
         {/* Trust cards */}
-        <div className="grid sm:grid-cols-3 gap-5 mt-12 max-w-4xl mx-auto">
+        <div className="grid sm:grid-cols-3 gap-3 sm:gap-5 mt-12 max-w-4xl mx-auto">
           {(['openSource', 'security', 'privacy'] as const).map((key, i) => (
             <FadeInUp key={key} delay={0.6 + i * 0.08}>
               <div className="bg-surface-1/50 border border-border rounded-2xl p-5">
