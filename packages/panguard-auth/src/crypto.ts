@@ -16,7 +16,7 @@ const AUTH_TAG_LENGTH = 16; // 128 bits
  * Must be a 64-character hex string (32 bytes).
  */
 function getEncryptionKey(): Buffer {
-  const keyHex = process.env.TOTP_ENCRYPTION_KEY;
+  const keyHex = process.env['TOTP_ENCRYPTION_KEY'];
   if (!keyHex || keyHex.length !== 64) {
     throw new Error(
       'TOTP_ENCRYPTION_KEY must be set as a 64-character hex string (32 bytes). ' +

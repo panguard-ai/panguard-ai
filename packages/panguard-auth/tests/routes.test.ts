@@ -191,7 +191,7 @@ describe('Auth Routes', () => {
       expect(res.status).toBe(400);
     });
 
-    it('should reject duplicate email', async () => {
+    it('should return generic 200 for duplicate email (prevent enumeration)', async () => {
       await request(server, 'POST', '/api/auth/register', {
         email: 'dup@test.com',
         name: 'A',
@@ -202,7 +202,11 @@ describe('Auth Routes', () => {
         name: 'B',
         password: 'password456',
       });
-      expect(res.status).toBe(409);
+      // Should not reveal that the email is already registered
+      expect(res.status).toBe(200);
+      expect(res.data.ok).toBe(true);
+      // Should NOT contain user data or token (didn't create a new account)
+      expect(res.data.data).toBeUndefined();
     });
   });
 
