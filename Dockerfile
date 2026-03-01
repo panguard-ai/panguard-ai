@@ -3,7 +3,7 @@
 #
 # Multi-stage build:
 #   Stage 1: pnpm workspace build
-#   Stage 2: Manual standalone bundle with npm (no pnpm symlinks)
+#   Stage 2: Standalone bundle with npm (no pnpm symlinks)
 #
 # Build:  docker build -t panguard-api .
 # Run:    docker run -p 3000:3000 -v pg-data:/data panguard-api
@@ -59,12 +59,17 @@ COPY config/ config/
 RUN pnpm --filter '!@panguard-ai/website' -r run build
 
 # ---- Create standalone bundle (no pnpm symlinks) ----
+RUN mkdir -p /standalone
 
-# Copy main CLI entry point
-RUN mkdir -p /standalone && \
-    cp -r packages/panguard/dist /standalone/dist
+# Step 1: Copy main CLI entry point
+RUN cp -r packages/panguard/dist /standalone/dist
 
-# Copy each workspace package as a regular node_modules entry
+# Step 2: Install external deps with npm FIRST (before workspace packages)
+# NOTE: Update these versions if workspace package.json deps change
+RUN printf '{"name":"panguard-api","version":"0.1.0","private":true,"type":"module","dependencies":{"commander":"^12.0.0","better-sqlite3":"^11.0.0","i18next":"^24.2.2","js-yaml":"^4.1.0","zod":"^3.24.0","pdfkit":"^0.15.0"},"optionalDependencies":{"ssh2":"^1.16.0"}}' > /standalone/package.json && \
+    cd /standalone && npm install --production
+
+# Step 3: Copy workspace packages into node_modules AFTER npm install
 RUN mkdir -p /standalone/node_modules/@panguard-ai && \
     for pkg in core panguard-auth panguard-guard panguard-scan panguard-chat panguard-report panguard-trap panguard-web; do \
       mkdir -p /standalone/node_modules/@panguard-ai/$pkg && \
@@ -78,52 +83,8 @@ RUN mkdir -p /standalone/node_modules/@panguard-ai && \
     cp -r packages/threat-cloud/dist /standalone/node_modules/@panguard-ai/threat-cloud/dist && \
     cp packages/threat-cloud/package.json /standalone/node_modules/@panguard-ai/threat-cloud/
 
-# Generate bundle package.json with all external (non-workspace) dependencies
-RUN node -e " \
-  const fs = require('fs'); \
-  const pkgPaths = [ \
-    'packages/core/package.json', \
-    'packages/panguard/package.json', \
-    'packages/panguard-auth/package.json', \
-    'packages/panguard-guard/package.json', \
-    'packages/panguard-scan/package.json', \
-    'packages/panguard-chat/package.json', \
-    'packages/panguard-report/package.json', \
-    'packages/panguard-trap/package.json', \
-    'packages/panguard-web/package.json', \
-    'packages/threat-cloud/package.json', \
-    'security-hardening/package.json', \
-  ]; \
-  const deps = {}; \
-  const optDeps = {}; \
-  for (const p of pkgPaths) { \
-    const pkg = JSON.parse(fs.readFileSync(p, 'utf8')); \
-    for (const [n, v] of Object.entries(pkg.dependencies || {})) { \
-      if (!n.startsWith('@panguard-ai/')) deps[n] = v; \
-    } \
-    for (const [n, v] of Object.entries(pkg.optionalDependencies || {})) { \
-      if (!n.startsWith('@panguard-ai/')) optDeps[n] = v; \
-    } \
-  } \
-  const bundle = { \
-    name: 'panguard-api', \
-    version: '0.1.0', \
-    private: true, \
-    type: 'module', \
-    dependencies: deps, \
-    optionalDependencies: optDeps, \
-  }; \
-  fs.writeFileSync('/standalone/package.json', JSON.stringify(bundle, null, 2)); \
-  console.log('External deps:', Object.keys(deps).join(', ')); \
-  console.log('Optional deps:', Object.keys(optDeps).join(', ')); \
-"
-
-# Install external production dependencies with npm (flat node_modules, no symlinks)
-RUN cd /standalone && npm install --production
-
-# Verify the entry point
-RUN node -e "require('fs').accessSync('/standalone/dist/cli/index.js')" && \
-    echo 'Entry point OK: /standalone/dist/cli/index.js'
+# Verify entry point exists
+RUN ls -la /standalone/dist/cli/index.js
 
 # -------------------------------------------------------
 # Stage 2: Production
@@ -140,7 +101,7 @@ WORKDIR /app
 # Copy standalone bundle (flat node_modules, no pnpm symlinks)
 COPY --from=builder /standalone .
 
-# Copy config directory (YARA rules etc., lives at monorepo root)
+# Copy config directory (YARA rules etc., at monorepo root)
 COPY --from=builder /build/config ./config
 
 # Persistent data directory
