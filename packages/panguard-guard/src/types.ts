@@ -189,11 +189,6 @@ export interface ResponseResult {
 
 // ===== Notification =====
 
-/** LINE Notify config / LINE Notify 配置 */
-export interface LineNotifyConfig {
-  accessToken: string;
-}
-
 /** Telegram Bot config / Telegram Bot 配置 */
 export interface TelegramConfig {
   botToken: string;
@@ -217,7 +212,6 @@ export interface EmailConfig {
 
 /** Notification config combining all channels / 通知配置（所有通道） */
 export interface NotificationConfig {
-  line?: LineNotifyConfig;
   telegram?: TelegramConfig;
   slack?: SlackConfig;
   email?: EmailConfig;
@@ -225,7 +219,7 @@ export interface NotificationConfig {
 
 /** Notification result / 通知結果 */
 export interface NotificationResult {
-  channel: 'line' | 'telegram' | 'slack' | 'email';
+  channel: 'telegram' | 'slack' | 'email';
   success: boolean;
   error?: string;
 }

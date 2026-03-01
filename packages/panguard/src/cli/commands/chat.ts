@@ -16,7 +16,7 @@ export function chatCommand(): Command {
     .command('setup')
     .description('Interactive notification setup / \u4E92\u52D5\u5F0F\u901A\u77E5\u8A2D\u5B9A')
     .option('--lang <lang>', 'Language: en or zh-TW / \u8A9E\u8A00', 'zh-TW')
-    .option('--channel <type>', 'Channel type (line, telegram, slack, email, webhook)')
+    .option('--channel <type>', 'Channel type (telegram, slack, email, webhook)')
     .option('--user-type <type>', 'User type (developer, boss, it_admin)')
     .action(
       withAuth('solo', async (opts: Record<string, string | undefined>) => {
