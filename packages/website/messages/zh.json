@@ -3753,7 +3753,7 @@
       "founding": "創始會員定價"
     },
     "successTitle": "你已在名單中。",
-    "successDesc": "我們已發送確認信至 {email}。我們會在你的存取準備好時聯繫你。",
+    "successDesc": "我們已發送確認信至 {email}。團隊將在 24 小時內審核你的申請。審核通過後，你會收到一封包含註冊連結的 email，即可開始 14 天免費試用。",
     "betaNote": "私人測試 2026 Q2 啟動"
   },
   "errorValidation": {

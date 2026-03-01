@@ -43,6 +43,8 @@ async function sendEmail(
   }
 }
 
+const UNSUBSCRIBE_EMAIL = 'unsubscribe@panguard.ai';
+
 // ── Resend HTTP API ─────────────────────────────────────────────────
 
 async function sendViaResend(
@@ -62,6 +64,10 @@ async function sendViaResend(
       to: [to],
       subject,
       html,
+      headers: {
+        'List-Unsubscribe': `<mailto:${UNSUBSCRIBE_EMAIL}?subject=Unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
     }),
   });
 
@@ -79,6 +85,8 @@ function buildMime(from: string, to: string, subject: string, bodyHtml: string):
     `From: ${from}`,
     `To: ${to}`,
     `Subject: ${subject}`,
+    `List-Unsubscribe: <mailto:${UNSUBSCRIBE_EMAIL}?subject=Unsubscribe>`,
+    'List-Unsubscribe-Post: List-Unsubscribe=One-Click',
     'MIME-Version: 1.0',
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
     '',
@@ -213,6 +221,7 @@ interface EmailStrings {
   // Shell
   footerTagline: string;
   footerRights: string;
+  footerUnsubscribe: string;
   // Verification
   verifySubject: string;
   verifyHeading: string;
@@ -263,6 +272,7 @@ const i18n: Record<EmailLocale, EmailStrings> = {
   en: {
     footerTagline: 'Panguard AI &mdash; AI-Powered Endpoint Security',
     footerRights: `&copy; ${new Date().getFullYear()} Panguard AI. All rights reserved.`,
+    footerUnsubscribe: 'Unsubscribe',
     verifySubject: 'Verify your email | Panguard AI',
     verifyHeading: 'Verify your email',
     verifyOverline: 'PANGUARD AI WAITLIST',
@@ -276,7 +286,7 @@ const i18n: Record<EmailLocale, EmailStrings> = {
     welcomeGreeting: (name) => (name ? `${name}, you're in` : "You're in"),
     welcomeOverline: 'EARLY ACCESS APPROVED',
     welcomeBody:
-      'Your spot on the Panguard AI waitlist has been approved. Welcome to the next generation of endpoint security.',
+      'Your spot on the Panguard AI waitlist has been approved. Create your account now to start a <strong style="color:#8B9A8E;">14-day free trial</strong> of the Solo plan — full access to all Solo features, no credit card required.',
     welcomeIncluded: "WHAT'S INCLUDED",
     welcomeButton: 'Create Your Account',
     welcomeDocs: 'Read the Getting Started guide',
@@ -315,6 +325,7 @@ const i18n: Record<EmailLocale, EmailStrings> = {
   zh: {
     footerTagline: 'Panguard AI &mdash; AI 驅動的端點安全防護',
     footerRights: `&copy; ${new Date().getFullYear()} Panguard AI. 保留所有權利。`,
+    footerUnsubscribe: '取消訂閱',
     verifySubject: '驗證您的信箱 | Panguard AI',
     verifyHeading: '驗證您的電子信箱',
     verifyOverline: 'PANGUARD AI 候補名單',
@@ -326,7 +337,7 @@ const i18n: Record<EmailLocale, EmailStrings> = {
     welcomeSubject: '您已通過審核 | Panguard AI',
     welcomeGreeting: (name) => (name ? `${name}，歡迎加入` : '歡迎加入'),
     welcomeOverline: '搶先體驗資格已通過',
-    welcomeBody: '您在 Panguard AI 候補名單上的名額已獲核准。歡迎體驗新一代的端點安全防護。',
+    welcomeBody: '您在 Panguard AI 候補名單上的名額已獲核准。立即建立帳號，即可開始 <strong style="color:#8B9A8E;">14 天免費試用</strong> Solo 方案 — 完整使用所有 Solo 功能，不需信用卡。',
     welcomeIncluded: '包含功能',
     welcomeButton: '建立您的帳號',
     welcomeDocs: '閱讀快速入門指南',
@@ -434,6 +445,9 @@ function emailShell(locale: EmailLocale, content: string): string {
       <tr><td align="center" style="font-family:${f};font-size:11px;color:#4A4540;line-height:1.5;">
         ${s.footerTagline}<br>
         ${s.footerRights}
+      </td></tr>
+      <tr><td align="center" style="padding-top:12px;">
+        <a href="mailto:${UNSUBSCRIBE_EMAIL}?subject=Unsubscribe" style="font-family:${FONT};font-size:11px;color:#4A4540;text-decoration:underline;">${s.footerUnsubscribe}</a>
       </td></tr>
     </table>
   </td></tr>

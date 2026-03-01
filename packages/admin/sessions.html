@@ -86,6 +86,12 @@
     <script>
       if (!PG.requireAuth()) throw new Error('Not authenticated');
 
+      // Verify admin role via API before rendering any content
+      (async () => {
+        const admin = await PG.requireAdminRole();
+        if (!admin) return; // Redirected to login
+      })();
+
       document.getElementById('nav').innerHTML = PG.renderNav('sessions');
       document.getElementById('pageIcon').innerHTML = Icons.key(20, '#8B9A8E');
       document.getElementById('refreshIcon').innerHTML = Icons.refresh(12, '#4A4540');
