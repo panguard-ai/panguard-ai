@@ -251,7 +251,7 @@ export default function ThreatCloudContent() {
             <h2 className="text-[clamp(28px,3.5vw,40px)] font-bold text-text-primary">
               {t('cta.title')}
             </h2>
-            <p className="text-text-secondary mt-3 mb-4">{t('cta.desc')}</p>
+            <p className="text-text-secondary mt-4 mb-8">{t('cta.desc')}</p>
             <code className="block text-sm bg-black/50 text-brand-sage px-6 py-3 rounded-lg mb-8 inline-block font-mono">
               $ curl -fsSL https://get.panguard.ai | bash
             </code>

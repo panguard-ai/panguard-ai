@@ -60,10 +60,10 @@ export default function AboutContent() {
             <p className="text-text-secondary mt-8 leading-relaxed text-lg">{t('origin.p1')}</p>
           </FadeInUp>
           <FadeInUp delay={0.15}>
-            <p className="text-text-secondary mt-6 leading-relaxed text-lg">{t('origin.p2')}</p>
+            <p className="text-text-secondary mt-8 leading-relaxed text-lg">{t('origin.p2')}</p>
           </FadeInUp>
           <FadeInUp delay={0.2}>
-            <p className="text-text-secondary mt-6 leading-relaxed text-lg">{t('origin.p3')}</p>
+            <p className="text-text-secondary mt-8 leading-relaxed text-lg">{t('origin.p3')}</p>
           </FadeInUp>
         </div>
       </SectionWrapper>
@@ -97,7 +97,7 @@ export default function AboutContent() {
           overline={t('numbers.overline')}
           title={t('numbers.title')}
         />
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-14">
           {(t.raw('numbers.stats') as Array<{ value: string; label: string }>).map((stat, i) => (
             <FadeInUp key={stat.label} delay={i * 0.05}>
               <div className="text-center">
@@ -145,7 +145,7 @@ export default function AboutContent() {
             <h2 className="text-[clamp(28px,3.5vw,40px)] font-bold text-text-primary">
               {t('cta.title')}
             </h2>
-            <p className="text-text-secondary mt-3 mb-8">{t('cta.desc')}</p>
+            <p className="text-text-secondary mt-4 mb-8">{t('cta.desc')}</p>
           </FadeInUp>
           <FadeInUp delay={0.1}>
             <div className="flex flex-wrap justify-center gap-3">

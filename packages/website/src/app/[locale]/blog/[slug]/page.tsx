@@ -99,7 +99,7 @@ export default async function BlogPostPage({
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
-                  {post.readingTime} read
+                  {post.readingTime}
                 </span>
               </div>
             </FadeInUp>
@@ -113,11 +113,11 @@ export default async function BlogPostPage({
             {/* ───────────── Article Content or Coming Soon ───────────── */}
             {post.content ? (
               <FadeInUp delay={0.2}>
-                <div className="mt-12 prose-panguard space-y-5">
+                <div className="mt-12 prose-panguard space-y-6">
                   {post.content.map((block, i) => {
                     if (block.startsWith('## ')) {
                       return (
-                        <h2 key={i} className="text-xl font-bold text-text-primary mt-10 mb-3">
+                        <h2 key={i} className="text-xl font-bold text-text-primary mt-12 mb-6">
                           {block.replace('## ', '')}
                         </h2>
                       );
@@ -137,10 +137,23 @@ export default async function BlogPostPage({
                       return (
                         <pre
                           key={i}
-                          className="bg-surface-1 border border-border rounded-xl p-4 overflow-x-auto"
+                          className="bg-surface-1 border border-border rounded-xl p-5 my-2 overflow-x-auto"
                         >
                           <code className="text-sm text-text-secondary font-mono">{code}</code>
                         </pre>
+                      );
+                    }
+                    if (block.startsWith('- ')) {
+                      const items = block.split('\n').filter(line => line.startsWith('- '));
+                      return (
+                        <ul key={i} className="space-y-2 pl-1">
+                          {items.map((item, j) => (
+                            <li key={j} className="flex items-start gap-2.5 text-text-secondary leading-relaxed">
+                              <span className="text-brand-sage mt-1.5 shrink-0">--</span>
+                              <span>{item.replace(/^- /, '')}</span>
+                            </li>
+                          ))}
+                        </ul>
                       );
                     }
                     return (
