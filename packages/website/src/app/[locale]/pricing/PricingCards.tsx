@@ -406,6 +406,9 @@ export default function PricingCards() {
             <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-surface-0 to-transparent md:hidden" />
           </div>
         </FadeInUp>
+        <p className="text-xs text-text-muted text-center mt-6 max-w-2xl mx-auto leading-relaxed">
+          {t('betaDisclaimer')}
+        </p>
       </div>
     </>
   );
