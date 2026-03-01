@@ -60,11 +60,11 @@ export default function IndustryProblem() {
             transition={{ duration: 0.5, delay: 0.8, ease }}
             className="mt-8 flex flex-wrap gap-4 text-sm text-gray-600"
           >
-            <span>{t('stats.attacks')}</span>
+            <span title={t('stats.attacksSource')}>{t('stats.attacks')}*</span>
             <span className="hidden sm:inline text-gray-700">&middot;</span>
-            <span>{t('stats.smb')}</span>
+            <span title={t('stats.smbSource')}>{t('stats.smb')}*</span>
             <span className="hidden sm:inline text-gray-700">&middot;</span>
-            <span>{t('stats.cost')}</span>
+            <span title={t('stats.costSource')}>{t('stats.cost')}*</span>
           </motion.div>
         </div>
       </div>
