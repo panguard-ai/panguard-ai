@@ -316,18 +316,40 @@ async function handleRequest(
       return;
     }
 
-    // Health check (with DB probe)
+    // Health check (with DB probe + service status)
     if (pathname === '/health') {
+      const mem = process.memoryUsage();
+      const services = {
+        email: !!(process.env['RESEND_API_KEY'] || process.env['SMTP_HOST']),
+        oauth: !!process.env['GOOGLE_CLIENT_ID'],
+        billing: !!process.env['LEMON_SQUEEZY_API_KEY'],
+        errorTracking: !!process.env['SENTRY_DSN'],
+      };
       try {
         _db.healthCheck();
         sendJson(res, 200, {
           ok: true,
-          data: { status: 'healthy', uptime: process.uptime(), db: 'connected' },
+          data: {
+            status: 'healthy',
+            version: process.env['npm_package_version'] ?? '0.0.0',
+            uptime: Math.round(process.uptime()),
+            db: 'connected',
+            memory: {
+              rss: Math.round(mem.rss / 1024 / 1024),
+              heapUsed: Math.round(mem.heapUsed / 1024 / 1024),
+            },
+            services,
+          },
         });
       } catch {
         sendJson(res, 503, {
           ok: false,
-          data: { status: 'unhealthy', uptime: process.uptime(), db: 'disconnected' },
+          data: {
+            status: 'unhealthy',
+            uptime: Math.round(process.uptime()),
+            db: 'disconnected',
+            services,
+          },
         });
       }
       return;
