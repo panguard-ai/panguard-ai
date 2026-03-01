@@ -243,7 +243,7 @@ export class SightingStore {
    * Apply sighting feedback to IoC confidence and status.
    * 將觀測回饋套用到 IoC 的信心度和狀態
    */
-  private applyFeedback(iocId: number, type: SightingType, sightingConfidence: number): void {
+  private applyFeedback(iocId: number, type: SightingType, _sightingConfidence: number): void {
     const delta = CONFIDENCE_DELTA[type];
 
     if (type === 'false_positive') {

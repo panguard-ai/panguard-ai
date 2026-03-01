@@ -40,6 +40,7 @@ interface CorrelatedEvent {
 }
 
 /** Dedup entry key → last-seen timestamp */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface DedupEntry {
   key: string;
   timestamp: number;

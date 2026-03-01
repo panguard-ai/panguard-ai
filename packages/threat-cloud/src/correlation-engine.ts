@@ -109,7 +109,7 @@ export class CorrelationEngine {
   scanForCampaigns(): CampaignScanResult {
     const startTime = Date.now();
     let newCampaigns = 0;
-    let updatedCampaigns = 0;
+    const updatedCampaigns = 0;
     let eventsCorrelated = 0;
 
     const sinceDate = new Date(Date.now() - this.config.scanWindowHours * 60 * 60 * 1000).toISOString();
