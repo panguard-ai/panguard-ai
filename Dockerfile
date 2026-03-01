@@ -1,6 +1,7 @@
-FROM node:22-slim AS base
+FROM node:22-slim
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+ENV CI=true
 RUN corepack enable
 
 WORKDIR /app
@@ -39,20 +40,20 @@ COPY tsconfig.json ./
 # Build backend packages only (skip website)
 RUN pnpm --filter '!@panguard-ai/website' -r run build
 
-# Prune dev dependencies to reduce image size
-RUN pnpm prune --prod
+# Verify the entry point exists
+RUN ls -la packages/panguard/dist/cli/index.js
 
-# Create non-root user and data directory
-RUN groupadd --system panguard && useradd --system --gid panguard panguard \
-    && mkdir -p /data && chown panguard:panguard /data
-
-USER panguard
+# Create data directory
+RUN mkdir -p /data
 
 ENV NODE_ENV=production
 ENV PANGUARD_DATA_DIR=/data
 ENV PANGUARD_PORT=3000
-
 EXPOSE 3000
 
-# No Docker HEALTHCHECK — Railway handles healthchecks natively
-CMD ["node", "packages/panguard/dist/cli/index.js", "serve", "--port", "3000", "--host", "0.0.0.0", "--db", "/data/auth.db"]
+# Use shell form to capture ALL output including errors
+CMD echo "=== Container starting ===" && \
+    echo "Node: $(node --version)" && \
+    echo "Entry: $(ls -la packages/panguard/dist/cli/index.js)" && \
+    echo "Starting serve..." && \
+    exec node packages/panguard/dist/cli/index.js serve --port ${PORT:-3000} --host 0.0.0.0 --db /data/auth.db
