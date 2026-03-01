@@ -181,7 +181,7 @@ export default function ProductGuardContent() {
           <FadeInUp delay={0.1}>
             <div className="bg-surface-1 rounded-xl border border-border p-6 mt-8 text-left font-mono text-sm">
               <p className="text-text-muted mb-2"># Install Panguard Guard</p>
-              <p className="text-brand-sage">curl -sSL https://get.panguard.ai | bash</p>
+              <p className="text-brand-sage">npm install -g @panguard-ai/panguard</p>
               <p className="text-text-muted mt-4 mb-2"># That&apos;s it. Guard is now running.</p>
               <p className="text-text-secondary">
                 <span className="text-[#22c55e]">[OK]</span> Panguard Guard v0.1.0 installed
