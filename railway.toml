@@ -1,10 +1,9 @@
 [build]
-builder = "nixpacks"
-buildCommand = "pnpm install --frozen-lockfile && pnpm --filter '!@panguard-ai/website' -r run build"
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "node packages/panguard/dist/cli/index.js threat start --port $PORT"
 healthcheckPath = "/health"
-healthcheckTimeout = 10
+healthcheckTimeout = 120
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
