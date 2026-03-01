@@ -20,7 +20,7 @@ export default function The3AMStory() {
     <SectionWrapper bg="bg-[#0a0a0a]" spacing="tight">
       <SectionTitle title={t('title')} subtitle={t('subtitle')} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mt-8 sm:mt-12 max-w-5xl mx-auto">
         {/* Left: Without Panguard (gray, slow reveal) */}
         <div ref={leftRef} className="stagger-group">
           <div className="flex items-center gap-2 mb-6">
@@ -28,7 +28,7 @@ export default function The3AMStory() {
             <h3 className="text-base sm:text-lg font-bold text-text-secondary">{t('leftTitle')}</h3>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-2.5 sm:space-y-4">
             {leftSteps.map((key, i) => (
               <div
                 key={key}
@@ -38,7 +38,7 @@ export default function The3AMStory() {
                 <div className="shrink-0 w-10 sm:w-12 text-xs text-text-muted font-mono pt-0.5">
                   {t(`${key}.time`)}
                 </div>
-                <div className="flex-1 bg-surface-1/50 border border-border rounded-lg p-3">
+                <div className="flex-1 bg-surface-1/50 border border-border rounded-lg p-2.5 sm:p-3">
                   <p className="text-sm text-text-secondary">{t(`${key}.text`)}</p>
                 </div>
               </div>
@@ -47,7 +47,7 @@ export default function The3AMStory() {
 
           {/* Outcome */}
           <FadeInUp delay={0.9}>
-            <div className="mt-6 p-4 bg-status-danger/10 border border-status-danger/20 rounded-xl">
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-status-danger/10 border border-status-danger/20 rounded-xl">
               <p className="text-sm text-status-danger font-semibold">{t('leftOutcome')}</p>
             </div>
           </FadeInUp>
@@ -62,7 +62,7 @@ export default function The3AMStory() {
             </h3>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-2.5 sm:space-y-4">
             {rightSteps.map((key, i) => (
               <div
                 key={key}
@@ -72,7 +72,7 @@ export default function The3AMStory() {
                 <div className="shrink-0 w-10 sm:w-12 text-xs text-panguard-green font-mono pt-0.5">
                   {t(`${key}.time`)}
                 </div>
-                <div className="flex-1 bg-panguard-green/5 border border-panguard-green/20 rounded-lg p-3">
+                <div className="flex-1 bg-panguard-green/5 border border-panguard-green/20 rounded-lg p-2.5 sm:p-3">
                   <p className="text-sm text-text-primary">{t(`${key}.text`)}</p>
                 </div>
               </div>
@@ -81,7 +81,7 @@ export default function The3AMStory() {
 
           {/* Chat bubble mockup */}
           <FadeInUp delay={0.8}>
-            <div className="mt-6 p-4 bg-surface-1 border border-border rounded-xl">
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-surface-1 border border-border rounded-xl">
               <div className="flex items-start gap-3">
                 <div className="shrink-0 w-8 h-8 rounded-full bg-panguard-green/20 flex items-center justify-center text-xs font-bold text-panguard-green">
                   P
@@ -99,7 +99,7 @@ export default function The3AMStory() {
           {/* Still sleeping */}
           <FadeInUp delay={1.0}>
             <p
-              className="text-center text-lg font-bold text-panguard-green mt-6 animate-bounce"
+              className="text-center text-lg font-bold text-panguard-green mt-4 sm:mt-6 animate-bounce"
               style={{ animationDuration: '3s' }}
             >
               {t('stillSleeping')}

@@ -23,9 +23,9 @@ import {
 
 /* ─── Layer Config ─── */
 const layerConfigs = [
-  { key: 'layer1' as const, badgeColor: 'bg-brand-sage/10 text-brand-sage', width: '100%' },
-  { key: 'layer2' as const, badgeColor: 'bg-[#60a5fa]/10 text-[#60a5fa]', width: '70%' },
-  { key: 'layer3' as const, badgeColor: 'bg-[#f59e0b]/10 text-[#f59e0b]', width: '40%' },
+  { key: 'layer1' as const, badgeColor: 'bg-brand-sage/10 text-brand-sage', mdClass: '' },
+  { key: 'layer2' as const, badgeColor: 'bg-[#60a5fa]/10 text-[#60a5fa]', mdClass: 'md:max-w-[70%]' },
+  { key: 'layer3' as const, badgeColor: 'bg-[#f59e0b]/10 text-[#f59e0b]', mdClass: 'md:max-w-[40%]' },
 ];
 
 /* ─── Agent Icons ─── */
@@ -119,8 +119,7 @@ export default function TechnologyContent() {
           {layerConfigs.map((l, i) => (
             <FadeInUp key={l.key} delay={i * 0.1}>
               <div
-                className="bg-surface-1 rounded-xl p-6 border border-border mx-auto"
-                style={{ maxWidth: l.width }}
+                className={`bg-surface-1 rounded-xl p-4 sm:p-6 border border-border md:mx-auto ${l.mdClass}`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-3">
                   <div className="flex items-center gap-3">
