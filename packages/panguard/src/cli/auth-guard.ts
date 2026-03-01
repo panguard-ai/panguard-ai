@@ -29,11 +29,11 @@ export interface AuthCheckResult {
 /* ── Feature → Tier mapping ── */
 
 export const FEATURE_TIER: Record<string, Tier> = {
-  setup: 'free',
-  scan: 'free',
-  guard: 'free',
-  'threat-cloud': 'free',
-  demo: 'free',
+  setup: 'community',
+  scan: 'community',
+  guard: 'community',
+  'threat-cloud': 'community',
+  demo: 'community',
   notifications: 'solo',
   notify: 'solo',
   trap: 'solo',
@@ -43,9 +43,9 @@ export const FEATURE_TIER: Record<string, Tier> = {
 /**
  * Check if the current CLI user is authenticated and has the required tier.
  */
-export function requireAuth(requiredTier: RequiredTier = 'free'): AuthCheckResult {
-  // Free tier requires no authentication — allow anonymous usage
-  if (requiredTier === 'free') {
+export function requireAuth(requiredTier: RequiredTier = 'community'): AuthCheckResult {
+  // Community tier requires no authentication — allow anonymous usage
+  if (requiredTier === 'community') {
     return { authenticated: true, authorized: true, credentials: null };
   }
 
@@ -138,15 +138,12 @@ export function withAuth<T>(
  * Tier badge string for display in menus.
  */
 export function tierBadge(tier: RequiredTier): string {
-  if (tier === 'free' || tier === 'community') return '';
+  if (tier === 'community') return '';
   const names: Record<string, string> = {
     solo: '[SOLO]',
     pro: '[PRO]',
     business: '[BIZ]',
-    // legacy
-    enterprise: '[BIZ]',
-    starter: '[SOLO]',
-    team: '[PRO]',
+    enterprise: '[ENT]',
   };
   return c.dim(names[tier] ?? '');
 }
@@ -180,12 +177,12 @@ export function refreshTierInBackground(): void {
         | null
         | undefined;
 
-      // Check if plan has expired server-side (tier got downgraded to free)
-      if (serverTier === 'free' && creds.tier !== 'free') {
+      // Check if plan has expired server-side (tier got downgraded to community)
+      if (serverTier === 'community' && creds.tier !== 'community') {
         console.log('');
         console.log(
           c.caution(
-            `  [!] Your ${tierDisplayName(creds.tier)} plan has expired. Account downgraded to free tier.`
+            `  [!] Your ${tierDisplayName(creds.tier)} plan has expired. Account downgraded to Community tier.`
           )
         );
         console.log(c.dim(`      Renew at https://panguard.ai/pricing`));
@@ -242,11 +239,11 @@ export function getLicense(): { tier: Tier; email?: string } {
         return { tier: data.tier as Tier, email: data.email };
       }
     } catch {
-      // Invalid license file — fall through to free
+      // Invalid license file — fall through to community
     }
   }
 
-  return { tier: 'free' };
+  return { tier: 'community' };
 }
 
 /**
@@ -262,7 +259,7 @@ export function checkAccess(requiredTier: Tier): boolean {
  * Uses FEATURE_TIER mapping to resolve the required tier.
  */
 export function checkFeatureAccess(feature: string): boolean {
-  const requiredTier = FEATURE_TIER[feature] ?? 'free';
+  const requiredTier = FEATURE_TIER[feature] ?? 'community';
   return checkAccess(requiredTier);
 }
 
@@ -285,7 +282,7 @@ const FEATURE_DISPLAY: Record<string, Record<string, string>> = {
  * Accepts feature KEY (e.g. 'report', not 'Compliance Report').
  */
 export function showUpgradePrompt(feature: string, lang: string = 'en'): void {
-  const tier = FEATURE_TIER[feature] ?? 'free';
+  const tier = FEATURE_TIER[feature] ?? 'community';
   const { tier: userTier } = getLicense();
   const tierName = tierDisplayName(tier);
   const userTierName = tierDisplayName(userTier);
@@ -392,7 +389,6 @@ export function showGuardAIHint(threatType: string, confidence: number, lang: st
 /* ── Pricing Constants ── */
 
 export const PRICING_TIERS: Record<string, { price: number; unit: string; machines: string }> = {
-  free: { price: 0, unit: '', machines: '1' },
   community: { price: 0, unit: '', machines: '1' },
   solo: { price: 9, unit: '/mo', machines: '3' },
   pro: { price: 29, unit: '/mo', machines: '10' },

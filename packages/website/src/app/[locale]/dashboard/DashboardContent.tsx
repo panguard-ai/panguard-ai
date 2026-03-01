@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from '@/navigation';
@@ -14,10 +14,13 @@ import {
   LogOut,
   Loader2,
   Terminal,
+  Copy,
+  Check,
 } from 'lucide-react';
 import BrandLogo from '@/components/ui/BrandLogo';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
+const REQUEST_TIMEOUT = 15_000;
 
 interface UsageItem {
   resource: string;
@@ -46,6 +49,7 @@ export default function DashboardContent() {
       try {
         const res = await fetch(`${API_URL}/api/usage`, {
           headers: { Authorization: `Bearer ${token}` },
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT),
         });
         const data = (await res.json()) as { ok: boolean; data?: { usage: UsageItem[] } };
         if (data.ok && data.data?.usage) {
@@ -169,16 +173,34 @@ export default function DashboardContent() {
           )}
         </div>
 
-        {/* CLI Install Banner */}
+        {/* Quick Start Guide */}
         <div className="mt-8 bg-surface-2 border border-border rounded-xl p-6">
           <div className="flex items-start gap-4">
             <Shield className="w-8 h-8 text-brand-sage shrink-0 mt-0.5" />
-            <div>
+            <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-text-primary">{t('quickStartHeading')}</h3>
               <p className="text-sm text-text-secondary mt-1">{t('quickStartDescription')}</p>
-              <code className="inline-block mt-3 bg-surface-0 border border-border rounded-lg px-4 py-2 font-mono text-sm text-brand-sage">
-                curl -fsSL https://panguard.ai/install | bash
-              </code>
+
+              <div className="mt-4 space-y-3">
+                <QuickStartStep
+                  step={1}
+                  label={t('quickStart.install')}
+                  command="curl -fsSL https://panguard.ai/install | bash"
+                />
+                {token && (
+                  <QuickStartStep
+                    step={2}
+                    label={t('quickStart.login')}
+                    command={`panguard login --token ${token.slice(0, 12)}...`}
+                    copyValue={`panguard login --token ${token}`}
+                  />
+                )}
+                <QuickStartStep
+                  step={3}
+                  label={t('quickStart.scan')}
+                  command="panguard scan"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -209,6 +231,53 @@ function QuickAction({
       <h3 className="text-sm font-medium text-text-primary">{title}</h3>
       <p className="text-xs text-text-tertiary mt-0.5">{description}</p>
     </Link>
+  );
+}
+
+function QuickStartStep({
+  step,
+  label,
+  command,
+  copyValue,
+}: {
+  step: number;
+  label: string;
+  command: string;
+  copyValue?: string;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(copyValue ?? command);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard not available
+    }
+  }, [command, copyValue]);
+
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-5 h-5 rounded-full bg-brand-sage/20 text-brand-sage text-xs font-bold flex items-center justify-center shrink-0">
+        {step}
+      </span>
+      <span className="text-xs text-text-secondary shrink-0 w-20">{label}</span>
+      <div className="flex-1 min-w-0 flex items-center gap-2 bg-surface-0 border border-border rounded-lg px-3 py-1.5">
+        <code className="font-mono text-xs text-brand-sage truncate flex-1">{command}</code>
+        <button
+          onClick={handleCopy}
+          className="text-text-tertiary hover:text-text-secondary transition-colors shrink-0"
+          aria-label="Copy command"
+        >
+          {copied ? (
+            <Check className="w-3.5 h-3.5 text-status-safe" />
+          ) : (
+            <Copy className="w-3.5 h-3.5" />
+          )}
+        </button>
+      </div>
+    </div>
   );
 }
 

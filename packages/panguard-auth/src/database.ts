@@ -52,7 +52,7 @@ export class AuthDB {
         name TEXT NOT NULL,
         password_hash TEXT NOT NULL,
         role TEXT DEFAULT 'user',
-        tier TEXT DEFAULT 'free',
+        tier TEXT DEFAULT 'community',
         verified INTEGER DEFAULT 0,
         created_at TEXT DEFAULT (datetime('now')),
         last_login TEXT
@@ -743,17 +743,17 @@ export class AuthDB {
         `SELECT id, email, tier FROM users
          WHERE plan_expires_at IS NOT NULL
            AND plan_expires_at <= datetime('now')
-           AND tier != 'free'`
+           AND tier != 'community'`
       )
       .all() as Array<{ id: number; email: string; tier: string }>;
 
     if (expired.length > 0) {
       this.db
         .prepare(
-          `UPDATE users SET tier = 'free', plan_expires_at = NULL
+          `UPDATE users SET tier = 'community', plan_expires_at = NULL
            WHERE plan_expires_at IS NOT NULL
              AND plan_expires_at <= datetime('now')
-             AND tier != 'free'`
+             AND tier != 'community'`
         )
         .run();
 
@@ -783,7 +783,7 @@ export class AuthDB {
          WHERE plan_expires_at IS NOT NULL
            AND plan_expires_at > datetime('now')
            AND plan_expires_at <= datetime('now', '+' || ? || ' days')
-           AND tier != 'free'`
+           AND tier != 'community'`
       )
       .all(withinDays) as Array<{
       id: number;

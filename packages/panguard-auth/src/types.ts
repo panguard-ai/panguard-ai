@@ -31,7 +31,7 @@ export interface User {
   name: string;
   passwordHash: string;
   role: 'user' | 'admin';
-  tier: 'free' | 'solo' | 'starter' | 'team' | 'business' | 'enterprise';
+  tier: 'community' | 'solo' | 'pro' | 'business' | 'enterprise';
   verified: number;
   suspended: number;
   createdAt: string;
