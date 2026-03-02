@@ -1,0 +1,44 @@
+name: CLI Smoke Test
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install CLI from npm
+        run: npm install -g @panguard-ai/panguard@latest
+
+      - name: Verify panguard is in PATH
+        run: panguard --version
+
+      - name: Run scan (quick check)
+        run: panguard scan --help
+
+      - name: Run guard help
+        run: panguard guard --help
+
+      - name: First-run welcome banner test
+        shell: bash
+        run: |
+          rm -f ~/.panguard/.welcome-shown 2>/dev/null || true
+          OUTPUT=$(panguard --version 2>&1)
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | grep -q "Welcome to Panguard AI"; then
+            echo "Welcome banner displayed OK"
+          else
+            echo "WARNING: Welcome banner not shown"
+          fi
