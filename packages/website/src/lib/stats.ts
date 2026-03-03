@@ -20,13 +20,13 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '0.2.5',
+  cliVersion: '0.2.6',
   sigmaRules: 3_155,
   yaraRules: 5_895,
   totalRules: 3_155 + 5_895,
   falcoConfigs: 1,
-  testsPassing: 2_992,
-  testFiles: 140,
+  testsPassing: 3_017,
+  testFiles: 142,
   honeypotProtocols: 8,
   detectionLayers: 3,
   responseActions: 6,
