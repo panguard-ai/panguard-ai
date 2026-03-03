@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 
 // Below-the-fold sections loaded lazily to reduce initial bundle
 const IndustryProblem = dynamic(() => import('@/components/home/IndustryProblem'));
+const WhyNowWhyUs = dynamic(() => import('@/components/home/WhyNowWhyUs'));
 const NotAntivirus = dynamic(() => import('@/components/home/NotAntivirus'));
 const ThreeRoads = dynamic(() => import('@/components/home/ThreeRoads'));
 const Redefine = dynamic(() => import('@/components/home/Redefine'));
@@ -14,6 +15,7 @@ const The3AMStory = dynamic(() => import('@/components/home/The3AMStory'));
 const UseCases = dynamic(() => import('@/components/home/UseCases'));
 const ProductOverview = dynamic(() => import('@/components/home/ProductOverview'));
 const NumbersWall = dynamic(() => import('@/components/home/NumbersWall'));
+const Traction = dynamic(() => import('@/components/home/Traction'));
 const HomePricing = dynamic(() => import('@/components/home/HomePricing'));
 const FinalCTA = dynamic(() => import('@/components/home/FinalCTA'));
 
@@ -26,27 +28,31 @@ export default function Home() {
         <Hero />
         {/* S2: Industry Problem */}
         <IndustryProblem />
-        {/* S3: Not Antivirus (common misconception) */}
+        {/* S3: Why Now / Why Us */}
+        <WhyNowWhyUs />
+        {/* S4: Not Antivirus (common misconception) */}
         <NotAntivirus />
-        {/* S4: Three Roads */}
+        {/* S5: Three Roads */}
         <ThreeRoads />
-        {/* S5: Redefine (transition) */}
+        {/* S6: Redefine (transition) */}
         <Redefine />
-        {/* S6: Show Muscle (5-person team + funnel + confidence) */}
+        {/* S7: Show Muscle (5-person team + funnel + confidence) */}
         <ShowMuscle />
-        {/* S7: Threat Cloud */}
+        {/* S8: Threat Cloud */}
         <ThreatCloudSection />
-        {/* S8: 3AM Timeline */}
+        {/* S9: 3AM Timeline */}
         <The3AMStory />
-        {/* S9: Use Cases */}
+        {/* S10: Use Cases */}
         <UseCases />
-        {/* S10: Product Overview */}
+        {/* S11: Product Overview */}
         <ProductOverview />
-        {/* S11: Numbers Wall + Trust */}
+        {/* S12: Numbers Wall + Trust */}
         <NumbersWall />
-        {/* S12: Pricing + Compliance */}
+        {/* S13: Traction / Built for Production */}
+        <Traction />
+        {/* S14: Pricing + Compliance */}
         <HomePricing />
-        {/* S13: Final CTA */}
+        {/* S15: Final CTA */}
         <FinalCTA />
       </main>
       <Footer />

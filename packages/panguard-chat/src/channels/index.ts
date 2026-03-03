@@ -10,3 +10,4 @@ export { SlackChannel } from './slack.js';
 export { EmailChannel } from './email.js';
 export { WebhookChannel } from './webhook.js';
 export { LINEChannel } from './line.js';
+export { DiscordChannel } from './discord.js';

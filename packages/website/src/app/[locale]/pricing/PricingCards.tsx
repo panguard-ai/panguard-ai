@@ -326,10 +326,21 @@ export default function PricingCards() {
                   </span>
                   {meta.unit && <span className="text-sm text-text-tertiary">{meta.unit}</span>}
                 </div>
-                <p className="text-xs text-text-muted mb-4">{t(`plans.${key}.machines`)}</p>
+                <p className="text-xs text-text-muted mb-2">{t(`plans.${key}.machines`)}</p>
                 {annual && meta.price > 0 && (
-                  <p className="text-[11px] text-text-muted -mt-3 mb-4">{tc('billedAnnually')}</p>
+                  <p className="text-[11px] text-text-muted -mt-1 mb-2">{tc('billedAnnually')}</p>
                 )}
+
+                <div className="mb-4 space-y-1">
+                  <p className="text-[11px] text-text-tertiary leading-snug">
+                    <span className="font-semibold text-text-secondary">{t('bestFor')}</span>{' '}
+                    {t(`plans.${key}.bestFor`)}
+                  </p>
+                  <p className="text-[11px] text-text-tertiary leading-snug">
+                    <span className="font-semibold text-text-secondary">{t('whenToUpgrade')}</span>{' '}
+                    {t(`plans.${key}.upgrade`)}
+                  </p>
+                </div>
 
                 <ul className="space-y-2 flex-1">
                   {features.map((f: string) => (

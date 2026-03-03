@@ -11,10 +11,13 @@ import {
   ReportIcon,
   GlobalIcon,
 } from '@/components/ui/BrandIcons';
+import type { MaturityLevel } from '@/lib/stats';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const productIcons = [ScanIcon, ShieldIcon, ChatIcon, TrapIcon, ReportIcon, GlobalIcon];
+
+const productMaturity: MaturityLevel[] = ['GA', 'GA', 'GA', 'GA', 'GA', 'GA', 'Beta'];
 
 export default function ProductOverview() {
   const t = useTranslations('home.productOverview');
@@ -58,7 +61,21 @@ export default function ProductOverview() {
                 }`}
               >
                 <Icon className="w-6 h-6 text-panguard-green mb-3" />
-                <h3 className="text-lg font-bold text-text-primary">{product.name}</h3>
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-lg font-bold text-text-primary">{product.name}</h3>
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                    productMaturity[i] === 'GA'
+                      ? 'bg-green-900/30 text-green-400'
+                      : productMaturity[i] === 'Beta'
+                      ? 'bg-yellow-900/30 text-yellow-400'
+                      : 'bg-gray-800 text-gray-500'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      productMaturity[i] === 'GA' ? 'bg-green-400' : productMaturity[i] === 'Beta' ? 'bg-yellow-400' : 'bg-gray-500'
+                    }`} />
+                    {productMaturity[i]}
+                  </span>
+                </div>
                 <p className="text-sm text-gray-400 mt-2 leading-relaxed">{product.desc}</p>
                 <Link
                   href="#"

@@ -296,6 +296,80 @@ export function getWizardSteps(): WizardStep[] {
       ],
     },
 
+    // ── Step 8a: Telegram Config ─────────────────────────────
+    {
+      id: 'telegram_token',
+      title: { en: 'Telegram Bot Token', 'zh-TW': 'Telegram Bot Token' },
+      description: {
+        en: 'Create a bot via @BotFather and paste the token',
+        'zh-TW': '透過 @BotFather 建立 bot 並貼上 token',
+      },
+      inputType: 'text',
+      dependsOn: { stepId: 'notification', values: ['telegram'] },
+      validate: (v: string) => (v.trim().length > 0 ? null : 'Required'),
+    },
+    {
+      id: 'telegram_chat_id',
+      title: { en: 'Telegram Chat ID', 'zh-TW': 'Telegram Chat ID' },
+      description: {
+        en: 'The chat/group ID to send alerts to (e.g. -1001234567890)',
+        'zh-TW': '要發送警報的聊天/群組 ID（如 -1001234567890）',
+      },
+      inputType: 'text',
+      dependsOn: { stepId: 'notification', values: ['telegram'] },
+      validate: (v: string) => (v.trim().length > 0 ? null : 'Required'),
+    },
+
+    // ── Step 8b: Slack Config ──────────────────────────────
+    {
+      id: 'slack_webhook_url',
+      title: { en: 'Slack Webhook URL', 'zh-TW': 'Slack Webhook URL' },
+      description: {
+        en: 'Create an Incoming Webhook in Slack and paste the URL',
+        'zh-TW': '在 Slack 建立 Incoming Webhook 並貼上 URL',
+      },
+      inputType: 'text',
+      dependsOn: { stepId: 'notification', values: ['slack'] },
+      validate: (v: string) => (v.startsWith('https://') ? null : 'Must be an HTTPS URL'),
+    },
+
+    // ── Step 8c: Email Config ────────────────────────────
+    {
+      id: 'email_smtp_host',
+      title: { en: 'SMTP Server', 'zh-TW': 'SMTP 伺服器' },
+      description: {
+        en: 'SMTP server hostname (e.g. smtp.gmail.com)',
+        'zh-TW': 'SMTP 伺服器主機名稱（如 smtp.gmail.com）',
+      },
+      inputType: 'text',
+      dependsOn: { stepId: 'notification', values: ['email'] },
+      validate: (v: string) => (v.trim().length > 0 ? null : 'Required'),
+    },
+    {
+      id: 'email_recipients',
+      title: { en: 'Alert Recipients', 'zh-TW': '警報收件人' },
+      description: {
+        en: 'Email addresses to receive alerts (comma-separated)',
+        'zh-TW': '接收警報的電子郵件地址（逗號分隔）',
+      },
+      inputType: 'text',
+      dependsOn: { stepId: 'notification', values: ['email'] },
+      validate: (v: string) => (v.includes('@') ? null : 'Enter a valid email'),
+    },
+
+    // ── Step 8d: Webhook Config ──────────────────────────
+    {
+      id: 'webhook_url',
+      title: { en: 'Webhook URL', 'zh-TW': 'Webhook URL' },
+      description: {
+        en: 'HTTPS endpoint for webhook notifications',
+        'zh-TW': '用於 webhook 通知的 HTTPS 端點',
+      },
+      inputType: 'text',
+      dependsOn: { stepId: 'notification', values: ['webhook'] },
+      validate: (v: string) => (v.startsWith('https://') ? null : 'Must be an HTTPS URL'),
+    },
+
     // ── Step 9: AI Preference ─────────────────────────────────
     {
       id: 'aiPreference',

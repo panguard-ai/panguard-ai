@@ -244,9 +244,9 @@ Available frameworks:
 
 | Framework   | Controls | Command                |
 | ----------- | -------- | ---------------------- |
-| Taiwan TCSA | 50       | `--framework tcsa`     |
-| ISO 27001   | 93       | `--framework iso27001` |
-| SOC 2       | 64       | `--framework soc2`     |
+| Taiwan TCSA | 10       | `--framework tcsa`     |
+| ISO 27001   | 30       | `--framework iso27001` |
+| SOC 2       | 10       | `--framework soc2`     |
 
 ---
 

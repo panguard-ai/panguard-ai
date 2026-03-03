@@ -16,7 +16,7 @@ export type UserType = 'developer' | 'boss' | 'it_admin';
 
 /** Supported notification channel.
  *  支援的通知管道。 */
-export type ChannelType = 'telegram' | 'slack' | 'email' | 'webhook' | 'line';
+export type ChannelType = 'telegram' | 'slack' | 'email' | 'webhook' | 'line' | 'discord';
 
 /** Supported language for messages.
  *  訊息支援的語言。 */
@@ -291,6 +291,7 @@ export interface ChannelConfigs {
   readonly email?: EmailChannelConfig;
   readonly webhook?: WebhookConfig;
   readonly line?: LINEChannelConfig;
+  readonly discord?: DiscordChannelConfig;
 }
 
 /** Telegram Bot configuration.
@@ -313,6 +314,13 @@ export interface SlackChannelConfig {
 export interface LINEChannelConfig {
   readonly channelAccessToken: string;
   readonly destinationUserId: string;
+}
+
+/** Discord webhook channel configuration.
+ *  Discord webhook 管道配置。 */
+export interface DiscordChannelConfig {
+  readonly webhookUrl: string;
+  readonly username?: string;
 }
 
 /** Email channel configuration.

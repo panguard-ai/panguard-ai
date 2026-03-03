@@ -32,7 +32,8 @@
       "@panguard-ai/panguard-web": ["./packages/panguard-web/src"],
       "@panguard-ai/panguard": ["./packages/panguard/src"],
       "@panguard-ai/panguard-auth": ["./packages/panguard-auth/src"],
-      "@panguard-ai/manager": ["./packages/panguard-manager/src"]
+      "@panguard-ai/manager": ["./packages/panguard-manager/src"],
+      "@panguard-ai/panguard-mcp": ["./packages/panguard-mcp/src"]
     }
   },
   "references": [
@@ -46,6 +47,7 @@
     { "path": "./packages/panguard" },
     { "path": "./packages/panguard-auth" },
     { "path": "./packages/panguard-manager" },
+    { "path": "./packages/panguard-mcp" },
     { "path": "./security-hardening" }
   ],
   "include": [],

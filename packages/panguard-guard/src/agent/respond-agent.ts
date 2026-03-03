@@ -24,6 +24,7 @@ import type {
   ResponseAction,
   GuardMode,
 } from '../types.js';
+import type { PlaybookEngine, PlaybookCorrelationMatch } from '../playbook/index.js';
 
 const logger = createLogger('panguard-guard:respond-agent');
 
@@ -92,7 +93,7 @@ const SAFETY_RULES = {
  * with persistence, auto-unblock timers, SIGKILL fallback, and escalation.
  */
 export class RespondAgent {
-  private readonly actionPolicy: ActionPolicy;
+  private actionPolicy: ActionPolicy;
   private mode: GuardMode;
   private actionCount = 0;
   private readonly additionalWhitelistedIPs: Set<string>;
@@ -106,6 +107,9 @@ export class RespondAgent {
 
   /** Active unblock timers */
   private readonly unblockTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+  /** Optional SOAR playbook engine for custom response strategies / 選用的 SOAR 劇本引擎 */
+  private playbookEngine: PlaybookEngine | null = null;
 
   constructor(
     actionPolicy: ActionPolicy,
@@ -135,9 +139,30 @@ export class RespondAgent {
   }
 
   /**
-   * Execute response based on verdict with escalation awareness
+   * Set the SOAR playbook engine for custom response strategies.
+   * 設定 SOAR 劇本引擎以使用自訂回應策略。
+   *
+   * When a playbook engine is set, it is consulted BEFORE the hardcoded
+   * response logic. If a playbook matches, its actions are executed.
+   * If no playbook matches, the existing hardcoded logic is used as fallback.
    */
-  async respond(verdict: ThreatVerdict): Promise<ResponseResult> {
+  setPlaybookEngine(engine: PlaybookEngine): void {
+    this.playbookEngine = engine;
+    logger.info(`PlaybookEngine attached with ${engine.count} playbooks`);
+  }
+
+  /**
+   * Execute response based on verdict with escalation awareness.
+   * If a PlaybookEngine is attached, it is consulted first.
+   * 根據判定執行回應，支援升級感知。若有附加劇本引擎，會優先查詢。
+   *
+   * @param verdict - Threat verdict from Analyze Agent / 分析代理的威脅判定
+   * @param correlationPatterns - Optional correlation patterns for playbook matching / 選用的關聯模式
+   */
+  async respond(
+    verdict: ThreatVerdict,
+    correlationPatterns?: PlaybookCorrelationMatch[]
+  ): Promise<ResponseResult> {
     // Learning mode: never take active response
     if (this.mode === 'learning') {
       logger.info('Learning mode: no response action taken');
@@ -149,6 +174,57 @@ export class RespondAgent {
       };
     }
 
+    // --- Playbook Engine check (before hardcoded logic) ---
+    // 劇本引擎檢查（在硬編碼邏輯之前）
+    if (this.playbookEngine) {
+      const matchedPlaybook = this.playbookEngine.match(verdict, correlationPatterns);
+      if (matchedPlaybook) {
+        const target = this.extractTarget(verdict);
+        const sourceKey = target ?? verdict.conclusion;
+
+        // Record occurrence for escalation tracking / 記錄發生次數以追蹤升級
+        const compositeKey = `${matchedPlaybook.name}:${sourceKey}`;
+        this.playbookEngine.recordOccurrence(compositeKey);
+
+        const actions = this.playbookEngine.getActions(matchedPlaybook, sourceKey);
+        logger.info(
+          `Playbook "${matchedPlaybook.name}" matched. Executing ${actions.length} action(s).`
+        );
+
+        // Execute all playbook actions and return the result of the first action
+        // 執行所有劇本動作，回傳第一個動作的結果
+        const results: ResponseResult[] = [];
+        for (const action of actions) {
+          const result = await this.executeAction(action.type, verdict);
+          results.push(result);
+        }
+
+        // Track escalation in the existing system too / 在現有系統中也追蹤升級
+        if (target) this.trackEscalation(target);
+
+        // Return first result, or a summary if multiple actions / 回傳第一個結果
+        if (results.length === 1) {
+          return results[0]!;
+        }
+
+        // Multiple actions: return composite result / 多個動作：回傳複合結果
+        const allSuccess = results.every((r) => r.success);
+        const details = results
+          .map((r) => `[${r.action}] ${r.details}`)
+          .join(' | ');
+
+        return {
+          action: results[0]!.action,
+          success: allSuccess,
+          details: `Playbook "${matchedPlaybook.name}": ${details}`,
+          timestamp: new Date().toISOString(),
+          target: results[0]!.target,
+        };
+      }
+    }
+
+    // --- Fallback: hardcoded response logic ---
+    // 後備方案：硬編碼回應邏輯
     const { confidence } = verdict;
 
     // Check escalation: repeat offenders get lower thresholds
@@ -829,6 +905,67 @@ export class RespondAgent {
   /** Get escalation records */
   getEscalationRecords(): Map<string, EscalationRecord> {
     return new Map(this.escalationMap);
+  }
+
+  /**
+   * Block an IP address directly by IP string (policy-driven block).
+   * Validates the IP, checks whitelist, and calls the firewall.
+   * 直接透過 IP 字串封鎖 IP 位址（策略驅動封鎖）。
+   *
+   * @param ip - The IP address to block / 要封鎖的 IP 位址
+   * @returns ResponseResult indicating success or failure / 回應結果
+   */
+  async addBlockedIP(ip: string): Promise<ResponseResult> {
+    // Safety: check whitelisted IPs
+    if (SAFETY_RULES.whitelistedIPs.has(ip) || this.additionalWhitelistedIPs.has(ip)) {
+      logger.warn(`Refusing to block whitelisted IP: ${ip}`);
+      return {
+        action: 'block_ip',
+        success: false,
+        details: `IP ${ip} is whitelisted and cannot be blocked`,
+        timestamp: new Date().toISOString(),
+        target: ip,
+      };
+    }
+
+    // Validate IP format (IPv4 or IPv6)
+    if (!/^[\d.]+$/.test(ip) && !/^[a-fA-F\d:]+$/.test(ip)) {
+      return {
+        action: 'block_ip',
+        success: false,
+        details: `Invalid IP format: ${ip}`,
+        timestamp: new Date().toISOString(),
+        target: ip,
+      };
+    }
+
+    // Synthesize a minimal verdict for the block
+    const policyVerdict = {
+      conclusion: 'policy_block',
+      confidence: 100,
+      reasoning: `Policy-driven block of IP ${ip}`,
+      evidence: [{ source: 'policy', description: `Block IP: ${ip}`, confidence: 100, data: { ip } }],
+      recommendedAction: 'block_ip',
+    } as unknown as ThreatVerdict;
+
+    this.actionCount++;
+    const result = await this.blockIP(policyVerdict);
+    // Annotate result as policy-driven block
+    if (result.success) {
+      return { ...result, details: `[policy] ${result.details}` };
+    }
+    return result;
+  }
+
+  /**
+   * Update the action policy thresholds.
+   * 更新動作策略閾值。
+   *
+   * @param updates - Partial policy update / 部分策略更新
+   */
+  updateActionPolicy(updates: Partial<ActionPolicy>): void {
+    this.actionPolicy = { ...this.actionPolicy, ...updates };
+    logger.info(`Action policy updated: ${JSON.stringify(updates)}`);
   }
 
   /** Cleanup: clear all timers (for graceful shutdown) */

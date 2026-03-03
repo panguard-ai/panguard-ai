@@ -1,0 +1,40 @@
+FROM node:22-bookworm-slim
+
+# Install build dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git curl ca-certificates python3 make g++ && \
+    rm -rf /var/lib/apt/lists/*
+
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+# Create non-root test user
+RUN useradd -m -s /bin/bash testuser
+
+# Copy installer script
+COPY scripts/installer/install.sh /tmp/install.sh
+
+# Switch to test user
+USER testuser
+WORKDIR /home/testuser
+
+# Create shell profiles (for PATH fallback testing)
+RUN touch ~/.bashrc ~/.profile
+
+# Run installer and verify
+CMD ["bash", "-c", "\
+  echo '=== Starting Panguard AI Installer Test (Ubuntu) ===' && \
+  bash /tmp/install.sh && \
+  echo '' && \
+  echo '=== Verifying Installation ===' && \
+  if command -v panguard &>/dev/null; then \
+    panguard --version; \
+  elif [ -x ~/.panguard/source/bin/panguard ]; then \
+    ~/.panguard/source/bin/panguard --version; \
+  elif [ -x ~/.local/bin/panguard ]; then \
+    ~/.local/bin/panguard --version; \
+  else \
+    echo 'FAIL: panguard not found after installation'; \
+    exit 1; \
+  fi && \
+  echo '=== Ubuntu Installer Test PASSED ==='"]

@@ -19,6 +19,8 @@ export const CLAWSCAN_NAME = 'PanguardScan';
 
 // Scanner exports / 掃描器匯出
 export { runScan } from './scanners/index.js';
+export { checkSourceCode } from './scanners/sast-checker.js';
+export { checkHardcodedSecrets } from './scanners/secrets-checker.js';
 export type { ScanConfig, ScanResult, Finding } from './scanners/types.js';
 export { sortBySeverity, SEVERITY_ORDER } from './scanners/types.js';
 

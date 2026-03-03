@@ -26,6 +26,7 @@ import type {
   GuardConfig,
   ThreatVerdict,
 } from '../types.js';
+import { DashboardRelayClient, type RelayClientConfig } from './relay-client.js';
 
 const logger = createLogger('panguard-guard:dashboard');
 
@@ -48,6 +49,16 @@ const RATE_LIMIT_WINDOW_MS = 60_000;
 /** Maximum concurrent WebSocket connections / 最大同時 WebSocket 連線數 */
 const MAX_WS_CLIENTS = 20;
 
+/** Relay configuration for connecting to a remote Manager / 連接到遠端 Manager 的 relay 配置 */
+export interface DashboardRelayOptions {
+  /** Manager URL to connect to / 要連接的 Manager URL */
+  readonly managerUrl: string;
+  /** Agent ID for identification / 用於識別的 Agent ID */
+  readonly agentId: string;
+  /** Auth token / 認證 token */
+  readonly token: string;
+}
+
 /**
  * Dashboard Server manages the HTTP + WebSocket real-time dashboard
  * Dashboard 伺服器管理 HTTP + WebSocket 即時儀表板
@@ -65,10 +76,15 @@ export class DashboardServer {
   private readonly authToken: string;
   /** Rate limiter state / 速率限制狀態 */
   private rateLimits: Map<string, RateLimitEntry> = new Map();
+  /** Optional relay client for upstream Manager connection / 可選的 relay 客戶端 */
+  private relayClient: DashboardRelayClient | null = null;
+  /** Relay configuration / Relay 配置 */
+  private readonly relayConfig: DashboardRelayOptions | undefined;
 
-  constructor(port: number) {
+  constructor(port: number, relayConfig?: DashboardRelayOptions) {
     this.port = port;
     this.authToken = randomBytes(32).toString('hex');
+    this.relayConfig = relayConfig;
     this.status = {
       mode: 'learning',
       uptime: 0,
@@ -166,6 +182,12 @@ export class DashboardServer {
       this.server.listen(this.port, '127.0.0.1', () => {
         logger.info(`Dashboard started on http://127.0.0.1:${this.port} / 儀表板已啟動`);
         logger.info(`Dashboard auth token: ${this.authToken}`);
+
+        // Start relay client if configured / 如果已配置則啟動 relay 客戶端
+        if (this.relayConfig) {
+          this.startRelayClient(this.relayConfig);
+        }
+
         resolve();
       });
     });
@@ -175,6 +197,12 @@ export class DashboardServer {
    * Stop the dashboard server / 停止儀表板伺服器
    */
   async stop(): Promise<void> {
+    // Disconnect relay client first / 先斷開 relay 客戶端
+    if (this.relayClient) {
+      this.relayClient.disconnect();
+      this.relayClient = null;
+    }
+
     return new Promise((resolve) => {
       for (const client of this.wsClients) {
         try {
@@ -376,9 +404,65 @@ export class DashboardServer {
   }
 
   private broadcast(event: DashboardEvent): void {
+    // Broadcast to local WebSocket clients / 廣播給本地 WebSocket 客戶端
     for (const client of this.wsClients) {
       this.sendToClient(client, event);
     }
+
+    // Also send via relay client if connected / 如果已連接也透過 relay 客戶端發送
+    if (this.relayClient?.isConnected) {
+      this.relayClient.sendEvent(event as unknown as Record<string, unknown>);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Relay client management / Relay 客戶端管理
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Start the relay client connection to Manager / 啟動與 Manager 的 relay 客戶端連接
+   */
+  private startRelayClient(config: DashboardRelayOptions): void {
+    const relayConfig: RelayClientConfig = {
+      managerUrl: config.managerUrl,
+      agentId: config.agentId,
+      token: config.token,
+    };
+
+    this.relayClient = new DashboardRelayClient(relayConfig);
+
+    this.relayClient.on('connected', () => {
+      logger.info(
+        `Dashboard relay connected to Manager / Dashboard relay 已連接到 Manager`
+      );
+    });
+
+    this.relayClient.on('disconnected', () => {
+      logger.info(
+        `Dashboard relay disconnected from Manager / Dashboard relay 已從 Manager 斷線`
+      );
+    });
+
+    this.relayClient.on('error', (err: Error) => {
+      logger.warn(
+        `Dashboard relay error: ${err.message} / Dashboard relay 錯誤`
+      );
+    });
+
+    // Listen for commands from Manager and handle them
+    // 監聽來自 Manager 的指令並處理
+    this.relayClient.on('message', (msg: Record<string, unknown>) => {
+      logger.debug(`Relay received command: ${JSON.stringify(msg)} / Relay 收到指令`);
+    });
+
+    this.relayClient.connect();
+  }
+
+  /**
+   * Get the relay client instance (for testing) / 取得 relay 客戶端實例（用於測試）
+   */
+  getRelayClient(): DashboardRelayClient | null {
+    return this.relayClient;
   }
 
   /** Create a WebSocket text frame / 建立 WebSocket 文字框架 */

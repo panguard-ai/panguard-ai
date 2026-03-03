@@ -155,6 +155,7 @@ export default function NavBar() {
     { label: t('howItWorks'), href: '/how-it-works' },
     { label: t('threatCloud'), href: '/threat-cloud' },
     { label: t('pricing'), href: '/pricing' },
+    { label: t('docs'), href: '/docs' },
     { label: t('about'), href: '/about' },
     { label: t('blog'), href: '/blog' },
   ];

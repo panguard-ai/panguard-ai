@@ -148,13 +148,44 @@ async function runDeploy(opts: {
     try {
       const guardConfigPath = join(homedir(), '.panguard-guard', 'config.json');
       const { writeFileSync } = await import('node:fs');
+
+      // Build complete guard config from master config
+      const notifCfg = config.notifications;
+      const guardNotifications: Record<string, unknown> = {};
+      if (notifCfg.channel === 'telegram' && notifCfg.config['botToken']) {
+        guardNotifications['telegram'] = {
+          botToken: notifCfg.config['botToken'],
+          chatId: notifCfg.config['chatId'],
+        };
+      } else if (notifCfg.channel === 'slack' && notifCfg.config['webhookUrl']) {
+        guardNotifications['slack'] = { webhookUrl: notifCfg.config['webhookUrl'] };
+      } else if (notifCfg.channel === 'email' && notifCfg.config['host']) {
+        guardNotifications['email'] = {
+          host: notifCfg.config['host'],
+          port: Number(notifCfg.config['port'] ?? 587),
+          secure: notifCfg.config['secure'] === 'true',
+          auth: { user: notifCfg.config['user'] ?? '', pass: notifCfg.config['pass'] ?? '' },
+          from: notifCfg.config['from'] ?? '',
+          to: (notifCfg.config['to'] ?? '').split(',').filter(Boolean),
+        };
+      } else if (notifCfg.channel === 'webhook' && notifCfg.config['url']) {
+        guardNotifications['webhook'] = {
+          url: notifCfg.config['url'],
+          secret: notifCfg.config['secret'],
+        };
+      } else if (notifCfg.channel === 'line' && notifCfg.config['accessToken']) {
+        guardNotifications['line'] = { accessToken: notifCfg.config['accessToken'] };
+      }
+
       writeFileSync(
         guardConfigPath,
         JSON.stringify(
           {
+            lang: config.meta.language,
             mode: config.guard.mode,
             learningDays: config.guard.learningDays,
-            actionThresholds: config.guard.actionPolicy,
+            actionPolicy: config.guard.actionPolicy,
+            notifications: guardNotifications,
             monitors: config.guard.monitors,
           },
           null,

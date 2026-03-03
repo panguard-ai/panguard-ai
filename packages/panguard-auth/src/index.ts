@@ -63,6 +63,17 @@ export {
 export type { MeterableResource, QuotaCheck, UsageSummary } from './usage-meter.js';
 export { initErrorTracking, captureException, captureRequestError } from './error-tracker.js';
 export { generateOpenApiSpec, generateSwaggerHtml } from './openapi.js';
+export { ManagerProxy } from './manager-proxy.js';
+export type {
+  ManagerEnvelope,
+  ManagerEnvelopeOk,
+  ManagerEnvelopeError,
+  AgentListResponse,
+  AgentResponse,
+  EventsResponse,
+  ThreatSummaryData,
+  ManagerOverviewData,
+} from './manager-proxy.js';
 export type {
   WaitlistEntry,
   WaitlistInput,

@@ -67,3 +67,14 @@ export function moduleCountDisplay(lang: Lang): string {
     ? `${unlocked}/${total} \u5DF2\u89E3\u9396`
     : `${unlocked}/${total} unlocked`;
 }
+
+/**
+ * Format a three-part error message: problem, current state, and fix.
+ */
+export function formatError(problem: string, current: string, fix: string): string {
+  return [
+    `  ${c.critical('Problem:')} ${problem}`,
+    `  ${c.dim('Current:')} ${current}`,
+    `  ${c.sage('Fix:')}     ${fix}`,
+  ].join('\n');
+}

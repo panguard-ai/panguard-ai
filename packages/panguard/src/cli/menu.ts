@@ -1,8 +1,8 @@
 /**
- * Arrow-key interactive menu system for Panguard CLI.
- * Minimalist design — no box-drawing borders, single language.
+ * Panguard CLI Menu System
  *
- * Uses ANSI cursor control for flicker-free re-rendering.
+ * Number-key instant select + text prompt input.
+ * Sub-menus use compact numbered selection.
  *
  * @module @panguard-ai/panguard/cli/menu
  */
@@ -22,35 +22,26 @@ export interface MenuItem {
   separator?: boolean;
 }
 
-// ── Constants ─────────────────────────────────────────────────────────
+// ── Main Input Types ────────────────────────────────────────────────
 
-const POINTER = '\u25B6'; // ►
-const SEP_LINE = '\u2500'.repeat(5); // ─────
-const MENU_WIDTH = 60;
+export type MainInputResult =
+  | { type: 'number'; index: number }
+  | { type: 'quit' }
+  | { type: 'help' }
+  | { type: 'lang_toggle' }
+  | { type: 'command'; text: string };
 
-// ── ANSI helpers ──────────────────────────────────────────────────────
+// ── ANSI helpers ────────────────────────────────────────────────────
 
-/** Move cursor up N lines */
-function cursorUp(n: number): void {
-  if (n > 0) process.stdout.write(`\x1b[${n}A`);
-}
-
-/** Clear from cursor to end of line */
-function clearLine(): void {
-  process.stdout.write('\x1b[2K');
-}
-
-/** Hide cursor */
 function hideCursor(): void {
   process.stdout.write('\x1b[?25l');
 }
 
-/** Show cursor */
 function showCursor(): void {
   process.stdout.write('\x1b[?25h');
 }
 
-// ── Key input ─────────────────────────────────────────────────────────
+// ── Key input ───────────────────────────────────────────────────────
 
 /**
  * Wait for a single keypress. Handles arrow keys, enter, and special keys.
@@ -73,22 +64,18 @@ export function waitForKey(): Promise<string> {
       }
       stdin.pause();
 
-      // Ctrl+C
       if (data === '\x03') {
         resolve('ctrl-c');
         return;
       }
-      // Enter
       if (data === '\r' || data === '\n') {
         resolve('enter');
         return;
       }
-      // Escape (standalone)
       if (data === '\x1b' && data.length === 1) {
         resolve('escape');
         return;
       }
-      // Arrow keys: \x1b[A (up), \x1b[B (down), \x1b[C (right), \x1b[D (left)
       if (data === '\x1b[A') {
         resolve('up');
         return;
@@ -113,150 +100,141 @@ export function waitForKey(): Promise<string> {
   });
 }
 
-// ── Menu rendering ────────────────────────────────────────────────────
-
-function renderMenuLine(item: MenuItem, selected: boolean, userTier?: Tier | string): string {
-  if (item.separator) {
-    return `    ${c.dim(SEP_LINE)}`;
-  }
-
-  const pointer = selected ? c.sage(POINTER) : ' ';
-  const label = selected ? c.sage(item.label) : c.dim(item.label);
-
-  // Build right-aligned tier badge
-  let badge = '';
-  if (item.tier) {
-    badge = tierLabel(item.tier as Tier, userTier);
-  }
-
-  // Calculate padding for right-alignment
-  const leftPart = `  ${pointer} ${label}`;
-  const leftLen = visLen(leftPart);
-  const badgeLen = visLen(badge);
-  const gap = Math.max(1, MENU_WIDTH - leftLen - badgeLen);
-
-  return `${leftPart}${' '.repeat(gap)}${badge}`;
-}
-
-/** Render the full menu to stdout */
-function drawMenu(
-  items: MenuItem[],
-  selectedIndex: number,
-  footer: string,
-  userTier?: Tier | string
-): void {
-  for (let i = 0; i < items.length; i++) {
-    clearLine();
-    console.log(renderMenuLine(items[i]!, i === selectedIndex, userTier));
-  }
-  // Footer
-  clearLine();
-  console.log('');
-  clearLine();
-  console.log(c.dim(`  ${footer}`));
-}
-
-/** Total lines rendered by drawMenu (items + 2 for blank + footer) */
-function menuLineCount(items: MenuItem[]): number {
-  return items.length + 2;
-}
-
-// ── Arrow-key menu ────────────────────────────────────────────────────
-
-export interface ArrowMenuResult {
-  key: string;
-  label: string;
-  tier?: Tier | string;
-}
+// ── Main menu input ─────────────────────────────────────────────────
 
 /**
- * Run an interactive arrow-key menu.
- * Returns the selected item, or null for quit.
- * Returns { key: '__lang__' } for language toggle.
+ * Wait for main menu input.
+ *
+ * In raw mode:
+ * - '0'-'7' triggers corresponding menu item instantly (no Enter)
+ * - 'q' quits
+ * - 'h' shows help
+ * - 'b' toggles language
+ * - Other printable chars enter command mode: user types text + Enter
  */
-export async function runArrowMenu(
-  items: MenuItem[],
-  opts: { lang: Lang; initialIndex?: number }
-): Promise<ArrowMenuResult | null> {
-  const selectableIndices = items
-    .map((item, i) => ({ item, i }))
-    .filter(({ item }) => !item.separator)
-    .map(({ i }) => i);
+export function waitForMainInput(): Promise<MainInputResult> {
+  return new Promise((resolve) => {
+    const stdin = process.stdin;
+    const wasRaw = stdin.isRaw;
 
-  if (selectableIndices.length === 0) return null;
+    if (stdin.isTTY) {
+      stdin.setRawMode(true);
+    }
+    stdin.resume();
+    stdin.setEncoding('utf-8');
 
-  let selectedIndex = opts.initialIndex ?? selectableIndices[0]!;
+    let buffer = '';
+    let inCommandMode = false;
 
-  // Ensure selectedIndex is valid
-  if (!selectableIndices.includes(selectedIndex)) {
-    selectedIndex = selectableIndices[0]!;
-  }
+    function cleanup(): void {
+      stdin.removeListener('data', onData);
+      if (stdin.isTTY) {
+        stdin.setRawMode(wasRaw ?? false);
+      }
+      stdin.pause();
+    }
 
-  const { tier: userTier } = getLicense();
-
-  const footerText =
-    opts.lang === 'zh-TW'
-      ? '\u2191\u2193 \u5C0E\u822A  \u23CE \u9078\u64C7  q \u9000\u51FA  l \u4E2D/EN'
-      : '\u2191\u2193 Navigate  \u23CE Select  q Quit  l \u4E2D/EN';
-
-  hideCursor();
-
-  // Initial draw
-  drawMenu(items, selectedIndex, footerText, userTier);
-
-  try {
-    while (true) {
-      const key = await waitForKey();
-
-      if (key === 'q' || key === 'ctrl-c') {
-        showCursor();
-        return null;
+    function onData(data: string): void {
+      // Ctrl+C always quits
+      if (data === '\x03') {
+        cleanup();
+        resolve({ type: 'quit' });
+        return;
       }
 
-      if (key === 'l') {
-        showCursor();
-        return { key: '__lang__', label: '' };
-      }
+      if (!inCommandMode) {
+        const ch = data[0];
+        if (!ch) return;
 
-      if (key === 'enter') {
-        showCursor();
-        const item = items[selectedIndex];
-        if (!item || item.separator) continue;
-        return { key: item.key, label: item.label, tier: item.tier };
-      }
-
-      let moved = false;
-
-      if (key === 'up') {
-        const currentPos = selectableIndices.indexOf(selectedIndex);
-        if (currentPos > 0) {
-          selectedIndex = selectableIndices[currentPos - 1]!;
-          moved = true;
+        // Number keys 0-7 — instant trigger
+        if (ch >= '0' && ch <= '7') {
+          cleanup();
+          process.stdout.write(ch + '\n');
+          resolve({ type: 'number', index: parseInt(ch, 10) });
+          return;
         }
-      }
 
-      if (key === 'down') {
-        const currentPos = selectableIndices.indexOf(selectedIndex);
-        if (currentPos < selectableIndices.length - 1) {
-          selectedIndex = selectableIndices[currentPos + 1]!;
-          moved = true;
+        // Quit
+        if (ch === 'q') {
+          cleanup();
+          resolve({ type: 'quit' });
+          return;
         }
-      }
 
-      if (moved) {
-        // Move cursor back up and redraw
-        const totalLines = menuLineCount(items);
-        cursorUp(totalLines);
-        drawMenu(items, selectedIndex, footerText, userTier);
+        // Help
+        if (ch === 'h') {
+          cleanup();
+          resolve({ type: 'help' });
+          return;
+        }
+
+        // Language toggle
+        if (ch === 'b') {
+          cleanup();
+          resolve({ type: 'lang_toggle' });
+          return;
+        }
+
+        // Enter with no input — ignore
+        if (data === '\r' || data === '\n') return;
+
+        // Any other printable char — enter command mode
+        if (ch.charCodeAt(0) >= 32) {
+          inCommandMode = true;
+          buffer = ch;
+          process.stdout.write(ch);
+        }
+      } else {
+        // Command mode — collecting text
+        for (const ch of data) {
+          // Enter — process command
+          if (ch === '\r' || ch === '\n') {
+            process.stdout.write('\n');
+            cleanup();
+            resolve({ type: 'command', text: buffer.trim() });
+            return;
+          }
+
+          // Backspace
+          if (ch === '\x7f' || ch === '\b') {
+            if (buffer.length > 0) {
+              buffer = buffer.slice(0, -1);
+              process.stdout.write('\b \b');
+            }
+            continue;
+          }
+
+          // Ctrl+C
+          if (ch === '\x03') {
+            cleanup();
+            resolve({ type: 'quit' });
+            return;
+          }
+
+          // Escape — cancel command, back to single-char mode
+          if (ch === '\x1b') {
+            for (let i = 0; i < buffer.length; i++) {
+              process.stdout.write('\b \b');
+            }
+            buffer = '';
+            inCommandMode = false;
+            continue;
+          }
+
+          // Printable char — accumulate
+          if (ch.charCodeAt(0) >= 32) {
+            buffer += ch;
+            process.stdout.write(ch);
+          }
+        }
       }
     }
-  } catch {
-    showCursor();
-    return null;
-  }
+
+    stdin.on('data', onData);
+  });
 }
 
-// ── Compact submenu (for scan depth, frameworks, etc.) ────────────────
+// ── Compact submenu ─────────────────────────────────────────────────
 
 /**
  * Render a compact submenu with number-key selection.
@@ -306,7 +284,7 @@ export async function waitForCompactChoice(
   }
 }
 
-// ── Utilities ─────────────────────────────────────────────────────────
+// ── Utilities ───────────────────────────────────────────────────────
 
 /**
  * "Press any key to continue..."

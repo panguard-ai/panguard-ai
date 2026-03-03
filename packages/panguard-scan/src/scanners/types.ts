@@ -35,6 +35,18 @@ export interface ScanConfig {
    * 啟用詳細輸出
    */
   verbose?: boolean;
+
+  /**
+   * Source code directory to scan (for SAST)
+   * 要掃描的原始碼目錄（用於 SAST）
+   */
+  codeDir?: string;
+
+  /**
+   * Exit with non-zero code if findings at or above this severity
+   * 若發現達到此嚴重等級則以非零碼退出
+   */
+  failOn?: Severity;
 }
 
 /**

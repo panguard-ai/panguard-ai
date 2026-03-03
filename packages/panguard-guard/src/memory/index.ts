@@ -19,7 +19,7 @@ import { createEmptyBaseline } from './baseline.js';
 
 const logger = createLogger('panguard-guard:memory');
 
-export { createEmptyBaseline, checkDeviation, updateBaseline } from './baseline.js';
+export { createEmptyBaseline, checkDeviation, updateBaseline, continuousBaselineUpdate, pruneStalePatterns } from './baseline.js';
 
 export {
   isLearningComplete,
@@ -28,6 +28,10 @@ export {
   switchToProtectionMode,
   getBaselineSummary,
 } from './learning.js';
+
+export { AnomalyScorer } from './anomaly-scorer.js';
+export type { MetricStats } from './anomaly-scorer.js';
+export { BaselineStats } from './baseline-stats.js';
 
 /**
  * Load baseline from a JSON file, or create empty if not found
