@@ -708,3 +708,42 @@ The production Docker image:
 - **Auth database**: `auth.db` (SQLite) should be backed up daily. Use `sqlite3 auth.db ".backup backup.db"`.
 - **Threat Cloud database**: Back up the SQLite database using the built-in scheduler's backup functionality.
 - **Configuration**: Store `~/.panguard/config.json` and environment files in version control or a secrets manager.
+
+---
+
+## Release Workflow
+
+Tagged releases are built and published automatically via CI.
+
+### Platforms
+
+Each release produces pre-compiled binaries for 4 target platforms:
+
+| Platform | Target |
+|----------|--------|
+| macOS Apple Silicon | `darwin-arm64` |
+| Linux x86-64 | `linux-x64` |
+| Linux ARM 64-bit | `linux-arm64` |
+| Windows x86-64 | `win-x64` |
+
+### npm Auto-Publish
+
+On a successful tagged release, the following packages are published to npm automatically:
+
+- `@panguard-ai/core` - Shared engine (rule engine, monitors, AI providers, i18n)
+- `@panguard-ai/panguard` - Unified CLI entry point
+
+### Triggering a Release
+
+```bash
+# Tag and push to trigger the release workflow
+git tag v0.2.6
+git push origin v0.2.6
+```
+
+The CI pipeline will:
+1. Run the full test suite (`pnpm test`)
+2. Build all packages (`pnpm build`)
+3. Compile platform binaries for all 4 targets
+4. Publish `@panguard-ai/core` and `@panguard-ai/panguard` to npm
+5. Attach binaries to the GitHub release

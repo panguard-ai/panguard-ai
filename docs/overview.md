@@ -216,7 +216,7 @@ Cloud down? Local AI takes over. Local AI down? Rules engine keeps running. Prot
 | Language   | TypeScript 5.7 (strict mode)                    |
 | Runtime    | Node.js 20+                                     |
 | Monorepo   | pnpm 10 workspaces                              |
-| Testing    | Vitest 3 (1,422 tests)                          |
+| Testing    | Vitest 3 (3,017 tests / 142 files)              |
 | Rules      | Sigma (3,155) + YARA (5,895) + Suricata + Falco |
 | AI         | Ollama (local) + Claude / OpenAI (cloud)        |
 | Auth       | Google OAuth (PKCE) + scrypt hashing            |
