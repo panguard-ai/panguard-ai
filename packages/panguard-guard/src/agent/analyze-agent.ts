@@ -23,6 +23,7 @@ import type {
   LLMClassificationResult,
 } from '../types.js';
 import { checkDeviation } from '../memory/baseline.js';
+import type { AnomalyScorer } from '../memory/anomaly-scorer.js';
 
 const logger = createLogger('panguard-guard:analyze-agent');
 
@@ -58,13 +59,15 @@ const ATTACK_CHAIN_BOOST_MAX = 25;
  */
 export class AnalyzeAgent {
   private readonly llm: AnalyzeLLM | null;
+  private readonly scorer: AnomalyScorer | undefined;
   private analysisCount = 0;
 
   /** Feedback history: ruleId → FeedbackRecord */
   private readonly feedbackHistory = new Map<string, FeedbackRecord>();
 
-  constructor(llm: AnalyzeLLM | null) {
+  constructor(llm: AnalyzeLLM | null, scorer?: AnomalyScorer) {
     this.llm = llm;
+    this.scorer = scorer;
   }
 
   /**
@@ -110,8 +113,9 @@ export class AnalyzeAgent {
       });
     }
 
-    // Step 3: Baseline deviation check with time-of-day awareness
-    const deviation: DeviationResult = checkDeviation(baseline, detection.event);
+    // Step 3: Baseline deviation check with time-of-day awareness and optional anomaly scoring
+    // 基線偏離檢查，含時段感知和可選異常評分
+    const deviation: DeviationResult = checkDeviation(baseline, detection.event, this.scorer);
     if (deviation.isDeviation) {
       let deviationConfidence = deviation.confidence;
 

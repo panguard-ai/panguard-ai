@@ -71,7 +71,7 @@ panguard guard start
 
 - 4-agent AI pipeline: Detect -> Analyze -> Respond -> Report
 - 7-day learning period builds behavioral baseline
-- 3,155 Sigma rules + 4,326 YARA rules
+- 3,155 Sigma rules + 5,895 YARA rules
 - Real-time threat intelligence (ThreatFox / URLhaus / GreyNoise)
 - Auto-response: IP blocking, file quarantine, process termination
 - Investigation engine for root cause analysis
@@ -90,7 +90,7 @@ Translates technical security alerts into plain language and delivers them throu
 panguard chat setup --channel line --user-type boss
 ```
 
-- 4 notification channels: Telegram, Slack (Block Kit), Email (SMTP/HTML), Webhook (mTLS)
+- 5 notification channels: Telegram, Slack (Block Kit), Email (SMTP/HTML), Webhook (mTLS), LINE
 - 3 tone modes:
   - **boss** - Impact summary, plain language
   - **developer** - Technical details, CLI commands and logs
@@ -216,8 +216,8 @@ Cloud down? Local AI takes over. Local AI down? Rules engine keeps running. Prot
 | Language   | TypeScript 5.7 (strict mode)                    |
 | Runtime    | Node.js 20+                                     |
 | Monorepo   | pnpm 10 workspaces                              |
-| Testing    | Vitest 3 (1,326 tests)                          |
-| Rules      | Sigma (3,155) + YARA (4,326) + Suricata + Falco |
+| Testing    | Vitest 3 (1,422 tests)                          |
+| Rules      | Sigma (3,155) + YARA (5,895) + Suricata + Falco |
 | AI         | Ollama (local) + Claude / OpenAI (cloud)        |
 | Auth       | Google OAuth (PKCE) + scrypt hashing            |
 | i18n       | English + Traditional Chinese                   |
@@ -247,10 +247,10 @@ Cloud down? Local AI takes over. Local AI down? Rules engine keeps running. Prot
 
 | Report         | Price | Controls |
 | -------------- | ----- | -------- |
-| Taiwan TCSA    | $299  | 50       |
-| ISO 27001      | $499  | 93       |
-| SOC 2          | $699  | 64       |
-| Bundle (all 3) | $999  | 207      |
+| Taiwan TCSA    | $299  | 10       |
+| ISO 27001      | $499  | 30       |
+| SOC 2          | $699  | 10       |
+| Bundle (all 3) | $999  | 50       |
 
 Annual billing: 20% discount on all plans.
 

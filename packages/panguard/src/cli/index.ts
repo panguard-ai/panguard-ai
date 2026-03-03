@@ -30,6 +30,7 @@ import { hardeningCommand } from './commands/hardening.js';
 import { managerCommand } from './commands/manager.js';
 import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
+import { doctorCommand } from './commands/doctor.js';
 import { startInteractive } from './interactive.js';
 import { refreshTierInBackground } from './auth-guard.js';
 
@@ -59,6 +60,7 @@ program.addCommand(hardeningCommand());
 program.addCommand(managerCommand());
 program.addCommand(upgradeCommand());
 program.addCommand(configCommand());
+program.addCommand(doctorCommand());
 
 // Refresh tier from server in background (non-blocking)
 refreshTierInBackground();

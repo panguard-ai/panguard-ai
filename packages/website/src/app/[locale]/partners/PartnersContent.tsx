@@ -56,7 +56,7 @@ export default function PartnersContent() {
     <>
       {/* -- Hero -- */}
       <SectionWrapper spacing="spacious">
-        <SectionTitle overline={t('overline')} title={t('title')} serif subtitle={t('subtitle')} />
+        <SectionTitle overline={t('overline')} title={t('title')} subtitle={t('subtitle')} />
       </SectionWrapper>
 
       {/* -- Partner Types -- */}

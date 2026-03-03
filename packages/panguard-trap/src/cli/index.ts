@@ -9,6 +9,7 @@
 import type { TrapConfig, TrapServiceType, TrapStatistics } from '../types.js';
 import { DEFAULT_TRAP_CONFIG, DEFAULT_SERVICE_CONFIGS } from '../types.js';
 import { TrapEngine } from '../trap-engine.js';
+import { PidFile } from '../pid-file.js';
 
 /** Available CLI commands / 可用的 CLI 命令 */
 export type TrapCliCommand =
@@ -226,6 +227,15 @@ export async function executeCli(args: string[]): Promise<void> {
 
     case 'start': {
       const config = buildConfigFromOptions(options);
+      const pidFile = new PidFile(config.dataDir);
+
+      if (pidFile.isRunning()) {
+        const existingPid = pidFile.read();
+        console.log(`PanguardTrap is already running (PID: ${existingPid}).`);
+        console.log('PanguardTrap 已在運行中。');
+        break;
+      }
+
       console.log('Starting PanguardTrap... / 啟動 PanguardTrap...');
 
       const engine = new TrapEngine(config);
@@ -240,6 +250,7 @@ export async function executeCli(args: string[]): Promise<void> {
       });
 
       await engine.start();
+      pidFile.write();
 
       const running = engine.getRunningServices();
       console.log(`Services running / 已啟動服務: ${running.join(', ') || '(none)'}`);
@@ -249,6 +260,7 @@ export async function executeCli(args: string[]): Promise<void> {
       const shutdown = async () => {
         console.log('\nStopping PanguardTrap... / 停止 PanguardTrap...');
         await engine.stop();
+        pidFile.remove();
         console.log('PanguardTrap stopped / PanguardTrap 已停止');
         process.exit(0);
       };
@@ -261,25 +273,53 @@ export async function executeCli(args: string[]): Promise<void> {
       break;
     }
 
-    case 'stop':
-      if (activeEngine) {
-        await activeEngine.stop();
-        activeEngine = null;
-        console.log('PanguardTrap stopped / PanguardTrap 已停止');
-      } else {
+    case 'stop': {
+      const config = buildConfigFromOptions(options);
+      const pidFile = new PidFile(config.dataDir);
+      const pid = pidFile.read();
+
+      if (!pid) {
         console.log('PanguardTrap is not running. / PanguardTrap 未運行。');
+        break;
+      }
+
+      if (!pidFile.isRunning()) {
+        console.log('Process not found, cleaning up PID file.');
+        console.log('程序未找到，清理 PID 檔案。');
+        pidFile.remove();
+        break;
+      }
+
+      try {
+        process.kill(pid, 'SIGTERM');
+        pidFile.remove();
+        console.log(`PanguardTrap stopped (PID: ${pid}) / PanguardTrap 已停止`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`Failed to stop: ${msg}`);
       }
       break;
+    }
 
-    case 'status':
+    case 'status': {
+      const config = buildConfigFromOptions(options);
+      const pidFile = new PidFile(config.dataDir);
+
       if (activeEngine && activeEngine.status === 'running') {
         const stats = activeEngine.getStatistics();
         console.log(formatStatistics(stats));
+      } else if (pidFile.isRunning()) {
+        const pid = pidFile.read();
+        console.log(`PanguardTrap is running (PID: ${pid})`);
+        console.log('Use this process to see detailed stats.');
+        console.log(`PanguardTrap 運行中 (PID: ${pid})`);
+        console.log('在此程序中查看詳細統計。');
       } else {
         console.log('PanguardTrap is not running. Use panguard-trap start to begin.');
         console.log('PanguardTrap 未運行。使用 panguard-trap start 開始。');
       }
       break;
+    }
 
     case 'deploy': {
       const deployConfig = buildConfigFromOptions(options);

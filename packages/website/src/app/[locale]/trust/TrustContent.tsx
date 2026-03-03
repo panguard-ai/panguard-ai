@@ -71,7 +71,7 @@ export default function TrustContent() {
   return (
     <>
       {/* -- Hero -- */}
-      <section className="relative min-h-[50vh] flex items-center px-6 lg:px-[120px] py-24 border-b border-border overflow-hidden">
+      <section className="relative min-h-[50vh] flex items-center px-6 lg:px-[120px] py-28 border-b border-border overflow-hidden">
         <div className="absolute top-1/3 right-1/4 w-[600px] h-[400px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative">
           <FadeInUp>
@@ -240,6 +240,72 @@ export default function TrustContent() {
             {t('subprocessors.updateNote')}
           </p>
         </FadeInUp>
+      </SectionWrapper>
+
+      {/* -- Data Retention -- */}
+      <SectionWrapper>
+        <SectionTitle
+          overline={t('dataRetention.overline')}
+          title={t('dataRetention.title')}
+          subtitle={t('dataRetention.subtitle')}
+        />
+        <div className="max-w-3xl mx-auto mt-14 space-y-4">
+          {([0, 1, 2, 3, 4] as const).map((idx) => (
+            <FadeInUp key={idx} delay={idx * 0.06}>
+              <div className="bg-surface-1 rounded-xl border border-border p-5 flex items-start gap-4">
+                <HistoryIcon className="w-5 h-5 text-brand-sage shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-3 mb-1">
+                    <span className="text-sm font-bold text-text-primary">
+                      {t(`dataRetention.items.${idx}.category`)}
+                    </span>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-sage/10 text-brand-sage">
+                      {t(`dataRetention.items.${idx}.period`)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-text-secondary leading-relaxed">
+                    {t(`dataRetention.items.${idx}.desc`)}
+                  </p>
+                </div>
+              </div>
+            </FadeInUp>
+          ))}
+        </div>
+      </SectionWrapper>
+
+      {/* -- Incident Response -- */}
+      <SectionWrapper dark>
+        <SectionTitle
+          overline={t('incidentResponse.overline')}
+          title={t('incidentResponse.title')}
+          subtitle={t('incidentResponse.subtitle')}
+        />
+        <div className="max-w-3xl mx-auto mt-14">
+          <FadeInUp>
+            <div className="bg-surface-2 rounded-xl border border-border overflow-hidden">
+              {([0, 1, 2, 3] as const).map((idx) => (
+                <div key={idx} className={`flex items-start gap-4 p-6 ${idx < 3 ? 'border-b border-border' : ''}`}>
+                  <div className="w-8 h-8 rounded-full bg-brand-sage/10 flex items-center justify-center shrink-0">
+                    <span className="text-sm font-bold text-brand-sage">{idx + 1}</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-3 mb-1">
+                      <p className="text-sm font-bold text-text-primary">
+                        {t(`incidentResponse.steps.${idx}.phase`)}
+                      </p>
+                      <span className="text-[10px] font-medium text-text-muted">
+                        {t(`incidentResponse.steps.${idx}.sla`)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-text-secondary leading-relaxed">
+                      {t(`incidentResponse.steps.${idx}.desc`)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </FadeInUp>
+        </div>
       </SectionWrapper>
 
       {/* -- Document Request CTA -- */}

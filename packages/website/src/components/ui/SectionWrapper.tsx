@@ -3,9 +3,9 @@ import { ReactNode } from 'react';
 type Spacing = 'tight' | 'default' | 'spacious';
 
 const spacingClasses: Record<Spacing, string> = {
-  tight: 'py-8 sm:py-12',
-  default: 'py-12 sm:py-16',
-  spacious: 'py-16 sm:py-20',
+  tight: 'py-12 sm:py-16',
+  default: 'py-16 sm:py-24',
+  spacious: 'py-24 sm:py-32',
 };
 
 export default function SectionWrapper({

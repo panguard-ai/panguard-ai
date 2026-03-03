@@ -29,6 +29,55 @@ export default function LoginForm() {
   const rawRedirect = searchParams.get('redirect') ?? '/dashboard';
   const redirect = /^\/[^/\\]/.test(rawRedirect) ? rawRedirect : '/dashboard';
 
+  // CLI login flow: detect cli_state and cli_callback params
+  const cliState = searchParams.get('cli_state');
+  const cliCallback = searchParams.get('cli_callback');
+  const isCliLogin = Boolean(cliState && cliCallback);
+
+  async function handleCliCallback(sessionToken: string) {
+    if (!cliCallback || !cliState) return;
+
+    // Validate callback is localhost (security)
+    try {
+      const parsed = new URL(cliCallback);
+      if (!['localhost', '127.0.0.1', '[::1]'].includes(parsed.hostname)) return;
+    } catch {
+      return;
+    }
+
+    // Fetch user info with the session token
+    try {
+      const res = await fetch(`${API_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${sessionToken}` },
+        signal: AbortSignal.timeout(10_000),
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as {
+        ok: boolean;
+        data?: { user: { email: string; name: string; tier: string } };
+      };
+      if (!data.ok || !data.data?.user) return;
+
+      const { email: userEmail, name: userName, tier } = data.data.user;
+      const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      const params = new URLSearchParams({
+        token: sessionToken,
+        email: userEmail,
+        name: userName,
+        tier,
+        state: cliState,
+        expires,
+      });
+
+      // Redirect browser to CLI's localhost callback
+      window.location.href = `${cliCallback}?${params.toString()}`;
+    } catch {
+      // Fall back to dashboard if CLI callback fails
+      router.push(redirect as typeof redirect);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
@@ -37,6 +86,14 @@ export default function LoginForm() {
     const result = await login(email, password, needs2FA ? totpCode : undefined);
 
     if (result.ok) {
+      if (isCliLogin) {
+        // CLI login: redirect to CLI callback with token
+        const token = localStorage.getItem('panguard_token');
+        if (token) {
+          await handleCliCallback(token);
+          return;
+        }
+      }
       router.push(redirect as '/dashboard');
       return;
     }
@@ -88,6 +145,11 @@ export default function LoginForm() {
           <p className="text-sm text-text-secondary mt-2">
             {needs2FA ? t('subtitle2FA') : t('subtitle')}
           </p>
+          {isCliLogin && (
+            <div className="mt-3 bg-brand-sage/10 border border-brand-sage/20 rounded-lg px-4 py-2.5 text-sm text-brand-sage">
+              Authenticating Panguard CLI
+            </div>
+          )}
         </div>
 
         <div className="bg-surface-1 border border-border rounded-xl p-6">

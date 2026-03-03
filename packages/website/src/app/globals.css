@@ -12,6 +12,58 @@ body {
   overflow-x: hidden;
 }
 
+/* Balanced text wrapping for headings and short paragraphs */
+h1, h2, h3, h4 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Subtle noise grain texture for premium feel */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E") repeat;
+  opacity: 0.025;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Ambient sage gradient mesh for depth */
+body::after {
+  content: '';
+  position: fixed;
+  top: 15%;
+  left: -15%;
+  width: 60vw;
+  height: 60vh;
+  background: radial-gradient(circle, rgba(139, 154, 142, 0.035) 0%, transparent 55%);
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: -1;
+  animation: ambient-drift 25s ease-in-out infinite;
+}
+
+@keyframes ambient-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(5vw, -3vh) scale(1.05); }
+  66% { transform: translate(-3vw, 5vh) scale(0.97); }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none; }
+  .js-ready .animate-on-scroll,
+  .js-ready .reveal-word {
+    transition-duration: 0.01ms !important;
+    filter: none !important;
+  }
+}
+
 ::selection {
   background: rgba(139, 154, 142, 0.3);
   color: #f5f1e8;
@@ -73,18 +125,25 @@ body {
   background-size: 100% 1px;
 }
 
-/* Section gradient transitions (replaces hard border-b) */
+/* Section gradient fog transitions (Linear/Vercel-style, no hard lines) */
+.section-fade {
+  position: relative;
+}
 .section-fade::after {
   content: '';
-  display: block;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(139, 154, 142, 0.2) 30%,
-    rgba(139, 154, 142, 0.2) 70%,
-    transparent
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 80px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(139, 154, 142, 0.05) 0%,
+    transparent 70%
   );
+  filter: blur(30px);
+  pointer-events: none;
 }
 
 /* Shield spinner animation */
@@ -332,14 +391,17 @@ body {
 /* Base: fade-up on scroll (scoped to .js-ready to prevent SSR flash of invisible content) */
 .js-ready .animate-on-scroll {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(20px);
+  filter: blur(4px);
   transition:
-    opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
-    transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .js-ready .animate-on-scroll.is-visible {
   opacity: 1;
   transform: translateY(0);
+  filter: blur(0);
 }
 
 /* Directional variants */
@@ -465,14 +527,17 @@ body {
 /* Reveal text word animation */
 .js-ready .reveal-word {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(16px);
+  filter: blur(3px);
   transition:
-    opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
-    transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .js-ready .reveal-text-container.is-visible .reveal-word {
   opacity: 1;
   transform: translateY(0);
+  filter: blur(0);
 }
 
 /* Stagger group: children animate when parent is visible */
@@ -488,7 +553,8 @@ body {
 
 :lang(zh) {
   overflow-wrap: break-word;
-  word-break: normal;
+  word-break: keep-all;
+  line-break: strict;
   font-feature-settings: 'palt';
 }
 
@@ -503,8 +569,8 @@ body {
 :lang(zh) h2,
 :lang(zh) h3,
 :lang(zh) h4 {
-  letter-spacing: 0.04em;
-  line-height: 1.3;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
 }
 
 /* Tighter max-width for CJK prose readability (35–40 chars/line ideal) */
@@ -526,14 +592,8 @@ body {
   margin-top: 0.75em;
 }
 
-/* Mobile: relax text-wrap and line-height for narrow screens */
+/* Mobile: slightly relaxed line-height for narrow screens */
 @media (max-width: 639px) {
-  :lang(zh) h1,
-  :lang(zh) h2,
-  :lang(zh) h3 {
-    text-wrap: auto;
-  }
-
   :lang(zh) p,
   :lang(zh) li,
   :lang(zh) dd,

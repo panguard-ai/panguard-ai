@@ -206,7 +206,7 @@ describe('RespondAgent', () => {
     const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection');
     const verdict: ThreatVerdict = {
       conclusion: 'suspicious',
-      confidence: 60,
+      confidence: 75,
       reasoning: 'Test',
       evidence: [],
       recommendedAction: 'block_ip',

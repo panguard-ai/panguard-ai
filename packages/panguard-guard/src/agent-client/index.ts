@@ -50,6 +50,27 @@ export interface AgentEventReport {
 }
 
 /**
+ * Policy update received from Manager push
+ * 從 Manager 推送收到的策略更新
+ */
+export interface PolicyUpdate {
+  readonly policyId: string;
+  readonly version: number;
+  readonly rules: readonly Record<string, unknown>[];
+  readonly updatedAt: string;
+  readonly appliedTo: readonly string[];
+}
+
+/**
+ * Incoming policy push request body from Manager
+ * 來自 Manager 的策略推送請求內容
+ */
+export interface IncomingPolicyPush {
+  readonly policy: PolicyUpdate;
+  readonly timestamp: string;
+}
+
+/**
  * HTTP helper - performs a JSON request using native Node.js http/https
  */
 async function jsonRequest<T>(
@@ -117,6 +138,7 @@ export class PanguardAgentClient {
   private token: string | null = null;
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
   private readonly heartbeatInterval: number;
+  private policyPushHandler: ((policy: PolicyUpdate) => void) | null = null;
 
   constructor(managerUrl: string, heartbeatInterval = 30000) {
     // Remove trailing slash
@@ -224,6 +246,85 @@ export class PanguardAgentClient {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
       logger.info('Heartbeat stopped');
+    }
+  }
+
+  /**
+   * Register a callback handler for incoming policy pushes from the Manager.
+   * 註冊一個回呼處理器，用於接收來自 Manager 的策略推送。
+   *
+   * The actual HTTP endpoint (`/api/policy/push`) must be hosted by the
+   * agent's API server; this method only stores the handler callback.
+   *
+   * @param handler - Callback invoked when a valid policy push is received
+   */
+  onPolicyPush(handler: (policy: PolicyUpdate) => void): void {
+    this.policyPushHandler = handler;
+    logger.info('Policy push handler registered / 策略推送處理器已註冊');
+  }
+
+  /**
+   * Handle an incoming policy push request from the Manager.
+   * 處理來自 Manager 的策略推送請求。
+   *
+   * Validates the policy structure and invokes the registered handler.
+   * Should be called by the agent's HTTP server when it receives a POST
+   * to `/api/policy/push`.
+   *
+   * @param request - The incoming push request body
+   * @returns `{ ok: true }` on success, `{ ok: false }` on failure
+   */
+  handleIncomingPolicyPush(request: IncomingPolicyPush): { ok: boolean } {
+    // Validate request structure / 驗證請求結構
+    if (!request || typeof request !== 'object') {
+      logger.warn('Invalid policy push: request is not an object / 無效的策略推送：請求不是物件');
+      return { ok: false };
+    }
+
+    const { policy, timestamp } = request;
+
+    if (!policy || typeof policy !== 'object') {
+      logger.warn('Invalid policy push: missing or invalid policy / 無效的策略推送：缺少或無效的策略');
+      return { ok: false };
+    }
+
+    if (!policy.policyId || typeof policy.policyId !== 'string') {
+      logger.warn('Invalid policy push: missing policyId / 無效的策略推送：缺少 policyId');
+      return { ok: false };
+    }
+
+    if (typeof policy.version !== 'number') {
+      logger.warn('Invalid policy push: invalid version / 無效的策略推送：無效的版本');
+      return { ok: false };
+    }
+
+    if (!Array.isArray(policy.rules)) {
+      logger.warn('Invalid policy push: rules must be an array / 無效的策略推送：rules 必須為陣列');
+      return { ok: false };
+    }
+
+    if (!timestamp || typeof timestamp !== 'string') {
+      logger.warn('Invalid policy push: missing timestamp / 無效的策略推送：缺少時間戳');
+      return { ok: false };
+    }
+
+    // Invoke handler if registered / 如已註冊則呼叫處理器
+    if (!this.policyPushHandler) {
+      logger.warn('No policy push handler registered / 未註冊策略推送處理器');
+      return { ok: false };
+    }
+
+    try {
+      this.policyPushHandler(policy);
+      logger.info(
+        `Policy push received: ${policy.policyId} v${policy.version} / ` +
+          `收到策略推送: ${policy.policyId} v${policy.version}`
+      );
+      return { ok: true };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      logger.error(`Policy push handler error: ${message} / 策略推送處理器錯誤: ${message}`);
+      return { ok: false };
     }
   }
 

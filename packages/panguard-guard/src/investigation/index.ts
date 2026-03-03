@@ -12,6 +12,7 @@
  */
 
 import { createLogger, checkThreatIntel } from '@panguard-ai/core';
+import type { LLMProvider } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
 import type {
   InvestigationTool,
@@ -20,6 +21,8 @@ import type {
   InvestigationPlan,
   EnvironmentBaseline,
 } from '../types.js';
+import { createLLMPlanner } from './llm-planner.js';
+import type { LLMInvestigationPlanner } from './llm-planner.js';
 
 const logger = createLogger('panguard-guard:investigation');
 
@@ -45,11 +48,25 @@ interface StoredEvent {
 export class InvestigationEngine {
   private readonly baseline: EnvironmentBaseline;
 
+  /** Optional LLM provider for AI-driven investigation planning / 可選的 LLM 供應商用於 AI 驅動的調查規劃 */
+  private readonly llm?: LLMProvider;
+
+  /** LLM planner instance (lazy-initialized) / LLM 規劃器實例（延遲初始化） */
+  private llmPlanner?: LLMInvestigationPlanner;
+
   /** Sliding window of recent events for correlation / 近期事件滑動視窗 */
   private readonly eventBuffer: StoredEvent[] = [];
 
-  constructor(baseline: EnvironmentBaseline) {
+  /**
+   * Create an InvestigationEngine instance
+   * 建立 InvestigationEngine 實例
+   *
+   * @param baseline - Environment behavior baseline / 環境行為基線
+   * @param llm - Optional LLM provider for AI-driven planning / 可選的 LLM 供應商用於 AI 驅動規劃
+   */
+  constructor(baseline: EnvironmentBaseline, llm?: LLMProvider) {
     this.baseline = baseline;
+    this.llm = llm;
   }
 
   /**
@@ -82,7 +99,9 @@ export class InvestigationEngine {
   async investigate(event: SecurityEvent): Promise<InvestigationPlan> {
     logger.info(`Starting investigation for event ${event.id} / 開始調查事件 ${event.id}`);
 
-    const plan = this.createPlan(event);
+    // Try LLM-based planning first, fallback to heuristic
+    // 優先嘗試 LLM 規劃，失敗時回退至啟發式方法
+    const plan = await this.createPlanWithFallback(event);
     const completedSteps: InvestigationStep[] = [];
 
     for (const step of plan.steps) {
@@ -139,8 +158,78 @@ export class InvestigationEngine {
   }
 
   /**
-   * Create an initial investigation plan based on event characteristics
-   * 根據事件特徵建立初始調查計畫
+   * Create investigation plan with LLM fallback to heuristic
+   * 建立調查計畫：優先使用 LLM，失敗時回退至啟發式方法
+   *
+   * Strategy:
+   * 1. If LLM is available, try LLM-based planning
+   * 2. If LLM is unavailable or returns empty plan, use heuristic
+   *
+   * 策略：
+   * 1. 若 LLM 可用，嘗試 LLM 規劃
+   * 2. 若 LLM 不可用或回傳空計畫，使用啟發式方法
+   */
+  private async createPlanWithFallback(event: SecurityEvent): Promise<InvestigationPlan> {
+    if (this.llm) {
+      const llmPlan = await this.createPlanWithLLM(event);
+      if (llmPlan.steps.length > 0) {
+        return llmPlan;
+      }
+      logger.info('LLM plan was empty, falling back to heuristic / LLM 計畫為空，回退至啟發式方法');
+    }
+    return this.createPlan(event);
+  }
+
+  /**
+   * Create an investigation plan using the LLM planner
+   * 使用 LLM 規劃器建立調查計畫
+   *
+   * @param event - Security event to investigate / 要調查的安全事件
+   * @returns LLM-generated investigation plan / LLM 產生的調查計畫
+   */
+  async createPlanWithLLM(event: SecurityEvent): Promise<InvestigationPlan> {
+    if (!this.llm) {
+      logger.warn('No LLM provider configured, returning empty plan / 未配置 LLM 供應商');
+      return { steps: [], reasoning: 'No LLM provider available / 無 LLM 供應商可用' };
+    }
+
+    // Lazy-initialize the LLM planner / 延遲初始化 LLM 規劃器
+    if (!this.llmPlanner) {
+      this.llmPlanner = createLLMPlanner(this.llm);
+    }
+
+    try {
+      const steps = await this.llmPlanner.planInvestigation(event);
+
+      if (steps.length === 0) {
+        return {
+          steps: [],
+          reasoning: 'LLM returned no investigation steps / LLM 未回傳調查步驟',
+        };
+      }
+
+      return {
+        steps,
+        reasoning:
+          `LLM-planned investigation for ${event.source}/${event.category} event ` +
+          `(${steps.length} steps) / ` +
+          `LLM 規劃的 ${event.source}/${event.category} 事件調查 (${steps.length} 個步驟)`,
+      };
+    } catch (error) {
+      logger.error(
+        `LLM planning failed: ${error instanceof Error ? error.message : String(error)} / ` +
+          'LLM 規劃失敗'
+      );
+      return {
+        steps: [],
+        reasoning: `LLM planning failed: ${error instanceof Error ? error.message : String(error)}`,
+      };
+    }
+  }
+
+  /**
+   * Create an initial investigation plan based on event characteristics (heuristic)
+   * 根據事件特徵建立初始調查計畫（啟發式）
    */
   private createPlan(event: SecurityEvent): InvestigationPlan {
     const steps: InvestigationStep[] = [];
