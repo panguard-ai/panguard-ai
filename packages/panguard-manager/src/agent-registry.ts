@@ -54,6 +54,7 @@ export class AgentRegistry {
     const registration: AgentRegistration = {
       agentId,
       hostname: request.hostname,
+      endpoint: request.endpoint,
       platform: {
         os: request.os,
         arch: request.arch,

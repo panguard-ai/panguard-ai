@@ -11,6 +11,8 @@
  * @module @panguard-ai/panguard-trap/threat-cloud-uploader
  */
 
+import { createHash } from 'node:crypto';
+
 import { createLogger } from '@panguard-ai/core';
 import type { TrapIntelligence } from './types.js';
 
@@ -139,18 +141,54 @@ export class ThreatCloudUploader {
   // Internal
   // -------------------------------------------------------------------------
 
+  /**
+   * Anonymize an IP address by zeroing the last two segments.
+   * 匿名化 IP 位址：將末兩段歸零。
+   *
+   * IPv4: 192.168.1.100 -> 192.168.0.0
+   * IPv6: 2001:db8:85a3::8a2e:370:7334 -> 2001:db8:85a3::8a2e:0:0
+   */
+  private anonymizeIP(ip: string): string {
+    if (ip.includes('.')) {
+      // IPv4
+      const parts = ip.split('.');
+      if (parts.length === 4) {
+        parts[2] = '0';
+        parts[3] = '0';
+        return parts.join('.');
+      }
+    } else if (ip.includes(':')) {
+      // IPv6
+      const parts = ip.split(':');
+      if (parts.length >= 2) {
+        parts[parts.length - 1] = '0';
+        parts[parts.length - 2] = '0';
+        return parts.join(':');
+      }
+    }
+    return ip;
+  }
+
+  /**
+   * Hash a username with SHA-256, truncated to 16 hex characters.
+   * 以 SHA-256 雜湊使用者名稱，截取前 16 個十六進位字元。
+   */
+  private hashUsername(username: string): string {
+    return createHash('sha256').update(username).digest('hex').slice(0, 16);
+  }
+
   private toPayload(intel: TrapIntelligence): TrapIntelPayload {
     return {
       timestamp: intel.timestamp.toISOString(),
       serviceType: intel.serviceType,
-      sourceIP: intel.sourceIP,
+      sourceIP: this.anonymizeIP(intel.sourceIP),
       attackType: intel.attackType,
       mitreTechniques: [...intel.mitreTechniques],
       skillLevel: intel.skillLevel,
       intent: intel.intent,
       tools: [...intel.tools],
       topCredentials: intel.topCredentials.map((c) => ({
-        username: c.username,
+        username: this.hashUsername(c.username),
         count: c.count,
       })),
       region: intel.region,

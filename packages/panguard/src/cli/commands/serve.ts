@@ -20,6 +20,7 @@ import {
   captureRequestError,
   generateOpenApiSpec,
   generateSwaggerHtml,
+  ManagerProxy,
 } from '@panguard-ai/panguard-auth';
 import type {
   AuthRouteConfig,
@@ -28,6 +29,8 @@ import type {
   GoogleSheetsConfig,
   LemonSqueezyConfig,
 } from '@panguard-ai/panguard-auth';
+import { ManagerServer, DEFAULT_MANAGER_CONFIG } from '@panguard-ai/manager';
+import type { ManagerConfig } from '@panguard-ai/manager';
 
 export function serveCommand(): Command {
   return new Command('serve')
@@ -35,7 +38,8 @@ export function serveCommand(): Command {
     .option('--port <port>', 'Port number', '3000')
     .option('--host <host>', 'Host to bind', '127.0.0.1')
     .option('--db <path>', 'Database path', join(homedir(), '.panguard', 'auth.db'))
-    .action(async (options: { port: string; host: string; db: string }) => {
+    .option('--manager-port <port>', 'Manager server port / Manager 伺服器埠', '8443')
+    .action(async (options: { port: string; host: string; db: string; managerPort: string }) => {
       const port = parseInt(options.port, 10);
       const host = options.host;
 
@@ -78,6 +82,9 @@ export function serveCommand(): Command {
       }
       if (!process.env['SENTRY_DSN']) {
         warnings.push('SENTRY_DSN not set — error tracking disabled');
+      }
+      if (!process.env['MANAGER_AUTH_TOKEN']) {
+        warnings.push('MANAGER_AUTH_TOKEN not set — Manager API allows unauthenticated access (OK for dev)');
       }
 
       if (errors.length > 0) {
@@ -169,6 +176,12 @@ export function serveCommand(): Command {
       };
       const handlers = createAuthHandlers(authConfig);
 
+      // Initialize Manager proxy for agent/event admin API routes
+      const managerProxy = new ManagerProxy(
+        process.env['MANAGER_URL'],
+        process.env['MANAGER_AUTH_TOKEN']
+      );
+
       // Resolve admin static directory
       // Try multiple locations: sibling package, or relative to CWD
       const thisDir = dirname(fileURLToPath(import.meta.url));
@@ -179,8 +192,17 @@ export function serveCommand(): Command {
       const adminDir = adminDirs.find((d) => existsSync(d));
 
       const server = createServer((req, res) => {
-        void handleRequest(req, res, handlers, db, adminDir);
+        void handleRequest(req, res, handlers, db, adminDir, managerProxy);
       });
+
+      // Build Manager config from environment / 從環境變數建構 Manager 設定
+      const managerPort = parseInt(options.managerPort, 10);
+      const managerConfig: ManagerConfig = {
+        ...DEFAULT_MANAGER_CONFIG,
+        port: managerPort,
+        authToken: process.env['MANAGER_AUTH_TOKEN'] ?? '',
+      };
+      const managerServer = new ManagerServer(managerConfig);
 
       server.listen(port, host, () => {
         console.log(`  ${c.safe('Server started')} on ${c.bold(`http://${host}:${port}`)}`);
@@ -202,6 +224,7 @@ export function serveCommand(): Command {
         console.log(`    ${c.dim('/docs/api')}        API Documentation (Swagger UI)`);
         console.log(`    ${c.dim('/openapi.json')}    OpenAPI 3.0 Spec`);
         console.log(`    ${c.dim('/health')}         Health check`);
+        console.log(`    ${c.dim('/api/manager/*')}  Manager API (port ${managerPort})`);
         console.log('');
         console.log(`  Services:`);
         console.log(
@@ -212,7 +235,21 @@ export function serveCommand(): Command {
           `    Billing: ${lemonsqueezy ? c.safe('Lemon Squeezy') : c.dim('Not configured')}`
         );
         console.log(`    Sheets:  ${sheets ? c.safe('Google Sheets') : c.dim('Not configured')}`);
+        console.log(
+          `    Manager: ${c.safe(`port ${managerPort}`)}${process.env['MANAGER_AUTH_TOKEN'] ? '' : c.dim(' (no auth)')}`
+        );
         console.log('');
+
+        // Start Manager server after auth server is listening / 在 Auth 伺服器啟動後啟動 Manager 伺服器
+        managerServer.start().then(() => {
+          console.log(`  ${c.safe('Manager server started')} on ${c.bold(`http://${host}:${managerPort}`)}`);
+          console.log('');
+        }).catch((err: unknown) => {
+          const message = err instanceof Error ? err.message : String(err);
+          console.log(`  ${c.caution('Manager server failed to start:')} ${message}`);
+          console.log(`  ${c.dim('Auth server continues running without Manager')}`);
+          console.log('');
+        });
       });
 
       // Subscription lifecycle: check expired plans hourly
@@ -248,10 +285,11 @@ export function serveCommand(): Command {
       const planCheckTimer = setInterval(runPlanCheck, 60 * 60 * 1000);
       if (planCheckTimer.unref) planCheckTimer.unref();
 
-      // Graceful shutdown
+      // Graceful shutdown / 優雅關閉
       const shutdown = () => {
         console.log('\n  Shutting down...');
         clearInterval(planCheckTimer);
+        managerServer.stop().catch(() => {});
         server.close(() => {
           db.close();
           process.exit(0);
@@ -267,7 +305,8 @@ async function handleRequest(
   res: ServerResponse,
   handlers: ReturnType<typeof createAuthHandlers>,
   _db: AuthDB,
-  adminDir: string | undefined
+  adminDir: string | undefined,
+  managerProxy: ManagerProxy
 ): Promise<void> {
   const url = req.url ?? '/';
   const pathname = url.split('?')[0] ?? '/';
@@ -619,6 +658,152 @@ async function handleRequest(
           },
         },
       });
+      return;
+    }
+
+    // ── Manager Proxy Routes ────────────────────────────────────────
+    // The admin frontend calls PG.managerFetch('/api/agents') which maps
+    // to /api/manager/api/agents when MANAGER_URL is not set. These routes
+    // proxy the request to the Manager server and return the response.
+
+    // GET /api/manager/api/overview
+    if (pathname === '/api/manager/api/overview' && req.method === 'GET') {
+      const result = await managerProxy.getOverview();
+      if (result.ok) {
+        sendJson(res, 200, result.data);
+      } else {
+        sendJson(res, 503, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // GET /api/manager/api/agents
+    if (pathname === '/api/manager/api/agents' && req.method === 'GET') {
+      const result = await managerProxy.getAgents();
+      if (result.ok) {
+        sendJson(res, 200, result.data);
+      } else {
+        sendJson(res, 503, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // GET /api/manager/api/agents/:id
+    const managerAgentMatch = pathname.match(/^\/api\/manager\/api\/agents\/([^/]+)$/);
+    if (managerAgentMatch && req.method === 'GET') {
+      const result = await managerProxy.getAgent(managerAgentMatch[1]!);
+      if (result.ok) {
+        sendJson(res, 200, result.data);
+      } else {
+        const status = result.error === 'Manager service unavailable' ? 503 : 404;
+        sendJson(res, status, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // GET /api/manager/api/events
+    if (pathname === '/api/manager/api/events' && req.method === 'GET') {
+      const urlObj = new URL(url, `http://${req.headers.host ?? 'localhost'}`);
+      const limit = parseInt(urlObj.searchParams.get('limit') ?? '50', 10) || 50;
+      const offset = parseInt(urlObj.searchParams.get('offset') ?? '0', 10) || 0;
+      const since = urlObj.searchParams.get('since') ?? undefined;
+
+      const result = await managerProxy.getEvents({ limit, offset, since });
+      if (result.ok) {
+        sendJson(res, 200, result.data);
+      } else {
+        sendJson(res, 503, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // GET /api/manager/api/threats/summary
+    if (pathname === '/api/manager/api/threats/summary' && req.method === 'GET') {
+      const result = await managerProxy.getThreatSummary();
+      if (result.ok) {
+        sendJson(res, 200, result.data);
+      } else {
+        sendJson(res, 503, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // GET /api/manager/api/threats
+    if (pathname === '/api/manager/api/threats' && req.method === 'GET') {
+      const urlObj = new URL(url, `http://${req.headers.host ?? 'localhost'}`);
+      const since = urlObj.searchParams.get('since') ?? undefined;
+
+      const result = await managerProxy.getEvents({ since });
+      if (result.ok) {
+        sendJson(res, 200, result.data);
+      } else {
+        sendJson(res, 503, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // ── Additional Admin Proxy Routes (without /api/manager prefix) ──
+    // These support the routes listed in the task specification.
+
+    // GET /api/admin/agents
+    if (pathname === '/api/admin/agents' && req.method === 'GET') {
+      const result = await managerProxy.getAgents();
+      if (result.ok) {
+        sendJson(res, 200, { ok: true, data: result.data });
+      } else {
+        sendJson(res, 503, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // GET /api/admin/agents/:id
+    const adminAgentMatch = pathname.match(/^\/api\/admin\/agents\/([^/]+)$/);
+    if (adminAgentMatch && req.method === 'GET') {
+      const result = await managerProxy.getAgent(adminAgentMatch[1]!);
+      if (result.ok) {
+        sendJson(res, 200, { ok: true, data: result.data });
+      } else {
+        const status = result.error === 'Manager service unavailable' ? 503 : 404;
+        sendJson(res, status, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // GET /api/admin/events
+    if (pathname === '/api/admin/events' && req.method === 'GET') {
+      const urlObj = new URL(url, `http://${req.headers.host ?? 'localhost'}`);
+      const limit = parseInt(urlObj.searchParams.get('limit') ?? '50', 10) || 50;
+      const offset = parseInt(urlObj.searchParams.get('offset') ?? '0', 10) || 0;
+      const since = urlObj.searchParams.get('since') ?? undefined;
+
+      const result = await managerProxy.getEvents({ limit, offset, since });
+      if (result.ok) {
+        sendJson(res, 200, { ok: true, data: result.data });
+      } else {
+        sendJson(res, 503, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // GET /api/admin/threats
+    if (pathname === '/api/admin/threats' && req.method === 'GET') {
+      const result = await managerProxy.getThreatSummary();
+      if (result.ok) {
+        sendJson(res, 200, { ok: true, data: result.data });
+      } else {
+        sendJson(res, 503, { ok: false, error: result.error });
+      }
+      return;
+    }
+
+    // GET /api/admin/overview
+    if (pathname === '/api/admin/overview' && req.method === 'GET') {
+      const result = await managerProxy.getOverview();
+      if (result.ok) {
+        sendJson(res, 200, { ok: true, data: result.data });
+      } else {
+        sendJson(res, 503, { ok: false, error: result.error });
+      }
       return;
     }
 

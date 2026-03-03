@@ -60,7 +60,7 @@ export default function SecurityContent() {
   return (
     <>
       {/* -- Hero -- */}
-      <section className="relative min-h-[50vh] flex items-center px-6 lg:px-[120px] py-24 border-b border-border overflow-hidden">
+      <section className="relative min-h-[50vh] flex items-center px-6 lg:px-[120px] py-28 border-b border-border overflow-hidden">
         <div className="absolute top-1/3 right-1/4 w-[600px] h-[400px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative">
           <FadeInUp>
@@ -222,6 +222,68 @@ export default function SecurityContent() {
                 {t('disclosure.cta2')}
               </Link>
             </div>
+          </FadeInUp>
+        </div>
+      </SectionWrapper>
+
+      {/* -- Encryption & Audit -- */}
+      <SectionWrapper>
+        <SectionTitle
+          overline={t('encryption.overline')}
+          title={t('encryption.title')}
+          subtitle={t('encryption.subtitle')}
+        />
+        <div className="grid sm:grid-cols-2 gap-6 mt-14 max-w-4xl mx-auto">
+          {([
+            { idx: 0, icon: LockIcon, delay: 0 },
+            { idx: 1, icon: LockIcon, delay: 0.08 },
+            { idx: 2, icon: AnalyticsIcon, delay: 0.16 },
+            { idx: 3, icon: ShieldIcon, delay: 0.24 },
+          ] as const).map((card) => (
+            <FadeInUp key={card.idx} delay={card.delay}>
+              <div className="bg-surface-1 rounded-xl border border-border p-6 h-full">
+                <card.icon className="w-5 h-5 text-brand-sage mb-4" />
+                <p className="text-sm font-bold text-text-primary mb-2">
+                  {t(`encryption.cards.${card.idx}.title`)}
+                </p>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  {t(`encryption.cards.${card.idx}.desc`)}
+                </p>
+              </div>
+            </FadeInUp>
+          ))}
+        </div>
+      </SectionWrapper>
+
+      {/* -- SLA Summary -- */}
+      <SectionWrapper dark>
+        <SectionTitle
+          overline={t('sla.overline')}
+          title={t('sla.title')}
+          subtitle={t('sla.subtitle')}
+        />
+        <div className="max-w-3xl mx-auto mt-14">
+          <FadeInUp>
+            <div className="bg-surface-2 rounded-xl border border-border overflow-hidden">
+              {([0, 1, 2, 3, 4] as const).map((idx) => (
+                <div key={idx} className={`grid grid-cols-3 gap-4 px-6 py-4 ${idx < 4 ? 'border-b border-border' : ''}`}>
+                  <span className="text-sm text-text-primary font-medium">
+                    {t(`sla.items.${idx}.metric`)}
+                  </span>
+                  <span className="text-sm font-bold text-brand-sage text-center">
+                    {t(`sla.items.${idx}.target`)}
+                  </span>
+                  <span className="text-xs text-text-muted text-right">
+                    {t(`sla.items.${idx}.scope`)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </FadeInUp>
+          <FadeInUp delay={0.1}>
+            <p className="text-xs text-text-muted text-center mt-4">
+              {t('sla.note')}
+            </p>
           </FadeInUp>
         </div>
       </SectionWrapper>

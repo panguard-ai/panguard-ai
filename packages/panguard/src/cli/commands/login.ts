@@ -162,7 +162,7 @@ interface CallbackServer {
 
 function startCallbackServer(expectedState: string): Promise<CallbackServer> {
   return new Promise((resolve, reject) => {
-    const settled = false;
+    let settled = false;
     let callbackResolve: (creds: StoredCredentials) => void;
     let callbackReject: (err: Error) => void;
 
@@ -232,6 +232,7 @@ function startCallbackServer(expectedState: string): Promise<CallbackServer> {
         reject(new Error('Failed to start callback server'));
         return;
       }
+      settled = true;
       resolve({
         port: addr.port,
         waitForCallback: async (apiUrl: string) => {
@@ -259,7 +260,10 @@ function startCallbackServer(expectedState: string): Promise<CallbackServer> {
     });
 
     server.on('error', (err) => {
-      if (!settled) reject(err);
+      if (!settled) {
+        settled = true;
+        reject(err);
+      }
     });
   });
 }

@@ -23,6 +23,7 @@ export interface AgentPlatformInfo {
 export interface AgentRegistration {
   readonly agentId: string;
   readonly hostname: string;
+  readonly endpoint: string;
   readonly platform: AgentPlatformInfo;
   readonly version: string;
   readonly registeredAt: string;
@@ -33,6 +34,7 @@ export interface AgentRegistration {
 /** Incoming registration request from a Guard agent / 來自 Guard 代理的登錄請求 */
 export interface AgentRegistrationRequest {
   readonly hostname: string;
+  readonly endpoint: string;
   readonly os: string;
   readonly arch: string;
   readonly version: string;
@@ -170,9 +172,19 @@ export interface ManagerOverview {
   readonly uptimeMs: number;
 }
 
+/** Per-agent policy push result / 單一代理策略推送結果 */
+export interface AgentPushResult {
+  readonly agentId: string;
+  readonly success: boolean;
+  readonly error?: string;
+}
+
 /** Policy broadcast result / 策略廣播結果 */
 export interface PolicyBroadcastResult {
   readonly policyId: string;
   readonly targetAgents: readonly string[];
   readonly queuedAt: string;
+  readonly agentResults?: readonly AgentPushResult[];
+  readonly successCount?: number;
+  readonly failureCount?: number;
 }

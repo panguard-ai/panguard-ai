@@ -86,7 +86,7 @@ export default function ApiDocsPage() {
   return (
     <div className="min-h-screen bg-[#1A1614] text-[#F5F1E8]">
       <div className="mx-auto max-w-4xl px-6 py-16">
-        <h1 className="font-display text-4xl font-bold tracking-tight">API Reference</h1>
+        <h1 className="text-4xl font-bold tracking-tight">API Reference</h1>
         <p className="mt-4 text-lg text-[#A09890]">
           REST API for authentication, billing, usage metering, admin management, and threat
           intelligence.
@@ -139,7 +139,7 @@ export default function ApiDocsPage() {
         <div className="mt-12 space-y-12">
           {API_SECTIONS.map((section) => (
             <section key={section.tag}>
-              <h2 className="font-display text-2xl font-semibold">{section.tag}</h2>
+              <h2 className="text-2xl font-semibold">{section.tag}</h2>
               <p className="mt-1 text-sm text-[#A09890]">{section.description}</p>
               <div className="mt-4 space-y-2">
                 {section.endpoints.map((ep) => (

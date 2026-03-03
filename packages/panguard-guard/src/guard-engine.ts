@@ -63,6 +63,7 @@ import {
 } from '@panguard-ai/security-hardening';
 import { FalcoMonitor } from './monitors/falco-monitor.js';
 import { SuricataMonitor } from './monitors/suricata-monitor.js';
+import { LogCollector } from './collectors/index.js';
 import { BUILTIN_RULES } from './rules/builtin-rules.js';
 import { PanguardAgentClient } from './agent-client/index.js';
 import type { AgentHeartbeat } from './agent-client/index.js';
@@ -225,6 +226,7 @@ export class GuardEngine {
   private falcoMonitor: FalcoMonitor | null = null;
   private suricataMonitor: SuricataMonitor | null = null;
   private agentClient: PanguardAgentClient | null = null;
+  private logCollector: LogCollector | null = null;
 
   // YARA scanner / YARA 掃描器
   private readonly yaraScanner: YaraScanner;
@@ -480,6 +482,18 @@ export class GuardEngine {
       logger.info('Suricata network IDS monitoring active');
     }
 
+    // Start log collector if configured / 啟動日誌收集器（如已配置）
+    if (this.config.monitors.logCollector?.enabled) {
+      const lcConfig = this.config.monitors.logCollector;
+      this.logCollector = new LogCollector({
+        filePaths: lcConfig.filePaths,
+        syslogUdp: lcConfig.syslogPort ? { port: lcConfig.syslogPort } : undefined,
+      });
+      this.logCollector.on('event', (event) => void this.processEvent(event));
+      this.logCollector.start();
+      logger.info('Log collector active / 日誌收集器已啟動');
+    }
+
     // Start agent client if manager URL is configured (distributed mode)
     // 如有設定 Manager URL 則啟動 Agent 客戶端（分散式模式）
     if (this.config.managerUrl) {
@@ -584,6 +598,10 @@ export class GuardEngine {
       this.suricataMonitor.stop();
       this.suricataMonitor = null;
     }
+    if (this.logCollector) {
+      this.logCollector.stop();
+      this.logCollector = null;
+    }
     if (this.agentClient) {
       this.agentClient.stopHeartbeat();
       this.agentClient = null;
@@ -658,11 +676,16 @@ export class GuardEngine {
       const detection = this.detectAgent.detect(event);
 
       if (!detection) {
-        // No threat detected - still update baseline in learning mode
-        // 未偵測到威脅 - 學習模式下仍更新基線
+        // No threat detected - update baseline based on mode
+        // 未偵測到威脅 - 根據模式更新基線
         if (this.mode === 'learning') {
           const { updateBaseline } = await import('./memory/baseline.js');
           this.baseline = updateBaseline(this.baseline, event);
+        } else {
+          // Protection mode: continuous baseline update for benign non-detections
+          // 防護模式：對良性非偵測事件進行持續基線更新
+          const { continuousBaselineUpdate } = await import('./memory/baseline.js');
+          this.baseline = continuousBaselineUpdate(this.baseline, event, 'benign');
         }
         return;
       }
@@ -859,6 +882,74 @@ export class GuardEngine {
    */
   setEventCallback(cb: (type: string, data: Record<string, unknown>) => void): void {
     this.eventCallback = cb;
+  }
+
+  /**
+   * Apply a policy update by iterating over its rules and dispatching
+   * each to the appropriate agent method.
+   * 套用策略更新，遍歷其規則並分派給適當的代理方法。
+   *
+   * Supported rule types:
+   * - block_ip: calls respondAgent.addBlockedIP(condition.ip)
+   * - alert_threshold: calls respondAgent.updateActionPolicy({ autoRespond, notifyAndWait })
+   * - auto_respond: calls respondAgent.updateActionPolicy({ autoRespond: 90 | 100 })
+   * Other rule types are silently ignored.
+   */
+  private applyPolicy(policy: { rules: Array<{ type: string; condition: Record<string, unknown>; action: string; description: string }> }): void {
+    for (const rule of policy.rules) {
+      switch (rule.type) {
+        case 'block_ip': {
+          const ip = rule.condition['ip'] as string | undefined;
+          if (ip) {
+            void this.respondAgent.addBlockedIP(ip);
+          }
+          break;
+        }
+        case 'alert_threshold': {
+          const updates: Partial<import('./types.js').ActionPolicy> = {};
+          if (typeof rule.condition['autoRespond'] === 'number') {
+            updates.autoRespond = rule.condition['autoRespond'] as number;
+          }
+          if (typeof rule.condition['notifyAndWait'] === 'number') {
+            updates.notifyAndWait = rule.condition['notifyAndWait'] as number;
+          }
+          if (Object.keys(updates).length > 0) {
+            this.respondAgent.updateActionPolicy(updates);
+          }
+          break;
+        }
+        case 'auto_respond': {
+          const enabled = rule.condition['enabled'] as boolean | undefined;
+          if (enabled === true) {
+            this.respondAgent.updateActionPolicy({ autoRespond: 90 });
+          } else if (enabled === false) {
+            this.respondAgent.updateActionPolicy({ autoRespond: 100 });
+          }
+          break;
+        }
+        default:
+          // Unknown rule type: silently ignore
+          break;
+      }
+    }
+  }
+
+  /**
+   * Poll the Manager for a policy update.
+   * Does nothing if the agent client is not registered.
+   * 向 Manager 輪詢策略更新。若代理客戶端未登錄則不執行任何操作。
+   */
+  private async pollPolicy(): Promise<void> {
+    if (!this.agentClient) return;
+    // agentClient.pollPolicy is invoked here when registered
+    // (implementation detail: agentClient may provide this method)
+    try {
+      if (typeof (this.agentClient as unknown as { pollPolicy?: () => Promise<void> }).pollPolicy === 'function') {
+        await (this.agentClient as unknown as { pollPolicy: () => Promise<void> }).pollPolicy();
+      }
+    } catch (err: unknown) {
+      logger.warn(`Policy poll failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   /**

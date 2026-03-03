@@ -13,6 +13,7 @@ import type {
 function makeRequest(overrides?: Partial<AgentRegistrationRequest>): AgentRegistrationRequest {
   return {
     hostname: 'test-server-01',
+    endpoint: 'http://192.168.1.100:8080',
     os: 'Linux 6.1.0',
     arch: 'x64',
     version: '1.0.0',

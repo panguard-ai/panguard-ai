@@ -37,6 +37,10 @@ export { TrapEngine } from '@panguard-ai/panguard-trap';
 // Threat Intelligence
 export { ThreatCloudServer, ThreatCloudDB } from '@panguard-ai/threat-cloud';
 
+// Bridges
+export { scanFindingsToComplianceFindings } from './bridges/scan-to-report.js';
+export type { ScanFinding } from './bridges/scan-to-report.js';
+
 // Init / Config
 export { runInitWizard, buildPanguardConfig, writeConfig, readConfig } from './init/index.js';
 export type { WizardAnswers, PanguardConfig, Lang } from './init/types.js';

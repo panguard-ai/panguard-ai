@@ -42,10 +42,11 @@ export async function runCLI(args: string[]): Promise<void> {
   const command = args[0] ?? 'help';
   const dataDir = extractOption(args, '--data-dir') ?? DEFAULT_DATA_DIR;
   const verbose = args.includes('--verbose');
+  const managerUrl = extractOption(args, '--manager');
 
   switch (command) {
     case 'start':
-      await commandStart(dataDir, verbose);
+      await commandStart(dataDir, verbose, managerUrl);
       break;
     case 'stop':
       commandStop(dataDir);
@@ -82,7 +83,7 @@ export async function runCLI(args: string[]): Promise<void> {
 }
 
 /** Start the guard engine / 啟動守護引擎 */
-async function commandStart(dataDir: string, verbose = false): Promise<void> {
+async function commandStart(dataDir: string, verbose = false, managerUrl?: string): Promise<void> {
   // Default quiet mode: suppress structured JSON logs
   if (!verbose) {
     setLogLevel('silent');
@@ -98,6 +99,12 @@ async function commandStart(dataDir: string, verbose = false): Promise<void> {
 
   const sp = spinner('Starting PanguardGuard...');
   const config = loadConfig(join(dataDir, 'config.json'));
+
+  // Pass --manager URL to config for distributed architecture
+  if (managerUrl) {
+    config.managerUrl = managerUrl;
+  }
+
   const engine = new GuardEngine(config);
 
   const shutdown = async () => {
@@ -303,6 +310,9 @@ function printHelp(): void {
   );
   console.log(
     `  ${c.sage('--verbose'.padEnd(22))} Show all event logs ${c.dim('(default: quiet mode)')}`
+  );
+  console.log(
+    `  ${c.sage('--manager <url>'.padEnd(22))} Manager URL for distributed mode`
   );
   console.log(`  ${c.sage('--license-key <key>'.padEnd(22))} License key for install-script`);
   console.log('');

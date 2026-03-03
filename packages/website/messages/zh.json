@@ -118,6 +118,7 @@
     "compliance": "合規",
     "integrations": "整合",
     "documentation": "技術文件",
+    "cliReference": "CLI 參考文件",
     "apiReference": "API 文件",
     "blog": "部落格",
     "resourceCenter": "資源中心",
@@ -144,15 +145,17 @@
     "hero": {
       "eyebrow": "資安新時代",
       "title": "資安，不再是特權。",
-      "subtitle": "一行指令，讓每個開發者、每間小公司都擁有企業級防護。",
+      "subtitle": "為請不起資安團隊的開發者和中小企業而生 -- 一行指令，60 秒內獲得企業級防護。",
       "boldLine": "開源｜AI 驅動｜免費起步",
+      "tryScan": "免費掃描",
+      "bookDemo": "預約 Demo",
       "getStarted": "立即開始",
       "github": "GitHub",
       "copied": "已複製!",
       "prereq": "",
       "badges": {
         "mit": "MIT 開源授權",
-        "tests": "1,420 項測試通過",
+        "tests": "2,992 項測試通過",
         "taiwan": "台灣製造"
       }
     },
@@ -306,7 +309,7 @@
             "desc": "從實戰自動鍛造偵測規則"
           }
         ],
-        "footer": "5 個角色 · 6 個產品 · 1 行指令 · 免費開始"
+        "footer": "5 個角色 · 7 個產品 · 1 行指令 · 免費開始"
       },
       "funnel": {
         "title": "90% 的威脅，根本不需要 AI。",
@@ -392,7 +395,7 @@
         "subtitle": "因為資安不該有門檻。",
         "desc": "MIT 授權，完整原始碼，零黑箱。每一行 code 都經得起檢驗。",
         "belief": "要真正打破資安壁壘，不是把價格壓低，而是讓所有人都能參與。",
-        "proof": "1,420 項測試 · TypeScript strict mode · MIT 授權——這不是業餘專案，這是基礎建設。"
+        "proof": "2,992 項測試 · TypeScript strict mode · MIT 授權——這不是業餘專案，這是基礎建設。"
       }
     },
     "the3amStory": {
@@ -547,7 +550,7 @@
         },
         "security": {
           "title": "安全優先",
-          "desc": "1,420 項測試通過。Strict TypeScript。ESLint 安全插件。憑證加密儲存。沙箱執行。"
+          "desc": "2,992 項測試通過。Strict TypeScript。ESLint 安全插件。憑證加密儲存。沙箱執行。"
         },
         "privacy": {
           "title": "隱私優先",
@@ -637,7 +640,7 @@
         },
         "3": {
           "name": "全部組合",
-          "controls": "216 控制項",
+          "controls": "50 控制項",
           "price": "NT$29,970",
           "market": "一般顧問費用：數百萬",
           "badge": "省 33%"
@@ -648,6 +651,53 @@
       "disclaimer": "準備度評估 ≠ 正式認證。報告協助你了解合規差距，為正式稽核做準備。",
       "priceNote": "以上價格均為新台幣。"
     },
+    "whyNow": {
+      "title": "為什麼是現在",
+      "subtitle": "威脅環境已經改變，過去的做法不再有效。",
+      "card1": {
+        "title": "AI Agent 全面擴散",
+        "desc": "每個開發者都在部署 AI 生成的程式碼，帶來傳統工具無法偵測的新攻擊面。"
+      },
+      "card2": {
+        "title": "中小企業安全缺口",
+        "desc": "43% 的網路攻擊瞄準中小企業，但市面上沒有任何 50 人以下團隊負擔得起的工具。"
+      },
+      "card3": {
+        "title": "合規壓力上升",
+        "desc": "資通安全法、GDPR、SOC 2 等法規要求正在擴展到更小規模的企業。"
+      }
+    },
+    "whyUs": {
+      "title": "為什麼選我們",
+      "subtitle": "從第一天就走不同的路。",
+      "card1": {
+        "title": "本地優先 AI",
+        "desc": "AI 在你的機器上執行。零遙測。你的資料永遠不會離開你的基礎架構。"
+      },
+      "card2": {
+        "title": "開源",
+        "desc": "MIT 授權。每一行程式碼可審計。無供應商鎖定。沒有黑箱。"
+      },
+      "card3": {
+        "title": "CLI 優先",
+        "desc": "一行指令安裝。原生 CI/CD 整合。不需要 GUI。"
+      },
+      "card4": {
+        "title": "Threat Cloud 網路效應",
+        "desc": "每次部署都透過匿名化威脅情報分享，強化所有人的偵測能力。"
+      }
+    },
+    "traction": {
+      "title": "為正式環境而生",
+      "subtitle": "來自真實程式碼庫的真實數字。沒有虛榮指標。",
+      "note": "想了解更多指標？聯繫我們取得部署數據與客戶案例。",
+      "tests": "測試通過",
+      "rules": "偵測規則",
+      "cli": "CLI 指令",
+      "products": "產品模組",
+      "mcp": "MCP 工具",
+      "license": "授權"
+    },
     "finalCta": {
       "title": "你部署，我們防守。",
       "subtitle": "一行指令安裝，免費版就有完整掃描。不用帳號、不用信用卡、不用跟業務講電話。",
@@ -655,8 +705,11 @@
       "btnGetStarted": "免費掃描我的伺服器",
       "btnGithub": "GitHub",
       "btnDocs": "技術文件",
+      "btnScan": "開始免費掃描",
+      "btnDemo": "預約 Demo",
+      "btnSales": "聯絡業務",
       "badge1": "MIT 開源授權",
-      "badge2": "1,420 測試通過",
+      "badge2": "2,992 測試通過",
       "badge3": "台灣製造"
     }
   },
@@ -1101,7 +1154,7 @@
       "title": "嚴謹打造",
       "stats": [
         {
-          "value": "1,420",
+          "value": "2,992",
           "label": "測試通過"
         },
         {
@@ -1117,11 +1170,11 @@
           "label": "產品"
         },
         {
-          "value": "25",
+          "value": "19",
           "label": "CLI 指令"
         },
         {
-          "value": "216",
+          "value": "50",
           "label": "合規控制項"
         },
         {
@@ -1231,16 +1284,24 @@
           "核心平台（Scan + Guard + Chat + Trap + Report）",
           "Threat Cloud v1",
           "3,155條 Sigma + 5,895 條 YARA 規則",
-          "1,420 個自動化測試"
+          "2,992 個自動化測試"
         ]
       },
       "inProgress": {
         "title": "進行中",
-        "items": ["Web 儀表板 UI", "Windows 支援", "Kubernetes 整合"]
+        "items": [
+          "Web 儀表板 UI",
+          "Windows 支援",
+          "Kubernetes 整合"
+        ]
       },
       "planned": {
         "title": "規劃中",
-        "items": ["行動 App（iOS/Android）", "Threat Cloud API v2", "偵測規則社群市集"]
+        "items": [
+          "行動 App（iOS/Android）",
+          "Threat Cloud API v2",
+          "偵測規則社群市集"
+        ]
       }
     },
     "cta": {
@@ -1269,7 +1330,7 @@
     },
     "productOverview": {
       "title": "產品總覽",
-      "description": "五大 AI 安全產品，一個平台。Scan、Guard、Chat、Trap 和 Report -- 從免費 60 秒稽核到完整企業合規。"
+      "description": "七大 AI 安全產品，一個平台。Scan、Guard、Chat、Trap、Report、MCP 和 Code Scanner -- 從免費 60 秒稽核到完整企業合規。"
     },
     "productScan": {
       "title": "Panguard Scan",
@@ -1466,11 +1527,15 @@
     "guarantee": "所有付費方案享 14 天免費試用。不需信用卡。",
     "checkoutUnavailable": "結帳服務暫時無法使用，請稍後再試。",
     "connectionError": "無法連線，請檢查你的網路連線後重試。",
+    "bestFor": "最適合：",
+    "whenToUpgrade": "升級時機：",
     "plans": {
       "community": {
         "name": "Community 社群版",
         "audience": "開源。永久免費。",
         "machines": "1 台機器",
+        "bestFor": "Side project、個人伺服器、學習資安基礎。",
+        "upgrade": "你需要自動修復、AI 防禦或多機器支援時。",
         "features": [
           "完整安全掃描（無限次）",
           "PDF 報告含風險評分",
@@ -1485,6 +1550,8 @@
         "name": "Solo 個人版",
         "audience": "個人開發者與自由工作者",
         "machines": "最多 3 台機器",
+        "bestFor": "經營 1-3 台正式環境伺服器的自由工作者與獨立開發者。",
+        "upgrade": "你新增第 4 台機器或需要合規報告時。",
         "features": [
           "Community 所有功能",
           "三層 AI 防禦（Layer 1+2+3）",
@@ -1499,6 +1566,8 @@
         "name": "Pro 專業版",
         "audience": "團隊與成長中的企業",
         "machines": "最多 10 台機器",
+        "bestFor": "需要合規報告和進階威脅偵測的成長型團隊。",
+        "upgrade": "你超過 10 台機器或需要 SSO/SIEM 整合時。",
         "features": [
           "Solo 所有功能",
           "Trap（蜜罐系統）",
@@ -1513,6 +1582,8 @@
         "name": "Business 商業版",
         "audience": "組織與企業",
         "machines": "最多 25 台機器",
+        "bestFor": "需要企業級控管、SSO 及專屬支援的組織。",
+        "upgrade": "你超過 25 台機器時 -- 聯繫我們取得 Enterprise 報價。",
         "features": [
           "Pro 所有功能",
           "客製 AI 模型",
@@ -1667,9 +1738,9 @@
   "product": {
     "overview": {
       "overline": "平台",
-      "title": "五大產品，一個使命：",
+      "title": "七大產品，一個使命：",
       "titleHighlight": "讓安全變得無形。",
-      "subtitle": "從免費掃描開始，擴展至 24/7 AI 防護、智慧蜜罐和自動合規 -- 全部透過一行指令安裝的單一平台。",
+      "subtitle": "從免費掃描開始，擴展至 24/7 AI 防護、智慧蜜罐、自動合規、SAST 程式碼掃描和 MCP 整合 -- 全部透過一行指令安裝的單一平台。",
       "products": {
         "scan": {
           "name": "Panguard Scan",
@@ -1695,6 +1766,16 @@
           "name": "Panguard Report",
           "tagline": "免顧問的合規報告。",
           "badge": "合規"
+        },
+        "mcp": {
+          "name": "MCP 伺服器",
+          "tagline": "從 AI 助手控制 Panguard。",
+          "badge": "整合"
+        },
+        "sast": {
+          "name": "程式碼掃描器",
+          "tagline": "在原始碼中找出漏洞。",
+          "badge": "SAST"
         }
       },
       "capabilities": "核心能力",
@@ -1825,6 +1906,22 @@
         "item6": {
           "title": "整合適配器",
           "desc": "預建 Windows Defender、Syslog 和 Wazuh 適配器。7 天學習期為你的系統建立行為基線。支援 Linux、macOS、Windows、Docker 和 Kubernetes。"
+        },
+        "item7": {
+          "title": "SOAR 劇本",
+          "desc": "以 YAML 定義自動回應策略。內建三個劇本：暴力破解、埠掃描和資料外洩。匹配關聯模式、升級為工單，並執行多步驟回應序列。"
+        },
+        "item8": {
+          "title": "日誌收集器",
+          "desc": "從 syslog（RFC 3164/5424）、認證日誌和自訂日誌檔案中收集安全事件。四個內建解析器，支援自動格式偵測。事件直接進入偵測管線。"
+        },
+        "item9": {
+          "title": "異常評分",
+          "desc": "Welford 線上演算法為每個指標建立統計基線。Z-score 偏差偵測無需手動調整閾值即可識別異常。持續適應您的環境。"
+        },
+        "item10": {
+          "title": "調查引擎",
+          "desc": "動態推理搭配 8 種調查工具：IP 歷史、使用者權限、時間異常、地理位置、相關事件、程序樹、檔案信譽和網路模式。AI 產生調查計畫並收集證據。"
         }
       },
       "install": {
@@ -2222,7 +2319,14 @@
       },
       "workflow": {
         "title": "適合你的工作流",
-        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "一行指令保護你的技術棧",
@@ -2283,7 +2387,13 @@
       },
       "integrations": {
         "title": "你團隊已在使用的整合",
-        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
+        "tools": [
+          "Slack",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "今天就保護你的企業",
@@ -2408,7 +2518,14 @@
       "stack": "例如 CrowdStrike、Cloudflare、自訂腳本...",
       "message": "告訴我們你的安全目標或任何具體問題..."
     },
-    "teamSizes": ["只有我", "2-10", "11-50", "51-200", "201-500", "500+"],
+    "teamSizes": [
+      "只有我",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
     "submit": "預約示範",
     "submitting": "提交中...",
     "error": "提交失敗，請再試一次。",
@@ -2589,7 +2706,12 @@
       "inquiryType": "選擇類型",
       "message": "我們能如何幫助你？"
     },
-    "inquiryTypes": ["業務", "技術支援", "合作夥伴", "其他"],
+    "inquiryTypes": [
+      "業務",
+      "技術支援",
+      "合作夥伴",
+      "其他"
+    ],
     "submit": "發送訊息",
     "submitting": "發送中...",
     "successTitle": "訊息已發送。",
@@ -2873,6 +2995,65 @@
       },
       "updateNote": "最後更新：2026 年 2 月。我們在新增次處理者前至少 30 天通知客戶。透過你的帳戶儀表板訂閱更新。"
     },
+    "dataRetention": {
+      "overline": "資料生命週期",
+      "title": "資料保留政策",
+      "subtitle": "明確的政策說明我們儲存什麼資料以及保留多久。",
+      "items": {
+        "0": {
+          "category": "安全事件",
+          "period": "90 天",
+          "desc": "偵測事件、警報和回應日誌儲存在你的端點本地。"
+        },
+        "1": {
+          "category": "基線資料",
+          "period": "持續",
+          "desc": "環境基線持續更新。新學習期開始時替換。"
+        },
+        "2": {
+          "category": "威脅雲提交",
+          "period": "1 年",
+          "desc": "僅匿名化威脅簽名。無 PII、無原始碼、無原始日誌。"
+        },
+        "3": {
+          "category": "帳戶資料",
+          "period": "使用中 + 30 天",
+          "desc": "帳戶使用期間保留電子郵件和帳單資訊，取消後 30 天刪除。"
+        },
+        "4": {
+          "category": "掃描報告",
+          "period": "30 天",
+          "desc": "PDF 報告儲存在本地。雲端副本（如有）30 天後自動刪除。"
+        }
+      }
+    },
+    "incidentResponse": {
+      "overline": "事件回應",
+      "title": "安全事件流程",
+      "subtitle": "我們對出問題時保持透明的承諾。",
+      "steps": {
+        "0": {
+          "phase": "偵測",
+          "sla": "< 1 小時",
+          "desc": "自動監控偵測異常。值班工程師收到警報。"
+        },
+        "1": {
+          "phase": "評估",
+          "sla": "< 4 小時",
+          "desc": "嚴重程度分類。識別受影響用戶。啟動遏制措施。"
+        },
+        "2": {
+          "phase": "通知",
+          "sla": "< 24 小時",
+          "desc": "透過電子郵件通知受影響客戶。更新狀態頁面。如有需要通報監管機構。"
+        },
+        "3": {
+          "phase": "修復",
+          "sla": "< 72 小時",
+          "desc": "找出根本原因並修復。部署修補程式。發布事後檢討報告。"
+        }
+      }
+    },
     "cta": {
       "title": "需要合規文件？",
       "desc": "申請 SOC 2 報告、滲透測試摘要、資料處理協議，或與我們團隊安排安全深度交流。企業客戶優先取得所有合規文件。",
@@ -2992,6 +3173,62 @@
       "desc2": "我們承諾在 24 小時內確認收到報告，72 小時內提供初步評估。",
       "cta1": "揭露政策",
       "cta2": "security@panguard.ai"
+    },
+    "encryption": {
+      "overline": "加密",
+      "title": "加密與稽核日誌",
+      "subtitle": "我們如何保護靜態、傳輸中的資料，以及追蹤每次存取。",
+      "cards": {
+        "0": {
+          "title": "傳輸中資料",
+          "desc": "所有 API 通訊使用 TLS 1.3。威脅雲連線使用憑證釘選。強制 HTTPS 並啟用 HSTS。"
+        },
+        "1": {
+          "title": "靜態資料",
+          "desc": "憑證儲存使用 AES-256 加密。組態檔案限制權限（0600）。基線資料儲存在本地，永不傳輸。"
+        },
+        "2": {
+          "title": "稽核日誌",
+          "desc": "每個偵測、回應動作和組態變更都記錄時間戳、來源和操作者。日誌儲存在本地，可選擇 syslog 轉發。"
+        },
+        "3": {
+          "title": "權限模型",
+          "desc": "盡可能以非特權使用者執行。僅網路監控和 IP 封鎖需要 root 權限。掃描操作在沙箱中執行。"
+        }
+      }
+    },
+    "sla": {
+      "overline": "服務等級",
+      "title": "SLA 摘要",
+      "subtitle": "我們對企業客戶的承諾。",
+      "items": {
+        "0": {
+          "metric": "威脅雲 API 可用性",
+          "target": "99.9%",
+          "scope": "企業方案"
+        },
+        "1": {
+          "metric": "嚴重弱點回應",
+          "target": "< 24 小時",
+          "scope": "所有方案"
+        },
+        "2": {
+          "metric": "安全事件通知",
+          "target": "< 24 小時",
+          "scope": "所有方案"
+        },
+        "3": {
+          "metric": "支援回應（企業）",
+          "target": "< 4 小時",
+          "scope": "企業方案"
+        },
+        "4": {
+          "metric": "支援回應（專業）",
+          "target": "< 24 小時",
+          "scope": "專業方案"
+        }
+      },
+      "note": "完整 SLA 條款請見企業合約。詳情請聯繫銷售團隊。"
     },
     "trustCenter": {
       "overline": "信任中心",
@@ -3225,6 +3462,22 @@
       "item10": {
         "name": "Prometheus",
         "desc": "指標與警報"
+      },
+      "item11": {
+        "name": "MCP 協議",
+        "desc": "用於 AI 助手整合的模型上下文協議"
+      },
+      "item12": {
+        "name": "Semgrep",
+        "desc": "SAST 程式碼靜態分析"
+      },
+      "item13": {
+        "name": "SOAR 引擎",
+        "desc": "以 YAML 劇本實現安全協調"
+      },
+      "item14": {
+        "name": "Welford 演算法",
+        "desc": "線上統計異常偵測"
       }
     },
     "defenseStack": {
@@ -3439,6 +3692,14 @@
         "title": "API 文件",
         "desc": "RESTful API，附完整端點文件和程式碼範例。",
         "link": "API 文件"
+      },
+      "cliRef": {
+        "title": "CLI 參考文件",
+        "desc": "完整的 21 個 CLI 命令參考，包含旗標、範例和所需方案等級。"
+      },
+      "benchmark": {
+        "title": "效能基準與限制",
+        "desc": "效能指標、偵測延遲、資源消耗，以及 Panguard 不做的事情。"
       }
     },
     "productDocs": {
@@ -3631,6 +3892,257 @@
       "tip4": "用 panguard chat config 設定統一的告警頻道（如一個 Slack channel）",
       "backToGettingStarted": "快速入門",
       "goToAdvancedSetup": "進階設定"
+    },
+    "benchmark": {
+      "backToDocs": "< 返回技術文件",
+      "title": "效能基準與能力邊界",
+      "subtitle": "透明的效能數據、資源使用情況，以及 Panguard AI 能做和不能做的誠實說明。",
+      "testMethodology": "測試方法論",
+      "methodLabel": {
+        "framework": "框架",
+        "testFiles": "測試檔案",
+        "testCases": "測試案例",
+        "coverage": "覆蓋範圍",
+        "ci": "CI"
+      },
+      "methodValue": {
+        "framework": "Vitest",
+        "testFiles": "140",
+        "testCases": "2,992",
+        "coverage": "單元測試 + 整合測試",
+        "ci": "每次提交自動執行"
+      },
+      "detectionPerformance": "偵測效能",
+      "metric": "指標",
+      "latency": "延遲",
+      "perf": {
+        "0": {
+          "name": "規則比對（Sigma / YARA）",
+          "latency": "< 50 ms"
+        },
+        "1": {
+          "name": "本地 AI 分析（Ollama）",
+          "latency": "< 200 ms"
+        },
+        "2": {
+          "name": "雲端 AI 分析（Claude / GPT）",
+          "latency": "1 - 3 s"
+        },
+        "3": {
+          "name": "事件關聯分析",
+          "latency": "< 100 ms"
+        },
+        "4": {
+          "name": "基線偏差檢查",
+          "latency": "< 10 ms"
+        },
+        "5": {
+          "name": "SAST 掃描（每個檔案）",
+          "latency": "< 500 ms"
+        }
+      },
+      "fpControl": "誤報控制",
+      "fp": {
+        "0": "7 天學習基線期",
+        "1": "Welford 線上演算法進行統計異常偵測",
+        "2": "基於 Z-score 的偏差評分",
+        "3": "可配置的信心閾值（autoRespond: 85, notify: 50, logOnly: 0）",
+        "4": "多代理驗證流水線（偵測 -> 分析 -> 回應 -> 報告）"
+      },
+      "resourceConsumption": "資源消耗",
+      "resource": {
+        "0": {
+          "name": "CPU",
+          "value": "監控期間（閒置）< 2%"
+        },
+        "1": {
+          "name": "RAM",
+          "value": "約 50 MB 基本記憶體佔用"
+        },
+        "2": {
+          "name": "磁碟",
+          "value": "約 100 MB（規則 + 基線資料）"
+        },
+        "3": {
+          "name": "網路",
+          "value": "極少（僅在啟用 Threat Cloud 上傳時使用）"
+        }
+      },
+      "whatWeDontDo": {
+        "title": "我們不做的事",
+        "subtitle": "透明度建立信任。以下是目前 Panguard AI 平台的明確邊界，讓您做出知情決策。"
+      },
+      "boundaries": {
+        "0": {
+          "title": "不是 WAF（Web 應用程式防火牆）",
+          "desc": "我們監控端點，而非 HTTP 流量。"
+        },
+        "1": {
+          "title": "不是完整的 SIEM 替代品",
+          "desc": "我們補充企業 SIEM，而非取代它。"
+        },
+        "2": {
+          "title": "不是 DLP（資料外洩防護）解決方案",
+          "desc": "我們的重點是威脅偵測，而非資料分類。"
+        },
+        "3": {
+          "title": "需要 Node.js 20+ 執行環境",
+          "desc": "不支援較舊的執行環境。"
+        },
+        "4": {
+          "title": "未安裝 Semgrep CLI 時，SAST 使用正則表達式回退",
+          "desc": "安裝 Semgrep 以獲得完整的靜態分析覆蓋。"
+        },
+        "5": {
+          "title": "雲端 AI 功能需要 API 金鑰和網路連線",
+          "desc": "提供純本地模式，但 AI 能力會有所降低。"
+        },
+        "6": {
+          "title": "Windows 支援目前為 Beta 版",
+          "desc": "macOS 和 Linux 已可用於生產環境；Windows 正在積極開發中。"
+        },
+        "7": {
+          "title": "無核心層級監控（僅使用者空間）",
+          "desc": "我們完全在使用者空間中運作，以確保安全性和可攜性。"
+        }
+      },
+      "cta": {
+        "title": "準備好親自體驗了嗎？",
+        "subtitle": "從免費掃描開始，或瀏覽完整技術文件。",
+        "getStarted": "開始使用",
+        "docs": "技術文件"
+      }
+    },
+    "cli": {
+      "backToDocs": "返回技術文件",
+      "title": "CLI 參考文件",
+      "subtitle": "Panguard CLI 完整命令參考。涵蓋掃描、即時防護、蜜罐、合規報告和系統工具等 6 大類別共 21 個命令。",
+      "installTitle": "安裝 CLI：",
+      "categories": {
+        "scanning": {
+          "title": "掃描",
+          "desc": "弱點掃描和靜態分析"
+        },
+        "protection": {
+          "title": "防護",
+          "desc": "即時 AI 防護守護程序"
+        },
+        "chat": {
+          "title": "聊天",
+          "desc": "團隊通知整合"
+        },
+        "honeypots": {
+          "title": "蜜罐",
+          "desc": "以欺騙手段偵測威脅"
+        },
+        "reporting": {
+          "title": "報告",
+          "desc": "合規與稽核報告"
+        },
+        "system": {
+          "title": "系統",
+          "desc": "設定、認證和診斷"
+        }
+      },
+      "options": "選項",
+      "example": "範例",
+      "beta": "Beta",
+      "ga": "GA",
+      "needHelp": "需要協助？",
+      "needHelpDesc": "執行 panguard doctor 診斷問題，或聯繫我們的支援團隊。",
+      "contactSupport": "聯繫支援",
+      "gettingStarted": "快速入門指南",
+      "commands": {
+        "scan": {
+          "desc": "對目前端點執行安全弱點掃描。檢查網路、程序、檔案系統和組態設定。",
+          "flags": {
+            "json": "以 JSON 格式輸出結果",
+            "output": "將結果寫入檔案",
+            "verbose": "顯示詳細掃描進度",
+            "lang": "報告語言（en、zh-TW、ja）",
+            "config": "自訂掃描組態檔路徑"
+          }
+        },
+        "scanCode": {
+          "desc": "對原始碼執行 SAST（靜態應用安全測試）。偵測 SQL 注入、XSS、寫死的密鑰和不安全的程式碼模式。",
+          "flags": {
+            "dir": "要掃描的目錄",
+            "lang": "原始碼語言（js、ts、py、go、java 等）",
+            "json": "以 JSON 格式輸出結果",
+            "failOn": "當發現項目達到嚴重度等級時以非零狀態碼結束（low、medium、high、critical）",
+            "output": "將結果寫入檔案"
+          }
+        },
+        "code": {
+          "desc": "scan code 的別名。以相同的旗標和行為執行 SAST 原始碼掃描。",
+          "flags": {
+            "dir": "要掃描的目錄",
+            "lang": "原始碼語言",
+            "json": "以 JSON 格式輸出結果",
+            "failOn": "達到嚴重度門檻時以非零狀態碼結束",
+            "output": "將結果寫入檔案"
+          }
+        },
+        "guardStart": {
+          "desc": "啟動即時防護守護程序。使用 AI 行為分析監控程序、網路流量和檔案系統變更。",
+          "flags": {
+            "mode": "防護模式：passive（僅告警）或 active（封鎖威脅）",
+            "verbose": "啟用詳細記錄",
+            "dashboardPort": "本地儀表板連接埠"
+          }
+        },
+        "guardStop": {
+          "desc": "優雅地停止正在運行的防護守護程序。"
+        },
+        "guardStatus": {
+          "desc": "顯示目前防護狀態、運行時間和資源使用情況。"
+        },
+        "guardEvents": {
+          "desc": "顯示防護守護程序偵測到的近期安全事件。"
+        },
+        "chatConnect": {
+          "desc": "連接團隊聊天頻道以接收即時安全通知。支援 Slack、Discord、Telegram 和 LINE。"
+        },
+        "chatDisconnect": {
+          "desc": "斷開先前連接的聊天頻道。"
+        },
+        "chatStatus": {
+          "desc": "顯示目前聊天整合狀態和已連接的頻道。"
+        },
+        "trapDeploy": {
+          "desc": "部署蜜罐服務以偵測未授權存取。支援 SSH、HTTP、FTP、SMTP、DNS、MySQL、Redis 和 Telnet 協定。"
+        },
+        "trapStatus": {
+          "desc": "顯示已部署蜜罐服務的狀態和活動。"
+        },
+        "trapRemove": {
+          "desc": "移除已部署的蜜罐服務。"
+        },
+        "reportGenerate": {
+          "desc": "產生合規報告。支援 ISO 27001、SOC 2 和 TCSA 框架。"
+        },
+        "reportList": {
+          "desc": "列出所有先前產生的合規報告。"
+        },
+        "init": {
+          "desc": "在目前目錄初始化 Panguard 組態。建立 panguard.yaml 組態檔。"
+        },
+        "deploy": {
+          "desc": "將 Panguard agent 部署到遠端伺服器或叢集。"
+        },
+        "login": {
+          "desc": "驗證 Panguard Cloud 身份。開啟瀏覽器進行 OAuth 或接受 API 金鑰。"
+        },
+        "logout": {
+          "desc": "登出並清除已儲存的憑證。"
+        },
+        "status": {
+          "desc": "顯示整體系統狀態，包括 guard、traps 和雲端連線。"
+        },
+        "doctor": {
+          "desc": "診斷安裝狀態、連線和組態問題。"
+        }
+      }
     }
   },
   "changelog": {
@@ -3732,19 +4244,34 @@
         "title": "MSP 合作夥伴",
         "subtitle": "託管安全服務供應商",
         "desc": "將 Panguard 的 AI 安全防護加入你的託管服務組合。多租戶儀表板、白標選項、量價定價。",
-        "highlights": ["多租戶管理主控台", "白標部署選項", "量價定價層級", "自動化佈建 API"]
+        "highlights": [
+          "多租戶管理主控台",
+          "白標部署選項",
+          "量價定價層級",
+          "自動化佈建 API"
+        ]
       },
       "technology": {
         "title": "技術合作夥伴",
         "subtitle": "整合與技術",
         "desc": "將 Panguard 與你的平台整合。API 存取、共同行銷機會、聯合解決方案開發。",
-        "highlights": ["完整 REST API 存取", "共同行銷計畫", "聯合解決方案開發", "技術整合支援"]
+        "highlights": [
+          "完整 REST API 存取",
+          "共同行銷計畫",
+          "聯合解決方案開發",
+          "技術整合支援"
+        ]
       },
       "reseller": {
         "title": "經銷合作夥伴",
         "subtitle": "增值經銷商",
         "desc": "向你的客戶群經銷 Panguard AI。交易登記、銷售賦能、專屬合作夥伴經理。",
-        "highlights": ["交易登記保護", "銷售賦能資源", "專屬合作夥伴經理", "具競爭力的利潤結構"]
+        "highlights": [
+          "交易登記保護",
+          "銷售賦能資源",
+          "專屬合作夥伴經理",
+          "具競爭力的利潤結構"
+        ]
       }
     },
     "benefits": {
@@ -4184,11 +4711,36 @@
     "upgradeDescription": "獲得更多掃描次數、端點及進階功能。",
     "viewPlans": "查看方案",
     "tierFeatures": {
-      "community": ["每月 100 次掃描", "1 個端點", "1,000 次 API 呼叫"],
-      "solo": ["無限次掃描", "3 個端點", "10,000 次 API 呼叫", "1 個蜜罐"],
-      "pro": ["無限次掃描", "10 個端點", "50,000 次 API 呼叫", "5 份報告", "3 個蜜罐"],
-      "business": ["無限次掃描", "25 個端點", "無限次 API 呼叫", "20 份報告", "8 個蜜罐"],
-      "enterprise": ["全功能無限制", "優先技術支援", "客製化 SLA"]
+      "community": [
+        "每月 100 次掃描",
+        "1 個端點",
+        "1,000 次 API 呼叫"
+      ],
+      "solo": [
+        "無限次掃描",
+        "3 個端點",
+        "10,000 次 API 呼叫",
+        "1 個蜜罐"
+      ],
+      "pro": [
+        "無限次掃描",
+        "10 個端點",
+        "50,000 次 API 呼叫",
+        "5 份報告",
+        "3 個蜜罐"
+      ],
+      "business": [
+        "無限次掃描",
+        "25 個端點",
+        "無限次 API 呼叫",
+        "20 份報告",
+        "8 個蜜罐"
+      ],
+      "enterprise": [
+        "全功能無限制",
+        "優先技術支援",
+        "客製化 SLA"
+      ]
     }
   }
 }

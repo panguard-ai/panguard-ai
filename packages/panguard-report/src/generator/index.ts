@@ -11,3 +11,6 @@ export {
   reportToJSON,
   generateSummaryText,
 } from './report-generator.js';
+
+export { generatePDFReport } from './pdf-generator.js';
+export type { PDFReportOptions } from './pdf-generator.js';

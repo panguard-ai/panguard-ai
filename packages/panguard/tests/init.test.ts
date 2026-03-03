@@ -45,9 +45,9 @@ describe('Init Wizard', () => {
   });
 
   describe('getWizardSteps (advanced)', () => {
-    it('should return 11 steps', () => {
+    it('should return 17 steps', () => {
       const steps = getWizardSteps();
-      expect(steps.length).toBe(11);
+      expect(steps.length).toBe(17);
     });
 
     it('should start with language step', () => {

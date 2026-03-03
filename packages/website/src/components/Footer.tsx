@@ -50,6 +50,7 @@ export default function Footer() {
       title: t('resources'),
       links: [
         { label: t('documentation'), href: '/docs' },
+        { label: t('cliReference'), href: '/docs/cli' },
         { label: 'GitHub', href: 'https://github.com/panguard-ai/panguard-ai', external: true },
         { label: t('openSource'), href: '/open-source' },
         { label: t('compliance'), href: '/compliance' },

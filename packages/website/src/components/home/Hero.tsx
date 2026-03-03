@@ -134,13 +134,19 @@ export default function Hero() {
             href="/docs/getting-started"
             className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base hover:bg-panguard-green-light transition-all duration-200 active:scale-[0.98]"
           >
-            {t('getStarted')} <ArrowRight className="w-4 h-4" />
+            {t('tryScan')} <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            href="/demo"
+            className="border border-border text-text-secondary hover:text-text-primary hover:border-panguard-green font-semibold rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base transition-all duration-200"
+          >
+            {t('bookDemo')}
           </Link>
           <a
             href="https://github.com/panguard-ai/panguard-ai"
             target="_blank"
             rel="noopener noreferrer"
-            className="border border-border text-text-secondary hover:text-text-primary hover:border-panguard-green font-semibold rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base transition-all duration-200"
+            className="text-text-secondary hover:text-text-primary text-sm sm:text-base transition-all duration-200 py-3"
           >
             {t('github')}
           </a>

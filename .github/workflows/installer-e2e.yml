@@ -1,0 +1,222 @@
+name: Installer E2E Tests
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'scripts/installer/**'
+      - 'tests/installer/**'
+      - '.github/workflows/installer-e2e.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'scripts/installer/**'
+      - 'tests/installer/**'
+  workflow_dispatch:
+
+concurrency:
+  group: installer-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -- Vitest unit tests for installer functions ---------------
+  vitest-unit:
+    name: Vitest installer tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run installer unit tests
+        run: pnpm run test:installer
+
+  # -- macOS arm64 (Apple Silicon) -----------------------------
+  macos-arm64:
+    name: macOS arm64 (source build)
+    runs-on: macos-14
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run install.sh
+        run: |
+          FAKE_HOME=$(mktemp -d)
+          touch "$FAKE_HOME/.bashrc" "$FAKE_HOME/.zshrc"
+          HOME="$FAKE_HOME" bash scripts/installer/install.sh
+          echo "FAKE_HOME=$FAKE_HOME" >> "$GITHUB_ENV"
+      - name: Verify installation
+        run: |
+          if [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
+            "$FAKE_HOME/.panguard/source/bin/panguard" --version
+          elif [ -x "$FAKE_HOME/.local/bin/panguard" ]; then
+            "$FAKE_HOME/.local/bin/panguard" --version
+          else
+            echo "panguard binary not found"
+            ls -la "$FAKE_HOME/.panguard/" || true
+            exit 1
+          fi
+
+  # -- macOS x64 (Intel) --------------------------------------
+  macos-x64:
+    name: macOS x64 (source build)
+    runs-on: macos-13
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run install.sh
+        run: |
+          FAKE_HOME=$(mktemp -d)
+          touch "$FAKE_HOME/.bashrc" "$FAKE_HOME/.zshrc"
+          HOME="$FAKE_HOME" bash scripts/installer/install.sh
+          echo "FAKE_HOME=$FAKE_HOME" >> "$GITHUB_ENV"
+      - name: Verify installation
+        run: |
+          if [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
+            "$FAKE_HOME/.panguard/source/bin/panguard" --version
+          elif [ -x "$FAKE_HOME/.local/bin/panguard" ]; then
+            "$FAKE_HOME/.local/bin/panguard" --version
+          else
+            echo "panguard binary not found"
+            exit 1
+          fi
+
+  # -- Ubuntu x64 ----------------------------------------------
+  ubuntu-x64:
+    name: Ubuntu x64 (source build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run install.sh
+        run: |
+          FAKE_HOME=$(mktemp -d)
+          touch "$FAKE_HOME/.bashrc" "$FAKE_HOME/.profile"
+          HOME="$FAKE_HOME" bash scripts/installer/install.sh
+          echo "FAKE_HOME=$FAKE_HOME" >> "$GITHUB_ENV"
+      - name: Verify installation
+        run: |
+          if [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
+            "$FAKE_HOME/.panguard/source/bin/panguard" --version
+          elif [ -x "$FAKE_HOME/.local/bin/panguard" ]; then
+            "$FAKE_HOME/.local/bin/panguard" --version
+          else
+            echo "panguard binary not found"
+            exit 1
+          fi
+
+  # -- Alpine Linux (musl detection via Docker) ----------------
+  alpine-musl:
+    name: Alpine Linux (musl detection)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Alpine test image
+        run: docker build -f tests/installer/docker/Dockerfile.alpine -t panguard-installer-alpine .
+      - name: Run installer in Alpine container
+        run: docker run --rm panguard-installer-alpine
+
+  # -- Windows x64 (PowerShell) --------------------------------
+  windows-x64:
+    name: Windows x64 (PowerShell)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run install.ps1
+        shell: pwsh
+        run: |
+          $FakeHome = Join-Path $env:TEMP "panguard-test-$(Get-Random)"
+          New-Item -ItemType Directory -Force -Path $FakeHome | Out-Null
+          $env:USERPROFILE = $FakeHome
+          & scripts\installer\install.ps1
+      - name: Verify installation
+        shell: pwsh
+        run: |
+          try {
+            panguard --version
+          } catch {
+            Write-Host "panguard not in PATH, checking direct..."
+            $binPath = Join-Path $env:USERPROFILE ".panguard\bin\panguard.cmd"
+            if (Test-Path $binPath) {
+              & $binPath --version
+            } else {
+              Write-Host "panguard.cmd not found"
+              exit 1
+            }
+          }
+
+  # -- Node.js version gate ------------------------------------
+  node-version-gate:
+    name: Node ${{ matrix.node }} version gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run installer
+        id: install
+        continue-on-error: true
+        run: |
+          FAKE_HOME=$(mktemp -d)
+          touch "$FAKE_HOME/.bashrc"
+          HOME="$FAKE_HOME" bash scripts/installer/install.sh 2>&1 | tee /tmp/install-output.txt
+          echo "FAKE_HOME=$FAKE_HOME" >> "$GITHUB_ENV"
+      - name: Assert Node 18 is rejected
+        if: matrix.node == '18'
+        run: |
+          if [ "${{ steps.install.outcome }}" = "success" ]; then
+            echo "ERROR: Installer should have failed on Node 18"
+            exit 1
+          fi
+          if grep -q "v20" /tmp/install-output.txt; then
+            echo "OK: Error message mentions v20 requirement"
+          else
+            echo "WARNING: Error message doesn't mention v20"
+            cat /tmp/install-output.txt
+          fi
+      - name: Assert Node 20+ succeeds
+        if: matrix.node != '18'
+        run: |
+          if [ "${{ steps.install.outcome }}" != "success" ]; then
+            echo "ERROR: Installer should succeed on Node ${{ matrix.node }}"
+            cat /tmp/install-output.txt
+            exit 1
+          fi
+          echo "OK: Installer succeeded on Node ${{ matrix.node }}"

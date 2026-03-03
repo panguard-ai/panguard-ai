@@ -9,6 +9,7 @@ import {
   TerminalIcon,
   NetworkIcon,
   AnalyticsIcon,
+  IntegrationIcon,
 } from '@/components/ui/BrandIcons';
 import BrandLogo from '@/components/ui/BrandLogo';
 import FadeInUp from '@/components/FadeInUp';
@@ -44,7 +45,7 @@ const productConfigs = [
       '4-agent AI pipeline: Detect, Analyze, Respond, Report + Chat notifications',
       '3 auto-response modules: IP Blocker, Process Killer, File Quarantine',
       'Investigation engine with event correlation and dynamic reasoning',
-      '4 notification channels: Telegram, Slack, Email, Webhook',
+      '5 notification channels: Telegram, Slack, Email, Webhook, LINE',
       'Integration adapters: Windows Defender, Syslog, Wazuh',
       'Supports Linux, macOS, Windows, Docker, Kubernetes',
     ],
@@ -60,7 +61,7 @@ const productConfigs = [
       'Natural language explanations of every security event',
       '13 built-in skills: scan, block IP, trap status, generate report, and more',
       'Multi-language support: English and Traditional Chinese',
-      '4 channels: Telegram, Slack, Email, Webhook',
+      '5 channels: Telegram, Slack, Email, Webhook, LINE',
       'Role-adaptive tone: developer, business owner, IT admin',
       'NLP skill matching with confidence-based routing',
     ],
@@ -97,6 +98,40 @@ const productConfigs = [
       'Remediation guides with prioritized action items',
     ],
     href: '/product/report',
+  },
+  {
+    key: 'mcp' as const,
+    icon: IntegrationIcon,
+    badgeColor: 'bg-[#a78bfa]/10 text-[#a78bfa] border-[#a78bfa]/20',
+    isBeta: true,
+    description:
+      `Panguard MCP Server exposes ${STATS.mcpTools} security tools via the Model Context Protocol, enabling AI assistants like Claude Desktop, Cursor, and Claude Code to control Panguard directly. Scan endpoints, start protection, block IPs, and generate reports -- all through natural language conversation with your AI assistant.`,
+    features: [
+      `${STATS.mcpTools} MCP tools: scan, scan_code, guard_start, guard_stop, status, alerts, block_ip, generate_report, init, deploy`,
+      'Works with Claude Desktop, Cursor, Claude Code, and any MCP-compatible client',
+      'Stdio transport for secure local communication',
+      'SAST code scanning via AI assistant conversation',
+      'Real-time guard status and alert monitoring',
+      'Zero configuration -- auto-discovers Panguard installation',
+    ],
+    href: '/docs/cli',
+  },
+  {
+    key: 'sast' as const,
+    icon: ScanIcon,
+    badgeColor: 'bg-[#a78bfa]/10 text-[#a78bfa] border-[#a78bfa]/20',
+    isBeta: true,
+    description:
+      `Panguard Code Scanner performs static application security testing (SAST) on your source code. It integrates with Semgrep for deep analysis and includes ${STATS.sastPatterns} built-in regex patterns as a fallback. Detect SQL injection, XSS, command injection, hardcoded secrets, weak cryptography, and more -- directly from the CLI or through your AI assistant.`,
+    features: [
+      'Semgrep integration for deep SAST analysis',
+      `${STATS.sastPatterns} built-in regex patterns covering OWASP Top 10`,
+      'Secrets scanning: AWS keys, GitHub tokens, Stripe keys, RSA private keys',
+      'Supports JavaScript, TypeScript, Python, and more',
+      'CI/CD integration with --fail-on severity threshold',
+      'JSON output for pipeline automation',
+    ],
+    href: '/docs/cli',
   },
 ];
 
@@ -189,9 +224,16 @@ export default function ProductOverviewContent() {
                     <product.icon className="w-5 h-5 text-brand-sage" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-text-primary">
-                      {t(`products.${product.key}.name`)}
-                    </h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-2xl font-bold text-text-primary">
+                        {t(`products.${product.key}.name`)}
+                      </h2>
+                      {'isBeta' in product && product.isBeta && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-yellow-900/30 text-yellow-400">
+                          Beta
+                        </span>
+                      )}
+                    </div>
                     <span
                       className={`inline-block ${product.badgeColor} border text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full`}
                     >

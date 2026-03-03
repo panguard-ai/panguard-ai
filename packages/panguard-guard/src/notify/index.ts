@@ -15,12 +15,16 @@ import type { NotificationConfig, NotificationResult, ThreatVerdict } from '../t
 import { sendTelegramNotify } from './telegram.js';
 import { sendSlackNotify } from './slack.js';
 import { sendEmailNotify } from './email.js';
+import { sendWebhookNotify } from './webhook.js';
+import { sendLineNotify } from './line.js';
 
 const logger = createLogger('panguard-guard:notify');
 
 export { sendTelegramNotify } from './telegram.js';
 export { sendSlackNotify } from './slack.js';
 export { sendEmailNotify } from './email.js';
+export { sendWebhookNotify } from './webhook.js';
+export { sendLineNotify } from './line.js';
 
 /**
  * Send notifications to all configured channels
@@ -52,6 +56,12 @@ export async function sendNotifications(
   if (config.email) {
     promises.push(sendEmailNotify(config.email, verdict, eventDescription));
   }
+  if (config.webhook) {
+    promises.push(sendWebhookNotify(config.webhook, verdict, eventDescription));
+  }
+  if (config.line) {
+    promises.push(sendLineNotify(config.line, verdict, eventDescription));
+  }
 
   if (promises.length === 0) {
     logger.info('No notification channels configured / 未配置通知通道');
@@ -68,7 +78,7 @@ export async function sendNotifications(
       const msg = result.reason instanceof Error ? result.reason.message : String(result.reason);
       logger.error(`Notification failed: ${msg} / 通知失敗: ${msg}`);
       notificationResults.push({
-        channel: 'telegram', // fallback channel name
+        channel: 'telegram', // fallback channel name for rejected promises
         success: false,
         error: msg,
       });

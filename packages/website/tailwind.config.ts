@@ -49,7 +49,6 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'var(--font-cjk)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'Georgia', 'serif'],
         mono: ['var(--font-mono)', 'monospace'],
       },
       borderColor: {

@@ -31,6 +31,7 @@ export function scanCommand(): Command {
     .option('--lang <language>', 'Language: en or zh-TW / 語言', 'en')
     .option('--verbose', 'Verbose output / 詳細輸出', false)
     .option('--json', 'Output pure JSON to stdout (for AI agents) / 輸出純 JSON', false)
+    .option('--save <path>', 'Save JSON results to file / 儲存 JSON 結果到檔案')
     .option('--target <host>', 'Remote target (IP or domain) / 遠端目標')
     .action(
       async (options: {
@@ -39,6 +40,7 @@ export function scanCommand(): Command {
         lang: string;
         verbose: boolean;
         json: boolean;
+        save?: string;
         target?: string;
       }) => {
         // Auth: local scan = community (free), remote scan = solo
@@ -95,6 +97,12 @@ export function scanCommand(): Command {
               powered_by: 'Panguard AI',
               agent_friendly: true,
             };
+            if (options.save) {
+              const { writeFile, mkdir } = await import('node:fs/promises');
+              const { dirname } = await import('node:path');
+              await mkdir(dirname(options.save), { recursive: true });
+              await writeFile(options.save, JSON.stringify(output, null, 2), 'utf-8');
+            }
             console.log(JSON.stringify(output, null, 2));
             return;
           }
@@ -147,6 +155,44 @@ export function scanCommand(): Command {
               box(`${symbols.pass} No issues found!`, { borderColor: c.safe, title: 'All Clear' })
             );
           }
+
+          // Save results to file if --save is set (remote human-friendly path)
+          if (options.save) {
+            const { writeFile, mkdir } = await import('node:fs/promises');
+            const { dirname } = await import('node:path');
+            const saveOutput = {
+              version: PANGUARD_VERSION,
+              timestamp: result.scannedAt,
+              target: options.target,
+              risk_score: result.riskScore,
+              risk_level: result.riskLevel,
+              grade,
+              scan_duration_ms: result.scanDuration,
+              findings_count: result.findings.length,
+              findings: result.findings.map((f, i) => ({
+                id: i + 1,
+                severity: f.severity,
+                title: f.title,
+                category: f.category,
+                description: f.description,
+                remediation: f.remediation,
+              })),
+              system: {
+                os: 'remote',
+                arch: 'remote',
+                open_ports: result.discovery.openPorts.length,
+                running_services: 0,
+                firewall_enabled: false,
+                security_tools_detected: 0,
+              },
+              powered_by: 'Panguard AI',
+              agent_friendly: true,
+            };
+            await mkdir(dirname(options.save), { recursive: true });
+            await writeFile(options.save, JSON.stringify(saveOutput, null, 2), 'utf-8');
+            console.log(`  Results saved to: ${options.save}`);
+          }
+
           console.log('');
           return;
         }
@@ -201,6 +247,12 @@ export function scanCommand(): Command {
             powered_by: 'Panguard AI',
             agent_friendly: true,
           };
+          if (options.save) {
+            const { writeFile, mkdir } = await import('node:fs/promises');
+            const { dirname } = await import('node:path');
+            await mkdir(dirname(options.save), { recursive: true });
+            await writeFile(options.save, JSON.stringify(output, null, 2), 'utf-8');
+          }
           console.log(JSON.stringify(output, null, 2));
           return;
         }
@@ -216,12 +268,19 @@ export function scanCommand(): Command {
         console.log('');
 
         const sp = spinner('Scanning system security...');
-        const result = await runScan({
-          depth: options.quick ? 'quick' : 'full',
-          lang,
-          output: options.output,
-          verbose: options.verbose,
-        });
+        let result;
+        try {
+          result = await runScan({
+            depth: options.quick ? 'quick' : 'full',
+            lang,
+            output: options.output,
+            verbose: options.verbose,
+          });
+        } catch (err) {
+          sp.fail(`Scan failed: ${err instanceof Error ? err.message : String(err)}`);
+          process.exitCode = 1;
+          return;
+        }
         sp.succeed(`Scan complete ${c.dim(`(${formatDuration(result.scanDuration)})`)}`);
 
         // Security Score
@@ -320,6 +379,44 @@ export function scanCommand(): Command {
             })
           );
           console.log('');
+        }
+
+        // Save results to file if --save is set (local human-friendly path)
+        if (options.save) {
+          const { writeFile, mkdir } = await import('node:fs/promises');
+          const { dirname } = await import('node:path');
+          const saveOutput = {
+            version: PANGUARD_VERSION,
+            timestamp: result.scannedAt,
+            target: 'localhost',
+            risk_score: result.riskScore,
+            risk_level: result.riskLevel,
+            grade,
+            scan_duration_ms: result.scanDuration,
+            findings_count: result.findings.length,
+            findings: result.findings.map((f, i) => ({
+              id: i + 1,
+              severity: f.severity,
+              title: f.title,
+              category: f.category,
+              description: f.description,
+              remediation: f.remediation,
+              manual_fix: f.manualFix ?? null,
+            })),
+            system: {
+              os: `${result.discovery.os.distro} ${result.discovery.os.version}`,
+              arch: result.discovery.os.arch,
+              open_ports: result.discovery.openPorts.length,
+              running_services: result.discovery.services.length,
+              firewall_enabled: result.discovery.security.firewall.enabled,
+              security_tools_detected: result.discovery.security.existingTools.length,
+            },
+            powered_by: 'Panguard AI',
+            agent_friendly: true,
+          };
+          await mkdir(dirname(options.save), { recursive: true });
+          await writeFile(options.save, JSON.stringify(saveOutput, null, 2), 'utf-8');
+          console.log(`  Results saved to: ${options.save}`);
         }
 
         // PDF report

@@ -158,6 +158,7 @@ export interface EnvironmentBaseline {
   confidenceLevel: number; // 0-1
   lastUpdated: string;
   eventCount: number;
+  lastContinuousUpdate?: string;
 }
 
 /** Deviation check result / 偏離檢查結果 */
@@ -166,6 +167,66 @@ export interface DeviationResult {
   deviationType: string;
   confidence: number; // 0-100
   description: string;
+}
+
+// ===== Correlation =====
+
+/** Correlation pattern type / 關聯模式類型 */
+export type CorrelationPatternType =
+  | 'brute_force'
+  | 'port_scan'
+  | 'lateral_movement'
+  | 'data_exfiltration'
+  | 'backdoor_install'
+  | 'privilege_escalation'
+  | 'attack_chain';
+
+/** Event submitted to the correlator / 提交至關聯器的事件 */
+export interface CorrelationEvent {
+  /** Unique event identifier / 唯一事件識別碼 */
+  id: string;
+  /** Unix timestamp in ms / Unix 時間戳 (毫秒) */
+  timestamp: number;
+  /** Source IP address (if available) / 來源 IP 位址 */
+  sourceIP?: string;
+  /** Event source type / 事件來源類型 */
+  source: string;
+  /** MITRE ATT&CK or general category / MITRE ATT&CK 或通用分類 */
+  category: string;
+  /** Severity level / 嚴重等級 */
+  severity: string;
+  /** Rule IDs that matched this event / 此事件匹配的規則 ID */
+  ruleIds: string[];
+  /** Additional metadata / 額外中繼資料 */
+  metadata: Record<string, unknown>;
+}
+
+/** A single matched correlation pattern / 單一匹配的關聯模式 */
+export interface CorrelationPattern {
+  /** Pattern type / 模式類型 */
+  type: CorrelationPatternType;
+  /** Confidence score 0-100 / 信心分數 */
+  confidence: number;
+  /** Source IP (if applicable) / 來源 IP */
+  sourceIP?: string;
+  /** Number of correlated events / 關聯事件數 */
+  eventCount: number;
+  /** IDs of correlated events / 關聯事件 ID */
+  eventIds: string[];
+  /** Human-readable description / 人類可讀描述 */
+  description: string;
+  /** MITRE ATT&CK technique ID / MITRE ATT&CK 技術 ID */
+  mitreTechnique?: string;
+  /** Suggested severity for the correlated pattern / 建議嚴重等級 */
+  suggestedSeverity: 'low' | 'medium' | 'high' | 'critical';
+}
+
+/** Result from the event correlator / 事件關聯器結果 */
+export interface CorrelationResult {
+  /** Whether any patterns matched / 是否有模式匹配 */
+  matched: boolean;
+  /** All matched patterns / 所有匹配的模式 */
+  patterns: CorrelationPattern[];
 }
 
 // ===== Detection =====
@@ -411,6 +472,12 @@ export interface GuardConfig {
     fileMonitor: boolean;
     networkPollInterval: number;
     processPollInterval: number;
+    /** Log collector config / 日誌收集器配置 */
+    logCollector?: {
+      enabled: boolean;
+      filePaths?: string[];
+      syslogPort?: number;
+    };
   };
   watchdogEnabled: boolean;
   watchdogInterval: number;
@@ -420,6 +487,8 @@ export interface GuardConfig {
   bundledSigmaDir?: string;
   /** Bundled YARA rules directory (shipped with installation) / 內建 YARA 規則目錄 */
   bundledYaraDir?: string;
+  /** SOAR playbook directory for custom response strategies / SOAR 劇本目錄 */
+  playbookDir?: string;
   /** Manager URL for agent mode (distributed architecture) */
   managerUrl?: string;
   /** Agent ID (auto-assigned on registration) */
