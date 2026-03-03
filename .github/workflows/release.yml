@@ -56,7 +56,7 @@ jobs:
 
       - name: Run tests (skip slow installer E2E in release)
         shell: bash
-        run: pnpm run test -- --exclude 'tests/installer/installer-e2e*'
+        run: pnpm exec vitest run --exclude '**/installer-e2e*'
 
       - name: Deploy standalone package (Unix)
         if: runner.os != 'Windows'
