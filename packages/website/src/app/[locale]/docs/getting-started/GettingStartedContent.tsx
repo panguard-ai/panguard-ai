@@ -41,13 +41,13 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       label: 'One-line Install',
       recommended: true,
       command: 'curl -fsSL https://get.panguard.ai | bash',
-      note: 'Requires Node.js 20+',
+      note: 'Apple Silicon (ARM64) native binary. Intel Mac users: install via npm, or enable Rosetta 2 first.',
     },
     {
       method: 'npm',
       label: 'npm',
       command: 'npm install -g @panguard-ai/panguard',
-      note: 'Requires Node.js 20+',
+      note: 'Requires Node.js 20+. Works on both Apple Silicon and Intel Mac.',
     },
   ],
   linux: [
@@ -56,7 +56,7 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       label: 'One-line Install',
       recommended: true,
       command: 'curl -fsSL https://get.panguard.ai | bash',
-      note: 'Requires Node.js 20+',
+      note: 'Supports x64 and ARM64 architectures. Requires Node.js 20+.',
     },
     {
       method: 'npm',
@@ -287,8 +287,19 @@ export default function GettingStartedContent() {
               <p className="text-xs text-text-muted mt-2">{activeOption.note}</p>
             )}
 
-            {/* Then start */}
+            {/* Verify */}
             <div className="mt-6 pt-6 border-t border-border/40">
+              <p className="text-sm text-text-secondary mb-3">
+                Verify the installation:
+              </p>
+              <CodeBlock
+                code={`panguard --version\n# Expected: ${STATS.cliVersion}`}
+                label="Terminal"
+              />
+            </div>
+
+            {/* Then start */}
+            <div className="mt-4">
               <p className="text-sm text-text-secondary mb-3">
                 Then start Panguard in any project:
               </p>

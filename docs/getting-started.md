@@ -25,6 +25,17 @@
 
 > macOS and Linux are primary platforms. Windows supports core features; some OS-level detection is limited.
 
+### Available Binaries (v0.2.6)
+
+| Platform       | Architecture | Install Method          |
+| -------------- | ------------ | ----------------------- |
+| macOS          | ARM64 (Apple Silicon) | curl one-liner or npm |
+| Linux          | x64          | curl one-liner or npm   |
+| Linux          | ARM64        | curl one-liner or npm   |
+| Windows        | x64          | npm (recommended) or PowerShell |
+
+> **Intel Mac users**: The curl installer downloads the ARM64 binary. Either install via npm (`npm install -g @panguard-ai/panguard`), or enable Rosetta 2 first (`softwareupdate --install-rosetta`) before using the curl installer.
+
 ---
 
 ## Step 1: Create Account
@@ -47,13 +58,19 @@ Community plan is enough to get started. Compliance reports available as add-on 
 
 ## Step 2: Install
 
-### One-Command Install (Recommended)
+### One-Command Install (Recommended — Unix)
 
 ```bash
 curl -fsSL https://get.panguard.ai | bash
 ```
 
-### Using npm
+### Windows (PowerShell)
+
+```powershell
+powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"
+```
+
+### Using npm (all platforms)
 
 ```bash
 npm install -g @panguard-ai/panguard
@@ -71,7 +88,12 @@ pnpm build
 ./bin/panguard --help
 ```
 
-> npm package not yet published. Use source install for now.
+### Verify Installation
+
+```bash
+panguard --version
+# Expected: 0.2.6
+```
 
 ---
 

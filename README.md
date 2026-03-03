@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://github.com/panguard-ai/panguard-ai/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License"></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-%3E%3D20-green.svg" alt="Node.js"></a>
-  <a href="#test-coverage"><img src="https://img.shields.io/badge/tests-1%2C422%20passed-brightgreen.svg" alt="Tests"></a>
+  <a href="#test-coverage"><img src="https://img.shields.io/badge/tests-3%2C017%20passed-brightgreen.svg" alt="Tests"></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-strict-blue.svg" alt="TypeScript"></a>
   <a href="https://panguard.ai"><img src="https://img.shields.io/badge/Made%20in-Taiwan-red.svg" alt="Made in Taiwan"></a>
 </p>
@@ -346,7 +346,7 @@ panguard-ai/
 ```bash
 pnpm install          # Install all dependencies
 pnpm build            # Build all packages
-pnpm test             # Run all 1,422 tests
+pnpm test             # Run all 3,017 tests
 pnpm typecheck        # TypeScript strict checking
 pnpm lint             # ESLint + security plugin
 pnpm dev              # Start all dev servers
@@ -359,7 +359,7 @@ pnpm dev              # Start all dev servers
 | Unit tests        | 1,292     | 91      |
 | Integration tests | 84        | 16      |
 | E2E tests         | 81        | 16      |
-| **Total**         | **1,422** | **87** |
+| **Total**         | **3,017** | **142** |
 
 ---
 
