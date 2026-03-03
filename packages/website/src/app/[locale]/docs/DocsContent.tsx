@@ -21,9 +21,11 @@ import {
 /* ────────────────────────  Config  ──────────────────────────────── */
 
 const quickStartConfigs = [
-  { key: 'item1' as const, icon: TerminalIcon },
+  { key: 'item1' as const, icon: TerminalIcon, href: '/docs/getting-started' },
   { key: 'item2' as const, icon: DeployIcon },
   { key: 'item3' as const, icon: IntegrationIcon },
+  { key: 'cliRef' as const, icon: TerminalIcon, href: '/docs/cli' },
+  { key: 'benchmark' as const, icon: AnalyticsIcon, href: '/docs/benchmark' },
 ];
 
 const productDocConfigs = [
@@ -78,7 +80,7 @@ export default function DocsContent() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
           {quickStartConfigs.map((card, i) => {
-            const isGettingStarted = card.key === 'item1';
+            const hasLink = 'href' in card && card.href;
             const inner = (
               <div className="bg-surface-1 border border-border rounded-2xl p-6 card-glow h-full flex flex-col">
                 <div className="w-9 h-9 rounded-lg bg-surface-2 border border-border flex items-center justify-center mb-4">
@@ -90,7 +92,7 @@ export default function DocsContent() {
                 <p className="text-sm text-text-secondary mt-2 leading-relaxed flex-1">
                   {t(`quickStart.${card.key}.desc`)}
                 </p>
-                {isGettingStarted ? (
+                {hasLink ? (
                   <span className="text-brand-sage text-xs font-medium flex items-center gap-1 mt-4">
                     {t('readGuide')} &rarr;
                   </span>
@@ -103,8 +105,8 @@ export default function DocsContent() {
             );
             return (
               <FadeInUp key={card.key} delay={i * 0.06}>
-                {isGettingStarted ? (
-                  <Link href="/docs/getting-started" className="block h-full">
+                {hasLink ? (
+                  <Link href={card.href as string} className="block h-full">
                     {inner}
                   </Link>
                 ) : (

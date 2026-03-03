@@ -15,6 +15,9 @@ import { createLogger } from '@panguard-ai/core';
 import { AgentRegistry } from './agent-registry.js';
 import { ThreatAggregator } from './threat-aggregator.js';
 import { PolicyEngine } from './policy-engine.js';
+import { DashboardRelay } from './dashboard-relay.js';
+import type { IncomingMessage } from 'node:http';
+import type { Socket } from 'node:net';
 import type {
   ManagerConfig,
   AgentRegistrationRequest,
@@ -27,6 +30,7 @@ import type {
   ManagerOverview,
   AgentOverview,
   ThreatSummary,
+  AgentPushResult,
   PolicyBroadcastResult,
 } from './types.js';
 
@@ -43,6 +47,8 @@ export class Manager {
   private readonly registry: AgentRegistry;
   private readonly aggregator: ThreatAggregator;
   private readonly policyEngine: PolicyEngine;
+  /** Dashboard relay for proxying remote dashboard connections / 用於代理遠端 dashboard 連接的 relay */
+  private readonly relay: DashboardRelay;
 
   private running: boolean;
   private startTime: number;
@@ -60,6 +66,7 @@ export class Manager {
       config.threatRetentionMs
     );
     this.policyEngine = new PolicyEngine();
+    this.relay = new DashboardRelay({ requireAuth: !!config.authToken });
 
     this.running = false;
     this.startTime = 0;
@@ -124,11 +131,35 @@ export class Manager {
       this.purgeTimer = null;
     }
 
+    // Disconnect all relay connections / 斷開所有 relay 連接
+    this.relay.disconnectAll();
+
     this.running = false;
 
     logger.info(
       `Manager stopped (uptime: ${Date.now() - this.startTime}ms) / Manager 已停止`
     );
+  }
+
+  /**
+   * Handle WebSocket upgrade for dashboard relay paths.
+   * Routes /api/dashboard/ paths to the DashboardRelay.
+   * 處理 dashboard relay 路徑的 WebSocket 升級。
+   *
+   * @returns true if the path was handled, false if not a dashboard path
+   */
+  handleDashboardUpgrade(req: IncomingMessage, socket: Socket, head: Buffer): boolean {
+    const url = req.url ?? '';
+    if (url.startsWith('/api/dashboard/')) {
+      this.relay.handleUpgrade(req, socket, head);
+      return true;
+    }
+    return false;
+  }
+
+  /** Get the dashboard relay instance / 取得 dashboard relay 實例 */
+  getDashboardRelay(): DashboardRelay {
+    return this.relay;
   }
 
   // ===== Agent Lifecycle / 代理生命週期 =====
@@ -209,15 +240,16 @@ export class Manager {
 
   /**
    * Create and optionally broadcast a new security policy.
+   * 建立並選擇性廣播新的安全策略。
    *
    * @param rules - Policy rules to include
-   * @param broadcast - Whether to queue broadcast to all active agents
+   * @param broadcast - Whether to push broadcast to all active agents
    * @returns The created policy
    */
-  createPolicy(
+  async createPolicy(
     rules: readonly PolicyRule[],
     broadcast = true
-  ): PolicyUpdate {
+  ): Promise<PolicyUpdate> {
     const activeAgentIds = this.registry
       .getActiveAgents()
       .map((a) => a.agentId);
@@ -225,38 +257,151 @@ export class Manager {
     const policy = this.policyEngine.createPolicy(rules, activeAgentIds);
 
     if (broadcast) {
-      this.broadcastPolicy(policy);
+      await this.broadcastPolicy(policy);
     }
 
     return policy;
   }
 
   /**
-   * Queue a policy update for broadcast to all active agents.
+   * Push a policy update to a single agent via HTTP POST.
+   * 透過 HTTP POST 將策略更新推送至單一代理。
+   *
+   * Looks up the agent's endpoint from the registry, sends a POST to
+   * `{agent.endpoint}/api/policy/push` with JSON body `{ policy, timestamp }`.
+   * Retries once on network failure. Timeout is 5 seconds per attempt.
+   *
+   * @param agentId - The target agent's unique identifier
+   * @param policy - The policy update to push
+   * @returns Push result indicating success or failure
+   */
+  async pushPolicyToAgent(
+    agentId: string,
+    policy: PolicyUpdate
+  ): Promise<AgentPushResult> {
+    const agent = this.registry.getAgent(agentId);
+    if (!agent) {
+      return {
+        agentId,
+        success: false,
+        error: `Agent ${agentId} not found in registry / 在登錄簿中找不到代理 ${agentId}`,
+      };
+    }
+
+    const url = `${agent.endpoint.replace(/\/+$/, '')}/api/policy/push`;
+    const body = JSON.stringify({
+      policy,
+      timestamp: new Date().toISOString(),
+    });
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (this.config.authToken) {
+      headers['Authorization'] = `Bearer ${this.config.authToken}`;
+    }
+
+    // Attempt HTTP POST with one retry on failure
+    // 嘗試 HTTP POST，失敗時重試一次
+    const maxAttempts = 2;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body,
+          signal: AbortSignal.timeout(5000),
+        });
+
+        if (!response.ok) {
+          const text = await response.text().catch(() => '');
+          throw new Error(`HTTP ${response.status}: ${text}`);
+        }
+
+        logger.info(
+          `Policy ${policy.policyId} pushed to agent ${agentId} / ` +
+            `策略 ${policy.policyId} 已推送至代理 ${agentId}`
+        );
+
+        return { agentId, success: true };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+
+        if (attempt < maxAttempts) {
+          logger.warn(
+            `Push to agent ${agentId} failed (attempt ${attempt}/${maxAttempts}), retrying / ` +
+              `推送至代理 ${agentId} 失敗 (嘗試 ${attempt}/${maxAttempts})，重試中: ${message}`
+          );
+          continue;
+        }
+
+        logger.error(
+          `Push to agent ${agentId} failed after ${maxAttempts} attempts / ` +
+            `推送至代理 ${agentId} 在 ${maxAttempts} 次嘗試後失敗: ${message}`
+        );
+
+        return {
+          agentId,
+          success: false,
+          error: message,
+        };
+      }
+    }
+
+    // Unreachable, but satisfies TypeScript
+    return { agentId, success: false, error: 'Unexpected push failure' };
+  }
+
+  /**
+   * Broadcast a policy update to active agents via HTTP POST push.
+   * 透過 HTTP POST 推送將策略更新廣播至活躍代理。
+   *
+   * Gets target agents (specified IDs or all active), pushes policy to each,
+   * and collects results into the broadcast queue.
    *
    * @param policy - The policy to broadcast
-   * @returns Broadcast result with target agent list
+   * @param targetAgentIds - Optional list of specific agent IDs to target
+   * @returns Broadcast result with per-agent outcomes
    */
-  broadcastPolicy(policy: PolicyUpdate): PolicyBroadcastResult {
-    const activeAgents = this.registry.getActiveAgents();
-    const targetIds = activeAgents.map((a) => a.agentId);
+  async broadcastPolicy(
+    policy: PolicyUpdate,
+    targetAgentIds?: string[]
+  ): Promise<PolicyBroadcastResult> {
+    // Determine target agents / 決定目標代理
+    const targetIds = targetAgentIds
+      ? [...targetAgentIds]
+      : this.registry.getActiveAgents().map((a) => a.agentId);
+
+    // Push to each agent concurrently / 同時推送至每個代理
+    const agentResults: AgentPushResult[] = await Promise.all(
+      targetIds.map((id) => this.pushPolicyToAgent(id, policy))
+    );
+
+    const successCount = agentResults.filter((r) => r.success).length;
+    const failureCount = agentResults.filter((r) => !r.success).length;
 
     const result: PolicyBroadcastResult = {
       policyId: policy.policyId,
       targetAgents: [...targetIds],
       queuedAt: new Date().toISOString(),
+      agentResults: [...agentResults],
+      successCount,
+      failureCount,
     };
 
     this.broadcastQueue.push(result);
 
     logger.info(
-      `Policy ${policy.policyId} queued for broadcast to ${targetIds.length} agents / ` +
-        `策略 ${policy.policyId} 已排入佇列廣播至 ${targetIds.length} 個代理`
+      `Policy ${policy.policyId} broadcast to ${targetIds.length} agents ` +
+        `(success: ${successCount}, failed: ${failureCount}) / ` +
+        `策略 ${policy.policyId} 已廣播至 ${targetIds.length} 個代理 ` +
+        `(成功: ${successCount}, 失敗: ${failureCount})`
     );
 
     return {
       ...result,
       targetAgents: [...result.targetAgents],
+      agentResults: [...agentResults],
     };
   }
 

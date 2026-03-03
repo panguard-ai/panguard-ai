@@ -268,7 +268,9 @@ describe('RuleGenerator', () => {
     expect(content).toContain('title:');
     expect(content).toContain('status: experimental');
     expect(content).toContain('detection:');
-    expect(content).toContain('EventType: brute_force');
+    expect(content).toContain('category: brute_force');
+    expect(content).toContain('logsource:');
+    expect(content).toContain('product: panguard');
     expect(content).toContain('condition: selection');
     expect(content).toContain('level: critical'); // max severity
     expect(content).toContain('attack.credential_access');

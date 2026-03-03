@@ -91,6 +91,10 @@ export default function NumbersWall() {
           })}
         </div>
 
+        <p className="text-center text-xs text-text-muted mt-3">
+          Last verified: {STATS.lastUpdated} | Source: GitHub CI
+        </p>
+
         {/* GitHub CTA */}
         <FadeInUp delay={0.5}>
           <div className="text-center mt-8">

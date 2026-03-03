@@ -1,0 +1,24 @@
+name: brute-force-response
+description: "Respond to brute force login attacks"
+descriptionZh: "回應暴力破解登入攻擊"
+priority: 100
+trigger:
+  pattern: brute_force
+  minConfidence: 75
+actions:
+  - type: block_ip
+    params:
+      duration: "1h"
+  - type: notify
+    params:
+      severity: high
+escalation:
+  after: 3
+  within: "24h"
+  actions:
+    - type: block_ip
+      params:
+        duration: "7d"
+    - type: notify
+      params:
+        severity: critical

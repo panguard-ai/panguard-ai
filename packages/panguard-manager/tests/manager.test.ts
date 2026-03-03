@@ -28,6 +28,7 @@ const TEST_CONFIG: ManagerConfig = {
 function makeRegistration(hostname: string): AgentRegistrationRequest {
   return {
     hostname,
+    endpoint: `http://${hostname}:8080`,
     os: 'Linux 6.1.0',
     arch: 'x64',
     version: '1.0.0',
@@ -314,7 +315,7 @@ describe('Manager', () => {
   // ===== Policy Management =====
 
   describe('policy management', () => {
-    it('should create a policy', () => {
+    it('should create a policy', async () => {
       manager.start();
 
       const rules: PolicyRule[] = [
@@ -328,13 +329,13 @@ describe('Manager', () => {
         },
       ];
 
-      const policy = manager.createPolicy(rules, false);
+      const policy = await manager.createPolicy(rules, false);
       expect(policy.policyId).toMatch(/^pol-/);
       expect(policy.version).toBe(1);
       expect(policy.rules).toHaveLength(1);
     });
 
-    it('should get active policy', () => {
+    it('should get active policy', async () => {
       manager.start();
 
       expect(manager.getActivePolicy()).toBeNull();
@@ -350,16 +351,16 @@ describe('Manager', () => {
         },
       ];
 
-      manager.createPolicy(rules, false);
+      await manager.createPolicy(rules, false);
       const active = manager.getActivePolicy();
       expect(active).not.toBeNull();
       expect(active!.version).toBe(1);
     });
 
-    it('should increment version on policy updates', () => {
+    it('should increment version on policy updates', async () => {
       manager.start();
 
-      manager.createPolicy(
+      await manager.createPolicy(
         [
           {
             ruleId: 'r1',
@@ -373,7 +374,7 @@ describe('Manager', () => {
         false
       );
 
-      const v2 = manager.createPolicy(
+      const v2 = await manager.createPolicy(
         [
           {
             ruleId: 'r2',
@@ -390,7 +391,7 @@ describe('Manager', () => {
       expect(v2.version).toBe(2);
     });
 
-    it('should broadcast policy to active agents', () => {
+    it('should broadcast policy to active agents', async () => {
       manager.start();
       manager.handleRegistration(makeRegistration('server-01'));
       manager.handleRegistration(makeRegistration('server-02'));
@@ -406,17 +407,25 @@ describe('Manager', () => {
         },
       ];
 
-      manager.createPolicy(rules, true);
+      // Mock fetch for broadcast HTTP calls / 模擬 fetch 進行廣播 HTTP 呼叫
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async () => new Response('{"ok":true}', { status: 200 });
 
-      const broadcasts = manager.getPendingBroadcasts();
-      expect(broadcasts).toHaveLength(1);
-      expect(broadcasts[0]!.targetAgents).toHaveLength(2);
+      try {
+        await manager.createPolicy(rules, true);
+
+        const broadcasts = manager.getPendingBroadcasts();
+        expect(broadcasts).toHaveLength(1);
+        expect(broadcasts[0]!.targetAgents).toHaveLength(2);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
     });
 
-    it('should get policy for a specific agent', () => {
+    it('should get policy for a specific agent', async () => {
       manager.start();
 
-      manager.createPolicy(
+      await manager.createPolicy(
         [
           {
             ruleId: 'r1',
@@ -439,7 +448,7 @@ describe('Manager', () => {
   // ===== Dashboard Overview =====
 
   describe('getOverview', () => {
-    it('should provide comprehensive fleet overview', () => {
+    it('should provide comprehensive fleet overview', async () => {
       manager.start();
 
       const reg1 = manager.handleRegistration(makeRegistration('server-01'));
@@ -460,7 +469,7 @@ describe('Manager', () => {
       });
 
       // Create a policy
-      manager.createPolicy(
+      await manager.createPolicy(
         [
           {
             ruleId: 'r1',
@@ -515,7 +524,7 @@ describe('Manager', () => {
   // ===== Full Lifecycle Scenario =====
 
   describe('full lifecycle scenario', () => {
-    it('should handle complete agent lifecycle: register, heartbeat, report, deregister', () => {
+    it('should handle complete agent lifecycle: register, heartbeat, report, deregister', async () => {
       manager.start();
 
       // Step 1: Register agents
@@ -578,23 +587,31 @@ describe('Manager', () => {
       expect(apiResult[0]!.correlatedWith.length).toBeGreaterThan(0);
 
       // Step 4: Create and broadcast blocking policy
-      const policy = manager.createPolicy(
-        [
-          {
-            ruleId: 'emergency-001',
-            type: 'block_ip',
-            condition: { ip: attackerIP },
-            action: 'auto_block',
-            severity: 'critical',
-            description: `Block coordinated attacker ${attackerIP}`,
-          },
-        ],
-        true
-      );
-      expect(policy.version).toBe(1);
+      // Mock fetch for broadcast HTTP calls / 模擬 fetch 進行廣播 HTTP 呼叫
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async () => new Response('{"ok":true}', { status: 200 });
 
-      const broadcasts = manager.getPendingBroadcasts();
-      expect(broadcasts[0]!.targetAgents).toHaveLength(3);
+      try {
+        const policy = await manager.createPolicy(
+          [
+            {
+              ruleId: 'emergency-001',
+              type: 'block_ip',
+              condition: { ip: attackerIP },
+              action: 'auto_block',
+              severity: 'critical',
+              description: `Block coordinated attacker ${attackerIP}`,
+            },
+          ],
+          true
+        );
+        expect(policy.version).toBe(1);
+
+        const broadcasts = manager.getPendingBroadcasts();
+        expect(broadcasts[0]!.targetAgents).toHaveLength(3);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
 
       // Step 5: Verify overview
       const overview = manager.getOverview();

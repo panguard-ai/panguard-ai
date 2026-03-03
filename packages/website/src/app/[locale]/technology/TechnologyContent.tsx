@@ -20,6 +20,7 @@ import {
   HistoryIcon,
   LockIcon,
   MonitorIcon,
+  IntegrationIcon,
 } from '@/components/ui/BrandIcons';
 
 /* ─── Layer Config ─── */
@@ -132,6 +133,10 @@ const stackConfigs = [
   { key: 'item8' as const, icon: NetworkIcon },
   { key: 'item9' as const, icon: GlobalIcon },
   { key: 'item10' as const, icon: AnalyticsIcon },
+  { key: 'item11' as const, icon: IntegrationIcon },
+  { key: 'item12' as const, icon: ScanIcon },
+  { key: 'item13' as const, icon: ResponseIcon },
+  { key: 'item14' as const, icon: AnalyticsIcon },
 ];
 
 export default function TechnologyContent() {
@@ -140,7 +145,7 @@ export default function TechnologyContent() {
   return (
     <>
       {/* -- Hero -- */}
-      <section className="relative min-h-[60vh] flex items-center px-6 lg:px-[120px] py-24 border-b border-border overflow-hidden">
+      <section className="relative min-h-[60vh] flex items-center px-6 lg:px-[120px] py-28 border-b border-border overflow-hidden">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative">
           <FadeInUp>

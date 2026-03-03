@@ -22,9 +22,9 @@ const taiwanIcons = [GlobalIcon, EnterpriseIcon, TerminalIcon, TeamIcon];
 
 /* ─── Report Types ─── */
 const reportTypes = [
-  { name: 'ISO 27001 Gap Analysis', controls: 114, status: 'Ready' },
-  { name: 'SOC 2 Type II Evidence', controls: 64, status: 'Ready' },
-  { name: 'Taiwan Cyber Security Act', controls: 38, status: 'Ready' },
+  { name: 'ISO 27001 Gap Analysis', controls: 30, status: 'Ready' },
+  { name: 'SOC 2 Type II Evidence', controls: 10, status: 'Ready' },
+  { name: 'Taiwan Cyber Security Act', controls: 10, status: 'Ready' },
   { name: 'Executive Security Summary', controls: null, status: 'Ready' },
   { name: 'Incident Response Report', controls: null, status: 'Ready' },
   { name: 'Bilingual Report (EN/zh-TW)', controls: null, status: 'Ready' },
@@ -52,7 +52,7 @@ export default function ComplianceContent() {
   return (
     <>
       {/* -- Hero -- */}
-      <section className="relative min-h-[50vh] flex items-center px-6 lg:px-[120px] py-24 border-b border-border overflow-hidden">
+      <section className="relative min-h-[50vh] flex items-center px-6 lg:px-[120px] py-28 border-b border-border overflow-hidden">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative text-center w-full">
           <FadeInUp>

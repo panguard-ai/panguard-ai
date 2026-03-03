@@ -365,6 +365,7 @@ export class ThreatCloudServer {
 
   // -------------------------------------------------------------------------
   // POST /api/threats - Upload anonymized threat data (enhanced: also creates IoC)
+  // Supports both single flat object and batch { events: [...] } formats.
   // -------------------------------------------------------------------------
   private async handlePostThreat(
     req: IncomingMessage,
@@ -372,7 +373,52 @@ export class ThreatCloudServer {
     auditCtx: { actorHash: string; ipAddress: string }
   ): Promise<void> {
     const body = await this.readBody(req);
-    const data = JSON.parse(body) as AnonymizedThreatData;
+    const parsed = JSON.parse(body) as
+      | AnonymizedThreatData
+      | { events: AnonymizedThreatData[] };
+
+    // Detect batch format ({ events: [...] }) vs single flat object
+    const isBatch =
+      'events' in parsed && Array.isArray((parsed as { events: unknown }).events);
+
+    if (isBatch) {
+      const items = (parsed as { events: AnonymizedThreatData[] }).events;
+
+      if (items.length > 100) {
+        this.sendJson(res, 400, { ok: false, error: 'Batch size exceeds maximum of 100' });
+        return;
+      }
+
+      let accepted = 0;
+      let rejected = 0;
+      let duplicates = 0;
+
+      for (const data of items) {
+        const result = this.processSingleThreat(data, auditCtx);
+        if (result === 'accepted') {
+          accepted++;
+        } else if (result === 'duplicate') {
+          accepted++;
+          duplicates++;
+        } else {
+          rejected++;
+        }
+      }
+
+      this.auditLogger.log('threat_upload', 'enriched_threat', 'batch', {
+        ...auditCtx,
+        details: { accepted, rejected, duplicates, batchSize: items.length },
+      });
+
+      this.sendJson(res, 201, {
+        ok: true,
+        data: { message: 'Batch threat data received', accepted, rejected, duplicates },
+      });
+      return;
+    }
+
+    // Single event format (backward compatible)
+    const data = parsed as AnonymizedThreatData;
 
     // Input validation
     if (
@@ -429,7 +475,7 @@ export class ThreatCloudServer {
         tags: [data.mitreTechnique],
       });
 
-      // Auto-sighting: agent reported this IP → positive sighting
+      // Auto-sighting: agent reported this IP -> positive sighting
       if (ioc.sightings > 1) {
         this.sightingStore.recordAgentMatch(ioc.id, 'guard', auditCtx.actorHash);
         // Check for cross-source correlation
@@ -450,6 +496,73 @@ export class ThreatCloudServer {
         enrichedId: enrichedId ?? 'duplicate',
       },
     });
+  }
+
+  /**
+   * Process a single threat event: validate, sanitize, insert, and extract IoC.
+   * Used by the batch path to process each item independently.
+   * Returns 'accepted', 'duplicate', or 'rejected'.
+   */
+  private processSingleThreat(
+    data: AnonymizedThreatData,
+    auditCtx: { actorHash: string; ipAddress: string }
+  ): 'accepted' | 'duplicate' | 'rejected' {
+    // Validate required fields
+    if (
+      !data.attackSourceIP ||
+      !data.attackType ||
+      !data.mitreTechnique ||
+      !data.sigmaRuleMatched ||
+      !data.timestamp ||
+      !data.region
+    ) {
+      return 'rejected';
+    }
+
+    if (!this.isValidIP(data.attackSourceIP)) return 'rejected';
+    if (!this.isValidTimestamp(data.timestamp)) return 'rejected';
+
+    // Sanitize string fields
+    data.attackType = this.sanitizeString(data.attackType, 100);
+    data.mitreTechnique = this.sanitizeString(data.mitreTechnique, 50);
+    data.sigmaRuleMatched = this.sanitizeString(data.sigmaRuleMatched, 200);
+    data.region = this.sanitizeString(data.region, 10);
+    if (data.industry) data.industry = this.sanitizeString(data.industry, 50);
+
+    // Anonymize IP
+    data.attackSourceIP = this.anonymizeIP(data.attackSourceIP);
+
+    // Insert into legacy threats table (backward compat)
+    this.db.insertThreat(data);
+
+    // Insert into enriched_threats
+    const enriched = ThreatCloudDB.guardToEnriched(data);
+    const enrichedId = this.db.insertEnrichedThreat(enriched);
+
+    // Extract IP as IoC + auto-sighting (learning)
+    if (data.attackSourceIP && data.attackSourceIP !== 'unknown') {
+      const ioc = this.iocStore.upsertIoC({
+        type: 'ip',
+        value: data.attackSourceIP,
+        threatType: data.attackType,
+        source: 'guard',
+        confidence: 50,
+        tags: [data.mitreTechnique],
+      });
+
+      if (ioc.sightings > 1) {
+        this.sightingStore.recordAgentMatch(ioc.id, 'guard', auditCtx.actorHash);
+        this.sightingStore.recordCrossSourceMatch(ioc.id, auditCtx.actorHash);
+      }
+    }
+
+    // Audit log for individual event
+    this.auditLogger.log('threat_upload', 'enriched_threat', String(enrichedId ?? 'dup'), {
+      ...auditCtx,
+      details: { attackType: data.attackType, region: data.region },
+    });
+
+    return enrichedId !== null ? 'accepted' : 'duplicate';
   }
 
   // -------------------------------------------------------------------------

@@ -1,0 +1,33 @@
+{
+  "name": "@panguard-ai/panguard-mcp",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "MCP server for Panguard AI — control security from Claude/Cursor / 透過 Claude/Cursor 控制 Panguard 的 MCP 伺服器",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "panguard-mcp": "./dist/cli/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": ["dist", "package.json", "README.md"],
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "tsc --build --watch",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@panguard-ai/core": "workspace:*",
+    "@panguard-ai/panguard-scan": "workspace:*",
+    "@panguard-ai/panguard-guard": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "~5.7.3"
+  }
+}

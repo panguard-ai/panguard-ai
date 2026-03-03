@@ -49,7 +49,13 @@ export function threatCommand(): Command {
         process.on('SIGINT', () => void shutdown());
         process.on('SIGTERM', () => void shutdown());
 
-        await server.start();
+        try {
+          await server.start();
+        } catch (err) {
+          sp.fail(`Failed to start server: ${err instanceof Error ? err.message : String(err)}`);
+          process.exitCode = 1;
+          return;
+        }
         sp.succeed('Threat Cloud API server started');
 
         console.log(

@@ -7,18 +7,157 @@
  */
 
 import { Command } from 'commander';
+import path from 'node:path';
 import type { Language } from '@panguard-ai/core';
 import { setLogLevel } from '@panguard-ai/core';
 import { PANGUARD_SCAN_VERSION } from '../index.js';
 import { executeScan } from './commands.js';
 import { runRemoteScan } from '../scanners/remote/index.js';
+import { sortBySeverity } from '../scanners/types.js';
+import type { Severity } from '@panguard-ai/core';
+
+/**
+ * Get all severity levels that are at or above the given threshold
+ * 取得達到或超過指定閾值的所有嚴重等級
+ *
+ * @param severity - Minimum severity threshold / 最低嚴重等級閾值
+ * @returns Array of severity strings at or above the threshold / 達到或超過閾值的嚴重等級陣列
+ */
+function getFailSeverities(severity: string): Severity[] {
+  const order: Severity[] = ['critical', 'high', 'medium', 'low', 'info'];
+  const idx = order.indexOf(severity as Severity);
+  if (idx === -1) return ['critical'];
+  return order.slice(0, idx + 1);
+}
 
 const program = new Command();
 
 program
   .name('panguard-scan')
   .description('PanguardScan - 60-second security health check tool / 60 秒資安健檢工具')
-  .version(PANGUARD_SCAN_VERSION)
+  .version(PANGUARD_SCAN_VERSION);
+
+// ---------------------------------------------------------------------------
+// code subcommand - SAST source code scanner
+// code 子命令 - SAST 原始碼掃描器
+// ---------------------------------------------------------------------------
+program
+  .command('code')
+  .description(
+    'Scan source code for security vulnerabilities (SAST) / 掃描原始碼安全漏洞'
+  )
+  .option('--dir <directory>', 'Source code directory to scan / 要掃描的原始碼目錄', '.')
+  .option('--lang <language>', 'Language: en or zh-TW / 語言', 'en')
+  .option('--json', 'Output pure JSON (for AI agents) / 輸出純 JSON', false)
+  .option(
+    '--fail-on <severity>',
+    'Exit with code 1 if findings at this severity level exist / 若發現達到此嚴重等級則以非零碼退出'
+  )
+  .option('--output <path>', 'Output PDF report path / 輸出 PDF 報告路徑')
+  .action(
+    async (options: {
+      dir: string;
+      lang: string;
+      json: boolean;
+      failOn?: string;
+      output?: string;
+    }) => {
+      const lang: Language = options.lang === 'zh-TW' ? 'zh-TW' : 'en';
+      const { checkSourceCode } = await import('../scanners/sast-checker.js');
+      const { checkHardcodedSecrets } = await import('../scanners/secrets-checker.js');
+
+      if (!options.json) {
+        setLogLevel('silent');
+        console.error(
+          `Scanning ${path.resolve(options.dir)} for security issues...`
+        );
+      } else {
+        setLogLevel('silent');
+      }
+
+      const [codeFindings, secretFindings] = await Promise.all([
+        checkSourceCode(options.dir),
+        checkHardcodedSecrets(options.dir),
+      ]);
+
+      const allFindings = [...codeFindings, ...secretFindings].sort(sortBySeverity);
+
+      if (options.json) {
+        console.log(
+          JSON.stringify(
+            {
+              version: PANGUARD_SCAN_VERSION,
+              timestamp: new Date().toISOString(),
+              scan_type: 'sast',
+              target: path.resolve(options.dir),
+              findings_count: allFindings.length,
+              findings: allFindings.map((f, i) => ({
+                seq: i + 1,
+                id: f.id,
+                title: f.title,
+                description: f.description,
+                severity: f.severity,
+                category: f.category,
+                remediation: f.remediation,
+                complianceRef: f.complianceRef,
+                details: f.details,
+              })),
+              powered_by: 'Panguard AI',
+              agent_friendly: true,
+            },
+            null,
+            2
+          )
+        );
+      } else {
+        // Human-friendly output
+        // 人性化輸出
+        if (allFindings.length === 0) {
+          console.log('No security issues found.');
+        } else {
+          console.log(`\nFound ${allFindings.length} finding(s):\n`);
+          for (const f of allFindings) {
+            console.log(`  [${f.severity.toUpperCase()}] ${f.title}`);
+            if (f.details) {
+              console.log(`         ${f.details}`);
+            }
+          }
+
+          const critCount = allFindings.filter((f) => f.severity === 'critical').length;
+          const highCount = allFindings.filter((f) => f.severity === 'high').length;
+          const medCount = allFindings.filter((f) => f.severity === 'medium').length;
+          const lowCount = allFindings.filter((f) => f.severity === 'low').length;
+
+          const parts: string[] = [];
+          if (critCount > 0) parts.push(`${critCount} Critical`);
+          if (highCount > 0) parts.push(`${highCount} High`);
+          if (medCount > 0) parts.push(`${medCount} Medium`);
+          if (lowCount > 0) parts.push(`${lowCount} Low`);
+
+          console.log(`\nSummary: ${parts.join(' | ')}`);
+        }
+        console.log('');
+      }
+
+      // Handle --fail-on
+      // 處理 --fail-on 選項
+      if (options.failOn) {
+        const failSeverities = getFailSeverities(options.failOn);
+        const hasFailingFindings = allFindings.some((f) =>
+          failSeverities.includes(f.severity)
+        );
+        if (hasFailingFindings) {
+          process.exit(1);
+        }
+      }
+    }
+  );
+
+// ---------------------------------------------------------------------------
+// Default scan command (root action)
+// 預設掃描指令（根動作）
+// ---------------------------------------------------------------------------
+program
   .option('--quick', 'Quick scan mode (~30 seconds) / 快速掃描模式', false)
   .option(
     '--output <path>',

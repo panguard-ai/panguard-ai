@@ -14,6 +14,7 @@
     { "path": "../panguard-trap" },
     { "path": "../threat-cloud" },
     { "path": "../panguard-auth" },
+    { "path": "../panguard-manager" },
     { "path": "../../security-hardening" }
   ],
   "include": ["src/**/*"],

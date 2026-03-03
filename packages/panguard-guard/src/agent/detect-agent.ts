@@ -12,7 +12,8 @@
 
 import { createLogger, checkThreatIntel } from '@panguard-ai/core';
 import type { SecurityEvent, RuleMatch, RuleEngine } from '@panguard-ai/core';
-import type { DetectionResult } from '../types.js';
+import type { DetectionResult, CorrelationEvent } from '../types.js';
+import { EventCorrelator } from '../correlation/event-correlator.js';
 
 const logger = createLogger('panguard-guard:detect-agent');
 
@@ -60,8 +61,12 @@ export class DetectAgent {
   /** Deduplication tracker: key → last detection timestamp */
   private readonly dedupMap = new Map<string, number>();
 
+  /** Pattern-based multi-step attack correlator */
+  private readonly correlator: EventCorrelator;
+
   constructor(ruleEngine: RuleEngine) {
     this.ruleEngine = ruleEngine;
+    this.correlator = new EventCorrelator(CORRELATION_WINDOW_MS, MAX_CORRELATION_BUFFER);
   }
 
   /**
@@ -105,10 +110,23 @@ export class DetectAgent {
     }
     this.recordDedup(dedupKey);
 
-    // Step 4: Correlation — check for attack chain
+    // Step 4: Correlation — check for attack chain (legacy IP-based)
     const sourceIP = this.extractIP(event);
     const ruleIds = ruleMatches.map((m) => m.rule.id);
     const attackChain = this.correlate(event, ruleIds, sourceIP);
+
+    // Step 5: Advanced pattern-based correlation
+    const correlationEvent: CorrelationEvent = {
+      id: event.id,
+      timestamp: Date.now(),
+      sourceIP,
+      source: event.source,
+      category: event.category,
+      severity: event.severity,
+      ruleIds,
+      metadata: event.metadata ?? {},
+    };
+    const correlationResult = this.correlator.addEvent(correlationEvent);
 
     this.detectionCount++;
 
@@ -123,12 +141,15 @@ export class DetectAgent {
       timestamp: new Date().toISOString(),
       // Attach correlation metadata if attack chain detected
       ...(attackChain ? { attackChain } : {}),
+      // Attach advanced correlation patterns
+      ...(correlationResult.matched ? { correlationPatterns: correlationResult.patterns } : {}),
     };
 
     logger.info(
       `Threat detected for event ${event.id}: ${ruleMatches.length} rule matches, ` +
         `threat intel: ${threatIntelMatch ? 'yes' : 'no'}, ` +
-        `attack chain: ${attackChain ? `${attackChain.eventCount} events` : 'no'}`
+        `attack chain: ${attackChain ? `${attackChain.eventCount} events` : 'no'}, ` +
+        `correlation patterns: ${correlationResult.patterns.length > 0 ? correlationResult.patterns.map((p) => p.type).join(', ') : 'none'}`
     );
 
     return result;

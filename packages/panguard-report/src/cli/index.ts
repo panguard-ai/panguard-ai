@@ -20,6 +20,7 @@ import {
   reportToJSON,
   generateSummaryText,
 } from '../generator/report-generator.js';
+import { generatePDFReport } from '../generator/pdf-generator.js';
 
 /** Available CLI commands / 可用的 CLI 命令 */
 export type ReportCliCommand =
@@ -42,6 +43,8 @@ export interface ReportCliOptions {
   verbose?: boolean;
   /** Run live system assessment / 執行即時系統評估 */
   assess?: boolean;
+  /** Path to panguard-scan JSON results file / panguard-scan JSON 結果檔案路徑 */
+  scanResultsFile?: string;
 }
 
 /**
@@ -76,6 +79,9 @@ export function parseCliArgs(args: string[]): ReportCliOptions {
       options.verbose = true;
     } else if (arg === '--assess') {
       options.assess = true;
+    } else if (arg === '--scan-results' && args[i + 1]) {
+      options.scanResultsFile = args[i + 1];
+      i++;
     }
   }
 
@@ -170,10 +176,12 @@ Options / 選項:
   --framework <name>   Compliance framework / 合規框架
                        (tw_cyber_security_act, iso27001, soc2)
   --language <lang>    Report language / 報告語言 (zh-TW, en)
-  --format <fmt>       Output format / 輸出格式 (json, pdf)
+  --format <fmt>       Output format / 輸出格式 (json, html, pdf)
   --output-dir <path>  Output directory / 輸出目錄
   --org <name>         Organization name / 組織名稱
   --input <file>       Findings input file (JSON) / 發現輸入檔案 (JSON)
+  --scan-results <file>  Panguard scan JSON results file / panguard scan JSON 結果檔案
+                         (auto-converts scan findings to compliance findings)
   --assess             Run live system assessment / 執行即時系統評估
   --verbose, -v        Verbose output / 詳細輸出
 
@@ -181,6 +189,7 @@ Examples / 範例:
   panguard-report generate --framework tw_cyber_security_act --assess
   panguard-report generate --framework iso27001 --org "ACME Corp" --assess
   panguard-report generate --framework iso27001 --org "ACME Corp" --input findings.json
+  panguard-report generate --framework soc2 --scan-results scan-output.json
   panguard-report list-frameworks
   panguard-report summary --input findings.json --framework soc2
 `.trim();
@@ -260,10 +269,40 @@ export async function executeCli(args: string[]): Promise<void> {
       console.log(`Framework / 框架: ${framework}`);
       console.log(`Language / 語言: ${language}`);
 
+      // Convert scan results to compliance findings if --scan-results provided
+      let scanFindings: ComplianceFinding[] = [];
+      if (options.scanResultsFile) {
+        const { readFile } = await import('node:fs/promises');
+        const raw = await readFile(options.scanResultsFile, 'utf-8');
+        const scanOutput = JSON.parse(raw) as {
+          findings: Array<{
+            id: number;
+            severity: string;
+            title: string;
+            description: string;
+            category: string;
+            remediation?: string;
+          }>;
+        };
+        scanFindings = scanOutput.findings.map((f) => ({
+          findingId: `SCAN-${String(f.id).padStart(3, '0')}`,
+          severity: f.severity as ComplianceFinding['severity'],
+          title: f.title,
+          description: f.description,
+          category: f.category,
+          timestamp: new Date(),
+          source: 'panguard-scan' as const,
+        }));
+        console.log(
+          `Scan results loaded / 已載入掃描結果: ${scanFindings.length} findings from ${options.scanResultsFile}`
+        );
+      }
+
       let report;
       if (options.assess) {
         console.log('Running live system assessment... / 執行即時系統評估...');
-        const additionalFindings = options.inputFile ? await loadFindings(options.inputFile) : [];
+        const inputFindings = options.inputFile ? await loadFindings(options.inputFile) : [];
+        const additionalFindings = [...inputFindings, ...scanFindings];
         report = await generateComplianceReportWithAssessment(framework, language, {
           organizationName: options.organizationName,
           includeRecommendations: true,
@@ -271,7 +310,8 @@ export async function executeCli(args: string[]): Promise<void> {
         });
         console.log(`Assessment findings / 評估發現: ${report.findings.length}`);
       } else {
-        const findings = await loadFindings(options.inputFile);
+        const inputFindings = await loadFindings(options.inputFile);
+        const findings = [...inputFindings, ...scanFindings];
         console.log(`Findings loaded / 已載入發現: ${findings.length}`);
         report = generateComplianceReport(findings, framework, language, {
           organizationName: options.organizationName,
@@ -279,7 +319,29 @@ export async function executeCli(args: string[]): Promise<void> {
         });
       }
 
-      if (format === 'json') {
+      if (format === 'pdf') {
+        const { mkdir } = await import('node:fs/promises');
+        const outputDir = options.outputDir ?? DEFAULT_REPORT_CONFIG.outputDir;
+        await mkdir(outputDir, { recursive: true });
+        const pdfPath = `${outputDir}/${report.metadata.reportId}.pdf`;
+
+        const isZh = language === 'zh-TW';
+        const pdfTitle = isZh
+          ? `Panguard AI - ${framework} 合規報告`
+          : `Panguard AI - ${framework} Compliance Report`;
+
+        await generatePDFReport({
+          title: pdfTitle,
+          framework,
+          lang: language,
+          outputPath: pdfPath,
+          findings: report.findings,
+          assessmentResult: report,
+          organizationName: options.organizationName,
+          generatedAt: report.metadata.generatedAt.toISOString().split('T')[0],
+        });
+        console.log(`PDF report saved to / PDF 報告已儲存至: ${pdfPath}`);
+      } else if (format === 'json') {
         const json = reportToJSON(report);
         if (options.outputDir) {
           const { writeFile, mkdir } = await import('node:fs/promises');
@@ -292,7 +354,7 @@ export async function executeCli(args: string[]): Promise<void> {
           console.log(json);
         }
       } else {
-        // For non-JSON formats, output the summary text
+        // For other formats, output the summary text
         const summary = generateSummaryText(report);
         console.log('');
         console.log(summary);

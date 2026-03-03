@@ -1,29 +1,29 @@
 /**
  * Panguard AI - Interactive CLI Mode
  *
- * Minimalist arrow-key menu interface inspired by Claude Code / Vercel CLI.
- * Single-language display, no box borders, brand sage green theme.
+ * Number-key menu [0]-[7] with panguard > prompt for text commands.
+ * Box-bordered status panel, breadcrumb navigation, no "press any key" interrupts.
  *
  * @module @panguard-ai/panguard/cli/interactive
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, openSync, closeSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { c, spinner, colorSeverity, formatDuration, box } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../index.js';
 import { renderLogo, theme } from './theme.js';
 import {
-  runArrowMenu,
+  waitForMainInput,
   pressAnyKey,
   cleanupTerminal,
   renderCompactMenu,
   waitForCompactChoice,
 } from './menu.js';
 import type { MenuItem, Lang } from './menu.js';
-import { checkFeatureAccess, showUpgradePrompt, getLicense } from './auth-guard.js';
+import { checkFeatureAccess, showUpgradePrompt, getLicense, FEATURE_TIER } from './auth-guard.js';
 import { tierDisplayName } from './credentials.js';
-import { breadcrumb, nextSteps, confirmDestructive, moduleCountDisplay } from './ux-helpers.js';
+import { breadcrumb, nextSteps, confirmDestructive, moduleCountDisplay, formatError } from './ux-helpers.js';
 
 // ---------------------------------------------------------------------------
 // Language management
@@ -33,7 +33,6 @@ const CONFIG_DIR = join(homedir(), '.panguard');
 const CONFIG_PATH = join(CONFIG_DIR, 'config.json');
 
 function detectLang(): Lang {
-  // 1. Read saved preference
   if (existsSync(CONFIG_PATH)) {
     try {
       const data = JSON.parse(readFileSync(CONFIG_PATH, 'utf-8'));
@@ -42,7 +41,6 @@ function detectLang(): Lang {
       /* ignore */
     }
   }
-  // 2. Detect from system locale
   const sysLang = process.env['LANG'] ?? process.env['LC_ALL'] ?? '';
   if (sysLang.includes('zh')) return 'zh-TW';
   return 'en';
@@ -65,58 +63,250 @@ function saveLang(lang: Lang): void {
 let currentLang: Lang = 'en';
 
 // ---------------------------------------------------------------------------
-// Menu data
+// Menu definitions — 8 core items matching the redesigned UI
 // ---------------------------------------------------------------------------
 
 interface MenuDef {
   key: string;
+  icon: string;
+  number: number;
   en: string;
   zh: string;
-  tier: string;
+  enDesc: string;
+  zhDesc: string;
+  tierBadge: string; // Display badge: '', '[STARTER]', '[PRO]', '[ENT]'
+  featureKey: string; // Key for FEATURE_TIER gating
 }
 
 const MENU_DEFS: MenuDef[] = [
-  { key: 'scan', en: 'Security scan', zh: '\u5B89\u5168\u6383\u63CF', tier: 'community' },
-  { key: 'guard', en: 'Real-time protection', zh: '\u5373\u6642\u9632\u8B77', tier: 'community' },
-  { key: 'hardening', en: 'Security hardening', zh: '\u5B89\u5168\u52A0\u56FA', tier: 'community' },
   {
-    key: 'threat-cloud',
-    en: 'Threat intelligence API',
-    zh: '\u5A01\u8105\u60C5\u5831 API',
-    tier: 'community',
+    key: 'setup',
+    icon: '>',
+    number: 0,
+    en: 'Setup Wizard',
+    zh: '\u521D\u59CB\u8A2D\u5B9A',
+    enDesc: 'Configure all modules with guided setup',
+    zhDesc: '\u958B\u555F\u6B64\u5F15\u64CE\uFF0C\u81EA\u52D5\u914D\u7F6E\u6240\u6709\u6A21\u7D44',
+    tierBadge: '',
+    featureKey: 'setup',
+  },
+  {
+    key: 'scan',
+    icon: '\u26A1',
+    number: 1,
+    en: 'Security Scan',
+    zh: '\u5B89\u5168\u6383\u63CF',
+    enDesc: 'Scan system security and analyze risks',
+    zhDesc: '\u6383\u63CF\u7CFB\u7D71\u5B89\u5168\u72C0\u614B\uFF0C\u5206\u6790\u6240\u6709\u98A8\u96AA',
+    tierBadge: '',
+    featureKey: 'scan',
+  },
+  {
+    key: 'report',
+    icon: '\u25A0',
+    number: 2,
+    en: 'Compliance Report',
+    zh: '\u5408\u898F\u5831\u544A',
+    enDesc: 'Generate ISO 27001, SOC 2, TW Cyber Security Act reports',
+    zhDesc: '\u7522\u751F ISO 27001\u3001SOC 2\u3001\u8CC7\u5B89\u7BA1\u7406\u6CD5\u5408\u898F\u5831\u544A',
+    tierBadge: '[PRO]',
+    featureKey: 'report',
+  },
+  {
+    key: 'guard',
+    icon: '\u2713',
+    number: 3,
+    en: 'Guard Engine',
+    zh: '\u5B88\u8B77\u5F15\u64CE',
+    enDesc: 'Real-time monitoring and continuous protection',
+    zhDesc: '\u5373\u6642\u76E3\u63A7\u9023\u7E8C\u9632\u8B77\u7CFB\u7D71',
+    tierBadge: '',
+    featureKey: 'guard',
+  },
+  {
+    key: 'trap',
+    icon: '\u00B7',
+    number: 4,
+    en: 'Honeypot System',
+    zh: '\u871C\u7F50\u7CFB\u7D71',
+    enDesc: 'Detect and profile attackers with decoy services',
+    zhDesc: '\u5373\u770B\u5373\u8B58\u99ED\u5BA2\uFF0C\u5206\u6790\u653B\u64CA\u8005\u884C\u70BA',
+    tierBadge: '[PRO]',
+    featureKey: 'trap',
   },
   {
     key: 'notify',
-    en: 'Notifications (Telegram, Slack)',
-    zh: '\u901A\u77E5\u7CFB\u7D71 (Telegram, Slack)',
-    tier: 'solo',
+    icon: '\u00B7',
+    number: 5,
+    en: 'Notifications',
+    zh: '\u901A\u77E5\u7CFB\u7D71',
+    enDesc: 'LINE, Telegram, Slack, Email, Webhook channels',
+    zhDesc: 'LINE\u3001Telegram\u3001Slack\u3001Email\u3001Webhook \u901A\u77E5\u7BA1\u9053',
+    tierBadge: '[STARTER]',
+    featureKey: 'notify',
   },
-  { key: 'trap', en: 'Honeypot system', zh: '\u871C\u7F50\u7CFB\u7D71', tier: 'pro' },
   {
-    key: 'report',
-    en: 'Compliance report (ISO 27001, SOC 2)',
-    zh: '\u5408\u898F\u5831\u544A (ISO 27001, SOC 2)',
-    tier: 'pro',
+    key: 'threat-cloud',
+    icon: '\u00B7',
+    number: 6,
+    en: 'Threat Cloud',
+    zh: '\u5A01\u8105\u60C5\u5831',
+    enDesc: 'Threat intelligence REST API server',
+    zhDesc: '\u5A01\u8105\u60C5\u5831 REST API \u4F3A\u670D\u52D9',
+    tierBadge: '[ENT]',
+    featureKey: 'threat-cloud',
   },
-  { key: 'manager', en: 'Distributed manager', zh: '\u5206\u6563\u5F0F\u7BA1\u7406', tier: 'business' },
-  { key: '__sep__', en: '', zh: '', tier: '' },
-  { key: 'status', en: 'System status', zh: '\u7CFB\u7D71\u72C0\u614B', tier: 'community' },
-  { key: 'login', en: 'Account login', zh: '\u5E33\u865F\u767B\u5165', tier: 'community' },
-  { key: 'config', en: 'Settings', zh: '\u8A2D\u5B9A\u7BA1\u7406', tier: 'community' },
-  { key: 'setup', en: 'Initial configuration', zh: '\u521D\u59CB\u8A2D\u5B9A', tier: 'community' },
-  { key: 'demo', en: 'Feature demo', zh: '\u529F\u80FD\u5C55\u793A', tier: 'community' },
-  { key: 'upgrade', en: 'Upgrade plan', zh: '\u5347\u7D1A\u65B9\u6848', tier: 'community' },
+  {
+    key: 'demo',
+    icon: '\u00B7',
+    number: 7,
+    en: 'Auto Demo',
+    zh: '\u81EA\u52D5\u5C55\u793A',
+    enDesc: 'Run through all security modules',
+    zhDesc: '\u81EA\u52D5\u57F7\u884C\u7D9C\u5408\u529F\u80FD\u5C55\u793A',
+    tierBadge: '',
+    featureKey: 'demo',
+  },
 ];
 
-function buildMenuItems(lang: Lang): MenuItem[] {
-  return MENU_DEFS.map((def) => {
-    if (def.key === '__sep__') return { key: '__sep__', label: '', separator: true };
-    return {
-      key: def.key,
-      label: lang === 'zh-TW' ? def.zh : def.en,
-      tier: def.tier || undefined,
-    };
-  });
+// ---------------------------------------------------------------------------
+// Guard process helpers
+// ---------------------------------------------------------------------------
+
+function isGuardRunning(): { running: boolean; pid?: number } {
+  const pidPath = join(homedir(), '.panguard-guard', 'panguard-guard.pid');
+  if (!existsSync(pidPath)) return { running: false };
+  try {
+    const pid = parseInt(readFileSync(pidPath, 'utf-8').trim(), 10);
+    process.kill(pid, 0);
+    return { running: true, pid };
+  } catch {
+    return { running: false };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Status panel with box border
+// ---------------------------------------------------------------------------
+
+function renderStatusPanel(): void {
+  const guardStatus = isGuardRunning();
+  const modulesValue = moduleCountDisplay(currentLang);
+
+  const guardLine = guardStatus.running
+    ? `${c.safe('PROTECTED')} ${c.dim(`(PID: ${guardStatus.pid})`)}`
+    : c.dim('Inactive');
+
+  const lines =
+    currentLang === 'zh-TW'
+      ? [
+          `\u9632\u8B77\u72C0\u614B\uFF1A${guardLine}`,
+          `\u53EF\u7528\u6A21\u7D44\uFF1A${modulesValue}`,
+          `\u7248\u672C\uFF1A  v${PANGUARD_VERSION}`,
+        ]
+      : [
+          `Protection: ${guardLine}`,
+          `Modules:    ${modulesValue}`,
+          `Version:    v${PANGUARD_VERSION}`,
+        ];
+
+  const title =
+    currentLang === 'zh-TW'
+      ? '\u7CFB\u7D71\u72C0\u614B / System Status'
+      : 'System Status';
+
+  console.log(box(lines.join('\n'), { borderColor: c.sage, title }));
+}
+
+// ---------------------------------------------------------------------------
+// Menu rendering
+// ---------------------------------------------------------------------------
+
+function renderMenu(): void {
+  const titleText =
+    currentLang === 'zh-TW'
+      ? '\u4E3B\u9078\u55AE / Main Menu'
+      : 'Main Menu';
+  console.log(`         ${theme.title(titleText)}`);
+  console.log('');
+
+  for (const def of MENU_DEFS) {
+    const name = currentLang === 'zh-TW' ? def.zh : def.en;
+    const desc = currentLang === 'zh-TW' ? def.zhDesc : def.enDesc;
+    const badge = def.tierBadge ? ` ${c.dim(def.tierBadge)}` : '';
+    const iconStr = def.icon === '\u2713' ? c.safe(def.icon) : c.dim(def.icon);
+
+    console.log(
+      `  ${iconStr}  ${c.sage(`[${def.number}]`)}  ${name}${badge}`
+    );
+    console.log(`           ${c.dim(desc)}`);
+    console.log('');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Footer shortcuts
+// ---------------------------------------------------------------------------
+
+function renderFooter(): void {
+  const quit = currentLang === 'zh-TW' ? '\u9000\u51FA' : 'Quit';
+  const help = currentLang === 'zh-TW' ? '\u8AAA\u660E' : 'Help';
+  const langToggle = currentLang === 'zh-TW' ? '\u4E2D/EN' : '\u4E2D/EN';
+
+  console.log(
+    `${c.dim(`[q] ${quit}   [h] ${help}   [b] ${langToggle}`)}`
+  );
+  console.log('');
+}
+
+// ---------------------------------------------------------------------------
+// Help display
+// ---------------------------------------------------------------------------
+
+function showHelp(): void {
+  console.log('');
+  const title =
+    currentLang === 'zh-TW' ? '\u6307\u4EE4\u8AAA\u660E' : 'Available Commands';
+  console.log(`  ${theme.brandBold(title)}`);
+  console.log('');
+
+  const menuTitle = currentLang === 'zh-TW' ? '\u4E3B\u9078\u55AE' : 'Main Menu';
+  console.log(`  ${c.sage(menuTitle)}`);
+  console.log(
+    c.dim(
+      currentLang === 'zh-TW'
+        ? '  [0]-[7]  \u6309\u6578\u5B57\u9375\u5373\u523B\u9078\u64C7\uFF08\u4E0D\u9700\u6309 Enter\uFF09'
+        : '  [0]-[7]  Press number key to select instantly (no Enter needed)'
+    )
+  );
+  console.log('');
+
+  const promptTitle = currentLang === 'zh-TW' ? '\u6587\u5B57\u6307\u4EE4' : 'Text Commands';
+  console.log(`  ${c.sage(promptTitle)}`);
+
+  const cmds = [
+    { cmd: 'status', en: 'System status overview', zh: '\u7CFB\u7D71\u72C0\u614B\u7E3D\u89BD' },
+    { cmd: 'login', en: 'Account login', zh: '\u5E33\u865F\u767B\u5165' },
+    { cmd: 'logout', en: 'Account logout', zh: '\u767B\u51FA' },
+    { cmd: 'config', en: 'Settings management', zh: '\u8A2D\u5B9A\u7BA1\u7406' },
+    { cmd: 'upgrade', en: 'Upgrade plan', zh: '\u5347\u7D1A\u65B9\u6848' },
+    { cmd: 'hardening', en: 'Security hardening', zh: '\u5B89\u5168\u52A0\u56FA' },
+    { cmd: 'doctor', en: 'Health diagnostics', zh: '\u5065\u5EB7\u8A3A\u65B7' },
+    { cmd: 'whoami', en: 'Current account info', zh: '\u986F\u793A\u7576\u524D\u5E33\u865F' },
+    { cmd: 'help', en: 'Show this help', zh: '\u986F\u793A\u6B64\u8AAA\u660E' },
+  ];
+
+  for (const { cmd, en, zh } of cmds) {
+    const desc = currentLang === 'zh-TW' ? zh : en;
+    console.log(`  ${c.sage(cmd.padEnd(14))} ${c.dim(desc)}`);
+  }
+
+  const shortcutTitle =
+    currentLang === 'zh-TW' ? '\u5FEB\u6377\u9375' : 'Shortcuts';
+  console.log('');
+  console.log(`  ${c.sage(shortcutTitle)}`);
+  console.log(c.dim(`  [q] ${currentLang === 'zh-TW' ? '\u9000\u51FA' : 'Quit'}   [h] ${currentLang === 'zh-TW' ? '\u8AAA\u660E' : 'Help'}   [b] ${currentLang === 'zh-TW' ? '\u5207\u63DB\u8A9E\u8A00' : 'Toggle language'}`));
+  console.log('');
 }
 
 // ---------------------------------------------------------------------------
@@ -132,31 +322,18 @@ function renderStartup(): void {
 
   // Tagline + version
   const tagline = c.dim('  AI-Powered Security Platform');
-  const version = c.dim(`v${PANGUARD_VERSION}`);
-  // Right-align version
-  // eslint-disable-next-line no-control-regex
-  const tagLen = tagline.replace(/\x1b\[[0-9;]*m/g, '').length;
-  // eslint-disable-next-line no-control-regex
-  const verLen = version.replace(/\x1b\[[0-9;]*m/g, '').length;
-  const totalWidth = Math.max(60, process.stdout.columns ?? 60);
-  const gap = Math.max(2, totalWidth - tagLen - verLen - 4);
-  console.log(`${tagline}${' '.repeat(gap)}${version}`);
+  console.log(tagline);
   console.log('');
 
-  // Status info
-  const { tier } = getLicense();
-  const tierName = tierDisplayName(tier);
-  const tierColor = tier === 'community' ? c.caution : c.safe;
-
-  const statusLabel = currentLang === 'zh-TW' ? '\u72C0\u614B' : 'Status';
-  const licenseLabel = currentLang === 'zh-TW' ? '\u6388\u6B0A' : 'License';
-  const modulesLabel = currentLang === 'zh-TW' ? '\u6A21\u7D44' : 'Modules';
-  const modulesValue = moduleCountDisplay(currentLang);
-
-  console.log(`  ${c.dim(statusLabel.padEnd(10))} ${c.safe('Ready')}`);
-  console.log(`  ${c.dim(licenseLabel.padEnd(10))} ${tierColor(tierName)}`);
-  console.log(`  ${c.dim(modulesLabel.padEnd(10))} ${modulesValue}`);
+  // Status panel
+  renderStatusPanel();
   console.log('');
+
+  // Menu
+  renderMenu();
+
+  // Footer
+  renderFooter();
 }
 
 // ---------------------------------------------------------------------------
@@ -181,68 +358,195 @@ export async function startInteractive(lang?: string): Promise<void> {
   if (!existsSync(CONFIG_PATH)) {
     const hint =
       currentLang === 'zh-TW'
-        ? `  ${c.sage('\u25C6')} \u9996\u6B21\u4F7F\u7528\uFF1F\u5EFA\u8B70\u5148\u57F7\u884C\u300C\u521D\u59CB\u8A2D\u5B9A\u300D\u6216\u300C\u529F\u80FD\u5C55\u793A\u300D`
-        : `  ${c.sage('\u25C6')} First time? Try "Initial configuration" or "Feature demo" to get started.`;
+        ? `  ${c.sage('\u25C6')} \u9996\u6B21\u4F7F\u7528\uFF1F\u5EFA\u8B70\u6309 [0] \u57F7\u884C\u521D\u59CB\u8A2D\u5B9A\u6216\u6309 [7] \u529F\u80FD\u5C55\u793A`
+        : `  ${c.sage('\u25C6')} First time? Press [0] for Setup Wizard or [7] for Auto Demo`;
     console.log(hint);
     console.log('');
   }
 
   // Main loop
   while (true) {
-    const title = currentLang === 'zh-TW' ? '  \u6307\u4EE4' : '  Commands';
-    console.log(theme.title(title));
-    console.log('');
+    const promptLabel = c.sage('panguard >') + ' ';
+    process.stdout.write(promptLabel);
 
-    const items = buildMenuItems(currentLang);
-    const choice = await runArrowMenu(items, { lang: currentLang });
+    const input = await waitForMainInput();
 
-    if (!choice) {
-      exit();
-      return;
+    switch (input.type) {
+      case 'quit':
+        exit();
+        return;
+
+      case 'help':
+        showHelp();
+        continue;
+
+      case 'lang_toggle':
+        currentLang = currentLang === 'zh-TW' ? 'en' : 'zh-TW';
+        saveLang(currentLang);
+        renderStartup();
+        continue;
+
+      case 'number': {
+        const def = MENU_DEFS[input.index];
+        if (!def) continue;
+
+        // Feature gate check
+        if (!checkFeatureAccess(def.featureKey)) {
+          showUpgradePrompt(def.featureKey, currentLang);
+          await new Promise((r) => setTimeout(r, 500));
+          renderStartup();
+          continue;
+        }
+
+        console.clear();
+        try {
+          await dispatch(def.key);
+        } catch (err) {
+          console.log('');
+          console.log(
+            formatError(
+              err instanceof Error ? err.message : String(err),
+              `${currentLang === 'zh-TW' ? '\u57F7\u884C' : 'Running'} ${def.key}`,
+              currentLang === 'zh-TW'
+                ? '\u8ACB\u67E5\u770B\u65E5\u8A8C\u6216\u91CD\u8A66'
+                : 'Check logs or retry'
+            )
+          );
+        }
+
+        await new Promise((r) => setTimeout(r, 500));
+        renderStartup();
+        continue;
+      }
+
+      case 'command': {
+        const text = input.text.toLowerCase();
+
+        if (!text) continue;
+
+        // Handle text commands
+        const handled = await dispatchCommand(text);
+        if (!handled) {
+          console.log(
+            c.dim(
+              currentLang === 'zh-TW'
+                ? `  \u672A\u77E5\u6307\u4EE4\u3002\u8F38\u5165 help \u67E5\u770B\u53EF\u7528\u6307\u4EE4\u3002`
+                : `  Unknown command. Type 'help' for available commands.`
+            )
+          );
+          console.log('');
+        }
+        continue;
+      }
     }
-
-    if (choice.key === '__lang__') {
-      currentLang = currentLang === 'zh-TW' ? 'en' : 'zh-TW';
-      saveLang(currentLang);
-      renderStartup();
-      continue;
-    }
-
-    // Feature gate check
-    if (!checkFeatureAccess(choice.key)) {
-      showUpgradePrompt(choice.key, currentLang);
-      await pressAnyKey(currentLang);
-      renderStartup();
-      continue;
-    }
-
-    console.clear();
-    try {
-      await dispatch(choice.key);
-    } catch (err) {
-      console.log('');
-      console.log(`  ${c.critical('Error:')} ${err instanceof Error ? err.message : String(err)}`);
-    }
-
-    await pressAnyKey(currentLang);
-    renderStartup();
   }
 }
 
 // ---------------------------------------------------------------------------
-// Action dispatch
+// Prompt command dispatch
+// ---------------------------------------------------------------------------
+
+async function dispatchCommand(text: string): Promise<boolean> {
+  switch (text) {
+    case 'status':
+      console.clear();
+      await actionStatus();
+      await new Promise((r) => setTimeout(r, 500));
+      renderStartup();
+      return true;
+
+    case 'login':
+      console.clear();
+      await actionLogin();
+      await new Promise((r) => setTimeout(r, 500));
+      renderStartup();
+      return true;
+
+    case 'logout': {
+      console.clear();
+      const { logoutCommand } = await import('./commands/logout.js');
+      const cmd = logoutCommand();
+      await cmd.parseAsync(['logout'], { from: 'user' });
+      await new Promise((r) => setTimeout(r, 500));
+      renderStartup();
+      return true;
+    }
+
+    case 'config':
+      console.clear();
+      await actionConfig();
+      await new Promise((r) => setTimeout(r, 500));
+      renderStartup();
+      return true;
+
+    case 'upgrade':
+      console.clear();
+      await actionUpgrade();
+      await new Promise((r) => setTimeout(r, 500));
+      renderStartup();
+      return true;
+
+    case 'hardening':
+      console.clear();
+      await actionHardening();
+      await new Promise((r) => setTimeout(r, 500));
+      renderStartup();
+      return true;
+
+    case 'doctor':
+      console.clear();
+      try {
+        const { runDoctor } = await import('./commands/doctor.js');
+        await runDoctor(currentLang);
+      } catch (err) {
+        console.log(
+          formatError(
+            err instanceof Error ? err.message : String(err),
+            currentLang === 'zh-TW' ? '\u57F7\u884C\u5065\u5EB7\u8A3A\u65B7' : 'Running diagnostics',
+            currentLang === 'zh-TW' ? '\u8ACB\u91CD\u8A66' : 'Please retry'
+          )
+        );
+      }
+      await new Promise((r) => setTimeout(r, 500));
+      renderStartup();
+      return true;
+
+    case 'whoami': {
+      console.clear();
+      const { whoamiCommand } = await import('./commands/whoami.js');
+      const cmd = whoamiCommand();
+      await cmd.parseAsync(['whoami'], { from: 'user' });
+      await new Promise((r) => setTimeout(r, 500));
+      renderStartup();
+      return true;
+    }
+
+    case 'help':
+      showHelp();
+      return true;
+
+    default:
+      return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Action dispatch (from numbered menu)
 // ---------------------------------------------------------------------------
 
 async function dispatch(key: string): Promise<void> {
   switch (key) {
+    case 'setup':
+      await actionInit();
+      break;
     case 'scan':
       await actionScan();
       break;
-    case 'guard':
-      await actionGuard();
-      break;
     case 'report':
       await actionReport();
+      break;
+    case 'guard':
+      await actionGuard();
       break;
     case 'trap':
       await actionTrap();
@@ -253,35 +557,14 @@ async function dispatch(key: string): Promise<void> {
     case 'threat-cloud':
       await actionThreat();
       break;
-    case 'setup':
-      await actionInit();
-      break;
     case 'demo':
       await actionDemo();
-      break;
-    case 'upgrade':
-      await actionUpgrade();
-      break;
-    case 'hardening':
-      await actionHardening();
-      break;
-    case 'manager':
-      await actionManager();
-      break;
-    case 'status':
-      await actionStatus();
-      break;
-    case 'login':
-      await actionLogin();
-      break;
-    case 'config':
-      await actionConfig();
       break;
   }
 }
 
 // ---------------------------------------------------------------------------
-// 0. Setup Wizard
+// [0] Setup Wizard
 // ---------------------------------------------------------------------------
 
 async function actionInit(): Promise<void> {
@@ -291,7 +574,7 @@ async function actionInit(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// 1. Security Scan
+// [1] Security Scan
 // ---------------------------------------------------------------------------
 
 async function actionScan(): Promise<void> {
@@ -300,7 +583,6 @@ async function actionScan(): Promise<void> {
   console.log(`  ${theme.brandBold(scanTitle)}`);
   console.log('');
 
-  // Scan depth selection
   const depthItems: MenuItem[] = [
     {
       key: '1',
@@ -348,7 +630,6 @@ async function actionScan(): Promise<void> {
             ? 'D'
             : 'F';
 
-  // Compact score display
   console.log('');
   const scoreLabel = currentLang === 'zh-TW' ? '\u6383\u63CF\u5B8C\u6210' : 'Scan Complete';
   console.log(
@@ -364,7 +645,6 @@ async function actionScan(): Promise<void> {
       const sev = colorSeverity(f.severity).padEnd(10);
       console.log(`  ${sev} ${f.title}`);
 
-      // Show manual fix commands for free tier
       if (tier === 'community' && f.manualFix && f.manualFix.length > 0) {
         const fixLabel = currentLang === 'zh-TW' ? '\u624B\u52D5\u4FEE\u5FA9:' : 'Manual fix:';
         console.log(c.dim(`          ${fixLabel}`));
@@ -382,7 +662,6 @@ async function actionScan(): Promise<void> {
         : `${result.findings.length} issue(s) found`;
     console.log(c.dim(`  ${issuesText}`));
 
-    // Upgrade prompt for free tier
     if (tier === 'community' && fixableCount > 0) {
       const upgradeLines =
         currentLang === 'zh-TW'
@@ -402,7 +681,6 @@ async function actionScan(): Promise<void> {
     console.log(`  ${c.safe(noIssues)}`);
   }
 
-  // Next steps
   nextSteps(
     currentLang === 'zh-TW'
       ? [
@@ -420,7 +698,7 @@ async function actionScan(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// 2. Compliance Report
+// [2] Compliance Report
 // ---------------------------------------------------------------------------
 
 async function actionReport(): Promise<void> {
@@ -481,7 +759,6 @@ async function actionReport(): Promise<void> {
   const { executeCli } = await import('@panguard-ai/panguard-report');
   await executeCli(['generate', '--framework', framework, '--language', reportLang]);
 
-  // Next steps
   nextSteps(
     currentLang === 'zh-TW'
       ? [
@@ -497,7 +774,7 @@ async function actionReport(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// 3. Guard Engine
+// [3] Guard Engine
 // ---------------------------------------------------------------------------
 
 async function actionGuard(): Promise<void> {
@@ -505,18 +782,8 @@ async function actionGuard(): Promise<void> {
   const title = currentLang === 'zh-TW' ? '\u5B88\u8B77\u5F15\u64CE' : 'Guard Engine';
   console.log(`  ${theme.brandBold(title)}`);
 
-  // Show current Guard running status
-  const guardPidPath = join(homedir(), '.panguard-guard', 'panguard-guard.pid');
-  let guardRunning = false;
-  if (existsSync(guardPidPath)) {
-    try {
-      const pid = parseInt(readFileSync(guardPidPath, 'utf-8').trim(), 10);
-      process.kill(pid, 0);
-      guardRunning = true;
-    } catch {
-      // not running
-    }
-  }
+  const guardInfo = isGuardRunning();
+  const guardRunning = guardInfo.running;
   const statusText = guardRunning
     ? c.safe(currentLang === 'zh-TW' ? '\u904B\u884C\u4E2D' : 'Running')
     : c.caution(currentLang === 'zh-TW' ? '\u672A\u904B\u884C' : 'Not running');
@@ -524,13 +791,10 @@ async function actionGuard(): Promise<void> {
   console.log('');
 
   const items: MenuItem[] = [
-    { key: '1', label: currentLang === 'zh-TW' ? '\u67E5\u770B\u72C0\u614B' : 'Status' },
-    { key: '2', label: currentLang === 'zh-TW' ? '\u555F\u52D5\u5F15\u64CE' : 'Start' },
-    { key: '3', label: currentLang === 'zh-TW' ? '\u505C\u6B62\u5F15\u64CE' : 'Stop' },
-    {
-      key: '4',
-      label: currentLang === 'zh-TW' ? '\u7522\u751F\u6E2C\u8A66\u91D1\u9470' : 'Generate Test Key',
-    },
+    { key: '1', label: currentLang === 'zh-TW' ? '\u555F\u52D5\u5F15\u64CE  Start' : 'Start' },
+    { key: '2', label: currentLang === 'zh-TW' ? '\u505C\u6B62\u5F15\u64CE  Stop' : 'Stop' },
+    { key: '3', label: currentLang === 'zh-TW' ? '\u67E5\u770B\u72C0\u614B  Status' : 'Status' },
+    { key: '4', label: currentLang === 'zh-TW' ? '\u67E5\u770B\u65E5\u8A8C  Logs' : 'Logs' },
   ];
 
   renderCompactMenu(currentLang === 'zh-TW' ? '\u5B88\u8B77\u5F15\u64CE' : 'Guard Engine', items);
@@ -542,25 +806,38 @@ async function actionGuard(): Promise<void> {
   const { runCLI } = await import('@panguard-ai/panguard-guard');
 
   switch (choice.key) {
-    case '1':
-      await runCLI(['status']);
-      break;
-    case '2': {
-      // Free tier — show positive capabilities first, then dimmed upgrade hints
+    case '1': {
+      // Start guard engine
+      if (guardRunning) {
+        console.log(
+          `  ${c.safe('\u2713')} ${currentLang === 'zh-TW' ? '\u5B88\u8B77\u5F15\u64CE\u5DF2\u5728\u904B\u884C\u4E2D' : 'Guard engine is already running'} ${c.dim(`(PID: ${guardInfo.pid})`)}`
+        );
+        nextSteps(
+          currentLang === 'zh-TW'
+            ? [
+                { cmd: 'guard > \u67E5\u770B\u72C0\u614B', desc: '\u67E5\u770B\u8A73\u7D30\u72C0\u614B' },
+                { cmd: 'guard > \u505C\u6B62\u5F15\u64CE', desc: '\u505C\u6B62\u9632\u8B77' },
+              ]
+            : [
+                { cmd: 'guard > Status', desc: 'View detailed status' },
+                { cmd: 'guard > Stop', desc: 'Stop protection' },
+              ],
+          currentLang
+        );
+        break;
+      }
+
+      // Free tier — show positive capabilities first
       const { tier } = getLicense();
       if (tier === 'community') {
         console.log(`  ${c.sage('\u25C6')} Guard active${' '.repeat(30)}Layer 1 \u00B7 Community`);
         console.log('');
         if (currentLang === 'zh-TW') {
-          console.log(
-            `  ${c.safe('\u2713')} \u5DF2\u77E5\u653B\u64CA\u6A21\u5F0F\u81EA\u52D5\u5C01\u9396`
-          );
+          console.log(`  ${c.safe('\u2713')} \u5DF2\u77E5\u653B\u64CA\u6A21\u5F0F\u81EA\u52D5\u5C01\u9396`);
           console.log(`  ${c.safe('\u2713')} Threat Cloud \u5A01\u8105\u60C5\u5831`);
           console.log(`  ${c.dim('\u2500')} AI \u5206\u6790 ${c.dim('(Solo $9/\u6708)')}`);
           console.log(`  ${c.dim('\u2500')} \u901A\u77E5\u7CFB\u7D71 ${c.dim('(Solo $9/\u6708)')}`);
-          console.log(
-            `  ${c.dim('\u2500')} \u65E5\u8A8C\u4FDD\u7559 7 \u5929+ ${c.dim('(Solo $9/\u6708)')}`
-          );
+          console.log(`  ${c.dim('\u2500')} \u65E5\u8A8C\u4FDD\u7559 7 \u5929+ ${c.dim('(Solo $9/\u6708)')}`);
         } else {
           console.log(`  ${c.safe('\u2713')} Auto-blocking for known attack patterns`);
           console.log(`  ${c.safe('\u2713')} Threat Cloud intelligence`);
@@ -570,8 +847,76 @@ async function actionGuard(): Promise<void> {
         }
         console.log('');
       }
-      await runCLI(['start']);
-      // Next steps after guard start
+
+      // Spawn guard as background process
+      const { spawn: spawnProcess } = await import('node:child_process');
+      const { fileURLToPath: toPath } = await import('node:url');
+
+      const guardMainUrl = import.meta.resolve('@panguard-ai/panguard-guard');
+      const guardCliScript = join(toPath(guardMainUrl), '..', 'cli', 'index.js');
+
+      const guardDataDir = join(homedir(), '.panguard-guard');
+      if (!existsSync(guardDataDir)) mkdirSync(guardDataDir, { recursive: true });
+      const logPath = join(guardDataDir, 'guard.log');
+      const logFd = openSync(logPath, 'a');
+
+      const guardSp = spinner(
+        currentLang === 'zh-TW'
+          ? '\u6B63\u5728\u555F\u52D5\u5B88\u8B77\u5F15\u64CE...'
+          : 'Starting guard engine...'
+      );
+
+      const child = spawnProcess(process.execPath, [guardCliScript, 'start'], {
+        detached: true,
+        stdio: ['ignore', logFd, logFd],
+        env: { ...process.env },
+      });
+      child.unref();
+      closeSync(logFd);
+
+      // Wait for PID file to confirm startup
+      const pidPath = join(guardDataDir, 'panguard-guard.pid');
+      let started = false;
+      const deadline = Date.now() + 5000;
+      while (Date.now() < deadline) {
+        if (existsSync(pidPath)) {
+          try {
+            const newPid = parseInt(readFileSync(pidPath, 'utf-8').trim(), 10);
+            process.kill(newPid, 0);
+            started = true;
+            break;
+          } catch {
+            /* not yet */
+          }
+        }
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
+
+      if (started) {
+        const newPid = parseInt(readFileSync(pidPath, 'utf-8').trim(), 10);
+        guardSp.succeed(
+          currentLang === 'zh-TW'
+            ? '\u5B88\u8B77\u5F15\u64CE\u5DF2\u555F\u52D5'
+            : 'Guard engine started'
+        );
+        console.log('');
+        console.log(
+          `  ${c.safe('\u2713')} ${currentLang === 'zh-TW' ? '\u7CFB\u7D71\u5DF2\u53D7\u4FDD\u8B77' : 'System is now protected'} ${c.dim(`(PID: ${newPid})`)}`
+        );
+        console.log(
+          `  ${c.dim(currentLang === 'zh-TW' ? '  \u65E5\u8A8C: ~/.panguard-guard/guard.log' : '  Logs: ~/.panguard-guard/guard.log')}`
+        );
+      } else {
+        guardSp.fail(
+          currentLang === 'zh-TW'
+            ? '\u5B88\u8B77\u5F15\u64CE\u555F\u52D5\u5931\u6557'
+            : 'Failed to start guard engine'
+        );
+        console.log(
+          `  ${c.dim(currentLang === 'zh-TW' ? '  \u67E5\u770B\u65E5\u8A8C: ~/.panguard-guard/guard.log' : '  Check logs: ~/.panguard-guard/guard.log')}`
+        );
+      }
+
       nextSteps(
         currentLang === 'zh-TW'
           ? [
@@ -586,8 +931,7 @@ async function actionGuard(): Promise<void> {
       );
       break;
     }
-    case '3': {
-      // Confirm before stopping protection
+    case '2': {
       const confirmed = await confirmDestructive(
         currentLang === 'zh-TW'
           ? '\u78BA\u5B9A\u8981\u505C\u6B62\u5373\u6642\u9632\u8B77\uFF1F'
@@ -601,14 +945,29 @@ async function actionGuard(): Promise<void> {
       }
       break;
     }
-    case '4':
-      await runCLI(['generate-key', 'pro']);
+    case '3':
+      await runCLI(['status']);
       break;
+    case '4': {
+      const logFilePath = join(homedir(), '.panguard-guard', 'guard.log');
+      if (existsSync(logFilePath)) {
+        const content = readFileSync(logFilePath, 'utf-8');
+        const lines = content.trim().split('\n').slice(-30);
+        console.log(c.dim(currentLang === 'zh-TW' ? '  \u6700\u8FD1 30 \u884C\u65E5\u8A8C:' : '  Last 30 log lines:'));
+        console.log('');
+        for (const line of lines) {
+          console.log(`  ${c.dim(line)}`);
+        }
+      } else {
+        console.log(c.dim(currentLang === 'zh-TW' ? '  \u5C1A\u7121\u65E5\u8A8C\u6A94\u6848' : '  No log file found'));
+      }
+      break;
+    }
   }
 }
 
 // ---------------------------------------------------------------------------
-// 4. Honeypot System
+// [4] Honeypot System
 // ---------------------------------------------------------------------------
 
 async function actionTrap(): Promise<void> {
@@ -667,7 +1026,7 @@ async function actionTrap(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// 5. Notifications
+// [5] Notifications
 // ---------------------------------------------------------------------------
 
 async function actionChat(): Promise<void> {
@@ -677,9 +1036,9 @@ async function actionChat(): Promise<void> {
   console.log('');
 
   const items: MenuItem[] = [
-    { key: '1', label: currentLang === 'zh-TW' ? '\u8A2D\u5B9A\u901A\u77E5' : 'Setup' },
+    { key: '1', label: currentLang === 'zh-TW' ? '\u8A2D\u5B9A\u901A\u77E5\u7BA1\u9053' : 'Setup Channels' },
     { key: '2', label: currentLang === 'zh-TW' ? '\u67E5\u770B\u72C0\u614B' : 'Status' },
-    { key: '3', label: currentLang === 'zh-TW' ? '\u67E5\u770B\u914D\u7F6E' : 'Config' },
+    { key: '3', label: currentLang === 'zh-TW' ? '\u6E2C\u8A66\u767C\u9001' : 'Test Send' },
   ];
 
   renderCompactMenu(currentLang === 'zh-TW' ? '\u901A\u77E5\u7CFB\u7D71' : 'Notifications', items);
@@ -687,23 +1046,23 @@ async function actionChat(): Promise<void> {
   if (!choice) return;
 
   console.log('');
-  const { runCLI } = await import('@panguard-ai/panguard-chat');
+  const { runCLI: chatRunCLI } = await import('@panguard-ai/panguard-chat');
 
   switch (choice.key) {
     case '1':
-      await runCLI(['setup', '--lang', currentLang]);
+      await chatRunCLI(['setup', '--lang', currentLang]);
       break;
     case '2':
-      await runCLI(['status']);
+      await chatRunCLI(['status']);
       break;
     case '3':
-      await runCLI(['config']);
+      await chatRunCLI(['config']);
       break;
   }
 }
 
 // ---------------------------------------------------------------------------
-// 6. Threat Cloud
+// [6] Threat Cloud
 // ---------------------------------------------------------------------------
 
 async function actionThreat(): Promise<void> {
@@ -712,7 +1071,6 @@ async function actionThreat(): Promise<void> {
   console.log(`  ${theme.brandBold(title)}`);
   console.log('');
 
-  // Port availability check
   const port = 8080;
   const net = await import('node:net');
   const portAvailable = await new Promise<boolean>((resolve) => {
@@ -726,11 +1084,15 @@ async function actionThreat(): Promise<void> {
 
   if (!portAvailable) {
     console.log(
-      `  ${c.critical(
+      formatError(
         currentLang === 'zh-TW'
-          ? `\u9023\u63A5\u57E0 ${port} \u5DF2\u88AB\u4F54\u7528\u3002\u8ACB\u91CB\u653E\u8A72\u57E0\u5F8C\u518D\u8A66\u3002`
-          : `Port ${port} is already in use. Please free it and try again.`
-      )}`
+          ? `\u9023\u63A5\u57E0 ${port} \u5DF2\u88AB\u4F54\u7528`
+          : `Port ${port} is already in use`,
+        `Port ${port}`,
+        currentLang === 'zh-TW'
+          ? `\u91CB\u653E\u9023\u63A5\u57E0 ${port} \u5F8C\u518D\u8A66`
+          : `Free port ${port} and try again`
+      )
     );
     return;
   }
@@ -793,7 +1155,7 @@ async function actionThreat(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// 7. Auto Demo
+// [7] Auto Demo
 // ---------------------------------------------------------------------------
 
 async function actionDemo(): Promise<void> {
@@ -813,7 +1175,6 @@ async function actionDemo(): Promise<void> {
   );
   console.log('');
 
-  // Track results: 'ok' | 'warn' | 'fail'
   type DemoResult = 'ok' | 'warn' | 'fail';
   const results: { name: string; status: DemoResult }[] = [];
 
@@ -1004,7 +1365,7 @@ async function actionDemo(): Promise<void> {
   }
   console.log('');
 
-  // Summary — show real results
+  // Summary
   console.log(
     `  ${theme.brandBold(currentLang === 'zh-TW' ? '\u5C55\u793A\u5B8C\u6210' : 'Demo Complete')}`
   );
@@ -1019,7 +1380,6 @@ async function actionDemo(): Promise<void> {
     console.log(`  ${icon} ${r.name}`);
   }
 
-  // Next steps
   nextSteps(
     currentLang === 'zh-TW'
       ? [
@@ -1037,20 +1397,18 @@ async function actionDemo(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// 8. Upgrade Plan
+// Prompt commands: Upgrade
 // ---------------------------------------------------------------------------
 
 async function actionUpgrade(): Promise<void> {
   breadcrumb(['Panguard', currentLang === 'zh-TW' ? '\u5347\u7D1A\u65B9\u6848' : 'Upgrade Plan']);
-
-  // Delegate to the upgrade command module
   const { upgradeCommand } = await import('./commands/upgrade.js');
   const cmd = upgradeCommand();
   await cmd.parseAsync(['upgrade', '--lang', currentLang], { from: 'user' });
 }
 
 // ---------------------------------------------------------------------------
-// 9. Security Hardening
+// Prompt commands: Hardening
 // ---------------------------------------------------------------------------
 
 async function actionHardening(): Promise<void> {
@@ -1087,44 +1445,7 @@ async function actionHardening(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// 10. Distributed Manager
-// ---------------------------------------------------------------------------
-
-async function actionManager(): Promise<void> {
-  breadcrumb(['Panguard', currentLang === 'zh-TW' ? '\u5206\u6563\u5F0F\u7BA1\u7406' : 'Manager']);
-  const title = currentLang === 'zh-TW' ? '\u5206\u6563\u5F0F\u7BA1\u7406' : 'Distributed Manager';
-  console.log(`  ${theme.brandBold(title)}`);
-  console.log('');
-
-  const items: MenuItem[] = [
-    { key: '1', label: currentLang === 'zh-TW' ? '\u67E5\u770B Agent \u72C0\u614B' : 'Agent status' },
-    { key: '2', label: currentLang === 'zh-TW' ? '\u5A01\u8105\u7E3D\u89BD' : 'Threat overview' },
-    { key: '3', label: currentLang === 'zh-TW' ? '\u653F\u7B56\u7BA1\u7406' : 'Policy management' },
-  ];
-
-  renderCompactMenu(currentLang === 'zh-TW' ? '\u7BA1\u7406\u7BC0\u9EDE' : 'Manager Node', items);
-  const choice = await waitForCompactChoice(items, currentLang);
-  if (!choice) return;
-
-  console.log('');
-  const { managerCommand } = await import('./commands/manager.js');
-  const cmd = managerCommand();
-
-  switch (choice.key) {
-    case '1':
-      await cmd.parseAsync(['manager', 'agents'], { from: 'user' });
-      break;
-    case '2':
-      await cmd.parseAsync(['manager', 'threats'], { from: 'user' });
-      break;
-    case '3':
-      await cmd.parseAsync(['manager', 'policies'], { from: 'user' });
-      break;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// 11. System Status
+// Prompt commands: Status
 // ---------------------------------------------------------------------------
 
 async function actionStatus(): Promise<void> {
@@ -1135,7 +1456,7 @@ async function actionStatus(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// 12. Account Login
+// Prompt commands: Login
 // ---------------------------------------------------------------------------
 
 async function actionLogin(): Promise<void> {
@@ -1146,7 +1467,7 @@ async function actionLogin(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// 13. Settings
+// Prompt commands: Config
 // ---------------------------------------------------------------------------
 
 async function actionConfig(): Promise<void> {

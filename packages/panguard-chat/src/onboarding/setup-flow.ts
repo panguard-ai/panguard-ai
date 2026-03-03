@@ -354,6 +354,10 @@ export function getChannelConfigSteps(channel: ChannelType): readonly SetupStep[
           inputType: 'text',
         },
       ];
+    default: {
+      const _exhaustive: never = channel;
+      return [];
+    }
   }
 }
 

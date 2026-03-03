@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ "$1" = "-v" ] || [ "$1" = "--version" ]; then
+  echo "v22.5.0"
+else
+  echo "v22.5.0"
+fi

@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://github.com/panguard-ai/panguard-ai/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License"></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-%3E%3D20-green.svg" alt="Node.js"></a>
-  <a href="#test-coverage"><img src="https://img.shields.io/badge/tests-1%2C326%20passed-brightgreen.svg" alt="Tests"></a>
+  <a href="#test-coverage"><img src="https://img.shields.io/badge/tests-1%2C422%20passed-brightgreen.svg" alt="Tests"></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-strict-blue.svg" alt="TypeScript"></a>
   <a href="https://panguard.ai"><img src="https://img.shields.io/badge/Made%20in-Taiwan-red.svg" alt="Made in Taiwan"></a>
 </p>
@@ -77,7 +77,7 @@ Panguard uses a tiered approach that handles 90% of threats locally in under 50m
 
 ```
 Layer 1: Rules Engine (90% of threats)
-  3,155 Sigma rules + 4,326 YARA rules + Suricata
+  3,155 Sigma rules + 5,895 YARA rules + Suricata
   Speed: <50ms | Cost: $0
 
 Layer 2: Local AI (7% of threats)
@@ -192,7 +192,7 @@ panguard chat setup --channel telegram       # Telegram
 panguard chat test                           # Send test notification
 ```
 
-**4 channels:** Telegram, Slack (Block Kit), Email (SMTP/Resend), Webhooks
+**5 channels:** Telegram, Slack (Block Kit), Email (SMTP/Resend), Webhooks, LINE
 
 **3 tone modes:**
 
@@ -295,12 +295,12 @@ All Panguard users protected (minutes)
 panguard-ai/
   packages/
     core/               # Shared engine: discovery, rules, monitoring, AI providers
-    panguard/           # Unified CLI: 15 commands, interactive menu, setup wizard
+    panguard/           # Unified CLI: 19 commands, interactive menu, setup wizard
     panguard-scan/      # Security scanner + PDF report generation
     panguard-guard/     # AI monitoring: 4 agents, investigation, dashboard, daemon
     panguard-chat/      # Notifications: 5 channels, tone adaptation, templates
     panguard-trap/      # Honeypots: 8 services, attacker profiling, intel
-    panguard-report/    # Compliance: TCSA (50), ISO 27001 (93), SOC 2 (64)
+    panguard-report/    # Compliance: ISO 27001 (30) + SOC 2 (10) + TCSA (10) = 50 controls
     panguard-auth/      # Auth: OAuth, sessions, billing, rate limiting
     panguard-web/       # Website content engine: personas, pricing, guidance
     website/            # Next.js 14 marketing website (bilingual)
@@ -308,7 +308,7 @@ panguard-ai/
   security-hardening/   # WebSocket security, credential storage, sandbox, RBAC
   config/
     sigma-rules/        # 3,155 Sigma detection rules
-    yara-rules/         # 4,326 YARA malware detection rules
+    yara-rules/         # 5,895 YARA malware detection rules (926 files)
     suricata/           # Suricata IDS/IPS rules
     falco-rules/        # Falco runtime security rules
   docs/                 # User documentation (bilingual)
@@ -346,7 +346,7 @@ panguard-ai/
 ```bash
 pnpm install          # Install all dependencies
 pnpm build            # Build all packages
-pnpm test             # Run all 1,326 tests
+pnpm test             # Run all 1,422 tests
 pnpm typecheck        # TypeScript strict checking
 pnpm lint             # ESLint + security plugin
 pnpm dev              # Start all dev servers
@@ -356,9 +356,10 @@ pnpm dev              # Start all dev servers
 
 | Scope             | Tests     | Files   |
 | ----------------- | --------- | ------- |
-| Unit tests        | 1,178     | 213     |
-| Integration tests | 268       | 19      |
-| **Total**         | **1,326** | **232** |
+| Unit tests        | 1,292     | 91      |
+| Integration tests | 84        | 16      |
+| E2E tests         | 81        | 16      |
+| **Total**         | **1,422** | **87** |
 
 ---
 

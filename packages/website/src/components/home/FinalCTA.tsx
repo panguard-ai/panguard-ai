@@ -89,21 +89,19 @@ export default function FinalCTA() {
             href="/docs/getting-started"
             className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-8 py-3.5 hover:bg-panguard-green-light transition-all duration-200 active:scale-[0.98]"
           >
-            {t('btnGetStarted')} <ArrowRight className="w-4 h-4" />
+            {t('btnScan')} <ArrowRight className="w-4 h-4" />
           </Link>
-          <a
-            href="https://github.com/panguard-ai/panguard-ai"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border border-border text-text-secondary hover:text-text-primary hover:border-panguard-green font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
-          >
-            {t('btnGithub')}
-          </a>
           <Link
-            href="/docs"
+            href="/demo"
             className="border border-border text-text-secondary hover:text-text-primary hover:border-panguard-green font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
           >
-            {t('btnDocs')}
+            {t('btnDemo')}
+          </Link>
+          <Link
+            href="/contact"
+            className="border border-border text-text-secondary hover:text-text-primary hover:border-panguard-green font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
+          >
+            {t('btnSales')}
           </Link>
         </motion.div>
 

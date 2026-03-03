@@ -21,6 +21,8 @@ export type Severity = 'info' | 'low' | 'medium' | 'high' | 'critical';
 export type EventSource =
   | 'windows_event'
   | 'syslog'
+  | 'authlog'
+  | 'journald'
   | 'network'
   | 'process'
   | 'file'

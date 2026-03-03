@@ -1,0 +1,46 @@
+FROM node:22-alpine
+
+# Install build dependencies
+RUN apk add --no-cache git curl bash python3 make g++
+
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+# Create non-root test user
+RUN adduser -D -s /bin/bash testuser
+
+# Copy installer script
+COPY scripts/installer/install.sh /tmp/install.sh
+
+# Switch to test user
+USER testuser
+WORKDIR /home/testuser
+
+# Create shell profiles
+RUN touch ~/.bashrc ~/.profile
+
+# Run installer and verify -- should detect musl and use source build
+CMD ["bash", "-c", "\
+  echo '=== Starting Panguard AI Installer Test (Alpine/musl) ===' && \
+  echo '--- Expected: musl detection -> source build ---' && \
+  bash /tmp/install.sh 2>&1 | tee /tmp/install-output.txt && \
+  echo '' && \
+  echo '=== Checking musl detection ===' && \
+  if grep -qi 'musl' /tmp/install-output.txt; then \
+    echo 'OK: musl was detected'; \
+  else \
+    echo 'WARN: musl detection message not found'; \
+  fi && \
+  echo '' && \
+  echo '=== Verifying Installation ===' && \
+  if command -v panguard &>/dev/null; then \
+    panguard --version; \
+  elif [ -x ~/.panguard/source/bin/panguard ]; then \
+    ~/.panguard/source/bin/panguard --version; \
+  elif [ -x ~/.local/bin/panguard ]; then \
+    ~/.local/bin/panguard --version; \
+  else \
+    echo 'FAIL: panguard not found after installation'; \
+    exit 1; \
+  fi && \
+  echo '=== Alpine Installer Test PASSED ==='"]

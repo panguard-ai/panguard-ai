@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
-import { Inter, JetBrains_Mono, Instrument_Serif, Noto_Sans_TC } from 'next/font/google';
+import { Inter, JetBrains_Mono, Noto_Sans_TC } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -20,13 +20,6 @@ const inter = Inter({
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
-  display: 'swap',
-});
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-display',
   display: 'swap',
 });
 
@@ -167,7 +160,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale === 'zh' ? 'zh-TW' : 'en'}
-      className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} ${notoSansTC.variable}`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansTC.variable}`}
     >
       <head>
         {/* DNS prefetch for external resources */}

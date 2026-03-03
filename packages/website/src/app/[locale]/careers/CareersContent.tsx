@@ -71,7 +71,7 @@ export default function CareersContent() {
     <>
       {/* ── Hero ── */}
       <SectionWrapper spacing="spacious">
-        <SectionTitle overline={t('overline')} title={t('title')} subtitle={t('subtitle')} serif />
+        <SectionTitle overline={t('overline')} title={t('title')} subtitle={t('subtitle')} />
       </SectionWrapper>
 
       {/* ── Mission Statement ── */}

@@ -89,10 +89,10 @@ function createMockMaliciousVerdict(): ThreatVerdict {
 function createMockSuspiciousVerdict(): ThreatVerdict {
   return {
     conclusion: 'suspicious',
-    confidence: 65,
+    confidence: 75,
     reasoning: 'Unusual outbound connection to unknown destination',
     evidence: [
-      { source: 'baseline_deviation', description: 'New outbound destination', confidence: 60 },
+      { source: 'baseline_deviation', description: 'New outbound destination', confidence: 75 },
     ],
     recommendedAction: 'notify',
   };
@@ -133,7 +133,7 @@ describe('PanguardGuard -> PanguardChat Pipeline Integration', () => {
 
       expect(alert.conclusion).toBe('suspicious');
       expect(alert.severity).toBe('medium');
-      expect(alert.confidence).toBeCloseTo(0.65);
+      expect(alert.confidence).toBeCloseTo(0.75);
     });
 
     it('should convert benign verdict to info alert', () => {
