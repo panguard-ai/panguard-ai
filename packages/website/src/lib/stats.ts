@@ -7,10 +7,10 @@
  *   packages/panguard-trap/src/types.ts        -> TrapServiceType union (8 protocols)
  *   packages/panguard-guard/src/types.ts       -> ResponseAction union (6 types)
  *   packages/core/src/ai/funnel-router.ts      -> 3 layers
- *   vitest run (140 test files)                -> 2,992 test cases
+ *   vitest run (142 test files)                -> 3,017 test cases
  *   packages/panguard/src/cli/index.ts         -> 21 top-level commands (incl. doctor, code)
  *   packages/panguard-report/src/frameworks/   -> 50 controls (ISO:30 + SOC2:10 + TCSA:10)
- *   packages/panguard-mcp/src/server.ts        -> 10 MCP tools
+ *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-scan/src/scanners/sast-checker.ts -> 16 SAST patterns
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
