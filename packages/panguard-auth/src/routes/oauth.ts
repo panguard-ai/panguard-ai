@@ -21,15 +21,24 @@ import { readBody, json } from './shared.js';
 export function createOAuthRoutes(ctx: RouteContext) {
   const { db, config, pendingOAuthFlows, pendingCliFlows, oauthExchangeCodes } = ctx;
 
-  function handleGoogleAuth(_req: IncomingMessage, res: ServerResponse): void {
+  function handleGoogleAuth(req: IncomingMessage, res: ServerResponse): void {
     if (!config.google) {
       json(res, 501, { ok: false, error: 'Google OAuth not configured' });
       return;
     }
+    const urlObj = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+    const cliState = urlObj.searchParams.get('cli_state');
+    const cliCallback = urlObj.searchParams.get('cli_callback');
+
     const state = generateOAuthState();
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = generateCodeChallenge(codeVerifier);
-    pendingOAuthFlows.set(state, { codeVerifier, createdAt: Date.now() });
+    pendingOAuthFlows.set(state, {
+      codeVerifier,
+      createdAt: Date.now(),
+      cliState: cliState ?? undefined,
+      cliCallback: cliCallback ?? undefined,
+    });
     const url = getGoogleAuthUrl(config.google, state, codeChallenge);
     res.writeHead(302, { Location: url });
     res.end();
@@ -109,7 +118,11 @@ export function createOAuthRoutes(ctx: RouteContext) {
       });
 
       const baseUrl = config.baseUrl ?? '';
-      const redirectUrl = `${baseUrl}/login?code=${exchangeCode}`;
+      const redirectParams = new URLSearchParams({ code: exchangeCode });
+      // Preserve CLI login flow params through the OAuth dance
+      if (flow.cliState) redirectParams.set('cli_state', flow.cliState);
+      if (flow.cliCallback) redirectParams.set('cli_callback', flow.cliCallback);
+      const redirectUrl = `${baseUrl}/login?${redirectParams.toString()}`;
       res.writeHead(302, { Location: redirectUrl });
       res.end();
     } catch {
