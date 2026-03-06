@@ -155,7 +155,7 @@
       "prereq": "",
       "badges": {
         "mit": "MIT Open Source",
-        "tests": "2,992 Tests Passing",
+        "tests": "3,017 Tests Passing",
         "taiwan": "Built in Taiwan"
       }
     },
@@ -395,7 +395,7 @@
         "subtitle": "Because security shouldn't have walls.",
         "desc": "MIT licensed. Full source code. Zero black boxes. Every line can be audited, verified, improved.",
         "belief": "We believe breaking the security barrier isn't about lowering prices — it's about letting everyone participate.",
-        "proof": "2,992 tests. TypeScript strict mode. MIT license. This is not a side project. This is infrastructure."
+        "proof": "3,017 tests. TypeScript strict mode. MIT license. This is not a side project. This is infrastructure."
       }
     },
     "the3amStory": {
@@ -499,7 +499,7 @@
       ]
     },
     "productOverview": {
-      "title": "Seven tools. One install.",
+      "title": "Eight tools. One install.",
       "subtitle": "Each works standalone. Together, they're a full security operations center in one curl command.",
       "products": [
         {
@@ -550,7 +550,7 @@
         },
         "security": {
           "title": "Security First",
-          "desc": "2,992 tests. Strict TypeScript. ESLint security plugin. Credential storage encryption. Sandboxed execution."
+          "desc": "3,017 tests. Strict TypeScript. ESLint security plugin. Credential storage encryption. Sandboxed execution."
         },
         "privacy": {
           "title": "Privacy by Design",
@@ -709,7 +709,7 @@
       "btnDemo": "Book a Demo",
       "btnSales": "Talk to Sales",
       "badge1": "MIT Open Source",
-      "badge2": "2,992 Tests Passing",
+      "badge2": "3,017 Tests Passing",
       "badge3": "Built in Taiwan"
     }
   },
@@ -2920,7 +2920,7 @@
       },
       "cliRef": {
         "title": "CLI Reference",
-        "desc": "Complete command reference for all 21 CLI commands with flags, examples, and tier requirements."
+        "desc": "Complete command reference for all 22 CLI commands with flags, examples, and tier requirements."
       },
       "benchmark": {
         "title": "Benchmark & Limitations",
@@ -3133,7 +3133,7 @@
       "methodValue": {
         "framework": "Vitest",
         "testFiles": "140",
-        "testCases": "2,992",
+        "testCases": "3,017",
         "coverage": "Unit + Integration tests",
         "ci": "Automated on every commit"
       },
@@ -4211,7 +4211,7 @@
       "title": "Built with rigor",
       "stats": [
         {
-          "value": "2,992",
+          "value": "3,017",
           "label": "Tests passing"
         },
         {
@@ -4223,11 +4223,11 @@
           "label": "YARA rules"
         },
         {
-          "value": "6",
+          "value": "8",
           "label": "Products"
         },
         {
-          "value": "19",
+          "value": "22",
           "label": "CLI commands"
         },
         {
@@ -4341,7 +4341,7 @@
           "Core platform (Scan + Guard + Chat + Trap + Report)",
           "Threat Cloud v1",
           "3,155 Sigma + 5,895 YARA rules",
-          "2,992 automated tests"
+          "3,017 automated tests"
         ]
       },
       "inProgress": {
