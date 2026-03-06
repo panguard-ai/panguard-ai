@@ -30,7 +30,7 @@ export function createAuthHandlers(config: AuthRouteConfig) {
   const waitlistLimiter = new RateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 5 });
 
   // Pending OAuth flows: state -> { codeVerifier, createdAt }
-  const pendingOAuthFlows = new Map<string, { codeVerifier: string; createdAt: number }>();
+  const pendingOAuthFlows = new Map<string, { codeVerifier: string; createdAt: number; cliState?: string; cliCallback?: string }>();
   // Pending CLI auth flows: state -> { callbackUrl, createdAt }
   const pendingCliFlows = new Map<string, { callbackUrl: string; createdAt: number }>();
   // One-time OAuth exchange codes: code -> { sessionToken, expiresAt, createdAt }

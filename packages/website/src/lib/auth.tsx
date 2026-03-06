@@ -109,10 +109,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
+      const cliState = params.get('cli_state');
+      const cliCallback = params.get('cli_callback');
       if (code) {
         // Clean URL immediately
         const url = new URL(window.location.href);
         url.searchParams.delete('code');
+        url.searchParams.delete('cli_state');
+        url.searchParams.delete('cli_callback');
         window.history.replaceState({}, '', url.toString());
 
         // Exchange code for token
@@ -122,10 +126,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ code }),
         })
           .then((res) => res.json() as Promise<{ ok: boolean; data?: { token: string } }>)
-          .then((data) => {
+          .then(async (data) => {
             if (data.ok && data.data?.token) {
               storeToken(data.data.token);
               setToken(data.data.token);
+
+              // CLI login flow: redirect token back to CLI's localhost callback
+              if (cliState && cliCallback) {
+                try {
+                  const parsed = new URL(cliCallback);
+                  if (['localhost', '127.0.0.1', '[::1]'].includes(parsed.hostname)) {
+                    const meRes = await fetch(`${API_URL}/api/auth/me`, {
+                      headers: { Authorization: `Bearer ${data.data.token}` },
+                      signal: AbortSignal.timeout(10_000),
+                    });
+                    if (meRes.ok) {
+                      const meData = (await meRes.json()) as {
+                        ok: boolean;
+                        data?: { user: { email: string; name: string; tier: string } };
+                      };
+                      if (meData.ok && meData.data?.user) {
+                        const { email, name, tier } = meData.data.user;
+                        const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+                        const cbParams = new URLSearchParams({
+                          token: data.data.token,
+                          email,
+                          name,
+                          tier,
+                          state: cliState,
+                          expires,
+                        });
+                        window.location.href = `${cliCallback}?${cbParams.toString()}`;
+                        return;
+                      }
+                    }
+                  }
+                } catch {
+                  // Fall through to normal flow
+                }
+              }
             }
           })
           .catch(() => {

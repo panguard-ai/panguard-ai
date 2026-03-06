@@ -166,7 +166,7 @@ export interface RouteContext {
   registerLimiter: RateLimiter;
   resetLimiter: RateLimiter;
   waitlistLimiter: RateLimiter;
-  pendingOAuthFlows: Map<string, { codeVerifier: string; createdAt: number }>;
+  pendingOAuthFlows: Map<string, { codeVerifier: string; createdAt: number; cliState?: string; cliCallback?: string }>;
   pendingCliFlows: Map<string, { callbackUrl: string; createdAt: number }>;
   oauthExchangeCodes: Map<string, { sessionToken: string; expiresAt: string; createdAt: number }>;
 }
