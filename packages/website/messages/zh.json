@@ -155,7 +155,7 @@
       "prereq": "",
       "badges": {
         "mit": "MIT 開源授權",
-        "tests": "2,992 項測試通過",
+        "tests": "3,017 項測試通過",
         "taiwan": "台灣製造"
       }
     },
@@ -395,7 +395,7 @@
         "subtitle": "因為資安不該有門檻。",
         "desc": "MIT 授權，完整原始碼，零黑箱。每一行 code 都經得起檢驗。",
         "belief": "要真正打破資安壁壘，不是把價格壓低，而是讓所有人都能參與。",
-        "proof": "2,992 項測試 · TypeScript strict mode · MIT 授權——這不是業餘專案，這是基礎建設。"
+        "proof": "3,017 項測試 · TypeScript strict mode · MIT 授權——這不是業餘專案，這是基礎建設。"
       }
     },
     "the3amStory": {
@@ -499,7 +499,7 @@
       ]
     },
     "productOverview": {
-      "title": "七個工具，一次裝好。",
+      "title": "八個工具，一次裝好。",
       "subtitle": "單獨用，各司其職。全裝上，就是一整套 SOC——一行指令搞定。",
       "products": [
         {
@@ -550,7 +550,7 @@
         },
         "security": {
           "title": "安全優先",
-          "desc": "2,992 項測試通過。Strict TypeScript。ESLint 安全插件。憑證加密儲存。沙箱執行。"
+          "desc": "3,017 項測試通過。Strict TypeScript。ESLint 安全插件。憑證加密儲存。沙箱執行。"
         },
         "privacy": {
           "title": "隱私優先",
@@ -709,7 +709,7 @@
       "btnDemo": "預約 Demo",
       "btnSales": "聯絡業務",
       "badge1": "MIT 開源授權",
-      "badge2": "2,992 測試通過",
+      "badge2": "3,017 測試通過",
       "badge3": "台灣製造"
     }
   },
@@ -1154,7 +1154,7 @@
       "title": "嚴謹打造",
       "stats": [
         {
-          "value": "2,992",
+          "value": "3,017",
           "label": "測試通過"
         },
         {
@@ -1166,11 +1166,11 @@
           "label": "YARA 規則"
         },
         {
-          "value": "6",
+          "value": "8",
           "label": "產品"
         },
         {
-          "value": "19",
+          "value": "22",
           "label": "CLI 指令"
         },
         {
@@ -1284,7 +1284,7 @@
           "核心平台（Scan + Guard + Chat + Trap + Report）",
           "Threat Cloud v1",
           "3,155條 Sigma + 5,895 條 YARA 規則",
-          "2,992 個自動化測試"
+          "3,017 個自動化測試"
         ]
       },
       "inProgress": {
@@ -3913,7 +3913,7 @@
       "methodValue": {
         "framework": "Vitest",
         "testFiles": "140",
-        "testCases": "2,992",
+        "testCases": "3,017",
         "coverage": "單元測試 + 整合測試",
         "ci": "每次提交自動執行"
       },
