@@ -35,6 +35,7 @@ export const STATS = {
   products: 8,
   aiAgents: 4,
   mcpTools: 11,
+  /** 8 SAST code patterns + 8 secrets patterns */
   sastPatterns: 16,
   playbookTemplates: 3,
   logParsers: 4,

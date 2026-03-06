@@ -20,7 +20,7 @@
 
 Panguard AI is an open-source cybersecurity platform that gives every developer and small business the same protection that Fortune 500 companies pay six figures for.
 
-One command installs six security tools. AI learns your environment in 7 days. Threats get blocked automatically. You get notified in plain language through Telegram or Slack.
+One command installs eight security tools. AI learns your environment in 7 days. Threats get blocked automatically. You get notified in plain language through Telegram or Slack.
 
 ```bash
 curl -fsSL https://get.panguard.ai | bash
@@ -38,6 +38,8 @@ curl -fsSL https://get.panguard.ai | bash
 | **Trap**         | 8 honeypot services for attacker profiling             | Pro ($29/mo)     |
 | **Report**       | Compliance reports: ISO 27001, SOC 2, Taiwan TCSA      | Pro ($29/mo)     |
 | **Threat Cloud** | Collective threat intelligence from all Panguard users | All plans        |
+| **MCP Server**   | Control Panguard from Claude, Cursor, or any MCP client| All plans        |
+| **Skill Auditor**| Security audit for OpenClaw/AgentSkills before install  | All plans        |
 
 ---
 
@@ -267,6 +269,43 @@ All Panguard users protected (minutes)
 
 ---
 
+### Panguard Skill Auditor
+
+Security auditing for OpenClaw and AgentSkills SKILL.md files.
+
+```bash
+panguard audit skill ./my-skill          # Pretty report
+panguard audit skill ./my-skill --json   # JSON output
+```
+
+**5 automated checks:**
+
+1. **Manifest validation** - SKILL.md structure, required fields, version format
+2. **Prompt injection detection** - 11 patterns + hidden Unicode + base64 payloads
+3. **Tool poisoning detection** - sudo escalation, curl|bash, file exfiltration, reverse shells
+4. **Dependency analysis** - External URLs, npm/pip installs, required binaries and env vars
+5. **Permission scope analysis** - Detects bash, network, database, credential tool usage
+
+Returns a 0-100 risk score. Exit code 2 for CRITICAL, 1 for HIGH.
+
+Also available as MCP tool (`panguard_audit_skill`) for use directly from Claude or Cursor.
+
+---
+
+### MCP Server
+
+Control Panguard from AI assistants via Model Context Protocol.
+
+```bash
+panguard serve --mcp    # Start MCP server
+```
+
+**11 tools:** scan, scan_code, guard_start, guard_stop, status, alerts, block_ip, generate_report, init, deploy, audit_skill
+
+Works with Claude Desktop, Cursor, Claude Code, and any MCP-compatible client.
+
+---
+
 ## Pricing
 
 | Plan          | Price  | Machines | Includes                                                 |
@@ -295,7 +334,7 @@ All Panguard users protected (minutes)
 panguard-ai/
   packages/
     core/               # Shared engine: discovery, rules, monitoring, AI providers
-    panguard/           # Unified CLI: 19 commands, interactive menu, setup wizard
+    panguard/           # Unified CLI: 22 commands, interactive menu, setup wizard
     panguard-scan/      # Security scanner + PDF report generation
     panguard-guard/     # AI monitoring: 4 agents, investigation, dashboard, daemon
     panguard-chat/      # Notifications: 5 channels, tone adaptation, templates
@@ -304,6 +343,9 @@ panguard-ai/
     panguard-auth/      # Auth: OAuth, sessions, billing, rate limiting
     panguard-web/       # Website content engine: personas, pricing, guidance
     website/            # Next.js 14 marketing website (bilingual)
+    panguard-mcp/       # MCP server: 11 tools for Claude/Cursor integration
+    panguard-manager/   # Distributed agent coordinator and policy engine
+    panguard-skill-auditor/ # OpenClaw skill security auditor (5 checks)
     admin/              # Admin panel: users, sessions, audit, usage
   security-hardening/   # WebSocket security, credential storage, sandbox, RBAC
   config/

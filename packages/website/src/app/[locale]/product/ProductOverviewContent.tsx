@@ -140,10 +140,10 @@ const productConfigs = [
     badgeColor: 'bg-[#a78bfa]/10 text-[#a78bfa] border-[#a78bfa]/20',
     isBeta: true,
     description:
-      `Panguard Code Scanner performs static application security testing (SAST) on your source code. It integrates with Semgrep for deep analysis and includes ${STATS.sastPatterns} built-in regex patterns as a fallback. Detect SQL injection, XSS, command injection, hardcoded secrets, weak cryptography, and more -- directly from the CLI or through your AI assistant.`,
+      `Panguard Code Scanner performs static application security testing (SAST) on your source code. It integrates with Semgrep for deep analysis and includes ${STATS.sastPatterns} built-in security patterns (8 SAST + 8 secrets detection) as a fallback. Detect SQL injection, XSS, command injection, hardcoded secrets, weak cryptography, and more -- directly from the CLI or through your AI assistant.`,
     features: [
       'Semgrep integration for deep SAST analysis',
-      `${STATS.sastPatterns} built-in regex patterns covering OWASP Top 10`,
+      `${STATS.sastPatterns} built-in security patterns: 8 SAST (OWASP Top 10) + 8 secrets detectors`,
       'Secrets scanning: AWS keys, GitHub tokens, Stripe keys, RSA private keys',
       'Supports JavaScript, TypeScript, Python, and more',
       'CI/CD integration with --fail-on severity threshold',
