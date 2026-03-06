@@ -289,6 +289,109 @@ describe('RuleGenerator', () => {
     expect(result.duration).toBeGreaterThanOrEqual(0);
   });
 
+  // -------------------------------------------------------------------------
+  // YARA Rule Generation / YARA 規則產生
+  // -------------------------------------------------------------------------
+
+  it('should generate YARA rules from detected patterns', () => {
+    const baseTime = new Date();
+
+    for (let i = 0; i < 5; i++) {
+      dbWrapper.insertEnrichedThreat(
+        ThreatCloudDB.guardToEnriched({
+          attackSourceIP: `10.0.0.${i + 1}`,
+          attackType: 'brute_force',
+          mitreTechnique: 'T1110',
+          sigmaRuleMatched: `r-${i}`,
+          timestamp: new Date(baseTime.getTime() + i * 60_000).toISOString(),
+          region: 'TW',
+        })
+      );
+    }
+
+    const result = generator.generateYaraRules();
+    expect(result.rulesGenerated).toBe(1);
+    expect(result.patternsAnalyzed).toBe(1);
+
+    const rules = dbWrapper.getAllRules();
+    const yaraRule = rules.find((r) => r.ruleId.startsWith('tc-yara-'));
+    expect(yaraRule).toBeDefined();
+    expect(yaraRule!.ruleContent).toContain('rule tc_yara_');
+    expect(yaraRule!.ruleContent).toContain('status = "experimental"');
+    expect(yaraRule!.ruleContent).toContain('brute_force');
+    expect(yaraRule!.ruleContent).toContain('T1110');
+    expect(yaraRule!.source).toBe('threat-cloud-yara-auto');
+  });
+
+  it('should generate YARA string patterns from attack type keywords', () => {
+    const baseTime = new Date();
+
+    for (let i = 0; i < 3; i++) {
+      dbWrapper.insertEnrichedThreat(
+        ThreatCloudDB.guardToEnriched({
+          attackSourceIP: `10.0.0.${i + 1}`,
+          attackType: 'credential_stuffing',
+          mitreTechnique: 'T1110',
+          sigmaRuleMatched: `r-${i}`,
+          timestamp: new Date(baseTime.getTime() + i * 60_000).toISOString(),
+          region: 'US',
+        })
+      );
+    }
+
+    generator.generateYaraRules();
+    const rules = dbWrapper.getAllRules();
+    const yaraRule = rules.find((r) => r.ruleId.startsWith('tc-yara-'));
+    expect(yaraRule).toBeDefined();
+    expect(yaraRule!.ruleContent).toContain('$s0 = "credential" ascii nocase');
+    expect(yaraRule!.ruleContent).toContain('$s1 = "stuffing" ascii nocase');
+    expect(yaraRule!.ruleContent).toContain('any of ($s*)');
+  });
+
+  it('should update existing YARA rule on re-run', () => {
+    const baseTime = new Date();
+
+    for (let i = 0; i < 3; i++) {
+      dbWrapper.insertEnrichedThreat(
+        ThreatCloudDB.guardToEnriched({
+          attackSourceIP: `10.0.0.${i + 1}`,
+          attackType: 'brute_force',
+          mitreTechnique: 'T1110',
+          sigmaRuleMatched: `r-${i}`,
+          timestamp: new Date(baseTime.getTime() + i * 60_000).toISOString(),
+          region: 'TW',
+        })
+      );
+    }
+
+    const first = generator.generateYaraRules();
+    expect(first.rulesGenerated).toBe(1);
+
+    // Add more events
+    for (let i = 0; i < 3; i++) {
+      dbWrapper.insertEnrichedThreat(
+        ThreatCloudDB.guardToEnriched({
+          attackSourceIP: `10.0.1.${i + 1}`,
+          attackType: 'brute_force',
+          mitreTechnique: 'T1110',
+          sigmaRuleMatched: `r-batch2-${i}`,
+          timestamp: new Date(baseTime.getTime() + (i + 10) * 60_000).toISOString(),
+          region: 'JP',
+        })
+      );
+    }
+
+    const second = generator.generateYaraRules();
+    expect(second.rulesGenerated).toBe(0);
+    expect(second.rulesUpdated).toBe(1);
+  });
+
+  it('should handle empty database for YARA generation', () => {
+    const result = generator.generateYaraRules();
+    expect(result.patternsAnalyzed).toBe(0);
+    expect(result.rulesGenerated).toBe(0);
+  });
+
   it('should collect regions from multiple events', () => {
     const baseTime = new Date();
     const regions = ['TW', 'JP', 'US'];

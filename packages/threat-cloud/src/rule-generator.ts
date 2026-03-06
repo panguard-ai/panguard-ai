@@ -328,4 +328,162 @@ export class RuleGenerator {
     }
     return 'medium';
   }
+
+  // -------------------------------------------------------------------------
+  // YARA Rule Generation / YARA 規則產生
+  // -------------------------------------------------------------------------
+
+  /**
+   * Generate YARA rules from detected patterns and known IoC hashes.
+   * 從偵測到的模式和已知 IoC 雜湊值產生 YARA 規則
+   *
+   * Generates rules based on:
+   * - File hashes (SHA-256) from IoC store
+   * - String patterns extracted from attack descriptions
+   * All generated rules are marked `status: experimental`.
+   */
+  generateYaraRules(): RuleGenerationResult {
+    const startTime = Date.now();
+
+    const patterns = this.detectPatterns();
+    let rulesGenerated = 0;
+    let rulesUpdated = 0;
+
+    this.db.transaction(() => {
+      for (const pattern of patterns) {
+        const yaraRuleId = `tc-yara-${pattern.patternHash}`;
+
+        const existing = this.db
+          .prepare('SELECT rule_id FROM rules WHERE rule_id = ?')
+          .get(yaraRuleId) as { rule_id: string } | undefined;
+
+        const hashes = this.getRelatedHashes(pattern.attackType);
+        const yaraContent = this.generateYaraContent(pattern, yaraRuleId, hashes);
+
+        if (existing) {
+          this.db
+            .prepare(
+              `UPDATE rules SET rule_content = ?, published_at = datetime('now'), updated_at = datetime('now')
+               WHERE rule_id = ?`
+            )
+            .run(yaraContent, yaraRuleId);
+          rulesUpdated++;
+        } else {
+          this.db
+            .prepare(
+              `INSERT INTO rules (rule_id, rule_content, published_at, source)
+               VALUES (?, ?, datetime('now'), 'threat-cloud-yara-auto')`
+            )
+            .run(yaraRuleId, yaraContent);
+          rulesGenerated++;
+        }
+      }
+    })();
+
+    return {
+      patternsAnalyzed: patterns.length,
+      rulesGenerated,
+      rulesUpdated,
+      duration: Date.now() - startTime,
+    };
+  }
+
+  /**
+   * Get file hashes associated with an attack type from IoC store
+   * 從 IoC 儲存庫取得與攻擊類型相關的檔案雜湊值
+   */
+  private getRelatedHashes(attackType: string): string[] {
+    try {
+      const rows = this.db
+        .prepare(
+          `SELECT DISTINCT ioc_value FROM ioc_store
+           WHERE ioc_type = 'hash' AND source LIKE ?
+           ORDER BY last_seen_at DESC
+           LIMIT 20`
+        )
+        .all(`%${attackType}%`) as Array<{ ioc_value: string }>;
+
+      return rows.map((r) => r.ioc_value);
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Generate YARA rule content from a detected pattern
+   * 從偵測到的模式產生 YARA 規則內容
+   */
+  private generateYaraContent(
+    pattern: DetectedPattern,
+    ruleId: string,
+    hashes: string[]
+  ): string {
+    const safeName = ruleId.replace(/[^a-zA-Z0-9_]/g, '_');
+    const severity = this.pickMaxSeverity(pattern.severityCounts);
+    const techniques = pattern.mitreTechniques.join(', ');
+    const regionList = pattern.regions.join(', ');
+
+    const lines: string[] = [
+      `rule ${safeName}`,
+      `{`,
+      `    meta:`,
+      `        description = "Threat Cloud Auto: ${pattern.attackType} via ${techniques}"`,
+      `        author = "Panguard Threat Cloud (auto-generated)"`,
+      `        date = "${new Date().toISOString().slice(0, 10)}"`,
+      `        status = "experimental"`,
+      `        severity = "${severity}"`,
+      `        occurrences = "${pattern.occurrences}"`,
+      `        distinct_ips = "${pattern.distinctIPs}"`,
+      `        regions = "${regionList}"`,
+      `        mitre = "${techniques}"`,
+      ``,
+    ];
+
+    // Strings section
+    const hasStrings = pattern.attackType.length > 3;
+    const hasHashes = hashes.length > 0;
+
+    if (hasStrings || hasHashes) {
+      lines.push(`    strings:`);
+
+      if (hasStrings) {
+        // Generate string patterns from attack type keywords
+        const keywords = pattern.attackType
+          .split(/[_\-\s]+/)
+          .filter((k) => k.length >= 3);
+        keywords.forEach((kw, i) => {
+          lines.push(`        $s${i} = "${kw}" ascii nocase`);
+        });
+      }
+
+      if (hasHashes) {
+        hashes.forEach((hash, i) => {
+          // Only include hashes that look like valid hex strings
+          if (/^[a-f0-9]{64}$/i.test(hash)) {
+            const hexPairs = hash.match(/.{2}/g);
+            if (hexPairs) {
+              lines.push(`        $h${i} = { ${hexPairs.join(' ')} }`);
+            }
+          }
+        });
+      }
+
+      lines.push(``);
+    }
+
+    // Condition section
+    lines.push(`    condition:`);
+    if (hasStrings && hasHashes) {
+      lines.push(`        any of ($s*) or any of ($h*)`);
+    } else if (hasStrings) {
+      lines.push(`        any of ($s*)`);
+    } else if (hasHashes) {
+      lines.push(`        any of ($h*)`);
+    } else {
+      lines.push(`        false`);
+    }
+    lines.push(`}`);
+
+    return lines.join('\n');
+  }
 }
