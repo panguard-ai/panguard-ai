@@ -296,7 +296,7 @@ export default function LoginForm() {
                   </div>
 
                   <a
-                    href={`${API_URL}/api/auth/google`}
+                    href={`${API_URL}/api/auth/google${isCliLogin ? `?cli_state=${encodeURIComponent(cliState!)}&cli_callback=${encodeURIComponent(cliCallback!)}` : ''}`}
                     className="w-full flex items-center justify-center gap-2 border border-border rounded-lg px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:border-border-hover transition-colors"
                   >
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
