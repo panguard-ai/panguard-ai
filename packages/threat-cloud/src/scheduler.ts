@@ -149,7 +149,7 @@ export class Scheduler {
       }
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const dest = join(backupDir, `threat-cloud-${timestamp}.db`);
-      this.db.exec(`VACUUM INTO '${dest.replace(/'/g, "''")}'`);
+      this.db.backup(dest);
 
       // Rotate: remove oldest backups beyond maxBackups
       const backups = readdirSync(backupDir)
