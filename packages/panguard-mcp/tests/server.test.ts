@@ -17,9 +17,9 @@ import { getAllToolDefinitions, dispatchTool } from '../src/server.js';
 // ─── Tool Definitions ───────────────────────────────────────────────────────
 
 describe('getAllToolDefinitions()', () => {
-  it('returns exactly 10 tool definitions', () => {
+  it('returns exactly 11 tool definitions', () => {
     const tools = getAllToolDefinitions();
-    expect(tools).toHaveLength(10);
+    expect(tools).toHaveLength(11);
   });
 
   it('contains all expected tool names', () => {
@@ -35,6 +35,7 @@ describe('getAllToolDefinitions()', () => {
     expect(names).toContain('panguard_generate_report');
     expect(names).toContain('panguard_init');
     expect(names).toContain('panguard_deploy');
+    expect(names).toContain('panguard_audit_skill');
   });
 
   it('every tool has an inputSchema', () => {
