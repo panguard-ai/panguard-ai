@@ -1,0 +1,101 @@
+{
+  "syncAt": "2026-03-07T16:55:38.683Z",
+  "totalRecords": 1800,
+  "totalDurationMs": 246741,
+  "perSource": [
+    {
+      "source": "nvd",
+      "fetched": 200,
+      "validated": 200,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 1426
+    },
+    {
+      "source": "cisa-kev",
+      "fetched": 200,
+      "validated": 200,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 346
+    },
+    {
+      "source": "mitre-attack",
+      "fetched": 200,
+      "validated": 200,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 3390
+    },
+    {
+      "source": "urlhaus",
+      "fetched": 200,
+      "validated": 200,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 993
+    },
+    {
+      "source": "malwarebazaar",
+      "fetched": 200,
+      "validated": 200,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 415
+    },
+    {
+      "source": "threatfox",
+      "fetched": 200,
+      "validated": 200,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 446
+    },
+    {
+      "source": "osv",
+      "fetched": 200,
+      "validated": 200,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 2709
+    },
+    {
+      "source": "github-advisory",
+      "fetched": 200,
+      "validated": 200,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 7528
+    },
+    {
+      "source": "alienvault-otx",
+      "fetched": 0,
+      "validated": 0,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 227531
+    },
+    {
+      "source": "exploitdb",
+      "fetched": 200,
+      "validated": 200,
+      "rejected": 0,
+      "errors": [],
+      "durationMs": 1957
+    }
+  ],
+  "byType": {
+    "vulnerability": 800,
+    "ioc": 400,
+    "technique": 200,
+    "exploit": 200,
+    "malware": 200
+  },
+  "bySeverity": {
+    "critical": 264,
+    "high": 815,
+    "medium": 688,
+    "low": 32,
+    "none": 1
+  }
+}

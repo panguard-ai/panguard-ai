@@ -24,7 +24,7 @@ import type {
 // Constants
 // ---------------------------------------------------------------------------
 
-const API_URL = 'https://threatfox-api.abuse.ch/api/v1/';
+const API_URL = 'https://threatfox.abuse.ch/export/json/recent/';
 const USER_AGENT = 'Panguard-ThreatIntel/1.0';
 
 const DEFAULT_CONFIG: AdapterConfig = {
@@ -117,15 +117,10 @@ export class ThreatFoxAdapter implements ThreatIntelAdapter {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.config.requestTimeoutMs);
 
-    let body: ThreatFoxResponse;
+    let rawData: Record<string, Array<Record<string, unknown>>>;
     try {
       const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': USER_AGENT,
-        },
-        body: JSON.stringify({ query: 'get_iocs', days: 7 }),
+        headers: { 'User-Agent': USER_AGENT },
         signal: controller.signal,
       });
 
@@ -133,7 +128,7 @@ export class ThreatFoxAdapter implements ThreatIntelAdapter {
         throw new Error(`ThreatFox API error: ${res.status} ${res.statusText}`);
       }
 
-      body = (await res.json()) as ThreatFoxResponse;
+      rawData = (await res.json()) as Record<string, Array<Record<string, unknown>>>;
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         throw new Error(`ThreatFox API request timed out after ${this.config.requestTimeoutMs}ms`);
@@ -143,15 +138,31 @@ export class ThreatFoxAdapter implements ThreatIntelAdapter {
       clearTimeout(timeout);
     }
 
-    // Validate top-level response shape
-    if (body?.query_status !== 'ok' || !Array.isArray(body?.data)) {
-      return [];
-    }
+    if (!rawData || typeof rawData !== 'object') return [];
 
     const sinceDate = since ? new Date(since) : null;
     const records: ThreatIntelRecord[] = [];
 
-    for (const entry of body.data) {
+    // Export format: { "id": [{ ioc_value, ioc_type, threat_type, malware, ... }] }
+    const entries: ThreatFoxEntry[] = [];
+    for (const [id, items] of Object.entries(rawData)) {
+      const item = items?.[0];
+      if (!item) continue;
+      entries.push({
+        id: String(id),
+        ioc: String(item['ioc_value'] ?? ''),
+        ioc_type: String(item['ioc_type'] ?? ''),
+        threat_type: String(item['threat_type'] ?? ''),
+        malware: String(item['malware_printable'] ?? item['malware'] ?? ''),
+        confidence_level: typeof item['confidence_level'] === 'number' ? item['confidence_level'] : 50,
+        first_seen: String(item['first_seen_utc'] ?? ''),
+        last_seen: item['last_seen_utc'] ? String(item['last_seen_utc']) : null,
+        tags: Array.isArray(item['tags']) ? (item['tags'] as string[]) : null,
+        reference: item['reference'] ? String(item['reference']) : null,
+      });
+    }
+
+    for (const entry of entries) {
       if (records.length >= this.config.maxRecords) break;
 
       const record = this.convertEntry(entry, sinceDate);

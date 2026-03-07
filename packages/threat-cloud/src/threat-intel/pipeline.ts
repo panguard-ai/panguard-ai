@@ -188,7 +188,7 @@ export class ThreatIntelPipeline {
         },
       }),
       'alienvault-otx': () => new OtxAdapter({
-        requestTimeoutMs: 30_000, rateLimitPerMinute: 60, maxRecords: max,
+        requestTimeoutMs: 60_000, rateLimitPerMinute: 60, maxRecords: max,
       }),
       'exploitdb': () => new ExploitDbAdapter({
         requestTimeoutMs: 60_000, rateLimitPerMinute: 10, maxRecords: max,

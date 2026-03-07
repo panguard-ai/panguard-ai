@@ -24,7 +24,7 @@ import type {
 // Constants
 // ---------------------------------------------------------------------------
 
-const API_URL = 'https://urlhaus-api.abuse.ch/v1/urls/recent/limit/1000/';
+const API_URL = 'https://urlhaus.abuse.ch/downloads/json_recent/';
 const USER_AGENT = 'Panguard-ThreatIntel/1.0';
 
 const DEFAULT_CONFIG: AdapterConfig = {
@@ -101,14 +101,10 @@ export class UrlhausAdapter implements ThreatIntelAdapter {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.config.requestTimeoutMs);
 
-    let body: UrlhausRecentResponse;
+    let rawData: Record<string, Array<Record<string, unknown>>>;
     try {
       const res = await fetch(API_URL, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'User-Agent': USER_AGENT,
-        },
+        headers: { 'User-Agent': USER_AGENT },
         signal: controller.signal,
       });
 
@@ -116,7 +112,7 @@ export class UrlhausAdapter implements ThreatIntelAdapter {
         throw new Error(`URLhaus API error: ${res.status} ${res.statusText}`);
       }
 
-      body = (await res.json()) as UrlhausRecentResponse;
+      rawData = (await res.json()) as Record<string, Array<Record<string, unknown>>>;
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         throw new Error(`URLhaus API request timed out after ${this.config.requestTimeoutMs}ms`);
@@ -126,21 +122,33 @@ export class UrlhausAdapter implements ThreatIntelAdapter {
       clearTimeout(timeout);
     }
 
-    // Validate top-level response shape
-    if (body?.query_status !== 'ok' || !Array.isArray(body?.urls)) {
-      return [];
-    }
+    if (!rawData || typeof rawData !== 'object') return [];
 
     const sinceDate = since ? new Date(since) : null;
     const records: ThreatIntelRecord[] = [];
 
-    for (const entry of body.urls) {
+    // Response is { "id": [{ dateadded, url, url_status, threat, tags, ... }] }
+    for (const [id, entries] of Object.entries(rawData)) {
       if (records.length >= this.config.maxRecords) break;
+      const entryData = entries?.[0];
+      if (!entryData) continue;
+
+      const entry: UrlhausEntry = {
+        id: String(id),
+        url: String(entryData['url'] ?? ''),
+        url_status: String(entryData['url_status'] ?? 'offline') as 'online' | 'offline',
+        host: '',
+        date_added: String(entryData['dateadded'] ?? ''),
+        threat: String(entryData['threat'] ?? ''),
+        tags: Array.isArray(entryData['tags']) ? (entryData['tags'] as string[]) : null,
+        reporter: String(entryData['reporter'] ?? ''),
+      };
+
+      // Extract host from URL
+      try { entry.host = new URL(entry.url).hostname; } catch { /* skip */ }
 
       const record = this.convertEntry(entry, sinceDate);
-      if (record) {
-        records.push(record);
-      }
+      if (record) records.push(record);
     }
 
     return records;

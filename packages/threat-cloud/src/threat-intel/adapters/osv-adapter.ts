@@ -27,9 +27,18 @@ import type {
 // Constants
 // ---------------------------------------------------------------------------
 
-const OSV_QUERY_URL = 'https://api.osv.dev/v1/query';
+const OSV_QUERY_URL = 'https://api.osv.dev/v1/querybatch';
 
 const SUPPORTED_ECOSYSTEMS = ['npm', 'PyPI', 'Go', 'Maven', 'crates.io'] as const;
+
+/** Popular packages to query per ecosystem for broad vulnerability coverage */
+const ECOSYSTEM_PACKAGES: Record<string, string[]> = {
+  'npm': ['express', 'lodash', 'axios', 'next', 'react', 'webpack', 'jsonwebtoken', 'moment', 'node-fetch', 'sharp'],
+  'PyPI': ['django', 'flask', 'requests', 'numpy', 'pillow', 'cryptography', 'jinja2', 'sqlalchemy', 'pyyaml', 'urllib3'],
+  'Go': ['github.com/gin-gonic/gin', 'github.com/gorilla/mux', 'golang.org/x/crypto', 'github.com/golang-jwt/jwt', 'github.com/stretchr/testify'],
+  'Maven': ['org.apache.logging.log4j:log4j-core', 'org.springframework:spring-core', 'com.fasterxml.jackson.core:jackson-databind', 'org.apache.commons:commons-text'],
+  'crates.io': ['hyper', 'tokio', 'serde', 'reqwest', 'actix-web'],
+};
 
 const DEFAULT_CONFIG: AdapterConfig = {
   requestTimeoutMs: 30_000,
@@ -119,33 +128,31 @@ export class OsvAdapter implements ThreatIntelAdapter {
     remaining: number,
   ): Promise<ThreatIntelRecord[]> {
     const records: ThreatIntelRecord[] = [];
-    let pageToken: string | undefined;
-    const maxPages = 20; // safety cap
-    let page = 0;
+    const packages = ECOSYSTEM_PACKAGES[ecosystem] ?? [];
 
-    while (records.length < remaining && page < maxPages) {
-      await this.rateLimit();
+    // Build batch query for all packages in this ecosystem
+    const queries = packages.map(name => ({ package: { ecosystem, name } }));
+    if (queries.length === 0) return records;
 
-      const body: Record<string, unknown> = {
-        package: { ecosystem },
-      };
-      if (pageToken) {
-        body['page_token'] = pageToken;
-      }
+    await this.rateLimit();
 
-      const response = await this.postQuery(body);
-      if (!response) break;
+    const response = await this.postQuery({ queries });
+    if (!response) return records;
 
-      const vulns = response.vulns;
-      if (!Array.isArray(vulns) || vulns.length === 0) break;
+    // Batch response: { results: [{ vulns: [...] }, ...] }
+    const batchResults = (response as unknown as { results?: Array<{ vulns?: OsvVulnerability[] }> })?.results;
+    if (!Array.isArray(batchResults)) return records;
 
-      const sinceDate = since ? new Date(since) : null;
+    const sinceDate = since ? new Date(since) : null;
+
+    for (const result of batchResults) {
+      const vulns = result?.vulns;
+      if (!Array.isArray(vulns)) continue;
 
       for (const vuln of vulns) {
         if (records.length >= remaining) break;
         if (!vuln?.id) continue;
 
-        // Incremental: skip if modified before `since`
         if (sinceDate && vuln.modified) {
           const modDate = new Date(vuln.modified);
           if (!Number.isNaN(modDate.getTime()) && modDate <= sinceDate) continue;
@@ -154,13 +161,6 @@ export class OsvAdapter implements ThreatIntelAdapter {
         const record = this.toRecord(vuln);
         if (record) records.push(record);
       }
-
-      pageToken = response.next_page_token
-        ? sanitizeString(response.next_page_token, 500)
-        : undefined;
-      if (!pageToken) break;
-
-      page++;
     }
 
     return records;

@@ -26,7 +26,7 @@ import type {
 // Constants
 // ---------------------------------------------------------------------------
 
-const ACTIVITY_API = 'https://otx.alienvault.com/api/v1/pulses/activity';
+const ACTIVITY_API = 'https://otx.alienvault.com/otxapi/pulses';
 const USER_AGENT = 'Panguard-ThreatIntel/1.0';
 const MAX_PAGES = 5;
 
