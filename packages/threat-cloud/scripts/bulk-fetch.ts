@@ -13,6 +13,7 @@ import { RuleValidator } from '../src/threat-intel/rule-validator.js';
 import type { StoredReport, GeneratedRule, GeneratedYaraRule } from '../src/threat-intel/types.js';
 
 const RULES_DIR = './config/sigma-rules/auto-generated';
+const YARA_RULES_DIR = './config/yara-rules/auto-generated';
 const META_FILE = join(RULES_DIR, '.meta.json');
 
 async function run() {
@@ -54,6 +55,7 @@ async function run() {
   const allReports: StoredReport[] = [];
 
   mkdirSync(RULES_DIR, { recursive: true });
+  mkdirSync(YARA_RULES_DIR, { recursive: true });
 
   for (const report of reports) {
     allReports.push(report);
@@ -83,7 +85,7 @@ async function run() {
     const yaraRules = yaraGenerator.generate(extraction);
     for (const rule of yaraRules) {
       const filename = `${rule.attackType.toLowerCase().replace(/\s+/g, '-')}-${rule.id}.yar`;
-      writeFileSync(join(RULES_DIR, filename), rule.ruleContent);
+      writeFileSync(join(YARA_RULES_DIR, filename), rule.ruleContent);
       allYaraRules.push(rule);
       console.log(`  YARA:  ${filename} (${rule.attackType}, confidence: ${rule.confidence}%)`);
     }

@@ -13,6 +13,7 @@ import type { StoredReport, GeneratedRule, GeneratedYaraRule } from '../src/thre
 
 const DATA_FILE = './packages/threat-cloud/data/threat-intel/records.json';
 const RULES_DIR = './config/sigma-rules/auto-generated';
+const YARA_RULES_DIR = './config/yara-rules/auto-generated';
 
 /** Map ThreatIntelRecord (summary) to StoredReport for rule generation */
 interface RecordSummary {
@@ -69,6 +70,7 @@ async function run() {
   const allYara: GeneratedYaraRule[] = [];
 
   mkdirSync(RULES_DIR, { recursive: true });
+  mkdirSync(YARA_RULES_DIR, { recursive: true });
 
   let converted = 0;
   let skipped = 0;
@@ -103,7 +105,7 @@ async function run() {
     const yaraRules = yaraGen.generate(extraction);
     for (const rule of yaraRules) {
       const filename = `${rule.attackType.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${rule.id}.yar`;
-      writeFileSync(join(RULES_DIR, filename), rule.ruleContent);
+      writeFileSync(join(YARA_RULES_DIR, filename), rule.ruleContent);
       allYara.push(rule);
     }
   }

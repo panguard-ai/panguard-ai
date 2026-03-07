@@ -30,6 +30,7 @@ import type {
 
 const DATA_DIR = './packages/threat-cloud/data/threat-intel';
 const RULES_DIR = './config/sigma-rules/auto-generated';
+const YARA_RULES_DIR = './config/yara-rules/auto-generated';
 const SYNC_STATE_FILE = join(DATA_DIR, 'sync-state.json');
 const RECORDS_FILE = join(DATA_DIR, 'records.json');
 const RULES_META_FILE = join(RULES_DIR, '.rules-meta.json');
@@ -77,6 +78,7 @@ async function run() {
 
   mkdirSync(DATA_DIR, { recursive: true });
   mkdirSync(RULES_DIR, { recursive: true });
+  mkdirSync(YARA_RULES_DIR, { recursive: true });
 
   // Load previous sync state
   const state = loadSyncState();
@@ -208,7 +210,7 @@ async function run() {
       });
     }
     const filename = `${rule.attackType.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${rule.id}.yar`;
-    writeFileSync(join(RULES_DIR, filename), rule.ruleContent);
+    writeFileSync(join(YARA_RULES_DIR, filename), rule.ruleContent);
     auditLog({
       timestamp: new Date().toISOString(),
       action: 'rule_created',
