@@ -9,6 +9,10 @@ import type { HackerOneHacktivityResponse } from '../../src/threat-intel/types.j
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
+/** Empty page response that stops pagination */
+const EMPTY_PAGE: HackerOneHacktivityResponse = { data: [], links: {} };
+const emptyResp = () => ({ ok: true, json: async () => EMPTY_PAGE });
+
 function makeResponse(overrides: Record<string, unknown> = {}): HackerOneHacktivityResponse {
   return {
     data: [
@@ -42,22 +46,23 @@ function makeResponse(overrides: Record<string, unknown> = {}): HackerOneHacktiv
             },
           },
           reporter: {
-            data: {
-              type: 'user',
-              attributes: { name: 'Test User', username: 'testuser' },
-            },
+            data: { type: 'user', attributes: { name: 'Test User', username: 'testuser' } },
           },
           program: {
-            data: {
-              type: 'program',
-              attributes: { handle: 'kubernetes', name: 'Kubernetes' },
-            },
+            data: { type: 'program', attributes: { handle: 'kubernetes', name: 'Kubernetes' } },
           },
         },
       },
     ],
-    links: { self: 'https://api.hackerone.com/v1/hackers/hacktivity' },
+    links: {},
   };
+}
+
+/** Helper: mock page 1 with data, then empty pages */
+function mockOnePage(overrides: Record<string, unknown> = {}) {
+  mockFetch
+    .mockResolvedValueOnce({ ok: true, json: async () => makeResponse(overrides) })
+    .mockResolvedValue(emptyResp());
 }
 
 describe('HackerOneAdapter', () => {
@@ -66,12 +71,8 @@ describe('HackerOneAdapter', () => {
   });
 
   it('fetches and converts disclosed reports', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse(),
-    });
-
-    const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
+    mockOnePage();
+    const adapter = new HackerOneAdapter({ maxReports: 1, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
 
     expect(reports).toHaveLength(1);
@@ -89,193 +90,126 @@ describe('HackerOneAdapter', () => {
   });
 
   it('filters by minimum severity', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse({ severity_rating: 'Low' }),
-    });
-
-    const adapter = new HackerOneAdapter({
-      minSeverity: 'medium',
-      rateLimitPerMinute: 600,
-    });
+    mockOnePage({ severity_rating: 'Low' });
+    const adapter = new HackerOneAdapter({ minSeverity: 'medium', maxReports: 5, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
-
     expect(reports).toHaveLength(0);
   });
 
   it('accepts reports meeting minimum severity', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse({ severity_rating: 'Critical' }),
-    });
-
-    const adapter = new HackerOneAdapter({
-      minSeverity: 'high',
-      rateLimitPerMinute: 600,
-    });
+    mockOnePage({ severity_rating: 'Critical' });
+    const adapter = new HackerOneAdapter({ minSeverity: 'high', maxReports: 1, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
-
     expect(reports).toHaveLength(1);
   });
 
   it('skips non-disclosed reports', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse({ disclosed: false }),
-    });
-
-    const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
+    mockOnePage({ disclosed: false });
+    const adapter = new HackerOneAdapter({ maxReports: 5, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
-
     expect(reports).toHaveLength(0);
   });
 
   it('skips reports without title', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse({ title: null }),
-    });
-
-    const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
+    mockOnePage({ title: null });
+    const adapter = new HackerOneAdapter({ maxReports: 5, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
-
     expect(reports).toHaveLength(0);
   });
 
-  it('handles pagination with next link', async () => {
-    const page1: HackerOneHacktivityResponse = {
-      ...makeResponse(),
-      links: {
-        self: 'https://api.hackerone.com/v1/hackers/hacktivity?page=1',
-        next: 'https://api.hackerone.com/v1/hackers/hacktivity?page=2',
-      },
-    };
-    const page2 = makeResponse({ title: 'XSS in search' });
-
+  it('pages through multiple pages to find disclosed reports', async () => {
     mockFetch
-      .mockResolvedValueOnce({ ok: true, json: async () => page1 })
-      .mockResolvedValueOnce({ ok: true, json: async () => page2 });
+      .mockResolvedValueOnce({ ok: true, json: async () => makeResponse() })
+      .mockResolvedValueOnce({ ok: true, json: async () => makeResponse({ title: 'XSS in search' }) })
+      .mockResolvedValue(emptyResp());
 
-    const adapter = new HackerOneAdapter({
-      maxReports: 50,
-      rateLimitPerMinute: 600,
-    });
+    const adapter = new HackerOneAdapter({ maxReports: 2, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
-
     expect(reports).toHaveLength(2);
-    expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 
   it('stops on rate limit (429)', async () => {
-    const page1: HackerOneHacktivityResponse = {
-      ...makeResponse(),
-      links: {
-        self: 'https://api.hackerone.com/v1/hackers/hacktivity?page=1',
-        next: 'https://api.hackerone.com/v1/hackers/hacktivity?page=2',
-      },
-    };
-
     mockFetch
-      .mockResolvedValueOnce({ ok: true, json: async () => page1 })
+      .mockResolvedValueOnce({ ok: true, json: async () => makeResponse() })
       .mockResolvedValueOnce({ ok: false, status: 429, statusText: 'Too Many Requests' });
 
-    const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
+    const adapter = new HackerOneAdapter({ maxReports: 50, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
-
     expect(reports).toHaveLength(1);
   });
 
   it('supports incremental sync with since parameter', async () => {
-    // Report disclosed before `since` should be skipped
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse({ disclosed_at: '2026-01-01T00:00:00Z' }),
-    });
-
-    const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
+    mockOnePage({ disclosed_at: '2026-01-01T00:00:00Z' });
+    const adapter = new HackerOneAdapter({ maxReports: 5, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports('2026-03-01T00:00:00Z');
-
     expect(reports).toHaveLength(0);
   });
 
   it('includes reports after since date', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse({ disclosed_at: '2026-03-07T00:00:00Z' }),
-    });
-
-    const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
+    mockOnePage({ disclosed_at: '2026-03-07T00:00:00Z' });
+    const adapter = new HackerOneAdapter({ maxReports: 1, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports('2026-03-01T00:00:00Z');
-
     expect(reports).toHaveLength(1);
   });
 
   it('handles API errors', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      statusText: 'Internal Server Error',
-    });
-
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Server Error' });
     const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
-
     await expect(adapter.fetchReports()).rejects.toThrow('HackerOne API error: 500');
   });
 
   it('handles missing CWE', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse({ cwe: null }),
-    });
-
-    const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
+    mockOnePage({ cwe: null });
+    const adapter = new HackerOneAdapter({ maxReports: 1, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
-
     expect(reports[0].cweId).toBeNull();
     expect(reports[0].cweName).toBeNull();
   });
 
   it('resolves CWE name to ID', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse({ cwe: 'Cross-Site Scripting (XSS)' }),
-    });
-
-    const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
+    mockOnePage({ cwe: 'Cross-Site Scripting (XSS)' });
+    const adapter = new HackerOneAdapter({ maxReports: 1, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
-
     expect(reports[0].cweId).toBe('CWE-79');
     expect(reports[0].cweName).toBe('Cross-Site Scripting (XSS)');
   });
 
   it('sets User-Agent header', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => makeResponse(),
-    });
-
-    const adapter = new HackerOneAdapter({ rateLimitPerMinute: 600 });
+    mockOnePage();
+    const adapter = new HackerOneAdapter({ maxReports: 1, rateLimitPerMinute: 600 });
     await adapter.fetchReports();
-
     const fetchOpts = mockFetch.mock.calls[0][1] as RequestInit;
     expect((fetchOpts.headers as Record<string, string>)['User-Agent']).toContain('Panguard');
   });
 
   it('respects maxReports limit', async () => {
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        ...makeResponse(),
-        links: { next: 'https://api.hackerone.com/v1/hackers/hacktivity?page=2' },
-      }),
-    });
+    mockFetch.mockResolvedValue({ ok: true, json: async () => makeResponse() });
+    const adapter = new HackerOneAdapter({ maxReports: 1, rateLimitPerMinute: 600 });
+    const reports = await adapter.fetchReports();
+    expect(reports).toHaveLength(1);
+  });
 
-    const adapter = new HackerOneAdapter({
-      maxReports: 1,
-      rateLimitPerMinute: 600,
-    });
+  it('stops after consecutive empty pages', async () => {
+    const undisclosedPage: HackerOneHacktivityResponse = {
+      data: [{
+        id: 99999, type: 'hacktivity_item',
+        attributes: {
+          title: null, substate: null, url: null, disclosed_at: null,
+          vulnerability_information: null, cve_ids: null, cwe: null,
+          severity_rating: null, votes: 0, total_awarded_amount: null,
+          latest_disclosable_action: 'Activities::BountyAwarded',
+          latest_disclosable_activity_at: '2026-03-07T00:00:00Z',
+          submitted_at: '2026-03-01T00:00:00Z', disclosed: false,
+        },
+      }],
+      links: {},
+    };
+
+    mockFetch.mockResolvedValue({ ok: true, json: async () => undisclosedPage });
+    const adapter = new HackerOneAdapter({ maxReports: 50, rateLimitPerMinute: 600 });
     const reports = await adapter.fetchReports();
 
-    expect(reports).toHaveLength(1);
+    expect(reports).toHaveLength(0);
+    expect(mockFetch.mock.calls.length).toBeLessThanOrEqual(16);
   });
 });

@@ -1,0 +1,109 @@
+{
+  "lastSyncAt": "2026-03-07T15:14:25.766Z",
+  "reports": [
+    {
+      "id": "2701701",
+      "title": "Injection in path parameter of Ingress-nginx",
+      "severity": "high",
+      "cweId": "CWE-94",
+      "cweName": "Code Injection",
+      "cveIds": [
+        "CVE-2021-25748"
+      ],
+      "summary": "A vulnerability was discovered in the Ingress-nginx controller where an attacker could inject arbitrary content into the path parameter of an Ingress. This allowed the attacker to upload a malicious nginx configuration file to the ingress controller's file system and then include that file in a subsequent Ingress. The attacker could then execute arbitrary code on the ingress controller.",
+      "disclosedAt": "2026-03-07T05:10:30.190Z",
+      "programHandle": "kubernetes",
+      "programName": "Kubernetes",
+      "reporterUsername": "fisjkars",
+      "url": "https://hackerone.com/reports/2701701",
+      "fetchedAt": "2026-03-07T15:12:01.853Z"
+    },
+    {
+      "id": "1734639",
+      "title": "IDOR to make someone attend or leave an event",
+      "severity": "medium",
+      "cweId": "CWE-639",
+      "cweName": "Insecure Direct Object Reference (IDOR)",
+      "cveIds": [],
+      "summary": "An Insecure Direct Object Reference (IDOR) vulnerability was discovered in LinkedIn's event attendance functionality. The vulnerability allowed an attacker to manipulate event attendance by modifying the fsd_profile parameter in POST requests to the voyagerScheduledcontentDashViewerStates API endpoint. This issue has been fixed.",
+      "disclosedAt": "2026-03-06T02:55:04.893Z",
+      "programHandle": "linkedin",
+      "programName": "LinkedIn",
+      "reporterUsername": "safehacker_2715",
+      "url": "https://hackerone.com/reports/1734639",
+      "fetchedAt": "2026-03-07T15:12:24.269Z"
+    },
+    {
+      "id": "2339192",
+      "title": "Blocking a company page admin prevents him from delete paid media admin or edit his roles",
+      "severity": "medium",
+      "cweId": null,
+      "cweName": "Improper Access Control - Generic",
+      "cveIds": [],
+      "summary": "A company page admin was prevented from managing (deleting or editing roles of) a paid media admin when the paid media admin blocked the company page admin. This created an access control vulnerability where administrative privileges were circumvented through the platform's social blocking feature.",
+      "disclosedAt": "2026-03-05T23:37:30.480Z",
+      "programHandle": "linkedin",
+      "programName": "LinkedIn",
+      "reporterUsername": "riadalrashed",
+      "url": "https://hackerone.com/reports/2339192",
+      "fetchedAt": "2026-03-07T15:12:30.597Z"
+    },
+    {
+      "id": "3506183",
+      "title": "Missing Access Control in MigrationFile allows attacker to upload files to any Migration",
+      "severity": "high",
+      "cweId": "CWE-639",
+      "cweName": "Insecure Direct Object Reference (IDOR)",
+      "cveIds": [
+        "CVE-2026-1355"
+      ],
+      "summary": "A Missing Authorization vulnerability was identified in GitHub Enterprise Server that allowed unauthorized content to be uploaded to a user's repository migration export due to a missing authorization check in the repository migration upload endpoint. The vulnerability could be exploited by supplying the migration identifier to overwrite or replace a victim's migration archive.",
+      "disclosedAt": "2026-03-05T02:23:08.428Z",
+      "programHandle": "github",
+      "programName": "GitHub",
+      "reporterUsername": "ahacker1",
+      "url": "https://hackerone.com/reports/3506183",
+      "fetchedAt": "2026-03-07T15:12:55.003Z"
+    }
+  ],
+  "sigmaRules": [
+    {
+      "id": "84de0f98-1096-4c72-90ad-c199845c8597",
+      "yamlContent": "title: Potential Code Injection Attack\nid: 84de0f98-1096-4c72-90ad-c199845c8597\nstatus: experimental\ndescription: |\n  \"Potential Code Injection attack detected. Auto-generated from HackerOne report: Injection in path parameter of Ingress-nginx\"\n  Auto-generated from HackerOne report analysis.\nreferences:\n  - https://hackerone.com/reports/2701701\nauthor: Panguard Threat Intel (auto-generated)\ndate: 2026/03/07\ntags:\n  - attack.execution\n  - attack.t1059\n  - cwe.94\nlogsource:\n  category: webserver\ndetection:\n  selection:\n    cs-uri-query|contains:\n      - 'eval('\n      - 'exec('\n      - 'system('\n      - '__import__'\n      - 'Runtime.getRuntime()'\n      - 'Process'\n      - 'spawn('\n      - 'require('\n  condition: selection\nfalsepositives:\n  - Legitimate internal API calls\n  - Development/testing environments\nlevel: medium",
+      "sourceReportId": "2701701",
+      "sourceReportUrl": "https://hackerone.com/reports/2701701",
+      "attackType": "Code Injection",
+      "confidence": 75,
+      "status": "experimental",
+      "generatedAt": "2026-03-07T15:14:25.760Z",
+      "reviewed": false,
+      "reviewDecision": "pending"
+    },
+    {
+      "id": "d87ab272-1876-441a-88b2-fc7abe9dad40",
+      "yamlContent": "title: Potential Insecure Direct Object Reference\nid: d87ab272-1876-441a-88b2-fc7abe9dad40\nstatus: experimental\ndescription: |\n  \"Potential IDOR attack detected. Auto-generated from HackerOne report: IDOR to make someone attend or leave an event\"\n  Auto-generated from HackerOne report analysis.\nreferences:\n  - https://hackerone.com/reports/1734639\nauthor: Panguard Threat Intel (auto-generated)\ndate: 2026/03/07\ntags:\n  - attack.defense_evasion\n  - attack.t1078\n  - cwe.639\nlogsource:\n  category: webserver\ndetection:\n  selection:\n    cs-uri-query|contains:\n      - '/users/'\n      - '/account/'\n      - '/profile/'\n      - '/order/'\n      - '/api/v'\n  condition: selection\nfalsepositives:\n  - Legitimate internal API calls\n  - Development/testing environments\nlevel: medium",
+      "sourceReportId": "1734639",
+      "sourceReportUrl": "https://hackerone.com/reports/1734639",
+      "attackType": "IDOR",
+      "confidence": 60,
+      "status": "draft",
+      "generatedAt": "2026-03-07T15:14:25.764Z",
+      "reviewed": false,
+      "reviewDecision": "pending"
+    }
+  ],
+  "yaraRules": [
+    {
+      "id": "panguard_code_injection_2701701",
+      "ruleContent": "rule panguard_code_injection_2701701\n{\n    meta:\n        description = \"Detects code injection payloads in files or network captures\"\n        author = \"Panguard Threat Intel (auto-generated)\"\n        date = \"2026-03-07\"\n        reference = \"https://hackerone.com/reports/2701701\"\n        report_title = \"Injection in path parameter of Ingress-nginx\"\n        confidence = 75\n        cwe = \"CWE-94\"\n        mitre = \"T1059\"\n\n    strings:\n        $eval_call = \"eval(\" nocase\n        $exec_call = \"exec(\" nocase\n        $system_call = \"system(\" nocase\n        $spawn_call = \"spawn(\" nocase\n        $runtime_exec = \"Runtime.getRuntime()\" nocase\n        $python_import = \"__import__\" nocase\n\n    condition:\n        2 of them\n}",
+      "sourceReportId": "2701701",
+      "sourceReportUrl": "https://hackerone.com/reports/2701701",
+      "attackType": "Code Injection",
+      "confidence": 75,
+      "status": "experimental",
+      "generatedAt": "2026-03-07T15:14:25.764Z",
+      "reviewed": false,
+      "reviewDecision": "pending"
+    }
+  ]
+}

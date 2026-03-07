@@ -145,6 +145,34 @@ export interface GeneratedRule {
 }
 
 // ---------------------------------------------------------------------------
+// Generated YARA Rule
+// ---------------------------------------------------------------------------
+
+/** A generated YARA rule with metadata */
+export interface GeneratedYaraRule {
+  /** Auto-generated rule name */
+  id: string;
+  /** YARA rule content */
+  ruleContent: string;
+  /** Source report ID */
+  sourceReportId: string;
+  /** Source report URL */
+  sourceReportUrl: string;
+  /** Attack type this rule detects */
+  attackType: string;
+  /** Confidence score (0-100) */
+  confidence: number;
+  /** Rule status: draft if confidence < 70, experimental otherwise */
+  status: 'draft' | 'experimental';
+  /** Generation timestamp */
+  generatedAt: string;
+  /** Whether reviewed by human */
+  reviewed: boolean;
+  /** Review decision */
+  reviewDecision: 'pending' | 'approved' | 'rejected' | null;
+}
+
+// ---------------------------------------------------------------------------
 // Rule Validation
 // ---------------------------------------------------------------------------
 

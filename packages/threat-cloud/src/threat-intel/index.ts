@@ -8,6 +8,7 @@
 export { HackerOneAdapter } from './hackerone-adapter.js';
 export { AttackExtractor } from './attack-extractor.js';
 export { SigmaRuleGenerator } from './sigma-rule-generator.js';
+export { YaraRuleGenerator } from './yara-rule-generator.js';
 export { RuleValidator } from './rule-validator.js';
 export type {
   HackerOneHacktivityItem,
@@ -16,6 +17,7 @@ export type {
   ExtractedAttackPattern,
   ExtractionResult,
   GeneratedRule,
+  GeneratedYaraRule,
   RuleValidationResult,
   HackerOneConfig,
   ExtractorConfig,

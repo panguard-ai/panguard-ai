@@ -28,6 +28,7 @@ const DEFAULT_CONFIG: HackerOneConfig = {
 const SEVERITY_ORDER = ['none', 'low', 'medium', 'high', 'critical'] as const;
 
 const HACKTIVITY_API = 'https://api.hackerone.com/v1/hackers/hacktivity';
+const PAGE_SIZE = 25;
 
 /** CWE name → CWE ID mapping for common web vulnerabilities */
 const CWE_NAME_TO_ID: Record<string, string> = {
@@ -76,24 +77,35 @@ export class HackerOneAdapter {
 
   /**
    * Fetch publicly disclosed reports from HackerOne Hacktivity.
-   * Supports incremental updates via `since` parameter.
+   * Pages through results since most items are undisclosed.
    */
   async fetchReports(since?: string): Promise<StoredReport[]> {
     const reports: StoredReport[] = [];
-    let nextUrl: string | undefined = this.buildUrl();
-    let page = 0;
-    const maxPages = Math.ceil(this.config.maxReports / 25);
+    let pageNumber = 1;
+    // Most items are undisclosed (~1-3 per page of 25 are disclosed),
+    // so we need many pages. Cap at reasonable limit.
+    const maxPages = Math.min(Math.ceil(this.config.maxReports * 12), 200);
+    let consecutiveEmpty = 0;
 
-    while (nextUrl && page < maxPages && reports.length < this.config.maxReports) {
+    while (pageNumber <= maxPages && reports.length < this.config.maxReports) {
       await this.rateLimit();
-      const response = await this.fetchPage(nextUrl);
+
+      const url = `${HACKTIVITY_API}?page%5Bsize%5D=${PAGE_SIZE}&page%5Bnumber%5D=${pageNumber}`;
+      const response = await this.fetchPage(url);
       if (!response) break;
 
+      // No more data
+      if (response.data.length === 0) break;
+
+      const beforeCount = reports.length;
+
       for (const item of response.data) {
-        // Only process disclosed reports with title
+        if (reports.length >= this.config.maxReports) break;
+
+        // Only disclosed reports with title
         if (!item.attributes.disclosed || !item.attributes.title) continue;
 
-        // Skip if before `since` date
+        // Incremental: skip if before `since`
         if (since && item.attributes.disclosed_at) {
           if (new Date(item.attributes.disclosed_at) <= new Date(since)) continue;
         }
@@ -104,19 +116,20 @@ export class HackerOneAdapter {
         if (stored) reports.push(stored);
       }
 
-      nextUrl = response.links.next;
-      page++;
+      // Track consecutive pages with no new disclosed reports
+      if (reports.length === beforeCount) {
+        consecutiveEmpty++;
+      } else {
+        consecutiveEmpty = 0;
+      }
 
-      // If no next link, stop paginating
-      if (!nextUrl) break;
+      // Stop if 15+ consecutive pages with no finds (we've run out)
+      if (consecutiveEmpty >= 15) break;
+
+      pageNumber++;
     }
 
-    return reports.slice(0, this.config.maxReports);
-  }
-
-  /** Build initial API URL */
-  private buildUrl(): string {
-    return `${HACKTIVITY_API}?page[size]=25`;
+    return reports;
   }
 
   /** Fetch a single page from the API */
