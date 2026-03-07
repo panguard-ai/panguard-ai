@@ -22,6 +22,17 @@ export interface SkillThreatSubmitResult {
 }
 
 /**
+ * Validate that a Threat Cloud URL uses HTTPS in production.
+ * 驗證 Threat Cloud URL 在生產環境使用 HTTPS。
+ */
+function validateBaseUrl(baseUrl: string): void {
+  const isLocal = baseUrl.startsWith('http://localhost') || baseUrl.startsWith('http://127.0.0.1');
+  if (!isLocal && baseUrl.startsWith('http://')) {
+    throw new Error('Threat Cloud baseUrl must use HTTPS in production. API keys would be sent in cleartext over HTTP.');
+  }
+}
+
+/**
  * Submit a skill threat scan result to Threat Cloud.
  * 提交 Skill 威脅掃描結果到威脅雲
  */
@@ -30,6 +41,8 @@ export async function submitSkillThreat(
   submission: SkillThreatSubmission,
   apiKey?: string
 ): Promise<ApiResponse<SkillThreatSubmitResult>> {
+  validateBaseUrl(baseUrl);
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -41,6 +54,7 @@ export async function submitSkillThreat(
     method: 'POST',
     headers,
     body: JSON.stringify(submission),
+    signal: AbortSignal.timeout(10_000),
   });
 
   const result = (await response.json()) as ApiResponse<SkillThreatSubmitResult>;
@@ -61,9 +75,11 @@ export async function lookupSkillThreat(
     headers['Authorization'] = `Bearer ${apiKey}`;
   }
 
+  validateBaseUrl(baseUrl);
+
   const response = await fetch(
     `${baseUrl}/api/skill-threats/${encodeURIComponent(skillHash)}`,
-    { headers }
+    { headers, signal: AbortSignal.timeout(5_000) }
   );
 
   const result = (await response.json()) as ApiResponse<SkillThreatLookup>;
