@@ -1,0 +1,88 @@
+---
+title: "Risk Scoring"
+description: "How Panguard Scan calculates the 0-100 risk score and A-F letter grade."
+icon: "chart-bar"
+---
+
+Every Panguard Scan produces a single risk score from 0 to 100 and an associated letter grade from A to F. This page explains how the score is calculated and what each grade means.
+
+## Score Display
+
+```
+Score: 62/100 [████████████░░░░░░░░] Grade: C
+```
+
+The score represents a **safety score**: higher is better. It is calculated as `100 - totalRiskPoints`, clamped to the 0--100 range.
+
+## Grade Thresholds
+
+| Grade | Score Range | Interpretation |
+|-------|------------|----------------|
+| **A** | 90 -- 100 | Excellent. Minimal risk. All critical and high issues resolved. |
+| **B** | 75 -- 89 | Good. A few medium-severity items remain. |
+| **C** | 60 -- 74 | Fair. Multiple findings need attention. |
+| **D** | 40 -- 59 | Poor. Significant security gaps present. |
+| **F** | 0 -- 39 | Critical. Immediate remediation required. |
+
+## Scoring Factors
+
+The risk score is derived from the severity and quantity of findings across all scanners. Each finding contributes penalty points based on its severity:
+
+| Severity | Points per Finding |
+|----------|--------------------|
+| CRITICAL | 15 |
+| HIGH | 10 |
+| MEDIUM | 5 |
+| LOW | 2 |
+| INFO | 0 |
+
+Points are summed and subtracted from 100. The resulting value is clamped to a minimum of 0.
+
+### Example Calculation
+
+| Finding | Severity | Points |
+|---------|----------|--------|
+| SSH on 0.0.0.0 | HIGH | 10 |
+| Weak password policy | MEDIUM | 5 |
+| Expired SSL cert | CRITICAL | 15 |
+| No firewall | HIGH | 10 |
+| Outdated kernel (CVE) | MEDIUM | 5 |
+| | **Total** | **45** |
+
+**Safety Score** = 100 - 45 = **55** (Grade: **D**)
+
+## Score Categories
+
+Beyond the single number, the score is contextualized across 8 categories:
+
+| Category | What It Measures |
+|----------|-----------------|
+| **System** | OS patch level, kernel version, architecture |
+| **Network** | Open ports, binding addresses, firewall status |
+| **Authentication** | Password policy strength, account lockout |
+| **Encryption** | SSL/TLS certificates, cipher suites, key strength |
+| **Access Control** | Shared folders, file permissions, anonymous access |
+| **Services** | Running services, unnecessary daemons |
+| **Scheduled Tasks** | Cron jobs, suspicious scripts, persistence vectors |
+| **Security Tools** | Presence of AV, IDS, firewall, audit daemon |
+
+## Improving Your Score
+
+<Steps>
+  <Step title="Fix CRITICAL findings first">
+    Each critical finding costs 15 points. Resolving just one can move your grade up a full letter.
+  </Step>
+  <Step title="Address HIGH findings">
+    High-severity items are the next priority at 10 points each.
+  </Step>
+  <Step title="Review MEDIUM findings">
+    These are typically configuration improvements that accumulate.
+  </Step>
+  <Step title="Re-scan to verify">
+    Run `panguard scan` again after making changes to confirm your new score.
+  </Step>
+</Steps>
+
+<Tip>
+  Run `panguard scan --json` to get machine-readable output that includes per-finding scores, making it easy to integrate into CI/CD pipelines.
+</Tip>

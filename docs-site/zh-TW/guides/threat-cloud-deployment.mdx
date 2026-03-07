@@ -1,0 +1,162 @@
+---
+title: "部署 Threat Cloud"
+description: "運行自架 Threat Cloud 伺服器，實現集中式威脅情報與完整隱私控制。"
+icon: "cloud"
+---
+
+Threat Cloud 是 Panguard 的自架威脅情報平台。它彙總來自 Guard 代理程式與蜜罐的入侵指標 (IoC)，提供下游工具的來源端點，並追蹤攻擊活動 -- 同時將您的資料完全掌控在自己手中。
+
+<Steps>
+  <Step title="啟動 Threat Cloud 伺服器">
+    在您選擇的連接埠啟動伺服器：
+
+    ```bash
+    panguard threat start --port 8080
+    ```
+
+    ```
+      PANGUARD AI - Threat Cloud
+
+      Starting Threat Cloud server...
+
+      -- Server Info ----------------------------
+
+      URL:        http://localhost:8080
+      Database:   SQLite (./panguard-threat.db)
+      API Key:    pg_threat_abc123...
+      Rate Limit: 100 req/min
+
+      Threat Cloud is running.
+      API documentation: http://localhost:8080/docs
+    ```
+
+    <Info>
+      API 金鑰在首次啟動時自動產生，並儲存於 Panguard 設定中。用它來驗證所有 API 請求。
+    </Info>
+  </Step>
+
+  <Step title="了解架構">
+    Threat Cloud 使用輕量級堆疊，設計用於單伺服器部署：
+
+    | 元件 | 技術 | 用途 |
+    | --- | --- | --- |
+    | **資料庫** | SQLite | 儲存 IoC、攻擊活動與來源資料 |
+    | **API** | REST + JSON | 所有資源的 CRUD 操作 |
+    | **驗證** | API 金鑰（Bearer token） | 驗證所有請求 |
+    | **速率限制** | 預設 100 次請求/分鐘 | 防止濫用；可設定 |
+
+    <Note>
+      SQLite 是預設後端。高流量部署（10+ 個代理程式）建議將資料庫放在 SSD 上並調整 WAL 模式：`panguard threat start --db-wal`。
+    </Note>
+  </Step>
+
+  <Step title="管理入侵指標">
+    手動新增 IoC 或讓 Guard 代理程式自動推送：
+
+    <CodeGroup>
+      ```bash Add an IoC via CLI
+      panguard threat ioc add \
+        --type ip \
+        --value "203.0.113.42" \
+        --severity high \
+        --tags "brute-force,ssh"
+      ```
+
+      ```bash List recent IoCs
+      panguard threat ioc list --limit 20
+      ```
+
+      ```bash Search IoCs
+      panguard threat ioc search --value "203.0.113.*"
+      ```
+    </CodeGroup>
+
+    由 Guard 代理程式新增的 IoC 包含完整上下文：觸發事件、蜜罐互動資料與分析結果。
+  </Step>
+
+  <Step title="設定來源端點">
+    Threat Cloud 公開來源端點，供下游工具（SIEM、防火牆、其他 Panguard 執行個體）訂閱：
+
+    ```
+    GET /api/v1/feeds/ip-blocklist     IP addresses to block
+    GET /api/v1/feeds/domain-blocklist  Malicious domains
+    GET /api/v1/feeds/ioc-all          All IoCs in STIX 2.1 format
+    ```
+
+    範例：取得 IP 封鎖清單：
+
+    ```bash
+    curl -H "Authorization: Bearer pg_threat_abc123..." \
+      http://localhost:8080/api/v1/feeds/ip-blocklist
+    ```
+
+    ```json
+    {
+      "feed": "ip-blocklist",
+      "updated": "2026-03-07T14:00:00Z",
+      "count": 42,
+      "indicators": [
+        { "value": "203.0.113.42", "severity": "high", "last_seen": "2026-03-07T14:30:22Z" },
+        { "value": "198.51.100.17", "severity": "medium", "last_seen": "2026-03-07T03:12:44Z" }
+      ]
+    }
+    ```
+  </Step>
+
+  <Step title="追蹤攻擊活動">
+    將相關 IoC 與事件分組為命名的攻擊活動以進行調查：
+
+    <CodeGroup>
+      ```bash Create a campaign
+      panguard threat campaign create \
+        --name "SSH Brute Force Wave" \
+        --description "Coordinated brute-force attacks from CN/RU ranges" \
+        --iocs "203.0.113.42,198.51.100.17,192.0.2.88"
+      ```
+
+      ```bash List campaigns
+      panguard threat campaign list
+      ```
+
+      ```bash View campaign details
+      panguard threat campaign view --name "SSH Brute Force Wave"
+      ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="隱私與資料處理">
+    Threat Cloud 以隱私為核心原則設計：
+
+    - **自架：** 所有資料留在您的基礎設施
+    - **匿名化資料：** 共享來源中的 IP 位址可進行雜湊處理
+    - **零遙測：** 不傳送任何資料至 Panguard AI 伺服器
+    - **資料保留：** IoC 可設定 TTL（預設：90 天）
+
+    ```bash
+    panguard threat start --port 8080 \
+      --retention-days 30 \
+      --anonymize-feeds
+    ```
+
+    <Warning>
+      如果您將 Threat Cloud 暴露至網際網路，請務必使用 HTTPS（反向代理）並以 IP 或 VPN 限制存取。API 金鑰本身不足以應對公開部署。
+    </Warning>
+  </Step>
+</Steps>
+
+## 接下來做什麼
+
+<CardGroup cols={2}>
+  <Card title="Threat Cloud 產品參考" icon="book" href="/products/threat-cloud/overview">
+    Threat Cloud 平台與架構的完整文件。
+  </Card>
+  <Card title="隱私模型" icon="lock" href="/products/threat-cloud/privacy">
+    資料處理、匿名化與保留政策的詳細說明。
+  </Card>
+  <Card title="Threat Cloud API" icon="code" href="/api-reference/threat-cloud/ioc">
+    IoC、來源與攻擊活動端點的完整 API 參考。
+  </Card>
+  <Card title="Docker 部署" icon="docker" href="/guides/docker-deployment">
+    在容器化環境中運行 Threat Cloud。
+  </Card>
+</CardGroup>

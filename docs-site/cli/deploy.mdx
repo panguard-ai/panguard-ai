@@ -1,0 +1,100 @@
+---
+title: "panguard deploy"
+description: "Deploy Panguard configuration and agents to remote endpoints."
+icon: "rocket"
+---
+
+The `deploy` command pushes your local Panguard configuration to remote machines, enabling consistent security policies across multiple endpoints. It handles agent installation, configuration distribution, and service registration in a single step.
+
+## Usage
+
+```bash
+panguard deploy [options]
+```
+
+## Options
+
+<ParamField path="--config" type="string">
+  Path to the deployment configuration file that defines target hosts and policies. Defaults to `~/.panguard/deploy.yaml`.
+</ParamField>
+
+<ParamField path="--dry-run" type="flag">
+  Simulate the deployment without making any changes. Shows what would be deployed to which hosts.
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  Set the output language for deployment logs.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Deploy with default config
+panguard deploy
+```
+
+```bash Dry run to preview changes
+panguard deploy --dry-run
+```
+
+```bash Deploy with custom config
+panguard deploy --config ./production-deploy.yaml
+```
+
+```bash Deploy with Chinese output
+panguard deploy --lang zh-TW
+```
+</CodeGroup>
+
+## Deployment Configuration
+
+The deploy configuration file (`deploy.yaml`) defines target hosts and the policies to apply:
+
+```yaml
+targets:
+  - host: 192.168.1.10
+    user: panguard
+    services:
+      - guard
+      - scan
+  - host: web-server.example.com
+    user: root
+    services:
+      - guard
+      - trap
+      - chat
+
+policy:
+  guard:
+    auto_response: true
+    learning_period: 24h
+  scan:
+    schedule: "0 2 * * *"  # Daily at 2 AM
+```
+
+<Tip>
+  Always run `panguard deploy --dry-run` first to verify the target list and configuration before making changes to production systems.
+</Tip>
+
+## Plan Requirements
+
+<Info>
+  Deploy requires the **Solo** ($9/mo) plan or higher.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Multi-Endpoint Guide" icon="server" href="/guides/multi-endpoint">
+    Managing security across multiple machines.
+  </Card>
+  <Card title="panguard manager" icon="server" href="/cli/manager">
+    Centralized management server for deployed agents.
+  </Card>
+  <Card title="panguard init" icon="wand-magic-sparkles" href="/cli/init">
+    Initialize configuration on the local machine before deploying.
+  </Card>
+  <Card title="Docker Deployment" icon="docker" href="/guides/docker-deployment">
+    Deploy Panguard in containerized environments.
+  </Card>
+</CardGroup>

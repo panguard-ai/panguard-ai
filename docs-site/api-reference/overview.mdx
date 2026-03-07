@@ -1,0 +1,142 @@
+---
+title: "API Overview"
+description: "Panguard AI exposes three REST API services for authentication, fleet management, and threat intelligence."
+icon: "code"
+---
+
+Panguard AI provides three independent API services. Each service runs on its own port and handles a distinct domain of functionality.
+
+## API Services
+
+<CardGroup cols={3}>
+  <Card title="Auth Server API" icon="user-shield">
+    **Port 3000** -- User registration, login, sessions, TOTP two-factor, GDPR compliance, and subscription management.
+  </Card>
+  <Card title="Manager API" icon="server">
+    **Port 8443** -- Agent registration, heartbeats, threat event ingestion, policy management, SSE streaming, and fleet dashboard.
+  </Card>
+  <Card title="Threat Cloud API" icon="cloud">
+    **Configurable port** -- IoC management, threat feeds, campaign tracking, MITRE heatmaps, geographic queries, and audit logs.
+  </Card>
+</CardGroup>
+
+## Base URLs
+
+| Service | Default Base URL | TLS |
+|---------|-----------------|-----|
+| Auth Server | `https://auth.panguard.ai` or `http://localhost:3000` | Optional (recommended) |
+| Manager | `https://localhost:8443` | Self-signed by default |
+| Threat Cloud | `https://tc.panguard.ai` or `http://localhost:PORT` | Optional |
+
+## Authentication
+
+All authenticated endpoints require a **Bearer token** in the `Authorization` header.
+
+```bash
+curl -X GET https://localhost:8443/api/agents \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+<Info>
+The Manager API uses a shared static token configured via the `MANAGER_AUTH_TOKEN` environment variable. The Auth Server API issues JWT tokens on login.
+</Info>
+
+## Common Response Format
+
+Every API endpoint returns a consistent JSON envelope:
+
+<Tabs>
+  <Tab title="Success">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "id": "agent-001",
+        "hostname": "web-server-1"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Error">
+    ```json
+    {
+      "ok": false,
+      "error": "Agent not found"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Rate Limiting
+
+All API services enforce rate limiting to protect against abuse.
+
+| Service | Default Limit | Scope |
+|---------|--------------|-------|
+| Auth Server | 20 req/min | Per IP |
+| Manager API | 60 req/min | Per IP |
+| Threat Cloud | Varies by endpoint | Per API key |
+
+When rate-limited, the API returns a `429` status code with a `Retry-After` header indicating when to retry.
+
+## Error Codes
+
+| Status Code | Meaning | Description |
+|-------------|---------|-------------|
+| `200` | OK | Request succeeded |
+| `201` | Created | Resource created successfully |
+| `400` | Bad Request | Invalid request body or missing required fields |
+| `401` | Unauthorized | Missing or invalid authentication token |
+| `403` | Forbidden | Valid token but insufficient permissions or tier |
+| `404` | Not Found | Requested resource does not exist |
+| `429` | Too Many Requests | Rate limit exceeded, check `Retry-After` header |
+| `500` | Internal Server Error | Unexpected server error, retry with backoff |
+
+## Content Type
+
+All request and response bodies use `application/json` unless otherwise noted. Feed endpoints may return `text/plain` for blocklist formats.
+
+## Pagination
+
+Endpoints that return collections support pagination via query parameters:
+
+<ParamField query="page" type="number" default="1">
+  Page number (1-indexed).
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  Number of items per page. Maximum 200.
+</ParamField>
+
+Paginated responses include metadata:
+
+```json
+{
+  "ok": true,
+  "data": [...],
+  "pagination": {
+    "total": 342,
+    "page": 1,
+    "limit": 50,
+    "pages": 7
+  }
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Auth API" icon="user-plus" href="/api-reference/auth/registration">
+    Register users and manage authentication.
+  </Card>
+  <Card title="Manager API" icon="lock" href="/api-reference/manager/authentication">
+    Manage your agent fleet and policies.
+  </Card>
+  <Card title="Threat Cloud API" icon="crosshairs" href="/api-reference/threat-cloud/ioc">
+    Query and submit threat intelligence.
+  </Card>
+  <Card title="Configuration" icon="gear" href="/configuration/environment-variables">
+    Configure API ports, tokens, and settings.
+  </Card>
+</CardGroup>

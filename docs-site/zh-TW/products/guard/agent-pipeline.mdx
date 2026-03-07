@@ -1,0 +1,160 @@
+---
+title: "代理管線（DARE）"
+description: "深入解析處理每個安全事件的 4 代理 Detect-Analyze-Respond-Report 管線。"
+icon: "arrow-right-arrow-left"
+---
+
+Guard 引擎透過一個稱為 DARE 管線的線性 4 代理鏈處理每個安全事件：**Detect**、**Analyze**、**Respond**、**Report**。每個代理都有單一職責，並產生供下一個代理使用的型別化輸出。
+
+## 管線流程
+
+```
+SecurityEvent
+     |
+     v
+[DetectAgent] ──> DetectionResult | null
+     |
+     v
+[AnalyzeAgent] ──> ThreatVerdict
+     |
+     v
+[RespondAgent] ──> ResponseResult
+     |
+     v
+[ReportAgent] ──> Updated baseline + anonymized data
+```
+
+如果 DetectAgent 回傳 `null`（無規則匹配、無威脅情報命中），該事件被視為良性並跳過。否則，完整管線會執行。
+
+---
+
+## DetectAgent
+
+**原始碼**：`packages/panguard-guard/src/agent/detect-agent.ts`
+
+| 欄位 | 值 |
+|-------|-------|
+| **輸入** | `SecurityEvent` |
+| **輸出** | `DetectionResult` 或 `null` |
+
+### 職責
+
+1. **Sigma 規則匹配** -- 透過 `RuleEngine` 對所有載入的規則執行事件匹配
+2. **威脅情報查詢** -- 檢查來源/目的 IP 是否存在於 5 個情報來源及 Threat Cloud 封鎖清單中（支援 IPv4 和 IPv6）
+3. **去重** -- 在 60 秒視窗內跳過相同的偵測（去重映射最多 500 個條目）
+4. **事件關聯** -- 包括傳統的基於 IP 的關聯（5 分鐘內同一來源 IP 的 3+ 事件）和透過 `EventCorrelator` 的進階模式基礎關聯（7 種攻擊模式）
+
+### 內部狀態
+
+| 緩衝區 | 容量 | 視窗 |
+|--------|----------|--------|
+| 關聯緩衝區 | 1,000 個事件 | 5 分鐘 |
+| 去重映射 | 500 個條目 | 60 秒 |
+
+---
+
+## AnalyzeAgent
+
+**原始碼**：`packages/panguard-guard/src/agent/analyze-agent.ts`
+
+| 欄位 | 值 |
+|-------|-------|
+| **輸入** | `DetectionResult` + `EnvironmentBaseline` |
+| **輸出** | `ThreatVerdict`（結論：benign / suspicious / malicious） |
+
+### 證據來源與權重
+
+AnalyzeAgent 從多個來源收集證據並計算加權信心評分（0--100）：
+
+| 來源 | 權重 | 備註 |
+|--------|--------|-------|
+| Sigma 規則匹配 | 0.40 | 由回饋迴圈調整 |
+| 威脅情報 | -- | 匹配時固定信心值 85 |
+| 基準線偏差 | 0.30 | 時段感知（00:00--05:59 加成） |
+| Falco/Suricata 證據 | 0.20--0.25 | 當核心層級監控器啟用時 |
+| 攻擊鏈關聯 | +5/事件 | 最高 +25 加成 |
+| AI 分析 | 0.30 | 當 AI 供應商可用時 |
+
+權重分配根據可用來源進行調整：
+
+| 可用來源 | 規則/情報 | 基準線 | AI | eBPF |
+|-------------------|-------------|----------|----|------|
+| 僅規則 | 0.60 | 0.40 | -- | -- |
+| 規則 + AI | 0.40 | 0.30 | 0.30 | -- |
+| 規則 + eBPF | 0.40 | 0.35 | -- | 0.25 |
+| 規則 + AI + eBPF | 0.30 | 0.20 | 0.30 | 0.20 |
+
+### 回饋迴圈
+
+AnalyzeAgent 維護每條規則的回饋歷史：
+
+- **高誤報率** -- 信心值降低最多 30%
+- **高真陽性率** -- 信心值提高最多 10%
+
+### 矛盾偵測
+
+如果高嚴重性規則觸發但基準線未顯示偏差，信心值會降低 10 分。這可以防止對符合規則模式但在特定環境中屬於正常的事件過度警報。
+
+---
+
+## RespondAgent
+
+**原始碼**：`packages/panguard-guard/src/agent/respond-agent.ts`
+
+| 欄位 | 值 |
+|-------|-------|
+| **輸入** | `ThreatVerdict` |
+| **輸出** | `ResponseResult` |
+
+### 基於信心的動作
+
+| 信心值 | 動作 |
+|------------|--------|
+| >= 90% | 自動執行，事後通知 |
+| 70--90% | 透過 Chat 要求確認 |
+| < 70% | 僅通知，不採取動作 |
+
+### 可用動作
+
+| 動作 | 描述 | 平台 |
+|--------|-------------|----------|
+| `block_ip` | 透過防火牆封鎖來源 IP | macOS (pfctl)、Linux (iptables)、Windows (netsh) |
+| `kill_process` | 終止惡意處理程序 | 全平台（先 SIGTERM 後 5 秒 SIGKILL） |
+| `isolate_file` | 隔離可疑檔案 | 全平台 |
+| `disable_account` | 鎖定使用者帳戶 | 全平台 |
+| `notify` | 透過 Chat 發送警報 | 全平台 |
+| `log_only` | 僅記錄不採取動作 | 全平台 |
+
+安全規則和升級的完整詳細資訊請參閱[自動回應](/products/guard/auto-response)。
+
+---
+
+## ReportAgent
+
+**原始碼**：`packages/panguard-guard/src/agent/report-agent.ts`
+
+| 欄位 | 值 |
+|-------|-------|
+| **輸入** | `SecurityEvent` + `ThreatVerdict` + `ResponseResult` + `EnvironmentBaseline` |
+| **輸出** | 更新的基準線 + 可選的匿名化威脅資料 |
+
+### 職責
+
+1. **JSONL 日誌記錄** -- 寫入完整的事件記錄，搭配日誌輪替（每個檔案 50 MB、10 個輪替檔案、90 天保留期）
+2. **基準線更新** -- 在學習模式期間，持續使用觀察到的模式更新行為基準線
+3. **匿名化** -- IP 位址在上傳至 Threat Cloud 前進行 /16 匿名化（最後兩個八位元組歸零）
+4. **摘要產生** -- 產生每日（24 小時）和每週（7 天）摘要，包含主要攻擊來源、動作分類和裁決分佈
+
+### 日誌格式
+
+每個日誌條目是一行包含以下內容的 JSON：
+
+```json
+{
+  "timestamp": "2025-01-15T14:23:01.000Z",
+  "event": { "type": "network", "sourceIp": "203.0.113.50" },
+  "verdict": { "conclusion": "malicious", "confidence": 95 },
+  "response": { "action": "block_ip", "success": true },
+  "baseline": { "deviation": true, "score": 0.85 }
+}
+```

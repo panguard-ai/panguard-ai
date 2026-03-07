@@ -1,0 +1,119 @@
+---
+title: "Honeypot Types"
+description: "Reference for all 8 honeypot service types with default ports, emulated protocols, and captured data."
+icon: "server"
+---
+
+Panguard Trap supports 8 honeypot service types, each emulating a common network service that attackers frequently target. You can deploy any combination of services simultaneously.
+
+## Service Reference
+
+### SSH Honeypot
+
+| Field | Details |
+|-------|---------|
+| **Default Port** | 2222 |
+| **Emulates** | OpenSSH server |
+| **Protocol** | SSH-2.0 |
+| **Captures** | Usernames, passwords, post-login commands, client version strings |
+| **Use case** | Detects brute force attempts, credential stuffing, and post-exploitation commands |
+
+### HTTP Honeypot
+
+| Field | Details |
+|-------|---------|
+| **Default Port** | 8080 |
+| **Emulates** | Web server (Apache/Nginx) |
+| **Protocol** | HTTP/1.1 |
+| **Captures** | Request paths, headers, payloads, exploit attempts, web shell uploads |
+| **Use case** | Detects web application attacks, directory traversal, SQL injection probes |
+
+### FTP Honeypot
+
+| Field | Details |
+|-------|---------|
+| **Default Port** | 2121 |
+| **Emulates** | FTP server |
+| **Protocol** | FTP |
+| **Captures** | Login credentials, file listing requests, upload/download attempts |
+| **Use case** | Detects anonymous access attempts, credential brute force |
+
+### SMB Honeypot
+
+| Field | Details |
+|-------|---------|
+| **Default Port** | 4450 |
+| **Emulates** | Windows file sharing (SMB) |
+| **Protocol** | SMB/CIFS |
+| **Captures** | Authentication attempts, share enumeration, file access patterns |
+| **Use case** | Detects EternalBlue-style exploits, lateral movement, ransomware propagation |
+
+### MySQL Honeypot
+
+| Field | Details |
+|-------|---------|
+| **Default Port** | 3307 |
+| **Emulates** | MySQL database server |
+| **Protocol** | MySQL wire protocol |
+| **Captures** | Login credentials, SQL queries, database enumeration attempts |
+| **Use case** | Detects database credential attacks, SQL injection follow-through |
+
+### RDP Honeypot
+
+| Field | Details |
+|-------|---------|
+| **Default Port** | 3390 |
+| **Emulates** | Windows Remote Desktop |
+| **Protocol** | RDP |
+| **Captures** | Login credentials, connection metadata, NLA authentication attempts |
+| **Use case** | Detects RDP brute force, BlueKeep-style exploits |
+
+### Telnet Honeypot
+
+| Field | Details |
+|-------|---------|
+| **Default Port** | 2323 |
+| **Emulates** | Telnet server |
+| **Protocol** | Telnet |
+| **Captures** | Login credentials, post-login commands, IoT botnet enrollment attempts |
+| **Use case** | Detects Mirai-style IoT attacks, legacy system exploitation |
+
+### Redis Honeypot
+
+| Field | Details |
+|-------|---------|
+| **Default Port** | 6380 |
+| **Emulates** | Redis cache server |
+| **Protocol** | RESP (Redis Serialization Protocol) |
+| **Captures** | Commands executed, configuration queries, unauthorized data access |
+| **Use case** | Detects unauthenticated Redis exploitation, cron-based persistence |
+
+## Summary Table
+
+| Service | Default Port | Real Service Port | Protocol |
+|---------|-------------|-------------------|----------|
+| SSH | 2222 | 22 | SSH-2.0 |
+| HTTP | 8080 | 80/443 | HTTP/1.1 |
+| FTP | 2121 | 21 | FTP |
+| SMB | 4450 | 445 | SMB/CIFS |
+| MySQL | 3307 | 3306 | MySQL |
+| RDP | 3390 | 3389 | RDP |
+| Telnet | 2323 | 23 | Telnet |
+| Redis | 6380 | 6379 | RESP |
+
+## Deployment Examples
+
+```bash
+# Deploy SSH and HTTP (most common)
+panguard trap start --services ssh,http
+
+# Deploy all 8 services
+panguard trap start --services ssh,http,ftp,smb,mysql,rdp,telnet,redis
+
+# Custom port for SSH honeypot
+panguard trap start --services ssh --port 22222
+```
+
+<Warning>
+  Always use non-standard ports for honeypots. If your real SSH runs on port 22, the SSH honeypot should run on a different port (default: 2222). Running a honeypot on the same port as a real service will conflict.
+</Warning>

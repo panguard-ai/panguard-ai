@@ -70,6 +70,7 @@ import { LogCollector } from './collectors/index.js';
 import { BUILTIN_RULES } from './rules/builtin-rules.js';
 import { PanguardAgentClient } from './agent-client/index.js';
 import type { AgentHeartbeat } from './agent-client/index.js';
+import { GuardATREngine } from './engines/atr-engine.js';
 
 const logger = createLogger('panguard-guard:engine');
 
@@ -234,6 +235,9 @@ export class GuardEngine {
   // YARA scanner / YARA 掃描器
   private readonly yaraScanner: YaraScanner;
 
+  // ATR (Agent Threat Rules) engine / ATR 引擎
+  private readonly atrEngine: GuardATREngine;
+
   // Smart AI routing / 智慧 AI 路由
   private readonly smartRouter: SmartRouter | null = null;
   private readonly knowledgeDistiller: KnowledgeDistiller | null = null;
@@ -303,6 +307,12 @@ export class GuardEngine {
 
     // Initialize YARA scanner / 初始化 YARA 掃描器
     this.yaraScanner = new YaraScanner();
+
+    // Initialize ATR engine for agent threat detection / 初始化 ATR 引擎
+    this.atrEngine = new GuardATREngine({
+      rulesDir: join(config.dataDir, 'atr-rules'),
+      hotReload: true,
+    });
 
     // Initialize agents / 初始化代理
     this.detectAgent = new DetectAgent(this.ruleEngine);
@@ -423,6 +433,20 @@ export class GuardEngine {
 
     // Load rules / 載入規則
     await this.ruleEngine.loadRules();
+
+    // Load ATR (Agent Threat Rules) / 載入 ATR 規則
+    this.atrEngine
+      .loadRules()
+      .then((count) => {
+        if (count > 0) {
+          logger.info(`ATR rules loaded: ${count} rules / ATR 規則已載入: ${count} 條`);
+        }
+      })
+      .catch((err: unknown) => {
+        logger.warn(
+          `ATR rules load failed: ${err instanceof Error ? err.message : String(err)}`
+        );
+      });
 
     // Load community rules from threat cloud / 從威脅雲載入社群規則
     const cloudRules = await this.threatCloud.fetchRules();
@@ -706,8 +730,39 @@ export class GuardEngine {
         }
       }
 
+      // ATR evaluation for agent-related events / ATR 代理威脅規則評估
+      const atrMatches = this.atrEngine.evaluate(event);
+
       // Stage 1: Detect / 階段 1: 偵測
-      const detection = this.detectAgent.detect(event);
+      let detection = this.detectAgent.detect(event);
+
+      // Merge ATR matches into detection pipeline / 將 ATR 匹配合併入偵測管線
+      if (atrMatches.length > 0) {
+        const atrRuleMatches = atrMatches.map((m) => ({
+          ruleId: m.rule.id,
+          ruleName: m.rule.title,
+          severity: (m.rule.severity === 'informational' ? 'info' : m.rule.severity) as import('@panguard-ai/core').Severity,
+        }));
+        const atrMatchData = atrMatches.map((m) => ({
+          ruleId: m.rule.id,
+          category: m.rule.tags?.category ?? 'agent-threat',
+          severity: m.rule.severity,
+        }));
+
+        if (detection) {
+          // Merge ATR matches into existing detection
+          detection.ruleMatches = [...detection.ruleMatches, ...atrRuleMatches];
+          detection.atrMatches = atrMatchData;
+        } else {
+          // Create detection from ATR matches alone
+          detection = {
+            event,
+            ruleMatches: atrRuleMatches,
+            atrMatches: atrMatchData,
+            timestamp: new Date().toISOString(),
+          };
+        }
+      }
 
       if (!detection) {
         // No threat detected - update baseline based on mode
@@ -805,7 +860,12 @@ export class GuardEngine {
       }
 
       // Upload to threat cloud / 上傳至威脅雲
-      if (anonymizedData) {
+      if (anonymizedData && this.config.telemetryEnabled !== false) {
+        if (this.config.showUploadData) {
+          logger.info(
+            `[upload-preview] Anonymized data: ${JSON.stringify(anonymizedData, null, 2)}`
+          );
+        }
         await this.threatCloud.upload(anonymizedData);
         this.threatCloudUploaded++;
       }
@@ -1030,6 +1090,8 @@ export class GuardEngine {
       baselineConfidence: this.baseline.confidenceLevel,
       memoryUsageMB: Math.round((memUsage.heapUsed / 1024 / 1024) * 10) / 10,
       licenseTier: license.tier,
+      atrRuleCount: this.atrEngine.getRuleCount(),
+      atrMatchCount: this.atrEngine.getMatchCount(),
     };
   }
 

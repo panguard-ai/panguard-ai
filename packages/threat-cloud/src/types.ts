@@ -16,6 +16,10 @@ export interface AnonymizedThreatData {
   timestamp: string;
   industry?: string;
   region: string;
+  /** ATR rule IDs that matched (comma-separated) */
+  atrRulesMatched?: string;
+  /** ATR attack category */
+  atrCategory?: string;
 }
 
 /** Community rule update / 社群規則更新 */
@@ -134,6 +138,10 @@ export interface EnrichedThreatEvent {
   eventHash: string;
   receivedAt: string;
   campaignId?: string;
+  /** ATR rule IDs that matched (comma-separated) */
+  atrRulesMatched?: string;
+  /** ATR attack category */
+  atrCategory?: string;
 }
 
 /** Pagination parameters / 分頁參數 */

@@ -1,0 +1,283 @@
+---
+title: "Notification Issues"
+description: "Troubleshoot Telegram, Slack, Email, and Webhook notification delivery problems."
+icon: "bell"
+---
+
+## Not Receiving Notifications
+
+If notifications are not arriving on any channel, start with these general checks:
+
+<AccordionGroup>
+  <Accordion title="1. Check notification status">
+    ```bash
+    panguard chat status
+    ```
+
+    This shows:
+    - Which channels are enabled
+    - Last successful delivery time
+    - Any pending errors
+    - Current minimum severity setting
+  </Accordion>
+  <Accordion title="2. Send a test notification">
+    ```bash
+    # Test all enabled channels
+    panguard chat test
+
+    # Test a specific channel
+    panguard chat test --channel telegram
+    ```
+
+    If the test succeeds but real notifications do not arrive, the issue is likely the severity filter or cooldown timer.
+  </Accordion>
+  <Accordion title="3. Check severity filter">
+    Notifications are only sent for events at or above the configured minimum severity:
+
+    ```bash
+    panguard config get notification.minSeverity
+    ```
+
+    If set to `critical`, only critical events trigger notifications. Lower it:
+    ```bash
+    panguard config set notification.minSeverity medium
+    ```
+  </Accordion>
+  <Accordion title="4. Check cooldown timer">
+    The cooldown prevents duplicate notifications. If many similar events occur, only the first triggers a notification:
+
+    ```bash
+    panguard config get notification.cooldownMinutes
+    ```
+
+    Reduce if needed:
+    ```bash
+    panguard config set notification.cooldownMinutes 5
+    ```
+  </Accordion>
+  <Accordion title="5. Re-run channel setup">
+    If none of the above resolves the issue, re-run the setup:
+
+    ```bash
+    panguard chat setup telegram
+    # or
+    panguard chat setup slack
+    ```
+
+    This re-validates credentials and re-encrypts the configuration.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Telegram Issues
+
+<AccordionGroup>
+  <Accordion title="Invalid bot token">
+    ```
+    Error: Telegram API returned 401: Unauthorized
+    ```
+
+    The bot token is invalid or has been revoked.
+
+    **Solution:**
+    1. Go to [@BotFather](https://t.me/BotFather) on Telegram
+    2. Send `/mybots` and select your bot
+    3. Regenerate the token if needed
+    4. Re-run setup:
+       ```bash
+       panguard chat setup telegram
+       ```
+  </Accordion>
+  <Accordion title="Invalid chat ID">
+    ```
+    Error: Telegram API returned 400: Bad Request: chat not found
+    ```
+
+    The chat ID is incorrect or the bot has not been added to the group.
+
+    **Solution:**
+    1. Send any message to your bot first (this is required by Telegram)
+    2. For group chats, add the bot to the group
+    3. Re-run setup to auto-detect the chat ID:
+       ```bash
+       panguard chat setup telegram
+       ```
+  </Accordion>
+  <Accordion title="Must message bot first">
+    Telegram bots cannot initiate conversations. You must send a message to the bot before it can send messages to you.
+
+    1. Open Telegram and find your bot by username
+    2. Send `/start` or any message
+    3. Then run:
+       ```bash
+       panguard chat test --channel telegram
+       ```
+  </Accordion>
+  <Accordion title="Group chat permissions">
+    If the bot cannot send messages to a group:
+    1. Ensure the bot is a member of the group
+    2. If the group has restricted messaging, make the bot an admin
+    3. In BotFather, check that **Group Privacy** is disabled (`/mybots` > Bot Settings > Group Privacy > Turn off)
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Slack Issues
+
+<AccordionGroup>
+  <Accordion title="Invalid webhook URL">
+    ```
+    Error: Slack webhook returned 403: invalid_token
+    ```
+
+    The webhook URL is invalid, expired, or has been revoked.
+
+    **Solution:**
+    1. Go to [api.slack.com/apps](https://api.slack.com/apps)
+    2. Select your app
+    3. Navigate to **Incoming Webhooks**
+    4. Create a new webhook or copy the existing URL
+    5. Re-run setup:
+       ```bash
+       panguard chat setup slack
+       ```
+  </Accordion>
+  <Accordion title="Channel not found">
+    ```
+    Error: Slack webhook returned 404: channel_not_found
+    ```
+
+    The configured channel does not exist or the webhook is not authorized for it.
+
+    **Solution:**
+    - Verify the channel name is correct (include the `#` prefix)
+    - Create a new webhook specifically for the target channel
+    - Re-run setup with the correct channel:
+      ```bash
+      panguard chat setup slack
+      ```
+  </Accordion>
+  <Accordion title="App permissions">
+    If using a Slack App (not just an incoming webhook), ensure the app has these scopes:
+    - `incoming-webhook` -- Post messages via webhook
+    - `chat:write` -- Post messages (if using Bot Token)
+    - `chat:write.public` -- Post to channels the bot is not a member of
+
+    Reinstall the app to your workspace after changing scopes.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Email Issues
+
+<AccordionGroup>
+  <Accordion title="SMTP connection refused">
+    ```
+    Error: connect ECONNREFUSED smtp.gmail.com:587
+    ```
+
+    - Verify the SMTP host and port are correct
+    - Check if your firewall or ISP blocks outbound port 587
+    - Try port 465 (SSL) if 587 (TLS) is blocked:
+      ```bash
+      panguard config set channels.email.smtp.port 465
+      ```
+  </Accordion>
+  <Accordion title="SMTP authentication failed">
+    ```
+    Error: Invalid login: 535-5.7.8 Username and Password not accepted
+    ```
+
+    **For Gmail:**
+    - Use an [App Password](https://support.google.com/accounts/answer/185833), not your account password
+    - Enable 2-step verification on your Google account first
+    - Generate an App Password at [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+
+    **For other providers:**
+    - Verify the username is correct (usually the full email address)
+    - Check if the provider requires app-specific passwords
+    - Re-run setup:
+      ```bash
+      panguard chat setup email
+      ```
+  </Accordion>
+  <Accordion title="Emails going to spam">
+    - Add `alerts@panguard.ai` (or your configured `from` address) to your contacts
+    - If self-hosting, set up SPF, DKIM, and DMARC records for your sending domain
+    - Use a reputable SMTP provider (SendGrid, AWS SES, Mailgun)
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Webhook Issues
+
+<AccordionGroup>
+  <Accordion title="Connection timeout">
+    ```
+    Error: Webhook request timed out after 10000ms
+    ```
+
+    The webhook endpoint is not responding within the timeout window.
+
+    - Verify the URL is correct and the server is reachable
+    - Increase the timeout:
+      ```bash
+      panguard config set channels.webhook.timeout 30000
+      ```
+    - Test the endpoint directly:
+      ```bash
+      curl -X POST YOUR_WEBHOOK_URL \
+        -H "Content-Type: application/json" \
+        -d '{"test": true}'
+      ```
+  </Accordion>
+  <Accordion title="SSL certificate error">
+    ```
+    Error: unable to verify the first certificate
+    ```
+
+    The webhook endpoint uses a self-signed or invalid SSL certificate.
+
+    - Use a valid SSL certificate (Let's Encrypt is free)
+    - For internal endpoints, set the CA certificate:
+      ```bash
+      export NODE_EXTRA_CA_CERTS=/path/to/ca-cert.pem
+      ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Wrong Notification Language
+
+If notifications arrive in the wrong language:
+
+```bash
+# Check current language
+panguard config get preferences.language
+
+# Change language
+panguard chat setup --lang zh-TW
+```
+
+Or re-run the full setup to reconfigure language preference:
+
+```bash
+panguard chat setup
+```
+
+Supported languages:
+
+| Code | Language |
+|------|----------|
+| `en` | English |
+| `zh-TW` | Traditional Chinese |
+| `ja` | Japanese |
+
+<Info>
+The notification language is independent of the CLI language (`PANGUARD_LANG`). The CLI language controls terminal output, while the notification language controls message content sent via Chat channels.
+</Info>

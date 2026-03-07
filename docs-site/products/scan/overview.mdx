@@ -1,0 +1,106 @@
+---
+title: "Panguard Scan"
+description: "60-second security health check with 10 scanners, risk scoring, and PDF report generation."
+icon: "magnifying-glass"
+---
+
+Panguard Scan is a fast, comprehensive security auditing tool that assesses your system's security posture in under 60 seconds. It runs 10 specialized scanners, produces a 0--100 risk score with an A--F letter grade, and optionally generates a professional PDF report.
+
+## Quick Start
+
+```bash
+# Quick scan (~30 seconds)
+panguard scan --quick
+
+# Full scan (~60 seconds)
+panguard scan
+
+# Generate PDF report
+panguard scan --output report.pdf
+
+# Traditional Chinese output
+panguard scan --lang zh-TW
+```
+
+## Quick Mode vs Full Mode
+
+| Capability | Quick Mode (`--quick`) | Full Mode (default) |
+|------------|----------------------|---------------------|
+| Duration | ~30 seconds | ~60 seconds |
+| OS detection | Yes | Yes |
+| Network interfaces | Yes | Yes |
+| Open ports | Yes | Yes |
+| Running services | Yes | Yes |
+| Password policy | Yes | Yes |
+| Firewall status | Yes | Yes |
+| Security tool detection | Yes | Yes |
+| SSL certificate validation | -- | Yes |
+| Scheduled task audit | -- | Yes |
+| Shared folder security | -- | Yes |
+| Risk scoring | Yes | Yes |
+| PDF report | With `--output` | With `--output` |
+
+## Severity Levels
+
+Every finding is classified into one of five severity levels:
+
+| Level | Meaning | Action Timeline |
+|-------|---------|-----------------|
+| **CRITICAL** | Immediate compromise risk | Fix immediately |
+| **HIGH** | Significant security risk | Fix within 24 hours |
+| **MEDIUM** | Moderate risk, improvement recommended | Fix within one week |
+| **LOW** | Low risk, best-practice recommendation | Fix when convenient |
+| **INFO** | Informational finding | Acknowledge |
+
+## Product Combinations
+
+### Scan + Guard
+
+Use Scan to establish a baseline, then activate Guard for continuous monitoring:
+
+```bash
+# 1. Run initial scan
+panguard scan --output baseline.pdf
+
+# 2. Fix issues found
+
+# 3. Start continuous protection
+panguard guard start
+
+# 4. Re-scan periodically to track improvement
+panguard scan --output weekly-check.pdf
+```
+
+### Scan + Report
+
+Scan findings feed directly into compliance report generation:
+
+```bash
+panguard scan --output scan-result.pdf
+```
+
+## CLI Options
+
+```
+panguard scan [options]
+
+Options:
+  --quick              Quick mode (~30 seconds)
+  --output <path>      PDF report output path
+  --lang <en|zh-TW>    Language (default: en)
+  --verbose            Verbose output
+  --json               Pure JSON output (for AI agents)
+  --target <host>      Remote target (IP or domain)
+```
+
+<CardGroup cols={3}>
+  <Card title="Scanners" icon="list-check" href="/products/scan/scanners">
+    All 10 scanner types in detail.
+  </Card>
+  <Card title="Risk Scoring" icon="chart-bar" href="/products/scan/risk-scoring">
+    How the 0-100 risk score is calculated.
+  </Card>
+  <Card title="PDF Reports" icon="file-pdf" href="/products/scan/pdf-reports">
+    PDF report structure and customization.
+  </Card>
+</CardGroup>

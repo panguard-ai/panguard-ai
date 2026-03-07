@@ -287,6 +287,15 @@ export class ThreatCloudDB {
           CREATE UNIQUE INDEX IF NOT EXISTS idx_skill_threats_hash ON skill_threats(skill_hash);
         `,
       },
+      {
+        version: 10,
+        name: 'add_atr_columns_to_enriched_threats',
+        sql: `
+          ALTER TABLE enriched_threats ADD COLUMN atr_rules_matched TEXT NOT NULL DEFAULT '';
+          ALTER TABLE enriched_threats ADD COLUMN atr_category TEXT NOT NULL DEFAULT '';
+          CREATE INDEX IF NOT EXISTS idx_enriched_atr_category ON enriched_threats(atr_category);
+        `,
+      },
     ];
 
     const insertMigration = this.db.prepare(
@@ -338,8 +347,8 @@ export class ThreatCloudDB {
       INSERT OR IGNORE INTO enriched_threats
         (source_type, attack_source_ip, attack_type, mitre_techniques, sigma_rule_matched,
          timestamp, industry, region, confidence, severity, service_type, skill_level,
-         intent, tools, event_hash)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         intent, tools, event_hash, atr_rules_matched, atr_category)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     const result = stmt.run(
       event.sourceType,
@@ -356,7 +365,9 @@ export class ThreatCloudDB {
       event.skillLevel ?? null,
       event.intent ?? null,
       event.tools ? JSON.stringify(event.tools) : null,
-      event.eventHash
+      event.eventHash,
+      event.atrRulesMatched ?? '',
+      event.atrCategory ?? ''
     );
     return result.changes > 0 ? Number(result.lastInsertRowid) : null;
   }
@@ -426,6 +437,8 @@ export class ThreatCloudDB {
       severity: 'medium',
       eventHash,
       receivedAt: new Date().toISOString(),
+      atrRulesMatched: data.atrRulesMatched ?? '',
+      atrCategory: data.atrCategory ?? '',
     };
   }
 

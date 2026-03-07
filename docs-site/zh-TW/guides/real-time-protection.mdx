@@ -1,0 +1,237 @@
+---
+title: "即時防護"
+description: "設定 Panguard Guard 進行持續監控、了解 7 天學習期的運作方式，並配置自動威脅回應。"
+icon: "shield"
+---
+
+# 即時防護
+
+Panguard Guard 全天候運行於您的系統上，監控行程、網路連線、檔案與日誌。它使用四代理 AI 流水線即時偵測、分析、回應與報告安全威脅。
+
+---
+
+## 快速開始
+
+<Steps>
+  <Step title="登入">
+    Guard 需要 Solo 方案或以上：
+
+    ```bash
+    panguard login
+    ```
+  </Step>
+  <Step title="啟動 Guard">
+    ```bash
+    panguard guard start
+    ```
+
+    Guard 進入**學習模式**，前 7 天觀察系統的正常行為。
+  </Step>
+  <Step title="查看狀態">
+    ```bash
+    panguard guard status
+    ```
+
+    ```
+      -- Guard Status -----------------------
+
+      Status:     Running
+      Mode:       Learning (Day 3/7)
+      PID:        12345
+      Uptime:     3d 14h 22m
+      Events:     12,847 observed
+      Baseline:   42% complete
+    ```
+  </Step>
+  <Step title="等待防護模式">
+    7 天後，Guard 自動轉換至**防護模式**，開始主動偵測與回應威脅。
+  </Step>
+</Steps>
+
+---
+
+## 學習模式（第 1-7 天）
+
+在學習期間，Guard 靜默觀察並記錄：
+
+- **行程** -- 哪些程式正常執行、啟動時間、資源使用
+- **網路** -- 正常連線模式、常用連接埠、流量特徵
+- **檔案** -- 重要目錄的變更模式
+- **使用者** -- 登入時間、來源 IP、操作模式
+
+<Info>
+Guard 在學習模式期間不會產生警報。這可防止大多數安全工具造成的誤報洪水。您會透過 Chat 收到每日學習進度摘要。
+</Info>
+
+---
+
+## 防護模式（第 8 天起）
+
+基線建立後，Guard 啟動完整防護：
+
+- 偏離基線的事件會觸發警報
+- 三層 AI 漏斗分析可疑事件
+- 依信心度等級進行自動或手動回應
+- 透過您設定的 Chat 頻道即時通知
+
+### 基於信心度的回應
+
+| 信心度 | 動作 | 範例 |
+| --- | --- | --- |
+| > 90% | 自動執行，事後通知 | 已知惡意 IP 自動封鎖 |
+| 70-90% | 透過 Chat 要求確認 | 可疑行程 -- 詢問是否要終止 |
+| < 70% | 僅通知 | 輕微異常 -- 通知您進行觀察 |
+
+---
+
+## 四代理流水線
+
+每個安全事件都經過四個專門的代理程式：
+
+```
+  Event -> [Detect] -> [Analyze] -> [Respond] -> [Report]
+```
+
+| 代理程式 | 職責 |
+| --- | --- |
+| **DetectAgent** | 規則匹配（Sigma + YARA）、威脅情報查詢、事件關聯 |
+| **AnalyzeAgent** | 證據收集、加權信心度評分、透過三層漏斗進行 AI 推理 |
+| **RespondAgent** | 動作執行（封鎖 IP、終止行程、隔離檔案）、安全檢查、升級處理 |
+| **ReportAgent** | 事件記錄、基線更新、Threat Cloud 匿名化資料 |
+
+---
+
+## 回應動作
+
+Guard 可自動執行以下回應動作：
+
+| 動作 | 說明 | 平台支援 |
+| --- | --- | --- |
+| **IP 封鎖** | 封鎖惡意 IP 位址 | macOS (pfctl)、Linux (iptables)、Windows (netsh) |
+| **檔案隔離** | 隔離可疑檔案並記錄 SHA-256 | 所有平台 |
+| **行程終止** | 終止惡意行程（先 SIGTERM，5 秒後 SIGKILL） | 所有平台 |
+
+### 安全防護
+
+Guard 內建安全規則以防止意外損害：
+
+- **白名單 IP：** `127.0.0.1`、`::1`、`localhost`、`0.0.0.0`（加上使用者自訂）
+- **受保護行程：** `sshd`、`systemd`、`init`、`launchd`、`node`、`panguard-guard`
+- **受保護帳號：** `root`、`Administrator`、`SYSTEM`
+- **網路隔離**需信心度 >= 95%
+- **自身行程終止**防護
+
+---
+
+## 整合威脅情報
+
+Guard 自動查詢 5 個威脅情報來源：
+
+- **ThreatFox** -- IoC 資料庫（IP、域名、URL、檔案雜湊）
+- **URLhaus** -- 惡意軟體散布 URL
+- **Feodo Tracker** -- C2 伺服器追蹤
+- **GreyNoise** -- IP 信譽（針對性 vs. 大規模掃描）
+- **AbuseIPDB** -- 社群回報的惡意 IP
+
+來源每 6 小時更新，搭配本地快取以避免重複查詢。
+
+---
+
+## 規則引擎
+
+### Sigma 規則
+
+Guard 內建 3000+ 條 Sigma 規則。您也可以新增自訂規則：
+
+```yaml
+# Custom rule: Detect mass SSH login failures
+title: SSH Brute Force Attempt
+logsource:
+  category: authentication
+  product: any
+detection:
+  selection:
+    event_type: login_failed
+    service: ssh
+  condition: selection
+level: high
+```
+
+將 `.yml` 檔案放入 Guard 的規則目錄。Guard 自動載入新規則，支援熱重載。
+
+### YARA 規則
+
+用於檔案層級的惡意軟體偵測：
+
+```yara
+rule WebShell {
+  strings:
+    $php = "<?php eval(" nocase
+    $asp = "<%execute(" nocase
+  condition:
+    any of them
+}
+```
+
+---
+
+## 管理 Guard
+
+```bash
+# 啟動 Guard
+panguard guard start
+
+# 查看狀態
+panguard guard status
+
+# 停止 Guard
+panguard guard stop
+
+# 查看目前設定
+panguard guard config
+
+# 安裝為系統服務（開機自動啟動）
+panguard guard install
+```
+
+<Tip>
+正式環境建議將 Guard 安裝為系統服務，使其開機自動啟動並在故障時重啟。請參閱[系統服務指南](/guides/system-service)。
+</Tip>
+
+---
+
+## CLI 參考
+
+```
+panguard guard <command> [options]
+
+Commands:
+  start              Start the Guard engine
+  stop               Stop the Guard engine
+  status             Display status
+  install            Install as system service
+  uninstall          Remove system service
+  config             Display current configuration
+
+Options:
+  --data-dir <path>  Data directory (default: ~/.panguard-guard)
+```
+
+---
+
+## 相關內容
+
+<CardGroup cols={2}>
+  <Card title="學習模式" icon="graduation-cap" href="/concepts/learning-mode">
+    深入了解 7 天學習期與基線建立。
+  </Card>
+  <Card title="三層式 AI 漏斗" icon="brain-circuit" href="/concepts/three-layer-ai">
+    規則、本地 AI 與雲端 AI 如何協同運作。
+  </Card>
+  <Card title="系統服務" icon="gear" href="/guides/system-service">
+    將 Guard 安裝為 systemd/launchd 服務。
+  </Card>
+  <Card title="通知設定" icon="bell" href="/guides/notifications-setup">
+    設定 Guard 如何通知您威脅。
+  </Card>
+</CardGroup>

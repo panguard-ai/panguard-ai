@@ -1,0 +1,147 @@
+---
+title: "自動回應"
+description: "自動化威脅回應模組、安全規則、升級階梯及回復支援。"
+icon: "bolt"
+---
+
+`RespondAgent` 根據 `AnalyzeAgent` 產生的 `ThreatVerdict` 執行防禦性動作。它實施嚴格的安全規則、分級的升級階梯，以及完整的回復支援。
+
+## 回應模組
+
+Guard 包含 3 個主動回應模組，加上通知和日誌記錄：
+
+### 1. IP 封鎖器
+
+在防火牆層級封鎖惡意來源 IP。
+
+| 欄位 | 詳細資訊 |
+|-------|---------|
+| **動作** | `block_ip` |
+| **macOS** | `pfctl`（Packet Filter） |
+| **Linux** | `iptables` |
+| **Windows** | `netsh advfirewall` |
+| **預設持續時間** | 1 小時 |
+| **重複違規者持續時間** | 24 小時 |
+| **自動解封** | 是，在設定的持續時間後 |
+
+### 2. 處理程序終止器
+
+終止惡意處理程序。
+
+| 欄位 | 詳細資訊 |
+|-------|---------|
+| **動作** | `kill_process` |
+| **方法** | 先 SIGTERM，5 秒後 SIGKILL |
+| **自我保護** | 無法終止 Panguard Guard 處理程序本身 |
+| **跨平台** | 使用原生作業系統處理程序管理 API |
+
+### 3. 檔案隔離
+
+透過將可疑檔案移至隔離目錄來隔離它們。
+
+| 欄位 | 詳細資訊 |
+|-------|---------|
+| **動作** | `isolate_file` |
+| **方法** | 將檔案移至隔離目錄，記錄 SHA-256 雜湊值 |
+| **中繼資料** | 保留原始路徑、時間戳、裁決和雜湊值 |
+| **復原** | 可透過動作清單從隔離區恢復檔案 |
+
+## 信心門檻
+
+RespondAgent 使用基於信心的決策：
+
+| 信心範圍 | 行為 |
+|-----------------|----------|
+| >= `autoRespond`（預設 90%） | 自動執行動作，事後通知 |
+| >= `notifyAndWait`（預設 70%） | 透過 Chat 發送確認請求，等待人工核准 |
+| < `notifyAndWait` | 記錄事件並發送資訊性通知 |
+
+在**學習模式**下，無論信心值如何，所有事件僅記錄不主動回應。
+
+## 安全規則
+
+RespondAgent 強制執行無法覆蓋的硬性安全限制：
+
+### 白名單 IP
+
+這些 IP 永遠不會被封鎖，即使觸發了偵測：
+
+```
+127.0.0.1, ::1, localhost, 0.0.0.0
+```
+
+可透過設定新增額外的 IP。
+
+### 受保護的處理程序
+
+這些處理程序永遠不會被終止：
+
+```
+sshd, systemd, init, launchd, node, panguard-guard,
+kernel, kthreadd, dockerd, containerd
+```
+
+### 受保護的帳戶
+
+這些帳戶永遠不會被停用：
+
+```
+root, Administrator, SYSTEM, LocalSystem, admin
+```
+
+### 網路隔離門檻
+
+網路隔離（封鎖來自某 IP 的所有流量）需要信心值 >= 95。這可以防止因激進但不確定的偵測而意外鎖定。
+
+## 升級階梯
+
+RespondAgent 實施漸進式升級：
+
+| 條件 | 動作 |
+|-----------|--------|
+| 來源的首次違規 | 套用正常門檻 |
+| 同一目標 3+ 次違規 | 自動回應門檻降低 10% |
+| 重複違規者（先前被封鎖） | 封鎖持續時間增至 24 小時 |
+
+這意味著持續性的攻擊者面臨越來越積極的回應，而首次異常則被保守地對待。
+
+## 動作持久化與回復
+
+所有執行的動作都持久化至 JSONL 清單檔案：
+
+```
+/var/panguard-guard/action-manifest.jsonl
+```
+
+每個條目記錄：
+
+| 欄位 | 描述 |
+|-------|-------------|
+| `timestamp` | 動作執行的時間 |
+| `action` | 動作類型（block_ip、kill_process、isolate_file） |
+| `target` | IP 位址、PID 或檔案路徑 |
+| `verdict` | 觸發該動作的完整 ThreatVerdict |
+| `reversible` | 該動作是否可以回復 |
+| `rollbackCmd` | 撤銷該動作的命令 |
+
+### 回復範例
+
+| 動作 | 回復 |
+|--------|----------|
+| `block_ip 203.0.113.50` | 持續時間到期後移除防火牆規則 |
+| `isolate_file /tmp/payload` | 從隔離區恢復檔案至原始路徑 |
+| `kill_process 5678` | 不可回復（處理程序已終止） |
+
+## 跨平台命令執行
+
+所有作業系統命令透過 `execFile`（而非 `exec`）執行，以防止 shell 注入：
+
+| 平台 | IP 封鎖命令 | IP 解封命令 |
+|----------|-----------------|-------------------|
+| macOS | `pfctl` 規則新增 | `pfctl` 規則移除 |
+| Linux | `iptables -A INPUT -s <ip> -j DROP` | `iptables -D INPUT -s <ip> -j DROP` |
+| Windows | `netsh advfirewall firewall add rule` | `netsh advfirewall firewall delete rule` |
+
+<Note>
+  RespondAgent 從不使用 `shell: true` 或基於字串的命令建構。所有參數都以陣列引數傳遞給 `execFile`，以防止命令注入漏洞。
+</Note>

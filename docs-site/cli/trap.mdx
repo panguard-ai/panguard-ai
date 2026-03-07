@@ -1,0 +1,105 @@
+---
+title: "panguard trap"
+description: "Deploy and manage honeypot deception services to detect and profile attackers."
+icon: "honey-pot"
+---
+
+The `trap` command deploys lightweight honeypot services that mimic real network services (SSH, HTTP, SMB, and more). When an attacker interacts with a trap, Panguard captures their tactics, generates threat intelligence, and alerts you immediately.
+
+## Usage
+
+```bash
+panguard trap <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+| --- | --- |
+| `start` | Start honeypot services |
+| `stop` | Stop all running honeypot services |
+| `status` | Show active traps and interaction statistics |
+| `config` | View or modify trap configuration |
+| `profiles` | List attacker profiles built from trap interactions |
+| `intel` | Export collected threat intelligence data |
+
+## Options
+
+<ParamField path="--services" type="string">
+  Comma-separated list of honeypot service types to deploy. Options include `ssh`, `http`, `smb`, `ftp`, `mysql`, `redis`, `rdp`.
+</ParamField>
+
+<ParamField path="--data-dir" type="string">
+  Override the default directory for trap logs and intelligence data. Defaults to `~/.panguard/trap/`.
+</ParamField>
+
+<ParamField path="--no-cloud" type="flag">
+  Keep all captured intelligence local -- do not upload to the Panguard Threat Cloud.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Start SSH and HTTP honeypots
+panguard trap start --services ssh,http
+```
+
+```bash Start all default honeypots
+panguard trap start
+```
+
+```bash Check trap status and stats
+panguard trap status
+```
+
+```bash View attacker profiles
+panguard trap profiles
+```
+
+```bash Export threat intelligence
+panguard trap intel
+```
+
+```bash Offline mode (no cloud upload)
+panguard trap start --services ssh,http --no-cloud
+```
+</CodeGroup>
+
+## Supported Honeypot Services
+
+| Service | Default Port | What It Mimics |
+| --- | --- | --- |
+| `ssh` | 2222 | OpenSSH server |
+| `http` | 8080 | Apache/Nginx web server |
+| `smb` | 4450 | Windows file sharing |
+| `ftp` | 2121 | FTP server |
+| `mysql` | 3307 | MySQL database |
+| `redis` | 6380 | Redis key-value store |
+| `rdp` | 3390 | Windows Remote Desktop |
+
+<Warning>
+  Honeypot ports are intentionally offset from standard ports to avoid conflicts with real services. You can customize port mappings in the trap configuration.
+</Warning>
+
+## Plan Requirements
+
+<Info>
+  Trap requires the **Pro** ($29/mo) plan or higher. Attacker profiling and threat intelligence export are included at the Pro tier.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Honeypots Guide" icon="book-open" href="/guides/honeypots">
+    Step-by-step guide for deploying and managing honeypots.
+  </Card>
+  <Card title="Trap Product Overview" icon="crosshairs" href="/products/trap/overview">
+    Architecture and design of the Trap deception system.
+  </Card>
+  <Card title="Attacker Profiling" icon="user-secret" href="/products/trap/attacker-profiling">
+    How Panguard builds attacker profiles from trap data.
+  </Card>
+  <Card title="panguard threat" icon="cloud" href="/cli/threat">
+    Run a local Threat Cloud server for intelligence aggregation.
+  </Card>
+</CardGroup>

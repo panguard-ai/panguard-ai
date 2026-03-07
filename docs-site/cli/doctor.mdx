@@ -1,0 +1,79 @@
+---
+title: "panguard doctor"
+description: "Diagnose and troubleshoot common Panguard system issues."
+icon: "stethoscope"
+---
+
+The `doctor` command runs a series of diagnostic checks to identify common problems with your Panguard installation, configuration, and runtime environment. It provides actionable recommendations for each issue found.
+
+## Usage
+
+```bash
+panguard doctor
+```
+
+## Diagnostic Checks
+
+The doctor command inspects the following areas:
+
+| Check | What It Verifies |
+| --- | --- |
+| **Installation** | Binary integrity, version currency, dependencies |
+| **Configuration** | Config file validity, required fields, path permissions |
+| **Authentication** | Token validity, API endpoint reachability |
+| **Guard** | Service status, log file health, resource usage |
+| **Network** | Connectivity to Panguard Cloud, DNS resolution, firewall rules |
+| **Permissions** | File ownership, directory access, elevated privilege requirements |
+| **Disk Space** | Available space for logs, scan data, and intelligence databases |
+
+## Examples
+
+<CodeGroup>
+```bash Run diagnostics
+panguard doctor
+```
+</CodeGroup>
+
+## Sample Output
+
+```
+Panguard Doctor v1.2.0
+======================
+
+[PASS] Installation: binary intact, version 1.2.0 (latest)
+[PASS] Configuration: ~/.panguard/config.yaml valid
+[PASS] Authentication: logged in as user@example.com (Pro plan)
+[WARN] Guard: not running -- start with 'panguard guard start'
+[PASS] Network: cloud API reachable (latency 45ms)
+[PASS] Permissions: all directories accessible
+[FAIL] Disk Space: /var/log/panguard has only 200MB free (minimum 500MB)
+
+1 failure, 1 warning, 5 passed
+```
+
+<Tip>
+  Run `panguard doctor` whenever you encounter unexpected behavior before opening a support ticket. The output is designed to be shared with the support team.
+</Tip>
+
+## Plan Requirements
+
+<Info>
+  Available on all plans including **Community (Free)**.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Common Issues" icon="circle-exclamation" href="/troubleshooting/common-issues">
+    Solutions for frequently encountered problems.
+  </Card>
+  <Card title="panguard status" icon="circle-info" href="/cli/status">
+    Quick health overview of all services.
+  </Card>
+  <Card title="Guard Troubleshooting" icon="shield" href="/troubleshooting/guard-issues">
+    Specific troubleshooting for Guard agent issues.
+  </Card>
+  <Card title="Auth Troubleshooting" icon="key" href="/troubleshooting/auth-issues">
+    Fix authentication and login problems.
+  </Card>
+</CardGroup>

@@ -1,0 +1,116 @@
+---
+title: "Panguard Trap"
+description: "Deploy 8 honeypot protocols to lure attackers, capture their tools and credentials, and profile their skill level and intent."
+icon: "flask"
+---
+
+Panguard Trap deploys decoy services that masquerade as real infrastructure. Legitimate users never interact with these services -- only attackers do. When someone connects to a honeypot, Trap records every action, analyzes their behavior, classifies their skill level, and shares the intelligence with Guard and Threat Cloud.
+
+## Quick Start
+
+```bash
+# Start SSH and HTTP honeypots (requires Pro plan)
+panguard trap start --services ssh,http
+
+# Check status (free)
+panguard trap status
+
+# View attacker profiles (free)
+panguard trap profiles
+
+# View collected intelligence (free)
+panguard trap intel
+```
+
+<Note>
+  Panguard Trap requires a **Pro plan** or above. Status, profile, and intelligence viewing are available on all plans.
+</Note>
+
+## How Honeypots Work
+
+A honeypot is a deliberately exposed fake service. It looks real to an attacker but is completely isolated from your actual infrastructure. Any interaction with a honeypot is inherently suspicious because no legitimate user would connect to it.
+
+Panguard Trap goes beyond simple connection logging:
+
+1. **Captures credentials** -- records every username/password combination attempted
+2. **Logs commands** -- tracks all commands executed after a successful (fake) login
+3. **Identifies tools** -- detects attacker tooling (Hydra, Metasploit, custom scripts)
+4. **Profiles attackers** -- classifies skill level and intent using behavioral analysis
+5. **Shares intelligence** -- feeds captured IoCs into Guard and Threat Cloud
+
+## Architecture
+
+```
+Attacker ──> [Honeypot Service] ──> Interaction Logger
+                                         |
+                                    Attacker Profiler
+                                         |
+                              ┌──────────┴──────────┐
+                              |                     |
+                         Guard DARE            Threat Cloud
+                         Pipeline              Intelligence
+```
+
+## Key Capabilities
+
+| Capability | Details |
+|-----------|---------|
+| **Honeypot types** | 8 service emulators (SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, Redis) |
+| **Attacker profiling** | Skill classification (Script Kiddie, Advanced, APT) |
+| **Credential capture** | All attempted usernames and passwords logged |
+| **Command logging** | Full session transcripts for interactive services |
+| **Threat Cloud feed** | Anonymized attacker data shared with collective intelligence |
+| **Guard integration** | Attacker IPs auto-added to Guard block list |
+
+## Integration with Guard and Threat Cloud
+
+### Guard Integration
+
+- Attacker IPs from Trap are automatically added to Guard's block list
+- Attack patterns are converted into Sigma rule candidates
+- Captured IoCs are added to the local threat intelligence database
+
+### Threat Cloud Integration
+
+```bash
+# Enable Threat Cloud upload (default)
+panguard trap start --services ssh,http
+
+# Disable Threat Cloud upload
+panguard trap start --services ssh,http --no-cloud
+```
+
+## Safety
+
+- Honeypot ports must differ from real service ports (e.g., SSH honeypot on 2222, not 22)
+- Honeypots are fully isolated -- attackers cannot access your real system
+- Each honeypot has memory and CPU resource limits to prevent abuse
+
+## CLI Options
+
+```
+panguard trap <command> [options]
+
+Commands:
+  start              Start honeypot services (Pro)
+  stop               Stop honeypot services (Pro)
+  status             Show status and statistics (Free)
+  config             Show current configuration (Free)
+  profiles           Show attacker profiles (Free)
+  intel              Show threat intelligence summary (Free)
+
+Options:
+  --services <types>     Service types (comma-separated)
+  --port <number>        Custom port for single service
+  --data-dir <path>      Data directory
+  --no-cloud             Disable Threat Cloud upload
+```
+
+<CardGroup cols={2}>
+  <Card title="Honeypot Types" icon="server" href="/products/trap/honeypot-types">
+    All 8 honeypot protocols with ports and capabilities.
+  </Card>
+  <Card title="Attacker Profiling" icon="fingerprint" href="/products/trap/attacker-profiling">
+    Skill classification, intent analysis, and MITRE mapping.
+  </Card>
+</CardGroup>

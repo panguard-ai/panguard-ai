@@ -1,0 +1,74 @@
+---
+title: "Product Suite Overview"
+description: "Panguard AI ships 8 integrated products that cover the full security lifecycle -- from scanning and detection to response, compliance, and collective intelligence."
+icon: "boxes-stacked"
+---
+
+Panguard AI is not a single tool. It is an integrated platform of 8 products, each focused on a specific stage of the security lifecycle. Together they form a closed loop: scan your systems, monitor them in real time, notify the right people, trap attackers, generate compliance reports, and share intelligence across your fleet.
+
+## The Product Suite
+
+<CardGroup cols={2}>
+  <Card title="Scan" icon="magnifying-glass" href="/products/scan/overview">
+    60-second security audit with 10 scanners. Produces a risk score (0--100), severity-graded findings, and optional PDF reports.
+  </Card>
+  <Card title="Guard" icon="shield" href="/products/guard/overview">
+    24/7 real-time monitoring powered by a 4-agent DARE pipeline (Detect, Analyze, Respond, Report). 10 monitor types, event correlation, and automated threat response.
+  </Card>
+  <Card title="Chat" icon="message-square" href="/products/chat/overview">
+    AI-powered notifications via Telegram, Slack, Email, and Webhook. Adapts tone and detail level to 3 user roles: boss, developer, and IT admin.
+  </Card>
+  <Card title="Trap" icon="flask" href="/products/trap/overview">
+    Deploy 8 honeypot protocols to lure and profile attackers. Captures credentials, commands, and tool signatures, then classifies attacker skill level and intent.
+  </Card>
+  <Card title="Report" icon="file-check" href="/products/report/overview">
+    Auto-generate compliance reports for ISO 27001, SOC 2, and Taiwan Cyber Security Act (TCSA). Outputs JSON and PDF in English and Traditional Chinese.
+  </Card>
+  <Card title="MCP Server" icon="plug" href="/products/mcp/overview">
+    Model Context Protocol server exposing 11 Panguard tools to AI assistants like Claude Desktop and Cursor.
+  </Card>
+  <Card title="Manager" icon="building" href="/products/manager/overview">
+    Centralized fleet orchestration with hub-and-spoke architecture. Agent registry, cross-agent threat correlation, and policy distribution for up to 500 endpoints.
+  </Card>
+  <Card title="Threat Cloud" icon="cloud" href="/products/threat-cloud/overview">
+    Collective threat intelligence platform. Every Guard instance contributes anonymized threat data, and every instance benefits from the community's detections.
+  </Card>
+</CardGroup>
+
+## How the Products Work Together
+
+The products are designed to complement each other in a layered defense strategy:
+
+```
+Scan ──> Guard ──> Chat
+  |        |         |
+  v        v         v
+Report   Trap    Threat Cloud
+           |         |
+           v         v
+        Manager (fleet-wide)
+```
+
+| Workflow | Products Involved | Description |
+|----------|-------------------|-------------|
+| **Assess and Protect** | Scan + Guard | Run a one-time scan to establish your baseline, then enable Guard for continuous monitoring. |
+| **Detect and Notify** | Guard + Chat | Guard detects threats in real time and Chat delivers plain-language alerts to your preferred channel. |
+| **Lure and Learn** | Trap + Guard + Threat Cloud | Honeypots capture attacker behavior, Guard auto-blocks the source IPs, and intelligence is shared via Threat Cloud. |
+| **Comply and Report** | Scan + Report | Scan findings map directly to compliance controls. Generate audit-ready PDF reports on demand. |
+| **Scale and Centralize** | Manager + Guard + Threat Cloud | Deploy Guard agents across your fleet, manage them from a single Manager, and correlate threats globally. |
+| **AI Copilot** | MCP + Scan + Guard | Use natural language in Claude or Cursor to run scans, check status, and block IPs via the MCP server. |
+
+## Architecture at a Glance
+
+Panguard is built as a **13-package TypeScript monorepo** managed by pnpm workspaces. All packages share a common `@panguard-ai/core` foundation that provides the rule engine, monitor engine, AI provider abstraction, i18n, and structured logging.
+
+| Layer | Components | Responsibility |
+|-------|-----------|----------------|
+| **Endpoint** | Guard, Scan, Trap, Chat | Local detection, scanning, honeypots, and notifications |
+| **Management** | Manager, Auth | Fleet orchestration, agent registry, authentication |
+| **Intelligence** | Threat Cloud, Report | Collective IoC sharing, compliance reporting |
+| **Integration** | MCP, Web, Admin | AI assistant integration, dashboards |
+
+<Info>
+  Each product can run independently. You do not need to deploy the full suite. Start with `panguard scan` and add products as your needs grow.
+</Info>

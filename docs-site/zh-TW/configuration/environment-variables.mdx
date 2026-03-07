@@ -1,0 +1,201 @@
+---
+title: "環境變數"
+description: "所有 Panguard 服務環境變數的完整參考。"
+icon: "square-terminal"
+---
+
+環境變數在啟動時設定 Panguard 服務。在您的 shell 設定檔、`.env` 檔案或容器編排系統中設定它們。
+
+## Panguard Guard
+
+| 變數 | 預設值 | 說明 |
+|----------|---------|-------------|
+| `PANGUARD_DATA_DIR` | `~/.panguard-guard` | Guard 資料、規則和日誌的基礎目錄 |
+| `PANGUARD_MODE` | `protect` | 運作模式：`learning`、`detect`、`protect` |
+| `OLLAMA_ENDPOINT` | `http://localhost:11434` | Ollama API 端點，用於本機 AI 分析 |
+| `ANTHROPIC_API_KEY` | -- | Anthropic API 金鑰，用於基於 Claude 的分析（第 2/3 層） |
+| `OPENAI_API_KEY` | -- | OpenAI API 金鑰，用於基於 GPT 的分析（第 2/3 層） |
+| `ABUSEIPDB_KEY` | -- | AbuseIPDB API 金鑰，用於 IP 聲譽查詢 |
+| `PANGUARD_LOG_LEVEL` | `info` | 日誌等級：`debug`、`info`、`warn`、`error` |
+| `PANGUARD_LANG` | `en` | CLI 輸出和通知的語言：`en`、`zh-TW`、`ja` |
+
+<CodeGroup>
+```bash Linux / macOS
+export PANGUARD_DATA_DIR=~/.panguard-guard
+export PANGUARD_MODE=protect
+export PANGUARD_LOG_LEVEL=info
+export PANGUARD_LANG=en
+
+# AI 提供者（建議至少設定一個）
+export OLLAMA_ENDPOINT=http://localhost:11434
+export ANTHROPIC_API_KEY=sk-ant-...
+export OPENAI_API_KEY=sk-...
+
+# 選用
+export ABUSEIPDB_KEY=your-key-here
+```
+
+```powershell Windows
+$env:PANGUARD_DATA_DIR = "$HOME\.panguard-guard"
+$env:PANGUARD_MODE = "protect"
+$env:PANGUARD_LOG_LEVEL = "info"
+$env:PANGUARD_LANG = "en"
+
+# AI 提供者
+$env:OLLAMA_ENDPOINT = "http://localhost:11434"
+$env:ANTHROPIC_API_KEY = "sk-ant-..."
+```
+</CodeGroup>
+
+<Info>
+Guard 使用三層 AI 系統。至少設定 `OLLAMA_ENDPOINT` 用於本機分析（第 1 層）。在 Pro 和 Business 方案中新增 `ANTHROPIC_API_KEY` 或 `OPENAI_API_KEY` 用於雲端分析（第 2/3 層）。
+</Info>
+
+---
+
+## Panguard Manager
+
+| 變數 | 預設值 | 說明 |
+|----------|---------|-------------|
+| `MANAGER_PORT` | `8443` | Manager API 的 HTTPS 埠 |
+| `MANAGER_AUTH_TOKEN` | -- | **必填。** 用於 API 存取的共享身份驗證 token |
+| `MANAGER_MAX_AGENTS` | `100` | 可註冊的最大代理數量 |
+| `MANAGER_HEARTBEAT_TIMEOUT_MS` | `120000` | 代理被標記為 stale 前的毫秒數 |
+| `CORS_ALLOWED_ORIGINS` | -- | 以逗號分隔的允許 CORS 來源清單 |
+
+<CodeGroup>
+```bash Linux / macOS
+export MANAGER_PORT=8443
+export MANAGER_AUTH_TOKEN=$(openssl rand -hex 32)
+export MANAGER_MAX_AGENTS=100
+export MANAGER_HEARTBEAT_TIMEOUT_MS=120000
+export CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai
+```
+
+```bash Docker
+docker run -d \
+  -e MANAGER_PORT=8443 \
+  -e MANAGER_AUTH_TOKEN=your-secure-token \
+  -e MANAGER_MAX_AGENTS=100 \
+  -e CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai \
+  panguard/manager
+```
+</CodeGroup>
+
+<Warning>
+`MANAGER_AUTH_TOKEN` 是必填的，且必須在啟動 Manager 前設定。使用至少 32 個字元的強隨機值。連接到此 Manager 的所有代理上必須設定相同的 token。
+</Warning>
+
+---
+
+## Panguard Auth Server
+
+| 變數 | 預設值 | 說明 |
+|----------|---------|-------------|
+| `PANGUARD_PORT` | `3000` | Auth Server 的 HTTP 埠 |
+| `JWT_SECRET` | -- | **必填。** 用於簽署 JWT token 的密鑰 |
+| `GOOGLE_CLIENT_ID` | -- | Google OAuth 用戶端 ID（用於社交登入） |
+| `GOOGLE_CLIENT_SECRET` | -- | Google OAuth 用戶端密鑰 |
+| `LEMONSQUEEZY_API_KEY` | -- | LemonSqueezy API 金鑰，用於訂閱管理 |
+| `LEMONSQUEEZY_STORE_ID` | -- | LemonSqueezy 商店 ID |
+| `LEMONSQUEEZY_WEBHOOK_SECRET` | -- | LemonSqueezy webhook 簽名密鑰 |
+
+<CodeGroup>
+```bash Linux / macOS
+export PANGUARD_PORT=3000
+export JWT_SECRET=$(openssl rand -hex 64)
+
+# 選用：Google OAuth
+export GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+export GOOGLE_CLIENT_SECRET=your-client-secret
+
+# 選用：LemonSqueezy 支付
+export LEMONSQUEEZY_API_KEY=your-api-key
+export LEMONSQUEEZY_STORE_ID=your-store-id
+export LEMONSQUEEZY_WEBHOOK_SECRET=your-webhook-secret
+```
+</CodeGroup>
+
+<Warning>
+`JWT_SECRET` 必須是強隨機值。如果它被洩露，所有已簽發的 token 都可以被偽造。如果懷疑洩露，請立即輪換 -- 這將使所有活躍的工作階段失效。
+</Warning>
+
+---
+
+## Panguard Threat Cloud
+
+| 變數 | 預設值 | 說明 |
+|----------|---------|-------------|
+| `TC_API_KEYS` | -- | 以逗號分隔的有效 API 金鑰清單 |
+| `TC_PORT` | `4000` | Threat Cloud API 的 HTTP 埠 |
+| `TC_DB_PATH` | `./data/threat-cloud.db` | SQLite 資料庫檔案路徑 |
+| `ALLOW_ANONYMOUS_UPLOAD` | `false` | 允許未認證的威脅提交 |
+
+<CodeGroup>
+```bash Linux / macOS
+export TC_API_KEYS=key1,key2,key3
+export TC_PORT=4000
+export TC_DB_PATH=/var/lib/panguard/threat-cloud.db
+export ALLOW_ANONYMOUS_UPLOAD=false
+```
+</CodeGroup>
+
+<Info>
+`ALLOW_ANONYMOUS_UPLOAD=true` 讓 Community 層級使用者無需 API 金鑰即可提交威脅資料。上傳的資料仍會經過驗證和聲譽評分。
+</Info>
+
+---
+
+## Docker / 正式環境
+
+| 變數 | 預設值 | 說明 |
+|----------|---------|-------------|
+| `NODE_ENV` | `development` | 對於正式部署設定為 `production` |
+
+設定 `NODE_ENV=production`：
+- 停用除錯日誌和錯誤回應中的堆疊追蹤
+- 啟用回應壓縮
+- 啟用更嚴格的安全標頭
+- 停用僅限開發的路由
+
+<CodeGroup>
+```yaml docker-compose.yml
+services:
+  manager:
+    image: panguard/manager
+    environment:
+      - NODE_ENV=production
+      - MANAGER_PORT=8443
+      - MANAGER_AUTH_TOKEN=${MANAGER_AUTH_TOKEN}
+      - CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai
+
+  auth:
+    image: panguard/auth
+    environment:
+      - NODE_ENV=production
+      - PANGUARD_PORT=3000
+      - JWT_SECRET=${JWT_SECRET}
+
+  threat-cloud:
+    image: panguard/threat-cloud
+    environment:
+      - NODE_ENV=production
+      - TC_PORT=4000
+      - TC_API_KEYS=${TC_API_KEYS}
+      - TC_DB_PATH=/data/threat-cloud.db
+    volumes:
+      - tc-data:/data
+```
+</CodeGroup>
+
+## 優先順序
+
+環境變數優先於設定檔值。解析順序為：
+
+1. 環境變數（最高優先順序）
+2. 設定檔值（`config.json`）
+3. 內建預設值（最低優先順序）
+
+<Tip>
+對於本機開發，在服務目錄中建立 `.env` 檔案並使用 `dotenv` 等工具載入。永遠不要將 `.env` 檔案提交到版本控制。
+</Tip>

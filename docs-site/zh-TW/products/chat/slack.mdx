@@ -1,0 +1,131 @@
+---
+title: "Slack 整合"
+description: "使用 Block Kit 豐富格式設定 Panguard Chat 搭配 Slack 的逐步指南。"
+icon: "hashtag"
+---
+
+Slack 是建議團隊和組織使用的管道。Panguard 發送豐富的 Block Kit 通知至指定的 Slack 頻道，並可選擇性地提供互動按鈕進行威脅回應。
+
+## 設定概覽
+
+<Steps>
+  <Step title="建立 Slack App">
+    在 Slack API 儀表板中註冊一個新的應用程式。
+  </Step>
+  <Step title="設定 Bot 權限">
+    新增所需的 OAuth 範圍。
+  </Step>
+  <Step title="安裝至您的 Workspace">
+    授權應用程式並取得 Bot Token。
+  </Step>
+  <Step title="取得 Signing Secret">
+    複製用於 webhook 驗證的 signing secret。
+  </Step>
+  <Step title="建立通知頻道">
+    建立一個專用頻道，例如 #security-alerts。
+  </Step>
+  <Step title="設定 Panguard">
+    使用您的憑證執行設定精靈。
+  </Step>
+</Steps>
+
+## 步驟 1：建立 Slack App
+
+1. 前往 [api.slack.com/apps](https://api.slack.com/apps)
+2. 點擊 **Create New App**
+3. 選擇 **From scratch**
+4. 輸入應用程式名稱：`Panguard Security`（或您偏好的名稱）
+5. 選擇您的 Workspace
+6. 點擊 **Create App**
+
+## 步驟 2：設定 Bot 權限
+
+1. 在左側邊欄中導航至 **OAuth & Permissions**
+2. 捲動至 **Scopes** 區段
+3. 在 **Bot Token Scopes** 下新增：
+
+| 範圍 | 用途 |
+|-------|---------|
+| `chat:write` | 發送訊息至頻道 |
+| `chat:write.public` | 發送至 Bot 尚未加入的公開頻道 |
+| `files:write` | 上傳 PDF 報告和附件 |
+
+4. 在頂部點擊 **Install to Workspace**
+5. 點擊 **Allow** 進行授權
+
+## 步驟 3：取得 Bot Token
+
+安裝後，頁面會顯示您的 **Bot User OAuth Token**：
+
+```
+xoxb-your-workspace-id-your-token-string
+```
+
+<Warning>
+  權杖必須以 `xoxb-` 開頭（bot token）。請勿使用 `xoxp-`（user token）。
+</Warning>
+
+## 步驟 4：取得 Signing Secret
+
+1. 在左側邊欄中導航至 **Basic Information**
+2. 找到 **App Credentials** 區段
+3. 點擊 **Signing Secret** 旁的 **Show**
+4. 複製並儲存該值
+
+## 步驟 5：建立通知頻道
+
+1. 建立一個 Slack 頻道（例如 `#security-alerts`）
+2. 邀請 Bot：在頻道中輸入 `/invite @Panguard Security`
+
+## 步驟 6：設定 Panguard Chat
+
+```bash
+panguard chat setup --channel slack
+```
+
+精靈會詢問：
+- **Bot Token** -- 步驟 3 中的 `xoxb-...` 權杖
+- **Signing Secret** -- 來自步驟 4
+- **Default Channel** -- 例如 `#security-alerts`
+
+### 測試連線
+
+```bash
+panguard chat test --channel slack
+```
+
+<AccordionGroup>
+  <Accordion title="Bot 未在頻道中發文">
+    確保 Bot 已透過 `/invite @Panguard Security` 被邀請至目標頻道。
+  </Accordion>
+  <Accordion title="權限錯誤">
+    驗證 Bot 是否擁有 `chat:write` 範圍。檢查應用程式的 **OAuth & Permissions** 頁面。
+  </Accordion>
+  <Accordion title="權杖格式無效">
+    權杖必須以 `xoxb-` 開頭。如果以 `xoxp-` 開頭，表示您使用的是 user token 而非 bot token。
+  </Accordion>
+</AccordionGroup>
+
+## 互動按鈕（可選）
+
+在 Slack 通知中啟用互動式威脅回應按鈕（例如「封鎖來源」、「查看詳情」）：
+
+1. 在 Slack App 設定中，導航至 **Interactivity & Shortcuts**
+2. 啟用 **Interactivity**
+3. 將 Request URL 設定為：`https://your-server.com/webhook/slack`
+4. 點擊 **Save Changes**
+
+<Note>
+  互動按鈕需要您的 Panguard 實例擁有一個公開可存取的 URL。對於本地開發，可以使用 ngrok 等工具提供臨時的公開 URL。
+</Note>
+
+## Block Kit 訊息格式
+
+Slack 通知使用 Block Kit 進行豐富格式：
+
+- **標題** -- 嚴重性色彩指示器搭配威脅標題
+- **上下文** -- 時間戳、來源 IP、信心評分
+- **詳情** -- 包含規則名稱、MITRE ATT&CK ID、受影響資源的結構化欄位
+- **動作** -- 互動按鈕（當互動功能啟用時）
+
+確切內容會根據您設定的[使用者角色](/products/chat/user-roles)而有所不同。

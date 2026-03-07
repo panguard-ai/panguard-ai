@@ -484,6 +484,8 @@ export class ThreatCloudServer {
     data.sigmaRuleMatched = this.sanitizeString(data.sigmaRuleMatched, 200);
     data.region = this.sanitizeString(data.region, 10);
     if (data.industry) data.industry = this.sanitizeString(data.industry, 50);
+    if (data.atrRulesMatched) data.atrRulesMatched = this.sanitizeString(data.atrRulesMatched, 500);
+    if (data.atrCategory) data.atrCategory = this.sanitizeString(data.atrCategory, 100);
 
     // Anonymize IP
     data.attackSourceIP = this.anonymizeIP(data.attackSourceIP);
@@ -559,6 +561,8 @@ export class ThreatCloudServer {
     data.sigmaRuleMatched = this.sanitizeString(data.sigmaRuleMatched, 200);
     data.region = this.sanitizeString(data.region, 10);
     if (data.industry) data.industry = this.sanitizeString(data.industry, 50);
+    if (data.atrRulesMatched) data.atrRulesMatched = this.sanitizeString(data.atrRulesMatched, 500);
+    if (data.atrCategory) data.atrCategory = this.sanitizeString(data.atrCategory, 100);
 
     // Anonymize IP
     data.attackSourceIP = this.anonymizeIP(data.attackSourceIP);

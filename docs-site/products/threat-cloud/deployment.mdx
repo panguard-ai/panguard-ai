@@ -1,0 +1,211 @@
+---
+title: "Deployment"
+description: "Deploy your own private Threat Cloud server with standalone, Docker, or systemd deployment options."
+icon: "rocket"
+---
+
+Panguard Threat Cloud can be deployed as a standalone process, inside a Docker container, or as a systemd service. This page covers all deployment methods, configuration options, and production recommendations.
+
+## Standalone Deployment
+
+### Basic Start
+
+```bash
+# Local-only access (default)
+panguard threat start --port 8080
+
+# External access with API key authentication
+panguard threat start --host 0.0.0.0 --port 8080 --api-key your-secret-key
+
+# Custom database path
+panguard threat start --port 8080 --db /var/lib/threat-cloud/data.db
+```
+
+By default, the server binds to `127.0.0.1` (local access only). Set `--host 0.0.0.0` to accept external connections.
+
+### API Key Authentication
+
+Strongly recommended when exposing the server externally:
+
+```bash
+# Single API key
+panguard threat start --api-key my-secret-key
+
+# Multiple API keys (for different client teams)
+panguard threat start --api-key key-team-a,key-team-b,key-team-c
+```
+
+Clients include the key in request headers:
+
+```
+Authorization: Bearer your-api-key
+```
+
+### Configuration Options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--port` | `8080` | Server listen port |
+| `--host` | `127.0.0.1` | Bind address |
+| `--db` | `./threat-cloud.db` | SQLite database path |
+| `--api-key` | (none) | API key(s), comma-separated |
+
+### Configuration File
+
+For persistent configuration, create `~/.panguard/threat-cloud.json`:
+
+```json
+{
+  "server": {
+    "port": 8080,
+    "host": "0.0.0.0"
+  },
+  "database": {
+    "path": "/var/lib/panguard/threat-cloud.db"
+  },
+  "feeds": {
+    "syncInterval": "6h",
+    "sources": ["threatfox", "urlhaus", "feodo", "greynoise", "abuseipdb"]
+  },
+  "api": {
+    "rateLimit": 100,
+    "rateLimitWindow": "1m"
+  }
+}
+```
+
+---
+
+## Docker Deployment
+
+### Quick Start
+
+```bash
+docker run -d \
+  --name panguard-threat-cloud \
+  -p 8080:8080 \
+  -v panguard-data:/data \
+  -e PANGUARD_TC_API_KEY=your-secret-key \
+  panguard/threat-cloud:latest
+```
+
+### Docker Compose
+
+```yaml
+version: "3.8"
+services:
+  threat-cloud:
+    image: panguard/threat-cloud:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - threat-data:/data
+    environment:
+      - PANGUARD_TC_PORT=8080
+      - PANGUARD_TC_DB=/data/threat-cloud.db
+      - PANGUARD_TC_API_KEY=your-secret-key
+    restart: unless-stopped
+
+volumes:
+  threat-data:
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PANGUARD_TC_PORT` | `8080` | Server port |
+| `PANGUARD_TC_HOST` | `0.0.0.0` | Bind address |
+| `PANGUARD_TC_DB` | `/data/threat-cloud.db` | Database path |
+| `PANGUARD_TC_API_KEY` | (none) | API key(s), comma-separated |
+| `PANGUARD_TC_FEED_INTERVAL` | `6h` | Feed sync interval |
+| `PANGUARD_TC_RATE_LIMIT` | `100` | API requests per window |
+
+---
+
+## Connecting Agents
+
+Configure Guard agents to use your private Threat Cloud instance:
+
+```bash
+panguard guard start --threat-cloud http://your-server:8080
+```
+
+---
+
+## Deployment Sizing
+
+| Scale | Endpoints | CPU | Memory | Disk |
+|-------|-----------|-----|--------|------|
+| **Small** | < 50 | 1 core | 256 MB | 1 GB |
+| **Medium** | 50--500 | 2 cores | 512 MB | 5 GB |
+| **Large** | 500+ | 4 cores | 1 GB | 20 GB |
+
+---
+
+## Feed Synchronization
+
+Threat Cloud syncs with 5 external feed sources:
+
+| Feed | Type | Sync Interval | Data |
+|------|------|---------------|------|
+| **ThreatFox** | IoC database | Every 6 hours | Malware, C2, botnet indicators |
+| **URLhaus** | URL blocklist | Every 6 hours | Malware distribution URLs |
+| **Feodo Tracker** | Botnet C2 | Every 6 hours | Botnet command-and-control IPs |
+| **GreyNoise** | Internet scan data | Every 6 hours | Mass scanning IPs |
+| **AbuseIPDB** | IP reputation | Every 6 hours | Reported malicious IPs |
+
+<Info>
+  Some feeds (GreyNoise, AbuseIPDB) require API keys for full access. The server operates with reduced coverage if API keys are not provided.
+</Info>
+
+---
+
+## Health Check
+
+```bash
+# CLI
+panguard threat status
+
+# HTTP
+curl http://localhost:8080/api/v1/health
+```
+
+```json
+{
+  "status": "healthy",
+  "uptime": "14d 6h 33m",
+  "database": { "size": "42 MB", "iocs": 125000 },
+  "feeds": {
+    "lastSync": "2025-01-15T12:00:00Z",
+    "sources": 5,
+    "healthy": 5
+  }
+}
+```
+
+---
+
+## Production Recommendations
+
+<Steps>
+  <Step title="Use persistent storage">
+    Mount a volume for the database to survive container restarts. Never use ephemeral storage for the IoC database.
+  </Step>
+  <Step title="Enable API key authentication">
+    Always use `--api-key` when the server is accessible from the network.
+  </Step>
+  <Step title="Place behind a reverse proxy">
+    Use nginx or Caddy for TLS termination and access control in production.
+  </Step>
+  <Step title="Configure rate limiting">
+    The default 100 requests/minute is suitable for small fleets. Increase for larger deployments.
+  </Step>
+  <Step title="Monitor disk usage">
+    The SQLite database grows as IoCs accumulate. IoC retention defaults to 90 days with automatic cleanup.
+  </Step>
+</Steps>
+
+<Warning>
+  Do not expose Threat Cloud directly to the public internet without authentication and TLS. Use a reverse proxy with TLS termination and restrict access to your agent network.
+</Warning>

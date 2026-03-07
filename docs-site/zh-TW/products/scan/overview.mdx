@@ -1,0 +1,106 @@
+---
+title: "Panguard Scan"
+description: "60 秒安全健康檢查，包含 10 個掃描器、風險評分及 PDF 報告產生。"
+icon: "magnifying-glass"
+---
+
+Panguard Scan 是一款快速、全面的安全稽核工具，能在 60 秒內評估您系統的安全態勢。它執行 10 個專業掃描器，產生 0--100 的風險評分搭配 A--F 字母等級，並可選擇性地產生專業 PDF 報告。
+
+## 快速開始
+
+```bash
+# 快速掃描（約 30 秒）
+panguard scan --quick
+
+# 完整掃描（約 60 秒）
+panguard scan
+
+# 產生 PDF 報告
+panguard scan --output report.pdf
+
+# 繁體中文輸出
+panguard scan --lang zh-TW
+```
+
+## 快速模式 vs 完整模式
+
+| 功能 | 快速模式（`--quick`） | 完整模式（預設） |
+|------------|----------------------|---------------------|
+| 時長 | 約 30 秒 | 約 60 秒 |
+| 作業系統偵測 | 是 | 是 |
+| 網路介面 | 是 | 是 |
+| 開放埠 | 是 | 是 |
+| 執行中的服務 | 是 | 是 |
+| 密碼策略 | 是 | 是 |
+| 防火牆狀態 | 是 | 是 |
+| 安全工具偵測 | 是 | 是 |
+| SSL 憑證驗證 | -- | 是 |
+| 排程任務稽核 | -- | 是 |
+| 共享資料夾安全 | -- | 是 |
+| 風險評分 | 是 | 是 |
+| PDF 報告 | 搭配 `--output` | 搭配 `--output` |
+
+## 嚴重等級
+
+每個發現項目被分類為五個嚴重等級之一：
+
+| 等級 | 含義 | 處理時程 |
+|-------|---------|-----------------|
+| **CRITICAL** | 立即受損風險 | 立即修復 |
+| **HIGH** | 重大安全風險 | 24 小時內修復 |
+| **MEDIUM** | 中等風險，建議改善 | 一週內修復 |
+| **LOW** | 低風險，最佳實務建議 | 方便時修復 |
+| **INFO** | 資訊性發現 | 確認即可 |
+
+## 產品搭配
+
+### Scan + Guard
+
+使用 Scan 建立基準線，然後啟動 Guard 進行持續監控：
+
+```bash
+# 1. 執行初始掃描
+panguard scan --output baseline.pdf
+
+# 2. 修復發現的問題
+
+# 3. 開始持續防護
+panguard guard start
+
+# 4. 定期重新掃描以追蹤改善情況
+panguard scan --output weekly-check.pdf
+```
+
+### Scan + Report
+
+掃描發現項目直接導入合規報告產生：
+
+```bash
+panguard scan --output scan-result.pdf
+```
+
+## CLI 選項
+
+```
+panguard scan [options]
+
+Options:
+  --quick              快速模式（約 30 秒）
+  --output <path>      PDF 報告輸出路徑
+  --lang <en|zh-TW>    語言（預設：en）
+  --verbose            詳細輸出
+  --json               純 JSON 輸出（供 AI 代理使用）
+  --target <host>      遠端目標（IP 或網域）
+```
+
+<CardGroup cols={3}>
+  <Card title="掃描器" icon="list-check" href="/products/scan/scanners">
+    所有 10 種掃描器類型的詳細說明。
+  </Card>
+  <Card title="風險評分" icon="chart-bar" href="/products/scan/risk-scoring">
+    0-100 風險評分的計算方式。
+  </Card>
+  <Card title="PDF 報告" icon="file-pdf" href="/products/scan/pdf-reports">
+    PDF 報告結構與自訂選項。
+  </Card>
+</CardGroup>

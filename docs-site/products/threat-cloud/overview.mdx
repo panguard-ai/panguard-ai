@@ -1,0 +1,144 @@
+---
+title: "Threat Cloud"
+description: "Collective threat intelligence platform where every Panguard agent contributes anonymized data and every agent benefits from the community's detections."
+icon: "cloud"
+---
+
+Panguard Threat Cloud is a collective threat intelligence platform. Every Guard agent that detects a threat contributes anonymized data to the cloud. Every agent benefits from the community's collective detections. The result: install Panguard on one machine and get the protection of the entire network's intelligence.
+
+## How It Works
+
+```
+Agent A (detects threat) ──> Anonymize ──> Threat Cloud ──> All Agents benefit
+Agent B (detects threat) ──> Anonymize ──┘
+Agent C (queries) ─────────────────────────┘
+```
+
+When a Guard agent detects a threat:
+1. The `ReportAgent` anonymizes the threat data (IP /16 masking, no hostnames, no file contents)
+2. Anonymized IoCs are submitted to Threat Cloud
+3. Threat Cloud validates, correlates, and stores the data
+4. Other agents query Threat Cloud during their detection pipeline and benefit from the collective intelligence
+
+## Key Capabilities
+
+| Capability | Details |
+|-----------|---------|
+| **IoC store** | IP addresses, domains, file hashes, URLs |
+| **Correlation engine** | Cross-source correlation of related indicators |
+| **Campaign tracking** | Group related IoCs into attack campaigns |
+| **Feed distribution** | IP and domain blocklists pushed to agents |
+| **Sighting store** | Track how many agents have seen each indicator |
+| **Reputation engine** | Confidence scoring based on sighting frequency and source diversity |
+| **Sigma rule sharing** | Community-contributed detection rules |
+| **Audit logging** | Full audit trail of all submissions and queries |
+| **RESTful API** | Query and submit threat intelligence programmatically |
+
+## Quick Start
+
+### Using Public Threat Cloud (Default)
+
+No configuration needed. Guard automatically connects to the public Threat Cloud when started:
+
+```bash
+panguard guard start
+```
+
+### Deploying a Private Instance
+
+Enterprises can deploy their own Threat Cloud server:
+
+```bash
+panguard threat start --port 8080 --api-key your-secret-key
+```
+
+See [Deployment](/products/threat-cloud/deployment) for full setup instructions.
+
+## IoC Types
+
+| Type | Example | Description |
+|------|---------|-------------|
+| **IP Address** | `203.0.113.50` | Known malicious source or C2 server |
+| **Domain** | `evil.example.com` | Malicious domain or phishing site |
+| **File Hash** | `sha256:abc123...` | Known malware signature |
+| **URL** | `http://evil.example.com/payload` | Malware distribution URL |
+
+## Campaign Tracking
+
+Related IoCs are grouped into campaigns for contextual analysis:
+
+```json
+{
+  "campaign": "SCATTERED_SPIDER_2025",
+  "firstSeen": "2025-01-01T00:00:00Z",
+  "lastSeen": "2025-01-15T14:23:01Z",
+  "iocs": [
+    { "type": "ip", "value": "203.0.113.50", "confidence": 95 },
+    { "type": "domain", "value": "c2.evil.example.com", "confidence": 90 },
+    { "type": "hash", "value": "sha256:abc123...", "confidence": 98 }
+  ],
+  "mitre": ["T1566", "T1059", "T1071"],
+  "description": "Social engineering campaign targeting cloud infrastructure"
+}
+```
+
+## Guard Integration
+
+The Guard `DetectAgent` queries Threat Cloud during event processing:
+
+1. Extract indicators from the security event (source IP, destination domain, file hash)
+2. Query Threat Cloud for matches
+3. If matched, the indicator's confidence score contributes to the `AnalyzeAgent`'s weighted verdict
+4. Threat intel matches have a fixed confidence contribution of 85
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/ioc` | Submit a new IoC |
+| `GET` | `/api/v1/ioc` | Query a single IoC by type and value |
+| `POST` | `/api/v1/ioc/batch` | Batch query multiple indicators |
+| `GET` | `/api/v1/ioc/recent` | Get recently reported IoCs |
+| `GET` | `/api/v1/health` | Health check |
+| `GET` | `/api/v1/campaigns/:id` | Get campaign details |
+| `GET` | `/api/v1/feeds/status` | Check feed sync status |
+| `GET` | `/api/v1/stats` | Aggregate statistics |
+
+## Feed Sources
+
+Threat Cloud syncs with 5 external threat intelligence feeds:
+
+| Feed | Data Type |
+|------|-----------|
+| **ThreatFox** (abuse.ch) | Malware, C2, botnet IoCs |
+| **URLhaus** (abuse.ch) | Malware distribution URLs |
+| **Feodo Tracker** (abuse.ch) | Botnet C2 server IPs |
+| **GreyNoise** | Mass scanning and internet noise IPs |
+| **AbuseIPDB** | Community-reported malicious IPs |
+
+## CLI Options
+
+```
+panguard threat <command> [options]
+
+Commands:
+  start              Start Threat Cloud server
+  stop               Stop Threat Cloud server
+  status             Show server status
+  lookup <indicator> Look up an IoC
+
+Options:
+  --port <number>    Listen port (default: 8080)
+  --host <string>    Bind address (default: 127.0.0.1)
+  --db <path>        SQLite database path
+  --api-key <keys>   API key(s), comma-separated
+```
+
+<CardGroup cols={2}>
+  <Card title="Deployment" icon="rocket" href="/products/threat-cloud/deployment">
+    Deploy your own private Threat Cloud server.
+  </Card>
+  <Card title="Privacy" icon="shield-check" href="/products/threat-cloud/privacy">
+    Anonymized data, zero telemetry, and opt-out controls.
+  </Card>
+</CardGroup>

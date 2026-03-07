@@ -1,0 +1,146 @@
+---
+title: "Agent Lifecycle"
+description: "How Panguard agents register, maintain heartbeats, report threats, poll policies, and deregister from the Manager server."
+icon: "rotate"
+---
+
+Every Panguard Guard agent connected to a Manager server follows a defined lifecycle with 5 phases: registration, heartbeat maintenance, threat reporting, policy polling, and deregistration.
+
+## Lifecycle Overview
+
+```
+Register ──> Heartbeat Loop ──> Threat Reports ──> Policy Polls ──> Deregister
+  (once)       (every 30s)       (real-time)       (every 5min)     (on stop)
+```
+
+---
+
+## Phase 1: Registration
+
+When a Guard agent starts with the `--manager` flag, it sends a `POST /api/agents/register` request:
+
+```bash
+panguard guard start --manager http://manager-host:8443
+```
+
+### Registration Payload
+
+| Field | Description |
+|-------|-------------|
+| `hostname` | System hostname |
+| `os` | Operating system type and version |
+| `arch` | System architecture (x64, arm64) |
+| `version` | Panguard CLI version |
+| `organizationId` | Optional organization identifier |
+
+### Registration Response
+
+The Manager assigns a unique `agentId` and returns it to the agent. If an agent with the same hostname and organization already exists, the registration is treated as a reconnection.
+
+---
+
+## Phase 2: Heartbeat
+
+Agents send heartbeat signals every 30 seconds via `POST /api/agents/:id/heartbeat` to confirm they are alive and operational.
+
+| Parameter | Value |
+|-----------|-------|
+| **Interval** | Every 30 seconds |
+| **Stale threshold** | 90 seconds (3 missed heartbeats) |
+| **Check frequency** | Manager checks every 30 seconds |
+
+### Heartbeat Payload
+
+| Field | Description |
+|-------|-------------|
+| `cpu` | Current CPU usage percentage |
+| `memory` | Current memory usage percentage |
+| `eventsProcessed` | Events processed since last heartbeat |
+| `mode` | Current operating mode (learning / protection) |
+| `uptime` | Agent uptime in seconds |
+
+### Stale Detection
+
+The Manager runs a stale-check every 30 seconds:
+
+```
+Normal:  heartbeat received within 30s
+Stale:   no heartbeat for 90s (3 missed)
+```
+
+Stale agents are flagged in the registry but not removed. This allows agents that temporarily lose network connectivity to reconnect without re-registration.
+
+---
+
+## Phase 3: Threat Reporting
+
+When a Guard agent detects threats through the DARE pipeline, it sends `POST /api/agents/:id/events` with threat data.
+
+| Field | Description |
+|-------|-------------|
+| `agentId` | Reporting agent identifier |
+| `threat` | Full threat verdict (type, confidence, evidence) |
+| `response` | Action taken (block_ip, kill_process, etc.) |
+| `timestamp` | Detection time |
+
+### Cross-Agent Correlation
+
+The `ThreatAggregator` correlates incoming threats across all agents within a 5-minute sliding window with 24-hour data retention:
+
+| Correlation Type | Detection Logic |
+|-----------------|----------------|
+| **Source IP** | Same IP targeting 2+ agents indicates lateral movement or mass scanning |
+| **Malware hash** | Same file hash on 2+ agents indicates worm propagation |
+| **Attack pattern** | Same MITRE technique on 2+ agents indicates coordinated campaign |
+
+When a cross-agent pattern is detected, the Manager pushes emergency policies to all affected agents.
+
+---
+
+## Phase 4: Policy Polling
+
+Agents poll `GET /api/policy/agent/:id` every 5 minutes to check for policy updates.
+
+| Parameter | Value |
+|-----------|-------|
+| **Poll interval** | Every 5 minutes |
+| **Mechanism** | Agent sends its current policy version, Manager responds with new policy or 304 (no change) |
+
+```
+Agent (v2) ──> GET /api/policy/agent/:id ──> Manager
+                                               |
+                               version=3? ──> Return new policy
+                               version=2? ──> Return 304 (no change)
+```
+
+Policy changes can adjust:
+- Action thresholds (auto-respond confidence level)
+- IP blocklists (fleet-wide blocks)
+- Alerting rules and notification preferences
+- Monitor configuration
+
+See [Policy Engine](/products/manager/policy-engine) for policy format and distribution details.
+
+---
+
+## Phase 5: Deregistration
+
+When a Guard agent is stopped cleanly, it sends `DELETE /api/agents/:id`:
+
+```bash
+panguard guard stop
+```
+
+The Manager marks the agent as offline and retains its registration data. If the agent reconnects later, it resumes with its existing identity.
+
+### Forced Removal
+
+To permanently remove an agent from the registry:
+
+```bash
+panguard manager agents remove --machine-id srv-01
+```
+
+<Warning>
+  If an agent crashes or loses network connectivity, it cannot send a deregistration request. The Manager detects this through missed heartbeats and marks the agent as stale after 90 seconds.
+</Warning>

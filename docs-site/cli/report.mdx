@@ -1,0 +1,107 @@
+---
+title: "panguard report"
+description: "Generate compliance and audit reports aligned with major security frameworks."
+icon: "file-chart-column"
+---
+
+The `report` command generates professional compliance reports from your scan and Guard data. Reports can be aligned to frameworks like ISO 27001, SOC 2, NIST CSF, and Taiwan TCSA, making audit preparation straightforward.
+
+## Usage
+
+```bash
+panguard report <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+| --- | --- |
+| `generate` | Generate a compliance report |
+| `summary` | Show a brief compliance summary without generating a full report |
+| `list-frameworks` | List all supported compliance frameworks |
+| `validate` | Validate an existing report for completeness and accuracy |
+| `config` | View or modify report configuration |
+
+## Options
+
+<ParamField path="--framework" type="string">
+  Target compliance framework. Run `panguard report list-frameworks` to see all options.
+</ParamField>
+
+<ParamField path="--language" type="string" default="en">
+  Report content language (e.g., `en`, `zh-TW`).
+</ParamField>
+
+<ParamField path="--format" type="string" default="pdf">
+  Output format: `pdf`, `html`, `json`, or `csv`.
+</ParamField>
+
+<ParamField path="--output-dir" type="string">
+  Directory to write the generated report. Defaults to the current working directory.
+</ParamField>
+
+<ParamField path="--org" type="string">
+  Organization name to include in the report header and metadata.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Generate ISO 27001 report
+panguard report generate --framework iso27001 --org "Acme Corp"
+```
+
+```bash Generate SOC 2 report in Chinese
+panguard report generate --framework soc2 --language zh-TW
+```
+
+```bash List available frameworks
+panguard report list-frameworks
+```
+
+```bash Quick compliance summary
+panguard report summary --framework nist-csf
+```
+
+```bash Export as HTML
+panguard report generate --framework tcsa --format html --output-dir ./reports
+```
+
+```bash Validate an existing report
+panguard report validate --output-dir ./reports
+```
+</CodeGroup>
+
+## Supported Frameworks
+
+| Framework | Identifier | Description |
+| --- | --- | --- |
+| ISO 27001 | `iso27001` | International information security standard |
+| SOC 2 | `soc2` | Service organization trust criteria |
+| NIST CSF | `nist-csf` | NIST Cybersecurity Framework |
+| CIS Controls | `cis` | Center for Internet Security critical controls |
+| Taiwan TCSA | `tcsa` | Taiwan Corporate Security Alliance standard |
+| PCI DSS | `pci-dss` | Payment card industry data security |
+
+## Plan Requirements
+
+<Info>
+  Report generation requires the **Pro** ($29/mo) plan or higher. `list-frameworks` and `summary` are available on all plans.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Compliance Reports Guide" icon="book-open" href="/guides/compliance-reports">
+    Step-by-step guide for generating your first compliance report.
+  </Card>
+  <Card title="Report Product Overview" icon="file-lines" href="/products/report/overview">
+    Full documentation of the Report system.
+  </Card>
+  <Card title="Supported Frameworks" icon="scale-balanced" href="/products/report/frameworks">
+    Detailed control mappings for each framework.
+  </Card>
+  <Card title="panguard scan" icon="magnifying-glass" href="/cli/scan">
+    Reports are generated from scan data -- run a scan first.
+  </Card>
+</CardGroup>

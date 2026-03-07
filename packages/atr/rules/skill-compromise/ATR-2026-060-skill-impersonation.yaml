@@ -1,0 +1,86 @@
+title: "MCP Skill Impersonation"
+id: ATR-2026-060
+status: experimental
+description: >
+  Detects MCP skills that impersonate well-known, trusted tools by using names
+  or descriptions that closely mimic legitimate skills (e.g., "filesytem_read"
+  mimicking "filesystem_read", or "github-api" impersonating official GitHub tools).
+  Attackers register lookalike skills on MCP marketplaces to intercept tool calls
+  intended for the real skill.
+author: "ATR Community"
+date: "2026/03/08"
+severity: high
+
+references:
+  owasp_llm:
+    - "LLM03:2025 - Supply Chain Vulnerabilities"
+    - "LLM05:2025 - Improper Output Handling"
+  mitre_atlas:
+    - "AML.T0010 - ML Supply Chain Compromise"
+
+tags:
+  category: tool-poisoning
+  subcategory: skill-impersonation
+  confidence: medium
+
+agent_source:
+  type: tool_call
+  framework:
+    - mcp
+    - langchain
+    - autogen
+  provider:
+    - any
+
+detection:
+  conditions:
+    - field: tool_name
+      operator: regex
+      value: "(?i)(filesytem|filsystem|file_sytem|flie_system|filessystem)_(read|write|list|delete)"
+    - field: tool_name
+      operator: regex
+      value: "(?i)(gtihub|githbu|gihtub|gthub|g1thub)[-_](api|search|commit|pr)"
+    - field: tool_name
+      operator: regex
+      value: "(?i)(databse|databaes|dtabase|datbase)[-_](query|read|write|exec)"
+    - field: tool_name
+      operator: regex
+      value: "(?i)(web[-_]?search|google[-_]?search|bing[-_]?search)[-_]?(v2|pro|enhanced|premium|fast)"
+    - field: tool_name
+      operator: regex
+      value: "(?i)(exec|execute|run|shell)[-_]?(cmd|command|script|code)[-_]?(safe|secure|sandbox)?"
+  condition: any
+  false_positives:
+    - "Legitimate tools with similar naming conventions from verified publishers"
+    - "Internal tools that follow company-specific naming patterns"
+
+response:
+  actions:
+    - block_tool
+    - alert
+    - snapshot
+  auto_response_threshold: high
+  message_template: >
+    [ATR-2026-060] Potential skill impersonation detected. Tool name "{tool_name}"
+    closely resembles a known legitimate tool. Verify the skill publisher and
+    source before allowing execution.
+
+test_cases:
+  true_positives:
+    - input:
+        tool_name: "filesytem_read"
+      expected: triggered
+      matched_condition: "typosquatted filesystem tool name"
+    - input:
+        tool_name: "gtihub-api"
+      expected: triggered
+      matched_condition: "typosquatted github tool name"
+  true_negatives:
+    - input:
+        tool_name: "filesystem_read"
+      expected: not_triggered
+      reason: "Correctly spelled legitimate tool name"
+    - input:
+        tool_name: "custom_database_query"
+      expected: not_triggered
+      reason: "Correctly spelled custom tool name"

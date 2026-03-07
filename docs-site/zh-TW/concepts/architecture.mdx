@@ -1,0 +1,219 @@
+---
+title: "系統架構"
+description: "Panguard AI 平台的技術架構概覽：monorepo 結構、部署層級與元件互動。"
+icon: "sitemap"
+---
+
+# 系統架構
+
+Panguard AI 是一個 TypeScript monorepo，包含 13 個套件，組織為三個部署層級。每個元件 -- 從您筆電上的 CLI 到資料中心的 Threat Cloud -- 都共享相同的 `@panguard-ai/core` 基礎。
+
+---
+
+## 三個部署層級
+
+```
+  +-------------------------------------------------------+
+  |                    Cloud Layer                         |
+  |   Threat Cloud (collective intelligence)              |
+  |   Cloud AI (Claude / OpenAI)                          |
+  |   Web Dashboard                                       |
+  +-------------------------------------------------------+
+                          ^
+                          | HTTPS / WebSocket
+                          v
+  +-------------------------------------------------------+
+  |                   Manager Layer                        |
+  |   Fleet orchestration, policy management              |
+  |   Agent registration, centralized logging             |
+  +-------------------------------------------------------+
+                          ^
+                          | HTTPS / WebSocket
+                          v
+  +-------------------------------------------------------+
+  |                  Endpoint Layer                        |
+  |   Guard agent (real-time protection)                  |
+  |   Scan, Chat, Trap, Report (CLI tools)                |
+  +-------------------------------------------------------+
+```
+
+<Tabs>
+  <Tab title="端點層">
+    Guard 代理程式與 CLI 工具直接在受保護的設備上執行。這是安全事件被偵測、由 Layer 1 與 Layer 2 AI 分析，並進行即時回應的地方。
+
+    **關鍵元件：**
+    - Guard 代理程式（持續監控）
+    - Scan 引擎（按需稽核）
+    - Chat 通知（Telegram、Slack、Email、LINE、Webhook）
+    - Trap 蜜罐（8 種誘餌服務類型）
+    - Report 產生器（PDF、JSON）
+    - 透過 Ollama 的本地 AI（Layer 2）
+
+    **完全離線運作。** 端點層使用快取規則與本地 AI，不需要網路連線即可運作。
+  </Tab>
+
+  <Tab title="Manager 層">
+    Manager 編排跨機群多台設備上的多個 Guard 代理程式。提供集中式策略管理、代理程式註冊與彙總日誌。
+
+    **關鍵功能：**
+    - 機群全域策略部署
+    - 代理程式健康監控與註冊
+    - 集中式日誌彙總
+    - WebSocket 即時儀表板
+    - REST API 用於程式化控制
+
+    **部署方式：** 自架於您的基礎設施或由 Panguard 代管（Business 方案）。
+  </Tab>
+
+  <Tab title="雲端層">
+    雲端層提供集體情報與深度 AI 分析，處理無法在本地解決的威脅。
+
+    **關鍵服務：**
+    - Threat Cloud（社群驅動的 IoC 資料庫）
+    - 雲端 AI 分析（Claude / OpenAI 用於 Layer 3）
+    - 網頁儀表板用於帳號與訂閱管理
+
+    **可選。** 雲端層增強防護但從不是必要的。所有核心功能不需雲端即可運作。
+  </Tab>
+</Tabs>
+
+---
+
+## 13 套件 Monorepo
+
+程式碼庫以 pnpm workspace monorepo 組織。每個套件有單一職責：
+
+| 套件 | 層級 | 用途 |
+| --- | --- | --- |
+| `@panguard-ai/core` | 共享 | 規則引擎、監控器、AI 供應商、i18n、加密 |
+| `@panguard-ai/panguard` | 端點 | CLI 入口點（`panguard` 指令） |
+| `@panguard-ai/panguard-guard` | 端點 | 即時防護代理程式（5 階段 AI 流水線） |
+| `@panguard-ai/panguard-scan` | 端點 | 安全掃描器與風險評分 |
+| `@panguard-ai/panguard-chat` | 端點 | 通知系統（5 個頻道、3 種角色格式） |
+| `@panguard-ai/panguard-trap` | 端點 | 蜜罐系統（8 種服務類型） |
+| `@panguard-ai/panguard-report` | 端點 | 合規報告產生（TCSA、ISO 27001、SOC 2） |
+| `@panguard-ai/panguard-auth` | 共享 | OAuth 流程、連線管理、層級限制 |
+| `@panguard-ai/panguard-manager` | Manager | 機群編排與代理程式註冊 |
+| `@panguard-ai/threat-cloud` | 雲端 | 集體情報 API 伺服器 |
+| `@panguard-ai/panguard-web` | 雲端 | 網頁儀表板（Next.js） |
+| `@panguard-ai/admin` | 雲端 | Threat Cloud 與使用者管理的管理面板 |
+| `@panguard-ai/website` | 雲端 | 行銷網站 (panguard.ai) |
+
+---
+
+## @panguard-ai/core -- 共享基礎
+
+`core` 套件是所有其他套件依賴的基礎。它提供：
+
+<AccordionGroup>
+  <Accordion title="規則引擎">
+    - Sigma 規則剖析器與評估器（布林邏輯、聚合、修飾器、萬用字元）
+    - YARA 掃描器，支援原生引擎與正規表達式降級
+    - 3000+ 條內建 Sigma 規則、自訂規則載入
+  </Accordion>
+
+  <Accordion title="監控器">
+    4 個系統監控器收集安全相關事件：
+    - **Log 監控器** -- 系統日誌剖析（syslog、journald、Windows Event Log）
+    - **Network 監控器** -- 連線追蹤、連接埠掃描、DNS 查詢
+    - **Process 監控器** -- 行程建立、終止、資源使用
+    - **File 監控器** -- 檔案系統變更、權限修改、新的可執行檔
+  </Accordion>
+
+  <Accordion title="AI 供應商">
+    - FunnelRouter 用於 Layer 2/3 級聯
+    - Ollama 轉接器（本地 AI）
+    - Claude 與 OpenAI 轉接器（雲端 AI）
+    - 啟動時供應商自動偵測
+    - AES-256-GCM 加密金鑰儲存（`~/.panguard/llm.enc`）
+  </Accordion>
+
+  <Accordion title="國際化 (i18n)">
+    - 英文與繁體中文
+    - 所有 CLI 輸出、報告與通知皆完整在地化
+    - 透過 `panguard init` 或 `--lang` 旗標選擇語言
+  </Accordion>
+
+  <Accordion title="系統偵察">
+    - 作業系統偵測（macOS、Linux、Windows）
+    - 網路介面列舉
+    - 執行中服務清單
+    - 安全工具偵測（防毒、EDR、IDS）
+    - 硬體識別碼收集，用於加密金鑰衍生
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 技術堆疊
+
+| 技術 | 版本 | 用途 |
+| --- | --- | --- |
+| **TypeScript** | 5.7 | 所有套件的主要語言 |
+| **Node.js** | 22 | 執行環境 |
+| **pnpm** | 9+ | 支援 workspace 的套件管理器 |
+| **Vitest** | 最新 | 單元與整合測試 |
+| **esbuild** | 最新 | CLI 發布的快速打包工具 |
+| **better-sqlite3** | 最新 | Threat Cloud 與 Guard 狀態的嵌入式資料庫 |
+| **Next.js** | 14 | 網頁儀表板與行銷網站 |
+
+---
+
+## 跨平台支援
+
+Panguard 在三大主要作業系統上運行：
+
+| 平台 | Guard | Scan | Trap | Manager |
+| --- | --- | --- | --- | --- |
+| **macOS** (ARM64, x64) | 是 | 是 | 是 | 是 |
+| **Linux** (x64, ARM64) | 是 | 是 | 是 | 是 |
+| **Windows** (x64) | 是 | 是 | 是 | 是 |
+
+平台特定實作在 `core` 中透過介面抽象化：
+
+- **防火牆：** macOS `pfctl`、Linux `iptables`/`nftables`、Windows `netsh`
+- **服務管理：** macOS `launchd`、Linux `systemd`、Windows Services
+- **日誌來源：** macOS unified log、Linux `journald`/syslog、Windows Event Log
+
+---
+
+## 資料流
+
+典型的安全事件在系統中的流程如下：
+
+<Steps>
+  <Step title="事件偵測">
+    `core` 中的監控器（行程、網路、檔案或日誌）在端點上偵測到安全相關事件。
+  </Step>
+  <Step title="Layer 1 評估">
+    Sigma/YARA 規則引擎在 1 毫秒內評估事件。如果規則匹配，事件會被分類並立即觸發回應。
+  </Step>
+  <Step title="AI 升級（如需）">
+    未匹配的事件透過 FunnelRouter 轉送至 Layer 2（本地 Ollama）或 Layer 3（雲端 AI）進行深度分析。
+  </Step>
+  <Step title="回應執行">
+    根據分類與信心度，自動回應引擎採取行動：封鎖 IP、隔離檔案、終止行程或僅通知。
+  </Step>
+  <Step title="報告與通知">
+    Chat 透過設定的頻道傳送通知。事件被記錄用於 Guard 狀態、安全分數更新與合規報告。
+  </Step>
+  <Step title="Threat Cloud 上傳（可選）">
+    如果啟用了 Threat Cloud 參與，匿名化的指標會上傳以造福社群。
+  </Step>
+</Steps>
+
+---
+
+## 相關內容
+
+<CardGroup cols={3}>
+  <Card title="三層式 AI" icon="brain-circuit" href="/concepts/three-layer-ai">
+    深入了解規則、本地 AI 與雲端 AI 漏斗。
+  </Card>
+  <Card title="Guard 流水線" icon="shield" href="/products/guard/agent-pipeline">
+    Guard 內部的 5 階段 AI 代理流水線。
+  </Card>
+  <Card title="Manager" icon="server" href="/products/guard/overview">
+    機群編排與集中式管理。
+  </Card>
+</CardGroup>
