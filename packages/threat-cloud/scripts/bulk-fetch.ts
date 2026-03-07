@@ -18,15 +18,15 @@ const META_FILE = join(RULES_DIR, '.meta.json');
 async function run() {
   console.log('=== Panguard Bulk Threat Intel Fetch ===\n');
 
-  // Fetch with generous limits - get as many disclosed reports as possible
+  // Aggressive fetch - maximize disclosed report collection
   const adapter = new HackerOneAdapter({
-    maxReports: 200,
-    minSeverity: 'low',
-    rateLimitPerMinute: 10,
+    maxReports: 500,
+    minSeverity: 'none',
+    rateLimitPerMinute: 60,
   });
 
-  console.log('Fetching HackerOne Hacktivity (up to 200 reports, pages of 25)...');
-  console.log('This may take a few minutes due to rate limiting.\n');
+  console.log('Fetching HackerOne Hacktivity (up to 500 reports, all severities)...');
+  console.log('This may take several minutes.\n');
 
   const reports = await adapter.fetchReports();
   console.log(`Fetched ${reports.length} disclosed reports\n`);
