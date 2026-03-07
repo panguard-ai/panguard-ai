@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Copy, Check, Shield, AlertTriangle, Search, Code, FileKey, Lock, Zap } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import { Link } from '@/navigation';
@@ -64,6 +65,8 @@ function CheckCard({
 }
 
 export default function SkillAuditorContent() {
+  const t = useTranslations('docs.skillAuditorDocs');
+
   return (
     <SectionWrapper className="py-16 sm:py-24">
       <div className="max-w-3xl mx-auto">
@@ -71,34 +74,33 @@ export default function SkillAuditorContent() {
         <FadeInUp>
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-panguard-green/70 font-semibold mb-4">
             <Link href="/docs" className="hover:text-panguard-green transition-colors">
-              Docs
+              {t('breadcrumbDocs')}
             </Link>
             <span>/</span>
-            <span>Skill Auditor</span>
+            <span>{t('breadcrumbSkillAuditor')}</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary">
-            Skill Auditor
+            {t('title')}
           </h1>
           <p className="text-lg text-text-secondary mt-4 max-w-2xl">
-            Automated security scanner for AI agent skills. Detect prompt injection, tool
-            poisoning, hidden Unicode, and credential theft before installing any skill.
+            {t('subtitle')}
           </p>
         </FadeInUp>
 
         {/* Quick Start */}
         <FadeInUp className="mt-12">
-          <h2 className="text-2xl font-bold text-text-primary mb-6">Quick Start</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-6">{t('quickStartTitle')}</h2>
           <div className="space-y-4">
             <CodeBlock
-              title="Install Panguard"
+              title={t('codeTitle1')}
               code="curl -fsSL https://panguard.ai/api/install | bash"
             />
             <CodeBlock
-              title="Audit a skill directory"
+              title={t('codeTitle2')}
               code="panguard audit skill ./path/to/skill"
             />
             <CodeBlock
-              title="Audit with JSON output (for CI/CD)"
+              title={t('codeTitle3')}
               code="panguard audit skill ./my-skill --json"
             />
           </div>
@@ -106,48 +108,48 @@ export default function SkillAuditorContent() {
 
         {/* What It Checks */}
         <FadeInUp className="mt-16">
-          <h2 className="text-2xl font-bold text-text-primary mb-6">7 Security Checks</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-6">{t('checksTitle')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <CheckCard
               icon={FileKey}
-              title="1. Manifest Validation"
-              description="Verifies SKILL.md frontmatter: required fields, valid YAML, proper metadata. Malformed manifests are the first sign of a malicious skill."
+              title={t('check1.title')}
+              description={t('check1.description')}
               severity="medium"
             />
             <CheckCard
               icon={Shield}
-              title="2. Prompt Injection"
-              description='11 regex patterns: "ignore previous instructions", identity override, system prompt manipulation, jailbreak patterns, hidden HTML comments.'
+              title={t('check2.title')}
+              description={t('check2.description')}
               severity="critical"
             />
             <CheckCard
               icon={Search}
-              title="3. Hidden Unicode"
-              description="Zero-width characters (U+200B-200F), RTL overrides (U+202A-202E), and homoglyphs that hide malicious instructions invisible to human readers."
+              title={t('check3.title')}
+              description={t('check3.description')}
               severity="critical"
             />
             <CheckCard
               icon={Code}
-              title="4. Encoded Payloads"
-              description="Extracts Base64 blocks, decodes them, and checks for eval(), exec(), subprocess, child_process, curl, wget patterns."
+              title={t('check4.title')}
+              description={t('check4.description')}
               severity="critical"
             />
             <CheckCard
               icon={AlertTriangle}
-              title="5. Tool Poisoning"
-              description="Privilege escalation (sudo, chmod 777), reverse shells (nc -e, /dev/tcp/), remote code execution (curl|bash), credential theft."
+              title={t('check5.title')}
+              description={t('check5.description')}
               severity="high"
             />
             <CheckCard
               icon={Lock}
-              title="6. Code SAST + Secrets"
-              description="Static analysis of all files in the skill directory. Detects hardcoded API keys, AWS credentials, private keys, and common vulnerabilities."
+              title={t('check6.title')}
+              description={t('check6.description')}
               severity="high"
             />
             <CheckCard
               icon={Zap}
-              title="7. Permission & Dependency"
-              description="Cross-references requested permissions against stated purpose. A weather skill requesting filesystem write access? Red flag."
+              title={t('check7.title')}
+              description={t('check7.description')}
               severity="medium"
             />
           </div>
@@ -155,40 +157,40 @@ export default function SkillAuditorContent() {
 
         {/* Risk Scoring */}
         <FadeInUp className="mt-16">
-          <h2 className="text-2xl font-bold text-text-primary mb-6">Risk Scoring</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-6">{t('riskScoringTitle')}</h2>
           <p className="text-text-secondary mb-6">
-            Each finding carries a severity weight. Weights are summed and capped at 100.
+            {t('riskScoringDesc')}
           </p>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm border border-border rounded-xl overflow-hidden">
               <thead>
                 <tr className="bg-surface-1 text-text-secondary">
-                  <th className="px-4 py-3 text-left font-medium">Severity</th>
-                  <th className="px-4 py-3 text-left font-medium">Weight</th>
-                  <th className="px-4 py-3 text-left font-medium">Example</th>
+                  <th className="px-4 py-3 text-left font-medium">{t('tableSeverity')}</th>
+                  <th className="px-4 py-3 text-left font-medium">{t('tableWeight')}</th>
+                  <th className="px-4 py-3 text-left font-medium">{t('tableExample')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 <tr>
-                  <td className="px-4 py-3 text-red-400 font-medium">Critical</td>
+                  <td className="px-4 py-3 text-red-400 font-medium">{t('severityCritical')}</td>
                   <td className="px-4 py-3 text-text-primary">25</td>
-                  <td className="px-4 py-3 text-text-secondary">Reverse shell, prompt injection</td>
+                  <td className="px-4 py-3 text-text-secondary">{t('exampleCritical')}</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3 text-orange-400 font-medium">High</td>
+                  <td className="px-4 py-3 text-orange-400 font-medium">{t('severityHigh')}</td>
                   <td className="px-4 py-3 text-text-primary">15</td>
-                  <td className="px-4 py-3 text-text-secondary">Privilege escalation, credential theft</td>
+                  <td className="px-4 py-3 text-text-secondary">{t('exampleHigh')}</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3 text-yellow-400 font-medium">Medium</td>
+                  <td className="px-4 py-3 text-yellow-400 font-medium">{t('severityMedium')}</td>
                   <td className="px-4 py-3 text-text-primary">5</td>
-                  <td className="px-4 py-3 text-text-secondary">Suspicious patterns, ambiguous</td>
+                  <td className="px-4 py-3 text-text-secondary">{t('exampleMedium')}</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-3 text-gray-400 font-medium">Low</td>
+                  <td className="px-4 py-3 text-gray-400 font-medium">{t('severityLow')}</td>
                   <td className="px-4 py-3 text-text-primary">1</td>
-                  <td className="px-4 py-3 text-text-secondary">Minor style issues</td>
+                  <td className="px-4 py-3 text-text-secondary">{t('exampleLow')}</td>
                 </tr>
               </tbody>
             </table>
@@ -196,15 +198,15 @@ export default function SkillAuditorContent() {
 
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { range: '0-14', level: 'LOW', color: 'bg-green-500/10 border-green-500/30 text-green-400', action: 'Safe to install' },
-              { range: '15-39', level: 'MEDIUM', color: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400', action: 'Review findings' },
-              { range: '40-69', level: 'HIGH', color: 'bg-orange-500/10 border-orange-500/30 text-orange-400', action: 'Manual review' },
-              { range: '70-100', level: 'CRITICAL', color: 'bg-red-500/10 border-red-500/30 text-red-400', action: 'Do NOT install' },
+              { range: '0-14', levelKey: 'riskLow' as const, color: 'bg-green-500/10 border-green-500/30 text-green-400', actionKey: 'actionLow' as const },
+              { range: '15-39', levelKey: 'riskMedium' as const, color: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400', actionKey: 'actionMedium' as const },
+              { range: '40-69', levelKey: 'riskHigh' as const, color: 'bg-orange-500/10 border-orange-500/30 text-orange-400', actionKey: 'actionHigh' as const },
+              { range: '70-100', levelKey: 'riskCritical' as const, color: 'bg-red-500/10 border-red-500/30 text-red-400', actionKey: 'actionCritical' as const },
             ].map((item) => (
-              <div key={item.level} className={`border rounded-xl p-4 text-center ${item.color}`}>
+              <div key={item.levelKey} className={`border rounded-xl p-4 text-center ${item.color}`}>
                 <div className="text-lg font-bold">{item.range}</div>
-                <div className="text-xs font-semibold mt-1">{item.level}</div>
-                <div className="text-xs mt-2 opacity-70">{item.action}</div>
+                <div className="text-xs font-semibold mt-1">{t(item.levelKey)}</div>
+                <div className="text-xs mt-2 opacity-70">{t(item.actionKey)}</div>
               </div>
             ))}
           </div>
@@ -212,11 +214,11 @@ export default function SkillAuditorContent() {
 
         {/* Integration */}
         <FadeInUp className="mt-16">
-          <h2 className="text-2xl font-bold text-text-primary mb-6">Integration Guide</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-6">{t('integrationTitle')}</h2>
 
-          <h3 className="text-lg font-semibold text-text-primary mb-3">CI/CD Pipeline Gate</h3>
+          <h3 className="text-lg font-semibold text-text-primary mb-3">{t('cicdTitle')}</h3>
           <p className="text-text-secondary mb-4">
-            Block installations of high-risk skills automatically:
+            {t('cicdDesc')}
           </p>
           <CodeBlock
             title="bash"
@@ -228,9 +230,9 @@ if [ "$RISK" = "HIGH" ] || [ "$RISK" = "CRITICAL" ]; then
 fi`}
           />
 
-          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">TypeScript API</h3>
+          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">{t('tsApiTitle')}</h3>
           <p className="text-text-secondary mb-4">
-            Use programmatically in your agent framework:
+            {t('tsApiDesc')}
           </p>
           <CodeBlock
             title="typescript"
@@ -255,10 +257,10 @@ for (const finding of report.findings) {
           />
 
           <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">
-            OpenClaw Pre-Install Hook
+            {t('openclawTitle')}
           </h3>
           <p className="text-text-secondary mb-4">
-            Add to your OpenClaw agent configuration to auto-audit every skill before installation:
+            {t('openclawDesc')}
           </p>
           <CodeBlock
             title="~/.openclaw/hooks/pre-skill-install.sh"
@@ -280,9 +282,9 @@ fi`}
 
         {/* Example Output */}
         <FadeInUp className="mt-16">
-          <h2 className="text-2xl font-bold text-text-primary mb-6">Example Output</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-6">{t('exampleOutputTitle')}</h2>
 
-          <h3 className="text-lg font-semibold text-text-primary mb-3">Safe Skill</h3>
+          <h3 className="text-lg font-semibold text-text-primary mb-3">{t('safeSkillTitle')}</h3>
           <CodeBlock
             code={`$ panguard audit skill ./skills/weather-widget
 
@@ -303,7 +305,7 @@ CHECKS:
 VERDICT: Safe to install`}
           />
 
-          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">Malicious Skill</h3>
+          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">{t('maliciousSkillTitle')}</h3>
           <CodeBlock
             code={`$ panguard audit skill ./skills/suspicious-helper
 
@@ -336,32 +338,34 @@ VERDICT: DO NOT INSTALL - Critical security issues found`}
         {/* vs Manual */}
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">
-            Panguard Auditor vs Manual Vetting
+            {t('vsManualTitle')}
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border border-border rounded-xl overflow-hidden">
               <thead>
                 <tr className="bg-surface-1 text-text-secondary">
-                  <th className="px-4 py-3 text-left font-medium">Feature</th>
-                  <th className="px-4 py-3 text-left font-medium">Manual Checklist</th>
-                  <th className="px-4 py-3 text-left font-medium">Panguard Auditor</th>
+                  <th className="px-4 py-3 text-left font-medium">{t('tableFeature')}</th>
+                  <th className="px-4 py-3 text-left font-medium">{t('tableManual')}</th>
+                  <th className="px-4 py-3 text-left font-medium">{t('tablePanguard')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {[
-                  ['Speed', 'Minutes per skill', '< 1 second'],
-                  ['Consistency', 'Varies by reviewer', 'Deterministic'],
-                  ['Hidden Unicode', 'Easy to miss', 'Auto-detect 15 categories'],
-                  ['Base64 payloads', 'Manual decode needed', 'Auto-decode + analyze'],
-                  ['Code SAST', 'Not included', 'Integrated scanner'],
-                  ['Secrets scan', 'Manual grep', 'Pattern-based detection'],
-                  ['Risk score', 'Subjective', 'Quantitative 0-100'],
-                  ['CI/CD ready', 'No', 'JSON output + exit codes'],
-                ].map(([feature, manual, panguard]) => (
-                  <tr key={feature}>
-                    <td className="px-4 py-3 text-text-primary font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-text-muted">{manual}</td>
-                    <td className="px-4 py-3 text-panguard-green">{panguard}</td>
+                {([
+                  ['vsSpeed', 'vsSpeedManual', '< 1 second'],
+                  ['vsConsistency', 'vsConsistencyManual', 'vsConsistencyPanguard'],
+                  ['vsUnicode', 'vsUnicodeManual', 'vsUnicodePanguard'],
+                  ['vsBase64', 'vsBase64Manual', 'vsBase64Panguard'],
+                  ['vsSast', 'vsSastManual', 'vsSastPanguard'],
+                  ['vsSecrets', 'vsSecretsManual', 'vsSecretsPanguard'],
+                  ['vsRiskScore', 'vsRiskScoreManual', 'vsRiskScorePanguard'],
+                  ['vsCicd', 'vsCicdManual', 'vsCicdPanguard'],
+                ] as const).map(([featureKey, manualKey, panguardKey]) => (
+                  <tr key={featureKey}>
+                    <td className="px-4 py-3 text-text-primary font-medium">{t(featureKey)}</td>
+                    <td className="px-4 py-3 text-text-muted">{t(manualKey)}</td>
+                    <td className="px-4 py-3 text-panguard-green">
+                      {panguardKey === '< 1 second' ? '< 1 second' : t(panguardKey)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -372,10 +376,9 @@ VERDICT: DO NOT INSTALL - Critical security issues found`}
         {/* CTA */}
         <FadeInUp className="mt-16">
           <div className="bg-surface-1/50 border border-border rounded-2xl p-8 text-center">
-            <h3 className="text-xl font-bold text-text-primary mb-3">Get Started</h3>
+            <h3 className="text-xl font-bold text-text-primary mb-3">{t('ctaTitle')}</h3>
             <p className="text-text-secondary mb-6 max-w-lg mx-auto">
-              Install Panguard and start auditing skills in under 2 minutes. Free forever on the
-              Community plan.
+              {t('ctaDesc')}
             </p>
             <CodeBlock code="curl -fsSL https://panguard.ai/api/install | bash" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">
@@ -383,13 +386,13 @@ VERDICT: DO NOT INSTALL - Critical security issues found`}
                 href="/docs/getting-started"
                 className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-6 py-2.5 text-sm hover:bg-panguard-green-light transition-all"
               >
-                Full Setup Guide
+                {t('ctaFullSetup')}
               </Link>
               <Link
                 href="/blog/skill-auditor-guide"
                 className="inline-flex items-center gap-2 border border-border text-text-secondary hover:text-text-primary hover:border-panguard-green font-semibold rounded-full px-6 py-2.5 text-sm transition-all"
               >
-                Read the Blog Post
+                {t('ctaBlogPost')}
               </Link>
             </div>
           </div>
