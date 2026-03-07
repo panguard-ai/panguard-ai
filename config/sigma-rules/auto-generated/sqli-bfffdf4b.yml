@@ -1,0 +1,32 @@
+title: "Potential SQL Injection Attempt [Report exploitdb:35275]"
+id: bfffdf4b-8939-453a-b996-5ffd6602ce1d
+status: experimental
+description: |
+  "Potential SQLi attack detected. Auto-generated from HackerOne report: ExploitDB #35275: Proticaret E-Commerce Script 3.0 - SQL Injection (2)"
+  Source report: ExploitDB #35275: Proticaret E-Commerce Script 3.0 - SQL Injection (2) (exploitdb:35275)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:35275
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - ''' OR ''1''=''1'
+      - 'UNION SELECT'
+      - '''; DROP'
+      - '1=1--'
+      - ''' OR 1=1'
+      - 'admin''--'
+      - 'SLEEP('
+      - 'BENCHMARK('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

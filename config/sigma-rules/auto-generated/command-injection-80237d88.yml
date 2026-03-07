@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report exploitdb:42354]"
+id: 80237d88-eab3-4ea0-bf16-22fcf8376cdd
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: ExploitDB #42354: Microsoft Internet Explorer - 'mshtml.dll' Remote Code Execution (MS17-007)"
+  Source report: ExploitDB #42354: Microsoft Internet Explorer - 'mshtml.dll' Remote Code Execution (MS17-007) (exploitdb:42354)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:42354
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

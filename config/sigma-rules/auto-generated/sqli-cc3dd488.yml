@@ -1,0 +1,32 @@
+title: "Potential SQL Injection Attempt [Report exploitdb:21546]"
+id: cc3dd488-d012-4b9a-a57d-0bc964069c2c
+status: experimental
+description: |
+  "Potential SQLi attack detected. Auto-generated from HackerOne report: ExploitDB #21546: Trend Micro Control Manager 5.5/6.0 AdHocQuery - (Authenticated) Blind SQL Injection"
+  Source report: ExploitDB #21546: Trend Micro Control Manager 5.5/6.0 AdHocQuery - (Authenticated) Blind SQL Injection (exploitdb:21546)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:21546
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - ''' OR ''1''=''1'
+      - 'UNION SELECT'
+      - '''; DROP'
+      - '1=1--'
+      - ''' OR 1=1'
+      - 'admin''--'
+      - 'SLEEP('
+      - 'BENCHMARK('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

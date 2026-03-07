@@ -1,0 +1,33 @@
+title: "Potential Directory/Path Traversal Attempt [Report github-advisory:GHSA-w75w-9qv4-j5xj]"
+id: 51153e8b-3446-471e-b194-2bfbebec3092
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: dbt-common's commonprefix() doesn't protect against path traversal"
+  Source report: dbt-common's commonprefix() doesn't protect against path traversal (github-advisory:GHSA-w75w-9qv4-j5xj)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-29790
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+  - cwe.22
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: low

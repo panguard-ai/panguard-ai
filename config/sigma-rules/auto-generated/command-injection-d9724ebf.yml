@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2023-7101]"
+id: d9724ebf-3412-4299-939e-0ebf90a67d3a
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Spreadsheet::ParseExcel Remote Code Execution Vulnerability"
+  Source report: Spreadsheet::ParseExcel Remote Code Execution Vulnerability (cisa-kev:CVE-2023-7101)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2023-7101
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

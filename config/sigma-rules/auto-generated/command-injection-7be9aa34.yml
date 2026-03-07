@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report exploitdb:11615]"
+id: 7be9aa34-9596-4d34-8c5f-5435390c5686
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: ExploitDB #11615: Microsoft Internet Explorer 6/7/8 - 'winhlp32.exe MsgBox()' Remote Code Execution"
+  Source report: ExploitDB #11615: Microsoft Internet Explorer 6/7/8 - 'winhlp32.exe MsgBox()' Remote Code Execution (exploitdb:11615)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:11615
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

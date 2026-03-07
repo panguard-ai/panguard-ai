@@ -1,0 +1,33 @@
+title: "Potential Directory/Path Traversal Attempt [Report github-advisory:GHSA-36h3-7c54-j27r]"
+id: 59d3dc24-9898-4f7f-94e3-c4ae35e8be35
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: OpenClaw has browser trace/download path symlink escape in temp output handling"
+  Source report: OpenClaw has browser trace/download path symlink escape in temp output handling (github-advisory:GHSA-36h3-7c54-j27r)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-36h3-7c54-j27r
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+  - cwe.22
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

@@ -1,0 +1,32 @@
+title: "Potential Directory/Path Traversal Attempt [Report cisa-kev:CVE-2021-41277]"
+id: fdf57346-7bbb-4f6c-b7b2-c67edf58d1cf
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: Metabase GeoJSON API Local File Inclusion Vulnerability"
+  Source report: Metabase GeoJSON API Local File Inclusion Vulnerability (cisa-kev:CVE-2021-41277)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2021-41277
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

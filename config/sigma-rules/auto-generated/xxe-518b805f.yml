@@ -1,0 +1,28 @@
+title: "Potential XML External Entity (XXE) Injection [Report exploitdb:39909]"
+id: 518b805f-5bf1-4b11-9d5e-22b7c21f3763
+status: experimental
+description: |
+  "Potential XXE attack detected. Auto-generated from HackerOne report: ExploitDB #39909: Dell OpenManage Server Administrator 8.3 - XML External Entity"
+  Source report: ExploitDB #39909: Dell OpenManage Server Administrator 8.3 - XML External Entity (exploitdb:39909)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:39909
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-body|contains:
+      - '<!ENTITY'
+      - '<!DOCTYPE'
+      - 'SYSTEM "file:'
+      - 'SYSTEM "http:'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

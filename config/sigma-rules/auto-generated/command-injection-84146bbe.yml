@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2020-14644]"
+id: 84146bbe-f148-45db-8216-621f9529272c
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Oracle WebLogic Server Remote Code Execution Vulnerability"
+  Source report: Oracle WebLogic Server Remote Code Execution Vulnerability (cisa-kev:CVE-2020-14644)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2020-14644
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

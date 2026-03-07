@@ -1,0 +1,32 @@
+title: "Potential Directory/Path Traversal Attempt [Report cisa-kev:CVE-2024-8963]"
+id: 8ddf496b-6c5c-4df2-a775-bd5c630d63e2
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: Ivanti Cloud Services Appliance (CSA) Path Traversal Vulnerability"
+  Source report: Ivanti Cloud Services Appliance (CSA) Path Traversal Vulnerability (cisa-kev:CVE-2024-8963)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-8963
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

@@ -1,0 +1,28 @@
+title: "Potential XML External Entity (XXE) Injection [Report exploitdb:43103]"
+id: 115dfd46-06e9-40e2-86de-0e7b8153f2c1
+status: experimental
+description: |
+  "Potential XXE attack detected. Auto-generated from HackerOne report: ExploitDB #43103: Oracle Java SE - Web Start jnlp XML External Entity Processing Information Disclosure"
+  Source report: ExploitDB #43103: Oracle Java SE - Web Start jnlp XML External Entity Processing Information Disclosure (exploitdb:43103)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:43103
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-body|contains:
+      - '<!ENTITY'
+      - '<!DOCTYPE'
+      - 'SYSTEM "file:'
+      - 'SYSTEM "http:'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

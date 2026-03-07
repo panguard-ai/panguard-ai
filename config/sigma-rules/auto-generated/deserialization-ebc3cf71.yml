@@ -1,0 +1,30 @@
+title: "Potential Insecure Deserialization Attack [Report cisa-kev:CVE-2024-38094]"
+id: ebc3cf71-a45f-4ef8-8589-e9a95b2929f1
+status: experimental
+description: |
+  "Potential Deserialization attack detected. Auto-generated from HackerOne report: Microsoft SharePoint Deserialization Vulnerability"
+  Source report: Microsoft SharePoint Deserialization Vulnerability (cisa-kev:CVE-2024-38094)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-38094
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: application
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'rO0AB'
+      - 'aced0005'
+      - 'O:4:'
+      - 'a:2:{'
+      - '__reduce__'
+      - 'pickle.loads'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

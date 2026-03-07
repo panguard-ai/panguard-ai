@@ -1,0 +1,33 @@
+title: "Potential Code Injection Attack [Report github-advisory:GHSA-75g8-rv7v-32f7]"
+id: 4a75e716-3416-4f71-aa79-ac6cfdc628d5
+status: experimental
+description: |
+  "Potential Code Injection attack detected. Auto-generated from HackerOne report: n8n has Unauthenticated Expression Evaluation via Form Node"
+  Source report: n8n has Unauthenticated Expression Evaluation via Form Node (github-advisory:GHSA-75g8-rv7v-32f7)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27493
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.94
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'eval('
+      - 'exec('
+      - 'system('
+      - '__import__'
+      - 'Runtime.getRuntime()'
+      - 'Process'
+      - 'spawn('
+      - 'require('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

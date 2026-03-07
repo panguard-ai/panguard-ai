@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-2mc2-g238-722j]"
+id: 2f00759d-2b93-46a6-a318-6c30ba18c666
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: OpenClaw affected by iMessage remote attachment SCP hardening (strict host-key checks and remoteHost validation)"
+  Source report: OpenClaw affected by iMessage remote attachment SCP hardening (strict host-key checks and remoteHost validation) (github-advisory:GHSA-2mc2-g238-722j)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-2mc2-g238-722j
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.78
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

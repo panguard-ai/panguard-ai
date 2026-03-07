@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-v53h-f6m7-xcgm]"
+id: a58e9280-80c0-4514-86b6-5d225a51b9c4
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Black's vulnerable version parsing leads to RCE in GitHub Action"
+  Source report: Black's vulnerable version parsing leads to RCE in GitHub Action (github-advisory:GHSA-v53h-f6m7-xcgm)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-v53h-f6m7-xcgm
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.20
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

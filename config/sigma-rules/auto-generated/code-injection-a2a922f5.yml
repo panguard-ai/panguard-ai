@@ -1,0 +1,33 @@
+title: "Potential Code Injection Attack [Report github-advisory:GHSA-h343-gg57-2q67]"
+id: a2a922f5-e372-4044-8cbd-3045590e174c
+status: experimental
+description: |
+  "Potential Code Injection attack detected. Auto-generated from HackerOne report: OneUpTime's Unsandboxed Code Execution in Probe Allows Any Project Member to Achieve RCE"
+  Source report: OneUpTime's Unsandboxed Code Execution in Probe Allows Any Project Member to Achieve RCE (github-advisory:GHSA-h343-gg57-2q67)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-h343-gg57-2q67
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.94
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'eval('
+      - 'exec('
+      - 'system('
+      - '__import__'
+      - 'Runtime.getRuntime()'
+      - 'Process'
+      - 'spawn('
+      - 'require('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

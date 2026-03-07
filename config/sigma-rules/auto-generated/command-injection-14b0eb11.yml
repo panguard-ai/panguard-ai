@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-gv46-4xfq-jv58]"
+id: 14b0eb11-f616-47f7-8aab-e899219b338b
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: OpenClaw Vulnerable to Remote Code Execution via Node Invoke Approval Bypass in Gateway"
+  Source report: OpenClaw Vulnerable to Remote Code Execution via Node Invoke Approval Bypass in Gateway (github-advisory:GHSA-gv46-4xfq-jv58)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28466
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.20
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

@@ -1,0 +1,30 @@
+title: "Potential Insecure Deserialization Attack [Report cisa-kev:CVE-2025-23006]"
+id: 4c88f42c-3603-4721-9c64-7de9225ba5ac
+status: experimental
+description: |
+  "Potential Deserialization attack detected. Auto-generated from HackerOne report: SonicWall SMA1000 Appliances Deserialization Vulnerability"
+  Source report: SonicWall SMA1000 Appliances Deserialization Vulnerability (cisa-kev:CVE-2025-23006)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-23006
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: application
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'rO0AB'
+      - 'aced0005'
+      - 'O:4:'
+      - 'a:2:{'
+      - '__reduce__'
+      - 'pickle.loads'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

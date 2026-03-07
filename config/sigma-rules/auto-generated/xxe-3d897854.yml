@@ -1,0 +1,28 @@
+title: "Potential XML External Entity (XXE) Injection [Report exploitdb:47526]"
+id: 3d897854-903e-4845-bd82-0ee75442d80f
+status: experimental
+description: |
+  "Potential XXE attack detected. Auto-generated from HackerOne report: ExploitDB #47526: Winrar 5.80 - XML External Entity Injection"
+  Source report: ExploitDB #47526: Winrar 5.80 - XML External Entity Injection (exploitdb:47526)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:47526
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-body|contains:
+      - '<!ENTITY'
+      - '<!DOCTYPE'
+      - 'SYSTEM "file:'
+      - 'SYSTEM "http:'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

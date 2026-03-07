@@ -1,0 +1,33 @@
+title: "Potential Directory/Path Traversal Attempt [Report github-advisory:GHSA-v892-hwpg-jwqp]"
+id: eb1ee0b9-3042-48fc-84d7-6e0ce3e86eb0
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: OpenClaw vulnerable to path traversal (Zip Slip) in archive extraction during explicit installation commands"
+  Source report: OpenClaw vulnerable to path traversal (Zip Slip) in archive extraction during explicit installation commands (github-advisory:GHSA-v892-hwpg-jwqp)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28486
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+  - cwe.22
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

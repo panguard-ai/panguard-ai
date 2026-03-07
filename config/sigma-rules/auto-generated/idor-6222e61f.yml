@@ -1,0 +1,30 @@
+title: "Potential Insecure Direct Object Reference [Report github-advisory:GHSA-jxm3-pmm2-9gf6]"
+id: 6222e61f-9bb0-4e17-a2a4-528b063d7c1e
+status: experimental
+description: |
+  "Potential IDOR attack detected. Auto-generated from HackerOne report: Craft CMS has Permission Bypass and IDOR in Duplicate Entry Action"
+  Source report: Craft CMS has Permission Bypass and IDOR in Duplicate Entry Action (github-advisory:GHSA-jxm3-pmm2-9gf6)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28782
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.639
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/users/'
+      - '/account/'
+      - '/profile/'
+      - '/order/'
+      - '/api/v'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

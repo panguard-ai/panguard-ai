@@ -1,0 +1,39 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report github-advisory:GHSA-6865-qjcf-286f]"
+id: 01606bc8-6047-4b97-9132-e576a934b3c1
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: SiYuan: Unauthenticated Reflected XSS via SVG Injection in /api/icon/getDynamicIcon Endpoint"
+  Source report: SiYuan: Unauthenticated Reflected XSS via SVG Injection in /api/icon/getDynamicIcon Endpoint (github-advisory:GHSA-6865-qjcf-286f)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-29183
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - cwe.79
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

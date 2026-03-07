@@ -1,0 +1,28 @@
+title: "Potential XML External Entity (XXE) Injection [Report exploitdb:48422]"
+id: 408fd30e-9fdd-426a-9645-18232758089a
+status: experimental
+description: |
+  "Potential XXE attack detected. Auto-generated from HackerOne report: ExploitDB #48422: BlogEngine 3.3 - 'syndication.axd' XML External Entity Injection"
+  Source report: ExploitDB #48422: BlogEngine 3.3 - 'syndication.axd' XML External Entity Injection (exploitdb:48422)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:48422
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-body|contains:
+      - '<!ENTITY'
+      - '<!DOCTYPE'
+      - 'SYSTEM "file:'
+      - 'SYSTEM "http:'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

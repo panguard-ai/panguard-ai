@@ -1,0 +1,37 @@
+title: Potential OS Command Injection (CVE-1999-0043)
+id: 4934a48a-0d8b-44f5-88b3-c0be5ab83f80
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: CVE-1999-0043"
+  Related vulnerabilities: CVE-1999-0043
+  Source report: CVE-1999-0043 (nvd:CVE-1999-0043)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-1999-0043
+  - https://nvd.nist.gov/vuln/detail/CVE-1999-0043
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.78
+  - cve.cve-1999-0043
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

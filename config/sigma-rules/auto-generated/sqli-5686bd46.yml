@@ -1,0 +1,33 @@
+title: "Potential SQL Injection Attempt [Report github-advisory:GHSA-r5j5-q42h-fc93]"
+id: 5686bd46-8bbb-419a-b6fe-7ad73891dc49
+status: experimental
+description: |
+  "Potential SQLi attack detected. Auto-generated from HackerOne report: Mautic is Vulnerable to SQL Injection through Contact Activity API Sorting"
+  Source report: Mautic is Vulnerable to SQL Injection through Contact Activity API Sorting (github-advisory:GHSA-r5j5-q42h-fc93)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-3105
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - cwe.89
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - ''' OR ''1''=''1'
+      - 'UNION SELECT'
+      - '''; DROP'
+      - '1=1--'
+      - ''' OR 1=1'
+      - 'admin''--'
+      - 'SLEEP('
+      - 'BENCHMARK('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

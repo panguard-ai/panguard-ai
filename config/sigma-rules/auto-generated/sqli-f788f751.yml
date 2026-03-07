@@ -1,0 +1,33 @@
+title: "Potential SQL Injection Attempt [Report github-advisory:GHSA-45rp-9p97-h852]"
+id: f788f751-c3cf-4d76-80fa-b4e2f6ce5989
+status: experimental
+description: |
+  "Potential SQLi attack detected. Auto-generated from HackerOne report: NocoDB Vulnerable to SQL Injection via DATEADD Formula"
+  Source report: NocoDB Vulnerable to SQL Injection via DATEADD Formula (github-advisory:GHSA-45rp-9p97-h852)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28399
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - cwe.89
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - ''' OR ''1''=''1'
+      - 'UNION SELECT'
+      - '''; DROP'
+      - '1=1--'
+      - ''' OR 1=1'
+      - 'admin''--'
+      - 'SLEEP('
+      - 'BENCHMARK('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

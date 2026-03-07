@@ -1,0 +1,28 @@
+title: "Potential XML External Entity (XXE) Injection [Report exploitdb:45146]"
+id: abec61f4-f56a-46ff-9a05-dcb1186e11fa
+status: experimental
+description: |
+  "Potential XXE attack detected. Auto-generated from HackerOne report: ExploitDB #45146: Plex Media Server 1.13.2.5154 - SSDP Processing XML External Entity Injection"
+  Source report: ExploitDB #45146: Plex Media Server 1.13.2.5154 - SSDP Processing XML External Entity Injection (exploitdb:45146)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:45146
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-body|contains:
+      - '<!ENTITY'
+      - '<!DOCTYPE'
+      - 'SYSTEM "file:'
+      - 'SYSTEM "http:'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

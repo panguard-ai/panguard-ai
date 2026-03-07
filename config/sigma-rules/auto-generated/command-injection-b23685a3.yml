@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-cgc2-rcrh-qr5x]"
+id: b23685a3-7f25-4f9c-9875-d2889e15b70f
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Ghost Vulnerable to Remote Code Execution via Malicious Themes"
+  Source report: Ghost Vulnerable to Remote Code Execution via Malicious Themes (github-advisory:GHSA-cgc2-rcrh-qr5x)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-29053
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.74
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

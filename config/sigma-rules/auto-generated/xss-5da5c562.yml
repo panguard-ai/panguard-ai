@@ -1,0 +1,39 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report github-advisory:GHSA-qgvg-pr8v-6rr3]"
+id: 5da5c562-86bb-40f6-8206-c2e7c75add6f
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: Svelte: XSS via HTML Comment Injection in SSR Error Boundary Hydration Markers"
+  Source report: Svelte: XSS via HTML Comment Injection in SSR Error Boundary Hydration Markers (github-advisory:GHSA-qgvg-pr8v-6rr3)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27902
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - cwe.79
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

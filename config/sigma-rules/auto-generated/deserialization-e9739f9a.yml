@@ -1,0 +1,31 @@
+title: "Potential Insecure Deserialization Attack [Report github-advisory:GHSA-m272-9rp6-32mc]"
+id: e9739f9a-4aed-40ac-b71a-bd518e3b17f7
+status: experimental
+description: |
+  "Potential Deserialization attack detected. Auto-generated from HackerOne report: `@orpc/client` has Prototype Pollution via `StandardRPCJsonSerializer` Deserialization"
+  Source report: `@orpc/client` has Prototype Pollution via `StandardRPCJsonSerializer` Deserialization (github-advisory:GHSA-m272-9rp6-32mc)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28794
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.1321
+logsource:
+  category: application
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'rO0AB'
+      - 'aced0005'
+      - 'O:4:'
+      - 'a:2:{'
+      - '__reduce__'
+      - 'pickle.loads'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

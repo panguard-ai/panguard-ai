@@ -1,44 +1,44 @@
 {
-  "generatedAt": "2026-03-07T18:09:41.910Z",
-  "inputRecords": 1800,
-  "convertedToReports": 1000,
-  "skipped": 800,
-  "sigmaRules": 13,
-  "yaraRules": 229,
+  "generatedAt": "2026-03-07T22:03:30.381Z",
+  "inputRecords": 6919,
+  "convertedToReports": 3503,
+  "skipped": 3416,
+  "sigmaRules": 567,
+  "yaraRules": 777,
   "sigmaByAttackType": {
-    "Command Injection": 1,
-    "Code Injection": 1,
-    "Path Traversal": 1,
-    "Auth Bypass": 1,
-    "Deserialization": 1,
-    "XSS": 1,
-    "SSRF": 1,
-    "File Upload": 1,
-    "SQLi": 1,
-    "Information Disclosure": 1,
-    "XXE": 1,
-    "IDOR": 1,
-    "Open Redirect": 1
+    "Command Injection": 134,
+    "Code Injection": 12,
+    "Path Traversal": 90,
+    "Auth Bypass": 48,
+    "Deserialization": 31,
+    "XSS": 79,
+    "SSRF": 31,
+    "File Upload": 12,
+    "SQLi": 37,
+    "Information Disclosure": 34,
+    "XXE": 37,
+    "IDOR": 18,
+    "Open Redirect": 4
   },
   "yaraByAttackType": {
-    "Command Injection": 55,
-    "Code Injection": 4,
-    "Path Traversal": 28,
-    "Auth Bypass": 20,
-    "Deserialization": 13,
-    "XSS": 31,
-    "SSRF": 16,
-    "File Upload": 5,
-    "SQLi": 9,
-    "Information Disclosure": 12,
-    "XXE": 36
+    "Command Injection": 190,
+    "Code Injection": 16,
+    "Path Traversal": 120,
+    "Auth Bypass": 68,
+    "Deserialization": 44,
+    "XSS": 110,
+    "SSRF": 47,
+    "File Upload": 17,
+    "SQLi": 46,
+    "Information Disclosure": 46,
+    "XXE": 73
   },
   "sigmaByStatus": {
-    "experimental": 11,
-    "draft": 2
+    "experimental": 339,
+    "draft": 228
   },
   "yaraByStatus": {
-    "experimental": 135,
-    "draft": 94
+    "experimental": 469,
+    "draft": 308
   }
 }

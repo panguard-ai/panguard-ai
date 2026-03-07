@@ -1,0 +1,36 @@
+title: Potential Code Injection Attack (CVE-1999-0509)
+id: 0b4ed6f6-a587-4309-860c-0cfa96c401be
+status: experimental
+description: |
+  "Potential Code Injection attack detected. Auto-generated from HackerOne report: CVE-1999-0509"
+  Related vulnerabilities: CVE-1999-0509
+  Source report: CVE-1999-0509 (nvd:CVE-1999-0509)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-1999-0509
+  - https://nvd.nist.gov/vuln/detail/CVE-1999-0509
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.94
+  - cve.cve-1999-0509
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'eval('
+      - 'exec('
+      - 'system('
+      - '__import__'
+      - 'Runtime.getRuntime()'
+      - 'Process'
+      - 'spawn('
+      - 'require('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

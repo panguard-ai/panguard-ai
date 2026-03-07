@@ -1,0 +1,39 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report github-advisory:GHSA-r294-2894-92j3]"
+id: 5138d9af-f859-4d19-93c2-4288ae43c177
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: OpenClaw has stored XSS in exported session HTML viewer via markdown/raw-HTML rendering"
+  Source report: OpenClaw has stored XSS in exported session HTML viewer via markdown/raw-HTML rendering (github-advisory:GHSA-r294-2894-92j3)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-r294-2894-92j3
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - cwe.79
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

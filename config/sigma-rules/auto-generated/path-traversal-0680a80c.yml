@@ -1,0 +1,33 @@
+title: "Potential Directory/Path Traversal Attempt [Report github-advisory:GHSA-phwh-4f42-gwf3]"
+id: 0680a80c-ba8f-4359-a4f9-4b57da08cb3f
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: Beszel: Docker API has a Path Traversal Vulnerability via Unsanitized Container ID"
+  Source report: Beszel: Docker API has a Path Traversal Vulnerability via Unsanitized Container ID (github-advisory:GHSA-phwh-4f42-gwf3)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27734
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+  - cwe.22
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

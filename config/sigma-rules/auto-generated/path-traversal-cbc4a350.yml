@@ -1,0 +1,32 @@
+title: "Potential Directory/Path Traversal Attempt [Report cisa-kev:CVE-2023-38950]"
+id: cbc4a350-a741-406c-b4f9-b1dcc000a07f
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: ZKTeco BioTime Path Traversal Vulnerability"
+  Source report: ZKTeco BioTime Path Traversal Vulnerability (cisa-kev:CVE-2023-38950)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2023-38950
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

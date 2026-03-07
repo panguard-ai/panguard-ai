@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-v47q-jxvr-p68x]"
+id: d20ff181-7903-460c-98ce-08008526e22f
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Craft CMS Vulnerable to Authenticated RCE via \"craft.app.fs.write()\" in Twig Templates"
+  Source report: Craft CMS Vulnerable to Authenticated RCE via "craft.app.fs.write()" in Twig Templates (github-advisory:GHSA-v47q-jxvr-p68x)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28697
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.1336
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

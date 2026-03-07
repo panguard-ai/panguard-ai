@@ -1,0 +1,35 @@
+title: "Potential SSRF via Internal Network Access [Report github-advisory:GHSA-p2v6-84h2-5x4r]"
+id: 9f94f916-0137-43ab-b6d3-db4f7957bf23
+status: experimental
+description: |
+  "Potential SSRF attack detected. Auto-generated from HackerOne report: esm.sh has SSRF localhost/private-network bypass in `/http(s)` module route"
+  Source report: esm.sh has SSRF localhost/private-network bypass in `/http(s)` module route (github-advisory:GHSA-p2v6-84h2-5x4r)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27730
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - attack.command_and_control
+  - attack.t1071
+  - cwe.918
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '127.0.0.1'
+      - 'localhost'
+      - '169.254.169.254'
+      - '10.0.'
+      - '172.16.'
+      - '192.168.'
+      - '0.0.0.0'
+      - '[::1]'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

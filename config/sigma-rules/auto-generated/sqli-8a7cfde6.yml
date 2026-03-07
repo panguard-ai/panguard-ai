@@ -1,0 +1,32 @@
+title: "Potential SQL Injection Attempt [Report exploitdb:45266]"
+id: 8a7cfde6-82aa-4658-b8c4-155f5aab513a
+status: experimental
+description: |
+  "Potential SQLi attack detected. Auto-generated from HackerOne report: ExploitDB #45266: Sentrifugo HRMS 3.2 - 'deptid' SQL Injection"
+  Source report: ExploitDB #45266: Sentrifugo HRMS 3.2 - 'deptid' SQL Injection (exploitdb:45266)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:45266
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - ''' OR ''1''=''1'
+      - 'UNION SELECT'
+      - '''; DROP'
+      - '1=1--'
+      - ''' OR 1=1'
+      - 'admin''--'
+      - 'SLEEP('
+      - 'BENCHMARK('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

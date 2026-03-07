@@ -1,0 +1,29 @@
+title: "Potential Authentication Bypass Attempt [Report cisa-kev:CVE-2025-2747]"
+id: d11c2adf-682a-411c-8862-47365b365b7b
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: Kentico Xperience CMS Authentication Bypass Using an Alternate Path or Channel Vulnerability"
+  Source report: Kentico Xperience CMS Authentication Bypass Using an Alternate Path or Channel Vulnerability (cisa-kev:CVE-2025-2747)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-2747
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

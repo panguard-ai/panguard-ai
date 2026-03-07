@@ -1,0 +1,33 @@
+title: "Potential Directory/Path Traversal Attempt [Report github-advisory:GHSA-xmv6-r34m-62p4]"
+id: d6d9ef47-2f2d-421f-8bee-a6d2d48e2a2d
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: OpenClaw: Sandbox media fallback tmp symlink alias bypass allows host file reads outside sandboxRoot"
+  Source report: OpenClaw: Sandbox media fallback tmp symlink alias bypass allows host file reads outside sandboxRoot (github-advisory:GHSA-xmv6-r34m-62p4)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-xmv6-r34m-62p4
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+  - cwe.22
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

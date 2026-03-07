@@ -1,0 +1,34 @@
+title: Potential Information Disclosure Attack (CVE-1999-0059)
+id: 34ea3e0d-a12b-4c3f-b435-ae53844ed083
+status: experimental
+description: |
+  "Potential Information Disclosure attack detected. Auto-generated from HackerOne report: CVE-1999-0059"
+  Related vulnerabilities: CVE-1999-0059
+  Source report: CVE-1999-0059 (nvd:CVE-1999-0059)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-1999-0059
+  - https://nvd.nist.gov/vuln/detail/CVE-1999-0059
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1082
+  - cwe.200
+  - cve.cve-1999-0059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '.env'
+      - '.git/'
+      - 'phpinfo'
+      - '/debug/'
+      - '/actuator'
+      - '/.well-known'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

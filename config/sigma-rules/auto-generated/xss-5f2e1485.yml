@@ -1,0 +1,39 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report github-advisory:GHSA-rcph-x7mj-54mm]"
+id: 5f2e1485-7551-46cc-b84f-560950b5d941
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: NocoDB Vulnerable to Stored Cross-site Scripting via Comments"
+  Source report: NocoDB Vulnerable to Stored Cross-site Scripting via Comments (github-advisory:GHSA-rcph-x7mj-54mm)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28397
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - cwe.79
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

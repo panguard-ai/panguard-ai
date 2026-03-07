@@ -1,0 +1,31 @@
+title: "Potential Information Disclosure Attack [Report github-advisory:GHSA-jc5m-wrp2-qq38]"
+id: f933d96b-0001-4da1-91dc-f9f13e334ab0
+status: experimental
+description: |
+  "Potential Information Disclosure attack detected. Auto-generated from HackerOne report: Flowise Vulnerable to PII Disclosure on Unauthenticated Forgot Password Endpoint"
+  Source report: Flowise Vulnerable to PII Disclosure on Unauthenticated Forgot Password Endpoint (github-advisory:GHSA-jc5m-wrp2-qq38)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-jc5m-wrp2-qq38
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1082
+  - cwe.200
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '.env'
+      - '.git/'
+      - 'phpinfo'
+      - '/debug/'
+      - '/actuator'
+      - '/.well-known'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

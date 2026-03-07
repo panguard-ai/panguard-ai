@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2023-49897]"
+id: 606d29b9-6107-47fa-9795-e1ce8a5de689
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: FXC AE1021, AE1021PE OS Command Injection Vulnerability"
+  Source report: FXC AE1021, AE1021PE OS Command Injection Vulnerability (cisa-kev:CVE-2023-49897)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2023-49897
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

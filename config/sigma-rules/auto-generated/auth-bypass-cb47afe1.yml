@@ -1,0 +1,30 @@
+title: "Potential Authentication Bypass Attempt [Report github-advisory:GHSA-gjjc-pcwp-c74m]"
+id: cb47afe1-a503-4508-aaa9-580ba6853d4d
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: OneUptime has WebAuthn 2FA bypass: server accepts client-supplied challenge instead of server-stored value, allowing credential replay"
+  Source report: OneUptime has WebAuthn 2FA bypass: server accepts client-supplied challenge instead of server-stored value, allowing credential replay (github-advisory:GHSA-gjjc-pcwp-c74m)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28787
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.287
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

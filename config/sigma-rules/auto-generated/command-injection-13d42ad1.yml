@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report exploitdb:42089]"
+id: 13d42ad1-05e3-416d-a0df-1a1d86e42867
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: ExploitDB #42089: Trend Micro Deep Security 6.5 - XML External Entity Injection / Local Privilege Escalation / Remote Code Execution"
+  Source report: ExploitDB #42089: Trend Micro Deep Security 6.5 - XML External Entity Injection / Local Privilege Escalation / Remote Code Execution (exploitdb:42089)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:42089
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

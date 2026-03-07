@@ -1,0 +1,33 @@
+title: "Potential Directory/Path Traversal Attempt [Report github-advisory:GHSA-j273-m5qq-6825]"
+id: a195f003-3ad9-49bf-890e-06becd76180d
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: Junrar has an arbitrary file write due to backslash Path Traversal bypass in LocalFolderExtractor on Linux/Unix"
+  Source report: Junrar has an arbitrary file write due to backslash Path Traversal bypass in LocalFolderExtractor on Linux/Unix (github-advisory:GHSA-j273-m5qq-6825)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28208
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+  - cwe.22
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

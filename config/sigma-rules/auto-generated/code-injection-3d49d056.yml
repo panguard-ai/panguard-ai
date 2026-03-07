@@ -1,0 +1,33 @@
+title: "Potential Code Injection Attack [Report github-advisory:GHSA-jjpj-p2wh-qf23]"
+id: 3d49d056-aec9-4bce-ad1b-5d2f8152bffb
+status: experimental
+description: |
+  "Potential Code Injection attack detected. Auto-generated from HackerOne report: n8n has a Sandbox Escape in its JavaScript Task Runner"
+  Source report: n8n has a Sandbox Escape in its JavaScript Task Runner (github-advisory:GHSA-jjpj-p2wh-qf23)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27495
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.94
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'eval('
+      - 'exec('
+      - 'system('
+      - '__import__'
+      - 'Runtime.getRuntime()'
+      - 'Process'
+      - 'spawn('
+      - 'require('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

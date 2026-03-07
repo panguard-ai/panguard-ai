@@ -1,0 +1,30 @@
+title: "Potential Insecure Deserialization Attack [Report cisa-kev:CVE-2018-0824]"
+id: 96165540-d161-48ef-a17b-370ba8edc098
+status: experimental
+description: |
+  "Potential Deserialization attack detected. Auto-generated from HackerOne report: Microsoft COM for Windows Deserialization of Untrusted Data Vulnerability"
+  Source report: Microsoft COM for Windows Deserialization of Untrusted Data Vulnerability (cisa-kev:CVE-2018-0824)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2018-0824
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: application
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'rO0AB'
+      - 'aced0005'
+      - 'O:4:'
+      - 'a:2:{'
+      - '__reduce__'
+      - 'pickle.loads'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium
