@@ -49,7 +49,7 @@ export interface ThreatCloudConfig {
 }
 
 const THREAT_CLOUD_API_BASE =
-  process.env.NEXT_PUBLIC_THREAT_CLOUD_URL || 'https://threatcloud.panguard.ai/v1';
+  process.env.NEXT_PUBLIC_THREAT_CLOUD_URL || 'https://tc.panguard.ai/api';
 
 export const DEFAULT_THREAT_CLOUD_CONFIG: ThreatCloudConfig = {
   version: '1.0.0',
