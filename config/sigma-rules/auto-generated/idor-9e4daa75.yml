@@ -1,0 +1,29 @@
+title: Potential Insecure Direct Object Reference
+id: 9e4daa75-6075-4c3e-809b-d8289df0ef42
+status: experimental
+description: |
+  "Potential IDOR attack detected. Auto-generated from HackerOne report: IDOR to make someone attend or leave an event"
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://hackerone.com/reports/1734639
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.639
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/users/'
+      - '/account/'
+      - '/profile/'
+      - '/order/'
+      - '/api/v'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium
