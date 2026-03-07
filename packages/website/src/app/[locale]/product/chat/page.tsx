@@ -10,6 +10,11 @@ export async function generateMetadata({ params }: { params: { locale: string } 
     title: t('productChat.title'),
     description: t('productChat.description'),
     alternates: buildAlternates('/product/chat', params.locale),
+    openGraph: {
+      title: t('productChat.title'),
+      description: t('productChat.description'),
+      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    },
   };
 }
 

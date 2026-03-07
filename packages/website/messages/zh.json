@@ -4665,6 +4665,107 @@
           "desc": "查看可用的方案升級或開啟訂閱管理入口。"
         }
       }
+    },
+    "skillAuditorDocs": {
+      "breadcrumbDocs": "文件",
+      "breadcrumbSkillAuditor": "技能審計器",
+      "title": "技能審計器",
+      "subtitle": "AI 代理技能的自動化安全掃描器。在安裝任何技能之前，偵測提示注入、工具投毒、隱藏 Unicode 和憑證竊取。",
+      "quickStartTitle": "快速開始",
+      "codeTitle1": "安裝 Panguard",
+      "codeTitle2": "審計技能目錄",
+      "codeTitle3": "以 JSON 格式輸出審計結果（用於 CI/CD）",
+      "checksTitle": "7 項安全檢查",
+      "check1": {
+        "title": "1. 清單驗證",
+        "description": "驗證 SKILL.md 前置資料：必要欄位、有效 YAML、正確的中繼資料。格式錯誤的清單是惡意技能的第一個徵兆。"
+      },
+      "check2": {
+        "title": "2. 提示注入",
+        "description": "11 種正則表達式模式：「忽略先前指令」、身份覆寫、系統提示操控、越獄模式、隱藏 HTML 註解。"
+      },
+      "check3": {
+        "title": "3. 隱藏 Unicode",
+        "description": "零寬度字元 (U+200B-200F)、RTL 覆寫 (U+202A-202E) 以及同形字，隱藏人眼不可見的惡意指令。"
+      },
+      "check4": {
+        "title": "4. 編碼酬載",
+        "description": "擷取 Base64 區塊並解碼，檢查 eval()、exec()、subprocess、child_process、curl、wget 模式。"
+      },
+      "check5": {
+        "title": "5. 工具投毒",
+        "description": "權限提升 (sudo, chmod 777)、反向 Shell (nc -e, /dev/tcp/)、遠端程式碼執行 (curl|bash)、憑證竊取。"
+      },
+      "check6": {
+        "title": "6. 程式碼 SAST + 密鑰",
+        "description": "對技能目錄中所有檔案進行靜態分析。偵測硬編碼 API 金鑰、AWS 憑證、私鑰和常見漏洞。"
+      },
+      "check7": {
+        "title": "7. 權限與相依性",
+        "description": "交叉比對請求的權限與宣稱的用途。天氣技能要求檔案系統寫入權限？這是危險訊號。"
+      },
+      "riskScoringTitle": "風險評分",
+      "riskScoringDesc": "每個發現都有嚴重性權重。權重加總後上限為 100。",
+      "tableSeverity": "嚴重性",
+      "tableWeight": "權重",
+      "tableExample": "範例",
+      "severityCritical": "嚴重",
+      "severityHigh": "高",
+      "severityMedium": "中",
+      "severityLow": "低",
+      "exampleCritical": "反向 Shell、提示注入",
+      "exampleHigh": "權限提升、憑證竊取",
+      "exampleMedium": "可疑模式、模糊不清",
+      "exampleLow": "次要風格問題",
+      "riskLow": "LOW",
+      "riskMedium": "MEDIUM",
+      "riskHigh": "HIGH",
+      "riskCritical": "CRITICAL",
+      "actionLow": "可安全安裝",
+      "actionMedium": "審查發現",
+      "actionHigh": "人工審查",
+      "actionCritical": "請勿安裝",
+      "integrationTitle": "整合指南",
+      "cicdTitle": "CI/CD 管線閘門",
+      "cicdDesc": "自動阻止安裝高風險技能：",
+      "tsApiTitle": "TypeScript API",
+      "tsApiDesc": "在代理框架中以程式方式使用：",
+      "openclawTitle": "OpenClaw 安裝前掛鉤",
+      "openclawDesc": "新增至 OpenClaw 代理設定，在安裝每個技能前自動審計：",
+      "exampleOutputTitle": "範例輸出",
+      "safeSkillTitle": "安全技能",
+      "maliciousSkillTitle": "惡意技能",
+      "vsManualTitle": "Panguard 審計器 vs 人工審查",
+      "tableFeature": "功能",
+      "tableManual": "人工檢查表",
+      "tablePanguard": "Panguard 審計器",
+      "vsSpeed": "速度",
+      "vsSpeedManual": "每個技能數分鐘",
+      "vsConsistency": "一致性",
+      "vsConsistencyManual": "因審查人員而異",
+      "vsConsistencyPanguard": "確定性",
+      "vsUnicode": "隱藏 Unicode",
+      "vsUnicodeManual": "容易遺漏",
+      "vsUnicodePanguard": "自動偵測 15 個類別",
+      "vsBase64": "Base64 酬載",
+      "vsBase64Manual": "需手動解碼",
+      "vsBase64Panguard": "自動解碼 + 分析",
+      "vsSast": "程式碼 SAST",
+      "vsSastManual": "未包含",
+      "vsSastPanguard": "整合式掃描器",
+      "vsSecrets": "密鑰掃描",
+      "vsSecretsManual": "手動 grep",
+      "vsSecretsPanguard": "基於模式的偵測",
+      "vsRiskScore": "風險評分",
+      "vsRiskScoreManual": "主觀判斷",
+      "vsRiskScorePanguard": "量化 0-100",
+      "vsCicd": "CI/CD 就緒",
+      "vsCicdManual": "否",
+      "vsCicdPanguard": "JSON 輸出 + 退出碼",
+      "ctaTitle": "立即開始",
+      "ctaDesc": "安裝 Panguard，2 分鐘內開始審計技能。Community 方案永久免費。",
+      "ctaFullSetup": "完整設定指南",
+      "ctaBlogPost": "閱讀部落格文章"
     }
   },
   "changelog": {

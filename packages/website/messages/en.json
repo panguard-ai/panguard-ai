@@ -3817,6 +3817,107 @@
           "desc": "View available plan upgrades or open the subscription management portal."
         }
       }
+    },
+    "skillAuditorDocs": {
+      "breadcrumbDocs": "Docs",
+      "breadcrumbSkillAuditor": "Skill Auditor",
+      "title": "Skill Auditor",
+      "subtitle": "Automated security scanner for AI agent skills. Detect prompt injection, tool poisoning, hidden Unicode, and credential theft before installing any skill.",
+      "quickStartTitle": "Quick Start",
+      "codeTitle1": "Install Panguard",
+      "codeTitle2": "Audit a skill directory",
+      "codeTitle3": "Audit with JSON output (for CI/CD)",
+      "checksTitle": "7 Security Checks",
+      "check1": {
+        "title": "1. Manifest Validation",
+        "description": "Verifies SKILL.md frontmatter: required fields, valid YAML, proper metadata. Malformed manifests are the first sign of a malicious skill."
+      },
+      "check2": {
+        "title": "2. Prompt Injection",
+        "description": "11 regex patterns: \"ignore previous instructions\", identity override, system prompt manipulation, jailbreak patterns, hidden HTML comments."
+      },
+      "check3": {
+        "title": "3. Hidden Unicode",
+        "description": "Zero-width characters (U+200B-200F), RTL overrides (U+202A-202E), and homoglyphs that hide malicious instructions invisible to human readers."
+      },
+      "check4": {
+        "title": "4. Encoded Payloads",
+        "description": "Extracts Base64 blocks, decodes them, and checks for eval(), exec(), subprocess, child_process, curl, wget patterns."
+      },
+      "check5": {
+        "title": "5. Tool Poisoning",
+        "description": "Privilege escalation (sudo, chmod 777), reverse shells (nc -e, /dev/tcp/), remote code execution (curl|bash), credential theft."
+      },
+      "check6": {
+        "title": "6. Code SAST + Secrets",
+        "description": "Static analysis of all files in the skill directory. Detects hardcoded API keys, AWS credentials, private keys, and common vulnerabilities."
+      },
+      "check7": {
+        "title": "7. Permission & Dependency",
+        "description": "Cross-references requested permissions against stated purpose. A weather skill requesting filesystem write access? Red flag."
+      },
+      "riskScoringTitle": "Risk Scoring",
+      "riskScoringDesc": "Each finding carries a severity weight. Weights are summed and capped at 100.",
+      "tableSeverity": "Severity",
+      "tableWeight": "Weight",
+      "tableExample": "Example",
+      "severityCritical": "Critical",
+      "severityHigh": "High",
+      "severityMedium": "Medium",
+      "severityLow": "Low",
+      "exampleCritical": "Reverse shell, prompt injection",
+      "exampleHigh": "Privilege escalation, credential theft",
+      "exampleMedium": "Suspicious patterns, ambiguous",
+      "exampleLow": "Minor style issues",
+      "riskLow": "LOW",
+      "riskMedium": "MEDIUM",
+      "riskHigh": "HIGH",
+      "riskCritical": "CRITICAL",
+      "actionLow": "Safe to install",
+      "actionMedium": "Review findings",
+      "actionHigh": "Manual review",
+      "actionCritical": "Do NOT install",
+      "integrationTitle": "Integration Guide",
+      "cicdTitle": "CI/CD Pipeline Gate",
+      "cicdDesc": "Block installations of high-risk skills automatically:",
+      "tsApiTitle": "TypeScript API",
+      "tsApiDesc": "Use programmatically in your agent framework:",
+      "openclawTitle": "OpenClaw Pre-Install Hook",
+      "openclawDesc": "Add to your OpenClaw agent configuration to auto-audit every skill before installation:",
+      "exampleOutputTitle": "Example Output",
+      "safeSkillTitle": "Safe Skill",
+      "maliciousSkillTitle": "Malicious Skill",
+      "vsManualTitle": "Panguard Auditor vs Manual Vetting",
+      "tableFeature": "Feature",
+      "tableManual": "Manual Checklist",
+      "tablePanguard": "Panguard Auditor",
+      "vsSpeed": "Speed",
+      "vsSpeedManual": "Minutes per skill",
+      "vsConsistency": "Consistency",
+      "vsConsistencyManual": "Varies by reviewer",
+      "vsConsistencyPanguard": "Deterministic",
+      "vsUnicode": "Hidden Unicode",
+      "vsUnicodeManual": "Easy to miss",
+      "vsUnicodePanguard": "Auto-detect 15 categories",
+      "vsBase64": "Base64 payloads",
+      "vsBase64Manual": "Manual decode needed",
+      "vsBase64Panguard": "Auto-decode + analyze",
+      "vsSast": "Code SAST",
+      "vsSastManual": "Not included",
+      "vsSastPanguard": "Integrated scanner",
+      "vsSecrets": "Secrets scan",
+      "vsSecretsManual": "Manual grep",
+      "vsSecretsPanguard": "Pattern-based detection",
+      "vsRiskScore": "Risk score",
+      "vsRiskScoreManual": "Subjective",
+      "vsRiskScorePanguard": "Quantitative 0-100",
+      "vsCicd": "CI/CD ready",
+      "vsCicdManual": "No",
+      "vsCicdPanguard": "JSON output + exit codes",
+      "ctaTitle": "Get Started",
+      "ctaDesc": "Install Panguard and start auditing skills in under 2 minutes. Free forever on the Community plan.",
+      "ctaFullSetup": "Full Setup Guide",
+      "ctaBlogPost": "Read the Blog Post"
     }
   },
   "changelog": {

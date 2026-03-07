@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     title: 'Skill Auditor — Panguard AI',
     description:
       'Know before you install. Not after it\'s too late. Automated security scanning for AI agent skills.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
 };
 
