@@ -182,7 +182,7 @@ export default function CareersContent() {
       <SectionWrapper dark>
         <FadeInUp>
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-[clamp(28px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
+            <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
               {t('spontaneous.title')}
             </h2>
             <p className="text-text-secondary mt-4 leading-relaxed">

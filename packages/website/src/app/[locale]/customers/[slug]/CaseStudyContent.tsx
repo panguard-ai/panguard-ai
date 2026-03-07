@@ -122,7 +122,7 @@ export default function CaseStudyContent({ study }: { study: CaseStudy }) {
       <SectionWrapper dark>
         <div className="text-center">
           <FadeInUp>
-            <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary">
+            <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary">
               {t('similarResults')}
             </h2>
             <p className="text-text-secondary mt-4 max-w-xl mx-auto leading-relaxed">

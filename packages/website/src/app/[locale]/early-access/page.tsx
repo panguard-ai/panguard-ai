@@ -60,7 +60,7 @@ export default async function EarlyAccessPage({ params }: { params: { locale: st
         <SectionWrapper dark>
           <FadeInUp>
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-[clamp(28px,3.5vw,40px)] font-bold text-text-primary leading-[1.1] text-center">
+              <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary leading-[1.1] text-center">
                 {t('whatYouGet')}
               </h2>
 

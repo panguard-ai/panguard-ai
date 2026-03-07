@@ -272,7 +272,7 @@ export default function NavBar() {
             {/* Products accordion */}
             <button
               onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
-              className="flex items-center justify-between w-full py-3 text-sm text-text-secondary hover:text-text-primary"
+              className="flex items-center justify-between w-full py-3 min-h-[44px] text-sm text-text-secondary hover:text-text-primary"
               aria-expanded={mobileProductsOpen}
             >
               {t('product')}
@@ -286,7 +286,7 @@ export default function NavBar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block py-3 text-sm text-text-tertiary hover:text-text-primary"
+                    className="block py-3 min-h-[44px] text-sm text-text-tertiary hover:text-text-primary"
                     onClick={() => setMobileOpen(false)}
                   >
                     {item.label}
@@ -300,7 +300,7 @@ export default function NavBar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block py-3 text-sm text-text-secondary hover:text-text-primary"
+                className="block py-3 min-h-[44px] text-sm text-text-secondary hover:text-text-primary"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
@@ -311,7 +311,7 @@ export default function NavBar() {
               href="https://github.com/panguard-ai/panguard-ai"
               target="_blank"
               rel="noopener noreferrer"
-              className="block py-3 text-sm text-text-secondary hover:text-text-primary"
+              className="block py-3 min-h-[44px] text-sm text-text-secondary hover:text-text-primary"
               onClick={() => setMobileOpen(false)}
             >
               GitHub

@@ -53,7 +53,7 @@ export default function CompanyContent() {
   return (
     <>
       {/* ── Hero / Mission ── */}
-      <section className="relative min-h-[60vh] flex items-center px-4 sm:px-6 lg:px-[120px] py-16 sm:py-28 border-b border-border overflow-hidden">
+      <section className="relative min-h-[60vh] flex items-center px-5 sm:px-6 lg:px-[120px] py-16 sm:py-28 border-b border-border overflow-hidden">
         <div className="absolute top-1/4 left-1/3 w-[700px] h-[400px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative">
           <FadeInUp>
@@ -62,7 +62,7 @@ export default function CompanyContent() {
             </p>
           </FadeInUp>
           <FadeInUp delay={0.05}>
-            <h1 className="text-[clamp(36px,4.5vw,56px)] font-extrabold leading-[1.1] tracking-tight text-text-primary max-w-4xl">
+            <h1 className="text-[clamp(24px,4.5vw,56px)] font-extrabold leading-[1.1] tracking-tight text-text-primary max-w-4xl">
               {t('title')}
               <br />
               {t('titleLine2')}
@@ -191,7 +191,7 @@ export default function CompanyContent() {
         <div className="text-center">
           <FadeInUp>
             <EnterpriseIcon className="w-8 h-8 text-brand-sage mx-auto mb-4" />
-            <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary">
+            <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary">
               {t('cta.title')}
             </h2>
             <p className="text-text-secondary mt-4 max-w-xl mx-auto leading-relaxed">

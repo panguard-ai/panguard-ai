@@ -23,7 +23,7 @@ export default function Traction() {
     { label: t('traction.license'), value: STATS.license },
   ] as const;
   return (
-    <section className="bg-[#080808] px-4 sm:px-6 py-16 sm:py-24">
+    <section className="bg-[#080808] px-5 sm:px-6 py-16 sm:py-24">
       <div className="max-w-[1200px] mx-auto">
         {/* Title */}
         <FadeInUp>

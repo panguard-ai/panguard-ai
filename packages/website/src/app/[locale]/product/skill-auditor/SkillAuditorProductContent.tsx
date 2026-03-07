@@ -46,7 +46,7 @@ function CodeBlock({ code, title }: { code: string; title?: string }) {
           {title}
         </div>
       )}
-      <pre className="p-4 font-mono text-sm text-gray-300 overflow-x-auto whitespace-pre">
+      <pre className="p-3 sm:p-4 font-mono text-[11px] sm:text-sm text-gray-300 overflow-x-auto whitespace-pre leading-relaxed">
         {code}
       </pre>
       <button
@@ -117,7 +117,7 @@ export default function SkillAuditorProductContent() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative min-h-[60vh] flex items-center px-4 sm:px-6 lg:px-[120px] py-20 sm:py-32 border-b border-border overflow-hidden">
+      <section className="relative min-h-[60vh] flex items-center px-5 sm:px-6 lg:px-[120px] py-20 sm:py-32 border-b border-border overflow-hidden">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative text-center w-full">
           <FadeInUp>
@@ -127,7 +127,7 @@ export default function SkillAuditorProductContent() {
             </div>
           </FadeInUp>
           <FadeInUp delay={0.05}>
-            <h1 className="text-[clamp(32px,5vw,64px)] font-extrabold leading-[1.05] tracking-tight text-text-primary max-w-4xl mx-auto">
+            <h1 className="text-[clamp(24px,5vw,64px)] font-extrabold leading-[1.05] tracking-tight text-text-primary max-w-4xl mx-auto">
               {t('title')}
               <span className="text-brand-sage">{t('titleHighlight')}</span>
               {t('titleSuffix') && ` ${t('titleSuffix')}`}
@@ -184,7 +184,7 @@ Run with --json for machine-readable output.`}
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4">
               {t('problem.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3.5vw,44px)] font-bold text-text-primary leading-[1.1]">
+            <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1]">
               {t('problem.title')}
             </h2>
           </FadeInUp>
@@ -206,7 +206,7 @@ Run with --json for machine-readable output.`}
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4 text-center">
               {t('comparison.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center max-w-2xl mx-auto">
+            <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center max-w-2xl mx-auto">
               {t('comparison.title')}
             </h2>
             <p className="text-text-secondary mt-4 text-center max-w-xl mx-auto">
@@ -216,8 +216,8 @@ Run with --json for machine-readable output.`}
 
           {/* Desktop: table layout */}
           <FadeInUp delay={0.1}>
-            <div className="mt-10 overflow-x-auto -mx-4 px-4">
-              <div className="min-w-[560px] overflow-hidden rounded-2xl border border-border">
+            <div className="mt-10 overflow-x-auto -mx-4 px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="min-w-[420px] sm:min-w-[560px] overflow-hidden rounded-2xl border border-border">
                 {/* Table header */}
                 <div className="grid grid-cols-3 bg-surface-1/50">
                   <div className="p-3 sm:p-4 border-b border-r border-border" />
@@ -281,7 +281,7 @@ Run with --json for machine-readable output.`}
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4 text-center">
               {t('pillars.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center max-w-2xl mx-auto">
+            <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center max-w-2xl mx-auto">
               {t('pillars.title')}
             </h2>
           </FadeInUp>
@@ -337,7 +337,7 @@ Run with --json for machine-readable output.`}
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4 text-center">
               {t('checks.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center">
+            <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center">
               {t('checks.title')}
             </h2>
           </FadeInUp>
@@ -387,7 +387,7 @@ Run with --json for machine-readable output.`}
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4 text-center">
               {t('checks.layers.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center max-w-2xl mx-auto">
+            <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center max-w-2xl mx-auto">
               {t('checks.layers.title')}
             </h2>
           </FadeInUp>
@@ -426,7 +426,7 @@ Run with --json for machine-readable output.`}
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4 text-center">
               {t('riskScoring.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center">
+            <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center">
               {t('riskScoring.title')}
             </h2>
             <p className="text-text-secondary mt-4 text-center max-w-xl mx-auto">
@@ -460,7 +460,7 @@ Run with --json for machine-readable output.`}
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4 text-center">
               {t('workflows.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center">
+            <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center">
               {t('workflows.title')}
             </h2>
           </FadeInUp>
@@ -510,7 +510,7 @@ Run with --json for machine-readable output.`}
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4 text-center">
               {t('complementary.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center max-w-2xl mx-auto">
+            <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1] text-center max-w-2xl mx-auto">
               {t('complementary.title')}
             </h2>
             <p className="text-text-secondary mt-4 text-center max-w-xl mx-auto">
@@ -619,7 +619,7 @@ Run with --json for machine-readable output.`}
           </FadeInUp>
           <FadeInUp delay={0.1}>
             <div className="mt-12">
-              <h2 className="text-[clamp(28px,3.5vw,44px)] font-bold text-text-primary leading-[1.1]">
+              <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1]">
                 {t('cta.title')}
               </h2>
               <p className="text-text-secondary mt-4 text-lg">
