@@ -920,3 +920,5 @@
 {"timestamp":"2026-03-07T18:17:15.273Z","action":"rule_created","ruleType":"yara","ruleId":"panguard_information_disclosure_3463719","attackType":"Information Disclosure","confidence":75,"status":"experimental"}
 {"timestamp":"2026-03-07T18:17:15.273Z","action":"rule_created","ruleType":"yara","ruleId":"panguard_xss_3447021","attackType":"XSS","confidence":60,"status":"draft"}
 {"timestamp":"2026-03-07T18:17:15.286Z","action":"sync_complete","details":"4527 records, 13 sigma, 558 yara, 349 promoted, 356250ms"}
+{"timestamp":"2026-03-07T22:03:22.378Z","action":"data_ingested","details":"619 records from 3 sources"}
+{"timestamp":"2026-03-07T22:03:22.435Z","action":"sync_complete","details":"619 records, 0 sigma, 0 yara, 0 promoted, 222686ms"}

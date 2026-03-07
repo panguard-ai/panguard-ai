@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-5c6j-r48x-rmvq]"
+id: 547096cc-159c-4b9d-8208-4e9686624cc4
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Serialize JavaScript is Vulnerable to RCE via RegExp.flags and Date.prototype.toISOString()"
+  Source report: Serialize JavaScript is Vulnerable to RCE via RegExp.flags and Date.prototype.toISOString() (github-advisory:GHSA-5c6j-r48x-rmvq)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-5c6j-r48x-rmvq
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.96
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

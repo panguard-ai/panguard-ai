@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report exploitdb:17360]"
+id: e90bce79-21b1-4f86-b12e-e6ce026e32b5
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: ExploitDB #17360: WebSVN 2.3.2 - Unproper Metacharacters Escaping 'exec()' Remote Command Injection"
+  Source report: ExploitDB #17360: WebSVN 2.3.2 - Unproper Metacharacters Escaping 'exec()' Remote Command Injection (exploitdb:17360)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:17360
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

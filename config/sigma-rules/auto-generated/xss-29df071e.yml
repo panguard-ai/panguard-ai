@@ -1,0 +1,38 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report exploitdb:20063]"
+id: 29df071e-85e9-46a9-81f5-5500d4a0909f
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: ExploitDB #20063: SpiceWorks 5.3.75941 - Persistent Cross-Site Scripting / (Authenticated) SQL Injection"
+  Source report: ExploitDB #20063: SpiceWorks 5.3.75941 - Persistent Cross-Site Scripting / (Authenticated) SQL Injection (exploitdb:20063)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:20063
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

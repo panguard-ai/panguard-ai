@@ -1,0 +1,28 @@
+title: "Potential XML External Entity (XXE) Injection [Report cisa-kev:CVE-2025-2776]"
+id: a2c36fd6-aa9f-4290-bae6-661fa70a5fe5
+status: experimental
+description: |
+  "Potential XXE attack detected. Auto-generated from HackerOne report: SysAid On-Prem Improper Restriction of XML External Entity Reference Vulnerability"
+  Source report: SysAid On-Prem Improper Restriction of XML External Entity Reference Vulnerability (cisa-kev:CVE-2025-2776)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-2776
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-body|contains:
+      - '<!ENTITY'
+      - '<!DOCTYPE'
+      - 'SYSTEM "file:'
+      - 'SYSTEM "http:'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

@@ -1,0 +1,29 @@
+title: "Potential Authentication Bypass Attempt [Report exploitdb:19339]"
+id: 318e5d10-cfe3-47ae-beb2-3bf8d4f51270
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: ExploitDB #19339: SoftPerfect Bandwidth Manager 2.9.10 - Authentication Bypass"
+  Source report: ExploitDB #19339: SoftPerfect Bandwidth Manager 2.9.10 - Authentication Bypass (exploitdb:19339)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:19339
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

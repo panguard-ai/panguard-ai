@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-943q-mwmv-hhvh]"
+id: 1c405735-bed2-45a9-8472-53d4353fdf49
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: OpenClaw: Gateway /tools/invoke tool escalation + ACP permission auto-approval"
+  Source report: OpenClaw: Gateway /tools/invoke tool escalation + ACP permission auto-approval (github-advisory:GHSA-943q-mwmv-hhvh)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-943q-mwmv-hhvh
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.78
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

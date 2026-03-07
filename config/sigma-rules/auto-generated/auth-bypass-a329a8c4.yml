@@ -1,0 +1,29 @@
+title: "Potential Authentication Bypass Attempt [Report cisa-kev:CVE-2021-33045]"
+id: a329a8c4-c03f-4829-8cfd-94753d0134e3
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: Dahua IP Camera Authentication Bypass Vulnerability"
+  Source report: Dahua IP Camera Authentication Bypass Vulnerability (cisa-kev:CVE-2021-33045)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2021-33045
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

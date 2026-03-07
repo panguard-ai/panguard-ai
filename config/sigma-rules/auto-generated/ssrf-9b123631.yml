@@ -1,0 +1,34 @@
+title: "Potential SSRF via Internal Network Access [Report cisa-kev:CVE-2021-39935]"
+id: 9b123631-c9cc-4c51-9e25-6af099d7eddf
+status: experimental
+description: |
+  "Potential SSRF attack detected. Auto-generated from HackerOne report: GitLab Community and Enterprise Editions Server-Side Request Forgery (SSRF) Vulnerability"
+  Source report: GitLab Community and Enterprise Editions Server-Side Request Forgery (SSRF) Vulnerability (cisa-kev:CVE-2021-39935)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2021-39935
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - attack.command_and_control
+  - attack.t1071
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '127.0.0.1'
+      - 'localhost'
+      - '169.254.169.254'
+      - '10.0.'
+      - '172.16.'
+      - '192.168.'
+      - '0.0.0.0'
+      - '[::1]'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

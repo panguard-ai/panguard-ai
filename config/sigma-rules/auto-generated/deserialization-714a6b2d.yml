@@ -1,0 +1,30 @@
+title: "Potential Insecure Deserialization Attack [Report cisa-kev:CVE-2025-24016]"
+id: 714a6b2d-a131-41be-8092-dd6eb74cb5d1
+status: experimental
+description: |
+  "Potential Deserialization attack detected. Auto-generated from HackerOne report: Wazuh Server Deserialization of Untrusted Data Vulnerability"
+  Source report: Wazuh Server Deserialization of Untrusted Data Vulnerability (cisa-kev:CVE-2025-24016)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-24016
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: application
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'rO0AB'
+      - 'aced0005'
+      - 'O:4:'
+      - 'a:2:{'
+      - '__reduce__'
+      - 'pickle.loads'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

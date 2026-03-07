@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2023-1671]"
+id: 6986f459-6d96-442c-97ab-1aa4ef870934
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Sophos Web Appliance Command Injection Vulnerability"
+  Source report: Sophos Web Appliance Command Injection Vulnerability (cisa-kev:CVE-2023-1671)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2023-1671
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

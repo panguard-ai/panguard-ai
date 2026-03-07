@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report exploitdb:42026]"
+id: d2ea50c9-7bbc-4550-b993-a143a3aadd2b
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: ExploitDB #42026: Oracle PeopleSoft - XML External Entity to SYSTEM Remote Code Execution"
+  Source report: ExploitDB #42026: Oracle PeopleSoft - XML External Entity to SYSTEM Remote Code Execution (exploitdb:42026)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:42026
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

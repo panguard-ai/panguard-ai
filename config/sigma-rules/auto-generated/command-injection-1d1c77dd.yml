@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-ff98-w8hj-qrxf]"
+id: 1d1c77dd-dc48-48ee-b68d-b23ef750394f
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: OpenClaw plugin runtime command execution is part of trusted plugin boundary"
+  Source report: OpenClaw plugin runtime command execution is part of trusted plugin boundary (github-advisory:GHSA-ff98-w8hj-qrxf)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-ff98-w8hj-qrxf
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.78
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

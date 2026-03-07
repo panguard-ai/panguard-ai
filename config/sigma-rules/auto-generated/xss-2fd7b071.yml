@@ -1,0 +1,39 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report github-advisory:GHSA-h2xq-h7f9-vh6c]"
+id: 2fd7b071-9ecc-4715-ad46-07d5fa910528
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: XWiki Blog Application home page vulnerable to Stored XSS via Post Title"
+  Source report: XWiki Blog Application home page vulnerable to Stored XSS via Post Title (github-advisory:GHSA-h2xq-h7f9-vh6c)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-66024
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - cwe.79
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

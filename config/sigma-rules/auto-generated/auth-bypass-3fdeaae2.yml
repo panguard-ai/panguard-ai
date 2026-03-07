@@ -1,0 +1,30 @@
+title: "Potential Authentication Bypass Attempt [Report github-advisory:GHSA-mwxv-35wr-4vvj]"
+id: 3fdeaae2-0b2e-457d-8182-caa21761d951
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: OpenClaw has gateway plugin auth bypass via encoded dot-segment traversal in protected /api/channels paths"
+  Source report: OpenClaw has gateway plugin auth bypass via encoded dot-segment traversal in protected /api/channels paths (github-advisory:GHSA-mwxv-35wr-4vvj)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-mwxv-35wr-4vvj
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.289
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

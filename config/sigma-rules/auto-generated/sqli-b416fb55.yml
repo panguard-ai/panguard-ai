@@ -1,0 +1,32 @@
+title: "Potential SQL Injection Attempt [Report exploitdb:31578]"
+id: b416fb55-9b9c-4ea4-9670-e97fca0e74b2
+status: experimental
+description: |
+  "Potential SQLi attack detected. Auto-generated from HackerOne report: ExploitDB #31578: Tableau Server < 8.0.7 / < 8.1.2 - Blind SQL Injection"
+  Source report: ExploitDB #31578: Tableau Server < 8.0.7 / < 8.1.2 - Blind SQL Injection (exploitdb:31578)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:31578
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - ''' OR ''1''=''1'
+      - 'UNION SELECT'
+      - '''; DROP'
+      - '1=1--'
+      - ''' OR 1=1'
+      - 'admin''--'
+      - 'SLEEP('
+      - 'BENCHMARK('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

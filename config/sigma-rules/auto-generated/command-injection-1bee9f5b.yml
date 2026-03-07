@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2024-8957]"
+id: 1bee9f5b-4941-408e-a971-7804e495f70b
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: PTZOptics PT30X-SDI/NDI Cameras OS Command Injection Vulnerability"
+  Source report: PTZOptics PT30X-SDI/NDI Cameras OS Command Injection Vulnerability (cisa-kev:CVE-2024-8957)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-8957
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

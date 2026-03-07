@@ -1,6 +1,6 @@
 {
-  "lastSyncAt": "2026-03-07T18:17:15.273Z",
-  "totalRecordsAllTime": 4527,
+  "lastSyncAt": "2026-03-07T22:03:22.386Z",
+  "totalRecordsAllTime": 5146,
   "totalSigmaRules": 13,
   "totalYaraRules": 558,
   "syncHistory": [
@@ -11,6 +11,16 @@
       "newYara": 558,
       "durationMs": 356250,
       "errors": []
+    },
+    {
+      "syncAt": "2026-03-07T22:03:22.386Z",
+      "newRecords": 619,
+      "newSigma": 0,
+      "newYara": 0,
+      "durationMs": 222686,
+      "errors": [
+        "GitHub Advisory API error: 422 Unprocessable Entity"
+      ]
     }
   ]
 }

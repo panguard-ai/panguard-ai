@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2024-12356]"
+id: da7906d5-f64b-4ecc-bf48-bf5321d8166a
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) Command Injection Vulnerability"
+  Source report: BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) Command Injection Vulnerability (cisa-kev:CVE-2024-12356)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-12356
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

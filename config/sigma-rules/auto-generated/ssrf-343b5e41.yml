@@ -1,0 +1,35 @@
+title: "Potential SSRF via Internal Network Access [Report github-advisory:GHSA-w76h-8m22-hpgh]"
+id: 343b5e41-8d82-4549-b429-4b8c132835aa
+status: experimental
+description: |
+  "Potential SSRF attack detected. Auto-generated from HackerOne report: OpenClaw's MSTeams attachment redirect handling could bypass configured media host allowlists"
+  Source report: OpenClaw's MSTeams attachment redirect handling could bypass configured media host allowlists (github-advisory:GHSA-w76h-8m22-hpgh)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-w76h-8m22-hpgh
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - attack.command_and_control
+  - attack.t1071
+  - cwe.918
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '127.0.0.1'
+      - 'localhost'
+      - '169.254.169.254'
+      - '10.0.'
+      - '172.16.'
+      - '192.168.'
+      - '0.0.0.0'
+      - '[::1]'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

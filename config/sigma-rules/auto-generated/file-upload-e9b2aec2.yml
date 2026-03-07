@@ -1,0 +1,33 @@
+title: "Potential Malicious File Upload Attempt [Report exploitdb:49734]"
+id: e9b2aec2-2573-4f49-8ef3-bcd8eae772ef
+status: experimental
+description: |
+  "Potential File Upload attack detected. Auto-generated from HackerOne report: ExploitDB #49734: ScadaBR 1.0 - Arbitrary File Upload (Authenticated) (1)"
+  Source report: ExploitDB #49734: ScadaBR 1.0 - Arbitrary File Upload (Authenticated) (1) (exploitdb:49734)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:49734
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.command_and_control
+  - attack.t1105
+logsource:
+  category: webserver
+detection:
+  selection_method:
+    cs-method: 'POST'
+  selection_ext:
+    cs-uri|endswith:
+      - '.php'
+      - '.jsp'
+      - '.asp'
+      - '.exe'
+      - '.sh'
+      - '..php'
+      - '%00.jpg'
+  condition: selection_method and selection_ext
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

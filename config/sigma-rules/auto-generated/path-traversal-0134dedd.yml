@@ -1,0 +1,32 @@
+title: "Potential Directory/Path Traversal Attempt [Report cisa-kev:CVE-2024-48248]"
+id: 0134dedd-9f50-4304-a57a-37e2eb98d312
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: NAKIVO Backup and Replication Absolute Path Traversal Vulnerability"
+  Source report: NAKIVO Backup and Replication Absolute Path Traversal Vulnerability (cisa-kev:CVE-2024-48248)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-48248
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

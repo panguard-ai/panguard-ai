@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2023-39780]"
+id: 7d9e1c44-6c85-405c-acdd-389f985d7bf8
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: ASUS RT-AX55 Routers OS Command Injection Vulnerability"
+  Source report: ASUS RT-AX55 Routers OS Command Injection Vulnerability (cisa-kev:CVE-2023-39780)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2023-39780
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

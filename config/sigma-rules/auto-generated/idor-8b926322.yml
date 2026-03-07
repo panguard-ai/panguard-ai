@@ -1,0 +1,30 @@
+title: "Potential Insecure Direct Object Reference [Report github-advisory:GHSA-w9f8-m526-h7fh]"
+id: 8b926322-ebe1-4a43-8d11-384de133bdeb
+status: experimental
+description: |
+  "Potential IDOR attack detected. Auto-generated from HackerOne report: Vaultwarden has Unauthorized Access via Partial Update API on Another User’s Cipher"
+  Source report: Vaultwarden has Unauthorized Access via Partial Update API on Another User’s Cipher (github-advisory:GHSA-w9f8-m526-h7fh)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27898
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.639
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/users/'
+      - '/account/'
+      - '/profile/'
+      - '/order/'
+      - '/api/v'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

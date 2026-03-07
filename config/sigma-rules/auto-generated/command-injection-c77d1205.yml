@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-g38g-8gr9-h9xp]"
+id: c77d1205-34fe-4ac1-bd7a-ee1ab9730c31
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: PickleScan has multiple stdlib modules with direct RCE not in blocklist"
+  Source report: PickleScan has multiple stdlib modules with direct RCE not in blocklist (github-advisory:GHSA-g38g-8gr9-h9xp)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-g38g-8gr9-h9xp
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.184
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

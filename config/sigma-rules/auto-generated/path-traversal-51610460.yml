@@ -1,0 +1,33 @@
+title: "Potential Directory/Path Traversal Attempt [Report github-advisory:GHSA-6rxq-q92g-4rmf]"
+id: 51610460-aa80-4a4e-bebb-2691dce4e2ce
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: kaniko has tar archive path traversal in its build context extraction, allowing file writes outside destination directories"
+  Source report: kaniko has tar archive path traversal in its build context extraction, allowing file writes outside destination directories (github-advisory:GHSA-6rxq-q92g-4rmf)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28406
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+  - cwe.22
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

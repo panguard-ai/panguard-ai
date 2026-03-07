@@ -1,0 +1,32 @@
+title: "Potential Directory/Path Traversal Attempt [Report cisa-kev:CVE-2024-57727]"
+id: aef21f28-3a94-45f3-abb7-d5d10eefa969
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: SimpleHelp Path Traversal Vulnerability"
+  Source report: SimpleHelp Path Traversal Vulnerability (cisa-kev:CVE-2024-57727)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-57727
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

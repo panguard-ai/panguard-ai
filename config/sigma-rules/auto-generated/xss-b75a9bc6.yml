@@ -1,0 +1,39 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report github-advisory:GHSA-mm5f-5rqw-574f]"
+id: b75a9bc6-86f7-492e-9db4-575d8a205c76
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: Concrete CMS has a stored Cross-site Scripting (XSS) vulnerability"
+  Source report: Concrete CMS has a stored Cross-site Scripting (XSS) vulnerability (github-advisory:GHSA-mm5f-5rqw-574f)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-3244
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - cwe.79
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

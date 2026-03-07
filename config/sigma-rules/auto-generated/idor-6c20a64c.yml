@@ -1,0 +1,30 @@
+title: "Potential Insecure Direct Object Reference [Report github-advisory:GHSA-g8gc-6c4h-jg86]"
+id: 6c20a64c-51f1-4d2b-8334-6743b43cefaa
+status: experimental
+description: |
+  "Potential IDOR attack detected. Auto-generated from HackerOne report: wger: IDOR in nutritional_values endpoints exposes private dietary data via direct ORM lookup"
+  Source report: wger: IDOR in nutritional_values endpoints exposes private dietary data via direct ORM lookup (github-advisory:GHSA-g8gc-6c4h-jg86)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27839
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.639
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/users/'
+      - '/account/'
+      - '/profile/'
+      - '/order/'
+      - '/api/v'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

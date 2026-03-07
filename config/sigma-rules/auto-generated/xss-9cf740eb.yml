@@ -1,0 +1,39 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report github-advisory:GHSA-6rx5-m2rc-hmf7]"
+id: 9cf740eb-ffa3-4d67-894b-c46190e000e8
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: ZITADEL: Stored XSS via Default URI Redirect Leads to Account Takeover"
+  Source report: ZITADEL: Stored XSS via Default URI Redirect Leads to Account Takeover (github-advisory:GHSA-6rx5-m2rc-hmf7)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-29192
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - cwe.79
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

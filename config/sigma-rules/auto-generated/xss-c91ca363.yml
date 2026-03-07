@@ -1,0 +1,38 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report exploitdb:20367]"
+id: c91ca363-2cd3-4f6f-ae0b-0625c7fde3f2
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: ExploitDB #20367: xeams email server 4.4 build 5720 - Persistent Cross-Site Scripting"
+  Source report: ExploitDB #20367: xeams email server 4.4 build 5720 - Persistent Cross-Site Scripting (exploitdb:20367)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:20367
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

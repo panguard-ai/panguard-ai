@@ -1,0 +1,33 @@
+title: "Potential Malicious File Upload Attempt [Report cisa-kev:CVE-2024-55956]"
+id: 52c4553d-87b0-4a9c-91c0-bc8eb42284bb
+status: experimental
+description: |
+  "Potential File Upload attack detected. Auto-generated from HackerOne report: Cleo Multiple Products Unauthenticated File Upload Vulnerability"
+  Source report: Cleo Multiple Products Unauthenticated File Upload Vulnerability (cisa-kev:CVE-2024-55956)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-55956
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.command_and_control
+  - attack.t1105
+logsource:
+  category: webserver
+detection:
+  selection_method:
+    cs-method: 'POST'
+  selection_ext:
+    cs-uri|endswith:
+      - '.php'
+      - '.jsp'
+      - '.asp'
+      - '.exe'
+      - '.sh'
+      - '..php'
+      - '%00.jpg'
+  condition: selection_method and selection_ext
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

@@ -1,0 +1,30 @@
+title: "Potential Authentication Bypass Attempt [Report github-advisory:GHSA-jmmg-jqc7-5qf4]"
+id: d13720b9-3c63-4670-a149-5ef001fdaa13
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: OpenClaw's browser-origin WebSocket auth hardening gap could enable loopback password brute-force chains"
+  Source report: OpenClaw's browser-origin WebSocket auth hardening gap could enable loopback password brute-force chains (github-advisory:GHSA-jmmg-jqc7-5qf4)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-jmmg-jqc7-5qf4
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.287
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

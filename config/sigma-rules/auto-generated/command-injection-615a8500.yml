@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2025-20352]"
+id: 615a8500-92ea-40ee-abd9-39bb193e681d
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Cisco IOS and IOS XE Software SNMP Denial of Service and Remote Code Execution Vulnerability"
+  Source report: Cisco IOS and IOS XE Software SNMP Denial of Service and Remote Code Execution Vulnerability (cisa-kev:CVE-2025-20352)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-20352
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

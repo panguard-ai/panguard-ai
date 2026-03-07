@@ -1,0 +1,33 @@
+title: "Potential SQL Injection Attempt [Report github-advisory:GHSA-f3f2-mcxc-pwjx]"
+id: 65b70af5-b897-4ffb-8aa2-3273f75dd712
+status: experimental
+description: |
+  "Potential SQLi attack detected. Auto-generated from HackerOne report: n8n: SQL Injection in MySQL, PostgreSQL, and Microsoft SQL nodes"
+  Source report: n8n: SQL Injection in MySQL, PostgreSQL, and Microsoft SQL nodes (github-advisory:GHSA-f3f2-mcxc-pwjx)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-f3f2-mcxc-pwjx
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - cwe.89
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - ''' OR ''1''=''1'
+      - 'UNION SELECT'
+      - '''; DROP'
+      - '1=1--'
+      - ''' OR 1=1'
+      - 'admin''--'
+      - 'SLEEP('
+      - 'BENCHMARK('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

@@ -1,0 +1,28 @@
+title: "Potential XML External Entity (XXE) Injection [Report cisa-kev:CVE-2023-45727]"
+id: 6ea4eba9-9ce1-410c-ac5c-8f8febb5dae4
+status: experimental
+description: |
+  "Potential XXE attack detected. Auto-generated from HackerOne report: North Grid Proself Improper Restriction of XML External Entity (XXE) Reference Vulnerability"
+  Source report: North Grid Proself Improper Restriction of XML External Entity (XXE) Reference Vulnerability (cisa-kev:CVE-2023-45727)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2023-45727
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-body|contains:
+      - '<!ENTITY'
+      - '<!DOCTYPE'
+      - 'SYSTEM "file:'
+      - 'SYSTEM "http:'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

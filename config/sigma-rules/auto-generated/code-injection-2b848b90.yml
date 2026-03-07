@@ -1,0 +1,33 @@
+title: "Potential Code Injection Attack [Report github-advisory:GHSA-cpv7-q2wx-m8rw]"
+id: 2b848b90-90c1-42de-80e3-2e3071bd9c0d
+status: experimental
+description: |
+  "Potential Code Injection attack detected. Auto-generated from HackerOne report: Statamic vulnerable to remote code execution via Antlers-enabled control panel inputs"
+  Source report: Statamic vulnerable to remote code execution via Antlers-enabled control panel inputs (github-advisory:GHSA-cpv7-q2wx-m8rw)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28425
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.94
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'eval('
+      - 'exec('
+      - 'system('
+      - '__import__'
+      - 'Runtime.getRuntime()'
+      - 'Process'
+      - 'spawn('
+      - 'require('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

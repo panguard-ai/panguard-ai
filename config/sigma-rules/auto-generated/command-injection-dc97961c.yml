@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2025-9377]"
+id: dc97961c-1f70-4053-b2f2-e5fdc884bf07
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: TP-Link Archer C7(EU) and TL-WR841N/ND(MS) OS Command Injection Vulnerability"
+  Source report: TP-Link Archer C7(EU) and TL-WR841N/ND(MS) OS Command Injection Vulnerability (cisa-kev:CVE-2025-9377)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-9377
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

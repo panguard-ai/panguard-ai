@@ -1,0 +1,29 @@
+title: "Potential Authentication Bypass Attempt [Report exploitdb:10513]"
+id: 259e088a-1525-4098-bdd8-f66759f19451
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: ExploitDB #10513: Sitecore Staging Module 5.4.0 - Authentication Bypass / File Manipulation"
+  Source report: ExploitDB #10513: Sitecore Staging Module 5.4.0 - Authentication Bypass / File Manipulation (exploitdb:10513)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:10513
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

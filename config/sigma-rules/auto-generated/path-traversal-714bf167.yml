@@ -1,0 +1,32 @@
+title: "Potential Directory/Path Traversal Attempt [Report exploitdb:17388]"
+id: 714bf167-8d87-440e-b071-983cc7b1382b
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: ExploitDB #17388: Trend Micro Data Loss Prevention Virtual Appliance 5.5 - Directory Traversal"
+  Source report: ExploitDB #17388: Trend Micro Data Loss Prevention Virtual Appliance 5.5 - Directory Traversal (exploitdb:17388)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:17388
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium
