@@ -1,0 +1,32 @@
+title: "Potential SQL Injection Attempt [Report exploitdb:45661]"
+id: 1b41874d-3c34-446b-b7da-f39e5143db8c
+status: experimental
+description: |
+  "Potential SQLi attack detected. Auto-generated from HackerOne report: ExploitDB #45661: ServersCheck Monitoring Software 14.3.3 - 'id' SQL Injection"
+  Source report: ExploitDB #45661: ServersCheck Monitoring Software 14.3.3 - 'id' SQL Injection (exploitdb:45661)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:45661
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - ''' OR ''1''=''1'
+      - 'UNION SELECT'
+      - '''; DROP'
+      - '1=1--'
+      - ''' OR 1=1'
+      - 'admin''--'
+      - 'SLEEP('
+      - 'BENCHMARK('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

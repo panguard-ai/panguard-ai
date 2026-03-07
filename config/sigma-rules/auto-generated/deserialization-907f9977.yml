@@ -1,0 +1,30 @@
+title: "Potential Insecure Deserialization Attack [Report cisa-kev:CVE-2025-8875]"
+id: 907f9977-84e9-40a8-9a7f-e376937d6034
+status: experimental
+description: |
+  "Potential Deserialization attack detected. Auto-generated from HackerOne report: N-able N-Central Insecure Deserialization Vulnerability"
+  Source report: N-able N-Central Insecure Deserialization Vulnerability (cisa-kev:CVE-2025-8875)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-8875
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: application
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'rO0AB'
+      - 'aced0005'
+      - 'O:4:'
+      - 'a:2:{'
+      - '__reduce__'
+      - 'pickle.loads'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

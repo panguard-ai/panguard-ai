@@ -1,0 +1,33 @@
+title: "Potential Directory/Path Traversal Attempt [Report github-advisory:GHSA-94rc-cqvm-m4pw]"
+id: 7f83bac0-b732-4f34-8f9d-e33b1ad37eac
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: Craft CMS Vulnerable to Authenticated RCE via Twig SSTI - create() function + Symfony Process gadget"
+  Source report: Craft CMS Vulnerable to Authenticated RCE via Twig SSTI - create() function + Symfony Process gadget (github-advisory:GHSA-94rc-cqvm-m4pw)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28695
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+  - cwe.22
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

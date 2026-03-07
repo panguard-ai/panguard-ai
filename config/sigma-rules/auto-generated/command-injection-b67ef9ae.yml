@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-7fcc-cw49-xm78]"
+id: b67ef9ae-54d6-4d76-a9a7-3fbcba5dbaa5
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: OpenClaw has command injection via Windows shell fallback in Lobster tool execution"
+  Source report: OpenClaw has command injection via Windows shell fallback in Lobster tool execution (github-advisory:GHSA-7fcc-cw49-xm78)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-7fcc-cw49-xm78
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.78
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-v6pg-v89r-w8wr]"
+id: c5fa17de-3c50-41b0-8a3a-4bf8536d8d4d
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Vaultwarden has 2FA Bypass on Protected Actions due to Faulty Rate Limit Enforcement"
+  Source report: Vaultwarden has 2FA Bypass on Protected Actions due to Faulty Rate Limit Enforcement (github-advisory:GHSA-v6pg-v89r-w8wr)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27801
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.307
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

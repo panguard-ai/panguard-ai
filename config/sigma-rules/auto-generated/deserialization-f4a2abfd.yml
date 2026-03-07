@@ -1,0 +1,30 @@
+title: "Potential Insecure Deserialization Attack [Report cisa-kev:CVE-2024-20953]"
+id: f4a2abfd-8e1f-4270-a22d-ee40d5bae548
+status: experimental
+description: |
+  "Potential Deserialization attack detected. Auto-generated from HackerOne report: Oracle Agile Product Lifecycle Management (PLM) Deserialization Vulnerability"
+  Source report: Oracle Agile Product Lifecycle Management (PLM) Deserialization Vulnerability (cisa-kev:CVE-2024-20953)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-20953
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: application
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'rO0AB'
+      - 'aced0005'
+      - 'O:4:'
+      - 'a:2:{'
+      - '__reduce__'
+      - 'pickle.loads'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

@@ -1,0 +1,35 @@
+title: "Potential SSRF via Internal Network Access [Report github-advisory:GHSA-8cp7-rp8r-mg77]"
+id: 5e0eff26-cf3e-4b1d-9e38-4229f95c2ac2
+status: experimental
+description: |
+  "Potential SSRF attack detected. Auto-generated from HackerOne report: OpenClaw has SSRF guard bypass via IPv6 transition over ISATAP"
+  Source report: OpenClaw has SSRF guard bypass via IPv6 transition over ISATAP (github-advisory:GHSA-8cp7-rp8r-mg77)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-8cp7-rp8r-mg77
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - attack.command_and_control
+  - attack.t1071
+  - cwe.918
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '127.0.0.1'
+      - 'localhost'
+      - '169.254.169.254'
+      - '10.0.'
+      - '172.16.'
+      - '192.168.'
+      - '0.0.0.0'
+      - '[::1]'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

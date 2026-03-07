@@ -1,0 +1,33 @@
+title: "Potential Code Injection Attack [Report github-advisory:GHSA-x2mw-7j39-93xq]"
+id: 14646374-e57d-4ae5-9b70-87dda1b5e638
+status: experimental
+description: |
+  "Potential Code Injection attack detected. Auto-generated from HackerOne report: n8n has Arbitrary Command Execution via File Write and Git Operations"
+  Source report: n8n has Arbitrary Command Execution via File Write and Git Operations (github-advisory:GHSA-x2mw-7j39-93xq)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27498
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.94
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'eval('
+      - 'exec('
+      - 'system('
+      - '__import__'
+      - 'Runtime.getRuntime()'
+      - 'Process'
+      - 'spawn('
+      - 'require('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

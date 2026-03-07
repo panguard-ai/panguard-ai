@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report exploitdb:47252]"
+id: 1ca77d8b-4fc6-4052-997f-075b8af7613b
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: ExploitDB #47252: TortoiseSVN 1.12.1 - Remote Code Execution"
+  Source report: ExploitDB #47252: TortoiseSVN 1.12.1 - Remote Code Execution (exploitdb:47252)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:47252
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

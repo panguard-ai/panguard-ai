@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report exploitdb:38599]"
+id: f2d856ef-e94a-4714-a92c-bf22ec666f17
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: ExploitDB #38599: Symantec pcAnywhere 12.5.0 (Windows x86) - Remote Code Execution"
+  Source report: ExploitDB #38599: Symantec pcAnywhere 12.5.0 (Windows x86) - Remote Code Execution (exploitdb:38599)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:38599
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

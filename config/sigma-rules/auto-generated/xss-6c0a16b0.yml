@@ -1,0 +1,39 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report github-advisory:GHSA-v9fg-3cr2-277j]"
+id: 6c0a16b0-b1c5-4bfe-9c10-f8ef72b2f526
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: Rust has Critical Stored XSS in Preview Modal, leading to Administrative Account Takeover"
+  Source report: Rust has Critical Stored XSS in Preview Modal, leading to Administrative Account Takeover (github-advisory:GHSA-v9fg-3cr2-277j)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-27822
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - cwe.79
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-33mp-8p67-xj7c]"
+id: 0addc01d-693f-4c8d-922c-0683a77785a4
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Froxlor has Admin-to-Root Privilege Escalation via Input Validation Bypass + OS Command Injection"
+  Source report: Froxlor has Admin-to-Root Privilege Escalation via Input Validation Bypass + OS Command Injection (github-advisory:GHSA-33mp-8p67-xj7c)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-26279
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.78
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

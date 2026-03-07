@@ -1,0 +1,30 @@
+title: "Potential Insecure Direct Object Reference [Report github-advisory:GHSA-j4xf-96qf-rx69]"
+id: 742435ee-0a22-4b2a-b329-1e5ed213c3f2
+status: experimental
+description: |
+  "Potential IDOR attack detected. Auto-generated from HackerOne report: OpenClaw has a Feishu allowFrom authorization bypass via display-name collision"
+  Source report: OpenClaw has a Feishu allowFrom authorization bypass via display-name collision (github-advisory:GHSA-j4xf-96qf-rx69)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-j4xf-96qf-rx69
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.639
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/users/'
+      - '/account/'
+      - '/profile/'
+      - '/order/'
+      - '/api/v'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

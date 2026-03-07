@@ -1,0 +1,38 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report cisa-kev:CVE-2024-37383]"
+id: 34c0f631-a259-45f4-9729-7dfe52586926
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: RoundCube Webmail Cross-Site Scripting (XSS) Vulnerability"
+  Source report: RoundCube Webmail Cross-Site Scripting (XSS) Vulnerability (cisa-kev:CVE-2024-37383)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-37383
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

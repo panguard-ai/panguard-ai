@@ -1,0 +1,32 @@
+title: "Potential Directory/Path Traversal Attempt [Report exploitdb:18605]"
+id: a545772f-36b1-45f6-8718-c58ecd27ecc9
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: ExploitDB #18605: sockso 1.5 - Directory Traversal"
+  Source report: ExploitDB #18605: sockso 1.5 - Directory Traversal (exploitdb:18605)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:18605
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

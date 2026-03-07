@@ -1,0 +1,33 @@
+title: "Potential SQL Injection Attempt [Report github-advisory:GHSA-49xw-vfc4-7p43]"
+id: be106e71-b9cb-4893-87e7-c05ee36db570
+status: experimental
+description: |
+  "Potential SQLi attack detected. Auto-generated from HackerOne report: Fleet has an SQL Injection vulnerability via backtick escape in ORDER BY parameter"
+  Source report: Fleet has an SQL Injection vulnerability via backtick escape in ORDER BY parameter (github-advisory:GHSA-49xw-vfc4-7p43)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-26186
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - cwe.89
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - ''' OR ''1''=''1'
+      - 'UNION SELECT'
+      - '''; DROP'
+      - '1=1--'
+      - ''' OR 1=1'
+      - 'admin''--'
+      - 'SLEEP('
+      - 'BENCHMARK('
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

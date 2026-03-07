@@ -1,0 +1,30 @@
+title: "Potential Authentication Bypass Attempt [Report github-advisory:GHSA-jh8h-6c9q-7gmw]"
+id: b761f239-9c9e-45ad-ba00-dc094ff447cb
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: n8n has an Authentication Bypass in its Chat Trigger Node"
+  Source report: n8n has an Authentication Bypass in its Chat Trigger Node (github-advisory:GHSA-jh8h-6c9q-7gmw)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-jh8h-6c9q-7gmw
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.287
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

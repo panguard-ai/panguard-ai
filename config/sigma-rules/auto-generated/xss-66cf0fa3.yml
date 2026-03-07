@@ -1,0 +1,38 @@
+title: "Potential Cross-Site Scripting (XSS) Attempt [Report exploitdb:15128]"
+id: 66cf0fa3-bcb8-4f8a-a892-c985e7d5eaab
+status: experimental
+description: |
+  "Potential XSS attack detected. Auto-generated from HackerOne report: ExploitDB #15128: Allpc 2.5 osCommerce - SQL Injection / Cross-Site Scripting"
+  Source report: ExploitDB #15128: Allpc 2.5 osCommerce - SQL Injection / Cross-Site Scripting (exploitdb:15128)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/exploitdb:15128
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059.007
+logsource:
+  category: webserver
+detection:
+  selection_query:
+    cs-uri-query|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  selection_body:
+    cs-body|contains:
+      - '<script'
+      - 'javascript:'
+      - 'onerror='
+      - 'onload='
+      - '<img src='
+      - '<svg'
+  condition: selection_query or selection_body
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

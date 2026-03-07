@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-37j7-56xc-c468]"
+id: 115ab758-ac60-40f7-b35a-779b89f345cd
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Idno Vulnerable to Remote Code Execution via Chained Import File Write and Template Path Traversal"
+  Source report: Idno Vulnerable to Remote Code Execution via Chained Import File Write and Template Path Traversal (github-advisory:GHSA-37j7-56xc-c468)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-28507
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.78
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

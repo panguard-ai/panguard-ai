@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2008-0015]"
+id: 4caa5d95-a59e-4899-81bc-964cf27d14cc
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Microsoft Windows Video ActiveX Control Remote Code Execution Vulnerability"
+  Source report: Microsoft Windows Video ActiveX Control Remote Code Execution Vulnerability (cisa-kev:CVE-2008-0015)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2008-0015
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

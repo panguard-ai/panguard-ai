@@ -1,0 +1,33 @@
+title: "Potential Directory/Path Traversal Attempt [Report github-advisory:GHSA-56pc-6hvp-4gv4]"
+id: 401b9477-751c-4a7b-ae93-917a06b65279
+status: experimental
+description: |
+  "Potential Path Traversal attack detected. Auto-generated from HackerOne report: OpenClaw vulnerable to arbitrary file read via $include directive"
+  Source report: OpenClaw vulnerable to arbitrary file read via $include directive (github-advisory:GHSA-56pc-6hvp-4gv4)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-56pc-6hvp-4gv4
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.discovery
+  - attack.t1083
+  - cwe.22
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri|contains:
+      - '../'
+      - '..\'
+      - '%2e%2e%2f'
+      - '....//..../'
+      - '/etc/passwd'
+      - '/etc/shadow'
+      - '..%252f'
+      - '%c0%ae%c0%ae/'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

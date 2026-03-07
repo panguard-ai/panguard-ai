@@ -1,0 +1,30 @@
+title: "Potential Authentication Bypass Attempt [Report github-advisory:GHSA-vvjh-f6p9-5vcf]"
+id: 704f2829-767a-4b56-a478-bdfb9e8add84
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: OpenClaw Canvas Authentication Bypass Vulnerability"
+  Source report: OpenClaw Canvas Authentication Bypass Vulnerability (github-advisory:GHSA-vvjh-f6p9-5vcf)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://panguard.ai/intel/github-advisory:GHSA-vvjh-f6p9-5vcf
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+  - cwe.291
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

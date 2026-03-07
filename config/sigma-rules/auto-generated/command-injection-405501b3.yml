@@ -1,0 +1,34 @@
+title: "Potential OS Command Injection [Report github-advisory:GHSA-r55h-3rwj-hcmg]"
+id: 405501b3-7db5-4ffd-9494-6eb89af885f7
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: WeKnora has Remote Code Execution (RCE) via Command Injection in MCP Stdio Configuration Validation"
+  Source report: WeKnora has Remote Code Execution (RCE) via Command Injection in MCP Stdio Configuration Validation (github-advisory:GHSA-r55h-3rwj-hcmg)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2026-30861
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+  - cwe.78
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: high

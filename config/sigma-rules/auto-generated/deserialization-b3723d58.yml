@@ -1,0 +1,30 @@
+title: "Potential Insecure Deserialization Attack [Report cisa-kev:CVE-2025-53690]"
+id: b3723d58-36e9-4f85-ac4a-ddf35f6fb651
+status: experimental
+description: |
+  "Potential Deserialization attack detected. Auto-generated from HackerOne report: Sitecore Multiple Products Deserialization of Untrusted Data Vulnerability"
+  Source report: Sitecore Multiple Products Deserialization of Untrusted Data Vulnerability (cisa-kev:CVE-2025-53690)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2025-53690
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: application
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'rO0AB'
+      - 'aced0005'
+      - 'O:4:'
+      - 'a:2:{'
+      - '__reduce__'
+      - 'pickle.loads'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

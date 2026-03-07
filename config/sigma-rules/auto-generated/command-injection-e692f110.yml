@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2023-47565]"
+id: e692f110-cf01-4484-bce6-532937481bea
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: QNAP VioStor NVR OS Command Injection Vulnerability"
+  Source report: QNAP VioStor NVR OS Command Injection Vulnerability (cisa-kev:CVE-2023-47565)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2023-47565
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

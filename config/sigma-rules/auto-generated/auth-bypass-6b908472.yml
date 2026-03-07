@@ -1,0 +1,29 @@
+title: "Potential Authentication Bypass Attempt [Report cisa-kev:CVE-2024-54085]"
+id: 6b908472-8d78-4bce-ae9a-988bfac75801
+status: experimental
+description: |
+  "Potential Auth Bypass attack detected. Auto-generated from HackerOne report: AMI MegaRAC SPx Authentication Bypass by Spoofing Vulnerability"
+  Source report: AMI MegaRAC SPx Authentication Bypass by Spoofing Vulnerability (cisa-kev:CVE-2024-54085)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-54085
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.defense_evasion
+  - attack.t1078
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '/admin'
+      - '/internal'
+      - 'x-forwarded-for'
+      - 'x-original-url'
+      - 'x-rewrite-url'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium

@@ -1,0 +1,33 @@
+title: "Potential OS Command Injection [Report cisa-kev:CVE-2023-20118]"
+id: 0bc5027f-b701-4bb3-9b1f-8600afb66708
+status: experimental
+description: |
+  "Potential Command Injection attack detected. Auto-generated from HackerOne report: Cisco Small Business RV Series Routers Command Injection Vulnerability"
+  Source report: Cisco Small Business RV Series Routers Command Injection Vulnerability (cisa-kev:CVE-2023-20118)
+  Auto-generated from HackerOne report analysis.
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2023-20118
+author: Panguard Threat Intel (auto-generated)
+date: 2026/03/07
+tags:
+  - attack.execution
+  - attack.t1059
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - '$('
+      - '`'
+      - '|'
+      - ';'
+      - '&&'
+      - '||'
+      - '%0a'
+      - '
+'
+  condition: selection
+falsepositives:
+  - Legitimate internal API calls
+  - Development/testing environments
+level: medium
