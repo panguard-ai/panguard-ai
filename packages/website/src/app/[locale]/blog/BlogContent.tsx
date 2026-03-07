@@ -217,7 +217,7 @@ export default function BlogContent() {
         <FadeInUp>
           <div className="text-center max-w-2xl mx-auto">
             <Mail className="w-8 h-8 text-brand-sage mx-auto mb-4" />
-            <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary">
+            <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary">
               {t('digest.title')}
             </h2>
             <p className="text-text-secondary mt-4 leading-relaxed">{t('digest.desc')}</p>

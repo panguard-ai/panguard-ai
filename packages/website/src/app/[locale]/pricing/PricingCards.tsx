@@ -395,7 +395,7 @@ export default function PricingCards() {
         <FadeInUp>
           <div className="relative mt-12">
             <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              <table className="w-full min-w-[600px]">
+              <table className="w-full min-w-[480px] sm:min-w-[600px]">
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left text-sm text-text-tertiary font-normal py-4 pr-4 w-[30%]" />

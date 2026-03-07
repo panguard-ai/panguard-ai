@@ -23,11 +23,11 @@ export default function SectionTitle({
         </div>
       )}
       <h2
-        className="text-[clamp(36px,4vw,48px)] text-text-primary leading-[1.1] font-bold"
+        className="text-[clamp(24px,4vw,48px)] text-text-primary leading-[1.15] font-bold"
       >
         {title}
       </h2>
-      {subtitle && <p className="text-text-secondary mt-6 leading-relaxed">{subtitle}</p>}
+      {subtitle && <p className="text-sm sm:text-base text-text-secondary mt-4 sm:mt-6 leading-relaxed">{subtitle}</p>}
     </FadeInUp>
   );
 }

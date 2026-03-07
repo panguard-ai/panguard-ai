@@ -15,7 +15,7 @@ export default function HomePricing() {
   const t = useTranslations('home.homePricing');
 
   return (
-    <section id="pricing" className="bg-[#0a0a0a] px-4 sm:px-6 py-16 sm:py-24">
+    <section id="pricing" className="bg-[#0a0a0a] px-5 sm:px-6 py-16 sm:py-24">
       <div className="max-w-[1200px] mx-auto">
         {/* Title */}
         <motion.div

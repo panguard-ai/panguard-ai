@@ -71,7 +71,7 @@ export default function TrustContent() {
   return (
     <>
       {/* -- Hero -- */}
-      <section className="relative min-h-[50vh] flex items-center px-4 sm:px-6 lg:px-[120px] py-16 sm:py-28 border-b border-border overflow-hidden">
+      <section className="relative min-h-[50vh] flex items-center px-5 sm:px-6 lg:px-[120px] py-16 sm:py-28 border-b border-border overflow-hidden">
         <div className="absolute top-1/3 right-1/4 w-[600px] h-[400px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative">
           <FadeInUp>
@@ -313,7 +313,7 @@ export default function TrustContent() {
         <div className="text-center">
           <FadeInUp>
             <MonitorIcon className="w-8 h-8 text-brand-sage mx-auto mb-4" />
-            <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary">
+            <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary">
               {t('cta.title')}
             </h2>
             <p className="text-text-secondary mt-4 max-w-xl mx-auto leading-relaxed">

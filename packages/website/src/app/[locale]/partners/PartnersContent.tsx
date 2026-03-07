@@ -199,7 +199,7 @@ export default function PartnersContent() {
           {statKeys.map((key, i) => (
             <FadeInUp key={key} delay={i * 0.06}>
               <div className="text-center">
-                <p className="text-[clamp(28px,3.5vw,40px)] font-extrabold text-brand-sage leading-none">
+                <p className="text-[clamp(20px,3.5vw,40px)] font-extrabold text-brand-sage leading-none">
                   {t(`stats.${key}.value`)}
                 </p>
                 <p className="text-sm text-text-secondary mt-2">{t(`stats.${key}.label`)}</p>
@@ -214,7 +214,7 @@ export default function PartnersContent() {
         <div className="text-center">
           <FadeInUp>
             <EnterpriseIcon className="w-10 h-10 text-brand-sage mx-auto mb-6" />
-            <h2 className="text-[clamp(28px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
+            <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
               {t('cta.title')}
             </h2>
             <p className="text-text-secondary mt-4 max-w-xl mx-auto leading-relaxed">

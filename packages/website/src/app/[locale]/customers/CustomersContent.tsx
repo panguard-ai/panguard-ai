@@ -30,7 +30,7 @@ export default function CustomersContent() {
           {statKeys.map((key, i) => (
             <FadeInUp key={key} delay={i * 0.06}>
               <div className="text-center">
-                <p className="text-[clamp(28px,3.5vw,40px)] font-extrabold text-brand-sage leading-none">
+                <p className="text-[clamp(20px,3.5vw,40px)] font-extrabold text-brand-sage leading-none">
                   {t(`stats.${key}.value`)}
                 </p>
                 <p className="text-sm text-text-secondary mt-2">{t(`stats.${key}.label`)}</p>
@@ -139,7 +139,7 @@ export default function CustomersContent() {
       <SectionWrapper dark>
         <div className="text-center">
           <FadeInUp>
-            <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary">
+            <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary">
               {t('cta.title')}
             </h2>
             <p className="text-text-secondary mt-4 max-w-xl mx-auto leading-relaxed">

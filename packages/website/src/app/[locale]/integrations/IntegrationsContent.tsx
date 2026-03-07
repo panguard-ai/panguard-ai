@@ -258,7 +258,7 @@ export default function IntegrationsContent() {
               <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
                 {t('developerApi.overline')}
               </p>
-              <h2 className="text-[clamp(28px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
+              <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
                 {t('developerApi.title')}
               </h2>
               <p className="text-text-secondary mt-4 leading-relaxed">{t('developerApi.desc')}</p>
@@ -318,7 +318,7 @@ export default function IntegrationsContent() {
         <FadeInUp>
           <div className="text-center max-w-2xl mx-auto">
             <NetworkIcon size={40} className="text-brand-sage mx-auto mb-6" />
-            <h2 className="text-[clamp(28px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
+            <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
               {t('dontSeeYourTool')}
             </h2>
             <p className="text-text-secondary mt-4 leading-relaxed">{t('dontSeeDesc')}</p>

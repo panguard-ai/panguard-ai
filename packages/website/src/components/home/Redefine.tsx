@@ -9,7 +9,7 @@ export default function Redefine() {
   const t = useTranslations('home.redefine');
 
   return (
-    <section className="bg-[#0a0a0a] px-4 sm:px-6 py-16 sm:py-20">
+    <section className="bg-[#0a0a0a] px-5 sm:px-6 py-16 sm:py-20">
       <div className="max-w-[900px] mx-auto text-center">
         {/* "Everyone asks" */}
         <motion.div

@@ -25,7 +25,7 @@ export default function AboutContent() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative min-h-[60vh] flex items-center px-4 sm:px-6 lg:px-[120px] py-16 sm:py-28 border-b border-border overflow-hidden">
+      <section className="relative min-h-[60vh] flex items-center px-5 sm:px-6 lg:px-[120px] py-16 sm:py-28 border-b border-border overflow-hidden">
         <div className="absolute top-1/4 left-1/3 w-[700px] h-[400px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative">
           <FadeInUp>
@@ -34,7 +34,7 @@ export default function AboutContent() {
             </p>
           </FadeInUp>
           <FadeInUp delay={0.05}>
-            <h1 className="text-[clamp(36px,4.5vw,56px)] font-extrabold leading-[1.1] tracking-tight text-text-primary max-w-4xl">
+            <h1 className="text-[clamp(24px,4.5vw,56px)] font-extrabold leading-[1.1] tracking-tight text-text-primary max-w-4xl">
               {t('title')} <span className="text-brand-sage">{t('titleHighlight')}</span>
             </h1>
           </FadeInUp>
@@ -53,7 +53,7 @@ export default function AboutContent() {
             <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
               {t('origin.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
+            <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
               {t('origin.title')}
             </h2>
           </FadeInUp>
@@ -105,7 +105,7 @@ export default function AboutContent() {
           {(t.raw('numbers.stats') as Array<{ value: string; label: string }>).map((stat, i) => (
             <FadeInUp key={stat.label} delay={i * 0.05}>
               <div className="text-center">
-                <p className="text-[clamp(28px,3.5vw,44px)] font-extrabold text-brand-sage">
+                <p className="text-[clamp(20px,3.5vw,44px)] font-extrabold text-brand-sage">
                   {stat.value}
                 </p>
                 <p className="text-sm text-text-secondary mt-1">{stat.label}</p>
@@ -123,7 +123,7 @@ export default function AboutContent() {
               <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
                 {t('taiwan.overline')}
               </p>
-              <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
+              <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
                 {t('taiwan.title')}
               </h2>
             </FadeInUp>
@@ -165,7 +165,7 @@ export default function AboutContent() {
       <SectionWrapper dark>
         <div className="text-center max-w-2xl mx-auto">
           <FadeInUp>
-            <h2 className="text-[clamp(28px,3.5vw,40px)] font-bold text-text-primary">
+            <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary">
               {t('cta.title')}
             </h2>
             <p className="text-text-secondary mt-4 mb-8">{t('cta.desc')}</p>
