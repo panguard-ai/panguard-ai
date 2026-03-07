@@ -129,7 +129,7 @@ export default async function PricingPage() {
           <FadeInUp>
             <div className="text-center max-w-2xl mx-auto">
               <EnterpriseIcon className="w-10 h-10 text-brand-sage mx-auto mb-6" />
-              <h2 className="text-[clamp(28px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
+              <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
                 {t('enterprise.title')}
               </h2>
               <p className="text-text-secondary mt-4 leading-relaxed">{t('enterprise.desc')}</p>

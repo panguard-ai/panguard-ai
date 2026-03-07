@@ -42,7 +42,7 @@ export default function ProductReportContent() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative min-h-[50vh] flex items-center px-4 sm:px-6 lg:px-[120px] py-16 sm:py-28 border-b border-border overflow-hidden">
+      <section className="relative min-h-[50vh] flex items-center px-5 sm:px-6 lg:px-[120px] py-16 sm:py-28 border-b border-border overflow-hidden">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-brand-sage/5 rounded-full blur-[200px] pointer-events-none" />
         <div className="max-w-[1200px] mx-auto relative text-center w-full">
           <FadeInUp>
@@ -56,7 +56,7 @@ export default function ProductReportContent() {
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-4">
               {t('overline')}
             </p>
-            <h1 className="text-[clamp(36px,4.5vw,56px)] font-extrabold leading-[1.08] tracking-tight text-text-primary max-w-3xl mx-auto">
+            <h1 className="text-[clamp(24px,4.5vw,56px)] font-extrabold leading-[1.08] tracking-tight text-text-primary max-w-3xl mx-auto">
               {t('title')} <span className="text-brand-sage">{t('titleHighlight')}</span>
             </h1>
           </FadeInUp>
@@ -75,7 +75,7 @@ export default function ProductReportContent() {
             <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
               {t('problem.overline')}
             </p>
-            <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
+            <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
               {t('problem.title')}
             </h2>
           </FadeInUp>
@@ -94,7 +94,7 @@ export default function ProductReportContent() {
               <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
                 {t('reportTypes.overline')}
               </p>
-              <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
+              <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
                 {t('reportTypes.title')}
               </h2>
             </FadeInUp>
@@ -176,7 +176,7 @@ export default function ProductReportContent() {
               <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
                 {t('costComparison.overline')}
               </p>
-              <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
+              <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
                 {t('costComparison.title')}
               </h2>
             </div>
@@ -255,7 +255,7 @@ export default function ProductReportContent() {
       <SectionWrapper dark>
         <div className="text-center">
           <FadeInUp>
-            <h2 className="text-[clamp(28px,3vw,40px)] font-bold text-text-primary">
+            <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary">
               {t('cta.title')}
             </h2>
             <p className="text-text-secondary mt-3 max-w-lg mx-auto">{t('cta.desc')}</p>

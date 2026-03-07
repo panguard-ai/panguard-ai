@@ -22,7 +22,7 @@ export default function FinalCTA() {
   };
 
   return (
-    <section className="bg-gradient-to-b from-[#0a0a0a] to-[#0d2614] px-4 sm:px-6 py-16 sm:py-24">
+    <section className="bg-gradient-to-b from-[#0a0a0a] to-[#0d2614] px-5 sm:px-6 py-16 sm:py-24">
       <div className="max-w-3xl mx-auto text-center">
         {/* Title */}
         <motion.h2
