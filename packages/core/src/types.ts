@@ -31,7 +31,17 @@ export type EventSource =
   | 'honeypot'
   | 'dpi'
   | 'memory_scanner'
-  | 'syscall';
+  | 'syscall'
+  | 'agent_input'
+  | 'agent_output'
+  | 'agent_behavior'
+  | 'llm_input'
+  | 'llm_output'
+  | 'tool_call'
+  | 'tool_response'
+  | 'function_call'
+  | 'mcp_response'
+  | 'multi_agent';
 
 /**
  * Base application configuration / 基礎應用程式配置

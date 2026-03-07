@@ -25,6 +25,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
+    "agent-threat-rules": "workspace:*",
     "@panguard-ai/core": "workspace:*",
     "@panguard-ai/panguard-trap": "workspace:*",
     "@panguard-ai/security-hardening": "workspace:*",

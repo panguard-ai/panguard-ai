@@ -1,0 +1,284 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Panguard AI",
+  "logo": {
+    "dark": "/logo/panguard-dark.svg",
+    "light": "/logo/panguard-light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#8B9A8E",
+    "light": "#A8B5AB",
+    "dark": "#6B7A6E",
+    "background": {
+      "dark": "#1A1614",
+      "light": "#F5F1E8"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Website",
+      "url": "https://panguard.ai"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://panguard.ai/register"
+  },
+  "anchors": [
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/panguard-ai/panguard-ai"
+    },
+    {
+      "name": "Changelog",
+      "icon": "list",
+      "url": "/changelog"
+    }
+  ],
+  "tabs": [
+    {
+      "name": "Products",
+      "url": "products"
+    },
+    {
+      "name": "CLI Reference",
+      "url": "cli"
+    },
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "introduction",
+        "overview",
+        "quickstart",
+        "installation",
+        "account-setup"
+      ]
+    },
+    {
+      "group": "Concepts",
+      "pages": [
+        "concepts/three-layer-ai",
+        "concepts/learning-mode",
+        "concepts/security-score",
+        "concepts/authentication",
+        "concepts/threat-intelligence",
+        "concepts/architecture"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "guides/first-scan",
+        "guides/real-time-protection",
+        "guides/notifications-setup",
+        "guides/honeypots",
+        "guides/compliance-reports",
+        "guides/threat-cloud-deployment",
+        "guides/mcp-integration",
+        "guides/multi-endpoint",
+        "guides/system-service",
+        "guides/docker-deployment"
+      ]
+    },
+    {
+      "group": "Configuration",
+      "pages": [
+        "configuration/guard-config",
+        "configuration/chat-config",
+        "configuration/environment-variables",
+        "configuration/sigma-rules",
+        "configuration/yara-rules"
+      ]
+    },
+    {
+      "group": "Troubleshooting",
+      "pages": [
+        "troubleshooting/common-issues",
+        "troubleshooting/auth-issues",
+        "troubleshooting/guard-issues",
+        "troubleshooting/notification-issues"
+      ]
+    },
+    {
+      "group": "Products",
+      "pages": [
+        "products/overview"
+      ]
+    },
+    {
+      "group": "Panguard Scan",
+      "pages": [
+        "products/scan/overview",
+        "products/scan/scanners",
+        "products/scan/risk-scoring",
+        "products/scan/pdf-reports"
+      ]
+    },
+    {
+      "group": "Panguard Guard",
+      "pages": [
+        "products/guard/overview",
+        "products/guard/agent-pipeline",
+        "products/guard/monitors",
+        "products/guard/event-correlation",
+        "products/guard/auto-response"
+      ]
+    },
+    {
+      "group": "Panguard Chat",
+      "pages": [
+        "products/chat/overview",
+        "products/chat/telegram",
+        "products/chat/slack",
+        "products/chat/email-webhook",
+        "products/chat/user-roles"
+      ]
+    },
+    {
+      "group": "Panguard Trap",
+      "pages": [
+        "products/trap/overview",
+        "products/trap/honeypot-types",
+        "products/trap/attacker-profiling"
+      ]
+    },
+    {
+      "group": "Panguard Report",
+      "pages": [
+        "products/report/overview",
+        "products/report/frameworks",
+        "products/report/output-formats"
+      ]
+    },
+    {
+      "group": "Panguard MCP",
+      "pages": [
+        "products/mcp/overview",
+        "products/mcp/tools-reference"
+      ]
+    },
+    {
+      "group": "Panguard Manager",
+      "pages": [
+        "products/manager/overview",
+        "products/manager/agent-lifecycle",
+        "products/manager/policy-engine"
+      ]
+    },
+    {
+      "group": "Threat Cloud",
+      "pages": [
+        "products/threat-cloud/overview",
+        "products/threat-cloud/deployment",
+        "products/threat-cloud/privacy"
+      ]
+    },
+    {
+      "group": "CLI Reference",
+      "pages": [
+        "cli/overview"
+      ]
+    },
+    {
+      "group": "Scanning",
+      "pages": [
+        "cli/scan"
+      ]
+    },
+    {
+      "group": "Protection",
+      "pages": [
+        "cli/guard",
+        "cli/trap",
+        "cli/chat",
+        "cli/report"
+      ]
+    },
+    {
+      "group": "System",
+      "pages": [
+        "cli/init",
+        "cli/deploy",
+        "cli/status",
+        "cli/config",
+        "cli/doctor",
+        "cli/upgrade"
+      ]
+    },
+    {
+      "group": "Authentication",
+      "pages": [
+        "cli/login",
+        "cli/logout",
+        "cli/whoami"
+      ]
+    },
+    {
+      "group": "Advanced",
+      "pages": [
+        "cli/manager",
+        "cli/threat"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/overview"
+      ]
+    },
+    {
+      "group": "Auth API",
+      "pages": [
+        "api-reference/auth/registration",
+        "api-reference/auth/login",
+        "api-reference/auth/sessions",
+        "api-reference/auth/gdpr"
+      ]
+    },
+    {
+      "group": "Manager API",
+      "pages": [
+        "api-reference/manager/authentication",
+        "api-reference/manager/agents",
+        "api-reference/manager/events",
+        "api-reference/manager/policy",
+        "api-reference/manager/dashboard"
+      ]
+    },
+    {
+      "group": "Threat Cloud API",
+      "pages": [
+        "api-reference/threat-cloud/ioc",
+        "api-reference/threat-cloud/feeds",
+        "api-reference/threat-cloud/campaigns",
+        "api-reference/threat-cloud/stats"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/panguard-ai/panguard-ai"
+  },
+  "search": {
+    "prompt": "Search Panguard docs..."
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true,
+    "raiseIssue": true
+  },
+  "i18n": {
+    "languages": [
+      { "locale": "en", "name": "English" },
+      { "locale": "zh-TW", "name": "繁體中文" }
+    ],
+    "defaultLocale": "en"
+  }
+}

@@ -1,0 +1,142 @@
+---
+title: "GDPR"
+description: "符合 GDPR 的帳號刪除和資料匯出端點。"
+icon: "shield-check"
+---
+
+Panguard AI 透過自助式資料匯出和帳號刪除端點提供完整的 GDPR 合規性。
+
+## DELETE /api/auth/delete-account
+
+永久刪除已認證使用者的帳號及所有相關資料。
+
+<ParamField body="password" type="string" required>
+  目前帳號密碼用於確認。這是一個需要明確驗證的破壞性操作。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://auth.panguard.ai/api/auth/delete-account \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "password": "secureP@ssw0rd" }'
+```
+</CodeGroup>
+
+<Tabs>
+  <Tab title="200 成功">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "message": "Account and all associated data have been permanently deleted"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="401 密碼錯誤">
+    ```json
+    {
+      "ok": false,
+      "error": "Invalid password"
+    }
+    ```
+  </Tab>
+  <Tab title="403 最後一位管理員">
+    ```json
+    {
+      "ok": false,
+      "error": "Cannot delete the only admin account for this organization"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+此操作**不可逆**。以下所有資料都會被永久刪除：
+- 使用者個人資料和憑證
+- 代理註冊和心跳歷史
+- 威脅事件歷史
+- 策略設定
+- 通知設定
+- 工作階段 token
+
+請先使用下方端點匯出您的資料。
+</Warning>
+
+### 安全性：最後管理員保護
+
+如果使用者是組織中唯一的管理員，刪除會被阻擋並回傳 `403` 回應。這可防止組織失去管理員存取權限。
+
+若要繼續，請先將管理員權限轉移給另一位使用者，或完全刪除組織。
+
+---
+
+## GET /api/auth/export-data
+
+匯出與已認證使用者相關的所有資料為可下載的 JSON 檔案。符合 GDPR 第 20 條（資料可攜權）。
+
+<CodeGroup>
+```bash cURL
+curl -X GET https://auth.panguard.ai/api/auth/export-data \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -o panguard-data-export.json
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "exportedAt": "2026-03-07T12:00:00.000Z",
+    "user": {
+      "id": "usr_a1b2c3d4e5f6",
+      "email": "user@example.com",
+      "name": "Alice Chen",
+      "tier": "pro",
+      "totpEnabled": true,
+      "createdAt": "2026-01-15T08:30:00.000Z"
+    },
+    "agents": [
+      {
+        "id": "agent-001",
+        "hostname": "web-server-1",
+        "registeredAt": "2026-02-01T10:00:00.000Z",
+        "lastHeartbeat": "2026-03-07T11:55:00.000Z"
+      }
+    ],
+    "threatEvents": [
+      {
+        "id": "evt_xyz789",
+        "type": "brute_force",
+        "severity": "high",
+        "timestamp": "2026-03-06T08:15:00.000Z"
+      }
+    ],
+    "policies": [...],
+    "notifications": [...],
+    "sessions": [...]
+  }
+}
+```
+</ResponseExample>
+
+<Info>
+匯出包含 Panguard 儲存的您的所有資料。回應是一個包含您的個人資料、代理、威脅事件、策略、通知設定和工作階段歷史的單一 JSON 物件。
+</Info>
+
+### 包含的內容
+
+| 類別 | 資料 |
+|----------|------|
+| **使用者個人資料** | ID、email、名稱、層級、建立日期 |
+| **代理** | 所有已註冊的代理、主機名稱、心跳歷史 |
+| **威脅事件** | 所有威脅偵測及其中繼資料 |
+| **策略** | 已建立的策略和規則設定 |
+| **通知** | 通知頻道設定（token 已遮蔽） |
+| **工作階段** | 登入歷史，含 IP 地址和時間戳 |
+
+<Tip>
+敏感值如 API token 和通知 webhook URL 在匯出中會被部分遮蔽以確保安全。資料匯出中永遠不會包含完整的憑證。
+</Tip>

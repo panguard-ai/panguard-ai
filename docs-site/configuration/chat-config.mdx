@@ -1,0 +1,232 @@
+---
+title: "Chat Configuration"
+description: "Configure notification channels for Panguard Chat: Telegram, Slack, Email, and Webhooks."
+icon: "message-bot"
+---
+
+Panguard Chat is configured via a JSON file located at `~/.panguard-chat/config.json`. This file manages notification channel credentials, formatting preferences, and delivery settings.
+
+## Configuration File Location
+
+```
+~/.panguard-chat/config.json
+```
+
+<Warning>
+Sensitive fields (API tokens, passwords, webhook URLs) are encrypted using **AES-256-GCM** after initial setup. Do not manually edit encrypted fields -- use `panguard chat setup` to reconfigure channels instead.
+</Warning>
+
+## Full Configuration Example
+
+```json
+{
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "ENC:v1:...",
+      "chatId": "ENC:v1:...",
+      "parseMode": "HTML",
+      "disablePreview": true
+    },
+    "slack": {
+      "enabled": false,
+      "webhookUrl": "ENC:v1:...",
+      "channel": "#security-alerts",
+      "username": "Panguard AI",
+      "iconEmoji": ":shield:"
+    },
+    "email": {
+      "enabled": false,
+      "smtp": {
+        "host": "smtp.gmail.com",
+        "port": 587,
+        "secure": true,
+        "auth": {
+          "user": "alerts@example.com",
+          "pass": "ENC:v1:..."
+        }
+      },
+      "from": "Panguard AI <alerts@example.com>",
+      "to": ["admin@example.com"],
+      "subjectPrefix": "[Panguard]"
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "ENC:v1:...",
+      "method": "POST",
+      "headers": {
+        "X-Custom-Header": "panguard"
+      },
+      "timeout": 10000
+    }
+  },
+  "preferences": {
+    "language": "en",
+    "minSeverity": "medium",
+    "cooldownMinutes": 15,
+    "batchWindow": 60,
+    "includeDetails": true,
+    "includeRecommendations": true
+  }
+}
+```
+
+## Channel Configuration
+
+### Telegram
+
+<AccordionGroup>
+  <Accordion title="Configuration Fields">
+    | Field | Type | Description |
+    |-------|------|-------------|
+    | `enabled` | boolean | Enable Telegram notifications |
+    | `botToken` | string | Bot API token from @BotFather (encrypted after setup) |
+    | `chatId` | string | Target chat/group ID (encrypted after setup) |
+    | `parseMode` | string | Message format: `HTML` or `Markdown` |
+    | `disablePreview` | boolean | Disable link previews in messages |
+  </Accordion>
+  <Accordion title="Setup via CLI">
+    ```bash
+    panguard chat setup telegram
+    ```
+
+    The CLI will prompt for:
+    1. Bot token (from [@BotFather](https://t.me/BotFather))
+    2. Chat ID (send a message to your bot first, then the CLI detects it)
+
+    Alternatively, set values directly:
+    ```bash
+    panguard chat setup telegram --bot-token YOUR_TOKEN --chat-id YOUR_CHAT_ID
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+You must send a message to your bot first before it can send messages to you. This is a Telegram Bot API requirement.
+</Info>
+
+### Slack
+
+<AccordionGroup>
+  <Accordion title="Configuration Fields">
+    | Field | Type | Description |
+    |-------|------|-------------|
+    | `enabled` | boolean | Enable Slack notifications |
+    | `webhookUrl` | string | Incoming webhook URL (encrypted after setup) |
+    | `channel` | string | Target channel (overrides webhook default) |
+    | `username` | string | Bot display name |
+    | `iconEmoji` | string | Bot icon emoji |
+  </Accordion>
+  <Accordion title="Setup via CLI">
+    ```bash
+    panguard chat setup slack
+    ```
+
+    Requires a Slack Incoming Webhook URL. Create one at:
+    1. Go to [api.slack.com/apps](https://api.slack.com/apps)
+    2. Create or select an app
+    3. Enable **Incoming Webhooks**
+    4. Add a webhook to your workspace
+    5. Copy the webhook URL
+  </Accordion>
+</AccordionGroup>
+
+### Email
+
+<AccordionGroup>
+  <Accordion title="Configuration Fields">
+    | Field | Type | Description |
+    |-------|------|-------------|
+    | `enabled` | boolean | Enable email notifications |
+    | `smtp.host` | string | SMTP server hostname |
+    | `smtp.port` | number | SMTP port (587 for TLS, 465 for SSL) |
+    | `smtp.secure` | boolean | Use TLS/SSL |
+    | `smtp.auth.user` | string | SMTP username |
+    | `smtp.auth.pass` | string | SMTP password (encrypted after setup) |
+    | `from` | string | Sender email address |
+    | `to` | string[] | Recipient email addresses |
+    | `subjectPrefix` | string | Prefix for email subject lines |
+  </Accordion>
+  <Accordion title="Setup via CLI">
+    ```bash
+    panguard chat setup email
+    ```
+
+    The CLI prompts for SMTP configuration. Common providers:
+
+    | Provider | Host | Port |
+    |----------|------|------|
+    | Gmail | `smtp.gmail.com` | 587 |
+    | Outlook | `smtp.office365.com` | 587 |
+    | SendGrid | `smtp.sendgrid.net` | 587 |
+    | AWS SES | `email-smtp.REGION.amazonaws.com` | 587 |
+
+    For Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) rather than your account password.
+  </Accordion>
+</AccordionGroup>
+
+### Webhook
+
+<AccordionGroup>
+  <Accordion title="Configuration Fields">
+    | Field | Type | Description |
+    |-------|------|-------------|
+    | `enabled` | boolean | Enable webhook notifications |
+    | `url` | string | Webhook endpoint URL (encrypted after setup) |
+    | `method` | string | HTTP method: `POST` or `PUT` |
+    | `headers` | object | Custom HTTP headers to include |
+    | `timeout` | number | Request timeout in milliseconds |
+  </Accordion>
+  <Accordion title="Webhook Payload Format">
+    ```json
+    {
+      "event": "threat_detected",
+      "severity": "high",
+      "hostname": "web-server-1",
+      "type": "brute_force",
+      "details": {
+        "sourceIp": "198.51.100.42",
+        "attempts": 150
+      },
+      "timestamp": "2026-03-07T08:15:00.000Z",
+      "actionTaken": "ip_blocked"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Preferences
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `language` | string | `en` | Notification language (`en`, `zh-TW`, `ja`) |
+| `minSeverity` | string | `medium` | Minimum severity to send: `low`, `medium`, `high`, `critical` |
+| `cooldownMinutes` | number | `15` | Minimum interval between duplicate alerts |
+| `batchWindow` | number | `60` | Seconds to batch related events before sending |
+| `includeDetails` | boolean | `true` | Include technical details in notifications |
+| `includeRecommendations` | boolean | `true` | Include AI-generated response recommendations |
+
+## Encryption Details
+
+Sensitive fields are encrypted at rest using **AES-256-GCM**:
+
+- Encrypted values are prefixed with `ENC:v1:`
+- The encryption key is derived from a machine-specific identifier
+- Encryption happens automatically during `panguard chat setup`
+- The CLI decrypts values transparently when sending notifications
+
+<Warning>
+Never manually edit fields prefixed with `ENC:v1:`. This will corrupt the encrypted data and break notification delivery. Always use `panguard chat setup` to modify credentials.
+</Warning>
+
+## Testing Notifications
+
+Verify your configuration by sending a test notification:
+
+```bash
+# Test all enabled channels
+panguard chat test
+
+# Test a specific channel
+panguard chat test --channel telegram
+```

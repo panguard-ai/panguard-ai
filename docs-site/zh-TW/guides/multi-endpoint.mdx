@@ -1,0 +1,225 @@
+---
+title: "多端點設定"
+description: "部署 Panguard Manager 實現跨多台設備的機群安全編排。"
+icon: "server"
+---
+
+# 多端點設定
+
+在分散式部署中，不同設備上的多個 Guard 代理程式向集中式 Manager 伺服器回報。Manager 提供機群全域可見性、跨代理程式威脅關聯與集中式策略分發。
+
+---
+
+## 架構
+
+```
+[Machine A: Manager]                [Machine B: Guard Agent]
++-------------------+               +---------------------+
+| Manager Server    |<-- heartbeat --| GuardEngine         |
+| :8443             |<-- events   --| (learning/protection)|
+|                   |-- policy   -->|                     |
++-------------------+               +---------------------+
+        ^
+        |                            [Machine C: Guard Agent]
+        |                            +---------------------+
+        +<-- heartbeat/events -------| GuardEngine         |
+        +--- policy ---------------->|                     |
+                                     +---------------------+
+```
+
+---
+
+## 部署 Manager
+
+<Steps>
+  <Step title="產生驗證 Token">
+    建立用於 Manager-Agent 通訊的安全 Token：
+
+    ```bash
+    export MANAGER_TOKEN=$(openssl rand -hex 32)
+    echo $MANAGER_TOKEN
+    ```
+
+    <Warning>
+    請安全保存此 Token。每個 Guard 代理程式都需要它來向 Manager 註冊。
+    </Warning>
+  </Step>
+  <Step title="啟動 Manager 伺服器">
+    ```bash
+    panguard manager --port 8443 --auth-token "$MANAGER_TOKEN"
+    ```
+
+    Manager 接受 Guard 代理程式的連線並提供：
+    - **代理程式登錄** -- 追蹤最多 500 個已註冊代理程式
+    - **威脅彙總器** -- 透過來源 IP、惡意軟體雜湊與攻擊模式跨代理程式關聯威脅
+    - **策略引擎** -- 分發集中式規則與設定
+    - **SSE 串流** -- 管理儀表板的即時事件串流
+  </Step>
+  <Step title="驗證 Manager 運行中">
+    ```bash
+    curl -H "Authorization: Bearer $MANAGER_TOKEN" \
+      http://localhost:8443/api/overview
+    ```
+  </Step>
+</Steps>
+
+---
+
+## 部署 Guard 代理程式
+
+在每台端點設備上：
+
+<Steps>
+  <Step title="安裝 Panguard">
+    ```bash
+    npm install -g @panguard-ai/panguard
+    ```
+  </Step>
+  <Step title="驗證身份">
+    ```bash
+    panguard login
+    ```
+  </Step>
+  <Step title="啟動 Guard 並連線 Manager">
+    ```bash
+    panguard guard start \
+      --manager-url "http://manager-host:8443" \
+      --manager-token "your-secure-token" \
+      --data-dir /var/panguard-guard
+    ```
+
+    代理程式會：
+    1. 啟動時向 Manager 註冊
+    2. 每 30 秒傳送心跳
+    3. 即時回報偵測到的威脅
+    4. 每 5 分鐘輪詢策略更新
+  </Step>
+</Steps>
+
+---
+
+## 代理程式生命週期
+
+| 階段 | 端點 | 間隔 | 說明 |
+| --- | --- | --- | --- |
+| **註冊** | `POST /api/agents/register` | 一次（啟動時） | 代理程式傳送主機名稱、作業系統、版本；接收唯一 `agentId` |
+| **心跳** | `POST /api/agents/:id/heartbeat` | 每 30 秒 | CPU/記憶體使用、已處理事件、模式、執行時間 |
+| **威脅回報** | `POST /api/agents/:id/events` | 即時 | 偵測到的威脅立即傳送 |
+| **策略輪詢** | `GET /api/policy/agent/:id` | 每 5 分鐘 | 代理程式檢查更新的策略 |
+| **失效偵測** | -- | 每 30 秒（伺服器端） | 90 秒無心跳的代理程式標記為失效 |
+| **取消註冊** | `DELETE /api/agents/:id` | 手動 | 從機群移除代理程式 |
+
+---
+
+## 跨代理程式威脅關聯
+
+Manager 的威脅彙總器即時跨所有代理程式關聯威脅：
+
+- **來源 IP 關聯** -- 多個端點看到相同攻擊者 IP 時觸發升級
+- **惡意軟體雜湊關聯** -- 跨代理程式的相同惡意軟體指紋表示有進行中的攻擊活動
+- **攻擊模式關聯** -- 5 分鐘窗口內的相關 MITRE ATT&CK 模式
+
+<Info>
+跨代理程式關聯使用 5 分鐘滑動窗口與 24 小時資料保留。跨 3+ 個代理程式關聯的威脅會自動升級至 CRITICAL 嚴重性。
+</Info>
+
+---
+
+## 策略分發
+
+策略引擎允許集中控制所有 Guard 代理程式：
+
+```bash
+# Set a global policy
+curl -X POST -H "Authorization: Bearer $MANAGER_TOKEN" \
+  -H "Content-Type: application/json" \
+  http://manager-host:8443/api/policy \
+  -d '{
+    "autoRespondThreshold": 85,
+    "ipBlocklist": ["203.0.113.0/24"],
+    "alertChannels": ["slack"]
+  }'
+```
+
+策略變更會在下次 5 分鐘輪詢週期內傳播至所有代理程式。
+
+---
+
+## 即時監控
+
+### SSE 事件串流
+
+即時串流所有代理程式的事件：
+
+```bash
+curl -N -H "Authorization: Bearer $MANAGER_TOKEN" \
+  http://manager-host:8443/api/events/stream
+```
+
+### 機群概覽
+
+```bash
+curl -H "Authorization: Bearer $MANAGER_TOKEN" \
+  http://manager-host:8443/api/overview
+```
+
+---
+
+## Manager 設定
+
+### 環境變數
+
+| 變數 | 預設值 | 說明 |
+| --- | --- | --- |
+| `MANAGER_PORT` | `8443` | HTTP 伺服器連接埠 |
+| `MANAGER_AUTH_TOKEN` | （無） | API 驗證用 Bearer token |
+| `MANAGER_MAX_AGENTS` | `500` | 最大已註冊代理程式數 |
+| `MANAGER_HEARTBEAT_TIMEOUT_MS` | `90000` | 心跳逾時後標記代理程式失效 |
+| `MANAGER_HEARTBEAT_INTERVAL_MS` | `30000` | 失效代理程式檢查間隔 |
+| `MANAGER_CORRELATION_WINDOW_MS` | `300000` | 跨代理程式威脅關聯窗口（5 分鐘） |
+| `MANAGER_THREAT_RETENTION_MS` | `86400000` | 威脅資料保留（24 小時） |
+| `CORS_ALLOWED_ORIGINS` | （無） | 逗號分隔的允許 CORS 來源 |
+
+### 可選 SQLite 持久化
+
+大型部署可啟用 SQLite 進行持久儲存：
+
+```bash
+panguard manager --port 8443 --auth-token "$MANAGER_TOKEN" --db /var/panguard-manager/data.db
+```
+
+---
+
+## 正式環境部署
+
+<Tip>
+正式環境建議將 Manager 安裝為 systemd 服務，並放置在 TLS 終止反向代理後方。請參閱[系統服務指南](/guides/system-service)與 [Docker 部署指南](/guides/docker-deployment)。
+</Tip>
+
+### 安全檢查清單
+
+- [ ] 產生強力驗證 Token（`openssl rand -hex 32`）
+- [ ] 使用 TLS 終止（nginx/Caddy 反向代理）
+- [ ] 限制 Manager 連接埠（8443）僅允許 Guard 代理程式網路
+- [ ] 以非 root 系統使用者執行
+- [ ] 設定 `NODE_ENV=production` 啟用強化模式
+- [ ] 將密鑰儲存於 `chmod 600` 的環境檔案中
+
+---
+
+## 相關內容
+
+<CardGroup cols={2}>
+  <Card title="架構" icon="sitemap" href="/concepts/architecture">
+    Manager-Agent 系統的完整技術架構。
+  </Card>
+  <Card title="系統服務" icon="gear" href="/guides/system-service">
+    將 Manager 與 Guard 安裝為 systemd/launchd 服務。
+  </Card>
+  <Card title="Docker 部署" icon="docker" href="/guides/docker-deployment">
+    使用 Docker Compose 運行完整堆疊。
+  </Card>
+  <Card title="Threat Cloud" icon="cloud" href="/guides/threat-cloud-deployment">
+    跨機群的集中式威脅情報。
+  </Card>
+</CardGroup>

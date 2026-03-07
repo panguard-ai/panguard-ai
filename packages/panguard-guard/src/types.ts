@@ -244,6 +244,8 @@ export interface DetectionResult {
     ruleIds: string[];
     windowMs: number;
   };
+  /** ATR (Agent Threat Rules) matches for agent-related events */
+  atrMatches?: Array<{ ruleId: string; category: string; severity: string }>;
 }
 
 // ===== Response =====
@@ -338,6 +340,10 @@ export interface AnonymizedThreatData {
   panguardVersion?: string;
   /** OS type (darwin/linux/windows) / 作業系統類型 */
   osType?: string;
+  /** ATR rule IDs that matched (comma-separated) */
+  atrRulesMatched?: string;
+  /** ATR threat category (prompt-injection, tool-poisoning, etc.) */
+  atrCategory?: string;
 }
 
 /** Threat cloud rule update / 威脅雲規則更新 */
@@ -513,6 +519,10 @@ export interface GuardConfig {
   managerUrl?: string;
   /** Agent ID (auto-assigned on registration) */
   agentId?: string;
+  /** Enable telemetry upload to Threat Cloud (default true) */
+  telemetryEnabled?: boolean;
+  /** Show anonymized upload data before sending (debug mode) */
+  showUploadData?: boolean;
 }
 
 /** Guard engine status / 守護引擎狀態 */
@@ -527,4 +537,8 @@ export interface GuardStatus {
   baselineConfidence: number;
   memoryUsageMB: number;
   licenseTier: LicenseTier;
+  /** Number of loaded ATR rules / 已載入的 ATR 規則數 */
+  atrRuleCount?: number;
+  /** Number of ATR matches / ATR 匹配數 */
+  atrMatchCount?: number;
 }

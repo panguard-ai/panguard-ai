@@ -1,0 +1,213 @@
+---
+title: "YARA Rules"
+description: "File pattern matching rules using the YARA format for malware detection."
+icon: "virus"
+---
+
+Panguard Guard uses [YARA rules](https://yara.readthedocs.io/) for file-based threat detection. YARA is the industry standard for identifying and classifying malware based on binary and textual patterns within files.
+
+## What Are YARA Rules?
+
+YARA rules describe patterns that identify malware families, suspicious tools, and unwanted software. Unlike Sigma rules (which match log events), YARA rules match **file content** -- scanning executables, scripts, documents, and other files for known malicious patterns.
+
+## Bundled Rules
+
+Panguard Guard ships with **900+ YARA rules** covering:
+
+- Common malware families and variants
+- Web shells and backdoors
+- Hacking tools and exploit kits
+- Cryptominers and ransomware
+- Suspicious file characteristics (packers, obfuscation)
+- Malicious document macros
+
+Rules are sourced from reputable open-source collections and updated via Threat Cloud.
+
+## Rule Format
+
+YARA rules use a C-like syntax with three main sections:
+
+```yara
+rule Detect_WebShell_Generic : webshell
+{
+    meta:
+        author = "Panguard AI"
+        description = "Detects common PHP web shell patterns"
+        severity = "critical"
+        date = "2026-03-01"
+        reference = "https://panguard.ai/rules/yara-ws-001"
+        mitre_attack = "T1505.003"
+
+    strings:
+        $eval1 = "eval($_POST" ascii
+        $eval2 = "eval($_GET" ascii
+        $eval3 = "eval($_REQUEST" ascii
+        $system1 = "system($_" ascii
+        $passthru = "passthru(" ascii
+        $shell_exec = "shell_exec(" ascii
+        $base64 = "base64_decode(" ascii
+        $gzinflate = "gzinflate(" ascii
+
+    condition:
+        filesize < 500KB and
+        (
+            any of ($eval*) or
+            (any of ($system1, $passthru, $shell_exec) and any of ($base64, $gzinflate))
+        )
+}
+```
+
+### Rule Sections
+
+| Section | Description |
+|---------|-------------|
+| `meta` | Metadata about the rule (author, description, severity, references) |
+| `strings` | Patterns to search for (text, hex, regex) |
+| `condition` | Boolean logic determining when the rule matches |
+
+## Custom Rules
+
+Add custom YARA rules by placing `.yar` or `.yara` files in the custom rules directory:
+
+```
+{dataDir}/yara-rules/custom/*.yar
+```
+
+Where `{dataDir}` defaults to `~/.panguard-guard`.
+
+<CodeGroup>
+```bash Create custom rules directory
+mkdir -p ~/.panguard-guard/yara-rules/custom
+```
+
+```bash Add a custom rule
+cat > ~/.panguard-guard/yara-rules/custom/detect-suspicious-scripts.yar << 'EOF'
+rule Suspicious_Bash_Script : suspicious
+{
+    meta:
+        author = "Custom"
+        description = "Detects bash scripts with suspicious download and execute patterns"
+        severity = "high"
+        date = "2026-03-07"
+
+    strings:
+        $download1 = "curl" ascii
+        $download2 = "wget" ascii
+        $pipe = "| bash" ascii
+        $pipe2 = "| sh" ascii
+        $hidden = "/tmp/." ascii
+        $chmod = "chmod +x" ascii
+        $nohup = "nohup" ascii
+
+    condition:
+        filesize < 100KB and
+        any of ($download*) and
+        (any of ($pipe*) or ($chmod and $hidden) or $nohup)
+}
+EOF
+```
+</CodeGroup>
+
+<Info>
+Custom YARA rules are loaded on the next scan cycle. For immediate testing, run `panguard scan --yara-only` to trigger a targeted scan with your new rules.
+</Info>
+
+## Engine Architecture
+
+Panguard Guard includes two YARA evaluation engines:
+
+### Native Engine (Primary)
+
+The native engine uses compiled YARA binaries for maximum performance. It is used when the YARA library is available on the system.
+
+| Feature | Detail |
+|---------|--------|
+| Performance | Up to 100x faster than regex fallback |
+| Compatibility | Supports all YARA features including modules |
+| Requirements | YARA library installed (`libyara`) |
+| Installation | Bundled with Panguard Guard on supported platforms |
+
+### Regex Fallback (Secondary)
+
+When the native YARA library is not available, Panguard falls back to a JavaScript-based regex engine that provides basic pattern matching.
+
+| Feature | Detail |
+|---------|--------|
+| Performance | Adequate for small file sets |
+| Compatibility | Supports string matching and basic conditions |
+| Limitations | No YARA modules, limited hex pattern support |
+| Requirements | None (built into Panguard) |
+
+<Tip>
+The native engine is strongly recommended for production deployments. Panguard will log a warning at startup if it falls back to the regex engine. Install YARA with your package manager: `brew install yara` (macOS), `apt install yara` (Debian/Ubuntu), or `yum install yara` (CentOS/RHEL).
+</Tip>
+
+## String Types
+
+YARA supports three types of string patterns:
+
+### Text Strings
+
+```yara
+strings:
+    $text1 = "malware_payload" ascii
+    $text2 = "malware_payload" wide        // UTF-16
+    $text3 = "malware_payload" nocase      // case-insensitive
+    $text4 = "malware_payload" ascii wide  // both encodings
+```
+
+### Hex Strings
+
+```yara
+strings:
+    $hex1 = { 4D 5A 90 00 }                    // exact bytes
+    $hex2 = { 4D 5A ?? 00 }                    // wildcard byte
+    $hex3 = { 4D 5A [2-4] 00 }                // byte range jump
+    $hex4 = { 4D 5A ( 90 00 | 89 00 ) 03 }    // alternatives
+```
+
+### Regular Expressions
+
+```yara
+strings:
+    $re1 = /https?:\/\/[a-z0-9\-\.]+\.evil\.com/
+    $re2 = /[A-Za-z0-9+\/]{50,}={0,2}/ // base64 blob
+```
+
+## Condition Operators
+
+| Operator | Example | Description |
+|----------|---------|-------------|
+| `and`, `or`, `not` | `$a and $b` | Boolean logic |
+| `any of` | `any of ($shell*)` | Any string in the set matches |
+| `all of` | `all of them` | All defined strings match |
+| `X of` | `2 of ($a, $b, $c)` | At least X strings match |
+| `filesize` | `filesize < 1MB` | File size constraint |
+| `at` | `$a at 0` | String at specific offset |
+| `in` | `$a in (0..1024)` | String within byte range |
+
+## Performance Considerations
+
+| Metric | Typical Value |
+|--------|--------------|
+| Rule loading time | < 1 second for 900 rules |
+| Per-file scan time | < 50 ms for files under 10 MB |
+| Memory overhead | ~30 MB for compiled rule set |
+| Custom rule limit | No hard limit (recommend < 200) |
+
+<Warning>
+YARA scans are CPU-intensive for large files. Panguard automatically skips files larger than 50 MB by default. Adjust this with `panguard config set rules.yaraMaxFileSize "100MB"`.
+</Warning>
+
+## Scan Targets
+
+By default, YARA rules are evaluated against:
+
+| Target | Description |
+|--------|-------------|
+| New files in monitored directories | `/tmp`, `/var/tmp`, `/dev/shm`, user home directories |
+| Downloaded files | Files created by `curl`, `wget`, browsers |
+| Modified executables | Any executable file that changes |
+| Quarantine review | Files flagged by other detection layers |
+
+Configure monitored directories in `config.json` under the `monitoring.fileIntegrity` settings.

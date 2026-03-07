@@ -1,0 +1,77 @@
+title: Unauthorized Tool Call Detection
+id: ATR-2026-012
+status: experimental
+description: |
+  Detects when an agent attempts to invoke tools that are not in its
+  approved tool list or when tool calls exceed the agent's authorized
+  scope. Includes calling privileged operations, path traversal in
+  parameters, and tool enumeration attempts.
+author: "ATR Community"
+date: 2026/03/08
+severity: high
+
+references:
+  owasp_llm:
+    - "LLM06:2025 - Excessive Agency"
+  mitre_atlas:
+    - "AML.T0053 - LLM Plugin Compromise"
+
+tags:
+  category: tool-poisoning
+  subcategory: unauthorized-access
+  confidence: high
+
+agent_source:
+  type: tool_call
+  framework:
+    - any
+  provider:
+    - any
+
+detection:
+  conditions:
+    privileged_tool:
+      field: tool_name
+      patterns:
+        - "(?:admin_|root_|sudo_|system_|internal_|debug_|maintenance_|privileged_|superuser_)"
+        - "(?:list_tools|enumerate_tools|get_available|discover_tools|tool_schema|__list__|__tools__)"
+      match_type: regex
+      case_sensitive: false
+    param_injection:
+      field: tool_args
+      patterns:
+        - "(?:\\.\\.[\\/\\\\]|~[\\/\\\\]|[\\/\\\\]etc[\\/\\\\]|[\\/\\\\]proc[\\/\\\\]|[\\/\\\\]root[\\/\\\\])"
+        - "(?:;|&&|\\|\\||\\$\\(|`).{0,50}(?:curl|wget|nc|bash|sh|python|ruby|perl|node)"
+      match_type: regex
+      case_sensitive: false
+  condition: "privileged_tool OR param_injection"
+  false_positives:
+    - "Agent frameworks that dynamically register tools during runtime"
+    - "Legitimate tool discovery during agent initialization phase"
+    - "Agents with broad tool access for administrative purposes"
+
+response:
+  actions:
+    - block_tool
+    - alert
+    - snapshot
+    - escalate
+  auto_response_threshold: high
+  message_template: |
+    [ATR] Unauthorized tool call detected
+    Rule: ATR-2026-012
+    Tool: {tool_name}
+    Pattern: {matched_pattern}
+    Action: Tool call blocked
+
+test_cases:
+  true_positives:
+    - tool_name: "admin_delete_user"
+      expected: triggered
+    - tool_args: "../../etc/passwd"
+      expected: triggered
+  true_negatives:
+    - tool_name: "search_knowledge_base"
+      expected: not_triggered
+    - tool_name: "read_file"
+      expected: not_triggered

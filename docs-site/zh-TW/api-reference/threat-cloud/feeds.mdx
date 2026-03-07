@@ -1,0 +1,210 @@
+---
+title: "摘要端點"
+description: "以封鎖清單和結構化 JSON 格式消費威脅情報摘要。"
+icon: "rss"
+---
+
+摘要端點以針對防火牆、DNS 解析器和 Panguard 代理最佳化的格式提供威脅情報。封鎖清單摘要回傳純文字；結構化摘要回傳 JSON。
+
+## GET /api/feeds/ip-blocklist
+
+回傳惡意 IP 位址的純文字清單，每行一個。設計用於防火牆（iptables、pf、Windows Firewall）和網路設備直接接收。
+
+<ParamField query="minReputation" type="number" default="30">
+  要包含的最高聲譽分數（0 = 最惡意）。較低的值產生較保守的清單。
+</ParamField>
+
+<ParamField query="category" type="string">
+  依威脅類別篩選：`malware`、`botnet`、`bruteforce`、`scanner`、`c2`。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/feeds/ip-blocklist?minReputation=20" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash 直接匯入 iptables
+curl -s "https://tc.panguard.ai/api/feeds/ip-blocklist" \
+  -H "Authorization: Bearer YOUR_API_KEY" | \
+  while read ip; do
+    iptables -A INPUT -s "$ip" -j DROP
+  done
+```
+</CodeGroup>
+
+### 回應
+
+```text
+# Panguard AI IP Blocklist
+# Generated: 2026-03-07T12:00:00Z
+# Total: 1423 IPs
+198.51.100.42
+198.51.100.78
+203.0.113.15
+203.0.113.99
+192.0.2.50
+...
+```
+
+<Info>
+回應內容類型為 `text/plain`。以 `#` 開頭的行是包含中繼資料的註解。清單依聲譽分數排序（最惡意的在前）。
+</Info>
+
+---
+
+## GET /api/feeds/domain-blocklist
+
+回傳惡意網域的純文字清單，每行一個。適用於 DNS 沉洞設定（Pi-hole、dnsmasq、Unbound）。
+
+<ParamField query="minReputation" type="number" default="30">
+  要包含的最高聲譽分數。
+</ParamField>
+
+<ParamField query="category" type="string">
+  依威脅類別篩選：`malware`、`phishing`、`c2`、`exploit`。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/feeds/domain-blocklist" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Pi-hole 格式
+curl -s "https://tc.panguard.ai/api/feeds/domain-blocklist" \
+  -H "Authorization: Bearer YOUR_API_KEY" | \
+  sed 's/^/0.0.0.0 /' > /etc/pihole/panguard-blocklist.txt
+```
+</CodeGroup>
+
+### 回應
+
+```text
+# Panguard AI Domain Blocklist
+# Generated: 2026-03-07T12:00:00Z
+# Total: 892 domains
+malware-c2.example.net
+phishing-bank.example.org
+dropper.example.com
+evil-redirect.example.io
+...
+```
+
+---
+
+## GET /api/feeds/iocs
+
+以結構化 JSON 格式回傳完整的 IoC 摘要和中繼資料，適用於 SIEM 整合和自動化處理。
+
+<ParamField query="since" type="string">
+  ISO 8601 時間戳。僅回傳此時間之後更新的 IoC（用於增量同步）。
+</ParamField>
+
+<ParamField query="type" type="string">
+  依 IoC 類型篩選：`ip`、`domain`、`hash`、`url`。
+</ParamField>
+
+<ParamField query="limit" type="number" default="1000">
+  回傳的最大 IoC 數量（最大 5000）。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/feeds/iocs?since=2026-03-06T00:00:00Z&type=ip" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "generatedAt": "2026-03-07T12:00:00.000Z",
+    "count": 156,
+    "iocs": [
+      {
+        "value": "198.51.100.42",
+        "type": "ip",
+        "reputation": 12,
+        "category": "bruteforce",
+        "sightings": 47,
+        "firstSeen": "2026-02-15T10:00:00.000Z",
+        "lastSeen": "2026-03-07T08:15:00.000Z",
+        "metadata": {
+          "asn": "AS64496",
+          "country": "CN",
+          "mitreIds": ["T1110"]
+        }
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/feeds/agent-update
+
+回傳 Panguard Guard 代理的打包更新，包含最新偵測規則和 IoC 資料。此端點在代理更新週期中自動呼叫。
+
+<ParamField query="currentVersion" type="string">
+  代理目前的規則版本。僅回傳此版本之後的變更。
+</ParamField>
+
+<ParamField query="agentId" type="string">
+  請求代理的 ID，用於存取控制。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/feeds/agent-update?currentVersion=v20260306" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "version": "v20260307",
+    "rules": {
+      "sigma": {
+        "added": 12,
+        "updated": 3,
+        "removed": 1,
+        "files": [
+          {
+            "id": "sigma-new-001",
+            "name": "Detect Cryptominer Process",
+            "content": "..."
+          }
+        ]
+      },
+      "yara": {
+        "added": 5,
+        "updated": 0,
+        "removed": 0,
+        "files": [...]
+      }
+    },
+    "iocs": {
+      "ipBlocklist": ["198.51.100.42", "203.0.113.99"],
+      "domainBlocklist": ["malware-c2.example.net"],
+      "hashBlocklist": ["e3b0c44298fc1c149afbf4c8996fb924"]
+    },
+    "config": {
+      "heartbeatInterval": 60,
+      "logLevel": "info"
+    }
+  }
+}
+```
+</ResponseExample>
+
+<Tip>
+當提供 `currentVersion` 時，agent-update 端點使用差異更新。這透過僅發送代理上次更新以來新增或修改的規則來最小化頻寬。
+</Tip>

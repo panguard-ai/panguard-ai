@@ -1,0 +1,308 @@
+---
+title: "System Service"
+description: "Install Panguard Guard as a systemd, launchd, or Windows service for automatic startup and continuous protection."
+icon: "gear"
+---
+
+# System Service Installation
+
+Install Guard as a system service so it starts automatically on boot, restarts on failure, and runs continuously without manual intervention.
+
+---
+
+## Quick Install
+
+```bash
+# Install as system service
+panguard guard install
+
+# Remove system service
+panguard guard uninstall
+```
+
+The `install` command detects your operating system and creates the appropriate service configuration automatically.
+
+---
+
+## Platform-Specific Details
+
+<Tabs>
+  <Tab title="macOS (launchd)">
+    Guard creates a LaunchDaemon plist file:
+
+    ```
+    /Library/LaunchDaemons/ai.panguard.guard.plist
+    ```
+
+    **Behavior after installation:**
+    - Starts automatically on boot
+    - Restarts automatically on abnormal exit
+    - Logs written to `/var/log/panguard-guard.log`
+
+    **Manual management:**
+
+    ```bash
+    # Check service status
+    sudo launchctl list | grep panguard
+
+    # Start manually
+    sudo launchctl load /Library/LaunchDaemons/ai.panguard.guard.plist
+
+    # Stop manually
+    sudo launchctl unload /Library/LaunchDaemons/ai.panguard.guard.plist
+    ```
+  </Tab>
+  <Tab title="Linux (systemd)">
+    Guard creates a systemd unit file:
+
+    ```
+    /etc/systemd/system/panguard-guard.service
+    ```
+
+    **Example unit file:**
+
+    ```ini
+    [Unit]
+    Description=Panguard Guard Agent
+    After=network-online.target
+    Wants=network-online.target
+
+    [Service]
+    Type=simple
+    User=panguard
+    Group=panguard
+    WorkingDirectory=/opt/panguard
+    ExecStart=/usr/bin/node /opt/panguard/dist/cli/index.js guard --mode protection --data-dir /var/panguard-guard
+    Restart=always
+    RestartSec=10
+    StandardOutput=journal
+    StandardError=journal
+    SyslogIdentifier=panguard-guard
+
+    # Security hardening
+    NoNewPrivileges=true
+    ProtectSystem=strict
+    ProtectHome=true
+    ReadWritePaths=/var/panguard-guard
+    PrivateTmp=true
+
+    # Required capabilities for response actions
+    AmbientCapabilities=CAP_NET_ADMIN CAP_KILL CAP_SYS_PTRACE
+
+    Environment=NODE_ENV=production
+    Environment=PANGUARD_DATA_DIR=/var/panguard-guard
+    EnvironmentFile=-/etc/panguard/guard.env
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+    **Manual management:**
+
+    ```bash
+    # Check service status
+    systemctl status panguard-guard
+
+    # Start / stop
+    sudo systemctl start panguard-guard
+    sudo systemctl stop panguard-guard
+
+    # View logs
+    journalctl -u panguard-guard -f
+    ```
+
+    **Required Linux capabilities:**
+
+    | Capability | Purpose |
+    | --- | --- |
+    | `CAP_NET_ADMIN` | Block IPs via iptables |
+    | `CAP_KILL` | Terminate malicious processes |
+    | `CAP_SYS_PTRACE` | Memory scanning for fileless malware |
+  </Tab>
+  <Tab title="Windows (Services)">
+    Guard registers as a Windows service:
+
+    ```
+    Service Name:    PanguardGuard
+    Display Name:    Panguard Guard AI
+    ```
+
+    **Behavior after installation:**
+    - Starts automatically on boot
+    - Restarts automatically on abnormal exit
+    - Logs written to Windows Event Log
+
+    **Manual management:**
+
+    ```powershell
+    # Check service status
+    sc.exe query PanguardGuard
+
+    # Start / stop
+    sc.exe start PanguardGuard
+    sc.exe stop PanguardGuard
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Manual systemd Setup (Advanced)
+
+For full control over the service configuration, follow these steps:
+
+<Steps>
+  <Step title="Create a System User">
+    ```bash
+    sudo useradd --system --home-dir /opt/panguard --shell /usr/sbin/nologin panguard
+    ```
+  </Step>
+  <Step title="Create Directories">
+    ```bash
+    sudo mkdir -p /opt/panguard /var/panguard-guard /etc/panguard
+    sudo chown -R panguard:panguard /opt/panguard /var/panguard-guard
+    ```
+  </Step>
+  <Step title="Deploy the Application">
+    ```bash
+    sudo cp -r dist/ /opt/panguard/dist/
+    sudo cp -r node_modules/ /opt/panguard/node_modules/
+    ```
+  </Step>
+  <Step title="Create Environment File">
+    ```bash
+    sudo tee /etc/panguard/guard.env << 'EOF'
+    PANGUARD_DATA_DIR=/var/panguard-guard
+    OLLAMA_ENDPOINT=http://localhost:11434
+    EOF
+
+    sudo chmod 600 /etc/panguard/guard.env
+    sudo chown panguard:panguard /etc/panguard/guard.env
+    ```
+
+    <Warning>
+    Environment files contain secrets. Always set permissions to `600` and restrict ownership to the service user.
+    </Warning>
+  </Step>
+  <Step title="Enable and Start">
+    ```bash
+    sudo systemctl daemon-reload
+    sudo systemctl enable panguard-guard
+    sudo systemctl start panguard-guard
+    sudo systemctl status panguard-guard
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Manager Service
+
+The Manager can also be installed as a systemd service for distributed deployments:
+
+```ini
+[Unit]
+Description=Panguard Manager Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=panguard
+Group=panguard
+WorkingDirectory=/opt/panguard
+ExecStart=/usr/bin/node /opt/panguard/dist/cli/index.js manager --port 8443
+Restart=always
+RestartSec=10
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/panguard-manager
+PrivateTmp=true
+
+Environment=NODE_ENV=production
+EnvironmentFile=-/etc/panguard/manager.env
+
+[Install]
+WantedBy=multi-user.target
+```
+
+---
+
+## Watchdog Health Monitoring
+
+The system service includes a built-in watchdog mechanism:
+
+- Checks Guard process health every 60 seconds
+- Restarts on abnormal memory usage
+- Degrades on abnormal CPU usage
+- Stops and notifies if restart count exceeds threshold
+
+---
+
+## Batch Deployment Script
+
+Generate a one-line installation script for deploying across multiple machines:
+
+```bash
+panguard guard install-script
+```
+
+The generated script will:
+1. Download Panguard AI
+2. Install dependencies
+3. Install as a system service
+4. Start Guard (user must complete `panguard login` separately)
+
+---
+
+## Data Directory
+
+| Platform | Default Path |
+| --- | --- |
+| macOS | `~/.panguard-guard/` |
+| Linux | `~/.panguard-guard/` |
+| Windows | `%APPDATA%\panguard-guard\` |
+
+Override with `--data-dir`:
+
+```bash
+panguard guard start --data-dir /opt/panguard/data
+```
+
+**Contents:**
+- `guard.pid` -- PID file (prevents duplicate instances)
+- `baseline/` -- Behavioral baseline data
+- `rules/` -- Custom Sigma and YARA rules
+- `logs/` -- Event logs (JSONL with rotation)
+- `config.json` -- Guard configuration
+
+---
+
+## PID Management
+
+Guard uses PID files to manage process state:
+
+- PID written on startup
+- PID file removed on clean shutdown
+- Prevents multiple instances from running simultaneously
+- Supports graceful shutdown via SIGTERM and SIGINT
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Real-Time Protection" icon="shield" href="/guides/real-time-protection">
+    Configure Guard for continuous monitoring and response.
+  </Card>
+  <Card title="Docker Deployment" icon="docker" href="/guides/docker-deployment">
+    Run Guard in a containerized environment.
+  </Card>
+  <Card title="Multi-Endpoint Setup" icon="server" href="/guides/multi-endpoint">
+    Connect Guard agents to a centralized Manager.
+  </Card>
+  <Card title="Environment Variables" icon="sliders" href="/configuration/environment-variables">
+    Complete environment variable reference.
+  </Card>
+</CardGroup>

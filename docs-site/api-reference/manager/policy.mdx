@@ -1,0 +1,225 @@
+---
+title: "Policy Management"
+description: "Create, broadcast, and query security policies across the agent fleet."
+icon: "gavel"
+---
+
+Policies define automated response rules that are broadcast to all agents. When a policy is created, it is immediately pushed to online agents via the SSE event stream.
+
+## POST /api/policy
+
+Creates a new policy and broadcasts it to all connected agents.
+
+<ParamField body="name" type="string" required>
+  Human-readable policy name.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Optional description of the policy purpose.
+</ParamField>
+
+<ParamField body="rules" type="object[]" required>
+  Array of policy rules to enforce.
+</ParamField>
+
+<ParamField body="rules[].type" type="string" required>
+  Rule type: `block_ip`, `alert_threshold`, `auto_respond`, or `custom`.
+</ParamField>
+
+<ParamField body="rules[].config" type="object" required>
+  Rule-specific configuration (varies by type).
+</ParamField>
+
+<ParamField body="rules[].enabled" type="boolean" default="true">
+  Whether the rule is active.
+</ParamField>
+
+<ParamField body="org_id" type="string">
+  Scope the policy to a specific organization.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://localhost:8443/api/policy \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Block Brute Force Sources",
+    "description": "Automatically block IPs after repeated SSH failures",
+    "rules": [
+      {
+        "type": "block_ip",
+        "config": {
+          "trigger": "brute_force",
+          "threshold": 50,
+          "duration": "24h",
+          "scope": "host"
+        },
+        "enabled": true
+      },
+      {
+        "type": "alert_threshold",
+        "config": {
+          "severity": "critical",
+          "countPerHour": 5,
+          "notifyChannels": ["telegram", "email"]
+        },
+        "enabled": true
+      }
+    ]
+  }'
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 201
+{
+  "ok": true,
+  "data": {
+    "id": "pol_abc123",
+    "name": "Block Brute Force Sources",
+    "version": "v3",
+    "rules": [
+      {
+        "type": "block_ip",
+        "config": {
+          "trigger": "brute_force",
+          "threshold": 50,
+          "duration": "24h",
+          "scope": "host"
+        },
+        "enabled": true
+      },
+      {
+        "type": "alert_threshold",
+        "config": {
+          "severity": "critical",
+          "countPerHour": 5,
+          "notifyChannels": ["telegram", "email"]
+        },
+        "enabled": true
+      }
+    ],
+    "broadcastedTo": 8,
+    "createdAt": "2026-03-07T12:00:00.000Z"
+  }
+}
+```
+</ResponseExample>
+
+### Rule Types
+
+<AccordionGroup>
+  <Accordion title="block_ip">
+    Automatically blocks source IPs that trigger specific threat types.
+
+    | Config Field | Type | Description |
+    |-------------|------|-------------|
+    | `trigger` | string | Threat type that activates the block |
+    | `threshold` | number | Number of events before blocking |
+    | `duration` | string | Block duration (e.g., `1h`, `24h`, `7d`, `permanent`) |
+    | `scope` | string | `host` (local firewall) or `fleet` (all agents) |
+  </Accordion>
+  <Accordion title="alert_threshold">
+    Sends notifications when threat counts exceed a threshold.
+
+    | Config Field | Type | Description |
+    |-------------|------|-------------|
+    | `severity` | string | Minimum severity to count |
+    | `countPerHour` | number | Threshold per hour |
+    | `notifyChannels` | string[] | Notification channels to alert |
+  </Accordion>
+  <Accordion title="auto_respond">
+    Triggers automatic response actions when threats are detected.
+
+    | Config Field | Type | Description |
+    |-------------|------|-------------|
+    | `trigger` | string | Threat type that activates response |
+    | `action` | string | Response action: `kill_process`, `quarantine_file`, `block_ip`, `isolate_host` |
+    | `minConfidence` | number | Minimum AI confidence score (0.0--1.0) |
+    | `requireApproval` | boolean | If true, sends approval request instead of auto-executing |
+  </Accordion>
+  <Accordion title="custom">
+    User-defined rule with arbitrary configuration. Evaluated by the agent's rule engine.
+
+    | Config Field | Type | Description |
+    |-------------|------|-------------|
+    | `condition` | string | Custom condition expression |
+    | `action` | string | Action to execute |
+    | `params` | object | Additional parameters |
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## GET /api/policy/active
+
+Returns the currently active policy with all its rules.
+
+<CodeGroup>
+```bash cURL
+curl -X GET https://localhost:8443/api/policy/active \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "id": "pol_abc123",
+    "name": "Block Brute Force Sources",
+    "version": "v3",
+    "rules": [...],
+    "createdAt": "2026-03-07T12:00:00.000Z"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/policy/agent/:id
+
+Returns the policy rules assigned to a specific agent, including any agent-specific overrides.
+
+<ParamField path="id" type="string" required>
+  The agent ID.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET https://localhost:8443/api/policy/agent/agent-a1b2c3d4 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "agentId": "agent-a1b2c3d4",
+    "policyVersion": "v3",
+    "rules": [
+      {
+        "type": "block_ip",
+        "config": {
+          "trigger": "brute_force",
+          "threshold": 50,
+          "duration": "24h",
+          "scope": "host"
+        },
+        "enabled": true
+      }
+    ],
+    "appliedAt": "2026-03-07T12:01:00.000Z"
+  }
+}
+```
+</ResponseExample>
+
+<Info>
+Policies are versioned incrementally. Each new policy creation increments the version (v1, v2, v3, etc.). Agents report their current policy version in heartbeat responses, making it easy to identify agents running outdated policies.
+</Info>

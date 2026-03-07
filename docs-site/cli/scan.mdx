@@ -1,0 +1,90 @@
+---
+title: "panguard scan"
+description: "Run security vulnerability scans on the local machine."
+icon: "magnifying-glass"
+---
+
+The `scan` command performs a comprehensive security assessment of your endpoint, checking for vulnerabilities, misconfigurations, outdated software, and known threats. Results are scored and prioritized by AI so you can focus on what matters most.
+
+## Usage
+
+```bash
+panguard scan [options]
+```
+
+## Options
+
+<ParamField path="--quick" type="flag">
+  Run a fast scan covering only critical checks. Available on all plans including Community (Free).
+</ParamField>
+
+<ParamField path="--output" type="string">
+  Write the scan results to the specified file path. Supports `.json`, `.html`, and `.pdf` formats based on file extension.
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  Set the output language for scan results (e.g., `en`, `zh-TW`, `ja`).
+</ParamField>
+
+<ParamField path="--verbose" type="flag">
+  Show detailed output including individual check progress and debug information.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Quick Scan (Free tier)
+panguard scan --quick
+```
+
+```bash Full Scan with JSON output
+panguard scan --output ./results/scan-report.json
+```
+
+```bash Full Scan in Traditional Chinese
+panguard scan --lang zh-TW --verbose
+```
+
+```bash Export PDF Report
+panguard scan --output ~/Desktop/security-audit.pdf
+```
+</CodeGroup>
+
+## Scan Types
+
+| Mode | Checks | Duration | Plan Required |
+| --- | --- | --- | --- |
+| `--quick` | Critical vulnerabilities, open ports, root access | ~30 seconds | Community (Free) |
+| Full (default) | All scanners including CVE, CIS benchmarks, malware signatures, network | 2-5 minutes | Solo+ |
+
+## What Gets Scanned
+
+- **System vulnerabilities** -- CVE database matching against installed packages
+- **Configuration audit** -- CIS benchmark checks for OS hardening
+- **Network exposure** -- Open ports, listening services, firewall rules
+- **Malware detection** -- YARA rule matching and hash lookups
+- **File integrity** -- Checks against known-good baselines
+- **User accounts** -- Privilege escalation risks, weak credentials
+
+## Plan Requirements
+
+<Info>
+  `scan --quick` is available on the **Community (Free)** plan. Full scans require **Solo** ($9/mo) or higher.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="First Scan Guide" icon="book-open" href="/guides/first-scan">
+    Step-by-step walkthrough of your first security scan.
+  </Card>
+  <Card title="Scanners Reference" icon="microscope" href="/products/scan/scanners">
+    Detailed documentation for each scanner module.
+  </Card>
+  <Card title="Risk Scoring" icon="chart-bar" href="/products/scan/risk-scoring">
+    How Panguard AI prioritizes and scores findings.
+  </Card>
+  <Card title="panguard report" icon="file-chart-column" href="/cli/report">
+    Generate compliance reports from scan data.
+  </Card>
+</CardGroup>

@@ -1,0 +1,160 @@
+---
+title: "Agent Pipeline (DARE)"
+description: "Deep dive into the 4-agent Detect-Analyze-Respond-Report pipeline that processes every security event."
+icon: "arrow-right-arrow-left"
+---
+
+The Guard engine processes every security event through a linear 4-agent chain called the DARE pipeline: **Detect**, **Analyze**, **Respond**, **Report**. Each agent has a single responsibility and produces a typed output consumed by the next agent.
+
+## Pipeline Flow
+
+```
+SecurityEvent
+     |
+     v
+[DetectAgent] ──> DetectionResult | null
+     |
+     v
+[AnalyzeAgent] ──> ThreatVerdict
+     |
+     v
+[RespondAgent] ──> ResponseResult
+     |
+     v
+[ReportAgent] ──> Updated baseline + anonymized data
+```
+
+If the DetectAgent returns `null` (no rules matched, no threat intel hit), the event is considered benign and skipped. Otherwise, the full pipeline executes.
+
+---
+
+## DetectAgent
+
+**Source**: `packages/panguard-guard/src/agent/detect-agent.ts`
+
+| Field | Value |
+|-------|-------|
+| **Input** | `SecurityEvent` |
+| **Output** | `DetectionResult` or `null` |
+
+### Responsibilities
+
+1. **Sigma rule matching** -- runs the event against all loaded rules via the `RuleEngine`
+2. **Threat intelligence lookup** -- checks source/destination IPs against 5 feed sources plus Threat Cloud blocklists (supports IPv4 and IPv6)
+3. **Deduplication** -- skips identical detections within a 60-second window (max 500 entries in the dedup map)
+4. **Event correlation** -- both legacy IP-based correlation (3+ events from same source IP in 5 minutes) and advanced pattern-based correlation via the `EventCorrelator` (7 attack patterns)
+
+### Internal State
+
+| Buffer | Capacity | Window |
+|--------|----------|--------|
+| Correlation buffer | 1,000 events | 5 minutes |
+| Deduplication map | 500 entries | 60 seconds |
+
+---
+
+## AnalyzeAgent
+
+**Source**: `packages/panguard-guard/src/agent/analyze-agent.ts`
+
+| Field | Value |
+|-------|-------|
+| **Input** | `DetectionResult` + `EnvironmentBaseline` |
+| **Output** | `ThreatVerdict` (conclusion: benign / suspicious / malicious) |
+
+### Evidence Sources and Weights
+
+The AnalyzeAgent collects evidence from multiple sources and calculates a weighted confidence score (0--100):
+
+| Source | Weight | Notes |
+|--------|--------|-------|
+| Sigma rule matches | 0.40 | Adjusted by feedback loop |
+| Threat intelligence | -- | Fixed confidence of 85 when matched |
+| Baseline deviation | 0.30 | Time-of-day awareness (00:00--05:59 boost) |
+| Falco/Suricata evidence | 0.20--0.25 | When kernel-level monitors are active |
+| Attack chain correlation | +5/event | Max +25 bonus |
+| AI analysis | 0.30 | When AI provider is available |
+
+Weight distribution adapts to available sources:
+
+| Available Sources | Rules/Intel | Baseline | AI | eBPF |
+|-------------------|-------------|----------|----|------|
+| Rules only | 0.60 | 0.40 | -- | -- |
+| Rules + AI | 0.40 | 0.30 | 0.30 | -- |
+| Rules + eBPF | 0.40 | 0.35 | -- | 0.25 |
+| Rules + AI + eBPF | 0.30 | 0.20 | 0.30 | 0.20 |
+
+### Feedback Loop
+
+The AnalyzeAgent maintains a per-rule feedback history:
+
+- **High false-positive rate** -- confidence reduced by up to 30%
+- **High true-positive rate** -- confidence increased by up to 10%
+
+### Contradiction Detection
+
+If a high-severity rule fires but the baseline shows no deviation, confidence is reduced by 10 points. This prevents over-alerting on events that match a rule pattern but are normal for the specific environment.
+
+---
+
+## RespondAgent
+
+**Source**: `packages/panguard-guard/src/agent/respond-agent.ts`
+
+| Field | Value |
+|-------|-------|
+| **Input** | `ThreatVerdict` |
+| **Output** | `ResponseResult` |
+
+### Confidence-Based Actions
+
+| Confidence | Action |
+|------------|--------|
+| >= 90% | Auto-execute, notify after |
+| 70--90% | Ask for confirmation via Chat |
+| < 70% | Notify only, no action |
+
+### Available Actions
+
+| Action | Description | Platform |
+|--------|-------------|----------|
+| `block_ip` | Block source IP via firewall | macOS (pfctl), Linux (iptables), Windows (netsh) |
+| `kill_process` | Terminate malicious process | All (SIGTERM then SIGKILL after 5s) |
+| `isolate_file` | Quarantine suspicious file | All |
+| `disable_account` | Lock user account | All |
+| `notify` | Send alert via Chat | All |
+| `log_only` | Record without action | All |
+
+Full details on safety rules and escalation are covered in [Auto-Response](/products/guard/auto-response).
+
+---
+
+## ReportAgent
+
+**Source**: `packages/panguard-guard/src/agent/report-agent.ts`
+
+| Field | Value |
+|-------|-------|
+| **Input** | `SecurityEvent` + `ThreatVerdict` + `ResponseResult` + `EnvironmentBaseline` |
+| **Output** | Updated baseline + optional anonymized threat data |
+
+### Responsibilities
+
+1. **JSONL Logging** -- writes complete event records with log rotation (50 MB per file, 10 rotated files, 90-day retention)
+2. **Baseline Updates** -- during learning mode, continuously updates the behavioral baseline with observed patterns
+3. **Anonymization** -- IP addresses are /16-anonymized (last two octets zeroed) before Threat Cloud upload
+4. **Summary Generation** -- produces daily (24h) and weekly (7d) summaries with top attack sources, action breakdown, and verdict distribution
+
+### Log Format
+
+Each log entry is a JSON line containing:
+
+```json
+{
+  "timestamp": "2025-01-15T14:23:01.000Z",
+  "event": { "type": "network", "sourceIp": "203.0.113.50" },
+  "verdict": { "conclusion": "malicious", "confidence": 95 },
+  "response": { "action": "block_ip", "success": true },
+  "baseline": { "deviation": true, "score": 0.85 }
+}
+```

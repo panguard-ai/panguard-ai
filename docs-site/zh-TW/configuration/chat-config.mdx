@@ -1,0 +1,232 @@
+---
+title: "Chat 設定"
+description: "設定 Panguard Chat 的通知頻道：Telegram、Slack、Email 和 Webhook。"
+icon: "message-bot"
+---
+
+Panguard Chat 透過位於 `~/.panguard-chat/config.json` 的 JSON 檔案進行設定。此檔案管理通知頻道憑證、格式偏好和送達設定。
+
+## 設定檔位置
+
+```
+~/.panguard-chat/config.json
+```
+
+<Warning>
+敏感欄位（API token、密碼、webhook URL）在初始設定後使用 **AES-256-GCM** 加密。請勿手動編輯已加密的欄位 -- 改用 `panguard chat setup` 重新設定頻道。
+</Warning>
+
+## 完整設定範例
+
+```json
+{
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "ENC:v1:...",
+      "chatId": "ENC:v1:...",
+      "parseMode": "HTML",
+      "disablePreview": true
+    },
+    "slack": {
+      "enabled": false,
+      "webhookUrl": "ENC:v1:...",
+      "channel": "#security-alerts",
+      "username": "Panguard AI",
+      "iconEmoji": ":shield:"
+    },
+    "email": {
+      "enabled": false,
+      "smtp": {
+        "host": "smtp.gmail.com",
+        "port": 587,
+        "secure": true,
+        "auth": {
+          "user": "alerts@example.com",
+          "pass": "ENC:v1:..."
+        }
+      },
+      "from": "Panguard AI <alerts@example.com>",
+      "to": ["admin@example.com"],
+      "subjectPrefix": "[Panguard]"
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "ENC:v1:...",
+      "method": "POST",
+      "headers": {
+        "X-Custom-Header": "panguard"
+      },
+      "timeout": 10000
+    }
+  },
+  "preferences": {
+    "language": "en",
+    "minSeverity": "medium",
+    "cooldownMinutes": 15,
+    "batchWindow": 60,
+    "includeDetails": true,
+    "includeRecommendations": true
+  }
+}
+```
+
+## 頻道設定
+
+### Telegram
+
+<AccordionGroup>
+  <Accordion title="設定欄位">
+    | 欄位 | 類型 | 說明 |
+    |-------|------|-------------|
+    | `enabled` | boolean | 啟用 Telegram 通知 |
+    | `botToken` | string | 來自 @BotFather 的 Bot API token（設定後加密） |
+    | `chatId` | string | 目標聊天/群組 ID（設定後加密） |
+    | `parseMode` | string | 訊息格式：`HTML` 或 `Markdown` |
+    | `disablePreview` | boolean | 在訊息中停用連結預覽 |
+  </Accordion>
+  <Accordion title="透過 CLI 設定">
+    ```bash
+    panguard chat setup telegram
+    ```
+
+    CLI 會提示輸入：
+    1. Bot token（來自 [@BotFather](https://t.me/BotFather)）
+    2. Chat ID（先向您的 bot 發送訊息，然後 CLI 會偵測到）
+
+    或者直接設定值：
+    ```bash
+    panguard chat setup telegram --bot-token YOUR_TOKEN --chat-id YOUR_CHAT_ID
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+您必須先向您的 bot 發送訊息，它才能向您發送訊息。這是 Telegram Bot API 的要求。
+</Info>
+
+### Slack
+
+<AccordionGroup>
+  <Accordion title="設定欄位">
+    | 欄位 | 類型 | 說明 |
+    |-------|------|-------------|
+    | `enabled` | boolean | 啟用 Slack 通知 |
+    | `webhookUrl` | string | Incoming webhook URL（設定後加密） |
+    | `channel` | string | 目標頻道（覆寫 webhook 預設值） |
+    | `username` | string | Bot 顯示名稱 |
+    | `iconEmoji` | string | Bot 圖示表情符號 |
+  </Accordion>
+  <Accordion title="透過 CLI 設定">
+    ```bash
+    panguard chat setup slack
+    ```
+
+    需要 Slack Incoming Webhook URL。建立方式：
+    1. 前往 [api.slack.com/apps](https://api.slack.com/apps)
+    2. 建立或選擇一個 app
+    3. 啟用 **Incoming Webhooks**
+    4. 將 webhook 新增到您的工作區
+    5. 複製 webhook URL
+  </Accordion>
+</AccordionGroup>
+
+### Email
+
+<AccordionGroup>
+  <Accordion title="設定欄位">
+    | 欄位 | 類型 | 說明 |
+    |-------|------|-------------|
+    | `enabled` | boolean | 啟用 email 通知 |
+    | `smtp.host` | string | SMTP 伺服器主機名稱 |
+    | `smtp.port` | number | SMTP 埠（587 用於 TLS，465 用於 SSL） |
+    | `smtp.secure` | boolean | 使用 TLS/SSL |
+    | `smtp.auth.user` | string | SMTP 使用者名稱 |
+    | `smtp.auth.pass` | string | SMTP 密碼（設定後加密） |
+    | `from` | string | 寄件者 email 地址 |
+    | `to` | string[] | 收件者 email 地址 |
+    | `subjectPrefix` | string | email 主旨前綴 |
+  </Accordion>
+  <Accordion title="透過 CLI 設定">
+    ```bash
+    panguard chat setup email
+    ```
+
+    CLI 會提示輸入 SMTP 設定。常見提供者：
+
+    | 提供者 | 主機 | 埠 |
+    |----------|------|------|
+    | Gmail | `smtp.gmail.com` | 587 |
+    | Outlook | `smtp.office365.com` | 587 |
+    | SendGrid | `smtp.sendgrid.net` | 587 |
+    | AWS SES | `email-smtp.REGION.amazonaws.com` | 587 |
+
+    對於 Gmail，請使用[應用程式密碼](https://support.google.com/accounts/answer/185833)而非您的帳號密碼。
+  </Accordion>
+</AccordionGroup>
+
+### Webhook
+
+<AccordionGroup>
+  <Accordion title="設定欄位">
+    | 欄位 | 類型 | 說明 |
+    |-------|------|-------------|
+    | `enabled` | boolean | 啟用 webhook 通知 |
+    | `url` | string | Webhook 端點 URL（設定後加密） |
+    | `method` | string | HTTP 方法：`POST` 或 `PUT` |
+    | `headers` | object | 要包含的自訂 HTTP 標頭 |
+    | `timeout` | number | 請求逾時時間（毫秒） |
+  </Accordion>
+  <Accordion title="Webhook 酬載格式">
+    ```json
+    {
+      "event": "threat_detected",
+      "severity": "high",
+      "hostname": "web-server-1",
+      "type": "brute_force",
+      "details": {
+        "sourceIp": "198.51.100.42",
+        "attempts": 150
+      },
+      "timestamp": "2026-03-07T08:15:00.000Z",
+      "actionTaken": "ip_blocked"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 偏好設定
+
+| 欄位 | 類型 | 預設值 | 說明 |
+|-------|------|---------|-------------|
+| `language` | string | `en` | 通知語言（`en`、`zh-TW`、`ja`） |
+| `minSeverity` | string | `medium` | 發送通知的最低嚴重程度：`low`、`medium`、`high`、`critical` |
+| `cooldownMinutes` | number | `15` | 重複警報之間的最少間隔 |
+| `batchWindow` | number | `60` | 在發送前批次處理相關事件的秒數 |
+| `includeDetails` | boolean | `true` | 在通知中包含技術詳情 |
+| `includeRecommendations` | boolean | `true` | 包含 AI 產生的回應建議 |
+
+## 加密詳情
+
+敏感欄位使用 **AES-256-GCM** 進行靜態加密：
+
+- 加密的值以 `ENC:v1:` 為前綴
+- 加密金鑰從機器特定的識別碼衍生
+- 加密在 `panguard chat setup` 期間自動發生
+- 發送通知時 CLI 會透明地解密值
+
+<Warning>
+永遠不要手動編輯以 `ENC:v1:` 為前綴的欄位。這會損壞加密資料並中斷通知送達。請始終使用 `panguard chat setup` 來修改憑證。
+</Warning>
+
+## 測試通知
+
+透過發送測試通知來驗證您的設定：
+
+```bash
+# 測試所有已啟用的頻道
+panguard chat test
+
+# 測試特定頻道
+panguard chat test --channel telegram
+```

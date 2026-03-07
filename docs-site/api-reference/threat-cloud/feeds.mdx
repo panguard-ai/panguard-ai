@@ -1,0 +1,210 @@
+---
+title: "Feed Endpoints"
+description: "Consume threat intelligence feeds in blocklist and structured JSON formats."
+icon: "rss"
+---
+
+Feed endpoints provide threat intelligence in formats optimized for consumption by firewalls, DNS resolvers, and Panguard agents. Blocklist feeds return plain text; structured feeds return JSON.
+
+## GET /api/feeds/ip-blocklist
+
+Returns a plain-text list of malicious IP addresses, one per line. Designed for direct ingestion by firewalls (iptables, pf, Windows Firewall) and network appliances.
+
+<ParamField query="minReputation" type="number" default="30">
+  Maximum reputation score to include (0 = most malicious). Lower values produce a more conservative list.
+</ParamField>
+
+<ParamField query="category" type="string">
+  Filter by threat category: `malware`, `botnet`, `bruteforce`, `scanner`, `c2`.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/feeds/ip-blocklist?minReputation=20" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Direct to iptables
+curl -s "https://tc.panguard.ai/api/feeds/ip-blocklist" \
+  -H "Authorization: Bearer YOUR_API_KEY" | \
+  while read ip; do
+    iptables -A INPUT -s "$ip" -j DROP
+  done
+```
+</CodeGroup>
+
+### Response
+
+```text
+# Panguard AI IP Blocklist
+# Generated: 2026-03-07T12:00:00Z
+# Total: 1423 IPs
+198.51.100.42
+198.51.100.78
+203.0.113.15
+203.0.113.99
+192.0.2.50
+...
+```
+
+<Info>
+The response content type is `text/plain`. Lines starting with `#` are comments containing metadata. The list is sorted by reputation score (most malicious first).
+</Info>
+
+---
+
+## GET /api/feeds/domain-blocklist
+
+Returns a plain-text list of malicious domains, one per line. Suitable for DNS sinkhole configurations (Pi-hole, dnsmasq, Unbound).
+
+<ParamField query="minReputation" type="number" default="30">
+  Maximum reputation score to include.
+</ParamField>
+
+<ParamField query="category" type="string">
+  Filter by threat category: `malware`, `phishing`, `c2`, `exploit`.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/feeds/domain-blocklist" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Pi-hole format
+curl -s "https://tc.panguard.ai/api/feeds/domain-blocklist" \
+  -H "Authorization: Bearer YOUR_API_KEY" | \
+  sed 's/^/0.0.0.0 /' > /etc/pihole/panguard-blocklist.txt
+```
+</CodeGroup>
+
+### Response
+
+```text
+# Panguard AI Domain Blocklist
+# Generated: 2026-03-07T12:00:00Z
+# Total: 892 domains
+malware-c2.example.net
+phishing-bank.example.org
+dropper.example.com
+evil-redirect.example.io
+...
+```
+
+---
+
+## GET /api/feeds/iocs
+
+Returns the full IoC feed in structured JSON format with metadata, suitable for SIEM integrations and automated processing.
+
+<ParamField query="since" type="string">
+  ISO 8601 timestamp. Returns only IoCs updated after this time (for incremental sync).
+</ParamField>
+
+<ParamField query="type" type="string">
+  Filter by IoC type: `ip`, `domain`, `hash`, `url`.
+</ParamField>
+
+<ParamField query="limit" type="number" default="1000">
+  Maximum number of IoCs to return (max 5000).
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/feeds/iocs?since=2026-03-06T00:00:00Z&type=ip" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "generatedAt": "2026-03-07T12:00:00.000Z",
+    "count": 156,
+    "iocs": [
+      {
+        "value": "198.51.100.42",
+        "type": "ip",
+        "reputation": 12,
+        "category": "bruteforce",
+        "sightings": 47,
+        "firstSeen": "2026-02-15T10:00:00.000Z",
+        "lastSeen": "2026-03-07T08:15:00.000Z",
+        "metadata": {
+          "asn": "AS64496",
+          "country": "CN",
+          "mitreIds": ["T1110"]
+        }
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/feeds/agent-update
+
+Returns a bundled update package for Panguard Guard agents containing the latest detection rules and IoC data. This endpoint is called automatically by agents during their update cycle.
+
+<ParamField query="currentVersion" type="string">
+  The agent's current rule version. Only returns changes since this version.
+</ParamField>
+
+<ParamField query="agentId" type="string">
+  The requesting agent's ID for access control.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/feeds/agent-update?currentVersion=v20260306" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "version": "v20260307",
+    "rules": {
+      "sigma": {
+        "added": 12,
+        "updated": 3,
+        "removed": 1,
+        "files": [
+          {
+            "id": "sigma-new-001",
+            "name": "Detect Cryptominer Process",
+            "content": "..."
+          }
+        ]
+      },
+      "yara": {
+        "added": 5,
+        "updated": 0,
+        "removed": 0,
+        "files": [...]
+      }
+    },
+    "iocs": {
+      "ipBlocklist": ["198.51.100.42", "203.0.113.99"],
+      "domainBlocklist": ["malware-c2.example.net"],
+      "hashBlocklist": ["e3b0c44298fc1c149afbf4c8996fb924"]
+    },
+    "config": {
+      "heartbeatInterval": 60,
+      "logLevel": "info"
+    }
+  }
+}
+```
+</ResponseExample>
+
+<Tip>
+The agent-update endpoint uses delta updates when a `currentVersion` is provided. This minimizes bandwidth by only sending new or modified rules since the agent's last update.
+</Tip>

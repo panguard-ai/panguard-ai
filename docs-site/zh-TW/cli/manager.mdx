@@ -1,0 +1,80 @@
+---
+title: "panguard manager"
+description: "啟動集中式多端點管理伺服器。"
+icon: "server"
+---
+
+`manager` 指令啟動 Panguard Manager 伺服器 -- 一個集中式儀表板和 API，用於監控和控制多個端點上的 Guard 代理。它提供全機群可見性、策略管理和事件彙整。
+
+## 使用方式
+
+```bash
+panguard manager [options]
+```
+
+## 選項
+
+<ParamField path="--port" type="number" default="9400">
+  Manager 網頁介面和 API 的埠。
+</ParamField>
+
+<ParamField path="--auth-token" type="string">
+  用於認證 API 請求的 Bearer token。如果未提供，啟動時會產生並列印一個 token。
+</ParamField>
+
+<ParamField path="--max-agents" type="number" default="25">
+  接受的最大代理連線數。與您的 Business 方案機器上限相符。
+</ParamField>
+
+## 範例
+
+<CodeGroup>
+```bash 使用預設值啟動 Manager
+panguard manager
+```
+
+```bash 自訂埠和 token
+panguard manager --port 8443 --auth-token my-secret-token
+```
+
+```bash 限制為 10 個代理
+panguard manager --max-agents 10
+```
+</CodeGroup>
+
+## 功能
+
+| 功能 | 說明 |
+| --- | --- |
+| **機群儀表板** | 所有已連線代理的即時概覽 |
+| **策略引擎** | 集中定義和分發安全策略 |
+| **事件彙整** | 來自所有端點的統一事件串流 |
+| **代理生命週期** | 遠端啟動、停止、升級和設定代理 |
+| **API 存取** | 用於自動化和整合的 RESTful API |
+
+<Tip>
+  Manager 網頁介面預設在 `http://localhost:9400` 上存取。對於正式部署，請將其放在帶有 TLS 的反向代理後面。
+</Tip>
+
+## 方案要求
+
+<Info>
+  Manager 需要 **Business**（$79/月）方案。Business 方案包含最多 25 台受管理的機器。
+</Info>
+
+## 相關資源
+
+<CardGroup cols={2}>
+  <Card title="Manager 產品概覽" icon="sitemap" href="/products/manager/overview">
+    Manager 系統的架構和功能。
+  </Card>
+  <Card title="代理生命週期" icon="arrows-spin" href="/products/manager/agent-lifecycle">
+    Manager 如何控制遠端代理實例。
+  </Card>
+  <Card title="策略引擎" icon="scale-balanced" href="/products/manager/policy-engine">
+    集中式策略定義和執行。
+  </Card>
+  <Card title="panguard deploy" icon="rocket" href="/cli/deploy">
+    將代理部署到 Manager 管理的端點。
+  </Card>
+</CardGroup>

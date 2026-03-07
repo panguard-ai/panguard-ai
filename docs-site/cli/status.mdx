@@ -1,0 +1,79 @@
+---
+title: "panguard status"
+description: "Display the overall health and status of all Panguard services."
+icon: "circle-info"
+---
+
+The `status` command provides a unified view of your Panguard installation -- authentication state, Guard agent health, last scan results, active traps, notification channel connectivity, and more.
+
+## Usage
+
+```bash
+panguard status [options]
+```
+
+## Options
+
+<ParamField path="--json" type="flag">
+  Output status information as structured JSON for scripting and automation.
+</ParamField>
+
+<ParamField path="--config" type="string">
+  Path to a custom configuration file. Defaults to `~/.panguard/config.yaml`.
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  Set the output language.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Show system status
+panguard status
+```
+
+```bash JSON output for scripting
+panguard status --json
+```
+
+```bash Status with custom config
+panguard status --config /etc/panguard/config.yaml
+```
+</CodeGroup>
+
+## Output Sections
+
+The status command reports on the following sections:
+
+| Section | Information |
+| --- | --- |
+| **Authentication** | Logged-in user, plan tier, token expiry |
+| **Guard** | Running / stopped, uptime, events processed |
+| **Scan** | Last scan time, findings count, risk score |
+| **Chat** | Configured channels, connectivity health |
+| **Trap** | Active honeypots, interactions captured |
+| **System** | Panguard version, OS, config path |
+
+## Plan Requirements
+
+<Info>
+  Available on all plans including **Community (Free)**.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="panguard doctor" icon="stethoscope" href="/cli/doctor">
+    Diagnose issues when status shows problems.
+  </Card>
+  <Card title="panguard whoami" icon="id-card" href="/cli/whoami">
+    Detailed authentication information.
+  </Card>
+  <Card title="panguard guard" icon="shield" href="/cli/guard">
+    Manage the Guard agent shown in status.
+  </Card>
+  <Card title="panguard config" icon="gear" href="/cli/config">
+    Edit the configuration referenced by status.
+  </Card>
+</CardGroup>

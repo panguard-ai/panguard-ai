@@ -1,0 +1,162 @@
+---
+title: "Deploy Threat Cloud"
+description: "Run a self-hosted Threat Cloud server for centralized threat intelligence with full privacy control."
+icon: "cloud"
+---
+
+Threat Cloud is Panguard's self-hosted threat intelligence platform. It aggregates indicators of compromise (IoCs) from your Guard agents and honeypots, provides feed endpoints for downstream tools, and tracks attacker campaigns -- all while keeping your data entirely under your control.
+
+<Steps>
+  <Step title="Start the Threat Cloud server">
+    Launch the server on your chosen port:
+
+    ```bash
+    panguard threat start --port 8080
+    ```
+
+    ```
+      PANGUARD AI - Threat Cloud
+
+      Starting Threat Cloud server...
+
+      -- Server Info ----------------------------
+
+      URL:        http://localhost:8080
+      Database:   SQLite (./panguard-threat.db)
+      API Key:    pg_threat_abc123...
+      Rate Limit: 100 req/min
+
+      Threat Cloud is running.
+      API documentation: http://localhost:8080/docs
+    ```
+
+    <Info>
+      The API key is auto-generated on first start and stored in your Panguard configuration. Use it to authenticate all API requests.
+    </Info>
+  </Step>
+
+  <Step title="Understand the architecture">
+    Threat Cloud uses a lightweight stack designed for single-server deployment:
+
+    | Component | Technology | Purpose |
+    | --- | --- | --- |
+    | **Database** | SQLite | Stores IoCs, campaigns, and feed data |
+    | **API** | REST + JSON | CRUD operations for all resources |
+    | **Auth** | API key (Bearer token) | Authenticates all requests |
+    | **Rate limiting** | 100 req/min default | Prevents abuse; configurable |
+
+    <Note>
+      SQLite is the default backend. For high-volume deployments (10+ agents), consider placing the database on an SSD and adjusting WAL mode: `panguard threat start --db-wal`.
+    </Note>
+  </Step>
+
+  <Step title="Manage indicators of compromise">
+    Add IoCs manually or let Guard agents push them automatically:
+
+    <CodeGroup>
+      ```bash Add an IoC via CLI
+      panguard threat ioc add \
+        --type ip \
+        --value "203.0.113.42" \
+        --severity high \
+        --tags "brute-force,ssh"
+      ```
+
+      ```bash List recent IoCs
+      panguard threat ioc list --limit 20
+      ```
+
+      ```bash Search IoCs
+      panguard threat ioc search --value "203.0.113.*"
+      ```
+    </CodeGroup>
+
+    IoCs added by Guard agents include full context: the triggering event, honeypot interaction data, and the profiling results.
+  </Step>
+
+  <Step title="Configure feed endpoints">
+    Threat Cloud exposes feed endpoints that downstream tools (SIEMs, firewalls, other Panguard instances) can subscribe to:
+
+    ```
+    GET /api/v1/feeds/ip-blocklist     IP addresses to block
+    GET /api/v1/feeds/domain-blocklist  Malicious domains
+    GET /api/v1/feeds/ioc-all          All IoCs in STIX 2.1 format
+    ```
+
+    Example: fetch the IP blocklist:
+
+    ```bash
+    curl -H "Authorization: Bearer pg_threat_abc123..." \
+      http://localhost:8080/api/v1/feeds/ip-blocklist
+    ```
+
+    ```json
+    {
+      "feed": "ip-blocklist",
+      "updated": "2026-03-07T14:00:00Z",
+      "count": 42,
+      "indicators": [
+        { "value": "203.0.113.42", "severity": "high", "last_seen": "2026-03-07T14:30:22Z" },
+        { "value": "198.51.100.17", "severity": "medium", "last_seen": "2026-03-07T03:12:44Z" }
+      ]
+    }
+    ```
+  </Step>
+
+  <Step title="Track campaigns">
+    Group related IoCs and events into named campaigns for investigation:
+
+    <CodeGroup>
+      ```bash Create a campaign
+      panguard threat campaign create \
+        --name "SSH Brute Force Wave" \
+        --description "Coordinated brute-force attacks from CN/RU ranges" \
+        --iocs "203.0.113.42,198.51.100.17,192.0.2.88"
+      ```
+
+      ```bash List campaigns
+      panguard threat campaign list
+      ```
+
+      ```bash View campaign details
+      panguard threat campaign view --name "SSH Brute Force Wave"
+      ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Privacy and data handling">
+    Threat Cloud is designed with privacy as a core principle:
+
+    - **Self-hosted:** All data stays on your infrastructure
+    - **Anonymized data:** IP addresses in shared feeds can be hashed
+    - **Zero telemetry:** No data is sent to Panguard AI servers
+    - **Data retention:** Configurable TTL for IoCs (default: 90 days)
+
+    ```bash
+    panguard threat start --port 8080 \
+      --retention-days 30 \
+      --anonymize-feeds
+    ```
+
+    <Warning>
+      If you expose Threat Cloud to the internet, always use HTTPS (reverse proxy) and restrict access by IP or VPN. The API key alone is not sufficient for public-facing deployments.
+    </Warning>
+  </Step>
+</Steps>
+
+## What to do next
+
+<CardGroup cols={2}>
+  <Card title="Threat Cloud product reference" icon="book" href="/products/threat-cloud/overview">
+    Full documentation of the Threat Cloud platform and architecture.
+  </Card>
+  <Card title="Privacy model" icon="lock" href="/products/threat-cloud/privacy">
+    Detailed explanation of data handling, anonymization, and retention policies.
+  </Card>
+  <Card title="Threat Cloud API" icon="code" href="/api-reference/threat-cloud/ioc">
+    Complete API reference for IoC, feed, and campaign endpoints.
+  </Card>
+  <Card title="Deploy with Docker" icon="docker" href="/guides/docker-deployment">
+    Run Threat Cloud in a containerized environment.
+  </Card>
+</CardGroup>

@@ -1,0 +1,153 @@
+---
+title: "Changelog"
+description: "Release history and version updates for Panguard AI."
+icon: "clock-rotate-left"
+---
+
+All notable changes to Panguard AI, organized by version.
+
+<Info>
+For the complete changelog including patch notes, see the [GitHub releases page](https://github.com/panguard-ai/panguard/releases).
+</Info>
+
+---
+
+## v0.7.0
+
+**Released: 2025-02-25** -- Sigma Enhancements and osquery Integration
+
+### Sigma Rule Engine Enhancements
+
+- Aggregation expression support: `1 of them`, `all of them`, `1 of sel*`, `all of filter*`
+- New matching modifiers: `|cidr` (IP range matching), `|gt`/`|gte`/`|lt`/`|lte` (numeric comparisons)
+- New encoding modifiers: `|base64`, `|base64offset`, `|utf8`, `|wide`
+- Parenthesized group conditions: `(sel_a OR sel_b) AND NOT filter`
+
+### osquery Integration
+
+- New `OsqueryProvider` for SQL-based system state queries
+- Support for process, port, user, network interface, and kernel module queries
+- Automatic fallback to shell commands when osquery is not installed
+
+---
+
+## v0.6.0
+
+**Released: 2025-02-25** -- Branded CLI, Security Score, and Achievement System
+
+### Branded CLI
+
+- New CLI rendering module with 24-bit ANSI color matching brand palette
+- Sage Green (#8B9A8E) primary color theme
+- Progress bars, tables, status panels, and Shield ASCII art
+- Zero external dependencies (no chalk, ora, or ink)
+
+### Security Score Engine
+
+- 8-factor weighted scoring (0-100)
+- A through F grade mapping
+- Trend tracking: improving, declining, or stable
+
+### Achievement System
+
+- 12 achievement badges with automatic unlock and notifications
+
+---
+
+## v0.5.0
+
+**Released: 2025-02-25** -- Auto-Response, YARA, and Threat Intelligence Feeds
+
+### Auto-Response Engine
+
+- IP blocking (macOS pfctl / Linux iptables / Windows netsh)
+- File quarantine with SHA-256 tracking
+- Process termination
+- Confidence-based actions: {'>'}90% automatic, 70-90% confirmation required, {'<'}70% notification only
+
+### YARA Scanner
+
+- Native YARA engine support with regex fallback
+- File and memory scanning
+
+### Threat Intelligence Feed Management
+
+- 5 feeds: ThreatFox, URLhaus, Feodo Tracker, GreyNoise, AbuseIPDB
+- Automatic updates with local caching
+
+---
+
+## v0.4.0
+
+**Released: 2025-02-24** -- Chat Notifications, Trap Honeypots, and Compliance Reports
+
+### Panguard Chat
+
+- 5 notification channels: LINE, Telegram, Slack, Email, Webhook
+- 3 user role formats: developer, boss, it_admin
+- Bilingual alert templates (English / Traditional Chinese)
+
+### Panguard Trap
+
+- 8 honeypot service types: SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, Redis
+- Attacker profiling with skill level classification and intent analysis
+
+### Panguard Report
+
+- Taiwan Cyber Security Act (10 controls), ISO 27001 (12 controls), SOC 2 (10 controls)
+- JSON and PDF output formats
+
+---
+
+## v0.3.0
+
+**Released: 2025-02-24** -- Guard AI Engine and Investigation
+
+### Panguard Guard
+
+- 5 AI agent pipeline: Detect, Analyze, Respond, Report, Investigation
+- 7-day learning period with automatic switch to protection mode
+- 42 Sigma rules, Dashboard WebSocket server
+- System service installation (macOS / Linux / Windows)
+
+### Threat Cloud
+
+- RESTful API server with SQLite backend
+- IoC submission, query, and batch query
+- API key authentication
+
+---
+
+## v0.2.0
+
+**Released: 2025-02-23** -- Scan Engine and PDF Reports
+
+### Panguard Scan
+
+- System environment reconnaissance, password policy audit
+- Port scanning with dangerous port detection
+- SSL certificate validation, scheduled task audit, shared folder security checks
+- Risk scoring 0-100 (A through F grades)
+- PDF report generation
+
+---
+
+## v0.1.0
+
+**Released: 2025-02-23** -- Core Foundation
+
+### @panguard-ai/core
+
+- TypeScript monorepo architecture
+- Internationalization support (English + Traditional Chinese)
+- Sigma rule engine, system reconnaissance engine
+- 4 monitors: Log, Network, Process, File
+- 3 adapters: Windows Defender, Wazuh, Syslog
+- AES-256-GCM encryption
+
+### Infrastructure
+
+- pnpm workspace monorepo
+- Vitest testing framework
+- ESLint with eslint-plugin-security
+- GitHub Actions CI/CD

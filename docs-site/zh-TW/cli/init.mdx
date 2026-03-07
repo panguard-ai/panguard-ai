@@ -1,0 +1,74 @@
+---
+title: "panguard init"
+description: "初始化當前機器的 Panguard 設定。"
+icon: "wand-magic-sparkles"
+---
+
+`init` 指令在您的機器上建立和設定 Panguard 環境。它會產生預設設定檔、建立資料目錄，並偵測您的作業系統和已安裝的服務以取得最佳預設值。
+
+## 使用方式
+
+```bash
+panguard init [options]
+```
+
+## 選項
+
+<ParamField path="--config" type="string">
+  自訂設定檔的路徑。如果提供，`init` 會將您的自訂設定與偵測到的預設值合併，而不是從頭建立新檔案。
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  設定 CLI 輸出和通知的預設語言。
+</ParamField>
+
+## 範例
+
+<CodeGroup>
+```bash 使用預設值初始化
+panguard init
+```
+
+```bash 使用自訂設定初始化
+panguard init --config ./my-panguard.yaml
+```
+
+```bash 以繁體中文初始化
+panguard init --lang zh-TW
+```
+</CodeGroup>
+
+## `init` 的功能
+
+1. **偵測作業系統和環境** -- 識別 Linux 發行版、macOS 版本或 WSL 設定
+2. **建立設定目錄** -- `~/.panguard/` 及預設的 `config.yaml`
+3. **建立資料目錄** -- 為 Guard、Trap 和 Scan 資料分別建立目錄
+4. **偵測執行中的服務** -- 識別網頁伺服器、資料庫和其他服務，以調整掃描和防護預設值
+5. **驗證身份認證** -- 確認您已登入，或提示您執行 `panguard login`
+
+<Tip>
+  每台機器只需執行一次 `init`。重新執行是安全的 -- 除非您明確提供新的設定檔，否則現有設定不會被覆蓋。
+</Tip>
+
+## 方案要求
+
+<Info>
+  適用於所有方案，包括 **Community（免費）**。
+</Info>
+
+## 相關資源
+
+<CardGroup cols={2}>
+  <Card title="快速入門" icon="rocket" href="/quickstart">
+    完整的上手流程，包括 init。
+  </Card>
+  <Card title="panguard config" icon="gear" href="/cli/config">
+    初始化後檢視和編輯設定。
+  </Card>
+  <Card title="panguard login" icon="right-to-bracket" href="/cli/login">
+    在初始化之前或之後進行身份驗證。
+  </Card>
+  <Card title="環境變數" icon="list" href="/configuration/environment-variables">
+    使用環境變數覆寫設定。
+  </Card>
+</CardGroup>

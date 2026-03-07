@@ -1,0 +1,126 @@
+---
+title: "Telegram Integration"
+description: "Step-by-step guide to setting up Panguard Chat with Telegram using BotFather."
+icon: "paper-plane"
+---
+
+Telegram is the recommended channel for individual developers and personal server monitoring. Panguard sends notifications via a Telegram Bot that you create and control.
+
+## Setup Overview
+
+<Steps>
+  <Step title="Create a Telegram Bot">
+    Register a new bot with BotFather to get a Bot Token.
+  </Step>
+  <Step title="Get your Chat ID">
+    Find your personal or group Chat ID.
+  </Step>
+  <Step title="Configure Panguard">
+    Run the setup wizard and provide your credentials.
+  </Step>
+  <Step title="Test the connection">
+    Send a test notification to verify everything works.
+  </Step>
+</Steps>
+
+## Step 1: Create a Telegram Bot
+
+1. Open Telegram and search for **@BotFather**
+2. Start a conversation and send `/newbot`
+3. Choose a display name for your bot (e.g., `My Panguard Security`)
+4. Choose a username ending in `bot` (e.g., `my_panguard_bot`)
+5. BotFather will reply with a **Bot Token** in this format:
+
+```
+7123456789:AAHxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+<Warning>
+  Keep your Bot Token secret. Anyone with the token can send messages as your bot. If compromised, use `/revoke` in BotFather to regenerate it.
+</Warning>
+
+## Step 2: Get Your Chat ID
+
+### Method A: Using @userinfobot (recommended)
+
+1. Search for **@userinfobot** in Telegram and start a conversation
+2. Send any message (e.g., `/start`)
+3. It replies with your **Chat ID** (a numeric value like `123456789`)
+
+### Method B: Using the Bot API
+
+1. Send any message to your newly created bot in Telegram
+2. Open this URL in your browser (replace `<YOUR_TOKEN>` with your actual token):
+
+```
+https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
+```
+
+3. Find the Chat ID in the JSON response under `"chat":{"id": 123456789}`
+
+## Step 3: Configure Panguard Chat
+
+### Interactive Setup
+
+```bash
+panguard chat setup --channel telegram
+```
+
+The wizard will ask for:
+- **Bot Token** -- paste the token from Step 1
+- **Chat ID** -- paste the Chat ID from Step 2
+
+### Non-Interactive Setup
+
+```bash
+panguard chat setup --channel telegram --user-type developer --lang zh-TW
+```
+
+## Step 4: Test
+
+```bash
+panguard chat test --channel telegram
+```
+
+You should receive a test message in Telegram. If you do not:
+
+<AccordionGroup>
+  <Accordion title="Bot not responding">
+    You must send a message to your bot first. Telegram bots cannot initiate conversations with users they have never interacted with.
+  </Accordion>
+  <Accordion title="Wrong Chat ID">
+    Use @userinfobot to verify your Chat ID. Group IDs are negative numbers (e.g., `-1001234567890`).
+  </Accordion>
+  <Accordion title="Network issues">
+    Ensure your system can reach `api.telegram.org` on port 443.
+  </Accordion>
+</AccordionGroup>
+
+## Group Notifications (Optional)
+
+To send notifications to a Telegram group instead of a direct message:
+
+1. Create a Telegram group
+2. Add your bot to the group
+3. Send a message in the group
+4. Use the `getUpdates` API method to find the group Chat ID (group IDs are negative, e.g., `-1001234567890`)
+5. Use the group Chat ID when configuring Panguard Chat
+
+## Message Format
+
+Telegram notifications use Markdown formatting with structured sections:
+
+```
+[Panguard AI Alert]
+
+Threat Intel Match: 203.0.113.50
+Source: AbuseIPDB (confidence: 98%)
+Action: IP blocked via iptables
+
+Timeline:
+  14:23:01 - Outbound connection detected
+  14:23:02 - Threat intel match confirmed
+  14:23:02 - Auto-response: IP blocked
+```
+
+The exact format varies by your configured [user role](/products/chat/user-roles).

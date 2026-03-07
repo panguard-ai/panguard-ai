@@ -1,0 +1,211 @@
+---
+title: "三層式 AI 漏斗"
+description: "Panguard 如何透過級聯式的規則、本地 AI 與雲端 AI 架構，在 1 毫秒內處理 90% 的安全事件。"
+icon: "brain-circuit"
+---
+
+# 三層式 AI 漏斗
+
+Panguard AI 使用三層級聯架構來分析安全事件。90% 的事件由規則引擎在 1 毫秒內處理。只有最複雜的 3% 才會送達雲端 AI。
+
+## 為什麼需要三層？
+
+將每個安全事件都送到 AI 模型會產生三個問題：
+
+1. **太慢** -- AI 推論需要數秒；攻擊不會等待。
+2. **太貴** -- 每台設備每天數千個事件意味著失控的 Token 成本。
+3. **不可靠** -- 如果 API 當機，防護就停止。
+
+三層漏斗建立在一個簡單原則之上：**大多數攻擊遵循已知模式。只有真正未知的威脅才需要深度 AI 推理。**
+
+---
+
+## 架構概覽
+
+```
+  Security Events
+       |
+       v
+  +-----------+
+  | Layer 1   |  Sigma / YARA Rule Engine
+  | 90% events|  Latency < 1ms | Cost = $0
+  +-----------+
+       |
+    Unmatched (10%)
+       |
+       v
+  +-----------+
+  | Layer 2   |  Local AI (Ollama)
+  | 7% events |  Latency < 5s  | Cost = $0 (on-device)
+  +-----------+
+       |
+    Needs deeper analysis (3%)
+       |
+       v
+  +-----------+
+  | Layer 3   |  Cloud AI (Claude / OpenAI)
+  | 3% events |  Latency < 30s | Cost ~ $0.01/event
+  +-----------+
+```
+
+---
+
+## 各層比較
+
+| 屬性 | Layer 1：規則 | Layer 2：本地 AI | Layer 3：雲端 AI |
+| --- | --- | --- | --- |
+| **事件佔比** | ~90% | ~7% | ~3% |
+| **延遲** | < 1 ms | < 5 s | < 30 s |
+| **每事件成本** | $0 | $0 | ~$0.01 |
+| **需要網路** | 否 | 否 | 是 |
+| **技術** | Sigma + YARA | Ollama (llama3) | Claude / OpenAI |
+| **最適用於** | 已知攻擊模式 | 行為異常 | 新型複雜威脅 |
+
+---
+
+## Layer 1 -- 規則引擎 (90%)
+
+以零延遲、零成本處理所有已知攻擊模式。
+
+### Sigma 規則
+
+Sigma 是安全偵測的社群標準規則格式。Panguard Guard 內建 3000+ 條規則，涵蓋常見攻擊模式。
+
+<CodeGroup>
+```yaml Sigma Rule Example
+title: Suspicious SSH Brute Force
+logsource:
+  category: network
+  product: any
+detection:
+  selection:
+    destination_port: 22
+    action: blocked
+  condition: selection
+level: high
+```
+
+```yara YARA Rule Example
+rule SuspiciousScript {
+  strings:
+    $cmd = "rm -rf /" nocase
+    $wget = "wget" nocase
+  condition:
+    any of them
+}
+```
+</CodeGroup>
+
+**支援的 Sigma 功能：**
+
+- 布林邏輯：`AND`、`OR`、`NOT`
+- 聚合表達式：`1 of them`、`all of them`、`1 of selection*`
+- 匹配修飾器：`|contains`、`|startswith`、`|endswith`、`|re`
+- 數值比較：`|gt`、`|gte`、`|lt`、`|lte`
+- 網路匹配：`|cidr`（IP 範圍匹配）
+- 萬用字元：`*`、`?`
+- 括號群組：`(sel_a OR sel_b) AND NOT filter`
+
+### YARA 規則
+
+用於檔案層級的惡意軟體偵測。Panguard 支援原生 YARA 引擎，並在系統未安裝 YARA 時自動降級至正規表達式引擎。
+
+---
+
+## Layer 2 -- 本地 AI (7%)
+
+當事件不匹配任何已知規則但展現可疑行為時，會被轉送至本地 AI 模型進行分析。
+
+- 透過 [Ollama](https://ollama.ai) 在本地執行 -- 不需要網路
+- 零 API 成本
+- 推論延遲約 3-5 秒
+- 預設模型：`llama3`
+
+<Info>
+**環境感知路由：** 在伺服器（VPS、雲端主機）上，事件會經過全部三層。在桌機與筆電上，Layer 2 會被跳過以避免佔用使用者資源。未匹配的事件直接從 Layer 1 送至 Layer 3。
+</Info>
+
+```
+Server:  Layer 1 (90%) -> Layer 2 (7%) -> Layer 3 (3%)
+Desktop: Layer 1 (90%) -> Layer 3 (5-8%)  (Layer 2 skipped)
+```
+
+---
+
+## Layer 3 -- 雲端 AI (3%)
+
+最複雜的未知威脅由雲端 AI 以完整的動態推理進行分析。
+
+- 完整上下文分析
+- 跨事件關聯
+- 搭配 MITRE ATT&CK 分類的攻擊鏈推理
+- 修復建議產生
+
+<Note>
+即使雲端 AI 不可用（網路中斷、Token 用盡），Layer 1 規則引擎仍會持續運作。**防護永不中斷。**
+</Note>
+
+---
+
+## 優雅降級
+
+三層架構的關鍵設計原則：如果任何一層失效，上一層會自動接手。
+
+| 情境 | 降級行為 |
+| --- | --- |
+| 雲端 AI 不可用 | Layer 2（本地 AI）接手 |
+| 未安裝 Ollama | Layer 1（規則引擎）接手 |
+| 規則檔損毀 | 內建預設規則啟動 |
+
+**Panguard 永遠有防護 -- 只有精確度等級會改變。**
+
+### 依可用來源調整信心度權重
+
+系統根據可用來源動態調整每種證據的權重：
+
+| 可用來源 | 規則/情報 | 基線 | AI | eBPF |
+| --- | --- | --- | --- | --- |
+| 僅規則 | 0.60 | 0.40 | -- | -- |
+| 規則 + AI | 0.40 | 0.30 | 0.30 | -- |
+| 規則 + eBPF | 0.40 | 0.35 | -- | 0.25 |
+| 規則 + AI + eBPF | 0.30 | 0.20 | 0.30 | 0.20 |
+
+---
+
+## FunnelRouter
+
+`@panguard-ai/core` 中的 `FunnelRouter` 元件實作 Layer 2 到 Layer 3 的降級邏輯：
+
+<Steps>
+  <Step title="先嘗試本地 AI">
+    將事件傳送至 Ollama 進行本地分析。
+  </Step>
+  <Step title="評估信心度">
+    如果 Ollama 回傳高信心度判定，則採用。如果 Ollama 不可用或信心度低，則升級處理。
+  </Step>
+  <Step title="降級至雲端 AI">
+    將事件傳送至 Claude 或 OpenAI 進行深度推理與 MITRE 分類。
+  </Step>
+  <Step title="最終降級">
+    如果沒有 AI 供應商可用，系統僅使用規則評分（權重調整為 0.6 規則 + 0.4 基線）。
+  </Step>
+</Steps>
+
+**供應商自動偵測**（啟動時）：
+1. 檢查 `~/.panguard/llm.enc`（加密本地設定，AES-256-GCM）
+2. 檢查環境變數：`ANTHROPIC_API_KEY`、`OPENAI_API_KEY`
+3. 探測本地 Ollama `http://localhost:11434`
+4. 建構適當的轉接器：FunnelRouter（雙方皆可用）、單一供應商或 null
+
+---
+
+## 相關內容
+
+<CardGroup cols={2}>
+  <Card title="學習模式" icon="graduation-cap" href="/concepts/learning-mode">
+    Guard 如何在 7 天學習期間建立行為基線。
+  </Card>
+  <Card title="即時防護" icon="shield" href="/guides/real-time-protection">
+    設定 Guard 進行持續監控與自動回應。
+  </Card>
+</CardGroup>

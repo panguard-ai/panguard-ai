@@ -1,0 +1,84 @@
+---
+title: "panguard whoami"
+description: "Display the currently authenticated user and account details."
+icon: "id-card"
+---
+
+The `whoami` command shows information about the currently logged-in user, including email, plan tier, organization, and token expiry.
+
+## Usage
+
+```bash
+panguard whoami [options]
+```
+
+## Options
+
+<ParamField path="--json" type="flag">
+  Output user information as structured JSON for scripting and automation.
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  Set the output language.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Show current user
+panguard whoami
+```
+
+```bash JSON output for scripting
+panguard whoami --json
+```
+</CodeGroup>
+
+## Sample Output
+
+<Tabs>
+  <Tab title="Human-readable">
+    ```
+    Email:   user@example.com
+    Plan:    Pro ($29/mo)
+    Org:     Acme Corp
+    Machines: 4 / 10
+    Token:   valid (expires in 28 days)
+    ```
+  </Tab>
+  <Tab title="JSON (--json)">
+    ```json
+    {
+      "email": "user@example.com",
+      "plan": "pro",
+      "org": "Acme Corp",
+      "machines_used": 4,
+      "machines_limit": 10,
+      "token_expires_at": "2026-04-04T12:00:00Z"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Plan Requirements
+
+<Info>
+  Available on all plans including **Community (Free)**.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="panguard login" icon="right-to-bracket" href="/cli/login">
+    Authenticate if whoami shows no active session.
+  </Card>
+  <Card title="panguard logout" icon="right-from-bracket" href="/cli/logout">
+    End the current session.
+  </Card>
+  <Card title="Account Setup" icon="user-plus" href="/account-setup">
+    Create or manage your Panguard account.
+  </Card>
+  <Card title="panguard status" icon="circle-info" href="/cli/status">
+    Full system health including authentication state.
+  </Card>
+</CardGroup>

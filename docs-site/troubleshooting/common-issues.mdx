@@ -1,0 +1,214 @@
+---
+title: "Common Issues"
+description: "System requirements, supported platforms, updating, and uninstalling Panguard AI."
+icon: "circle-question"
+---
+
+## Supported Operating Systems
+
+| OS | Minimum Version | Architecture | Notes |
+|----|----------------|--------------|-------|
+| macOS | 12 (Monterey)+ | x64, ARM64 (Apple Silicon) | Full support including Guard and Trap |
+| Ubuntu | 20.04 LTS+ | x64, ARM64 | Recommended Linux distribution |
+| Debian | 11 (Bullseye)+ | x64, ARM64 | Full support |
+| CentOS / RHEL | 8+ | x64 | SELinux compatible |
+| Windows | 10 (build 1903)+ | x64 | Guard requires Administrator |
+
+## System Requirements
+
+<AccordionGroup>
+  <Accordion title="Node.js">
+    **Node.js >= 20** is required. Panguard uses modern JavaScript features (top-level await, native fetch) that require Node.js 20 or later.
+
+    Check your version:
+    ```bash
+    node --version
+    ```
+
+    Install or update via [nvm](https://github.com/nvm-sh/nvm):
+    ```bash
+    nvm install 20
+    nvm use 20
+    ```
+
+    Or via your package manager:
+    ```bash
+    # macOS
+    brew install node@20
+
+    # Ubuntu/Debian
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+    # Windows (winget)
+    winget install OpenJS.NodeJS.LTS
+    ```
+  </Accordion>
+  <Accordion title="Root / Administrator Privileges">
+    Different Panguard modules have different privilege requirements:
+
+    | Module | Root/Admin Required | Reason |
+    |--------|-------------------|--------|
+    | `panguard scan` | No | Reads files with user permissions |
+    | `panguard guard` | **Yes** | Monitors system logs, manages firewall rules |
+    | `panguard trap` | **Yes** | Binds to privileged ports (< 1024) |
+    | `panguard chat` | No | Sends notifications over HTTPS |
+    | `panguard report` | No | Generates reports from existing data |
+    | `panguard manager` | No | Runs as a regular HTTP server |
+
+    Run privileged modules with `sudo`:
+    ```bash
+    sudo panguard guard start
+    sudo panguard trap start
+    ```
+  </Accordion>
+  <Accordion title="Disk Space">
+    | Component | Approximate Size |
+    |-----------|-----------------|
+    | Panguard CLI + core | ~50 MB |
+    | Sigma rules (3,000+) | ~15 MB |
+    | YARA rules (900+) | ~8 MB |
+    | Threat Cloud database (self-hosted) | 100 MB -- 10 GB (depends on data) |
+    | Guard logs + data | Grows over time, recommend 1 GB minimum |
+  </Accordion>
+  <Accordion title="Network">
+    Panguard requires outbound HTTPS access to:
+
+    | Destination | Purpose |
+    |-------------|---------|
+    | `auth.panguard.ai` | Authentication and subscription management |
+    | `tc.panguard.ai` | Threat Cloud intelligence feeds |
+    | `registry.npmjs.org` | Package installation and updates |
+    | `api.anthropic.com` | AI analysis (if using Anthropic) |
+    | `api.openai.com` | AI analysis (if using OpenAI) |
+    | `localhost:11434` | Ollama local AI (if configured) |
+
+    All connections can optionally go through an HTTP proxy via the `HTTPS_PROXY` environment variable.
+  </Accordion>
+</AccordionGroup>
+
+## How to Update
+
+Update Panguard to the latest version:
+
+<CodeGroup>
+```bash npm (global install)
+npm update -g panguard
+```
+
+```bash npx (no install)
+npx panguard@latest doctor
+```
+
+```bash Verify version
+panguard --version
+```
+</CodeGroup>
+
+After updating, restart any running services:
+
+```bash
+# Restart Guard
+sudo panguard guard stop
+sudo panguard guard start
+
+# Restart Chat
+panguard chat stop
+panguard chat start
+```
+
+<Info>
+Panguard checks for updates automatically and displays a notification in the CLI when a new version is available. Detection rules (Sigma + YARA) update independently from the CLI tool.
+</Info>
+
+## How to Uninstall
+
+To completely remove Panguard from your system:
+
+<Tabs>
+  <Tab title="macOS / Linux">
+    ```bash
+    # 1. Stop all running services
+    sudo panguard guard stop
+    panguard chat stop
+
+    # 2. Remove the system service (if installed)
+    sudo panguard guard uninstall-service
+
+    # 3. Uninstall the npm package
+    npm uninstall -g panguard
+
+    # 4. Remove data directories
+    rm -rf ~/.panguard
+    rm -rf ~/.panguard-guard
+    rm -rf ~/.panguard-chat
+
+    # 5. Remove credentials
+    rm -f ~/.panguard/credentials.json
+
+    # 6. Remove firewall rules added by Guard
+    # macOS:
+    sudo pfctl -F all
+    # Linux:
+    sudo iptables -F PANGUARD 2>/dev/null
+    sudo iptables -X PANGUARD 2>/dev/null
+    ```
+  </Tab>
+  <Tab title="Windows">
+    ```powershell
+    # 1. Stop all running services
+    panguard guard stop
+    panguard chat stop
+
+    # 2. Remove the Windows service (if installed)
+    panguard guard uninstall-service
+
+    # 3. Uninstall the npm package
+    npm uninstall -g panguard
+
+    # 4. Remove data directories
+    Remove-Item -Recurse -Force "$HOME\.panguard"
+    Remove-Item -Recurse -Force "$HOME\.panguard-guard"
+    Remove-Item -Recurse -Force "$HOME\.panguard-chat"
+
+    # 5. Remove firewall rules
+    Remove-NetFirewallRule -DisplayName "Panguard*"
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+Uninstalling removes all local data including scan history, threat logs, and configuration. Export your data first with `panguard report generate` if you need historical records.
+</Warning>
+
+## Common Error Messages
+
+<AccordionGroup>
+  <Accordion title="Error: Node.js version 20 or later is required">
+    Your Node.js version is too old. Update to Node.js 20+:
+    ```bash
+    nvm install 20 && nvm use 20
+    ```
+  </Accordion>
+  <Accordion title="Error: EACCES permission denied">
+    You are running a privileged module without root access:
+    ```bash
+    sudo panguard guard start
+    ```
+    For non-root setups, see the [system service guide](/guides/system-service).
+  </Accordion>
+  <Accordion title="Error: Cannot find module 'panguard'">
+    Panguard is not installed globally, or your PATH does not include the npm global bin directory:
+    ```bash
+    npm install -g panguard
+    # Or check your PATH:
+    npm config get prefix
+    ```
+  </Accordion>
+  <Accordion title="Error: ECONNREFUSED">
+    The target service is not running or is unreachable. Check:
+    - Is the service started? (`panguard status`)
+    - Is the port correct? (check environment variables)
+    - Is a firewall blocking the connection?
+  </Accordion>
+</AccordionGroup>

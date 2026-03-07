@@ -43,10 +43,12 @@ export async function runCLI(args: string[]): Promise<void> {
   const dataDir = extractOption(args, '--data-dir') ?? DEFAULT_DATA_DIR;
   const verbose = args.includes('--verbose');
   const managerUrl = extractOption(args, '--manager');
+  const noTelemetry = args.includes('--no-telemetry');
+  const showUploadData = args.includes('--show-upload-data');
 
   switch (command) {
     case 'start':
-      await commandStart(dataDir, verbose, managerUrl);
+      await commandStart(dataDir, verbose, managerUrl, noTelemetry, showUploadData);
       break;
     case 'stop':
       commandStop(dataDir);
@@ -83,7 +85,13 @@ export async function runCLI(args: string[]): Promise<void> {
 }
 
 /** Start the guard engine / 啟動守護引擎 */
-async function commandStart(dataDir: string, verbose = false, managerUrl?: string): Promise<void> {
+async function commandStart(
+  dataDir: string,
+  verbose = false,
+  managerUrl?: string,
+  noTelemetry = false,
+  showUploadData = false,
+): Promise<void> {
   // Default quiet mode: suppress structured JSON logs
   if (!verbose) {
     setLogLevel('silent');
@@ -103,6 +111,12 @@ async function commandStart(dataDir: string, verbose = false, managerUrl?: strin
   // Pass --manager URL to config for distributed architecture
   if (managerUrl) {
     config.managerUrl = managerUrl;
+  }
+  if (noTelemetry) {
+    config.telemetryEnabled = false;
+  }
+  if (showUploadData) {
+    config.showUploadData = true;
   }
 
   const engine = new GuardEngine(config);
@@ -130,9 +144,17 @@ async function commandStart(dataDir: string, verbose = false, managerUrl?: strin
   );
 
   // Threat intelligence sharing transparency message
-  console.log(`  ${symbols.info} Threat intelligence sharing: ${c.safe('enabled')}`);
-  console.log(`  ${c.dim('  Detected threats are anonymously uploaded to Panguard Threat Cloud')}`);
-  console.log(`  ${c.dim('  Disable: panguard config set threat-cloud.upload false')}`);
+  if (config.telemetryEnabled === false) {
+    console.log(`  ${symbols.info} Threat intelligence sharing: ${c.dim('disabled')}`);
+    console.log(`  ${c.dim('  No data will be uploaded to Panguard Threat Cloud')}`);
+  } else {
+    console.log(`  ${symbols.info} Threat intelligence sharing: ${c.safe('enabled')}`);
+    console.log(`  ${c.dim('  Detected threats are anonymously uploaded to Panguard Threat Cloud')}`);
+    console.log(`  ${c.dim('  Disable: panguard-guard start --no-telemetry')}`);
+  }
+  if (config.showUploadData) {
+    console.log(`  ${symbols.info} Upload data preview: ${c.safe('enabled')}`);
+  }
   console.log('');
 
   // Free tier: show what's enabled/disabled
@@ -313,6 +335,12 @@ function printHelp(): void {
   );
   console.log(
     `  ${c.sage('--manager <url>'.padEnd(22))} Manager URL for distributed mode`
+  );
+  console.log(
+    `  ${c.sage('--no-telemetry'.padEnd(22))} Disable threat intelligence sharing`
+  );
+  console.log(
+    `  ${c.sage('--show-upload-data'.padEnd(22))} Show anonymized data before upload`
   );
   console.log(`  ${c.sage('--license-key <key>'.padEnd(22))} License key for install-script`);
   console.log('');
