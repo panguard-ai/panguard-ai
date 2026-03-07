@@ -2397,6 +2397,97 @@
         "cta1": "開始使用",
         "cta2": "查看方案價格"
       }
+    },
+    "skillAuditor": {
+      "overline": "SKILL AUDITOR",
+      "title": "在 AI 動手之前，",
+      "titleHighlight": "先過我這關。",
+      "titleSuffix": "",
+      "subtitle": "掃描任何 AI agent skill，偵測 prompt injection、工具投毒、隱藏攻擊。不到 1 秒完成評估，給出 0-100 風險評分。支援 OpenClaw、Claude、MCP 等所有主流格式。",
+      "cta1": "立即開始",
+      "cta2": "閱讀文件",
+      "problem": {
+        "overline": "為什麼你該在意",
+        "title": "AI skill 市集，是新一代的攻擊入口。",
+        "desc": "OpenClaw、ClawdHub、MCP 等平台讓安裝 AI skill 變得超簡單。但你裝進來的每一個 skill，都是用你 agent 的權限在跑 — 它可以讀你的檔案、環境變數、甚至連到你的伺服器。",
+        "desc2": "一個惡意 skill 就能偷走你的 API key、開 reverse shell、或劫持你 agent 的身份。人工審查看不到零寬字元、Base64 編碼的惡意 payload、或精心設計的 prompt injection。"
+      },
+      "pillars": {
+        "overline": "為什麼選 PANGUARD",
+        "title": "AI 做不到的事，我們來。",
+        "preInstall": {
+          "title": "裝之前就擋",
+          "subtitle": "先知道再安裝",
+          "desc": "AI agent 只會在執行時問你 allow/deny — 那時惡意程式碼已經在你機器上了。Panguard 在安裝前就完成掃描，把威脅擋在門外。",
+          "them": "執行時才跳出 allow/deny",
+          "us": "安裝前完成完整靜態分析"
+        },
+        "riskScore": {
+          "title": "0-100 量化評分",
+          "subtitle": "不只是 allow 或 deny",
+          "desc": "每個 skill 都有量化風險分數，附帶具體發現、行號、嚴重等級。你的團隊做的是明智決策，不是盲猜。",
+          "them": "只有 allow 或 deny 兩個選項",
+          "us": "量化分數 + 完整報告"
+        },
+        "cicd": {
+          "title": "CI/CD 原生整合",
+          "subtitle": "自動化你的安全關卡",
+          "desc": "放進 GitHub Actions、GitLab CI 或任何 pipeline，自動阻擋高風險 skill 進入正式環境。沒有任何 AI agent 能做到這件事。",
+          "them": "不支援 CI/CD",
+          "us": "JSON 輸出、exit code、pipeline 原生支援"
+        },
+        "crossPlatform": {
+          "title": "跨平台通吃",
+          "subtitle": "所有 skill 格式，一個掃描器",
+          "desc": "支援 OpenClaw SKILL.md、Claude skills、MCP tools，以及任何 markdown 格式的 agent skill。一個工具掃全部。",
+          "them": "只能掃自己生態系的 skill",
+          "us": "OpenClaw、Claude、MCP、自訂格式"
+        }
+      },
+      "checks": {
+        "overline": "7 項自動化檢查",
+        "title": "深度掃描，不到 1 秒。",
+        "promptInjection": { "name": "Prompt Injection", "detail": "11 組 regex 偵測身份覆寫、指令劫持、越獄攻擊" },
+        "hiddenUnicode": { "name": "隱藏 Unicode", "detail": "零寬字元、RTL 覆蓋、同形字攻擊 — 人眼完全看不到" },
+        "encodedPayloads": { "name": "編碼惡意載荷", "detail": "自動解碼 Base64，偵測內含的 eval、exec、subprocess、child_process" },
+        "toolPoisoning": { "name": "工具投毒", "detail": "Reverse shell、權限提升、遠端程式碼執行、環境變數竊取" },
+        "sastSecrets": { "name": "程式碼掃描 + 機敏資料", "detail": "靜態分析找漏洞，偵測寫死的 API key、AWS 憑證、私鑰" },
+        "permissionScope": { "name": "權限範圍分析", "detail": "比對 skill 要求的權限與它宣稱的用途是否合理" },
+        "manifestValidation": { "name": "Manifest 驗證", "detail": "驗證 SKILL.md 結構、必填欄位、metadata 完整性" },
+        "scanTime": "掃描時間",
+        "checkCategories": "檢查類別",
+        "injectionPatterns": "注入特徵"
+      },
+      "riskScoring": {
+        "overline": "風險評分",
+        "title": "不只告訴你結果，還告訴你為什麼。",
+        "desc": "不是只有「已封鎖」或「已允許」。每個 skill 都有量化分數和具體發現，讓你的團隊做出行動。",
+        "low": "快速瀏覽後可安心安裝",
+        "medium": "建議檢視發現項目再安裝",
+        "high": "需要詳細人工審查",
+        "critical": "請勿安裝"
+      },
+      "workflows": {
+        "overline": "真實使用場景",
+        "title": "配合你實際的工作方式。",
+        "developer": { "persona": "開發者", "title": "從 OpenClaw 安裝 skill" },
+        "smb": { "persona": "中小企業 IT 管理員", "title": "幫團隊審核 skill" },
+        "enterprise": { "persona": "企業 DevSecOps", "title": "CI/CD pipeline 安全關卡" }
+      },
+      "ecosystem": {
+        "overline": "全方位防護",
+        "title": "從 skill 安全到伺服器防護，一條龍。",
+        "desc": "Skill Auditor 保護你的 AI agent。Panguard Guard 保護你的基礎設施。兩者組合，涵蓋完整攻擊面。",
+        "auditor": "安裝前掃描",
+        "runtime": "Agent 層級 allow/deny",
+        "guard": "系統層級防護"
+      },
+      "cta": {
+        "title": "別盲信。先掃描。",
+        "desc": "一行指令。七項檢查。零死角。",
+        "cta1": "免費開始",
+        "cta2": "查看方案價格"
+      }
     }
   },
   "solutions": {

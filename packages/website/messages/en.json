@@ -1650,6 +1650,97 @@
         "cta1": "Get Started",
         "cta2": "View Pricing"
       }
+    },
+    "skillAuditor": {
+      "overline": "SKILL AUDITOR",
+      "title": "The security layer that runs",
+      "titleHighlight": "before",
+      "titleSuffix": "your AI agent does.",
+      "subtitle": "Scan any AI agent skill for prompt injection, tool poisoning, and hidden threats. Get a 0-100 risk score in under 1 second. Works with OpenClaw, Claude, MCP, and more.",
+      "cta1": "Get Started",
+      "cta2": "Read the Docs",
+      "problem": {
+        "overline": "THE PROBLEM",
+        "title": "AI agent skills are the new attack surface.",
+        "desc": "OpenClaw, ClawdHub, and MCP marketplaces make it easy to install powerful skills into your AI agent. But every skill you install is code that runs with your agent's permissions — accessing your files, your environment variables, your servers.",
+        "desc2": "A single malicious skill can exfiltrate credentials, open reverse shells, or hijack your agent's identity. Manual review can't catch zero-width Unicode, encoded payloads, or sophisticated prompt injection."
+      },
+      "pillars": {
+        "overline": "WHY PANGUARD",
+        "title": "What AI agents can't do for you.",
+        "preInstall": {
+          "title": "Pre-Install Gate",
+          "subtitle": "Know before you install",
+          "desc": "AI agents only check permissions at runtime — after the code is already on your machine. Panguard scans skills before installation, blocking threats at the door.",
+          "them": "Allow / Deny prompt at runtime",
+          "us": "Full static analysis before install"
+        },
+        "riskScore": {
+          "title": "0-100 Risk Score",
+          "subtitle": "Not just allow/deny",
+          "desc": "Every skill gets a quantitative risk score with specific findings, line numbers, and severity levels. Your team makes informed decisions, not blind guesses.",
+          "them": "Binary allow or deny",
+          "us": "Quantitative score + detailed report"
+        },
+        "cicd": {
+          "title": "CI/CD Pipeline Ready",
+          "subtitle": "Automate your security gate",
+          "desc": "Add Panguard to your GitHub Actions, GitLab CI, or any pipeline. Block risky skills from reaching production automatically. No AI agent offers this.",
+          "them": "No CI/CD integration",
+          "us": "JSON output, exit codes, pipeline-native"
+        },
+        "crossPlatform": {
+          "title": "Cross-Platform",
+          "subtitle": "Every skill format, one scanner",
+          "desc": "Works with OpenClaw SKILL.md, Claude skills, MCP tools, and any markdown-based agent skill. One tool to scan them all.",
+          "them": "Only their own ecosystem",
+          "us": "OpenClaw, Claude, MCP, custom formats"
+        }
+      },
+      "checks": {
+        "overline": "7 AUTOMATED CHECKS",
+        "title": "Deep scan in under 1 second.",
+        "promptInjection": { "name": "Prompt Injection", "detail": "11 regex patterns detect identity override, instruction hijacking, and jailbreak attempts" },
+        "hiddenUnicode": { "name": "Hidden Unicode", "detail": "Zero-width characters, RTL overrides, homoglyph attacks invisible to human reviewers" },
+        "encodedPayloads": { "name": "Encoded Payloads", "detail": "Auto-decode Base64 and detect eval, exec, subprocess, child_process inside" },
+        "toolPoisoning": { "name": "Tool Poisoning", "detail": "Reverse shells, privilege escalation, remote code execution, env exfiltration" },
+        "sastSecrets": { "name": "SAST + Secrets", "detail": "Static analysis for vulnerabilities, hardcoded API keys, AWS credentials, private keys" },
+        "permissionScope": { "name": "Permission Scope", "detail": "Evaluates requested permissions against the skill's stated purpose" },
+        "manifestValidation": { "name": "Manifest Validation", "detail": "Verifies SKILL.md structure, required fields, and metadata integrity" },
+        "scanTime": "Scan time",
+        "checkCategories": "Check categories",
+        "injectionPatterns": "Injection patterns"
+      },
+      "riskScoring": {
+        "overline": "RISK SCORING",
+        "title": "Understand exactly why.",
+        "desc": "Not just \"blocked\" or \"allowed\". Every skill gets a quantitative score with specific findings your team can act on.",
+        "low": "Safe to install after quick review",
+        "medium": "Review findings before installing",
+        "high": "Requires thorough manual review",
+        "critical": "Do NOT install"
+      },
+      "workflows": {
+        "overline": "REAL WORKFLOWS",
+        "title": "Built for how you actually work.",
+        "developer": { "persona": "Developer", "title": "Installing a skill from OpenClaw" },
+        "smb": { "persona": "SMB IT Admin", "title": "Vetting skills for your team" },
+        "enterprise": { "persona": "Enterprise DevSecOps", "title": "CI/CD pipeline gate" }
+      },
+      "ecosystem": {
+        "overline": "FULL STACK SECURITY",
+        "title": "From skill safety to server protection.",
+        "desc": "Skill Auditor protects your AI agent. Panguard Guard protects your infrastructure. Together, they cover the full attack surface.",
+        "auditor": "Pre-install scanning",
+        "runtime": "Agent-level allow/deny",
+        "guard": "System-level protection"
+      },
+      "cta": {
+        "title": "Stop trusting. Start scanning.",
+        "desc": "One command. Seven checks. Zero blind spots.",
+        "cta1": "Get Started Free",
+        "cta2": "View Pricing"
+      }
     }
   },
   "solutions": {
