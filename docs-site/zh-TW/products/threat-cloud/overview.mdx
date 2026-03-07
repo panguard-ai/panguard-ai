@@ -1,0 +1,144 @@
+---
+title: "Threat Cloud"
+description: "集體威脅情報平台，每個 Panguard 代理貢獻匿名化資料，每個代理都能從社群的偵測中受益。"
+icon: "cloud"
+---
+
+Panguard Threat Cloud 是一個集體威脅情報平台。每個偵測到威脅的 Guard 代理都會將匿名化資料貢獻至雲端。每個代理都能從社群的集體偵測中受益。結果是：在一台機器上安裝 Panguard，就能獲得整個網路情報的防護。
+
+## 運作方式
+
+```
+Agent A (偵測到威脅) ──> 匿名化 ──> Threat Cloud ──> 所有代理受益
+Agent B (偵測到威脅) ──> 匿名化 ──┘
+Agent C (查詢) ──────────────────────┘
+```
+
+當 Guard 代理偵測到威脅時：
+1. `ReportAgent` 匿名化威脅資料（IP /16 遮罩、無主機名稱、無檔案內容）
+2. 匿名化的 IoC 提交至 Threat Cloud
+3. Threat Cloud 驗證、關聯並儲存資料
+4. 其他代理在偵測管線中查詢 Threat Cloud，從集體情報中受益
+
+## 主要功能
+
+| 功能 | 詳細資訊 |
+|-----------|---------|
+| **IoC 儲存** | IP 位址、網域、檔案雜湊、URL |
+| **關聯引擎** | 相關指標的跨來源關聯 |
+| **攻擊活動追蹤** | 將相關 IoC 分組為攻擊活動 |
+| **饋送分發** | IP 和網域封鎖清單推送至代理 |
+| **目擊儲存** | 追蹤多少代理已看過每個指標 |
+| **信譽引擎** | 基於目擊頻率和來源多樣性的信心評分 |
+| **Sigma 規則分享** | 社群貢獻的偵測規則 |
+| **稽核日誌** | 所有提交和查詢的完整稽核軌跡 |
+| **RESTful API** | 程式化查詢和提交威脅情報 |
+
+## 快速開始
+
+### 使用公共 Threat Cloud（預設）
+
+無需設定。Guard 啟動時自動連接至公共 Threat Cloud：
+
+```bash
+panguard guard start
+```
+
+### 部署私有實例
+
+企業可以部署自己的 Threat Cloud 伺服器：
+
+```bash
+panguard threat start --port 8080 --api-key your-secret-key
+```
+
+請參閱[部署](/products/threat-cloud/deployment)了解完整設定指引。
+
+## IoC 類型
+
+| 類型 | 範例 | 描述 |
+|------|---------|-------------|
+| **IP 位址** | `203.0.113.50` | 已知的惡意來源或 C2 伺服器 |
+| **網域** | `evil.example.com` | 惡意網域或釣魚網站 |
+| **檔案雜湊** | `sha256:abc123...` | 已知的惡意軟體特徵 |
+| **URL** | `http://evil.example.com/payload` | 惡意軟體分發 URL |
+
+## 攻擊活動追蹤
+
+相關 IoC 被分組為攻擊活動以進行情境分析：
+
+```json
+{
+  "campaign": "SCATTERED_SPIDER_2025",
+  "firstSeen": "2025-01-01T00:00:00Z",
+  "lastSeen": "2025-01-15T14:23:01Z",
+  "iocs": [
+    { "type": "ip", "value": "203.0.113.50", "confidence": 95 },
+    { "type": "domain", "value": "c2.evil.example.com", "confidence": 90 },
+    { "type": "hash", "value": "sha256:abc123...", "confidence": 98 }
+  ],
+  "mitre": ["T1566", "T1059", "T1071"],
+  "description": "Social engineering campaign targeting cloud infrastructure"
+}
+```
+
+## Guard 整合
+
+Guard `DetectAgent` 在事件處理期間查詢 Threat Cloud：
+
+1. 從安全事件中提取指標（來源 IP、目的網域、檔案雜湊）
+2. 向 Threat Cloud 查詢匹配
+3. 如果匹配，指標的信心評分會貢獻至 `AnalyzeAgent` 的加權裁決
+4. 威脅情報匹配有固定的信心貢獻值 85
+
+## API 端點
+
+| 方法 | 端點 | 描述 |
+|--------|----------|-------------|
+| `POST` | `/api/v1/ioc` | 提交新的 IoC |
+| `GET` | `/api/v1/ioc` | 按類型和值查詢單一 IoC |
+| `POST` | `/api/v1/ioc/batch` | 批次查詢多個指標 |
+| `GET` | `/api/v1/ioc/recent` | 取得最近報告的 IoC |
+| `GET` | `/api/v1/health` | 健康檢查 |
+| `GET` | `/api/v1/campaigns/:id` | 取得攻擊活動詳情 |
+| `GET` | `/api/v1/feeds/status` | 檢查饋送同步狀態 |
+| `GET` | `/api/v1/stats` | 彙總統計資料 |
+
+## 饋送來源
+
+Threat Cloud 與 5 個外部威脅情報饋送同步：
+
+| 饋送 | 資料類型 |
+|------|-----------|
+| **ThreatFox**（abuse.ch） | 惡意軟體、C2、殭屍網路 IoC |
+| **URLhaus**（abuse.ch） | 惡意軟體分發 URL |
+| **Feodo Tracker**（abuse.ch） | 殭屍網路 C2 伺服器 IP |
+| **GreyNoise** | 大規模掃描和網際網路噪音 IP |
+| **AbuseIPDB** | 社群報告的惡意 IP |
+
+## CLI 選項
+
+```
+panguard threat <command> [options]
+
+Commands:
+  start              啟動 Threat Cloud 伺服器
+  stop               停止 Threat Cloud 伺服器
+  status             顯示伺服器狀態
+  lookup <indicator> 查詢 IoC
+
+Options:
+  --port <number>    監聽埠（預設：8080）
+  --host <string>    綁定位址（預設：127.0.0.1）
+  --db <path>        SQLite 資料庫路徑
+  --api-key <keys>   API 金鑰，以逗號分隔
+```
+
+<CardGroup cols={2}>
+  <Card title="部署" icon="rocket" href="/products/threat-cloud/deployment">
+    部署您自己的私有 Threat Cloud 伺服器。
+  </Card>
+  <Card title="隱私" icon="shield-check" href="/products/threat-cloud/privacy">
+    匿名化資料、零遙測及退出控制。
+  </Card>
+</CardGroup>

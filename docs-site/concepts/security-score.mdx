@@ -1,0 +1,209 @@
+---
+title: "Security Score"
+description: "How Panguard calculates your system's risk score from 0-100 with letter grades A through F."
+icon: "chart-simple"
+---
+
+# Security Score
+
+A single 0-100 number that tells you exactly where your system's security stands. Every scan and every Guard status check returns this score alongside a letter grade.
+
+```
+  Score: 85/100 [=================---] Grade: B
+```
+
+---
+
+## Grade Scale
+
+| Score | Grade | Meaning |
+| --- | --- | --- |
+| 90-100 | **A** | Excellent -- protection is comprehensive |
+| 80-89 | **B** | Good -- minor improvements possible |
+| 70-79 | **C** | Fair -- address medium-risk issues |
+| 60-69 | **D** | Needs improvement -- significant risks present |
+| 0-59 | **F** | Critical -- immediate action required |
+
+---
+
+## Scoring Factors
+
+The security score is a weighted composite of 8 factors, each independently scored 0-100:
+
+| Factor | Weight | What It Measures |
+| --- | --- | --- |
+| **Open Ports** | 15% | Are unnecessary ports exposed to the network? |
+| **Firewall** | 15% | Is the firewall enabled with comprehensive rules? |
+| **System Updates** | 15% | Are OS and software packages up to date? |
+| **Threat Status** | 15% | Are there known active threats on the system? |
+| **Password Policy** | 10% | Is password complexity enforced? |
+| **Security Tools** | 10% | Are antivirus, EDR, or IDS tools installed? |
+| **Compliance** | 10% | Does the system meet basic security frameworks? |
+| **Response Readiness** | 10% | Are threat response mechanisms in place? |
+
+### Calculation
+
+```
+Total = (Ports x 0.15) + (Firewall x 0.15) + (Updates x 0.15) +
+        (Threats x 0.15) + (Password x 0.10) + (Tools x 0.10) +
+        (Compliance x 0.10) + (Response x 0.10)
+```
+
+<Info>
+Each factor is independently scored 0-100. The weighted sum produces the final composite score.
+</Info>
+
+---
+
+## Quick Scan vs Full Scan
+
+The depth of the scan affects how many factors are evaluated:
+
+| Scan Mode | Duration | Factors Evaluated | Use Case |
+| --- | --- | --- | --- |
+| `panguard scan --quick` | ~30 seconds | Open ports, firewall, password policy, running services | Fast daily check |
+| `panguard scan` | ~60 seconds | All 8 factors including SSL certs, scheduled tasks, shared folders | Comprehensive audit |
+
+<Tip>
+A quick scan may produce a slightly different score than a full scan because it evaluates fewer factors. For the most accurate score, run a full scan.
+</Tip>
+
+---
+
+## Score Breakdown Example
+
+After running a scan, Panguard displays a detailed breakdown:
+
+```
+  -- Risk Score ----------------------------
+
+  Score: 72/100 [==================--] Grade: C
+  Trend: improving (+5 since last scan)
+
+  Breakdown:
+    Firewall:    80/100
+    Open Ports:  60/100
+    Passwords:   50/100
+    Updates:     90/100
+    Tools:       70/100
+    Threats:     85/100
+    Compliance:  65/100
+    Response:    70/100
+```
+
+---
+
+## Continuous Score Updates with Guard
+
+When Guard is running, the security score is recalculated continuously as conditions change:
+
+- A new port opens -- the Open Ports factor drops, score decreases
+- A threat is detected and auto-blocked -- the Threat Status factor updates
+- Guard has been running for 7+ days -- the Response Readiness factor improves
+
+```bash
+panguard guard status
+```
+
+```
+  -- Security Score -----------------------
+
+  Score: 88/100 [===================] Grade: B
+  Trend: stable (no change in 48h)
+  Guard uptime: 14 days
+```
+
+<Note>
+Guard's continuous monitoring provides a more accurate and current score than periodic scans alone. The score updates in near real-time as your system's security posture changes.
+</Note>
+
+---
+
+## Trend Tracking
+
+The security score tracks changes over time:
+
+| Trend | Condition | Meaning |
+| --- | --- | --- |
+| **Improving** | Score increased by 2+ points since last check | Security posture is getting better |
+| **Declining** | Score decreased by 2+ points since last check | Security posture is degrading |
+| **Stable** | Change within 2 points | Security posture is steady |
+
+<Warning>
+A declining trend should trigger investigation even if the absolute score is still acceptable. Small drops often precede larger issues.
+</Warning>
+
+---
+
+## PDF Reports
+
+The security score is a central element of generated PDF reports:
+
+- **Score and grade** displayed prominently on the first page
+- **Factor breakdown** with individual scores per category
+- **Remediation recommendations** prioritized by impact on score
+- **Trend graph** showing score changes over time (when historical data is available)
+
+```bash
+panguard scan --output my-report.pdf
+```
+
+---
+
+## Where to View Your Score
+
+<AccordionGroup>
+  <Accordion title="Panguard Scan">
+    Every scan displays the security score at completion:
+
+    ```bash
+    panguard scan
+    ```
+  </Accordion>
+  <Accordion title="Panguard Guard">
+    Guard continuously calculates a real-time score. View it with:
+
+    ```bash
+    panguard guard status
+    ```
+  </Accordion>
+  <Accordion title="Panguard Status">
+    Quick overview of the current score:
+
+    ```bash
+    panguard status
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Improving Your Score
+
+<Steps>
+  <Step title="Run a full scan">
+    Start with `panguard scan` to get your current score and see the factor breakdown.
+  </Step>
+  <Step title="Address critical findings first">
+    Focus on CRITICAL and HIGH severity findings. These have the largest impact on your score.
+  </Step>
+  <Step title="Enable Guard">
+    Running Guard continuously improves your Response Readiness and Threat Status factors.
+  </Step>
+  <Step title="Rescan to verify">
+    Run another scan after making changes to confirm your score has improved.
+  </Step>
+</Steps>
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Your First Scan" icon="magnifying-glass" href="/guides/first-scan">
+    Step-by-step guide to running your first security scan.
+  </Card>
+  <Card title="Learning Mode" icon="graduation-cap" href="/concepts/learning-mode">
+    How Guard builds a behavioral baseline during the 7-day learning period.
+  </Card>
+</CardGroup>

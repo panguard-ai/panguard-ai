@@ -1,0 +1,100 @@
+---
+title: "panguard chat"
+description: "設定安全警報的通知頻道，並與 AI 助手互動。"
+icon: "message-bot"
+---
+
+`chat` 指令管理 Panguard 與您的溝通方式。設定 Telegram、Slack 或 Email 通知用於安全事件、設定警報偏好，並測試訊息是否正確送達。
+
+## 使用方式
+
+```bash
+panguard chat <subcommand> [options]
+```
+
+## 子指令
+
+| 子指令 | 說明 |
+| --- | --- |
+| `setup` | 通知頻道的互動式設定精靈 |
+| `test` | 發送測試訊息以驗證頻道連線 |
+| `status` | 顯示已設定的頻道及其健康狀態 |
+| `config` | 檢視或修改 chat 設定 |
+| `prefs` | 設定通知偏好（嚴重性篩選、靜音時段、語言） |
+
+## 選項
+
+<ParamField path="--channel" type="string">
+  指定通知頻道類型：`telegram`、`slack` 或 `email`。
+</ParamField>
+
+<ParamField path="--user-type" type="string">
+  設定通知路由的使用者角色：`owner`、`admin` 或 `viewer`。
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  設定通知語言（例如 `en`、`zh-TW`、`ja`）。
+</ParamField>
+
+## 範例
+
+<CodeGroup>
+```bash 設定 Telegram 通知
+panguard chat setup --channel telegram
+```
+
+```bash 設定 Slack 通知
+panguard chat setup --channel slack
+```
+
+```bash 測試目前設定
+panguard chat test
+```
+
+```bash 檢查頻道狀態
+panguard chat status
+```
+
+```bash 設定通知偏好
+panguard chat prefs --lang zh-TW
+```
+
+```bash 檢視 chat 設定
+panguard chat config
+```
+</CodeGroup>
+
+## 通知頻道
+
+| 頻道 | 設定方式 | 送達速度 |
+| --- | --- | --- |
+| Telegram | Bot token + chat ID（引導式精靈） | 即時 |
+| Slack | Webhook URL 或 Slack App 安裝 | 即時 |
+| Email | SMTP 設定或 Panguard 中繼 | 1-5 分鐘 |
+
+<Tip>
+  Telegram 是個人開發者的建議頻道。它支援豐富格式、內嵌操作和雙向 AI 對話。
+</Tip>
+
+## 方案要求
+
+<Info>
+  Chat 設定和通知需要 **Solo**（$9/月）方案或更高。Community 方案使用者可以檢視通知示範流程。
+</Info>
+
+## 相關資源
+
+<CardGroup cols={2}>
+  <Card title="通知設定指南" icon="bell" href="/guides/notifications-setup">
+    各通知頻道的逐步指南。
+  </Card>
+  <Card title="Chat 產品概覽" icon="comments" href="/products/chat/overview">
+    Chat 通知系統的完整文件。
+  </Card>
+  <Card title="Chat 設定" icon="gear" href="/configuration/chat-config">
+    通知路由的進階設定選項。
+  </Card>
+  <Card title="使用者角色" icon="users" href="/products/chat/user-roles">
+    通知路由如何依使用者角色而異。
+  </Card>
+</CardGroup>

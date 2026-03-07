@@ -1,0 +1,197 @@
+---
+title: "Policy Engine"
+description: "Centralized policy distribution with versioning, per-agent overrides, and broadcast queue for fleet-wide configuration management."
+icon: "scroll"
+---
+
+The Policy Engine provides centralized configuration management for your Guard agent fleet. It supports global policies that apply to all agents, per-agent overrides for specific endpoints, and version-controlled distribution with a broadcast queue.
+
+## How Policies Work
+
+```
+Admin ──> POST /api/policy ──> PolicyEngine ──> Broadcast Queue
+                                                      |
+                                    Agent Poll (every 5 min)
+                                                      |
+                               ┌──────────┬──────────┬──────────┐
+                             Agent 1    Agent 2    Agent 3
+```
+
+1. An administrator creates or updates a policy via the REST API or CLI
+2. The PolicyEngine increments the version number and stores the policy
+3. The policy is added to the broadcast queue
+4. Agents poll for updates every 5 minutes and download new policies when their local version is outdated
+
+## Policy Structure
+
+Policies are JSON documents with a version number and configuration sections:
+
+```json
+{
+  "version": 3,
+  "scope": "global",
+  "updatedAt": "2025-01-15T14:23:01Z",
+  "thresholds": {
+    "autoRespond": 90,
+    "notifyAndWait": 70
+  },
+  "blocklist": {
+    "ips": ["203.0.113.50", "198.51.100.0/24"]
+  },
+  "allowlist": {
+    "ips": ["10.0.0.0/8"],
+    "processes": ["nginx", "postgres"]
+  },
+  "monitors": {
+    "enabled": ["log", "network", "process", "file"],
+    "advanced": ["falco", "suricata"]
+  },
+  "alerting": {
+    "minimumSeverity": "medium",
+    "channels": ["slack"]
+  },
+  "response": {
+    "actions": ["block_ip", "notify", "log_only"],
+    "escalation": {
+      "repeatThreshold": 3,
+      "repeatBlockDuration": "24h"
+    }
+  }
+}
+```
+
+## Policy Configuration Sections
+
+| Section | Fields | Description |
+|---------|--------|-------------|
+| **thresholds** | `autoRespond`, `notifyAndWait` | Confidence thresholds for automated response |
+| **blocklist** | `ips`, `domains` | Fleet-wide block lists pushed to all agents |
+| **allowlist** | `ips`, `processes` | Whitelisted IPs and processes exempt from response |
+| **monitors** | `enabled`, `advanced` | Which monitors to activate on each agent |
+| **alerting** | `channels`, `severity` | Minimum severity for notifications, channel routing |
+| **response** | `actions`, `escalation` | Allowed response actions and escalation parameters |
+| **rules** | `sigma`, `yara` | Custom rule distribution |
+
+## Rule Types
+
+| Type | Description | Value Format |
+|------|-------------|-------------|
+| `block_ip` | Add IP or CIDR to fleet-wide blocklist | IP address or CIDR notation |
+| `alert_threshold` | Set minimum confidence for alerting | Number (0-100) |
+| `auto_respond` | Enable/disable automatic response | Boolean + confidence threshold |
+| `custom` | Custom key-value configuration | String |
+
+### block_ip
+
+Adds an IP address or CIDR range to the blocklist on all target agents:
+
+```json
+{
+  "type": "block_ip",
+  "value": "203.0.113.50",
+  "duration": "24h",
+  "reason": "Cross-agent correlation: scanning 5 agents"
+}
+```
+
+### auto_respond
+
+Controls whether the RespondAgent can take automated actions. Useful during maintenance windows:
+
+```json
+{
+  "type": "auto_respond",
+  "value": false,
+  "reason": "Maintenance window: disable auto-response"
+}
+```
+
+## Policy Scopes
+
+<Tabs>
+  <Tab title="Global Policies">
+    Global policies apply to all registered agents:
+
+    ```bash
+    panguard manager policies set --global --file policy.json
+    ```
+
+    Every agent receives global policies during policy polling.
+  </Tab>
+  <Tab title="Per-Agent Policies">
+    Per-agent policies target specific machines and override global settings:
+
+    ```bash
+    panguard manager policies set --agent srv-01 --file policy.json
+    ```
+
+    Per-agent policies are merged with global policies. In case of conflict, the per-agent rule takes precedence.
+  </Tab>
+</Tabs>
+
+### Policy Resolution Order
+
+When an agent polls for its policy, the Manager merges settings:
+
+```
+Defaults ──> Global Policy ──> Per-Agent Policy
+```
+
+Later values override earlier ones.
+
+## Version Control
+
+Every policy change increments the version number. Agents compare their local version against the Manager's current version during each poll cycle.
+
+| Event | Version Behavior |
+|-------|-----------------|
+| New policy created | Version incremented |
+| Policy updated | Version incremented |
+| Per-agent override added | Agent-specific version incremented |
+| Agent polls with current version | Manager returns 304 (no change) |
+| Agent polls with outdated version | Manager returns new policy |
+
+## Broadcast Queue
+
+When a policy change requires immediate action, the Manager pushes the update to all online agents immediately:
+
+| Delivery Mode | Trigger | Latency |
+|--------------|---------|---------|
+| **Poll** | Non-urgent policy changes | Up to 5 minutes |
+| **Broadcast** | `block_ip` rules, `auto_respond` disable | Immediate (via next heartbeat, ~30 seconds) |
+
+## Emergency Policies
+
+When the `ThreatAggregator` detects a cross-agent threat pattern, it triggers an emergency policy push:
+
+| Trigger | Emergency Action |
+|---------|-----------------|
+| Same IP attacking 3+ agents | Fleet-wide IP block |
+| Same malware hash on 2+ agents | Fleet-wide file quarantine rule |
+| Coordinated attack detected | Elevated auto-respond threshold across fleet |
+
+Emergency policies bypass the normal poll interval and are distributed via the broadcast queue.
+
+## CLI Reference
+
+```
+panguard manager policies <command> [options]
+
+Commands:
+  list               Show current policy rules
+  set                Add or update a policy rule
+  remove             Remove a policy rule
+  history            Show policy version history
+  broadcast          Force immediate policy push
+  get                Get policy for a specific agent
+
+Options:
+  --global           Apply to all agents (default)
+  --agent <id>       Apply to specific agent
+  --rule <json>      Rule definition as JSON
+  --file <path>      Policy file (JSON)
+```
+
+<Warning>
+  Policy changes that disable `auto_respond` take effect immediately via broadcast. Use this during planned maintenance to prevent Guard from taking actions that could interfere with your work.
+</Warning>

@@ -1,0 +1,138 @@
+---
+title: "Panguard Manager"
+description: "採用中心輻射架構的集中化設備群組協調，可管理最多 500 個 Guard 代理，支援策略分發和跨代理威脅關聯。"
+icon: "building"
+---
+
+Panguard Manager 是一個集中化的協調伺服器，用於協調您基礎設施中的多個 Guard 代理。它使用中心輻射架構，每個端點代理連接至單一 Manager 伺服器進行註冊、心跳監控、威脅報告、跨代理關聯和策略分發。
+
+## 快速開始
+
+```bash
+# 啟動 Manager 伺服器
+panguard manager start --port 8443
+
+# 在每個端點上，將 Guard 連接至 Manager
+panguard guard start --manager http://manager-host:8443
+
+# 檢查設備群組狀態
+panguard manager status
+```
+
+<Note>
+  Panguard Manager 需要 **Business 方案**。Business 層級支援最多 25 台機器。如需更高限額請聯繫銷售團隊。
+</Note>
+
+## 中心輻射架構
+
+```
+                 Panguard Manager (Hub)
+                 ┌──────────────────────┐
+                 |  Agent Registry      |  最多 500 個代理
+                 |  Threat Aggregator   |  跨代理關聯
+                 |  Policy Engine       |  集中化規則
+                 |  Manager Server      |  REST API + SSE
+                 |  Manager DB          |  SQLite（可選）
+                 └────────┬─────────────┘
+          ┌───────────────┼───────────────┐
+          |               |               |
+     Agent (srv-01)  Agent (srv-02)  Agent (srv-03)
+       Guard            Guard            Guard
+       Scan             Scan             Scan
+       Chat             Trap             Chat
+```
+
+每個代理連接至 Manager，報告其狀態和偵測到的威脅，並輪詢策略更新。Manager 在整個設備群組中關聯威脅。
+
+## 核心組件
+
+| 組件 | 原始碼 | 職責 |
+|-----------|--------|---------------|
+| **Manager** | `manager.ts` | 組合所有子系統的中央協調器 |
+| **AgentRegistry** | `agent-registry.ts` | 代理 CRUD、心跳追蹤、過期偵測（最多 500 個代理） |
+| **ThreatAggregator** | `threat-aggregator.ts` | 威脅攝入、跨代理關聯（5 分鐘視窗）、24 小時保留 |
+| **PolicyEngine** | `policy-engine.ts` | 策略版本控制、個別代理和全域策略、廣播佇列 |
+| **ManagerServer** | `server.ts` | HTTP API（原生 `node:http`）、Bearer token 認證（SHA-256 時序安全）、速率限制（60 req/min）、SSE 串流 |
+| **ManagerDB** | `db.ts` | 可選的 SQLite 持久化，用於組織範圍的查詢 |
+
+## 主要功能
+
+| 功能 | 詳細資訊 |
+|-----------|---------|
+| **代理註冊** | 最多 500 個已註冊代理 |
+| **心跳監控** | 30 秒間隔、90 秒過期偵測 |
+| **策略分發** | 全域和個別代理策略搭配版本控制 |
+| **跨代理關聯** | 透過來源 IP、惡意軟體雜湊和攻擊模式偵測跨多台機器的攻擊 |
+| **SSE 串流** | 管理儀表板的即時事件串流 |
+| **認證** | Bearer token 搭配 SHA-256 時序安全比較 |
+| **速率限制** | 每個客戶端每分鐘 60 個請求 |
+| **持久化** | 可選的 SQLite 用於組織範圍的資料保留 |
+
+## 設備群組狀態
+
+```bash
+panguard manager status
+```
+
+```
+Fleet Status:
+  Total agents:    12
+  Online:          11
+  Stale:           1 (srv-07, last seen 3m ago)
+
+  Avg. score:      78/100
+  Active threats:  2 (across 2 agents)
+  Policies:        v3 (deployed to 11/12 agents)
+```
+
+## 跨代理威脅關聯
+
+`ThreatAggregator` 在 5 分鐘滑動視窗內跨代理關聯威脅：
+
+| 模式 | 偵測 |
+|---------|-----------|
+| 同一來源 IP 針對多個代理 | 橫向移動或大規模掃描 |
+| 同一惡意軟體雜湊出現在多個代理 | 蠕蟲傳播 |
+| 同一攻擊模式跨代理出現 | 協調攻擊活動 |
+
+當偵測到跨代理模式時，Manager 向所有代理推送緊急策略（例如全設備群組 IP 封鎖）。
+
+## API 端點
+
+| 方法 | 路徑 | 描述 |
+|--------|------|-------------|
+| `POST` | `/api/agents/register` | 註冊新代理 |
+| `POST` | `/api/agents/:id/heartbeat` | 發送代理心跳 |
+| `POST` | `/api/agents/:id/events` | 報告威脅事件 |
+| `GET` | `/api/agents` | 列出所有代理 |
+| `DELETE` | `/api/agents/:id` | 取消註冊代理 |
+| `GET` | `/api/policy/agent/:id` | 取得代理的策略 |
+| `POST` | `/api/policy` | 建立/更新策略 |
+| `GET` | `/api/events/stream` | SSE 事件串流 |
+
+## CLI 選項
+
+```
+panguard manager <command> [options]
+
+Commands:
+  start              啟動 Manager 伺服器
+  stop               停止 Manager 伺服器
+  status             顯示設備群組狀態
+  agents             列出已註冊的代理
+  policies           管理策略
+
+Options:
+  --port <number>    伺服器埠（預設：8443）
+  --host <string>    綁定位址（預設：0.0.0.0）
+  --data-dir <path>  資料目錄（預設：~/.panguard-manager）
+```
+
+<CardGroup cols={2}>
+  <Card title="代理生命週期" icon="rotate" href="/products/manager/agent-lifecycle">
+    註冊、心跳、過期偵測和取消註冊。
+  </Card>
+  <Card title="策略引擎" icon="scroll" href="/products/manager/policy-engine">
+    搭配版本控制的集中化策略分發。
+  </Card>
+</CardGroup>

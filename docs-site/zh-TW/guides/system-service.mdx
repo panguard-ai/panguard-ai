@@ -1,0 +1,308 @@
+---
+title: "系統服務"
+description: "將 Panguard Guard 安裝為 systemd、launchd 或 Windows 服務，實現自動啟動與持續防護。"
+icon: "gear"
+---
+
+# 系統服務安裝
+
+將 Guard 安裝為系統服務，使其在開機時自動啟動、故障時自動重啟，並持續運行而無需手動介入。
+
+---
+
+## 快速安裝
+
+```bash
+# 安裝為系統服務
+panguard guard install
+
+# 移除系統服務
+panguard guard uninstall
+```
+
+`install` 指令會偵測您的作業系統並自動建立相應的服務設定。
+
+---
+
+## 各平台詳細說明
+
+<Tabs>
+  <Tab title="macOS (launchd)">
+    Guard 會建立 LaunchDaemon plist 檔案：
+
+    ```
+    /Library/LaunchDaemons/ai.panguard.guard.plist
+    ```
+
+    **安裝後行為：**
+    - 開機時自動啟動
+    - 異常退出時自動重啟
+    - 日誌寫入 `/var/log/panguard-guard.log`
+
+    **手動管理：**
+
+    ```bash
+    # 查看服務狀態
+    sudo launchctl list | grep panguard
+
+    # 手動啟動
+    sudo launchctl load /Library/LaunchDaemons/ai.panguard.guard.plist
+
+    # 手動停止
+    sudo launchctl unload /Library/LaunchDaemons/ai.panguard.guard.plist
+    ```
+  </Tab>
+  <Tab title="Linux (systemd)">
+    Guard 會建立 systemd unit 檔案：
+
+    ```
+    /etc/systemd/system/panguard-guard.service
+    ```
+
+    **Unit 檔案範例：**
+
+    ```ini
+    [Unit]
+    Description=Panguard Guard Agent
+    After=network-online.target
+    Wants=network-online.target
+
+    [Service]
+    Type=simple
+    User=panguard
+    Group=panguard
+    WorkingDirectory=/opt/panguard
+    ExecStart=/usr/bin/node /opt/panguard/dist/cli/index.js guard --mode protection --data-dir /var/panguard-guard
+    Restart=always
+    RestartSec=10
+    StandardOutput=journal
+    StandardError=journal
+    SyslogIdentifier=panguard-guard
+
+    # Security hardening
+    NoNewPrivileges=true
+    ProtectSystem=strict
+    ProtectHome=true
+    ReadWritePaths=/var/panguard-guard
+    PrivateTmp=true
+
+    # Required capabilities for response actions
+    AmbientCapabilities=CAP_NET_ADMIN CAP_KILL CAP_SYS_PTRACE
+
+    Environment=NODE_ENV=production
+    Environment=PANGUARD_DATA_DIR=/var/panguard-guard
+    EnvironmentFile=-/etc/panguard/guard.env
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+    **手動管理：**
+
+    ```bash
+    # 查看服務狀態
+    systemctl status panguard-guard
+
+    # 啟動 / 停止
+    sudo systemctl start panguard-guard
+    sudo systemctl stop panguard-guard
+
+    # 查看日誌
+    journalctl -u panguard-guard -f
+    ```
+
+    **所需 Linux 權限：**
+
+    | 權限 | 用途 |
+    | --- | --- |
+    | `CAP_NET_ADMIN` | 透過 iptables 封鎖 IP |
+    | `CAP_KILL` | 終止惡意行程 |
+    | `CAP_SYS_PTRACE` | 記憶體掃描以偵測無檔案惡意軟體 |
+  </Tab>
+  <Tab title="Windows (Services)">
+    Guard 註冊為 Windows 服務：
+
+    ```
+    Service Name:    PanguardGuard
+    Display Name:    Panguard Guard AI
+    ```
+
+    **安裝後行為：**
+    - 開機時自動啟動
+    - 異常退出時自動重啟
+    - 日誌寫入 Windows Event Log
+
+    **手動管理：**
+
+    ```powershell
+    # 查看服務狀態
+    sc.exe query PanguardGuard
+
+    # 啟動 / 停止
+    sc.exe start PanguardGuard
+    sc.exe stop PanguardGuard
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## 手動 systemd 設定（進階）
+
+若需完全控制服務設定，請依照以下步驟：
+
+<Steps>
+  <Step title="建立系統使用者">
+    ```bash
+    sudo useradd --system --home-dir /opt/panguard --shell /usr/sbin/nologin panguard
+    ```
+  </Step>
+  <Step title="建立目錄">
+    ```bash
+    sudo mkdir -p /opt/panguard /var/panguard-guard /etc/panguard
+    sudo chown -R panguard:panguard /opt/panguard /var/panguard-guard
+    ```
+  </Step>
+  <Step title="部署應用程式">
+    ```bash
+    sudo cp -r dist/ /opt/panguard/dist/
+    sudo cp -r node_modules/ /opt/panguard/node_modules/
+    ```
+  </Step>
+  <Step title="建立環境檔案">
+    ```bash
+    sudo tee /etc/panguard/guard.env << 'EOF'
+    PANGUARD_DATA_DIR=/var/panguard-guard
+    OLLAMA_ENDPOINT=http://localhost:11434
+    EOF
+
+    sudo chmod 600 /etc/panguard/guard.env
+    sudo chown panguard:panguard /etc/panguard/guard.env
+    ```
+
+    <Warning>
+    環境檔案包含密鑰。請務必將權限設為 `600` 並限制所有權歸服務使用者。
+    </Warning>
+  </Step>
+  <Step title="啟用並啟動">
+    ```bash
+    sudo systemctl daemon-reload
+    sudo systemctl enable panguard-guard
+    sudo systemctl start panguard-guard
+    sudo systemctl status panguard-guard
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Manager 服務
+
+Manager 也可以安裝為 systemd 服務，適用於分散式部署：
+
+```ini
+[Unit]
+Description=Panguard Manager Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=panguard
+Group=panguard
+WorkingDirectory=/opt/panguard
+ExecStart=/usr/bin/node /opt/panguard/dist/cli/index.js manager --port 8443
+Restart=always
+RestartSec=10
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/panguard-manager
+PrivateTmp=true
+
+Environment=NODE_ENV=production
+EnvironmentFile=-/etc/panguard/manager.env
+
+[Install]
+WantedBy=multi-user.target
+```
+
+---
+
+## Watchdog 健康監控
+
+系統服務內建 watchdog 機制：
+
+- 每 60 秒檢查 Guard 行程健康狀態
+- 記憶體使用異常時重啟
+- CPU 使用異常時降級
+- 重啟次數超過門檻時停止並通知
+
+---
+
+## 批次部署腳本
+
+產生一行安裝腳本，用於跨多台設備部署：
+
+```bash
+panguard guard install-script
+```
+
+產生的腳本會：
+1. 下載 Panguard AI
+2. 安裝依賴
+3. 安裝為系統服務
+4. 啟動 Guard（使用者需另外完成 `panguard login`）
+
+---
+
+## 資料目錄
+
+| 平台 | 預設路徑 |
+| --- | --- |
+| macOS | `~/.panguard-guard/` |
+| Linux | `~/.panguard-guard/` |
+| Windows | `%APPDATA%\panguard-guard\` |
+
+使用 `--data-dir` 覆蓋：
+
+```bash
+panguard guard start --data-dir /opt/panguard/data
+```
+
+**內容：**
+- `guard.pid` -- PID 檔（防止重複執行個體）
+- `baseline/` -- 行為基線資料
+- `rules/` -- 自訂 Sigma 與 YARA 規則
+- `logs/` -- 事件日誌（JSONL 搭配輪替）
+- `config.json` -- Guard 設定
+
+---
+
+## PID 管理
+
+Guard 使用 PID 檔管理行程狀態：
+
+- 啟動時寫入 PID
+- 正常關閉時移除 PID 檔
+- 防止多個執行個體同時運行
+- 支援透過 SIGTERM 與 SIGINT 的優雅關閉
+
+---
+
+## 相關內容
+
+<CardGroup cols={2}>
+  <Card title="即時防護" icon="shield" href="/guides/real-time-protection">
+    設定 Guard 進行持續監控與回應。
+  </Card>
+  <Card title="Docker 部署" icon="docker" href="/guides/docker-deployment">
+    在容器化環境中運行 Guard。
+  </Card>
+  <Card title="多端點設定" icon="server" href="/guides/multi-endpoint">
+    將 Guard 代理程式連線至集中式 Manager。
+  </Card>
+  <Card title="環境變數" icon="sliders" href="/configuration/environment-variables">
+    完整的環境變數參考。
+  </Card>
+</CardGroup>

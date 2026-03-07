@@ -1,0 +1,84 @@
+---
+title: "歡迎使用 Panguard AI"
+description: "AI 驅動的自適應端點防護，專為開發者與中小企業打造。從註冊到安全防護，只需一行指令。"
+icon: "hand-wave"
+---
+
+Panguard AI 是一個開源網路安全平台，為開發者與中小企業帶來企業級端點防護，無需專業安全團隊。在官網註冊帳號，透過 CLI 登入，即可讓 AI 自動保護您的設備。
+
+核心理念很簡單：**當有事發生，Panguard 通知您。沒事發生時，您什麼都不用做。**
+
+<CardGroup cols={2}>
+  <Card title="快速入門" icon="rocket" href="/quickstart">
+    五分鐘內完成首次安全掃描。
+  </Card>
+  <Card title="產品總覽" icon="shield-check" href="/overview">
+    探索完整產品套件：Scan、Guard、Chat、Trap、Report 等。
+  </Card>
+  <Card title="CLI 參考" icon="terminal" href="/cli/overview">
+    所有 Panguard CLI 工具的完整指令參考。
+  </Card>
+  <Card title="API 參考" icon="code" href="/api-reference/overview">
+    Threat Cloud、Manager 與 Auth 服務的 REST API 文件。
+  </Card>
+</CardGroup>
+
+## Panguard AI 適合誰？
+
+<CardGroup cols={3}>
+  <Card title="開發者" icon="laptop-code">
+    零配置保護您的個人伺服器、VPS 主機與開發環境。執行一行指令，繼續專注工作。
+  </Card>
+  <Card title="中小企業" icon="building">
+    無需聘僱專門團隊即可獲得合規等級的安全防護。自動產生 ISO 27001、SOC 2 與台灣資安法稽核報告。
+  </Card>
+  <Card title="託管服務供應商" icon="server">
+    透過單一儀表板監控和保護多個客戶端點。使用集中式策略管理，跨機群部署代理程式。
+  </Card>
+</CardGroup>
+
+## 為什麼選擇 Panguard AI？
+
+傳統安全工具需要深厚的專業知識、產生大量未分類的警報，且企業授權費用高達六位數。免費工具雖然存在，但沒有專職安全工程師幾乎無法使用。
+
+Panguard AI 採取不同的方式：
+
+- **一行指令安裝** -- 無需設定檔、無需調校、無需專業術語
+- **白話通知** -- 透過 Telegram、Slack 或 Email 以您能理解的語言接收警報
+- **AI 自動判斷嚴重性** -- 系統自動分類、回應與報告，無需人工介入
+- **持續進化** -- 行為基線會自適應您的特定環境
+
+## 快速安裝
+
+```bash
+curl -fsSL https://get.panguard.ai | bash
+```
+
+然後進行驗證並執行首次掃描：
+
+```bash
+panguard login
+panguard scan --quick
+```
+
+<Info>
+  Community 方案免費，包含無限次掃描與 Layer 1 規則式防護。
+  無需信用卡。
+</Info>
+
+## 後續步驟
+
+<CardGroup cols={2}>
+  <Card title="安裝指南" icon="download" href="/installation">
+    macOS、Linux 與 Windows 的詳細平台安裝說明。
+  </Card>
+  <Card title="帳號設定" icon="user-plus" href="/account-setup">
+    建立帳號、選擇方案並設定 CLI 連線。
+  </Card>
+  <Card title="核心概念" icon="lightbulb" href="/concepts/three-layer-ai">
+    了解驅動 Panguard 的三層式 AI 架構。
+  </Card>
+  <Card title="使用指南" icon="book-open" href="/guides/first-scan">
+    從掃描到蜜罐部署，每項功能的逐步指南。
+  </Card>
+</CardGroup>

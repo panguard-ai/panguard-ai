@@ -1,0 +1,126 @@
+---
+title: "Registration"
+description: "Create a new Panguard AI account and receive an authentication token."
+icon: "user-plus"
+---
+
+## POST /api/auth/register
+
+Creates a new user account and automatically activates a 14-day Solo trial. Returns a JWT token for immediate API access.
+
+### Request
+
+<ParamField body="email" type="string" required>
+  Valid email address. Must be unique across the platform.
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Display name for the user. 1--100 characters.
+</ParamField>
+
+<ParamField body="password" type="string" required>
+  Account password. Must be 8--128 characters.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://auth.panguard.ai/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "name": "Alice Chen",
+    "password": "secureP@ssw0rd"
+  }'
+```
+
+```javascript Node.js
+const response = await fetch('https://auth.panguard.ai/api/auth/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'user@example.com',
+    name: 'Alice Chen',
+    password: 'secureP@ssw0rd',
+  }),
+});
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post('https://auth.panguard.ai/api/auth/register', json={
+    'email': 'user@example.com',
+    'name': 'Alice Chen',
+    'password': 'secureP@ssw0rd',
+})
+data = response.json()
+```
+</CodeGroup>
+
+### Response
+
+<Tabs>
+  <Tab title="201 Created">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "user": {
+          "id": "usr_a1b2c3d4e5f6",
+          "email": "user@example.com",
+          "name": "Alice Chen",
+          "tier": "solo",
+          "trialEndsAt": "2026-03-21T00:00:00.000Z",
+          "createdAt": "2026-03-07T12:00:00.000Z"
+        },
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        "expiresAt": "2026-03-08T12:00:00.000Z"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="400 Validation Error">
+    ```json
+    {
+      "ok": false,
+      "error": "Password must be between 8 and 128 characters"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Trial Activation
+
+Every new account automatically receives a **14-day Solo trial** that includes:
+
+- Up to 3 machines
+- Full scan, guard, chat, and report capabilities
+- Basic AI analysis
+
+<Info>
+After the trial expires, the account reverts to the **Community** tier (1 machine, scan + Layer 1 guard only). Upgrade at any time from the CLI with `panguard upgrade` or from the web dashboard.
+</Info>
+
+### Security: Duplicate Email Handling
+
+<Warning>
+To prevent email enumeration attacks, registering with an already-used email returns a **200 OK** with a generic success message instead of revealing that the email is taken. The actual account is not modified, and no new token is issued.
+</Warning>
+
+This means:
+- Attackers cannot probe the API to discover which emails have accounts
+- The original account remains unaffected
+- A "password reset" email is silently sent to the existing account holder
+
+### Validation Rules
+
+| Field | Rule |
+|-------|------|
+| `email` | Must be a valid email format |
+| `name` | 1--100 characters, trimmed |
+| `password` | 8--128 characters, no other restrictions |
+
+<Tip>
+After registration, store the returned `token` securely. Use it as a Bearer token for all subsequent Auth API requests. The CLI handles this automatically when you run `panguard login`.
+</Tip>

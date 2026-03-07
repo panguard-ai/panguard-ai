@@ -1,0 +1,331 @@
+---
+title: "Docker Deployment"
+description: "Run Panguard AI with Docker and Docker Compose for containerized security monitoring."
+icon: "docker"
+---
+
+# Docker Deployment
+
+Panguard provides Docker images and Compose configurations for containerized deployments. This guide covers single-container setup, full-stack Compose deployments, and production hardening.
+
+---
+
+## Prerequisites
+
+| Requirement | Version |
+| --- | --- |
+| Docker | >= 24.0 |
+| Docker Compose | >= 2.20 |
+
+---
+
+## Quick Start with Docker
+
+<Steps>
+  <Step title="Pull the Image">
+    ```bash
+    docker pull panguard/panguard-ai:latest
+    ```
+  </Step>
+  <Step title="Run the Container">
+    ```bash
+    docker run -d \
+      --name panguard \
+      -p 3000:3000 \
+      -v panguard-data:/data \
+      panguard/panguard-ai:latest
+    ```
+  </Step>
+  <Step title="Verify">
+    ```bash
+    docker logs panguard
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Docker Compose: Basic Setup (API + Ollama)
+
+This configuration runs the Panguard API server with a local Ollama instance for Layer 2 AI analysis at zero cost.
+
+```yaml
+# docker-compose.yml
+services:
+  panguard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: panguard
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - panguard-data:/data
+      - ./config:/app/config:ro
+    environment:
+      - PANGUARD_DATA_DIR=/data
+      - PANGUARD_PORT=3000
+      - OLLAMA_ENDPOINT=http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: panguard-ollama
+    restart: unless-stopped
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:11434/api/tags']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  panguard-data:
+  ollama-models:
+```
+
+```bash
+# Build and start
+docker compose up -d
+
+# Pull an Ollama model (first time only)
+docker exec panguard-ollama ollama pull llama3
+
+# View logs
+docker compose logs -f panguard
+```
+
+---
+
+## Docker Compose: Full Stack (Auth + Manager + Guard + Ollama)
+
+This configuration runs the complete Panguard platform with authentication, fleet management, and local AI.
+
+```yaml
+# docker-compose.full.yml
+services:
+  panguard-auth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: panguard-auth
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - auth-data:/data
+      - ./config:/app/config:ro
+    environment:
+      - PANGUARD_DATA_DIR=/data
+      - PANGUARD_PORT=3000
+      - JWT_SECRET=your-secret-key-here
+      - GOOGLE_CLIENT_ID=your-google-client-id
+      - GOOGLE_CLIENT_SECRET=your-google-client-secret
+      - MANAGER_URL=http://panguard-manager:8443
+      - MANAGER_AUTH_TOKEN=your-manager-token
+      - OLLAMA_ENDPOINT=http://ollama:11434
+    depends_on:
+      panguard-manager:
+        condition: service_started
+      ollama:
+        condition: service_healthy
+    networks:
+      - panguard-net
+
+  panguard-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: panguard-manager
+    command: ["node", "dist/cli/index.js", "manager", "--port", "8443"]
+    restart: unless-stopped
+    ports:
+      - '8443:8443'
+    environment:
+      - MANAGER_PORT=8443
+      - MANAGER_AUTH_TOKEN=your-manager-token
+      - MANAGER_MAX_AGENTS=500
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000
+    networks:
+      - panguard-net
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: panguard-ollama
+    restart: unless-stopped
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama-models:/root/.ollama
+    networks:
+      - panguard-net
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:11434/api/tags']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  auth-data:
+  ollama-models:
+
+networks:
+  panguard-net:
+    driver: bridge
+```
+
+```bash
+docker compose -f docker-compose.full.yml up -d
+```
+
+---
+
+## Port Reference
+
+| Port | Service | Protocol | Notes |
+| --- | --- | --- | --- |
+| `3000` | API Server (Auth + Web) | HTTP | Main entry point |
+| `8443` | Manager Server | HTTP | Agent registration, heartbeats, SSE |
+| `11434` | Ollama | HTTP | Local AI inference |
+| `2222` | Trap: SSH Honeypot | TCP | Default SSH trap port |
+| `8080` | Trap: HTTP Honeypot | TCP | Default HTTP trap port |
+| `2121` | Trap: FTP Honeypot | TCP | Default FTP trap port |
+| `4450` | Trap: SMB Honeypot | TCP | Default SMB trap port |
+| `3307` | Trap: MySQL Honeypot | TCP | Default MySQL trap port |
+| `3390` | Trap: RDP Honeypot | TCP | Default RDP trap port |
+| `2323` | Trap: Telnet Honeypot | TCP | Default Telnet trap port |
+
+---
+
+## Environment Variables
+
+### Guard Agent
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `PANGUARD_DATA_DIR` | `./data` | Data directory for baselines, logs, rules |
+| `PANGUARD_MODE` | `learning` | Guard mode: `learning` or `protection` |
+| `OLLAMA_ENDPOINT` | `http://localhost:11434` | Ollama API endpoint |
+| `ANTHROPIC_API_KEY` | (none) | Claude API key for cloud AI |
+| `OPENAI_API_KEY` | (none) | OpenAI API key for cloud AI |
+| `ABUSEIPDB_KEY` | (none) | AbuseIPDB API key for threat intel |
+
+### Auth Server
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `PANGUARD_PORT` | `3000` | API server port |
+| `JWT_SECRET` | (none) | JWT signing secret (required in production) |
+| `GOOGLE_CLIENT_ID` | (none) | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | (none) | Google OAuth client secret |
+
+### Manager
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `MANAGER_PORT` | `8443` | Manager HTTP server port |
+| `MANAGER_AUTH_TOKEN` | (none) | Bearer token for API authentication |
+| `MANAGER_MAX_AGENTS` | `500` | Maximum registered agents |
+
+<Warning>
+Never pass secrets via the `environment` key in production Compose files. Use `env_file` with restricted permissions instead:
+
+```yaml
+env_file:
+  - /etc/panguard/guard.env  # chmod 600
+```
+</Warning>
+
+---
+
+## Production Hardening
+
+### Docker Image Security
+
+The production Docker image includes:
+- **Multi-stage build** -- Build dependencies are not in the final image
+- **Non-root user** -- Runs as `panguard` (UID 1001)
+- **tini** -- Proper PID 1 signal handling and zombie reaping
+- **Minimal packages** -- Only `tini` and `curl` in the final image
+
+### Required Capabilities
+
+For Guard response actions to function inside Docker, grant these capabilities:
+
+```yaml
+cap_add:
+  - NET_ADMIN    # Block IPs via iptables
+  - KILL         # Terminate malicious processes
+  - SYS_PTRACE   # Memory scanning
+```
+
+### Checklist
+
+- [ ] Set `NODE_ENV=production` (enables HSTS, disables wildcard CORS)
+- [ ] Generate strong secrets (`openssl rand -hex 32`)
+- [ ] Use TLS termination (nginx/Caddy reverse proxy in front)
+- [ ] Restrict network access to Manager port
+- [ ] Mount secrets as env files, not inline environment variables
+- [ ] Use named volumes for persistent data
+- [ ] Configure log rotation for container logs
+
+---
+
+## Log Locations (Inside Container)
+
+| Component | Path | Format |
+| --- | --- | --- |
+| Guard events | `/data/events.jsonl` | JSONL |
+| Guard actions | `/data/action-manifest.jsonl` | JSONL |
+| Guard baseline | `/data/baseline.json` | JSON |
+| Application logs | stdout/stderr | Structured JSON |
+
+### Log Rotation
+
+The ReportAgent handles log rotation automatically:
+
+| Setting | Default |
+| --- | --- |
+| Max file size | 50 MB |
+| Max rotated files | 10 |
+| Retention | 90 days |
+
+---
+
+## Backup Strategy
+
+<Tip>
+Back up these critical files regularly:
+
+- **Baseline data** (`/data/baseline.json`) -- Loss requires re-running learning mode
+- **Auth database** (`auth.db`) -- Back up daily with `sqlite3 auth.db ".backup backup.db"`
+- **Threat Cloud database** -- Back up the SQLite database on schedule
+- **Configuration** -- Store config and env files in version control or a secrets manager
+</Tip>
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="System Service" icon="gear" href="/guides/system-service">
+    Install Guard as a native systemd/launchd service instead of Docker.
+  </Card>
+  <Card title="Multi-Endpoint Setup" icon="server" href="/guides/multi-endpoint">
+    Connect Guard agents to a centralized Manager.
+  </Card>
+  <Card title="Threat Cloud" icon="cloud" href="/guides/threat-cloud-deployment">
+    Deploy Threat Cloud alongside your Guard fleet.
+  </Card>
+  <Card title="Architecture" icon="sitemap" href="/concepts/architecture">
+    Full technical architecture of the platform.
+  </Card>
+</CardGroup>

@@ -1,0 +1,176 @@
+---
+title: "透過 MCP 整合 AI 助手"
+description: "使用 Model Context Protocol 將 Panguard 連接至 Claude Desktop、Cursor 或 Windsurf，實現 AI 輔助安全操作。"
+icon: "robot"
+---
+
+Panguard 內建 MCP (Model Context Protocol) 伺服器，將安全工具公開給 AI 助手。這讓您可以透過 AI 程式碼助手，使用自然語言執行掃描、查看 Guard 狀態、查詢威脅與部署蜜罐。
+
+<Steps>
+  <Step title="了解 MCP">
+    Model Context Protocol (MCP) 是一個連接 AI 助手與外部工具的開放標準。Panguard 的 MCP 伺服器將安全操作公開為 AI 助手可代您呼叫的工具。
+
+    支援的 AI 助手：
+
+    | 助手 | 設定檔位置 |
+    | --- | --- |
+    | **Claude Desktop** | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) |
+    | **Cursor** | `.cursor/mcp.json`（專案根目錄） |
+    | **Windsurf** | `~/.windsurf/mcp.json` |
+
+    <Info>
+      Panguard 必須已安裝並完成驗證（`panguard login`），MCP 伺服器才能運作。
+    </Info>
+  </Step>
+
+  <Step title="新增 MCP 設定">
+    將 Panguard MCP 伺服器加入您 AI 助手的設定檔：
+
+    <Tabs>
+      <Tab title="Claude Desktop">
+        編輯 `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) 或 `%APPDATA%\Claude\claude_desktop_config.json` (Windows)：
+
+        ```json
+        {
+          "mcpServers": {
+            "panguard": {
+              "command": "panguard",
+              "args": ["mcp", "serve"],
+              "env": {}
+            }
+          }
+        }
+        ```
+      </Tab>
+
+      <Tab title="Cursor">
+        在專案根目錄建立或編輯 `.cursor/mcp.json`：
+
+        ```json
+        {
+          "mcpServers": {
+            "panguard": {
+              "command": "panguard",
+              "args": ["mcp", "serve"],
+              "env": {}
+            }
+          }
+        }
+        ```
+      </Tab>
+
+      <Tab title="Windsurf">
+        編輯 `~/.windsurf/mcp.json`：
+
+        ```json
+        {
+          "mcpServers": {
+            "panguard": {
+              "command": "panguard",
+              "args": ["mcp", "serve"],
+              "env": {}
+            }
+          }
+        }
+        ```
+      </Tab>
+    </Tabs>
+
+    儲存後，重新啟動您的 AI 助手以使變更生效。
+  </Step>
+
+  <Step title="可用的 MCP 工具">
+    Panguard MCP 伺服器向 AI 助手公開以下工具：
+
+    | 工具 | 說明 | 方案 |
+    | --- | --- | --- |
+    | `scan_system` | 執行安全掃描並回傳發現 | Community+ |
+    | `guard_status` | 查看 Guard 引擎狀態與近期事件 | Solo+ |
+    | `guard_start` | 啟動 Guard 引擎 | Solo+ |
+    | `guard_stop` | 停止 Guard 引擎 | Solo+ |
+    | `get_threats` | 查詢威脅情報與 IoC | Solo+ |
+    | `deploy_honeypot` | 在指定服務/連接埠部署蜜罐 | Pro+ |
+    | `get_attacker_profiles` | 從 Trap 取得攻擊者分析 | Pro+ |
+    | `generate_report` | 產生合規報告 | Solo+ |
+    | `get_security_score` | 取得目前風險分數與等級 | Community+ |
+    | `list_events` | 列出近期 Guard 事件，支援篩選 | Solo+ |
+
+    <Note>
+      工具會遵守您的方案限制。在 Solo 方案上嘗試使用 Pro 專屬工具會回傳錯誤與升級提示。
+    </Note>
+  </Step>
+
+  <Step title="使用自然語言進行安全操作">
+    設定完成後，您可以透過 AI 助手使用自然語言與 Panguard 互動：
+
+    <AccordionGroup>
+      <Accordion title="執行安全掃描">
+        **您：**「掃描我的系統是否有安全問題」
+
+        助手會呼叫 `scan_system` 並以可讀格式呈現發現、風險分數與建議。
+      </Accordion>
+
+      <Accordion title="查看防護狀態">
+        **您：**「Guard 在運行嗎？顯示近期警報。」
+
+        助手會依序呼叫 `guard_status` 與 `list_events`，提供完整的狀態概覽。
+      </Accordion>
+
+      <Accordion title="調查威脅">
+        **您：**「我們對 IP 203.0.113.42 了解多少？」
+
+        助手會呼叫 `get_threats` 與 `get_attacker_profiles` 彙整威脅檔案。
+      </Accordion>
+
+      <Accordion title="產生合規報告">
+        **您：**「產生 ISO 27001 合規報告」
+
+        助手會使用 ISO 27001 框架呼叫 `generate_report` 並呈現結果。
+      </Accordion>
+
+      <Accordion title="部署蜜罐">
+        **您：**「設置 SSH 與 HTTP 蜜罐來捕捉攻擊者」
+
+        助手會為每種服務類型呼叫 `deploy_honeypot` 並確認部署。
+      </Accordion>
+    </AccordionGroup>
+  </Step>
+
+  <Step title="驗證連線">
+    測試您的 AI 助手是否能連線至 Panguard MCP 伺服器：
+
+    ```bash
+    panguard mcp test
+    ```
+
+    ```
+      PANGUARD AI - MCP Server
+
+      -- Connection Test ------------------------
+
+      Server:     Running (stdio transport)
+      Tools:      10 registered
+      Auth:       Authenticated (user@example.com)
+      Plan:       Pro
+
+      MCP server is ready for AI assistant connections.
+    ```
+  </Step>
+</Steps>
+
+## 接下來做什麼
+
+<CardGroup cols={2}>
+  <Card title="MCP 產品參考" icon="book" href="/products/mcp/overview">
+    MCP 伺服器架構與功能的完整文件。
+  </Card>
+  <Card title="MCP 工具參考" icon="wrench" href="/products/mcp/tools-reference">
+    每個 MCP 工具的詳細 schema，包含參數與回傳類型。
+  </Card>
+  <Card title="執行首次掃描" icon="magnifying-glass" href="/guides/first-scan">
+    使用 AI 輔助掃描前，先了解掃描輸出。
+  </Card>
+  <Card title="即時防護" icon="shield-halved" href="/guides/real-time-protection">
+    設定 Guard 讓 AI 助手可以監控並回應威脅。
+  </Card>
+</CardGroup>

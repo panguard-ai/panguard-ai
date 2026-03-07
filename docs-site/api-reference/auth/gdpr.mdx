@@ -1,0 +1,142 @@
+---
+title: "GDPR"
+description: "GDPR-compliant account deletion and data export endpoints."
+icon: "shield-check"
+---
+
+Panguard AI provides full GDPR compliance through self-service data export and account deletion endpoints.
+
+## DELETE /api/auth/delete-account
+
+Permanently deletes the authenticated user's account and all associated data.
+
+<ParamField body="password" type="string" required>
+  Current account password for confirmation. This is a destructive action requiring explicit verification.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://auth.panguard.ai/api/auth/delete-account \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{ "password": "secureP@ssw0rd" }'
+```
+</CodeGroup>
+
+<Tabs>
+  <Tab title="200 Success">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "message": "Account and all associated data have been permanently deleted"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="401 Wrong Password">
+    ```json
+    {
+      "ok": false,
+      "error": "Invalid password"
+    }
+    ```
+  </Tab>
+  <Tab title="403 Last Admin">
+    ```json
+    {
+      "ok": false,
+      "error": "Cannot delete the only admin account for this organization"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+This action is **irreversible**. All of the following are permanently deleted:
+- User profile and credentials
+- Agent registrations and heartbeat history
+- Threat event history
+- Policy configurations
+- Notification settings
+- Session tokens
+
+Export your data first using the endpoint below.
+</Warning>
+
+### Safety: Last Admin Protection
+
+If the user is the only administrator of an organization, the deletion is blocked with a `403` response. This prevents orphaning an organization with no admin access.
+
+To proceed, first transfer admin rights to another user or delete the organization entirely.
+
+---
+
+## GET /api/auth/export-data
+
+Exports all data associated with the authenticated user as a downloadable JSON file. Compliant with GDPR Article 20 (right to data portability).
+
+<CodeGroup>
+```bash cURL
+curl -X GET https://auth.panguard.ai/api/auth/export-data \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -o panguard-data-export.json
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "exportedAt": "2026-03-07T12:00:00.000Z",
+    "user": {
+      "id": "usr_a1b2c3d4e5f6",
+      "email": "user@example.com",
+      "name": "Alice Chen",
+      "tier": "pro",
+      "totpEnabled": true,
+      "createdAt": "2026-01-15T08:30:00.000Z"
+    },
+    "agents": [
+      {
+        "id": "agent-001",
+        "hostname": "web-server-1",
+        "registeredAt": "2026-02-01T10:00:00.000Z",
+        "lastHeartbeat": "2026-03-07T11:55:00.000Z"
+      }
+    ],
+    "threatEvents": [
+      {
+        "id": "evt_xyz789",
+        "type": "brute_force",
+        "severity": "high",
+        "timestamp": "2026-03-06T08:15:00.000Z"
+      }
+    ],
+    "policies": [...],
+    "notifications": [...],
+    "sessions": [...]
+  }
+}
+```
+</ResponseExample>
+
+<Info>
+The export includes all data Panguard stores about you. The response is a single JSON object containing your profile, agents, threat events, policies, notification configurations, and session history.
+</Info>
+
+### What is Included
+
+| Category | Data |
+|----------|------|
+| **User profile** | ID, email, name, tier, creation date |
+| **Agents** | All registered agents, hostnames, heartbeat history |
+| **Threat events** | All threat detections and their metadata |
+| **Policies** | Created policies and rule configurations |
+| **Notifications** | Notification channel configs (tokens redacted) |
+| **Sessions** | Login history with IP addresses and timestamps |
+
+<Tip>
+Sensitive values like API tokens and notification webhook URLs are partially redacted in the export for security. Full credentials are never included in data exports.
+</Tip>

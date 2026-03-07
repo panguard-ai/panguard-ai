@@ -1,0 +1,167 @@
+---
+title: "Generate Compliance Reports"
+description: "Auto-generate audit-ready compliance reports for ISO 27001, SOC 2, and Taiwan TCSA frameworks."
+icon: "file-chart-column"
+---
+
+Panguard Report maps your scan findings to recognized compliance frameworks and generates assessment reports. These reports evaluate your current readiness -- they do not constitute certification.
+
+<Warning>
+  Compliance reports assess your system's alignment with framework controls. They are **readiness assessments**, not certifications. Use them to identify gaps before a formal audit.
+</Warning>
+
+<Steps>
+  <Step title="Choose a framework">
+    Panguard supports 3 compliance frameworks:
+
+    | Framework | Controls | Focus |
+    | --- | --- | --- |
+    | **Taiwan TCSA** | 10 controls | Taiwan Cyber Security Act compliance for government and critical infrastructure |
+    | **ISO 27001** | 30 controls | International information security management standard |
+    | **SOC 2** | 10 controls | Service organization controls for data security, availability, and privacy |
+
+    <AccordionGroup>
+      <Accordion title="Taiwan TCSA (10 controls)">
+        Covers access control, network security monitoring, incident response procedures, data protection, system backup and recovery, vulnerability management, security awareness training, physical security, audit logging, and third-party risk management.
+      </Accordion>
+      <Accordion title="ISO 27001 (30 controls)">
+        Comprehensive coverage including information security policies, asset management, access control, cryptography, physical security, operations security, communications security, system acquisition/development, supplier relationships, incident management, business continuity, and compliance.
+      </Accordion>
+      <Accordion title="SOC 2 (10 controls)">
+        Trust service criteria covering security, availability, processing integrity, confidentiality, and privacy. Includes logical and physical access controls, system operations, change management, and risk mitigation.
+      </Accordion>
+    </AccordionGroup>
+  </Step>
+
+  <Step title="Generate a report">
+    Run a scan and map the results to your chosen framework:
+
+    ```bash
+    panguard report generate --framework iso27001
+    ```
+
+    ```
+      PANGUARD AI - Compliance Report
+
+      Framework:  ISO 27001
+      Date:       2026-03-07
+      Machine:    prod-web-01
+
+      -- Control Assessment ---------------------
+
+      A.5   Information Security Policies    PASS
+      A.6   Organization of InfoSec          PASS
+      A.7   Human Resource Security          N/A
+      A.8   Asset Management                 PARTIAL
+      A.9   Access Control                   FAIL
+      A.10  Cryptography                     PASS
+      ...
+
+      -- Summary --------------------------------
+
+      Total:    30 controls
+      Pass:     18 (60%)
+      Partial:  7 (23%)
+      Fail:     3 (10%)
+      N/A:      2 (7%)
+
+      Readiness Score: 72% (Fair)
+    ```
+
+    <Tabs>
+      <Tab title="Taiwan TCSA">
+        ```bash
+        panguard report generate --framework tcsa
+        ```
+      </Tab>
+      <Tab title="ISO 27001">
+        ```bash
+        panguard report generate --framework iso27001
+        ```
+      </Tab>
+      <Tab title="SOC 2">
+        ```bash
+        panguard report generate --framework soc2
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Choose output format">
+    Reports can be exported as PDF or JSON:
+
+    <CodeGroup>
+      ```bash PDF report
+      panguard report generate --framework iso27001 --output report.pdf
+      ```
+
+      ```bash JSON report
+      panguard report generate --framework iso27001 --output report.json
+      ```
+    </CodeGroup>
+
+    The JSON format is useful for integrating compliance data into dashboards or CI/CD pipelines.
+  </Step>
+
+  <Step title="Set report language">
+    Generate reports in English or Traditional Chinese:
+
+    <CodeGroup>
+      ```bash English
+      panguard report generate --framework tcsa --lang en --output report.pdf
+      ```
+
+      ```bash Traditional Chinese
+      panguard report generate --framework tcsa --lang zh-TW --output report.pdf
+      ```
+    </CodeGroup>
+
+    <Info>
+      Taiwan TCSA reports default to `zh-TW`. ISO 27001 and SOC 2 reports default to `en`. Use `--lang` to override.
+    </Info>
+  </Step>
+
+  <Step title="Review and remediate">
+    For each **FAIL** or **PARTIAL** control, the report includes:
+
+    - **Finding:** What the scan detected
+    - **Expected:** What the framework requires
+    - **Remediation:** Specific steps to achieve compliance
+
+    Example remediation output:
+
+    ```
+      Control A.9: Access Control                 FAIL
+
+      Finding:     Root SSH login enabled, no key-only auth
+      Expected:    Privileged access restricted, MFA or key-based auth
+      Remediation:
+        1. Set PermitRootLogin to 'no' in /etc/ssh/sshd_config
+        2. Set PasswordAuthentication to 'no'
+        3. Restart sshd: systemctl restart sshd
+    ```
+
+    After applying fixes, re-run the report to confirm improvements:
+
+    ```bash
+    panguard report generate --framework iso27001 --output updated-report.pdf
+    ```
+  </Step>
+</Steps>
+
+## What to do next
+
+<CardGroup cols={2}>
+  <Card title="Frameworks reference" icon="scale-balanced" href="/products/report/frameworks">
+    Detailed documentation of all controls assessed per framework.
+  </Card>
+  <Card title="Output formats" icon="file-export" href="/products/report/output-formats">
+    PDF and JSON schema details, customization options.
+  </Card>
+  <Card title="Run your first scan" icon="magnifying-glass" href="/guides/first-scan">
+    Reports are built on scan data. Make sure you understand the scan output first.
+  </Card>
+  <Card title="CLI report reference" icon="terminal" href="/cli/report">
+    Complete list of flags and options for the report command.
+  </Card>
+</CardGroup>

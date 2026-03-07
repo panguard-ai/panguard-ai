@@ -1,0 +1,201 @@
+---
+title: "Environment Variables"
+description: "Complete reference for all environment variables across Panguard services."
+icon: "square-terminal"
+---
+
+Environment variables configure Panguard services at startup. Set them in your shell profile, `.env` file, or container orchestration system.
+
+## Panguard Guard
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PANGUARD_DATA_DIR` | `~/.panguard-guard` | Base directory for Guard data, rules, and logs |
+| `PANGUARD_MODE` | `protect` | Operating mode: `learning`, `detect`, `protect` |
+| `OLLAMA_ENDPOINT` | `http://localhost:11434` | Ollama API endpoint for local AI analysis |
+| `ANTHROPIC_API_KEY` | -- | Anthropic API key for Claude-based analysis (Layer 2/3) |
+| `OPENAI_API_KEY` | -- | OpenAI API key for GPT-based analysis (Layer 2/3) |
+| `ABUSEIPDB_KEY` | -- | AbuseIPDB API key for IP reputation lookups |
+| `PANGUARD_LOG_LEVEL` | `info` | Log level: `debug`, `info`, `warn`, `error` |
+| `PANGUARD_LANG` | `en` | Language for CLI output and notifications: `en`, `zh-TW`, `ja` |
+
+<CodeGroup>
+```bash Linux / macOS
+export PANGUARD_DATA_DIR=~/.panguard-guard
+export PANGUARD_MODE=protect
+export PANGUARD_LOG_LEVEL=info
+export PANGUARD_LANG=en
+
+# AI providers (at least one recommended)
+export OLLAMA_ENDPOINT=http://localhost:11434
+export ANTHROPIC_API_KEY=sk-ant-...
+export OPENAI_API_KEY=sk-...
+
+# Optional
+export ABUSEIPDB_KEY=your-key-here
+```
+
+```powershell Windows
+$env:PANGUARD_DATA_DIR = "$HOME\.panguard-guard"
+$env:PANGUARD_MODE = "protect"
+$env:PANGUARD_LOG_LEVEL = "info"
+$env:PANGUARD_LANG = "en"
+
+# AI providers
+$env:OLLAMA_ENDPOINT = "http://localhost:11434"
+$env:ANTHROPIC_API_KEY = "sk-ant-..."
+```
+</CodeGroup>
+
+<Info>
+Guard uses a three-layer AI system. At minimum, configure `OLLAMA_ENDPOINT` for local analysis (Layer 1). Add `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` for cloud-based analysis (Layer 2/3) on Pro and Business tiers.
+</Info>
+
+---
+
+## Panguard Manager
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MANAGER_PORT` | `8443` | HTTPS port for the Manager API |
+| `MANAGER_AUTH_TOKEN` | -- | **Required.** Shared authentication token for API access |
+| `MANAGER_MAX_AGENTS` | `100` | Maximum number of agents that can register |
+| `MANAGER_HEARTBEAT_TIMEOUT_MS` | `120000` | Milliseconds before an agent is marked stale |
+| `CORS_ALLOWED_ORIGINS` | -- | Comma-separated list of allowed CORS origins |
+
+<CodeGroup>
+```bash Linux / macOS
+export MANAGER_PORT=8443
+export MANAGER_AUTH_TOKEN=$(openssl rand -hex 32)
+export MANAGER_MAX_AGENTS=100
+export MANAGER_HEARTBEAT_TIMEOUT_MS=120000
+export CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai
+```
+
+```bash Docker
+docker run -d \
+  -e MANAGER_PORT=8443 \
+  -e MANAGER_AUTH_TOKEN=your-secure-token \
+  -e MANAGER_MAX_AGENTS=100 \
+  -e CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai \
+  panguard/manager
+```
+</CodeGroup>
+
+<Warning>
+`MANAGER_AUTH_TOKEN` is required and must be set before starting the Manager. Use a strong, random value of at least 32 characters. The same token must be configured on all agents connecting to this Manager.
+</Warning>
+
+---
+
+## Panguard Auth Server
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PANGUARD_PORT` | `3000` | HTTP port for the Auth Server |
+| `JWT_SECRET` | -- | **Required.** Secret key for signing JWT tokens |
+| `GOOGLE_CLIENT_ID` | -- | Google OAuth client ID (for social login) |
+| `GOOGLE_CLIENT_SECRET` | -- | Google OAuth client secret |
+| `LEMONSQUEEZY_API_KEY` | -- | LemonSqueezy API key for subscription management |
+| `LEMONSQUEEZY_STORE_ID` | -- | LemonSqueezy store ID |
+| `LEMONSQUEEZY_WEBHOOK_SECRET` | -- | LemonSqueezy webhook signature secret |
+
+<CodeGroup>
+```bash Linux / macOS
+export PANGUARD_PORT=3000
+export JWT_SECRET=$(openssl rand -hex 64)
+
+# Optional: Google OAuth
+export GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+export GOOGLE_CLIENT_SECRET=your-client-secret
+
+# Optional: LemonSqueezy payments
+export LEMONSQUEEZY_API_KEY=your-api-key
+export LEMONSQUEEZY_STORE_ID=your-store-id
+export LEMONSQUEEZY_WEBHOOK_SECRET=your-webhook-secret
+```
+</CodeGroup>
+
+<Warning>
+`JWT_SECRET` must be a strong, random value. If it is compromised, all issued tokens can be forged. Rotate it immediately if exposure is suspected -- this will invalidate all active sessions.
+</Warning>
+
+---
+
+## Panguard Threat Cloud
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `TC_API_KEYS` | -- | Comma-separated list of valid API keys |
+| `TC_PORT` | `4000` | HTTP port for the Threat Cloud API |
+| `TC_DB_PATH` | `./data/threat-cloud.db` | SQLite database file path |
+| `ALLOW_ANONYMOUS_UPLOAD` | `false` | Allow unauthenticated threat submissions |
+
+<CodeGroup>
+```bash Linux / macOS
+export TC_API_KEYS=key1,key2,key3
+export TC_PORT=4000
+export TC_DB_PATH=/var/lib/panguard/threat-cloud.db
+export ALLOW_ANONYMOUS_UPLOAD=false
+```
+</CodeGroup>
+
+<Info>
+`ALLOW_ANONYMOUS_UPLOAD=true` enables Community tier users to submit threat data without an API key. Uploaded data still goes through validation and reputation scoring.
+</Info>
+
+---
+
+## Docker / Production
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NODE_ENV` | `development` | Set to `production` for production deployments |
+
+Setting `NODE_ENV=production`:
+- Disables debug logging and stack traces in error responses
+- Enables response compression
+- Enables stricter security headers
+- Disables development-only routes
+
+<CodeGroup>
+```yaml docker-compose.yml
+services:
+  manager:
+    image: panguard/manager
+    environment:
+      - NODE_ENV=production
+      - MANAGER_PORT=8443
+      - MANAGER_AUTH_TOKEN=${MANAGER_AUTH_TOKEN}
+      - CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai
+
+  auth:
+    image: panguard/auth
+    environment:
+      - NODE_ENV=production
+      - PANGUARD_PORT=3000
+      - JWT_SECRET=${JWT_SECRET}
+
+  threat-cloud:
+    image: panguard/threat-cloud
+    environment:
+      - NODE_ENV=production
+      - TC_PORT=4000
+      - TC_API_KEYS=${TC_API_KEYS}
+      - TC_DB_PATH=/data/threat-cloud.db
+    volumes:
+      - tc-data:/data
+```
+</CodeGroup>
+
+## Precedence
+
+Environment variables take precedence over configuration file values. The resolution order is:
+
+1. Environment variables (highest priority)
+2. Configuration file values (`config.json`)
+3. Built-in defaults (lowest priority)
+
+<Tip>
+For local development, create a `.env` file in the service directory and use a tool like `dotenv` to load it. Never commit `.env` files to version control.
+</Tip>

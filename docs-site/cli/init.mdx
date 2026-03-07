@@ -1,0 +1,74 @@
+---
+title: "panguard init"
+description: "Initialize Panguard configuration for the current machine."
+icon: "wand-magic-sparkles"
+---
+
+The `init` command creates and configures the Panguard environment on your machine. It generates the default configuration file, sets up data directories, and detects your operating system and installed services for optimal defaults.
+
+## Usage
+
+```bash
+panguard init [options]
+```
+
+## Options
+
+<ParamField path="--config" type="string">
+  Path to a custom configuration file. If provided, `init` will merge your custom settings with detected defaults instead of creating a new file from scratch.
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  Set the default language for CLI output and notifications.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Initialize with defaults
+panguard init
+```
+
+```bash Initialize with custom config
+panguard init --config ./my-panguard.yaml
+```
+
+```bash Initialize in Traditional Chinese
+panguard init --lang zh-TW
+```
+</CodeGroup>
+
+## What `init` Does
+
+1. **Detects the OS and environment** -- identifies Linux distro, macOS version, or WSL setup
+2. **Creates configuration directory** -- `~/.panguard/` with default `config.yaml`
+3. **Sets up data directories** -- separate directories for Guard, Trap, and Scan data
+4. **Detects running services** -- identifies web servers, databases, and other services to tailor scan and guard defaults
+5. **Validates authentication** -- confirms you are logged in or prompts you to run `panguard login`
+
+<Tip>
+  You only need to run `init` once per machine. Re-running it is safe -- existing configuration will not be overwritten unless you explicitly provide a new config file.
+</Tip>
+
+## Plan Requirements
+
+<Info>
+  Available on all plans including **Community (Free)**.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Full onboarding walkthrough including init.
+  </Card>
+  <Card title="panguard config" icon="gear" href="/cli/config">
+    View and edit configuration after initialization.
+  </Card>
+  <Card title="panguard login" icon="right-to-bracket" href="/cli/login">
+    Authenticate before or after initialization.
+  </Card>
+  <Card title="Environment Variables" icon="list" href="/configuration/environment-variables">
+    Override configuration with environment variables.
+  </Card>
+</CardGroup>

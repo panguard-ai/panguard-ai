@@ -1,0 +1,138 @@
+title: "Agent Resource Exhaustion Detection"
+id: ATR-2026-051
+status: draft
+description: >
+  Detects when an agent causes resource exhaustion through excessive token
+  consumption, massive or unbounded tool calls, large data transfers, or
+  uncontrolled processing that degrades system performance or incurs
+  disproportionate costs. Resource exhaustion can be intentional (adversarial
+  denial of service) or unintentional (poorly constrained agent logic).
+  This rule monitors token usage rates, data volume patterns, concurrent
+  resource consumption, and cost accumulation anomalies.
+author: "ATR Community"
+date: "2026/03/08"
+severity: high
+
+references:
+  owasp_llm:
+    - "LLM06:2025 - Excessive Agency"
+    - "LLM10:2025 - Unbounded Consumption"
+  mitre_atlas:
+    - "AML.T0046 - Spamming ML System with Chaff Data"
+    - "AML.T0053 - LLM Plugin Compromise"
+
+tags:
+  category: excessive-autonomy
+  subcategory: resource-exhaustion
+  confidence: high
+
+agent_source:
+  type: agent_behavior
+  framework:
+    - autogen
+    - crewai
+    - langchain
+    - langgraph
+    - swarm
+    - openai
+  provider:
+    - openai
+    - anthropic
+    - google
+    - aws
+    - azure
+
+detection:
+  conditions:
+    - field: agent_metrics
+      operator: threshold
+      value: "token_usage > 500000 within 600s"
+      description: "Agent consuming more than 500K tokens within a 10-minute window"
+    - field: agent_metrics
+      operator: threshold
+      value: "estimated_cost_usd > 10.00 within single_session"
+      description: "Session cost exceeding $10 USD threshold"
+    - field: agent_behavior
+      operator: threshold
+      value: "data_transfer_bytes > 104857600 within 300s"
+      description: "Agent transferring more than 100MB of data within 5 minutes"
+    - field: tool_args
+      operator: regex
+      value: "(?i)(limit|max_results?|page_size|batch_size)\\s*[:=]\\s*(\\d{5,}|all|unlimited|-1|999999)"
+      description: "Unbounded or excessively large query parameters in tool calls"
+    - field: agent_metrics
+      operator: threshold
+      value: "concurrent_tool_calls > 20"
+      description: "Agent spawning more than 20 concurrent tool calls"
+    - field: agent_metrics
+      operator: rate
+      value: "api_calls_per_minute > 120"
+      description: "Agent exceeding 120 API calls per minute"
+    - field: agent_behavior
+      operator: threshold
+      value: "output_tokens_single_response > 32000"
+      description: "Single agent response exceeding 32K output tokens"
+  condition: any
+  false_positives:
+    - "Authorized large-scale data processing or ETL pipeline agents"
+    - "Batch analysis tasks with expected high token usage approved by admin"
+    - "Initial data ingestion or indexing operations with known high volume"
+
+response:
+  actions:
+    - reduce_permissions
+    - escalate
+    - alert
+  auto_response_threshold: high
+  message_template: >
+    [ATR-2026-051] HIGH: Resource exhaustion detected for agent
+    {agent_id}. Metrics exceeded thresholds - Token usage: {token_count},
+    Estimated cost: ${estimated_cost}, Data transfer: {data_bytes} bytes,
+    API call rate: {api_rate}/min. The agent has been throttled and quotas
+    enforced. Session: {session_id}. Review resource allocation and agent
+    constraints.
+
+test_cases:
+  true_positives:
+    - input:
+        agent_id: "research-agent-05"
+        session_metrics:
+          token_usage: 750000
+          time_window_seconds: 480
+          estimated_cost_usd: 15.50
+          api_calls: 340
+      expected: triggered
+      description: "Agent consuming 750K tokens and $15.50 in under 8 minutes"
+    - input:
+        agent_id: "data-agent-07"
+        tool_call: "query_database"
+        tool_args: {"sql": "SELECT * FROM transactions", "limit": "unlimited", "batch_size": 999999}
+      expected: triggered
+      description: "Agent issuing unbounded database query with no result limits"
+    - input:
+        agent_id: "crawler-agent-02"
+        session_metrics:
+          data_transfer_bytes: 524288000
+          time_window_seconds: 180
+          concurrent_tool_calls: 35
+      expected: triggered
+      description: "Agent transferring 500MB with 35 concurrent connections in 3 minutes"
+  true_negatives:
+    - input:
+        agent_id: "chat-agent-01"
+        session_metrics:
+          token_usage: 12000
+          time_window_seconds: 600
+          estimated_cost_usd: 0.05
+          api_calls: 8
+      expected: not_triggered
+      description: "Normal conversational agent with modest resource usage"
+    - input:
+        agent_id: "search-agent-03"
+        session_metrics:
+          token_usage: 45000
+          time_window_seconds: 300
+          data_transfer_bytes: 2048000
+          api_calls: 15
+      expected: not_triggered
+      description: "Search agent with reasonable resource consumption within normal bounds"

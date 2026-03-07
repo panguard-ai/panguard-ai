@@ -1,0 +1,192 @@
+---
+title: "Configure Notifications"
+description: "Set up alert channels so Panguard can notify you of threats via Telegram, Slack, Email, LINE, or Webhook."
+icon: "bell"
+---
+
+Panguard Chat delivers security alerts to the channels your team already uses. This guide covers setting up each of the 5 supported notification channels and configuring user roles to control who receives what.
+
+<Steps>
+  <Step title="Initialize Chat configuration">
+    Run the interactive setup wizard:
+
+    ```bash
+    panguard chat setup
+    ```
+
+    The wizard walks you through channel selection and credential entry. You can also configure channels individually using the flags shown below.
+  </Step>
+
+  <Step title="Configure your channels">
+    Set up one or more notification channels:
+
+    <Tabs>
+      <Tab title="Telegram">
+        1. Message [@BotFather](https://t.me/BotFather) on Telegram and create a new bot
+        2. Copy the bot token
+        3. Start a chat with your bot and send any message
+        4. Get your chat ID from the Telegram API or use [@userinfobot](https://t.me/userinfobot)
+
+        ```bash
+        panguard chat setup --channel telegram \
+          --telegram-token "123456:ABC-DEF..." \
+          --telegram-chat-id "-1001234567890"
+        ```
+
+        <Tip>
+          For group notifications, add the bot to a Telegram group and use the group chat ID (starts with `-100`).
+        </Tip>
+      </Tab>
+
+      <Tab title="Slack">
+        1. Go to [api.slack.com/apps](https://api.slack.com/apps) and create a new app
+        2. Add the `chat:write` OAuth scope under **Bot Token Scopes**
+        3. Install the app to your workspace
+        4. Copy the Bot User OAuth Token
+
+        ```bash
+        panguard chat setup --channel slack \
+          --slack-token "xoxb-..." \
+          --slack-channel "#security-alerts"
+        ```
+      </Tab>
+
+      <Tab title="Email">
+        Configure SMTP credentials for email notifications:
+
+        ```bash
+        panguard chat setup --channel email \
+          --smtp-host "smtp.gmail.com" \
+          --smtp-port 587 \
+          --smtp-user "alerts@yourcompany.com" \
+          --smtp-pass "app-password" \
+          --email-to "security-team@yourcompany.com"
+        ```
+
+        <Info>
+          For Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) rather than your account password. Enable 2FA first.
+        </Info>
+      </Tab>
+
+      <Tab title="LINE">
+        1. Create a LINE Notify token at [notify-bot.line.me](https://notify-bot.line.me/)
+        2. Select the group or 1-on-1 chat to receive notifications
+
+        ```bash
+        panguard chat setup --channel line \
+          --line-token "your-line-notify-token"
+        ```
+      </Tab>
+
+      <Tab title="Webhook">
+        Send raw JSON payloads to any HTTP endpoint:
+
+        ```bash
+        panguard chat setup --channel webhook \
+          --webhook-url "https://your-server.com/api/panguard-alerts" \
+          --webhook-secret "your-hmac-secret"
+        ```
+
+        Panguard sends a `POST` request with the following payload structure:
+
+        ```json
+        {
+          "event": "guard.alert",
+          "severity": "critical",
+          "title": "Reverse shell detected",
+          "details": { ... },
+          "timestamp": "2026-03-07T14:22:01Z",
+          "signature": "sha256=..."
+        }
+        ```
+
+        The `signature` header contains an HMAC-SHA256 of the body using your webhook secret for verification.
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Configure user roles">
+    Panguard supports 3 user roles that control notification verbosity:
+
+    | Role | Receives | Best for |
+    | --- | --- | --- |
+    | `developer` | All severity levels with full technical details | Engineers, DevOps |
+    | `boss` | CRITICAL and HIGH only, plain-language summaries | Executives, managers |
+    | `it_admin` | All severity levels, medium detail, action items | IT operations |
+
+    Set the role for each channel:
+
+    ```bash
+    panguard chat setup --channel telegram --role developer
+    panguard chat setup --channel email --role boss
+    panguard chat setup --channel slack --role it_admin
+    ```
+
+    <Tip>
+      You can configure the same channel type multiple times with different roles. For example, send developer-level alerts to `#security-engineering` and boss-level summaries to `#security-executive`.
+    </Tip>
+  </Step>
+
+  <Step title="Test your configuration">
+    Send a test notification to all configured channels:
+
+    ```bash
+    panguard chat test
+    ```
+
+    ```
+      PANGUARD AI - Chat Test
+
+      Sending test notification...
+
+      Telegram   ... sent
+      Slack      ... sent
+      Email      ... sent
+
+      All channels verified.
+    ```
+
+    Test a specific channel:
+
+    ```bash
+    panguard chat test --channel slack
+    ```
+  </Step>
+
+  <Step title="Verify active channels">
+    List all configured notification channels and their status:
+
+    ```bash
+    panguard chat status
+    ```
+
+    ```
+      PANGUARD AI - Chat Status
+
+      -- Channels -------------------------------
+
+      Telegram   Active   role: developer   last sent: 2m ago
+      Slack      Active   role: it_admin    last sent: 15m ago
+      Email      Active   role: boss        last sent: 1h ago
+
+      3 channels configured, 3 active.
+    ```
+  </Step>
+</Steps>
+
+## What to do next
+
+<CardGroup cols={2}>
+  <Card title="Set up real-time protection" icon="shield-halved" href="/guides/real-time-protection">
+    Notifications require Guard to be running. Start continuous monitoring first.
+  </Card>
+  <Card title="Chat product reference" icon="comments" href="/products/chat/overview">
+    Full documentation for the Chat notification system.
+  </Card>
+  <Card title="User roles deep dive" icon="users" href="/products/chat/user-roles">
+    Detailed breakdown of what each role receives and message formatting.
+  </Card>
+  <Card title="Troubleshoot notifications" icon="wrench" href="/troubleshooting/notification-issues">
+    Common issues with channel configuration and delivery.
+  </Card>
+</CardGroup>

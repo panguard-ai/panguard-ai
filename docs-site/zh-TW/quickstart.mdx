@@ -1,0 +1,174 @@
+---
+title: "快速入門"
+description: "從註冊到首份安全報告只需 5 分鐘。安裝 CLI、驗證身份、掃描系統，並啟動即時防護。"
+icon: "rocket"
+---
+
+本指南將引導您以最快的方式，使用 Panguard AI 保護您的第一台設備。
+
+<Steps>
+  <Step title="安裝 CLI">
+    選擇您的平台，使用一行指令安裝 Panguard。
+
+    <Tabs>
+      <Tab title="macOS / Linux">
+        ```bash
+        curl -fsSL https://get.panguard.ai | bash
+        ```
+      </Tab>
+      <Tab title="Windows">
+        ```powershell
+        powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"
+        ```
+      </Tab>
+      <Tab title="npm（所有平台）">
+        ```bash
+        npm install -g @panguard-ai/panguard
+        ```
+      </Tab>
+    </Tabs>
+
+    驗證安裝：
+
+    ```bash
+    panguard --version
+    # 預期輸出: 0.3.1
+    ```
+
+    <Tip>
+      **Intel Mac 使用者：**curl 安裝程式預設下載 ARM64 二進位檔。您可以改用 npm 安裝
+      (`npm install -g @panguard-ai/panguard`)，或先啟用 Rosetta 2
+      (`softwareupdate --install-rosetta`) 再使用 curl 安裝。
+    </Tip>
+  </Step>
+
+  <Step title="建立帳號並登入">
+    如果您尚未擁有帳號，請至 [panguard.ai](https://panguard.ai) 註冊。Community 方案免費，無需信用卡。
+
+    接著從 CLI 進行驗證：
+
+    ```bash
+    panguard login
+    ```
+
+    瀏覽器會自動開啟。完成驗證後，返回終端機：
+
+    ```
+      PANGUARD AI
+
+      -- Login Info ----------------------------------------
+
+      Email     user@example.com
+      Name      User Name
+      Plan      Solo
+      Expires   2026-04-27
+
+      Login successful!
+    ```
+
+    <Info>
+      **無圖形介面伺服器：** 使用 `panguard login --no-browser` 取得 URL，可在其他裝置上開啟。
+    </Info>
+  </Step>
+
+  <Step title="執行首次掃描">
+    對您的系統執行快速安全稽核：
+
+    ```bash
+    panguard scan --quick
+    ```
+
+    掃描約 30 秒完成，並產出風險評估結果：
+
+    ```
+      PANGUARD AI - Security Scanner
+
+      Scanning system environment...
+
+      -- Security Findings ----------------------
+
+      CRITICAL  Port 22 (SSH) exposed to 0.0.0.0
+      HIGH      No firewall rules detected
+      MEDIUM    Password policy not enforced
+      LOW       12 unnecessary services running
+
+      -- Risk Score -----------------------------
+
+      Score: 62/100 [============--------] Grade: C
+
+      -- Recommendations ------------------------
+
+      1. Restrict SSH access to specific IP ranges
+      2. Enable and configure system firewall
+      3. Enforce password complexity requirements
+    ```
+
+    移除 `--quick` 旗標可執行完整掃描（約 60 秒），包含 SSL 憑證驗證、排程任務稽核與共享資料夾檢查。
+
+    <Tabs>
+      <Tab title="產生 PDF 報告">
+        ```bash
+        panguard scan --output my-report.pdf
+        ```
+      </Tab>
+      <Tab title="繁體中文輸出">
+        ```bash
+        panguard scan --lang zh-TW
+        ```
+      </Tab>
+      <Tab title="完整掃描">
+        ```bash
+        panguard scan
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="啟動即時防護">
+    掃描是一次性檢查。若要持續防護，請啟動 Guard 引擎：
+
+    ```bash
+    panguard guard start
+    ```
+
+    ```
+      PANGUARD AI - Guard Engine
+
+      Guard engine starting...
+
+      -- Status ---------------------------------
+
+      Mode:       Learning (Day 1/7)
+      Monitoring: processes, network, files
+      Rules:      3,155 Sigma rules loaded
+      Score:      --/100 (building baseline)
+
+      Guard is now protecting your system.
+      Learning mode: AI is observing normal behavior.
+      Protection mode activates automatically after 7 days.
+    ```
+
+    <Info>
+      **Guard 的運作方式：** 前 7 天，AI 觀察系統的正常行為並建立基線（此期間不會產生誤報）。從第 8 天開始，它會自動偵測異常、執行回應並通知您。
+    </Info>
+  </Step>
+</Steps>
+
+## 接下來做什麼
+
+您的系統已完成掃描並受到保護，可以探索以下功能：
+
+<CardGroup cols={2}>
+  <Card title="設定通知" icon="bell" href="/guides/notifications-setup">
+    當偵測到威脅時，透過 Telegram、Slack 或 Email 接收警報。
+  </Card>
+  <Card title="部署蜜罐" icon="honey-pot" href="/guides/honeypots">
+    使用 8 種誘餌服務捕捉攻擊者。需 Pro 方案。
+  </Card>
+  <Card title="產生合規報告" icon="file-chart-column" href="/guides/compliance-reports">
+    自動產生 ISO 27001、SOC 2 與台灣資安法稽核報告。
+  </Card>
+  <Card title="探索 CLI" icon="terminal" href="/cli/overview">
+    所有 Panguard 指令與旗標的完整參考。
+  </Card>
+</CardGroup>

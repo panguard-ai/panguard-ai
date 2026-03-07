@@ -1,0 +1,281 @@
+---
+title: "身份驗證"
+description: "Panguard AI 如何處理使用者身份驗證、連線管理與憑證安全。"
+icon: "lock"
+---
+
+# 身份驗證
+
+Panguard AI 使用基於 OAuth 的身份驗證流程進行 CLI 連線，並搭配多層憑證安全機制，包括 AES-256-GCM 加密、TOTP 雙因素驗證與計時安全的 API 金鑰驗證。
+
+---
+
+## 身份驗證流程概覽
+
+```
+  User
+    |
+    v
+  [panguard.ai]  -- Register / Google OAuth / Email+Password
+    |
+    | OAuth callback
+    v
+  [panguard login]  -- Opens browser -> completes auth -> stores token
+    |
+    | Token at ~/.panguard/credentials.json (0o600)
+    v
+  [panguard scan / guard / trap ...]  -- Features unlocked by tier
+```
+
+---
+
+## CLI 登入
+
+### 標準流程（使用瀏覽器）
+
+<Steps>
+  <Step title="開始登入">
+    ```bash
+    panguard login
+    ```
+
+    CLI 會在隨機本地連接埠啟動臨時 HTTP 伺服器，並產生 CSRF 狀態 Token。
+  </Step>
+  <Step title="瀏覽器驗證">
+    預設瀏覽器開啟至 `panguard.ai/login?cli_state={state}`。透過 Google OAuth 或電子郵件與密碼完成登入。
+  </Step>
+  <Step title="Token 回呼">
+    伺服器重新導向至本地回呼 URL。CLI 接收並儲存連線 Token。
+  </Step>
+  <Step title="連線啟用">
+    終端機顯示登入成功訊息與您的帳號詳情。
+
+    ```
+      PANGUARD AI
+
+      -- Login Info ----------------------------------------
+
+      Email     user@example.com
+      Name      User Name
+      Plan      Solo
+      Expires   2026-04-27
+
+      Login successful!
+    ```
+  </Step>
+</Steps>
+
+### 無圖形介面流程（SSH / 無瀏覽器）
+
+```bash
+panguard login --no-browser
+```
+
+CLI 會印出驗證 URL，您可以複製並在任何有瀏覽器的裝置上開啟：
+
+```
+  Open the following URL in your browser to complete login:
+  https://panguard.ai/login?cli_state=abc123&callback=...
+
+  Waiting for authentication...
+```
+
+<Tip>
+`--no-browser` 旗標對 CI/CD 流水線、Docker 容器與透過 SSH 存取的遠端伺服器至關重要。
+</Tip>
+
+### Google OAuth
+
+Panguard 支援 Google OAuth 一鍵登入。當您在網頁上或 CLI 流程中點擊「Sign in with Google」時，Panguard 僅接收您的電子郵件與顯示名稱 -- 不會存取 Google 密碼或其他帳號資料。
+
+---
+
+## 憑證儲存
+
+### 檔案位置與權限
+
+```
+~/.panguard/credentials.json
+```
+
+檔案權限在建立後立即設為 `0o600`（僅擁有者可讀寫）。CLI 在每次啟動時驗證這些權限，若已被放寬則發出警告。
+
+### Token 格式
+
+```json
+{
+  "token": "session-token-string",
+  "expiresAt": "2026-04-27T00:00:00.000Z",
+  "email": "user@example.com",
+  "tier": "solo",
+  "name": "User Name",
+  "savedAt": "2026-02-26T12:00:00.000Z",
+  "apiUrl": "https://panguard.ai"
+}
+```
+
+### 連線有效期
+
+- CLI 連線有效期為 **30 天**
+- 過期後請再次執行 `panguard login`
+- 使用 `panguard whoami` 查看到期日
+
+---
+
+## 憑證加密
+
+敏感設定欄位（API 金鑰、LLM 供應商 Token）使用 **AES-256-GCM** 進行靜態加密：
+
+| 屬性 | 值 |
+| --- | --- |
+| **演算法** | AES-256-GCM |
+| **金鑰衍生** | 從硬體識別碼衍生的設備專屬金鑰 |
+| **儲存位置** | `~/.panguard/llm.enc` 用於 AI 供應商金鑰 |
+| **IV** | 每次加密操作唯一 |
+
+<Info>
+加密金鑰從您設備的硬體識別碼衍生，因此加密的設定檔無法複製到其他設備並解密。
+</Info>
+
+---
+
+## TOTP 雙因素驗證
+
+Panguard 支援基於 TOTP 的雙因素驗證，提供額外的帳號安全。
+
+<Steps>
+  <Step title="啟用 2FA">
+    前往 [panguard.ai](https://panguard.ai) 的**帳號設定**，選擇**啟用雙因素驗證**。使用您的驗證器 App（Google Authenticator、Authy、1Password 等）掃描 QR code。
+  </Step>
+  <Step title="驗證設定">
+    從驗證器 App 輸入 TOTP 代碼以確認設定正常運作。
+  </Step>
+  <Step title="儲存備用碼">
+    Panguard 會產生 10 組一次性備用碼。請安全保存 -- 這是您失去驗證器裝置時恢復帳號的唯一方式。
+  </Step>
+  <Step title="使用 2FA 登入 CLI">
+    啟用後，CLI 登入流程會在瀏覽器驗證後要求輸入 TOTP 代碼。6 位數代碼直接在終端機輸入。
+  </Step>
+</Steps>
+
+<Warning>
+備用碼僅在 2FA 設定時顯示一次。如果您同時遺失驗證器裝置與備用碼，帳號恢復需要聯繫客服並進行身份驗證。
+</Warning>
+
+---
+
+## 連線管理
+
+### 登出
+
+```bash
+panguard logout
+```
+
+登出會執行兩個動作：
+1. **本地** -- 刪除 `~/.panguard/credentials.json`
+2. **伺服器端** -- 在 Panguard API 伺服器上使連線 Token 失效
+
+登出後，即使保留了 Token 副本也無法再使用。
+
+### 驗證連線
+
+```bash
+panguard whoami
+```
+
+```bash
+# JSON 格式輸出，適用於腳本
+panguard whoami --json
+```
+
+---
+
+## Manager API 驗證
+
+Panguard Manager（機群編排層）的 REST API 使用 Bearer token 驗證：
+
+| 屬性 | 值 |
+| --- | --- |
+| **標頭** | `Authorization: Bearer <token>` |
+| **比對方式** | SHA-256 計時安全比對（`crypto.timingSafeEqual`） |
+| **速率限制** | 依 Token，可設定 |
+
+```bash
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  https://manager.example.com/api/v1/agents
+```
+
+<Note>
+計時安全比對可防止計時攻擊，避免攻擊者逐字元猜測有效 Token。
+</Note>
+
+---
+
+## Threat Cloud API 驗證
+
+Threat Cloud API 使用 API 金鑰搭配依金鑰的速率限制：
+
+| 屬性 | 值 |
+| --- | --- |
+| **標頭** | `X-API-Key: <key>` |
+| **速率限制** | 依金鑰，預設 100 次請求/分鐘 |
+| **金鑰格式** | 64 字元十六進位字串 |
+| **比對方式** | SHA-256 計時安全比對 |
+
+```bash
+curl -H "X-API-Key: YOUR_API_KEY" \
+  https://threat.panguard.ai/api/v1/ioc/query?ip=203.0.113.50
+```
+
+---
+
+## 安全措施摘要
+
+| 措施 | 詳情 |
+| --- | --- |
+| **CSRF 防護** | 隨機狀態 Token 驗證 OAuth 回呼 |
+| **回呼限制** | 僅接受 `localhost` 回呼 URL |
+| **檔案權限** | `credentials.json` 建立時設為 `0o600` |
+| **Token 到期** | 連線 30 天後自動過期 |
+| **流程逾時** | 待處理的驗證流程 10 分鐘後清除 |
+| **靜態加密** | AES-256-GCM 用於敏感設定欄位 |
+| **計時安全比對** | 所有 API Token 驗證使用常數時間比對 |
+| **2FA 支援** | 可選的 TOTP 搭配備用碼 |
+
+---
+
+## 常用操作
+
+```bash
+# 登入（開啟瀏覽器）
+panguard login
+
+# 在無圖形介面伺服器上登入
+panguard login --no-browser
+
+# 查看帳號資訊
+panguard whoami
+
+# JSON 格式輸出，適用於腳本
+panguard whoami --json
+
+# 登出（本地 + 伺服器端失效）
+panguard logout
+
+# 使用自訂驗證伺服器（開發 / 自架）
+panguard login --api-url http://localhost:3100
+```
+
+---
+
+## 相關內容
+
+<CardGroup cols={2}>
+  <Card title="帳號設定" icon="user-plus" href="/account-setup">
+    建立帳號並設定訂閱。
+  </Card>
+  <Card title="系統架構" icon="sitemap" href="/concepts/architecture">
+    身份驗證如何融入三層式平台架構。
+  </Card>
+</CardGroup>

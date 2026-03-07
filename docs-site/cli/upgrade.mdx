@@ -1,0 +1,75 @@
+---
+title: "panguard upgrade"
+description: "Update the Panguard CLI to the latest version."
+icon: "arrow-up"
+---
+
+The `upgrade` command checks for and installs the latest version of the Panguard CLI. It handles binary replacement, database migrations, and post-upgrade verification automatically.
+
+## Usage
+
+```bash
+panguard upgrade
+```
+
+## What It Does
+
+1. **Checks the current version** against the latest release
+2. **Downloads the new binary** from the official release channel
+3. **Verifies the checksum** to ensure integrity
+4. **Replaces the binary** in place
+5. **Runs migrations** if any data format changes are required
+6. **Verifies the upgrade** by running a quick self-test
+
+## Examples
+
+<CodeGroup>
+```bash Upgrade to latest version
+panguard upgrade
+```
+</CodeGroup>
+
+<Warning>
+  If Guard is running during an upgrade, it will be briefly restarted. There is a short window (typically under 5 seconds) where real-time protection is paused.
+</Warning>
+
+## Alternative Upgrade Methods
+
+If you installed Panguard through a package manager, you may prefer to upgrade through that channel:
+
+<CodeGroup>
+```bash Homebrew (macOS)
+brew upgrade panguard
+```
+
+```bash APT (Debian/Ubuntu)
+sudo apt update && sudo apt upgrade panguard
+```
+
+```bash Install script (any platform)
+curl -fsSL https://get.panguard.ai | bash
+```
+</CodeGroup>
+
+## Plan Requirements
+
+<Info>
+  Available on all plans including **Community (Free)**.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Platform-specific installation instructions.
+  </Card>
+  <Card title="Changelog" icon="list" href="/changelog">
+    See what changed in each release.
+  </Card>
+  <Card title="panguard doctor" icon="stethoscope" href="/cli/doctor">
+    Run diagnostics after upgrading if you encounter issues.
+  </Card>
+  <Card title="panguard status" icon="circle-info" href="/cli/status">
+    Verify system health after upgrading.
+  </Card>
+</CardGroup>

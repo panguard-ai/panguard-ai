@@ -1,0 +1,113 @@
+---
+title: "CLI Overview"
+description: "Unified command-line interface for all Panguard AI security operations."
+icon: "terminal"
+---
+
+The Panguard CLI is your single entry point for scanning, protecting, monitoring, and managing endpoint security. Every feature -- from a quick vulnerability scan to deploying a honeypot network -- is accessible through one binary.
+
+## Usage
+
+```bash
+panguard <command> [options]
+```
+
+## Global Options
+
+| Option | Description |
+| --- | --- |
+| `--help` | Show help for any command |
+| `--version` | Print the installed Panguard CLI version |
+| `--lang <lang>` | Set output language (`en`, `zh-TW`, `ja`, etc.) |
+
+## Command Categories
+
+### Scanning
+
+| Command | Description |
+| --- | --- |
+| [`scan`](/cli/scan) | Run security scans on the local machine |
+
+### Protection
+
+| Command | Description |
+| --- | --- |
+| [`guard`](/cli/guard) | Real-time endpoint protection agent |
+| [`trap`](/cli/trap) | Honeypot / deception technology |
+| [`chat`](/cli/chat) | Notification channel management (Telegram, Slack, Email) |
+| [`report`](/cli/report) | Compliance report generation |
+
+### System
+
+| Command | Description |
+| --- | --- |
+| [`init`](/cli/init) | Initialize configuration for the current machine |
+| [`deploy`](/cli/deploy) | Deploy configuration to remote endpoints |
+| [`status`](/cli/status) | Show overall system health |
+| [`config`](/cli/config) | View or edit configuration |
+| [`doctor`](/cli/doctor) | Diagnose common system issues |
+| [`upgrade`](/cli/upgrade) | Update Panguard CLI to the latest version |
+
+### Authentication
+
+| Command | Description |
+| --- | --- |
+| [`login`](/cli/login) | Authenticate with your Panguard account |
+| [`logout`](/cli/logout) | End the current session |
+| [`whoami`](/cli/whoami) | Display the currently authenticated user |
+
+### Advanced
+
+| Command | Description |
+| --- | --- |
+| [`manager`](/cli/manager) | Start the multi-endpoint Manager server |
+| [`threat`](/cli/threat) | Start the local Threat Cloud intelligence server |
+
+## Plan Access Matrix
+
+Not every command is available on every plan. The table below shows the minimum plan required for each command.
+
+| Command | Community (Free) | Solo ($9/mo) | Pro ($29/mo) | Business ($79/mo) |
+| --- | :---: | :---: | :---: | :---: |
+| `login` / `logout` / `whoami` | Yes | Yes | Yes | Yes |
+| `init` / `status` / `config` | Yes | Yes | Yes | Yes |
+| `doctor` / `upgrade` | Yes | Yes | Yes | Yes |
+| `scan --quick` | Yes | Yes | Yes | Yes |
+| `scan` (full) | -- | Yes | Yes | Yes |
+| `guard start` | -- | Yes | Yes | Yes |
+| `guard status` | Yes | Yes | Yes | Yes |
+| `chat setup` | -- | Yes | Yes | Yes |
+| `deploy` | -- | Yes | Yes | Yes |
+| `report generate` | -- | -- | Yes | Yes |
+| `trap start` | -- | -- | Yes | Yes |
+| `threat start` | -- | -- | -- | Yes |
+| `manager` | -- | -- | -- | Yes |
+
+## Installation
+
+If you have not installed the CLI yet, run:
+
+```bash
+curl -fsSL https://get.panguard.ai | bash
+```
+
+<Info>
+  See the [Installation](/installation) page for platform-specific instructions including Homebrew, APT, and Docker options.
+</Info>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Get from zero to your first scan in under 5 minutes.
+  </Card>
+  <Card title="panguard scan" icon="magnifying-glass" href="/cli/scan">
+    Run your first security scan.
+  </Card>
+  <Card title="panguard guard" icon="shield" href="/cli/guard">
+    Enable real-time endpoint protection.
+  </Card>
+  <Card title="Account Setup" icon="user-plus" href="/account-setup">
+    Create your account and choose a plan.
+  </Card>
+</CardGroup>

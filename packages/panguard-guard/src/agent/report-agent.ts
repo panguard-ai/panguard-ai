@@ -497,6 +497,16 @@ export class ReportAgent {
         .filter(Boolean)
         .join(',') || 'none';
 
+    // Extract ATR rule match data from evidence / 從證據中提取 ATR 規則匹配數據
+    const atrRuleIds = verdict.evidence
+      .filter((e) => e.source === 'rule_match')
+      .map((e) => (e.data as Record<string, unknown>)?.['ruleId'] as string)
+      .filter((id) => id?.startsWith('ATR-'));
+    const atrCategories = verdict.evidence
+      .filter((e) => e.source === 'rule_match')
+      .map((e) => (e.data as Record<string, unknown>)?.['category'] as string)
+      .filter(Boolean);
+
     return {
       attackSourceIP,
       attackType: event.category,
@@ -504,6 +514,8 @@ export class ReportAgent {
       sigmaRuleMatched,
       timestamp: new Date().toISOString(),
       region: getCountryCode(),
+      ...(atrRuleIds.length > 0 && { atrRulesMatched: atrRuleIds.join(',') }),
+      ...(atrCategories.length > 0 && { atrCategory: atrCategories[0] }),
     };
   }
 

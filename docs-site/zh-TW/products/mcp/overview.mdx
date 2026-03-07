@@ -1,0 +1,133 @@
+---
+title: "Panguard MCP Server"
+description: "Model Context Protocol 伺服器，將 11 個 Panguard 安全工具暴露給 Claude Desktop、Cursor 和 Windsurf 等 AI 助手。"
+icon: "plug"
+---
+
+Panguard MCP 實作 [Model Context Protocol](https://modelcontextprotocol.io) 標準，允許 AI 助手透過自然語言與您的安全基礎設施互動。在 AI 中要求掃描漏洞、檢查 Guard 狀態、封鎖惡意 IP 或產生合規報告——全部透過對話完成。
+
+## 快速開始
+
+將 Panguard 加入您的 AI 助手的 MCP 設定：
+
+<Tabs>
+  <Tab title="Claude Desktop">
+    編輯 `~/Library/Application Support/Claude/claude_desktop_config.json`（macOS）或 `%APPDATA%\Claude\claude_desktop_config.json`（Windows）：
+
+    ```json
+    {
+      "mcpServers": {
+        "panguard": {
+          "command": "npx",
+          "args": ["-y", "@panguard-ai/mcp"]
+        }
+      }
+    }
+    ```
+
+    儲存後重新啟動 Claude Desktop。
+  </Tab>
+  <Tab title="Cursor">
+    加入至您的 Cursor MCP 設定（Settings > MCP Servers）：
+
+    ```json
+    {
+      "panguard": {
+        "command": "npx",
+        "args": ["-y", "@panguard-ai/mcp"]
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Windsurf">
+    加入至您的 Windsurf MCP 設定：
+
+    ```json
+    {
+      "mcpServers": {
+        "panguard": {
+          "command": "npx",
+          "args": ["-y", "@panguard-ai/mcp"]
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Claude Code">
+    加入至您的 Claude Code MCP 設定：
+
+    ```json
+    {
+      "mcpServers": {
+        "panguard": {
+          "command": "npx",
+          "args": ["-y", "@panguard-ai/mcp"]
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## 您可以做什麼
+
+設定完成後，透過自然語言與 Panguard 互動：
+
+| 範例請求 | 使用的 MCP 工具 |
+|----------------|---------------|
+| 「掃描這台機器的漏洞」 | `panguard_scan` |
+| 「檢查我的原始碼是否有安全問題」 | `panguard_scan_code` |
+| 「啟動即時防護」 | `panguard_guard_start` |
+| 「停止 Guard 引擎」 | `panguard_guard_stop` |
+| 「目前的安全狀態是什麼？」 | `panguard_status` |
+| 「顯示最近的警報」 | `panguard_alerts` |
+| 「封鎖 IP 203.0.113.50」 | `panguard_block_ip` |
+| 「產生 PDF 安全報告」 | `panguard_generate_report` |
+| 「初始化 Panguard 設定」 | `panguard_init` |
+| 「稽核這個 skill 目錄的安全性」 | `panguard_audit_skill` |
+| 「在這台機器上部署完整防護」 | `panguard_deploy` |
+
+## 11 個可用工具
+
+| 工具 | 類別 | 描述 |
+|------|----------|-------------|
+| `panguard_scan` | Scan | 執行安全健康檢查掃描（快速或完整） |
+| `panguard_scan_code` | Scan | 原始碼目錄的 SAST 掃描 |
+| `panguard_guard_start` | Guard | 啟動即時監控常駐程式 |
+| `panguard_guard_stop` | Guard | 停止監控常駐程式 |
+| `panguard_status` | System | 取得所有 Panguard 服務的狀態 |
+| `panguard_alerts` | Guard | 取得最近的安全警報，支援嚴重性篩選 |
+| `panguard_block_ip` | Guard | 手動封鎖 IP 位址 |
+| `panguard_generate_report` | Report | 產生 PDF 合規報告 |
+| `panguard_init` | System | 初始化 Panguard 設定 |
+| `panguard_audit_skill` | Scan | 稽核 OpenClaw/AgentSkills 目錄 |
+| `panguard_deploy` | System | 一鍵部署：掃描 + Guard + 報告 |
+
+<Card title="工具參考" icon="wrench" href="/products/mcp/tools-reference">
+  所有 11 個 MCP 工具的完整參數參考和範例。
+</Card>
+
+## 架構
+
+```
+AI Assistant (Claude Desktop, Cursor, etc.)
+         |
+    MCP Protocol (stdio transport)
+         |
+   Panguard MCP Server (@panguard-ai/mcp)
+         |
+   ┌─────┼─────┬──────┬───────┐
+   Scan  Guard  Report  System
+```
+
+MCP 伺服器作為本地處理程序執行，透過 stdio 與您的 AI 助手通訊。所有安全操作都在您的機器上本地執行——沒有任何資料透過 MCP 管道傳送至外部伺服器。
+
+## 前提條件
+
+- 已安裝 Panguard CLI（執行 `panguard --version` 驗證）
+- Node.js 20+（用於 `npx` 執行）
+- 有效的 Panguard 帳戶（部分工具需要 Solo 方案或以上）
+
+<Note>
+  MCP 伺服器遵守與 CLI 相同的方案限制。需要特定方案層級的工具在您的方案不包含該功能時會回傳適當的錯誤。
+</Note>

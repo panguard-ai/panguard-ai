@@ -1,0 +1,147 @@
+---
+title: "Panguard Guard"
+description: "24/7 AI-driven real-time threat monitoring with the DARE pipeline, 10 monitor types, event correlation, and automated response."
+icon: "shield"
+---
+
+Panguard Guard is the core runtime protection engine. It monitors your system 24/7 using 10 monitor types, processes every security event through a 4-agent DARE pipeline (Detect, Analyze, Respond, Report), and takes automated action against threats based on confidence scoring.
+
+## Quick Start
+
+```bash
+# Start Guard (requires Solo plan or above)
+panguard guard start
+
+# Check status (free)
+panguard guard status
+
+# Stop Guard
+panguard guard stop
+```
+
+## Operating Modes
+
+Guard operates in two modes and transitions automatically:
+
+### Learning Mode (Day 1--7)
+
+During the first 7 days, Guard observes your system to build a behavioral baseline:
+
+```
+Mode:       Learning (Day 3/7)
+Monitoring: processes, network, files
+Baseline:   42% complete
+```
+
+- No alerts are generated (prevents false positives)
+- Records normal process patterns, network connections, file activity
+- Sends daily learning progress summaries via Chat
+
+### Protection Mode (Day 8+)
+
+After the baseline is established, Guard switches to active protection:
+
+```
+Mode:       Protection
+Score:      85/100 (Grade: A)
+Threats:    0 active
+Blocked:    12 IPs today
+```
+
+- Deviations from baseline trigger alerts
+- Automated response based on confidence thresholds
+- Real-time notifications via Chat
+
+## The DARE Pipeline
+
+Every security event flows through 4 agents in sequence:
+
+```
+Event ──> Detect ──> Analyze ──> Respond ──> Report
+```
+
+| Agent | Responsibility |
+|-------|---------------|
+| **Detect** | Rule matching (Sigma + YARA), threat intel lookup, deduplication, event correlation |
+| **Analyze** | Evidence collection, weighted confidence scoring, AI reasoning, baseline deviation checks |
+| **Respond** | Action execution (block IP, kill process, quarantine file), safety checks, escalation |
+| **Report** | JSONL logging with rotation, baseline updates, anonymized data for Threat Cloud |
+
+<Card title="Agent Pipeline Deep Dive" icon="arrow-right-arrow-left" href="/products/guard/agent-pipeline">
+  Detailed breakdown of each agent's inputs, outputs, and decision logic.
+</Card>
+
+## Detection Layers
+
+Guard uses a 3-layer AI detection funnel to minimize latency and cost:
+
+| Layer | Engine | Cost | Latency | Traffic |
+|-------|--------|------|---------|---------|
+| **Layer 1** | Sigma rules, YARA, built-in patterns, threat intel | $0 | < 1 ms | ~90% of events |
+| **Layer 2** | Ollama (local AI) | $0 | ~100 ms | ~7% of events |
+| **Layer 3** | Claude / OpenAI (cloud AI) | ~$0.01/event | ~1 s | ~3% of events |
+
+Only events that cannot be resolved at a lower layer are escalated to the next.
+
+## Key Capabilities
+
+| Capability | Details |
+|-----------|---------|
+| **Monitor types** | 10 (4 built-in + 6 advanced) |
+| **Sigma rules** | 20 built-in + custom + community |
+| **YARA rules** | 900+ file pattern matching rules |
+| **Threat intel feeds** | 5 sources (ThreatFox, URLhaus, Feodo, GreyNoise, AbuseIPDB) |
+| **Correlation patterns** | 7 attack patterns with MITRE ATT&CK mapping |
+| **Response actions** | IP block, process kill, file quarantine, notify, log |
+| **Cross-platform** | macOS (pfctl), Linux (iptables), Windows (netsh) |
+| **Log retention** | 50 MB per file, 10 rotated files, 90-day retention |
+
+## Status Dashboard
+
+```bash
+panguard guard status
+```
+
+```
+Status:     Running
+Mode:       Protection
+PID:        12345
+Uptime:     14d 6h 33m
+Score:      85/100 (Grade: A)
+Threats:    0 active
+Events:     134,567 processed
+Rules:      42 Sigma + 15 YARA
+Feeds:      5 active
+```
+
+## CLI Options
+
+```
+panguard guard <command> [options]
+
+Commands:
+  start              Start Guard engine
+  stop               Stop Guard engine
+  status             Show current status
+  install            Install as system service
+  uninstall          Remove system service
+  config             Show current configuration
+
+Options:
+  --data-dir <path>  Data directory (default: ~/.panguard-guard)
+```
+
+<CardGroup cols={2}>
+  <Card title="Monitors" icon="eye" href="/products/guard/monitors">
+    All 10 monitor types: built-in and advanced.
+  </Card>
+  <Card title="Event Correlation" icon="diagram-project" href="/products/guard/event-correlation">
+    7 correlation patterns for multi-step attack detection.
+  </Card>
+  <Card title="Auto-Response" icon="bolt" href="/products/guard/auto-response">
+    Response actions, safety rules, and escalation ladder.
+  </Card>
+  <Card title="Agent Pipeline" icon="arrow-right-arrow-left" href="/products/guard/agent-pipeline">
+    Deep dive into the 4-agent DARE pipeline.
+  </Card>
+</CardGroup>

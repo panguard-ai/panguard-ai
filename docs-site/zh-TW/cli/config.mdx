@@ -1,0 +1,67 @@
+---
+title: "panguard config"
+description: "檢視和編輯 Panguard CLI 設定。"
+icon: "gear"
+---
+
+`config` 指令開啟目前 Panguard 設定的互動式檢視，讓您能檢查和修改所有服務的設定 -- Guard、Scan、Chat、Trap 等。
+
+## 使用方式
+
+```bash
+panguard config
+```
+
+## 顯示內容
+
+執行 `panguard config` 會顯示 `~/.panguard/config.yaml` 中的活躍設定，包括：
+
+- **General** -- 語言、資料目錄、雲端端點
+- **Guard** -- 啟用的監控器、自動回應規則、學習期間
+- **Scan** -- 掃描器模組、輸出偏好、排程
+- **Chat** -- 通知頻道、嚴重性篩選、靜音時段
+- **Trap** -- 蜜罐服務、埠對應、雲端上傳設定
+- **Report** -- 預設框架、輸出格式、組織名稱
+
+## 範例
+
+<CodeGroup>
+```bash 檢視目前設定
+panguard config
+```
+</CodeGroup>
+
+<Tip>
+  如需直接編輯檔案，設定位於 `~/.panguard/config.yaml`。您可以使用任何文字編輯器編輯 -- 變更會在下次執行 Panguard 指令或 Guard 重新啟動時生效。
+</Tip>
+
+## 設定檔位置
+
+| 平台 | 預設路徑 |
+| --- | --- |
+| Linux | `~/.panguard/config.yaml` |
+| macOS | `~/.panguard/config.yaml` |
+| Windows (WSL) | `~/.panguard/config.yaml` |
+
+## 方案要求
+
+<Info>
+  適用於所有方案，包括 **Community（免費）**。
+</Info>
+
+## 相關資源
+
+<CardGroup cols={2}>
+  <Card title="Guard 設定" icon="shield" href="/configuration/guard-config">
+    詳細的 Guard 代理設定參考。
+  </Card>
+  <Card title="Chat 設定" icon="message-bot" href="/configuration/chat-config">
+    通知頻道設定參考。
+  </Card>
+  <Card title="環境變數" icon="list" href="/configuration/environment-variables">
+    使用環境變數覆寫設定檔值。
+  </Card>
+  <Card title="panguard init" icon="wand-magic-sparkles" href="/cli/init">
+    重新產生預設設定。
+  </Card>
+</CardGroup>

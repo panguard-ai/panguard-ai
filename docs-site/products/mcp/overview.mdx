@@ -1,0 +1,133 @@
+---
+title: "Panguard MCP Server"
+description: "Model Context Protocol server exposing 11 Panguard security tools to AI assistants like Claude Desktop, Cursor, and Windsurf."
+icon: "plug"
+---
+
+Panguard MCP implements the [Model Context Protocol](https://modelcontextprotocol.io) standard, allowing AI assistants to interact with your security infrastructure through natural language. Ask your AI to scan for vulnerabilities, check guard status, block malicious IPs, or generate compliance reports -- all through conversation.
+
+## Quick Start
+
+Add Panguard to your AI assistant's MCP configuration:
+
+<Tabs>
+  <Tab title="Claude Desktop">
+    Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+    ```json
+    {
+      "mcpServers": {
+        "panguard": {
+          "command": "npx",
+          "args": ["-y", "@panguard-ai/mcp"]
+        }
+      }
+    }
+    ```
+
+    Restart Claude Desktop after saving.
+  </Tab>
+  <Tab title="Cursor">
+    Add to your Cursor MCP settings (Settings > MCP Servers):
+
+    ```json
+    {
+      "panguard": {
+        "command": "npx",
+        "args": ["-y", "@panguard-ai/mcp"]
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Windsurf">
+    Add to your Windsurf MCP configuration:
+
+    ```json
+    {
+      "mcpServers": {
+        "panguard": {
+          "command": "npx",
+          "args": ["-y", "@panguard-ai/mcp"]
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Claude Code">
+    Add to your Claude Code MCP settings:
+
+    ```json
+    {
+      "mcpServers": {
+        "panguard": {
+          "command": "npx",
+          "args": ["-y", "@panguard-ai/mcp"]
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## What You Can Do
+
+Once configured, interact with Panguard through natural language:
+
+| Example Request | MCP Tool Used |
+|----------------|---------------|
+| "Scan this machine for vulnerabilities" | `panguard_scan` |
+| "Check my source code for security issues" | `panguard_scan_code` |
+| "Start real-time protection" | `panguard_guard_start` |
+| "Stop the Guard engine" | `panguard_guard_stop` |
+| "What is the current security status?" | `panguard_status` |
+| "Show me recent alerts" | `panguard_alerts` |
+| "Block IP 203.0.113.50" | `panguard_block_ip` |
+| "Generate a PDF security report" | `panguard_generate_report` |
+| "Initialize Panguard configuration" | `panguard_init` |
+| "Audit this skill directory for security" | `panguard_audit_skill` |
+| "Deploy full protection on this machine" | `panguard_deploy` |
+
+## 11 Available Tools
+
+| Tool | Category | Description |
+|------|----------|-------------|
+| `panguard_scan` | Scan | Run a security health check scan (quick or full) |
+| `panguard_scan_code` | Scan | SAST scan of source code directory |
+| `panguard_guard_start` | Guard | Start the real-time monitoring daemon |
+| `panguard_guard_stop` | Guard | Stop the monitoring daemon |
+| `panguard_status` | System | Get status of all Panguard services |
+| `panguard_alerts` | Guard | Get recent security alerts with severity filter |
+| `panguard_block_ip` | Guard | Manually block an IP address |
+| `panguard_generate_report` | Report | Generate a PDF compliance report |
+| `panguard_init` | System | Initialize Panguard configuration |
+| `panguard_audit_skill` | Scan | Audit an OpenClaw/AgentSkills directory |
+| `panguard_deploy` | System | One-click deploy: scan + guard + report |
+
+<Card title="Tools Reference" icon="wrench" href="/products/mcp/tools-reference">
+  Full parameter reference and examples for all 11 MCP tools.
+</Card>
+
+## Architecture
+
+```
+AI Assistant (Claude Desktop, Cursor, etc.)
+         |
+    MCP Protocol (stdio transport)
+         |
+   Panguard MCP Server (@panguard-ai/mcp)
+         |
+   ┌─────┼─────┬──────┬───────┐
+   Scan  Guard  Report  System
+```
+
+The MCP server runs as a local process, communicating with your AI assistant via stdio. All security operations execute locally on your machine -- no data is sent to external servers through the MCP channel.
+
+## Prerequisites
+
+- Panguard CLI installed (`panguard --version` to verify)
+- Node.js 20+ (for `npx` execution)
+- A valid Panguard account (some tools require Solo plan or above)
+
+<Note>
+  The MCP server respects the same plan restrictions as the CLI. Tools that require a specific plan tier will return an appropriate error if your plan does not include that feature.
+</Note>

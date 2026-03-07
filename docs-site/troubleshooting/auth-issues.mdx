@@ -1,0 +1,215 @@
+---
+title: "Authentication Issues"
+description: "Troubleshoot login, token, and credential problems with Panguard AI."
+icon: "lock"
+---
+
+## Browser Not Opening During Login
+
+When running `panguard login`, the CLI attempts to open your default browser for authentication. If the browser does not open:
+
+<AccordionGroup>
+  <Accordion title="Use --no-browser flag">
+    Skip the automatic browser launch and log in manually:
+
+    ```bash
+    panguard login --no-browser
+    ```
+
+    The CLI will print a URL. Copy and paste it into your browser manually, then enter the returned token in the CLI prompt.
+  </Accordion>
+  <Accordion title="SSH / Headless Environment">
+    On servers without a desktop environment, always use `--no-browser`:
+
+    ```bash
+    panguard login --no-browser
+    ```
+
+    Alternatively, log in on a machine with a browser and copy the credentials file:
+
+    ```bash
+    # On the machine with a browser:
+    panguard login
+    cat ~/.panguard/credentials.json
+
+    # On the server:
+    mkdir -p ~/.panguard
+    # Paste the credentials JSON into:
+    nano ~/.panguard/credentials.json
+    chmod 600 ~/.panguard/credentials.json
+    ```
+  </Accordion>
+  <Accordion title="WSL (Windows Subsystem for Linux)">
+    WSL may not be able to launch a Windows browser. Set the browser path:
+
+    ```bash
+    export BROWSER="/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
+    panguard login
+    ```
+
+    Or use `--no-browser` as described above.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Login Timeout
+
+If the login flow times out before you complete authentication:
+
+```
+Error: Login timed out. Please try again.
+```
+
+**Solutions:**
+
+1. Retry the login -- the default timeout is 120 seconds:
+   ```bash
+   panguard login
+   ```
+
+2. Check your internet connection -- the CLI must reach `auth.panguard.ai`
+
+3. If behind a corporate proxy, set the proxy environment variable:
+   ```bash
+   export HTTPS_PROXY=http://proxy.example.com:8080
+   panguard login
+   ```
+
+---
+
+## Token Expired
+
+```
+Error: Authentication token has expired. Please log in again.
+```
+
+JWT tokens expire after **24 hours**. Re-authenticate:
+
+```bash
+panguard login
+```
+
+<Tip>
+For automated scripts and CI/CD pipelines, use API tokens instead of JWT tokens. API tokens do not expire until explicitly revoked. Generate one from your account dashboard or with `panguard token create`.
+</Tip>
+
+---
+
+## Tier Insufficient
+
+```
+Error: This feature requires the Pro tier or higher. Current tier: community
+```
+
+Some features are restricted by subscription tier:
+
+| Feature | Minimum Tier |
+|---------|-------------|
+| Basic scan | Community |
+| Layer 1 Guard | Community |
+| Full Guard (3 layers) | Solo |
+| Chat notifications | Solo |
+| Trap (honeypots) | Pro |
+| Report generation | Pro |
+| Custom AI models | Business |
+| API access | Business |
+
+**Solutions:**
+
+1. Upgrade your subscription:
+   ```bash
+   panguard upgrade
+   ```
+
+2. Check your current tier:
+   ```bash
+   panguard whoami
+   ```
+
+3. If you recently upgraded, re-login to refresh your session:
+   ```bash
+   panguard logout
+   panguard login
+   ```
+
+---
+
+## Credentials File Permissions
+
+The credentials file at `~/.panguard/credentials.json` stores your authentication token. It should be readable only by your user.
+
+<Warning>
+If the credentials file has overly permissive permissions (readable by other users), Panguard will refuse to use it and display a security warning.
+</Warning>
+
+**Fix permissions:**
+
+<CodeGroup>
+```bash macOS / Linux
+chmod 600 ~/.panguard/credentials.json
+```
+
+```powershell Windows
+icacls "$HOME\.panguard\credentials.json" /inheritance:r /grant:r "$($env:USERNAME):F"
+```
+</CodeGroup>
+
+Verify:
+```bash
+ls -la ~/.panguard/credentials.json
+# Should show: -rw------- 1 youruser yourgroup ... credentials.json
+```
+
+---
+
+## Invalid or Corrupted Credentials
+
+If you see errors like `Error: Invalid token format` or `Error: Failed to parse credentials`:
+
+```bash
+# Remove the corrupted credentials file
+rm ~/.panguard/credentials.json
+
+# Log in again
+panguard login
+```
+
+---
+
+## Google OAuth Issues
+
+If Google login fails:
+
+<AccordionGroup>
+  <Accordion title="Popup blocked">
+    Allow popups from `auth.panguard.ai` in your browser settings.
+  </Accordion>
+  <Accordion title="Redirect URI mismatch">
+    This is a server-side configuration issue. Contact support if you encounter this on `auth.panguard.ai`.
+  </Accordion>
+  <Accordion title="Self-hosted auth server">
+    Ensure `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are correctly configured, and the redirect URI in your Google Cloud Console matches your auth server URL.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Two-Factor Authentication (2FA) Issues
+
+<AccordionGroup>
+  <Accordion title="Lost authenticator app">
+    Use one of your backup codes to log in:
+    ```bash
+    panguard login
+    # When prompted for TOTP code, enter a backup code instead
+    ```
+    Each backup code is single-use. After logging in, disable 2FA and re-enable it to get new backup codes.
+  </Accordion>
+  <Accordion title="TOTP code not accepted">
+    - Verify your device clock is synchronized (TOTP is time-based)
+    - Ensure you are using the code for the correct account
+    - Codes rotate every 30 seconds -- try waiting for the next code
+    - If the problem persists, use a backup code
+  </Accordion>
+</AccordionGroup>

@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import FadeInUp from '../FadeInUp';
-import { Shield, Cpu, Scale, Eye, GitBranch, Terminal, Globe } from 'lucide-react';
+import { Shield, Cpu, Scale, Eye, GitBranch, Terminal, Globe, Scan } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 interface CardData {
@@ -66,6 +66,11 @@ export default function WhyNowWhyUs() {
       title: t('whyUs.card4.title'),
       description: t('whyUs.card4.desc'),
     },
+    {
+      icon: Scan,
+      title: t('whyUs.card5.title'),
+      description: t('whyUs.card5.desc'),
+    },
   ];
 
   return (
@@ -104,7 +109,7 @@ export default function WhyNowWhyUs() {
             </div>
           </FadeInUp>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
             {whyUsCards.map((card, i) => (
               <Card key={card.title} card={card} delay={i * 0.1} />
             ))}

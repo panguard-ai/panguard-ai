@@ -1,0 +1,287 @@
+---
+title: "Guard Issues"
+description: "Troubleshoot Panguard Guard startup, performance, and detection problems."
+icon: "shield"
+---
+
+## Guard Already Running
+
+```
+Error: Panguard Guard is already running (PID: 12345)
+```
+
+Another instance of Guard is active. Stop it first:
+
+```bash
+# Stop the running instance
+sudo panguard guard stop
+
+# If stop fails, check and remove the PID file
+cat ~/.panguard-guard/guard.pid
+sudo kill $(cat ~/.panguard-guard/guard.pid)
+rm ~/.panguard-guard/guard.pid
+
+# Now start again
+sudo panguard guard start
+```
+
+<Warning>
+Do not run multiple Guard instances on the same machine. They will conflict on log file access, firewall rules, and monitoring resources.
+</Warning>
+
+If the PID file references a process that no longer exists (stale PID):
+
+```bash
+# Verify the process is actually gone
+ps -p $(cat ~/.panguard-guard/guard.pid)
+
+# If "no such process", safely remove the PID file
+rm ~/.panguard-guard/guard.pid
+sudo panguard guard start
+```
+
+---
+
+## Permission Denied
+
+```
+Error: EACCES: permission denied, open '/var/log/auth.log'
+```
+
+Guard requires root/admin privileges to read system logs and manage firewall rules.
+
+<Tabs>
+  <Tab title="Run with sudo">
+    ```bash
+    sudo panguard guard start
+    ```
+  </Tab>
+  <Tab title="Install as system service">
+    Install Guard as a systemd service that runs with appropriate privileges:
+
+    ```bash
+    sudo panguard guard install-service
+    sudo systemctl start panguard-guard
+    sudo systemctl enable panguard-guard
+    ```
+
+    Check service status:
+    ```bash
+    sudo systemctl status panguard-guard
+    ```
+  </Tab>
+  <Tab title="macOS launchd">
+    ```bash
+    sudo panguard guard install-service
+    sudo launchctl load /Library/LaunchDaemons/com.panguard.guard.plist
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## High Memory Usage
+
+If Guard consumes more memory than expected:
+
+<AccordionGroup>
+  <Accordion title="Check current usage">
+    ```bash
+    panguard status --verbose
+    ```
+
+    Normal memory ranges:
+
+    | Component | Typical Memory |
+    |-----------|---------------|
+    | Core agent | 50--100 MB |
+    | Sigma engine (3,000 rules) | ~50 MB |
+    | YARA engine (900 rules) | ~30 MB |
+    | AI analysis (local) | 100--500 MB |
+    | **Total** | **230--680 MB** |
+  </Accordion>
+  <Accordion title="Reduce memory usage">
+    1. **Disable unused monitors** -- Turn off monitoring for subsystems you do not need:
+       ```bash
+       panguard config set monitoring.dockerEvents false
+       panguard config set monitoring.kernelModules false
+       ```
+
+    2. **Reduce rule count** -- Disable rule categories you do not need:
+       ```bash
+       panguard config set rules.excludeCategories '["informational", "test"]'
+       ```
+
+    3. **Use remote AI instead of local** -- Switch from Ollama to a cloud AI provider to save the memory used by local models:
+       ```bash
+       export ANTHROPIC_API_KEY=sk-ant-...
+       # Stop Ollama if running
+       ```
+
+    4. **Increase garbage collection** -- For Node.js memory optimization:
+       ```bash
+       export NODE_OPTIONS="--max-old-space-size=512"
+       ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## False Positives
+
+If Guard generates too many alerts for legitimate activity:
+
+<AccordionGroup>
+  <Accordion title="Extend the learning period">
+    The default learning period is 7 days. If your workload is complex, extend it:
+
+    ```bash
+    panguard config set learningDays 14
+    ```
+
+    Reset learning data and restart:
+    ```bash
+    sudo panguard guard stop
+    panguard config set mode learning
+    sudo panguard guard start
+    ```
+  </Accordion>
+  <Accordion title="Adjust detection thresholds">
+    Increase the threshold for specific threat types:
+
+    ```bash
+    # Require more events before alerting on brute force
+    panguard config set response.minConfidence 0.90
+
+    # Increase SSH failure threshold
+    panguard config set rules.sshFailureThreshold 20
+    ```
+  </Accordion>
+  <Accordion title="Whitelist known-good IPs and processes">
+    Add trusted IPs and processes to the whitelist:
+
+    ```bash
+    # Whitelist an IP
+    panguard config set response.whitelistedIps '["10.0.0.0/8", "192.168.1.100"]'
+
+    # Whitelist a process
+    panguard config set response.whitelistedProcesses '["backup-agent", "monitoring-daemon"]'
+    ```
+  </Accordion>
+  <Accordion title="Disable noisy rules">
+    Identify and disable specific rules causing false positives:
+
+    ```bash
+    # Check recent alerts with rule IDs
+    panguard guard logs --severity low --limit 20
+
+    # Disable a specific rule
+    panguard config set rules.excludeIds '["sigma-noisy-001"]'
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Auto-Response Not Executing
+
+If Guard detects threats but does not take automated action:
+
+<AccordionGroup>
+  <Accordion title="Check tier requirements">
+    Auto-response requires **Solo tier or higher**. Community tier only supports detection, not automated response.
+
+    ```bash
+    panguard whoami
+    # If tier is "community", upgrade:
+    panguard upgrade
+    ```
+  </Accordion>
+  <Accordion title="Check confidence threshold">
+    Auto-response only triggers when the AI confidence score exceeds `minConfidence`:
+
+    ```bash
+    # Check current threshold
+    panguard config get response.minConfidence
+    ```
+
+    If detections are below the threshold, lower it carefully:
+    ```bash
+    panguard config set response.minConfidence 0.80
+    ```
+
+    <Warning>
+    Setting `minConfidence` below 0.7 significantly increases the risk of false positive responses (blocking legitimate IPs or killing legitimate processes).
+    </Warning>
+  </Accordion>
+  <Accordion title="Verify response is enabled">
+    ```bash
+    panguard config get response.enabled
+    panguard config get response.autoBlock
+    ```
+
+    Enable if disabled:
+    ```bash
+    panguard config set response.enabled true
+    panguard config set response.autoBlock true
+    ```
+  </Accordion>
+  <Accordion title="Check operating mode">
+    Auto-response does not execute in `learning` or `detect` modes:
+
+    ```bash
+    panguard config get mode
+    ```
+
+    Switch to `protect` mode:
+    ```bash
+    panguard config set mode protect
+    sudo panguard guard restart
+    ```
+  </Accordion>
+  <Accordion title="Check approval requirement">
+    If `requireApproval` is enabled, Guard sends approval requests instead of auto-executing:
+
+    ```bash
+    panguard config get response.requireApproval
+    # If true, check pending approvals:
+    panguard guard approvals
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Guard Crashes on Startup
+
+<AccordionGroup>
+  <Accordion title="Check logs">
+    ```bash
+    cat ~/.panguard-guard/logs/guard.log | tail -50
+    ```
+
+    Or with the CLI:
+    ```bash
+    panguard guard logs --limit 50
+    ```
+  </Accordion>
+  <Accordion title="Run diagnostics">
+    ```bash
+    panguard doctor
+    ```
+
+    This checks Node.js version, permissions, disk space, port availability, and configuration validity.
+  </Accordion>
+  <Accordion title="Reset configuration">
+    If the config file is corrupted:
+
+    ```bash
+    # Back up current config
+    cp ~/.panguard-guard/config.json ~/.panguard-guard/config.json.bak
+
+    # Reset to defaults
+    rm ~/.panguard-guard/config.json
+    sudo panguard guard start
+    ```
+  </Accordion>
+</AccordionGroup>

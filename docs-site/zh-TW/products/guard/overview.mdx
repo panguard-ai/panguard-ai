@@ -1,0 +1,147 @@
+---
+title: "Panguard Guard"
+description: "24/7 AI 驅動的即時威脅監控，搭配 DARE 管線、10 種監控類型、事件關聯及自動化回應。"
+icon: "shield"
+---
+
+Panguard Guard 是核心的運行時防護引擎。它使用 10 種監控類型全天候監控您的系統，透過 4 代理 DARE 管線（偵測、分析、回應、報告）處理每個安全事件，並根據信心評分對威脅採取自動化行動。
+
+## 快速開始
+
+```bash
+# 啟動 Guard（需要 Solo 方案或以上）
+panguard guard start
+
+# 檢查狀態（免費）
+panguard guard status
+
+# 停止 Guard
+panguard guard stop
+```
+
+## 運作模式
+
+Guard 以兩種模式運作，並自動切換：
+
+### 學習模式（第 1--7 天）
+
+在前 7 天，Guard 觀察您的系統以建立行為基準線：
+
+```
+Mode:       Learning (Day 3/7)
+Monitoring: processes, network, files
+Baseline:   42% complete
+```
+
+- 不產生警報（防止誤報）
+- 記錄正常的處理程序模式、網路連線、檔案活動
+- 透過 Chat 發送每日學習進度摘要
+
+### 防護模式（第 8 天以後）
+
+基準線建立後，Guard 切換到主動防護：
+
+```
+Mode:       Protection
+Score:      85/100 (Grade: A)
+Threats:    0 active
+Blocked:    12 IPs today
+```
+
+- 偏離基準線的行為觸發警報
+- 基於信心門檻的自動化回應
+- 透過 Chat 的即時通知
+
+## DARE 管線
+
+每個安全事件依序流經 4 個代理：
+
+```
+Event ──> Detect ──> Analyze ──> Respond ──> Report
+```
+
+| 代理 | 職責 |
+|-------|---------------|
+| **Detect** | 規則匹配（Sigma + YARA）、威脅情報查詢、去重、事件關聯 |
+| **Analyze** | 證據收集、加權信心評分、AI 推理、基準線偏差檢查 |
+| **Respond** | 動作執行（封鎖 IP、終止處理程序、隔離檔案）、安全檢查、升級 |
+| **Report** | JSONL 日誌記錄與輪替、基準線更新、Threat Cloud 匿名化資料 |
+
+<Card title="代理管線深入解析" icon="arrow-right-arrow-left" href="/products/guard/agent-pipeline">
+  每個代理的輸入、輸出和決策邏輯的詳細分析。
+</Card>
+
+## 偵測層
+
+Guard 使用 3 層 AI 偵測漏斗以最小化延遲和成本：
+
+| 層級 | 引擎 | 成本 | 延遲 | 流量 |
+|-------|--------|------|---------|---------|
+| **第 1 層** | Sigma 規則、YARA、內建模式、威脅情報 | $0 | < 1 ms | 約 90% 的事件 |
+| **第 2 層** | Ollama（本地 AI） | $0 | 約 100 ms | 約 7% 的事件 |
+| **第 3 層** | Claude / OpenAI（雲端 AI） | 約 $0.01/事件 | 約 1 秒 | 約 3% 的事件 |
+
+只有在較低層級無法解決的事件才會升級到下一層。
+
+## 主要功能
+
+| 功能 | 詳細資訊 |
+|-----------|---------|
+| **監控類型** | 10 種（4 種內建 + 6 種進階） |
+| **Sigma 規則** | 20 條內建 + 自訂 + 社群 |
+| **YARA 規則** | 900+ 檔案模式匹配規則 |
+| **威脅情報來源** | 5 個來源（ThreatFox、URLhaus、Feodo、GreyNoise、AbuseIPDB） |
+| **關聯模式** | 7 種攻擊模式搭配 MITRE ATT&CK 對應 |
+| **回應動作** | IP 封鎖、處理程序終止、檔案隔離、通知、記錄 |
+| **跨平台** | macOS (pfctl)、Linux (iptables)、Windows (netsh) |
+| **日誌保留** | 每個檔案 50 MB、10 個輪替檔案、90 天保留期 |
+
+## 狀態儀表板
+
+```bash
+panguard guard status
+```
+
+```
+Status:     Running
+Mode:       Protection
+PID:        12345
+Uptime:     14d 6h 33m
+Score:      85/100 (Grade: A)
+Threats:    0 active
+Events:     134,567 processed
+Rules:      42 Sigma + 15 YARA
+Feeds:      5 active
+```
+
+## CLI 選項
+
+```
+panguard guard <command> [options]
+
+Commands:
+  start              啟動 Guard 引擎
+  stop               停止 Guard 引擎
+  status             顯示目前狀態
+  install            安裝為系統服務
+  uninstall          移除系統服務
+  config             顯示目前設定
+
+Options:
+  --data-dir <path>  資料目錄（預設：~/.panguard-guard）
+```
+
+<CardGroup cols={2}>
+  <Card title="監控器" icon="eye" href="/products/guard/monitors">
+    所有 10 種監控類型：內建與進階。
+  </Card>
+  <Card title="事件關聯" icon="diagram-project" href="/products/guard/event-correlation">
+    7 種關聯模式用於多步驟攻擊偵測。
+  </Card>
+  <Card title="自動回應" icon="bolt" href="/products/guard/auto-response">
+    回應動作、安全規則及升級階梯。
+  </Card>
+  <Card title="代理管線" icon="arrow-right-arrow-left" href="/products/guard/agent-pipeline">
+    4 代理 DARE 管線的深入探討。
+  </Card>
+</CardGroup>

@@ -1,0 +1,237 @@
+---
+title: "Real-Time Protection"
+description: "Set up Panguard Guard for continuous monitoring, learn how the 7-day learning period works, and configure automated threat response."
+icon: "shield"
+---
+
+# Real-Time Protection
+
+Panguard Guard runs 24/7 on your system, monitoring processes, network connections, files, and logs. It uses a four-agent AI pipeline to detect, analyze, respond to, and report on security threats in real time.
+
+---
+
+## Quick Start
+
+<Steps>
+  <Step title="Log In">
+    Guard requires the Solo tier or above:
+
+    ```bash
+    panguard login
+    ```
+  </Step>
+  <Step title="Start Guard">
+    ```bash
+    panguard guard start
+    ```
+
+    Guard enters **learning mode** for the first 7 days, observing your system's normal behavior.
+  </Step>
+  <Step title="Check Status">
+    ```bash
+    panguard guard status
+    ```
+
+    ```
+      -- Guard Status -----------------------
+
+      Status:     Running
+      Mode:       Learning (Day 3/7)
+      PID:        12345
+      Uptime:     3d 14h 22m
+      Events:     12,847 observed
+      Baseline:   42% complete
+    ```
+  </Step>
+  <Step title="Wait for Protection Mode">
+    After 7 days, Guard automatically transitions to **protection mode** and begins active threat detection and response.
+  </Step>
+</Steps>
+
+---
+
+## Learning Mode (Days 1-7)
+
+During the learning period, Guard silently observes and records:
+
+- **Processes** -- Which programs normally run, startup times, resource usage
+- **Network** -- Normal connection patterns, common ports, traffic characteristics
+- **Files** -- Change patterns in critical directories
+- **Users** -- Login times, source IPs, operational patterns
+
+<Info>
+Guard does not generate alerts during learning mode. This prevents the flood of false positives that makes most security tools useless. You receive a daily learning progress summary via Chat.
+</Info>
+
+---
+
+## Protection Mode (Day 8+)
+
+Once the baseline is established, Guard activates full protection:
+
+- Events that deviate from the baseline trigger alerts
+- The three-layer AI funnel analyzes suspicious events
+- Automated or manual responses based on confidence level
+- Real-time notifications via your configured Chat channel
+
+### Confidence-Based Response
+
+| Confidence | Action | Example |
+| --- | --- | --- |
+| > 90% | Auto-execute, notify after | Known malicious IP automatically blocked |
+| 70-90% | Ask for confirmation via Chat | Suspicious process -- asks if you want to terminate |
+| < 70% | Notify only | Minor anomaly -- informs you for observation |
+
+---
+
+## The Four-Agent Pipeline
+
+Every security event flows through four specialized agents:
+
+```
+  Event -> [Detect] -> [Analyze] -> [Respond] -> [Report]
+```
+
+| Agent | Role |
+| --- | --- |
+| **DetectAgent** | Rule matching (Sigma + YARA), threat intelligence lookup, event correlation |
+| **AnalyzeAgent** | Evidence collection, weighted confidence scoring, AI reasoning via three-layer funnel |
+| **RespondAgent** | Action execution (block IP, kill process, isolate file), safety checks, escalation |
+| **ReportAgent** | Event logging, baseline updates, anonymized data for Threat Cloud |
+
+---
+
+## Response Actions
+
+Guard can execute the following response actions automatically:
+
+| Action | Description | Platform Support |
+| --- | --- | --- |
+| **IP Block** | Block malicious IP addresses | macOS (pfctl), Linux (iptables), Windows (netsh) |
+| **File Isolation** | Quarantine suspicious files with SHA-256 record | All platforms |
+| **Process Termination** | Kill malicious processes (SIGTERM, then SIGKILL after 5s) | All platforms |
+
+### Safety Protections
+
+Guard includes built-in safety rules to prevent accidental damage:
+
+- **Whitelisted IPs:** `127.0.0.1`, `::1`, `localhost`, `0.0.0.0` (plus user-configured)
+- **Protected processes:** `sshd`, `systemd`, `init`, `launchd`, `node`, `panguard-guard`
+- **Protected accounts:** `root`, `Administrator`, `SYSTEM`
+- **Network isolation** requires confidence >= 95%
+- **Self-process kill** prevention
+
+---
+
+## Integrated Threat Intelligence
+
+Guard automatically queries 5 threat intelligence feeds:
+
+- **ThreatFox** -- IoC database (IPs, domains, URLs, file hashes)
+- **URLhaus** -- Malware distribution URLs
+- **Feodo Tracker** -- C2 server tracking
+- **GreyNoise** -- IP reputation (targeted vs. mass scanning)
+- **AbuseIPDB** -- Community-reported malicious IPs
+
+Feeds update every 6 hours with local caching to avoid redundant queries.
+
+---
+
+## Rule Engine
+
+### Sigma Rules
+
+Guard ships with 3000+ bundled Sigma rules. You can also add custom rules:
+
+```yaml
+# Custom rule: Detect mass SSH login failures
+title: SSH Brute Force Attempt
+logsource:
+  category: authentication
+  product: any
+detection:
+  selection:
+    event_type: login_failed
+    service: ssh
+  condition: selection
+level: high
+```
+
+Place `.yml` files in Guard's rules directory. Guard automatically loads new rules with hot reload support.
+
+### YARA Rules
+
+For file-level malware detection:
+
+```yara
+rule WebShell {
+  strings:
+    $php = "<?php eval(" nocase
+    $asp = "<%execute(" nocase
+  condition:
+    any of them
+}
+```
+
+---
+
+## Managing Guard
+
+```bash
+# Start Guard
+panguard guard start
+
+# Check status
+panguard guard status
+
+# Stop Guard
+panguard guard stop
+
+# View current configuration
+panguard guard config
+
+# Install as system service (auto-start on boot)
+panguard guard install
+```
+
+<Tip>
+For production environments, install Guard as a system service so it starts automatically on boot and restarts on failure. See the [System Service guide](/guides/system-service).
+</Tip>
+
+---
+
+## CLI Reference
+
+```
+panguard guard <command> [options]
+
+Commands:
+  start              Start the Guard engine
+  stop               Stop the Guard engine
+  status             Display status
+  install            Install as system service
+  uninstall          Remove system service
+  config             Display current configuration
+
+Options:
+  --data-dir <path>  Data directory (default: ~/.panguard-guard)
+```
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Learning Mode" icon="graduation-cap" href="/concepts/learning-mode">
+    Deep dive into the 7-day learning period and baseline building.
+  </Card>
+  <Card title="Three-Layer AI Funnel" icon="brain-circuit" href="/concepts/three-layer-ai">
+    How rules, local AI, and cloud AI work together.
+  </Card>
+  <Card title="System Service" icon="gear" href="/guides/system-service">
+    Install Guard as a systemd/launchd service.
+  </Card>
+  <Card title="Notification Setup" icon="bell" href="/guides/notifications-setup">
+    Configure how Guard notifies you about threats.
+  </Card>
+</CardGroup>

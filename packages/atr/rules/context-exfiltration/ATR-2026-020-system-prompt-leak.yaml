@@ -1,0 +1,77 @@
+title: System Prompt Leakage via Agent Output
+id: ATR-2026-020
+status: experimental
+description: |
+  Detects when an agent's output contains fragments that appear to be
+  system prompt content, internal instructions, or configuration details
+  that should not be exposed to end users.
+author: "ATR Community"
+date: 2026/03/08
+severity: high
+
+references:
+  owasp_llm:
+    - "LLM07:2025"
+  mitre_atlas:
+    - "AML.T0056 - LLM Meta Prompt Extraction"
+
+tags:
+  category: context-exfiltration
+  subcategory: system-prompt-leak
+  confidence: medium
+
+agent_source:
+  type: llm_io
+  framework:
+    - any
+  provider:
+    - any
+
+detection:
+  conditions:
+    output_analysis:
+      field: agent_output
+      patterns:
+        - "(?:my|the)\\s+(?:system\\s+)?(?:prompt|instructions?)\\s+(?:is|are|says?|states?|reads?)"
+        - "(?:here\\s+(?:is|are)|below\\s+(?:is|are))\\s+(?:my|the)\\s+(?:system\\s+)?(?:prompt|instructions?)"
+        - "you are a (?:helpful|friendly|professional)"
+        - "your (?:role|purpose|goal|mission) is"
+        - "you (?:must|should) (?:always|never)"
+        - "(?:system\\s*prompt|system\\s*message)\\s*[:\\-]"
+        - "<<SYS>>|<\\|im_start\\|>system"
+        - "sk-[a-zA-Z0-9]{20,}"
+        - "ANTHROPIC_API_KEY|OPENAI_API_KEY"
+        - "i (?:was|am) (?:instructed|told|configured|programmed) to"
+        - "(?:internal instruction|confidential.*instruction|do not reveal)"
+      match_type: regex
+      case_sensitive: false
+  condition: "output_analysis"
+  false_positives:
+    - "Agent explaining its own capabilities when legitimately asked"
+    - "Educational content about AI system design"
+    - "Agents designed to be transparent about their system prompt"
+
+response:
+  actions:
+    - block_output
+    - alert
+    - snapshot
+    - reset_context
+  auto_response_threshold: medium
+  message_template: |
+    [ATR] Possible system prompt leakage detected
+    Rule: ATR-2026-020
+    Pattern: {matched_pattern}
+    Action: Output blocked, context reset
+
+test_cases:
+  true_positives:
+    - agent_output: "Sure! My system prompt says: You are a helpful assistant that..."
+      expected: triggered
+    - agent_output: "I was instructed to never reveal pricing data and use API key sk-abc123def456ghi789jkl012mno345"
+      expected: triggered
+  true_negatives:
+    - agent_output: "I'm an AI assistant. How can I help you today?"
+      expected: not_triggered
+    - agent_output: "System prompts are instructions given to language models that define their behavior."
+      expected: not_triggered

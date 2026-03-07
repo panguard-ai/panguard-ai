@@ -1,0 +1,67 @@
+---
+title: "panguard config"
+description: "View and edit the Panguard CLI configuration."
+icon: "gear"
+---
+
+The `config` command opens an interactive view of your current Panguard configuration, allowing you to inspect and modify settings for all services -- Guard, Scan, Chat, Trap, and more.
+
+## Usage
+
+```bash
+panguard config
+```
+
+## What It Shows
+
+Running `panguard config` displays the active configuration from `~/.panguard/config.yaml`, including:
+
+- **General** -- language, data directory, cloud endpoint
+- **Guard** -- monitors enabled, auto-response rules, learning period
+- **Scan** -- scanner modules, output preferences, schedules
+- **Chat** -- notification channels, severity filters, quiet hours
+- **Trap** -- honeypot services, port mappings, cloud upload settings
+- **Report** -- default framework, output format, organization name
+
+## Examples
+
+<CodeGroup>
+```bash View current configuration
+panguard config
+```
+</CodeGroup>
+
+<Tip>
+  For direct file editing, the configuration lives at `~/.panguard/config.yaml`. You can edit it with any text editor -- changes take effect the next time a Panguard command runs or when Guard is restarted.
+</Tip>
+
+## Configuration File Location
+
+| Platform | Default Path |
+| --- | --- |
+| Linux | `~/.panguard/config.yaml` |
+| macOS | `~/.panguard/config.yaml` |
+| Windows (WSL) | `~/.panguard/config.yaml` |
+
+## Plan Requirements
+
+<Info>
+  Available on all plans including **Community (Free)**.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Guard Configuration" icon="shield" href="/configuration/guard-config">
+    Detailed Guard agent configuration reference.
+  </Card>
+  <Card title="Chat Configuration" icon="message-bot" href="/configuration/chat-config">
+    Notification channel configuration reference.
+  </Card>
+  <Card title="Environment Variables" icon="list" href="/configuration/environment-variables">
+    Override config file settings with environment variables.
+  </Card>
+  <Card title="panguard init" icon="wand-magic-sparkles" href="/cli/init">
+    Regenerate default configuration.
+  </Card>
+</CardGroup>

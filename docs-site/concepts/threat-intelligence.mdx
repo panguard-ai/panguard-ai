@@ -1,0 +1,236 @@
+---
+title: "Threat Intelligence"
+description: "Real-time threat intelligence feeds and the Threat Cloud collective intelligence network."
+icon: "globe"
+---
+
+# Threat Intelligence
+
+Threat intelligence provides structured information about known attackers, malicious IPs, domains, URLs, and malware signatures. Panguard automatically queries these databases to determine whether activity on your system is linked to known threats.
+
+<Info>
+You do not need to understand the technical details. Guard handles the queries automatically, and Chat explains the results in plain language.
+</Info>
+
+---
+
+## 5 Built-in Threat Intelligence Feeds
+
+### abuse.ch Suite
+
+| Source | Indicator Types | Description |
+| --- | --- | --- |
+| [ThreatFox](https://threatfox.abuse.ch) | IP, domain, URL, hash | Database of indicators of compromise (IoCs) linked to malware campaigns |
+| [URLhaus](https://urlhaus.abuse.ch) | URL | Database of malware distribution URLs |
+| [Feodo Tracker](https://feodotracker.abuse.ch) | IP | Botnet Command and Control (C2) server tracking |
+
+### Additional Sources
+
+| Source | Indicator Types | Description |
+| --- | --- | --- |
+| [GreyNoise](https://greynoise.io) | IP | Distinguishes targeted attacks from mass internet scanning |
+| [AbuseIPDB](https://abuseipdb.com) | IP | Community-reported malicious IP database with confidence scoring |
+
+---
+
+## Feed Update Schedule
+
+| Feed | Update Frequency | Query Type |
+| --- | --- | --- |
+| ThreatFox | Every 6 hours | Cached locally |
+| URLhaus | Every 6 hours | Cached locally |
+| Feodo Tracker | Every 6 hours | Cached locally |
+| GreyNoise | Real-time per query | API call |
+| AbuseIPDB | Real-time per query | API call |
+
+<Tip>
+The 6-hour update interval is configurable. For high-security environments, you can reduce it to 1 hour. For bandwidth-constrained systems, increase it to 24 hours.
+</Tip>
+
+### Local Caching
+
+Query results are cached locally to avoid redundant lookups:
+
+- Cache duration: 1-24 hours depending on the source
+- Cache location: Guard data directory
+- Expired entries are cleaned up automatically
+
+---
+
+## Indicators of Compromise (IoCs)
+
+Threat intelligence tracks the following types of indicators:
+
+| Type | Description | Example |
+| --- | --- | --- |
+| **IP Address** | Known malicious IP | `203.0.113.50` |
+| **Domain** | Malicious domain name | `malware.example.com` |
+| **URL** | Malicious URL | `http://evil.com/payload.exe` |
+| **File Hash** | Malware fingerprint (SHA-256) | `e3b0c44298fc1c149a...` |
+| **Email** | Phishing email address | `phish@attacker.com` |
+
+### Automatic Querying
+
+Guard automatically queries threat intelligence when it detects suspicious activity:
+
+```
+Suspicious IP 203.0.113.50 connection detected
+       |
+       v
+  Query ThreatFox  -> Known C2 server
+  Query AbuseIPDB  -> Reported 1,247 times
+  Query GreyNoise  -> Mass scanner
+       |
+       v
+  Conclusion: High risk -- auto-block + notify
+```
+
+---
+
+## Threat Cloud -- Collective Intelligence
+
+Beyond public feeds, Panguard users contribute to and benefit from the Threat Cloud, a community-driven collective intelligence network.
+
+```
+  Your Panguard           Threat Cloud          Other Users' Panguard
+       |                      |                         |
+  Detect threat  --upload-->  Collect+Verify  --push-->  Preemptive protection
+```
+
+### How It Works
+
+1. Your Guard detects a new threat indicator
+2. The indicator is anonymized and uploaded to Threat Cloud
+3. Threat Cloud verifies and correlates across all submissions
+4. Verified indicators are distributed to all participating Panguard instances
+
+### IoC Reputation Scoring
+
+Every indicator in Threat Cloud receives a reputation score from 0 to 100:
+
+| Score Range | Classification | Action |
+| --- | --- | --- |
+| 80-100 | Confirmed malicious | Auto-block eligible |
+| 50-79 | Suspicious | Alert + manual review |
+| 20-49 | Low confidence | Monitor only |
+| 0-19 | Informational | Logged, no action |
+
+### Campaign Tracking and Correlation
+
+Threat Cloud correlates indicators across submissions to identify attack campaigns:
+
+- Multiple users reporting the same IP within a time window triggers campaign detection
+- Campaign indicators receive an elevated reputation score
+- Related indicators (same ASN, same domain family) are linked automatically
+
+---
+
+## Privacy and Data Protection
+
+<Warning>
+**Privacy guarantee:** Only threat indicators (IPs, hashes, patterns) are uploaded. No system information, usernames, internal IPs, file contents, or personally identifiable information is ever shared.
+</Warning>
+
+| Privacy Measure | Details |
+| --- | --- |
+| **IP anonymization** | Source IPs are /16-anonymized before upload |
+| **GDPR compliance** | No personal data is collected or stored |
+| **Zero raw data** | No log content, file content, or system details are transmitted |
+| **Zero telemetry** | No usage analytics, crash reports, or behavioral tracking |
+| **Opt-out available** | Threat Cloud can be fully disabled |
+
+---
+
+## Offline Mode
+
+Panguard works fully offline. When threat intelligence feeds are unreachable:
+
+- Layer 1 rule engine continues operating with locally cached rules
+- Previously cached feed data remains available until expiration
+- New detections rely on Sigma/YARA rules and behavioral baselines only
+- Score adjustments reflect reduced intelligence coverage
+
+```bash
+# Disable all external intelligence (rules-only mode)
+panguard guard start --offline
+```
+
+<Note>
+Offline mode disables Threat Cloud participation and real-time feed queries. Cached data is still used until it expires.
+</Note>
+
+---
+
+## Viewing Threat Intelligence
+
+### Guard Status
+
+```bash
+panguard guard status
+```
+
+```
+  -- Threat Intelligence --------------------
+
+  Feeds:        5 active, last update 2h ago
+  IoC matched:  3 in last 24h
+  Blocked IPs:  12 total
+```
+
+### Chat Notifications
+
+When threat intelligence matches activity on your system, Chat notifies you in a format tailored to your user role:
+
+<Tabs>
+  <Tab title="Boss Role">
+    ```
+    [Panguard AI Security Alert]
+
+    Your server was communicating with a known malicious server.
+    That IP has been reported 1,247 times globally.
+    The connection has been automatically blocked. No action needed.
+
+    Risk level: High
+    Status: Automatically resolved
+    ```
+  </Tab>
+  <Tab title="Developer Role">
+    ```
+    [Panguard AI Alert]
+
+    Threat Intel Match: 203.0.113.50
+    Source: AbuseIPDB (confidence: 98%), ThreatFox (tag: C2)
+    Process: curl (PID 5678) -> 203.0.113.50:443
+    Action: IP blocked via iptables
+    Rule: sigma/network/c2-communication.yml
+    ```
+  </Tab>
+  <Tab title="IT Admin Role">
+    ```
+    [Panguard AI - Remediation Guide]
+
+    Event: Communication with known C2 server detected
+    Severity: High
+    Action taken: Auto-blocked IP 203.0.113.50
+
+    Recommended next steps:
+    1. Check if process curl (PID 5678) is legitimate
+    2. If not, terminate: kill -9 5678
+    3. Check for other processes connecting to the same IP
+    4. Run a system scan: panguard scan
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Threat Cloud Deployment" icon="cloud" href="/guides/threat-cloud-deployment">
+    Deploy your own private Threat Cloud server.
+  </Card>
+  <Card title="Three-Layer AI Funnel" icon="brain-circuit" href="/concepts/three-layer-ai">
+    How threat intelligence integrates with the detection pipeline.
+  </Card>
+</CardGroup>

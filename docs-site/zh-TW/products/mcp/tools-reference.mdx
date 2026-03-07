@@ -1,0 +1,231 @@
+---
+title: "MCP 工具參考"
+description: "所有 11 個 Panguard MCP 工具的完整參數參考和使用範例。"
+icon: "wrench"
+---
+
+本頁記錄 Panguard MCP 伺服器暴露的每個工具。每個工具包含其描述、輸入結構描述和使用範例。
+
+---
+
+## panguard_scan
+
+在本地系統上執行安全健康檢查掃描。回傳風險評分（0--100）、等級（A--F）和安全發現項目列表。
+
+<ParamField path="depth" type="string" default="quick">
+  掃描深度：`quick`（約 30 秒）或 `full`（約 60 秒）。
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  輸出語言：`en` 或 `zh-TW`。
+</ParamField>
+
+**範例提示：**「以中文在這台機器上執行完整安全掃描。」
+
+**範例回應：** 風險評分 72/100（等級 C），8 項發現（1 項嚴重、2 項高、3 項中、2 項低）。
+
+---
+
+## panguard_scan_code
+
+掃描原始碼目錄以尋找安全漏洞（SAST）。偵測 SQL 注入、XSS、硬編碼密鑰、命令注入等。
+
+<ParamField path="dir" type="string" required>
+  要掃描的原始碼目錄。絕對或相對路徑。
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  輸出語言：`en` 或 `zh-TW`。
+</ParamField>
+
+**範例提示：**「檢查 ./src 目錄是否有安全漏洞。」
+
+---
+
+## panguard_guard_start
+
+啟動 Panguard Guard 即時威脅監控常駐程式。
+
+<ParamField path="dataDir" type="string">
+  資料目錄路徑。預設為 `~/.panguard-guard`。
+</ParamField>
+
+<ParamField path="mode" type="string">
+  運作模式：`learning` 或 `protection`。
+</ParamField>
+
+**範例提示：**「以學習模式啟動即時防護。」
+
+---
+
+## panguard_guard_stop
+
+停止 Panguard Guard 常駐程式。
+
+<ParamField path="dataDir" type="string">
+  資料目錄路徑。預設為 `~/.panguard-guard`。
+</ParamField>
+
+**範例提示：**「停止 Guard 引擎。」
+
+---
+
+## panguard_status
+
+取得所有 Panguard 服務（Guard、Scan、Manager）的目前狀態。回傳執行狀態、威脅數量和系統資訊。
+
+<ParamField path="dataDir" type="string">
+  資料目錄路徑。預設為 `~/.panguard-guard`。
+</ParamField>
+
+**範例提示：**「這台機器目前的安全狀態是什麼？」
+
+**回傳：** Guard 執行狀態、模式、運行時間、安全評分、活躍威脅、已處理事件。
+
+---
+
+## panguard_alerts
+
+取得 Panguard Guard 偵測到的最近安全警報。回傳最新的威脅事件搭配嚴重性和詳情。
+
+<ParamField path="limit" type="number" default="20">
+  回傳的最大警報數量。
+</ParamField>
+
+<ParamField path="severity" type="string" default="all">
+  按嚴重性篩選：`critical`、`high`、`medium`、`low` 或 `all`。
+</ParamField>
+
+<ParamField path="dataDir" type="string">
+  資料目錄路徑。預設為 `~/.panguard-guard`。
+</ParamField>
+
+**範例提示：**「顯示最近 5 個嚴重警報。」
+
+---
+
+## panguard_block_ip
+
+手動封鎖一個 IP 位址，禁止其存取系統。
+
+<ParamField path="ip" type="string" required>
+  要封鎖的 IP 位址（IPv4 或 IPv6）。
+</ParamField>
+
+<ParamField path="duration" type="string" default="1h">
+  封鎖持續時間。範例：`1h`、`24h`、`permanent`。
+</ParamField>
+
+<ParamField path="reason" type="string">
+  封鎖原因（儲存於動作清單中）。
+</ParamField>
+
+**範例提示：**「封鎖 IP 203.0.113.50 24 小時，因為它正在進行埠掃描。」
+
+---
+
+## panguard_generate_report
+
+從掃描結果產生 PDF 合規報告。回傳產生的 PDF 路徑。
+
+<ParamField path="output" type="string" default="./panguard-report.pdf">
+  輸出 PDF 檔案路徑。
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  報告語言：`en` 或 `zh-TW`。
+</ParamField>
+
+<ParamField path="depth" type="string" default="full">
+  底層掃描的掃描深度：`quick` 或 `full`。
+</ParamField>
+
+**範例提示：**「產生繁體中文的 PDF 安全報告。」
+
+---
+
+## panguard_init
+
+以預設值初始化 Panguard 設定（非互動模式）。
+
+<ParamField path="dataDir" type="string">
+  資料目錄路徑。預設為 `~/.panguard-guard`。
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  預設語言：`en` 或 `zh-TW`。
+</ParamField>
+
+<ParamField path="mode" type="string" default="learning">
+  初始運作模式：`learning` 或 `protection`。
+</ParamField>
+
+**範例提示：**「以中文語言預設值初始化 Panguard。」
+
+---
+
+## panguard_audit_skill
+
+稽核 OpenClaw/AgentSkills `SKILL.md` 目錄以尋找安全問題。檢查清單有效性、提示注入、工具投毒、程式碼漏洞、依賴和權限。
+
+<ParamField path="path" type="string" required>
+  包含 `SKILL.md` 的 skill 目錄路徑。
+</ParamField>
+
+**回傳：** 風險評分（0--100）和涵蓋以下方面的詳細發現：
+- 清單有效性
+- 提示注入偵測
+- 工具投毒分析
+- 程式碼漏洞掃描
+- 依賴稽核
+- 權限審查
+
+**範例提示：**「稽核 ./my-agent-skill 的安全問題。」
+
+---
+
+## panguard_deploy
+
+部署 Panguard 服務：掃描漏洞、啟動 Guard 監控，並產生初始報告。這是完整防護的一鍵設定。
+
+<ParamField path="dataDir" type="string">
+  資料目錄路徑。預設為 `~/.panguard-guard`。
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  語言：`en` 或 `zh-TW`。
+</ParamField>
+
+<ParamField path="mode" type="string" default="learning">
+  初始 Guard 模式：`learning` 或 `protection`。
+</ParamField>
+
+<ParamField path="generateReport" type="boolean" default="true">
+  掃描後是否產生 PDF 報告。
+</ParamField>
+
+**範例提示：**「在這台機器上部署完整防護並產生 PDF 報告。」
+
+**執行：** `panguard scan` + `panguard guard start` + `panguard scan --output report.pdf`
+
+---
+
+## 各方案的工具可用性
+
+| 工具 | Community | Solo | Pro | Business |
+|------|-----------|------|-----|----------|
+| `panguard_scan` | 是 | 是 | 是 | 是 |
+| `panguard_scan_code` | 是 | 是 | 是 | 是 |
+| `panguard_guard_start` | -- | 是 | 是 | 是 |
+| `panguard_guard_stop` | -- | 是 | 是 | 是 |
+| `panguard_status` | 是 | 是 | 是 | 是 |
+| `panguard_alerts` | -- | 是 | 是 | 是 |
+| `panguard_block_ip` | -- | 是 | 是 | 是 |
+| `panguard_generate_report` | -- | -- | 是 | 是 |
+| `panguard_init` | 是 | 是 | 是 | 是 |
+| `panguard_audit_skill` | 是 | 是 | 是 | 是 |
+| `panguard_deploy` | -- | 是 | 是 | 是 |
+
+<Tip>
+  所有工具都回傳結構化 JSON 回應，AI 助手可以解析並以自然語言呈現。回應中的 `isError` 欄位表示操作是成功還是失敗。
+</Tip>

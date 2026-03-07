@@ -1,0 +1,271 @@
+---
+title: "代理管理"
+description: "在您的機群中註冊、監控和管理 Panguard Guard 代理。"
+icon: "server"
+---
+
+代理管理端點處理 Guard 代理的完整生命週期：註冊、心跳監控、查詢和取消註冊。
+
+## POST /api/agents/register
+
+向 Manager 註冊新的代理。通常在 `panguard guard start` 運行時自動呼叫。
+
+<ParamField body="hostname" type="string" required>
+  機器主機名稱。
+</ParamField>
+
+<ParamField body="os" type="string" required>
+  作業系統識別碼（例如 `linux`、`darwin`、`win32`）。
+</ParamField>
+
+<ParamField body="version" type="string" required>
+  在代理上運行的 Panguard Guard 版本。
+</ParamField>
+
+<ParamField body="ip" type="string">
+  代理的 IP 位址。如果未提供，會從請求中自動偵測。
+</ParamField>
+
+<ParamField body="org_id" type="string">
+  用於多租戶部署的組織 ID。
+</ParamField>
+
+<ParamField body="tags" type="string[]">
+  用於分組和篩選的選用標籤（例如 `["production", "web-tier"]`）。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://localhost:8443/api/agents/register \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "hostname": "web-server-1",
+    "os": "linux",
+    "version": "1.2.0",
+    "tags": ["production", "web-tier"]
+  }'
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 201
+{
+  "ok": true,
+  "data": {
+    "id": "agent-a1b2c3d4",
+    "hostname": "web-server-1",
+    "os": "linux",
+    "version": "1.2.0",
+    "ip": "203.0.113.10",
+    "tags": ["production", "web-tier"],
+    "status": "online",
+    "registeredAt": "2026-03-07T12:00:00.000Z"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## POST /api/agents/:id/heartbeat
+
+發送心跳以確認代理存活。超過設定逾時未發送心跳的代理會被標記為 `stale`。
+
+<ParamField path="id" type="string" required>
+  註冊時回傳的代理 ID。
+</ParamField>
+
+<ParamField body="uptime" type="number">
+  代理運行時間（秒）。
+</ParamField>
+
+<ParamField body="cpu" type="number">
+  目前 CPU 使用率百分比（0--100）。
+</ParamField>
+
+<ParamField body="memory" type="number">
+  目前記憶體使用率百分比（0--100）。
+</ParamField>
+
+<ParamField body="version" type="string">
+  目前 Panguard Guard 版本（用於追蹤升級）。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://localhost:8443/api/agents/agent-a1b2c3d4/heartbeat \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "uptime": 86400,
+    "cpu": 12.5,
+    "memory": 45.2,
+    "version": "1.2.0"
+  }'
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "id": "agent-a1b2c3d4",
+    "status": "online",
+    "lastHeartbeat": "2026-03-07T12:05:00.000Z",
+    "pendingPolicies": 1
+  }
+}
+```
+</ResponseExample>
+
+<Info>
+回應包含 `pendingPolicies` 計數，讓代理知道何時需要取得新的策略規則。心跳間隔預設為 60 秒，可透過 `MANAGER_HEARTBEAT_TIMEOUT_MS` 設定。
+</Info>
+
+---
+
+## DELETE /api/agents/:id
+
+取消註冊代理並將其從機群中移除。歷史威脅資料會被保留。
+
+<ParamField path="id" type="string" required>
+  要取消註冊的代理 ID。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://localhost:8443/api/agents/agent-a1b2c3d4 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+</CodeGroup>
+
+<Tabs>
+  <Tab title="200 成功">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "message": "Agent agent-a1b2c3d4 deregistered successfully"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="404 未找到">
+    ```json
+    {
+      "ok": false,
+      "error": "Agent not found"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## GET /api/agents
+
+列出所有已註冊的代理及其目前狀態。
+
+<ParamField query="status" type="string">
+  依狀態篩選：`online`、`stale` 或 `offline`。
+</ParamField>
+
+<ParamField query="org_id" type="string">
+  依組織 ID 篩選。
+</ParamField>
+
+<ParamField query="tag" type="string">
+  依標籤篩選。可指定多次。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://localhost:8443/api/agents?status=online" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "agent-a1b2c3d4",
+      "hostname": "web-server-1",
+      "os": "linux",
+      "version": "1.2.0",
+      "ip": "203.0.113.10",
+      "status": "online",
+      "tags": ["production", "web-tier"],
+      "lastHeartbeat": "2026-03-07T12:05:00.000Z",
+      "registeredAt": "2026-03-01T08:00:00.000Z"
+    },
+    {
+      "id": "agent-e5f6g7h8",
+      "hostname": "db-server-1",
+      "os": "linux",
+      "version": "1.2.0",
+      "ip": "203.0.113.11",
+      "status": "online",
+      "tags": ["production", "database"],
+      "lastHeartbeat": "2026-03-07T12:04:30.000Z",
+      "registeredAt": "2026-03-01T08:05:00.000Z"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/agents/:id
+
+回傳特定代理的詳細資訊。
+
+<ParamField path="id" type="string" required>
+  代理 ID。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET https://localhost:8443/api/agents/agent-a1b2c3d4 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+</CodeGroup>
+
+<Tabs>
+  <Tab title="200 成功">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "id": "agent-a1b2c3d4",
+        "hostname": "web-server-1",
+        "os": "linux",
+        "version": "1.2.0",
+        "ip": "203.0.113.10",
+        "status": "online",
+        "tags": ["production", "web-tier"],
+        "cpu": 12.5,
+        "memory": 45.2,
+        "uptime": 86400,
+        "lastHeartbeat": "2026-03-07T12:05:00.000Z",
+        "registeredAt": "2026-03-01T08:00:00.000Z",
+        "recentThreats": 3,
+        "activePolicyVersion": "v2"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="404 未找到">
+    ```json
+    {
+      "ok": false,
+      "error": "Agent not found"
+    }
+    ```
+  </Tab>
+</Tabs>

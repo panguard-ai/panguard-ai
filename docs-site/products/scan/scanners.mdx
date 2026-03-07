@@ -1,0 +1,133 @@
+---
+title: "Scanner Types"
+description: "Detailed reference for all 10 scanner types included in Panguard Scan."
+icon: "list-check"
+---
+
+Panguard Scan includes 10 specialized scanners, each targeting a different attack surface. All scanners run concurrently for maximum speed. Quick mode runs the first 7; full mode adds SSL, Scheduled Tasks, and Shared Folders.
+
+## Scanner Reference
+
+### 1. Discovery Scanner
+
+Collects foundational system information used by all other scanners.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Quick + Full |
+| **Data collected** | OS distro, version, kernel, architecture, hostname |
+| **Output** | `SystemDiscovery` object consumed by downstream scanners |
+
+### 2. CVE Checker
+
+Checks the system's operating system and installed packages against known CVE databases.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Quick + Full |
+| **Detection method** | OS version fingerprinting, package version comparison |
+| **Severity mapping** | CVSS score mapped to CRITICAL / HIGH / MEDIUM / LOW |
+| **Output** | List of matched CVEs with remediation advice |
+
+### 3. SAST (Static Application Security Testing)
+
+Scans source code directories for security vulnerabilities.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Via `panguard scan code` subcommand |
+| **Languages** | JavaScript, TypeScript, Python, PHP, Ruby, Java, Go |
+| **Detections** | SQL injection, XSS, command injection, path traversal, insecure deserialization |
+| **Output** | Findings with file path, line number, and remediation |
+
+```bash
+panguard scan code --dir ./my-project
+```
+
+### 4. Secrets Checker
+
+Scans files for hardcoded secrets, API keys, tokens, and credentials.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Via `panguard scan code` subcommand |
+| **Detection patterns** | AWS keys, GitHub tokens, private keys, database URLs, JWT secrets, generic high-entropy strings |
+| **False-positive reduction** | Ignores test files, examples, and known placeholder values |
+
+### 5. Password Policy Auditor
+
+Evaluates the system's password policy configuration.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Quick + Full |
+| **Checks** | Minimum password length, complexity requirements, expiration policy, account lockout policy |
+| **Platforms** | Linux (PAM), macOS (pwpolicy), Windows (net accounts) |
+
+### 6. Scheduled Tasks Scanner
+
+Audits cron jobs and scheduled tasks for suspicious entries.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Full mode only |
+| **Detections** | Download commands (curl, wget), reverse shells, base64-encoded payloads, unusual execution paths, non-standard scheduling times |
+| **Sources** | `/etc/crontab`, user crontabs, `/etc/cron.d/`, systemd timers (Linux); launchd plists (macOS); Task Scheduler (Windows) |
+
+### 7. Open Ports Scanner
+
+Identifies all listening network ports and flags high-risk services.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Quick + Full |
+| **Detection method** | `netstat` / `ss` / `lsof` output parsing |
+| **High-risk ports** | SSH (22), FTP (21), Telnet (23), MySQL (3306), PostgreSQL (5432), Redis (6379), MongoDB (27017), Elasticsearch (9200) |
+| **Risk factors** | Binding to 0.0.0.0, running without TLS, default port for sensitive services |
+
+### 8. Shared Folders Scanner
+
+Checks file-sharing configurations for overly permissive access.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Full mode only |
+| **Checks** | SMB/CIFS shares, NFS exports, public folder permissions |
+| **Detections** | Anonymous access enabled, world-readable sensitive directories, guest access without authentication |
+
+### 9. SSL/TLS Certificate Checker
+
+Validates SSL/TLS certificates found on the system.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Full mode only |
+| **Checks** | Expiration date, self-signed status, key strength (minimum 2048-bit RSA or 256-bit ECDSA), certificate chain completeness, deprecated protocols (SSLv3, TLS 1.0, TLS 1.1) |
+| **Sources** | System certificate stores, common certificate paths, running HTTPS services |
+
+### 10. Compliance Mapping
+
+Maps all findings from other scanners to compliance framework controls.
+
+| Field | Details |
+|-------|---------|
+| **Availability** | Quick + Full |
+| **Frameworks** | ISO 27001, SOC 2, Taiwan Cyber Security Act (TCSA) |
+| **Output** | Each finding annotated with applicable compliance control references |
+
+## Scanner Execution Order
+
+All scanners run concurrently using `Promise.all` for maximum speed. The Discovery scanner's output is available to all other scanners as shared context.
+
+```
+Discovery ──┐
+CVE ────────┤
+Ports ──────┤
+Password ───┤  ──> Aggregate ──> Risk Score ──> Report
+Firewall ───┤
+Security ───┤
+SSL ────────┤ (full only)
+Tasks ──────┤ (full only)
+Shares ─────┘ (full only)
+Compliance ─── (post-processing)
+```

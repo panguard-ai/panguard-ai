@@ -1,0 +1,122 @@
+---
+title: "Compliance Frameworks"
+description: "Detailed breakdown of all controls evaluated for ISO 27001, SOC 2, and Taiwan Cyber Security Act."
+icon: "scale-balanced"
+---
+
+Panguard Report evaluates your security posture against three compliance frameworks. Each framework defines a set of controls that are assessed as Compliant, Partially Compliant, Non-Compliant, or Not Assessed.
+
+## ISO 27001
+
+ISO/IEC 27001 is the international standard for Information Security Management Systems (ISMS). Panguard evaluates 30 controls across the Annex A control domains.
+
+### Control Domains
+
+| Domain | Controls | Description |
+|--------|----------|-------------|
+| A.5 | Information Security Policies | Policy documentation and review |
+| A.6 | Organization of Information Security | Internal organization and mobile/remote work |
+| A.7 | Human Resource Security | Prior to, during, and termination of employment |
+| A.8 | Asset Management | Inventory, classification, and media handling |
+| A.9 | Access Control | Business requirements, user management, system access |
+| A.10 | Cryptography | Encryption policy and key management |
+| A.11 | Physical Security | Secure areas and equipment |
+| A.12 | Operations Security | Procedures, malware protection, backup, logging, patching |
+| A.13 | Communications Security | Network management and information transfer |
+| A.14 | System Development | Security in development and support processes |
+| A.15 | Supplier Relationships | Information security in supplier agreements |
+| A.16 | Incident Management | Event reporting, response, and lessons learned |
+| A.17 | Business Continuity | Continuity planning and verification |
+| A.18 | Compliance | Legal, contractual, and review requirements |
+
+### How Panguard Maps Findings
+
+| Scan Finding | ISO 27001 Control |
+|-------------|-------------------|
+| Weak password policy | A.9.4 -- System and application access control |
+| Missing encryption | A.10.1 -- Cryptographic controls |
+| Unpatched CVEs | A.12.6 -- Technical vulnerability management |
+| Open unnecessary ports | A.13.1 -- Network security management |
+| No firewall enabled | A.13.1 -- Network security management |
+| Excessive file permissions | A.9.1 -- Business requirements of access control |
+
+---
+
+## SOC 2
+
+SOC 2 (System and Organization Controls 2) evaluates organizations against 5 Trust Services Criteria. Panguard focuses on the Security criterion with extensions into Availability and Confidentiality.
+
+### Trust Services Criteria
+
+| Category | Criteria ID | Description |
+|----------|------------|-------------|
+| **Security** | CC1 | Control environment |
+| | CC2 | Communication and information |
+| | CC3 | Risk assessment |
+| | CC4 | Monitoring activities |
+| | CC5 | Control activities |
+| | CC6 | Logical and physical access controls |
+| | CC7 | System operations |
+| | CC8 | Change management |
+| **Availability** | A1 | Availability commitments and system requirements |
+| **Confidentiality** | C1 | Confidential information identification and protection |
+
+### How Panguard Maps Findings
+
+| Scan Finding | SOC 2 Criteria |
+|-------------|----------------|
+| No monitoring enabled | CC4.1 -- Ongoing monitoring |
+| Weak access controls | CC6.1 -- Logical access security |
+| Missing patch management | CC7.1 -- Infrastructure management |
+| No incident response | CC7.3 -- Incident response |
+| Unencrypted data | C1.1 -- Confidential information protection |
+
+---
+
+## Taiwan Cyber Security Act (TCSA)
+
+The Taiwan Cyber Security Management Act (TCSA) is the primary cybersecurity regulation for organizations operating in Taiwan. Panguard evaluates 10 control areas.
+
+### Control Areas
+
+| Control | Chinese Name | Description |
+|---------|-------------|-------------|
+| Security Policy | Security Policy | Cybersecurity management policy documentation |
+| Access Control | Access Control | System access rights management |
+| Encryption Management | Encryption Management | Data encryption mechanisms |
+| Physical Security | Physical Security | Physical environment protection |
+| Operations Security | Operations Security | Day-to-day operational security management |
+| Communications Security | Communications Security | Network communication security |
+| System Development | System Development | Secure development practices |
+| Supplier Management | Supplier Management | Supply chain security management |
+| Incident Management | Incident Management | Cybersecurity incident handling procedures |
+| Business Continuity | Business Continuity | Business continuity planning |
+
+### Bilingual Report Support
+
+TCSA reports are fully supported in Traditional Chinese:
+
+```bash
+panguard report generate \
+  --framework tw_cyber_security_act \
+  --language zh-TW \
+  --org "Your Company" \
+  --output-dir ./reports
+```
+
+---
+
+## Control Assessment Statuses
+
+Each control is evaluated and assigned one of four statuses:
+
+| Status | Meaning | Color |
+|--------|---------|-------|
+| **Compliant** | Control requirements are fully met | Green |
+| **Partially Compliant** | Some requirements met, gaps remain | Yellow |
+| **Non-Compliant** | Control requirements are not met | Red |
+| **Not Assessed** | Insufficient data to evaluate | Gray |
+
+<Info>
+  Panguard Report automatically maps scan findings to framework controls. Running `panguard scan` before generating a report provides the most accurate compliance assessment.
+</Info>

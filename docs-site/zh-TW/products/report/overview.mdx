@@ -1,0 +1,138 @@
+---
+title: "Panguard Report"
+description: "針對 ISO 27001、SOC 2 和台灣資通安全管理法的自動化合規報告產生，支援 PDF 和 JSON 輸出。"
+icon: "file-check"
+---
+
+Panguard Report 產生符合主要法規框架的合規就緒安全報告。它根據框架控制措施評估您系統的安全態勢，產生包含修復指引的詳細發現項目，並輸出專業 PDF 或機器可讀的 JSON 報告。
+
+## 快速開始
+
+```bash
+# 產生 ISO 27001 合規報告
+panguard report generate --framework iso27001
+
+# 產生繁體中文的台灣資通安全管理法報告
+panguard report generate --framework tw_cyber_security_act --language zh-TW
+
+# 產生 SOC 2 報告
+panguard report generate --framework soc2
+
+# 快速合規摘要
+panguard report summary --framework iso27001
+
+# 列出可用框架
+panguard report list-frameworks
+```
+
+<Note>
+  Panguard Report 需要 **Pro 方案**或以上。在產生報告前先執行 `panguard scan` 以獲得最準確的合規評估。
+</Note>
+
+## 支援的框架
+
+| 框架 | 控制措施數 | 識別碼 |
+|-----------|----------|------------|
+| **ISO 27001** | 30 項控制措施 | `iso27001` |
+| **SOC 2** | 10 項控制措施 | `soc2` |
+| **台灣資通安全管理法（TCSA）** | 10 項控制措施 | `tw_cyber_security_act` |
+
+請參閱[框架](/products/report/frameworks)了解每項控制措施的完整分析。
+
+## 運作方式
+
+<Steps>
+  <Step title="收集證據">
+    Report 從最近的 Panguard Scan 結果和 Guard 事件日誌中提取發現項目。無需額外掃描。
+  </Step>
+  <Step title="對應至控制措施">
+    每個發現項目對應至適用的框架控制措施。單一發現項目可能對應至跨多個框架的多項控制措施。
+  </Step>
+  <Step title="評估合規性">
+    每項控制措施根據收集的證據獲得狀態：合規、部分合規、不合規或未評估。
+  </Step>
+  <Step title="產生輸出">
+    報告以您選擇的格式（PDF 或 JSON）呈現，包含執行摘要、控制措施評估、發現項目和修復建議。
+  </Step>
+</Steps>
+
+## 報告內容
+
+每份合規報告包含 6 個章節：
+
+| 章節 | 內容 |
+|---------|---------|
+| **組織資訊** | 組織名稱、報告日期、評估範圍 |
+| **框架概覽** | 適用合規框架的描述 |
+| **控制措施評估** | 每項控制措施的評估結果及證據 |
+| **發現明細** | 具體問題搭配嚴重性和受影響的控制措施 |
+| **修復建議** | 每項發現的可執行改善步驟 |
+| **合規摘要** | 整體合規百分比和風險評估 |
+
+## 快速合規摘要
+
+快速概覽而無需產生完整報告：
+
+```bash
+panguard report summary --framework iso27001
+```
+
+```
+── ISO 27001 Compliance Summary ───────
+
+Overall:    72% compliant
+Compliant:  8/12 controls
+Partial:    2/12 controls
+Gap:        2/12 controls
+
+Priority fixes:
+1. Access Control - Enforce MFA
+2. Incident Response - Define procedures
+```
+
+## 與 Scan 的整合
+
+Scan 的發現項目可作為 Report 的輸入：
+
+```bash
+# 執行掃描以收集發現項目
+panguard scan --output scan-findings.pdf
+
+# 使用發現項目產生合規報告
+panguard report generate \
+  --framework tw_cyber_security_act \
+  --org "Your Company Name" \
+  --language zh-TW \
+  --output-dir ./reports
+```
+
+## CLI 選項
+
+```
+panguard report <command> [options]
+
+Commands:
+  generate           產生合規報告
+  list-frameworks    列出支援的框架
+  validate           驗證輸入發現項目檔案
+  summary            顯示合規摘要
+  config             顯示目前設定
+
+Options:
+  --framework <name>     框架（tw_cyber_security_act|iso27001|soc2）
+  --language <lang>      報告語言（en|zh-TW）
+  --format <fmt>         輸出格式（json|pdf）
+  --output-dir <path>    輸出目錄
+  --org <name>           組織名稱
+  --input <file>         輸入發現項目檔案（JSON）
+  --verbose, -v          詳細輸出
+```
+
+<CardGroup cols={2}>
+  <Card title="框架" icon="scale-balanced" href="/products/report/frameworks">
+    3 個框架的完整控制措施分析。
+  </Card>
+  <Card title="輸出格式" icon="file-export" href="/products/report/output-formats">
+    JSON、PDF 和文字輸出選項，支援雙語。
+  </Card>
+</CardGroup>

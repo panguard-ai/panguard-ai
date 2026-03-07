@@ -1,0 +1,142 @@
+---
+title: "Email & Webhook"
+description: "Configure SMTP email notifications and custom webhook integrations with mTLS support."
+icon: "envelope"
+---
+
+Email and Webhook channels serve different use cases: Email provides compliance-friendly audit trails, while Webhooks enable integration with custom automation systems.
+
+## Email (SMTP)
+
+### Setup
+
+```bash
+panguard chat setup --channel email
+```
+
+The wizard will ask for:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **SMTP Host** | Mail server hostname | `smtp.gmail.com` |
+| **SMTP Port** | 587 for TLS, 465 for SSL | `587` |
+| **SMTP Username** | Authentication username | `alerts@company.com` |
+| **SMTP Password** | Authentication password | (App Password for Gmail) |
+| **From Address** | Sender email address | `panguard@company.com` |
+| **To Address** | Recipient email address | `security-team@company.com` |
+
+### Gmail Configuration
+
+Gmail requires an App Password instead of your regular password:
+
+<Steps>
+  <Step title="Enable 2-Step Verification">
+    Go to Google Account > Security > 2-Step Verification and enable it.
+  </Step>
+  <Step title="Generate App Password">
+    Go to Google Account > Security > 2-Step Verification > App passwords.
+  </Step>
+  <Step title="Create a new App Password">
+    Select "Mail" and your device, then click Generate.
+  </Step>
+  <Step title="Use the generated password">
+    Enter the 16-character App Password when Panguard asks for the SMTP password.
+  </Step>
+</Steps>
+
+### Email Format
+
+Email notifications are sent as HTML with:
+
+- Severity-colored header bar
+- Structured event details table
+- Remediation steps (for `it_admin` role)
+- Unsubscribe link
+- Plain-text fallback for email clients that do not render HTML
+
+### When to Use Email
+
+- Compliance requirements that mandate email-based audit trails
+- Organizations where email is the primary communication tool
+- When you need searchable notification history in your inbox
+
+---
+
+## Webhook
+
+### Setup
+
+```bash
+panguard chat setup --channel webhook
+```
+
+The wizard will ask for:
+
+| Field | Description |
+|-------|-------------|
+| **Webhook URL** | The endpoint to receive POST requests |
+| **Authentication** | Bearer Token, HMAC, or mTLS |
+| **Secret/Token** | Authentication credential |
+
+### Authentication Methods
+
+| Method | Header | Use Case |
+|--------|--------|----------|
+| **Bearer Token** | `Authorization: Bearer <token>` | Simple API integrations |
+| **HMAC** | `X-Panguard-Signature: sha256=<hash>` | Webhook verification (GitHub-style) |
+| **mTLS** | Client certificate | Enterprise-grade mutual authentication |
+
+### Payload Format
+
+Webhook notifications are sent as JSON POST requests:
+
+```json
+{
+  "event_type": "threat_alert",
+  "timestamp": "2025-01-15T14:23:01.000Z",
+  "severity": "high",
+  "title": "Threat Intel Match: 203.0.113.50",
+  "details": {
+    "source_ip": "203.0.113.50",
+    "confidence": 95,
+    "rule": "sigma/network/c2-communication.yml",
+    "mitre_id": "T1071",
+    "action_taken": "block_ip",
+    "action_success": true
+  },
+  "panguard_version": "1.0.0"
+}
+```
+
+### HMAC Verification Example
+
+To verify the webhook signature on your server:
+
+```javascript
+const crypto = require('crypto');
+
+function verifySignature(payload, signature, secret) {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  return `sha256=${expected}` === signature;
+}
+```
+
+### When to Use Webhooks
+
+- Integration with SIEM systems (Splunk, Elastic, etc.)
+- Custom dashboards and monitoring tools
+- Automated incident response workflows
+- PagerDuty, Opsgenie, or other alerting platforms
+
+### Test
+
+```bash
+panguard chat test --channel webhook
+```
+
+<Note>
+  Webhook requests include a 10-second timeout. If your endpoint does not respond within 10 seconds, the notification is logged as failed and retried up to 3 times with exponential backoff.
+</Note>

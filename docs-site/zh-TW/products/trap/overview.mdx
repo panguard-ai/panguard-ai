@@ -1,0 +1,116 @@
+---
+title: "Panguard Trap"
+description: "部署 8 種蜜罐協定來引誘攻擊者、擷取其工具和憑證，並分析其技能等級和意圖。"
+icon: "flask"
+---
+
+Panguard Trap 部署偽裝成真實基礎設施的誘餌服務。合法使用者永遠不會與這些服務互動——只有攻擊者才會。當有人連線至蜜罐時，Trap 會記錄每個動作、分析其行為、分類其技能等級，並將情報分享給 Guard 和 Threat Cloud。
+
+## 快速開始
+
+```bash
+# 啟動 SSH 和 HTTP 蜜罐（需要 Pro 方案）
+panguard trap start --services ssh,http
+
+# 檢查狀態（免費）
+panguard trap status
+
+# 查看攻擊者檔案（免費）
+panguard trap profiles
+
+# 查看收集的情報（免費）
+panguard trap intel
+```
+
+<Note>
+  Panguard Trap 需要 **Pro 方案**或以上。狀態、檔案和情報檢視在所有方案中均可使用。
+</Note>
+
+## 蜜罐如何運作
+
+蜜罐是一個刻意暴露的假服務。它對攻擊者來說看起來是真的，但完全與您的實際基礎設施隔離。任何與蜜罐的互動本質上都是可疑的，因為沒有合法使用者會連線到它。
+
+Panguard Trap 不僅僅是簡單的連線記錄：
+
+1. **擷取憑證** -- 記錄每一組嘗試的使用者名稱/密碼組合
+2. **記錄命令** -- 追蹤成功（假）登入後執行的所有命令
+3. **識別工具** -- 偵測攻擊者的工具（Hydra、Metasploit、自訂腳本）
+4. **分析攻擊者** -- 使用行為分析分類技能等級和意圖
+5. **分享情報** -- 將擷取的 IoC 饋入 Guard 和 Threat Cloud
+
+## 架構
+
+```
+Attacker ──> [Honeypot Service] ──> Interaction Logger
+                                         |
+                                    Attacker Profiler
+                                         |
+                              ┌──────────┴──────────┐
+                              |                     |
+                         Guard DARE            Threat Cloud
+                         Pipeline              Intelligence
+```
+
+## 主要功能
+
+| 功能 | 詳細資訊 |
+|-----------|---------|
+| **蜜罐類型** | 8 種服務模擬器（SSH、HTTP、FTP、SMB、MySQL、RDP、Telnet、Redis） |
+| **攻擊者分析** | 技能分類（Script Kiddie、Advanced、APT） |
+| **憑證擷取** | 記錄所有嘗試的使用者名稱和密碼 |
+| **命令記錄** | 互動式服務的完整工作階段記錄 |
+| **Threat Cloud 饋送** | 匿名化的攻擊者資料分享至集體情報 |
+| **Guard 整合** | 攻擊者 IP 自動加入 Guard 封鎖清單 |
+
+## 與 Guard 和 Threat Cloud 的整合
+
+### Guard 整合
+
+- 來自 Trap 的攻擊者 IP 自動加入 Guard 的封鎖清單
+- 攻擊模式被轉換為 Sigma 規則候選
+- 擷取的 IoC 加入本地威脅情報資料庫
+
+### Threat Cloud 整合
+
+```bash
+# 啟用 Threat Cloud 上傳（預設）
+panguard trap start --services ssh,http
+
+# 停用 Threat Cloud 上傳
+panguard trap start --services ssh,http --no-cloud
+```
+
+## 安全性
+
+- 蜜罐埠必須與真實服務埠不同（例如 SSH 蜜罐使用 2222 而非 22）
+- 蜜罐完全隔離——攻擊者無法存取您的真實系統
+- 每個蜜罐都有記憶體和 CPU 資源限制以防止濫用
+
+## CLI 選項
+
+```
+panguard trap <command> [options]
+
+Commands:
+  start              啟動蜜罐服務（Pro）
+  stop               停止蜜罐服務（Pro）
+  status             顯示狀態和統計資料（免費）
+  config             顯示目前設定（免費）
+  profiles           顯示攻擊者檔案（免費）
+  intel              顯示威脅情報摘要（免費）
+
+Options:
+  --services <types>     服務類型（以逗號分隔）
+  --port <number>        單一服務的自訂埠
+  --data-dir <path>      資料目錄
+  --no-cloud             停用 Threat Cloud 上傳
+```
+
+<CardGroup cols={2}>
+  <Card title="蜜罐類型" icon="server" href="/products/trap/honeypot-types">
+    所有 8 種蜜罐協定的埠和功能。
+  </Card>
+  <Card title="攻擊者分析" icon="fingerprint" href="/products/trap/attacker-profiling">
+    技能分類、意圖分析及 MITRE 對應。
+  </Card>
+</CardGroup>

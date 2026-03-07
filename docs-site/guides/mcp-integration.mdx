@@ -1,0 +1,176 @@
+---
+title: "Integrate with AI Assistants via MCP"
+description: "Connect Panguard to Claude Desktop, Cursor, or Windsurf using the Model Context Protocol for AI-assisted security operations."
+icon: "robot"
+---
+
+Panguard includes a built-in MCP (Model Context Protocol) server that exposes security tools to AI assistants. This lets you run scans, check Guard status, query threats, and deploy honeypots using natural language through your AI coding assistant.
+
+<Steps>
+  <Step title="Understand MCP">
+    The Model Context Protocol (MCP) is an open standard for connecting AI assistants to external tools. Panguard's MCP server exposes security operations as tools that AI assistants can call on your behalf.
+
+    Supported AI assistants:
+
+    | Assistant | Config Location |
+    | --- | --- |
+    | **Claude Desktop** | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) |
+    | **Cursor** | `.cursor/mcp.json` in your project root |
+    | **Windsurf** | `~/.windsurf/mcp.json` |
+
+    <Info>
+      Panguard must be installed and authenticated (`panguard login`) before the MCP server can function.
+    </Info>
+  </Step>
+
+  <Step title="Add the MCP configuration">
+    Add the Panguard MCP server to your AI assistant's configuration file:
+
+    <Tabs>
+      <Tab title="Claude Desktop">
+        Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+        ```json
+        {
+          "mcpServers": {
+            "panguard": {
+              "command": "panguard",
+              "args": ["mcp", "serve"],
+              "env": {}
+            }
+          }
+        }
+        ```
+      </Tab>
+
+      <Tab title="Cursor">
+        Create or edit `.cursor/mcp.json` in your project root:
+
+        ```json
+        {
+          "mcpServers": {
+            "panguard": {
+              "command": "panguard",
+              "args": ["mcp", "serve"],
+              "env": {}
+            }
+          }
+        }
+        ```
+      </Tab>
+
+      <Tab title="Windsurf">
+        Edit `~/.windsurf/mcp.json`:
+
+        ```json
+        {
+          "mcpServers": {
+            "panguard": {
+              "command": "panguard",
+              "args": ["mcp", "serve"],
+              "env": {}
+            }
+          }
+        }
+        ```
+      </Tab>
+    </Tabs>
+
+    After saving, restart your AI assistant for the changes to take effect.
+  </Step>
+
+  <Step title="Available MCP tools">
+    The Panguard MCP server exposes these tools to your AI assistant:
+
+    | Tool | Description | Plan |
+    | --- | --- | --- |
+    | `scan_system` | Run a security scan and return findings | Community+ |
+    | `guard_status` | Check Guard engine status and recent events | Solo+ |
+    | `guard_start` | Start the Guard engine | Solo+ |
+    | `guard_stop` | Stop the Guard engine | Solo+ |
+    | `get_threats` | Query threat intelligence and IoCs | Solo+ |
+    | `deploy_honeypot` | Deploy a honeypot on a specified service/port | Pro+ |
+    | `get_attacker_profiles` | Retrieve attacker profiles from Trap | Pro+ |
+    | `generate_report` | Generate a compliance report | Solo+ |
+    | `get_security_score` | Get current risk score and grade | Community+ |
+    | `list_events` | List recent Guard events with filtering | Solo+ |
+
+    <Note>
+      Tools respect your plan limits. Attempting to use a Pro-only tool on a Solo plan returns an error with an upgrade prompt.
+    </Note>
+  </Step>
+
+  <Step title="Use natural language for security ops">
+    Once configured, you can interact with Panguard through your AI assistant using natural language:
+
+    <AccordionGroup>
+      <Accordion title="Run a security scan">
+        **You:** "Scan my system for security issues"
+
+        The assistant calls `scan_system` and presents the findings, risk score, and recommendations in a readable format.
+      </Accordion>
+
+      <Accordion title="Check protection status">
+        **You:** "Is Guard running? Show me recent alerts."
+
+        The assistant calls `guard_status` followed by `list_events` to give you a comprehensive status overview.
+      </Accordion>
+
+      <Accordion title="Investigate a threat">
+        **You:** "What do we know about IP 203.0.113.42?"
+
+        The assistant calls `get_threats` and `get_attacker_profiles` to compile a threat dossier.
+      </Accordion>
+
+      <Accordion title="Generate a compliance report">
+        **You:** "Generate an ISO 27001 compliance report"
+
+        The assistant calls `generate_report` with the ISO 27001 framework and presents the results.
+      </Accordion>
+
+      <Accordion title="Deploy honeypots">
+        **You:** "Set up SSH and HTTP honeypots to catch attackers"
+
+        The assistant calls `deploy_honeypot` for each service type and confirms deployment.
+      </Accordion>
+    </AccordionGroup>
+  </Step>
+
+  <Step title="Verify the connection">
+    Test that your AI assistant can reach the Panguard MCP server:
+
+    ```bash
+    panguard mcp test
+    ```
+
+    ```
+      PANGUARD AI - MCP Server
+
+      -- Connection Test ------------------------
+
+      Server:     Running (stdio transport)
+      Tools:      10 registered
+      Auth:       Authenticated (user@example.com)
+      Plan:       Pro
+
+      MCP server is ready for AI assistant connections.
+    ```
+  </Step>
+</Steps>
+
+## What to do next
+
+<CardGroup cols={2}>
+  <Card title="MCP product reference" icon="book" href="/products/mcp/overview">
+    Full documentation of the MCP server architecture and capabilities.
+  </Card>
+  <Card title="MCP tools reference" icon="wrench" href="/products/mcp/tools-reference">
+    Detailed schema for each MCP tool including parameters and return types.
+  </Card>
+  <Card title="Run your first scan" icon="magnifying-glass" href="/guides/first-scan">
+    Understand scan output before using AI-assisted scanning.
+  </Card>
+  <Card title="Real-time protection" icon="shield-halved" href="/guides/real-time-protection">
+    Set up Guard so the AI assistant can monitor and respond to threats.
+  </Card>
+</CardGroup>

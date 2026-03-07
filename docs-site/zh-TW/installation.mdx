@@ -1,0 +1,175 @@
+---
+title: "安裝指南"
+description: "macOS、Linux 與 Windows 的詳細安裝說明，包含系統需求、多種安裝方式與驗證步驟。"
+icon: "download"
+---
+
+## 系統需求
+
+| 項目 | 最低要求 |
+| --- | --- |
+| **作業系統** | macOS 12+、Ubuntu 20.04+、Windows 10+ |
+| **Node.js** | >= 20.0.0 |
+| **硬碟空間** | 200 MB |
+| **記憶體** | 512 MB（Guard 建議 1 GB） |
+
+## 平台支援
+
+並非所有功能在每個平台上的支援度相同。macOS 與 Linux 為主要目標平台。
+
+| 功能 | macOS | Linux | Windows |
+| --- | --- | --- | --- |
+| **Scan** | 完整（lsof, socketfilterfw） | 完整（ss, ufw/iptables） | 部分（netstat，無防火牆） |
+| **Guard** | 輪詢監控（5秒） | 輪詢監控（5秒） | 輪詢監控（5秒） |
+| **Trap** | TCP 蜜罐 | TCP 蜜罐 | TCP 蜜罐 |
+| **Chat** | Telegram / Slack / Email | Telegram / Slack / Email | Telegram / Slack / Email |
+| **Report** | 完整（3 個框架） | 完整（3 個框架） | 完整（3 個框架） |
+
+<Warning>
+  Windows 支援核心功能，但某些作業系統層級的偵測能力與 macOS 和 Linux 相比有所限制。
+</Warning>
+
+## 可用二進位檔 (v0.3.1)
+
+| 平台 | 架構 | 安裝方式 |
+| --- | --- | --- |
+| macOS | ARM64 (Apple Silicon) | curl 一行安裝或 npm |
+| Linux | x64 | curl 一行安裝或 npm |
+| Linux | ARM64 | curl 一行安裝或 npm |
+| Windows | x64 | npm（建議）或 PowerShell |
+
+## 安裝方式
+
+<Tabs>
+  <Tab title="macOS">
+    ### 一行指令安裝（建議）
+
+    ```bash
+    curl -fsSL https://get.panguard.ai | bash
+    ```
+
+    此指令會下載適用於 Apple Silicon Mac 的 ARM64 二進位檔並放置於您的 PATH 中。
+
+    <Tip>
+      **Intel Mac 使用者：**curl 安裝程式預設下載 ARM64 二進位檔。您有兩個選項：
+      1. 改用 npm 安裝：`npm install -g @panguard-ai/panguard`
+      2. 先啟用 Rosetta 2：`softwareupdate --install-rosetta`
+    </Tip>
+
+    ### 使用 npm
+
+    ```bash
+    npm install -g @panguard-ai/panguard
+    ```
+
+    ### 使用 Homebrew（即將推出）
+
+    ```bash
+    brew install panguard-ai/tap/panguard
+    ```
+  </Tab>
+
+  <Tab title="Linux">
+    ### 一行指令安裝（建議）
+
+    ```bash
+    curl -fsSL https://get.panguard.ai | bash
+    ```
+
+    安裝程式會自動偵測您的架構（x64 或 ARM64）並下載正確的二進位檔。
+
+    ### 使用 npm
+
+    ```bash
+    npm install -g @panguard-ai/panguard
+    ```
+
+    ### 系統套件（即將推出）
+
+    ```bash
+    # Debian / Ubuntu
+    sudo apt install panguard
+
+    # RHEL / Fedora
+    sudo dnf install panguard
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ### 使用 npm（建議）
+
+    ```powershell
+    npm install -g @panguard-ai/panguard
+    ```
+
+    ### PowerShell 一行安裝
+
+    ```powershell
+    powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"
+    ```
+
+    <Info>
+      Windows 建議使用 npm 安裝。PowerShell 安裝程式需要系統管理員權限。
+    </Info>
+  </Tab>
+</Tabs>
+
+## 從原始碼安裝
+
+適用於貢獻者或希望使用最新開發版本的使用者：
+
+```bash
+git clone https://github.com/panguard-ai/panguard-ai.git
+cd panguard-ai
+pnpm install
+pnpm build
+
+# 執行 CLI
+./bin/panguard --help
+```
+
+<Info>
+  從原始碼建置需要 [pnpm](https://pnpm.io/) 10+ 與 Node.js 20+。
+</Info>
+
+## 驗證安裝
+
+安裝完成後，確認 CLI 可正常使用：
+
+```bash
+panguard --version
+```
+
+預期輸出：
+
+```
+0.3.1
+```
+
+如果找不到指令，請確認安裝路徑已加入系統 PATH。對於 npm 全域安裝，可使用以下指令確認：
+
+```bash
+npm list -g @panguard-ai/panguard
+```
+
+## 解除安裝
+
+<Tabs>
+  <Tab title="npm">
+    ```bash
+    npm uninstall -g @panguard-ai/panguard
+    ```
+  </Tab>
+  <Tab title="curl 安裝">
+    ```bash
+    rm "$(which panguard)"
+    ```
+  </Tab>
+  <Tab title="原始碼建置">
+    直接刪除複製的儲存庫目錄即可。
+  </Tab>
+</Tabs>
+
+## 下一步
+
+安裝完成後，請前往[帳號設定](/account-setup)建立帳號並驗證 CLI。

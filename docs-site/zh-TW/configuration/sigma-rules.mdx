@@ -1,0 +1,206 @@
+---
+title: "Sigma 規則"
+description: "使用 Sigma 格式的偵測規則，用於基於日誌的威脅偵測。"
+icon: "list-check"
+---
+
+Panguard Guard 使用 [Sigma 規則](https://sigmahq.io/)作為其主要偵測引擎之一。Sigma 是一種開放的通用簽章格式，適用於 SIEM 系統，讓您能以結構化的方式描述日誌事件。
+
+## 什麼是 Sigma 規則？
+
+Sigma 規則是基於 YAML 的偵測簽章，描述可疑的日誌模式。它們與廠商無關 -- 單一規則可以跨不同的日誌來源和平台應用。Panguard Guard 的代理管線根據即時日誌串流評估 Sigma 規則以偵測威脅。
+
+## 內建規則
+
+Panguard Guard 附帶來自 [SigmaHQ](https://github.com/SigmaHQ/sigma) 社群儲存庫的 **3,000+ Sigma 規則**，涵蓋：
+
+- 身份驗證攻擊（暴力破解、憑證填充）
+- 權限提升技術
+- 橫向移動模式
+- 惡意軟體執行指標
+- 持久化機制
+- 資料外洩行為
+- 利用系統內建工具的技術
+
+當 Guard 設定中啟用 `autoUpdate` 時，規則會從 Threat Cloud 自動更新。
+
+## 規則格式
+
+Sigma 規則遵循標準化的 YAML 結構：
+
+```yaml
+title: SSH Brute Force Detection
+id: sigma-bf-ssh-001
+status: stable
+level: high
+description: Detects multiple failed SSH login attempts from a single source
+author: Panguard AI
+date: 2026/03/01
+tags:
+  - attack.credential_access
+  - attack.t1110
+logsource:
+  category: authentication
+  product: linux
+detection:
+  selection:
+    EventType: login_failed
+    Service: sshd
+  condition: selection | count(SourceIp) by SourceIp > 10
+  timeframe: 5m
+falsepositives:
+  - Legitimate users with forgotten passwords
+  - Automated deployment tools with misconfigured credentials
+fields:
+  - SourceIp
+  - TargetUser
+  - Service
+```
+
+### 規則欄位
+
+| 欄位 | 必填 | 說明 |
+|-------|----------|-------------|
+| `title` | 是 | 人類可讀的規則名稱 |
+| `id` | 是 | 唯一識別碼 |
+| `status` | 是 | `experimental`、`test` 或 `stable` |
+| `level` | 是 | 嚴重程度：`informational`、`low`、`medium`、`high`、`critical` |
+| `description` | 是 | 規則偵測的內容 |
+| `logsource` | 是 | 日誌來源規格（category、product、service） |
+| `detection` | 是 | 包含選擇和條件的偵測邏輯 |
+| `falsepositives` | 否 | 已知的誤報情境 |
+| `tags` | 否 | MITRE ATT&CK 標籤和自訂標籤 |
+| `fields` | 否 | 要包含在警報輸出中的欄位 |
+
+## 自訂規則
+
+將 `.yml` 檔案放在自訂規則目錄中即可新增自訂 Sigma 規則：
+
+```
+{dataDir}/rules/*.yml
+```
+
+其中 `{dataDir}` 預設為 `~/.panguard-guard`。自訂規則與內建規則一起載入，並在同一管線中評估。
+
+<CodeGroup>
+```bash 建立自訂規則目錄
+mkdir -p ~/.panguard-guard/rules
+```
+
+```bash 新增自訂規則
+cat > ~/.panguard-guard/rules/detect-cryptominer.yml << 'EOF'
+title: Cryptominer Process Detection
+id: custom-cryptominer-001
+status: stable
+level: high
+description: Detects common cryptocurrency mining processes
+author: Custom
+date: 2026/03/07
+tags:
+  - attack.impact
+  - attack.t1496
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    CommandLine|contains:
+      - 'xmrig'
+      - 'minerd'
+      - 'cpuminer'
+      - 'stratum+tcp'
+      - 'stratum+ssl'
+  condition: selection
+falsepositives:
+  - Legitimate cryptocurrency operations
+fields:
+  - CommandLine
+  - User
+  - ParentProcess
+EOF
+```
+</CodeGroup>
+
+<Info>
+自訂規則在下一個偵測週期（通常在 60 秒內）立即生效。無需重新啟動。
+</Info>
+
+## 支援的功能
+
+Panguard 的 Sigma 引擎支援以下偵測功能：
+
+### 布林邏輯
+
+```yaml
+detection:
+  selection1:
+    EventType: login_failed
+  selection2:
+    EventType: login_success
+  condition: selection1 and not selection2
+```
+
+### 彙總
+
+```yaml
+detection:
+  selection:
+    EventType: login_failed
+  condition: selection | count() by SourceIp > 10
+  timeframe: 5m
+```
+
+支援的彙總函式：`count`、`min`、`max`、`avg`、`sum`。
+
+### 修飾符
+
+| 修飾符 | 說明 | 範例 |
+|----------|-------------|---------|
+| `contains` | 子字串比對 | `CommandLine\|contains: 'wget'` |
+| `startswith` | 前綴比對 | `FilePath\|startswith: '/tmp'` |
+| `endswith` | 後綴比對 | `FileName\|endswith: '.sh'` |
+| `re` | 正規表達式 | `CommandLine\|re: '(curl\|wget).*\|.*sh'` |
+| `all` | 所有值都必須匹配 | `Tags\|all: ['malware', 'dropper']` |
+| `base64` | Base64 解碼比對 | `CommandLine\|base64contains: 'password'` |
+
+### 萬用字元
+
+```yaml
+detection:
+  selection:
+    CommandLine: '*wget*evil*'
+    FilePath: '/tmp/*.sh'
+```
+
+使用 `*` 代表任意數量的字元，`?` 代表單一字元。
+
+## 效能考量
+
+<Tip>
+擁有 3,000+ 規則時，Panguard 使用預編譯的規則索引以進行快速評估。自訂規則在載入時被索引。保持個別規則條件聚焦和具體以維持偵測速度。
+</Tip>
+
+| 指標 | 典型值 |
+|--------|--------------|
+| 規則載入時間 | 3,000 條規則不到 2 秒 |
+| 每事件評估 | 不到 5 ms |
+| 記憶體開銷 | 完整規則集約 50 MB |
+| 自訂規則限制 | 無硬性限制（建議少於 500） |
+
+## 停用規則
+
+若要停用特定的內建規則而不刪除它，請將其 ID 加入排除清單：
+
+```bash
+panguard config set rules.excludeIds '["sigma-fp-001", "sigma-noisy-002"]'
+```
+
+或在 `config.json` 中：
+
+```json
+{
+  "rules": {
+    "excludeIds": ["sigma-fp-001", "sigma-noisy-002"]
+  }
+}
+```

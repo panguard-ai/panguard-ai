@@ -1,0 +1,101 @@
+title: "Agent Goal Hijacking Detection"
+id: ATR-2026-032
+status: experimental
+description: >
+  Detects when an agent's objective is being redirected away from its
+  original task. Goal hijacking occurs when external input, adversarial
+  prompts, or inter-agent manipulation causes an agent to abandon its
+  assigned objective and pursue a different goal. This can result in
+  task failure, unauthorized actions, data leakage, or resource waste.
+  Detection is based on behavioral drift analysis, task deviation
+  patterns, and explicit redirection attempts.
+author: "ATR Community"
+date: "2026/03/08"
+severity: high
+
+references:
+  owasp_llm:
+    - "LLM01:2025 - Prompt Injection"
+    - "LLM06:2025 - Excessive Agency"
+  mitre_atlas:
+    - "AML.T0051 - Prompt Injection"
+    - "AML.T0043 - Craft Adversarial Data"
+
+tags:
+  category: agent-manipulation
+  subcategory: goal-hijacking
+  confidence: medium
+
+agent_source:
+  type: agent_behavior
+  framework:
+    - autogen
+    - crewai
+    - langchain
+    - langgraph
+    - swarm
+  provider:
+    - openai
+    - anthropic
+    - google
+
+detection:
+  conditions:
+    - field: agent_output
+      operator: regex
+      value: "(?i)(instead|rather\\s+than|forget\\s+about)\\s+(of\\s+)?(that|the\\s+original|my\\s+(previous|assigned)|what\\s+you\\s+asked)"
+      description: "Agent explicitly abandoning original task"
+    - field: user_input
+      operator: regex
+      value: "(?i)(actually|stop|wait|change|switch)\\s+(doing\\s+that|your\\s+(task|goal|objective)|to\\s+a\\s+different)"
+      description: "User attempting to redirect agent from assigned task"
+    - field: agent_output
+      operator: regex
+      value: "(?i)(my\\s+new\\s+(goal|objective|task|mission)|i('?ve|\\s+have)\\s+(decided|chosen)\\s+to\\s+(focus|work)\\s+on\\s+something\\s+(else|different))"
+      description: "Agent declaring a self-assigned new goal"
+  condition: any
+  false_positives:
+    - "Legitimate task pivot requested by an authorized orchestrator or admin"
+    - "Agent correctly following up on a user's topic change in conversational context"
+    - "Multi-step task where intermediate steps may appear unrelated to final goal"
+
+response:
+  actions:
+    - reduce_permissions
+    - escalate
+    - alert
+  auto_response_threshold: high
+  message_template: >
+    [ATR-2026-032] HIGH: Goal hijacking detected. Agent {agent_id}
+    appears to have deviated from its assigned task objective. The agent has
+    been paused pending review. Original task: {original_task}. Detected
+    deviation: {deviation_description}. Session: {session_id}. Please confirm
+    whether the task change is authorized.
+
+test_cases:
+  true_positives:
+    - input:
+        assigned_task: "Summarize the Q4 financial report"
+        agent_output: "Instead of the financial report, I have decided to focus on something different. Let me write a poem about the ocean."
+      expected: triggered
+      description: "Agent explicitly abandons assigned task for unrelated activity"
+    - input:
+        assigned_task: "Research competitor pricing data"
+        agent_behavior:
+          - tool_call: "send_email"
+          - tool_call: "delete_file"
+          - tool_call: "create_user"
+        time_window: "45s"
+      expected: triggered
+      description: "Agent making tool calls completely outside the scope of its research task"
+  true_negatives:
+    - input:
+        assigned_task: "Analyze customer feedback and create a report"
+        agent_output: "I have completed the sentiment analysis. Now I will format the results into the requested report."
+      expected: not_triggered
+      description: "Agent progressing through legitimate sub-steps of assigned task"
+    - input:
+        assigned_task: "Research market trends"
+        agent_output: "Based on my research, I found that the market is shifting toward AI-driven solutions. Here is my detailed analysis."
+      expected: not_triggered
+      description: "Agent staying on topic and delivering results aligned with assigned task"

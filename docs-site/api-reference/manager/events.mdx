@@ -1,0 +1,252 @@
+---
+title: "Threat Events"
+description: "Submit threat detections, query threat history, and subscribe to real-time event streams."
+icon: "triangle-exclamation"
+---
+
+## POST /api/agents/:id/events
+
+Submits one or more threat events detected by an agent. This is the primary ingestion endpoint for Guard-detected threats.
+
+<ParamField path="id" type="string" required>
+  The agent ID reporting the threats.
+</ParamField>
+
+<ParamField body="events" type="object[]" required>
+  Array of threat event objects.
+</ParamField>
+
+<ParamField body="events[].type" type="string" required>
+  Threat type (e.g., `brute_force`, `port_scan`, `malware_detected`, `suspicious_process`, `file_integrity`, `privilege_escalation`).
+</ParamField>
+
+<ParamField body="events[].severity" type="string" required>
+  Severity level: `low`, `medium`, `high`, or `critical`.
+</ParamField>
+
+<ParamField body="events[].details" type="object" required>
+  Threat-specific details (source IP, file path, process name, etc.).
+</ParamField>
+
+<ParamField body="events[].timestamp" type="string">
+  ISO 8601 timestamp. Defaults to server receipt time if omitted.
+</ParamField>
+
+<ParamField body="events[].sigmaRuleId" type="string">
+  The Sigma rule ID that triggered this detection.
+</ParamField>
+
+<ParamField body="events[].confidence" type="number">
+  AI confidence score (0.0--1.0).
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://localhost:8443/api/agents/agent-a1b2c3d4/events \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "events": [
+      {
+        "type": "brute_force",
+        "severity": "high",
+        "confidence": 0.92,
+        "details": {
+          "sourceIp": "198.51.100.42",
+          "attempts": 150,
+          "targetService": "sshd",
+          "timeWindow": "300s"
+        },
+        "sigmaRuleId": "sigma-bf-001"
+      }
+    ]
+  }'
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 201
+{
+  "ok": true,
+  "data": {
+    "received": 1,
+    "eventIds": ["evt_x1y2z3"]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/threats
+
+Queries recent threat events across the fleet.
+
+<ParamField query="since" type="string">
+  ISO 8601 timestamp. Returns only events after this time.
+</ParamField>
+
+<ParamField query="org_id" type="string">
+  Filter by organization ID.
+</ParamField>
+
+<ParamField query="severity" type="string">
+  Filter by severity: `low`, `medium`, `high`, `critical`.
+</ParamField>
+
+<ParamField query="type" type="string">
+  Filter by threat type.
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  Maximum number of results (max 200).
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://localhost:8443/api/threats?since=2026-03-07T00:00:00Z&severity=high" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "evt_x1y2z3",
+      "agentId": "agent-a1b2c3d4",
+      "hostname": "web-server-1",
+      "type": "brute_force",
+      "severity": "high",
+      "confidence": 0.92,
+      "details": {
+        "sourceIp": "198.51.100.42",
+        "attempts": 150,
+        "targetService": "sshd"
+      },
+      "timestamp": "2026-03-07T08:15:00.000Z"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/threats/summary
+
+Returns an aggregated summary of threats across the fleet.
+
+<ParamField query="period" type="string" default="24h">
+  Time period: `1h`, `6h`, `24h`, `7d`, `30d`.
+</ParamField>
+
+<ParamField query="org_id" type="string">
+  Filter by organization ID.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://localhost:8443/api/threats/summary?period=24h" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "period": "24h",
+    "total": 47,
+    "bySeverity": {
+      "critical": 2,
+      "high": 8,
+      "medium": 15,
+      "low": 22
+    },
+    "byType": {
+      "brute_force": 12,
+      "port_scan": 8,
+      "suspicious_process": 15,
+      "file_integrity": 7,
+      "malware_detected": 3,
+      "privilege_escalation": 2
+    },
+    "topAgents": [
+      { "agentId": "agent-a1b2c3d4", "hostname": "web-server-1", "count": 18 },
+      { "agentId": "agent-e5f6g7h8", "hostname": "db-server-1", "count": 12 }
+    ],
+    "topSourceIps": [
+      { "ip": "198.51.100.42", "count": 25 },
+      { "ip": "203.0.113.99", "count": 14 }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/events/stream
+
+Opens a **Server-Sent Events (SSE)** stream for real-time event notifications. The connection remains open and pushes events as they occur.
+
+<CodeGroup>
+```bash cURL
+curl -N -X GET https://localhost:8443/api/events/stream \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Accept: text/event-stream"
+```
+
+```javascript Browser
+const evtSource = new EventSource(
+  'https://localhost:8443/api/events/stream',
+  {
+    headers: { 'Authorization': 'Bearer YOUR_TOKEN' }
+  }
+);
+
+evtSource.addEventListener('threats_reported', (event) => {
+  const data = JSON.parse(event.data);
+  console.log('New threats:', data);
+});
+
+evtSource.addEventListener('agent_online', (event) => {
+  const data = JSON.parse(event.data);
+  console.log('Agent online:', data.hostname);
+});
+```
+</CodeGroup>
+
+### Event Types
+
+| Event Type | Description | Payload |
+|------------|-------------|---------|
+| `connected` | Initial connection confirmation | `{ message: "Connected to event stream" }` |
+| `agent_online` | An agent sent its first heartbeat | `{ agentId, hostname, ip }` |
+| `agent_offline` | An agent missed its heartbeat timeout | `{ agentId, hostname, lastSeen }` |
+| `threats_reported` | New threat events were submitted | `{ agentId, hostname, count, maxSeverity }` |
+| `policy_created` | A new policy was created and broadcast | `{ policyId, version, ruleCount }` |
+
+### Example SSE Output
+
+```
+event: connected
+data: {"message":"Connected to event stream"}
+
+event: agent_online
+data: {"agentId":"agent-a1b2c3d4","hostname":"web-server-1","ip":"203.0.113.10"}
+
+event: threats_reported
+data: {"agentId":"agent-a1b2c3d4","hostname":"web-server-1","count":3,"maxSeverity":"high"}
+
+event: policy_created
+data: {"policyId":"pol_abc123","version":"v3","ruleCount":5}
+```
+
+<Info>
+The SSE stream sends a heartbeat comment (`: keepalive`) every 30 seconds to maintain the connection. If the connection drops, clients should implement automatic reconnection with exponential backoff.
+</Info>

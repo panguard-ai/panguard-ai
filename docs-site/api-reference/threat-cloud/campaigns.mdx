@@ -1,0 +1,209 @@
+---
+title: "Campaigns"
+description: "Track coordinated attack campaigns identified through IoC correlation."
+icon: "flag"
+---
+
+Campaigns represent coordinated attack patterns identified by correlating IoCs across the Panguard Threat Cloud network. When multiple indicators share behavioral patterns, infrastructure, or timing, they are grouped into a campaign.
+
+## GET /api/campaigns
+
+Lists all identified campaigns with pagination.
+
+<ParamField query="status" type="string">
+  Filter by status: `active`, `dormant`, `resolved`.
+</ParamField>
+
+<ParamField query="since" type="string">
+  ISO 8601 timestamp. Returns campaigns updated after this time.
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Page number.
+</ParamField>
+
+<ParamField query="limit" type="number" default="20">
+  Results per page (max 100).
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/campaigns?status=active&limit=10" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "campaign_botnet_xyz",
+      "name": "XYZ Botnet SSH Scanner",
+      "status": "active",
+      "severity": "high",
+      "firstSeen": "2026-02-01T00:00:00.000Z",
+      "lastActivity": "2026-03-07T11:45:00.000Z",
+      "iocCount": 234,
+      "affectedOrgs": 18,
+      "mitreIds": ["T1110", "T1078", "T1059"],
+      "tags": ["botnet", "ssh", "bruteforce"]
+    },
+    {
+      "id": "campaign_phish_abc",
+      "name": "ABC Phishing Kit",
+      "status": "active",
+      "severity": "critical",
+      "firstSeen": "2026-03-01T00:00:00.000Z",
+      "lastActivity": "2026-03-07T10:30:00.000Z",
+      "iocCount": 89,
+      "affectedOrgs": 7,
+      "mitreIds": ["T1566", "T1204"],
+      "tags": ["phishing", "credential-theft"]
+    }
+  ],
+  "pagination": {
+    "total": 12,
+    "page": 1,
+    "limit": 10,
+    "pages": 2
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/campaigns/stats
+
+Returns aggregate statistics about campaigns across the Threat Cloud.
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/campaigns/stats" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "totalCampaigns": 45,
+    "activeCampaigns": 12,
+    "dormantCampaigns": 28,
+    "resolvedCampaigns": 5,
+    "bySeverity": {
+      "critical": 3,
+      "high": 8,
+      "medium": 22,
+      "low": 12
+    },
+    "topMitreTechniques": [
+      { "id": "T1110", "name": "Brute Force", "campaigns": 15 },
+      { "id": "T1566", "name": "Phishing", "campaigns": 8 },
+      { "id": "T1059", "name": "Command and Scripting Interpreter", "campaigns": 7 },
+      { "id": "T1078", "name": "Valid Accounts", "campaigns": 6 },
+      { "id": "T1204", "name": "User Execution", "campaigns": 5 }
+    ],
+    "avgIocsPerCampaign": 52,
+    "totalAffectedOrgs": 89
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/campaigns/:id
+
+Returns detailed information about a specific campaign, including all associated IoCs and a timeline of activity.
+
+<ParamField path="id" type="string" required>
+  The campaign ID.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/campaigns/campaign_botnet_xyz" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "id": "campaign_botnet_xyz",
+    "name": "XYZ Botnet SSH Scanner",
+    "description": "Coordinated SSH brute-force campaign targeting Linux servers. Deploys cryptominer payloads upon successful login.",
+    "status": "active",
+    "severity": "high",
+    "firstSeen": "2026-02-01T00:00:00.000Z",
+    "lastActivity": "2026-03-07T11:45:00.000Z",
+    "mitreIds": ["T1110", "T1078", "T1059"],
+    "tags": ["botnet", "ssh", "bruteforce", "cryptominer"],
+    "iocs": {
+      "total": 234,
+      "byType": {
+        "ip": 189,
+        "domain": 12,
+        "hash": 28,
+        "url": 5
+      },
+      "topIps": [
+        { "value": "198.51.100.42", "sightings": 47, "reputation": 12 },
+        { "value": "203.0.113.99", "sightings": 35, "reputation": 8 },
+        { "value": "198.51.100.78", "sightings": 28, "reputation": 15 }
+      ],
+      "topDomains": [
+        { "value": "malware-c2.example.net", "sightings": 89, "reputation": 5 }
+      ]
+    },
+    "timeline": [
+      {
+        "date": "2026-02-01",
+        "event": "First IoCs observed",
+        "details": "Initial SSH scan activity from 3 IPs"
+      },
+      {
+        "date": "2026-02-15",
+        "event": "Infrastructure expansion",
+        "details": "C2 domain registered, 50+ new scanner IPs"
+      },
+      {
+        "date": "2026-03-01",
+        "event": "Payload updated",
+        "details": "New cryptominer variant deployed via wget"
+      }
+    ],
+    "affectedOrgs": 18,
+    "geography": {
+      "sourceCountries": ["CN", "RU", "VN", "BR"],
+      "targetCountries": ["US", "DE", "JP", "TW", "SG"]
+    },
+    "recommendations": [
+      "Block all associated IPs at the network perimeter",
+      "Monitor for SSH login anomalies",
+      "Check for unauthorized cryptominer processes",
+      "Update SSH configuration to disable password authentication"
+    ]
+  }
+}
+```
+</ResponseExample>
+
+### Campaign Statuses
+
+| Status | Description |
+|--------|-------------|
+| `active` | New IoCs or sightings observed within the last 7 days |
+| `dormant` | No new activity for 7--30 days, but infrastructure may still be operational |
+| `resolved` | No activity for 30+ days, associated infrastructure appears decommissioned |
+
+<Tip>
+Subscribe to the [SSE event stream](/api-reference/manager/events#get-apieventsstream) for real-time notifications when your agents encounter IoCs linked to active campaigns.
+</Tip>

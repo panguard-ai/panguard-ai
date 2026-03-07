@@ -1,0 +1,75 @@
+---
+title: "panguard upgrade"
+description: "將 Panguard CLI 更新至最新版本。"
+icon: "arrow-up"
+---
+
+`upgrade` 指令檢查並安裝最新版本的 Panguard CLI。它會自動處理二進位檔替換、資料庫遷移和升級後驗證。
+
+## 使用方式
+
+```bash
+panguard upgrade
+```
+
+## 執行內容
+
+1. **檢查目前版本**與最新版本的差異
+2. **下載新的二進位檔**從官方發布頻道
+3. **驗證校驗碼**以確保完整性
+4. **原地替換二進位檔**
+5. **執行遷移**（如果需要資料格式變更）
+6. **驗證升級**透過執行快速自我測試
+
+## 範例
+
+<CodeGroup>
+```bash 升級至最新版本
+panguard upgrade
+```
+</CodeGroup>
+
+<Warning>
+  如果升級期間 Guard 正在運行，它會短暫重新啟動。即時防護會有一小段暫停窗口（通常不超過 5 秒）。
+</Warning>
+
+## 替代升級方式
+
+如果您透過套件管理器安裝了 Panguard，您可能更偏好透過該頻道升級：
+
+<CodeGroup>
+```bash Homebrew (macOS)
+brew upgrade panguard
+```
+
+```bash APT (Debian/Ubuntu)
+sudo apt update && sudo apt upgrade panguard
+```
+
+```bash 安裝腳本（任何平台）
+curl -fsSL https://get.panguard.ai | bash
+```
+</CodeGroup>
+
+## 方案要求
+
+<Info>
+  適用於所有方案，包括 **Community（免費）**。
+</Info>
+
+## 相關資源
+
+<CardGroup cols={2}>
+  <Card title="安裝" icon="download" href="/installation">
+    各平台的安裝說明。
+  </Card>
+  <Card title="更新日誌" icon="list" href="/changelog">
+    查看每個版本的變更內容。
+  </Card>
+  <Card title="panguard doctor" icon="stethoscope" href="/cli/doctor">
+    升級後如遇到問題，請執行診斷。
+  </Card>
+  <Card title="panguard status" icon="circle-info" href="/cli/status">
+    升級後驗證系統健康狀態。
+  </Card>
+</CardGroup>

@@ -1,0 +1,147 @@
+---
+title: "Auto-Response"
+description: "Automated threat response modules, safety rules, escalation ladder, and rollback support."
+icon: "bolt"
+---
+
+The `RespondAgent` executes defensive actions based on the `ThreatVerdict` produced by the `AnalyzeAgent`. It implements strict safety rules, a graduated escalation ladder, and full rollback support.
+
+## Response Modules
+
+Guard includes 3 active response modules plus notification and logging:
+
+### 1. IP Blocker
+
+Blocks malicious source IPs at the firewall level.
+
+| Field | Details |
+|-------|---------|
+| **Action** | `block_ip` |
+| **macOS** | `pfctl` (Packet Filter) |
+| **Linux** | `iptables` |
+| **Windows** | `netsh advfirewall` |
+| **Default duration** | 1 hour |
+| **Repeat offender duration** | 24 hours |
+| **Auto-unblock** | Yes, after configured duration |
+
+### 2. Process Killer
+
+Terminates malicious processes.
+
+| Field | Details |
+|-------|---------|
+| **Action** | `kill_process` |
+| **Method** | SIGTERM first, then SIGKILL after 5-second timeout |
+| **Self-protection** | Cannot kill the Panguard Guard process itself |
+| **Cross-platform** | Uses native OS process management APIs |
+
+### 3. File Quarantine
+
+Isolates suspicious files by moving them to a quarantine directory.
+
+| Field | Details |
+|-------|---------|
+| **Action** | `isolate_file` |
+| **Method** | Moves file to quarantine directory with SHA-256 hash recorded |
+| **Metadata** | Original path, timestamp, verdict, and hash preserved |
+| **Recovery** | Files can be restored from quarantine via the action manifest |
+
+## Confidence Thresholds
+
+The RespondAgent uses confidence-based decision making:
+
+| Confidence Range | Behavior |
+|-----------------|----------|
+| >= `autoRespond` (default 90%) | Execute action automatically, notify after |
+| >= `notifyAndWait` (default 70%) | Send confirmation request via Chat, wait for human approval |
+| < `notifyAndWait` | Log the event and send an informational notification |
+
+In **Learning Mode**, all events are logged without active response regardless of confidence.
+
+## Safety Rules
+
+The RespondAgent enforces hard safety limits that cannot be overridden:
+
+### Whitelisted IPs
+
+These IPs are never blocked, even if they trigger detections:
+
+```
+127.0.0.1, ::1, localhost, 0.0.0.0
+```
+
+Additional IPs can be added via configuration.
+
+### Protected Processes
+
+These processes are never killed:
+
+```
+sshd, systemd, init, launchd, node, panguard-guard,
+kernel, kthreadd, dockerd, containerd
+```
+
+### Protected Accounts
+
+These accounts are never disabled:
+
+```
+root, Administrator, SYSTEM, LocalSystem, admin
+```
+
+### Network Isolation Threshold
+
+Network isolation (blocking all traffic from an IP) requires confidence >= 95. This prevents accidental lockouts from aggressive but uncertain detections.
+
+## Escalation Ladder
+
+The RespondAgent implements progressive escalation:
+
+| Condition | Action |
+|-----------|--------|
+| First violation from a source | Normal thresholds apply |
+| 3+ violations from same target | Auto-respond threshold lowered by 10% |
+| Repeat offender (previously blocked) | Block duration increased to 24 hours |
+
+This means a persistent attacker faces increasingly aggressive responses while first-time anomalies are treated conservatively.
+
+## Action Persistence and Rollback
+
+All executed actions are persisted to a JSONL manifest file:
+
+```
+/var/panguard-guard/action-manifest.jsonl
+```
+
+Each entry records:
+
+| Field | Description |
+|-------|-------------|
+| `timestamp` | When the action was executed |
+| `action` | Action type (block_ip, kill_process, isolate_file) |
+| `target` | IP address, PID, or file path |
+| `verdict` | Full ThreatVerdict that triggered the action |
+| `reversible` | Whether the action can be rolled back |
+| `rollbackCmd` | Command to undo the action |
+
+### Rollback Examples
+
+| Action | Rollback |
+|--------|----------|
+| `block_ip 203.0.113.50` | Remove firewall rule after duration expires |
+| `isolate_file /tmp/payload` | Restore file from quarantine to original path |
+| `kill_process 5678` | Not reversible (process already terminated) |
+
+## Cross-Platform Command Execution
+
+All OS commands are executed via `execFile` (never `exec`) to prevent shell injection:
+
+| Platform | IP Block Command | IP Unblock Command |
+|----------|-----------------|-------------------|
+| macOS | `pfctl` rule addition | `pfctl` rule removal |
+| Linux | `iptables -A INPUT -s <ip> -j DROP` | `iptables -D INPUT -s <ip> -j DROP` |
+| Windows | `netsh advfirewall firewall add rule` | `netsh advfirewall firewall delete rule` |
+
+<Note>
+  The RespondAgent never uses `shell: true` or string-based command construction. All parameters are passed as array arguments to `execFile` to prevent command injection vulnerabilities.
+</Note>

@@ -1,0 +1,457 @@
+---
+title: "統計與查詢"
+description: "時間序列、地理分佈、MITRE 熱力圖、觀測記錄和稽核日誌的進階分析端點。"
+icon: "chart-bar"
+---
+
+統計和查詢端點提供 Threat Cloud 資料集的進階分析。用於儀表板、報告和威脅研究。
+
+## GET /api/stats
+
+回傳 Threat Cloud 資料庫的增強統計資料。
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/stats" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "totalIocs": 48923,
+    "activeIocs": 12456,
+    "totalSightings": 892341,
+    "totalSources": 342,
+    "byType": {
+      "ip": 32100,
+      "domain": 8923,
+      "hash": 5400,
+      "url": 1800,
+      "email": 500,
+      "cve": 200
+    },
+    "byCategory": {
+      "bruteforce": 15200,
+      "malware": 12300,
+      "botnet": 8400,
+      "phishing": 5600,
+      "scanner": 4200,
+      "c2": 2100,
+      "exploit": 1123
+    },
+    "last24h": {
+      "newIocs": 234,
+      "newSightings": 4521,
+      "topCategory": "bruteforce"
+    },
+    "updatedAt": "2026-03-07T12:00:00.000Z"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/query/timeseries
+
+回傳威脅活動的時間序列資料，適用於圖表繪製。
+
+<ParamField query="granularity" type="string" default="day">
+  時間區間大小：`hour`、`day` 或 `week`。
+</ParamField>
+
+<ParamField query="period" type="string" default="30d">
+  時間範圍：`24h`、`7d`、`30d`、`90d`。
+</ParamField>
+
+<ParamField query="type" type="string">
+  依 IoC 類型篩選。
+</ParamField>
+
+<ParamField query="category" type="string">
+  依威脅類別篩選。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/query/timeseries?granularity=day&period=7d" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "granularity": "day",
+    "period": "7d",
+    "series": [
+      { "timestamp": "2026-03-01T00:00:00Z", "newIocs": 198, "sightings": 4200 },
+      { "timestamp": "2026-03-02T00:00:00Z", "newIocs": 215, "sightings": 4510 },
+      { "timestamp": "2026-03-03T00:00:00Z", "newIocs": 187, "sightings": 3980 },
+      { "timestamp": "2026-03-04T00:00:00Z", "newIocs": 234, "sightings": 5120 },
+      { "timestamp": "2026-03-05T00:00:00Z", "newIocs": 201, "sightings": 4350 },
+      { "timestamp": "2026-03-06T00:00:00Z", "newIocs": 256, "sightings": 5890 },
+      { "timestamp": "2026-03-07T00:00:00Z", "newIocs": 142, "sightings": 3100 }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/query/geo
+
+回傳威脅來源的地理分佈。
+
+<ParamField query="type" type="string">
+  依 IoC 類型篩選（主要對 `ip` 有用）。
+</ParamField>
+
+<ParamField query="period" type="string" default="30d">
+  時間範圍：`24h`、`7d`、`30d`、`90d`。
+</ParamField>
+
+<ParamField query="limit" type="number" default="20">
+  回傳的國家數量。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/query/geo?period=7d&limit=10" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "period": "7d",
+    "countries": [
+      { "code": "CN", "name": "China", "count": 8923, "percentage": 28.4 },
+      { "code": "US", "name": "United States", "count": 5210, "percentage": 16.6 },
+      { "code": "RU", "name": "Russia", "count": 4100, "percentage": 13.1 },
+      { "code": "BR", "name": "Brazil", "count": 2890, "percentage": 9.2 },
+      { "code": "VN", "name": "Vietnam", "count": 2100, "percentage": 6.7 },
+      { "code": "IN", "name": "India", "count": 1850, "percentage": 5.9 },
+      { "code": "KR", "name": "South Korea", "count": 1420, "percentage": 4.5 },
+      { "code": "DE", "name": "Germany", "count": 1100, "percentage": 3.5 },
+      { "code": "TW", "name": "Taiwan", "count": 980, "percentage": 3.1 },
+      { "code": "NL", "name": "Netherlands", "count": 870, "percentage": 2.8 }
+    ],
+    "total": 31400
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/query/trends
+
+回傳基於 IoC 速度和模式分析的新興威脅趨勢。
+
+<ParamField query="periodDays" type="number" default="7">
+  用於趨勢偵測分析的天數。
+</ParamField>
+
+<ParamField query="minChange" type="number" default="10">
+  符合趨勢資格的最低百分比變化。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/query/trends?periodDays=7" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "periodDays": 7,
+    "trends": [
+      {
+        "category": "bruteforce",
+        "direction": "increasing",
+        "changePercent": 45.2,
+        "currentRate": 2100,
+        "previousRate": 1446,
+        "description": "SSH brute-force activity surging, primarily from CN and VN ranges"
+      },
+      {
+        "category": "phishing",
+        "direction": "increasing",
+        "changePercent": 23.8,
+        "currentRate": 890,
+        "previousRate": 719,
+        "description": "New phishing kit targeting financial services identified"
+      },
+      {
+        "category": "scanner",
+        "direction": "decreasing",
+        "changePercent": -15.3,
+        "currentRate": 1200,
+        "previousRate": 1417,
+        "description": "Port scanning activity declining after major botnet takedown"
+      }
+    ],
+    "emergingThreats": [
+      {
+        "indicator": "CVE-2026-1234",
+        "type": "cve",
+        "firstSeen": "2026-03-05T00:00:00Z",
+        "velocity": "rapid",
+        "sightingsLast24h": 342
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/query/mitre-heatmap
+
+回傳 MITRE ATT&CK 框架熱力圖，顯示在觀測到的威脅中技術出現的頻率。
+
+<ParamField query="period" type="string" default="30d">
+  時間範圍：`7d`、`30d`、`90d`。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/query/mitre-heatmap?period=30d" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "period": "30d",
+    "techniques": [
+      {
+        "id": "T1110",
+        "name": "Brute Force",
+        "tactic": "Credential Access",
+        "count": 15200,
+        "intensity": "critical"
+      },
+      {
+        "id": "T1059",
+        "name": "Command and Scripting Interpreter",
+        "tactic": "Execution",
+        "count": 8900,
+        "intensity": "high"
+      },
+      {
+        "id": "T1078",
+        "name": "Valid Accounts",
+        "tactic": "Persistence",
+        "count": 5400,
+        "intensity": "high"
+      },
+      {
+        "id": "T1566",
+        "name": "Phishing",
+        "tactic": "Initial Access",
+        "count": 3200,
+        "intensity": "medium"
+      },
+      {
+        "id": "T1204",
+        "name": "User Execution",
+        "tactic": "Execution",
+        "count": 2100,
+        "intensity": "medium"
+      }
+    ],
+    "tactics": {
+      "Initial Access": 5300,
+      "Execution": 11000,
+      "Persistence": 5400,
+      "Credential Access": 15200,
+      "Discovery": 3800,
+      "Lateral Movement": 1200,
+      "Collection": 800,
+      "Command and Control": 2100,
+      "Exfiltration": 400,
+      "Impact": 1500
+    }
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## POST /api/sightings
+
+記錄現有 IoC 的新觀測。觀測會增加指標的聲譽分數權重。
+
+<ParamField body="value" type="string" required>
+  被觀測到的 IoC 值。
+</ParamField>
+
+<ParamField body="source" type="string" required>
+  觀測來源（例如 `guard-agent`、`honeypot`）。
+</ParamField>
+
+<ParamField body="context" type="object">
+  關於觀測的額外上下文。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://tc.panguard.ai/api/sightings" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "value": "198.51.100.42",
+    "source": "guard-agent",
+    "context": {
+      "agentId": "agent-a1b2c3d4",
+      "detectionType": "brute_force",
+      "targetPort": 22
+    }
+  }'
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 201
+{
+  "ok": true,
+  "data": {
+    "sightingId": "sig_x1y2z3",
+    "iocValue": "198.51.100.42",
+    "totalSightings": 48,
+    "reputationChange": -2
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/sightings
+
+查詢特定 IoC 的觀測記錄。
+
+<ParamField query="value" type="string" required>
+  要查詢觀測記錄的 IoC 值。
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  最大結果數。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/sightings?value=198.51.100.42&limit=5" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "sig_x1y2z3",
+      "value": "198.51.100.42",
+      "source": "guard-agent",
+      "context": {
+        "agentId": "agent-a1b2c3d4",
+        "detectionType": "brute_force"
+      },
+      "timestamp": "2026-03-07T08:15:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 48,
+    "page": 1,
+    "limit": 5,
+    "pages": 10
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/audit-log
+
+回傳針對 Threat Cloud 執行的 API 操作稽核日誌。用於合規和除錯。
+
+<ParamField query="action" type="string">
+  依操作類型篩選：`create`、`update`、`delete`、`query`。
+</ParamField>
+
+<ParamField query="since" type="string">
+  日誌起始的 ISO 8601 時間戳。
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  最大結果數（最大 200）。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/audit-log?action=create&limit=10" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "audit_001",
+      "action": "create",
+      "resource": "ioc",
+      "details": "Added 3 IoCs (2 new, 1 updated)",
+      "apiKey": "key_...redacted",
+      "ip": "203.0.113.10",
+      "timestamp": "2026-03-07T08:15:00.000Z"
+    },
+    {
+      "id": "audit_002",
+      "action": "create",
+      "resource": "sighting",
+      "details": "Recorded sighting for 198.51.100.42",
+      "apiKey": "key_...redacted",
+      "ip": "203.0.113.10",
+      "timestamp": "2026-03-07T08:14:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 1234,
+    "page": 1,
+    "limit": 10,
+    "pages": 124
+  }
+}
+```
+</ResponseExample>
+
+<Info>
+稽核日誌回應中的 API key 值會被部分遮蔽。僅顯示前 4 個和最後 4 個字元。
+</Info>

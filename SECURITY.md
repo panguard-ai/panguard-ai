@@ -111,6 +111,26 @@ The marketing website sets the following security headers:
 - `Permissions-Policy: camera=(), microphone=(), geolocation=()`
 - `Content-Security-Policy` (with script-src self)
 
+## Telemetry & Data Collection / 遙測與數據收集
+
+PanguardGuard uploads anonymized threat data to Panguard Threat Cloud by default.
+
+- **No PII is ever collected** -- IP addresses are masked, no prompts or file contents are sent
+- **Fully opt-out** -- Use `panguard-guard start --no-telemetry` to disable all uploads
+- **Auditable** -- Use `--show-upload-data` to inspect exact payloads before upload
+- **Open source** -- All anonymization code is in `packages/panguard-guard/src/agent/report-agent.ts`
+
+See `packages/panguard-guard/PRIVACY.md` for the complete list of uploaded fields.
+
+## ATR (Agent Threat Rules) / 代理威脅規則
+
+ATR rules are open-source YAML detection rules for AI agent threats.
+
+- **Source**: [github.com/panguard-ai/agent-threat-rules](https://github.com/panguard-ai/agent-threat-rules)
+- **License**: MIT
+- **Verification**: All rules are YAML files with regex patterns -- no executable code
+- **Custom rules**: Users can add their own rules to `~/.panguard-guard/atr-rules/`
+
 ## Known Limitations / 已知限制
 
 - CSP uses `unsafe-inline` for script-src due to Next.js JSON-LD requirements

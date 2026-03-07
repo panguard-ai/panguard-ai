@@ -1,0 +1,236 @@
+---
+title: "威脅情報"
+description: "即時威脅情報來源與 Threat Cloud 集體情報網路。"
+icon: "globe"
+---
+
+# 威脅情報
+
+威脅情報提供關於已知攻擊者、惡意 IP、網域、URL 與惡意軟體特徵的結構化資訊。Panguard 自動查詢這些資料庫，以判斷您系統上的活動是否與已知威脅有關。
+
+<Info>
+您不需要了解技術細節。Guard 會自動處理查詢，Chat 則以白話語言解釋結果。
+</Info>
+
+---
+
+## 5 個內建威脅情報來源
+
+### abuse.ch 套件
+
+| 來源 | 指標類型 | 說明 |
+| --- | --- | --- |
+| [ThreatFox](https://threatfox.abuse.ch) | IP、域名、URL、雜湊 | 與惡意軟體攻擊活動相關的入侵指標 (IoC) 資料庫 |
+| [URLhaus](https://urlhaus.abuse.ch) | URL | 惡意軟體散布 URL 資料庫 |
+| [Feodo Tracker](https://feodotracker.abuse.ch) | IP | 殭屍網路命令控制 (C2) 伺服器追蹤 |
+
+### 其他來源
+
+| 來源 | 指標類型 | 說明 |
+| --- | --- | --- |
+| [GreyNoise](https://greynoise.io) | IP | 區分針對性攻擊與大規模網路掃描 |
+| [AbuseIPDB](https://abuseipdb.com) | IP | 社群回報的惡意 IP 資料庫，附帶信心度評分 |
+
+---
+
+## 來源更新排程
+
+| 來源 | 更新頻率 | 查詢方式 |
+| --- | --- | --- |
+| ThreatFox | 每 6 小時 | 本地快取 |
+| URLhaus | 每 6 小時 | 本地快取 |
+| Feodo Tracker | 每 6 小時 | 本地快取 |
+| GreyNoise | 每次查詢即時 | API 呼叫 |
+| AbuseIPDB | 每次查詢即時 | API 呼叫 |
+
+<Tip>
+6 小時的更新間隔可以調整。高安全性環境可縮短至 1 小時。頻寬受限的系統可延長至 24 小時。
+</Tip>
+
+### 本地快取
+
+查詢結果會在本地快取以避免重複查詢：
+
+- 快取持續時間：依來源 1-24 小時
+- 快取位置：Guard 資料目錄
+- 過期的項目會自動清除
+
+---
+
+## 入侵指標 (IoC)
+
+威脅情報追蹤以下類型的指標：
+
+| 類型 | 說明 | 範例 |
+| --- | --- | --- |
+| **IP 位址** | 已知惡意 IP | `203.0.113.50` |
+| **域名** | 惡意域名 | `malware.example.com` |
+| **URL** | 惡意 URL | `http://evil.com/payload.exe` |
+| **檔案雜湊** | 惡意軟體指紋（SHA-256） | `e3b0c44298fc1c149a...` |
+| **電子郵件** | 釣魚電子郵件地址 | `phish@attacker.com` |
+
+### 自動查詢
+
+Guard 偵測到可疑活動時會自動查詢威脅情報：
+
+```
+Suspicious IP 203.0.113.50 connection detected
+       |
+       v
+  Query ThreatFox  -> Known C2 server
+  Query AbuseIPDB  -> Reported 1,247 times
+  Query GreyNoise  -> Mass scanner
+       |
+       v
+  Conclusion: High risk -- auto-block + notify
+```
+
+---
+
+## Threat Cloud -- 集體情報
+
+除了公開來源外，Panguard 使用者還可貢獻並受益於 Threat Cloud，這是一個社群驅動的集體情報網路。
+
+```
+  Your Panguard           Threat Cloud          Other Users' Panguard
+       |                      |                         |
+  Detect threat  --upload-->  Collect+Verify  --push-->  Preemptive protection
+```
+
+### 運作方式
+
+1. 您的 Guard 偵測到新的威脅指標
+2. 指標經匿名化後上傳至 Threat Cloud
+3. Threat Cloud 驗證並與所有提交進行關聯
+4. 已驗證的指標分發至所有參與的 Panguard 執行個體
+
+### IoC 信譽評分
+
+Threat Cloud 中的每個指標都會獲得 0 到 100 的信譽分數：
+
+| 分數範圍 | 分類 | 動作 |
+| --- | --- | --- |
+| 80-100 | 已確認惡意 | 可自動封鎖 |
+| 50-79 | 可疑 | 警報 + 人工審查 |
+| 20-49 | 低信心度 | 僅監控 |
+| 0-19 | 資訊性 | 已記錄，不採取行動 |
+
+### 攻擊活動追蹤與關聯
+
+Threat Cloud 跨提交關聯指標，以識別攻擊活動：
+
+- 多位使用者在時間窗口內回報相同 IP 會觸發攻擊活動偵測
+- 攻擊活動指標會獲得提升的信譽分數
+- 相關指標（相同 ASN、相同域名家族）會自動連結
+
+---
+
+## 隱私與資料保護
+
+<Warning>
+**隱私保證：** 僅上傳威脅指標（IP、雜湊、模式）。絕不分享任何系統資訊、使用者名稱、內部 IP、檔案內容或個人識別資訊。
+</Warning>
+
+| 隱私措施 | 詳情 |
+| --- | --- |
+| **IP 匿名化** | 來源 IP 在上傳前進行 /16 匿名化 |
+| **GDPR 合規** | 不收集或儲存個人資料 |
+| **零原始資料** | 不傳輸日誌內容、檔案內容或系統詳情 |
+| **零遙測** | 不收集使用分析、當機報告或行為追蹤 |
+| **可選擇退出** | Threat Cloud 可完全停用 |
+
+---
+
+## 離線模式
+
+Panguard 可完全離線運作。當威脅情報來源無法連線時：
+
+- Layer 1 規則引擎以本地快取規則持續運作
+- 先前快取的來源資料在過期前仍可使用
+- 新的偵測僅依賴 Sigma/YARA 規則與行為基線
+- 分數調整會反映情報覆蓋率降低
+
+```bash
+# 停用所有外部情報（僅規則模式）
+panguard guard start --offline
+```
+
+<Note>
+離線模式停用 Threat Cloud 參與與即時來源查詢。快取資料在過期前仍會使用。
+</Note>
+
+---
+
+## 查看威脅情報
+
+### Guard 狀態
+
+```bash
+panguard guard status
+```
+
+```
+  -- Threat Intelligence --------------------
+
+  Feeds:        5 active, last update 2h ago
+  IoC matched:  3 in last 24h
+  Blocked IPs:  12 total
+```
+
+### Chat 通知
+
+當威脅情報與您系統上的活動匹配時，Chat 會以適合您使用者角色的格式通知您：
+
+<Tabs>
+  <Tab title="Boss 角色">
+    ```
+    [Panguard AI Security Alert]
+
+    Your server was communicating with a known malicious server.
+    That IP has been reported 1,247 times globally.
+    The connection has been automatically blocked. No action needed.
+
+    Risk level: High
+    Status: Automatically resolved
+    ```
+  </Tab>
+  <Tab title="Developer 角色">
+    ```
+    [Panguard AI Alert]
+
+    Threat Intel Match: 203.0.113.50
+    Source: AbuseIPDB (confidence: 98%), ThreatFox (tag: C2)
+    Process: curl (PID 5678) -> 203.0.113.50:443
+    Action: IP blocked via iptables
+    Rule: sigma/network/c2-communication.yml
+    ```
+  </Tab>
+  <Tab title="IT Admin 角色">
+    ```
+    [Panguard AI - Remediation Guide]
+
+    Event: Communication with known C2 server detected
+    Severity: High
+    Action taken: Auto-blocked IP 203.0.113.50
+
+    Recommended next steps:
+    1. Check if process curl (PID 5678) is legitimate
+    2. If not, terminate: kill -9 5678
+    3. Check for other processes connecting to the same IP
+    4. Run a system scan: panguard scan
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## 相關內容
+
+<CardGroup cols={2}>
+  <Card title="部署 Threat Cloud" icon="cloud" href="/guides/threat-cloud-deployment">
+    部署您自己的私有 Threat Cloud 伺服器。
+  </Card>
+  <Card title="三層式 AI 漏斗" icon="brain-circuit" href="/concepts/three-layer-ai">
+    威脅情報如何整合至偵測流水線。
+  </Card>
+</CardGroup>

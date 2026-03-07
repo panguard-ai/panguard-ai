@@ -1,0 +1,100 @@
+---
+title: "Panguard Chat"
+description: "透過 Telegram、Slack、Email 和 Webhook 的 AI 驅動安全通知，搭配基於角色的語氣調適。"
+icon: "message-square"
+---
+
+Panguard Chat 是通知與溝通層。它透過您偏好的管道以淺顯語言傳遞安全警報，並根據您的角色調整語氣和詳細程度——無論您是想要影響摘要的老闆、想要原始技術資料的開發者，還是想要修復步驟的 IT 管理員。
+
+## 快速開始
+
+```bash
+# 互動式設定精靈
+panguard chat setup
+
+# 直接設定
+panguard chat setup --channel telegram --user-type boss --lang zh-TW
+
+# 測試您的通知管道
+panguard chat test
+
+# 檢查狀態
+panguard chat status
+```
+
+## 通知管道
+
+<CardGroup cols={2}>
+  <Card title="Telegram" icon="paper-plane" href="/products/chat/telegram">
+    Bot API 整合搭配 Markdown 格式。最適合個人開發者和個人伺服器。
+  </Card>
+  <Card title="Slack" icon="hashtag" href="/products/chat/slack">
+    Block Kit 豐富格式搭配頻道路由。最適合團隊和組織。
+  </Card>
+  <Card title="Email 與 Webhook" icon="envelope" href="/products/chat/email-webhook">
+    SMTP HTML 電子郵件和自訂 webhook 載荷搭配 mTLS。最適合合規和自動化。
+  </Card>
+  <Card title="使用者角色" icon="users" href="/products/chat/user-roles">
+    3 種角色搭配量身定製的通知格式：老闆、開發者、IT 管理員。
+  </Card>
+</CardGroup>
+
+## 通知類型
+
+Chat 發送以下通知類型，每種由不同的 Guard 事件觸發：
+
+| 類型 | 觸發條件 | 頻率 |
+|------|---------|-----------|
+| **威脅警報** | Guard 偵測到威脅 | 即時 |
+| **自動回應通知** | Guard 執行了回應動作 | 即時 |
+| **確認請求** | 信心值 70--90%，需要人工核准 | 即時 |
+| **每日摘要** | 排程的每日總結 | 每天一次 |
+| **學習進度** | 學習模式期間 | 每天一次 |
+| **評分變動** | 安全評分顯著變動 | 即時 |
+
+## 3 種使用者角色
+
+相同的安全事件根據您設定的角色以不同方式呈現：
+
+| 角色 | 目標受眾 | 重點 |
+|------|----------------|-------|
+| `boss` | 非技術主管 | 影響摘要、業務風險、動作狀態 |
+| `developer` | 工程師、DevOps | 原始技術資料、IP、PID、規則、時間線 |
+| `it_admin` | IT 管理員 | 逐步修復指引 |
+
+請參閱[使用者角色](/products/chat/user-roles)了解範例輸出。
+
+## 雙語支援
+
+所有通知模板均提供英文和繁體中文版本：
+
+```bash
+# 繁體中文通知
+panguard chat setup --channel telegram --lang zh-TW
+
+# 英文通知
+panguard chat setup --channel slack --lang en
+```
+
+## 憑證安全
+
+管道憑證（Bot 權杖、SMTP 密碼、webhook 密鑰）使用 AES-256-GCM 加密並儲存在本地。憑證永遠不會以明文傳輸，也永遠不會離開您的機器。
+
+## CLI 選項
+
+```
+panguard chat <command> [options]
+
+Commands:
+  setup              互動式設定精靈
+  test               發送測試通知
+  status             顯示管道狀態
+  config             顯示目前設定
+  prefs              檢視/更新通知偏好
+
+Options:
+  --channel <type>       管道類型（telegram|slack|email|webhook）
+  --user-type <type>     使用者角色（developer|boss|it_admin）
+  --lang <en|zh-TW>      語言
+  --data-dir <path>      資料目錄
+```

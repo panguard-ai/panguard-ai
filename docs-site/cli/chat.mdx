@@ -1,0 +1,100 @@
+---
+title: "panguard chat"
+description: "Configure notification channels for security alerts and interact with the AI assistant."
+icon: "message-bot"
+---
+
+The `chat` command manages how Panguard communicates with you. Set up Telegram, Slack, or Email notifications for security events, configure alert preferences, and test that messages are delivered correctly.
+
+## Usage
+
+```bash
+panguard chat <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+| --- | --- |
+| `setup` | Interactive setup wizard for a notification channel |
+| `test` | Send a test message to verify channel connectivity |
+| `status` | Show configured channels and their health |
+| `config` | View or modify chat configuration |
+| `prefs` | Set notification preferences (severity filters, quiet hours, language) |
+
+## Options
+
+<ParamField path="--channel" type="string">
+  Specify the notification channel type: `telegram`, `slack`, or `email`.
+</ParamField>
+
+<ParamField path="--user-type" type="string">
+  Set the user role for notification routing: `owner`, `admin`, or `viewer`.
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  Set the language for notifications (e.g., `en`, `zh-TW`, `ja`).
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Set up Telegram notifications
+panguard chat setup --channel telegram
+```
+
+```bash Set up Slack notifications
+panguard chat setup --channel slack
+```
+
+```bash Test current configuration
+panguard chat test
+```
+
+```bash Check channel status
+panguard chat status
+```
+
+```bash Set notification preferences
+panguard chat prefs --lang zh-TW
+```
+
+```bash View chat configuration
+panguard chat config
+```
+</CodeGroup>
+
+## Notification Channels
+
+| Channel | Setup Method | Delivery Speed |
+| --- | --- | --- |
+| Telegram | Bot token + chat ID (guided wizard) | Instant |
+| Slack | Webhook URL or Slack App install | Instant |
+| Email | SMTP config or Panguard relay | 1-5 minutes |
+
+<Tip>
+  Telegram is the recommended channel for individual developers. It supports rich formatting, inline actions, and two-way AI chat.
+</Tip>
+
+## Plan Requirements
+
+<Info>
+  Chat setup and notifications require the **Solo** ($9/mo) plan or higher. Community plan users can view the demo notification flow.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Notifications Setup Guide" icon="bell" href="/guides/notifications-setup">
+    Step-by-step guide for each notification channel.
+  </Card>
+  <Card title="Chat Product Overview" icon="comments" href="/products/chat/overview">
+    Full documentation of the Chat notification system.
+  </Card>
+  <Card title="Chat Configuration" icon="gear" href="/configuration/chat-config">
+    Advanced configuration options for notification routing.
+  </Card>
+  <Card title="User Roles" icon="users" href="/products/chat/user-roles">
+    How notification routing differs by user role.
+  </Card>
+</CardGroup>

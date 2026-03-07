@@ -1,0 +1,209 @@
+---
+title: "安全分數"
+description: "Panguard 如何計算系統的 0-100 風險分數與 A 到 F 等級。"
+icon: "chart-simple"
+---
+
+# 安全分數
+
+一個 0-100 的數字，精確告訴您系統的安全狀態。每次掃描與每次 Guard 狀態檢查都會回傳此分數與對應的字母等級。
+
+```
+  Score: 85/100 [=================---] Grade: B
+```
+
+---
+
+## 等級量表
+
+| 分數 | 等級 | 意義 |
+| --- | --- | --- |
+| 90-100 | **A** | 優秀 -- 防護全面 |
+| 80-89 | **B** | 良好 -- 可進行小幅改善 |
+| 70-79 | **C** | 尚可 -- 請處理中等風險問題 |
+| 60-69 | **D** | 需改善 -- 存在重大風險 |
+| 0-59 | **F** | 危急 -- 需立即採取行動 |
+
+---
+
+## 評分因子
+
+安全分數是 8 個因子的加權合成，每個因子獨立評分 0-100：
+
+| 因子 | 權重 | 衡量內容 |
+| --- | --- | --- |
+| **開放連接埠** | 15% | 是否有不必要的連接埠暴露在網路上？ |
+| **防火牆** | 15% | 防火牆是否啟用且規則完整？ |
+| **系統更新** | 15% | 作業系統與軟體套件是否為最新？ |
+| **威脅狀態** | 15% | 系統上是否存在已知的活躍威脅？ |
+| **密碼策略** | 10% | 是否強制密碼複雜度？ |
+| **安全工具** | 10% | 是否安裝防毒、EDR 或 IDS 工具？ |
+| **合規性** | 10% | 系統是否符合基本安全框架？ |
+| **回應準備度** | 10% | 威脅回應機制是否就緒？ |
+
+### 計算方式
+
+```
+Total = (Ports x 0.15) + (Firewall x 0.15) + (Updates x 0.15) +
+        (Threats x 0.15) + (Password x 0.10) + (Tools x 0.10) +
+        (Compliance x 0.10) + (Response x 0.10)
+```
+
+<Info>
+每個因子獨立評分 0-100。加權總和產生最終合成分數。
+</Info>
+
+---
+
+## 快速掃描 vs 完整掃描
+
+掃描深度會影響評估的因子數量：
+
+| 掃描模式 | 持續時間 | 評估因子 | 使用場景 |
+| --- | --- | --- | --- |
+| `panguard scan --quick` | ~30 秒 | 開放連接埠、防火牆、密碼策略、執行中服務 | 每日快速檢查 |
+| `panguard scan` | ~60 秒 | 全部 8 個因子，包含 SSL 憑證、排程任務、共享資料夾 | 全面稽核 |
+
+<Tip>
+快速掃描可能產生與完整掃描略有不同的分數，因為評估的因子較少。若要取得最準確的分數，請執行完整掃描。
+</Tip>
+
+---
+
+## 分數明細範例
+
+掃描後，Panguard 會顯示詳細的分數明細：
+
+```
+  -- Risk Score ----------------------------
+
+  Score: 72/100 [==================--] Grade: C
+  Trend: improving (+5 since last scan)
+
+  Breakdown:
+    Firewall:    80/100
+    Open Ports:  60/100
+    Passwords:   50/100
+    Updates:     90/100
+    Tools:       70/100
+    Threats:     85/100
+    Compliance:  65/100
+    Response:    70/100
+```
+
+---
+
+## Guard 持續更新分數
+
+Guard 執行時，安全分數會隨狀態變化持續重新計算：
+
+- 新連接埠開啟 -- 開放連接埠因子下降，分數降低
+- 偵測到威脅並自動封鎖 -- 威脅狀態因子更新
+- Guard 已運行 7 天以上 -- 回應準備度因子改善
+
+```bash
+panguard guard status
+```
+
+```
+  -- Security Score -----------------------
+
+  Score: 88/100 [===================] Grade: B
+  Trend: stable (no change in 48h)
+  Guard uptime: 14 days
+```
+
+<Note>
+Guard 的持續監控比單純的定期掃描提供更準確、更即時的分數。分數會隨系統安全態勢變化近乎即時更新。
+</Note>
+
+---
+
+## 趨勢追蹤
+
+安全分數追蹤隨時間的變化：
+
+| 趨勢 | 條件 | 意義 |
+| --- | --- | --- |
+| **改善中** | 分數較上次檢查增加 2+ 分 | 安全態勢正在改善 |
+| **下降中** | 分數較上次檢查減少 2+ 分 | 安全態勢正在惡化 |
+| **穩定** | 變化在 2 分以內 | 安全態勢平穩 |
+
+<Warning>
+即使絕對分數仍可接受，下降趨勢也應觸發調查。小幅下降往往是更大問題的前兆。
+</Warning>
+
+---
+
+## PDF 報告
+
+安全分數是產生的 PDF 報告中的核心元素：
+
+- **分數與等級** 醒目顯示於首頁
+- **因子明細** 包含各類別的個別分數
+- **修復建議** 依對分數的影響排序
+- **趨勢圖表** 顯示分數隨時間的變化（有歷史資料時）
+
+```bash
+panguard scan --output my-report.pdf
+```
+
+---
+
+## 在哪裡查看分數
+
+<AccordionGroup>
+  <Accordion title="Panguard Scan">
+    每次掃描完成時都會顯示安全分數：
+
+    ```bash
+    panguard scan
+    ```
+  </Accordion>
+  <Accordion title="Panguard Guard">
+    Guard 持續計算即時分數。使用以下指令查看：
+
+    ```bash
+    panguard guard status
+    ```
+  </Accordion>
+  <Accordion title="Panguard Status">
+    快速查看目前分數：
+
+    ```bash
+    panguard status
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## 提升分數
+
+<Steps>
+  <Step title="執行完整掃描">
+    先用 `panguard scan` 取得目前分數並查看因子明細。
+  </Step>
+  <Step title="優先處理嚴重發現">
+    專注於 CRITICAL 與 HIGH 嚴重性的發現。這些對分數影響最大。
+  </Step>
+  <Step title="啟用 Guard">
+    持續執行 Guard 可改善回應準備度與威脅狀態因子。
+  </Step>
+  <Step title="重新掃描以驗證">
+    修改後再次掃描，確認分數已改善。
+  </Step>
+</Steps>
+
+---
+
+## 相關內容
+
+<CardGroup cols={2}>
+  <Card title="首次掃描" icon="magnifying-glass" href="/guides/first-scan">
+    執行首次安全掃描的逐步指南。
+  </Card>
+  <Card title="學習模式" icon="graduation-cap" href="/concepts/learning-mode">
+    Guard 如何在 7 天學習期間建立行為基線。
+  </Card>
+</CardGroup>

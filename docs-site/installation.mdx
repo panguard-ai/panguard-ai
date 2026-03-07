@@ -1,0 +1,175 @@
+---
+title: "Installation"
+description: "Detailed installation instructions for macOS, Linux, and Windows including system requirements, multiple install methods, and verification steps."
+icon: "download"
+---
+
+## System Requirements
+
+| Item | Minimum |
+| --- | --- |
+| **OS** | macOS 12+, Ubuntu 20.04+, Windows 10+ |
+| **Node.js** | >= 20.0.0 |
+| **Disk** | 200 MB |
+| **Memory** | 512 MB (1 GB recommended for Guard) |
+
+## Platform Support
+
+Not all features are equally supported across every platform. macOS and Linux are the primary targets.
+
+| Feature | macOS | Linux | Windows |
+| --- | --- | --- | --- |
+| **Scan** | Full (lsof, socketfilterfw) | Full (ss, ufw/iptables) | Partial (netstat, no firewall) |
+| **Guard** | Poll monitoring (5s) | Poll monitoring (5s) | Poll monitoring (5s) |
+| **Trap** | TCP honeypots | TCP honeypots | TCP honeypots |
+| **Chat** | Telegram / Slack / Email | Telegram / Slack / Email | Telegram / Slack / Email |
+| **Report** | Full (3 frameworks) | Full (3 frameworks) | Full (3 frameworks) |
+
+<Warning>
+  Windows supports core features, but some OS-level detection capabilities are limited compared to macOS and Linux.
+</Warning>
+
+## Available Binaries (v0.3.1)
+
+| Platform | Architecture | Install Method |
+| --- | --- | --- |
+| macOS | ARM64 (Apple Silicon) | curl one-liner or npm |
+| Linux | x64 | curl one-liner or npm |
+| Linux | ARM64 | curl one-liner or npm |
+| Windows | x64 | npm (recommended) or PowerShell |
+
+## Install Methods
+
+<Tabs>
+  <Tab title="macOS">
+    ### One-command install (recommended)
+
+    ```bash
+    curl -fsSL https://get.panguard.ai | bash
+    ```
+
+    This downloads the ARM64 binary for Apple Silicon Macs and places it on your PATH.
+
+    <Tip>
+      **Intel Mac users:** The curl installer downloads the ARM64 binary by default. You have two options:
+      1. Install via npm instead: `npm install -g @panguard-ai/panguard`
+      2. Enable Rosetta 2 first: `softwareupdate --install-rosetta`
+    </Tip>
+
+    ### Using npm
+
+    ```bash
+    npm install -g @panguard-ai/panguard
+    ```
+
+    ### Using Homebrew (coming soon)
+
+    ```bash
+    brew install panguard-ai/tap/panguard
+    ```
+  </Tab>
+
+  <Tab title="Linux">
+    ### One-command install (recommended)
+
+    ```bash
+    curl -fsSL https://get.panguard.ai | bash
+    ```
+
+    The installer auto-detects your architecture (x64 or ARM64) and downloads the correct binary.
+
+    ### Using npm
+
+    ```bash
+    npm install -g @panguard-ai/panguard
+    ```
+
+    ### System package (coming soon)
+
+    ```bash
+    # Debian / Ubuntu
+    sudo apt install panguard
+
+    # RHEL / Fedora
+    sudo dnf install panguard
+    ```
+  </Tab>
+
+  <Tab title="Windows">
+    ### Using npm (recommended)
+
+    ```powershell
+    npm install -g @panguard-ai/panguard
+    ```
+
+    ### PowerShell one-liner
+
+    ```powershell
+    powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"
+    ```
+
+    <Info>
+      npm is the recommended install method on Windows. The PowerShell installer requires administrator privileges.
+    </Info>
+  </Tab>
+</Tabs>
+
+## Install from Source
+
+For contributors or users who want the latest development build:
+
+```bash
+git clone https://github.com/panguard-ai/panguard-ai.git
+cd panguard-ai
+pnpm install
+pnpm build
+
+# Run the CLI
+./bin/panguard --help
+```
+
+<Info>
+  Building from source requires [pnpm](https://pnpm.io/) 10+ and Node.js 20+.
+</Info>
+
+## Verify Installation
+
+After installing, confirm that the CLI is available:
+
+```bash
+panguard --version
+```
+
+Expected output:
+
+```
+0.3.1
+```
+
+If the command is not found, ensure the install location is on your system PATH. For npm global installs, verify with:
+
+```bash
+npm list -g @panguard-ai/panguard
+```
+
+## Uninstall
+
+<Tabs>
+  <Tab title="npm">
+    ```bash
+    npm uninstall -g @panguard-ai/panguard
+    ```
+  </Tab>
+  <Tab title="curl install">
+    ```bash
+    rm "$(which panguard)"
+    ```
+  </Tab>
+  <Tab title="Source build">
+    Simply delete the cloned repository directory.
+  </Tab>
+</Tabs>
+
+## Next step
+
+Once installed, proceed to [Account Setup](/account-setup) to create your account and authenticate the CLI.

@@ -1,0 +1,138 @@
+---
+title: "Panguard Report"
+description: "Automated compliance report generation for ISO 27001, SOC 2, and Taiwan Cyber Security Act with PDF and JSON output."
+icon: "file-check"
+---
+
+Panguard Report generates compliance-ready security reports aligned to major regulatory frameworks. It evaluates your system's security posture against framework controls, produces detailed findings with remediation guidance, and outputs professional PDF or machine-readable JSON reports.
+
+## Quick Start
+
+```bash
+# Generate ISO 27001 compliance report
+panguard report generate --framework iso27001
+
+# Generate Taiwan Cyber Security Act report in Chinese
+panguard report generate --framework tw_cyber_security_act --language zh-TW
+
+# Generate SOC 2 report
+panguard report generate --framework soc2
+
+# Quick compliance summary
+panguard report summary --framework iso27001
+
+# List available frameworks
+panguard report list-frameworks
+```
+
+<Note>
+  Panguard Report requires a **Pro plan** or above. Run `panguard scan` before generating reports for the most accurate compliance assessment.
+</Note>
+
+## Supported Frameworks
+
+| Framework | Controls | Identifier |
+|-----------|----------|------------|
+| **ISO 27001** | 30 controls | `iso27001` |
+| **SOC 2** | 10 controls | `soc2` |
+| **Taiwan Cyber Security Act (TCSA)** | 10 controls | `tw_cyber_security_act` |
+
+See [Frameworks](/products/report/frameworks) for a full breakdown of every control.
+
+## How It Works
+
+<Steps>
+  <Step title="Collect evidence">
+    Report pulls findings from the most recent Panguard Scan results and Guard event logs. No additional scanning is required.
+  </Step>
+  <Step title="Map to controls">
+    Each finding is mapped to applicable framework controls. A single finding may map to multiple controls across multiple frameworks.
+  </Step>
+  <Step title="Assess compliance">
+    Each control receives a status: Compliant, Partially Compliant, Non-Compliant, or Not Assessed based on the evidence collected.
+  </Step>
+  <Step title="Generate output">
+    The report is rendered in your chosen format (PDF or JSON) with executive summary, control assessments, findings, and remediation.
+  </Step>
+</Steps>
+
+## Report Contents
+
+Every compliance report includes 6 sections:
+
+| Section | Content |
+|---------|---------|
+| **Organization Information** | Organization name, report date, assessment scope |
+| **Framework Overview** | Description of the applicable compliance framework |
+| **Control Evaluation** | Each control assessed with status and evidence |
+| **Findings Detail** | Specific issues with severity and affected controls |
+| **Remediation Recommendations** | Actionable improvement steps per finding |
+| **Compliance Summary** | Overall compliance percentage and risk assessment |
+
+## Quick Compliance Summary
+
+For a fast overview without generating a full report:
+
+```bash
+panguard report summary --framework iso27001
+```
+
+```
+── ISO 27001 Compliance Summary ───────
+
+Overall:    72% compliant
+Compliant:  8/12 controls
+Partial:    2/12 controls
+Gap:        2/12 controls
+
+Priority fixes:
+1. Access Control - Enforce MFA
+2. Incident Response - Define procedures
+```
+
+## Integration with Scan
+
+Scan findings can serve as input to Report:
+
+```bash
+# Run a scan to collect findings
+panguard scan --output scan-findings.pdf
+
+# Generate compliance report using findings
+panguard report generate \
+  --framework tw_cyber_security_act \
+  --org "Your Company Name" \
+  --language zh-TW \
+  --output-dir ./reports
+```
+
+## CLI Options
+
+```
+panguard report <command> [options]
+
+Commands:
+  generate           Generate compliance report
+  list-frameworks    List supported frameworks
+  validate           Validate input findings file
+  summary            Show compliance summary
+  config             Show current configuration
+
+Options:
+  --framework <name>     Framework (tw_cyber_security_act|iso27001|soc2)
+  --language <lang>      Report language (en|zh-TW)
+  --format <fmt>         Output format (json|pdf)
+  --output-dir <path>    Output directory
+  --org <name>           Organization name
+  --input <file>         Input findings file (JSON)
+  --verbose, -v          Verbose output
+```
+
+<CardGroup cols={2}>
+  <Card title="Frameworks" icon="scale-balanced" href="/products/report/frameworks">
+    All 3 frameworks with full control breakdowns.
+  </Card>
+  <Card title="Output Formats" icon="file-export" href="/products/report/output-formats">
+    JSON, PDF, and text output options with bilingual support.
+  </Card>
+</CardGroup>

@@ -1,0 +1,91 @@
+---
+title: "panguard login"
+description: "Authenticate with your Panguard AI account."
+icon: "right-to-bracket"
+---
+
+The `login` command authenticates your CLI session with the Panguard Cloud. By default it opens a browser for OAuth authentication, but also supports headless environments with the `--no-browser` flag.
+
+## Usage
+
+```bash
+panguard login [options]
+```
+
+## Options
+
+<ParamField path="--api-url" type="string">
+  Override the default Panguard API endpoint. Useful for self-hosted or staging environments.
+</ParamField>
+
+<ParamField path="--no-browser" type="flag">
+  Use device-code authentication instead of opening a browser. Prints a URL and code to enter manually -- ideal for SSH sessions and headless servers.
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  Set the language for login prompts and messages.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Browser-based login (default)
+panguard login
+```
+
+```bash Headless / SSH login
+panguard login --no-browser
+```
+
+```bash Self-hosted API endpoint
+panguard login --api-url https://panguard.internal.example.com/api
+```
+
+```bash Login in Traditional Chinese
+panguard login --lang zh-TW
+```
+</CodeGroup>
+
+## Authentication Flow
+
+<Tabs>
+  <Tab title="Browser (default)">
+    1. CLI opens your default browser to the Panguard login page
+    2. You sign in with email, Google, or GitHub
+    3. Browser redirects back and the CLI receives the token
+    4. Token is stored securely in `~/.panguard/credentials`
+  </Tab>
+  <Tab title="Headless (--no-browser)">
+    1. CLI prints a URL and a one-time device code
+    2. You open the URL on any device and enter the code
+    3. After confirmation, the CLI receives the token
+    4. Token is stored securely in `~/.panguard/credentials`
+  </Tab>
+</Tabs>
+
+<Tip>
+  Authentication tokens are valid for 30 days and refresh automatically. You only need to log in again if the token expires or you explicitly log out.
+</Tip>
+
+## Plan Requirements
+
+<Info>
+  Available on all plans including **Community (Free)**.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Account Setup" icon="user-plus" href="/account-setup">
+    Create your Panguard account before logging in.
+  </Card>
+  <Card title="panguard logout" icon="right-from-bracket" href="/cli/logout">
+    End your current CLI session.
+  </Card>
+  <Card title="panguard whoami" icon="id-card" href="/cli/whoami">
+    Verify your authenticated identity.
+  </Card>
+  <Card title="Auth Troubleshooting" icon="key" href="/troubleshooting/auth-issues">
+    Fix common authentication problems.
+  </Card>
+</CardGroup>

@@ -1,0 +1,78 @@
+title: SSRF via Agent Tool Calls
+id: ATR-2026-013
+status: experimental
+description: |
+  Detects Server-Side Request Forgery (SSRF) attempts through agent tool
+  calls. Attackers manipulate agents into making requests to internal
+  network endpoints, cloud metadata services, localhost, or private IP
+  ranges through tool parameters.
+author: "ATR Community"
+date: 2026/03/08
+severity: critical
+
+references:
+  owasp_llm:
+    - "LLM06:2025 - Excessive Agency"
+    - "LLM05:2025 - Improper Output Handling"
+  mitre_atlas:
+    - "AML.T0049 - Exploit Public-Facing Application"
+
+tags:
+  category: tool-poisoning
+  subcategory: ssrf
+  confidence: high
+
+agent_source:
+  type: tool_call
+  framework:
+    - any
+  provider:
+    - any
+
+detection:
+  conditions:
+    ssrf_patterns:
+      field: tool_args
+      patterns:
+        - "(?:https?://)?169\\.254\\.169\\.254"
+        - "(?:https?://)?metadata\\.google\\.internal"
+        - "(?:https?://)?(?:localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[::1\\])(?::[0-9]+)?"
+        - "(?:https?://)?10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"
+        - "(?:https?://)?172\\.(?:1[6-9]|2[0-9]|3[01])\\.\\d{1,3}\\.\\d{1,3}"
+        - "(?:https?://)?192\\.168\\.\\d{1,3}\\.\\d{1,3}"
+        - "/latest/meta-data|/latest/api/token|/computeMetadata/v1|/metadata/v1"
+        - "(?:https?://)?[a-zA-Z0-9.-]+\\.internal(?::[0-9]+)?(?:/|$)"
+        - "file:///|gopher://|dict://|ftp://127\\.|tftp://"
+      match_type: regex
+      case_sensitive: false
+  condition: "ssrf_patterns"
+  false_positives:
+    - "Agents with legitimate access to internal services explicitly allowlisted"
+    - "Development environments where localhost access is expected"
+    - "Private network tools designed for internal infrastructure"
+
+response:
+  actions:
+    - block_tool
+    - alert
+    - snapshot
+    - kill_agent
+  auto_response_threshold: high
+  message_template: |
+    [ATR] SSRF attempt detected via agent tool call
+    Rule: ATR-2026-013
+    Tool: {tool_name}
+    Pattern: {matched_pattern}
+    Action: Tool call blocked, agent terminated
+
+test_cases:
+  true_positives:
+    - tool_args: "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
+      expected: triggered
+    - tool_args: "http://localhost:8080/admin/config"
+      expected: triggered
+  true_negatives:
+    - tool_args: "https://api.github.com/repos/user/repo"
+      expected: not_triggered
+    - tool_args: "https://www.example.com/public/data.json"
+      expected: not_triggered

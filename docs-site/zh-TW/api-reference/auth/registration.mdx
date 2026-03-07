@@ -1,0 +1,126 @@
+---
+title: "註冊"
+description: "建立新的 Panguard AI 帳號並取得身份驗證 token。"
+icon: "user-plus"
+---
+
+## POST /api/auth/register
+
+建立新的使用者帳號並自動啟用 14 天 Solo 試用。回傳 JWT token 以立即存取 API。
+
+### 請求
+
+<ParamField body="email" type="string" required>
+  有效的 email 地址。必須在平台上唯一。
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  使用者的顯示名稱。1--100 個字元。
+</ParamField>
+
+<ParamField body="password" type="string" required>
+  帳號密碼。必須為 8--128 個字元。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://auth.panguard.ai/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "name": "Alice Chen",
+    "password": "secureP@ssw0rd"
+  }'
+```
+
+```javascript Node.js
+const response = await fetch('https://auth.panguard.ai/api/auth/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'user@example.com',
+    name: 'Alice Chen',
+    password: 'secureP@ssw0rd',
+  }),
+});
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post('https://auth.panguard.ai/api/auth/register', json={
+    'email': 'user@example.com',
+    'name': 'Alice Chen',
+    'password': 'secureP@ssw0rd',
+})
+data = response.json()
+```
+</CodeGroup>
+
+### 回應
+
+<Tabs>
+  <Tab title="201 Created">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "user": {
+          "id": "usr_a1b2c3d4e5f6",
+          "email": "user@example.com",
+          "name": "Alice Chen",
+          "tier": "solo",
+          "trialEndsAt": "2026-03-21T00:00:00.000Z",
+          "createdAt": "2026-03-07T12:00:00.000Z"
+        },
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        "expiresAt": "2026-03-08T12:00:00.000Z"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="400 驗證錯誤">
+    ```json
+    {
+      "ok": false,
+      "error": "Password must be between 8 and 128 characters"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### 試用啟用
+
+每個新帳號自動獲得 **14 天 Solo 試用**，包括：
+
+- 最多 3 台機器
+- 完整的掃描、防護、聊天和報告功能
+- 基本 AI 分析
+
+<Info>
+試用到期後，帳號會還原為 **Community** 層級（1 台機器，僅掃描 + 第一層防護）。您可以隨時透過 CLI 的 `panguard upgrade` 或網頁儀表板升級。
+</Info>
+
+### 安全性：重複 Email 處理
+
+<Warning>
+為防止 email 列舉攻擊，使用已存在的 email 註冊會回傳 **200 OK** 和通用的成功訊息，而不會揭露該 email 已被使用。實際帳號不會被修改，也不會簽發新的 token。
+</Warning>
+
+這意味著：
+- 攻擊者無法透過探測 API 來發現哪些 email 已有帳號
+- 原始帳號不受影響
+- 會靜默地向現有帳號持有者發送「密碼重設」email
+
+### 驗證規則
+
+| 欄位 | 規則 |
+|-------|------|
+| `email` | 必須是有效的 email 格式 |
+| `name` | 1--100 個字元，前後空白自動去除 |
+| `password` | 8--128 個字元，無其他限制 |
+
+<Tip>
+註冊後，請安全儲存回傳的 `token`。在所有後續 Auth API 請求中將其作為 Bearer token 使用。當您執行 `panguard login` 時，CLI 會自動處理此操作。
+</Tip>

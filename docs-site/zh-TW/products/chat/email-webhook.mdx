@@ -1,0 +1,142 @@
+---
+title: "Email 與 Webhook"
+description: "設定 SMTP 電子郵件通知和自訂 webhook 整合，支援 mTLS。"
+icon: "envelope"
+---
+
+Email 和 Webhook 管道服務於不同的使用案例：Email 提供符合合規要求的稽核軌跡，而 Webhook 則能與自訂自動化系統整合。
+
+## Email（SMTP）
+
+### 設定
+
+```bash
+panguard chat setup --channel email
+```
+
+精靈會詢問：
+
+| 欄位 | 描述 | 範例 |
+|-------|-------------|---------|
+| **SMTP Host** | 郵件伺服器主機名稱 | `smtp.gmail.com` |
+| **SMTP Port** | TLS 使用 587，SSL 使用 465 | `587` |
+| **SMTP Username** | 認證使用者名稱 | `alerts@company.com` |
+| **SMTP Password** | 認證密碼 | （Gmail 使用應用程式密碼） |
+| **From Address** | 寄件者電子郵件地址 | `panguard@company.com` |
+| **To Address** | 收件者電子郵件地址 | `security-team@company.com` |
+
+### Gmail 設定
+
+Gmail 需要使用應用程式密碼而非一般密碼：
+
+<Steps>
+  <Step title="啟用兩步驟驗證">
+    前往 Google 帳戶 > 安全性 > 兩步驟驗證並啟用。
+  </Step>
+  <Step title="產生應用程式密碼">
+    前往 Google 帳戶 > 安全性 > 兩步驟驗證 > 應用程式密碼。
+  </Step>
+  <Step title="建立新的應用程式密碼">
+    選擇「郵件」和您的裝置，然後點擊「產生」。
+  </Step>
+  <Step title="使用產生的密碼">
+    當 Panguard 詢問 SMTP 密碼時，輸入 16 個字元的應用程式密碼。
+  </Step>
+</Steps>
+
+### 電子郵件格式
+
+電子郵件通知以 HTML 格式發送，包含：
+
+- 嚴重性色彩標題列
+- 結構化事件詳情表格
+- 修復步驟（`it_admin` 角色）
+- 取消訂閱連結
+- 純文字備用版本，供不支援 HTML 渲染的郵件客戶端使用
+
+### 何時使用 Email
+
+- 合規要求規定必須使用電子郵件稽核軌跡
+- 電子郵件為主要溝通工具的組織
+- 當您需要在收件匣中保有可搜尋的通知歷史
+
+---
+
+## Webhook
+
+### 設定
+
+```bash
+panguard chat setup --channel webhook
+```
+
+精靈會詢問：
+
+| 欄位 | 描述 |
+|-------|-------------|
+| **Webhook URL** | 接收 POST 請求的端點 |
+| **Authentication** | Bearer Token、HMAC 或 mTLS |
+| **Secret/Token** | 認證憑證 |
+
+### 認證方法
+
+| 方法 | 標頭 | 使用案例 |
+|--------|--------|----------|
+| **Bearer Token** | `Authorization: Bearer <token>` | 簡單的 API 整合 |
+| **HMAC** | `X-Panguard-Signature: sha256=<hash>` | Webhook 驗證（GitHub 風格） |
+| **mTLS** | 客戶端憑證 | 企業級雙向認證 |
+
+### 載荷格式
+
+Webhook 通知以 JSON POST 請求發送：
+
+```json
+{
+  "event_type": "threat_alert",
+  "timestamp": "2025-01-15T14:23:01.000Z",
+  "severity": "high",
+  "title": "Threat Intel Match: 203.0.113.50",
+  "details": {
+    "source_ip": "203.0.113.50",
+    "confidence": 95,
+    "rule": "sigma/network/c2-communication.yml",
+    "mitre_id": "T1071",
+    "action_taken": "block_ip",
+    "action_success": true
+  },
+  "panguard_version": "1.0.0"
+}
+```
+
+### HMAC 驗證範例
+
+在您的伺服器上驗證 webhook 簽名：
+
+```javascript
+const crypto = require('crypto');
+
+function verifySignature(payload, signature, secret) {
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  return `sha256=${expected}` === signature;
+}
+```
+
+### 何時使用 Webhook
+
+- 與 SIEM 系統整合（Splunk、Elastic 等）
+- 自訂儀表板和監控工具
+- 自動化事件回應工作流程
+- PagerDuty、Opsgenie 或其他警報平台
+
+### 測試
+
+```bash
+panguard chat test --channel webhook
+```
+
+<Note>
+  Webhook 請求包含 10 秒逾時。如果您的端點未在 10 秒內回應，該通知會被記錄為失敗，並以指數退避重試最多 3 次。
+</Note>

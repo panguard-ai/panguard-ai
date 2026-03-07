@@ -162,6 +162,10 @@ export type {
   ValidationResult,
 } from './playbook/index.js';
 
+// ATR (Agent Threat Rules) Engine / ATR 引擎
+export { GuardATREngine } from './engines/atr-engine.js';
+export type { GuardATREngineConfig } from './engines/atr-engine.js';
+
 // Bridges / 橋接
 export { trapSessionToSecurityEvent } from './bridges/trap-bridge.js';
 

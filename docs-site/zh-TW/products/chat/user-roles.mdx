@@ -1,0 +1,131 @@
+---
+title: "使用者角色"
+description: "3 種使用者角色——老闆、開發者和 IT 管理員——如何塑造通知內容和詳細程度。"
+icon: "users"
+---
+
+Panguard Chat 根據您的角色調適通知內容。相同的安全事件會根據收件者是主管、工程師或 IT 管理員，產生三種完全不同的訊息。
+
+## 角色設定
+
+```bash
+# 在設定時設定您的角色
+panguard chat setup --user-type boss
+
+# 之後變更角色
+panguard chat prefs --user-type developer
+```
+
+## 角色比較
+
+以下範例展示同一事件——偵測到並封鎖了 C2 伺服器通訊——為每個角色格式化的結果。
+
+### boss -- 影響摘要
+
+目標受眾：主管、非技術經理、企業主。
+
+重點：業務影響、風險等級、是否已採取行動。
+
+```
+[Panguard AI Security Notice]
+
+Your server was detected communicating with a known
+malicious server. That IP has been reported 1,247 times
+globally.
+
+The connection has been automatically blocked. No action
+is required from you.
+
+Risk Level: HIGH
+Status: Automatically resolved
+```
+
+主要特點：
+- 無技術術語（無 IP、PID 或規則名稱）
+- 清楚說明影響
+- 明確的「我需要做什麼」指引
+- 商業友善的語言
+
+### developer -- 技術詳情
+
+目標受眾：軟體工程師、DevOps、SRE。
+
+重點：原始資料、IP、處理程序詳情、規則匹配、時間線。
+
+```
+[Panguard AI Alert]
+
+Threat Intel Match: 203.0.113.50
+Source: AbuseIPDB (confidence: 98%)
+Tag: C2-Server, ThreatFox IOC-12345
+Process: curl (PID 5678) -> 203.0.113.50:443
+Action: IP blocked via iptables
+Rule: sigma/network/c2-communication.yml
+
+Timeline:
+  14:23:01 - Outbound connection detected
+  14:23:02 - Threat intel match confirmed
+  14:23:02 - Auto-response: IP blocked
+```
+
+主要特點：
+- 完整的 IP 位址、PID 和埠號
+- 威脅情報來源和信心評分
+- 確切匹配的規則
+- 精確到秒的時間線
+
+### it_admin -- 修復步驟
+
+目標受眾：IT 管理員、系統管理員、技術支援。
+
+重點：發生了什麼、做了什麼、下一步該做什麼。
+
+```
+[Panguard AI - Remediation Guide]
+
+Event: Communication with known C2 server detected
+Severity: HIGH
+Action taken: Automatically blocked IP 203.0.113.50
+
+Recommended next steps:
+1. Check if process curl (PID 5678) is a legitimate operation
+2. If not, terminate the process: kill -9 5678
+3. Check for other processes connecting to the same IP
+4. Run a full system scan: panguard scan
+5. If confirmed compromise, run a full investigation
+```
+
+主要特點：
+- 編號的修復步驟
+- 具體的執行命令
+- 升級指引
+- 參考其他 Panguard 工具
+
+## 各角色的通知內容
+
+| 內容元素 | boss | developer | it_admin |
+|----------------|------|-----------|----------|
+| 嚴重等級 | 是 | 是 | 是 |
+| 業務影響 | 是 | -- | -- |
+| 來源 IP 位址 | -- | 是 | 是 |
+| 處理程序 ID（PID） | -- | 是 | 是 |
+| 規則名稱 | -- | 是 | -- |
+| MITRE ATT&CK ID | -- | 是 | -- |
+| 時間線 | -- | 是 | -- |
+| 修復步驟 | -- | -- | 是 |
+| 「該做什麼」指引 | 是 | -- | 是 |
+| 威脅情報來源 | -- | 是 | -- |
+| 信心評分 | -- | 是 | -- |
+
+## 選擇適合的角色
+
+| 如果您是... | 選擇 | 因為 |
+|--------------|--------|---------|
+| 收到伺服器安全更新的創辦人或 CEO | `boss` | 您需要了解影響，而非技術細節 |
+| 管理自己 VPS 或副專案的開發者 | `developer` | 您想要原始資料來自行偵錯和調查 |
+| 負責多個系統的 IT 管理員 | `it_admin` | 您需要每個事件的清楚步驟 |
+| 管理客戶基礎設施的 MSP | `it_admin` | 逐步指南幫助您的團隊一致地回應 |
+
+<Tip>
+  您可以隨時再次執行 `panguard chat setup` 來切換角色。變更對所有未來的通知立即生效。
+</Tip>

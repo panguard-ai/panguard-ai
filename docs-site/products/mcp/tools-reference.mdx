@@ -1,0 +1,231 @@
+---
+title: "MCP Tools Reference"
+description: "Complete parameter reference and usage examples for all 11 Panguard MCP tools."
+icon: "wrench"
+---
+
+This page documents every tool exposed by the Panguard MCP server. Each tool includes its description, input schema, and example usage.
+
+---
+
+## panguard_scan
+
+Run a security health check scan on the local system. Returns risk score (0--100), grade (A--F), and list of security findings.
+
+<ParamField path="depth" type="string" default="quick">
+  Scan depth: `quick` (~30 seconds) or `full` (~60 seconds).
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  Output language: `en` or `zh-TW`.
+</ParamField>
+
+**Example prompt:** "Run a full security scan on this machine in Chinese."
+
+**Example response:** Risk score 72/100 (Grade C), 8 findings (1 critical, 2 high, 3 medium, 2 low).
+
+---
+
+## panguard_scan_code
+
+Scan a source code directory for security vulnerabilities (SAST). Detects SQL injection, XSS, hardcoded secrets, command injection, and more.
+
+<ParamField path="dir" type="string" required>
+  Source code directory to scan. Absolute or relative path.
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  Output language: `en` or `zh-TW`.
+</ParamField>
+
+**Example prompt:** "Check the ./src directory for security vulnerabilities."
+
+---
+
+## panguard_guard_start
+
+Start the Panguard Guard real-time threat monitoring daemon.
+
+<ParamField path="dataDir" type="string">
+  Data directory path. Defaults to `~/.panguard-guard`.
+</ParamField>
+
+<ParamField path="mode" type="string">
+  Operating mode: `learning` or `protection`.
+</ParamField>
+
+**Example prompt:** "Start real-time protection in learning mode."
+
+---
+
+## panguard_guard_stop
+
+Stop the Panguard Guard daemon.
+
+<ParamField path="dataDir" type="string">
+  Data directory path. Defaults to `~/.panguard-guard`.
+</ParamField>
+
+**Example prompt:** "Stop the Guard engine."
+
+---
+
+## panguard_status
+
+Get the current status of all Panguard services (Guard, Scan, Manager). Returns running state, threat counts, and system information.
+
+<ParamField path="dataDir" type="string">
+  Data directory path. Defaults to `~/.panguard-guard`.
+</ParamField>
+
+**Example prompt:** "What is the current security status of this machine?"
+
+**Returns:** Guard running state, mode, uptime, security score, active threats, events processed.
+
+---
+
+## panguard_alerts
+
+Get recent security alerts detected by Panguard Guard. Returns the latest threat events with severity and details.
+
+<ParamField path="limit" type="number" default="20">
+  Maximum number of alerts to return.
+</ParamField>
+
+<ParamField path="severity" type="string" default="all">
+  Filter by severity: `critical`, `high`, `medium`, `low`, or `all`.
+</ParamField>
+
+<ParamField path="dataDir" type="string">
+  Data directory path. Defaults to `~/.panguard-guard`.
+</ParamField>
+
+**Example prompt:** "Show me the last 5 critical alerts."
+
+---
+
+## panguard_block_ip
+
+Manually block an IP address from accessing the system.
+
+<ParamField path="ip" type="string" required>
+  IP address to block (IPv4 or IPv6).
+</ParamField>
+
+<ParamField path="duration" type="string" default="1h">
+  Block duration. Examples: `1h`, `24h`, `permanent`.
+</ParamField>
+
+<ParamField path="reason" type="string">
+  Reason for blocking (stored in the action manifest).
+</ParamField>
+
+**Example prompt:** "Block IP 203.0.113.50 for 24 hours because it was port scanning."
+
+---
+
+## panguard_generate_report
+
+Generate a PDF compliance report from scan results. Returns the path to the generated PDF.
+
+<ParamField path="output" type="string" default="./panguard-report.pdf">
+  Output PDF file path.
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  Report language: `en` or `zh-TW`.
+</ParamField>
+
+<ParamField path="depth" type="string" default="full">
+  Scan depth for the underlying scan: `quick` or `full`.
+</ParamField>
+
+**Example prompt:** "Generate a PDF security report in Traditional Chinese."
+
+---
+
+## panguard_init
+
+Initialize Panguard configuration with defaults (non-interactive mode).
+
+<ParamField path="dataDir" type="string">
+  Data directory path. Defaults to `~/.panguard-guard`.
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  Default language: `en` or `zh-TW`.
+</ParamField>
+
+<ParamField path="mode" type="string" default="learning">
+  Initial operating mode: `learning` or `protection`.
+</ParamField>
+
+**Example prompt:** "Initialize Panguard with Chinese language defaults."
+
+---
+
+## panguard_audit_skill
+
+Audit an OpenClaw/AgentSkills `SKILL.md` directory for security issues. Checks manifest validity, prompt injection, tool poisoning, code vulnerabilities, dependencies, and permissions.
+
+<ParamField path="path" type="string" required>
+  Path to skill directory containing `SKILL.md`.
+</ParamField>
+
+**Returns:** Risk score (0--100) and detailed findings covering:
+- Manifest validity
+- Prompt injection detection
+- Tool poisoning analysis
+- Code vulnerability scanning
+- Dependency audit
+- Permission review
+
+**Example prompt:** "Audit the skill at ./my-agent-skill for security issues."
+
+---
+
+## panguard_deploy
+
+Deploy Panguard services: scan for vulnerabilities, start Guard monitoring, and generate an initial report. This is the one-click setup for full protection.
+
+<ParamField path="dataDir" type="string">
+  Data directory path. Defaults to `~/.panguard-guard`.
+</ParamField>
+
+<ParamField path="lang" type="string" default="en">
+  Language: `en` or `zh-TW`.
+</ParamField>
+
+<ParamField path="mode" type="string" default="learning">
+  Initial Guard mode: `learning` or `protection`.
+</ParamField>
+
+<ParamField path="generateReport" type="boolean" default="true">
+  Whether to generate a PDF report after scanning.
+</ParamField>
+
+**Example prompt:** "Deploy full protection on this machine with a PDF report."
+
+**Executes:** `panguard scan` + `panguard guard start` + `panguard scan --output report.pdf`
+
+---
+
+## Tool Availability by Plan
+
+| Tool | Community | Solo | Pro | Business |
+|------|-----------|------|-----|----------|
+| `panguard_scan` | Yes | Yes | Yes | Yes |
+| `panguard_scan_code` | Yes | Yes | Yes | Yes |
+| `panguard_guard_start` | -- | Yes | Yes | Yes |
+| `panguard_guard_stop` | -- | Yes | Yes | Yes |
+| `panguard_status` | Yes | Yes | Yes | Yes |
+| `panguard_alerts` | -- | Yes | Yes | Yes |
+| `panguard_block_ip` | -- | Yes | Yes | Yes |
+| `panguard_generate_report` | -- | -- | Yes | Yes |
+| `panguard_init` | Yes | Yes | Yes | Yes |
+| `panguard_audit_skill` | Yes | Yes | Yes | Yes |
+| `panguard_deploy` | -- | Yes | Yes | Yes |
+
+<Tip>
+  All tools return structured JSON responses that AI assistants can parse and present in natural language. The `isError` field in the response indicates whether the operation succeeded or failed.
+</Tip>

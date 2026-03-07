@@ -1,0 +1,118 @@
+title: "API Key or Secret Exposure in Agent Output"
+id: ATR-2026-021
+status: experimental
+description: >
+  Detects when an AI agent exposes API keys, secret tokens, bearer tokens,
+  or other sensitive credentials in its output. This includes common key
+  formats such as OpenAI (sk-), AWS (AKIA), Bearer tokens, and generic
+  secret patterns. Credential leakage in agent output poses a critical
+  security risk as it can lead to unauthorized access, financial loss,
+  and full account compromise.
+author: "ATR Community"
+date: "2026/03/08"
+severity: critical
+
+references:
+  owasp_llm:
+    - "LLM02:2025 - Sensitive Information Disclosure"
+    - "LLM07:2025 - System Prompt Leakage"
+  mitre_atlas:
+    - "AML.T0057 - LLM Data Leakage"
+    - "AML.T0055 - Unsecured Credentials"
+
+tags:
+  category: context-exfiltration
+  subcategory: api-key-exposure
+  confidence: high
+
+agent_source:
+  type: llm_io
+  framework:
+    - openai
+    - anthropic
+    - langchain
+    - llamaindex
+    - autogen
+  provider:
+    - openai
+    - anthropic
+    - google
+    - aws
+    - azure
+
+detection:
+  conditions:
+    - field: agent_output
+      operator: regex
+      value: "sk-[a-zA-Z0-9]{20,}"
+      description: "OpenAI-style API key pattern"
+    - field: agent_output
+      operator: regex
+      value: "AKIA[0-9A-Z]{16}"
+      description: "AWS Access Key ID pattern"
+    - field: agent_output
+      operator: regex
+      value: "Bearer\\s+[a-zA-Z0-9\\-._~+/]+=*"
+      description: "Bearer token in output"
+    - field: agent_output
+      operator: regex
+      value: "ghp_[a-zA-Z0-9]{36}"
+      description: "GitHub personal access token"
+    - field: agent_output
+      operator: regex
+      value: "xox[bpors]-[a-zA-Z0-9\\-]+"
+      description: "Slack token pattern"
+    - field: agent_output
+      operator: regex
+      value: "-----BEGIN (RSA |EC )?PRIVATE KEY-----"
+      description: "PEM private key header"
+    - field: agent_output
+      operator: regex
+      value: "api[_-]?key[\"'\\s]*[:=][\"'\\s]*[a-zA-Z0-9]{16,}"
+      description: "Generic api_key assignment pattern"
+    - field: agent_output
+      operator: regex
+      value: "secret[\"'\\s]*[:=][\"'\\s]*[a-zA-Z0-9]{16,}"
+      description: "Generic secret assignment pattern"
+  condition: any
+  false_positives:
+    - "Agent discussing API key formats in an educational context without real keys"
+    - "Redacted or placeholder keys such as sk-xxxxxxxxxxxx or AKIA_EXAMPLE"
+    - "Documentation examples using clearly fake credentials"
+
+response:
+  actions:
+    - block_output
+    - escalate
+    - alert
+  auto_response_threshold: critical
+  message_template: >
+    [ATR-2026-021] CRITICAL: API key or secret credential detected
+    in agent output. The output has been blocked and the content redacted.
+    Incident logged for review. Affected agent: {agent_id}, session: {session_id}.
+    Rotate any potentially exposed credentials immediately.
+
+test_cases:
+  true_positives:
+    - input: "Here is your API key: sk-abc123def456ghi789jkl012mno345pqr"
+      expected: triggered
+      description: "Output contains an OpenAI-style API key"
+    - input: "Your AWS access key is AKIAIOSFODNN7EXAMPLE"
+      expected: triggered
+      description: "Output contains an AWS access key ID"
+    - input: "Use this header: Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
+      expected: triggered
+      description: "Output contains a Bearer JWT token"
+    - input: "Connect to Slack with token xoxb-0000000000000-0000000000000-PLACEHOLDER"
+      expected: triggered
+      description: "Output contains a Slack bot token"
+  true_negatives:
+    - input: "To set up your API key, go to Settings > API Keys and click Generate New Key."
+      expected: not_triggered
+      description: "General instructions about API keys without actual key values"
+    - input: "The key format looks like sk-xxxx where xxxx is your unique identifier."
+      expected: not_triggered
+      description: "Placeholder key format description, not a real key"
+    - input: "AWS IAM best practices recommend rotating access keys every 90 days."
+      expected: not_triggered
+      description: "General AWS security advice without credentials"

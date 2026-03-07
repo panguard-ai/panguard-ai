@@ -1,0 +1,91 @@
+---
+title: "panguard login"
+description: "使用 Panguard AI 帳號進行身份驗證。"
+icon: "right-to-bracket"
+---
+
+`login` 指令將您的 CLI 工作階段與 Panguard Cloud 進行身份驗證。預設會開啟瀏覽器進行 OAuth 認證，也支援使用 `--no-browser` 旗標在無介面環境中操作。
+
+## 使用方式
+
+```bash
+panguard login [options]
+```
+
+## 選項
+
+<ParamField path="--api-url" type="string">
+  覆寫預設的 Panguard API 端點。適用於自架或測試環境。
+</ParamField>
+
+<ParamField path="--no-browser" type="flag">
+  使用裝置代碼認證而非開啟瀏覽器。列印 URL 和代碼供手動輸入 -- 適合 SSH 工作階段和無介面伺服器。
+</ParamField>
+
+<ParamField path="--lang" type="string" default="en">
+  設定登入提示和訊息的語言。
+</ParamField>
+
+## 範例
+
+<CodeGroup>
+```bash 瀏覽器登入（預設）
+panguard login
+```
+
+```bash 無介面 / SSH 登入
+panguard login --no-browser
+```
+
+```bash 自架 API 端點
+panguard login --api-url https://panguard.internal.example.com/api
+```
+
+```bash 以繁體中文登入
+panguard login --lang zh-TW
+```
+</CodeGroup>
+
+## 身份驗證流程
+
+<Tabs>
+  <Tab title="瀏覽器（預設）">
+    1. CLI 開啟您的預設瀏覽器至 Panguard 登入頁面
+    2. 使用 email、Google 或 GitHub 登入
+    3. 瀏覽器重新導向回來，CLI 接收 token
+    4. Token 安全儲存在 `~/.panguard/credentials`
+  </Tab>
+  <Tab title="無介面（--no-browser）">
+    1. CLI 列印 URL 和一次性裝置代碼
+    2. 在任何裝置上開啟該 URL 並輸入代碼
+    3. 確認後，CLI 接收 token
+    4. Token 安全儲存在 `~/.panguard/credentials`
+  </Tab>
+</Tabs>
+
+<Tip>
+  身份驗證 token 有效期為 30 天並自動更新。只有在 token 過期或您明確登出時才需要重新登入。
+</Tip>
+
+## 方案要求
+
+<Info>
+  適用於所有方案，包括 **Community（免費）**。
+</Info>
+
+## 相關資源
+
+<CardGroup cols={2}>
+  <Card title="帳號設定" icon="user-plus" href="/account-setup">
+    在登入前建立您的 Panguard 帳號。
+  </Card>
+  <Card title="panguard logout" icon="right-from-bracket" href="/cli/logout">
+    結束目前的 CLI 工作階段。
+  </Card>
+  <Card title="panguard whoami" icon="id-card" href="/cli/whoami">
+    驗證您已認證的身份。
+  </Card>
+  <Card title="身份驗證疑難排解" icon="key" href="/troubleshooting/auth-issues">
+    修復常見的身份驗證問題。
+  </Card>
+</CardGroup>

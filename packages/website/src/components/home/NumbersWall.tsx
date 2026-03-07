@@ -25,6 +25,7 @@ const statIcons = [
   ShieldIcon,
   BlockIcon,
   NetworkIcon,
+  ShieldIcon,
   LockIcon,
 ];
 const statValues: (number | string)[] = [
@@ -35,6 +36,7 @@ const statValues: (number | string)[] = [
   STATS.detectionLayers,
   STATS.responseActions,
   STATS.honeypotProtocols,
+  STATS.atrRules,
   STATS.license,
 ];
 const statKeys = [
@@ -45,6 +47,7 @@ const statKeys = [
   'layers',
   'actions',
   'protocols',
+  'atrRules',
   'mit',
 ] as const;
 
@@ -69,7 +72,7 @@ export default function NumbersWall() {
         </motion.div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 max-w-4xl mx-auto">
+        <div className="grid grid-cols-3 sm:grid-cols-3 gap-2.5 sm:gap-4 max-w-4xl mx-auto">
           {statKeys.map((key, i) => {
             const Icon = statIcons[i];
             const val = statValues[i];

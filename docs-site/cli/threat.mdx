@@ -1,0 +1,92 @@
+---
+title: "panguard threat"
+description: "Start a local Threat Cloud intelligence server for aggregating and querying threat data."
+icon: "cloud"
+---
+
+The `threat` command runs a local instance of the Panguard Threat Cloud -- a threat intelligence server that aggregates indicators of compromise (IoCs), campaign data, and attacker profiles from your Guard agents and Trap honeypots. It provides a REST API and real-time dashboard for threat analysis.
+
+## Usage
+
+```bash
+panguard threat <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+| --- | --- |
+| `start` | Start the Threat Cloud server |
+| `stats` | Show threat intelligence statistics without starting the server |
+
+## Options
+
+<ParamField path="--port" type="number" default="9500">
+  Port for the Threat Cloud API and dashboard.
+</ParamField>
+
+<ParamField path="--host" type="string" default="127.0.0.1">
+  Host address to bind the server to. Use `0.0.0.0` to listen on all interfaces.
+</ParamField>
+
+<ParamField path="--db" type="string">
+  Path to the SQLite database for storing threat intelligence data. Defaults to `~/.panguard/threat/threat.db`.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+```bash Start Threat Cloud server
+panguard threat start
+```
+
+```bash Start on custom port
+panguard threat start --port 8500 --host 0.0.0.0
+```
+
+```bash View threat statistics
+panguard threat stats
+```
+
+```bash Use custom database path
+panguard threat start --db /opt/panguard/threat.db
+```
+</CodeGroup>
+
+## Intelligence Sources
+
+The Threat Cloud aggregates data from:
+
+| Source | Data Type |
+| --- | --- |
+| **Guard agents** | Process anomalies, network indicators, file hashes |
+| **Trap honeypots** | Attacker IPs, credentials used, exploit payloads |
+| **Community feeds** | Public IoC feeds, STIX/TAXII sources |
+| **Manual upload** | Custom IoC lists via API |
+
+<Warning>
+  When binding to `0.0.0.0`, the Threat Cloud API is exposed to the network. Ensure you configure authentication and place the server behind a firewall or reverse proxy.
+</Warning>
+
+## Plan Requirements
+
+<Info>
+  Threat Cloud requires the **Business** ($79/mo) plan. It is designed for organizations managing multiple endpoints that need centralized intelligence.
+</Info>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Threat Cloud Overview" icon="globe" href="/products/threat-cloud/overview">
+    Architecture and design of the Threat Cloud system.
+  </Card>
+  <Card title="Threat Cloud Deployment" icon="server" href="/guides/threat-cloud-deployment">
+    Production deployment guide for Threat Cloud.
+  </Card>
+  <Card title="Privacy" icon="lock" href="/products/threat-cloud/privacy">
+    Data handling and privacy policies for threat data.
+  </Card>
+  <Card title="panguard trap" icon="honey-pot" href="/cli/trap">
+    Honeypots feed intelligence into Threat Cloud.
+  </Card>
+</CardGroup>

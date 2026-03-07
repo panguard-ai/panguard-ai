@@ -1,0 +1,225 @@
+---
+title: "Multi-Endpoint Setup"
+description: "Deploy the Panguard Manager for fleet-wide security orchestration across multiple machines."
+icon: "server"
+---
+
+# Multi-Endpoint Setup
+
+In a distributed deployment, multiple Guard agents on different machines report to a centralized Manager server. The Manager provides fleet-wide visibility, cross-agent threat correlation, and centralized policy distribution.
+
+---
+
+## Architecture
+
+```
+[Machine A: Manager]                [Machine B: Guard Agent]
++-------------------+               +---------------------+
+| Manager Server    |<-- heartbeat --| GuardEngine         |
+| :8443             |<-- events   --| (learning/protection)|
+|                   |-- policy   -->|                     |
++-------------------+               +---------------------+
+        ^
+        |                            [Machine C: Guard Agent]
+        |                            +---------------------+
+        +<-- heartbeat/events -------| GuardEngine         |
+        +--- policy ---------------->|                     |
+                                     +---------------------+
+```
+
+---
+
+## Deploy the Manager
+
+<Steps>
+  <Step title="Generate an Authentication Token">
+    Create a secure token for Manager-Agent communication:
+
+    ```bash
+    export MANAGER_TOKEN=$(openssl rand -hex 32)
+    echo $MANAGER_TOKEN
+    ```
+
+    <Warning>
+    Store this token securely. Every Guard agent needs it to register with the Manager.
+    </Warning>
+  </Step>
+  <Step title="Start the Manager Server">
+    ```bash
+    panguard manager --port 8443 --auth-token "$MANAGER_TOKEN"
+    ```
+
+    The Manager accepts connections from Guard agents and provides:
+    - **Agent Registry** -- Tracks up to 500 registered agents
+    - **Threat Aggregator** -- Correlates threats across agents by source IP, malware hash, and attack pattern
+    - **Policy Engine** -- Distributes centralized rules and configuration
+    - **SSE Stream** -- Real-time event stream for the admin dashboard
+  </Step>
+  <Step title="Verify the Manager is Running">
+    ```bash
+    curl -H "Authorization: Bearer $MANAGER_TOKEN" \
+      http://localhost:8443/api/overview
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Deploy Guard Agents
+
+On each endpoint machine:
+
+<Steps>
+  <Step title="Install Panguard">
+    ```bash
+    npm install -g @panguard-ai/panguard
+    ```
+  </Step>
+  <Step title="Authenticate">
+    ```bash
+    panguard login
+    ```
+  </Step>
+  <Step title="Start Guard with Manager Connection">
+    ```bash
+    panguard guard start \
+      --manager-url "http://manager-host:8443" \
+      --manager-token "your-secure-token" \
+      --data-dir /var/panguard-guard
+    ```
+
+    The agent will:
+    1. Register with the Manager on startup
+    2. Send heartbeats every 30 seconds
+    3. Report detected threats in real-time
+    4. Poll for policy updates every 5 minutes
+  </Step>
+</Steps>
+
+---
+
+## Agent Lifecycle
+
+| Phase | Endpoint | Interval | Description |
+| --- | --- | --- | --- |
+| **Registration** | `POST /api/agents/register` | Once (startup) | Agent sends hostname, OS, version; receives unique `agentId` |
+| **Heartbeat** | `POST /api/agents/:id/heartbeat` | Every 30s | CPU/memory usage, events processed, mode, uptime |
+| **Threat Report** | `POST /api/agents/:id/events` | Real-time | Detected threats sent immediately |
+| **Policy Poll** | `GET /api/policy/agent/:id` | Every 5 min | Agent checks for updated policies |
+| **Stale Detection** | -- | Every 30s (server) | Agents without heartbeat for 90s are flagged stale |
+| **Deregistration** | `DELETE /api/agents/:id` | Manual | Removes agent from fleet |
+
+---
+
+## Cross-Agent Threat Correlation
+
+The Manager's Threat Aggregator correlates threats across all agents in real-time:
+
+- **Source IP correlation** -- Same attacker IP seen on multiple endpoints triggers escalation
+- **Malware hash correlation** -- Same malware fingerprint across agents indicates an active campaign
+- **Attack pattern correlation** -- Related MITRE ATT&CK patterns within a 5-minute window
+
+<Info>
+Cross-agent correlation uses a 5-minute sliding window with 24-hour data retention. Threats correlated across 3+ agents are automatically elevated to CRITICAL severity.
+</Info>
+
+---
+
+## Policy Distribution
+
+The Policy Engine allows centralized control over all Guard agents:
+
+```bash
+# Set a global policy
+curl -X POST -H "Authorization: Bearer $MANAGER_TOKEN" \
+  -H "Content-Type: application/json" \
+  http://manager-host:8443/api/policy \
+  -d '{
+    "autoRespondThreshold": 85,
+    "ipBlocklist": ["203.0.113.0/24"],
+    "alertChannels": ["slack"]
+  }'
+```
+
+Policy changes propagate to all agents within their next 5-minute poll cycle.
+
+---
+
+## Real-Time Monitoring
+
+### SSE Event Stream
+
+Stream events from all agents in real-time:
+
+```bash
+curl -N -H "Authorization: Bearer $MANAGER_TOKEN" \
+  http://manager-host:8443/api/events/stream
+```
+
+### Fleet Overview
+
+```bash
+curl -H "Authorization: Bearer $MANAGER_TOKEN" \
+  http://manager-host:8443/api/overview
+```
+
+---
+
+## Manager Configuration
+
+### Environment Variables
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `MANAGER_PORT` | `8443` | HTTP server port |
+| `MANAGER_AUTH_TOKEN` | (none) | Bearer token for API authentication |
+| `MANAGER_MAX_AGENTS` | `500` | Maximum registered agents |
+| `MANAGER_HEARTBEAT_TIMEOUT_MS` | `90000` | Heartbeat timeout before marking agent stale |
+| `MANAGER_HEARTBEAT_INTERVAL_MS` | `30000` | Interval for stale agent checks |
+| `MANAGER_CORRELATION_WINDOW_MS` | `300000` | Cross-agent threat correlation window (5 min) |
+| `MANAGER_THREAT_RETENTION_MS` | `86400000` | Threat data retention (24 hours) |
+| `CORS_ALLOWED_ORIGINS` | (none) | Comma-separated allowed CORS origins |
+
+### Optional SQLite Persistence
+
+For large deployments, enable SQLite for persistent storage:
+
+```bash
+panguard manager --port 8443 --auth-token "$MANAGER_TOKEN" --db /var/panguard-manager/data.db
+```
+
+---
+
+## Production Deployment
+
+<Tip>
+For production, install the Manager as a systemd service and place it behind a TLS-terminating reverse proxy. See the [System Service guide](/guides/system-service) and [Docker Deployment guide](/guides/docker-deployment).
+</Tip>
+
+### Security Checklist
+
+- [ ] Generate a strong authentication token (`openssl rand -hex 32`)
+- [ ] Use TLS termination (nginx/Caddy reverse proxy)
+- [ ] Restrict Manager port (8443) to Guard agent networks only
+- [ ] Run as a non-root system user
+- [ ] Set `NODE_ENV=production` for hardened mode
+- [ ] Store secrets in environment files with `chmod 600`
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Architecture" icon="sitemap" href="/concepts/architecture">
+    Full technical architecture of the Manager-Agent system.
+  </Card>
+  <Card title="System Service" icon="gear" href="/guides/system-service">
+    Install Manager and Guard as systemd/launchd services.
+  </Card>
+  <Card title="Docker Deployment" icon="docker" href="/guides/docker-deployment">
+    Run the full stack with Docker Compose.
+  </Card>
+  <Card title="Threat Cloud" icon="cloud" href="/guides/threat-cloud-deployment">
+    Centralized threat intelligence across your fleet.
+  </Card>
+</CardGroup>

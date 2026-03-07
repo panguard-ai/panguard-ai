@@ -1,0 +1,142 @@
+---
+title: "API 概覽"
+description: "Panguard AI 提供三個 REST API 服務，用於身份驗證、機群管理和威脅情報。"
+icon: "code"
+---
+
+Panguard AI 提供三個獨立的 API 服務。每個服務運行在自己的埠上，處理不同的功能領域。
+
+## API 服務
+
+<CardGroup cols={3}>
+  <Card title="Auth Server API" icon="user-shield">
+    **Port 3000** -- 使用者註冊、登入、工作階段、TOTP 雙因素驗證、GDPR 合規和訂閱管理。
+  </Card>
+  <Card title="Manager API" icon="server">
+    **Port 8443** -- 代理註冊、心跳、威脅事件接收、策略管理、SSE 串流和機群儀表板。
+  </Card>
+  <Card title="Threat Cloud API" icon="cloud">
+    **可設定埠** -- IoC 管理、威脅摘要、攻擊活動追蹤、MITRE 熱力圖、地理查詢和稽核日誌。
+  </Card>
+</CardGroup>
+
+## 基礎 URL
+
+| 服務 | 預設基礎 URL | TLS |
+|---------|-----------------|-----|
+| Auth Server | `https://auth.panguard.ai` 或 `http://localhost:3000` | 選用（建議使用） |
+| Manager | `https://localhost:8443` | 預設為自簽憑證 |
+| Threat Cloud | `https://tc.panguard.ai` 或 `http://localhost:PORT` | 選用 |
+
+## 身份驗證
+
+所有需認證的端點都需要在 `Authorization` 標頭中提供 **Bearer token**。
+
+```bash
+curl -X GET https://localhost:8443/api/agents \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+<Info>
+Manager API 使用透過 `MANAGER_AUTH_TOKEN` 環境變數設定的共享靜態 token。Auth Server API 在登入時簽發 JWT token。
+</Info>
+
+## 通用回應格式
+
+每個 API 端點都回傳一致的 JSON 封套：
+
+<Tabs>
+  <Tab title="成功">
+    ```json
+    {
+      "ok": true,
+      "data": {
+        "id": "agent-001",
+        "hostname": "web-server-1"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="錯誤">
+    ```json
+    {
+      "ok": false,
+      "error": "Agent not found"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## 速率限制
+
+所有 API 服務都實施速率限制以防止濫用。
+
+| 服務 | 預設限制 | 範圍 |
+|---------|--------------|-------|
+| Auth Server | 20 次請求/分鐘 | 每個 IP |
+| Manager API | 60 次請求/分鐘 | 每個 IP |
+| Threat Cloud | 因端點而異 | 每個 API key |
+
+當受到速率限制時，API 回傳 `429` 狀態碼，並附帶 `Retry-After` 標頭指示何時可以重試。
+
+## 錯誤碼
+
+| 狀態碼 | 意義 | 說明 |
+|-------------|---------|-------------|
+| `200` | OK | 請求成功 |
+| `201` | Created | 資源建立成功 |
+| `400` | Bad Request | 無效的請求主體或缺少必要欄位 |
+| `401` | Unauthorized | 缺少或無效的身份驗證 token |
+| `403` | Forbidden | Token 有效但權限或方案層級不足 |
+| `404` | Not Found | 請求的資源不存在 |
+| `429` | Too Many Requests | 超出速率限制，請檢查 `Retry-After` 標頭 |
+| `500` | Internal Server Error | 非預期的伺服器錯誤，請以退避方式重試 |
+
+## 內容類型
+
+除非另有說明，所有請求和回應主體都使用 `application/json`。摘要端點可能會回傳 `text/plain` 用於封鎖清單格式。
+
+## 分頁
+
+回傳集合的端點支援透過查詢參數進行分頁：
+
+<ParamField query="page" type="number" default="1">
+  頁碼（從 1 開始）。
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  每頁項目數。最大 200。
+</ParamField>
+
+分頁回應包含中繼資料：
+
+```json
+{
+  "ok": true,
+  "data": [...],
+  "pagination": {
+    "total": 342,
+    "page": 1,
+    "limit": 50,
+    "pages": 7
+  }
+}
+```
+
+## 下一步
+
+<CardGroup cols={2}>
+  <Card title="Auth API" icon="user-plus" href="/api-reference/auth/registration">
+    註冊使用者和管理身份驗證。
+  </Card>
+  <Card title="Manager API" icon="lock" href="/api-reference/manager/authentication">
+    管理您的代理機群和策略。
+  </Card>
+  <Card title="Threat Cloud API" icon="crosshairs" href="/api-reference/threat-cloud/ioc">
+    查詢和提交威脅情報。
+  </Card>
+  <Card title="設定" icon="gear" href="/configuration/environment-variables">
+    設定 API 埠、token 和相關設定。
+  </Card>
+</CardGroup>

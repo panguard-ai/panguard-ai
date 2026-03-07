@@ -1,0 +1,211 @@
+---
+title: "部署"
+description: "使用獨立、Docker 或 systemd 部署選項部署您自己的私有 Threat Cloud 伺服器。"
+icon: "rocket"
+---
+
+Panguard Threat Cloud 可以作為獨立處理程序、Docker 容器或 systemd 服務部署。本頁涵蓋所有部署方法、設定選項及生產環境建議。
+
+## 獨立部署
+
+### 基本啟動
+
+```bash
+# 僅限本地存取（預設）
+panguard threat start --port 8080
+
+# 外部存取搭配 API 金鑰認證
+panguard threat start --host 0.0.0.0 --port 8080 --api-key your-secret-key
+
+# 自訂資料庫路徑
+panguard threat start --port 8080 --db /var/lib/threat-cloud/data.db
+```
+
+預設情況下，伺服器綁定至 `127.0.0.1`（僅限本地存取）。設定 `--host 0.0.0.0` 以接受外部連線。
+
+### API 金鑰認證
+
+在對外暴露伺服器時強烈建議：
+
+```bash
+# 單一 API 金鑰
+panguard threat start --api-key my-secret-key
+
+# 多個 API 金鑰（供不同客戶端團隊使用）
+panguard threat start --api-key key-team-a,key-team-b,key-team-c
+```
+
+客戶端在請求標頭中包含金鑰：
+
+```
+Authorization: Bearer your-api-key
+```
+
+### 設定選項
+
+| 旗標 | 預設值 | 描述 |
+|------|---------|-------------|
+| `--port` | `8080` | 伺服器監聽埠 |
+| `--host` | `127.0.0.1` | 綁定位址 |
+| `--db` | `./threat-cloud.db` | SQLite 資料庫路徑 |
+| `--api-key` | （無） | API 金鑰，以逗號分隔 |
+
+### 設定檔
+
+如需持久化設定，建立 `~/.panguard/threat-cloud.json`：
+
+```json
+{
+  "server": {
+    "port": 8080,
+    "host": "0.0.0.0"
+  },
+  "database": {
+    "path": "/var/lib/panguard/threat-cloud.db"
+  },
+  "feeds": {
+    "syncInterval": "6h",
+    "sources": ["threatfox", "urlhaus", "feodo", "greynoise", "abuseipdb"]
+  },
+  "api": {
+    "rateLimit": 100,
+    "rateLimitWindow": "1m"
+  }
+}
+```
+
+---
+
+## Docker 部署
+
+### 快速開始
+
+```bash
+docker run -d \
+  --name panguard-threat-cloud \
+  -p 8080:8080 \
+  -v panguard-data:/data \
+  -e PANGUARD_TC_API_KEY=your-secret-key \
+  panguard/threat-cloud:latest
+```
+
+### Docker Compose
+
+```yaml
+version: "3.8"
+services:
+  threat-cloud:
+    image: panguard/threat-cloud:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - threat-data:/data
+    environment:
+      - PANGUARD_TC_PORT=8080
+      - PANGUARD_TC_DB=/data/threat-cloud.db
+      - PANGUARD_TC_API_KEY=your-secret-key
+    restart: unless-stopped
+
+volumes:
+  threat-data:
+```
+
+### 環境變數
+
+| 變數 | 預設值 | 描述 |
+|----------|---------|-------------|
+| `PANGUARD_TC_PORT` | `8080` | 伺服器埠 |
+| `PANGUARD_TC_HOST` | `0.0.0.0` | 綁定位址 |
+| `PANGUARD_TC_DB` | `/data/threat-cloud.db` | 資料庫路徑 |
+| `PANGUARD_TC_API_KEY` | （無） | API 金鑰，以逗號分隔 |
+| `PANGUARD_TC_FEED_INTERVAL` | `6h` | 饋送同步間隔 |
+| `PANGUARD_TC_RATE_LIMIT` | `100` | 每個視窗的 API 請求數 |
+
+---
+
+## 連接代理
+
+設定 Guard 代理使用您的私有 Threat Cloud 實例：
+
+```bash
+panguard guard start --threat-cloud http://your-server:8080
+```
+
+---
+
+## 部署規模
+
+| 規模 | 端點數 | CPU | 記憶體 | 磁碟 |
+|-------|-----------|-----|--------|------|
+| **小型** | < 50 | 1 核心 | 256 MB | 1 GB |
+| **中型** | 50--500 | 2 核心 | 512 MB | 5 GB |
+| **大型** | 500+ | 4 核心 | 1 GB | 20 GB |
+
+---
+
+## 饋送同步
+
+Threat Cloud 與 5 個外部饋送來源同步：
+
+| 饋送 | 類型 | 同步間隔 | 資料 |
+|------|------|---------------|------|
+| **ThreatFox** | IoC 資料庫 | 每 6 小時 | 惡意軟體、C2、殭屍網路指標 |
+| **URLhaus** | URL 封鎖清單 | 每 6 小時 | 惡意軟體分發 URL |
+| **Feodo Tracker** | 殭屍網路 C2 | 每 6 小時 | 殭屍網路命令與控制 IP |
+| **GreyNoise** | 網際網路掃描資料 | 每 6 小時 | 大規模掃描 IP |
+| **AbuseIPDB** | IP 信譽 | 每 6 小時 | 已報告的惡意 IP |
+
+<Info>
+  部分饋送（GreyNoise、AbuseIPDB）需要 API 金鑰才能完整存取。如果未提供 API 金鑰，伺服器會以降低的覆蓋率運作。
+</Info>
+
+---
+
+## 健康檢查
+
+```bash
+# CLI
+panguard threat status
+
+# HTTP
+curl http://localhost:8080/api/v1/health
+```
+
+```json
+{
+  "status": "healthy",
+  "uptime": "14d 6h 33m",
+  "database": { "size": "42 MB", "iocs": 125000 },
+  "feeds": {
+    "lastSync": "2025-01-15T12:00:00Z",
+    "sources": 5,
+    "healthy": 5
+  }
+}
+```
+
+---
+
+## 生產環境建議
+
+<Steps>
+  <Step title="使用持久化儲存">
+    為資料庫掛載磁碟區以在容器重啟後保存。永遠不要對 IoC 資料庫使用臨時儲存。
+  </Step>
+  <Step title="啟用 API 金鑰認證">
+    當伺服器可從網路存取時，務必使用 `--api-key`。
+  </Step>
+  <Step title="放置在反向代理後方">
+    在生產環境中使用 nginx 或 Caddy 進行 TLS 終止和存取控制。
+  </Step>
+  <Step title="設定速率限制">
+    預設的每分鐘 100 個請求適合小型設備群組。較大的部署請增加此值。
+  </Step>
+  <Step title="監控磁碟使用量">
+    SQLite 資料庫會隨著 IoC 累積而增長。IoC 保留期預設為 90 天，並自動清理。
+  </Step>
+</Steps>
+
+<Warning>
+  不要在沒有認證和 TLS 的情況下將 Threat Cloud 直接暴露至公共網際網路。使用搭配 TLS 終止的反向代理，並將存取限制在您的代理網路。
+</Warning>

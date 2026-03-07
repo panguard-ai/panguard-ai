@@ -1,0 +1,457 @@
+---
+title: "Statistics & Queries"
+description: "Advanced analytics endpoints for time series, geographic distribution, MITRE heatmaps, sightings, and audit logs."
+icon: "chart-bar"
+---
+
+The statistics and query endpoints provide advanced analytics over the Threat Cloud dataset. Use these for dashboards, reporting, and threat research.
+
+## GET /api/stats
+
+Returns enhanced statistics about the Threat Cloud database.
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/stats" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "totalIocs": 48923,
+    "activeIocs": 12456,
+    "totalSightings": 892341,
+    "totalSources": 342,
+    "byType": {
+      "ip": 32100,
+      "domain": 8923,
+      "hash": 5400,
+      "url": 1800,
+      "email": 500,
+      "cve": 200
+    },
+    "byCategory": {
+      "bruteforce": 15200,
+      "malware": 12300,
+      "botnet": 8400,
+      "phishing": 5600,
+      "scanner": 4200,
+      "c2": 2100,
+      "exploit": 1123
+    },
+    "last24h": {
+      "newIocs": 234,
+      "newSightings": 4521,
+      "topCategory": "bruteforce"
+    },
+    "updatedAt": "2026-03-07T12:00:00.000Z"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/query/timeseries
+
+Returns time-series data for threat activity, suitable for charting.
+
+<ParamField query="granularity" type="string" default="day">
+  Time bucket size: `hour`, `day`, or `week`.
+</ParamField>
+
+<ParamField query="period" type="string" default="30d">
+  Time range: `24h`, `7d`, `30d`, `90d`.
+</ParamField>
+
+<ParamField query="type" type="string">
+  Filter by IoC type.
+</ParamField>
+
+<ParamField query="category" type="string">
+  Filter by threat category.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/query/timeseries?granularity=day&period=7d" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "granularity": "day",
+    "period": "7d",
+    "series": [
+      { "timestamp": "2026-03-01T00:00:00Z", "newIocs": 198, "sightings": 4200 },
+      { "timestamp": "2026-03-02T00:00:00Z", "newIocs": 215, "sightings": 4510 },
+      { "timestamp": "2026-03-03T00:00:00Z", "newIocs": 187, "sightings": 3980 },
+      { "timestamp": "2026-03-04T00:00:00Z", "newIocs": 234, "sightings": 5120 },
+      { "timestamp": "2026-03-05T00:00:00Z", "newIocs": 201, "sightings": 4350 },
+      { "timestamp": "2026-03-06T00:00:00Z", "newIocs": 256, "sightings": 5890 },
+      { "timestamp": "2026-03-07T00:00:00Z", "newIocs": 142, "sightings": 3100 }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/query/geo
+
+Returns geographic distribution of threat sources.
+
+<ParamField query="type" type="string">
+  Filter by IoC type (primarily useful for `ip`).
+</ParamField>
+
+<ParamField query="period" type="string" default="30d">
+  Time range: `24h`, `7d`, `30d`, `90d`.
+</ParamField>
+
+<ParamField query="limit" type="number" default="20">
+  Number of countries to return.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/query/geo?period=7d&limit=10" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "period": "7d",
+    "countries": [
+      { "code": "CN", "name": "China", "count": 8923, "percentage": 28.4 },
+      { "code": "US", "name": "United States", "count": 5210, "percentage": 16.6 },
+      { "code": "RU", "name": "Russia", "count": 4100, "percentage": 13.1 },
+      { "code": "BR", "name": "Brazil", "count": 2890, "percentage": 9.2 },
+      { "code": "VN", "name": "Vietnam", "count": 2100, "percentage": 6.7 },
+      { "code": "IN", "name": "India", "count": 1850, "percentage": 5.9 },
+      { "code": "KR", "name": "South Korea", "count": 1420, "percentage": 4.5 },
+      { "code": "DE", "name": "Germany", "count": 1100, "percentage": 3.5 },
+      { "code": "TW", "name": "Taiwan", "count": 980, "percentage": 3.1 },
+      { "code": "NL", "name": "Netherlands", "count": 870, "percentage": 2.8 }
+    ],
+    "total": 31400
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/query/trends
+
+Returns emerging threat trends based on IoC velocity and pattern analysis.
+
+<ParamField query="periodDays" type="number" default="7">
+  Number of days to analyze for trend detection.
+</ParamField>
+
+<ParamField query="minChange" type="number" default="10">
+  Minimum percentage change to qualify as a trend.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/query/trends?periodDays=7" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "periodDays": 7,
+    "trends": [
+      {
+        "category": "bruteforce",
+        "direction": "increasing",
+        "changePercent": 45.2,
+        "currentRate": 2100,
+        "previousRate": 1446,
+        "description": "SSH brute-force activity surging, primarily from CN and VN ranges"
+      },
+      {
+        "category": "phishing",
+        "direction": "increasing",
+        "changePercent": 23.8,
+        "currentRate": 890,
+        "previousRate": 719,
+        "description": "New phishing kit targeting financial services identified"
+      },
+      {
+        "category": "scanner",
+        "direction": "decreasing",
+        "changePercent": -15.3,
+        "currentRate": 1200,
+        "previousRate": 1417,
+        "description": "Port scanning activity declining after major botnet takedown"
+      }
+    ],
+    "emergingThreats": [
+      {
+        "indicator": "CVE-2026-1234",
+        "type": "cve",
+        "firstSeen": "2026-03-05T00:00:00Z",
+        "velocity": "rapid",
+        "sightingsLast24h": 342
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/query/mitre-heatmap
+
+Returns a MITRE ATT&CK framework heatmap showing technique frequency across observed threats.
+
+<ParamField query="period" type="string" default="30d">
+  Time range: `7d`, `30d`, `90d`.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/query/mitre-heatmap?period=30d" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": {
+    "period": "30d",
+    "techniques": [
+      {
+        "id": "T1110",
+        "name": "Brute Force",
+        "tactic": "Credential Access",
+        "count": 15200,
+        "intensity": "critical"
+      },
+      {
+        "id": "T1059",
+        "name": "Command and Scripting Interpreter",
+        "tactic": "Execution",
+        "count": 8900,
+        "intensity": "high"
+      },
+      {
+        "id": "T1078",
+        "name": "Valid Accounts",
+        "tactic": "Persistence",
+        "count": 5400,
+        "intensity": "high"
+      },
+      {
+        "id": "T1566",
+        "name": "Phishing",
+        "tactic": "Initial Access",
+        "count": 3200,
+        "intensity": "medium"
+      },
+      {
+        "id": "T1204",
+        "name": "User Execution",
+        "tactic": "Execution",
+        "count": 2100,
+        "intensity": "medium"
+      }
+    ],
+    "tactics": {
+      "Initial Access": 5300,
+      "Execution": 11000,
+      "Persistence": 5400,
+      "Credential Access": 15200,
+      "Discovery": 3800,
+      "Lateral Movement": 1200,
+      "Collection": 800,
+      "Command and Control": 2100,
+      "Exfiltration": 400,
+      "Impact": 1500
+    }
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## POST /api/sightings
+
+Records a new sighting of an existing IoC. Sightings increase the reputation score weight of an indicator.
+
+<ParamField body="value" type="string" required>
+  The IoC value that was observed.
+</ParamField>
+
+<ParamField body="source" type="string" required>
+  Source of the sighting (e.g., `guard-agent`, `honeypot`).
+</ParamField>
+
+<ParamField body="context" type="object">
+  Additional context about the sighting.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://tc.panguard.ai/api/sightings" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "value": "198.51.100.42",
+    "source": "guard-agent",
+    "context": {
+      "agentId": "agent-a1b2c3d4",
+      "detectionType": "brute_force",
+      "targetPort": 22
+    }
+  }'
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 201
+{
+  "ok": true,
+  "data": {
+    "sightingId": "sig_x1y2z3",
+    "iocValue": "198.51.100.42",
+    "totalSightings": 48,
+    "reputationChange": -2
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/sightings
+
+Queries sighting records for a specific IoC.
+
+<ParamField query="value" type="string" required>
+  The IoC value to query sightings for.
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  Maximum results.
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/sightings?value=198.51.100.42&limit=5" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "sig_x1y2z3",
+      "value": "198.51.100.42",
+      "source": "guard-agent",
+      "context": {
+        "agentId": "agent-a1b2c3d4",
+        "detectionType": "brute_force"
+      },
+      "timestamp": "2026-03-07T08:15:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 48,
+    "page": 1,
+    "limit": 5,
+    "pages": 10
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## GET /api/audit-log
+
+Returns the audit log of API operations performed against the Threat Cloud. Useful for compliance and debugging.
+
+<ParamField query="action" type="string">
+  Filter by action type: `create`, `update`, `delete`, `query`.
+</ParamField>
+
+<ParamField query="since" type="string">
+  ISO 8601 timestamp for log start.
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  Maximum results (max 200).
+</ParamField>
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://tc.panguard.ai/api/audit-log?action=create&limit=10" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+<ResponseExample>
+```json 200
+{
+  "ok": true,
+  "data": [
+    {
+      "id": "audit_001",
+      "action": "create",
+      "resource": "ioc",
+      "details": "Added 3 IoCs (2 new, 1 updated)",
+      "apiKey": "key_...redacted",
+      "ip": "203.0.113.10",
+      "timestamp": "2026-03-07T08:15:00.000Z"
+    },
+    {
+      "id": "audit_002",
+      "action": "create",
+      "resource": "sighting",
+      "details": "Recorded sighting for 198.51.100.42",
+      "apiKey": "key_...redacted",
+      "ip": "203.0.113.10",
+      "timestamp": "2026-03-07T08:14:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 1234,
+    "page": 1,
+    "limit": 10,
+    "pages": 124
+  }
+}
+```
+</ResponseExample>
+
+<Info>
+API key values are partially redacted in audit log responses. Only the first 4 and last 4 characters are shown.
+</Info>

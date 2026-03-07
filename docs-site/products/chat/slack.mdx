@@ -1,0 +1,131 @@
+---
+title: "Slack Integration"
+description: "Step-by-step guide to setting up Panguard Chat with Slack using Block Kit rich formatting."
+icon: "hashtag"
+---
+
+Slack is the recommended channel for teams and organizations. Panguard sends rich Block Kit notifications to designated Slack channels with optional interactive buttons for threat response.
+
+## Setup Overview
+
+<Steps>
+  <Step title="Create a Slack App">
+    Register a new app in the Slack API dashboard.
+  </Step>
+  <Step title="Configure Bot permissions">
+    Add the required OAuth scopes.
+  </Step>
+  <Step title="Install to your Workspace">
+    Authorize the app and get the Bot Token.
+  </Step>
+  <Step title="Get the Signing Secret">
+    Copy the signing secret for webhook verification.
+  </Step>
+  <Step title="Create a notification channel">
+    Set up a dedicated channel like #security-alerts.
+  </Step>
+  <Step title="Configure Panguard">
+    Run the setup wizard with your credentials.
+  </Step>
+</Steps>
+
+## Step 1: Create a Slack App
+
+1. Go to [api.slack.com/apps](https://api.slack.com/apps)
+2. Click **Create New App**
+3. Select **From scratch**
+4. Enter app name: `Panguard Security` (or your preference)
+5. Select your Workspace
+6. Click **Create App**
+
+## Step 2: Configure Bot Permissions
+
+1. Navigate to **OAuth & Permissions** in the left sidebar
+2. Scroll to the **Scopes** section
+3. Under **Bot Token Scopes**, add:
+
+| Scope | Purpose |
+|-------|---------|
+| `chat:write` | Send messages to channels |
+| `chat:write.public` | Send to public channels the bot has not joined |
+| `files:write` | Upload PDF reports and attachments |
+
+4. Click **Install to Workspace** at the top
+5. Click **Allow** to authorize
+
+## Step 3: Get the Bot Token
+
+After installation, the page displays your **Bot User OAuth Token**:
+
+```
+xoxb-your-workspace-id-your-token-string
+```
+
+<Warning>
+  The token must start with `xoxb-` (bot token). Do not use `xoxp-` (user token).
+</Warning>
+
+## Step 4: Get the Signing Secret
+
+1. Navigate to **Basic Information** in the left sidebar
+2. Find the **App Credentials** section
+3. Click **Show** next to **Signing Secret**
+4. Copy and save the value
+
+## Step 5: Create a Notification Channel
+
+1. Create a Slack channel (e.g., `#security-alerts`)
+2. Invite the bot: type `/invite @Panguard Security` in the channel
+
+## Step 6: Configure Panguard Chat
+
+```bash
+panguard chat setup --channel slack
+```
+
+The wizard will ask for:
+- **Bot Token** -- the `xoxb-...` token from Step 3
+- **Signing Secret** -- from Step 4
+- **Default Channel** -- e.g., `#security-alerts`
+
+### Test the Connection
+
+```bash
+panguard chat test --channel slack
+```
+
+<AccordionGroup>
+  <Accordion title="Bot not posting to channel">
+    Ensure the bot has been invited to the target channel with `/invite @Panguard Security`.
+  </Accordion>
+  <Accordion title="Permission errors">
+    Verify the bot has `chat:write` scope. Check the app's **OAuth & Permissions** page.
+  </Accordion>
+  <Accordion title="Invalid token format">
+    The token must start with `xoxb-`. If it starts with `xoxp-`, you are using a user token instead of a bot token.
+  </Accordion>
+</AccordionGroup>
+
+## Interactive Buttons (Optional)
+
+Enable interactive threat response buttons in Slack notifications (e.g., "Block Source", "View Details"):
+
+1. In Slack App settings, navigate to **Interactivity & Shortcuts**
+2. Enable **Interactivity**
+3. Set the Request URL to: `https://your-server.com/webhook/slack`
+4. Click **Save Changes**
+
+<Note>
+  Interactive buttons require your Panguard instance to have a publicly accessible URL. For local development, tools like ngrok can provide temporary public URLs.
+</Note>
+
+## Block Kit Message Format
+
+Slack notifications use Block Kit for rich formatting:
+
+- **Header** -- severity-colored indicator with threat title
+- **Context** -- timestamp, source IP, confidence score
+- **Details** -- structured fields with rule name, MITRE ATT&CK ID, affected resource
+- **Actions** -- interactive buttons (when interactivity is enabled)
+
+The exact content varies by your configured [user role](/products/chat/user-roles).
