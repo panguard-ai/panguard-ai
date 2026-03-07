@@ -198,7 +198,7 @@ export default function PricingCards() {
   const t = useTranslations('pricingPage');
   const tc = useTranslations('common');
   const { token: authToken } = useAuth();
-  const [annual, setAnnual] = useState(false);
+  const [annual, setAnnual] = useState(true);
   const [loading, setLoading] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
