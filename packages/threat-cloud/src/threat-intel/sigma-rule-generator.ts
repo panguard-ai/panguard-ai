@@ -57,7 +57,10 @@ export class SigmaRuleGenerator {
     const status = pattern.confidence >= 70 ? 'experimental' : 'draft';
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
 
-    const yamlContent = this.buildYaml(ruleId, pattern, extraction, date);
+    // Extract CVE IDs from the report title for per-report uniqueness
+    const cveIds = this.extractCveIds(extraction.reportTitle);
+
+    const yamlContent = this.buildYaml(ruleId, pattern, extraction, date, cveIds);
 
     return {
       id: ruleId,
@@ -73,33 +76,49 @@ export class SigmaRuleGenerator {
     };
   }
 
+  /** Extract CVE IDs from a string (e.g. report title or description) */
+  private extractCveIds(text: string): string[] {
+    const matches = text.match(/CVE-\d{4}-\d{4,}/g);
+    if (!matches) return [];
+    return [...new Set(matches)];
+  }
+
   /** Build the YAML content for a Sigma rule */
   private buildYaml(
     ruleId: string,
     pattern: ExtractedAttackPattern,
     extraction: ExtractionResult,
-    date: string
+    date: string,
+    cveIds: string[] = []
   ): string {
     const lines: string[] = [];
 
-    // Header
-    lines.push(`title: ${this.escapeYaml(this.buildTitle(pattern))}`);
+    // Header — include report ID and CVE in title for per-report uniqueness
+    const title = this.buildTitle(pattern, extraction.reportId, cveIds);
+    lines.push(`title: ${this.escapeYaml(title)}`);
     lines.push(`id: ${ruleId}`);
     lines.push(`status: experimental`);
     lines.push('description: |');
     lines.push(`  ${this.escapeYaml(pattern.description)}`);
+    if (cveIds.length > 0) {
+      lines.push(`  Related vulnerabilities: ${cveIds.join(', ')}`);
+    }
+    lines.push(`  Source report: ${extraction.reportTitle} (${extraction.reportId})`);
     lines.push(`  Auto-generated from HackerOne report analysis.`);
 
-    // References
+    // References — include report URL and any CVE references
     lines.push('references:');
     lines.push(`  - ${extraction.reportUrl}`);
+    for (const cve of cveIds) {
+      lines.push(`  - https://nvd.nist.gov/vuln/detail/${cve}`);
+    }
 
     // Author & date
     lines.push('author: Panguard Threat Intel (auto-generated)');
     lines.push(`date: ${date}`);
 
-    // Tags
-    const tags = this.buildTags(pattern);
+    // Tags — include CVE tags for uniqueness
+    const tags = this.buildTags(pattern, cveIds);
     if (tags.length > 0) {
       lines.push('tags:');
       for (const tag of tags) {
@@ -131,42 +150,67 @@ export class SigmaRuleGenerator {
     return lines.join('\n');
   }
 
-  /** Build a descriptive title */
-  private buildTitle(pattern: ExtractedAttackPattern): string {
+  /** Build a descriptive title, including report ID and CVE for uniqueness */
+  private buildTitle(
+    pattern: ExtractedAttackPattern,
+    reportId: string,
+    cveIds: string[] = []
+  ): string {
+    let base: string;
     switch (pattern.attackType) {
       case 'SSRF':
-        return 'Potential SSRF via Internal Network Access';
+        base = 'Potential SSRF via Internal Network Access';
+        break;
       case 'XSS':
-        return 'Potential Cross-Site Scripting (XSS) Attempt';
+        base = 'Potential Cross-Site Scripting (XSS) Attempt';
+        break;
       case 'SQLi':
-        return 'Potential SQL Injection Attempt';
+        base = 'Potential SQL Injection Attempt';
+        break;
       case 'Command Injection':
-        return 'Potential OS Command Injection';
+        base = 'Potential OS Command Injection';
+        break;
       case 'Path Traversal':
-        return 'Potential Directory/Path Traversal Attempt';
+        base = 'Potential Directory/Path Traversal Attempt';
+        break;
       case 'XXE':
-        return 'Potential XML External Entity (XXE) Injection';
+        base = 'Potential XML External Entity (XXE) Injection';
+        break;
       case 'IDOR':
-        return 'Potential Insecure Direct Object Reference';
+        base = 'Potential Insecure Direct Object Reference';
+        break;
       case 'CSRF':
-        return 'Potential Cross-Site Request Forgery';
+        base = 'Potential Cross-Site Request Forgery';
+        break;
       case 'File Upload':
-        return 'Potential Malicious File Upload Attempt';
+        base = 'Potential Malicious File Upload Attempt';
+        break;
       case 'Open Redirect':
-        return 'Potential Open Redirect Attempt';
+        base = 'Potential Open Redirect Attempt';
+        break;
       case 'Auth Bypass':
-        return 'Potential Authentication Bypass Attempt';
+        base = 'Potential Authentication Bypass Attempt';
+        break;
       case 'Deserialization':
-        return 'Potential Insecure Deserialization Attack';
+        base = 'Potential Insecure Deserialization Attack';
+        break;
       case 'Privilege Escalation':
-        return 'Potential Privilege Escalation Attempt';
+        base = 'Potential Privilege Escalation Attempt';
+        break;
       default:
-        return `Potential ${pattern.attackType} Attack`;
+        base = `Potential ${pattern.attackType} Attack`;
+        break;
     }
+
+    // Append CVE or report ID suffix to differentiate rules for different reports
+    const suffix = cveIds.length > 0
+      ? ` (${cveIds[0]})`
+      : ` [Report ${reportId}]`;
+    return `${base}${suffix}`;
   }
 
-  /** Build MITRE ATT&CK tags */
-  private buildTags(pattern: ExtractedAttackPattern): string[] {
+  /** Build MITRE ATT&CK tags, including CVE tags for per-report uniqueness */
+  private buildTags(pattern: ExtractedAttackPattern, cveIds: string[] = []): string[] {
     const tags: string[] = [];
     const addedTactics = new Set<string>();
 
@@ -182,6 +226,11 @@ export class SigmaRuleGenerator {
     for (const cwe of pattern.cweIds) {
       const num = cwe.replace(/\D/g, '');
       if (num) tags.push(`cwe.${num}`);
+    }
+
+    // Add CVE tags for per-vulnerability uniqueness
+    for (const cve of cveIds) {
+      tags.push(`cve.${cve.toLowerCase()}`);
     }
 
     return tags;

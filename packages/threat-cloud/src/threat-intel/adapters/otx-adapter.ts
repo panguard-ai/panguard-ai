@@ -2,10 +2,14 @@
  * AlienVault OTX (Open Threat Exchange) Adapter
  * AlienVault OTX 適配器 - 開放威脅情報交換平台
  *
- * Fetches public threat intelligence pulses from AlienVault OTX activity feed.
- * Uses the public activity endpoint (no authentication required).
+ * Fetches threat intelligence pulses from AlienVault OTX.
  *
- * API: https://otx.alienvault.com/api/v1/pulses/activity
+ * Strategy:
+ * - Authenticated (OTX_API_KEY env var): uses /api/v1/pulses/subscribed
+ * - Public fallback: uses /otxapi/pulses listing + per-pulse /indicators/
+ *
+ * Gracefully returns empty array when API key is missing or invalid.
+ *
  * License: Public community data
  *
  * @module @panguard-ai/threat-cloud/threat-intel/adapters/otx-adapter
@@ -26,9 +30,16 @@ import type {
 // Constants
 // ---------------------------------------------------------------------------
 
-const ACTIVITY_API = 'https://otx.alienvault.com/otxapi/pulses';
+/** Authenticated endpoint — returns full pulses with indicators */
+const SUBSCRIBED_API = 'https://otx.alienvault.com/api/v1/pulses/subscribed';
+/** Public listing endpoint — returns pulse metadata (no indicators) */
+const PUBLIC_PULSES_API = 'https://otx.alienvault.com/otxapi/pulses';
+/** Public per-pulse indicators endpoint (no auth required) */
+const PULSE_INDICATORS_API = 'https://otx.alienvault.com/otxapi/pulses';
 const USER_AGENT = 'Panguard-ThreatIntel/1.0';
 const MAX_PAGES = 5;
+/** Max indicators to fetch per pulse in public mode */
+const MAX_INDICATORS_PER_PULSE = 200;
 
 const DEFAULT_CONFIG: AdapterConfig = {
   requestTimeoutMs: 30_000,
@@ -123,17 +134,45 @@ export class OtxAdapter implements ThreatIntelAdapter {
   readonly source: ThreatSource = 'alienvault-otx';
 
   private readonly config: AdapterConfig;
+  private readonly apiKey: string | null;
   private lastRequestAt = 0;
 
   constructor(config?: Partial<AdapterConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+    this.apiKey = typeof process !== 'undefined'
+      ? (process.env?.OTX_API_KEY ?? null)
+      : null;
   }
 
   /**
-   * Fetch public OTX pulses and convert indicators to ThreatIntelRecords.
+   * Fetch OTX pulses and convert indicators to ThreatIntelRecords.
+   *
+   * Strategy:
+   * - If OTX_API_KEY is set, use the authenticated `/api/v1/pulses/subscribed`
+   *   endpoint which returns full pulses with embedded indicators.
+   * - Otherwise, use the public `/otxapi/pulses` listing to discover pulses,
+   *   then fetch each pulse's indicators via `/otxapi/pulses/{id}/indicators/`.
+   *
+   * Gracefully returns an empty array on auth errors or missing API key failures.
+   *
    * @param since - Optional ISO date string; pulses before this date are skipped.
    */
   async fetch(since?: string): Promise<ThreatIntelRecord[]> {
+    try {
+      if (this.apiKey) {
+        return await this.fetchAuthenticated(since);
+      }
+      return await this.fetchPublic(since);
+    } catch {
+      // Graceful degradation: return empty array on any unhandled error
+      return [];
+    }
+  }
+
+  /**
+   * Authenticated path: use /api/v1/pulses/subscribed (returns indicators inline).
+   */
+  private async fetchAuthenticated(since?: string): Promise<ThreatIntelRecord[]> {
     const sinceDate = since ? new Date(since) : null;
     const records: ThreatIntelRecord[] = [];
     let page = 1;
@@ -141,8 +180,43 @@ export class OtxAdapter implements ThreatIntelAdapter {
     while (page <= MAX_PAGES && records.length < this.config.maxRecords) {
       await this.rateLimit();
 
-      const url = `${ACTIVITY_API}?limit=50&page=${page}`;
-      const response = await this.fetchPage(url);
+      const sinceParam = since ? `&modified_since=${encodeURIComponent(since)}` : '';
+      const url = `${SUBSCRIBED_API}?limit=50&page=${page}${sinceParam}`;
+      const response = await this.fetchPage(url, true);
+      if (!response) break;
+
+      const pulses = response?.results;
+      if (!Array.isArray(pulses) || pulses.length === 0) break;
+
+      for (const pulse of pulses) {
+        if (records.length >= this.config.maxRecords) break;
+        const converted = this.convertPulse(pulse, sinceDate);
+        for (const rec of converted) {
+          if (records.length >= this.config.maxRecords) break;
+          records.push(rec);
+        }
+      }
+
+      if (!response?.next) break;
+      page++;
+    }
+
+    return records;
+  }
+
+  /**
+   * Public (no-auth) path: list pulses then fetch indicators per pulse.
+   */
+  private async fetchPublic(since?: string): Promise<ThreatIntelRecord[]> {
+    const sinceDate = since ? new Date(since) : null;
+    const records: ThreatIntelRecord[] = [];
+    let page = 1;
+
+    while (page <= MAX_PAGES && records.length < this.config.maxRecords) {
+      await this.rateLimit();
+
+      const url = `${PUBLIC_PULSES_API}?limit=50&page=${page}&sort=-modified`;
+      const response = await this.fetchPage(url, false);
       if (!response) break;
 
       const pulses = response?.results;
@@ -151,14 +225,17 @@ export class OtxAdapter implements ThreatIntelAdapter {
       for (const pulse of pulses) {
         if (records.length >= this.config.maxRecords) break;
 
-        const converted = this.convertPulse(pulse, sinceDate);
+        // Public listing does not include indicators; fetch them separately
+        const indicators = await this.fetchPulseIndicators(pulse.id);
+        const enrichedPulse: OtxPulse = { ...pulse, indicators };
+
+        const converted = this.convertPulse(enrichedPulse, sinceDate);
         for (const rec of converted) {
           if (records.length >= this.config.maxRecords) break;
           records.push(rec);
         }
       }
 
-      // Check if there are more pages
       if (!response?.next) break;
       page++;
     }
@@ -166,26 +243,65 @@ export class OtxAdapter implements ThreatIntelAdapter {
     return records;
   }
 
+  /**
+   * Fetch indicators for a specific pulse via the public otxapi endpoint.
+   * Returns an empty array on failure (graceful degradation).
+   */
+  private async fetchPulseIndicators(pulseId: string): Promise<OtxIndicator[]> {
+    if (!pulseId) return [];
+
+    try {
+      await this.rateLimit();
+      const url = `${PULSE_INDICATORS_API}/${encodeURIComponent(pulseId)}/indicators/?limit=${MAX_INDICATORS_PER_PULSE}`;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), this.config.requestTimeoutMs);
+
+      try {
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: { Accept: 'application/json', 'User-Agent': USER_AGENT },
+          signal: controller.signal,
+        });
+
+        if (!res.ok) return [];
+
+        const data = (await res.json()) as { results?: OtxIndicator[] };
+        return Array.isArray(data?.results) ? data.results : [];
+      } finally {
+        clearTimeout(timeout);
+      }
+    } catch {
+      return [];
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Private helpers
   // ---------------------------------------------------------------------------
 
-  private async fetchPage(url: string): Promise<OtxPulseResponse | null> {
+  private async fetchPage(url: string, useAuth: boolean): Promise<OtxPulseResponse | null> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.config.requestTimeoutMs);
+
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+      'User-Agent': USER_AGENT,
+    };
+    if (useAuth && this.apiKey) {
+      headers['X-OTX-API-KEY'] = this.apiKey;
+    }
 
     try {
       const res = await fetch(url, {
         method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'User-Agent': USER_AGENT,
-        },
+        headers,
         signal: controller.signal,
       });
 
       if (!res.ok) {
         if (res.status === 429) return null;
+        // Auth failure: return null instead of throwing (graceful degradation)
+        if (res.status === 401 || res.status === 403) return null;
         throw new Error(`OTX API error: ${res.status} ${res.statusText}`);
       }
 

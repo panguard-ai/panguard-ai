@@ -50,9 +50,10 @@ describe('SigmaRuleGenerator', () => {
 
     // Verify YAML content
     const yaml = rule.yamlContent;
-    expect(yaml).toContain('title: Potential SSRF via Internal Network Access');
+    expect(yaml).toContain('title: "Potential SSRF via Internal Network Access [Report 12345]"');
     expect(yaml).toContain(`id: ${rule.id}`);
     expect(yaml).toContain('status: experimental');
+    expect(yaml).toContain('Source report: Test Report (12345)');
     expect(yaml).toContain('Auto-generated from HackerOne report analysis');
     expect(yaml).toContain('https://hackerone.com/reports/12345');
     expect(yaml).toContain('author: Panguard Threat Intel');
@@ -102,7 +103,7 @@ describe('SigmaRuleGenerator', () => {
     );
 
     const yaml = rules[0].yamlContent;
-    expect(yaml).toContain('Potential SQL Injection Attempt');
+    expect(yaml).toContain('Potential SQL Injection Attempt [Report 12345]');
     expect(yaml).toContain('cs-uri-query|contains:');
     expect(yaml).toContain('UNION SELECT');
   });

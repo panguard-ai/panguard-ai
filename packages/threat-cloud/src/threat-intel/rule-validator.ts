@@ -119,16 +119,30 @@ export class RuleValidator {
   }
 
   /**
-   * Generate a fingerprint of a rule's detection block for dedup.
-   * Normalizes whitespace and extracts the detection section.
+   * Generate a fingerprint of a rule for dedup.
+   *
+   * Uses both the title (which contains CVE/report ID) and the detection block
+   * so that two rules with the same attack type but different source reports
+   * (e.g. CVE-2024-1234 XSS vs CVE-2024-5678 XSS) produce different fingerprints.
    */
   private fingerprint(yaml: string): string {
+    // Extract title for per-report uniqueness
+    const titleMatch = yaml.match(/^title:\s*(.*)/m);
+    const title = titleMatch?.[1]?.trim() ?? '';
+
+    // Extract references for additional source context
+    const refsMatch = yaml.match(/^references:\s*\n((?:\s+-\s+.*\n?)*)/m);
+    const refs = refsMatch?.[1]?.trim() ?? '';
+
     // Extract detection block (from "detection:" to next top-level key or EOF)
     const detectionMatch = yaml.match(/^detection:\s*\n([\s\S]*?)(?=^\w|\Z)/m);
     const detectionBlock = detectionMatch?.[1] ?? yaml;
 
+    // Combine title + references + detection for a granular fingerprint
+    const combined = [title, refs, detectionBlock].join('\n---\n');
+
     // Normalize: lowercase, collapse whitespace, trim lines
-    const normalized = detectionBlock
+    const normalized = combined
       .toLowerCase()
       .split('\n')
       .map((line) => line.trim())
