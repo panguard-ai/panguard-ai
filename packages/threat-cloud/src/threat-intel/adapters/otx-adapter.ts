@@ -140,7 +140,7 @@ export class OtxAdapter implements ThreatIntelAdapter {
   constructor(config?: Partial<AdapterConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.apiKey = typeof process !== 'undefined'
-      ? (process.env?.OTX_API_KEY ?? null)
+      ? (process.env?.['OTX_API_KEY'] ?? null)
       : null;
   }
 
