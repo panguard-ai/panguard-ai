@@ -10,10 +10,10 @@
 >
 > ATR changes that.
 
-![Rules](https://img.shields.io/badge/rules-29-green)
+![Rules](https://img.shields.io/badge/rules-32-green)
 ![Categories](https://img.shields.io/badge/categories-9-blue)
-![CVEs](https://img.shields.io/badge/CVE_mappings-11-red)
-![OWASP](https://img.shields.io/badge/OWASP_Agentic_Top_10-100%25-brightgreen)
+![CVEs](https://img.shields.io/badge/CVE_mappings-15-red)
+![OWASP](https://img.shields.io/badge/OWASP_Agentic_Top_10-8%2F10-yellow)
 ![Status](https://img.shields.io/badge/status-RFC-yellow)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
 
@@ -171,7 +171,7 @@ See `spec/atr-schema.yaml` for the full schema specification.
 | Data Poisoning | LLM04 | ASI06 | AML.T0020 | 1 | -- |
 | Model Security | LLM03 | ASI04 | AML.T0044 | 2 | -- |
 
-**Total: 29 rules, 11 unique CVEs, 100% OWASP Agentic Top 10 coverage**
+**Total: 32 rules, 15 CVE mappings, 8/10 OWASP Agentic Top 10 covered (ASI07, ASI09 are gaps)**
 
 ## How to Use
 
@@ -251,7 +251,7 @@ The reference engine (`src/engine.ts`) supports:
 | `sequence` (ordered) | Partial | Checks pattern co-occurrence, not strict ordering |
 | `behavioral_drift` | Planned | ML-based behavioral baseline comparison |
 
-All 29 current rules use only implemented operators and produce matches correctly.
+All 32 current rules use only implemented operators and produce matches correctly.
 
 Contributions to extend the engine are welcome -- see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -278,7 +278,7 @@ Organizations and projects using ATR. Add yours via PR.
 
 ## Roadmap
 
-- [x] v0.1 -- 29 rules, 9 categories, TypeScript engine, OWASP Agentic Top 10 coverage
+- [x] v0.1 -- 32 rules, 9 categories, TypeScript engine, 8/10 OWASP Agentic Top 10
 - [ ] v0.2 -- Community-contributed rules, Python reference engine
 - [ ] v0.3 -- Auto-generation from Threat Cloud telemetry
 - [ ] v1.0 -- Stable schema, multi-framework validation

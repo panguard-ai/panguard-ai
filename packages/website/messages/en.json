@@ -5628,7 +5628,7 @@
         "dataPoisoning": "Data Poisoning",
         "modelSecurity": "Model Security"
       },
-      "statsLine": "15 CVE mappings. OWASP Agentic Top 10: all 10 categories addressed. MIT licensed."
+      "statsLine": "15 CVE mappings. OWASP Agentic Top 10: 8 of 10 categories covered. MIT licensed."
     },
     "howItWorks": {
       "title": "Install. Protect. Contribute.",

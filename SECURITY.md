@@ -126,7 +126,7 @@ See `packages/panguard-guard/PRIVACY.md` for the complete list of uploaded field
 
 ATR rules are open-source YAML detection rules for AI agent threats.
 
-- **Source**: [github.com/panguard-ai/agent-threat-rules](https://github.com/panguard-ai/agent-threat-rules)
+- **Source**: [github.com/Agent-Threat-Rule/agent-threat-rules](https://github.com/Agent-Threat-Rule/agent-threat-rules)
 - **License**: MIT
 - **Verification**: All rules are YAML files with regex patterns -- no executable code
 - **Custom rules**: Users can add their own rules to `~/.panguard-guard/atr-rules/`
