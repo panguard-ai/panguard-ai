@@ -5610,7 +5610,7 @@
     "hero": {
       "eyebrow": "AGENT THREAT RULES",
       "title": "你的 AI Agent 擁有最高權限。誰在監控它？",
-      "subtitle": "MCP Skill 擁有完整系統權限。一個惡意 Skill 就能竊取資料、洩漏憑證、劫持你的 Agent。Agent Threat Rules 是第一個針對 AI Agent 威脅的開放偵測標準。安裝一次，每個 Skill、每次互動，都在防護下。",
+      "subtitle": "Claude Code、Cursor、CodeBuddy -- 你的 AI Agent 擁有完整系統權限。一個惡意 Skill 就能竊取你的資料、洩漏憑證、劫持工作流程。你沒有資安團隊，也不該需要。Agent Threat Rules 是第一個針對 AI Agent 威脅的開放偵測標準。一行指令，基礎防護啟動。給每一個開發者。",
       "viewATR": "GitHub 上的 Agent Threat Rules",
       "install": "開始使用",
       "copied": "已複製!",
@@ -5689,15 +5689,15 @@
       "steps": {
         "install": {
           "title": "安裝",
-          "desc": "一行指令。32 條偵測規則。零設定。"
+          "desc": "支援所有 AI 程式助手 -- Claude Code、Cursor、CodeBuddy，或你自己的 MCP 環境。一行指令。32 條偵測規則。零設定。"
         },
         "protect": {
           "title": "防護",
-          "desc": "即時監控每一筆 LLM 輸入、輸出、工具呼叫和 Agent 行為。威脅自動封鎖。"
+          "desc": "每一筆 LLM 輸入、每次工具呼叫、每個 Skill 安裝 -- 即時監控。Prompt Injection、資料外洩、惡意 MCP 回應，在到達 Agent 之前就被攔截。"
         },
         "contribute": {
           "title": "貢獻",
-          "desc": "匿名化攻擊模式自動上傳到 Threat Cloud，AI 產生新偵測規則，推送到每個部署環境。安裝就是貢獻。"
+          "desc": "每次部署都將匿名化威脅模式上傳到 Threat Cloud。AI 產生新偵測規則，推送給所有使用者。安裝就是貢獻 -- 你讓每個人都更安全。"
         }
       }
     },
@@ -5757,9 +5757,9 @@
     },
     "securityStack": {
       "title": "Agent Threat Rules 在資安架構中的定位",
-      "intro": "Claude Code 和 OpenAI Codex 在部署前掃描程式碼漏洞。這是必要的工作。",
+      "intro": "Claude Code、Cursor、CodeBuddy 幫你寫出安全的程式碼。這是部署前防線。",
       "but": "但它們止步於部署邊界。它們不會在 Production 監控你的 Agent，偵測不到正在進行的 Prompt Injection，看不到即時的惡意 MCP 回應，也抓不到三個看似無害的工具呼叫組合成資料外洩的 Skill Chain Attack。",
-      "conclusion": "程式碼掃描是部署前防線。Agent Threat Rules 是 Runtime 防線。兩者缺一不可。",
+      "conclusion": "程式碼掃描保護你的程式碼。Agent Threat Rules 保護你的 Agent。兩者缺一不可。",
       "preDeployment": {
         "label": "部署前",
         "title": "程式碼安全",
