@@ -9,8 +9,11 @@ description: |
   triggers from unverified sources, and pipeline stages that amplify
   incorrect signals. These patterns exploit the "trust the previous
   stage" assumption in multi-step agent workflows.
+  Note: This rule detects textual descriptions of cascading failure patterns, not live cascading failures. Structural cascade prevention requires behavioral monitoring.
 author: "Panguard AI"
 date: "2026/03/09"
+schema_version: "0.1"
+detection_tier: pattern
 severity: high
 
 references:
@@ -90,8 +93,6 @@ detection:
 
 response:
   actions:
-    - reduce_permissions
-    - escalate
     - alert
     - snapshot
   auto_response_threshold: high

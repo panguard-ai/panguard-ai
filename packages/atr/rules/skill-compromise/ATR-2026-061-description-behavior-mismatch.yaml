@@ -9,6 +9,8 @@ description: >
   may retain its benign description while performing malicious actions.
 author: "ATR Community"
 date: "2026/03/08"
+schema_version: "0.1"
+detection_tier: pattern
 severity: high
 
 references:
