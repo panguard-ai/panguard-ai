@@ -5556,7 +5556,7 @@
     "hero": {
       "eyebrow": "AGENT THREAT RULES",
       "title": "Your AI agent has root access. Who's watching it?",
-      "subtitle": "MCP skills run with full system permissions. One malicious skill can exfiltrate your data, leak credentials, or hijack your agent. Agent Threat Rules is the first open detection standard for AI agent threats. Install once. Every skill, every interaction -- protected.",
+      "subtitle": "Claude Code, Cursor, CodeBuddy -- your AI agent runs with full system permissions. One malicious skill can exfiltrate your data, leak credentials, or hijack your workflow. You don't have a security team. You shouldn't need one. Agent Threat Rules is the first open detection standard for AI agent threats. One command. Basic protection. For every developer.",
       "viewATR": "Agent Threat Rules on GitHub",
       "install": "Get Started",
       "copied": "Copied!",
@@ -5635,15 +5635,15 @@
       "steps": {
         "install": {
           "title": "Install",
-          "desc": "One command. 32 detection rules. Zero configuration."
+          "desc": "Works with any AI coding agent -- Claude Code, Cursor, CodeBuddy, or your own MCP setup. One command. 32 detection rules. Zero configuration."
         },
         "protect": {
           "title": "Protect",
-          "desc": "Real-time monitoring of every LLM input, output, tool call, and agent behavior. Threats are blocked automatically."
+          "desc": "Every LLM input, every tool call, every skill install -- monitored in real time. Prompt injection, data exfiltration, and malicious MCP responses are blocked before they reach your agent."
         },
         "contribute": {
           "title": "Contribute",
-          "desc": "Anonymized attack patterns flow to Threat Cloud. AI generates new detection rules. Pushed to every deployment. You don't have to do anything -- installing is contributing."
+          "desc": "Every deployment anonymously contributes threat patterns to Threat Cloud. AI generates new detection rules. Pushed to every user. Installing is contributing -- you make everyone safer."
         }
       }
     },
@@ -5703,9 +5703,9 @@
     },
     "securityStack": {
       "title": "Where Agent Threat Rules fits",
-      "intro": "Claude Code and OpenAI Codex scan your code for vulnerabilities before deployment. That's essential work.",
-      "but": "But they stop at the deployment boundary. They don't monitor your agent in production. They can't detect a prompt injection in progress, a malicious MCP response in real time, or a skill chain attack where three benign-looking tool calls combine into data exfiltration.",
-      "conclusion": "Code scanning is the pre-deployment layer. Agent Threat Rules is the runtime layer. You need both.",
+      "intro": "Claude Code, Cursor, and CodeBuddy help you write secure code. That's the pre-deployment layer.",
+      "but": "But they stop at the deployment boundary. They don't monitor your agent at runtime. They can't detect a prompt injection in progress, a malicious MCP response in real time, or a skill chain attack where three benign-looking tool calls combine into data exfiltration.",
+      "conclusion": "Code scanning protects your code. Agent Threat Rules protects your agent. You need both.",
       "preDeployment": {
         "label": "Pre-deployment",
         "title": "Code Security",
