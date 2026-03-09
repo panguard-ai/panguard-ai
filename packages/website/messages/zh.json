@@ -5682,7 +5682,7 @@
         "dataPoisoning": "Data Poisoning",
         "modelSecurity": "Model Security"
       },
-      "statsLine": "13 個真實 CVE 對應。OWASP Agentic Top 10：完整覆蓋。MIT 開源。"
+      "statsLine": "15 個 CVE 對應。OWASP Agentic Top 10：全部 10 項類別涵蓋。MIT 開源。"
     },
     "howItWorks": {
       "title": "安裝。防護。貢獻。",

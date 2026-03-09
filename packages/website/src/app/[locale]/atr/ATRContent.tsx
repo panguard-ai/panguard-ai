@@ -194,7 +194,7 @@ export default function ATRContent() {
           title={t('categories.title')}
           subtitle={t('categories.subtitle')}
         />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-14">
           {categoryKeys.map((key, i) => {
             const Icon = categoryIcons[i];
             return (

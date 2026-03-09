@@ -10,8 +10,11 @@ description: |
   targets structural communication integrity failures: missing
   authentication tokens, tampered routing headers, replay timestamps,
   and unauthenticated command channels.
+  Note: Pattern-based detection of communication security failures. Protocol-level inspection planned for v0.2.
 author: "Panguard AI"
 date: "2026/03/09"
+schema_version: "0.1"
+detection_tier: pattern
 severity: high
 
 references:

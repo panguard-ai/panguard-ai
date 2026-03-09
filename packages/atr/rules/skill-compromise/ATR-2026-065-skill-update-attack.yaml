@@ -9,6 +9,8 @@ description: >
   appear after a skill version change or re-registration.
 author: "ATR Community"
 date: "2026/03/08"
+schema_version: "0.1"
+detection_tier: pattern
 severity: high
 
 references:

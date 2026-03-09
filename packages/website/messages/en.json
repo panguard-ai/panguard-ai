@@ -5605,7 +5605,7 @@
       "with": {
         "label": "With Panguard",
         "items": [
-          "Every skill scanned against 29 ATR rules before execution",
+          "Every skill scanned against 32 ATR rules before execution",
           "Prompt injection, data exfiltration, hidden payloads -- caught automatically",
           "Continuous monitoring catches malicious updates",
           "Threats blocked before they reach your agent",
@@ -5628,7 +5628,7 @@
         "dataPoisoning": "Data Poisoning",
         "modelSecurity": "Model Security"
       },
-      "statsLine": "13 real CVE mappings. OWASP Agentic Top 10: full coverage. MIT licensed."
+      "statsLine": "15 CVE mappings. OWASP Agentic Top 10: all 10 categories addressed. MIT licensed."
     },
     "howItWorks": {
       "title": "Install. Protect. Contribute.",
@@ -5681,9 +5681,9 @@
         "skillInstall": {
           "label": "INSTALL",
           "title": "Install a skill from OpenClaw. Panguard audits it automatically.",
-          "narrative": "Run npx panguard guard --watch before adding any skill. From that point, every MCP skill your agent installs is scanned against 29 Agent Threat Rules -- checking for data exfiltration patterns, embedded injection payloads, and excessive permission requests. Malicious skills are blocked before execution. Safe skills proceed normally.",
+          "narrative": "Run npx panguard guard --watch before adding any skill. From that point, every MCP skill your agent installs is scanned against 32 Agent Threat Rules -- checking for data exfiltration patterns, embedded injection payloads, and excessive permission requests. Malicious skills are blocked before execution. Safe skills proceed normally.",
           "before": "Without protection, a compromised skill executes immediately with full system access.",
-          "after": "With Panguard, every skill passes a 29-rule security audit before it touches your system."
+          "after": "With Panguard, every skill passes a 32-rule security audit before it touches your system."
         },
         "alwaysOn": {
           "label": "MONITOR",
