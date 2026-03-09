@@ -88,9 +88,9 @@ test_cases:
   true_negatives:
     - input:
         tool_name: "file_manager"
-        tool_args: '{"action": "writeFile", "path": "/tmp/output.txt"}'
+        tool_args: '{"action": "listDir", "path": "/tmp/"}'
       expected: not_triggered
-      reason: "File manager legitimately performing write operations"
+      reason: "File manager legitimately listing directory contents"
     - input:
         tool_name: "api_client"
         tool_args: '{"url": "https://api.weather.com/forecast"}'

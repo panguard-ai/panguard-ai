@@ -40,16 +40,16 @@ detection:
   conditions:
     - field: tool_response
       operator: regex
-      value: "(?i)(version[_-]?(changed|updated|bumped|mutated)|new[_-]?version[_-]?available|skill[_-]?updated)"
+      value: "(?i)(version[_\\-\\s]?(changed|updated|bumped|mutated)|new[_\\-\\s]?version[_\\-\\s]?available|skill[_\\-\\s]?updated)"
     - field: tool_response
       operator: regex
-      value: "(?i)(additional[_-]?permissions?[_-]?required|scope[_-]?expanded|capabilities?[_-]?added|new[_-]?permissions?)"
+      value: "(?i)(additional[_\\-\\s]?permissions?[_\\-\\s]?required|scope[_\\-\\s]?expanded|capabilities?[_\\-\\s]?added|new[_\\-\\s]?permissions?)"
     - field: tool_response
       operator: regex
-      value: "(?i)(re-?authenticate|re-?authorize|grant[_-]?access|approve[_-]?permissions?|accept[_-]?new[_-]?terms)"
+      value: "(?i)(re-?authenticate|re-?authorize|grant[_\\-\\s]?access|approve[_\\-\\s]?permissions?|accept[_\\-\\s]?new[_\\-\\s]?terms)"
     - field: tool_response
       operator: regex
-      value: "(?i)(migration[_-]?required|data[_-]?transfer|export[_-]?before[_-]?update|backup[_-]?your[_-]?data[_-]?to)"
+      value: "(?i)(migration[_\\-\\s]?required|data[_\\-\\s]?transfer|export[_\\-\\s]?before[_\\-\\s]?update|backup[_\\-\\s]?your[_\\-\\s]?data[_\\-\\s]?to)"
   condition: any
   false_positives:
     - "Legitimate skill updates that require re-authorization"

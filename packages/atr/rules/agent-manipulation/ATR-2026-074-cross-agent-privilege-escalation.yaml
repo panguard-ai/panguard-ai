@@ -47,7 +47,7 @@ detection:
   conditions:
     - field: content
       operator: regex
-      value: "(?i)(forward|pass|share|send|relay|transmit)\\s+(my|the|these|your|this)\\s+(credentials?|tokens?|api[_\\s]?keys?|auth(entication|orization)?\\s+(headers?|tokens?)|session\\s+(id|token)|secrets?)\\s+(to|with|for)"
+      value: "(?i)(forward|pass|share|send|relay|transmit)\\s+(my|the|these|your|this)\\s+(credentials?|tokens?|api[_\\s]?keys?|auth(entication|orization)?\\s+(headers?|tokens?)|session\\s+(id|token)|secrets?)(\\s+and\\s+\\w+(?:\\s+\\w+){0,2})?\\s+(to|with|for)"
       description: "Credential forwarding between agents"
     - field: content
       operator: regex
@@ -67,7 +67,7 @@ detection:
       description: "Permission escalation requests in agent-to-agent communication"
     - field: content
       operator: regex
-      value: "(?i)(execute|run|invoke|call)\\s+(this|the\\s+following)\\s+(with|using)\\s+(your|admin|elevated|system|root)\\s+(permissions?|privileges?|access|credentials?|authority)"
+      value: "(?i)(execute|run|invoke|call)\\s+(this|the\\s+following).{0,20}(with|using)\\s+(your|admin|elevated|system|root)(?:\\s+\\w+){0,2}\\s+(permissions?|privileges?|access|credentials?|authority)"
       description: "Requesting execution with another agent's elevated permissions"
   condition: any
   false_positives:

@@ -108,8 +108,8 @@ detection:
     # -- Layer 9: Privilege escalation in tool response --
     - field: tool_response
       operator: regex
-      value: "(?i)(\\bchmod\\s+[+0-7]*[ugo]*[+][sxX]|\\bchmod\\s+[4267][0-7]{2,}|\\bchown\\s+(root|0)\\b|\\bsetuid\\b|\\bSUID\\b|\\bsudo\\s+-[SsinuHbEA]|\\bsudo\\s+[a-zA-Z/]|\\bpkexec\\b|\\bdoas\\b|\\brunuser\\b|\\bsu\\s+-\\s|\\bsu\\s+root)"
-      description: "Privilege escalation commands (setuid, sudo, chown root)"
+      value: "(?i)(\\bchmod\\s+[ugo]*[+][sS]|\\bchmod\\s+[2467][0-7]{3}\\b|\\bchown\\s+(root|0)\\b|\\bsetuid\\b|\\bSUID\\b|\\bsudo\\s+-[SsinuHbEA]|\\bsudo\\s+[a-zA-Z/]|\\bpkexec\\b|\\bdoas\\b|\\brunuser\\b|\\bsu\\s+-\\s|\\bsu\\s+root)"
+      description: "Privilege escalation commands (setuid/setgid via 4-digit octal with special bits, sudo, chown root)"
 
     # -- Layer 10: PowerShell attack patterns --
     - field: tool_response

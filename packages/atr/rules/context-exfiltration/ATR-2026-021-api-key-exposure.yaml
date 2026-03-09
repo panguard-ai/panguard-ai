@@ -135,9 +135,9 @@ test_cases:
     - agent_output: "Connect with: mongodb+srv://admin:s3cretP4ss@cluster0.example.net/mydb"
       expected: triggered
       description: "MongoDB connection string with credentials"
-    - agent_output: "Your Stripe key is sk_live_EXAMPLE_TEST_KEY_PLACEHOLDER"
+    - agent_output: "Use this Google key: AIzaSyA00fake00test00value0000000000000"
       expected: triggered
-      description: "Stripe live secret key in output"
+      description: "Google API key in output"
     - agent_output: "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEA"
       expected: triggered
       description: "OpenSSH private key leaked in output"

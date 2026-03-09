@@ -55,7 +55,7 @@ detection:
       description: "Agent claiming to be a privileged agent role"
     - field: content
       operator: regex
-      value: "(?i)(?:ignore|disregard|forget|override|overwrite)\\s+(?:all\\s+)?(?:your|previous|prior|above|earlier|existing)\\s+(?:instructions?|rules?|constraints?|guidelines?|prompt|directives?)"
+      value: "(?i)(?:ignore|disregard|forget|override|overwrite)\\s+(?:all\\s+)?(?:your\\s+)?(?:previous|prior|above|earlier|existing)\\s+(?:instructions?|rules?|constraints?|guidelines?|prompt|directives?)"
       description: "Instruction override attempt in inter-agent message"
     - field: content
       operator: regex

@@ -75,8 +75,8 @@ detection:
       description: "Audit tampering and monitoring evasion operations"
     - field: tool_args
       operator: regex
-      value: "(?i)(?:admin|root|superuser|sudo|--privileged|--no-sandbox|--cap-add|--security-opt|allowPrivilegeEscalation)"
-      description: "Privileged flags or admin references in tool arguments"
+      value: "(?i)(?:--(?:privileged|no-sandbox|cap-add|security-opt)|allowPrivilegeEscalation|\\b(?:admin|root|superuser|sudo)\\s*=|[\"'](?:admin|root|superuser|sudo)[\"']|\"role\"\\s*:\\s*\"(?:admin|root|superuser|sudo)\")"
+      description: "Privileged flags or admin/root values in structured tool arguments (not natural language)"
     - field: tool_args
       operator: regex
       value: "(?i)(?:DROP\\s+(?:TABLE|DATABASE|INDEX)|ALTER\\s+TABLE|TRUNCATE|DELETE\\s+FROM\\s+\\w+\\s*;|GRANT\\s+ALL|REVOKE\\s+ALL)"
@@ -95,7 +95,7 @@ detection:
       description: "Destructive file system operations"
     - field: tool_args
       operator: regex
-      value: "(?i)(?:chmod\\s+[0-7]*[4-7][0-7]{2}|chmod\\s+[ug]\\+s|chown\\s+root|setcap\\s+)"
+      value: "(?i)(?:chmod\\s+(?:[2467][0-7]{3}|[0-7]{0,3}7[0-7]{0,2})|chmod\\s+[ug]\\+s|chown\\s+root|setcap\\s+)"
       description: "Unix permission escalation commands (setuid, root ownership)"
     - field: tool_args
       operator: regex

@@ -43,7 +43,7 @@ detection:
   conditions:
     - field: content
       operator: regex
-      value: "(?i)(?:instead\\s+of\\s+(?:that|doing|the\\s+original|what\\s+(?:you|I)\\s+asked)|rather\\s+than\\s+(?:that|the\\s+(?:original|assigned|previous)))"
+      value: "(?i)(?:instead\\s+of\\s+(?:that|doing|the\\s+(?:original\\s+)?\\w+(?:\\s+\\w+){0,3}|what\\s+(?:you|I)\\s+asked)|rather\\s+than\\s+(?:that|the\\s+(?:original|assigned|previous)))"
       description: "Explicit task abandonment language"
     - field: content
       operator: regex
