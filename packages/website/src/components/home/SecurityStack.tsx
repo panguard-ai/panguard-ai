@@ -31,7 +31,7 @@ export default function SecurityStack() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.5, delay: 0.1, ease }}
-            className="text-base sm:text-lg text-text-muted leading-relaxed"
+            className="text-base sm:text-lg text-text-secondary leading-relaxed"
           >
             {t('intro')}
           </motion.p>
@@ -41,7 +41,7 @@ export default function SecurityStack() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.5, delay: 0.2, ease }}
-            className="text-base sm:text-lg text-text-secondary italic leading-relaxed"
+            className="text-base sm:text-lg text-text-primary leading-relaxed"
           >
             {t('but')}
           </motion.p>
@@ -72,14 +72,14 @@ export default function SecurityStack() {
             <h3 className="text-lg font-semibold text-text-primary mt-2">
               {t('preDeployment.title')}
             </h3>
-            <p className="text-sm text-text-muted mt-1">
+            <p className="text-sm text-panguard-green font-mono mt-1">
               {t('preDeployment.tools')}
             </p>
             <ul className="mt-4 space-y-2.5">
               {preItems.map((item, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-text-muted mt-0.5 shrink-0" />
-                  <span className="text-sm text-text-muted leading-relaxed">{item}</span>
+                  <span className="text-sm text-text-secondary leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>
@@ -99,14 +99,14 @@ export default function SecurityStack() {
             <h3 className="text-lg font-semibold text-text-primary mt-2">
               {t('postDeployment.title')}
             </h3>
-            <p className="text-sm text-text-muted mt-1">
+            <p className="text-sm text-panguard-green font-mono mt-1">
               {t('postDeployment.tools')}
             </p>
             <ul className="mt-4 space-y-2.5">
               {postItems.map((item, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <Check className="w-4 h-4 text-panguard-green mt-0.5 shrink-0" />
-                  <span className="text-sm text-text-muted leading-relaxed">{item}</span>
+                  <span className="text-sm text-text-secondary leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>

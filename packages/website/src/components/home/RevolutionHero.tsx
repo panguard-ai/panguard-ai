@@ -91,7 +91,7 @@ export default function RevolutionHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease }}
-          className="text-[clamp(22px,6vw,64px)] font-bold leading-[1.12] tracking-tight text-text-primary"
+          className="text-[clamp(22px,6vw,64px)] font-bold leading-[1.12] tracking-tight text-text-primary max-w-3xl mx-auto"
         >
           {t('title')}
         </motion.h1>
@@ -101,10 +101,16 @@ export default function RevolutionHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3, ease }}
-          className="mt-8 max-w-2xl mx-auto"
+          className="mt-8 max-w-2xl mx-auto space-y-3"
         >
-          <p className="text-base sm:text-lg md:text-xl text-gray-400 leading-relaxed">
-            {t('subtitle')}
+          <p className="text-lg sm:text-xl text-text-secondary leading-relaxed">
+            {t('subtitleLine1')}
+          </p>
+          <p className="text-lg sm:text-xl text-text-primary font-medium leading-relaxed">
+            {t('subtitleLine2')}
+          </p>
+          <p className="text-lg sm:text-xl text-panguard-green font-semibold leading-relaxed">
+            {t('subtitleLine3')}
           </p>
         </motion.div>
 

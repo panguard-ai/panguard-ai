@@ -25,13 +25,13 @@ export default function SkillProtection() {
           <div className="inline-flex items-center gap-2 bg-panguard-green/10 border border-panguard-green/20 rounded-full px-4 py-1.5 mb-6">
             <Shield className="w-4 h-4 text-panguard-green" />
             <span className="text-xs font-semibold text-panguard-green uppercase tracking-wider">
-              Skill Security
+              OpenClaw Ecosystem
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary">
             {t('title')}
           </h2>
-          <p className="text-base sm:text-lg text-gray-400 mt-4 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-text-secondary mt-4 max-w-2xl mx-auto leading-relaxed">
             {t('subtitle')}
           </p>
         </motion.div>
@@ -56,7 +56,7 @@ export default function SkillProtection() {
               {withoutItems.map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <X className="w-4 h-4 text-red-400/60 mt-0.5 shrink-0" />
-                  <span className="text-sm text-text-muted leading-relaxed">{item}</span>
+                  <span className="text-base text-text-muted leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>
@@ -80,7 +80,7 @@ export default function SkillProtection() {
               {withItems.map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <Check className="w-4 h-4 text-panguard-green/60 mt-0.5 shrink-0" />
-                  <span className="text-sm text-text-secondary leading-relaxed">{item}</span>
+                  <span className="text-base text-text-secondary leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>

@@ -100,13 +100,13 @@ export default function ATRShowcase() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-40px' }}
                   transition={{ duration: 0.4, delay: 0.15 * i, ease }}
-                  className="bg-[#0a0a0a] border border-border rounded-xl p-5 hover:border-brand-sage/40 transition-colors duration-300"
+                  className="bg-[#0a0a0a] border border-border rounded-xl p-6 hover:border-brand-sage/40 transition-colors duration-300"
                 >
                   <Icon className="w-5 h-5 text-panguard-green mb-3" />
-                  <h3 className="text-sm font-semibold text-text-primary mb-1.5">
+                  <h3 className="text-base font-semibold text-text-primary mb-1.5">
                     {t(`features.${key}.title`)}
                   </h3>
-                  <p className="text-xs text-text-muted leading-relaxed">
+                  <p className="text-sm text-text-muted leading-relaxed">
                     {t(`features.${key}.desc`)}
                   </p>
                 </motion.div>

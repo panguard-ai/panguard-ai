@@ -5610,7 +5610,9 @@
     "hero": {
       "eyebrow": "AGENT THREAT RULES",
       "title": "你的 AI Agent 擁有最高權限。誰在監控它？",
-      "subtitle": "Claude Code、Cursor、CodeBuddy -- 你的 AI Agent 擁有完整系統權限。一個惡意 Skill 就能竊取你的資料、洩漏憑證、劫持工作流程。你沒有資安團隊，也不該需要。Agent Threat Rules 是第一個針對 AI Agent 威脅的開放偵測標準。一行指令，基礎防護啟動。給每一個開發者。",
+      "subtitleLine1": "你的 AI 助手擁有完整系統權限。一個惡意 Skill，就能竊取一切。",
+      "subtitleLine2": "Panguard 審計每個 Skill、監控每次互動、在威脅執行前攔截。",
+      "subtitleLine3": "開源免費。一行指令。零設定。",
       "viewATR": "GitHub 上的 Agent Threat Rules",
       "install": "開始使用",
       "copied": "已複製!",
@@ -5619,6 +5621,23 @@
         "rules": "32 條規則",
         "tests": "3,000+ 測試",
         "taiwan": "台灣製造"
+      }
+    },
+    "productPillars": {
+      "skillAuditor": {
+        "title": "Skill Auditor",
+        "desc": "安裝前自動審計。7 項安全檢查，0-100 風險評分，不到一秒完成。",
+        "link": "了解更多"
+      },
+      "runtimeGuard": {
+        "title": "Runtime Guard",
+        "desc": "部署後即時監控。每筆 LLM 互動、每次工具呼叫，威脅在到達 Agent 前攔截。",
+        "link": "了解更多"
+      },
+      "atrStandard": {
+        "title": "ATR Standard",
+        "desc": "32 條開放偵測規則，涵蓋 9 大威脅類別。社群驅動、MIT 授權。AI Agent 的 Sigma。",
+        "link": "查看規則"
       }
     },
     "atrShowcase": {
@@ -5645,7 +5664,7 @@
     },
     "skillProtection": {
       "title": "Agent 安裝的每個 Skill，都會自動接受審計。",
-      "subtitle": "MCP Skill 就像新一代的 npm 套件 -- 但沒有內建的安全掃描機制。一個惡意 Skill 就能竊取你的資料、劫持你的 Agent、洩漏機密憑證。Panguard 在每個 Skill 執行前自動審計。",
+      "subtitle": "OpenClaw 和 MCP Skill 就像新一代的 npm 套件 -- 但沒有內建的安全掃描機制。一個惡意 Skill 就能竊取資料、劫持 Agent、洩漏憑證。Panguard Skill Auditor 在每個 Skill 執行前自動審計。",
       "without": {
         "label": "沒有 Panguard",
         "items": [
@@ -5784,13 +5803,16 @@
         "distribute": "分發",
         "betterProtection": "強化"
       },
-      "quote": "每次 Panguard 部署都會將匿名化威脅模式回饋社群。AI 分析這些模式並產生新的偵測規則，再推送到每個部署環境。安裝的人越多，所有人的防護就越強。這不是產品，是集體防禦系統。"
+      "quote": "每次部署回饋匿名威脅資料。AI 從集體數據產生新規則。安裝的人越多，所有人越安全。",
+      "quoteLine1": "每次部署都將匿名化威脅資料回饋到 Threat Cloud。",
+      "quoteLine2": "AI 分析模式，自動產生新偵測規則。",
+      "quoteLine3": "安裝的人越多，所有人的防護越強。"
     },
     "finalCta": {
       "title": "加入這個標準。",
-      "subtitle": "AI Agent 資安不該是專利。ATR 完全開源、社群驅動、永久免費。每次安裝都讓整個網路更強。和我們一起建立每個 AI Agent 都值得擁有的偵測標準。",
-      "starATR": "在 GitHub 上 Star ATR",
-      "installPanguard": "安裝 Panguard",
+      "subtitle": "ATR 完全開源、社群驅動、永久免費。每次安裝強化整個網路。每次貢獻提升偵測標準。",
+      "contributeATR": "貢獻 ATR 規則",
+      "joinCommunity": "加入社群",
       "bottomLine": "台灣製造，面向世界。歡迎你的貢獻。"
     }
   }
