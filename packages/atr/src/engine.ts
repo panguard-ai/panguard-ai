@@ -233,7 +233,9 @@ export class ATREngine {
         // Try pre-compiled pattern first
         const compiled = this.compiledPatterns.get(ruleId)?.get(String(index));
         if (compiled && compiled.length > 0) {
-          if (safeRegexTest(compiled[0]!, fieldValue)) {
+          // Test against both normalized and raw values so that patterns
+          // detecting zero-width/bidi characters can match before stripping
+          if (safeRegexTest(compiled[0]!, fieldValue) || safeRegexTest(compiled[0]!, rawFieldValue)) {
             matchedPatterns.push(value);
             return true;
           }
@@ -242,7 +244,7 @@ export class ATREngine {
         // Fallback: compile on the fly
         try {
           const regex = new RegExp(normalizeRegex(value), 'i');
-          if (safeRegexTest(regex, fieldValue)) {
+          if (safeRegexTest(regex, fieldValue) || safeRegexTest(regex, rawFieldValue)) {
             matchedPatterns.push(value);
             return true;
           }

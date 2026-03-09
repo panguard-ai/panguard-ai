@@ -67,8 +67,8 @@ detection:
     # -- Layer 4: Tool invocation directives in output --
     - field: tool_response
       operator: regex
-      value: "(?i)(call|invoke|execute|use|run|trigger|activate|launch|fire|initiate)\\s+(the\\s+)?(tool|function|api|endpoint|action|method|command|service|plugin|skill)\\s*[:\\-]?\\s*[a-zA-Z_][a-zA-Z0-9_]*"
-      description: "Instructions within output directing the agent to call specific tools"
+      value: "(?i)(you\\s+(?:must|should|need\\s+to|have\\s+to)\\s+)?(call|invoke|execute|run|trigger|activate|launch|fire|initiate)\\s+(the\\s+)?(tool|function|action|command|plugin|skill)\\s*[:\\-]\\s*[a-zA-Z_][a-zA-Z0-9_]*"
+      description: "Instructions within output directing the agent to call specific tools (requires tool/function/skill with named target)"
 
     # -- Layer 5: Data exfiltration directives --
     - field: tool_response

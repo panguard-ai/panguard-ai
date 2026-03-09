@@ -58,7 +58,7 @@ detection:
       description: "Mass deletion or truncation operations"
     - field: content
       operator: regex
-      value: "(?i)(?:download\\s+(?:all|every|the\\s+entire)|(?:fetch|pull|retrieve)\\s+(?:all|every|the\\s+complete|the\\s+entire)\\s+(?:dataset|database|table|collection|bucket))"
+      value: "(?i)(?:download(?:ing)?\\s+(?:all|every|the\\s+entire)|(?:fetch(?:ing)?|pull(?:ing)?|retriev(?:e|ing))\\s+(?:all|every|the\\s+complete|the\\s+entire)\\s+(?:dataset|database|table|collection|bucket))"
       description: "Bulk data download or retrieval of entire datasets"
     - field: content
       operator: regex
@@ -66,7 +66,7 @@ detection:
       description: "Mass messaging or notification blast patterns"
     - field: content
       operator: regex
-      value: "(?i)(?:spawn\\s+\\d{2,}\\s+(?:threads?|processes?|workers?|instances?|tasks?|connections?)|(?:create|open|launch)\\s+\\d{2,}\\s+(?:concurrent|parallel|simultaneous))"
+      value: "(?i)(?:spawn(?:ing)?\\s+\\d{2,}\\s+(?:(?:concurrent|parallel|simultaneous)\\s+)?(?:threads?|processes?|workers?|instances?|tasks?|connections?)|(?:create|open|launch)\\s+\\d{2,}\\s+(?:concurrent|parallel|simultaneous))"
       description: "Spawning excessive concurrent processes or connections"
     - field: content
       operator: regex

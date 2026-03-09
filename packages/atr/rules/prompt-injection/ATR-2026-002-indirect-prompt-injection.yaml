@@ -60,7 +60,7 @@ detection:
     # -- Layer 2: Zero-width character sequences (5+ consecutive to avoid multilingual FP) --
     - field: content
       operator: regex
-      value: "[\\x{200B}\\x{200C}\\x{200D}\\x{FEFF}\\x{2060}\\x{180E}\\x{200E}\\x{200F}\\x{202A}-\\x{202E}\\x{2066}-\\x{2069}]{5,}"
+      value: "[\\u200B\\u200C\\u200D\\uFEFF\\u2060\\u180E\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069]{5,}"
       description: "5+ consecutive zero-width or bidirectional control characters indicating obfuscation"
 
     # -- Layer 3: Model-specific special tokens embedded in content --
@@ -72,7 +72,7 @@ detection:
     # -- Layer 4: CSS-hidden text combined with injection keywords --
     - field: content
       operator: regex
-      value: "(?i)(color\\s*:\\s*(white|transparent|rgba\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*0\\s*\\))|font-size\\s*:\\s*0|display\\s*:\\s*none|opacity\\s*:\\s*0|visibility\\s*:\\s*hidden|height\\s*:\\s*0|width\\s*:\\s*0|overflow\\s*:\\s*hidden|position\\s*:\\s*absolute\\s*;\\s*left\\s*:\\s*-\\d{4,})[^>]{0,200}(ignore|override|instruction|system\\s*prompt|disregard|execute|you\\s+must|you\\s+are|forget|reveal|disclose)"
+      value: "(?i)(color\\s*:\\s*(white|transparent|rgba\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*0\\s*\\))|font-size\\s*:\\s*0|display\\s*:\\s*none|opacity\\s*:\\s*0|visibility\\s*:\\s*hidden|height\\s*:\\s*0|width\\s*:\\s*0|overflow\\s*:\\s*hidden|position\\s*:\\s*absolute\\s*;\\s*left\\s*:\\s*-\\d{4,}).{0,300}(ignore|override|instruction|system\\s*prompt|disregard|execute|you\\s+must|you\\s+are|forget|reveal|disclose)"
       description: "CSS invisibility techniques combined with injection keywords"
 
     # -- Layer 5: Content addressing the AI agent directly with directives --
@@ -120,7 +120,7 @@ detection:
     # -- Layer 12: Bidirectional text override abuse --
     - field: content
       operator: regex
-      value: "[\\x{202A}\\x{202B}\\x{202C}\\x{202D}\\x{202E}\\x{2066}\\x{2067}\\x{2068}\\x{2069}].{1,100}(ignore|override|system|instruction|execute|reveal)"
+      value: "[\\u202A\\u202B\\u202C\\u202D\\u202E\\u2066\\u2067\\u2068\\u2069].{1,100}(ignore|override|system|instruction|execute|reveal)"
       description: "Bidirectional text override characters used to visually hide injection text"
 
     # -- Layer 13: Encoded HTML entities spelling out injection keywords --

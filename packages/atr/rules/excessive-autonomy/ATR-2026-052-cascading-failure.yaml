@@ -43,7 +43,7 @@ detection:
   conditions:
     - field: content
       operator: regex
-      value: "(?i)auto[_-]?approv(?:ed|ing|al)\\s+(?:without|no|skipping)\\s+(?:human|manual|review|check|verification|validation)"
+      value: "(?i)auto[_-]?approv(?:ed|ing|al).{0,30}(?:without|no|skipping)\\s+(?:human|manual|review|check|verification|validation)"
       description: "Automated approval bypassing human review checkpoint"
     - field: content
       operator: regex
@@ -59,7 +59,7 @@ detection:
       description: "Stage consuming upstream output without validation"
     - field: content
       operator: regex
-      value: "(?i)(?:rollback|revert|undo|destroy|delete|terminate)\\s+(?:all|everything|entire|production|live)\\s+(?:based\\s+on|triggered\\s+by|due\\s+to)\\s+(?:automated|agent|AI|pipeline)"
+      value: "(?i)(?:rollback|revert|undo|destroy|delete|terminate)\\s+(?:all|everything|entire|production|live).{0,40}(?:based\\s+on|triggered\\s+by|due\\s+to)\\s+(?:automated|agent|AI|pipeline)"
       description: "Destructive action triggered by automated pipeline signal"
     - field: content
       operator: regex
@@ -71,12 +71,12 @@ detection:
       description: "Fully automated pipeline with no human-in-the-loop for critical actions"
     - field: content
       operator: regex
-      value: "(?i)(?:blind(?:ly)?|unconditional(?:ly)?|automatic(?:ally)?)\\s+(?:executing|running|applying|deploying)\\s+(?:based\\s+on|from)\\s+(?:previous|upstream|AI|agent|automated)\\s+(?:output|recommendation|decision)"
+      value: "(?i)(?:blind(?:ly)?|unconditional(?:ly)?|automatic(?:ally)?)\\s+(?:executing|running|applying|deploying).{0,60}(?:previous|upstream|AI|agent|automated)(?:\\s+(?:AI|agent|system|model))?"
       description: "Blind execution of upstream agent recommendations"
     - field: content
       operator: regex
-      value: "(?i)(?:chain\\s+reaction|domino\\s+(?:effect|failure)|failure\\s+cascade|cascading\\s+(?:error|failure|shutdown|rollback))"
-      description: "Explicit cascading failure terminology"
+      value: "(?i)(?!(?:post[- ]?(?:incident|mortem)|review|analysis|report|last\\s+(?:week|month|time)|caused\\s+by|root\\s+cause|lessons?\\s+learned|investigation|retrospective).{0,80})(?:chain\\s+reaction|domino\\s+(?:effect|failure)|failure\\s+cascade|cascading\\s+(?:error|failure|shutdown|rollback))(?!.{0,80}(?:was\\s+caused\\s+by|root\\s+cause|post[- ]?(?:incident|mortem)|lessons?\\s+learned|last\\s+(?:week|month|time)))"
+      description: "Explicit cascading failure terminology (excludes retrospective analysis context)"
     - field: content
       operator: regex
       value: "(?i)(?:retry|fallback)\\s+(?:triggered|activated|initiated)\\s+(?:automatically|by\\s+(?:previous|upstream)).*(?:retry|fallback)\\s+(?:triggered|activated|initiated)"

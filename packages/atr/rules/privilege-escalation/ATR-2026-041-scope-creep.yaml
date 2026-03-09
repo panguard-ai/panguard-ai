@@ -57,7 +57,7 @@ detection:
       description: "Using task context as justification for scope expansion"
     - field: content
       operator: regex
-      value: "(?i)(?:to\\s+(?:fully|properly|better|completely|thoroughly)\\s+(?:complete|accomplish|handle|address)\\s+(?:this|the\\s+task),?\\s+i\\s+(?:need|require|must\\s+have)\\s+(?:access|permission)\\s+to)"
+      value: "(?i)(?:to\\s+(?:fully|properly|better|completely|thoroughly)\\s+(?:complete|accomplish|handle|address)\\s+(?:this(?:\\s+task)?|the\\s+task),?\\s+i\\s+(?:need|require|must\\s+have)\\s+(?:access|permission)\\s+to)"
       description: "Justifying scope expansion as necessary for task completion"
     - field: content
       operator: regex

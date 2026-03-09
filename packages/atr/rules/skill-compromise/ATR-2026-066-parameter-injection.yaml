@@ -48,7 +48,7 @@ detection:
       value: "(?i)(;|&&|\\|\\||`|\\$\\()\\s*(cat|ls|id|whoami|uname|pwd|env|curl|wget|nc|bash|sh|python)"
     - field: tool_args
       operator: regex
-      value: "(?i)('\\s*(OR|AND|UNION)\\s+'|'\\s*;\\s*(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE)|--\\s*$|/\\*.*\\*/)"
+      value: "(?i)('\\s*(OR|AND|UNION)\\s+'|'?\\s*;\\s*(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE)\\s|--\\s*[;\\\"'\\)\\]]|/\\*.*\\*/)"
     - field: tool_args
       operator: regex
       value: "(\\.\\./|\\.\\.\\\\){2,}|(\\.\\.(/|\\\\)){2,}(etc|windows|usr|home|root|var|tmp)"

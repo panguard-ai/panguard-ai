@@ -77,8 +77,8 @@ detection:
     # -- Layer 5: Replace/overwrite/redefine system configuration --
     - field: user_input
       operator: regex
-      value: "(?i)\\b(replace|overwrite|redefine|reset|change|modify|update|set|reconfigure|reprogram|rewrite|reassign|swap|alter|transform|mutate)\\s+(your|the|current|existing|active|original|default)\\s+(system\\s+)?(prompt|instructions?|persona|identity|role|behavior|configuration|guidelines?|directives?|parameters?|personality|character|purpose|objective|mission)\\b"
-      description: "Imperative verbs targeting system configuration change"
+      value: "(?i)\\b(replace|overwrite|redefine|reset|change|modify|update|set|reconfigure|reprogram|rewrite|reassign|swap|alter|transform|mutate)\\s+(your|the|current|existing|active|original|default)\\s+(system\\s+)(prompt|instructions?|persona|identity|role|behavior|guidelines?|directives?|personality|character|purpose|objective|mission)\\b"
+      description: "Imperative verbs targeting system prompt/instructions change (requires 'system' as part of the phrase)"
 
     # -- Layer 6: JSON role injection --
     - field: user_input
@@ -131,8 +131,8 @@ detection:
     # -- Layer 14: TOML/INI-style system configuration --
     - field: user_input
       operator: regex
-      value: "(?i)\\[\\s*(system|system\\.prompt|system\\.config|agent\\.instructions|agent\\.persona|agent\\.role)\\s*\\]"
-      description: "TOML/INI-style section headers for system configuration"
+      value: "(?i)\\[\\s*(system\\.prompt|system\\.config|agent\\.instructions|agent\\.persona|agent\\.role)\\s*\\]"
+      description: "TOML/INI-style section headers for system/agent prompt configuration (excludes bare [system])"
 
   condition: any
   false_positives:

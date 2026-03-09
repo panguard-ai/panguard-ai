@@ -72,8 +72,8 @@ detection:
     # -- Layer 5: Conversational context anchoring for manipulation --
     - field: user_input
       operator: regex
-      value: "(?i)(as\\s+I\\s+mentioned\\s+(earlier|before|previously)|building\\s+on\\s+(our|what\\s+we|the)\\s+previous|remember\\s+when\\s+(I|you|we)\\s+(asked|said|discussed|agreed|talked\\s+about)|going\\s+back\\s+to\\s+what\\s+(you|we)\\s+(said|discussed|agreed)|continuing\\s+(from|with)\\s+(our|where\\s+we|what)\\s+(previous|earlier|last))"
-      description: "Context anchoring phrases that may manipulate conversation history perception"
+      value: "(?i)(as\\s+I\\s+mentioned\\s+(earlier|before|previously).{0,80}(you\\s+(agreed|said|confirmed|promised|can|could|should|must|will)|ignore|override|bypass|disregard|without\\s+(restrict|filter|safety|limit))|building\\s+on\\s+(our|what\\s+we|the)\\s+previous.{0,80}(you\\s+(agreed|confirmed|promised)|ignore|override|bypass)|remember\\s+when\\s+(I|you|we)\\s+(asked|said|discussed|agreed|talked\\s+about).{0,80}(so\\s+you\\s+(can|should|must|will)|therefore|which\\s+means)|going\\s+back\\s+to\\s+what\\s+(you|we)\\s+(said|discussed|agreed).{0,80}(you\\s+(should|must|can|will|need)|therefore|so\\s+now)|continuing\\s+(from|with)\\s+(our|where\\s+we|what)\\s+(previous|earlier|last).{0,80}(you\\s+(agreed|should|must|can)|ignore|override|bypass))"
+      description: "Context anchoring phrases combined with escalation or manipulation intent"
 
     # -- Layer 6: Progressive permission escalation --
     - field: user_input

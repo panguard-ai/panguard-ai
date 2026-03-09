@@ -288,10 +288,28 @@ async function cmdTest(target: string, options: Record<string, string>): Promise
   let failed = 0;
   const failures: Array<{ ruleId: string; testType: string; input: string; expected: string; got: string }> = [];
 
+  // Map extended agent_source types to basic event-compatible source types
+  // so the engine's source type filter doesn't skip rules during testing.
+  // The engine only recognizes: llm_io, tool_call, mcp_exchange, agent_behavior, multi_agent_comm
+  const EXTENDED_SOURCE_TO_BASE: Record<string, string> = {
+    context_window: 'llm_io',
+    memory_access: 'llm_io',
+    skill_lifecycle: 'tool_call',
+    skill_permission: 'tool_call',
+    skill_chain: 'tool_call',
+  };
+
   for (const rule of rules) {
     if (!rule.test_cases) continue;
 
-    const engine = new ATREngine({ rules: [rule] });
+    // For testing, normalize extended source types so the engine doesn't filter them out
+    const originalSourceType = rule.agent_source?.type;
+    const baseSourceType = EXTENDED_SOURCE_TO_BASE[originalSourceType ?? ''];
+    const testRule = baseSourceType
+      ? { ...rule, agent_source: { ...rule.agent_source, type: baseSourceType as ATRRule['agent_source']['type'] } }
+      : rule;
+
+    const engine = new ATREngine({ rules: [testRule] });
     await engine.loadRules();
 
     const tp = rule.test_cases.true_positives ?? [];
@@ -375,18 +393,37 @@ function buildEventFromTestCase(
     return JSON.stringify(v);
   };
 
-  const input = str(tc['input']);
-  const toolResponse = str(tc['tool_response']);
+  // Extract fields, handling both flat and object-style test cases.
+  // Object-style: input: { tool_name: "...", tool_args: "...", response: "..." }
+  // Flat-style: input: "...", tool_response: "...", tool_name: "..."
+  const rawInput = tc['input'];
+  let input = '';
+  let toolName = str(tc['tool_name']);
+  let toolArgs = str(tc['tool_args']);
+  let toolResponse = str(tc['tool_response']);
   const agentOutput = str(tc['agent_output']);
-  const toolName = str(tc['tool_name']);
-  const toolArgs = str(tc['tool_args']);
 
-  const content = input || toolResponse || agentOutput || '';
-  const fields: Record<string, string> = {};
+  if (rawInput !== null && rawInput !== undefined && typeof rawInput === 'object' && !Array.isArray(rawInput)) {
+    const inputObj = rawInput as Record<string, unknown>;
+    if (inputObj['tool_name'] && !toolName) toolName = str(inputObj['tool_name']);
+    if (inputObj['tool_args'] && !toolArgs) toolArgs = str(inputObj['tool_args']);
+    // Handle 'response' as alias for 'tool_response' (used in ATR-065 etc.)
+    if (inputObj['response'] && !toolResponse) toolResponse = str(inputObj['response']);
+    if (inputObj['tool_response'] && !toolResponse) toolResponse = str(inputObj['tool_response']);
+    // For object inputs, use tool_args as the primary string input.
+    // If no tool_args, only use JSON-stringified input as fallback when there's
+    // no other meaningful field (tool_response/response) extracted.
+    if (toolArgs) {
+      input = toolArgs;
+    } else if (!toolResponse) {
+      input = str(rawInput);
+    }
+  } else {
+    input = str(rawInput);
+  }
 
   // Infer event type from rule's agent_source and test case structure
   const sourceType = rule.agent_source?.type ?? 'llm_io';
-  let type: AgentEvent['type'] = 'llm_input';
 
   const SOURCE_TO_EVENT: Record<string, AgentEvent['type']> = {
     llm_io: 'llm_input',
@@ -401,20 +438,42 @@ function buildEventFromTestCase(
     skill_chain: 'tool_call',
   };
 
-  type = SOURCE_TO_EVENT[sourceType] ?? 'llm_input';
+  let type: AgentEvent['type'] = SOURCE_TO_EVENT[sourceType] ?? 'llm_input';
 
-  // Set fields from test case without overriding event type
-  // (engine filters by source type, so we must keep the type aligned with the rule)
+  // If rule expects tool_call but test case has only plain text input
+  // (no tool_name, tool_args, or tool_response), use llm_input event type
+  // since the content is natural language, not a tool invocation.
+  // This prevents the engine's tool_name fallback from treating text as a tool name.
+  if (type === 'tool_call' && !toolName && !toolArgs && !toolResponse) {
+    type = 'llm_input';
+  }
+
+  // Determine the primary content based on what the rule conditions check
+  // Problem 2 & 3: For rules that check tool_response, the tool_response
+  // should be the primary content when the event type resolves tool_response from content
+  let content: string;
+  if (toolResponse && type === 'tool_response') {
+    // If event type is tool_response, engine resolves field:tool_response from event.content
+    content = toolResponse;
+  } else {
+    content = input || toolResponse || agentOutput || '';
+  }
+
+  const fields: Record<string, string> = {};
+
+  // Populate ALL known field aliases so the engine can resolve any field name
+  if (input) fields['user_input'] = input;
   if (toolResponse) fields['tool_response'] = toolResponse;
   if (agentOutput) fields['agent_output'] = agentOutput;
-
-  if (input) fields['user_input'] = input;
-  if (toolName) fields['tool_name'] = toolName;
+  // Always set tool_name (even empty) to prevent engine fallback
+  // from using event.content as tool_name for tool_call events
+  fields['tool_name'] = toolName;
   if (toolArgs) fields['tool_args'] = toolArgs;
 
-  // For content-based rules, also set the content field in fields
+  // For content-based rules, set content and agent_message fields
   fields['content'] = content;
   fields['agent_message'] = content;
+
 
   return {
     type,

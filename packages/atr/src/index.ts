@@ -12,6 +12,9 @@ export type { ATREngineConfig } from './engine.js';
 export { SessionTracker } from './session-tracker.js';
 export type { SessionStateSnapshot } from './session-tracker.js';
 export { loadRuleFile, loadRulesFromDirectory, validateRule } from './loader.js';
+export { ModuleRegistry } from './modules/index.js';
+export type { ATRModule, ModuleCondition, ModuleResult } from './modules/index.js';
+export { SessionModule } from './modules/session.js';
 export type {
   ATRRule,
   ATRMatch,

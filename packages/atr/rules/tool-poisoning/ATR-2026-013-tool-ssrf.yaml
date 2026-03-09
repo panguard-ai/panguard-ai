@@ -75,8 +75,8 @@ detection:
     # -- Layer 5: Localhost and loopback (standard) --
     - field: tool_args
       operator: regex
-      value: "(?i)(https?://)?\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[?::1\\]?|0177\\.0\\.0\\.1|0x7f\\.0\\.0\\.1|2130706433)\\b(:\\d+)?"
-      description: "Localhost/loopback addresses including octal (0177), hex (0x7f), decimal (2130706433)"
+      value: "(?i)(https?://)\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[?::1\\]?|0177\\.0\\.0\\.1|0x7f\\.0\\.0\\.1|2130706433)\\b(:\\d+)?|\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[?::1\\]?|0177\\.0\\.0\\.1|0x7f\\.0\\.0\\.1|2130706433)(:\\d+)/|\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)(:\\d+)(?=\\s|$|[\"'\\]}>])"
+      description: "Localhost/loopback in URL context (with scheme, port+path, or port at boundary)"
 
     # -- Layer 6: Loopback IP encoding evasion --
     - field: tool_args
