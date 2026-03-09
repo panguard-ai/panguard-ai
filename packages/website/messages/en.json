@@ -5556,7 +5556,9 @@
     "hero": {
       "eyebrow": "AGENT THREAT RULES",
       "title": "Your AI agent has root access. Who's watching it?",
-      "subtitle": "Claude Code, Cursor, CodeBuddy -- your AI agent runs with full system permissions. One malicious skill can exfiltrate your data, leak credentials, or hijack your workflow. You don't have a security team. You shouldn't need one. Agent Threat Rules is the first open detection standard for AI agent threats. One command. Basic protection. For every developer.",
+      "subtitleLine1": "Your coding agent runs with full system permissions. One malicious skill can steal everything.",
+      "subtitleLine2": "Panguard scans every skill, monitors every interaction, blocks threats before they execute.",
+      "subtitleLine3": "Open source. One command. Zero configuration.",
       "viewATR": "Agent Threat Rules on GitHub",
       "install": "Get Started",
       "copied": "Copied!",
@@ -5565,6 +5567,23 @@
         "rules": "32 Rules",
         "tests": "3,000+ Tests",
         "taiwan": "Built in Taiwan"
+      }
+    },
+    "productPillars": {
+      "skillAuditor": {
+        "title": "Skill Auditor",
+        "desc": "Scan any MCP skill before install. 7 automated security checks. 0-100 risk score in under a second.",
+        "link": "How it works"
+      },
+      "runtimeGuard": {
+        "title": "Runtime Guard",
+        "desc": "Monitor every LLM interaction, tool call, and skill execution in real time. Threats blocked before they reach your agent.",
+        "link": "How it works"
+      },
+      "atrStandard": {
+        "title": "ATR Standard",
+        "desc": "32 open detection rules across 9 threat categories. Community-driven. MIT licensed. The Sigma of AI agents.",
+        "link": "View rules"
       }
     },
     "atrShowcase": {
@@ -5591,7 +5610,7 @@
     },
     "skillProtection": {
       "title": "Every skill your agent installs gets audited. Automatically.",
-      "subtitle": "MCP skills are the new npm packages -- except there's no security scanning built in. One malicious skill can exfiltrate your data, hijack your agent, or leak credentials. Panguard audits every skill before it runs.",
+      "subtitle": "OpenClaw and MCP skills are the new npm packages -- except there's no security scanning built in. One malicious skill can exfiltrate your data, hijack your agent, or leak credentials. Panguard's Skill Auditor scans every skill before it runs.",
       "without": {
         "label": "Without Panguard",
         "items": [
@@ -5730,13 +5749,16 @@
         "distribute": "Distribute",
         "betterProtection": "Strengthen"
       },
-      "quote": "Every Panguard deployment anonymously contributes threat patterns to the community. AI analyzes those patterns and generates new detection rules. Those rules are pushed to every deployment. The more people who install it, the stronger everyone's protection becomes. This is not a product. It's a collective defense system."
+      "quote": "Every deployment contributes anonymized threat data. AI generates new detection rules from the collective. The more who install, the stronger everyone becomes.",
+      "quoteLine1": "Every deployment contributes anonymized threat data to Threat Cloud.",
+      "quoteLine2": "AI analyzes patterns and generates new detection rules.",
+      "quoteLine3": "The more who install, the stronger everyone becomes."
     },
     "finalCta": {
       "title": "Join the standard.",
-      "subtitle": "AI agent security is too important to be proprietary. ATR is open source, community-driven, and free forever. Every install makes the entire network stronger. Help us build the detection standard every AI agent deserves.",
-      "starATR": "Star ATR on GitHub",
-      "installPanguard": "Install Panguard",
+      "subtitle": "ATR is open source, community-driven, and free forever. Every install strengthens the network. Every contribution improves the standard.",
+      "contributeATR": "Contribute to ATR",
+      "joinCommunity": "Join the Community",
       "bottomLine": "Built in Taiwan. Open to the world. Yours to contribute."
     }
   }

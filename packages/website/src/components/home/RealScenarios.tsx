@@ -80,7 +80,7 @@ export default function RealScenarios() {
                 {t(`items.${key}.title`)}
               </h3>
 
-              <p className="text-sm text-text-muted leading-relaxed mt-3">
+              <p className="text-base text-text-secondary leading-relaxed mt-3">
                 {t(`items.${key}.narrative`)}
               </p>
 
@@ -88,7 +88,7 @@ export default function RealScenarios() {
                 <div className="bg-red-500/5 border border-red-500/20 rounded-lg p-4">
                   <div className="flex items-start gap-2">
                     <X className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
-                    <p className="text-sm text-text-muted leading-relaxed">
+                    <p className="text-sm text-text-secondary leading-relaxed">
                       {t(`items.${key}.before`)}
                     </p>
                   </div>
@@ -97,7 +97,7 @@ export default function RealScenarios() {
                 <div className="bg-panguard-green/5 border border-panguard-green/20 rounded-lg p-4">
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-panguard-green mt-0.5 shrink-0" />
-                    <p className="text-sm text-text-muted leading-relaxed">
+                    <p className="text-sm text-text-secondary leading-relaxed">
                       {t(`items.${key}.after`)}
                     </p>
                   </div>

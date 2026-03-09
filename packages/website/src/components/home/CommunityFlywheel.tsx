@@ -2,119 +2,21 @@
 
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import { Upload, Cpu, Send, Shield, Search, TrendingUp } from 'lucide-react';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-const FLYWHEEL_NODES = [
-  'installPanguard',
-  'detectThreats',
-  'uploadToCloud',
-  'generateRules',
-  'distribute',
-  'betterProtection',
+const STEPS = [
+  { key: 'installPanguard', icon: Shield },
+  { key: 'detectThreats', icon: Search },
+  { key: 'uploadToCloud', icon: Upload },
+  { key: 'generateRules', icon: Cpu },
+  { key: 'distribute', icon: Send },
+  { key: 'betterProtection', icon: TrendingUp },
 ] as const;
-
-function FlywheelDiagram({ labels }: { labels: string[] }) {
-  const cx = 200;
-  const cy = 200;
-  const r = 150;
-  const nodeCount = 6;
-
-  const positions = Array.from({ length: nodeCount }, (_, i) => {
-    const angle = (Math.PI * 2 * i) / nodeCount - Math.PI / 2;
-    return {
-      x: cx + r * Math.cos(angle),
-      y: cy + r * Math.sin(angle),
-    };
-  });
-
-  return (
-    <svg viewBox="0 0 400 400" className="w-full max-w-[400px] mx-auto" aria-hidden="true">
-      {/* Connecting arrows */}
-      {positions.map((pos, i) => {
-        const next = positions[(i + 1) % nodeCount];
-        const dx = next.x - pos.x;
-        const dy = next.y - pos.y;
-        const len = Math.sqrt(dx * dx + dy * dy);
-        const ux = dx / len;
-        const uy = dy / len;
-        const startX = pos.x + ux * 36;
-        const startY = pos.y + uy * 36;
-        const endX = next.x - ux * 36;
-        const endY = next.y - uy * 36;
-
-        return (
-          <line
-            key={`arrow-${i}`}
-            x1={startX}
-            y1={startY}
-            x2={endX}
-            y2={endY}
-            stroke="#8B9A8E"
-            strokeWidth={1.5}
-            strokeOpacity={0.4}
-            markerEnd="url(#arrowhead)"
-          />
-        );
-      })}
-
-      <defs>
-        <marker
-          id="arrowhead"
-          markerWidth="8"
-          markerHeight="6"
-          refX="7"
-          refY="3"
-          orient="auto"
-        >
-          <polygon points="0 0, 8 3, 0 6" fill="#8B9A8E" fillOpacity={0.6} />
-        </marker>
-      </defs>
-
-      {/* Nodes */}
-      {positions.map((pos, i) => (
-        <g key={`node-${i}`}>
-          <circle
-            cx={pos.x}
-            cy={pos.y}
-            r={32}
-            fill="#0a0a0a"
-            stroke="#8B9A8E"
-            strokeWidth={1.5}
-            strokeOpacity={0.5}
-          />
-          <text
-            x={pos.x}
-            y={pos.y}
-            textAnchor="middle"
-            dominantBaseline="central"
-            fill="#F5F1E8"
-            fontSize={9}
-            fontWeight={500}
-          >
-            {labels[i]?.split(' ').length > 2 ? (
-              <>
-                <tspan x={pos.x} dy="-0.5em">
-                  {labels[i].split(' ').slice(0, 2).join(' ')}
-                </tspan>
-                <tspan x={pos.x} dy="1.1em">
-                  {labels[i].split(' ').slice(2).join(' ')}
-                </tspan>
-              </>
-            ) : (
-              labels[i]
-            )}
-          </text>
-        </g>
-      ))}
-    </svg>
-  );
-}
 
 export default function CommunityFlywheel() {
   const t = useTranslations('revolution.flywheel');
-
-  const labels = FLYWHEEL_NODES.map((key) => t(`nodes.${key}`));
 
   return (
     <section className="bg-gradient-to-b from-[#0d2614] to-[#0a0a0a] px-5 sm:px-6 py-16 sm:py-24">
@@ -129,26 +31,51 @@ export default function CommunityFlywheel() {
           {t('title')}
         </motion.h2>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease }}
-        >
-          <FlywheelDiagram labels={labels} />
-        </motion.div>
+        {/* Pipeline grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          {STEPS.map(({ key, icon: Icon }, i) => (
+            <motion.div
+              key={key}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.4, delay: i * 0.08, ease }}
+              className="relative flex flex-col items-center text-center bg-surface-1/30 border border-border rounded-xl p-4 sm:p-5"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-panguard-green/10 border border-panguard-green/20 mb-3">
+                <Icon className="w-4 h-4 text-panguard-green" />
+              </div>
+              <span className="text-sm font-semibold text-text-primary leading-tight">
+                {t(`nodes.${key}`)}
+              </span>
+              {/* Arrow indicator (hidden on last item) */}
+              {i < STEPS.length - 1 && (
+                <div className="hidden lg:block absolute -right-3 top-1/2 -translate-y-1/2 text-panguard-green/40 text-lg">
+                  &rsaquo;
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
 
-        <motion.blockquote
+        {/* Quote as 3 lines */}
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3, ease }}
-          className="mt-12 text-center max-w-2xl mx-auto"
+          className="mt-12 text-center max-w-2xl mx-auto space-y-2"
         >
-          <p className="text-lg sm:text-xl text-text-secondary italic leading-relaxed">
-            {t('quote')}
+          <p className="text-base sm:text-lg text-text-secondary leading-relaxed">
+            {t('quoteLine1')}
           </p>
-        </motion.blockquote>
+          <p className="text-base sm:text-lg text-text-secondary leading-relaxed">
+            {t('quoteLine2')}
+          </p>
+          <p className="text-base sm:text-lg text-text-primary font-semibold leading-relaxed">
+            {t('quoteLine3')}
+          </p>
+        </motion.div>
       </div>
     </section>
   );
