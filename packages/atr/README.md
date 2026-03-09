@@ -257,12 +257,14 @@ Contributions to extend the engine are welcome -- see [CONTRIBUTING.md](CONTRIBU
 
 ## Contributing
 
-We need the security community's expertise to make ATR useful.
+ATR is MIT-licensed. Contributing requires a text editor, a YAML file,
+and `npx agent-threat-rules test`. No vendor infrastructure needed.
 
-- **Security researchers**: Submit new rules via PR
-- **AI framework developers**: Help improve the agent_source spec
-- **Red teamers**: Submit attack patterns you've discovered
-- **Everyone**: Review existing rules and report false positives
+Three ways to contribute, from lowest friction:
+
+1. **Report an evasion** (~15 min) -- Found a bypass? File an issue. Every confirmed evasion becomes a test case.
+2. **Report a false positive** (~20 min) -- Rule triggered on legitimate content? Let us know.
+3. **Submit a new rule** (1-2 hrs) -- Write a YAML detection rule for an attack pattern you have discovered.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
