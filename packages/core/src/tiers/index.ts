@@ -27,10 +27,10 @@ export const FEATURE_TIER: Readonly<Record<string, Tier>> = {
   guard: 'community',
   'threat-cloud': 'community',
   demo: 'community',
-  notifications: 'solo',
-  notify: 'solo',
-  trap: 'pro',
-  report: 'pro',
+  notifications: 'community',
+  notify: 'community',
+  trap: 'community',
+  report: 'community',
 };
 
 /** Check if current tier meets or exceeds the required tier */

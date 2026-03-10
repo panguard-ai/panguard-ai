@@ -12,7 +12,7 @@ interface RuleStatsValues {
 }
 
 const RuleStatsContext = createContext<RuleStatsValues>({
-  atrRules: 32,
+  atrRules: 49,
   sigmaRules: '3,700',
   yaraRules: '4,300',
   totalRules: '8,000',

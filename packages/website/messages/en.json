@@ -275,7 +275,7 @@
           "label": "Compliance reports",
           "diy": "no",
           "consultant": "$10,000+",
-          "panguard": "From $299"
+          "panguard": "Free"
         },
         "scales": {
           "label": "Scales with you",
@@ -481,7 +481,7 @@
           "pain": "Used to SSH into each server every morning to check logs.",
           "result": "Panguard monitors all 8. Caught a cryptominer in 4 minutes. He was asleep.",
           "products": "GUARD + TRAP + CHAT",
-          "cost": "$29/mo",
+          "cost": "Free",
           "saved": "15 hours/week recovered"
         },
         {
@@ -490,17 +490,17 @@
           "pain": "Enterprise client sent a 200-question security questionnaire. Team panicked.",
           "result": "Ran Panguard Scan. Sent back a 40-page ISO 27001 report. Signed the deal that week.",
           "products": "SCAN + REPORT",
-          "cost": "$499",
+          "cost": "Free",
           "saved": "Closed $180K ARR deal"
         },
         {
           "type": "Taiwan SMB",
           "detail": "30 employees, government bid",
           "pain": "Needed ISMS compliance. Consultants quoted $10,000 and 3 months.",
-          "result": "Panguard Report: $299, 60 seconds, 50 controls mapped.",
+          "result": "Panguard Report: free, 60 seconds, 50 controls mapped.",
           "products": "REPORT (ISMS)",
-          "cost": "$299",
-          "saved": "Saved $9,700 and 3 months"
+          "cost": "Free",
+          "saved": "Saved $10,000 and 3 months"
         },
         {
           "type": "E-Commerce",
@@ -508,7 +508,7 @@
           "pain": "No idea how to answer \"Is your site secure?\"",
           "result": "Guard caught SSH brute-force at 2 AM. Blocked 3 IPs. Notified on Telegram. Read it over breakfast.",
           "products": "GUARD + CHAT",
-          "cost": "$9/mo",
+          "cost": "Free",
           "saved": "Zero downtime since install"
         }
       ]
@@ -4701,7 +4701,7 @@
     },
     "pricing": {
       "title": "Pricing",
-      "description": "Simple, transparent pricing for AI-powered endpoint security. Free Scan, Solo $9/mo, Pro $29/mo, Business $79/mo. 14-day free trial on all paid plans."
+      "description": "AI-powered endpoint security. All features are free and open source."
     },
     "earlyAccess": {
       "title": "Pro Early Access",

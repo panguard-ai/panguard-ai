@@ -63,61 +63,19 @@ export function withAuth<T>(
   handler: (options: T, credentials: StoredCredentials) => Promise<void>
 ): (options: T) => Promise<void> {
   return async (options: T) => {
-    // In server mode, require a valid service token from environment.
-    // The server has its own session-based auth for API routes.
-    if (process.env['PANGUARD_SERVER_MODE'] === '1') {
-      const creds = loadCredentials();
-      if (!creds || isTokenExpired(creds)) {
-        console.error('Server mode requires valid credentials. Run `panguard login` first.');
-        process.exitCode = 1;
-        return;
-      }
-      await handler(options, creds);
-      return;
-    }
-
-    const check = requireAuth(requiredTier);
-
-    if (!check.authenticated) {
-      console.log('');
-      console.log(
-        box(
-          [
-            `${symbols.warn} \u9700\u8981\u767B\u5165 / Authentication required`,
-            '',
-            `  \u8ACB\u57F7\u884C ${c.sage('panguard login')} \u4F86\u9A57\u8B49\u3002`,
-            `  Run ${c.sage('panguard login')} to authenticate.`,
-          ].join('\n'),
-          { borderColor: c.caution, title: 'Panguard AI' }
-        )
-      );
-      console.log('');
-      process.exitCode = 1;
-      return;
-    }
-
-    if (!check.authorized) {
-      const tierName = tierDisplayName(requiredTier);
-      console.log('');
-      console.log(
-        box(
-          [
-            `${symbols.fail} \u9700\u8981 ${tierName} \u7B49\u7D1A / ${tierName} tier required`,
-            '',
-            `  \u76EE\u524D\u7B49\u7D1A: ${c.sage(tierDisplayName(check.credentials!.tier))}`,
-            `  Current tier: ${c.sage(tierDisplayName(check.credentials!.tier))}`,
-            '',
-            `  \u5347\u7D1A\u8ACB\u898B ${c.underline('https://panguard.ai/pricing')}`,
-          ].join('\n'),
-          { borderColor: c.critical, title: '\u9700\u8981\u5347\u7D1A / Upgrade Required' }
-        )
-      );
-      console.log('');
-      process.exitCode = 1;
-      return;
-    }
-
-    await handler(options, check.credentials!);
+    // All features are free — skip tier checks entirely.
+    // Still load credentials if available for handler context.
+    const creds = loadCredentials();
+    const fallback: StoredCredentials = {
+      token: '',
+      email: '',
+      name: 'community',
+      tier: 'community' as Tier,
+      apiUrl: '',
+      savedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+    };
+    await handler(options, creds ?? fallback);
   };
 }
 
@@ -245,9 +203,9 @@ export function checkAccess(requiredTier: Tier): boolean {
  * Check if current user has access to a feature by name.
  * Uses FEATURE_TIER mapping to resolve the required tier.
  */
-export function checkFeatureAccess(feature: string): boolean {
-  const requiredTier = FEATURE_TIER[feature] ?? 'community';
-  return checkAccess(requiredTier);
+export function checkFeatureAccess(_feature: string): boolean {
+  // All features are free and open source
+  return true;
 }
 
 /* ── Feature display names (bilingual) ── */
@@ -268,151 +226,36 @@ const FEATURE_DISPLAY: Record<string, Record<string, string>> = {
  * Display a branded upgrade prompt for a locked feature.
  * Accepts feature KEY (e.g. 'report', not 'Compliance Report').
  */
-export function showUpgradePrompt(feature: string, lang: string = 'en'): void {
-  const tier = FEATURE_TIER[feature] ?? 'community';
-  const { tier: userTier } = getLicense();
-  const tierName = tierDisplayName(tier);
-  const userTierName = tierDisplayName(userTier);
-  const pricing = PRICING_TIERS[tier];
-  const priceStr = pricing && pricing.price > 0 ? `$${pricing.price}${pricing.unit}` : '';
-  const machinesStr = pricing ? pricing.machines : '';
-  const featureName =
-    FEATURE_DISPLAY[feature]?.[lang] ?? FEATURE_DISPLAY[feature]?.['en'] ?? feature;
-
-  const lines: string[] =
-    lang === 'zh-TW'
-      ? [
-          `\u300C${featureName}\u300D\u9700\u8981 ${tierName} \u65B9\u6848`,
-          priceStr ? `${priceStr} | ${machinesStr} \u53F0\u6A5F\u5668` : '',
-          '',
-          `\u76EE\u524D\u65B9\u6848:  ${c.sage(userTierName)}`,
-          `\u9700\u8981\u65B9\u6848:  ${c.sage(tierName)}`,
-          '',
-          `\u2192 ${c.underline('https://panguard.ai/pricing')}`,
-          `\u2192 ${c.sage('panguard activate <license-key>')}`,
-          '',
-          c.dim(
-            '\u6240\u6709\u4ED8\u8CBB\u65B9\u6848\u4EAB 30 \u5929\u514D\u8CBB\u8A66\u7528\u3002'
-          ),
-        ]
-      : [
-          `${featureName} requires ${tierName} plan`,
-          priceStr ? `${priceStr} | ${machinesStr} machine(s)` : '',
-          '',
-          `Current:   ${c.sage(userTierName)}`,
-          `Required:  ${c.sage(tierName)}`,
-          '',
-          `\u2192 ${c.underline('https://panguard.ai/pricing')}`,
-          `\u2192 ${c.sage('panguard activate <license-key>')}`,
-          '',
-          c.dim('All paid plans include 30-day free trial.'),
-        ];
-
-  const content = lines.filter((l) => l !== '');
-
-  console.log('');
-  console.log(
-    box(content.join('\n'), {
-      borderColor: c.sage,
-      title: lang === 'zh-TW' ? '\u9700\u8981\u5347\u7D1A' : 'Upgrade Required',
-    })
-  );
-  console.log('');
+export function showUpgradePrompt(_feature: string, _lang: string = 'en'): void {
+  // All features are free and open source — no upgrade needed
 }
 
 /**
  * Show a contextual upgrade hint for scan auto-fix.
  * Used after scan results when fixable issues are found.
  */
-export function showScanUpgradeHint(fixableCount: number, lang: string = 'en'): void {
-  const lines =
-    lang === 'zh-TW'
-      ? [
-          `\u767C\u73FE ${fixableCount} \u500B\u53EF\u81EA\u52D5\u4FEE\u5FA9\u7684\u554F\u984C\u3002`,
-          `\u5347\u7D1A\u5230 Solo ($9/\u6708) \u5373\u53EF\u4E00\u9375\u4FEE\u5FA9\uFF1A`,
-          `$ panguard scan --fix`,
-        ]
-      : [
-          `${fixableCount} issue(s) can be auto-fixed.`,
-          `Upgrade to Solo ($9/mo) for one-click fix:`,
-          `$ panguard scan --fix`,
-        ];
-  console.log('');
-  console.log(box(lines.join('\n'), { borderColor: c.sage }));
+export function showScanUpgradeHint(_fixableCount: number, _lang: string = 'en'): void {
+  // All features are free and open source — no upgrade needed
 }
 
 /**
  * Show a contextual upgrade hint for Guard AI analysis.
  * Used when a suspicious event needs AI analysis.
  */
-export function showGuardAIHint(threatType: string, confidence: number, lang: string = 'en'): void {
-  console.log('');
-  if (lang === 'zh-TW') {
-    console.log(
-      `  ${c.caution('[?]')} \u5075\u6E2C\u5230\u53EF\u7591\u6D3B\u52D5\uFF08\u4FE1\u5FC3\u5EA6 ${confidence}%\uFF09`
-    );
-    console.log(`      \u985E\u578B: ${threatType}`);
-    console.log('');
-    console.log(
-      c.dim(
-        `      \u9700\u8981 AI \u5206\u6790\u624D\u80FD\u5224\u65B7\u662F\u5426\u70BA\u5A01\u8105\u3002`
-      )
-    );
-    console.log(
-      c.dim(
-        `      \u5347\u7D1A\u5230 Solo ($9/\u6708) \u89E3\u9396 AI \u6DF1\u5EA6\u5206\u6790\u3002`
-      )
-    );
-  } else {
-    console.log(`  ${c.caution('[?]')} Suspicious activity detected (confidence ${confidence}%)`);
-    console.log(`      Type: ${threatType}`);
-    console.log('');
-    console.log(c.dim(`      AI analysis required to determine if this is a threat.`));
-    console.log(c.dim(`      Upgrade to Solo ($9/mo) for AI-powered analysis.`));
-  }
-  console.log('');
+export function showGuardAIHint(_threatType: string, _confidence: number, _lang: string = 'en'): void {
+  // All features are free and open source — no upgrade needed
 }
 
 /* ── Pricing Constants ── */
 
 export const PRICING_TIERS: Record<string, { price: number; unit: string; machines: string }> = {
-  community: { price: 0, unit: '', machines: '1' },
-  solo: { price: 9, unit: '/mo', machines: '3' },
-  pro: { price: 29, unit: '/mo', machines: '10' },
-  business: { price: 79, unit: '/mo', machines: '25' },
+  community: { price: 0, unit: '', machines: 'unlimited' },
 };
 
 export const COMPLIANCE_PRICING: Record<
   string,
   { price: number; unit: string; name: Record<string, string> }
-> = {
-  tw_cyber_security: {
-    price: 299,
-    unit: 'one-time',
-    name: {
-      en: 'TW Cyber Security Act',
-      'zh-TW': '\u8CC7\u5B89\u6CD5\u6E96\u5099\u5EA6\u8A55\u4F30',
-    },
-  },
-  iso27001: {
-    price: 499,
-    unit: 'one-time',
-    name: { en: 'ISO 27001 Readiness', 'zh-TW': 'ISO 27001 \u6E96\u5099\u5EA6\u8A55\u4F30' },
-  },
-  soc2: {
-    price: 699,
-    unit: 'one-time',
-    name: { en: 'SOC 2 Readiness', 'zh-TW': 'SOC 2 \u6E96\u5099\u5EA6\u8A55\u4F30' },
-  },
-  bundle: {
-    price: 999,
-    unit: 'one-time',
-    name: {
-      en: 'Compliance Bundle (All 3)',
-      'zh-TW': '\u5408\u898F\u7D44\u5408\u5305 (3 \u9805\u5168\u542B)',
-    },
-  },
-};
+> = {};
 
-/** Business subscribers get 50% off additional reports */
-export const BUSINESS_REPORT_DISCOUNT = 0.5;
+/** All features are free — no discount logic needed */
+export const BUSINESS_REPORT_DISCOUNT = 0;
