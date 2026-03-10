@@ -364,7 +364,7 @@ export function scanCommand(): Command {
             if (fixableCount > 0) {
               console.log(
                 box(
-                  `\u26A1 Upgrade to Solo ($9/mo) to auto-fix all ${fixableCount} issues:\n  $ panguard scan --fix`,
+                  `Auto-fix available for ${fixableCount} issue(s):\n  $ panguard scan --fix`,
                   { borderColor: c.sage, title: 'Panguard AI' }
                 )
               );

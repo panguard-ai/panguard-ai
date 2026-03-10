@@ -41,7 +41,7 @@ export const STATS = {
   logParsers: 4,
   license: 'MIT' as const,
   skillAuditChecks: 7,
-  atrRules: 32,
+  atrRules: 49,
   atrDraftRules: 0,
   /** Threat Intel Pipeline stats (auto-updated by CI every 6 hours) */
   threatIntel: {

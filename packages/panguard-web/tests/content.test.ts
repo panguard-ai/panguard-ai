@@ -94,7 +94,7 @@ describe('Personas', () => {
 describe('Pricing Plans', () => {
   it('should have 4 pricing plans', () => {
     const all = getAllPricingPlans();
-    expect(all).toHaveLength(4);
+    expect(all).toHaveLength(1);
   });
 
   it('should have community plan at $0', () => {
@@ -103,23 +103,10 @@ describe('Pricing Plans', () => {
     expect(community!.priceUsd).toBe(0);
   });
 
-  it('should have solo plan at $9', () => {
-    const solo = getPricingPlan('solo');
-    expect(solo).toBeDefined();
-    expect(solo!.priceUsd).toBe(9);
-    expect(solo!.targetPersona).toBe('developer');
-  });
-
-  it('should have pro plan highlighted', () => {
-    const pro = getPricingPlan('pro');
-    expect(pro).toBeDefined();
-    expect(pro!.highlighted).toBe(true);
-  });
-
-  it('should have business plan', () => {
-    const biz = getPricingPlan('business');
-    expect(biz).toBeDefined();
-    expect(biz!.targetPersona).toBe('mid_enterprise');
+  it('should have community plan highlighted', () => {
+    const community = getPricingPlan('community');
+    expect(community).toBeDefined();
+    expect(community!.highlighted).toBe(true);
   });
 
   it('should return undefined for unknown plan', () => {

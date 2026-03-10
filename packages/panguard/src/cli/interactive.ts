@@ -661,14 +661,14 @@ async function actionScan(): Promise<void> {
         : `${result.findings.length} issue(s) found`;
     console.log(c.dim(`  ${issuesText}`));
 
-    if (tier === 'community' && fixableCount > 0) {
+    if (fixableCount > 0) {
       const upgradeLines =
         currentLang === 'zh-TW'
           ? [
-              `\u5347\u7D1A\u5230 Solo ($9/\u6708) \u5373\u53EF\u4E00\u9375\u4FEE\u5FA9:`,
+              `\u53EF\u81EA\u52D5\u4FEE\u5FA9:`,
               `$ panguard scan --fix`,
             ]
-          : [`Upgrade to Solo ($9/mo) to auto-fix all:`, `$ panguard scan --fix`];
+          : [`Auto-fix available:`, `$ panguard scan --fix`];
       console.log('');
       console.log(box(upgradeLines.join('\n'), { borderColor: c.sage }));
     }
@@ -845,26 +845,23 @@ async function actionGuard(): Promise<void> {
         break;
       }
 
-      // Free tier — show positive capabilities first
-      const { tier } = getLicense();
-      if (tier === 'community') {
-        console.log(`  ${c.sage('\u25C6')} Guard active${' '.repeat(30)}Layer 1 \u00B7 Community`);
-        console.log('');
-        if (currentLang === 'zh-TW') {
-          console.log(`  ${c.safe('\u2713')} \u5DF2\u77E5\u653B\u64CA\u6A21\u5F0F\u81EA\u52D5\u5C01\u9396`);
-          console.log(`  ${c.safe('\u2713')} Threat Cloud \u5A01\u8105\u60C5\u5831`);
-          console.log(`  ${c.dim('\u2500')} AI \u5206\u6790 ${c.dim('(Solo $9/\u6708)')}`);
-          console.log(`  ${c.dim('\u2500')} \u901A\u77E5\u7CFB\u7D71 ${c.dim('(Solo $9/\u6708)')}`);
-          console.log(`  ${c.dim('\u2500')} \u65E5\u8A8C\u4FDD\u7559 7 \u5929+ ${c.dim('(Solo $9/\u6708)')}`);
-        } else {
-          console.log(`  ${c.safe('\u2713')} Auto-blocking for known attack patterns`);
-          console.log(`  ${c.safe('\u2713')} Threat Cloud intelligence`);
-          console.log(`  ${c.dim('\u2500')} AI analysis ${c.dim('(Solo $9/mo)')}`);
-          console.log(`  ${c.dim('\u2500')} Notifications ${c.dim('(Solo $9/mo)')}`);
-          console.log(`  ${c.dim('\u2500')} Log retention 7d+ ${c.dim('(Solo $9/mo)')}`);
-        }
-        console.log('');
+      // Show Guard capabilities
+      console.log(`  ${c.sage('\u25C6')} Guard active${' '.repeat(30)}All Layers \u00B7 Free`);
+      console.log('');
+      if (currentLang === 'zh-TW') {
+        console.log(`  ${c.safe('\u2713')} \u5DF2\u77E5\u653B\u64CA\u6A21\u5F0F\u81EA\u52D5\u5C01\u9396`);
+        console.log(`  ${c.safe('\u2713')} Threat Cloud \u5A01\u8105\u60C5\u5831`);
+        console.log(`  ${c.safe('\u2713')} AI \u5206\u6790`);
+        console.log(`  ${c.safe('\u2713')} \u901A\u77E5\u7CFB\u7D71`);
+        console.log(`  ${c.safe('\u2713')} \u65E5\u8A8C\u4FDD\u7559`);
+      } else {
+        console.log(`  ${c.safe('\u2713')} Auto-blocking for known attack patterns`);
+        console.log(`  ${c.safe('\u2713')} Threat Cloud intelligence`);
+        console.log(`  ${c.safe('\u2713')} AI analysis`);
+        console.log(`  ${c.safe('\u2713')} Notifications`);
+        console.log(`  ${c.safe('\u2713')} Log retention`);
       }
+      console.log('');
 
       // Spawn guard as background process
       const { spawn: spawnProcess } = await import('node:child_process');
