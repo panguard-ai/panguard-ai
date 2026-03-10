@@ -2,8 +2,10 @@ import dynamic from 'next/dynamic';
 import NavBar from '@/components/NavBar';
 import RevolutionHero from '@/components/home/RevolutionHero';
 import Footer from '@/components/Footer';
+import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
 // Below-the-fold sections loaded lazily
+const ThreatCards = dynamic(() => import('@/components/home/ThreatCards'));
 const PipelineFlow = dynamic(() => import('@/components/home/PipelineFlow'));
 const ProductPillars = dynamic(() => import('@/components/home/ProductPillars'));
 const SkillProtection = dynamic(() => import('@/components/home/SkillProtection'));
@@ -17,31 +19,35 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <main id="main-content">
-        <p id="definition" className="sr-only">
-          Panguard AI provides the first Skills Audit for AI agents. It audits every skill before it
-          runs, catches known threats with community ATR + Sigma + YARA rules, catches unknown threats
-          with AI analysis, and shares new rules to protect everyone. MIT licensed. Open source.
-        </p>
-        {/* 1. Hero: The first Skills Audit for AI agents */}
-        <RevolutionHero />
-        {/* 2. Pipeline: 6-step visual flow diagram */}
-        <PipelineFlow />
-        {/* 3. Three pillars: Community Rules / Collective Defense / AI Fallback */}
-        <ProductPillars />
-        {/* 4. Before/after: With and without Panguard */}
-        <SkillProtection />
-        {/* 5. Three layers: Rules / AI / Cloud */}
-        <RealScenarios />
-        {/* 6. Your agent's immune system */}
-        <SecurityStack />
-        {/* 7. Simple summary: Install / Review / Evolve */}
-        <HowItWorksNew />
-        {/* 8. Collective immunity flywheel */}
-        <CommunityFlywheel />
-        {/* 9. Final CTA */}
-        <FinalCTANew />
-      </main>
+      <RuleStatsProvider>
+        <main id="main-content">
+          <p id="definition" className="sr-only">
+            Panguard AI provides the first Skills Audit for AI agents. It audits every skill before it
+            runs, catches known threats with community ATR + Sigma + YARA rules, catches unknown threats
+            with AI analysis, and shares new rules to protect everyone. MIT licensed. Open source.
+          </p>
+          {/* 1. Hero: The first Skills Audit for AI agents */}
+          <RevolutionHero />
+          {/* 1.5. Threat cards: What happens without audit */}
+          <ThreatCards />
+          {/* 2. Pipeline: 6-step visual flow diagram */}
+          <PipelineFlow />
+          {/* 3. Three pillars: Community Rules / Collective Defense / AI Fallback */}
+          <ProductPillars />
+          {/* 4. Before/after: With and without Panguard */}
+          <SkillProtection />
+          {/* 5. Three layers: Rules / AI / Cloud */}
+          <RealScenarios />
+          {/* 6. Your agent's immune system */}
+          <SecurityStack />
+          {/* 7. Simple summary: Install / Review / Evolve */}
+          <HowItWorksNew />
+          {/* 8. Collective immunity flywheel */}
+          <CommunityFlywheel />
+          {/* 9. Final CTA */}
+          <FinalCTANew />
+        </main>
+      </RuleStatsProvider>
       <Footer />
     </>
   );

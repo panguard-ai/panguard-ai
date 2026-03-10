@@ -5401,14 +5401,14 @@
           { "label": "Leak credentials", "detail": "SSH keys, tokens, cloud secrets -- all accessible" }
         ]
       },
-      "subtitleLine2": "Panguard brings Skills Audit to the AI agent ecosystem. Every skill is analyzed by 8,000+ community rules and AI before it runs. Every install, safer.",
+      "subtitleLine2": "Panguard brings Skills Audit to the AI agent ecosystem. Every skill is analyzed by {totalRules}+ community rules and AI before it runs. Every install, safer.",
       "subtitleLine3": "One install. Always on. Gets smarter with every user.",
       "viewATR": "ATR Standard on GitHub",
       "install": "Get Started",
       "copied": "Copied!",
       "badges": {
         "mit": "MIT Licensed",
-        "rules": "32 ATR Rules",
+        "rules": "{atrRules} ATR Rules",
         "tests": "3,500+ Tests",
         "taiwan": "Built in Taiwan"
       }
@@ -5433,7 +5433,7 @@
           "number": "3",
           "title": "New skill? Audit it first.",
           "desc": "Every new skill is audited against community ATR rules (AI agent threats), plus Sigma rules (network threats) and YARA rules (file threats) simultaneously.",
-          "detail": "32 ATR + 3,700 Sigma + 4,300 YARA rules"
+          "detail": "{atrRules} ATR + {sigmaRules} Sigma + {yaraRules} YARA rules"
         },
         "llmAnalysis": {
           "number": "4",
@@ -5459,7 +5459,7 @@
     "productPillars": {
       "atrStandard": {
         "title": "Community Rules",
-        "desc": "32 ATR rules for AI agent threats + 8,000 Sigma/YARA rules for traditional threats. All open source, all community-driven. The review criteria that every skill must pass.",
+        "desc": "{atrRules} ATR rules for AI agent threats + {totalRules} Sigma/YARA rules for traditional threats. All open source, all community-driven. The review criteria that every skill must pass.",
         "link": "View ATR rules"
       },
       "threatCloud": {
@@ -5541,7 +5541,7 @@
       "steps": {
         "install": {
           "title": "Install",
-          "desc": "One command. Panguard loads 32 ATR rules (AI agent threats) + 3,700 Sigma rules (network threats) + 4,300 YARA rules (file threats). All three layers activate simultaneously."
+          "desc": "One command. Panguard loads {atrRules} ATR rules (AI agent threats) + {sigmaRules} Sigma rules (network threats) + {yaraRules} YARA rules (file threats). All three layers activate simultaneously."
         },
         "protect": {
           "title": "Review",
@@ -5587,7 +5587,7 @@
         "skillInstall": {
           "label": "LAYER 1: RULES",
           "title": "A new skill arrives. ATR + Sigma + YARA rules review it instantly.",
-          "narrative": "You install a new skill from OpenClaw or MCP. Before it runs, Panguard checks it against 32 ATR rules (prompt injection, tool poisoning, skill compromise), 3,700 Sigma rules (network-level threats), and 4,300 YARA rules (file-level threats). All three layers run simultaneously. Known threats are blocked. Safe skills proceed.",
+          "narrative": "You install a new skill from OpenClaw or MCP. Before it runs, Panguard checks it against {atrRules} ATR rules (prompt injection, tool poisoning, skill compromise), {sigmaRules} Sigma rules (network-level threats), and {yaraRules} YARA rules (file-level threats). All three layers run simultaneously. Known threats are blocked. Safe skills proceed.",
           "before": "Without Skills Audit, the skill runs immediately with full system access.",
           "after": "With Skills Audit, every skill passes a three-layer review before it touches your system."
         },
@@ -5616,7 +5616,7 @@
         "label": "Known threats",
         "title": "Rule-based review",
         "tools": "ATR + Sigma + YARA",
-        "items": ["32 ATR rules: prompt injection, tool poisoning, skill compromise", "3,700 Sigma rules: network-level threats, brute force, reverse shells", "4,300 YARA rules: malicious files, encoded payloads, malware signatures", "Community-driven, updated continuously"]
+        "items": ["{atrRules} ATR rules: prompt injection, tool poisoning, skill compromise", "{sigmaRules} Sigma rules: network-level threats, brute force, reverse shells", "{yaraRules} YARA rules: malicious files, encoded payloads, malware signatures", "Community-driven, updated continuously"]
       },
       "postDeployment": {
         "label": "Unknown threats",

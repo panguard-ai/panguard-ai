@@ -3,13 +3,21 @@
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
+import { useRuleStatsContext } from '@/contexts/RuleStatsContext';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
+function interpolateStats(text: string, vars: Record<string, string | number>): string {
+  return text.replace(/\{(\w+)\}/g, (_, key: string) => String(vars[key] ?? `{${key}}`));
+}
+
 export default function SecurityStack() {
   const t = useTranslations('revolution.securityStack');
+  const stats = useRuleStatsContext();
 
-  const preItems = t.raw('preDeployment.items') as string[];
+  const preItems = (t.raw('preDeployment.items') as string[]).map(
+    (item) => interpolateStats(item, stats)
+  );
   const postItems = t.raw('postDeployment.items') as string[];
 
   return (

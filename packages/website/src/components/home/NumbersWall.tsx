@@ -14,6 +14,7 @@ import {
   LockIcon,
 } from '@/components/ui/BrandIcons';
 import { STATS } from '@/lib/stats';
+import { useRuleStats } from '@/hooks/useRuleStats';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -28,17 +29,7 @@ const statIcons = [
   ShieldIcon,
   LockIcon,
 ];
-const statValues: (number | string)[] = [
-  STATS.sigmaRules,
-  STATS.yaraRules,
-  STATS.complianceControls,
-  STATS.testsPassing,
-  STATS.detectionLayers,
-  STATS.responseActions,
-  STATS.honeypotProtocols,
-  STATS.atrRules,
-  STATS.license,
-];
+
 const statKeys = [
   'sigmaRules',
   'yaraRules',
@@ -53,6 +44,19 @@ const statKeys = [
 
 export default function NumbersWall() {
   const t = useTranslations('home.numbersWall');
+  const ruleStats = useRuleStats();
+
+  const statValues: (number | string)[] = [
+    ruleStats.sigmaRules,
+    ruleStats.yaraRules,
+    STATS.complianceControls,
+    STATS.testsPassing,
+    STATS.detectionLayers,
+    STATS.responseActions,
+    STATS.honeypotProtocols,
+    ruleStats.atrRules,
+    STATS.license,
+  ];
 
   return (
     <section className="bg-[#0c0d0c] px-5 sm:px-6 py-16 sm:py-24">
@@ -95,7 +99,7 @@ export default function NumbersWall() {
         </div>
 
         <p className="text-center text-xs text-text-muted mt-3">
-          Last verified: {STATS.lastUpdated} | Source: GitHub CI
+          Last verified: {ruleStats.lastSync ?? STATS.lastUpdated} | Source: GitHub CI (auto-refresh every 6h)
         </p>
 
         {/* GitHub CTA */}
