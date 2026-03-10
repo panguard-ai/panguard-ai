@@ -132,53 +132,83 @@ function checkCredentials(): CheckResult {
 }
 
 function checkAiProvider(): CheckResult {
-  // Check environment variables
-  const hasOllama = Boolean(process.env['OLLAMA_HOST']);
-  const hasOpenAi = Boolean(process.env['OPENAI_API_KEY']);
-  const hasAnthropic = Boolean(process.env['ANTHROPIC_API_KEY']);
+  const layers: string[] = [];
 
-  if (hasOllama || hasOpenAi || hasAnthropic) {
-    const providers: string[] = [];
-    if (hasOllama) providers.push('Ollama');
-    if (hasOpenAi) providers.push('OpenAI');
-    if (hasAnthropic) providers.push('Anthropic');
-    return {
-      status: 'pass',
-      label: 'AI provider',
-      detail: `API key set (${providers.join(', ')})`,
-    };
+  // Check Layer 2: Local AI (Ollama)
+  const hasOllamaEnv = Boolean(process.env['OLLAMA_HOST']);
+  let ollamaInstalled = false;
+  try {
+    const { execFileSync } = require('node:child_process') as typeof import('node:child_process');
+    execFileSync('ollama', ['--version'], { encoding: 'utf-8', timeout: 3000 });
+    ollamaInstalled = true;
+  } catch {
+    // Ollama not available
   }
 
-  // Fall back to config file
+  // Check Layer 3: Cloud AI (API keys)
+  const hasOpenAi = Boolean(process.env['OPENAI_API_KEY']);
+  const hasAnthropic = Boolean(process.env['ANTHROPIC_API_KEY'] || process.env['PANGUARD_AI_KEY']);
+
+  if (hasOllamaEnv || ollamaInstalled) {
+    layers.push('Layer 2: Ollama' + (hasOllamaEnv ? ' (env)' : ' (installed)'));
+  }
+  if (hasOpenAi) layers.push('Layer 3: OpenAI');
+  if (hasAnthropic) layers.push('Layer 3: Anthropic');
+
+  // Check config file for AI settings
+  let configProvider: string | undefined;
+  let configModel: string | undefined;
   if (existsSync(CONFIG_PATH)) {
     try {
       const raw = readFileSync(CONFIG_PATH, 'utf-8');
-      const cfg = JSON.parse(raw) as { ai?: { preference?: string; provider?: string } };
+      const cfg = JSON.parse(raw) as { ai?: { preference?: string; provider?: string; model?: string } };
       if (cfg.ai?.preference === 'rules_only') {
         return {
           status: 'pass',
           label: 'AI provider',
-          detail: 'Rules-only mode (no AI provider required)',
+          detail: 'Rules-only mode (Layer 1 only, no AI provider required)',
         };
       }
       if (cfg.ai?.provider) {
-        return {
-          status: 'pass',
-          label: 'AI provider',
-          detail: `Provider configured: ${cfg.ai.provider}`,
-        };
+        configProvider = cfg.ai.provider;
+        configModel = cfg.ai.model;
+        const layerNum = cfg.ai.provider === 'ollama' ? '2' : '3';
+        layers.push(`Layer ${layerNum}: ${cfg.ai.provider} (config)` + (cfg.ai.model ? ` / ${cfg.ai.model}` : ''));
       }
     } catch {
-      // fall through to warn
+      // fall through
     }
+  }
+
+  // Also check guard-specific config
+  const guardConfigPath = join(HOME, '.panguard-guard', 'config.json');
+  if (existsSync(guardConfigPath) && !configProvider) {
+    try {
+      const raw = readFileSync(guardConfigPath, 'utf-8');
+      const cfg = JSON.parse(raw) as { ai?: { provider?: string; model?: string } };
+      if (cfg.ai?.provider) {
+        const layerNum = cfg.ai.provider === 'ollama' ? '2' : '3';
+        layers.push(`Layer ${layerNum}: ${cfg.ai.provider} (guard config)` + (cfg.ai.model ? ` / ${cfg.ai.model}` : ''));
+      }
+    } catch {
+      // fall through
+    }
+  }
+
+  if (layers.length > 0) {
+    return {
+      status: 'pass',
+      label: 'AI provider',
+      detail: layers.join(', '),
+    };
   }
 
   return {
     status: 'warn',
     label: 'AI provider',
-    detail: 'No AI provider configured',
+    detail: 'No AI provider configured (Layer 1 rules-only mode)',
     fix:
-      'Set OPENAI_API_KEY / ANTHROPIC_API_KEY env var, or run "panguard config llm --provider ollama"',
+      'Run "panguard guard setup-ai" for interactive setup, or set ANTHROPIC_API_KEY / install Ollama',
   };
 }
 
@@ -432,12 +462,106 @@ function checkShellCompletions(): CheckResult {
 // Run all checks
 // ---------------------------------------------------------------------------
 
+function checkAiLayerLocal(): CheckResult {
+  // Check if Ollama is installed
+  let ollamaInstalled = false;
+  let ollamaVersion = '';
+  try {
+    const { execFileSync } = require('node:child_process') as typeof import('node:child_process');
+    ollamaVersion = execFileSync('ollama', ['--version'], { encoding: 'utf-8', timeout: 3000 }).trim();
+    ollamaInstalled = true;
+  } catch {
+    // not installed
+  }
+
+  if (!ollamaInstalled) {
+    return {
+      status: 'warn',
+      label: 'AI Layer 2 (Local)',
+      detail: 'Ollama not installed',
+      fix: 'Install: curl -fsSL https://ollama.com/install.sh | sh && ollama pull llama3.2',
+    };
+  }
+
+  // Check if any models are pulled
+  try {
+    const { execFileSync } = require('node:child_process') as typeof import('node:child_process');
+    const models = execFileSync('ollama', ['list'], { encoding: 'utf-8', timeout: 5000 }).trim();
+    const modelLines = models.split('\n').slice(1).filter(Boolean);
+    if (modelLines.length === 0) {
+      return {
+        status: 'warn',
+        label: 'AI Layer 2 (Local)',
+        detail: `Ollama installed (${ollamaVersion}) but no models pulled`,
+        fix: 'Pull a model: ollama pull llama3.2',
+      };
+    }
+    const firstModel = modelLines[0]?.split(/\s+/)[0] ?? 'unknown';
+    return {
+      status: 'pass',
+      label: 'AI Layer 2 (Local)',
+      detail: `Ollama ready (${modelLines.length} model${modelLines.length > 1 ? 's' : ''}, e.g. ${firstModel})`,
+    };
+  } catch {
+    return {
+      status: 'warn',
+      label: 'AI Layer 2 (Local)',
+      detail: 'Ollama installed but cannot list models (is it running?)',
+      fix: 'Start Ollama: ollama serve',
+    };
+  }
+}
+
+function checkAiLayerCloud(): CheckResult {
+  const hasAnthropic = Boolean(process.env['ANTHROPIC_API_KEY'] || process.env['PANGUARD_AI_KEY']);
+  const hasOpenAi = Boolean(process.env['OPENAI_API_KEY']);
+
+  // Check config files
+  let configCloud = false;
+  let configProvider = '';
+  for (const cfgPath of [CONFIG_PATH, join(HOME, '.panguard-guard', 'config.json')]) {
+    if (existsSync(cfgPath)) {
+      try {
+        const raw = readFileSync(cfgPath, 'utf-8');
+        const cfg = JSON.parse(raw) as { ai?: { provider?: string; apiKey?: string; model?: string } };
+        if (cfg.ai?.provider && cfg.ai.provider !== 'ollama' && cfg.ai?.apiKey) {
+          configCloud = true;
+          configProvider = `${cfg.ai.provider}${cfg.ai.model ? ' / ' + cfg.ai.model : ''}`;
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  if (hasAnthropic || hasOpenAi || configCloud) {
+    const sources: string[] = [];
+    if (hasAnthropic) sources.push('Anthropic (env)');
+    if (hasOpenAi) sources.push('OpenAI (env)');
+    if (configCloud) sources.push(configProvider + ' (config)');
+    return {
+      status: 'pass',
+      label: 'AI Layer 3 (Cloud)',
+      detail: sources.join(', '),
+    };
+  }
+
+  return {
+    status: 'warn',
+    label: 'AI Layer 3 (Cloud)',
+    detail: 'No cloud AI API key configured',
+    fix: 'Run "panguard guard setup-ai" or set ANTHROPIC_API_KEY / OPENAI_API_KEY',
+  };
+}
+
 function runAllChecks(): CheckResult[] {
   return [
     checkInstallation(),
     checkConfiguration(),
     checkCredentials(),
     checkAiProvider(),
+    checkAiLayerLocal(),
+    checkAiLayerCloud(),
     checkGuardEngine(),
     checkNotificationChannels(),
     checkLastScan(),

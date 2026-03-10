@@ -12,7 +12,6 @@ import { c, FEATURE_TIER as _CORE_FEATURE_TIER, isTierAtLeast, TIER_LEVEL } from
 import type { Tier } from '@panguard-ai/core';
 import {
   loadCredentials,
-  saveCredentials,
   isTokenExpired,
 } from './credentials.js';
 import type { StoredCredentials } from './credentials.js';
@@ -94,42 +93,10 @@ export function tierBadge(tier: RequiredTier): string {
 
 /**
  * Refresh tier from server in background.
- * Called on CLI startup to ensure local cache is current.
+ * No-op: all features are free and open source. No auth needed.
  */
 export function refreshTierInBackground(): void {
-  const creds = loadCredentials();
-  if (!creds || isTokenExpired(creds) || !creds.apiUrl) return;
-
-  // Fire-and-forget: don't block CLI startup
-  fetch(`${creds.apiUrl}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${creds.token}` },
-    signal: AbortSignal.timeout(5000),
-  })
-    .then((res) =>
-      res.ok
-        ? (res.json() as Promise<{
-            ok: boolean;
-            data?: { user?: { tier?: string; name?: string; email?: string } };
-          }>)
-        : null
-    )
-    .then((body) => {
-      if (!body?.data?.user?.tier) return;
-      const serverTier = body.data.user.tier as Tier;
-
-      // All features are free — no expiry warnings needed
-
-      if (serverTier !== creds.tier || body.data.user.name !== creds.name) {
-        saveCredentials({
-          ...creds,
-          tier: serverTier,
-          name: body.data.user.name ?? creds.name,
-        });
-      }
-    })
-    .catch(() => {
-      /* offline or timeout — keep local cache */
-    });
+  // No-op: all features are free and open source
 }
 
 /**
