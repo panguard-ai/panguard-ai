@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Clock, RefreshCw, X, Check } from 'lucide-react';
+import { useRuleStatsContext } from '@/contexts/RuleStatsContext';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -32,6 +33,7 @@ const cardVariants = {
 
 export default function RealScenarios() {
   const t = useTranslations('revolution.scenarios');
+  const stats = useRuleStatsContext();
 
   return (
     <section className="bg-[#0e0f0e] px-5 sm:px-6 py-16 sm:py-24">
@@ -81,7 +83,7 @@ export default function RealScenarios() {
               </h3>
 
               <p className="text-base text-text-secondary leading-relaxed mt-3">
-                {t(`items.${key}.narrative`)}
+                {t(`items.${key}.narrative`, stats)}
               </p>
 
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">

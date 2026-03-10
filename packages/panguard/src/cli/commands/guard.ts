@@ -13,9 +13,14 @@ import { runCLI } from '@panguard-ai/panguard-guard';
 import { c, box, header } from '@panguard-ai/core';
 
 export function guardCommand(): Command {
-  const cmd = new Command('guard').description(
-    'Guard engine management / \u5B88\u8B77\u5F15\u64CE\u7BA1\u7406'
-  );
+  const cmd = new Command('guard')
+    .description('Guard engine management / \u5B88\u8B77\u5F15\u64CE\u7BA1\u7406')
+    .option('--watch', 'Start guard engine in foreground (alias for guard start) / 前景啟動守護引擎', false)
+    .action(async (opts: { watch?: boolean }) => {
+      if (opts.watch) {
+        await runCLI(['start']);
+      }
+    });
 
   cmd
     .command('start')

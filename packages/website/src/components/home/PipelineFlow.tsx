@@ -12,6 +12,7 @@ import {
   Cloud,
   ArrowDown,
 } from 'lucide-react';
+import { useRuleStatsContext } from '@/contexts/RuleStatsContext';
 
 const stepKeys = ['install', 'scan', 'knownCheck', 'llmAnalysis', 'generateRule', 'uploadCloud'] as const;
 
@@ -46,6 +47,7 @@ const numberColors = [
 
 export default function PipelineFlow() {
   const t = useTranslations('revolution.pipeline');
+  const stats = useRuleStatsContext();
 
   return (
     <SectionWrapper>
@@ -83,7 +85,7 @@ export default function PipelineFlow() {
                       {t(`steps.${key}.desc`)}
                     </p>
                     <p className="text-xs text-text-muted mt-2 font-mono">
-                      {t(`steps.${key}.detail`)}
+                      {t(`steps.${key}.detail`, stats)}
                     </p>
                   </div>
                 </div>

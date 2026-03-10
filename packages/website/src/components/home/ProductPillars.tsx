@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { FileText, Globe, Shield, ArrowRight } from 'lucide-react';
 import { Link } from '@/navigation';
+import { useRuleStatsContext } from '@/contexts/RuleStatsContext';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -15,6 +16,7 @@ const PILLARS = [
 
 export default function ProductPillars() {
   const t = useTranslations('revolution.productPillars');
+  const stats = useRuleStatsContext();
 
   return (
     <section className="bg-[#0a0a0a] px-5 sm:px-6 py-12 sm:py-16">
@@ -39,7 +41,7 @@ export default function ProductPillars() {
                   {t(`${key}.title`)}
                 </h3>
                 <p className="text-sm text-text-secondary leading-relaxed mb-4">
-                  {t(`${key}.desc`)}
+                  {t(`${key}.desc`, stats)}
                 </p>
                 <span className="inline-flex items-center gap-1.5 text-sm text-panguard-green font-medium group-hover:gap-2.5 transition-all duration-200">
                   {t(`${key}.link`)}

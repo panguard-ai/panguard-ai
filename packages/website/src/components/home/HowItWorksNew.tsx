@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Terminal, Shield, Users } from 'lucide-react';
+import { useRuleStatsContext } from '@/contexts/RuleStatsContext';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -14,6 +15,7 @@ const STEPS = [
 
 export default function HowItWorksNew() {
   const t = useTranslations('revolution.howItWorks');
+  const stats = useRuleStatsContext();
 
   return (
     <section className="bg-[#0e0f0e] px-5 sm:px-6 py-16 sm:py-24">
@@ -45,7 +47,7 @@ export default function HowItWorksNew() {
                 {t(`steps.${key}.title`)}
               </h3>
               <p className="text-base text-text-secondary leading-relaxed">
-                {t(`steps.${key}.desc`)}
+                {t(`steps.${key}.desc`, stats)}
               </p>
             </motion.div>
           ))}

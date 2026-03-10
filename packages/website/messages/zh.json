@@ -5455,14 +5455,14 @@
           { "label": "洩漏憑證", "detail": "SSH 金鑰、Token、雲端密鑰 -- 全部可存取" }
         ]
       },
-      "subtitleLine2": "Panguard 為 AI Agent 生態系帶來 Skills Audit。每個 Skill 在執行前，都經過 8,000+ 社群規則與 AI 分析。每次安裝，更安心。",
+      "subtitleLine2": "Panguard 為 AI Agent 生態系帶來 Skills Audit。每個 Skill 在執行前，都經過 {totalRules}+ 社群規則與 AI 分析。每次安裝，更安心。",
       "subtitleLine3": "一行安裝。全天候守護。使用者越多越聰明。",
       "viewATR": "GitHub 上的 ATR 標準",
       "install": "開始使用",
       "copied": "已複製!",
       "badges": {
         "mit": "MIT 開源",
-        "rules": "32 條 ATR 規則",
+        "rules": "{atrRules} 條 ATR 規則",
         "tests": "3,500+ 測試",
         "taiwan": "台灣製造"
       }
@@ -5487,7 +5487,7 @@
           "number": "3",
           "title": "新 Skill？先過審計。",
           "desc": "每個新 Skill 同時接受社群 ATR 規則（AI Agent 威脅）、Sigma 規則（網路威脅）和 YARA 規則（檔案威脅）三重審計。",
-          "detail": "32 ATR + 3,700 Sigma + 4,300 YARA 規則"
+          "detail": "{atrRules} ATR + {sigmaRules} Sigma + {yaraRules} YARA 規則"
         },
         "llmAnalysis": {
           "number": "4",
@@ -5513,7 +5513,7 @@
     "productPillars": {
       "atrStandard": {
         "title": "社群規則",
-        "desc": "32 條 ATR 規則對付 AI Agent 威脅 + 8,000 條 Sigma/YARA 規則對付傳統威脅。全部開源、社群驅動。每個 Skill 必須通過的審核標準。",
+        "desc": "{atrRules} 條 ATR 規則對付 AI Agent 威脅 + {totalRules} 條 Sigma/YARA 規則對付傳統威脅。全部開源、社群驅動。每個 Skill 必須通過的審核標準。",
         "link": "查看 ATR 規則"
       },
       "threatCloud": {
@@ -5595,7 +5595,7 @@
       "steps": {
         "install": {
           "title": "安裝",
-          "desc": "一行指令。Panguard 載入 32 條 ATR 規則（AI Agent 威脅）+ 3,700 條 Sigma 規則（網路威脅）+ 4,300 條 YARA 規則（檔案威脅）。三層防護同時啟動。"
+          "desc": "一行指令。Panguard 載入 {atrRules} 條 ATR 規則（AI Agent 威脅）+ {sigmaRules} 條 Sigma 規則（網路威脅）+ {yaraRules} 條 YARA 規則（檔案威脅）。三層防護同時啟動。"
         },
         "protect": {
           "title": "審核",
@@ -5641,7 +5641,7 @@
         "skillInstall": {
           "label": "第一層：規則",
           "title": "新 Skill 來了。ATR + Sigma + YARA 規則即時審核。",
-          "narrative": "你從 OpenClaw 或 MCP 安裝新 Skill。在它執行前，Panguard 同時用 32 條 ATR 規則（Prompt Injection、Tool Poisoning、Skill 入侵）、3,700 條 Sigma 規則（網路層威脅）和 4,300 條 YARA 規則（檔案層威脅）進行三重審核。已知威脅被阻擋，安全的 Skill 正常運作。",
+          "narrative": "你從 OpenClaw 或 MCP 安裝新 Skill。在它執行前，Panguard 同時用 {atrRules} 條 ATR 規則（Prompt Injection、Tool Poisoning、Skill 入侵）、{sigmaRules} 條 Sigma 規則（網路層威脅）和 {yaraRules} 條 YARA 規則（檔案層威脅）進行三重審核。已知威脅被阻擋，安全的 Skill 正常運作。",
           "before": "沒有 Skills Audit，Skill 安裝後立刻擁有完整系統權限。",
           "after": "有了 Skills Audit，每個 Skill 在碰到系統前都通過三層審計。"
         },
@@ -5670,7 +5670,7 @@
         "label": "已知威脅",
         "title": "規則審核",
         "tools": "ATR + Sigma + YARA",
-        "items": ["32 條 ATR 規則：Prompt Injection、Tool Poisoning、Skill 入侵", "3,700 條 Sigma 規則：網路威脅、暴力破解、反向 Shell", "4,300 條 YARA 規則：惡意檔案、編碼 payload、惡意程式特徵", "社群驅動，持續更新"]
+        "items": ["{atrRules} 條 ATR 規則：Prompt Injection、Tool Poisoning、Skill 入侵", "{sigmaRules} 條 Sigma 規則：網路威脅、暴力破解、反向 Shell", "{yaraRules} 條 YARA 規則：惡意檔案、編碼 payload、惡意程式特徵", "社群驅動，持續更新"]
       },
       "postDeployment": {
         "label": "未知威脅",
