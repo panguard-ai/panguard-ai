@@ -1,38 +1,43 @@
 /**
- * panguard report - Compliance report generation
- * panguard report - 合規報告產生
+ * panguard report - Compliance report generation (Coming Soon)
+ * panguard report - 合規報告產生（即將推出）
  */
 
 import { Command } from 'commander';
-import { executeCli } from '@panguard-ai/panguard-report';
-import { withAuth } from '../auth-guard.js';
+
+const COMING_SOON_MSG = `
+  Compliance Report — Coming Soon
+
+  ISO 27001, SOC 2, and TW Cyber Security Act compliance
+  reports are under active development.
+
+  Follow progress: https://github.com/panguard-ai/panguard-ai
+
+  ---
+  合規報告 — 即將推出
+
+  ISO 27001、SOC 2、資安管理法合規報告功能開發中。
+
+  追蹤進度: https://github.com/panguard-ai/panguard-ai
+`;
 
 export function reportCommand(): Command {
   const cmd = new Command('report').description(
-    'Compliance report generation / \u5408\u898F\u5831\u544A\u7522\u751F'
+    '[Coming Soon] Compliance report generation / [即將推出] 合規報告產生'
   );
 
   cmd
     .command('generate')
-    .description('Generate a compliance report / \u7522\u751F\u5408\u898F\u5831\u544A')
+    .description('Generate a compliance report / 產生合規報告')
     .option('--framework <name>', 'Compliance framework (iso27001, soc2, tw_cyber_security_act)')
     .option('--language <lang>', 'Report language (en, zh-TW)')
     .option('--format <fmt>', 'Output format (json, pdf)')
-    .option('--output-dir <path>', 'Output directory / \u8F38\u51FA\u76EE\u9304')
-    .option('--org <name>', 'Organization name / \u7D44\u7E54\u540D\u7A31')
+    .option('--output-dir <path>', 'Output directory / 輸出目錄')
+    .option('--org <name>', 'Organization name / 組織名稱')
     .option('--input <file>', 'Findings input file (JSON)')
-    .action(
-      withAuth('pro', async (opts: Record<string, string | undefined>) => {
-        const args = ['generate'];
-        if (opts['framework']) args.push('--framework', opts['framework']);
-        if (opts['language']) args.push('--language', opts['language']);
-        if (opts['format']) args.push('--format', opts['format']);
-        if (opts['outputDir']) args.push('--output-dir', opts['outputDir']);
-        if (opts['org']) args.push('--org', opts['org']);
-        if (opts['input']) args.push('--input', opts['input']);
-        await executeCli(args);
-      })
-    );
+    .action(async () => {
+      console.log(COMING_SOON_MSG);
+    });
 
   cmd
     .command('summary')
@@ -40,31 +45,23 @@ export function reportCommand(): Command {
     .option('--framework <name>', 'Compliance framework')
     .option('--language <lang>', 'Report language')
     .option('--input <file>', 'Findings input file (JSON)')
-    .action(
-      withAuth('pro', async (opts: Record<string, string | undefined>) => {
-        const args = ['summary'];
-        if (opts['framework']) args.push('--framework', opts['framework']);
-        if (opts['language']) args.push('--language', opts['language']);
-        if (opts['input']) args.push('--input', opts['input']);
-        await executeCli(args);
-      })
-    );
+    .action(async () => {
+      console.log(COMING_SOON_MSG);
+    });
 
   cmd
     .command('list-frameworks')
     .description('List supported compliance frameworks / 列出支援的合規框架')
     .action(async () => {
-      await executeCli(['list-frameworks']);
+      console.log(COMING_SOON_MSG);
     });
 
   cmd
     .command('validate')
     .description('Validate findings input file / 驗證發現輸入檔案')
     .option('--input <file>', 'Input file path')
-    .action(async (opts: Record<string, string | undefined>) => {
-      const args = ['validate'];
-      if (opts['input']) args.push('--input', opts['input']);
-      await executeCli(args);
+    .action(async () => {
+      console.log(COMING_SOON_MSG);
     });
 
   return cmd;
