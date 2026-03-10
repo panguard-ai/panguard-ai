@@ -258,7 +258,7 @@ export default function DashboardContent() {
             icon={<Terminal className="w-5 h-5" />}
             title={t('quickActions.installCLI.title')}
             description={t('quickActions.installCLI.description')}
-            href="/docs/getting-started"
+            href="/docs/installation"
             index={0}
           />
           <QuickAction
@@ -626,7 +626,7 @@ function QuickAction({
       custom={index}
     >
       <Link
-        href={href as '/docs/getting-started'}
+        href={href as '/docs/installation'}
         className="block bg-surface-1 border border-border rounded-xl p-4 hover:border-border-hover transition-colors group h-full"
       >
         <div className="text-brand-sage mb-2 group-hover:text-brand-sage-light transition-colors">

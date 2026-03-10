@@ -396,7 +396,7 @@ panguard report generate --framework soc2 --json --fail-on-score 70`}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/docs/getting-started"
+                href="/docs/installation"
                 className="bg-brand-sage text-surface-0 rounded-full px-8 py-3.5 font-semibold hover:bg-brand-sage-light transition-colors"
               >
                 Getting Started Guide

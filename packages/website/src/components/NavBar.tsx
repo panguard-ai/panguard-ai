@@ -249,7 +249,7 @@ export default function NavBar() {
                 {t('login')}
               </Link>
               <Link
-                href="/docs/getting-started"
+                href="/docs/installation"
                 className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-2.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
               >
                 {t('install')}
@@ -361,7 +361,7 @@ export default function NavBar() {
                     {t('login')}
                   </Link>
                   <Link
-                    href="/docs/getting-started"
+                    href="/docs/installation"
                     className="block text-center bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-3"
                     onClick={() => setMobileOpen(false)}
                   >
