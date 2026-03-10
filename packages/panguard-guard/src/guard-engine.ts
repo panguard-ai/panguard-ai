@@ -27,6 +27,7 @@ import {
   setFeedManager,
   SmartRouter,
   KnowledgeDistiller,
+  parseSigmaYaml,
 } from '@panguard-ai/core';
 import type { QuotaTier } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
@@ -71,6 +72,7 @@ import { BUILTIN_RULES } from './rules/builtin-rules.js';
 import { PanguardAgentClient } from './agent-client/index.js';
 import type { AgentHeartbeat } from './agent-client/index.js';
 import { GuardATREngine } from './engines/atr-engine.js';
+import { ATRDrafter } from './engines/atr-drafter.js';
 
 const logger = createLogger('panguard-guard:engine');
 
@@ -238,6 +240,9 @@ export class GuardEngine {
   // ATR (Agent Threat Rules) engine / ATR 引擎
   private readonly atrEngine: GuardATREngine;
 
+  // ATR Drafter - local LLM-powered rule proposal / ATR 草稿器 - 本地 LLM 規則提案
+  private atrDrafter: ATRDrafter | null = null;
+
   // Smart AI routing / 智慧 AI 路由
   private readonly smartRouter: SmartRouter | null = null;
   private readonly knowledgeDistiller: KnowledgeDistiller | null = null;
@@ -312,6 +317,11 @@ export class GuardEngine {
     this.atrEngine = new GuardATREngine({
       rulesDir: join(config.dataDir, 'atr-rules'),
       hotReload: true,
+      whitelist: {
+        persistPath: join(config.dataDir, 'skill-whitelist.json'),
+        staticSkills: config.trustedSkills ?? [],
+        autoPromoteStable: true,
+      },
     });
 
     // Initialize agents / 初始化代理
@@ -361,6 +371,16 @@ export class GuardEngine {
       abuseIPDBKey: process.env['ABUSEIPDB_KEY'],
     });
     setFeedManager(this.feedManager);
+
+    // Initialize ATR Drafter if LLM is available (distributed consensus)
+    // 初始化 ATR 草稿器（如有 LLM 則啟用分散式共識）
+    if (analyzeLLM) {
+      this.atrDrafter = new ATRDrafter(analyzeLLM, this.threatCloud, {
+        llmProvider: process.env['ANTHROPIC_API_KEY'] ? 'claude' :
+          process.env['OPENAI_API_KEY'] ? 'openai' : 'ollama',
+        llmModel: process.env['PANGUARD_LLM_MODEL'] ?? 'unknown',
+      });
+    }
 
     // PID file / PID 檔案
     this.pidFile = new PidFile(config.dataDir);
@@ -640,6 +660,11 @@ export class GuardEngine {
       this.checkLearningTransition();
     }, 60000);
 
+    // Start ATR Drafter for distributed rule proposals / 啟動 ATR 草稿器
+    if (this.atrDrafter) {
+      this.atrDrafter.start();
+    }
+
     this.running = true;
     this.startTime = Date.now();
 
@@ -669,6 +694,9 @@ export class GuardEngine {
     }
 
     // Stop components / 停止元件
+    if (this.atrDrafter) {
+      this.atrDrafter.stop();
+    }
     this.atrEngine.stop();
     this.feedManager.stop();
     setFeedManager(null);
@@ -809,6 +837,19 @@ export class GuardEngine {
 
       this.threatsDetected++;
 
+      // Skill Whitelist: whitelisted skills skip LLM deep analysis (only ATR rules applied)
+      // Skill 白名單：白名單 skill 跳過 LLM 深度分析（只跑 ATR 規則）
+      const toolName = event.metadata?.['tool_name'] as string | undefined;
+      const isWhitelisted = toolName ? this.atrEngine.isSkillWhitelisted(toolName) : false;
+      if (isWhitelisted && !detection.atrMatches?.length) {
+        // Whitelisted skill with no ATR matches — skip heavy analysis
+        logger.info(
+          `Whitelist skip: ${toolName} is trusted, no ATR match / ` +
+            `白名單跳過: ${toolName} 為信任 skill，無 ATR 匹配`
+        );
+        return;
+      }
+
       // SmartRouter: assess complexity and skip AI for high-confidence rule matches
       // SmartRouter: 評估複雜度，對高信心規則匹配跳過 AI
       if (this.smartRouter) {
@@ -838,6 +879,68 @@ export class GuardEngine {
       // Stage 2: Analyze (with Dynamic Reasoning investigation)
       // 階段 2: 分析（使用動態推理調查）
       const verdict: ThreatVerdict = await this.analyzeAgent.analyze(detection, this.baseline);
+
+      // Knowledge Distillation: convert LLM verdict into a reusable Sigma rule
+      // 知識蒸餾：將 LLM 判決轉換為可重複使用的 Sigma 規則
+      // "Learn once, detect forever" - 第一次靠重分析，後面靠 rule 快速擋
+      if (this.knowledgeDistiller && verdict.conclusion !== 'benign' && verdict.confidence >= 70) {
+        const indicators: Record<string, string> = {};
+        const ip = (event.metadata?.['sourceIP'] as string) ??
+          (event.metadata?.['remoteAddress'] as string);
+        if (ip) indicators['sourceIP'] = ip;
+        const proc = event.metadata?.['processName'] as string;
+        if (proc) indicators['processName'] = proc;
+        const port = event.metadata?.['destinationPort'] as string;
+        if (port) indicators['destinationPort'] = port;
+        const path = event.metadata?.['filePath'] as string;
+        if (path) indicators['filePath'] = path;
+        const cmd = event.metadata?.['commandLine'] as string;
+        if (cmd) indicators['commandLine'] = cmd.slice(0, 200);
+
+        const distilled = this.knowledgeDistiller.distill({
+          eventCategory: event.category,
+          eventSource: event.source,
+          eventSeverity: verdict.confidence >= 90 ? 'critical' :
+            verdict.confidence >= 75 ? 'high' : 'medium',
+          mitreTechnique: verdict.mitreTechnique,
+          indicators,
+          aiResult: {
+            summary: verdict.reasoning,
+            severity: verdict.confidence >= 90 ? 'critical' :
+              verdict.confidence >= 75 ? 'high' : 'medium',
+            confidence: verdict.confidence / 100,
+            recommendations: verdict.evidence.map((e) => e.description).slice(0, 3),
+          },
+        });
+
+        // Inject distilled rule into live rule engine (immediate effect)
+        // 將蒸餾規則注入即時規則引擎（立即生效）
+        if (distilled) {
+          try {
+            const parsed = parseSigmaYaml(distilled.sigmaYaml);
+            if (parsed) {
+              this.ruleEngine.addRule(parsed);
+              logger.info(
+                `Rule distilled from AI: ${distilled.ruleId} / ` +
+                  `AI 蒸餾規則: ${distilled.ruleId}`
+              );
+            }
+          } catch {
+            // Parse failed, rule logged but not injected
+          }
+        }
+      }
+
+      // Record detection for ATR Drafter (distributed rule proposal)
+      // 記錄偵測結果供 ATR 草稿器使用（分散式規則提案）
+      if (this.atrDrafter && verdict.conclusion !== 'benign') {
+        this.atrDrafter.recordDetection(event, {
+          conclusion: verdict.conclusion,
+          confidence: verdict.confidence,
+          mitreTechniques: verdict.mitreTechnique ? [verdict.mitreTechnique] : undefined,
+          atrRulesMatched: detection.atrMatches?.map((m) => m.ruleId),
+        });
+      }
 
       // Run investigation for suspicious/malicious verdicts
       // 對可疑/惡意判決執行調查
@@ -1144,6 +1247,11 @@ export class GuardEngine {
       licenseTier: license.tier,
       atrRuleCount: this.atrEngine.getRuleCount(),
       atrMatchCount: this.atrEngine.getMatchCount(),
+      atrDrafterPatterns: this.atrDrafter?.getPatternCount() ?? 0,
+      atrDrafterSubmitted: this.atrDrafter?.getSubmittedCount() ?? 0,
+      whitelistedSkills: this.atrEngine.getWhitelistManager().getStats().active,
+      trackedSkills: this.atrEngine.getTrackedSkillCount(),
+      stableFingerprints: this.atrEngine.getStableFingerprintCount(),
     };
   }
 
