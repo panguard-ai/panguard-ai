@@ -5385,11 +5385,11 @@
   },
   "revolution": {
     "hero": {
-      "eyebrow": "THE OPEN STANDARD FOR AI AGENT SECURITY",
-      "title": "AI agents have root access. There's no standard for watching them. Until now.",
-      "subtitleLine1": "Claude Code, Cursor, OpenClaw, WorkBuddy -- every AI agent runs with full system permissions. One malicious skill can steal everything.",
-      "subtitleLine2": "ATR is the first open standard that defines what an agent under attack looks like. Panguard enforces it.",
-      "subtitleLine3": "Open source. Community-driven. One command to deploy.",
+      "eyebrow": "THE APP STORE GATEKEEPER FOR AI AGENTS",
+      "title": "Every AI agent needs a gatekeeper.",
+      "subtitleLine1": "Your AI agent installs skills with full system access. No review process. No security audit. Nothing between a malicious skill and your data.",
+      "subtitleLine2": "Panguard is the missing gatekeeper. It reviews every skill before it runs -- just like App Store review, but for AI agents.",
+      "subtitleLine3": "One install. Always on. Gets smarter with every user.",
       "viewATR": "ATR Standard on GitHub",
       "install": "Get Started",
       "copied": "Copied!",
@@ -5400,20 +5400,63 @@
         "taiwan": "Built in Taiwan"
       }
     },
+    "pipeline": {
+      "title": "How Panguard protects you",
+      "subtitle": "Every skill goes through a multi-layer review pipeline before it touches your system.",
+      "steps": {
+        "install": {
+          "number": "1",
+          "title": "Install Panguard",
+          "desc": "One command. Works with Claude Code, Cursor, OpenClaw, or any AI agent.",
+          "detail": "npx panguard guard --watch"
+        },
+        "scan": {
+          "number": "2",
+          "title": "Scan all existing skills",
+          "desc": "Panguard immediately scans every skill already installed on your system.",
+          "detail": "Checks for known threats in your current setup"
+        },
+        "knownCheck": {
+          "number": "3",
+          "title": "New skill? Check the rules first.",
+          "desc": "Every new skill is reviewed against community ATR rules (AI agent threats), plus Sigma rules (network threats) and YARA rules (file threats) simultaneously.",
+          "detail": "32 ATR + 3,700 Sigma + 4,300 YARA rules"
+        },
+        "llmAnalysis": {
+          "number": "4",
+          "title": "Unknown threat? AI analyzes it.",
+          "desc": "If no rule matches but the behavior is suspicious, an LLM analyzes the skill in real-time. Block first, ask questions later.",
+          "detail": "Real-time AI behavioral analysis"
+        },
+        "generateRule": {
+          "number": "5",
+          "title": "New rule auto-generated",
+          "desc": "The blocked threat is turned into a new ATR rule automatically. What attacked you becomes a shield for everyone.",
+          "detail": "Threat → Rule → Protection"
+        },
+        "uploadCloud": {
+          "number": "6",
+          "title": "Anonymously shared to the cloud",
+          "desc": "The new rule is uploaded to Threat Cloud. Every Panguard user gets it. One person's encounter protects thousands.",
+          "detail": "Collective immunity"
+        }
+      },
+      "bottomLine": "Known threats blocked by rules. Unknown threats blocked by AI. New rules protect everyone."
+    },
     "productPillars": {
       "atrStandard": {
-        "title": "ATR -- The Standard",
-        "desc": "The first open detection format for AI agent threats. 32 rules across 9 categories. Sigma defined network attacks. ATR defines agent attacks.",
-        "link": "View the standard"
+        "title": "Community Rules",
+        "desc": "32 ATR rules for AI agent threats + 8,000 Sigma/YARA rules for traditional threats. All open source, all community-driven. The review criteria that every skill must pass.",
+        "link": "View ATR rules"
       },
       "threatCloud": {
-        "title": "Threat Cloud -- The Network",
-        "desc": "Every deployment contributes anonymized threat data. New rules are auto-generated and pushed to all users. One install strengthens the entire ecosystem.",
+        "title": "Collective Defense",
+        "desc": "Every blocked threat becomes a new rule. Every rule is shared anonymously. Every user strengthens the network. Like a vaccine -- one encounter immunizes everyone.",
         "link": "How it works"
       },
       "guard": {
-        "title": "Guard -- The Engine",
-        "desc": "Audits every skill before install. Blocks known threats with 3,700+ Sigma and 4,300+ YARA rules. Auto-responds: block, kill, quarantine.",
+        "title": "AI Fallback",
+        "desc": "When rules can't catch it, AI does. LLM analyzes suspicious behavior in real-time, blocks the threat, and auto-generates a new rule so it never gets through again.",
         "link": "How it works"
       }
     },
@@ -5481,116 +5524,116 @@
       "statsLine": "OWASP Agentic Top 10: 10 of 10 categories covered. 15 CVE mappings. MIT licensed."
     },
     "howItWorks": {
-      "title": "Install. Protect. Contribute.",
+      "title": "Think of it like the App Store.",
       "steps": {
         "install": {
           "title": "Install",
-          "desc": "Works alongside any AI agent -- Claude Code, Cursor, OpenClaw, WorkBuddy, or your own setup. One command. 32 ATR rules + 8,000+ Sigma/YARA rules loaded. Zero configuration."
+          "desc": "One command. Panguard loads 32 ATR rules (AI agent threats) + 3,700 Sigma rules (network threats) + 4,300 YARA rules (file threats). All three layers activate simultaneously."
         },
         "protect": {
-          "title": "Protect",
-          "desc": "Every skill audited before install. Known attack patterns blocked by Sigma and YARA rules. Suspicious activity flagged and auto-responded -- block IP, kill process, quarantine file."
+          "title": "Review",
+          "desc": "Every new skill goes through the same review pipeline: ATR rules check for agent attacks, Sigma and YARA rules check for traditional threats. Known threats are blocked instantly."
         },
         "contribute": {
-          "title": "Contribute",
-          "desc": "Every deployment anonymously contributes threat data to Threat Cloud. New Sigma, YARA, and ATR rules are auto-generated from collective patterns. The more who install, the stronger everyone becomes."
+          "title": "Evolve",
+          "desc": "Unknown threats get analyzed by AI in real-time and blocked. The new pattern becomes a rule, shared anonymously to Threat Cloud. Every user gets the update. The more people install, the safer everyone becomes."
         }
       }
     },
     "costDisruption": {
-      "title": "Most teams skip agent security entirely. We made it impossible to skip.",
-      "subtitle": "Every team uses AI agents now. Few have thought about securing them. There's no standard for what an agent attack looks like -- and no tool built for it. Until Panguard.",
+      "title": "AI agents have no App Store review. Until now.",
+      "subtitle": "When you download an app from the App Store, Apple reviews it first. When your AI agent installs a skill? Nothing. No review. No audit. Full system access granted immediately. Panguard changes that.",
       "comparison": {
         "enterprise": {
-          "label": "The current reality",
+          "label": "Without a gatekeeper",
           "items": [
-            "AI agents run with root access, zero oversight",
-            "Skills installed without any security review",
-            "No standard for agent threat detection",
-            "Traditional security tools don't understand agents",
-            "Breaches discovered after the damage"
+            "Skills install with full system access, no review",
+            "No one checks for prompt injection or data theft",
+            "Traditional antivirus can't understand AI agent behavior",
+            "New attack patterns spread unchecked",
+            "You find out about breaches after the damage"
           ]
         },
         "panguard": {
           "label": "With Panguard",
           "items": [
-            "ATR: the first open standard for agent threats",
-            "Every skill audited before install",
-            "Known threats blocked by 8,000+ detection rules",
-            "Threat Cloud: collective immunity across all deployments",
-            "Gets stronger with every user"
+            "Every skill reviewed before it runs",
+            "Community rules catch known threats (ATR + Sigma + YARA)",
+            "AI catches unknown threats in real-time",
+            "New rules auto-generated and shared to all users",
+            "Gets smarter and stronger with every install"
           ]
         }
       },
-      "punchline": "AI agents changed how we build software. ATR changes how we secure them."
+      "punchline": "The App Store made mobile safe. Panguard makes AI agents safe."
     },
     "scenarios": {
-      "title": "How it works in practice.",
-      "subtitle": "Three scenarios. One command. Zero configuration.",
+      "title": "Three layers. One gatekeeper.",
+      "subtitle": "Known AI threats. Known traditional threats. Unknown threats. Panguard handles all three.",
       "items": {
         "skillInstall": {
-          "label": "INSTALL",
-          "title": "Install a skill from OpenClaw. Panguard audits it automatically.",
-          "narrative": "Before any skill runs, Panguard's Skill Auditor scans it -- checking for prompt injection patterns, encoded payloads, tool poisoning, excessive permissions, and hidden Unicode attacks. Skills above the risk threshold are blocked. Safe skills proceed normally. All results feed into Threat Cloud.",
-          "before": "Without protection, a compromised skill executes immediately with full system access.",
-          "after": "With Panguard, every skill passes a 7-check security audit before it touches your system."
+          "label": "LAYER 1: RULES",
+          "title": "A new skill arrives. ATR + Sigma + YARA rules review it instantly.",
+          "narrative": "You install a new skill from OpenClaw or MCP. Before it runs, Panguard checks it against 32 ATR rules (prompt injection, tool poisoning, skill compromise), 3,700 Sigma rules (network-level threats), and 4,300 YARA rules (file-level threats). All three layers run simultaneously. Known threats are blocked. Safe skills proceed.",
+          "before": "Without a gatekeeper, the skill runs immediately with full system access.",
+          "after": "With Panguard, every skill passes a three-layer review before it touches your system."
         },
         "alwaysOn": {
-          "label": "DETECT",
-          "title": "A known attack pattern hits your server. Guard blocks it instantly.",
-          "narrative": "Guard runs 3,700+ Sigma rules and 4,300+ YARA rules against system events in real time. When a brute force attack, a reverse shell attempt, or a credential dump matches a known pattern, Guard auto-responds: block IP, kill process, quarantine file. No human intervention needed.",
-          "before": "Without protection, known attack patterns execute because nobody wrote the firewall rule.",
-          "after": "With Panguard, 8,000+ community-proven detection rules run continuously on your system."
+          "label": "LAYER 2: AI",
+          "title": "No rule matches, but the behavior looks wrong. AI steps in.",
+          "narrative": "A skill passes all rule checks but starts doing something suspicious -- exfiltrating context, making unexpected API calls, or manipulating the agent. Panguard's LLM analyzes the behavior in real-time: block the action, alert the user, and auto-generate a new ATR rule from the pattern.",
+          "before": "Without AI fallback, novel attacks slip through every rule-based system.",
+          "after": "With Panguard, unknown threats are caught by AI and turned into rules for everyone."
         },
         "supplyChain": {
-          "label": "EVOLVE",
-          "title": "A new attack pattern emerges. Threat Cloud generates a rule. Everyone gets it.",
-          "narrative": "One Panguard user encounters a novel threat. Their Guard uploads anonymized data to Threat Cloud. The system detects the pattern, auto-generates a new Sigma rule, and pushes it to every connected Guard instance. What attacked one user can never attack another.",
-          "before": "Without collective defense, each team discovers the same attack independently.",
-          "after": "With Threat Cloud, one detection protects the entire network. Collective immunity."
+          "label": "LAYER 3: CLOUD",
+          "title": "The new rule goes to the cloud. Every user gets protected.",
+          "narrative": "The auto-generated rule is anonymously uploaded to Threat Cloud. Within minutes, every Panguard user receives the update. What attacked one person can never attack anyone else. The more people use Panguard, the faster new threats are caught and shared.",
+          "before": "Without collective defense, every team discovers the same attack independently.",
+          "after": "With Threat Cloud, one encounter immunizes the entire network."
         }
       }
     },
     "securityStack": {
-      "title": "Where ATR fits in the security stack",
-      "intro": "Claude Code and Codex find bugs in your code before you ship. That's the pre-deployment layer.",
-      "but": "But what about after deployment? Who defines what an agent attack looks like? Who detects a prompt injection in a skill? Who blocks a supply chain compromise in an MCP tool? There was no standard for this. ATR fills that gap.",
-      "conclusion": "Pre-deployment tools protect your code. ATR protects your agents. You need both.",
+      "title": "Your AI agent's immune system",
+      "intro": "Your phone has the App Store. Your browser has extensions review. Your package manager has npm audit.",
+      "but": "Your AI agent has nothing. Skills install with full system access, zero review. Panguard gives your agent the same protection every other platform already has -- but built specifically for the AI era.",
+      "conclusion": "Rules catch known threats. AI catches unknown threats. The cloud makes everyone stronger.",
       "preDeployment": {
-        "label": "Pre-deployment",
-        "title": "Code Security",
-        "tools": "Claude Code / Codex",
-        "items": ["Static analysis and vulnerability scanning", "Code review automation", "Dependency auditing", "Pre-ship bug detection"]
+        "label": "Known threats",
+        "title": "Rule-based review",
+        "tools": "ATR + Sigma + YARA",
+        "items": ["32 ATR rules: prompt injection, tool poisoning, skill compromise", "3,700 Sigma rules: network-level threats, brute force, reverse shells", "4,300 YARA rules: malicious files, encoded payloads, malware signatures", "Community-driven, updated continuously"]
       },
       "postDeployment": {
-        "label": "Post-deployment",
-        "title": "Agent Security",
-        "tools": "ATR + Panguard Guard",
-        "items": ["Skill audit before install (prompt injection, encoded payloads)", "Known threat blocking (3,700+ Sigma, 4,300+ YARA rules)", "Auto-response (block IP, kill process, quarantine)", "Collective defense via Threat Cloud"]
+        "label": "Unknown threats",
+        "title": "AI analysis + auto-rule generation",
+        "tools": "LLM + Threat Cloud",
+        "items": ["LLM behavioral analysis for threats no rule has seen", "Block first, generate rule, share anonymously", "Threat Cloud pushes new rules to all users", "Every encounter makes the entire network stronger"]
       },
-      "bottomLine": "Pre-deployment finds bugs in code. Post-deployment stops attacks on agents."
+      "bottomLine": "Known threats: rules. Unknown threats: AI. New rules: shared to everyone."
     },
     "flywheel": {
-      "title": "Collective immunity.",
+      "title": "The more people install, the safer everyone gets.",
       "nodes": {
-        "installPanguard": "Deploy",
-        "detectThreats": "Detect",
-        "uploadToCloud": "Share",
+        "installPanguard": "Install",
+        "detectThreats": "Review",
+        "uploadToCloud": "Catch",
         "generateRules": "Generate",
-        "distribute": "Distribute",
-        "betterProtection": "Strengthen"
+        "distribute": "Share",
+        "betterProtection": "Stronger"
       },
-      "quote": "Every deployment contributes anonymized threat data. Threat Cloud auto-generates new Sigma, YARA, and ATR rules. The more who install, the stronger everyone becomes.",
-      "quoteLine1": "Every deployment contributes anonymized threat data to Threat Cloud.",
-      "quoteLine2": "Threat Cloud auto-generates new detection rules from collective patterns.",
-      "quoteLine3": "The more who install, the stronger everyone becomes. Collective immunity."
+      "quote": "Every blocked threat becomes a new rule. Every rule is shared to the cloud. Every user receives the update. This is collective immunity for AI agents.",
+      "quoteLine1": "Blocked threats are auto-converted into new detection rules.",
+      "quoteLine2": "Rules are anonymously shared to Threat Cloud for all users.",
+      "quoteLine3": "The more people install, the faster threats are caught. Collective immunity."
     },
     "finalCta": {
-      "title": "Join the standard.",
-      "subtitle": "ATR is the first open standard for AI agent security. Community-driven. MIT licensed. Every install strengthens the network.",
-      "contributeATR": "Contribute to ATR",
-      "joinCommunity": "Join the Community",
-      "bottomLine": "Built in Taiwan. Open to the world. Yours to contribute."
+      "title": "Give your AI agent a gatekeeper.",
+      "subtitle": "One command to install. Every skill reviewed. Known threats blocked by community rules. Unknown threats caught by AI. New rules shared to everyone.",
+      "contributeATR": "Contribute Rules",
+      "joinCommunity": "Install Panguard",
+      "bottomLine": "Open source. MIT licensed. Built in Taiwan."
     }
   }
 }

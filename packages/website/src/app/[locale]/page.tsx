@@ -4,11 +4,11 @@ import RevolutionHero from '@/components/home/RevolutionHero';
 import Footer from '@/components/Footer';
 
 // Below-the-fold sections loaded lazily
+const PipelineFlow = dynamic(() => import('@/components/home/PipelineFlow'));
 const ProductPillars = dynamic(() => import('@/components/home/ProductPillars'));
 const SkillProtection = dynamic(() => import('@/components/home/SkillProtection'));
 const RealScenarios = dynamic(() => import('@/components/home/RealScenarios'));
 const SecurityStack = dynamic(() => import('@/components/home/SecurityStack'));
-const ATRShowcase = dynamic(() => import('@/components/home/ATRShowcase'));
 const HowItWorksNew = dynamic(() => import('@/components/home/HowItWorksNew'));
 const CommunityFlywheel = dynamic(() => import('@/components/home/CommunityFlywheel'));
 const FinalCTANew = dynamic(() => import('@/components/home/FinalCTANew'));
@@ -19,27 +19,27 @@ export default function Home() {
       <NavBar />
       <main id="main-content">
         <p id="definition" className="sr-only">
-          Panguard AI created ATR (Agent Threat Rules), the first open security standard for AI
-          agents. 32 rules across 9 threat categories detect prompt injection, tool poisoning,
-          context exfiltration, and more. MIT licensed. Open source. Built in Taiwan.
+          Panguard AI is the App Store gatekeeper for AI agents. It reviews every skill before it
+          runs, blocks known threats with community ATR + Sigma + YARA rules, catches unknown threats
+          with AI analysis, and shares new rules to protect everyone. MIT licensed. Open source.
         </p>
-        {/* 1. WHAT: 5-second clarity -- AI Agent runtime security */}
+        {/* 1. Hero: Your AI agent needs a gatekeeper */}
         <RevolutionHero />
-        {/* 2. WHAT: Three pillars -- Skill Auditor / Guard / ATR */}
+        {/* 2. Pipeline: 6-step visual flow diagram */}
+        <PipelineFlow />
+        {/* 3. Three pillars: Community Rules / Collective Defense / AI Fallback */}
         <ProductPillars />
-        {/* 3. WHAT: OpenClaw ecosystem security + before/after */}
+        {/* 4. Before/after: With and without Panguard */}
         <SkillProtection />
-        {/* 4. WHY: Three real attack scenarios */}
+        {/* 5. Three layers: Rules / AI / Cloud */}
         <RealScenarios />
-        {/* 5. WHY: Pre-deployment vs runtime positioning */}
+        {/* 6. Your agent's immune system */}
         <SecurityStack />
-        {/* 6. HOW: ATR rules with real YAML + features */}
-        <ATRShowcase />
-        {/* 7. HOW: Install / Protect / Contribute summary */}
+        {/* 7. Simple summary: Install / Review / Evolve */}
         <HowItWorksNew />
-        {/* 8. JOIN: Collective defense flywheel */}
+        {/* 8. Collective immunity flywheel */}
         <CommunityFlywheel />
-        {/* 9. JOIN: Final CTA -- Contribute + Community */}
+        {/* 9. Final CTA */}
         <FinalCTANew />
       </main>
       <Footer />

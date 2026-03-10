@@ -5439,11 +5439,11 @@
   },
   "revolution": {
     "hero": {
-      "eyebrow": "AI AGENT 安全的開放標準",
-      "title": "AI Agent 擁有最高權限。沒有標準在監控它們。直到現在。",
-      "subtitleLine1": "Claude Code、Cursor、OpenClaw、WorkBuddy -- 每個 AI Agent 都擁有完整系統權限。一個惡意 Skill，就能竊取一切。",
-      "subtitleLine2": "ATR 是第一個定義「Agent 被攻擊長什麼樣」的開放標準。Panguard 執行它。",
-      "subtitleLine3": "開源免費。社群驅動。一行指令部署。",
+      "eyebrow": "AI AGENT 的 APP STORE 守門員",
+      "title": "你的 AI Agent 需要一個守門員。",
+      "subtitleLine1": "你的 AI Agent 安裝 Skill 時擁有完整系統權限。沒有審核流程、沒有安全檢查、惡意 Skill 和你的資料之間零防線。",
+      "subtitleLine2": "Panguard 就是那個缺失的守門員。每個 Skill 執行前先審核 -- 就像 App Store 審核，但專為 AI Agent 設計。",
+      "subtitleLine3": "一行安裝。全天候守護。使用者越多越聰明。",
       "viewATR": "GitHub 上的 ATR 標準",
       "install": "開始使用",
       "copied": "已複製!",
@@ -5454,20 +5454,63 @@
         "taiwan": "台灣製造"
       }
     },
+    "pipeline": {
+      "title": "Panguard 怎麼保護你",
+      "subtitle": "每個 Skill 都要通過多層審核流水線，才能碰到你的系統。",
+      "steps": {
+        "install": {
+          "number": "1",
+          "title": "安裝 Panguard",
+          "desc": "一行指令。搭配 Claude Code、Cursor、OpenClaw 或任何 AI Agent。",
+          "detail": "npx panguard guard --watch"
+        },
+        "scan": {
+          "number": "2",
+          "title": "掃描所有已裝 Skill",
+          "desc": "Panguard 立即掃描系統上所有已安裝的 Skill。",
+          "detail": "檢查現有環境中的已知威脅"
+        },
+        "knownCheck": {
+          "number": "3",
+          "title": "新 Skill？先過規則審核。",
+          "desc": "每個新 Skill 同時接受社群 ATR 規則（AI Agent 威脅）、Sigma 規則（網路威脅）和 YARA 規則（檔案威脅）三重審核。",
+          "detail": "32 ATR + 3,700 Sigma + 4,300 YARA 規則"
+        },
+        "llmAnalysis": {
+          "number": "4",
+          "title": "未知威脅？AI 即時分析。",
+          "desc": "如果沒有規則匹配但行為可疑，LLM 會即時分析。先阻擋，再問問題。",
+          "detail": "即時 AI 行為分析"
+        },
+        "generateRule": {
+          "number": "5",
+          "title": "自動產生新規則",
+          "desc": "被阻擋的威脅自動轉化為新的 ATR 規則。攻擊你的東西，變成保護所有人的盾牌。",
+          "detail": "威脅 → 規則 → 防護"
+        },
+        "uploadCloud": {
+          "number": "6",
+          "title": "匿名分享到雲端",
+          "desc": "新規則上傳到 Threat Cloud。每個 Panguard 使用者都會收到。一個人的遭遇，保護數千人。",
+          "detail": "集體免疫"
+        }
+      },
+      "bottomLine": "已知威脅靠規則阻擋。未知威脅靠 AI 阻擋。新規則保護所有人。"
+    },
     "productPillars": {
       "atrStandard": {
-        "title": "ATR -- 標準",
-        "desc": "第一個 AI Agent 威脅偵測的開放格式。32 條規則、9 大類別。Sigma 定義了網路攻擊。ATR 定義了 Agent 攻擊。",
-        "link": "查看標準"
+        "title": "社群規則",
+        "desc": "32 條 ATR 規則對付 AI Agent 威脅 + 8,000 條 Sigma/YARA 規則對付傳統威脅。全部開源、社群驅動。每個 Skill 必須通過的審核標準。",
+        "link": "查看 ATR 規則"
       },
       "threatCloud": {
-        "title": "Threat Cloud -- 網路",
-        "desc": "每次部署都貢獻匿名威脅資料。新規則自動產生、推送給所有人。一次安裝，強化整個生態系。",
+        "title": "集體防禦",
+        "desc": "每個被阻擋的威脅變成新規則。每條規則匿名分享。每個使用者強化網路。就像疫苗 -- 一次接觸，全體免疫。",
         "link": "了解更多"
       },
       "guard": {
-        "title": "Guard -- 引擎",
-        "desc": "安裝前審計每個 Skill。3,700+ Sigma 和 4,300+ YARA 規則阻斷已知威脅。自動回應：封鎖、終止、隔離。",
+        "title": "AI 兜底",
+        "desc": "當規則抓不到時，AI 出手。LLM 即時分析可疑行為、阻擋威脅、自動產生新規則，確保同樣的攻擊再也不會得逞。",
         "link": "了解更多"
       }
     },
@@ -5535,116 +5578,116 @@
       "statsLine": "OWASP Agentic Top 10：涵蓋 10/10 類別。15 個 CVE 對應。MIT 開源。"
     },
     "howItWorks": {
-      "title": "安裝。防護。貢獻。",
+      "title": "就像 App Store 一樣簡單。",
       "steps": {
         "install": {
           "title": "安裝",
-          "desc": "搭配任何 AI Agent 使用 -- Claude Code、Cursor、OpenClaw、WorkBuddy，或你自己的環境。一行指令。32 條 ATR + 8,000+ Sigma/YARA 規則自動載入。零設定。"
+          "desc": "一行指令。Panguard 載入 32 條 ATR 規則（AI Agent 威脅）+ 3,700 條 Sigma 規則（網路威脅）+ 4,300 條 YARA 規則（檔案威脅）。三層防護同時啟動。"
         },
         "protect": {
-          "title": "防護",
-          "desc": "每個 Skill 安裝前自動審計。已知攻擊模式由 Sigma 和 YARA 規則阻斷。可疑活動自動回應 -- 封鎖 IP、終止程序、隔離檔案。"
+          "title": "審核",
+          "desc": "每個新 Skill 通過同一條審核流水線：ATR 規則檢查 Agent 攻擊、Sigma 和 YARA 規則檢查傳統威脅。已知威脅即時阻擋。"
         },
         "contribute": {
-          "title": "貢獻",
-          "desc": "每次部署都將匿名威脅資料上傳到 Threat Cloud。新的 Sigma、YARA、ATR 規則從集體模式自動產生。安裝的人越多，所有人都越安全。"
+          "title": "進化",
+          "desc": "未知威脅由 AI 即時分析並阻擋。新模式自動轉化為規則、匿名分享到 Threat Cloud。每個使用者都會收到更新。安裝的人越多，所有人越安全。"
         }
       }
     },
     "costDisruption": {
-      "title": "多數團隊直接跳過 Agent 資安。我們讓你沒辦法跳過。",
-      "subtitle": "每個團隊都在用 AI Agent，但很少人想過怎麼保護它們。沒有標準定義 Agent 攻擊長什麼樣 -- 也沒有專門為此打造的工具。直到 Panguard。",
+      "title": "AI Agent 沒有 App Store 審核。直到現在。",
+      "subtitle": "你從 App Store 下載 App 時，Apple 會先審核。但你的 AI Agent 安裝 Skill 時呢？什麼都沒有。不審核、不檢查、直接給完整系統權限。Panguard 改變了這件事。",
       "comparison": {
         "enterprise": {
-          "label": "現狀",
+          "label": "沒有守門員",
           "items": [
-            "AI Agent 擁有 root 權限，零監控",
-            "Skill 安裝不經任何安全審查",
-            "沒有 Agent 威脅偵測的標準",
-            "傳統資安工具不理解 Agent",
-            "損害發生後才發現入侵"
+            "Skill 安裝時擁有完整系統權限，零審核",
+            "沒有人檢查 Prompt Injection 或資料竊取",
+            "傳統防毒軟體無法理解 AI Agent 行為",
+            "新型攻擊模式不受控制地擴散",
+            "損害發生後才發現被入侵"
           ]
         },
         "panguard": {
           "label": "有 Panguard",
           "items": [
-            "ATR：第一個 Agent 威脅的開放標準",
-            "每個 Skill 安裝前自動審計",
-            "8,000+ 偵測規則阻斷已知威脅",
-            "Threat Cloud：跨部署的集體免疫",
-            "使用者越多，防護越強"
+            "每個 Skill 執行前先經過審核",
+            "社群規則攔截已知威脅（ATR + Sigma + YARA）",
+            "AI 即時攔截未知威脅",
+            "新規則自動產生並分享給所有使用者",
+            "安裝的人越多，防護越聰明越強"
           ]
         }
       },
-      "punchline": "AI Agent 改變了我們建造軟體的方式。ATR 改變了我們保護它們的方式。"
+      "punchline": "App Store 讓手機變安全。Panguard 讓 AI Agent 變安全。"
     },
     "scenarios": {
-      "title": "實際運作的樣子。",
-      "subtitle": "三個場景。一行指令。零設定。",
+      "title": "三層防護。一個守門員。",
+      "subtitle": "已知 AI 威脅、已知傳統威脅、未知威脅。Panguard 三者兼顧。",
       "items": {
         "skillInstall": {
-          "label": "INSTALL",
-          "title": "從 OpenClaw 安裝 Skill，Panguard 自動審計。",
-          "narrative": "在任何 Skill 執行前，Panguard Skill Auditor 會掃描它 -- 檢查 Prompt Injection 模式、編碼 payload、Tool Poisoning、過度權限、隱藏 Unicode 攻擊。超過風險閾值的 Skill 被封鎖。安全的 Skill 正常運作。所有結果回饋到 Threat Cloud。",
-          "before": "沒有防護，被入侵的 Skill 會立刻以完整系統權限執行。",
-          "after": "有了 Panguard，每個 Skill 在碰到系統前都經過 7 項安全檢查審計。"
+          "label": "第一層：規則",
+          "title": "新 Skill 來了。ATR + Sigma + YARA 規則即時審核。",
+          "narrative": "你從 OpenClaw 或 MCP 安裝新 Skill。在它執行前，Panguard 同時用 32 條 ATR 規則（Prompt Injection、Tool Poisoning、Skill 入侵）、3,700 條 Sigma 規則（網路層威脅）和 4,300 條 YARA 規則（檔案層威脅）進行三重審核。已知威脅被阻擋，安全的 Skill 正常運作。",
+          "before": "沒有守門員，Skill 安裝後立刻擁有完整系統權限。",
+          "after": "有了 Panguard，每個 Skill 在碰到系統前都通過三層審核。"
         },
         "alwaysOn": {
-          "label": "DETECT",
-          "title": "已知攻擊模式打到你的伺服器。Guard 立即阻斷。",
-          "narrative": "Guard 用 3,700+ Sigma 規則和 4,300+ YARA 規則即時比對系統事件。當暴力破解、反向 Shell 嘗試或憑證傾印比對到已知模式，Guard 自動回應：封鎖 IP、終止程序、隔離檔案。不需要人工介入。",
-          "before": "沒有防護，已知攻擊模式執行成功，因為沒有人寫防火牆規則。",
-          "after": "有了 Panguard，8,000+ 社群驗證的偵測規則持續在你的系統上運行。"
+          "label": "第二層：AI",
+          "title": "規則沒匹配，但行為不對勁。AI 出手。",
+          "narrative": "一個 Skill 通過所有規則檢查，但開始做可疑的事 -- 竊取上下文、發起非預期 API 呼叫、操縱 Agent。Panguard 的 LLM 即時分析行為：阻擋動作、通知使用者、自動從該模式產生新的 ATR 規則。",
+          "before": "沒有 AI 兜底，新型攻擊穿透所有基於規則的系統。",
+          "after": "有了 Panguard，未知威脅被 AI 攔截並轉化為保護所有人的規則。"
         },
         "supplyChain": {
-          "label": "EVOLVE",
-          "title": "新的攻擊模式出現。Threat Cloud 產生規則。所有人都拿到。",
-          "narrative": "一個 Panguard 使用者遇到新型威脅。他們的 Guard 上傳匿名資料到 Threat Cloud。系統偵測到模式，自動產生新的 Sigma 規則，推送給每個連線的 Guard 實例。攻擊了一個人的威脅，再也無法攻擊其他人。",
+          "label": "第三層：雲端",
+          "title": "新規則上傳雲端。所有使用者獲得保護。",
+          "narrative": "自動產生的規則匿名上傳到 Threat Cloud。幾分鐘內，每個 Panguard 使用者都收到更新。攻擊了一個人的威脅，再也無法攻擊其他人。使用 Panguard 的人越多，新威脅被捕獲和分享的速度就越快。",
           "before": "沒有集體防禦，每個團隊獨立發現同樣的攻擊。",
-          "after": "有了 Threat Cloud，一次偵測保護整個網路。集體免疫。"
+          "after": "有了 Threat Cloud，一次遭遇免疫整個網路。"
         }
       }
     },
     "securityStack": {
-      "title": "ATR 在資安架構中的位置",
-      "intro": "Claude Code 和 Codex 在你出貨前找出程式碼中的 Bug。這是部署前防線。",
-      "but": "但部署之後呢？誰定義 Agent 攻擊長什麼樣？誰偵測 Skill 中的 Prompt Injection？誰阻斷 MCP 工具的供應鏈入侵？過去沒有這個標準。ATR 填補了這個缺口。",
-      "conclusion": "部署前工具保護你的程式碼。ATR 保護你的 Agent。兩者缺一不可。",
+      "title": "你 AI Agent 的免疫系統",
+      "intro": "你的手機有 App Store。你的瀏覽器有擴充審核。你的套件管理器有 npm audit。",
+      "but": "你的 AI Agent 呢？什麼都沒有。Skill 安裝時擁有完整系統權限，零審核。Panguard 給你的 Agent 與其他平台相同的防護 -- 但專為 AI 時代打造。",
+      "conclusion": "規則攔截已知威脅。AI 攔截未知威脅。雲端讓所有人更強。",
       "preDeployment": {
-        "label": "部署前",
-        "title": "程式碼安全",
-        "tools": "Claude Code / Codex",
-        "items": ["靜態分析與漏洞掃描", "自動化程式碼審查", "依賴套件審計", "上線前 Bug 偵測"]
+        "label": "已知威脅",
+        "title": "規則審核",
+        "tools": "ATR + Sigma + YARA",
+        "items": ["32 條 ATR 規則：Prompt Injection、Tool Poisoning、Skill 入侵", "3,700 條 Sigma 規則：網路威脅、暴力破解、反向 Shell", "4,300 條 YARA 規則：惡意檔案、編碼 payload、惡意程式特徵", "社群驅動，持續更新"]
       },
       "postDeployment": {
-        "label": "部署後",
-        "title": "Agent 安全",
-        "tools": "ATR + Panguard Guard",
-        "items": ["安裝前 Skill 審計（Prompt Injection、編碼 payload）", "已知威脅阻斷（3,700+ Sigma、4,300+ YARA 規則）", "自動回應（封鎖 IP、終止程序、隔離檔案）", "Threat Cloud 集體防禦"]
+        "label": "未知威脅",
+        "title": "AI 分析 + 自動產生規則",
+        "tools": "LLM + Threat Cloud",
+        "items": ["LLM 行為分析，攔截規則從未見過的威脅", "先阻擋、產生規則、匿名分享", "Threat Cloud 將新規則推送給所有使用者", "每次遭遇讓整個網路更強"]
       },
-      "bottomLine": "部署前找程式碼的 Bug。部署後擋 Agent 的攻擊。"
+      "bottomLine": "已知威脅：規則擋。未知威脅：AI 擋。新規則：分享給所有人。"
     },
     "flywheel": {
-      "title": "集體免疫。",
+      "title": "安裝的人越多，所有人越安全。",
       "nodes": {
-        "installPanguard": "部署",
-        "detectThreats": "偵測",
-        "uploadToCloud": "分享",
+        "installPanguard": "安裝",
+        "detectThreats": "審核",
+        "uploadToCloud": "攔截",
         "generateRules": "產生",
-        "distribute": "分發",
-        "betterProtection": "強化"
+        "distribute": "分享",
+        "betterProtection": "更強"
       },
-      "quote": "每次部署回饋匿名威脅資料。Threat Cloud 從集體模式自動產生新的 Sigma、YARA、ATR 規則。安裝的人越多，所有人越安全。",
-      "quoteLine1": "每次部署都將匿名化威脅資料回饋到 Threat Cloud。",
-      "quoteLine2": "Threat Cloud 從集體模式自動產生新偵測規則。",
-      "quoteLine3": "安裝的人越多，所有人的防護越強。集體免疫。"
+      "quote": "每個被阻擋的威脅變成新規則。每條規則分享到雲端。每個使用者收到更新。這就是 AI Agent 的集體免疫。",
+      "quoteLine1": "被阻擋的威脅自動轉化為新的偵測規則。",
+      "quoteLine2": "規則匿名分享到 Threat Cloud，所有使用者同步。",
+      "quoteLine3": "安裝的人越多，威脅被捕獲的速度越快。集體免疫。"
     },
     "finalCta": {
-      "title": "加入這個標準。",
-      "subtitle": "ATR 是 AI Agent 安全的第一個開放標準。社群驅動、MIT 授權。每次安裝強化整個網路。",
-      "contributeATR": "貢獻 ATR 規則",
-      "joinCommunity": "加入社群",
-      "bottomLine": "台灣製造，面向世界。歡迎你的貢獻。"
+      "title": "給你的 AI Agent 一個守門員。",
+      "subtitle": "一行指令安裝。每個 Skill 都經過審核。已知威脅靠社群規則阻擋。未知威脅靠 AI 攔截。新規則分享給所有人。",
+      "contributeATR": "貢獻規則",
+      "joinCommunity": "安裝 Panguard",
+      "bottomLine": "開源。MIT 授權。台灣製造。"
     }
   }
 }
