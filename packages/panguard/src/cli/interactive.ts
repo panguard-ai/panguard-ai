@@ -285,13 +285,9 @@ function showHelp(): void {
 
   const cmds = [
     { cmd: 'status', en: 'System status overview', zh: '\u7CFB\u7D71\u72C0\u614B\u7E3D\u89BD' },
-    { cmd: 'login', en: 'Account login', zh: '\u5E33\u865F\u767B\u5165' },
-    { cmd: 'logout', en: 'Account logout', zh: '\u767B\u51FA' },
     { cmd: 'config', en: 'Settings management', zh: '\u8A2D\u5B9A\u7BA1\u7406' },
-    { cmd: 'upgrade', en: 'All features are free', zh: '\u6240\u6709\u529F\u80FD\u514D\u8CBB' },
     { cmd: 'hardening', en: 'Security hardening', zh: '\u5B89\u5168\u52A0\u56FA' },
     { cmd: 'doctor', en: 'Health diagnostics', zh: '\u5065\u5EB7\u8A3A\u65B7' },
-    { cmd: 'whoami', en: 'Current account info', zh: '\u986F\u793A\u7576\u524D\u5E33\u865F' },
     { cmd: 'help', en: 'Show this help', zh: '\u986F\u793A\u6B64\u8AAA\u660E' },
   ];
 
@@ -455,17 +451,11 @@ async function dispatchCommand(text: string): Promise<boolean> {
       return true;
 
     case 'login':
-      console.clear();
-      await actionLogin();
-      await new Promise((r) => setTimeout(r, 500));
-      renderStartup();
-      return true;
-
     case 'logout': {
       console.clear();
-      const { logoutCommand } = await import('./commands/logout.js');
-      const cmd = logoutCommand();
-      await cmd.parseAsync(['logout'], { from: 'user' });
+      console.log('');
+      console.log('  Authentication removed. All features are free and open source.');
+      console.log('');
       await new Promise((r) => setTimeout(r, 500));
       renderStartup();
       return true;
@@ -478,12 +468,15 @@ async function dispatchCommand(text: string): Promise<boolean> {
       renderStartup();
       return true;
 
-    case 'upgrade':
+    case 'upgrade': {
       console.clear();
-      await actionUpgrade();
+      console.log('');
+      console.log('  All features are free and open source.');
+      console.log('');
       await new Promise((r) => setTimeout(r, 500));
       renderStartup();
       return true;
+    }
 
     case 'hardening':
       console.clear();
@@ -512,9 +505,9 @@ async function dispatchCommand(text: string): Promise<boolean> {
 
     case 'whoami': {
       console.clear();
-      const { whoamiCommand } = await import('./commands/whoami.js');
-      const cmd = whoamiCommand();
-      await cmd.parseAsync(['whoami'], { from: 'user' });
+      console.log('');
+      console.log('  All features available (no login required).');
+      console.log('');
       await new Promise((r) => setTimeout(r, 500));
       renderStartup();
       return true;
@@ -1412,17 +1405,6 @@ async function actionDemo(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// Prompt commands: Upgrade
-// ---------------------------------------------------------------------------
-
-async function actionUpgrade(): Promise<void> {
-  breadcrumb(['Panguard', currentLang === 'zh-TW' ? '\u5347\u7D1A\u65B9\u6848' : 'Upgrade Plan']);
-  const { upgradeCommand } = await import('./commands/upgrade.js');
-  const cmd = upgradeCommand();
-  await cmd.parseAsync(['upgrade', '--lang', currentLang], { from: 'user' });
-}
-
-// ---------------------------------------------------------------------------
 // Prompt commands: Hardening
 // ---------------------------------------------------------------------------
 
@@ -1468,17 +1450,6 @@ async function actionStatus(): Promise<void> {
   const { statusCommand } = await import('./commands/status.js');
   const cmd = statusCommand();
   await cmd.parseAsync(['status'], { from: 'user' });
-}
-
-// ---------------------------------------------------------------------------
-// Prompt commands: Login
-// ---------------------------------------------------------------------------
-
-async function actionLogin(): Promise<void> {
-  breadcrumb(['Panguard', currentLang === 'zh-TW' ? '\u5E33\u865F\u767B\u5165' : 'Login']);
-  const { loginCommand } = await import('./commands/login.js');
-  const cmd = loginCommand();
-  await cmd.parseAsync(['login'], { from: 'user' });
 }
 
 // ---------------------------------------------------------------------------

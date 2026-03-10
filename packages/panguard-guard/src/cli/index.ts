@@ -159,6 +159,28 @@ async function commandStart(
 
   // Free tier: show what's enabled/disabled
   console.log(`  ${c.safe('\u2713')} Auto-blocking: known attack patterns (Layer 1 rules)`);
+
+  // Show AI layer status and setup guide if not configured
+  const hasLocalAi = config.ai?.provider === 'ollama';
+  const hasCloudAi = config.ai?.provider === 'claude' || config.ai?.provider === 'openai';
+  const hasAnyAi = Boolean(config.ai?.provider);
+  const hasEnvKey = Boolean(process.env['PANGUARD_AI_KEY'] || process.env['ANTHROPIC_API_KEY'] || process.env['OPENAI_API_KEY']);
+
+  if (hasLocalAi) {
+    console.log(`  ${c.safe('\u2713')} Layer 2 Local AI: ${c.sage(config.ai?.provider + ' / ' + (config.ai?.model ?? 'default'))}`);
+  }
+  if (hasCloudAi || hasEnvKey) {
+    const provider = config.ai?.provider ?? (process.env['ANTHROPIC_API_KEY'] ? 'anthropic' : 'openai');
+    console.log(`  ${c.safe('\u2713')} Layer 3 Cloud AI: ${c.sage(provider + ' connected')}`);
+  }
+
+  if (!hasAnyAi && !hasEnvKey) {
+    console.log('');
+    console.log(`  ${symbols.info} Guard started with ${c.sage('Layer 1 (Pattern Detection)')} active.`);
+    console.log('');
+    printAiSetupGuide();
+  }
+
   console.log(`  ${symbols.info} Monitoring...`);
   console.log('');
 
@@ -194,6 +216,50 @@ async function commandStart(
   }
 
   console.log(c.dim('  Press Ctrl+C to stop'));
+  console.log('');
+}
+
+// ---------------------------------------------------------------------------
+// AI setup guide — shown when no AI layers are configured
+// AI 設定指南 — 當沒有配置 AI 層時顯示
+// ---------------------------------------------------------------------------
+
+/** Print bilingual AI layer setup instructions */
+function printAiSetupGuide(): void {
+  const configDir = join(homedir(), '.panguard');
+
+  console.log(`  To enable AI-powered detection layers:`);
+  console.log('');
+  console.log(`  ${c.sage('Layer 2')} -- Local AI (Free, Private)`);
+  console.log(`    1. Install Ollama: ${c.dim('curl -fsSL https://ollama.com/install.sh | sh')}`);
+  console.log(`    2. Pull a model:   ${c.dim('ollama pull llama3.2')}`);
+  console.log(`    3. Set in config:`);
+  console.log(`       ${c.dim(`echo '{"ai":{"provider":"ollama","model":"llama3.2"}}' > ${configDir}/guard-ai.json`)}`);
+  console.log('');
+  console.log(`  ${c.sage('Layer 3')} -- Cloud AI (Fastest, Most Accurate)`);
+  console.log(`    1. Get API key: ${c.dim('https://console.anthropic.com/')}`);
+  console.log(`    2. Set in config:`);
+  console.log(`       ${c.dim('export PANGUARD_AI_KEY=sk-ant-your-key-here')}`);
+  console.log(`       ${c.dim(`# or add to ${configDir}/config.json:`)}`);
+  console.log(`       ${c.dim(`# {"ai":{"provider":"claude","apiKey":"sk-ant-...","model":"claude-sonnet-4-20250514"}}`)}`);
+  console.log('');
+  console.log(c.dim(`  ${divider()}`));
+  console.log('');
+  console.log(`  ${c.sage('\u5553\u7528 AI \u5075\u6E2C\u5C64\uFF1A')}`);
+  console.log('');
+  console.log(`  ${c.sage('\u7B2C\u4E8C\u5C64')} -- \u672C\u5730 AI\uFF08\u514D\u8CBB\u3001\u79C1\u5BC6\uFF09`);
+  console.log(`    1. \u5B89\u88DD Ollama: ${c.dim('curl -fsSL https://ollama.com/install.sh | sh')}`);
+  console.log(`    2. \u4E0B\u8F09\u6A21\u578B: ${c.dim('ollama pull llama3.2')}`);
+  console.log(`    3. \u8A2D\u5B9A:`);
+  console.log(`       ${c.dim(`echo '{"ai":{"provider":"ollama","model":"llama3.2"}}' > ${configDir}/guard-ai.json`)}`);
+  console.log('');
+  console.log(`  ${c.sage('\u7B2C\u4E09\u5C64')} -- \u96F2\u7AEF AI\uFF08\u6700\u5FEB\u3001\u6700\u6E96\u78BA\uFF09`);
+  console.log(`    1. \u53D6\u5F97 API key: ${c.dim('https://console.anthropic.com/')}`);
+  console.log(`    2. \u8A2D\u5B9A:`);
+  console.log(`       ${c.dim('export PANGUARD_AI_KEY=sk-ant-your-key-here')}`);
+  console.log('');
+  console.log(`  ${c.dim(`Run "panguard guard setup-ai" for interactive setup`)}`);
+  console.log(`  ${c.dim(`\u57F7\u884C "panguard guard setup-ai" \u9032\u884C\u4E92\u52D5\u5F0F\u8A2D\u5B9A`)}`);
   console.log('');
 }
 

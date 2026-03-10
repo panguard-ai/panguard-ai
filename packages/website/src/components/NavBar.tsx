@@ -1,12 +1,10 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { Link, usePathname, useRouter } from '@/navigation';
 import type { Locale } from '@/navigation';
 import BrandLogo from './ui/BrandLogo';
-import { useAuth } from '@/lib/auth';
-
 /* ─── Locale Switcher ─── */
 function LocaleSwitcher() {
   const locale = useLocale() as Locale;
@@ -126,8 +124,6 @@ function NavDropdown({ label, items }: { label: string; items: DropdownItem[] })
 
 export default function NavBar() {
   const t = useTranslations('nav');
-  const { user, loading: authLoading, logout } = useAuth();
-  const navRouter = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -220,42 +216,12 @@ export default function NavBar() {
         {/* Desktop CTA + Locale Switcher */}
         <div className="hidden lg:flex items-center gap-4">
           <LocaleSwitcher />
-          {!authLoading && user ? (
-            <>
-              <Link
-                href="/dashboard"
-                className="flex items-center gap-1.5 px-3 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
-              >
-                <User className="w-4 h-4" />
-                Dashboard
-              </Link>
-              <button
-                onClick={() => {
-                  void logout();
-                  navRouter.push('/');
-                }}
-                className="text-text-tertiary hover:text-text-secondary transition-colors"
-                aria-label="Log out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="px-3 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
-              >
-                {t('login')}
-              </Link>
-              <Link
-                href="/docs/installation"
-                className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-2.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
-              >
-                {t('install')}
-              </Link>
-            </>
-          )}
+          <Link
+            href="/docs/installation"
+            className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-2.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
+          >
+            {t('install')}
+          </Link>
         </div>
 
         {/* Mobile hamburger */}
@@ -331,44 +297,13 @@ export default function NavBar() {
             </a>
 
             <div className="pt-4 border-t border-border space-y-3">
-              {!authLoading && user ? (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="block text-center bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-3"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={() => {
-                      void logout();
-                      navRouter.push('/');
-                      setMobileOpen(false);
-                    }}
-                    className="block w-full text-center text-sm text-text-secondary py-2"
-                  >
-                    Log out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="block text-center border border-border text-text-secondary font-semibold text-sm rounded-full px-5 py-3"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {t('login')}
-                  </Link>
-                  <Link
-                    href="/docs/installation"
-                    className="block text-center bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-3"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {t('install')}
-                  </Link>
-                </>
-              )}
+              <Link
+                href="/docs/installation"
+                className="block text-center bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-3"
+                onClick={() => setMobileOpen(false)}
+              >
+                {t('install')}
+              </Link>
             </div>
           </div>
         </div>
