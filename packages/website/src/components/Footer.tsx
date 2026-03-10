@@ -27,15 +27,13 @@ export default function Footer() {
     {
       title: t('product'),
       links: [
-        { label: t('atrStandard'), href: 'https://github.com/Agent-Threat-Rule/agent-threat-rules', external: true },
+        { label: t('skillAuditor'), href: '/product/skill-auditor' },
         { label: t('guard'), href: '/product/guard' },
         { label: t('scan'), href: '/product/scan' },
-        { label: t('threatCloud'), href: '/threat-cloud' },
-        { label: t('atr'), href: '/atr' },
-        { label: t('chat'), href: '/product/chat' },
-        { label: t('trap'), href: '/product/trap' },
-        { label: t('report'), href: '/product/report' },
         { label: t('mcp'), href: '/product/mcp' },
+        { label: t('threatCloud'), href: '/threat-cloud' },
+        { label: t('atrStandard'), href: 'https://github.com/Agent-Threat-Rule/agent-threat-rules', external: true },
+        { label: t('atr'), href: '/atr' },
       ],
     },
     {

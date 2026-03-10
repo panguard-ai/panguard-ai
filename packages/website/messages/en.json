@@ -128,6 +128,8 @@
     "trap": "Trap",
     "report": "Report",
     "mcp": "MCP Server",
+    "skillAuditor": "Skill Auditor",
+    "atrStandard": "ATR Standard",
     "compliance": "Compliance",
     "integrations": "Integrations",
     "documentation": "Documentation",
@@ -410,7 +412,7 @@
         "subtitle": "Because security shouldn't have walls.",
         "desc": "MIT licensed. Full source code. Zero black boxes. Every line can be audited, verified, improved.",
         "belief": "We believe breaking the security barrier isn't about lowering prices — it's about letting everyone participate.",
-        "proof": "3,017 tests. TypeScript strict mode. MIT license. This is not a side project. This is infrastructure."
+        "proof": "3,583 tests. TypeScript strict mode. MIT license. This is not a side project. This is infrastructure."
       }
     },
     "the3amStory": {
@@ -503,32 +505,38 @@
       }
     },
     "productOverview": {
-      "title": "Eight tools. One install.",
-      "subtitle": "Each works standalone. Together, they're a full security operations center in one curl command.",
+      "title": "Six tools. One flywheel.",
+      "subtitle": "Audit before install, guard around the clock, share threat intel with the community. Each scan makes every node stronger.",
       "products": [
         {
+          "name": "Skill Auditor",
+          "desc": "6-layer pre-install security gate. Catches prompt injection, tool poisoning, and hidden capabilities before any AI skill runs.",
+          "href": "/product/skill-auditor"
+        },
+        {
           "name": "Scan",
-          "desc": "Find vulnerabilities before attackers do. 60-second audit with PDF report."
+          "desc": "60-second security audit. Sigma, YARA, and ATR rules sweep your environment in one pass.",
+          "href": "/product/scan"
         },
         {
           "name": "Guard",
-          "desc": "4 AI agents that detect, analyze, respond, and report — 24/7."
+          "desc": "4-agent AI pipeline — detect, analyze, respond, report — running 24/7 with confidence-based auto-response.",
+          "href": "/product/guard"
         },
         {
-          "name": "Chat",
-          "desc": "Security alerts on Telegram and Slack. Plain language, not log dumps."
+          "name": "MCP Server",
+          "desc": "11 panguard_* tools let Claude Code, Cursor, and other AI assistants run scans and manage Guard in natural language.",
+          "href": "/product/mcp"
         },
         {
-          "name": "Trap",
-          "desc": "8 fake services that lure attackers and profile their techniques. Defense + intel."
-        },
-        {
-          "name": "Report",
-          "desc": "AI compliance reports for Taiwan ISMS, ISO 27001, SOC 2. 60 seconds."
+          "name": "ATR Standard",
+          "desc": "49 open-source rules for AI agent threats. The Sigma equivalent for prompt injection, tool poisoning, and skill compromise.",
+          "href": "/atr"
         },
         {
           "name": "Threat Cloud",
-          "desc": "Collective defense. Auto-generates detection rules from real attacks across all users."
+          "desc": "Collective defense. Every node contributes anonymized signals; the pipeline auto-generates Sigma, YARA, and ATR rules from real attacks.",
+          "href": "/threat-cloud"
         }
       ],
       "learnMore": "Learn more"
@@ -539,12 +547,12 @@
       "stats": {
         "sigmaRules": "Sigma detection rules",
         "yaraRules": "YARA malware rules",
-        "controls": "Compliance controls",
+        "atrRules": "ATR agent threat rules",
         "tests": "Tests passing",
         "layers": "Detection layers",
         "actions": "Response actions",
-        "protocols": "Honeypot protocols",
-        "atrRules": "ATR agent threat rules",
+        "skillChecks": "Skill audit checks",
+        "mcpTools": "MCP tools",
         "mit": "Open source license"
       },
       "githubCta": "Verify on GitHub",
@@ -555,7 +563,7 @@
         },
         "security": {
           "title": "Security First",
-          "desc": "3,017 tests. Strict TypeScript. ESLint security plugin. Credential storage encryption. Sandboxed execution."
+          "desc": "3,583 tests. Strict TypeScript. ESLint security plugin. Credential storage encryption. Sandboxed execution."
         },
         "privacy": {
           "title": "Privacy by Design",
@@ -4967,7 +4975,17 @@
     "notifyMe": "Notify Me",
     "error": "Something went wrong. Please try again.",
     "emailPlaceholder": "you@company.com",
-    "backHome": "Back to Home"
+    "backHome": "Back to Home",
+    "trap": {
+      "title": "Panguard Trap",
+      "subtitle": "Intelligent honeypot system that deploys decoy services to detect, profile, and study attackers. SSH, HTTP, FTP and more.",
+      "followProgress": "Follow development progress on GitHub"
+    },
+    "report": {
+      "title": "Panguard Report",
+      "subtitle": "AI-powered compliance reports for ISO 27001, SOC 2, and Taiwan Cyber Security Act. Auto-generated from your scan findings.",
+      "followProgress": "Follow development progress on GitHub"
+    }
   },
   "cookieBanner": {
     "ariaLabel": "Cookie consent",

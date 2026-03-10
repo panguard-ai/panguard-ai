@@ -21,24 +21,24 @@ const ease = [0.22, 1, 0.36, 1] as const;
 const statIcons = [
   ShieldIcon,
   ScanIcon,
-  CheckIcon,
+  ShieldIcon,
   MonitorIcon,
   ShieldIcon,
   BlockIcon,
+  CheckIcon,
   NetworkIcon,
-  ShieldIcon,
   LockIcon,
 ];
 
 const statKeys = [
   'sigmaRules',
   'yaraRules',
-  'controls',
+  'atrRules',
   'tests',
   'layers',
   'actions',
-  'protocols',
-  'atrRules',
+  'skillChecks',
+  'mcpTools',
   'mit',
 ] as const;
 
@@ -49,12 +49,12 @@ export default function NumbersWall() {
   const statValues: (number | string)[] = [
     ruleStats.sigmaRules,
     ruleStats.yaraRules,
-    STATS.complianceControls,
+    ruleStats.atrRules,
     STATS.testsPassing,
     STATS.detectionLayers,
     STATS.responseActions,
-    STATS.honeypotProtocols,
-    ruleStats.atrRules,
+    STATS.skillAuditChecks,
+    STATS.mcpTools,
     STATS.license,
   ];
 

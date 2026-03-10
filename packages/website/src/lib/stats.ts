@@ -1,17 +1,16 @@
 /**
  * Single source of truth for all marketing statistics.
  *
- * Derived from (verified 2026-03-03):
+ * Derived from (verified 2026-03-11):
  *   config/sigma-rules/       -> 3,754 YAML files (3,110 community + 45 custom + 605 auto-generated)
  *   config/yara-rules/        -> 4,369 rule definitions across 537 files (491 community + 3 custom + 43 auto-generated)
- *   packages/panguard-trap/src/types.ts        -> TrapServiceType union (8 protocols)
- *   packages/panguard-guard/src/types.ts       -> ResponseAction union (6 types)
+ *   packages/panguard-guard/src/types.ts       -> ResponseAction union (11 types)
  *   packages/core/src/ai/funnel-router.ts      -> 3 layers
- *   vitest run (142 test files)                -> 3,017 test cases
- *   packages/panguard/src/cli/index.ts         -> 21 top-level commands (incl. doctor, code)
- *   packages/panguard-report/src/frameworks/   -> 50 controls (ISO:30 + SOC2:10 + TCSA:10)
+ *   vitest run (165 test files)                -> 3,583 test cases
+ *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
- *   packages/panguard-scan/src/scanners/sast-checker.ts -> 16 SAST patterns
+ *   packages/panguard-skill-auditor/src/checks/ -> 6 audit checks
+ *   agent-threat-rules (npm)                   -> 49 ATR rules (v0.2.1)
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -23,25 +22,21 @@ export const STATS = {
   cliVersion: '0.3.1',
   sigmaRules: 3_754,
   yaraRules: 4_369,
-  totalRules: 3_754 + 4_369,
+  atrRules: 49,
+  totalRules: 3_754 + 4_369 + 49,
   falcoConfigs: 1,
   testsPassing: 3_583,
   testFiles: 165,
-  honeypotProtocols: 8,
   detectionLayers: 3,
-  responseActions: 6,
-  complianceControls: 50,
-  cliCommands: 22,
+  responseActions: 11,
+  cliCommands: 23,
   products: 3,
   aiAgents: 4,
   mcpTools: 11,
-  /** Secrets detection patterns (SAST removed, use Semgrep) */
-  sastPatterns: 0,
   playbookTemplates: 3,
   logParsers: 4,
   license: 'MIT' as const,
-  skillAuditChecks: 7,
-  atrRules: 49,
+  skillAuditChecks: 6,
   atrDraftRules: 0,
   /** Threat Intel Pipeline stats (auto-updated by CI every 6 hours) */
   threatIntel: {
@@ -55,29 +50,23 @@ export const STATS = {
     lastSync: '2026-03-08',
     syncInterval: '6h',
   },
-  lastUpdated: '2026-03-08',
+  lastUpdated: '2026-03-11',
 } as const;
 
 export type Stats = typeof STATS;
 
 /** Product maturity label */
-export type MaturityLevel = 'GA' | 'Beta' | 'Roadmap';
+export type MaturityLevel = 'GA' | 'Beta' | 'ComingSoon';
 
 /** Maturity status for each feature / product */
 export const MATURITY: Record<string, MaturityLevel> = {
   scan: 'GA',
   guard: 'GA',
   chat: 'GA',
-  trap: 'GA',
-  report: 'GA',
   threatCloud: 'GA',
   manager: 'GA',
   skillAuditor: 'Beta',
   mcp: 'Beta',
-  sast: 'Beta',
-  soarPlaybooks: 'Beta',
-  logCollectors: 'Beta',
-  anomalyScoring: 'Beta',
-  dashboardRelay: 'Beta',
-  investigationLLM: 'Beta',
+  trap: 'ComingSoon',
+  report: 'ComingSoon',
 };

@@ -4,29 +4,34 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Link } from '@/navigation';
 import {
+  CheckIcon,
   ScanIcon,
   ShieldIcon,
-  ChatIcon,
-  TrapIcon,
-  ReportIcon,
+  TerminalIcon,
+  AnalyticsIcon,
   GlobalIcon,
 } from '@/components/ui/BrandIcons';
 import type { MaturityLevel } from '@/lib/stats';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-const productIcons = [ScanIcon, ShieldIcon, ChatIcon, TrapIcon, ReportIcon, GlobalIcon];
+const productIcons = [CheckIcon, ScanIcon, ShieldIcon, TerminalIcon, AnalyticsIcon, GlobalIcon];
 
-const productMaturity: MaturityLevel[] = ['GA', 'GA', 'GA', 'GA', 'GA', 'GA', 'Beta'];
+const productMaturity: MaturityLevel[] = ['Beta', 'GA', 'GA', 'Beta', 'GA', 'GA'];
+
+const maturityStyles: Record<MaturityLevel, { bg: string; dot: string }> = {
+  GA: { bg: 'bg-green-900/30 text-green-400', dot: 'bg-green-400' },
+  Beta: { bg: 'bg-yellow-900/30 text-yellow-400', dot: 'bg-yellow-400' },
+  ComingSoon: { bg: 'bg-gray-800 text-gray-500', dot: 'bg-gray-500' },
+};
 
 export default function ProductOverview() {
   const t = useTranslations('home.productOverview');
-  const products = t.raw('products') as Array<{ name: string; desc: string }>;
+  const products = t.raw('products') as Array<{ name: string; desc: string; href: string }>;
 
   return (
     <section className="bg-[#0a0a0a] px-5 sm:px-6 py-16 sm:py-24">
       <div className="max-w-[1200px] mx-auto">
-        {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -42,10 +47,11 @@ export default function ProductOverview() {
           </p>
         </motion.div>
 
-        {/* 6 product cards - 2x3 grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {products.map((product, i) => {
             const Icon = productIcons[i];
+            const maturity = productMaturity[i];
+            const style = maturityStyles[maturity];
             const isThreatCloud = i === 5;
             return (
               <motion.div
@@ -60,25 +66,17 @@ export default function ProductOverview() {
                     : 'border-border bg-surface-1/50'
                 }`}
               >
-                <Icon className="w-6 h-6 text-panguard-green mb-3" />
+                {Icon && <Icon className="w-6 h-6 text-panguard-green mb-3" />}
                 <div className="flex items-center justify-between gap-1.5 sm:gap-2">
                   <h3 className="text-base sm:text-lg font-bold text-text-primary">{product.name}</h3>
-                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
-                    productMaturity[i] === 'GA'
-                      ? 'bg-green-900/30 text-green-400'
-                      : productMaturity[i] === 'Beta'
-                      ? 'bg-yellow-900/30 text-yellow-400'
-                      : 'bg-gray-800 text-gray-500'
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${
-                      productMaturity[i] === 'GA' ? 'bg-green-400' : productMaturity[i] === 'Beta' ? 'bg-yellow-400' : 'bg-gray-500'
-                    }`} />
-                    {productMaturity[i]}
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${style.bg}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+                    {maturity === 'ComingSoon' ? 'Soon' : maturity}
                   </span>
                 </div>
                 <p className="text-sm text-gray-400 mt-2 leading-relaxed">{product.desc}</p>
                 <Link
-                  href="#"
+                  href={product.href || '#'}
                   className="text-sm text-panguard-green hover:text-panguard-green-light font-medium mt-3 inline-block transition-colors"
                 >
                   {t('learnMore')} &rarr;

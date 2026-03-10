@@ -53,7 +53,7 @@ function Logo() {
 }
 
 /* ─── Desktop Dropdown ─── */
-type DropdownItem = { label: string; desc: string; href: string };
+type DropdownItem = { label: string; desc: string; href: string; comingSoon?: boolean };
 
 function NavDropdown({ label, items }: { label: string; items: DropdownItem[] }) {
   const [open, setOpen] = useState(false);
@@ -106,11 +106,16 @@ function NavDropdown({ label, items }: { label: string; items: DropdownItem[] })
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col px-4 py-2.5 rounded-lg hover:bg-surface-2 transition-colors group"
+                className={`flex flex-col px-4 py-2.5 rounded-lg hover:bg-surface-2 transition-colors group ${item.comingSoon ? 'opacity-60' : ''}`}
                 onClick={() => setOpen(false)}
               >
-                <span className="text-sm font-semibold text-text-primary group-hover:text-brand-sage transition-colors">
+                <span className="text-sm font-semibold text-text-primary group-hover:text-brand-sage transition-colors flex items-center gap-2">
                   {item.label}
+                  {item.comingSoon && (
+                    <span className="text-[10px] font-medium text-text-muted bg-surface-2 rounded-full px-2 py-0.5">
+                      Coming Soon
+                    </span>
+                  )}
                 </span>
                 <span className="text-xs text-text-muted mt-0.5">{item.desc}</span>
               </Link>
@@ -136,35 +141,13 @@ export default function NavBar() {
 
   const productItems: DropdownItem[] = [
     { label: t('productLinks.overview'), desc: t('productLinks.overviewDesc'), href: '/product' },
+    { label: t('productLinks.skillAuditor'), desc: t('productLinks.skillAuditorDesc'), href: '/product/skill-auditor' },
     { label: t('productLinks.scan'), desc: t('productLinks.scanDesc'), href: '/product/scan' },
     { label: t('productLinks.guard'), desc: t('productLinks.guardDesc'), href: '/product/guard' },
-    { label: t('productLinks.chat'), desc: t('productLinks.chatDesc'), href: '/product/chat' },
-    { label: t('productLinks.trap'), desc: t('productLinks.trapDesc'), href: '/product/trap' },
-    {
-      label: t('productLinks.report'),
-      desc: t('productLinks.reportDesc'),
-      href: '/product/report',
-    },
-    {
-      label: t('productLinks.manager'),
-      desc: t('productLinks.managerDesc'),
-      href: '/product/manager',
-    },
-    {
-      label: t('productLinks.mcp'),
-      desc: t('productLinks.mcpDesc'),
-      href: '/product/mcp',
-    },
-    {
-      label: t('productLinks.skillAuditor'),
-      desc: t('productLinks.skillAuditorDesc'),
-      href: '/product/skill-auditor',
-    },
-    {
-      label: t('productLinks.atrStandard'),
-      desc: t('productLinks.atrStandardDesc'),
-      href: '/atr',
-    },
+    { label: t('productLinks.mcp'), desc: t('productLinks.mcpDesc'), href: '/product/mcp' },
+    { label: t('productLinks.atrStandard'), desc: t('productLinks.atrStandardDesc'), href: '/atr' },
+    { label: t('productLinks.trap'), desc: t('productLinks.trapDesc'), href: '/product/trap', comingSoon: true },
+    { label: t('productLinks.report'), desc: t('productLinks.reportDesc'), href: '/product/report', comingSoon: true },
   ];
 
   const topLinks = [
@@ -265,10 +248,15 @@ export default function NavBar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block py-3 min-h-[44px] text-sm text-text-tertiary hover:text-text-primary"
+                    className={`block py-3 min-h-[44px] text-sm text-text-tertiary hover:text-text-primary ${item.comingSoon ? 'opacity-60' : ''}`}
                     onClick={() => setMobileOpen(false)}
                   >
                     {item.label}
+                    {item.comingSoon && (
+                      <span className="ml-2 text-[10px] font-medium text-text-muted bg-surface-2 rounded-full px-2 py-0.5">
+                        Coming Soon
+                      </span>
+                    )}
                   </Link>
                 ))}
               </div>
