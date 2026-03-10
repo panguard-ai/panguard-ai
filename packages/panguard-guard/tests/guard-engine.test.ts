@@ -151,6 +151,8 @@ vi.mock('../src/agent/index.js', () => ({
     setMode: mockSetModeRespond,
     addBlockedIP: mockAddBlockedIP,
     updateActionPolicy: mockUpdateActionPolicy,
+    setWhitelistManager: vi.fn(),
+    setPlaybookEngine: vi.fn(),
   })),
   ReportAgent: vi.fn().mockImplementation(() => ({
     report: mockReport,

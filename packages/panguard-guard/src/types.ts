@@ -68,7 +68,13 @@ export type ResponseAction =
   | 'block_ip'
   | 'kill_process'
   | 'disable_account'
-  | 'isolate_file';
+  | 'isolate_file'
+  // ATR agent-specific actions / ATR 代理專用動作
+  | 'block_tool'
+  | 'kill_agent'
+  | 'quarantine_session'
+  | 'revoke_skill'
+  | 'reduce_permissions';
 
 /** Threat verdict from Analyze Agent / 分析代理的威脅判決 */
 export interface ThreatVerdict {
@@ -245,7 +251,15 @@ export interface DetectionResult {
     windowMs: number;
   };
   /** ATR (Agent Threat Rules) matches for agent-related events */
-  atrMatches?: Array<{ ruleId: string; category: string; severity: string }>;
+  atrMatches?: Array<{
+    ruleId: string;
+    category: string;
+    severity: string;
+    /** Preserved response actions from ATR rule definition */
+    responseActions?: string[];
+    /** ATR match confidence score (0-1) */
+    confidence?: number;
+  }>;
 }
 
 // ===== Response =====

@@ -8,6 +8,7 @@ import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 const ThreatCards = dynamic(() => import('@/components/home/ThreatCards'));
 const PipelineFlow = dynamic(() => import('@/components/home/PipelineFlow'));
 const UseCases = dynamic(() => import('@/components/home/UseCases'));
+const AutoResponse = dynamic(() => import('@/components/home/AutoResponse'));
 const ProductPillars = dynamic(() => import('@/components/home/ProductPillars'));
 const SkillProtection = dynamic(() => import('@/components/home/SkillProtection'));
 const RealScenarios = dynamic(() => import('@/components/home/RealScenarios'));
@@ -35,6 +36,8 @@ export default function Home() {
           <PipelineFlow />
           {/* 2.5. Use Cases: What you can do after installing */}
           <UseCases />
+          {/* 2.75. Auto Response: Confidence-based response tiers */}
+          <AutoResponse />
           {/* 3. Three pillars: Community Rules / Collective Defense / AI Fallback */}
           <ProductPillars />
           {/* 4. Before/after: With and without Panguard */}

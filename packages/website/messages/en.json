@@ -484,7 +484,7 @@
         },
         "guard": {
           "title": "24/7 Real-Time Guard",
-          "description": "Start the guard daemon and forget about it. Three detection layers monitor every AI agent interaction: ATR rules for AI threats, Sigma rules for system threats, YARA rules for malware. Behavioral fingerprinting catches drift.",
+          "description": "Threats aren't just detected -- they're automatically blocked. ATR rules revoke malicious skills, Sigma rules block IPs and kill processes, YARA rules quarantine malware. Confidence scoring ensures only high-certainty threats get auto-response.",
           "snippetLabel": "CLI or AI Agent",
           "snippet": "panguard guard start\n# or ask your AI agent:\n\"start security protection\""
         },
@@ -622,6 +622,77 @@
       "products": "Products",
       "mcp": "MCP Tools",
       "license": "License"
+    },
+    "autoResponse": {
+      "overline": "Automated Response",
+      "title": "Detect. Decide. Respond. Automatically.",
+      "subtitle": "Three confidence tiers determine the response. High-confidence threats are blocked before they can act.",
+      "tiers": {
+        "auto": {
+          "label": "Auto-Respond",
+          "threshold": ">=85% confidence",
+          "tagline": "Immediate action. No human needed.",
+          "description": "ATR rule matches with high severity and high confidence trigger instant response.",
+          "actions": "Block IP, Kill Process, Quarantine File, Revoke Skill, Kill Agent"
+        },
+        "notify": {
+          "label": "Notify & Wait",
+          "threshold": "50-84% confidence",
+          "tagline": "Evidence collected. Human decides.",
+          "description": "Suspicious patterns that need human judgment before action.",
+          "actions": "Alert with full context, Snapshot evidence, Suggest response"
+        },
+        "log": {
+          "label": "Log Only",
+          "threshold": "<50% confidence",
+          "tagline": "Recorded for investigation.",
+          "description": "Low-confidence signals that build the behavioral baseline.",
+          "actions": "Log event, Enrich with metadata, Available in dashboard"
+        }
+      },
+      "actionsTable": {
+        "title": "Response Actions",
+        "headers": {
+          "action": "Action",
+          "trigger": "Trigger",
+          "description": "What It Does"
+        },
+        "blockIp": {
+          "action": "Block IP",
+          "trigger": "Sigma network rules",
+          "description": "Firewall block + Threat Cloud report"
+        },
+        "killProcess": {
+          "action": "Kill Process",
+          "trigger": "Sigma/Falco process rules",
+          "description": "SIGTERM then SIGKILL with safety checks"
+        },
+        "quarantineFile": {
+          "action": "Quarantine File",
+          "trigger": "YARA malware match",
+          "description": "Isolate to quarantine directory"
+        },
+        "blockTool": {
+          "action": "Block Tool",
+          "trigger": "ATR tool-poisoning rules",
+          "description": "Prevent MCP tool invocation"
+        },
+        "revokeSkill": {
+          "action": "Revoke Skill",
+          "trigger": "ATR skill-compromise rules",
+          "description": "Remove from whitelist, re-audit required"
+        },
+        "killAgent": {
+          "action": "Kill Agent",
+          "trigger": "ATR excessive-autonomy rules",
+          "description": "Terminate runaway agent process"
+        },
+        "reducePermissions": {
+          "action": "Reduce Permissions",
+          "trigger": "ATR privilege-escalation rules",
+          "description": "Restrict to read-only / no-network"
+        }
+      }
     },
     "finalCta": {
       "title": "You deploy. We defend.",
@@ -871,9 +942,9 @@
     },
     "guard": {
       "overline": "Panguard Guard",
-      "title": "24/7 AI endpoint protection.",
+      "title": "Real-Time Threat Response.",
       "titleHighlight": "One command to install.",
-      "subtitle": "The always-on security agent that detects, analyzes, and responds to threats automatically.",
+      "subtitle": "Detects via ATR, Sigma, and YARA rules. Responds automatically based on confidence scoring. Blocks threats before they can act.",
       "dashboard": {
         "allSystemsProtected": "All Systems Protected",
         "lastUpdated": "Last updated: just now",
@@ -906,8 +977,8 @@
           "desc": "Events flow through 5 specialized AI agents: Detect (Sigma/YARA rules + local LLM), Analyze (threat classification), Respond (auto-remediation), Report (compliance documentation), and Chat (Telegram, Slack, email notifications). 90% of events handled at zero cost by rules alone."
         },
         "item2": {
-          "title": "3 Auto-Response Types",
-          "desc": "High-confidence threats are neutralized automatically via three response modules: IP Blocker (firewall rules), Process Killer (malicious process termination), and File Quarantine (suspicious file isolation). Every action is logged and reversible."
+          "title": "Confidence-Based Auto-Response",
+          "desc": "Every detection gets a confidence score. At 85% or above, Guard auto-responds: blocks the threat, kills the process, quarantines the session. Between 50-84%, Guard alerts with full evidence and suggests an action, waiting for human confirmation. Below 50%, the event is logged for investigation. No guesswork -- every response is proportional to certainty."
         },
         "item3": {
           "title": "4 Notification Channels",
@@ -926,16 +997,16 @@
           "desc": "Pre-built adapters for Windows Defender, Syslog, and Wazuh. 7-day learning period builds a behavioral baseline for your system. Supports Linux, macOS, Windows, Docker, and Kubernetes."
         },
         "item7": {
-          "title": "SOAR Playbooks",
-          "desc": "Define automated response strategies in YAML. Three built-in playbooks for brute-force, port-scan, and data-exfiltration. Match correlation patterns, escalate to tickets, and run multi-step response sequences."
+          "title": "8 Response Actions",
+          "desc": "Guard executes 8 distinct response actions: block_ip (firewall rules), kill_process (process tree cleanup), isolate_file (SHA-256 quarantine), block_tool (prevent MCP tool invocation), kill_agent (terminate rogue AI agent), quarantine_session (isolate compromised session), revoke_skill (remove from whitelist), and reduce_permissions (downgrade access). Every action is logged and reversible."
         },
         "item8": {
-          "title": "Log Collectors",
-          "desc": "Ingest security events from syslog (RFC 3164/5424), auth logs, and custom log files. Four built-in parsers with automatic format detection. Feed events directly into the detection pipeline."
+          "title": "Rate Limiting and Safety Rails",
+          "desc": "Guard enforces rate limits on response actions to prevent cascade failures: kill_agent capped at 3/min, block_tool at 10/min. Safety rails prevent runaway automation. Every response action includes an auto-unblock timer and rollback capability, so aggressive protection never permanently locks out legitimate operations."
         },
         "item9": {
-          "title": "Anomaly Scoring",
-          "desc": "Welford's online algorithm builds statistical baselines for every metric. Z-score deviation detection identifies anomalies without manual threshold tuning. Adapts continuously to your environment."
+          "title": "ATR/Sigma/YARA Unified Pipeline",
+          "desc": "All three rule engines run simultaneously in a single pipeline: 49 ATR rules for AI agent threats (prompt injection, tool poisoning, skill supply-chain attacks), 3,754 Sigma rules for system threats, and 4,369 YARA rules for malware. Sub-millisecond evaluation per event. One pipeline, full-stack protection."
         },
         "item10": {
           "title": "Investigation Engine",
@@ -4128,8 +4199,8 @@
       "layer5": {
         "badge": "Layer 5",
         "name": "Automated Response",
-        "desc": "6 response actions: block IP, kill process, quarantine file, alert, snapshot evidence, escalate.",
-        "detail": "Confidence > 90%: automatic. 70-90%: asks you first. < 70%: notifies only."
+        "desc": "8 response actions: block_ip, kill_process, isolate_file, block_tool, kill_agent, quarantine_session, revoke_skill, reduce_permissions. ATR-specific actions for AI agent threats.",
+        "detail": "Confidence >= 85%: automatic. 50-84%: alerts with evidence, suggests action. < 50%: logs for investigation. Rate limited: kill_agent 3/min, block_tool 10/min."
       }
     },
     "aiFunnel": {
@@ -4182,8 +4253,8 @@
     },
     "response": {
       "overline": "AUTOMATED RESPONSE",
-      "title": "Six actions. Three confidence levels.",
-      "subtitle": "Panguard doesn't just detect. It acts.",
+      "title": "Eight actions. Three confidence levels.",
+      "subtitle": "Panguard doesn't just detect. It acts -- with ATR-specific response actions for AI agent threats.",
       "actions": [
         {
           "name": "Block IP",
@@ -4194,34 +4265,42 @@
           "desc": "SIGTERM then SIGKILL with process tree cleanup"
         },
         {
-          "name": "Quarantine File",
-          "desc": "Isolate with SHA-256 hash and restore capability"
+          "name": "Isolate File",
+          "desc": "SHA-256 hash quarantine with restore capability"
         },
         {
-          "name": "Alert",
-          "desc": "Send to your channels in plain language"
+          "name": "Block Tool",
+          "desc": "Prevent MCP tool invocation (rate limit: 10/min)"
         },
         {
-          "name": "Snapshot Evidence",
-          "desc": "Forensic capture of the event context"
+          "name": "Kill Agent",
+          "desc": "Terminate rogue AI agent session (rate limit: 3/min)"
         },
         {
-          "name": "Escalate",
-          "desc": "Notify team lead or external SOC"
+          "name": "Quarantine Session",
+          "desc": "Isolate compromised AI agent session from other resources"
+        },
+        {
+          "name": "Revoke Skill",
+          "desc": "Remove skill from whitelist and block future invocations"
+        },
+        {
+          "name": "Reduce Permissions",
+          "desc": "Downgrade agent access level to minimum privileges"
         }
       ],
       "confidence": {
         "high": {
-          "threshold": "> 90%",
+          "threshold": ">= 85%",
           "action": "Automatic execution"
         },
         "medium": {
-          "threshold": "70 - 90%",
-          "action": "Asks you first via Chat"
+          "threshold": "50 - 84%",
+          "action": "Alerts with evidence, suggests action"
         },
         "low": {
-          "threshold": "< 70%",
-          "action": "Notifies only"
+          "threshold": "< 50%",
+          "action": "Logs for investigation"
         }
       }
     },
@@ -5653,7 +5732,7 @@
       },
       "q2": {
         "q": "What if a skill passes audit but turns malicious later?",
-        "a": "Guard monitors every whitelisted skill continuously using three detection layers:\n\n1. Rule matching (sub-millisecond) -- 49 ATR rules for AI threats, 3,754 Sigma rules for system threats, 4,369 YARA rules for malware. If the skill's behavior matches any rule, it's flagged instantly.\n\n2. Fingerprint drift -- Skill Auditor records what the skill is supposed to do. Guard compares live behavior against that fingerprint. A code-review tool that suddenly starts making network calls to unknown endpoints? Caught the moment it deviates.\n\n3. LLM deep analysis -- For novel patterns that rules and fingerprinting miss, the AI analyzer examines behavior semantically. Its verdict is automatically distilled into a new ATR rule so the same attack is caught by rules alone next time.\n\nEven a patient attacker who waits 50 invocations before acting gets caught the moment they do something outside their fingerprint."
+        "a": "Guard monitors every whitelisted skill continuously using three detection layers -- and when it detects drift, it doesn't just alert. It auto-responds.\n\n1. Rule matching (sub-millisecond) -- 49 ATR rules for AI threats, 3,754 Sigma rules for system threats, 4,369 YARA rules for malware. If the skill's behavior matches any rule, it's flagged instantly.\n\n2. Fingerprint drift -- Skill Auditor records what the skill is supposed to do. Guard compares live behavior against that fingerprint. A code-review tool that suddenly starts making network calls to unknown endpoints? Caught the moment it deviates.\n\n3. LLM deep analysis -- For novel patterns that rules and fingerprinting miss, the AI analyzer examines behavior semantically. Its verdict is automatically distilled into a new ATR rule so the same attack is caught by rules alone next time.\n\nWhen a threat is confirmed, Guard's confidence-based response kicks in:\n- Confidence >= 85%: automatic response -- revoke skill from whitelist, block tool invocation, quarantine session. No human delay.\n- Confidence 50-84%: alert with full evidence, suggest specific action (e.g., revoke_skill or kill_agent), wait for human confirmation.\n- Below 50%: log for investigation with all context preserved.\n\nEven a patient attacker who waits 50 invocations before acting gets caught the moment they do something outside their fingerprint -- and Guard responds in proportion to its certainty."
       },
       "q3": {
         "q": "What are ATR, Sigma, and YARA rules? Why three types?",
@@ -5668,7 +5747,7 @@
       "title": "Detection & Rules",
       "q1": {
         "q": "How does the flywheel work?",
-        "a": "The Panguard flywheel turns every user's discovery into everyone's defense:\n\nStep 1: You audit a skill with Skill Auditor. It checks against existing ATR rules and the whitelist.\n\nStep 2: If a new threat is found -- either by rules, fingerprint drift, or LLM analysis -- the anonymized threat pattern is reported to Threat Cloud.\n\nStep 3: Community members vote on the report. LLM review validates the pattern. If confirmed, a new ATR rule is generated and enters the experimental pipeline (7 days alert-only).\n\nStep 4: The new rule is distributed to all Guard instances. Next time anyone audits a skill with that same attack pattern, it's caught instantly by rules -- no AI needed.\n\nEvery cycle makes the next audit stronger. More users = more discoveries = more rules = better protection for everyone."
+        "a": "The Panguard flywheel turns every user's discovery into everyone's defense:\n\nStep 1: You audit a skill with Skill Auditor. It checks against existing ATR rules and the whitelist.\n\nStep 2: If a new threat is found -- either by rules, fingerprint drift, or LLM analysis -- the anonymized threat pattern is reported to Threat Cloud.\n\nStep 3: Community members vote on the report. LLM review validates the pattern. If confirmed, a new ATR rule is generated and enters the experimental pipeline (7 days alert-only).\n\nStep 4: The new rule is distributed to all Guard instances. Next time anyone audits a skill with that same attack pattern, it's caught instantly by rules -- no AI needed.\n\nStep 5: When those rules trigger in Guard, the confidence-based response system automatically blocks, quarantines, or escalates -- completing the defense loop. A threat discovered on one machine is detected and auto-responded to on every machine running Guard.\n\nEvery cycle makes the next audit stronger. More users = more discoveries = more rules = better protection for everyone. The flywheel doesn't stop at detection -- it closes the loop with automated response."
       },
       "q2": {
         "q": "How do rules get updated?",
