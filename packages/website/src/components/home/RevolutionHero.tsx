@@ -140,7 +140,7 @@ export default function RevolutionHero() {
             {t('viewATR')}
           </a>
           <Link
-            href="/docs/getting-started"
+            href="/docs/installation"
             className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-6 sm:px-8 py-3.5 text-sm sm:text-base hover:bg-panguard-green-light transition-all duration-200 active:scale-[0.98]"
           >
             {t('install')} <ArrowRight className="w-4 h-4" />

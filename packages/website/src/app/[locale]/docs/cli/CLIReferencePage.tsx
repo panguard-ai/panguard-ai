@@ -259,7 +259,7 @@ export default function CLIReferencePage() {
                 {t('cli.contactSupport')}
               </Link>
               <Link
-                href="/docs/getting-started"
+                href="/docs/installation"
                 className="border border-border text-text-secondary rounded-full px-6 py-2.5 text-sm font-medium hover:text-text-primary hover:border-text-muted transition-colors"
               >
                 {t('cli.gettingStarted')}

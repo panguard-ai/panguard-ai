@@ -158,7 +158,7 @@ export default function AdvancedSetupContent() {
           <FadeInUp>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/docs/getting-started"
+                href="/docs/installation"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('backToGettingStarted')}

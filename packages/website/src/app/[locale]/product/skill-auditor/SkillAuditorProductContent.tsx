@@ -141,7 +141,7 @@ export default function SkillAuditorProductContent() {
           <FadeInUp delay={0.15}>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
               <Link
-                href="/docs/getting-started"
+                href="/docs/installation"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-brand-sage text-surface-0 font-semibold text-sm hover:opacity-90 transition-opacity"
               >
                 {t('cta1')} <ChevronRight className="w-4 h-4" />
@@ -633,7 +633,7 @@ Run with --json for machine-readable output.`}
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
               <Link
-                href="/docs/getting-started"
+                href="/docs/installation"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-brand-sage text-surface-0 font-semibold text-sm hover:opacity-90 transition-opacity"
               >
                 {t('cta.cta1')} <ChevronRight className="w-4 h-4" />

@@ -36,7 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/blog',
     '/docs',
     '/docs/api',
-    '/docs/getting-started',
+    '/docs/installation',
     '/docs/deployment',
     '/docs/advanced-setup',
     '/docs/skill-auditor',

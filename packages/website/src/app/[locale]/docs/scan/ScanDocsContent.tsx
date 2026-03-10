@@ -470,7 +470,7 @@ SUMMARY: 1 critical, 1 high, 1 medium, 1 low`}
             <CodeBlock code="curl -fsSL https://panguard.ai/api/install | bash && panguard scan" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">
               <Link
-                href="/docs/getting-started"
+                href="/docs/installation"
                 className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-6 py-2.5 text-sm hover:bg-panguard-green-light transition-all"
               >
                 Getting Started Guide
