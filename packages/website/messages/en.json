@@ -472,46 +472,35 @@
       "stillSleeping": "You're still sleeping."
     },
     "useCases": {
-      "overline": "Use Cases",
-      "title": "Real scenarios. Real results.",
-      "scenarios": [
-        {
-          "type": "Vibe Coder",
-          "detail": "8 servers, one person",
-          "pain": "Used to SSH into each server every morning to check logs.",
-          "result": "Panguard monitors all 8. Caught a cryptominer in 4 minutes. He was asleep.",
-          "products": "GUARD + TRAP + CHAT",
-          "cost": "Free",
-          "saved": "15 hours/week recovered"
+      "overline": "How to Use",
+      "title": "What you can do after installing Panguard",
+      "subtitle": "Four core workflows that protect your AI agents from day one.",
+      "cards": {
+        "audit": {
+          "title": "Audit Before You Install",
+          "description": "Before installing any MCP skill or AI plugin, run it through Panguard's Skill Auditor. Detects prompt injection, tool poisoning, hidden payloads, and excessive permissions in seconds.",
+          "snippetLabel": "CLI or AI Agent",
+          "snippet": "panguard audit skill ./my-skill\n# or ask your AI agent:\n\"audit this skill for security issues\""
         },
-        {
-          "type": "SaaS Startup",
-          "detail": "12 employees",
-          "pain": "Enterprise client sent a 200-question security questionnaire. Team panicked.",
-          "result": "Ran Panguard Scan. Sent back a 40-page ISO 27001 report. Signed the deal that week.",
-          "products": "SCAN + REPORT",
-          "cost": "Free",
-          "saved": "Closed $180K ARR deal"
+        "guard": {
+          "title": "24/7 Real-Time Guard",
+          "description": "Start the guard daemon and forget about it. Three detection layers monitor every AI agent interaction: ATR rules for AI threats, Sigma rules for system threats, YARA rules for malware. Behavioral fingerprinting catches drift.",
+          "snippetLabel": "CLI or AI Agent",
+          "snippet": "panguard guard start\n# or ask your AI agent:\n\"start security protection\""
         },
-        {
-          "type": "Taiwan SMB",
-          "detail": "30 employees, government bid",
-          "pain": "Needed ISMS compliance. Consultants quoted $10,000 and 3 months.",
-          "result": "Panguard Report: free, 60 seconds, 50 controls mapped.",
-          "products": "REPORT (ISMS)",
-          "cost": "Free",
-          "saved": "Saved $10,000 and 3 months"
+        "community": {
+          "title": "Community Threat Intelligence",
+          "description": "Every threat your Panguard detects strengthens the entire network. Anonymized patterns flow to Threat Cloud, undergo community review and LLM analysis, and become new detection rules distributed to all users.",
+          "snippetLabel": "How it works",
+          "snippet": "Your detection → Threat Cloud → Community vote\n→ New rule → Everyone protected"
         },
-        {
-          "type": "E-Commerce",
-          "detail": "Solo founder",
-          "pain": "No idea how to answer \"Is your site secure?\"",
-          "result": "Guard caught SSH brute-force at 2 AM. Blocked 3 IPs. Notified on Telegram. Read it over breakfast.",
-          "products": "GUARD + CHAT",
-          "cost": "Free",
-          "saved": "Zero downtime since install"
+        "agent": {
+          "title": "AI Agent as Security Analyst",
+          "description": "After panguard setup, your AI agent (Claude Code, Cursor, etc.) gains 11 security tools via MCP. Ask naturally: 'scan my system', 'audit this skill', 'show me alerts', 'block that IP'.",
+          "snippetLabel": "Works with",
+          "snippet": "Claude Code, Claude Desktop, Cursor,\nOpenClaw, Codex, Workbuddy, NemoClaw"
         }
-      ]
+      }
     },
     "productOverview": {
       "title": "Eight tools. One install.",
@@ -5659,84 +5648,84 @@
     "security": {
       "title": "Security & Detection",
       "q1": {
-        "q": "If a skill passes inspection during install but turns malicious later, can Panguard catch it?",
-        "a": "Yes. Panguard uses three independent detection layers for exactly this scenario:\n\n1. Behavioral Fingerprinting -- During the first interactions, Panguard builds a profile of what each skill normally does: which APIs it calls, which network targets it contacts, which files it accesses. Once that fingerprint stabilizes, any deviation triggers an alert. A weather tool that suddenly reads your API keys? Caught.\n\n2. ATR Pattern Rules -- 32+ built-in rules specifically designed for AI agent threats, including post-install attacks like description-behavior mismatch (skill says it's read-only but starts writing files) and skill update attacks (permissions quietly expand after an update).\n\n3. LLM Deep Analysis -- For completely new attack patterns that bypass rules and fingerprinting, the AI analyzer examines the behavior semantically. If it detects malicious intent, that analysis is automatically distilled into a new rule so the same pattern is caught instantly next time -- no AI needed.\n\nBottom line: even a patient attacker who waits 50 invocations before acting will be caught the moment they do something their fingerprint doesn't include."
+        "q": "I install an MCP skill or plugin -- how does Panguard protect me?",
+        "a": "Skill Auditor is your first line of defense. Before any skill runs on your system, Skill Auditor scans it against 49 ATR rules purpose-built for AI agent threats -- prompt injection, tool poisoning, hidden payloads, permission overreach.\n\nIf the skill passes, it gets added to your local whitelist with a behavioral fingerprint. If anything looks suspicious -- say, a weather tool that requests file-system write access -- Skill Auditor flags it with the specific ATR rule that triggered (e.g., ATR-2026-005 for multi-turn injection patterns) and blocks installation until you explicitly approve.\n\nThe whitelist isn't just a pass/fail list. It records the skill's declared capabilities, so Guard can later detect if behavior drifts from what was approved."
       },
       "q2": {
-        "q": "How is this different from a regular antivirus?",
-        "a": "Traditional antivirus scans files for known malware signatures. Panguard operates at a completely different level -- it monitors the behavior of AI agents in real-time.\n\nAI agents face unique threats that antivirus can't see: prompt injection, tool poisoning, context exfiltration, privilege escalation through skill chains. These aren't files on disk -- they're patterns in how AI tools communicate.\n\nPanguard uses ATR (Agent Threat Rules), a purpose-built detection language for AI threats. Think of it as Sigma rules, but designed specifically for AI agent attack surfaces."
+        "q": "What if a skill passes audit but turns malicious later?",
+        "a": "Guard monitors every whitelisted skill continuously using three detection layers:\n\n1. Rule matching (sub-millisecond) -- 49 ATR rules for AI threats, 3,754 Sigma rules for system threats, 4,369 YARA rules for malware. If the skill's behavior matches any rule, it's flagged instantly.\n\n2. Fingerprint drift -- Skill Auditor records what the skill is supposed to do. Guard compares live behavior against that fingerprint. A code-review tool that suddenly starts making network calls to unknown endpoints? Caught the moment it deviates.\n\n3. LLM deep analysis -- For novel patterns that rules and fingerprinting miss, the AI analyzer examines behavior semantically. Its verdict is automatically distilled into a new ATR rule so the same attack is caught by rules alone next time.\n\nEven a patient attacker who waits 50 invocations before acting gets caught the moment they do something outside their fingerprint."
       },
       "q3": {
-        "q": "What happens when a new type of attack appears that no rule covers?",
-        "a": "This is where the three-layer defense really shines:\n\nFirst encounter: The LLM analyzer performs a deep semantic analysis and flags the threat. This costs one AI call.\n\nAutomatic distillation: That AI verdict is immediately converted into a lightweight detection rule (Sigma or ATR format). The rule is injected into the local rule engine -- so the exact same attack pattern is caught instantly on the second attempt, with zero AI cost.\n\nCommunity distribution: If multiple Panguard users independently detect the same pattern, it enters the community consensus process. Once enough independent nodes agree, the rule is distributed to every Panguard user worldwide.\n\nResult: One user encounters the attack, everyone gets protected. First time costs an AI call. Every time after is free."
+        "q": "What are ATR, Sigma, and YARA rules? Why three types?",
+        "a": "Each rule type covers a different attack surface:\n\nATR (Agent Threat Rules) -- 49 rules across 9 threat categories, built specifically for AI agent attacks: prompt injection, tool poisoning, context exfiltration, cross-agent privilege escalation. This is the layer no other tool provides.\n\nSigma -- 3,754 rules for system and log-level threats: SSH brute force, process injection, suspicious network connections, SQL injection patterns, XSS attempts, remote code execution.\n\nYARA -- 4,369 rules for file and malware threats: known malware signatures, suspicious binaries, packed executables.\n\nThreat Cloud aggregates all three rule types from the community. Guard runs all three simultaneously. You get full-stack protection -- from traditional infrastructure attacks to AI-specific threats -- in a single tool."
       },
       "q4": {
-        "q": "Can attackers bypass Panguard by moving slowly?",
-        "a": "Slow attacks are harder to detect, but Panguard has specific defenses:\n\nBehavioral fingerprinting tracks capability, not speed. It doesn't matter if a skill waits 1 second or 1 week before trying something new -- the moment it accesses a resource outside its established fingerprint, an alert fires.\n\nMulti-turn injection detection (ATR-2026-005) specifically tracks conversation patterns across turns, catching attackers who build context gradually before injecting malicious instructions.\n\nSession-level behavioral metrics track aggregated patterns within a session window, flagging subtle frequency changes that individual events wouldn't catch.\n\nThat said, we're transparent: an attacker who spends 20 turns building rapport before a subtle single-turn attack is the hardest scenario. This is on our v0.3 roadmap with LLM-as-judge, where the AI periodically audits entire conversation histories."
+        "q": "Can Panguard handle basic attacks too, not just AI threats?",
+        "a": "Yes. Panguard is not AI-only security. The three rule engines cover the full threat spectrum.\n\nSigma rules handle traditional infrastructure attacks: SQL injection patterns in logs, XSS payloads, remote code execution attempts, SSH brute force, privilege escalation on the OS level. These are the same community-maintained Sigma rules used by enterprise SOCs worldwide -- 3,754 of them.\n\nYARA rules catch malware: known signatures, suspicious file patterns, packed executables. 4,369 rules from the YARA community.\n\nATR rules add the AI-specific layer on top: prompt injection, tool poisoning, skill supply-chain attacks. 49 rules covering 9 threat categories.\n\nAll three run in Guard simultaneously. You don't need separate tools for traditional and AI security."
       }
     },
     "detection": {
       "title": "Detection & Rules",
       "q1": {
-        "q": "What are ATR rules and why are they needed?",
-        "a": "ATR (Agent Threat Rules) is an open standard we created for detecting AI-specific threats. Just like Sigma rules detect system intrusions and YARA rules detect malware, ATR rules detect attacks targeting AI agents.\n\nExamples: prompt injection attempts, tool output containing hidden instructions, skills requesting permissions beyond their scope, cross-agent privilege escalation.\n\nPanguard ships with 32+ battle-tested ATR rules covering 9 threat categories. They're YAML-based, human-readable, and open source -- anyone can write new ones."
+        "q": "How does the flywheel work?",
+        "a": "The Panguard flywheel turns every user's discovery into everyone's defense:\n\nStep 1: You audit a skill with Skill Auditor. It checks against existing ATR rules and the whitelist.\n\nStep 2: If a new threat is found -- either by rules, fingerprint drift, or LLM analysis -- the anonymized threat pattern is reported to Threat Cloud.\n\nStep 3: Community members vote on the report. LLM review validates the pattern. If confirmed, a new ATR rule is generated and enters the experimental pipeline (7 days alert-only).\n\nStep 4: The new rule is distributed to all Guard instances. Next time anyone audits a skill with that same attack pattern, it's caught instantly by rules -- no AI needed.\n\nEvery cycle makes the next audit stronger. More users = more discoveries = more rules = better protection for everyone."
       },
       "q2": {
-        "q": "If rules already catch known threats, why does Panguard also use AI?",
-        "a": "Rules are fast and cheap but only catch known patterns. AI is slow and expensive but catches novel attacks.\n\nPanguard's key insight: use AI the first time, then convert that knowledge into a rule so you never need AI for the same pattern again.\n\nThe Knowledge Distillation pipeline: AI analyzes a new threat -> verdict is auto-converted into a Sigma/ATR rule -> rule is injected into the engine -> same attack pattern caught by rules from now on.\n\nThis means your AI costs decrease over time as more patterns get distilled into rules. A mature Panguard deployment eventually catches most threats through rules alone."
+        "q": "How do rules get updated?",
+        "a": "Guard syncs with Threat Cloud every hour, automatically pulling new Sigma, ATR, and YARA rules. No manual action needed.\n\nLocally distilled rules -- generated when your LLM analyzes a novel threat -- take effect immediately on your machine.\n\nCommunity-contributed rules go through a staged pipeline: peer review by other Panguard users, then experimental stage (alert-only for 7 days, no blocking), then stable (can auto-block). A rule needs confirmation from at least 3 independent Panguard nodes before promotion.\n\nYou can check your current rule counts anytime with `panguard rules status`."
       },
       "q3": {
-        "q": "How do rules get updated? Do I need to do anything?",
-        "a": "Rules update automatically. No action needed.\n\nPanguard Guard syncs with Threat Cloud every hour, pulling new rules (Sigma, ATR, YARA) and IP blocklists. Locally distilled rules from your own AI analysis take effect immediately.\n\nCommunity-sourced rules go through a safety pipeline: draft -> peer review -> experimental (alert-only for 7 days) -> stable (can block). A rule must be confirmed by at least 3 independent Panguard nodes with a combined trust score before it's promoted.\n\nYou can also write custom rules and contribute them back to the community."
+        "q": "What if a rule causes false positives?",
+        "a": "Panguard uses confidence-tiered actions to minimize impact:\n\nLow confidence: log only. You can review later.\nMedium confidence: alert + evidence snapshot. No blocking.\nHigh confidence: auto-block + alert + detailed report.\n\nCommunity feedback loop handles systemic issues: if a rule's false positive rate exceeds 20%, it's automatically deprecated across all users. Rules in the experimental stage that show high false positive rates never get promoted to stable.\n\nLocally, you can adjust confidence thresholds or disable specific rules in your config. Your overrides are preserved across rule updates."
       },
       "q4": {
-        "q": "What if a rule causes false positives?",
-        "a": "Every detection in Panguard includes a confidence score. Actions are tiered:\n\nLow confidence: log only (you can review later)\nMedium confidence: alert + snapshot (evidence captured, no blocking)\nHigh confidence: auto-respond (block + alert + detailed report)\n\nIf a community rule causes false positives, users report it through the feedback system. Rules with a false positive rate above 20% are automatically deprecated. Rules in the experimental stage that show >5% false positives never get promoted to stable.\n\nYou can also adjust thresholds or disable specific rules in your local config."
+        "q": "Can I write my own rules?",
+        "a": "Yes. ATR rules are YAML-based and human-readable. Use `atr scaffold` to generate a template with the correct structure -- metadata, detection logic, MITRE mapping, and response actions.\n\nWrite your rule, test it locally with `panguard rules test`, then submit it to Threat Cloud for community review. Accepted rules are distributed to all Panguard users and protect every system running Guard.\n\nThis is the highest-impact way to contribute. Every new ATR rule strengthens the flywheel for the entire community."
       }
     },
     "privacy": {
       "title": "Privacy & Data",
       "q1": {
-        "q": "What data does Panguard send to the cloud?",
-        "a": "Only anonymized threat intelligence. Never your files, code, conversations, or personal data.\n\nWhen a threat is detected, Panguard strips all identifying information and sends only the attack pattern: category, MITRE technique ID, severity, and a hashed fingerprint. No IP addresses, no usernames, no file contents.\n\nYou can inspect exactly what gets uploaded by enabling --show-upload-data in the CLI. You can also disable cloud telemetry entirely -- Panguard works fully offline."
+        "q": "What data leaves my machine?",
+        "a": "Only anonymized threat patterns: category, MITRE technique ID, severity, and a hashed fingerprint. Never files, code, conversations, or personal data. No IP addresses, no usernames, no file contents.\n\nYou can inspect exactly what gets uploaded with the --show-upload-data flag. You can also disable cloud sync entirely -- Panguard works fully offline with local rules only.\n\nThreat Cloud participation is opt-in. Even with it enabled, the data is stripped of all identifying information before it leaves your machine."
       },
       "q2": {
-        "q": "Does the AI analysis send my data to OpenAI/Anthropic?",
-        "a": "Only if you configure it to. Panguard supports three LLM modes:\n\n1. Ollama (local) -- Runs entirely on your machine. No data leaves your device. This is the default fallback.\n2. Your own API key -- You control which provider (Anthropic, OpenAI) and what data is sent. The LLM only sees the specific event being analyzed, not your entire system.\n3. No AI -- Panguard works perfectly fine with rules-only mode. AI enhances detection but isn't required.\n\nThe encrypted LLM config (~/.panguard/llm.enc) is stored locally, encrypted with your machine's identity. It never leaves your device."
+        "q": "Does AI analysis send my data to third parties?",
+        "a": "Only if you explicitly configure it. Panguard supports three LLM modes:\n\n1. Rules-only (default) -- No AI, no external calls. Guard runs ATR, Sigma, and YARA rules locally. This is the default mode and provides strong protection without any data leaving your device.\n\n2. Ollama (local AI) -- Runs entirely on your machine. AI-enhanced analysis with zero external data transfer.\n\n3. Your own API key -- You choose the provider (Anthropic, OpenAI, etc.) and control what gets sent. The LLM only sees the specific event being analyzed, not your files or conversations.\n\nThe encrypted LLM config (~/.panguard/llm.enc) is stored locally, encrypted with your machine's identity. It never leaves your device."
       },
       "q3": {
-        "q": "Is Panguard open source? Can I audit the code?",
-        "a": "Yes. Panguard is 100% open source under the MIT license. Every line of code, every ATR rule, every detection algorithm is publicly auditable on GitHub.\n\nThere is no separate closed-source \"enterprise edition\" with hidden features. What you see in the repo is what runs on your machine.\n\nWe believe security tools must be transparent. If you can't verify what your security software does, it's not really protecting you."
+        "q": "Is it open source? Can I audit the code?",
+        "a": "100% open source, MIT license. Every line of code, every ATR rule, every detection algorithm is publicly auditable on GitHub.\n\nThere is no hidden enterprise edition. No closed-source components. No telemetry you can't inspect. What you see in the repo is exactly what runs on your machine.\n\nWe believe security tools must be transparent. If you can't verify what your security software does, it's not really protecting you."
       }
     },
     "deployment": {
       "title": "Installation & Setup",
       "q1": {
-        "q": "How hard is it to set up?",
-        "a": "One command:\n\nnpx panguard scan     # Quick security audit (no install)\nnpx panguard guard    # Full 24/7 protection\n\nNo configuration files, no accounts, no API keys required. Panguard auto-detects your environment, enters a learning phase to understand normal behavior, then transitions to protection mode.\n\nIf you have an LLM API key (Anthropic, OpenAI, or local Ollama), AI-enhanced analysis activates automatically. If not, rules-only mode provides solid baseline protection."
+        "q": "How do I get started?",
+        "a": "One command:\n\nnpm install -g @panguard-ai/panguard && panguard setup\n\nSetup auto-detects Claude Code, Cursor, and 5 other AI platforms. It injects MCP config so your AI agent can call Panguard tools via natural language -- \"audit this skill\", \"scan my system\", \"what threats were blocked today\".\n\nNo accounts, no API keys required. Rules-only mode works out of the box. Add an LLM key later if you want AI-enhanced analysis."
       },
       "q2": {
-        "q": "Does it slow down my system?",
-        "a": "Minimal impact. Panguard is designed for always-on monitoring:\n\nRule evaluation is sub-millisecond per event (regex/pattern matching, no AI involved for known threats).\nAI analysis only triggers for events that rules can't classify -- typically less than 1% of all events.\nMemory footprint stays under 100MB for most deployments.\nBackground operation with configurable polling intervals.\n\nPanguard also has a SmartRouter that assesses event complexity and skips AI entirely for high-confidence rule matches, reducing unnecessary compute."
+        "q": "What can I do after installing?",
+        "a": "Four main use cases:\n\n(a) Audit any MCP skill before installing -- say \"audit this skill\" to your AI agent, or run `panguard audit skill <path>` directly. Skill Auditor checks it against 49 ATR rules and the community whitelist.\n\n(b) Scan your system -- `panguard scan` runs all three rule engines (ATR, Sigma, YARA) across your environment.\n\n(c) Start 24/7 guard -- `panguard guard start` launches the daemon. Continuous monitoring with sub-millisecond rule evaluation.\n\n(d) Your AI agent becomes security-aware -- after setup, your AI agent can scan, audit, and check threats through natural conversation. It calls Panguard tools as MCP skills.\n\nCompliance Report and Honeypot Trap are coming soon."
       },
       "q3": {
-        "q": "Can I use Panguard in production?",
-        "a": "Yes. Panguard is designed for production use:\n\nGraceful degradation -- if any component fails (LLM unavailable, Threat Cloud unreachable, feed timeout), other layers continue working independently.\nOffline mode -- local rules and cached threat data work without any network connectivity.\nDaemon mode -- PID file, watchdog restart, persistent baseline across reboots.\n\nThe MIT license explicitly allows commercial and production use."
+        "q": "Does it slow down my system?",
+        "a": "Negligible impact. Rule evaluation is sub-millisecond per event -- pure pattern matching, no AI involved for known threats.\n\nAI analysis only triggers for events that all three rule engines can't classify, which is typically less than 1% of all events. Memory footprint stays under 100MB.\n\nGuard runs as a daemon with watchdog restart. It's designed for always-on operation without noticeable performance cost."
       }
     },
     "general": {
       "title": "General",
       "q1": {
-        "q": "Is Panguard really free?",
-        "a": "Yes. 100% free, open source, MIT licensed. No paid tiers, no feature gating, no usage limits.\n\nAll features -- Guard, Scan, Chat, Trap, Report, Threat Cloud, ATR rules, Skill Auditor -- are available to everyone. No credit card, no signup.\n\nWe sustain through community contributions, sponsorships, and enterprise consulting partnerships."
+        "q": "Is it really free?",
+        "a": "Yes. 100% free, open source, MIT license. No paid tiers, no feature gating, no usage limits.\n\nScan, Guard, Skill Auditor, Threat Cloud, all 49 ATR rules, 3,754 Sigma rules, 4,369 YARA rules -- all free, all open source.\n\nCompliance Report and Honeypot Trap are coming soon and will also be free.\n\nNo credit card, no signup, no \"contact sales for pricing.\""
       },
       "q2": {
-        "q": "Who builds Panguard?",
-        "a": "Panguard is built in Taiwan by a team that believes AI agent security should be a public good, not a premium feature.\n\nOur thesis: as AI agents become more autonomous, the security tools protecting them must be open, transparent, and collectively maintained -- like the immune system of the AI ecosystem."
+        "q": "Who builds this?",
+        "a": "Built in Taiwan by a team that believes AI agent security should be a public good, not a premium feature.\n\nOur thesis: the flywheel model -- where every user's threat discovery strengthens every other user's defense -- only works if the tool is open and free. Paid tiers would fragment the community and weaken collective protection.\n\nAI agents are becoming the primary interface between humans and computing. The security layer for that interface must be community-owned."
       },
       "q3": {
         "q": "How can I contribute?",
-        "a": "Many ways:\n\nWrite ATR rules -- Every new rule protects all Panguard users. This is the highest-impact contribution.\nReport threats -- When Panguard detects something new on your system, the anonymized pattern automatically strengthens community defense.\nCode contributions -- Bug fixes, new features, performance improvements.\nTranslations -- Help make Panguard accessible in more languages.\nFeedback -- Report false positives, suggest improvements, share your use case.\n\nVisit our GitHub repository to get started."
+        "a": "Write ATR rules -- This is the highest-impact contribution. Every new rule protects all Panguard users. Use `atr scaffold` to get started.\n\nReport threats -- Automatic via Guard. When a new threat is detected on your system, the anonymized pattern strengthens community defense through the flywheel.\n\nCode contributions -- Bug fixes, new features, performance improvements. Check our GitHub issues for good first issues.\n\nTranslations and feedback -- Help make Panguard accessible in more languages, report false positives, suggest improvements.\n\nVisit our GitHub repository to get started."
       }
     },
     "cta": {

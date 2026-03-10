@@ -7,6 +7,7 @@ import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 // Below-the-fold sections loaded lazily
 const ThreatCards = dynamic(() => import('@/components/home/ThreatCards'));
 const PipelineFlow = dynamic(() => import('@/components/home/PipelineFlow'));
+const UseCases = dynamic(() => import('@/components/home/UseCases'));
 const ProductPillars = dynamic(() => import('@/components/home/ProductPillars'));
 const SkillProtection = dynamic(() => import('@/components/home/SkillProtection'));
 const RealScenarios = dynamic(() => import('@/components/home/RealScenarios'));
@@ -32,6 +33,8 @@ export default function Home() {
           <ThreatCards />
           {/* 2. Pipeline: 6-step visual flow diagram */}
           <PipelineFlow />
+          {/* 2.5. Use Cases: What you can do after installing */}
+          <UseCases />
           {/* 3. Three pillars: Community Rules / Collective Defense / AI Fallback */}
           <ProductPillars />
           {/* 4. Before/after: With and without Panguard */}
