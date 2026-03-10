@@ -386,7 +386,81 @@ function determineConclusion(confidence: number): 'benign' | 'suspicious' | 'mal
   return 'benign';
 }
 
+/**
+ * Map ATR action names to ResponseAction values.
+ * ATR 動作名稱對應到 ResponseAction 值。
+ */
+const ATR_ACTION_MAP: Record<string, ResponseAction> = {
+  block_tool: 'block_tool',
+  kill_agent: 'kill_agent',
+  quarantine_session: 'quarantine_session',
+  reduce_permissions: 'reduce_permissions',
+  alert: 'notify',
+  block_input: 'block_tool',
+  block_output: 'block_tool',
+  snapshot: 'log_only',
+  escalate: 'notify',
+  reset_context: 'quarantine_session',
+};
+
+/**
+ * ATR action priority — higher index = more severe.
+ * ATR 動作優先級 — 索引越高 = 越嚴重。
+ */
+const ATR_ACTION_PRIORITY: ResponseAction[] = [
+  'log_only',
+  'notify',
+  'reduce_permissions',
+  'revoke_skill',
+  'block_tool',
+  'quarantine_session',
+  'kill_agent',
+];
+
+/**
+ * Pick the highest-priority action from ATR matches.
+ * Collects all responseActions, maps them, and returns the most severe.
+ * 從 ATR 匹配中挑選最高優先級的動作。
+ */
+function pickATRAction(
+  atrMatches: NonNullable<DetectionResult['atrMatches']>,
+  _confidence: number
+): ResponseAction | null {
+  const mapped: ResponseAction[] = [];
+
+  for (const match of atrMatches) {
+    if (!match.responseActions?.length) continue;
+    for (const action of match.responseActions) {
+      const resolved = ATR_ACTION_MAP[action];
+      if (resolved) mapped.push(resolved);
+    }
+  }
+
+  if (mapped.length === 0) return null;
+
+  // Return the action with the highest priority index
+  let best: ResponseAction = mapped[0]!;
+  let bestIdx = ATR_ACTION_PRIORITY.indexOf(best);
+
+  for (const action of mapped) {
+    const idx = ATR_ACTION_PRIORITY.indexOf(action);
+    if (idx > bestIdx) {
+      best = action;
+      bestIdx = idx;
+    }
+  }
+
+  return best;
+}
+
 function determineAction(confidence: number, detection: DetectionResult): ResponseAction {
+  // If ATR matches have explicit response actions, prefer those
+  // ATR 匹配有明確回應動作時，優先使用
+  if (detection.atrMatches?.length) {
+    const atrAction = pickATRAction(detection.atrMatches, confidence);
+    if (atrAction) return atrAction;
+  }
+
   const hasCritical = detection.ruleMatches.some((m) => m.severity === 'critical');
   const hasAttackChain = !!detection.attackChain;
 
@@ -398,6 +472,8 @@ function determineAction(confidence: number, detection: DetectionResult): Respon
       return 'block_ip';
     if (detection.event.source === 'process' || detection.event.source === 'falco')
       return 'kill_process';
+    // YARA / file-triggered events should prefer isolate_file
+    if (detection.event.source === 'file') return 'isolate_file';
     return 'notify';
   }
 

@@ -25,6 +25,8 @@ import type {
   GuardMode,
 } from '../types.js';
 import type { PlaybookEngine, PlaybookCorrelationMatch } from '../playbook/index.js';
+import { ATRActionHandlers } from './atr-action-handlers.js';
+import type { SkillWhitelistManager } from '../engines/skill-whitelist.js';
 
 const logger = createLogger('panguard-guard:respond-agent');
 
@@ -106,6 +108,12 @@ class ActionRateLimiter {
     isolate_file: 5,
     notify: 30,
     log_only: Infinity,
+    // ATR agent-specific actions
+    block_tool: 10,
+    kill_agent: 3,
+    quarantine_session: 5,
+    revoke_skill: 10,
+    reduce_permissions: 5,
   };
 
   /** Circuit breaker: pause all actions after N consecutive failures */
@@ -209,6 +217,9 @@ export class RespondAgent {
   /** Optional SOAR playbook engine for custom response strategies / 選用的 SOAR 劇本引擎 */
   private playbookEngine: PlaybookEngine | null = null;
 
+  /** ATR action handlers for agent-specific response actions / ATR 動作處理器 */
+  private readonly atrHandlers: ATRActionHandlers;
+
   constructor(
     actionPolicy: ActionPolicy,
     mode: GuardMode,
@@ -219,6 +230,7 @@ export class RespondAgent {
     this.mode = mode;
     this.additionalWhitelistedIPs = new Set(whitelistedIPs);
     this.manifestPath = `${dataDir}/action-manifest.jsonl`;
+    this.atrHandlers = new ATRActionHandlers(dataDir);
 
     // Ensure manifest directory exists
     try {
@@ -247,6 +259,14 @@ export class RespondAgent {
   setPlaybookEngine(engine: PlaybookEngine): void {
     this.playbookEngine = engine;
     logger.info(`PlaybookEngine attached with ${engine.count} playbooks`);
+  }
+
+  /**
+   * Set the SkillWhitelistManager for revoke_skill actions.
+   * 設定 SkillWhitelistManager 以支援 revoke_skill 動作。
+   */
+  setWhitelistManager(manager: SkillWhitelistManager): void {
+    this.atrHandlers.setWhitelistManager(manager);
   }
 
   /**
@@ -467,6 +487,21 @@ export class RespondAgent {
         break;
       case 'isolate_file':
         result = await this.isolateFile(verdict);
+        break;
+      case 'block_tool':
+        result = await this.atrHandlers.blockTool(verdict);
+        break;
+      case 'kill_agent':
+        result = await this.atrHandlers.killAgent(verdict);
+        break;
+      case 'quarantine_session':
+        result = await this.atrHandlers.quarantineSession(verdict);
+        break;
+      case 'revoke_skill':
+        result = await this.atrHandlers.revokeSkill(verdict);
+        break;
+      case 'reduce_permissions':
+        result = await this.atrHandlers.reducePermissions(verdict);
         break;
       case 'notify':
         result = {

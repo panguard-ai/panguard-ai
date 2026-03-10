@@ -17,7 +17,9 @@
  * @module @panguard-ai/panguard-guard/guard-engine
  */
 
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
 import {
   createLogger,
   RuleEngine,
@@ -73,6 +75,7 @@ import { PanguardAgentClient } from './agent-client/index.js';
 import type { AgentHeartbeat } from './agent-client/index.js';
 import { GuardATREngine } from './engines/atr-engine.js';
 import { ATRDrafter } from './engines/atr-drafter.js';
+import { PlaybookEngine } from './playbook/index.js';
 
 const logger = createLogger('panguard-guard:engine');
 
@@ -357,6 +360,35 @@ export class GuardEngine {
     }
 
     this.respondAgent = new RespondAgent(config.actionPolicy, this.mode);
+    // Wire whitelist manager into RespondAgent for revoke_skill actions
+    this.respondAgent.setWhitelistManager(this.atrEngine.getWhitelistManager());
+
+    // Wire PlaybookEngine into RespondAgent for SOAR playbook-driven responses
+    // 將 PlaybookEngine 連接到 RespondAgent 以支援 SOAR 劇本驅動回應
+    try {
+      const playbookEngine = new PlaybookEngine();
+      const playbooksDir = this.findPlaybooksDir();
+      if (playbooksDir) {
+        playbookEngine.loadFromDir(playbooksDir);
+        this.respondAgent.setPlaybookEngine(playbookEngine);
+        logger.info(
+          `PlaybookEngine wired: ${playbookEngine.count} playbooks loaded from ${playbooksDir} / ` +
+            `PlaybookEngine 已連接: 從 ${playbooksDir} 載入 ${playbookEngine.count} 個劇本`
+        );
+      } else {
+        logger.warn(
+          'PlaybookEngine: no bundled playbooks directory found, skipping / ' +
+            'PlaybookEngine: 找不到內建劇本目錄，跳過'
+        );
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.warn(
+        `PlaybookEngine initialization failed, continuing without playbooks: ${msg} / ` +
+          `PlaybookEngine 初始化失敗，將在無劇本的情況下繼續: ${msg}`
+      );
+    }
+
     this.reportAgent = new ReportAgent(join(config.dataDir, 'events.jsonl'), this.mode);
 
     // Initialize investigation engine / 初始化調查引擎
@@ -803,6 +835,8 @@ export class GuardEngine {
           ruleId: m.rule.id,
           category: m.rule.tags?.category ?? 'agent-threat',
           severity: m.rule.severity,
+          responseActions: m.rule.response?.actions ?? [],
+          confidence: m.confidence,
         }));
 
         if (detection) {
@@ -1050,6 +1084,28 @@ export class GuardEngine {
    * Check if learning period should transition to protection
    * 檢查學習期是否應轉換為防護模式
    */
+  /**
+   * Locate the bundled playbooks directory by walking up from this file's location.
+   * Returns the path if found, or undefined if not found.
+   * 從此檔案位置向上搜尋內建劇本目錄。
+   */
+  private findPlaybooksDir(): string | undefined {
+    try {
+      const thisDir = dirname(fileURLToPath(import.meta.url));
+      let dir = thisDir;
+      for (let i = 0; i < 8; i++) {
+        const candidate = join(dir, 'config', 'playbooks');
+        if (existsSync(candidate)) {
+          return candidate;
+        }
+        dir = dirname(dir);
+      }
+    } catch {
+      // fileURLToPath may fail in some environments
+    }
+    return undefined;
+  }
+
   private checkLearningTransition(): void {
     if (this.mode !== 'learning') return;
 

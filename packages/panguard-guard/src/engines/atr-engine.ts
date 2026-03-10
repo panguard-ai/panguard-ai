@@ -253,13 +253,21 @@ export class GuardATREngine {
       }
     }
 
+    // Ensure sessionId is always set for SessionTracker correlation.
+    // Priority: explicit metadata > source-based derivation > daemon default.
+    // 確保 sessionId 始終設定，以供 SessionTracker 關聯使用。
+    const sessionId =
+      (meta['sessionId'] as string | undefined) ??
+      (meta['agentId'] ? `agent:${meta['agentId']}` : undefined) ??
+      (event.source ? `guard:${event.source}` : 'guard:default');
+
     return {
       type,
       timestamp: new Date().toISOString(),
       content,
       fields: Object.keys(fields).length > 0 ? fields : undefined,
       metrics: Object.keys(metrics).length > 0 ? metrics : undefined,
-      sessionId: meta['sessionId'] as string | undefined,
+      sessionId,
       agentId: meta['agentId'] as string | undefined,
       metadata: meta,
     };
@@ -288,6 +296,15 @@ export class GuardATREngine {
       if (evicted > 0) {
         logger.info(`ATR session cleanup: evicted ${evicted} idle sessions`);
       }
+      // Periodic session stats for monitoring / 定期 session 統計（監控用途）
+      const stats = this.getSessionStats();
+      if (stats.activeSessions > 0 || stats.totalMatches > 0) {
+        logger.info(
+          `ATR stats: ${stats.activeSessions} active sessions, ` +
+            `${stats.totalMatches} matches, ${stats.totalRules} rules, ` +
+            `${stats.trackedSkills} tracked skills (${stats.stableFingerprints} stable)`
+        );
+      }
     }, CLEANUP_INTERVAL);
   }
 
@@ -302,6 +319,26 @@ export class GuardATREngine {
   /** Get active session count */
   getSessionCount(): number {
     return this.sessionTracker.getSessionCount();
+  }
+
+  /**
+   * Get a summary of session tracking state for dashboard/monitoring.
+   * 取得 session 追蹤狀態摘要（供儀表板/監控使用）。
+   */
+  getSessionStats(): {
+    activeSessions: number;
+    totalMatches: number;
+    totalRules: number;
+    trackedSkills: number;
+    stableFingerprints: number;
+  } {
+    return {
+      activeSessions: this.sessionTracker.getSessionCount(),
+      totalMatches: this.matchCount,
+      totalRules: this.getRuleCount(),
+      trackedSkills: this.fingerprintStore.getTrackedCount(),
+      stableFingerprints: this.fingerprintStore.getStableCount(),
+    };
   }
 
   /** Get tracked skill count / 取得已追蹤的 skill 數量 */
