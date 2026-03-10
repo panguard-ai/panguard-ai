@@ -501,36 +501,64 @@ print_quickstart() {
   echo -e "  ${BOLD}Quick Start${NC}"
   echo -e "  ${DIM}===========${NC}"
   echo ""
-  echo "  # Run a security scan on the current directory"
+  echo "  # Connect to Claude Code, Cursor, and other AI agents"
+  echo "  panguard setup"
+  echo ""
+  echo "  # Audit installed AI skills for security threats"
+  echo "  panguard audit skill ."
+  echo ""
+  echo "  # Run a security scan"
   echo "  panguard scan"
   echo ""
-  echo "  # Start real-time file protection"
+  echo "  # Start 24/7 real-time protection"
   echo "  panguard guard start"
-  echo ""
-  echo "  # Check protection status"
-  echo "  panguard guard status"
-  echo ""
-  echo "  # Get help"
-  echo "  panguard --help"
   echo ""
   echo -e "  ${DIM}Documentation: https://panguard.ai/docs${NC}"
   echo -e "  ${DIM}Report issues: ${REPO_URL}/issues${NC}"
   echo ""
   success "Installation complete!"
+}
 
-  # Launch interactive mode (only when /dev/tty is available — works with curl|bash)
-  if [ -e /dev/tty ]; then
-    echo ""
-    printf "  ${BOLD}Launch Panguard AI now?${NC} [Y/n] "
-    read -r answer </dev/tty 2>/dev/null || answer="n"
-    case "$answer" in
-      [nN]*) info "Run 'panguard' to start the interactive dashboard." ;;
-      *)
-        echo ""
-        exec panguard </dev/tty
-        ;;
-    esac
+# ── auto_setup() ──────────────────────────────────────────────
+# Auto-run panguard setup to connect AI agents, then offer skill audit.
+auto_setup() {
+  if [ ! -e /dev/tty ]; then
+    info "Run 'panguard setup' to connect your AI agents."
+    return
   fi
+
+  echo ""
+  printf "  ${BOLD}Connect to AI agents (Claude Code, Cursor, etc.)?${NC} [Y/n] "
+  read -r answer </dev/tty 2>/dev/null || answer="n"
+  case "$answer" in
+    [nN]*) info "Run 'panguard setup' later to connect AI agents." ;;
+    *)
+      echo ""
+      panguard setup </dev/tty
+      ;;
+  esac
+
+  echo ""
+  printf "  ${BOLD}Audit current directory for AI skill security issues?${NC} [Y/n] "
+  read -r answer </dev/tty 2>/dev/null || answer="n"
+  case "$answer" in
+    [nN]*) info "Run 'panguard audit skill .' later to audit skills." ;;
+    *)
+      echo ""
+      panguard audit skill . </dev/tty
+      ;;
+  esac
+
+  echo ""
+  printf "  ${BOLD}Launch Panguard interactive mode?${NC} [Y/n] "
+  read -r answer </dev/tty 2>/dev/null || answer="n"
+  case "$answer" in
+    [nN]*) info "Run 'panguard' to start the interactive dashboard." ;;
+    *)
+      echo ""
+      exec panguard </dev/tty
+      ;;
+  esac
 }
 
 # ── Main ─────────────────────────────────────────────────────────
@@ -578,8 +606,32 @@ main() {
   if [ "$NPM_INSTALLED" = "false" ]; then
     setup_path "$bin_source" "$SYMLINK_TARGET" "$BIN_DIR"
   fi
+
+  # Ensure PATH works in the current session (critical for curl|bash installs)
+  if ! command -v panguard &>/dev/null; then
+    if [ -x "$bin_source" ]; then
+      export PATH="$(dirname "$bin_source"):$PATH"
+    fi
+    # Also try common install dirs
+    for try_dir in "${BIN_DIR}" "/usr/local/bin" "${HOME}/.local/bin"; do
+      if [ -x "${try_dir}/panguard" ]; then
+        export PATH="${try_dir}:$PATH"
+        break
+      fi
+    done
+    if ! command -v panguard &>/dev/null; then
+      echo ""
+      warn "panguard not found in PATH. Run one of these to fix:"
+      echo "  source ~/.zshrc    # macOS (zsh)"
+      echo "  source ~/.bashrc   # Linux (bash)"
+      echo "  Or restart your terminal."
+      echo ""
+    fi
+  fi
+
   verify_installation "$bin_source"
   print_quickstart
+  auto_setup
 }
 
 # Run main only when executed directly (not when sourced for testing).

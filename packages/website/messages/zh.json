@@ -128,6 +128,8 @@
     "trap": "Trap",
     "report": "Report",
     "mcp": "MCP 伺服器",
+    "skillAuditor": "Skill Auditor",
+    "atrStandard": "ATR 標準",
     "compliance": "合規",
     "integrations": "整合",
     "documentation": "技術文件",
@@ -170,7 +172,7 @@
       "prereq": "",
       "badges": {
         "mit": "MIT 開源授權",
-        "tests": "3,017 項測試通過",
+        "tests": "3,583 項測試通過",
         "taiwan": "台灣製造"
       }
     },
@@ -410,7 +412,7 @@
         "subtitle": "因為資安不該有門檻。",
         "desc": "MIT 授權，完整原始碼，零黑箱。每一行 code 都經得起檢驗。",
         "belief": "要真正打破資安壁壘，不是把價格壓低，而是讓所有人都能參與。",
-        "proof": "3,017 項測試 · TypeScript strict mode · MIT 授權——這不是業餘專案，這是基礎建設。"
+        "proof": "3,583 項測試 · TypeScript strict mode · MIT 授權——這不是業餘專案，這是基礎建設。"
       }
     },
     "the3amStory": {
@@ -503,32 +505,38 @@
       }
     },
     "productOverview": {
-      "title": "八個工具，一次裝好。",
-      "subtitle": "單獨用，各司其職。全裝上，就是一整套 SOC——一行指令搞定。",
+      "title": "六個工具，一個飛輪。",
+      "subtitle": "安裝前審計、全天候守護、威脅情報共享。每一次掃描，讓每個節點都更強。",
       "products": [
         {
+          "name": "Skill Auditor",
+          "desc": "6 層安裝前安全閘門。在任何 AI 技能執行前攔截 prompt injection、tool poisoning 與隱藏功能。",
+          "href": "/product/skill-auditor"
+        },
+        {
           "name": "Scan",
-          "desc": "搶在攻擊者前面找到弱點。60 秒掃描，直出 PDF 報告。"
+          "desc": "60 秒資安掃描。Sigma、YARA、ATR 規則一次掃完你的環境。",
+          "href": "/product/scan"
         },
         {
           "name": "Guard",
-          "desc": "5 個 AI Agent 全天候偵測、分析、回應、報告、通知，不眠不休。"
+          "desc": "4 個 AI Agent 管線——偵測、分析、回應、報告——24/7 執行，信心值自動回應。",
+          "href": "/product/guard"
         },
         {
-          "name": "Chat",
-          "desc": "資安警報直送 Telegram、Slack。講人話，不丟 log。"
+          "name": "MCP Server",
+          "desc": "11 個 panguard_* 工具，讓 Claude Code、Cursor 等 AI 助手用自然語言執行掃描和管理 Guard。",
+          "href": "/product/mcp"
         },
         {
-          "name": "Trap",
-          "desc": "8 種假服務引蛇出洞。不只擋人，還能摸清對方底細。"
-        },
-        {
-          "name": "Report",
-          "desc": "AI 產出合規報告——資安法、ISO 27001、SOC 2，60 秒交件。"
+          "name": "ATR 標準",
+          "desc": "49 條開源 AI Agent 威脅規則。等同 Sigma 之於 prompt injection、tool poisoning、skill compromise。",
+          "href": "/atr"
         },
         {
           "name": "Threat Cloud",
-          "desc": "全網聯防。從真實攻擊中自動鍛造偵測規則。"
+          "desc": "全網聯防。每個節點貢獻匿名訊號，管線從真實攻擊自動鍛造 Sigma、YARA、ATR 規則。",
+          "href": "/threat-cloud"
         }
       ],
       "learnMore": "了解更多"
@@ -539,12 +547,12 @@
       "stats": {
         "sigmaRules": "Sigma 偵測規則",
         "yaraRules": "YARA 惡意程式規則",
-        "controls": "合規控制項",
+        "atrRules": "ATR Agent 威脅規則",
         "tests": "測試通過",
         "layers": "偵測層",
         "actions": "回應動作",
-        "protocols": "蜜罐協定",
-        "atrRules": "ATR Agent 威脅規則",
+        "skillChecks": "技能審計檢查",
+        "mcpTools": "MCP 工具",
         "mit": "開源授權"
       },
       "githubCta": "去 GitHub 驗證",
@@ -555,7 +563,7 @@
         },
         "security": {
           "title": "安全優先",
-          "desc": "3,017 項測試通過。Strict TypeScript。ESLint 安全插件。憑證加密儲存。沙箱執行。"
+          "desc": "3,583 項測試通過。Strict TypeScript。ESLint 安全插件。憑證加密儲存。沙箱執行。"
         },
         "privacy": {
           "title": "隱私優先",
@@ -5021,7 +5029,17 @@
     "notifyMe": "通知我",
     "error": "出了點問題。請重試。",
     "emailPlaceholder": "you@company.com",
-    "backHome": "返回首頁"
+    "backHome": "返回首頁",
+    "trap": {
+      "title": "Panguard Trap",
+      "subtitle": "智慧蜜罐系統——部署誘餌服務偵測、分析並研究攻擊者。支援 SSH、HTTP、FTP 等協定。",
+      "followProgress": "在 GitHub 追蹤開發進度"
+    },
+    "report": {
+      "title": "Panguard Report",
+      "subtitle": "AI 驅動合規報告——支援 ISO 27001、SOC 2、資安管理法。從掃描結果自動產生。",
+      "followProgress": "在 GitHub 追蹤開發進度"
+    }
   },
   "cookieBanner": {
     "ariaLabel": "Cookie 同意設定",

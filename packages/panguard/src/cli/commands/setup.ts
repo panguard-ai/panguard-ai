@@ -14,6 +14,17 @@ import {
   symbols,
 } from '@panguard-ai/core';
 
+/** Platform-specific restart instructions */
+const PLATFORM_RESTART_HINTS: Record<string, string> = {
+  'claude-code': 'Close and reopen your terminal',
+  'claude-desktop': 'Quit and reopen Claude Desktop',
+  'cursor': 'Cmd+Shift+P (or Ctrl+Shift+P) > "Reload Window"',
+  'openclaw': 'Close and reopen OpenClaw',
+  'codex': 'Restart the Codex CLI session',
+  'workbuddy': 'Close and reopen WorkBuddy',
+  'nemoclaw': 'Close and reopen NemoClaw',
+};
+
 export function setupCommand(): Command {
   const cmd = new Command('setup')
     .description('Auto-detect AI agent platforms and configure Panguard MCP / 自動偵測 AI Agent 平台並設定 Panguard MCP')
@@ -94,7 +105,7 @@ export function setupCommand(): Command {
         console.log();
       }
 
-      const results = [];
+      const results: Array<{ success: boolean; platformId: string; configPath?: string; error?: string }> = [];
       for (const p of actionable) {
         const result = options.remove
           ? removeMCPConfig(p.id)
@@ -140,7 +151,15 @@ export function setupCommand(): Command {
 
       console.log();
       console.log(c.dim('  Next steps:'));
-      console.log(c.dim('    1. Restart your AI agent (Claude Code, Cursor, NemoClaw, etc.)'));
+      console.log(c.dim('    1. Restart your AI agent:'));
+
+      // Platform-specific restart instructions
+      const configuredPlatforms = actionable.filter((_, i) => results[i]?.success);
+      for (const p of configuredPlatforms) {
+        const restartHint = PLATFORM_RESTART_HINTS[p.id] ?? 'Restart the application';
+        console.log(c.dim(`       ${p.name}: ${restartHint}`));
+      }
+
       console.log(c.dim('    2. Ask your agent: "Run panguard_status to check security"'));
       console.log(c.dim('    3. Try: "Audit the skills in this project with panguard_audit_skill"'));
       console.log();

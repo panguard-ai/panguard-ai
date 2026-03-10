@@ -86,11 +86,14 @@ detect_platform() {
 # Sets SKIP_BINARY_DOWNLOAD=true if musl libc is detected.
 # Returns 0 if musl detected, 1 otherwise.
 detect_musl() {
-  if [ "$PLATFORM_OS" = "linux" ] && (ldd --version 2>&1 | grep -qi musl); then
-    warn "Detected Alpine/musl Linux. Prebuilt binaries may not work."
-    info "Will use npm install method instead of prebuilt binary."
-    SKIP_BINARY_DOWNLOAD=true
-    return 0
+  if [ "$PLATFORM_OS" = "linux" ]; then
+    # Check multiple indicators for musl libc
+    if (ldd --version 2>&1 | grep -qi musl) || [ -f /etc/alpine-release ] || ls /lib/ld-musl-*.so* &>/dev/null; then
+      warn "Detected Alpine/musl Linux. Prebuilt binaries may not work."
+      info "Will try npm install instead of prebuilt binary."
+      SKIP_BINARY_DOWNLOAD=true
+      return 0
+    fi
   fi
   return 1
 }
@@ -498,36 +501,64 @@ print_quickstart() {
   echo -e "  ${BOLD}Quick Start${NC}"
   echo -e "  ${DIM}===========${NC}"
   echo ""
-  echo "  # Run a security scan on the current directory"
+  echo "  # Connect to Claude Code, Cursor, and other AI agents"
+  echo "  panguard setup"
+  echo ""
+  echo "  # Audit installed AI skills for security threats"
+  echo "  panguard audit skill ."
+  echo ""
+  echo "  # Run a security scan"
   echo "  panguard scan"
   echo ""
-  echo "  # Start real-time file protection"
+  echo "  # Start 24/7 real-time protection"
   echo "  panguard guard start"
-  echo ""
-  echo "  # Check protection status"
-  echo "  panguard guard status"
-  echo ""
-  echo "  # Get help"
-  echo "  panguard --help"
   echo ""
   echo -e "  ${DIM}Documentation: https://panguard.ai/docs${NC}"
   echo -e "  ${DIM}Report issues: ${REPO_URL}/issues${NC}"
   echo ""
   success "Installation complete!"
+}
 
-  # Launch interactive mode (only when /dev/tty is available — works with curl|bash)
-  if [ -e /dev/tty ]; then
-    echo ""
-    printf "  ${BOLD}Launch Panguard AI now?${NC} [Y/n] "
-    read -r answer </dev/tty 2>/dev/null || answer="n"
-    case "$answer" in
-      [nN]*) info "Run 'panguard' to start the interactive dashboard." ;;
-      *)
-        echo ""
-        exec panguard </dev/tty
-        ;;
-    esac
+# ── auto_setup() ──────────────────────────────────────────────
+# Auto-run panguard setup to connect AI agents, then offer skill audit.
+auto_setup() {
+  if [ ! -e /dev/tty ]; then
+    info "Run 'panguard setup' to connect your AI agents."
+    return
   fi
+
+  echo ""
+  printf "  ${BOLD}Connect to AI agents (Claude Code, Cursor, etc.)?${NC} [Y/n] "
+  read -r answer </dev/tty 2>/dev/null || answer="n"
+  case "$answer" in
+    [nN]*) info "Run 'panguard setup' later to connect AI agents." ;;
+    *)
+      echo ""
+      panguard setup </dev/tty
+      ;;
+  esac
+
+  echo ""
+  printf "  ${BOLD}Audit current directory for AI skill security issues?${NC} [Y/n] "
+  read -r answer </dev/tty 2>/dev/null || answer="n"
+  case "$answer" in
+    [nN]*) info "Run 'panguard audit skill .' later to audit skills." ;;
+    *)
+      echo ""
+      panguard audit skill . </dev/tty
+      ;;
+  esac
+
+  echo ""
+  printf "  ${BOLD}Launch Panguard interactive mode?${NC} [Y/n] "
+  read -r answer </dev/tty 2>/dev/null || answer="n"
+  case "$answer" in
+    [nN]*) info "Run 'panguard' to start the interactive dashboard." ;;
+    *)
+      echo ""
+      exec panguard </dev/tty
+      ;;
+  esac
 }
 
 # ── Main ─────────────────────────────────────────────────────────
@@ -539,25 +570,68 @@ main() {
   backup_existing
 
   BINARY_INSTALLED=false
+  NPM_INSTALLED=false
   if download_binary; then
     success "Prebuilt binary installed to ${INSTALL_DIR}"
     BINARY_INSTALLED=true
   else
-    warn "No prebuilt binary available for ${PLATFORM}. Falling back to source build..."
-    build_from_source
+    # Try npm global install before heavy source build
+    warn "No prebuilt binary available for ${PLATFORM}. Trying npm install..."
+    if command -v npm &>/dev/null; then
+      if npm install -g @panguard-ai/panguard 2>/dev/null; then
+        success "Panguard AI installed via npm"
+        NPM_INSTALLED=true
+      else
+        warn "npm global install failed. Falling back to source build..."
+        build_from_source
+      fi
+    else
+      warn "npm not found. Falling back to source build..."
+      build_from_source
+    fi
   fi
 
   # Determine binary location
   local bin_source
   if [ "$BINARY_INSTALLED" = "true" ]; then
     bin_source="${INSTALL_DIR}/bin/panguard"
+  elif [ "$NPM_INSTALLED" = "true" ]; then
+    # npm global install puts it in PATH already
+    bin_source="$(command -v panguard 2>/dev/null || echo "${INSTALL_DIR}/bin/panguard")"
   else
     bin_source="${INSTALL_DIR}/source/bin/panguard"
   fi
 
-  setup_path "$bin_source" "$SYMLINK_TARGET" "$BIN_DIR"
+  # npm global install already handles PATH; only run setup_path for binary/source installs
+  if [ "$NPM_INSTALLED" = "false" ]; then
+    setup_path "$bin_source" "$SYMLINK_TARGET" "$BIN_DIR"
+  fi
+
+  # Ensure PATH works in the current session (critical for curl|bash installs)
+  if ! command -v panguard &>/dev/null; then
+    if [ -x "$bin_source" ]; then
+      export PATH="$(dirname "$bin_source"):$PATH"
+    fi
+    # Also try common install dirs
+    for try_dir in "${BIN_DIR}" "/usr/local/bin" "${HOME}/.local/bin"; do
+      if [ -x "${try_dir}/panguard" ]; then
+        export PATH="${try_dir}:$PATH"
+        break
+      fi
+    done
+    if ! command -v panguard &>/dev/null; then
+      echo ""
+      warn "panguard not found in PATH. Run one of these to fix:"
+      echo "  source ~/.zshrc    # macOS (zsh)"
+      echo "  source ~/.bashrc   # Linux (bash)"
+      echo "  Or restart your terminal."
+      echo ""
+    fi
+  fi
+
   verify_installation "$bin_source"
   print_quickstart
+  auto_setup
 }
 
 # Run main only when executed directly (not when sourced for testing).

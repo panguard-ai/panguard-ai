@@ -180,6 +180,20 @@ const MENU_DEFS: MenuDef[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// MCP detection helper
+// ---------------------------------------------------------------------------
+
+async function isMCPConfigured(): Promise<boolean> {
+  try {
+    const mcpConfig = await import('@panguard-ai/panguard-mcp/config');
+    const platforms = await mcpConfig.detectPlatforms();
+    return platforms.some((p: { detected: boolean; alreadyConfigured: boolean }) => p.detected && p.alreadyConfigured);
+  } catch {
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Guard process helpers
 // ---------------------------------------------------------------------------
 
@@ -295,10 +309,11 @@ function showHelp(): void {
   console.log(`  ${c.sage(promptTitle)}`);
 
   const cmds = [
+    { cmd: 'setup', en: 'Connect AI agents via MCP', zh: '\u900F\u904E MCP \u9023\u63A5 AI \u4EE3\u7406' },
+    { cmd: 'audit', en: 'Audit AI agent skills', zh: '\u5BE9\u8A08 AI \u4EE3\u7406\u6280\u80FD' },
     { cmd: 'status', en: 'System status overview', zh: '\u7CFB\u7D71\u72C0\u614B\u7E3D\u89BD' },
     { cmd: 'config', en: 'Settings management', zh: '\u8A2D\u5B9A\u7BA1\u7406' },
     { cmd: 'hardening', en: 'Security hardening', zh: '\u5B89\u5168\u52A0\u56FA' },
-    { cmd: 'audit', en: 'Audit AI agent skills', zh: '\u5BE9\u8A08 AI \u4EE3\u7406\u6280\u80FD' },
     { cmd: 'doctor', en: 'Health diagnostics', zh: '\u5065\u5EB7\u8A3A\u65B7' },
     { cmd: 'help', en: 'Show this help', zh: '\u986F\u793A\u6B64\u8AAA\u660E' },
   ];
@@ -361,20 +376,31 @@ export async function startInteractive(lang?: string): Promise<void> {
 
   renderStartup();
 
-  // First-time user hint
+  // First-time user hint — detect MCP status and guide user
+  const mcpConfigured = await isMCPConfigured();
   if (!existsSync(CONFIG_PATH)) {
-    const hint =
+    console.log(
       currentLang === 'zh-TW'
-        ? `  ${c.sage('\u25C6')} \u9996\u6B21\u4F7F\u7528\uFF1F\u5EFA\u8B70\u6309 [0] \u57F7\u884C\u521D\u59CB\u8A2D\u5B9A\u6216\u6309 [7] \u529F\u80FD\u5C55\u793A`
-        : `  ${c.sage('\u25C6')} First time? Press [0] for Setup Wizard or [7] for Auto Demo`;
-    console.log(hint);
-
-    // MCP setup hint for AI agent integration
-    const mcpHint =
+        ? `  ${c.sage('\u25C6')} \u9996\u6B21\u4F7F\u7528\uFF1F\u5EFA\u8B70\u6D41\u7A0B\uFF1A`
+        : `  ${c.sage('\u25C6')} First time? Recommended flow:`
+    );
+    console.log(
       currentLang === 'zh-TW'
-        ? `  ${c.sage('\u25C6')} \u8981\u9023\u63A5 Claude Code\u3001Cursor \u7B49 AI \u4EE3\u7406\uFF1F\u57F7\u884C: ${c.sage('panguard setup')}`
-        : `  ${c.sage('\u25C6')} Connect with Claude Code, Cursor, or other AI agents: ${c.sage('panguard setup')}`;
-    console.log(mcpHint);
+        ? `    ${c.sage('[0]')} \u521D\u59CB\u8A2D\u5B9A \u2192 \u81EA\u52D5\u9023\u63A5 AI \u4EE3\u7406 + \u6280\u80FD\u5BE9\u8A08 + \u6383\u63CF`
+        : `    ${c.sage('[0]')} Setup Wizard \u2192 auto-connect AI agents + skill audit + scan`
+    );
+    console.log(
+      currentLang === 'zh-TW'
+        ? `    ${c.sage('[8]')} \u6280\u80FD\u5BE9\u8A08 \u2192 \u5BE9\u8A08\u5DF2\u5B89\u88DD AI \u6280\u80FD\u7684\u5B89\u5168\u554F\u984C`
+        : `    ${c.sage('[8]')} Skill Auditor \u2192 check installed AI skills for security issues`
+    );
+    console.log('');
+  } else if (!mcpConfigured) {
+    console.log(
+      currentLang === 'zh-TW'
+        ? `  ${c.sage('\u25C6')} AI \u4EE3\u7406\u5C1A\u672A\u9023\u63A5\u3002\u57F7\u884C ${c.sage('panguard setup')} \u6216\u6309 ${c.sage('[0]')} \u9023\u63A5 Claude Code\u3001Cursor \u7B49\u5E73\u53F0\u3002`
+        : `  ${c.sage('\u25C6')} AI agents not connected. Run ${c.sage('panguard setup')} or press ${c.sage('[0]')} to connect Claude Code, Cursor, etc.`
+    );
     console.log('');
   }
 
@@ -539,6 +565,14 @@ async function dispatchCommand(text: string): Promise<boolean> {
       renderStartup();
       return true;
 
+    case 'setup': {
+      console.clear();
+      await actionMCPSetup();
+      await new Promise((r) => setTimeout(r, 500));
+      renderStartup();
+      return true;
+    }
+
     case 'help':
       showHelp();
       return true;
@@ -592,6 +626,152 @@ async function actionInit(): Promise<void> {
   breadcrumb(['Panguard', currentLang === 'zh-TW' ? '\u521D\u59CB\u8A2D\u5B9A' : 'Setup']);
   const { runInitWizard } = await import('../init/index.js');
   await runInitWizard(currentLang);
+}
+
+// ---------------------------------------------------------------------------
+// Text command: setup (MCP-only, for users who already have config)
+// ---------------------------------------------------------------------------
+
+async function actionMCPSetup(): Promise<void> {
+  breadcrumb(['Panguard', currentLang === 'zh-TW' ? 'MCP \u8A2D\u5B9A' : 'MCP Setup']);
+  const title = currentLang === 'zh-TW' ? 'AI \u4EE3\u7406\u9023\u63A5 (MCP)' : 'AI Agent Connection (MCP)';
+  console.log(`  ${theme.brandBold(title)}`);
+  console.log('');
+
+  const { spinner: sp } = await import('@panguard-ai/core');
+
+  const detectSp = sp(
+    currentLang === 'zh-TW'
+      ? '\u6B63\u5728\u5075\u6E2C AI \u4EE3\u7406\u5E73\u53F0...'
+      : 'Detecting AI agent platforms...'
+  );
+
+  try {
+    const mcpConfig = await import('@panguard-ai/panguard-mcp/config');
+    const platforms = await mcpConfig.detectPlatforms();
+    const detected = platforms.filter((p: { detected: boolean }) => p.detected);
+    const unconfigured = detected.filter((p: { alreadyConfigured: boolean }) => !p.alreadyConfigured);
+
+    if (detected.length === 0) {
+      detectSp.warn(
+        currentLang === 'zh-TW'
+          ? '\u672A\u5075\u6E2C\u5230\u4EFB\u4F55 AI \u4EE3\u7406\u5E73\u53F0'
+          : 'No AI agent platforms detected'
+      );
+      console.log('');
+      console.log(c.dim(
+        currentLang === 'zh-TW'
+          ? '  \u652F\u63F4\u5E73\u53F0: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop'
+          : '  Supported: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop'
+      ));
+      return;
+    }
+
+    detectSp.succeed(
+      currentLang === 'zh-TW'
+        ? `\u5075\u6E2C\u5230 ${detected.length} \u500B\u5E73\u53F0`
+        : `Found ${detected.length} platform(s)`
+    );
+    console.log('');
+
+    // Show all platforms
+    for (const p of platforms) {
+      const status = p.detected
+        ? p.alreadyConfigured
+          ? c.safe('\u2713 configured')
+          : c.caution('~ not configured')
+        : c.dim('- not found');
+      console.log(`  ${p.detected ? c.bold(p.name) : c.dim(p.name)}  ${status}`);
+    }
+    console.log('');
+
+    if (unconfigured.length === 0) {
+      console.log(c.safe(
+        currentLang === 'zh-TW'
+          ? `  \u2713 \u6240\u6709\u5E73\u53F0\u5DF2\u8A2D\u5B9A\u5B8C\u6210\uFF01`
+          : '  \u2713 All platforms already configured!'
+      ));
+      console.log('');
+      console.log(c.dim(
+        currentLang === 'zh-TW'
+          ? '  \u91CD\u555F AI \u4EE3\u7406\u5F8C\uFF0C\u8ACB\u6C42\u300Cpanguard_status\u300D\u5373\u53EF\u9A57\u8B49\u3002'
+          : '  Restart your AI agent, then ask "panguard_status" to verify.'
+      ));
+      return;
+    }
+
+    // Configure unconfigured platforms
+    const configSp = sp(
+      currentLang === 'zh-TW'
+        ? `\u6B63\u5728\u8A2D\u5B9A ${unconfigured.length} \u500B\u5E73\u53F0...`
+        : `Configuring ${unconfigured.length} platform(s)...`
+    );
+
+    let successCount = 0;
+    for (const p of unconfigured) {
+      const result = mcpConfig.injectMCPConfig(p.id);
+      if (result.success) successCount++;
+    }
+
+    if (successCount === unconfigured.length) {
+      configSp.succeed(
+        currentLang === 'zh-TW'
+          ? `${successCount} \u500B\u5E73\u53F0\u8A2D\u5B9A\u5B8C\u6210`
+          : `${successCount} platform(s) configured`
+      );
+    } else {
+      configSp.warn(
+        currentLang === 'zh-TW'
+          ? `${successCount}/${unconfigured.length} \u5E73\u53F0\u8A2D\u5B9A\u6210\u529F`
+          : `${successCount}/${unconfigured.length} platform(s) configured`
+      );
+    }
+
+    console.log('');
+    console.log(c.dim(
+      currentLang === 'zh-TW'
+        ? '  \u91CD\u555F AI \u4EE3\u7406\u5F8C\u5373\u53EF\u4F7F\u7528 11 \u500B panguard_* MCP \u5DE5\u5177\uFF1A'
+        : '  Restart your AI agent to use 11 panguard_* MCP tools:'
+    ));
+
+    // Platform-specific restart instructions
+    const restartHints: Record<string, { en: string; zh: string }> = {
+      'claude-code': { en: 'Close and reopen your terminal', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F\u7D42\u7AEF\u6A5F' },
+      'claude-desktop': { en: 'Quit and reopen Claude Desktop', zh: '\u9000\u51FA\u4E26\u91CD\u65B0\u958B\u555F Claude Desktop' },
+      cursor: { en: 'Cmd+Shift+P (or Ctrl+Shift+P) > "Reload Window"', zh: 'Cmd+Shift+P > "Reload Window"' },
+      openclaw: { en: 'Close and reopen OpenClaw', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F OpenClaw' },
+      codex: { en: 'Restart the Codex CLI session', zh: '\u91CD\u65B0\u555F\u52D5 Codex CLI' },
+      workbuddy: { en: 'Close and reopen WorkBuddy', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F WorkBuddy' },
+      nemoclaw: { en: 'Close and reopen NemoClaw', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F NemoClaw' },
+    };
+    for (const p of unconfigured) {
+      const hint = restartHints[p.id];
+      const text = hint
+        ? (currentLang === 'zh-TW' ? hint.zh : hint.en)
+        : (currentLang === 'zh-TW' ? '\u91CD\u65B0\u555F\u52D5\u61C9\u7528\u7A0B\u5F0F' : 'Restart the application');
+      console.log(c.dim(`    ${p.name}: ${text}`));
+    }
+
+    console.log('');
+    console.log(c.dim(
+      currentLang === 'zh-TW'
+        ? '  \u8A66\u8A66\u554F AI: \u300C\u5BE9\u8A08\u9019\u500B\u5C08\u6848\u7684\u6280\u80FD\u300D\u6216\u300C\u6383\u63CF\u6211\u7684\u7CFB\u7D71\u300D'
+        : '  Try asking your AI: "audit the skills in this project" or "scan my system"'
+    ));
+  } catch (err) {
+    detectSp.fail(
+      currentLang === 'zh-TW'
+        ? 'MCP \u8A2D\u5B9A\u5931\u6557'
+        : 'MCP setup failed'
+    );
+    console.log(
+      formatError(
+        err instanceof Error ? err.message : String(err),
+        'MCP Setup',
+        currentLang === 'zh-TW' ? '\u8ACB\u91CD\u8A66' : 'Please retry'
+      )
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -666,13 +846,22 @@ async function actionScan(): Promise<void> {
       const sev = colorSeverity(f.severity).padEnd(10);
       console.log(`  ${sev} ${f.title}`);
 
-      if (tier === 'community' && f.manualFix && f.manualFix.length > 0) {
-        const fixLabel = currentLang === 'zh-TW' ? '\u624B\u52D5\u4FEE\u5FA9:' : 'Manual fix:';
+      // Show description if available
+      if (f.description) {
+        console.log(c.dim(`          ${f.description}`));
+      }
+
+      if (f.manualFix && f.manualFix.length > 0) {
+        const fixLabel = currentLang === 'zh-TW' ? '\u4FEE\u5FA9:' : 'Fix:';
         console.log(c.dim(`          ${fixLabel}`));
         for (const cmd of f.manualFix) {
           console.log(c.dim(`          $ ${cmd}`));
         }
         fixableCount++;
+      } else if (f.remediation) {
+        // Show recommendation even if no auto-fix command
+        const recLabel = currentLang === 'zh-TW' ? '\u5EFA\u8B70:' : 'Recommendation:';
+        console.log(c.dim(`          ${recLabel} ${f.remediation}`));
       }
     }
     console.log('');
@@ -1455,16 +1644,105 @@ async function actionAudit(): Promise<void> {
       currentLang
     );
   } catch (err) {
-    sp.fail(
-      currentLang === 'zh-TW' ? '\u5BE9\u8A08\u5931\u6557' : 'Audit failed'
-    );
-    console.log(
-      formatError(
-        err instanceof Error ? err.message : String(err),
-        currentLang === 'zh-TW' ? '\u6280\u80FD\u5BE9\u8A08' : 'Skill Auditor',
-        currentLang === 'zh-TW' ? '\u8ACB\u78BA\u8A8D\u76EE\u9304\u5305\u542B SKILL.md' : 'Ensure the directory contains a SKILL.md file'
-      )
-    );
+    const errMsg = err instanceof Error ? err.message : String(err);
+    const isNoSkill = errMsg.toLowerCase().includes('skill.md') || errMsg.toLowerCase().includes('not found') || errMsg.toLowerCase().includes('enoent');
+
+    if (isNoSkill) {
+      sp.warn(
+        currentLang === 'zh-TW'
+          ? '\u6B64\u76EE\u9304\u672A\u627E\u5230 AI \u6280\u80FD (SKILL.md)'
+          : 'No AI skills (SKILL.md) found in this directory'
+      );
+      console.log('');
+      console.log(c.dim(
+        currentLang === 'zh-TW'
+          ? '  Skill Auditor \u6383\u63CF\u5305\u542B SKILL.md \u7684 AI \u6280\u80FD\u76EE\u9304\u3002'
+          : '  Skill Auditor scans AI skill directories containing a SKILL.md file.'
+      ));
+      console.log('');
+      console.log(c.dim(
+        currentLang === 'zh-TW'
+          ? '  \u5E38\u898B\u6280\u80FD\u4F4D\u7F6E\uFF1A'
+          : '  Common skill locations:'
+      ));
+      console.log(c.dim('    ~/.claude/skills/'));
+      console.log(c.dim('    ./.claude/skills/'));
+      console.log(c.dim('    ./.mcp/'));
+      console.log(c.dim('    ./skills/'));
+      console.log('');
+
+      // Auto-scan known skill directories
+      const fs = await import('node:fs');
+      const path = await import('node:path');
+      const skillDirs = [
+        path.join(homedir(), '.claude', 'skills'),
+        path.join(process.cwd(), '.claude', 'skills'),
+        path.join(process.cwd(), '.mcp'),
+        path.join(process.cwd(), 'skills'),
+      ];
+      const foundDirs: string[] = [];
+      for (const dir of skillDirs) {
+        if (fs.existsSync(dir)) {
+          // Check for subdirectories that might have SKILL.md
+          try {
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            for (const entry of entries) {
+              if (entry.isDirectory()) {
+                const skillMdPath = path.join(dir, entry.name, 'SKILL.md');
+                if (fs.existsSync(skillMdPath)) {
+                  foundDirs.push(path.join(dir, entry.name));
+                }
+              }
+            }
+            // Also check the directory itself
+            if (fs.existsSync(path.join(dir, 'SKILL.md'))) {
+              foundDirs.push(dir);
+            }
+          } catch {
+            /* skip inaccessible dirs */
+          }
+        }
+      }
+
+      if (foundDirs.length > 0) {
+        console.log(c.sage(
+          currentLang === 'zh-TW'
+            ? `  \u5728\u7CFB\u7D71\u4E2D\u627E\u5230 ${foundDirs.length} \u500B\u6280\u80FD\uFF1A`
+            : `  Found ${foundDirs.length} skill(s) on your system:`
+        ));
+        for (const dir of foundDirs) {
+          console.log(c.dim(`    ${dir}`));
+        }
+        console.log('');
+        console.log(c.dim(
+          currentLang === 'zh-TW'
+            ? `  \u57F7\u884C\uFF1Apanguard audit skill <path> \u4F86\u5BE9\u8A08\u7279\u5B9A\u6280\u80FD`
+            : `  Run: panguard audit skill <path> to audit a specific skill`
+        ));
+      } else {
+        console.log(c.dim(
+          currentLang === 'zh-TW'
+            ? '  \u7CFB\u7D71\u4E2D\u672A\u627E\u5230\u5DF2\u5B89\u88DD\u7684 AI \u6280\u80FD\u3002'
+            : '  No installed AI skills found on your system.'
+        ));
+        console.log(c.dim(
+          currentLang === 'zh-TW'
+            ? '  \u5728\u5305\u542B AI \u6280\u80FD\u7684\u5C08\u6848\u76EE\u9304\u4E2D\u57F7\u884C\u6B64\u6307\u4EE4\u3002'
+            : '  Run this command inside a project directory that contains AI skills.'
+        ));
+      }
+    } else {
+      sp.fail(
+        currentLang === 'zh-TW' ? '\u5BE9\u8A08\u5931\u6557' : 'Audit failed'
+      );
+      console.log(
+        formatError(
+          errMsg,
+          currentLang === 'zh-TW' ? '\u6280\u80FD\u5BE9\u8A08' : 'Skill Auditor',
+          currentLang === 'zh-TW' ? '\u8ACB\u91CD\u8A66\u6216\u6AA2\u67E5\u65E5\u8A8C' : 'Please retry or check logs'
+        )
+      );
+    }
   }
 }
 
