@@ -1,0 +1,128 @@
+name: MiroFish-Generated Rules
+description: Submit ATR rules generated from MiroFish swarm intelligence predictions
+title: "[MiroFish] "
+labels: ["mirofish-generated", "new-rule"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## MiroFish-Generated Rule Submission
+
+        Use this template when submitting rules generated via the MiroFish prediction pipeline.
+        See [docs/mirofish-prediction-guide.md](../docs/mirofish-prediction-guide.md) for the full workflow.
+
+  - type: input
+    id: simulation-model
+    attributes:
+      label: Simulation Model
+      description: Which LLM model was used for the MiroFish simulation?
+      placeholder: e.g., claude-sonnet-4-20250514
+    validations:
+      required: true
+
+  - type: input
+    id: agent-count
+    attributes:
+      label: Agent Count
+      description: How many agents participated in the simulation?
+      placeholder: e.g., 14
+    validations:
+      required: true
+
+  - type: input
+    id: round-count
+    attributes:
+      label: Deliberation Rounds
+      description: How many rounds did the simulation run?
+      placeholder: e.g., 40
+    validations:
+      required: true
+
+  - type: input
+    id: consensus-score
+    attributes:
+      label: Consensus Score
+      description: Minimum consensus threshold used for rule generation (0.0 - 1.0)
+      placeholder: e.g., 0.6
+    validations:
+      required: true
+
+  - type: textarea
+    id: simulation-topic
+    attributes:
+      label: Simulation Topic
+      description: What topic/question was the swarm given?
+      placeholder: e.g., "Predict novel attack vectors against AI agents using MCP in 2026-2027"
+    validations:
+      required: true
+
+  - type: textarea
+    id: knowledge-base-summary
+    attributes:
+      label: Knowledge Base Summary
+      description: Summarize the seed data provided to the swarm (frameworks, CVEs, research papers)
+    validations:
+      required: true
+
+  - type: input
+    id: rules-generated
+    attributes:
+      label: Number of Rules Generated
+      description: How many ATR rules did the converter produce?
+      placeholder: e.g., 17
+    validations:
+      required: true
+
+  - type: textarea
+    id: rule-list
+    attributes:
+      label: Rule Summary
+      description: |
+        List each generated rule with its category and severity.
+        Example:
+        - ATR-2026-XXX: MCP Relay Attack (skill-compromise, high)
+        - ATR-2026-XXX: Context Window Overflow (context-exfiltration, medium)
+    validations:
+      required: true
+
+  - type: textarea
+    id: human-review-notes
+    attributes:
+      label: Human Review Notes
+      description: |
+        Describe any changes made during human review:
+        - Patterns narrowed or broadened
+        - False positives discovered
+        - Evasion tests added
+        - Severity adjustments
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: quality-gate
+    attributes:
+      label: Quality Gate Checklist
+      description: Confirm all checks pass before submission
+      options:
+        - label: "`atr validate` passes for all generated rules"
+          required: true
+        - label: "`atr test` passes for all generated rules"
+          required: true
+        - label: "Each rule has at least 5 true positives"
+          required: true
+        - label: "Each rule has at least 5 true negatives (including adversarial near-misses)"
+          required: true
+        - label: "Each rule has at least 3 evasion tests"
+          required: true
+        - label: "Each rule has OWASP or MITRE ATLAS references"
+          required: true
+        - label: "Human review completed -- patterns verified for specificity"
+          required: true
+        - label: "No overly broad regex patterns (`.+` or `.*` alone)"
+          required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context about the simulation or generated rules

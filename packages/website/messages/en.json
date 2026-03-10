@@ -5406,6 +5406,7 @@
       "viewATR": "ATR Standard on GitHub",
       "install": "Get Started",
       "copied": "Copied!",
+      "platforms": "Works with Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop",
       "badges": {
         "mit": "MIT Licensed",
         "rules": "{atrRules} ATR Rules",

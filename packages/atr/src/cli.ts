@@ -44,6 +44,8 @@ ${BOLD}Usage:${RESET}
   atr validate <rule.yaml|dir>             Validate rule file(s)
   atr test <rule.yaml|dir>                 Run embedded test cases
   atr stats [--rules <dir>]                Show rule collection statistics
+  atr mcp                                  Start MCP server (stdio transport)
+  atr scaffold                             Interactive rule scaffolding
 
 ${BOLD}Options:${RESET}
   --rules <dir>    Custom rules directory (default: bundled rules)
@@ -63,6 +65,12 @@ ${BOLD}Examples:${RESET}
 
   ${DIM}# Show stats for bundled rules${RESET}
   atr stats
+
+  ${DIM}# Start MCP server for AI agent integration${RESET}
+  atr mcp
+
+  ${DIM}# Interactively scaffold a new rule${RESET}
+  atr scaffold
 `);
 }
 
@@ -567,6 +575,100 @@ function cmdStats(options: Record<string, string>): void {
   console.log('');
 }
 
+// --- MCP command ---
+
+async function cmdMcp(): Promise<void> {
+  const { startMCPServer } = await import('./mcp-server.js');
+  await startMCPServer();
+}
+
+// --- SCAFFOLD command ---
+
+async function cmdScaffold(): Promise<void> {
+  const { createInterface } = await import('node:readline');
+  const { RuleScaffolder } = await import('./rule-scaffolder.js');
+
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+
+  const ask = (question: string): Promise<string> =>
+    new Promise((resolve) => rl.question(question, resolve));
+
+  console.log(`\n${BOLD}ATR Rule Scaffolder${RESET}`);
+  console.log(`${DIM}Generate a draft ATR detection rule interactively.${RESET}\n`);
+
+  const title = await ask('Rule title: ');
+  if (!title.trim()) {
+    console.error(`${RED}Error: Title is required.${RESET}`);
+    rl.close();
+    process.exit(1);
+  }
+
+  const categories = [
+    'prompt-injection', 'tool-poisoning', 'context-exfiltration',
+    'agent-manipulation', 'privilege-escalation', 'excessive-autonomy',
+    'data-poisoning', 'model-abuse', 'skill-compromise',
+  ];
+  console.log(`\nCategories: ${categories.join(', ')}`);
+  const category = await ask('Category: ');
+  if (!categories.includes(category.trim())) {
+    console.error(`${RED}Error: Invalid category.${RESET}`);
+    rl.close();
+    process.exit(1);
+  }
+
+  const attackDescription = await ask('Attack description: ');
+  if (!attackDescription.trim()) {
+    console.error(`${RED}Error: Description is required.${RESET}`);
+    rl.close();
+    process.exit(1);
+  }
+
+  console.log('\nEnter example payloads (one per line, empty line to finish):');
+  const payloads: string[] = [];
+  while (true) {
+    const payload = await ask(`  Payload ${payloads.length + 1}: `);
+    if (!payload.trim()) break;
+    payloads.push(payload.trim());
+  }
+
+  if (payloads.length === 0) {
+    console.error(`${RED}Error: At least one example payload is required.${RESET}`);
+    rl.close();
+    process.exit(1);
+  }
+
+  const severities = ['critical', 'high', 'medium', 'low', 'informational'];
+  const severity = await ask(`Severity [${severities.join('/')}] (default: medium): `);
+  const finalSeverity = severity.trim() && severities.includes(severity.trim())
+    ? severity.trim()
+    : 'medium';
+
+  rl.close();
+
+  const scaffolder = new RuleScaffolder();
+  const result = scaffolder.scaffold({
+    title: title.trim(),
+    category: category.trim() as import('./types.js').ATRCategory,
+    attackDescription: attackDescription.trim(),
+    examplePayloads: payloads,
+    severity: finalSeverity as import('./types.js').ATRSeverity,
+  });
+
+  console.log(`\n${GREEN}Generated rule ${result.id}:${RESET}\n`);
+  console.log(`${DIM}${'─'.repeat(60)}${RESET}`);
+  console.log(result.yaml);
+  console.log(`${DIM}${'─'.repeat(60)}${RESET}`);
+
+  if (result.warnings.length > 0) {
+    console.log(`\n${BOLD}Warnings:${RESET}`);
+    for (const w of result.warnings) {
+      console.log(`  - ${w}`);
+    }
+  }
+
+  console.log(`\n${DIM}Copy this YAML to a .yaml file in rules/${category.trim()}/ and validate with: atr validate <file>${RESET}\n`);
+}
+
 // --- Main ---
 
 async function main(): Promise<void> {
@@ -589,6 +691,12 @@ async function main(): Promise<void> {
       break;
     case 'stats':
       cmdStats(options);
+      break;
+    case 'mcp':
+      await cmdMcp();
+      break;
+    case 'scaffold':
+      await cmdScaffold();
       break;
     default:
       console.error(`${RED}Unknown command: ${command}${RESET}`);

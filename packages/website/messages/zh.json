@@ -5460,6 +5460,7 @@
       "viewATR": "GitHub 上的 ATR 標準",
       "install": "開始使用",
       "copied": "已複製!",
+      "platforms": "支援 Claude Code、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、Claude Desktop",
       "badges": {
         "mit": "MIT 開源",
         "rules": "{atrRules} 條 ATR 規則",

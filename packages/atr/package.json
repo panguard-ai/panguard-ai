@@ -14,6 +14,10 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./mcp": {
+      "import": "./dist/mcp-server.js",
+      "types": "./dist/mcp-server.d.ts"
+    },
     "./rules": "./rules",
     "./spec": "./spec/atr-schema.yaml"
   },
@@ -59,6 +63,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {

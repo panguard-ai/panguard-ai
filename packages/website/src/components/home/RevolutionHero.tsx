@@ -149,12 +149,22 @@ export default function RevolutionHero() {
           </Link>
         </motion.div>
 
+        {/* Supported platforms */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 1.1, ease }}
+          className="text-xs text-text-tertiary mt-8 tracking-wide"
+        >
+          {t('platforms')}
+        </motion.p>
+
         {/* Trust line */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1.1, ease }}
-          className="flex flex-wrap gap-3 justify-center mt-6"
+          transition={{ duration: 0.5, delay: 1.2, ease }}
+          className="flex flex-wrap gap-3 justify-center mt-4"
         >
           {(['mit', 'rules', 'tests', 'taiwan'] as const).map((key) => (
             <span
