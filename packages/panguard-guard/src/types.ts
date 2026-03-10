@@ -523,6 +523,8 @@ export interface GuardConfig {
   telemetryEnabled?: boolean;
   /** Show anonymized upload data before sending (debug mode) */
   showUploadData?: boolean;
+  /** Skill whitelist: static list of trusted skill names / Skill 白名單 */
+  trustedSkills?: string[];
 }
 
 /** Guard engine status / 守護引擎狀態 */
@@ -541,4 +543,14 @@ export interface GuardStatus {
   atrRuleCount?: number;
   /** Number of ATR matches / ATR 匹配數 */
   atrMatchCount?: number;
+  /** Number of patterns accumulated by ATR drafter / ATR 草稿器累積的模式數 */
+  atrDrafterPatterns?: number;
+  /** Number of proposals submitted by ATR drafter / ATR 草稿器已提交的提案數 */
+  atrDrafterSubmitted?: number;
+  /** Number of whitelisted skills / 白名單 skill 數量 */
+  whitelistedSkills?: number;
+  /** Number of skills tracked by fingerprinting / 指紋追蹤的 skill 數量 */
+  trackedSkills?: number;
+  /** Number of stable fingerprints / 已穩定的指紋數量 */
+  stableFingerprints?: number;
 }

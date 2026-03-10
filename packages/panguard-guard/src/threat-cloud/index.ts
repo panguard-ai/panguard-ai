@@ -329,6 +329,57 @@ export class ThreatCloudClient {
   }
 
   // ---------------------------------------------------------------------------
+  // ATR Proposal Submission / ATR 提案提交
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Submit a locally-drafted ATR rule proposal to Threat Cloud.
+   * The proposal will go through community consensus voting.
+   * 提交本地 LLM 產生的 ATR 規則提案至 Threat Cloud（經社群共識投票）
+   */
+  async submitATRProposal(proposal: {
+    patternHash: string;
+    ruleContent: string;
+    llmProvider: string;
+    llmModel: string;
+    selfReviewVerdict: string;
+  }): Promise<boolean> {
+    if (this.status === 'offline' || !this.endpoint) {
+      logger.info('Cannot submit ATR proposal in offline mode / 離線模式無法提交 ATR 提案');
+      return false;
+    }
+
+    try {
+      const url = `${this.endpoint}/api/atr-proposals`;
+      await this.httpPost(url, proposal);
+      logger.info(
+        `ATR proposal submitted for pattern ${proposal.patternHash} / ` +
+          `ATR 提案已提交 (pattern: ${proposal.patternHash})`
+      );
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.warn(`ATR proposal submission failed: ${msg} / ATR 提案提交失敗: ${msg}`);
+      return false;
+    }
+  }
+
+  /**
+   * Report ATR rule match feedback (true/false positive) to Threat Cloud.
+   * 回報 ATR 規則比對結果（正確/誤報）至 Threat Cloud
+   */
+  async reportATRFeedback(ruleId: string, isTruePositive: boolean): Promise<void> {
+    if (this.status === 'offline' || !this.endpoint) return;
+
+    try {
+      const url = `${this.endpoint}/api/atr-feedback`;
+      await this.httpPost(url, { ruleId, isTruePositive });
+    } catch {
+      // Best effort, don't fail the main flow
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // HTTP helpers / HTTP 輔助函數
   // ---------------------------------------------------------------------------
 

@@ -12,8 +12,10 @@ import { join, dirname } from 'node:path';
 import { createRequire } from 'node:module';
 import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
-import { ATREngine, SessionTracker } from 'agent-threat-rules';
-import type { ATRMatch, ATRRule, AgentEvent, AgentEventType } from 'agent-threat-rules';
+import { ATREngine, SessionTracker, SkillFingerprintStore } from 'agent-threat-rules';
+import type { ATRMatch, ATRRule, AgentEvent, AgentEventType, BehaviorAnomaly } from 'agent-threat-rules';
+import { SkillWhitelistManager } from './skill-whitelist.js';
+import type { SkillWhitelistConfig } from './skill-whitelist.js';
 
 const logger = createLogger('panguard-guard:atr-engine');
 
@@ -38,6 +40,8 @@ export interface GuardATREngineConfig {
   bundledRulesDir?: string;
   /** Enable hot-reload of rule files */
   hotReload?: boolean;
+  /** Skill whitelist configuration / Skill 白名單配置 */
+  whitelist?: SkillWhitelistConfig;
 }
 
 /**
@@ -54,6 +58,8 @@ export class GuardATREngine {
   private readonly cloudRuleIds = new Set<string>();
   private matchCount = 0;
   private readonly sessionTracker: SessionTracker;
+  private readonly fingerprintStore: SkillFingerprintStore;
+  private readonly whitelistManager: SkillWhitelistManager;
   private cleanupTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(config: GuardATREngineConfig = {}) {
@@ -76,6 +82,13 @@ export class GuardATREngine {
     }
 
     this.sessionTracker = sessionTracker;
+
+    // Skill behavioral fingerprinting for post-install drift detection
+    // Skill 行為指紋：偵測安裝後行為偏移
+    this.fingerprintStore = new SkillFingerprintStore();
+
+    // Skill whitelist manager / Skill 白名單管理器
+    this.whitelistManager = new SkillWhitelistManager(config.whitelist);
   }
 
   /**
@@ -115,8 +128,36 @@ export class GuardATREngine {
     const bundledMatches = this.bundledEngine?.evaluate(agentEvent) ?? [];
     const customMatches = this.engine.evaluate(agentEvent);
     const matches = [...bundledMatches, ...customMatches];
+
+    // Skill behavioral fingerprinting: track + detect drift
+    // Skill 行為指紋：追蹤 + 偵測偏移
+    const toolName = agentEvent.fields?.['tool_name'];
+    if (toolName && (agentEvent.type === 'tool_call' || agentEvent.type === 'tool_response')) {
+      const anomalies = this.fingerprintStore.recordInvocation(toolName, agentEvent);
+
+      if (anomalies.length > 0) {
+        // Drift detected — revoke whitelist if fingerprint-sourced
+        this.whitelistManager.onFingerprintDrift(toolName);
+
+        for (const anomaly of anomalies) {
+          logger.warn(
+            `Skill behavior drift: ${anomaly.description} [${anomaly.severity}]`
+          );
+          // Convert anomaly into a synthetic ATR match so it enters the detection pipeline
+          matches.push(this.anomalyToATRMatch(anomaly));
+          this.matchCount++;
+        }
+      } else {
+        // No anomalies — check if fingerprint is stable enough for whitelist auto-promotion
+        const fp = this.fingerprintStore.getFingerprint(toolName);
+        if (fp?.isStable && !this.whitelistManager.isWhitelisted(toolName)) {
+          this.whitelistManager.autoPromote(toolName, fp.capabilityHash);
+        }
+      }
+    }
+
     if (matches.length > 0) {
-      this.matchCount += matches.length;
+      this.matchCount += matches.filter((m) => m.rule.id !== 'ATR-DRIFT-DETECT').length;
       logger.warn(
         `ATR match: ${matches.length} rules triggered for event ${event.id} ` +
         `[${matches.map((m) => m.rule.id).join(', ')}]`
@@ -253,5 +294,71 @@ export class GuardATREngine {
   /** Get active session count */
   getSessionCount(): number {
     return this.sessionTracker.getSessionCount();
+  }
+
+  /** Get tracked skill count / 取得已追蹤的 skill 數量 */
+  getTrackedSkillCount(): number {
+    return this.fingerprintStore.getTrackedCount();
+  }
+
+  /** Get stable fingerprint count / 取得已穩定指紋數量 */
+  getStableFingerprintCount(): number {
+    return this.fingerprintStore.getStableCount();
+  }
+
+  /** Get the whitelist manager instance / 取得白名單管理器 */
+  getWhitelistManager(): SkillWhitelistManager {
+    return this.whitelistManager;
+  }
+
+  /** Check if a skill is whitelisted (shorthand) / 檢查 skill 是否在白名單 */
+  isSkillWhitelisted(skillName: string): boolean {
+    return this.whitelistManager.isWhitelisted(skillName);
+  }
+
+  /**
+   * Convert a behavioral anomaly into a synthetic ATR match
+   * for the detection pipeline.
+   * 將行為異常轉換為合成 ATR 匹配，進入偵測管線
+   */
+  private anomalyToATRMatch(anomaly: BehaviorAnomaly): ATRMatch {
+    const severityMap: Record<string, 'critical' | 'high' | 'medium' | 'low'> = {
+      critical: 'critical',
+      high: 'high',
+      medium: 'medium',
+      low: 'low',
+    };
+
+    return {
+      rule: {
+        title: `Skill Behavioral Drift: ${anomaly.skillName}`,
+        id: 'ATR-DRIFT-DETECT',
+        status: 'stable',
+        description: anomaly.description,
+        author: 'Panguard Skill Fingerprint',
+        date: new Date().toISOString().slice(0, 10),
+        severity: severityMap[anomaly.severity] ?? 'medium',
+        tags: {
+          category: 'skill-compromise',
+          subcategory: anomaly.anomalyType,
+          confidence: anomaly.severity === 'critical' ? 'high' : 'medium',
+        },
+        agent_source: { type: 'skill_lifecycle' },
+        detection: {
+          conditions: [],
+          condition: 'fingerprint_drift',
+        },
+        response: {
+          actions: anomaly.severity === 'critical'
+            ? ['block_tool', 'alert', 'snapshot']
+            : ['alert', 'snapshot'],
+        },
+      },
+      matchedConditions: [anomaly.anomalyType],
+      matchedPatterns: [anomaly.newValue],
+      confidence: anomaly.severity === 'critical' ? 95 :
+        anomaly.severity === 'high' ? 85 : 70,
+      timestamp: new Date().toISOString(),
+    };
   }
 }
