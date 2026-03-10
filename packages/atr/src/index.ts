@@ -15,6 +15,18 @@ export { loadRuleFile, loadRulesFromDirectory, validateRule } from './loader.js'
 export { ModuleRegistry } from './modules/index.js';
 export type { ATRModule, ModuleCondition, ModuleResult } from './modules/index.js';
 export { SessionModule } from './modules/session.js';
+export { SemanticModule } from './modules/semantic.js';
+export type { SemanticModuleConfig } from './modules/semantic.js';
+export { SkillFingerprintStore } from './skill-fingerprint.js';
+export type {
+  SkillFingerprint,
+  BehaviorAnomaly,
+  SkillFingerprintConfig,
+} from './skill-fingerprint.js';
+export { RuleScaffolder } from './rule-scaffolder.js';
+export type { ScaffoldInput, ScaffoldResult, ScaffoldOptions } from './rule-scaffolder.js';
+export { CoverageAnalyzer } from './coverage-analyzer.js';
+export type { CoverageGap, CoverageReport } from './coverage-analyzer.js';
 export type {
   ATRRule,
   ATRMatch,

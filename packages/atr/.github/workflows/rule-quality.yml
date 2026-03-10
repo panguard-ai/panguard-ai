@@ -1,0 +1,203 @@
+name: Rule Quality Gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'rules/**'
+
+jobs:
+  quality-check:
+    name: ATR Rule Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Identify changed rule files
+        id: changed-rules
+        run: |
+          CHANGED=$(git diff --name-only --diff-filter=ACMR origin/main...HEAD -- 'rules/**/*.yaml' 'rules/**/*.yml' || true)
+          if [ -z "$CHANGED" ]; then
+            echo "No rule files changed."
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Changed rule files:"
+            echo "$CHANGED"
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            # Write to file for later steps
+            echo "$CHANGED" > changed_rules.txt
+          fi
+
+      - name: Validate changed rules
+        if: steps.changed-rules.outputs.has_changes == 'true'
+        id: validate
+        run: |
+          PASS=0
+          FAIL=0
+          ERRORS=""
+
+          while IFS= read -r file; do
+            if [ -f "$file" ]; then
+              echo "Validating: $file"
+              if npx agent-threat-rules validate "$file" 2>&1; then
+                PASS=$((PASS + 1))
+              else
+                FAIL=$((FAIL + 1))
+                ERRORS="${ERRORS}\n- ${file}"
+              fi
+            fi
+          done < changed_rules.txt
+
+          echo "validate_pass=$PASS" >> "$GITHUB_OUTPUT"
+          echo "validate_fail=$FAIL" >> "$GITHUB_OUTPUT"
+          echo "validate_errors<<EOF" >> "$GITHUB_OUTPUT"
+          echo -e "$ERRORS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          if [ "$FAIL" -gt 0 ]; then
+            echo "validation_status=failed" >> "$GITHUB_OUTPUT"
+          else
+            echo "validation_status=passed" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Test changed rules
+        if: steps.changed-rules.outputs.has_changes == 'true'
+        id: test
+        run: |
+          PASS=0
+          FAIL=0
+          ERRORS=""
+
+          while IFS= read -r file; do
+            if [ -f "$file" ]; then
+              echo "Testing: $file"
+              OUTPUT=$(npx agent-threat-rules test "$file" 2>&1) || true
+              if echo "$OUTPUT" | grep -q "All tests passed"; then
+                PASS=$((PASS + 1))
+              else
+                FAIL=$((FAIL + 1))
+                ERRORS="${ERRORS}\n- ${file}"
+              fi
+              echo "$OUTPUT"
+            fi
+          done < changed_rules.txt
+
+          echo "test_pass=$PASS" >> "$GITHUB_OUTPUT"
+          echo "test_fail=$FAIL" >> "$GITHUB_OUTPUT"
+          echo "test_errors<<EOF" >> "$GITHUB_OUTPUT"
+          echo -e "$ERRORS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          if [ "$FAIL" -gt 0 ]; then
+            echo "test_status=failed" >> "$GITHUB_OUTPUT"
+          else
+            echo "test_status=passed" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run full rule collection stats
+        if: steps.changed-rules.outputs.has_changes == 'true'
+        id: stats
+        run: |
+          STATS=$(npx agent-threat-rules stats --json 2>&1) || true
+          echo "stats_json<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$STATS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Post quality report comment
+        if: steps.changed-rules.outputs.has_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const validatePass = '${{ steps.validate.outputs.validate_pass }}';
+            const validateFail = '${{ steps.validate.outputs.validate_fail }}';
+            const validateErrors = `${{ steps.validate.outputs.validate_errors }}`;
+            const testPass = '${{ steps.test.outputs.test_pass }}';
+            const testFail = '${{ steps.test.outputs.test_fail }}';
+            const testErrors = `${{ steps.test.outputs.test_errors }}`;
+            const validationStatus = '${{ steps.validate.outputs.validation_status }}';
+            const testStatus = '${{ steps.test.outputs.test_status }}';
+
+            const allPassed = validationStatus === 'passed' && testStatus === 'passed';
+            const statusIcon = allPassed ? 'PASS' : 'FAIL';
+            const label = allPassed ? 'quality-ready' : 'needs-work';
+
+            let body = `## ATR Rule Quality Report\n\n`;
+            body += `**Status: ${statusIcon}**\n\n`;
+            body += `### Validation\n`;
+            body += `- Passed: ${validatePass}\n`;
+            body += `- Failed: ${validateFail}\n`;
+            if (validateErrors.trim()) {
+              body += `- Errors:${validateErrors}\n`;
+            }
+            body += `\n### Test Cases\n`;
+            body += `- Passed: ${testPass}\n`;
+            body += `- Failed: ${testFail}\n`;
+            if (testErrors.trim()) {
+              body += `- Errors:${testErrors}\n`;
+            }
+            body += `\n### Quality Checklist\n`;
+            body += `- [${validationStatus === 'passed' ? 'x' : ' '}] Schema validation\n`;
+            body += `- [${testStatus === 'passed' ? 'x' : ' '}] Test cases pass\n`;
+            body += `\n---\n`;
+            body += `Label: \`${label}\`\n`;
+
+            // Post comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
+
+            // Apply label
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: [label]
+              });
+            } catch (e) {
+              console.log(`Could not apply label ${label}: ${e.message}`);
+            }
+
+            // Remove opposite label if present
+            const oppositeLabel = allPassed ? 'needs-work' : 'quality-ready';
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: oppositeLabel
+              });
+            } catch (e) {
+              // Label might not exist, that's fine
+            }
+
+      - name: Fail if quality gate not met
+        if: steps.changed-rules.outputs.has_changes == 'true'
+        run: |
+          if [ "${{ steps.validate.outputs.validation_status }}" != "passed" ]; then
+            echo "Validation failed. Fix errors and re-push."
+            exit 1
+          fi
+          if [ "${{ steps.test.outputs.test_status }}" != "passed" ]; then
+            echo "Test cases failed. Fix failing tests and re-push."
+            exit 1
+          fi
+          echo "All quality checks passed."

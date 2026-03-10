@@ -200,6 +200,37 @@ The tiers are additive. A production deployment runs all three, with Layer 1 han
 
 6. **Plan for multilingual deployments.** If your agents process non-English input, ATR v0.1 provides no injection detection for those languages. Implement additional controls until Layer 2 (embedding similarity) is available.
 
+## MiroFish Predictive Threat Intelligence (2026-03)
+
+An independent evaluation using MiroFish swarm intelligence simulation (14 AI agents, 40 rounds, Claude Sonnet 4) predicted ATR's baseline success rate at **30-40%** if limited to static pattern matching alone. Key findings:
+
+### Predicted Failure Modes
+- **Evasion velocity exceeds rule velocity.** Attackers develop new encoding, semantic paraphrasing, and behavioral drift techniques faster than rules can be written.
+- **Multi-platform divergence.** Enterprise, startup, and open-source deployments have fundamentally different threat profiles; a one-size-fits-all rule set under-protects all three.
+- **LLM architecture gaps.** Different providers (Anthropic, OpenAI, open-source) expose different attack surfaces; rules targeting one provider may miss attacks on another.
+
+### Predicted Success Factors
+- **Three-layer detection architecture.** Layer 1 (regex) + Layer 2 (behavioral fingerprinting) + Layer 3 (AI semantic) raises predicted success rate to **70-80%**.
+- **Adaptive whitelist system.** Auto-promote stable skills, auto-revoke on behavioral drift. Reduces false positive burden by 60%.
+- **Community contribution velocity.** Three contribution paths (manual, MiroFish-predicted, detection-driven) increase rule coverage growth rate 3-5x vs. manual-only.
+
+### Architecture Response
+
+| Predicted Gap | ATR Response | Status |
+|---------------|-------------|--------|
+| Static rules insufficient | Layer 3 SemanticModule (LLM-as-judge) | v0.2 shipped |
+| Rules lag behind attacks | MiroFish predictive pipeline auto-generates rules from simulated future attacks | v0.2 shipped |
+| Behavioral evasion | SkillFingerprintStore with drift detection | v0.1 shipped |
+| Multi-platform gap | agent_source.framework[] and provider[] fields for platform-specific rules | v0.1 shipped |
+| Community bottleneck | MCP server + 3 contribution paths + GitHub Actions quality gate | v0.2 shipped |
+| False positive burden | Skill whitelist with auto-promote/revoke | v0.2 shipped |
+
+### Methodology
+
+Simulation used 14 agent archetypes (8 attackers including prompt injection specialist, supply chain attacker, audit evasion specialist; 4 defenders; 2 users) interacting across Reddit and Twitter-style platforms for 72 simulated hours. Predictions extracted via `mirofish_to_atr.py` converter with quality review gate. 17 ATR rules generated from simulation predictions.
+
+Full prediction report: `tools/mirofish-bridge/output/` (not in public repo).
+
 ## References
 
 - [OWASP Top 10 for Agentic Applications (2026)](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)

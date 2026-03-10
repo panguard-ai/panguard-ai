@@ -128,7 +128,7 @@ export interface ATRTestCase {
   agent_output?: string;
   tool_name?: string;
   tool_args?: string;
-  expected: 'trigger' | 'no_trigger';
+  expected: 'trigger' | 'no_trigger' | 'triggered' | 'not_triggered';
 }
 
 export interface ATRTestCases {
