@@ -436,7 +436,7 @@ panguard guard config set auto_response true`}
           </div>
           <p className="text-sm text-text-secondary mt-4">
             Full details on data collection and retention are available in{' '}
-            <Link href="/privacy" className="text-panguard-green hover:underline">
+            <Link href="/legal/privacy" className="text-panguard-green hover:underline">
               PRIVACY.md
             </Link>.
           </p>

@@ -20,6 +20,11 @@ import {
   Zap,
   Wrench,
   Database,
+  Minus,
+  GitPullRequest,
+  Search,
+  Layers,
+  ArrowDown,
 } from 'lucide-react';
 import {
   ShieldIcon,
@@ -57,7 +62,11 @@ const categoryIcons = [
 const stepKeys = ['step1', 'step2', 'step3', 'step4'] as const;
 const stepIcons = [FileCode2, Shield, Cpu, Zap];
 
-/* -- YAML example block -- */
+/* -- Contribution steps -- */
+const contribStepKeys = ['step1', 'step2', 'step3', 'step4'] as const;
+const contribStepIcons = [Search, FileCode2, GitPullRequest, Shield];
+
+/* -- YAML example blocks -- */
 
 const YAML_EXAMPLE = `title: "Direct Prompt Injection via User Input"
 id: ATR-2026-001
@@ -81,8 +90,97 @@ response:
     - alert
     - snapshot`;
 
+const YAML_TOOL_POISONING = `title: "Tool Poisoning via MCP Response"
+id: ATR-2026-008
+status: experimental
+severity: critical
+
+references:
+  owasp_llm:
+    - "LLM02:2025 - Tool Misuse"
+
+detection:
+  conditions:
+    - field: tool_output
+      operator: contains_any
+      value: ["eval(", "exec(", "child_process",
+              "__import__", "subprocess.run"]
+    - field: tool_name
+      operator: not_in
+      value: ["code_executor", "shell"]
+  condition: all
+
+response:
+  actions:
+    - block_output
+    - alert
+    - quarantine_tool`;
+
+const YAML_CONTEXT_EXFIL = `title: "Context Exfiltration via Markdown"
+id: ATR-2026-012
+status: experimental
+severity: high
+
+detection:
+  conditions:
+    - field: model_output
+      operator: regex
+      value: "!\\\\[.*\\\\]\\\\(https?://[^)]+\\\\?.*="
+    - field: context
+      operator: contains_any
+      value: ["api_key", "secret", "token",
+              "password", "credential"]
+  condition: all
+
+response:
+  actions:
+    - block_output
+    - alert
+    - snapshot`;
+
+const severityColors: Record<string, string> = {
+  critical: 'text-red-400 bg-red-400/10',
+  high: 'text-orange-400 bg-orange-400/10',
+  medium: 'text-yellow-400 bg-yellow-400/10',
+};
+
+const yamlExamples = [YAML_EXAMPLE, YAML_TOOL_POISONING, YAML_CONTEXT_EXFIL];
+
 export default function ATRContent() {
   const t = useTranslations('atrPage');
+
+  const comparisonRows = t.raw('comparison.rows') as Array<{
+    feature: string;
+    sigma: boolean | string;
+    yara: boolean | string;
+    atr: boolean | string;
+  }>;
+
+  const architectureLayers = t.raw('architecture.layers') as Array<{
+    name: string;
+    desc: string;
+    position: string;
+    highlighted?: boolean;
+  }>;
+
+  const ruleExamples = t.raw('moreExamples.rules') as Array<{
+    title: string;
+    id: string;
+    severity: string;
+    category: string;
+  }>;
+
+  const ecosystemStats = t.raw('ecosystem.stats') as Array<{
+    value: string;
+    label: string;
+  }>;
+
+  const roadmapPhases = t.raw('roadmap.phases') as Array<{
+    version: string;
+    status: string;
+    title: string;
+    items: string[];
+  }>;
 
   return (
     <>
@@ -187,8 +285,67 @@ export default function ATRContent() {
         </div>
       </SectionWrapper>
 
-      {/* -- Rule Categories -- */}
+      {/* -- Comparison Table -- */}
       <SectionWrapper dark>
+        <SectionTitle
+          overline={t('comparison.overline')}
+          title={t('comparison.title')}
+          subtitle={t('comparison.subtitle')}
+        />
+        <FadeInUp delay={0.1}>
+          <div className="max-w-3xl mx-auto mt-14 overflow-x-auto">
+            <div className="bg-surface-2 rounded-xl border border-border overflow-hidden min-w-[500px]">
+              {/* Header */}
+              <div className="grid grid-cols-4 gap-0 border-b border-border bg-surface-1">
+                <div className="px-5 py-3.5 text-xs font-semibold text-text-secondary">
+                  {t('comparison.headers.feature')}
+                </div>
+                <div className="px-5 py-3.5 text-xs font-semibold text-text-muted text-center">
+                  {t('comparison.headers.sigma')}
+                </div>
+                <div className="px-5 py-3.5 text-xs font-semibold text-text-muted text-center">
+                  {t('comparison.headers.yara')}
+                </div>
+                <div className="px-5 py-3.5 text-xs font-semibold text-brand-sage text-center">
+                  {t('comparison.headers.atr')}
+                </div>
+              </div>
+              {/* Rows */}
+              {comparisonRows.map((row, i) => (
+                <div
+                  key={i}
+                  className={`grid grid-cols-4 gap-0 ${
+                    i < comparisonRows.length - 1 ? 'border-b border-border/50' : ''
+                  }`}
+                >
+                  <div className="px-5 py-3 text-sm text-text-primary">
+                    {row.feature}
+                  </div>
+                  {(['sigma', 'yara', 'atr'] as const).map((col) => {
+                    const val = row[col];
+                    return (
+                      <div key={col} className="px-5 py-3 flex items-center justify-center">
+                        {val === true ? (
+                          <Check className={`w-4 h-4 ${col === 'atr' ? 'text-brand-sage' : 'text-text-secondary'}`} />
+                        ) : val === false ? (
+                          <Minus className="w-4 h-4 text-text-muted/40" />
+                        ) : (
+                          <span className={`text-xs ${col === 'atr' ? 'text-brand-sage font-semibold' : 'text-text-secondary'}`}>
+                            {val}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </FadeInUp>
+      </SectionWrapper>
+
+      {/* -- Rule Categories -- */}
+      <SectionWrapper>
         <SectionTitle
           overline={t('categories.overline')}
           title={t('categories.title')}
@@ -199,7 +356,7 @@ export default function ATRContent() {
             const Icon = categoryIcons[i];
             return (
               <FadeInUp key={key} delay={i * 0.05}>
-                <div className="bg-surface-2 rounded-xl border border-border p-6 h-full card-glow">
+                <div className="bg-surface-1 rounded-xl border border-border p-6 h-full card-glow">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-9 h-9 rounded-full bg-brand-sage/10 flex items-center justify-center">
                       <Icon className="w-4 h-4 text-brand-sage" />
@@ -219,6 +376,52 @@ export default function ATRContent() {
             );
           })}
         </div>
+      </SectionWrapper>
+
+      {/* -- Architecture -- */}
+      <SectionWrapper dark>
+        <SectionTitle
+          overline={t('architecture.overline')}
+          title={t('architecture.title')}
+          subtitle={t('architecture.subtitle')}
+        />
+        <FadeInUp delay={0.1}>
+          <div className="max-w-2xl mx-auto mt-14 space-y-3">
+            {architectureLayers.map((layer, i) => (
+              <div key={i}>
+                <div
+                  className={`rounded-xl border p-5 flex items-start gap-4 ${
+                    layer.highlighted
+                      ? 'bg-brand-sage/10 border-brand-sage/30'
+                      : 'bg-surface-2 border-border'
+                  }`}
+                >
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
+                    layer.highlighted ? 'bg-brand-sage/20' : 'bg-surface-1'
+                  }`}>
+                    <Layers className={`w-4 h-4 ${layer.highlighted ? 'text-brand-sage' : 'text-text-muted'}`} />
+                  </div>
+                  <div>
+                    <p className={`text-sm font-semibold ${layer.highlighted ? 'text-brand-sage' : 'text-text-primary'}`}>
+                      {layer.name}
+                    </p>
+                    <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                      {layer.desc}
+                    </p>
+                  </div>
+                </div>
+                {i < architectureLayers.length - 1 && (
+                  <div className="flex justify-center py-1">
+                    <ArrowDown className="w-4 h-4 text-text-muted/40" />
+                  </div>
+                )}
+              </div>
+            ))}
+            <p className="text-xs text-text-muted text-center mt-6 leading-relaxed max-w-lg mx-auto">
+              {t('architecture.caption')}
+            </p>
+          </div>
+        </FadeInUp>
       </SectionWrapper>
 
       {/* -- How it Works -- */}
@@ -275,8 +478,45 @@ export default function ATRContent() {
         </div>
       </SectionWrapper>
 
-      {/* -- OWASP Mapping -- */}
+      {/* -- More Rule Examples -- */}
       <SectionWrapper dark>
+        <SectionTitle
+          overline={t('moreExamples.overline')}
+          title={t('moreExamples.title')}
+          subtitle={t('moreExamples.subtitle')}
+        />
+        <div className="grid lg:grid-cols-3 gap-4 mt-14">
+          {ruleExamples.map((rule, i) => (
+            <FadeInUp key={rule.id} delay={i * 0.08}>
+              <div className="bg-surface-2 rounded-xl border border-border overflow-hidden h-full flex flex-col">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                  <div className="flex items-center gap-2">
+                    <FileCode2 className="w-4 h-4 text-brand-sage" />
+                    <span className="text-xs font-mono text-text-muted">{rule.id}</span>
+                  </div>
+                  <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full ${
+                    severityColors[rule.severity] ?? 'text-text-muted bg-surface-1'
+                  }`}>
+                    {rule.severity}
+                  </span>
+                </div>
+                <div className="p-4 flex-1">
+                  <p className="text-sm font-semibold text-text-primary mb-1">{rule.title}</p>
+                  <span className="text-[10px] text-text-muted bg-surface-1 px-2 py-0.5 rounded-full">
+                    {rule.category}
+                  </span>
+                </div>
+                <pre className="px-4 pb-4 text-[10px] text-text-muted overflow-x-auto leading-relaxed font-mono max-h-[200px]">
+                  <code>{yamlExamples[i]}</code>
+                </pre>
+              </div>
+            </FadeInUp>
+          ))}
+        </div>
+      </SectionWrapper>
+
+      {/* -- OWASP Mapping -- */}
+      <SectionWrapper>
         <SectionTitle
           overline={t('owasp.overline')}
           title={t('owasp.title')}
@@ -284,7 +524,7 @@ export default function ATRContent() {
         />
         <FadeInUp delay={0.1}>
           <div className="max-w-2xl mx-auto mt-14">
-            <div className="bg-surface-2 rounded-xl border border-border overflow-hidden">
+            <div className="bg-surface-1 rounded-xl border border-border overflow-hidden">
               {(
                 t.raw('owasp.items') as Array<{
                   id: string;
@@ -318,8 +558,115 @@ export default function ATRContent() {
         </FadeInUp>
       </SectionWrapper>
 
-      {/* -- CTA -- */}
+      {/* -- Ecosystem & Contribution -- */}
+      <SectionWrapper dark>
+        <SectionTitle
+          overline={t('ecosystem.overline')}
+          title={t('ecosystem.title')}
+          subtitle={t('ecosystem.subtitle')}
+        />
+
+        {/* Stats */}
+        <FadeInUp delay={0.1}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-14 max-w-2xl mx-auto">
+            {ecosystemStats.map((stat, i) => (
+              <div key={i} className="text-center">
+                <p className="text-3xl font-extrabold text-brand-sage">{stat.value}</p>
+                <p className="text-xs text-text-secondary mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </FadeInUp>
+
+        {/* Contribution flow */}
+        <div className="mt-16 max-w-2xl mx-auto">
+          <FadeInUp>
+            <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-8 text-center">
+              {t('ecosystem.steps.overline')}
+            </p>
+          </FadeInUp>
+          <div className="relative">
+            <div className="absolute left-[18px] top-0 bottom-0 w-px bg-border hidden sm:block" />
+            {contribStepKeys.map((key, i) => {
+              const Icon = contribStepIcons[i];
+              return (
+                <FadeInUp key={key} delay={i * 0.08}>
+                  <div className="flex gap-6 mb-8 last:mb-0">
+                    <div className="relative shrink-0">
+                      <div className="w-9 h-9 rounded-full border border-brand-sage/30 bg-surface-2 flex items-center justify-center">
+                        <Icon className="w-4 h-4 text-brand-sage" />
+                      </div>
+                    </div>
+                    <div className="pb-2">
+                      <p className="text-sm font-semibold text-text-primary">
+                        {t(`ecosystem.steps.${key}.name`)}
+                      </p>
+                      <p className="text-sm text-text-secondary mt-1 leading-relaxed">
+                        {t(`ecosystem.steps.${key}.desc`)}
+                      </p>
+                    </div>
+                  </div>
+                </FadeInUp>
+              );
+            })}
+          </div>
+        </div>
+      </SectionWrapper>
+
+      {/* -- Roadmap -- */}
       <SectionWrapper>
+        <SectionTitle
+          overline={t('roadmap.overline')}
+          title={t('roadmap.title')}
+        />
+        <div className="grid sm:grid-cols-3 gap-4 mt-14 max-w-4xl mx-auto">
+          {roadmapPhases.map((phase, i) => (
+            <FadeInUp key={phase.version} delay={i * 0.08}>
+              <div className={`rounded-xl border p-6 h-full ${
+                phase.status === 'current'
+                  ? 'bg-brand-sage/5 border-brand-sage/30'
+                  : 'bg-surface-1 border-border'
+              }`}>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className={`text-xs font-mono font-bold ${
+                    phase.status === 'current' ? 'text-brand-sage' : 'text-text-muted'
+                  }`}>
+                    {phase.version}
+                  </span>
+                  {phase.status === 'current' && (
+                    <span className="text-[10px] font-semibold text-brand-sage bg-brand-sage/10 px-2 py-0.5 rounded-full">
+                      Current
+                    </span>
+                  )}
+                  {phase.status === 'next' && (
+                    <span className="text-[10px] font-semibold text-text-muted bg-surface-2 px-2 py-0.5 rounded-full">
+                      Next
+                    </span>
+                  )}
+                </div>
+                <p className="text-base font-bold text-text-primary mb-3">{phase.title}</p>
+                <ul className="space-y-2">
+                  {phase.items.map((item, j) => (
+                    <li key={j} className="flex items-start gap-2 text-xs text-text-secondary leading-relaxed">
+                      {phase.status === 'current' ? (
+                        <Check className="w-3 h-3 text-brand-sage mt-0.5 shrink-0" />
+                      ) : (
+                        <span className="w-3 h-3 mt-0.5 shrink-0 flex items-center justify-center">
+                          <span className="w-1 h-1 rounded-full bg-text-muted" />
+                        </span>
+                      )}
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </FadeInUp>
+          ))}
+        </div>
+      </SectionWrapper>
+
+      {/* -- CTA -- */}
+      <SectionWrapper dark>
         <div className="text-center max-w-2xl mx-auto">
           <FadeInUp>
             <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary">
