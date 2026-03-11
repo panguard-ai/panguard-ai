@@ -26,7 +26,7 @@
 ## Technology
 
 - [How It Works](https://panguard.ai/how-it-works): 3 detection layers, confidence-based auto-response
-- [Threat Cloud](https://panguard.ai/threat-cloud): Collective threat intelligence with 3,754 Sigma + 4,369 YARA + 49 ATR rules
+- [Threat Cloud](https://panguard.ai/threat-cloud): Collective threat intelligence with 8,000+ detection rules (Sigma + YARA + ATR)
 
 ## Documentation
 

@@ -313,7 +313,7 @@ export default function GettingStartedContent() {
               <TerminalOutput
                 lines={[
                   `[OK] Panguard v${STATS.cliVersion} installed`,
-                  `[OK] Rule engine loaded (${STATS.sigmaRules.toLocaleString()} Sigma + ${STATS.yaraRules.toLocaleString()} YARA rules)`,
+                  `[OK] Rule engine loaded (${STATS.totalRulesDisplay} Sigma + YARA + ATR rules)`,
                   '[OK] Monitoring started. Learning period: 7 days.',
                 ]}
               />

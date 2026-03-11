@@ -7,7 +7,7 @@ import { Copy, Check, ArrowRight } from 'lucide-react';
 import { Link } from '@/navigation';
 import BrandLogo from '@/components/ui/BrandLogo';
 import { CheckIcon } from '@/components/ui/BrandIcons';
-import { useRuleStatsContext } from '@/contexts/RuleStatsContext';
+import { STATS } from '@/lib/stats';
 
 const INSTALL_CMD = 'npx panguard guard --watch';
 
@@ -49,8 +49,6 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function RevolutionHero() {
   const t = useTranslations('revolution.hero');
-  const stats = useRuleStatsContext();
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a0a]">
       {/* Grid background */}
@@ -109,7 +107,7 @@ export default function RevolutionHero() {
             {t('subtitleLine1')}
           </p>
           <p className="text-lg sm:text-xl text-text-primary font-medium leading-relaxed">
-            {t('subtitleLine2', { totalRules: stats.totalRules })}
+            {t('subtitleLine2', { totalRules: STATS.totalRulesDisplay })}
           </p>
           <p className="text-lg sm:text-xl text-panguard-green font-semibold leading-relaxed">
             {t('subtitleLine3')}
@@ -172,7 +170,7 @@ export default function RevolutionHero() {
               className="inline-flex items-center gap-1.5 text-xs text-text-tertiary bg-surface-1/50 border border-border/50 rounded-full px-3 py-1.5"
             >
               <CheckIcon size={12} className="text-panguard-green" />
-              {t(`badges.${key}`, { atrRules: stats.atrRules })}
+              {t(`badges.${key}`)}
             </span>
           ))}
         </motion.div>

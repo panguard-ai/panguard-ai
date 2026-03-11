@@ -24,6 +24,8 @@ export const STATS = {
   yaraRules: 4_369,
   atrRules: 49,
   totalRules: 3_754 + 4_369 + 49,
+  /** Use this for all user-facing display — avoids stale hardcoded counts */
+  totalRulesDisplay: '8,000+' as const,
   falcoConfigs: 1,
   testsPassing: 3_583,
   testFiles: 165,

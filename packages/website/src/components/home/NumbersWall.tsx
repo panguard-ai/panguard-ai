@@ -14,7 +14,7 @@ import {
   LockIcon,
 } from '@/components/ui/BrandIcons';
 import { STATS } from '@/lib/stats';
-import { useRuleStats } from '@/hooks/useRuleStats';
+
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -31,30 +31,29 @@ const statIcons = [
 ];
 
 const statKeys = [
-  'sigmaRules',
-  'yaraRules',
-  'atrRules',
+  'totalRules',
   'tests',
   'layers',
   'actions',
   'skillChecks',
   'mcpTools',
+  'cliCommands',
+  'responseActions',
   'mit',
 ] as const;
 
 export default function NumbersWall() {
   const t = useTranslations('home.numbersWall');
-  const ruleStats = useRuleStats();
 
   const statValues: (number | string)[] = [
-    ruleStats.sigmaRules,
-    ruleStats.yaraRules,
-    ruleStats.atrRules,
+    STATS.totalRulesDisplay,
     STATS.testsPassing,
     STATS.detectionLayers,
     STATS.responseActions,
     STATS.skillAuditChecks,
     STATS.mcpTools,
+    STATS.cliCommands,
+    STATS.responseActions,
     STATS.license,
   ];
 
@@ -99,7 +98,7 @@ export default function NumbersWall() {
         </div>
 
         <p className="text-center text-xs text-text-muted mt-3">
-          Last verified: {ruleStats.lastSync ?? STATS.lastUpdated} | Source: GitHub CI (auto-refresh every 6h)
+          Last verified: {STATS.lastUpdated} | Source: GitHub CI (auto-refresh every 6h)
         </p>
 
         {/* GitHub CTA */}
