@@ -2703,14 +2703,14 @@
           "desc": "自動生成 SOC 2、ISO 27001 和 GDPR 的合規報告。一鍵報告向客戶和合作夥伴展示你的安全態勢。"
         },
         "item5": {
-          "title": "可預測定價",
-          "desc": "簡單的每端點定價，隨你的業務擴展。無隱藏費用、無意外超支、無長期合約。從免費方案開始，準備好再升級。"
+          "title": "完全免費",
+          "desc": "100% 免費開源。無隱藏費用、無意外超支、無供應商鎖定。安裝一次，保護一切。"
         }
       },
       "pricing": {
-        "title": "隨團隊擴展的可預測定價",
-        "subtitle": "無隱藏費用，無每用戶授權的意外。簡單的每端點定價。",
-        "teamPlanDesc": "5-50 端點。所有產品包含。",
+        "title": "對所有人免費，沒有任何附加條件。",
+        "subtitle": "所有功能皆包含。無分層、無每用戶授權、無意外。",
+        "teamPlanDesc": "無限端點。所有產品包含。",
         "teamFeatures": [
           "Guard + Chat + Scan + Report + Trap",
           "Slack / Telegram / Email 通知",
@@ -5187,8 +5187,8 @@
       "business": "商業版",
       "enterprise": "企業版",
       "freeTier": "免費",
-      "upgradeMessage": "升級以解鎖更多端點及進階功能",
-      "upgradeButton": "升級方案",
+      "upgradeMessage": "所有功能皆包含於免費開源版本中",
+      "upgradeButton": "查看文件",
       "machines": "機器數",
       "scansPerMonth": "每月掃描次數",
       "guardEndpoints": "Guard 端點數",
