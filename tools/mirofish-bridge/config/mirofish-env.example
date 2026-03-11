@@ -1,0 +1,52 @@
+# MiroFish Environment Configuration for ATR Attack Prediction
+# MiroFish 環境配置 - 用於 ATR 攻擊預測
+
+# =============================================================================
+# LLM API Configuration (Required)
+# =============================================================================
+# MiroFish supports any OpenAI SDK compatible API
+# Recommended: Alibaba Qwen-plus or Claude/GPT-4o for higher quality predictions
+
+# Option A: Alibaba Qwen (cost-effective, recommended for long simulations)
+# LLM_API_KEY=your_qwen_api_key
+# LLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+# LLM_MODEL_NAME=qwen-plus
+
+# Option B: OpenAI GPT-4o
+# LLM_API_KEY=your_openai_api_key
+# LLM_BASE_URL=https://api.openai.com/v1
+# LLM_MODEL_NAME=gpt-4o
+
+# Option C: Anthropic Claude (via OpenAI-compatible proxy)
+# LLM_API_KEY=your_anthropic_api_key
+# LLM_BASE_URL=https://api.anthropic.com/v1
+# LLM_MODEL_NAME=claude-sonnet-4-20250514
+
+# Option D: Local Ollama (free, slower)
+# LLM_API_KEY=not-needed
+# LLM_BASE_URL=http://localhost:11434/v1
+# LLM_MODEL_NAME=llama3
+
+# =============================================================================
+# Zep Cloud (Required for agent memory)
+# =============================================================================
+# Free tier is sufficient for small simulations
+# Sign up at: https://app.getzep.com/
+ZEP_API_KEY=your_zep_api_key
+
+# =============================================================================
+# Panguard Threat Cloud (Optional - for rule submission)
+# =============================================================================
+# Set this to automatically submit generated ATR rules to Threat Cloud
+# PANGUARD_THREAT_CLOUD_URL=https://threat-cloud.panguard.ai
+# PANGUARD_CLIENT_HASH=auto
+
+# =============================================================================
+# Simulation Parameters
+# =============================================================================
+# Number of simulation rounds (higher = more predictions, more API cost)
+# Start with 20-30 for testing, 100+ for comprehensive predictions
+SIMULATION_ROUNDS=30
+
+# Number of agents per archetype (more agents = richer interactions)
+AGENTS_PER_ARCHETYPE=3

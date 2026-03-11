@@ -457,6 +457,16 @@ export interface DashboardStatus {
   cpuPercent: number;
   lastEvent?: SecurityEvent;
   recentVerdicts: ThreatVerdict[];
+  sigmaRuleCount?: number;
+  yaraRuleCount?: number;
+  atrRuleCount?: number;
+  atrMatchCount?: number;
+  atrDrafterPatterns?: number;
+  atrDrafterSubmitted?: number;
+  whitelistedSkills?: number;
+  trackedSkills?: number;
+  stableFingerprints?: number;
+  licenseTier?: string;
 }
 
 /** Dashboard event for WebSocket push / WebSocket 推送事件 */
@@ -491,7 +501,7 @@ export interface GuardConfig {
   actionPolicy: ActionPolicy;
   notifications: NotificationConfig;
   ai?: {
-    provider: 'ollama' | 'claude' | 'openai';
+    provider: 'ollama' | 'claude' | 'openai' | 'gemini' | 'groq' | 'mistral' | 'deepseek' | 'lmstudio';
     model: string;
     endpoint?: string;
     apiKey?: string;
@@ -499,6 +509,7 @@ export interface GuardConfig {
   };
   dataDir: string;
   threatCloudEndpoint?: string;
+  threatCloudUploadEnabled?: boolean;
   licenseKey?: string;
   /** CLI tier from panguard credentials (overrides key-based license) */
   cliTier?: string;

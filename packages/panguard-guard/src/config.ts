@@ -18,13 +18,27 @@ const logger = createLogger('panguard-guard:config');
 export const DEFAULT_DATA_DIR = join(homedir(), '.panguard-guard');
 
 /**
- * Resolve the bundled rules directory from the installation root.
- * Walks up from this file's location to find the monorepo config/ directory.
- * 從安裝根目錄解析內建規則目錄。
+ * Resolve the bundled rules directory.
+ * Search order:
+ * 1. bundled-rules/ inside the package (npm install scenario)
+ * 2. config/ in monorepo root (development scenario)
+ * 從安裝包或 monorepo 解析內建規則目錄。
  */
 function findBundledDir(subdir: string): string | undefined {
   const thisDir = dirname(fileURLToPath(import.meta.url));
-  // Walk up to find the monorepo root (contains config/)
+
+  // 1. Check for bundled-rules/ inside the package (npm install)
+  //    thisDir = .../dist/ or .../dist/src/ → package root is 1-2 levels up
+  let pkgDir = thisDir;
+  for (let i = 0; i < 3; i++) {
+    const bundled = join(pkgDir, 'bundled-rules', subdir);
+    if (existsSync(bundled)) {
+      return bundled;
+    }
+    pkgDir = dirname(pkgDir);
+  }
+
+  // 2. Walk up to find monorepo root (development — contains config/)
   let dir = thisDir;
   for (let i = 0; i < 8; i++) {
     const candidate = join(dir, 'config', subdir);

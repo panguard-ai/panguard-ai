@@ -44,9 +44,9 @@ describe('guardCommand', () => {
       expect(subcommandNames).toContain('uninstall');
     });
 
-    it('should have 8 subcommands total', () => {
+    it('should have 9 subcommands total', () => {
       const cmd = guardCommand();
-      expect(cmd.commands).toHaveLength(8);
+      expect(cmd.commands).toHaveLength(9);
     });
   });
 

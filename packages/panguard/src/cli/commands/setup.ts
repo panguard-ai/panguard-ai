@@ -1,18 +1,27 @@
 /**
- * panguard setup - One-command platform setup
- * panguard setup - 一行指令平台安裝
+ * panguard setup - One-command platform setup with skill scanning
+ * panguard setup - 一行指令平台安裝並掃描技能
  *
- * Detects installed AI agent platforms, injects MCP config, and verifies.
- * 偵測已安裝的 AI Agent 平台，注入 MCP 設定，並驗證。
+ * Detects installed AI agent platforms, injects MCP config,
+ * scans and audits all installed skills, and optionally starts Guard.
+ * 偵測已安裝的 AI Agent 平台，注入 MCP 設定，掃描審核所有已安裝技能，可選啟動 Guard。
  */
 
 import { Command } from 'commander';
+import { spawn } from 'node:child_process';
 import {
   c,
   banner,
   divider,
   symbols,
+  promptConfirm,
 } from '@panguard-ai/core';
+import {
+  scanInstalledSkills,
+  renderSkillScanResults,
+  reviewFlaggedSkills,
+  collectSafeSkillNames,
+} from './setup-skill-scan.js';
 
 /** Platform-specific restart instructions */
 const PLATFORM_RESTART_HINTS: Record<string, string> = {
@@ -32,7 +41,16 @@ export function setupCommand(): Command {
     .option('--remove', 'Remove Panguard MCP config from platforms / 移除設定', false)
     .option('--json', 'Output as JSON / 以 JSON 格式輸出', false)
     .option('--yes', 'Skip confirmation prompts / 跳過確認提示', false)
-    .action(async (options: { platform?: string; remove: boolean; json: boolean; yes: boolean }) => {
+    .option('--skip-scan', 'Skip skill scanning / 跳過技能掃描', false)
+    .option('--skip-guard', 'Skip guard start prompt / 跳過 Guard 啟動', false)
+    .action(async (options: {
+      platform?: string;
+      remove: boolean;
+      json: boolean;
+      yes: boolean;
+      skipScan: boolean;
+      skipGuard: boolean;
+    }) => {
       const mcpConfig = await import('@panguard-ai/panguard-mcp/config');
       const { detectPlatforms, injectMCPConfig, removeMCPConfig } = mcpConfig;
 
@@ -149,11 +167,83 @@ export function setupCommand(): Command {
         console.log(c.yellow(`  ${succeeded} succeeded, ${failed} failed.`));
       }
 
+      // ── 4. Scan installed skills ──────────────────────────────────
+      if (!options.remove && !options.skipScan) {
+        console.log();
+        divider('Skill Security Scan');
+        console.log();
+        console.log(c.dim('  Scanning installed MCP skills across all platforms...'));
+        console.log();
+
+        try {
+          const { discoverAllSkills } = await import('@panguard-ai/panguard-mcp/config');
+          const skills = await discoverAllSkills();
+
+          if (skills.length > 0) {
+            const scanResults = await scanInstalledSkills(skills);
+            renderSkillScanResults(scanResults);
+
+            // Whitelist safe skills
+            const safeNames = collectSafeSkillNames(scanResults);
+            if (safeNames.length > 0) {
+              console.log();
+              console.log(c.green(`  ${symbols.pass} ${safeNames.length} safe skill(s) auto-whitelisted.`));
+            }
+
+            // Review flagged skills interactively
+            const flagged = scanResults.filter((r) => r.status === 'flagged');
+            if (flagged.length > 0 && !options.yes) {
+              await reviewFlaggedSkills(flagged);
+            } else if (flagged.length > 0) {
+              console.log(c.yellow(`  ${symbols.warn} ${flagged.length} flagged skill(s) — run panguard guard --interactive to review.`));
+            }
+          } else {
+            console.log(c.dim(`  ${symbols.info} No MCP skills found. Skills will be audited as you install them.`));
+          }
+        } catch {
+          console.log(c.dim(`  ${symbols.info} Skill scanning skipped (auditor not available).`));
+        }
+
+        console.log();
+        divider();
+      }
+
+      // ── 5. Start guard ─────────────────────────────────────────────
+      if (!options.remove && !options.skipGuard) {
+        console.log();
+        const startGuard = options.yes || await promptConfirm({
+          message: {
+            en: 'Start Panguard Guard now? (24/7 protection)',
+            'zh-TW': '現在啟動 Panguard Guard 嗎？（24/7 防護）',
+          },
+          defaultValue: true,
+          lang: 'en',
+        });
+
+        if (startGuard) {
+          console.log();
+          console.log(c.dim('  Starting Panguard Guard in background...'));
+
+          try {
+            const child = spawn('npx', ['panguard-guard', 'start'], {
+              detached: true,
+              stdio: 'ignore',
+            });
+            child.unref();
+            console.log(c.green(`  ${symbols.pass} Guard started (PID: ${child.pid}).`));
+            console.log(c.dim('    Run "panguard guard --watch" to see the live dashboard.'));
+          } catch {
+            console.log(c.yellow(`  ${symbols.warn} Could not start guard automatically.`));
+            console.log(c.dim('    Run manually: panguard guard --watch'));
+          }
+        }
+      }
+
+      // ── Next steps ─────────────────────────────────────────────────
       console.log();
       console.log(c.dim('  Next steps:'));
       console.log(c.dim('    1. Restart your AI agent:'));
 
-      // Platform-specific restart instructions
       const configuredPlatforms = actionable.filter((_, i) => results[i]?.success);
       for (const p of configuredPlatforms) {
         const restartHint = PLATFORM_RESTART_HINTS[p.id] ?? 'Restart the application';

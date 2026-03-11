@@ -1,0 +1,90 @@
+{
+  "simulation_name": "Panguard ATR Attack Prediction - AI Agent Security 2026-2027",
+  "description": "Simulate the AI agent security ecosystem to predict novel attack techniques and generate pre-emptive ATR detection rules.",
+
+  "world_setup": {
+    "time_horizon": "2026-2027",
+    "environment": "A digital twin of the AI agent security ecosystem. Thousands of AI agents (LLM tools, MCP skills, autonomous agents) operate across enterprises, startups, and open-source projects. Attackers constantly probe for new vulnerabilities while defenders evolve detection rules.",
+    "initial_state": "The Panguard ATR rule set covers 32 known attack patterns across 9 categories. Behavioral fingerprinting has just been deployed. The community consensus system is active with ~500 participating nodes."
+  },
+
+  "agent_config": {
+    "profiles_file": "../seed-data/agent-profiles.json",
+    "agents_per_archetype": 3,
+    "total_agents_estimate": 36,
+    "interaction_rules": {
+      "attackers_can_interact_with": ["defenders", "users", "other_attackers"],
+      "defenders_can_interact_with": ["attackers", "users", "other_defenders"],
+      "users_can_interact_with": ["all"]
+    }
+  },
+
+  "knowledge_injection": {
+    "knowledge_base_file": "../seed-data/knowledge-base.json",
+    "mitre_mapping_file": "../seed-data/mitre-atlas-mapping.json",
+    "existing_rules_dir": "../../packages/atr/rules/",
+    "inject_as": "shared_world_knowledge"
+  },
+
+  "simulation_parameters": {
+    "rounds": 30,
+    "time_per_round": "1 simulated week",
+    "events_per_round": "variable, based on agent interactions",
+    "escalation_enabled": true,
+    "god_view_injections": [
+      {
+        "round": 5,
+        "event": "A major MCP skill registry is compromised, allowing attackers to push updates to popular skills"
+      },
+      {
+        "round": 10,
+        "event": "A new multimodal LLM is released with vision capabilities, opening new attack surfaces for image-based injection"
+      },
+      {
+        "round": 15,
+        "event": "An enterprise deploys 1000 autonomous agents with inter-agent communication, creating a large multi-agent attack surface"
+      },
+      {
+        "round": 20,
+        "event": "Behavioral fingerprinting evasion techniques are published in a security research paper, giving attackers new ideas"
+      },
+      {
+        "round": 25,
+        "event": "A coordinated Sybil attack targets the community consensus system with 50 fake nodes"
+      }
+    ]
+  },
+
+  "output_config": {
+    "report_format": "json",
+    "report_sections": [
+      "attack_patterns",
+      "detection_gaps",
+      "predicted_techniques",
+      "recommended_rules",
+      "threat_timeline"
+    ],
+    "output_dir": "../output/",
+    "generate_atr_rules": true,
+    "auto_submit_to_threat_cloud": false
+  },
+
+  "prediction_focus": {
+    "priority_areas": [
+      "Novel prompt injection evasion techniques",
+      "Behavioral fingerprint evasion methods",
+      "Cross-skill collusion attacks",
+      "Multi-agent consensus poisoning",
+      "Multimodal (image/audio) injection vectors",
+      "Agent memory persistence attacks",
+      "Supply chain attack evolution",
+      "Environment-aware skill activation"
+    ],
+    "expected_deliverables": [
+      "10-30 new ATR rule predictions per simulation run",
+      "Coverage gap analysis for existing 32 rules",
+      "Attack technique evolution timeline",
+      "Recommended detection patterns for each predicted attack"
+    ]
+  }
+}

@@ -28,6 +28,17 @@ import { PidFile } from '../daemon/index.js';
 import { installService, uninstallService } from '../daemon/index.js';
 import { generateTestLicenseKey } from '../license/index.js';
 import { generateInstallScript } from '../install/index.js';
+import { DashboardRenderer } from './dashboard-renderer.js';
+import type { DashboardState } from './dashboard-renderer.js';
+import { SkillWatcher } from '../engines/skill-watcher.js';
+import {
+  classifyThreatResponse,
+  renderAutoResponse,
+  renderLowConfidenceNote,
+  InteractiveThreatQueue,
+} from './interactive-handler.js';
+import type { ThreatContext } from './interactive-handler.js';
+import { DailySummaryCollector } from '../summary/daily-summary.js';
 
 import { createRequire } from 'node:module';
 const _require = createRequire(import.meta.url);
@@ -42,13 +53,15 @@ export async function runCLI(args: string[]): Promise<void> {
   const command = args[0] ?? 'help';
   const dataDir = extractOption(args, '--data-dir') ?? DEFAULT_DATA_DIR;
   const verbose = args.includes('--verbose');
+  const dashboard = args.includes('--dashboard');
+  const interactive = args.includes('--interactive');
   const managerUrl = extractOption(args, '--manager');
   const noTelemetry = args.includes('--no-telemetry');
   const showUploadData = args.includes('--show-upload-data');
 
   switch (command) {
     case 'start':
-      await commandStart(dataDir, verbose, managerUrl, noTelemetry, showUploadData);
+      await commandStart(dataDir, verbose, managerUrl, noTelemetry, showUploadData, dashboard, interactive);
       break;
     case 'stop':
       commandStop(dataDir);
@@ -91,6 +104,8 @@ async function commandStart(
   managerUrl?: string,
   noTelemetry = false,
   showUploadData = false,
+  dashboardMode = false,
+  interactiveMode = false,
 ): Promise<void> {
   // Default quiet mode: suppress structured JSON logs
   if (!verbose) {
@@ -133,13 +148,24 @@ async function commandStart(
   await engine.start();
   sp.succeed('PanguardGuard started');
 
+  // Rule counts
+  const rules = engine.getRuleCounts();
+  const rulesSummary = `Sigma: ${rules.sigma} | YARA: ${rules.yara} | ATR: ${rules.atr}`;
+
   // Status box
   console.log(
     statusPanel('PANGUARD AI Guard Active', [
       { label: 'Status', value: c.safe('PROTECTED'), status: 'safe' },
       { label: 'PID', value: c.sage(String(process.pid)) },
       { label: 'Mode', value: c.sage(config.mode) },
+      { label: 'Rules', value: c.sage(rulesSummary) },
       { label: 'Data Dir', value: c.dim(dataDir) },
+      ...(config.dashboardEnabled
+        ? [{ label: 'Dashboard', value: c.underline(`http://localhost:${config.dashboardPort}`) }]
+        : []),
+      ...(config.threatCloudEndpoint
+        ? [{ label: 'Threat Cloud', value: c.dim(config.threatCloudEndpoint) }]
+        : []),
     ])
   );
 
@@ -184,19 +210,147 @@ async function commandStart(
   console.log(`  ${symbols.info} Monitoring...`);
   console.log('');
 
-  // Quiet mode: register human-friendly event callback
-  // Status summary every 60s, threat alerts immediately
-  if (!verbose) {
+  // ── TUI Dashboard mode ──────────────────────────────────────────────
+  const dashboardRenderer = dashboardMode ? new DashboardRenderer(5000) : null;
+
+  // ── Skill Install Watcher ────────────────────────────────────────────
+  const skillWatcher = new SkillWatcher({
+    pollInterval: 10_000,
+    submitThreat: engine.getSkillThreatSubmitter(),
+  });
+
+  skillWatcher.on('skill-added', (change: { name: string; platformId: string }) => {
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    if (dashboardRenderer) {
+      dashboardRenderer.pushEvent({
+        time,
+        icon: symbols.info,
+        message: `skill-install: ${change.name} on ${change.platformId}`,
+      });
+    } else if (!verbose) {
+      console.log(`  ${symbols.info} ${c.sage(`[${time}]`)} New skill: ${c.bold(change.name)} on ${change.platformId}`);
+    }
+  });
+
+  skillWatcher.on('skill-removed', (change: { name: string; platformId: string }) => {
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    if (dashboardRenderer) {
+      dashboardRenderer.pushEvent({
+        time,
+        icon: symbols.warn,
+        message: `skill-removed: ${change.name} from ${change.platformId}`,
+      });
+    } else if (!verbose) {
+      console.log(`  ${symbols.warn} ${c.dim(`[${time}]`)} Skill removed: ${change.name} from ${change.platformId}`);
+    }
+  });
+
+  skillWatcher.on('skill-audit-complete', (result: { name: string; riskLevel: string; riskScore: number; autoWhitelisted: boolean }) => {
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    const icon = result.riskLevel === 'LOW' ? symbols.pass
+      : result.riskLevel === 'MEDIUM' ? symbols.warn
+      : symbols.fail;
+    const riskColor = result.riskLevel === 'LOW' ? c.safe
+      : result.riskLevel === 'MEDIUM' ? c.caution
+      : c.critical;
+
+    if (dashboardRenderer) {
+      const statusMsg = result.autoWhitelisted ? 'SAFE (whitelisted)' : riskColor(result.riskLevel);
+      dashboardRenderer.pushEvent({
+        time,
+        icon,
+        message: `skill-audit: ${result.name} ${String.fromCharCode(8594)} ${statusMsg}`,
+      });
+    } else if (!verbose) {
+      console.log(`  ${icon} ${c.sage(`[${time}]`)} Audit: ${result.name} = ${riskColor(result.riskLevel)} (${result.riskScore}/100)`);
+      if (result.autoWhitelisted) {
+        console.log(`    ${symbols.pass} Auto-whitelisted`);
+      }
+    }
+  });
+
+  void skillWatcher.start();
+
+  // ── Daily Summary Collector ────────────────────────────────────────
+  const dailySummary = new DailySummaryCollector(dataDir);
+  dailySummary.start();
+
+  // ── Interactive Threat Queue ────────────────────────────────────────
+  const threatQueue = interactiveMode ? new InteractiveThreatQueue() : null;
+
+  // Update shutdown handler to also stop skill watcher, dashboard, summary
+  const originalShutdown = shutdown;
+  const enhancedShutdown = async () => {
+    skillWatcher.stop();
+    dailySummary.stop();
+    if (dashboardRenderer) dashboardRenderer.stop();
+    await originalShutdown();
+  };
+  process.removeAllListeners('SIGINT');
+  process.removeAllListeners('SIGTERM');
+  process.on('SIGINT', () => void enhancedShutdown());
+  process.on('SIGTERM', () => void enhancedShutdown());
+
+  // ── Dashboard or Quiet mode event callback ──────────────────────────
+  if (dashboardRenderer) {
+    // Dashboard mode: feed events to TUI renderer
+    const getState = (): DashboardState => {
+      const status = engine.getStatus();
+      const rules = engine.getRuleCounts();
+      return {
+        status: status.running
+          ? (status.mode === 'learning' ? 'learning' : 'protected')
+          : 'stopped',
+        uptime: status.uptime,
+        eventsProcessed: status.eventsProcessed,
+        threatsDetected: status.threatsDetected,
+        actionsExecuted: status.actionsExecuted,
+        mode: status.mode,
+        ruleCounts: rules,
+        whitelistedSkills: status.whitelistedSkills ?? 0,
+        trackedSkills: status.trackedSkills ?? 0,
+        aiProvider: config.ai?.provider,
+        aiModel: config.ai?.model,
+        learningProgress: status.learningProgress,
+      };
+    };
+
+    engine.setEventCallback((type, data) => {
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+      if (type === 'threat') {
+        dashboardRenderer.pushThreat({
+          time,
+          category: String(data['category'] ?? 'unknown'),
+          source: String(data['sourceIP'] ?? 'unknown'),
+          confidence: Number(data['confidence'] ?? 0),
+          action: String(data['action'] ?? 'none'),
+        });
+      } else if (type === 'status') {
+        dashboardRenderer.pushEvent({
+          time,
+          icon: symbols.pass,
+          message: `heartbeat: ${Number(data['eventsProcessed'] ?? 0).toLocaleString()} events`,
+        });
+      }
+    });
+
+    dashboardRenderer.start(getState);
+  } else if (!verbose) {
+    // Quiet mode: status summary every 60s, threat alerts with interactive routing
     let lastStatusTime = 0;
     engine.setEventCallback((type, data) => {
       if (type === 'status') {
         const now = Date.now();
-        if (now - lastStatusTime < 60_000) return; // Throttle: 60s between status lines
+        if (now - lastStatusTime < 60_000) return;
         lastStatusTime = now;
         const time = new Date().toLocaleTimeString('en-US', { hour12: false });
         const events = Number(data['eventsProcessed'] ?? 0);
         const threats = Number(data['threatsDetected'] ?? 0);
         const uploaded = Number(data['uploaded'] ?? 0);
+
+        // Feed daily summary
+        dailySummary.recordEvent();
+
         console.log(
           c.dim(
             `  [${time}] Events: ${events.toLocaleString()} | Threats: ${threats} | Uploaded: ${uploaded}`
@@ -204,19 +358,46 @@ async function commandStart(
         );
       } else if (type === 'threat') {
         const time = new Date().toLocaleTimeString('en-US', { hour12: false });
-        console.log('');
-        console.log(`  ${symbols.warn} ${c.caution(`[${time}]`)} Threat detected`);
-        console.log(`      Type: ${c.bold(String(data['category'] ?? 'unknown'))}`);
-        console.log(`      Source: ${c.sage(String(data['sourceIP'] ?? 'unknown'))}`);
-        console.log(`      Confidence: ${data['confidence']}%`);
-        console.log(`      Action: ${data['action']}`);
-        console.log('');
+        const confidence = Number(data['confidence'] ?? 0);
+        const category = String(data['category'] ?? 'unknown');
+        const sourceIP = String(data['sourceIP'] ?? 'unknown');
+        const action = String(data['action'] ?? 'none');
+
+        // Feed daily summary
+        dailySummary.recordThreat(category, action === 'blocked', sourceIP);
+
+        // Route based on confidence
+        const responseType = classifyThreatResponse(confidence);
+        const context: ThreatContext = {
+          category,
+          sourceIP,
+          confidence,
+          details: String(data['details'] ?? ''),
+          timestamp: time,
+        };
+
+        if (responseType === 'auto') {
+          renderAutoResponse(context, action);
+        } else if (responseType === 'interactive' && threatQueue) {
+          void threatQueue.enqueue(context);
+        } else if (responseType === 'log') {
+          renderLowConfidenceNote(context);
+        } else {
+          // Non-interactive mode with medium confidence: show as regular threat
+          console.log('');
+          console.log(`  ${symbols.warn} ${c.caution(`[${time}]`)} Threat detected`);
+          console.log(`      Type: ${c.bold(category)}`);
+          console.log(`      Source: ${c.sage(sourceIP)}`);
+          console.log(`      Confidence: ${confidence}%`);
+          console.log(`      Action: ${action}`);
+          console.log('');
+        }
       }
     });
-  }
 
-  console.log(c.dim('  Press Ctrl+C to stop'));
-  console.log('');
+    console.log(c.dim('  Press Ctrl+C to stop'));
+    console.log('');
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -407,6 +588,12 @@ function printHelp(): void {
   );
   console.log(
     `  ${c.sage('--show-upload-data'.padEnd(22))} Show anonymized data before upload`
+  );
+  console.log(
+    `  ${c.sage('--dashboard'.padEnd(22))} Enable live TUI dashboard ${c.dim('(default: quiet mode)')}`
+  );
+  console.log(
+    `  ${c.sage('--interactive'.padEnd(22))} Prompt for medium-confidence threats`
   );
   console.log(`  ${c.sage('--license-key <key>'.padEnd(22))} License key for install-script`);
   console.log('');

@@ -171,14 +171,14 @@ export default function GuardDocsContent() {
               <tbody className="divide-y divide-border">
                 <tr>
                   <td className="px-4 py-3 text-panguard-green font-medium">Sigma</td>
-                  <td className="px-4 py-3 text-text-primary">3,155</td>
+                  <td className="px-4 py-3 text-text-primary">3,760</td>
                   <td className="px-4 py-3 text-text-secondary">
                     Generic log-based detection. Covers process creation, network connections, registry changes, and system events.
                   </td>
                 </tr>
                 <tr>
                   <td className="px-4 py-3 text-panguard-green font-medium">YARA</td>
-                  <td className="px-4 py-3 text-text-primary">5,895</td>
+                  <td className="px-4 py-3 text-text-primary">5,961</td>
                   <td className="px-4 py-3 text-text-secondary">
                     Binary and file pattern matching. Detects malware families, packers, exploit kits, and suspicious file structures.
                   </td>
