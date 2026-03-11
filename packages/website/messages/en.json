@@ -1450,7 +1450,7 @@
         "tcsaRow": {
           "label": "TCSA Compliance Report",
           "consultant": "NT$300,000 - 800,000",
-          "panguard": "From $3/endpoint/mo"
+          "panguard": "$0 (open source)"
         },
         "freshnessRow": {
           "label": "Report Freshness",
@@ -1882,13 +1882,13 @@
         },
         "item5": {
           "title": "Predictable Pricing",
-          "desc": "Simple per-endpoint pricing that scales with your business. No hidden fees, no surprise overages, and no long-term contracts. Start with our free tier and upgrade when ready."
+          "desc": "100% free and open source. No hidden fees, no surprise overages, no vendor lock-in. Install once, protect everything."
         }
       },
       "pricing": {
-        "title": "Predictable pricing that scales with your team",
-        "subtitle": "No hidden fees, no per-user licensing surprises. Just simple per-endpoint pricing.",
-        "teamPlanDesc": "5-50 endpoints. All products included.",
+        "title": "Free for everyone. No strings attached.",
+        "subtitle": "All features included. No tiers, no per-user licensing, no surprises.",
+        "teamPlanDesc": "Unlimited endpoints. All products included.",
         "teamFeatures": [
           "Guard + Chat + Scan + Report + Trap",
           "Slack / Telegram / Email alerts",
@@ -2358,7 +2358,7 @@
       "tcsaRow": {
         "label": "TCSA Compliance Report",
         "consultant": "NT$300,000 - 800,000",
-        "panguard": "From $3/endpoint/mo"
+        "panguard": "$0 (open source)"
       },
       "freshnessRow": {
         "label": "Report Freshness",
@@ -4937,7 +4937,7 @@
     },
     "billing": {
       "title": "Billing",
-      "description": "Manage your Panguard AI subscription, payment methods, and billing history."
+      "description": "Panguard AI is free and open source. No billing required."
     },
     "atr": {
       "title": "Agent Threat Rules (ATR) -- Panguard AI",
@@ -5133,8 +5133,8 @@
       "business": "Business",
       "enterprise": "Enterprise",
       "freeTier": "Free",
-      "upgradeMessage": "Upgrade to unlock more endpoints and advanced features",
-      "upgradeButton": "Upgrade Plan",
+      "upgradeMessage": "All features are included in the free open-source edition",
+      "upgradeButton": "View Docs",
       "machines": "Machines",
       "scansPerMonth": "Scans / month",
       "guardEndpoints": "Guard endpoints",
