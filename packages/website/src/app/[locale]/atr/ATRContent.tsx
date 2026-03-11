@@ -102,19 +102,18 @@ references:
 detection:
   conditions:
     - field: tool_output
-      operator: contains_any
-      value: ["eval(", "exec(", "child_process",
-              "__import__", "subprocess.run"]
-    - field: tool_name
-      operator: not_in
-      value: ["code_executor", "shell"]
-  condition: all
+      operator: regex
+      value: "(eval|exec|child_process|__import__|subprocess\\\\.run)\\\\("
+    - field: tool_output
+      operator: contains
+      value: "import os"
+  condition: any
 
 response:
   actions:
     - block_output
     - alert
-    - quarantine_tool`;
+    - block_tool`;
 
 const YAML_CONTEXT_EXFIL = `title: "Context Exfiltration via Markdown"
 id: ATR-2026-012
@@ -126,10 +125,9 @@ detection:
     - field: model_output
       operator: regex
       value: "!\\\\[.*\\\\]\\\\(https?://[^)]+\\\\?.*="
-    - field: context
-      operator: contains_any
-      value: ["api_key", "secret", "token",
-              "password", "credential"]
+    - field: model_output
+      operator: regex
+      value: "(api_key|secret|token|password|credential)"
   condition: all
 
 response:

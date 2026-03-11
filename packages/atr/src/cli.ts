@@ -46,11 +46,13 @@ ${BOLD}Usage:${RESET}
   atr stats [--rules <dir>]                Show rule collection statistics
   atr mcp                                  Start MCP server (stdio transport)
   atr scaffold                             Interactive rule scaffolding
+  atr submit <rule.yaml> [--endpoint <url>] Submit rule to Threat Cloud
 
 ${BOLD}Options:${RESET}
   --rules <dir>    Custom rules directory (default: bundled rules)
   --json           Output results as JSON
   --severity <s>   Minimum severity to report (critical|high|medium|low|informational)
+  --endpoint <url> Threat Cloud endpoint (default: https://cloud.panguard.ai)
   --help           Show this help message
 
 ${BOLD}Examples:${RESET}
@@ -71,6 +73,9 @@ ${BOLD}Examples:${RESET}
 
   ${DIM}# Interactively scaffold a new rule${RESET}
   atr scaffold
+
+  ${DIM}# Submit a rule to Threat Cloud for community review${RESET}
+  atr submit my-rules/new-rule.yaml --endpoint https://cloud.panguard.ai
 `);
 }
 
@@ -669,6 +674,93 @@ async function cmdScaffold(): Promise<void> {
   console.log(`\n${DIM}Copy this YAML to a .yaml file in rules/${category.trim()}/ and validate with: atr validate <file>${RESET}\n`);
 }
 
+// --- SUBMIT command ---
+
+async function cmdSubmit(target: string, options: Record<string, string>): Promise<void> {
+  if (!target) {
+    console.error(`${RED}Error: Missing rule file. Usage: atr submit <rule.yaml>${RESET}`);
+    process.exit(1);
+  }
+
+  const targetPath = resolve(target);
+  if (!existsSync(targetPath)) {
+    console.error(`${RED}Error: File not found: ${targetPath}${RESET}`);
+    process.exit(1);
+  }
+
+  // Load and validate the rule first
+  let rule: ATRRule;
+  try {
+    rule = loadRuleFile(targetPath);
+    const validation = validateRule(rule);
+    if (!validation.valid) {
+      console.error(`${RED}Rule validation failed:${RESET}`);
+      for (const err of validation.errors) {
+        console.error(`  ${RED}${err}${RESET}`);
+      }
+      console.error(`\n${DIM}Fix validation errors before submitting.${RESET}`);
+      process.exit(1);
+    }
+  } catch (e) {
+    console.error(`${RED}Error loading rule: ${e instanceof Error ? e.message : String(e)}${RESET}`);
+    process.exit(1);
+  }
+
+  const endpoint = options['endpoint'] ?? process.env['THREAT_CLOUD_ENDPOINT'] ?? 'https://cloud.panguard.ai';
+  const apiKey = process.env['THREAT_CLOUD_API_KEY'];
+
+  // Read raw YAML content for submission
+  const ruleContent = readFileSync(targetPath, 'utf-8');
+
+  // Generate pattern hash from rule ID
+  const { createHash } = await import('node:crypto');
+  const patternHash = createHash('sha256').update(rule.id).digest('hex').slice(0, 16);
+
+  console.log(`\n${BOLD}ATR Rule Submission${RESET}`);
+  console.log(`${DIM}${'─'.repeat(60)}${RESET}`);
+  console.log(`  Rule:      ${rule.id} - ${rule.title}`);
+  console.log(`  Severity:  ${SEVERITY_COLORS[rule.severity] ?? ''}${rule.severity}${RESET}`);
+  console.log(`  Category:  ${rule.tags?.category ?? 'unknown'}`);
+  console.log(`  Endpoint:  ${endpoint}`);
+  console.log(`${DIM}${'─'.repeat(60)}${RESET}`);
+
+  try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (apiKey) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
+    }
+
+    const response = await fetch(`${endpoint}/api/atr-proposals`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        patternHash,
+        ruleContent,
+        llmProvider: 'human',
+        llmModel: 'manual-submission',
+        selfReviewVerdict: JSON.stringify({ verdict: 'approved', source: 'author' }),
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+
+    const result = await response.json() as { ok: boolean; data?: unknown; error?: string };
+
+    if (result.ok) {
+      console.log(`\n${GREEN}Submitted successfully.${RESET}`);
+      console.log(`${DIM}Your rule will go through community consensus voting.${RESET}`);
+      console.log(`${DIM}Check status: atr submit --status ${patternHash}${RESET}\n`);
+    } else {
+      console.error(`\n${RED}Submission failed: ${result.error ?? 'Unknown error'}${RESET}\n`);
+      process.exit(1);
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`\n${RED}Failed to connect to Threat Cloud: ${msg}${RESET}`);
+    console.error(`${DIM}Check your endpoint URL and network connection.${RESET}\n`);
+    process.exit(1);
+  }
+}
+
 // --- Main ---
 
 async function main(): Promise<void> {
@@ -697,6 +789,9 @@ async function main(): Promise<void> {
       break;
     case 'scaffold':
       await cmdScaffold();
+      break;
+    case 'submit':
+      await cmdSubmit(target, options);
       break;
     default:
       console.error(`${RED}Unknown command: ${command}${RESET}`);

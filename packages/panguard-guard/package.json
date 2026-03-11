@@ -13,11 +13,12 @@
   },
   "files": [
     "dist",
+    "bundled-rules",
     "package.json",
     "README.md"
   ],
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build && node scripts/bundle-rules.js",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

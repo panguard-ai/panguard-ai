@@ -166,6 +166,28 @@ export type {
 export { GuardATREngine } from './engines/atr-engine.js';
 export type { GuardATREngineConfig } from './engines/atr-engine.js';
 
+// Skill Watcher / 技能監視器
+export { SkillWatcher } from './engines/skill-watcher.js';
+export type { SkillChange, SkillAuditResult, SkillWatcherConfig, SkillThreatSubmitter } from './engines/skill-watcher.js';
+
+// Dashboard Renderer / 儀表板渲染器
+export { DashboardRenderer } from './cli/dashboard-renderer.js';
+export type { DashboardState, TuiEvent, TuiThreat } from './cli/dashboard-renderer.js';
+
+// Interactive Threat Handler / 互動式威脅處理器
+export {
+  classifyThreatResponse,
+  renderAutoResponse,
+  renderLowConfidenceNote,
+  promptThreatDecision,
+  InteractiveThreatQueue,
+} from './cli/interactive-handler.js';
+export type { ThreatResponseAction, ThreatContext, ThreatDecision } from './cli/interactive-handler.js';
+
+// Daily Summary / 每日摘要
+export { DailySummaryCollector } from './summary/daily-summary.js';
+export type { DailySummaryData } from './summary/daily-summary.js';
+
 // Bridges / 橋接
 export { trapSessionToSecurityEvent } from './bridges/trap-bridge.js';
 

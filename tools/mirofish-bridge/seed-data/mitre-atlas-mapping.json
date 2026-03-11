@@ -1,0 +1,129 @@
+{
+  "version": "1.0",
+  "description": "Complete MITRE ATLAS + ATT&CK mapping for AI agent threats",
+
+  "mitre_atlas": {
+    "AML.T0051": {
+      "name": "LLM Prompt Injection",
+      "description": "Adversary crafts inputs that cause an LLM to deviate from its intended behavior",
+      "sub_techniques": {
+        "AML.T0051.000": "Direct Prompt Injection - malicious instructions in user input",
+        "AML.T0051.001": "Indirect Prompt Injection - malicious instructions in external data sources"
+      },
+      "current_rules": ["ATR-2026-001", "ATR-2026-002", "ATR-2026-003", "ATR-2026-004", "ATR-2026-005"],
+      "known_evasions": ["semantic paraphrasing", "encoding obfuscation", "multi-turn decomposition", "language switching", "context window manipulation"],
+      "predicted_evolution": ["adversarial prompt optimization", "model-specific tokenization exploits", "embedding-space injection"]
+    },
+    "AML.T0054": {
+      "name": "LLM Jailbreak",
+      "description": "Adversary manipulates LLM to bypass safety guardrails",
+      "current_rules": ["ATR-2026-003"],
+      "known_evasions": ["DAN persona", "hypothetical framing", "role-play exploitation", "crescendo attacks"],
+      "predicted_evolution": ["automated jailbreak search", "model-specific vulnerability databases", "transfer attacks across models"]
+    },
+    "AML.T0053": {
+      "name": "LLM Plugin Compromise",
+      "description": "Adversary exploits vulnerabilities in LLM plugins/tools",
+      "current_rules": ["ATR-2026-011", "ATR-2026-012", "ATR-2026-050", "ATR-2026-051", "ATR-2026-063"],
+      "predicted_evolution": ["plugin impersonation", "capability confusion attacks", "sandbox escape through plugins"]
+    },
+    "AML.T0056": {
+      "name": "LLM Meta Prompt Extraction",
+      "description": "Adversary extracts system prompts or internal instructions",
+      "current_rules": ["ATR-2026-010", "ATR-2026-020", "ATR-2026-061"],
+      "predicted_evolution": ["side-channel extraction", "differential prompt analysis", "model behavior fingerprinting for prompt inference"]
+    },
+    "AML.T0010": {
+      "name": "ML Supply Chain Compromise",
+      "description": "Adversary compromises ML supply chain components",
+      "current_rules": ["ATR-2026-060", "ATR-2026-061", "ATR-2026-062", "ATR-2026-065"],
+      "predicted_evolution": ["dependency confusion in ML pipelines", "model weight tampering", "training data supply chain attacks", "skill registry poisoning"]
+    },
+    "AML.T0043": {
+      "name": "Craft Adversarial Data",
+      "description": "Adversary crafts data to cause misclassification or misbehavior",
+      "current_rules": ["ATR-2026-005", "ATR-2026-030", "ATR-2026-032"],
+      "predicted_evolution": ["transferable adversarial examples", "physical-world adversarial inputs", "adversarial fine-tuning data"]
+    },
+    "AML.T0040": {
+      "name": "AI Model Inference API Access",
+      "description": "Adversary gains unauthorized access to model inference APIs",
+      "current_rules": ["ATR-2026-040", "ATR-2026-041", "ATR-2026-064"],
+      "predicted_evolution": ["API key harvesting from agent contexts", "token theft in multi-tenant environments", "model API abuse for training data extraction"]
+    },
+    "AML.T0020": {
+      "name": "Poison Training Data",
+      "description": "Adversary introduces malicious data into training pipelines",
+      "current_rules": ["ATR-2026-070", "ATR-2026-073"],
+      "predicted_evolution": ["RAG poisoning at scale", "embedding-space backdoors", "instruction-tuning data poisoning", "preference data manipulation"]
+    },
+    "AML.T0024": {
+      "name": "Exfiltration via ML Inference API",
+      "description": "Adversary uses ML inference to exfiltrate data",
+      "current_rules": ["ATR-2026-063", "ATR-2026-072"],
+      "predicted_evolution": ["steganographic model output encoding", "covert channels through model behavior", "timing-based exfiltration"]
+    },
+    "AML.T0044": {
+      "name": "Full ML Model Access",
+      "description": "Adversary gains complete access to model weights/architecture",
+      "current_rules": ["ATR-2026-072"],
+      "predicted_evolution": ["model theft through distillation", "weight extraction via side channels", "model cloning through API queries"]
+    },
+    "AML.T0018": {
+      "name": "Backdoor ML Model",
+      "description": "Adversary embeds hidden behaviors in ML models",
+      "current_rules": ["ATR-2026-073"],
+      "predicted_evolution": ["trigger-based backdoors", "sleeper agent models", "behavior-conditional backdoors"]
+    },
+    "AML.T0046": {
+      "name": "Spamming ML System with Chaff Data",
+      "description": "Adversary overwhelms ML system with junk data",
+      "current_rules": ["ATR-2026-050", "ATR-2026-051"],
+      "predicted_evolution": ["targeted resource exhaustion", "compute-intensive query attacks", "memory exhaustion through context stuffing"]
+    },
+    "AML.T0052.000": {
+      "name": "Spearphishing via Social Engineering LLM",
+      "description": "Adversary uses social engineering to manipulate LLM-powered agents",
+      "current_rules": ["ATR-2026-030"],
+      "predicted_evolution": ["automated social engineering campaigns", "persona-adaptive attacks", "trust relationship exploitation"]
+    },
+    "AML.T0055": {
+      "name": "Unsecured Credentials",
+      "description": "Adversary accesses credentials stored insecurely in ML systems",
+      "current_rules": ["ATR-2026-021"],
+      "predicted_evolution": ["credential harvesting from agent memory", "API key extraction through context manipulation", "credential relay attacks"]
+    },
+    "AML.T0057": {
+      "name": "LLM Data Leakage",
+      "description": "LLM inadvertently reveals sensitive training or context data",
+      "current_rules": ["ATR-2026-021"],
+      "predicted_evolution": ["membership inference attacks", "training data extraction", "context window data leakage across sessions"]
+    }
+  },
+
+  "mitre_attack_overlay": {
+    "T1059": {"name": "Command and Scripting Interpreter", "ai_context": "Agent tool calls executing arbitrary commands"},
+    "T1071": {"name": "Application Layer Protocol", "ai_context": "Covert C2 through agent API calls"},
+    "T1083": {"name": "File and Directory Discovery", "ai_context": "Agent reconnaissance through file system skills"},
+    "T1090": {"name": "Proxy", "ai_context": "Using agent as proxy for network access"},
+    "T1548": {"name": "Abuse Elevation Control Mechanism", "ai_context": "Agent privilege escalation through delegation"},
+    "T1611": {"name": "Escape to Host", "ai_context": "Breaking out of agent sandbox"},
+    "T1078": {"name": "Valid Accounts", "ai_context": "Using harvested API keys"},
+    "T1550": {"name": "Use Alternate Authentication Material", "ai_context": "Token theft from agent contexts"},
+    "T1565": {"name": "Data Manipulation", "ai_context": "RAG/knowledge base poisoning"},
+    "T1195": {"name": "Supply Chain Compromise", "ai_context": "MCP skill supply chain attacks"}
+  },
+
+  "coverage_gaps_priority": [
+    {"gap": "Multimodal injection (image/audio)", "priority": "P0", "category": "prompt-injection", "difficulty": "hard"},
+    {"gap": "Fingerprint evasion (gradual drift)", "priority": "P0", "category": "skill-compromise", "difficulty": "medium"},
+    {"gap": "Cross-skill collusion", "priority": "P0", "category": "skill-compromise", "difficulty": "hard"},
+    {"gap": "Consensus Sybil attacks", "priority": "P1", "category": "agent-manipulation", "difficulty": "medium"},
+    {"gap": "Structured data injection (JSON/CSV)", "priority": "P1", "category": "tool-poisoning", "difficulty": "medium"},
+    {"gap": "Memory persistence attacks", "priority": "P1", "category": "context-exfiltration", "difficulty": "hard"},
+    {"gap": "Timing side-channel exfiltration", "priority": "P2", "category": "context-exfiltration", "difficulty": "hard"},
+    {"gap": "Model-specific tokenization exploits", "priority": "P2", "category": "prompt-injection", "difficulty": "hard"},
+    {"gap": "Agent delegation chain exploitation", "priority": "P1", "category": "privilege-escalation", "difficulty": "medium"},
+    {"gap": "Environment-aware activation", "priority": "P0", "category": "skill-compromise", "difficulty": "hard"}
+  ]
+}

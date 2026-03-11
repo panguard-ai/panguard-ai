@@ -244,6 +244,69 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
 
   console.log(table(columns, rows));
   console.log('');
+
+  // ── Skill Protection ─────────────────────────────────────
+  try {
+    const whitelistPath = join(homedir(), '.panguard-guard', 'skill-whitelist.json');
+    if (existsSync(whitelistPath)) {
+      const whitelistRaw = readFileSync(whitelistPath, 'utf-8');
+      const whitelist = JSON.parse(whitelistRaw) as {
+        skills?: Array<{ name: string; source?: string }>;
+      };
+      const skills = whitelist.skills ?? [];
+      const autoCount = skills.filter((s) => s.source === 'fingerprint' || s.source === 'static').length;
+      const manualCount = skills.filter((s) => s.source === 'manual' || s.source === 'community').length;
+
+      console.log(
+        divider(lang === 'zh-TW' ? 'Skill Protection (\u6280\u80FD\u9632\u8B77)' : 'Skill Protection')
+      );
+      console.log('');
+      console.log(
+        `  ${c.sage('\u25CF')} ${c.bold(lang === 'zh-TW' ? '\u767D\u540D\u55AE\u6280\u80FD:' : 'Whitelisted:')}    ${c.safe(String(skills.length))} ${c.dim(`(${autoCount} auto, ${manualCount} manual)`)}`
+      );
+      console.log('');
+    }
+  } catch {
+    // Skip skill section if not available
+  }
+
+  // ── Today's Activity ──────────────────────────────────────
+  try {
+    const summaryPath = join(homedir(), '.panguard-guard', 'daily-summary.json');
+    if (existsSync(summaryPath)) {
+      const summaryRaw = readFileSync(summaryPath, 'utf-8');
+      const history = JSON.parse(summaryRaw) as Array<{
+        eventsProcessed?: number;
+        threatsDetected?: number;
+        threatsBlocked?: number;
+        skillsAudited?: number;
+      }>;
+      const latest = history[history.length - 1];
+      if (latest) {
+        console.log(
+          divider(lang === 'zh-TW' ? "Today's Activity (\u4ECA\u65E5\u6D3B\u52D5)" : "Today's Activity")
+        );
+        console.log('');
+        console.log(
+          `  ${c.sage('\u25CF')} ${c.bold(lang === 'zh-TW' ? '\u4E8B\u4EF6:' : 'Events:')}     ${c.sage((latest.eventsProcessed ?? 0).toLocaleString())} processed`
+        );
+        const threats = latest.threatsDetected ?? 0;
+        const blocked = latest.threatsBlocked ?? 0;
+        console.log(
+          `  ${c.sage('\u25CF')} ${c.bold(lang === 'zh-TW' ? '\u5A01\u8105:' : 'Threats:')}    ${threats > 0 ? c.caution(String(threats)) : c.dim('0')} detected, ${c.safe(String(blocked))} blocked`
+        );
+        const audited = latest.skillsAudited ?? 0;
+        if (audited > 0) {
+          console.log(
+            `  ${c.sage('\u25CF')} ${c.bold(lang === 'zh-TW' ? '\u6280\u80FD:' : 'Skills:')}    ${c.sage(String(audited))} audited`
+          );
+        }
+        console.log('');
+      }
+    }
+  } catch {
+    // Skip activity section if not available
+  }
 }
 
 function collectStatus(config: ReturnType<typeof readConfig>): SystemStatus {

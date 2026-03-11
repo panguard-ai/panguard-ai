@@ -275,6 +275,77 @@ export class ThreatCloudClient {
   }
 
   /**
+   * Fetch YARA rules from Threat Cloud (auto-generated from threat patterns).
+   * 從 Threat Cloud 取得 YARA 規則（自動從威脅模式產生）
+   *
+   * @param since - Optional ISO timestamp for incremental sync
+   * @returns Array of YARA rule updates / YARA 規則更新陣列
+   */
+  async fetchYaraRules(since?: string): Promise<ThreatCloudUpdate[]> {
+    if (this.status === 'offline' || !this.endpoint) {
+      return [];
+    }
+
+    try {
+      let url = `${this.endpoint}/api/yara-rules`;
+      const lastSync = since ?? this.cache.lastSync;
+      if (lastSync) {
+        url += `?since=${encodeURIComponent(lastSync)}`;
+      }
+
+      const body = await this.httpGet(url);
+      const rules = JSON.parse(body) as ThreatCloudUpdate[];
+      this.status = 'connected';
+      if (rules.length > 0) {
+        logger.info(
+          `Fetched ${rules.length} YARA rules from Threat Cloud / ` +
+            `從 Threat Cloud 取得 ${rules.length} 條 YARA 規則`
+        );
+      }
+      return rules;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.error(`Fetch YARA rules failed: ${msg} / 取得 YARA 規則失敗: ${msg}`);
+      this.status = 'disconnected';
+      return [];
+    }
+  }
+
+  /**
+   * Fetch domain blocklist from the cloud (plain text, one domain per line).
+   * 從雲端取得網域封鎖清單（純文字，每行一個網域）
+   *
+   * @returns Array of blocked domains / 封鎖網域陣列
+   */
+  async fetchDomainBlocklist(): Promise<string[]> {
+    if (this.status === 'offline' || !this.endpoint) {
+      return [];
+    }
+
+    try {
+      const url = `${this.endpoint}/api/feeds/domain-blocklist`;
+      const response = await this.httpGet(url);
+      const domains = response
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0 && !line.startsWith('#'));
+
+      this.status = 'connected';
+      if (domains.length > 0) {
+        logger.info(
+          `Fetched ${domains.length} domains from blocklist / 從封鎖清單取得 ${domains.length} 個網域`
+        );
+      }
+      return domains;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.error(`Fetch domain blocklist failed: ${msg} / 取得網域封鎖清單失敗: ${msg}`);
+      this.status = 'disconnected';
+      return [];
+    }
+  }
+
+  /**
    * Fetch IP blocklist from the cloud (plain text, one IP per line).
    * 從雲端取得 IP 封鎖清單（純文字，每行一個 IP）。
    *
@@ -376,6 +447,46 @@ export class ThreatCloudClient {
       await this.httpPost(url, { ruleId, isTruePositive });
     } catch {
       // Best effort, don't fail the main flow
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Skill Threat Submission / Skill 威脅提交
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Submit a skill audit result to Threat Cloud.
+   * Anonymized: only hash, name, score, and finding IDs are sent.
+   * 提交 Skill 審計結果至 Threat Cloud（匿名化：只傳 hash、名稱、分數和 finding ID）
+   */
+  async submitSkillThreat(submission: {
+    skillHash: string;
+    skillName: string;
+    riskScore: number;
+    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+    findingSummaries?: Array<{
+      id: string;
+      category: string;
+      severity: string;
+      title: string;
+    }>;
+  }): Promise<boolean> {
+    if (this.status === 'offline' || !this.endpoint) {
+      logger.info('Cannot submit skill threat in offline mode');
+      return false;
+    }
+
+    try {
+      const url = `${this.endpoint}/api/skill-threats`;
+      await this.httpPost(url, submission);
+      logger.info(
+        `Skill threat submitted: ${submission.skillName} (risk: ${submission.riskLevel})`
+      );
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      logger.warn(`Skill threat submission failed: ${msg}`);
+      return false;
     }
   }
 

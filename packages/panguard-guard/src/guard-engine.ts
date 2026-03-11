@@ -1173,14 +1173,59 @@ export class GuardEngine {
         logger.warn(`ATR cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
       }
 
-      // Refresh blocklist / 更新封鎖清單
+      // Sync YARA rules from Threat Cloud / 從 Threat Cloud 同步 YARA 規則
+      let newYaraRules = 0;
+      try {
+        const yaraRules = await this.threatCloud.fetchYaraRules();
+        if (yaraRules.length > 0) {
+          const yaraCloudDir = join(this.config.dataDir, 'yara-rules', 'cloud');
+          const { mkdirSync, writeFileSync } = await import('node:fs');
+          mkdirSync(yaraCloudDir, { recursive: true });
+          for (const rule of yaraRules) {
+            try {
+              const filename = `${rule.ruleId ?? 'unknown'}.yar`;
+              writeFileSync(join(yaraCloudDir, filename), rule.ruleContent, 'utf-8');
+              newYaraRules++;
+            } catch {
+              // skip invalid YARA rules
+            }
+          }
+          if (newYaraRules > 0) {
+            // Reload YARA scanner with new rules
+            const yaraCustomDir = this.config.yaraRulesDir
+              ? join(this.config.yaraRulesDir, 'custom')
+              : join(this.config.dataDir, 'yara-rules', 'custom');
+            await this.yaraScanner.loadAllRules(yaraCustomDir, this.config.bundledYaraDir);
+          }
+        }
+      } catch (err: unknown) {
+        logger.warn(`YARA cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
+      }
+
+      // Refresh IP blocklist / 更新 IP 封鎖清單
       const ips = await this.threatCloud.fetchBlocklist();
-      const added =
+      const addedIPs =
         ips.length > 0 ? this.feedManager.addExternalIPs(ips, 'threat_cloud_blocklist', 85) : 0;
 
+      // Refresh domain blocklist / 更新網域封鎖清單
+      let addedDomains = 0;
+      try {
+        const domains = await this.threatCloud.fetchDomainBlocklist();
+        addedDomains =
+          domains.length > 0
+            ? this.feedManager.addExternalDomains(domains, 'threat_cloud_blocklist', 85)
+            : 0;
+      } catch (err: unknown) {
+        logger.warn(
+          `Domain blocklist sync failed: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+
       logger.info(
-        `Threat Cloud sync: ${newRules} Sigma rules, ${newATRRules} ATR rules, ${added} blocklist IPs / ` +
-          `Threat Cloud 同步: ${newRules} 條 Sigma 規則, ${newATRRules} 條 ATR 規則, ${added} 個封鎖 IP`
+        `Threat Cloud sync: ${newRules} Sigma, ${newATRRules} ATR, ${newYaraRules} YARA, ` +
+          `${addedIPs} IPs, ${addedDomains} domains / ` +
+          `Threat Cloud 同步: ${newRules} Sigma, ${newATRRules} ATR, ${newYaraRules} YARA, ` +
+          `${addedIPs} IP, ${addedDomains} 網域`
       );
     } catch (err: unknown) {
       logger.warn(`Threat Cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -1194,6 +1239,7 @@ export class GuardEngine {
     if (!this.dashboard) return;
 
     const memUsage = process.memoryUsage();
+    const ruleCounts = this.getRuleCounts();
     this.dashboard.updateStatus({
       mode: this.mode,
       uptime: Date.now() - this.startTime,
@@ -1204,6 +1250,15 @@ export class GuardEngine {
       baselineConfidence: this.baseline.confidenceLevel,
       memoryUsageMB: Math.round((memUsage.heapUsed / 1024 / 1024) * 10) / 10,
       cpuPercent: 0, // CPU tracking would need os.cpus()
+      sigmaRuleCount: ruleCounts.sigma,
+      yaraRuleCount: ruleCounts.yara,
+      atrRuleCount: this.atrEngine.getRuleCount(),
+      atrMatchCount: this.atrEngine.getMatchCount(),
+      atrDrafterPatterns: this.atrDrafter?.getPatternCount() ?? 0,
+      atrDrafterSubmitted: this.atrDrafter?.getSubmittedCount() ?? 0,
+      whitelistedSkills: this.atrEngine.getWhitelistManager().getStats().active,
+      trackedSkills: this.atrEngine.getTrackedSkillCount(),
+      stableFingerprints: this.atrEngine.getStableFingerprintCount(),
     });
   }
 
@@ -1281,6 +1336,20 @@ export class GuardEngine {
     } catch (err: unknown) {
       logger.warn(`Policy poll failed: ${err instanceof Error ? err.message : String(err)}`);
     }
+  }
+
+  /**
+   * Get a skill threat submitter function for SkillWatcher integration.
+   * Returns a bound callback that submits to Threat Cloud.
+   */
+  getSkillThreatSubmitter(): (submission: {
+    skillHash: string;
+    skillName: string;
+    riskScore: number;
+    riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+    findingSummaries?: Array<{ id: string; category: string; severity: string; title: string }>;
+  }) => Promise<boolean> {
+    return (submission) => this.threatCloud.submitSkillThreat(submission);
   }
 
   /**

@@ -272,6 +272,43 @@ export class ThreatIntelFeedManager {
     return added;
   }
 
+  /**
+   * Bulk-add domain IoCs from an external source (e.g. Threat Cloud blocklist).
+   * 從外部來源批量加入網域 IoC（如 Threat Cloud 封鎖清單）
+   */
+  addExternalDomains(
+    domains: string[],
+    threatType: string = 'blocklisted',
+    confidence: number = 80
+  ): number {
+    let added = 0;
+    const now = new Date().toISOString();
+
+    for (const domain of domains) {
+      const trimmed = domain.trim().toLowerCase();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+
+      const ioc: IoC = {
+        type: 'domain',
+        value: trimmed,
+        threatType,
+        source: 'threatfox',
+        confidence,
+        lastSeen: now,
+        tags: ['threat-cloud-blocklist'],
+      };
+      this.addIoC(ioc);
+      added++;
+    }
+
+    if (added > 0) {
+      logger.info(
+        `Added ${added} external domains to threat intel / 已加入 ${added} 個外部網域`
+      );
+    }
+    return added;
+  }
+
   /** Get all IP-based IoCs as ThreatIntelEntry array / 取得所有 IP IoC 為 ThreatIntelEntry 陣列 */
   getAllIPEntries(): ThreatIntelEntry[] {
     const entries: ThreatIntelEntry[] = [];
