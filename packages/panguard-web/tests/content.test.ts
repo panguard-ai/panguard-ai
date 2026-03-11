@@ -143,14 +143,16 @@ describe('Pricing Plans', () => {
   });
 
   it('should recommend plan for personas', () => {
+    // Only community plan exists; it targets 'developer'
     expect(getRecommendedPlan('developer')).toBeDefined();
-    expect(getRecommendedPlan('small_business')).toBeDefined();
-    expect(getRecommendedPlan('mid_enterprise')).toBeDefined();
+    // small_business and mid_enterprise have no matching plan in the all-free model
+    expect(getRecommendedPlan('small_business')).toBeUndefined();
+    expect(getRecommendedPlan('mid_enterprise')).toBeUndefined();
   });
 
-  it('should recommend pro plan for small_business (highlighted)', () => {
-    const rec = getRecommendedPlan('small_business');
+  it('should recommend community plan for developer (highlighted)', () => {
+    const rec = getRecommendedPlan('developer');
     expect(rec).toBeDefined();
-    expect(rec!.plan).toBe('pro');
+    expect(rec!.plan).toBe('community');
   });
 });

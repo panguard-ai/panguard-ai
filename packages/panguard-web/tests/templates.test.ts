@@ -156,8 +156,9 @@ describe('HTML Templates', () => {
     });
 
     it('should not highlight non-highlighted plans', () => {
-      const free = getAllPricingPlans()[0]!;
-      const html = generatePricingCard(free, 'en');
+      const base = getAllPricingPlans()[0]!;
+      const nonHighlighted = { ...base, highlighted: false };
+      const html = generatePricingCard(nonHighlighted, 'en');
       expect(html).not.toContain('pricing-highlighted');
     });
 
@@ -169,8 +170,15 @@ describe('HTML Templates', () => {
     });
 
     it('should mark included/not-included features', () => {
-      const plan = getAllPricingPlans()[0]!;
-      const html = generatePricingCard(plan, 'en');
+      const base = getAllPricingPlans()[0]!;
+      const planWithMixedFeatures = {
+        ...base,
+        features: [
+          ...base.features,
+          { nameEn: 'Enterprise SSO', nameZh: '企業 SSO', included: false },
+        ],
+      };
+      const html = generatePricingCard(planWithMixedFeatures, 'en');
       expect(html).toContain('included');
       expect(html).toContain('not-included');
     });

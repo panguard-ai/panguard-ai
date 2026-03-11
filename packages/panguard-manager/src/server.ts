@@ -81,9 +81,13 @@ export class ManagerServer {
 
   /** Start the HTTP server and Manager service */
   async start(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       this.server = createServer((req, res) => {
         void this.handleRequest(req, res);
+      });
+
+      this.server.once('error', (err) => {
+        reject(err);
       });
 
       this.server.listen(this.config.port, () => {
