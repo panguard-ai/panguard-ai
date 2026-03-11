@@ -32,73 +32,136 @@ npm has `audit`. Docker has scanning. Chrome has extension review.<br>
 
 ---
 
-## The Problem
-
-A single malicious AI agent skill can:
-
-- **Steal your API keys** and upload them to a remote server
-- **Exfiltrate conversations** containing proprietary business data
-- **Execute arbitrary code** on your machine via prompt injection
-- **Hijack your agent** to act against your interests
-
-There are **zero pre-install security checks** for AI agent skills today. No CVE database. No vulnerability scanner. No shared threat intelligence. Every agent runtime is a trust-everything sandbox.
-
-**Panguard changes this.** Every skill is analyzed by 9,700+ community rules and multi-layer AI before it touches your system. Known threats are blocked instantly. Unknown threats are caught by behavioral analysis. New attack patterns are shared anonymously to protect everyone.
+## One Line. App Store-Level Security for Every Skill.
 
 ```bash
 curl -fsSL https://get.panguard.ai | bash
 ```
 
+That's it. From this point on, every AI agent skill on your machine goes through a **7-layer security audit** before it can run -- like App Store review, but for AI agents. No configuration. No account. No cost.
+
+What happens after install:
+
+```
+You install a skill
+    |
+    v
+Panguard intercepts it
+    |
+    +--> Manifest validation        (Is the SKILL.md well-formed?)
+    +--> Prompt injection scan      (11 patterns + Unicode + base64)
+    +--> Tool poisoning detection   (curl|bash, reverse shells, sudo abuse)
+    +--> Dependency analysis         (External URLs, npm/pip installs)
+    +--> Permission scope check     (Bash, network, database, credentials)
+    +--> Secrets detection          (API keys, tokens, passwords)
+    +--> Behavioral intent analysis (Does the code match the description?)
+    |
+    v
+Risk Score: 0-100
+    |
+    +--> PASS (0-39)    --> Skill runs normally
+    +--> WARN (40-69)   --> You decide with full evidence
+    +--> BLOCK (70-100) --> Skill blocked, threat reported to Threat Cloud
+```
+
 ---
 
-## How It Works
+## How Protection Works
+
+Three layers. Each one catches what the previous one missed. If any layer goes down, the others keep running.
 
 ```
-                    +-----------------------+
-                    |   AI Agent Ecosystem  |
-                    |  Claude Code, Cursor  |
-                    |  Windsurf, OpenClaw   |
-                    +-----------+-----------+
-                                |
-                    +-----------v-----------+
-                    |    PANGUARD GUARD     |
-                    |    MCP / CLI / SDK    |
-                    +-----------+-----------+
-                                |
-              +-----------------+-----------------+
-              |                 |                 |
-     +--------v------+  +------v-------+  +------v-------+
-     |   Layer 1     |  |   Layer 2    |  |   Layer 3    |
-     |  Rules Engine |  |  Local AI    |  |  Cloud AI    |
-     |               |  |              |  |              |
-     | 3,760 Sigma   |  | Ollama GPU   |  | Claude /     |
-     | 5,961 YARA    |  | Fully local  |  | OpenAI       |
-     | 69 ATR        |  | Zero network |  | Deep reason  |
-     |               |  |              |  |              |
-     | 90% threats   |  | 7% threats   |  | 3% threats   |
-     | < 50ms        |  | ~ 2s         |  | ~ 5s         |
-     | $0            |  | $0           |  | $0.008/call  |
-     +-------+-------+  +------+-------+  +------+-------+
-              |                 |                 |
-              +-----------------+-----------------+
-                                |
-                    +-----------v-----------+
-                    |   Confidence Engine   |
-                    |                       |
-                    |  > 90%  Auto-respond  |
-                    |  70-90% Ask human     |
-                    |  < 70%  Log + notify  |
-                    +-----------+-----------+
-                                |
-                    +-----------v-----------+
-                    |    THREAT CLOUD       |
-                    |  Anonymous rule share |
-                    |  Community consensus  |
-                    |  LLM-reviewed rules   |
-                    +-----------------------+
+ +------------------------------------------------------------------+
+ |                                                                    |
+ |   Layer 1: Rules Engine            90% of threats    < 50ms   $0  |
+ |   3,760 Sigma + 5,961 YARA + 69 ATR rules                        |
+ |   Pattern matching. Instant. Runs fully offline.                  |
+ |                                                                    |
+ +-----+------------------------------------------------------------+
+       | Unmatched events pass down
+       v
+ +------------------------------------------------------------------+
+ |                                                                    |
+ |   Layer 2: Local AI                7% of threats     ~ 2s     $0  |
+ |   Ollama on your GPU. Zero network. Zero data leaves machine.     |
+ |   Classifies ambiguous events the rule engine can't decide.       |
+ |                                                                    |
+ +-----+------------------------------------------------------------+
+       | Still uncertain? Pass down
+       v
+ +------------------------------------------------------------------+
+ |                                                                    |
+ |   Layer 3: Cloud AI                3% of threats    ~ 5s  $0.008  |
+ |   Claude / OpenAI. Multi-step reasoning for novel attacks.        |
+ |   Only invoked when local AI is uncertain. Optional.              |
+ |                                                                    |
+ +------------------------------------------------------------------+
+       |
+       v
+ +------------------------------------------------------------------+
+ |   Confidence Engine                                                |
+ |                                                                    |
+ |   > 90% confidence  -->  Auto-respond (block, kill, quarantine)   |
+ |   70-90%            -->  Ask you first, show evidence             |
+ |   < 70%             -->  Log and notify only                      |
+ +------------------------------------------------------------------+
 ```
 
-If Cloud AI is down, Local AI takes over. If Local AI is down, the Rules Engine keeps running. **Protection never stops.**
+**Graceful degradation:** Cloud AI down? Local AI handles it. Local AI down? Rules engine keeps running. Internet down? Everything still works. Protection never stops.
+
+---
+
+## Threat Cloud
+
+Every Panguard instance is a sensor. When you detect a new attack, Panguard can anonymously share the pattern so everyone else is protected within minutes.
+
+```
+Your machine detects a novel attack
+    |
+    v
+Guard auto-drafts an ATR rule from the attack pattern
+    |
+    v
+Anonymous upload to Threat Cloud (zero PII, zero raw data)
+    |
+    v
+3+ unique clients must independently confirm the threat (consensus)
+    |
+    v
+LLM review (Claude Sonnet) validates rule quality
+    |
+    v
+Rule promoted to "stable" --> distributed to all Panguard users
+    |
+    v
+Next time this attack hits anyone, Layer 1 blocks it in < 50ms
+```
+
+### Why This Matters
+
+Traditional threat intelligence is top-down: a vendor writes rules, you pay for updates. Threat Cloud is **bottom-up**: every user contributes, every user benefits. The more people run Panguard, the faster new attacks get caught.
+
+### Privacy
+
+- Only anonymized threat signatures leave your machine
+- Zero raw data, zero telemetry, zero PII
+- Anonymous client IDs -- no accounts, no login
+- TLS 1.3 encrypted transport
+- **Fully optional** -- works 100% offline without it
+
+### Infrastructure
+
+Threat Cloud is operated by Panguard AI at `tc.panguard.ai`. All Panguard installations sync with it automatically. No configuration needed.
+
+- **Rule sync:** Every 1 hour, Guard fetches the latest rules (incremental, bandwidth-efficient)
+- **Threat upload:** Detected threats are batched and uploaded every 60 seconds
+- **Offline mode:** If Threat Cloud is unreachable, Guard continues with cached rules. Zero downtime.
+- **Consensus engine:** Rules require 3+ independent client confirmations before promotion
+- **LLM review:** Claude Sonnet validates rule quality before distribution
+
+The Threat Cloud **server** is proprietary infrastructure operated exclusively by Panguard AI. The **client** (upload/download/sync) is open source and built into every Guard installation.
+
+Enterprise users who need a private Threat Cloud instance can [contact us](mailto:security@panguard.ai).
 
 ---
 
