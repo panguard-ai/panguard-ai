@@ -16,7 +16,7 @@ export default function Traction() {
 
   const metrics: readonly MetricItem[] = [
     { label: t('traction.tests'), value: STATS.testsPassing },
-    { label: t('traction.rules'), value: STATS.totalRules },
+    { label: t('traction.rules'), value: STATS.totalRulesDisplay },
     { label: t('traction.cli'), value: STATS.cliCommands },
     { label: t('traction.products'), value: STATS.products },
     { label: t('traction.mcp'), value: STATS.mcpTools },

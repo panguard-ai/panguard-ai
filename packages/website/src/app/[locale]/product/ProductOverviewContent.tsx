@@ -22,9 +22,9 @@ const productConfigs = [
     icon: AnalyticsIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
     description:
-      `ATR (Agent Threat Rules) is the first open standard for detecting AI agent threats. ${STATS.atrRules} YAML-based rules across 9 categories cover prompt injection, tool poisoning, skill compromise, unauthorized access, data exfiltration, and more. Like Sigma for network attacks, ATR gives the security community a shared language for AI agent threats. Rules are open-source, human-readable, and machine-enforceable.`,
+      `ATR (Agent Threat Rules) is an open standard for detecting AI agent threats. YAML-based rules across 9 categories cover prompt injection, tool poisoning, skill compromise, unauthorized access, data exfiltration, and more. Inspired by Sigma for network attacks, ATR gives the security community a shared language for AI agent threats. Rules are open-source, human-readable, and machine-enforceable.`,
     features: [
-      `${STATS.atrRules} rules across 9 threat categories`,
+      'Rules across 9 threat categories, growing continuously',
       'YAML-based, human-readable rule format',
       'Covers prompt injection, tool poisoning, skill compromise, data exfiltration',
       'Open-source -- community-contributed and reviewed',
@@ -54,10 +54,10 @@ const productConfigs = [
     icon: ShieldIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
     description:
-      `Panguard Guard is the enforcement engine. A 4-agent pipeline (Detect, Analyze, Respond, Report) processes OS-level events through ${STATS.sigmaRules.toLocaleString()} Sigma rules, ${STATS.yaraRules.toLocaleString()} YARA signatures, and ${STATS.atrRules} ATR rules. Built-in Skill Auditor runs ${STATS.skillAuditChecks} checks before any AI skill is installed. Three response modules auto-block IPs, kill processes, and quarantine files.`,
+      `Panguard Guard is the enforcement engine. A 4-agent pipeline (Detect, Analyze, Respond, Report) processes OS-level events through ${STATS.totalRulesDisplay} combined Sigma, YARA, and ATR rules. Built-in Skill Auditor runs ${STATS.skillAuditChecks} checks before any AI skill is installed. Three response modules auto-block IPs, kill processes, and quarantine files.`,
     features: [
       '4-agent AI pipeline: Detect, Analyze, Respond, Report',
-      `${STATS.totalRules.toLocaleString()}+ detection rules (Sigma + YARA + ATR)`,
+      `${STATS.totalRulesDisplay} detection rules (Sigma + YARA + ATR)`,
       `Skill Auditor: ${STATS.skillAuditChecks}-layer pre-install security gate`,
       '3 auto-response modules: IP Blocker, Process Killer, File Quarantine',
       'Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent',

@@ -10,10 +10,10 @@ import { STATS } from '@/lib/stats';
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const highlights = [
-  `${(STATS.totalRules).toLocaleString()}+ detection rules`,
-  `${STATS.atrRules} ATR rules`,
+  `${STATS.totalRulesDisplay} detection rules (Sigma + YARA + ATR)`,
+  'ATR rules for AI agent threats',
   'Unlimited machines',
-  'Threat Cloud collective immunity',
+  'Threat Cloud collective intelligence',
   'All notifications (Telegram, Slack, Email, LINE)',
   'Compliance reports included',
   'Full source code (MIT)',

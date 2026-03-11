@@ -9,6 +9,7 @@ interface RuleStatsValues {
   sigmaRules: string;
   yaraRules: string;
   totalRules: string;
+  totalRulesDisplay: string;
 }
 
 const RuleStatsContext = createContext<RuleStatsValues>({
@@ -16,6 +17,7 @@ const RuleStatsContext = createContext<RuleStatsValues>({
   sigmaRules: '3,700',
   yaraRules: '4,300',
   totalRules: '8,000',
+  totalRulesDisplay: '8,000+',
 });
 
 export function RuleStatsProvider({ children }: { children: ReactNode }) {
@@ -26,6 +28,7 @@ export function RuleStatsProvider({ children }: { children: ReactNode }) {
     sigmaRules: stats.sigmaRules.toLocaleString(),
     yaraRules: stats.yaraRules.toLocaleString(),
     totalRules: (stats.sigmaRules + stats.yaraRules).toLocaleString(),
+    totalRulesDisplay: '8,000+',
   };
 
   return (

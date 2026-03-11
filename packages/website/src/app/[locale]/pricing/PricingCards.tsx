@@ -9,9 +9,9 @@ import { STATS } from '@/lib/stats';
 /* ── All-inclusive feature list ── */
 
 const features = [
-  `${STATS.totalRules.toLocaleString()}+ detection rules (Sigma + YARA + ATR)`,
+  `${STATS.totalRulesDisplay} detection rules (Sigma + YARA + ATR)`,
   '4-agent AI pipeline: Detect, Analyze, Respond, Report',
-  `${STATS.atrRules} Agent Threat Rules across 9 categories`,
+  'Agent Threat Rules (ATR) across 9 threat categories',
   `Skill Auditor with ${STATS.skillAuditChecks}-layer pre-install security gate`,
   `${STATS.responseActions} auto-response actions with confidence-based thresholds`,
   'Threat Cloud collective intelligence network',
