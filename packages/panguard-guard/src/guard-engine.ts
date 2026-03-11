@@ -512,7 +512,7 @@ export class GuardEngine {
         let added = 0;
         for (const rule of atrCloudRules) {
           try {
-            const parsed = JSON.parse(rule.ruleContent) as import('agent-threat-rules').ATRRule;
+            const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
             if (parsed.id && parsed.title && parsed.detection) {
               this.atrEngine.addCloudRule(parsed);
               added++;
@@ -1159,7 +1159,7 @@ export class GuardEngine {
         const atrRules = await this.threatCloud.fetchATRRules();
         for (const rule of atrRules) {
           try {
-            const parsed = JSON.parse(rule.ruleContent) as import('agent-threat-rules').ATRRule;
+            const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
             if (parsed.id && parsed.title && parsed.detection) {
               this.atrEngine.addCloudRule(parsed);
               newATRRules++;

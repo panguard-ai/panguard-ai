@@ -6,8 +6,8 @@
  */
 
 import { describe, it, expect, beforeAll } from 'vitest';
-import { ATREngine } from 'agent-threat-rules';
-import type { AgentEvent } from 'agent-threat-rules';
+import { ATREngine } from '@panguard-ai/atr';
+import type { AgentEvent } from '@panguard-ai/atr';
 import { join } from 'node:path';
 
 describe('Guard + ATR Integration (E2E)', () => {

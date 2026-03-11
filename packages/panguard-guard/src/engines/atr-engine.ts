@@ -12,8 +12,8 @@ import { join, dirname } from 'node:path';
 import { createRequire } from 'node:module';
 import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
-import { ATREngine, SessionTracker, SkillFingerprintStore } from 'agent-threat-rules';
-import type { ATRMatch, ATRRule, AgentEvent, AgentEventType, BehaviorAnomaly } from 'agent-threat-rules';
+import { ATREngine, SessionTracker, SkillFingerprintStore } from '@panguard-ai/atr';
+import type { ATRMatch, ATRRule, AgentEvent, AgentEventType, BehaviorAnomaly } from '@panguard-ai/atr';
 import { SkillWhitelistManager } from './skill-whitelist.js';
 import type { SkillWhitelistConfig } from './skill-whitelist.js';
 
@@ -26,7 +26,7 @@ const logger = createLogger('panguard-guard:atr-engine');
 function resolveBundledRulesDir(): string | null {
   try {
     const require = createRequire(import.meta.url);
-    const atrPkgPath = require.resolve('agent-threat-rules/package.json');
+    const atrPkgPath = require.resolve('@panguard-ai/atr/package.json');
     return join(dirname(atrPkgPath), 'rules');
   } catch {
     return null;
