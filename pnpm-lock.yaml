@@ -54,6 +54,9 @@ importers:
 
   packages/atr:
     dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.12.0
+        version: 1.27.1(zod@3.25.76)
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -188,6 +191,9 @@ importers:
 
   packages/panguard-guard:
     dependencies:
+      '@panguard-ai/atr':
+        specifier: workspace:*
+        version: link:../atr
       '@panguard-ai/core':
         specifier: workspace:*
         version: link:../core
@@ -197,9 +203,6 @@ importers:
       '@panguard-ai/security-hardening':
         specifier: workspace:*
         version: link:../../security-hardening
-      agent-threat-rules:
-        specifier: workspace:*
-        version: link:../atr
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1

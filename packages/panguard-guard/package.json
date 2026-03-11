@@ -5,8 +5,17 @@
   "description": "AI real-time endpoint monitoring and auto-response / AI \u5373\u6642\u7aef\u9ede\u76e3\u63a7\u8207\u81ea\u52d5\u56de\u61c9",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "bin": {
     "panguard-guard": "./dist/cli/index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "publishConfig": {
     "access": "public"
@@ -26,7 +35,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "agent-threat-rules": "workspace:*",
+    "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/core": "workspace:*",
     "@panguard-ai/panguard-trap": "workspace:*",
     "@panguard-ai/security-hardening": "workspace:*",
