@@ -752,7 +752,8 @@ function normalizeRegex(pattern: string): string {
 function normalizeUnicode(text: string): string {
   return text
     .normalize('NFC')
-    .replace(/[\u200B\u200C\u200D\uFEFF\u2060\u180E\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, '');
+    // eslint-disable-next-line no-misleading-character-class
+    .replace(/[\u200B\u200C\u200D\uFEFF\u2060\u180E\u200E\u200F\u202A\u202B\u202C\u202D\u202E\u2066\u2067\u2068\u2069]/gu, '');
 }
 
 /** Maximum input length for regex evaluation to mitigate ReDoS */

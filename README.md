@@ -4,14 +4,16 @@
 
 <!-- [English](README.md) | [繁體中文](README.zh-TW.md) -->
 
-<br>
+<img src="assets/PANGUARD_GitHub_Banner_Clean.png" alt="Panguard AI" width="100%">
 
-# PANGUARD AI
+<br>
 
 ### The First Open-Source Security Platform Built for AI Agents
 
 <br>
 
+[![GitHub Stars](https://img.shields.io/github/stars/panguard-ai/panguard-ai?style=social)](https://github.com/panguard-ai/panguard-ai)
+[![npm version](https://img.shields.io/npm/v/@panguard-ai/panguard?style=flat-square&color=cb3837&logo=npm)](https://www.npmjs.com/package/@panguard-ai/panguard)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A518-339933.svg?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6.svg?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -49,6 +51,12 @@ Enterprise security tools don't cover this. They weren't built for it. And if yo
 curl -fsSL https://get.panguard.ai | bash
 ```
 
+Or install via npm if you prefer to verify the source first:
+
+```bash
+npm install -g @panguard-ai/panguard
+```
+
 From this point on, every AI agent skill on your machine goes through a multi-layer security audit before it can run. No configuration. No account. No cost.
 
 ---
@@ -82,6 +90,25 @@ Checks: manifest validation, prompt injection scan (11 patterns + Unicode + base
 
 ---
 
+## How Panguard Gets Smarter
+
+Panguard is not a static rule set. Every user makes everyone safer:
+
+```
+You install Panguard
+    --> Skills are audited before they run
+        --> Threats are detected in real-time
+            --> New rules are drafted from novel attacks
+                --> Shared anonymously to Threat Cloud
+                    --> Community votes + LLM reviews
+                        --> Rules distributed to all users
+                            --> Your Panguard is now stronger --> Loop
+```
+
+One user's encounter with a new attack becomes a protection rule for everyone. The more people run Panguard, the faster new threats get caught.
+
+---
+
 ## Quick Start
 
 ```bash
@@ -98,10 +125,10 @@ npx @panguard-ai/panguard scan --quick
 ### First Commands
 
 ```bash
-panguard scan --quick              # 60-second security audit
-panguard audit skill ./my-skill    # Audit a skill before install
-panguard guard start               # Start real-time protection
-panguard setup                     # Auto-configure your AI agents
+panguard scan --quick              # Scan your machine for vulnerabilities (60s)
+panguard audit skill ./my-skill    # Check if a skill is safe before installing it
+panguard guard start               # Start 24/7 background protection
+panguard setup                     # Auto-configure Claude, Cursor, Windsurf, etc.
 ```
 
 ### MCP Configuration (Claude Desktop / Cursor)
@@ -129,13 +156,17 @@ Each layer catches what the previous one missed. If any layer goes down, the oth
 
 | Layer | Engine | Coverage | Latency | Cost | Network |
 |-------|--------|----------|---------|------|---------|
-| **1** | **Rules Engine** -- 3,760 Sigma + 5,961 YARA + 69 ATR | 90% of threats | < 50ms | $0 | Offline |
-| **2** | **Local AI** -- Ollama on your GPU | 7% of threats | ~ 2s | $0 | Offline |
-| **3** | **Cloud AI** -- Claude / OpenAI | 3% of threats | ~ 5s | ~$0.008 | Optional |
+| **1** | **Rules Engine** -- 9,700+ Sigma / YARA / ATR pattern rules | ~90% of known threats | < 50ms | $0 | Offline |
+| **2** | **Local AI** -- Ollama on your machine | ~7% (ambiguous cases) | ~ 2s | $0 | Offline |
+| **3** | **Cloud AI** -- Claude / OpenAI | ~3% (novel attacks) | ~ 5s | ~$0.008 | Optional |
+
+Coverage estimates are from internal simulation benchmarks, not empirical field data. Real-world results vary by threat type and environment.
 
 **Graceful degradation:** Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet down? Everything still works. Protection never stops.
 
 **Confidence engine:** >90% confidence triggers auto-response (block, kill, quarantine). 70-90% asks you first with evidence. <70% logs and notifies only.
+
+**Evasion handling:** Layer 1 regex can be bypassed by paraphrasing. That's why Layer 2 (behavioral classification) and Layer 3 (multi-step LLM reasoning) exist -- they catch what patterns miss.
 
 Full architecture details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
@@ -214,25 +245,7 @@ Every Panguard instance is a sensor. When one user encounters a new attack, Pang
 
 **Privacy:** Threat Cloud participation is fully optional. When enabled, only anonymized threat signatures leave your machine -- zero raw data, zero PII. Anonymous client IDs. TLS 1.3 encrypted. When disabled, everything runs 100% offline with zero network calls.
 
----
-
-## The Flywheel
-
-This is what makes Panguard different from a static rule set:
-
-```
-Install Panguard
-    --> Audit skills before install (Skill Auditor)
-        --> Detect threats in real-time (Guard + ATR)
-            --> Draft new rules from novel attacks (ATR Drafter)
-                --> Share anonymously (Threat Cloud)
-                    --> Community votes + LLM reviews
-                        --> New rules distributed to all users
-                            --> Your Panguard is now stronger
-                                --> Loop
-```
-
-One user's encounter with a new attack pattern becomes a protection rule for everyone.
+**Note:** The Threat Cloud **server** (`tc.panguard.ai`) is proprietary infrastructure operated by Panguard AI. The **client** (upload, download, sync) is fully open source and built into every installation. Enterprise users needing a private instance can [contact us](mailto:security@panguard.ai).
 
 ---
 
@@ -339,6 +352,10 @@ We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 [Documentation](docs/)
 
 <br>
+
+If Panguard helps protect your AI agents, consider giving it a star. It helps others discover the project.
+
+[![Star on GitHub](https://img.shields.io/github/stars/panguard-ai/panguard-ai?style=for-the-badge&logo=github&label=Star%20on%20GitHub)](https://github.com/panguard-ai/panguard-ai)
 
 <sub>If AI agents can act on your behalf, someone should check what they're about to do.</sub>
 

@@ -146,7 +146,7 @@ export function checkFeatureAccess(_feature: string): boolean {
 
 /* ── Feature display names (bilingual) ── */
 
-const FEATURE_DISPLAY: Record<string, Record<string, string>> = {
+const _FEATURE_DISPLAY: Record<string, Record<string, string>> = {
   scan: { en: 'Security Scan', 'zh-TW': '\u5B89\u5168\u6383\u63CF' },
   guard: { en: 'Guard Engine', 'zh-TW': '\u5B88\u8B77\u5F15\u64CE' },
   report: { en: 'Compliance Report', 'zh-TW': '\u5408\u898F\u5831\u544A' },

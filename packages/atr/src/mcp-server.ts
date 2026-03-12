@@ -178,7 +178,7 @@ const TOOLS = [
 
 export async function createMCPServer(): Promise<Server> {
   const engine = new ATREngine({ rulesDir: RULES_DIR });
-  const ruleCount = await engine.loadRules();
+  const _ruleCount = await engine.loadRules();
 
   const server = new Server(
     {
