@@ -1,8 +1,8 @@
 {
   "common": {
     "getStarted": "立即開始",
-    "signIn": "登入",
-    "startFreeTrial": "免費安裝",
+    "signIn": "Login",
+    "startFreeTrial": "Install",
     "scanFree": "免費掃描",
     "contactSales": "聯繫業務",
     "requestDemo": "預約示範",
@@ -33,19 +33,19 @@
     "solutions": "解決方案",
     "resources": "資源",
     "company": "關於我們",
-    "pricing": "方案價格",
+    "pricing": "Pricing",
     "docs": "文件",
     "useCases": "使用場景",
     "howItWorks": "技術架構",
     "threatCloud": "Threat Cloud",
     "atr": "ATR",
     "about": "關於我們",
-    "blog": "部落格",
+    "blog": "Blog",
     "startFreeScan": "免費掃描",
     "getStarted": "立即開始",
     "install": "安裝",
     "community": "社群",
-    "login": "登入",
+    "login": "Login",
     "productLinks": {
       "overview": "產品總覽",
       "overviewDesc": "查看完整平台",
@@ -85,13 +85,13 @@
       "partnersDesc": "託管服務供應商"
     },
     "resourceLinks": {
-      "blog": "部落格",
+      "blog": "Blog",
       "blogDesc": "最新洞察",
       "docs": "技術文件",
       "docsDesc": "指南與參考",
       "api": "API 文件",
       "apiDesc": "開發者文件",
-      "changelog": "更新日誌",
+      "changelog": "Changelog",
       "changelogDesc": "最新功能",
       "status": "系統狀態",
       "statusDesc": "服務運行狀態",
@@ -107,7 +107,7 @@
       "contactDesc": "與我們聯繫",
       "press": "新聞中心",
       "pressDesc": "媒體報導",
-      "trust": "信任中心",
+      "trust": "Trust Center",
       "trustDesc": "安全與合規",
       "partners": "合作夥伴",
       "partnersDesc": "夥伴生態系",
@@ -127,7 +127,7 @@
     "chat": "Chat",
     "trap": "Trap",
     "report": "Report",
-    "mcp": "MCP 伺服器",
+    "mcp": "MCP Server",
     "skillAuditor": "Skill Auditor",
     "atrStandard": "ATR 標準",
     "compliance": "合規",
@@ -135,9 +135,9 @@
     "documentation": "技術文件",
     "cliReference": "CLI 參考文件",
     "apiReference": "API 文件",
-    "blog": "部落格",
+    "blog": "Blog",
     "resourceCenter": "資源中心",
-    "changelog": "更新紀錄",
+    "changelog": "Changelog",
     "statusPage": "系統狀態",
     "about": "關於我們",
     "careers": "加入團隊",
@@ -146,7 +146,7 @@
     "partners": "合作夥伴",
     "customers": "客戶案例",
     "openSource": "開源",
-    "trustCenter": "信任中心",
+    "trustCenter": "Trust Center",
     "security": "安全",
     "privacyPolicy": "隱私政策",
     "termsOfService": "服務條款",
@@ -1343,7 +1343,7 @@
       "inProgress": {
         "title": "進行中",
         "items": [
-          "Web 儀表板 UI",
+          "Web Dashboard UI",
           "Windows 支援",
           "Kubernetes 整合"
         ]
@@ -1446,7 +1446,7 @@
       "description": "台灣與全球標準的合規自動化。ISO 27001、SOC 2 和台灣資通安全管理法 -- 自動化、平價且永遠最新。"
     },
     "trust": {
-      "title": "信任中心",
+      "title": "Trust Center",
       "description": "可驗證的安全。查看我們的合規狀態、安全架構、資料處理實踐和次處理者關係。"
     },
     "security": {
@@ -1474,7 +1474,7 @@
       "description": "沒有黑箱的資安防護。每一條偵測規則都可以被稽核。每一個 AI 決策都可以被追蹤。MIT 授權。"
     },
     "blog": {
-      "title": "部落格",
+      "title": "Blog",
       "description": "Panguard AI 團隊的安全洞察與更新。研究、產品更新和工程深度探討。"
     },
     "customers": {
@@ -1486,7 +1486,7 @@
       "description": "安裝、設定和精通 Panguard AI 所需的一切。指南、API 文件和產品文件。"
     },
     "changelog": {
-      "title": "更新日誌",
+      "title": "Changelog",
       "description": "Panguard 最新動態。每一次更新、改進和修復 -- 透明記錄。"
     },
     "faq": {
@@ -1510,7 +1510,7 @@
       "description": "所有 Panguard AI 平台服務的即時運營狀態和正常運行歷史。"
     },
     "login": {
-      "title": "登入",
+      "title": "Login",
       "description": "登入你的 Panguard AI 帳號，管理安全儀表板和設定。"
     },
     "register": {
@@ -1687,12 +1687,12 @@
           "badge": "功能"
         },
         "mcp": {
-          "name": "MCP 伺服器",
+          "name": "MCP Server",
           "tagline": "從 AI 助手控制 Panguard。",
           "badge": "整合"
         },
         "skillAuditor": {
-          "name": "技能審計器",
+          "name": "Skill Auditor",
           "tagline": "安裝 AI 技能前先審計安全性。",
           "badge": "內建"
         }
@@ -2093,7 +2093,7 @@
           "label": "分享",
           "desc": "匿名化的威脅情報推送到集體網路，強化每個 Panguard 使用者。"
         },
-        "logTitle": "陷阱活動記錄"
+        "logTitle": "Trap Activity Log"
       },
       "features": {
         "title": "Panguard Trap 的功能。",
@@ -2290,7 +2290,7 @@
         "desc": "在幾分鐘內生成你的第一份合規報告，而不是幾個月。ISO 27001、SOC 2 和台灣資通安全管理法 -- 一個平台搞定。",
         "cta1": "立即開始",
         "cta2": "我們的安全實踐",
-        "trustLink": "查看我們的信任中心",
+        "trustLink": "Trust Center",
         "trustNote": "想看我們自己的合規狀態？"
       },
       "reportTypes": {
@@ -3194,11 +3194,11 @@
       "cta1": "搶先體驗",
       "cta2": "查看 Panguard Report",
       "trustNote": "想看我們自己的合規狀態嗎？",
-      "trustLink": "前往信任中心"
+      "trustLink": "Trust Center"
     }
   },
   "trust": {
-    "overline": "信任中心",
+    "overline": "Trust Center",
     "title": "可以",
     "titleHighlight": "驗證",
     "subtitle": "透明是信任的基礎。查看我們的合規狀態、安全架構、資料處理實踐和次處理者關係 -- 全在一處。",
@@ -3563,7 +3563,7 @@
       "note": "完整 SLA 條款請見企業合約。詳情請聯繫銷售團隊。"
     },
     "trustCenter": {
-      "overline": "信任中心",
+      "overline": "Trust Center",
       "title": "可驗證的文件。",
       "subtitle": "下載我們的安全文件、申請稽核報告，或查看我們的合規文件。",
       "doc1": {
@@ -3890,7 +3890,7 @@
     }
   },
   "blog": {
-    "overline": "部落格",
+    "overline": "Blog",
     "title": "安全洞察與更新",
     "subtitle": "掌握 Panguard AI 團隊的最新安全研究、產品更新和工程深度探討。",
     "featured": "精選",
@@ -3956,7 +3956,7 @@
     }
   },
   "blogPost": {
-    "backToBlog": "返回部落格",
+    "backToBlog": "Back to Blog",
     "comingSoon": "即將推出",
     "fullArticleInProgress": "全文撰寫中",
     "fullArticleDesc": "本文正由 Panguard AI 團隊最終審定。訂閱我們的電子報，在文章發布時收到通知。",
@@ -4602,8 +4602,8 @@
     },
     "skillAuditorDocs": {
       "breadcrumbDocs": "文件",
-      "breadcrumbSkillAuditor": "技能審計器",
-      "title": "技能審計器",
+      "breadcrumbSkillAuditor": "Skill Auditor",
+      "title": "Skill Auditor",
       "subtitle": "AI 代理技能的自動化安全掃描器。在安裝任何技能之前，偵測提示注入、工具投毒、隱藏 Unicode 和憑證竊取。",
       "quickStartTitle": "快速開始",
       "codeTitle1": "安裝 Panguard",
@@ -4699,11 +4699,11 @@
       "ctaTitle": "立即開始",
       "ctaDesc": "安裝 Panguard，2 分鐘內開始審計技能。MIT 授權，開源免費。",
       "ctaFullSetup": "完整設定指南",
-      "ctaBlogPost": "閱讀部落格文章"
+      "ctaBlogPost": "Read Blog Post"
     }
   },
   "changelog": {
-    "overline": "更新日誌",
+    "overline": "Changelog",
     "title": "Panguard 最新動態",
     "subtitle": "我們快速且透明地交付。每一次更新、改進和修復 -- 都記錄在這裡。",
     "filters": {
@@ -5065,7 +5065,7 @@
       "showPassword": "顯示密碼",
       "authCodeLabel": "驗證碼",
       "verifyButton": "驗證",
-      "loginButton": "登入",
+      "loginButton": "Login",
       "errorFallback": "登入失敗",
       "errorEmailFirst": "請先輸入您的電子信箱",
       "errorResetEmail": "寄送重設郵件失敗",
@@ -5090,7 +5090,7 @@
       "successMessage": "請至信箱完成帳戶驗證，驗證後即可登入。",
       "goToLogin": "前往登入",
       "alreadyHaveAccount": "已有帳戶？",
-      "loginLink": "登入",
+      "loginLink": "Login",
       "legalPrefix": "建立帳戶即表示您同意我們的",
       "termsLink": "服務條款",
       "legalAnd": "及",
@@ -5147,7 +5147,7 @@
     "quickStartDescription": "安裝 Panguard CLI，2 分鐘內完成首次安全掃描：",
     "quickStart": {
       "install": "安裝",
-      "login": "登入",
+      "login": "Login",
       "scan": "掃描"
     },
     "onboarding": {

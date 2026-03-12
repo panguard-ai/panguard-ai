@@ -547,9 +547,10 @@ body::after {
 
 :lang(zh) {
   overflow-wrap: break-word;
-  word-break: keep-all;
+  word-break: normal;
   line-break: strict;
   font-feature-settings: 'palt';
+  text-rendering: geometricPrecision;
 }
 
 :lang(zh) p,
@@ -563,8 +564,18 @@ body::after {
 :lang(zh) h2,
 :lang(zh) h3,
 :lang(zh) h4 {
-  letter-spacing: 0.02em;
-  line-height: 1.25;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+@media (max-width: 639px) {
+  :lang(zh) h1,
+  :lang(zh) h2,
+  :lang(zh) h3,
+  :lang(zh) h4 {
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
 }
 
 /* Tighter max-width for CJK prose readability (35–40 chars/line ideal) */

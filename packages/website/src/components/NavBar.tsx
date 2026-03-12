@@ -171,7 +171,7 @@ export default function NavBar() {
       {/* Brand accent line */}
       <div className="h-[2px] bg-gradient-to-r from-transparent via-brand-sage/60 to-transparent" />
 
-      <div className="h-16 flex items-center justify-between px-6 lg:px-[120px]">
+      <div className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-[120px]">
         <Logo />
 
         {/* Desktop nav */}
