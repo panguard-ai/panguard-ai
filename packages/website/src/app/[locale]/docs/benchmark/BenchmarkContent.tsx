@@ -187,7 +187,7 @@ export default function BenchmarkContent() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/docs/installation"
+                href="/docs/getting-started"
                 className="bg-brand-sage text-surface-0 rounded-full px-8 py-3.5 text-sm font-medium hover:bg-brand-sage-light transition-colors"
               >
                 {t('cta.getStarted')}

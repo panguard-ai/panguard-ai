@@ -322,7 +322,7 @@ panguard chat setup --channel email --type weekly`}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/docs/installation"
+                href="/docs/getting-started"
                 className="bg-brand-sage text-surface-0 rounded-full px-8 py-3.5 font-semibold hover:bg-brand-sage-light transition-colors"
               >
                 Getting Started Guide
