@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { Copy, Check, ArrowRight } from 'lucide-react';
+import { Copy, Check, ArrowRight, Star } from 'lucide-react';
 import { Link } from '@/navigation';
 import { useOS } from '@/hooks/useOS';
 import BrandLogo from '@/components/ui/BrandLogo';
@@ -148,9 +148,9 @@ export default function Hero() {
             href="https://github.com/panguard-ai/panguard-ai"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-text-secondary hover:text-text-primary text-sm sm:text-base transition-all duration-200 py-3"
+            className="inline-flex items-center gap-2 border border-border text-text-secondary hover:text-text-primary hover:border-text-tertiary font-semibold rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base transition-all duration-200"
           >
-            {t('github')}
+            <Star className="w-4 h-4" /> Star on GitHub
           </a>
         </motion.div>
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { Copy, Check, ArrowRight } from 'lucide-react';
+import { Copy, Check, ArrowRight, Star } from 'lucide-react';
 import { CheckIcon } from '@/components/ui/BrandIcons';
 import { Link } from '@/navigation';
 import { useOS } from '@/hooks/useOS';
@@ -97,12 +97,14 @@ export default function FinalCTA() {
           >
             {t('btnDemo')}
           </Link>
-          <Link
-            href="/contact"
-            className="border border-border text-text-secondary hover:text-text-primary hover:border-panguard-green font-semibold rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base transition-all duration-200"
+          <a
+            href="https://github.com/panguard-ai/panguard-ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 border border-border text-text-secondary hover:text-text-primary hover:border-text-tertiary font-semibold rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base transition-all duration-200"
           >
-            {t('btnSales')}
-          </Link>
+            <Star className="w-4 h-4" /> Star on GitHub
+          </a>
         </motion.div>
 
         {/* Manifesto */}
