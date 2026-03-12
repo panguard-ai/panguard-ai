@@ -4,6 +4,10 @@ description: "部署 8 種蜜罐協定來引誘攻擊者、擷取其工具和憑
 icon: "flask"
 ---
 
+<Warning>
+**即將推出** -- Panguard Trap 目前正在開發中，尚未正式發布。以下文件為預覽內容。
+</Warning>
+
 Panguard Trap 部署偽裝成真實基礎設施的誘餌服務。合法使用者永遠不會與這些服務互動——只有攻擊者才會。當有人連線至蜜罐時，Trap 會記錄每個動作、分析其行為、分類其技能等級，並將情報分享給 Guard 和 Threat Cloud。
 
 ## 快速開始
@@ -89,8 +93,8 @@ panguard trap start --services ssh,http --no-cloud
 panguard trap <command> [options]
 
 Commands:
-  start              啟動蜜罐服務（Pro）
-  stop               停止蜜罐服務（Pro）
+  start              啟動蜜罐服務
+  stop               停止蜜罐服務
   status             顯示狀態和統計資料
   config             顯示目前設定
   profiles           顯示攻擊者檔案

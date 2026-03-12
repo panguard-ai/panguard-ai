@@ -4,7 +4,7 @@ description: "將 Panguard CLI 更新至最新版本。"
 icon: "arrow-up"
 ---
 
-`upgrade` 指令檢查並安裝最新版本的 Panguard CLI。它會自動處理二進位檔替換、資料庫遷移和升級後驗證。
+`upgrade` 指令檢查並安裝最新版本的 Panguard CLI。它會自動偵測目前安裝方式，下載最新版本並完成升級。
 
 ## 使用方式
 
@@ -14,18 +14,28 @@ panguard upgrade
 
 ## 執行內容
 
-1. **檢查目前版本**與最新版本的差異
-2. **下載新的二進位檔**從官方發布頻道
-3. **驗證校驗碼**以確保完整性
-4. **原地替換二進位檔**
-5. **執行遷移**（如果需要資料格式變更）
-6. **驗證升級**透過執行快速自我測試
+1. **檢查目前版本**與 npm registry 上最新版本的差異
+2. **下載最新版本**透過 npm
+3. **驗證安裝**確保新版本正確運行
+4. **執行遷移**（如果需要資料格式變更）
+
+## 替代升級方式
+
+如果您使用 npm 全域安裝，也可以直接透過 npm 更新：
+
+```bash
+npm update -g @panguard-ai/panguard
+```
 
 ## 範例
 
 <CodeGroup>
 ```bash 升級至最新版本
 panguard upgrade
+```
+
+```bash 透過 npm 升級
+npm update -g @panguard-ai/panguard
 ```
 </CodeGroup>
 
