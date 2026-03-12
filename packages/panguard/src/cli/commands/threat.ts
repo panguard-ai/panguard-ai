@@ -54,6 +54,7 @@ export function threatCommand(): Command {
         apiKeyRequired: false,
         apiKeys: [],
         rateLimitPerMinute: 120,
+        anthropicApiKey: process.env['ANTHROPIC_API_KEY'],
       });
 
       const shutdown = async () => {

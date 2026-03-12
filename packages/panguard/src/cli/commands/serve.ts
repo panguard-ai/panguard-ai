@@ -37,6 +37,8 @@ import type { ManagerConfig } from '@panguard-ai/manager';
 // Threat Cloud types (dynamically loaded — not published to npm)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ThreatCloudDBInstance = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LLMReviewerInstance = any;
 
 export function serveCommand(): Command {
   return new Command('serve')
@@ -145,6 +147,34 @@ export function serveCommand(): Command {
       } catch {
         console.log(`  ${c.dim('Threat Cloud DB not available — threat API routes disabled')}`);
         console.log('');
+      }
+
+      // Initialize LLM Reviewer for ATR proposals (optional — needs ANTHROPIC_API_KEY)
+      let llmReviewer: LLMReviewerInstance = null;
+      if (threatDb && process.env['ANTHROPIC_API_KEY']) {
+        try {
+          const tcMod = '@panguard-ai/threat-cloud';
+          const tc = await import(/* webpackIgnore: true */ tcMod);
+          llmReviewer = new tc.LLMReviewer(process.env['ANTHROPIC_API_KEY'], threatDb);
+          console.log(`  ${c.safe('LLM Reviewer')} enabled for ATR proposal review`);
+        } catch {
+          console.log(`  ${c.dim('LLM Reviewer not available')}`);
+        }
+      }
+
+      // Promotion cron: every 15 minutes, promote confirmed + LLM-approved proposals to rules
+      let promotionTimer: ReturnType<typeof setInterval> | null = null;
+      if (threatDb) {
+        promotionTimer = setInterval(() => {
+          try {
+            const promoted = threatDb.promoteConfirmedProposals();
+            if (promoted > 0) {
+              console.log(`  [Promotion] ${promoted} proposal(s) promoted to rules`);
+            }
+          } catch (err: unknown) {
+            console.error(`  [Promotion] Error: ${err instanceof Error ? err.message : String(err)}`);
+          }
+        }, 15 * 60 * 1000);
       }
 
       // Periodic database backup (every 6 hours)
@@ -261,7 +291,7 @@ export function serveCommand(): Command {
       const adminDir = adminDirs.find((d) => existsSync(d));
 
       const server = createServer((req, res) => {
-        void handleRequest(req, res, handlers, db, adminDir, managerProxy, threatDb);
+        void handleRequest(req, res, handlers, db, adminDir, managerProxy, threatDb, llmReviewer);
       });
 
       // Build Manager config from environment / 從環境變數建構 Manager 設定
@@ -369,6 +399,7 @@ export function serveCommand(): Command {
         console.log('\n  Shutting down...');
         clearInterval(planCheckTimer);
         if (backupTimer) clearInterval(backupTimer);
+        if (promotionTimer) clearInterval(promotionTimer);
         managerServer.stop().catch(() => {});
         server.close(() => {
           db.close();
@@ -388,7 +419,8 @@ async function handleRequest(
   _db: AuthDB,
   adminDir: string | undefined,
   managerProxy: ManagerProxy,
-  threatDb: ThreatCloudDBInstance
+  threatDb: ThreatCloudDBInstance,
+  llmReviewer: LLMReviewerInstance
 ): Promise<void> {
   const url = req.url ?? '/';
   const pathname = url.split('?')[0] ?? '/';
@@ -499,7 +531,7 @@ async function handleRequest(
     // Security: rate limiting, auth, input validation
 
     // Rate limit for Threat Cloud endpoints (per-IP, shared state)
-    if (threatDb && pathname.startsWith('/api/') && ['/api/threats', '/api/rules', '/api/stats', '/api/atr-proposals', '/api/atr-feedback', '/api/skill-threats'].some((p) => pathname === p)) {
+    if (threatDb && pathname.startsWith('/api/') && ['/api/threats', '/api/rules', '/api/stats', '/api/atr-proposals', '/api/atr-feedback', '/api/skill-threats', '/api/atr-rules', '/api/yara-rules', '/api/feeds/ip-blocklist', '/api/feeds/domain-blocklist'].some((p) => pathname === p)) {
       const clientIP = req.socket.remoteAddress ?? 'unknown';
       if (!checkTCRateLimit(clientIP)) {
         sendJson(res, 429, { ok: false, error: 'Rate limit exceeded. Try again later.' });
@@ -601,6 +633,12 @@ async function handleRequest(
         sendJson(res, 200, { ok: true, data: { message: 'Confirmation recorded', patternHash: pHash } });
       } else {
         threatDb.insertATRProposal(proposal);
+        // Fire-and-forget LLM review on first submission
+        if (llmReviewer?.isAvailable()) {
+          void llmReviewer.reviewProposal(pHash, String(proposal['ruleContent'])).catch((err: unknown) => {
+            console.error(`LLM review error for ${pHash}:`, err);
+          });
+        }
         sendJson(res, 201, { ok: true, data: { message: 'Proposal submitted', patternHash: pHash } });
       }
       return;
@@ -670,6 +708,50 @@ async function handleRequest(
       const limit = isNaN(rawLimit) || rawLimit < 1 ? 50 : Math.min(rawLimit, 500);
       const threats = threatDb.getSkillThreats(limit);
       sendJson(res, 200, { ok: true, data: threats });
+      return;
+    }
+
+    // GET /api/atr-rules - Fetch confirmed ATR rules (for Guard sync)
+    if (pathname === '/api/atr-rules' && req.method === 'GET') {
+      if (!threatDb) { sendJson(res, 503, { ok: false, error: 'Threat Cloud not available' }); return; }
+      const urlObj = new URL(url, `http://${req.headers.host ?? 'localhost'}`);
+      const since = urlObj.searchParams.get('since') ?? undefined;
+      const rules = threatDb.getConfirmedATRRules(since);
+      sendJson(res, 200, { ok: true, data: rules });
+      return;
+    }
+
+    // GET /api/yara-rules - Fetch YARA rules (for Guard sync)
+    if (pathname === '/api/yara-rules' && req.method === 'GET') {
+      if (!threatDb) { sendJson(res, 503, { ok: false, error: 'Threat Cloud not available' }); return; }
+      const urlObj = new URL(url, `http://${req.headers.host ?? 'localhost'}`);
+      const since = urlObj.searchParams.get('since') ?? undefined;
+      const rules = threatDb.getRulesBySource('yara', since);
+      sendJson(res, 200, { ok: true, data: rules });
+      return;
+    }
+
+    // GET /api/feeds/ip-blocklist - IP blocklist feed (plain text)
+    if (pathname === '/api/feeds/ip-blocklist' && req.method === 'GET') {
+      if (!threatDb) { sendJson(res, 503, { ok: false, error: 'Threat Cloud not available' }); return; }
+      const urlObj = new URL(url, `http://${req.headers.host ?? 'localhost'}`);
+      const minReputation = Number(urlObj.searchParams.get('minReputation') ?? '70');
+      const ips = threatDb.getIPBlocklist(minReputation);
+      res.setHeader('Content-Type', 'text/plain');
+      res.writeHead(200);
+      res.end(ips.join('\n'));
+      return;
+    }
+
+    // GET /api/feeds/domain-blocklist - Domain blocklist feed (plain text)
+    if (pathname === '/api/feeds/domain-blocklist' && req.method === 'GET') {
+      if (!threatDb) { sendJson(res, 503, { ok: false, error: 'Threat Cloud not available' }); return; }
+      const urlObj = new URL(url, `http://${req.headers.host ?? 'localhost'}`);
+      const minReputation = Number(urlObj.searchParams.get('minReputation') ?? '70');
+      const domains = threatDb.getDomainBlocklist(minReputation);
+      res.setHeader('Content-Type', 'text/plain');
+      res.writeHead(200);
+      res.end(domains.join('\n'));
       return;
     }
 
