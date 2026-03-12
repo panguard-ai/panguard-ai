@@ -9,6 +9,10 @@
 
 import { Command } from 'commander';
 import { spawn } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
+import { createRequire } from 'node:module';
 import { c, banner, divider, symbols, promptConfirm } from '@panguard-ai/core';
 import {
   scanInstalledSkills,
@@ -16,6 +20,49 @@ import {
   reviewFlaggedSkills,
   collectSafeSkillNames,
 } from './setup-skill-scan.js';
+
+/** Persist skill names into the Guard whitelist JSON file */
+function persistToWhitelist(skillNames: readonly string[], source: 'manual' | 'static'): void {
+  const guardDir = join(homedir(), '.panguard-guard');
+  const whitelistPath = join(guardDir, 'skill-whitelist.json');
+
+  if (!existsSync(guardDir)) {
+    mkdirSync(guardDir, { recursive: true });
+  }
+
+  // Load existing whitelist if present
+  let existing: {
+    whitelist: Array<{ name: string; normalizedName: string; source: string; addedAt: string; fingerprintHash?: string; reason?: string }>;
+    revoked: string[];
+  } = { whitelist: [], revoked: [] };
+
+  if (existsSync(whitelistPath)) {
+    try {
+      existing = JSON.parse(readFileSync(whitelistPath, 'utf-8')) as typeof existing;
+    } catch {
+      console.warn(c.yellow(`  ${symbols.warn} Whitelist file was corrupt and has been reset.`));
+    }
+  }
+
+  const existingNames = new Set(existing.whitelist.map((e) => e.normalizedName));
+  const now = new Date().toISOString();
+
+  for (const name of skillNames) {
+    const normalized = name.toLowerCase().trim().replace(/\s+/g, '-');
+    if (existingNames.has(normalized)) continue;
+
+    existing.whitelist.push({
+      name,
+      normalizedName: normalized,
+      source,
+      addedAt: now,
+      reason: source === 'manual' ? 'User-approved during setup' : 'Auto-whitelisted during setup (safe)',
+    });
+    existingNames.add(normalized);
+  }
+
+  writeFileSync(whitelistPath, JSON.stringify(existing, null, 2), 'utf-8');
+}
 
 /** Platform-specific restart instructions */
 const PLATFORM_RESTART_HINTS: Record<string, string> = {
@@ -206,23 +253,37 @@ export function setupCommand(): Command {
               const scanResults = await scanInstalledSkills(skills);
               renderSkillScanResults(scanResults);
 
-              // Whitelist safe skills
-              const safeNames = collectSafeSkillNames(scanResults);
-              if (safeNames.length > 0) {
+              // Whitelist only safe (LOW risk) skills — caution (MEDIUM) needs review
+              const safeOnly = scanResults.filter((r) => r.status === 'safe').map((r) => r.entry.name);
+              if (safeOnly.length > 0) {
+                persistToWhitelist(safeOnly, 'static');
                 console.log();
                 console.log(
-                  c.green(`  ${symbols.pass} ${safeNames.length} safe skill(s) auto-whitelisted.`)
+                  c.green(`  ${symbols.pass} ${safeOnly.length} safe skill(s) auto-whitelisted.`)
+                );
+                console.log(
+                  c.dim(`    Saved to ~/.panguard-guard/skill-whitelist.json`)
                 );
               }
 
-              // Review flagged skills interactively
+              const caution = scanResults.filter((r) => r.status === 'caution');
+              if (caution.length > 0) {
+                console.log(
+                  c.yellow(`  ${symbols.warn} ${caution.length} skill(s) at MEDIUM risk — monitored but not whitelisted.`)
+                );
+              }
+
+              // Review flagged (HIGH/CRITICAL) skills interactively
               const flagged = scanResults.filter((r) => r.status === 'flagged');
               if (flagged.length > 0 && !options.yes) {
-                await reviewFlaggedSkills(flagged);
+                const userWhitelisted = await reviewFlaggedSkills(flagged);
+                if (userWhitelisted.length > 0) {
+                  persistToWhitelist(userWhitelisted, 'manual');
+                }
               } else if (flagged.length > 0) {
                 console.log(
                   c.yellow(
-                    `  ${symbols.warn} ${flagged.length} flagged skill(s) — run panguard guard --interactive to review.`
+                    `  ${symbols.warn} ${flagged.length} flagged skill(s) — run "panguard guard --watch" to review.`
                   )
                 );
               }
@@ -260,13 +321,72 @@ export function setupCommand(): Command {
             console.log(c.dim('  Starting Panguard Guard in background...'));
 
             try {
-              const child = spawn('npx', ['panguard-guard', 'start'], {
-                detached: true,
-                stdio: 'ignore',
-              });
-              child.unref();
-              console.log(c.green(`  ${symbols.pass} Guard started (PID: ${child.pid}).`));
-              console.log(c.dim('    Run "panguard guard --watch" to see the live dashboard.'));
+              // Resolve the guard CLI entry point directly instead of relying on npx
+              let guardBin: string | undefined;
+              try {
+                const require = createRequire(import.meta.url);
+                guardBin = require.resolve('@panguard-ai/panguard-guard/dist/cli/index.js');
+              } catch {
+                // Fallback: check common global/local paths
+              }
+
+              if (!guardBin) {
+                console.log(c.yellow(`  ${symbols.warn} Could not locate panguard-guard binary.`));
+                console.log(c.dim('    Run manually: panguard guard --watch'));
+              } else {
+                const child = spawn(process.execPath, [guardBin, 'start', '--dashboard'], {
+                  detached: true,
+                  stdio: ['ignore', 'pipe', 'pipe'],
+                });
+
+                let stderrData = '';
+                child.stderr?.on('data', (chunk: Buffer) => {
+                  stderrData += chunk.toString();
+                });
+
+                // Capture dashboard URL from stdout
+                child.stdout?.on('data', (chunk: Buffer) => {
+                  const line = chunk.toString();
+                  const urlMatch = line.match(/Dashboard:\s*(http\S+)/);
+                  if (urlMatch) {
+                    console.log(c.green(`  ${symbols.pass} Dashboard: ${urlMatch[1]}`));
+                  }
+                });
+
+                // Wait briefly to confirm the process didn't crash immediately
+                const launched = await new Promise<boolean>((resolve) => {
+                  const timer = setTimeout(() => {
+                    child.stderr?.removeAllListeners();
+                    child.unref();
+                    resolve(true);
+                  }, 1500);
+
+                  child.on('error', (err) => {
+                    clearTimeout(timer);
+                    console.log(c.yellow(`  ${symbols.warn} Guard failed to start: ${err.message}`));
+                    resolve(false);
+                  });
+
+                  child.on('exit', (code) => {
+                    clearTimeout(timer);
+                    if (code !== null && code !== 0) {
+                      const detail = stderrData.trim().slice(0, 200);
+                      console.log(c.yellow(`  ${symbols.warn} Guard exited with code ${code}.`));
+                      if (detail) console.log(c.dim(`    ${detail}`));
+                      resolve(false);
+                    }
+                    // If exit code is 0 or null (still running), treat as success
+                  });
+                });
+
+                if (launched) {
+                  console.log(c.green(`  ${symbols.pass} Guard started with dashboard (PID: ${child.pid}).`));
+                  console.log(c.dim('    Dashboard will open in your browser automatically.'));
+                  console.log(c.dim('    If not, run: panguard guard start --dashboard'));
+                } else {
+                  console.log(c.dim('    Run manually: panguard guard start --dashboard'));
+                }
+              }
             } catch {
               console.log(c.yellow(`  ${symbols.warn} Could not start guard automatically.`));
               console.log(c.dim('    Run manually: panguard guard --watch'));

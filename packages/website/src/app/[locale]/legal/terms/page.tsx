@@ -89,39 +89,35 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
         {/* 4 */}
         <section>
           <h2 className="text-lg font-semibold text-text-primary mb-3">
-            4. Subscription and Payment
+            4. Open Source License
           </h2>
           <p>
-            4.1 <strong className="text-text-primary">Plans.</strong> Panguard offers subscription
-            plans as described on our pricing page. Plan features, limits, and pricing are subject
-            to change with 30 days prior written notice.
+            4.1 <strong className="text-text-primary">License.</strong> Panguard is released under
+            the MIT License. You are free to use, modify, and distribute the software in accordance
+            with the terms of the MIT License. The full license text is available in the project
+            repository.
           </p>
           <p className="mt-2">
-            4.2 <strong className="text-text-primary">Billing.</strong> Subscriptions are billed in
-            advance on a monthly or annual basis, depending on the plan selected. All fees are
-            quoted in US Dollars and are non-refundable except as expressly set forth herein.
+            4.2 <strong className="text-text-primary">No Fees.</strong> Panguard is free and open
+            source software. No subscription, payment, or account registration is required to use
+            any feature of the Service.
           </p>
           <p className="mt-2">
-            4.3 <strong className="text-text-primary">Taxes.</strong> All fees are exclusive of
-            applicable taxes. You are responsible for paying any taxes, duties, or levies imposed by
-            taxing authorities, except for taxes based on Panguard&apos;s net income.
-          </p>
-          <p className="mt-2">
-            4.4 <strong className="text-text-primary">Late Payment.</strong> If payment is not
-            received within 15 days of the due date, Panguard reserves the right to suspend access
-            to the Service until all outstanding amounts are paid.
+            4.3 <strong className="text-text-primary">Optional Services.</strong> Panguard may offer
+            optional hosted services (such as Threat Cloud) in the future. Any paid services will be
+            clearly identified and offered separately from the open source software.
           </p>
         </section>
 
         {/* 5 */}
         <section>
-          <h2 className="text-lg font-semibold text-text-primary mb-3">5. Free Trial</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-3">5. Community Contributions</h2>
           <p>
-            Panguard offers a 14-day free trial of the Solo plan. During the trial period, you will
-            have access to the features of the Solo plan at no cost. At the end of the trial period,
-            your account will be automatically downgraded to the free Community tier unless you
-            subscribe to a paid plan. No credit card is required to initiate a free trial. Panguard
-            reserves the right to modify or discontinue the free trial offer at any time.
+            Panguard welcomes community contributions including code, detection rules, threat
+            intelligence, and documentation. By submitting contributions to the project, you agree
+            to license your contributions under the same MIT License that governs the project.
+            Panguard reserves the right to accept, modify, or decline contributions at its
+            discretion.
           </p>
         </section>
 
@@ -192,9 +188,9 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
             9. Service Level Agreement
           </h2>
           <p>
-            For Pro and Business plan customers, Panguard provides a Service Level Agreement (SLA)
-            guaranteeing 99.9% uptime availability. The full terms of the SLA, including service
-            credits and exclusions, are set forth in our{' '}
+            For users of Panguard&apos;s optional hosted services, Panguard may provide a Service
+            Level Agreement (SLA) guaranteeing uptime availability. The full terms of the SLA,
+            including service credits and exclusions, are set forth in our{' '}
             <Link href="/legal/sla" className="text-brand-sage hover:text-brand-sage-light underline">
               Service Level Agreement
             </Link>

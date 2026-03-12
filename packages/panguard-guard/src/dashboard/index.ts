@@ -15,7 +15,7 @@
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
@@ -163,7 +163,7 @@ export class DashboardServer {
 
       this.server.listen(this.port, '127.0.0.1', () => {
         logger.info(`Dashboard started on http://127.0.0.1:${this.port}`);
-        logger.info(`Dashboard auth token: ${this.authToken}`);
+        logger.debug(`Dashboard auth token: ${this.authToken.slice(0, 8)}...`);
 
         if (this.relayConfig) {
           this.startRelayClient(this.relayConfig);
@@ -288,7 +288,11 @@ export class DashboardServer {
       const queryToken = new URL(url, `http://127.0.0.1:${this.port}`).searchParams.get('token');
       const providedToken = authHeader.replace('Bearer ', '') || queryToken;
 
-      if (providedToken !== this.authToken) {
+      if (
+        !providedToken ||
+        providedToken.length !== this.authToken.length ||
+        !timingSafeEqual(Buffer.from(providedToken), Buffer.from(this.authToken))
+      ) {
         res.writeHead(401, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Unauthorized' }));
         return;
@@ -391,9 +395,11 @@ export class DashboardServer {
     try {
       const raw = readFileSync(whitelistPath, 'utf-8');
       const data = JSON.parse(raw) as {
+        whitelist?: Array<{ name: string; source?: string; reason?: string; addedAt?: string }>;
         skills?: Array<{ name: string; source?: string; reason?: string; addedAt?: string }>;
       };
-      const skills = data.skills ?? [];
+      // Support both formats: engine writes 'whitelist', legacy might use 'skills'
+      const skills = data.whitelist ?? data.skills ?? [];
       const autoCount = skills.filter(
         (s) => s.source === 'fingerprint' || s.source === 'static'
       ).length;
@@ -640,8 +646,8 @@ export class DashboardServer {
     if (existsSync(whitelistPath)) {
       try {
         const raw = readFileSync(whitelistPath, 'utf-8');
-        const data = JSON.parse(raw) as { skills?: Array<{ name: string; source?: string }> };
-        whitelist = data.skills ?? [];
+        const data = JSON.parse(raw) as { whitelist?: Array<{ name: string; source?: string }>; skills?: Array<{ name: string; source?: string }> };
+        whitelist = data.whitelist ?? data.skills ?? [];
       } catch {
         /* ignore */
       }
@@ -1245,15 +1251,15 @@ document.querySelectorAll('.ni').forEach(function(n){n.addEventListener('click',
 
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
 function fUp(ms){var s=Math.floor(ms/1000);if(s<60)return s+'s';var m=Math.floor(s/60);s%=60;if(m<60)return m+'m '+s+'s';var h=Math.floor(m/60);m%=60;return h+'h '+m+'m'}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
 
-function gTk(){var h=location.hash;if(h.indexOf('token=')!==-1){tk=h.split('token=')[1].split('&')[0]}}
-function af(p,o){o=o||{};o.headers=o.headers||{};if(tk)o.headers['Authorization']='Bearer '+tk;return fetch(p,o)}
+function gTk(){var h=location.hash;if(h.indexOf('token=')!==-1){tk=h.split('token=')[1].split('&')[0];try{localStorage.setItem('panguard_token',tk)}catch(e){}}if(!tk){try{tk=localStorage.getItem('panguard_token')||''}catch(e){}}}
+function af(p,o){o=o||{};o.headers=o.headers||{};if(tk)o.headers['Authorization']='Bearer '+tk;return fetch(p,o).then(function(r){if(r.status===401){document.getElementById('wl').textContent=lang==='zh'?'Token 無效':'Invalid token';document.getElementById('wd').classList.remove('on')}return r})}
 
 /* WS */
 function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event')aE(m)}catch(x){}}}
 
-function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updateG6()}
+function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.sigmaRuleCount!==undefined)document.getElementById('v-sigma').textContent=s.sigmaRuleCount;if(s.yaraRuleCount!==undefined)document.getElementById('v-yara').textContent=s.yaraRuleCount;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updateG6()}
 
 function aE(m){var l=document.getElementById('evl');var d=document.createElement('div');var c=(m.data&&m.data.conclusion)||'benign';d.className='ei '+c;var t=m.timestamp?m.timestamp.split('T')[1].split('.')[0]:'--:--:--';d.innerHTML='<span class="ei-t">'+t+'</span><span class="ei-y">'+esc(m.type||'')+'</span><span class="ei-d">'+esc(JSON.stringify(m.data||{}).slice(0,200))+'</span>';l.prepend(d);while(l.children.length>50)l.removeChild(l.lastChild)}
 

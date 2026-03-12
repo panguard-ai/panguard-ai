@@ -13,7 +13,7 @@
  */
 
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, watch, type FSWatcher } from 'node:fs';
 import { dirname } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 
@@ -72,6 +72,8 @@ export class SkillWhitelistManager {
   private readonly config: Required<SkillWhitelistConfig>;
   private readonly whitelist = new Map<string, WhitelistedSkill>();
   private readonly revokedSkills = new Set<string>();
+  private fileWatcher: FSWatcher | null = null;
+  private writingToDisk = false;
 
   constructor(config?: SkillWhitelistConfig) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -79,6 +81,7 @@ export class SkillWhitelistManager {
     // Load persisted whitelist
     if (this.config.persistPath) {
       this.loadFromDisk();
+      this.watchFile();
     }
 
     // Add static skills
@@ -332,11 +335,45 @@ export class SkillWhitelistManager {
         whitelist: [...this.whitelist.values()],
         revoked: [...this.revokedSkills],
       };
+      this.writingToDisk = true;
       writeFileSync(this.config.persistPath, JSON.stringify(data, null, 2), 'utf-8');
+      this.writingToDisk = false;
     } catch (err) {
+      this.writingToDisk = false;
       logger.warn(
         `Failed to persist whitelist: ${err instanceof Error ? err.message : String(err)}`
       );
+    }
+  }
+
+  /** Watch the whitelist file for external changes (e.g., from `panguard setup`) */
+  private watchFile(): void {
+    if (!this.config.persistPath || !existsSync(this.config.persistPath)) return;
+
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    try {
+      this.fileWatcher = watch(this.config.persistPath, () => {
+        // Ignore changes we wrote ourselves
+        if (this.writingToDisk) return;
+
+        // Debounce rapid changes (e.g., editor save)
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          logger.info('Whitelist file changed externally, reloading...');
+          this.loadFromDisk();
+        }, 500);
+      });
+      if (this.fileWatcher.unref) this.fileWatcher.unref();
+    } catch {
+      // File watching not supported or permission denied — non-fatal
+    }
+  }
+
+  /** Stop watching the whitelist file */
+  stopWatching(): void {
+    if (this.fileWatcher) {
+      this.fileWatcher.close();
+      this.fileWatcher = null;
     }
   }
 
