@@ -21,7 +21,7 @@ import {
 /* ────────────────────────  Config  ──────────────────────────────── */
 
 const quickStartConfigs = [
-  { key: 'item1' as const, icon: TerminalIcon, href: '/docs/installation' },
+  { key: 'item1' as const, icon: TerminalIcon, href: '/docs/getting-started' },
   { key: 'cliRef' as const, icon: TerminalIcon, href: '/docs/cli' },
   { key: 'item3' as const, icon: IntegrationIcon, href: '/docs/api' },
   { key: 'benchmark' as const, icon: AnalyticsIcon, href: '/docs/benchmark' },
@@ -177,7 +177,7 @@ export default function DocsContent() {
                 {t('contactSupport')}
               </Link>
               <Link
-                href="/docs/installation"
+                href="/docs/getting-started"
                 className="border border-border text-text-secondary rounded-full px-6 py-2.5 text-sm font-medium hover:text-text-primary hover:border-text-muted transition-colors"
               >
                 {t('earlyAccess')}

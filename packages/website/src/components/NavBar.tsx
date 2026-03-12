@@ -200,7 +200,7 @@ export default function NavBar() {
         <div className="hidden lg:flex items-center gap-4">
           <LocaleSwitcher />
           <Link
-            href="/docs/installation"
+            href="/docs/getting-started"
             className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-2.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
           >
             {t('install')}
@@ -286,7 +286,7 @@ export default function NavBar() {
 
             <div className="pt-4 border-t border-border space-y-3">
               <Link
-                href="/docs/installation"
+                href="/docs/getting-started"
                 className="block text-center bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-3"
                 onClick={() => setMobileOpen(false)}
               >

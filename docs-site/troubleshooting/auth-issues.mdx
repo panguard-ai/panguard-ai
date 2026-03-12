@@ -68,7 +68,7 @@ Error: Login timed out. Please try again.
    panguard login
    ```
 
-2. Check your internet connection -- the CLI must reach `auth.panguard.ai`
+2. Check your internet connection -- the CLI must reach `localhost:3000`
 
 3. If behind a corporate proxy, set the proxy environment variable:
    ```bash
@@ -93,23 +93,6 @@ panguard login
 <Tip>
 For automated scripts and CI/CD pipelines, use API tokens instead of JWT tokens. API tokens do not expire until explicitly revoked. Generate one from your account dashboard or with `panguard token create`.
 </Tip>
-
----
-
-## Tier Insufficient
-
-```
-Error: This feature requires the Pro tier or higher. Current tier: community
-```
-
-Panguard is 100% open source (MIT license) -- all features are available to every user at no cost. If you see this error, you are running an outdated version that still contained tier restrictions.
-
-**Solution:**
-
-Update to the latest version:
-```bash
-npm install -g @panguard-ai/panguard@latest
-```
 
 ---
 
@@ -161,10 +144,10 @@ If Google login fails:
 
 <AccordionGroup>
   <Accordion title="Popup blocked">
-    Allow popups from `auth.panguard.ai` in your browser settings.
+    Allow popups from `localhost:3000` in your browser settings.
   </Accordion>
   <Accordion title="Redirect URI mismatch">
-    This is a server-side configuration issue. Contact support if you encounter this on `auth.panguard.ai`.
+    This is a server-side configuration issue. Contact support if you encounter this on `localhost:3000`.
   </Accordion>
   <Accordion title="Self-hosted auth server">
     Ensure `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are correctly configured, and the redirect URI in your Google Cloud Console matches your auth server URL.

@@ -41,15 +41,6 @@ const API_SECTIONS = [
     ],
   },
   {
-    tag: 'Billing',
-    description: 'Subscription and payment via Lemon Squeezy',
-    endpoints: [
-      { method: 'POST', path: '/api/billing/checkout', summary: 'Create checkout session' },
-      { method: 'GET', path: '/api/billing/portal', summary: 'Subscription management portal' },
-      { method: 'GET', path: '/api/billing/status', summary: 'Get billing status' },
-    ],
-  },
-  {
     tag: 'Usage',
     description: 'Usage metering and quota enforcement',
     endpoints: [
@@ -88,7 +79,7 @@ export default function ApiDocsPage() {
       <div className="mx-auto max-w-4xl px-6 py-16">
         <h1 className="text-4xl font-bold tracking-tight">API Reference</h1>
         <p className="mt-4 text-lg text-[#A09890]">
-          REST API for authentication, billing, usage metering, admin management, and threat
+          REST API for authentication, usage metering, admin management, and threat
           intelligence.
         </p>
 

@@ -300,7 +300,7 @@ function CTASection() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <Link
-              href="/docs/installation"
+              href="/docs/getting-started"
               className="bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
             >
               Get Started Free

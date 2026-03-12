@@ -68,7 +68,7 @@ Error: Login timed out. Please try again.
    panguard login
    ```
 
-2. 檢查您的網路連線 -- CLI 必須連線到 `auth.panguard.ai`
+2. 檢查您的網路連線 -- CLI 必須連線到 `localhost:3000`
 
 3. 如果在企業代理後面，設定代理環境變數：
    ```bash
@@ -154,10 +154,10 @@ panguard login
 
 <AccordionGroup>
   <Accordion title="彈出視窗被封鎖">
-    在您的瀏覽器設定中允許來自 `auth.panguard.ai` 的彈出視窗。
+    在您的瀏覽器設定中允許來自 `localhost:3000` 的彈出視窗。
   </Accordion>
   <Accordion title="重新導向 URI 不匹配">
-    這是伺服器端的設定問題。如果您在 `auth.panguard.ai` 上遇到此問題，請聯繫支援。
+    這是伺服器端的設定問題。如果您在 `localhost:3000` 上遇到此問題，請聯繫支援。
   </Accordion>
   <Accordion title="自架 auth server">
     確保 `GOOGLE_CLIENT_ID` 和 `GOOGLE_CLIENT_SECRET` 已正確設定，且 Google Cloud Console 中的重新導向 URI 與您的 auth server URL 匹配。

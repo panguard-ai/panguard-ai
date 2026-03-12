@@ -137,7 +137,7 @@ export default function ThreeRoads() {
           className="text-center mt-8"
         >
           <Link
-            href="/docs/installation"
+            href="/docs/getting-started"
             className="text-panguard-green hover:text-panguard-green-light text-sm font-medium transition-colors"
           >
             {t('cta')} &rarr;

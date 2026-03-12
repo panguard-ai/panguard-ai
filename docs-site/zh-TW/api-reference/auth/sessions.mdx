@@ -32,7 +32,7 @@ curl -X POST http://localhost:3000/api/auth/logout \
 
 ### GET /api/auth/me
 
-回傳已認證使用者的個人資料、訂閱層級和帳號詳細資訊。
+回傳已認證使用者的個人資料和帳號詳細資訊。
 
 <CodeGroup>
 ```bash cURL
@@ -50,8 +50,6 @@ curl -X GET http://localhost:3000/api/auth/me \
     "email": "user@example.com",
     "name": "Alice Chen",
     "totpEnabled": true,
-    "machineLimit": 10,
-    "trialEndsAt": null,
     "createdAt": "2026-01-15T08:30:00.000Z",
     "updatedAt": "2026-03-01T14:22:00.000Z"
   }

@@ -11,7 +11,6 @@ import {
   Activity,
   BarChart3,
   Settings,
-  CreditCard,
   LogOut,
   Loader2,
   Terminal,
@@ -258,7 +257,7 @@ export default function DashboardContent() {
             icon={<Terminal className="w-5 h-5" />}
             title={t('quickActions.installCLI.title')}
             description={t('quickActions.installCLI.description')}
-            href="/docs/installation"
+            href="/docs/getting-started"
             index={0}
           />
           <QuickAction
@@ -269,18 +268,11 @@ export default function DashboardContent() {
             index={1}
           />
           <QuickAction
-            icon={<CreditCard className="w-5 h-5" />}
-            title={t('quickActions.billing.title')}
-            description={t('quickActions.billing.description')}
-            href="/account/billing"
-            index={2}
-          />
-          <QuickAction
             icon={<BarChart3 className="w-5 h-5" />}
             title={t('quickActions.apiDocs.title')}
             description={t('quickActions.apiDocs.description')}
             href="/docs/api"
-            index={3}
+            index={2}
           />
         </motion.div>
 
@@ -626,7 +618,7 @@ function QuickAction({
       custom={index}
     >
       <Link
-        href={href as '/docs/installation'}
+        href={href as '/docs/getting-started'}
         className="block bg-surface-1 border border-border rounded-xl p-4 hover:border-border-hover transition-colors group h-full"
       >
         <div className="text-brand-sage mb-2 group-hover:text-brand-sage-light transition-colors">
