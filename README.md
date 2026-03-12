@@ -154,11 +154,11 @@ Build from source and full development guide: [docs/getting-started.md](docs/get
 
 Each layer catches what the previous one missed. If any layer goes down, the others keep running.
 
-| Layer | Engine | Coverage | Latency | Cost | Network |
-|-------|--------|----------|---------|------|---------|
-| **1** | **Rules Engine** -- 9,700+ Sigma / YARA / ATR pattern rules | ~90% of known threats | < 50ms | $0 | Offline |
-| **2** | **Local AI** -- Ollama on your machine | ~7% (ambiguous cases) | ~ 2s | $0 | Offline |
-| **3** | **Cloud AI** -- Claude / OpenAI | ~3% (novel attacks) | ~ 5s | ~$0.008 | Optional |
+| Layer | Engine                                                      | Coverage              | Latency | Cost    | Network  |
+| ----- | ----------------------------------------------------------- | --------------------- | ------- | ------- | -------- |
+| **1** | **Rules Engine** -- 9,700+ Sigma / YARA / ATR pattern rules | ~90% of known threats | < 50ms  | $0      | Offline  |
+| **2** | **Local AI** -- Ollama on your machine                      | ~7% (ambiguous cases) | ~ 2s    | $0      | Offline  |
+| **3** | **Cloud AI** -- Claude / OpenAI                             | ~3% (novel attacks)   | ~ 5s    | ~$0.008 | Optional |
 
 Coverage estimates are from internal simulation benchmarks, not empirical field data. Real-world results vary by threat type and environment.
 
@@ -176,17 +176,17 @@ Full architecture details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 Everything is **free and open source**. MIT licensed. No tiers, no limits, no vendor lock-in.
 
-| Product | What It Does | Status |
-|---------|-------------|--------|
-| **[Skill Auditor](docs/overview.md)** | Multi-check security gate for AI agent skills before install | Beta |
-| **[Scan](docs/DETECTION.md)** | 60-second security audit with PDF report | GA |
-| **[Guard](docs/ARCHITECTURE.md)** | 24/7 AI monitoring with 4-agent pipeline and auto-response | GA |
-| **[Chat](docs/OPERATIONS.md)** | Security alerts via Telegram, Slack, Discord, LINE, Email, Webhook | GA |
-| **[Trap](docs/DETECTION.md)** | 8 honeypot services for attacker profiling | Coming Soon |
-| **[Report](docs/DETECTION.md)** | Compliance gap analysis: ISO 27001, SOC 2, Taiwan CMA | Coming Soon |
-| **[Threat Cloud](#threat-cloud)** | Collective threat intelligence from all Panguard instances | GA |
-| **[MCP Server](docs/API.md)** | 11 tools for Claude, Cursor, Windsurf, and any MCP client | Beta |
-| **[Manager](docs/OPERATIONS.md)** | Distributed coordinator for up to 500 guard agents | GA |
+| Product                               | What It Does                                                       | Status      |
+| ------------------------------------- | ------------------------------------------------------------------ | ----------- |
+| **[Skill Auditor](docs/overview.md)** | Multi-check security gate for AI agent skills before install       | Beta        |
+| **[Scan](docs/DETECTION.md)**         | 60-second security audit with PDF report                           | GA          |
+| **[Guard](docs/ARCHITECTURE.md)**     | 24/7 AI monitoring with 4-agent pipeline and auto-response         | GA          |
+| **[Chat](docs/OPERATIONS.md)**        | Security alerts via Telegram, Slack, Discord, LINE, Email, Webhook | GA          |
+| **[Trap](docs/DETECTION.md)**         | 8 honeypot services for attacker profiling                         | Coming Soon |
+| **[Report](docs/DETECTION.md)**       | Compliance gap analysis: ISO 27001, SOC 2, Taiwan CMA              | Coming Soon |
+| **[Threat Cloud](#threat-cloud)**     | Collective threat intelligence from all Panguard instances         | GA          |
+| **[MCP Server](docs/API.md)**         | 11 tools for Claude, Cursor, Windsurf, and any MCP client          | Beta        |
+| **[Manager](docs/OPERATIONS.md)**     | Distributed coordinator for up to 500 guard agents                 | GA          |
 
 ---
 
@@ -194,12 +194,12 @@ Everything is **free and open source**. MIT licensed. No tiers, no limits, no ve
 
 9,700+ open-source, community-driven rules. Bundled with the npm package. No cloud required.
 
-| Rule Type | Count | Purpose |
-|-----------|-------|---------|
-| **Sigma** | 3,760 | Network intrusion, auth bypass, lateral movement |
-| **YARA** | 5,961 | Malware, encoded payloads, obfuscated scripts |
-| **ATR** | 69 | AI agent threats: prompt injection, tool poisoning, skill compromise |
-| **Builtin** | 20 | OS hardening, credential hygiene, service audit |
+| Rule Type   | Count | Purpose                                                              |
+| ----------- | ----- | -------------------------------------------------------------------- |
+| **Sigma**   | 3,760 | Network intrusion, auth bypass, lateral movement                     |
+| **YARA**    | 5,961 | Malware, encoded payloads, obfuscated scripts                        |
+| **ATR**     | 69    | AI agent threats: prompt injection, tool poisoning, skill compromise |
+| **Builtin** | 20    | OS hardening, credential hygiene, service audit                      |
 
 Full detection reference: [docs/DETECTION.md](docs/DETECTION.md)
 
@@ -251,15 +251,15 @@ Every Panguard instance is a sensor. When one user encounters a new attack, Pang
 
 ## Why Panguard
 
-| Principle | Detail |
-|-----------|--------|
-| **Open source, MIT licensed** | Use it, modify it, deploy it, sell it. No strings attached. |
-| **No usage telemetry** | Zero tracking, zero analytics, zero usage stats. Threat Cloud sharing is opt-in only. |
-| **Offline-first** | Rules engine and local AI work without internet. Cloud AI is optional. |
-| **Community-driven** | Every detection strengthens everyone via Threat Cloud. |
-| **Framework-agnostic** | Works with Claude, GPT, LangChain, CrewAI, AutoGen, raw APIs. |
-| **Production-tested** | 16 packages, 3,480+ tests, TypeScript strict mode. |
-| **Made in Taiwan** | Independent. No corporate strings. |
+| Principle                     | Detail                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------- |
+| **Open source, MIT licensed** | Use it, modify it, deploy it, sell it. No strings attached.                           |
+| **No usage telemetry**        | Zero tracking, zero analytics, zero usage stats. Threat Cloud sharing is opt-in only. |
+| **Offline-first**             | Rules engine and local AI work without internet. Cloud AI is optional.                |
+| **Community-driven**          | Every detection strengthens everyone via Threat Cloud.                                |
+| **Framework-agnostic**        | Works with Claude, GPT, LangChain, CrewAI, AutoGen, raw APIs.                         |
+| **Production-tested**         | 16 packages, 3,480+ tests, TypeScript strict mode.                                    |
+| **Made in Taiwan**            | Independent. No corporate strings.                                                    |
 
 ---
 
@@ -267,13 +267,13 @@ Every Panguard instance is a sensor. When one user encounters a new attack, Pang
 
 Panguard works as an MCP server with 11 tools, compatible with any MCP-enabled AI platform.
 
-| Platform | Setup |
-|----------|-------|
-| Claude Desktop | `panguard setup` |
-| Claude Code | `panguard setup` |
-| Cursor | `panguard setup` |
-| Windsurf | `panguard setup` |
-| Codex | `panguard setup` |
+| Platform       | Setup                        |
+| -------------- | ---------------------------- |
+| Claude Desktop | `panguard setup`             |
+| Claude Code    | `panguard setup`             |
+| Cursor         | `panguard setup`             |
+| Windsurf       | `panguard setup`             |
+| Codex          | `panguard setup`             |
 | Any MCP client | [Manual config](docs/API.md) |
 
 Full MCP reference: [docs/API.md](docs/API.md)
@@ -306,15 +306,15 @@ panguard-ai/
     yara-rules/              5,961 YARA detection rules
 ```
 
-| Category | Technology |
-|----------|-----------|
-| Language | TypeScript 5.7 (strict mode) |
-| Runtime | Node.js 18+ |
-| Monorepo | pnpm workspaces (16 packages) |
-| Testing | Vitest 3 + v8 coverage (3,480+ tests) |
-| AI | Ollama (local) + Claude / OpenAI (cloud) |
-| Rules | Sigma + YARA + ATR |
-| Encryption | AES-256-GCM |
+| Category   | Technology                               |
+| ---------- | ---------------------------------------- |
+| Language   | TypeScript 5.7 (strict mode)             |
+| Runtime    | Node.js 18+                              |
+| Monorepo   | pnpm workspaces (16 packages)            |
+| Testing    | Vitest 3 + v8 coverage (3,480+ tests)    |
+| AI         | Ollama (local) + Claude / OpenAI (cloud) |
+| Rules      | Sigma + YARA + ATR                       |
+| Encryption | AES-256-GCM                              |
 
 Full architecture documentation: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 

@@ -10,8 +10,28 @@ export async function checkCode(skillDir: string): Promise<CheckResult> {
   const findings: AuditFinding[] = [];
 
   // Dynamic import to handle case where panguard-scan is not available
-  let checkSourceCode: ((dir: string) => Promise<Array<{ id: string; title: string; description: string; severity: Severity; details?: string }>>) | null = null;
-  let checkHardcodedSecrets: ((dir: string) => Promise<Array<{ id: string; title: string; description: string; severity: Severity; details?: string }>>) | null = null;
+  let checkSourceCode:
+    | ((dir: string) => Promise<
+        Array<{
+          id: string;
+          title: string;
+          description: string;
+          severity: Severity;
+          details?: string;
+        }>
+      >)
+    | null = null;
+  let checkHardcodedSecrets:
+    | ((dir: string) => Promise<
+        Array<{
+          id: string;
+          title: string;
+          description: string;
+          severity: Severity;
+          details?: string;
+        }>
+      >)
+    | null = null;
 
   try {
     const scan = await import('@panguard-ai/panguard-scan');
@@ -25,13 +45,16 @@ export async function checkCode(skillDir: string): Promise<CheckResult> {
     return {
       status: 'warn',
       label: 'Code: panguard-scan not available, code analysis skipped',
-      findings: [{
-        id: 'code-scan-unavailable',
-        title: 'Code scanner not available',
-        description: 'panguard-scan module could not be loaded. Code vulnerabilities and hardcoded secrets were NOT checked. Install @panguard-ai/panguard-scan for full coverage.',
-        severity: 'medium',
-        category: 'code',
-      }],
+      findings: [
+        {
+          id: 'code-scan-unavailable',
+          title: 'Code scanner not available',
+          description:
+            'panguard-scan module could not be loaded. Code vulnerabilities and hardcoded secrets were NOT checked. Install @panguard-ai/panguard-scan for full coverage.',
+          severity: 'medium',
+          category: 'code',
+        },
+      ],
     };
   }
 
@@ -66,13 +89,15 @@ export async function checkCode(skillDir: string): Promise<CheckResult> {
   const hasHigh = findings.some((f) => f.severity === 'high');
   const status = hasCritical ? 'fail' : hasHigh ? 'warn' : findings.length > 0 ? 'warn' : 'pass';
 
-  const codeLabel = findings.filter((f) => f.category === 'code').length === 0
-    ? `Code: No vulnerabilities found`
-    : `Code: ${findings.filter((f) => f.category === 'code').length} issue(s) found`;
+  const codeLabel =
+    findings.filter((f) => f.category === 'code').length === 0
+      ? `Code: No vulnerabilities found`
+      : `Code: ${findings.filter((f) => f.category === 'code').length} issue(s) found`;
 
-  const secretLabel = findings.filter((f) => f.category === 'secrets').length === 0
-    ? 'Secrets: No hardcoded credentials found'
-    : `Secrets: ${findings.filter((f) => f.category === 'secrets').length} credential(s) exposed`;
+  const secretLabel =
+    findings.filter((f) => f.category === 'secrets').length === 0
+      ? 'Secrets: No hardcoded credentials found'
+      : `Secrets: ${findings.filter((f) => f.category === 'secrets').length} credential(s) exposed`;
 
   return {
     status,

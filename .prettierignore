@@ -4,3 +4,8 @@ build
 coverage
 *.min.js
 pnpm-lock.yaml
+tools/mirofish-bridge/output/
+config/sigma-rules/
+config/yara-rules/
+bundled-rules/
+test-results/
