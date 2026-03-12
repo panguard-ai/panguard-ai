@@ -215,26 +215,26 @@ cd packages/website && npx next dev -p 3001
 
 #### 公開頁面 (全部完成)
 
-| 頁面         | 路徑              | 說明                    |
-| ------------ | ----------------- | ----------------------- |
-| 首頁         | `/`               | 15 個動態區塊           |
-| 產品總覽     | `/product`        | 產品介紹                |
-| Scan         | `/product/scan`   | 掃描產品頁              |
-| Guard        | `/product/guard`  | 防護產品頁              |
-| Chat         | `/product/chat`   | 通知產品頁              |
-| Trap         | `/product/trap`   | 蜜罐產品頁              |
-| Report       | `/product/report` | 報告產品頁              |
-| 定價         | `/pricing`        | 免費開源方案說明        |
-| 技術原理     | `/how-it-works`   | 運作方式                |
-| 技術         | `/technology`     | 技術細節                |
-| Threat Cloud | `/threat-cloud`   | 威脅情報                |
-| 安全         | `/security`       | 安全措施                |
-| 合規         | `/compliance`     | 合規框架                |
-| 開源         | `/open-source`    | 開源說明                |
-| 整合         | `/integrations`   | 第三方整合              |
-| 資源         | `/resources`      | 資源中心                |
-| 狀態         | `/status`         | 服務狀態                |
-| 信任中心     | `/trust`          | 信任頁面                |
+| 頁面         | 路徑              | 說明             |
+| ------------ | ----------------- | ---------------- |
+| 首頁         | `/`               | 15 個動態區塊    |
+| 產品總覽     | `/product`        | 產品介紹         |
+| Scan         | `/product/scan`   | 掃描產品頁       |
+| Guard        | `/product/guard`  | 防護產品頁       |
+| Chat         | `/product/chat`   | 通知產品頁       |
+| Trap         | `/product/trap`   | 蜜罐產品頁       |
+| Report       | `/product/report` | 報告產品頁       |
+| 定價         | `/pricing`        | 免費開源方案說明 |
+| 技術原理     | `/how-it-works`   | 運作方式         |
+| 技術         | `/technology`     | 技術細節         |
+| Threat Cloud | `/threat-cloud`   | 威脅情報         |
+| 安全         | `/security`       | 安全措施         |
+| 合規         | `/compliance`     | 合規框架         |
+| 開源         | `/open-source`    | 開源說明         |
+| 整合         | `/integrations`   | 第三方整合       |
+| 資源         | `/resources`      | 資源中心         |
+| 狀態         | `/status`         | 服務狀態         |
+| 信任中心     | `/trust`          | 信任頁面         |
 
 #### 解決方案 (全部完成)
 
@@ -299,7 +299,7 @@ cd packages/website && npx next dev -p 3001
 | 頁面     | 路徑                | 狀態       |
 | -------- | ------------------- | ---------- |
 | 帳號設定 | `/account/settings` | **未實作** |
-| (已移除)  | -                   | -          |
+| (已移除) | -                   | -          |
 
 ### 前端環境變數
 
@@ -355,16 +355,16 @@ node --env-file=.env packages/panguard/dist/cli/index.js serve \
 
 #### Auth Routes (`/api/auth/`)
 
-| Method | 路徑                        | Auth | 說明                        |
-| ------ | --------------------------- | ---- | --------------------------- |
-| POST   | `/api/auth/register`        | No   | 註冊                         |
-| POST   | `/api/auth/login`           | No   | 登入 (返回 session token)   |
-| POST   | `/api/auth/logout`          | Yes  | 登出                        |
-| GET    | `/api/auth/me`              | Yes  | 取得目前用戶資料            |
-| POST   | `/api/auth/delete-account`  | Yes  | 刪除帳號 (GDPR)             |
-| GET    | `/api/auth/export-data`     | Yes  | 匯出用戶資料 (GDPR)         |
-| POST   | `/api/auth/forgot-password` | No   | 請求密碼重設                |
-| POST   | `/api/auth/reset-password`  | No   | 重設密碼                    |
+| Method | 路徑                        | Auth | 說明                      |
+| ------ | --------------------------- | ---- | ------------------------- |
+| POST   | `/api/auth/register`        | No   | 註冊                      |
+| POST   | `/api/auth/login`           | No   | 登入 (返回 session token) |
+| POST   | `/api/auth/logout`          | Yes  | 登出                      |
+| GET    | `/api/auth/me`              | Yes  | 取得目前用戶資料          |
+| POST   | `/api/auth/delete-account`  | Yes  | 刪除帳號 (GDPR)           |
+| GET    | `/api/auth/export-data`     | Yes  | 匯出用戶資料 (GDPR)       |
+| POST   | `/api/auth/forgot-password` | No   | 請求密碼重設              |
+| POST   | `/api/auth/reset-password`  | No   | 重設密碼                  |
 
 #### TOTP 2FA Routes (`/api/auth/totp/`)
 
@@ -421,12 +421,12 @@ node --env-file=.env packages/panguard/dist/cli/index.js serve \
 
 #### Usage Routes (`/api/usage/`)
 
-| Method | 路徑                | Auth | 說明              |
-| ------ | ------------------- | ---- | ----------------- |
-| GET    | `/api/usage`        | Yes  | 目前使用量     |
-| GET    | `/api/usage/limits` | Yes  | 配額限制       |
-| POST   | `/api/usage/check`  | Yes  | 檢查配額          |
-| POST   | `/api/usage/record` | Yes  | 記錄使用量        |
+| Method | 路徑                | Auth | 說明       |
+| ------ | ------------------- | ---- | ---------- |
+| GET    | `/api/usage`        | Yes  | 目前使用量 |
+| GET    | `/api/usage/limits` | Yes  | 配額限制   |
+| POST   | `/api/usage/check`  | Yes  | 檢查配額   |
+| POST   | `/api/usage/record` | Yes  | 記錄使用量 |
 
 #### Waitlist Routes (`/api/waitlist/`)
 

@@ -5186,7 +5186,14 @@
     "upgradeDescription": "All Panguard features are free and open source.",
     "viewPlans": "View Plans",
     "tierFeatures": {
-      "all": ["Unlimited scans", "Unlimited endpoints", "Unlimited API calls", "All features included", "Community support", "MIT License"]
+      "all": [
+        "Unlimited scans",
+        "Unlimited endpoints",
+        "Unlimited API calls",
+        "All features included",
+        "Community support",
+        "MIT License"
+      ]
     }
   },
   "atrPage": {

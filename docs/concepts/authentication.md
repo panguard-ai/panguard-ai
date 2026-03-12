@@ -97,20 +97,20 @@ CLI 會印出認證 URL，你可以複製到有瀏覽器的裝置開啟：
 
 所有功能對所有使用者免費開放（MIT 授權）：
 
-| 指令                               | 說明                 |
-| ---------------------------------- | -------------------- |
-| `panguard init`                    | 設定精靈             |
-| `panguard login / logout / whoami` | 認證指令             |
-| `panguard status`                  | 狀態查詢             |
-| `panguard demo`                    | 功能展示             |
-| `panguard scan --quick`            | 快速掃描             |
-| `panguard scan`                    | 完整掃描             |
-| `panguard guard start`             | 即時防護             |
-| `panguard chat setup`              | 通知設定             |
-| `panguard deploy`                  | 部署服務             |
+| 指令                               | 說明                    |
+| ---------------------------------- | ----------------------- |
+| `panguard init`                    | 設定精靈                |
+| `panguard login / logout / whoami` | 認證指令                |
+| `panguard status`                  | 狀態查詢                |
+| `panguard demo`                    | 功能展示                |
+| `panguard scan --quick`            | 快速掃描                |
+| `panguard scan`                    | 完整掃描                |
+| `panguard guard start`             | 即時防護                |
+| `panguard chat setup`              | 通知設定                |
+| `panguard deploy`                  | 部署服務                |
 | `panguard trap`                    | 蜜罐系統（Coming Soon） |
 | `panguard report`                  | 合規報告（Coming Soon） |
-| `panguard threat`                  | 威脅情報 API         |
+| `panguard threat`                  | 威脅情報 API            |
 
 ---
 

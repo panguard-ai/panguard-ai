@@ -103,12 +103,12 @@ panguard init [options]
 panguard scan [options]
 ```
 
-| 選項              | 類型    | 預設值                     | 說明                          |
-| ----------------- | ------- | -------------------------- | ----------------------------- |
-| `--quick`         | boolean | `false`                    | 快速模式（~30 秒）            |
-| `--output <path>` | string  | `panguard-scan-report.pdf` | PDF 報告輸出路徑              |
-| `--lang <lang>`   | string  | `en`                       | 語言（`en` 或 `zh-TW`）       |
-| `--verbose`       | boolean | `false`                    | 詳細輸出                      |
+| 選項              | 類型    | 預設值                     | 說明                    |
+| ----------------- | ------- | -------------------------- | ----------------------- |
+| `--quick`         | boolean | `false`                    | 快速模式（~30 秒）      |
+| `--output <path>` | string  | `panguard-scan-report.pdf` | PDF 報告輸出路徑        |
+| `--lang <lang>`   | string  | `en`                       | 語言（`en` 或 `zh-TW`） |
+| `--verbose`       | boolean | `false`                    | 詳細輸出                |
 
 ```bash
 # 快速掃描
