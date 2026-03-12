@@ -24,7 +24,7 @@ Panguard AI provides three independent API services. Each service runs on its ow
 
 | Service | Default Base URL | TLS |
 |---------|-----------------|-----|
-| Auth Server | `https://auth.panguard.ai` or `http://localhost:3000` | Optional (recommended) |
+| Auth Server | `http://localhost:3000` or `http://localhost:3000` | Optional (recommended) |
 | Manager | `https://localhost:8443` | Self-signed by default |
 | Threat Cloud | `https://tc.panguard.ai` or `http://localhost:PORT` | Optional |
 
@@ -88,7 +88,7 @@ When rate-limited, the API returns a `429` status code with a `Retry-After` head
 | `201` | Created | Resource created successfully |
 | `400` | Bad Request | Invalid request body or missing required fields |
 | `401` | Unauthorized | Missing or invalid authentication token |
-| `403` | Forbidden | Valid token but insufficient permissions or tier |
+| `403` | Forbidden | Valid token but insufficient permissions |
 | `404` | Not Found | Requested resource does not exist |
 | `429` | Too Many Requests | Rate limit exceeded, check `Retry-After` header |
 | `500` | Internal Server Error | Unexpected server error, retry with backoff |

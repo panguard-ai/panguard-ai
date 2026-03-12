@@ -96,42 +96,13 @@ panguard login
 
 ---
 
-## 方案層級不足
+## 功能存取
 
+Panguard 以 MIT 授權 100% 開源，所有功能皆免費可用，無需付費方案或帳號。如果您遇到功能受限的錯誤訊息，請確認您使用的是最新版本：
+
+```bash
+npm update -g @panguard-ai/panguard
 ```
-Error: This feature requires the Pro tier or higher. Current tier: community
-```
-
-某些功能受訂閱層級限制：
-
-| 功能 | 最低層級 |
-|---------|-------------|
-| 基本掃描 | Community |
-| 第一層 Guard | Community |
-| 完整 Guard（3 層） | Solo |
-| Chat 通知 | Solo |
-| Trap（蜜罐） | Pro |
-| 報告產生 | Pro |
-| 自訂 AI 模型 | Business |
-| API 存取 | Business |
-
-**解決方案：**
-
-1. 升級您的訂閱：
-   ```bash
-   panguard upgrade
-   ```
-
-2. 檢查您目前的層級：
-   ```bash
-   panguard whoami
-   ```
-
-3. 如果您最近升級了，重新登入以更新您的工作階段：
-   ```bash
-   panguard logout
-   panguard login
-   ```
 
 ---
 

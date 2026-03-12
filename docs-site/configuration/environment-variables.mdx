@@ -48,7 +48,7 @@ $env:ANTHROPIC_API_KEY = "sk-ant-..."
 </CodeGroup>
 
 <Info>
-Guard uses a three-layer AI system. At minimum, configure `OLLAMA_ENDPOINT` for local analysis (Layer 1). Add `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` for cloud-based analysis (Layer 2/3) on Pro and Business tiers.
+Guard uses a three-layer AI system. At minimum, configure `OLLAMA_ENDPOINT` for local analysis (Layer 1). Add `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` for cloud-based analysis (Layer 2/3).
 </Info>
 
 ---
@@ -105,11 +105,6 @@ export JWT_SECRET=$(openssl rand -hex 64)
 # Optional: Google OAuth
 export GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 export GOOGLE_CLIENT_SECRET=your-client-secret
-
-# Optional: LemonSqueezy payments
-export LEMONSQUEEZY_API_KEY=your-api-key
-export LEMONSQUEEZY_STORE_ID=your-store-id
-export LEMONSQUEEZY_WEBHOOK_SECRET=your-webhook-secret
 ```
 </CodeGroup>
 
@@ -138,7 +133,7 @@ export ALLOW_ANONYMOUS_UPLOAD=false
 </CodeGroup>
 
 <Info>
-`ALLOW_ANONYMOUS_UPLOAD=true` enables Community tier users to submit threat data without an API key. Uploaded data still goes through validation and reputation scoring.
+`ALLOW_ANONYMOUS_UPLOAD=true` enables users to submit threat data without an API key. Uploaded data still goes through validation and reputation scoring.
 </Info>
 
 ---

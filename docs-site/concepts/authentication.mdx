@@ -6,7 +6,11 @@ icon: "lock"
 
 # Authentication
 
-Panguard AI uses an OAuth-based authentication flow for CLI sessions, with multiple layers of credential security including AES-256-GCM encryption, TOTP two-factor authentication, and timing-safe API key verification.
+<Info>
+Panguard works without authentication. All features are available immediately after install. This page documents the **optional** self-hosted auth server (`@panguard-ai/panguard-auth`) for team deployments where centralized user management is needed.
+</Info>
+
+Panguard AI supports an optional OAuth-based authentication flow for CLI sessions, with multiple layers of credential security including AES-256-GCM encryption, TOTP two-factor authentication, and timing-safe API key verification.
 
 ---
 
@@ -24,7 +28,7 @@ Panguard AI uses an OAuth-based authentication flow for CLI sessions, with multi
     |
     | Token at ~/.panguard/credentials.json (0o600)
     v
-  [panguard scan / guard / trap ...]  -- Features unlocked by tier
+  [panguard scan / guard / trap ...]  -- All features available
 ```
 
 ---
@@ -57,9 +61,6 @@ Panguard AI uses an OAuth-based authentication flow for CLI sessions, with multi
 
       Email     user@example.com
       Name      User Name
-      Plan      Solo
-      Expires   2026-04-27
-
       Login successful!
     ```
   </Step>
@@ -107,7 +108,6 @@ File permissions are set to `0o600` (owner read/write only) immediately after cr
   "token": "session-token-string",
   "expiresAt": "2026-04-27T00:00:00.000Z",
   "email": "user@example.com",
-  "tier": "solo",
   "name": "User Name",
   "savedAt": "2026-02-26T12:00:00.000Z",
   "apiUrl": "https://panguard.ai"
@@ -116,9 +116,8 @@ File permissions are set to `0o600` (owner read/write only) immediately after cr
 
 ### Session Lifetime
 
-- CLI sessions are valid for **30 days**
-- After expiration, run `panguard login` again
-- Check expiration with `panguard whoami`
+- CLI sessions are valid until explicitly revoked
+- Check session info with `panguard whoami`
 
 ---
 
@@ -237,7 +236,7 @@ curl -H "X-API-Key: YOUR_API_KEY" \
 | **CSRF protection** | Random state token validates the OAuth callback |
 | **Callback restriction** | Only `localhost` callback URLs are accepted |
 | **File permissions** | `credentials.json` set to `0o600` on creation |
-| **Token expiration** | Sessions auto-expire after 30 days |
+| **Token expiration** | Sessions valid until revoked (configurable on self-hosted) |
 | **Flow timeout** | Pending authentication flows cleaned up after 10 minutes |
 | **Encryption at rest** | AES-256-GCM for sensitive config fields |
 | **Timing-safe comparison** | All API token verification uses constant-time comparison |
@@ -272,8 +271,8 @@ panguard login --api-url http://localhost:3100
 ## Related
 
 <CardGroup cols={2}>
-  <Card title="Account Setup" icon="user-plus" href="/account-setup">
-    Create your account and get started.
+  <Card title="Quick Start" icon="play" href="/quickstart">
+    Install and get started.
   </Card>
   <Card title="System Architecture" icon="sitemap" href="/concepts/architecture">
     How authentication fits into the three-layer platform architecture.
