@@ -136,14 +136,15 @@ export class ThreatCloudDB {
     return stmt.all(since) as ThreatCloudRule[];
   }
 
-  /** Fetch all rules / 取得所有規則 */
-  getAllRules(): ThreatCloudRule[] {
+  /** Fetch all rules with limit / 取得所有規則（含限制） */
+  getAllRules(limit = 5000): ThreatCloudRule[] {
     const stmt = this.db.prepare(`
       SELECT rule_id as ruleId, rule_content as ruleContent, published_at as publishedAt, source
       FROM rules
       ORDER BY published_at DESC
+      LIMIT ?
     `);
-    return stmt.all() as ThreatCloudRule[];
+    return stmt.all(limit) as ThreatCloudRule[];
   }
 
   /** Insert ATR rule proposal / 插入 ATR 規則提案 */

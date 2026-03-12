@@ -119,8 +119,8 @@ function mapWazuhLevel(level: number): string {
  * const adapter = new WazuhAdapter({
  *   enabled: true,
  *   endpoint: 'https://wazuh-manager:55000',
- *   username: 'wazuh-wui',
- *   password: 'wazuh-wui',
+ *   username: 'your-wazuh-username',
+ *   password: 'your-wazuh-password',
  * });
  *
  * if (await adapter.isAvailable()) {

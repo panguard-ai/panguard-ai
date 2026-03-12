@@ -60,7 +60,7 @@ const dataHandlingConfigs = [
 ];
 
 /* ─── Subprocessors Config ─── */
-const subprocessorKeys = ['aws', 'anthropic', 'cloudflare', 'lemonSqueezy', 'resend'] as const;
+const subprocessorKeys = ['aws', 'anthropic', 'cloudflare', 'resend'] as const;
 
 /* ═══════════════════════════════════════════════════════════════════
    Trust Center Content

@@ -55,7 +55,7 @@ export function readBody(req: IncomingMessage): Promise<ReadBodyResult> {
       } catch {
         console.warn(
           `[readBody] JSON parse failed for ${req.method} ${req.url} ` +
-            `(${raw.length} bytes, first 200 chars: ${raw.slice(0, 200)})`
+            `(${raw.length} bytes) [body redacted for security]`
         );
         resolve({ ok: false, status: 400 });
       }

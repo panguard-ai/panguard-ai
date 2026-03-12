@@ -22,7 +22,8 @@ async function verifyAdmin(req: Request): Promise<boolean> {
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { slug: string } }) {
+export async function PUT(req: Request, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   if (!(await verifyAdmin(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -62,7 +63,8 @@ export async function PUT(req: Request, { params }: { params: { slug: string } }
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { slug: string } }) {
+export async function DELETE(req: Request, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   if (!(await verifyAdmin(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

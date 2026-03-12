@@ -1,13 +1,11 @@
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import { Inter, JetBrains_Mono, Noto_Sans_TC } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { buildAlternates } from '@/lib/seo';
-
-const CookieBanner = dynamic(() => import('@/components/CookieBanner'), { ssr: false });
+import { CookieBannerLazy } from '@/components/CookieBannerLazy';
 
 const locales = ['en', 'zh'] as const;
 
@@ -30,11 +28,17 @@ const notoSansTC = Noto_Sans_TC({
   display: 'swap',
 });
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const t = await getTranslations({ locale, namespace: 'metadata.home' });
 
   return {
@@ -144,13 +148,22 @@ const jsonLd = [
   },
 ];
 
-export default async function LocaleLayout({
-  children,
-  params: { locale },
-}: Readonly<{
-  children: React.ReactNode;
-  params: { locale: string };
-}>) {
+export default async function LocaleLayout(
+  props: Readonly<{
+    children: React.ReactNode;
+    params: Promise<{ locale: string }>;
+  }>
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
+  const {
+    children
+  } = props;
+
   if (!locales.includes(locale as (typeof locales)[number])) {
     notFound();
   }
@@ -201,7 +214,7 @@ export default async function LocaleLayout({
         </a>
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>{children}</AuthProvider>
-          <CookieBanner />
+          <CookieBannerLazy />
         </NextIntlClientProvider>
       </body>
     </html>

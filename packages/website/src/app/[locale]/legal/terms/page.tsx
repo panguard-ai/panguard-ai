@@ -1,18 +1,31 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   return {
     title: locale === 'zh' ? '服務條款' : 'Terms of Service',
     description: 'Panguard AI Terms of Service. Usage terms, intellectual property, and liability.',
   };
 }
 
-export default function TermsOfServicePage({ params: { locale } }: { params: { locale: string } }) {
+export default async function TermsOfServicePage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   return (
     <article className="prose-legal">
       <header className="mb-10">
@@ -117,12 +130,12 @@ export default function TermsOfServicePage({ params: { locale } }: { params: { l
           <h2 className="text-lg font-semibold text-text-primary mb-3">6. Acceptable Use</h2>
           <p>
             Your use of the Service is subject to our{' '}
-            <a
+            <Link
               href="/legal/acceptable-use"
               className="text-brand-sage hover:text-brand-sage-light underline"
             >
               Acceptable Use Policy
-            </a>
+            </Link>
             , which is incorporated into these Terms by reference. You agree not to use the Service
             in any manner that is unlawful, harmful, fraudulent, or in violation of any applicable
             regulations.
@@ -157,16 +170,16 @@ export default function TermsOfServicePage({ params: { locale } }: { params: { l
           <h2 className="text-lg font-semibold text-text-primary mb-3">8. Data Rights</h2>
           <p>
             Panguard processes Customer Data in accordance with our{' '}
-            <a
+            <Link
               href="/legal/privacy"
               className="text-brand-sage hover:text-brand-sage-light underline"
             >
               Privacy Policy
-            </a>{' '}
+            </Link>{' '}
             and, where applicable, our{' '}
-            <a href="/legal/dpa" className="text-brand-sage hover:text-brand-sage-light underline">
+            <Link href="/legal/dpa" className="text-brand-sage hover:text-brand-sage-light underline">
               Data Processing Agreement
-            </a>
+            </Link>
             . You acknowledge that anonymized and aggregated threat intelligence data derived from
             the Service may be used by Panguard to improve its products and contribute to collective
             cybersecurity efforts.
@@ -182,9 +195,9 @@ export default function TermsOfServicePage({ params: { locale } }: { params: { l
             For Pro and Business plan customers, Panguard provides a Service Level Agreement (SLA)
             guaranteeing 99.9% uptime availability. The full terms of the SLA, including service
             credits and exclusions, are set forth in our{' '}
-            <a href="/legal/sla" className="text-brand-sage hover:text-brand-sage-light underline">
+            <Link href="/legal/sla" className="text-brand-sage hover:text-brand-sage-light underline">
               Service Level Agreement
-            </a>
+            </Link>
             .
           </p>
         </section>

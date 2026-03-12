@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
@@ -155,12 +156,12 @@ export default function FAQContent() {
             >
               {t('cta.github')}
             </a>
-            <a
+            <Link
               href="/contact"
               className="inline-flex items-center gap-2 border border-border text-text-primary px-6 py-3 rounded-full text-sm font-semibold hover:border-brand-sage hover:text-brand-sage transition-colors"
             >
               {t('cta.contact')}
-            </a>
+            </Link>
           </div>
         </FadeInUp>
       </SectionWrapper>

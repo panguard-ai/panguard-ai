@@ -16,7 +16,7 @@ import type {
   ActivityItem,
   AuditLogFilter,
 } from './types.js';
-import { timingSafeEqual } from 'node:crypto';
+import { timingSafeEqual, createHash } from 'node:crypto';
 import { hashToken } from './auth.js';
 import { encryptSecret, decryptSecret, isEncrypted } from './crypto.js';
 
@@ -969,6 +969,9 @@ export class AuthDB {
    */
   saveTotpSecret(userId: number, secret: string, backupCodes: string): void {
     const encrypted = encryptSecret(secret);
+    // Hash backup codes before storage so plaintext is never at rest
+    const codes: string[] = JSON.parse(backupCodes);
+    const hashedCodes = codes.map((c) => createHash('sha256').update(c).digest('hex'));
     this.db
       .prepare(
         `INSERT INTO totp_secrets (user_id, encrypted_secret, backup_codes, enabled)
@@ -979,7 +982,7 @@ export class AuthDB {
            enabled = 0,
            updated_at = datetime('now')`
       )
-      .run(userId, encrypted, backupCodes);
+      .run(userId, encrypted, JSON.stringify(hashedCodes));
   }
 
   /**
@@ -1042,16 +1045,17 @@ export class AuthDB {
     const secret = this.getTotpSecret(userId);
     if (!secret) return false;
 
-    const codes: string[] = JSON.parse(secret.backupCodes);
-    // Timing-safe comparison to prevent side-channel attacks
-    const index = codes.findIndex((c) => {
-      const a = Buffer.from(c, 'utf8');
-      const b = Buffer.from(code, 'utf8');
+    const storedHashes: string[] = JSON.parse(secret.backupCodes);
+    const inputHash = createHash('sha256').update(code).digest('hex');
+    // Timing-safe comparison of SHA-256 hashes
+    const index = storedHashes.findIndex((h) => {
+      const a = Buffer.from(h, 'hex');
+      const b = Buffer.from(inputHash, 'hex');
       return a.length === b.length && timingSafeEqual(a, b);
     });
     if (index === -1) return false;
 
-    const remaining = [...codes.slice(0, index), ...codes.slice(index + 1)];
+    const remaining = [...storedHashes.slice(0, index), ...storedHashes.slice(index + 1)];
     this.db
       .prepare(
         "UPDATE totp_secrets SET backup_codes = ?, updated_at = datetime('now') WHERE user_id = ?"

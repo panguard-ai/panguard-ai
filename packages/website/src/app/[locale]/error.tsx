@@ -30,6 +30,7 @@ export default function Error({
             <RefreshCw className="w-4 h-4" />
             Try again
           </button>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Error boundary cannot use Next.js router */}
           <a
             href="/"
             className="inline-flex items-center gap-2 border border-border text-text-secondary font-semibold text-sm rounded-full px-6 py-3 hover:text-text-primary hover:border-brand-sage transition-colors"

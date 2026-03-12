@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -65,9 +66,9 @@ export default function SLAPage() {
           <p className="mt-2">
             2.3 Panguard uses independent third-party monitoring services to verify uptime. Current
             uptime status and historical data are available on our public status page at{' '}
-            <a href="/status" className="text-brand-sage hover:text-brand-sage-light underline">
+            <Link href="/status" className="text-brand-sage hover:text-brand-sage-light underline">
               status.panguard.ai
-            </a>
+            </Link>
             .
           </p>
         </section>

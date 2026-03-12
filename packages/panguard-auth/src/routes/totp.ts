@@ -19,7 +19,7 @@ export function createTotpRoutes(ctx: RouteContext) {
    * POST /api/auth/totp/setup
    * Generate a new TOTP secret and backup codes. Returns otpauth URI for QR code.
    */
-  function handleTotpSetup(req: IncomingMessage, res: ServerResponse): void {
+  async function handleTotpSetup(req: IncomingMessage, res: ServerResponse): Promise<void> {
     if (req.method !== 'POST') {
       json(res, 405, { ok: false, error: 'Method not allowed' });
       return;
@@ -28,6 +28,32 @@ export function createTotpRoutes(ctx: RouteContext) {
     const user = authenticateRequest(req, db);
     if (!user) {
       json(res, 401, { ok: false, error: 'Not authenticated' });
+      return;
+    }
+
+    // Rate limit TOTP setup (reuse loginLimiter — 10 per 15 min per IP)
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ?? req.socket.remoteAddress ?? 'unknown';
+    const rl = ctx.loginLimiter.check(ip);
+    if (!rl.allowed) {
+      res.setHeader('Retry-After', String(Math.ceil(rl.retryAfterMs / 1000)));
+      json(res, 429, { ok: false, error: 'Too many requests. Try again later.' });
+      return;
+    }
+
+    // Require password confirmation before generating new TOTP secret
+    const body = await readBody(req);
+    if (!body.ok) {
+      json(res, body.status, { ok: false, error: 'Invalid request body' });
+      return;
+    }
+    const { password } = body.data;
+    if (typeof password !== 'string') {
+      json(res, 400, { ok: false, error: 'Password is required to set up 2FA' });
+      return;
+    }
+    const userRecord = db.getUserById(user.id);
+    if (!userRecord || !(await verifyPassword(password, userRecord.passwordHash))) {
+      json(res, 401, { ok: false, error: 'Invalid password' });
       return;
     }
 

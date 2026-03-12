@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -22,12 +23,12 @@ export default function CookiePolicyPage() {
             &quot;us,&quot; or &quot;our&quot;) uses cookies and similar tracking technologies when
             you visit our website at panguard.ai and use our services. This policy should be read
             alongside our{' '}
-            <a
+            <Link
               href="/legal/privacy"
               className="text-brand-sage hover:text-brand-sage-light underline"
             >
               Privacy Policy
-            </a>
+            </Link>
             .
           </p>
         </section>
