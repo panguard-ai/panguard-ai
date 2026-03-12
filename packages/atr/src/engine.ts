@@ -159,10 +159,22 @@ export class ATREngine {
 
     // Detect format: array or named map
     if (Array.isArray(conditions)) {
-      return this.evaluateArrayConditions(rule, conditions, detection.condition, event, allMatchedPatterns);
+      return this.evaluateArrayConditions(
+        rule,
+        conditions,
+        detection.condition,
+        event,
+        allMatchedPatterns
+      );
     }
 
-    return this.evaluateNamedConditions(rule, conditions, detection.condition, event, allMatchedPatterns);
+    return this.evaluateNamedConditions(
+      rule,
+      conditions,
+      detection.condition,
+      event,
+      allMatchedPatterns
+    );
   }
 
   /**
@@ -195,7 +207,8 @@ export class ATREngine {
 
     if (!matched) return null;
 
-    const baseConfidence = rule.tags.confidence === 'high' ? 0.9 : rule.tags.confidence === 'medium' ? 0.7 : 0.5;
+    const baseConfidence =
+      rule.tags.confidence === 'high' ? 0.9 : rule.tags.confidence === 'medium' ? 0.7 : 0.5;
     const matchRatio = matchedConditionIndices.length / Math.max(conditions.length, 1);
     const confidence = Math.min(baseConfidence + matchRatio * 0.1, 1.0);
 
@@ -235,7 +248,10 @@ export class ATREngine {
         if (compiled && compiled.length > 0) {
           // Test against both normalized and raw values so that patterns
           // detecting zero-width/bidi characters can match before stripping
-          if (safeRegexTest(compiled[0]!, fieldValue) || safeRegexTest(compiled[0]!, rawFieldValue)) {
+          if (
+            safeRegexTest(compiled[0]!, fieldValue) ||
+            safeRegexTest(compiled[0]!, rawFieldValue)
+          ) {
             matchedPatterns.push(value);
             return true;
           }
@@ -294,7 +310,13 @@ export class ATREngine {
     const matchedConditionNames: string[] = [];
 
     for (const [condName, condDef] of Object.entries(conditions)) {
-      const result = this.evaluateNamedCondition(condName, condDef, event, rule, allMatchedPatterns);
+      const result = this.evaluateNamedCondition(
+        condName,
+        condDef,
+        event,
+        rule,
+        allMatchedPatterns
+      );
       conditionResults.set(condName, result);
       if (result) {
         matchedConditionNames.push(condName);
@@ -305,7 +327,8 @@ export class ATREngine {
     const finalResult = this.evaluateExpression(conditionExpr, conditionResults);
     if (!finalResult) return null;
 
-    const baseConfidence = rule.tags.confidence === 'high' ? 0.9 : rule.tags.confidence === 'medium' ? 0.7 : 0.5;
+    const baseConfidence =
+      rule.tags.confidence === 'high' ? 0.9 : rule.tags.confidence === 'medium' ? 0.7 : 0.5;
     const matchRatio = matchedConditionNames.length / Math.max(Object.keys(conditions).length, 1);
     const confidence = Math.min(baseConfidence + matchRatio * 0.1, 1.0);
 
@@ -431,19 +454,21 @@ export class ATREngine {
    * When a session tracker is available and the event has a sessionId,
    * supports session-derived metrics: call_frequency, pattern_frequency, event_count.
    */
-  private evaluateBehavioralCondition(
-    cond: ATRBehavioralCondition,
-    event: AgentEvent
-  ): boolean {
+  private evaluateBehavioralCondition(cond: ATRBehavioralCondition, event: AgentEvent): boolean {
     const metricValue = this.resolveMetricValue(cond, event);
     if (metricValue === undefined) return false;
 
     switch (cond.operator) {
-      case 'gt': return metricValue > cond.threshold;
-      case 'lt': return metricValue < cond.threshold;
-      case 'eq': return metricValue === cond.threshold;
-      case 'gte': return metricValue >= cond.threshold;
-      case 'lte': return metricValue <= cond.threshold;
+      case 'gt':
+        return metricValue > cond.threshold;
+      case 'lt':
+        return metricValue < cond.threshold;
+      case 'eq':
+        return metricValue === cond.threshold;
+      case 'gte':
+        return metricValue >= cond.threshold;
+      case 'lte':
+        return metricValue <= cond.threshold;
       case 'deviation_from_baseline':
         return Math.abs(metricValue) > cond.threshold;
       default:
@@ -455,10 +480,7 @@ export class ATREngine {
    * Resolve a metric value from event metrics or session tracker.
    * Session-derived metrics use the format: "call_frequency:toolName" or "pattern_frequency:pattern".
    */
-  private resolveMetricValue(
-    cond: ATRBehavioralCondition,
-    event: AgentEvent
-  ): number | undefined {
+  private resolveMetricValue(cond: ATRBehavioralCondition, event: AgentEvent): number | undefined {
     // Check event-level metrics first
     const directValue = event.metrics?.[cond.metric];
     if (directValue !== undefined) return directValue;
@@ -501,10 +523,14 @@ export class ATREngine {
     const unit = match[2]!;
 
     switch (unit) {
-      case 's': return value * 1000;
-      case 'm': return value * 60 * 1000;
-      case 'h': return value * 60 * 60 * 1000;
-      default: return 5 * 60 * 1000;
+      case 's':
+        return value * 1000;
+      case 'm':
+        return value * 60 * 1000;
+      case 'h':
+        return value * 60 * 60 * 1000;
+      default:
+        return 5 * 60 * 1000;
     }
   }
 
@@ -516,10 +542,7 @@ export class ATREngine {
    * execution across separate events or enforce time windows.
    * Full session-aware sequence detection is planned for v0.2.
    */
-  private evaluateSequenceCondition(
-    cond: Record<string, unknown>,
-    event: AgentEvent
-  ): boolean {
+  private evaluateSequenceCondition(cond: Record<string, unknown>, event: AgentEvent): boolean {
     const steps = cond['steps'] as Array<Record<string, unknown>>;
     if (!steps || steps.length === 0) return false;
 
@@ -570,11 +593,15 @@ export class ATREngine {
       case 'tool_response':
         return event.type === 'tool_response' ? event.content : event.fields?.['tool_response'];
       case 'tool_name':
-        return event.fields?.['tool_name'] ?? (event.type === 'tool_call' ? event.content : undefined);
+        return (
+          event.fields?.['tool_name'] ?? (event.type === 'tool_call' ? event.content : undefined)
+        );
       case 'tool_args':
         return event.fields?.['tool_args'];
       case 'agent_message':
-        return event.type === 'multi_agent_message' ? event.content : event.fields?.['agent_message'];
+        return event.type === 'multi_agent_message'
+          ? event.content
+          : event.fields?.['agent_message'];
       default:
         // Try metadata
         return event.metadata?.[fieldName] as string | undefined;
@@ -585,10 +612,7 @@ export class ATREngine {
    * Evaluate a boolean expression string against condition results.
    * Supports AND, OR, NOT operators.
    */
-  private evaluateExpression(
-    expression: string,
-    results: Map<string, boolean>
-  ): boolean {
+  private evaluateExpression(expression: string, results: Map<string, boolean>): boolean {
     const expr = expression.trim();
 
     // Simple single condition
@@ -750,10 +774,16 @@ function normalizeRegex(pattern: string): string {
  * This prevents evasion via combining characters, zero-width joiners, etc.
  */
 function normalizeUnicode(text: string): string {
-  return text
-    .normalize('NFC')
-    // eslint-disable-next-line no-misleading-character-class
-    .replace(/[\u200B\u200C\u200D\uFEFF\u2060\u180E\u200E\u200F\u202A\u202B\u202C\u202D\u202E\u2066\u2067\u2068\u2069]/gu, '');
+  return (
+    text
+      .normalize('NFC')
+      .replace(
+        // Zero-width and bidi control characters (listed individually to avoid misleading character class)
+        /[\u200B\u200C\uFEFF\u2060\u180E\u200E\u200F]/gu,
+        ''
+      )
+      .replace(/[\u202A-\u202E\u2066-\u2069\u200D]/gu, '')
+  );
 }
 
 /** Maximum input length for regex evaluation to mitigate ReDoS */

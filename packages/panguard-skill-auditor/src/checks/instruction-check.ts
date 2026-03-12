@@ -24,14 +24,16 @@ const PATTERNS: Pattern[] = [
   {
     id: 'pi-ignore-previous',
     title: 'Prompt injection: ignore previous instructions',
-    regex: /\b(ignore|disregard|forget|override)\b.{0,30}\b(previous|above|prior|earlier|system)\b.{0,20}\b(instructions?|prompt|rules?|context)\b/i,
+    regex:
+      /\b(ignore|disregard|forget|override)\b.{0,30}\b(previous|above|prior|earlier|system)\b.{0,20}\b(instructions?|prompt|rules?|context)\b/i,
     severity: 'critical',
     category: 'prompt-injection',
   },
   {
     id: 'pi-you-are-now',
     title: 'Prompt injection: identity override',
-    regex: /\b(you are now|act as|pretend to be|assume the role|from now on you|your true identity|henceforth operate as|your persona for this|switch to developer mode|enable maintenance mode|your updated system config)/i,
+    regex:
+      /\b(you are now|act as|pretend to be|assume the role|from now on you|your true identity|henceforth operate as|your persona for this|switch to developer mode|enable maintenance mode|your updated system config)/i,
     severity: 'high',
     category: 'prompt-injection',
   },
@@ -45,7 +47,8 @@ const PATTERNS: Pattern[] = [
   {
     id: 'pi-do-anything',
     title: 'Prompt injection: jailbreak pattern',
-    regex: /\b(DAN|do anything now|jailbreak|bypass safety|ignore safety|no restrictions|unrestricted mode|god mode|developer mode|maintenance mode|STAN|respond without filter|disable content policy)\b/i,
+    regex:
+      /\b(DAN|do anything now|jailbreak|bypass safety|ignore safety|no restrictions|unrestricted mode|god mode|developer mode|maintenance mode|STAN|respond without filter|disable content policy)\b/i,
     severity: 'critical',
     category: 'prompt-injection',
   },
@@ -68,7 +71,8 @@ const PATTERNS: Pattern[] = [
   {
     id: 'tp-reverse-shell',
     title: 'Reverse shell pattern detected',
-    regex: /\b(nc\s+-[elp]|ncat\s+-|bash\s+-i\s+>&|\/dev\/tcp\/|mkfifo|socat\s.*exec|python[23]?\s+-c\s+['"]import\s+socket|perl\s+-e\s+['"]use\s+Socket|php\s+-r\s+['"]\$sock\s*=\s*fsockopen|powershell\s.*TCPClient)/i,
+    regex:
+      /\b(nc\s+-[elp]|ncat\s+-|bash\s+-i\s+>&|\/dev\/tcp\/|mkfifo|socat\s.*exec|python[23]?\s+-c\s+['"]import\s+socket|perl\s+-e\s+['"]use\s+Socket|php\s+-r\s+['"]\$sock\s*=\s*fsockopen|powershell\s.*TCPClient)/i,
     severity: 'critical',
     category: 'tool-poisoning',
   },
@@ -82,14 +86,16 @@ const PATTERNS: Pattern[] = [
   {
     id: 'tp-env-exfil',
     title: 'Environment variable exfiltration',
-    regex: /\b(printenv|env\b|set\b).*\|\s*(curl|wget|nc\b)|curl.*\$\{?\w*(KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL)/i,
+    regex:
+      /\b(printenv|env\b|set\b).*\|\s*(curl|wget|nc\b)|curl.*\$\{?\w*(KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL)/i,
     severity: 'critical',
     category: 'tool-poisoning',
   },
   {
     id: 'tp-file-exfil',
     title: 'Sensitive file access pattern',
-    regex: /\b(cat|less|more|head|tail)\s+.*(\/etc\/shadow|\/etc\/passwd|~\/\.ssh|\.env|credentials|\.aws\/)/i,
+    regex:
+      /\b(cat|less|more|head|tail)\s+.*(\/etc\/shadow|\/etc\/passwd|~\/\.ssh|\.env|credentials|\.aws\/)/i,
     severity: 'high',
     category: 'tool-poisoning',
   },
@@ -102,9 +108,9 @@ const PATTERNS: Pattern[] = [
   },
 ];
 
-/** Zero-width, invisible, and steganographic Unicode characters */
-// eslint-disable-next-line no-misleading-character-class
-const HIDDEN_UNICODE_RE = /[\u200B\u200C\u200D\u200E\u200F\u202A-\u202E\u2060\u2061\u2062\u2063\u2064\uFEFF\u00AD\u3164\u115F\u1160\uFFF9-\uFFFB]|\uDB40[\uDC00-\uDC7F]/;
+/** Zero-width, invisible, and steganographic Unicode characters (split to avoid misleading-character-class) */
+const HIDDEN_UNICODE_RE =
+  /[\u200B\u200C\u200E\u200F\u2060-\u2064\uFEFF\u00AD\u3164\u115F\u1160\uFFF9-\uFFFB]|[\u200D\u202A-\u202E]|\uDB40[\uDC00-\uDC7F]/;
 
 /** Fullwidth Latin characters (U+FF01-U+FF5E) — visually similar to ASCII but bypass \b word boundaries */
 const FULLWIDTH_LATIN_RE = /[\uFF01-\uFF5E]{4,}/;
@@ -114,22 +120,54 @@ const FULLWIDTH_LATIN_RE = /[\uFF01-\uFF5E]{4,}/;
  * Maps confusable Unicode codepoints to their Latin lookalikes.
  */
 const HOMOGLYPH_MAP: Record<string, string> = {
-  '\u0410': 'A', '\u0412': 'B', '\u0421': 'C', '\u0415': 'E', '\u041D': 'H',
-  '\u041A': 'K', '\u041C': 'M', '\u041E': 'O', '\u0420': 'P', '\u0422': 'T',
-  '\u0425': 'X', '\u0430': 'a', '\u0435': 'e', '\u043E': 'o', '\u0440': 'p',
-  '\u0441': 'c', '\u0443': 'y', '\u0445': 'x', '\u0455': 's', '\u0456': 'i',
-  '\u0458': 'j', '\u0471': 'v', '\u0473': 'w',
+  '\u0410': 'A',
+  '\u0412': 'B',
+  '\u0421': 'C',
+  '\u0415': 'E',
+  '\u041D': 'H',
+  '\u041A': 'K',
+  '\u041C': 'M',
+  '\u041E': 'O',
+  '\u0420': 'P',
+  '\u0422': 'T',
+  '\u0425': 'X',
+  '\u0430': 'a',
+  '\u0435': 'e',
+  '\u043E': 'o',
+  '\u0440': 'p',
+  '\u0441': 'c',
+  '\u0443': 'y',
+  '\u0445': 'x',
+  '\u0455': 's',
+  '\u0456': 'i',
+  '\u0458': 'j',
+  '\u0471': 'v',
+  '\u0473': 'w',
   // Greek
-  '\u0391': 'A', '\u0392': 'B', '\u0395': 'E', '\u0396': 'Z', '\u0397': 'H',
-  '\u0399': 'I', '\u039A': 'K', '\u039C': 'M', '\u039D': 'N', '\u039F': 'O',
-  '\u03A1': 'P', '\u03A4': 'T', '\u03A5': 'Y', '\u03A7': 'X',
-  '\u03B1': 'a', '\u03BF': 'o', '\u03C1': 'p',
+  '\u0391': 'A',
+  '\u0392': 'B',
+  '\u0395': 'E',
+  '\u0396': 'Z',
+  '\u0397': 'H',
+  '\u0399': 'I',
+  '\u039A': 'K',
+  '\u039C': 'M',
+  '\u039D': 'N',
+  '\u039F': 'O',
+  '\u03A1': 'P',
+  '\u03A4': 'T',
+  '\u03A5': 'Y',
+  '\u03A7': 'X',
+  '\u03B1': 'a',
+  '\u03BF': 'o',
+  '\u03C1': 'p',
 };
 const HOMOGLYPH_RE = new RegExp(`[${Object.keys(HOMOGLYPH_MAP).join('')}]`);
 
 /** Base64-encoded suspicious keywords — lowered threshold to 20 chars */
 const BASE64_BLOCK_RE = /[A-Za-z0-9+/]{20,}={0,2}/g;
-const SUSPICIOUS_DECODED = /(eval|exec|system|import\s+os|subprocess|child_process|require\s*\(|__import__|curl|wget)/i;
+const SUSPICIOUS_DECODED =
+  /(eval|exec|system|import\s+os|subprocess|child_process|require\s*\(|__import__|curl|wget)/i;
 
 /** Hex-encoded payload detection — sequences of \xNN or contiguous hex */
 const HEX_ESCAPE_RE = /(\\x[0-9a-fA-F]{2}){8,}/g;
@@ -248,9 +286,10 @@ export function checkInstructions(instructions: string): CheckResult {
   const hasHigh = findings.some((f) => f.severity === 'high');
   const status = hasCritical ? 'fail' : hasHigh ? 'warn' : findings.length > 0 ? 'warn' : 'pass';
 
-  const label = findings.length === 0
-    ? 'Prompt Safety: No injection patterns detected'
-    : `Prompt Safety: ${findings.length} suspicious pattern(s) detected`;
+  const label =
+    findings.length === 0
+      ? 'Prompt Safety: No injection patterns detected'
+      : `Prompt Safety: ${findings.length} suspicious pattern(s) detected`;
 
   return { status, label, findings };
 }
