@@ -9,7 +9,7 @@ icon: "download"
 | 項目 | 最低要求 |
 | --- | --- |
 | **作業系統** | macOS 12+、Ubuntu 20.04+、Windows 10+ |
-| **Node.js** | >= 20.0.0 |
+| **Node.js** | >= 18.0.0 |
 | **硬碟空間** | 200 MB |
 | **記憶體** | 512 MB（Guard 建議 1 GB） |
 
@@ -29,7 +29,7 @@ icon: "download"
   Windows 支援核心功能，但某些作業系統層級的偵測能力與 macOS 和 Linux 相比有所限制。
 </Warning>
 
-## 可用二進位檔 (v0.3.1)
+## 可用二進位檔 (v0.3.3)
 
 | 平台 | 架構 | 安裝方式 |
 | --- | --- | --- |
@@ -143,7 +143,7 @@ panguard --version
 預期輸出：
 
 ```
-0.3.1
+0.3.3
 ```
 
 如果找不到指令，請確認安裝路徑已加入系統 PATH。對於 npm 全域安裝，可使用以下指令確認：
@@ -170,6 +170,16 @@ npm list -g @panguard-ai/panguard
   </Tab>
 </Tabs>
 
+## 配置 AI Agent
+
+安裝完成後，執行 `panguard setup` 自動配置所有偵測到的 AI Agent 平台：
+
+```bash
+panguard setup
+```
+
+自動偵測並配置 Claude Code、Cursor、OpenClaw、Codex CLI、Claude Desktop 和 Windsurf。詳見[快速入門](/quickstart)。
+
 ## 下一步
 
-安裝完成後，請前往[帳號設定](/account-setup)建立帳號並驗證 CLI。
+安裝完成後，請前往[快速入門](/quickstart)執行您的首次安全掃描。

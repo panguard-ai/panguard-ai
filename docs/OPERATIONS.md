@@ -1,6 +1,6 @@
 # Panguard AI 營運管理手冊 (Operations Manual)
 
-> 最後更新: 2026-03-06 | 版本: v0.3.1
+> 最後更新: 2026-03-06 | 版本: v0.3.3
 
 ---
 
@@ -1061,7 +1061,7 @@ panguard chat test
 ### Release 自動化流程
 
 ```
-git tag v0.3.1 && git push --tags
+git tag v0.3.3 && git push --tags
     ↓
 release.yml 觸發:
     ↓

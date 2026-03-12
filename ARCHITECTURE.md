@@ -247,8 +247,8 @@ Vercel deployment. Next.js 14 with ISR. Bilingual (EN + zh-TW).
 
 | Package | npm Name | Version | Maturity | Description |
 | ------- | -------- | ------- | -------- | ----------- |
-| core | @panguard-ai/core | 0.3.1 | GA | Shared foundation: rules, AI, monitor, discovery, i18n |
-| panguard | @panguard-ai/panguard | 0.3.1 | GA | Unified CLI with 22 commands |
+| core | @panguard-ai/core | 0.3.3 | GA | Shared foundation: rules, AI, monitor, discovery, i18n |
+| panguard | @panguard-ai/panguard | 0.3.3 | GA | Unified CLI with 22 commands |
 | atr | agent-threat-rules | 0.1.0 | RFC | Open detection standard for AI agent threats |
 | panguard-scan | @panguard-ai/panguard-scan | 0.2.0 | GA | 60-second security scanning |
 | panguard-guard | @panguard-ai/panguard-guard | 0.2.0 | GA | Real-time monitoring, 4-agent pipeline |

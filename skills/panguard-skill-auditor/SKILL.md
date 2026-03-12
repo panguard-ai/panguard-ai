@@ -5,7 +5,7 @@ homepage: https://panguard.ai/docs/skill-auditor
 metadata:
   {
     "author": "panguard-ai",
-    "version": "0.3.1",
+    "version": "0.3.3",
     "tags": ["security", "audit", "skill-vetting", "prompt-injection", "tool-poisoning"],
     "triggers": ["audit", "vet", "security check", "skill review", "before installing"],
     "openclaw":
