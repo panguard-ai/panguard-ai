@@ -35,41 +35,43 @@ import { auditCommand } from './commands/audit.js';
 import { hacktivityCommand } from './commands/hacktivity.js';
 import { setupCommand } from './commands/setup.js';
 import { startInteractive } from './interactive.js';
-import { refreshTierInBackground } from './auth-guard.js';
 
 const program = new Command();
 
 program
   .name('panguard')
-  .description('Panguard AI - Unified Security Platform / 統一資安平台')
+  .description('Panguard AI - Security for AI Agents / AI Agent 資安防護')
   .version(PANGUARD_VERSION);
 
+// ── Core commands (shown in help) ──
+program.addCommand(setupCommand());
+program.addCommand(auditCommand());
 program.addCommand(scanCommand());
 program.addCommand(guardCommand());
-program.addCommand(reportCommand());
-program.addCommand(chatCommand());
-program.addCommand(trapCommand());
-program.addCommand(threatCommand());
-program.addCommand(demoCommand());
-program.addCommand(initCommand());
-program.addCommand(deployCommand());
 program.addCommand(statusCommand());
-program.addCommand(loginCommand());
-program.addCommand(logoutCommand());
-program.addCommand(whoamiCommand());
-program.addCommand(serveCommand());
-program.addCommand(adminCommand());
-program.addCommand(hardeningCommand());
-program.addCommand(managerCommand());
 program.addCommand(upgradeCommand());
+
+// ── Secondary commands (shown in help) ──
+program.addCommand(chatCommand());
 program.addCommand(configCommand());
 program.addCommand(doctorCommand());
-program.addCommand(auditCommand());
-program.addCommand(hacktivityCommand());
-program.addCommand(setupCommand());
 
-// Refresh tier from server in background (non-blocking)
-refreshTierInBackground();
+// ── Advanced commands (hidden from help, still usable) ──
+const hidden = { hidden: true };
+program.addCommand(reportCommand().helpOption(false), hidden);
+program.addCommand(trapCommand().helpOption(false), hidden);
+program.addCommand(threatCommand(), hidden);
+program.addCommand(demoCommand(), hidden);
+program.addCommand(initCommand(), hidden);
+program.addCommand(deployCommand(), hidden);
+program.addCommand(loginCommand(), hidden);
+program.addCommand(logoutCommand(), hidden);
+program.addCommand(whoamiCommand(), hidden);
+program.addCommand(serveCommand(), hidden);
+program.addCommand(adminCommand(), hidden);
+program.addCommand(hardeningCommand(), hidden);
+program.addCommand(managerCommand(), hidden);
+program.addCommand(hacktivityCommand(), hidden);
 
 const userArgs = process.argv.slice(2);
 const helpFlags = new Set(['-h', '--help', '-V', '--version']);
