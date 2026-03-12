@@ -34,21 +34,9 @@ const CATEGORIES = [
   'authentication',
 ];
 
-const SOURCES: SecurityEvent['source'][] = [
-  'network',
-  'process',
-  'file',
-  'syslog',
-  'suricata',
-];
+const SOURCES: SecurityEvent['source'][] = ['network', 'process', 'file', 'syslog', 'suricata'];
 
-const SEVERITIES: SecurityEvent['severity'][] = [
-  'info',
-  'low',
-  'medium',
-  'high',
-  'critical',
-];
+const SEVERITIES: SecurityEvent['severity'][] = ['info', 'low', 'medium', 'high', 'critical'];
 
 function makeEvent(index: number): SecurityEvent {
   return {
@@ -98,7 +86,6 @@ function generateEvents(count: number): SecurityEvent[] {
 // ---------------------------------------------------------------------------
 // Utility: snapshot heap usage
 // ---------------------------------------------------------------------------
-
 
 // ---------------------------------------------------------------------------
 // Pre-generate data
@@ -235,7 +222,7 @@ describe('Memory Footprint', () => {
         baseline = continuousBaselineUpdate(
           baseline,
           EVENTS_1000[i % EVENTS_1000.length]!,
-          'benign',
+          'benign'
         );
       }
     });

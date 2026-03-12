@@ -3,12 +3,14 @@ import { checkWithAI, type SkillAnalysisLLM } from '../src/checks/ai-check.js';
 
 function makeLLM(overrides: Partial<SkillAnalysisLLM> = {}): SkillAnalysisLLM {
   return {
-    analyze: overrides.analyze ?? vi.fn().mockResolvedValue({
-      summary: '{"findings": [], "overallAssessment": "safe", "confidence": 0.9}',
-      severity: 'info' as const,
-      confidence: 0.9,
-      recommendations: [],
-    }),
+    analyze:
+      overrides.analyze ??
+      vi.fn().mockResolvedValue({
+        summary: '{"findings": [], "overallAssessment": "safe", "confidence": 0.9}',
+        severity: 'info' as const,
+        confidence: 0.9,
+        recommendations: [],
+      }),
     isAvailable: overrides.isAvailable ?? vi.fn().mockResolvedValue(true),
   };
 }
@@ -86,9 +88,7 @@ describe('checkWithAI', () => {
       const llm = makeLLM({
         analyze: vi.fn().mockResolvedValue({
           summary: JSON.stringify({
-            findings: [
-              { id: 'ai-test', title: 'Test', description: 'Test', severity: 'high' },
-            ],
+            findings: [{ id: 'ai-test', title: 'Test', description: 'Test', severity: 'high' }],
           }),
           severity: 'high' as const,
           confidence: 0.8,
@@ -105,7 +105,12 @@ describe('checkWithAI', () => {
         analyze: vi.fn().mockResolvedValue({
           summary: JSON.stringify({
             findings: [
-              { id: 'ai-test', title: 'Critical issue', description: 'Very bad', severity: 'critical' },
+              {
+                id: 'ai-test',
+                title: 'Critical issue',
+                description: 'Very bad',
+                severity: 'critical',
+              },
             ],
           }),
           severity: 'critical' as const,
@@ -213,7 +218,8 @@ describe('checkWithAI', () => {
 
   describe('markdown code fence handling', () => {
     it('should parse findings from JSON wrapped in code fences', async () => {
-      const summary = '```json\n{"findings": [{"id": "ai-test", "title": "Test", "description": "Desc", "severity": "medium"}]}\n```';
+      const summary =
+        '```json\n{"findings": [{"id": "ai-test", "title": "Test", "description": "Desc", "severity": "medium"}]}\n```';
       const llm = makeLLM({
         analyze: vi.fn().mockResolvedValue({
           summary,

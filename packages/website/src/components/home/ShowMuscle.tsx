@@ -82,7 +82,9 @@ function TeamSection() {
               <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-panguard-green mb-2 sm:mb-3" />
               <p className="text-xs sm:text-sm font-semibold text-text-primary">{role.role}</p>
               <p className="text-[10px] sm:text-xs text-panguard-green mt-1">{role.product}</p>
-              <p className="text-[10px] sm:text-xs text-gray-500 mt-1.5 sm:mt-2 leading-relaxed">{role.desc}</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-1.5 sm:mt-2 leading-relaxed">
+                {role.desc}
+              </p>
             </motion.div>
           );
         })}

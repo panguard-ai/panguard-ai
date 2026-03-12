@@ -12,10 +12,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  ListToolsRequestSchema,
-  CallToolRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { ATREngine } from './engine.js';
 import { handleScan } from './mcp-tools/scan.js';
 import { handleListRules } from './mcp-tools/list-rules.js';
@@ -38,11 +35,19 @@ const TOOLS = [
       properties: {
         content: {
           type: 'string',
-          description: 'The text content to scan for threats (prompt, tool response, agent output, etc.)',
+          description:
+            'The text content to scan for threats (prompt, tool response, agent output, etc.)',
         },
         event_type: {
           type: 'string',
-          enum: ['llm_input', 'llm_output', 'tool_call', 'tool_response', 'agent_behavior', 'multi_agent_message'],
+          enum: [
+            'llm_input',
+            'llm_output',
+            'tool_call',
+            'tool_response',
+            'agent_behavior',
+            'multi_agent_message',
+          ],
           description: 'Type of agent event being scanned. Defaults to "llm_input".',
         },
         min_severity: {
@@ -64,9 +69,15 @@ const TOOLS = [
         category: {
           type: 'string',
           enum: [
-            'prompt-injection', 'tool-poisoning', 'context-exfiltration',
-            'agent-manipulation', 'privilege-escalation', 'excessive-autonomy',
-            'data-poisoning', 'model-abuse', 'skill-compromise',
+            'prompt-injection',
+            'tool-poisoning',
+            'context-exfiltration',
+            'agent-manipulation',
+            'privilege-escalation',
+            'excessive-autonomy',
+            'data-poisoning',
+            'model-abuse',
+            'skill-compromise',
           ],
           description: 'Filter rules by threat category.',
         },
@@ -111,9 +122,15 @@ const TOOLS = [
         category: {
           type: 'string',
           enum: [
-            'prompt-injection', 'tool-poisoning', 'context-exfiltration',
-            'agent-manipulation', 'privilege-escalation', 'excessive-autonomy',
-            'data-poisoning', 'model-abuse', 'skill-compromise',
+            'prompt-injection',
+            'tool-poisoning',
+            'context-exfiltration',
+            'agent-manipulation',
+            'privilege-escalation',
+            'excessive-autonomy',
+            'data-poisoning',
+            'model-abuse',
+            'skill-compromise',
           ],
           description: 'Threat category for the rule.',
         },
@@ -165,9 +182,15 @@ const TOOLS = [
         category: {
           type: 'string',
           enum: [
-            'prompt-injection', 'tool-poisoning', 'context-exfiltration',
-            'agent-manipulation', 'privilege-escalation', 'excessive-autonomy',
-            'data-poisoning', 'model-abuse', 'skill-compromise',
+            'prompt-injection',
+            'tool-poisoning',
+            'context-exfiltration',
+            'agent-manipulation',
+            'privilege-escalation',
+            'excessive-autonomy',
+            'data-poisoning',
+            'model-abuse',
+            'skill-compromise',
           ],
           description: 'Optional: filter statistics to a single threat category.',
         },
@@ -239,12 +262,13 @@ export async function startMCPServer(): Promise<void> {
 // Auto-start when run directly
 const isDirectExecution =
   process.argv[1] &&
-  (process.argv[1].endsWith('mcp-server.js') ||
-   process.argv[1].endsWith('mcp-server.ts'));
+  (process.argv[1].endsWith('mcp-server.js') || process.argv[1].endsWith('mcp-server.ts'));
 
 if (isDirectExecution) {
   startMCPServer().catch((err) => {
-    process.stderr.write(`ATR MCP Server error: ${err instanceof Error ? err.message : String(err)}\n`);
+    process.stderr.write(
+      `ATR MCP Server error: ${err instanceof Error ? err.message : String(err)}\n`
+    );
     process.exit(1);
   });
 }

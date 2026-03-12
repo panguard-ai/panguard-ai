@@ -29,9 +29,7 @@ export default function CaseStudyContent({ study }: { study: CaseStudy }) {
           <FadeInUp delay={0.04}>
             <div className="flex items-start gap-3 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3 mb-6">
               <Info className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
-              <p className="text-xs text-amber-300/80 leading-relaxed">
-                {t('scenarioDisclaimer')}
-              </p>
+              <p className="text-xs text-amber-300/80 leading-relaxed">{t('scenarioDisclaimer')}</p>
             </div>
           </FadeInUp>
         )}
@@ -138,7 +136,7 @@ export default function CaseStudyContent({ study }: { study: CaseStudy }) {
               {t('similarResults')}
             </h2>
             <p className="text-text-secondary mt-4 max-w-xl mx-auto leading-relaxed">
-{t('ctaDesc')}
+              {t('ctaDesc')}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.1}>

@@ -297,10 +297,7 @@ export class CoverageAnalyzer {
    * Count how many active rules cover a given framework item,
    * either by ATR category match or by explicit reference in rule metadata.
    */
-  private countCoveringRules(
-    activeRules: readonly ATRRule[],
-    item: FrameworkItem,
-  ): number {
+  private countCoveringRules(activeRules: readonly ATRRule[], item: FrameworkItem): number {
     if (item.noDirectRules) {
       return 0;
     }
@@ -326,9 +323,7 @@ export class CoverageAnalyzer {
   /**
    * Build a distribution count of rules per ATR category.
    */
-  private buildCategoryDistribution(
-    activeRules: readonly ATRRule[],
-  ): Record<string, number> {
+  private buildCategoryDistribution(activeRules: readonly ATRRule[]): Record<string, number> {
     const dist: Record<string, number> = {};
 
     for (const cat of ALL_ATR_CATEGORIES) {
@@ -349,7 +344,7 @@ export class CoverageAnalyzer {
    */
   private generateSuggestions(
     gaps: readonly CoverageGap[],
-    categoryDistribution: Readonly<Record<string, number>>,
+    categoryDistribution: Readonly<Record<string, number>>
   ): string[] {
     const suggestions: string[] = [];
 
@@ -359,7 +354,7 @@ export class CoverageAnalyzer {
       const ids = owaspGaps.map((g) => g.riskId).join(', ');
       suggestions.push(
         `OWASP Agentic Top 10 coverage gaps found for: ${ids}. ` +
-        `Create rules targeting these risk areas to improve coverage.`,
+          `Create rules targeting these risk areas to improve coverage.`
       );
     }
 
@@ -369,18 +364,18 @@ export class CoverageAnalyzer {
       const ids = mitreGaps.map((g) => g.riskId).join(', ');
       suggestions.push(
         `MITRE ATLAS technique coverage gaps found for: ${ids}. ` +
-        `Add detection rules or reference mappings for these techniques.`,
+          `Add detection rules or reference mappings for these techniques.`
       );
     }
 
     // Check for empty categories
     const emptyCategories = ALL_ATR_CATEGORIES.filter(
-      (cat) => (categoryDistribution[cat] ?? 0) === 0,
+      (cat) => (categoryDistribution[cat] ?? 0) === 0
     );
     if (emptyCategories.length > 0) {
       suggestions.push(
         `No rules found for ATR categories: ${emptyCategories.join(', ')}. ` +
-        `Consider adding at least one rule per category for baseline coverage.`,
+          `Consider adding at least one rule per category for baseline coverage.`
       );
     }
 
@@ -389,8 +384,8 @@ export class CoverageAnalyzer {
     if (asi09Gap) {
       suggestions.push(
         `ASI09 (Insufficient Logging) has no direct ATR rule category. ` +
-        `Consider implementing logging validation at the agent framework level ` +
-        `rather than through detection rules.`,
+          `Consider implementing logging validation at the agent framework level ` +
+          `rather than through detection rules.`
       );
     }
 
@@ -398,7 +393,7 @@ export class CoverageAnalyzer {
     if (gaps.length > 10) {
       suggestions.push(
         `${gaps.length} total coverage gaps detected. Prioritize OWASP Agentic Top 10 ` +
-        `gaps first, then address MITRE ATLAS technique gaps.`,
+          `gaps first, then address MITRE ATLAS technique gaps.`
       );
     }
 

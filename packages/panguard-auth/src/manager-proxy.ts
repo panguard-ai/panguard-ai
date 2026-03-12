@@ -181,30 +181,26 @@ export class ManagerProxy {
     const rawThreats = Array.isArray(result.data) ? result.data : [];
 
     // Map AggregatedThreat to the EventItem shape the frontend expects
-    const allEvents: EventItem[] = rawThreats.map(
-      (t: Record<string, unknown>) => {
-        const original = (t['originalThreat'] ?? {}) as Record<string, unknown>;
-        const verdict = (original['verdict'] ?? {}) as Record<string, unknown>;
-        const event = (original['event'] ?? {}) as Record<string, unknown>;
+    const allEvents: EventItem[] = rawThreats.map((t: Record<string, unknown>) => {
+      const original = (t['originalThreat'] ?? {}) as Record<string, unknown>;
+      const verdict = (original['verdict'] ?? {}) as Record<string, unknown>;
+      const event = (original['event'] ?? {}) as Record<string, unknown>;
 
-        return {
-          agentId: String(t['sourceAgentId'] ?? ''),
-          agentHostname: String(t['sourceHostname'] ?? ''),
-          receivedAt: String(t['receivedAt'] ?? ''),
-          event,
-          verdict: {
-            conclusion: String(verdict['conclusion'] ?? 'unknown'),
-            confidence: Number(verdict['confidence'] ?? 0),
-            action: String(verdict['action'] ?? ''),
-          },
-        };
-      }
-    );
+      return {
+        agentId: String(t['sourceAgentId'] ?? ''),
+        agentHostname: String(t['sourceHostname'] ?? ''),
+        receivedAt: String(t['receivedAt'] ?? ''),
+        event,
+        verdict: {
+          conclusion: String(verdict['conclusion'] ?? 'unknown'),
+          confidence: Number(verdict['confidence'] ?? 0),
+          action: String(verdict['action'] ?? ''),
+        },
+      };
+    });
 
     // Sort by receivedAt descending
-    allEvents.sort(
-      (a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime()
-    );
+    allEvents.sort((a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime());
 
     const total = allEvents.length;
     const offset = params?.offset ?? 0;

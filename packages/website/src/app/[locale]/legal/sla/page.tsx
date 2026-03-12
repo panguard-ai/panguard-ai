@@ -3,7 +3,8 @@ import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: 'Service Level Agreement',
-  description: 'Panguard AI Service Level Agreement. Uptime guarantees, support response times, and remedies.',
+  description:
+    'Panguard AI Service Level Agreement. Uptime guarantees, support response times, and remedies.',
 };
 
 export default function SLAPage() {

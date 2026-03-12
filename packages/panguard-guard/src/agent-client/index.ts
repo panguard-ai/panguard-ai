@@ -284,7 +284,9 @@ export class PanguardAgentClient {
     const { policy, timestamp } = request;
 
     if (!policy || typeof policy !== 'object') {
-      logger.warn('Invalid policy push: missing or invalid policy / 無效的策略推送：缺少或無效的策略');
+      logger.warn(
+        'Invalid policy push: missing or invalid policy / 無效的策略推送：缺少或無效的策略'
+      );
       return { ok: false };
     }
 

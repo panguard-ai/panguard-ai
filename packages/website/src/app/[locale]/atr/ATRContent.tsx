@@ -26,10 +26,7 @@ import {
   Layers,
   ArrowDown,
 } from 'lucide-react';
-import {
-  ShieldIcon,
-  CheckIcon,
-} from '@/components/ui/BrandIcons';
+import { ShieldIcon, CheckIcon } from '@/components/ui/BrandIcons';
 
 /* -- Category config -- */
 
@@ -45,17 +42,7 @@ const categoryKeys = [
   'model-security',
 ] as const;
 
-const categoryIcons = [
-  AlertTriangle,
-  Wrench,
-  Eye,
-  Users,
-  KeyRound,
-  Zap,
-  Lock,
-  Database,
-  Cpu,
-];
+const categoryIcons = [AlertTriangle, Wrench, Eye, Users, KeyRound, Zap, Lock, Database, Cpu];
 
 /* -- How-it-works steps -- */
 
@@ -198,8 +185,7 @@ export default function ATRContent() {
               {t('hero.overline')}
             </p>
             <h1 className="text-[clamp(24px,4.5vw,56px)] font-extrabold leading-[1.08] tracking-tight text-text-primary max-w-3xl mx-auto">
-              {t('hero.title')}{' '}
-              <span className="text-brand-sage">{t('hero.titleHighlight')}</span>
+              {t('hero.title')} <span className="text-brand-sage">{t('hero.titleHighlight')}</span>
             </h1>
           </FadeInUp>
           <FadeInUp delay={0.1}>
@@ -254,7 +240,9 @@ export default function ATRContent() {
                   <X className="w-5 h-5 text-text-muted" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-text-primary">{t('problem.sigmaTitle')}</p>
+                  <p className="text-sm font-semibold text-text-primary">
+                    {t('problem.sigmaTitle')}
+                  </p>
                   <p className="text-sm text-text-secondary mt-1">{t('problem.sigmaDesc')}</p>
                 </div>
               </div>
@@ -264,7 +252,9 @@ export default function ATRContent() {
                   <X className="w-5 h-5 text-text-muted" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-text-primary">{t('problem.yaraTitle')}</p>
+                  <p className="text-sm font-semibold text-text-primary">
+                    {t('problem.yaraTitle')}
+                  </p>
                   <p className="text-sm text-text-secondary mt-1">{t('problem.yaraDesc')}</p>
                 </div>
               </div>
@@ -316,19 +306,21 @@ export default function ATRContent() {
                     i < comparisonRows.length - 1 ? 'border-b border-border/50' : ''
                   }`}
                 >
-                  <div className="px-5 py-3 text-sm text-text-primary">
-                    {row.feature}
-                  </div>
+                  <div className="px-5 py-3 text-sm text-text-primary">{row.feature}</div>
                   {(['sigma', 'yara', 'atr'] as const).map((col) => {
                     const val = row[col];
                     return (
                       <div key={col} className="px-5 py-3 flex items-center justify-center">
                         {val === true ? (
-                          <Check className={`w-4 h-4 ${col === 'atr' ? 'text-brand-sage' : 'text-text-secondary'}`} />
+                          <Check
+                            className={`w-4 h-4 ${col === 'atr' ? 'text-brand-sage' : 'text-text-secondary'}`}
+                          />
                         ) : val === false ? (
                           <Minus className="w-4 h-4 text-text-muted/40" />
                         ) : (
-                          <span className={`text-xs ${col === 'atr' ? 'text-brand-sage font-semibold' : 'text-text-secondary'}`}>
+                          <span
+                            className={`text-xs ${col === 'atr' ? 'text-brand-sage font-semibold' : 'text-text-secondary'}`}
+                          >
                             {val}
                           </span>
                         )}
@@ -394,18 +386,22 @@ export default function ATRContent() {
                       : 'bg-surface-2 border-border'
                   }`}
                 >
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
-                    layer.highlighted ? 'bg-brand-sage/20' : 'bg-surface-1'
-                  }`}>
-                    <Layers className={`w-4 h-4 ${layer.highlighted ? 'text-brand-sage' : 'text-text-muted'}`} />
+                  <div
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
+                      layer.highlighted ? 'bg-brand-sage/20' : 'bg-surface-1'
+                    }`}
+                  >
+                    <Layers
+                      className={`w-4 h-4 ${layer.highlighted ? 'text-brand-sage' : 'text-text-muted'}`}
+                    />
                   </div>
                   <div>
-                    <p className={`text-sm font-semibold ${layer.highlighted ? 'text-brand-sage' : 'text-text-primary'}`}>
+                    <p
+                      className={`text-sm font-semibold ${layer.highlighted ? 'text-brand-sage' : 'text-text-primary'}`}
+                    >
                       {layer.name}
                     </p>
-                    <p className="text-xs text-text-secondary mt-1 leading-relaxed">
-                      {layer.desc}
-                    </p>
+                    <p className="text-xs text-text-secondary mt-1 leading-relaxed">{layer.desc}</p>
                   </div>
                 </div>
                 {i < architectureLayers.length - 1 && (
@@ -492,9 +488,11 @@ export default function ATRContent() {
                     <FileCode2 className="w-4 h-4 text-brand-sage" />
                     <span className="text-xs font-mono text-text-muted">{rule.id}</span>
                   </div>
-                  <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full ${
-                    severityColors[rule.severity] ?? 'text-text-muted bg-surface-1'
-                  }`}>
+                  <span
+                    className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full ${
+                      severityColors[rule.severity] ?? 'text-text-muted bg-surface-1'
+                    }`}
+                  >
                     {rule.severity}
                   </span>
                 </div>
@@ -613,22 +611,23 @@ export default function ATRContent() {
 
       {/* -- Roadmap -- */}
       <SectionWrapper>
-        <SectionTitle
-          overline={t('roadmap.overline')}
-          title={t('roadmap.title')}
-        />
+        <SectionTitle overline={t('roadmap.overline')} title={t('roadmap.title')} />
         <div className="grid sm:grid-cols-3 gap-4 mt-14 max-w-4xl mx-auto">
           {roadmapPhases.map((phase, i) => (
             <FadeInUp key={phase.version} delay={i * 0.08}>
-              <div className={`rounded-xl border p-6 h-full ${
-                phase.status === 'current'
-                  ? 'bg-brand-sage/5 border-brand-sage/30'
-                  : 'bg-surface-1 border-border'
-              }`}>
+              <div
+                className={`rounded-xl border p-6 h-full ${
+                  phase.status === 'current'
+                    ? 'bg-brand-sage/5 border-brand-sage/30'
+                    : 'bg-surface-1 border-border'
+                }`}
+              >
                 <div className="flex items-center gap-2 mb-4">
-                  <span className={`text-xs font-mono font-bold ${
-                    phase.status === 'current' ? 'text-brand-sage' : 'text-text-muted'
-                  }`}>
+                  <span
+                    className={`text-xs font-mono font-bold ${
+                      phase.status === 'current' ? 'text-brand-sage' : 'text-text-muted'
+                    }`}
+                  >
                     {phase.version}
                   </span>
                   {phase.status === 'current' && (
@@ -645,7 +644,10 @@ export default function ATRContent() {
                 <p className="text-base font-bold text-text-primary mb-3">{phase.title}</p>
                 <ul className="space-y-2">
                   {phase.items.map((item, j) => (
-                    <li key={j} className="flex items-start gap-2 text-xs text-text-secondary leading-relaxed">
+                    <li
+                      key={j}
+                      className="flex items-start gap-2 text-xs text-text-secondary leading-relaxed"
+                    >
                       {phase.status === 'current' ? (
                         <Check className="w-3 h-3 text-brand-sage mt-0.5 shrink-0" />
                       ) : (

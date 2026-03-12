@@ -604,7 +604,13 @@ describe('InvestigationEngine', () => {
       // We cannot access the private buffer directly, but we can verify
       // no error thrown and the engine still works
       expect(async () => {
-        await engine.investigate(makeEvent({ source: 'network', category: 'authentication', metadata: { sourceIP: '1.2.3.4' } }));
+        await engine.investigate(
+          makeEvent({
+            source: 'network',
+            category: 'authentication',
+            metadata: { sourceIP: '1.2.3.4' },
+          })
+        );
       }).not.toThrow();
     });
   });

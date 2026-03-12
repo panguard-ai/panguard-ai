@@ -60,8 +60,7 @@ vi.mock('../src/scanners/discovery-scanner.js', () => ({
 }));
 
 vi.mock('../src/scanners/password-policy.js', () => ({
-  checkPasswordPolicy: (...args: unknown[]) =>
-    mockCheckPasswordPolicy(...(args as [])),
+  checkPasswordPolicy: (...args: unknown[]) => mockCheckPasswordPolicy(...(args as [])),
 }));
 
 vi.mock('../src/scanners/open-ports.js', () => ({
@@ -70,18 +69,15 @@ vi.mock('../src/scanners/open-ports.js', () => ({
 }));
 
 vi.mock('../src/scanners/ssl-checker.js', () => ({
-  checkSslCertificates: (...args: unknown[]) =>
-    mockCheckSslCertificates(...(args as [])),
+  checkSslCertificates: (...args: unknown[]) => mockCheckSslCertificates(...(args as [])),
 }));
 
 vi.mock('../src/scanners/scheduled-tasks.js', () => ({
-  checkScheduledTasks: (...args: unknown[]) =>
-    mockCheckScheduledTasks(...(args as [])),
+  checkScheduledTasks: (...args: unknown[]) => mockCheckScheduledTasks(...(args as [])),
 }));
 
 vi.mock('../src/scanners/shared-folders.js', () => ({
-  checkSharedFolders: (...args: unknown[]) =>
-    mockCheckSharedFolders(...(args as [])),
+  checkSharedFolders: (...args: unknown[]) => mockCheckSharedFolders(...(args as [])),
 }));
 
 vi.mock('../src/scanners/cve-checker.js', () => ({
@@ -98,9 +94,7 @@ import { runScan } from '../src/scanners/index.js';
 /**
  * Create a minimal DiscoveryResult for testing.
  */
-function makeDiscoveryResult(
-  overrides: Partial<DiscoveryResult> = {}
-): DiscoveryResult {
+function makeDiscoveryResult(overrides: Partial<DiscoveryResult> = {}): DiscoveryResult {
   return {
     os: {
       platform: 'linux',
@@ -138,9 +132,7 @@ function makeDiscoveryResult(
 /**
  * Create a minimal Finding for testing.
  */
-function makeFinding(
-  overrides: Partial<Finding> & { severity: Finding['severity'] }
-): Finding {
+function makeFinding(overrides: Partial<Finding> & { severity: Finding['severity'] }): Finding {
   return {
     id: overrides.id ?? 'TEST-001',
     title: overrides.title ?? 'Test finding',
@@ -157,9 +149,7 @@ function makeFinding(
 /**
  * Create a RiskFactor for testing.
  */
-function makeRiskFactor(
-  overrides: Partial<RiskFactor> = {}
-): RiskFactor {
+function makeRiskFactor(overrides: Partial<RiskFactor> = {}): RiskFactor {
   return {
     category: overrides.category ?? 'noFirewall',
     description: overrides.description ?? 'Firewall is disabled',
@@ -172,9 +162,7 @@ function makeRiskFactor(
 /**
  * Set up default mock return values for a clean scan.
  */
-function setupDefaultMocks(
-  discoveryOverrides: Partial<DiscoveryResult> = {}
-): void {
+function setupDefaultMocks(discoveryOverrides: Partial<DiscoveryResult> = {}): void {
   mockDiscover.mockResolvedValue(makeDiscoveryResult(discoveryOverrides));
   mockCheckPasswordPolicy.mockResolvedValue([]);
   mockCheckUnnecessaryPorts.mockReturnValue([]);
@@ -295,18 +283,14 @@ describe('runScan - orchestrator', () => {
     // Should have at least the risk factor findings
     expect(result.findings.length).toBeGreaterThanOrEqual(2);
 
-    const firewallFinding = result.findings.find(
-      (f) => f.id === 'DISC-noFirewall'
-    );
+    const firewallFinding = result.findings.find((f) => f.id === 'DISC-noFirewall');
     expect(firewallFinding).toBeDefined();
     expect(firewallFinding!.title).toContain('Firewall disabled');
     expect(firewallFinding!.severity).toBe('high');
     expect(firewallFinding!.description).toBe('Firewall is disabled');
     expect(firewallFinding!.remediation).toContain('firewall');
 
-    const portsFinding = result.findings.find(
-      (f) => f.id === 'DISC-dangerousPorts'
-    );
+    const portsFinding = result.findings.find((f) => f.id === 'DISC-dangerousPorts');
     expect(portsFinding).toBeDefined();
     expect(portsFinding!.details).toBe('Port 21 open');
   });
@@ -322,9 +306,7 @@ describe('runScan - orchestrator', () => {
 
     const result = await runScan({ depth: 'quick', lang: 'en' });
 
-    const finding = result.findings.find(
-      (f) => f.id === 'DISC-unknownCategory'
-    );
+    const finding = result.findings.find((f) => f.id === 'DISC-unknownCategory');
     expect(finding).toBeDefined();
     expect(finding!.title).toContain('Risk factor: unknownCategory');
     expect(finding!.remediation).toContain('Review and address');
@@ -346,9 +328,7 @@ describe('runScan - orchestrator', () => {
 
     const result = await runScan({ depth: 'quick', lang: 'en' });
 
-    const firewallFinding = result.findings.find(
-      (f) => f.id === 'DISC-noFirewall'
-    );
+    const firewallFinding = result.findings.find((f) => f.id === 'DISC-noFirewall');
     expect(firewallFinding).toBeDefined();
     expect(firewallFinding!.manualFix).toBeDefined();
     expect(firewallFinding!.manualFix!.length).toBeGreaterThan(0);
@@ -491,12 +471,9 @@ describe('runScan - orchestrator', () => {
     // Verify findings are sorted: critical before high before low
     const severityOrder = result.findings.map((f) => f.severity);
     for (let i = 1; i < severityOrder.length; i++) {
-      const prevOrder = { critical: 0, high: 1, medium: 2, low: 3, info: 4 }[
-        severityOrder[i - 1]
-      ] ?? 5;
-      const currOrder = { critical: 0, high: 1, medium: 2, low: 3, info: 4 }[
-        severityOrder[i]
-      ] ?? 5;
+      const prevOrder =
+        { critical: 0, high: 1, medium: 2, low: 3, info: 4 }[severityOrder[i - 1]] ?? 5;
+      const currOrder = { critical: 0, high: 1, medium: 2, low: 3, info: 4 }[severityOrder[i]] ?? 5;
       expect(prevOrder).toBeLessThanOrEqual(currOrder);
     }
   });
@@ -613,40 +590,28 @@ describe('runScan - orchestrator', () => {
 
   it('should attach manual fix for dangerousPorts risk factor', async () => {
     setupDefaultMocks({
-      vulnerabilities: [
-        makeRiskFactor({ category: 'dangerousPorts', severity: 'medium' }),
-      ],
+      vulnerabilities: [makeRiskFactor({ category: 'dangerousPorts', severity: 'medium' })],
     });
 
     const result = await runScan({ depth: 'quick', lang: 'en' });
 
-    const finding = result.findings.find(
-      (f) => f.id === 'DISC-dangerousPorts'
-    );
+    const finding = result.findings.find((f) => f.id === 'DISC-dangerousPorts');
     expect(finding).toBeDefined();
     expect(finding!.manualFix).toBeDefined();
-    expect(finding!.manualFix!.some((cmd) => cmd.includes('ufw deny'))).toBe(
-      true
-    );
+    expect(finding!.manualFix!.some((cmd) => cmd.includes('ufw deny'))).toBe(true);
   });
 
   it('should attach manual fix for noUpdates risk factor', async () => {
     setupDefaultMocks({
-      vulnerabilities: [
-        makeRiskFactor({ category: 'noUpdates', severity: 'medium' }),
-      ],
+      vulnerabilities: [makeRiskFactor({ category: 'noUpdates', severity: 'medium' })],
     });
 
     const result = await runScan({ depth: 'quick', lang: 'en' });
 
-    const finding = result.findings.find(
-      (f) => f.id === 'DISC-noUpdates'
-    );
+    const finding = result.findings.find((f) => f.id === 'DISC-noUpdates');
     expect(finding).toBeDefined();
     expect(finding!.manualFix).toBeDefined();
-    expect(
-      finding!.manualFix!.some((cmd) => cmd.includes('apt update'))
-    ).toBe(true);
+    expect(finding!.manualFix!.some((cmd) => cmd.includes('apt update'))).toBe(true);
   });
 
   // -------------------------------------------------------------------------

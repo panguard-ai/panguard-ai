@@ -9,4 +9,9 @@
  * @module @panguard-ai/panguard-mcp
  */
 
-export { startMCPServer, getAllToolDefinitions, dispatchTool, PANGUARD_MCP_VERSION } from './server.js';
+export {
+  startMCPServer,
+  getAllToolDefinitions,
+  dispatchTool,
+  PANGUARD_MCP_VERSION,
+} from './server.js';

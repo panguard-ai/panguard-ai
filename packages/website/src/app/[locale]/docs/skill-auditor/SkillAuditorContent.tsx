@@ -82,27 +82,16 @@ export default function SkillAuditorContent() {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary">
             {t('title')}
           </h1>
-          <p className="text-lg text-text-secondary mt-4 max-w-2xl">
-            {t('subtitle')}
-          </p>
+          <p className="text-lg text-text-secondary mt-4 max-w-2xl">{t('subtitle')}</p>
         </FadeInUp>
 
         {/* Quick Start */}
         <FadeInUp className="mt-12">
           <h2 className="text-2xl font-bold text-text-primary mb-6">{t('quickStartTitle')}</h2>
           <div className="space-y-4">
-            <CodeBlock
-              title={t('codeTitle1')}
-              code="curl -fsSL https://get.panguard.ai | bash"
-            />
-            <CodeBlock
-              title={t('codeTitle2')}
-              code="panguard audit skill ./path/to/skill"
-            />
-            <CodeBlock
-              title={t('codeTitle3')}
-              code="panguard audit skill ./my-skill --json"
-            />
+            <CodeBlock title={t('codeTitle1')} code="curl -fsSL https://get.panguard.ai | bash" />
+            <CodeBlock title={t('codeTitle2')} code="panguard audit skill ./path/to/skill" />
+            <CodeBlock title={t('codeTitle3')} code="panguard audit skill ./my-skill --json" />
           </div>
         </FadeInUp>
 
@@ -158,9 +147,7 @@ export default function SkillAuditorContent() {
         {/* Risk Scoring */}
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">{t('riskScoringTitle')}</h2>
-          <p className="text-text-secondary mb-6">
-            {t('riskScoringDesc')}
-          </p>
+          <p className="text-text-secondary mb-6">{t('riskScoringDesc')}</p>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm border border-border rounded-xl overflow-hidden">
@@ -198,12 +185,35 @@ export default function SkillAuditorContent() {
 
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { range: '0-14', levelKey: 'riskLow' as const, color: 'bg-green-500/10 border-green-500/30 text-green-400', actionKey: 'actionLow' as const },
-              { range: '15-39', levelKey: 'riskMedium' as const, color: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400', actionKey: 'actionMedium' as const },
-              { range: '40-69', levelKey: 'riskHigh' as const, color: 'bg-orange-500/10 border-orange-500/30 text-orange-400', actionKey: 'actionHigh' as const },
-              { range: '70-100', levelKey: 'riskCritical' as const, color: 'bg-red-500/10 border-red-500/30 text-red-400', actionKey: 'actionCritical' as const },
+              {
+                range: '0-14',
+                levelKey: 'riskLow' as const,
+                color: 'bg-green-500/10 border-green-500/30 text-green-400',
+                actionKey: 'actionLow' as const,
+              },
+              {
+                range: '15-39',
+                levelKey: 'riskMedium' as const,
+                color: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
+                actionKey: 'actionMedium' as const,
+              },
+              {
+                range: '40-69',
+                levelKey: 'riskHigh' as const,
+                color: 'bg-orange-500/10 border-orange-500/30 text-orange-400',
+                actionKey: 'actionHigh' as const,
+              },
+              {
+                range: '70-100',
+                levelKey: 'riskCritical' as const,
+                color: 'bg-red-500/10 border-red-500/30 text-red-400',
+                actionKey: 'actionCritical' as const,
+              },
             ].map((item) => (
-              <div key={item.levelKey} className={`border rounded-xl p-4 text-center ${item.color}`}>
+              <div
+                key={item.levelKey}
+                className={`border rounded-xl p-4 text-center ${item.color}`}
+              >
                 <div className="text-lg font-bold">{item.range}</div>
                 <div className="text-xs font-semibold mt-1">{t(item.levelKey)}</div>
                 <div className="text-xs mt-2 opacity-70">{t(item.actionKey)}</div>
@@ -217,9 +227,7 @@ export default function SkillAuditorContent() {
           <h2 className="text-2xl font-bold text-text-primary mb-6">{t('integrationTitle')}</h2>
 
           <h3 className="text-lg font-semibold text-text-primary mb-3">{t('cicdTitle')}</h3>
-          <p className="text-text-secondary mb-4">
-            {t('cicdDesc')}
-          </p>
+          <p className="text-text-secondary mb-4">{t('cicdDesc')}</p>
           <CodeBlock
             title="bash"
             code={`# Block if HIGH or CRITICAL
@@ -231,9 +239,7 @@ fi`}
           />
 
           <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">{t('tsApiTitle')}</h3>
-          <p className="text-text-secondary mb-4">
-            {t('tsApiDesc')}
-          </p>
+          <p className="text-text-secondary mb-4">{t('tsApiDesc')}</p>
           <CodeBlock
             title="typescript"
             code={`import { auditSkill } from '@panguard-ai/panguard-skill-auditor';
@@ -259,9 +265,7 @@ for (const finding of report.findings) {
           <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">
             {t('openclawTitle')}
           </h3>
-          <p className="text-text-secondary mb-4">
-            {t('openclawDesc')}
-          </p>
+          <p className="text-text-secondary mb-4">{t('openclawDesc')}</p>
           <CodeBlock
             title="~/.openclaw/hooks/pre-skill-install.sh"
             code={`#!/bin/bash
@@ -305,7 +309,9 @@ CHECKS:
 VERDICT: Safe to install`}
           />
 
-          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">{t('maliciousSkillTitle')}</h3>
+          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">
+            {t('maliciousSkillTitle')}
+          </h3>
           <CodeBlock
             code={`$ panguard audit skill ./skills/suspicious-helper
 
@@ -337,9 +343,7 @@ VERDICT: DO NOT INSTALL - Critical security issues found`}
 
         {/* vs Manual */}
         <FadeInUp className="mt-16">
-          <h2 className="text-2xl font-bold text-text-primary mb-6">
-            {t('vsManualTitle')}
-          </h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-6">{t('vsManualTitle')}</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border border-border rounded-xl overflow-hidden">
               <thead>
@@ -350,16 +354,18 @@ VERDICT: DO NOT INSTALL - Critical security issues found`}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {([
-                  ['vsSpeed', 'vsSpeedManual', '< 1 second'],
-                  ['vsConsistency', 'vsConsistencyManual', 'vsConsistencyPanguard'],
-                  ['vsUnicode', 'vsUnicodeManual', 'vsUnicodePanguard'],
-                  ['vsBase64', 'vsBase64Manual', 'vsBase64Panguard'],
-                  ['vsSast', 'vsSastManual', 'vsSastPanguard'],
-                  ['vsSecrets', 'vsSecretsManual', 'vsSecretsPanguard'],
-                  ['vsRiskScore', 'vsRiskScoreManual', 'vsRiskScorePanguard'],
-                  ['vsCicd', 'vsCicdManual', 'vsCicdPanguard'],
-                ] as const).map(([featureKey, manualKey, panguardKey]) => (
+                {(
+                  [
+                    ['vsSpeed', 'vsSpeedManual', '< 1 second'],
+                    ['vsConsistency', 'vsConsistencyManual', 'vsConsistencyPanguard'],
+                    ['vsUnicode', 'vsUnicodeManual', 'vsUnicodePanguard'],
+                    ['vsBase64', 'vsBase64Manual', 'vsBase64Panguard'],
+                    ['vsSast', 'vsSastManual', 'vsSastPanguard'],
+                    ['vsSecrets', 'vsSecretsManual', 'vsSecretsPanguard'],
+                    ['vsRiskScore', 'vsRiskScoreManual', 'vsRiskScorePanguard'],
+                    ['vsCicd', 'vsCicdManual', 'vsCicdPanguard'],
+                  ] as const
+                ).map(([featureKey, manualKey, panguardKey]) => (
                   <tr key={featureKey}>
                     <td className="px-4 py-3 text-text-primary font-medium">{t(featureKey)}</td>
                     <td className="px-4 py-3 text-text-muted">{t(manualKey)}</td>
@@ -377,9 +383,7 @@ VERDICT: DO NOT INSTALL - Critical security issues found`}
         <FadeInUp className="mt-16">
           <div className="bg-surface-1/50 border border-border rounded-2xl p-8 text-center">
             <h3 className="text-xl font-bold text-text-primary mb-3">{t('ctaTitle')}</h3>
-            <p className="text-text-secondary mb-6 max-w-lg mx-auto">
-              {t('ctaDesc')}
-            </p>
+            <p className="text-text-secondary mb-6 max-w-lg mx-auto">{t('ctaDesc')}</p>
             <CodeBlock code="curl -fsSL https://get.panguard.ai | bash" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">
               <Link

@@ -31,9 +31,7 @@ export default function Traction() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary">
               {t('traction.title')}
             </h2>
-            <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">
-              {t('traction.subtitle')}
-            </p>
+            <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">{t('traction.subtitle')}</p>
           </div>
         </FadeInUp>
 

@@ -23,9 +23,9 @@ import {
  * Must be called before navigating to the target page.
  */
 async function dismissCookieConsent(page: Page): Promise<void> {
-  await page.context().addCookies([
-    { name: 'pg_consent', value: 'all', domain: 'localhost', path: '/' },
-  ]);
+  await page
+    .context()
+    .addCookies([{ name: 'pg_consent', value: 'all', domain: 'localhost', path: '/' }]);
 }
 
 /**
@@ -53,7 +53,7 @@ function jsonResponse(body: unknown, status = 200) {
  */
 export async function setupAuthenticatedUser(
   page: Page,
-  userOverrides?: Record<string, unknown>,
+  userOverrides?: Record<string, unknown>
 ): Promise<void> {
   const meResponse = userOverrides ? authMeSuccess(userOverrides) : authMeSuccess();
   const isFree = (userOverrides?.tier ?? MOCK_USER.tier) === 'community';
@@ -61,10 +61,10 @@ export async function setupAuthenticatedUser(
   await page.route('**/api/auth/me', (route) => route.fulfill(jsonResponse(meResponse)));
   await page.route('**/api/usage', (route) => route.fulfill(jsonResponse(usageSuccess())));
   await page.route('**/api/billing/status', (route) =>
-    route.fulfill(jsonResponse(isFree ? billingStatusFree() : billingStatusPro())),
+    route.fulfill(jsonResponse(isFree ? billingStatusFree() : billingStatusPro()))
   );
   await page.route('**/api/auth/totp/status', (route) =>
-    route.fulfill(jsonResponse(totpStatusDisabled())),
+    route.fulfill(jsonResponse(totpStatusDisabled()))
   );
 
   // Dismiss cookie consent banner to prevent click interception
@@ -82,10 +82,10 @@ export async function setupAuthenticatedAdmin(page: Page): Promise<void> {
   await page.route('**/api/auth/me', (route) => route.fulfill(jsonResponse(authMeAdmin())));
   await page.route('**/api/usage', (route) => route.fulfill(jsonResponse(usageSuccess())));
   await page.route('**/api/billing/status', (route) =>
-    route.fulfill(jsonResponse(billingStatusPro())),
+    route.fulfill(jsonResponse(billingStatusPro()))
   );
   await page.route('**/api/auth/totp/status', (route) =>
-    route.fulfill(jsonResponse(totpStatusDisabled())),
+    route.fulfill(jsonResponse(totpStatusDisabled()))
   );
 
   await dismissCookieConsent(page);
@@ -100,58 +100,38 @@ export async function setupAuthenticatedAdmin(page: Page): Promise<void> {
 export async function setupUnauthenticated(page: Page): Promise<void> {
   await dismissCookieConsent(page);
   await page.route('**/api/auth/me', (route) =>
-    route.fulfill(jsonResponse(authMeUnauthorized(), 401)),
+    route.fulfill(jsonResponse(authMeUnauthorized(), 401))
   );
 }
 
 /**
  * Mock login endpoint with a specific response.
  */
-export async function mockLoginEndpoint(
-  page: Page,
-  body: unknown,
-  status = 200,
-): Promise<void> {
-  await page.route('**/api/auth/login', (route) =>
-    route.fulfill(jsonResponse(body, status)),
-  );
+export async function mockLoginEndpoint(page: Page, body: unknown, status = 200): Promise<void> {
+  await page.route('**/api/auth/login', (route) => route.fulfill(jsonResponse(body, status)));
 }
 
 /**
  * Mock register endpoint with a specific response.
  */
-export async function mockRegisterEndpoint(
-  page: Page,
-  body: unknown,
-  status = 200,
-): Promise<void> {
-  await page.route('**/api/auth/register', (route) =>
-    route.fulfill(jsonResponse(body, status)),
-  );
+export async function mockRegisterEndpoint(page: Page, body: unknown, status = 200): Promise<void> {
+  await page.route('**/api/auth/register', (route) => route.fulfill(jsonResponse(body, status)));
 }
 
 /**
  * Mock forgot-password endpoint.
  */
-export async function mockForgotPassword(
-  page: Page,
-  body: unknown,
-  status = 200,
-): Promise<void> {
+export async function mockForgotPassword(page: Page, body: unknown, status = 200): Promise<void> {
   await page.route('**/api/auth/forgot-password', (route) =>
-    route.fulfill(jsonResponse(body, status)),
+    route.fulfill(jsonResponse(body, status))
   );
 }
 
 /**
  * Mock reset-password endpoint.
  */
-export async function mockResetPassword(
-  page: Page,
-  body: unknown,
-  status = 200,
-): Promise<void> {
+export async function mockResetPassword(page: Page, body: unknown, status = 200): Promise<void> {
   await page.route('**/api/auth/reset-password', (route) =>
-    route.fulfill(jsonResponse(body, status)),
+    route.fulfill(jsonResponse(body, status))
   );
 }

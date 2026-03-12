@@ -1,7 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { Copy, Check, Shield, Globe, Terminal, FileCode, Server, Wifi, Lock, Search, Database, Clock } from 'lucide-react';
+import {
+  Copy,
+  Check,
+  Shield,
+  Globe,
+  Terminal,
+  FileCode,
+  Server,
+  Wifi,
+  Lock,
+  Search,
+  Database,
+  Clock,
+} from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import { Link } from '@/navigation';
@@ -56,8 +69,8 @@ export default function ScanDocsContent() {
           </h1>
           <p className="text-lg text-text-secondary mt-4 max-w-2xl">
             Run comprehensive security audits with a single command. Scan your infrastructure,
-            analyze code, check remote targets, and generate machine-readable reports for
-            CI/CD pipelines.
+            analyze code, check remote targets, and generate machine-readable reports for CI/CD
+            pipelines.
           </p>
         </FadeInUp>
 
@@ -65,18 +78,12 @@ export default function ScanDocsContent() {
         <FadeInUp className="mt-12">
           <h2 className="text-2xl font-bold text-text-primary mb-6">Quick Start</h2>
           <div className="space-y-4">
-            <CodeBlock
-              title="Run a default scan on the local machine"
-              code="panguard scan"
-            />
+            <CodeBlock title="Run a default scan on the local machine" code="panguard scan" />
             <CodeBlock
               title="Deep scan — enables all scanner engines"
               code="panguard scan --deep"
             />
-            <CodeBlock
-              title="JSON output for scripting and CI/CD"
-              code="panguard scan --json"
-            />
+            <CodeBlock title="JSON output for scripting and CI/CD" code="panguard scan --json" />
           </div>
         </FadeInUp>
 
@@ -93,8 +100,8 @@ export default function ScanDocsContent() {
                 </span>
               </div>
               <p className="text-sm text-text-secondary mb-3">
-                Default mode. Runs the fastest checks — open ports, password policies,
-                environment discovery — and returns a risk score within a minute.
+                Default mode. Runs the fastest checks — open ports, password policies, environment
+                discovery — and returns a risk score within a minute.
               </p>
               <CodeBlock code="panguard scan" />
             </div>
@@ -105,9 +112,9 @@ export default function ScanDocsContent() {
                 <h3 className="text-lg font-semibold text-text-primary">Deep Scan</h3>
               </div>
               <p className="text-sm text-text-secondary mb-3">
-                Enables every scanner engine: CVE lookup, shared folder enumeration,
-                scheduled task analysis, and full SSL certificate validation. Takes longer
-                but leaves no stone unturned.
+                Enables every scanner engine: CVE lookup, shared folder enumeration, scheduled task
+                analysis, and full SSL certificate validation. Takes longer but leaves no stone
+                unturned.
               </p>
               <CodeBlock code="panguard scan --deep" />
             </div>
@@ -118,8 +125,8 @@ export default function ScanDocsContent() {
                 <h3 className="text-lg font-semibold text-text-primary">Remote Scan</h3>
               </div>
               <p className="text-sm text-text-secondary mb-3">
-                Scan a remote host by domain name or IP address. Checks externally visible
-                attack surface without requiring agent installation on the target.
+                Scan a remote host by domain name or IP address. Checks externally visible attack
+                surface without requiring agent installation on the target.
               </p>
               <CodeBlock code="panguard scan --target example.com" />
             </div>
@@ -133,8 +140,8 @@ export default function ScanDocsContent() {
                 </span>
               </div>
               <p className="text-sm text-text-secondary mb-3">
-                Static application security testing for your source code. Detects
-                vulnerabilities, hardcoded secrets, and insecure patterns.
+                Static application security testing for your source code. Detects vulnerabilities,
+                hardcoded secrets, and insecure patterns.
               </p>
               <CodeBlock code="panguard scan code --dir ." />
             </div>
@@ -147,18 +154,48 @@ export default function ScanDocsContent() {
 
           <h3 className="text-lg font-semibold text-text-primary mb-3">Risk Score</h3>
           <p className="text-sm text-text-secondary mb-4">
-            Every scan produces a risk score from 0 to 100. The score is calculated from the
-            number and severity of findings, weighted by impact. Lower is better.
+            Every scan produces a risk score from 0 to 100. The score is calculated from the number
+            and severity of findings, weighted by impact. Lower is better.
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
             {[
-              { range: '0-20', grade: 'A', color: 'bg-green-500/10 border-green-500/30 text-green-400', label: 'Excellent' },
-              { range: '21-40', grade: 'B', color: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400', label: 'Good' },
-              { range: '41-60', grade: 'C', color: 'bg-orange-500/10 border-orange-500/30 text-orange-400', label: 'Fair' },
-              { range: '61-80', grade: 'D', color: 'bg-orange-600/10 border-orange-600/30 text-orange-500', label: 'Poor' },
-              { range: '81-90', grade: 'E', color: 'bg-red-500/10 border-red-500/30 text-red-400', label: 'Bad' },
-              { range: '91-100', grade: 'F', color: 'bg-red-600/10 border-red-600/30 text-red-500', label: 'Critical' },
+              {
+                range: '0-20',
+                grade: 'A',
+                color: 'bg-green-500/10 border-green-500/30 text-green-400',
+                label: 'Excellent',
+              },
+              {
+                range: '21-40',
+                grade: 'B',
+                color: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
+                label: 'Good',
+              },
+              {
+                range: '41-60',
+                grade: 'C',
+                color: 'bg-orange-500/10 border-orange-500/30 text-orange-400',
+                label: 'Fair',
+              },
+              {
+                range: '61-80',
+                grade: 'D',
+                color: 'bg-orange-600/10 border-orange-600/30 text-orange-500',
+                label: 'Poor',
+              },
+              {
+                range: '81-90',
+                grade: 'E',
+                color: 'bg-red-500/10 border-red-500/30 text-red-400',
+                label: 'Bad',
+              },
+              {
+                range: '91-100',
+                grade: 'F',
+                color: 'bg-red-600/10 border-red-600/30 text-red-500',
+                label: 'Critical',
+              },
             ].map((item) => (
               <div key={item.grade} className={`border rounded-xl p-4 text-center ${item.color}`}>
                 <div className="text-2xl font-bold">{item.grade}</div>
@@ -181,7 +218,9 @@ export default function ScanDocsContent() {
               <tbody className="divide-y divide-border">
                 <tr>
                   <td className="px-4 py-3 text-red-400 font-medium">Critical</td>
-                  <td className="px-4 py-3 text-text-secondary">Actively exploitable vulnerability</td>
+                  <td className="px-4 py-3 text-text-secondary">
+                    Actively exploitable vulnerability
+                  </td>
                   <td className="px-4 py-3 text-text-primary">Fix immediately</td>
                 </tr>
                 <tr>
@@ -191,7 +230,9 @@ export default function ScanDocsContent() {
                 </tr>
                 <tr>
                   <td className="px-4 py-3 text-yellow-400 font-medium">Medium</td>
-                  <td className="px-4 py-3 text-text-secondary">Potential risk under certain conditions</td>
+                  <td className="px-4 py-3 text-text-secondary">
+                    Potential risk under certain conditions
+                  </td>
                   <td className="px-4 py-3 text-text-primary">Schedule a fix</td>
                 </tr>
                 <tr>
@@ -236,8 +277,8 @@ SUMMARY: 1 high, 2 medium, 1 low — Grade B`}
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">What Gets Scanned</h2>
           <p className="text-sm text-text-secondary mb-6">
-            Panguard Scan runs seven independent scanner modules. Each module focuses on a
-            specific attack surface and contributes findings to the final risk score.
+            Panguard Scan runs seven independent scanner modules. Each module focuses on a specific
+            attack surface and contributes findings to the final risk score.
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border border-border rounded-xl overflow-hidden">
@@ -250,16 +291,46 @@ SUMMARY: 1 high, 2 medium, 1 low — Grade B`}
               </thead>
               <tbody className="divide-y divide-border">
                 {[
-                  ['Password Policies', 'Complexity rules, expiration, lockout thresholds, reuse limits', 'Quick + Deep'],
-                  ['Open Ports', 'TCP/UDP listeners, unexpected services, binding scope (0.0.0.0 vs 127.0.0.1)', 'Quick + Deep'],
-                  ['SSL Certificates', 'Expiry dates, weak ciphers, chain validity, revocation status', 'Quick + Deep'],
-                  ['Scheduled Tasks', 'Cron jobs, launchd plists, systemd timers running as root or with write-world paths', 'Deep only'],
-                  ['Shared Folders', 'SMB/NFS shares, permission misconfiguration, guest access, world-readable exports', 'Deep only'],
-                  ['Environment Discovery', 'OS version, installed software, missing patches, EOL detection', 'Quick + Deep'],
-                  ['CVE Lookup', 'Matches installed packages against NVD/MITRE CVE databases for known vulnerabilities', 'Deep only'],
+                  [
+                    'Password Policies',
+                    'Complexity rules, expiration, lockout thresholds, reuse limits',
+                    'Quick + Deep',
+                  ],
+                  [
+                    'Open Ports',
+                    'TCP/UDP listeners, unexpected services, binding scope (0.0.0.0 vs 127.0.0.1)',
+                    'Quick + Deep',
+                  ],
+                  [
+                    'SSL Certificates',
+                    'Expiry dates, weak ciphers, chain validity, revocation status',
+                    'Quick + Deep',
+                  ],
+                  [
+                    'Scheduled Tasks',
+                    'Cron jobs, launchd plists, systemd timers running as root or with write-world paths',
+                    'Deep only',
+                  ],
+                  [
+                    'Shared Folders',
+                    'SMB/NFS shares, permission misconfiguration, guest access, world-readable exports',
+                    'Deep only',
+                  ],
+                  [
+                    'Environment Discovery',
+                    'OS version, installed software, missing patches, EOL detection',
+                    'Quick + Deep',
+                  ],
+                  [
+                    'CVE Lookup',
+                    'Matches installed packages against NVD/MITRE CVE databases for known vulnerabilities',
+                    'Deep only',
+                  ],
                 ].map(([module, checks, mode]) => (
                   <tr key={module}>
-                    <td className="px-4 py-3 text-text-primary font-medium whitespace-nowrap">{module}</td>
+                    <td className="px-4 py-3 text-text-primary font-medium whitespace-nowrap">
+                      {module}
+                    </td>
                     <td className="px-4 py-3 text-text-secondary">{checks}</td>
                     <td className="px-4 py-3 text-panguard-green whitespace-nowrap">{mode}</td>
                   </tr>
@@ -273,16 +344,18 @@ SUMMARY: 1 high, 2 medium, 1 low — Grade B`}
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">JSON Output for Automation</h2>
           <p className="text-sm text-text-secondary mb-4">
-            Add the <code className="text-panguard-green bg-panguard-green/10 px-1.5 py-0.5 rounded text-xs font-mono">--json</code> flag
-            to any scan command to get structured output suitable for parsing, dashboards, and
+            Add the{' '}
+            <code className="text-panguard-green bg-panguard-green/10 px-1.5 py-0.5 rounded text-xs font-mono">
+              --json
+            </code>{' '}
+            flag to any scan command to get structured output suitable for parsing, dashboards, and
             CI/CD pipeline gates.
           </p>
-          <CodeBlock
-            title="Generate JSON report"
-            code="panguard scan --json > report.json"
-          />
+          <CodeBlock title="Generate JSON report" code="panguard scan --json > report.json" />
 
-          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">Sample JSON Structure</h3>
+          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">
+            Sample JSON Structure
+          </h3>
           <CodeBlock
             title="report.json"
             code={`{
@@ -321,8 +394,8 @@ SUMMARY: 1 high, 2 medium, 1 low — Grade B`}
 
           <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">CI/CD Integration</h3>
           <p className="text-sm text-text-secondary mb-4">
-            Use the exit code and JSON output to gate deployments. Panguard exits with
-            code 1 when critical or high findings are present.
+            Use the exit code and JSON output to gate deployments. Panguard exits with code 1 when
+            critical or high findings are present.
           </p>
           <CodeBlock
             title="GitHub Actions example"
@@ -342,26 +415,45 @@ SUMMARY: 1 high, 2 medium, 1 low — Grade B`}
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">Remote Scanning</h2>
           <p className="text-sm text-text-secondary mb-4">
-            Use the <code className="text-panguard-green bg-panguard-green/10 px-1.5 py-0.5 rounded text-xs font-mono">--target</code> flag
-            to scan a remote host by domain name or IP address. No agent installation is
+            Use the{' '}
+            <code className="text-panguard-green bg-panguard-green/10 px-1.5 py-0.5 rounded text-xs font-mono">
+              --target
+            </code>{' '}
+            flag to scan a remote host by domain name or IP address. No agent installation is
             required on the target — Panguard probes the externally visible attack surface.
           </p>
-          <CodeBlock
-            title="Scan a domain"
-            code="panguard scan --target example.com"
-          />
-          <CodeBlock
-            title="Scan an IP address"
-            code="panguard scan --target 192.168.1.100"
-          />
+          <CodeBlock title="Scan a domain" code="panguard scan --target example.com" />
+          <CodeBlock title="Scan an IP address" code="panguard scan --target 192.168.1.100" />
 
-          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">What Remote Scan Checks</h3>
+          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">
+            What Remote Scan Checks
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { icon: Wifi, title: 'Open Ports', description: 'TCP port scan of common service ports (22, 80, 443, 3306, 5432, 8080, etc.) with service fingerprinting.' },
-              { icon: Lock, title: 'SSL / TLS', description: 'Certificate validity, expiration, cipher strength, protocol version, and chain-of-trust verification.' },
-              { icon: Shield, title: 'HTTP Headers', description: 'Security headers analysis: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.' },
-              { icon: Server, title: 'DNS Records', description: 'SPF, DKIM, DMARC validation. Detects dangling CNAMEs and zone transfer misconfigurations.' },
+              {
+                icon: Wifi,
+                title: 'Open Ports',
+                description:
+                  'TCP port scan of common service ports (22, 80, 443, 3306, 5432, 8080, etc.) with service fingerprinting.',
+              },
+              {
+                icon: Lock,
+                title: 'SSL / TLS',
+                description:
+                  'Certificate validity, expiration, cipher strength, protocol version, and chain-of-trust verification.',
+              },
+              {
+                icon: Shield,
+                title: 'HTTP Headers',
+                description:
+                  'Security headers analysis: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy.',
+              },
+              {
+                icon: Server,
+                title: 'DNS Records',
+                description:
+                  'SPF, DKIM, DMARC validation. Detects dangling CNAMEs and zone transfer misconfigurations.',
+              },
             ].map((item) => (
               <div key={item.title} className="border border-border rounded-xl p-5 bg-surface-1/30">
                 <item.icon className="w-5 h-5 text-panguard-green mb-3" />
@@ -374,21 +466,16 @@ SUMMARY: 1 high, 2 medium, 1 low — Grade B`}
 
         {/* Code Scanning */}
         <FadeInUp className="mt-16">
-          <h2 className="text-2xl font-bold text-text-primary mb-4">
-            Code Scanning (SAST)
-          </h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-4">Code Scanning (SAST)</h2>
           <span className="inline-block text-xs bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 rounded-full px-2.5 py-0.5 font-medium mb-6">
             Beta
           </span>
           <p className="text-sm text-text-secondary mb-4">
-            Panguard includes a built-in static application security testing engine.
-            Point it at any source directory to detect vulnerabilities, insecure patterns,
-            and leaked secrets before they reach production.
+            Panguard includes a built-in static application security testing engine. Point it at any
+            source directory to detect vulnerabilities, insecure patterns, and leaked secrets before
+            they reach production.
           </p>
-          <CodeBlock
-            title="Scan the current directory"
-            code="panguard scan code --dir ."
-          />
+          <CodeBlock title="Scan the current directory" code="panguard scan code --dir ." />
           <CodeBlock
             title="Scan a specific project with JSON output"
             code="panguard scan code --dir ./my-app --json"
@@ -402,9 +489,9 @@ SUMMARY: 1 high, 2 medium, 1 low — Grade B`}
                 <h4 className="text-sm font-semibold text-text-primary">Semgrep Integration</h4>
               </div>
               <p className="text-xs text-text-secondary leading-relaxed">
-                When Semgrep is installed locally, Panguard delegates to it for deep
-                pattern-based analysis across 30+ languages. If Semgrep is not available,
-                Panguard falls back to its own built-in rule engine.
+                When Semgrep is installed locally, Panguard delegates to it for deep pattern-based
+                analysis across 30+ languages. If Semgrep is not available, Panguard falls back to
+                its own built-in rule engine.
               </p>
             </div>
             <div className="border border-border rounded-xl p-5 bg-surface-1/30">
@@ -413,9 +500,9 @@ SUMMARY: 1 high, 2 medium, 1 low — Grade B`}
                 <h4 className="text-sm font-semibold text-text-primary">Built-in Patterns</h4>
               </div>
               <p className="text-xs text-text-secondary leading-relaxed">
-                Even without Semgrep, Panguard scans for SQL injection, command injection,
-                path traversal, insecure deserialization, and XSS vulnerabilities using
-                its own regex-based engine.
+                Even without Semgrep, Panguard scans for SQL injection, command injection, path
+                traversal, insecure deserialization, and XSS vulnerabilities using its own
+                regex-based engine.
               </p>
             </div>
             <div className="border border-border rounded-xl p-5 bg-surface-1/30">
@@ -424,9 +511,9 @@ SUMMARY: 1 high, 2 medium, 1 low — Grade B`}
                 <h4 className="text-sm font-semibold text-text-primary">Secrets Detection</h4>
               </div>
               <p className="text-xs text-text-secondary leading-relaxed">
-                Scans all files for hardcoded API keys, AWS credentials, private keys,
-                database connection strings, and tokens. Supports detection of 40+
-                secret formats including GitHub, Stripe, and cloud provider patterns.
+                Scans all files for hardcoded API keys, AWS credentials, private keys, database
+                connection strings, and tokens. Supports detection of 40+ secret formats including
+                GitHub, Stripe, and cloud provider patterns.
               </p>
             </div>
           </div>
@@ -464,8 +551,8 @@ SUMMARY: 1 critical, 1 high, 1 medium, 1 low`}
           <div className="bg-surface-1/50 border border-border rounded-2xl p-8 text-center">
             <h3 className="text-xl font-bold text-text-primary mb-3">Start Scanning</h3>
             <p className="text-text-secondary mb-6 max-w-lg mx-auto">
-              Install Panguard and run your first security scan in under a minute. The
-              Open source with unlimited local scans. MIT licensed.
+              Install Panguard and run your first security scan in under a minute. The Open source
+              with unlimited local scans. MIT licensed.
             </p>
             <CodeBlock code="curl -fsSL https://get.panguard.ai | bash && panguard scan" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">

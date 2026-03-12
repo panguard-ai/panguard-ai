@@ -74,11 +74,11 @@ python tools/mirofish-bridge/converter/mirofish_to_atr.py \
 
 ## Seed Data Files
 
-| File | Purpose |
-|------|---------|
-| `seed-data/agent-profiles.json` | 12 agent archetypes (6 attackers, 3 defenders, 3 users) |
-| `seed-data/knowledge-base.json` | Complete AI threat landscape, existing ATR coverage, gaps, scenarios |
-| `seed-data/mitre-atlas-mapping.json` | Full MITRE ATLAS + ATT&CK mapping with coverage analysis |
+| File                                 | Purpose                                                              |
+| ------------------------------------ | -------------------------------------------------------------------- |
+| `seed-data/agent-profiles.json`      | 12 agent archetypes (6 attackers, 3 defenders, 3 users)              |
+| `seed-data/knowledge-base.json`      | Complete AI threat landscape, existing ATR coverage, gaps, scenarios |
+| `seed-data/mitre-atlas-mapping.json` | Full MITRE ATLAS + ATT&CK mapping with coverage analysis             |
 
 ## Converter Usage
 
@@ -97,6 +97,7 @@ python converter/mirofish_to_atr.py -i report.json --submit-to https://threat-cl
 ```
 
 The converter accepts MiroFish output in JSON, YAML, or plain text format. It:
+
 1. Parses predictions from simulation reports
 2. Infers ATR category, severity, and MITRE techniques
 3. Extracts detection patterns (regex-suitable)
@@ -107,17 +108,18 @@ The converter accepts MiroFish output in JSON, YAML, or plain text format. It:
 
 The seed data includes 6 pre-defined scenarios for MiroFish god-view injection:
 
-| Round | Event |
-|-------|-------|
-| 5 | MCP skill registry compromised |
-| 10 | New multimodal LLM released (image injection surface) |
-| 15 | Enterprise deploys 1000 autonomous agents |
-| 20 | Fingerprint evasion techniques published |
-| 25 | Sybil attack on community consensus (50 fake nodes) |
+| Round | Event                                                 |
+| ----- | ----------------------------------------------------- |
+| 5     | MCP skill registry compromised                        |
+| 10    | New multimodal LLM released (image injection surface) |
+| 15    | Enterprise deploys 1000 autonomous agents             |
+| 20    | Fingerprint evasion techniques published              |
+| 25    | Sybil attack on community consensus (50 fake nodes)   |
 
 ## Expected Output
 
 Each simulation run should produce 10-30 predicted attack patterns, covering:
+
 - Novel prompt injection evasion techniques
 - Behavioral fingerprint evasion methods
 - Cross-skill collusion attacks
@@ -137,6 +139,7 @@ Generated rules automatically integrate with Panguard's skill whitelist system:
 ```
 
 Whitelisted skills:
+
 - Still run through ATR pattern rules (Layer 1)
 - Still tracked by behavioral fingerprinting (Layer 2)
 - Skip expensive LLM deep analysis (Layer 3)

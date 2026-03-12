@@ -8,12 +8,7 @@
  * @module @panguard-ai/panguard-guard/cli/dashboard-renderer
  */
 
-import {
-  c,
-  symbols,
-  box,
-  formatDuration,
-} from '@panguard-ai/core';
+import { c, symbols, box, formatDuration } from '@panguard-ai/core';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -140,17 +135,22 @@ export class DashboardRenderer {
     const lines: string[] = [];
 
     // Status line
-    const statusText = state.status === 'protected'
-      ? c.safe('PROTECTED')
-      : state.status === 'learning'
-        ? c.caution('LEARNING')
-        : c.critical('STOPPED');
+    const statusText =
+      state.status === 'protected'
+        ? c.safe('PROTECTED')
+        : state.status === 'learning'
+          ? c.caution('LEARNING')
+          : c.critical('STOPPED');
 
     const uptimeText = state.uptime > 0 ? formatDuration(state.uptime) : '-';
 
     // Header
-    lines.push(`${c.bold('Status:')} ${statusText}          ${c.bold('Uptime:')} ${c.sage(uptimeText)}`);
-    lines.push(`${c.bold('Events:')} ${c.sage(state.eventsProcessed.toLocaleString().padEnd(16))}${c.bold('Threats:')} ${state.threatsDetected > 0 ? c.caution(String(state.threatsDetected)) : c.dim('0')}`);
+    lines.push(
+      `${c.bold('Status:')} ${statusText}          ${c.bold('Uptime:')} ${c.sage(uptimeText)}`
+    );
+    lines.push(
+      `${c.bold('Events:')} ${c.sage(state.eventsProcessed.toLocaleString().padEnd(16))}${c.bold('Threats:')} ${state.threatsDetected > 0 ? c.caution(String(state.threatsDetected)) : c.dim('0')}`
+    );
 
     // Skills line
     const skillLine = `${c.bold('Skills:')} ${c.sage(String(state.trackedSkills))} tracked (${c.safe(String(state.whitelistedSkills))} whitelisted)`;
@@ -158,7 +158,9 @@ export class DashboardRenderer {
 
     // Learning progress
     if (state.status === 'learning' && state.learningProgress !== undefined) {
-      lines.push(`${c.bold('Learning:')} ${c.caution(`${Math.round(state.learningProgress * 100)}%`)} complete`);
+      lines.push(
+        `${c.bold('Learning:')} ${c.caution(`${Math.round(state.learningProgress * 100)}%`)} complete`
+      );
     }
 
     // Separator
@@ -183,8 +185,11 @@ export class DashboardRenderer {
     if (recentThreats.length > 0) {
       lines.push(c.caution('Threats:'));
       for (const t of recentThreats.slice(-3)) {
-        const conf = t.confidence >= 90 ? c.critical(`${t.confidence}%`) : c.caution(`${t.confidence}%`);
-        lines.push(`${c.dim(t.time)}  ${symbols.warn} ${t.category} from ${c.sage(t.source)} ${c.dim('|')} ${conf} ${c.dim('|')} ${t.action}`);
+        const conf =
+          t.confidence >= 90 ? c.critical(`${t.confidence}%`) : c.caution(`${t.confidence}%`);
+        lines.push(
+          `${c.dim(t.time)}  ${symbols.warn} ${t.category} from ${c.sage(t.source)} ${c.dim('|')} ${conf} ${c.dim('|')} ${t.action}`
+        );
       }
     }
 
@@ -206,7 +211,12 @@ export class DashboardRenderer {
     process.stdout.write(
       box(content, {
         title: 'PANGUARD GUARD',
-        borderColor: state.status === 'protected' ? c.sage : state.status === 'learning' ? c.caution : c.critical,
+        borderColor:
+          state.status === 'protected'
+            ? c.sage
+            : state.status === 'learning'
+              ? c.caution
+              : c.critical,
         width: Math.min(process.stdout.columns ? process.stdout.columns - 6 : 70, 74),
       })
     );

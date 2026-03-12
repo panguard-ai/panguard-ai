@@ -47,9 +47,7 @@ import { checkHardcodedSecrets } from '../src/scanners/secrets-checker.js';
  * @returns Absolute path to the temp directory / 臨時目錄的絕對路徑
  */
 async function createTempDir(files: Record<string, string>): Promise<string> {
-  const tmpDir = await fs.mkdtemp(
-    path.join(os.tmpdir(), 'panguard-secrets-test-')
-  );
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'panguard-secrets-test-'));
 
   for (const [relPath, content] of Object.entries(files)) {
     const fullPath = path.join(tmpDir, relPath);
@@ -250,9 +248,7 @@ const stripe = new Stripe('${'sk' + '_live'}_51FAKEFAKEFAKEFAKEFAKE000');
     });
 
     const findings = await checkHardcodedSecrets(tmpDir);
-    const stripeFindings = findings.filter((f) =>
-      f.id.startsWith('SECRETS-STRIPE-LIVE-KEY')
-    );
+    const stripeFindings = findings.filter((f) => f.id.startsWith('SECRETS-STRIPE-LIVE-KEY'));
     expect(stripeFindings.length).toBeGreaterThanOrEqual(1);
     expect(stripeFindings[0].severity).toBe('critical');
   });
@@ -267,9 +263,7 @@ const stripe = new Stripe('${'sk' + '_live'}_51FAKEFAKEFAKEFAKEFAKE000');
     });
 
     const findings = await checkHardcodedSecrets(tmpDir);
-    const stripeFindings = findings.filter((f) =>
-      f.id.startsWith('SECRETS-STRIPE-LIVE-KEY')
-    );
+    const stripeFindings = findings.filter((f) => f.id.startsWith('SECRETS-STRIPE-LIVE-KEY'));
     expect(stripeFindings.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -291,9 +285,7 @@ const headers = {
     });
 
     const findings = await checkHardcodedSecrets(tmpDir);
-    const bearerFindings = findings.filter((f) =>
-      f.id.startsWith('SECRETS-BEARER-TOKEN')
-    );
+    const bearerFindings = findings.filter((f) => f.id.startsWith('SECRETS-BEARER-TOKEN'));
     expect(bearerFindings.length).toBeGreaterThanOrEqual(1);
     expect(bearerFindings[0].severity).toBe('critical');
   });
@@ -314,9 +306,7 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xHn/ygWep4m+hVEGNMCQEFo0F25LbG7h5...
     });
 
     const findings = await checkHardcodedSecrets(tmpDir);
-    const keyFindings = findings.filter((f) =>
-      f.id.startsWith('SECRETS-RSA-PRIVATE-KEY')
-    );
+    const keyFindings = findings.filter((f) => f.id.startsWith('SECRETS-RSA-PRIVATE-KEY'));
     expect(keyFindings.length).toBeGreaterThanOrEqual(1);
     expect(keyFindings[0].severity).toBe('critical');
   });
@@ -331,9 +321,7 @@ MIIEpAIBAAKCAQEA0Z3VS5JJcds3xHn/ygWep4m+hVEGNMCQEFo0F25LbG7h5...
     });
 
     const findings = await checkHardcodedSecrets(tmpDir);
-    const keyFindings = findings.filter((f) =>
-      f.id.startsWith('SECRETS-RSA-PRIVATE-KEY')
-    );
+    const keyFindings = findings.filter((f) => f.id.startsWith('SECRETS-RSA-PRIVATE-KEY'));
     expect(keyFindings.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -353,9 +341,7 @@ const DATABASE_URL = 'postgresql://admin:mypassword@localhost:5432/mydb';
     });
 
     const findings = await checkHardcodedSecrets(tmpDir);
-    const dbFindings = findings.filter((f) =>
-      f.id.startsWith('SECRETS-DB-CONNECTION-STRING')
-    );
+    const dbFindings = findings.filter((f) => f.id.startsWith('SECRETS-DB-CONNECTION-STRING'));
     expect(dbFindings.length).toBeGreaterThanOrEqual(1);
     expect(dbFindings[0].severity).toBe('critical');
   });
@@ -372,9 +358,7 @@ mongoose.connect('mongodb://user:secret@cluster0.mongodb.net/mydb');
     });
 
     const findings = await checkHardcodedSecrets(tmpDir);
-    const dbFindings = findings.filter((f) =>
-      f.id.startsWith('SECRETS-DB-CONNECTION-STRING')
-    );
+    const dbFindings = findings.filter((f) => f.id.startsWith('SECRETS-DB-CONNECTION-STRING'));
     expect(dbFindings.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -388,9 +372,7 @@ mongoose.connect('mongodb://user:secret@cluster0.mongodb.net/mydb');
     });
 
     const findings = await checkHardcodedSecrets(tmpDir);
-    const dbFindings = findings.filter((f) =>
-      f.id.startsWith('SECRETS-DB-CONNECTION-STRING')
-    );
+    const dbFindings = findings.filter((f) => f.id.startsWith('SECRETS-DB-CONNECTION-STRING'));
     expect(dbFindings.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -411,9 +393,7 @@ API_KEY=sk-1234567890abcdef1234567890abcdef
     });
 
     const findings = await checkHardcodedSecrets(tmpDir);
-    const apiKeyFindings = findings.filter((f) =>
-      f.id.startsWith('SECRETS-GENERIC-API-KEY-ENV')
-    );
+    const apiKeyFindings = findings.filter((f) => f.id.startsWith('SECRETS-GENERIC-API-KEY-ENV'));
     expect(apiKeyFindings.length).toBeGreaterThanOrEqual(1);
     expect(apiKeyFindings[0].severity).toBe('critical');
   });
@@ -544,7 +524,9 @@ const STRIPE_KEY = '${'sk' + '_live'}_51FAKEFAKEFAKEFAKEFAKE000';
 
     const ids = findings.map((f) => f.id.split('-').slice(0, 3).join('-'));
     expect(ids).toContain('SECRETS-AWS-KEY');
-    expect(ids.some((id) => id === 'SECRETS-GITHUB-TOKEN' || id.startsWith('SECRETS-GITHUB'))).toBe(true);
+    expect(ids.some((id) => id === 'SECRETS-GITHUB-TOKEN' || id.startsWith('SECRETS-GITHUB'))).toBe(
+      true
+    );
     expect(ids.some((id) => id.startsWith('SECRETS-STRIPE'))).toBe(true);
   });
 

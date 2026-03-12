@@ -16,7 +16,11 @@ export function initCommand(): Command {
   return new Command('init')
     .description('Interactive setup wizard / \u4E92\u52D5\u5F0F\u8A2D\u5B9A\u7CBE\u9748')
     .option('--lang <language>', 'Language: en or zh-TW')
-    .option('--advanced', 'Full advanced wizard for power users / \u5B8C\u6574\u8A2D\u5B9A\u7CBE\u9748', false)
+    .option(
+      '--advanced',
+      'Full advanced wizard for power users / \u5B8C\u6574\u8A2D\u5B9A\u7CBE\u9748',
+      false
+    )
     .option('--config <path>', 'Import config from JSON file (non-interactive)')
     .action(async (opts: { lang?: string; config?: string; advanced: boolean }) => {
       if (opts.config) {
@@ -44,7 +48,9 @@ async function importConfig(rawPath: string): Promise<void> {
     const parsed: unknown = JSON.parse(json);
 
     if (!validateConfigSchema(parsed)) {
-      sp.fail('Invalid configuration file: missing required fields (version, meta, organization, environment, security)');
+      sp.fail(
+        'Invalid configuration file: missing required fields (version, meta, organization, environment, security)'
+      );
       return;
     }
 

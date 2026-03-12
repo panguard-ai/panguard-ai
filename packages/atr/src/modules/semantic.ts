@@ -267,7 +267,7 @@ export class SemanticModule implements ATRModule {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          Authorization: `Bearer ${this.config.apiKey}`,
         },
         body: JSON.stringify(body),
         signal: controller.signal,
@@ -280,7 +280,7 @@ export class SemanticModule implements ATRModule {
         throw new Error(`LLM API error ${response.status}: ${errText}`);
       }
 
-      const data = await response.json() as {
+      const data = (await response.json()) as {
         choices: Array<{ message: { content: string } }>;
       };
 
@@ -312,8 +312,10 @@ export class SemanticModule implements ATRModule {
       return {
         threatScore: Math.max(0, Math.min(1, Number(parsed['threat_score']) || 0)),
         category: typeof parsed['category'] === 'string' ? parsed['category'] : null,
-        reasoning: typeof parsed['reasoning'] === 'string' ? parsed['reasoning'] : 'No reasoning provided',
-        mitreTechnique: typeof parsed['mitre_technique'] === 'string' ? parsed['mitre_technique'] : null,
+        reasoning:
+          typeof parsed['reasoning'] === 'string' ? parsed['reasoning'] : 'No reasoning provided',
+        mitreTechnique:
+          typeof parsed['mitre_technique'] === 'string' ? parsed['mitre_technique'] : null,
       };
     } catch {
       return {
@@ -344,12 +346,18 @@ export class SemanticModule implements ATRModule {
 
   private compareThreshold(value: number, operator: string, threshold: number): boolean {
     switch (operator) {
-      case 'gt': return value > threshold;
-      case 'gte': return value >= threshold;
-      case 'lt': return value < threshold;
-      case 'lte': return value <= threshold;
-      case 'eq': return value === threshold;
-      default: return value >= threshold;
+      case 'gt':
+        return value > threshold;
+      case 'gte':
+        return value >= threshold;
+      case 'lt':
+        return value < threshold;
+      case 'lte':
+        return value <= threshold;
+      case 'eq':
+        return value === threshold;
+      default:
+        return value >= threshold;
     }
   }
 }

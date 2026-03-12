@@ -37,24 +37,49 @@ const SENSITIVE_DIRS = [
 
 /** Suspicious process names that always trigger alerts / 始終觸發告警的可疑程序名稱 */
 const SUSPICIOUS_PROCESSES = new Set([
-  'nc', 'ncat', 'netcat', 'nmap', 'masscan',
-  'socat', 'meterpreter', 'mimikatz', 'hydra',
-  'john', 'hashcat', 'tcpdump', 'tshark',
-  'strace', 'ltrace', 'ptrace', 'gdb',
-  'base64', 'xxd',
+  'nc',
+  'ncat',
+  'netcat',
+  'nmap',
+  'masscan',
+  'socat',
+  'meterpreter',
+  'mimikatz',
+  'hydra',
+  'john',
+  'hashcat',
+  'tcpdump',
+  'tshark',
+  'strace',
+  'ltrace',
+  'ptrace',
+  'gdb',
+  'base64',
+  'xxd',
 ]);
 
 /** Unusual outbound ports that may indicate C2 / 可能指示 C2 的異常出站端口 */
 const SUSPICIOUS_PORTS = new Set([
-  4444, 5555, 6666, 1234, 31337, 12345,
-  8888, 9999, 4443, 8443, 1337, 6667,
-  6697, 9001, 9030, // Tor
+  4444,
+  5555,
+  6666,
+  1234,
+  31337,
+  12345,
+  8888,
+  9999,
+  4443,
+  8443,
+  1337,
+  6667,
+  6697,
+  9001,
+  9030, // Tor
 ]);
 
 /** Normal system ports that should not trigger alerts / 不應觸發告警的正常系統端口 */
 const NORMAL_PORTS = new Set([
-  22, 53, 80, 443, 993, 995, 587, 25, 110, 143,
-  8080, 3306, 5432, 6379, 27017,
+  22, 53, 80, 443, 993, 995, 587, 25, 110, 143, 8080, 3306, 5432, 6379, 27017,
 ]);
 
 let eventCounter = 0;
@@ -259,8 +284,7 @@ export class SyscallMonitor extends EventEmitter {
 
     // Check for tracefs / 檢查 tracefs
     const tracingAvailable =
-      existsSync('/sys/kernel/debug/tracing') ||
-      existsSync('/sys/kernel/tracing');
+      existsSync('/sys/kernel/debug/tracing') || existsSync('/sys/kernel/tracing');
 
     if (!tracingAvailable) {
       logger.info('Syscall monitoring not available: tracefs not mounted');
@@ -269,8 +293,8 @@ export class SyscallMonitor extends EventEmitter {
 
     // Check for BPF support via /proc filesystem
     // 透過 /proc 檢查 BPF 支援
-    const hasBpf = existsSync('/proc/sys/kernel/unprivileged_bpf_disabled') ||
-      existsSync('/sys/fs/bpf');
+    const hasBpf =
+      existsSync('/proc/sys/kernel/unprivileged_bpf_disabled') || existsSync('/sys/fs/bpf');
 
     if (!hasBpf) {
       logger.info('Syscall monitoring not available: BPF not enabled in kernel');
@@ -391,9 +415,7 @@ export class SyscallMonitor extends EventEmitter {
         }
       }
     } catch (err: unknown) {
-      logger.warn(
-        `Process scan failed: ${err instanceof Error ? err.message : String(err)}`
-      );
+      logger.warn(`Process scan failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -462,9 +484,7 @@ export class SyscallMonitor extends EventEmitter {
         }
       }
     } catch (err: unknown) {
-      logger.warn(
-        `Network scan failed: ${err instanceof Error ? err.message : String(err)}`
-      );
+      logger.warn(`Network scan failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -474,12 +494,7 @@ export class SyscallMonitor extends EventEmitter {
   private hexToIPv4(hex: string): string {
     if (hex.length !== 8) return hex;
     const num = parseInt(hex, 16);
-    return [
-      num & 0xff,
-      (num >> 8) & 0xff,
-      (num >> 16) & 0xff,
-      (num >> 24) & 0xff,
-    ].join('.');
+    return [num & 0xff, (num >> 8) & 0xff, (num >> 16) & 0xff, (num >> 24) & 0xff].join('.');
   }
 
   /**

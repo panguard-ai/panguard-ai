@@ -7,7 +7,8 @@ function makeManifest(overrides: Partial<SkillManifest> = {}): SkillManifest {
     name: 'Test Skill',
     description: 'A test skill that does something useful for users',
     license: 'MIT',
-    instructions: 'This is a detailed instruction set that exceeds the minimum character threshold for validation.',
+    instructions:
+      'This is a detailed instruction set that exceeds the minimum character threshold for validation.',
     ...overrides,
   };
 }
@@ -126,7 +127,8 @@ describe('checkManifest', () => {
     });
 
     it('should not flag instructions over 50 characters', () => {
-      const long = 'This is a sufficiently detailed instruction that is well over the minimum threshold required.';
+      const long =
+        'This is a sufficiently detailed instruction that is well over the minimum threshold required.';
       const result = checkManifest(makeManifest({ instructions: long }));
       const finding = result.findings.find((f) => f.id === 'manifest-short-instructions');
       expect(finding).toBeUndefined();
@@ -213,13 +215,15 @@ describe('checkManifest', () => {
 
   describe('multiple issues', () => {
     it('should collect all findings for a manifest with multiple issues', () => {
-      const result = checkManifest(makeManifest({
-        name: '',
-        description: '',
-        license: undefined,
-        instructions: 'Short.',
-        metadata: { version: 'bad-version' },
-      }));
+      const result = checkManifest(
+        makeManifest({
+          name: '',
+          description: '',
+          license: undefined,
+          instructions: 'Short.',
+          metadata: { version: 'bad-version' },
+        })
+      );
       const ids = result.findings.map((f) => f.id);
       expect(ids).toContain('manifest-no-name');
       expect(ids).toContain('manifest-no-description');

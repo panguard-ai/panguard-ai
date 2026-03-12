@@ -23,17 +23,34 @@ interface ValidationResult {
 const VALID_STATUSES = ['draft', 'experimental', 'stable', 'deprecated'];
 const VALID_SEVERITIES = ['critical', 'high', 'medium', 'low', 'informational'];
 const VALID_CATEGORIES = [
-  'prompt-injection', 'tool-poisoning', 'context-exfiltration',
-  'agent-manipulation', 'privilege-escalation', 'excessive-autonomy',
-  'data-poisoning', 'model-abuse',
+  'prompt-injection',
+  'tool-poisoning',
+  'context-exfiltration',
+  'agent-manipulation',
+  'privilege-escalation',
+  'excessive-autonomy',
+  'data-poisoning',
+  'model-abuse',
 ];
 const VALID_SOURCE_TYPES = [
-  'llm_io', 'tool_call', 'mcp_exchange', 'agent_behavior',
-  'multi_agent_comm', 'context_window', 'memory_access',
+  'llm_io',
+  'tool_call',
+  'mcp_exchange',
+  'agent_behavior',
+  'multi_agent_comm',
+  'context_window',
+  'memory_access',
 ];
 const VALID_ACTIONS = [
-  'block_input', 'block_output', 'block_tool', 'quarantine_session',
-  'reset_context', 'alert', 'snapshot', 'escalate', 'reduce_permissions',
+  'block_input',
+  'block_output',
+  'block_tool',
+  'quarantine_session',
+  'reset_context',
+  'alert',
+  'snapshot',
+  'escalate',
+  'reduce_permissions',
   'kill_agent',
 ];
 
@@ -72,7 +89,19 @@ function validateRule(filePath: string): ValidationResult {
     }
 
     // Required fields
-    const required = ['title', 'id', 'status', 'description', 'author', 'date', 'severity', 'tags', 'agent_source', 'detection', 'response'];
+    const required = [
+      'title',
+      'id',
+      'status',
+      'description',
+      'author',
+      'date',
+      'severity',
+      'tags',
+      'agent_source',
+      'detection',
+      'response',
+    ];
     for (const field of required) {
       if (!rule[field]) {
         errors.push(`Missing required field: ${field}`);
@@ -102,7 +131,10 @@ function validateRule(filePath: string): ValidationResult {
     if (tags) {
       if (!tags['category']) {
         errors.push('Missing tags.category');
-      } else if (typeof tags['category'] === 'string' && !VALID_CATEGORIES.includes(tags['category'])) {
+      } else if (
+        typeof tags['category'] === 'string' &&
+        !VALID_CATEGORIES.includes(tags['category'])
+      ) {
         errors.push(`Invalid tags.category: ${tags['category']}`);
       }
     }
@@ -112,7 +144,10 @@ function validateRule(filePath: string): ValidationResult {
     if (agentSource) {
       if (!agentSource['type']) {
         errors.push('Missing agent_source.type');
-      } else if (typeof agentSource['type'] === 'string' && !VALID_SOURCE_TYPES.includes(agentSource['type'])) {
+      } else if (
+        typeof agentSource['type'] === 'string' &&
+        !VALID_SOURCE_TYPES.includes(agentSource['type'])
+      ) {
         errors.push(`Invalid agent_source.type: ${agentSource['type']}`);
       }
     }
@@ -174,13 +209,14 @@ function validateRule(filePath: string): ValidationResult {
             try {
               new RegExp(pattern, 'i');
             } catch (e) {
-              errors.push(`Invalid regex in ${condName}: ${pattern} (${e instanceof Error ? e.message : String(e)})`);
+              errors.push(
+                `Invalid regex in ${condName}: ${pattern} (${e instanceof Error ? e.message : String(e)})`
+              );
             }
           }
         }
       }
     }
-
   } catch (e) {
     errors.push(`YAML parse error: ${e instanceof Error ? e.message : String(e)}`);
   }

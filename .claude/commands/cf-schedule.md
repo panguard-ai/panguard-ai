@@ -22,6 +22,7 @@ When the user invokes `/cf:schedule`, you will:
 ### Parameters
 
 **Optional (but at least one recommended):**
+
 - `--period` - Time period to schedule (default: next 30 days)
   - Examples: "January 2025", "Q1", "Next 8 weeks", "March through May"
 - `--frequency` - Publishing frequency per content type
@@ -41,12 +42,14 @@ When the user invokes `/cf:schedule`, you will:
 ### Step 1: Gather Information
 
 **Required information:**
+
 - **Time period** - When does this calendar cover?
 - **Content frequency** - How often to publish each type?
 - **Channels/formats** - What types of content?
 - **Themes/topics** - What to focus on?
 
 **If not provided, ask:**
+
 ```
 To create your content calendar, I need:
 
@@ -67,12 +70,14 @@ To create your content calendar, I need:
 Based on inputs, determine:
 
 **Total content needed:**
+
 - Blogs: [frequency] × [weeks] = [total]
 - Emails: [frequency] × [weeks] = [total]
 - Social: [frequency] × [days] = [total]
 - Video: [frequency] × [weeks] = [total]
 
 **Example calculation:**
+
 ```
 Period: 4 weeks (28 days)
 Frequency: 2 blogs/week, 5 social/day, 1 email/week
@@ -85,12 +90,14 @@ Total needed:
 
 **Capacity check:**
 If `--team-capacity` provided, estimate hours:
+
 - Blog (1500 words): ~3 hours each
 - Email (300 words): ~1 hour each
 - Social post: ~15 minutes each
 - Video script: ~2 hours each
 
 **Warn if overcommitted:**
+
 ```
 ⚠️ Capacity Warning:
 Your calendar requires ~85 hours of work over 4 weeks (21 hrs/week).
@@ -111,6 +118,7 @@ Week 3: Customer Success (40%) + Product Updates (30%) + Thought Leadership (30%
 Week 4: Mix of all three (33% each)
 
 **Distribution principles:**
+
 - Vary week to week (not repetitive)
 - Balance promotional vs. educational
 - Front-load important campaigns
@@ -121,24 +129,28 @@ Week 4: Mix of all three (33% each)
 For each calendar slot, generate:
 
 **Blog Topics:**
+
 - Specific, searchable titles
 - SEO keyword integration
 - Mix of content types (how-to, list, analysis, story)
 - Progressive value (build on previous topics)
 
 **Email Topics:**
+
 - Sequence-aware (if part of sequence)
 - Mix of promotional and value-add
 - Seasonal/timely hooks
 - A/B test opportunities
 
 **Social Topics:**
+
 - Platform-specific ideas
 - Mix of types (educational, promotional, engagement)
 - Shareable and comment-worthy
 - Coordinate with other content (promote blogs, etc.)
 
 **Video Topics:**
+
 - High-impact subjects
 - Visual-friendly topics
 - Appropriate length estimates
@@ -148,24 +160,28 @@ For each calendar slot, generate:
 **Best practices to follow:**
 
 **Blog Publishing:**
+
 - Optimal days: Tuesday, Wednesday, Thursday
 - Optimal times: 10am or 2pm
 - Space posts 2-3 days apart
 - Coordinate with email newsletters
 
 **Email Sending:**
+
 - Optimal days: Tuesday, Wednesday (B2B) or Sunday (B2C)
 - Optimal times: 10am or 2pm
 - Avoid Mondays (overwhelmed inboxes)
 - Space promotional emails 5-7 days apart
 
 **Social Posting:**
+
 - LinkedIn: Weekdays, 8am, 12pm, 5pm
 - Twitter: Multiple times daily, 9am, 12pm, 3pm, 6pm
 - Instagram: Daily, 11am, 2pm, 7pm
 - Vary times to reach different audiences
 
 **Video Publishing:**
+
 - YouTube: Consistent day/time weekly
 - Social video: Higher engagement afternoon/evening
 - Coordinate with blog content
@@ -183,17 +199,20 @@ Create comprehensive calendar with:
 ### Step 7: Content Generation (Optional)
 
 If `--generate-content true`:
+
 - Generate actual content for each slot
 - Create drafts ready for review
 - Organize in folders by week/type
 - Update calendar with file paths
 
 If `--generate-content partial`:
+
 - Generate outlines/briefs for each piece
 - Include key points and structure
 - Ready for team to flesh out
 
 If false:
+
 - Just create calendar structure with topics
 
 ## Calendar Format
@@ -220,12 +239,12 @@ If false:
 
 ## Content Summary
 
-| Type | Planned | In Progress | Complete | Published |
-|------|---------|-------------|----------|-----------|
-| Blog | [#] | 0 | 0 | 0 |
-| Email | [#] | 0 | 0 | 0 |
-| Social | [#] | 0 | 0 | 0 |
-| Video | [#] | 0 | 0 | 0 |
+| Type   | Planned | In Progress | Complete | Published |
+| ------ | ------- | ----------- | -------- | --------- |
+| Blog   | [#]     | 0           | 0        | 0         |
+| Email  | [#]     | 0           | 0        | 0         |
+| Social | [#]     | 0           | 0        | 0         |
+| Video  | [#]     | 0           | 0        | 0         |
 
 ---
 
@@ -237,6 +256,7 @@ If false:
 ### Monday, [Date]
 
 **Social Media:**
+
 - 9:00 AM - LinkedIn: [Topic/Hook] → [Preview of content]
   - **Content:** [Brief description or first line]
   - **Goal:** [Engagement/Traffic/Awareness]
@@ -257,6 +277,7 @@ If false:
 ### Tuesday, [Date]
 
 **Blog Post:**
+
 - **Title:** [SEO-optimized title]
 - **Topic:** [Subject matter]
 - **Keywords:** [Target keywords]
@@ -269,6 +290,7 @@ If false:
 - **Publish:** 10:00 AM
 
 **Social Media:**
+
 - [Morning post]
 - [Afternoon post]
 - [Evening post]
@@ -276,6 +298,7 @@ If false:
 ### Wednesday, [Date]
 
 **Email Newsletter:**
+
 - **Subject:** [Working subject line]
 - **Topic:** [What it covers]
 - **Audience:** [Segment]
@@ -288,6 +311,7 @@ If false:
 - **Owner:** [Name]
 
 **Social Media:**
+
 - [Posts promoting blog and email]
 
 [Continue for each day...]
@@ -335,11 +359,13 @@ If false:
 ### [Theme 1]: Product Updates (30% of content)
 
 **Topics:**
+
 - [Topic 1]
 - [Topic 2]
 - [Topic 3]
 
 **Goals:**
+
 - Educate users on new features
 - Drive product adoption
 - Support sales team
@@ -347,11 +373,13 @@ If false:
 ### [Theme 2]: Thought Leadership (40% of content)
 
 **Topics:**
+
 - [Topic 1]
 - [Topic 2]
 - [Topic 3]
 
 **Goals:**
+
 - Build brand authority
 - Attract inbound interest
 - Generate shares
@@ -359,10 +387,12 @@ If false:
 ### [Theme 3]: Customer Success (30% of content)
 
 **Topics:**
+
 - [Topic 1]
 - [Topic 2]
 
 **Goals:**
+
 - Provide social proof
 - Inspire prospects
 - Celebrate customers
@@ -371,12 +401,12 @@ If false:
 
 ## Team Assignments
 
-| Team Member | Role | Content Types | Weekly Capacity |
-|-------------|------|---------------|-----------------|
-| [Name] | Content Lead | Oversee all, write blogs | 20 hrs |
-| [Name] | Social Manager | All social content | 15 hrs |
-| [Name] | Email Specialist | Email campaigns | 10 hrs |
-| [Name] | Designer | Graphics, visuals | 15 hrs |
+| Team Member | Role             | Content Types            | Weekly Capacity |
+| ----------- | ---------------- | ------------------------ | --------------- |
+| [Name]      | Content Lead     | Oversee all, write blogs | 20 hrs          |
+| [Name]      | Social Manager   | All social content       | 15 hrs          |
+| [Name]      | Email Specialist | Email campaigns          | 10 hrs          |
+| [Name]      | Designer         | Graphics, visuals        | 15 hrs          |
 
 ---
 
@@ -385,24 +415,28 @@ If false:
 ### Metrics to Track
 
 **Blog:**
+
 - Page views
 - Time on page
 - Bounce rate
 - Conversions (CTA clicks)
 
 **Email:**
+
 - Open rate
 - Click-through rate
 - Unsubscribe rate
 - Conversions
 
 **Social:**
+
 - Impressions
 - Engagement rate (likes, comments, shares)
 - Click-through to website
 - Follower growth
 
 **Video:**
+
 - Views
 - Watch time
 - Engagement
@@ -411,6 +445,7 @@ If false:
 ### Weekly Review
 
 Every [Day], review:
+
 - What performed best?
 - What underperformed?
 - What adjustments needed?
@@ -420,31 +455,33 @@ Every [Day], review:
 
 ## Content Repurposing Plan
 
-| Original Content | Repurposed As | Timeline |
-|------------------|---------------|----------|
-| Blog #1 | → LinkedIn post, Twitter thread | Same day as blog |
-| Blog #2 | → Email content, Social series | Week after blog |
-| Video #1 | → Blog post, Social clips | 3 days after video |
+| Original Content | Repurposed As                   | Timeline           |
+| ---------------- | ------------------------------- | ------------------ |
+| Blog #1          | → LinkedIn post, Twitter thread | Same day as blog   |
+| Blog #2          | → Email content, Social series  | Week after blog    |
+| Video #1         | → Blog post, Social clips       | 3 days after video |
 
 ---
 
 ## Important Dates & Deadlines
 
-| Date | Event | Content Impact |
-|------|-------|----------------|
-| [Date] | Product launch | Coordinate launch content |
-| [Date] | Industry conference | Tie into event |
-| [Date] | Holiday | Seasonal content |
+| Date   | Event               | Content Impact            |
+| ------ | ------------------- | ------------------------- |
+| [Date] | Product launch      | Coordinate launch content |
+| [Date] | Industry conference | Tie into event            |
+| [Date] | Holiday             | Seasonal content          |
 
 ---
 
 ## Notes & Adjustments
 
 ### Week 1 Notes:
+
 - [Observations]
 - [Adjustments made]
 
 ### Week 2 Notes:
+
 - [Observations]
 - [Adjustments made]
 
@@ -470,10 +507,11 @@ After creating calendar, provide:
 ✓ **Total Content:** [Number] pieces
 ✓ **Channels:** [List]
 ✓ **Content Breakdown:**
-  - Blog posts: [Number]
-  - Email campaigns: [Number]
-  - Social media posts: [Number]
-  - Video scripts: [Number]
+
+- Blog posts: [Number]
+- Email campaigns: [Number]
+- Social media posts: [Number]
+- Video scripts: [Number]
 
 ## Publishing Schedule
 
@@ -525,6 +563,7 @@ Your calendar is ready: `[file path]`
 - Begin Week 1 production
 
 Would you like me to:
+
 - Generate content for any specific weeks?
 - Adjust the schedule or themes?
 - Create campaign-specific content?
@@ -536,6 +575,7 @@ Would you like me to:
 ### Example 1: Monthly Social Calendar
 
 **Input:**
+
 ```bash
 /cf:schedule \
   --period "March 2025" \
@@ -545,6 +585,7 @@ Would you like me to:
 ```
 
 **What you do:**
+
 1. Calculate: 5 posts × 31 days = 155 posts
 2. Distribute across platforms (daily: 2 LinkedIn, 2 Twitter, 1 Instagram)
 3. Distribute themes across month
@@ -557,6 +598,7 @@ Would you like me to:
 ### Example 2: Blog Content Calendar
 
 **Input:**
+
 ```bash
 /cf:schedule \
   --period "Q1 2025" \
@@ -566,6 +608,7 @@ Would you like me to:
 ```
 
 **What you do:**
+
 1. Calculate: 3 × 13 weeks = 39 blog posts
 2. Distribute themes (rotate weekly)
 3. Generate 39 blog topics with SEO keywords
@@ -578,6 +621,7 @@ Would you like me to:
 ### Example 3: Full Campaign Calendar
 
 **Input:**
+
 ```bash
 /cf:schedule \
   --period "6 weeks" \
@@ -587,6 +631,7 @@ Would you like me to:
 ```
 
 **What you do:**
+
 1. Read product launch campaign brief
 2. Calculate all content needed
 3. Create integrated calendar (blog → email → social → video)
@@ -597,24 +642,28 @@ Would you like me to:
 ## Best Practices
 
 ### Realistic Scheduling
+
 - Don't overcommit team capacity
 - Include buffer time for revisions
 - Account for holidays and events
 - Leave room for reactive content
 
 ### Strategic Distribution
+
 - Vary content types week to week
 - Balance promotional vs. educational
 - Build momentum toward key dates
 - Coordinate cross-channel
 
 ### Flexibility
+
 - Calendar should guide, not constrain
 - Allow for real-time adjustments
 - Save room for trending topics
 - Can swap in better ideas
 
 ### Tracking & Learning
+
 - Monitor what works
 - Adjust future calendars based on data
 - Document learnings in calendar notes
@@ -637,6 +686,7 @@ Would you like me to:
 ## Final Notes
 
 A great content calendar is:
+
 - **Strategic** - Aligned with goals
 - **Realistic** - Team can execute
 - **Flexible** - Can adapt to changes

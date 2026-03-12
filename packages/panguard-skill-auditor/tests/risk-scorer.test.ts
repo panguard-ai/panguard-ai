@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { calculateRiskScore } from '../src/risk-scorer.js';
 import type { AuditFinding } from '../src/types.js';
 
-function makeFinding(overrides: Partial<AuditFinding> & Pick<AuditFinding, 'id' | 'severity'>): AuditFinding {
+function makeFinding(
+  overrides: Partial<AuditFinding> & Pick<AuditFinding, 'id' | 'severity'>
+): AuditFinding {
   return {
     title: 'Test finding',
     description: 'Test description',
@@ -14,37 +16,27 @@ function makeFinding(overrides: Partial<AuditFinding> & Pick<AuditFinding, 'id' 
 describe('calculateRiskScore', () => {
   describe('severity weights', () => {
     it('should assign weight 25 to CRITICAL findings', () => {
-      const { score } = calculateRiskScore([
-        makeFinding({ id: 'f1', severity: 'critical' }),
-      ]);
+      const { score } = calculateRiskScore([makeFinding({ id: 'f1', severity: 'critical' })]);
       expect(score).toBe(25);
     });
 
     it('should assign weight 15 to HIGH findings', () => {
-      const { score } = calculateRiskScore([
-        makeFinding({ id: 'f1', severity: 'high' }),
-      ]);
+      const { score } = calculateRiskScore([makeFinding({ id: 'f1', severity: 'high' })]);
       expect(score).toBe(15);
     });
 
     it('should assign weight 5 to MEDIUM findings', () => {
-      const { score } = calculateRiskScore([
-        makeFinding({ id: 'f1', severity: 'medium' }),
-      ]);
+      const { score } = calculateRiskScore([makeFinding({ id: 'f1', severity: 'medium' })]);
       expect(score).toBe(5);
     });
 
     it('should assign weight 1 to LOW findings', () => {
-      const { score } = calculateRiskScore([
-        makeFinding({ id: 'f1', severity: 'low' }),
-      ]);
+      const { score } = calculateRiskScore([makeFinding({ id: 'f1', severity: 'low' })]);
       expect(score).toBe(1);
     });
 
     it('should assign weight 0 to INFO findings', () => {
-      const { score } = calculateRiskScore([
-        makeFinding({ id: 'f1', severity: 'info' }),
-      ]);
+      const { score } = calculateRiskScore([makeFinding({ id: 'f1', severity: 'info' })]);
       expect(score).toBe(0);
     });
   });
@@ -99,7 +91,7 @@ describe('calculateRiskScore', () => {
   describe('score capping', () => {
     it('should cap score at 100', () => {
       const findings = Array.from({ length: 10 }, (_, i) =>
-        makeFinding({ id: `f${i}`, severity: 'critical' }),
+        makeFinding({ id: `f${i}`, severity: 'critical' })
       );
       // 10 * 25 = 250, but capped at 100
       const { score } = calculateRiskScore(findings);
@@ -167,7 +159,7 @@ describe('calculateRiskScore', () => {
 
       // score = 100 (capped)
       const findings = Array.from({ length: 5 }, (_, i) =>
-        makeFinding({ id: `f${i}`, severity: 'critical' }),
+        makeFinding({ id: `f${i}`, severity: 'critical' })
       );
       const result100 = calculateRiskScore(findings);
       expect(result100.level).toBe('CRITICAL');

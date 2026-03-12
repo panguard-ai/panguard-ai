@@ -22,11 +22,7 @@ export {
 } from './schema.js';
 
 // Parser / 解析器
-export {
-  parsePlaybook,
-  validatePlaybook,
-  loadPlaybooksFromDir,
-} from './parser.js';
+export { parsePlaybook, validatePlaybook, loadPlaybooksFromDir } from './parser.js';
 
 export type { ValidationResult } from './parser.js';
 

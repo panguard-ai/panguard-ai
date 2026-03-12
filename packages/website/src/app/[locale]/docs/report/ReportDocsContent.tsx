@@ -50,18 +50,46 @@ function CodeBlock({ code, label }: { code: string; label?: string }) {
 /* ────────────────────────  Data  ──────────────────────────── */
 
 const FRAMEWORKS = [
-  { name: 'ISO 27001', controls: '114 Annex A controls', coverage: '92%', flag: '--framework iso27001' },
-  { name: 'SOC 2', controls: '64 Trust Services Criteria', coverage: '88%', flag: '--framework soc2' },
+  {
+    name: 'ISO 27001',
+    controls: '114 Annex A controls',
+    coverage: '92%',
+    flag: '--framework iso27001',
+  },
+  {
+    name: 'SOC 2',
+    controls: '64 Trust Services Criteria',
+    coverage: '88%',
+    flag: '--framework soc2',
+  },
   { name: 'Taiwan TCSA', controls: 'ISMS requirements', coverage: '85%', flag: '--framework tcsa' },
 ];
 
 const REPORT_CONTENTS = [
-  { title: 'Executive Summary', desc: 'High-level overview of security posture, risk score, and key recommendations for stakeholders.' },
-  { title: 'Risk Score', desc: 'Quantified risk assessment (0-100) with historical trend and comparison to industry benchmarks.' },
-  { title: 'Prioritized Findings', desc: 'All findings ranked by severity and business impact, with effort estimates for remediation.' },
-  { title: 'Control Mapping', desc: 'Each finding mapped to specific framework controls (e.g., ISO 27001 A.12.6.1) with compliance status.' },
-  { title: 'Evidence Snapshots', desc: 'Auto-collected evidence from scan and guard data, timestamped and linked to relevant controls.' },
-  { title: 'Remediation Steps', desc: 'AI-generated step-by-step fix instructions for each finding, including code examples where applicable.' },
+  {
+    title: 'Executive Summary',
+    desc: 'High-level overview of security posture, risk score, and key recommendations for stakeholders.',
+  },
+  {
+    title: 'Risk Score',
+    desc: 'Quantified risk assessment (0-100) with historical trend and comparison to industry benchmarks.',
+  },
+  {
+    title: 'Prioritized Findings',
+    desc: 'All findings ranked by severity and business impact, with effort estimates for remediation.',
+  },
+  {
+    title: 'Control Mapping',
+    desc: 'Each finding mapped to specific framework controls (e.g., ISO 27001 A.12.6.1) with compliance status.',
+  },
+  {
+    title: 'Evidence Snapshots',
+    desc: 'Auto-collected evidence from scan and guard data, timestamped and linked to relevant controls.',
+  },
+  {
+    title: 'Remediation Steps',
+    desc: 'AI-generated step-by-step fix instructions for each finding, including code examples where applicable.',
+  },
 ];
 
 /* ════════════════════════  Component  ═════════════════════════ */
@@ -84,8 +112,8 @@ export default function ReportDocsContent() {
               Panguard Report
             </h1>
             <p className="text-text-secondary mt-4 text-lg leading-relaxed">
-              Generate compliance reports for ISO 27001, SOC 2, and Taiwan TCSA.
-              Automated evidence collection, AI-generated remediation steps, and bilingual PDF export.
+              Generate compliance reports for ISO 27001, SOC 2, and Taiwan TCSA. Automated evidence
+              collection, AI-generated remediation steps, and bilingual PDF export.
             </p>
           </FadeInUp>
         </div>
@@ -105,28 +133,19 @@ export default function ReportDocsContent() {
                 <p className="text-sm text-text-secondary mb-2">
                   Generate an ISO 27001 compliance report:
                 </p>
-                <CodeBlock
-                  code="panguard report generate --framework iso27001"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard report generate --framework iso27001" label="Terminal" />
               </div>
               <div>
                 <p className="text-sm text-text-secondary mb-2">
                   View a quick summary of the latest report:
                 </p>
-                <CodeBlock
-                  code="panguard report summary"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard report summary" label="Terminal" />
               </div>
               <div>
                 <p className="text-sm text-text-secondary mb-2">
                   List all supported compliance frameworks:
                 </p>
-                <CodeBlock
-                  code="panguard report list-frameworks"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard report list-frameworks" label="Terminal" />
               </div>
             </div>
           </FadeInUp>
@@ -139,7 +158,8 @@ export default function ReportDocsContent() {
           <FadeInUp>
             <h2 className="text-xl font-bold text-text-primary mb-2">Supported Frameworks</h2>
             <p className="text-text-secondary mb-6">
-              Three compliance frameworks are supported out of the box. Each maps scan findings to specific controls.
+              Three compliance frameworks are supported out of the box. Each maps scan findings to
+              specific controls.
             </p>
 
             <div className="overflow-x-auto">
@@ -177,7 +197,8 @@ export default function ReportDocsContent() {
           <FadeInUp>
             <h2 className="text-xl font-bold text-text-primary mb-2">Report Contents</h2>
             <p className="text-text-secondary mb-6">
-              Every generated report includes six sections designed for both technical teams and executive stakeholders.
+              Every generated report includes six sections designed for both technical teams and
+              executive stakeholders.
             </p>
 
             <div className="space-y-3">
@@ -240,9 +261,7 @@ panguard report generate --framework tcsa --pdf --logo ./company-logo.png --comp
 
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-text-secondary mb-2">
-                  Schedule a weekly SOC 2 report:
-                </p>
+                <p className="text-sm text-text-secondary mb-2">Schedule a weekly SOC 2 report:</p>
                 <CodeBlock
                   code="panguard report schedule --weekly --framework soc2"
                   label="Terminal"
@@ -258,9 +277,7 @@ panguard report generate --framework tcsa --pdf --logo ./company-logo.png --comp
                 />
               </div>
               <div>
-                <p className="text-sm text-text-secondary mb-2">
-                  Custom cron schedule:
-                </p>
+                <p className="text-sm text-text-secondary mb-2">Custom cron schedule:</p>
                 <CodeBlock
                   code={`# Every Friday at 18:00
 panguard report schedule --cron "0 18 * * 5" --framework soc2 --pdf`}
@@ -288,15 +305,22 @@ panguard report schedule --remove <schedule-id>`}
           <FadeInUp>
             <h2 className="text-xl font-bold text-text-primary mb-2">Evidence Collection</h2>
             <p className="text-text-secondary mb-6">
-              Panguard automatically collects and timestamps evidence from scan and guard data to support compliance findings.
+              Panguard automatically collects and timestamps evidence from scan and guard data to
+              support compliance findings.
             </p>
 
             <div className="bg-surface-1 border border-border rounded-xl p-5">
-              <p className="text-sm font-semibold text-text-primary mb-3">How Evidence is Collected</p>
+              <p className="text-sm font-semibold text-text-primary mb-3">
+                How Evidence is Collected
+              </p>
               <ul className="space-y-2 text-sm text-text-secondary">
                 <li>Scan results are stored with timestamps and linked to framework controls</li>
-                <li>Guard events provide real-time evidence of detection and response capabilities</li>
-                <li>Configuration snapshots document security settings at the time of the report</li>
+                <li>
+                  Guard events provide real-time evidence of detection and response capabilities
+                </li>
+                <li>
+                  Configuration snapshots document security settings at the time of the report
+                </li>
                 <li>Trap intelligence demonstrates proactive threat detection measures</li>
               </ul>
             </div>
@@ -326,7 +350,9 @@ panguard report schedule --remove <schedule-id>`}
                     </tr>
                     <tr>
                       <td className="py-3 text-text-secondary">Business</td>
-                      <td className="py-3 text-text-primary font-mono text-right">90+ days (configurable)</td>
+                      <td className="py-3 text-text-primary font-mono text-right">
+                        90+ days (configurable)
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -342,7 +368,8 @@ panguard report schedule --remove <schedule-id>`}
           <FadeInUp>
             <h2 className="text-xl font-bold text-text-primary mb-2">CI/CD Integration</h2>
             <p className="text-text-secondary mb-6">
-              Integrate compliance checks into your deployment pipeline with JSON output and exit codes.
+              Integrate compliance checks into your deployment pipeline with JSON output and exit
+              codes.
             </p>
 
             <div className="space-y-4">
@@ -368,9 +395,7 @@ panguard report generate --framework soc2 --json --fail-on-score 70`}
               </div>
 
               <div>
-                <p className="text-sm text-text-secondary mb-2">
-                  Example GitHub Actions step:
-                </p>
+                <p className="text-sm text-text-secondary mb-2">Example GitHub Actions step:</p>
                 <CodeBlock
                   code={`# .github/workflows/compliance.yml
 - name: Compliance Check

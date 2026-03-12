@@ -104,9 +104,12 @@ describe('WorkBuddy platform sandbox', () => {
 
     it('reports alreadyConfigured when config contains panguard', async () => {
       ensureDir(WORKBUDDY_DIR);
-      writeFileSync(WORKBUDDY_CONFIG, JSON.stringify({
-        mcpServers: { panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] } },
-      }));
+      writeFileSync(
+        WORKBUDDY_CONFIG,
+        JSON.stringify({
+          mcpServers: { panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] } },
+        })
+      );
 
       const platforms = await detectPlatforms();
       const wb = platforms.find((p) => p.id === 'workbuddy');
@@ -156,11 +159,14 @@ describe('WorkBuddy platform sandbox', () => {
 
     it('preserves existing MCP servers when injecting', () => {
       ensureDir(WORKBUDDY_DIR);
-      writeFileSync(WORKBUDDY_CONFIG, JSON.stringify({
-        mcpServers: {
-          'other-server': { command: 'node', args: ['server.js'] },
-        },
-      }));
+      writeFileSync(
+        WORKBUDDY_CONFIG,
+        JSON.stringify({
+          mcpServers: {
+            'other-server': { command: 'node', args: ['server.js'] },
+          },
+        })
+      );
 
       const result = injectMCPConfig('workbuddy');
 
@@ -196,12 +202,15 @@ describe('WorkBuddy platform sandbox', () => {
   describe('removal', () => {
     it('removes panguard entry from config', () => {
       ensureDir(WORKBUDDY_DIR);
-      writeFileSync(WORKBUDDY_CONFIG, JSON.stringify({
-        mcpServers: {
-          panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] },
-          'other-server': { command: 'node', args: ['server.js'] },
-        },
-      }));
+      writeFileSync(
+        WORKBUDDY_CONFIG,
+        JSON.stringify({
+          mcpServers: {
+            panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] },
+            'other-server': { command: 'node', args: ['server.js'] },
+          },
+        })
+      );
 
       const result = removeMCPConfig('workbuddy');
 
@@ -223,9 +232,12 @@ describe('WorkBuddy platform sandbox', () => {
 
     it('creates backup before removal', () => {
       ensureDir(WORKBUDDY_DIR);
-      writeFileSync(WORKBUDDY_CONFIG, JSON.stringify({
-        mcpServers: { panguard: { command: 'npx' } },
-      }));
+      writeFileSync(
+        WORKBUDDY_CONFIG,
+        JSON.stringify({
+          mcpServers: { panguard: { command: 'npx' } },
+        })
+      );
 
       const result = removeMCPConfig('workbuddy');
 
@@ -271,9 +283,12 @@ describe('NemoClaw platform sandbox', () => {
 
     it('reports alreadyConfigured when config contains panguard', async () => {
       ensureDir(NEMOCLAW_DIR);
-      writeFileSync(NEMOCLAW_CONFIG, JSON.stringify({
-        mcpServers: { panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] } },
-      }));
+      writeFileSync(
+        NEMOCLAW_CONFIG,
+        JSON.stringify({
+          mcpServers: { panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] } },
+        })
+      );
 
       const platforms = await detectPlatforms();
       const nc = platforms.find((p) => p.id === 'nemoclaw');
@@ -329,11 +344,14 @@ describe('NemoClaw platform sandbox', () => {
 
     it('preserves existing MCP servers when injecting', () => {
       ensureDir(NEMOCLAW_DIR);
-      writeFileSync(NEMOCLAW_CONFIG, JSON.stringify({
-        mcpServers: {
-          'nvidia-tools': { command: 'nemoclaw-tools', args: ['--gpu'] },
-        },
-      }));
+      writeFileSync(
+        NEMOCLAW_CONFIG,
+        JSON.stringify({
+          mcpServers: {
+            'nvidia-tools': { command: 'nemoclaw-tools', args: ['--gpu'] },
+          },
+        })
+      );
 
       const result = injectMCPConfig('nemoclaw');
 
@@ -380,12 +398,15 @@ describe('NemoClaw platform sandbox', () => {
   describe('removal', () => {
     it('removes panguard entry from config', () => {
       ensureDir(NEMOCLAW_DIR);
-      writeFileSync(NEMOCLAW_CONFIG, JSON.stringify({
-        mcpServers: {
-          panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] },
-          'nvidia-tools': { command: 'nemoclaw-tools', args: ['--gpu'] },
-        },
-      }));
+      writeFileSync(
+        NEMOCLAW_CONFIG,
+        JSON.stringify({
+          mcpServers: {
+            panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] },
+            'nvidia-tools': { command: 'nemoclaw-tools', args: ['--gpu'] },
+          },
+        })
+      );
 
       const result = removeMCPConfig('nemoclaw');
 
@@ -407,9 +428,12 @@ describe('NemoClaw platform sandbox', () => {
 
     it('creates backup before removal', () => {
       ensureDir(NEMOCLAW_DIR);
-      writeFileSync(NEMOCLAW_CONFIG, JSON.stringify({
-        mcpServers: { panguard: { command: 'npx' } },
-      }));
+      writeFileSync(
+        NEMOCLAW_CONFIG,
+        JSON.stringify({
+          mcpServers: { panguard: { command: 'npx' } },
+        })
+      );
 
       const result = removeMCPConfig('nemoclaw');
 
@@ -451,8 +475,13 @@ describe('All 7 platforms registered', () => {
 
   it('getConfigPath returns valid path for all platforms', () => {
     const allIds: PlatformId[] = [
-      'claude-code', 'claude-desktop', 'cursor',
-      'openclaw', 'codex', 'workbuddy', 'nemoclaw',
+      'claude-code',
+      'claude-desktop',
+      'cursor',
+      'openclaw',
+      'codex',
+      'workbuddy',
+      'nemoclaw',
     ];
 
     for (const id of allIds) {

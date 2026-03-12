@@ -10,11 +10,19 @@ import type { SkillManifest, AuditFinding, CheckResult } from '../types.js';
 
 /** Well-known safe domains */
 const SAFE_DOMAINS = new Set([
-  'github.com', 'gitlab.com', 'bitbucket.org',
-  'npmjs.com', 'pypi.org', 'crates.io',
-  'google.com', 'googleapis.com', 'microsoft.com',
-  'stackoverflow.com', 'developer.mozilla.org',
-  'docs.python.org', 'nodejs.org',
+  'github.com',
+  'gitlab.com',
+  'bitbucket.org',
+  'npmjs.com',
+  'pypi.org',
+  'crates.io',
+  'google.com',
+  'googleapis.com',
+  'microsoft.com',
+  'stackoverflow.com',
+  'developer.mozilla.org',
+  'docs.python.org',
+  'nodejs.org',
 ]);
 
 const URL_RE = /https?:\/\/[^\s"'<>)\]]+/gi;
@@ -107,9 +115,10 @@ export function checkDependencies(manifest: SkillManifest): CheckResult {
       : 'pass';
 
   const urlCount = urls.length;
-  const label = urlCount > 0
-    ? `Dependencies: ${urlCount} URL(s), ${externalDomains.length} external domain(s)`
-    : 'Dependencies: No external references found';
+  const label =
+    urlCount > 0
+      ? `Dependencies: ${urlCount} URL(s), ${externalDomains.length} external domain(s)`
+      : 'Dependencies: No external references found';
 
   return { status, label, findings };
 }

@@ -242,7 +242,8 @@ export async function runInitWizard(
   const runMCPSetup = await promptConfirm({
     message: {
       en: 'Connect to AI agents (Claude Code, Cursor, etc.) via MCP?',
-      'zh-TW': '\u8981\u900F\u904E MCP \u9023\u63A5 AI \u4EE3\u7406\uFF08Claude Code\u3001Cursor \u7B49\uFF09\u55CE\uFF1F',
+      'zh-TW':
+        '\u8981\u900F\u904E MCP \u9023\u63A5 AI \u4EE3\u7406\uFF08Claude Code\u3001Cursor \u7B49\uFF09\u55CE\uFF1F',
     },
     defaultValue: true,
     lang,
@@ -259,7 +260,9 @@ export async function runInitWizard(
       const mcpConfig = await import('@panguard-ai/panguard-mcp/config');
       const platforms = await mcpConfig.detectPlatforms();
       const detected = platforms.filter((p: { detected: boolean }) => p.detected);
-      const unconfigured = detected.filter((p: { alreadyConfigured: boolean }) => !p.alreadyConfigured);
+      const unconfigured = detected.filter(
+        (p: { alreadyConfigured: boolean }) => !p.alreadyConfigured
+      );
 
       if (unconfigured.length > 0) {
         mcpSp.succeed(
@@ -290,13 +293,31 @@ export async function runInitWizard(
           );
           // Platform-specific restart guidance
           const restartMap: Record<string, { en: string; zh: string }> = {
-            'claude-code': { en: 'Close and reopen your terminal', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F\u7D42\u7AEF\u6A5F' },
-            'claude-desktop': { en: 'Quit and reopen Claude Desktop', zh: '\u9000\u51FA\u4E26\u91CD\u65B0\u958B\u555F Claude Desktop' },
+            'claude-code': {
+              en: 'Close and reopen your terminal',
+              zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F\u7D42\u7AEF\u6A5F',
+            },
+            'claude-desktop': {
+              en: 'Quit and reopen Claude Desktop',
+              zh: '\u9000\u51FA\u4E26\u91CD\u65B0\u958B\u555F Claude Desktop',
+            },
             cursor: { en: 'Cmd+Shift+P > "Reload Window"', zh: 'Cmd+Shift+P > "Reload Window"' },
-            openclaw: { en: 'Close and reopen OpenClaw', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F OpenClaw' },
-            codex: { en: 'Restart the Codex CLI session', zh: '\u91CD\u65B0\u555F\u52D5 Codex CLI' },
-            workbuddy: { en: 'Close and reopen WorkBuddy', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F WorkBuddy' },
-            nemoclaw: { en: 'Close and reopen NemoClaw', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F NemoClaw' },
+            openclaw: {
+              en: 'Close and reopen OpenClaw',
+              zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F OpenClaw',
+            },
+            codex: {
+              en: 'Restart the Codex CLI session',
+              zh: '\u91CD\u65B0\u555F\u52D5 Codex CLI',
+            },
+            workbuddy: {
+              en: 'Close and reopen WorkBuddy',
+              zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F WorkBuddy',
+            },
+            nemoclaw: {
+              en: 'Close and reopen NemoClaw',
+              zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F NemoClaw',
+            },
           };
           for (const p of unconfigured) {
             const hint = restartMap[p.id];
@@ -332,7 +353,8 @@ export async function runInitWizard(
   const runAudit = await promptConfirm({
     message: {
       en: 'Audit current directory for AI skill security issues?',
-      'zh-TW': '\u8981\u5BE9\u8A08\u7576\u524D\u76EE\u9304\u7684 AI \u6280\u80FD\u5B89\u5168\u554F\u984C\u55CE\uFF1F',
+      'zh-TW':
+        '\u8981\u5BE9\u8A08\u7576\u524D\u76EE\u9304\u7684 AI \u6280\u80FD\u5B89\u5168\u554F\u984C\u55CE\uFF1F',
     },
     defaultValue: true,
     lang,
@@ -340,11 +362,7 @@ export async function runInitWizard(
 
   if (runAudit) {
     console.log('');
-    const auditSp = spinner(
-      lang === 'zh-TW'
-        ? '\u6B63\u5728\u5BE9\u8A08...'
-        : 'Auditing...'
-    );
+    const auditSp = spinner(lang === 'zh-TW' ? '\u6B63\u5728\u5BE9\u8A08...' : 'Auditing...');
     try {
       const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
       const report = await auditSkill(process.cwd());
@@ -370,7 +388,8 @@ export async function runInitWizard(
     const configureAI = await promptConfirm({
       message: {
         en: 'Configure AI detection layer for Guard? (Ollama or Claude API)',
-        'zh-TW': '\u8981\u8A2D\u5B9A Guard \u7684 AI \u5075\u6E2C\u5C64\u55CE\uFF1F\uFF08Ollama \u6216 Claude API\uFF09',
+        'zh-TW':
+          '\u8981\u8A2D\u5B9A Guard \u7684 AI \u5075\u6E2C\u5C64\u55CE\uFF1F\uFF08Ollama \u6216 Claude API\uFF09',
       },
       defaultValue: false,
       lang,

@@ -196,8 +196,7 @@ export class AnomalyScorer {
     }
 
     // Distance from nearest fence, normalized by IQR / 到最近圍欄的距離，以 IQR 正規化
-    const distance =
-      value < lowerFence ? lowerFence - value : value - upperFence;
+    const distance = value < lowerFence ? lowerFence - value : value - upperFence;
     const normalizedDistance = distance / iqr;
 
     // Scale: 1 IQR beyond fence -> ~33, 2 IQR -> ~67, 3+ IQR -> 100

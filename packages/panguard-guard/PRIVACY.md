@@ -16,22 +16,22 @@ panguard-guard start --no-telemetry
 
 When a threat is detected, the following anonymized data is uploaded:
 
-| Field | Example | Contains PII? |
-|-------|---------|---------------|
-| `attackSourceIP` | `192.168.xxx.xxx` | No (last two octets masked) |
-| `attackType` | `prompt-injection` | No |
-| `mitreTechnique` | `T1059` | No |
-| `sigmaRuleMatched` | `sigma-001,sigma-042` | No |
-| `atrRulesMatched` | `ATR-2026-001,ATR-2026-010` | No |
-| `atrCategory` | `prompt-injection` | No |
-| `timestamp` | `2026-03-08T12:00:00Z` | No |
-| `region` | `US` | No (country only) |
-| `severity` | `high` | No |
-| `autoResponseTaken` | `block_input` | No |
-| `panguardVersion` | `0.1.0` | No |
-| `osType` | `linux` | No |
-| `patternHash` | `a1b2c3...` | No (SHA-256 of pattern) |
-| `confidence` | `0.85` | No |
+| Field               | Example                     | Contains PII?               |
+| ------------------- | --------------------------- | --------------------------- |
+| `attackSourceIP`    | `192.168.xxx.xxx`           | No (last two octets masked) |
+| `attackType`        | `prompt-injection`          | No                          |
+| `mitreTechnique`    | `T1059`                     | No                          |
+| `sigmaRuleMatched`  | `sigma-001,sigma-042`       | No                          |
+| `atrRulesMatched`   | `ATR-2026-001,ATR-2026-010` | No                          |
+| `atrCategory`       | `prompt-injection`          | No                          |
+| `timestamp`         | `2026-03-08T12:00:00Z`      | No                          |
+| `region`            | `US`                        | No (country only)           |
+| `severity`          | `high`                      | No                          |
+| `autoResponseTaken` | `block_input`               | No                          |
+| `panguardVersion`   | `0.1.0`                     | No                          |
+| `osType`            | `linux`                     | No                          |
+| `patternHash`       | `a1b2c3...`                 | No (SHA-256 of pattern)     |
+| `confidence`        | `0.85`                      | No                          |
 
 ### What Is NOT Uploaded
 
@@ -58,6 +58,7 @@ verify that no sensitive data is included.
 ### IP Addresses
 
 Source IPs are anonymized by masking the last two octets:
+
 - `10.0.45.123` becomes `10.0.xxx.xxx`
 
 This preserves network-level correlation (same /16 subnet) while preventing

@@ -5,10 +5,12 @@ import ReportDocsContent from './ReportDocsContent';
 
 export const metadata: Metadata = {
   title: 'Panguard Report — Documentation',
-  description: 'Generate compliance reports for ISO 27001, SOC 2, and Taiwan TCSA. Automated evidence collection with PDF export.',
+  description:
+    'Generate compliance reports for ISO 27001, SOC 2, and Taiwan TCSA. Automated evidence collection with PDF export.',
   openGraph: {
     title: 'Panguard Report — Panguard AI Docs',
-    description: 'Automated compliance reporting: ISO 27001, SOC 2, TCSA. PDF export with AI-generated remediation steps.',
+    description:
+      'Automated compliance reporting: ISO 27001, SOC 2, TCSA. PDF export with AI-generated remediation steps.',
   },
 };
 

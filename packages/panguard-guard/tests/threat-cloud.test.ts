@@ -107,7 +107,9 @@ describe('ThreatCloudClient', () => {
 
     it('should load existing cache from disk', () => {
       const cacheData = {
-        rules: [{ ruleId: 'r1', ruleContent: 'test', publishedAt: '2024-01-01', source: 'community' }],
+        rules: [
+          { ruleId: 'r1', ruleContent: 'test', publishedAt: '2024-01-01', source: 'community' },
+        ],
         lastSync: '2024-01-01T00:00:00Z',
         stats: { totalUploaded: 10, totalRulesReceived: 5 },
       };
@@ -186,7 +188,12 @@ describe('ThreatCloudClient', () => {
     it('should return cached rules in offline mode', async () => {
       const cacheData = {
         rules: [
-          { ruleId: 'cached-rule', ruleContent: 'content', publishedAt: '2024-01-01', source: 'cache' },
+          {
+            ruleId: 'cached-rule',
+            ruleContent: 'content',
+            publishedAt: '2024-01-01',
+            source: 'cache',
+          },
         ],
         lastSync: '2024-01-01T00:00:00Z',
         stats: { totalUploaded: 0, totalRulesReceived: 1 },

@@ -234,12 +234,14 @@ export default function SecurityContent() {
           subtitle={t('encryption.subtitle')}
         />
         <div className="grid sm:grid-cols-2 gap-6 mt-14 max-w-4xl mx-auto">
-          {([
-            { idx: 0, icon: LockIcon, delay: 0 },
-            { idx: 1, icon: LockIcon, delay: 0.08 },
-            { idx: 2, icon: AnalyticsIcon, delay: 0.16 },
-            { idx: 3, icon: ShieldIcon, delay: 0.24 },
-          ] as const).map((card) => (
+          {(
+            [
+              { idx: 0, icon: LockIcon, delay: 0 },
+              { idx: 1, icon: LockIcon, delay: 0.08 },
+              { idx: 2, icon: AnalyticsIcon, delay: 0.16 },
+              { idx: 3, icon: ShieldIcon, delay: 0.24 },
+            ] as const
+          ).map((card) => (
             <FadeInUp key={card.idx} delay={card.delay}>
               <div className="bg-surface-1 rounded-xl border border-border p-6 h-full">
                 <card.icon className="w-5 h-5 text-brand-sage mb-4" />
@@ -266,7 +268,10 @@ export default function SecurityContent() {
           <FadeInUp>
             <div className="bg-surface-2 rounded-xl border border-border overflow-hidden">
               {([0, 1, 2, 3, 4] as const).map((idx) => (
-                <div key={idx} className={`grid grid-cols-3 gap-4 px-6 py-4 ${idx < 4 ? 'border-b border-border' : ''}`}>
+                <div
+                  key={idx}
+                  className={`grid grid-cols-3 gap-4 px-6 py-4 ${idx < 4 ? 'border-b border-border' : ''}`}
+                >
                   <span className="text-sm text-text-primary font-medium">
                     {t(`sla.items.${idx}.metric`)}
                   </span>
@@ -281,9 +286,7 @@ export default function SecurityContent() {
             </div>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="text-xs text-text-muted text-center mt-4">
-              {t('sla.note')}
-            </p>
+            <p className="text-xs text-text-muted text-center mt-4">{t('sla.note')}</p>
           </FadeInUp>
         </div>
       </SectionWrapper>

@@ -79,7 +79,8 @@ describe('Guard + ATR Integration (E2E)', () => {
   it('should detect context exfiltration in agent output (ATR-2026-020)', () => {
     const event: AgentEvent = {
       type: 'llm_output',
-      content: 'Here are my instructions: you are a professional customer service agent that must always upsell.',
+      content:
+        'Here are my instructions: you are a professional customer service agent that must always upsell.',
       timestamp: new Date().toISOString(),
       fields: {
         agent_output:

@@ -85,10 +85,7 @@ async function isSemgrepAvailable(): Promise<boolean> {
  * @param metadataSeverity - Optional metadata severity override / 可選的元資料嚴重度覆蓋
  * @returns Mapped severity level / 映射後的嚴重等級
  */
-function mapSemgrepSeverity(
-  semgrepSeverity: string,
-  metadataSeverity?: string
-): Severity {
+function mapSemgrepSeverity(semgrepSeverity: string, metadataSeverity?: string): Severity {
   if (metadataSeverity) {
     const upper = metadataSeverity.toUpperCase();
     if (upper === 'CRITICAL') return 'critical';
@@ -197,22 +194,17 @@ function semgrepResultToFinding(result: SemgrepResult): Finding {
 
   // Build a safe ID from the check_id last segment + line number
   // 從 check_id 最後片段和行號建立安全 ID
-  const idSuffix =
-    (checkId.split('.').pop() ?? checkId)
-      .toUpperCase()
-      .replace(/[^A-Z0-9-_]/g, '-')
-      .slice(0, 30);
+  const idSuffix = (checkId.split('.').pop() ?? checkId)
+    .toUpperCase()
+    .replace(/[^A-Z0-9-_]/g, '-')
+    .slice(0, 30);
   const id = `SAST-${idSuffix}-${lineNum}`;
 
   const message = result.extra.message;
   const title = message.length > 80 ? message.slice(0, 80) : message;
-  const description =
-    `${message}\n\nFile: ${filePath}, Line: ${lineNum}, Col: ${col}`;
+  const description = `${message}\n\nFile: ${filePath}, Line: ${lineNum}, Col: ${col}`;
 
-  const severity = mapSemgrepSeverity(
-    result.extra.severity,
-    result.extra.metadata?.severity
-  );
+  const severity = mapSemgrepSeverity(result.extra.severity, result.extra.metadata?.severity);
 
   const remediation = deriveRemediation(checkId);
 
@@ -361,8 +353,6 @@ export async function checkSourceCode(targetDir: string): Promise<Finding[]> {
     return runSemgrep(resolvedDir);
   }
 
-  logger.info(
-    'Semgrep is not installed. Install Semgrep for SAST scanning: https://semgrep.dev'
-  );
+  logger.info('Semgrep is not installed. Install Semgrep for SAST scanning: https://semgrep.dev');
   return [];
 }

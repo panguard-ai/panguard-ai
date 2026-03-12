@@ -41,9 +41,9 @@ describe('Filesystem Guard - Extended', () => {
 
     it('should block double-dot traversal even when it appears to land back in allowed dir', () => {
       // The path contains ".." which validateFilePath should reject
-      expect(
-        isPathAllowed('/home/user/workspace/sub/../../workspace/file.txt', allowedDirs)
-      ).toBe(false);
+      expect(isPathAllowed('/home/user/workspace/sub/../../workspace/file.txt', allowedDirs)).toBe(
+        false
+      );
     });
 
     it('should handle multiple allowed directories', () => {

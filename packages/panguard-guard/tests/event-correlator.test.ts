@@ -15,9 +15,7 @@ import { EventCorrelator } from '../src/correlation/event-correlator.js';
 
 let nextId = 1;
 
-function makeCorrelationEvent(
-  overrides: Partial<CorrelationEvent> = {}
-): CorrelationEvent {
+function makeCorrelationEvent(overrides: Partial<CorrelationEvent> = {}): CorrelationEvent {
   return {
     id: `evt-${String(nextId++).padStart(4, '0')}`,
     timestamp: Date.now(),
@@ -1032,14 +1030,10 @@ describe('EventCorrelator - Buffer Management', () => {
     expect(correlator.getBufferSize()).toBe(0);
 
     const now = Date.now();
-    correlator.addEvent(
-      makeCorrelationEvent({ timestamp: now, metadata: {} })
-    );
+    correlator.addEvent(makeCorrelationEvent({ timestamp: now, metadata: {} }));
     expect(correlator.getBufferSize()).toBe(1);
 
-    correlator.addEvent(
-      makeCorrelationEvent({ timestamp: now + 100, metadata: {} })
-    );
+    correlator.addEvent(makeCorrelationEvent({ timestamp: now + 100, metadata: {} }));
     expect(correlator.getBufferSize()).toBe(2);
   });
 

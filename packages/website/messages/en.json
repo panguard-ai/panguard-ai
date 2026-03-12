@@ -1829,14 +1829,7 @@
       },
       "workflow": {
         "title": "Fits your workflow",
-        "tools": [
-          "CLI",
-          "REST API",
-          "GitHub Actions",
-          "Docker",
-          "SSH",
-          "Webhooks"
-        ]
+        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
       },
       "cta": {
         "title": "Secure your stack with one command",
@@ -1897,13 +1890,7 @@
       },
       "integrations": {
         "title": "Integrations your team already uses",
-        "tools": [
-          "Slack",
-          "Telegram",
-          "Email",
-          "Microsoft Teams",
-          "Webhooks"
-        ]
+        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
       },
       "cta": {
         "title": "Protect your business today",
@@ -2028,14 +2015,7 @@
       "stack": "e.g. CrowdStrike, Cloudflare, custom scripts...",
       "message": "Tell us about your security goals or any specific questions..."
     },
-    "teamSizes": [
-      "Just me",
-      "2-10",
-      "11-50",
-      "51-200",
-      "201-500",
-      "500+"
-    ],
+    "teamSizes": ["Just me", "2-10", "11-50", "51-200", "201-500", "500+"],
     "submit": "Send Message",
     "submitting": "Submitting...",
     "error": "Failed to submit request. Please try again.",
@@ -2216,12 +2196,7 @@
       "inquiryType": "Select type",
       "message": "How can we help?"
     },
-    "inquiryTypes": [
-      "Sales",
-      "Support",
-      "Partnership",
-      "Other"
-    ],
+    "inquiryTypes": ["Sales", "Support", "Partnership", "Other"],
     "submit": "Send Message",
     "submitting": "Sending...",
     "successTitle": "Message sent.",
@@ -4748,11 +4723,7 @@
       },
       "inProgress": {
         "title": "In Progress",
-        "items": [
-          "Web dashboard UI",
-          "Windows support",
-          "Kubernetes integration"
-        ]
+        "items": ["Web dashboard UI", "Windows support", "Kubernetes integration"]
       },
       "planned": {
         "title": "Planned",
@@ -5220,24 +5191,9 @@
     "upgradeDescription": "All Panguard features are free and open source.",
     "viewPlans": "View Plans",
     "tierFeatures": {
-      "community": [
-        "100 scans/month",
-        "1 endpoint",
-        "1,000 API calls"
-      ],
-      "solo": [
-        "Unlimited scans",
-        "3 endpoints",
-        "10,000 API calls",
-        "1 honeypot"
-      ],
-      "pro": [
-        "Unlimited scans",
-        "10 endpoints",
-        "50,000 API calls",
-        "5 reports",
-        "3 honeypots"
-      ],
+      "community": ["100 scans/month", "1 endpoint", "1,000 API calls"],
+      "solo": ["Unlimited scans", "3 endpoints", "10,000 API calls", "1 honeypot"],
+      "pro": ["Unlimited scans", "10 endpoints", "50,000 API calls", "5 reports", "3 honeypots"],
       "business": [
         "Unlimited scans",
         "25 endpoints",
@@ -5245,11 +5201,7 @@
         "20 reports",
         "8 honeypots"
       ],
-      "enterprise": [
-        "Everything unlimited",
-        "Priority support",
-        "Custom SLA"
-      ]
+      "enterprise": ["Everything unlimited", "Priority support", "Custom SLA"]
     }
   },
   "atrPage": {
@@ -5374,10 +5326,20 @@
         "atr": "ATR"
       },
       "rows": [
-        { "feature": "Detection target", "sigma": "Log events", "yara": "Files / memory", "atr": "Agent behavior" },
+        {
+          "feature": "Detection target",
+          "sigma": "Log events",
+          "yara": "Files / memory",
+          "atr": "Agent behavior"
+        },
         { "feature": "Prompt injection detection", "sigma": false, "yara": false, "atr": true },
         { "feature": "Tool call monitoring", "sigma": false, "yara": false, "atr": true },
-        { "feature": "Multi-turn conversation analysis", "sigma": false, "yara": false, "atr": true },
+        {
+          "feature": "Multi-turn conversation analysis",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
         { "feature": "Semantic-layer matching", "sigma": false, "yara": false, "atr": true },
         { "feature": "OWASP Agentic Top 10 mapping", "sigma": false, "yara": false, "atr": true },
         { "feature": "MITRE ATT&CK / ATLAS references", "sigma": true, "yara": false, "atr": true },
@@ -5391,10 +5353,27 @@
       "title": "Where ATR fits in the stack",
       "subtitle": "ATR rules are evaluated at the semantic layer -- between the LLM and the tools it invokes.",
       "layers": [
-        { "name": "User Input", "desc": "Prompt text, uploaded files, conversation context", "position": "top" },
-        { "name": "ATR Engine", "desc": "32 rules evaluated in <1ms per event. Block, alert, or escalate.", "position": "middle", "highlighted": true },
-        { "name": "LLM / Agent", "desc": "Claude, GPT, Gemini, local models -- any provider", "position": "middle" },
-        { "name": "Tools & Skills", "desc": "MCP servers, OpenClaw skills, file system, shell, APIs", "position": "bottom" }
+        {
+          "name": "User Input",
+          "desc": "Prompt text, uploaded files, conversation context",
+          "position": "top"
+        },
+        {
+          "name": "ATR Engine",
+          "desc": "32 rules evaluated in <1ms per event. Block, alert, or escalate.",
+          "position": "middle",
+          "highlighted": true
+        },
+        {
+          "name": "LLM / Agent",
+          "desc": "Claude, GPT, Gemini, local models -- any provider",
+          "position": "middle"
+        },
+        {
+          "name": "Tools & Skills",
+          "desc": "MCP servers, OpenClaw skills, file system, shell, APIs",
+          "position": "bottom"
+        }
       ],
       "caption": "ATR intercepts at the semantic layer -- before malicious instructions reach the agent, and before compromised outputs reach the tools."
     },
@@ -5435,10 +5414,22 @@
       ],
       "steps": {
         "overline": "CONTRIBUTION FLOW",
-        "step1": { "name": "Identify a threat pattern", "desc": "Observe a new attack vector in production, research, or CTF. Document the behavior." },
-        "step2": { "name": "Write an ATR rule", "desc": "Define detection conditions in YAML. Map to OWASP and MITRE references. Add test cases." },
-        "step3": { "name": "Submit a pull request", "desc": "The community reviews, tests, and merges. Rules ship to all ATR users automatically." },
-        "step4": { "name": "Collective defense", "desc": "Every new rule strengthens the entire ecosystem. One contributor protects thousands of deployments." }
+        "step1": {
+          "name": "Identify a threat pattern",
+          "desc": "Observe a new attack vector in production, research, or CTF. Document the behavior."
+        },
+        "step2": {
+          "name": "Write an ATR rule",
+          "desc": "Define detection conditions in YAML. Map to OWASP and MITRE references. Add test cases."
+        },
+        "step3": {
+          "name": "Submit a pull request",
+          "desc": "The community reviews, tests, and merges. Rules ship to all ATR users automatically."
+        },
+        "step4": {
+          "name": "Collective defense",
+          "desc": "Every new rule strengthens the entire ecosystem. One contributor protects thousands of deployments."
+        }
       }
     },
     "roadmap": {
@@ -5449,19 +5440,37 @@
           "version": "v0.1",
           "status": "current",
           "title": "Foundation",
-          "items": ["32 rules across 9 categories", "YAML format specification", "OWASP Agentic Top 10 mapping", "Real-time evaluation engine", "CLI tooling"]
+          "items": [
+            "32 rules across 9 categories",
+            "YAML format specification",
+            "OWASP Agentic Top 10 mapping",
+            "Real-time evaluation engine",
+            "CLI tooling"
+          ]
         },
         {
           "version": "v0.2",
           "status": "next",
           "title": "Expansion",
-          "items": ["50+ rules with community contributions", "Semantic operator support", "Multi-agent correlation rules", "IDE integration (VS Code, Cursor)", "Threat Cloud auto-generated rules"]
+          "items": [
+            "50+ rules with community contributions",
+            "Semantic operator support",
+            "Multi-agent correlation rules",
+            "IDE integration (VS Code, Cursor)",
+            "Threat Cloud auto-generated rules"
+          ]
         },
         {
           "version": "v1.0",
           "status": "future",
           "title": "Industry Standard",
-          "items": ["100+ production-grade rules", "Formal specification document", "Vendor integration program", "Certification and compliance toolkit", "Governing body formation"]
+          "items": [
+            "100+ production-grade rules",
+            "Formal specification document",
+            "Vendor integration program",
+            "Certification and compliance toolkit",
+            "Governing body formation"
+          ]
         }
       ]
     },
@@ -5482,9 +5491,15 @@
         "title": "One malicious skill is all it takes.",
         "items": [
           { "label": "Steal API keys", "detail": "Read .env, forward to attacker" },
-          { "label": "Exfiltrate conversations", "detail": "Your private context, sent to a remote server" },
+          {
+            "label": "Exfiltrate conversations",
+            "detail": "Your private context, sent to a remote server"
+          },
           { "label": "Hijack your agent", "detail": "Turn it into a tool for attacking others" },
-          { "label": "Leak credentials", "detail": "SSH keys, tokens, cloud secrets -- all accessible" }
+          {
+            "label": "Leak credentials",
+            "detail": "SSH keys, tokens, cloud secrets -- all accessible"
+          }
         ]
       },
       "subtitleLine2": "Panguard is the missing gatekeeper. It reviews every skill before it runs -- just like App Store review, but for AI agents. {totalRules}+ community rules and AI, always on.",
@@ -5703,13 +5718,23 @@
         "label": "Known threats",
         "title": "Rule-based review",
         "tools": "ATR + Sigma + YARA",
-        "items": ["ATR rules: prompt injection, tool poisoning, skill compromise", "Sigma rules: network-level threats, brute force, reverse shells", "YARA rules: malicious files, encoded payloads, malware signatures", "9,700+ combined rules, community-driven, updated continuously"]
+        "items": [
+          "ATR rules: prompt injection, tool poisoning, skill compromise",
+          "Sigma rules: network-level threats, brute force, reverse shells",
+          "YARA rules: malicious files, encoded payloads, malware signatures",
+          "9,700+ combined rules, community-driven, updated continuously"
+        ]
       },
       "postDeployment": {
         "label": "Unknown threats",
         "title": "AI analysis + auto-rule generation",
         "tools": "LLM + Threat Cloud",
-        "items": ["LLM behavioral analysis for threats no rule has seen", "Block first, generate rule, share anonymously", "Threat Cloud pushes new rules to all users", "Every encounter makes the entire network stronger"]
+        "items": [
+          "LLM behavioral analysis for threats no rule has seen",
+          "Block first, generate rule, share anonymously",
+          "Threat Cloud pushes new rules to all users",
+          "Every encounter makes the entire network stronger"
+        ]
       },
       "bottomLine": "Known threats: rules. Unknown threats: AI. New rules: shared to everyone."
     },

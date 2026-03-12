@@ -154,10 +154,9 @@ describe('reportCommand', () => {
       const cmd = reportCommand();
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       await expect(
-        cmd.parseAsync(
-          ['summary', '--framework', 'tw_cyber_security_act', '--language', 'zh-TW'],
-          { from: 'user' }
-        )
+        cmd.parseAsync(['summary', '--framework', 'tw_cyber_security_act', '--language', 'zh-TW'], {
+          from: 'user',
+        })
       ).resolves.not.toThrow();
       consoleSpy.mockRestore();
     });

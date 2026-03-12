@@ -3,18 +3,17 @@
 import { useTranslations } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
-import {
-  Terminal,
-  Search,
-  ShieldCheck,
-  Brain,
-  FileCode2,
-  Cloud,
-  ArrowDown,
-} from 'lucide-react';
+import { Terminal, Search, ShieldCheck, Brain, FileCode2, Cloud, ArrowDown } from 'lucide-react';
 import { useRuleStatsContext } from '@/contexts/RuleStatsContext';
 
-const stepKeys = ['install', 'scan', 'knownCheck', 'llmAnalysis', 'generateRule', 'uploadCloud'] as const;
+const stepKeys = [
+  'install',
+  'scan',
+  'knownCheck',
+  'llmAnalysis',
+  'generateRule',
+  'uploadCloud',
+] as const;
 
 const stepIcons = [Terminal, Search, ShieldCheck, Brain, FileCode2, Cloud];
 
@@ -56,9 +55,7 @@ export default function PipelineFlow() {
           <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary leading-[1.1]">
             {t('title')}
           </h2>
-          <p className="text-text-secondary mt-4 max-w-xl mx-auto">
-            {t('subtitle')}
-          </p>
+          <p className="text-text-secondary mt-4 max-w-xl mx-auto">{t('subtitle')}</p>
         </FadeInUp>
       </div>
 
@@ -69,7 +66,9 @@ export default function PipelineFlow() {
             <div key={key}>
               <FadeInUp delay={i * 0.06}>
                 <div className={`rounded-xl border p-5 flex items-start gap-4 ${stepColors[i]}`}>
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${iconColors[i]}`}>
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${iconColors[i]}`}
+                  >
                     <Icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">

@@ -80,7 +80,10 @@ function fakeScanResult(overrides: Record<string, unknown> = {}) {
 
 /** Create a unique temp directory path for test isolation. */
 function tmpDir(label: string): string {
-  return path.join(os.tmpdir(), `panguard-mcp-test-${label}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+  return path.join(
+    os.tmpdir(),
+    `panguard-mcp-test-${label}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  );
 }
 
 // ─── Cleanup tracker ────────────────────────────────────────────────────────
@@ -132,11 +135,11 @@ describe('panguard_scan', () => {
 
   it('returns correct grades for different risk scores', async () => {
     const testCases = [
-      { riskScore: 5, expectedGrade: 'A' },    // safety=95 >= 90
-      { riskScore: 20, expectedGrade: 'B' },   // safety=80 >= 75
-      { riskScore: 35, expectedGrade: 'C' },   // safety=65 >= 60
-      { riskScore: 55, expectedGrade: 'D' },   // safety=45 >= 40
-      { riskScore: 80, expectedGrade: 'F' },   // safety=20 < 40
+      { riskScore: 5, expectedGrade: 'A' }, // safety=95 >= 90
+      { riskScore: 20, expectedGrade: 'B' }, // safety=80 >= 75
+      { riskScore: 35, expectedGrade: 'C' }, // safety=65 >= 60
+      { riskScore: 55, expectedGrade: 'D' }, // safety=45 >= 40
+      { riskScore: 80, expectedGrade: 'F' }, // safety=20 < 40
     ];
 
     for (const { riskScore, expectedGrade } of testCases) {
@@ -303,7 +306,10 @@ describe('panguard_init', () => {
     expect(parsed['dataDir']).toBe(dataDir);
 
     const configPath = path.join(dataDir, 'config.json');
-    const exists = await fs.access(configPath).then(() => true).catch(() => false);
+    const exists = await fs
+      .access(configPath)
+      .then(() => true)
+      .catch(() => false);
     expect(exists).toBe(true);
   });
 
@@ -394,7 +400,10 @@ describe('panguard_guard_start', () => {
 
     await dispatchTool('panguard_guard_start', { dataDir });
 
-    const exists = await fs.access(dataDir).then(() => true).catch(() => false);
+    const exists = await fs
+      .access(dataDir)
+      .then(() => true)
+      .catch(() => false);
     expect(exists).toBe(true);
   });
 });
@@ -451,7 +460,10 @@ describe('panguard_guard_stop', () => {
 
     await dispatchTool('panguard_guard_stop', { dataDir });
 
-    const pidExists = await fs.access(pidFile).then(() => true).catch(() => false);
+    const pidExists = await fs
+      .access(pidFile)
+      .then(() => true)
+      .catch(() => false);
     expect(pidExists).toBe(false);
   });
 });
@@ -500,7 +512,7 @@ describe('panguard_status', () => {
     await fs.mkdir(dataDir, { recursive: true });
     await fs.writeFile(
       path.join(dataDir, 'config.json'),
-      JSON.stringify({ mode: 'protection', lang: 'zh-TW' }),
+      JSON.stringify({ mode: 'protection', lang: 'zh-TW' })
     );
 
     const result = await dispatchTool('panguard_status', { dataDir });
@@ -527,7 +539,7 @@ describe('panguard_status', () => {
     const result = await dispatchTool('panguard_status', { dataDir });
     const parsed = parseResult(result);
 
-    expect((parsed['summary'] as string)).toContain('NOT running');
+    expect(parsed['summary'] as string).toContain('NOT running');
   });
 
   it('returns zero events when no events file exists', async () => {
@@ -603,7 +615,7 @@ describe('panguard_alerts', () => {
 
     await fs.mkdir(dataDir, { recursive: true });
     const events = Array.from({ length: 10 }, (_, i) =>
-      JSON.stringify({ severity: 'medium', message: `Alert ${i}` }),
+      JSON.stringify({ severity: 'medium', message: `Alert ${i}` })
     ).join('\n');
     await fs.writeFile(path.join(dataDir, 'events.jsonl'), events);
 
@@ -653,7 +665,7 @@ describe('panguard_alerts', () => {
     const result = await dispatchTool('panguard_alerts', { dataDir });
     const parsed = parseResult(result);
 
-    expect((parsed['summary'] as string)).toContain('clean');
+    expect(parsed['summary'] as string).toContain('clean');
   });
 });
 
@@ -716,7 +728,7 @@ describe('panguard_generate_report', () => {
     expect(mockGeneratePdfReport).toHaveBeenCalledWith(
       expect.anything(),
       path.resolve('./panguard-report.pdf'),
-      'en',
+      'en'
     );
   });
 
@@ -765,7 +777,10 @@ describe('panguard_deploy', () => {
 
     // Verify config was written
     const configPath = path.join(dataDir, 'config.json');
-    const exists = await fs.access(configPath).then(() => true).catch(() => false);
+    const exists = await fs
+      .access(configPath)
+      .then(() => true)
+      .catch(() => false);
     expect(exists).toBe(true);
   });
 
@@ -954,8 +969,12 @@ describe('panguard_scan_code', () => {
     vi.clearAllMocks();
     // Get references to the mock functions from the mocked module
     const scanMod = await import('@panguard-ai/panguard-scan');
-    mockCheckSourceCode = (scanMod as Record<string, unknown>)['checkSourceCode'] as ReturnType<typeof vi.fn>;
-    mockCheckHardcodedSecrets = (scanMod as Record<string, unknown>)['checkHardcodedSecrets'] as ReturnType<typeof vi.fn>;
+    mockCheckSourceCode = (scanMod as Record<string, unknown>)['checkSourceCode'] as ReturnType<
+      typeof vi.fn
+    >;
+    mockCheckHardcodedSecrets = (scanMod as Record<string, unknown>)[
+      'checkHardcodedSecrets'
+    ] as ReturnType<typeof vi.fn>;
   });
 
   it('returns content array with scan_type "sast"', async () => {
@@ -991,10 +1010,24 @@ describe('panguard_scan_code', () => {
 
   it('aggregates findings from both source code and secrets checks', async () => {
     mockCheckSourceCode.mockResolvedValueOnce([
-      { id: 'SAST-001', severity: 'high', title: 'SQL Injection', category: 'injection', description: 'desc', remediation: 'fix' },
+      {
+        id: 'SAST-001',
+        severity: 'high',
+        title: 'SQL Injection',
+        category: 'injection',
+        description: 'desc',
+        remediation: 'fix',
+      },
     ]);
     mockCheckHardcodedSecrets.mockResolvedValueOnce([
-      { id: 'SECRET-001', severity: 'critical', title: 'Hardcoded API key', category: 'secrets', description: 'desc', remediation: 'fix' },
+      {
+        id: 'SECRET-001',
+        severity: 'critical',
+        title: 'Hardcoded API key',
+        category: 'secrets',
+        description: 'desc',
+        remediation: 'fix',
+      },
     ]);
 
     const result = await dispatchTool('panguard_scan_code', { dir: '/code' });
@@ -1013,7 +1046,7 @@ describe('panguard_scan_code', () => {
     const parsed = parseResult(result);
 
     expect(parsed['findings_count']).toBe(0);
-    expect((parsed['summary'] as string)).toContain('No security issues');
+    expect(parsed['summary'] as string).toContain('No security issues');
   });
 
   it('returns isError when SAST check throws', async () => {
@@ -1029,9 +1062,23 @@ describe('panguard_scan_code', () => {
 
   it('counts severity levels correctly', async () => {
     mockCheckSourceCode.mockResolvedValueOnce([
-      { id: 'S1', severity: 'medium', title: 't', category: 'c', description: 'd', remediation: 'r' },
+      {
+        id: 'S1',
+        severity: 'medium',
+        title: 't',
+        category: 'c',
+        description: 'd',
+        remediation: 'r',
+      },
       { id: 'S2', severity: 'low', title: 't', category: 'c', description: 'd', remediation: 'r' },
-      { id: 'S3', severity: 'medium', title: 't', category: 'c', description: 'd', remediation: 'r' },
+      {
+        id: 'S3',
+        severity: 'medium',
+        title: 't',
+        category: 'c',
+        description: 'd',
+        remediation: 'r',
+      },
     ]);
     mockCheckHardcodedSecrets.mockResolvedValueOnce([
       { id: 'S4', severity: 'low', title: 't', category: 'c', description: 'd', remediation: 'r' },

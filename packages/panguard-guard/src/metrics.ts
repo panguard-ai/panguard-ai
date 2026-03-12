@@ -20,13 +20,25 @@ interface MetricDef {
 }
 
 const METRIC_DEFS: MetricDef[] = [
-  { name: 'panguard_events_processed_total', help: 'Total security events processed', type: 'counter' },
+  {
+    name: 'panguard_events_processed_total',
+    help: 'Total security events processed',
+    type: 'counter',
+  },
   { name: 'panguard_threats_detected_total', help: 'Total threats detected', type: 'counter' },
-  { name: 'panguard_actions_executed_total', help: 'Total response actions executed', type: 'counter' },
+  {
+    name: 'panguard_actions_executed_total',
+    help: 'Total response actions executed',
+    type: 'counter',
+  },
   { name: 'panguard_uptime_seconds', help: 'Guard engine uptime in seconds', type: 'gauge' },
   { name: 'panguard_memory_usage_bytes', help: 'Heap memory usage in bytes', type: 'gauge' },
   { name: 'panguard_cpu_usage_percent', help: 'Process CPU usage percentage', type: 'gauge' },
-  { name: 'panguard_baseline_confidence', help: 'Environment baseline confidence (0-1)', type: 'gauge' },
+  {
+    name: 'panguard_baseline_confidence',
+    help: 'Environment baseline confidence (0-1)',
+    type: 'gauge',
+  },
   { name: 'panguard_learning_progress', help: 'Learning mode progress (0-1)', type: 'gauge' },
   { name: 'panguard_running', help: 'Whether the guard engine is running (0 or 1)', type: 'gauge' },
   { name: 'panguard_ai_requests_total', help: 'Total AI API requests made', type: 'counter' },

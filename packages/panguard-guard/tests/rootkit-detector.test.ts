@@ -188,9 +188,7 @@ describe('checkLdPreload', () => {
 
     const findings = checkLdPreload();
 
-    const envFinding = findings.find(
-      (f) => f.details['source'] === 'environment'
-    );
+    const envFinding = findings.find((f) => f.details['source'] === 'environment');
     expect(envFinding).toBeDefined();
     expect(envFinding!.checkType).toBe('ld_preload');
     expect(envFinding!.severity).toBe('high');
@@ -203,9 +201,7 @@ describe('checkLdPreload', () => {
 
     const findings = checkLdPreload();
 
-    const envFinding = findings.find(
-      (f) => f.details['source'] === 'environment'
-    );
+    const envFinding = findings.find((f) => f.details['source'] === 'environment');
     expect(envFinding).toBeDefined();
     const libraries = envFinding!.details['libraries'] as string[];
     expect(libraries).toHaveLength(2);
@@ -218,9 +214,7 @@ describe('checkLdPreload', () => {
 
     const findings = checkLdPreload();
 
-    const envFinding = findings.find(
-      (f) => f.details['source'] === 'environment'
-    );
+    const envFinding = findings.find((f) => f.details['source'] === 'environment');
     expect(envFinding).toBeUndefined();
   });
 
@@ -229,9 +223,7 @@ describe('checkLdPreload', () => {
 
     const findings = checkLdPreload();
 
-    const envFinding = findings.find(
-      (f) => f.details['source'] === 'environment'
-    );
+    const envFinding = findings.find((f) => f.details['source'] === 'environment');
     expect(envFinding).toBeUndefined();
   });
 
@@ -240,9 +232,7 @@ describe('checkLdPreload', () => {
 
     const findings = checkLdPreload();
 
-    const envFinding = findings.find(
-      (f) => f.details['source'] === 'environment'
-    );
+    const envFinding = findings.find((f) => f.details['source'] === 'environment');
     expect(envFinding).toBeUndefined();
   });
 });
@@ -387,13 +377,7 @@ describe('RootkitFinding interface', () => {
   });
 
   it('should support all severity levels', () => {
-    const severities: RootkitFinding['severity'][] = [
-      'info',
-      'low',
-      'medium',
-      'high',
-      'critical',
-    ];
+    const severities: RootkitFinding['severity'][] = ['info', 'low', 'medium', 'high', 'critical'];
 
     for (const severity of severities) {
       const finding: RootkitFinding = {

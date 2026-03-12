@@ -8,12 +8,14 @@ or any component of this project, please report it responsibly.
 **Email:** security@panguard.ai
 
 **What to include:**
+
 - Description of the vulnerability
 - Steps to reproduce
 - Affected rule IDs (if applicable)
 - Potential impact assessment
 
 **What to expect:**
+
 - Acknowledgment within 48 hours
 - Status update within 7 business days
 - Credit in the advisory (unless you prefer anonymity)

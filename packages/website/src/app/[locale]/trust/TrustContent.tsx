@@ -284,7 +284,10 @@ export default function TrustContent() {
           <FadeInUp>
             <div className="bg-surface-2 rounded-xl border border-border overflow-hidden">
               {([0, 1, 2, 3] as const).map((idx) => (
-                <div key={idx} className={`flex items-start gap-4 p-6 ${idx < 3 ? 'border-b border-border' : ''}`}>
+                <div
+                  key={idx}
+                  className={`flex items-start gap-4 p-6 ${idx < 3 ? 'border-b border-border' : ''}`}
+                >
                   <div className="w-8 h-8 rounded-full bg-brand-sage/10 flex items-center justify-center shrink-0">
                     <span className="text-sm font-bold text-brand-sage">{idx + 1}</span>
                   </div>

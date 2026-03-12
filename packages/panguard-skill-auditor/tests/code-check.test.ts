@@ -10,13 +10,15 @@ vi.mock('@panguard-ai/panguard-scan', () => ({
 import { checkCode } from '../src/checks/code-check.js';
 import * as panguardScan from '@panguard-ai/panguard-scan';
 
-function makeCodeFinding(overrides: Partial<{
-  id: string;
-  title: string;
-  description: string;
-  severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
-  details: string;
-}> = {}) {
+function makeCodeFinding(
+  overrides: Partial<{
+    id: string;
+    title: string;
+    description: string;
+    severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
+    details: string;
+  }> = {}
+) {
   return {
     id: 'vuln-1',
     title: 'SQL Injection',
@@ -27,13 +29,15 @@ function makeCodeFinding(overrides: Partial<{
   };
 }
 
-function makeSecretFinding(overrides: Partial<{
-  id: string;
-  title: string;
-  description: string;
-  severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
-  details: string;
-}> = {}) {
+function makeSecretFinding(
+  overrides: Partial<{
+    id: string;
+    title: string;
+    description: string;
+    severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
+    details: string;
+  }> = {}
+) {
   return {
     id: 'aws-key',
     title: 'AWS Access Key',
@@ -96,9 +100,7 @@ describe('checkCode', () => {
     });
 
     it('should assign "code" category to code scanner findings', async () => {
-      vi.mocked(panguardScan.checkSourceCode).mockResolvedValue([
-        makeCodeFinding(),
-      ]);
+      vi.mocked(panguardScan.checkSourceCode).mockResolvedValue([makeCodeFinding()]);
 
       const result = await checkCode('/some/dir');
       expect(result.findings[0]!.category).toBe('code');
@@ -181,9 +183,7 @@ describe('checkCode', () => {
     });
 
     it('should assign "secrets" category to secret scanner findings', async () => {
-      vi.mocked(panguardScan.checkHardcodedSecrets).mockResolvedValue([
-        makeSecretFinding(),
-      ]);
+      vi.mocked(panguardScan.checkHardcodedSecrets).mockResolvedValue([makeSecretFinding()]);
 
       const result = await checkCode('/some/dir');
       expect(result.findings[0]!.category).toBe('secrets');
@@ -313,7 +313,9 @@ describe('checkCode', () => {
 
     it('should call checkHardcodedSecrets with the provided directory', async () => {
       await checkCode('/my/specific/skill');
-      expect(vi.mocked(panguardScan.checkHardcodedSecrets)).toHaveBeenCalledWith('/my/specific/skill');
+      expect(vi.mocked(panguardScan.checkHardcodedSecrets)).toHaveBeenCalledWith(
+        '/my/specific/skill'
+      );
     });
   });
 });

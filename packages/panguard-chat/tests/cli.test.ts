@@ -22,7 +22,15 @@ describe('commandSetup config persistence', () => {
     process.env['PANGUARD_CHAT_CONFIG'] = configPath;
 
     const { runCLI } = await import('../src/cli/index.js');
-    await runCLI(['setup', '--channel', 'webhook', '--user-type', 'it_admin', '--url', 'https://example.com/hook']);
+    await runCLI([
+      'setup',
+      '--channel',
+      'webhook',
+      '--user-type',
+      'it_admin',
+      '--url',
+      'https://example.com/hook',
+    ]);
 
     expect(existsSync(configPath)).toBe(true);
     const saved = JSON.parse(readFileSync(configPath, 'utf-8'));
@@ -38,7 +46,15 @@ describe('commandSetup config persistence', () => {
     process.env['PANGUARD_CHAT_CONFIG'] = configPath;
 
     const { runCLI } = await import('../src/cli/index.js');
-    await runCLI(['setup', '--channel', 'webhook', '--user-type', 'developer', '--url', 'https://example.com/hook']);
+    await runCLI([
+      'setup',
+      '--channel',
+      'webhook',
+      '--user-type',
+      'developer',
+      '--url',
+      'https://example.com/hook',
+    ]);
 
     const saved = JSON.parse(readFileSync(configPath, 'utf-8'));
     expect(saved.userProfile.language).toBe('zh-TW');
@@ -50,7 +66,17 @@ describe('commandSetup config persistence', () => {
     process.env['PANGUARD_CHAT_CONFIG'] = configPath;
 
     const { runCLI } = await import('../src/cli/index.js');
-    await runCLI(['setup', '--channel', 'webhook', '--user-type', 'boss', '--lang', 'en', '--url', 'https://example.com/hook']);
+    await runCLI([
+      'setup',
+      '--channel',
+      'webhook',
+      '--user-type',
+      'boss',
+      '--lang',
+      'en',
+      '--url',
+      'https://example.com/hook',
+    ]);
 
     const saved = JSON.parse(readFileSync(configPath, 'utf-8'));
     expect(saved.userProfile.language).toBe('en');
@@ -63,7 +89,17 @@ describe('commandSetup config persistence', () => {
     process.env['PANGUARD_CHAT_CONFIG'] = configPath;
 
     const { runCLI } = await import('../src/cli/index.js');
-    await runCLI(['setup', '--channel', 'telegram', '--user-type', 'it_admin', '--token', 'bot123', '--chat-id', '456']);
+    await runCLI([
+      'setup',
+      '--channel',
+      'telegram',
+      '--user-type',
+      'it_admin',
+      '--token',
+      'bot123',
+      '--chat-id',
+      '456',
+    ]);
 
     const saved = JSON.parse(readFileSync(configPath, 'utf-8'));
     expect(saved.channels.telegram.botToken).toBe('bot123');
@@ -76,7 +112,15 @@ describe('commandSetup config persistence', () => {
     process.env['PANGUARD_CHAT_CONFIG'] = configPath;
 
     const { runCLI } = await import('../src/cli/index.js');
-    await runCLI(['setup', '--channel', 'webhook', '--user-type', 'it_admin', '--url', 'https://example.com/hook']);
+    await runCLI([
+      'setup',
+      '--channel',
+      'webhook',
+      '--user-type',
+      'it_admin',
+      '--url',
+      'https://example.com/hook',
+    ]);
 
     const saved = JSON.parse(readFileSync(configPath, 'utf-8'));
     expect(saved.userProfile.preferences.criticalAlerts).toBe(true);

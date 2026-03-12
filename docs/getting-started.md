@@ -27,12 +27,12 @@
 
 ### Available Binaries (v0.3.3)
 
-| Platform       | Architecture | Install Method          |
-| -------------- | ------------ | ----------------------- |
-| macOS          | ARM64 (Apple Silicon) | curl one-liner or npm |
-| Linux          | x64          | curl one-liner or npm   |
-| Linux          | ARM64        | curl one-liner or npm   |
-| Windows        | x64          | npm (recommended) or PowerShell |
+| Platform | Architecture          | Install Method                  |
+| -------- | --------------------- | ------------------------------- |
+| macOS    | ARM64 (Apple Silicon) | curl one-liner or npm           |
+| Linux    | x64                   | curl one-liner or npm           |
+| Linux    | ARM64                 | curl one-liner or npm           |
+| Windows  | x64                   | npm (recommended) or PowerShell |
 
 > **Intel Mac users**: The curl installer downloads the ARM64 binary. Either install via npm (`npm install -g @panguard-ai/panguard`), or enable Rosetta 2 first (`softwareupdate --install-rosetta`) before using the curl installer.
 

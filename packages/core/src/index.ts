@@ -146,7 +146,14 @@ export type {
 } from './scoring/index.js';
 
 // AI / LLM interface / AI/LLM 介面
-export { AI_VERSION, createLLM, FunnelRouter, SmartRouter, AIQuotaManager, KnowledgeDistiller } from './ai/index.js';
+export {
+  AI_VERSION,
+  createLLM,
+  FunnelRouter,
+  SmartRouter,
+  AIQuotaManager,
+  KnowledgeDistiller,
+} from './ai/index.js';
 export type {
   LLMConfig,
   LLMProvider,
@@ -181,13 +188,7 @@ export type {
 } from './adapters/index.js';
 
 // Tiers / 訂閱等級
-export {
-  TIERS,
-  TIER_LEVEL,
-  FEATURE_TIER,
-  isTierAtLeast,
-  isValidTier,
-} from './tiers/index.js';
+export { TIERS, TIER_LEVEL, FEATURE_TIER, isTierAtLeast, isValidTier } from './tiers/index.js';
 export type { Tier } from './tiers/index.js';
 
 // CLI utilities / CLI 工具

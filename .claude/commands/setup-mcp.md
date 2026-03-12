@@ -5,6 +5,7 @@ Guide the user through setting up MCP servers for marketing automation.
 ## Available MCP Servers
 
 ### 1. Twitter/X MCP (Post & Search)
+
 ```bash
 # Install via Claude Code
 claude mcp add twitter -- npx -y @enescinar/twitter-mcp
@@ -14,17 +15,20 @@ npx -y @smithery/cli install @rafaljanicki/x-twitter-mcp-server --client claude
 ```
 
 **Required env vars** (set in `.claude/settings.local.json` or env):
+
 - `TWITTER_API_KEY`
 - `TWITTER_API_SECRET`
 - `TWITTER_ACCESS_TOKEN`
 - `TWITTER_ACCESS_TOKEN_SECRET`
 
 **Get credentials:** https://developer.x.com/en/portal/dashboard
+
 - Create a project + app
 - Set app permissions to "Read and Write"
 - Generate Access Token and Secret
 
 ### 2. SE Ranking MCP (SEO Data)
+
 ```bash
 # Requires Docker
 claude mcp add seo-data-api-mcp \
@@ -39,6 +43,7 @@ claude mcp add seo-data-api-mcp \
 **Get credentials:** https://seranking.com (requires paid plan)
 
 ### 3. GitHub MCP (for ATR repo management)
+
 ```bash
 claude mcp add github -- npx -y @modelcontextprotocol/server-github
 
@@ -47,9 +52,11 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=your_token
 ```
 
 ### 4. OpenTweet MCP (Schedule Tweets)
+
 ```bash
 claude mcp add opentweet -- npx -y @opentweet/mcp-server
 ```
+
 **Get API key:** https://opentweet.io
 
 ## Quick Setup (Recommended Stack)
@@ -63,11 +70,13 @@ For a solopreneur marketing setup, install in this order:
 ## Verification
 
 After setup, run:
+
 ```bash
 claude mcp list
 ```
 
 Then test each server:
+
 - Twitter: "Search for recent tweets about endpoint security"
 - GitHub: "List open issues on panguard/atr repo"
 - SEO: "Get keyword data for 'server security tool'"

@@ -46,9 +46,7 @@ export default function ThreatsOverview() {
               <h3 className="text-sm font-semibold text-text-primary mb-1">
                 {t(`categories.${cat.key}`)}
               </h3>
-              <p className="text-xs text-text-muted">
-                {t('ruleCount', { count: cat.rules })}
-              </p>
+              <p className="text-xs text-text-muted">{t('ruleCount', { count: cat.rules })}</p>
             </motion.div>
           ))}
         </div>

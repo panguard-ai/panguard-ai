@@ -117,7 +117,9 @@ function OpenSourceSpirit() {
       className="mt-16 max-w-3xl mx-auto"
     >
       <h3 className="text-2xl md:text-3xl font-bold text-text-primary text-center">{t('title')}</h3>
-      <p className="text-lg sm:text-xl text-panguard-green font-medium mt-2 text-center">{t('subtitle')}</p>
+      <p className="text-lg sm:text-xl text-panguard-green font-medium mt-2 text-center">
+        {t('subtitle')}
+      </p>
       <p className="text-gray-400 mt-6 leading-relaxed">{t('desc')}</p>
       <p className="text-gray-400 mt-4 leading-relaxed">{t('belief')}</p>
       <p className="text-sm text-gray-500 font-medium mt-6 text-center">{t('proof')}</p>
@@ -164,7 +166,9 @@ export default function ThreatCloudSection() {
           className="max-w-3xl mx-auto mt-6 text-center"
         >
           <p className="text-base sm:text-lg text-gray-400 leading-relaxed">{t('desc')}</p>
-          <p className="text-base sm:text-lg text-text-primary font-semibold mt-4">{t('descHighlight')}</p>
+          <p className="text-base sm:text-lg text-text-primary font-semibold mt-4">
+            {t('descHighlight')}
+          </p>
         </motion.div>
 
         {/* 3-step flow */}

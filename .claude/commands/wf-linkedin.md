@@ -3,16 +3,20 @@
 Convert LinkedIn post engagers (likes, comments) into qualified leads and send personalized cold emails.
 
 ## What This Does
+
 Automates: LinkedIn post URL → PhantomBuster (scrape engagers) → Apollo (enrich) → Million Verifier (verify) → Instantly (cold email)
 
 This is the highest-ROI workflow because these people already showed interest in your topic.
 
 ## Prerequisites
+
 - API keys in `marketing/.env`: PHANTOMBUSTER_API_KEY, APOLLO_API_KEY, MILLIONVERIFIER_API_KEY, INSTANTLY_API_KEY
 - A LinkedIn post URL (yours or a competitor's post about security/devops)
 
 ## Input
+
 User provides a LinkedIn post URL, e.g.:
+
 ```
 https://www.linkedin.com/feed/update/urn:li:activity:1234567890
 ```
@@ -22,6 +26,7 @@ https://www.linkedin.com/feed/update/urn:li:activity:1234567890
 ### 1. Scrape LinkedIn engagers (PhantomBuster)
 
 Use the "LinkedIn Post Likers" phantom:
+
 ```bash
 curl -s https://api.phantombuster.com/api/v2/agents/launch \
   -H "X-Phantombuster-Key: $PHANTOMBUSTER_API_KEY" \
@@ -36,12 +41,14 @@ curl -s https://api.phantombuster.com/api/v2/agents/launch \
 ```
 
 **Setup required (one-time):**
+
 1. Go to PhantomBuster dashboard
 2. Create "LinkedIn Post Likers" phantom
 3. Connect your LinkedIn session cookie
 4. Note the phantom ID for API calls
 
 Extract from each engager:
+
 - Full name
 - LinkedIn URL
 - Job title
@@ -51,6 +58,7 @@ Extract from each engager:
 ### 2. Enrich contacts (Apollo)
 
 For each engager, enrich:
+
 ```bash
 curl -s https://api.apollo.io/v1/people/match \
   -H "X-Api-Key: $APOLLO_API_KEY" \
@@ -65,6 +73,7 @@ curl -s https://api.apollo.io/v1/people/match \
 Extract: business email, phone, company size, industry, seniority level.
 
 **Filter for ICP (Ideal Customer Profile):**
+
 - Title contains: CTO, VP Engineering, DevOps, Security, IT Manager, Founder
 - Company size: 10-500 employees (SMB sweet spot)
 - Industry: Technology, SaaS, E-commerce, FinTech
@@ -84,11 +93,13 @@ Keep only: "ok" and "catch_all" results.
 The key insight — they engaged with a post about [topic], so reference that:
 
 **Subject lines (A/B):**
+
 - "Saw you liked [poster's] post about [topic]"
 - "Quick question about [their company]'s security"
 - "[First name], 60-second server protection"
 
 **Email body:**
+
 ```
 Hi [First Name],
 
@@ -106,6 +117,7 @@ Would it make sense to show you a quick demo? It's literally a 60-second install
 ```
 
 **Personalization variables:**
+
 - {first_name} — from Apollo
 - {company} — from Apollo
 - {post_topic} — from the LinkedIn post
@@ -127,6 +139,7 @@ curl -s https://api.instantly.ai/api/v1/lead/add \
 ### 6. Save output
 
 Save to `marketing/output/linkedin/`:
+
 - `engagers-raw.json` — raw PhantomBuster scrape
 - `enriched-contacts.json` — Apollo-enriched data
 - `verified-leads.json` — email-verified leads
@@ -134,6 +147,7 @@ Save to `marketing/output/linkedin/`:
 - `campaign-loaded.md` — confirmation of Instantly upload
 
 ## Metrics to Track
+
 - Engagers scraped → Emails found rate (target: 40-60%)
 - Email verification pass rate (target: 80%+)
 - Email open rate (target: 50%+, since they're warm)
@@ -141,6 +155,7 @@ Save to `marketing/output/linkedin/`:
 - Demo booked rate (target: 2-5% of sends)
 
 ## Tips
+
 - Best posts to scrape: competitor posts about security challenges
 - Best timing: scrape within 48 hours of post going viral
 - Volume: 50-200 leads per post is typical

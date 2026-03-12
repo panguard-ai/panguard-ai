@@ -339,7 +339,9 @@ export class DashboardServer {
         break;
       case '/api/installed-skills':
         this.handleInstalledSkillsApi(res).catch((err: unknown) => {
-          logger.error(`handleInstalledSkillsApi error: ${err instanceof Error ? err.message : String(err)}`);
+          logger.error(
+            `handleInstalledSkillsApi error: ${err instanceof Error ? err.message : String(err)}`
+          );
           if (!res.headersSent) this.jsonResponse(res, { error: 'Internal error' }, 500);
         });
         break;
@@ -376,7 +378,10 @@ export class DashboardServer {
 
   private handleSkillsApi(res: ServerResponse): void {
     const dataDir = this.getConfig?.()?.dataDir;
-    const whitelistPath = join(dataDir ?? join(homedir(), '.panguard-guard'), 'skill-whitelist.json');
+    const whitelistPath = join(
+      dataDir ?? join(homedir(), '.panguard-guard'),
+      'skill-whitelist.json'
+    );
 
     if (!existsSync(whitelistPath)) {
       this.jsonResponse(res, { skills: [], total: 0, autoCount: 0, manualCount: 0 });
@@ -385,10 +390,16 @@ export class DashboardServer {
 
     try {
       const raw = readFileSync(whitelistPath, 'utf-8');
-      const data = JSON.parse(raw) as { skills?: Array<{ name: string; source?: string; reason?: string; addedAt?: string }> };
+      const data = JSON.parse(raw) as {
+        skills?: Array<{ name: string; source?: string; reason?: string; addedAt?: string }>;
+      };
       const skills = data.skills ?? [];
-      const autoCount = skills.filter(s => s.source === 'fingerprint' || s.source === 'static').length;
-      const manualCount = skills.filter(s => s.source === 'manual' || s.source === 'community').length;
+      const autoCount = skills.filter(
+        (s) => s.source === 'fingerprint' || s.source === 'static'
+      ).length;
+      const manualCount = skills.filter(
+        (s) => s.source === 'manual' || s.source === 'community'
+      ).length;
       this.jsonResponse(res, { skills, total: skills.length, autoCount, manualCount });
     } catch {
       this.jsonResponse(res, { skills: [], total: 0, autoCount: 0, manualCount: 0 });
@@ -435,12 +446,25 @@ export class DashboardServer {
           apiKey?: string;
         };
 
-        if (update.endpoint !== undefined && update.endpoint !== '' && !DashboardServer.isValidEndpointUrl(update.endpoint)) {
+        if (
+          update.endpoint !== undefined &&
+          update.endpoint !== '' &&
+          !DashboardServer.isValidEndpointUrl(update.endpoint)
+        ) {
           this.jsonResponse(res, { error: 'Invalid endpoint URL' }, 400);
           return;
         }
 
-        const validProviders = ['ollama', 'claude', 'openai', 'gemini', 'groq', 'mistral', 'deepseek', 'lmstudio'];
+        const validProviders = [
+          'ollama',
+          'claude',
+          'openai',
+          'gemini',
+          'groq',
+          'mistral',
+          'deepseek',
+          'lmstudio',
+        ];
         if (update.provider && !validProviders.includes(update.provider)) {
           this.jsonResponse(res, { error: 'Invalid provider' }, 400);
           return;
@@ -473,7 +497,9 @@ export class DashboardServer {
   private static isValidEndpointUrl(url: string): boolean {
     try {
       const parsed = new URL(url);
-      return (parsed.protocol === 'https:' || parsed.protocol === 'http:') && parsed.hostname.length > 0;
+      return (
+        (parsed.protocol === 'https:' || parsed.protocol === 'http:') && parsed.hostname.length > 0
+      );
     } catch {
       return false;
     }
@@ -493,7 +519,9 @@ export class DashboardServer {
       try {
         const cache = JSON.parse(readFileSync(cachePath, 'utf-8')) as { lastSync?: string };
         lastSync = cache.lastSync ?? null;
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
 
     this.jsonResponse(res, {
@@ -530,7 +558,9 @@ export class DashboardServer {
           queueSize: cache.queueSize ?? 0,
         };
         lastSync = cache.lastSync ?? null;
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
 
     let clientId = '';
@@ -539,7 +569,9 @@ export class DashboardServer {
       try {
         const fullId = readFileSync(clientIdPath, 'utf-8').trim();
         clientId = fullId.slice(0, 8) + '****-****-' + fullId.slice(-4);
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
 
     const uploadEnabled = config?.threatCloudUploadEnabled !== false;
@@ -610,10 +642,12 @@ export class DashboardServer {
         const raw = readFileSync(whitelistPath, 'utf-8');
         const data = JSON.parse(raw) as { skills?: Array<{ name: string; source?: string }> };
         whitelist = data.skills ?? [];
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
 
-    const whitelistedNames = new Set(whitelist.map(s => s.name));
+    const whitelistedNames = new Set(whitelist.map((s) => s.name));
 
     let allSkills: Array<{
       name: string;
@@ -627,19 +661,21 @@ export class DashboardServer {
       // Dynamic import — module may not be installed in all configurations
       // @ts-expect-error — optional peer dependency, may not have type declarations
       const mcpConfig: Record<string, unknown> = await import('@panguard-ai/panguard-mcp/config');
-      const discover = mcpConfig['discoverAllSkills'] as (() => Promise<Array<{ name: string; platform: string; command?: string }>>) | undefined;
+      const discover = mcpConfig['discoverAllSkills'] as
+        | (() => Promise<Array<{ name: string; platform: string; command?: string }>>)
+        | undefined;
       if (discover) {
         const discovered = await discover();
-        allSkills = discovered.map(s => ({
+        allSkills = discovered.map((s) => ({
           name: s.name,
           platform: s.platform,
           command: s.command,
           whitelisted: whitelistedNames.has(s.name),
-          source: whitelist.find(w => w.name === s.name)?.source,
+          source: whitelist.find((w) => w.name === s.name)?.source,
         }));
       }
     } catch {
-      allSkills = whitelist.map(s => ({
+      allSkills = whitelist.map((s) => ({
         name: s.name,
         platform: 'unknown',
         whitelisted: true,
@@ -650,8 +686,8 @@ export class DashboardServer {
     this.jsonResponse(res, {
       skills: allSkills,
       total: allSkills.length,
-      whitelisted: allSkills.filter(s => s.whitelisted).length,
-      tracked: allSkills.filter(s => !s.whitelisted).length,
+      whitelisted: allSkills.filter((s) => s.whitelisted).length,
+      tracked: allSkills.filter((s) => !s.whitelisted).length,
     });
   }
 

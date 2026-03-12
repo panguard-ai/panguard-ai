@@ -53,9 +53,9 @@ export interface LLMInvestigationPlanner {
  * 建構 LLM 安全分析師角色的系統提示詞
  */
 function buildSystemPrompt(): string {
-  const toolList = INVESTIGATION_TOOL_DESCRIPTIONS.map(
-    (t) => `- ${t.name}: ${t.description}`
-  ).join('\n');
+  const toolList = INVESTIGATION_TOOL_DESCRIPTIONS.map((t) => `- ${t.name}: ${t.description}`).join(
+    '\n'
+  );
 
   return [
     'You are a senior security analyst AI. Your task is to plan an investigation for a security event.',
@@ -88,9 +88,7 @@ function buildSystemPrompt(): string {
  * 建構事件上下文提示詞
  */
 function buildEventPrompt(event: SecurityEvent): string {
-  const metadataStr = event.metadata
-    ? JSON.stringify(event.metadata, null, 2)
-    : '{}';
+  const metadataStr = event.metadata ? JSON.stringify(event.metadata, null, 2) : '{}';
 
   return [
     'Security Event to investigate:',

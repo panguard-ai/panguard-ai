@@ -41,19 +41,12 @@ function TierBadge({ tier }: { tier: 'Free' | 'Pro' | 'Enterprise' }) {
 function TerminalBlock({ code }: { code: string }) {
   return (
     <div className="bg-[#111] border border-border rounded-xl p-4 font-mono text-sm overflow-x-auto">
-      <span className="text-panguard-green">$</span>{' '}
-      <span className="text-gray-300">{code}</span>
+      <span className="text-panguard-green">$</span> <span className="text-gray-300">{code}</span>
     </div>
   );
 }
 
-function CommandCard({
-  cmd,
-  t,
-}: {
-  cmd: Command;
-  t: (key: string) => string;
-}) {
+function CommandCard({ cmd, t }: { cmd: Command; t: (key: string) => string }) {
   const [expanded, setExpanded] = useState(false);
   const hasFlags = cmd.flags && cmd.flags.length > 0;
 
@@ -64,15 +57,9 @@ function CommandCard({
         className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-surface-2/50 transition-colors"
       >
         <span className="text-text-muted shrink-0">
-          {expanded ? (
-            <ChevronDown className="w-4 h-4" />
-          ) : (
-            <ChevronRight className="w-4 h-4" />
-          )}
+          {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </span>
-        <code className="text-text-primary font-mono text-sm font-semibold">
-          {cmd.command}
-        </code>
+        <code className="text-text-primary font-mono text-sm font-semibold">{cmd.command}</code>
         <span className="flex items-center gap-2 ml-auto shrink-0">
           <MaturityBadge
             maturity={cmd.maturity}
@@ -84,9 +71,7 @@ function CommandCard({
 
       {expanded && (
         <div className="px-5 pb-5 pt-0 border-t border-border/60 space-y-4">
-          <p className="text-sm text-text-secondary leading-relaxed pt-4">
-            {t(cmd.descKey)}
-          </p>
+          <p className="text-sm text-text-secondary leading-relaxed pt-4">{t(cmd.descKey)}</p>
 
           {hasFlags && (
             <div>
@@ -104,9 +89,7 @@ function CommandCard({
                         <td className="px-4 py-2.5 text-text-secondary">
                           {t(flag.descKey)}
                           {flag.default && (
-                            <span className="text-text-muted ml-1">
-                              (default: {flag.default})
-                            </span>
+                            <span className="text-text-muted ml-1">(default: {flag.default})</span>
                           )}
                         </td>
                       </tr>
@@ -192,9 +175,7 @@ export default function CLIReferencePage() {
             <h1 className="text-[clamp(32px,4vw,48px)] font-bold text-text-primary mt-4 leading-[1.1]">
               {t('cli.title')}
             </h1>
-            <p className="text-text-secondary mt-4 text-lg leading-relaxed">
-              {t('cli.subtitle')}
-            </p>
+            <p className="text-text-secondary mt-4 text-lg leading-relaxed">{t('cli.subtitle')}</p>
           </FadeInUp>
         </div>
       </SectionWrapper>

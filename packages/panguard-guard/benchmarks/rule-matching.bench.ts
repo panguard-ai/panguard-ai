@@ -39,13 +39,7 @@ const CATEGORIES = [
   'dns_tunneling',
 ];
 
-const SEVERITIES: SecurityEvent['severity'][] = [
-  'info',
-  'low',
-  'medium',
-  'high',
-  'critical',
-];
+const SEVERITIES: SecurityEvent['severity'][] = ['info', 'low', 'medium', 'high', 'critical'];
 
 function makeSyntheticEvent(index: number): SecurityEvent {
   return {

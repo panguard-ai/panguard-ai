@@ -22,11 +22,14 @@ export interface ToolDescription {
   /** JSON Schema for the tool's parameters / 工具參數的 JSON Schema */
   parameters: {
     type: 'object';
-    properties: Record<string, {
-      type: string;
-      description: string;
-      enum?: string[];
-    }>;
+    properties: Record<
+      string,
+      {
+        type: string;
+        description: string;
+        enum?: string[];
+      }
+    >;
     required: string[];
   };
 }

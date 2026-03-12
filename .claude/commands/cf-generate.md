@@ -22,9 +22,11 @@ When the user invokes `/cf:generate`, you will:
 ### Parameters
 
 **Required:**
+
 - `<brief>` - Campaign brief, product launch, or content description
 
 **Optional:**
+
 - `--formats` - Content formats to generate (default: blog,email,social)
   - Options: blog, email, social, video, podcast, landing-page, ad-copy
 - `--quantity` - How many of each format (default: varies by format)
@@ -41,6 +43,7 @@ When the user invokes `/cf:generate`, you will:
 ### Step 1: Brief Analysis
 
 Extract from the brief:
+
 - **Campaign name** - What to call this campaign
 - **Campaign type** - Product launch, thought leadership, lead gen, etc.
 - **Target audience** - Who is this for? (Personas)
@@ -50,6 +53,7 @@ Extract from the brief:
 - **Tone** - How should content sound?
 
 **If brief is minimal:** Ask clarifying questions before proceeding:
+
 - Who is the target audience?
 - What action should they take?
 - What's the key message?
@@ -60,6 +64,7 @@ Extract from the brief:
 Based on the brief and requested formats, plan:
 
 **For Blogs:**
+
 - Determine number of posts (default: 3-5)
 - Assign topics (mix of educational, promotional, thought leadership)
 - Plan structure (how-to, list, case study, analysis)
@@ -67,6 +72,7 @@ Based on the brief and requested formats, plan:
 - Plan publishing schedule
 
 **For Emails:**
+
 - Determine sequence type (welcome, nurture, launch, etc.)
 - Plan number of emails (default: 5-7)
 - Assign purpose to each email (introduce, educate, convert, etc.)
@@ -74,6 +80,7 @@ Based on the brief and requested formats, plan:
 - Plan CTAs for each email
 
 **For Social:**
+
 - Determine platform mix (LinkedIn, Twitter, Instagram, etc.)
 - Plan post frequency (daily, 3x/week, etc.)
 - Mix content types (promotional, educational, engagement)
@@ -81,12 +88,14 @@ Based on the brief and requested formats, plan:
 - Coordinate with other content (promote blogs, etc.)
 
 **For Video:**
+
 - Plan video types (explainer, demo, testimonial, etc.)
 - Determine length (30 sec, 90 sec, 3 min, etc.)
 - Create script structure
 - Include visual descriptions
 
 **For Other Formats:**
+
 - Adapt planning to format requirements
 
 ### Step 3: Content Generation
@@ -96,6 +105,7 @@ Generate all content based on the plan. Use this structure:
 #### Blog Posts
 
 For each blog post:
+
 1. **Title** (SEO-optimized, attention-grabbing)
 2. **Meta description** (150-160 characters)
 3. **Introduction** (Hook, context, promise)
@@ -111,6 +121,7 @@ For each blog post:
 #### Email Copy
 
 For each email:
+
 1. **Subject lines** (3 A/B test options)
 2. **Preview text** (complementary to subject)
 3. **Email body** (structured for skimming)
@@ -124,6 +135,7 @@ For each email:
 #### Social Media Posts
 
 For each post:
+
 1. **Platform-specific copy** (respect character limits)
 2. **Hook** (first line must grab attention)
 3. **Value** (why should they care?)
@@ -132,6 +144,7 @@ For each post:
 6. **Visual suggestions** (what image/video to use)
 
 **Length by platform:**
+
 - LinkedIn: 100-150 words (can go longer for thought leadership)
 - Twitter/X: 280 characters or thread structure
 - Instagram: 125-150 words + emojis
@@ -140,6 +153,7 @@ For each post:
 #### Video Scripts
 
 For each video:
+
 1. **Title & concept**
 2. **Length** (target duration)
 3. **Scene-by-scene script**
@@ -155,12 +169,14 @@ For each video:
 For each piece of content, validate:
 
 #### Brand Voice Check
+
 - Does it match brand tone and style?
 - Does it use approved terminology?
 - Does it align with brand values?
 - Is the messaging consistent?
 
 #### SEO Optimization
+
 - Are target keywords included naturally?
 - Is meta description optimized?
 - Are headers structured properly (H1, H2, H3)?
@@ -168,6 +184,7 @@ For each piece of content, validate:
 - Are internal/external links suggested?
 
 #### Conversion Optimization
+
 - Is there a clear CTA?
 - Does it address objections?
 - Is the value proposition clear?
@@ -228,6 +245,7 @@ After generation, provide:
 # Content Generation Complete: [Campaign Name]
 
 ## Campaign Overview
+
 - **Campaign:** [Name]
 - **Formats:** [What was generated]
 - **Total Pieces:** [Number]
@@ -237,23 +255,27 @@ After generation, provide:
 ## Generated Content Summary
 
 ### Blog Posts (X)
+
 1. **[Title]** - [Topic] - [SEO keywords] - [Target publish date]
 2. **[Title]** - [Topic] - [SEO keywords] - [Target publish date]
-...
+   ...
 
 ### Email Sequence (X emails)
+
 1. **[Email name]** - [Purpose] - [Send timing]
 2. **[Email name]** - [Purpose] - [Send timing]
-...
+   ...
 
 ### Social Media (X posts)
+
 - **LinkedIn:** X posts
 - **Twitter:** X posts
 - **Instagram:** X posts
 
 ### Video Scripts (X)
+
 1. **[Video title]** - [Length] - [Concept]
-...
+   ...
 
 ## Quality Check Results
 
@@ -277,6 +299,7 @@ After generation, provide:
 - **First publish date:** [date]
 
 Would you like me to:
+
 - Generate additional content for any format?
 - Refine any specific pieces?
 - Create variations for A/B testing?
@@ -288,6 +311,7 @@ Would you like me to:
 ### Example 1: Product Launch
 
 **Input:**
+
 ```bash
 /cf:generate "FocusFlow 2.0 Launch - productivity app for remote teams" \
   --formats "blog,email,social" \
@@ -297,6 +321,7 @@ Would you like me to:
 ```
 
 **What you do:**
+
 1. Analyze: Product launch, remote teams audience, 4-week campaign
 2. Plan:
    - 5 blogs: 1 announcement, 1 feature deep-dive, 1 comparison, 1 how-to, 1 customer story
@@ -310,6 +335,7 @@ Would you like me to:
 ### Example 2: Thought Leadership Series
 
 **Input:**
+
 ```bash
 /cf:generate "Future of Work thought leadership series" \
   --formats "blog,social,video" \
@@ -317,6 +343,7 @@ Would you like me to:
 ```
 
 **What you do:**
+
 1. Analyze: Thought leadership, likely C-level audience, educational goal
 2. Plan 10 blog topics on future of work themes
 3. Plan social to promote blogs + standalone insights
@@ -327,6 +354,7 @@ Would you like me to:
 ### Example 3: Content Repurposing (via generate)
 
 **Input:**
+
 ```bash
 /cf:generate "Monthly newsletter content" \
   --formats "email,social" \
@@ -335,6 +363,7 @@ Would you like me to:
 ```
 
 **What you do:**
+
 1. Plan 4 newsletters (weekly)
 2. Each newsletter → 15 social posts (repurposing key points)
 3. Generate newsletters first
@@ -345,6 +374,7 @@ Would you like me to:
 ## Brand Voice Integration
 
 If `--brand-guidelines` provided, read the file and ensure all content:
+
 - Matches specified tone
 - Uses approved terminology
 - Avoids forbidden phrases
@@ -352,15 +382,19 @@ If `--brand-guidelines` provided, read the file and ensure all content:
 - Follows style preferences
 
 **Example brand guidelines:**
+
 ```markdown
 ## Voice
+
 Professional yet friendly, data-driven, optimistic
 
 ## Terminology
+
 ✓ Use: workspace, project, collaboration
 ✗ Avoid: folder, task list, teamwork
 
 ## Style
+
 - Oxford comma: yes
 - Contractions: acceptable
 - Numbers: spell out one-nine
@@ -369,6 +403,7 @@ Professional yet friendly, data-driven, optimistic
 ## SEO Best Practices
 
 For all blog content:
+
 - Include target keyword in title, first paragraph, H2 headers
 - Keep keyword density 1-2%
 - Create compelling meta descriptions (150-160 chars)
@@ -380,6 +415,7 @@ For all blog content:
 ## Tone Adaptation
 
 Adapt tone based on:
+
 - **Format:** Blogs more detailed, social more casual, emails more personal
 - **Platform:** LinkedIn professional, Twitter concise, Instagram visual
 - **Audience:** Technical audiences get details, executives get summaries
@@ -388,12 +424,14 @@ Adapt tone based on:
 ## Performance Tips
 
 For fast generation:
+
 - Use template structures
 - Parallel thinking (plan all first, then generate)
 - Reuse research across pieces
 - Cross-reference content (blog → email → social)
 
 For quality generation:
+
 - Deep research for each piece
 - Unique angles for each topic
 - Comprehensive examples

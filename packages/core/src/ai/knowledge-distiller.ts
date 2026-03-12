@@ -213,9 +213,7 @@ export class KnowledgeDistiller {
       ...selectionEntries,
       `  condition: selection`,
       `level: ${severity}`,
-      technique !== 'unknown'
-        ? `tags:\n  - attack.${technique.toLowerCase()}`
-        : '',
+      technique !== 'unknown' ? `tags:\n  - attack.${technique.toLowerCase()}` : '',
     ]
       .filter((line) => line.length > 0)
       .join('\n');

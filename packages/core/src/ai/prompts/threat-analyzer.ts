@@ -23,14 +23,16 @@ import type { Language } from '../../types.js';
  * @returns Sanitized string / 清洗後的字串
  */
 export function sanitizeInput(input: string): string {
-  return input
-    // Strip attempts to close our boundary tags
-    .replace(/<\/?event_data>/gi, '')
-    .replace(/<\/?additional_context>/gi, '')
-    // Strip common system/role override attempts
-    .replace(/\b(system|assistant)\s*:/gi, '[role-ref]:')
-    // Strip markdown-style instruction blocks that try to hijack the prompt
-    .replace(/```\s*(system|instruction|prompt)\b/gi, '```blocked-$1');
+  return (
+    input
+      // Strip attempts to close our boundary tags
+      .replace(/<\/?event_data>/gi, '')
+      .replace(/<\/?additional_context>/gi, '')
+      // Strip common system/role override attempts
+      .replace(/\b(system|assistant)\s*:/gi, '[role-ref]:')
+      // Strip markdown-style instruction blocks that try to hijack the prompt
+      .replace(/```\s*(system|instruction|prompt)\b/gi, '```blocked-$1')
+  );
 }
 
 /**

@@ -229,9 +229,7 @@ describe('PlaybookEngine', () => {
 
     it('should return null when no matching pattern', () => {
       const verdict = makeVerdict();
-      const patterns: PlaybookCorrelationMatch[] = [
-        { type: 'lateral_movement', confidence: 90 },
-      ];
+      const patterns: PlaybookCorrelationMatch[] = [{ type: 'lateral_movement', confidence: 90 }];
 
       const matched = engine.match(verdict, patterns);
 
@@ -289,10 +287,7 @@ describe('PlaybookEngine', () => {
         priority: 200, // Higher priority but disabled
       };
 
-      const engineWithDisabled = new PlaybookEngine([
-        disabledPlaybook,
-        makeBruteForcePlaybook(),
-      ]);
+      const engineWithDisabled = new PlaybookEngine([disabledPlaybook, makeBruteForcePlaybook()]);
 
       const verdict = makeVerdict();
       const patterns = makeBruteForcePatterns();
@@ -599,9 +594,7 @@ escalation:
 
       // Create verdict and patterns
       const verdict = makeVerdict({ confidence: 70 });
-      const patterns: PlaybookCorrelationMatch[] = [
-        { type: 'reconnaissance', confidence: 70 },
-      ];
+      const patterns: PlaybookCorrelationMatch[] = [{ type: 'reconnaissance', confidence: 70 }];
 
       // Match
       const matched = intEngine.match(verdict, patterns);

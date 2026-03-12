@@ -3,12 +3,15 @@
 Build a targeted cold email campaign from scratch using Apollo prospecting.
 
 ## What This Does
+
 Apollo (prospect) → Million Verifier (verify) → Claude (personalize) → Instantly (send)
 
 Use this when you don't have a LinkedIn post to scrape — you're going outbound to a specific ICP.
 
 ## Input
+
 User provides target criteria, e.g.:
+
 - "CTO at SaaS companies, 20-200 employees, Taiwan"
 - "DevOps engineers at fintech startups, US"
 - "IT managers at e-commerce companies"
@@ -33,11 +36,11 @@ curl -s https://api.apollo.io/v1/mixed_people/search \
 
 **Panguard ICP Segments:**
 
-| Segment | Titles | Company Size | Industry | Region |
-|---------|--------|-------------|----------|--------|
-| Taiwan SMB | CTO, IT Manager | 10-200 | Tech, E-commerce | Taiwan |
-| US Startups | CTO, DevOps Lead | 10-100 | SaaS, FinTech | US |
-| APAC DevOps | DevOps Engineer, SRE | 20-500 | Technology | APAC |
+| Segment     | Titles               | Company Size | Industry         | Region |
+| ----------- | -------------------- | ------------ | ---------------- | ------ |
+| Taiwan SMB  | CTO, IT Manager      | 10-200       | Tech, E-commerce | Taiwan |
+| US Startups | CTO, DevOps Lead     | 10-100       | SaaS, FinTech    | US     |
+| APAC DevOps | DevOps Engineer, SRE | 20-500       | Technology       | APAC   |
 
 ### 2. Verify emails (Million Verifier)
 
@@ -47,16 +50,17 @@ Batch verify all emails. Discard invalid.
 
 **Segment by pain point:**
 
-| Segment | Pain Point | Angle |
-|---------|-----------|-------|
-| No security team | "You probably don't have a dedicated security person" | DIY security in 60 seconds |
-| Compliance pressure | "SOC 2 / ISO 27001 deadline coming?" | Automated compliance reports |
-| Cost sensitive | "CrowdStrike quoted you $50k/year?" | Free tier + $29/mo Pro |
-| Developer-led | "Your devs are also your security team" | CLI-first, developer-friendly |
+| Segment             | Pain Point                                            | Angle                         |
+| ------------------- | ----------------------------------------------------- | ----------------------------- |
+| No security team    | "You probably don't have a dedicated security person" | DIY security in 60 seconds    |
+| Compliance pressure | "SOC 2 / ISO 27001 deadline coming?"                  | Automated compliance reports  |
+| Cost sensitive      | "CrowdStrike quoted you $50k/year?"                   | Free tier + $29/mo Pro        |
+| Developer-led       | "Your devs are also your security team"               | CLI-first, developer-friendly |
 
 **Email sequence (4 emails):**
 
 **Email 1 — Pain point hook:**
+
 ```
 Subject: [Company] + server security (quick question)
 
@@ -75,6 +79,7 @@ Would a 5-minute demo make sense?
 ```
 
 **Email 2 (Day 3) — Value add:**
+
 ```
 Subject: Re: [Company] + server security
 
@@ -92,6 +97,7 @@ Might be useful even if Panguard isn't a fit.
 ```
 
 **Email 3 (Day 7) — Social proof:**
+
 ```
 Subject: How [similar company] secured their servers in under a minute
 
@@ -107,6 +113,7 @@ Want me to show you what it finds on your servers?
 ```
 
 **Email 4 (Day 14) — Breakup:**
+
 ```
 Subject: closing the loop
 
@@ -129,12 +136,14 @@ Create campaign with the 4-email sequence, proper delays, and tracking.
 ### 5. Save output
 
 Save to `marketing/output/emails/`:
+
 - `prospects.json` — Apollo results
 - `verified.json` — verified leads
 - `sequences/` — email sequences per segment
 - `campaign-config.json` — Instantly campaign settings
 
 ## Volume Guidelines
+
 - Start with 50 emails/day (warm up period)
 - Scale to 200/day after 2 weeks
 - Use 3-5 sending accounts (rotate via Instantly)

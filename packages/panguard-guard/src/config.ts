@@ -117,7 +117,9 @@ export function loadConfig(configPath?: string): GuardConfig {
 function loadGuardConfigFile(path: string): GuardConfig {
   try {
     const raw = readFileSync(path, 'utf-8');
-    const parsed = JSON.parse(raw) as Partial<GuardConfig> & { actionThresholds?: Partial<GuardConfig['actionPolicy']> };
+    const parsed = JSON.parse(raw) as Partial<GuardConfig> & {
+      actionThresholds?: Partial<GuardConfig['actionPolicy']>;
+    };
     // Support legacy `actionThresholds` key from older deploy writes
     const policySource = parsed.actionPolicy ?? parsed.actionThresholds ?? {};
     const merged: GuardConfig = {
@@ -175,8 +177,7 @@ function loadFromMasterConfig(masterPath: string): GuardConfig {
     };
 
     // Map threat cloud API key from master config or env
-    const tcKey = (master['threatCloudApiKey'] as string | undefined)
-      ?? process.env['TC_API_KEY'];
+    const tcKey = (master['threatCloudApiKey'] as string | undefined) ?? process.env['TC_API_KEY'];
     if (tcKey) {
       config.threatCloudApiKey = tcKey;
     }
@@ -218,9 +219,7 @@ function buildNotificationConfig(
         ? { telegram: { botToken: cfg['botToken'], chatId: cfg['chatId'] } }
         : {};
     case 'slack':
-      return cfg['webhookUrl']
-        ? { slack: { webhookUrl: cfg['webhookUrl'] } }
-        : {};
+      return cfg['webhookUrl'] ? { slack: { webhookUrl: cfg['webhookUrl'] } } : {};
     case 'email':
       return cfg['host']
         ? {
@@ -235,13 +234,9 @@ function buildNotificationConfig(
           }
         : {};
     case 'webhook':
-      return cfg['url']
-        ? { webhook: { url: cfg['url'], secret: cfg['secret'] } }
-        : {};
+      return cfg['url'] ? { webhook: { url: cfg['url'], secret: cfg['secret'] } } : {};
     case 'line':
-      return cfg['accessToken']
-        ? { line: { accessToken: cfg['accessToken'] } }
-        : {};
+      return cfg['accessToken'] ? { line: { accessToken: cfg['accessToken'] } } : {};
     default:
       return {};
   }

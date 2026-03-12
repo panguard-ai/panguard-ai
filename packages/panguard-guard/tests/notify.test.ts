@@ -126,11 +126,7 @@ describe('sendNotifications', () => {
       const results = await sendNotifications(config, verdict, 'SQL injection attempt');
 
       expect(mockSendSlack).toHaveBeenCalledTimes(1);
-      expect(mockSendSlack).toHaveBeenCalledWith(
-        config.slack,
-        verdict,
-        'SQL injection attempt'
-      );
+      expect(mockSendSlack).toHaveBeenCalledWith(config.slack, verdict, 'SQL injection attempt');
       expect(results).toHaveLength(1);
       expect(results[0].channel).toBe('slack');
       expect(results[0].success).toBe(true);
@@ -171,11 +167,7 @@ describe('sendNotifications', () => {
       const results = await sendNotifications(config, verdict, 'Malware detected');
 
       expect(mockSendEmail).toHaveBeenCalledTimes(1);
-      expect(mockSendEmail).toHaveBeenCalledWith(
-        config.email,
-        verdict,
-        'Malware detected'
-      );
+      expect(mockSendEmail).toHaveBeenCalledWith(config.email, verdict, 'Malware detected');
       expect(results).toHaveLength(1);
       expect(results[0].channel).toBe('email');
       expect(results[0].success).toBe(true);
@@ -256,11 +248,7 @@ describe('sendNotifications', () => {
       const results = await sendNotifications(config, verdict, 'Webhook test');
 
       expect(mockSendWebhook).toHaveBeenCalledTimes(1);
-      expect(mockSendWebhook).toHaveBeenCalledWith(
-        config.webhook,
-        verdict,
-        'Webhook test'
-      );
+      expect(mockSendWebhook).toHaveBeenCalledWith(config.webhook, verdict, 'Webhook test');
       expect(results).toHaveLength(1);
       expect(results[0].channel).toBe('webhook');
       expect(results[0].success).toBe(true);
@@ -277,11 +265,7 @@ describe('sendNotifications', () => {
       const results = await sendNotifications(config, verdict, 'LINE test');
 
       expect(mockSendLine).toHaveBeenCalledTimes(1);
-      expect(mockSendLine).toHaveBeenCalledWith(
-        config.line,
-        verdict,
-        'LINE test'
-      );
+      expect(mockSendLine).toHaveBeenCalledWith(config.line, verdict, 'LINE test');
       expect(results).toHaveLength(1);
       expect(results[0].channel).toBe('line');
       expect(results[0].success).toBe(true);

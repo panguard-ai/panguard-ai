@@ -28,7 +28,13 @@ interface NavItem {
 }
 
 const NAV_ITEMS: readonly NavItem[] = [
-  { id: 'dashboard', label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard, enabled: true },
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    href: '/admin/dashboard',
+    icon: LayoutDashboard,
+    enabled: true,
+  },
   { id: 'endpoints', label: 'Endpoints', href: '/admin/endpoints', icon: Monitor, enabled: true },
   { id: 'threats', label: 'Threats', href: '/admin/threats', icon: ShieldAlert, enabled: true },
   { id: 'policies', label: 'Policies', href: '/admin/policies', icon: FileText, enabled: false },
@@ -150,9 +156,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 <Icon className="w-4.5 h-4.5" />
                 <span className="text-sm font-medium">{item.label}</span>
-                {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-sage" />
-                )}
+                {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-sage" />}
               </Link>
             );
           })}
@@ -197,16 +201,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <Menu className="w-5 h-5" />
           </button>
-          <Link href="/" className="flex items-center gap-1.5 text-text-tertiary hover:text-text-secondary transition-colors">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-text-tertiary hover:text-text-secondary transition-colors"
+          >
             <ChevronLeft className="w-4 h-4" />
             <span className="text-xs">Back to site</span>
           </Link>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

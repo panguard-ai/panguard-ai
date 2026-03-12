@@ -34,6 +34,7 @@ Run through the complete launch readiness checklist for Panguard AI.
 ## Launch Day Sequence
 
 ### T-1 Day (Preparation)
+
 - [ ] Draft Product Hunt listing (tagline, description, 5 images, maker comment)
 - [ ] Draft Show HN post (plain text, no marketing speak)
 - [ ] Pre-write 5 tweets for launch day thread
@@ -41,6 +42,7 @@ Run through the complete launch readiness checklist for Panguard AI.
 - [ ] Email early access list (if any)
 
 ### T-0 (Launch Day)
+
 - [ ] Submit to Product Hunt at 12:01 AM PT
 - [ ] Post Show HN at 8 AM PT / 11 PM Taipei
 - [ ] Tweet launch thread
@@ -50,12 +52,15 @@ Run through the complete launch readiness checklist for Panguard AI.
 - [ ] Share launch link with friends/network for initial upvotes
 
 ### T+1 Day (Follow-up)
+
 - [ ] Thank voters and commenters
 - [ ] Write "lessons learned" tweet thread
 - [ ] Check analytics for traffic spike sources
 - [ ] Follow up with any interested users/leads
 
 ## Output
+
 For each item, check the current state and report:
+
 - PASS / FAIL / SKIP
 - Action needed if FAIL

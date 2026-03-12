@@ -68,8 +68,12 @@ export default function ProductOverview() {
               >
                 {Icon && <Icon className="w-6 h-6 text-panguard-green mb-3" />}
                 <div className="flex items-center justify-between gap-1.5 sm:gap-2">
-                  <h3 className="text-base sm:text-lg font-bold text-text-primary">{product.name}</h3>
-                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${style.bg}`}>
+                  <h3 className="text-base sm:text-lg font-bold text-text-primary">
+                    {product.name}
+                  </h3>
+                  <span
+                    className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${style.bg}`}
+                  >
                     <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
                     {maturity === 'ComingSoon' ? 'Soon' : maturity}
                   </span>

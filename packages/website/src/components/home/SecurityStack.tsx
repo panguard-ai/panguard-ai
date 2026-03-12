@@ -15,8 +15,8 @@ export default function SecurityStack() {
   const t = useTranslations('revolution.securityStack');
   const stats = useRuleStatsContext();
 
-  const preItems = (t.raw('preDeployment.items') as string[]).map(
-    (item) => interpolateStats(item, stats)
+  const preItems = (t.raw('preDeployment.items') as string[]).map((item) =>
+    interpolateStats(item, stats)
   );
   const postItems = t.raw('postDeployment.items') as string[];
 
@@ -80,9 +80,7 @@ export default function SecurityStack() {
             <h3 className="text-lg font-semibold text-text-primary mt-2">
               {t('preDeployment.title')}
             </h3>
-            <p className="text-sm text-panguard-green font-mono mt-1">
-              {t('preDeployment.tools')}
-            </p>
+            <p className="text-sm text-panguard-green font-mono mt-1">{t('preDeployment.tools')}</p>
             <ul className="mt-4 space-y-3">
               {preItems.map((item, i) => (
                 <li key={i} className="flex items-start gap-2">

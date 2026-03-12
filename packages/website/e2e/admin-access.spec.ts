@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { setupAuthenticatedUser, setupAuthenticatedAdmin, setupUnauthenticated } from './fixtures/auth';
+import {
+  setupAuthenticatedUser,
+  setupAuthenticatedAdmin,
+  setupUnauthenticated,
+} from './fixtures/auth';
 
 test.describe('Admin Access Control', () => {
   test('redirects unauthenticated user to login', async ({ page }) => {

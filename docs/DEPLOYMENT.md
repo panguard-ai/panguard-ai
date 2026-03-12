@@ -20,25 +20,25 @@
 
 ## Prerequisites
 
-| Requirement | Version | Notes |
-|-------------|---------|-------|
-| Node.js | >= 20 (22 recommended) | Required for all deployments |
-| pnpm | >= 9.0.0 | Package manager for monorepo |
-| Docker | >= 24.0 | For containerized deployments |
-| Docker Compose | >= 2.20 | For multi-container setups |
-| Linux | Kernel 4.18+ | Required for eBPF, Falco, rootkit detection |
-| Falco | >= 0.35 | Optional: kernel-level monitoring |
-| Suricata | >= 7.0 | Optional: network IDS |
-| Ollama | >= 0.1.0 | Optional: local AI analysis |
+| Requirement    | Version                | Notes                                       |
+| -------------- | ---------------------- | ------------------------------------------- |
+| Node.js        | >= 20 (22 recommended) | Required for all deployments                |
+| pnpm           | >= 9.0.0               | Package manager for monorepo                |
+| Docker         | >= 24.0                | For containerized deployments               |
+| Docker Compose | >= 2.20                | For multi-container setups                  |
+| Linux          | Kernel 4.18+           | Required for eBPF, Falco, rootkit detection |
+| Falco          | >= 0.35                | Optional: kernel-level monitoring           |
+| Suricata       | >= 7.0                 | Optional: network IDS                       |
+| Ollama         | >= 0.1.0               | Optional: local AI analysis                 |
 
 ### OS Support
 
-| Platform | Guard Agent | Manager | Response Actions |
-|----------|-------------|---------|-----------------|
+| Platform          | Guard Agent  | Manager      | Response Actions                        |
+| ----------------- | ------------ | ------------ | --------------------------------------- |
 | Linux (x64/arm64) | Full support | Full support | iptables, process kill, account disable |
-| macOS (x64/arm64) | Full support | Full support | pfctl, process kill, account disable |
-| Windows (x64) | Full support | Full support | netsh, process kill, account disable |
-| Docker | Full support | Full support | Host firewall via capabilities |
+| macOS (x64/arm64) | Full support | Full support | pfctl, process kill, account disable    |
+| Windows (x64)     | Full support | Full support | netsh, process kill, account disable    |
+| Docker            | Full support | Full support | Host firewall via capabilities          |
 
 ---
 
@@ -98,6 +98,7 @@ panguard init --language en --mode learning
 ```
 
 The `init` command creates:
+
 - `~/.panguard/config.json` -- global configuration
 - `~/.panguard/llm.enc` -- encrypted AI provider credentials (if configured)
 - `./data/` -- local data directory for baselines, logs, and rules
@@ -289,7 +290,13 @@ services:
     networks:
       - panguard-net
     healthcheck:
-      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -299,7 +306,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: panguard-manager
-    command: ["node", "dist/cli/index.js", "manager", "--port", "8443"]
+    command: ['node', 'dist/cli/index.js', 'manager', '--port', '8443']
     restart: unless-stopped
     ports:
       - '8443:8443'
@@ -386,6 +393,7 @@ pnpm panguard guard \
 ```
 
 The Guard agent will:
+
 1. Register with the Manager on startup
 2. Send heartbeats every 30 seconds
 3. Report detected threats in real-time
@@ -409,76 +417,76 @@ curl -H "Authorization: Bearer your-secure-token" \
 
 ### Guard Agent
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PANGUARD_DATA_DIR` | `./data` | Data directory for baselines, logs, rules |
-| `PANGUARD_MODE` | `learning` | Guard mode: `learning` or `protection` |
-| `PANGUARD_LLM_MODEL` | (auto-detect) | Override AI model name |
-| `PANGUARD_SYSLOG_SERVER` | (none) | Syslog forwarding destination host |
-| `PANGUARD_SYSLOG_PORT` | `514` | Syslog forwarding destination port |
-| `OLLAMA_ENDPOINT` | `http://localhost:11434` | Ollama API endpoint |
-| `ANTHROPIC_API_KEY` | (none) | Claude API key for cloud AI |
-| `OPENAI_API_KEY` | (none) | OpenAI API key for cloud AI |
-| `ABUSEIPDB_KEY` | (none) | AbuseIPDB API key for threat intel |
+| Variable                 | Default                  | Description                               |
+| ------------------------ | ------------------------ | ----------------------------------------- |
+| `PANGUARD_DATA_DIR`      | `./data`                 | Data directory for baselines, logs, rules |
+| `PANGUARD_MODE`          | `learning`               | Guard mode: `learning` or `protection`    |
+| `PANGUARD_LLM_MODEL`     | (auto-detect)            | Override AI model name                    |
+| `PANGUARD_SYSLOG_SERVER` | (none)                   | Syslog forwarding destination host        |
+| `PANGUARD_SYSLOG_PORT`   | `514`                    | Syslog forwarding destination port        |
+| `OLLAMA_ENDPOINT`        | `http://localhost:11434` | Ollama API endpoint                       |
+| `ANTHROPIC_API_KEY`      | (none)                   | Claude API key for cloud AI               |
+| `OPENAI_API_KEY`         | (none)                   | OpenAI API key for cloud AI               |
+| `ABUSEIPDB_KEY`          | (none)                   | AbuseIPDB API key for threat intel        |
 
 ### Manager Server
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `MANAGER_PORT` | `8443` | Manager HTTP server port |
-| `MANAGER_AUTH_TOKEN` | (none) | Bearer token for API authentication |
-| `MANAGER_MAX_AGENTS` | `500` | Maximum registered agents |
-| `MANAGER_HEARTBEAT_TIMEOUT_MS` | `90000` | Heartbeat timeout before marking agent stale |
-| `MANAGER_HEARTBEAT_INTERVAL_MS` | `30000` | Interval for stale agent checks |
-| `MANAGER_CORRELATION_WINDOW_MS` | `300000` | Cross-agent threat correlation window |
-| `MANAGER_THREAT_RETENTION_MS` | `86400000` | Threat data retention period (default 24h) |
-| `CORS_ALLOWED_ORIGINS` | (none) | Comma-separated allowed CORS origins |
+| Variable                        | Default    | Description                                  |
+| ------------------------------- | ---------- | -------------------------------------------- |
+| `MANAGER_PORT`                  | `8443`     | Manager HTTP server port                     |
+| `MANAGER_AUTH_TOKEN`            | (none)     | Bearer token for API authentication          |
+| `MANAGER_MAX_AGENTS`            | `500`      | Maximum registered agents                    |
+| `MANAGER_HEARTBEAT_TIMEOUT_MS`  | `90000`    | Heartbeat timeout before marking agent stale |
+| `MANAGER_HEARTBEAT_INTERVAL_MS` | `30000`    | Interval for stale agent checks              |
+| `MANAGER_CORRELATION_WINDOW_MS` | `300000`   | Cross-agent threat correlation window        |
+| `MANAGER_THREAT_RETENTION_MS`   | `86400000` | Threat data retention period (default 24h)   |
+| `CORS_ALLOWED_ORIGINS`          | (none)     | Comma-separated allowed CORS origins         |
 
 ### Auth Server
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PANGUARD_PORT` | `3000` | API server port |
-| `JWT_SECRET` | (none) | JWT signing secret (required in production) |
-| `GOOGLE_CLIENT_ID` | (none) | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | (none) | Google OAuth client secret |
-| `LEMONSQUEEZY_API_KEY` | (none) | LemonSqueezy billing API key |
-| `LEMONSQUEEZY_WEBHOOK_SECRET` | (none) | LemonSqueezy webhook signing secret |
+| Variable                      | Default | Description                                 |
+| ----------------------------- | ------- | ------------------------------------------- |
+| `PANGUARD_PORT`               | `3000`  | API server port                             |
+| `JWT_SECRET`                  | (none)  | JWT signing secret (required in production) |
+| `GOOGLE_CLIENT_ID`            | (none)  | Google OAuth client ID                      |
+| `GOOGLE_CLIENT_SECRET`        | (none)  | Google OAuth client secret                  |
+| `LEMONSQUEEZY_API_KEY`        | (none)  | LemonSqueezy billing API key                |
+| `LEMONSQUEEZY_WEBHOOK_SECRET` | (none)  | LemonSqueezy webhook signing secret         |
 
 ### Threat Cloud Server
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `TC_API_KEYS` | (none) | Comma-separated API keys |
-| `TC_PORT` | (configurable) | Server port |
-| `TC_DB_PATH` | (configurable) | SQLite database path |
-| `ALLOW_ANONYMOUS_UPLOAD` | `false` | Allow anonymous threat data uploads |
-| `CORS_ALLOWED_ORIGINS` | `https://panguard.ai,...` | CORS origins |
-| `NODE_ENV` | `development` | Set to `production` for hardened mode |
+| Variable                 | Default                   | Description                           |
+| ------------------------ | ------------------------- | ------------------------------------- |
+| `TC_API_KEYS`            | (none)                    | Comma-separated API keys              |
+| `TC_PORT`                | (configurable)            | Server port                           |
+| `TC_DB_PATH`             | (configurable)            | SQLite database path                  |
+| `ALLOW_ANONYMOUS_UPLOAD` | `false`                   | Allow anonymous threat data uploads   |
+| `CORS_ALLOWED_ORIGINS`   | `https://panguard.ai,...` | CORS origins                          |
+| `NODE_ENV`               | `development`             | Set to `production` for hardened mode |
 
 ### Docker / Production
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `NODE_ENV` | `development` | Set to `production` for hardened mode |
-| `PANGUARD_DATA_DIR` | `/data` | Data directory (Docker volume mount point) |
+| Variable            | Default       | Description                                |
+| ------------------- | ------------- | ------------------------------------------ |
+| `NODE_ENV`          | `development` | Set to `production` for hardened mode      |
+| `PANGUARD_DATA_DIR` | `/data`       | Data directory (Docker volume mount point) |
 
 ---
 
 ## Port Reference
 
-| Port | Service | Protocol | Notes |
-|------|---------|----------|-------|
-| `3000` | API Server (Auth + Web) | HTTP | Main entry point, serves API and admin dashboard |
-| `8443` | Manager Server | HTTP | Agent registration, heartbeats, threat reports, SSE |
-| `11434` | Ollama | HTTP | Local AI inference |
-| `2222` | Trap: SSH Honeypot | TCP | Default SSH trap port |
-| `8080` | Trap: HTTP Honeypot | TCP | Default HTTP trap port |
-| `2121` | Trap: FTP Honeypot | TCP | Default FTP trap port |
-| `4450` | Trap: SMB Honeypot | TCP | Default SMB trap port |
-| `3307` | Trap: MySQL Honeypot | TCP | Default MySQL trap port |
-| `3390` | Trap: RDP Honeypot | TCP | Default RDP trap port |
-| `2323` | Trap: Telnet Honeypot | TCP | Default Telnet trap port |
+| Port    | Service                 | Protocol | Notes                                               |
+| ------- | ----------------------- | -------- | --------------------------------------------------- |
+| `3000`  | API Server (Auth + Web) | HTTP     | Main entry point, serves API and admin dashboard    |
+| `8443`  | Manager Server          | HTTP     | Agent registration, heartbeats, threat reports, SSE |
+| `11434` | Ollama                  | HTTP     | Local AI inference                                  |
+| `2222`  | Trap: SSH Honeypot      | TCP      | Default SSH trap port                               |
+| `8080`  | Trap: HTTP Honeypot     | TCP      | Default HTTP trap port                              |
+| `2121`  | Trap: FTP Honeypot      | TCP      | Default FTP trap port                               |
+| `4450`  | Trap: SMB Honeypot      | TCP      | Default SMB trap port                               |
+| `3307`  | Trap: MySQL Honeypot    | TCP      | Default MySQL trap port                             |
+| `3390`  | Trap: RDP Honeypot      | TCP      | Default RDP trap port                               |
+| `2323`  | Trap: Telnet Honeypot   | TCP      | Default Telnet trap port                            |
 
 ---
 
@@ -614,19 +622,20 @@ sudo journalctl -u panguard-manager -f
 
 ### Log Locations
 
-| Component | Path | Format |
-|-----------|------|--------|
-| Guard events | `{dataDir}/events.jsonl` | JSONL (one JSON record per line) |
-| Guard actions | `{dataDir}/action-manifest.jsonl` | JSONL action history |
-| Guard baseline | `{dataDir}/baseline.json` | JSON baseline state |
-| Guard PID file | `{dataDir}/panguard-guard.pid` | Plain text PID |
-| Application logs | stdout/stderr (or syslog) | Structured JSON (via `createLogger`) |
-| Falco alerts | `/var/log/falco/alerts.json` | Falco JSON format |
-| Suricata EVE | `/var/log/suricata/eve.json` | Suricata EVE JSON |
-| YARA rules (custom) | `{dataDir}/yara-rules/custom/` | `.yar` files |
-| Sigma rules (custom) | `{dataDir}/rules/` | `.yml` Sigma YAML files |
+| Component            | Path                              | Format                               |
+| -------------------- | --------------------------------- | ------------------------------------ |
+| Guard events         | `{dataDir}/events.jsonl`          | JSONL (one JSON record per line)     |
+| Guard actions        | `{dataDir}/action-manifest.jsonl` | JSONL action history                 |
+| Guard baseline       | `{dataDir}/baseline.json`         | JSON baseline state                  |
+| Guard PID file       | `{dataDir}/panguard-guard.pid`    | Plain text PID                       |
+| Application logs     | stdout/stderr (or syslog)         | Structured JSON (via `createLogger`) |
+| Falco alerts         | `/var/log/falco/alerts.json`      | Falco JSON format                    |
+| Suricata EVE         | `/var/log/suricata/eve.json`      | Suricata EVE JSON                    |
+| YARA rules (custom)  | `{dataDir}/yara-rules/custom/`    | `.yar` files                         |
+| Sigma rules (custom) | `{dataDir}/rules/`                | `.yml` Sigma YAML files              |
 
 Default `dataDir` values:
+
 - CLI: `./data` or `--data-dir` flag
 - Docker: `/data` (mounted volume)
 - Systemd: `/var/panguard-guard` or `/var/panguard-manager`
@@ -635,13 +644,14 @@ Default `dataDir` values:
 
 The `ReportAgent` handles log rotation automatically for `events.jsonl`:
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `maxFileSizeBytes` | 50 MB | Rotate when file exceeds this size |
-| `maxRotatedFiles` | 10 | Maximum number of rotated files to keep |
-| `retentionDays` | 90 | Delete files older than this |
+| Setting            | Default | Description                             |
+| ------------------ | ------- | --------------------------------------- |
+| `maxFileSizeBytes` | 50 MB   | Rotate when file exceeds this size      |
+| `maxRotatedFiles`  | 10      | Maximum number of rotated files to keep |
+| `retentionDays`    | 90      | Delete files older than this            |
 
 Rotation naming scheme:
+
 ```
 events.jsonl        (current)
 events.jsonl.1      (most recent rotation)
@@ -687,15 +697,16 @@ The `SyslogAdapter` from `security-hardening` forwards structured events to the 
 
 ### Capabilities Required (Linux)
 
-| Capability | Purpose |
-|------------|---------|
-| `CAP_NET_ADMIN` | Block IPs via iptables |
-| `CAP_KILL` | Terminate malicious processes |
+| Capability       | Purpose                              |
+| ---------------- | ------------------------------------ |
+| `CAP_NET_ADMIN`  | Block IPs via iptables               |
+| `CAP_KILL`       | Terminate malicious processes        |
 | `CAP_SYS_PTRACE` | Memory scanning for fileless malware |
 
 ### Docker Security
 
 The production Docker image:
+
 - Uses multi-stage build (build dependencies not in final image)
 - Runs as non-root user (`panguard:1001`)
 - Uses `tini` as PID 1 for proper signal handling and zombie reaping
@@ -719,12 +730,12 @@ Tagged releases are built and published automatically via CI.
 
 Each release produces pre-compiled binaries for 4 target platforms:
 
-| Platform | Target |
-|----------|--------|
+| Platform            | Target         |
+| ------------------- | -------------- |
 | macOS Apple Silicon | `darwin-arm64` |
-| Linux x86-64 | `linux-x64` |
-| Linux ARM 64-bit | `linux-arm64` |
-| Windows x86-64 | `win-x64` |
+| Linux x86-64        | `linux-x64`    |
+| Linux ARM 64-bit    | `linux-arm64`  |
+| Windows x86-64      | `win-x64`      |
 
 ### npm Auto-Publish
 
@@ -742,6 +753,7 @@ git push origin v0.3.3
 ```
 
 The CI pipeline will:
+
 1. Run the full test suite (`pnpm test`)
 2. Build all packages (`pnpm build`)
 3. Compile platform binaries for all 4 targets

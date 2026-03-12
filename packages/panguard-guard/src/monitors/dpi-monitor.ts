@@ -83,9 +83,7 @@ interface ConnectionRecord {
 }
 
 /** Known DNS tunneling domains / 已知 DNS 隧道網域 */
-const KNOWN_TUNNEL_DOMAINS = new Set([
-  'dnscat2', 'iodine', 'dns2tcp', 'dnstt',
-]);
+const KNOWN_TUNNEL_DOMAINS = new Set(['dnscat2', 'iodine', 'dns2tcp', 'dnstt']);
 
 /** Entropy threshold for DNS tunneling (base32/base64 encoded data) */
 const DNS_ENTROPY_THRESHOLD = 3.5;
@@ -138,12 +136,7 @@ function parseProcNetTcp(content: string): readonly ConnectionRecord[] {
 function hexToIPv4(hex: string): string {
   if (hex.length !== 8) return hex;
   const num = parseInt(hex, 16);
-  return [
-    num & 0xff,
-    (num >> 8) & 0xff,
-    (num >> 16) & 0xff,
-    (num >> 24) & 0xff,
-  ].join('.');
+  return [num & 0xff, (num >> 8) & 0xff, (num >> 16) & 0xff, (num >> 24) & 0xff].join('.');
 }
 
 /**
@@ -192,7 +185,10 @@ export class DpiMonitor extends EventEmitter {
   private previousSnapshotTime = 0;
 
   /** Data transfer tracking / 資料傳輸追蹤 */
-  private readonly dataTransfer = new Map<string, { bytesOut: number; bytesIn: number; firstSeen: number }>();
+  private readonly dataTransfer = new Map<
+    string,
+    { bytesOut: number; bytesIn: number; firstSeen: number }
+  >();
 
   constructor(pollIntervalMs = 5000) {
     super();
@@ -601,7 +597,8 @@ export class DpiMonitor extends EventEmitter {
 
       const mean = tracker.intervals.reduce((a, b) => a + b, 0) / tracker.intervals.length;
       const variance =
-        tracker.intervals.reduce((sum, val) => sum + (val - mean) ** 2, 0) / tracker.intervals.length;
+        tracker.intervals.reduce((sum, val) => sum + (val - mean) ** 2, 0) /
+        tracker.intervals.length;
       const stddev = Math.sqrt(variance);
       const jitter = mean > 0 ? stddev / mean : 1;
 

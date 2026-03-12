@@ -120,21 +120,21 @@ graph LR
 
 ### Package Summary
 
-| # | Package | npm Scope | Key Responsibilities |
-|---|---------|-----------|---------------------|
-| 1 | `core` | `@panguard-ai/core` | Rule engine, monitor engine, AI providers (Ollama/Claude/OpenAI), FunnelRouter, YARA scanner, threat intel feed manager, i18n, structured logger |
-| 2 | `panguard-guard` | `@panguard-ai/panguard-guard` | 4-agent pipeline, event correlation, baseline memory, 6 advanced monitors, response execution, dashboard server, agent client |
-| 3 | `panguard-manager` | `@panguard-ai/panguard-manager` | Agent registry (max 500), threat aggregation with cross-agent correlation, policy engine, SSE broadcasting, optional SQLite persistence |
-| 4 | `panguard-auth` | `@panguard-ai/panguard-auth` | User registration, login, TOTP 2FA, Google OAuth, password reset, rate limiting, GDPR (delete/export), admin routes, usage metering, LemonSqueezy billing |
-| 5 | `panguard-scan` | `@panguard-ai/panguard-scan` | CVE checker, SSL/TLS scanner, open port scanner, password policy auditor, shared folder scanner, scheduled tasks scanner, remote scanning, PDF report generation |
-| 6 | `panguard-chat` | `@panguard-ai/panguard-chat` | Multi-channel notifications (Telegram, Slack, Email, LINE, Webhook), AI chat agent, user-type tone adaptation (developer/boss/IT admin), confirmation flows, follow-up Q&A |
-| 7 | `panguard-report` | `@panguard-ai/panguard-report` | Compliance report generation (Taiwan Cyber Security Act, ISO 27001, SOC 2), PDF/JSON output, control evaluation, finding mapping, executive summaries |
-| 8 | `panguard-trap` | `@panguard-ai/panguard-trap` | 8 honeypot service types (SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, Redis), attacker profiling, skill level assessment, Threat Cloud intel upload |
-| 9 | `panguard-web` | `@panguard-ai/panguard-web` | Real-time web dashboard for guard status and threat visualization |
-| 10 | `threat-cloud` | `@panguard-ai/threat-cloud` | IoC store, correlation engine, campaign tracking, feed distribution (IP/domain blocklists), sighting store, reputation engine, Sigma rule sharing, audit logging |
-| 11 | `panguard` | `@panguard-ai/panguard` | CLI entry point with 19 commands: scan, guard, chat, report, trap, serve, manager, login, logout, whoami, config, init, status, deploy, hardening, admin, threat, upgrade, demo |
-| 12 | `admin` | `@panguard-ai/admin` | Static admin dashboard UI served by the API server |
-| 13 | `website` | `@panguard-ai/website` | Next.js marketing website (separate from platform) |
+| #   | Package            | npm Scope                       | Key Responsibilities                                                                                                                                                            |
+| --- | ------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `core`             | `@panguard-ai/core`             | Rule engine, monitor engine, AI providers (Ollama/Claude/OpenAI), FunnelRouter, YARA scanner, threat intel feed manager, i18n, structured logger                                |
+| 2   | `panguard-guard`   | `@panguard-ai/panguard-guard`   | 4-agent pipeline, event correlation, baseline memory, 6 advanced monitors, response execution, dashboard server, agent client                                                   |
+| 3   | `panguard-manager` | `@panguard-ai/panguard-manager` | Agent registry (max 500), threat aggregation with cross-agent correlation, policy engine, SSE broadcasting, optional SQLite persistence                                         |
+| 4   | `panguard-auth`    | `@panguard-ai/panguard-auth`    | User registration, login, TOTP 2FA, Google OAuth, password reset, rate limiting, GDPR (delete/export), admin routes, usage metering, LemonSqueezy billing                       |
+| 5   | `panguard-scan`    | `@panguard-ai/panguard-scan`    | CVE checker, SSL/TLS scanner, open port scanner, password policy auditor, shared folder scanner, scheduled tasks scanner, remote scanning, PDF report generation                |
+| 6   | `panguard-chat`    | `@panguard-ai/panguard-chat`    | Multi-channel notifications (Telegram, Slack, Email, LINE, Webhook), AI chat agent, user-type tone adaptation (developer/boss/IT admin), confirmation flows, follow-up Q&A      |
+| 7   | `panguard-report`  | `@panguard-ai/panguard-report`  | Compliance report generation (Taiwan Cyber Security Act, ISO 27001, SOC 2), PDF/JSON output, control evaluation, finding mapping, executive summaries                           |
+| 8   | `panguard-trap`    | `@panguard-ai/panguard-trap`    | 8 honeypot service types (SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, Redis), attacker profiling, skill level assessment, Threat Cloud intel upload                                |
+| 9   | `panguard-web`     | `@panguard-ai/panguard-web`     | Real-time web dashboard for guard status and threat visualization                                                                                                               |
+| 10  | `threat-cloud`     | `@panguard-ai/threat-cloud`     | IoC store, correlation engine, campaign tracking, feed distribution (IP/domain blocklists), sighting store, reputation engine, Sigma rule sharing, audit logging                |
+| 11  | `panguard`         | `@panguard-ai/panguard`         | CLI entry point with 19 commands: scan, guard, chat, report, trap, serve, manager, login, logout, whoami, config, init, status, deploy, hardening, admin, threat, upgrade, demo |
+| 12  | `admin`            | `@panguard-ai/admin`            | Static admin dashboard UI served by the API server                                                                                                                              |
+| 13  | `website`          | `@panguard-ai/website`          | Next.js marketing website (separate from platform)                                                                                                                              |
 
 Additionally, `security-hardening` (`@panguard-ai/security-hardening`) provides policy enforcement, security self-audit, syslog forwarding, and audit event logging.
 
@@ -336,6 +336,7 @@ The `FunnelRouter` (in `@panguard-ai/core`) implements Layer 2 -> Layer 3 fallba
 3. If no AI provider is available, the system continues with rule-based scoring only (weights shift to 0.6 rules + 0.4 baseline)
 
 **Provider Auto-Detection** (in `guard-engine.ts`):
+
 1. Check `~/.panguard/llm.enc` (encrypted local config, AES-256-GCM)
 2. Check environment variables: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`
 3. Probe local Ollama at `http://localhost:11434`
@@ -343,12 +344,12 @@ The `FunnelRouter` (in `@panguard-ai/core`) implements Layer 2 -> Layer 3 fallba
 
 **Confidence Weighting** varies by available sources:
 
-| Sources Available | Rule/Intel | Baseline | AI | eBPF |
-|-------------------|-----------|----------|-----|------|
-| Rules only | 0.60 | 0.40 | -- | -- |
-| Rules + AI | 0.40 | 0.30 | 0.30 | -- |
-| Rules + eBPF | 0.40 | 0.35 | -- | 0.25 |
-| Rules + AI + eBPF | 0.30 | 0.20 | 0.30 | 0.20 |
+| Sources Available | Rule/Intel | Baseline | AI   | eBPF |
+| ----------------- | ---------- | -------- | ---- | ---- |
+| Rules only        | 0.60       | 0.40     | --   | --   |
+| Rules + AI        | 0.40       | 0.30     | 0.30 | --   |
+| Rules + eBPF      | 0.40       | 0.35     | --   | 0.25 |
+| Rules + AI + eBPF | 0.30       | 0.20     | 0.30 | 0.20 |
 
 ---
 
@@ -392,15 +393,15 @@ graph TB
 
 ### 7 Correlation Patterns
 
-| Pattern | MITRE ID | Detection Logic | Window | Threshold | Confidence Range |
-|---------|----------|-----------------|--------|-----------|-----------------|
-| Brute Force | T1110 | Auth failures from same source IP | 60s | 5 events | 60-100 (+8/event) |
-| Port Scan | T1046 | Distinct destination ports from same IP | 60s | 10 ports | 65-100 (+3/port) |
-| Lateral Movement | T1021 | Connections to distinct internal (RFC 1918) IPs | 5 min | 3 IPs | 55-100 (+10/IP) |
-| Data Exfiltration | T1041 | Large outbound transfer to external IP | single | 10 MB | 50-100 (+15/10MB) |
-| Backdoor Install | T1059 | File write + process creation + outbound network | 5 min | all 3 | 55-100 |
-| Privilege Escalation | T1548 | setuid/setgid/sudo/pkexec events | 5 min | 1+ events | 50-100 (+15/event) |
-| Severity Escalation | -- | Compound low or medium events from same source | 5 min | 3 events | 40-100 (+10/event) |
+| Pattern              | MITRE ID | Detection Logic                                  | Window | Threshold | Confidence Range   |
+| -------------------- | -------- | ------------------------------------------------ | ------ | --------- | ------------------ |
+| Brute Force          | T1110    | Auth failures from same source IP                | 60s    | 5 events  | 60-100 (+8/event)  |
+| Port Scan            | T1046    | Distinct destination ports from same IP          | 60s    | 10 ports  | 65-100 (+3/port)   |
+| Lateral Movement     | T1021    | Connections to distinct internal (RFC 1918) IPs  | 5 min  | 3 IPs     | 55-100 (+10/IP)    |
+| Data Exfiltration    | T1041    | Large outbound transfer to external IP           | single | 10 MB     | 50-100 (+15/10MB)  |
+| Backdoor Install     | T1059    | File write + process creation + outbound network | 5 min  | all 3     | 55-100             |
+| Privilege Escalation | T1548    | setuid/setgid/sudo/pkexec events                 | 5 min  | 1+ events | 50-100 (+15/event) |
+| Severity Escalation  | --       | Compound low or medium events from same source   | 5 min  | 3 events  | 40-100 (+10/event) |
 
 ---
 
@@ -462,14 +463,14 @@ graph TB
 
 ### Manager Components
 
-| Component | Source File | Responsibility |
-|-----------|------------|---------------|
-| `Manager` | `manager.ts` | Central orchestrator composing registry, aggregator, and policy engine |
-| `AgentRegistry` | `agent-registry.ts` | Agent CRUD, heartbeat tracking, stale detection, max 500 agents |
-| `ThreatAggregator` | `threat-aggregator.ts` | Threat ingestion, cross-agent correlation (5-min window), 24-hour retention |
-| `PolicyEngine` | `policy-engine.ts` | Policy versioning, per-agent and global policies, broadcast queue |
-| `ManagerServer` | `server.ts` | HTTP API (raw `node:http`), Bearer token auth (SHA-256 timing-safe), rate limiting (60 req/min), SSE streaming |
-| `ManagerDB` | `db.ts` | Optional SQLite persistence for org-scoped queries |
+| Component          | Source File            | Responsibility                                                                                                 |
+| ------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `Manager`          | `manager.ts`           | Central orchestrator composing registry, aggregator, and policy engine                                         |
+| `AgentRegistry`    | `agent-registry.ts`    | Agent CRUD, heartbeat tracking, stale detection, max 500 agents                                                |
+| `ThreatAggregator` | `threat-aggregator.ts` | Threat ingestion, cross-agent correlation (5-min window), 24-hour retention                                    |
+| `PolicyEngine`     | `policy-engine.ts`     | Policy versioning, per-agent and global policies, broadcast queue                                              |
+| `ManagerServer`    | `server.ts`            | HTTP API (raw `node:http`), Bearer token auth (SHA-256 timing-safe), rate limiting (60 req/min), SSE streaming |
+| `ManagerDB`        | `db.ts`                | Optional SQLite persistence for org-scoped queries                                                             |
 
 ---
 
@@ -479,23 +480,23 @@ The Guard agent supports 10 monitor types across two tiers: 4 built-in monitors 
 
 ### Built-in Monitors (from `@panguard-ai/core`)
 
-| Monitor | Source | Capabilities |
-|---------|--------|-------------|
-| **Log Monitor** | `core/monitors` | Reads syslog, Windows Event Log, and application log files. Normalizes entries to `SecurityEvent` format. |
-| **Network Monitor** | `core/monitors` | Monitors network connections via `/proc/net/tcp` (Linux) or `netstat`. Detects new connections, unusual ports, and traffic patterns. |
-| **Process Monitor** | `core/monitors` | Scans running processes via `/proc` (Linux) or OS APIs. Detects new/unusual process spawning. |
-| **File Monitor** | `core/monitors` | Watches critical filesystem paths for modifications using inotify (Linux) or FSEvents (macOS). Tracks file creation, modification, and deletion. |
+| Monitor             | Source          | Capabilities                                                                                                                                     |
+| ------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Log Monitor**     | `core/monitors` | Reads syslog, Windows Event Log, and application log files. Normalizes entries to `SecurityEvent` format.                                        |
+| **Network Monitor** | `core/monitors` | Monitors network connections via `/proc/net/tcp` (Linux) or `netstat`. Detects new connections, unusual ports, and traffic patterns.             |
+| **Process Monitor** | `core/monitors` | Scans running processes via `/proc` (Linux) or OS APIs. Detects new/unusual process spawning.                                                    |
+| **File Monitor**    | `core/monitors` | Watches critical filesystem paths for modifications using inotify (Linux) or FSEvents (macOS). Tracks file creation, modification, and deletion. |
 
 ### Advanced Monitors (from `@panguard-ai/panguard-guard`)
 
-| Monitor | Source File | Dependencies | Capabilities |
-|---------|------------|-------------|-------------|
-| **Falco Monitor** | `falco-monitor.ts` | Falco >= 0.35 | Reads Falco alerts from `/var/log/falco/alerts.json`. Detects container escapes, privilege escalation, anomalous system calls. |
-| **Suricata Monitor** | `suricata-monitor.ts` | Suricata >= 7.0 | Reads Suricata EVE JSON from `/var/log/suricata/eve.json`. Network IDS with protocol-aware deep packet analysis. |
-| **Syscall Monitor** | `syscall-monitor.ts` | Linux Kernel 4.18+ | Process and network activity monitoring via /proc polling. Detects suspicious processes, privilege escalation, and C2 connections. |
-| **Memory Scanner** | `memory-scanner.ts` | `CAP_SYS_PTRACE` | Scans process memory for fileless malware signatures, injected code, and suspicious memory regions. |
-| **DPI Monitor** | `dpi-monitor.ts` | None (userspace) | Deep Packet Inspection for protocol analysis. Detects C2 beacons, DNS tunneling, and encrypted traffic anomalies. |
-| **Rootkit Detector** | `rootkit-detector.ts` | Linux | Checks for hidden processes, hidden kernel modules, modified system binaries, and LD_PRELOAD injections. |
+| Monitor              | Source File           | Dependencies       | Capabilities                                                                                                                       |
+| -------------------- | --------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Falco Monitor**    | `falco-monitor.ts`    | Falco >= 0.35      | Reads Falco alerts from `/var/log/falco/alerts.json`. Detects container escapes, privilege escalation, anomalous system calls.     |
+| **Suricata Monitor** | `suricata-monitor.ts` | Suricata >= 7.0    | Reads Suricata EVE JSON from `/var/log/suricata/eve.json`. Network IDS with protocol-aware deep packet analysis.                   |
+| **Syscall Monitor**  | `syscall-monitor.ts`  | Linux Kernel 4.18+ | Process and network activity monitoring via /proc polling. Detects suspicious processes, privilege escalation, and C2 connections. |
+| **Memory Scanner**   | `memory-scanner.ts`   | `CAP_SYS_PTRACE`   | Scans process memory for fileless malware signatures, injected code, and suspicious memory regions.                                |
+| **DPI Monitor**      | `dpi-monitor.ts`      | None (userspace)   | Deep Packet Inspection for protocol analysis. Detects C2 beacons, DNS tunneling, and encrypted traffic anomalies.                  |
+| **Rootkit Detector** | `rootkit-detector.ts` | Linux              | Checks for hidden processes, hidden kernel modules, modified system binaries, and LD_PRELOAD injections.                           |
 
 All advanced monitors gracefully degrade when their dependencies are not installed.
 
@@ -604,18 +605,18 @@ The Guard operates in two modes:
 
 ## Technology Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Language | TypeScript 5.7, Node.js 22 |
-| Package Manager | pnpm 9+ with workspaces |
-| Build | esbuild (via tsx), TypeScript compiler |
-| Testing | Vitest with coverage-v8 |
-| Linting | ESLint 9 with security plugin, Prettier |
-| HTTP Server | Raw `node:http` (no framework dependency) |
-| Database | better-sqlite3 (optional) |
-| Container | Docker multi-stage build, tini for PID 1 |
-| AI | Ollama (local), Claude, OpenAI (cloud) |
-| Rules | Sigma (YAML), YARA (native + fallback) |
-| Monitoring | Falco, Suricata, eBPF, /proc filesystem |
-| Notifications | Telegram, Slack, Email, LINE, Webhook |
-| Compliance | Taiwan Cyber Security Act, ISO 27001, SOC 2 |
+| Layer           | Technology                                  |
+| --------------- | ------------------------------------------- |
+| Language        | TypeScript 5.7, Node.js 22                  |
+| Package Manager | pnpm 9+ with workspaces                     |
+| Build           | esbuild (via tsx), TypeScript compiler      |
+| Testing         | Vitest with coverage-v8                     |
+| Linting         | ESLint 9 with security plugin, Prettier     |
+| HTTP Server     | Raw `node:http` (no framework dependency)   |
+| Database        | better-sqlite3 (optional)                   |
+| Container       | Docker multi-stage build, tini for PID 1    |
+| AI              | Ollama (local), Claude, OpenAI (cloud)      |
+| Rules           | Sigma (YAML), YARA (native + fallback)      |
+| Monitoring      | Falco, Suricata, eBPF, /proc filesystem     |
+| Notifications   | Telegram, Slack, Email, LINE, Webhook       |
+| Compliance      | Taiwan Cyber Security Act, ISO 27001, SOC 2 |

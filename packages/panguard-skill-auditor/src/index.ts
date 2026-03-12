@@ -19,7 +19,13 @@ import { checkWithAI } from './checks/ai-check.js';
 import { calculateRiskScore } from './risk-scorer.js';
 import type { AuditReport, AuditOptions, CheckResult } from './types.js';
 
-export type { AuditReport, AuditFinding, CheckResult, SkillManifest, AuditOptions } from './types.js';
+export type {
+  AuditReport,
+  AuditFinding,
+  CheckResult,
+  SkillManifest,
+  AuditOptions,
+} from './types.js';
 export type { SkillAnalysisLLM } from './checks/ai-check.js';
 export { parseSkillManifest } from './manifest-parser.js';
 

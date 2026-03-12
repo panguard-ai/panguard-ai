@@ -82,9 +82,7 @@ describe('scanFindingsToComplianceFindings', () => {
 
   it('should generate a Date timestamp for each finding', () => {
     const before = new Date();
-    const findings = [
-      { id: '1', title: 'T', description: 'D', severity: 'high', category: 'c' },
-    ];
+    const findings = [{ id: '1', title: 'T', description: 'D', severity: 'high', category: 'c' }];
     const result = scanFindingsToComplianceFindings(findings);
     const after = new Date();
 

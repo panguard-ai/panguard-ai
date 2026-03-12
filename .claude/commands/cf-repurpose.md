@@ -22,9 +22,11 @@ When the user invokes `/cf:repurpose`, you will:
 ### Parameters
 
 **Required:**
+
 - `<source-file>` - Path to the source content file
 
 **Optional:**
+
 - `--into` - Target formats (default: social)
   - Options: blog, email, social, video-script, podcast-outline, infographic-copy, ad-copy, landing-page
 - `--platforms` - Social platforms (if into=social)
@@ -42,6 +44,7 @@ When the user invokes `/cf:repurpose`, you will:
 Read and deeply understand the source content:
 
 **What to extract:**
+
 - **Main topic** - What is this about?
 - **Key messages** - 3-5 core points
 - **Supporting evidence** - Data, quotes, examples
@@ -53,6 +56,7 @@ Read and deeply understand the source content:
 - **Visual elements** - Charts, images, diagrams mentioned
 
 **Content types you might encounter:**
+
 - Blog posts (1000-3000 words)
 - Case studies
 - Whitepapers / Reports
@@ -68,6 +72,7 @@ Read and deeply understand the source content:
 Break source into reusable components:
 
 **For long-form content (blog, whitepaper):**
+
 1. **Hook/Opening** - Attention-grabbing intro
 2. **Problem statement** - What pain point is addressed?
 3. **Key points** - Main arguments or sections
@@ -78,12 +83,14 @@ Break source into reusable components:
 8. **Conclusion/CTA** - Final message and next step
 
 **For visual content (presentation, video):**
+
 1. **Core narrative** - Story being told
 2. **Key slides/scenes** - Most impactful moments
 3. **Visual metaphors** - Concepts illustrated
 4. **Transitions** - How ideas connect
 
 **For data content (report, study):**
+
 1. **Headline findings** - Most newsworthy insights
 2. **Supporting statistics** - Evidence
 3. **Methodology** - How data was gathered
@@ -97,6 +104,7 @@ Break source into reusable components:
 **From:** Video, podcast, presentation, whitepaper
 
 **Transformation:**
+
 1. **Create structure** - Intro, body (H2 sections), conclusion
 2. **Expand key points** - Add context and detail
 3. **Add SEO elements** - Keywords, meta description, links
@@ -107,6 +115,7 @@ Break source into reusable components:
 **Format:** Markdown with proper headers
 
 **Example transformation:**
+
 - Webinar (60 min) → Blog post highlighting key insights + embedded video
 - Podcast episode → Written guide with quotes and timestamps
 - Data report → Analysis article with key findings
@@ -118,6 +127,7 @@ Break source into reusable components:
 **From:** Blog, whitepaper, case study, video
 
 **Transformation:**
+
 1. **Compelling subject line** - Based on main hook
 2. **Concise summary** - Hit key points in 200-300 words
 3. **Personal tone** - Make it conversational
@@ -128,6 +138,7 @@ Break source into reusable components:
 **Format:** Email-ready markdown
 
 **Example transformation:**
+
 - Blog post → Email newsletter featuring key insights
 - Case study → Customer success story email
 - Report → "Here's what we learned" email
@@ -145,6 +156,7 @@ Break source into reusable components:
 **Format:** Professional, insight-driven
 **Length:** 100-150 words (or 1300-2000 for long-form)
 **Structure:**
+
 1. Hook (first line must stop scroll)
 2. Insight/Value (why this matters)
 3. Context/Example (bring it to life)
@@ -155,6 +167,7 @@ Break source into reusable components:
 **Visual:** Recommend carousel, image, or document
 
 **Example from blog post:**
+
 ```
 Original title: "10 Ways to Improve Remote Team Productivity"
 
@@ -184,6 +197,7 @@ What's your remote team's biggest challenge?
 **Format:** Conversational, punchy
 **Length:** 280 chars per tweet, 5-10 tweet threads
 **Structure:**
+
 1. Hook tweet (create curiosity)
 2. Context tweet (set up the insight)
 3. Value tweets (3-7 tweets with key points)
@@ -194,6 +208,7 @@ What's your remote team's biggest challenge?
 **Visual:** Can attach image to first tweet
 
 **Example transformation:**
+
 ```
 1/ Remote teams are struggling with productivity. But it's not what you think.
 
@@ -221,6 +236,7 @@ Wrong.
 **Format:** Visual-first, story-driven
 **Length:** 125-150 words + emojis
 **Structure:**
+
 1. Visual hook (relates to image)
 2. Story or insight
 3. Relatable moment
@@ -231,6 +247,7 @@ Wrong.
 **Visual:** MUST recommend image concept
 
 **Example transformation:**
+
 ```
 📊 35% productivity drop. That's what remote work did to most teams.
 
@@ -259,6 +276,7 @@ What's your remote team's secret weapon? Drop it in the comments 👇
 **From:** Blog, presentation, whitepaper
 
 **Transformation:**
+
 1. **Create narrative arc** - Beginning, middle, end
 2. **Write for ear, not eye** - Conversational language
 3. **Include visual directions** - What viewers see
@@ -276,18 +294,19 @@ What's your remote team's secret weapon? Drop it in the comments 👇
 **Length:** 90 seconds
 **Style:** Fast-paced, data-driven, actionable
 
-| VIDEO | AUDIO |
-|-------|-------|
-| Text on screen: "35% productivity drop" | Remote work killed productivity for most teams. |
-| Show frustrated person at home laptop | But a few teams? They're crushing it. 2x output, same team size. |
-| Cut to data visualization | We studied 500 remote teams. Here's what the winners do differently. |
-| Graphic: "Rule 1: 15-min standups" | First: Daily 15-minute standups. Not hour-long meetings. Just quick syncs. |
-| Graphic: "Rule 2: Async updates" | Second: Async updates. Write it down. Stop the Slack chaos. |
-| Graphic: "Rule 3: Focus time" | Third: Sacred focus time. 9 to noon. No meetings. No interruptions. |
-| Show productive team montage | The result? Teams moving faster, shipping more, burning out less. |
-| CTA on screen | Want the full playbook? Link in description. |
+| VIDEO                                   | AUDIO                                                                      |
+| --------------------------------------- | -------------------------------------------------------------------------- |
+| Text on screen: "35% productivity drop" | Remote work killed productivity for most teams.                            |
+| Show frustrated person at home laptop   | But a few teams? They're crushing it. 2x output, same team size.           |
+| Cut to data visualization               | We studied 500 remote teams. Here's what the winners do differently.       |
+| Graphic: "Rule 1: 15-min standups"      | First: Daily 15-minute standups. Not hour-long meetings. Just quick syncs. |
+| Graphic: "Rule 2: Async updates"        | Second: Async updates. Write it down. Stop the Slack chaos.                |
+| Graphic: "Rule 3: Focus time"           | Third: Sacred focus time. 9 to noon. No meetings. No interruptions.        |
+| Show productive team montage            | The result? Teams moving faster, shipping more, burning out less.          |
+| CTA on screen                           | Want the full playbook? Link in description.                               |
 
 **B-Roll Needed:**
+
 - Stock footage: Remote workers
 - Screen recordings: Slack, calendar apps
 - Data visualizations: Charts showing improvement
@@ -300,6 +319,7 @@ What's your remote team's secret weapon? Drop it in the comments 👇
 **From:** Blog, research, interview
 
 **Transformation:**
+
 1. **Create episode structure** - Segments and topics
 2. **Write talking points** - Not full scripts
 3. **Include questions** - For co-host or guest
@@ -309,6 +329,7 @@ What's your remote team's secret weapon? Drop it in the comments 👇
 **Format:** Outline with talking points
 
 **Example transformation:**
+
 ```markdown
 # Podcast Episode Outline: Remote Team Productivity
 
@@ -317,49 +338,59 @@ What's your remote team's secret weapon? Drop it in the comments 👇
 **Format:** Solo + listener Q&A
 
 ## Intro (2 min)
+
 - Hook: "Remote work killed productivity by 35% for most teams"
 - Tease: "But I studied 500 teams and found the secret"
 - Episode promise: "Today you'll learn the 3 rules high-performers follow"
 
 ## Segment 1: The Problem (5 min)
+
 - Most people blame tools
 - But tools aren't the issue
 - Real problem: Intentional communication (or lack of)
 - Story: Company that spent $50k on tools, saw zero improvement
 
 ## Segment 2: The Study (3 min)
+
 - How we studied 500 remote teams
 - What we measured (output, satisfaction, burnout)
 - The stark difference between top 10% and bottom 10%
 
 ## Segment 3: The 3 Rules (12 min)
+
 Rule 1: 15-Minute Daily Standups
+
 - Why not 30 or 60 minutes
 - Exact structure to use
 - Common mistakes
 
 Rule 2: Async Updates
+
 - The Slack problem
 - How to shift to async
 - Tools that help
 
 Rule 3: Sacred Focus Time
+
 - Why 9-12 is optimal
 - How to enforce it
 - What to do about urgent issues
 
 ## Segment 4: Listener Q&A (6 min)
+
 - Q: "What if my manager wants all-day availability?"
 - Q: "How do you handle different time zones?"
 - Q: "Can this work for customer support teams?"
 
 ## Outro (2 min)
+
 - Recap the 3 rules
 - Challenge: Implement one this week
 - Tease next episode
 - CTA: Leave a review
 
 ## Show Notes
+
 [Links to resources, studies, tools mentioned]
 ```
 
@@ -370,6 +401,7 @@ Rule 3: Sacred Focus Time
 **From:** Data-heavy content, reports, blogs
 
 **Transformation:**
+
 1. **Pull key statistics** - Most impressive numbers
 2. **Create hierarchy** - What's the headline stat?
 3. **Write short headers** - For each section
@@ -385,12 +417,14 @@ Rule 3: Sacred Focus Time
 **From:** Blog, case study, landing page
 
 **Transformation:**
+
 1. **Extract core benefit** - What's the value prop?
 2. **Find proof point** - Best statistic or result
 3. **Create urgency** - Why act now?
 4. **Write multiple CTAs** - Test variations
 
 **Formats:**
+
 - Google Search Ad (headlines + descriptions)
 - LinkedIn Sponsored Content
 - Facebook/Instagram Ad
@@ -438,6 +472,7 @@ After repurposing, provide:
 # Content Repurposed: [Source Title]
 
 ## Source Content
+
 - **Original:** [File name]
 - **Type:** [Blog / Video / Report / etc.]
 - **Length:** [Word count / Duration]
@@ -446,18 +481,21 @@ After repurposing, provide:
 ## Repurposed Formats
 
 ### ✓ LinkedIn Post
+
 **Location:** `social/linkedin-post.md`
 **Length:** 150 words
 **Hook:** "[First line of post]"
 **Engagement goal:** Comments on remote work challenges
 
 ### ✓ Twitter Thread
+
 **Location:** `social/twitter-thread.md`
 **Tweets:** 7 tweets
 **Hook:** "[First tweet]"
 **Engagement goal:** Shares and discussion
 
 ### ✓ Email Newsletter
+
 **Location:** `email/newsletter-version.md`
 **Length:** 300 words
 **Subject:** "[Suggested subject line]"
@@ -468,6 +506,7 @@ After repurposing, provide:
 ## Repurposing Strategy
 
 **Content lifecycle:**
+
 1. Publish source blog → website
 2. Send email version → newsletter subscribers (Day 1)
 3. Post LinkedIn version → feed (Day 2)
@@ -476,6 +515,7 @@ After repurposing, provide:
 6. Video script → YouTube (Week 2)
 
 **Estimated reach:**
+
 - Email: [Subscriber count]
 - LinkedIn: [Follower reach]
 - Twitter: [Follower reach]
@@ -485,6 +525,7 @@ After repurposing, provide:
 **Total content created:** [Number] pieces from 1 source
 
 Would you like me to:
+
 - Create additional variations?
 - Optimize any specific piece?
 - Generate more platform versions?
@@ -495,6 +536,7 @@ Would you like me to:
 ### Example 1: Blog to Social
 
 **Input:**
+
 ```bash
 /cf:repurpose content/blog/remote-productivity.md \
   --into social \
@@ -502,6 +544,7 @@ Would you like me to:
 ```
 
 **What you do:**
+
 1. Read the blog post thoroughly
 2. Extract 3-5 key insights
 3. Create LinkedIn post (professional angle)
@@ -515,12 +558,14 @@ Would you like me to:
 ### Example 2: Webinar to Multiple Formats
 
 **Input:**
+
 ```bash
 /cf:repurpose webinars/productivity-webinar-transcript.txt \
   --into blog,email,social,podcast-outline
 ```
 
 **What you do:**
+
 1. Read transcript, extract key insights
 2. Transform to blog post (add structure, visuals)
 3. Create email summary (key takeaways + CTA to watch replay)
@@ -533,12 +578,14 @@ Would you like me to:
 ### Example 3: Case Study to Sales Content
 
 **Input:**
+
 ```bash
 /cf:repurpose case-studies/acme-corp-success.md \
   --into email,social,ad-copy,landing-page
 ```
 
 **What you do:**
+
 1. Extract key results and quotes
 2. Create email version (customer story format)
 3. Create social posts (highlight specific metrics)
@@ -548,22 +595,26 @@ Would you like me to:
 ## Best Practices
 
 ### Preserve Core Value
+
 - Don't lose the main insight when shortening
 - Keep the "aha moment" intact
 - Maintain any unique perspective
 
 ### Optimize for Platform
+
 - LinkedIn: Professional, insight-driven
 - Twitter: Conversational, punchy
 - Instagram: Visual, story-based
 - Email: Personal, value-focused
 
 ### Maintain Brand Voice
+
 - Adjust formality, not identity
 - Keep terminology consistent
 - Preserve company values
 
 ### Add Context
+
 - Not every repurposed piece needs full context
 - But readers should understand the value
 - Link back to source for more depth

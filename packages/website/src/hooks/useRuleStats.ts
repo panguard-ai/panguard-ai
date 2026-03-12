@@ -36,10 +36,7 @@ function getFromCache(): RuleStats | null {
 
 function setCache(data: RuleStats): void {
   try {
-    sessionStorage.setItem(
-      CACHE_KEY,
-      JSON.stringify({ data, timestamp: Date.now() })
-    );
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
   } catch {
     // sessionStorage full or unavailable
   }

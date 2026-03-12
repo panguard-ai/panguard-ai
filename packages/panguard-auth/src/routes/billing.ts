@@ -25,7 +25,10 @@ export function createBillingRoutes(ctx: RouteContext) {
    * Billing disabled — all features are free and open source.
    */
   async function handleBillingCheckout(_req: IncomingMessage, res: ServerResponse): Promise<void> {
-    json(res, 501, { ok: false, error: 'Billing disabled. All features are free and open source.' });
+    json(res, 501, {
+      ok: false,
+      error: 'Billing disabled. All features are free and open source.',
+    });
   }
 
   /**
@@ -33,7 +36,10 @@ export function createBillingRoutes(ctx: RouteContext) {
    * Billing disabled — all features are free and open source.
    */
   async function handleBillingPortal(_req: IncomingMessage, res: ServerResponse): Promise<void> {
-    json(res, 501, { ok: false, error: 'Billing disabled. All features are free and open source.' });
+    json(res, 501, {
+      ok: false,
+      error: 'Billing disabled. All features are free and open source.',
+    });
   }
 
   /**

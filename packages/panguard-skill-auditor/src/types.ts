@@ -47,7 +47,15 @@ export interface AuditFinding {
   title: string;
   description: string;
   severity: Severity;
-  category: 'manifest' | 'prompt-injection' | 'tool-poisoning' | 'code' | 'secrets' | 'dependency' | 'permission' | 'ai-analysis';
+  category:
+    | 'manifest'
+    | 'prompt-injection'
+    | 'tool-poisoning'
+    | 'code'
+    | 'secrets'
+    | 'dependency'
+    | 'permission'
+    | 'ai-analysis';
   location?: string;
 }
 

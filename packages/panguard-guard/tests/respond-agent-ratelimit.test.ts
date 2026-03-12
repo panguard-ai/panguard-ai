@@ -27,8 +27,7 @@ vi.mock('node:child_process', () => ({
 
 // Mock createLogger
 vi.mock('@panguard-ai/core', async () => {
-  const actual =
-    await vi.importActual<Record<string, unknown>>('@panguard-ai/core');
+  const actual = await vi.importActual<Record<string, unknown>>('@panguard-ai/core');
   return {
     ...actual,
     createLogger: () => ({
@@ -138,11 +137,14 @@ describe('RespondAgent rate limiting', () => {
   it('should trip circuit breaker after 5 consecutive failures', async () => {
     // Mock execFile to simulate failures
     const mockedExecFile = vi.mocked(execFile);
-    mockedExecFile.mockImplementation(
-      ((_cmd: string, _args: string[], _opts: unknown, cb: (err: Error | null) => void) => {
-        cb(new Error('firewall command failed'));
-      }) as typeof execFile
-    );
+    mockedExecFile.mockImplementation(((
+      _cmd: string,
+      _args: string[],
+      _opts: unknown,
+      cb: (err: Error | null) => void
+    ) => {
+      cb(new Error('firewall command failed'));
+    }) as typeof execFile);
 
     // Execute 5 failing actions
     for (let i = 0; i < 5; i++) {
@@ -172,12 +174,7 @@ describe('RespondAgent rate limiting', () => {
   });
 
   it('should not rate-limit in learning mode', async () => {
-    const learningAgent = new RespondAgent(
-      DEFAULT_ACTION_POLICY,
-      'learning',
-      [],
-      tempDir
-    );
+    const learningAgent = new RespondAgent(DEFAULT_ACTION_POLICY, 'learning', [], tempDir);
 
     for (let i = 0; i < 20; i++) {
       const verdict = makeVerdict(90, 'block_ip', `10.0.0.${i + 1}`);

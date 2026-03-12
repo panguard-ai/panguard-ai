@@ -130,7 +130,9 @@ describe('auditSkill integration', () => {
       const report = await auditSkill(tmpDir, { skipAI: true });
       expect(report.manifest).not.toBeNull();
       expect(report.manifest!.name).toBe('Clean Skill');
-      expect(report.manifest!.description).toBe('A well-written skill that summarizes text for users');
+      expect(report.manifest!.description).toBe(
+        'A well-written skill that summarizes text for users'
+      );
       expect(report.manifest!.license).toBe('MIT');
     });
   });
@@ -146,7 +148,7 @@ describe('auditSkill integration', () => {
       await writeSkillFile(tmpDir, INJECTION_SKILL_CONTENT);
       const report = await auditSkill(tmpDir, { skipAI: true });
       const injectionFindings = report.findings.filter(
-        (f) => f.category === 'prompt-injection' || f.category === 'tool-poisoning',
+        (f) => f.category === 'prompt-injection' || f.category === 'tool-poisoning'
       );
       expect(injectionFindings.length).toBeGreaterThan(0);
     });
@@ -209,7 +211,9 @@ describe('auditSkill integration', () => {
       await writeSkillFile(tmpDir, CLEAN_SKILL_CONTENT);
       const reportWithSkip = await auditSkill(tmpDir, { skipAI: true });
       // AI check label starts with "AI:" — verify none present
-      const aiChecks = reportWithSkip.checks.filter((c) => c.label.includes('AI:') || c.label.includes('Skipped'));
+      const aiChecks = reportWithSkip.checks.filter(
+        (c) => c.label.includes('AI:') || c.label.includes('Skipped')
+      );
       expect(aiChecks).toHaveLength(0);
     });
   });
@@ -225,7 +229,10 @@ describe('auditSkill integration', () => {
 
   describe('edge cases', () => {
     it('should handle a skill with only instructions (no frontmatter) without crashing', async () => {
-      await writeSkillFile(tmpDir, 'Just plain instructions with no frontmatter at all, quite a lot of text here.');
+      await writeSkillFile(
+        tmpDir,
+        'Just plain instructions with no frontmatter at all, quite a lot of text here.'
+      );
       const report = await auditSkill(tmpDir, { skipAI: true });
       expect(report).toBeDefined();
       expect(report.manifest).not.toBeNull();

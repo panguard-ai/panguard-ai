@@ -22,7 +22,13 @@ import {
 } from './menu.js';
 import type { MenuItem, Lang } from './menu.js';
 import { checkFeatureAccess, showUpgradePrompt, getLicense } from './auth-guard.js';
-import { breadcrumb, nextSteps, confirmDestructive, moduleCountDisplay, formatError } from './ux-helpers.js';
+import {
+  breadcrumb,
+  nextSteps,
+  confirmDestructive,
+  moduleCountDisplay,
+  formatError,
+} from './ux-helpers.js';
 
 // ---------------------------------------------------------------------------
 // Language management
@@ -96,7 +102,8 @@ const MENU_DEFS: MenuDef[] = [
     en: 'Security Scan',
     zh: '\u5B89\u5168\u6383\u63CF',
     enDesc: 'Scan system security and analyze risks',
-    zhDesc: '\u6383\u63CF\u7CFB\u7D71\u5B89\u5168\u72C0\u614B\uFF0C\u5206\u6790\u6240\u6709\u98A8\u96AA',
+    zhDesc:
+      '\u6383\u63CF\u7CFB\u7D71\u5B89\u5168\u72C0\u614B\uFF0C\u5206\u6790\u6240\u6709\u98A8\u96AA',
     tierBadge: '',
     featureKey: 'scan',
   },
@@ -187,7 +194,9 @@ async function isMCPConfigured(): Promise<boolean> {
   try {
     const mcpConfig = await import('@panguard-ai/panguard-mcp/config');
     const platforms = await mcpConfig.detectPlatforms();
-    return platforms.some((p: { detected: boolean; alreadyConfigured: boolean }) => p.detected && p.alreadyConfigured);
+    return platforms.some(
+      (p: { detected: boolean; alreadyConfigured: boolean }) => p.detected && p.alreadyConfigured
+    );
   } catch {
     return false;
   }
@@ -235,9 +244,7 @@ function renderStatusPanel(): void {
         ];
 
   const title =
-    currentLang === 'zh-TW'
-      ? '\u7CFB\u7D71\u72C0\u614B / System Status'
-      : 'System Status';
+    currentLang === 'zh-TW' ? '\u7CFB\u7D71\u72C0\u614B / System Status' : 'System Status';
 
   console.log(box(lines.join('\n'), { borderColor: c.sage, title }));
 }
@@ -247,10 +254,7 @@ function renderStatusPanel(): void {
 // ---------------------------------------------------------------------------
 
 function renderMenu(): void {
-  const titleText =
-    currentLang === 'zh-TW'
-      ? '\u4E3B\u9078\u55AE / Main Menu'
-      : 'Main Menu';
+  const titleText = currentLang === 'zh-TW' ? '\u4E3B\u9078\u55AE / Main Menu' : 'Main Menu';
   console.log(`         ${theme.title(titleText)}`);
   console.log('');
 
@@ -260,9 +264,7 @@ function renderMenu(): void {
     const badge = def.tierBadge ? ` ${c.dim(def.tierBadge)}` : '';
     const iconStr = def.icon === '\u2713' ? c.safe(def.icon) : c.dim(def.icon);
 
-    console.log(
-      `  ${iconStr}  ${c.sage(`[${def.number}]`)}  ${name}${badge}`
-    );
+    console.log(`  ${iconStr}  ${c.sage(`[${def.number}]`)}  ${name}${badge}`);
     console.log(`           ${c.dim(desc)}`);
     console.log('');
   }
@@ -277,9 +279,7 @@ function renderFooter(): void {
   const help = currentLang === 'zh-TW' ? '\u8AAA\u660E' : 'Help';
   const langToggle = currentLang === 'zh-TW' ? '\u4E2D/EN' : '\u4E2D/EN';
 
-  console.log(
-    `${c.dim(`[q] ${quit}   [h] ${help}   [b] ${langToggle}`)}`
-  );
+  console.log(`${c.dim(`[q] ${quit}   [h] ${help}   [b] ${langToggle}`)}`);
   console.log('');
 }
 
@@ -289,8 +289,7 @@ function renderFooter(): void {
 
 function showHelp(): void {
   console.log('');
-  const title =
-    currentLang === 'zh-TW' ? '\u6307\u4EE4\u8AAA\u660E' : 'Available Commands';
+  const title = currentLang === 'zh-TW' ? '\u6307\u4EE4\u8AAA\u660E' : 'Available Commands';
   console.log(`  ${theme.brandBold(title)}`);
   console.log('');
 
@@ -309,7 +308,11 @@ function showHelp(): void {
   console.log(`  ${c.sage(promptTitle)}`);
 
   const cmds = [
-    { cmd: 'setup', en: 'Connect AI agents via MCP', zh: '\u900F\u904E MCP \u9023\u63A5 AI \u4EE3\u7406' },
+    {
+      cmd: 'setup',
+      en: 'Connect AI agents via MCP',
+      zh: '\u900F\u904E MCP \u9023\u63A5 AI \u4EE3\u7406',
+    },
     { cmd: 'audit', en: 'Audit AI agent skills', zh: '\u5BE9\u8A08 AI \u4EE3\u7406\u6280\u80FD' },
     { cmd: 'status', en: 'System status overview', zh: '\u7CFB\u7D71\u72C0\u614B\u7E3D\u89BD' },
     { cmd: 'config', en: 'Settings management', zh: '\u8A2D\u5B9A\u7BA1\u7406' },
@@ -323,11 +326,14 @@ function showHelp(): void {
     console.log(`  ${c.sage(cmd.padEnd(14))} ${c.dim(desc)}`);
   }
 
-  const shortcutTitle =
-    currentLang === 'zh-TW' ? '\u5FEB\u6377\u9375' : 'Shortcuts';
+  const shortcutTitle = currentLang === 'zh-TW' ? '\u5FEB\u6377\u9375' : 'Shortcuts';
   console.log('');
   console.log(`  ${c.sage(shortcutTitle)}`);
-  console.log(c.dim(`  [q] ${currentLang === 'zh-TW' ? '\u9000\u51FA' : 'Quit'}   [h] ${currentLang === 'zh-TW' ? '\u8AAA\u660E' : 'Help'}   [b] ${currentLang === 'zh-TW' ? '\u5207\u63DB\u8A9E\u8A00' : 'Toggle language'}`));
+  console.log(
+    c.dim(
+      `  [q] ${currentLang === 'zh-TW' ? '\u9000\u51FA' : 'Quit'}   [h] ${currentLang === 'zh-TW' ? '\u8AAA\u660E' : 'Help'}   [b] ${currentLang === 'zh-TW' ? '\u5207\u63DB\u8A9E\u8A00' : 'Toggle language'}`
+    )
+  );
   console.log('');
 }
 
@@ -539,7 +545,9 @@ async function dispatchCommand(text: string): Promise<boolean> {
         console.log(
           formatError(
             err instanceof Error ? err.message : String(err),
-            currentLang === 'zh-TW' ? '\u57F7\u884C\u5065\u5EB7\u8A3A\u65B7' : 'Running diagnostics',
+            currentLang === 'zh-TW'
+              ? '\u57F7\u884C\u5065\u5EB7\u8A3A\u65B7'
+              : 'Running diagnostics',
             currentLang === 'zh-TW' ? '\u8ACB\u91CD\u8A66' : 'Please retry'
           )
         );
@@ -634,7 +642,8 @@ async function actionInit(): Promise<void> {
 
 async function actionMCPSetup(): Promise<void> {
   breadcrumb(['Panguard', currentLang === 'zh-TW' ? 'MCP \u8A2D\u5B9A' : 'MCP Setup']);
-  const title = currentLang === 'zh-TW' ? 'AI \u4EE3\u7406\u9023\u63A5 (MCP)' : 'AI Agent Connection (MCP)';
+  const title =
+    currentLang === 'zh-TW' ? 'AI \u4EE3\u7406\u9023\u63A5 (MCP)' : 'AI Agent Connection (MCP)';
   console.log(`  ${theme.brandBold(title)}`);
   console.log('');
 
@@ -650,7 +659,9 @@ async function actionMCPSetup(): Promise<void> {
     const mcpConfig = await import('@panguard-ai/panguard-mcp/config');
     const platforms = await mcpConfig.detectPlatforms();
     const detected = platforms.filter((p: { detected: boolean }) => p.detected);
-    const unconfigured = detected.filter((p: { alreadyConfigured: boolean }) => !p.alreadyConfigured);
+    const unconfigured = detected.filter(
+      (p: { alreadyConfigured: boolean }) => !p.alreadyConfigured
+    );
 
     if (detected.length === 0) {
       detectSp.warn(
@@ -659,11 +670,13 @@ async function actionMCPSetup(): Promise<void> {
           : 'No AI agent platforms detected'
       );
       console.log('');
-      console.log(c.dim(
-        currentLang === 'zh-TW'
-          ? '  \u652F\u63F4\u5E73\u53F0: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop'
-          : '  Supported: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop'
-      ));
+      console.log(
+        c.dim(
+          currentLang === 'zh-TW'
+            ? '  \u652F\u63F4\u5E73\u53F0: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop'
+            : '  Supported: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop'
+        )
+      );
       return;
     }
 
@@ -686,17 +699,21 @@ async function actionMCPSetup(): Promise<void> {
     console.log('');
 
     if (unconfigured.length === 0) {
-      console.log(c.safe(
-        currentLang === 'zh-TW'
-          ? `  \u2713 \u6240\u6709\u5E73\u53F0\u5DF2\u8A2D\u5B9A\u5B8C\u6210\uFF01`
-          : '  \u2713 All platforms already configured!'
-      ));
+      console.log(
+        c.safe(
+          currentLang === 'zh-TW'
+            ? `  \u2713 \u6240\u6709\u5E73\u53F0\u5DF2\u8A2D\u5B9A\u5B8C\u6210\uFF01`
+            : '  \u2713 All platforms already configured!'
+        )
+      );
       console.log('');
-      console.log(c.dim(
-        currentLang === 'zh-TW'
-          ? '  \u91CD\u555F AI \u4EE3\u7406\u5F8C\uFF0C\u8ACB\u6C42\u300Cpanguard_status\u300D\u5373\u53EF\u9A57\u8B49\u3002'
-          : '  Restart your AI agent, then ask "panguard_status" to verify.'
-      ));
+      console.log(
+        c.dim(
+          currentLang === 'zh-TW'
+            ? '  \u91CD\u555F AI \u4EE3\u7406\u5F8C\uFF0C\u8ACB\u6C42\u300Cpanguard_status\u300D\u5373\u53EF\u9A57\u8B49\u3002'
+            : '  Restart your AI agent, then ask "panguard_status" to verify.'
+        )
+      );
       return;
     }
 
@@ -728,42 +745,64 @@ async function actionMCPSetup(): Promise<void> {
     }
 
     console.log('');
-    console.log(c.dim(
-      currentLang === 'zh-TW'
-        ? '  \u91CD\u555F AI \u4EE3\u7406\u5F8C\u5373\u53EF\u4F7F\u7528 11 \u500B panguard_* MCP \u5DE5\u5177\uFF1A'
-        : '  Restart your AI agent to use 11 panguard_* MCP tools:'
-    ));
+    console.log(
+      c.dim(
+        currentLang === 'zh-TW'
+          ? '  \u91CD\u555F AI \u4EE3\u7406\u5F8C\u5373\u53EF\u4F7F\u7528 11 \u500B panguard_* MCP \u5DE5\u5177\uFF1A'
+          : '  Restart your AI agent to use 11 panguard_* MCP tools:'
+      )
+    );
 
     // Platform-specific restart instructions
     const restartHints: Record<string, { en: string; zh: string }> = {
-      'claude-code': { en: 'Close and reopen your terminal', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F\u7D42\u7AEF\u6A5F' },
-      'claude-desktop': { en: 'Quit and reopen Claude Desktop', zh: '\u9000\u51FA\u4E26\u91CD\u65B0\u958B\u555F Claude Desktop' },
-      cursor: { en: 'Cmd+Shift+P (or Ctrl+Shift+P) > "Reload Window"', zh: 'Cmd+Shift+P > "Reload Window"' },
-      openclaw: { en: 'Close and reopen OpenClaw', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F OpenClaw' },
+      'claude-code': {
+        en: 'Close and reopen your terminal',
+        zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F\u7D42\u7AEF\u6A5F',
+      },
+      'claude-desktop': {
+        en: 'Quit and reopen Claude Desktop',
+        zh: '\u9000\u51FA\u4E26\u91CD\u65B0\u958B\u555F Claude Desktop',
+      },
+      cursor: {
+        en: 'Cmd+Shift+P (or Ctrl+Shift+P) > "Reload Window"',
+        zh: 'Cmd+Shift+P > "Reload Window"',
+      },
+      openclaw: {
+        en: 'Close and reopen OpenClaw',
+        zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F OpenClaw',
+      },
       codex: { en: 'Restart the Codex CLI session', zh: '\u91CD\u65B0\u555F\u52D5 Codex CLI' },
-      workbuddy: { en: 'Close and reopen WorkBuddy', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F WorkBuddy' },
-      nemoclaw: { en: 'Close and reopen NemoClaw', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F NemoClaw' },
+      workbuddy: {
+        en: 'Close and reopen WorkBuddy',
+        zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F WorkBuddy',
+      },
+      nemoclaw: {
+        en: 'Close and reopen NemoClaw',
+        zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F NemoClaw',
+      },
     };
     for (const p of unconfigured) {
       const hint = restartHints[p.id];
       const text = hint
-        ? (currentLang === 'zh-TW' ? hint.zh : hint.en)
-        : (currentLang === 'zh-TW' ? '\u91CD\u65B0\u555F\u52D5\u61C9\u7528\u7A0B\u5F0F' : 'Restart the application');
+        ? currentLang === 'zh-TW'
+          ? hint.zh
+          : hint.en
+        : currentLang === 'zh-TW'
+          ? '\u91CD\u65B0\u555F\u52D5\u61C9\u7528\u7A0B\u5F0F'
+          : 'Restart the application';
       console.log(c.dim(`    ${p.name}: ${text}`));
     }
 
     console.log('');
-    console.log(c.dim(
-      currentLang === 'zh-TW'
-        ? '  \u8A66\u8A66\u554F AI: \u300C\u5BE9\u8A08\u9019\u500B\u5C08\u6848\u7684\u6280\u80FD\u300D\u6216\u300C\u6383\u63CF\u6211\u7684\u7CFB\u7D71\u300D'
-        : '  Try asking your AI: "audit the skills in this project" or "scan my system"'
-    ));
-  } catch (err) {
-    detectSp.fail(
-      currentLang === 'zh-TW'
-        ? 'MCP \u8A2D\u5B9A\u5931\u6557'
-        : 'MCP setup failed'
+    console.log(
+      c.dim(
+        currentLang === 'zh-TW'
+          ? '  \u8A66\u8A66\u554F AI: \u300C\u5BE9\u8A08\u9019\u500B\u5C08\u6848\u7684\u6280\u80FD\u300D\u6216\u300C\u6383\u63CF\u6211\u7684\u7CFB\u7D71\u300D'
+          : '  Try asking your AI: "audit the skills in this project" or "scan my system"'
+      )
     );
+  } catch (err) {
+    detectSp.fail(currentLang === 'zh-TW' ? 'MCP \u8A2D\u5B9A\u5931\u6557' : 'MCP setup failed');
     console.log(
       formatError(
         err instanceof Error ? err.message : String(err),
@@ -875,10 +914,7 @@ async function actionScan(): Promise<void> {
     if (fixableCount > 0) {
       const upgradeLines =
         currentLang === 'zh-TW'
-          ? [
-              `\u53EF\u81EA\u52D5\u4FEE\u5FA9:`,
-              `$ panguard scan --fix`,
-            ]
+          ? [`\u53EF\u81EA\u52D5\u4FEE\u5FA9:`, `$ panguard scan --fix`]
           : [`Auto-fix available:`, `$ panguard scan --fix`];
       console.log('');
       console.log(box(upgradeLines.join('\n'), { borderColor: c.sage }));
@@ -895,15 +931,34 @@ async function actionScan(): Promise<void> {
   const guardRunning = isGuardRunning().running;
   if (!guardRunning) {
     console.log('');
-    const agentMsg = currentLang === 'zh-TW'
-      ? `${c.sage('\u25C6')} \u5373\u6642\u9632\u8B77\u5C1A\u672A\u555F\u52D5\u3002\u8981\u73FE\u5728\u555F\u7528\u55CE\uFF1F`
-      : `${c.sage('\u25C6')} Real-time protection is not active. Enable now?`;
+    const agentMsg =
+      currentLang === 'zh-TW'
+        ? `${c.sage('\u25C6')} \u5373\u6642\u9632\u8B77\u5C1A\u672A\u555F\u52D5\u3002\u8981\u73FE\u5728\u555F\u7528\u55CE\uFF1F`
+        : `${c.sage('\u25C6')} Real-time protection is not active. Enable now?`;
     console.log(`  ${agentMsg}`);
 
     const guardItems: MenuItem[] = [
-      { key: '1', label: currentLang === 'zh-TW' ? '\u662F\uFF0C\u555F\u52D5 Guard \u9632\u8B77' : 'Yes, start Guard protection' },
-      { key: '2', label: currentLang === 'zh-TW' ? '\u5BE9\u8A08\u5DF2\u5B89\u88DD\u6280\u80FD\u7684\u5B89\u5168\u5A01\u8105' : 'Audit installed skills for threats' },
-      { key: '3', label: currentLang === 'zh-TW' ? '\u4E0D\u7528\uFF0C\u56DE\u4E3B\u9078\u55AE' : 'No, return to main menu' },
+      {
+        key: '1',
+        label:
+          currentLang === 'zh-TW'
+            ? '\u662F\uFF0C\u555F\u52D5 Guard \u9632\u8B77'
+            : 'Yes, start Guard protection',
+      },
+      {
+        key: '2',
+        label:
+          currentLang === 'zh-TW'
+            ? '\u5BE9\u8A08\u5DF2\u5B89\u88DD\u6280\u80FD\u7684\u5B89\u5168\u5A01\u8105'
+            : 'Audit installed skills for threats',
+      },
+      {
+        key: '3',
+        label:
+          currentLang === 'zh-TW'
+            ? '\u4E0D\u7528\uFF0C\u56DE\u4E3B\u9078\u55AE'
+            : 'No, return to main menu',
+      },
     ];
     renderCompactMenu('', guardItems);
     const guardChoice = await waitForCompactChoice(guardItems, currentLang);
@@ -919,7 +974,10 @@ async function actionScan(): Promise<void> {
     nextSteps(
       currentLang === 'zh-TW'
         ? [
-            { cmd: '[8] \u6280\u80FD\u5BE9\u8A08', desc: '\u5BE9\u8A08\u5DF2\u5B89\u88DD\u6280\u80FD\u7684\u5B89\u5168\u5A01\u8105' },
+            {
+              cmd: '[8] \u6280\u80FD\u5BE9\u8A08',
+              desc: '\u5BE9\u8A08\u5DF2\u5B89\u88DD\u6280\u80FD\u7684\u5B89\u5168\u5A01\u8105',
+            },
             { cmd: 'scan --full', desc: '\u57F7\u884C\u5B8C\u6574\u6383\u63CF' },
             { cmd: 'guard start', desc: '\u555F\u52D5\u5373\u6642\u9632\u8B77' },
           ]
@@ -946,7 +1004,9 @@ async function actionReport(): Promise<void> {
   if (currentLang === 'zh-TW') {
     console.log('  \u5408\u898F\u5831\u544A \u2014 \u5373\u5C07\u63A8\u51FA');
     console.log('');
-    console.log('  ISO 27001\u3001SOC 2\u3001\u8CC7\u5B89\u7BA1\u7406\u6CD5\u5408\u898F\u5831\u544A\u529F\u80FD\u958B\u767C\u4E2D\u3002');
+    console.log(
+      '  ISO 27001\u3001SOC 2\u3001\u8CC7\u5B89\u7BA1\u7406\u6CD5\u5408\u898F\u5831\u544A\u529F\u80FD\u958B\u767C\u4E2D\u3002'
+    );
     console.log('  \u8FFD\u8E64\u9032\u5EA6: https://github.com/panguard-ai/panguard-ai');
   } else {
     console.log('  Compliance Report \u2014 Coming Soon');
@@ -1000,7 +1060,10 @@ async function actionGuard(): Promise<void> {
         nextSteps(
           currentLang === 'zh-TW'
             ? [
-                { cmd: 'guard > \u67E5\u770B\u72C0\u614B', desc: '\u67E5\u770B\u8A73\u7D30\u72C0\u614B' },
+                {
+                  cmd: 'guard > \u67E5\u770B\u72C0\u614B',
+                  desc: '\u67E5\u770B\u8A73\u7D30\u72C0\u614B',
+                },
                 { cmd: 'guard > \u505C\u6B62\u5F15\u64CE', desc: '\u505C\u6B62\u9632\u8B77' },
               ]
             : [
@@ -1016,7 +1079,9 @@ async function actionGuard(): Promise<void> {
       console.log(`  ${c.sage('\u25C6')} Guard active${' '.repeat(30)}All Layers \u00B7 Free`);
       console.log('');
       if (currentLang === 'zh-TW') {
-        console.log(`  ${c.safe('\u2713')} \u5DF2\u77E5\u653B\u64CA\u6A21\u5F0F\u81EA\u52D5\u5C01\u9396`);
+        console.log(
+          `  ${c.safe('\u2713')} \u5DF2\u77E5\u653B\u64CA\u6A21\u5F0F\u81EA\u52D5\u5C01\u9396`
+        );
         console.log(`  ${c.safe('\u2713')} Threat Cloud \u5A01\u8105\u60C5\u5831`);
         console.log(`  ${c.safe('\u2713')} AI \u5206\u6790`);
         console.log(`  ${c.safe('\u2713')} \u901A\u77E5\u7CFB\u7D71`);
@@ -1135,13 +1200,25 @@ async function actionGuard(): Promise<void> {
       if (existsSync(logFilePath)) {
         const content = readFileSync(logFilePath, 'utf-8');
         const lines = content.trim().split('\n').slice(-30);
-        console.log(c.dim(currentLang === 'zh-TW' ? '  \u6700\u8FD1 30 \u884C\u65E5\u8A8C:' : '  Last 30 log lines:'));
+        console.log(
+          c.dim(
+            currentLang === 'zh-TW'
+              ? '  \u6700\u8FD1 30 \u884C\u65E5\u8A8C:'
+              : '  Last 30 log lines:'
+          )
+        );
         console.log('');
         for (const line of lines) {
           console.log(`  ${c.dim(line)}`);
         }
       } else {
-        console.log(c.dim(currentLang === 'zh-TW' ? '  \u5C1A\u7121\u65E5\u8A8C\u6A94\u6848' : '  No log file found'));
+        console.log(
+          c.dim(
+            currentLang === 'zh-TW'
+              ? '  \u5C1A\u7121\u65E5\u8A8C\u6A94\u6848'
+              : '  No log file found'
+          )
+        );
       }
       break;
     }
@@ -1161,7 +1238,9 @@ async function actionTrap(): Promise<void> {
   if (currentLang === 'zh-TW') {
     console.log('  \u871C\u7F50\u7CFB\u7D71 \u2014 \u5373\u5C07\u63A8\u51FA');
     console.log('');
-    console.log('  \u8A98\u990C\u670D\u52D9\uFF08SSH\u3001HTTP\u3001FTP\uFF09\u5075\u6E2C\u8207\u5206\u6790\u653B\u64CA\u8005\u529F\u80FD\u958B\u767C\u4E2D\u3002');
+    console.log(
+      '  \u8A98\u990C\u670D\u52D9\uFF08SSH\u3001HTTP\u3001FTP\uFF09\u5075\u6E2C\u8207\u5206\u6790\u653B\u64CA\u8005\u529F\u80FD\u958B\u767C\u4E2D\u3002'
+    );
     console.log('  \u8FFD\u8E64\u9032\u5EA6: https://github.com/panguard-ai/panguard-ai');
   } else {
     console.log('  Honeypot System \u2014 Coming Soon');
@@ -1184,7 +1263,10 @@ async function actionChat(): Promise<void> {
   console.log('');
 
   const items: MenuItem[] = [
-    { key: '1', label: currentLang === 'zh-TW' ? '\u8A2D\u5B9A\u901A\u77E5\u7BA1\u9053' : 'Setup Channels' },
+    {
+      key: '1',
+      label: currentLang === 'zh-TW' ? '\u8A2D\u5B9A\u901A\u77E5\u7BA1\u9053' : 'Setup Channels',
+    },
     { key: '2', label: currentLang === 'zh-TW' ? '\u67E5\u770B\u72C0\u614B' : 'Status' },
     { key: '3', label: currentLang === 'zh-TW' ? '\u6E2C\u8A66\u767C\u9001' : 'Test Send' },
   ];
@@ -1520,10 +1602,7 @@ async function actionAudit(): Promise<void> {
     },
     {
       key: '2',
-      label:
-        currentLang === 'zh-TW'
-          ? '\u8F38\u5165\u81EA\u5B9A\u8DEF\u5F91'
-          : 'Enter custom path',
+      label: currentLang === 'zh-TW' ? '\u8F38\u5165\u81EA\u5B9A\u8DEF\u5F91' : 'Enter custom path',
     },
   ];
 
@@ -1563,9 +1642,7 @@ async function actionAudit(): Promise<void> {
   try {
     const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
     const report = await auditSkill(resolvedPath);
-    sp.succeed(
-      currentLang === 'zh-TW' ? '\u5BE9\u8A08\u5B8C\u6210' : 'Audit complete'
-    );
+    sp.succeed(currentLang === 'zh-TW' ? '\u5BE9\u8A08\u5B8C\u6210' : 'Audit complete');
 
     // Display results
     const levelColors: Record<string, (s: string) => string> = {
@@ -1631,9 +1708,7 @@ async function actionAudit(): Promise<void> {
             : finding.severity === 'high'
               ? c.caution
               : c.dim;
-        console.log(
-          `  ${sevColor(`[${finding.severity.toUpperCase()}]`)} ${finding.title}`
-        );
+        console.log(`  ${sevColor(`[${finding.severity.toUpperCase()}]`)} ${finding.title}`);
         console.log(`    ${c.dim(finding.description)}`);
         if (finding.location) console.log(`    ${c.dim(`at ${finding.location}`)}`);
         console.log('');
@@ -1654,7 +1729,10 @@ async function actionAudit(): Promise<void> {
     );
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
-    const isNoSkill = errMsg.toLowerCase().includes('skill.md') || errMsg.toLowerCase().includes('not found') || errMsg.toLowerCase().includes('enoent');
+    const isNoSkill =
+      errMsg.toLowerCase().includes('skill.md') ||
+      errMsg.toLowerCase().includes('not found') ||
+      errMsg.toLowerCase().includes('enoent');
 
     if (isNoSkill) {
       sp.warn(
@@ -1663,17 +1741,21 @@ async function actionAudit(): Promise<void> {
           : 'No AI skills (SKILL.md) found in this directory'
       );
       console.log('');
-      console.log(c.dim(
-        currentLang === 'zh-TW'
-          ? '  Skill Auditor \u6383\u63CF\u5305\u542B SKILL.md \u7684 AI \u6280\u80FD\u76EE\u9304\u3002'
-          : '  Skill Auditor scans AI skill directories containing a SKILL.md file.'
-      ));
+      console.log(
+        c.dim(
+          currentLang === 'zh-TW'
+            ? '  Skill Auditor \u6383\u63CF\u5305\u542B SKILL.md \u7684 AI \u6280\u80FD\u76EE\u9304\u3002'
+            : '  Skill Auditor scans AI skill directories containing a SKILL.md file.'
+        )
+      );
       console.log('');
-      console.log(c.dim(
-        currentLang === 'zh-TW'
-          ? '  \u5E38\u898B\u6280\u80FD\u4F4D\u7F6E\uFF1A'
-          : '  Common skill locations:'
-      ));
+      console.log(
+        c.dim(
+          currentLang === 'zh-TW'
+            ? '  \u5E38\u898B\u6280\u80FD\u4F4D\u7F6E\uFF1A'
+            : '  Common skill locations:'
+        )
+      );
       console.log(c.dim('    ~/.claude/skills/'));
       console.log(c.dim('    ./.claude/skills/'));
       console.log(c.dim('    ./.mcp/'));
@@ -1714,41 +1796,49 @@ async function actionAudit(): Promise<void> {
       }
 
       if (foundDirs.length > 0) {
-        console.log(c.sage(
-          currentLang === 'zh-TW'
-            ? `  \u5728\u7CFB\u7D71\u4E2D\u627E\u5230 ${foundDirs.length} \u500B\u6280\u80FD\uFF1A`
-            : `  Found ${foundDirs.length} skill(s) on your system:`
-        ));
+        console.log(
+          c.sage(
+            currentLang === 'zh-TW'
+              ? `  \u5728\u7CFB\u7D71\u4E2D\u627E\u5230 ${foundDirs.length} \u500B\u6280\u80FD\uFF1A`
+              : `  Found ${foundDirs.length} skill(s) on your system:`
+          )
+        );
         for (const dir of foundDirs) {
           console.log(c.dim(`    ${dir}`));
         }
         console.log('');
-        console.log(c.dim(
-          currentLang === 'zh-TW'
-            ? `  \u57F7\u884C\uFF1Apanguard audit skill <path> \u4F86\u5BE9\u8A08\u7279\u5B9A\u6280\u80FD`
-            : `  Run: panguard audit skill <path> to audit a specific skill`
-        ));
+        console.log(
+          c.dim(
+            currentLang === 'zh-TW'
+              ? `  \u57F7\u884C\uFF1Apanguard audit skill <path> \u4F86\u5BE9\u8A08\u7279\u5B9A\u6280\u80FD`
+              : `  Run: panguard audit skill <path> to audit a specific skill`
+          )
+        );
       } else {
-        console.log(c.dim(
-          currentLang === 'zh-TW'
-            ? '  \u7CFB\u7D71\u4E2D\u672A\u627E\u5230\u5DF2\u5B89\u88DD\u7684 AI \u6280\u80FD\u3002'
-            : '  No installed AI skills found on your system.'
-        ));
-        console.log(c.dim(
-          currentLang === 'zh-TW'
-            ? '  \u5728\u5305\u542B AI \u6280\u80FD\u7684\u5C08\u6848\u76EE\u9304\u4E2D\u57F7\u884C\u6B64\u6307\u4EE4\u3002'
-            : '  Run this command inside a project directory that contains AI skills.'
-        ));
+        console.log(
+          c.dim(
+            currentLang === 'zh-TW'
+              ? '  \u7CFB\u7D71\u4E2D\u672A\u627E\u5230\u5DF2\u5B89\u88DD\u7684 AI \u6280\u80FD\u3002'
+              : '  No installed AI skills found on your system.'
+          )
+        );
+        console.log(
+          c.dim(
+            currentLang === 'zh-TW'
+              ? '  \u5728\u5305\u542B AI \u6280\u80FD\u7684\u5C08\u6848\u76EE\u9304\u4E2D\u57F7\u884C\u6B64\u6307\u4EE4\u3002'
+              : '  Run this command inside a project directory that contains AI skills.'
+          )
+        );
       }
     } else {
-      sp.fail(
-        currentLang === 'zh-TW' ? '\u5BE9\u8A08\u5931\u6557' : 'Audit failed'
-      );
+      sp.fail(currentLang === 'zh-TW' ? '\u5BE9\u8A08\u5931\u6557' : 'Audit failed');
       console.log(
         formatError(
           errMsg,
           currentLang === 'zh-TW' ? '\u6280\u80FD\u5BE9\u8A08' : 'Skill Auditor',
-          currentLang === 'zh-TW' ? '\u8ACB\u91CD\u8A66\u6216\u6AA2\u67E5\u65E5\u8A8C' : 'Please retry or check logs'
+          currentLang === 'zh-TW'
+            ? '\u8ACB\u91CD\u8A66\u6216\u6AA2\u67E5\u65E5\u8A8C'
+            : 'Please retry or check logs'
         )
       );
     }
@@ -1760,13 +1850,20 @@ async function actionAudit(): Promise<void> {
 // ---------------------------------------------------------------------------
 
 async function actionHardening(): Promise<void> {
-  breadcrumb(['Panguard', currentLang === 'zh-TW' ? '\u5B89\u5168\u52A0\u56FA' : 'Security Hardening']);
+  breadcrumb([
+    'Panguard',
+    currentLang === 'zh-TW' ? '\u5B89\u5168\u52A0\u56FA' : 'Security Hardening',
+  ]);
   const title = currentLang === 'zh-TW' ? '\u5B89\u5168\u52A0\u56FA' : 'Security Hardening';
   console.log(`  ${theme.brandBold(title)}`);
   console.log('');
 
   const items: MenuItem[] = [
-    { key: '1', label: currentLang === 'zh-TW' ? '\u57F7\u884C\u52A0\u56FA\u6383\u63CF' : 'Run hardening audit' },
+    {
+      key: '1',
+      label:
+        currentLang === 'zh-TW' ? '\u57F7\u884C\u52A0\u56FA\u6383\u63CF' : 'Run hardening audit',
+    },
     { key: '2', label: currentLang === 'zh-TW' ? '\u81EA\u52D5\u4FEE\u5FA9' : 'Auto-fix issues' },
     { key: '3', label: currentLang === 'zh-TW' ? '\u67E5\u770B\u5831\u544A' : 'View report' },
   ];

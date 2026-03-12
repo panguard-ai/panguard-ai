@@ -29,14 +29,19 @@ const VALID_EVENT_TYPES: ReadonlySet<string> = new Set([
   'multi_agent_message',
 ]);
 
-export function handleScan(engine: ATREngine, args: Record<string, unknown>): {
+export function handleScan(
+  engine: ATREngine,
+  args: Record<string, unknown>
+): {
   content: Array<{ type: string; text: string }>;
   isError?: boolean;
 } {
   const content = args['content'];
   if (typeof content !== 'string' || content.trim().length === 0) {
     return {
-      content: [{ type: 'text', text: 'Error: "content" is required and must be a non-empty string.' }],
+      content: [
+        { type: 'text', text: 'Error: "content" is required and must be a non-empty string.' },
+      ],
       isError: true,
     };
   }
@@ -44,7 +49,12 @@ export function handleScan(engine: ATREngine, args: Record<string, unknown>): {
   const eventTypeRaw = (args['event_type'] as string) ?? 'llm_input';
   if (!VALID_EVENT_TYPES.has(eventTypeRaw)) {
     return {
-      content: [{ type: 'text', text: `Error: Invalid event_type "${eventTypeRaw}". Valid types: ${[...VALID_EVENT_TYPES].join(', ')}` }],
+      content: [
+        {
+          type: 'text',
+          text: `Error: Invalid event_type "${eventTypeRaw}". Valid types: ${[...VALID_EVENT_TYPES].join(', ')}`,
+        },
+      ],
       isError: true,
     };
   }
@@ -52,7 +62,12 @@ export function handleScan(engine: ATREngine, args: Record<string, unknown>): {
   const minSeverity = ((args['min_severity'] as string) ?? 'informational').toLowerCase();
   if (!(minSeverity in SEVERITY_ORDER)) {
     return {
-      content: [{ type: 'text', text: `Error: Invalid min_severity "${minSeverity}". Valid: informational, low, medium, high, critical` }],
+      content: [
+        {
+          type: 'text',
+          text: `Error: Invalid min_severity "${minSeverity}". Valid: informational, low, medium, high, critical`,
+        },
+      ],
       isError: true,
     };
   }
@@ -72,9 +87,7 @@ export function handleScan(engine: ATREngine, args: Record<string, unknown>): {
   };
 
   const matches = engine.evaluate(event);
-  const filtered = matches.filter(
-    (m) => (SEVERITY_ORDER[m.rule.severity] ?? 0) >= minIdx
-  );
+  const filtered = matches.filter((m) => (SEVERITY_ORDER[m.rule.severity] ?? 0) >= minIdx);
 
   const result = {
     threats_found: filtered.length,

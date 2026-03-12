@@ -23,9 +23,7 @@ export function middleware(request: NextRequest) {
   const docsMatch = pathname.match(/^(?:\/(?:en|zh))?\/docs(?:\/(.*))?$/);
   if (docsMatch) {
     const subpath = docsMatch[1] || '';
-    const target = subpath
-      ? `https://docs.panguard.ai/${subpath}`
-      : 'https://docs.panguard.ai';
+    const target = subpath ? `https://docs.panguard.ai/${subpath}` : 'https://docs.panguard.ai';
     return NextResponse.redirect(target, 301);
   }
 

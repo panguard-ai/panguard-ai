@@ -56,7 +56,10 @@ export class SmartRouter {
   private readonly cloudProvider: LLMProvider | null;
 
   /** Knowledge cache: pattern hash -> cached result (avoids repeat AI calls) */
-  private readonly knowledgeCache = new Map<string, { result: AnalysisResult; timestamp: number }>();
+  private readonly knowledgeCache = new Map<
+    string,
+    { result: AnalysisResult; timestamp: number }
+  >();
   private readonly cacheTTL = 3_600_000; // 1 hour
 
   /** Stats */
@@ -191,7 +194,8 @@ export class SmartRouter {
 
       if (result) {
         const funnelStatus = this.funnel.getStatus();
-        const usedCloud = funnelStatus.activeLayer === 'cloud-ai' ||
+        const usedCloud =
+          funnelStatus.activeLayer === 'cloud-ai' ||
           (!funnelStatus.local.available && funnelStatus.cloud.available);
 
         if (usedCloud) {

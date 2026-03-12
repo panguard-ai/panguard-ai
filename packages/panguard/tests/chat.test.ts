@@ -13,11 +13,13 @@ vi.mock('@panguard-ai/panguard-chat', () => ({
 
 // Mock auth-guard to bypass authentication for testing
 vi.mock('../src/cli/auth-guard.js', () => ({
-  withAuth: vi.fn((_tier: string, handler: (opts: Record<string, string | undefined>) => Promise<void>) => {
-    return async (opts: Record<string, string | undefined>) => {
-      await handler(opts);
-    };
-  }),
+  withAuth: vi.fn(
+    (_tier: string, handler: (opts: Record<string, string | undefined>) => Promise<void>) => {
+      return async (opts: Record<string, string | undefined>) => {
+        await handler(opts);
+      };
+    }
+  ),
 }));
 
 import { runCLI } from '@panguard-ai/panguard-chat';
@@ -197,13 +199,7 @@ describe('chatCommand', () => {
     it('should forward --weekly and --peaceful options', async () => {
       const cmd = chatCommand();
       await cmd.parseAsync(['prefs', '--weekly', 'on', '--peaceful', 'off'], { from: 'user' });
-      expect(mockedRunCLI).toHaveBeenCalledWith([
-        'prefs',
-        '--weekly',
-        'on',
-        '--peaceful',
-        'off',
-      ]);
+      expect(mockedRunCLI).toHaveBeenCalledWith(['prefs', '--weekly', 'on', '--peaceful', 'off']);
     });
 
     it('should forward all preference options combined', async () => {

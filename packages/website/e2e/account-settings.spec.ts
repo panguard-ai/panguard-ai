@@ -41,12 +41,17 @@ test.describe('Account Settings', () => {
     await page.goto('/account/settings');
 
     // The delete button is inside the Danger Zone section — select the button element specifically
-    const deleteBtn = page.locator('button').filter({ hasText: /delete.*account/i }).first();
+    const deleteBtn = page
+      .locator('button')
+      .filter({ hasText: /delete.*account/i })
+      .first();
     if (await deleteBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
       await deleteBtn.click();
       await page.waitForTimeout(1000);
       // Should show password confirmation or warning
-      const confirmation = page.locator('input[type="password"], [role="alertdialog"], .text-status-danger').first();
+      const confirmation = page
+        .locator('input[type="password"], [role="alertdialog"], .text-status-danger')
+        .first();
       if (await confirmation.isVisible({ timeout: 3000 }).catch(() => false)) {
         await expect(confirmation).toBeVisible();
       }

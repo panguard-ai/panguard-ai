@@ -15,11 +15,7 @@ import type { SkillWhitelistManager } from '../engines/skill-whitelist.js';
 const logger = createLogger('panguard-guard:atr-actions');
 
 /** Safety: agents that must not be killed */
-const PROTECTED_AGENTS = new Set([
-  'panguard-guard',
-  'panguard-manager',
-  'system-agent',
-]);
+const PROTECTED_AGENTS = new Set(['panguard-guard', 'panguard-manager', 'system-agent']);
 
 /**
  * ATR action handler collection.
@@ -57,7 +53,8 @@ export class ATRActionHandlers {
     return {
       action: 'block_tool',
       success: true,
-      details: `Tool "${label}" blocked by ATR rule. ` +
+      details:
+        `Tool "${label}" blocked by ATR rule. ` +
         `Conclusion: ${verdict.conclusion}, confidence: ${verdict.confidence}%`,
       timestamp: new Date().toISOString(),
       target: label,
@@ -124,7 +121,8 @@ export class ATRActionHandlers {
         return {
           action: 'kill_agent',
           success: true,
-          details: `Agent PID ${pid} terminated${isAlive ? ' (SIGKILL required)' : ''}` +
+          details:
+            `Agent PID ${pid} terminated${isAlive ? ' (SIGKILL required)' : ''}` +
             (agentId ? ` [agentId: ${agentId}]` : ''),
           timestamp: new Date().toISOString(),
           target: String(pid),

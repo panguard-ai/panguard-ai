@@ -14,15 +14,31 @@ import { withAuth } from '../auth-guard.js';
 
 // Dynamic import — threat-cloud server package is not published to npm
 type StoredReport = {
-  id: string; title: string; url: string; severity: 'none' | 'low' | 'medium' | 'high' | 'critical';
-  cweId: string | null; cweName: string | null; cveIds: string[];
-  summary: string | null; disclosedAt: string; programHandle: string | null;
-  programName: string | null; reporterUsername: string | null; fetchedAt: string;
+  id: string;
+  title: string;
+  url: string;
+  severity: 'none' | 'low' | 'medium' | 'high' | 'critical';
+  cweId: string | null;
+  cweName: string | null;
+  cveIds: string[];
+  summary: string | null;
+  disclosedAt: string;
+  programHandle: string | null;
+  programName: string | null;
+  reporterUsername: string | null;
+  fetchedAt: string;
 };
 type GeneratedRule = {
-  id: string; yamlContent: string; sourceReportId: string; sourceReportUrl: string;
-  attackType: string; confidence: number; status: string; generatedAt: string;
-  reviewed: boolean; reviewDecision: string | null;
+  id: string;
+  yamlContent: string;
+  sourceReportId: string;
+  sourceReportUrl: string;
+  attackType: string;
+  confidence: number;
+  status: string;
+  generatedAt: string;
+  reviewed: boolean;
+  reviewDecision: string | null;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,7 +49,7 @@ async function loadThreatCloud(): Promise<any> {
   } catch {
     console.error(
       `\n  ${c.red('Threat Cloud server package is not available.')}\n` +
-      `  This command is for Panguard operators only.\n`
+        `  This command is for Panguard operators only.\n`
     );
     process.exitCode = 1;
     return null;
@@ -100,7 +116,9 @@ export function hacktivityCommand(): Command {
 
           // Merge with existing reports (dedup by id)
           const existingIds = new Set(meta.reports.map((r: StoredReport) => r.id));
-          const newReports = (reports as StoredReport[]).filter((r: StoredReport) => !existingIds.has(r.id));
+          const newReports = (reports as StoredReport[]).filter(
+            (r: StoredReport) => !existingIds.has(r.id)
+          );
 
           meta.reports = [...meta.reports, ...newReports];
           meta.lastSyncAt = new Date().toISOString();
@@ -115,11 +133,12 @@ export function hacktivityCommand(): Command {
           ];
           const rows = newReports.slice(0, 20).map((r) => ({
             id: r.id,
-            severity: r.severity === 'critical'
-              ? c.red(r.severity)
-              : r.severity === 'high'
-                ? c.yellow(r.severity)
-                : r.severity,
+            severity:
+              r.severity === 'critical'
+                ? c.red(r.severity)
+                : r.severity === 'high'
+                  ? c.yellow(r.severity)
+                  : r.severity,
             cwe: r.cweId ?? c.dim('N/A'),
             title: r.title.length > 48 ? r.title.slice(0, 48) + '...' : r.title,
           }));
@@ -149,134 +168,137 @@ export function hacktivityCommand(): Command {
     .option('--model <name>', 'Ollama model name', 'llama3.2')
     .option('--heuristic-only', 'Skip Ollama, use heuristic extraction only', false)
     .action(
-      withAuth('solo', async (opts: { ollamaUrl: string; model: string; heuristicOnly: boolean }) => {
-        const meta = loadMeta();
+      withAuth(
+        'solo',
+        async (opts: { ollamaUrl: string; model: string; heuristicOnly: boolean }) => {
+          const meta = loadMeta();
 
-        if (meta.reports.length === 0) {
-          console.log(
-            `  ${symbols.warn} ${c.dim('No reports found. Run')} ${c.sage('panguard hacktivity sync')} ${c.dim('first.')}`
-          );
-          return;
-        }
+          if (meta.reports.length === 0) {
+            console.log(
+              `  ${symbols.warn} ${c.dim('No reports found. Run')} ${c.sage('panguard hacktivity sync')} ${c.dim('first.')}`
+            );
+            return;
+          }
 
-        const tc = await loadThreatCloud();
-        if (!tc) return;
-        const extractor = new tc.AttackExtractor({
-          ollamaBaseUrl: opts.ollamaUrl,
-          model: opts.model,
-        });
-        const generator = new tc.SigmaRuleGenerator();
-        const validator = new tc.RuleValidator();
+          const tc = await loadThreatCloud();
+          if (!tc) return;
+          const extractor = new tc.AttackExtractor({
+            ollamaBaseUrl: opts.ollamaUrl,
+            model: opts.model,
+          });
+          const generator = new tc.SigmaRuleGenerator();
+          const validator = new tc.RuleValidator();
 
-        // Register existing rules for dedup
-        validator.registerExistingRules(meta.rules);
+          // Register existing rules for dedup
+          validator.registerExistingRules(meta.rules);
 
-        // Check Ollama availability
-        let useOllama = !opts.heuristicOnly;
-        if (useOllama) {
-          const sp = spinner('Checking Ollama availability...');
-          useOllama = await extractor.isOllamaAvailable();
+          // Check Ollama availability
+          let useOllama = !opts.heuristicOnly;
           if (useOllama) {
-            sp.succeed(`Ollama connected (model: ${opts.model})`);
-          } else {
-            sp.warn('Ollama unavailable, using heuristic extraction');
-          }
-        }
-
-        // Find reports without rules
-        const ruledReportIds = new Set(meta.rules.map((r) => r.sourceReportId));
-        const pendingReports = meta.reports.filter((r) => !ruledReportIds.has(r.id));
-
-        if (pendingReports.length === 0) {
-          console.log(`  ${symbols.info} ${c.dim('All reports already have generated rules.')}`);
-          return;
-        }
-
-        const sp2 = spinner(`Generating rules for ${pendingReports.length} reports...`);
-        const newRules: GeneratedRule[] = [];
-        let skippedDupes = 0;
-        let skippedInvalid = 0;
-
-        for (const report of pendingReports) {
-          try {
-            const extraction = useOllama
-              ? await extractor.extract(report)
-              : {
-                  reportId: report.id,
-                  reportTitle: report.title,
-                  reportUrl: report.url,
-                  patterns: extractor.extractHeuristic(report),
-                  extractedAt: new Date().toISOString(),
-                  model: 'heuristic',
-                };
-
-            const rules = generator.generate(extraction);
-
-            for (const rule of rules) {
-              const validation = validator.validate(rule);
-
-              if (validation.isDuplicate) {
-                skippedDupes++;
-                continue;
-              }
-
-              if (!validation.valid) {
-                skippedInvalid++;
-                continue;
-              }
-
-              // Write rule file
-              mkdirSync(RULES_DIR, { recursive: true });
-              const filename = `${rule.attackType.toLowerCase().replace(/\s+/g, '-')}-${rule.id.slice(0, 8)}.yml`;
-              writeFileSync(join(RULES_DIR, filename), rule.yamlContent);
-              newRules.push(rule);
+            const sp = spinner('Checking Ollama availability...');
+            useOllama = await extractor.isOllamaAvailable();
+            if (useOllama) {
+              sp.succeed(`Ollama connected (model: ${opts.model})`);
+            } else {
+              sp.warn('Ollama unavailable, using heuristic extraction');
             }
-          } catch {
-            // Skip failed extractions silently
           }
-        }
 
-        meta.rules = [...meta.rules, ...newRules];
-        saveMeta(meta);
+          // Find reports without rules
+          const ruledReportIds = new Set(meta.rules.map((r) => r.sourceReportId));
+          const pendingReports = meta.reports.filter((r) => !ruledReportIds.has(r.id));
 
-        sp2.succeed(`Generated ${newRules.length} new rules`);
+          if (pendingReports.length === 0) {
+            console.log(`  ${symbols.info} ${c.dim('All reports already have generated rules.')}`);
+            return;
+          }
 
-        if (skippedDupes > 0) {
-          console.log(`  ${symbols.info} ${c.dim(`Skipped ${skippedDupes} duplicates`)}`);
-        }
-        if (skippedInvalid > 0) {
-          console.log(`  ${symbols.warn} ${c.dim(`Skipped ${skippedInvalid} invalid rules`)}`);
-        }
+          const sp2 = spinner(`Generating rules for ${pendingReports.length} reports...`);
+          const newRules: GeneratedRule[] = [];
+          let skippedDupes = 0;
+          let skippedInvalid = 0;
 
-        // Summary
-        const draftCount = newRules.filter((r) => r.status === 'draft').length;
-        const experimentalCount = newRules.filter((r) => r.status === 'experimental').length;
+          for (const report of pendingReports) {
+            try {
+              const extraction = useOllama
+                ? await extractor.extract(report)
+                : {
+                    reportId: report.id,
+                    reportTitle: report.title,
+                    reportUrl: report.url,
+                    patterns: extractor.extractHeuristic(report),
+                    extractedAt: new Date().toISOString(),
+                    model: 'heuristic',
+                  };
 
-        console.log('');
-        console.log(
-          statusPanel('Rule Generation Summary', [
-            { label: 'New Rules', value: String(newRules.length) },
-            {
-              label: 'Experimental (auto-enabled)',
-              value: String(experimentalCount),
-              status: 'safe',
-            },
-            {
-              label: 'Draft (needs review)',
-              value: String(draftCount),
-              status: draftCount > 0 ? 'caution' : 'safe',
-            },
-            { label: 'Output', value: RULES_DIR },
-          ])
-        );
+              const rules = generator.generate(extraction);
 
-        if (draftCount > 0) {
+              for (const rule of rules) {
+                const validation = validator.validate(rule);
+
+                if (validation.isDuplicate) {
+                  skippedDupes++;
+                  continue;
+                }
+
+                if (!validation.valid) {
+                  skippedInvalid++;
+                  continue;
+                }
+
+                // Write rule file
+                mkdirSync(RULES_DIR, { recursive: true });
+                const filename = `${rule.attackType.toLowerCase().replace(/\s+/g, '-')}-${rule.id.slice(0, 8)}.yml`;
+                writeFileSync(join(RULES_DIR, filename), rule.yamlContent);
+                newRules.push(rule);
+              }
+            } catch {
+              // Skip failed extractions silently
+            }
+          }
+
+          meta.rules = [...meta.rules, ...newRules];
+          saveMeta(meta);
+
+          sp2.succeed(`Generated ${newRules.length} new rules`);
+
+          if (skippedDupes > 0) {
+            console.log(`  ${symbols.info} ${c.dim(`Skipped ${skippedDupes} duplicates`)}`);
+          }
+          if (skippedInvalid > 0) {
+            console.log(`  ${symbols.warn} ${c.dim(`Skipped ${skippedInvalid} invalid rules`)}`);
+          }
+
+          // Summary
+          const draftCount = newRules.filter((r) => r.status === 'draft').length;
+          const experimentalCount = newRules.filter((r) => r.status === 'experimental').length;
+
           console.log('');
           console.log(
-            `  ${symbols.info} Run ${c.sage('panguard hacktivity review')} to review draft rules.`
+            statusPanel('Rule Generation Summary', [
+              { label: 'New Rules', value: String(newRules.length) },
+              {
+                label: 'Experimental (auto-enabled)',
+                value: String(experimentalCount),
+                status: 'safe',
+              },
+              {
+                label: 'Draft (needs review)',
+                value: String(draftCount),
+                status: draftCount > 0 ? 'caution' : 'safe',
+              },
+              { label: 'Output', value: RULES_DIR },
+            ])
           );
+
+          if (draftCount > 0) {
+            console.log('');
+            console.log(
+              `  ${symbols.info} Run ${c.sage('panguard hacktivity review')} to review draft rules.`
+            );
+          }
         }
-      })
+      )
     );
 
   // ─── review ───
@@ -313,9 +335,8 @@ export function hacktivityCommand(): Command {
           idx: String(i + 1),
           id: r.id.slice(0, 8),
           attack: r.attackType,
-          confidence: r.confidence >= 70
-            ? c.sage(`${r.confidence}%`)
-            : c.yellow(`${r.confidence}%`),
+          confidence:
+            r.confidence >= 70 ? c.sage(`${r.confidence}%`) : c.yellow(`${r.confidence}%`),
           status: r.status === 'draft' ? c.yellow(r.status) : c.sage(r.status),
           source: r.sourceReportUrl,
         }));

@@ -100,12 +100,15 @@ export class ATRDrafter {
    * Called by GuardEngine after a threat is detected.
    * 記錄偵測到的威脅事件用於模式累積
    */
-  recordDetection(event: SecurityEvent, verdict: {
-    conclusion: string;
-    confidence: number;
-    mitreTechniques?: string[];
-    atrRulesMatched?: string[];
-  }): void {
+  recordDetection(
+    event: SecurityEvent,
+    verdict: {
+      conclusion: string;
+      confidence: number;
+      mitreTechniques?: string[];
+      atrRulesMatched?: string[];
+    }
+  ): void {
     // Only track suspicious/malicious verdicts with reasonable confidence
     if (verdict.conclusion === 'benign' || verdict.confidence < 50) return;
 
@@ -132,8 +135,8 @@ export class ATRDrafter {
     pattern.occurrences++;
     pattern.lastSeen = new Date().toISOString();
 
-    const ip = (event.metadata?.['sourceIP'] as string) ??
-      (event.metadata?.['remoteAddress'] as string);
+    const ip =
+      (event.metadata?.['sourceIP'] as string) ?? (event.metadata?.['remoteAddress'] as string);
     if (ip) pattern.distinctIPs.add(ip);
 
     const severity = (event.metadata?.['severity'] as string) ?? 'medium';
@@ -162,10 +165,7 @@ export class ATRDrafter {
     // Run first cycle after a delay to accumulate some events
     setTimeout(() => void this.runDraftCycle(), 30 * 60 * 1000); // 30 min initial delay
 
-    this.cycleTimer = setInterval(
-      () => void this.runDraftCycle(),
-      this.config.windowMs
-    );
+    this.cycleTimer = setInterval(() => void this.runDraftCycle(), this.config.windowMs);
 
     logger.info(
       `ATR drafter started (cycle: ${this.config.windowMs / 3600000}h) / ` +
@@ -274,7 +274,7 @@ export class ATRDrafter {
     if (!ruleContent || ruleContent.length < 100) {
       logger.warn(
         `ATR draft for ${patternHash}: LLM returned invalid/short YAML. ` +
-        `Raw response (first 500 chars): ${draftResponse.summary.slice(0, 500)}`
+          `Raw response (first 500 chars): ${draftResponse.summary.slice(0, 500)}`
       );
       return null;
     }
@@ -284,7 +284,7 @@ export class ATRDrafter {
     if (validationError) {
       logger.warn(
         `ATR draft for ${patternHash}: YAML schema validation failed: ${validationError}. ` +
-        `Raw YAML (first 500 chars): ${ruleContent.slice(0, 500)}`
+          `Raw YAML (first 500 chars): ${ruleContent.slice(0, 500)}`
       );
       return null;
     }
@@ -375,9 +375,10 @@ export class ATRDrafter {
 
   private buildDraftPrompt(pattern: LocalPattern): string {
     const samples = pattern.sampleDescriptions.map((d, i) => `  ${i + 1}. ${d}`).join('\n');
-    const existingATR = pattern.atrRulesMatched.length > 0
-      ? `\nExisting ATR rules already matching: ${pattern.atrRulesMatched.join(', ')}`
-      : '';
+    const existingATR =
+      pattern.atrRulesMatched.length > 0
+        ? `\nExisting ATR rules already matching: ${pattern.atrRulesMatched.join(', ')}`
+        : '';
 
     return `You are a cybersecurity expert. Generate an ATR (Agent Threat Rules) YAML rule for this attack pattern.
 
@@ -394,7 +395,10 @@ ${samples}
 
 REQUIREMENTS:
 1. Follow ATR schema v0.1
-2. Use id: ATR-AUTO-${pattern.attackType.toUpperCase().replace(/[^A-Z0-9]/g, '-').slice(0, 20)}
+2. Use id: ATR-AUTO-${pattern.attackType
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '-')
+      .slice(0, 20)}
 3. Set status: "draft"
 4. Use specific detection conditions (regex or contains), NOT overly broad
 5. Include false_positives section
@@ -447,7 +451,10 @@ Output JSON only:
       const yamlLines: string[] = [];
       for (let i = start; i < lines.length; i++) {
         const line = lines[i]!;
-        if (line.startsWith('```') || line.startsWith('---') && i > start && yamlLines.length > 3) {
+        if (
+          line.startsWith('```') ||
+          (line.startsWith('---') && i > start && yamlLines.length > 3)
+        ) {
           break;
         }
         yamlLines.push(line);

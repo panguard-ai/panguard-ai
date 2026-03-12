@@ -12,11 +12,7 @@
  */
 
 import { createLogger } from '@panguard-ai/core';
-import type {
-  CorrelationEvent,
-  CorrelationResult,
-  CorrelationPattern,
-} from '../types.js';
+import type { CorrelationEvent, CorrelationResult, CorrelationPattern } from '../types.js';
 
 const logger = createLogger('panguard-guard:event-correlator');
 
@@ -68,10 +64,7 @@ function isInternalIP(ip: string): boolean {
 /**
  * Extract a numeric value from metadata by trying multiple field names
  */
-function extractNumber(
-  metadata: Record<string, unknown>,
-  ...fields: string[]
-): number | undefined {
+function extractNumber(metadata: Record<string, unknown>, ...fields: string[]): number | undefined {
   for (const field of fields) {
     const val = metadata[field];
     if (typeof val === 'number') return val;
@@ -86,10 +79,7 @@ function extractNumber(
 /**
  * Extract a string value from metadata by trying multiple field names
  */
-function extractString(
-  metadata: Record<string, unknown>,
-  ...fields: string[]
-): string | undefined {
+function extractString(metadata: Record<string, unknown>, ...fields: string[]): string | undefined {
   for (const field of fields) {
     const val = metadata[field];
     if (typeof val === 'string' && val.length > 0) return val;
@@ -210,10 +200,7 @@ export class EventCorrelator {
 
   private pruneBuffer(now: number): void {
     // Remove events outside the time window
-    while (
-      this.eventBuffer.length > 0 &&
-      now - this.eventBuffer[0]!.timestamp > this.windowMs
-    ) {
+    while (this.eventBuffer.length > 0 && now - this.eventBuffer[0]!.timestamp > this.windowMs) {
       this.eventBuffer.shift();
     }
 
@@ -230,10 +217,7 @@ export class EventCorrelator {
   /**
    * Brute Force (T1110): Same source IP, 5+ auth failure events within 60s
    */
-  private detectBruteForce(
-    event: CorrelationEvent,
-    now: number
-  ): CorrelationPattern[] {
+  private detectBruteForce(event: CorrelationEvent, now: number): CorrelationPattern[] {
     // Only trigger on auth events
     if (event.source !== 'auth' && event.category !== 'authentication') {
       return [];
@@ -292,10 +276,7 @@ export class EventCorrelator {
   /**
    * Port Scan (T1046): Same source IP, 10+ distinct destination ports within 60s
    */
-  private detectPortScan(
-    event: CorrelationEvent,
-    now: number
-  ): CorrelationPattern[] {
+  private detectPortScan(event: CorrelationEvent, now: number): CorrelationPattern[] {
     if (event.source !== 'network' && event.source !== 'suricata') return [];
     if (!event.sourceIP) return [];
 
@@ -342,10 +323,7 @@ export class EventCorrelator {
   /**
    * Lateral Movement (T1021): Network connections to 3+ internal IPs from same source within 5min
    */
-  private detectLateralMovement(
-    event: CorrelationEvent,
-    now: number
-  ): CorrelationPattern[] {
+  private detectLateralMovement(event: CorrelationEvent, now: number): CorrelationPattern[] {
     if (event.source !== 'network' && event.source !== 'suricata') return [];
     if (!event.sourceIP) return [];
 
@@ -369,7 +347,10 @@ export class EventCorrelator {
     }
 
     if (internalDestIPs.size >= LATERAL_MOVEMENT_THRESHOLD) {
-      const confidence = Math.min(100, 55 + (internalDestIPs.size - LATERAL_MOVEMENT_THRESHOLD) * 10);
+      const confidence = Math.min(
+        100,
+        55 + (internalDestIPs.size - LATERAL_MOVEMENT_THRESHOLD) * 10
+      );
       return [
         {
           type: 'lateral_movement',
@@ -428,10 +409,7 @@ export class EventCorrelator {
    * Backdoor Installation: file write + process creation + outbound network connection
    * all within the correlation window
    */
-  private detectBackdoorInstall(
-    event: CorrelationEvent,
-    now: number
-  ): CorrelationPattern[] {
+  private detectBackdoorInstall(event: CorrelationEvent, now: number): CorrelationPattern[] {
     // Only check when we see a network outbound event (the last step in the chain)
     if (event.source !== 'network' && event.source !== 'suricata') return [];
 
@@ -467,15 +445,11 @@ export class EventCorrelator {
     // We have all three: file write, process creation, and network connection
     // Check if the same host is involved (optional correlation by sourceIP)
     const relevantFileEvents = event.sourceIP
-      ? fileWriteEvents.filter(
-          (e) => !e.sourceIP || e.sourceIP === event.sourceIP
-        )
+      ? fileWriteEvents.filter((e) => !e.sourceIP || e.sourceIP === event.sourceIP)
       : fileWriteEvents;
 
     const relevantProcessEvents = event.sourceIP
-      ? processEvents.filter(
-          (e) => !e.sourceIP || e.sourceIP === event.sourceIP
-        )
+      ? processEvents.filter((e) => !e.sourceIP || e.sourceIP === event.sourceIP)
       : processEvents;
 
     if (relevantFileEvents.length === 0 || relevantProcessEvents.length === 0) {
@@ -508,10 +482,7 @@ export class EventCorrelator {
   /**
    * Privilege Escalation (T1548): setuid/setgid events or sudo usage patterns
    */
-  private detectPrivilegeEscalation(
-    event: CorrelationEvent,
-    now: number
-  ): CorrelationPattern[] {
+  private detectPrivilegeEscalation(event: CorrelationEvent, now: number): CorrelationPattern[] {
     const isPrivEscEvent = this.isPrivilegeEscalationEvent(event);
     if (!isPrivEscEvent) return [];
 
@@ -574,19 +545,18 @@ export class EventCorrelator {
     }
 
     // Metadata-based detection (sudo, su, setuid, setgid, chmod +s)
-    const processName = extractString(
-      event.metadata,
-      'processName',
-      'process_name',
-      'comm',
-      'exe'
-    );
+    const processName = extractString(event.metadata, 'processName', 'process_name', 'comm', 'exe');
     if (processName === 'sudo' || processName === 'su' || processName === 'pkexec') {
       return true;
     }
 
     const action = extractString(event.metadata, 'action', 'syscall');
-    if (action === 'setuid' || action === 'setgid' || action === 'setreuid' || action === 'setregid') {
+    if (
+      action === 'setuid' ||
+      action === 'setgid' ||
+      action === 'setreuid' ||
+      action === 'setregid'
+    ) {
       return true;
     }
 
@@ -602,10 +572,7 @@ export class EventCorrelator {
    * Severity Escalation: 3+ low-severity events from same source -> medium;
    * 3+ medium -> high
    */
-  private detectSeverityEscalation(
-    event: CorrelationEvent,
-    now: number
-  ): CorrelationPattern[] {
+  private detectSeverityEscalation(event: CorrelationEvent, now: number): CorrelationPattern[] {
     if (!event.sourceIP) return [];
 
     const cutoff = now - this.windowMs;

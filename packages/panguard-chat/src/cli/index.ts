@@ -126,7 +126,13 @@ async function commandSetup(args: string[]): Promise<void> {
         ? { slack: { botToken: '', signingSecret: '', defaultChannel: url || webhookUrl || '' } }
         : {}),
       ...(channel === 'webhook' && (url || webhookUrl)
-        ? { webhook: { endpoint: url || webhookUrl || '', secret: '', authMethod: 'bearer_token' as const } }
+        ? {
+            webhook: {
+              endpoint: url || webhookUrl || '',
+              secret: '',
+              authMethod: 'bearer_token' as const,
+            },
+          }
         : {}),
     };
 
@@ -153,9 +159,7 @@ async function commandSetup(args: string[]): Promise<void> {
 
     console.log('');
     console.log(
-      lang === 'zh-TW'
-        ? `配置已儲存至 ${configPath}`
-        : `Configuration saved to ${configPath}`
+      lang === 'zh-TW' ? `配置已儲存至 ${configPath}` : `Configuration saved to ${configPath}`
     );
     console.log(getWelcomeMessage(lang));
   }

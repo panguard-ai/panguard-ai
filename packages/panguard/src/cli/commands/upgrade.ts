@@ -36,4 +36,3 @@ export function upgradeCommand(): Command {
 
   return cmd;
 }
-

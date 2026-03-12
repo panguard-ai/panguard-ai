@@ -513,9 +513,7 @@ export class RootkitDetector extends EventEmitter {
    */
   async checkAvailability(): Promise<boolean> {
     if (process.platform !== 'linux') {
-      logger.info(
-        `Rootkit detection not available on ${process.platform} (Linux only), skipping`
-      );
+      logger.info(`Rootkit detection not available on ${process.platform} (Linux only), skipping`);
       return false;
     }
 

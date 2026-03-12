@@ -160,7 +160,7 @@ export class ModuleRegistry {
    * List all registered modules.
    */
   list(): ReadonlyArray<{ name: string; version: string; description: string }> {
-    return Array.from(this.modules.values()).map(m => ({
+    return Array.from(this.modules.values()).map((m) => ({
       name: m.name,
       version: m.version,
       description: m.description,

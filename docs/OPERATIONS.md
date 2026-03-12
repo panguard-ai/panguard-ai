@@ -79,23 +79,23 @@ SecurityEvent  DetectionResult  ThreatVerdict  ResponseResult  JSONL Log
 
 ### 3-Layer AI Funnel
 
-| Layer | 技術 | 成本 | 延遲 | 涵蓋率 |
-|-------|------|------|------|--------|
-| Layer 1 | 規則 (3,760 Sigma + 5,961 YARA) | $0 | <1ms | 90% |
-| Layer 2 | 本地 AI (Ollama llama3) | $0 | ~100ms | 7% |
-| Layer 3 | 雲端 AI (Claude/OpenAI) | ~$0.01/event | ~1s | 3% |
+| Layer   | 技術                            | 成本         | 延遲   | 涵蓋率 |
+| ------- | ------------------------------- | ------------ | ------ | ------ |
+| Layer 1 | 規則 (3,760 Sigma + 5,961 YARA) | $0           | <1ms   | 90%    |
+| Layer 2 | 本地 AI (Ollama llama3)         | $0           | ~100ms | 7%     |
+| Layer 3 | 雲端 AI (Claude/OpenAI)         | ~$0.01/event | ~1s    | 3%     |
 
 ### 事件關聯模式 (7 patterns)
 
-| 模式 | MITRE ID | 閾值 | 時間窗口 |
-|------|----------|------|----------|
-| 暴力破解 | T1110 | 5 次認證失敗 | 60s |
-| 端口掃描 | T1046 | 10 個不同端口 | 60s |
-| 橫向移動 | T1021 | 3+ 內部 IP | 5min |
-| 資料外洩 | T1041 | >10MB 外送 | single |
-| 後門安裝 | T1059 | file+process+network | 5min |
-| 提權 | T1548 | setuid/sudo patterns | 5min |
-| 嚴重度升級 | -- | 3+ low→medium | 5min |
+| 模式       | MITRE ID | 閾值                 | 時間窗口 |
+| ---------- | -------- | -------------------- | -------- |
+| 暴力破解   | T1110    | 5 次認證失敗         | 60s      |
+| 端口掃描   | T1046    | 10 個不同端口        | 60s      |
+| 橫向移動   | T1021    | 3+ 內部 IP           | 5min     |
+| 資料外洩   | T1041    | >10MB 外送           | single   |
+| 後門安裝   | T1059    | file+process+network | 5min     |
+| 提權       | T1548    | setuid/sudo patterns | 5min     |
+| 嚴重度升級 | --       | 3+ low→medium        | 5min     |
 
 ### 核心依賴圖
 
@@ -121,13 +121,13 @@ admin (HTML)        panguard-cli   core  ← 所有 packages 依賴 core
 
 ### 系統需求
 
-| 項目 | 最低要求 |
-|------|---------|
-| OS | macOS 12+, Ubuntu 20.04+, Windows 10+ |
-| Node.js | >= 20.0.0 |
-| pnpm | >= 9.0.0 |
-| 磁碟 | 200 MB |
-| 記憶體 | 512 MB (Guard 建議 1 GB) |
+| 項目    | 最低要求                              |
+| ------- | ------------------------------------- |
+| OS      | macOS 12+, Ubuntu 20.04+, Windows 10+ |
+| Node.js | >= 20.0.0                             |
+| pnpm    | >= 9.0.0                              |
+| 磁碟    | 200 MB                                |
+| 記憶體  | 512 MB (Guard 建議 1 GB)              |
 
 ### 首次設定
 
@@ -153,12 +153,14 @@ pnpm test
 ### 啟動三個服務
 
 #### 後端 API Server (port 3002)
+
 ```bash
 cd /Users/user/Downloads/panguard-ai
 node --env-file=.env packages/panguard/dist/cli/index.js serve --port 3002
 ```
 
 啟動後的路由：
+
 - `/api/auth/*` — Auth API
 - `/api/admin/*` — Admin API
 - `/api/billing/*` — Billing API
@@ -169,6 +171,7 @@ node --env-file=.env packages/panguard/dist/cli/index.js serve --port 3002
 - `/openapi.json` — OpenAPI 3.0 Spec
 
 #### 前端 Website (port 3001)
+
 ```bash
 cd packages/website
 npx next dev -p 3001
@@ -177,6 +180,7 @@ npx next dev -p 3001
 > **注意**: 需要 `.env.local` 設定 `NEXT_PUBLIC_API_URL=http://localhost:3002`
 
 #### CLI 互動模式
+
 ```bash
 panguard
 # 或開發模式
@@ -184,6 +188,7 @@ node packages/panguard/dist/cli/index.js
 ```
 
 ### 開發模式 (watch)
+
 ```bash
 # Terminal 1: 編譯 core (watch)
 cd packages/core && pnpm dev
@@ -211,61 +216,61 @@ cd packages/website && npx next dev -p 3001
 
 #### 公開頁面 (全部完成)
 
-| 頁面 | 路徑 | 說明 |
-|------|------|------|
-| 首頁 | `/` | 15 個動態區塊 |
-| 產品總覽 | `/product` | 產品介紹 |
-| Scan | `/product/scan` | 掃描產品頁 |
-| Guard | `/product/guard` | 防護產品頁 |
-| Chat | `/product/chat` | 通知產品頁 |
-| Trap | `/product/trap` | 蜜罐產品頁 |
-| Report | `/product/report` | 報告產品頁 |
-| 定價 | `/pricing` | 4 方案 + FAQ + 功能比較 |
-| 技術原理 | `/how-it-works` | 運作方式 |
-| 技術 | `/technology` | 技術細節 |
-| Threat Cloud | `/threat-cloud` | 威脅情報 |
-| 安全 | `/security` | 安全措施 |
-| 合規 | `/compliance` | 合規框架 |
-| 開源 | `/open-source` | 開源說明 |
-| 整合 | `/integrations` | 第三方整合 |
-| 資源 | `/resources` | 資源中心 |
-| 狀態 | `/status` | 服務狀態 |
-| 信任中心 | `/trust` | 信任頁面 |
+| 頁面         | 路徑              | 說明                    |
+| ------------ | ----------------- | ----------------------- |
+| 首頁         | `/`               | 15 個動態區塊           |
+| 產品總覽     | `/product`        | 產品介紹                |
+| Scan         | `/product/scan`   | 掃描產品頁              |
+| Guard        | `/product/guard`  | 防護產品頁              |
+| Chat         | `/product/chat`   | 通知產品頁              |
+| Trap         | `/product/trap`   | 蜜罐產品頁              |
+| Report       | `/product/report` | 報告產品頁              |
+| 定價         | `/pricing`        | 4 方案 + FAQ + 功能比較 |
+| 技術原理     | `/how-it-works`   | 運作方式                |
+| 技術         | `/technology`     | 技術細節                |
+| Threat Cloud | `/threat-cloud`   | 威脅情報                |
+| 安全         | `/security`       | 安全措施                |
+| 合規         | `/compliance`     | 合規框架                |
+| 開源         | `/open-source`    | 開源說明                |
+| 整合         | `/integrations`   | 第三方整合              |
+| 資源         | `/resources`      | 資源中心                |
+| 狀態         | `/status`         | 服務狀態                |
+| 信任中心     | `/trust`          | 信任頁面                |
 
 #### 解決方案 (全部完成)
 
-| 頁面 | 路徑 |
-|------|------|
-| 開發者 | `/solutions/developers` |
-| 中小企業 | `/solutions/smb` |
-| 企業 | `/solutions/enterprise` |
+| 頁面     | 路徑                    |
+| -------- | ----------------------- |
+| 開發者   | `/solutions/developers` |
+| 中小企業 | `/solutions/smb`        |
+| 企業     | `/solutions/enterprise` |
 
 #### 內容頁面 (全部完成)
 
-| 頁面 | 路徑 |
-|------|------|
-| 部落格 | `/blog` + `/blog/[slug]` |
-| 更新日誌 | `/changelog` |
-| 關於 | `/about` |
-| 職缺 | `/careers` |
-| 聯絡 | `/contact` |
-| 新聞 | `/press` |
-| 客戶案例 | `/customers` + `/customers/[slug]` |
-| 合作夥伴 | `/partners` |
-| Demo 申請 | `/demo` |
-| Early Access | `/early-access` |
+| 頁面         | 路徑                               |
+| ------------ | ---------------------------------- |
+| 部落格       | `/blog` + `/blog/[slug]`           |
+| 更新日誌     | `/changelog`                       |
+| 關於         | `/about`                           |
+| 職缺         | `/careers`                         |
+| 聯絡         | `/contact`                         |
+| 新聞         | `/press`                           |
+| 客戶案例     | `/customers` + `/customers/[slug]` |
+| 合作夥伴     | `/partners`                        |
+| Demo 申請    | `/demo`                            |
+| Early Access | `/early-access`                    |
 
 #### 文件 (全部完成)
 
-| 頁面 | 路徑 |
-|------|------|
-| 文件首頁 | `/docs` |
+| 頁面     | 路徑                    |
+| -------- | ----------------------- |
+| 文件首頁 | `/docs`                 |
 | 快速開始 | `/docs/getting-started` |
-| CLI 參考 | `/docs/cli` |
-| API 文件 | `/docs/api` |
-| 部署 | `/docs/deployment` |
-| 進階設定 | `/docs/advanced-setup` |
-| 效能測試 | `/docs/benchmark` |
+| CLI 參考 | `/docs/cli`             |
+| API 文件 | `/docs/api`             |
+| 部署     | `/docs/deployment`      |
+| 進階設定 | `/docs/advanced-setup`  |
+| 效能測試 | `/docs/benchmark`       |
 
 #### 法律頁面 (全部完成)
 
@@ -273,29 +278,29 @@ cd packages/website && npx next dev -p 3001
 
 #### 認證相關 (完成)
 
-| 頁面 | 路徑 | 狀態 |
-|------|------|------|
-| 登入 | `/login` | 完成 (Email + Google + 2FA) |
-| 註冊 | `/register` | 完成 |
-| 重設密碼 | `/reset-password` | 完成 |
-| 用戶儀表板 | `/dashboard` | 部分 (mock usage data) |
+| 頁面       | 路徑              | 狀態                        |
+| ---------- | ----------------- | --------------------------- |
+| 登入       | `/login`          | 完成 (Email + Google + 2FA) |
+| 註冊       | `/register`       | 完成                        |
+| 重設密碼   | `/reset-password` | 完成                        |
+| 用戶儀表板 | `/dashboard`      | 部分 (mock usage data)      |
 
 #### 管理後台 (部分完成)
 
-| 頁面 | 路徑 | 狀態 |
-|------|------|------|
+| 頁面      | 路徑               | 狀態                   |
+| --------- | ------------------ | ---------------------- |
 | Dashboard | `/admin/dashboard` | UI 完成, **mock data** |
 | Endpoints | `/admin/endpoints` | UI 完成, **mock data** |
-| Threats | `/admin/threats` | UI 完成, **mock data** |
-| Policies | `/admin/policies` | **Coming Soon** |
-| Settings | `/admin/settings` | **Coming Soon** |
+| Threats   | `/admin/threats`   | UI 完成, **mock data** |
+| Policies  | `/admin/policies`  | **Coming Soon**        |
+| Settings  | `/admin/settings`  | **Coming Soon**        |
 
 #### 帳號管理 (未實作)
 
-| 頁面 | 路徑 | 狀態 |
-|------|------|------|
+| 頁面     | 路徑                | 狀態       |
+| -------- | ------------------- | ---------- |
 | 帳號設定 | `/account/settings` | **未實作** |
-| 帳單管理 | `/account/billing` | **未實作** |
+| 帳單管理 | `/account/billing`  | **未實作** |
 
 ### 前端環境變數
 
@@ -325,13 +330,13 @@ npx next build && npx next start -p 3001
 
 ### 設計系統
 
-| Token | 值 | 用途 |
-|-------|------|------|
-| brand-sage | #8B9A8E | 品牌主色 |
-| surface-0 | #1A1614 | 深色背景 |
-| text-primary | #F5F1E8 | 主要文字 |
-| 按鈕形狀 | `rounded-full` | 圓角膠囊 |
-| 卡片效果 | `card-glow` | Sage 光暈 |
+| Token        | 值             | 用途      |
+| ------------ | -------------- | --------- |
+| brand-sage   | #8B9A8E        | 品牌主色  |
+| surface-0    | #1A1614        | 深色背景  |
+| text-primary | #F5F1E8        | 主要文字  |
+| 按鈕形狀     | `rounded-full` | 圓角膠囊  |
+| 卡片效果     | `card-glow`    | Sage 光暈 |
 
 ---
 
@@ -351,122 +356,122 @@ node --env-file=.env packages/panguard/dist/cli/index.js serve \
 
 #### Auth Routes (`/api/auth/`)
 
-| Method | 路徑 | Auth | 說明 |
-|--------|------|------|------|
-| POST | `/api/auth/register` | No | 註冊 (自動 14 天 Solo 試用) |
-| POST | `/api/auth/login` | No | 登入 (返回 session token) |
-| POST | `/api/auth/logout` | Yes | 登出 |
-| GET | `/api/auth/me` | Yes | 取得目前用戶資料 |
-| POST | `/api/auth/delete-account` | Yes | 刪除帳號 (GDPR) |
-| GET | `/api/auth/export-data` | Yes | 匯出用戶資料 (GDPR) |
-| POST | `/api/auth/forgot-password` | No | 請求密碼重設 |
-| POST | `/api/auth/reset-password` | No | 重設密碼 |
+| Method | 路徑                        | Auth | 說明                        |
+| ------ | --------------------------- | ---- | --------------------------- |
+| POST   | `/api/auth/register`        | No   | 註冊 (自動 14 天 Solo 試用) |
+| POST   | `/api/auth/login`           | No   | 登入 (返回 session token)   |
+| POST   | `/api/auth/logout`          | Yes  | 登出                        |
+| GET    | `/api/auth/me`              | Yes  | 取得目前用戶資料            |
+| POST   | `/api/auth/delete-account`  | Yes  | 刪除帳號 (GDPR)             |
+| GET    | `/api/auth/export-data`     | Yes  | 匯出用戶資料 (GDPR)         |
+| POST   | `/api/auth/forgot-password` | No   | 請求密碼重設                |
+| POST   | `/api/auth/reset-password`  | No   | 重設密碼                    |
 
 #### TOTP 2FA Routes (`/api/auth/totp/`)
 
-| Method | 路徑 | Auth | 說明 |
-|--------|------|------|------|
-| POST | `/api/auth/totp/setup` | Yes | 產生 TOTP secret + 備援碼 |
-| POST | `/api/auth/totp/verify` | Yes | 驗證 TOTP 碼以啟用 2FA |
-| POST | `/api/auth/totp/disable` | Yes | 停用 2FA |
-| GET | `/api/auth/totp/status` | Yes | 取得 2FA 狀態 |
+| Method | 路徑                     | Auth | 說明                      |
+| ------ | ------------------------ | ---- | ------------------------- |
+| POST   | `/api/auth/totp/setup`   | Yes  | 產生 TOTP secret + 備援碼 |
+| POST   | `/api/auth/totp/verify`  | Yes  | 驗證 TOTP 碼以啟用 2FA    |
+| POST   | `/api/auth/totp/disable` | Yes  | 停用 2FA                  |
+| GET    | `/api/auth/totp/status`  | Yes  | 取得 2FA 狀態             |
 
 #### OAuth Routes (`/api/auth/`)
 
-| Method | 路徑 | Auth | 說明 |
-|--------|------|------|------|
-| GET | `/api/auth/google` | No | 發起 Google OAuth (PKCE) |
-| GET | `/api/auth/google/callback` | No | Google OAuth callback |
-| POST | `/api/auth/oauth/exchange` | No | 交換 OAuth code 為 session |
-| GET | `/api/auth/cli` | No | CLI OAuth 發起 |
-| POST | `/api/auth/cli/exchange` | No | CLI OAuth token 交換 |
+| Method | 路徑                        | Auth | 說明                       |
+| ------ | --------------------------- | ---- | -------------------------- |
+| GET    | `/api/auth/google`          | No   | 發起 Google OAuth (PKCE)   |
+| GET    | `/api/auth/google/callback` | No   | Google OAuth callback      |
+| POST   | `/api/auth/oauth/exchange`  | No   | 交換 OAuth code 為 session |
+| GET    | `/api/auth/cli`             | No   | CLI OAuth 發起             |
+| POST   | `/api/auth/cli/exchange`    | No   | CLI OAuth token 交換       |
 
 #### Admin Routes (`/api/admin/`) — 需要 role=admin
 
-| Method | 路徑 | 說明 |
-|--------|------|------|
-| GET | `/api/admin/dashboard` | Dashboard 總覽 |
-| GET | `/api/admin/users` | 用戶列表 |
-| GET | `/api/admin/users/search` | 搜尋用戶 |
-| GET | `/api/admin/users/:id` | 用戶詳情 |
-| PATCH | `/api/admin/users/:id/tier` | 更新方案等級 |
-| PATCH | `/api/admin/users/:id/role` | 更新角色 |
-| PATCH | `/api/admin/users/:id/suspend` | 停用帳號 |
-| POST | `/api/admin/users/bulk-action` | 批次操作 |
-| GET | `/api/admin/stats` | 平台統計 |
-| GET | `/api/admin/sessions` | Session 列表 |
-| DELETE | `/api/admin/sessions/:id` | 撤銷 Session |
-| GET | `/api/admin/activity` | 用戶活動日誌 |
-| GET | `/api/admin/audit` | 完整稽核日誌 |
-| GET | `/api/admin/audit/actions` | 稽核動作類型 |
-| GET | `/api/admin/usage` | 平台使用量 |
-| GET | `/api/admin/usage/:userId` | 個別用戶使用量 |
-| PATCH | `/api/admin/waitlist/:id/approve` | 核准候補名單 |
-| PATCH | `/api/admin/waitlist/:id/reject` | 拒絕候補名單 |
-| GET | `/api/admin/settings` | 設定狀態 |
+| Method | 路徑                              | 說明           |
+| ------ | --------------------------------- | -------------- |
+| GET    | `/api/admin/dashboard`            | Dashboard 總覽 |
+| GET    | `/api/admin/users`                | 用戶列表       |
+| GET    | `/api/admin/users/search`         | 搜尋用戶       |
+| GET    | `/api/admin/users/:id`            | 用戶詳情       |
+| PATCH  | `/api/admin/users/:id/tier`       | 更新方案等級   |
+| PATCH  | `/api/admin/users/:id/role`       | 更新角色       |
+| PATCH  | `/api/admin/users/:id/suspend`    | 停用帳號       |
+| POST   | `/api/admin/users/bulk-action`    | 批次操作       |
+| GET    | `/api/admin/stats`                | 平台統計       |
+| GET    | `/api/admin/sessions`             | Session 列表   |
+| DELETE | `/api/admin/sessions/:id`         | 撤銷 Session   |
+| GET    | `/api/admin/activity`             | 用戶活動日誌   |
+| GET    | `/api/admin/audit`                | 完整稽核日誌   |
+| GET    | `/api/admin/audit/actions`        | 稽核動作類型   |
+| GET    | `/api/admin/usage`                | 平台使用量     |
+| GET    | `/api/admin/usage/:userId`        | 個別用戶使用量 |
+| PATCH  | `/api/admin/waitlist/:id/approve` | 核准候補名單   |
+| PATCH  | `/api/admin/waitlist/:id/reject`  | 拒絕候補名單   |
+| GET    | `/api/admin/settings`             | 設定狀態       |
 
 #### Admin Proxy → Manager
 
-| Method | 路徑 | 說明 |
-|--------|------|------|
-| GET | `/api/admin/agents` | Guard Agent 列表 |
-| GET | `/api/admin/agents/:id` | Agent 詳情 |
-| GET | `/api/admin/events` | 威脅事件列表 |
-| GET | `/api/admin/threats` | 威脅摘要 |
-| GET | `/api/admin/overview` | Manager 總覽 |
+| Method | 路徑                    | 說明             |
+| ------ | ----------------------- | ---------------- |
+| GET    | `/api/admin/agents`     | Guard Agent 列表 |
+| GET    | `/api/admin/agents/:id` | Agent 詳情       |
+| GET    | `/api/admin/events`     | 威脅事件列表     |
+| GET    | `/api/admin/threats`    | 威脅摘要         |
+| GET    | `/api/admin/overview`   | Manager 總覽     |
 
 #### Billing Routes (`/api/billing/`)
 
-| Method | 路徑 | Auth | 說明 |
-|--------|------|------|------|
-| POST | `/api/billing/webhook` | No (HMAC) | Lemon Squeezy webhook |
-| POST | `/api/billing/checkout` | Yes | 建立結帳 URL |
-| POST | `/api/billing/portal` | Yes | 建立客戶入口 URL |
-| GET | `/api/billing/status` | Yes | 訂閱狀態 |
+| Method | 路徑                    | Auth      | 說明                  |
+| ------ | ----------------------- | --------- | --------------------- |
+| POST   | `/api/billing/webhook`  | No (HMAC) | Lemon Squeezy webhook |
+| POST   | `/api/billing/checkout` | Yes       | 建立結帳 URL          |
+| POST   | `/api/billing/portal`   | Yes       | 建立客戶入口 URL      |
+| GET    | `/api/billing/status`   | Yes       | 訂閱狀態              |
 
 #### Usage Routes (`/api/usage/`)
 
-| Method | 路徑 | Auth | 說明 |
-|--------|------|------|------|
-| GET | `/api/usage` | Yes | 目前使用量 + 方案 |
-| GET | `/api/usage/limits` | Yes | 方案配額限制 |
-| POST | `/api/usage/check` | Yes | 檢查配額 |
-| POST | `/api/usage/record` | Yes | 記錄使用量 |
+| Method | 路徑                | Auth | 說明              |
+| ------ | ------------------- | ---- | ----------------- |
+| GET    | `/api/usage`        | Yes  | 目前使用量 + 方案 |
+| GET    | `/api/usage/limits` | Yes  | 方案配額限制      |
+| POST   | `/api/usage/check`  | Yes  | 檢查配額          |
+| POST   | `/api/usage/record` | Yes  | 記錄使用量        |
 
 #### Waitlist Routes (`/api/waitlist/`)
 
-| Method | 路徑 | Auth | 說明 |
-|--------|------|------|------|
-| POST | `/api/waitlist/join` | No | 加入候補名單 |
-| GET | `/api/waitlist/verify/:token` | No | 驗證 email |
-| GET | `/api/waitlist/stats` | No | 候補統計 |
-| GET | `/api/waitlist/list` | Admin | 候補列表 |
+| Method | 路徑                          | Auth  | 說明         |
+| ------ | ----------------------------- | ----- | ------------ |
+| POST   | `/api/waitlist/join`          | No    | 加入候補名單 |
+| GET    | `/api/waitlist/verify/:token` | No    | 驗證 email   |
+| GET    | `/api/waitlist/stats`         | No    | 候補統計     |
+| GET    | `/api/waitlist/list`          | Admin | 候補列表     |
 
 #### Manager Server Routes (port 8443)
 
-| Method | 路徑 | 說明 |
-|--------|------|------|
-| POST | `/api/agents/register` | 註冊 Guard Agent |
-| POST | `/api/agents/:id/heartbeat` | Agent 心跳 |
-| POST | `/api/agents/:id/events` | 提交威脅報告 |
-| DELETE | `/api/agents/:id` | 取消註冊 Agent |
-| GET | `/api/agents` | Agent 列表 |
-| GET | `/api/agents/:id` | Agent 詳情 |
-| GET | `/api/overview` | Dashboard 總覽 |
-| GET | `/api/threats` | 近期威脅 |
-| GET | `/api/threats/summary` | 威脅摘要 |
-| POST | `/api/policy` | 建立政策 |
-| GET | `/api/policy/active` | 取得生效政策 |
-| GET | `/api/events/stream` | SSE 即時串流 |
-| GET | `/health` | 健康檢查 |
+| Method | 路徑                        | 說明             |
+| ------ | --------------------------- | ---------------- |
+| POST   | `/api/agents/register`      | 註冊 Guard Agent |
+| POST   | `/api/agents/:id/heartbeat` | Agent 心跳       |
+| POST   | `/api/agents/:id/events`    | 提交威脅報告     |
+| DELETE | `/api/agents/:id`           | 取消註冊 Agent   |
+| GET    | `/api/agents`               | Agent 列表       |
+| GET    | `/api/agents/:id`           | Agent 詳情       |
+| GET    | `/api/overview`             | Dashboard 總覽   |
+| GET    | `/api/threats`              | 近期威脅         |
+| GET    | `/api/threats/summary`      | 威脅摘要         |
+| POST   | `/api/policy`               | 建立政策         |
+| GET    | `/api/policy/active`        | 取得生效政策     |
+| GET    | `/api/events/stream`        | SSE 即時串流     |
+| GET    | `/health`                   | 健康檢查         |
 
 #### Utility Routes
 
-| Method | 路徑 | 說明 |
-|--------|------|------|
-| GET | `/health` | 健康檢查 + DB 探測 |
-| GET | `/openapi.json` | OpenAPI 3.0 規格 |
-| GET | `/docs/api` | Swagger UI |
+| Method | 路徑            | 說明               |
+| ------ | --------------- | ------------------ |
+| GET    | `/health`       | 健康檢查 + DB 探測 |
+| GET    | `/openapi.json` | OpenAPI 3.0 規格   |
+| GET    | `/docs/api`     | Swagger UI         |
 
 ### API 回應格式
 
@@ -487,6 +492,7 @@ node --env-file=.env packages/panguard/dist/cli/index.js serve \
 ### 安全 Headers
 
 伺服器自動加入：
+
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options: SAMEORIGIN`
 - `Referrer-Policy: strict-origin-when-cross-origin`
@@ -496,6 +502,7 @@ node --env-file=.env packages/panguard/dist/cli/index.js serve \
 ### 啟動驗證
 
 生產環境 (NODE_ENV=production) 必填：
+
 - `JWT_SECRET` — 不設定則拒絕啟動
 - `PANGUARD_BASE_URL` — OAuth/email 連結必需
 - `CORS_ALLOWED_ORIGINS` — 跨域請求必需
@@ -511,42 +518,42 @@ node --env-file=.env packages/panguard/dist/cli/index.js serve \
 
 ### 全部 22 個指令
 
-| 指令 | 說明 | 方案要求 |
-|------|------|---------|
-| `panguard` | 互動式 TUI 模式 | Community |
-| `panguard scan` | 安全掃描 | Community |
-| `panguard scan --quick` | 快速掃描 (~30s) | Community |
-| `panguard scan --output report.pdf` | 產生 PDF 報告 | Community |
-| `panguard scan --target 1.2.3.4` | 遠端掃描 | Solo+ |
-| `panguard scan --json` | JSON 輸出 | Community |
-| `panguard guard start` | 啟動即時防護 | Solo+ |
-| `panguard guard stop` | 停止防護 | Solo+ |
-| `panguard guard restart` | 重啟防護 | Solo+ |
-| `panguard guard status` | 防護狀態 | Solo+ |
-| `panguard guard config` | 防護設定 | Solo+ |
-| `panguard report generate --framework iso27001` | 產生合規報告 | Pro+ |
-| `panguard report summary` | 報告摘要 | Pro+ |
-| `panguard report list-frameworks` | 列出合規框架 | Pro+ |
-| `panguard chat setup` | 通知設定精靈 | Solo+ |
-| `panguard chat test` | 測試通知 | Solo+ |
-| `panguard trap start --services ssh,http,mysql` | 啟動蜜罐 | Pro+ |
-| `panguard login` | OAuth 登入 | All |
-| `panguard login --no-browser` | 無瀏覽器登入 (SSH) | All |
-| `panguard logout` | 登出 | All |
-| `panguard whoami` | 顯示目前用戶 | All |
-| `panguard serve` | 啟動 HTTP 伺服器 | All |
-| `panguard admin init` | 建立初始 admin 帳號 | All |
-| `panguard admin create-user` | 建立用戶 | Admin |
-| `panguard status` | 系統狀態 | All |
-| `panguard config` | 設定管理 | All |
-| `panguard doctor` | 診斷工具 | All |
-| `panguard deploy` | 部署工具 | All |
-| `panguard hardening` | 安全強化 | All |
-| `panguard init` | 專案初始化 | All |
-| `panguard threat` | 威脅分析 | All |
-| `panguard upgrade` | 升級方案 | All |
-| `panguard demo` | Demo 模式 | All |
-| `panguard audit skill <path>` | Skill 安全審計 | All |
+| 指令                                            | 說明                | 方案要求  |
+| ----------------------------------------------- | ------------------- | --------- |
+| `panguard`                                      | 互動式 TUI 模式     | Community |
+| `panguard scan`                                 | 安全掃描            | Community |
+| `panguard scan --quick`                         | 快速掃描 (~30s)     | Community |
+| `panguard scan --output report.pdf`             | 產生 PDF 報告       | Community |
+| `panguard scan --target 1.2.3.4`                | 遠端掃描            | Solo+     |
+| `panguard scan --json`                          | JSON 輸出           | Community |
+| `panguard guard start`                          | 啟動即時防護        | Solo+     |
+| `panguard guard stop`                           | 停止防護            | Solo+     |
+| `panguard guard restart`                        | 重啟防護            | Solo+     |
+| `panguard guard status`                         | 防護狀態            | Solo+     |
+| `panguard guard config`                         | 防護設定            | Solo+     |
+| `panguard report generate --framework iso27001` | 產生合規報告        | Pro+      |
+| `panguard report summary`                       | 報告摘要            | Pro+      |
+| `panguard report list-frameworks`               | 列出合規框架        | Pro+      |
+| `panguard chat setup`                           | 通知設定精靈        | Solo+     |
+| `panguard chat test`                            | 測試通知            | Solo+     |
+| `panguard trap start --services ssh,http,mysql` | 啟動蜜罐            | Pro+      |
+| `panguard login`                                | OAuth 登入          | All       |
+| `panguard login --no-browser`                   | 無瀏覽器登入 (SSH)  | All       |
+| `panguard logout`                               | 登出                | All       |
+| `panguard whoami`                               | 顯示目前用戶        | All       |
+| `panguard serve`                                | 啟動 HTTP 伺服器    | All       |
+| `panguard admin init`                           | 建立初始 admin 帳號 | All       |
+| `panguard admin create-user`                    | 建立用戶            | Admin     |
+| `panguard status`                               | 系統狀態            | All       |
+| `panguard config`                               | 設定管理            | All       |
+| `panguard doctor`                               | 診斷工具            | All       |
+| `panguard deploy`                               | 部署工具            | All       |
+| `panguard hardening`                            | 安全強化            | All       |
+| `panguard init`                                 | 專案初始化          | All       |
+| `panguard threat`                               | 威脅分析            | All       |
+| `panguard upgrade`                              | 升級方案            | All       |
+| `panguard demo`                                 | Demo 模式           | All       |
+| `panguard audit skill <path>`                   | Skill 安全審計      | All       |
 
 ### CLI 認證流程
 
@@ -582,6 +589,7 @@ Callback 收到 auth code
 ### 互動模式 (TUI)
 
 執行 `panguard` 不帶參數啟動互動式選單：
+
 - 按數字鍵即時選擇 (1-8)
 - 麵包屑導航 (隨時知道在哪)
 - 自動語言偵測 (EN / ZH-TW)
@@ -616,6 +624,7 @@ sqlite3 ~/.panguard/auth.db \
 ### 功能總覽
 
 #### Dashboard (`/admin/dashboard`)
+
 - 4 統計卡片: Endpoints Monitored, Active Threats, Guard Agents Online, Threats Blocked (30d)
 - 14 天威脅趨勢圖 (長條圖)
 - 最近警報列表 (嚴重度標籤: critical/high/medium/low)
@@ -624,6 +633,7 @@ sqlite3 ~/.panguard/auth.db \
 - **目前狀態: Mock Data (未串接 API)**
 
 #### Endpoints (`/admin/endpoints`)
+
 - 搜尋: hostname, IP, OS, tag
 - 篩選: All / Online / Warning / Offline
 - 排序: hostname / status / threat count
@@ -631,6 +641,7 @@ sqlite3 ~/.panguard/auth.db \
 - **目前狀態: Mock Data (14 個模擬 endpoints)**
 
 #### Threats (`/admin/threats`)
+
 - 摘要卡片: Critical / High / Medium / Low 計數
 - 搜尋: description, type, IP, endpoint
 - 排序: time / severity / confidence
@@ -715,22 +726,22 @@ user.role === 'user'   → 重導至 /dashboard
 
 ### 定價方案
 
-| 方案 | 月費 | Endpoints | 主要功能 |
-|------|------|-----------|---------|
-| **Community** | $0 | 1 | Scan + Layer 1 Guard |
-| **Solo** | $9/mo | 3 | Full Guard (3 layers) + Chat |
-| **Pro** | $29/mo | 10 | + Trap + Report + Advanced Chat |
-| **Business** | $79/mo | 25 | + Custom models + SIEM + SSO |
+| 方案          | 月費   | Endpoints | 主要功能                        |
+| ------------- | ------ | --------- | ------------------------------- |
+| **Community** | $0     | 1         | Scan + Layer 1 Guard            |
+| **Solo**      | $9/mo  | 3         | Full Guard (3 layers) + Chat    |
+| **Pro**       | $29/mo | 10        | + Trap + Report + Advanced Chat |
+| **Business**  | $79/mo | 25        | + Custom models + SIEM + SSO    |
 
 年付享 20% 折扣。
 
 ### 合規報告加購 (Pro+)
 
-| 框架 | 控制項 | 指令 |
-|------|--------|------|
-| Taiwan TCSA | 10 | `--framework tcsa` |
-| ISO 27001 | 30 | `--framework iso27001` |
-| SOC 2 | 10 | `--framework soc2` |
+| 框架        | 控制項 | 指令                   |
+| ----------- | ------ | ---------------------- |
+| Taiwan TCSA | 10     | `--framework tcsa`     |
+| ISO 27001   | 30     | `--framework iso27001` |
+| SOC 2       | 10     | `--framework soc2`     |
 
 ---
 
@@ -820,6 +831,7 @@ NEXT_PUBLIC_PLAUSIBLE_DOMAIN=panguard.ai          # 分析 (選用)
 ### 資料表結構
 
 #### users
+
 ```sql
 CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -837,6 +849,7 @@ CREATE TABLE users (
 ```
 
 #### sessions
+
 ```sql
 CREATE TABLE sessions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -848,6 +861,7 @@ CREATE TABLE sessions (
 ```
 
 #### subscriptions (Lemon Squeezy)
+
 ```sql
 CREATE TABLE subscriptions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -865,6 +879,7 @@ CREATE TABLE subscriptions (
 ```
 
 #### 其他表
+
 - **totp_secrets** — 2FA TOTP 密鑰 (AES-256-GCM 加密)
 - **password_reset_tokens** — 密碼重設 token (SHA-256 hash)
 - **usage_meters** — 使用量計量 (user_id + resource + period)
@@ -986,13 +1001,13 @@ LEMON_SQUEEZY_VARIANT_MAP={"<variant-id>":"solo","<variant-id>":"pro","<variant-
 
 ### Webhook 事件
 
-| 事件 | 處理邏輯 |
-|------|---------|
-| `order.created` | 升級用戶方案 |
-| `order.refunded` | 降級為 community |
-| `subscription.created` | 記錄訂閱 |
-| `subscription.updated` | 更新方案/到期日 |
-| `subscription.cancelled` | 排程降級 |
+| 事件                     | 處理邏輯         |
+| ------------------------ | ---------------- |
+| `order.created`          | 升級用戶方案     |
+| `order.refunded`         | 降級為 community |
+| `subscription.created`   | 記錄訂閱         |
+| `subscription.updated`   | 更新方案/到期日  |
+| `subscription.cancelled` | 排程降級         |
 
 ### 結帳流程
 
@@ -1014,21 +1029,21 @@ LEMON_SQUEEZY_VARIANT_MAP={"<variant-id>":"solo","<variant-id>":"pro","<variant-
 
 ### 支援通道
 
-| 通道 | 設定方式 | 特色 |
-|------|---------|------|
+| 通道     | 設定方式                                 | 特色               |
+| -------- | ---------------------------------------- | ------------------ |
 | Telegram | `panguard chat setup --channel telegram` | Bot 互動、即時推播 |
-| Slack | `panguard chat setup --channel slack` | Block Kit 格式化 |
-| Email | `panguard chat setup --channel email` | HTML 格式報告 |
-| LINE | `panguard chat setup --channel line` | LINE Notify |
-| Webhook | `panguard chat setup --channel webhook` | 自訂 HTTP + mTLS |
+| Slack    | `panguard chat setup --channel slack`    | Block Kit 格式化   |
+| Email    | `panguard chat setup --channel email`    | HTML 格式報告      |
+| LINE     | `panguard chat setup --channel line`     | LINE Notify        |
+| Webhook  | `panguard chat setup --channel webhook`  | 自訂 HTTP + mTLS   |
 
 ### 三種語氣模式
 
-| 模式 | 適合對象 | 內容風格 |
-|------|---------|---------|
-| `boss` | 老闆/主管 | 影響摘要、白話語言 |
-| `developer` | 開發者 | 技術細節、程式碼片段 |
-| `it_admin` | IT 管理員 | 修復步驟、SOP |
+| 模式        | 適合對象  | 內容風格             |
+| ----------- | --------- | -------------------- |
+| `boss`      | 老闆/主管 | 影響摘要、白話語言   |
+| `developer` | 開發者    | 技術細節、程式碼片段 |
+| `it_admin`  | IT 管理員 | 修復步驟、SOP        |
 
 ### 設定範例
 
@@ -1049,14 +1064,14 @@ panguard chat test
 
 ### GitHub Actions Workflows
 
-| 檔案 | 觸發條件 | 用途 |
-|------|---------|------|
-| `ci.yml` | push to main/dev, PR | Lint + TypeCheck + Test + Build |
-| `release.yml` | tag `v*.*.*` | 4 平台 binary + GitHub Release + npm publish |
-| `deploy.yml` | push to main | Docker build + 部署 + health check |
-| `installer-e2e.yml` | push/PR | 安裝腳本端對端測試 |
-| `cli-smoke.yml` | push/PR | CLI 基本功能測試 |
-| `uptime.yml` | cron | 定期健康檢查 + 告警 |
+| 檔案                | 觸發條件             | 用途                                         |
+| ------------------- | -------------------- | -------------------------------------------- |
+| `ci.yml`            | push to main/dev, PR | Lint + TypeCheck + Test + Build              |
+| `release.yml`       | tag `v*.*.*`         | 4 平台 binary + GitHub Release + npm publish |
+| `deploy.yml`        | push to main         | Docker build + 部署 + health check           |
+| `installer-e2e.yml` | push/PR              | 安裝腳本端對端測試                           |
+| `cli-smoke.yml`     | push/PR              | CLI 基本功能測試                             |
+| `uptime.yml`        | cron                 | 定期健康檢查 + 告警                          |
 
 ### Release 自動化流程
 
@@ -1100,6 +1115,7 @@ docker compose up -d
 ```
 
 服務：
+
 - **panguard-api** — Port 3000, 含所有 API 路由
 - **ollama** — Port 11434, 本地 AI (選用)
 
@@ -1172,13 +1188,13 @@ panguard --version  # 應該顯示新版本
 
 ### 版本號位置一覽
 
-| 檔案 | 欄位 |
-|------|------|
-| `packages/panguard/package.json` | `"version"` |
-| `packages/core/package.json` | `"version"` |
+| 檔案                                | 欄位         |
+| ----------------------------------- | ------------ |
+| `packages/panguard/package.json`    | `"version"`  |
+| `packages/core/package.json`        | `"version"`  |
 | `packages/website/src/lib/stats.ts` | `cliVersion` |
-| `docs/getting-started.md` | 多處版本引用 |
-| `docs/DEPLOYMENT.md` | tag 範例 |
+| `docs/getting-started.md`           | 多處版本引用 |
+| `docs/DEPLOYMENT.md`                | tag 範例     |
 
 ---
 
@@ -1220,12 +1236,12 @@ panguard --version  # 應該顯示新版本
 
 ### 生產環境必填
 
-| 環境變數 | 說明 |
-|---------|------|
-| `JWT_SECRET` | 不設定則拒絕啟動 |
-| `PANGUARD_BASE_URL` | OAuth/email 連結必需 |
-| `CORS_ALLOWED_ORIGINS` | 跨域請求控制 |
-| `MANAGER_AUTH_TOKEN` | Manager API 認證 |
+| 環境變數               | 說明                 |
+| ---------------------- | -------------------- |
+| `JWT_SECRET`           | 不設定則拒絕啟動     |
+| `PANGUARD_BASE_URL`    | OAuth/email 連結必需 |
+| `CORS_ALLOWED_ORIGINS` | 跨域請求控制         |
+| `MANAGER_AUTH_TOKEN`   | Manager API 認證     |
 
 ---
 
@@ -1236,11 +1252,13 @@ panguard --version  # 應該顯示新版本
 ```
 Error: JWT_SECRET not set in production
 ```
+
 → 設定 `JWT_SECRET` 或確認 `NODE_ENV` 不是 `production`
 
 ```
 Error: listen EADDRINUSE :::3002
 ```
+
 → 其他程式占用 port: `lsof -i :3002` 找到並 kill
 
 ### Google OAuth 不工作
@@ -1248,11 +1266,13 @@ Error: listen EADDRINUSE :::3002
 ```
 OAuth: Not configured
 ```
+
 → 確認 `.env` 有 `GOOGLE_CLIENT_ID` 和 `GOOGLE_CLIENT_SECRET`，重啟後端
 
 ```
 Error: redirect_uri_mismatch
 ```
+
 → Google Cloud Console 的 redirect URI 必須完全匹配 `GOOGLE_REDIRECT_URI`
 
 ### 前端 CORS 錯誤
@@ -1260,6 +1280,7 @@ Error: redirect_uri_mismatch
 ```
 Access-Control-Allow-Origin header missing
 ```
+
 → 確認 `.env` 的 `CORS_ALLOWED_ORIGINS` 包含前端 URL (如 `http://localhost:3001`)
 
 ### CLI 安裝失敗
@@ -1267,6 +1288,7 @@ Access-Control-Allow-Origin header missing
 ```
 panguard: command not found
 ```
+
 → 確認 `~/.local/bin` 在 PATH 中: `echo $PATH | tr ':' '\n' | grep local`
 → 重新載入 shell: `source ~/.zshrc` 或 `source ~/.bashrc`
 
@@ -1275,6 +1297,7 @@ panguard: command not found
 ```
 Error: SQLITE_BUSY: database is locked
 ```
+
 → 確認沒有其他程式存取同一個 .db 檔案
 → 檢查: `lsof ~/.panguard/auth.db`
 
@@ -1283,6 +1306,7 @@ Error: SQLITE_BUSY: database is locked
 ```
 Cannot read file 'packages/xxx/tsconfig.json'
 ```
+
 → 確認所有 packages 在 Dockerfile COPY 中都有列出
 → 使用 build-error-resolver agent 或 `pnpm build 2>&1 | head -50`
 
@@ -1291,6 +1315,7 @@ Cannot read file 'packages/xxx/tsconfig.json'
 ```
 VERCEL_TOKEN expired
 ```
+
 → 生成新 token: https://vercel.com/account/tokens
 → 或使用本地 CLI: `cd packages/website && vercel deploy --prod`
 
@@ -1299,6 +1324,7 @@ VERCEL_TOKEN expired
 ```
 Tier check failed: requires solo or above
 ```
+
 → 確認 CLI 已登入且方案為 Solo 以上: `panguard whoami`
 
 ---
@@ -1389,89 +1415,89 @@ panguard doctor                   # 診斷
 
 ## 19. 已知問題與改進建議
 
-| # | 區域 | 問題 | 嚴重度 | 建議 |
-|---|------|------|--------|------|
-| 1 | Admin Dashboard | 全部使用 mock data，未串接後端 API | Medium | 串接 `/api/admin/dashboard` + `/api/admin/agents` |
-| 2 | Admin Endpoints | 同上 mock data | Medium | 串接 Manager API `/api/agents` |
-| 3 | Admin Threats | 同上 mock data | Medium | 串接 Manager API `/api/threats` |
-| 4 | Admin Policies | 頁面未實作 (Coming Soon) | Low | 實作政策管理 UI |
-| 5 | Admin Settings | 頁面未實作 (Coming Soon) | Low | 實作系統設定 UI |
-| 6 | Account Settings | `/account/settings` 路由存在但無內容 | Medium | 實作帳號設定頁 |
-| 7 | Account Billing | `/account/billing` 路由存在但無內容 | Medium | 實作帳單管理頁 |
-| 8 | User Dashboard | 使用 mock usage data | Low | 串接 `/api/usage` |
-| 9 | ENV 更新 | 前端需重啟 dev server 才能套用 .env.local 變更 | Low | Next.js 限制，無法熱更新 |
-| 10 | Google OAuth | 新用戶自動 role=user，需手動 DB 升級為 admin | Low | 加入 admin invite flow |
-| 11 | ESLint | 66 個預存 no-unused-vars 警告 | Low | 批次修復 |
-| 12 | Vercel Token | GitHub Secret VERCEL_TOKEN 過期 | Medium | 更新 token 或設定 auto-rotate |
-| 13 | Skill Auditor | 無測試檔案 | Low | 補充單元測試 |
-| 14 | panguard-mcp | 僅 1 個測試 | Low | 補充覆蓋率 |
+| #   | 區域             | 問題                                           | 嚴重度 | 建議                                              |
+| --- | ---------------- | ---------------------------------------------- | ------ | ------------------------------------------------- |
+| 1   | Admin Dashboard  | 全部使用 mock data，未串接後端 API             | Medium | 串接 `/api/admin/dashboard` + `/api/admin/agents` |
+| 2   | Admin Endpoints  | 同上 mock data                                 | Medium | 串接 Manager API `/api/agents`                    |
+| 3   | Admin Threats    | 同上 mock data                                 | Medium | 串接 Manager API `/api/threats`                   |
+| 4   | Admin Policies   | 頁面未實作 (Coming Soon)                       | Low    | 實作政策管理 UI                                   |
+| 5   | Admin Settings   | 頁面未實作 (Coming Soon)                       | Low    | 實作系統設定 UI                                   |
+| 6   | Account Settings | `/account/settings` 路由存在但無內容           | Medium | 實作帳號設定頁                                    |
+| 7   | Account Billing  | `/account/billing` 路由存在但無內容            | Medium | 實作帳單管理頁                                    |
+| 8   | User Dashboard   | 使用 mock usage data                           | Low    | 串接 `/api/usage`                                 |
+| 9   | ENV 更新         | 前端需重啟 dev server 才能套用 .env.local 變更 | Low    | Next.js 限制，無法熱更新                          |
+| 10  | Google OAuth     | 新用戶自動 role=user，需手動 DB 升級為 admin   | Low    | 加入 admin invite flow                            |
+| 11  | ESLint           | 66 個預存 no-unused-vars 警告                  | Low    | 批次修復                                          |
+| 12  | Vercel Token     | GitHub Secret VERCEL_TOKEN 過期                | Medium | 更新 token 或設定 auto-rotate                     |
+| 13  | Skill Auditor    | 無測試檔案                                     | Low    | 補充單元測試                                      |
+| 14  | panguard-mcp     | 僅 1 個測試                                    | Low    | 補充覆蓋率                                        |
 
 ---
 
 ## 附錄 A: 關鍵檔案路徑速查
 
-| 用途 | 路徑 |
-|------|------|
-| 後端入口 | `packages/panguard/src/cli/commands/serve.ts` |
-| Auth 路由 | `packages/panguard-auth/src/routes/auth.ts` |
-| OAuth 路由 | `packages/panguard-auth/src/routes/oauth.ts` |
-| TOTP 路由 | `packages/panguard-auth/src/routes/totp.ts` |
-| Admin 路由 | `packages/panguard-auth/src/routes/admin.ts` |
-| Billing 路由 | `packages/panguard-auth/src/routes/billing.ts` |
-| Usage 路由 | `packages/panguard-auth/src/routes/usage.ts` |
-| Waitlist 路由 | `packages/panguard-auth/src/routes/waitlist.ts` |
-| DB Schema | `packages/panguard-auth/src/database.ts` |
-| 前端 Auth | `packages/website/src/lib/auth.tsx` |
-| Admin Layout | `packages/website/src/app/[locale]/admin/layout.tsx` |
-| Admin Dashboard | `packages/website/src/app/[locale]/admin/dashboard/DashboardContent.tsx` |
-| Admin Endpoints | `packages/website/src/app/[locale]/admin/endpoints/EndpointsContent.tsx` |
-| Admin Threats | `packages/website/src/app/[locale]/admin/threats/ThreatsContent.tsx` |
-| Login Form | `packages/website/src/app/[locale]/login/LoginForm.tsx` |
-| Register Form | `packages/website/src/app/[locale]/register/RegisterForm.tsx` |
-| User Dashboard | `packages/website/src/app/[locale]/dashboard/DashboardContent.tsx` |
-| Pricing Cards | `packages/website/src/app/[locale]/pricing/PricingCards.tsx` |
-| CLI 入口 | `packages/panguard/src/cli/index.ts` |
-| CLI 互動模式 | `packages/panguard/src/cli/interactive.ts` |
-| Guard 引擎 | `packages/panguard-guard/src/guard-engine.ts` |
-| Detect Agent | `packages/panguard-guard/src/agent/detect-agent.ts` |
-| Analyze Agent | `packages/panguard-guard/src/agent/analyze-agent.ts` |
-| Respond Agent | `packages/panguard-guard/src/agent/respond-agent.ts` |
-| Report Agent | `packages/panguard-guard/src/agent/report-agent.ts` |
-| Event Correlator | `packages/panguard-guard/src/correlation/event-correlator.ts` |
-| FunnelRouter | `packages/core/src/ai/funnel-router.ts` |
-| Manager Server | `packages/panguard-manager/src/server.ts` |
-| Threat Cloud | `packages/threat-cloud/src/database.ts` |
-| 安裝腳本 | `scripts/installer/install.sh` |
-| 網站統計 | `packages/website/src/lib/stats.ts` |
-| 環境變數範本 | `.env.example` |
-| CI/CD | `.github/workflows/` |
-| Docker | `Dockerfile` + `docker-compose.yml` |
-| 安全政策 | `SECURITY.md` |
+| 用途             | 路徑                                                                     |
+| ---------------- | ------------------------------------------------------------------------ |
+| 後端入口         | `packages/panguard/src/cli/commands/serve.ts`                            |
+| Auth 路由        | `packages/panguard-auth/src/routes/auth.ts`                              |
+| OAuth 路由       | `packages/panguard-auth/src/routes/oauth.ts`                             |
+| TOTP 路由        | `packages/panguard-auth/src/routes/totp.ts`                              |
+| Admin 路由       | `packages/panguard-auth/src/routes/admin.ts`                             |
+| Billing 路由     | `packages/panguard-auth/src/routes/billing.ts`                           |
+| Usage 路由       | `packages/panguard-auth/src/routes/usage.ts`                             |
+| Waitlist 路由    | `packages/panguard-auth/src/routes/waitlist.ts`                          |
+| DB Schema        | `packages/panguard-auth/src/database.ts`                                 |
+| 前端 Auth        | `packages/website/src/lib/auth.tsx`                                      |
+| Admin Layout     | `packages/website/src/app/[locale]/admin/layout.tsx`                     |
+| Admin Dashboard  | `packages/website/src/app/[locale]/admin/dashboard/DashboardContent.tsx` |
+| Admin Endpoints  | `packages/website/src/app/[locale]/admin/endpoints/EndpointsContent.tsx` |
+| Admin Threats    | `packages/website/src/app/[locale]/admin/threats/ThreatsContent.tsx`     |
+| Login Form       | `packages/website/src/app/[locale]/login/LoginForm.tsx`                  |
+| Register Form    | `packages/website/src/app/[locale]/register/RegisterForm.tsx`            |
+| User Dashboard   | `packages/website/src/app/[locale]/dashboard/DashboardContent.tsx`       |
+| Pricing Cards    | `packages/website/src/app/[locale]/pricing/PricingCards.tsx`             |
+| CLI 入口         | `packages/panguard/src/cli/index.ts`                                     |
+| CLI 互動模式     | `packages/panguard/src/cli/interactive.ts`                               |
+| Guard 引擎       | `packages/panguard-guard/src/guard-engine.ts`                            |
+| Detect Agent     | `packages/panguard-guard/src/agent/detect-agent.ts`                      |
+| Analyze Agent    | `packages/panguard-guard/src/agent/analyze-agent.ts`                     |
+| Respond Agent    | `packages/panguard-guard/src/agent/respond-agent.ts`                     |
+| Report Agent     | `packages/panguard-guard/src/agent/report-agent.ts`                      |
+| Event Correlator | `packages/panguard-guard/src/correlation/event-correlator.ts`            |
+| FunnelRouter     | `packages/core/src/ai/funnel-router.ts`                                  |
+| Manager Server   | `packages/panguard-manager/src/server.ts`                                |
+| Threat Cloud     | `packages/threat-cloud/src/database.ts`                                  |
+| 安裝腳本         | `scripts/installer/install.sh`                                           |
+| 網站統計         | `packages/website/src/lib/stats.ts`                                      |
+| 環境變數範本     | `.env.example`                                                           |
+| CI/CD            | `.github/workflows/`                                                     |
+| Docker           | `Dockerfile` + `docker-compose.yml`                                      |
+| 安全政策         | `SECURITY.md`                                                            |
 
 ---
 
 ## 附錄 B: 測試覆蓋率
 
-| Package | 測試檔案數 | 說明 |
-|---------|-----------|------|
-| panguard-guard | 29 | 最完整覆蓋 |
-| panguard-auth | 13 | 認證流程 |
-| core | 12 | 核心模組 |
-| panguard | 11 | CLI 指令 |
-| threat-cloud | 11 | 威脅情報 |
-| security-hardening | 10 | 安全強化 |
-| panguard-chat | 10 | 通知系統 |
-| panguard-report | 8 | 報告產生 |
-| panguard-scan | 7 | 掃描器 |
-| panguard-trap | 7 | 蜜罐 |
-| panguard-manager | 7 | Manager |
-| panguard-web | 5 | Web 引擎 |
-| panguard-mcp | 1 | MCP Server |
-| panguard-skill-auditor | 0 | **缺少測試** |
+| Package                | 測試檔案數 | 說明         |
+| ---------------------- | ---------- | ------------ |
+| panguard-guard         | 29         | 最完整覆蓋   |
+| panguard-auth          | 13         | 認證流程     |
+| core                   | 12         | 核心模組     |
+| panguard               | 11         | CLI 指令     |
+| threat-cloud           | 11         | 威脅情報     |
+| security-hardening     | 10         | 安全強化     |
+| panguard-chat          | 10         | 通知系統     |
+| panguard-report        | 8          | 報告產生     |
+| panguard-scan          | 7          | 掃描器       |
+| panguard-trap          | 7          | 蜜罐         |
+| panguard-manager       | 7          | Manager      |
+| panguard-web           | 5          | Web 引擎     |
+| panguard-mcp           | 1          | MCP Server   |
+| panguard-skill-auditor | 0          | **缺少測試** |
 
 測試框架: Vitest 3.0 + coverage-v8
 總測試案例: ~3,017+
 
 ---
 
-*本文件由 Panguard AI 開發團隊維護。如有問題請聯絡 admin@panguard.ai*
+_本文件由 Panguard AI 開發團隊維護。如有問題請聯絡 admin@panguard.ai_

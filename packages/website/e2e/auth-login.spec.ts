@@ -53,10 +53,18 @@ test.describe('Login Page', () => {
     });
     // Mock usage and billing for dashboard
     await page.route('**/api/usage', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"data":{"usage":[]}}' }),
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: '{"ok":true,"data":{"usage":[]}}',
+      })
     );
     await page.route('**/api/billing/status', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"data":{"tier":"community"}}' }),
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: '{"ok":true,"data":{"tier":"community"}}',
+      })
     );
 
     await page.goto('/login');
@@ -84,7 +92,7 @@ test.describe('Login Page', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(forgotPasswordSuccess()),
-      }),
+      })
     );
 
     await page.goto('/login');
@@ -102,7 +110,9 @@ test.describe('Login Page', () => {
     const passwordInput = page.locator('#login-password');
     await expect(passwordInput).toHaveAttribute('type', 'password');
 
-    const toggleBtn = page.locator('#login-password ~ button, label:has(#login-password) button').first();
+    const toggleBtn = page
+      .locator('#login-password ~ button, label:has(#login-password) button')
+      .first();
     if (await toggleBtn.isVisible()) {
       await toggleBtn.click();
       await expect(passwordInput).toHaveAttribute('type', 'text');
@@ -117,16 +127,28 @@ test.describe('Login Page', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(authMeSuccess()),
-      }),
+      })
     );
     await page.route('**/api/usage', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"data":{"usage":[]}}' }),
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: '{"ok":true,"data":{"usage":[]}}',
+      })
     );
     await page.route('**/api/billing/status', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"data":{"tier":"community"}}' }),
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: '{"ok":true,"data":{"tier":"community"}}',
+      })
     );
     await page.route('**/api/auth/totp/status', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"data":{"enabled":false}}' }),
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: '{"ok":true,"data":{"enabled":false}}',
+      })
     );
 
     await page.goto('/login?redirect=/account/settings');

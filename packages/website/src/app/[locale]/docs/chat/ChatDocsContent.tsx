@@ -50,18 +50,46 @@ function CodeBlock({ code, label }: { code: string; label?: string }) {
 /* ────────────────────────  Data  ──────────────────────────── */
 
 const CHANNELS = [
-  { name: 'Telegram', config: 'Bot token + Chat ID', command: 'panguard chat setup --channel telegram' },
+  {
+    name: 'Telegram',
+    config: 'Bot token + Chat ID',
+    command: 'panguard chat setup --channel telegram',
+  },
   { name: 'Slack', config: 'Webhook URL', command: 'panguard chat setup --channel slack' },
   { name: 'LINE', config: 'Channel access token', command: 'panguard chat setup --channel line' },
   { name: 'Email', config: 'SMTP credentials', command: 'panguard chat setup --channel email' },
-  { name: 'Webhook', config: 'Custom URL + secret', command: 'panguard chat setup --channel webhook' },
+  {
+    name: 'Webhook',
+    config: 'Custom URL + secret',
+    command: 'panguard chat setup --channel webhook',
+  },
 ];
 
 const NOTIFICATION_TYPES = [
-  { type: 'Threat Alerts', timing: 'Immediate', description: 'Real-time notifications when threats are detected. Includes severity, source IP, and recommended action.' },
-  { type: 'Daily Summaries', timing: 'Daily at 09:00', description: 'Aggregated overview of all security events from the past 24 hours with trend analysis.' },
-  { type: 'Weekly Reports', timing: 'Monday 09:00', description: 'Comprehensive weekly digest with risk score changes, top threats, and compliance status.' },
-  { type: 'System Status', timing: 'On change', description: 'Guard start/stop events, scan completions, configuration changes, and license alerts.' },
+  {
+    type: 'Threat Alerts',
+    timing: 'Immediate',
+    description:
+      'Real-time notifications when threats are detected. Includes severity, source IP, and recommended action.',
+  },
+  {
+    type: 'Daily Summaries',
+    timing: 'Daily at 09:00',
+    description:
+      'Aggregated overview of all security events from the past 24 hours with trend analysis.',
+  },
+  {
+    type: 'Weekly Reports',
+    timing: 'Monday 09:00',
+    description:
+      'Comprehensive weekly digest with risk score changes, top threats, and compliance status.',
+  },
+  {
+    type: 'System Status',
+    timing: 'On change',
+    description:
+      'Guard start/stop events, scan completions, configuration changes, and license alerts.',
+  },
 ];
 
 /* ════════════════════════  Component  ═════════════════════════ */
@@ -84,8 +112,8 @@ export default function ChatDocsContent() {
               Panguard Chat
             </h1>
             <p className="text-text-secondary mt-4 text-lg leading-relaxed">
-              AI-powered security notifications delivered to your preferred channels.
-              Get threat alerts in plain language via Telegram, Slack, LINE, Email, or custom Webhook.
+              AI-powered security notifications delivered to your preferred channels. Get threat
+              alerts in plain language via Telegram, Slack, LINE, Email, or custom Webhook.
             </p>
           </FadeInUp>
         </div>
@@ -105,28 +133,19 @@ export default function ChatDocsContent() {
                 <p className="text-sm text-text-secondary mb-2">
                   Launch the interactive setup wizard:
                 </p>
-                <CodeBlock
-                  code="panguard chat setup"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard chat setup" label="Terminal" />
               </div>
               <div>
                 <p className="text-sm text-text-secondary mb-2">
                   Send a test message to verify connectivity:
                 </p>
-                <CodeBlock
-                  code="panguard chat test"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard chat test" label="Terminal" />
               </div>
               <div>
                 <p className="text-sm text-text-secondary mb-2">
                   Check which channels are currently active:
                 </p>
-                <CodeBlock
-                  code="panguard chat status"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard chat status" label="Terminal" />
               </div>
             </div>
           </FadeInUp>
@@ -139,7 +158,8 @@ export default function ChatDocsContent() {
           <FadeInUp>
             <h2 className="text-xl font-bold text-text-primary mb-2">Supported Channels</h2>
             <p className="text-text-secondary mb-6">
-              Panguard Chat supports five notification channels. Each can be configured independently.
+              Panguard Chat supports five notification channels. Each can be configured
+              independently.
             </p>
 
             <div className="overflow-x-auto">
@@ -233,10 +253,7 @@ View full report: https://app.panguard.ai/events/evt_abc123`}
                 <p className="text-sm text-text-secondary mb-2">
                   Open the interactive preferences editor:
                 </p>
-                <CodeBlock
-                  code="panguard chat prefs"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard chat prefs" label="Terminal" />
               </div>
 
               <div className="bg-surface-1 border border-border rounded-xl p-5">
@@ -245,17 +262,16 @@ View full report: https://app.panguard.ai/events/evt_abc123`}
                   <div>
                     <p className="text-sm text-text-primary font-medium">Severity Threshold</p>
                     <p className="text-sm text-text-secondary">
-                      Only receive alerts at or above a chosen severity: low, medium, high, or critical.
+                      Only receive alerts at or above a chosen severity: low, medium, high, or
+                      critical.
                     </p>
-                    <CodeBlock
-                      code="panguard chat prefs --severity high"
-                      label="Terminal"
-                    />
+                    <CodeBlock code="panguard chat prefs --severity high" label="Terminal" />
                   </div>
                   <div className="pt-2 border-t border-border/40">
                     <p className="text-sm text-text-primary font-medium">Quiet Hours</p>
                     <p className="text-sm text-text-secondary">
-                      Suppress non-critical notifications during specified hours. Critical alerts always deliver.
+                      Suppress non-critical notifications during specified hours. Critical alerts
+                      always deliver.
                     </p>
                     <CodeBlock
                       code="panguard chat prefs --quiet-hours 22:00-08:00"
@@ -267,10 +283,7 @@ View full report: https://app.panguard.ai/events/evt_abc123`}
                     <p className="text-sm text-text-secondary">
                       Set the notification language. Supported: en, zh-TW.
                     </p>
-                    <CodeBlock
-                      code="panguard chat prefs --lang zh-TW"
-                      label="Terminal"
-                    />
+                    <CodeBlock code="panguard chat prefs --lang zh-TW" label="Terminal" />
                   </div>
                 </div>
               </div>
@@ -285,7 +298,8 @@ View full report: https://app.panguard.ai/events/evt_abc123`}
           <FadeInUp>
             <h2 className="text-xl font-bold text-text-primary mb-2">Multiple Channels</h2>
             <p className="text-text-secondary mb-6">
-              Configure multiple channels simultaneously and route different severity levels to different destinations.
+              Configure multiple channels simultaneously and route different severity levels to
+              different destinations.
             </p>
 
             <CodeBlock
@@ -303,9 +317,9 @@ panguard chat setup --channel email --type weekly`}
             <div className="bg-surface-1 border border-border rounded-xl p-5 mt-4">
               <p className="text-sm font-semibold text-text-primary mb-2">Routing Example</p>
               <p className="text-sm text-text-secondary leading-relaxed">
-                A common pattern is to send critical and high alerts to Telegram for immediate mobile notifications,
-                all severity levels to a dedicated Slack channel for team-wide visibility, and weekly
-                compliance summaries via email to management stakeholders.
+                A common pattern is to send critical and high alerts to Telegram for immediate
+                mobile notifications, all severity levels to a dedicated Slack channel for team-wide
+                visibility, and weekly compliance summaries via email to management stakeholders.
               </p>
             </div>
           </FadeInUp>

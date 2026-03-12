@@ -5,6 +5,7 @@ Create a comprehensive, research-backed campaign brief that leverages accumulate
 ## Purpose
 
 Transform a campaign idea into a detailed, actionable brief by:
+
 1. Researching similar past campaigns in the project
 2. Analyzing target audience and competitive landscape
 3. Generating structured campaign brief with all essential sections
@@ -47,17 +48,21 @@ Transform a campaign idea into a detailed, actionable brief by:
 ## Examples
 
 ### Basic Usage
+
 ```bash
 /cm:plan "Q3 Feature Launch"
 ```
-*Will prompt for budget, duration, and other details interactively*
+
+_Will prompt for budget, duration, and other details interactively_
 
 ### Complete Specification
+
 ```bash
 /cm:plan "Q2 FocusFlow 2.0 Launch" --budget 50000 --duration "6 weeks" --goal "500 trial signups" --audience "Startup Founder, Marketing Manager" --channels "paid search, LinkedIn, content marketing"
 ```
 
 ### Quick Launch Campaigns
+
 ```bash
 /cm:plan "Flash Sale Weekend" --budget 5000 --duration "72 hours" --goal "100 sales"
 ```
@@ -67,18 +72,21 @@ Transform a campaign idea into a detailed, actionable brief by:
 ### Step 1: Research Phase
 
 **Analyze Project History:**
+
 - Search for previous campaigns in `campaigns/` folder
 - Identify similar campaign types
 - Extract successful patterns and tactics
 - Note what worked and what didn't
 
 **Research Questions:**
+
 - Have we run similar campaigns before?
 - What budget allocations worked best?
 - Which channels delivered best ROI?
 - What messaging resonated with target personas?
 
 **Compounding Effect:**
+
 - Campaign 1: Limited history, general best practices
 - Campaign 5: Rich history, specific patterns recognized
 - Campaign 10: Deep insights, predictive recommendations
@@ -86,12 +94,14 @@ Transform a campaign idea into a detailed, actionable brief by:
 ### Step 2: Audience & Competitive Analysis
 
 **Audience Research:**
+
 - Review target persona profiles (from CLAUDE.md)
 - Analyze persona-specific messaging from past campaigns
 - Identify pain points and motivations
 - Recommend messaging angles
 
 **Competitive Landscape:**
+
 - Search for competitive intelligence in `research/` folder
 - Identify key differentiators
 - Note competitive positioning opportunities
@@ -102,72 +112,84 @@ Transform a campaign idea into a detailed, actionable brief by:
 Create comprehensive brief with these sections:
 
 **1. Campaign Overview**
+
 - Campaign name and tagline
 - Duration and key dates
 - Budget allocation
 - Team roles and responsibilities
 
 **2. Goals & Success Metrics**
+
 - Primary goal (with specific target)
 - Secondary goals
 - Key Performance Indicators (KPIs)
 - Success criteria
 
 **3. Target Audience**
+
 - Primary persona(s) with profiles
 - Secondary audience(s)
 - Persona-specific messaging angles
 - Key pain points to address
 
 **4. Competitive Positioning**
+
 - Key competitors
 - Our differentiation
 - Competitive advantages
 - Positioning statement
 
 **5. Strategic Approach**
+
 - Core message and value proposition
 - Key themes and narratives
 - Proof points and social proof
 - Creative direction
 
 **6. Channel Strategy**
+
 - Recommended channels with rationale
 - Budget allocation by channel
 - Expected performance by channel
 - Channel-specific tactics
 
 **7. Content Plan**
+
 - Content types needed
 - Quantity by format and channel
 - Content calendar outline
 - Resource requirements
 
 **8. Execution Timeline**
+
 - Week-by-week plan
 - Key milestones
 - Dependencies and critical path
 - Launch date and promotion schedule
 
 **9. Budget Breakdown**
+
 - Channel-by-channel allocation
 - Content production costs
 - Tool and platform costs
 - Contingency budget (10%)
 
 **10. Risks & Mitigation**
+
 - Potential risks identified
 - Mitigation strategies
 - Contingency plans
 - Decision triggers
 
 **11. Measurement & Reporting**
+
 - Tracking methodology
 - Reporting cadence
 - Dashboard/tools to use
 - Success criteria validation
 
 **12. Execution Checklist**
+
 - Pre-launch todos
 - Launch day checklist
 - Ongoing management tasks
@@ -176,12 +198,14 @@ Create comprehensive brief with these sections:
 ### Step 4: Leverage Templates
 
 **Template Usage:**
+
 - If templates exist in `templates/campaign-briefs/`, use them
 - Adapt template sections to specific campaign
 - Fill in campaign-specific details
 - Maintain consistent structure
 
 **Compounding Effect:**
+
 - First time: Creates template while building brief
 - Subsequent times: Starts from template, customizes
 - Over time: Templates become more sophisticated
@@ -191,6 +215,7 @@ Create comprehensive brief with these sections:
 Generate actionable checklist:
 
 **Pre-Launch (4-2 weeks before):**
+
 - [ ] Finalize campaign messaging
 - [ ] Create content calendar
 - [ ] Design creative assets
@@ -198,6 +223,7 @@ Generate actionable checklist:
 - [ ] Brief stakeholders
 
 **Launch Prep (2 weeks - 1 day before):**
+
 - [ ] Create all content assets
 - [ ] Review with subagents
 - [ ] Set up ad campaigns
@@ -205,6 +231,7 @@ Generate actionable checklist:
 - [ ] Prepare launch day schedule
 
 **Launch Day:**
+
 - [ ] Publish blog post
 - [ ] Send email blast
 - [ ] Launch paid ads
@@ -212,12 +239,14 @@ Generate actionable checklist:
 - [ ] Monitor initial performance
 
 **Ongoing (During campaign):**
+
 - [ ] Daily performance monitoring
 - [ ] Weekly optimization
 - [ ] Respond to engagement
 - [ ] Adjust based on data
 
 **Post-Launch:**
+
 - [ ] Final performance analysis
 - [ ] Campaign retrospective
 - [ ] Update templates
@@ -226,6 +255,7 @@ Generate actionable checklist:
 ### Step 6: Save & Organize
 
 **File Structure Created:**
+
 ```
 campaigns/
 └── q2-focusflow-2-0-launch/
@@ -311,14 +341,17 @@ campaigns/
 ## Goals & Success Metrics
 
 ### Primary Goal
+
 Generate 500 trial signups for FocusFlow 2.0
 
 ### Secondary Goals
+
 - Create $100,000 in qualified pipeline
 - Increase brand awareness by 50%
 - Achieve 20% trial-to-paid conversion rate
 
 ### Key Performance Indicators (KPIs)
+
 - Trial signups: 500 (target)
 - Cost per trial: < $100
 - Website traffic: +50% (7,500 → 11,250 visits)
@@ -326,6 +359,7 @@ Generate 500 trial signups for FocusFlow 2.0
 - Social engagement: +75%
 
 ### Success Criteria
+
 - ✅ Reach 500 trials by end of Week 6
 - ✅ Maintain cost per trial under $100
 - ✅ Achieve 20%+ trial-to-paid conversion
@@ -336,6 +370,7 @@ Generate 500 trial signups for FocusFlow 2.0
 ### Primary: Startup Founder (40% of budget - $20K)
 
 **Profile:**
+
 - Age: 28, startup founder
 - Company: 10-person tech startup
 - Pain: Team scattered across tools, losing focus
@@ -346,6 +381,7 @@ Generate 500 trial signups for FocusFlow 2.0
 "Get your 10-person team focused in 10 minutes. No complex setup, no training needed. Just instant productivity."
 
 **Key Messages:**
+
 - 10-minute setup (vs competitors' 2+ hours)
 - AI prioritization (unique feature)
 - Free trial, no credit card
@@ -354,6 +390,7 @@ Generate 500 trial signups for FocusFlow 2.0
 ### Secondary: Marketing Manager (40% of budget - $20K)
 
 **Profile:**
+
 - Age: 38, team manager at mid-size company
 - Manages: 15 remote employees
 - Pain: Can't see what team is working on
@@ -364,6 +401,7 @@ Generate 500 trial signups for FocusFlow 2.0
 "Save 6+ hours per week on status meetings. Get real-time team visibility without the meetings."
 
 **Key Messages:**
+
 - ROI justification ($1,800/month time saved)
 - Case studies from similar companies
 - Team dashboard for visibility
@@ -372,6 +410,7 @@ Generate 500 trial signups for FocusFlow 2.0
 ### Tertiary: Solopreneur (20% of budget - $10K)
 
 **Profile:**
+
 - Age: 32, freelance consultant
 - Manages: 3-5 client projects simultaneously
 - Pain: Juggling deadlines, using spreadsheets
@@ -382,6 +421,7 @@ Generate 500 trial signups for FocusFlow 2.0
 "Manage all your client projects in one place. Simple enough for solo use, powerful enough to scale."
 
 **Key Messages:**
+
 - Affordable pricing ($15/month solo tier)
 - Multi-project management
 - Free tier available
@@ -390,20 +430,24 @@ Generate 500 trial signups for FocusFlow 2.0
 ## Competitive Positioning
 
 ### Key Competitors
+
 1. **Asana** - Market leader, complex, 2+ hour setup
 2. **Monday.com** - Feature-heavy, overwhelming UI
 3. **ClickUp** - Too many features, steep learning curve
 
 ### Our Differentiation
+
 1. **Simplicity**: 10-minute setup vs 2+ hours
 2. **AI Prioritization**: Unique feature (tells you what to work on)
 3. **Modern**: Built for remote-first teams
 4. **Right-Sized**: Not overwhelming, just right for 10-50 person teams
 
 ### Positioning Statement
+
 "FocusFlow is the simple, AI-powered productivity platform for modern remote teams who want to get focused fast without the complexity of enterprise tools."
 
 ### Competitive Advantages
+
 - ✅ 10-minute setup (fastest in market)
 - ✅ AI task prioritization (unique)
 - ✅ Better pricing for small teams
@@ -412,20 +456,24 @@ Generate 500 trial signups for FocusFlow 2.0
 ## Strategic Approach
 
 ### Core Message
+
 "Get your team focused and moving forward with AI-powered productivity."
 
 ### Key Themes
+
 1. **Speed & Simplicity**: "10 minutes to productivity"
 2. **AI Innovation**: "AI that actually helps you prioritize"
 3. **Built for Remote**: "Finally, productivity for how we work now"
 
 ### Proof Points
+
 - 5,000+ remote teams using FocusFlow
 - 4.8/5 star rating (2,500+ reviews)
 - Average user saves 2 hours per day
 - 10-minute average setup time
 
 ### Creative Direction
+
 - Clean, modern visual style
 - Focus on forward momentum (arrows, progress)
 - Energetic, optimistic tone
@@ -470,6 +518,7 @@ Generate 500 trial signups for FocusFlow 2.0
 ### Content Requirements (42 total assets)
 
 **Email (5 assets):**
+
 - Welcome email (trial signup)
 - Day 1: Feature education
 - Day 3: Team collaboration
@@ -477,6 +526,7 @@ Generate 500 trial signups for FocusFlow 2.0
 - Day 7: Conversion push
 
 **Blog Posts (8 assets):**
+
 - How to improve team productivity (pillar)
 - AI task prioritization guide
 - Remote team management tips
@@ -486,45 +536,53 @@ Generate 500 trial signups for FocusFlow 2.0
 - Integration spotlight series (3 posts)
 
 **Social Media (15 assets):**
+
 - LinkedIn posts (5)
 - Twitter threads (3)
 - Instagram/Facebook (5)
 - Short-form video clips (2)
 
 **Paid Ads (10 assets):**
+
 - Google Search ads (3 variants)
 - LinkedIn Sponsored Content (3 variants)
 - Display ads (2 formats)
 - Retargeting ads (2 variants)
 
 **Landing Pages (2 assets):**
+
 - Primary: Trial signup page
 - Secondary: Webinar registration
 
 **Other (2 assets):**
+
 - Case study: Startup success story
 - Webinar: AI-powered productivity
 
 ### Content Calendar Outline
 
 **Weeks 1-2: Pre-Launch**
+
 - Blog content production
 - Email sequence creation
 - Ad creative development
 - Social media asset creation
 
 **Week 3: Soft Launch**
+
 - Blog posts go live
 - Email warmup begins
 - Organic social posts
 
 **Week 4: Main Launch**
+
 - Press release
 - Email blast to full list
 - Paid ads launch
 - Social media amplification
 
 **Weeks 5-6: Amplification**
+
 - Case studies published
 - Webinars conducted
 - Continued paid ads
@@ -533,6 +591,7 @@ Generate 500 trial signups for FocusFlow 2.0
 ## Execution Timeline
 
 ### Week 1-2: Pre-Launch (April 1-14)
+
 - Finalize messaging and positioning
 - Create all content assets
 - Design ad creatives
@@ -541,6 +600,7 @@ Generate 500 trial signups for FocusFlow 2.0
 - Review content with subagents
 
 ### Week 3: Soft Launch (April 15-21)
+
 - Publish blog posts
 - Start email warmup
 - Organic social posting
@@ -548,6 +608,7 @@ Generate 500 trial signups for FocusFlow 2.0
 - Refine based on feedback
 
 ### Week 4: Main Launch (April 22-28)
+
 - Press release distribution
 - Email blast to full list (20K)
 - Launch all paid ad campaigns
@@ -556,6 +617,7 @@ Generate 500 trial signups for FocusFlow 2.0
 - Monitor closely, optimize
 
 ### Week 5: Amplification (April 29-May 5)
+
 - Publish case studies
 - Host first webinar
 - Continue paid ads (optimize)
@@ -563,6 +625,7 @@ Generate 500 trial signups for FocusFlow 2.0
 - Mid-campaign analysis
 
 ### Week 6: Final Push (May 6-12)
+
 - Host second webinar
 - Limited-time offer messaging
 - Maximize ad spend (if performing)
@@ -570,6 +633,7 @@ Generate 500 trial signups for FocusFlow 2.0
 - Urgency messaging
 
 ### Week 7: Wrap-Up (May 13-31)
+
 - Campaign conclusion
 - Final performance analysis
 - Post-campaign retrospective
@@ -578,17 +642,18 @@ Generate 500 trial signups for FocusFlow 2.0
 
 ## Budget Breakdown
 
-| Channel | Budget | % of Total | Expected Trials | CPA | Expected ROI |
-|---------|--------|------------|----------------|-----|--------------|
-| Paid Search | $15,000 | 30% | 200 | $75 | 8:1 |
-| LinkedIn Ads | $12,000 | 24% | 120 | $100 | 6:1 |
-| Content Marketing | $10,000 | 20% | 100 | $100 | Organic+ |
-| Email Campaigns | $5,000 | 10% | 60 | $83 | 12:1 |
-| Partnerships | $5,000 | 10% | 15 | $333 | Brand+ |
-| Events/Webinars | $3,000 | 6% | 5 | $600 | Qualified |
-| **Total** | **$50,000** | **100%** | **500** | **$100 avg** | **7:1** |
+| Channel           | Budget      | % of Total | Expected Trials | CPA          | Expected ROI |
+| ----------------- | ----------- | ---------- | --------------- | ------------ | ------------ |
+| Paid Search       | $15,000     | 30%        | 200             | $75          | 8:1          |
+| LinkedIn Ads      | $12,000     | 24%        | 120             | $100         | 6:1          |
+| Content Marketing | $10,000     | 20%        | 100             | $100         | Organic+     |
+| Email Campaigns   | $5,000      | 10%        | 60              | $83          | 12:1         |
+| Partnerships      | $5,000      | 10%        | 15              | $333         | Brand+       |
+| Events/Webinars   | $3,000      | 6%         | 5               | $600         | Qualified    |
+| **Total**         | **$50,000** | **100%**   | **500**         | **$100 avg** | **7:1**      |
 
 ### Additional Costs
+
 - Content production: Included
 - Design/creative: Included
 - Tools/platforms: Existing subscriptions
@@ -597,36 +662,44 @@ Generate 500 trial signups for FocusFlow 2.0
 ## Risks & Mitigation
 
 ### Risk 1: Paid ads underperform
+
 **Likelihood:** Medium
 **Impact:** High
 **Mitigation:**
+
 - Daily performance monitoring
 - A/B test ad creative and copy
 - Pivot budget to top performers within week 1
 - Pause underperformers quickly
 
 ### Risk 2: Message doesn't resonate
+
 **Likelihood:** Low
 **Impact:** High
 **Mitigation:**
+
 - A/B test messaging angles
 - Monitor engagement signals
 - Survey trial users for feedback
 - Iterate messaging weekly
 
 ### Risk 3: Competitive response
+
 **Likelihood:** Medium
 **Impact:** Medium
 **Mitigation:**
+
 - Battle cards ready for sales team
 - Emphasize unique AI feature
 - Monitor competitor activity
 - Have backup messaging angles
 
 ### Risk 4: Budget pacing issues
+
 **Likelihood:** Low
 **Impact:** Medium
 **Mitigation:**
+
 - Weekly budget review
 - Front-load spend to learn fast
 - Contingency fund available
@@ -635,18 +708,21 @@ Generate 500 trial signups for FocusFlow 2.0
 ## Measurement & Reporting
 
 ### Tracking Setup
+
 - Google Analytics 4 (website traffic, conversions)
 - HubSpot (email performance, lead attribution)
 - Ad platform dashboards (Google Ads, LinkedIn Campaign Manager)
 - Custom dashboard (aggregate view)
 
 ### Reporting Cadence
+
 - **Daily**: Key metrics review (trials, spend, CPA)
 - **Weekly**: Full channel analysis, optimization decisions
 - **Bi-weekly**: Stakeholder update report
 - **Post-campaign**: Comprehensive analysis and retrospective
 
 ### Dashboard Metrics
+
 - Trial signups (daily, by source)
 - Cost per acquisition (by channel)
 - Budget pacing vs plan
@@ -655,6 +731,7 @@ Generate 500 trial signups for FocusFlow 2.0
 - Top-performing content/ads
 
 ### Success Validation
+
 Week 3 checkpoint: 100 trials (on track)
 Week 5 checkpoint: 350 trials (on track)
 Week 7 final: 500 trials (success!)
@@ -662,6 +739,7 @@ Week 7 final: 500 trials (success!)
 ## Compounding Insights
 
 ### Leveraged from Past Campaigns
+
 - ✅ LinkedIn ads outperform Facebook (reallocated $5K)
 - ✅ Curiosity-based email subject lines (+15% open rate)
 - ✅ "Save 2 hours/day" messaging resonates strongly
@@ -669,6 +747,7 @@ Week 7 final: 500 trials (success!)
 - ✅ Video ads drive 40% higher CTR
 
 ### To Document for Next Campaign
+
 - [ ] Final ROI by channel
 - [ ] Top-performing ad creative
 - [ ] Best converting landing page elements
@@ -696,18 +775,21 @@ This will generate all 42 content assets across channels using parallel subagent
 ## Compounding Benefits
 
 ### First Campaign Using This Command
+
 - **Time to create brief:** 2-3 hours
 - **Research depth:** General best practices
 - **Template usage:** Creates new template
 - **Pattern recognition:** Limited historical data
 
 ### Fifth Campaign Using This Command
+
 - **Time to create brief:** 45 minutes ⚡
 - **Research depth:** Leverages 4 past campaigns
 - **Template usage:** 65% pre-filled from template
 - **Pattern recognition:** 12+ patterns identified
 
 ### Tenth Campaign Using This Command
+
 - **Time to create brief:** 30 minutes ⚡⚡
 - **Research depth:** Rich historical insights
 - **Template usage:** 80% pre-filled, highly refined

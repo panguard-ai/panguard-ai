@@ -39,7 +39,9 @@ export default function PricingCards() {
               </p>
               <div className="mt-3">
                 <span className="text-5xl font-extrabold text-text-primary">$0</span>
-                <span className="text-xs uppercase tracking-wider text-brand-sage font-semibold ml-3">{t('badge')}</span>
+                <span className="text-xs uppercase tracking-wider text-brand-sage font-semibold ml-3">
+                  {t('badge')}
+                </span>
               </div>
               <p className="text-sm text-text-secondary mt-2">{t('planDesc')}</p>
             </div>

@@ -16,7 +16,10 @@ import type { AuditFinding, CheckResult } from '../types.js';
 
 /** Minimal LLM interface to avoid tight coupling with @panguard-ai/core */
 export interface SkillAnalysisLLM {
-  analyze(prompt: string, context?: string): Promise<{
+  analyze(
+    prompt: string,
+    context?: string
+  ): Promise<{
     summary: string;
     severity: 'critical' | 'high' | 'medium' | 'low' | 'info';
     confidence: number;
@@ -78,7 +81,7 @@ If the skill looks safe, return: {"findings": [], "overallAssessment": "safe", "
 export async function checkWithAI(
   instructions: string,
   description: string | undefined,
-  llm?: SkillAnalysisLLM,
+  llm?: SkillAnalysisLLM
 ): Promise<CheckResult> {
   // No LLM configured — skip gracefully
   if (!llm) {
@@ -126,7 +129,7 @@ export async function checkWithAI(
       title: f.title,
       description: f.description,
       severity: f.severity,
-      category: AI_CATEGORY_MAP[f.id] ?? 'ai-analysis' as AuditFinding['category'],
+      category: AI_CATEGORY_MAP[f.id] ?? ('ai-analysis' as AuditFinding['category']),
       location: 'AI analysis',
     }));
 
@@ -134,9 +137,10 @@ export async function checkWithAI(
     const hasHigh = findings.some((f) => f.severity === 'high');
     const status = hasCritical ? 'fail' : hasHigh ? 'warn' : findings.length > 0 ? 'warn' : 'pass';
 
-    const label = findings.length === 0
-      ? 'AI Analysis: No semantic threats detected'
-      : `AI Analysis: ${findings.length} semantic issue(s) found`;
+    const label =
+      findings.length === 0
+        ? 'AI Analysis: No semantic threats detected'
+        : `AI Analysis: ${findings.length} semantic issue(s) found`;
 
     return { status, label, findings };
   } catch (error) {
@@ -156,7 +160,10 @@ export async function checkWithAI(
 function parseAIFindings(raw: string): AIFinding[] {
   try {
     // Strip markdown code fences if present
-    const cleaned = raw.replace(/^```(?:json)?\s*\n?/m, '').replace(/\n?```\s*$/m, '').trim();
+    const cleaned = raw
+      .replace(/^```(?:json)?\s*\n?/m, '')
+      .replace(/\n?```\s*$/m, '')
+      .trim();
     const parsed = JSON.parse(cleaned) as { findings?: AIFinding[] };
     if (!Array.isArray(parsed.findings)) return [];
 
@@ -166,7 +173,7 @@ function parseAIFindings(raw: string): AIFinding[] {
           typeof f.id === 'string' &&
           typeof f.title === 'string' &&
           typeof f.description === 'string' &&
-          ['critical', 'high', 'medium', 'low'].includes(f.severity),
+          ['critical', 'high', 'medium', 'low'].includes(f.severity)
       )
       .slice(0, 10); // Cap at 10 findings to prevent score inflation
   } catch {

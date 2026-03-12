@@ -15,7 +15,11 @@ import { c, box, header, symbols, divider } from '@panguard-ai/core';
 export function guardCommand(): Command {
   const cmd = new Command('guard')
     .description('Guard engine management / \u5B88\u8B77\u5F15\u64CE\u7BA1\u7406')
-    .option('--watch', 'Start guard engine in foreground (alias for guard start) / 前景啟動守護引擎', false)
+    .option(
+      '--watch',
+      'Start guard engine in foreground (alias for guard start) / 前景啟動守護引擎',
+      false
+    )
     .option('--dashboard', 'Enable live TUI dashboard / 啟用即時 TUI 儀表板', false)
     .action(async (opts: { watch?: boolean; dashboard?: boolean }) => {
       if (opts.watch) {
@@ -30,21 +34,37 @@ export function guardCommand(): Command {
     .description('Start the guard engine / \u555F\u52D5\u5B88\u8B77\u5F15\u64CE')
     .option('--data-dir <path>', 'Data directory / \u8CC7\u6599\u76EE\u9304')
     .option('--verbose', 'Verbose output (show all event logs) / \u8A73\u7D30\u8F38\u51FA', false)
-    .option('--dashboard', 'Enable live TUI dashboard / \u555F\u7528\u5373\u6642 TUI \u5100\u8868\u677F', false)
-    .option('--interactive', 'Prompt for medium-confidence threats / \u4E2D\u4FE1\u5FC3\u5EA6\u5A01\u8105\u4E92\u52D5\u63D0\u793A', false)
+    .option(
+      '--dashboard',
+      'Enable live TUI dashboard / \u555F\u7528\u5373\u6642 TUI \u5100\u8868\u677F',
+      false
+    )
+    .option(
+      '--interactive',
+      'Prompt for medium-confidence threats / \u4E2D\u4FE1\u5FC3\u5EA6\u5A01\u8105\u4E92\u52D5\u63D0\u793A',
+      false
+    )
     .option(
       '--manager <url>',
       'Manager URL for agent mode / Manager \u7DB2\u5740\uFF08Agent \u6A21\u5F0F\uFF09'
     )
-    .action(async (opts: { dataDir?: string; verbose: boolean; dashboard: boolean; interactive: boolean; manager?: string }) => {
-      const args = ['start'];
-      if (opts.dataDir) args.push('--data-dir', opts.dataDir);
-      if (opts.verbose) args.push('--verbose');
-      if (opts.dashboard) args.push('--dashboard');
-      if (opts.interactive) args.push('--interactive');
-      if (opts.manager) args.push('--manager', opts.manager);
-      await runCLI(args);
-    });
+    .action(
+      async (opts: {
+        dataDir?: string;
+        verbose: boolean;
+        dashboard: boolean;
+        interactive: boolean;
+        manager?: string;
+      }) => {
+        const args = ['start'];
+        if (opts.dataDir) args.push('--data-dir', opts.dataDir);
+        if (opts.verbose) args.push('--verbose');
+        if (opts.dashboard) args.push('--dashboard');
+        if (opts.interactive) args.push('--interactive');
+        if (opts.manager) args.push('--manager', opts.manager);
+        await runCLI(args);
+      }
+    );
 
   cmd
     .command('stop')
@@ -215,8 +235,12 @@ async function commandSetupAi(): Promise<void> {
 
   const existingAi = existingConfig['ai'] as Record<string, unknown> | undefined;
   if (existingAi?.['provider']) {
-    console.log(`  ${symbols.info} Current AI config: ${c.sage(String(existingAi['provider']))} / ${c.sage(String(existingAi['model'] ?? 'default'))}`);
-    console.log(`  ${c.dim('目前 AI 設定')}: ${String(existingAi['provider'])} / ${String(existingAi['model'] ?? 'default')}`);
+    console.log(
+      `  ${symbols.info} Current AI config: ${c.sage(String(existingAi['provider']))} / ${c.sage(String(existingAi['model'] ?? 'default'))}`
+    );
+    console.log(
+      `  ${c.dim('目前 AI 設定')}: ${String(existingAi['provider'])} / ${String(existingAi['model'] ?? 'default')}`
+    );
     console.log('');
   }
 
@@ -306,7 +330,10 @@ async function commandSetupAi(): Promise<void> {
     console.log(divider('Layer 3: Cloud AI / 第三層：雲端 AI'));
     console.log('');
 
-    const envKey = process.env['PANGUARD_AI_KEY'] || process.env['ANTHROPIC_API_KEY'] || process.env['OPENAI_API_KEY'];
+    const envKey =
+      process.env['PANGUARD_AI_KEY'] ||
+      process.env['ANTHROPIC_API_KEY'] ||
+      process.env['OPENAI_API_KEY'];
     if (envKey) {
       const { provider } = validateApiKeyFormat(envKey);
       console.log(`  ${symbols.pass} API key found in environment: ${c.sage(provider)}`);
@@ -326,10 +353,13 @@ async function commandSetupAi(): Promise<void> {
     if (apiKey) {
       const { valid, provider } = validateApiKeyFormat(apiKey);
       if (!valid) {
-        console.log(`  ${symbols.warn} Unrecognized key format, saving as-is / 無法識別的金鑰格式，直接儲存`);
+        console.log(
+          `  ${symbols.warn} Unrecognized key format, saving as-is / 無法識別的金鑰格式，直接儲存`
+        );
       }
 
-      const cloudProvider = provider === 'anthropic' ? 'claude' : provider === 'openai' ? 'openai' : 'claude';
+      const cloudProvider =
+        provider === 'anthropic' ? 'claude' : provider === 'openai' ? 'openai' : 'claude';
       const defaultModel = cloudProvider === 'claude' ? 'claude-sonnet-4-20250514' : 'gpt-4o';
 
       const model = await readLine(`  Model / 模型 [${defaultModel}]: `);
@@ -364,7 +394,9 @@ async function commandSetupAi(): Promise<void> {
       }
 
       console.log('');
-      console.log(`  ${symbols.pass} Cloud AI configured: ${c.sage(`${cloudProvider} / ${cloudModel}`)}`);
+      console.log(
+        `  ${symbols.pass} Cloud AI configured: ${c.sage(`${cloudProvider} / ${cloudModel}`)}`
+      );
       console.log(`  ${c.dim('雲端 AI 已設定')}: ${cloudProvider} / ${cloudModel}`);
     } else {
       console.log(`  ${symbols.info} Skipped cloud AI setup / 跳過雲端 AI 設定`);
@@ -384,7 +416,9 @@ async function commandSetupAi(): Promise<void> {
   }
 
   console.log('');
-  console.log(`  ${symbols.info} Restart guard to apply changes: ${c.sage('panguard guard restart')}`);
+  console.log(
+    `  ${symbols.info} Restart guard to apply changes: ${c.sage('panguard guard restart')}`
+  );
   console.log(`  ${c.dim('重啟守護以套用變更')}: panguard guard restart`);
   console.log('');
 }
@@ -415,7 +449,10 @@ async function checkDashboardReachable(port: number): Promise<boolean> {
       }
     );
     req.on('error', () => resolve(false));
-    req.on('timeout', () => { req.destroy(); resolve(false); });
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(false);
+    });
     req.end();
   });
 }
@@ -501,8 +538,11 @@ async function showDetailedStatus(dataDirOverride?: string): Promise<void> {
       // ps etime format: [[DD-]HH:]MM:SS
       const parts = out.split(/[-:]/).map(Number);
       let seconds = 0;
-      if (parts.length === 4) seconds = (parts[0] ?? 0) * 86400 + (parts[1] ?? 0) * 3600 + (parts[2] ?? 0) * 60 + (parts[3] ?? 0);
-      else if (parts.length === 3) seconds = (parts[0] ?? 0) * 3600 + (parts[1] ?? 0) * 60 + (parts[2] ?? 0);
+      if (parts.length === 4)
+        seconds =
+          (parts[0] ?? 0) * 86400 + (parts[1] ?? 0) * 3600 + (parts[2] ?? 0) * 60 + (parts[3] ?? 0);
+      else if (parts.length === 3)
+        seconds = (parts[0] ?? 0) * 3600 + (parts[1] ?? 0) * 60 + (parts[2] ?? 0);
       else if (parts.length === 2) seconds = (parts[0] ?? 0) * 60 + (parts[1] ?? 0);
       else seconds = parts[0] ?? 0;
       if (seconds > 0) uptimeStr = formatUptime(seconds);
@@ -513,14 +553,14 @@ async function showDetailedStatus(dataDirOverride?: string): Promise<void> {
 
   // ── Layer 2: Dashboard + config ───────────────────────────────────────────
   const config = readJsonFile(configPath);
-  const dashboardPort = typeof config?.['dashboardPort'] === 'number'
-    ? config['dashboardPort']
-    : 3100;
+  const dashboardPort =
+    typeof config?.['dashboardPort'] === 'number' ? config['dashboardPort'] : 3100;
   const dashboardEnabled = config?.['dashboardEnabled'] !== false;
   const mode = typeof config?.['mode'] === 'string' ? config['mode'] : 'unknown';
-  const cloudEndpoint = typeof config?.['threatCloudEndpoint'] === 'string'
-    ? config['threatCloudEndpoint']
-    : 'tc.panguard.ai';
+  const cloudEndpoint =
+    typeof config?.['threatCloudEndpoint'] === 'string'
+      ? config['threatCloudEndpoint']
+      : 'tc.panguard.ai';
 
   let dashboardStatus: string;
   if (!dashboardEnabled) {
@@ -550,8 +590,7 @@ async function showDetailedStatus(dataDirOverride?: string): Promise<void> {
 
   // ── Render ────────────────────────────────────────────────────────────────
   const processLine = processRunning
-    ? c.safe(`running`) +
-      c.dim(` (PID: ${pid ?? '?'}, uptime: ${uptimeStr})`)
+    ? c.safe(`running`) + c.dim(` (PID: ${pid ?? '?'}, uptime: ${uptimeStr})`)
     : c.critical('stopped');
 
   const cloudHost = cloudEndpoint.replace(/^https?:\/\//, '').replace(/\/.*$/, '');

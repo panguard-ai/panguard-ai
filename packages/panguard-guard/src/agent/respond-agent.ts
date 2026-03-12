@@ -178,7 +178,11 @@ class ActionRateLimiter {
   }
 
   /** Get current rate limit status for monitoring */
-  getStatus(): { circuitBroken: boolean; consecutiveFailures: number; windowCounts: Record<string, number> } {
+  getStatus(): {
+    circuitBroken: boolean;
+    consecutiveFailures: number;
+    windowCounts: Record<string, number>;
+  } {
     const now = Date.now();
     const cutoff = now - this.windowMs;
     const windowCounts: Record<string, number> = {};
@@ -327,9 +331,7 @@ export class RespondAgent {
 
         // Multiple actions: return composite result / 多個動作：回傳複合結果
         const allSuccess = results.every((r) => r.success);
-        const details = results
-          .map((r) => `[${r.action}] ${r.details}`)
-          .join(' | ');
+        const details = results.map((r) => `[${r.action}] ${r.details}`).join(' | ');
 
         return {
           action: results[0]!.action,
@@ -1067,7 +1069,11 @@ export class RespondAgent {
   }
 
   /** Get rate limiter status for monitoring */
-  getRateLimiterStatus(): { circuitBroken: boolean; consecutiveFailures: number; windowCounts: Record<string, number> } {
+  getRateLimiterStatus(): {
+    circuitBroken: boolean;
+    consecutiveFailures: number;
+    windowCounts: Record<string, number>;
+  } {
     return this.rateLimiter.getStatus();
   }
 
@@ -1113,7 +1119,9 @@ export class RespondAgent {
       conclusion: 'policy_block',
       confidence: 100,
       reasoning: `Policy-driven block of IP ${ip}`,
-      evidence: [{ source: 'policy', description: `Block IP: ${ip}`, confidence: 100, data: { ip } }],
+      evidence: [
+        { source: 'policy', description: `Block IP: ${ip}`, confidence: 100, data: { ip } },
+      ],
       recommendedAction: 'block_ip',
     } as unknown as ThreatVerdict;
 

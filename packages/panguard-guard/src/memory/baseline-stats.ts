@@ -66,9 +66,10 @@ export class BaselineStats {
    * @param event - Security event to ingest / 要送入的安全事件
    */
   ingestEvent(event: SecurityEvent): void {
-    const eventTime = event.timestamp instanceof Date
-      ? event.timestamp.getTime()
-      : new Date(event.timestamp).getTime();
+    const eventTime =
+      event.timestamp instanceof Date
+        ? event.timestamp.getTime()
+        : new Date(event.timestamp).getTime();
 
     // Check if we need to flush the time window / 檢查是否需要刷新時間窗口
     this.maybeFlushWindow(eventTime);
@@ -96,9 +97,10 @@ export class BaselineStats {
 
       // Track port diversity per source IP / 追蹤每來源 IP 的埠多樣性
       const sourceIP = (event.metadata?.['sourceIP'] as string) ?? undefined;
-      const destPort = (event.metadata?.['remotePort'] as number)
-        ?? (event.metadata?.['destPort'] as number)
-        ?? undefined;
+      const destPort =
+        (event.metadata?.['remotePort'] as number) ??
+        (event.metadata?.['destPort'] as number) ??
+        undefined;
       if (sourceIP && destPort !== undefined && typeof destPort === 'number') {
         const ports = this.portSets.get(sourceIP) ?? new Set();
         ports.add(destPort);
@@ -110,9 +112,8 @@ export class BaselineStats {
     // Track login hour / 追蹤登入小時
     const username = extractUsername(event);
     if (username) {
-      const eventDate = event.timestamp instanceof Date
-        ? event.timestamp
-        : new Date(event.timestamp);
+      const eventDate =
+        event.timestamp instanceof Date ? event.timestamp : new Date(event.timestamp);
       this.scorer.updateStats('login_hour', eventDate.getHours());
     }
 
@@ -126,9 +127,10 @@ export class BaselineStats {
     }
 
     // Track authentication failures / 追蹤認證失敗
-    const isAuthFailure = event.category === 'authentication_failure'
-      || event.category === 'brute_force'
-      || (event.metadata?.['authResult'] === 'failure');
+    const isAuthFailure =
+      event.category === 'authentication_failure' ||
+      event.category === 'brute_force' ||
+      event.metadata?.['authResult'] === 'failure';
     if (isAuthFailure) {
       this.authFailureCount += 1;
       this.scorer.updateStats('auth_failures', this.authFailureCount);
@@ -154,9 +156,10 @@ export class BaselineStats {
       if (destIP) {
         const metricKey = `conn_freq_${destIP}`;
         const timestamps = this.connTimestamps.get(destIP) ?? [];
-        const eventTime = event.timestamp instanceof Date
-          ? event.timestamp.getTime()
-          : new Date(event.timestamp).getTime();
+        const eventTime =
+          event.timestamp instanceof Date
+            ? event.timestamp.getTime()
+            : new Date(event.timestamp).getTime();
         const windowMinutes = Math.max(1, (eventTime - this.windowStart) / 60_000);
         const freq = (timestamps.length + 1) / windowMinutes;
         scores.push(this.scorer.anomalyScore(metricKey, freq));
@@ -181,9 +184,8 @@ export class BaselineStats {
     // Score login hour / 評分登入小時
     const username = extractUsername(event);
     if (username) {
-      const eventDate = event.timestamp instanceof Date
-        ? event.timestamp
-        : new Date(event.timestamp);
+      const eventDate =
+        event.timestamp instanceof Date ? event.timestamp : new Date(event.timestamp);
       scores.push(this.scorer.anomalyScore('login_hour', eventDate.getHours()));
     }
 
@@ -193,9 +195,10 @@ export class BaselineStats {
     }
 
     // Score auth failures / 評分認證失敗
-    const isAuthFailure = event.category === 'authentication_failure'
-      || event.category === 'brute_force'
-      || (event.metadata?.['authResult'] === 'failure');
+    const isAuthFailure =
+      event.category === 'authentication_failure' ||
+      event.category === 'brute_force' ||
+      event.metadata?.['authResult'] === 'failure';
     if (isAuthFailure) {
       scores.push(this.scorer.anomalyScore('auth_failures', this.authFailureCount + 1));
     }
@@ -236,18 +239,16 @@ export class BaselineStats {
 /** Extract destination IP from event metadata / 從事件 metadata 提取目的 IP */
 function extractDestIP(event: SecurityEvent): string | undefined {
   return (
-    (event.metadata?.['destinationIP'] as string)
-    ?? (event.metadata?.['remoteAddress'] as string)
-    ?? (event.metadata?.['destIP'] as string)
-    ?? undefined
+    (event.metadata?.['destinationIP'] as string) ??
+    (event.metadata?.['remoteAddress'] as string) ??
+    (event.metadata?.['destIP'] as string) ??
+    undefined
   );
 }
 
 /** Extract username from event metadata / 從事件 metadata 提取使用者名稱 */
 function extractUsername(event: SecurityEvent): string | undefined {
   return (
-    (event.metadata?.['user'] as string)
-    ?? (event.metadata?.['username'] as string)
-    ?? undefined
+    (event.metadata?.['user'] as string) ?? (event.metadata?.['username'] as string) ?? undefined
   );
 }

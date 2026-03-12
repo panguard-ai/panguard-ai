@@ -37,7 +37,9 @@ export default function ThreeRoads() {
           transition={{ duration: 0.5, ease }}
           className="text-center mb-10"
         >
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary">{t('title')}</h2>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold text-text-primary">
+            {t('title')}
+          </h2>
           <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">{t('subtitle')}</p>
         </motion.div>
 

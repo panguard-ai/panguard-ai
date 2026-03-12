@@ -399,7 +399,7 @@ export class GuardEngine {
     this.threatCloud = new ThreatCloudClient(
       config.threatCloudEndpoint,
       config.dataDir,
-      config.threatCloudApiKey,
+      config.threatCloudApiKey
     );
 
     // Initialize threat intel feed manager
@@ -412,8 +412,11 @@ export class GuardEngine {
     // 初始化 ATR 草稿器（如有 LLM 則啟用分散式共識）
     if (analyzeLLM) {
       this.atrDrafter = new ATRDrafter(analyzeLLM, this.threatCloud, {
-        llmProvider: process.env['ANTHROPIC_API_KEY'] ? 'claude' :
-          process.env['OPENAI_API_KEY'] ? 'openai' : 'ollama',
+        llmProvider: process.env['ANTHROPIC_API_KEY']
+          ? 'claude'
+          : process.env['OPENAI_API_KEY']
+            ? 'openai'
+            : 'ollama',
         llmModel: process.env['PANGUARD_LLM_MODEL'] ?? 'unknown',
       });
     }
@@ -500,9 +503,7 @@ export class GuardEngine {
         this.atrEngine.startSessionCleanup();
       })
       .catch((err: unknown) => {
-        logger.warn(
-          `ATR rules load failed: ${err instanceof Error ? err.message : String(err)}`
-        );
+        logger.warn(`ATR rules load failed: ${err instanceof Error ? err.message : String(err)}`);
       });
 
     // Load ATR rules from Threat Cloud / 從 Threat Cloud 載入 ATR 規則
@@ -833,7 +834,9 @@ export class GuardEngine {
         const atrRuleMatches = atrMatches.map((m) => ({
           ruleId: m.rule.id,
           ruleName: m.rule.title,
-          severity: (m.rule.severity === 'informational' ? 'info' : m.rule.severity) as import('@panguard-ai/core').Severity,
+          severity: (m.rule.severity === 'informational'
+            ? 'info'
+            : m.rule.severity) as import('@panguard-ai/core').Severity,
         }));
         const atrMatchData = atrMatches.map((m) => ({
           ruleId: m.rule.id,
@@ -923,8 +926,8 @@ export class GuardEngine {
       // "Learn once, detect forever" - 第一次靠重分析，後面靠 rule 快速擋
       if (this.knowledgeDistiller && verdict.conclusion !== 'benign' && verdict.confidence >= 70) {
         const indicators: Record<string, string> = {};
-        const ip = (event.metadata?.['sourceIP'] as string) ??
-          (event.metadata?.['remoteAddress'] as string);
+        const ip =
+          (event.metadata?.['sourceIP'] as string) ?? (event.metadata?.['remoteAddress'] as string);
         if (ip) indicators['sourceIP'] = ip;
         const proc = event.metadata?.['processName'] as string;
         if (proc) indicators['processName'] = proc;
@@ -938,14 +941,14 @@ export class GuardEngine {
         const distilled = this.knowledgeDistiller.distill({
           eventCategory: event.category,
           eventSource: event.source,
-          eventSeverity: verdict.confidence >= 90 ? 'critical' :
-            verdict.confidence >= 75 ? 'high' : 'medium',
+          eventSeverity:
+            verdict.confidence >= 90 ? 'critical' : verdict.confidence >= 75 ? 'high' : 'medium',
           mitreTechnique: verdict.mitreTechnique,
           indicators,
           aiResult: {
             summary: verdict.reasoning,
-            severity: verdict.confidence >= 90 ? 'critical' :
-              verdict.confidence >= 75 ? 'high' : 'medium',
+            severity:
+              verdict.confidence >= 90 ? 'critical' : verdict.confidence >= 75 ? 'high' : 'medium',
             confidence: verdict.confidence / 100,
             recommendations: verdict.evidence.map((e) => e.description).slice(0, 3),
           },
@@ -1285,7 +1288,14 @@ export class GuardEngine {
    * - auto_respond: calls respondAgent.updateActionPolicy({ autoRespond: 90 | 100 })
    * Other rule types are silently ignored.
    */
-  private applyPolicy(policy: { rules: Array<{ type: string; condition: Record<string, unknown>; action: string; description: string }> }): void {
+  private applyPolicy(policy: {
+    rules: Array<{
+      type: string;
+      condition: Record<string, unknown>;
+      action: string;
+      description: string;
+    }>;
+  }): void {
     for (const rule of policy.rules) {
       switch (rule.type) {
         case 'block_ip': {
@@ -1334,7 +1344,10 @@ export class GuardEngine {
     // agentClient.pollPolicy is invoked here when registered
     // (implementation detail: agentClient may provide this method)
     try {
-      if (typeof (this.agentClient as unknown as { pollPolicy?: () => Promise<void> }).pollPolicy === 'function') {
+      if (
+        typeof (this.agentClient as unknown as { pollPolicy?: () => Promise<void> }).pollPolicy ===
+        'function'
+      ) {
         await (this.agentClient as unknown as { pollPolicy: () => Promise<void> }).pollPolicy();
       }
     } catch (err: unknown) {

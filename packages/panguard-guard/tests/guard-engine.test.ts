@@ -7,11 +7,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { SecurityEvent } from '@panguard-ai/core';
-import type {
-  DetectionResult,
-  EnvironmentBaseline,
-  GuardConfig,
-} from '../src/types.js';
+import type { DetectionResult, EnvironmentBaseline, GuardConfig } from '../src/types.js';
 import { DEFAULT_ACTION_POLICY } from '../src/types.js';
 
 // ---------------------------------------------------------------------------
@@ -136,7 +132,12 @@ const mockReport = vi.fn().mockReturnValue({
 });
 const mockSetModeRespond = vi.fn();
 const mockSetModeReport = vi.fn();
-const mockAddBlockedIP = vi.fn().mockResolvedValue({ action: 'block_ip', success: true, details: 'Blocked', timestamp: new Date().toISOString() });
+const mockAddBlockedIP = vi.fn().mockResolvedValue({
+  action: 'block_ip',
+  success: true,
+  details: 'Blocked',
+  timestamp: new Date().toISOString(),
+});
 const mockUpdateActionPolicy = vi.fn();
 
 vi.mock('../src/agent/index.js', () => ({
@@ -673,7 +674,9 @@ describe('GuardEngine', () => {
 
       // Trigger the learning check by calling private method via workaround
       // We simulate the interval by calling the method name directly
-      (learningEngine as unknown as { checkLearningTransition: () => void }).checkLearningTransition();
+      (
+        learningEngine as unknown as { checkLearningTransition: () => void }
+      ).checkLearningTransition();
 
       expect(switchToProtectionMode).toHaveBeenCalled();
       expect(mockSetModeRespond).toHaveBeenCalledWith('protection');
@@ -696,7 +699,9 @@ describe('GuardEngine', () => {
       const learningEngine = new GuardEngine(makeConfig({ mode: 'learning' }));
       vi.mocked(isLearningComplete).mockReturnValue(false);
 
-      (learningEngine as unknown as { checkLearningTransition: () => void }).checkLearningTransition();
+      (
+        learningEngine as unknown as { checkLearningTransition: () => void }
+      ).checkLearningTransition();
 
       expect(switchToProtectionMode).not.toHaveBeenCalled();
       await learningEngine.stop();
@@ -798,9 +803,24 @@ describe('GuardEngine', () => {
     it('should handle multiple rules in a single policy', () => {
       const policy = {
         rules: [
-          { type: 'block_ip', condition: { ip: '1.2.3.4' }, action: 'block', description: 'Block IP 1' },
-          { type: 'block_ip', condition: { ip: '5.6.7.8' }, action: 'block', description: 'Block IP 2' },
-          { type: 'alert_threshold', condition: { autoRespond: 80 }, action: 'adjust', description: 'Lower threshold' },
+          {
+            type: 'block_ip',
+            condition: { ip: '1.2.3.4' },
+            action: 'block',
+            description: 'Block IP 1',
+          },
+          {
+            type: 'block_ip',
+            condition: { ip: '5.6.7.8' },
+            action: 'block',
+            description: 'Block IP 2',
+          },
+          {
+            type: 'alert_threshold',
+            condition: { autoRespond: 80 },
+            action: 'adjust',
+            description: 'Lower threshold',
+          },
         ],
       };
 

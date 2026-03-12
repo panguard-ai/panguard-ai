@@ -80,7 +80,10 @@ interface McpConfigModule {
 }
 
 interface AuditModule {
-  auditSkill: (dir: string, opts?: { skipAI?: boolean }) => Promise<{
+  auditSkill: (
+    dir: string,
+    opts?: { skipAI?: boolean }
+  ) => Promise<{
     riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
     riskScore: number;
     findings?: Array<{ id: string; category: string; severity: string; title: string }>;
@@ -89,12 +92,12 @@ interface AuditModule {
 
 async function loadMcpConfig(): Promise<McpConfigModule> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return await import('@panguard-ai/panguard-mcp/config' as string) as unknown as McpConfigModule;
+  return (await import('@panguard-ai/panguard-mcp/config' as string)) as unknown as McpConfigModule;
 }
 
 async function loadAuditor(): Promise<AuditModule> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return await import('@panguard-ai/panguard-skill-auditor' as string) as unknown as AuditModule;
+  return (await import('@panguard-ai/panguard-skill-auditor' as string)) as unknown as AuditModule;
 }
 
 // ---------------------------------------------------------------------------
@@ -107,7 +110,8 @@ async function loadAuditor(): Promise<AuditModule> {
  */
 export class SkillWatcher extends EventEmitter {
   private fileMonitor: FileMonitor | null = null;
-  private readonly config: Required<Omit<SkillWatcherConfig, 'submitThreat'>> & Pick<SkillWatcherConfig, 'submitThreat'>;
+  private readonly config: Required<Omit<SkillWatcherConfig, 'submitThreat'>> &
+    Pick<SkillWatcherConfig, 'submitThreat'>;
   private previousSkills: Map<string, MCPServerEntryMinimal> = new Map();
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private running = false;
@@ -320,7 +324,7 @@ export class SkillWatcher extends EventEmitter {
         platformId: change.platformId,
         riskLevel: audit.riskLevel,
         riskScore: audit.riskScore,
-        autoWhitelisted: this.config.autoWhitelist && (audit.riskLevel === 'LOW'),
+        autoWhitelisted: this.config.autoWhitelist && audit.riskLevel === 'LOW',
       };
 
       this.emit('skill-audit-complete', result);
@@ -332,23 +336,27 @@ export class SkillWatcher extends EventEmitter {
       // Submit audit result to Threat Cloud (anonymized)
       if (this.config.submitThreat && audit.riskScore > 0) {
         const { createHash } = await import('node:crypto');
-        const skillHash = createHash('sha256').update(`${change.name}:${change.command}`).digest('hex');
-        this.config.submitThreat({
-          skillHash,
-          skillName: change.name,
-          riskScore: audit.riskScore,
-          riskLevel: audit.riskLevel,
-          findingSummaries: (audit.findings ?? []).map((f) => ({
-            id: f.id,
-            category: f.category,
-            severity: f.severity,
-            title: f.title,
-          })),
-        }).catch((submitErr: unknown) => {
-          logger.warn(
-            `Skill threat submission failed for ${change.name}: ${submitErr instanceof Error ? submitErr.message : String(submitErr)}`
-          );
-        });
+        const skillHash = createHash('sha256')
+          .update(`${change.name}:${change.command}`)
+          .digest('hex');
+        this.config
+          .submitThreat({
+            skillHash,
+            skillName: change.name,
+            riskScore: audit.riskScore,
+            riskLevel: audit.riskLevel,
+            findingSummaries: (audit.findings ?? []).map((f) => ({
+              id: f.id,
+              category: f.category,
+              severity: f.severity,
+              title: f.title,
+            })),
+          })
+          .catch((submitErr: unknown) => {
+            logger.warn(
+              `Skill threat submission failed for ${change.name}: ${submitErr instanceof Error ? submitErr.message : String(submitErr)}`
+            );
+          });
       }
     } catch (err) {
       logger.warn(

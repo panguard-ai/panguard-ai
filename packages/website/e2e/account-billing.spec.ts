@@ -36,8 +36,11 @@ test.describe('Account Billing', () => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ ok: true, data: { url: 'https://billing.lemonsqueezy.com/portal/test' } }),
-      }),
+        body: JSON.stringify({
+          ok: true,
+          data: { url: 'https://billing.lemonsqueezy.com/portal/test' },
+        }),
+      })
     );
     await page.goto('/account/billing');
     const manageBtn = page.getByText(/manage.*subscription|customer portal/i).first();

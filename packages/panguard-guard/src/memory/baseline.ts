@@ -92,9 +92,7 @@ export function checkDeviation(
       if (!known) {
         // Use statistical score when scorer is available / 有評分器時使用統計分數
         const connFreqMetric = `conn_freq_${remoteAddr}`;
-        const confidence = scorer
-          ? Math.max(65, scorer.anomalyScore(connFreqMetric, 1))
-          : 65;
+        const confidence = scorer ? Math.max(65, scorer.anomalyScore(connFreqMetric, 1)) : 65;
 
         return {
           isDeviation: true,
@@ -114,13 +112,10 @@ export function checkDeviation(
     const known = baseline.normalLoginPatterns.some((l: LoginPattern) => l.username === username);
     if (!known) {
       // Use statistical score for login hour when scorer is available / 有評分器時使用登入小時統計分數
-      const eventDate = event.timestamp instanceof Date
-        ? event.timestamp
-        : new Date(event.timestamp);
+      const eventDate =
+        event.timestamp instanceof Date ? event.timestamp : new Date(event.timestamp);
       const loginHour = eventDate.getHours();
-      const confidence = scorer
-        ? Math.max(60, scorer.anomalyScore('login_hour', loginHour))
-        : 60;
+      const confidence = scorer ? Math.max(60, scorer.anomalyScore('login_hour', loginHour)) : 60;
 
       return {
         isDeviation: true,
@@ -380,7 +375,8 @@ export function continuousBaselineUpdate(
   const now = new Date().toISOString();
 
   // Start from the current baseline, optionally pruned
-  const base = retentionDays !== undefined ? pruneStalePatterns(baseline, retentionDays) : { ...baseline };
+  const base =
+    retentionDays !== undefined ? pruneStalePatterns(baseline, retentionDays) : { ...baseline };
 
   const updated: EnvironmentBaseline = {
     ...base,
@@ -430,7 +426,14 @@ export function continuousBaselineUpdate(
       } else {
         updated.normalConnections = [
           ...updated.normalConnections,
-          { remoteAddress: remoteAddr, remotePort, protocol, frequency: 0.25, firstSeen: now, lastSeen: now },
+          {
+            remoteAddress: remoteAddr,
+            remotePort,
+            protocol,
+            frequency: 0.25,
+            firstSeen: now,
+            lastSeen: now,
+          },
         ];
       }
     }

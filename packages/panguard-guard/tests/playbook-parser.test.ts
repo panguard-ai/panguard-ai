@@ -147,7 +147,9 @@ describe('validatePlaybook', () => {
     const result = validatePlaybook(playbook);
 
     expect(result.valid).toBe(false);
-    expect(result.errors.some((e) => e.includes('trigger must have at least one condition'))).toBe(true);
+    expect(result.errors.some((e) => e.includes('trigger must have at least one condition'))).toBe(
+      true
+    );
   });
 
   it('should report error for invalid pattern type', () => {
@@ -265,16 +267,8 @@ describe('loadPlaybooksFromDir', () => {
   });
 
   it('should load all valid .yaml files from directory', () => {
-    writeFileSync(
-      join(tempDir, 'brute-force.yaml'),
-      VALID_YAML,
-      'utf-8'
-    );
-    writeFileSync(
-      join(tempDir, 'minimal.yaml'),
-      MINIMAL_YAML,
-      'utf-8'
-    );
+    writeFileSync(join(tempDir, 'brute-force.yaml'), VALID_YAML, 'utf-8');
+    writeFileSync(join(tempDir, 'minimal.yaml'), MINIMAL_YAML, 'utf-8');
 
     const playbooks = loadPlaybooksFromDir(tempDir);
 
@@ -284,27 +278,15 @@ describe('loadPlaybooksFromDir', () => {
   });
 
   it('should load .yml files as well', () => {
-    writeFileSync(
-      join(tempDir, 'test.yml'),
-      MINIMAL_YAML,
-      'utf-8'
-    );
+    writeFileSync(join(tempDir, 'test.yml'), MINIMAL_YAML, 'utf-8');
 
     const playbooks = loadPlaybooksFromDir(tempDir);
     expect(playbooks).toHaveLength(1);
   });
 
   it('should skip invalid files with warning (not throw)', () => {
-    writeFileSync(
-      join(tempDir, 'valid.yaml'),
-      VALID_YAML,
-      'utf-8'
-    );
-    writeFileSync(
-      join(tempDir, 'invalid.yaml'),
-      'name: ""\ntrigger: {}\nactions: []',
-      'utf-8'
-    );
+    writeFileSync(join(tempDir, 'valid.yaml'), VALID_YAML, 'utf-8');
+    writeFileSync(join(tempDir, 'invalid.yaml'), 'name: ""\ntrigger: {}\nactions: []', 'utf-8');
 
     const playbooks = loadPlaybooksFromDir(tempDir);
 
@@ -314,32 +296,16 @@ describe('loadPlaybooksFromDir', () => {
   });
 
   it('should skip files with YAML parse errors', () => {
-    writeFileSync(
-      join(tempDir, 'broken.yaml'),
-      '{{{{invalid yaml',
-      'utf-8'
-    );
+    writeFileSync(join(tempDir, 'broken.yaml'), '{{{{invalid yaml', 'utf-8');
 
     const playbooks = loadPlaybooksFromDir(tempDir);
     expect(playbooks).toHaveLength(0);
   });
 
   it('should ignore non-yaml files', () => {
-    writeFileSync(
-      join(tempDir, 'readme.md'),
-      '# Not a playbook',
-      'utf-8'
-    );
-    writeFileSync(
-      join(tempDir, 'config.json'),
-      '{}',
-      'utf-8'
-    );
-    writeFileSync(
-      join(tempDir, 'valid.yaml'),
-      VALID_YAML,
-      'utf-8'
-    );
+    writeFileSync(join(tempDir, 'readme.md'), '# Not a playbook', 'utf-8');
+    writeFileSync(join(tempDir, 'config.json'), '{}', 'utf-8');
+    writeFileSync(join(tempDir, 'valid.yaml'), VALID_YAML, 'utf-8');
 
     const playbooks = loadPlaybooksFromDir(tempDir);
     expect(playbooks).toHaveLength(1);

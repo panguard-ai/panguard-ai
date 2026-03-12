@@ -88,27 +88,19 @@ describe('getWizardSteps', () => {
     expect(telegramChatId?.validate?.('-1001234567890')).toBeNull();
 
     const slackWebhook = steps.find((s) => s.id === 'slack_webhook_url');
-    expect(slackWebhook?.validate?.('http://not-secure')).toBe(
-      'Must be an HTTPS URL'
-    );
-    expect(
-      slackWebhook?.validate?.('https://hooks.slack.com/services/xxx')
-    ).toBeNull();
+    expect(slackWebhook?.validate?.('http://not-secure')).toBe('Must be an HTTPS URL');
+    expect(slackWebhook?.validate?.('https://hooks.slack.com/services/xxx')).toBeNull();
 
     const emailSmtp = steps.find((s) => s.id === 'email_smtp_host');
     expect(emailSmtp?.validate?.('')).toBe('Required');
     expect(emailSmtp?.validate?.('smtp.gmail.com')).toBeNull();
 
     const emailRecipients = steps.find((s) => s.id === 'email_recipients');
-    expect(emailRecipients?.validate?.('not-an-email')).toBe(
-      'Enter a valid email'
-    );
+    expect(emailRecipients?.validate?.('not-an-email')).toBe('Enter a valid email');
     expect(emailRecipients?.validate?.('user@example.com')).toBeNull();
 
     const webhookUrl = steps.find((s) => s.id === 'webhook_url');
-    expect(webhookUrl?.validate?.('http://insecure')).toBe(
-      'Must be an HTTPS URL'
-    );
+    expect(webhookUrl?.validate?.('http://insecure')).toBe('Must be an HTTPS URL');
     expect(webhookUrl?.validate?.('https://api.example.com/webhook')).toBeNull();
   });
 

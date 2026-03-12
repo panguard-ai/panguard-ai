@@ -91,7 +91,7 @@ function buildBaseline(
   connectionCount: number,
   loginCount: number,
   portCount: number,
-  staleRatio: number = 0.2,
+  staleRatio: number = 0.2
 ): EnvironmentBaseline {
   const processes: ProcessPattern[] = [];
   for (let i = 0; i < processCount; i++) {
@@ -255,7 +255,7 @@ describe('Baseline Operations', () => {
         baseline = continuousBaselineUpdate(
           baseline,
           PROCESS_EVENTS[i % PROCESS_EVENTS.length]!,
-          'benign',
+          'benign'
         );
       }
     });
@@ -263,9 +263,10 @@ describe('Baseline Operations', () => {
     bench('50 continuous updates on large baseline', () => {
       let baseline = LARGE_BASELINE;
       for (let i = 0; i < 50; i++) {
-        const event = i % 2 === 0
-          ? PROCESS_EVENTS[i % PROCESS_EVENTS.length]!
-          : NETWORK_EVENTS[i % NETWORK_EVENTS.length]!;
+        const event =
+          i % 2 === 0
+            ? PROCESS_EVENTS[i % PROCESS_EVENTS.length]!
+            : NETWORK_EVENTS[i % NETWORK_EVENTS.length]!;
         baseline = continuousBaselineUpdate(baseline, event, 'benign');
       }
     });

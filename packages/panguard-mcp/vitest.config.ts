@@ -33,7 +33,7 @@ export default defineConfig({
       '@panguard-ai/panguard-guard': resolve(__dirname, '../../packages/panguard-guard/src'),
       '@panguard-ai/panguard-skill-auditor': resolve(
         __dirname,
-        '../../packages/panguard-skill-auditor/src',
+        '../../packages/panguard-skill-auditor/src'
       ),
     },
   },

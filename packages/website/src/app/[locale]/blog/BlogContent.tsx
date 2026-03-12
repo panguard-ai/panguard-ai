@@ -166,47 +166,47 @@ export default function BlogContent() {
             {filteredPosts.map((rawPost, i) => {
               const post = getLocalizedPost(rawPost, t, locale);
               return (
-              <FadeInUp key={post.slug} delay={i * 0.06}>
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="block bg-surface-1 border border-border rounded-2xl p-6 hover:border-brand-sage/40 transition-all duration-200 card-glow h-full group"
-                >
-                  <div className="flex flex-col h-full">
-                    <div className="flex items-center gap-3 mb-3">
-                      <CategoryBadge category={post.category} />
-                      <span className="text-xs text-text-muted">
-                        {formatDate(post.date, locale)}
-                      </span>
-                    </div>
-
-                    <h3 className="text-lg font-bold text-text-primary leading-snug group-hover:text-brand-sage transition-colors duration-200">
-                      {post.title}
-                    </h3>
-
-                    <p className="text-sm text-text-secondary mt-3 leading-relaxed flex-1">
-                      {post.excerpt}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-5 pt-4 border-t border-border/50">
-                      <div className="flex items-center gap-4 text-xs text-text-tertiary">
-                        <span className="flex items-center gap-1">
-                          <User className="w-3 h-3" />
-                          {post.author}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {post.readingTime}
+                <FadeInUp key={post.slug} delay={i * 0.06}>
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="block bg-surface-1 border border-border rounded-2xl p-6 hover:border-brand-sage/40 transition-all duration-200 card-glow h-full group"
+                  >
+                    <div className="flex flex-col h-full">
+                      <div className="flex items-center gap-3 mb-3">
+                        <CategoryBadge category={post.category} />
+                        <span className="text-xs text-text-muted">
+                          {formatDate(post.date, locale)}
                         </span>
                       </div>
-                      <span className="flex items-center gap-1 text-brand-sage text-sm font-semibold group-hover:gap-2 transition-all duration-200">
-                        Read
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </span>
+
+                      <h3 className="text-lg font-bold text-text-primary leading-snug group-hover:text-brand-sage transition-colors duration-200">
+                        {post.title}
+                      </h3>
+
+                      <p className="text-sm text-text-secondary mt-3 leading-relaxed flex-1">
+                        {post.excerpt}
+                      </p>
+
+                      <div className="flex items-center justify-between mt-5 pt-4 border-t border-border/50">
+                        <div className="flex items-center gap-4 text-xs text-text-tertiary">
+                          <span className="flex items-center gap-1">
+                            <User className="w-3 h-3" />
+                            {post.author}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {post.readingTime}
+                          </span>
+                        </div>
+                        <span className="flex items-center gap-1 text-brand-sage text-sm font-semibold group-hover:gap-2 transition-all duration-200">
+                          Read
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              </FadeInUp>
-            );
+                  </Link>
+                </FadeInUp>
+              );
             })}
           </div>
         )}

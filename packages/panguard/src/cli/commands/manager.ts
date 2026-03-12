@@ -94,8 +94,7 @@ export function managerCommand(): Command {
         for (const agent of agents) {
           const id = ('agentId' in agent ? agent.agentId : (agent as { id: string }).id) ?? '-';
           const status = agent.status ?? '-';
-          const statusSymbol =
-            status === 'online' ? '[OK]' : status === 'stale' ? '[!!]' : '[--]';
+          const statusSymbol = status === 'online' ? '[OK]' : status === 'stale' ? '[!!]' : '[--]';
           const threats = 'threatCount' in agent ? String(agent.threatCount) : '-';
           const lastSeen = ('lastHeartbeat' in agent ? agent.lastHeartbeat : '') ?? '-';
 

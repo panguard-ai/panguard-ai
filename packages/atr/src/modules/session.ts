@@ -27,23 +27,48 @@ export class SessionModule implements ATRModule {
       name: 'call_frequency',
       description: 'Count how many times a specific tool was called within a time window',
       args: [
-        { name: 'tool_name', type: 'string' as const, required: true, description: 'Tool name to count' },
-        { name: 'window', type: 'string' as const, required: false, description: 'Time window (e.g., "5m", "1h"). Default: 5m' },
+        {
+          name: 'tool_name',
+          type: 'string' as const,
+          required: true,
+          description: 'Tool name to count',
+        },
+        {
+          name: 'window',
+          type: 'string' as const,
+          required: false,
+          description: 'Time window (e.g., "5m", "1h"). Default: 5m',
+        },
       ],
     },
     {
       name: 'pattern_frequency',
       description: 'Count how many times a pattern was matched within a time window',
       args: [
-        { name: 'pattern', type: 'string' as const, required: true, description: 'Pattern string to count' },
-        { name: 'window', type: 'string' as const, required: false, description: 'Time window. Default: 5m' },
+        {
+          name: 'pattern',
+          type: 'string' as const,
+          required: true,
+          description: 'Pattern string to count',
+        },
+        {
+          name: 'window',
+          type: 'string' as const,
+          required: false,
+          description: 'Time window. Default: 5m',
+        },
       ],
     },
     {
       name: 'event_count',
       description: 'Total number of events in the current session within a time window',
       args: [
-        { name: 'window', type: 'string' as const, required: false, description: 'Time window. Default: 5m' },
+        {
+          name: 'window',
+          type: 'string' as const,
+          required: false,
+          description: 'Time window. Default: 5m',
+        },
       ],
     },
     {
@@ -123,12 +148,18 @@ export class SessionModule implements ATRModule {
 
 function compare(value: number, operator: string, threshold: number): boolean {
   switch (operator) {
-    case 'gt': return value > threshold;
-    case 'lt': return value < threshold;
-    case 'eq': return value === threshold;
-    case 'gte': return value >= threshold;
-    case 'lte': return value <= threshold;
-    default: return false;
+    case 'gt':
+      return value > threshold;
+    case 'lt':
+      return value < threshold;
+    case 'eq':
+      return value === threshold;
+    case 'gte':
+      return value >= threshold;
+    case 'lte':
+      return value <= threshold;
+    default:
+      return false;
   }
 }
 
@@ -138,9 +169,13 @@ function parseWindow(window: string): number {
   const [, num, unit] = match;
   const n = parseInt(num, 10);
   switch (unit) {
-    case 's': return n * 1000;
-    case 'm': return n * 60_000;
-    case 'h': return n * 3_600_000;
-    default: return 300_000;
+    case 's':
+      return n * 1000;
+    case 'm':
+      return n * 60_000;
+    case 'h':
+      return n * 3_600_000;
+    default:
+      return 300_000;
   }
 }

@@ -72,9 +72,7 @@ function FAQCategory({
           <div className="w-10 h-10 rounded-xl bg-brand-sage/10 flex items-center justify-center">
             {icon}
           </div>
-          <h3 className="text-lg font-semibold text-text-primary">
-            {t(`${categoryKey}.title`)}
-          </h3>
+          <h3 className="text-lg font-semibold text-text-primary">{t(`${categoryKey}.title`)}</h3>
         </div>
 
         <div>
@@ -97,7 +95,12 @@ function FAQCategory({
 // ---------------------------------------------------------------------------
 
 const categories: CategoryDef[] = [
-  { key: 'security', icon: <ShieldIcon size={20} className="text-brand-sage" />, count: 4, highlightFirst: true },
+  {
+    key: 'security',
+    icon: <ShieldIcon size={20} className="text-brand-sage" />,
+    count: 4,
+    highlightFirst: true,
+  },
   { key: 'detection', icon: <ScanIcon size={20} className="text-brand-sage" />, count: 4 },
   { key: 'privacy', icon: <LockIcon size={20} className="text-brand-sage" />, count: 3 },
   { key: 'deployment', icon: <DeployIcon size={20} className="text-brand-sage" />, count: 3 },
@@ -128,17 +131,20 @@ export default function FAQContent() {
       <SectionWrapper>
         <div className="space-y-8">
           {categories.map((cat) => (
-            <FAQCategory key={cat.key} categoryKey={cat.key} icon={cat.icon} count={cat.count} highlightFirst={cat.highlightFirst} />
+            <FAQCategory
+              key={cat.key}
+              categoryKey={cat.key}
+              icon={cat.icon}
+              count={cat.count}
+              highlightFirst={cat.highlightFirst}
+            />
           ))}
         </div>
       </SectionWrapper>
 
       {/* Still have questions */}
       <SectionWrapper dark spacing="tight">
-        <SectionTitle
-          title={t('cta.title')}
-          subtitle={t('cta.subtitle')}
-        />
+        <SectionTitle title={t('cta.title')} subtitle={t('cta.subtitle')} />
         <FadeInUp>
           <div className="flex justify-center mt-8 gap-4">
             <a

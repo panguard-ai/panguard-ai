@@ -17,7 +17,9 @@ export function handleValidate(args: Record<string, unknown>): {
   const yamlContent = args['yaml_content'];
   if (typeof yamlContent !== 'string' || yamlContent.trim().length === 0) {
     return {
-      content: [{ type: 'text', text: 'Error: "yaml_content" is required and must be a non-empty string.' }],
+      content: [
+        { type: 'text', text: 'Error: "yaml_content" is required and must be a non-empty string.' },
+      ],
       isError: true,
     };
   }
@@ -26,7 +28,16 @@ export function handleValidate(args: Record<string, unknown>): {
     const parsed = yaml.load(yamlContent);
     if (!parsed || typeof parsed !== 'object') {
       return {
-        content: [{ type: 'text', text: JSON.stringify({ valid: false, errors: ['YAML parsed to a non-object value.'] }, null, 2) }],
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              { valid: false, errors: ['YAML parsed to a non-object value.'] },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
 
@@ -39,7 +50,10 @@ export function handleValidate(args: Record<string, unknown>): {
         id: (parsed as Record<string, unknown>)['id'] ?? null,
         title: (parsed as Record<string, unknown>)['title'] ?? null,
         severity: (parsed as Record<string, unknown>)['severity'] ?? null,
-        category: ((parsed as Record<string, unknown>)['tags'] as Record<string, unknown> | undefined)?.['category'] ?? null,
+        category:
+          ((parsed as Record<string, unknown>)['tags'] as Record<string, unknown> | undefined)?.[
+            'category'
+          ] ?? null,
         status: (parsed as Record<string, unknown>)['status'] ?? null,
       },
     };
@@ -50,7 +64,12 @@ export function handleValidate(args: Record<string, unknown>): {
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return {
-      content: [{ type: 'text', text: JSON.stringify({ valid: false, errors: [`YAML parse error: ${msg}`] }, null, 2) }],
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify({ valid: false, errors: [`YAML parse error: ${msg}`] }, null, 2),
+        },
+      ],
     };
   }
 }

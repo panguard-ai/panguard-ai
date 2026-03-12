@@ -8,12 +8,14 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { c, FEATURE_TIER as _CORE_FEATURE_TIER, isTierAtLeast, TIER_LEVEL } from '@panguard-ai/core';
-import type { Tier } from '@panguard-ai/core';
 import {
-  loadCredentials,
-  isTokenExpired,
-} from './credentials.js';
+  c,
+  FEATURE_TIER as _CORE_FEATURE_TIER,
+  isTierAtLeast,
+  TIER_LEVEL,
+} from '@panguard-ai/core';
+import type { Tier } from '@panguard-ai/core';
+import { loadCredentials, isTokenExpired } from './credentials.js';
 import type { StoredCredentials } from './credentials.js';
 
 export type RequiredTier = Tier;
@@ -178,7 +180,11 @@ export function showScanUpgradeHint(_fixableCount: number, _lang: string = 'en')
  * Show a contextual upgrade hint for Guard AI analysis.
  * Used when a suspicious event needs AI analysis.
  */
-export function showGuardAIHint(_threatType: string, _confidence: number, _lang: string = 'en'): void {
+export function showGuardAIHint(
+  _threatType: string,
+  _confidence: number,
+  _lang: string = 'en'
+): void {
   // All features are free and open source — no upgrade needed
 }
 

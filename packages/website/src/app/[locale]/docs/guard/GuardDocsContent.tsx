@@ -56,8 +56,8 @@ export default function GuardDocsContent() {
           </h1>
           <p className="text-lg text-text-secondary mt-4 max-w-2xl">
             Real-time endpoint protection powered by a 5-agent AI pipeline. Guard monitors
-            processes, network traffic, and file system changes 24/7 using Sigma, YARA, and
-            ATR rule engines backed by a three-layer AI analysis funnel.
+            processes, network traffic, and file system changes 24/7 using Sigma, YARA, and ATR rule
+            engines backed by a three-layer AI analysis funnel.
           </p>
         </FadeInUp>
 
@@ -65,23 +65,14 @@ export default function GuardDocsContent() {
         <FadeInUp className="mt-12">
           <h2 className="text-2xl font-bold text-text-primary mb-6">Quick Start</h2>
           <div className="space-y-4">
-            <CodeBlock
-              title="Start Guard daemon"
-              code="panguard guard start"
-            />
-            <CodeBlock
-              title="Check Guard status"
-              code="panguard guard status"
-            />
-            <CodeBlock
-              title="Stop Guard daemon"
-              code="panguard guard stop"
-            />
+            <CodeBlock title="Start Guard daemon" code="panguard guard start" />
+            <CodeBlock title="Check Guard status" code="panguard guard status" />
+            <CodeBlock title="Stop Guard daemon" code="panguard guard stop" />
           </div>
           <p className="text-sm text-text-secondary mt-4">
             By default, Guard starts in <code className="text-panguard-green">monitor</code> mode.
-            It logs threats but does not take automated action until you switch
-            to <code className="text-panguard-green">protect</code> mode.
+            It logs threats but does not take automated action until you switch to{' '}
+            <code className="text-panguard-green">protect</code> mode.
           </p>
         </FadeInUp>
 
@@ -89,8 +80,8 @@ export default function GuardDocsContent() {
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">5-Agent Pipeline</h2>
           <p className="text-text-secondary mb-6">
-            Every event flows through five specialised agents in sequence. Each agent
-            enriches the event context before passing it to the next.
+            Every event flows through five specialised agents in sequence. Each agent enriches the
+            event context before passing it to the next.
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border border-border rounded-xl overflow-hidden">
@@ -108,7 +99,8 @@ export default function GuardDocsContent() {
                   </td>
                   <td className="px-4 py-3 text-text-primary">Rule matching</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Runs Sigma, YARA, and ATR rules against incoming telemetry. Produces raw alerts with severity and confidence scores.
+                    Runs Sigma, YARA, and ATR rules against incoming telemetry. Produces raw alerts
+                    with severity and confidence scores.
                   </td>
                 </tr>
                 <tr>
@@ -117,7 +109,8 @@ export default function GuardDocsContent() {
                   </td>
                   <td className="px-4 py-3 text-text-primary">AI triage</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Escalates ambiguous alerts through the three-layer AI funnel. Adjusts confidence scores and adds contextual reasoning.
+                    Escalates ambiguous alerts through the three-layer AI funnel. Adjusts confidence
+                    scores and adds contextual reasoning.
                   </td>
                 </tr>
                 <tr>
@@ -126,7 +119,8 @@ export default function GuardDocsContent() {
                   </td>
                   <td className="px-4 py-3 text-text-primary">Action execution</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Selects and executes response actions based on confidence thresholds: auto-act, confirm, or notify.
+                    Selects and executes response actions based on confidence thresholds: auto-act,
+                    confirm, or notify.
                   </td>
                 </tr>
                 <tr>
@@ -135,7 +129,8 @@ export default function GuardDocsContent() {
                   </td>
                   <td className="px-4 py-3 text-text-primary">Structured logging</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Writes JSONL event records, generates daily summaries, and pushes notifications to configured channels.
+                    Writes JSONL event records, generates daily summaries, and pushes notifications
+                    to configured channels.
                   </td>
                 </tr>
                 <tr>
@@ -144,7 +139,8 @@ export default function GuardDocsContent() {
                   </td>
                   <td className="px-4 py-3 text-text-primary">Interactive query</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Natural-language interface for investigating past events, tuning rules, and asking follow-up questions about alerts.
+                    Natural-language interface for investigating past events, tuning rules, and
+                    asking follow-up questions about alerts.
                   </td>
                 </tr>
               </tbody>
@@ -156,8 +152,8 @@ export default function GuardDocsContent() {
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">Detection Engines</h2>
           <p className="text-text-secondary mb-6">
-            Guard ships with three rule engines. All rules are updated automatically via
-            the Panguard rule feed.
+            Guard ships with three rule engines. All rules are updated automatically via the
+            Panguard rule feed.
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border border-border rounded-xl overflow-hidden">
@@ -173,21 +169,24 @@ export default function GuardDocsContent() {
                   <td className="px-4 py-3 text-panguard-green font-medium">Sigma</td>
                   <td className="px-4 py-3 text-text-primary">3,760</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Generic log-based detection. Covers process creation, network connections, registry changes, and system events.
+                    Generic log-based detection. Covers process creation, network connections,
+                    registry changes, and system events.
                   </td>
                 </tr>
                 <tr>
                   <td className="px-4 py-3 text-panguard-green font-medium">YARA</td>
                   <td className="px-4 py-3 text-text-primary">5,961</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Binary and file pattern matching. Detects malware families, packers, exploit kits, and suspicious file structures.
+                    Binary and file pattern matching. Detects malware families, packers, exploit
+                    kits, and suspicious file structures.
                   </td>
                 </tr>
                 <tr>
                   <td className="px-4 py-3 text-panguard-green font-medium">ATR</td>
                   <td className="px-4 py-3 text-text-primary">69</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    AI Agent Threat Rules. Purpose-built for prompt injection, tool poisoning, MCP server abuse, and credential exfiltration by autonomous agents.
+                    AI Agent Threat Rules. Purpose-built for prompt injection, tool poisoning, MCP
+                    server abuse, and credential exfiltration by autonomous agents.
                   </td>
                 </tr>
               </tbody>
@@ -199,8 +198,8 @@ export default function GuardDocsContent() {
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">Three-Layer AI Funnel</h2>
           <p className="text-text-secondary mb-6">
-            Not every alert needs cloud-scale AI. The funnel resolves the vast majority of
-            events locally, keeping latency low and costs predictable.
+            Not every alert needs cloud-scale AI. The funnel resolves the vast majority of events
+            locally, keeping latency low and costs predictable.
           </p>
           <div className="space-y-4">
             {[
@@ -208,21 +207,24 @@ export default function GuardDocsContent() {
                 layer: 'Layer 1: Rules',
                 percent: '90%',
                 latency: '< 50 ms',
-                description: 'Sigma, YARA, and ATR engines resolve clear-cut matches. No AI involved.',
+                description:
+                  'Sigma, YARA, and ATR engines resolve clear-cut matches. No AI involved.',
                 color: 'border-green-500/30 bg-green-500/5',
               },
               {
                 layer: 'Layer 2: Local AI (Ollama)',
                 percent: '7%',
                 latency: '~ 2 s',
-                description: 'Ambiguous alerts are analysed by a local LLM running on-device via Ollama. No data leaves the machine.',
+                description:
+                  'Ambiguous alerts are analysed by a local LLM running on-device via Ollama. No data leaves the machine.',
                 color: 'border-yellow-500/30 bg-yellow-500/5',
               },
               {
                 layer: 'Layer 3: Cloud AI',
                 percent: '3%',
                 latency: '~ 5 s',
-                description: 'Complex, multi-signal events are escalated to cloud AI for deep reasoning and cross-tenant intelligence.',
+                description:
+                  'Complex, multi-signal events are escalated to cloud AI for deep reasoning and cross-tenant intelligence.',
                 color: 'border-orange-500/30 bg-orange-500/5',
               },
             ].map((item) => (
@@ -245,8 +247,9 @@ export default function GuardDocsContent() {
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">Response Actions</h2>
           <p className="text-text-secondary mb-6">
-            Guard supports six response actions. In <code className="text-panguard-green">protect</code> mode,
-            the Respond agent selects actions automatically based on confidence thresholds.
+            Guard supports six response actions. In{' '}
+            <code className="text-panguard-green">protect</code> mode, the Respond agent selects
+            actions automatically based on confidence thresholds.
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border border-border rounded-xl overflow-hidden">
@@ -260,13 +263,21 @@ export default function GuardDocsContent() {
                 {[
                   ['block_ip', 'Add source IP to firewall deny list (iptables / pf).'],
                   ['kill_process', 'Terminate the offending process tree immediately.'],
-                  ['quarantine_file', 'Move file to quarantine directory and strip execute permissions.'],
+                  [
+                    'quarantine_file',
+                    'Move file to quarantine directory and strip execute permissions.',
+                  ],
                   ['alert', 'Send notification via configured channels (Slack, email, webhook).'],
-                  ['snapshot', 'Capture full process state, environment, and open file handles for forensics.'],
+                  [
+                    'snapshot',
+                    'Capture full process state, environment, and open file handles for forensics.',
+                  ],
                   ['escalate', 'Forward event to SOC / human analyst for manual triage.'],
                 ].map(([action, desc]) => (
                   <tr key={action}>
-                    <td className="px-4 py-3 text-panguard-green font-mono font-medium">{action}</td>
+                    <td className="px-4 py-3 text-panguard-green font-mono font-medium">
+                      {action}
+                    </td>
                     <td className="px-4 py-3 text-text-secondary">{desc}</td>
                   </tr>
                 ))}
@@ -274,12 +285,29 @@ export default function GuardDocsContent() {
             </table>
           </div>
 
-          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">Confidence Thresholds</h3>
+          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">
+            Confidence Thresholds
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { range: '> 90%', level: 'AUTO', color: 'bg-green-500/10 border-green-500/30 text-green-400', action: 'Execute action immediately' },
-              { range: '70 - 90%', level: 'CONFIRM', color: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400', action: 'Prompt operator for approval' },
-              { range: '< 70%', level: 'NOTIFY', color: 'bg-orange-500/10 border-orange-500/30 text-orange-400', action: 'Log and send alert only' },
+              {
+                range: '> 90%',
+                level: 'AUTO',
+                color: 'bg-green-500/10 border-green-500/30 text-green-400',
+                action: 'Execute action immediately',
+              },
+              {
+                range: '70 - 90%',
+                level: 'CONFIRM',
+                color: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
+                action: 'Prompt operator for approval',
+              },
+              {
+                range: '< 70%',
+                level: 'NOTIFY',
+                color: 'bg-orange-500/10 border-orange-500/30 text-orange-400',
+                action: 'Log and send alert only',
+              },
             ].map((item) => (
               <div key={item.level} className={`border rounded-xl p-4 text-center ${item.color}`}>
                 <div className="text-lg font-bold">{item.range}</div>
@@ -296,10 +324,7 @@ export default function GuardDocsContent() {
           <p className="text-text-secondary mb-4">
             View and modify Guard configuration interactively:
           </p>
-          <CodeBlock
-            title="Open configuration editor"
-            code="panguard guard config"
-          />
+          <CodeBlock title="Open configuration editor" code="panguard guard config" />
 
           <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">Key Options</h3>
           <div className="overflow-x-auto">
@@ -314,16 +339,53 @@ export default function GuardDocsContent() {
               </thead>
               <tbody className="divide-y divide-border">
                 {[
-                  ['mode', 'monitor | protect', 'monitor', 'Monitor logs only, or actively respond to threats.'],
-                  ['auto_response', 'true | false', 'false', 'Enable automated response actions in protect mode.'],
-                  ['notification.slack', 'webhook URL', '(none)', 'Slack incoming webhook for alert delivery.'],
-                  ['notification.email', 'address', '(none)', 'Email address for critical alert notifications.'],
-                  ['notification.webhook', 'URL', '(none)', 'Generic webhook endpoint for all events.'],
-                  ['ai.local_model', 'model name', 'llama3.2:3b', 'Ollama model used for Layer 2 analysis.'],
-                  ['ai.cloud_enabled', 'true | false', 'true', 'Allow Layer 3 cloud AI escalation.'],
+                  [
+                    'mode',
+                    'monitor | protect',
+                    'monitor',
+                    'Monitor logs only, or actively respond to threats.',
+                  ],
+                  [
+                    'auto_response',
+                    'true | false',
+                    'false',
+                    'Enable automated response actions in protect mode.',
+                  ],
+                  [
+                    'notification.slack',
+                    'webhook URL',
+                    '(none)',
+                    'Slack incoming webhook for alert delivery.',
+                  ],
+                  [
+                    'notification.email',
+                    'address',
+                    '(none)',
+                    'Email address for critical alert notifications.',
+                  ],
+                  [
+                    'notification.webhook',
+                    'URL',
+                    '(none)',
+                    'Generic webhook endpoint for all events.',
+                  ],
+                  [
+                    'ai.local_model',
+                    'model name',
+                    'llama3.2:3b',
+                    'Ollama model used for Layer 2 analysis.',
+                  ],
+                  [
+                    'ai.cloud_enabled',
+                    'true | false',
+                    'true',
+                    'Allow Layer 3 cloud AI escalation.',
+                  ],
                 ].map(([option, values, def, desc]) => (
                   <tr key={option}>
-                    <td className="px-4 py-3 text-panguard-green font-mono font-medium text-xs">{option}</td>
+                    <td className="px-4 py-3 text-panguard-green font-mono font-medium text-xs">
+                      {option}
+                    </td>
                     <td className="px-4 py-3 text-text-primary text-xs">{values}</td>
                     <td className="px-4 py-3 text-text-muted text-xs">{def}</td>
                     <td className="px-4 py-3 text-text-secondary text-xs">{desc}</td>
@@ -350,28 +412,25 @@ panguard guard config set auto_response true`}
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">Monitoring and Logs</h2>
           <p className="text-text-secondary mb-4">
-            Guard writes structured event logs in JSONL format. Each line is a
-            self-contained JSON object with timestamp, severity, rule ID, and action taken.
+            Guard writes structured event logs in JSONL format. Each line is a self-contained JSON
+            object with timestamp, severity, rule ID, and action taken.
           </p>
-          <CodeBlock
-            title="Default log location"
-            code="~/.panguard-guard/events.jsonl"
-          />
+          <CodeBlock title="Default log location" code="~/.panguard-guard/events.jsonl" />
 
           <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">Verbose Output</h3>
           <p className="text-text-secondary mb-4">
-            Use the <code className="text-panguard-green">--verbose</code> flag to stream
-            events to stdout in real time:
+            Use the <code className="text-panguard-green">--verbose</code> flag to stream events to
+            stdout in real time:
           </p>
           <CodeBlock
             title="Start Guard with verbose logging"
             code="panguard guard start --verbose"
           />
 
-          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">Event Callback Format</h3>
-          <p className="text-text-secondary mb-4">
-            Each event record follows this structure:
-          </p>
+          <h3 className="text-lg font-semibold text-text-primary mt-8 mb-3">
+            Event Callback Format
+          </h3>
+          <p className="text-text-secondary mb-4">Each event record follows this structure:</p>
           <CodeBlock
             title="JSONL event record"
             code={`{
@@ -397,22 +456,16 @@ panguard guard config set auto_response true`}
         <FadeInUp className="mt-16">
           <h2 className="text-2xl font-bold text-text-primary mb-6">System Service</h2>
           <p className="text-text-secondary mb-4">
-            Install Guard as a system service so it starts automatically on boot.
-            On Linux this creates a systemd unit; on macOS it creates a launchd plist.
+            Install Guard as a system service so it starts automatically on boot. On Linux this
+            creates a systemd unit; on macOS it creates a launchd plist.
           </p>
           <div className="space-y-4">
-            <CodeBlock
-              title="Install as system service"
-              code="panguard guard install"
-            />
-            <CodeBlock
-              title="Uninstall system service"
-              code="panguard guard uninstall"
-            />
+            <CodeBlock title="Install as system service" code="panguard guard install" />
+            <CodeBlock title="Uninstall system service" code="panguard guard uninstall" />
           </div>
           <p className="text-sm text-text-secondary mt-4">
-            Both commands require root / administrator privileges. Guard will prompt for
-            elevation if not already running as root.
+            Both commands require root / administrator privileges. Guard will prompt for elevation
+            if not already running as root.
           </p>
         </FadeInUp>
 
@@ -421,14 +474,11 @@ panguard guard config set auto_response true`}
           <h2 className="text-2xl font-bold text-text-primary mb-6">Telemetry</h2>
           <p className="text-text-secondary mb-4">
             Guard collects anonymous usage telemetry to improve rule quality and false-positive
-            rates. No file contents, process arguments, or personally identifiable information
-            is ever transmitted.
+            rates. No file contents, process arguments, or personally identifiable information is
+            ever transmitted.
           </p>
           <div className="space-y-4">
-            <CodeBlock
-              title="Disable telemetry"
-              code="panguard guard start --no-telemetry"
-            />
+            <CodeBlock title="Disable telemetry" code="panguard guard start --no-telemetry" />
             <CodeBlock
               title="Inspect telemetry payload before upload"
               code="panguard guard --show-upload-data"
@@ -438,7 +488,8 @@ panguard guard config set auto_response true`}
             Full details on data collection and retention are available in{' '}
             <Link href="/legal/privacy" className="text-panguard-green hover:underline">
               PRIVACY.md
-            </Link>.
+            </Link>
+            .
           </p>
         </FadeInUp>
 
@@ -478,7 +529,8 @@ panguard guard config set auto_response true`}
             For Falco and Suricata setup instructions, see the{' '}
             <Link href="/docs/advanced-setup" className="text-panguard-green hover:underline">
               Advanced Setup Guide
-            </Link>.
+            </Link>
+            .
           </p>
         </FadeInUp>
 
@@ -487,8 +539,8 @@ panguard guard config set auto_response true`}
           <div className="bg-surface-1/50 border border-border rounded-2xl p-8 text-center">
             <h3 className="text-xl font-bold text-text-primary mb-3">Start Protecting</h3>
             <p className="text-text-secondary mb-6 max-w-lg mx-auto">
-              Install Panguard and activate Guard in under a minute. Community plan
-              includes full scan and Layer 1 rule-based protection at no cost.
+              Install Panguard and activate Guard in under a minute. Community plan includes full
+              scan and Layer 1 rule-based protection at no cost.
             </p>
             <CodeBlock code="panguard guard start" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">
