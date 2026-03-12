@@ -444,12 +444,12 @@ curl -H "Authorization: Bearer your-secure-token" \
 
 ### Auth Server
 
-| Variable                      | Default | Description                                 |
-| ----------------------------- | ------- | ------------------------------------------- |
-| `PANGUARD_PORT`               | `3000`  | API server port                             |
-| `JWT_SECRET`                  | (none)  | JWT signing secret (required in production) |
-| `GOOGLE_CLIENT_ID`            | (none)  | Google OAuth client ID                      |
-| `GOOGLE_CLIENT_SECRET`        | (none)  | Google OAuth client secret                  |
+| Variable               | Default | Description                                 |
+| ---------------------- | ------- | ------------------------------------------- |
+| `PANGUARD_PORT`        | `3000`  | API server port                             |
+| `JWT_SECRET`           | (none)  | JWT signing secret (required in production) |
+| `GOOGLE_CLIENT_ID`     | (none)  | Google OAuth client ID                      |
+| `GOOGLE_CLIENT_SECRET` | (none)  | Google OAuth client secret                  |
 
 ### Threat Cloud Server
 
