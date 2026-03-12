@@ -15,7 +15,6 @@ import {
   getPersona,
   getAllPersonas,
   getAllPricingPlans,
-  getRecommendedPlan,
   getPage,
   getAllPages,
   getNavItems,

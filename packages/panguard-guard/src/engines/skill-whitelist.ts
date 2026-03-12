@@ -14,7 +14,7 @@
 
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { dirname } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-guard:skill-whitelist');

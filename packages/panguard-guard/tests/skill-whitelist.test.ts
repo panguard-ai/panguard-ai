@@ -2,8 +2,8 @@
  * SkillWhitelistManager unit tests
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { SkillWhitelistManager } from '../src/engines/skill-whitelist.js';
 
 // Mock logger

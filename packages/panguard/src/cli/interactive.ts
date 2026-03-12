@@ -838,7 +838,7 @@ async function actionScan(): Promise<void> {
   );
   console.log('');
 
-  const { tier } = getLicense();
+  const { tier: _tier } = getLicense();
   let fixableCount = 0;
 
   if (result.findings.length > 0) {

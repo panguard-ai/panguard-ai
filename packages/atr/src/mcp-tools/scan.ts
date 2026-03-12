@@ -4,7 +4,7 @@
  */
 
 import type { ATREngine } from '../engine.js';
-import type { AgentEvent, AgentEventType, ATRSeverity } from '../types.js';
+import type { AgentEvent, AgentEventType } from '../types.js';
 
 export interface ScanInput {
   content: string;

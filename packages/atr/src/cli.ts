@@ -208,7 +208,7 @@ function cmdValidate(target: string, options: Record<string, string>): void {
   const files: string[] = [];
 
   if (statSync(targetPath).isDirectory()) {
-    const rules = loadRulesFromDirectory(targetPath);
+    const _rules = loadRulesFromDirectory(targetPath);
     // Re-validate each file individually for error reporting
     collectYamlFiles(targetPath, files);
   } else {

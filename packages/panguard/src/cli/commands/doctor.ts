@@ -12,6 +12,7 @@ import { Command } from 'commander';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
+import { execFileSync } from 'node:child_process';
 import { c, symbols, box, header } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
 
@@ -138,7 +139,6 @@ function checkAiProvider(): CheckResult {
   const hasOllamaEnv = Boolean(process.env['OLLAMA_HOST']);
   let ollamaInstalled = false;
   try {
-    const { execFileSync } = require('node:child_process') as typeof import('node:child_process');
     execFileSync('ollama', ['--version'], { encoding: 'utf-8', timeout: 3000 });
     ollamaInstalled = true;
   } catch {
@@ -157,7 +157,7 @@ function checkAiProvider(): CheckResult {
 
   // Check config file for AI settings
   let configProvider: string | undefined;
-  let configModel: string | undefined;
+  let _configModel: string | undefined;
   if (existsSync(CONFIG_PATH)) {
     try {
       const raw = readFileSync(CONFIG_PATH, 'utf-8');
@@ -171,7 +171,7 @@ function checkAiProvider(): CheckResult {
       }
       if (cfg.ai?.provider) {
         configProvider = cfg.ai.provider;
-        configModel = cfg.ai.model;
+        _configModel = cfg.ai.model;
         const layerNum = cfg.ai.provider === 'ollama' ? '2' : '3';
         layers.push(`Layer ${layerNum}: ${cfg.ai.provider} (config)` + (cfg.ai.model ? ` / ${cfg.ai.model}` : ''));
       }
@@ -467,7 +467,6 @@ function checkAiLayerLocal(): CheckResult {
   let ollamaInstalled = false;
   let ollamaVersion = '';
   try {
-    const { execFileSync } = require('node:child_process') as typeof import('node:child_process');
     ollamaVersion = execFileSync('ollama', ['--version'], { encoding: 'utf-8', timeout: 3000 }).trim();
     ollamaInstalled = true;
   } catch {
@@ -485,7 +484,6 @@ function checkAiLayerLocal(): CheckResult {
 
   // Check if any models are pulled
   try {
-    const { execFileSync } = require('node:child_process') as typeof import('node:child_process');
     const models = execFileSync('ollama', ['list'], { encoding: 'utf-8', timeout: 5000 }).trim();
     const modelLines = models.split('\n').slice(1).filter(Boolean);
     if (modelLines.length === 0) {
