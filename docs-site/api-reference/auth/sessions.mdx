@@ -12,7 +12,7 @@ Invalidates the current session token.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://auth.panguard.ai/api/auth/logout \
+curl -X POST http://localhost:3000/api/auth/logout \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 </CodeGroup>
@@ -36,7 +36,7 @@ Returns the authenticated user's profile and account details.
 
 <CodeGroup>
 ```bash cURL
-curl -X GET https://auth.panguard.ai/api/auth/me \
+curl -X GET http://localhost:3000/api/auth/me \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 </CodeGroup>
@@ -49,7 +49,6 @@ curl -X GET https://auth.panguard.ai/api/auth/me \
     "id": "usr_a1b2c3d4e5f6",
     "email": "user@example.com",
     "name": "Alice Chen",
-    "tier": "pro",
     "totpEnabled": true,
     "machineLimit": 10,
     "trialEndsAt": null,
@@ -74,7 +73,7 @@ Sends a password reset email to the specified address. Always returns 200 regard
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://auth.panguard.ai/api/auth/forgot-password \
+curl -X POST http://localhost:3000/api/auth/forgot-password \
   -H "Content-Type: application/json" \
   -d '{ "email": "user@example.com" }'
 ```
@@ -107,7 +106,7 @@ Resets the password using a token from the reset email.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://auth.panguard.ai/api/auth/reset-password \
+curl -X POST http://localhost:3000/api/auth/reset-password \
   -H "Content-Type: application/json" \
   -d '{
     "token": "rst_x9y8z7w6v5u4",
@@ -151,7 +150,7 @@ Generates a TOTP secret and QR code URI for setting up an authenticator app.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://auth.panguard.ai/api/auth/totp/setup \
+curl -X POST http://localhost:3000/api/auth/totp/setup \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 </CodeGroup>
@@ -191,7 +190,7 @@ Verifies a TOTP code to complete 2FA setup. Must be called after `/totp/setup` t
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://auth.panguard.ai/api/auth/totp/verify \
+curl -X POST http://localhost:3000/api/auth/totp/verify \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{ "totpCode": "482917" }'
@@ -231,7 +230,7 @@ Disables TOTP two-factor authentication. Requires current password for security.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://auth.panguard.ai/api/auth/totp/disable \
+curl -X POST http://localhost:3000/api/auth/totp/disable \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{ "password": "secureP@ssw0rd" }'

@@ -93,9 +93,6 @@ docker run -d \
 | `JWT_SECRET` | -- | **必填。** 用於簽署 JWT token 的密鑰 |
 | `GOOGLE_CLIENT_ID` | -- | Google OAuth 用戶端 ID（用於社交登入） |
 | `GOOGLE_CLIENT_SECRET` | -- | Google OAuth 用戶端密鑰 |
-| `LEMONSQUEEZY_API_KEY` | -- | LemonSqueezy API 金鑰，用於訂閱管理 |
-| `LEMONSQUEEZY_STORE_ID` | -- | LemonSqueezy 商店 ID |
-| `LEMONSQUEEZY_WEBHOOK_SECRET` | -- | LemonSqueezy webhook 簽名密鑰 |
 
 <CodeGroup>
 ```bash Linux / macOS
@@ -105,11 +102,6 @@ export JWT_SECRET=$(openssl rand -hex 64)
 # 選用：Google OAuth
 export GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 export GOOGLE_CLIENT_SECRET=your-client-secret
-
-# 選用：LemonSqueezy 支付
-export LEMONSQUEEZY_API_KEY=your-api-key
-export LEMONSQUEEZY_STORE_ID=your-store-id
-export LEMONSQUEEZY_WEBHOOK_SECRET=your-webhook-secret
 ```
 </CodeGroup>
 
@@ -138,7 +130,7 @@ export ALLOW_ANONYMOUS_UPLOAD=false
 </CodeGroup>
 
 <Info>
-`ALLOW_ANONYMOUS_UPLOAD=true` 讓 Community 層級使用者無需 API 金鑰即可提交威脅資料。上傳的資料仍會經過驗證和聲譽評分。
+`ALLOW_ANONYMOUS_UPLOAD=true` 讓使用者無需 API 金鑰即可提交威脅資料。上傳的資料仍會經過驗證和聲譽評分。
 </Info>
 
 ---

@@ -15,7 +15,7 @@ panguard scan [options]
 ## 選項
 
 <ParamField path="--quick" type="flag">
-  執行僅涵蓋關鍵檢查的快速掃描。適用於所有方案，包括 Community（免費）。
+  執行僅涵蓋關鍵檢查的快速掃描。
 </ParamField>
 
 <ParamField path="--output" type="string">
@@ -33,7 +33,7 @@ panguard scan [options]
 ## 範例
 
 <CodeGroup>
-```bash 快速掃描（免費方案）
+```bash 快速掃描
 panguard scan --quick
 ```
 
@@ -52,10 +52,10 @@ panguard scan --output ~/Desktop/security-audit.pdf
 
 ## 掃描類型
 
-| 模式 | 檢查項目 | 持續時間 | 所需方案 |
-| --- | --- | --- | --- |
-| `--quick` | 關鍵弱點、開放埠、root 存取 | 約 30 秒 | Community（免費） |
-| 完整（預設） | 所有掃描器，包括 CVE、CIS 基準、惡意軟體特徵、網路 | 2-5 分鐘 | Solo 以上 |
+| 模式 | 檢查項目 | 持續時間 |
+| --- | --- | --- |
+| `--quick` | 關鍵弱點、開放埠、root 存取 | 約 30 秒 |
+| 完整（預設） | 所有掃描器，包括 CVE、CIS 基準、惡意軟體特徵、網路 | 2-5 分鐘 |
 
 ## 掃描內容
 
@@ -65,9 +65,6 @@ panguard scan --output ~/Desktop/security-audit.pdf
 - **惡意軟體偵測** -- YARA 規則比對和雜湊值查詢
 - **檔案完整性** -- 與已知良好基線進行比對
 - **使用者帳號** -- 權限提升風險、弱密碼
-
-## 方案要求
-
 
 ## 相關資源
 

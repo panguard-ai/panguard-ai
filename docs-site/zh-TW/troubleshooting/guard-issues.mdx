@@ -188,15 +188,6 @@ Guard 需要 root/admin 權限來讀取系統日誌和管理防火牆規則。
 如果 Guard 偵測到威脅但未採取自動動作：
 
 <AccordionGroup>
-  <Accordion title="檢查方案要求">
-    自動回應需要 **Solo 層級或更高**。Community 層級僅支援偵測，不支援自動回應。
-
-    ```bash
-    panguard whoami
-    # 如果層級是「community」，請升級：
-    panguard upgrade
-    ```
-  </Accordion>
   <Accordion title="檢查信心閾值">
     自動回應僅在 AI 信心分數超過 `minConfidence` 時觸發：
 

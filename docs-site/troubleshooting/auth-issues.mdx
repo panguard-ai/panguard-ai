@@ -102,20 +102,14 @@ For automated scripts and CI/CD pipelines, use API tokens instead of JWT tokens.
 Error: This feature requires the Pro tier or higher. Current tier: community
 ```
 
-Panguard is 100% open source (MIT license) -- all features are available to every user at no cost. If you see this error, you may be running an outdated version.
+Panguard is 100% open source (MIT license) -- all features are available to every user at no cost. If you see this error, you are running an outdated version that still contained tier restrictions.
 
 **Solution:**
 
 Update to the latest version:
 ```bash
-npm install -g panguard@latest
+npm install -g @panguard-ai/panguard@latest
 ```
-
-3. If you recently upgraded, re-login to refresh your session:
-   ```bash
-   panguard logout
-   panguard login
-   ```
 
 ---
 

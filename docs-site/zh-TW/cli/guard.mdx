@@ -14,15 +14,15 @@ panguard guard <subcommand> [options]
 
 ## 子指令
 
-| 子指令 | 說明 | 所需方案 |
-| --- | --- | --- |
-| `start` | 啟動 Guard 代理 | Solo 以上 |
-| `stop` | 停止運行中的 Guard 代理 | Solo 以上 |
-| `status` | 顯示目前 Guard 狀態和統計資料 | Community（免費） |
-| `install` | 將 Guard 安裝為系統服務（systemd / launchd） | Solo 以上 |
-| `uninstall` | 移除 Guard 系統服務 | Solo 以上 |
-| `config` | 檢視或修改 Guard 設定 | Solo 以上 |
-| `help` | 顯示 Guard 子指令說明 | 全部 |
+| 子指令 | 說明 |
+| --- | --- |
+| `start` | 啟動 Guard 代理 |
+| `stop` | 停止運行中的 Guard 代理 |
+| `status` | 顯示目前 Guard 狀態和統計資料 |
+| `install` | 將 Guard 安裝為系統服務（systemd / launchd） |
+| `uninstall` | 移除 Guard 系統服務 |
+| `config` | 檢視或修改 Guard 設定 |
+| `help` | 顯示 Guard 子指令說明 |
 
 ## 選項
 
@@ -62,16 +62,13 @@ panguard guard config
 
 Guard 透過三層 AI 處理運作：
 
-1. **第一層 -- 規則引擎** -- Sigma 規則和 YARA 簽章，用於已知威脅模式（Community 方案僅提供狀態檢視）
+1. **第一層 -- 規則引擎** -- Sigma 規則和 YARA 簽章，用於已知威脅模式
 2. **第二層 -- 行為 AI** -- 機器學習基線偵測異常的程序、網路和檔案活動
 3. **第三層 -- LLM 判斷** -- 大型語言模型關聯事件、判斷嚴重程度，並產生白話警報
 
 <Tip>
   啟動 Guard 後，會在前 24 小時進入**學習模式**以建立行為基線。在此期間，您可能會看到較多的資訊性警報。
 </Tip>
-
-## 方案要求
-
 
 ## 相關資源
 

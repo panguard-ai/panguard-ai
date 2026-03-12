@@ -12,13 +12,13 @@ Panguard Trap 部署偽裝成真實基礎設施的誘餌服務。合法使用者
 # 啟動 SSH 和 HTTP 蜜罐
 panguard trap start --services ssh,http
 
-# 檢查狀態（免費）
+# 檢查狀態
 panguard trap status
 
-# 查看攻擊者檔案（免費）
+# 查看攻擊者檔案
 panguard trap profiles
 
-# 查看收集的情報（免費）
+# 查看收集的情報
 panguard trap intel
 ```
 
@@ -91,10 +91,10 @@ panguard trap <command> [options]
 Commands:
   start              啟動蜜罐服務（Pro）
   stop               停止蜜罐服務（Pro）
-  status             顯示狀態和統計資料（免費）
-  config             顯示目前設定（免費）
-  profiles           顯示攻擊者檔案（免費）
-  intel              顯示威脅情報摘要（免費）
+  status             顯示狀態和統計資料
+  config             顯示目前設定
+  profiles           顯示攻擊者檔案
+  intel              顯示威脅情報摘要
 
 Options:
   --services <types>     服務類型（以逗號分隔）

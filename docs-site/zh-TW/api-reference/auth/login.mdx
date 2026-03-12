@@ -28,7 +28,7 @@ icon: "right-to-bracket"
 
 <CodeGroup>
 ```bash cURL（無 2FA）
-curl -X POST https://auth.panguard.ai/api/auth/login \
+curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -37,7 +37,7 @@ curl -X POST https://auth.panguard.ai/api/auth/login \
 ```
 
 ```bash cURL（有 2FA）
-curl -X POST https://auth.panguard.ai/api/auth/login \
+curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -47,7 +47,7 @@ curl -X POST https://auth.panguard.ai/api/auth/login \
 ```
 
 ```bash cURL（使用備用代碼）
-curl -X POST https://auth.panguard.ai/api/auth/login \
+curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -69,7 +69,6 @@ curl -X POST https://auth.panguard.ai/api/auth/login \
           "id": "usr_a1b2c3d4e5f6",
           "email": "user@example.com",
           "name": "Alice Chen",
-          "tier": "solo",
           "totpEnabled": false
         },
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",

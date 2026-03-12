@@ -1,10 +1,10 @@
 ---
 title: "歡迎使用 Panguard AI"
-description: "AI 驅動的自適應端點防護，專為開發者與中小企業打造。從註冊到安全防護，只需一行指令。"
+description: "AI 驅動的自適應端點防護，專為開發者與中小企業打造。一行指令即可安裝並開始防護。"
 icon: "hand-wave"
 ---
 
-Panguard AI 是一個開源網路安全平台，為開發者與中小企業帶來企業級端點防護，無需專業安全團隊。在官網註冊帳號，透過 CLI 登入，即可讓 AI 自動保護您的設備。
+Panguard AI 是一個 100% 開源（MIT 授權）的網路安全平台，為開發者與中小企業帶來企業級端點防護，無需專業安全團隊。不需帳號、不需登入，安裝後即可讓 AI 自動保護您的設備。
 
 核心理念很簡單：**當有事發生，Panguard 通知您。沒事發生時，您什麼都不用做。**
 
@@ -54,10 +54,10 @@ Panguard AI 採取不同的方式：
 curl -fsSL https://get.panguard.ai | bash
 ```
 
-然後進行驗證並執行首次掃描：
+然後初始化並執行首次掃描：
 
 ```bash
-panguard login
+panguard setup
 panguard scan --quick
 ```
 
@@ -68,8 +68,8 @@ panguard scan --quick
   <Card title="安裝指南" icon="download" href="/installation">
     macOS、Linux 與 Windows 的詳細平台安裝說明。
   </Card>
-  <Card title="帳號設定" icon="user-plus" href="/account-setup">
-    建立帳號、選擇方案並設定 CLI 連線。
+  <Card title="快速入門" icon="rocket" href="/quickstart">
+    安裝 Panguard 並在五分鐘內完成首次掃描。
   </Card>
   <Card title="核心概念" icon="lightbulb" href="/concepts/three-layer-ai">
     了解驅動 Panguard 的三層式 AI 架構。

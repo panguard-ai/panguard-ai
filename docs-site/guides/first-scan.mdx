@@ -6,7 +6,7 @@ icon: "magnifying-glass"
 
 # Your First Scan
 
-Panguard Scan analyzes your system in approximately 60 seconds, identifies security weaknesses, and provides actionable remediation guidance. Quick scans are free; full scans require the Solo tier or above.
+Panguard Scan analyzes your system in approximately 60 seconds, identifies security weaknesses, and provides actionable remediation guidance. All scan modes are free and open source.
 
 ---
 
@@ -31,7 +31,7 @@ panguard --version
 
 <Steps>
   <Step title="Run a Quick Scan">
-    Start with a quick scan to get an immediate overview (free, no login required):
+    Start with a quick scan to get an immediate overview:
 
     ```bash
     panguard scan --quick
@@ -89,7 +89,6 @@ panguard --version
 | Feature | Quick Mode (`--quick`) | Full Mode (default) |
 | --- | --- | --- |
 | **Duration** | ~30 seconds | ~60 seconds |
-| **Tier required** | Free | Solo |
 | **OS detection** | Yes | Yes |
 | **Network interfaces** | Yes | Yes |
 | **Open ports** | Yes | Yes |
@@ -105,10 +104,6 @@ panguard --version
 To run a full scan:
 
 ```bash
-# Login first (required for Solo tier)
-panguard login
-
-# Run full scan
 panguard scan
 ```
 

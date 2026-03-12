@@ -22,8 +22,8 @@
     }
   ],
   "topbarCtaButton": {
-    "name": "Get Started",
-    "url": "https://panguard.ai/register"
+    "name": "Star on GitHub",
+    "url": "https://github.com/panguard-ai/panguard-ai"
   },
   "anchors": [
     {
@@ -58,8 +58,7 @@
         "introduction",
         "overview",
         "quickstart",
-        "installation",
-        "account-setup"
+        "installation"
       ]
     },
     {

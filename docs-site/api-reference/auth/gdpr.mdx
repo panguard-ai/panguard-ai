@@ -16,7 +16,7 @@ Permanently deletes the authenticated user's account and all associated data.
 
 <CodeGroup>
 ```bash cURL
-curl -X DELETE https://auth.panguard.ai/api/auth/delete-account \
+curl -X DELETE http://localhost:3000/api/auth/delete-account \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{ "password": "secureP@ssw0rd" }'
@@ -78,7 +78,7 @@ Exports all data associated with the authenticated user as a downloadable JSON f
 
 <CodeGroup>
 ```bash cURL
-curl -X GET https://auth.panguard.ai/api/auth/export-data \
+curl -X GET http://localhost:3000/api/auth/export-data \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -o panguard-data-export.json
 ```
@@ -94,7 +94,6 @@ curl -X GET https://auth.panguard.ai/api/auth/export-data \
       "id": "usr_a1b2c3d4e5f6",
       "email": "user@example.com",
       "name": "Alice Chen",
-      "tier": "pro",
       "totpEnabled": true,
       "createdAt": "2026-01-15T08:30:00.000Z"
     },
@@ -130,7 +129,7 @@ The export includes all data Panguard stores about you. The response is a single
 
 | Category | Data |
 |----------|------|
-| **User profile** | ID, email, name, tier, creation date |
+| **User profile** | ID, email, name, creation date |
 | **Agents** | All registered agents, hostnames, heartbeat history |
 | **Threat events** | All threat detections and their metadata |
 | **Policies** | Created policies and rule configurations |

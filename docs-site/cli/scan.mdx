@@ -15,7 +15,7 @@ panguard scan [options]
 ## Options
 
 <ParamField path="--quick" type="flag">
-  Run a fast scan covering only critical checks. Available on all plans including Community (Free).
+  Run a fast scan covering only critical checks.
 </ParamField>
 
 <ParamField path="--output" type="string">
@@ -33,7 +33,7 @@ panguard scan [options]
 ## Examples
 
 <CodeGroup>
-```bash Quick Scan (Free tier)
+```bash Quick Scan 
 panguard scan --quick
 ```
 
@@ -52,10 +52,10 @@ panguard scan --output ~/Desktop/security-audit.pdf
 
 ## Scan Types
 
-| Mode | Checks | Duration | Plan Required |
-| --- | --- | --- | --- |
-| `--quick` | Critical vulnerabilities, open ports, root access | ~30 seconds | Community (Free) |
-| Full (default) | All scanners including CVE, CIS benchmarks, malware signatures, network | 2-5 minutes | Solo+ |
+| Mode | Checks | Duration |
+| --- | --- | --- |
+| `--quick` | Critical vulnerabilities, open ports, root access | ~30 seconds |
+| Full (default) | All scanners including CVE, CIS benchmarks, malware signatures, network | 2-5 minutes |
 
 ## What Gets Scanned
 
@@ -65,9 +65,6 @@ panguard scan --output ~/Desktop/security-audit.pdf
 - **Malware detection** -- YARA rule matching and hash lookups
 - **File integrity** -- Checks against known-good baselines
 - **User accounts** -- Privilege escalation risks, weak credentials
-
-## Plan Requirements
-
 
 ## Related
 

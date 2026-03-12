@@ -188,15 +188,6 @@ If Guard generates too many alerts for legitimate activity:
 If Guard detects threats but does not take automated action:
 
 <AccordionGroup>
-  <Accordion title="Check tier requirements">
-    Auto-response requires **Solo tier or higher**. Community tier only supports detection, not automated response.
-
-    ```bash
-    panguard whoami
-    # If tier is "community", upgrade:
-    panguard upgrade
-    ```
-  </Accordion>
   <Accordion title="Check confidence threshold">
     Auto-response only triggers when the AI confidence score exceeds `minConfidence`:
 
