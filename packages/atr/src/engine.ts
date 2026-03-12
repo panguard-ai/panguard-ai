@@ -774,16 +774,14 @@ function normalizeRegex(pattern: string): string {
  * This prevents evasion via combining characters, zero-width joiners, etc.
  */
 function normalizeUnicode(text: string): string {
-  return (
-    text
-      .normalize('NFC')
-      .replace(
-        // Zero-width and bidi control characters (listed individually to avoid misleading character class)
-        /[\u200B\u200C\uFEFF\u2060\u180E\u200E\u200F]/gu,
-        ''
-      )
-      .replace(/[\u202A-\u202E\u2066-\u2069\u200D]/gu, '')
-  );
+  return text
+    .normalize('NFC')
+    .replace(
+      // Zero-width and bidi control characters (listed individually to avoid misleading character class)
+      /[\u200B\u200C\uFEFF\u2060\u180E\u200E\u200F]/gu,
+      ''
+    )
+    .replace(/[\u202A-\u202E\u2066-\u2069\u200D]/gu, '');
 }
 
 /** Maximum input length for regex evaluation to mitigate ReDoS */
