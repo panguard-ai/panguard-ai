@@ -9,7 +9,7 @@
  * @module @panguard-ai/threat-cloud/llm-reviewer
  */
 
-import https from 'node:https';
+import * as https from 'node:https';
 import type { ThreatCloudDB } from './database.js';
 
 /** LLM review verdict structure */
