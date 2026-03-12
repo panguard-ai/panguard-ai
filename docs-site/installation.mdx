@@ -9,7 +9,7 @@ icon: "download"
 | Item | Minimum |
 | --- | --- |
 | **OS** | macOS 12+, Ubuntu 20.04+, Windows 10+ |
-| **Node.js** | >= 20.0.0 |
+| **Node.js** | >= 18.0.0 |
 | **Disk** | 200 MB |
 | **Memory** | 512 MB (1 GB recommended for Guard) |
 
@@ -29,7 +29,7 @@ Not all features are equally supported across every platform. macOS and Linux ar
   Windows supports core features, but some OS-level detection capabilities are limited compared to macOS and Linux.
 </Warning>
 
-## Available Binaries (v0.3.1)
+## Available Binaries (v0.3.3)
 
 | Platform | Architecture | Install Method |
 | --- | --- | --- |
@@ -143,7 +143,7 @@ panguard --version
 Expected output:
 
 ```
-0.3.1
+0.3.3
 ```
 
 If the command is not found, ensure the install location is on your system PATH. For npm global installs, verify with:
@@ -170,6 +170,16 @@ npm list -g @panguard-ai/panguard
   </Tab>
 </Tabs>
 
+## Configure AI Agents
+
+After installing, run `panguard setup` to auto-configure all detected AI agent platforms:
+
+```bash
+panguard setup
+```
+
+This detects and configures Claude Code, Cursor, OpenClaw, Codex CLI, Claude Desktop, and Windsurf automatically. See [Quick Start](/quickstart) for details.
+
 ## Next step
 
-Once installed, proceed to [Account Setup](/account-setup) to create your account and authenticate the CLI.
+Once installed, proceed to [Quick Start](/quickstart) to run your first security scan.

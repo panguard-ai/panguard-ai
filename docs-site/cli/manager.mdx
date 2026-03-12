@@ -23,7 +23,7 @@ panguard manager [options]
 </ParamField>
 
 <ParamField path="--max-agents" type="number" default="25">
-  Maximum number of agent connections to accept. Matches your Business plan machine limit.
+  Maximum number of agent connections to accept. Default: 25.
 </ParamField>
 
 ## Examples
@@ -55,12 +55,6 @@ panguard manager --max-agents 10
 <Tip>
   The Manager web interface is accessible at `http://localhost:9400` by default. For production deployments, place it behind a reverse proxy with TLS.
 </Tip>
-
-## Plan Requirements
-
-<Info>
-  Manager requires the **Business** ($79/mo) plan. The Business plan includes up to 25 managed machines.
-</Info>
 
 ## Related
 

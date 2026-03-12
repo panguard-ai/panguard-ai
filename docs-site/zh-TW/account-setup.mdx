@@ -1,212 +1,42 @@
 ---
 title: "帳號設定"
-description: "建立您的 Panguard AI 帳號、選擇訂閱方案，並設定 CLI 連線。"
+description: "建立 Panguard AI 開發環境並配置 CLI。"
 icon: "user-plus"
 ---
 
-## 建立帳號
+## 開始使用
+
+Panguard 是 100% 開源專案（MIT 授權）。無需帳號、無需信用卡，所有功能完全免費。
 
 <Steps>
-  <Step title="在網站註冊">
-    前往 [panguard.ai](https://panguard.ai)，點擊右上角的**註冊**。
+  <Step title="安裝 CLI">
+    ```bash
+    curl -fsSL https://get.panguard.ai | bash
+    ```
 
-    您可以使用以下方式註冊：
-    - **Google 帳號** -- 一鍵 OAuth 登入
-    - **Email + 密碼** -- 傳統註冊方式，需進行 Email 驗證
+    或使用 npm：
+
+    ```bash
+    npm install -g @panguard-ai/panguard
+    ```
   </Step>
 
-  <Step title="選擇方案">
-    Panguard 100% 開源，MIT 授權。不需要帳號或信用卡。
+  <Step title="配置 AI Agent">
+    一行指令自動配置所有偵測到的 AI 平台：
 
-    <Info>
-      所有功能皆已包含。沒有付費版，沒有付費牆。前往 [panguard.ai/pricing](https://panguard.ai/pricing) 了解詳情。
-    </Info>
+    ```bash
+    panguard setup
+    ```
+
+    自動偵測並配置 Claude Code、Cursor、OpenClaw、Codex CLI、Claude Desktop 和 Windsurf。
   </Step>
 
-  <Step title="確認帳號">
-    如果您使用 Email 註冊，請檢查收件匣中的驗證信並確認帳號。Google OAuth 使用者會自動完成驗證。
+  <Step title="執行首次掃描">
+    ```bash
+    panguard scan --quick
+    ```
   </Step>
 </Steps>
-
----
-
-## 方案詳情
-
-<Tabs>
-  <Tab title="Community（免費）">
-    **MIT 開源 -- 全功能免費**
-
-    - 無限次安全掃描（快速與完整）
-    - Guard Layer 1 規則引擎（3000+ Sigma/YARA 規則）
-    - Threat Cloud 參與（僅讀取）
-    - 完全離線運作
-    - 無需信用卡
-
-    適合：體驗 Panguard、一次性稽核、個人實驗。
-  </Tab>
-
-  <Tab title="Solo ($9/月)">
-    **3 台設備 -- 完整防護堆疊**
-
-    包含 Community 所有功能，另加：
-    - 完整三層 Guard（規則 + 本地 AI + 雲端 AI）
-    - Chat 通知（Telegram、Slack、Email、Webhook、LINE）
-    - 透過 Ollama 進行本地 AI 分析
-    - PDF 報告產生
-
-    適合：保護個人伺服器與 VPS 主機的獨立開發者。
-  </Tab>
-
-  <Tab title="Pro ($29/月) -- 最受歡迎">
-    **10 台設備 -- 完整功能組**
-
-    包含 Solo 所有功能，另加：
-    - 雲端 AI 分析（Claude / OpenAI）
-    - Trap 蜜罐（8 種服務類型）
-    - 合規報告產生（TCSA、ISO 27001、SOC 2）
-    - 完整 Report、Trap 與 Chat 功能
-
-    適合：需要合規文件的小型團隊與企業。
-  </Tab>
-
-  <Tab title="Business ($79/月)">
-    **25 台設備 -- 企業級功能**
-
-    包含 Pro 所有功能，另加：
-    - 自訂 AI 模型配置
-    - REST API 存取，可程式化整合
-    - 90+ 天日誌保留
-    - SIEM 整合
-    - SSO 與角色型存取控制 (RBAC)
-    - 專屬支援
-
-    適合：有機群管理與企業合規需求的組織。
-  </Tab>
-</Tabs>
-
----
-
-## CLI 驗證
-
-建立帳號後，驗證 CLI 以連結您的訂閱。
-
-### 標準登入
-
-```bash
-panguard login
-```
-
-CLI 會自動開啟您的預設瀏覽器。完成驗證流程後，返回終端機：
-
-```
-  PANGUARD AI
-
-  -- Login Info ----------------------------------------
-
-  Email     user@example.com
-  Name      User Name
-  Plan      Solo
-  Expires   2026-04-27
-
-  Login successful!
-```
-
-### 驗證連線狀態
-
-```bash
-panguard whoami
-```
-
-```
-  PANGUARD AI
-
-  -- Account Info ----------------------------------------
-
-  Email     user@example.com
-  Name      User Name
-  Plan      Solo
-  Expires   2026-04-27
-  Server    https://panguard.ai
-```
-
-<Info>
-  CLI 連線有效期為 30 天。過期後請再次執行 `panguard login` 重新驗證。
-</Info>
-
-### 無圖形介面與 SSH 伺服器
-
-如果您在沒有瀏覽器的伺服器上作業：
-
-```bash
-panguard login --no-browser
-```
-
-這會印出一個驗證 URL，您可以複製並在任何有瀏覽器的裝置上開啟。在該裝置上完成驗證後，CLI 連線會自動啟用。
-
-```
-  Open the following URL in your browser to complete login:
-  https://panguard.ai/login?cli_state=abc123&callback=...
-
-  Waiting for authentication...
-```
-
-<Tip>
-  `--no-browser` 旗標適用於 CI/CD 流水線、Docker 容器與透過 SSH 存取的遠端伺服器。
-</Tip>
-
----
-
-## 訂閱管理
-
-### 升級方案
-
-您可以隨時透過網站或 CLI 升級：
-
-```bash
-panguard upgrade
-```
-
-或直接前往 [panguard.ai/pricing](https://panguard.ai/pricing)。
-
-### 查看目前方案
-
-```bash
-panguard whoami
-```
-
-### 登出
-
-```bash
-panguard logout
-```
-
-這會移除本地的驗證 Token。您的帳號與訂閱仍然有效。
-
----
-
-## 疑難排解
-
-<AccordionGroup>
-  <Accordion title="瀏覽器未自動開啟">
-    使用 `--no-browser` 旗標並手動開啟印出的 URL：
-
-    ```bash
-    panguard login --no-browser
-    ```
-  </Accordion>
-
-  <Accordion title="功能被方案層級限制">
-    如果您看到訊息表示您的方案不支援某項功能，請前往 [panguard.ai/pricing](https://panguard.ai/pricing) 升級您的訂閱。
-  </Accordion>
-
-  <Accordion title="Token 已過期">
-    CLI 連線 30 天後過期。請重新驗證：
-
-    ```bash
-    panguard login
-    ```
-  </Accordion>
-</AccordionGroup>
 
 ---
 

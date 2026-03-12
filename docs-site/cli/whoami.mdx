@@ -4,7 +4,7 @@ description: "Display the currently authenticated user and account details."
 icon: "id-card"
 ---
 
-The `whoami` command shows information about the currently logged-in user, including email, plan tier, organization, and token expiry.
+The `whoami` command shows information about the currently logged-in user, including email, organization, and token expiry.
 
 ## Usage
 
@@ -40,10 +40,9 @@ panguard whoami --json
   <Tab title="Human-readable">
     ```
     Email:   user@example.com
-    Plan:    Pro ($29/mo)
+    License: MIT (Open Source)
     Org:     Acme Corp
-    Machines: 4 / 10
-    Token:   valid (expires in 28 days)
+    Version: 0.3.3
     ```
   </Tab>
   <Tab title="JSON (--json)">
@@ -59,12 +58,6 @@ panguard whoami --json
     ```
   </Tab>
 </Tabs>
-
-## Plan Requirements
-
-<Info>
-  Available on all plans including **Community (Free)**.
-</Info>
 
 ## Related
 
