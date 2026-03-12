@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://panguard-api-production.up.railway.app';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 const REQUEST_TIMEOUT = 15_000;
 
 export interface AuthUser {

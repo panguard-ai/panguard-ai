@@ -31,7 +31,7 @@ Three detection engines run in parallel:
 |--------|--------|-------|--------|
 | **Sigma** | Built-in + community + Threat Cloud | ~200+ | Sigma YAML |
 | **YARA** | Built-in + custom | ~50+ | YARA rules |
-| **ATR** | Built-in (agent-threat-rules package) + custom | 27 | ATR YAML |
+| **ATR** | Built-in (@panguard-ai/atr package) + custom | 27 | ATR YAML |
 
 ATR rules specifically detect AI agent threats: prompt injection, tool poisoning,
 context exfiltration, agent manipulation, privilege escalation, excessive autonomy,

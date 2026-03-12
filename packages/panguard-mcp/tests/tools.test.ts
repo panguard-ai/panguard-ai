@@ -715,7 +715,7 @@ describe('panguard_generate_report', () => {
     expect(mockRunScan).toHaveBeenCalledWith({ depth: 'full', lang: 'en' });
     expect(mockGeneratePdfReport).toHaveBeenCalledWith(
       expect.anything(),
-      './panguard-report.pdf',
+      path.resolve('./panguard-report.pdf'),
       'en',
     );
   });

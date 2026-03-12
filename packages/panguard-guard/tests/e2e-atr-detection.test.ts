@@ -1,7 +1,7 @@
 /**
  * End-to-end test: Guard + ATR integration
  *
- * Loads the bundled ATR rules from the agent-threat-rules package
+ * Loads the bundled ATR rules from the @panguard-ai/atr package
  * and evaluates real-world threat scenarios against the ATR engine.
  */
 
@@ -14,7 +14,7 @@ describe('Guard + ATR Integration (E2E)', () => {
   let engine: ATREngine;
 
   beforeAll(async () => {
-    // Resolve bundled rules directory relative to the agent-threat-rules package
+    // Resolve bundled rules directory relative to the @panguard-ai/atr package
     const rulesDir = join(__dirname, '../../atr/rules');
     engine = new ATREngine({ rulesDir });
     const count = await engine.loadRules();
