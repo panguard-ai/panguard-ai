@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
 import { ArrowRight, ExternalLink, Download, Mail, FileText, Palette, Monitor } from 'lucide-react';
 import BrandLogo from '@/components/ui/BrandLogo';
 import { CertifiedSecureBadge, AIPoweredBadge } from '@/components/ui/BrandBadges';
@@ -204,13 +205,13 @@ function BrandAssetCard({
           {t('formatsLabel')}: {t(`brandAssets.${assetKey}.formats`)}
         </p>
 
-        <a
+        <Link
           href="/contact"
           className="inline-flex items-center justify-center gap-2 bg-surface-2 border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage/40 font-semibold rounded-full px-5 py-2.5 text-sm transition-all duration-200"
         >
           <Download className="w-4 h-4" />
           {t('requestAccess')}
-        </a>
+        </Link>
       </div>
     </FadeInUp>
   );

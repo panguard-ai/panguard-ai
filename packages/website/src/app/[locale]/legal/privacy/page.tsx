@@ -1,18 +1,31 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { locale: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   return {
     title: locale === 'zh' ? '隱私權政策' : 'Privacy Policy',
     description: 'Panguard AI Privacy Policy. How we collect, use, and protect your personal data.',
   };
 }
 
-export default function PrivacyPolicyPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function PrivacyPolicyPage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   return (
     <article className="prose-legal">
       <header className="mb-10">
@@ -247,12 +260,12 @@ export default function PrivacyPolicyPage({ params: { locale } }: { params: { lo
             We use cookies and similar tracking technologies to operate and improve our website. For
             detailed information about the cookies we use and how to manage them, please refer to
             our{' '}
-            <a
+            <Link
               href="/legal/cookies"
               className="text-brand-sage hover:text-brand-sage-light underline"
             >
               Cookie Policy
-            </a>
+            </Link>
             .
           </p>
         </section>

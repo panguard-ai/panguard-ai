@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { MonitorIcon, HistoryIcon } from '@/components/ui/BrandIcons';
 import NavBar from '@/components/NavBar';
@@ -54,12 +55,12 @@ export default function DemoContent() {
                   </p>
                   <p className="text-sm text-text-tertiary">{t('selfGuided.comingSoonDesc')}</p>
                 </div>
-                <a
+                <Link
                   href="/docs/getting-started"
                   className="mt-6 block w-full text-center font-semibold rounded-full px-6 py-3 border border-border text-text-secondary hover:border-brand-sage hover:text-text-primary transition-all duration-200"
                 >
                   {t('selfGuided.tryFreeScan')}
-                </a>
+                </Link>
               </div>
             </FadeInUp>
 

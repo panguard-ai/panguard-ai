@@ -177,6 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refresh is stable via useCallback, intentionally run once on mount
   }, []);
 
   const login = useCallback(

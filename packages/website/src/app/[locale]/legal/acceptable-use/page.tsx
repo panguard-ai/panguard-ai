@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -21,12 +22,12 @@ export default function AcceptableUsePolicyPage() {
             This Acceptable Use Policy (&quot;AUP&quot;) governs the use of all products and
             services provided by Panguard AI, Inc. (&quot;Panguard&quot;). This AUP is incorporated
             by reference into our{' '}
-            <a
+            <Link
               href="/legal/terms"
               className="text-brand-sage hover:text-brand-sage-light underline"
             >
               Terms of Service
-            </a>
+            </Link>
             . Violation of this AUP may result in suspension or termination of your account.
           </p>
         </section>

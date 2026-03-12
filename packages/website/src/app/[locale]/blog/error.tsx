@@ -26,6 +26,7 @@ export default function BlogError({
             <RefreshCw className="w-3.5 h-3.5" />
             Retry
           </button>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Error boundary cannot use Next.js router */}
           <a
             href="/blog"
             className="inline-flex items-center gap-2 border border-border text-text-secondary text-sm rounded-full px-5 py-2.5 hover:text-text-primary transition-colors"

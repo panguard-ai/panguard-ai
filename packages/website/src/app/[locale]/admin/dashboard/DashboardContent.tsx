@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import FadeInUp from '@/components/FadeInUp';
 import {
   Monitor,
@@ -294,12 +295,12 @@ export default function DashboardContent() {
                 <AlertTriangle className="w-4 h-4 text-status-caution" />
                 Recent Alerts
               </h2>
-              <a
+              <Link
                 href="/admin/threats"
                 className="text-xs text-brand-sage hover:text-brand-sage-light transition-colors flex items-center gap-1"
               >
                 View all <ArrowUpRight className="w-3 h-3" />
-              </a>
+              </Link>
             </div>
             {liveAlerts.length === 0 ? (
               <EmptyState

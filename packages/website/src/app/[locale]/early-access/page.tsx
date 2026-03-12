@@ -6,7 +6,8 @@ import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import WaitlistForm from './WaitlistForm';
 
-export async function generateMetadata({ params }: { params: { locale: string } }) {
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
   const t = await getTranslations({ locale: params.locale, namespace: 'metadata' });
   return {
     title: t('earlyAccess.title'),
@@ -27,7 +28,8 @@ const timelineSteps = [
 
 /* ════════════════════════  Page Component  ═══════════════════════ */
 
-export default async function EarlyAccessPage({ params }: { params: { locale: string } }) {
+export default async function EarlyAccessPage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
   const t = await getTranslations({ locale: params.locale, namespace: 'earlyAccess' });
 
   return (

@@ -14,7 +14,8 @@ export const dynamic = 'force-dynamic';
 
 /* ─── Metadata ─── */
 
-export async function generateMetadata({ params }: { params: { slug: string; locale: string } }) {
+export async function generateMetadata(props: { params: Promise<{ slug: string; locale: string }> }) {
+  const params = await props.params;
   const t = await getTranslations({ locale: params.locale, namespace: 'metadata' });
   const allPosts = await getAllPosts();
   const post = allPosts.find((p) => p.slug === params.slug);
@@ -59,11 +60,12 @@ function formatDate(dateStr: string, locale: string): string {
 
 /* ════════════════════════  Page Component  ═══════════════════════ */
 
-export default async function BlogPostPage({
-  params,
-}: {
-  params: { slug: string; locale: string };
-}) {
+export default async function BlogPostPage(
+  props: {
+    params: Promise<{ slug: string; locale: string }>;
+  }
+) {
+  const params = await props.params;
   const t = await getTranslations({ locale: params.locale, namespace: 'blogPost' });
   const allPosts = await getAllPosts();
   const post = allPosts.find((p) => p.slug === params.slug);
