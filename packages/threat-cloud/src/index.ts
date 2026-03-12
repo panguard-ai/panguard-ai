@@ -1,5 +1,6 @@
 export { ThreatCloudServer } from './server.js';
 export { ThreatCloudDB } from './database.js';
+export { LLMReviewer } from './llm-reviewer.js';
 export { BackupManager } from './backup.js';
 export type { BackupResult } from './backup.js';
 export type {

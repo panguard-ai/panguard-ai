@@ -87,10 +87,23 @@ export class ThreatCloudDB {
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
 
+      CREATE TABLE IF NOT EXISTS ioc_entries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type TEXT NOT NULL,
+        value TEXT NOT NULL UNIQUE,
+        reputation INTEGER NOT NULL DEFAULT 50,
+        source TEXT,
+        first_seen TEXT DEFAULT (datetime('now')),
+        last_seen TEXT DEFAULT (datetime('now')),
+        sighting_count INTEGER DEFAULT 1
+      );
+
       CREATE INDEX IF NOT EXISTS idx_atr_proposals_status ON atr_proposals(status);
       CREATE INDEX IF NOT EXISTS idx_atr_proposals_pattern ON atr_proposals(pattern_hash);
       CREATE INDEX IF NOT EXISTS idx_skill_threats_hash ON skill_threats(skill_hash);
       CREATE INDEX IF NOT EXISTS idx_atr_feedback_rule ON atr_feedback(rule_id);
+      CREATE INDEX IF NOT EXISTS idx_ioc_entries_type ON ioc_entries(type);
+      CREATE INDEX IF NOT EXISTS idx_ioc_entries_reputation ON ioc_entries(reputation);
     `);
   }
 
@@ -270,6 +283,133 @@ export class ThreatCloudDB {
       proposalStats,
       skillThreatsTotal,
     };
+  }
+
+  /** Get confirmed/promoted ATR rules, optionally filtered by date / 取得已確認 ATR 規則 */
+  getConfirmedATRRules(since?: string): Array<{ ruleId: string; ruleContent: string; publishedAt: string; source: string }> {
+    if (since) {
+      return this.db.prepare(`
+        SELECT pattern_hash as ruleId, rule_content as ruleContent, updated_at as publishedAt, 'atr-community' as source
+        FROM atr_proposals
+        WHERE (status = 'confirmed' OR status = 'promoted') AND updated_at > ?
+        ORDER BY updated_at ASC
+      `).all(since) as Array<{ ruleId: string; ruleContent: string; publishedAt: string; source: string }>;
+    }
+    return this.db.prepare(`
+      SELECT pattern_hash as ruleId, rule_content as ruleContent, updated_at as publishedAt, 'atr-community' as source
+      FROM atr_proposals
+      WHERE status = 'confirmed' OR status = 'promoted'
+      ORDER BY updated_at ASC
+    `).all() as Array<{ ruleId: string; ruleContent: string; publishedAt: string; source: string }>;
+  }
+
+  /** Get IP blocklist from IoC entries and aggregated threat data / 取得 IP 封鎖清單 */
+  getIPBlocklist(minReputation: number): string[] {
+    // IoC entries with sufficient reputation
+    const iocIPs = this.db.prepare(`
+      SELECT value FROM ioc_entries
+      WHERE type = 'ip' AND reputation >= ?
+      ORDER BY reputation DESC
+    `).all(minReputation) as Array<{ value: string }>;
+
+    // Aggregate from threats table: distinct IPs with >= 3 occurrences
+    const threatIPs = this.db.prepare(`
+      SELECT attack_source_ip as value
+      FROM threats
+      GROUP BY attack_source_ip
+      HAVING COUNT(*) >= 3
+    `).all() as Array<{ value: string }>;
+
+    // Merge and deduplicate
+    const ipSet = new Set<string>();
+    for (const row of iocIPs) ipSet.add(row.value);
+    for (const row of threatIPs) ipSet.add(row.value);
+    return Array.from(ipSet);
+  }
+
+  /** Get domain blocklist from IoC entries / 取得域名封鎖清單 */
+  getDomainBlocklist(minReputation: number): string[] {
+    const iocDomains = this.db.prepare(`
+      SELECT value FROM ioc_entries
+      WHERE type = 'domain' AND reputation >= ?
+      ORDER BY reputation DESC
+    `).all(minReputation) as Array<{ value: string }>;
+
+    return iocDomains.map((row) => row.value);
+  }
+
+  /** Upsert an IoC entry / 插入或更新 IoC 條目 */
+  upsertIoC(type: string, value: string, reputation: number, source: string): void {
+    this.db.prepare(`
+      INSERT INTO ioc_entries (type, value, reputation, source)
+      VALUES (?, ?, ?, ?)
+      ON CONFLICT(value) DO UPDATE SET
+        reputation = excluded.reputation,
+        source = excluded.source,
+        last_seen = datetime('now'),
+        sighting_count = sighting_count + 1
+    `).run(type, value, reputation, source);
+  }
+
+  /** Promote confirmed proposals with approved LLM review to rules / 推廣已確認提案為規則 */
+  promoteConfirmedProposals(): number {
+    const proposals = this.db.prepare(`
+      SELECT pattern_hash, rule_content, llm_review_verdict
+      FROM atr_proposals
+      WHERE status = 'confirmed' AND llm_review_verdict IS NOT NULL
+    `).all() as Array<{ pattern_hash: string; rule_content: string; llm_review_verdict: string }>;
+
+    let promoted = 0;
+    for (const proposal of proposals) {
+      try {
+        const verdict = JSON.parse(proposal.llm_review_verdict) as { approved?: boolean };
+        if (verdict.approved !== true) continue;
+
+        this.upsertRule({
+          ruleId: proposal.pattern_hash,
+          ruleContent: proposal.rule_content,
+          publishedAt: new Date().toISOString(),
+          source: 'atr-community',
+        });
+
+        this.db.prepare(`
+          UPDATE atr_proposals SET status = 'promoted', updated_at = datetime('now')
+          WHERE pattern_hash = ?
+        `).run(proposal.pattern_hash);
+
+        promoted++;
+      } catch {
+        // Skip proposals with unparseable verdicts
+      }
+    }
+
+    return promoted;
+  }
+
+  /** Reject an ATR proposal / 拒絕 ATR 提案 */
+  rejectATRProposal(patternHash: string): void {
+    this.db.prepare(`
+      UPDATE atr_proposals SET status = 'rejected', updated_at = datetime('now')
+      WHERE pattern_hash = ?
+    `).run(patternHash);
+  }
+
+  /** Get rules by source type, optionally filtered by date / 依來源取得規則 */
+  getRulesBySource(source: string, since?: string): ThreatCloudRule[] {
+    if (since) {
+      return this.db.prepare(`
+        SELECT rule_id as ruleId, rule_content as ruleContent, published_at as publishedAt, source
+        FROM rules
+        WHERE source = ? AND published_at > ?
+        ORDER BY published_at ASC
+      `).all(source, since) as ThreatCloudRule[];
+    }
+    return this.db.prepare(`
+      SELECT rule_id as ruleId, rule_content as ruleContent, published_at as publishedAt, source
+      FROM rules
+      WHERE source = ?
+      ORDER BY published_at ASC
+    `).all(source) as ThreatCloudRule[];
   }
 
   /** Close the database / 關閉資料庫 */

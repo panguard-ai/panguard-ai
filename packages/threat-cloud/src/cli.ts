@@ -26,6 +26,9 @@ function parseArgs(args: string[]): Partial<ServerConfig> {
         config.apiKeyRequired = true;
         config.apiKeys = (args[++i] ?? '').split(',');
         break;
+      case '--anthropic-api-key':
+        config.anthropicApiKey = args[++i];
+        break;
       case '--help':
         console.log(`
 Threat Cloud Server - Collective Threat Intelligence Backend
@@ -33,11 +36,12 @@ Threat Cloud Server - Collective Threat Intelligence Backend
 Usage: threat-cloud [options]
 
 Options:
-  --port <number>      Listen port (default: 8080)
-  --host <string>      Listen host (default: 127.0.0.1)
-  --db <path>          SQLite database path (default: ./threat-cloud.db)
-  --api-key <keys>     Comma-separated API keys (enables auth)
-  --help               Show this help
+  --port <number>              Listen port (default: 8080)
+  --host <string>              Listen host (default: 127.0.0.1)
+  --db <path>                  SQLite database path (default: ./threat-cloud.db)
+  --api-key <keys>             Comma-separated API keys (enables auth)
+  --anthropic-api-key <key>    Anthropic API key for LLM review of ATR proposals
+  --help                       Show this help
 `);
         process.exit(0);
     }
@@ -55,6 +59,7 @@ async function main(): Promise<void> {
     apiKeyRequired: args.apiKeyRequired ?? false,
     apiKeys: args.apiKeys ?? [],
     rateLimitPerMinute: 120,
+    anthropicApiKey: args.anthropicApiKey ?? process.env['ANTHROPIC_API_KEY'],
   };
 
   const server = new ThreatCloudServer(config);

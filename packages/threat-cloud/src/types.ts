@@ -75,4 +75,6 @@ export interface ServerConfig {
   apiKeyRequired: boolean;
   apiKeys: string[];
   rateLimitPerMinute: number;
+  /** Optional Anthropic API key for LLM review of ATR proposals */
+  anthropicApiKey?: string;
 }
