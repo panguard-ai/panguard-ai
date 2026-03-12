@@ -98,7 +98,7 @@ npx @panguard-ai/panguard scan --quick
 panguard audit skill ./my-skill    # Check if a skill is safe before installing it
 panguard scan --quick              # Scan your machine for vulnerabilities (60s)
 panguard guard start               # Start 24/7 background protection
-panguard setup                     # Auto-configure Claude, Cursor, Windsurf, etc.
+panguard setup                     # Auto-configure Claude, Cursor, QClaw, etc.
 ```
 
 ### MCP Configuration (Claude Desktop / Cursor)
@@ -312,7 +312,8 @@ Panguard 作為 MCP 伺服器提供 11 個工具，相容所有支援 MCP 的 AI
 | Claude Desktop | `panguard setup` |
 | Claude Code | `panguard setup` |
 | Cursor | `panguard setup` |
-| Windsurf | `panguard setup` |
+| QClaw | `panguard setup` |
+| OpenClaw | `panguard setup` |
 | Codex | `panguard setup` |
 | Any MCP client | [Manual config](docs/API.md) |
 

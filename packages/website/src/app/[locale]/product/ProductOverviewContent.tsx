@@ -53,7 +53,7 @@ const productConfigs = [
       `${STATS.totalRulesDisplay} detection rules (Sigma + YARA + ATR)`,
       `Skill Auditor: ${STATS.skillAuditChecks}-layer pre-install security gate`,
       '3 auto-response modules: IP Blocker, Process Killer, File Quarantine',
-      'Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent',
+      'Works with Claude Code, Cursor, QClaw, OpenClaw, WorkBuddy, and any AI agent',
       'Supports Linux, macOS, Windows, Docker, Kubernetes',
     ],
     href: '/product/guard',

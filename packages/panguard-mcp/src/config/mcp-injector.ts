@@ -192,6 +192,7 @@ export function injectMCPConfig(platformId: PlatformId): InjectionResult {
       case 'codex':
       case 'workbuddy':
       case 'nemoclaw':
+      case 'qclaw':
         injectGenericMCP(configPath);
         break;
     }

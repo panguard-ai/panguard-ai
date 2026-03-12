@@ -5512,7 +5512,7 @@
       "viewATR": "GitHub 上的 ATR 標準",
       "install": "開始使用",
       "copied": "已複製!",
-      "platforms": "支援 Claude Code、Cursor、OpenClaw、Codex、WorkBuddy、Claude Desktop",
+      "platforms": "支援 Claude Code、Cursor、QClaw、OpenClaw、Codex、WorkBuddy、Claude Desktop",
       "badges": {
         "mit": "MIT 開源",
         "rules": "ATR 規則",
