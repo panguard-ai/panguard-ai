@@ -86,18 +86,23 @@ interface MutableFingerprint {
 // Pattern detectors (regex-based, no LLM needed)
 // ---------------------------------------------------------------------------
 
-const FS_WRITE_PATTERN = /(?:write(?:File)?|appendFile|fs\.write|truncate|mkdir|rmdir|unlink|rm\s+-)/i;
+const FS_WRITE_PATTERN =
+  /(?:write(?:File)?|appendFile|fs\.write|truncate|mkdir|rmdir|unlink|rm\s+-)/i;
 const FS_READ_PATTERN = /(?:read(?:File)?|readdir|stat|access|exists|glob|find\s)/i;
 const FS_DELETE_PATTERN = /(?:unlink|rm\s+-rf|delete(?:File)?|removeDir|rmdir)/i;
 
-const NETWORK_PATTERN = /(?:https?:\/\/|fetch|curl|wget|axios|http\.request|net\.connect|socket)[\s('"]*([a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,}))/i;
+const NETWORK_PATTERN =
+  /(?:https?:\/\/|fetch|curl|wget|axios|http\.request|net\.connect|socket)[\s('"]*([a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,}))/i;
 
-const ENV_PATTERN = /(?:process\.env|os\.environ|getenv|System\.getenv)\[?['"(]?([A-Z_][A-Z0-9_]*)/i;
+const ENV_PATTERN =
+  /(?:process\.env|os\.environ|getenv|System\.getenv)\[?['"(]?([A-Z_][A-Z0-9_]*)/i;
 const ENV_INLINE_PATTERN = /\$\{?([A-Z_][A-Z0-9_]{2,})\}?/g;
 
-const EXEC_PATTERN = /(?:child_process|spawn|exec(?:File)?|system\(|popen|subprocess|shell_exec|os\.system)\s*\(\s*['"(]?([^\s'")\]]{1,80})/i;
+const EXEC_PATTERN =
+  /(?:child_process|spawn|exec(?:File)?|system\(|popen|subprocess|shell_exec|os\.system)\s*\(\s*['"(]?([^\s'")\]]{1,80})/i;
 
-const EXFIL_PATTERN = /(?:base64|btoa|encode|compress|deflate|gzip).*(?:http|fetch|curl|send|post|upload)/i;
+const EXFIL_PATTERN =
+  /(?:base64|btoa|encode|compress|deflate|gzip).*(?:http|fetch|curl|send|post|upload)/i;
 const REDIRECT_PATTERN = /(?:redirect|forward|proxy|tunnel)\s+(?:to\s+)?(?:https?:\/\/)/i;
 
 /** Classify a text content into behavioral capabilities */
@@ -188,10 +193,7 @@ export class SkillFingerprintStore {
    * 記錄 skill 呼叫並偵測行為異常。
    * 如果指紋已穩定且出現新能力，回傳異常列表。
    */
-  recordInvocation(
-    skillName: string,
-    event: AgentEvent
-  ): readonly BehaviorAnomaly[] {
+  recordInvocation(skillName: string, event: AgentEvent): readonly BehaviorAnomaly[] {
     const now = Date.now();
     const fp = this.getOrCreate(skillName, now);
     fp.invocationCount++;
@@ -282,19 +284,34 @@ export class SkillFingerprintStore {
     // Update fingerprint with observed capabilities
     let newCapsSeen = false;
     for (const op of caps.filesystemOps) {
-      if (!fp.filesystemOps.has(op)) { fp.filesystemOps.add(op); newCapsSeen = true; }
+      if (!fp.filesystemOps.has(op)) {
+        fp.filesystemOps.add(op);
+        newCapsSeen = true;
+      }
     }
     for (const t of caps.networkTargets) {
-      if (!fp.networkTargets.has(t)) { fp.networkTargets.add(t); newCapsSeen = true; }
+      if (!fp.networkTargets.has(t)) {
+        fp.networkTargets.add(t);
+        newCapsSeen = true;
+      }
     }
     for (const e of caps.envAccesses) {
-      if (!fp.envAccesses.has(e)) { fp.envAccesses.add(e); newCapsSeen = true; }
+      if (!fp.envAccesses.has(e)) {
+        fp.envAccesses.add(e);
+        newCapsSeen = true;
+      }
     }
     for (const p of caps.processExecs) {
-      if (!fp.processExecs.has(p)) { fp.processExecs.add(p); newCapsSeen = true; }
+      if (!fp.processExecs.has(p)) {
+        fp.processExecs.add(p);
+        newCapsSeen = true;
+      }
     }
     for (const o of caps.outputPatterns) {
-      if (!fp.outputPatterns.has(o)) { fp.outputPatterns.add(o); newCapsSeen = true; }
+      if (!fp.outputPatterns.has(o)) {
+        fp.outputPatterns.add(o);
+        newCapsSeen = true;
+      }
     }
 
     // Track stability
@@ -306,10 +323,7 @@ export class SkillFingerprintStore {
       }
 
       // Mark stable when threshold met
-      if (
-        fp.invocationCount >= this.stabilityThreshold &&
-        fp.stableStreak >= this.stableStreak
-      ) {
+      if (fp.invocationCount >= this.stabilityThreshold && fp.stableStreak >= this.stableStreak) {
         fp.stableHash = this.computeCapabilityHash(fp);
       }
     }

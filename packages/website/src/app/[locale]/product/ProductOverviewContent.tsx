@@ -3,11 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/navigation';
 import { ArrowRight } from 'lucide-react';
-import {
-  ShieldIcon,
-  AnalyticsIcon,
-  GlobalIcon,
-} from '@/components/ui/BrandIcons';
+import { ShieldIcon, AnalyticsIcon, GlobalIcon } from '@/components/ui/BrandIcons';
 import BrandLogo from '@/components/ui/BrandLogo';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
@@ -21,8 +17,7 @@ const productConfigs = [
     key: 'atr' as const,
     icon: AnalyticsIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
-    description:
-      `ATR (Agent Threat Rules) is an open standard for detecting AI agent threats. YAML-based rules across 9 categories cover prompt injection, tool poisoning, skill compromise, unauthorized access, data exfiltration, and more. Inspired by Sigma for network attacks, ATR gives the security community a shared language for AI agent threats. Rules are open-source, human-readable, and machine-enforceable.`,
+    description: `ATR (Agent Threat Rules) is an open standard for detecting AI agent threats. YAML-based rules across 9 categories cover prompt injection, tool poisoning, skill compromise, unauthorized access, data exfiltration, and more. Inspired by Sigma for network attacks, ATR gives the security community a shared language for AI agent threats. Rules are open-source, human-readable, and machine-enforceable.`,
     features: [
       'Rules across 9 threat categories, growing continuously',
       'YAML-based, human-readable rule format',
@@ -37,8 +32,7 @@ const productConfigs = [
     key: 'threatCloud' as const,
     icon: GlobalIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
-    description:
-      `Threat Cloud is a self-hosted collective intelligence network. Every Panguard install contributes anonymized threat signals; the pipeline auto-generates Sigma, YARA, and ATR rules from real-world attacks. ${STATS.threatIntel.sources} threat intel sources, ${STATS.threatIntel.validatedRecords.toLocaleString()} validated IoC records, and ${STATS.threatIntel.promotedRules} community-promoted rules -- all synced every 6 hours. The more nodes participate, the stronger everyone's defense.`,
+    description: `Threat Cloud is a self-hosted collective intelligence network. Every Panguard install contributes anonymized threat signals; the pipeline auto-generates Sigma, YARA, and ATR rules from real-world attacks. ${STATS.threatIntel.sources} threat intel sources, ${STATS.threatIntel.validatedRecords.toLocaleString()} validated IoC records, and ${STATS.threatIntel.promotedRules} community-promoted rules -- all synced every 6 hours. The more nodes participate, the stronger everyone's defense.`,
     features: [
       `${STATS.threatIntel.sources} threat intel sources with ${STATS.threatIntel.validatedRecords.toLocaleString()} validated records`,
       'Auto-generates Sigma, YARA, and ATR rules from collective data',
@@ -53,8 +47,7 @@ const productConfigs = [
     key: 'guard' as const,
     icon: ShieldIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
-    description:
-      `Panguard Guard is the enforcement engine. A 4-agent pipeline (Detect, Analyze, Respond, Report) processes OS-level events through ${STATS.totalRulesDisplay} combined Sigma, YARA, and ATR rules. Built-in Skill Auditor runs ${STATS.skillAuditChecks} checks before any AI skill is installed. Three response modules auto-block IPs, kill processes, and quarantine files.`,
+    description: `Panguard Guard is the enforcement engine. A 4-agent pipeline (Detect, Analyze, Respond, Report) processes OS-level events through ${STATS.totalRulesDisplay} combined Sigma, YARA, and ATR rules. Built-in Skill Auditor runs ${STATS.skillAuditChecks} checks before any AI skill is installed. Three response modules auto-block IPs, kill processes, and quarantine files.`,
     features: [
       '4-agent AI pipeline: Detect, Analyze, Respond, Report',
       `${STATS.totalRulesDisplay} detection rules (Sigma + YARA + ATR)`,

@@ -27,11 +27,11 @@ SecurityEvent
 
 Three detection engines run in parallel:
 
-| Engine | Source | Rules | Format |
-|--------|--------|-------|--------|
-| **Sigma** | Built-in + community + Threat Cloud | ~200+ | Sigma YAML |
-| **YARA** | Built-in + custom | ~50+ | YARA rules |
-| **ATR** | Built-in (@panguard-ai/atr package) + custom | 27 | ATR YAML |
+| Engine    | Source                                       | Rules | Format     |
+| --------- | -------------------------------------------- | ----- | ---------- |
+| **Sigma** | Built-in + community + Threat Cloud          | ~200+ | Sigma YAML |
+| **YARA**  | Built-in + custom                            | ~50+  | YARA rules |
+| **ATR**   | Built-in (@panguard-ai/atr package) + custom | 27    | ATR YAML   |
 
 ATR rules specifically detect AI agent threats: prompt injection, tool poisoning,
 context exfiltration, agent manipulation, privilege escalation, excessive autonomy,
@@ -46,6 +46,7 @@ MITRE ATT&CK mapping, and confidence score.
 ### Stage 3: Respond
 
 The RespondAgent executes response actions based on threat verdict:
+
 - `block_input` / `block_output` -- Block malicious I/O
 - `block_tool` -- Prevent tool execution
 - `alert` -- Notify operators
@@ -68,12 +69,12 @@ This is fully opt-out: use `--no-telemetry` to disable.
 
 PanguardGuard operates at 4 levels depending on available resources:
 
-| Level | Available | Detection | Analysis | Response |
-|-------|-----------|-----------|----------|----------|
-| **L1** | Rules only (offline) | Sigma + YARA + ATR | Rule-based | Auto-block |
-| **L2** | + AI model | Full pipeline | AI-powered | Full |
-| **L3** | + Threat Cloud | + community rules | + threat intel | + IP blocklist |
-| **L4** | + Manager | + distributed | + cross-node | + coordinated |
+| Level  | Available            | Detection          | Analysis       | Response       |
+| ------ | -------------------- | ------------------ | -------------- | -------------- |
+| **L1** | Rules only (offline) | Sigma + YARA + ATR | Rule-based     | Auto-block     |
+| **L2** | + AI model           | Full pipeline      | AI-powered     | Full           |
+| **L3** | + Threat Cloud       | + community rules  | + threat intel | + IP blocklist |
+| **L4** | + Manager            | + distributed      | + cross-node   | + coordinated  |
 
 The system never fails silently. If a component is unavailable, it logs the
 degradation and continues with available capabilities.

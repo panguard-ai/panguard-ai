@@ -3,10 +3,12 @@
 Find relevant podcasts, verify host emails, and send personalized cold outreach to get booked as a guest.
 
 ## What This Does
+
 Automates the entire podcast guest booking pipeline:
 Rephonic (find podcasts) → Apollo (enrich contact) → Million Verifier (verify email) → Instantly (send outreach)
 
 ## Prerequisites
+
 - API keys in `marketing/.env`: REPHONIC_API_KEY, APOLLO_API_KEY, MILLIONVERIFIER_API_KEY, INSTANTLY_API_KEY
 
 ## Step-by-Step
@@ -14,6 +16,7 @@ Rephonic (find podcasts) → Apollo (enrich contact) → Million Verifier (verif
 ### 1. Find target podcasts (Rephonic API)
 
 Search categories relevant to Panguard:
+
 - "cybersecurity"
 - "developer tools"
 - "startup technology"
@@ -23,6 +26,7 @@ Search categories relevant to Panguard:
 - "information security"
 
 Filter criteria:
+
 - Audience size: 500-50,000 (sweet spot — big enough to matter, small enough to get booked)
 - Active: published episode in last 30 days
 - Language: English (primary), Chinese (secondary)
@@ -38,6 +42,7 @@ curl -s https://api.rephonic.com/v1/podcasts/search \
 ### 2. Enrich host contacts (Apollo API)
 
 For each podcast host, enrich via Apollo:
+
 ```bash
 curl -s https://api.apollo.io/v1/people/match \
   -H "Content-Type: application/json" \
@@ -60,11 +65,13 @@ Only keep emails with result: "ok" or "catch_all". Discard "invalid" and "dispos
 For each verified host, generate a personalized pitch:
 
 **Subject line options (A/B test):**
+
 - "Guest pitch: How a solo dev built an AI security platform"
 - "The 60-second server protection story — podcast guest idea"
 - "[Podcast Name] guest idea: Open-source AI security"
 
 **Email template:**
+
 ```
 Hi [First Name],
 
@@ -84,6 +91,7 @@ Founder, Panguard AI
 ```
 
 **Personalization rules:**
+
 - Reference their most recent episode by title
 - Match their audience (developer show = technical angle, business show = ROI angle)
 - Keep under 150 words
@@ -115,15 +123,18 @@ curl -s https://api.instantly.ai/api/v1/lead/add \
 ### 6. Save output
 
 Save to `marketing/output/podcasts/`:
+
 - `target-list.json` — all found podcasts with host info
 - `verified-contacts.json` — verified email contacts
 - `pitch-emails.md` — generated pitch emails for review
 - `campaign-stats.md` — sent/open/reply tracking
 
 ## Output
+
 Complete podcast outreach pipeline data in `marketing/output/podcasts/`
 
 ## Follow-up sequence (automated via Instantly)
+
 - Day 0: Initial pitch
 - Day 3: Follow-up if no reply ("Just bumping this up...")
 - Day 7: Value-add follow-up (share a relevant blog post)

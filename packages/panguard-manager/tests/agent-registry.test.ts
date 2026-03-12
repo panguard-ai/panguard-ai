@@ -5,10 +5,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AgentRegistry } from '../src/agent-registry.js';
-import type {
-  AgentRegistrationRequest,
-  AgentHeartbeat,
-} from '../src/types.js';
+import type { AgentRegistrationRequest, AgentHeartbeat } from '../src/types.js';
 
 function makeRequest(overrides?: Partial<AgentRegistrationRequest>): AgentRegistrationRequest {
   return {
@@ -66,9 +63,9 @@ describe('AgentRegistry', () => {
       smallRegistry.registerAgent(makeRequest({ hostname: 's1' }));
       smallRegistry.registerAgent(makeRequest({ hostname: 's2' }));
 
-      expect(() =>
-        smallRegistry.registerAgent(makeRequest({ hostname: 's3' }))
-      ).toThrow('Maximum agent limit reached');
+      expect(() => smallRegistry.registerAgent(makeRequest({ hostname: 's3' }))).toThrow(
+        'Maximum agent limit reached'
+      );
     });
 
     it('should return an immutable copy (modifying return does not affect registry)', () => {

@@ -50,9 +50,9 @@ describe('MetricsCollector', () => {
 
   it('should generate AI latency histogram buckets', () => {
     const collector = new MetricsCollector();
-    collector.recordAILatency(100);   // 0.1s
-    collector.recordAILatency(500);   // 0.5s
-    collector.recordAILatency(2000);  // 2.0s
+    collector.recordAILatency(100); // 0.1s
+    collector.recordAILatency(500); // 0.5s
+    collector.recordAILatency(2000); // 2.0s
     collector.recordAILatency(15000); // 15.0s
 
     const output = collector.toPrometheus(makeStatus());

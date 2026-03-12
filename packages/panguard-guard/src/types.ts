@@ -501,7 +501,15 @@ export interface GuardConfig {
   actionPolicy: ActionPolicy;
   notifications: NotificationConfig;
   ai?: {
-    provider: 'ollama' | 'claude' | 'openai' | 'gemini' | 'groq' | 'mistral' | 'deepseek' | 'lmstudio';
+    provider:
+      | 'ollama'
+      | 'claude'
+      | 'openai'
+      | 'gemini'
+      | 'groq'
+      | 'mistral'
+      | 'deepseek'
+      | 'lmstudio';
     model: string;
     endpoint?: string;
     apiKey?: string;

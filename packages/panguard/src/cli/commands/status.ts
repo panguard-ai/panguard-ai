@@ -254,11 +254,17 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
         skills?: Array<{ name: string; source?: string }>;
       };
       const skills = whitelist.skills ?? [];
-      const autoCount = skills.filter((s) => s.source === 'fingerprint' || s.source === 'static').length;
-      const manualCount = skills.filter((s) => s.source === 'manual' || s.source === 'community').length;
+      const autoCount = skills.filter(
+        (s) => s.source === 'fingerprint' || s.source === 'static'
+      ).length;
+      const manualCount = skills.filter(
+        (s) => s.source === 'manual' || s.source === 'community'
+      ).length;
 
       console.log(
-        divider(lang === 'zh-TW' ? 'Skill Protection (\u6280\u80FD\u9632\u8B77)' : 'Skill Protection')
+        divider(
+          lang === 'zh-TW' ? 'Skill Protection (\u6280\u80FD\u9632\u8B77)' : 'Skill Protection'
+        )
       );
       console.log('');
       console.log(
@@ -284,7 +290,9 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
       const latest = history[history.length - 1];
       if (latest) {
         console.log(
-          divider(lang === 'zh-TW' ? "Today's Activity (\u4ECA\u65E5\u6D3B\u52D5)" : "Today's Activity")
+          divider(
+            lang === 'zh-TW' ? "Today's Activity (\u4ECA\u65E5\u6D3B\u52D5)" : "Today's Activity"
+          )
         );
         console.log('');
         console.log(

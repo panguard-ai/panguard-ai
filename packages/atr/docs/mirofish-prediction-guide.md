@@ -136,21 +136,21 @@ python mirofish_run.py \
 
 ### Parameters
 
-| Parameter | Recommended | Description |
-|-----------|-------------|-------------|
-| `--rounds` | 40 | Number of deliberation rounds. Lower (20) for quick exploration, higher (60) for deeper consensus |
-| `--model` | `claude-sonnet-4-20250514` | LLM backend. Sonnet balances cost and quality |
-| `--agents` | 10-14 profiles | More agents = more diverse perspectives, higher cost |
-| `--topic` | Specific question | Be specific. Vague topics produce vague predictions |
+| Parameter  | Recommended                | Description                                                                                       |
+| ---------- | -------------------------- | ------------------------------------------------------------------------------------------------- |
+| `--rounds` | 40                         | Number of deliberation rounds. Lower (20) for quick exploration, higher (60) for deeper consensus |
+| `--model`  | `claude-sonnet-4-20250514` | LLM backend. Sonnet balances cost and quality                                                     |
+| `--agents` | 10-14 profiles             | More agents = more diverse perspectives, higher cost                                              |
+| `--topic`  | Specific question          | Be specific. Vague topics produce vague predictions                                               |
 
 ### Cost Estimate
 
-| Configuration | Approximate Cost |
-|---------------|-----------------|
-| 10 agents, 20 rounds, Sonnet | $0.50 - $1.00 |
-| 14 agents, 40 rounds, Sonnet | $1.00 - $3.00 |
-| 14 agents, 60 rounds, Sonnet | $2.00 - $5.00 |
-| 14 agents, 40 rounds, Opus | $5.00 - $15.00 |
+| Configuration                | Approximate Cost |
+| ---------------------------- | ---------------- |
+| 10 agents, 20 rounds, Sonnet | $0.50 - $1.00    |
+| 14 agents, 40 rounds, Sonnet | $1.00 - $3.00    |
+| 14 agents, 60 rounds, Sonnet | $2.00 - $5.00    |
+| 14 agents, 40 rounds, Opus   | $5.00 - $15.00   |
 
 ---
 
@@ -194,11 +194,11 @@ python mirofish_to_atr.py \
 
 ### Parameters
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `--min-consensus` | 0.6 | Minimum swarm consensus score (0-1) to generate a rule |
-| `--severity-override` | none | Override the swarm's severity assessment |
-| `--dry-run` | false | Preview rules without writing files |
+| Parameter             | Default | Description                                            |
+| --------------------- | ------- | ------------------------------------------------------ |
+| `--min-consensus`     | 0.6     | Minimum swarm consensus score (0-1) to generate a rule |
+| `--severity-override` | none    | Override the swarm's severity assessment               |
+| `--dry-run`           | false   | Preview rules without writing files                    |
 
 ### Output
 
@@ -266,17 +266,17 @@ AI-generated rules require human review. For each rule:
 
 The first MiroFish-to-ATR pipeline run produced 17 rules:
 
-| Parameter | Value |
-|-----------|-------|
-| Model | Claude Sonnet (via Anthropic API) |
-| Agents | 14 specialized personas |
-| Rounds | 40 deliberation rounds |
-| Topic | Novel attack vectors against AI agents using MCP in 2026-2027 |
-| Knowledge base | OWASP Agentic Top 10, MITRE ATLAS, 6 published CVEs, 10 research papers |
-| Cost | ~$2.50 USD |
-| Output | 17 predicted attack vectors |
-| Rules generated | 17 ATR rule drafts |
-| After human review | 17 rules passed quality gate |
+| Parameter          | Value                                                                   |
+| ------------------ | ----------------------------------------------------------------------- |
+| Model              | Claude Sonnet (via Anthropic API)                                       |
+| Agents             | 14 specialized personas                                                 |
+| Rounds             | 40 deliberation rounds                                                  |
+| Topic              | Novel attack vectors against AI agents using MCP in 2026-2027           |
+| Knowledge base     | OWASP Agentic Top 10, MITRE ATLAS, 6 published CVEs, 10 research papers |
+| Cost               | ~$2.50 USD                                                              |
+| Output             | 17 predicted attack vectors                                             |
+| Rules generated    | 17 ATR rule drafts                                                      |
+| After human review | 17 rules passed quality gate                                            |
 
 The generated rules covered attack vectors across 6 categories: skill-compromise, tool-poisoning, context-exfiltration, privilege-escalation, agent-manipulation, and model-abuse.
 

@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/BrandIcons';
 import { STATS } from '@/lib/stats';
 
-
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const statIcons = [

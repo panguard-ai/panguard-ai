@@ -49,6 +49,7 @@
 ### Security Headers
 
 All responses include:
+
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options: DENY`
 - `X-XSS-Protection: 0`
@@ -96,6 +97,7 @@ curl -H "Authorization: Bearer YOUR_AUTH_TOKEN" \
 All responses follow a consistent envelope format.
 
 **Success**:
+
 ```json
 {
   "ok": true,
@@ -104,6 +106,7 @@ All responses follow a consistent envelope format.
 ```
 
 **Error**:
+
 ```json
 {
   "ok": false,
@@ -118,6 +121,7 @@ All responses follow a consistent envelope format.
 Health check endpoint. **No authentication required.**
 
 **Response** `200`:
+
 ```json
 {
   "ok": true,
@@ -139,6 +143,7 @@ Health check endpoint. **No authentication required.**
 Register a new Guard agent with the Manager.
 
 **Request Body**:
+
 ```json
 {
   "hostname": "web-server-01",
@@ -150,16 +155,17 @@ Register a new Guard agent with the Manager.
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `hostname` | `string` | Yes | Agent hostname |
-| `os` | `string` | Yes | Operating system (`linux`, `darwin`, `win32`) |
-| `arch` | `string` | Yes | CPU architecture (`x64`, `arm64`) |
-| `version` | `string` | Yes | Guard agent version |
-| `ip` | `string` | No | Agent IP address |
-| `organizationId` | `string` | No | Organization ID for multi-tenant deployments |
+| Field            | Type     | Required | Description                                   |
+| ---------------- | -------- | -------- | --------------------------------------------- |
+| `hostname`       | `string` | Yes      | Agent hostname                                |
+| `os`             | `string` | Yes      | Operating system (`linux`, `darwin`, `win32`) |
+| `arch`           | `string` | Yes      | CPU architecture (`x64`, `arm64`)             |
+| `version`        | `string` | Yes      | Guard agent version                           |
+| `ip`             | `string` | No       | Agent IP address                              |
+| `organizationId` | `string` | No       | Organization ID for multi-tenant deployments  |
 
 **Response** `201`:
+
 ```json
 {
   "ok": true,
@@ -187,6 +193,7 @@ Register a new Guard agent with the Manager.
 Send a heartbeat from a Guard agent.
 
 **Request Body**:
+
 ```json
 {
   "timestamp": "2026-03-03T00:01:00.000Z",
@@ -200,16 +207,16 @@ Send a heartbeat from a Guard agent.
 }
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `timestamp` | `string` | ISO 8601 timestamp |
-| `cpuUsage` | `number` | CPU usage percentage |
-| `memUsage` | `number` | Memory usage percentage |
-| `activeMonitors` | `number` | Number of active monitors |
-| `threatCount` | `number` | Total threats detected |
-| `eventsProcessed` | `number` | Total events processed |
-| `mode` | `string` | Current guard mode (`learning` or `protection`) |
-| `uptime` | `number` | Agent uptime in milliseconds |
+| Field             | Type     | Description                                     |
+| ----------------- | -------- | ----------------------------------------------- |
+| `timestamp`       | `string` | ISO 8601 timestamp                              |
+| `cpuUsage`        | `number` | CPU usage percentage                            |
+| `memUsage`        | `number` | Memory usage percentage                         |
+| `activeMonitors`  | `number` | Number of active monitors                       |
+| `threatCount`     | `number` | Total threats detected                          |
+| `eventsProcessed` | `number` | Total events processed                          |
+| `mode`            | `string` | Current guard mode (`learning` or `protection`) |
+| `uptime`          | `number` | Agent uptime in milliseconds                    |
 
 **Response** `200`: Updated agent registration.
 
@@ -222,6 +229,7 @@ Send a heartbeat from a Guard agent.
 Deregister a Guard agent.
 
 **Response** `200`:
+
 ```json
 {
   "ok": true,
@@ -256,6 +264,7 @@ Get details for a single agent.
 Submit threat events from a Guard agent.
 
 **Request Body**:
+
 ```json
 {
   "threats": [
@@ -283,6 +292,7 @@ Submit threat events from a Guard agent.
 ```
 
 **Response** `200`:
+
 ```json
 {
   "ok": true,
@@ -319,6 +329,7 @@ Get recent threats. Supports `?since=` (ISO 8601, default 1h ago) and `?org_id=`
 Aggregated threat summary.
 
 **Response** `200`:
+
 ```json
 {
   "ok": true,
@@ -343,6 +354,7 @@ Aggregated threat summary.
 Comprehensive dashboard overview. Supports `?org_id=`.
 
 **Response** `200`:
+
 ```json
 {
   "ok": true,
@@ -376,6 +388,7 @@ Comprehensive dashboard overview. Supports `?org_id=`.
 Create a new security policy and optionally broadcast to all active agents.
 
 **Request Body**:
+
 ```json
 {
   "rules": [
@@ -395,6 +408,7 @@ Create a new security policy and optionally broadcast to all active agents.
 **Policy Rule Types**: `block_ip`, `alert_threshold`, `auto_respond`, `custom`
 
 **Response** `201`:
+
 ```json
 {
   "ok": true,
@@ -431,6 +445,7 @@ Get the policy applicable to a specific agent (may include agent-specific overri
 Server-Sent Events connection for real-time updates.
 
 **Response Headers**:
+
 ```
 Content-Type: text/event-stream
 Cache-Control: no-cache
@@ -442,15 +457,16 @@ X-Accel-Buffering: no
 
 **Event Types**:
 
-| Event Type | Trigger | Data |
-|------------|---------|------|
-| `connected` | Connection established | `{ timestamp }` |
-| `agent_online` | New agent registers | `{ agentId, hostname }` |
-| `agent_offline` | Agent deregisters | `{ agentId }` |
-| `threats_reported` | Threats submitted | `{ agentId, count, threats }` |
-| `policy_created` | New policy created | `{ policyId, version }` |
+| Event Type         | Trigger                | Data                          |
+| ------------------ | ---------------------- | ----------------------------- |
+| `connected`        | Connection established | `{ timestamp }`               |
+| `agent_online`     | New agent registers    | `{ agentId, hostname }`       |
+| `agent_offline`    | Agent deregisters      | `{ agentId }`                 |
+| `threats_reported` | Threats submitted      | `{ agentId, count, threats }` |
+| `policy_created`   | New policy created     | `{ policyId, version }`       |
 
 **Event Format**:
+
 ```
 data: {"type":"threats_reported","data":{...},"timestamp":"2026-03-03T00:00:00.000Z"}
 ```
@@ -477,6 +493,7 @@ All auth endpoints use the same `{ ok, data/error }` envelope format. Rate limit
 Register a new user account. Automatically activates a 14-day Solo trial.
 
 **Request Body**:
+
 ```json
 {
   "email": "user@example.com",
@@ -485,13 +502,14 @@ Register a new user account. Automatically activates a 14-day Solo trial.
 }
 ```
 
-| Field | Type | Validation |
-|-------|------|------------|
-| `email` | `string` | Must be valid email format |
-| `name` | `string` | Required, non-empty |
-| `password` | `string` | 8-128 characters |
+| Field      | Type     | Validation                 |
+| ---------- | -------- | -------------------------- |
+| `email`    | `string` | Must be valid email format |
+| `name`     | `string` | Required, non-empty        |
+| `password` | `string` | 8-128 characters           |
 
 **Response** `201`:
+
 ```json
 {
   "ok": true,
@@ -518,6 +536,7 @@ Register a new user account. Automatically activates a 14-day Solo trial.
 Authenticate with email and password. Supports TOTP 2FA.
 
 **Request Body**:
+
 ```json
 {
   "email": "user@example.com",
@@ -527,14 +546,15 @@ Authenticate with email and password. Supports TOTP 2FA.
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `email` | `string` | Yes | User email |
-| `password` | `string` | Yes | User password |
-| `totpCode` | `string` | Conditional | Required if 2FA enabled |
+| Field        | Type     | Required    | Description              |
+| ------------ | -------- | ----------- | ------------------------ |
+| `email`      | `string` | Yes         | User email               |
+| `password`   | `string` | Yes         | User password            |
+| `totpCode`   | `string` | Conditional | Required if 2FA enabled  |
 | `backupCode` | `string` | Conditional | Alternative to TOTP code |
 
 **Response when 2FA required** `200`:
+
 ```json
 {
   "ok": true,
@@ -546,6 +566,7 @@ Authenticate with email and password. Supports TOTP 2FA.
 ```
 
 **Response on success** `200`:
+
 ```json
 {
   "ok": true,
@@ -570,6 +591,7 @@ Invalidate the current session.
 **Headers**: `Authorization: Bearer <token>`
 
 **Response** `200`:
+
 ```json
 { "ok": true, "data": { "message": "Logged out" } }
 ```
@@ -597,6 +619,7 @@ Request a password reset link.
 Complete a password reset.
 
 **Request Body**:
+
 ```json
 {
   "token": "reset-token-from-email",
@@ -617,6 +640,7 @@ Permanently delete the authenticated user's account and all data. Requires passw
 **Request Body**: `{ "password": "currentPassword" }`
 
 **Response** `200`:
+
 ```json
 {
   "ok": true,
@@ -651,30 +675,31 @@ The auth server supports TOTP-based two-factor authentication with backup codes.
 
 All admin endpoints require `role: "admin"` authentication.
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin/users` | List all users |
-| `GET` | `/api/admin/users/search?q=` | Search users |
-| `GET` | `/api/admin/users/:id` | User detail with usage/sessions/audit |
-| `PATCH` | `/api/admin/users/:id/tier` | Update user tier |
-| `PATCH` | `/api/admin/users/:id/role` | Update user role |
-| `PATCH` | `/api/admin/users/:id/suspend` | Suspend/unsuspend user |
-| `GET` | `/api/admin/stats` | User and waitlist statistics |
-| `GET` | `/api/admin/dashboard` | Admin dashboard stats |
-| `GET` | `/api/admin/sessions` | Active sessions |
-| `DELETE` | `/api/admin/sessions/:id` | Revoke session |
-| `GET` | `/api/admin/activity?limit=` | Recent activity |
-| `GET` | `/api/admin/audit-log` | Filtered audit log |
-| `GET` | `/api/admin/audit-log/actions` | Distinct audit actions |
-| `GET` | `/api/admin/usage` | Usage overview by user and tier |
-| `GET` | `/api/admin/usage/:userId` | Per-user usage detail |
-| `POST` | `/api/admin/bulk-action` | Bulk operations (max 100 users) |
+| Method   | Path                           | Description                           |
+| -------- | ------------------------------ | ------------------------------------- |
+| `GET`    | `/api/admin/users`             | List all users                        |
+| `GET`    | `/api/admin/users/search?q=`   | Search users                          |
+| `GET`    | `/api/admin/users/:id`         | User detail with usage/sessions/audit |
+| `PATCH`  | `/api/admin/users/:id/tier`    | Update user tier                      |
+| `PATCH`  | `/api/admin/users/:id/role`    | Update user role                      |
+| `PATCH`  | `/api/admin/users/:id/suspend` | Suspend/unsuspend user                |
+| `GET`    | `/api/admin/stats`             | User and waitlist statistics          |
+| `GET`    | `/api/admin/dashboard`         | Admin dashboard stats                 |
+| `GET`    | `/api/admin/sessions`          | Active sessions                       |
+| `DELETE` | `/api/admin/sessions/:id`      | Revoke session                        |
+| `GET`    | `/api/admin/activity?limit=`   | Recent activity                       |
+| `GET`    | `/api/admin/audit-log`         | Filtered audit log                    |
+| `GET`    | `/api/admin/audit-log/actions` | Distinct audit actions                |
+| `GET`    | `/api/admin/usage`             | Usage overview by user and tier       |
+| `GET`    | `/api/admin/usage/:userId`     | Per-user usage detail                 |
+| `POST`   | `/api/admin/bulk-action`       | Bulk operations (max 100 users)       |
 
 **Tier Values**: `community`, `solo`, `pro`, `business`, `enterprise`
 
 **Bulk Action Types**: `change_tier`, `change_role`, `suspend`, `unsuspend`
 
 **Bulk Action Request**:
+
 ```json
 {
   "userIds": [1, 2, 3],
@@ -702,6 +727,7 @@ All admin endpoints require `role: "admin"` authentication.
 Upload anonymized threat data. Supports single event and batch formats.
 
 **Single Event**:
+
 ```json
 {
   "attackSourceIP": "203.0.113.50",
@@ -715,6 +741,7 @@ Upload anonymized threat data. Supports single event and batch formats.
 ```
 
 **Batch Format** (max 100 events):
+
 ```json
 {
   "events": [
@@ -725,6 +752,7 @@ Upload anonymized threat data. Supports single event and batch formats.
 ```
 
 **Response** `201`:
+
 ```json
 {
   "ok": true,
@@ -744,6 +772,7 @@ IP addresses are automatically /16-anonymized (GDPR compliant). IoCs are extract
 Upload honeypot intelligence data. Supports single and batch (max 100).
 
 **Request Body**:
+
 ```json
 {
   "sourceIP": "203.0.113.50",
@@ -774,6 +803,7 @@ Fetch community Sigma rules. Supports `?since=<ISO timestamp>` filter.
 Publish a new community rule. Requires API key. Rule content must be valid Sigma YAML (max 64KB).
 
 **Request Body**:
+
 ```json
 {
   "ruleId": "community-rule-001",
@@ -791,16 +821,16 @@ Publish a new community rule. Requires API key. Rule content must be valid Sigma
 
 Search IoCs with filters.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `type` | `string` | `ip`, `domain`, `hash`, `url` |
-| `source` | `string` | `guard`, `trap`, `external` |
-| `minReputation` | `number` | Minimum reputation score (0-100) |
-| `status` | `string` | `active`, `expired`, `false_positive` |
-| `since` | `string` | ISO timestamp |
-| `search` | `string` | Free-text search |
-| `page` | `number` | Page number (default 1) |
-| `limit` | `number` | Results per page (default 50) |
+| Parameter       | Type     | Description                           |
+| --------------- | -------- | ------------------------------------- |
+| `type`          | `string` | `ip`, `domain`, `hash`, `url`         |
+| `source`        | `string` | `guard`, `trap`, `external`           |
+| `minReputation` | `number` | Minimum reputation score (0-100)      |
+| `status`        | `string` | `active`, `expired`, `false_positive` |
+| `since`         | `string` | ISO timestamp                         |
+| `search`        | `string` | Free-text search                      |
+| `page`          | `number` | Page number (default 1)               |
+| `limit`         | `number` | Results per page (default 50)         |
 
 #### GET /api/iocs/:value
 
@@ -810,34 +840,34 @@ Lookup a single IoC with context (related threat count, sightings).
 
 ### Query Endpoints
 
-| Method | Path | Description | Parameters |
-|--------|------|-------------|------------|
-| `GET` | `/api/stats` | Enhanced threat statistics | -- |
-| `GET` | `/api/query/timeseries` | Time series data | `granularity` (hour/day/week), `since`, `attackType` |
-| `GET` | `/api/query/geo` | Geographic distribution | `since` |
-| `GET` | `/api/query/trends` | Threat trends | `periodDays` (default 7) |
-| `GET` | `/api/query/mitre-heatmap` | MITRE ATT&CK heatmap | `since` |
+| Method | Path                       | Description                | Parameters                                           |
+| ------ | -------------------------- | -------------------------- | ---------------------------------------------------- |
+| `GET`  | `/api/stats`               | Enhanced threat statistics | --                                                   |
+| `GET`  | `/api/query/timeseries`    | Time series data           | `granularity` (hour/day/week), `since`, `attackType` |
+| `GET`  | `/api/query/geo`           | Geographic distribution    | `since`                                              |
+| `GET`  | `/api/query/trends`        | Threat trends              | `periodDays` (default 7)                             |
+| `GET`  | `/api/query/mitre-heatmap` | MITRE ATT&CK heatmap       | `since`                                              |
 
 ---
 
 ### Feed Endpoints
 
-| Method | Path | Response Type | Description |
-|--------|------|---------------|-------------|
-| `GET` | `/api/feeds/ip-blocklist` | `text/plain` | IP blocklist (one per line). `?minReputation=` (default 70) |
-| `GET` | `/api/feeds/domain-blocklist` | `text/plain` | Domain blocklist. `?minReputation=` (default 70) |
-| `GET` | `/api/feeds/iocs` | `application/json` | IoC feed. `?minReputation=`, `?limit=`, `?since=` |
-| `GET` | `/api/feeds/agent-update` | `application/json` | Agent update bundle (rules + IoCs). `?since=` |
+| Method | Path                          | Response Type      | Description                                                 |
+| ------ | ----------------------------- | ------------------ | ----------------------------------------------------------- |
+| `GET`  | `/api/feeds/ip-blocklist`     | `text/plain`       | IP blocklist (one per line). `?minReputation=` (default 70) |
+| `GET`  | `/api/feeds/domain-blocklist` | `text/plain`       | Domain blocklist. `?minReputation=` (default 70)            |
+| `GET`  | `/api/feeds/iocs`             | `application/json` | IoC feed. `?minReputation=`, `?limit=`, `?since=`           |
+| `GET`  | `/api/feeds/agent-update`     | `application/json` | Agent update bundle (rules + IoCs). `?since=`               |
 
 ---
 
 ### Campaign Endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/campaigns` | List campaigns. `?page=`, `?limit=`, `?status=` |
-| `GET` | `/api/campaigns/stats` | Campaign statistics |
-| `GET` | `/api/campaigns/:id` | Campaign detail with associated events |
+| Method | Path                   | Description                                     |
+| ------ | ---------------------- | ----------------------------------------------- |
+| `GET`  | `/api/campaigns`       | List campaigns. `?page=`, `?limit=`, `?status=` |
+| `GET`  | `/api/campaigns/stats` | Campaign statistics                             |
+| `GET`  | `/api/campaigns/:id`   | Campaign detail with associated events          |
 
 ---
 
@@ -848,6 +878,7 @@ Lookup a single IoC with context (related threat count, sightings).
 Record a sighting (positive, negative, or false_positive) for an IoC.
 
 **Request Body**:
+
 ```json
 {
   "iocId": 42,
@@ -913,19 +944,19 @@ await client.deregister();
 
 ## Error Codes
 
-| HTTP Status | Meaning |
-|-------------|---------|
-| `200` | Success |
-| `201` | Created (registration, policy, rule) |
-| `204` | No Content (OPTIONS preflight) |
-| `400` | Bad Request -- missing or invalid fields |
-| `401` | Unauthorized -- missing or invalid authentication |
-| `403` | Forbidden -- insufficient permissions or suspended account |
-| `404` | Not Found -- resource or endpoint not found |
-| `405` | Method Not Allowed |
-| `409` | Conflict -- duplicate or constraint violation |
-| `413` | Payload Too Large |
-| `415` | Unsupported Media Type -- POST without `application/json` |
-| `429` | Too Many Requests -- rate limit exceeded |
-| `500` | Internal Server Error |
-| `503` | Service Unavailable -- server not configured (e.g., missing API keys) |
+| HTTP Status | Meaning                                                               |
+| ----------- | --------------------------------------------------------------------- |
+| `200`       | Success                                                               |
+| `201`       | Created (registration, policy, rule)                                  |
+| `204`       | No Content (OPTIONS preflight)                                        |
+| `400`       | Bad Request -- missing or invalid fields                              |
+| `401`       | Unauthorized -- missing or invalid authentication                     |
+| `403`       | Forbidden -- insufficient permissions or suspended account            |
+| `404`       | Not Found -- resource or endpoint not found                           |
+| `405`       | Method Not Allowed                                                    |
+| `409`       | Conflict -- duplicate or constraint violation                         |
+| `413`       | Payload Too Large                                                     |
+| `415`       | Unsupported Media Type -- POST without `application/json`             |
+| `429`       | Too Many Requests -- rate limit exceeded                              |
+| `500`       | Internal Server Error                                                 |
+| `503`       | Service Unavailable -- server not configured (e.g., missing API keys) |

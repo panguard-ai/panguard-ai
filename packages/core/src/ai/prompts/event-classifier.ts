@@ -47,20 +47,23 @@ const MITRE_TACTICS = [
  * @returns Formatted prompt string / 格式化的提示詞字串
  */
 export function getEventClassifierPrompt(event: SecurityEvent, lang: Language): string {
-  const eventData = sanitizeInput(JSON.stringify(
-    {
-      id: event.id,
-      timestamp: event.timestamp instanceof Date ? event.timestamp.toISOString() : event.timestamp,
-      source: event.source,
-      severity: event.severity,
-      category: event.category,
-      description: event.description,
-      host: event.host,
-      metadata: event.metadata,
-    },
-    null,
-    2
-  ));
+  const eventData = sanitizeInput(
+    JSON.stringify(
+      {
+        id: event.id,
+        timestamp:
+          event.timestamp instanceof Date ? event.timestamp.toISOString() : event.timestamp,
+        source: event.source,
+        severity: event.severity,
+        category: event.category,
+        description: event.description,
+        host: event.host,
+        metadata: event.metadata,
+      },
+      null,
+      2
+    )
+  );
 
   if (lang === 'zh-TW') {
     return `你是一位專業的資安分析師。請根據 MITRE ATT&CK 框架分析以下安全事件。

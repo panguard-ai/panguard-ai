@@ -52,7 +52,9 @@ test.describe('Register Page', () => {
 
     // Should show validation error or alert
     await page.waitForTimeout(1000);
-    const errorIndicator = page.locator('[role="alert"], .text-status-danger, .text-red-500').first();
+    const errorIndicator = page
+      .locator('[role="alert"], .text-status-danger, .text-red-500')
+      .first();
     if (await errorIndicator.isVisible()) {
       await expect(errorIndicator).toBeVisible();
     }

@@ -61,10 +61,7 @@ export class Manager {
   constructor(config: ManagerConfig) {
     this.config = config;
     this.registry = new AgentRegistry(config.maxAgents);
-    this.aggregator = new ThreatAggregator(
-      config.correlationWindowMs,
-      config.threatRetentionMs
-    );
+    this.aggregator = new ThreatAggregator(config.correlationWindowMs, config.threatRetentionMs);
     this.policyEngine = new PolicyEngine();
     this.relay = new DashboardRelay({ requireAuth: !!config.authToken });
 
@@ -109,8 +106,7 @@ export class Manager {
     }, purgeIntervalMs);
 
     logger.info(
-      `Manager started on port ${this.config.port} / ` +
-        `Manager 已啟動於埠 ${this.config.port}`
+      `Manager started on port ${this.config.port} / ` + `Manager 已啟動於埠 ${this.config.port}`
     );
   }
 
@@ -136,9 +132,7 @@ export class Manager {
 
     this.running = false;
 
-    logger.info(
-      `Manager stopped (uptime: ${Date.now() - this.startTime}ms) / Manager 已停止`
-    );
+    logger.info(`Manager stopped (uptime: ${Date.now() - this.startTime}ms) / Manager 已停止`);
   }
 
   /**
@@ -171,9 +165,7 @@ export class Manager {
    * @returns Immutable copy of the registration record
    * @throws Error if max agents exceeded
    */
-  handleRegistration(
-    request: AgentRegistrationRequest
-  ): AgentRegistration {
+  handleRegistration(request: AgentRegistrationRequest): AgentRegistration {
     const registration = this.registry.registerAgent(request);
 
     logger.info(
@@ -191,9 +183,7 @@ export class Manager {
    * @param heartbeat - Heartbeat data from the agent
    * @returns Updated registration, or undefined if agent unknown
    */
-  handleHeartbeat(
-    heartbeat: AgentHeartbeat
-  ): AgentRegistration | undefined {
+  handleHeartbeat(heartbeat: AgentHeartbeat): AgentRegistration | undefined {
     return this.registry.updateHeartbeat(heartbeat);
   }
 
@@ -204,18 +194,14 @@ export class Manager {
    * @param report - Threat report containing one or more events
    * @returns Array of aggregated threats, with correlation data if detected
    */
-  handleThreatReport(
-    report: ThreatReport
-  ): readonly AggregatedThreat[] {
+  handleThreatReport(report: ThreatReport): readonly AggregatedThreat[] {
     const agent = this.registry.getAgent(report.agentId);
     const hostname = agent?.hostname ?? 'unknown';
 
     const aggregated = this.aggregator.ingestReport(report, hostname);
 
     // Log correlation detections
-    const correlated = aggregated.filter(
-      (t) => t.correlatedWith.length > 0
-    );
+    const correlated = aggregated.filter((t) => t.correlatedWith.length > 0);
     if (correlated.length > 0) {
       logger.warn(
         `ALERT: ${correlated.length} cross-agent correlations detected from ${hostname} / ` +
@@ -246,13 +232,8 @@ export class Manager {
    * @param broadcast - Whether to push broadcast to all active agents
    * @returns The created policy
    */
-  async createPolicy(
-    rules: readonly PolicyRule[],
-    broadcast = true
-  ): Promise<PolicyUpdate> {
-    const activeAgentIds = this.registry
-      .getActiveAgents()
-      .map((a) => a.agentId);
+  async createPolicy(rules: readonly PolicyRule[], broadcast = true): Promise<PolicyUpdate> {
+    const activeAgentIds = this.registry.getActiveAgents().map((a) => a.agentId);
 
     const policy = this.policyEngine.createPolicy(rules, activeAgentIds);
 
@@ -275,10 +256,7 @@ export class Manager {
    * @param policy - The policy update to push
    * @returns Push result indicating success or failure
    */
-  async pushPolicyToAgent(
-    agentId: string,
-    policy: PolicyUpdate
-  ): Promise<AgentPushResult> {
+  async pushPolicyToAgent(agentId: string, policy: PolicyUpdate): Promise<AgentPushResult> {
     const agent = this.registry.getAgent(agentId);
     if (!agent) {
       return {
@@ -443,14 +421,11 @@ export class Manager {
    * Called periodically by the stale check timer.
    */
   private checkStaleAgents(): void {
-    const stale = this.registry.getStaleAgents(
-      this.config.heartbeatTimeoutMs
-    );
+    const stale = this.registry.getStaleAgents(this.config.heartbeatTimeoutMs);
 
     if (stale.length > 0) {
       logger.warn(
-        `${stale.length} stale agent(s) detected / ` +
-          `偵測到 ${stale.length} 個過期代理`
+        `${stale.length} stale agent(s) detected / ` + `偵測到 ${stale.length} 個過期代理`
       );
     }
   }
@@ -506,9 +481,7 @@ export class Manager {
    * @param agentId - The agent's unique identifier
    * @returns Array of aggregated threats
    */
-  getThreatsByAgent(
-    agentId: string
-  ): readonly AggregatedThreat[] {
+  getThreatsByAgent(agentId: string): readonly AggregatedThreat[] {
     return this.aggregator.getThreatsByAgent(agentId);
   }
 

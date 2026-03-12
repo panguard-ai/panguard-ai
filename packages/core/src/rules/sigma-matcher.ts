@@ -40,13 +40,17 @@ function safeRegex(pattern: string, flags: string): RegExp | null {
 
   // Reject overly long patterns
   if (pattern.length > MAX_REGEX_LEN) {
-    logger.warn(`Regex pattern too long (${pattern.length} chars), skipping / 正規表達式過長，跳過`);
+    logger.warn(
+      `Regex pattern too long (${pattern.length} chars), skipping / 正規表達式過長，跳過`
+    );
     return null;
   }
 
   // Detect common ReDoS patterns: nested quantifiers like (a+)+, (a*)*
   if (/(\.[*+]|\[[^\]]*\][*+]|\([^)]*[*+][^)]*\))[*+{]/.test(pattern)) {
-    logger.warn(`Potential ReDoS pattern detected, skipping: "${pattern.slice(0, 80)}" / 偵測到潛在 ReDoS 模式，跳過`);
+    logger.warn(
+      `Potential ReDoS pattern detected, skipping: "${pattern.slice(0, 80)}" / 偵測到潛在 ReDoS 模式，跳過`
+    );
     return null;
   }
 

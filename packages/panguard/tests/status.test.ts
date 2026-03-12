@@ -152,7 +152,14 @@ describe('statusCommand', () => {
 
     it('should show modules from config in JSON output', async () => {
       mockReadConfig.mockReturnValue({
-        modules: { guard: true, scan: true, chat: false, trap: false, report: true, dashboard: true },
+        modules: {
+          guard: true,
+          scan: true,
+          chat: false,
+          trap: false,
+          report: true,
+          dashboard: true,
+        },
         guard: { mode: 'learning', learningDays: 7 },
         notifications: { channel: 'telegram', configured: true },
         trap: { enabled: false, services: [] },
@@ -173,7 +180,14 @@ describe('statusCommand', () => {
 
     it('should include AI and notification status in JSON output', async () => {
       mockReadConfig.mockReturnValue({
-        modules: { guard: true, scan: true, chat: true, trap: false, report: true, dashboard: true },
+        modules: {
+          guard: true,
+          scan: true,
+          chat: true,
+          trap: false,
+          report: true,
+          dashboard: true,
+        },
         guard: { mode: 'protection', learningDays: 7 },
         notifications: { channel: 'slack', configured: true },
         trap: { enabled: false, services: [] },

@@ -102,10 +102,10 @@ export async function GET() {
       countYaraDefinitions(join(yaraBase, 'auto-generated'));
 
     const syncState = readJsonSafe<SyncState>(
-      resolve(root, 'packages/threat-cloud/data/threat-intel/sync-state.json'),
+      resolve(root, 'packages/threat-cloud/data/threat-intel/sync-state.json')
     );
     const syncStats = readJsonSafe<SyncStats>(
-      resolve(root, 'packages/threat-cloud/data/threat-intel/sync-stats.json'),
+      resolve(root, 'packages/threat-cloud/data/threat-intel/sync-stats.json')
     );
 
     const sources = syncStats?.perSource
@@ -113,9 +113,7 @@ export async function GET() {
       : 0;
     const validatedRecords = syncStats?.totalRecords ?? 0;
 
-    const meta = readJsonSafe<RulesMeta>(
-      resolve(sigmaBase, 'auto-generated/.rules-meta.json'),
-    );
+    const meta = readJsonSafe<RulesMeta>(resolve(sigmaBase, 'auto-generated/.rules-meta.json'));
 
     const draftSigma = meta?.sigmaByStatus?.['draft'] ?? 0;
     const draftYara = meta?.yaraByStatus?.['draft'] ?? 0;
@@ -148,9 +146,6 @@ export async function GET() {
       validatedRecords,
     });
   } catch {
-    return NextResponse.json(
-      { error: 'Failed to compute rule stats' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to compute rule stats' }, { status: 500 });
   }
 }

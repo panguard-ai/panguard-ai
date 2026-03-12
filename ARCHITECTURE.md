@@ -116,11 +116,13 @@ Event -> [Detect Agent] -> [Analyze Agent] -> [Respond Agent] -> [Report Agent]
 ```
 
 **Learning Mode (first 7 days):**
+
 - Detect Agent collects events and builds a behavioral baseline
 - No auto-responses during learning (alert-only)
 - After baseline established, switches to protection mode
 
 **Protection Mode:**
+
 - Deviations from baseline trigger analysis
 - Confidence > 90%: auto-respond
 - Confidence 70-90%: ask user with evidence
@@ -146,6 +148,7 @@ rules/
 ```
 
 Each rule contains:
+
 - Detection patterns (regex, keyword, behavioral)
 - True positive and true negative test cases
 - Evasion tests (honestly documenting known bypasses)
@@ -178,6 +181,7 @@ Your Machine                    Threat Cloud                   Other Users
 ```
 
 **Privacy guarantees:**
+
 - Only anonymized threat signatures leave your machine
 - Zero raw data, zero telemetry, zero source code
 - TLS 1.3 encrypted transport
@@ -191,19 +195,19 @@ Your Machine                    Threat Cloud                   Other Users
 
 Panguard exposes 11 tools via the Model Context Protocol (MCP):
 
-| Tool                      | Description                                   |
-| ------------------------- | --------------------------------------------- |
-| `panguard_scan`           | System security health check (quick/full)     |
-| `panguard_scan_code`      | SAST scanning for vulnerabilities             |
-| `panguard_guard_start`    | Launch threat monitoring daemon               |
-| `panguard_guard_stop`     | Shutdown monitoring                           |
-| `panguard_status`         | Multi-service status check                    |
-| `panguard_alerts`         | Recent security alerts with severity filter   |
-| `panguard_block_ip`       | Manual IP blocking (1h/24h/permanent)         |
-| `panguard_generate_report`| PDF compliance report generation              |
-| `panguard_init`           | Non-interactive initialization                |
-| `panguard_deploy`         | Full deployment pipeline                      |
-| `panguard_audit_skill`    | AI agent skill security audit                 |
+| Tool                       | Description                                 |
+| -------------------------- | ------------------------------------------- |
+| `panguard_scan`            | System security health check (quick/full)   |
+| `panguard_scan_code`       | SAST scanning for vulnerabilities           |
+| `panguard_guard_start`     | Launch threat monitoring daemon             |
+| `panguard_guard_stop`      | Shutdown monitoring                         |
+| `panguard_status`          | Multi-service status check                  |
+| `panguard_alerts`          | Recent security alerts with severity filter |
+| `panguard_block_ip`        | Manual IP blocking (1h/24h/permanent)       |
+| `panguard_generate_report` | PDF compliance report generation            |
+| `panguard_init`            | Non-interactive initialization              |
+| `panguard_deploy`          | Full deployment pipeline                    |
+| `panguard_audit_skill`     | AI agent skill security audit               |
 
 **Platform auto-detection:** `panguard setup` detects installed AI agent platforms (Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop) and injects MCP configuration automatically.
 
@@ -245,24 +249,24 @@ Vercel deployment. Next.js 14 with ISR. Bilingual (EN + zh-TW).
 
 ## Package Inventory
 
-| Package | npm Name | Version | Maturity | Description |
-| ------- | -------- | ------- | -------- | ----------- |
-| core | @panguard-ai/core | 0.3.3 | GA | Shared foundation: rules, AI, monitor, discovery, i18n |
-| panguard | @panguard-ai/panguard | 0.3.3 | GA | Unified CLI with 22 commands |
-| atr | agent-threat-rules | 0.1.0 | RFC | Open detection standard for AI agent threats |
-| panguard-scan | @panguard-ai/panguard-scan | 0.2.0 | GA | 60-second security scanning |
-| panguard-guard | @panguard-ai/panguard-guard | 0.2.0 | GA | Real-time monitoring, 4-agent pipeline |
-| panguard-chat | @panguard-ai/panguard-chat | 0.2.0 | GA | 6-channel notification system |
-| panguard-trap | @panguard-ai/panguard-trap | 0.2.0 | GA | 8 honeypot service types |
-| panguard-report | @panguard-ai/panguard-report | 0.2.0 | GA | Compliance reports (CMA, ISO 27001, SOC 2) |
-| panguard-mcp | @panguard-ai/panguard-mcp | 0.1.0 | Beta | MCP server with 11 tools |
-| panguard-skill-auditor | @panguard-ai/panguard-skill-auditor | 0.1.1 | Beta | 7-check skill security analysis |
-| panguard-auth | @panguard-ai/panguard-auth | 0.2.0 | GA | Auth, licensing, payment (LemonSqueezy) |
-| manager | @panguard-ai/manager | 0.2.0 | GA | Distributed agent orchestration (500 max) |
-| threat-cloud | @panguard-ai/threat-cloud | 0.2.0 | GA | Collective threat intelligence backend |
-| panguard-web | @panguard-ai/panguard-web | 0.2.0 | GA | Website content engine |
-| security-hardening | @panguard-ai/security-hardening | 0.1.1 | GA | Security policy enforcement |
-| website | @panguard-ai/website | 0.2.0 | GA | Next.js 14 marketing site (39 pages) |
+| Package                | npm Name                            | Version | Maturity | Description                                            |
+| ---------------------- | ----------------------------------- | ------- | -------- | ------------------------------------------------------ |
+| core                   | @panguard-ai/core                   | 0.3.3   | GA       | Shared foundation: rules, AI, monitor, discovery, i18n |
+| panguard               | @panguard-ai/panguard               | 0.3.3   | GA       | Unified CLI with 22 commands                           |
+| atr                    | agent-threat-rules                  | 0.1.0   | RFC      | Open detection standard for AI agent threats           |
+| panguard-scan          | @panguard-ai/panguard-scan          | 0.2.0   | GA       | 60-second security scanning                            |
+| panguard-guard         | @panguard-ai/panguard-guard         | 0.2.0   | GA       | Real-time monitoring, 4-agent pipeline                 |
+| panguard-chat          | @panguard-ai/panguard-chat          | 0.2.0   | GA       | 6-channel notification system                          |
+| panguard-trap          | @panguard-ai/panguard-trap          | 0.2.0   | GA       | 8 honeypot service types                               |
+| panguard-report        | @panguard-ai/panguard-report        | 0.2.0   | GA       | Compliance reports (CMA, ISO 27001, SOC 2)             |
+| panguard-mcp           | @panguard-ai/panguard-mcp           | 0.1.0   | Beta     | MCP server with 11 tools                               |
+| panguard-skill-auditor | @panguard-ai/panguard-skill-auditor | 0.1.1   | Beta     | 7-check skill security analysis                        |
+| panguard-auth          | @panguard-ai/panguard-auth          | 0.2.0   | GA       | Auth, licensing, payment (LemonSqueezy)                |
+| manager                | @panguard-ai/manager                | 0.2.0   | GA       | Distributed agent orchestration (500 max)              |
+| threat-cloud           | @panguard-ai/threat-cloud           | 0.2.0   | GA       | Collective threat intelligence backend                 |
+| panguard-web           | @panguard-ai/panguard-web           | 0.2.0   | GA       | Website content engine                                 |
+| security-hardening     | @panguard-ai/security-hardening     | 0.1.1   | GA       | Security policy enforcement                            |
+| website                | @panguard-ai/website                | 0.2.0   | GA       | Next.js 14 marketing site (39 pages)                   |
 
 **Maturity levels:** GA = Generally Available, Beta = Feature complete but evolving, RFC = Request for Comments (open standard)
 
@@ -270,13 +274,13 @@ Vercel deployment. Next.js 14 with ISR. Bilingual (EN + zh-TW).
 
 ## CI/CD
 
-| Workflow | Trigger | Purpose |
-| -------- | ------- | ------- |
-| ci.yml | push/PR | Lint, format, typecheck, test with coverage |
-| deploy.yml | push main | Deploy website (Vercel) + backend (Docker) |
-| publish.yml | release tag | Publish packages to npm |
-| threat-intel-sync.yml | every 6h | Update threat intelligence feeds |
-| installer-e2e.yml | event | E2E testing for installer |
-| cli-smoke.yml | event | CLI smoke tests |
-| release.yml | manual | Create GitHub releases |
-| uptime.yml | scheduled | Service health monitoring |
+| Workflow              | Trigger     | Purpose                                     |
+| --------------------- | ----------- | ------------------------------------------- |
+| ci.yml                | push/PR     | Lint, format, typecheck, test with coverage |
+| deploy.yml            | push main   | Deploy website (Vercel) + backend (Docker)  |
+| publish.yml           | release tag | Publish packages to npm                     |
+| threat-intel-sync.yml | every 6h    | Update threat intelligence feeds            |
+| installer-e2e.yml     | event       | E2E testing for installer                   |
+| cli-smoke.yml         | event       | CLI smoke tests                             |
+| release.yml           | manual      | Create GitHub releases                      |
+| uptime.yml            | scheduled   | Service health monitoring                   |

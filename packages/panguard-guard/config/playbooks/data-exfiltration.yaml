@@ -1,6 +1,6 @@
 name: data-exfiltration-response
-description: "Respond to suspected data exfiltration"
-descriptionZh: "回應疑似資料外洩"
+description: 'Respond to suspected data exfiltration'
+descriptionZh: '回應疑似資料外洩'
 priority: 120
 trigger:
   pattern: data_exfiltration
@@ -9,7 +9,7 @@ trigger:
 actions:
   - type: block_ip
     params:
-      duration: "24h"
+      duration: '24h'
   - type: isolate_file
   - type: notify
     params:

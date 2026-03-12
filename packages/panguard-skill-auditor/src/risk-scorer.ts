@@ -26,12 +26,18 @@ const SEVERITY_RANK: Record<string, number> = {
  * Calculate risk score (0-100) from findings.
  * Deduplicates by finding ID — keeps the highest severity instance.
  */
-export function calculateRiskScore(findings: AuditFinding[]): { score: number; level: AuditReport['riskLevel'] } {
+export function calculateRiskScore(findings: AuditFinding[]): {
+  score: number;
+  level: AuditReport['riskLevel'];
+} {
   // Deduplicate: keep highest severity per finding ID
   const deduped = new Map<string, AuditFinding>();
   for (const finding of findings) {
     const existing = deduped.get(finding.id);
-    if (!existing || (SEVERITY_RANK[finding.severity] ?? 0) > (SEVERITY_RANK[existing.severity] ?? 0)) {
+    if (
+      !existing ||
+      (SEVERITY_RANK[finding.severity] ?? 0) > (SEVERITY_RANK[existing.severity] ?? 0)
+    ) {
       deduped.set(finding.id, finding);
     }
   }

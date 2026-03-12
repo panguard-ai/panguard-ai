@@ -49,7 +49,9 @@ export async function parseSkillManifest(skillDir: string): Promise<SkillManifes
 
   let parsed: Record<string, unknown>;
   try {
-    parsed = (yaml.load(frontmatterRaw ?? '', { schema: yaml.JSON_SCHEMA }) as Record<string, unknown>) ?? {};
+    parsed =
+      (yaml.load(frontmatterRaw ?? '', { schema: yaml.JSON_SCHEMA }) as Record<string, unknown>) ??
+      {};
   } catch {
     return {
       name: path.basename(skillDir),

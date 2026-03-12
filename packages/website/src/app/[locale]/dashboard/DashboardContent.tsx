@@ -304,24 +304,28 @@ export default function DashboardContent() {
               <div className="space-y-2.5 mb-5">
                 <TierLimitRow
                   label={t('currentPlan.machines')}
-                  value={t(`currentPlan.${TIER_LIMITS[tierKey].machines}` as 'currentPlan.communityMachines')}
+                  value={t(
+                    `currentPlan.${TIER_LIMITS[tierKey].machines}` as 'currentPlan.communityMachines'
+                  )}
                 />
                 <TierLimitRow
                   label={t('currentPlan.scansPerMonth')}
-                  value={t(`currentPlan.${TIER_LIMITS[tierKey].scans}` as 'currentPlan.communityScans')}
+                  value={t(
+                    `currentPlan.${TIER_LIMITS[tierKey].scans}` as 'currentPlan.communityScans'
+                  )}
                 />
                 <TierLimitRow
                   label={t('currentPlan.guardEndpoints')}
-                  value={t(`currentPlan.${TIER_LIMITS[tierKey].guard}` as 'currentPlan.communityGuard')}
+                  value={t(
+                    `currentPlan.${TIER_LIMITS[tierKey].guard}` as 'currentPlan.communityGuard'
+                  )}
                 />
               </div>
             )}
 
             {isCommunity && (
               <div className="pt-3 border-t border-border">
-                <p className="text-xs text-text-tertiary mb-3">
-                  {t('currentPlan.upgradeMessage')}
-                </p>
+                <p className="text-xs text-text-tertiary mb-3">{t('currentPlan.upgradeMessage')}</p>
                 <Link
                   href="/pricing"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-sage text-surface-0 text-sm font-medium hover:bg-brand-sage/90 transition-colors"
@@ -412,9 +416,7 @@ export default function DashboardContent() {
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.4, ease }}
             >
-              <QuickStartGuide
-                onDismiss={handleDismiss}
-              />
+              <QuickStartGuide onDismiss={handleDismiss} />
             </motion.div>
           ) : (
             <motion.div
@@ -476,11 +478,7 @@ export default function DashboardContent() {
 
 /* ── Quick Start Guide Section ── */
 
-function QuickStartGuide({
-  onDismiss,
-}: {
-  onDismiss: () => void;
-}) {
+function QuickStartGuide({ onDismiss }: { onDismiss: () => void }) {
   const t = useTranslations('dashboard');
 
   const steps = [
@@ -528,12 +526,8 @@ function QuickStartGuide({
             <Terminal className="w-5 h-5 text-brand-sage" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-text-primary">
-              {t('onboarding.heading')}
-            </h2>
-            <p className="text-sm text-text-secondary mt-0.5">
-              {t('onboarding.subtitle')}
-            </p>
+            <h2 className="text-lg font-semibold text-text-primary">{t('onboarding.heading')}</h2>
+            <p className="text-sm text-text-secondary mt-0.5">{t('onboarding.subtitle')}</p>
           </div>
         </div>
         <button
@@ -560,9 +554,7 @@ function QuickStartGuide({
                 <div className="w-8 h-8 rounded-full bg-brand-sage/15 border border-brand-sage/30 flex items-center justify-center shrink-0">
                   <span className="text-xs font-bold text-brand-sage">{step.num}</span>
                 </div>
-                {idx < steps.length - 1 && (
-                  <div className="w-px flex-1 bg-border mt-2" />
-                )}
+                {idx < steps.length - 1 && <div className="w-px flex-1 bg-border mt-2" />}
               </div>
 
               <div className="flex-1 min-w-0 pb-2">
@@ -613,10 +605,7 @@ function QuickAction({
   index: number;
 }) {
   return (
-    <motion.div
-      variants={fadeInUp}
-      custom={index}
-    >
+    <motion.div variants={fadeInUp} custom={index}>
       <Link
         href={href as '/docs/getting-started'}
         className="block bg-surface-1 border border-border rounded-xl p-4 hover:border-border-hover transition-colors group h-full"
@@ -631,13 +620,7 @@ function QuickAction({
   );
 }
 
-function CommandBlock({
-  command,
-  copyValue,
-}: {
-  command: string;
-  copyValue?: string;
-}) {
+function CommandBlock({ command, copyValue }: { command: string; copyValue?: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
@@ -688,13 +671,19 @@ function ChecklistItem({
           : 'bg-surface-0 border-border hover:border-border-hover'
       }`}
     >
-      <div className={`shrink-0 transition-colors ${checked ? 'text-brand-sage' : 'text-text-tertiary'}`}>
+      <div
+        className={`shrink-0 transition-colors ${checked ? 'text-brand-sage' : 'text-text-tertiary'}`}
+      >
         {checked ? <CircleCheck className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
       </div>
-      <div className={`shrink-0 transition-colors ${checked ? 'text-brand-sage' : 'text-text-tertiary'}`}>
+      <div
+        className={`shrink-0 transition-colors ${checked ? 'text-brand-sage' : 'text-text-tertiary'}`}
+      >
         {icon}
       </div>
-      <span className={`text-sm transition-colors ${checked ? 'text-brand-sage font-medium' : 'text-text-secondary'}`}>
+      <span
+        className={`text-sm transition-colors ${checked ? 'text-brand-sage font-medium' : 'text-text-secondary'}`}
+      >
         {label}
       </span>
     </button>

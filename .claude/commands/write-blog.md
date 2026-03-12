@@ -3,9 +3,11 @@
 You are writing a blog post for Panguard AI (https://panguard.ai), an AI-powered endpoint security platform.
 
 ## Input
+
 The user will provide a topic or keyword. If no topic is given, suggest 3 topics from the content calendar.
 
 ## Brand Context
+
 - Product: CLI security tool for developers and SMBs
 - Installs in 60 seconds, single command
 - 5 tools: Scan, Guard, Chat, Trap, Report
@@ -33,6 +35,7 @@ The user will provide a topic or keyword. If no topic is given, suggest 3 topics
 5. **Add translations** to both `packages/website/messages/en.json` and `packages/website/messages/zh.json` if needed
 
 ## SEO Checklist
+
 - [ ] Title contains primary keyword
 - [ ] First paragraph contains primary keyword
 - [ ] At least 2 internal links
@@ -41,4 +44,5 @@ The user will provide a topic or keyword. If no topic is given, suggest 3 topics
 - [ ] Schema-friendly structure (lists, definitions, how-to steps)
 
 ## Tone
+
 Professional but approachable. Write for developers and IT admins who are skeptical of security vendor marketing. Use concrete numbers and technical details. No fluff, no emojis.

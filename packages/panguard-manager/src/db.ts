@@ -198,33 +198,23 @@ export class ManagerDB {
           org_id = excluded.org_id
       `),
 
-      getAgent: this.db.prepare(
-        'SELECT * FROM agents WHERE agent_id = ?'
-      ),
+      getAgent: this.db.prepare('SELECT * FROM agents WHERE agent_id = ?'),
 
-      getAllAgents: this.db.prepare(
-        'SELECT * FROM agents ORDER BY registered_at DESC'
-      ),
+      getAllAgents: this.db.prepare('SELECT * FROM agents ORDER BY registered_at DESC'),
 
       getAgentsByStatus: this.db.prepare(
         'SELECT * FROM agents WHERE status = ? ORDER BY last_heartbeat DESC'
       ),
 
-      updateAgentStatus: this.db.prepare(
-        'UPDATE agents SET status = ? WHERE agent_id = ?'
-      ),
+      updateAgentStatus: this.db.prepare('UPDATE agents SET status = ? WHERE agent_id = ?'),
 
       updateHeartbeat: this.db.prepare(
         'UPDATE agents SET last_heartbeat = ?, status = ? WHERE agent_id = ?'
       ),
 
-      deleteAgent: this.db.prepare(
-        'DELETE FROM agents WHERE agent_id = ?'
-      ),
+      deleteAgent: this.db.prepare('DELETE FROM agents WHERE agent_id = ?'),
 
-      getAgentCount: this.db.prepare(
-        'SELECT COUNT(*) as count FROM agents'
-      ),
+      getAgentCount: this.db.prepare('SELECT COUNT(*) as count FROM agents'),
 
       getAgentsByOrg: this.db.prepare(
         'SELECT * FROM agents WHERE org_id = ? ORDER BY registered_at DESC'
@@ -244,13 +234,9 @@ export class ManagerDB {
         'SELECT * FROM threats WHERE received_at >= ? ORDER BY received_at DESC'
       ),
 
-      getThreatCount: this.db.prepare(
-        'SELECT COUNT(*) as count FROM threats'
-      ),
+      getThreatCount: this.db.prepare('SELECT COUNT(*) as count FROM threats'),
 
-      purgeOldThreats: this.db.prepare(
-        'DELETE FROM threats WHERE received_at < ?'
-      ),
+      purgeOldThreats: this.db.prepare('DELETE FROM threats WHERE received_at < ?'),
 
       getThreatsByOrg: this.db.prepare(
         'SELECT * FROM threats WHERE org_id = ? ORDER BY received_at DESC'
@@ -266,13 +252,9 @@ export class ManagerDB {
         'SELECT * FROM policies WHERE active = 1 ORDER BY version DESC LIMIT 1'
       ),
 
-      getPolicyHistory: this.db.prepare(
-        'SELECT * FROM policies ORDER BY version DESC'
-      ),
+      getPolicyHistory: this.db.prepare('SELECT * FROM policies ORDER BY version DESC'),
 
-      deactivateAllPolicies: this.db.prepare(
-        'UPDATE policies SET active = 0'
-      ),
+      deactivateAllPolicies: this.db.prepare('UPDATE policies SET active = 0'),
 
       getActivePolicyForOrg: this.db.prepare(
         'SELECT * FROM policies WHERE active = 1 AND org_id = ? ORDER BY version DESC LIMIT 1'

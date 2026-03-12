@@ -84,7 +84,9 @@ export function serveCommand(): Command {
         warnings.push('SENTRY_DSN not set — error tracking disabled');
       }
       if (!process.env['MANAGER_AUTH_TOKEN']) {
-        warnings.push('MANAGER_AUTH_TOKEN not set — Manager API allows unauthenticated access (OK for dev)');
+        warnings.push(
+          'MANAGER_AUTH_TOKEN not set — Manager API allows unauthenticated access (OK for dev)'
+        );
       }
 
       if (errors.length > 0) {
@@ -241,15 +243,20 @@ export function serveCommand(): Command {
         console.log('');
 
         // Start Manager server after auth server is listening / 在 Auth 伺服器啟動後啟動 Manager 伺服器
-        managerServer.start().then(() => {
-          console.log(`  ${c.safe('Manager server started')} on ${c.bold(`http://${host}:${managerPort}`)}`);
-          console.log('');
-        }).catch((err: unknown) => {
-          const message = err instanceof Error ? err.message : String(err);
-          console.log(`  ${c.caution('Manager server failed to start:')} ${message}`);
-          console.log(`  ${c.dim('Auth server continues running without Manager')}`);
-          console.log('');
-        });
+        managerServer
+          .start()
+          .then(() => {
+            console.log(
+              `  ${c.safe('Manager server started')} on ${c.bold(`http://${host}:${managerPort}`)}`
+            );
+            console.log('');
+          })
+          .catch((err: unknown) => {
+            const message = err instanceof Error ? err.message : String(err);
+            console.log(`  ${c.caution('Manager server failed to start:')} ${message}`);
+            console.log(`  ${c.dim('Auth server continues running without Manager')}`);
+            console.log('');
+          });
       });
 
       // Subscription lifecycle: check expired plans hourly

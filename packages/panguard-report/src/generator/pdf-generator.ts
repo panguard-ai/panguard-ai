@@ -182,10 +182,9 @@ export async function registerCjkFont(doc: PDFKit.PDFDocument): Promise<boolean>
     }
   }
 
-  logger.warn(
-    'No CJK font found on this system. Chinese characters may not render correctly.',
-    { platform }
-  );
+  logger.warn('No CJK font found on this system. Chinese characters may not render correctly.', {
+    platform,
+  });
   return false;
 }
 
@@ -258,11 +257,7 @@ function selectFont(hasCjk: boolean, style: 'heading' | 'body' | 'mono'): string
  * If not, add a new page and return the new Y position.
  * 檢查目前頁面是否有足夠的垂直空間，如果不夠則新增頁面並回傳新的 Y 位置。
  */
-function ensureSpace(
-  doc: PDFKit.PDFDocument,
-  currentY: number,
-  requiredHeight: number
-): number {
+function ensureSpace(doc: PDFKit.PDFDocument, currentY: number, requiredHeight: number): number {
   const maxY = LAYOUT.pageHeight - LAYOUT.margin - LAYOUT.footerHeight - 10;
   if (currentY + requiredHeight > maxY) {
     doc.addPage();
@@ -418,12 +413,9 @@ function renderExecutiveSummary(
   const scoreLabel = isZh
     ? `整體合規分數: ${es.overallScore}%`
     : `Overall Compliance Score: ${es.overallScore}%`;
-  const scoreColor = es.overallScore >= 80 ? COLORS.pass : es.overallScore >= 50 ? COLORS.medium : COLORS.fail;
-  doc
-    .font(headingFont)
-    .fontSize(16)
-    .fillColor(scoreColor)
-    .text(scoreLabel, LAYOUT.margin, y);
+  const scoreColor =
+    es.overallScore >= 80 ? COLORS.pass : es.overallScore >= 50 ? COLORS.medium : COLORS.fail;
+  doc.font(headingFont).fontSize(16).fillColor(scoreColor).text(scoreLabel, LAYOUT.margin, y);
   y += 30;
 
   // Controls summary
@@ -481,11 +473,7 @@ function renderExecutiveSummary(
   // Key achievements
   if (es.keyAchievements.length > 0) {
     const achieveTitle = isZh ? '主要成果:' : 'Key Achievements:';
-    doc
-      .font(headingFont)
-      .fontSize(12)
-      .fillColor(COLORS.pass)
-      .text(achieveTitle, LAYOUT.margin, y);
+    doc.font(headingFont).fontSize(12).fillColor(COLORS.pass).text(achieveTitle, LAYOUT.margin, y);
     y += 18;
 
     for (const achievement of es.keyAchievements) {
@@ -567,19 +555,15 @@ function renderFindingsTable(
     const badgeColor = severityColor(finding.severity);
     const badgeWidth = 60;
     const badgeHeight = 16;
-    doc
-      .roundedRect(LAYOUT.margin, y, badgeWidth, badgeHeight, 3)
-      .fill(badgeColor);
+    doc.roundedRect(LAYOUT.margin, y, badgeWidth, badgeHeight, 3).fill(badgeColor);
     doc
       .font(FONTS.body)
       .fontSize(8)
       .fillColor(COLORS.white)
-      .text(
-        getSeverityLabel(finding.severity, lang).toUpperCase(),
-        LAYOUT.margin + 2,
-        y + 3,
-        { width: badgeWidth - 4, align: 'center' }
-      );
+      .text(getSeverityLabel(finding.severity, lang).toUpperCase(), LAYOUT.margin + 2, y + 3, {
+        width: badgeWidth - 4,
+        align: 'center',
+      });
 
     // Finding ID
     doc
@@ -719,9 +703,7 @@ function renderComplianceMatrix(
     // Status badge
     const sColor = statusColor(control.status);
     const statusLabel = getStatusLabel(control.status, lang);
-    doc
-      .roundedRect(cellX + 10, y + 3, 50, 14, 2)
-      .fill(sColor);
+    doc.roundedRect(cellX + 10, y + 3, 50, 14, 2).fill(sColor);
     doc
       .font(FONTS.body)
       .fontSize(7)
@@ -917,9 +899,7 @@ export async function generatePDFReport(options: PDFReportOptions): Promise<stri
         outputPath: options.outputPath,
         error: err.message,
       });
-      reject(new Error(
-        `Failed to write PDF report to ${options.outputPath}: ${err.message}`
-      ));
+      reject(new Error(`Failed to write PDF report to ${options.outputPath}: ${err.message}`));
     });
   });
 }

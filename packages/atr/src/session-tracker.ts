@@ -145,7 +145,8 @@ export class SessionTracker {
     if (!state) return undefined;
 
     const oldest = state.events.length > 0 ? state.events[0]!.recordedAt : undefined;
-    const newest = state.events.length > 0 ? state.events[state.events.length - 1]!.recordedAt : undefined;
+    const newest =
+      state.events.length > 0 ? state.events[state.events.length - 1]!.recordedAt : undefined;
 
     return Object.freeze({
       sessionId,

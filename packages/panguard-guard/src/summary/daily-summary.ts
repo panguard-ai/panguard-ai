@@ -11,12 +11,7 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import {
-  c,
-  symbols,
-  divider,
-  createLogger,
-} from '@panguard-ai/core';
+import { c, symbols, divider, createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-guard:daily-summary');
 
@@ -165,7 +160,9 @@ export class DailySummaryCollector {
       writeFileSync(this.persistPath, JSON.stringify(history, null, 2), 'utf-8');
       logger.info(`Daily summary persisted to ${this.persistPath}`);
     } catch (err) {
-      logger.warn(`Failed to persist daily summary: ${err instanceof Error ? err.message : String(err)}`);
+      logger.warn(
+        `Failed to persist daily summary: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
   }
 
@@ -193,14 +190,21 @@ export class DailySummaryCollector {
     const start = new Date(data.periodStart);
     const end = new Date(data.periodEnd);
     const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const endStr = end.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
     console.log('');
     console.log(divider(`Daily Summary: ${startStr} - ${endStr}`));
     console.log('');
 
     // Events
-    console.log(`  ${c.bold('Events Processed:')}  ${c.sage(data.eventsProcessed.toLocaleString())}`);
+    console.log(
+      `  ${c.bold('Events Processed:')}  ${c.sage(data.eventsProcessed.toLocaleString())}`
+    );
 
     // Threats
     if (data.threatsDetected > 0) {

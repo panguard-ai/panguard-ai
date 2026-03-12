@@ -11,7 +11,13 @@
         "name": "Prompt Injection",
         "current_state": "Well-studied but constantly evolving. Direct injection is mostly caught by regex rules. Indirect injection through tool responses is the main active threat. Semantic and multi-turn injection are emerging frontiers.",
         "evolution_trajectory": "Moving toward context-aware semantic injection that adapts to the target model's behavior. Expect injection techniques that exploit model-specific tokenization quirks.",
-        "existing_rules": ["ATR-2026-001", "ATR-2026-002", "ATR-2026-003", "ATR-2026-004", "ATR-2026-005"],
+        "existing_rules": [
+          "ATR-2026-001",
+          "ATR-2026-002",
+          "ATR-2026-003",
+          "ATR-2026-004",
+          "ATR-2026-005"
+        ],
         "gaps": [
           "Semantic injection that doesn't use obvious keywords",
           "Injection through image/audio modalities in multimodal agents",
@@ -39,7 +45,15 @@
         "name": "Skill & Supply Chain Compromise",
         "current_state": "The fastest-growing attack category. Typosquatting attacks on MCP skill registries are common. Behavioral drift detection (fingerprinting) is newly deployed but attackers are adapting.",
         "evolution_trajectory": "Attackers will develop techniques to evade behavioral fingerprinting: gradual capability introduction, capability aliasing (same function different name), and polymorphic skills that change behavior based on detection state.",
-        "existing_rules": ["ATR-2026-060", "ATR-2026-061", "ATR-2026-062", "ATR-2026-063", "ATR-2026-064", "ATR-2026-065", "ATR-2026-066"],
+        "existing_rules": [
+          "ATR-2026-060",
+          "ATR-2026-061",
+          "ATR-2026-062",
+          "ATR-2026-063",
+          "ATR-2026-064",
+          "ATR-2026-065",
+          "ATR-2026-066"
+        ],
         "gaps": [
           "Skills that detect they are being fingerprinted and behave normally",
           "Legitimate skill acquisitions/takeovers (package maintainer handoffs)",
@@ -69,7 +83,13 @@
         "name": "Multi-Agent Manipulation",
         "current_state": "Cross-agent attacks are detected for obvious impersonation. But subtle manipulation of agent goals and priorities is harder to catch.",
         "evolution_trajectory": "As A2A (Agent-to-Agent) protocol adoption grows, expect attacks that exploit trust federation, delegation chains, and consensus mechanisms in multi-agent systems.",
-        "existing_rules": ["ATR-2026-030", "ATR-2026-032", "ATR-2026-074", "ATR-2026-076", "ATR-2026-077"],
+        "existing_rules": [
+          "ATR-2026-030",
+          "ATR-2026-032",
+          "ATR-2026-074",
+          "ATR-2026-076",
+          "ATR-2026-077"
+        ],
         "gaps": [
           "Subtle goal hijacking that doesn't change instructions but shifts priorities",
           "Sybil attacks on community consensus voting systems",
@@ -134,9 +154,31 @@
 
   "atr_rule_schema": {
     "format": "YAML",
-    "required_fields": ["title", "id", "status", "description", "author", "date", "severity", "tags", "agent_source", "detection", "response"],
+    "required_fields": [
+      "title",
+      "id",
+      "status",
+      "description",
+      "author",
+      "date",
+      "severity",
+      "tags",
+      "agent_source",
+      "detection",
+      "response"
+    ],
     "id_format": "ATR-YYYY-NNN",
-    "categories": ["prompt-injection", "tool-poisoning", "context-exfiltration", "agent-manipulation", "privilege-escalation", "excessive-autonomy", "data-poisoning", "model-abuse", "skill-compromise"],
+    "categories": [
+      "prompt-injection",
+      "tool-poisoning",
+      "context-exfiltration",
+      "agent-manipulation",
+      "privilege-escalation",
+      "excessive-autonomy",
+      "data-poisoning",
+      "model-abuse",
+      "skill-compromise"
+    ],
     "severity_levels": ["critical", "high", "medium", "low", "informational"],
     "detection_fields": {
       "llm_io": ["user_input", "agent_output"],
@@ -146,7 +188,18 @@
       "agent_behavior": ["metric_*"],
       "skill_lifecycle": ["skill_name", "skill_version", "capability_*"]
     },
-    "response_actions": ["block_input", "block_output", "block_tool", "quarantine_session", "reset_context", "alert", "snapshot", "escalate", "reduce_permissions", "kill_agent"]
+    "response_actions": [
+      "block_input",
+      "block_output",
+      "block_tool",
+      "quarantine_session",
+      "reset_context",
+      "alert",
+      "snapshot",
+      "escalate",
+      "reduce_permissions",
+      "kill_agent"
+    ]
   },
 
   "real_world_incidents": [
@@ -238,7 +291,9 @@
         "layer": 1,
         "name": "Manifest Check",
         "what_it_checks": "SKILL.md structure: name, description, license, version, instruction length",
-        "known_bypasses": ["Filling all fields with legitimate-looking content while instructions are malicious"]
+        "known_bypasses": [
+          "Filling all fields with legitimate-looking content while instructions are malicious"
+        ]
       },
       {
         "layer": 2,

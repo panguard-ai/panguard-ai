@@ -205,25 +205,27 @@ The tiers are additive. A production deployment runs all three, with Layer 1 han
 An independent evaluation using MiroFish swarm intelligence simulation (14 AI agents, 40 rounds, Claude Sonnet 4) predicted ATR's baseline success rate at **30-40%** if limited to static pattern matching alone. Key findings:
 
 ### Predicted Failure Modes
+
 - **Evasion velocity exceeds rule velocity.** Attackers develop new encoding, semantic paraphrasing, and behavioral drift techniques faster than rules can be written.
 - **Multi-platform divergence.** Enterprise, startup, and open-source deployments have fundamentally different threat profiles; a one-size-fits-all rule set under-protects all three.
 - **LLM architecture gaps.** Different providers (Anthropic, OpenAI, open-source) expose different attack surfaces; rules targeting one provider may miss attacks on another.
 
 ### Predicted Success Factors
+
 - **Three-layer detection architecture.** Layer 1 (regex) + Layer 2 (behavioral fingerprinting) + Layer 3 (AI semantic) raises predicted success rate to **70-80%**.
 - **Adaptive whitelist system.** Auto-promote stable skills, auto-revoke on behavioral drift. Reduces false positive burden by 60%.
 - **Community contribution velocity.** Three contribution paths (manual, MiroFish-predicted, detection-driven) increase rule coverage growth rate 3-5x vs. manual-only.
 
 ### Architecture Response
 
-| Predicted Gap | ATR Response | Status |
-|---------------|-------------|--------|
-| Static rules insufficient | Layer 3 SemanticModule (LLM-as-judge) | v0.2 shipped |
-| Rules lag behind attacks | MiroFish predictive pipeline auto-generates rules from simulated future attacks | v0.2 shipped |
-| Behavioral evasion | SkillFingerprintStore with drift detection | v0.1 shipped |
-| Multi-platform gap | agent_source.framework[] and provider[] fields for platform-specific rules | v0.1 shipped |
-| Community bottleneck | MCP server + 3 contribution paths + GitHub Actions quality gate | v0.2 shipped |
-| False positive burden | Skill whitelist with auto-promote/revoke | v0.2 shipped |
+| Predicted Gap             | ATR Response                                                                    | Status       |
+| ------------------------- | ------------------------------------------------------------------------------- | ------------ |
+| Static rules insufficient | Layer 3 SemanticModule (LLM-as-judge)                                           | v0.2 shipped |
+| Rules lag behind attacks  | MiroFish predictive pipeline auto-generates rules from simulated future attacks | v0.2 shipped |
+| Behavioral evasion        | SkillFingerprintStore with drift detection                                      | v0.1 shipped |
+| Multi-platform gap        | agent_source.framework[] and provider[] fields for platform-specific rules      | v0.1 shipped |
+| Community bottleneck      | MCP server + 3 contribution paths + GitHub Actions quality gate                 | v0.2 shipped |
+| False positive burden     | Skill whitelist with auto-promote/revoke                                        | v0.2 shipped |
 
 ### Methodology
 

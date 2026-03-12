@@ -141,19 +141,13 @@ export class DashboardRelay extends EventEmitter {
   // ---------------------------------------------------------------------------
 
   /** Handle agent WebSocket upgrade / 處理 agent WebSocket 升級 */
-  private handleAgentUpgrade(
-    req: IncomingMessage,
-    socket: Socket,
-    agentId: string
-  ): void {
+  private handleAgentUpgrade(req: IncomingMessage, socket: Socket, agentId: string): void {
     // Validate auth if required / 若需要則驗證認證
     if (this.config.requireAuth) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
       if (!token) {
-        logger.warn(
-          `Agent relay auth failed for ${agentId} / Agent relay 認證失敗`
-        );
+        logger.warn(`Agent relay auth failed for ${agentId} / Agent relay 認證失敗`);
         socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
         socket.destroy();
         return;
@@ -203,9 +197,7 @@ export class DashboardRelay extends EventEmitter {
     });
 
     socket.on('error', (err: Error) => {
-      logger.warn(
-        `Agent ${agentId} relay socket error: ${err.message} / Agent relay 連線錯誤`
-      );
+      logger.warn(`Agent ${agentId} relay socket error: ${err.message} / Agent relay 連線錯誤`);
       this.handleAgentDisconnect(agentId, socket);
     });
   }
@@ -258,10 +250,7 @@ export class DashboardRelay extends EventEmitter {
     this.agentConnections.delete(agentId);
     this.emit('agent:disconnected', agentId);
 
-    logger.info(
-      `Agent ${agentId} disconnected from relay / ` +
-        `Agent ${agentId} 已從 relay 斷線`
-    );
+    logger.info(`Agent ${agentId} disconnected from relay / ` + `Agent ${agentId} 已從 relay 斷線`);
 
     // Notify all connected clients that the agent is gone
     // 通知所有已連接的客戶端 agent 已離線
@@ -288,16 +277,11 @@ export class DashboardRelay extends EventEmitter {
   // ---------------------------------------------------------------------------
 
   /** Handle client WebSocket upgrade / 處理客戶端 WebSocket 升級 */
-  private handleClientUpgrade(
-    req: IncomingMessage,
-    socket: Socket,
-    agentId: string
-  ): void {
+  private handleClientUpgrade(req: IncomingMessage, socket: Socket, agentId: string): void {
     // Check if agent exists / 檢查 agent 是否存在
     if (!this.agentConnections.has(agentId)) {
       logger.warn(
-        `Client tried to view non-connected agent ${agentId} / ` +
-          `客戶端嘗試查看未連接的 agent`
+        `Client tried to view non-connected agent ${agentId} / ` + `客戶端嘗試查看未連接的 agent`
       );
       socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
       socket.destroy();

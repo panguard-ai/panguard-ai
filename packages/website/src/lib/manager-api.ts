@@ -60,9 +60,7 @@ export async function fetchDashboardStatus(): Promise<ManagerStatus | null> {
  * Create an SSE connection to the manager event stream.
  * Returns a cleanup function.
  */
-export function connectManagerSSE(
-  onEvent: (type: string, data: unknown) => void
-): () => void {
+export function connectManagerSSE(onEvent: (type: string, data: unknown) => void): () => void {
   let es: EventSource | null = null;
 
   try {

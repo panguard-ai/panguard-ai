@@ -187,7 +187,8 @@ export class ThreatIntelFeedManager {
     const now = Date.now();
     const lastSuccess = this.lastSuccessfulUpdate.get(source);
     const staleThreshold = this.config.updateIntervalMs * this.config.staleThresholdMultiplier;
-    const degradedThreshold = this.config.updateIntervalMs * this.config.degradedThresholdMultiplier;
+    const degradedThreshold =
+      this.config.updateIntervalMs * this.config.degradedThresholdMultiplier;
 
     const timeSinceUpdate = lastSuccess ? now - lastSuccess : Infinity;
     const stale = timeSinceUpdate > staleThreshold;
@@ -302,9 +303,7 @@ export class ThreatIntelFeedManager {
     }
 
     if (added > 0) {
-      logger.info(
-        `Added ${added} external domains to threat intel / 已加入 ${added} 個外部網域`
-      );
+      logger.info(`Added ${added} external domains to threat intel / 已加入 ${added} 個外部網域`);
     }
     return added;
   }

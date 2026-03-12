@@ -147,7 +147,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                       };
                       if (meData.ok && meData.data?.user) {
                         const { email, name, tier } = meData.data.user;
-                        const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+                        const expires = new Date(
+                          Date.now() + 30 * 24 * 60 * 60 * 1000
+                        ).toISOString();
                         const cbParams = new URLSearchParams({
                           token: data.data.token,
                           email,

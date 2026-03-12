@@ -27,8 +27,7 @@ vi.mock('node:child_process', () => ({
 
 // Mock createLogger
 vi.mock('@panguard-ai/core', async () => {
-  const actual =
-    await vi.importActual<Record<string, unknown>>('@panguard-ai/core');
+  const actual = await vi.importActual<Record<string, unknown>>('@panguard-ai/core');
   return {
     ...actual,
     createLogger: () => ({
@@ -86,11 +85,14 @@ describe('RespondAgent chaos scenarios', () => {
 
   it('should handle firewall command failure gracefully', async () => {
     const mockedExecFile = vi.mocked(execFile);
-    mockedExecFile.mockImplementation(
-      ((_cmd: string, _args: string[], _opts: unknown, cb: (err: Error | null) => void) => {
-        cb(new Error('iptables: command not found'));
-      }) as typeof execFile
-    );
+    mockedExecFile.mockImplementation(((
+      _cmd: string,
+      _args: string[],
+      _opts: unknown,
+      cb: (err: Error | null) => void
+    ) => {
+      cb(new Error('iptables: command not found'));
+    }) as typeof execFile);
 
     const verdict = makeVerdict(90, 'block_ip', '10.0.0.1');
     const result = await agent.respond(verdict);
@@ -137,11 +139,14 @@ describe('RespondAgent chaos scenarios', () => {
 
   it('should recover from circuit breaker after cooldown', async () => {
     const mockedExecFile = vi.mocked(execFile);
-    mockedExecFile.mockImplementation(
-      ((_cmd: string, _args: string[], _opts: unknown, cb: (err: Error | null) => void) => {
-        cb(new Error('fail'));
-      }) as typeof execFile
-    );
+    mockedExecFile.mockImplementation(((
+      _cmd: string,
+      _args: string[],
+      _opts: unknown,
+      cb: (err: Error | null) => void
+    ) => {
+      cb(new Error('fail'));
+    }) as typeof execFile);
 
     // Trip circuit breaker with 5 consecutive failures
     for (let i = 0; i < 5; i++) {
@@ -159,11 +164,14 @@ describe('RespondAgent chaos scenarios', () => {
 
   it('should process log_only actions even when circuit breaker is active', async () => {
     const mockedExecFile = vi.mocked(execFile);
-    mockedExecFile.mockImplementation(
-      ((_cmd: string, _args: string[], _opts: unknown, cb: (err: Error | null) => void) => {
-        cb(new Error('fail'));
-      }) as typeof execFile
-    );
+    mockedExecFile.mockImplementation(((
+      _cmd: string,
+      _args: string[],
+      _opts: unknown,
+      cb: (err: Error | null) => void
+    ) => {
+      cb(new Error('fail'));
+    }) as typeof execFile);
 
     // Trip circuit breaker
     for (let i = 0; i < 5; i++) {

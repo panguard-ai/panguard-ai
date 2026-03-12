@@ -201,7 +201,9 @@ export function header(subtitle: string = '', version?: string): string {
   const ver = version ? `  ${c.dim(`v${version}`)}` : '';
   const lines: string[] = [];
   if (isColorSupported()) {
-    lines.push(`  ${BOLD}${palette.cream}PANGUARD ${palette.sage}[▣]${palette.cream} AI${RESET}${ver}`);
+    lines.push(
+      `  ${BOLD}${palette.cream}PANGUARD ${palette.sage}[▣]${palette.cream} AI${RESET}${ver}`
+    );
   } else {
     lines.push(`  PANGUARD [#] AI${ver}`);
   }

@@ -39,12 +39,8 @@ export default function ThreatCards() {
                 <div className="flex items-start gap-3">
                   <Icon className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-sm font-semibold text-red-300">
-                      {t(`items.${i}.label`)}
-                    </p>
-                    <p className="text-xs text-red-400/70 mt-1">
-                      {t(`items.${i}.detail`)}
-                    </p>
+                    <p className="text-sm font-semibold text-red-300">{t(`items.${i}.label`)}</p>
+                    <p className="text-xs text-red-400/70 mt-1">{t(`items.${i}.detail`)}</p>
                   </div>
                 </div>
               </motion.div>

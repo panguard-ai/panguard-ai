@@ -108,7 +108,7 @@ export async function executeBlockIP(args: Record<string, unknown>) {
             note: 'Ensure Panguard Guard is running for the block to take effect.',
           },
           null,
-          2,
+          2
         ),
       },
     ],
@@ -144,7 +144,7 @@ export async function executeGenerateReport(args: Record<string, unknown>) {
               message: `PDF report generated at ${path.resolve(output)}`,
             },
             null,
-            2,
+            2
           ),
         },
       ],
@@ -208,7 +208,7 @@ export async function executeInit(args: Record<string, unknown>) {
             message: `Panguard initialized at ${dataDir}. Use panguard_deploy to start all services.`,
           },
           null,
-          2,
+          2
         ),
       },
     ],
@@ -267,7 +267,7 @@ export async function executeDeploy(args: Record<string, unknown>) {
       await generatePdfReport(scanResult, reportPath, lang);
     } catch (err: unknown) {
       logger.warn(
-        'Report generation failed: ' + (err instanceof Error ? err.message : String(err)),
+        'Report generation failed: ' + (err instanceof Error ? err.message : String(err))
       );
       reportPath = null;
     }
@@ -314,7 +314,7 @@ export async function executeDeploy(args: Record<string, unknown>) {
             ],
           },
           null,
-          2,
+          2
         ),
       },
     ],

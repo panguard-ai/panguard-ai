@@ -40,7 +40,12 @@ export const MOCK_PRO_USER = {
   planExpiresAt: '2027-02-01T00:00:00Z',
 } as const;
 
-export const MOCK_USAGE: readonly { resource: string; current: number; limit: number; percentage: number }[] = [
+export const MOCK_USAGE: readonly {
+  resource: string;
+  current: number;
+  limit: number;
+  percentage: number;
+}[] = [
   { resource: 'machines', current: 1, limit: 3, percentage: 33 },
   { resource: 'scans', current: 12, limit: 50, percentage: 24 },
   { resource: 'guard_endpoints', current: 1, limit: 3, percentage: 33 },

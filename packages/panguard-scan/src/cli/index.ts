@@ -43,9 +43,7 @@ program
 // ---------------------------------------------------------------------------
 program
   .command('code')
-  .description(
-    'Scan source code for security vulnerabilities (SAST) / 掃描原始碼安全漏洞'
-  )
+  .description('Scan source code for security vulnerabilities (SAST) / 掃描原始碼安全漏洞')
   .option('--dir <directory>', 'Source code directory to scan / 要掃描的原始碼目錄', '.')
   .option('--lang <language>', 'Language: en or zh-TW / 語言', 'en')
   .option('--json', 'Output pure JSON (for AI agents) / 輸出純 JSON', false)
@@ -68,9 +66,7 @@ program
 
       if (!options.json) {
         setLogLevel('silent');
-        console.error(
-          `Scanning ${path.resolve(options.dir)} for security issues...`
-        );
+        console.error(`Scanning ${path.resolve(options.dir)} for security issues...`);
       } else {
         setLogLevel('silent');
       }
@@ -143,9 +139,7 @@ program
       // 處理 --fail-on 選項
       if (options.failOn) {
         const failSeverities = getFailSeverities(options.failOn);
-        const hasFailingFindings = allFindings.some((f) =>
-          failSeverities.includes(f.severity)
-        );
+        const hasFailingFindings = allFindings.some((f) => failSeverities.includes(f.severity));
         if (hasFailingFindings) {
           process.exit(1);
         }

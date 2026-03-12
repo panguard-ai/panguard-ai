@@ -22,10 +22,7 @@ const TEST_CONFIG: ManagerConfig = {
   threatRetentionMs: 86_400_000,
 };
 
-function makeRegistration(
-  hostname: string,
-  endpoint?: string
-): AgentRegistrationRequest {
+function makeRegistration(hostname: string, endpoint?: string): AgentRegistrationRequest {
   return {
     hostname,
     endpoint: endpoint ?? `http://${hostname}:8080`,
@@ -107,9 +104,7 @@ describe('Policy Push', () => {
       expect(result.success).toBe(true);
       expect(result.agentId).toBe(reg.agentId);
       expect(fetchCalls).toHaveLength(1);
-      expect(fetchCalls[0]!.url).toBe(
-        'http://192.168.1.10:8080/api/policy/push'
-      );
+      expect(fetchCalls[0]!.url).toBe('http://192.168.1.10:8080/api/policy/push');
       expect(fetchCalls[0]!.init.method).toBe('POST');
     });
 
@@ -154,9 +149,7 @@ describe('Policy Push', () => {
       const noAuthManager = new Manager(noAuthConfig);
       noAuthManager.start();
 
-      const reg = noAuthManager.handleRegistration(
-        makeRegistration('server-01')
-      );
+      const reg = noAuthManager.handleRegistration(makeRegistration('server-01'));
       const policy = makePolicy();
 
       let capturedHeaders: Record<string, string> = {};
@@ -186,8 +179,7 @@ describe('Policy Push', () => {
       const reg = manager.handleRegistration(makeRegistration('server-01'));
       const policy = makePolicy();
 
-      globalThis.fetch = async () =>
-        new Response('Internal Server Error', { status: 500 });
+      globalThis.fetch = async () => new Response('Internal Server Error', { status: 500 });
 
       const result = await manager.pushPolicyToAgent(reg.agentId, policy);
 
@@ -253,15 +245,9 @@ describe('Policy Push', () => {
 
   describe('broadcastPolicy', () => {
     it('should push policy to all active agents', async () => {
-      manager.handleRegistration(
-        makeRegistration('server-01', 'http://server-01:8080')
-      );
-      manager.handleRegistration(
-        makeRegistration('server-02', 'http://server-02:8080')
-      );
-      manager.handleRegistration(
-        makeRegistration('server-03', 'http://server-03:8080')
-      );
+      manager.handleRegistration(makeRegistration('server-01', 'http://server-01:8080'));
+      manager.handleRegistration(makeRegistration('server-02', 'http://server-02:8080'));
+      manager.handleRegistration(makeRegistration('server-03', 'http://server-03:8080'));
 
       const fetchUrls: string[] = [];
       globalThis.fetch = async (input: RequestInfo | URL) => {
@@ -286,9 +272,7 @@ describe('Policy Push', () => {
       const reg2 = manager.handleRegistration(
         makeRegistration('server-02', 'http://server-02:8080')
       );
-      manager.handleRegistration(
-        makeRegistration('server-03', 'http://server-03:8080')
-      );
+      manager.handleRegistration(makeRegistration('server-03', 'http://server-03:8080'));
 
       const fetchUrls: string[] = [];
       globalThis.fetch = async (input: RequestInfo | URL) => {
@@ -297,10 +281,7 @@ describe('Policy Push', () => {
       };
 
       const policy = makePolicy();
-      const result = await manager.broadcastPolicy(policy, [
-        reg1.agentId,
-        reg2.agentId,
-      ]);
+      const result = await manager.broadcastPolicy(policy, [reg1.agentId, reg2.agentId]);
 
       expect(result.targetAgents).toHaveLength(2);
       expect(fetchUrls).toHaveLength(2);
@@ -332,12 +313,8 @@ describe('Policy Push', () => {
       expect(result.failureCount).toBe(1);
       expect(result.agentResults).toHaveLength(2);
 
-      const successResult = result.agentResults!.find(
-        (r) => r.agentId === reg1.agentId
-      );
-      const failResult = result.agentResults!.find(
-        (r) => r.agentId === reg2.agentId
-      );
+      const successResult = result.agentResults!.find((r) => r.agentId === reg1.agentId);
+      const failResult = result.agentResults!.find((r) => r.agentId === reg2.agentId);
 
       expect(successResult!.success).toBe(true);
       expect(failResult!.success).toBe(false);
@@ -347,8 +324,7 @@ describe('Policy Push', () => {
     it('should queue result to broadcastQueue', async () => {
       manager.handleRegistration(makeRegistration('server-01'));
 
-      globalThis.fetch = async () =>
-        new Response('{"ok":true}', { status: 200 });
+      globalThis.fetch = async () => new Response('{"ok":true}', { status: 200 });
 
       const policy = makePolicy();
       await manager.broadcastPolicy(policy);
@@ -391,15 +367,9 @@ describe('Policy Push', () => {
     });
 
     it('should handle mixed success and failure across agents', async () => {
-      manager.handleRegistration(
-        makeRegistration('server-01', 'http://server-01:8080')
-      );
-      manager.handleRegistration(
-        makeRegistration('server-02', 'http://server-02:8080')
-      );
-      manager.handleRegistration(
-        makeRegistration('server-03', 'http://server-03:8080')
-      );
+      manager.handleRegistration(makeRegistration('server-01', 'http://server-01:8080'));
+      manager.handleRegistration(makeRegistration('server-02', 'http://server-02:8080'));
+      manager.handleRegistration(makeRegistration('server-03', 'http://server-03:8080'));
 
       // server-01 OK, server-02 fails, server-03 OK
       globalThis.fetch = async (input: RequestInfo | URL) => {

@@ -12,9 +12,18 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { SecurityEvent } from '@panguard-ai/core';
-import type { LLMProvider, AnalysisResult, ThreatClassification, TokenUsage } from '@panguard-ai/core';
+import type {
+  LLMProvider,
+  AnalysisResult,
+  ThreatClassification,
+  TokenUsage,
+} from '@panguard-ai/core';
 import type { EnvironmentBaseline } from '../src/types.js';
-import { INVESTIGATION_TOOL_DESCRIPTIONS, getToolDescription, getToolNames } from '../src/investigation/tool-descriptions.js';
+import {
+  INVESTIGATION_TOOL_DESCRIPTIONS,
+  getToolDescription,
+  getToolNames,
+} from '../src/investigation/tool-descriptions.js';
 import { createLLMPlanner, parseLLMResponse } from '../src/investigation/llm-planner.js';
 import { InvestigationEngine } from '../src/investigation/index.js';
 import { createEmptyBaseline } from '../src/memory/baseline.js';
@@ -44,22 +53,22 @@ function makeEvent(overrides: Partial<SecurityEvent> = {}): SecurityEvent {
 }
 
 /** Create a mock LLM provider / 建立模擬 LLM 供應商 */
-function createMockLLM(
-  overrides: Partial<LLMProvider> = {}
-): LLMProvider {
+function createMockLLM(overrides: Partial<LLMProvider> = {}): LLMProvider {
   return {
     providerType: 'ollama',
     model: 'test-model',
-    analyze: vi.fn<(prompt: string, context?: string) => Promise<AnalysisResult>>().mockResolvedValue({
-      summary: 'Mock analysis',
-      severity: 'medium',
-      confidence: 0.8,
-      recommendations: [],
-      rawResponse: JSON.stringify([
-        { tool: 'checkTimeAnomaly', reason: 'Check timing' },
-        { tool: 'checkIPHistory', reason: 'Check IP reputation' },
-      ]),
-    }),
+    analyze: vi
+      .fn<(prompt: string, context?: string) => Promise<AnalysisResult>>()
+      .mockResolvedValue({
+        summary: 'Mock analysis',
+        severity: 'medium',
+        confidence: 0.8,
+        recommendations: [],
+        rawResponse: JSON.stringify([
+          { tool: 'checkTimeAnomaly', reason: 'Check timing' },
+          { tool: 'checkIPHistory', reason: 'Check IP reputation' },
+        ]),
+      }),
     classify: vi.fn<(event: SecurityEvent) => Promise<ThreatClassification>>().mockResolvedValue({
       category: 'test',
       technique: 'T1000',
@@ -67,7 +76,9 @@ function createMockLLM(
       confidence: 0.8,
       description: 'Mock classification',
     }),
-    summarize: vi.fn<(events: SecurityEvent[]) => Promise<string>>().mockResolvedValue('Mock summary'),
+    summarize: vi
+      .fn<(events: SecurityEvent[]) => Promise<string>>()
+      .mockResolvedValue('Mock summary'),
     isAvailable: vi.fn<() => Promise<boolean>>().mockResolvedValue(true),
     getTokenUsage: vi.fn<() => TokenUsage>().mockReturnValue({
       promptTokens: 100,
@@ -170,7 +181,8 @@ describe('parseLLMResponse', () => {
   });
 
   it('should extract JSON from surrounding text / 應從周圍文字中提取 JSON', () => {
-    const response = 'Here are the tools:\n' +
+    const response =
+      'Here are the tools:\n' +
       JSON.stringify([{ tool: 'checkTimeAnomaly', reason: 'Check' }]) +
       '\nDone.';
     const steps = parseLLMResponse(response);
@@ -201,9 +213,14 @@ describe('parseLLMResponse', () => {
 
   it('should enforce MAX_STEPS limit (8) / 應強制 MAX_STEPS 限制 (8)', () => {
     const tools = [
-      'checkIPHistory', 'checkUserPrivilege', 'checkTimeAnomaly',
-      'checkGeoLocation', 'checkRelatedEvents', 'checkProcessTree',
-      'checkFileReputation', 'checkNetworkPattern',
+      'checkIPHistory',
+      'checkUserPrivilege',
+      'checkTimeAnomaly',
+      'checkGeoLocation',
+      'checkRelatedEvents',
+      'checkProcessTree',
+      'checkFileReputation',
+      'checkNetworkPattern',
       // This 9th item should exceed the limit but all 8 valid tools are unique
     ];
     const response = JSON.stringify(tools.map((t) => ({ tool: t, reason: 'test' })));
@@ -222,9 +239,7 @@ describe('parseLLMResponse', () => {
   });
 
   it('should handle items with missing reason / 應處理缺少 reason 的項目', () => {
-    const response = JSON.stringify([
-      { tool: 'checkTimeAnomaly' },
-    ]);
+    const response = JSON.stringify([{ tool: 'checkTimeAnomaly' }]);
     const steps = parseLLMResponse(response);
     expect(steps).toHaveLength(1);
     expect(steps[0]!.reason).toContain('LLM selected');
@@ -268,7 +283,10 @@ describe('createLLMPlanner', () => {
 
     await planner.planInvestigation(event);
 
-    const analyzeCall = (mockLLM.analyze as ReturnType<typeof vi.fn>).mock.calls[0] as [string, string?];
+    const analyzeCall = (mockLLM.analyze as ReturnType<typeof vi.fn>).mock.calls[0] as [
+      string,
+      string?,
+    ];
     const prompt = analyzeCall[0];
     expect(prompt).toContain('evt-special-123');
     expect(prompt).toContain('network');
@@ -282,7 +300,10 @@ describe('createLLMPlanner', () => {
 
     await planner.planInvestigation(event);
 
-    const analyzeCall = (mockLLM.analyze as ReturnType<typeof vi.fn>).mock.calls[0] as [string, string?];
+    const analyzeCall = (mockLLM.analyze as ReturnType<typeof vi.fn>).mock.calls[0] as [
+      string,
+      string?,
+    ];
     const context = analyzeCall[1];
     expect(context).toBeDefined();
     expect(context).toContain('checkIPHistory');
@@ -491,9 +512,14 @@ describe('InvestigationEngine with LLM', () => {
   it('should respect MAX_STEPS even with LLM plan / 即使使用 LLM 計畫也應遵守 MAX_STEPS', async () => {
     // LLM returns 8 tools (the max)
     const allTools = [
-      'checkIPHistory', 'checkUserPrivilege', 'checkTimeAnomaly',
-      'checkGeoLocation', 'checkRelatedEvents', 'checkProcessTree',
-      'checkFileReputation', 'checkNetworkPattern',
+      'checkIPHistory',
+      'checkUserPrivilege',
+      'checkTimeAnomaly',
+      'checkGeoLocation',
+      'checkRelatedEvents',
+      'checkProcessTree',
+      'checkFileReputation',
+      'checkNetworkPattern',
     ];
     const mockLLM = createMockLLM({
       analyze: vi.fn().mockResolvedValue({

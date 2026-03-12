@@ -5,6 +5,7 @@ All notable changes to ATR will be documented in this file.
 ## [0.1.0-rc2] - 2026-03-09
 
 ### Added
+
 - 29 detection rules across 9 attack categories
 - TypeScript reference engine with SessionTracker
 - Full OWASP Top 10 for Agentic Applications (2026) coverage
@@ -17,6 +18,7 @@ All notable changes to ATR will be documented in this file.
 - Coverage report (COVERAGE.md)
 
 ### Attack Categories
+
 - Prompt Injection (5 rules)
 - Tool Poisoning (4 rules)
 - Context Exfiltration (3 rules)

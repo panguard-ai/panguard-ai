@@ -28,10 +28,7 @@ function makeConfig(overrides?: Partial<ManagerConfig>): ManagerConfig {
   };
 }
 
-async function request(
-  path: string,
-  options: RequestInit = {}
-): Promise<Response> {
+async function request(path: string, options: RequestInit = {}): Promise<Response> {
   const headers: Record<string, string> = {
     Authorization: `Bearer ${TEST_TOKEN}`,
     'Content-Type': 'application/json',
@@ -317,17 +314,14 @@ describe('ManagerServer HTTP API', () => {
       });
       const { data: reg } = await regRes.json();
 
-      const res = await fetch(
-        `http://127.0.0.1:${TEST_PORT}/api/agents/${reg.agentId}/heartbeat`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${TEST_TOKEN}`,
-            'Content-Type': 'application/json',
-          },
-          body: 'not-valid-json',
-        }
-      );
+      const res = await fetch(`http://127.0.0.1:${TEST_PORT}/api/agents/${reg.agentId}/heartbeat`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${TEST_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: 'not-valid-json',
+      });
 
       expect(res.status).toBe(400);
 
@@ -675,17 +669,14 @@ describe('ManagerServer HTTP API', () => {
     });
 
     it('should return 415 for POST without application/json Content-Type', async () => {
-      const res = await fetch(
-        `http://127.0.0.1:${TEST_PORT}/api/agents/register`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${TEST_TOKEN}`,
-            'Content-Type': 'text/plain',
-          },
-          body: 'not json',
-        }
-      );
+      const res = await fetch(`http://127.0.0.1:${TEST_PORT}/api/agents/register`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${TEST_TOKEN}`,
+          'Content-Type': 'text/plain',
+        },
+        body: 'not json',
+      });
 
       expect(res.status).toBe(415);
 
@@ -695,16 +686,13 @@ describe('ManagerServer HTTP API', () => {
     });
 
     it('should return 415 for POST with no Content-Type header', async () => {
-      const res = await fetch(
-        `http://127.0.0.1:${TEST_PORT}/api/agents/register`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${TEST_TOKEN}`,
-          },
-          body: '{}',
-        }
-      );
+      const res = await fetch(`http://127.0.0.1:${TEST_PORT}/api/agents/register`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${TEST_TOKEN}`,
+        },
+        body: '{}',
+      });
 
       expect(res.status).toBe(415);
     });
@@ -727,9 +715,7 @@ describe('ManagerServer HTTP API', () => {
       expect(res.headers.get('x-content-type-options')).toBe('nosniff');
       expect(res.headers.get('x-frame-options')).toBe('DENY');
       expect(res.headers.get('x-xss-protection')).toBe('0');
-      expect(res.headers.get('referrer-policy')).toBe(
-        'strict-origin-when-cross-origin'
-      );
+      expect(res.headers.get('referrer-policy')).toBe('strict-origin-when-cross-origin');
       expect(res.headers.get('content-type')).toBe('application/json');
     });
   });
@@ -755,9 +741,7 @@ describe('ManagerServer HTTP API', () => {
       // Step 2: Verify agent appears in list
       const listRes = await request('/api/agents');
       const { data: agentList } = await listRes.json();
-      const found = agentList.find(
-        (a: { agentId: string }) => a.agentId === agentId
-      );
+      const found = agentList.find((a: { agentId: string }) => a.agentId === agentId);
       expect(found).toBeDefined();
 
       // Step 3: Send heartbeat
@@ -817,9 +801,7 @@ describe('ManagerServer without auth token', () => {
   const NO_AUTH_PORT = 19877;
 
   beforeAll(async () => {
-    noAuthServer = new ManagerServer(
-      makeConfig({ authToken: '', port: NO_AUTH_PORT })
-    );
+    noAuthServer = new ManagerServer(makeConfig({ authToken: '', port: NO_AUTH_PORT }));
     await noAuthServer.start();
   });
 
@@ -839,14 +821,11 @@ describe('ManagerServer without auth token', () => {
   });
 
   it('should allow registration without auth', async () => {
-    const res = await fetch(
-      `http://127.0.0.1:${NO_AUTH_PORT}/api/agents/register`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(makeRegistrationBody()),
-      }
-    );
+    const res = await fetch(`http://127.0.0.1:${NO_AUTH_PORT}/api/agents/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(makeRegistrationBody()),
+    });
 
     expect(res.status).toBe(201);
 

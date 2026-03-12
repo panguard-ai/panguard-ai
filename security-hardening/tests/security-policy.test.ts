@@ -79,11 +79,7 @@ describe('Security Policy Loading - Extended', () => {
     });
 
     it('should handle allowedOrigins with various URL formats', () => {
-      const origins = [
-        'http://localhost:3000',
-        'https://example.com',
-        'http://192.168.1.1:8080',
-      ];
+      const origins = ['http://localhost:3000', 'https://example.com', 'http://192.168.1.1:8080'];
       const policy = loadSecurityPolicy({ allowedOrigins: origins });
       expect(policy.allowedOrigins).toEqual(origins);
     });

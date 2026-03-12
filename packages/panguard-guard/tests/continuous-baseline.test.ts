@@ -61,9 +61,7 @@ function makePopulatedBaseline(): EnvironmentBaseline {
         lastSeen: now,
       },
     ],
-    normalServicePorts: [
-      { port: 443, service: 'https', firstSeen: now, lastSeen: now },
-    ],
+    normalServicePorts: [{ port: 443, service: 'https', firstSeen: now, lastSeen: now }],
     learningStarted: now,
     learningComplete: true,
     confidenceLevel: 0.6,
@@ -135,9 +133,7 @@ describe('continuousBaselineUpdate', () => {
   });
 
   it('should increment existing process pattern frequency by 0.25', () => {
-    const originalFrequency = baseline.normalProcesses.find(
-      (p) => p.name === 'nginx'
-    )!.frequency;
+    const originalFrequency = baseline.normalProcesses.find((p) => p.name === 'nginx')!.frequency;
 
     const event = makeEvent({
       source: 'process',
@@ -192,9 +188,7 @@ describe('continuousBaselineUpdate', () => {
 
     const updated = continuousBaselineUpdate(baseline, event, 'benign');
 
-    const newLogin = updated.normalLoginPatterns.find(
-      (l) => l.username === 'deploy-bot'
-    );
+    const newLogin = updated.normalLoginPatterns.find((l) => l.username === 'deploy-bot');
     expect(newLogin).toBeDefined();
     expect(newLogin!.frequency).toBe(0.25);
   });
@@ -456,9 +450,7 @@ describe('pruneStalePatterns', () => {
   });
 
   it('should use default retention of 30 days when not specified', () => {
-    const thirtyOneDaysAgo = new Date(
-      Date.now() - 31 * 24 * 60 * 60 * 1000
-    ).toISOString();
+    const thirtyOneDaysAgo = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString();
     const recentDate = new Date().toISOString();
 
     const baseline: EnvironmentBaseline = {
@@ -592,9 +584,7 @@ describe('continuousBaselineUpdate - integration with pruning', () => {
     const updated = continuousBaselineUpdate(baseline, event, 'benign');
 
     // New connection should be added
-    const newConn = updated.normalConnections.find(
-      (c) => c.remoteAddress === '93.184.216.34'
-    );
+    const newConn = updated.normalConnections.find((c) => c.remoteAddress === '93.184.216.34');
     expect(newConn).toBeDefined();
     expect(newConn!.frequency).toBe(0.25);
     expect(newConn!.remotePort).toBe(80);
@@ -611,9 +601,7 @@ describe('continuousBaselineUpdate - integration with pruning', () => {
 
     const updated = continuousBaselineUpdate(baseline, event, 'benign');
 
-    const newLogin = updated.normalLoginPatterns.find(
-      (l) => l.username === 'new-user'
-    );
+    const newLogin = updated.normalLoginPatterns.find((l) => l.username === 'new-user');
     expect(newLogin).toBeDefined();
     expect(newLogin!.frequency).toBe(0.25);
   });

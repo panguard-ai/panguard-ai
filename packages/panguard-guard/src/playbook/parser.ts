@@ -13,11 +13,7 @@ import { join } from 'node:path';
 import yaml from 'js-yaml';
 import { createLogger } from '@panguard-ai/core';
 import type { Playbook, PlaybookAction } from './schema.js';
-import {
-  VALID_RESPONSE_ACTIONS,
-  VALID_SEVERITIES,
-  VALID_CORRELATION_PATTERNS,
-} from './schema.js';
+import { VALID_RESPONSE_ACTIONS, VALID_SEVERITIES, VALID_CORRELATION_PATTERNS } from './schema.js';
 
 const logger = createLogger('panguard-guard:playbook-parser');
 
@@ -73,10 +69,11 @@ export function validatePlaybook(playbook: Playbook): ValidationResult {
     errors.push('trigger is required and must be an object');
   } else {
     const { pattern, minConfidence, minSeverity, category, mitreTechnique } = playbook.trigger;
-    const hasCondition = pattern !== undefined
-      || minSeverity !== undefined
-      || category !== undefined
-      || mitreTechnique !== undefined;
+    const hasCondition =
+      pattern !== undefined ||
+      minSeverity !== undefined ||
+      category !== undefined ||
+      mitreTechnique !== undefined;
 
     if (!hasCondition) {
       errors.push(
@@ -150,11 +147,7 @@ export function validatePlaybook(playbook: Playbook): ValidationResult {
  * Validate an array of playbook actions.
  * 驗證一組劇本動作。
  */
-function validateActions(
-  actions: PlaybookAction[],
-  prefix: string,
-  errors: string[]
-): void {
+function validateActions(actions: PlaybookAction[], prefix: string, errors: string[]): void {
   for (let i = 0; i < actions.length; i++) {
     const action = actions[i];
     if (!action || typeof action !== 'object') {
@@ -162,9 +155,7 @@ function validateActions(
       continue;
     }
     if (!VALID_RESPONSE_ACTIONS.has(action.type)) {
-      errors.push(
-        `${prefix}[${i}].type "${action.type}" is not a valid response action`
-      );
+      errors.push(`${prefix}[${i}].type "${action.type}" is not a valid response action`);
     }
   }
 }
@@ -191,9 +182,7 @@ export function loadPlaybooksFromDir(dir: string): Playbook[] {
     return playbooks;
   }
 
-  const yamlFiles = files.filter(
-    (f) => f.endsWith('.yaml') || f.endsWith('.yml')
-  );
+  const yamlFiles = files.filter((f) => f.endsWith('.yaml') || f.endsWith('.yml'));
 
   for (const file of yamlFiles) {
     const filePath = join(dir, file);
@@ -206,9 +195,7 @@ export function loadPlaybooksFromDir(dir: string): Playbook[] {
         playbooks.push(playbook);
         logger.info(`Loaded playbook: ${playbook.name} from ${file}`);
       } else {
-        logger.warn(
-          `Skipping invalid playbook "${file}": ${validation.errors.join('; ')}`
-        );
+        logger.warn(`Skipping invalid playbook "${file}": ${validation.errors.join('; ')}`);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);

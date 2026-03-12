@@ -61,7 +61,15 @@ export async function runCLI(args: string[]): Promise<void> {
 
   switch (command) {
     case 'start':
-      await commandStart(dataDir, verbose, managerUrl, noTelemetry, showUploadData, dashboard, interactive);
+      await commandStart(
+        dataDir,
+        verbose,
+        managerUrl,
+        noTelemetry,
+        showUploadData,
+        dashboard,
+        interactive
+      );
       break;
     case 'stop':
       commandStop(dataDir);
@@ -105,7 +113,7 @@ async function commandStart(
   noTelemetry = false,
   showUploadData = false,
   dashboardMode = false,
-  interactiveMode = false,
+  interactiveMode = false
 ): Promise<void> {
   // Default quiet mode: suppress structured JSON logs
   if (!verbose) {
@@ -175,7 +183,9 @@ async function commandStart(
     console.log(`  ${c.dim('  No data will be uploaded to Panguard Threat Cloud')}`);
   } else {
     console.log(`  ${symbols.info} Threat intelligence sharing: ${c.safe('enabled')}`);
-    console.log(`  ${c.dim('  Detected threats are anonymously uploaded to Panguard Threat Cloud')}`);
+    console.log(
+      `  ${c.dim('  Detected threats are anonymously uploaded to Panguard Threat Cloud')}`
+    );
     console.log(`  ${c.dim('  Disable: panguard-guard start --no-telemetry')}`);
   }
   if (config.showUploadData) {
@@ -190,19 +200,28 @@ async function commandStart(
   const hasLocalAi = config.ai?.provider === 'ollama';
   const hasCloudAi = config.ai?.provider === 'claude' || config.ai?.provider === 'openai';
   const hasAnyAi = Boolean(config.ai?.provider);
-  const hasEnvKey = Boolean(process.env['PANGUARD_AI_KEY'] || process.env['ANTHROPIC_API_KEY'] || process.env['OPENAI_API_KEY']);
+  const hasEnvKey = Boolean(
+    process.env['PANGUARD_AI_KEY'] ||
+    process.env['ANTHROPIC_API_KEY'] ||
+    process.env['OPENAI_API_KEY']
+  );
 
   if (hasLocalAi) {
-    console.log(`  ${c.safe('\u2713')} Layer 2 Local AI: ${c.sage(config.ai?.provider + ' / ' + (config.ai?.model ?? 'default'))}`);
+    console.log(
+      `  ${c.safe('\u2713')} Layer 2 Local AI: ${c.sage(config.ai?.provider + ' / ' + (config.ai?.model ?? 'default'))}`
+    );
   }
   if (hasCloudAi || hasEnvKey) {
-    const provider = config.ai?.provider ?? (process.env['ANTHROPIC_API_KEY'] ? 'anthropic' : 'openai');
+    const provider =
+      config.ai?.provider ?? (process.env['ANTHROPIC_API_KEY'] ? 'anthropic' : 'openai');
     console.log(`  ${c.safe('\u2713')} Layer 3 Cloud AI: ${c.sage(provider + ' connected')}`);
   }
 
   if (!hasAnyAi && !hasEnvKey) {
     console.log('');
-    console.log(`  ${symbols.info} Guard started with ${c.sage('Layer 1 (Pattern Detection)')} active.`);
+    console.log(
+      `  ${symbols.info} Guard started with ${c.sage('Layer 1 (Pattern Detection)')} active.`
+    );
     console.log('');
     printAiSetupGuide();
   }
@@ -228,7 +247,9 @@ async function commandStart(
         message: `skill-install: ${change.name} on ${change.platformId}`,
       });
     } else if (!verbose) {
-      console.log(`  ${symbols.info} ${c.sage(`[${time}]`)} New skill: ${c.bold(change.name)} on ${change.platformId}`);
+      console.log(
+        `  ${symbols.info} ${c.sage(`[${time}]`)} New skill: ${c.bold(change.name)} on ${change.platformId}`
+      );
     }
   });
 
@@ -241,33 +262,48 @@ async function commandStart(
         message: `skill-removed: ${change.name} from ${change.platformId}`,
       });
     } else if (!verbose) {
-      console.log(`  ${symbols.warn} ${c.dim(`[${time}]`)} Skill removed: ${change.name} from ${change.platformId}`);
+      console.log(
+        `  ${symbols.warn} ${c.dim(`[${time}]`)} Skill removed: ${change.name} from ${change.platformId}`
+      );
     }
   });
 
-  skillWatcher.on('skill-audit-complete', (result: { name: string; riskLevel: string; riskScore: number; autoWhitelisted: boolean }) => {
-    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
-    const icon = result.riskLevel === 'LOW' ? symbols.pass
-      : result.riskLevel === 'MEDIUM' ? symbols.warn
-      : symbols.fail;
-    const riskColor = result.riskLevel === 'LOW' ? c.safe
-      : result.riskLevel === 'MEDIUM' ? c.caution
-      : c.critical;
+  skillWatcher.on(
+    'skill-audit-complete',
+    (result: { name: string; riskLevel: string; riskScore: number; autoWhitelisted: boolean }) => {
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+      const icon =
+        result.riskLevel === 'LOW'
+          ? symbols.pass
+          : result.riskLevel === 'MEDIUM'
+            ? symbols.warn
+            : symbols.fail;
+      const riskColor =
+        result.riskLevel === 'LOW'
+          ? c.safe
+          : result.riskLevel === 'MEDIUM'
+            ? c.caution
+            : c.critical;
 
-    if (dashboardRenderer) {
-      const statusMsg = result.autoWhitelisted ? 'SAFE (whitelisted)' : riskColor(result.riskLevel);
-      dashboardRenderer.pushEvent({
-        time,
-        icon,
-        message: `skill-audit: ${result.name} ${String.fromCharCode(8594)} ${statusMsg}`,
-      });
-    } else if (!verbose) {
-      console.log(`  ${icon} ${c.sage(`[${time}]`)} Audit: ${result.name} = ${riskColor(result.riskLevel)} (${result.riskScore}/100)`);
-      if (result.autoWhitelisted) {
-        console.log(`    ${symbols.pass} Auto-whitelisted`);
+      if (dashboardRenderer) {
+        const statusMsg = result.autoWhitelisted
+          ? 'SAFE (whitelisted)'
+          : riskColor(result.riskLevel);
+        dashboardRenderer.pushEvent({
+          time,
+          icon,
+          message: `skill-audit: ${result.name} ${String.fromCharCode(8594)} ${statusMsg}`,
+        });
+      } else if (!verbose) {
+        console.log(
+          `  ${icon} ${c.sage(`[${time}]`)} Audit: ${result.name} = ${riskColor(result.riskLevel)} (${result.riskScore}/100)`
+        );
+        if (result.autoWhitelisted) {
+          console.log(`    ${symbols.pass} Auto-whitelisted`);
+        }
       }
     }
-  });
+  );
 
   void skillWatcher.start();
 
@@ -299,7 +335,9 @@ async function commandStart(
       const rules = engine.getRuleCounts();
       return {
         status: status.running
-          ? (status.mode === 'learning' ? 'learning' : 'protected')
+          ? status.mode === 'learning'
+            ? 'learning'
+            : 'protected'
           : 'stopped',
         uptime: status.uptime,
         eventsProcessed: status.eventsProcessed,
@@ -415,32 +453,46 @@ function printAiSetupGuide(): void {
   console.log(`    1. Install Ollama: ${c.dim('curl -fsSL https://ollama.com/install.sh | sh')}`);
   console.log(`    2. Pull a model:   ${c.dim('ollama pull llama3.2')}`);
   console.log(`    3. Set in config:`);
-  console.log(`       ${c.dim(`echo '{"ai":{"provider":"ollama","model":"llama3.2"}}' > ${configDir}/guard-ai.json`)}`);
+  console.log(
+    `       ${c.dim(`echo '{"ai":{"provider":"ollama","model":"llama3.2"}}' > ${configDir}/guard-ai.json`)}`
+  );
   console.log('');
   console.log(`  ${c.sage('Layer 3')} -- Cloud AI (Fastest, Most Accurate)`);
   console.log(`    1. Get API key: ${c.dim('https://console.anthropic.com/')}`);
   console.log(`    2. Set in config:`);
   console.log(`       ${c.dim('export PANGUARD_AI_KEY=sk-ant-your-key-here')}`);
   console.log(`       ${c.dim(`# or add to ${configDir}/config.json:`)}`);
-  console.log(`       ${c.dim(`# {"ai":{"provider":"claude","apiKey":"sk-ant-...","model":"claude-sonnet-4-20250514"}}`)}`);
+  console.log(
+    `       ${c.dim(`# {"ai":{"provider":"claude","apiKey":"sk-ant-...","model":"claude-sonnet-4-20250514"}}`)}`
+  );
   console.log('');
   console.log(c.dim(`  ${divider()}`));
   console.log('');
   console.log(`  ${c.sage('\u5553\u7528 AI \u5075\u6E2C\u5C64\uFF1A')}`);
   console.log('');
-  console.log(`  ${c.sage('\u7B2C\u4E8C\u5C64')} -- \u672C\u5730 AI\uFF08\u514D\u8CBB\u3001\u79C1\u5BC6\uFF09`);
-  console.log(`    1. \u5B89\u88DD Ollama: ${c.dim('curl -fsSL https://ollama.com/install.sh | sh')}`);
+  console.log(
+    `  ${c.sage('\u7B2C\u4E8C\u5C64')} -- \u672C\u5730 AI\uFF08\u514D\u8CBB\u3001\u79C1\u5BC6\uFF09`
+  );
+  console.log(
+    `    1. \u5B89\u88DD Ollama: ${c.dim('curl -fsSL https://ollama.com/install.sh | sh')}`
+  );
   console.log(`    2. \u4E0B\u8F09\u6A21\u578B: ${c.dim('ollama pull llama3.2')}`);
   console.log(`    3. \u8A2D\u5B9A:`);
-  console.log(`       ${c.dim(`echo '{"ai":{"provider":"ollama","model":"llama3.2"}}' > ${configDir}/guard-ai.json`)}`);
+  console.log(
+    `       ${c.dim(`echo '{"ai":{"provider":"ollama","model":"llama3.2"}}' > ${configDir}/guard-ai.json`)}`
+  );
   console.log('');
-  console.log(`  ${c.sage('\u7B2C\u4E09\u5C64')} -- \u96F2\u7AEF AI\uFF08\u6700\u5FEB\u3001\u6700\u6E96\u78BA\uFF09`);
+  console.log(
+    `  ${c.sage('\u7B2C\u4E09\u5C64')} -- \u96F2\u7AEF AI\uFF08\u6700\u5FEB\u3001\u6700\u6E96\u78BA\uFF09`
+  );
   console.log(`    1. \u53D6\u5F97 API key: ${c.dim('https://console.anthropic.com/')}`);
   console.log(`    2. \u8A2D\u5B9A:`);
   console.log(`       ${c.dim('export PANGUARD_AI_KEY=sk-ant-your-key-here')}`);
   console.log('');
   console.log(`  ${c.dim(`Run "panguard guard setup-ai" for interactive setup`)}`);
-  console.log(`  ${c.dim(`\u57F7\u884C "panguard guard setup-ai" \u9032\u884C\u4E92\u52D5\u5F0F\u8A2D\u5B9A`)}`);
+  console.log(
+    `  ${c.dim(`\u57F7\u884C "panguard guard setup-ai" \u9032\u884C\u4E92\u52D5\u5F0F\u8A2D\u5B9A`)}`
+  );
   console.log('');
 }
 
@@ -580,21 +632,13 @@ function printHelp(): void {
   console.log(
     `  ${c.sage('--verbose'.padEnd(22))} Show all event logs ${c.dim('(default: quiet mode)')}`
   );
-  console.log(
-    `  ${c.sage('--manager <url>'.padEnd(22))} Manager URL for distributed mode`
-  );
-  console.log(
-    `  ${c.sage('--no-telemetry'.padEnd(22))} Disable threat intelligence sharing`
-  );
-  console.log(
-    `  ${c.sage('--show-upload-data'.padEnd(22))} Show anonymized data before upload`
-  );
+  console.log(`  ${c.sage('--manager <url>'.padEnd(22))} Manager URL for distributed mode`);
+  console.log(`  ${c.sage('--no-telemetry'.padEnd(22))} Disable threat intelligence sharing`);
+  console.log(`  ${c.sage('--show-upload-data'.padEnd(22))} Show anonymized data before upload`);
   console.log(
     `  ${c.sage('--dashboard'.padEnd(22))} Enable live TUI dashboard ${c.dim('(default: quiet mode)')}`
   );
-  console.log(
-    `  ${c.sage('--interactive'.padEnd(22))} Prompt for medium-confidence threats`
-  );
+  console.log(`  ${c.sage('--interactive'.padEnd(22))} Prompt for medium-confidence threats`);
   console.log(`  ${c.sage('--license-key <key>'.padEnd(22))} License key for install-script`);
   console.log('');
   console.log(c.dim(`  Version: ${CLI_VERSION}`));

@@ -31,11 +31,7 @@ export function RuleStatsProvider({ children }: { children: ReactNode }) {
     totalRulesDisplay: '8,000+',
   };
 
-  return (
-    <RuleStatsContext.Provider value={values}>
-      {children}
-    </RuleStatsContext.Provider>
-  );
+  return <RuleStatsContext.Provider value={values}>{children}</RuleStatsContext.Provider>;
 }
 
 export function useRuleStatsContext() {

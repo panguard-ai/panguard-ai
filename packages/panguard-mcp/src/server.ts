@@ -10,14 +10,16 @@
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { createLogger } from '@panguard-ai/core';
 
 import { executeScan, executeScanCode } from './tools/scan-tools.js';
-import { executeGuardStart, executeGuardStop, executeStatus, executeAlerts } from './tools/guard-tools.js';
+import {
+  executeGuardStart,
+  executeGuardStop,
+  executeStatus,
+  executeAlerts,
+} from './tools/guard-tools.js';
 import {
   executeBlockIP,
   executeGenerateReport,
@@ -106,8 +108,7 @@ const TOOL_DEFINITIONS = [
   },
   {
     name: 'panguard_guard_stop',
-    description:
-      'Stop the Panguard Guard daemon. / 停止 Panguard Guard 常駐程式。',
+    description: 'Stop the Panguard Guard daemon. / 停止 Panguard Guard 常駐程式。',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -338,7 +339,7 @@ export async function dispatchTool(name: string, args: Record<string, unknown>) 
 export async function startMCPServer(): Promise<void> {
   const server = new Server(
     { name: 'panguard-mcp', version: PANGUARD_MCP_VERSION },
-    { capabilities: { tools: {} } },
+    { capabilities: { tools: {} } }
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({

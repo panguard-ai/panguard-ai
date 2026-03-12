@@ -14,7 +14,7 @@ test.describe('Contact Form', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({ ok: true }),
-      }),
+      })
     );
 
     await page.goto('/contact');
@@ -36,7 +36,7 @@ test.describe('Contact Form', () => {
         status: 500,
         contentType: 'application/json',
         body: JSON.stringify({ ok: false, error: 'Server error' }),
-      }),
+      })
     );
 
     await page.goto('/contact');

@@ -137,7 +137,7 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
       'Average cost of a data breach: $4.88 M (IBM 2024).',
       'Mean time to detect without tools: 204 days (IBM 2024).',
       'Panguard is 100% open source under the MIT license.',
-      'The question isn\'t whether you can afford Panguard \u2014 it\'s whether you can afford not to use it.',
+      "The question isn't whether you can afford Panguard \u2014 it's whether you can afford not to use it.",
     ],
   },
 ] as const;
@@ -218,7 +218,10 @@ function ComparisonTable() {
             </thead>
             <tbody>
               {COMPARISON_ROWS.map((row) => (
-                <tr key={row.feature} className="border-b border-border/50 hover:bg-surface-2/30 transition-colors">
+                <tr
+                  key={row.feature}
+                  className="border-b border-border/50 hover:bg-surface-2/30 transition-colors"
+                >
                   <td className="py-3 px-4 text-text-primary font-medium">{row.feature}</td>
                   {colKeys.map((key, i) => (
                     <td
@@ -243,7 +246,10 @@ function ComparisonTable() {
               <p className="text-text-primary font-semibold text-sm mb-3">{row.feature}</p>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 {colKeys.map((key, i) => (
-                  <div key={key} className={`flex flex-col gap-1 ${i === 0 ? 'text-brand-sage' : 'text-text-secondary'}`}>
+                  <div
+                    key={key}
+                    className={`flex flex-col gap-1 ${i === 0 ? 'text-brand-sage' : 'text-text-secondary'}`}
+                  >
                     <span className="text-text-tertiary font-medium">{columns[i]}</span>
                     <CellContent value={row[key]} />
                   </div>
@@ -273,7 +279,10 @@ function ComparisonCards() {
               <h3 className="text-lg font-bold text-text-primary mb-4">{card.title}</h3>
               <ul className="space-y-3 flex-1">
                 {card.bullets.map((bullet) => (
-                  <li key={bullet} className="flex items-start gap-2 text-sm text-text-secondary leading-relaxed">
+                  <li
+                    key={bullet}
+                    className="flex items-start gap-2 text-sm text-text-secondary leading-relaxed"
+                  >
                     <span className="mt-1.5 block w-1.5 h-1.5 rounded-full bg-brand-sage shrink-0" />
                     {bullet}
                   </li>

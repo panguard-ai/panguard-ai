@@ -14,19 +14,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Shared mock state - created with vi.hoisted so vi.mock factories can reference them
 // ---------------------------------------------------------------------------
 
-const {
-  mockExecFile,
-  mockPlatform,
-  mockReadFileSync,
-  mockExistsSync,
-  mockReaddirSync,
-} = vi.hoisted(() => ({
-  mockExecFile: vi.fn(),
-  mockPlatform: vi.fn<() => string>().mockReturnValue('linux'),
-  mockReadFileSync: vi.fn<(path: string, encoding: string) => string>(),
-  mockExistsSync: vi.fn<(path: string) => boolean>(),
-  mockReaddirSync: vi.fn<(path: string) => string[]>(),
-}));
+const { mockExecFile, mockPlatform, mockReadFileSync, mockExistsSync, mockReaddirSync } =
+  vi.hoisted(() => ({
+    mockExecFile: vi.fn(),
+    mockPlatform: vi.fn<() => string>().mockReturnValue('linux'),
+    mockReadFileSync: vi.fn<(path: string, encoding: string) => string>(),
+    mockExistsSync: vi.fn<(path: string) => boolean>(),
+    mockReaddirSync: vi.fn<(path: string) => string[]>(),
+  }));
 
 // ---------------------------------------------------------------------------
 // Module mocks
@@ -86,7 +81,7 @@ function stubExec(stubs: Record<string, string | null>): void {
       cmd: string,
       _args: string[],
       _opts: unknown,
-      cb: (err: Error | null, stdout: string) => void,
+      cb: (err: Error | null, stdout: string) => void
     ) => {
       const key = cmd;
       if (key in stubs) {
@@ -99,7 +94,7 @@ function stubExec(stubs: Record<string, string | null>): void {
       } else {
         cb(new Error('not found'), '');
       }
-    },
+    }
   );
 }
 
@@ -240,10 +235,9 @@ describe('Compliance Assessors', () => {
         mockExistsSync.mockImplementation((p: string) => p === '/etc/shadow');
         mockReadFileSync.mockImplementation((p: string) => {
           if (p === '/etc/shadow') {
-            return [
-              'root:$6$hash:19000:0:99999:7:::',
-              'user1:$6$hash:19000:0:99999:7:::',
-            ].join('\n');
+            return ['root:$6$hash:19000:0:99999:7:::', 'user1:$6$hash:19000:0:99999:7:::'].join(
+              '\n'
+            );
           }
           return '';
         });
@@ -264,10 +258,7 @@ describe('Compliance Assessors', () => {
         mockExistsSync.mockImplementation((p: string) => p === '/etc/shadow');
         mockReadFileSync.mockImplementation((p: string) => {
           if (p === '/etc/shadow') {
-            return Array.from(
-              { length: 8 },
-              (_, i) => `user${i}::19000:0:99999:7:::`,
-            ).join('\n');
+            return Array.from({ length: 8 }, (_, i) => `user${i}::19000:0:99999:7:::`).join('\n');
           }
           return '';
         });
@@ -285,8 +276,7 @@ describe('Compliance Assessors', () => {
       it('should report NOPASSWD: ALL in sudoers', async () => {
         mockExistsSync.mockImplementation((p: string) => p === '/etc/sudoers');
         mockReadFileSync.mockImplementation((p: string) => {
-          if (p === '/etc/sudoers')
-            return 'root ALL=(ALL) ALL\nuser ALL=(ALL) NOPASSWD: ALL';
+          if (p === '/etc/sudoers') return 'root ALL=(ALL) ALL\nuser ALL=(ALL) NOPASSWD: ALL';
           return '';
         });
 
@@ -375,8 +365,7 @@ describe('Compliance Assessors', () => {
       it('should check sudo on macOS (non-win32)', async () => {
         mockExistsSync.mockImplementation((p: string) => p === '/etc/sudoers');
         mockReadFileSync.mockImplementation((p: string) => {
-          if (p === '/etc/sudoers')
-            return 'admin ALL=(ALL) NOPASSWD: ALL';
+          if (p === '/etc/sudoers') return 'admin ALL=(ALL) NOPASSWD: ALL';
           return '';
         });
 
@@ -423,8 +412,7 @@ describe('Compliance Assessors', () => {
 
       it('should report when macOS firewall is disabled', async () => {
         stubExec({
-          '/usr/libexec/ApplicationFirewall/socketfilterfw':
-            'Firewall is disabled. (State = 0)',
+          '/usr/libexec/ApplicationFirewall/socketfilterfw': 'Firewall is disabled. (State = 0)',
           '/usr/sbin/lsof': '',
         });
 
@@ -437,8 +425,7 @@ describe('Compliance Assessors', () => {
 
       it('should NOT report when macOS firewall is enabled', async () => {
         stubExec({
-          '/usr/libexec/ApplicationFirewall/socketfilterfw':
-            'Firewall is enabled. (State = 1)',
+          '/usr/libexec/ApplicationFirewall/socketfilterfw': 'Firewall is enabled. (State = 1)',
           '/usr/sbin/lsof': '',
         });
 
@@ -459,8 +446,7 @@ describe('Compliance Assessors', () => {
 
       it('should report risky services on common ports', async () => {
         stubExec({
-          '/usr/libexec/ApplicationFirewall/socketfilterfw':
-            'Firewall is enabled. (State = 1)',
+          '/usr/libexec/ApplicationFirewall/socketfilterfw': 'Firewall is enabled. (State = 1)',
           '/usr/sbin/lsof': [
             'COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME',
             'redis-ser 1234 user 6u IPv4 0x1234 0t0 TCP *:6379 (LISTEN)',
@@ -479,8 +465,7 @@ describe('Compliance Assessors', () => {
 
       it('should NOT report for non-risky ports', async () => {
         stubExec({
-          '/usr/libexec/ApplicationFirewall/socketfilterfw':
-            'Firewall is enabled. (State = 1)',
+          '/usr/libexec/ApplicationFirewall/socketfilterfw': 'Firewall is enabled. (State = 1)',
           '/usr/sbin/lsof': [
             'COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME',
             'nginx    1234 user 6u IPv4 0x1234 0t0 TCP *:443 (LISTEN)',
@@ -495,8 +480,7 @@ describe('Compliance Assessors', () => {
 
       it('should handle empty lsof output', async () => {
         stubExec({
-          '/usr/libexec/ApplicationFirewall/socketfilterfw':
-            'Firewall is enabled. (State = 1)',
+          '/usr/libexec/ApplicationFirewall/socketfilterfw': 'Firewall is enabled. (State = 1)',
           '/usr/sbin/lsof': '',
         });
 
@@ -557,8 +541,7 @@ describe('Compliance Assessors', () => {
 
       it('should detect risky ports via ss command', async () => {
         stubExec({
-          '/sbin/iptables':
-            Array.from({ length: 12 }, (_, i) => `rule-${i}`).join('\n'),
+          '/sbin/iptables': Array.from({ length: 12 }, (_, i) => `rule-${i}`).join('\n'),
           '/usr/sbin/ufw': 'Status: active',
           '/usr/bin/ss': [
             'State Recv-Q Send-Q Local Address:Port Peer Address:Port',
@@ -684,17 +667,10 @@ describe('Compliance Assessors', () => {
 
       it('should report unencrypted RSA private keys', async () => {
         mockExistsSync.mockImplementation((p: string) => p === sshDir);
-        mockReaddirSync.mockReturnValue([
-          'id_rsa',
-          'id_rsa.pub',
-          'known_hosts',
-          'id_ed25519',
-        ]);
+        mockReaddirSync.mockReturnValue(['id_rsa', 'id_rsa.pub', 'known_hosts', 'id_ed25519']);
         mockReadFileSync.mockImplementation((p: string) => {
-          if (p === `${sshDir}/id_rsa`)
-            return '-----BEGIN RSA PRIVATE KEY-----\nMIIE...';
-          if (p === `${sshDir}/id_ed25519`)
-            return '-----BEGIN OPENSSH PRIVATE KEY-----\nbase64...';
+          if (p === `${sshDir}/id_rsa`) return '-----BEGIN RSA PRIVATE KEY-----\nMIIE...';
+          if (p === `${sshDir}/id_ed25519`) return '-----BEGIN OPENSSH PRIVATE KEY-----\nbase64...';
           return '';
         });
 
@@ -722,17 +698,10 @@ describe('Compliance Assessors', () => {
 
       it('should skip .pub files and known_hosts', async () => {
         mockExistsSync.mockImplementation((p: string) => p === sshDir);
-        mockReaddirSync.mockReturnValue([
-          'id_rsa.pub',
-          'known_hosts',
-          'known_hosts.old',
-          'config',
-        ]);
+        mockReaddirSync.mockReturnValue(['id_rsa.pub', 'known_hosts', 'known_hosts.old', 'config']);
 
         const findings = await assessEncryption();
-        const sshFindings = findings.filter((f) =>
-          f.findingId.startsWith('ENC-SSH-'),
-        );
+        const sshFindings = findings.filter((f) => f.findingId.startsWith('ENC-SSH-'));
         expect(sshFindings).toHaveLength(0);
       });
 
@@ -740,9 +709,7 @@ describe('Compliance Assessors', () => {
         mockExistsSync.mockReturnValue(false);
 
         const findings = await assessEncryption();
-        const sshFindings = findings.filter((f) =>
-          f.findingId.startsWith('ENC-SSH-'),
-        );
+        const sshFindings = findings.filter((f) => f.findingId.startsWith('ENC-SSH-'));
         expect(sshFindings).toHaveLength(0);
       });
 
@@ -754,9 +721,7 @@ describe('Compliance Assessors', () => {
         });
 
         const findings = await assessEncryption();
-        const sshFindings = findings.filter((f) =>
-          f.findingId.startsWith('ENC-SSH-'),
-        );
+        const sshFindings = findings.filter((f) => f.findingId.startsWith('ENC-SSH-'));
         expect(sshFindings).toHaveLength(0);
       });
     });
@@ -803,8 +768,7 @@ describe('Compliance Assessors', () => {
 
       it('should NOT report when journald has disk usage', async () => {
         stubExec({
-          '/bin/journalctl':
-            'Archived and active journals take up 256.0M in the file system.',
+          '/bin/journalctl': 'Archived and active journals take up 256.0M in the file system.',
           '/bin/systemctl': 'active',
           '/bin/ps': 'PID TTY TIME CMD',
         });
@@ -854,9 +818,7 @@ describe('Compliance Assessors', () => {
         });
 
         const findings = await assessMonitoring();
-        const auditFinding = findings.find(
-          (f) => f.findingId === 'MON-AUDIT-001',
-        );
+        const auditFinding = findings.find((f) => f.findingId === 'MON-AUDIT-001');
         expect(auditFinding).toBeUndefined();
       });
     });
@@ -878,9 +840,7 @@ describe('Compliance Assessors', () => {
         });
 
         const findings = await assessMonitoring();
-        const auditFinding = findings.find(
-          (f) => f.findingId === 'MON-AUDIT-001',
-        );
+        const auditFinding = findings.find((f) => f.findingId === 'MON-AUDIT-001');
         expect(auditFinding).toBeDefined();
         expect(auditFinding!.severity).toBe('medium');
         expect(auditFinding!.category).toBe('audit');
@@ -894,9 +854,7 @@ describe('Compliance Assessors', () => {
         });
 
         const findings = await assessMonitoring();
-        const auditFinding = findings.find(
-          (f) => f.findingId === 'MON-AUDIT-001',
-        );
+        const auditFinding = findings.find((f) => f.findingId === 'MON-AUDIT-001');
         expect(auditFinding).toBeUndefined();
       });
     });
@@ -912,9 +870,7 @@ describe('Compliance Assessors', () => {
         });
 
         const findings = await mod.assessMonitoring();
-        const guardFinding = findings.find(
-          (f) => f.findingId === 'MON-GUARD-001',
-        );
+        const guardFinding = findings.find((f) => f.findingId === 'MON-GUARD-001');
         expect(guardFinding).toBeDefined();
         expect(guardFinding!.severity).toBe('medium');
         expect(guardFinding!.category).toBe('monitoring');
@@ -930,9 +886,7 @@ describe('Compliance Assessors', () => {
         });
 
         const findings = await mod.assessMonitoring();
-        const guardFinding = findings.find(
-          (f) => f.findingId === 'MON-GUARD-001',
-        );
+        const guardFinding = findings.find((f) => f.findingId === 'MON-GUARD-001');
         expect(guardFinding).toBeUndefined();
       });
 
@@ -945,9 +899,7 @@ describe('Compliance Assessors', () => {
         });
 
         const findings = await mod.assessMonitoring();
-        const guardFinding = findings.find(
-          (f) => f.findingId === 'MON-GUARD-001',
-        );
+        const guardFinding = findings.find((f) => f.findingId === 'MON-GUARD-001');
         expect(guardFinding).toBeUndefined();
       });
     });
@@ -967,10 +919,7 @@ describe('Compliance Assessors', () => {
       });
 
       it('should report pending updates with high severity when > 5', async () => {
-        const updates = Array.from(
-          { length: 7 },
-          (_, i) => `   * macOS Update ${i}`,
-        ).join('\n');
+        const updates = Array.from({ length: 7 }, (_, i) => `   * macOS Update ${i}`).join('\n');
         stubExec({ '/usr/sbin/softwareupdate': updates });
 
         const findings = await assessPatching();
@@ -981,8 +930,7 @@ describe('Compliance Assessors', () => {
       });
 
       it('should report pending updates with medium severity when <= 5', async () => {
-        const updates =
-          '   * Safari update\n   * Security Update 2025-001\n   * XProtect';
+        const updates = '   * Safari update\n   * Security Update 2025-001\n   * XProtect';
         stubExec({ '/usr/sbin/softwareupdate': updates });
 
         const findings = await assessPatching();
@@ -994,8 +942,7 @@ describe('Compliance Assessors', () => {
 
       it('should NOT report when no updates are available', async () => {
         stubExec({
-          '/usr/sbin/softwareupdate':
-            'Software Update Tool\n\nNo new software available.',
+          '/usr/sbin/softwareupdate': 'Software Update Tool\n\nNo new software available.',
         });
 
         const findings = await assessPatching();
@@ -1025,7 +972,7 @@ describe('Compliance Assessors', () => {
         const lines = Array.from(
           { length: 12 },
           (_, i) =>
-            `libssl${i}/focal-security 1.1.1f-1ubuntu2.${i} amd64 [upgradable from: 1.1.1f-1ubuntu2.${i - 1}]`,
+            `libssl${i}/focal-security 1.1.1f-1ubuntu2.${i} amd64 [upgradable from: 1.1.1f-1ubuntu2.${i - 1}]`
         ).join('\n');
         stubExec({ '/usr/bin/apt': `Listing...\n${lines}` });
 
@@ -1051,8 +998,7 @@ describe('Compliance Assessors', () => {
 
       it('should NOT report when no security updates are pending', async () => {
         mockExistsSync.mockImplementation((p: string) => p === '/usr/bin/apt');
-        const lines =
-          'vim/focal 8.1.2269-1 amd64 [upgradable from: 8.1.2269-0]';
+        const lines = 'vim/focal 8.1.2269-1 amd64 [upgradable from: 8.1.2269-0]';
         stubExec({ '/usr/bin/apt': `Listing...\n${lines}` });
 
         const findings = await assessPatching();
@@ -1096,9 +1042,7 @@ describe('Compliance Assessors', () => {
       mockExistsSync.mockReturnValue(false);
 
       const findings = await assessIncidentResponse();
-      const configFinding = findings.find(
-        (f) => f.findingId === 'IR-CONFIG-001',
-      );
+      const configFinding = findings.find((f) => f.findingId === 'IR-CONFIG-001');
       expect(configFinding).toBeDefined();
       expect(configFinding!.severity).toBe('low');
       expect(configFinding!.category).toBe('incident');
@@ -1112,9 +1056,7 @@ describe('Compliance Assessors', () => {
       });
 
       const findings = await assessIncidentResponse();
-      const notifyFinding = findings.find(
-        (f) => f.findingId === 'IR-NOTIFY-001',
-      );
+      const notifyFinding = findings.find((f) => f.findingId === 'IR-NOTIFY-001');
       expect(notifyFinding).toBeDefined();
       expect(notifyFinding!.severity).toBe('medium');
     });
@@ -1127,9 +1069,7 @@ describe('Compliance Assessors', () => {
       });
 
       const findings = await assessIncidentResponse();
-      const notifyFinding = findings.find(
-        (f) => f.findingId === 'IR-NOTIFY-001',
-      );
+      const notifyFinding = findings.find((f) => f.findingId === 'IR-NOTIFY-001');
       expect(notifyFinding).toBeDefined();
     });
 
@@ -1147,13 +1087,9 @@ describe('Compliance Assessors', () => {
       });
 
       const findings = await assessIncidentResponse();
-      const notifyFinding = findings.find(
-        (f) => f.findingId === 'IR-NOTIFY-001',
-      );
+      const notifyFinding = findings.find((f) => f.findingId === 'IR-NOTIFY-001');
       expect(notifyFinding).toBeUndefined();
-      const configFinding = findings.find(
-        (f) => f.findingId === 'IR-CONFIG-001',
-      );
+      const configFinding = findings.find((f) => f.findingId === 'IR-CONFIG-001');
       expect(configFinding).toBeUndefined();
     });
 
@@ -1203,10 +1139,7 @@ describe('Compliance Assessors', () => {
 
     it('should deduplicate assessor invocations for same function', async () => {
       // access_control and authentication both map to assessAccessControl
-      const findings = await runAssessment([
-        'access_control',
-        'authentication',
-      ]);
+      const findings = await runAssessment(['access_control', 'authentication']);
       const ids = findings.map((f) => f.findingId);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
@@ -1232,17 +1165,13 @@ describe('Compliance Assessors', () => {
           _cmd: string,
           _args: string[],
           _opts: unknown,
-          cb: (err: Error | null, stdout: string) => void,
+          cb: (err: Error | null, stdout: string) => void
         ) => {
           cb(new Error('command failed'), '');
-        },
+        }
       );
 
-      const findings = await runAssessment([
-        'access_control',
-        'monitoring',
-        'encryption',
-      ]);
+      const findings = await runAssessment(['access_control', 'monitoring', 'encryption']);
       expect(Array.isArray(findings)).toBe(true);
     });
 
@@ -1328,9 +1257,7 @@ describe('Compliance Assessors', () => {
       const findings = await runFullAssessment();
       for (const f of findings) {
         expect(typeof f.findingId).toBe('string');
-        expect(['critical', 'high', 'medium', 'low', 'info']).toContain(
-          f.severity,
-        );
+        expect(['critical', 'high', 'medium', 'low', 'info']).toContain(f.severity);
         expect(typeof f.title).toBe('string');
         expect(typeof f.description).toBe('string');
         expect(typeof f.category).toBe('string');

@@ -43,8 +43,7 @@ export class AgentRegistry {
   registerAgent(request: AgentRegistrationRequest): AgentRegistration {
     if (this.agents.size >= this.maxAgents) {
       throw new Error(
-        `Maximum agent limit reached (${this.maxAgents}). ` +
-          'Cannot register additional agents.'
+        `Maximum agent limit reached (${this.maxAgents}). ` + 'Cannot register additional agents.'
       );
     }
 
@@ -212,8 +211,7 @@ export class AgentRegistry {
     this.agents.set(agentId, updated);
 
     logger.info(
-      `Agent marked offline: ${agentId} (${existing.hostname}) / ` +
-        `代理已標記為離線: ${agentId}`
+      `Agent marked offline: ${agentId} (${existing.hostname}) / ` + `代理已標記為離線: ${agentId}`
     );
     return true;
   }

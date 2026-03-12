@@ -88,7 +88,10 @@ describe('EncryptedFileCredentialStore', () => {
   let store: EncryptedFileCredentialStore;
 
   beforeEach(() => {
-    storePath = join(tmpdir(), `panguard-test-creds-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    storePath = join(
+      tmpdir(),
+      `panguard-test-creds-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
     store = new EncryptedFileCredentialStore(storePath);
   });
 
@@ -223,7 +226,10 @@ describe('Plaintext Credential Scanner', () => {
   let testDir: string;
 
   beforeEach(() => {
-    testDir = join(tmpdir(), `panguard-test-scan-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    testDir = join(
+      tmpdir(),
+      `panguard-test-scan-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
     mkdirSync(testDir, { recursive: true });
   });
 
@@ -337,7 +343,10 @@ describe('Credential Migration', () => {
   let store: InMemoryCredentialStore;
 
   beforeEach(() => {
-    testDir = join(tmpdir(), `panguard-test-migrate-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    testDir = join(
+      tmpdir(),
+      `panguard-test-migrate-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
     mkdirSync(testDir, { recursive: true });
     store = new InMemoryCredentialStore();
   });

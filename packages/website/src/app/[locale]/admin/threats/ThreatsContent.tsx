@@ -125,10 +125,7 @@ function ConfidenceBar({ confidence }: { confidence: number }) {
   return (
     <div className="flex items-center gap-2">
       <div className="w-16 h-1.5 bg-surface-3 rounded-full">
-        <div
-          className={`h-full rounded-full ${color}`}
-          style={{ width: `${confidence}%` }}
-        />
+        <div className={`h-full rounded-full ${color}`} style={{ width: `${confidence}%` }} />
       </div>
       <span className="text-[10px] font-mono text-text-muted">{confidence}%</span>
     </div>
@@ -342,7 +339,9 @@ export default function ThreatsContent() {
                         )}
                       </div>
 
-                      <p className={`text-sm text-text-secondary leading-relaxed ${isExpanded ? '' : 'line-clamp-1'}`}>
+                      <p
+                        className={`text-sm text-text-secondary leading-relaxed ${isExpanded ? '' : 'line-clamp-1'}`}
+                      >
                         {threat.description}
                       </p>
 

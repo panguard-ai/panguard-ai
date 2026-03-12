@@ -31,12 +31,14 @@ Analyze current growth metrics and suggest next actions.
 ## Analysis Framework
 
 For each metric area, provide:
+
 1. **Current state** — what the numbers say
 2. **Benchmark** — what good looks like for a pre-launch/early-stage security SaaS
 3. **Gap** — where you're behind
 4. **Action** — specific next step to improve
 
 ## Growth Levers (prioritized)
+
 1. **SEO content** — blog posts targeting long-tail keywords
 2. **Open source community** — GitHub stars, ATR contributions
 3. **Product-led growth** — free Scan tool as top-of-funnel
@@ -44,4 +46,5 @@ For each metric area, provide:
 5. **Partnerships** — MSPs, IT consultancies, hosting providers
 
 ## Output
+
 Return a dashboard-style summary with red/yellow/green indicators and the top 3 actions for this week.

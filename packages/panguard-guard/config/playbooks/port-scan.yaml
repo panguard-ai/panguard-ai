@@ -1,6 +1,6 @@
 name: port-scan-response
-description: "Respond to port scanning activity"
-descriptionZh: "回應端口掃描活動"
+description: 'Respond to port scanning activity'
+descriptionZh: '回應端口掃描活動'
 priority: 80
 trigger:
   pattern: port_scan
@@ -8,17 +8,17 @@ trigger:
 actions:
   - type: block_ip
     params:
-      duration: "30m"
+      duration: '30m'
   - type: notify
     params:
       severity: medium
 escalation:
   after: 5
-  within: "1h"
+  within: '1h'
   actions:
     - type: block_ip
       params:
-        duration: "24h"
+        duration: '24h'
     - type: notify
       params:
         severity: high

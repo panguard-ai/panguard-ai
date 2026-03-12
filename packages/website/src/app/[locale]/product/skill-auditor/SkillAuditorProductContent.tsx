@@ -94,19 +94,38 @@ const workflowSteps = [
     '    --json --threshold 40',
     '  # Blocks PR if risk > 40',
   ],
-  [
-    '# panguard-manager policy',
-    'skill_policy:',
-    '  require_audit: true',
-    '  max_risk_score: 39',
-  ],
+  ['# panguard-manager policy', 'skill_policy:', '  require_audit: true', '  max_risk_score: 39'],
 ];
 
 const riskLevels = [
-  { range: '0-14', level: 'LOW', color: 'text-green-400', bg: 'bg-green-400/10', key: 'low' as const },
-  { range: '15-39', level: 'MEDIUM', color: 'text-yellow-400', bg: 'bg-yellow-400/10', key: 'medium' as const },
-  { range: '40-69', level: 'HIGH', color: 'text-orange-400', bg: 'bg-orange-400/10', key: 'high' as const },
-  { range: '70-100', level: 'CRITICAL', color: 'text-red-400', bg: 'bg-red-400/10', key: 'critical' as const },
+  {
+    range: '0-14',
+    level: 'LOW',
+    color: 'text-green-400',
+    bg: 'bg-green-400/10',
+    key: 'low' as const,
+  },
+  {
+    range: '15-39',
+    level: 'MEDIUM',
+    color: 'text-yellow-400',
+    bg: 'bg-yellow-400/10',
+    key: 'medium' as const,
+  },
+  {
+    range: '40-69',
+    level: 'HIGH',
+    color: 'text-orange-400',
+    bg: 'bg-orange-400/10',
+    key: 'high' as const,
+  },
+  {
+    range: '70-100',
+    level: 'CRITICAL',
+    color: 'text-red-400',
+    bg: 'bg-red-400/10',
+    key: 'critical' as const,
+  },
 ];
 
 const comparisonRows = ['method', 'speed', 'coverage', 'consistency', 'output'] as const;
@@ -189,12 +208,8 @@ Run with --json for machine-readable output.`}
             </h2>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="text-text-secondary mt-6 leading-relaxed text-lg">
-              {t('problem.desc')}
-            </p>
-            <p className="text-text-secondary mt-4 leading-relaxed text-lg">
-              {t('problem.desc2')}
-            </p>
+            <p className="text-text-secondary mt-6 leading-relaxed text-lg">{t('problem.desc')}</p>
+            <p className="text-text-secondary mt-4 leading-relaxed text-lg">{t('problem.desc2')}</p>
           </FadeInUp>
         </div>
       </SectionWrapper>
@@ -367,11 +382,15 @@ Run with --json for machine-readable output.`}
                   </div>
                   <div>
                     <div className="text-3xl font-extrabold text-text-primary">7</div>
-                    <div className="text-xs text-text-muted mt-1">{t('checks.checkCategories')}</div>
+                    <div className="text-xs text-text-muted mt-1">
+                      {t('checks.checkCategories')}
+                    </div>
                   </div>
                   <div>
                     <div className="text-3xl font-extrabold text-text-primary">11+</div>
-                    <div className="text-xs text-text-muted mt-1">{t('checks.injectionPatterns')}</div>
+                    <div className="text-xs text-text-muted mt-1">
+                      {t('checks.injectionPatterns')}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -395,13 +414,20 @@ Run with --json for machine-readable output.`}
           <FadeInUp delay={0.1}>
             <div className="mt-10 space-y-4">
               {(['layer1', 'layer2', 'layer3'] as const).map((key, i) => (
-                <div key={key} className={`flex items-start gap-4 p-5 rounded-xl border ${i === 1 ? 'border-brand-sage/30 bg-brand-sage/5' : 'border-border bg-surface-0'}`}>
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-extrabold ${i === 1 ? 'bg-brand-sage/20 text-brand-sage' : 'bg-surface-1 text-text-muted'}`}>
+                <div
+                  key={key}
+                  className={`flex items-start gap-4 p-5 rounded-xl border ${i === 1 ? 'border-brand-sage/30 bg-brand-sage/5' : 'border-border bg-surface-0'}`}
+                >
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-extrabold ${i === 1 ? 'bg-brand-sage/20 text-brand-sage' : 'bg-surface-1 text-text-muted'}`}
+                  >
                     {i + 1}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className={`text-xs font-semibold ${i === 1 ? 'text-brand-sage' : 'text-text-muted'}`}>
+                      <span
+                        className={`text-xs font-semibold ${i === 1 ? 'text-brand-sage' : 'text-text-muted'}`}
+                      >
                         {t(`checks.layers.${key}.label`)}
                       </span>
                     </div>
@@ -436,12 +462,18 @@ Run with --json for machine-readable output.`}
           <div className="mt-8 space-y-3">
             {riskLevels.map((r, i) => (
               <FadeInUp key={r.level} delay={0.05 * i}>
-                <div className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-4 rounded-xl border border-border ${r.bg}`}>
+                <div
+                  className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-4 rounded-xl border border-border ${r.bg}`}
+                >
                   <div className="flex items-center gap-3 sm:gap-4">
-                    <div className={`text-xl sm:text-2xl font-extrabold ${r.color} w-16 sm:w-20 text-center flex-shrink-0`}>
+                    <div
+                      className={`text-xl sm:text-2xl font-extrabold ${r.color} w-16 sm:w-20 text-center flex-shrink-0`}
+                    >
                       {r.range}
                     </div>
-                    <div className={`text-sm font-bold ${r.color} w-20 flex-shrink-0`}>{r.level}</div>
+                    <div className={`text-sm font-bold ${r.color} w-20 flex-shrink-0`}>
+                      {r.level}
+                    </div>
                   </div>
                   <div className="text-text-secondary text-sm flex-1 pl-16 sm:pl-0">
                     {t(`riskScoring.${r.key}`)}
@@ -487,9 +519,7 @@ Run with --json for machine-readable output.`}
                       {workflowSteps[i].map((s, j) => (
                         <div
                           key={j}
-                          className={
-                            s.startsWith('$') || s.startsWith('#') ? 'text-gray-200' : ''
-                          }
+                          className={s.startsWith('$') || s.startsWith('#') ? 'text-gray-200' : ''}
                         >
                           {s}
                         </div>
@@ -532,9 +562,7 @@ Run with --json for machine-readable output.`}
                 <h3 className="text-lg font-bold text-text-primary">
                   {t('complementary.layer1.name')}
                 </h3>
-                <p className="text-sm text-text-secondary mt-2">
-                  {t('complementary.layer1.desc')}
-                </p>
+                <p className="text-sm text-text-secondary mt-2">{t('complementary.layer1.desc')}</p>
                 <div className="mt-4 px-3 py-2 rounded-lg bg-surface-0 border border-border">
                   <div className="flex items-center gap-2 justify-center">
                     <ClipboardCheck className="w-4 h-4 text-brand-sage" />
@@ -556,9 +584,7 @@ Run with --json for machine-readable output.`}
                 <h3 className="text-lg font-bold text-text-primary">
                   {t('complementary.layer2.name')}
                 </h3>
-                <p className="text-sm text-text-secondary mt-2">
-                  {t('complementary.layer2.desc')}
-                </p>
+                <p className="text-sm text-text-secondary mt-2">{t('complementary.layer2.desc')}</p>
                 <div className="mt-4 px-3 py-2 rounded-lg bg-surface-1/50 border border-border">
                   <div className="flex items-center gap-2 justify-center">
                     <Smartphone className="w-4 h-4 text-text-muted" />
@@ -580,9 +606,7 @@ Run with --json for machine-readable output.`}
                 <h3 className="text-lg font-bold text-text-primary">
                   {t('complementary.layer3.name')}
                 </h3>
-                <p className="text-sm text-text-secondary mt-2">
-                  {t('complementary.layer3.desc')}
-                </p>
+                <p className="text-sm text-text-secondary mt-2">{t('complementary.layer3.desc')}</p>
                 <div className="mt-4 px-3 py-2 rounded-lg bg-surface-0 border border-border">
                   <div className="flex items-center gap-2 justify-center">
                     <Shield className="w-4 h-4 text-brand-sage" />
@@ -622,14 +646,15 @@ Run with --json for machine-readable output.`}
               <h2 className="text-[clamp(20px,3.5vw,44px)] font-bold text-text-primary leading-[1.1]">
                 {t('cta.title')}
               </h2>
-              <p className="text-text-secondary mt-4 text-lg">
-                {t('cta.desc')}
-              </p>
+              <p className="text-text-secondary mt-4 text-lg">{t('cta.desc')}</p>
             </div>
           </FadeInUp>
           <FadeInUp delay={0.15}>
             <div className="max-w-lg mx-auto mt-8">
-              <CodeBlock code="curl -fsSL https://get.panguard.ai | bash" title={t('cta.installTitle')} />
+              <CodeBlock
+                code="curl -fsSL https://get.panguard.ai | bash"
+                title={t('cta.installTitle')}
+              />
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
               <Link

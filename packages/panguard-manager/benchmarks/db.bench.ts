@@ -45,7 +45,10 @@ function makeThreatEvent(index: number): ThreatEvent {
       severity: index % 4 === 0 ? 'critical' : index % 3 === 0 ? 'high' : 'medium',
       category: index % 2 === 0 ? 'intrusion' : 'brute_force',
       description: `Threat event ${index}`,
-      raw: { src_ip: `10.0.${Math.floor(index / 256)}.${index % 256}`, dst_port: 4444 + (index % 100) },
+      raw: {
+        src_ip: `10.0.${Math.floor(index / 256)}.${index % 256}`,
+        dst_port: 4444 + (index % 100),
+      },
       host: `host-${index % 100}`,
       metadata: { rule: `ET-RULE-${index % 50}` },
     },

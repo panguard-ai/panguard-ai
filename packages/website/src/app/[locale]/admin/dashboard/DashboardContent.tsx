@@ -108,7 +108,9 @@ function StatusDot({ status }: { status: 'online' | 'offline' | 'warning' }) {
   return (
     <span className="relative flex h-2.5 w-2.5">
       {status === 'online' && (
-        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${colorMap[status]} opacity-40`} />
+        <span
+          className={`animate-ping absolute inline-flex h-full w-full rounded-full ${colorMap[status]} opacity-40`}
+        />
       )}
       <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${colorMap[status]}`} />
     </span>
@@ -119,7 +121,11 @@ function StatusDot({ status }: { status: 'online' | 'offline' | 'warning' }) {
 /*  Empty State                                                        */
 /* ------------------------------------------------------------------ */
 
-function EmptyState({ icon: Icon, title, description }: {
+function EmptyState({
+  icon: Icon,
+  title,
+  description,
+}: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
@@ -166,7 +172,7 @@ export default function DashboardContent() {
     });
 
     // Connect to SSE for real-time updates
-     
+
     const cleanup = connectManagerSSE((type) => {
       if (type === 'agent_online' || type === 'agent_offline' || type === 'threats_reported') {
         // Refetch agents on status changes
@@ -202,7 +208,8 @@ export default function DashboardContent() {
       id: 'endpoints',
       label: 'Endpoints Monitored',
       value: String(displayedAgents.length),
-      change: displayedAgents.length === 0 ? 'Install Guard to get started' : `${onlineCount} online`,
+      change:
+        displayedAgents.length === 0 ? 'Install Guard to get started' : `${onlineCount} online`,
       changeType: 'neutral',
       icon: Monitor,
       accentColor: 'text-brand-sage',
@@ -220,7 +227,8 @@ export default function DashboardContent() {
       id: 'agents',
       label: 'Guard Agents Online',
       value: String(onlineCount),
-      change: displayedAgents.length === 0 ? 'No agents connected' : `${displayedAgents.length} total`,
+      change:
+        displayedAgents.length === 0 ? 'No agents connected' : `${displayedAgents.length} total`,
       changeType: 'neutral',
       icon: Cpu,
       accentColor: 'text-status-safe',
@@ -304,7 +312,9 @@ export default function DashboardContent() {
                 {liveAlerts.map((alert) => (
                   <button
                     key={alert.id}
-                    onClick={() => setSelectedAlertId(selectedAlertId === alert.id ? null : alert.id)}
+                    onClick={() =>
+                      setSelectedAlertId(selectedAlertId === alert.id ? null : alert.id)
+                    }
                     className={`w-full text-left p-3 rounded-lg border transition-all duration-200 ${
                       selectedAlertId === alert.id
                         ? 'bg-surface-2 border-brand-sage/30'
@@ -409,7 +419,9 @@ export default function DashboardContent() {
         <div className="bg-surface-1 border border-border rounded-xl p-5 card-glow">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`${isConnected ? 'bg-status-safe/10' : 'bg-surface-2'} p-2 rounded-lg`}>
+              <div
+                className={`${isConnected ? 'bg-status-safe/10' : 'bg-surface-2'} p-2 rounded-lg`}
+              >
                 {isConnected ? (
                   <Wifi className="w-5 h-5 text-status-safe" />
                 ) : (

@@ -161,7 +161,9 @@ function checkAiProvider(): CheckResult {
   if (existsSync(CONFIG_PATH)) {
     try {
       const raw = readFileSync(CONFIG_PATH, 'utf-8');
-      const cfg = JSON.parse(raw) as { ai?: { preference?: string; provider?: string; model?: string } };
+      const cfg = JSON.parse(raw) as {
+        ai?: { preference?: string; provider?: string; model?: string };
+      };
       if (cfg.ai?.preference === 'rules_only') {
         return {
           status: 'pass',
@@ -173,7 +175,10 @@ function checkAiProvider(): CheckResult {
         configProvider = cfg.ai.provider;
         _configModel = cfg.ai.model;
         const layerNum = cfg.ai.provider === 'ollama' ? '2' : '3';
-        layers.push(`Layer ${layerNum}: ${cfg.ai.provider} (config)` + (cfg.ai.model ? ` / ${cfg.ai.model}` : ''));
+        layers.push(
+          `Layer ${layerNum}: ${cfg.ai.provider} (config)` +
+            (cfg.ai.model ? ` / ${cfg.ai.model}` : '')
+        );
       }
     } catch {
       // fall through
@@ -188,7 +193,10 @@ function checkAiProvider(): CheckResult {
       const cfg = JSON.parse(raw) as { ai?: { provider?: string; model?: string } };
       if (cfg.ai?.provider) {
         const layerNum = cfg.ai.provider === 'ollama' ? '2' : '3';
-        layers.push(`Layer ${layerNum}: ${cfg.ai.provider} (guard config)` + (cfg.ai.model ? ` / ${cfg.ai.model}` : ''));
+        layers.push(
+          `Layer ${layerNum}: ${cfg.ai.provider} (guard config)` +
+            (cfg.ai.model ? ` / ${cfg.ai.model}` : '')
+        );
       }
     } catch {
       // fall through
@@ -207,8 +215,7 @@ function checkAiProvider(): CheckResult {
     status: 'warn',
     label: 'AI provider',
     detail: 'No AI provider configured (Layer 1 rules-only mode)',
-    fix:
-      'Run "panguard guard setup-ai" for interactive setup, or set ANTHROPIC_API_KEY / install Ollama',
+    fix: 'Run "panguard guard setup-ai" for interactive setup, or set ANTHROPIC_API_KEY / install Ollama',
   };
 }
 
@@ -410,9 +417,7 @@ function checkSystemService(): CheckResult {
       detail: matchesConfig
         ? 'launchd unit matches config'
         : 'launchd plist exists but may be outdated',
-      fix: matchesConfig
-        ? undefined
-        : 'Run "panguard guard install" to reinstall the service',
+      fix: matchesConfig ? undefined : 'Run "panguard guard install" to reinstall the service',
     };
   } catch {
     return {
@@ -467,7 +472,10 @@ function checkAiLayerLocal(): CheckResult {
   let ollamaInstalled = false;
   let ollamaVersion = '';
   try {
-    ollamaVersion = execFileSync('ollama', ['--version'], { encoding: 'utf-8', timeout: 3000 }).trim();
+    ollamaVersion = execFileSync('ollama', ['--version'], {
+      encoding: 'utf-8',
+      timeout: 3000,
+    }).trim();
     ollamaInstalled = true;
   } catch {
     // not installed
@@ -521,7 +529,9 @@ function checkAiLayerCloud(): CheckResult {
     if (existsSync(cfgPath)) {
       try {
         const raw = readFileSync(cfgPath, 'utf-8');
-        const cfg = JSON.parse(raw) as { ai?: { provider?: string; apiKey?: string; model?: string } };
+        const cfg = JSON.parse(raw) as {
+          ai?: { provider?: string; apiKey?: string; model?: string };
+        };
         if (cfg.ai?.provider && cfg.ai.provider !== 'ollama' && cfg.ai?.apiKey) {
           configCloud = true;
           configProvider = `${cfg.ai.provider}${cfg.ai.model ? ' / ' + cfg.ai.model : ''}`;
@@ -608,9 +618,7 @@ export async function runDoctor(lang: Lang): Promise<void> {
   const results = runAllChecks();
 
   console.log('');
-  console.log(
-    header(lang === 'zh-TW' ? 'Panguard AI 健康診斷' : 'Panguard AI Health Check')
-  );
+  console.log(header(lang === 'zh-TW' ? 'Panguard AI 健康診斷' : 'Panguard AI Health Check'));
 
   // Label column width for alignment
   const labelWidth = Math.max(...results.map((r) => r.label.length));
@@ -650,60 +658,60 @@ export async function runDoctor(lang: Lang): Promise<void> {
 
 export function doctorCommand(): Command {
   return new Command('doctor')
-    .description(
-      'Run health diagnostics / \u57F7\u884C\u5065\u5EB7\u8A3A\u65B7'
-    )
+    .description('Run health diagnostics / \u57F7\u884C\u5065\u5EB7\u8A3A\u65B7')
     .option('--json', 'Output results as JSON')
     .option('--fix', 'Attempt auto-repair of detected issues')
     .option('--lang <language>', 'Language override (en | zh-TW)')
-    .action(
-      async (opts: { json?: boolean; fix?: boolean; lang?: string }) => {
-        const lang: Lang = opts.lang === 'en' ? 'en' : 'zh-TW';
-        const results = runAllChecks();
+    .action(async (opts: { json?: boolean; fix?: boolean; lang?: string }) => {
+      const lang: Lang = opts.lang === 'en' ? 'en' : 'zh-TW';
+      const results = runAllChecks();
 
-        if (opts.json) {
-          console.log(JSON.stringify(results, null, 2));
-          return;
-        }
-
-        if (opts.fix) {
-          console.log('');
-          console.log(
-            header(lang === 'zh-TW' ? 'Panguard AI 健康診斷 — 自動修復' : 'Panguard AI Health Check — Auto-fix')
-          );
-
-          const fixable = results.filter((r) => r.status !== 'pass' && r.fix);
-          if (fixable.length === 0) {
-            console.log(`  ${symbols.pass} ${c.sage('No issues require fixing.')}`);
-            console.log('');
-            return;
-          }
-
-          for (const result of fixable) {
-            const sym = statusSymbol(result.status);
-            console.log(`  ${sym} ${c.bold(result.label)}`);
-            console.log(`     ${c.dim('Would run:')} ${result.fix}`);
-          }
-
-          console.log('');
-          console.log(
-            `  ${symbols.info} ${c.dim(
-              lang === 'zh-TW'
-                ? '自動修復功能即將推出。請手動執行上述指令。'
-                : 'Automated fix execution coming soon. Please run the above commands manually.'
-            )}`
-          );
-          console.log('');
-          return;
-        }
-
-        // Default: same as interactive display
-        await runDoctor(lang);
-
-        const hasFailure = results.some((r) => r.status === 'fail');
-        if (hasFailure) {
-          process.exitCode = 1;
-        }
+      if (opts.json) {
+        console.log(JSON.stringify(results, null, 2));
+        return;
       }
-    );
+
+      if (opts.fix) {
+        console.log('');
+        console.log(
+          header(
+            lang === 'zh-TW'
+              ? 'Panguard AI 健康診斷 — 自動修復'
+              : 'Panguard AI Health Check — Auto-fix'
+          )
+        );
+
+        const fixable = results.filter((r) => r.status !== 'pass' && r.fix);
+        if (fixable.length === 0) {
+          console.log(`  ${symbols.pass} ${c.sage('No issues require fixing.')}`);
+          console.log('');
+          return;
+        }
+
+        for (const result of fixable) {
+          const sym = statusSymbol(result.status);
+          console.log(`  ${sym} ${c.bold(result.label)}`);
+          console.log(`     ${c.dim('Would run:')} ${result.fix}`);
+        }
+
+        console.log('');
+        console.log(
+          `  ${symbols.info} ${c.dim(
+            lang === 'zh-TW'
+              ? '自動修復功能即將推出。請手動執行上述指令。'
+              : 'Automated fix execution coming soon. Please run the above commands manually.'
+          )}`
+        );
+        console.log('');
+        return;
+      }
+
+      // Default: same as interactive display
+      await runDoctor(lang);
+
+      const hasFailure = results.some((r) => r.status === 'fail');
+      if (hasFailure) {
+        process.exitCode = 1;
+      }
+    });
 }

@@ -76,10 +76,7 @@ export class LINEChannel implements MessagingChannel {
         messages: [{ type: 'text', text: fullText }],
       });
 
-      const response = await this.httpPost(
-        'https://api.line.me/v2/bot/message/push',
-        payload
-      );
+      const response = await this.httpPost('https://api.line.me/v2/bot/message/push', payload);
 
       logger.info(`LINE message sent to ${targetId} / LINE 訊息已發送`);
 

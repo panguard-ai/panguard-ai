@@ -26,8 +26,16 @@ import {
 /* ─── Layer Config ─── */
 const layerConfigs = [
   { key: 'layer1' as const, badgeColor: 'bg-brand-sage/10 text-brand-sage', mdClass: '' },
-  { key: 'layer2' as const, badgeColor: 'bg-[#60a5fa]/10 text-[#60a5fa]', mdClass: 'md:max-w-[70%]' },
-  { key: 'layer3' as const, badgeColor: 'bg-[#f59e0b]/10 text-[#f59e0b]', mdClass: 'md:max-w-[40%]' },
+  {
+    key: 'layer2' as const,
+    badgeColor: 'bg-[#60a5fa]/10 text-[#60a5fa]',
+    mdClass: 'md:max-w-[70%]',
+  },
+  {
+    key: 'layer3' as const,
+    badgeColor: 'bg-[#f59e0b]/10 text-[#f59e0b]',
+    mdClass: 'md:max-w-[40%]',
+  },
 ];
 
 /* ─── Defense Stack Layers ─── */
@@ -145,8 +153,8 @@ export default function TechnologyContent() {
   return (
     <>
       <p id="definition" className="sr-only">
-        Panguard&apos;s detection engine combines three analysis engines — Sigma rule matching,
-        YARA signature scanning, and ATR (Agent Threat Rules) — across five detection stages with
+        Panguard&apos;s detection engine combines three analysis engines — Sigma rule matching, YARA
+        signature scanning, and ATR (Agent Threat Rules) — across five detection stages with
         graceful degradation from cloud to fully offline operation.
       </p>
 
@@ -236,18 +244,20 @@ export default function TechnologyContent() {
                 className={`relative bg-surface-2 rounded-xl border ${layer.borderColor} p-6 sm:p-8 hover:border-opacity-60 transition-all duration-300 group`}
               >
                 {/* Layer connector line (not on first) */}
-                {i > 0 && (
-                  <div className="absolute -top-4 left-10 w-px h-4 bg-border" />
-                )}
+                {i > 0 && <div className="absolute -top-4 left-10 w-px h-4 bg-border" />}
 
                 {/* Header row */}
                 <div className="flex flex-wrap items-start gap-4 mb-4">
-                  <div className={`shrink-0 w-12 h-12 rounded-lg ${layer.bgGlow} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
+                  <div
+                    className={`shrink-0 w-12 h-12 rounded-lg ${layer.bgGlow} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}
+                  >
                     <layer.icon className={`w-6 h-6 ${layer.iconColor}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-3 mb-1">
-                      <span className={`${layer.badgeBg} text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full`}>
+                      <span
+                        className={`${layer.badgeBg} text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full`}
+                      >
                         {t(`defenseStack.${layer.key}.layer`)}
                       </span>
                       <h3 className="text-lg font-bold text-text-primary">
@@ -295,7 +305,9 @@ export default function TechnologyContent() {
             <div className="h-px w-12 bg-border" />
             <div className="flex items-center gap-2 text-text-tertiary">
               <MonitorIcon className="w-4 h-4 text-brand-sage" />
-              <span className="text-xs font-medium">All layers feed into the unified event pipeline</span>
+              <span className="text-xs font-medium">
+                All layers feed into the unified event pipeline
+              </span>
             </div>
             <div className="h-px w-12 bg-border" />
           </div>

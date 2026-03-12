@@ -146,7 +146,13 @@ describe('Init Wizard', () => {
         version: '1.0.0',
         meta: { createdAt: '2026-01-01', language: 'en' },
         organization: { name: 'Test', size: 'individual', industry: 'tech' },
-        environment: { os: 'linux', hostname: 'h', arch: 'x64', deployType: 'cloud', serverCount: 1 },
+        environment: {
+          os: 'linux',
+          hostname: 'h',
+          arch: 'x64',
+          deployType: 'cloud',
+          serverCount: 1,
+        },
         security: { goals: [], compliance: [], protectionLevel: 'balanced' },
       };
       expect(validateConfigSchema(valid)).toBe(true);
@@ -263,7 +269,6 @@ describe('Init Wizard', () => {
         })
       ).toBe(false);
     });
-
   });
 
   describe('buildPanguardConfig (full wizard)', () => {

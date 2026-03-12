@@ -9,7 +9,6 @@ import { randomBytes } from 'node:crypto';
 import type { Socket } from 'node:net';
 import { DashboardRelay } from '../src/dashboard-relay.js';
 
-
 /** Helper to get a free port / 輔助取得可用埠 */
 function getPort(): Promise<number> {
   return new Promise((resolve) => {
@@ -23,11 +22,7 @@ function getPort(): Promise<number> {
 }
 
 /** Helper to perform a WebSocket handshake as a client / 輔助以客戶端身分執行 WebSocket 交握 */
-function wsConnect(
-  port: number,
-  path: string,
-  headers?: Record<string, string>
-): Promise<Socket> {
+function wsConnect(port: number, path: string, headers?: Record<string, string>): Promise<Socket> {
   return new Promise((resolve, reject) => {
     const wsKey = randomBytes(16).toString('base64');
 
@@ -37,8 +32,8 @@ function wsConnect(
       path,
       method: 'GET',
       headers: {
-        'Upgrade': 'websocket',
-        'Connection': 'Upgrade',
+        Upgrade: 'websocket',
+        Connection: 'Upgrade',
         'Sec-WebSocket-Key': wsKey,
         'Sec-WebSocket-Version': '13',
         ...headers,
@@ -136,7 +131,11 @@ describe('DashboardRelay', () => {
   afterEach(async () => {
     // Cleanup sockets
     for (const s of sockets) {
-      try { s.destroy(); } catch { /* ignore */ }
+      try {
+        s.destroy();
+      } catch {
+        /* ignore */
+      }
     }
     sockets.length = 0;
 
@@ -184,7 +183,7 @@ describe('DashboardRelay', () => {
       await new Promise((r) => setTimeout(r, 50));
       expect(relay.getConnectedAgents()).toContain('agent-002');
       // Still only one agent
-      expect(relay.getConnectedAgents().filter(id => id === 'agent-002')).toHaveLength(1);
+      expect(relay.getConnectedAgents().filter((id) => id === 'agent-002')).toHaveLength(1);
     });
   });
 
@@ -202,9 +201,9 @@ describe('DashboardRelay', () => {
     });
 
     it('should reject client connection for non-connected agent', async () => {
-      await expect(
-        wsConnect(port, '/api/dashboard/view/non-existent-agent')
-      ).rejects.toThrow('Upgrade rejected');
+      await expect(wsConnect(port, '/api/dashboard/view/non-existent-agent')).rejects.toThrow(
+        'Upgrade rejected'
+      );
     });
   });
 
@@ -219,7 +218,11 @@ describe('DashboardRelay', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       // Agent sends event
-      const event = { type: 'status_update', data: { mode: 'protection' }, timestamp: new Date().toISOString() };
+      const event = {
+        type: 'status_update',
+        data: { mode: 'protection' },
+        timestamp: new Date().toISOString(),
+      };
       const frame = createMaskedFrame(JSON.stringify(event));
       agentSocket.write(frame);
 
@@ -248,14 +251,15 @@ describe('DashboardRelay', () => {
       expect(relay.getClientCount('agent-030')).toBe(2);
 
       // Agent sends event
-      const event = { type: 'new_event', data: { threat: true }, timestamp: new Date().toISOString() };
+      const event = {
+        type: 'new_event',
+        data: { threat: true },
+        timestamp: new Date().toISOString(),
+      };
       agentSocket.write(createMaskedFrame(JSON.stringify(event)));
 
       // Both clients should receive
-      const [data1, data2] = await Promise.all([
-        waitForData(client1),
-        waitForData(client2),
-      ]);
+      const [data1, data2] = await Promise.all([waitForData(client1), waitForData(client2)]);
 
       const text1 = extractTextFromFrame(data1);
       const text2 = extractTextFromFrame(data2);
@@ -344,9 +348,7 @@ describe('DashboardRelay', () => {
 
   describe('unknown path', () => {
     it('should reject upgrade for unknown paths', async () => {
-      await expect(
-        wsConnect(port, '/api/dashboard/unknown/agent-x')
-      ).rejects.toThrow();
+      await expect(wsConnect(port, '/api/dashboard/unknown/agent-x')).rejects.toThrow();
     });
   });
 

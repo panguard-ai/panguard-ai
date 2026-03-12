@@ -493,15 +493,11 @@ describe('Manager', () => {
 
       // Agents detail
       expect(overview.agents).toHaveLength(2);
-      const agent1Overview = overview.agents.find(
-        (a) => a.agentId === reg1.agentId
-      );
+      const agent1Overview = overview.agents.find((a) => a.agentId === reg1.agentId);
       expect(agent1Overview).toBeDefined();
       expect(agent1Overview!.threatCount).toBe(1);
 
-      const agent2Overview = overview.agents.find(
-        (a) => a.agentId === reg2.agentId
-      );
+      const agent2Overview = overview.agents.find((a) => a.agentId === reg2.agentId);
       expect(agent2Overview!.threatCount).toBe(0);
 
       // Threat summary

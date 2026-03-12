@@ -40,28 +40,42 @@ export function handleSubmitProposal(args: Record<string, unknown>): {
   // Validate required fields
   if (typeof title !== 'string' || title.trim().length === 0) {
     return {
-      content: [{ type: 'text', text: 'Error: "title" is required and must be a non-empty string.' }],
+      content: [
+        { type: 'text', text: 'Error: "title" is required and must be a non-empty string.' },
+      ],
       isError: true,
     };
   }
 
   if (typeof category !== 'string' || !VALID_CATEGORIES.has(category)) {
     return {
-      content: [{ type: 'text', text: `Error: "category" must be one of: ${[...VALID_CATEGORIES].join(', ')}` }],
+      content: [
+        {
+          type: 'text',
+          text: `Error: "category" must be one of: ${[...VALID_CATEGORIES].join(', ')}`,
+        },
+      ],
       isError: true,
     };
   }
 
   if (typeof attackDescription !== 'string' || attackDescription.trim().length === 0) {
     return {
-      content: [{ type: 'text', text: 'Error: "attack_description" is required and must be a non-empty string.' }],
+      content: [
+        {
+          type: 'text',
+          text: 'Error: "attack_description" is required and must be a non-empty string.',
+        },
+      ],
       isError: true,
     };
   }
 
   if (!Array.isArray(examplePayloads) || examplePayloads.length === 0) {
     return {
-      content: [{ type: 'text', text: 'Error: "example_payloads" must be a non-empty array of strings.' }],
+      content: [
+        { type: 'text', text: 'Error: "example_payloads" must be a non-empty array of strings.' },
+      ],
       isError: true,
     };
   }
@@ -69,7 +83,9 @@ export function handleSubmitProposal(args: Record<string, unknown>): {
   for (const payload of examplePayloads) {
     if (typeof payload !== 'string') {
       return {
-        content: [{ type: 'text', text: 'Error: All items in "example_payloads" must be strings.' }],
+        content: [
+          { type: 'text', text: 'Error: All items in "example_payloads" must be strings.' },
+        ],
         isError: true,
       };
     }
@@ -77,7 +93,12 @@ export function handleSubmitProposal(args: Record<string, unknown>): {
 
   if (severity && !VALID_SEVERITIES.has(severity)) {
     return {
-      content: [{ type: 'text', text: `Error: "severity" must be one of: ${[...VALID_SEVERITIES].join(', ')}` }],
+      content: [
+        {
+          type: 'text',
+          text: `Error: "severity" must be one of: ${[...VALID_SEVERITIES].join(', ')}`,
+        },
+      ],
       isError: true,
     };
   }

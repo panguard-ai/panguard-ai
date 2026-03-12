@@ -18,13 +18,7 @@
  */
 
 import { EventEmitter } from 'node:events';
-import {
-  createReadStream,
-  existsSync,
-  statSync,
-  watchFile,
-  unwatchFile,
-} from 'node:fs';
+import { createReadStream, existsSync, statSync, watchFile, unwatchFile } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { createSocket, type Socket as DgramSocket } from 'node:dgram';
 import { createServer, type Server as NetServer } from 'node:net';
@@ -207,9 +201,7 @@ export class LogCollector extends EventEmitter {
 
       this.emit('event', event);
     } catch (err: unknown) {
-      logger.debug(
-        `Failed to parse log line: ${err instanceof Error ? err.message : String(err)}`
-      );
+      logger.debug(`Failed to parse log line: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -234,9 +226,7 @@ export class LogCollector extends EventEmitter {
    */
   private startFileTail(filePath: string): void {
     if (!existsSync(filePath)) {
-      logger.warn(
-        `Log file not found, skipping: ${filePath} / 日誌檔案不存在，跳過: ${filePath}`
-      );
+      logger.warn(`Log file not found, skipping: ${filePath} / 日誌檔案不存在，跳過: ${filePath}`);
       return;
     }
 
@@ -329,9 +319,7 @@ export class LogCollector extends EventEmitter {
       });
 
       this.udpSocket.on('error', (err) => {
-        logger.error(
-          `Syslog UDP error: ${err.message} / Syslog UDP 錯誤: ${err.message}`
-        );
+        logger.error(`Syslog UDP error: ${err.message} / Syslog UDP 錯誤: ${err.message}`);
       });
 
       const bindHost = host ?? '0.0.0.0';
@@ -434,9 +422,7 @@ export class LogCollector extends EventEmitter {
       }
 
       this.journaldProcess.on('error', (err) => {
-        logger.warn(
-          `Journald process error: ${err.message} / Journald 程序錯誤: ${err.message}`
-        );
+        logger.warn(`Journald process error: ${err.message} / Journald 程序錯誤: ${err.message}`);
         // Fall back to polling / 退回到輪詢
         this.journaldProcess = null;
         this.startJournaldPolling(unit, pollIntervalMs ?? 5000);
@@ -509,7 +495,20 @@ export class LogCollector extends EventEmitter {
       // Reconstruct a syslog-like line for the parser
       // 重建類似 syslog 的行給解析器使用
       const now = new Date();
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthNames = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
       const month = monthNames[now.getMonth()];
       const day = String(now.getDate()).padStart(2, ' ');
       const time = now.toTimeString().split(' ')[0];

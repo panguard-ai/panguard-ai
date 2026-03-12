@@ -16,7 +16,9 @@ export function loadRuleFile(filePath: string): ATRRule {
   const parsed = yaml.load(content) as ATRRule;
 
   if (!parsed.id || !parsed.title || !parsed.detection) {
-    throw new Error(`Invalid ATR rule in ${filePath}: missing required fields (id, title, detection)`);
+    throw new Error(
+      `Invalid ATR rule in ${filePath}: missing required fields (id, title, detection)`
+    );
   }
 
   return parsed;
@@ -55,7 +57,19 @@ export function validateRule(rule: unknown): { valid: boolean; errors: string[] 
   const r = rule as Record<string, unknown>;
 
   // Required fields
-  const required = ['title', 'id', 'status', 'description', 'author', 'date', 'severity', 'tags', 'agent_source', 'detection', 'response'];
+  const required = [
+    'title',
+    'id',
+    'status',
+    'description',
+    'author',
+    'date',
+    'severity',
+    'tags',
+    'agent_source',
+    'detection',
+    'response',
+  ];
   for (const field of required) {
     if (!r[field]) {
       errors.push(`Missing required field: ${field}`);
@@ -83,9 +97,15 @@ export function validateRule(rule: unknown): { valid: boolean; errors: string[] 
   const tags = r['tags'] as Record<string, unknown> | undefined;
   if (tags) {
     const validCategories = [
-      'prompt-injection', 'tool-poisoning', 'context-exfiltration',
-      'agent-manipulation', 'privilege-escalation', 'excessive-autonomy',
-      'data-poisoning', 'model-abuse', 'skill-compromise',
+      'prompt-injection',
+      'tool-poisoning',
+      'context-exfiltration',
+      'agent-manipulation',
+      'privilege-escalation',
+      'excessive-autonomy',
+      'data-poisoning',
+      'model-abuse',
+      'skill-compromise',
     ];
     if (typeof tags['category'] === 'string' && !validCategories.includes(tags['category'])) {
       errors.push(`Invalid tags.category: ${tags['category']}`);
@@ -96,9 +116,16 @@ export function validateRule(rule: unknown): { valid: boolean; errors: string[] 
   const agentSource = r['agent_source'] as Record<string, unknown> | undefined;
   if (agentSource) {
     const validTypes = [
-      'llm_io', 'tool_call', 'mcp_exchange', 'agent_behavior',
-      'multi_agent_comm', 'context_window', 'memory_access',
-      'skill_lifecycle', 'skill_permission', 'skill_chain',
+      'llm_io',
+      'tool_call',
+      'mcp_exchange',
+      'agent_behavior',
+      'multi_agent_comm',
+      'context_window',
+      'memory_access',
+      'skill_lifecycle',
+      'skill_permission',
+      'skill_chain',
     ];
     if (typeof agentSource['type'] === 'string' && !validTypes.includes(agentSource['type'])) {
       errors.push(`Invalid agent_source.type: ${agentSource['type']}`);

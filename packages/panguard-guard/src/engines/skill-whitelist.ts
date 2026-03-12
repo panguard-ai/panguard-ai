@@ -229,9 +229,7 @@ export class SkillWhitelistManager {
    * 取得所有白名單 skills
    */
   getAll(): WhitelistedSkill[] {
-    return [...this.whitelist.values()].filter(
-      (s) => !this.revokedSkills.has(s.normalizedName)
-    );
+    return [...this.whitelist.values()].filter((s) => !this.revokedSkills.has(s.normalizedName));
   }
 
   /**
@@ -336,7 +334,9 @@ export class SkillWhitelistManager {
       };
       writeFileSync(this.config.persistPath, JSON.stringify(data, null, 2), 'utf-8');
     } catch (err) {
-      logger.warn(`Failed to persist whitelist: ${err instanceof Error ? err.message : String(err)}`);
+      logger.warn(
+        `Failed to persist whitelist: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
   }
 
@@ -362,7 +362,9 @@ export class SkillWhitelistManager {
         }
       }
 
-      logger.info(`Whitelist loaded: ${this.whitelist.size} skills (${this.revokedSkills.size} revoked)`);
+      logger.info(
+        `Whitelist loaded: ${this.whitelist.size} skills (${this.revokedSkills.size} revoked)`
+      );
     } catch (err) {
       logger.warn(`Failed to load whitelist: ${err instanceof Error ? err.message : String(err)}`);
     }

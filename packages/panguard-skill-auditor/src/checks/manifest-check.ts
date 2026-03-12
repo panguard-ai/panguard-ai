@@ -12,7 +12,8 @@ export function checkManifest(manifest: SkillManifest | null): CheckResult {
     findings.push({
       id: 'manifest-missing',
       title: 'SKILL.md not found',
-      description: 'No SKILL.md file found in the skill directory. This is required for all valid skills.',
+      description:
+        'No SKILL.md file found in the skill directory. This is required for all valid skills.',
       severity: 'critical',
       category: 'manifest',
     });
@@ -43,7 +44,8 @@ export function checkManifest(manifest: SkillManifest | null): CheckResult {
     findings.push({
       id: 'manifest-no-license',
       title: 'No license declared',
-      description: 'Skill does not declare a license. Consider adding one for trust and legal clarity.',
+      description:
+        'Skill does not declare a license. Consider adding one for trust and legal clarity.',
       severity: 'low',
       category: 'manifest',
     });
@@ -78,9 +80,10 @@ export function checkManifest(manifest: SkillManifest | null): CheckResult {
       ? 'warn'
       : 'pass';
 
-  const label = status === 'pass'
-    ? 'Manifest: Valid SKILL.md with all required fields'
-    : `Manifest: ${findings.length} issue(s) found`;
+  const label =
+    status === 'pass'
+      ? 'Manifest: Valid SKILL.md with all required fields'
+      : `Manifest: ${findings.length} issue(s) found`;
 
   return { status, label, findings };
 }

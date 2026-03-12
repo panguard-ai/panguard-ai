@@ -5,11 +5,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ThreatAggregator } from '../src/threat-aggregator.js';
-import type {
-  ThreatReport,
-  ThreatEvent,
-  SecurityEvent,
-} from '../src/types.js';
+import type { ThreatReport, ThreatEvent, SecurityEvent } from '../src/types.js';
 
 function makeSecurityEvent(overrides?: Partial<SecurityEvent>): SecurityEvent {
   return {
@@ -41,10 +37,7 @@ function makeThreatEvent(overrides?: {
   };
 }
 
-function makeReport(
-  agentId: string,
-  threats: ThreatEvent[]
-): ThreatReport {
+function makeReport(agentId: string, threats: ThreatEvent[]): ThreatReport {
   return {
     agentId,
     threats,
@@ -92,10 +85,7 @@ describe('ThreatAggregator', () => {
     it('should track threats in the size property', () => {
       expect(aggregator.size).toBe(0);
 
-      aggregator.ingestReport(
-        makeReport('ag-001', [makeThreatEvent()]),
-        'server-01'
-      );
+      aggregator.ingestReport(makeReport('ag-001', [makeThreatEvent()]), 'server-01');
       expect(aggregator.size).toBe(1);
 
       aggregator.ingestReport(
@@ -216,9 +206,7 @@ describe('ThreatAggregator', () => {
       expect(result2[0]!.correlatedWith[0]).toBe(result1[0]!.id);
 
       const correlations = aggregator.getCorrelations();
-      const hashCorrelation = correlations.find(
-        (c) => c.correlationType === 'same_malware_hash'
-      );
+      const hashCorrelation = correlations.find((c) => c.correlationType === 'same_malware_hash');
       expect(hashCorrelation).toBeDefined();
       expect(hashCorrelation!.sharedIndicator).toBe(malwareHash);
     });
@@ -312,20 +300,14 @@ describe('ThreatAggregator', () => {
     it('should return threats since the given timestamp', () => {
       const before = new Date(Date.now() - 10000);
 
-      aggregator.ingestReport(
-        makeReport('ag-001', [makeThreatEvent()]),
-        'server-01'
-      );
+      aggregator.ingestReport(makeReport('ag-001', [makeThreatEvent()]), 'server-01');
 
       const recent = aggregator.getRecentThreats(before);
       expect(recent).toHaveLength(1);
     });
 
     it('should exclude old threats', () => {
-      aggregator.ingestReport(
-        makeReport('ag-001', [makeThreatEvent()]),
-        'server-01'
-      );
+      aggregator.ingestReport(makeReport('ag-001', [makeThreatEvent()]), 'server-01');
 
       const future = new Date(Date.now() + 60000);
       const recent = aggregator.getRecentThreats(future);
@@ -339,10 +321,7 @@ describe('ThreatAggregator', () => {
         makeReport('ag-001', [makeThreatEvent(), makeThreatEvent()]),
         'server-01'
       );
-      aggregator.ingestReport(
-        makeReport('ag-002', [makeThreatEvent()]),
-        'server-02'
-      );
+      aggregator.ingestReport(makeReport('ag-002', [makeThreatEvent()]), 'server-02');
 
       const agent1Threats = aggregator.getThreatsByAgent('ag-001');
       expect(agent1Threats).toHaveLength(2);
@@ -425,10 +404,7 @@ describe('ThreatAggregator', () => {
       // Use zero retention so everything is immediately expired
       const shortRetention = new ThreatAggregator(300_000, 0);
 
-      shortRetention.ingestReport(
-        makeReport('ag-001', [makeThreatEvent()]),
-        'server-01'
-      );
+      shortRetention.ingestReport(makeReport('ag-001', [makeThreatEvent()]), 'server-01');
 
       expect(shortRetention.size).toBe(1);
 
@@ -438,10 +414,7 @@ describe('ThreatAggregator', () => {
     });
 
     it('should not purge recent threats', () => {
-      aggregator.ingestReport(
-        makeReport('ag-001', [makeThreatEvent()]),
-        'server-01'
-      );
+      aggregator.ingestReport(makeReport('ag-001', [makeThreatEvent()]), 'server-01');
 
       const purged = aggregator.purgeExpired();
       expect(purged).toBe(0);

@@ -290,8 +290,7 @@ describe('parseAuthLog', () => {
   });
 
   it('should return a generic auth event for unrecognized sshd messages', () => {
-    const line =
-      'Mar  1 12:00:00 webserver sshd[100]: Connection reset by 10.0.0.1 port 22';
+    const line = 'Mar  1 12:00:00 webserver sshd[100]: Connection reset by 10.0.0.1 port 22';
     const result = parseAuthLog(line);
 
     expect(result).not.toBeNull();
@@ -352,8 +351,7 @@ describe('parseLogLine', () => {
   });
 
   it('should handle non-ASCII hostnames (CJK characters)', () => {
-    const line =
-      '<14>1 2026-03-01T12:00:00Z server-01 myapp 1 - - Test message';
+    const line = '<14>1 2026-03-01T12:00:00Z server-01 myapp 1 - - Test message';
     const result = parseLogLine(line);
 
     expect(result).not.toBeNull();

@@ -10,11 +10,7 @@
  * @module @panguard-ai/panguard-guard/cli/interactive-handler
  */
 
-import {
-  c,
-  symbols,
-  promptSelect,
-} from '@panguard-ai/core';
+import { c, symbols, promptSelect } from '@panguard-ai/core';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -69,7 +65,9 @@ export function renderAutoResponse(context: ThreatContext, action: string): void
 export function renderLowConfidenceNote(context: ThreatContext): void {
   const time = context.timestamp;
   console.log(
-    c.dim(`  [${time}] Low-confidence event logged: ${context.category} from ${context.sourceIP} (${context.confidence}%)`)
+    c.dim(
+      `  [${time}] Low-confidence event logged: ${context.category} from ${context.sourceIP} (${context.confidence}%)`
+    )
   );
 }
 
@@ -81,11 +79,11 @@ export function renderLowConfidenceNote(context: ThreatContext): void {
  * Prompt the user for a threat decision.
  * Times out after 30 seconds and defaults to 'block'.
  */
-export async function promptThreatDecision(
-  context: ThreatContext,
-): Promise<ThreatDecision> {
+export async function promptThreatDecision(context: ThreatContext): Promise<ThreatDecision> {
   console.log('');
-  console.log(`  ${symbols.warn} ${c.caution(`[${context.timestamp}]`)} ${c.bold('THREAT DETECTED - Action Required')}`);
+  console.log(
+    `  ${symbols.warn} ${c.caution(`[${context.timestamp}]`)} ${c.bold('THREAT DETECTED - Action Required')}`
+  );
   console.log(`      Category:   ${c.bold(context.category)}`);
   console.log(`      Source:     ${c.sage(context.sourceIP)}`);
   console.log(`      Confidence: ${c.caution(`${context.confidence}%`)}`);

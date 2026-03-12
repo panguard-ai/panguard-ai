@@ -71,7 +71,11 @@ function getClaudeDesktopConfigPath(): string {
     case 'darwin':
       return join(home, 'Library', 'Application Support', 'Claude', 'claude_desktop_config.json');
     case 'win32':
-      return join(process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'), 'Claude', 'claude_desktop_config.json');
+      return join(
+        process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'),
+        'Claude',
+        'claude_desktop_config.json'
+      );
     default:
       return join(home, '.config', 'claude', 'claude_desktop_config.json');
   }
@@ -123,7 +127,8 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // Claude Code
   const claudeCodePath = getClaudeCodeConfigPath();
-  const claudeCodeDetected = await commandExists('claude') || existsSync(join(homedir(), '.claude'));
+  const claudeCodeDetected =
+    (await commandExists('claude')) || existsSync(join(homedir(), '.claude'));
   platforms.push({
     id: 'claude-code',
     name: 'Claude Code',
@@ -134,7 +139,8 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // Claude Desktop
   const claudeDesktopPath = getClaudeDesktopConfigPath();
-  const claudeDesktopDetected = existsSync(claudeDesktopPath) ||
+  const claudeDesktopDetected =
+    existsSync(claudeDesktopPath) ||
     (platform() === 'darwin' && existsSync('/Applications/Claude.app'));
   platforms.push({
     id: 'claude-desktop',
@@ -146,7 +152,8 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // Cursor
   const cursorPath = getCursorConfigPath();
-  const cursorDetected = await commandExists('cursor') ||
+  const cursorDetected =
+    (await commandExists('cursor')) ||
     existsSync(join(homedir(), '.cursor')) ||
     (platform() === 'darwin' && existsSync('/Applications/Cursor.app'));
   platforms.push({
@@ -159,7 +166,8 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // OpenClaw (uses native skill system, not MCP)
   const openclawSkillDir = getOpenClawSkillDir();
-  const openclawDetected = await commandExists('openclaw') || existsSync(join(homedir(), '.openclaw'));
+  const openclawDetected =
+    (await commandExists('openclaw')) || existsSync(join(homedir(), '.openclaw'));
   platforms.push({
     id: 'openclaw',
     name: 'OpenClaw',
@@ -170,7 +178,7 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // Codex
   const codexPath = getCodexConfigPath();
-  const codexDetected = await commandExists('codex') || existsSync(join(homedir(), '.codex'));
+  const codexDetected = (await commandExists('codex')) || existsSync(join(homedir(), '.codex'));
   platforms.push({
     id: 'codex',
     name: 'Codex CLI',
@@ -181,7 +189,8 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // Workbuddy
   const workbuddyPath = getWorkbuddyConfigPath();
-  const workbuddyDetected = await commandExists('workbuddy') || existsSync(join(homedir(), '.workbuddy'));
+  const workbuddyDetected =
+    (await commandExists('workbuddy')) || existsSync(join(homedir(), '.workbuddy'));
   platforms.push({
     id: 'workbuddy',
     name: 'Workbuddy',
@@ -192,7 +201,8 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // NemoClaw
   const nemoclawPath = getNemoClawConfigPath();
-  const nemoclawDetected = await commandExists('nemoclaw') || existsSync(join(homedir(), '.nemoclaw'));
+  const nemoclawDetected =
+    (await commandExists('nemoclaw')) || existsSync(join(homedir(), '.nemoclaw'));
   platforms.push({
     id: 'nemoclaw',
     name: 'NemoClaw',
@@ -202,7 +212,9 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
   });
 
   const detected = platforms.filter((p) => p.detected);
-  logger.info(`Detected ${detected.length} platform(s): ${detected.map((p) => p.name).join(', ') || 'none'}`);
+  logger.info(
+    `Detected ${detected.length} platform(s): ${detected.map((p) => p.name).join(', ') || 'none'}`
+  );
   return platforms;
 }
 
@@ -212,12 +224,19 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
  */
 export function getConfigPath(platformId: PlatformId): string {
   switch (platformId) {
-    case 'claude-code': return getClaudeCodeConfigPath();
-    case 'claude-desktop': return getClaudeDesktopConfigPath();
-    case 'cursor': return getCursorConfigPath();
-    case 'openclaw': return getOpenClawSkillDir();
-    case 'codex': return getCodexConfigPath();
-    case 'workbuddy': return getWorkbuddyConfigPath();
-    case 'nemoclaw': return getNemoClawConfigPath();
+    case 'claude-code':
+      return getClaudeCodeConfigPath();
+    case 'claude-desktop':
+      return getClaudeDesktopConfigPath();
+    case 'cursor':
+      return getCursorConfigPath();
+    case 'openclaw':
+      return getOpenClawSkillDir();
+    case 'codex':
+      return getCodexConfigPath();
+    case 'workbuddy':
+      return getWorkbuddyConfigPath();
+    case 'nemoclaw':
+      return getNemoClawConfigPath();
   }
 }

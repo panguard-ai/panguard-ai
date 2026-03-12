@@ -123,23 +123,23 @@ atr scaffold
 This generates a template YAML file with all required fields pre-filled. Edit the file to define your detection logic:
 
 ```yaml
-title: "My Custom Detection Rule"
+title: 'My Custom Detection Rule'
 id: ATR-2026-XXX
 status: experimental
 description: |
   Detects [describe the attack pattern].
-author: "Your Name"
-date: "2026/03/11"
-schema_version: "0.1"
+author: 'Your Name'
+date: '2026/03/11'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: high
 
 references:
   owasp_llm:
-    - "LLM01:2025 - Prompt Injection"
+    - 'LLM01:2025 - Prompt Injection'
   mitre_atlas:
-    - "AML.T0051 - LLM Prompt Injection"
+    - 'AML.T0051 - LLM Prompt Injection'
 
 tags:
   category: prompt-injection
@@ -156,10 +156,10 @@ detection:
     - field: user_input
       operator: regex
       value: "(?i)your\\s+detection\\s+pattern"
-      description: "What this pattern catches"
+      description: 'What this pattern catches'
   condition: any
   false_positives:
-    - "Describe known false positive scenarios"
+    - 'Describe known false positive scenarios'
 
 response:
   actions: [alert, snapshot]
@@ -167,13 +167,13 @@ response:
 
 test_cases:
   true_positives:
-    - input: "Text that SHOULD trigger this rule"
+    - input: 'Text that SHOULD trigger this rule'
       expected: triggered
-      description: "Why this triggers"
+      description: 'Why this triggers'
   true_negatives:
-    - input: "Legitimate text that should NOT trigger"
+    - input: 'Legitimate text that should NOT trigger'
       expected: not_triggered
-      description: "Why this does not trigger"
+      description: 'Why this does not trigger'
 ```
 
 ## 5. Validate and Test

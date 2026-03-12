@@ -32,7 +32,7 @@ export interface MCPServerEntry {
  */
 export function parseMCPServers(
   configPath: string,
-  platformId: PlatformId,
+  platformId: PlatformId
 ): readonly MCPServerEntry[] {
   if (!existsSync(configPath)) return [];
 
@@ -57,20 +57,23 @@ export function parseMCPServers(
 
       if (!command) continue;
 
-      const env = server['env'] && typeof server['env'] === 'object'
-        ? Object.fromEntries(
-            Object.entries(server['env'] as Record<string, unknown>)
-              .filter(([, v]) => typeof v === 'string')
-              .map(([k, v]) => [k, v as string]),
-          )
-        : undefined;
+      const env =
+        server['env'] && typeof server['env'] === 'object'
+          ? Object.fromEntries(
+              Object.entries(server['env'] as Record<string, unknown>)
+                .filter(([, v]) => typeof v === 'string')
+                .map(([k, v]) => [k, v as string])
+            )
+          : undefined;
 
       entries.push({ name, command, args, env, configPath, platformId });
     }
 
     return entries;
   } catch (err) {
-    logger.warn(`Failed to parse MCP config at ${configPath}: ${err instanceof Error ? err.message : String(err)}`);
+    logger.warn(
+      `Failed to parse MCP config at ${configPath}: ${err instanceof Error ? err.message : String(err)}`
+    );
     return [];
   }
 }

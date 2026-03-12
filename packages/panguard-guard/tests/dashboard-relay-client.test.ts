@@ -91,16 +91,22 @@ function createMockManager(port: number): {
     server,
     connections,
     receivedFrames,
-    start: () => new Promise<void>((resolve) => {
-      server.listen(port, '127.0.0.1', () => resolve());
-    }),
-    stop: () => new Promise<void>((resolve) => {
-      for (const conn of connections) {
-        try { conn.destroy(); } catch { /* ignore */ }
-      }
-      connections.length = 0;
-      server.close(() => resolve());
-    }),
+    start: () =>
+      new Promise<void>((resolve) => {
+        server.listen(port, '127.0.0.1', () => resolve());
+      }),
+    stop: () =>
+      new Promise<void>((resolve) => {
+        for (const conn of connections) {
+          try {
+            conn.destroy();
+          } catch {
+            /* ignore */
+          }
+        }
+        connections.length = 0;
+        server.close(() => resolve());
+      }),
   };
 }
 
@@ -270,7 +276,11 @@ describe('DashboardRelayClient', () => {
       // Clear any initial frames / 清除初始框架
       mockManager.receivedFrames.length = 0;
 
-      const event = { type: 'status_update', data: { mode: 'learning' }, timestamp: '2026-01-01T00:00:00Z' };
+      const event = {
+        type: 'status_update',
+        data: { mode: 'learning' },
+        timestamp: '2026-01-01T00:00:00Z',
+      };
       client.sendEvent(event);
 
       // Wait for data to arrive
@@ -295,9 +305,7 @@ describe('DashboardRelayClient', () => {
 
   describe('auto-reconnect', () => {
     it('should attempt to reconnect after server-initiated disconnect', async () => {
-      const client = new DashboardRelayClient(
-        makeConfig({ reconnectInterval: 100 })
-      );
+      const client = new DashboardRelayClient(makeConfig({ reconnectInterval: 100 }));
 
       let connectCount = 0;
       client.on('connected', () => {

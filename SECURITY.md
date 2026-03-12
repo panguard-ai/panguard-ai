@@ -2,10 +2,10 @@
 
 ## Supported Versions / 支援版本
 
-| Version | Supported |
-|---------|-----------|
-| Latest  | Yes       |
-| < Latest | No       |
+| Version  | Supported |
+| -------- | --------- |
+| Latest   | Yes       |
+| < Latest | No        |
 
 Only the latest release receives security updates.
 僅最新版本接受安全性更新。
@@ -18,12 +18,14 @@ If you discover a security vulnerability, please report it responsibly.
 **Email:** security@panguard-ai.io
 
 Please include:
+
 - Description of the vulnerability
 - Steps to reproduce
 - Potential impact assessment
 - Suggested fix (if any)
 
 請包含：
+
 - 漏洞描述
 - 重現步驟
 - 潛在影響評估
@@ -31,13 +33,13 @@ Please include:
 
 ## Response Timeline / 回應時間
 
-| Phase | Target |
-|-------|--------|
-| Acknowledgment / 確認 | 24 hours |
-| Assessment / 評估 | 72 hours |
-| CRITICAL fix / 緊急修復 | 7 days |
-| HIGH fix / 高優先修復 | 14 days |
-| MEDIUM fix / 中優先修復 | 30 days |
+| Phase                   | Target   |
+| ----------------------- | -------- |
+| Acknowledgment / 確認   | 24 hours |
+| Assessment / 評估       | 72 hours |
+| CRITICAL fix / 緊急修復 | 7 days   |
+| HIGH fix / 高優先修復   | 14 days  |
+| MEDIUM fix / 中優先修復 | 30 days  |
 
 ## Disclosure Policy / 揭露政策
 
@@ -46,13 +48,13 @@ We follow a 90-day responsible disclosure policy. If a fix is not available with
 
 ## Encryption & Authentication / 加密與驗證
 
-| Component | Method |
-|-----------|--------|
-| Password hashing | scrypt (N=65536, r=8, p=1, keylen=64) |
-| Session tokens | SHA-256 hash stored; 32-byte random plaintext sent to client |
-| TOTP secrets | AES-256-GCM encrypted at rest |
-| Reset tokens | SHA-256 hash stored; plaintext sent via email |
-| Transport | TLS 1.2+ (HSTS enabled with preload) |
+| Component        | Method                                                       |
+| ---------------- | ------------------------------------------------------------ |
+| Password hashing | scrypt (N=65536, r=8, p=1, keylen=64)                        |
+| Session tokens   | SHA-256 hash stored; 32-byte random plaintext sent to client |
+| TOTP secrets     | AES-256-GCM encrypted at rest                                |
+| Reset tokens     | SHA-256 hash stored; plaintext sent via email                |
+| Transport        | TLS 1.2+ (HSTS enabled with preload)                         |
 
 ## Code Security Rules / 程式碼安全規則
 

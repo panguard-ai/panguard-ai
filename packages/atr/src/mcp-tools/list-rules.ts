@@ -11,7 +11,10 @@ export interface ListRulesInput {
   search?: string;
 }
 
-export function handleListRules(engine: ATREngine, args: Record<string, unknown>): {
+export function handleListRules(
+  engine: ATREngine,
+  args: Record<string, unknown>
+): {
   content: Array<{ type: string; text: string }>;
 } {
   const category = args['category'] as string | undefined;

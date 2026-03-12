@@ -5,15 +5,16 @@
 
 import type { ATREngine } from '../engine.js';
 
-export function handleThreatSummary(engine: ATREngine, args: Record<string, unknown>): {
+export function handleThreatSummary(
+  engine: ATREngine,
+  args: Record<string, unknown>
+): {
   content: Array<{ type: string; text: string }>;
 } {
   const category = args['category'] as string | undefined;
   const rules = [...engine.getRules()];
 
-  const filtered = category
-    ? rules.filter((r) => r.tags.category === category)
-    : rules;
+  const filtered = category ? rules.filter((r) => r.tags.category === category) : rules;
 
   // Aggregate by category
   const byCategory: Record<string, number> = {};

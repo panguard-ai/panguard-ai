@@ -9,14 +9,7 @@
  * @module @panguard-ai/panguard/cli/commands/setup-skill-scan
  */
 
-import {
-  c,
-  symbols,
-  table,
-  ProgressBar,
-  promptSelect,
-  divider,
-} from '@panguard-ai/core';
+import { c, symbols, table, ProgressBar, promptSelect, divider } from '@panguard-ai/core';
 import type { TableColumn } from '@panguard-ai/core';
 import type { MCPServerEntry } from '@panguard-ai/panguard-mcp/config';
 import type { AuditReport } from '@panguard-ai/panguard-skill-auditor';
@@ -48,19 +41,27 @@ function classifyRisk(audit: AuditReport | null): 'safe' | 'caution' | 'flagged'
 
 function statusIcon(status: string): string {
   switch (status) {
-    case 'safe': return c.green(symbols.pass);
-    case 'caution': return c.yellow(symbols.warn);
-    case 'flagged': return c.red(symbols.fail);
-    default: return c.dim(symbols.dot);
+    case 'safe':
+      return c.green(symbols.pass);
+    case 'caution':
+      return c.yellow(symbols.warn);
+    case 'flagged':
+      return c.red(symbols.fail);
+    default:
+      return c.dim(symbols.dot);
   }
 }
 
 function statusLabel(status: string): string {
   switch (status) {
-    case 'safe': return c.green('SAFE');
-    case 'caution': return c.yellow('CAUTION');
-    case 'flagged': return c.red('FLAGGED');
-    default: return c.dim('UNKNOWN');
+    case 'safe':
+      return c.green('SAFE');
+    case 'caution':
+      return c.yellow('CAUTION');
+    case 'flagged':
+      return c.red('FLAGGED');
+    default:
+      return c.dim('UNKNOWN');
   }
 }
 
@@ -73,7 +74,7 @@ function statusLabel(status: string): string {
  */
 export async function scanInstalledSkills(
   skills: readonly MCPServerEntry[],
-  options?: SkillScanOptions,
+  options?: SkillScanOptions
 ): Promise<readonly SkillScanResult[]> {
   if (skills.length === 0) return [];
 
@@ -170,7 +171,7 @@ export function renderSkillScanResults(results: readonly SkillScanResult[]): voi
  * Returns names of skills the user chose to whitelist.
  */
 export async function reviewFlaggedSkills(
-  flagged: readonly SkillScanResult[],
+  flagged: readonly SkillScanResult[]
 ): Promise<readonly string[]> {
   if (flagged.length === 0) return [];
 
@@ -206,8 +207,20 @@ export async function reviewFlaggedSkills(
         'zh-TW': `${name} 要如何處理？`,
       },
       options: [
-        { label: { en: 'Keep and whitelist (I trust this skill)', 'zh-TW': '保留並加入白名單（我信任此技能）' }, value: 'whitelist' },
-        { label: { en: 'Keep but monitor (do not whitelist)', 'zh-TW': '保留但監控（不加入白名單）' }, value: 'monitor' },
+        {
+          label: {
+            en: 'Keep and whitelist (I trust this skill)',
+            'zh-TW': '保留並加入白名單（我信任此技能）',
+          },
+          value: 'whitelist',
+        },
+        {
+          label: {
+            en: 'Keep but monitor (do not whitelist)',
+            'zh-TW': '保留但監控（不加入白名單）',
+          },
+          value: 'monitor',
+        },
         { label: { en: 'Skip for now', 'zh-TW': '暫時跳過' }, value: 'skip' },
       ],
       lang: 'en',

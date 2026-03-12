@@ -54,12 +54,7 @@
   "navigation": [
     {
       "group": "Getting Started",
-      "pages": [
-        "introduction",
-        "overview",
-        "quickstart",
-        "installation"
-      ]
+      "pages": ["introduction", "overview", "quickstart", "installation"]
     },
     {
       "group": "Concepts",
@@ -108,9 +103,7 @@
     },
     {
       "group": "Products",
-      "pages": [
-        "products/overview"
-      ]
+      "pages": ["products/overview"]
     },
     {
       "group": "Panguard Scan",
@@ -159,10 +152,7 @@
     },
     {
       "group": "Panguard MCP",
-      "pages": [
-        "products/mcp/overview",
-        "products/mcp/tools-reference"
-      ]
+      "pages": ["products/mcp/overview", "products/mcp/tools-reference"]
     },
     {
       "group": "Panguard Manager",
@@ -182,56 +172,31 @@
     },
     {
       "group": "CLI Reference",
-      "pages": [
-        "cli/overview"
-      ]
+      "pages": ["cli/overview"]
     },
     {
       "group": "Scanning",
-      "pages": [
-        "cli/scan"
-      ]
+      "pages": ["cli/scan"]
     },
     {
       "group": "Protection",
-      "pages": [
-        "cli/guard",
-        "cli/trap",
-        "cli/chat",
-        "cli/report"
-      ]
+      "pages": ["cli/guard", "cli/trap", "cli/chat", "cli/report"]
     },
     {
       "group": "System",
-      "pages": [
-        "cli/init",
-        "cli/deploy",
-        "cli/status",
-        "cli/config",
-        "cli/doctor",
-        "cli/upgrade"
-      ]
+      "pages": ["cli/init", "cli/deploy", "cli/status", "cli/config", "cli/doctor", "cli/upgrade"]
     },
     {
       "group": "Authentication",
-      "pages": [
-        "cli/login",
-        "cli/logout",
-        "cli/whoami"
-      ]
+      "pages": ["cli/login", "cli/logout", "cli/whoami"]
     },
     {
       "group": "Advanced",
-      "pages": [
-        "cli/manager",
-        "cli/threat"
-      ]
+      "pages": ["cli/manager", "cli/threat"]
     },
     {
       "group": "API Reference",
-      "pages": [
-        "api-reference/overview"
-      ]
+      "pages": ["api-reference/overview"]
     },
     {
       "group": "Auth API",

@@ -254,7 +254,9 @@ export class MemoryScanner extends EventEmitter {
         return false;
       }
       if (scope !== '0' && process.getuid?.() !== 0) {
-        logger.info('Memory scanning limited: ptrace_scope=' + scope + ' (may need root for some processes)');
+        logger.info(
+          'Memory scanning limited: ptrace_scope=' + scope + ' (may need root for some processes)'
+        );
       }
     } catch {
       // ptrace_scope file may not exist on some systems
@@ -327,9 +329,7 @@ export class MemoryScanner extends EventEmitter {
         }
       }
     } catch (err: unknown) {
-      logger.warn(
-        `Memory scan failed: ${err instanceof Error ? err.message : String(err)}`
-      );
+      logger.warn(`Memory scan failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -346,7 +346,9 @@ export class MemoryScanner extends EventEmitter {
     }
 
     // Skip kernel threads and known safe processes / 跳過核心執行緒和已知安全程序
-    if (['kthreadd', 'kworker', 'rcu_gp', 'rcu_par_gp', 'systemd'].some((s) => comm.startsWith(s))) {
+    if (
+      ['kthreadd', 'kworker', 'rcu_gp', 'rcu_par_gp', 'systemd'].some((s) => comm.startsWith(s))
+    ) {
       return null;
     }
 
@@ -366,7 +368,8 @@ export class MemoryScanner extends EventEmitter {
 
       // Focus on anonymous memory and executable regions
       // 重點掃描匿名記憶體和可執行區域
-      const isAnonymous = region.pathname === '' || region.pathname === '[heap]' || region.pathname === '[stack]';
+      const isAnonymous =
+        region.pathname === '' || region.pathname === '[heap]' || region.pathname === '[stack]';
       const isExecutable = region.perms.includes('x');
 
       // Only scan anonymous+executable or suspicious regions

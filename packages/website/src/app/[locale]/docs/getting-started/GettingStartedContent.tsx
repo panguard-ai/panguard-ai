@@ -71,13 +71,15 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       method: 'npm',
       label: 'npm (Recommended)',
       recommended: true,
-      prereq: '# Install Node.js first (pick one):\nwinget install OpenJS.NodeJS.LTS\n# Or download from https://nodejs.org (v20+ LTS)',
+      prereq:
+        '# Install Node.js first (pick one):\nwinget install OpenJS.NodeJS.LTS\n# Or download from https://nodejs.org (v20+ LTS)',
       command: 'npm install -g @panguard-ai/panguard',
     },
     {
       method: 'curl',
       label: 'PowerShell',
-      command: 'powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
+      command:
+        'powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
       note: 'If using PowerShell 7+: pwsh -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
     },
   ],
@@ -289,9 +291,7 @@ export default function GettingStartedContent() {
 
             {/* Verify */}
             <div className="mt-6 pt-6 border-t border-border/40">
-              <p className="text-sm text-text-secondary mb-3">
-                Verify the installation:
-              </p>
+              <p className="text-sm text-text-secondary mb-3">Verify the installation:</p>
               <CodeBlock
                 code={`panguard --version\n# Expected: ${STATS.cliVersion}`}
                 label="Terminal"
@@ -301,12 +301,10 @@ export default function GettingStartedContent() {
             {/* Setup step */}
             <div className="mt-4">
               <p className="text-sm text-text-secondary mb-3">
-                Run setup to auto-configure all detected AI platforms (Claude Code, Cursor, OpenClaw, Codex):
+                Run setup to auto-configure all detected AI platforms (Claude Code, Cursor,
+                OpenClaw, Codex):
               </p>
-              <CodeBlock
-                code="panguard setup"
-                label="Terminal"
-              />
+              <CodeBlock code="panguard setup" label="Terminal" />
             </div>
 
             {/* Then start */}
@@ -314,10 +312,7 @@ export default function GettingStartedContent() {
               <p className="text-sm text-text-secondary mb-3">
                 Then start Panguard in any project:
               </p>
-              <CodeBlock
-                code={`cd your-project\npanguard scan`}
-                label="Terminal"
-              />
+              <CodeBlock code={`cd your-project\npanguard scan`} label="Terminal" />
             </div>
 
             <div className="mt-4">
@@ -413,7 +408,9 @@ export default function GettingStartedContent() {
                     ]}
                   />
                 </div>
-                <span className="inline-block mt-2 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-yellow-900/30 text-yellow-400">Beta</span>
+                <span className="inline-block mt-2 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-yellow-900/30 text-yellow-400">
+                  Beta
+                </span>
               </div>
 
               {/* Remote scanning */}
@@ -505,22 +502,18 @@ export default function GettingStartedContent() {
       <SectionWrapper dark>
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
-            <h2 className="text-xl font-bold text-text-primary mb-2">
-              {t('advancedHintTitle')}
-            </h2>
+            <h2 className="text-xl font-bold text-text-primary mb-2">{t('advancedHintTitle')}</h2>
             <p className="text-text-secondary mb-6">{t('advancedHintDesc')}</p>
 
             <div className="space-y-3">
-              {[
-                t('advancedHintOllama'),
-                t('advancedHintFalco'),
-                t('advancedHintSuricata'),
-              ].map((hint) => (
-                <div key={hint} className="flex items-start gap-3">
-                  <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
-                  <p className="text-sm text-text-secondary leading-relaxed">{hint}</p>
-                </div>
-              ))}
+              {[t('advancedHintOllama'), t('advancedHintFalco'), t('advancedHintSuricata')].map(
+                (hint) => (
+                  <div key={hint} className="flex items-start gap-3">
+                    <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
+                    <p className="text-sm text-text-secondary leading-relaxed">{hint}</p>
+                  </div>
+                )
+              )}
             </div>
 
             <p className="text-xs text-text-muted mt-4 mb-4">{t('advancedHintEnv')}</p>
@@ -539,9 +532,7 @@ export default function GettingStartedContent() {
       <SectionWrapper>
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
-            <h2 className="text-xl font-bold text-text-primary mb-2">
-              {t('multiEndpointTitle')}
-            </h2>
+            <h2 className="text-xl font-bold text-text-primary mb-2">{t('multiEndpointTitle')}</h2>
             <p className="text-text-secondary mb-6">{t('multiEndpointDesc')}</p>
 
             <CodeBlock
@@ -549,9 +540,7 @@ export default function GettingStartedContent() {
               label={t('multiEndpointSshLabel')}
             />
 
-            <p className="text-sm text-text-secondary mt-4 mb-4">
-              {t('multiEndpointAnsibleHint')}
-            </p>
+            <p className="text-sm text-text-secondary mt-4 mb-4">{t('multiEndpointAnsibleHint')}</p>
 
             <Link
               href="/docs/deployment"

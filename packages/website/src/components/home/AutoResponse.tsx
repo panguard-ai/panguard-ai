@@ -57,11 +57,7 @@ export default function AutoResponse() {
   return (
     <SectionWrapper id="auto-response" dark>
       <div className="text-center mb-14">
-        <SectionTitle
-          overline={t('overline')}
-          title={t('title')}
-          subtitle={t('subtitle')}
-        />
+        <SectionTitle overline={t('overline')} title={t('title')} subtitle={t('subtitle')} />
       </div>
 
       {/* Three confidence tiers */}
@@ -84,9 +80,7 @@ export default function AutoResponse() {
                     <h3 className="text-sm font-bold text-text-primary">
                       {t(`tiers.${tier.key}.label`)}
                     </h3>
-                    <span
-                      className={`text-[11px] font-mono font-semibold ${tier.accentText}`}
-                    >
+                    <span className={`text-[11px] font-mono font-semibold ${tier.accentText}`}>
                       {t(`tiers.${tier.key}.threshold`)}
                     </span>
                   </div>
@@ -142,10 +136,7 @@ export default function AutoResponse() {
                 {actionKeys.map((key, i) => {
                   const ActionIcon = actionIcons[i];
                   return (
-                    <tr
-                      key={key}
-                      className="border-b border-border/50 last:border-b-0"
-                    >
+                    <tr key={key} className="border-b border-border/50 last:border-b-0">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <ActionIcon className="w-4 h-4 text-brand-sage shrink-0" />

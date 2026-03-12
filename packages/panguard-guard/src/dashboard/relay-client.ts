@@ -159,23 +159,21 @@ export class DashboardRelayClient extends EventEmitter {
     const port = parsedUrl.port || (isHttps ? '443' : '80');
     const wsKey = randomBytes(16).toString('base64');
 
-    const req = doRequest(
-      {
-        hostname: parsedUrl.hostname,
-        port: Number(port),
-        path: parsedUrl.pathname,
-        method: 'GET',
-        headers: {
-          'Upgrade': 'websocket',
-          'Connection': 'Upgrade',
-          'Sec-WebSocket-Key': wsKey,
-          'Sec-WebSocket-Version': '13',
-          'Authorization': `Bearer ${this.config.token}`,
-          'X-Agent-Id': this.config.agentId,
-        },
-        timeout: 10_000,
-      }
-    );
+    const req = doRequest({
+      hostname: parsedUrl.hostname,
+      port: Number(port),
+      path: parsedUrl.pathname,
+      method: 'GET',
+      headers: {
+        Upgrade: 'websocket',
+        Connection: 'Upgrade',
+        'Sec-WebSocket-Key': wsKey,
+        'Sec-WebSocket-Version': '13',
+        Authorization: `Bearer ${this.config.token}`,
+        'X-Agent-Id': this.config.agentId,
+      },
+      timeout: 10_000,
+    });
 
     req.on('upgrade', (_res, socket: Socket, _head: Buffer) => {
       this.socket = socket;
@@ -183,8 +181,7 @@ export class DashboardRelayClient extends EventEmitter {
       this.setConnected(true);
 
       logger.info(
-        `Relay connected to Manager for agent ${this.config.agentId} / ` +
-          `Relay 已連接到 Manager`
+        `Relay connected to Manager for agent ${this.config.agentId} / ` + `Relay 已連接到 Manager`
       );
 
       socket.on('data', (data: Buffer) => {
@@ -202,9 +199,7 @@ export class DashboardRelayClient extends EventEmitter {
     });
 
     req.on('error', (err: Error) => {
-      logger.warn(
-        `Relay connection failed: ${err.message} / Relay 連接失敗`
-      );
+      logger.warn(`Relay connection failed: ${err.message} / Relay 連接失敗`);
       this.emit('error', err);
       this.scheduleReconnect();
     });
@@ -232,9 +227,7 @@ export class DashboardRelayClient extends EventEmitter {
   private buildRelayUrl(): string {
     const base = this.config.managerUrl.replace(/\/+$/, '');
     // Convert ws:// -> http:// and wss:// -> https:// for Node.js http module
-    const httpBase = base
-      .replace(/^ws:/, 'http:')
-      .replace(/^wss:/, 'https:');
+    const httpBase = base.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:');
     return `${httpBase}/api/dashboard/relay/${this.config.agentId}`;
   }
 

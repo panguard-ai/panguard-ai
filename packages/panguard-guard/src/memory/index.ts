@@ -19,7 +19,13 @@ import { createEmptyBaseline } from './baseline.js';
 
 const logger = createLogger('panguard-guard:memory');
 
-export { createEmptyBaseline, checkDeviation, updateBaseline, continuousBaselineUpdate, pruneStalePatterns } from './baseline.js';
+export {
+  createEmptyBaseline,
+  checkDeviation,
+  updateBaseline,
+  continuousBaselineUpdate,
+  pruneStalePatterns,
+} from './baseline.js';
 
 export {
   isLearningComplete,

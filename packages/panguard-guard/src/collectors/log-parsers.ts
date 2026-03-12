@@ -38,8 +38,18 @@ function syslogSeverityFromPriority(priority: number): Severity {
  * Month abbreviation to month number mapping / 月份縮寫到數字的映射
  */
 const MONTH_MAP: Record<string, number> = {
-  Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
-  Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+  Jan: 0,
+  Feb: 1,
+  Mar: 2,
+  Apr: 3,
+  May: 4,
+  Jun: 5,
+  Jul: 6,
+  Aug: 7,
+  Sep: 8,
+  Oct: 9,
+  Nov: 10,
+  Dec: 11,
 };
 
 /**
@@ -109,8 +119,7 @@ export function parseSyslog5424(line: string): Partial<SecurityEvent> | null {
   if (!line || typeof line !== 'string') return null;
 
   // Match RFC 5424: <pri>version SP timestamp SP hostname SP app-name SP procid SP msgid SP SD SP msg
-  const regex =
-    /^<(\d{1,3})>(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s*(.*)$/;
+  const regex = /^<(\d{1,3})>(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s*(.*)$/;
   const match = line.match(regex);
   if (!match) return null;
 
@@ -223,9 +232,7 @@ export function parseAuthLog(line: string): Partial<SecurityEvent> | null {
 
     // Invalid user attempt / 無效使用者嘗試
     // Message: Invalid user USERNAME from IP port PORT
-    const invalidUser = message.match(
-      /Invalid\s+user\s+(\S+)\s+from\s+(\S+)(?:\s+port\s+(\d+))?/i
-    );
+    const invalidUser = message.match(/Invalid\s+user\s+(\S+)\s+from\s+(\S+)(?:\s+port\s+(\d+))?/i);
     if (invalidUser) {
       const [, user, sourceIP, port] = invalidUser;
       return {
@@ -251,9 +258,7 @@ export function parseAuthLog(line: string): Partial<SecurityEvent> | null {
   // Sudo command execution / Sudo 指令執行
   // Message: username : TTY=... ; ... COMMAND=command
   if (program === 'sudo') {
-    const sudoCmd = message.match(
-      /(\S+)\s*:.*COMMAND=(.*)/i
-    );
+    const sudoCmd = message.match(/(\S+)\s*:.*COMMAND=(.*)/i);
     if (sudoCmd) {
       const [, user, command] = sudoCmd;
       return {
@@ -278,9 +283,7 @@ export function parseAuthLog(line: string): Partial<SecurityEvent> | null {
   // Su session opened / Su 會話開啟
   // Message: ... session opened for user TARGET by USER(uid=...)
   if (program === 'su') {
-    const suSession = message.match(
-      /session\s+opened\s+for\s+user\s+(\S+)(?:\s+by\s+(\S+))?/i
-    );
+    const suSession = message.match(/session\s+opened\s+for\s+user\s+(\S+)(?:\s+by\s+(\S+))?/i);
     if (suSession) {
       const [, targetUser, byUser] = suSession;
       return {

@@ -64,7 +64,7 @@ export async function executeGuardStart(args: Record<string, unknown>) {
                   message: `Guard engine is already running (PID: ${existingPid}).`,
                 },
                 null,
-                2,
+                2
               ),
             },
           ],
@@ -100,7 +100,7 @@ export async function executeGuardStart(args: Record<string, unknown>) {
                 message: 'Could not resolve @panguard-ai/panguard-guard package. Is it installed?',
               },
               null,
-              2,
+              2
             ),
           },
         ],
@@ -125,7 +125,7 @@ export async function executeGuardStart(args: Record<string, unknown>) {
               message: `Failed to open log file: ${err instanceof Error ? err.message : String(err)}`,
             },
             null,
-            2,
+            2
           ),
         },
       ],
@@ -179,7 +179,7 @@ export async function executeGuardStart(args: Record<string, unknown>) {
                 message: `Guard engine started successfully (PID: ${newPid}).`,
               },
               null,
-              2,
+              2
             ),
           },
         ],
@@ -195,10 +195,11 @@ export async function executeGuardStart(args: Record<string, unknown>) {
                 dataDir,
                 mode,
                 logFile: logPath,
-                message: 'Guard engine was spawned but did not confirm startup within 5 seconds. Check the log file for details.',
+                message:
+                  'Guard engine was spawned but did not confirm startup within 5 seconds. Check the log file for details.',
               },
               null,
-              2,
+              2
             ),
           },
         ],
@@ -216,7 +217,7 @@ export async function executeGuardStart(args: Record<string, unknown>) {
               message: `Failed to spawn guard process: ${err instanceof Error ? err.message : String(err)}`,
             },
             null,
-            2,
+            2
           ),
         },
       ],
@@ -269,7 +270,7 @@ export async function executeGuardStop(args: Record<string, unknown>) {
               : 'Guard engine was not running (no PID file found).',
           },
           null,
-          2,
+          2
         ),
       },
     ],
@@ -340,7 +341,7 @@ export async function executeStatus(args: Record<string, unknown>) {
               : 'Panguard Guard is NOT running. Use panguard_guard_start to start it.',
           },
           null,
-          2,
+          2
         ),
       },
     ],
@@ -395,7 +396,7 @@ export async function executeAlerts(args: Record<string, unknown>) {
                 : `${recentAlerts.length} recent alert(s) detected.`,
           },
           null,
-          2,
+          2
         ),
       },
     ],

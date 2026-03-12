@@ -54,19 +54,22 @@ const HONEYPOT_TYPES = [
     name: 'SSH Honeypot',
     port: '2222',
     captures: 'Credentials, commands, session recordings',
-    description: 'Emulates an OpenSSH server. Captures login attempts, passwords, and post-auth commands entered by attackers.',
+    description:
+      'Emulates an OpenSSH server. Captures login attempts, passwords, and post-auth commands entered by attackers.',
   },
   {
     name: 'HTTP Honeypot',
     port: '8080',
     captures: 'URLs, payloads, user agents, exploit attempts',
-    description: 'Serves fake admin panels (WordPress, phpMyAdmin, cPanel). Records all HTTP requests and submitted credentials.',
+    description:
+      'Serves fake admin panels (WordPress, phpMyAdmin, cPanel). Records all HTTP requests and submitted credentials.',
   },
   {
     name: 'DNS Honeypot',
     port: '5353',
     captures: 'Query patterns, tunneling attempts, exfiltration',
-    description: 'Detects DNS tunneling and data exfiltration. Identifies C2 communication channels hidden in DNS traffic.',
+    description:
+      'Detects DNS tunneling and data exfiltration. Identifies C2 communication channels hidden in DNS traffic.',
   },
 ];
 
@@ -90,8 +93,8 @@ export default function TrapDocsContent() {
               Panguard Trap
             </h1>
             <p className="text-text-secondary mt-4 text-lg leading-relaxed">
-              Deploy honeypot decoys to detect, profile, and block attackers before they reach real assets.
-              Captured intelligence feeds directly into Guard blocklists.
+              Deploy honeypot decoys to detect, profile, and block attackers before they reach real
+              assets. Captured intelligence feeds directly into Guard blocklists.
             </p>
           </FadeInUp>
         </div>
@@ -108,31 +111,18 @@ export default function TrapDocsContent() {
 
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-text-secondary mb-2">
-                  Deploy all configured honeypots:
-                </p>
-                <CodeBlock
-                  code="panguard trap start"
-                  label="Terminal"
-                />
+                <p className="text-sm text-text-secondary mb-2">Deploy all configured honeypots:</p>
+                <CodeBlock code="panguard trap start" label="Terminal" />
               </div>
               <div>
                 <p className="text-sm text-text-secondary mb-2">
                   Check running honeypots and captured events:
                 </p>
-                <CodeBlock
-                  code="panguard trap status"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard trap status" label="Terminal" />
               </div>
               <div>
-                <p className="text-sm text-text-secondary mb-2">
-                  Stop all honeypot services:
-                </p>
-                <CodeBlock
-                  code="panguard trap stop"
-                  label="Terminal"
-                />
+                <p className="text-sm text-text-secondary mb-2">Stop all honeypot services:</p>
+                <CodeBlock code="panguard trap stop" label="Terminal" />
               </div>
             </div>
           </FadeInUp>
@@ -155,7 +145,9 @@ export default function TrapDocsContent() {
                     <p className="text-sm font-semibold text-text-primary">{hp.name}</p>
                     <span className="text-xs text-text-muted font-mono">Port {hp.port}</span>
                   </div>
-                  <p className="text-sm text-text-secondary leading-relaxed mb-3">{hp.description}</p>
+                  <p className="text-sm text-text-secondary leading-relaxed mb-3">
+                    {hp.description}
+                  </p>
                   <p className="text-xs text-text-muted">
                     <span className="text-brand-sage font-medium">Captures:</span> {hp.captures}
                   </p>
@@ -164,9 +156,7 @@ export default function TrapDocsContent() {
             </div>
 
             <div className="mt-6">
-              <p className="text-sm text-text-secondary mb-2">
-                Deploy a specific honeypot type:
-              </p>
+              <p className="text-sm text-text-secondary mb-2">Deploy a specific honeypot type:</p>
               <CodeBlock
                 code={`panguard trap start --type ssh --port 2222
 panguard trap start --type http --port 8080
@@ -189,13 +179,34 @@ panguard trap start --type dns --port 5353`}
 
             <div className="space-y-3">
               {[
-                { step: '1', title: 'Attacker Connects', desc: 'An attacker discovers and connects to a decoy service, believing it to be a real target.' },
-                { step: '2', title: 'Capture Intelligence', desc: 'Panguard records credentials, source IP, geolocation, tools used, and attack techniques (mapped to MITRE ATT&CK).' },
-                { step: '3', title: 'Auto-Block', desc: 'The attacker IP is automatically added to Guard blocklists, preventing access to real services.' },
-                { step: '4', title: 'Feed Threat Intel', desc: 'Captured data enriches your local threat intelligence database and optionally uploads to Panguard Threat Cloud.' },
+                {
+                  step: '1',
+                  title: 'Attacker Connects',
+                  desc: 'An attacker discovers and connects to a decoy service, believing it to be a real target.',
+                },
+                {
+                  step: '2',
+                  title: 'Capture Intelligence',
+                  desc: 'Panguard records credentials, source IP, geolocation, tools used, and attack techniques (mapped to MITRE ATT&CK).',
+                },
+                {
+                  step: '3',
+                  title: 'Auto-Block',
+                  desc: 'The attacker IP is automatically added to Guard blocklists, preventing access to real services.',
+                },
+                {
+                  step: '4',
+                  title: 'Feed Threat Intel',
+                  desc: 'Captured data enriches your local threat intelligence database and optionally uploads to Panguard Threat Cloud.',
+                },
               ].map((item) => (
-                <div key={item.step} className="flex gap-4 bg-surface-1 border border-border rounded-xl p-5">
-                  <span className="text-brand-sage font-bold text-lg shrink-0 w-6">{item.step}</span>
+                <div
+                  key={item.step}
+                  className="flex gap-4 bg-surface-1 border border-border rounded-xl p-5"
+                >
+                  <span className="text-brand-sage font-bold text-lg shrink-0 w-6">
+                    {item.step}
+                  </span>
                   <div>
                     <p className="text-sm font-semibold text-text-primary mb-1">{item.title}</p>
                     <p className="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
@@ -218,45 +229,36 @@ panguard trap start --type dns --port 5353`}
 
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-text-secondary mb-2">
-                  View captured threat data:
-                </p>
-                <CodeBlock
-                  code="panguard trap intel"
-                  label="Terminal"
-                />
+                <p className="text-sm text-text-secondary mb-2">View captured threat data:</p>
+                <CodeBlock code="panguard trap intel" label="Terminal" />
               </div>
               <div>
                 <p className="text-sm text-text-secondary mb-2">
                   Export intelligence as JSON for integration with SIEMs:
                 </p>
-                <CodeBlock
-                  code="panguard trap intel --json --last 7d"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard trap intel --json --last 7d" label="Terminal" />
               </div>
             </div>
 
             <div className="bg-surface-1 border border-border rounded-xl p-5 mt-4">
               <p className="text-sm font-semibold text-text-primary mb-2">Auto-feed to Guard</p>
               <p className="text-sm text-text-secondary leading-relaxed">
-                All captured attacker IPs are automatically added to Guard blocklists.
-                No manual configuration required. The integration is bidirectional:
-                Guard events can also trigger Trap to deploy targeted honeypots.
+                All captured attacker IPs are automatically added to Guard blocklists. No manual
+                configuration required. The integration is bidirectional: Guard events can also
+                trigger Trap to deploy targeted honeypots.
               </p>
             </div>
 
             <div className="bg-surface-1 border border-border rounded-xl p-5 mt-4">
-              <p className="text-sm font-semibold text-text-primary mb-2">Threat Cloud (Optional)</p>
+              <p className="text-sm font-semibold text-text-primary mb-2">
+                Threat Cloud (Optional)
+              </p>
               <p className="text-sm text-text-secondary leading-relaxed">
-                Opt in to share anonymized threat data with the Panguard Threat Cloud.
-                In return, receive community-sourced blocklists from other Panguard deployments worldwide.
+                Opt in to share anonymized threat data with the Panguard Threat Cloud. In return,
+                receive community-sourced blocklists from other Panguard deployments worldwide.
               </p>
               <div className="mt-3">
-                <CodeBlock
-                  code="panguard trap intel --cloud-upload enable"
-                  label="Terminal"
-                />
+                <CodeBlock code="panguard trap intel --cloud-upload enable" label="Terminal" />
               </div>
             </div>
           </FadeInUp>
@@ -314,17 +316,25 @@ trap:
                   <tbody>
                     <tr className="border-b border-border/50">
                       <td className="py-3 text-brand-sage font-mono">low</td>
-                      <td className="py-3 text-text-secondary">Captures connection metadata only</td>
-                      <td className="py-3 text-text-secondary">Minimal resource usage, IP collection</td>
+                      <td className="py-3 text-text-secondary">
+                        Captures connection metadata only
+                      </td>
+                      <td className="py-3 text-text-secondary">
+                        Minimal resource usage, IP collection
+                      </td>
                     </tr>
                     <tr className="border-b border-border/50">
                       <td className="py-3 text-brand-sage font-mono">medium</td>
-                      <td className="py-3 text-text-secondary">Accepts credentials, records commands</td>
+                      <td className="py-3 text-text-secondary">
+                        Accepts credentials, records commands
+                      </td>
                       <td className="py-3 text-text-secondary">Balanced intelligence gathering</td>
                     </tr>
                     <tr>
                       <td className="py-3 text-brand-sage font-mono">high</td>
-                      <td className="py-3 text-text-secondary">Full emulation with fake file system</td>
+                      <td className="py-3 text-text-secondary">
+                        Full emulation with fake file system
+                      </td>
                       <td className="py-3 text-text-secondary">Maximum attacker profiling</td>
                     </tr>
                   </tbody>
@@ -346,12 +356,27 @@ trap:
 
             <div className="space-y-3">
               {[
-                { title: 'Container Isolation', desc: 'Each honeypot runs in an isolated container with no access to the host filesystem or network services.' },
-                { title: 'No Real Data', desc: 'Decoy services contain only synthetic data. Fake credentials, dummy files, and fabricated database entries.' },
-                { title: 'Resource Limits', desc: 'Configurable CPU and memory caps prevent honeypots from consuming production resources.' },
-                { title: 'Network Segmentation', desc: 'Honeypot traffic is isolated on a dedicated virtual network, separate from production traffic.' },
+                {
+                  title: 'Container Isolation',
+                  desc: 'Each honeypot runs in an isolated container with no access to the host filesystem or network services.',
+                },
+                {
+                  title: 'No Real Data',
+                  desc: 'Decoy services contain only synthetic data. Fake credentials, dummy files, and fabricated database entries.',
+                },
+                {
+                  title: 'Resource Limits',
+                  desc: 'Configurable CPU and memory caps prevent honeypots from consuming production resources.',
+                },
+                {
+                  title: 'Network Segmentation',
+                  desc: 'Honeypot traffic is isolated on a dedicated virtual network, separate from production traffic.',
+                },
               ].map((item) => (
-                <div key={item.title} className="flex items-start gap-3 bg-surface-1 border border-border rounded-xl p-5">
+                <div
+                  key={item.title}
+                  className="flex items-start gap-3 bg-surface-1 border border-border rounded-xl p-5"
+                >
                   <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-text-primary mb-1">{item.title}</p>

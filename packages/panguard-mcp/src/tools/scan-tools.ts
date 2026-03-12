@@ -80,7 +80,7 @@ export async function executeScan(args: Record<string, unknown>) {
               summary: `Risk Score: ${result.riskScore}/100 (${result.riskLevel}). ${result.findings.length} findings detected.`,
             },
             null,
-            2,
+            2
           ),
         },
       ],
@@ -116,7 +116,7 @@ export async function executeScanCode(args: Record<string, unknown>) {
                 'SAST scanning (checkSourceCode / checkHardcodedSecrets) is not yet available in this build of @panguard-ai/panguard-scan. Please upgrade to the latest version.',
             },
             null,
-            2,
+            2
           ),
         },
       ],
@@ -160,7 +160,7 @@ export async function executeScanCode(args: Record<string, unknown>) {
                   : `Found ${allFindings.length} security issues (${allFindings.filter((f) => f.severity === 'critical').length} critical, ${allFindings.filter((f) => f.severity === 'high').length} high).`,
             },
             null,
-            2,
+            2
           ),
         },
       ],

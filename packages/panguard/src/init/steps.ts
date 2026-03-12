@@ -483,7 +483,8 @@ export function getQuickSteps(): WizardStep[] {
       },
       description: {
         en: 'We will auto-configure everything based on your choice',
-        'zh-TW': '\u6211\u5011\u6703\u6839\u64DA\u4F60\u7684\u9078\u64C7\u81EA\u52D5\u914D\u7F6E\u6240\u6709\u8A2D\u5B9A',
+        'zh-TW':
+          '\u6211\u5011\u6703\u6839\u64DA\u4F60\u7684\u9078\u64C7\u81EA\u52D5\u914D\u7F6E\u6240\u6709\u8A2D\u5B9A',
       },
       inputType: 'select',
       options: [
@@ -495,7 +496,8 @@ export function getQuickSteps(): WizardStep[] {
           },
           description: {
             en: 'Protect your laptop, desktop, or personal server',
-            'zh-TW': '\u4FDD\u8B77\u4F60\u7684\u7B46\u96FB\u3001\u684C\u6A5F\u6216\u500B\u4EBA\u4F3A\u670D\u5668',
+            'zh-TW':
+              '\u4FDD\u8B77\u4F60\u7684\u7B46\u96FB\u3001\u684C\u6A5F\u6216\u500B\u4EBA\u4F3A\u670D\u5668',
           },
         },
         {
@@ -506,7 +508,8 @@ export function getQuickSteps(): WizardStep[] {
           },
           description: {
             en: 'Cloud VPS or office server for a small team',
-            'zh-TW': '\u96F2\u7AEF VPS \u6216\u5C0F\u578B\u5718\u968A\u8FA6\u516C\u5BA4\u4F3A\u670D\u5668',
+            'zh-TW':
+              '\u96F2\u7AEF VPS \u6216\u5C0F\u578B\u5718\u968A\u8FA6\u516C\u5BA4\u4F3A\u670D\u5668',
           },
         },
         {

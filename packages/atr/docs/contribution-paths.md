@@ -13,6 +13,7 @@ Best for: security researchers, red teamers, developers who have discovered an a
 ### Workflow
 
 1. **Scaffold** -- Generate a rule template:
+
    ```bash
    atr scaffold
    ```
@@ -25,11 +26,13 @@ Best for: security researchers, red teamers, developers who have discovered an a
    - Map to OWASP LLM Top 10, OWASP Agentic Top 10, or MITRE ATLAS
 
 3. **Validate** -- Check schema conformance:
+
    ```bash
    atr validate my-rule.yaml
    ```
 
 4. **Test** -- Run embedded test cases:
+
    ```bash
    atr test my-rule.yaml
    ```
@@ -60,6 +63,7 @@ MiroFish is a multi-agent swarm intelligence framework. It runs N agents through
    - `knowledge-base.json`: Include OWASP Top 10 descriptions, known CVEs, published attack research
 
 2. **Run simulation** -- Execute the MiroFish swarm:
+
    ```bash
    python mirofish_run.py \
      --agents agent-profiles.json \
@@ -67,20 +71,24 @@ MiroFish is a multi-agent swarm intelligence framework. It runs N agents through
      --rounds 40 \
      --model claude-sonnet-4-20250514
    ```
+
    - 40 rounds recommended for stable consensus
    - Cost estimate: $1-3 USD for 40 rounds with Claude Sonnet
 
 3. **Export report** -- Save the prediction output:
+
    ```bash
    python mirofish_export.py --format json --output prediction-report.json
    ```
 
 4. **Convert to ATR rules** -- Use the converter script:
+
    ```bash
    python mirofish_to_atr.py \
      --input prediction-report.json \
      --output-dir generated-rules/
    ```
+
    The converter:
    - Extracts attack patterns from the prediction report
    - Generates ATR-compliant YAML for each pattern
@@ -164,27 +172,27 @@ All three paths must pass the same quality gate before merge. No exceptions.
 
 ### Automated checks (CI)
 
-| Check | Requirement |
-|-------|-------------|
-| Schema validation | `atr validate` passes with zero errors |
-| True positives | Minimum 5 test cases, all pass |
-| True negatives | Minimum 5 test cases, all pass |
+| Check               | Requirement                                                     |
+| ------------------- | --------------------------------------------------------------- |
+| Schema validation   | `atr validate` passes with zero errors                          |
+| True positives      | Minimum 5 test cases, all pass                                  |
+| True negatives      | Minimum 5 test cases, all pass                                  |
 | Framework reference | At least one OWASP LLM, OWASP Agentic, or MITRE ATLAS reference |
-| Regex safety | No overly broad patterns (`.+` or `.*` alone as the full value) |
-| Regex complexity | No patterns vulnerable to catastrophic backtracking (ReDoS) |
-| ID format | Matches `ATR-YYYY-NNN` pattern |
-| Required fields | All schema-required fields present |
+| Regex safety        | No overly broad patterns (`.+` or `.*` alone as the full value) |
+| Regex complexity    | No patterns vulnerable to catastrophic backtracking (ReDoS)     |
+| ID format           | Matches `ATR-YYYY-NNN` pattern                                  |
+| Required fields     | All schema-required fields present                              |
 
 ### Human review
 
-| Check | Requirement |
-|-------|-------------|
-| Detection specificity | Patterns target actual attack indicators, not generic language |
-| False positive documentation | `false_positives` section lists realistic scenarios |
-| Evasion honesty | At least 3 evasion tests with `expected: not_triggered` where appropriate |
-| Severity justification | Severity matches real-world impact, not pattern complexity |
-| Description accuracy | States what IS detected and what IS NOT |
-| Reviewer approval | At least one maintainer approval |
+| Check                        | Requirement                                                               |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| Detection specificity        | Patterns target actual attack indicators, not generic language            |
+| False positive documentation | `false_positives` section lists realistic scenarios                       |
+| Evasion honesty              | At least 3 evasion tests with `expected: not_triggered` where appropriate |
+| Severity justification       | Severity matches real-world impact, not pattern complexity                |
+| Description accuracy         | States what IS detected and what IS NOT                                   |
+| Reviewer approval            | At least one maintainer approval                                          |
 
 ### Labels applied by CI
 

@@ -63,8 +63,7 @@ export class ManagerServer {
     // In production, require an auth token to prevent unauthenticated access
     if (process.env['NODE_ENV'] === 'production' && !config.authToken) {
       throw new Error(
-        'MANAGER_AUTH_TOKEN is required in production. ' +
-          'Generate one with: openssl rand -hex 32'
+        'MANAGER_AUTH_TOKEN is required in production. ' + 'Generate one with: openssl rand -hex 32'
       );
     }
 
@@ -201,11 +200,7 @@ export class ManagerServer {
   }
 
   /** Route requests to handlers */
-  private async route(
-    req: IncomingMessage,
-    res: ServerResponse,
-    pathname: string
-  ): Promise<void> {
+  private async route(req: IncomingMessage, res: ServerResponse, pathname: string): Promise<void> {
     const method = req.method ?? 'GET';
 
     // POST /api/agents/register
@@ -454,7 +449,7 @@ export class ManagerServer {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
       'X-Accel-Buffering': 'no',
     });
 

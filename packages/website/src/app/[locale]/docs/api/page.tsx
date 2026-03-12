@@ -79,8 +79,7 @@ export default function ApiDocsPage() {
       <div className="mx-auto max-w-4xl px-6 py-16">
         <h1 className="text-4xl font-bold tracking-tight">API Reference</h1>
         <p className="mt-4 text-lg text-[#A09890]">
-          REST API for authentication, usage metering, admin management, and threat
-          intelligence.
+          REST API for authentication, usage metering, admin management, and threat intelligence.
         </p>
 
         <div className="mt-8 flex gap-4">

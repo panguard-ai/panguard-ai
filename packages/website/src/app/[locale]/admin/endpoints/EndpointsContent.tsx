@@ -231,9 +231,7 @@ export default function EndpointsContent() {
                     }`}
                   >
                     {filter.label}
-                    <span className="ml-1.5 text-text-muted">
-                      {statusCounts[filter.value]}
-                    </span>
+                    <span className="ml-1.5 text-text-muted">{statusCounts[filter.value]}</span>
                   </button>
                 ))}
               </div>
@@ -273,7 +271,9 @@ export default function EndpointsContent() {
                 <div className="px-5 py-12 text-center">
                   <Monitor className="w-8 h-8 text-text-muted mx-auto mb-3" />
                   <p className="text-sm text-text-secondary">No endpoints match your filters</p>
-                  <p className="text-xs text-text-tertiary mt-1">Try adjusting the search or status filter</p>
+                  <p className="text-xs text-text-tertiary mt-1">
+                    Try adjusting the search or status filter
+                  </p>
                 </div>
               )}
 

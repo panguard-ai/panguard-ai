@@ -1,10 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { validateOrigin, createOriginValidator } from '../src/websocket/origin-validator.js';
 import { CsrfTokenManager } from '../src/websocket/csrf-token.js';
-import {
-  validateGatewayUrl,
-  sanitizeWebSocketUrl,
-} from '../src/websocket/connection-validator.js';
+import { validateGatewayUrl, sanitizeWebSocketUrl } from '../src/websocket/connection-validator.js';
 
 // ---------------------------------------------------------------------------
 // Origin Validator
@@ -376,15 +373,11 @@ describe('Connection Validator', () => {
 
   describe('sanitizeWebSocketUrl', () => {
     it('should sanitize valid ws:// URLs', () => {
-      expect(sanitizeWebSocketUrl('ws://localhost:18789/path')).toBe(
-        'ws://localhost:18789/path'
-      );
+      expect(sanitizeWebSocketUrl('ws://localhost:18789/path')).toBe('ws://localhost:18789/path');
     });
 
     it('should sanitize valid wss:// URLs', () => {
-      expect(sanitizeWebSocketUrl('wss://secure.example.com/')).toBe(
-        'wss://secure.example.com/'
-      );
+      expect(sanitizeWebSocketUrl('wss://secure.example.com/')).toBe('wss://secure.example.com/');
     });
 
     it('should reject http:// protocol', () => {

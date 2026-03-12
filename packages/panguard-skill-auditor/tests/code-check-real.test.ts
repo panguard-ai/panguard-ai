@@ -28,7 +28,11 @@ describe('checkCode (real panguard-scan)', () => {
 
   afterEach(() => {
     for (const dir of tempDirs) {
-      try { rmSync(dir, { recursive: true, force: true }); } catch { /* ignore */ }
+      try {
+        rmSync(dir, { recursive: true, force: true });
+      } catch {
+        /* ignore */
+      }
     }
     tempDirs.length = 0;
   });
@@ -53,7 +57,7 @@ describe('checkCode (real panguard-scan)', () => {
 
     const result = await checkCode(dir);
     // Should find at least one secret
-    const secretFindings = result.findings.filter(f => f.category === 'secrets');
+    const secretFindings = result.findings.filter((f) => f.category === 'secrets');
     expect(secretFindings.length).toBeGreaterThanOrEqual(1);
     expect(result.status).not.toBe('pass');
   });
@@ -70,7 +74,7 @@ describe('checkCode (real panguard-scan)', () => {
 
     const result = await checkCode(dir);
     // Without Semgrep installed, SAST code findings are not produced
-    const codeFindings = result.findings.filter(f => f.category === 'code');
+    const codeFindings = result.findings.filter((f) => f.category === 'code');
     expect(codeFindings.length).toBe(0);
   });
 
@@ -83,7 +87,7 @@ describe('checkCode (real panguard-scan)', () => {
     });
 
     const result = await checkCode(dir);
-    const secretFindings = result.findings.filter(f => f.category === 'secrets');
+    const secretFindings = result.findings.filter((f) => f.category === 'secrets');
     expect(secretFindings.length).toBeGreaterThanOrEqual(1);
   });
 

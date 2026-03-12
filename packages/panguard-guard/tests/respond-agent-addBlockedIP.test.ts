@@ -13,10 +13,17 @@ import { DEFAULT_ACTION_POLICY } from '../src/types.js';
 
 // Mock child_process.execFile to avoid actual firewall commands
 vi.mock('node:child_process', () => ({
-  execFile: vi.fn((_cmd: string, _args: string[], _opts: unknown, cb: (err: Error | null, stdout: string) => void) => {
-    // Simulate successful firewall command
-    cb(null, '');
-  }),
+  execFile: vi.fn(
+    (
+      _cmd: string,
+      _args: string[],
+      _opts: unknown,
+      cb: (err: Error | null, stdout: string) => void
+    ) => {
+      // Simulate successful firewall command
+      cb(null, '');
+    }
+  ),
 }));
 
 // Mock createLogger
@@ -83,7 +90,12 @@ describe('RespondAgent.addBlockedIP()', () => {
   });
 
   it('should reject user-configured whitelisted IPs', async () => {
-    const customAgent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', ['192.168.1.100'], tempDir);
+    const customAgent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      ['192.168.1.100'],
+      tempDir
+    );
     const result = await customAgent.addBlockedIP('192.168.1.100');
     expect(result.success).toBe(false);
     expect(result.details).toContain('whitelisted');

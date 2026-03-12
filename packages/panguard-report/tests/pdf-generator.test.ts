@@ -460,12 +460,9 @@ describe('PDF Generator', () => {
   describe('pre-computed assessmentResult', () => {
     it('should use assessmentResult when provided', async () => {
       const { generateComplianceReport } = await import('../src/generator/report-generator.js');
-      const assessmentResult = generateComplianceReport(
-        createTestFindings(),
-        'iso27001',
-        'en',
-        { organizationName: 'Precomputed Corp' }
-      );
+      const assessmentResult = generateComplianceReport(createTestFindings(), 'iso27001', 'en', {
+        organizationName: 'Precomputed Corp',
+      });
 
       const opts = defaultOptions({
         title: 'Precomputed Corp Report',
@@ -503,9 +500,7 @@ describe('PDF Generator', () => {
       // We expect at least 4 pages: cover, exec summary, findings, compliance matrix
       // Note: /Type /Pages is the parent, /Type /Page is individual pages
       // Filter out /Type /Pages entries
-      const pageCount = pageMatches
-        ? pageMatches.filter((m) => !m.includes('/Pages')).length
-        : 0;
+      const pageCount = pageMatches ? pageMatches.filter((m) => !m.includes('/Pages')).length : 0;
       expect(pageCount).toBeGreaterThanOrEqual(4);
     });
   });

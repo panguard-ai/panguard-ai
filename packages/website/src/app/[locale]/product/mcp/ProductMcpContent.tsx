@@ -20,26 +20,62 @@ import { STATS } from '@/lib/stats';
 
 /* ─── MCP Tools ─── */
 const mcpTools = [
-  { icon: ScanIcon, name: 'panguard_scan', desc: 'Run a full security health check and get risk score + findings' },
-  { icon: ScanIcon, name: 'panguard_scan_code', desc: 'SAST source code scanning for vulnerabilities and secrets' },
-  { icon: ShieldIcon, name: 'panguard_guard_start', desc: 'Start the Guard daemon for 24/7 real-time protection' },
+  {
+    icon: ScanIcon,
+    name: 'panguard_scan',
+    desc: 'Run a full security health check and get risk score + findings',
+  },
+  {
+    icon: ScanIcon,
+    name: 'panguard_scan_code',
+    desc: 'SAST source code scanning for vulnerabilities and secrets',
+  },
+  {
+    icon: ShieldIcon,
+    name: 'panguard_guard_start',
+    desc: 'Start the Guard daemon for 24/7 real-time protection',
+  },
   { icon: ShieldIcon, name: 'panguard_guard_stop', desc: 'Stop the Guard daemon gracefully' },
-  { icon: AnalyticsIcon, name: 'panguard_status', desc: 'Get current system protection status and health' },
-  { icon: AnalyticsIcon, name: 'panguard_alerts', desc: 'Fetch recent security alerts with severity and details' },
+  {
+    icon: AnalyticsIcon,
+    name: 'panguard_status',
+    desc: 'Get current system protection status and health',
+  },
+  {
+    icon: AnalyticsIcon,
+    name: 'panguard_alerts',
+    desc: 'Fetch recent security alerts with severity and details',
+  },
   { icon: BlockIcon, name: 'panguard_block_ip', desc: 'Block an attacker IP address immediately' },
-  { icon: AnalyticsIcon, name: 'panguard_generate_report', desc: 'Generate ISO 27001, SOC 2, or TCSA compliance report' },
-  { icon: SettingsIcon, name: 'panguard_init', desc: 'Initialize Panguard configuration on a new system' },
-  { icon: DeployIcon, name: 'panguard_deploy', desc: 'Deploy security configuration to an endpoint' },
-  { icon: TerminalIcon, name: 'panguard_skill_audit', desc: 'Audit AI agent SKILL.md files for security threats' },
+  {
+    icon: AnalyticsIcon,
+    name: 'panguard_generate_report',
+    desc: 'Generate ISO 27001, SOC 2, or TCSA compliance report',
+  },
+  {
+    icon: SettingsIcon,
+    name: 'panguard_init',
+    desc: 'Initialize Panguard configuration on a new system',
+  },
+  {
+    icon: DeployIcon,
+    name: 'panguard_deploy',
+    desc: 'Deploy security configuration to an endpoint',
+  },
+  {
+    icon: TerminalIcon,
+    name: 'panguard_skill_audit',
+    desc: 'Audit AI agent SKILL.md files for security threats',
+  },
 ];
 
 /* ─── Compatible clients ─── */
 const clients = [
-  { name: 'Claude Desktop', desc: 'Anthropic\'s desktop app with native MCP support' },
+  { name: 'Claude Desktop', desc: "Anthropic's desktop app with native MCP support" },
   { name: 'Cursor', desc: 'AI-first code editor with MCP tool integration' },
   { name: 'Claude Code', desc: 'CLI agent that can call MCP tools directly' },
   { name: 'OpenClaw', desc: 'Native Skill (auto-installed via `panguard setup`)' },
-  { name: 'Codex CLI', desc: 'OpenAI\'s coding agent with MCP tool support' },
+  { name: 'Codex CLI', desc: "OpenAI's coding agent with MCP tool support" },
   { name: 'Any MCP Client', desc: 'Any app implementing the Model Context Protocol' },
 ];
 
@@ -99,10 +135,12 @@ export default function ProductMcpContent() {
           <FadeInUp delay={0.15}>
             <div className="mt-8 bg-[#0c0d0c] border border-border rounded-xl overflow-hidden">
               <div className="px-4 py-2 border-b border-border/60">
-                <span className="text-xs text-text-muted font-mono">claude_desktop_config.json</span>
+                <span className="text-xs text-text-muted font-mono">
+                  claude_desktop_config.json
+                </span>
               </div>
               <pre className="p-4 text-sm font-mono text-text-secondary overflow-x-auto leading-relaxed">
-{`{
+                {`{
   "mcpServers": {
     "panguard": {
       "command": "npx",

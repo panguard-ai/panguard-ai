@@ -48,9 +48,7 @@ export default function SkillProtection() {
           >
             <div className="flex items-center gap-2 mb-6">
               <X className="w-5 h-5 text-red-400" />
-              <h3 className="text-lg font-bold text-red-400">
-                {t('without.label')}
-              </h3>
+              <h3 className="text-lg font-bold text-red-400">{t('without.label')}</h3>
             </div>
             <ul className="space-y-4">
               {withoutItems.map((item, i) => (
@@ -72,9 +70,7 @@ export default function SkillProtection() {
           >
             <div className="flex items-center gap-2 mb-6">
               <Check className="w-5 h-5 text-panguard-green" />
-              <h3 className="text-lg font-bold text-panguard-green">
-                {t('with.label')}
-              </h3>
+              <h3 className="text-lg font-bold text-panguard-green">{t('with.label')}</h3>
             </div>
             <ul className="space-y-4">
               {withItems.map((item, i) => (

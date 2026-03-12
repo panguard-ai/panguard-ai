@@ -16,9 +16,7 @@ const BOUNDARY_COUNT = 8;
 /* ────────────────────────  Helpers  ─────────────────────────────── */
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-xl font-bold text-text-primary mb-6">{children}</h2>
-  );
+  return <h2 className="text-xl font-bold text-text-primary mb-6">{children}</h2>;
 }
 
 /* ════════════════════════  Component  ═════════════════════════ */
@@ -41,9 +39,7 @@ export default function BenchmarkContent() {
             <h1 className="text-[clamp(32px,4vw,48px)] font-bold text-text-primary mt-4 leading-[1.1]">
               {t('title')}
             </h1>
-            <p className="text-text-secondary mt-4 text-lg leading-relaxed">
-              {t('subtitle')}
-            </p>
+            <p className="text-text-secondary mt-4 text-lg leading-relaxed">{t('subtitle')}</p>
           </FadeInUp>
         </div>
       </SectionWrapper>
@@ -55,10 +51,7 @@ export default function BenchmarkContent() {
             <SectionHeading>{t('testMethodology')}</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {METHOD_KEYS.map((key) => (
-                <div
-                  key={key}
-                  className="bg-surface-0 border border-border rounded-xl px-5 py-4"
-                >
+                <div key={key} className="bg-surface-0 border border-border rounded-xl px-5 py-4">
                   <p className="text-xs uppercase tracking-wider text-text-muted mb-1">
                     {t(`methodLabel.${key}`)}
                   </p>
@@ -87,10 +80,7 @@ export default function BenchmarkContent() {
                 </thead>
                 <tbody>
                   {Array.from({ length: PERF_COUNT }, (_, i) => (
-                    <tr
-                      key={i}
-                      className={i < PERF_COUNT - 1 ? 'border-b border-border/50' : ''}
-                    >
+                    <tr key={i} className={i < PERF_COUNT - 1 ? 'border-b border-border/50' : ''}>
                       <td className="py-3 text-text-secondary">{t(`perf.${i}.name`)}</td>
                       <td className="py-3 text-text-primary font-mono text-right">
                         {t(`perf.${i}.latency`)}
@@ -130,16 +120,11 @@ export default function BenchmarkContent() {
             <SectionHeading>{t('resourceConsumption')}</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Array.from({ length: RESOURCE_COUNT }, (_, i) => (
-                <div
-                  key={i}
-                  className="bg-surface-1 border border-border rounded-xl px-5 py-4"
-                >
+                <div key={i} className="bg-surface-1 border border-border rounded-xl px-5 py-4">
                   <p className="text-xs uppercase tracking-wider text-text-muted mb-1">
                     {t(`resource.${i}.name`)}
                   </p>
-                  <p className="text-text-primary font-semibold">
-                    {t(`resource.${i}.value`)}
-                  </p>
+                  <p className="text-text-primary font-semibold">{t(`resource.${i}.value`)}</p>
                 </div>
               ))}
             </div>
@@ -179,12 +164,8 @@ export default function BenchmarkContent() {
       <SectionWrapper>
         <div className="max-w-3xl mx-auto text-center">
           <FadeInUp>
-            <h2 className="text-2xl font-bold text-text-primary mb-3">
-              {t('cta.title')}
-            </h2>
-            <p className="text-text-secondary mb-8">
-              {t('cta.subtitle')}
-            </p>
+            <h2 className="text-2xl font-bold text-text-primary mb-3">{t('cta.title')}</h2>
+            <p className="text-text-secondary mb-8">{t('cta.subtitle')}</p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
                 href="/docs/getting-started"

@@ -8,7 +8,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createHmac } from 'node:crypto';
-import { WebhookServer, type WebhookHandler, type WebhookServerConfig } from '../src/server/webhook-server.js';
+import {
+  WebhookServer,
+  type WebhookHandler,
+  type WebhookServerConfig,
+} from '../src/server/webhook-server.js';
 
 // ---------------------------------------------------------------------------
 // Mock @panguard-ai/core logger
@@ -80,7 +84,8 @@ class MockIncomingMessage {
     this.method = options.method ?? 'POST';
     this.url = options.url ?? '/';
     this.headers = options.headers ?? {};
-    this.chunks = options.bodyChunks ?? (options.body !== undefined ? [Buffer.from(options.body)] : []);
+    this.chunks =
+      options.bodyChunks ?? (options.body !== undefined ? [Buffer.from(options.body)] : []);
     this.errorToEmit = options.errorToEmit ?? null;
     this.shouldDestroy = false;
   }
@@ -143,10 +148,7 @@ class MockServerResponse {
 // 輔助函數：透過伺服器發送模擬請求
 // ---------------------------------------------------------------------------
 
-async function dispatchRequest(
-  req: MockIncomingMessage,
-  res: MockServerResponse
-): Promise<void> {
+async function dispatchRequest(req: MockIncomingMessage, res: MockServerResponse): Promise<void> {
   if (!mockServerInstance?.requestHandler) {
     throw new Error('Server not started - requestHandler is null');
   }
@@ -245,14 +247,8 @@ describe('WebhookServer', () => {
 
       await server.start();
 
-      expect(mockServerInstance.listen).toHaveBeenCalledWith(
-        8080,
-        '0.0.0.0',
-        expect.any(Function)
-      );
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        expect.stringContaining('0.0.0.0:8080')
-      );
+      expect(mockServerInstance.listen).toHaveBeenCalledWith(8080, '0.0.0.0', expect.any(Function));
+      expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining('0.0.0.0:8080'));
     });
 
     it('should default to 127.0.0.1 when host is not specified', async () => {
@@ -462,10 +458,7 @@ describe('WebhookServer', () => {
       await dispatchRequest(req, res);
 
       expect(res.statusCode).toBe(200);
-      expect(handler).toHaveBeenCalledWith(
-        { message: 'test' },
-        expect.any(Object)
-      );
+      expect(handler).toHaveBeenCalledWith({ message: 'test' }, expect.any(Object));
     });
 
     it('should match channel with extra path segments (e.g. /webhook/telegram/extra)', async () => {
@@ -559,9 +552,12 @@ describe('WebhookServer', () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.getBody()).toEqual({ ok: true });
-      expect(handler).toHaveBeenCalledWith(payload, expect.objectContaining({
-        'content-type': 'application/json',
-      }));
+      expect(handler).toHaveBeenCalledWith(
+        payload,
+        expect.objectContaining({
+          'content-type': 'application/json',
+        })
+      );
     });
 
     it('should return 200 with { ok: true } on success', async () => {
@@ -674,14 +670,8 @@ describe('WebhookServer', () => {
       const res2 = new MockServerResponse();
       await dispatchRequest(req2, res2);
 
-      expect(telegramHandler).toHaveBeenCalledWith(
-        { from: 'telegram' },
-        expect.any(Object)
-      );
-      expect(slackHandler).toHaveBeenCalledWith(
-        { from: 'slack' },
-        expect.any(Object)
-      );
+      expect(telegramHandler).toHaveBeenCalledWith({ from: 'telegram' }, expect.any(Object));
+      expect(slackHandler).toHaveBeenCalledWith({ from: 'slack' }, expect.any(Object));
       expect(res1.statusCode).toBe(200);
       expect(res2.statusCode).toBe(200);
     });
@@ -1467,10 +1457,7 @@ describe('WebhookServer', () => {
       const res2 = new MockServerResponse();
 
       // Dispatch both concurrently
-      await Promise.all([
-        dispatchRequest(req1, res1),
-        dispatchRequest(req2, res2),
-      ]);
+      await Promise.all([dispatchRequest(req1, res1), dispatchRequest(req2, res2)]);
 
       expect(res1.statusCode).toBe(200);
       expect(res2.statusCode).toBe(200);

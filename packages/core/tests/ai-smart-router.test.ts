@@ -2,7 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { SmartRouter } from '../src/ai/smart-router.js';
 import type { SmartRouterConfig } from '../src/ai/smart-router.js';
-import type { LLMProvider, AnalysisResult, ThreatClassification, TokenUsage } from '../src/ai/types.js';
+import type {
+  LLMProvider,
+  AnalysisResult,
+  ThreatClassification,
+  TokenUsage,
+} from '../src/ai/types.js';
 
 // Suppress logger stderr output during tests
 let stderrSpy: ReturnType<typeof vi.spyOn>;
@@ -48,14 +53,16 @@ function makeMockProvider(result: AnalysisResult = makeAnalysisResult()): LLMPro
 }
 
 /** Build a SmartRouter pre-configured with mocked providers */
-function makeRouter(options: {
-  tier?: SmartRouterConfig['tier'];
-  localProvider?: LLMProvider | null;
-  cloudProvider?: LLMProvider | null;
-  skipAIThreshold?: number;
-  preferLocalThreshold?: number;
-  quotaOverride?: SmartRouterConfig['quotaOverride'];
-} = {}): SmartRouter {
+function makeRouter(
+  options: {
+    tier?: SmartRouterConfig['tier'];
+    localProvider?: LLMProvider | null;
+    cloudProvider?: LLMProvider | null;
+    skipAIThreshold?: number;
+    preferLocalThreshold?: number;
+    quotaOverride?: SmartRouterConfig['quotaOverride'];
+  } = {}
+): SmartRouter {
   const config: SmartRouterConfig = {
     tier: options.tier ?? 'pro',
     localProvider: options.localProvider ?? makeMockProvider(),

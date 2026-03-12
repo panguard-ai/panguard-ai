@@ -3,7 +3,23 @@ name: panguard
 description: AI agent security platform — audit skills, scan for threats, and run 24/7 protection with 9,700+ detection rules
 homepage: https://panguard.ai
 license: MIT
-metadata: { "openclaw": { "requires": { "bins": ["npx"] }, "install": [{ "id": "node", "kind": "node", "package": "@panguard-ai/panguard", "bins": ["panguard"], "label": "Install Panguard AI via npm" }] } }
+metadata:
+  {
+    'openclaw':
+      {
+        'requires': { 'bins': ['npx'] },
+        'install':
+          [
+            {
+              'id': 'node',
+              'kind': 'node',
+              'package': '@panguard-ai/panguard',
+              'bins': ['panguard'],
+              'label': 'Install Panguard AI via npm',
+            },
+          ],
+      },
+  }
 ---
 
 # Panguard AI — Security for AI Agents
@@ -13,47 +29,61 @@ Panguard protects AI agents from prompt injection, tool poisoning, data exfiltra
 ## Available Commands
 
 ### Audit installed skills for security threats
+
 ```bash
 panguard audit skill .
 ```
+
 Scans all SKILL.md files in the current directory and subdirectories. Reports risk level, flagged patterns, and recommendations.
 
 ### Quick security scan
+
 ```bash
 panguard scan
 ```
+
 Runs a fast security health check on the current system.
 
 ### Full security scan with code analysis
+
 ```bash
 panguard scan --depth full
 ```
+
 Deep scan including SAST code analysis, dependency audit, and threat detection.
 
 ### Start real-time protection (Guard)
+
 ```bash
 panguard guard start
 ```
+
 Starts the Guard engine as a background daemon. Monitors all agent activity in real-time using ATR (Agent Threat Rules), Sigma, and YARA rules.
 
 ### Check Guard status
+
 ```bash
 panguard guard status
 ```
+
 Shows whether Guard is running, rule counts, and recent alerts.
 
 ### Stop Guard
+
 ```bash
 panguard guard stop
 ```
 
 ### Show system status dashboard
+
 ```bash
 panguard status
 ```
+
 Displays a comprehensive status panel: Guard state, rule counts, threat stats, and connected platforms.
 
 ### Show recent security alerts
+
 ```bash
 panguard guard alerts
 ```
@@ -70,11 +100,13 @@ When the user asks about security, skill auditing, or threat protection:
 ## Setup
 
 If panguard is not installed, install it:
+
 ```bash
 npm install -g @panguard-ai/panguard
 ```
 
 Then configure for all AI agent platforms:
+
 ```bash
 panguard setup
 ```

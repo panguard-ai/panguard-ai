@@ -36,6 +36,7 @@ Perform a comprehensive SEO audit of the Panguard AI website.
    - Report missing pages
 
 ## Output
+
 Produce a markdown table with:
 | Category | Status | Issues Found | Priority |
 

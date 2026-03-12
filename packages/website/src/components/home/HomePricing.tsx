@@ -45,7 +45,9 @@ export default function HomePricing() {
           <div className="bg-surface-1 rounded-2xl border border-panguard-green p-8 sm:p-10 text-center">
             <div className="mb-6">
               <span className="text-5xl font-extrabold text-text-primary">$0</span>
-              <span className="text-xs uppercase tracking-wider text-brand-sage font-semibold ml-3">{t('badge')}</span>
+              <span className="text-xs uppercase tracking-wider text-brand-sage font-semibold ml-3">
+                {t('badge')}
+              </span>
             </div>
             <p className="text-text-secondary mb-8">{t('desc')}</p>
 

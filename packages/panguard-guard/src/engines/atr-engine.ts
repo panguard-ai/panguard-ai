@@ -13,7 +13,13 @@ import { createRequire } from 'node:module';
 import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
 import { ATREngine, SessionTracker, SkillFingerprintStore } from '@panguard-ai/atr';
-import type { ATRMatch, ATRRule, AgentEvent, AgentEventType, BehaviorAnomaly } from '@panguard-ai/atr';
+import type {
+  ATRMatch,
+  ATRRule,
+  AgentEvent,
+  AgentEventType,
+  BehaviorAnomaly,
+} from '@panguard-ai/atr';
 import { SkillWhitelistManager } from './skill-whitelist.js';
 import type { SkillWhitelistConfig } from './skill-whitelist.js';
 
@@ -115,8 +121,8 @@ export class GuardATREngine {
     if (total === 0) {
       logger.warn(
         'ATR: No rules loaded from any source. Detection will not function. ' +
-        'Verify that @panguard-ai/atr package is installed and rules directory exists. / ' +
-        'ATR: 未從任何來源載入規則。偵測將無法運作。'
+          'Verify that @panguard-ai/atr package is installed and rules directory exists. / ' +
+          'ATR: 未從任何來源載入規則。偵測將無法運作。'
       );
     }
 
@@ -148,9 +154,7 @@ export class GuardATREngine {
         this.whitelistManager.onFingerprintDrift(toolName);
 
         for (const anomaly of anomalies) {
-          logger.warn(
-            `Skill behavior drift: ${anomaly.description} [${anomaly.severity}]`
-          );
+          logger.warn(`Skill behavior drift: ${anomaly.description} [${anomaly.severity}]`);
           // Convert anomaly into a synthetic ATR match so it enters the detection pipeline
           matches.push(this.anomalyToATRMatch(anomaly));
           this.matchCount++;
@@ -168,7 +172,7 @@ export class GuardATREngine {
       this.matchCount += matches.filter((m) => m.rule.id !== 'ATR-DRIFT-DETECT').length;
       logger.warn(
         `ATR match: ${matches.length} rules triggered for event ${event.id} ` +
-        `[${matches.map((m) => m.rule.id).join(', ')}]`
+          `[${matches.map((m) => m.rule.id).join(', ')}]`
       );
     }
 
@@ -223,7 +227,8 @@ export class GuardATREngine {
       case 'tool_response':
       case 'mcp_response':
         type = 'tool_response';
-        content = (meta['tool_response'] as string) ?? (meta['result'] as string) ?? event.description;
+        content =
+          (meta['tool_response'] as string) ?? (meta['result'] as string) ?? event.description;
         if (meta['tool_name']) fields['tool_name'] = meta['tool_name'] as string;
         if (meta['tool_response']) fields['tool_response'] = meta['tool_response'] as string;
         break;
@@ -429,9 +434,10 @@ export class GuardATREngine {
           condition: 'fingerprint_drift',
         },
         response: {
-          actions: anomaly.severity === 'critical'
-            ? ['block_tool', 'alert', 'snapshot']
-            : ['alert', 'snapshot'],
+          actions:
+            anomaly.severity === 'critical'
+              ? ['block_tool', 'alert', 'snapshot']
+              : ['alert', 'snapshot'],
         },
       },
       matchedConditions: [anomaly.anomalyType],

@@ -33,7 +33,18 @@ const featureIcons = [
   SettingsIcon,
   ShieldIcon,
 ];
-const featureKeys = ['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9', 'item10'] as const;
+const featureKeys = [
+  'item1',
+  'item2',
+  'item3',
+  'item4',
+  'item5',
+  'item6',
+  'item7',
+  'item8',
+  'item9',
+  'item10',
+] as const;
 
 const useCaseIcons = [TerminalIcon, TeamIcon, EnterpriseIcon];
 const useCaseKeys = ['item1', 'item2', 'item3'] as const;
@@ -192,7 +203,8 @@ export default function ProductGuardContent() {
                 <span className="text-[#22c55e]">[OK]</span> Panguard Guard v0.1.0 installed
               </p>
               <p className="text-text-secondary">
-                <span className="text-[#22c55e]">[OK]</span> Rule engine loaded ({STATS.totalRulesDisplay} Sigma + YARA + ATR rules)
+                <span className="text-[#22c55e]">[OK]</span> Rule engine loaded (
+                {STATS.totalRulesDisplay} Sigma + YARA + ATR rules)
               </p>
               <p className="text-text-secondary">
                 <span className="text-[#22c55e]">[OK]</span> Local LLM ready (Ollama)

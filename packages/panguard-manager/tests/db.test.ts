@@ -174,21 +174,27 @@ describe('ManagerDB', () => {
 
     describe('getAllAgents', () => {
       it('should return all agents ordered by registration date descending', () => {
-        db.upsertAgent(makeAgent({
-          agentId: 'ag-oldest',
-          hostname: 'oldest',
-          registeredAt: '2026-01-01T00:00:00.000Z',
-        }));
-        db.upsertAgent(makeAgent({
-          agentId: 'ag-newest',
-          hostname: 'newest',
-          registeredAt: '2026-03-01T00:00:00.000Z',
-        }));
-        db.upsertAgent(makeAgent({
-          agentId: 'ag-middle',
-          hostname: 'middle',
-          registeredAt: '2026-02-01T00:00:00.000Z',
-        }));
+        db.upsertAgent(
+          makeAgent({
+            agentId: 'ag-oldest',
+            hostname: 'oldest',
+            registeredAt: '2026-01-01T00:00:00.000Z',
+          })
+        );
+        db.upsertAgent(
+          makeAgent({
+            agentId: 'ag-newest',
+            hostname: 'newest',
+            registeredAt: '2026-03-01T00:00:00.000Z',
+          })
+        );
+        db.upsertAgent(
+          makeAgent({
+            agentId: 'ag-middle',
+            hostname: 'middle',
+            registeredAt: '2026-02-01T00:00:00.000Z',
+          })
+        );
 
         const agents = db.getAllAgents();
         expect(agents).toHaveLength(3);
@@ -241,16 +247,20 @@ describe('ManagerDB', () => {
       });
 
       it('should order results by last_heartbeat descending', () => {
-        db.upsertAgent(makeAgent({
-          agentId: 'ag-old-hb',
-          status: 'online',
-          lastHeartbeat: '2026-01-01T00:00:00.000Z',
-        }));
-        db.upsertAgent(makeAgent({
-          agentId: 'ag-new-hb',
-          status: 'online',
-          lastHeartbeat: '2026-03-01T00:00:00.000Z',
-        }));
+        db.upsertAgent(
+          makeAgent({
+            agentId: 'ag-old-hb',
+            status: 'online',
+            lastHeartbeat: '2026-01-01T00:00:00.000Z',
+          })
+        );
+        db.upsertAgent(
+          makeAgent({
+            agentId: 'ag-new-hb',
+            status: 'online',
+            lastHeartbeat: '2026-03-01T00:00:00.000Z',
+          })
+        );
 
         const online = db.getAgentsByStatus('online');
         expect(online[0]!.agentId).toBe('ag-new-hb');
@@ -391,22 +401,28 @@ describe('ManagerDB', () => {
 
     describe('getThreatsByAgent', () => {
       it('should return threats for a specific agent only', () => {
-        db.insertThreat(makeThreat({
-          id: 'threat-a1',
-          sourceAgentId: 'ag-test001',
-          receivedAt: '2026-01-15T12:00:00.000Z',
-        }));
-        db.insertThreat(makeThreat({
-          id: 'threat-a2',
-          sourceAgentId: 'ag-test001',
-          receivedAt: '2026-01-16T12:00:00.000Z',
-        }));
-        db.insertThreat(makeThreat({
-          id: 'threat-b1',
-          sourceAgentId: 'ag-test002',
-          sourceHostname: 'host-2',
-          receivedAt: '2026-01-15T12:00:00.000Z',
-        }));
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-a1',
+            sourceAgentId: 'ag-test001',
+            receivedAt: '2026-01-15T12:00:00.000Z',
+          })
+        );
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-a2',
+            sourceAgentId: 'ag-test001',
+            receivedAt: '2026-01-16T12:00:00.000Z',
+          })
+        );
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-b1',
+            sourceAgentId: 'ag-test002',
+            sourceHostname: 'host-2',
+            receivedAt: '2026-01-15T12:00:00.000Z',
+          })
+        );
 
         const agent1Threats = db.getThreatsByAgent('ag-test001');
         expect(agent1Threats).toHaveLength(2);
@@ -418,14 +434,18 @@ describe('ManagerDB', () => {
       });
 
       it('should return threats ordered by received_at descending', () => {
-        db.insertThreat(makeThreat({
-          id: 'threat-old',
-          receivedAt: '2026-01-10T12:00:00.000Z',
-        }));
-        db.insertThreat(makeThreat({
-          id: 'threat-new',
-          receivedAt: '2026-01-20T12:00:00.000Z',
-        }));
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-old',
+            receivedAt: '2026-01-10T12:00:00.000Z',
+          })
+        );
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-new',
+            receivedAt: '2026-01-20T12:00:00.000Z',
+          })
+        );
 
         const threats = db.getThreatsByAgent('ag-test001');
         expect(threats[0]!.id).toBe('threat-new');
@@ -440,18 +460,24 @@ describe('ManagerDB', () => {
 
     describe('getRecentThreats', () => {
       it('should return threats received after the given timestamp', () => {
-        db.insertThreat(makeThreat({
-          id: 'threat-old',
-          receivedAt: '2026-01-01T00:00:00.000Z',
-        }));
-        db.insertThreat(makeThreat({
-          id: 'threat-recent',
-          receivedAt: '2026-02-01T00:00:00.000Z',
-        }));
-        db.insertThreat(makeThreat({
-          id: 'threat-newest',
-          receivedAt: '2026-03-01T00:00:00.000Z',
-        }));
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-old',
+            receivedAt: '2026-01-01T00:00:00.000Z',
+          })
+        );
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-recent',
+            receivedAt: '2026-02-01T00:00:00.000Z',
+          })
+        );
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-newest',
+            receivedAt: '2026-03-01T00:00:00.000Z',
+          })
+        );
 
         const recent = db.getRecentThreats('2026-01-15T00:00:00.000Z');
         expect(recent).toHaveLength(2);
@@ -461,10 +487,12 @@ describe('ManagerDB', () => {
       });
 
       it('should include threats at exactly the given timestamp', () => {
-        db.insertThreat(makeThreat({
-          id: 'threat-exact',
-          receivedAt: '2026-02-01T00:00:00.000Z',
-        }));
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-exact',
+            receivedAt: '2026-02-01T00:00:00.000Z',
+          })
+        );
 
         const recent = db.getRecentThreats('2026-02-01T00:00:00.000Z');
         expect(recent).toHaveLength(1);
@@ -472,10 +500,12 @@ describe('ManagerDB', () => {
       });
 
       it('should return empty array when no threats are recent enough', () => {
-        db.insertThreat(makeThreat({
-          id: 'threat-old',
-          receivedAt: '2026-01-01T00:00:00.000Z',
-        }));
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-old',
+            receivedAt: '2026-01-01T00:00:00.000Z',
+          })
+        );
 
         const recent = db.getRecentThreats('2026-12-01T00:00:00.000Z');
         expect(recent).toEqual([]);
@@ -490,11 +520,13 @@ describe('ManagerDB', () => {
       it('should return correct total count across all agents', () => {
         db.insertThreat(makeThreat({ id: 'threat-1', sourceAgentId: 'ag-test001' }));
         db.insertThreat(makeThreat({ id: 'threat-2', sourceAgentId: 'ag-test001' }));
-        db.insertThreat(makeThreat({
-          id: 'threat-3',
-          sourceAgentId: 'ag-test002',
-          sourceHostname: 'host-2',
-        }));
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-3',
+            sourceAgentId: 'ag-test002',
+            sourceHostname: 'host-2',
+          })
+        );
 
         expect(db.getThreatCount()).toBe(3);
       });
@@ -502,18 +534,24 @@ describe('ManagerDB', () => {
 
     describe('purgeOldThreats', () => {
       it('should remove threats older than the given date and return count', () => {
-        db.insertThreat(makeThreat({
-          id: 'threat-old-1',
-          receivedAt: '2026-01-01T00:00:00.000Z',
-        }));
-        db.insertThreat(makeThreat({
-          id: 'threat-old-2',
-          receivedAt: '2026-01-05T00:00:00.000Z',
-        }));
-        db.insertThreat(makeThreat({
-          id: 'threat-keep',
-          receivedAt: '2026-03-01T00:00:00.000Z',
-        }));
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-old-1',
+            receivedAt: '2026-01-01T00:00:00.000Z',
+          })
+        );
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-old-2',
+            receivedAt: '2026-01-05T00:00:00.000Z',
+          })
+        );
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-keep',
+            receivedAt: '2026-03-01T00:00:00.000Z',
+          })
+        );
 
         const purged = db.purgeOldThreats('2026-02-01T00:00:00.000Z');
         expect(purged).toBe(2);
@@ -524,10 +562,12 @@ describe('ManagerDB', () => {
       });
 
       it('should return 0 when no threats are old enough to purge', () => {
-        db.insertThreat(makeThreat({
-          id: 'threat-recent',
-          receivedAt: '2026-06-01T00:00:00.000Z',
-        }));
+        db.insertThreat(
+          makeThreat({
+            id: 'threat-recent',
+            receivedAt: '2026-06-01T00:00:00.000Z',
+          })
+        );
 
         const purged = db.purgeOldThreats('2026-01-01T00:00:00.000Z');
         expect(purged).toBe(0);
@@ -546,16 +586,22 @@ describe('ManagerDB', () => {
   describe('Policy CRUD', () => {
     describe('insertPolicy', () => {
       it('should insert an active policy and deactivate others', () => {
-        db.insertPolicy(makePolicy({
-          policyId: 'pol-v1',
-          version: 1,
-        }), true);
+        db.insertPolicy(
+          makePolicy({
+            policyId: 'pol-v1',
+            version: 1,
+          }),
+          true
+        );
 
-        db.insertPolicy(makePolicy({
-          policyId: 'pol-v2',
-          version: 2,
-          updatedAt: '2026-02-01T00:00:00.000Z',
-        }), true);
+        db.insertPolicy(
+          makePolicy({
+            policyId: 'pol-v2',
+            version: 2,
+            updatedAt: '2026-02-01T00:00:00.000Z',
+          }),
+          true
+        );
 
         const active = db.getActivePolicy();
         expect(active).not.toBeNull();
@@ -568,16 +614,22 @@ describe('ManagerDB', () => {
       });
 
       it('should insert an inactive policy without deactivating others', () => {
-        db.insertPolicy(makePolicy({
-          policyId: 'pol-active',
-          version: 1,
-        }), true);
+        db.insertPolicy(
+          makePolicy({
+            policyId: 'pol-active',
+            version: 1,
+          }),
+          true
+        );
 
-        db.insertPolicy(makePolicy({
-          policyId: 'pol-draft',
-          version: 2,
-          updatedAt: '2026-02-01T00:00:00.000Z',
-        }), false);
+        db.insertPolicy(
+          makePolicy({
+            policyId: 'pol-draft',
+            version: 2,
+            updatedAt: '2026-02-01T00:00:00.000Z',
+          }),
+          false
+        );
 
         const active = db.getActivePolicy();
         expect(active).not.toBeNull();
@@ -587,13 +639,20 @@ describe('ManagerDB', () => {
       it('should serialize and deserialize rules JSON correctly', () => {
         const rules: PolicyRule[] = [
           makePolicyRule({ ruleId: 'rule-1', type: 'block_ip' }),
-          makePolicyRule({ ruleId: 'rule-2', type: 'alert_threshold', condition: { threshold: 100 } }),
+          makePolicyRule({
+            ruleId: 'rule-2',
+            type: 'alert_threshold',
+            condition: { threshold: 100 },
+          }),
         ];
 
-        db.insertPolicy(makePolicy({
-          policyId: 'pol-rules',
-          rules,
-        }), true);
+        db.insertPolicy(
+          makePolicy({
+            policyId: 'pol-rules',
+            rules,
+          }),
+          true
+        );
 
         const active = db.getActivePolicy();
         expect(active!.rules).toHaveLength(2);
@@ -607,10 +666,13 @@ describe('ManagerDB', () => {
       it('should serialize and deserialize appliedTo array correctly', () => {
         const appliedTo = ['ag-001', 'ag-002', 'ag-003'];
 
-        db.insertPolicy(makePolicy({
-          policyId: 'pol-applied',
-          appliedTo,
-        }), true);
+        db.insertPolicy(
+          makePolicy({
+            policyId: 'pol-applied',
+            appliedTo,
+          }),
+          true
+        );
 
         const active = db.getActivePolicy();
         expect(active!.appliedTo).toEqual(['ag-001', 'ag-002', 'ag-003']);
@@ -634,17 +696,23 @@ describe('ManagerDB', () => {
       it('should return the highest-version active policy', () => {
         // Insert two active policies manually (bypassing deactivation logic)
         // to verify ORDER BY version DESC LIMIT 1
-        db.insertPolicy(makePolicy({
-          policyId: 'pol-v1',
-          version: 1,
-        }), true);
+        db.insertPolicy(
+          makePolicy({
+            policyId: 'pol-v1',
+            version: 1,
+          }),
+          true
+        );
 
         // This will deactivate pol-v1 and activate pol-v3
-        db.insertPolicy(makePolicy({
-          policyId: 'pol-v3',
-          version: 3,
-          updatedAt: '2026-03-01T00:00:00.000Z',
-        }), true);
+        db.insertPolicy(
+          makePolicy({
+            policyId: 'pol-v3',
+            version: 3,
+            updatedAt: '2026-03-01T00:00:00.000Z',
+          }),
+          true
+        );
 
         const active = db.getActivePolicy();
         expect(active!.policyId).toBe('pol-v3');
@@ -723,22 +791,27 @@ describe('ManagerDB', () => {
 
     it('should handle threat with empty correlatedWith array', () => {
       db.upsertAgent(makeAgent({ agentId: 'ag-edge' }));
-      db.insertThreat(makeThreat({
-        id: 'threat-empty-corr',
-        sourceAgentId: 'ag-edge',
-        correlatedWith: [],
-      }));
+      db.insertThreat(
+        makeThreat({
+          id: 'threat-empty-corr',
+          sourceAgentId: 'ag-edge',
+          correlatedWith: [],
+        })
+      );
 
       const threats = db.getThreatsByAgent('ag-edge');
       expect(threats[0]!.correlatedWith).toEqual([]);
     });
 
     it('should handle policy with empty rules array', () => {
-      db.insertPolicy(makePolicy({
-        policyId: 'pol-empty-rules',
-        rules: [],
-        appliedTo: [],
-      }), true);
+      db.insertPolicy(
+        makePolicy({
+          policyId: 'pol-empty-rules',
+          rules: [],
+          appliedTo: [],
+        }),
+        true
+      );
 
       const active = db.getActivePolicy();
       expect(active).not.toBeNull();

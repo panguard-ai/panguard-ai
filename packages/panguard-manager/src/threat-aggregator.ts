@@ -68,10 +68,7 @@ export class ThreatAggregator {
    * @param hostname - The hostname of the reporting agent
    * @returns Array of newly created AggregatedThreats
    */
-  ingestReport(
-    report: ThreatReport,
-    hostname: string
-  ): readonly AggregatedThreat[] {
+  ingestReport(report: ThreatReport, hostname: string): readonly AggregatedThreat[] {
     const newThreats: AggregatedThreat[] = [];
 
     for (const threat of report.threats) {
@@ -101,11 +98,7 @@ export class ThreatAggregator {
       this.indexThreat(indexEntry, threat);
 
       // Find correlations for this new threat / 為此新威脅尋找關聯
-      const correlatedIds = this.findCorrelations(
-        indexEntry,
-        threat,
-        report.agentId
-      );
+      const correlatedIds = this.findCorrelations(indexEntry, threat, report.agentId);
 
       if (correlatedIds.length > 0) {
         // Update the new threat with correlation data (immutable)
@@ -378,8 +371,7 @@ export class ThreatAggregator {
 
     if (toRemove.length > 0) {
       logger.info(
-        `Purged ${toRemove.length} expired threats / ` +
-          `清除了 ${toRemove.length} 個過期威脅`
+        `Purged ${toRemove.length} expired threats / ` + `清除了 ${toRemove.length} 個過期威脅`
       );
     }
 

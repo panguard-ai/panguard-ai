@@ -43,7 +43,11 @@ describe('false positive detection', () => {
 
   afterEach(() => {
     for (const dir of tempDirs) {
-      try { rmSync(dir, { recursive: true, force: true }); } catch { /* ignore */ }
+      try {
+        rmSync(dir, { recursive: true, force: true });
+      } catch {
+        /* ignore */
+      }
     }
     tempDirs.length = 0;
   });
@@ -147,7 +151,7 @@ curl -X POST https://api.example.com/users
     const report = await auditSkill(dir, { skipAI: true });
     expect(report.riskLevel).toBe('LOW');
     // Should have at most a medium-severity network permission finding
-    const criticalFindings = report.findings.filter(f => f.severity === 'critical');
+    const criticalFindings = report.findings.filter((f) => f.severity === 'critical');
     expect(criticalFindings).toHaveLength(0);
   });
 
@@ -236,7 +240,7 @@ Reference .env.example for the full list of required variables.
     // MEDIUM is acceptable -- the skill legitimately references database and credentials
     expect(report.riskLevel).not.toBe('CRITICAL');
     expect(report.riskScore).toBeLessThan(40);
-    const criticalFindings = report.findings.filter(f => f.severity === 'critical');
+    const criticalFindings = report.findings.filter((f) => f.severity === 'critical');
     expect(criticalFindings).toHaveLength(0);
   });
 
@@ -363,7 +367,7 @@ Be educational and factual. Always recommend defensive coding practices.
 
     const report = await auditSkill(dir, { skipAI: true });
     expect(report.riskLevel).toBe('LOW');
-    const criticalFindings = report.findings.filter(f => f.severity === 'critical');
+    const criticalFindings = report.findings.filter((f) => f.severity === 'critical');
     expect(criticalFindings).toHaveLength(0);
   });
 

@@ -1,10 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { validateOrigin, createOriginValidator } from '../src/websocket/origin-validator.js';
 import { CsrfTokenManager } from '../src/websocket/csrf-token.js';
-import {
-  validateGatewayUrl,
-  sanitizeWebSocketUrl,
-} from '../src/websocket/connection-validator.js';
+import { validateGatewayUrl, sanitizeWebSocketUrl } from '../src/websocket/connection-validator.js';
 import type { OriginConfig } from '../src/types.js';
 
 // Suppress log output
@@ -165,9 +162,7 @@ describe('CSRF Token Manager - Extended', () => {
     });
 
     it('should generate tokens of consistent length', () => {
-      const tokens = Array.from({ length: 10 }, (_, i) =>
-        manager.generate(`session-${i}`)
-      );
+      const tokens = Array.from({ length: 10 }, (_, i) => manager.generate(`session-${i}`));
       // 32 random bytes in base64url should be ~43 chars
       for (const token of tokens) {
         expect(token.token.length).toBeGreaterThan(30);
@@ -246,9 +241,7 @@ describe('CSRF Token Manager - Extended', () => {
     });
 
     it('should not affect other tokens when revoking one', () => {
-      const tokens = Array.from({ length: 5 }, (_, i) =>
-        manager.generate(`session-${i}`)
-      );
+      const tokens = Array.from({ length: 5 }, (_, i) => manager.generate(`session-${i}`));
       manager.revoke(tokens[2]!.token);
       expect(manager.size).toBe(4);
       for (let i = 0; i < 5; i++) {
@@ -355,9 +348,9 @@ describe('Connection Validator - Extended', () => {
         throw new Error('Callback error');
       };
       // Should propagate the error from the callback
-      await expect(
-        validateGatewayUrl('https://external.com', throwingConfirm)
-      ).rejects.toThrow('Callback error');
+      await expect(validateGatewayUrl('https://external.com', throwingConfirm)).rejects.toThrow(
+        'Callback error'
+      );
     });
 
     it('should pass correct URL string to confirm callback', async () => {
@@ -370,10 +363,7 @@ describe('Connection Validator - Extended', () => {
       await validateGatewayUrl('https://first.com/path', trackingConfirm);
       await validateGatewayUrl('https://second.com/other', trackingConfirm);
 
-      expect(receivedUrls).toEqual([
-        'https://first.com/path',
-        'https://second.com/other',
-      ]);
+      expect(receivedUrls).toEqual(['https://first.com/path', 'https://second.com/other']);
     });
 
     it('should not call confirm callback for localhost URLs', async () => {
@@ -446,7 +436,7 @@ describe('Connection Validator - Extended', () => {
         '',
         'not-a-url',
         '://missing-protocol',
-        'ws://',  // URL constructor may handle this
+        'ws://', // URL constructor may handle this
       ];
       for (const url of malformed) {
         const result = sanitizeWebSocketUrl(url);

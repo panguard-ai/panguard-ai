@@ -14,7 +14,17 @@ export function whoamiCommand(): Command {
     .option('--lang <language>', 'Language override')
     .action(async (opts: { json?: boolean; lang?: string }) => {
       if (opts.json) {
-        console.log(JSON.stringify({ authenticated: true, tier: 'community', note: 'All features available (no login required)' }, null, 2));
+        console.log(
+          JSON.stringify(
+            {
+              authenticated: true,
+              tier: 'community',
+              note: 'All features available (no login required)',
+            },
+            null,
+            2
+          )
+        );
         return;
       }
       console.log('');

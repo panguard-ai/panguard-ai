@@ -22,10 +22,10 @@ const __dirname = dirname(__filename);
 const RULES_DIR = resolve(__dirname, '..', 'rules');
 
 const SEVERITY_COLORS: Record<string, string> = {
-  critical: '\x1b[91m',  // bright red
-  high: '\x1b[31m',       // red
-  medium: '\x1b[33m',     // yellow
-  low: '\x1b[36m',        // cyan
+  critical: '\x1b[91m', // bright red
+  high: '\x1b[31m', // red
+  medium: '\x1b[33m', // yellow
+  low: '\x1b[36m', // cyan
   informational: '\x1b[37m', // white
 };
 const RESET = '\x1b[0m';
@@ -79,7 +79,11 @@ ${BOLD}Examples:${RESET}
 `);
 }
 
-function parseArgs(argv: string[]): { command: string; target: string; options: Record<string, string> } {
+function parseArgs(argv: string[]): {
+  command: string;
+  target: string;
+  options: Record<string, string>;
+} {
   const args = argv.slice(2);
   const command = args[0] ?? 'help';
   const options: Record<string, string> = {};
@@ -139,8 +143,9 @@ async function cmdScan(target: string, options: Record<string, string>): Promise
   let totalThreats = 0;
 
   for (const event of events) {
-    const matches = engine.evaluate(event)
-      .filter(m => severityOrder.indexOf(m.rule.severity) >= minIdx);
+    const matches = engine
+      .evaluate(event)
+      .filter((m) => severityOrder.indexOf(m.rule.severity) >= minIdx);
     if (matches.length > 0) {
       allMatches.push({ event, matches });
       totalThreats += matches.length;
@@ -148,21 +153,31 @@ async function cmdScan(target: string, options: Record<string, string>): Promise
   }
 
   if (jsonOutput) {
-    console.log(JSON.stringify({
-      eventsScanned: events.length,
-      threatsDetected: totalThreats,
-      rulesLoaded: engine.getRuleCount(),
-      results: allMatches.map(({ event, matches }) => ({
-        event: { type: event.type, timestamp: event.timestamp, contentPreview: event.content.slice(0, 100) },
-        matches: matches.map(m => ({
-          ruleId: m.rule.id,
-          title: m.rule.title,
-          severity: m.rule.severity,
-          confidence: m.confidence,
-          matchedConditions: m.matchedConditions,
-        })),
-      })),
-    }, null, 2));
+    console.log(
+      JSON.stringify(
+        {
+          eventsScanned: events.length,
+          threatsDetected: totalThreats,
+          rulesLoaded: engine.getRuleCount(),
+          results: allMatches.map(({ event, matches }) => ({
+            event: {
+              type: event.type,
+              timestamp: event.timestamp,
+              contentPreview: event.content.slice(0, 100),
+            },
+            matches: matches.map((m) => ({
+              ruleId: m.rule.id,
+              title: m.rule.title,
+              severity: m.rule.severity,
+              confidence: m.confidence,
+              matchedConditions: m.matchedConditions,
+            })),
+          })),
+        },
+        null,
+        2
+      )
+    );
     return;
   }
 
@@ -170,7 +185,9 @@ async function cmdScan(target: string, options: Record<string, string>): Promise
   console.log(`${DIM}${'─'.repeat(60)}${RESET}`);
   console.log(`  Events scanned:  ${events.length}`);
   console.log(`  Rules loaded:    ${engine.getRuleCount()}`);
-  console.log(`  Threats found:   ${totalThreats > 0 ? RED + totalThreats + RESET : GREEN + '0' + RESET}`);
+  console.log(
+    `  Threats found:   ${totalThreats > 0 ? RED + totalThreats + RESET : GREEN + '0' + RESET}`
+  );
   console.log(`${DIM}${'─'.repeat(60)}${RESET}\n`);
 
   if (totalThreats === 0) {
@@ -183,8 +200,12 @@ async function cmdScan(target: string, options: Record<string, string>): Promise
     console.log(`  ${DIM}Event: [${event.type}] "${preview}..."${RESET}`);
     for (const m of matches) {
       const color = SEVERITY_COLORS[m.rule.severity] ?? '';
-      console.log(`    ${color}${m.rule.severity.toUpperCase().padEnd(13)}${RESET} ${m.rule.id} - ${m.rule.title}`);
-      console.log(`    ${DIM}Confidence: ${(m.confidence * 100).toFixed(0)}% | Conditions: ${m.matchedConditions.join(', ')}${RESET}`);
+      console.log(
+        `    ${color}${m.rule.severity.toUpperCase().padEnd(13)}${RESET} ${m.rule.id} - ${m.rule.title}`
+      );
+      console.log(
+        `    ${DIM}Confidence: ${(m.confidence * 100).toFixed(0)}% | Conditions: ${m.matchedConditions.join(', ')}${RESET}`
+      );
     }
     console.log('');
   }
@@ -194,7 +215,9 @@ async function cmdScan(target: string, options: Record<string, string>): Promise
 
 function cmdValidate(target: string, options: Record<string, string>): void {
   if (!target) {
-    console.error(`${RED}Error: Missing rule file/directory. Usage: atr validate <rule.yaml|dir>${RESET}`);
+    console.error(
+      `${RED}Error: Missing rule file/directory. Usage: atr validate <rule.yaml|dir>${RESET}`
+    );
     process.exit(1);
   }
 
@@ -256,7 +279,9 @@ function cmdValidate(target: string, options: Record<string, string>): void {
   }
 
   console.log(`${DIM}${'─'.repeat(60)}${RESET}`);
-  console.log(`  ${GREEN}${passed} passed${RESET}  ${failed > 0 ? RED + failed + ' failed' + RESET : ''}\n`);
+  console.log(
+    `  ${GREEN}${passed} passed${RESET}  ${failed > 0 ? RED + failed + ' failed' + RESET : ''}\n`
+  );
 
   if (failed > 0) process.exit(1);
 }
@@ -299,7 +324,13 @@ async function cmdTest(target: string, options: Record<string, string>): Promise
   let totalTests = 0;
   let passed = 0;
   let failed = 0;
-  const failures: Array<{ ruleId: string; testType: string; input: string; expected: string; got: string }> = [];
+  const failures: Array<{
+    ruleId: string;
+    testType: string;
+    input: string;
+    expected: string;
+    got: string;
+  }> = [];
 
   // Map extended agent_source types to basic event-compatible source types
   // so the engine's source type filter doesn't skip rules during testing.
@@ -319,7 +350,13 @@ async function cmdTest(target: string, options: Record<string, string>): Promise
     const originalSourceType = rule.agent_source?.type;
     const baseSourceType = EXTENDED_SOURCE_TO_BASE[originalSourceType ?? ''];
     const testRule = baseSourceType
-      ? { ...rule, agent_source: { ...rule.agent_source, type: baseSourceType as ATRRule['agent_source']['type'] } }
+      ? {
+          ...rule,
+          agent_source: {
+            ...rule.agent_source,
+            type: baseSourceType as ATRRule['agent_source']['type'],
+          },
+        }
       : rule;
 
     const engine = new ATREngine({ rules: [testRule] });
@@ -332,7 +369,7 @@ async function cmdTest(target: string, options: Record<string, string>): Promise
       totalTests++;
       const event = buildEventFromTestCase(tc as unknown as Record<string, unknown>, rule);
       const matches = engine.evaluate(event);
-      const triggered = matches.some(m => m.rule.id === rule.id);
+      const triggered = matches.some((m) => m.rule.id === rule.id);
       if (triggered) {
         passed++;
       } else {
@@ -351,7 +388,7 @@ async function cmdTest(target: string, options: Record<string, string>): Promise
       totalTests++;
       const event = buildEventFromTestCase(tc as unknown as Record<string, unknown>, rule);
       const matches = engine.evaluate(event);
-      const triggered = matches.some(m => m.rule.id === rule.id);
+      const triggered = matches.some((m) => m.rule.id === rule.id);
       if (!triggered) {
         passed++;
       } else {
@@ -368,7 +405,9 @@ async function cmdTest(target: string, options: Record<string, string>): Promise
   }
 
   if (jsonOutput) {
-    console.log(JSON.stringify({ totalRules: rules.length, totalTests, passed, failed, failures }, null, 2));
+    console.log(
+      JSON.stringify({ totalRules: rules.length, totalTests, passed, failed, failures }, null, 2)
+    );
     return;
   }
 
@@ -395,10 +434,7 @@ async function cmdTest(target: string, options: Record<string, string>): Promise
   }
 }
 
-function buildEventFromTestCase(
-  tc: Record<string, unknown>,
-  rule: ATRRule,
-): AgentEvent {
+function buildEventFromTestCase(tc: Record<string, unknown>, rule: ATRRule): AgentEvent {
   // Stringify any object values
   const str = (v: unknown): string => {
     if (v === undefined || v === null) return '';
@@ -416,7 +452,12 @@ function buildEventFromTestCase(
   let toolResponse = str(tc['tool_response']);
   const agentOutput = str(tc['agent_output']);
 
-  if (rawInput !== null && rawInput !== undefined && typeof rawInput === 'object' && !Array.isArray(rawInput)) {
+  if (
+    rawInput !== null &&
+    rawInput !== undefined &&
+    typeof rawInput === 'object' &&
+    !Array.isArray(rawInput)
+  ) {
     const inputObj = rawInput as Record<string, unknown>;
     if (inputObj['tool_name'] && !toolName) toolName = str(inputObj['tool_name']);
     if (inputObj['tool_args'] && !toolArgs) toolArgs = str(inputObj['tool_args']);
@@ -487,7 +528,6 @@ function buildEventFromTestCase(
   fields['content'] = content;
   fields['agent_message'] = content;
 
-
   return {
     type,
     timestamp: new Date().toISOString(),
@@ -519,10 +559,12 @@ function cmdStats(options: Record<string, string>): void {
     byCategory[cat] = (byCategory[cat] ?? 0) + 1;
     bySeverity[rule.severity] = (bySeverity[rule.severity] ?? 0) + 1;
 
-    const maturity = (rule as unknown as Record<string, unknown>)['maturity'] as string ?? 'experimental';
+    const maturity =
+      ((rule as unknown as Record<string, unknown>)['maturity'] as string) ?? 'experimental';
     byMaturity[maturity] = (byMaturity[maturity] ?? 0) + 1;
 
-    const tier = (rule as unknown as Record<string, unknown>)['detection_tier'] as string ?? 'pattern';
+    const tier =
+      ((rule as unknown as Record<string, unknown>)['detection_tier'] as string) ?? 'pattern';
     byTier[tier] = (byTier[tier] ?? 0) + 1;
 
     if (rule.test_cases) {
@@ -537,12 +579,21 @@ function cmdStats(options: Record<string, string>): void {
   }
 
   if (jsonOutput) {
-    console.log(JSON.stringify({
-      totalRules: rules.length,
-      byCategory, bySeverity, byMaturity, byTier,
-      testCases: { truePositives: totalTP, trueNegatives: totalTN, evasionTests: totalEvasion },
-      rulesWithCVE: withCVE,
-    }, null, 2));
+    console.log(
+      JSON.stringify(
+        {
+          totalRules: rules.length,
+          byCategory,
+          bySeverity,
+          byMaturity,
+          byTier,
+          testCases: { truePositives: totalTP, trueNegatives: totalTN, evasionTests: totalEvasion },
+          rulesWithCVE: withCVE,
+        },
+        null,
+        2
+      )
+    );
     return;
   }
 
@@ -609,9 +660,15 @@ async function cmdScaffold(): Promise<void> {
   }
 
   const categories = [
-    'prompt-injection', 'tool-poisoning', 'context-exfiltration',
-    'agent-manipulation', 'privilege-escalation', 'excessive-autonomy',
-    'data-poisoning', 'model-abuse', 'skill-compromise',
+    'prompt-injection',
+    'tool-poisoning',
+    'context-exfiltration',
+    'agent-manipulation',
+    'privilege-escalation',
+    'excessive-autonomy',
+    'data-poisoning',
+    'model-abuse',
+    'skill-compromise',
   ];
   console.log(`\nCategories: ${categories.join(', ')}`);
   const category = await ask('Category: ');
@@ -644,9 +701,8 @@ async function cmdScaffold(): Promise<void> {
 
   const severities = ['critical', 'high', 'medium', 'low', 'informational'];
   const severity = await ask(`Severity [${severities.join('/')}] (default: medium): `);
-  const finalSeverity = severity.trim() && severities.includes(severity.trim())
-    ? severity.trim()
-    : 'medium';
+  const finalSeverity =
+    severity.trim() && severities.includes(severity.trim()) ? severity.trim() : 'medium';
 
   rl.close();
 
@@ -671,7 +727,9 @@ async function cmdScaffold(): Promise<void> {
     }
   }
 
-  console.log(`\n${DIM}Copy this YAML to a .yaml file in rules/${category.trim()}/ and validate with: atr validate <file>${RESET}\n`);
+  console.log(
+    `\n${DIM}Copy this YAML to a .yaml file in rules/${category.trim()}/ and validate with: atr validate <file>${RESET}\n`
+  );
 }
 
 // --- SUBMIT command ---
@@ -702,11 +760,14 @@ async function cmdSubmit(target: string, options: Record<string, string>): Promi
       process.exit(1);
     }
   } catch (e) {
-    console.error(`${RED}Error loading rule: ${e instanceof Error ? e.message : String(e)}${RESET}`);
+    console.error(
+      `${RED}Error loading rule: ${e instanceof Error ? e.message : String(e)}${RESET}`
+    );
     process.exit(1);
   }
 
-  const endpoint = options['endpoint'] ?? process.env['THREAT_CLOUD_ENDPOINT'] ?? 'https://cloud.panguard.ai';
+  const endpoint =
+    options['endpoint'] ?? process.env['THREAT_CLOUD_ENDPOINT'] ?? 'https://cloud.panguard.ai';
   const apiKey = process.env['THREAT_CLOUD_API_KEY'];
 
   // Read raw YAML content for submission
@@ -743,7 +804,7 @@ async function cmdSubmit(target: string, options: Record<string, string>): Promi
       signal: AbortSignal.timeout(10_000),
     });
 
-    const result = await response.json() as { ok: boolean; data?: unknown; error?: string };
+    const result = (await response.json()) as { ok: boolean; data?: unknown; error?: string };
 
     if (result.ok) {
       console.log(`\n${GREEN}Submitted successfully.${RESET}`);
@@ -800,7 +861,7 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(`${RED}Error: ${err instanceof Error ? err.message : String(err)}${RESET}`);
   process.exit(1);
 });

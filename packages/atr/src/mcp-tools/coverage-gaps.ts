@@ -7,7 +7,10 @@ import { CoverageAnalyzer } from '../coverage-analyzer.js';
 import type { CoverageReport } from '../coverage-analyzer.js';
 import type { ATREngine } from '../engine.js';
 
-export function handleCoverageGaps(engine: ATREngine, args: Record<string, unknown>): {
+export function handleCoverageGaps(
+  engine: ATREngine,
+  args: Record<string, unknown>
+): {
   content: Array<{ type: string; text: string }>;
   isError?: boolean;
 } {
@@ -16,7 +19,9 @@ export function handleCoverageGaps(engine: ATREngine, args: Record<string, unkno
   const validFrameworks = ['owasp_agentic', 'mitre_atlas', 'all'];
   if (!validFrameworks.includes(framework)) {
     return {
-      content: [{ type: 'text', text: `Error: "framework" must be one of: ${validFrameworks.join(', ')}` }],
+      content: [
+        { type: 'text', text: `Error: "framework" must be one of: ${validFrameworks.join(', ')}` },
+      ],
       isError: true,
     };
   }
@@ -25,21 +30,23 @@ export function handleCoverageGaps(engine: ATREngine, args: Record<string, unkno
   const report: CoverageReport = analyzer.analyze();
 
   // Filter gaps by requested framework
-  const filteredGaps = framework === 'all'
-    ? report.gaps
-    : report.gaps.filter((g) => {
-        if (framework === 'owasp_agentic') return g.framework === 'OWASP Agentic Top 10';
-        if (framework === 'mitre_atlas') return g.framework === 'MITRE ATLAS';
-        return true;
-      });
+  const filteredGaps =
+    framework === 'all'
+      ? report.gaps
+      : report.gaps.filter((g) => {
+          if (framework === 'owasp_agentic') return g.framework === 'OWASP Agentic Top 10';
+          if (framework === 'mitre_atlas') return g.framework === 'MITRE ATLAS';
+          return true;
+        });
 
-  const filteredSuggestions = framework === 'all'
-    ? report.suggestions
-    : report.suggestions.filter((s) => {
-        if (framework === 'owasp_agentic') return s.includes('OWASP') || s.includes('ASI');
-        if (framework === 'mitre_atlas') return s.includes('MITRE') || s.includes('AML');
-        return true;
-      });
+  const filteredSuggestions =
+    framework === 'all'
+      ? report.suggestions
+      : report.suggestions.filter((s) => {
+          if (framework === 'owasp_agentic') return s.includes('OWASP') || s.includes('ASI');
+          if (framework === 'mitre_atlas') return s.includes('MITRE') || s.includes('AML');
+          return true;
+        });
 
   const result = {
     analysis_timestamp: new Date().toISOString(),

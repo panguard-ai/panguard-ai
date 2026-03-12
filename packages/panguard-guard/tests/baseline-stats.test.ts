@@ -122,18 +122,24 @@ describe('BaselineStats', () => {
     });
 
     it('should track distinct processes within window', () => {
-      stats.ingestEvent(makeEvent({
-        source: 'process',
-        metadata: { processName: 'nginx' },
-      }));
-      stats.ingestEvent(makeEvent({
-        source: 'process',
-        metadata: { processName: 'node' },
-      }));
-      stats.ingestEvent(makeEvent({
-        source: 'process',
-        metadata: { processName: 'nginx' }, // duplicate, should not increase count
-      }));
+      stats.ingestEvent(
+        makeEvent({
+          source: 'process',
+          metadata: { processName: 'nginx' },
+        })
+      );
+      stats.ingestEvent(
+        makeEvent({
+          source: 'process',
+          metadata: { processName: 'node' },
+        })
+      );
+      stats.ingestEvent(
+        makeEvent({
+          source: 'process',
+          metadata: { processName: 'nginx' }, // duplicate, should not increase count
+        })
+      );
 
       // process_count should have been updated with values 1, 2, 2
       const processStats = scorer.getStats('process_count');
@@ -142,18 +148,24 @@ describe('BaselineStats', () => {
     });
 
     it('should track port diversity per source IP', () => {
-      stats.ingestEvent(makeEvent({
-        source: 'network',
-        metadata: { sourceIP: '192.168.1.1', remotePort: 80, destinationIP: '10.0.0.1' },
-      }));
-      stats.ingestEvent(makeEvent({
-        source: 'network',
-        metadata: { sourceIP: '192.168.1.1', remotePort: 443, destinationIP: '10.0.0.2' },
-      }));
-      stats.ingestEvent(makeEvent({
-        source: 'network',
-        metadata: { sourceIP: '192.168.1.1', remotePort: 8080, destinationIP: '10.0.0.3' },
-      }));
+      stats.ingestEvent(
+        makeEvent({
+          source: 'network',
+          metadata: { sourceIP: '192.168.1.1', remotePort: 80, destinationIP: '10.0.0.1' },
+        })
+      );
+      stats.ingestEvent(
+        makeEvent({
+          source: 'network',
+          metadata: { sourceIP: '192.168.1.1', remotePort: 443, destinationIP: '10.0.0.2' },
+        })
+      );
+      stats.ingestEvent(
+        makeEvent({
+          source: 'network',
+          metadata: { sourceIP: '192.168.1.1', remotePort: 8080, destinationIP: '10.0.0.3' },
+        })
+      );
 
       const portStats = scorer.getStats('port_diversity_192.168.1.1');
       expect(portStats).toBeDefined();
@@ -179,11 +191,13 @@ describe('BaselineStats', () => {
       // Train with normal traffic pattern (9-17h logins) / 用正常流量模式訓練
       for (let i = 0; i < 50; i++) {
         const hour = 9 + (i % 8); // hours 9-16
-        stats.ingestEvent(makeEvent({
-          source: 'syslog' as SecurityEvent['source'],
-          metadata: { user: 'admin' },
-          timestamp: new Date(`2024-06-15T${String(hour).padStart(2, '0')}:00:00Z`),
-        }));
+        stats.ingestEvent(
+          makeEvent({
+            source: 'syslog' as SecurityEvent['source'],
+            metadata: { user: 'admin' },
+            timestamp: new Date(`2024-06-15T${String(hour).padStart(2, '0')}:00:00Z`),
+          })
+        );
       }
 
       // Score a normal login at 10am / 評分正常 10 點登入
@@ -200,18 +214,22 @@ describe('BaselineStats', () => {
     it('should return high score for anomalous auth failure burst', () => {
       // Train with low auth failure rate / 用低認證失敗率訓練
       for (let i = 0; i < 30; i++) {
-        stats.ingestEvent(makeEvent({
-          category: 'network_connection',
-          metadata: { user: 'admin' },
-        }));
+        stats.ingestEvent(
+          makeEvent({
+            category: 'network_connection',
+            metadata: { user: 'admin' },
+          })
+        );
       }
 
       // Now simulate many auth failures / 模擬大量認證失敗
       for (let i = 0; i < 20; i++) {
-        stats.ingestEvent(makeEvent({
-          category: 'authentication_failure',
-          metadata: { user: 'admin' },
-        }));
+        stats.ingestEvent(
+          makeEvent({
+            category: 'authentication_failure',
+            metadata: { user: 'admin' },
+          })
+        );
       }
 
       // Score another auth failure / 評分另一個認證失敗
@@ -229,13 +247,15 @@ describe('BaselineStats', () => {
     it('should score network events with bytesOut', () => {
       // Train with normal traffic / 用正常流量訓練
       for (let i = 0; i < 20; i++) {
-        stats.ingestEvent(makeEvent({
-          source: 'network',
-          metadata: {
-            destinationIP: '10.0.0.1',
-            bytesOut: 500 + (i * 10),
-          },
-        }));
+        stats.ingestEvent(
+          makeEvent({
+            source: 'network',
+            metadata: {
+              destinationIP: '10.0.0.1',
+              bytesOut: 500 + i * 10,
+            },
+          })
+        );
       }
 
       // Score event with massive data exfil / 評分大量數據外洩事件
@@ -254,10 +274,12 @@ describe('BaselineStats', () => {
     it('should return score in 0-100 range', () => {
       // Ingest some data / 送入一些數據
       for (let i = 0; i < 10; i++) {
-        stats.ingestEvent(makeEvent({
-          source: 'network',
-          metadata: { destinationIP: '10.0.0.1', bytesOut: 100 },
-        }));
+        stats.ingestEvent(
+          makeEvent({
+            source: 'network',
+            metadata: { destinationIP: '10.0.0.1', bytesOut: 100 },
+          })
+        );
       }
 
       const event = makeEvent({
@@ -273,14 +295,18 @@ describe('BaselineStats', () => {
     it('should track multiple event types independently', () => {
       // Ingest network and process events / 送入網路和程序事件
       for (let i = 0; i < 10; i++) {
-        stats.ingestEvent(makeEvent({
-          source: 'network',
-          metadata: { destinationIP: '10.0.0.1', bytesOut: 100 },
-        }));
-        stats.ingestEvent(makeEvent({
-          source: 'process',
-          metadata: { processName: 'nginx' },
-        }));
+        stats.ingestEvent(
+          makeEvent({
+            source: 'network',
+            metadata: { destinationIP: '10.0.0.1', bytesOut: 100 },
+          })
+        );
+        stats.ingestEvent(
+          makeEvent({
+            source: 'process',
+            metadata: { processName: 'nginx' },
+          })
+        );
       }
 
       // Network metrics should not affect process scoring / 網路指標不應影響程序評分

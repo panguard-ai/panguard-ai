@@ -78,14 +78,7 @@ describe('SKILLS', () => {
   });
 
   it('should have at least one skill in every category', () => {
-    const categories: Skill['category'][] = [
-      'scan',
-      'guard',
-      'trap',
-      'report',
-      'system',
-      'info',
-    ];
+    const categories: Skill['category'][] = ['scan', 'guard', 'trap', 'report', 'system', 'info'];
     for (const cat of categories) {
       const count = SKILLS.filter((s) => s.category === cat).length;
       expect(count).toBeGreaterThanOrEqual(1);
@@ -344,14 +337,7 @@ describe('getSkillsByCategory', () => {
   });
 
   it('should include all skills when summing all categories', () => {
-    const categories: Skill['category'][] = [
-      'scan',
-      'guard',
-      'trap',
-      'report',
-      'system',
-      'info',
-    ];
+    const categories: Skill['category'][] = ['scan', 'guard', 'trap', 'report', 'system', 'info'];
     let totalCount = 0;
     for (const cat of categories) {
       totalCount += getSkillsByCategory(cat).length;

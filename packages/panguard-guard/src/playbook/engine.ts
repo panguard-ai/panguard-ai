@@ -11,11 +11,7 @@
 
 import { createLogger } from '@panguard-ai/core';
 import type { ThreatVerdict } from '../types.js';
-import type {
-  Playbook,
-  PlaybookAction,
-  CorrelationPatternType,
-} from './schema.js';
+import type { Playbook, PlaybookAction, CorrelationPatternType } from './schema.js';
 import { SEVERITY_ORDER } from './schema.js';
 import { loadPlaybooksFromDir, validatePlaybook } from './parser.js';
 
@@ -102,7 +98,9 @@ export class PlaybookEngine {
   loadFromDir(dir: string): void {
     const loaded = loadPlaybooksFromDir(dir);
     this.playbooks = [...this.playbooks, ...loaded];
-    logger.info(`PlaybookEngine: loaded ${loaded.length} playbooks from ${dir} (total: ${this.playbooks.length})`);
+    logger.info(
+      `PlaybookEngine: loaded ${loaded.length} playbooks from ${dir} (total: ${this.playbooks.length})`
+    );
   }
 
   /**
@@ -115,12 +113,12 @@ export class PlaybookEngine {
   addPlaybook(playbook: Playbook): void {
     const validation = validatePlaybook(playbook);
     if (!validation.valid) {
-      throw new Error(
-        `Invalid playbook "${playbook.name}": ${validation.errors.join('; ')}`
-      );
+      throw new Error(`Invalid playbook "${playbook.name}": ${validation.errors.join('; ')}`);
     }
     this.playbooks = [...this.playbooks, playbook];
-    logger.info(`PlaybookEngine: added playbook "${playbook.name}" (total: ${this.playbooks.length})`);
+    logger.info(
+      `PlaybookEngine: added playbook "${playbook.name}" (total: ${this.playbooks.length})`
+    );
   }
 
   /**
@@ -136,14 +134,9 @@ export class PlaybookEngine {
    * @param patterns - Optional correlation patterns / 選用的關聯模式
    * @returns Matching playbook or null / 匹配的劇本或 null
    */
-  match(
-    verdict: ThreatVerdict,
-    patterns?: PlaybookCorrelationMatch[]
-  ): Playbook | null {
+  match(verdict: ThreatVerdict, patterns?: PlaybookCorrelationMatch[]): Playbook | null {
     // Sort by priority descending (higher priority first)
-    const sorted = [...this.playbooks].sort(
-      (a, b) => (b.priority ?? 0) - (a.priority ?? 0)
-    );
+    const sorted = [...this.playbooks].sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
 
     for (const playbook of sorted) {
       // Skip disabled playbooks / 跳過停用的劇本
@@ -311,9 +304,7 @@ export class PlaybookEngine {
 
     // Category match / 分類匹配
     if (trigger.category !== undefined) {
-      const matchesCategory = patterns?.some(
-        (p) => p.category === trigger.category
-      );
+      const matchesCategory = patterns?.some((p) => p.category === trigger.category);
       if (!matchesCategory) {
         return false;
       }

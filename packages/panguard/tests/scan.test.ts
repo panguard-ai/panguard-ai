@@ -151,9 +151,7 @@ describe('scanCommand', () => {
       await cmd.parseAsync(['--quick'], { from: 'user' });
       consoleSpy.mockRestore();
 
-      expect(mockedRunScan).toHaveBeenCalledWith(
-        expect.objectContaining({ depth: 'quick' })
-      );
+      expect(mockedRunScan).toHaveBeenCalledWith(expect.objectContaining({ depth: 'quick' }));
     });
 
     it('should pass "full" depth by default', async () => {
@@ -166,9 +164,7 @@ describe('scanCommand', () => {
       await cmd.parseAsync([], { from: 'user' });
       consoleSpy.mockRestore();
 
-      expect(mockedRunScan).toHaveBeenCalledWith(
-        expect.objectContaining({ depth: 'full' })
-      );
+      expect(mockedRunScan).toHaveBeenCalledWith(expect.objectContaining({ depth: 'full' }));
     });
 
     it('should use runRemoteScan when --target is set with --json', async () => {
@@ -219,9 +215,7 @@ describe('scanCommand', () => {
       await cmd.parseAsync(['--lang', 'zh-TW'], { from: 'user' });
       consoleSpy.mockRestore();
 
-      expect(mockedRunScan).toHaveBeenCalledWith(
-        expect.objectContaining({ lang: 'zh-TW' })
-      );
+      expect(mockedRunScan).toHaveBeenCalledWith(expect.objectContaining({ lang: 'zh-TW' }));
     });
   });
 

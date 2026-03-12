@@ -50,9 +50,7 @@ export function generateAuthToken(): string {
  * @param metadata - The event metadata record
  * @returns The source IP string, or undefined if not found
  */
-export function extractSourceIP(
-  metadata: Record<string, unknown>
-): string | undefined {
+export function extractSourceIP(metadata: Record<string, unknown>): string | undefined {
   const candidates = [
     'sourceIP',
     'remoteAddress',
@@ -78,17 +76,8 @@ export function extractSourceIP(
  * @param metadata - The event metadata record
  * @returns The hash string, or undefined if not found
  */
-export function extractFileHash(
-  metadata: Record<string, unknown>
-): string | undefined {
-  const candidates = [
-    'sha256',
-    'sha1',
-    'md5',
-    'fileHash',
-    'hash',
-    'malwareHash',
-  ];
+export function extractFileHash(metadata: Record<string, unknown>): string | undefined {
+  const candidates = ['sha256', 'sha1', 'md5', 'fileHash', 'hash', 'malwareHash'];
 
   for (const key of candidates) {
     const value = metadata[key];

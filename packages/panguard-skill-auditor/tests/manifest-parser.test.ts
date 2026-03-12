@@ -46,7 +46,8 @@ describe('parseSkillManifest', () => {
 
     it('should parse a file exactly at the 1MB limit (under limit)', async () => {
       // A file under 1MB should not be rejected
-      const content = '---\nname: My Skill\ndescription: A skill\n---\nDo something useful with the system to help users accomplish their goals efficiently.';
+      const content =
+        '---\nname: My Skill\ndescription: A skill\n---\nDo something useful with the system to help users accomplish their goals efficiently.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result).not.toBeNull();
@@ -80,7 +81,8 @@ describe('parseSkillManifest', () => {
 
   describe('valid frontmatter with instructions', () => {
     it('should parse name and description from frontmatter', async () => {
-      const content = '---\nname: My Skill\ndescription: Does something useful\n---\nInstructions here.';
+      const content =
+        '---\nname: My Skill\ndescription: Does something useful\n---\nInstructions here.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result).not.toBeNull();
@@ -89,7 +91,8 @@ describe('parseSkillManifest', () => {
     });
 
     it('should parse instructions body after frontmatter', async () => {
-      const content = '---\nname: My Skill\ndescription: A test skill\n---\nThese are the instructions.';
+      const content =
+        '---\nname: My Skill\ndescription: A test skill\n---\nThese are the instructions.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.instructions).toBe('These are the instructions.');
@@ -103,42 +106,48 @@ describe('parseSkillManifest', () => {
     });
 
     it('should parse homepage field from frontmatter', async () => {
-      const content = '---\nname: Tool\ndescription: A tool\nhomepage: https://example.com\n---\nInstructions.';
+      const content =
+        '---\nname: Tool\ndescription: A tool\nhomepage: https://example.com\n---\nInstructions.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.homepage).toBe('https://example.com');
     });
 
     it('should parse user-invocable field from frontmatter', async () => {
-      const content = '---\nname: Tool\ndescription: A tool\nuser-invocable: true\n---\nInstructions.';
+      const content =
+        '---\nname: Tool\ndescription: A tool\nuser-invocable: true\n---\nInstructions.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.userInvocable).toBe(true);
     });
 
     it('should parse disable-model-invocation field from frontmatter', async () => {
-      const content = '---\nname: Tool\ndescription: A tool\ndisable-model-invocation: true\n---\nInstructions.';
+      const content =
+        '---\nname: Tool\ndescription: A tool\ndisable-model-invocation: true\n---\nInstructions.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.disableModelInvocation).toBe(true);
     });
 
     it('should parse command-dispatch field from frontmatter', async () => {
-      const content = '---\nname: Tool\ndescription: A tool\ncommand-dispatch: tool\n---\nInstructions.';
+      const content =
+        '---\nname: Tool\ndescription: A tool\ncommand-dispatch: tool\n---\nInstructions.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.commandDispatch).toBe('tool');
     });
 
     it('should parse command-tool field from frontmatter', async () => {
-      const content = '---\nname: Tool\ndescription: A tool\ncommand-tool: my_tool\n---\nInstructions.';
+      const content =
+        '---\nname: Tool\ndescription: A tool\ncommand-tool: my_tool\n---\nInstructions.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.commandTool).toBe('my_tool');
     });
 
     it('should handle multiline instructions', async () => {
-      const content = '---\nname: Tool\ndescription: A tool\n---\nLine one.\nLine two.\nLine three.';
+      const content =
+        '---\nname: Tool\ndescription: A tool\n---\nLine one.\nLine two.\nLine three.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.instructions).toBe('Line one.\nLine two.\nLine three.');
@@ -186,7 +195,8 @@ describe('parseSkillManifest', () => {
     });
 
     it('should set metadata to undefined when JSON string is invalid', async () => {
-      const content = "---\nname: Tool\ndescription: A tool\nmetadata: 'not-valid-json-{'\n---\nInstructions.";
+      const content =
+        "---\nname: Tool\ndescription: A tool\nmetadata: 'not-valid-json-{'\n---\nInstructions.";
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.metadata).toBeUndefined();
@@ -195,7 +205,8 @@ describe('parseSkillManifest', () => {
 
   describe('metadata as object', () => {
     it('should assign metadata directly when it is a YAML object', async () => {
-      const content = '---\nname: Tool\ndescription: A tool\nmetadata:\n  version: "2.0.0"\n  author: Bob\n---\nInstructions.';
+      const content =
+        '---\nname: Tool\ndescription: A tool\nmetadata:\n  version: "2.0.0"\n  author: Bob\n---\nInstructions.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.metadata).toBeDefined();
@@ -204,7 +215,8 @@ describe('parseSkillManifest', () => {
     });
 
     it('should parse openclaw nested metadata correctly', async () => {
-      const content = '---\nname: Tool\ndescription: A tool\nmetadata:\n  openclaw:\n    requires:\n      bins:\n        - git\n        - curl\n      env:\n        - API_KEY\n---\nInstructions.';
+      const content =
+        '---\nname: Tool\ndescription: A tool\nmetadata:\n  openclaw:\n    requires:\n      bins:\n        - git\n        - curl\n      env:\n        - API_KEY\n---\nInstructions.';
       await writeSkillFile(tmpDir, content);
       const result = await parseSkillManifest(tmpDir);
       expect(result!.metadata!.openclaw!.requires!.bins).toEqual(['git', 'curl']);

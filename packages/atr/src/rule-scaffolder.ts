@@ -122,14 +122,12 @@ export class RuleScaffolder {
     const id = generateId();
     const date = getCurrentDate();
 
-    const conditions: ATRArrayCondition[] = input.examplePayloads.map(
-      (payload, idx) => ({
-        field,
-        operator: 'regex',
-        value: buildRegexPattern(payload),
-        description: `Pattern ${idx + 1}: detects "${payload.trim()}"`,
-      }),
-    );
+    const conditions: ATRArrayCondition[] = input.examplePayloads.map((payload, idx) => ({
+      field,
+      operator: 'regex',
+      value: buildRegexPattern(payload),
+      description: `Pattern ${idx + 1}: detects "${payload.trim()}"`,
+    }));
 
     const truePositives = input.examplePayloads.map((payload) => ({
       input: payload.trim(),
@@ -175,9 +173,7 @@ export class RuleScaffolder {
       detection: {
         conditions,
         condition: conditionExpr,
-        false_positives: [
-          'TODO: Document known false positive scenarios',
-        ],
+        false_positives: ['TODO: Document known false positive scenarios'],
       },
       response: {
         actions: [...SEVERITY_TO_ACTIONS[severity]],
@@ -223,7 +219,7 @@ export class RuleScaffolder {
 
     if (input.examplePayloads.length < 3) {
       warnings.push(
-        'Fewer than 3 example payloads - consider adding more for better pattern coverage.',
+        'Fewer than 3 example payloads - consider adding more for better pattern coverage.'
       );
     }
 

@@ -48,10 +48,7 @@ export class PolicyEngine {
    * @param targetAgentIds - Agent IDs this policy applies to (empty = all)
    * @returns Immutable copy of the new policy
    */
-  createPolicy(
-    rules: readonly PolicyRule[],
-    targetAgentIds: readonly string[] = []
-  ): PolicyUpdate {
+  createPolicy(rules: readonly PolicyRule[], targetAgentIds: readonly string[] = []): PolicyUpdate {
     const previousVersion = this.activePolicy?.version ?? 0;
 
     const policy: PolicyUpdate = {
@@ -118,10 +115,7 @@ export class PolicyEngine {
    * @param rules - Array of policy rules for this agent
    * @returns Immutable copy of the agent-specific policy
    */
-  setAgentOverride(
-    agentId: string,
-    rules: readonly PolicyRule[]
-  ): PolicyUpdate {
+  setAgentOverride(agentId: string, rules: readonly PolicyRule[]): PolicyUpdate {
     const policy: PolicyUpdate = {
       policyId: generatePolicyId(),
       version: 1,
@@ -136,8 +130,7 @@ export class PolicyEngine {
     this.agentOverrides.set(agentId, policy);
 
     logger.info(
-      `Agent override set: ${agentId} -> ${policy.policyId} / ` +
-        `代理覆寫策略已設定: ${agentId}`
+      `Agent override set: ${agentId} -> ${policy.policyId} / ` + `代理覆寫策略已設定: ${agentId}`
     );
 
     return this.copyPolicy(policy);
@@ -152,9 +145,7 @@ export class PolicyEngine {
   removeAgentOverride(agentId: string): boolean {
     const removed = this.agentOverrides.delete(agentId);
     if (removed) {
-      logger.info(
-        `Agent override removed: ${agentId} / 代理覆寫策略已移除: ${agentId}`
-      );
+      logger.info(`Agent override removed: ${agentId} / 代理覆寫策略已移除: ${agentId}`);
     }
     return removed;
   }
@@ -166,11 +157,7 @@ export class PolicyEngine {
    * @param name - Human-readable group name
    * @param agentIds - Agent IDs in this group
    */
-  createAgentGroup(
-    groupId: string,
-    name: string,
-    agentIds: readonly string[]
-  ): AgentGroup {
+  createAgentGroup(groupId: string, name: string, agentIds: readonly string[]): AgentGroup {
     const group: AgentGroup = {
       groupId,
       name,

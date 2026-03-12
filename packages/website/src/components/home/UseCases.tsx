@@ -30,11 +30,7 @@ export default function UseCases() {
   return (
     <SectionWrapper id="use-cases">
       <div className="text-center mb-14">
-        <SectionTitle
-          overline={t('overline')}
-          title={t('title')}
-          subtitle={t('subtitle')}
-        />
+        <SectionTitle overline={t('overline')} title={t('title')} subtitle={t('subtitle')} />
       </div>
 
       <div className="grid sm:grid-cols-2 gap-5 max-w-4xl mx-auto">
@@ -52,9 +48,7 @@ export default function UseCases() {
                   >
                     <Icon className="w-[18px] h-[18px]" />
                   </div>
-                  <h3 className="text-sm font-bold text-text-primary">
-                    {t(`cards.${key}.title`)}
-                  </h3>
+                  <h3 className="text-sm font-bold text-text-primary">{t(`cards.${key}.title`)}</h3>
                 </div>
 
                 {/* Description */}
