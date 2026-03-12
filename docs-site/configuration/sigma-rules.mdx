@@ -12,7 +12,7 @@ Sigma rules are YAML-based detection signatures that describe suspicious log pat
 
 ## Bundled Rules
 
-Panguard Guard ships with **3,000+ Sigma rules** from the [SigmaHQ](https://github.com/SigmaHQ/sigma) community repository, covering:
+Panguard Guard ships with **3,760 Sigma rules** from the [SigmaHQ](https://github.com/SigmaHQ/sigma) community repository, covering:
 
 - Authentication attacks (brute force, credential stuffing)
 - Privilege escalation techniques
@@ -177,12 +177,12 @@ Use `*` for any number of characters and `?` for a single character.
 ## Performance Considerations
 
 <Tip>
-With 3,000+ rules, Panguard uses a pre-compiled rule index for fast evaluation. Custom rules are indexed upon load. Keep individual rule conditions focused and specific to maintain detection speed.
+With 3,760 rules, Panguard uses a pre-compiled rule index for fast evaluation. Custom rules are indexed upon load. Keep individual rule conditions focused and specific to maintain detection speed.
 </Tip>
 
 | Metric | Typical Value |
 |--------|--------------|
-| Rule loading time | < 2 seconds for 3,000 rules |
+| Rule loading time | < 2 seconds for 3,760 rules |
 | Per-event evaluation | < 5 ms |
 | Memory overhead | ~50 MB for full rule set |
 | Custom rule limit | No hard limit (recommend < 500) |
