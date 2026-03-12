@@ -1,6 +1,7 @@
 {
   "name": "@panguard-ai/panguard-report",
   "version": "0.2.0",
+  "license": "MIT",
   "type": "module",
   "description": "AI-powered security incident report generator / AI 自動產生資安事件報告",
   "main": "./dist/index.js",

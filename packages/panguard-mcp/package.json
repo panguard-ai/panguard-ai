@@ -1,6 +1,7 @@
 {
   "name": "@panguard-ai/panguard-mcp",
   "version": "0.1.0",
+  "license": "MIT",
   "type": "module",
   "description": "MCP server for Panguard AI — control security from Claude/Cursor / 透過 Claude/Cursor 控制 Panguard 的 MCP 伺服器",
   "main": "./dist/index.js",

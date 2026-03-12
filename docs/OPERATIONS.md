@@ -770,9 +770,9 @@ SMTP_FROM=noreply@panguard.ai
 
 # ── Lemon Squeezy (付款) ───────────────────────────
 LEMON_SQUEEZY_API_KEY=eyJ...                     # API Key
-LEMON_SQUEEZY_STORE_ID=303383                    # Store ID
-LEMON_SQUEEZY_WEBHOOK_SECRET=d4dfe98...          # Webhook Secret
-LEMON_SQUEEZY_VARIANT_MAP={"1355444":"solo","1355423":"pro","1355437":"business"}
+LEMON_SQUEEZY_STORE_ID=<your-store-id>           # Store ID
+LEMON_SQUEEZY_WEBHOOK_SECRET=<your-secret>       # Webhook Secret
+LEMON_SQUEEZY_VARIANT_MAP={"<id>":"solo","<id>":"pro","<id>":"business"}
 
 # ── AI Provider ─────────────────────────────────────
 ANTHROPIC_API_KEY=sk-ant-...                     # Claude API Key
@@ -978,10 +978,10 @@ Google callback → GET /api/auth/google/callback?code=xxx&state=yyy
 ### 環境變數
 
 ```bash
-LEMON_SQUEEZY_API_KEY=eyJ...
-LEMON_SQUEEZY_STORE_ID=303383
-LEMON_SQUEEZY_WEBHOOK_SECRET=d4dfe986663b88316eeacfa5b26507be16499bde
-LEMON_SQUEEZY_VARIANT_MAP={"1355444":"solo","1355423":"pro","1355437":"business"}
+LEMON_SQUEEZY_API_KEY=eyJ...           # from LemonSqueezy dashboard
+LEMON_SQUEEZY_STORE_ID=<your-store-id>
+LEMON_SQUEEZY_WEBHOOK_SECRET=<your-webhook-secret>
+LEMON_SQUEEZY_VARIANT_MAP={"<variant-id>":"solo","<variant-id>":"pro","<variant-id>":"business"}
 ```
 
 ### Webhook 事件

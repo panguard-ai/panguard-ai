@@ -22,12 +22,40 @@ const IPV4_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
 /** IPv6 validation regex — accepts compressed and full forms */
 const IPV6_REGEX = /^[0-9a-fA-F:]+$/;
 
+/** Directories that are safe for Panguard to write into. */
+const SAFE_BASES = [
+  os.homedir(),
+  os.tmpdir(),
+  process.cwd(),
+  // macOS: /tmp is a symlink to /private/tmp, distinct from os.tmpdir()
+  '/tmp',
+  '/private/tmp',
+];
+
+/**
+ * Assert that a resolved path stays within an allowed base directory.
+ * Prevents path traversal attacks from MCP tool arguments.
+ */
+function assertSafePath(resolved: string): void {
+  const normalResolved = path.resolve(resolved);
+  const isAllowed = SAFE_BASES.some((base) => {
+    const normalBase = path.resolve(base);
+    return normalResolved === normalBase || normalResolved.startsWith(normalBase + path.sep);
+  });
+  if (!isAllowed) {
+    throw new Error(`Path traversal rejected: ${resolved} is outside allowed directories`);
+  }
+}
+
 /**
  * Resolve the guard data directory from args or default.
  * 從參數或預設值解析守護資料目錄。
  */
 function resolveDataDir(args: Record<string, unknown>): string {
-  return (args['dataDir'] as string) ?? path.join(os.homedir(), '.panguard-guard');
+  const dataDir = (args['dataDir'] as string) ?? path.join(os.homedir(), '.panguard-guard');
+  const resolved = path.resolve(dataDir);
+  assertSafePath(resolved);
+  return resolved;
 }
 
 /**
@@ -97,8 +125,10 @@ export async function executeGenerateReport(args: Record<string, unknown>) {
   const depth = ((args['depth'] as string) ?? 'full') as 'quick' | 'full';
 
   try {
+    const resolvedOutput = path.resolve(output);
+    assertSafePath(resolvedOutput);
     const result = await runScan({ depth, lang });
-    await generatePdfReport(result, output, lang);
+    await generatePdfReport(result, resolvedOutput, lang);
 
     return {
       content: [

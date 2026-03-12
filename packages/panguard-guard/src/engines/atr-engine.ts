@@ -20,7 +20,7 @@ import type { SkillWhitelistConfig } from './skill-whitelist.js';
 const logger = createLogger('panguard-guard:atr-engine');
 
 /**
- * Resolve the bundled ATR rules directory from the installed agent-threat-rules package.
+ * Resolve the bundled ATR rules directory from the installed @panguard-ai/atr package.
  * Falls back to null if the package can't be resolved.
  */
 function resolveBundledRulesDir(): string | null {
@@ -36,7 +36,7 @@ function resolveBundledRulesDir(): string | null {
 export interface GuardATREngineConfig {
   /** Directory containing custom ATR YAML rules */
   rulesDir?: string;
-  /** Directory containing bundled ATR rules (auto-resolved from agent-threat-rules if omitted) */
+  /** Directory containing bundled ATR rules (auto-resolved from @panguard-ai/atr if omitted) */
   bundledRulesDir?: string;
   /** Enable hot-reload of rule files */
   hotReload?: boolean;
@@ -49,7 +49,7 @@ export interface GuardATREngineConfig {
  * the PanguardGuard event processing pipeline.
  *
  * Rules are loaded from:
- * 1. Bundled rules shipped with the agent-threat-rules package
+ * 1. Bundled rules shipped with the @panguard-ai/atr package
  * 2. Custom rules from the user's configured rulesDir
  */
 export class GuardATREngine {
@@ -73,7 +73,7 @@ export class GuardATREngine {
       sessionTracker,
     });
 
-    // Bundled rules from the agent-threat-rules package
+    // Bundled rules from the @panguard-ai/atr package
     const bundledDir = config.bundledRulesDir ?? resolveBundledRulesDir();
     if (bundledDir) {
       this.bundledEngine = new ATREngine({ rulesDir: bundledDir, sessionTracker });
@@ -98,7 +98,7 @@ export class GuardATREngine {
   async loadRules(): Promise<number> {
     let total = 0;
 
-    // Load bundled rules from agent-threat-rules package
+    // Load bundled rules from @panguard-ai/atr package
     if (this.bundledEngine) {
       const bundled = await this.bundledEngine.loadRules();
       total += bundled;
@@ -115,7 +115,7 @@ export class GuardATREngine {
     if (total === 0) {
       logger.warn(
         'ATR: No rules loaded from any source. Detection will not function. ' +
-        'Verify that agent-threat-rules package is installed and rules directory exists. / ' +
+        'Verify that @panguard-ai/atr package is installed and rules directory exists. / ' +
         'ATR: 未從任何來源載入規則。偵測將無法運作。'
       );
     }
