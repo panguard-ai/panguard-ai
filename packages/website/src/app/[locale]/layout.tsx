@@ -124,10 +124,7 @@ const jsonLd = [
       'AI-powered endpoint security for developers and SMBs. One command to install. Zero configuration.',
     url: 'https://panguard.ai',
     offers: [
-      { '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Community' },
-      { '@type': 'Offer', price: '9', priceCurrency: 'USD', name: 'Solo' },
-      { '@type': 'Offer', price: '29', priceCurrency: 'USD', name: 'Pro' },
-      { '@type': 'Offer', price: '79', priceCurrency: 'USD', name: 'Business' },
+      { '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Community (Open Source)' },
     ],
     publisher: {
       '@type': 'Organization',

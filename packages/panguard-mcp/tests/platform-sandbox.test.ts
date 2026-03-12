@@ -444,14 +444,14 @@ describe('NemoClaw platform sandbox', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Cross-platform: All 7 platforms present
+// Cross-platform: All 8 platforms present
 // ═══════════════════════════════════════════════════════════════════════════
 
-describe('All 7 platforms registered', () => {
-  it('detectPlatforms returns exactly 7 platforms', async () => {
+describe('All 8 platforms registered', () => {
+  it('detectPlatforms returns exactly 8 platforms', async () => {
     const platforms = await detectPlatforms();
 
-    expect(platforms).toHaveLength(7);
+    expect(platforms).toHaveLength(8);
   });
 
   it('includes all expected platform IDs', async () => {
@@ -466,6 +466,7 @@ describe('All 7 platforms registered', () => {
       'codex',
       'workbuddy',
       'nemoclaw',
+      'qclaw',
     ];
 
     for (const id of expectedIds) {

@@ -663,11 +663,26 @@ export class GuardEngine {
     }
 
     // Start dashboard if enabled / 啟動儀表板（如已啟用）
-    const license = validateLicense(this.config.licenseKey);
-    if (this.config.dashboardEnabled && hasFeature(license, 'dashboard')) {
+    if (this.config.dashboardEnabled) {
       this.dashboard = new DashboardServer(this.config.dashboardPort);
       this.dashboard.setConfigGetter(() => this.config);
       await this.dashboard.start();
+
+      // Auto-open browser / 自動開啟瀏覽器
+      const dashPort = Number(this.config.dashboardPort);
+      const token = this.dashboard.getAuthToken();
+      const dashUrl = `http://127.0.0.1:${dashPort}#token=${token}`;
+      logger.info(`Dashboard: http://127.0.0.1:${dashPort}`);
+      try {
+        const { execFile } = await import('node:child_process');
+        const openCmd =
+          process.platform === 'darwin' ? 'open' :
+          process.platform === 'win32' ? 'start' : 'xdg-open';
+        execFile(openCmd, [dashUrl]);
+      } catch {
+        // Non-fatal: browser open is best-effort
+        logger.debug('Could not auto-open browser');
+      }
     }
 
     // Start watchdog if enabled / 啟動看門狗（如已啟用）
