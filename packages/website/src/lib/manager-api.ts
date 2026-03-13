@@ -6,7 +6,7 @@
  * when the manager server is not available.
  */
 
-const MANAGER_URL = process.env.NEXT_PUBLIC_MANAGER_URL || 'http://localhost:3100';
+const MANAGER_URL = process.env.NEXT_PUBLIC_MANAGER_URL || '';
 
 export interface ManagerAgent {
   agentId: string;
@@ -29,6 +29,7 @@ export interface ManagerStatus {
  * Fetch all registered agents from the manager
  */
 export async function fetchAgents(): Promise<ManagerAgent[] | null> {
+  if (!MANAGER_URL) return null;
   try {
     const res = await fetch(`${MANAGER_URL}/api/agents`, {
       signal: AbortSignal.timeout(5000),
@@ -45,6 +46,7 @@ export async function fetchAgents(): Promise<ManagerAgent[] | null> {
  * Fetch aggregated dashboard status from the manager
  */
 export async function fetchDashboardStatus(): Promise<ManagerStatus | null> {
+  if (!MANAGER_URL) return null;
   try {
     const res = await fetch(`${MANAGER_URL}/api/dashboard/status`, {
       signal: AbortSignal.timeout(5000),
@@ -61,6 +63,7 @@ export async function fetchDashboardStatus(): Promise<ManagerStatus | null> {
  * Returns a cleanup function.
  */
 export function connectManagerSSE(onEvent: (type: string, data: unknown) => void): () => void {
+  if (!MANAGER_URL) return () => {};
   let es: EventSource | null = null;
 
   try {
