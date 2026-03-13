@@ -26,7 +26,7 @@ Technical architecture of the Panguard AI platform. For product-level documentat
    +----+----+----+
    |    |    |    |
   Sigma YARA ATR Suricata/Falco
-  3754  4369  32
+  3760  5961  52
         |
    Threat Cloud
    Collective Intelligence

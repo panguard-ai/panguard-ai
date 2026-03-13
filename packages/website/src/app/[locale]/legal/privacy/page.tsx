@@ -106,7 +106,7 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
           <ul className="list-disc list-inside mt-2 space-y-1">
             <li>To provide, maintain, and improve our security products and services</li>
             <li>To detect, prevent, and respond to security threats on your behalf</li>
-            <li>To process transactions and send related billing communications</li>
+            <li>To communicate with you about service updates and security advisories</li>
             <li>To send you technical alerts, security advisories, and support messages</li>
             <li>To conduct research and analysis to enhance our AI threat detection models</li>
             <li>To comply with legal obligations and enforce our agreements</li>
