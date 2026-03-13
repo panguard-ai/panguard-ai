@@ -26,6 +26,7 @@ import { join, basename, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ThreatCloudDB } from './database.js';
 import { LLMReviewer } from './llm-reviewer.js';
+import { getAdminHTML } from './admin-dashboard.js';
 import type {
   ServerConfig,
   AnonymizedThreatData,
@@ -195,6 +196,10 @@ export class ThreatCloudServer {
             ok: true,
             data: { status: 'healthy', uptime: process.uptime() },
           });
+          break;
+
+        case '/admin':
+          this.serveAdminDashboard(req, res);
           break;
 
         case '/api/threats':
@@ -596,6 +601,15 @@ export class ThreatCloudServer {
       return parts.join(':');
     }
     return ip;
+  }
+
+  /** Serve admin dashboard HTML (requires admin key or returns login page) */
+  private serveAdminDashboard(_req: IncomingMessage, res: ServerResponse): void {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    res.writeHead(200);
+    res.end(getAdminHTML());
   }
 
   /** Check admin API key for write-protected endpoints / 檢查管理員 API 金鑰 */
