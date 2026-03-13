@@ -2,16 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
 
-  const {
-    locale
-  } = params;
+  const { locale } = params;
 
   return {
     title: locale === 'zh' ? '隱私權政策' : 'Privacy Policy',
@@ -22,9 +18,7 @@ export async function generateMetadata(
 export default async function PrivacyPolicyPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
 
-  const {
-    locale
-  } = params;
+  const { locale } = params;
 
   return (
     <article className="prose-legal">
@@ -68,9 +62,9 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
 
           <h3 className="text-base font-medium text-text-primary mb-2">1.1 Account Information</h3>
           <p>
-            When you register for a Panguard account, we collect your name, email address,
-            organization name, billing address, and payment information. Payment information is
-            processed by our PCI-compliant payment processor and is never stored on our servers.
+            When you register for a Panguard account, we collect your name and email address.
+            Panguard is free and open-source software — we do not collect payment information
+            or billing addresses.
           </p>
 
           <h3 className="text-base font-medium text-text-primary mt-4 mb-2">

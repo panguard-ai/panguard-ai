@@ -345,7 +345,7 @@ Run with --json for machine-readable output.`}
         </div>
       </SectionWrapper>
 
-      {/* ── 7 Checks ── */}
+      {/* ── 6 Checks ── */}
       <SectionWrapper className="border-t border-border">
         <div className="max-w-[1200px] mx-auto">
           <FadeInUp>

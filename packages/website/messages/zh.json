@@ -172,7 +172,7 @@
       "prereq": "",
       "badges": {
         "mit": "MIT 開源授權",
-        "tests": "3,583 項測試通過",
+        "tests": "3,490 項測試通過",
         "taiwan": "台灣製造"
       }
     },
@@ -412,7 +412,7 @@
         "subtitle": "因為資安不該有門檻。",
         "desc": "MIT 授權，完整原始碼，零黑箱。每一行 code 都經得起檢驗。",
         "belief": "要真正打破資安壁壘，不是把價格壓低，而是讓所有人都能參與。",
-        "proof": "3,583 項測試 · TypeScript strict mode · MIT 授權——這不是業餘專案，這是基礎建設。"
+        "proof": "3,490 項測試 · TypeScript strict mode · MIT 授權——這不是業餘專案，這是基礎建設。"
       }
     },
     "the3amStory": {
@@ -713,7 +713,7 @@
       "btnDemo": "預約 Demo",
       "btnSales": "聯絡業務",
       "badge1": "MIT 開源授權",
-      "badge2": "3,017 測試通過",
+      "badge2": "3,490 測試通過",
       "badge3": "台灣製造",
       "copied": "已複製！"
     }
@@ -1202,7 +1202,7 @@
       "title": "嚴謹打造",
       "stats": [
         {
-          "value": "69",
+          "value": "52+",
           "label": "ATR 規則 (AI Agent 威脅)"
         },
         {
@@ -1337,7 +1337,7 @@
           "核心平台（Scan + Guard + Chat + Skill Auditor）",
           "Threat Cloud v1",
           "3,760條 Sigma + 5,961 條 YARA 規則",
-          "3,017 個自動化測試"
+          "3,490 個自動化測試"
         ]
       },
       "inProgress": {
@@ -1692,7 +1692,7 @@
       "capabilities": "核心能力",
       "cta": {
         "title": "準備好守護你的 AI Agent 了嗎？",
-        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。69 條 ATR 規則 + 9,700+ 偵測規則。免費開始。",
+        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。52+ 條 ATR 規則 + 9,700+ 偵測規則。免費開始。",
         "cta1": "立即開始",
         "cta2": "在 GitHub 上查看 ATR"
       }
@@ -4208,7 +4208,7 @@
       "methodValue": {
         "framework": "Vitest",
         "testFiles": "140",
-        "testCases": "3,017",
+        "testCases": "3,490",
         "coverage": "單元測試 + 整合測試",
         "ci": "每次提交自動執行"
       },

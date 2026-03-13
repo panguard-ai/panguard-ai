@@ -10,7 +10,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 6 audit checks
- *   agent-threat-rules/rules/                  -> 52 stable + 17 predicted = 69 ATR rules
+ *   agent-threat-rules/rules/                  -> 52 stable ATR rules (+ 17 predicted drafts)
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -22,12 +22,12 @@ export const STATS = {
   cliVersion: '0.3.4',
   sigmaRules: 3_760,
   yaraRules: 5_961,
-  atrRules: 69,
-  totalRules: 3_760 + 5_961 + 69,
+  atrRules: 52,
+  totalRules: 3_760 + 5_961 + 52,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
   totalRulesDisplay: '9,700+' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '69' as const,
+  atrRulesDisplay: '52+' as const,
   integratedRulesDisplay: '9,700+' as const,
   falcoConfigs: 1,
   testsPassing: 3_490,
