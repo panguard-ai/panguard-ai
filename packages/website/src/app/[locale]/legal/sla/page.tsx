@@ -5,7 +5,7 @@ import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 export const metadata: Metadata = {
   title: 'Service Level Agreement',
   description:
-    'Panguard AI Service Level Agreement. Uptime guarantees, support response times, and remedies.',
+    'Panguard AI Service Level Agreement. Uptime commitments for the Panguard platform.',
 };
 
 export default function SLAPage() {
@@ -19,11 +19,9 @@ export default function SLAPage() {
       <div className="space-y-8 text-sm text-text-secondary leading-relaxed">
         <section>
           <p>
-            This Service Level Agreement (&quot;SLA&quot;) is a part of the agreement between
-            Panguard AI, Inc. (&quot;Panguard&quot;) and customers on the Pro and Business
-            subscription plans (&quot;Customer&quot;). This SLA describes the uptime commitments for
-            the Panguard platform and the remedies available to the Customer in the event that
-            Panguard fails to meet those commitments.
+            This Service Level Agreement (&quot;SLA&quot;) describes the uptime commitments
+            Panguard AI, Inc. (&quot;Panguard&quot;) makes to all users of the Panguard platform.
+            Panguard is free and open-source software licensed under the MIT License.
           </p>
         </section>
 
@@ -32,16 +30,14 @@ export default function SLAPage() {
           <h2 className="text-lg font-semibold text-text-primary mb-3">1. Uptime Commitment</h2>
           <p>
             Panguard commits to maintaining{' '}
-            <strong className="text-text-primary">99.9% uptime</strong> for the Panguard platform,
-            measured on a monthly basis. This commitment applies to Pro and Business plan customers
-            and covers the following services:
+            <strong className="text-text-primary">99.9% uptime</strong> for the Panguard
+            hosted services, measured on a monthly basis. This commitment covers:
           </p>
           <ul className="list-disc list-inside mt-2 space-y-1">
-            <li>Panguard Dashboard (app.panguard.ai)</li>
-            <li>Panguard API (api.panguard.ai)</li>
-            <li>Panguard Guard agent communication endpoints</li>
+            <li>Panguard Website (panguard.ai)</li>
+            <li>Panguard Threat Cloud (tc.panguard.ai)</li>
+            <li>Panguard Guard rule synchronization endpoints</li>
             <li>Panguard Scan initiation and reporting endpoints</li>
-            <li>Panguard Chat service availability</li>
           </ul>
           <p className="mt-3">
             99.9% uptime equates to a maximum of approximately 43 minutes and 50 seconds of
@@ -98,9 +94,9 @@ export default function SLAPage() {
               services, to the extent such outages are not within Panguard&apos;s control.
             </li>
             <li>
-              <strong className="text-text-primary">Customer Causes:</strong> Downtime resulting
-              from the Customer&apos;s misuse, misconfiguration, or actions taken by the Customer
-              that affect Service availability.
+              <strong className="text-text-primary">User Causes:</strong> Downtime resulting
+              from misuse, misconfiguration, or actions taken by the user that affect Service
+              availability.
             </li>
             <li>
               <strong className="text-text-primary">Emergency Maintenance:</strong> Unscheduled
@@ -113,81 +109,84 @@ export default function SLAPage() {
 
         {/* 4 */}
         <section>
-          <h2 className="text-lg font-semibold text-text-primary mb-3">4. Service Credits</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-3">4. Remediation</h2>
           <p>
-            If Panguard fails to meet the uptime commitment in any calendar month, the Customer is
-            entitled to service credits as described below. Service credits are applied as a
-            percentage of the Customer&apos;s monthly subscription fee for the affected month.
+            If Panguard fails to meet the uptime commitment in any calendar month, Panguard will:
           </p>
+          <ul className="list-disc list-inside mt-2 space-y-1">
+            <li>Publish a post-incident report within 5 business days</li>
+            <li>Identify root cause and implement corrective measures</li>
+            <li>Provide status updates via the public status page during any outage</li>
+          </ul>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-border">
                   <th className="py-3 pr-4 text-text-primary font-medium">Monthly Uptime</th>
-                  <th className="py-3 pr-4 text-text-primary font-medium">Service Credit</th>
+                  <th className="py-3 pr-4 text-text-primary font-medium">Response</th>
                   <th className="py-3 text-text-primary font-medium">Approximate Downtime</th>
                 </tr>
               </thead>
               <tbody className="text-text-secondary">
                 <tr className="border-b border-border/50">
                   <td className="py-3 pr-4">99.0% - 99.9%</td>
-                  <td className="py-3 pr-4 font-semibold text-text-primary">10%</td>
+                  <td className="py-3 pr-4 font-semibold text-text-primary">Post-incident report</td>
                   <td className="py-3">44 min - 7.3 hours</td>
                 </tr>
                 <tr className="border-b border-border/50">
                   <td className="py-3 pr-4">95.0% - 99.0%</td>
-                  <td className="py-3 pr-4 font-semibold text-text-primary">25%</td>
+                  <td className="py-3 pr-4 font-semibold text-text-primary">Report + corrective action plan</td>
                   <td className="py-3">7.3 hours - 36.5 hours</td>
                 </tr>
                 <tr className="border-b border-border/50">
                   <td className="py-3 pr-4">Below 95.0%</td>
-                  <td className="py-3 pr-4 font-semibold text-text-primary">50%</td>
+                  <td className="py-3 pr-4 font-semibold text-text-primary">Report + architecture review</td>
                   <td className="py-3">More than 36.5 hours</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <p className="mt-4">
-            Service credits are the Customer&apos;s sole and exclusive remedy for Panguard&apos;s
-            failure to meet the uptime commitment. Service credits may not exceed 50% of the
-            Customer&apos;s monthly subscription fee for the affected month. Credits are not
-            transferable, are not redeemable for cash, and cannot be carried over to subsequent
-            months.
-          </p>
         </section>
 
         {/* 5 */}
         <section>
-          <h2 className="text-lg font-semibold text-text-primary mb-3">5. Claim Process</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-3">5. Incident Reporting</h2>
           <p>
-            To request service credits, the Customer must submit a claim in writing to{' '}
+            To report a service outage or request a post-incident report, contact{' '}
             <a
               href="mailto:support@panguard.ai"
               className="text-brand-sage hover:text-brand-sage-light underline"
             >
               support@panguard.ai
             </a>{' '}
-            within 30 days of the end of the month in which the downtime occurred. The claim must
-            include:
+            or open an issue on our{' '}
+            <a
+              href="https://github.com/panguard-ai/panguard-ai/issues"
+              className="text-brand-sage hover:text-brand-sage-light underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub repository
+            </a>
+            . Please include:
           </p>
           <ul className="list-disc list-inside mt-2 space-y-1">
-            <li>The Customer&apos;s account identifier</li>
-            <li>The dates and times of the claimed downtime (in UTC)</li>
-            <li>A description of the impact on the Customer&apos;s use of the Service</li>
+            <li>The dates and times of the observed downtime (in UTC)</li>
+            <li>Which services were affected</li>
+            <li>A description of the impact on your use of the Service</li>
             <li>Any supporting evidence, such as error logs or screenshots</li>
           </ul>
           <p className="mt-3">
-            Panguard will review the claim against its monitoring records and respond within 15
-            business days. If the claim is validated, Panguard will prioritize remediation and
-            provide a post-incident report. Panguard&apos;s monitoring records shall be the
-            definitive source for determining uptime and downtime.
+            Panguard will review the report against its monitoring records and respond within 15
+            business days. Panguard&apos;s monitoring records shall be the definitive source for
+            determining uptime and downtime.
           </p>
         </section>
 
         <section>
           <div className="mt-6 p-4 bg-surface-1 border border-border rounded-lg">
             <p className="font-medium text-text-primary">Panguard AI, Inc.</p>
-            <p className="mt-1">Customer Support</p>
+            <p className="mt-1">Open Source Support</p>
             <p>
               Email:{' '}
               <a
@@ -195,6 +194,17 @@ export default function SLAPage() {
                 className="text-brand-sage hover:text-brand-sage-light underline"
               >
                 support@panguard.ai
+              </a>
+            </p>
+            <p>
+              GitHub:{' '}
+              <a
+                href="https://github.com/panguard-ai/panguard-ai"
+                className="text-brand-sage hover:text-brand-sage-light underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                panguard-ai/panguard-ai
               </a>
             </p>
             <p>Taipei, Taiwan</p>
