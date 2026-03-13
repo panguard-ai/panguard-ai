@@ -56,9 +56,6 @@ export class ThreatCloudDB {
       CREATE INDEX IF NOT EXISTS idx_threats_attack_type ON threats(attack_type);
       CREATE INDEX IF NOT EXISTS idx_threats_mitre ON threats(mitre_technique);
       CREATE INDEX IF NOT EXISTS idx_rules_published ON rules(published_at);
-      CREATE INDEX IF NOT EXISTS idx_rules_category ON rules(category);
-      CREATE INDEX IF NOT EXISTS idx_rules_severity ON rules(severity);
-      CREATE INDEX IF NOT EXISTS idx_rules_source ON rules(source);
 
       CREATE TABLE IF NOT EXISTS atr_proposals (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -124,6 +121,9 @@ export class ThreatCloudDB {
     this.migrate();
 
     this.db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_rules_category ON rules(category);
+      CREATE INDEX IF NOT EXISTS idx_rules_severity ON rules(severity);
+      CREATE INDEX IF NOT EXISTS idx_rules_source ON rules(source);
       CREATE INDEX IF NOT EXISTS idx_atr_proposals_status ON atr_proposals(status);
       CREATE INDEX IF NOT EXISTS idx_atr_proposals_pattern ON atr_proposals(pattern_hash);
       CREATE INDEX IF NOT EXISTS idx_skill_threats_hash ON skill_threats(skill_hash);
