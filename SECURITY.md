@@ -15,7 +15,7 @@ Only the latest release receives security updates.
 If you discover a security vulnerability, please report it responsibly.
 如果您發現安全漏洞，請負責任地回報。
 
-**Email:** security@panguard-ai.io
+**Email:** security@panguard.ai
 
 Please include:
 

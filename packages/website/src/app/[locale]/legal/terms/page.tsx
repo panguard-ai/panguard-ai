@@ -2,16 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
 
-  const {
-    locale
-  } = params;
+  const { locale } = params;
 
   return {
     title: locale === 'zh' ? '服務條款' : 'Terms of Service',
@@ -22,9 +18,7 @@ export async function generateMetadata(
 export default async function TermsOfServicePage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
 
-  const {
-    locale
-  } = params;
+  const { locale } = params;
 
   return (
     <article className="prose-legal">
@@ -69,7 +63,7 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
             limited to: automated vulnerability scanning (Panguard Scan), continuous endpoint
             protection (Panguard Guard), AI-assisted security analysis (Panguard Chat), intelligent
             honeypot deployment (Panguard Trap), and automated compliance reporting (Panguard
-            Report). The specific features available to you depend on your subscription plan.
+            Report). All features are available to all users under the MIT License at no cost.
           </p>
         </section>
 
@@ -88,9 +82,7 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
 
         {/* 4 */}
         <section>
-          <h2 className="text-lg font-semibold text-text-primary mb-3">
-            4. Open Source License
-          </h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-3">4. Open Source License</h2>
           <p>
             4.1 <strong className="text-text-primary">License.</strong> Panguard is released under
             the MIT License. You are free to use, modify, and distribute the software in accordance
@@ -111,7 +103,9 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
 
         {/* 5 */}
         <section>
-          <h2 className="text-lg font-semibold text-text-primary mb-3">5. Community Contributions</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-3">
+            5. Community Contributions
+          </h2>
           <p>
             Panguard welcomes community contributions including code, detection rules, threat
             intelligence, and documentation. By submitting contributions to the project, you agree
@@ -173,7 +167,10 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
               Privacy Policy
             </Link>{' '}
             and, where applicable, our{' '}
-            <Link href="/legal/dpa" className="text-brand-sage hover:text-brand-sage-light underline">
+            <Link
+              href="/legal/dpa"
+              className="text-brand-sage hover:text-brand-sage-light underline"
+            >
               Data Processing Agreement
             </Link>
             . You acknowledge that anonymized and aggregated threat intelligence data derived from
@@ -191,7 +188,10 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
             For users of Panguard&apos;s optional hosted services, Panguard may provide a Service
             Level Agreement (SLA) guaranteeing uptime availability. The full terms of the SLA,
             including service credits and exclusions, are set forth in our{' '}
-            <Link href="/legal/sla" className="text-brand-sage hover:text-brand-sage-light underline">
+            <Link
+              href="/legal/sla"
+              className="text-brand-sage hover:text-brand-sage-light underline"
+            >
               Service Level Agreement
             </Link>
             .
@@ -242,12 +242,12 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
           <p>
             12.1 <strong className="text-text-primary">By You.</strong> You may terminate your
             account at any time by contacting support or through your account settings. Termination
-            does not entitle you to a refund of any prepaid fees.
+            will take effect immediately.
           </p>
           <p className="mt-2">
             12.2 <strong className="text-text-primary">By Panguard.</strong> We may suspend or
-            terminate your access to the Service immediately if you breach these Terms, fail to pay
-            applicable fees, or if we are required to do so by law. We may also discontinue the
+            terminate your access to the Service immediately if you breach these Terms
+            or if we are required to do so by law. We may also discontinue the
             Service with 90 days prior notice.
           </p>
           <p className="mt-2">
