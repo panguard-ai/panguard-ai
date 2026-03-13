@@ -15,6 +15,7 @@
  * - GET  /api/feeds/ip-blocklist     IP blocklist feed (text/plain, ?minReputation=)
  * - GET  /api/feeds/domain-blocklist Domain blocklist feed (text/plain, ?minReputation=)
  * - GET  /api/skill-blacklist        Community skill blacklist (aggregated threats)
+ * - GET  /api/audit-log             Admin audit log (paginated, admin-only)
  * - GET  /health                     Health check
  *
  * @module @panguard-ai/threat-cloud/server
@@ -24,6 +25,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, basename, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { randomUUID } from 'node:crypto';
 import { ThreatCloudDB } from './database.js';
 import { LLMReviewer } from './llm-reviewer.js';
 import { getAdminHTML } from './admin-dashboard.js';
@@ -35,15 +37,13 @@ import type {
   SkillThreatSubmission,
 } from './types.js';
 
-/** Simple structured logger for threat-cloud (no core dependency) */
+/** Structured JSON logger for threat-cloud */
 const log = {
-  info: (msg: string) => {
-    process.stdout.write(`[threat-cloud] ${msg}\n`);
+  info: (msg: string, extra?: Record<string, unknown>) => {
+    process.stdout.write(JSON.stringify({ ts: new Date().toISOString(), level: 'info', msg, ...extra }) + '\n');
   },
-  error: (msg: string, err?: unknown) => {
-    process.stderr.write(
-      `[threat-cloud] ERROR ${msg}${err ? `: ${err instanceof Error ? err.message : String(err)}` : ''}\n`
-    );
+  error: (msg: string, err?: unknown, extra?: Record<string, unknown>) => {
+    process.stderr.write(JSON.stringify({ ts: new Date().toISOString(), level: 'error', msg, error: err instanceof Error ? err.message : String(err), ...extra }) + '\n');
   },
 };
 
@@ -162,28 +162,37 @@ export class ThreatCloudServer {
   }
 
   private async handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
-    // Security headers
+    const startTime = Date.now();
+    const requestId = randomUUID();
+
+    // Security headers + request ID
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('X-Request-Id', requestId);
 
     const clientIP = req.socket.remoteAddress ?? 'unknown';
 
     // Rate limiting
     if (!this.checkRateLimit(clientIP)) {
-      this.sendJson(res, 429, { ok: false, error: 'Rate limit exceeded' });
+      this.sendJson(res, 429, { ok: false, error: 'Rate limit exceeded', request_id: requestId });
+      log.info('request', { method: req.method, path: req.url, status: 429, duration_ms: Date.now() - startTime, client_ip: clientIP, request_id: requestId });
       return;
     }
 
     // API key verification (skip for health check)
     const url = req.url ?? '/';
-    const pathname = url.split('?')[0];
+    const rawPathname = url.split('?')[0];
+
+    // API versioning: strip /v1 prefix for backward compatibility
+    const pathname = rawPathname.startsWith('/v1/') ? rawPathname.slice(3) : rawPathname === '/v1' ? '/' : rawPathname;
 
     if (pathname !== '/health' && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
       if (!this.config.apiKeys.includes(token)) {
-        this.sendJson(res, 401, { ok: false, error: 'Invalid API key' });
+        this.sendJson(res, 401, { ok: false, error: 'Invalid API key', request_id: requestId });
+        log.info('request', { method: req.method, path: rawPathname, status: 401, duration_ms: Date.now() - startTime, client_ip: clientIP, request_id: requestId });
         return;
       }
     }
@@ -203,8 +212,12 @@ export class ThreatCloudServer {
     if (req.method === 'OPTIONS') {
       res.writeHead(204);
       res.end();
+      log.info('request', { method: 'OPTIONS', path: rawPathname, status: 204, duration_ms: Date.now() - startTime, client_ip: clientIP, request_id: requestId });
       return;
     }
+
+    // Store requestId on response for sendJson to include
+    (res as ServerResponse & { _requestId?: string })._requestId = requestId;
 
     try {
       switch (pathname) {
@@ -344,13 +357,35 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/audit-log':
+          if (req.method === 'GET') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            this.handleGetAuditLog(url, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         default:
           this.sendJson(res, 404, { ok: false, error: 'Not found' });
       }
     } catch (err) {
-      log.error('Request failed', err);
-      this.sendJson(res, 500, { ok: false, error: 'Internal server error' });
+      log.error('Request failed', err, { request_id: requestId, path: rawPathname });
+      this.sendJson(res, 500, { ok: false, error: 'Internal server error', request_id: requestId });
     }
+
+    // Request logging
+    log.info('request', {
+      method: req.method,
+      path: rawPathname,
+      status: res.statusCode,
+      duration_ms: Date.now() - startTime,
+      client_ip: clientIP,
+      request_id: requestId,
+    });
   }
 
   /** POST /api/threats - Upload anonymized threat data (single or batch) */
@@ -387,6 +422,9 @@ export class ThreatCloudServer {
       this.db.insertThreat(data);
     }
 
+    const clientIP = req.socket.remoteAddress ?? 'unknown';
+    this.db.audit.logAction('client', 'threat.submit', 'threat', undefined, { count: events.length }, clientIP);
+
     this.sendJson(res, 201, {
       ok: true,
       data: { message: 'Threat data received', count: events.length },
@@ -409,7 +447,8 @@ export class ThreatCloudServer {
     const rules = since
       ? this.db.getRulesSince(since, filters)
       : this.db.getAllRules(5000, filters);
-    this.sendJson(res, 200, rules);
+    const ruleList = Array.isArray(rules) ? rules : [];
+    this.sendJson(res, 200, { ok: true, data: ruleList, meta: { total: ruleList.length } });
   }
 
   /** POST /api/rules - Publish rules (single or batch) */
@@ -429,6 +468,9 @@ export class ThreatCloudServer {
       this.db.upsertRule(rule);
       count++;
     }
+
+    const clientIP = req.socket.remoteAddress ?? 'unknown';
+    this.db.audit.logAction('admin', 'rule.create', 'rule', undefined, { count }, clientIP);
 
     this.sendJson(res, 201, { ok: true, data: { message: `${count} rule(s) published`, count } });
   }
@@ -569,6 +611,10 @@ export class ThreatCloudServer {
       clientId: clientId ?? data.clientId,
     };
     this.db.insertSkillThreat(submission);
+
+    const clientIP = req.socket.remoteAddress ?? 'unknown';
+    this.db.audit.logAction('client', 'skill_threat.submit', 'skill_threat', submission.skillHash, { skillName: submission.skillName, riskScore: submission.riskScore }, clientIP);
+
     this.sendJson(res, 201, { ok: true, data: { message: 'Skill threat received' } });
   }
 
@@ -578,7 +624,8 @@ export class ThreatCloudServer {
     const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
     const since = params.get('since') ?? undefined;
     const rules = this.db.getConfirmedATRRules(since);
-    this.sendJson(res, 200, rules);
+    const ruleList = Array.isArray(rules) ? rules : [];
+    this.sendJson(res, 200, { ok: true, data: ruleList, meta: { total: ruleList.length } });
   }
 
   /** GET /api/yara-rules?since=<ISO> - Fetch YARA rules */
@@ -587,7 +634,8 @@ export class ThreatCloudServer {
     const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
     const since = params.get('since') ?? undefined;
     const rules = this.db.getRulesBySource('yara', since);
-    this.sendJson(res, 200, rules);
+    const ruleList = Array.isArray(rules) ? rules : [];
+    this.sendJson(res, 200, { ok: true, data: ruleList, meta: { total: ruleList.length } });
   }
 
   /** GET /api/feeds/ip-blocklist?minReputation=70 - IP blocklist feed (plain text) */
@@ -655,6 +703,21 @@ export class ThreatCloudServer {
     res.setHeader('Cache-Control', 'public, max-age=1800, s-maxage=1800');
     const blacklist = this.db.getSkillBlacklist(minReports, minAvgRisk);
     this.sendJson(res, 200, { ok: true, data: blacklist });
+  }
+
+  /** GET /api/audit-log?page=1&limit=50 (admin-only) */
+  private handleGetAuditLog(url: string, res: ServerResponse): void {
+    const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
+    const page = Math.max(1, parseInt(params.get('page') ?? '1', 10));
+    const limit = Math.min(200, Math.max(1, parseInt(params.get('limit') ?? '50', 10)));
+    const offset = (page - 1) * limit;
+    const entries = this.db.audit.getAuditLog(limit, offset);
+    const total = this.db.audit.getAuditLogCount();
+    this.sendJson(res, 200, {
+      ok: true,
+      data: entries,
+      meta: { total, page, limit, pages: Math.ceil(total / limit) },
+    });
   }
 
   /** Anonymize IP by zeroing last octet / 匿名化 IP */
@@ -738,8 +801,12 @@ export class ThreatCloudServer {
 
   /** Send JSON response / 發送 JSON 回應 */
   private sendJson(res: ServerResponse, status: number, data: unknown): void {
+    const requestId = (res as ServerResponse & { _requestId?: string })._requestId;
+    const payload = typeof data === 'object' && data !== null
+      ? { ...data as Record<string, unknown>, request_id: requestId }
+      : data;
     res.writeHead(status);
-    res.end(JSON.stringify(data));
+    res.end(JSON.stringify(payload));
   }
 
   /**

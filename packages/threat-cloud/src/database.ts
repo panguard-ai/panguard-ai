@@ -16,6 +16,8 @@ import type {
   SkillThreatSubmission,
   SkillBlacklistEntry,
 } from './types.js';
+import { runMigrations } from './migrations.js';
+import { AuditLogger } from './audit-logger.js';
 
 /**
  * Threat Cloud database backed by SQLite
@@ -23,12 +25,14 @@ import type {
  */
 export class ThreatCloudDB {
   private readonly db: Database.Database;
+  readonly audit: AuditLogger;
 
   constructor(dbPath: string) {
     this.db = new Database(dbPath);
     this.db.pragma('journal_mode = WAL');
     this.db.pragma('foreign_keys = ON');
     this.initialize();
+    this.audit = new AuditLogger(this.db);
   }
 
   /** Create tables if they don't exist / 建立資料表 */
@@ -120,12 +124,10 @@ export class ThreatCloudDB {
         last_reported TEXT DEFAULT (datetime('now'))
       );
 
-      -- Migration: add classification columns to existing rules table
-      -- SQLite allows ADD COLUMN on existing tables; IF NOT EXISTS not supported,
-      -- so we catch errors for already-existing columns in migrate().
+      -- Migrations are handled by the numbered migration system in migrations.ts
     `);
 
-    this.migrate();
+    runMigrations(this.db);
 
     this.db.exec(`
       CREATE INDEX IF NOT EXISTS idx_rules_category ON rules(category);
@@ -140,21 +142,6 @@ export class ThreatCloudDB {
       CREATE INDEX IF NOT EXISTS idx_skill_whitelist_status ON skill_whitelist(status);
       CREATE INDEX IF NOT EXISTS idx_skill_whitelist_name ON skill_whitelist(normalized_name);
     `);
-  }
-
-  /** Run schema migrations for existing databases / 執行既有資料庫的 schema 遷移 */
-  private migrate(): void {
-    const addColumn = (table: string, column: string, type: string): void => {
-      try {
-        this.db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
-      } catch {
-        // Column already exists — safe to ignore
-      }
-    };
-    addColumn('rules', 'category', 'TEXT');
-    addColumn('rules', 'severity', 'TEXT');
-    addColumn('rules', 'mitre_techniques', 'TEXT');
-    addColumn('rules', 'tags', 'TEXT');
   }
 
   /** Insert anonymized threat data / 插入匿名化威脅數據 */

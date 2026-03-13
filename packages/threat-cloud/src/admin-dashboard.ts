@@ -124,6 +124,7 @@ tr:hover td{background:var(--surface2)}
   <button data-tab="skills">Skill Threats</button>
   <button data-tab="blacklist">Blacklist</button>
   <button data-tab="feeds">Feeds</button>
+  <button data-tab="audit">Audit Log</button>
 </nav>
 <main id="content">
   <div class="loading">Loading...</div>
@@ -189,6 +190,7 @@ function renderTab(tab){
     case 'skills':renderSkills();break;
     case 'blacklist':renderBlacklist();break;
     case 'feeds':renderFeeds();break;
+    case 'audit':renderAuditLog();break;
   }
 }
 
@@ -501,6 +503,44 @@ function renderFeeds(){
     html+='</div>';
 
     $('content').innerHTML=html;
+  });
+}
+
+// Audit Log
+let auditPage=1;
+function renderAuditLog(){
+  $('content').innerHTML='<div class="loading">Loading audit log...</div>';
+  api('/api/audit-log?page='+auditPage+'&limit=50').then(d=>{
+    const entries=d.data||[];
+    const meta=d.meta||{total:0,page:1,pages:1};
+    let html='<div class="table-wrap"><div class="table-header"><h2>Audit Log ('+num(meta.total)+')</h2></div>';
+    if(!entries.length){html+='<div class="empty">No audit entries yet. Actions are logged as they occur.</div>';}
+    else{
+      html+='<table><tr><th>Time</th><th>Actor</th><th>Action</th><th>Resource</th><th>Resource ID</th><th>IP</th></tr>';
+      entries.forEach(e=>{
+        const actionCls=e.action.includes('delete')||e.action.includes('reject')?'critical':e.action.includes('create')||e.action.includes('approve')?'low':'medium';
+        html+='<tr><td>'+timeAgo(e.timestamp)+'</td>';
+        html+='<td>'+h((e.actor||'').slice(0,12))+'</td>';
+        html+='<td>'+badge(e.action,actionCls)+'</td>';
+        html+='<td>'+h(e.resource_type||'-')+'</td>';
+        html+='<td title="'+h(e.resource_id||'')+'">'+h((e.resource_id||'-').slice(0,20))+'</td>';
+        html+='<td>'+h(e.ip_address||'-')+'</td></tr>';
+      });
+      html+='</table>';
+      if(meta.pages>1){
+        html+='<div class="pagination">';
+        html+='<button onclick="auditPage=1;renderAuditLog()" '+(meta.page<=1?'disabled':'')+'>First</button>';
+        html+='<button onclick="auditPage--;renderAuditLog()" '+(meta.page<=1?'disabled':'')+'>Prev</button>';
+        html+='<span>Page '+meta.page+' of '+meta.pages+'</span>';
+        html+='<button onclick="auditPage++;renderAuditLog()" '+(meta.page>=meta.pages?'disabled':'')+'>Next</button>';
+        html+='<button onclick="auditPage='+meta.pages+';renderAuditLog()" '+(meta.page>=meta.pages?'disabled':'')+'>Last</button>';
+        html+='</div>';
+      }
+    }
+    html+='</div>';
+    $('content').innerHTML=html;
+  }).catch(()=>{
+    $('content').innerHTML='<div class="empty">Audit log endpoint not available. Upgrade server to enable.</div>';
   });
 }
 </script>
