@@ -6,11 +6,11 @@ import GuardDocsContent from './GuardDocsContent';
 export const metadata: Metadata = {
   title: 'Panguard Guard — Documentation',
   description:
-    'Real-time endpoint protection with 5-agent AI pipeline. Configure detection rules, response actions, and threat monitoring.',
+    'Real-time skill behavior monitoring with AI pipeline. Configure detection rules, response actions, and threat monitoring.',
   openGraph: {
     title: 'Panguard Guard — Panguard AI Docs',
     description:
-      '24/7 endpoint protection: Sigma + YARA + ATR rules, AI analysis, automated response.',
+      '24/7 skill behavior monitoring: 52+ ATR + 9,700+ Sigma/YARA rules, AI analysis, automated response.',
   },
 };
 

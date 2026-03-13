@@ -178,8 +178,8 @@ export default function SLAPage() {
           </ul>
           <p className="mt-3">
             Panguard will review the claim against its monitoring records and respond within 15
-            business days. If the claim is validated, service credits will be applied to the
-            Customer&apos;s next billing cycle. Panguard&apos;s monitoring records shall be the
+            business days. If the claim is validated, Panguard will prioritize remediation and
+            provide a post-incident report. Panguard&apos;s monitoring records shall be the
             definitive source for determining uptime and downtime.
           </p>
         </section>

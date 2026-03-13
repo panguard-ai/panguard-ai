@@ -172,7 +172,7 @@
       "prereq": "",
       "badges": {
         "mit": "MIT Open Source",
-        "tests": "3,017 Tests Passing",
+        "tests": "3,490 Tests Passing",
         "taiwan": "Built in Taiwan"
       }
     },
@@ -412,7 +412,7 @@
         "subtitle": "Because security shouldn't have walls.",
         "desc": "MIT licensed. Full source code. Zero black boxes. Every line can be audited, verified, improved.",
         "belief": "We believe breaking the security barrier isn't about lowering prices — it's about letting everyone participate.",
-        "proof": "3,583 tests. TypeScript strict mode. MIT license. This is not a side project. This is infrastructure."
+        "proof": "3,490 tests. TypeScript strict mode. MIT license. This is not a side project. This is infrastructure."
       }
     },
     "the3amStory": {
@@ -713,7 +713,7 @@
       "btnDemo": "Book a Demo",
       "btnSales": "Talk to Sales",
       "badge1": "MIT Open Source",
-      "badge2": "3,017 Tests Passing",
+      "badge2": "3,490 Tests Passing",
       "badge3": "Built in Taiwan",
       "copied": "Copied!"
     }
@@ -878,7 +878,7 @@
       "capabilities": "Key Capabilities",
       "cta": {
         "title": "Ready to secure your AI agents?",
-        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 69 ATR rules + 9,700+ detection rules. Free to start.",
+        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 52+ ATR rules + 9,700+ detection rules. Free to start.",
         "cta1": "Get Started",
         "cta2": "View ATR on GitHub"
       }
@@ -1785,7 +1785,7 @@
       },
       "cta": {
         "title": "Stop trusting. Start scanning.",
-        "desc": "One command. Seven checks. Zero blind spots.",
+        "desc": "One command. Six checks. Zero blind spots.",
         "cta1": "Get Started Free",
         "cta2": "View on GitHub",
         "installTitle": "Install Panguard"
@@ -3344,7 +3344,7 @@
       "methodValue": {
         "framework": "Vitest",
         "testFiles": "140",
-        "testCases": "3,017",
+        "testCases": "3,490",
         "coverage": "Unit + Integration tests",
         "ci": "Automated on every commit"
       },
@@ -4578,7 +4578,7 @@
       "title": "Built with rigor",
       "stats": [
         {
-          "value": "69",
+          "value": "52+",
           "label": "ATR rules (AI agent threats)"
         },
         {
@@ -4713,7 +4713,7 @@
           "Core platform (Scan + Guard + Chat + Skill Auditor)",
           "Threat Cloud v1",
           "3,760 Sigma + 5,961 YARA rules",
-          "3,017 automated tests"
+          "3,490 automated tests"
         ]
       },
       "inProgress": {
