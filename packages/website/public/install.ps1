@@ -5,8 +5,8 @@
 # Or set for current user: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 #
 # Installation order:
-#   1. Try prebuilt binary from GitHub Releases
-#   2. Fall back to npm global install
+#   1. Try npm global install (fastest, most reliable)
+#   2. Fall back to prebuilt binary from GitHub Releases
 #   3. Fall back to source build (git clone or zip archive)
 
 $ErrorActionPreference = "Stop"
@@ -33,7 +33,7 @@ Write-Host ""
 Write-Host "  Panguard AI Installer" -ForegroundColor White
 Write-Host "  =====================" -ForegroundColor DarkGray
 Write-Host ""
-Write-Host "  AI-driven adaptive cybersecurity platform" -ForegroundColor DarkGray
+Write-Host "  The App Store Gatekeeper for AI Agents" -ForegroundColor DarkGray
 Write-Host ""
 
 # ── Step 1: Detect Architecture ──────────────────────────────────
@@ -81,10 +81,22 @@ if (Test-Path "$InstallDir\bin\panguard.cmd") {
     }
 }
 
-# ── Step 4: Try prebuilt binary from GitHub Releases ─────────────
+# ── Step 4: Try npm global install first (fastest) ───────────────
+$NpmInstalled = $false
+
+Write-Info "Installing Panguard AI via npm..."
+try {
+    npm install -g @panguard-ai/panguard 2>$null
+    $NpmInstalled = $true
+    Write-Ok "Panguard AI installed via npm"
+} catch {
+    Write-Warn "npm global install failed. Trying prebuilt binary..."
+}
+
+# ── Step 5: Fall back to prebuilt binary from GitHub Releases ────
 $BinaryInstalled = $false
 
-if (-not $SkipBinaryDownload) {
+if ((-not $NpmInstalled) -and (-not $SkipBinaryDownload)) {
     $version = if ($env:PANGUARD_VERSION) { $env:PANGUARD_VERSION } else { "latest" }
 
     if ($version -eq "latest") {
@@ -145,24 +157,10 @@ if (-not $SkipBinaryDownload) {
         Write-Ok "Prebuilt binary installed to $InstallDir"
     } catch {
         Write-Warn "Prebuilt binary not available for ${Platform}: $($_.Exception.Message)"
-        Write-Info "Falling back to npm install..."
+        Write-Info "Falling back to source build..."
     } finally {
         Remove-Item -Force $tmpZip -ErrorAction SilentlyContinue
         Remove-Item -Force $tmpChecksums -ErrorAction SilentlyContinue
-    }
-}
-
-# ── Step 5: Fall back to npm global install ──────────────────────
-$NpmInstalled = $false
-
-if (-not $BinaryInstalled) {
-    Write-Info "Installing Panguard AI via npm..."
-    try {
-        npm install -g @panguard-ai/panguard 2>$null
-        $NpmInstalled = $true
-        Write-Ok "Panguard AI installed via npm"
-    } catch {
-        Write-Warn "npm global install failed. Trying source build..."
     }
 }
 
@@ -356,17 +354,17 @@ Write-Host ""
 Write-Host "  Quick Start" -ForegroundColor White
 Write-Host "  ===========" -ForegroundColor DarkGray
 Write-Host ""
-Write-Host "  # Run a security scan on the current directory"
+Write-Host "  # Connect to Claude Code, Cursor, and other AI agents"
+Write-Host "  panguard setup"
+Write-Host ""
+Write-Host "  # Audit installed AI skills for security threats"
+Write-Host "  panguard audit skill ."
+Write-Host ""
+Write-Host "  # Run a security scan"
 Write-Host "  panguard scan"
 Write-Host ""
-Write-Host "  # Start real-time file protection"
+Write-Host "  # Start 24/7 real-time protection"
 Write-Host "  panguard guard start"
-Write-Host ""
-Write-Host "  # Check protection status"
-Write-Host "  panguard guard status"
-Write-Host ""
-Write-Host "  # Get help"
-Write-Host "  panguard --help"
 Write-Host ""
 Write-Host "  Documentation: https://panguard.ai/docs" -ForegroundColor DarkGray
 Write-Host "  Report issues: https://github.com/panguard-ai/panguard-ai/issues" -ForegroundColor DarkGray
