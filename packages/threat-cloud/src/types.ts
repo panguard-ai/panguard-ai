@@ -46,6 +46,8 @@ export interface ThreatStats {
   last24hThreats: number;
   proposalStats?: { pending: number; confirmed: number; rejected: number; total: number };
   skillThreatsTotal?: number;
+  /** Number of blacklisted skills / 黑名單技能數量 */
+  skillBlacklistTotal?: number;
   /** Rule distribution by category / 規則分類分布 */
   rulesByCategory?: Array<{ category: string; count: number }>;
   /** Rule distribution by severity / 規則嚴重等級分布 */
@@ -79,6 +81,17 @@ export interface SkillThreatSubmission {
     title: string;
   }>;
   clientId?: string;
+}
+
+/** Skill blacklist entry from community reports / 社群回報的技能黑名單條目 */
+export interface SkillBlacklistEntry {
+  skillHash: string;
+  skillName: string;
+  avgRiskScore: number;
+  maxRiskLevel: string;
+  reportCount: number;
+  firstReported: string;
+  lastReported: string;
 }
 
 /** Server configuration / 伺服器配置 */

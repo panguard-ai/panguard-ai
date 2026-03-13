@@ -14,6 +14,7 @@
  * - GET  /api/yara-rules             Fetch YARA rules (?since= filter)
  * - GET  /api/feeds/ip-blocklist     IP blocklist feed (text/plain, ?minReputation=)
  * - GET  /api/feeds/domain-blocklist Domain blocklist feed (text/plain, ?minReputation=)
+ * - GET  /api/skill-blacklist        Community skill blacklist (aggregated threats)
  * - GET  /health                     Health check
  *
  * @module @panguard-ai/threat-cloud/server
@@ -25,7 +26,7 @@ import { join, basename, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ThreatCloudDB } from './database.js';
 import { LLMReviewer } from './llm-reviewer.js';
-import type { ServerConfig, ApiResponse, AnonymizedThreatData, ThreatCloudRule, ATRProposal, SkillThreatSubmission } from './types.js';
+import type { ServerConfig, ApiResponse, AnonymizedThreatData, ThreatCloudRule, ATRProposal, SkillThreatSubmission, SkillBlacklistEntry } from './types.js';
 
 /** Simple structured logger for threat-cloud (no core dependency) */
 const log = {
@@ -274,6 +275,14 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/skill-blacklist':
+          if (req.method === 'GET') {
+            this.handleGetSkillBlacklist(url, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         default:
           this.sendJson(res, 404, { ok: false, error: 'Not found' });
       }
@@ -503,6 +512,21 @@ export class ThreatCloudServer {
   private handleGetSkillWhitelist(res: ServerResponse): void {
     const whitelist = this.db.getSkillWhitelist();
     this.sendJson(res, 200, { ok: true, data: whitelist });
+  }
+
+  /**
+   * GET /api/skill-blacklist?minReports=3&minAvgRisk=70
+   * Fetch community skill blacklist (aggregated from skill threat reports)
+   * 取得社群技能黑名單（從技能威脅回報聚合）
+   */
+  private handleGetSkillBlacklist(url: string, res: ServerResponse): void {
+    const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
+    const minReports = Number(params.get('minReports') ?? '3');
+    const minAvgRisk = Number(params.get('minAvgRisk') ?? '70');
+
+    res.setHeader('Cache-Control', 'public, max-age=1800, s-maxage=1800');
+    const blacklist = this.db.getSkillBlacklist(minReports, minAvgRisk);
+    this.sendJson(res, 200, { ok: true, data: blacklist });
   }
 
   /** Anonymize IP by zeroing last octet / 匿名化 IP */

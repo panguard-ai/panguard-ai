@@ -11,4 +11,5 @@ export type {
   ApiResponse,
   ATRProposal,
   SkillThreatSubmission,
+  SkillBlacklistEntry,
 } from './types.js';

@@ -8,7 +8,7 @@
  */
 
 import Database from 'better-sqlite3';
-import type { AnonymizedThreatData, ThreatCloudRule, ThreatStats, ATRProposal, SkillThreatSubmission } from './types.js';
+import type { AnonymizedThreatData, ThreatCloudRule, ThreatStats, ATRProposal, SkillThreatSubmission, SkillBlacklistEntry } from './types.js';
 
 /**
  * Threat Cloud database backed by SQLite
@@ -431,6 +431,8 @@ export class ThreatCloudDB {
     const proposalStats = this.getProposalStats();
     const skillThreatsTotal = (this.db.prepare('SELECT COUNT(*) as count FROM skill_threats').get() as { count: number }).count;
 
+    const skillBlacklistTotal = this.getSkillBlacklist().length;
+
     const rulesByCategory = this.db.prepare(`
       SELECT COALESCE(category, 'unknown') as category, COUNT(*) as count
       FROM rules GROUP BY category ORDER BY count DESC LIMIT 20
@@ -454,6 +456,7 @@ export class ThreatCloudDB {
       last24hThreats: last24h,
       proposalStats,
       skillThreatsTotal,
+      skillBlacklistTotal,
       rulesByCategory,
       rulesBySeverity,
       rulesBySource,
@@ -611,6 +614,27 @@ export class ThreatCloudDB {
       WHERE status = 'confirmed'
       ORDER BY confirmations DESC
     `).all() as Array<{ name: string; hash: string | null; confirmations: number }>;
+  }
+
+  /**
+   * Get skill blacklist: skills reported by 3+ distinct clients with avg risk >= 70
+   * 取得技能黑名單：3+ 不同客戶端回報且平均風險 >= 70 的技能
+   */
+  getSkillBlacklist(minReports: number = 3, minAvgRisk: number = 70): SkillBlacklistEntry[] {
+    return this.db.prepare(`
+      SELECT
+        skill_hash as skillHash,
+        skill_name as skillName,
+        ROUND(AVG(risk_score)) as avgRiskScore,
+        MAX(risk_level) as maxRiskLevel,
+        COUNT(DISTINCT COALESCE(client_id, 'anonymous')) as reportCount,
+        MIN(created_at) as firstReported,
+        MAX(created_at) as lastReported
+      FROM skill_threats
+      GROUP BY skill_hash
+      HAVING reportCount >= ? AND AVG(risk_score) >= ?
+      ORDER BY avgRiskScore DESC
+    `).all(minReports, minAvgRisk) as SkillBlacklistEntry[];
   }
 
   /** Backfill classification for rules with NULL category / 回填缺少分類的規則 */

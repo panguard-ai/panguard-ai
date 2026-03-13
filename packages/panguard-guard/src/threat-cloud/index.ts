@@ -418,6 +418,32 @@ export class ThreatCloudClient {
   }
 
   /**
+   * Fetch community skill blacklist from Threat Cloud
+   * 從 Threat Cloud 取得社群 skill 黑名單
+   */
+  async fetchSkillBlacklist(): Promise<Array<{ skillHash: string; skillName: string; avgRiskScore: number; maxRiskLevel: string; reportCount: number }>> {
+    if (this.status === 'offline' || !this.endpoint) return [];
+
+    try {
+      const url = `${this.endpoint}/api/skill-blacklist`;
+      const response = await this.httpGet(url);
+      const parsed = JSON.parse(response) as { ok?: boolean; data?: Array<{ skillHash: string; skillName: string; avgRiskScore: number; maxRiskLevel: string; reportCount: number }> };
+      const skills = parsed.data ?? [];
+      this.status = 'connected';
+      if (skills.length > 0) {
+        logger.info(
+          `Fetched ${skills.length} skills from community blacklist / ` +
+            `從社群黑名單取得 ${skills.length} 個技能`
+        );
+      }
+      return skills;
+    } catch (err: unknown) {
+      logger.warn(`Fetch skill blacklist failed: ${err instanceof Error ? err.message : String(err)}`);
+      return [];
+    }
+  }
+
+  /**
    * Get cached rules without network call / 取得快取規則（不進行網路呼叫）
    */
   getCachedRules(): ThreatCloudUpdate[] {
