@@ -46,6 +46,9 @@ export type SkillThreatSubmitter = (submission: {
   findingSummaries?: Array<{ id: string; category: string; severity: string; title: string }>;
 }) => Promise<boolean>;
 
+/** Callback for checking if a skill is in the community blacklist */
+export type SkillBlacklistChecker = (skillName: string) => Promise<boolean>;
+
 export interface SkillWatcherConfig {
   /** Polling interval in ms (default: 10000 = 10s) */
   readonly pollInterval?: number;
@@ -55,6 +58,8 @@ export interface SkillWatcherConfig {
   readonly autoWhitelist?: boolean;
   /** Optional callback to submit audit results to Threat Cloud */
   readonly submitThreat?: SkillThreatSubmitter;
+  /** Optional callback to check community blacklist before auditing */
+  readonly checkBlacklist?: SkillBlacklistChecker;
 }
 
 // ---------------------------------------------------------------------------
@@ -110,8 +115,8 @@ async function loadAuditor(): Promise<AuditModule> {
  */
 export class SkillWatcher extends EventEmitter {
   private fileMonitor: FileMonitor | null = null;
-  private readonly config: Required<Omit<SkillWatcherConfig, 'submitThreat'>> &
-    Pick<SkillWatcherConfig, 'submitThreat'>;
+  private readonly config: Required<Omit<SkillWatcherConfig, 'submitThreat' | 'checkBlacklist'>> &
+    Pick<SkillWatcherConfig, 'submitThreat' | 'checkBlacklist'>;
   private previousSkills: Map<string, MCPServerEntryMinimal> = new Map();
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private running = false;
@@ -300,6 +305,30 @@ export class SkillWatcher extends EventEmitter {
 
   /** Audit a newly installed skill */
   private async auditNewSkill(change: SkillChange): Promise<void> {
+    // Check community blacklist first / 先檢查社群黑名單
+    if (this.config.checkBlacklist) {
+      try {
+        const isBlacklisted = await this.config.checkBlacklist(change.name);
+        if (isBlacklisted) {
+          const result: SkillAuditResult = {
+            name: change.name,
+            platformId: change.platformId,
+            riskLevel: 'CRITICAL',
+            riskScore: 100,
+            autoWhitelisted: false,
+          };
+          this.emit('skill-audit-complete', result);
+          logger.warn(
+            `Skill ${change.name} is BLACKLISTED by community — skipping local audit / ` +
+              `技能 ${change.name} 已被社群列入黑名單 — 跳過本地審計`
+          );
+          return;
+        }
+      } catch (err: unknown) {
+        logger.warn(`Blacklist check failed for ${change.name}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+
     try {
       const mcpConfig = await loadMcpConfig();
       const auditor = await loadAuditor();

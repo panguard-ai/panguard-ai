@@ -1271,11 +1271,33 @@ export class GuardEngine {
         logger.warn(`Skill whitelist sync failed: ${err instanceof Error ? err.message : String(err)}`);
       }
 
+      // Sync community skill blacklist / 同步社群 skill 黑名單
+      let revokedSkills = 0;
+      try {
+        const blacklist = await this.threatCloud.fetchSkillBlacklist();
+        const whitelistMgr = this.atrEngine.getWhitelistManager();
+        for (const entry of blacklist) {
+          const wasRevoked = whitelistMgr.revoke(
+            entry.skillName,
+            `community-blacklist: ${entry.reportCount} reports, avg risk ${entry.avgRiskScore}`
+          );
+          if (wasRevoked) revokedSkills++;
+        }
+        if (revokedSkills > 0) {
+          logger.warn(
+            `Community blacklist: ${revokedSkills} skill(s) revoked / ` +
+              `社群黑名單: ${revokedSkills} 個技能已撤銷`
+          );
+        }
+      } catch (err: unknown) {
+        logger.warn(`Skill blacklist sync failed: ${err instanceof Error ? err.message : String(err)}`);
+      }
+
       logger.info(
         `Threat Cloud sync: ${newRules} Sigma, ${newATRRules} ATR, ${newYaraRules} YARA, ` +
-          `${addedIPs} IPs, ${addedDomains} domains, ${importedSkills} whitelist / ` +
+          `${addedIPs} IPs, ${addedDomains} domains, ${importedSkills} whitelist, ${revokedSkills} blacklist / ` +
           `Threat Cloud 同步: ${newRules} Sigma, ${newATRRules} ATR, ${newYaraRules} YARA, ` +
-          `${addedIPs} IP, ${addedDomains} 網域, ${importedSkills} 白名單`
+          `${addedIPs} IP, ${addedDomains} 網域, ${importedSkills} 白名單, ${revokedSkills} 黑名單`
       );
     } catch (err: unknown) {
       logger.warn(`Threat Cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -1410,6 +1432,21 @@ export class GuardEngine {
     findingSummaries?: Array<{ id: string; category: string; severity: string; title: string }>;
   }) => Promise<boolean> {
     return (submission) => this.threatCloud.submitSkillThreat(submission);
+  }
+
+  /**
+   * Get a skill blacklist checker function for SkillWatcher integration.
+   * Checks if a skill name appears in the community blacklist from Threat Cloud.
+   * 取得技能黑名單檢查函式供 SkillWatcher 整合使用
+   */
+  getSkillBlacklistChecker(): (skillName: string) => Promise<boolean> {
+    return async (skillName: string): Promise<boolean> => {
+      const blacklist = await this.threatCloud.fetchSkillBlacklist();
+      const normalized = skillName.toLowerCase().trim().replace(/\s+/g, '-');
+      return blacklist.some(
+        (entry) => entry.skillName.toLowerCase().trim().replace(/\s+/g, '-') === normalized
+      );
+    };
   }
 
   /**
