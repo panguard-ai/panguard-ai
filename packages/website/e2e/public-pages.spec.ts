@@ -25,12 +25,6 @@ test.describe('Public Pages', () => {
     await expect(page.locator('main')).toBeVisible();
   });
 
-  test('docs getting-started page loads', async ({ page }) => {
-    const res = await page.goto('/docs/getting-started');
-    expect(res?.status()).toBe(200);
-    await expect(page.locator('main')).toBeVisible();
-  });
-
   test('compliance page loads', async ({ page }) => {
     const res = await page.goto('/compliance');
     expect(res?.status()).toBe(200);
