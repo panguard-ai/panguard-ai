@@ -9,6 +9,9 @@
     "url": "https://github.com/panguard-ai/panguard-ai"
   },
   "homepage": "https://panguard.ai",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
     "package.json",
