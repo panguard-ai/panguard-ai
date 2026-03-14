@@ -17,7 +17,7 @@ export function generateOpenApiSpec(baseUrl: string): Record<string, unknown> {
       title: 'Panguard AI API',
       version: '1.0.0',
       description:
-        'REST API for Panguard AI — authentication, billing, usage metering, admin management, and threat intelligence.',
+        'REST API for Panguard AI — authentication, usage metering, admin management, and threat intelligence.',
       contact: { email: 'support@panguard.ai', url: 'https://panguard.ai' },
       license: { name: 'BSL 1.1', url: 'https://panguard.ai/legal/terms' },
     },
@@ -25,7 +25,6 @@ export function generateOpenApiSpec(baseUrl: string): Record<string, unknown> {
     tags: [
       { name: 'Auth', description: 'Authentication and session management' },
       { name: 'Account', description: 'Account management (GDPR, 2FA)' },
-      { name: 'Billing', description: 'Subscription and payment (Lemon Squeezy)' },
       { name: 'Usage', description: 'Usage metering and quota' },
       { name: 'Waitlist', description: 'Waitlist management' },
       { name: 'Admin', description: 'Admin dashboard API' },
@@ -336,64 +335,6 @@ export function generateOpenApiSpec(baseUrl: string): Record<string, unknown> {
           summary: 'Check 2FA status',
           security: [{ bearerAuth: [] }],
           responses: { 200: { description: 'Returns enabled status and backup codes remaining' } },
-        },
-      },
-
-      // ── Billing ──
-      '/api/billing/checkout': {
-        post: {
-          tags: ['Billing'],
-          summary: 'Create a Lemon Squeezy checkout session',
-          security: [{ bearerAuth: [] }],
-          requestBody: {
-            required: true,
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    tier: { type: 'string', enum: ['solo', 'pro', 'business'] },
-                    variantId: {
-                      type: 'string',
-                      description: 'Lemon Squeezy variant ID (alternative to tier)',
-                    },
-                  },
-                },
-              },
-            },
-          },
-          responses: {
-            200: { description: 'Returns checkout URL' },
-            400: { description: 'Invalid tier or variant' },
-            501: { description: 'Billing not configured' },
-          },
-        },
-      },
-      '/api/billing/portal': {
-        get: {
-          tags: ['Billing'],
-          summary: 'Get subscription management portal URL',
-          security: [{ bearerAuth: [] }],
-          responses: {
-            200: { description: 'Returns portal URL' },
-            404: { description: 'No active subscription' },
-          },
-        },
-      },
-      '/api/billing/status': {
-        get: {
-          tags: ['Billing'],
-          summary: 'Get current billing status',
-          security: [{ bearerAuth: [] }],
-          responses: { 200: { description: 'Returns tier and subscription details' } },
-        },
-      },
-      '/api/billing/webhook': {
-        post: {
-          tags: ['Billing'],
-          summary: 'Lemon Squeezy webhook handler',
-          description: 'Receives subscription lifecycle events. Verified via HMAC SHA-256.',
-          responses: { 200: { description: 'Webhook processed' } },
         },
       },
 
