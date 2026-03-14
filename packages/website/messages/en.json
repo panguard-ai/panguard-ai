@@ -943,7 +943,7 @@
       },
       "cta": {
         "title": "Try it now. Open source.",
-        "desc": "Run your first scan in under a minute. If you like what you see, upgrade to Panguard Guard for continuous protection.",
+        "desc": "Run your first scan in under a minute. Enable Panguard Guard for continuous protection.",
         "cta1": "Get Early Access",
         "cta2": "Run Free Scan"
       }
@@ -2498,7 +2498,7 @@
         "3": {
           "category": "Account Data",
           "period": "Active + 30 days",
-          "desc": "Email and billing info retained while account is active, deleted 30 days after cancellation."
+          "desc": "Email and account info retained while account is active, deleted 30 days after cancellation."
         },
         "4": {
           "category": "Scan Reports",
@@ -3219,7 +3219,7 @@
       "step8Note": "Reports can be generated in English or Traditional Chinese with PDF export.",
       "step9Title": "More CLI Commands",
       "step9Desc": "Panguard has a full CLI toolkit. Here are the most useful commands beyond scan and guard.",
-      "step9Whoami": "Check your account and subscription status:",
+      "step9Whoami": "Check your account status:",
       "step9Chat": "Set up notification channels (Telegram, Slack, email):",
       "step9Trap": "Deploy honeypot services to profile attackers (Coming Soon):",
       "step9Report": "List supported compliance frameworks:",
@@ -3925,8 +3925,8 @@
       "title": "Built for mutual growth.",
       "subtitle": "Every partner gets access to tools, resources, and support designed to accelerate your business.",
       "item1": {
-        "title": "Revenue Share",
-        "desc": "Competitive margins on all customer subscriptions"
+        "title": "Joint Marketing",
+        "desc": "Co-promotion opportunities and shared visibility across partner networks"
       },
       "item2": {
         "title": "Sales Enablement",
@@ -4896,9 +4896,9 @@
       "title": "Account Settings",
       "description": "Manage your Panguard AI account settings, profile, and preferences."
     },
-    "billing": {
-      "title": "Billing",
-      "description": "Panguard AI is free and open source. No billing required."
+    "account": {
+      "title": "Account",
+      "description": "Manage your Panguard AI account. Free and open source."
     },
     "atr": {
       "title": "Agent Threat Rules (ATR) -- Panguard AI",
@@ -5038,9 +5038,9 @@
         "title": "Account Settings",
         "description": "2FA, profile, security"
       },
-      "billing": {
-        "title": "Billing",
-        "description": "Manage subscription"
+      "account": {
+        "title": "Account",
+        "description": "Manage your account"
       },
       "apiDocs": {
         "title": "API Docs",
@@ -5159,7 +5159,7 @@
     "deleteAccount": {
       "sectionTitle": "Delete Account",
       "description": "Permanently delete your account and all associated data. This action cannot be undone.",
-      "warning": "This will permanently delete your account, all data, sessions, and subscription.",
+      "warning": "This will permanently delete your account, all data, and sessions.",
       "passwordLabel": "Enter your password to confirm:",
       "passwordPlaceholder": "Your password",
       "cancelButton": "Cancel",
@@ -5169,17 +5169,17 @@
     }
   },
   "billing": {
-    "headerTitle": "Billing",
+    "headerTitle": "Account Plan",
     "currentPlan": "Current Plan",
-    "manageSubscription": "Manage Subscription",
-    "errorLoading": "Unable to load billing data. Please refresh.",
-    "freeTier": "Free tier — no subscription",
-    "planIncludes": "Plan includes",
-    "renewsOn": "Renews on {date}",
-    "endsOn": "Ends on {date}",
+    "manageSubscription": "View Account",
+    "errorLoading": "Unable to load account data. Please refresh.",
+    "freeTier": "Free and open source",
+    "planIncludes": "Includes",
+    "renewsOn": "Active since {date}",
+    "endsOn": "Active since {date}",
     "upgradeHeading": "All features included",
     "upgradeDescription": "All Panguard features are free and open source.",
-    "viewPlans": "View Plans",
+    "viewPlans": "View Features",
     "tierFeatures": {
       "all": [
         "Unlimited scans",
