@@ -51,8 +51,53 @@ export const migrations: readonly Migration[] = [
     version: 2,
     name: 'create_audit_log_table',
     up: (db) => {
+      // Check if audit_log exists with the correct schema.
+      // If it exists with wrong columns (pre-migration legacy), skip —
+      // migration v3 will drop and recreate it properly.
+      const existing = db
+        .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='audit_log'")
+        .get() as { name: string } | undefined;
+      if (existing) {
+        const cols = db.prepare("PRAGMA table_info('audit_log')").all() as Array<{ name: string }>;
+        const colNames = new Set(cols.map((c) => c.name));
+        if (!colNames.has('actor') || !colNames.has('timestamp')) {
+          // Legacy table with wrong schema — skip, v3 will fix it
+          return;
+        }
+      } else {
+        db.exec(`
+          CREATE TABLE audit_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT NOT NULL DEFAULT (datetime('now')),
+            actor TEXT NOT NULL,
+            action TEXT NOT NULL,
+            resource_type TEXT NOT NULL,
+            resource_id TEXT,
+            details TEXT,
+            ip_address TEXT
+          );
+        `);
+      }
+
       db.exec(`
-        CREATE TABLE IF NOT EXISTS audit_log (
+        CREATE INDEX IF NOT EXISTS idx_audit_log_timestamp ON audit_log(timestamp);
+        CREATE INDEX IF NOT EXISTS idx_audit_log_actor ON audit_log(actor);
+        CREATE INDEX IF NOT EXISTS idx_audit_log_action ON audit_log(action);
+        CREATE INDEX IF NOT EXISTS idx_audit_log_resource ON audit_log(resource_type);
+      `);
+    },
+  },
+  {
+    version: 3,
+    name: 'recreate_audit_log_table',
+    up: (db) => {
+      // The audit_log table may exist from a pre-migration schema with
+      // different columns (missing timestamp, actor, etc.). Drop and
+      // recreate with the correct schema.
+      db.exec(`
+        DROP TABLE IF EXISTS audit_log;
+
+        CREATE TABLE audit_log (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           timestamp TEXT NOT NULL DEFAULT (datetime('now')),
           actor TEXT NOT NULL,
