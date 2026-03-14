@@ -177,6 +177,14 @@ export type {
 export { GuardATREngine } from './engines/atr-engine.js';
 export type { GuardATREngineConfig } from './engines/atr-engine.js';
 
+// Skill Whitelist / 技能白名單
+export { SkillWhitelistManager } from './engines/skill-whitelist.js';
+export type {
+  WhitelistedSkill,
+  WhitelistSource,
+  SkillWhitelistConfig,
+} from './engines/skill-whitelist.js';
+
 // Skill Watcher / 技能監視器
 export { SkillWatcher } from './engines/skill-watcher.js';
 export type {

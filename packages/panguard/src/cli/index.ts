@@ -32,6 +32,7 @@ import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
 import { doctorCommand } from './commands/doctor.js';
 import { auditCommand } from './commands/audit.js';
+import { skillsCommand } from './commands/skills.js';
 import { hacktivityCommand } from './commands/hacktivity.js';
 import { setupCommand } from './commands/setup.js';
 import { startInteractive } from './interactive.js';
@@ -46,6 +47,7 @@ program
 // ── Core commands (shown in help) ──
 program.addCommand(setupCommand());
 program.addCommand(auditCommand());
+program.addCommand(skillsCommand());
 program.addCommand(scanCommand());
 program.addCommand(guardCommand());
 program.addCommand(statusCommand());
