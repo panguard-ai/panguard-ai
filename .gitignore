@@ -33,6 +33,16 @@ packages/website/.next/
 .vercel
 pancore/
 
+# Build artifacts
+bundled-rules/
+package-lock.json
+
+# Test results
+test-results/
+
+# Tool state
+.gstack/
+
 # Internal files (not for public release)
 marketing/
 progress.md
