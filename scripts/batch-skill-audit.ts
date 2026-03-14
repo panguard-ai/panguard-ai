@@ -21,7 +21,7 @@ import {
   mkdtempSync,
   rmSync,
 } from 'node:fs';
-import { join, basename, dirname, resolve } from 'node:path';
+import { join, basename, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 
 // ---------------------------------------------------------------------------
