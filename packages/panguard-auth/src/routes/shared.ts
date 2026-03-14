@@ -8,7 +8,6 @@ import type { AuthDB } from '../database.js';
 import type { EmailConfig } from '../email-verify.js';
 import type { GoogleOAuthConfig } from '../google-oauth.js';
 import type { GoogleSheetsConfig } from '../google-sheets.js';
-import type { LemonSqueezyConfig } from '../lemonsqueezy.js';
 import { RateLimiter } from '../rate-limiter.js';
 import type { UserPublic } from '../types.js';
 
@@ -154,7 +153,6 @@ export interface AuthRouteConfig {
   baseUrl?: string;
   google?: GoogleOAuthConfig;
   sheets?: GoogleSheetsConfig;
-  lemonsqueezy?: LemonSqueezyConfig;
 }
 
 // ── RouteContext ─────────────────────────────────────────────────────

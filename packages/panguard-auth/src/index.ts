@@ -46,13 +46,6 @@ export { syncWaitlistEntry, appendRow, ensureSheetHeaders } from './google-sheet
 export type { GoogleSheetsConfig } from './google-sheets.js';
 export type { AuthRouteConfig } from './routes/index.js';
 export {
-  verifyWebhookSignature,
-  handleWebhookEvent,
-  createCheckoutUrl,
-  getCustomerPortalUrl,
-} from './lemonsqueezy.js';
-export type { LemonSqueezyConfig, WebhookResult } from './lemonsqueezy.js';
-export {
   checkQuota,
   recordUsage,
   setUsage,

@@ -29,7 +29,6 @@ import type {
   EmailConfig,
   GoogleOAuthConfig,
   GoogleSheetsConfig,
-  LemonSqueezyConfig,
 } from '@panguard-ai/panguard-auth';
 import { ManagerServer, DEFAULT_MANAGER_CONFIG } from '@panguard-ai/manager';
 import type { ManagerConfig } from '@panguard-ai/manager';
@@ -269,18 +268,6 @@ export function serveCommand(): Command {
           }
         : undefined;
 
-      const lemonsqueezy: LemonSqueezyConfig | undefined = process.env['LEMON_SQUEEZY_API_KEY']
-        ? {
-            apiKey: process.env['LEMON_SQUEEZY_API_KEY'],
-            storeId: process.env['LEMON_SQUEEZY_STORE_ID'] ?? '',
-            webhookSecret: process.env['LEMON_SQUEEZY_WEBHOOK_SECRET'] ?? '',
-            variantTierMap: JSON.parse(process.env['LEMON_SQUEEZY_VARIANT_MAP'] ?? '{}') as Record<
-              string,
-              string
-            >,
-          }
-        : undefined;
-
       const baseUrl = process.env['PANGUARD_BASE_URL'] ?? `http://${host}:${port}`;
 
       const authConfig: AuthRouteConfig = {
@@ -289,7 +276,6 @@ export function serveCommand(): Command {
         baseUrl,
         google,
         sheets,
-        lemonsqueezy,
       };
       const handlers = createAuthHandlers(authConfig);
 
@@ -327,9 +313,6 @@ export function serveCommand(): Command {
         console.log(`  Routes:`);
         console.log(`    ${c.dim('/api/auth/*')}     Auth API`);
         console.log(`    ${c.dim('/api/admin/*')}    Admin API`);
-        if (lemonsqueezy) {
-          console.log(`    ${c.dim('/api/billing/*')}  Billing API (Lemon Squeezy)`);
-        }
         console.log(`    ${c.dim('/api/usage/*')}    Usage & Quota API`);
         if (adminDir) {
           console.log(`    ${c.dim('/admin')}          Admin Dashboard`);
@@ -353,9 +336,6 @@ export function serveCommand(): Command {
           `    Email:   ${emailConfig ? ('apiKey' in emailConfig ? c.safe('Resend API') : c.safe('SMTP')) : c.caution('Not configured')}`
         );
         console.log(`    OAuth:   ${google ? c.safe('Google') : c.dim('Not configured')}`);
-        console.log(
-          `    Billing: ${lemonsqueezy ? c.safe('Lemon Squeezy') : c.dim('Not configured')}`
-        );
         console.log(`    Sheets:  ${sheets ? c.safe('Google Sheets') : c.dim('Not configured')}`);
         console.log(
           `    Manager: ${c.safe(`port ${managerPort}`)}${process.env['MANAGER_AUTH_TOKEN'] ? '' : c.dim(' (no auth)')}`
@@ -518,7 +498,6 @@ async function handleRequest(
       const services = {
         email: !!(process.env['RESEND_API_KEY'] || process.env['SMTP_HOST']),
         oauth: !!process.env['GOOGLE_CLIENT_ID'],
-        billing: !!process.env['LEMON_SQUEEZY_API_KEY'],
         errorTracking: !!process.env['SENTRY_DSN'],
         threatCloud: !!threatDb,
         tcApiKey: !!process.env['TC_API_KEY'],
@@ -1052,24 +1031,6 @@ async function handleRequest(
     }
     if (pathname === '/api/waitlist/list') {
       handlers.handleWaitlistList(req, res);
-      return;
-    }
-
-    // Billing API routes (Lemon Squeezy)
-    if (pathname === '/api/billing/webhook') {
-      await handlers.handleBillingWebhook(req, res);
-      return;
-    }
-    if (pathname === '/api/billing/checkout') {
-      await handlers.handleBillingCheckout(req, res);
-      return;
-    }
-    if (pathname === '/api/billing/portal') {
-      await handlers.handleBillingPortal(req, res);
-      return;
-    }
-    if (pathname === '/api/billing/status') {
-      handlers.handleBillingStatus(req, res);
       return;
     }
 

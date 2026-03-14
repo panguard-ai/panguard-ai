@@ -1,0 +1,72 @@
+name: ATR Rule Proposal
+description: Propose a new Agent Threat Rule
+labels: ["atr-rule", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Propose a new detection rule for the ATR (Agent Threat Rules) standard.
+        See [ATR Contributing Guide](../../packages/atr/CONTRIBUTING.md) for details.
+
+  - type: input
+    id: rule_id
+    attributes:
+      label: Rule ID
+      description: "Format: ATR-XXXX (next available number)"
+      placeholder: "ATR-0070"
+    validations:
+      required: true
+
+  - type: input
+    id: title
+    attributes:
+      label: Rule Title
+      description: Short descriptive title.
+      placeholder: "Unauthorized Credential Store Access"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - prompt-injection
+        - tool-poisoning
+        - context-exfiltration
+        - agent-manipulation
+        - privilege-escalation
+        - excessive-autonomy
+        - skill-compromise
+        - data-poisoning
+        - model-security
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - critical
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Threat Description
+      description: What attack does this rule detect? Include real-world examples if possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: detection
+    attributes:
+      label: Detection Logic
+      description: How should this threat be detected? (regex patterns, behavioral indicators, etc.)
+    validations:
+      required: false

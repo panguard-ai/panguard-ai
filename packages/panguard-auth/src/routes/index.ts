@@ -10,7 +10,6 @@ import type { AuthRouteConfig, RouteContext } from './shared.js';
 import { createAuthRoutes } from './auth.js';
 import { createOAuthRoutes } from './oauth.js';
 import { createTotpRoutes } from './totp.js';
-import { createBillingRoutes } from './billing.js';
 import { createAdminRoutes } from './admin.js';
 import { createWaitlistRoutes } from './waitlist.js';
 import { createUsageRoutes } from './usage.js';
@@ -84,7 +83,6 @@ export function createAuthHandlers(config: AuthRouteConfig) {
   const authHandlers = createAuthRoutes(ctx);
   const oauthHandlers = createOAuthRoutes(ctx);
   const totpHandlers = createTotpRoutes(ctx);
-  const billingHandlers = createBillingRoutes(ctx);
   const adminHandlers = createAdminRoutes(ctx);
   const waitlistHandlers = createWaitlistRoutes(ctx);
   const usageHandlers = createUsageRoutes(ctx);
@@ -135,11 +133,6 @@ export function createAuthHandlers(config: AuthRouteConfig) {
     handleTotpVerify: totpHandlers.handleTotpVerify,
     handleTotpDisable: totpHandlers.handleTotpDisable,
     handleTotpStatus: totpHandlers.handleTotpStatus,
-    // Billing (Lemon Squeezy)
-    handleBillingWebhook: billingHandlers.handleBillingWebhook,
-    handleBillingCheckout: billingHandlers.handleBillingCheckout,
-    handleBillingPortal: billingHandlers.handleBillingPortal,
-    handleBillingStatus: billingHandlers.handleBillingStatus,
     // Usage / Quota
     handleUsageSummary: usageHandlers.handleUsageSummary,
     handleUsageLimits: usageHandlers.handleUsageLimits,
