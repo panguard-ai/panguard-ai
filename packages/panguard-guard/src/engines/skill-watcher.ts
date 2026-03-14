@@ -325,7 +325,9 @@ export class SkillWatcher extends EventEmitter {
           return;
         }
       } catch (err: unknown) {
-        logger.warn(`Blacklist check failed for ${change.name}: ${err instanceof Error ? err.message : String(err)}`);
+        logger.warn(
+          `Blacklist check failed for ${change.name}: ${err instanceof Error ? err.message : String(err)}`
+        );
       }
     }
 

@@ -1,7 +1,7 @@
 {
   "brand": {
     "name": "Panguard AI",
-    "tagline": "AI 驅動的自適應端點防護平台",
+    "tagline": "AI Agent 的 App Store 守門員",
     "cta": "免費掃描你的系統"
   },
   "hero": {
@@ -44,7 +44,7 @@
     "setupTime": "預估設定時間：{{time}}"
   },
   "footer": {
-    "copyright": "Panguard AI - AI 驅動的自適應端點防護平台",
+    "copyright": "Panguard AI - AI Agent 的 App Store 守門員",
     "builtBy": "由 Panguard AI 團隊打造"
   }
 }

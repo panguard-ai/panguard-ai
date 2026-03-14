@@ -122,8 +122,8 @@ export default function AcceptableUsePolicyPage() {
         <section>
           <h2 className="text-lg font-semibold text-text-primary mb-3">3. Resource Limits</h2>
           <p>
-            Panguard is free and open-source software. To ensure fair access for all users,
-            the following resource guidelines apply:
+            Panguard is free and open-source software. To ensure fair access for all users, the
+            following resource guidelines apply:
           </p>
           <ul className="list-disc list-inside mt-2 space-y-1">
             <li>

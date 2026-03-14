@@ -237,6 +237,6 @@ export const DEFAULT_WEB_CONFIG: WebConfig = {
   language: 'zh-TW',
   baseUrl: 'https://panguard.ai',
   brandName: 'Panguard AI',
-  taglineEn: 'AI-Driven Adaptive Endpoint Protection',
-  taglineZh: 'AI 驅動的自適應端點防護平台',
+  taglineEn: 'The App Store Gatekeeper for AI Agents',
+  taglineZh: 'AI Agent 的 App Store 守門員',
 };

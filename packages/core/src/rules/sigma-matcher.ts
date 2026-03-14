@@ -475,11 +475,12 @@ export function matchEvent(event: SecurityEvent, rule: SigmaRule): RuleMatch | n
     const eventSource = (event.source ?? '').toLowerCase();
     const eventHost = (event.host ?? '').toLowerCase();
     const eventDesc = (event.description ?? '').toLowerCase();
-    const hasDarwinSignal = eventSource === 'syslog' || eventSource === 'network' || eventSource === 'process'
-      ? (event.raw as Record<string, unknown>)?.['source'] === 'macOS-log-stream'
-        || eventHost.includes('mac')
-        || eventHost.includes('darwin')
-      : false;
+    const hasDarwinSignal =
+      eventSource === 'syslog' || eventSource === 'network' || eventSource === 'process'
+        ? (event.raw as Record<string, unknown>)?.['source'] === 'macOS-log-stream' ||
+          eventHost.includes('mac') ||
+          eventHost.includes('darwin')
+        : false;
     const hasLinuxSignal = eventHost.includes('linux') || eventDesc.includes('linux');
 
     if (product === 'windows' && (hasDarwinSignal || hasLinuxSignal)) {

@@ -219,8 +219,7 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // QClaw (Tencent)
   const qclawPath = getQClawConfigPath();
-  const qclawDetected =
-    (await commandExists('qclaw')) || existsSync(join(homedir(), '.qclaw'));
+  const qclawDetected = (await commandExists('qclaw')) || existsSync(join(homedir(), '.qclaw'));
   platforms.push({
     id: 'qclaw',
     name: 'QClaw',

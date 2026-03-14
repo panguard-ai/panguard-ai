@@ -203,7 +203,11 @@ export function threatCommand(): Command {
         join(thisDir, '..', '..', '..', '..', '..', 'config'),
       ];
       const configDir = configDirs.find((d) => {
-        try { return statSync(d).isDirectory(); } catch { return false; }
+        try {
+          return statSync(d).isDirectory();
+        } catch {
+          return false;
+        }
       });
 
       if (!configDir) {
@@ -224,7 +228,9 @@ export function threatCommand(): Command {
               results.push(fullPath);
             }
           }
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
         return results;
       }
 
@@ -239,7 +245,9 @@ export function threatCommand(): Command {
           seeded++;
         }
         console.log(`  ${symbols.pass} Sigma: ${sigmaFiles.length} rules`);
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
 
       // YARA rules
       const yaraDir = join(configDir, 'yara-rules');
@@ -264,7 +272,9 @@ export function threatCommand(): Command {
         }
         seeded += yaraCount;
         console.log(`  ${symbols.pass} YARA: ${yaraCount} rules (from ${yaraFiles.length} files)`);
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
 
       // ATR rules
       const atrDirs = [
@@ -272,7 +282,11 @@ export function threatCommand(): Command {
         join(thisDir, '..', '..', '..', '..', '..', 'packages', 'atr', 'rules'),
       ];
       const atrDir = atrDirs.find((d) => {
-        try { return statSync(d).isDirectory(); } catch { return false; }
+        try {
+          return statSync(d).isDirectory();
+        } catch {
+          return false;
+        }
       });
       if (atrDir) {
         try {
@@ -284,7 +298,9 @@ export function threatCommand(): Command {
             seeded++;
           }
           console.log(`  ${symbols.pass} ATR: ${atrFiles.length} rules`);
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
       }
 
       seedSp.succeed(`Seeded ${seeded} rules into Threat Cloud DB`);
@@ -305,7 +321,11 @@ export function threatCommand(): Command {
     .command('backup')
     .description('Backup Threat Cloud and auth databases / 備份威脅雲及認證資料庫')
     .option('--db <path>', 'Auth database path / 認證資料庫路徑', '/data/auth.db')
-    .option('--threat-db <path>', 'Threat Cloud database path / 威脅雲資料庫路徑', '/data/threat-cloud.db')
+    .option(
+      '--threat-db <path>',
+      'Threat Cloud database path / 威脅雲資料庫路徑',
+      '/data/threat-cloud.db'
+    )
     .option('--backup-dir <path>', 'Backup directory / 備份目錄', '/data/backups')
     .option('--max-backups <number>', 'Maximum backups to keep / 最多保留備份數', '7')
     .option('--list', 'List existing backups / 列出現有備份', false)
@@ -358,9 +378,7 @@ export function threatCommand(): Command {
           const threatMgr = new tc.BackupManager(opts.threatDb, opts.backupDir, maxBackups);
           const sp1 = spinner('Backing up threat-cloud.db...');
           const r1 = threatMgr.backup();
-          sp1.succeed(
-            `threat-cloud.db backed up (${tc.BackupManager.formatSize(r1.sizeBytes)})`
-          );
+          sp1.succeed(`threat-cloud.db backed up (${tc.BackupManager.formatSize(r1.sizeBytes)})`);
           results.push({
             label: 'Threat Cloud',
             value: c.sage(r1.path),

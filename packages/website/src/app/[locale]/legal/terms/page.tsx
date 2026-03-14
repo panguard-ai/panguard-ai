@@ -246,9 +246,8 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
           </p>
           <p className="mt-2">
             12.2 <strong className="text-text-primary">By Panguard.</strong> We may suspend or
-            terminate your access to the Service immediately if you breach these Terms
-            or if we are required to do so by law. We may also discontinue the
-            Service with 90 days prior notice.
+            terminate your access to the Service immediately if you breach these Terms or if we are
+            required to do so by law. We may also discontinue the Service with 90 days prior notice.
           </p>
           <p className="mt-2">
             12.3 <strong className="text-text-primary">Effect of Termination.</strong> Upon

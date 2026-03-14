@@ -122,7 +122,7 @@
     "removedService": "PanguardGuard 已從系統服務移除"
   },
   "cli": {
-    "description": "PanguardGuard - AI 即時端點監控",
+    "description": "PanguardGuard - AI Skill 行為監控",
     "startDesc": "啟動 PanguardGuard 監控",
     "stopDesc": "停止 PanguardGuard 守護程式",
     "statusDesc": "顯示目前狀態",

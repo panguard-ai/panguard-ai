@@ -10,7 +10,13 @@ import { CATEGORIES, type Command } from './cli-data';
 
 /* ──────────────────────────  Sub-components  ─────────────────── */
 
-function MaturityBadge({ maturity, label }: { maturity: 'GA' | 'Beta' | 'Deprecated'; label: string }) {
+function MaturityBadge({
+  maturity,
+  label,
+}: {
+  maturity: 'GA' | 'Beta' | 'Deprecated';
+  label: string;
+}) {
   if (maturity === 'Deprecated') {
     return (
       <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-red-900/30 text-red-400">
@@ -70,7 +76,13 @@ function CommandCard({ cmd, t }: { cmd: Command; t: (key: string) => string }) {
         <span className="flex items-center gap-2 ml-auto shrink-0">
           <MaturityBadge
             maturity={cmd.maturity}
-            label={cmd.maturity === 'Beta' ? t('cli.beta') : cmd.maturity === 'Deprecated' ? 'Deprecated' : t('cli.ga')}
+            label={
+              cmd.maturity === 'Beta'
+                ? t('cli.beta')
+                : cmd.maturity === 'Deprecated'
+                  ? 'Deprecated'
+                  : t('cli.ga')
+            }
           />
           <TierBadge tier={cmd.tier} />
         </span>
