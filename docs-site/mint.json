@@ -34,7 +34,7 @@
     {
       "name": "Changelog",
       "icon": "list",
-      "url": "/changelog"
+      "url": "https://docs.panguard.ai/changelog"
     }
   ],
   "tabs": [
@@ -49,6 +49,10 @@
     {
       "name": "API Reference",
       "url": "api-reference"
+    },
+    {
+      "name": "Changelog",
+      "url": "changelog"
     }
   ],
   "navigation": [
@@ -221,6 +225,10 @@
         "api-reference/threat-cloud/campaigns",
         "api-reference/threat-cloud/stats"
       ]
+    },
+    {
+      "group": "Changelog",
+      "pages": ["changelog"]
     }
   ],
   "footerSocials": {
