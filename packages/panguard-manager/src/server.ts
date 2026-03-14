@@ -533,9 +533,7 @@ export class ManagerServer {
     if (this.hashedAuthToken.length === 0) {
       const remoteAddr = req.socket.remoteAddress ?? '';
       return (
-        remoteAddr === '127.0.0.1' ||
-        remoteAddr === '::1' ||
-        remoteAddr === '::ffff:127.0.0.1'
+        remoteAddr === '127.0.0.1' || remoteAddr === '::1' || remoteAddr === '::ffff:127.0.0.1'
       );
     }
 

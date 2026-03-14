@@ -820,9 +820,7 @@ export class ThreatCloudServer {
       // No admin key configured — only allow from loopback addresses
       const remoteAddr = req.socket.remoteAddress ?? '';
       const isLoopback =
-        remoteAddr === '127.0.0.1' ||
-        remoteAddr === '::1' ||
-        remoteAddr === '::ffff:127.0.0.1';
+        remoteAddr === '127.0.0.1' || remoteAddr === '::1' || remoteAddr === '::ffff:127.0.0.1';
       if (!isLoopback) {
         log.info(
           `Admin access denied: no TC_ADMIN_API_KEY configured and request from non-loopback address`,
