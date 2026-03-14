@@ -41,6 +41,7 @@ package-lock.json
 test-results/
 
 # Tool state
+.claude/
 .gstack/
 
 # Internal files (not for public release)
