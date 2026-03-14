@@ -1,7 +1,7 @@
 {
   "brand": {
     "name": "Panguard AI",
-    "tagline": "AI-Driven Adaptive Endpoint Protection",
+    "tagline": "The App Store Gatekeeper for AI Agents",
     "cta": "Scan Your System Free"
   },
   "hero": {
@@ -44,7 +44,7 @@
     "setupTime": "Estimated setup time: {{time}}"
   },
   "footer": {
-    "copyright": "Panguard AI - AI-Driven Adaptive Endpoint Protection",
+    "copyright": "Panguard AI - The App Store Gatekeeper for AI Agents",
     "builtBy": "Built by the Panguard AI team"
   }
 }

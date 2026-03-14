@@ -40,10 +40,20 @@ import type {
 /** Structured JSON logger for threat-cloud */
 const log = {
   info: (msg: string, extra?: Record<string, unknown>) => {
-    process.stdout.write(JSON.stringify({ ts: new Date().toISOString(), level: 'info', msg, ...extra }) + '\n');
+    process.stdout.write(
+      JSON.stringify({ ts: new Date().toISOString(), level: 'info', msg, ...extra }) + '\n'
+    );
   },
   error: (msg: string, err?: unknown, extra?: Record<string, unknown>) => {
-    process.stderr.write(JSON.stringify({ ts: new Date().toISOString(), level: 'error', msg, error: err instanceof Error ? err.message : String(err), ...extra }) + '\n');
+    process.stderr.write(
+      JSON.stringify({
+        ts: new Date().toISOString(),
+        level: 'error',
+        msg,
+        error: err instanceof Error ? err.message : String(err),
+        ...extra,
+      }) + '\n'
+    );
   },
 };
 
@@ -176,7 +186,14 @@ export class ThreatCloudServer {
     // Rate limiting
     if (!this.checkRateLimit(clientIP)) {
       this.sendJson(res, 429, { ok: false, error: 'Rate limit exceeded', request_id: requestId });
-      log.info('request', { method: req.method, path: req.url, status: 429, duration_ms: Date.now() - startTime, client_ip: clientIP, request_id: requestId });
+      log.info('request', {
+        method: req.method,
+        path: req.url,
+        status: 429,
+        duration_ms: Date.now() - startTime,
+        client_ip: clientIP,
+        request_id: requestId,
+      });
       return;
     }
 
@@ -185,14 +202,25 @@ export class ThreatCloudServer {
     const rawPathname = url.split('?')[0];
 
     // API versioning: strip /v1 prefix for backward compatibility
-    const pathname = rawPathname.startsWith('/v1/') ? rawPathname.slice(3) : rawPathname === '/v1' ? '/' : rawPathname;
+    const pathname = rawPathname.startsWith('/v1/')
+      ? rawPathname.slice(3)
+      : rawPathname === '/v1'
+        ? '/'
+        : rawPathname;
 
     if (pathname !== '/health' && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
       if (!this.config.apiKeys.includes(token)) {
         this.sendJson(res, 401, { ok: false, error: 'Invalid API key', request_id: requestId });
-        log.info('request', { method: req.method, path: rawPathname, status: 401, duration_ms: Date.now() - startTime, client_ip: clientIP, request_id: requestId });
+        log.info('request', {
+          method: req.method,
+          path: rawPathname,
+          status: 401,
+          duration_ms: Date.now() - startTime,
+          client_ip: clientIP,
+          request_id: requestId,
+        });
         return;
       }
     }
@@ -212,7 +240,14 @@ export class ThreatCloudServer {
     if (req.method === 'OPTIONS') {
       res.writeHead(204);
       res.end();
-      log.info('request', { method: 'OPTIONS', path: rawPathname, status: 204, duration_ms: Date.now() - startTime, client_ip: clientIP, request_id: requestId });
+      log.info('request', {
+        method: 'OPTIONS',
+        path: rawPathname,
+        status: 204,
+        duration_ms: Date.now() - startTime,
+        client_ip: clientIP,
+        request_id: requestId,
+      });
       return;
     }
 
@@ -423,7 +458,14 @@ export class ThreatCloudServer {
     }
 
     const clientIP = req.socket.remoteAddress ?? 'unknown';
-    this.db.audit.logAction('client', 'threat.submit', 'threat', undefined, { count: events.length }, clientIP);
+    this.db.audit.logAction(
+      'client',
+      'threat.submit',
+      'threat',
+      undefined,
+      { count: events.length },
+      clientIP
+    );
 
     this.sendJson(res, 201, {
       ok: true,
@@ -613,7 +655,14 @@ export class ThreatCloudServer {
     this.db.insertSkillThreat(submission);
 
     const clientIP = req.socket.remoteAddress ?? 'unknown';
-    this.db.audit.logAction('client', 'skill_threat.submit', 'skill_threat', submission.skillHash, { skillName: submission.skillName, riskScore: submission.riskScore }, clientIP);
+    this.db.audit.logAction(
+      'client',
+      'skill_threat.submit',
+      'skill_threat',
+      submission.skillHash,
+      { skillName: submission.skillName, riskScore: submission.riskScore },
+      clientIP
+    );
 
     this.sendJson(res, 201, { ok: true, data: { message: 'Skill threat received' } });
   }
@@ -802,9 +851,10 @@ export class ThreatCloudServer {
   /** Send JSON response / 發送 JSON 回應 */
   private sendJson(res: ServerResponse, status: number, data: unknown): void {
     const requestId = (res as ServerResponse & { _requestId?: string })._requestId;
-    const payload = typeof data === 'object' && data !== null
-      ? { ...data as Record<string, unknown>, request_id: requestId }
-      : data;
+    const payload =
+      typeof data === 'object' && data !== null
+        ? { ...(data as Record<string, unknown>), request_id: requestId }
+        : data;
     res.writeHead(status);
     res.end(JSON.stringify(payload));
   }

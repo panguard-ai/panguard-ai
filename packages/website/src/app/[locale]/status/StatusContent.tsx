@@ -32,7 +32,7 @@ interface Incident {
 
 const services: Service[] = [
   {
-    name: 'Panguard Guard \u2014 Endpoint Protection',
+    name: 'Panguard Guard \u2014 Skill Monitoring',
     status: 'beta',
     uptime: 0,
     uptimeHistory: [],

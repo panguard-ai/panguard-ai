@@ -87,7 +87,9 @@ export function skillsCommand(): Command {
       if (whitelist.length === 0) {
         console.log();
         console.log(
-          c.dim(`  ${symbols.info} No skills in whitelist. Run ${c.bold('panguard setup')} to scan and whitelist skills.`)
+          c.dim(
+            `  ${symbols.info} No skills in whitelist. Run ${c.bold('panguard setup')} to scan and whitelist skills.`
+          )
         );
         console.log();
         return;

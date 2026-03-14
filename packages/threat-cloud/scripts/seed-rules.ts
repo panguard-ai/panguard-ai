@@ -140,12 +140,14 @@ function splitYaraRules(filePath: string, content: string): RulePayload[] {
 
   if (matches.length <= 1) {
     // Single rule or unparseable — upload as-is
-    return [{
-      ruleId: `yara:${contentHash(content)}-${basename(filePath, extname(filePath))}`,
-      ruleContent: content,
-      publishedAt: new Date().toISOString(),
-      source: 'yara',
-    }];
+    return [
+      {
+        ruleId: `yara:${contentHash(content)}-${basename(filePath, extname(filePath))}`,
+        ruleContent: content,
+        publishedAt: new Date().toISOString(),
+        source: 'yara',
+      },
+    ];
   }
 
   // Multiple rules in one file
@@ -203,7 +205,11 @@ function prepareATRRules(dir: string): RulePayload[] {
 // Upload
 // ---------------------------------------------------------------------------
 
-async function uploadBatch(endpoint: string, rules: RulePayload[], adminApiKey?: string): Promise<number> {
+async function uploadBatch(
+  endpoint: string,
+  rules: RulePayload[],
+  adminApiKey?: string
+): Promise<number> {
   const url = `${endpoint}/api/rules`;
   const body = JSON.stringify({ rules });
 
@@ -250,7 +256,9 @@ async function main(): Promise<void> {
   console.log(`  Sigma: ${sigmaRules.length} rules`);
 
   const yaraRules = prepareYaraRules(config.yaraDir);
-  console.log(`  YARA:  ${yaraRules.length} rules (from ${findFiles(config.yaraDir, ['.yar', '.yara']).length} files)`);
+  console.log(
+    `  YARA:  ${yaraRules.length} rules (from ${findFiles(config.yaraDir, ['.yar', '.yara']).length} files)`
+  );
 
   const atrRules = prepareATRRules(config.atrDir);
   console.log(`  ATR:   ${atrRules.length} rules`);
@@ -279,7 +287,9 @@ async function main(): Promise<void> {
       const count = await uploadBatch(config.endpoint, batch, config.adminApiKey);
       uploaded += count;
       const pct = ((uploaded / total) * 100).toFixed(1);
-      process.stdout.write(`  Batch ${batchNum}/${batches}: ${count} rules uploaded (${pct}% total)\n`);
+      process.stdout.write(
+        `  Batch ${batchNum}/${batches}: ${count} rules uploaded (${pct}% total)\n`
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error(`  Batch ${batchNum}/${batches}: FAILED - ${msg}`);

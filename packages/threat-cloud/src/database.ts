@@ -130,7 +130,10 @@ export class ThreatCloudDB {
     try {
       runMigrations(this.db);
     } catch (err) {
-      console.error('[threat-cloud] Migration failed (non-fatal):', err instanceof Error ? err.message : String(err));
+      console.error(
+        '[threat-cloud] Migration failed (non-fatal):',
+        err instanceof Error ? err.message : String(err)
+      );
     }
 
     this.db.exec(`
@@ -174,7 +177,8 @@ export class ThreatCloudDB {
 
   /** Get total threat count / 取得威脅總數 */
   getThreatCount(): number {
-    return (this.db.prepare('SELECT COUNT(*) as count FROM threats').get() as { count: number }).count;
+    return (this.db.prepare('SELECT COUNT(*) as count FROM threats').get() as { count: number })
+      .count;
   }
 
   /** Extract classification metadata from rule content / 從規則內容提取分類元資料 */

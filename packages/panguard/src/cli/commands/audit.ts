@@ -122,9 +122,7 @@ export function auditCommand(): Command {
                   : finding.severity === 'high'
                     ? c.yellow
                     : c.dim;
-              console.log(
-                `  ${sevColor(`[${finding.severity.toUpperCase()}]`)} ${finding.title}`
-              );
+              console.log(`  ${sevColor(`[${finding.severity.toUpperCase()}]`)} ${finding.title}`);
               console.log(`    ${c.dim(finding.description)}`);
               if (finding.location) console.log(`    ${c.dim(`at ${finding.location}`)}`);
               console.log();

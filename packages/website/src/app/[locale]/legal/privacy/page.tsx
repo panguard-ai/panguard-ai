@@ -63,8 +63,8 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
           <h3 className="text-base font-medium text-text-primary mb-2">1.1 Account Information</h3>
           <p>
             When you register for a Panguard account, we collect your name and email address.
-            Panguard is free and open-source software — we do not collect payment information
-            or billing addresses.
+            Panguard is free and open-source software — we do not collect payment information or
+            billing addresses.
           </p>
 
           <h3 className="text-base font-medium text-text-primary mt-4 mb-2">

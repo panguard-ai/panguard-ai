@@ -87,14 +87,7 @@ export class AuditLogger {
         VALUES (?, ?, ?, ?, ?, ?)
       `
       )
-      .run(
-        actor,
-        action,
-        resourceType,
-        resourceId ?? null,
-        detailsJson,
-        ipAddress ?? null
-      );
+      .run(actor, action, resourceType, resourceId ?? null, detailsJson, ipAddress ?? null);
   }
 
   /**

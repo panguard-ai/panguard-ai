@@ -4,8 +4,7 @@ import { LEGAL_LAST_UPDATED } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: 'Service Level Agreement',
-  description:
-    'Panguard AI Service Level Agreement. Uptime commitments for the Panguard platform.',
+  description: 'Panguard AI Service Level Agreement. Uptime commitments for the Panguard platform.',
 };
 
 export default function SLAPage() {
@@ -19,9 +18,9 @@ export default function SLAPage() {
       <div className="space-y-8 text-sm text-text-secondary leading-relaxed">
         <section>
           <p>
-            This Service Level Agreement (&quot;SLA&quot;) describes the uptime commitments
-            Panguard AI, Inc. (&quot;Panguard&quot;) makes to all users of the Panguard platform.
-            Panguard is free and open-source software licensed under the MIT License.
+            This Service Level Agreement (&quot;SLA&quot;) describes the uptime commitments Panguard
+            AI, Inc. (&quot;Panguard&quot;) makes to all users of the Panguard platform. Panguard is
+            free and open-source software licensed under the MIT License.
           </p>
         </section>
 
@@ -30,8 +29,8 @@ export default function SLAPage() {
           <h2 className="text-lg font-semibold text-text-primary mb-3">1. Uptime Commitment</h2>
           <p>
             Panguard commits to maintaining{' '}
-            <strong className="text-text-primary">99.9% uptime</strong> for the Panguard
-            hosted services, measured on a monthly basis. This commitment covers:
+            <strong className="text-text-primary">99.9% uptime</strong> for the Panguard hosted
+            services, measured on a monthly basis. This commitment covers:
           </p>
           <ul className="list-disc list-inside mt-2 space-y-1">
             <li>Panguard Website (panguard.ai)</li>
@@ -94,8 +93,8 @@ export default function SLAPage() {
               services, to the extent such outages are not within Panguard&apos;s control.
             </li>
             <li>
-              <strong className="text-text-primary">User Causes:</strong> Downtime resulting
-              from misuse, misconfiguration, or actions taken by the user that affect Service
+              <strong className="text-text-primary">User Causes:</strong> Downtime resulting from
+              misuse, misconfiguration, or actions taken by the user that affect Service
               availability.
             </li>
             <li>
@@ -130,17 +129,23 @@ export default function SLAPage() {
               <tbody className="text-text-secondary">
                 <tr className="border-b border-border/50">
                   <td className="py-3 pr-4">99.0% - 99.9%</td>
-                  <td className="py-3 pr-4 font-semibold text-text-primary">Post-incident report</td>
+                  <td className="py-3 pr-4 font-semibold text-text-primary">
+                    Post-incident report
+                  </td>
                   <td className="py-3">44 min - 7.3 hours</td>
                 </tr>
                 <tr className="border-b border-border/50">
                   <td className="py-3 pr-4">95.0% - 99.0%</td>
-                  <td className="py-3 pr-4 font-semibold text-text-primary">Report + corrective action plan</td>
+                  <td className="py-3 pr-4 font-semibold text-text-primary">
+                    Report + corrective action plan
+                  </td>
                   <td className="py-3">7.3 hours - 36.5 hours</td>
                 </tr>
                 <tr className="border-b border-border/50">
                   <td className="py-3 pr-4">Below 95.0%</td>
-                  <td className="py-3 pr-4 font-semibold text-text-primary">Report + architecture review</td>
+                  <td className="py-3 pr-4 font-semibold text-text-primary">
+                    Report + architecture review
+                  </td>
                   <td className="py-3">More than 36.5 hours</td>
                 </tr>
               </tbody>

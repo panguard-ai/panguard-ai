@@ -124,7 +124,10 @@ export class BackupManager {
 
     const prefix = `${this.dbName}-`;
     return readdirSync(this.backupDir)
-      .filter((f) => f.startsWith(prefix) && f.endsWith('.db') && !f.endsWith('-wal') && !f.endsWith('-shm'))
+      .filter(
+        (f) =>
+          f.startsWith(prefix) && f.endsWith('.db') && !f.endsWith('-wal') && !f.endsWith('-shm')
+      )
       .sort()
       .reverse(); // newest first (ISO timestamps sort lexicographically)
   }

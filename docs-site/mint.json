@@ -135,10 +135,7 @@
     },
     {
       "group": "Coming Soon",
-      "pages": [
-        "products/trap/overview",
-        "products/report/overview"
-      ]
+      "pages": ["products/trap/overview", "products/report/overview"]
     },
     {
       "group": "Panguard MCP",

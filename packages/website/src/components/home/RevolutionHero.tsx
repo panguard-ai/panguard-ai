@@ -107,7 +107,10 @@ export default function RevolutionHero() {
             {t('subtitleLine1')}
           </p>
           <p className="text-lg sm:text-xl text-text-primary font-medium leading-relaxed">
-            {t('subtitleLine2', { atrRules: STATS.atrRulesDisplay, integratedRules: STATS.integratedRulesDisplay })}
+            {t('subtitleLine2', {
+              atrRules: STATS.atrRulesDisplay,
+              integratedRules: STATS.integratedRulesDisplay,
+            })}
           </p>
           <p className="text-lg sm:text-xl text-panguard-green font-semibold leading-relaxed">
             {t('subtitleLine3')}

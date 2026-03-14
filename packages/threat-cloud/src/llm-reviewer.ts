@@ -52,7 +52,7 @@ export class LLMReviewer {
    */
   async reviewProposal(
     patternHash: string,
-    ruleContent: string,
+    ruleContent: string
   ): Promise<{ verdict: string; approved: boolean }> {
     const prompt = this.buildReviewPrompt(ruleContent);
 
@@ -136,9 +136,7 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
       const requestBody = JSON.stringify({
         model: this.model,
         max_tokens: 1024,
-        messages: [
-          { role: 'user', content: prompt },
-        ],
+        messages: [{ role: 'user', content: prompt }],
       });
 
       const options = {
@@ -166,7 +164,9 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
           const body = Buffer.concat(chunks).toString('utf-8');
 
           if (res.statusCode !== 200) {
-            reject(new Error(`Anthropic API returned status ${res.statusCode}: ${body.slice(0, 500)}`));
+            reject(
+              new Error(`Anthropic API returned status ${res.statusCode}: ${body.slice(0, 500)}`)
+            );
             return;
           }
 
@@ -181,7 +181,11 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
               reject(new Error('Anthropic API response missing text content'));
             }
           } catch (err) {
-            reject(new Error(`Failed to parse Anthropic API response: ${err instanceof Error ? err.message : String(err)}`));
+            reject(
+              new Error(
+                `Failed to parse Anthropic API response: ${err instanceof Error ? err.message : String(err)}`
+              )
+            );
           }
         });
       });
@@ -225,17 +229,21 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
       const approved = parsed.approved === true;
 
       const validRisks = ['low', 'medium', 'high'] as const;
-      const falsePositiveRisk = validRisks.includes(parsed.falsePositiveRisk as typeof validRisks[number])
+      const falsePositiveRisk = validRisks.includes(
+        parsed.falsePositiveRisk as (typeof validRisks)[number]
+      )
         ? (parsed.falsePositiveRisk as 'low' | 'medium' | 'high')
         : 'high';
 
-      const coverageScore = typeof parsed.coverageScore === 'number'
-        ? Math.max(0, Math.min(100, Math.round(parsed.coverageScore)))
-        : 0;
+      const coverageScore =
+        typeof parsed.coverageScore === 'number'
+          ? Math.max(0, Math.min(100, Math.round(parsed.coverageScore)))
+          : 0;
 
-      const reasoning = typeof parsed.reasoning === 'string'
-        ? parsed.reasoning.slice(0, 1000)
-        : 'No reasoning provided';
+      const reasoning =
+        typeof parsed.reasoning === 'string'
+          ? parsed.reasoning.slice(0, 1000)
+          : 'No reasoning provided';
 
       return { approved, falsePositiveRisk, coverageScore, reasoning };
     } catch {

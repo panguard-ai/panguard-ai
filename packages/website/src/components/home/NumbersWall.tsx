@@ -18,15 +18,15 @@ import { STATS } from '@/lib/stats';
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const statIcons = [
-  ShieldIcon,
-  ScanIcon,
-  ShieldIcon,
-  MonitorIcon,
-  ShieldIcon,
-  BlockIcon,
-  CheckIcon,
-  NetworkIcon,
-  LockIcon,
+  ShieldIcon, // atrRules
+  NetworkIcon, // integratedRules
+  ScanIcon, // tests
+  MonitorIcon, // layers
+  ShieldIcon, // skillChecks
+  BlockIcon, // mcpTools
+  CheckIcon, // cliCommands
+  NetworkIcon, // responseActions
+  LockIcon, // mit
 ];
 
 const statKeys = [

@@ -32,7 +32,10 @@ export function createTotpRoutes(ctx: RouteContext) {
     }
 
     // Rate limit TOTP setup (reuse loginLimiter — 10 per 15 min per IP)
-    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ?? req.socket.remoteAddress ?? 'unknown';
+    const ip =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ??
+      req.socket.remoteAddress ??
+      'unknown';
     const rl = ctx.loginLimiter.check(ip);
     if (!rl.allowed) {
       res.setHeader('Retry-After', String(Math.ceil(rl.retryAfterMs / 1000)));

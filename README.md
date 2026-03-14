@@ -88,11 +88,11 @@ Panguard 不是靜態規則集。三個元件互相強化 -- 使用者越多，�
                              +--------> back to Skill Auditor --> Loop
 ```
 
-| Component | Role | Status |
-| --------- | ---- | ------ |
-| **[Skill Auditor](docs/overview.md)** | 7-check security gate before any skill runs (prompt injection, tool poisoning, secrets, permissions...) | GA |
-| **[Threat Cloud](#threat-cloud)** | Anonymous threat intelligence from all Panguard instances. 3+ confirmations + Claude Sonnet review before promotion. | GA |
-| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard for AI agent threats. 69 rules, 9 categories, OWASP + MITRE mapped. | RFC |
+| Component                                                          | Role                                                                                                                 | Status |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------ |
+| **[Skill Auditor](docs/overview.md)**                              | 7-check security gate before any skill runs (prompt injection, tool poisoning, secrets, permissions...)              | GA     |
+| **[Threat Cloud](#threat-cloud)**                                  | Anonymous threat intelligence from all Panguard instances. 3+ confirmations + Claude Sonnet review before promotion. | GA     |
+| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard for AI agent threats. 69 rules, 9 categories, OWASP + MITRE mapped.                          | RFC    |
 
 One user's encounter with a new attack becomes a rule that protects everyone. Next time the same attack hits anyone, Layer 1 blocks it in < 50ms.
 
@@ -135,11 +135,11 @@ Each layer catches what the previous one missed. If any layer goes down, the oth
 
 每一層捕捉前一層遺漏的威脅。任何一層失效，其他層繼續運作。
 
-| Layer | Engine | Coverage | Latency | Cost | Network |
-| ----- | ------ | -------- | ------- | ---- | ------- |
-| **1** | **Rules Engine** -- 69 ATR + 9,700+ integrated Sigma/YARA rules | ~90% of known threats | < 50ms | $0 | Offline |
-| **2** | **Local AI** -- Ollama on your machine | ~7% (ambiguous cases) | ~ 2s | $0 | Offline |
-| **3** | **Cloud AI** -- Claude / OpenAI | ~3% (novel attacks) | ~ 5s | ~$0.008 | Optional |
+| Layer | Engine                                                          | Coverage              | Latency | Cost    | Network  |
+| ----- | --------------------------------------------------------------- | --------------------- | ------- | ------- | -------- |
+| **1** | **Rules Engine** -- 69 ATR + 9,700+ integrated Sigma/YARA rules | ~90% of known threats | < 50ms  | $0      | Offline  |
+| **2** | **Local AI** -- Ollama on your machine                          | ~7% (ambiguous cases) | ~ 2s    | $0      | Offline  |
+| **3** | **Cloud AI** -- Claude / OpenAI                                 | ~3% (novel attacks)   | ~ 5s    | ~$0.008 | Optional |
 
 **Graceful degradation:** Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet down? Everything still works.
 
@@ -147,23 +147,21 @@ Each layer catches what the previous one missed. If any layer goes down, the oth
 
 ---
 
-## Product Suite
+## Core Products
 
 Everything is **free and open source**. MIT licensed.
 
 所有功能**免費開源**。MIT 授權。
 
-| Product | What It Does | Status |
-| ------- | ------------ | ------ |
-| **[Skill Auditor](docs/overview.md)** | 7-check security gate for AI agent skills | GA |
-| **[Scan](docs/DETECTION.md)** | 60-second security audit | GA |
-| **[Guard](docs/ARCHITECTURE.md)** | 24/7 AI monitoring with 4-agent pipeline | GA |
-| **[Chat](docs/OPERATIONS.md)** | Alerts via Telegram, Slack, Discord, LINE, Email | GA |
-| **[Threat Cloud](#threat-cloud)** | Collective threat intelligence | GA |
-| **[MCP Server](docs/API.md)** | 11 tools for any MCP client | GA |
-| **[Manager](docs/OPERATIONS.md)** | Distributed coordinator (up to 500 agents) | GA |
-| **[Trap](docs/DETECTION.md)** | Honeypot services for attacker profiling | Coming Soon |
-| **[Report](docs/DETECTION.md)** | Compliance: ISO 27001, SOC 2, Taiwan CMA | Coming Soon |
+| Product                               | What It Does                                                          | Status      |
+| ------------------------------------- | --------------------------------------------------------------------- | ----------- |
+| **[Skill Auditor](docs/overview.md)** | 7-check security gate -- audits every AI skill before install         | GA          |
+| **[Guard](docs/ARCHITECTURE.md)**     | 24/7 skill behavior monitoring + auto-response                        | GA          |
+| **[Threat Cloud](#threat-cloud)**     | Collective threat intelligence -- every block strengthens the network | GA          |
+| **[MCP Server](docs/API.md)**         | 11 tools for Claude, Cursor, and any MCP client                       | GA          |
+| **[Scan](docs/DETECTION.md)**         | 60-second security audit                                              | GA          |
+| **[Trap](docs/DETECTION.md)**         | Honeypot services for attacker profiling                              | Coming Soon |
+| **[Report](docs/DETECTION.md)**       | Compliance: ISO 27001, SOC 2, Taiwan CMA                              | Coming Soon |
 
 ---
 
@@ -171,12 +169,12 @@ Everything is **free and open source**. MIT licensed.
 
 69 ATR rules purpose-built for AI agent threats + 9,700+ integrated Sigma/YARA rules. All bundled with npm. No cloud required.
 
-| Rule Type | Count | Purpose |
-| --------- | ----- | ------- |
-| **Sigma** | 3,760 | Network intrusion, auth bypass, lateral movement |
-| **YARA** | 5,961 | Malware, encoded payloads, obfuscated scripts |
-| **ATR** | 69 | AI agent threats: prompt injection, tool poisoning, skill compromise |
-| **Builtin** | 20 | OS hardening, credential hygiene, service audit |
+| Rule Type   | Count | Purpose                                                              |
+| ----------- | ----- | -------------------------------------------------------------------- |
+| **Sigma**   | 3,760 | Network intrusion, auth bypass, lateral movement                     |
+| **YARA**    | 5,961 | Malware, encoded payloads, obfuscated scripts                        |
+| **ATR**     | 69    | AI agent threats: prompt injection, tool poisoning, skill compromise |
+| **Builtin** | 20    | OS hardening, credential hygiene, service audit                      |
 
 ---
 
@@ -215,29 +213,26 @@ Or auto-detect all AI platforms: `panguard setup` (Claude Desktop, Claude Code, 
 panguard-ai/
   packages/
     panguard-skill-auditor/  Skill security auditor (entry point)
-    panguard-guard/          24/7 AI monitoring + Threat Cloud client
+    panguard-guard/          24/7 skill behavior monitoring + Threat Cloud sync
     atr/                     Agent Threat Rules: 69 rules, 9 categories
+    panguard-mcp/            MCP server: 11 tools for AI assistants
     panguard-scan/           Security scanner
-    panguard-chat/           Notifications: 6 channels
-    panguard-mcp/            MCP server: 11 tools
-    panguard-manager/        Distributed coordinator (up to 500 agents)
-    core/                    Shared engine: rules, monitoring, AI adapters
-    panguard-cli/            Unified CLI
-    panguard-auth/           Auth: OAuth, sessions
+    core/                    Shared engine: rules, AI adapters
+    panguard-cli/            Unified CLI (23 commands)
     website/                 Next.js 14 marketing site (EN / zh-TW)
   config/
     sigma-rules/             3,760 Sigma detection rules
     yara-rules/              5,961 YARA detection rules
 ```
 
-| Category | Technology |
-| -------- | ---------- |
-| Language | TypeScript 5.7 (strict mode) |
-| Runtime | Node.js 18+ |
-| Monorepo | pnpm workspaces (16 packages) |
-| Testing | Vitest 3 + v8 coverage (3,490+ tests) |
-| AI | Ollama (local) + Claude / OpenAI (cloud) |
-| Encryption | AES-256-GCM |
+| Category   | Technology                               |
+| ---------- | ---------------------------------------- |
+| Language   | TypeScript 5.7 (strict mode)             |
+| Runtime    | Node.js 18+                              |
+| Monorepo   | pnpm workspaces (16 packages)            |
+| Testing    | Vitest 3 + v8 coverage (3,490+ tests)    |
+| AI         | Ollama (local) + Claude / OpenAI (cloud) |
+| Encryption | AES-256-GCM                              |
 
 ---
 

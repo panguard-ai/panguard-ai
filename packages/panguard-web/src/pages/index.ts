@@ -15,11 +15,12 @@ import type { PageId, PageMeta, WebLanguage } from '../types.js';
 export const PAGES: PageMeta[] = [
   {
     id: 'home',
-    titleEn: 'Panguard AI - AI-Driven Endpoint Protection',
-    titleZh: 'Panguard AI - AI 驅動的端點防護',
+    titleEn: 'Panguard AI - The App Store Gatekeeper for AI Agents',
+    titleZh: 'Panguard AI - AI Agent 的 App Store 守門員',
     descriptionEn:
-      'One command to install. AI protects your machines automatically. It tells you when something happens. You do nothing when all is well.',
-    descriptionZh: '一行指令安裝，AI 全自動保護你的機器。有事它會告訴你，沒事你什麼都不用做。',
+      'Audits every AI skill before it runs. Monitors agent behavior 24/7. Turns every threat discovery into protection for everyone.',
+    descriptionZh:
+      '每個 AI Skill 執行前先審計。24/7 監控 Agent 行為。將每個威脅發現轉化為所有人的防護。',
     path: '/',
   },
   {
@@ -158,17 +159,17 @@ export const PRODUCT_FEATURES: ProductFeature[] = [
     highlightsEn: [
       'Multi-agent pipeline: Detect > Analyze > Respond > Report',
       '3-layer funnel: Rules (90%) > Local AI (7%) > Cloud AI (3%)',
-      '7-day learning period - zero false positives',
+      '69 ATR rules + 9,700+ integrated Sigma/YARA rules',
       'Auto-block, auto-isolate, auto-notify',
-      'Context Memory - gets smarter over time',
+      'Skill behavior monitoring - catches runtime threats',
       'Panguard Threat Cloud - collective intelligence',
     ],
     highlightsZh: [
       '多 Agent 管線：偵測 > 分析 > 回應 > 報告',
       '三層漏斗：規則 (90%) > 本地 AI (7%) > 雲端 AI (3%)',
-      '7 天學習期 - 零誤報',
+      '69 條 ATR 規則 + 9,700+ 條整合 Sigma/YARA 規則',
       '自動封鎖、自動隔離、自動通知',
-      'Context Memory - 越用越準',
+      'Skill 行為監控 - 捕捉執行期威脅',
       'Panguard Threat Cloud - 集體威脅智慧',
     ],
   },

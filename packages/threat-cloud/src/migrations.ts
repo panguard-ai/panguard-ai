@@ -30,9 +30,7 @@ export const migrations: readonly Migration[] = [
       // These columns may already exist from the original CREATE TABLE.
       // SQLite does not support IF NOT EXISTS for ADD COLUMN, so we
       // check the table_info pragma before adding each one.
-      const existing = db
-        .prepare("PRAGMA table_info('rules')")
-        .all() as Array<{ name: string }>;
+      const existing = db.prepare("PRAGMA table_info('rules')").all() as Array<{ name: string }>;
       const columnNames = new Set(existing.map((c) => c.name));
 
       const columnsToAdd: Array<{ name: string; type: string }> = [
@@ -124,17 +122,13 @@ export function runMigrations(db: Database.Database): number {
   let applied = 0;
   for (const migration of pending) {
     const runOne = db.transaction(() => {
-      console.log(
-        `[threat-cloud] Running migration v${migration.version}: ${migration.name}`
-      );
+      console.log(`[threat-cloud] Running migration v${migration.version}: ${migration.name}`);
       migration.up(db);
       db.prepare('UPDATE schema_version SET version = ?').run(migration.version);
     });
     runOne();
     applied++;
-    console.log(
-      `[threat-cloud] Migration v${migration.version} applied successfully`
-    );
+    console.log(`[threat-cloud] Migration v${migration.version} applied successfully`);
   }
 
   console.log(

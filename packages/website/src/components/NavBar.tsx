@@ -140,13 +140,11 @@ export default function NavBar() {
   }, []);
 
   const productItems: DropdownItem[] = [
-    { label: t('productLinks.overview'), desc: t('productLinks.overviewDesc'), href: '/product' },
     {
       label: t('productLinks.skillAuditor'),
       desc: t('productLinks.skillAuditorDesc'),
       href: '/product/skill-auditor',
     },
-    { label: t('productLinks.scan'), desc: t('productLinks.scanDesc'), href: '/product/scan' },
     { label: t('productLinks.guard'), desc: t('productLinks.guardDesc'), href: '/product/guard' },
     { label: t('productLinks.mcp'), desc: t('productLinks.mcpDesc'), href: '/product/mcp' },
     { label: t('productLinks.atrStandard'), desc: t('productLinks.atrStandardDesc'), href: '/atr' },

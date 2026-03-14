@@ -646,7 +646,10 @@ export class DashboardServer {
     if (existsSync(whitelistPath)) {
       try {
         const raw = readFileSync(whitelistPath, 'utf-8');
-        const data = JSON.parse(raw) as { whitelist?: Array<{ name: string; source?: string }>; skills?: Array<{ name: string; source?: string }> };
+        const data = JSON.parse(raw) as {
+          whitelist?: Array<{ name: string; source?: string }>;
+          skills?: Array<{ name: string; source?: string }>;
+        };
         whitelist = data.whitelist ?? data.skills ?? [];
       } catch {
         /* ignore */
@@ -999,7 +1002,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <!-- AI Setup -->
 <div class="pg" id="p-ai">
 <div class="pt" data-i18n="t_ai"><em>AI Configuration</em></div>
-<div class="pd" data-i18n="d_ai">Panguard uses a 3-layer detection system. Layer 1 (rules) is always active. Layer 2 and 3 use AI models for deep threat analysis. Configure your own API keys below -- each instance is independent, your keys are stored locally only.</div>
+<div class="pd" data-i18n="d_ai">Panguard uses a 3-layer detection system. Layer 1 (rules) and Layer 2 (fingerprint & heuristic) are always active with zero config. Layer 3 uses cloud AI for the deepest analysis -- configure your API key below.</div>
 
 <div class="fs">
 <h3><span class="dot dot-ok"></span> <span data-i18n="l1">Layer 1: Rules Engine (Sigma + YARA + ATR)</span></h3>
@@ -1008,13 +1011,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 
 <div class="fs">
-<h3><span class="dot" id="l2d"></span> <span data-i18n="l2">Layer 2: Local AI (Private, on your machine)</span></h3>
-<div class="desc" data-i18n="l2desc">Runs AI analysis locally for privacy. Threats that bypass Layer 1 rules are sent to your local model for deeper inspection. No data leaves your machine.</div>
-<div class="fr"><label data-i18n="provider">Provider</label><select id="ai2p"><option value="">-- None --</option><option value="ollama">Ollama</option><option value="lmstudio">LM Studio</option></select></div>
-<div class="fr"><label data-i18n="endpoint">Endpoint</label><input id="ai2e" placeholder="http://localhost:11434"></div>
-<div class="fr"><label data-i18n="model">Model</label><input id="ai2m" placeholder="llama3.2 / deepseek-r1 / qwen2.5"></div>
-<div class="prov-card"><div><div class="prov-name">Ollama</div><div style="font-size:11px;color:var(--tm)">Free, open-source, runs locally</div></div><a class="prov-link" href="https://ollama.com" target="_blank" rel="noopener">ollama.com &rarr;</a></div>
-<div class="prov-card"><div><div class="prov-name">LM Studio</div><div style="font-size:11px;color:var(--tm)">GUI for local models, OpenAI-compatible API</div></div><a class="prov-link" href="https://lmstudio.ai" target="_blank" rel="noopener">lmstudio.ai &rarr;</a></div>
+<h3><span class="dot dot-ok" id="l2d"></span> <span data-i18n="l2">Layer 2: Fingerprint & Heuristic (Local, zero-config)</span></h3>
+<div class="desc" data-i18n="l2desc">Behavioral fingerprinting and heuristic analysis that runs locally. Detects suspicious patterns like permission escalation, unusual file access, and skill drift. Always active, no configuration needed.</div>
+<div style="color:var(--ok);font-size:13px;font-weight:600" data-i18n="active">Active</div>
+<div class="info-box">
+<strong>How it works:</strong><br>
+&bull; <strong>Skill Fingerprinting</strong> &mdash; tracks each skill's behavior baseline and detects drift<br>
+&bull; <strong>Heuristic Analysis</strong> &mdash; flags suspicious patterns (e.g., reading ~/.ssh, injecting prompts, excessive permissions)<br>
+&bull; <strong>ATR Pattern Matching</strong> &mdash; 52 Agent Threat Rules detect known AI agent attack vectors<br><br>
+<span style="color:var(--ok)">No external dependencies. No API keys. No data leaves your machine.</span>
+</div>
 </div>
 
 <div class="fs">
@@ -1151,7 +1157,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="gs"><div class="sn" id="g2n">2</div><div class="sb-body"><div class="sb-title" data-i18n="g2t">Initialize Configuration</div><div class="sb-desc" data-i18n="g2d">Run the interactive setup wizard. It creates your config file, detects your environment, and sets notification preferences.</div><div class="sb-cmd">panguard init</div></div></div>
 <div class="gs"><div class="sn" id="g3n">3</div><div class="sb-body"><div class="sb-title" data-i18n="g3t">Setup MCP Integration</div><div class="sb-desc" data-i18n="g3d">Inject Panguard into your AI coding platforms (Claude Code, Cursor, etc.). This enables real-time skill auditing.</div><div class="sb-cmd">npx panguard setup</div></div></div>
 <div class="gs"><div class="sn done" id="g4n">4</div><div class="sb-body"><div class="sb-title" data-i18n="g4t">Start Guard Engine</div><div class="sb-desc" data-i18n="g4d">Enable 24/7 real-time protection. The guard engine monitors all activity and auto-responds to threats.</div><div class="sb-cmd">panguard guard start --dashboard</div></div></div>
-<div class="gs"><div class="sn" id="g5n">5</div><div class="sb-body"><div class="sb-title" data-i18n="g5t">Configure AI Layers</div><div class="sb-desc" data-i18n="g5d">Set up Layer 2 (local AI) and/or Layer 3 (cloud AI) for deeper threat analysis. Go to the AI Setup tab or use the links below to get your API keys.</div><div class="sb-cmd">Use the "AI Setup" tab above</div><a class="sb-link" href="#" onclick="nav('ai');return false" data-i18n="go_ai">Go to AI Setup &rarr;</a></div></div>
+<div class="gs"><div class="sn" id="g5n">5</div><div class="sb-body"><div class="sb-title" data-i18n="g5t">Configure AI Layers</div><div class="sb-desc" data-i18n="g5d">Layer 2 (fingerprint & heuristic) is already active. Optionally configure Layer 3 (cloud AI) for the deepest threat analysis. Go to the AI Setup tab to add your API key.</div><div class="sb-cmd">Use the "AI Setup" tab above</div><a class="sb-link" href="#" onclick="nav('ai');return false" data-i18n="go_ai">Go to AI Setup &rarr;</a></div></div>
 <div class="gs"><div class="sn" id="g6n">6</div><div class="sb-body"><div class="sb-title" data-i18n="g6t">Protection Active!</div><div class="sb-desc" data-i18n="g6d">Once Guard is running, Panguard continuously monitors your system. Check the Overview tab for real-time status, threat detection, and event history.</div><div id="g6-status" style="margin-top:8px;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600"></div></div></div>
 </div>
 </div>
@@ -1165,7 +1171,7 @@ en:{n_ov:'Overview',n_sk:'Skills & Trust',n_ai:'AI Setup',n_ru:'Rules',n_tc:'Thr
 t_ov:'<em>Overview</em>',t_sk:'<em>Skills & Trust</em>',t_ai:'<em>AI Configuration</em>',t_ru:'<em>Detection Rules</em>',t_tc:'<em>Threat Cloud</em>',t_th:'<em>Threat Intelligence</em>',t_gd:'<em>Getting Started</em>',
 d_ov:'Real-time system status. All metrics update automatically via WebSocket.',
 d_sk:'Panguard audits every MCP skill installed on your system. Safe skills are auto-whitelisted; risky ones are flagged for your review.',
-d_ai:'Panguard uses a 3-layer detection system. Layer 1 (rules) is always active. Layer 2 and 3 use AI models for deep threat analysis. Configure your own API keys below -- keys are stored locally only.',
+d_ai:'Panguard uses a 3-layer detection system. Layer 1 (rules) and Layer 2 (fingerprint & heuristic) are always active with zero config. Layer 3 uses cloud AI for the deepest analysis -- configure your API key below.',
 d_ru:'Panguard uses a 3-layer rule system to detect threats. Rules sync automatically from Threat Cloud every hour. ATR rules are community-driven, auto-drafted by AI from real threat patterns.',
 d_tc:'Threat Cloud is Panguard\\'s anonymous threat intelligence sharing network. Your device can optionally upload anonymized threat data to help the community, and receives updated detection rules in return.',
 d_th:'All detected threats are logged here. Malicious events are auto-blocked. Suspicious events may require your attention.',
@@ -1174,7 +1180,7 @@ mode:'Mode',events:'Events',threats:'Threats',uptime:'Uptime',learning:'Learning
 det_rules:'Detection Rules',skill_sum:'Skill Summary',wl_skills:'Whitelisted',tr_skills:'Tracked',st_fp:'Stable FP',
 total:'Total Installed',wl_count:'Whitelisted',tr_count:'Tracked / Unknown',all_skills:'All Installed Skills',whitelist:'Whitelisted Skills',name:'Name',source:'Source',reason:'Reason',date:'Date',platform:'Platform',trust:'Trust Status',
 l1:'Layer 1: Rules Engine (Sigma + YARA + ATR)',l1d:'Pattern-matching rules that detect known threats instantly. Always active, zero config needed. 3,700+ Sigma rules, 4,300+ YARA signatures, custom ATR.',active:'Active',
-l2:'Layer 2: Local AI (Private, on your machine)',l2desc:'Runs AI analysis locally for privacy. Threats bypassing Layer 1 are sent to your local model. No data leaves your machine.',
+l2:'Layer 2: Fingerprint & Heuristic (Local, zero-config)',l2desc:'Behavioral fingerprinting and heuristic analysis. Detects suspicious patterns like permission escalation, unusual file access, and skill drift. Always active, no config needed.',
 l3:'Layer 3: Cloud AI (Most powerful analysis)',l3desc:'Cloud models for the deepest analysis of complex threats. Only used when Layer 1+2 are inconclusive. Requires your own API key.',
 provider:'Provider',endpoint:'Endpoint',model:'Model',api_key:'API Key',custom_ep:'Custom Endpoint',ep_note:'Use custom endpoint for self-hosted models, API proxies, or enterprise gateways. Leave empty for default.',key_note:'Keys are stored locally in ~/.panguard-guard/config.json and never sent to Panguard servers.',
 save:'Save Configuration',reload:'Reload',
@@ -1193,7 +1199,7 @@ tmap:'Threat Map',verdicts:'Recent Verdicts',src_ip:'Source IP',atk:'Attack Type
 all:'All',malicious:'Malicious',suspicious:'Suspicious',benign_f:'Benign',
 g1t:'Install Panguard',g1d:'Install the Panguard CLI globally.',g2t:'Initialize Configuration',g2d:'Run the interactive setup wizard.',
 g3t:'Setup MCP Integration',g3d:'Inject Panguard into your AI coding platforms.',g4t:'Start Guard Engine',g4d:'Enable 24/7 real-time protection.',
-g5t:'Configure AI Layers',g5d:'Set up Layer 2/3 for deeper threat analysis.',go_ai:'Go to AI Setup &rarr;',
+g5t:'Configure AI Layers',g5d:'Layer 2 is already active. Optionally add Layer 3 (cloud AI) for the deepest analysis.',go_ai:'Go to AI Setup &rarr;',
 g6t:'Protection Active!',g6d:'Guard is running. Check Overview for real-time status.',
 wc_title:'Welcome to <span>Panguard</span>',wc_desc:'Your AI-powered security guard is ready. Panguard provides multi-layer threat detection with real-time monitoring, community-driven intelligence, and zero-config protection.',
 wc_s1t:'Initializing Guard Engine',wc_s1d:'Loading detection rules and security modules...',
@@ -1205,7 +1211,7 @@ zh:{n_ov:'\u7e3d\u89bd',n_sk:'Skills & Trust',n_ai:'AI \u8a2d\u5b9a',n_ru:'Rules
 t_ov:'<em>\u7cfb\u7d71\u7e3d\u89bd</em>',t_sk:'<em>Skills & Trust</em>',t_ai:'<em>AI \u914d\u7f6e</em>',t_ru:'<em>Detection Rules</em>',t_tc:'<em>Threat Cloud</em>',t_th:'<em>Threat Intelligence</em>',t_gd:'<em>Quick Start</em>',
 d_ov:'\u5373\u6642\u7cfb\u7d71\u72c0\u614b\u3002\u6240\u6709\u6307\u6a19\u900f\u904e WebSocket \u81ea\u52d5\u66f4\u65b0\u3002',
 d_sk:'Panguard \u6703\u5be9\u8a08\u60a8\u7cfb\u7d71\u4e0a\u5b89\u88dd\u7684\u6bcf\u500b MCP skill\u3002\u5b89\u5168\u7684 skill \u6703\u81ea\u52d5\u52a0\u5165 whitelist\uff0c\u6709\u98a8\u96aa\u7684\u6703\u6a19\u8a18\u4f9b\u60a8\u5be9\u67e5\u3002',
-d_ai:'Panguard \u4f7f\u7528\u4e09\u5c64\u5075\u6e2c\u7cfb\u7d71\u3002Layer 1 (Rules) \u59cb\u7d42\u6d3b\u8e8d\u3002Layer 2\u30013 \u4f7f\u7528 AI model \u9032\u884c\u6df1\u5ea6\u5a01\u8105\u5206\u6790\u3002\u5728\u4e0b\u65b9\u914d\u7f6e\u60a8\u81ea\u5df1\u7684 API key -- key \u50c5\u5132\u5b58\u5728\u672c\u6a5f\u3002',
+d_ai:'Panguard \u4f7f\u7528\u4e09\u5c64\u5075\u6e2c\u7cfb\u7d71\u3002Layer 1 (Rules) \u548c Layer 2 (Fingerprint & Heuristic) \u59cb\u7d42\u6d3b\u8e8d\uff0c\u96f6\u914d\u7f6e\u3002Layer 3 \u4f7f\u7528 Cloud AI \u9032\u884c\u6700\u6df1\u5ea6\u5206\u6790 -- \u5728\u4e0b\u65b9\u914d\u7f6e API key\u3002',
 d_ru:'Panguard \u4f7f\u7528\u4e09\u5c64 rule \u7cfb\u7d71\u5075\u6e2c\u5a01\u8105\u3002Rules \u6bcf\u5c0f\u6642\u81ea\u52d5\u5f9e Threat Cloud \u540c\u6b65\u3002ATR rules \u7531\u793e\u7fa4\u9a45\u52d5\uff0cAI \u81ea\u52d5\u5f9e\u771f\u5be6\u5a01\u8105\u6a21\u5f0f\u8349\u64ec\u3002',
 d_tc:'Threat Cloud \u662f Panguard \u7684\u533f\u540d\u5a01\u8105\u60c5\u5831\u5171\u4eab\u7db2\u8def\u3002\u60a8\u7684\u88dd\u7f6e\u53ef\u9078\u64c7\u6027\u4e0a\u50b3\u533f\u540d\u5316\u5a01\u8105\u8cc7\u6599\u4ee5\u5e6b\u52a9\u793e\u7fa4\uff0c\u4e26\u63a5\u6536\u66f4\u65b0\u7684 detection rules\u3002',
 d_th:'\u6240\u6709\u5075\u6e2c\u5230\u7684 threats \u90fd\u8a18\u9304\u5728\u6b64\u3002Malicious \u4e8b\u4ef6\u6703\u81ea\u52d5\u5c01\u9396\u3002Suspicious \u4e8b\u4ef6\u53ef\u80fd\u9700\u8981\u60a8\u7684\u6ce8\u610f\u3002',
@@ -1214,7 +1220,7 @@ mode:'Mode',events:'Events',threats:'Threats',uptime:'Uptime',learning:'Learning
 det_rules:'Detection Rules',skill_sum:'Skill Summary',wl_skills:'Whitelisted',tr_skills:'Tracked',st_fp:'Stable FP',
 total:'\u5df2\u5b89\u88dd\u7e3d\u6578',wl_count:'Whitelisted',tr_count:'Tracked / Unknown',all_skills:'\u6240\u6709\u5df2\u5b89\u88dd Skills',whitelist:'Whitelisted Skills',name:'\u540d\u7a31',source:'Source',reason:'Reason',date:'\u65e5\u671f',platform:'Platform',trust:'Trust Status',
 l1:'Layer 1: Rules Engine (Sigma + YARA + ATR)',l1d:'Pattern-matching rules\uff0c\u5373\u6642\u5075\u6e2c\u5df2\u77e5\u5a01\u8105\u3002\u59cb\u7d42\u6d3b\u8e8d\uff0c\u7121\u9700\u914d\u7f6e\u3002\u5305\u542b 3,700+ Sigma rules\u30014,300+ YARA signatures\u3001\u81ea\u8a02 ATR\u3002',active:'Active',
-l2:'Layer 2: Local AI\uff08\u79c1\u5bc6\uff0c\u5728\u60a8\u7684\u6a5f\u5668\u4e0a\uff09',l2desc:'\u5728\u672c\u5730\u57f7\u884c AI \u5206\u6790\u4ee5\u4fdd\u8b77\u96b1\u79c1\u3002\u7e5e\u904e Layer 1 \u7684\u5a01\u8105\u6703\u767c\u9001\u5230\u60a8\u7684\u672c\u5730 model\u3002\u6c92\u6709\u8cc7\u6599\u96e2\u958b\u60a8\u7684\u6a5f\u5668\u3002',
+l2:'Layer 2: Fingerprint & Heuristic\uff08\u672c\u5730\uff0c\u96f6\u914d\u7f6e\uff09',l2desc:'\u884c\u70ba\u6307\u7d0b\u8207\u555f\u767c\u5f0f\u5206\u6790\u3002\u5075\u6e2c\u53ef\u7591\u6a21\u5f0f\u5982\u6b0a\u9650\u63d0\u5347\u3001\u7570\u5e38\u6a94\u6848\u5b58\u53d6\u3001skill \u884c\u70ba\u504f\u79fb\u3002\u59cb\u7d42\u6d3b\u8e8d\uff0c\u7121\u9700\u914d\u7f6e\u3002',
 l3:'Layer 3: Cloud AI\uff08\u6700\u5f37\u5206\u6790\uff09',l3desc:'Cloud model \u63d0\u4f9b\u6700\u6df1\u5165\u7684\u5206\u6790\u3002\u50c5\u5728 Layer 1+2 \u7121\u6cd5\u5224\u5b9a\u6642\u4f7f\u7528\u3002\u9700\u8981\u60a8\u81ea\u5df1\u7684 API key\u3002',
 provider:'Provider',endpoint:'Endpoint',model:'Model',api_key:'API Key',custom_ep:'Custom Endpoint',ep_note:'\u7528\u65bc\u81ea\u67b6 model\u3001API proxy \u6216\u4f01\u696d gateway\u3002\u7559\u7a7a\u5373\u4f7f\u7528\u9810\u8a2d endpoint\u3002',key_note:'Key \u5132\u5b58\u5728\u672c\u6a5f ~/.panguard-guard/config.json\uff0c\u7d55\u4e0d\u6703\u50b3\u9001\u5230 Panguard server\u3002',
 save:'\u5132\u5b58\u914d\u7f6e',reload:'\u91cd\u65b0\u8f09\u5165',
@@ -1233,7 +1239,7 @@ tmap:'Threat Map',verdicts:'Recent Verdicts',src_ip:'Source IP',atk:'Attack Type
 all:'\u5168\u90e8',malicious:'Malicious',suspicious:'Suspicious',benign_f:'Benign',
 g1t:'\u5b89\u88dd Panguard',g1d:'\u5168\u57df\u5b89\u88dd Panguard CLI\u3002',g2t:'\u521d\u59cb\u5316\u914d\u7f6e',g2d:'\u57f7\u884c interactive setup wizard\u3002',
 g3t:'\u8a2d\u5b9a MCP Integration',g3d:'\u5c07 Panguard \u6ce8\u5165\u60a8\u7684 AI \u7de8\u7a0b\u5e73\u53f0\u3002',g4t:'\u555f\u52d5 Guard Engine',g4d:'\u555f\u7528 24/7 \u5373\u6642\u9632\u8b77\u3002',
-g5t:'\u914d\u7f6e AI Layers',g5d:'\u8a2d\u5b9a Layer 2/3 AI \u9032\u884c\u6df1\u5ea6\u5a01\u8105\u5206\u6790\u3002',go_ai:'\u524d\u5f80 AI \u8a2d\u5b9a &rarr;',
+g5t:'\u914d\u7f6e AI Layers',g5d:'Layer 2 \u5df2\u6d3b\u8e8d\u3002\u53ef\u9078\u914d\u7f6e Layer 3 (Cloud AI) \u9032\u884c\u6700\u6df1\u5ea6\u5206\u6790\u3002',go_ai:'\u524d\u5f80 AI \u8a2d\u5b9a &rarr;',
 g6t:'Protection Active!',g6d:'Guard \u904b\u884c\u4e2d\u3002\u5728 Overview \u9801\u67e5\u770b\u5373\u6642\u72c0\u614b\u3002',
 wc_title:'\u6b61\u8fce\u4f86\u5230 <span>Panguard</span>',wc_desc:'\u60a8\u7684 AI \u5b89\u5168\u5b88\u8b77\u5df2\u5c31\u7dd2\u3002Panguard \u63d0\u4f9b\u591a\u5c64\u5a01\u8105\u5075\u6e2c\u3001\u5373\u6642\u76e3\u63a7\u3001\u793e\u7fa4\u60c5\u5831\u548c\u96f6\u914d\u7f6e\u9632\u8b77\u3002',
 wc_s1t:'\u521d\u59cb\u5316 Guard Engine',wc_s1d:'\u8f09\u5165 detection rules \u548c\u5b89\u5168\u6a21\u7d44...',

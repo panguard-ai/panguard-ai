@@ -28,16 +28,12 @@ const notoSansTC = Noto_Sans_TC({
   display: 'swap',
 });
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ locale: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
 
-  const {
-    locale
-  } = params;
+  const { locale } = params;
 
   const t = await getTranslations({ locale, namespace: 'metadata.home' });
 
@@ -153,13 +149,9 @@ export default async function LocaleLayout(
 ) {
   const params = await props.params;
 
-  const {
-    locale
-  } = params;
+  const { locale } = params;
 
-  const {
-    children
-  } = props;
+  const { children } = props;
 
   if (!locales.includes(locale as (typeof locales)[number])) {
     notFound();

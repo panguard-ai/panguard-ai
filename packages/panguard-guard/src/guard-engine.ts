@@ -680,8 +680,11 @@ export class GuardEngine {
       try {
         const { execFile } = await import('node:child_process');
         const openCmd =
-          process.platform === 'darwin' ? 'open' :
-          process.platform === 'win32' ? 'start' : 'xdg-open';
+          process.platform === 'darwin'
+            ? 'open'
+            : process.platform === 'win32'
+              ? 'start'
+              : 'xdg-open';
         execFile(openCmd, [dashUrl]);
       } catch {
         // Non-fatal: browser open is best-effort
@@ -1249,13 +1252,17 @@ export class GuardEngine {
 
       // Report locally whitelisted skills to Threat Cloud / 上報本地白名單 skills
       try {
-        const localSkills = this.atrEngine.getWhitelistManager().getAll()
+        const localSkills = this.atrEngine
+          .getWhitelistManager()
+          .getAll()
           .filter((s) => s.source === 'fingerprint' || s.source === 'manual');
         for (const skill of localSkills) {
           await this.threatCloud.reportSafeSkill(skill.name, skill.fingerprintHash);
         }
       } catch (err: unknown) {
-        logger.warn(`Skill whitelist upload failed: ${err instanceof Error ? err.message : String(err)}`);
+        logger.warn(
+          `Skill whitelist upload failed: ${err instanceof Error ? err.message : String(err)}`
+        );
       }
 
       // Sync community skill whitelist / 同步社群 skill 白名單
@@ -1263,12 +1270,14 @@ export class GuardEngine {
       try {
         const communitySkills = await this.threatCloud.fetchSkillWhitelist();
         if (communitySkills.length > 0) {
-          importedSkills = this.atrEngine.getWhitelistManager().importCommunityWhitelist(
-            communitySkills.map((s) => ({ name: s.name, hash: s.hash }))
-          );
+          importedSkills = this.atrEngine
+            .getWhitelistManager()
+            .importCommunityWhitelist(communitySkills.map((s) => ({ name: s.name, hash: s.hash })));
         }
       } catch (err: unknown) {
-        logger.warn(`Skill whitelist sync failed: ${err instanceof Error ? err.message : String(err)}`);
+        logger.warn(
+          `Skill whitelist sync failed: ${err instanceof Error ? err.message : String(err)}`
+        );
       }
 
       // Sync community skill blacklist / 同步社群 skill 黑名單
@@ -1290,7 +1299,9 @@ export class GuardEngine {
           );
         }
       } catch (err: unknown) {
-        logger.warn(`Skill blacklist sync failed: ${err instanceof Error ? err.message : String(err)}`);
+        logger.warn(
+          `Skill blacklist sync failed: ${err instanceof Error ? err.message : String(err)}`
+        );
       }
 
       logger.info(

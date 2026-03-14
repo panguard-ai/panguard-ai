@@ -46,15 +46,22 @@ describe('Installer E2E', { timeout: TIMEOUT }, () => {
         // The installer should report success
         expect(result).toContain('Installation complete');
 
-        // Either binary install (.panguard/bin/) or source build (.panguard/source/) should exist
+        // npm-first strategy: npm global install, binary install, or source build
+        const hasNpmInstall = result.includes('installed via npm');
         const hasBinaryInstall = existsSync(join(fakeHome, '.panguard', 'bin'));
         const hasSourceBuild = existsSync(join(fakeHome, '.panguard', 'source'));
-        expect(hasBinaryInstall || hasSourceBuild).toBe(true);
+        expect(hasNpmInstall || hasBinaryInstall || hasSourceBuild).toBe(true);
       },
       TIMEOUT
     );
 
     it('should have a working panguard binary after install', () => {
+      // npm global install: panguard is in PATH
+      const npmGlobalBin = execSync('command -v panguard 2>/dev/null || true', {
+        env: { ...process.env, HOME: fakeHome },
+        encoding: 'utf-8',
+        timeout: 10_000,
+      }).trim();
       // Binary download path: .panguard/bin/panguard
       const binaryBinPath = join(fakeHome, '.panguard', 'bin', 'panguard');
       // Source build path: .panguard/source/bin/panguard
@@ -75,20 +82,30 @@ describe('Installer E2E', { timeout: TIMEOUT }, () => {
         'index.js'
       );
 
+      const hasNpmGlobal = npmGlobalBin.length > 0;
       const hasBinary =
         existsSync(binaryBinPath) || existsSync(sourceBinPath) || existsSync(localBinPath);
       const hasCli = existsSync(binaryCli) || existsSync(sourceCli);
-      expect(hasBinary || hasCli).toBe(true);
+      expect(hasNpmGlobal || hasBinary || hasCli).toBe(true);
 
       // Try running --version via whichever CLI entry exists
-      const cliEntry = existsSync(binaryCli) ? binaryCli : sourceCli;
-      if (existsSync(cliEntry)) {
-        const version = execSync(`node "${cliEntry}" --version 2>&1 || true`, {
+      if (hasNpmGlobal) {
+        const version = execSync('panguard --version 2>&1 || true', {
           env: { ...process.env, HOME: fakeHome },
           encoding: 'utf-8',
           timeout: 30_000,
         });
         expect(version.trim()).toMatch(/\d+\.\d+/);
+      } else {
+        const cliEntry = existsSync(binaryCli) ? binaryCli : sourceCli;
+        if (existsSync(cliEntry)) {
+          const version = execSync(`node "${cliEntry}" --version 2>&1 || true`, {
+            env: { ...process.env, HOME: fakeHome },
+            encoding: 'utf-8',
+            timeout: 30_000,
+          });
+          expect(version.trim()).toMatch(/\d+\.\d+/);
+        }
       }
     }, 30_000);
   });
