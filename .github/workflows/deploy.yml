@@ -56,7 +56,7 @@ jobs:
       - name: Install Vercel CLI
         run: npm i -g vercel@latest
       - name: Deploy to Vercel (remote build)
-        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
 
   # Build and push Docker image for backend
   deploy-backend:
