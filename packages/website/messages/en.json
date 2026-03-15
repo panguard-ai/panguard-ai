@@ -738,7 +738,8 @@
       "hideFindings": "Hide findings",
       "ctaText": "Want real-time protection for all your AI agents?",
       "learnMore": "Learn more",
-      "trustNote": "Scans run server-side. No code is stored. Only content hash is cached for deduplication."
+      "trustNote": "Scans run server-side. No code is stored. Only content hash is cached for deduplication.",
+      "submitATR": "Submit ATR Rule Proposal"
     }
   },
   "pricing": {
@@ -4962,6 +4963,18 @@
     "productManager": {
       "title": "Panguard Manager",
       "description": "Central orchestration for distributed Guard agents. Manage endpoints from a single interface."
+    },
+    "whitelist": {
+      "title": "Community Whitelist -- Panguard AI",
+      "description": "Community-verified safe AI skills and MCP servers. 1,266 clean skills out of 1,295 scanned. 97.7% trust score."
+    },
+    "blacklist": {
+      "title": "Threat Registry -- Panguard AI",
+      "description": "Known dangerous AI skills flagged by community scanning. 26 malicious skills detected across critical and high severity."
+    },
+    "skillScan": {
+      "title": "Scan AI Skills | Panguard AI",
+      "description": "Scan any AI skill or MCP server for security threats. Paste a GitHub URL and get instant results. No installation required."
     }
   },
   "notFound": {
@@ -5997,5 +6010,50 @@
       "github": "GitHub Repository",
       "contact": "Contact Us"
     }
+  },
+  "whitelistPage": {
+    "overline": "COMMUNITY WHITELIST",
+    "title": "Community Whitelist",
+    "subtitle": "Verified safe skills from community scanning",
+    "stats": {
+      "totalScanned": "Total Scanned",
+      "safeSkills": "Safe Skills",
+      "trustScore": "Trust Score"
+    },
+    "howItWorks": {
+      "title": "How the Whitelist Works",
+      "description": "A skill is added to the whitelist when it receives 3 or more independent scans with a clean result. This ensures no single scan can whitelist a skill -- community consensus is required.",
+      "step1": "3+ independent scans required",
+      "step2": "All scans must return clean (risk score below 30)",
+      "step3": "Continuous monitoring -- removal on any new finding"
+    },
+    "cta": "Scan your skill to get on the whitelist",
+    "ctaBtn": "Scan Now"
+  },
+  "blacklistPage": {
+    "overline": "THREAT REGISTRY",
+    "title": "Threat Registry",
+    "subtitle": "Skills flagged by community scanning",
+    "stats": {
+      "maliciousFound": "Malicious Found",
+      "critical": "Critical Severity",
+      "high": "High Severity"
+    },
+    "howItWorks": {
+      "title": "How the Blacklist Works",
+      "description": "A skill is blacklisted when it receives 3 or more independent reports with an average risk score of 70 or above. Blacklisted skills trigger automatic blocking in Panguard Guard.",
+      "step1": "3+ independent reports required",
+      "step2": "Average risk score must be 70 or above",
+      "step3": "Auto-blocked by Panguard Guard on all protected endpoints"
+    },
+    "severity": {
+      "title": "Severity Breakdown",
+      "critical": "Critical",
+      "criticalDesc": "Remote code execution, data exfiltration, credential theft",
+      "high": "High",
+      "highDesc": "Privilege escalation, unauthorized network access, prompt injection"
+    },
+    "ctaInstall": "Install Panguard to auto-block these threats",
+    "ctaReport": "Report a malicious skill"
   }
 }

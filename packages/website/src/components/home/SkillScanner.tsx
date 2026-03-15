@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Link } from '@/navigation';
 import { ShieldIcon, ScanIcon } from '@/components/ui/BrandIcons';
 
@@ -271,6 +271,30 @@ export default function SkillScanner() {
                       </motion.div>
                     )}
                   </AnimatePresence>
+                </div>
+              )}
+
+              {/* ATR Proposal */}
+              {(report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') && (
+                <div className="px-5 py-3 border-t border-border bg-red-400/5 text-center">
+                  <a
+                    href={`https://github.com/Agent-Threat-Rule/agent-threat-rules/issues/new?title=${encodeURIComponent(`[ATR Proposal] ${report.skillName ?? 'Unknown Skill'} — Risk ${report.riskScore}`)}&body=${encodeURIComponent(
+                      `## Skill\n\n- **Name**: ${report.skillName ?? 'Unknown'}\n- **Risk Score**: ${report.riskScore}/100\n- **Risk Level**: ${report.riskLevel}\n\n## Top Findings\n\n${report.findings
+                        .slice(0, 5)
+                        .map(
+                          (f) => `- **[${f.severity.toUpperCase()}]** ${f.title}: ${f.description}`
+                        )
+                        .join(
+                          '\n'
+                        )}\n\n## Proposed ATR Rule\n\n_Describe the detection logic you propose..._\n`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    {t('submitATR')}
+                  </a>
                 </div>
               )}
 
