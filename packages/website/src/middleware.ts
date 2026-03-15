@@ -31,9 +31,20 @@ function buildCspHeader(nonce: string): string {
   return directives.join('; ');
 }
 
-function applyNonceHeaders(response: NextResponse, nonce: string): NextResponse {
+function applySecurityHeaders(response: NextResponse, nonce: string): NextResponse {
   response.headers.set('x-nonce', nonce);
   response.headers.set('Content-Security-Policy', buildCspHeader(nonce));
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=()'
+  );
+  response.headers.set(
+    'Strict-Transport-Security',
+    'max-age=31536000; includeSubDomains; preload'
+  );
   return response;
 }
 
@@ -44,7 +55,6 @@ export function middleware(request: NextRequest) {
 
   // get.panguard.ai → serve install script via API route
   if (host.startsWith('get.')) {
-    // Strip any locale prefix that next-intl matcher may have added
     const cleanPath = pathname.replace(/^\/(en|zh)/, '') || '/';
     if (cleanPath === '/windows' || cleanPath === '/win' || cleanPath === '/install.ps1') {
       return NextResponse.rewrite(new URL('/api/install/windows', request.url));
@@ -60,15 +70,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(target, 301);
   }
 
-  // Set nonce in request headers so Server Components can read it
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
+  // Run next-intl middleware for locale routing (handles / → /en, /zh, etc.)
+  const response = intlMiddleware(request);
 
-  const response = NextResponse.next({
-    request: { headers: requestHeaders },
-  });
-
-  return applyNonceHeaders(response, nonce);
+  // Apply security headers (nonce + CSP) to the response
+  return applySecurityHeaders(response, nonce);
 }
 
 export const config = {
