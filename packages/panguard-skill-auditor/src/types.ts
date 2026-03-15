@@ -89,6 +89,8 @@ export interface AuditOptions {
   skipAI?: boolean;
   /** Skip ATR pattern detection */
   skipATR?: boolean;
+  /** Additional ATR rules fetched from Threat Cloud (parsed ATRRule objects) */
+  cloudRules?: Array<{ id: string; title: string; detection: unknown; [key: string]: unknown }>;
 }
 
 /** Complete audit report */

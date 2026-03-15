@@ -200,14 +200,14 @@ export class ThreatCloudDB {
       if (source === 'yara') {
         // YARA rules: extract from meta section
         const metaMatch = ruleContent.match(/meta\s*:\s*([\s\S]*?)(?:strings|condition)\s*:/);
-        if (metaMatch) {
+        if (metaMatch && metaMatch[1]) {
           const meta = metaMatch[1];
           const catMatch = meta.match(/category\s*=\s*"([^"]+)"/);
-          if (catMatch) category = catMatch[1].toLowerCase();
+          if (catMatch?.[1]) category = catMatch[1].toLowerCase();
           const sevMatch = meta.match(/severity\s*=\s*"([^"]+)"/);
-          if (sevMatch) severity = sevMatch[1].toLowerCase();
+          if (sevMatch?.[1]) severity = sevMatch[1].toLowerCase();
           const mitreMatch = meta.match(/mitre_att(?:ack|&ck)\s*=\s*"([^"]+)"/i);
-          if (mitreMatch) mitreTechniques = mitreMatch[1];
+          if (mitreMatch?.[1]) mitreTechniques = mitreMatch[1];
         }
         // Fallback: infer category from rule content keywords
         if (category === 'unknown') {
@@ -222,11 +222,11 @@ export class ThreatCloudDB {
         // Sigma / ATR: YAML-based extraction
         // Extract level/severity
         const sevMatch = ruleContent.match(/(?:^|\n)\s*(?:level|severity)\s*:\s*(\w+)/);
-        if (sevMatch) severity = sevMatch[1].toLowerCase();
+        if (sevMatch?.[1]) severity = sevMatch[1].toLowerCase();
 
         // Extract tags list
         const tagMatch = ruleContent.match(/(?:^|\n)\s*tags\s*:\s*\n((?:\s+-\s*.+\n?)+)/);
-        if (tagMatch) {
+        if (tagMatch?.[1]) {
           const tagLines = tagMatch[1].match(/-\s*(.+)/g) ?? [];
           const tagList = tagLines.map((t) => t.replace(/^-\s*/, '').trim());
           tags = tagList.join(',');
@@ -306,13 +306,13 @@ export class ThreatCloudDB {
           const lsCatMatch = ruleContent.match(
             /(?:^|\n)\s*logsource\s*:\s*\n(?:\s+\w+\s*:.+\n)*?\s+category\s*:\s*(\S+)/
           );
-          if (lsCatMatch) {
+          if (lsCatMatch?.[1]) {
             category = lsCatMatch[1].toLowerCase();
           } else {
             const lsProdMatch = ruleContent.match(
               /(?:^|\n)\s*logsource\s*:\s*\n(?:\s+\w+\s*:.+\n)*?\s+product\s*:\s*(\S+)/
             );
-            if (lsProdMatch) category = lsProdMatch[1].toLowerCase();
+            if (lsProdMatch?.[1]) category = lsProdMatch[1].toLowerCase();
           }
         }
       }

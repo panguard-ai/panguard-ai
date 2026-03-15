@@ -129,6 +129,7 @@ function matchesToFindings(matches: readonly ATRMatch[]): AuditFinding[] {
  */
 export async function checkWithATR(
   manifest: SkillManifest,
+  cloudRules?: Array<{ id: string; title: string; detection: unknown; [key: string]: unknown }>,
 ): Promise<CheckResult> {
   // Dynamic import — gracefully handle missing dependency
   let ATREngine: typeof ATREngineType;
@@ -146,7 +147,19 @@ export async function checkWithATR(
   try {
     const rulesDir = resolveRulesDir();
     const engine = new ATREngine({ rulesDir });
-    const ruleCount = await engine.loadRules();
+    let ruleCount = await engine.loadRules();
+
+    // Inject cloud rules from Threat Cloud (flywheel: community rules enhance audits)
+    if (cloudRules && cloudRules.length > 0) {
+      for (const rule of cloudRules) {
+        try {
+          engine.addRule(rule as unknown as import('@panguard-ai/atr').ATRRule);
+          ruleCount++;
+        } catch {
+          // Skip invalid cloud rules silently
+        }
+      }
+    }
 
     if (ruleCount === 0) {
       return {
