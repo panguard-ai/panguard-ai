@@ -226,11 +226,21 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
   logger.info('GuardEngine initialized / GuardEngine 已初始化');
 
   return {
-    ruleEngine, yaraScanner, atrEngine,
-    detectAgent, analyzeAgent, respondAgent, reportAgent,
-    investigationEngine, threatCloud, feedManager,
-    smartRouter, knowledgeDistiller, atrDrafter,
-    baseline, baselinePath,
+    ruleEngine,
+    yaraScanner,
+    atrEngine,
+    detectAgent,
+    analyzeAgent,
+    respondAgent,
+    reportAgent,
+    investigationEngine,
+    threatCloud,
+    feedManager,
+    smartRouter,
+    knowledgeDistiller,
+    atrDrafter,
+    baseline,
+    baselinePath,
     license: { tier: license.tier, isValid: license.isValid },
   };
 }
@@ -339,9 +349,7 @@ export async function loadAllRules(
         logger.info(`YARA rules loaded: ${count} rules / YARA 規則已載入: ${count} 條`);
       })
       .catch((err: unknown) => {
-        logger.warn(
-          `YARA rules load failed: ${err instanceof Error ? err.message : String(err)}`
-        );
+        logger.warn(`YARA rules load failed: ${err instanceof Error ? err.message : String(err)}`);
       });
   }
 }

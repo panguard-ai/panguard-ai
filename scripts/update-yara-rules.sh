@@ -22,7 +22,7 @@ TARGET_DIR="$(cd "$(dirname "$0")/.." && pwd)/config/yara-rules/community"
 TEMP_BASE="/tmp/panguard-yara-community"
 
 # MIT/BSD/Apache-compatible YARA rule repositories (bash 3 compatible)
-REPO_NAMES="reversinglabs jpcert bartblaze inquest eset trellix chronicle mandiant ditekshen volexity withsecure loldrivers intezer"
+REPO_NAMES="reversinglabs jpcert bartblaze inquest eset trellix chronicle mandiant ditekshen volexity withsecure loldrivers intezer baderj albertzsigovits barrosleo"
 
 repo_url() {
   case "$1" in
@@ -39,6 +39,9 @@ repo_url() {
     withsecure)    echo "https://github.com/WithSecureLabs/iocs.git" ;;
     loldrivers)    echo "https://github.com/magicsword-io/LOLDrivers.git" ;;
     intezer)       echo "https://github.com/intezer/yara-rules.git" ;;
+    baderj)        echo "https://github.com/baderj/yara.git" ;;
+    albertzsigovits) echo "https://github.com/albertzsigovits/malware-yara.git" ;;
+    barrosleo)     echo "https://github.com/Barrosleo/Yara-Rules-Library.git" ;;
   esac
 }
 
@@ -57,6 +60,9 @@ repo_license() {
     withsecure)    echo "BSD-2-Clause" ;;
     loldrivers)    echo "Apache-2.0" ;;
     intezer)       echo "MIT" ;;
+    baderj)        echo "MIT" ;;
+    albertzsigovits) echo "MIT" ;;
+    barrosleo)     echo "MIT" ;;
   esac
 }
 

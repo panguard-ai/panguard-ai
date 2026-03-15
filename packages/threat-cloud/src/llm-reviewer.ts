@@ -315,7 +315,7 @@ REMEMBER: Output "NO_THREATS_FOUND" for 90%+ of skills. Only flag genuinely susp
 
       const toolSummary = skill.tools
         .slice(0, 30) // Limit to avoid token overflow
-        .map(t => `- ${t.name}: ${t.description}`)
+        .map((t) => `- ${t.name}: ${t.description}`)
         .join('\n');
 
       const userMessage = `Analyze these MCP tools from "${skill.package}" for threats that regex scanning missed:\n\n${toolSummary}`;
@@ -326,14 +326,24 @@ REMEMBER: Output "NO_THREATS_FOUND" for 90%+ of skills. Only flag genuinely susp
         );
 
         if (responseText.includes('NO_THREATS_FOUND')) {
-          results.push({ package: skill.package, threatsFound: false, proposals: [], status: 'success' });
+          results.push({
+            package: skill.package,
+            threatsFound: false,
+            proposals: [],
+            status: 'success',
+          });
           continue;
         }
 
         // Extract YAML blocks
         const yamlBlocks = responseText.match(/```yaml\n([\s\S]*?)```/g);
         if (!yamlBlocks || yamlBlocks.length === 0) {
-          results.push({ package: skill.package, threatsFound: false, proposals: [], status: 'success' });
+          results.push({
+            package: skill.package,
+            threatsFound: false,
+            proposals: [],
+            status: 'success',
+          });
           continue;
         }
 
@@ -341,7 +351,10 @@ REMEMBER: Output "NO_THREATS_FOUND" for 90%+ of skills. Only flag genuinely susp
         const { createHash } = await import('node:crypto');
 
         for (const block of yamlBlocks) {
-          const ruleContent = block.replace(/```yaml\n?/, '').replace(/```$/, '').trim();
+          const ruleContent = block
+            .replace(/```yaml\n?/, '')
+            .replace(/```$/, '')
+            .trim();
 
           // Validate: must have required ATR fields
           if (!ruleContent.includes('title:') || !ruleContent.includes('detection:')) continue;
@@ -390,9 +403,7 @@ REMEMBER: Output "NO_THREATS_FOUND" for 90%+ of skills. Only flag genuinely susp
         });
       } catch (err: unknown) {
         const errorReason = err instanceof Error ? err.message : String(err);
-        console.error(
-          `LLM analysis error for skill "${skill.package}": ${errorReason}`
-        );
+        console.error(`LLM analysis error for skill "${skill.package}": ${errorReason}`);
         results.push({
           package: skill.package,
           threatsFound: false,
@@ -449,9 +460,7 @@ REMEMBER: Output "NO_THREATS_FOUND" for 90%+ of skills. Only flag genuinely susp
 
       return { approved, falsePositiveRisk, coverageScore, reasoning };
     } catch (err: unknown) {
-      console.warn(
-        `LLM verdict parse error: ${err instanceof Error ? err.message : String(err)}`
-      );
+      console.warn(`LLM verdict parse error: ${err instanceof Error ? err.message : String(err)}`);
       return defaultVerdict;
     }
   }

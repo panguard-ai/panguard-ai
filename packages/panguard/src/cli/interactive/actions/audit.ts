@@ -27,8 +27,17 @@ export async function actionAudit(lang: Lang): Promise<void> {
   console.log('');
 
   const pathItems: MenuItem[] = [
-    { key: '1', label: lang === 'zh-TW' ? '\u5BE9\u8A08\u7576\u524D\u76EE\u9304 (.)' : 'Audit current directory (.)' },
-    { key: '2', label: lang === 'zh-TW' ? '\u8F38\u5165\u81EA\u5B9A\u8DEF\u5F91' : 'Enter custom path' },
+    {
+      key: '1',
+      label:
+        lang === 'zh-TW'
+          ? '\u5BE9\u8A08\u7576\u524D\u76EE\u9304 (.)'
+          : 'Audit current directory (.)',
+    },
+    {
+      key: '2',
+      label: lang === 'zh-TW' ? '\u8F38\u5165\u81EA\u5B9A\u8DEF\u5F91' : 'Enter custom path',
+    },
   ];
 
   renderCompactMenu(lang === 'zh-TW' ? '\u9078\u64C7\u76EE\u6A19' : 'Select target', pathItems);
@@ -88,13 +97,21 @@ export async function actionAudit(lang: Lang): Promise<void> {
 
     for (const check of report.checks) {
       const icon =
-        check.status === 'pass' ? c.safe('\u2713')
-          : check.status === 'fail' ? c.critical('\u2717')
-            : check.status === 'warn' ? c.caution('~') : c.dim('i');
+        check.status === 'pass'
+          ? c.safe('\u2713')
+          : check.status === 'fail'
+            ? c.critical('\u2717')
+            : check.status === 'warn'
+              ? c.caution('~')
+              : c.dim('i');
       const statusLabel =
-        check.status === 'pass' ? 'PASS'
-          : check.status === 'fail' ? 'FAIL'
-            : check.status === 'warn' ? 'WARN' : 'INFO';
+        check.status === 'pass'
+          ? 'PASS'
+          : check.status === 'fail'
+            ? 'FAIL'
+            : check.status === 'warn'
+              ? 'WARN'
+              : 'INFO';
       console.log(`  ${icon} [${statusLabel}] ${check.label}`);
     }
 
@@ -111,7 +128,11 @@ export async function actionAudit(lang: Lang): Promise<void> {
       console.log('');
       for (const finding of report.findings) {
         const sevColor =
-          finding.severity === 'critical' ? c.critical : finding.severity === 'high' ? c.caution : c.dim;
+          finding.severity === 'critical'
+            ? c.critical
+            : finding.severity === 'high'
+              ? c.caution
+              : c.dim;
         console.log(`  ${sevColor(`[${finding.severity.toUpperCase()}]`)} ${finding.title}`);
         console.log(`    ${c.dim(finding.description)}`);
         if (finding.location) console.log(`    ${c.dim(`at ${finding.location}`)}`);
@@ -154,7 +175,11 @@ export async function actionAudit(lang: Lang): Promise<void> {
       );
       console.log('');
       console.log(
-        c.dim(lang === 'zh-TW' ? '  \u5E38\u898B\u6280\u80FD\u4F4D\u7F6E\uFF1A' : '  Common skill locations:')
+        c.dim(
+          lang === 'zh-TW'
+            ? '  \u5E38\u898B\u6280\u80FD\u4F4D\u7F6E\uFF1A'
+            : '  Common skill locations:'
+        )
       );
       console.log(c.dim('    ~/.claude/skills/'));
       console.log(c.dim('    ./.claude/skills/'));
@@ -231,7 +256,9 @@ export async function actionAudit(lang: Lang): Promise<void> {
         formatError(
           errMsg,
           lang === 'zh-TW' ? '\u6280\u80FD\u5BE9\u8A08' : 'Skill Auditor',
-          lang === 'zh-TW' ? '\u8ACB\u91CD\u8A66\u6216\u6AA2\u67E5\u65E5\u8A8C' : 'Please retry or check logs'
+          lang === 'zh-TW'
+            ? '\u8ACB\u91CD\u8A66\u6216\u6AA2\u67E5\u65E5\u8A8C'
+            : 'Please retry or check logs'
         )
       );
     }

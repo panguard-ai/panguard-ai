@@ -261,9 +261,7 @@ describe('GitWatcher', () => {
 
       await watcher.analyzeLatestCommit();
 
-      const secretEvents = events.filter(
-        (e) => e.metadata['trigger'] === 'secret_in_commit'
-      );
+      const secretEvents = events.filter((e) => e.metadata['trigger'] === 'secret_in_commit');
       expect(secretEvents.length).toBeGreaterThanOrEqual(1);
       expect(secretEvents[0]!.metadata['patternId']).toBe('aws-key');
     });
@@ -280,9 +278,7 @@ describe('GitWatcher', () => {
 
       await watcher.analyzeLatestCommit();
 
-      const branchEvents = events.filter(
-        (e) => e.metadata['trigger'] === 'direct_main_commit'
-      );
+      const branchEvents = events.filter((e) => e.metadata['trigger'] === 'direct_main_commit');
       // This should fire on main/master default branch
       expect(branchEvents.length).toBeGreaterThanOrEqual(1);
       expect(branchEvents[0]!.severity).toBe('medium');
@@ -329,9 +325,7 @@ describe('GitWatcher', () => {
       await watcher.analyzeLatestCommit();
 
       // Both commits are to main, so we expect at least one direct_main_commit event
-      const mainEvents = events.filter(
-        (e) => e.metadata['trigger'] === 'direct_main_commit'
-      );
+      const mainEvents = events.filter((e) => e.metadata['trigger'] === 'direct_main_commit');
       expect(mainEvents.length).toBeGreaterThanOrEqual(1);
     });
   });

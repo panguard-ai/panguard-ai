@@ -36,12 +36,14 @@ Result: User D installs the same skill
 ## Why No Voting?
 
 Voting requires:
+
 - UI for users to review threats (complex)
 - Users with expertise to judge (rare)
 - Enough active voters for quorum (chicken-and-egg)
 - Anti-gaming measures (bot prevention)
 
 Automatic consensus requires:
+
 - N >= 3 independent reports with same pattern hash
 - LLM review for quality gate
 - That's it.
@@ -52,25 +54,25 @@ and not susceptible to social engineering.
 
 ## Thresholds
 
-| Threshold | Value | Configurable |
-|-----------|-------|-------------|
-| Confirmations to auto-confirm | 3 | DB constant |
-| Promotion cycle interval | 15 min | `PROMOTION_INTERVAL_MS` |
-| Guard sync interval | 1 hour | `syncThreatCloud()` |
-| LLM review required for promotion | Yes | `llm_review_verdict IS NOT NULL` |
-| LLM must approve | Yes | `verdict.approved === true` |
+| Threshold                         | Value  | Configurable                     |
+| --------------------------------- | ------ | -------------------------------- |
+| Confirmations to auto-confirm     | 3      | DB constant                      |
+| Promotion cycle interval          | 15 min | `PROMOTION_INTERVAL_MS`          |
+| Guard sync interval               | 1 hour | `syncThreatCloud()`              |
+| LLM review required for promotion | Yes    | `llm_review_verdict IS NOT NULL` |
+| LLM must approve                  | Yes    | `verdict.approved === true`      |
 
 ## What Each Component Does
 
-| Component | Role |
-|-----------|------|
-| Skill Auditor | Scans locally, reports findings |
-| Threat Cloud API | Aggregates reports, counts confirmations |
-| LLM Reviewer | Quality gate — prevents bad rules from promoting |
-| Promotion cron | Converts confirmed+approved proposals to rules |
-| Guard sync | Distributes new rules to all users |
-| Skill Whitelist | Safe skills confirmed by 3+ reports |
-| Skill Blacklist | Dangerous skills aggregated from reports |
+| Component        | Role                                             |
+| ---------------- | ------------------------------------------------ |
+| Skill Auditor    | Scans locally, reports findings                  |
+| Threat Cloud API | Aggregates reports, counts confirmations         |
+| LLM Reviewer     | Quality gate — prevents bad rules from promoting |
+| Promotion cron   | Converts confirmed+approved proposals to rules   |
+| Guard sync       | Distributes new rules to all users               |
+| Skill Whitelist  | Safe skills confirmed by 3+ reports              |
+| Skill Blacklist  | Dangerous skills aggregated from reports         |
 
 ## Privacy
 

@@ -71,7 +71,7 @@ function buildLlmInputEvent(content: string, toolName?: string): AgentEvent {
 function buildToolCallEvent(
   toolName: string,
   description: string,
-  inputSchema?: unknown,
+  inputSchema?: unknown
 ): AgentEvent {
   return {
     type: 'tool_call',
@@ -79,10 +79,7 @@ function buildToolCallEvent(
     content: description,
     fields: {
       tool_name: toolName,
-      tool_args:
-        typeof inputSchema === 'string'
-          ? inputSchema
-          : JSON.stringify(inputSchema ?? {}),
+      tool_args: typeof inputSchema === 'string' ? inputSchema : JSON.stringify(inputSchema ?? {}),
     },
   };
 }
@@ -108,9 +105,10 @@ function matchesToFindings(matches: readonly ATRMatch[]): AuditFinding[] {
       description: match.rule.description,
       severity,
       category,
-      location: match.matchedPatterns.length > 0
-        ? `Matched: ${match.matchedPatterns.slice(0, 3).join(', ')}`
-        : undefined,
+      location:
+        match.matchedPatterns.length > 0
+          ? `Matched: ${match.matchedPatterns.slice(0, 3).join(', ')}`
+          : undefined,
     });
   }
 
@@ -129,7 +127,7 @@ function matchesToFindings(matches: readonly ATRMatch[]): AuditFinding[] {
  */
 export async function checkWithATR(
   manifest: SkillManifest,
-  cloudRules?: Array<{ id: string; title: string; detection: unknown; [key: string]: unknown }>,
+  cloudRules?: Array<{ id: string; title: string; detection: unknown; [key: string]: unknown }>
 ): Promise<CheckResult> {
   // Dynamic import — gracefully handle missing dependency
   let ATREngine: typeof ATREngineType;
@@ -174,16 +172,14 @@ export async function checkWithATR(
     // 1. Scan instructions
     if (manifest.instructions) {
       const instructionMatches = engine.evaluate(
-        buildLlmInputEvent(manifest.instructions, manifest.name),
+        buildLlmInputEvent(manifest.instructions, manifest.name)
       );
       allMatches.push(...instructionMatches);
     }
 
     // 2. Scan description
     if (manifest.description) {
-      const descMatches = engine.evaluate(
-        buildLlmInputEvent(manifest.description),
-      );
+      const descMatches = engine.evaluate(buildLlmInputEvent(manifest.description));
       allMatches.push(...descMatches);
     }
 
@@ -197,8 +193,8 @@ export async function checkWithATR(
             buildToolCallEvent(
               (t['name'] as string) ?? '',
               t['description'] as string,
-              t['inputSchema'],
-            ),
+              t['inputSchema']
+            )
           );
           allMatches.push(...toolMatches);
         }
@@ -211,30 +207,27 @@ export async function checkWithATR(
     const hasCritical = findings.some((f) => f.severity === 'critical');
     const hasHigh = findings.some((f) => f.severity === 'high');
 
-    const status = hasCritical
-      ? 'fail'
-      : hasHigh
-        ? 'warn'
-        : findings.length > 0
-          ? 'warn'
-          : 'pass';
+    const status = hasCritical ? 'fail' : hasHigh ? 'warn' : findings.length > 0 ? 'warn' : 'pass';
 
-    const label = findings.length === 0
-      ? `${CHECK_LABEL}: clean (${ruleCount} rules evaluated)`
-      : `${CHECK_LABEL}: ${findings.length} threat(s) detected`;
+    const label =
+      findings.length === 0
+        ? `${CHECK_LABEL}: clean (${ruleCount} rules evaluated)`
+        : `${CHECK_LABEL}: ${findings.length} threat(s) detected`;
 
     return { status, label, findings };
   } catch (err) {
     return {
       status: 'info',
       label: `${CHECK_LABEL}: engine error`,
-      findings: [{
-        id: 'atr-engine-error',
-        title: 'ATR engine failed to initialize',
-        description: err instanceof Error ? err.message : String(err),
-        severity: 'info',
-        category: 'atr',
-      }],
+      findings: [
+        {
+          id: 'atr-engine-error',
+          title: 'ATR engine failed to initialize',
+          description: err instanceof Error ? err.message : String(err),
+          severity: 'info',
+          category: 'atr',
+        },
+      ],
     };
   }
 }

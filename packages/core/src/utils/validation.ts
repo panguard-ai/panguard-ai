@@ -55,19 +55,10 @@ export const ISODateSchema = z
   .regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2})?/, 'Must be ISO 8601 format');
 
 /** Pagination limit (positive integer, clamped to max) */
-export const PaginationLimitSchema = z.coerce
-  .number()
-  .int()
-  .min(1)
-  .max(5000)
-  .default(1000);
+export const PaginationLimitSchema = z.coerce.number().int().min(1).max(5000).default(1000);
 
 /** Reputation score for blocklist feeds */
-export const ReputationSchema = z.coerce
-  .number()
-  .min(0)
-  .max(100)
-  .default(70);
+export const ReputationSchema = z.coerce.number().min(0).max(100).default(70);
 
 /** Risk level enum */
 export const RiskLevelSchema = z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
@@ -89,7 +80,10 @@ export type ThreatDataInput = z.infer<typeof ThreatDataSchema>;
 /** POST /api/rules */
 export const RulePublishSchema = z.object({
   ruleId: z.string().min(1, 'ruleId is required').max(256, 'ruleId exceeds maximum length of 256'),
-  ruleContent: z.string().min(1, 'ruleContent is required').max(65_536, 'ruleContent exceeds maximum size of 64KB'),
+  ruleContent: z
+    .string()
+    .min(1, 'ruleContent is required')
+    .max(65_536, 'ruleContent exceeds maximum size of 64KB'),
   source: z.string().min(1, 'source is required'),
   publishedAt: z.string().optional(),
   category: z.string().optional(),

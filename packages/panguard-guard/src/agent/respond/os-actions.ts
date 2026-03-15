@@ -12,7 +12,13 @@ import { resolve } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 import type { ThreatVerdict, ResponseResult } from '../../types.js';
 import { SAFETY_RULES } from './safety-rules.js';
-import { extractIP, extractPID, extractProcessName, extractUsername, extractFilePath } from './evidence-extractor.js';
+import {
+  extractIP,
+  extractPID,
+  extractProcessName,
+  extractUsername,
+  extractFilePath,
+} from './evidence-extractor.js';
 import type { ActionManifest } from './action-manifest.js';
 import type { EscalationTracker } from './escalation-tracker.js';
 
@@ -101,8 +107,14 @@ export async function blockIP(verdict: ThreatVerdict, deps: BlockIPDeps): Promis
       await execFilePromise('/sbin/iptables', ['-A', 'INPUT', '-s', ip, '-j', 'DROP']);
     } else if (os === 'win32') {
       await execFilePromise('netsh', [
-        'advfirewall', 'firewall', 'add', 'rule',
-        `name=PanguardGuard_Block_${ip}`, 'dir=in', 'action=block', `remoteip=${ip}`,
+        'advfirewall',
+        'firewall',
+        'add',
+        'rule',
+        `name=PanguardGuard_Block_${ip}`,
+        'dir=in',
+        'action=block',
+        `remoteip=${ip}`,
       ]);
     }
 
@@ -145,7 +157,11 @@ export async function unblockIP(
       await execFilePromise('/sbin/iptables', ['-D', 'INPUT', '-s', ip, '-j', 'DROP']);
     } else if (os === 'win32') {
       await execFilePromise('netsh', [
-        'advfirewall', 'firewall', 'delete', 'rule', `name=PanguardGuard_Block_${ip}`,
+        'advfirewall',
+        'firewall',
+        'delete',
+        'rule',
+        `name=PanguardGuard_Block_${ip}`,
       ]);
     }
 
@@ -176,12 +192,7 @@ export async function unblockIP(
   }
 }
 
-function scheduleUnblock(
-  ip: string,
-  durationMs: number,
-  entryId: string,
-  deps: BlockIPDeps
-): void {
+function scheduleUnblock(ip: string, durationMs: number, entryId: string, deps: BlockIPDeps): void {
   const existing = deps.unblockTimers.get(ip);
   if (existing) clearTimeout(existing);
 
@@ -202,7 +213,10 @@ function scheduleUnblock(
 // Kill Process
 // ---------------------------------------------------------------------------
 
-export async function killProcess(verdict: ThreatVerdict, manifest: ActionManifest): Promise<ResponseResult> {
+export async function killProcess(
+  verdict: ThreatVerdict,
+  manifest: ActionManifest
+): Promise<ResponseResult> {
   const pid = extractPID(verdict);
   if (!pid) {
     return {
@@ -276,7 +290,10 @@ export async function killProcess(verdict: ThreatVerdict, manifest: ActionManife
 // Disable Account
 // ---------------------------------------------------------------------------
 
-export async function disableAccount(verdict: ThreatVerdict, manifest: ActionManifest): Promise<ResponseResult> {
+export async function disableAccount(
+  verdict: ThreatVerdict,
+  manifest: ActionManifest
+): Promise<ResponseResult> {
   const username = extractUsername(verdict);
   if (!username) {
     return {
@@ -312,7 +329,11 @@ export async function disableAccount(verdict: ThreatVerdict, manifest: ActionMan
   try {
     if (os === 'darwin') {
       await execFilePromise('/usr/bin/dscl', [
-        '.', '-create', `/Users/${username}`, 'AuthenticationAuthority', ';DisabledUser;',
+        '.',
+        '-create',
+        `/Users/${username}`,
+        'AuthenticationAuthority',
+        ';DisabledUser;',
       ]);
     } else if (os === 'linux') {
       await execFilePromise('/usr/sbin/usermod', ['-L', username]);
@@ -380,7 +401,10 @@ function isPathSafeToIsolate(filePath: string): { safe: boolean; reason?: string
   return { safe: false, reason: `Path "${resolved}" is not within allowed directories` };
 }
 
-export async function isolateFile(verdict: ThreatVerdict, manifest: ActionManifest): Promise<ResponseResult> {
+export async function isolateFile(
+  verdict: ThreatVerdict,
+  manifest: ActionManifest
+): Promise<ResponseResult> {
   const filePath = extractFilePath(verdict);
   if (!filePath) {
     return {

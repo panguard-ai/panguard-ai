@@ -16,7 +16,8 @@ export async function actionInit(lang: Lang): Promise<void> {
 
 export async function actionMCPSetup(lang: Lang): Promise<void> {
   breadcrumb(['Panguard', lang === 'zh-TW' ? 'MCP \u8A2D\u5B9A' : 'MCP Setup']);
-  const title = lang === 'zh-TW' ? 'AI \u4EE3\u7406\u9023\u63A5 (MCP)' : 'AI Agent Connection (MCP)';
+  const title =
+    lang === 'zh-TW' ? 'AI \u4EE3\u7406\u9023\u63A5 (MCP)' : 'AI Agent Connection (MCP)';
   console.log(`  ${theme.brandBold(title)}`);
   console.log('');
 
@@ -123,19 +124,41 @@ export async function actionMCPSetup(lang: Lang): Promise<void> {
     );
 
     const restartHints: Record<string, { en: string; zh: string }> = {
-      'claude-code': { en: 'Close and reopen your terminal', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F\u7D42\u7AEF\u6A5F' },
-      'claude-desktop': { en: 'Quit and reopen Claude Desktop', zh: '\u9000\u51FA\u4E26\u91CD\u65B0\u958B\u555F Claude Desktop' },
-      cursor: { en: 'Cmd+Shift+P (or Ctrl+Shift+P) > "Reload Window"', zh: 'Cmd+Shift+P > "Reload Window"' },
-      openclaw: { en: 'Close and reopen OpenClaw', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F OpenClaw' },
+      'claude-code': {
+        en: 'Close and reopen your terminal',
+        zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F\u7D42\u7AEF\u6A5F',
+      },
+      'claude-desktop': {
+        en: 'Quit and reopen Claude Desktop',
+        zh: '\u9000\u51FA\u4E26\u91CD\u65B0\u958B\u555F Claude Desktop',
+      },
+      cursor: {
+        en: 'Cmd+Shift+P (or Ctrl+Shift+P) > "Reload Window"',
+        zh: 'Cmd+Shift+P > "Reload Window"',
+      },
+      openclaw: {
+        en: 'Close and reopen OpenClaw',
+        zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F OpenClaw',
+      },
       codex: { en: 'Restart the Codex CLI session', zh: '\u91CD\u65B0\u555F\u52D5 Codex CLI' },
-      workbuddy: { en: 'Close and reopen WorkBuddy', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F WorkBuddy' },
-      nemoclaw: { en: 'Close and reopen NemoClaw', zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F NemoClaw' },
+      workbuddy: {
+        en: 'Close and reopen WorkBuddy',
+        zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F WorkBuddy',
+      },
+      nemoclaw: {
+        en: 'Close and reopen NemoClaw',
+        zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F NemoClaw',
+      },
     };
     for (const p of unconfigured) {
       const hint = restartHints[p.id];
       const text = hint
-        ? lang === 'zh-TW' ? hint.zh : hint.en
-        : lang === 'zh-TW' ? '\u91CD\u65B0\u555F\u52D5\u61C9\u7528\u7A0B\u5F0F' : 'Restart the application';
+        ? lang === 'zh-TW'
+          ? hint.zh
+          : hint.en
+        : lang === 'zh-TW'
+          ? '\u91CD\u65B0\u555F\u52D5\u61C9\u7528\u7A0B\u5F0F'
+          : 'Restart the application';
       console.log(c.dim(`    ${p.name}: ${text}`));
     }
 

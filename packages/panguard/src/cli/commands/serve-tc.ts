@@ -197,11 +197,9 @@ export async function handleTCRoutes(
       threatDb.insertATRProposal(proposalData);
       // Fire-and-forget LLM review on first submission
       if (llmReviewer?.isAvailable()) {
-        void llmReviewer
-          .reviewProposal(pHash, proposal.ruleContent)
-          .catch((err: unknown) => {
-            console.error(`LLM review error for ${pHash}:`, err);
-          });
+        void llmReviewer.reviewProposal(pHash, proposal.ruleContent).catch((err: unknown) => {
+          console.error(`LLM review error for ${pHash}:`, err);
+        });
       }
       sendJson(res, 201, {
         ok: true,
@@ -313,9 +311,7 @@ export async function handleTCRoutes(
 
     const data = raw as Record<string, unknown>;
     const skills =
-      'skills' in data && Array.isArray(data['skills'])
-        ? (data['skills'] as unknown[])
-        : [data];
+      'skills' in data && Array.isArray(data['skills']) ? (data['skills'] as unknown[]) : [data];
 
     let count = 0;
     for (const skill of skills) {

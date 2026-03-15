@@ -120,7 +120,9 @@ export async function startInteractive(lang?: string): Promise<void> {
             formatError(
               err instanceof Error ? err.message : String(err),
               `${getLang() === 'zh-TW' ? '\u57F7\u884C' : 'Running'} ${def.key}`,
-              getLang() === 'zh-TW' ? '\u8ACB\u67E5\u770B\u65E5\u8A8C\u6216\u91CD\u8A66' : 'Check logs or retry'
+              getLang() === 'zh-TW'
+                ? '\u8ACB\u67E5\u770B\u65E5\u8A8C\u6216\u91CD\u8A66'
+                : 'Check logs or retry'
             )
           );
         }
@@ -261,7 +263,11 @@ async function dispatch(key: string): Promise<void> {
       await actionInit(lang);
       break;
     case 'scan':
-      await actionScan(lang, () => actionGuard(lang), () => actionAudit(lang));
+      await actionScan(
+        lang,
+        () => actionGuard(lang),
+        () => actionAudit(lang)
+      );
       break;
     case 'report':
       await actionReport(lang);

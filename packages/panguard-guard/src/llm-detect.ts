@@ -10,11 +10,7 @@
 import { join } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
-import type {
-  AnalyzeLLM,
-  LLMAnalysisResult,
-  LLMClassificationResult,
-} from './types.js';
+import type { AnalyzeLLM, LLMAnalysisResult, LLMClassificationResult } from './types.js';
 
 const logger = createLogger('panguard-guard:llm-detect');
 

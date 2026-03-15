@@ -456,9 +456,7 @@ export class ThreatCloudServer {
     // Support both single object and batch { events: [...] } format
     const rawObj = raw as Record<string, unknown>;
     const rawEvents: unknown[] =
-      'events' in rawObj && Array.isArray(rawObj['events'])
-        ? rawObj['events']
-        : [raw];
+      'events' in rawObj && Array.isArray(rawObj['events']) ? rawObj['events'] : [raw];
 
     const validated: AnonymizedThreatData[] = [];
     for (const event of rawEvents) {
@@ -766,10 +764,7 @@ export class ThreatCloudServer {
    * Body: { skills: [{ package: string, tools: [{ name, description }] }] }
    * Response: { ok: true, data: { analyzed, proposalsCreated, results } }
    */
-  private async handleAnalyzeSkills(
-    req: IncomingMessage,
-    res: ServerResponse
-  ): Promise<void> {
+  private async handleAnalyzeSkills(req: IncomingMessage, res: ServerResponse): Promise<void> {
     if (!this.llmReviewer?.isAvailable()) {
       this.sendJson(res, 503, {
         ok: false,
@@ -779,13 +774,20 @@ export class ThreatCloudServer {
     }
 
     const AnalyzeSkillsSchema = z.object({
-      skills: z.array(z.object({
-        package: z.string().min(1),
-        tools: z.array(z.object({
-          name: z.string().min(1),
-          description: z.string(),
-        })),
-      })).min(1, 'skills array must not be empty').max(10, 'Maximum 10 skills per request'),
+      skills: z
+        .array(
+          z.object({
+            package: z.string().min(1),
+            tools: z.array(
+              z.object({
+                name: z.string().min(1),
+                description: z.string(),
+              })
+            ),
+          })
+        )
+        .min(1, 'skills array must not be empty')
+        .max(10, 'Maximum 10 skills per request'),
     });
 
     const data = await this.parseAndValidate(req, res, AnalyzeSkillsSchema);
@@ -794,7 +796,7 @@ export class ThreatCloudServer {
     const skills = data.skills;
 
     log.info(`Analyzing ${skills.length} skills with LLM`, {
-      packages: skills.map(s => s.package),
+      packages: skills.map((s) => s.package),
     });
 
     const results = await this.llmReviewer.analyzeSkills(skills);
@@ -808,11 +810,11 @@ export class ThreatCloudServer {
       data: {
         analyzed: results.length,
         proposalsCreated,
-        results: results.map(r => ({
+        results: results.map((r) => ({
           package: r.package,
           threatsFound: r.threatsFound,
           proposalCount: r.proposals.length,
-          patternHashes: r.proposals.map(p => p.patternHash),
+          patternHashes: r.proposals.map((p) => p.patternHash),
           status: r.status,
           ...(r.errorReason ? { errorReason: r.errorReason } : {}),
         })),

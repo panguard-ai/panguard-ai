@@ -16,5 +16,12 @@ export {
   extractProcessName,
   extractTarget,
 } from './evidence-extractor.js';
-export { blockIP, unblockIP, killProcess, disableAccount, isolateFile, execFilePromise } from './os-actions.js';
+export {
+  blockIP,
+  unblockIP,
+  killProcess,
+  disableAccount,
+  isolateFile,
+  execFilePromise,
+} from './os-actions.js';
 export type { BlockIPDeps } from './os-actions.js';

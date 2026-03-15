@@ -25,7 +25,13 @@ import { ActionRateLimiter } from './respond/action-rate-limiter.js';
 import { ActionManifest } from './respond/action-manifest.js';
 import { EscalationTracker } from './respond/escalation-tracker.js';
 import { extractTarget } from './respond/evidence-extractor.js';
-import { blockIP, unblockIP, killProcess, disableAccount, isolateFile } from './respond/os-actions.js';
+import {
+  blockIP,
+  unblockIP,
+  killProcess,
+  disableAccount,
+  isolateFile,
+} from './respond/os-actions.js';
 import type { ActionManifestEntry } from './respond/types.js';
 
 const logger = createLogger('panguard-guard:respond-agent');
@@ -215,7 +221,10 @@ export class RespondAgent {
   }
 
   /** Get escalation records */
-  getEscalationRecords(): Map<string, { target: string; violationCount: number; firstSeen: string; lastSeen: string }> {
+  getEscalationRecords(): Map<
+    string,
+    { target: string; violationCount: number; firstSeen: string; lastSeen: string }
+  > {
     return this.escalation.getAll();
   }
 

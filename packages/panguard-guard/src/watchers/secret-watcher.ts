@@ -65,7 +65,8 @@ export const SECRET_PATTERNS: readonly SecretPattern[] = Object.freeze([
   {
     id: 'generic-api-key',
     name: 'Generic API Key Assignment',
-    pattern: /(?:api[_-]?key|apikey|api[_-]?secret|api[_-]?token)\s*[=:]\s*['"][A-Za-z0-9_-]{20,}['"]/i,
+    pattern:
+      /(?:api[_-]?key|apikey|api[_-]?secret|api[_-]?token)\s*[=:]\s*['"][A-Za-z0-9_-]{20,}['"]/i,
     severity: 'high',
   },
   {
@@ -230,8 +231,7 @@ export class SecretWatcher extends EventEmitter {
       const watcher = fs.watch(this.watchDir, (eventType, filename) => {
         if (!filename || eventType !== 'rename') return;
         const basename = path.basename(filename);
-        const isEnvFile =
-          ENV_FILE_PATTERNS.includes(basename) || basename.startsWith('.env');
+        const isEnvFile = ENV_FILE_PATTERNS.includes(basename) || basename.startsWith('.env');
         if (isEnvFile) {
           const filePath = path.join(this.watchDir, filename);
           // Small delay to let the file be fully written
@@ -261,15 +261,11 @@ export class SecretWatcher extends EventEmitter {
       const findings = this.detectSecrets(lines);
 
       // Build current secret fingerprint set
-      const currentSecretKeys = new Set(
-        findings.map((f) => `${f.pattern.id}:${f.line}`)
-      );
+      const currentSecretKeys = new Set(findings.map((f) => `${f.pattern.id}:${f.line}`));
 
       // Determine which findings are new (deduplication)
       const previousKeys = this.knownSecrets.get(filePath) ?? new Set<string>();
-      const newFindings = findings.filter(
-        (f) => !previousKeys.has(`${f.pattern.id}:${f.line}`)
-      );
+      const newFindings = findings.filter((f) => !previousKeys.has(`${f.pattern.id}:${f.line}`));
 
       // Update known secrets (immutable set replacement)
       this.knownSecrets.set(filePath, Object.freeze(new Set(currentSecretKeys)));
@@ -317,11 +313,7 @@ export class SecretWatcher extends EventEmitter {
   /**
    * Emit a SecurityEvent for a detected secret.
    */
-  private emitSecretEvent(
-    filePath: string,
-    finding: SecretFinding,
-    trigger: string
-  ): void {
+  private emitSecretEvent(filePath: string, finding: SecretFinding, trigger: string): void {
     const redacted = this.redactValue(finding.match);
     const fileName = path.basename(filePath);
 

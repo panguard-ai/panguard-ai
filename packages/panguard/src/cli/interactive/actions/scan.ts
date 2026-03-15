@@ -22,7 +22,11 @@ export async function actionScan(
   console.log('');
 
   const depthItems: MenuItem[] = [
-    { key: '1', label: lang === 'zh-TW' ? '\u5FEB\u901F\u6383\u63CF (~30 \u79D2)' : 'Quick Scan (~30 seconds)' },
+    {
+      key: '1',
+      label:
+        lang === 'zh-TW' ? '\u5FEB\u901F\u6383\u63CF (~30 \u79D2)' : 'Quick Scan (~30 seconds)',
+    },
     { key: '2', label: lang === 'zh-TW' ? '\u5B8C\u6574\u6383\u63CF' : 'Full Scan' },
   ];
 
@@ -46,10 +50,15 @@ export async function actionScan(
 
   const safetyScore = Math.max(0, 100 - result.riskScore);
   const grade =
-    safetyScore >= 90 ? 'A'
-      : safetyScore >= 75 ? 'B'
-        : safetyScore >= 60 ? 'C'
-          : safetyScore >= 40 ? 'D' : 'F';
+    safetyScore >= 90
+      ? 'A'
+      : safetyScore >= 75
+        ? 'B'
+        : safetyScore >= 60
+          ? 'C'
+          : safetyScore >= 40
+            ? 'D'
+            : 'F';
 
   console.log('');
   const scoreLabel = lang === 'zh-TW' ? '\u6383\u63CF\u5B8C\u6210' : 'Scan Complete';
@@ -82,35 +91,57 @@ export async function actionScan(
     }
     console.log('');
 
-    const issuesText = lang === 'zh-TW'
-      ? `${result.findings.length} \u500B\u554F\u984C`
-      : `${result.findings.length} issue(s) found`;
+    const issuesText =
+      lang === 'zh-TW'
+        ? `${result.findings.length} \u500B\u554F\u984C`
+        : `${result.findings.length} issue(s) found`;
     console.log(c.dim(`  ${issuesText}`));
 
     if (fixableCount > 0) {
-      const upgradeLines = lang === 'zh-TW'
-        ? [`\u53EF\u81EA\u52D5\u4FEE\u5FA9:`, `$ panguard scan --fix`]
-        : [`Auto-fix available:`, `$ panguard scan --fix`];
+      const upgradeLines =
+        lang === 'zh-TW'
+          ? [`\u53EF\u81EA\u52D5\u4FEE\u5FA9:`, `$ panguard scan --fix`]
+          : [`Auto-fix available:`, `$ panguard scan --fix`];
       console.log('');
       console.log(box(upgradeLines.join('\n'), { borderColor: c.sage }));
     }
   } else {
-    const noIssues = lang === 'zh-TW' ? '\u672A\u767C\u73FE\u5B89\u5168\u554F\u984C' : 'No security issues found';
+    const noIssues =
+      lang === 'zh-TW' ? '\u672A\u767C\u73FE\u5B89\u5168\u554F\u984C' : 'No security issues found';
     console.log(`  ${c.safe(noIssues)}`);
   }
 
   const guardRunning = isGuardRunning().running;
   if (!guardRunning) {
     console.log('');
-    const agentMsg = lang === 'zh-TW'
-      ? `${c.sage('\u25C6')} \u5373\u6642\u9632\u8B77\u5C1A\u672A\u555F\u52D5\u3002\u8981\u73FE\u5728\u555F\u7528\u55CE\uFF1F`
-      : `${c.sage('\u25C6')} Real-time protection is not active. Enable now?`;
+    const agentMsg =
+      lang === 'zh-TW'
+        ? `${c.sage('\u25C6')} \u5373\u6642\u9632\u8B77\u5C1A\u672A\u555F\u52D5\u3002\u8981\u73FE\u5728\u555F\u7528\u55CE\uFF1F`
+        : `${c.sage('\u25C6')} Real-time protection is not active. Enable now?`;
     console.log(`  ${agentMsg}`);
 
     const guardItems: MenuItem[] = [
-      { key: '1', label: lang === 'zh-TW' ? '\u662F\uFF0C\u555F\u52D5 Guard \u9632\u8B77' : 'Yes, start Guard protection' },
-      { key: '2', label: lang === 'zh-TW' ? '\u5BE9\u8A08\u5DF2\u5B89\u88DD\u6280\u80FD\u7684\u5B89\u5168\u5A01\u8105' : 'Audit installed skills for threats' },
-      { key: '3', label: lang === 'zh-TW' ? '\u4E0D\u7528\uFF0C\u56DE\u4E3B\u9078\u55AE' : 'No, return to main menu' },
+      {
+        key: '1',
+        label:
+          lang === 'zh-TW'
+            ? '\u662F\uFF0C\u555F\u52D5 Guard \u9632\u8B77'
+            : 'Yes, start Guard protection',
+      },
+      {
+        key: '2',
+        label:
+          lang === 'zh-TW'
+            ? '\u5BE9\u8A08\u5DF2\u5B89\u88DD\u6280\u80FD\u7684\u5B89\u5168\u5A01\u8105'
+            : 'Audit installed skills for threats',
+      },
+      {
+        key: '3',
+        label:
+          lang === 'zh-TW'
+            ? '\u4E0D\u7528\uFF0C\u56DE\u4E3B\u9078\u55AE'
+            : 'No, return to main menu',
+      },
     ];
     renderCompactMenu('', guardItems);
     const guardChoice = await waitForCompactChoice(guardItems, lang);
@@ -126,7 +157,10 @@ export async function actionScan(
     nextSteps(
       lang === 'zh-TW'
         ? [
-            { cmd: '[8] \u6280\u80FD\u5BE9\u8A08', desc: '\u5BE9\u8A08\u5DF2\u5B89\u88DD\u6280\u80FD\u7684\u5B89\u5168\u5A01\u8105' },
+            {
+              cmd: '[8] \u6280\u80FD\u5BE9\u8A08',
+              desc: '\u5BE9\u8A08\u5DF2\u5B89\u88DD\u6280\u80FD\u7684\u5B89\u5168\u5A01\u8105',
+            },
             { cmd: 'scan --full', desc: '\u57F7\u884C\u5B8C\u6574\u6383\u63CF' },
             { cmd: 'guard start', desc: '\u555F\u52D5\u5373\u6642\u9632\u8B77' },
           ]

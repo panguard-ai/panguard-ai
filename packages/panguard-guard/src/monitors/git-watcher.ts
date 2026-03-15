@@ -52,12 +52,37 @@ export interface DiffSecretPattern {
 
 const DIFF_SECRET_PATTERNS: readonly DiffSecretPattern[] = [
   { id: 'aws-key', name: 'AWS Access Key', pattern: /AKIA[0-9A-Z]{16}/, severity: 'high' },
-  { id: 'github-token', name: 'GitHub Token', pattern: /gh[pousr]_[A-Za-z0-9_]{36,}/, severity: 'high' },
-  { id: 'private-key', name: 'Private Key', pattern: /-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----/, severity: 'critical' },
-  { id: 'anthropic-key', name: 'Anthropic Key', pattern: /sk-ant-[A-Za-z0-9_-]{20,}/, severity: 'high' },
+  {
+    id: 'github-token',
+    name: 'GitHub Token',
+    pattern: /gh[pousr]_[A-Za-z0-9_]{36,}/,
+    severity: 'high',
+  },
+  {
+    id: 'private-key',
+    name: 'Private Key',
+    pattern: /-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----/,
+    severity: 'critical',
+  },
+  {
+    id: 'anthropic-key',
+    name: 'Anthropic Key',
+    pattern: /sk-ant-[A-Za-z0-9_-]{20,}/,
+    severity: 'high',
+  },
   { id: 'openai-key', name: 'OpenAI Key', pattern: /sk-[A-Za-z0-9]{20,}/, severity: 'high' },
-  { id: 'stripe-live', name: 'Stripe Live Key', pattern: /sk_live_[0-9a-zA-Z]{24,}/, severity: 'high' },
-  { id: 'db-connection', name: 'DB Connection String', pattern: /(?:mongodb|postgres|mysql|redis):\/\/[^\s'"]{10,}/, severity: 'high' },
+  {
+    id: 'stripe-live',
+    name: 'Stripe Live Key',
+    pattern: /sk_live_[0-9a-zA-Z]{24,}/,
+    severity: 'high',
+  },
+  {
+    id: 'db-connection',
+    name: 'DB Connection String',
+    pattern: /(?:mongodb|postgres|mysql|redis):\/\/[^\s'"]{10,}/,
+    severity: 'high',
+  },
 ] as const;
 
 /** Protected branch names that should not receive direct commits */
@@ -209,21 +234,19 @@ export class GitWatcher extends EventEmitter {
    */
   private watchGitEvents(): void {
     try {
-      this.watcher = fs.watch(
-        this.gitDir,
-        { recursive: true },
-        (_eventType, filename) => {
-          if (!filename || !this.running) return;
+      this.watcher = fs.watch(this.gitDir, { recursive: true }, (_eventType, filename) => {
+        if (!filename || !this.running) return;
 
-          // Debounce: git operations trigger multiple fs events
-          if (this.debounceTimer) clearTimeout(this.debounceTimer);
-          this.debounceTimer = setTimeout(() => {
-            void this.analyzeGitChange(filename);
-          }, this.debounceMs);
-        }
-      );
+        // Debounce: git operations trigger multiple fs events
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        this.debounceTimer = setTimeout(() => {
+          void this.analyzeGitChange(filename);
+        }, this.debounceMs);
+      });
       this.watcher.on('error', (err) => {
-        logger.warn(`Git directory watch error: ${err instanceof Error ? err.message : String(err)}`);
+        logger.warn(
+          `Git directory watch error: ${err instanceof Error ? err.message : String(err)}`
+        );
       });
     } catch (err) {
       logger.warn(
@@ -267,10 +290,7 @@ export class GitWatcher extends EventEmitter {
         { cwd: this.repoDir, timeout: 5000 }
       );
 
-      const changedFiles = namesOutput
-        .trim()
-        .split('\n')
-        .filter(Boolean);
+      const changedFiles = namesOutput.trim().split('\n').filter(Boolean);
 
       // Check for sensitive file changes
       for (const file of changedFiles) {
@@ -313,11 +333,10 @@ export class GitWatcher extends EventEmitter {
     shortHash: string
   ): Promise<void> {
     try {
-      const { stdout: diffContent } = await execFileAsync(
-        'git',
-        ['diff', diffBase, newHead],
-        { cwd: this.repoDir, timeout: 10000 }
-      );
+      const { stdout: diffContent } = await execFileAsync('git', ['diff', diffBase, newHead], {
+        cwd: this.repoDir,
+        timeout: 10000,
+      });
 
       // Only check added lines (lines starting with +, excluding +++ header)
       const addedLines = diffContent
@@ -355,11 +374,10 @@ export class GitWatcher extends EventEmitter {
    */
   private async checkProtectedBranch(shortHash: string): Promise<void> {
     try {
-      const { stdout } = await execFileAsync(
-        'git',
-        ['rev-parse', '--abbrev-ref', 'HEAD'],
-        { cwd: this.repoDir, timeout: 3000 }
-      );
+      const { stdout } = await execFileAsync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
+        cwd: this.repoDir,
+        timeout: 3000,
+      });
 
       const branch = stdout.trim();
       if (PROTECTED_BRANCHES.includes(branch)) {
@@ -387,11 +405,10 @@ export class GitWatcher extends EventEmitter {
    */
   private async checkForcePush(shortHash: string): Promise<void> {
     try {
-      const { stdout } = await execFileAsync(
-        'git',
-        ['reflog', 'show', '--format=%gs', '-1'],
-        { cwd: this.repoDir, timeout: 3000 }
-      );
+      const { stdout } = await execFileAsync('git', ['reflog', 'show', '--format=%gs', '-1'], {
+        cwd: this.repoDir,
+        timeout: 3000,
+      });
 
       const entry = stdout.trim().toLowerCase();
       if (entry.includes('forced-update') || entry.includes('force')) {
@@ -419,11 +436,10 @@ export class GitWatcher extends EventEmitter {
    */
   private async getCurrentHead(): Promise<string> {
     try {
-      const { stdout } = await execFileAsync(
-        'git',
-        ['rev-parse', 'HEAD'],
-        { cwd: this.repoDir, timeout: 3000 }
-      );
+      const { stdout } = await execFileAsync('git', ['rev-parse', 'HEAD'], {
+        cwd: this.repoDir,
+        timeout: 3000,
+      });
       return stdout.trim();
     } catch {
       return '';
