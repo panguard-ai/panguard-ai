@@ -62,7 +62,7 @@ export function auditCommand(): Command {
 
         // ── Fetch cloud rules from Threat Cloud (flywheel: community rules enhance audits) ──
         type CloudATRRule = { id: string; title: string; detection: unknown; [key: string]: unknown };
-        let cloudRules: CloudATRRule[] = [];
+        const cloudRules: CloudATRRule[] = [];
         if (options.cloud) {
           try {
             const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');

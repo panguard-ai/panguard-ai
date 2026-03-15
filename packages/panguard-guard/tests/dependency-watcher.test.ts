@@ -241,9 +241,6 @@ describe('DependencyWatcher', () => {
   });
 
   it('detects new packages via diff logic', () => {
-    const oldNames = new Set(['express', 'lodash']);
-    const newNames = new Set(['express', 'lodash', 'malicious-pkg']);
-
     // Directly test the diff logic via exported functions
     // We test typosquat detection for the new package
     const result = detectTyposquat('malicious-pkg');

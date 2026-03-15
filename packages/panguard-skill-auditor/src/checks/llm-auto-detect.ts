@@ -26,7 +26,6 @@ export async function autoDetectSkillLLM(): Promise<SkillAnalysisLLM | null> {
 
     let provider: ProviderType;
     let apiKey: string | undefined;
-    let model: string;
 
     const defaultModels: Record<ProviderType, string> = {
       claude: 'claude-sonnet-4-20250514',
@@ -46,7 +45,7 @@ export async function autoDetectSkillLLM(): Promise<SkillAnalysisLLM | null> {
     }
 
     // Allow override via PANGUARD_LLM_MODEL env var
-    model = process.env['PANGUARD_LLM_MODEL'] ?? defaultModels[provider];
+    const model = process.env['PANGUARD_LLM_MODEL'] ?? defaultModels[provider];
 
     const llmProvider = createLLM({ provider, model, apiKey, lang: 'en' });
 
