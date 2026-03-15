@@ -726,6 +726,19 @@
       "badge2": "3,490 測試通過",
       "badge3": "台灣製造",
       "copied": "已複製！"
+    },
+    "scanner": {
+      "overline": "線上技能掃描器",
+      "title": "掃描任何技能。無需安裝。",
+      "subtitle": "貼上 GitHub URL 即可檢查 AI 技能或 MCP 伺服器是否安全。結果會被快取 -- 相同內容不會重複掃描。",
+      "placeholder": "github.com/owner/repo",
+      "scanBtn": "掃描",
+      "cached": "已快取",
+      "showFindings": "顯示 {count} 個發現",
+      "hideFindings": "隱藏發現",
+      "ctaText": "想要即時保護所有 AI Agent？",
+      "learnMore": "了解更多",
+      "trustNote": "掃描在伺服器端執行。不會儲存代碼。僅快取內容 hash 用於去重。"
     }
   },
   "pricing": {

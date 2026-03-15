@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
 // Below-the-fold sections loaded lazily
+const SkillScanner = dynamic(() => import('@/components/home/SkillScanner'));
 const ThreatCards = dynamic(() => import('@/components/home/ThreatCards'));
 const PipelineFlow = dynamic(() => import('@/components/home/PipelineFlow'));
 const UseCases = dynamic(() => import('@/components/home/UseCases'));
@@ -32,6 +33,8 @@ export default function Home() {
           </p>
           {/* 1. Hero: The first Skills Audit for AI agents */}
           <RevolutionHero />
+          {/* 1.25. Online Skill Scanner: Try it now, no install needed */}
+          <SkillScanner />
           {/* 1.5. Threat cards: What happens without audit */}
           <ThreatCards />
           {/* 2. Pipeline: 6-step visual flow diagram */}
