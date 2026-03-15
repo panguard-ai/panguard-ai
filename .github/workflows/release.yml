@@ -59,12 +59,12 @@ jobs:
 
       - name: Deploy standalone package (Unix)
         if: runner.os != 'Windows'
-        run: pnpm deploy --filter=@panguard-ai/panguard --prod /tmp/panguard-release
+        run: pnpm deploy --legacy --filter=@panguard-ai/panguard --prod /tmp/panguard-release
 
       - name: Deploy standalone package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: pnpm deploy --filter=@panguard-ai/panguard --prod ${{ runner.temp }}\panguard-release
+        run: pnpm deploy --legacy --filter=@panguard-ai/panguard --prod ${{ runner.temp }}\panguard-release
 
       - name: Copy config (detection rules) (Unix)
         if: runner.os != 'Windows'
