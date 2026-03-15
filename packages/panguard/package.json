@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/panguard",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -41,6 +41,7 @@
     "postinstall": "node -e \"console.log('\\n  Run: panguard setup\\n  to connect with Claude Code, Cursor, or other AI agents.\\n')\""
   },
   "dependencies": {
+    "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/core": "workspace:*",
     "@panguard-ai/panguard-scan": "workspace:*",
     "@panguard-ai/panguard-guard": "workspace:*",
