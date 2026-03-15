@@ -155,7 +155,6 @@
     "sla": "SLA",
     "responsibleDisclosure": "Responsible Disclosure",
     "securityWhitepaper": "Security Whitepaper",
-    "atrStandard": "ATR Standard",
     "contribute": "Contribute"
   },
   "home": {
@@ -572,15 +571,14 @@
       }
     },
     "ecosystemScanner": {
-      "title": "Scanning the MCP Ecosystem",
-      "subtitle": "We continuously crawl MCP registries, audit skills, and build a threat intelligence database so you don't have to.",
-      "discovered": "MCP Skills Discovered",
-      "scanned": "Skills Audited",
-      "builtInRules": "Built-in Detection Rules",
-      "atrRules": "ATR Agent Threat Rules",
-      "findingsTitle": "Audit Findings Distribution",
-      "lastScan": "Last scan: {date}",
+      "title": "Community Defense Network",
+      "subtitle": "Three rule engines working together. Every threat discovered by any user strengthens protection for everyone.",
       "rules": "Rules",
+      "sigmaDesc": "Network & system threats",
+      "yaraDesc": "Malware & binary threats",
+      "atrDesc": "AI agent-specific threats",
+      "totalRulesDesc": "Total integrated detection rules across all engines",
+      "growingDaily": "Growing daily via Threat Cloud community contributions",
       "cta": "Every scan feeds the collective defense. Install one skill, protect the whole ecosystem."
     },
     "homePricing": {
@@ -742,9 +740,8 @@
       "title": "100% free. 100% open source.",
       "subtitle": "MIT License. No paywalls, no tiers, no limits. Every feature. Every rule. Every tool."
     },
-    "badge": "MIT Open Source",
-    "planName": "Panguard AI",
     "badge": "MIT Licensed",
+    "planName": "Panguard AI",
     "planDesc": "Everything included. Unlimited machines. Full source code on GitHub.",
     "ctaInstall": "Install Now",
     "ctaGithub": "View on GitHub",
@@ -972,7 +969,10 @@
         "activeEndpoints": "Active Endpoints",
         "uptime": "Uptime",
         "recentEvents": "Recent Events",
-        "exampleLabel": "Example Dashboard"
+        "exampleLabel": "Example Dashboard",
+        "detectionRules": "Detection Rules",
+        "detectionLayers": "Detection Layers",
+        "responseActions": "Response Actions"
       },
       "events": {
         "event1": "Blocked SSH brute force from 185.x.x.x",
@@ -5302,16 +5302,56 @@
       "title": "OWASP Agentic Top 10 coverage",
       "subtitle": "Every ATR rule maps to the OWASP Top 10 for Agentic Applications, providing structured coverage of the most critical AI agent security risks.",
       "items": [
-        { "id": "ASI01", "name": "Agent Goal Hijack", "covered": true },
-        { "id": "ASI02", "name": "Tool Misuse & Exploitation", "covered": true },
-        { "id": "ASI03", "name": "Identity & Privilege Abuse", "covered": true },
-        { "id": "ASI04", "name": "Agentic Supply Chain Vulnerabilities", "covered": true },
-        { "id": "ASI05", "name": "Unexpected Code Execution", "covered": true },
-        { "id": "ASI06", "name": "Memory & Context Poisoning", "covered": true },
-        { "id": "ASI07", "name": "Insecure Inter-Agent Communication", "covered": true },
-        { "id": "ASI08", "name": "Cascading Failures", "covered": true },
-        { "id": "ASI09", "name": "Human-Agent Trust Exploitation", "covered": true },
-        { "id": "ASI10", "name": "Rogue Agents", "covered": true }
+        {
+          "id": "ASI01",
+          "name": "Agent Goal Hijack",
+          "covered": true
+        },
+        {
+          "id": "ASI02",
+          "name": "Tool Misuse & Exploitation",
+          "covered": true
+        },
+        {
+          "id": "ASI03",
+          "name": "Identity & Privilege Abuse",
+          "covered": true
+        },
+        {
+          "id": "ASI04",
+          "name": "Agentic Supply Chain Vulnerabilities",
+          "covered": true
+        },
+        {
+          "id": "ASI05",
+          "name": "Unexpected Code Execution",
+          "covered": true
+        },
+        {
+          "id": "ASI06",
+          "name": "Memory & Context Poisoning",
+          "covered": true
+        },
+        {
+          "id": "ASI07",
+          "name": "Insecure Inter-Agent Communication",
+          "covered": true
+        },
+        {
+          "id": "ASI08",
+          "name": "Cascading Failures",
+          "covered": true
+        },
+        {
+          "id": "ASI09",
+          "name": "Human-Agent Trust Exploitation",
+          "covered": true
+        },
+        {
+          "id": "ASI10",
+          "name": "Rogue Agents",
+          "covered": true
+        }
       ]
     },
     "comparison": {
@@ -5331,20 +5371,60 @@
           "yara": "Files / memory",
           "atr": "Agent behavior"
         },
-        { "feature": "Prompt injection detection", "sigma": false, "yara": false, "atr": true },
-        { "feature": "Tool call monitoring", "sigma": false, "yara": false, "atr": true },
+        {
+          "feature": "Prompt injection detection",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "Tool call monitoring",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
         {
           "feature": "Multi-turn conversation analysis",
           "sigma": false,
           "yara": false,
           "atr": true
         },
-        { "feature": "Semantic-layer matching", "sigma": false, "yara": false, "atr": true },
-        { "feature": "OWASP Agentic Top 10 mapping", "sigma": false, "yara": false, "atr": true },
-        { "feature": "MITRE ATT&CK / ATLAS references", "sigma": true, "yara": false, "atr": true },
-        { "feature": "Machine-readable format", "sigma": true, "yara": true, "atr": true },
-        { "feature": "Automated response actions", "sigma": false, "yara": false, "atr": true },
-        { "feature": "Community rule repository", "sigma": true, "yara": true, "atr": true }
+        {
+          "feature": "Semantic-layer matching",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "OWASP Agentic Top 10 mapping",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "MITRE ATT&CK / ATLAS references",
+          "sigma": true,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "Machine-readable format",
+          "sigma": true,
+          "yara": true,
+          "atr": true
+        },
+        {
+          "feature": "Automated response actions",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "Community rule repository",
+          "sigma": true,
+          "yara": true,
+          "atr": true
+        }
       ]
     },
     "architecture": {
@@ -5406,10 +5486,22 @@
       "title": "Open standard. Community-driven growth.",
       "subtitle": "ATR follows the same playbook that made Sigma and YARA industry standards -- open governance, community contributions, and vendor-neutral design.",
       "stats": [
-        { "value": "52", "label": "Detection rules" },
-        { "value": "9", "label": "Threat categories" },
-        { "value": "10/10", "label": "OWASP Agentic coverage" },
-        { "value": "MIT", "label": "License" }
+        {
+          "value": "52",
+          "label": "Detection rules"
+        },
+        {
+          "value": "9",
+          "label": "Threat categories"
+        },
+        {
+          "value": "10/10",
+          "label": "OWASP Agentic coverage"
+        },
+        {
+          "value": "MIT",
+          "label": "License"
+        }
       ],
       "steps": {
         "overline": "CONTRIBUTION FLOW",
@@ -5483,33 +5575,39 @@
   },
   "revolution": {
     "hero": {
-      "eyebrow": "THE APP STORE GATEKEEPER FOR AI AGENTS",
-      "title": "Every AI agent needs a gatekeeper.",
-      "subtitleLine1": "Your AI agent installs skills with full system access. No review process. No security audit. Nothing between a malicious skill and your data.",
+      "eyebrow": "SECURITY FLYWHEEL FOR AI AGENTS",
+      "title": "Your threat discovery protects everyone.",
+      "subtitleLine1": "AI agents install skills with full system access. One malicious skill can steal your API keys, exfiltrate data, or hijack your workflow.",
       "threats": {
         "title": "One malicious skill is all it takes.",
         "items": [
-          { "label": "Steal API keys", "detail": "Read .env, forward to attacker" },
+          {
+            "label": "Steal API keys",
+            "detail": "Read .env, forward to attacker"
+          },
           {
             "label": "Exfiltrate conversations",
             "detail": "Your private context, sent to a remote server"
           },
-          { "label": "Hijack your agent", "detail": "Turn it into a tool for attacking others" },
+          {
+            "label": "Hijack your agent",
+            "detail": "Turn it into a tool for attacking others"
+          },
           {
             "label": "Leak credentials",
             "detail": "SSH keys, tokens, cloud secrets -- all accessible"
           }
         ]
       },
-      "subtitleLine2": "Panguard is the missing gatekeeper. It reviews every skill before it runs -- just like App Store review, but for AI agents. {atrRules} ATR rules for AI agent threats + {integratedRules} integrated Sigma/YARA rules. Always on.",
-      "subtitleLine3": "One install. Always on. Gets smarter with every user.",
+      "subtitleLine2": "Panguard audits every skill before it runs. {atrRules} ATR rules + {integratedRules} Sigma & YARA rules catch known threats instantly. AI analysis catches the rest.",
+      "subtitleLine3": "When you find a threat, it becomes a rule that protects the entire community.",
       "viewATR": "ATR Standard on GitHub",
       "install": "Get Started",
       "copied": "Copied!",
       "platforms": "Works with Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop",
       "badges": {
         "mit": "MIT Licensed",
-        "rules": "ATR Rules",
+        "rules": "9,700+ Rules",
         "tests": "3,490+ Tests",
         "taiwan": "Built in Taiwan"
       }

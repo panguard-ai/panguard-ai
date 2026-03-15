@@ -155,7 +155,6 @@
     "sla": "SLA",
     "responsibleDisclosure": "漏洞揭露",
     "securityWhitepaper": "安全白皮書",
-    "atrStandard": "ATR 標準",
     "contribute": "參與貢獻"
   },
   "home": {
@@ -572,15 +571,14 @@
       }
     },
     "ecosystemScanner": {
-      "title": "持續掃描 MCP 生態系",
-      "subtitle": "我們持續爬取 MCP 註冊表、審計技能、建立威脅情報資料庫，讓你不必自己動手。",
-      "discovered": "已發現 MCP Skills",
-      "scanned": "已審計 Skills",
-      "builtInRules": "內建偵測規則",
-      "atrRules": "ATR Agent 威脅規則",
-      "findingsTitle": "審計結果分佈",
-      "lastScan": "最後掃描：{date}",
+      "title": "社群防禦網路",
+      "subtitle": "三大規則引擎協同運作。任何用戶發現的威脅，都會強化所有人的防護。",
       "rules": "規則",
+      "sigmaDesc": "網路與系統威脅",
+      "yaraDesc": "惡意軟體與二進位威脅",
+      "atrDesc": "AI Agent 專屬威脅",
+      "totalRulesDesc": "跨所有引擎的整合偵測規則總數",
+      "growingDaily": "透過 Threat Cloud 社群貢獻每日成長",
       "cta": "每一次掃描都強化集體防禦。安裝一個技能，保護整個生態系。"
     },
     "homePricing": {
@@ -1556,9 +1554,8 @@
       "title": "100% 免費。100% 開源。",
       "subtitle": "MIT 授權。沒有付費牆、沒有分級、沒有限制。所有功能。所有規則。所有工具。"
     },
-    "badge": "MIT 開源",
-    "planName": "Panguard AI",
     "badge": "MIT 授權",
+    "planName": "Panguard AI",
     "planDesc": "全功能。無限機器。完整原始碼公開於 GitHub。",
     "ctaInstall": "立即安裝",
     "ctaGithub": "在 GitHub 上查看",
@@ -1786,7 +1783,10 @@
         "activeEndpoints": "活躍端點",
         "uptime": "運行時間",
         "recentEvents": "近期事件",
-        "exampleLabel": "範例儀表板"
+        "exampleLabel": "範例儀表板",
+        "detectionRules": "偵測規則",
+        "detectionLayers": "偵測層級",
+        "responseActions": "回應動作"
       },
       "events": {
         "event1": "已阻擋來自 185.x.x.x 的 SSH 暴力破解",
@@ -5330,16 +5330,56 @@
       "title": "OWASP Agentic Top 10 覆蓋",
       "subtitle": "每條 ATR 規則對應到 OWASP Agentic Top 10，提供最關鍵 AI Agent 安全風險的結構化覆蓋。",
       "items": [
-        { "id": "ASI01", "name": "Agent 目標劫持", "covered": true },
-        { "id": "ASI02", "name": "工具濫用與利用", "covered": true },
-        { "id": "ASI03", "name": "身份與權限濫用", "covered": true },
-        { "id": "ASI04", "name": "Agent 供應鏈漏洞", "covered": true },
-        { "id": "ASI05", "name": "非預期程式碼執行", "covered": true },
-        { "id": "ASI06", "name": "記憶體與上下文投毒", "covered": true },
-        { "id": "ASI07", "name": "不安全的跨 Agent 通訊", "covered": true },
-        { "id": "ASI08", "name": "連鎖故障", "covered": true },
-        { "id": "ASI09", "name": "人機信任利用", "covered": true },
-        { "id": "ASI10", "name": "失控 Agent", "covered": true }
+        {
+          "id": "ASI01",
+          "name": "Agent 目標劫持",
+          "covered": true
+        },
+        {
+          "id": "ASI02",
+          "name": "工具濫用與利用",
+          "covered": true
+        },
+        {
+          "id": "ASI03",
+          "name": "身份與權限濫用",
+          "covered": true
+        },
+        {
+          "id": "ASI04",
+          "name": "Agent 供應鏈漏洞",
+          "covered": true
+        },
+        {
+          "id": "ASI05",
+          "name": "非預期程式碼執行",
+          "covered": true
+        },
+        {
+          "id": "ASI06",
+          "name": "記憶體與上下文投毒",
+          "covered": true
+        },
+        {
+          "id": "ASI07",
+          "name": "不安全的跨 Agent 通訊",
+          "covered": true
+        },
+        {
+          "id": "ASI08",
+          "name": "連鎖故障",
+          "covered": true
+        },
+        {
+          "id": "ASI09",
+          "name": "人機信任利用",
+          "covered": true
+        },
+        {
+          "id": "ASI10",
+          "name": "失控 Agent",
+          "covered": true
+        }
       ]
     },
     "comparison": {
@@ -5359,15 +5399,60 @@
           "yara": "檔案 / 記憶體",
           "atr": "Agent 行為"
         },
-        { "feature": "提示詞注入偵測", "sigma": false, "yara": false, "atr": true },
-        { "feature": "工具呼叫監控", "sigma": false, "yara": false, "atr": true },
-        { "feature": "多輪對話分析", "sigma": false, "yara": false, "atr": true },
-        { "feature": "語意層匹配", "sigma": false, "yara": false, "atr": true },
-        { "feature": "OWASP Agentic Top 10 對應", "sigma": false, "yara": false, "atr": true },
-        { "feature": "MITRE ATT&CK / ATLAS 參考", "sigma": true, "yara": false, "atr": true },
-        { "feature": "機器可讀格式", "sigma": true, "yara": true, "atr": true },
-        { "feature": "自動化回應動作", "sigma": false, "yara": false, "atr": true },
-        { "feature": "社群規則庫", "sigma": true, "yara": true, "atr": true }
+        {
+          "feature": "提示詞注入偵測",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "工具呼叫監控",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "多輪對話分析",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "語意層匹配",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "OWASP Agentic Top 10 對應",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "MITRE ATT&CK / ATLAS 參考",
+          "sigma": true,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "機器可讀格式",
+          "sigma": true,
+          "yara": true,
+          "atr": true
+        },
+        {
+          "feature": "自動化回應動作",
+          "sigma": false,
+          "yara": false,
+          "atr": true
+        },
+        {
+          "feature": "社群規則庫",
+          "sigma": true,
+          "yara": true,
+          "atr": true
+        }
       ]
     },
     "architecture": {
@@ -5375,7 +5460,11 @@
       "title": "ATR 在技術堆疊中的位置",
       "subtitle": "ATR 規則在語意層進行評估 -- 介於 LLM 和它呼叫的工具之間。",
       "layers": [
-        { "name": "使用者輸入", "desc": "提示詞文字、上傳檔案、對話上下文", "position": "top" },
+        {
+          "name": "使用者輸入",
+          "desc": "提示詞文字、上傳檔案、對話上下文",
+          "position": "top"
+        },
         {
           "name": "ATR 引擎",
           "desc": "32 條規則，每個事件評估時間 <1ms。封鎖、告警或上報。",
@@ -5425,10 +5514,22 @@
       "title": "開放標準。社群驅動成長。",
       "subtitle": "ATR 遵循讓 Sigma 和 YARA 成為產業標準的同一模式 -- 開放治理、社群貢獻、廠商中立設計。",
       "stats": [
-        { "value": "52", "label": "偵測規則" },
-        { "value": "9", "label": "威脅類別" },
-        { "value": "10/10", "label": "OWASP Agentic 覆蓋" },
-        { "value": "MIT", "label": "授權" }
+        {
+          "value": "52",
+          "label": "偵測規則"
+        },
+        {
+          "value": "9",
+          "label": "威脅類別"
+        },
+        {
+          "value": "10/10",
+          "label": "OWASP Agentic 覆蓋"
+        },
+        {
+          "value": "MIT",
+          "label": "授權"
+        }
       ],
       "steps": {
         "overline": "貢獻流程",
@@ -5502,27 +5603,39 @@
   },
   "revolution": {
     "hero": {
-      "eyebrow": "AI AGENT 的 APP STORE 守門員",
-      "title": "你的 AI Agent 需要一個守門員。",
-      "subtitleLine1": "你的 AI Agent 安裝 Skill 時擁有完整系統權限。沒有審核流程、沒有安全檢查、惡意 Skill 和你的資料之間零防線。",
+      "eyebrow": "AI AGENT 安全飛輪",
+      "title": "你發現的威脅，保護所有人。",
+      "subtitleLine1": "AI Agent 安裝技能時擁有完整系統權限。一個惡意技能就能竊取 API 金鑰、外洩資料、或劫持你的工作流程。",
       "threats": {
         "title": "一個惡意 Skill 就夠了。",
         "items": [
-          { "label": "竊取 API 金鑰", "detail": "讀取 .env，轉發給攻擊者" },
-          { "label": "外洩對話紀錄", "detail": "你的私密上下文，傳送到遠端伺服器" },
-          { "label": "劫持你的 Agent", "detail": "把它變成攻擊他人的工具" },
-          { "label": "洩漏憑證", "detail": "SSH 金鑰、Token、雲端密鑰 -- 全部可存取" }
+          {
+            "label": "竊取 API 金鑰",
+            "detail": "讀取 .env，轉發給攻擊者"
+          },
+          {
+            "label": "外洩對話紀錄",
+            "detail": "你的私密上下文，傳送到遠端伺服器"
+          },
+          {
+            "label": "劫持你的 Agent",
+            "detail": "把它變成攻擊他人的工具"
+          },
+          {
+            "label": "洩漏憑證",
+            "detail": "SSH 金鑰、Token、雲端密鑰 -- 全部可存取"
+          }
         ]
       },
-      "subtitleLine2": "Panguard 就是那個缺失的守門員。每個 Skill 執行前先審核 -- 就像 App Store 審核，但專為 AI Agent 設計。{atrRules} 條 ATR 規則偵測 AI Agent 威脅 + {integratedRules} 條整合 Sigma/YARA 規則。全天候運作。",
-      "subtitleLine3": "一行安裝。全天候守護。使用者越多越聰明。",
+      "subtitleLine2": "Panguard 在每個技能執行前進行審計。{atrRules} ATR 規則 + {integratedRules} Sigma 和 YARA 規則即時攔截已知威脅。AI 分析捕捉剩餘的。",
+      "subtitleLine3": "當你發現威脅，它會成為保護整個社群的規則。",
       "viewATR": "GitHub 上的 ATR 標準",
       "install": "開始使用",
       "copied": "已複製!",
       "platforms": "支援 Claude Code、Cursor、QClaw、OpenClaw、Codex、WorkBuddy、Claude Desktop",
       "badges": {
         "mit": "MIT 開源",
-        "rules": "ATR 規則",
+        "rules": "9,700+ 規則",
         "tests": "3,490+ 測試",
         "taiwan": "台灣製造"
       }

@@ -100,12 +100,20 @@ export default function ProductGuardContent() {
               <div className="grid grid-cols-3 gap-px bg-border">
                 {[
                   {
-                    label: t('dashboard.threatsBlocked'),
-                    value: '2,847',
+                    label: t('dashboard.detectionRules'),
+                    value: STATS.integratedRulesDisplay,
                     color: 'text-status-safe',
                   },
-                  { label: t('dashboard.activeEndpoints'), value: '12', color: 'text-brand-sage' },
-                  { label: t('dashboard.uptime'), value: '99.97%', color: 'text-text-primary' },
+                  {
+                    label: t('dashboard.detectionLayers'),
+                    value: String(STATS.detectionLayers),
+                    color: 'text-brand-sage',
+                  },
+                  {
+                    label: t('dashboard.responseActions'),
+                    value: String(STATS.responseActions),
+                    color: 'text-text-primary',
+                  },
                 ].map((s) => (
                   <div key={s.label} className="bg-surface-1 p-4 text-center">
                     <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>

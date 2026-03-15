@@ -82,8 +82,8 @@ export const MATURITY: Record<string, MaturityLevel> = {
   chat: 'GA',
   threatCloud: 'GA',
   manager: 'GA',
-  skillAuditor: 'Beta',
+  skillAuditor: 'GA',
   mcp: 'Beta',
-  trap: 'ComingSoon',
-  report: 'ComingSoon',
+  trap: 'Beta',
+  report: 'GA',
 };
