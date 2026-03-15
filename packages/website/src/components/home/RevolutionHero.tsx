@@ -167,12 +167,23 @@ export default function RevolutionHero() {
         >
           <div className="bg-surface-1/60 backdrop-blur-sm border border-border/60 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
             <div className="text-left">
-              <p className="text-xs text-text-muted uppercase tracking-wider">{t('scanHighlight.label')}</p>
-              <p className="text-sm text-text-secondary mt-1">{t('scanHighlight.desc', { scanned: STATS.ecosystem.skillsScanned.toLocaleString(), sources: STATS.ecosystem.entriesCrawled.toLocaleString() })}</p>
+              <p className="text-xs text-text-muted uppercase tracking-wider">
+                {t('scanHighlight.label')}
+              </p>
+              <p className="text-sm text-text-secondary mt-1">
+                {t('scanHighlight.desc', {
+                  scanned: STATS.ecosystem.skillsScanned.toLocaleString(),
+                  sources: STATS.ecosystem.entriesCrawled.toLocaleString(),
+                })}
+              </p>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-2xl font-extrabold text-red-400">{STATS.ecosystem.maliciousFound}</p>
-              <p className="text-[10px] text-red-400/70 uppercase tracking-wider">{t('scanHighlight.found')}</p>
+              <p className="text-2xl font-extrabold text-red-400">
+                {STATS.ecosystem.maliciousFound}
+              </p>
+              <p className="text-[10px] text-red-400/70 uppercase tracking-wider">
+                {t('scanHighlight.found')}
+              </p>
             </div>
           </div>
         </motion.div>
