@@ -744,12 +744,16 @@ export class ThreatCloudDB {
 
   /** Promote confirmed proposals with approved LLM review to rules / 推廣已確認提案為規則 */
   promoteConfirmedProposals(): number {
+    // Promote proposals that are either:
+    // 1. Community-confirmed (3+ confirmations) AND LLM approved
+    // 2. LLM approved (pending status) — single submission with LLM seal of approval
     const proposals = this.db
       .prepare(
         `
       SELECT pattern_hash, rule_content, llm_review_verdict
       FROM atr_proposals
-      WHERE status = 'confirmed' AND llm_review_verdict IS NOT NULL
+      WHERE llm_review_verdict IS NOT NULL
+        AND status IN ('confirmed', 'pending')
     `
       )
       .all() as Array<{ pattern_hash: string; rule_content: string; llm_review_verdict: string }>;
