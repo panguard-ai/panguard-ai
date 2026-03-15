@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getNonce } from '@/lib/nonce';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import GettingStartedContent from './GettingStartedContent';
@@ -42,10 +43,13 @@ const howToJsonLd = {
   ],
 };
 
-export default function GettingStartedPage() {
+export default async function GettingStartedPage() {
+  const nonce = await getNonce();
+
   return (
     <>
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />

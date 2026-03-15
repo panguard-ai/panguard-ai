@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates } from '@/lib/seo';
+import { getNonce } from '@/lib/nonce';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import FAQContent from './FAQContent';
@@ -21,6 +22,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
 
 export default async function FAQPage() {
   const t = await getTranslations('faqPage');
+  const nonce = await getNonce();
 
   // JSON-LD for SEO
   const faqCategories = ['security', 'detection', 'privacy', 'deployment', 'general'] as const;
@@ -52,6 +54,7 @@ export default async function FAQPage() {
   return (
     <>
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />

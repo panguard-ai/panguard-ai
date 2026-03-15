@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates } from '@/lib/seo';
+import { getNonce } from '@/lib/nonce';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import FadeInUp from '@/components/FadeInUp';
@@ -28,6 +29,7 @@ const faqKeys = ['faq1', 'faq2', 'faq3', 'faq4', 'faq5'] as const;
 
 export default async function PricingPage() {
   const t = await getTranslations('pricingPage');
+  const nonce = await getNonce();
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
@@ -45,6 +47,7 @@ export default async function PricingPage() {
   return (
     <>
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
