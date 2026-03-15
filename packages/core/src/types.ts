@@ -41,7 +41,8 @@ export type EventSource =
   | 'tool_response'
   | 'function_call'
   | 'mcp_response'
-  | 'multi_agent';
+  | 'multi_agent'
+  | 'git';
 
 /**
  * Base application configuration / 基礎應用程式配置

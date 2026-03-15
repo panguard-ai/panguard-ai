@@ -42,6 +42,10 @@ import {
 } from '@panguard-ai/security-hardening';
 import { FalcoMonitor } from './monitors/falco-monitor.js';
 import { SuricataMonitor } from './monitors/suricata-monitor.js';
+import { SecretWatcher } from './watchers/secret-watcher.js';
+import { DependencyWatcher } from './watchers/dependency-watcher.js';
+import { ProcessWatcher } from './watchers/process-watcher.js';
+import { GitWatcher } from './monitors/git-watcher.js';
 import { LogCollector } from './collectors/index.js';
 import { PanguardAgentClient } from './agent-client/index.js';
 import type { AgentHeartbeat } from './agent-client/index.js';
@@ -82,6 +86,10 @@ export class GuardEngine {
   private syslogAdapter: SyslogAdapter | null = null;
   private falcoMonitor: FalcoMonitor | null = null;
   private suricataMonitor: SuricataMonitor | null = null;
+  private secretWatcher: SecretWatcher | null = null;
+  private dependencyWatcher: DependencyWatcher | null = null;
+  private processWatcher: ProcessWatcher | null = null;
+  private gitWatcher: GitWatcher | null = null;
   private agentClient: PanguardAgentClient | null = null;
   private logCollector: LogCollector | null = null;
 
@@ -252,6 +260,41 @@ export class GuardEngine {
       this.suricataMonitor.on('event', (event) => void this.processEvent(event));
       await this.suricataMonitor.start();
       logger.info('Suricata network IDS monitoring active');
+    }
+
+    // Start secret/env watcher (optional, graceful degradation)
+    this.secretWatcher = new SecretWatcher(process.cwd());
+    const secretWatcherAvailable = await this.secretWatcher.checkAvailability();
+    if (secretWatcherAvailable) {
+      this.secretWatcher.on('event', (event) => void this.processEvent(event));
+      await this.secretWatcher.start();
+      logger.info('Secret/env watcher active');
+    }
+
+    // Start dependency watcher (optional, graceful degradation)
+    this.dependencyWatcher = new DependencyWatcher(process.cwd());
+    if (this.dependencyWatcher.checkAvailability()) {
+      this.dependencyWatcher.on('event', (event) => void this.processEvent(event));
+      await this.dependencyWatcher.start();
+      logger.info('Dependency watcher active');
+    }
+
+    // Start git repository watcher (optional, graceful degradation)
+    this.gitWatcher = new GitWatcher(process.cwd());
+    const gitWatcherAvailable = await this.gitWatcher.checkAvailability();
+    if (gitWatcherAvailable) {
+      this.gitWatcher.on('event', (event) => void this.processEvent(event));
+      await this.gitWatcher.start();
+      logger.info('Git repository watcher active');
+    }
+
+    // Start process watcher (optional, graceful degradation)
+    this.processWatcher = new ProcessWatcher();
+    const processWatcherAvailable = await this.processWatcher.checkAvailability();
+    if (processWatcherAvailable) {
+      this.processWatcher.on('event', (event) => void this.processEvent(event));
+      await this.processWatcher.start();
+      logger.info('Process command-line watcher active');
     }
 
     // Start log collector if configured
@@ -433,6 +476,22 @@ export class GuardEngine {
     if (this.suricataMonitor) {
       this.suricataMonitor.stop();
       this.suricataMonitor = null;
+    }
+    if (this.secretWatcher) {
+      this.secretWatcher.stop();
+      this.secretWatcher = null;
+    }
+    if (this.dependencyWatcher) {
+      this.dependencyWatcher.stop();
+      this.dependencyWatcher = null;
+    }
+    if (this.gitWatcher) {
+      this.gitWatcher.stop();
+      this.gitWatcher = null;
+    }
+    if (this.processWatcher) {
+      this.processWatcher.stop();
+      this.processWatcher = null;
     }
     if (this.logCollector) {
       this.logCollector.stop();
