@@ -41,6 +41,21 @@ const METRIC_DEFS: MetricDef[] = [
   },
   { name: 'panguard_learning_progress', help: 'Learning mode progress (0-1)', type: 'gauge' },
   { name: 'panguard_running', help: 'Whether the guard engine is running (0 or 1)', type: 'gauge' },
+  {
+    name: 'panguard_memory_heap_total_bytes',
+    help: 'Total V8 heap allocated in bytes',
+    type: 'gauge',
+  },
+  {
+    name: 'panguard_memory_heap_limit_bytes',
+    help: 'V8 heap size limit in bytes',
+    type: 'gauge',
+  },
+  {
+    name: 'panguard_memory_pressure_percent',
+    help: 'Heap usage as percentage of heap limit',
+    type: 'gauge',
+  },
   { name: 'panguard_ai_requests_total', help: 'Total AI API requests made', type: 'counter' },
   { name: 'panguard_ai_latency_seconds', help: 'AI API request latency', type: 'histogram' },
 ];
@@ -104,6 +119,9 @@ export class MetricsCollector {
       panguard_baseline_confidence: status.baselineConfidence,
       panguard_learning_progress: status.learningProgress,
       panguard_running: status.running ? 1 : 0,
+      panguard_memory_heap_total_bytes: (status.heapTotalMB ?? 0) * 1024 * 1024,
+      panguard_memory_heap_limit_bytes: (status.heapLimitMB ?? 0) * 1024 * 1024,
+      panguard_memory_pressure_percent: status.heapUsagePercent ?? 0,
       panguard_ai_requests_total: this.aiRequestCount,
     };
 

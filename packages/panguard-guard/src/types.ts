@@ -467,6 +467,14 @@ export interface DashboardStatus {
   trackedSkills?: number;
   stableFingerprints?: number;
   licenseTier?: string;
+  /** Heap total in MB / 堆積總量（MB） */
+  heapTotalMB?: number;
+  /** V8 heap size limit in MB / V8 堆積上限（MB） */
+  heapLimitMB?: number;
+  /** Heap usage as percentage of limit / 堆積使用率（佔上限百分比） */
+  heapUsagePercent?: number;
+  /** Memory pressure status / 記憶體壓力狀態 */
+  memoryStatus?: 'healthy' | 'warning' | 'critical';
 }
 
 /** Dashboard event for WebSocket push / WebSocket 推送事件 */
@@ -587,4 +595,12 @@ export interface GuardStatus {
   trackedSkills?: number;
   /** Number of stable fingerprints / 已穩定的指紋數量 */
   stableFingerprints?: number;
+  /** Heap total in MB / 堆積總量（MB） */
+  heapTotalMB?: number;
+  /** V8 heap size limit in MB / V8 堆積上限（MB） */
+  heapLimitMB?: number;
+  /** Heap usage as percentage of limit / 堆積使用率（佔上限百分比） */
+  heapUsagePercent?: number;
+  /** Memory pressure status / 記憶體壓力狀態 */
+  memoryStatus?: 'healthy' | 'warning' | 'critical';
 }
