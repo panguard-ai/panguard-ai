@@ -15,6 +15,7 @@
  * - GET  /api/feeds/ip-blocklist     IP blocklist feed (text/plain, ?minReputation=)
  * - GET  /api/feeds/domain-blocklist Domain blocklist feed (text/plain, ?minReputation=)
  * - GET  /api/skill-blacklist        Community skill blacklist (aggregated threats)
+ * - POST /api/analyze-skills         Submit scan results for server-side LLM analysis
  * - GET  /api/audit-log             Admin audit log (paginated, admin-only)
  * - GET  /health                     Health check
  *
@@ -392,6 +393,14 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/analyze-skills':
+          if (req.method === 'POST') {
+            await this.handleAnalyzeSkills(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/audit-log':
           if (req.method === 'GET') {
             if (!this.checkAdminAuth(req)) {
@@ -752,6 +761,66 @@ export class ThreatCloudServer {
     res.setHeader('Cache-Control', 'public, max-age=1800, s-maxage=1800');
     const blacklist = this.db.getSkillBlacklist(minReports, minAvgRisk);
     this.sendJson(res, 200, { ok: true, data: blacklist });
+  }
+
+  /**
+   * POST /api/analyze-skills - Submit scan results for server-side LLM analysis
+   * 提交掃描結果讓伺服器端 LLM 分析語義威脅並自動產出 ATR proposals
+   *
+   * Body: { skills: [{ package: string, tools: [{ name, description }] }] }
+   * Response: { ok: true, data: { analyzed, proposalsCreated, results } }
+   */
+  private async handleAnalyzeSkills(
+    req: IncomingMessage,
+    res: ServerResponse
+  ): Promise<void> {
+    if (!this.llmReviewer?.isAvailable()) {
+      this.sendJson(res, 503, {
+        ok: false,
+        error: 'LLM reviewer not available — ANTHROPIC_API_KEY not configured on server',
+      });
+      return;
+    }
+
+    const body = await this.readBody(req);
+    const data = JSON.parse(body) as {
+      skills?: Array<{ package: string; tools: Array<{ name: string; description: string }> }>;
+    };
+
+    if (!data.skills || !Array.isArray(data.skills) || data.skills.length === 0) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'Request body must contain "skills" array with package name and tools',
+      });
+      return;
+    }
+
+    // Limit batch size to prevent abuse (max 10 skills per request)
+    const skills = data.skills.slice(0, 10);
+
+    log.info(`Analyzing ${skills.length} skills with LLM`, {
+      packages: skills.map(s => s.package),
+    });
+
+    const results = await this.llmReviewer.analyzeSkills(skills);
+
+    const proposalsCreated = results.reduce((sum, r) => sum + r.proposals.length, 0);
+
+    log.info(`LLM analysis complete: ${proposalsCreated} proposals from ${skills.length} skills`);
+
+    this.sendJson(res, 200, {
+      ok: true,
+      data: {
+        analyzed: results.length,
+        proposalsCreated,
+        results: results.map(r => ({
+          package: r.package,
+          threatsFound: r.threatsFound,
+          proposalCount: r.proposals.length,
+          patternHashes: r.proposals.map(p => p.patternHash),
+        })),
+      },
+    });
   }
 
   /** GET /api/audit-log?page=1&limit=50 (admin-only) */
