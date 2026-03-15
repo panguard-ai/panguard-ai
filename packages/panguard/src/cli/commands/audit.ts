@@ -59,7 +59,39 @@ export function auditCommand(): Command {
         }
 
         const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
-        const report = await auditSkill(resolvedPath);
+
+        // ── Fetch cloud rules from Threat Cloud (flywheel: community rules enhance audits) ──
+        type CloudATRRule = { id: string; title: string; detection: unknown; [key: string]: unknown };
+        let cloudRules: CloudATRRule[] = [];
+        if (options.cloud) {
+          try {
+            const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
+            const dataDir = path.join(
+              process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
+              '.panguard-guard'
+            );
+            const tc = new ThreatCloudClient(options.tcEndpoint, dataDir);
+            const atrUpdates = await tc.fetchATRRules();
+            for (const update of atrUpdates) {
+              try {
+                const parsed = JSON.parse(update.ruleContent) as CloudATRRule;
+                if (parsed.id && parsed.title && parsed.detection) {
+                  cloudRules.push(parsed);
+                }
+              } catch {
+                // Skip unparseable rules
+              }
+            }
+            if (cloudRules.length > 0 && !options.json) {
+              console.log(c.dim(`  Threat Cloud: ${cloudRules.length} community rule(s) loaded`));
+              console.log();
+            }
+          } catch {
+            // Threat Cloud fetch is best-effort — never block the audit
+          }
+        }
+
+        const report = await auditSkill(resolvedPath, { cloudRules });
 
         if (options.json) {
           console.log(JSON.stringify(report, null, 2));

@@ -95,7 +95,7 @@ export class RespondAgent {
 
     // Playbook Engine check (before hardcoded logic)
     if (this.playbookEngine) {
-      const result = this.tryPlaybook(verdict, correlationPatterns);
+      const result = await this.tryPlaybook(verdict, correlationPatterns);
       if (result) return result;
     }
 

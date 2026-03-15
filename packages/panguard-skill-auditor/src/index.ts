@@ -56,9 +56,9 @@ export async function auditSkill(skillDir: string, options?: AuditOptions): Prom
     checks.push(checkPermissions(manifest));
   }
 
-  // ATR pattern detection (52+ rules including CJK-aware patterns)
+  // ATR pattern detection (52+ rules including CJK-aware patterns + cloud rules)
   if (manifest && !options?.skipATR) {
-    checks.push(await checkWithATR(manifest));
+    checks.push(await checkWithATR(manifest, options?.cloudRules));
   }
 
   // Code security (SAST + secrets)
