@@ -726,6 +726,19 @@
       "badge2": "3,490 Tests Passing",
       "badge3": "Built in Taiwan",
       "copied": "Copied!"
+    },
+    "scanner": {
+      "overline": "ONLINE SKILL SCANNER",
+      "title": "Scan any skill. No install needed.",
+      "subtitle": "Paste a GitHub URL to instantly check if an AI skill or MCP server is safe. Results are cached -- same content is never re-scanned.",
+      "placeholder": "github.com/owner/repo",
+      "scanBtn": "Scan",
+      "cached": "Cached",
+      "showFindings": "Show {count} finding(s)",
+      "hideFindings": "Hide findings",
+      "ctaText": "Want real-time protection for all your AI agents?",
+      "learnMore": "Learn more",
+      "trustNote": "Scans run server-side. No code is stored. Only content hash is cached for deduplication."
     }
   },
   "pricing": {
