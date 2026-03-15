@@ -133,7 +133,11 @@ export function showHelp(lang: Lang): void {
   console.log(`  ${c.sage(promptTitle)}`);
 
   const cmds = [
-    { cmd: 'setup', en: 'Connect AI agents via MCP', zh: '\u900F\u904E MCP \u9023\u63A5 AI \u4EE3\u7406' },
+    {
+      cmd: 'setup',
+      en: 'Connect AI agents via MCP',
+      zh: '\u900F\u904E MCP \u9023\u63A5 AI \u4EE3\u7406',
+    },
     { cmd: 'audit', en: 'Audit AI agent skills', zh: '\u5BE9\u8A08 AI \u4EE3\u7406\u6280\u80FD' },
     { cmd: 'status', en: 'System status overview', zh: '\u7CFB\u7D71\u72C0\u614B\u7E3D\u89BD' },
     { cmd: 'config', en: 'Settings management', zh: '\u8A2D\u5B9A\u7BA1\u7406' },

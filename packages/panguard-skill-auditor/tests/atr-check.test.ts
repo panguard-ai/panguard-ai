@@ -16,7 +16,8 @@ describe('checkWithATR', () => {
   describe('safe skills', () => {
     it('should return pass with no findings for benign instructions', async () => {
       const manifest = buildManifest({
-        instructions: 'This skill helps format TypeScript code using prettier. It reads files and outputs formatted versions.',
+        instructions:
+          'This skill helps format TypeScript code using prettier. It reads files and outputs formatted versions.',
       });
       const result = await checkWithATR(manifest);
       expect(result.findings).toHaveLength(0);

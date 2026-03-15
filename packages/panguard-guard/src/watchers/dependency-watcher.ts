@@ -38,12 +38,42 @@ const WATCHED_FILES = [
 
 /** Popular packages used for typosquat detection */
 const POPULAR_PACKAGES: readonly string[] = [
-  'express', 'react', 'lodash', 'axios', 'webpack', 'babel', 'typescript',
-  'next', 'vue', 'angular', 'svelte', 'fastify', 'nest', 'prisma',
-  'mongoose', 'sequelize', 'knex', 'dotenv', 'cors', 'helmet',
-  'jsonwebtoken', 'bcrypt', 'passport', 'socket.io', 'redis', 'pg',
-  'mysql2', 'chalk', 'commander', 'inquirer', 'ora', 'zod', 'yup',
-  'anthropic', 'openai', 'langchain',
+  'express',
+  'react',
+  'lodash',
+  'axios',
+  'webpack',
+  'babel',
+  'typescript',
+  'next',
+  'vue',
+  'angular',
+  'svelte',
+  'fastify',
+  'nest',
+  'prisma',
+  'mongoose',
+  'sequelize',
+  'knex',
+  'dotenv',
+  'cors',
+  'helmet',
+  'jsonwebtoken',
+  'bcrypt',
+  'passport',
+  'socket.io',
+  'redis',
+  'pg',
+  'mysql2',
+  'chalk',
+  'commander',
+  'inquirer',
+  'ora',
+  'zod',
+  'yup',
+  'anthropic',
+  'openai',
+  'langchain',
 ] as const;
 
 /** Maximum Levenshtein distance to flag as typosquat */
@@ -72,9 +102,9 @@ export function levenshtein(a: string, b: string): number {
     for (let j = 1; j <= bLen; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
       curr[j] = Math.min(
-        (prev[j] ?? 0) + 1,        // deletion
-        (curr[j - 1] ?? 0) + 1,    // insertion
-        (prev[j - 1] ?? 0) + cost  // substitution
+        (prev[j] ?? 0) + 1, // deletion
+        (curr[j - 1] ?? 0) + 1, // insertion
+        (prev[j - 1] ?? 0) + cost // substitution
       );
     }
     prev = curr;
@@ -324,12 +354,10 @@ export class DependencyWatcher extends EventEmitter {
       // Non-JS dependency file changed
       this.emit(
         'event',
-        buildSecurityEvent(
-          'low',
-          'supply-chain',
-          `Dependency file changed: ${fileName}`,
-          { fileName, watchDir: this.watchDir }
-        )
+        buildSecurityEvent('low', 'supply-chain', `Dependency file changed: ${fileName}`, {
+          fileName,
+          watchDir: this.watchDir,
+        })
       );
     }
   }
@@ -436,9 +464,7 @@ export class DependencyWatcher extends EventEmitter {
    */
   private isJsLockfile(fileName: string): boolean {
     return (
-      fileName === 'package-lock.json' ||
-      fileName === 'pnpm-lock.yaml' ||
-      fileName === 'yarn.lock'
+      fileName === 'package-lock.json' || fileName === 'pnpm-lock.yaml' || fileName === 'yarn.lock'
     );
   }
 

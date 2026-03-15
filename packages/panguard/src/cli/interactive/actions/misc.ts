@@ -19,7 +19,9 @@ export async function actionReport(lang: Lang): Promise<void> {
   if (lang === 'zh-TW') {
     console.log('  \u5408\u898F\u5831\u544A \u2014 \u5373\u5C07\u63A8\u51FA');
     console.log('');
-    console.log('  ISO 27001\u3001SOC 2\u3001\u8CC7\u5B89\u7BA1\u7406\u6CD5\u5408\u898F\u5831\u544A\u529F\u80FD\u958B\u767C\u4E2D\u3002');
+    console.log(
+      '  ISO 27001\u3001SOC 2\u3001\u8CC7\u5B89\u7BA1\u7406\u6CD5\u5408\u898F\u5831\u544A\u529F\u80FD\u958B\u767C\u4E2D\u3002'
+    );
     console.log('  \u8FFD\u8E64\u9032\u5EA6: https://github.com/panguard-ai/panguard-ai');
   } else {
     console.log('  Compliance Report \u2014 Coming Soon');
@@ -41,7 +43,9 @@ export async function actionTrap(lang: Lang): Promise<void> {
   if (lang === 'zh-TW') {
     console.log('  \u871C\u7F50\u7CFB\u7D71 \u2014 \u5373\u5C07\u63A8\u51FA');
     console.log('');
-    console.log('  \u8A98\u990C\u670D\u52D9\uFF08SSH\u3001HTTP\u3001FTP\uFF09\u5075\u6E2C\u8207\u5206\u6790\u653B\u64CA\u8005\u529F\u80FD\u958B\u767C\u4E2D\u3002');
+    console.log(
+      '  \u8A98\u990C\u670D\u52D9\uFF08SSH\u3001HTTP\u3001FTP\uFF09\u5075\u6E2C\u8207\u5206\u6790\u653B\u64CA\u8005\u529F\u80FD\u958B\u767C\u4E2D\u3002'
+    );
     console.log('  \u8FFD\u8E64\u9032\u5EA6: https://github.com/panguard-ai/panguard-ai');
   } else {
     console.log('  Honeypot System \u2014 Coming Soon');
@@ -64,7 +68,10 @@ export async function actionChat(lang: Lang): Promise<void> {
   console.log('');
 
   const items: MenuItem[] = [
-    { key: '1', label: lang === 'zh-TW' ? '\u8A2D\u5B9A\u901A\u77E5\u7BA1\u9053' : 'Setup Channels' },
+    {
+      key: '1',
+      label: lang === 'zh-TW' ? '\u8A2D\u5B9A\u901A\u77E5\u7BA1\u9053' : 'Setup Channels',
+    },
     { key: '2', label: lang === 'zh-TW' ? '\u67E5\u770B\u72C0\u614B' : 'Status' },
     { key: '3', label: lang === 'zh-TW' ? '\u6E2C\u8A66\u767C\u9001' : 'Test Send' },
   ];
@@ -113,9 +120,13 @@ export async function actionThreat(lang: Lang): Promise<void> {
   if (!portAvailable) {
     console.log(
       formatError(
-        lang === 'zh-TW' ? `\u9023\u63A5\u57E0 ${port} \u5DF2\u88AB\u4F54\u7528` : `Port ${port} is already in use`,
+        lang === 'zh-TW'
+          ? `\u9023\u63A5\u57E0 ${port} \u5DF2\u88AB\u4F54\u7528`
+          : `Port ${port} is already in use`,
         `Port ${port}`,
-        lang === 'zh-TW' ? `\u91CB\u653E\u9023\u63A5\u57E0 ${port} \u5F8C\u518D\u8A66` : `Free port ${port} and try again`
+        lang === 'zh-TW'
+          ? `\u91CB\u653E\u9023\u63A5\u57E0 ${port} \u5F8C\u518D\u8A66`
+          : `Free port ${port} and try again`
       )
     );
     return;
@@ -141,7 +152,9 @@ export async function actionThreat(lang: Lang): Promise<void> {
     return;
   }
   const sp = spinner(
-    lang === 'zh-TW' ? '\u6B63\u5728\u555F\u52D5 Threat Cloud API...' : 'Starting Threat Cloud API server...'
+    lang === 'zh-TW'
+      ? '\u6B63\u5728\u555F\u52D5 Threat Cloud API...'
+      : 'Starting Threat Cloud API server...'
   );
 
   const server = new ThreatCloudServer({
@@ -155,7 +168,9 @@ export async function actionThreat(lang: Lang): Promise<void> {
 
   try {
     await server.start();
-    sp.succeed(lang === 'zh-TW' ? 'Threat Cloud API \u5DF2\u555F\u52D5' : 'Threat Cloud API started');
+    sp.succeed(
+      lang === 'zh-TW' ? 'Threat Cloud API \u5DF2\u555F\u52D5' : 'Threat Cloud API started'
+    );
 
     console.log('');
     console.log(`  URL       ${c.underline('http://127.0.0.1:8080')}`);
@@ -163,7 +178,11 @@ export async function actionThreat(lang: Lang): Promise<void> {
     console.log(`  API       ${c.sage('http://127.0.0.1:8080/api/stats')}`);
     console.log('');
     console.log(
-      c.dim(lang === 'zh-TW' ? '  \u6309\u4EFB\u610F\u9375\u505C\u6B62\u4F3A\u670D\u5668...' : '  Press any key to stop...')
+      c.dim(
+        lang === 'zh-TW'
+          ? '  \u6309\u4EFB\u610F\u9375\u505C\u6B62\u4F3A\u670D\u5668...'
+          : '  Press any key to stop...'
+      )
     );
 
     await pressAnyKey(lang);
@@ -187,7 +206,10 @@ export async function actionHardening(lang: Lang): Promise<void> {
   console.log('');
 
   const items: MenuItem[] = [
-    { key: '1', label: lang === 'zh-TW' ? '\u57F7\u884C\u52A0\u56FA\u6383\u63CF' : 'Run hardening audit' },
+    {
+      key: '1',
+      label: lang === 'zh-TW' ? '\u57F7\u884C\u52A0\u56FA\u6383\u63CF' : 'Run hardening audit',
+    },
     { key: '2', label: lang === 'zh-TW' ? '\u81EA\u52D5\u4FEE\u5FA9' : 'Auto-fix issues' },
     { key: '3', label: lang === 'zh-TW' ? '\u67E5\u770B\u5831\u544A' : 'View report' },
   ];

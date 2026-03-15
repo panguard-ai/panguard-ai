@@ -139,9 +139,7 @@ describe('runNpmAudit', () => {
       // Result is either null (error) or an object with no vulnerabilities
       if (result !== null) {
         // If npm ran successfully, vulnerabilities should be empty or undefined
-        const vulnCount = result.vulnerabilities
-          ? Object.keys(result.vulnerabilities).length
-          : 0;
+        const vulnCount = result.vulnerabilities ? Object.keys(result.vulnerabilities).length : 0;
         expect(vulnCount).toBeGreaterThanOrEqual(0);
       } else {
         expect(result).toBeNull();

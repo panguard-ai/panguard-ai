@@ -13,7 +13,13 @@ interface BreadcrumbItem {
   href?: string;
 }
 
-export default function JsonLdBreadcrumb({ items, nonce }: { items: BreadcrumbItem[]; nonce?: string }) {
+export default function JsonLdBreadcrumb({
+  items,
+  nonce,
+}: {
+  items: BreadcrumbItem[];
+  nonce?: string;
+}) {
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

@@ -6,7 +6,13 @@
 export { SecretWatcher } from './secret-watcher.js';
 export type { SecretPattern } from './secret-watcher.js';
 
-export { DependencyWatcher, levenshtein, detectTyposquat, detectSuspiciousScripts, runNpmAudit } from './dependency-watcher.js';
+export {
+  DependencyWatcher,
+  levenshtein,
+  detectTyposquat,
+  detectSuspiciousScripts,
+  runNpmAudit,
+} from './dependency-watcher.js';
 
 export {
   ProcessWatcher,

@@ -17,11 +17,7 @@ import type {
   KnowledgeDistiller,
   Logger,
 } from '@panguard-ai/core';
-import type {
-  GuardConfig,
-  GuardMode,
-  EnvironmentBaseline,
-} from './types.js';
+import type { GuardConfig, GuardMode, EnvironmentBaseline } from './types.js';
 import type { DetectAgent, AnalyzeAgent, RespondAgent, ReportAgent } from './agent/index.js';
 import type { InvestigationEngine } from './investigation/index.js';
 import type { ThreatCloudClient } from './threat-cloud/index.js';

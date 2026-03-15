@@ -9,10 +9,7 @@
  * @module @panguard-ai/panguard-guard/event-processor
  */
 
-import {
-  createLogger,
-  parseSigmaYaml,
-} from '@panguard-ai/core';
+import { createLogger, parseSigmaYaml } from '@panguard-ai/core';
 import type {
   RuleEngine,
   YaraScanner,
@@ -121,9 +118,7 @@ function evaluateATR(
   const atrRuleMatches = atrMatches.map((m) => ({
     ruleId: m.rule.id,
     ruleName: m.rule.title,
-    severity: (m.rule.severity === 'informational'
-      ? 'info'
-      : m.rule.severity) as Severity,
+    severity: (m.rule.severity === 'informational' ? 'info' : m.rule.severity) as Severity,
   }));
   const atrMatchData = atrMatches.map((m) => ({
     ruleId: m.rule.id,
@@ -154,10 +149,7 @@ function evaluateATR(
 /**
  * Run SmartRouter assessment to determine whether AI analysis can be skipped.
  */
-function runSmartRouter(
-  detection: DetectionResult,
-  smartRouter: SmartRouter | null
-): void {
+function runSmartRouter(detection: DetectionResult, smartRouter: SmartRouter | null): void {
   if (!smartRouter) return;
 
   const maxRuleConfidence = Math.max(
@@ -230,8 +222,7 @@ function runKnowledgeDistillation(
       if (parsed) {
         ruleEngine.addRule(parsed);
         logger.info(
-          `Rule distilled from AI: ${distilled.ruleId} / ` +
-            `AI 蒸餾規則: ${distilled.ruleId}`
+          `Rule distilled from AI: ${distilled.ruleId} / ` + `AI 蒸餾規則: ${distilled.ruleId}`
         );
       }
     } catch {
@@ -288,9 +279,7 @@ async function reportAndNotify(
   // Upload to threat cloud
   if (anonymizedData && state.config.telemetryEnabled !== false) {
     if (state.config.showUploadData) {
-      logger.info(
-        `[upload-preview] Anonymized data: ${JSON.stringify(anonymizedData, null, 2)}`
-      );
+      logger.info(`[upload-preview] Anonymized data: ${JSON.stringify(anonymizedData, null, 2)}`);
     }
     await deps.threatCloud.upload(anonymizedData);
     state.threatCloudUploaded++;

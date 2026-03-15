@@ -111,7 +111,7 @@ describe('scanCommandLine', () => {
     });
 
     it('detects node -e execution', () => {
-      const matches = scanCommandLine('node -e "require(\'child_process\').execSync(\'id\')"');
+      const matches = scanCommandLine("node -e \"require('child_process').execSync('id')\"");
       expect(matches.some((m) => m.id === 'node-inline')).toBe(true);
     });
 

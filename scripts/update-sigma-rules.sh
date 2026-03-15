@@ -33,9 +33,14 @@ COMMIT_DATE=$(git -C "$REPO_DIR" log -1 --format='%ci')
 rm -rf "$TARGET_DIR"
 mkdir -p "$TARGET_DIR"
 
-if [ -d "$REPO_DIR/rules" ]; then
-  cp -r "$REPO_DIR/rules/"* "$TARGET_DIR/"
-else
+for rule_dir in rules rules-emerging-threats rules-threat-hunting rules-compliance rules-placeholder; do
+  if [ -d "$REPO_DIR/$rule_dir" ]; then
+    cp -r "$REPO_DIR/$rule_dir/"* "$TARGET_DIR/"
+    echo "  Copied $rule_dir/"
+  fi
+done
+
+if [ ! -d "$REPO_DIR/rules" ]; then
   echo "ERROR: rules/ directory not found in SigmaHQ repo"
   exit 1
 fi

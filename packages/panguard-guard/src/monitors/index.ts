@@ -34,10 +34,5 @@ export type { MemoryScanResult, MemoryMatch } from './memory-scanner.js';
 
 export { DpiMonitor } from './dpi-monitor.js';
 
-export {
-  GitWatcher,
-  createGitEvent,
-  isSensitiveFile,
-  scanLineForSecrets,
-} from './git-watcher.js';
+export { GitWatcher, createGitEvent, isSensitiveFile, scanLineForSecrets } from './git-watcher.js';
 export type { DiffSecretPattern } from './git-watcher.js';

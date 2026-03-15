@@ -49,7 +49,10 @@ export async function actionGuard(lang: Lang): Promise<void> {
         nextSteps(
           lang === 'zh-TW'
             ? [
-                { cmd: 'guard > \u67E5\u770B\u72C0\u614B', desc: '\u67E5\u770B\u8A73\u7D30\u72C0\u614B' },
+                {
+                  cmd: 'guard > \u67E5\u770B\u72C0\u614B',
+                  desc: '\u67E5\u770B\u8A73\u7D30\u72C0\u614B',
+                },
                 { cmd: 'guard > \u505C\u6B62\u5F15\u64CE', desc: '\u505C\u6B62\u9632\u8B77' },
               ]
             : [
@@ -64,7 +67,9 @@ export async function actionGuard(lang: Lang): Promise<void> {
       console.log(`  ${c.sage('\u25C6')} Guard active${' '.repeat(30)}All Layers \u00B7 Free`);
       console.log('');
       if (lang === 'zh-TW') {
-        console.log(`  ${c.safe('\u2713')} \u5DF2\u77E5\u653B\u64CA\u6A21\u5F0F\u81EA\u52D5\u5C01\u9396`);
+        console.log(
+          `  ${c.safe('\u2713')} \u5DF2\u77E5\u653B\u64CA\u6A21\u5F0F\u81EA\u52D5\u5C01\u9396`
+        );
         console.log(`  ${c.safe('\u2713')} Threat Cloud \u5A01\u8105\u60C5\u5831`);
         console.log(`  ${c.safe('\u2713')} AI \u5206\u6790`);
         console.log(`  ${c.safe('\u2713')} \u901A\u77E5\u7CFB\u7D71`);
@@ -90,7 +95,9 @@ export async function actionGuard(lang: Lang): Promise<void> {
       const logFd = openSync(logPath, 'a');
 
       const guardSp = spinner(
-        lang === 'zh-TW' ? '\u6B63\u5728\u555F\u52D5\u5B88\u8B77\u5F15\u64CE...' : 'Starting guard engine...'
+        lang === 'zh-TW'
+          ? '\u6B63\u5728\u555F\u52D5\u5B88\u8B77\u5F15\u64CE...'
+          : 'Starting guard engine...'
       );
 
       const child = spawnProcess(process.execPath, [guardCliScript, 'start'], {
@@ -120,7 +127,9 @@ export async function actionGuard(lang: Lang): Promise<void> {
 
       if (started) {
         const newPid = parseInt(readFileSync(pidPath, 'utf-8').trim(), 10);
-        guardSp.succeed(lang === 'zh-TW' ? '\u5B88\u8B77\u5F15\u64CE\u5DF2\u555F\u52D5' : 'Guard engine started');
+        guardSp.succeed(
+          lang === 'zh-TW' ? '\u5B88\u8B77\u5F15\u64CE\u5DF2\u555F\u52D5' : 'Guard engine started'
+        );
         console.log('');
         console.log(
           `  ${c.safe('\u2713')} ${lang === 'zh-TW' ? '\u7CFB\u7D71\u5DF2\u53D7\u4FDD\u8B77' : 'System is now protected'} ${c.dim(`(PID: ${newPid})`)}`
@@ -129,7 +138,11 @@ export async function actionGuard(lang: Lang): Promise<void> {
           `  ${c.dim(lang === 'zh-TW' ? '  \u65E5\u8A8C: ~/.panguard-guard/guard.log' : '  Logs: ~/.panguard-guard/guard.log')}`
         );
       } else {
-        guardSp.fail(lang === 'zh-TW' ? '\u5B88\u8B77\u5F15\u64CE\u555F\u52D5\u5931\u6557' : 'Failed to start guard engine');
+        guardSp.fail(
+          lang === 'zh-TW'
+            ? '\u5B88\u8B77\u5F15\u64CE\u555F\u52D5\u5931\u6557'
+            : 'Failed to start guard engine'
+        );
         console.log(
           `  ${c.dim(lang === 'zh-TW' ? '  \u67E5\u770B\u65E5\u8A8C: ~/.panguard-guard/guard.log' : '  Check logs: ~/.panguard-guard/guard.log')}`
         );
@@ -151,7 +164,9 @@ export async function actionGuard(lang: Lang): Promise<void> {
     }
     case '2': {
       const confirmed = await confirmDestructive(
-        lang === 'zh-TW' ? '\u78BA\u5B9A\u8981\u505C\u6B62\u5373\u6642\u9632\u8B77\uFF1F' : 'Stop real-time protection?',
+        lang === 'zh-TW'
+          ? '\u78BA\u5B9A\u8981\u505C\u6B62\u5373\u6642\u9632\u8B77\uFF1F'
+          : 'Stop real-time protection?',
         lang
       );
       if (confirmed) {
@@ -177,7 +192,9 @@ export async function actionGuard(lang: Lang): Promise<void> {
           console.log(`  ${c.dim(line)}`);
         }
       } else {
-        console.log(c.dim(lang === 'zh-TW' ? '  \u5C1A\u7121\u65E5\u8A8C\u6A94\u6848' : '  No log file found'));
+        console.log(
+          c.dim(lang === 'zh-TW' ? '  \u5C1A\u7121\u65E5\u8A8C\u6A94\u6848' : '  No log file found')
+        );
       }
       break;
     }

@@ -81,9 +81,7 @@ describe('SecretWatcher', () => {
       const secretEvents = events.filter((e) => e.category === 'credential-access');
       expect(secretEvents.length).toBeGreaterThanOrEqual(1);
 
-      const awsEvent = secretEvents.find((e) =>
-        e.description.includes('AWS Access Key')
-      );
+      const awsEvent = secretEvents.find((e) => e.description.includes('AWS Access Key'));
       expect(awsEvent).toBeDefined();
       expect(awsEvent!.severity).toBe('critical');
       expect(awsEvent!.source).toBe('file');
@@ -102,9 +100,7 @@ describe('SecretWatcher', () => {
       await wait(200);
       watcher.stop();
 
-      const awsEvent = events.find((e) =>
-        e.description.includes('AWS Secret Key')
-      );
+      const awsEvent = events.find((e) => e.description.includes('AWS Secret Key'));
       expect(awsEvent).toBeDefined();
       expect(awsEvent!.severity).toBe('critical');
     });
@@ -113,19 +109,14 @@ describe('SecretWatcher', () => {
   describe('secret detection - GitHub tokens', () => {
     it('should detect GitHub personal access token', async () => {
       const envPath = path.join(tempDir, '.env');
-      fs.writeFileSync(
-        envPath,
-        'GITHUB_TOKEN=ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij\n'
-      );
+      fs.writeFileSync(envPath, 'GITHUB_TOKEN=ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij\n');
 
       const events = collectEvents(watcher);
       await watcher.start();
       await wait(200);
       watcher.stop();
 
-      const ghEvent = events.find((e) =>
-        e.description.includes('GitHub Token')
-      );
+      const ghEvent = events.find((e) => e.description.includes('GitHub Token'));
       expect(ghEvent).toBeDefined();
       expect(ghEvent!.severity).toBe('high');
       expect(ghEvent!.metadata['patternId']).toBe('github-token');
@@ -135,19 +126,14 @@ describe('SecretWatcher', () => {
   describe('secret detection - private keys (critical severity)', () => {
     it('should detect RSA private key with critical severity', async () => {
       const envPath = path.join(tempDir, '.env');
-      fs.writeFileSync(
-        envPath,
-        'PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----"\n'
-      );
+      fs.writeFileSync(envPath, 'PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----"\n');
 
       const events = collectEvents(watcher);
       await watcher.start();
       await wait(200);
       watcher.stop();
 
-      const pkEvent = events.find((e) =>
-        e.description.includes('Private Key')
-      );
+      const pkEvent = events.find((e) => e.description.includes('Private Key'));
       expect(pkEvent).toBeDefined();
       expect(pkEvent!.severity).toBe('critical');
       expect(pkEvent!.metadata['patternId']).toBe('private-key');
@@ -155,19 +141,14 @@ describe('SecretWatcher', () => {
 
     it('should detect EC private key', async () => {
       const envPath = path.join(tempDir, '.env');
-      fs.writeFileSync(
-        envPath,
-        'KEY="-----BEGIN EC PRIVATE KEY-----"\n'
-      );
+      fs.writeFileSync(envPath, 'KEY="-----BEGIN EC PRIVATE KEY-----"\n');
 
       const events = collectEvents(watcher);
       await watcher.start();
       await wait(200);
       watcher.stop();
 
-      const pkEvent = events.find((e) =>
-        e.description.includes('Private Key')
-      );
+      const pkEvent = events.find((e) => e.description.includes('Private Key'));
       expect(pkEvent).toBeDefined();
       expect(pkEvent!.severity).toBe('critical');
     });
@@ -205,9 +186,7 @@ describe('SecretWatcher', () => {
       await watcher.start();
       await wait(200);
 
-      const countAfterFirstScan = events.filter(
-        (e) => e.category === 'credential-access'
-      ).length;
+      const countAfterFirstScan = events.filter((e) => e.category === 'credential-access').length;
       expect(countAfterFirstScan).toBe(1);
 
       // Trigger a re-scan by modifying the file with the same content
@@ -215,9 +194,7 @@ describe('SecretWatcher', () => {
       await wait(500);
       watcher.stop();
 
-      const countAfterRescan = events.filter(
-        (e) => e.category === 'credential-access'
-      ).length;
+      const countAfterRescan = events.filter((e) => e.category === 'credential-access').length;
       // Should still be 1 (no duplicate)
       expect(countAfterRescan).toBe(1);
     });
@@ -240,9 +217,7 @@ describe('SecretWatcher', () => {
       const secretEvents = events.filter((e) => e.category === 'credential-access');
       expect(secretEvents.length).toBeGreaterThanOrEqual(1);
 
-      const stripeEvent = secretEvents.find((e) =>
-        e.description.includes('Stripe Live Key')
-      );
+      const stripeEvent = secretEvents.find((e) => e.description.includes('Stripe Live Key'));
       expect(stripeEvent).toBeDefined();
     });
 

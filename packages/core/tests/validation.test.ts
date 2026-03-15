@@ -186,15 +186,13 @@ describe('RulePublishSchema', () => {
   });
 
   it('rejects ruleId exceeding 256 chars', () => {
-    expect(
-      RulePublishSchema.safeParse({ ...valid, ruleId: 'x'.repeat(257) }).success
-    ).toBe(false);
+    expect(RulePublishSchema.safeParse({ ...valid, ruleId: 'x'.repeat(257) }).success).toBe(false);
   });
 
   it('rejects ruleContent exceeding 64KB', () => {
-    expect(
-      RulePublishSchema.safeParse({ ...valid, ruleContent: 'x'.repeat(65_537) }).success
-    ).toBe(false);
+    expect(RulePublishSchema.safeParse({ ...valid, ruleContent: 'x'.repeat(65_537) }).success).toBe(
+      false
+    );
   });
 
   it('rejects missing source', () => {
@@ -232,18 +230,18 @@ describe('ATRProposalSchema', () => {
 
 describe('ATRFeedbackSchema', () => {
   it('accepts valid feedback', () => {
-    expect(
-      ATRFeedbackSchema.safeParse({ ruleId: 'rule-001', isTruePositive: true }).success
-    ).toBe(true);
-    expect(
-      ATRFeedbackSchema.safeParse({ ruleId: 'rule-001', isTruePositive: false }).success
-    ).toBe(true);
+    expect(ATRFeedbackSchema.safeParse({ ruleId: 'rule-001', isTruePositive: true }).success).toBe(
+      true
+    );
+    expect(ATRFeedbackSchema.safeParse({ ruleId: 'rule-001', isTruePositive: false }).success).toBe(
+      true
+    );
   });
 
   it('rejects non-boolean isTruePositive', () => {
-    expect(
-      ATRFeedbackSchema.safeParse({ ruleId: 'rule-001', isTruePositive: 'yes' }).success
-    ).toBe(false);
+    expect(ATRFeedbackSchema.safeParse({ ruleId: 'rule-001', isTruePositive: 'yes' }).success).toBe(
+      false
+    );
   });
 
   it('rejects missing ruleId', () => {
@@ -268,9 +266,7 @@ describe('SkillThreatSchema', () => {
   it('accepts with findingSummaries', () => {
     const withFindings = {
       ...valid,
-      findingSummaries: [
-        { id: 'f1', category: 'exec', severity: 'high', title: 'Shell command' },
-      ],
+      findingSummaries: [{ id: 'f1', category: 'exec', severity: 'high', title: 'Shell command' }],
     };
     expect(SkillThreatSchema.safeParse(withFindings).success).toBe(true);
   });
@@ -296,9 +292,7 @@ describe('SkillThreatSchema', () => {
 
 describe('SkillWhitelistItemSchema', () => {
   it('accepts valid item', () => {
-    expect(
-      SkillWhitelistItemSchema.safeParse({ skillName: 'safe-skill' }).success
-    ).toBe(true);
+    expect(SkillWhitelistItemSchema.safeParse({ skillName: 'safe-skill' }).success).toBe(true);
   });
 
   it('accepts with fingerprintHash', () => {
@@ -323,18 +317,13 @@ describe('SkillWhitelistItemSchema', () => {
 
 describe('SkillWhitelistSchema', () => {
   it('accepts single skill via top-level fields', () => {
-    expect(
-      SkillWhitelistSchema.safeParse({ skillName: 'my-skill' }).success
-    ).toBe(true);
+    expect(SkillWhitelistSchema.safeParse({ skillName: 'my-skill' }).success).toBe(true);
   });
 
   it('accepts batch via skills array', () => {
     expect(
       SkillWhitelistSchema.safeParse({
-        skills: [
-          { skillName: 'skill-a' },
-          { skillName: 'skill-b', fingerprintHash: 'hash-b' },
-        ],
+        skills: [{ skillName: 'skill-a' }, { skillName: 'skill-b', fingerprintHash: 'hash-b' }],
       }).success
     ).toBe(true);
   });

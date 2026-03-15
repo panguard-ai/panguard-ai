@@ -397,9 +397,7 @@ export class ProcessWatcher extends EventEmitter {
       // Update snapshot (immutable replace)
       this.previousPids = currentPids;
     } catch (err) {
-      logger.warn(
-        `Process poll failed: ${err instanceof Error ? err.message : String(err)}`
-      );
+      logger.warn(`Process poll failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -477,9 +475,8 @@ export class ProcessWatcher extends EventEmitter {
    */
   private redactCommand(command: string): string {
     const maxLen = 500;
-    let redacted = command.length > maxLen
-      ? command.substring(0, maxLen) + '...[truncated]'
-      : command;
+    let redacted =
+      command.length > maxLen ? command.substring(0, maxLen) + '...[truncated]' : command;
     // Mask values after common secret env patterns
     redacted = redacted.replace(
       /((?:KEY|TOKEN|SECRET|PASSWORD|PASS|CREDENTIAL|API_KEY)\s*=\s*)\S+/gi,
@@ -507,11 +504,10 @@ export class ProcessWatcher extends EventEmitter {
    */
   private async getUnixProcessList(): Promise<readonly ProcessSnapshot[]> {
     try {
-      const { stdout } = await execFileAsync(
-        'ps',
-        ['-eo', 'pid,ppid,user,comm,args'],
-        { timeout: 5000, maxBuffer: 10 * 1024 * 1024 }
-      );
+      const { stdout } = await execFileAsync('ps', ['-eo', 'pid,ppid,user,comm,args'], {
+        timeout: 5000,
+        maxBuffer: 10 * 1024 * 1024,
+      });
 
       const lines = stdout.trim().split('\n');
       // Skip header line
@@ -544,11 +540,10 @@ export class ProcessWatcher extends EventEmitter {
    */
   private async getWindowsProcessList(): Promise<readonly ProcessSnapshot[]> {
     try {
-      const { stdout } = await execFileAsync(
-        'tasklist',
-        ['/FO', 'CSV', '/V'],
-        { timeout: 5000, maxBuffer: 10 * 1024 * 1024 }
-      );
+      const { stdout } = await execFileAsync('tasklist', ['/FO', 'CSV', '/V'], {
+        timeout: 5000,
+        maxBuffer: 10 * 1024 * 1024,
+      });
 
       const lines = stdout.trim().split('\n');
       const processes: ProcessSnapshot[] = [];

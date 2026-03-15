@@ -33,9 +33,7 @@ export default function EcosystemScanner() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary">
             {t('title')}
           </h2>
-          <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">
-            {t('subtitle')}
-          </p>
+          <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">{t('subtitle')}</p>
         </motion.div>
 
         {/* Main counter row */}
@@ -175,9 +173,7 @@ export default function EcosystemScanner() {
 
         {/* CTA */}
         <FadeInUp delay={0.5}>
-          <p className="text-center text-sm text-gray-400 mt-8">
-            {t('cta')}
-          </p>
+          <p className="text-center text-sm text-gray-400 mt-8">{t('cta')}</p>
         </FadeInUp>
       </div>
     </section>

@@ -34,7 +34,8 @@ export const MENU_DEFS: MenuDef[] = [
     en: 'Security Scan',
     zh: '\u5B89\u5168\u6383\u63CF',
     enDesc: 'Scan system security and analyze risks',
-    zhDesc: '\u6383\u63CF\u7CFB\u7D71\u5B89\u5168\u72C0\u614B\uFF0C\u5206\u6790\u6240\u6709\u98A8\u96AA',
+    zhDesc:
+      '\u6383\u63CF\u7CFB\u7D71\u5B89\u5168\u72C0\u614B\uFF0C\u5206\u6790\u6240\u6709\u98A8\u96AA',
     tierBadge: '',
     featureKey: 'scan',
   },

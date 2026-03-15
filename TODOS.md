@@ -41,6 +41,7 @@ Added: legal-pages.spec.ts (8 legal pages + zh variants), mobile-responsive.spec
 ## P2 - Flywheel Core Component Unit Tests (XL)
 
 The 6 flywheel core components currently have minimal direct test coverage:
+
 - `skill-watcher.ts` (SkillWatcher: config watch, auto-audit trigger, blacklist check)
 - `llm-reviewer.ts` (LLM reviewer: analyzeSkills, reviewProposal, parseVerdict)
 - `rule-sync.ts` (Rule sync: YARA download, rule file write, path sanitization)

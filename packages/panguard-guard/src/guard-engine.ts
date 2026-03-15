@@ -12,11 +12,7 @@
  */
 
 import v8 from 'node:v8';
-import {
-  createLogger,
-  MonitorEngine,
-  setFeedManager,
-} from '@panguard-ai/core';
+import { createLogger, MonitorEngine, setFeedManager } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
 import type {
   GuardConfig,
@@ -389,9 +385,7 @@ export class GuardEngine {
             `consecutive critical: ${this.consecutiveCriticalChecks}`
         );
         if (this.consecutiveCriticalChecks >= 3) {
-          logger.warn(
-            'Memory pressure sustained for 15+ seconds, triggering graceful restart'
-          );
+          logger.warn('Memory pressure sustained for 15+ seconds, triggering graceful restart');
           this.eventCallback?.('memory_critical', {
             heapUsedMB: memCheck.heapUsedMB,
             heapLimitMB: memCheck.heapLimitMB,
@@ -650,8 +644,7 @@ export class GuardEngine {
     const heapUsedMB = Math.round((mem.heapUsed / 1024 / 1024) * 10) / 10;
     const heapTotalMB = Math.round((mem.heapTotal / 1024 / 1024) * 10) / 10;
     const heapLimitMB = Math.round((heapStats.heap_size_limit / 1024 / 1024) * 10) / 10;
-    const heapUsagePercent =
-      Math.round((mem.heapUsed / heapStats.heap_size_limit) * 1000) / 10;
+    const heapUsagePercent = Math.round((mem.heapUsed / heapStats.heap_size_limit) * 1000) / 10;
 
     let memoryStatus: 'healthy' | 'warning' | 'critical' = 'healthy';
     if (heapUsagePercent >= 80) {
@@ -699,11 +692,7 @@ export class GuardEngine {
    * Get loaded rule counts for each engine layer.
    */
   getRuleCounts(): { sigma: number; atr: number; yara: number } {
-    return getRuleCounts(
-      this.engines.ruleEngine,
-      this.engines.atrEngine,
-      this.engines.yaraScanner
-    );
+    return getRuleCounts(this.engines.ruleEngine, this.engines.atrEngine, this.engines.yaraScanner);
   }
 
   /**

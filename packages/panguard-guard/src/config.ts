@@ -19,47 +19,66 @@ const logger = createLogger('panguard-guard:config');
  * Zod schema for validating loaded config files.
  * All fields are optional since they merge with defaults.
  */
-const GuardConfigFileSchema = z.object({
-  lang: z.enum(['en', 'zh-TW', 'ja']).optional(),
-  mode: z.enum(['learning', 'protection']).optional(),
-  learningDays: z.number().int().min(1).max(365).optional(),
-  actionPolicy: z.object({
-    autoRespond: z.number().min(0).max(100),
-    notifyAndWait: z.number().min(0).max(100),
-    logOnly: z.number().min(0).max(100),
-  }).optional(),
-  dashboardPort: z.number().int().min(1).max(65535).optional(),
-  dashboardEnabled: z.boolean().optional(),
-  verbose: z.boolean().optional(),
-  dataDir: z.string().min(1).optional(),
-  monitors: z.object({
-    logMonitor: z.boolean().optional(),
-    networkMonitor: z.boolean().optional(),
-    processMonitor: z.boolean().optional(),
-    fileMonitor: z.boolean().optional(),
-    networkPollInterval: z.number().int().min(1000).optional(),
-    processPollInterval: z.number().int().min(1000).optional(),
-    logCollector: z.object({
-      enabled: z.boolean(),
-      filePaths: z.array(z.string()).optional(),
-      syslogPort: z.number().int().min(1).max(65535).optional(),
-    }).optional(),
-  }).optional(),
-  watchdogEnabled: z.boolean().optional(),
-  watchdogInterval: z.number().int().min(5000).optional(),
-  ai: z.object({
-    provider: z.enum(['ollama', 'claude', 'openai', 'gemini', 'groq', 'mistral', 'deepseek', 'lmstudio']),
-    model: z.string().min(1),
-    endpoint: z.string().optional(),
-    apiKey: z.string().optional(),
-    byokApiKey: z.string().optional(),
-  }).optional(),
-  threatCloudEndpoint: z.string().url().optional(),
-  threatCloudApiKey: z.string().optional(),
-  threatCloudUploadEnabled: z.boolean().optional(),
-  telemetryEnabled: z.boolean().optional(),
-  trustedSkills: z.array(z.string()).optional(),
-}).passthrough();
+const GuardConfigFileSchema = z
+  .object({
+    lang: z.enum(['en', 'zh-TW', 'ja']).optional(),
+    mode: z.enum(['learning', 'protection']).optional(),
+    learningDays: z.number().int().min(1).max(365).optional(),
+    actionPolicy: z
+      .object({
+        autoRespond: z.number().min(0).max(100),
+        notifyAndWait: z.number().min(0).max(100),
+        logOnly: z.number().min(0).max(100),
+      })
+      .optional(),
+    dashboardPort: z.number().int().min(1).max(65535).optional(),
+    dashboardEnabled: z.boolean().optional(),
+    verbose: z.boolean().optional(),
+    dataDir: z.string().min(1).optional(),
+    monitors: z
+      .object({
+        logMonitor: z.boolean().optional(),
+        networkMonitor: z.boolean().optional(),
+        processMonitor: z.boolean().optional(),
+        fileMonitor: z.boolean().optional(),
+        networkPollInterval: z.number().int().min(1000).optional(),
+        processPollInterval: z.number().int().min(1000).optional(),
+        logCollector: z
+          .object({
+            enabled: z.boolean(),
+            filePaths: z.array(z.string()).optional(),
+            syslogPort: z.number().int().min(1).max(65535).optional(),
+          })
+          .optional(),
+      })
+      .optional(),
+    watchdogEnabled: z.boolean().optional(),
+    watchdogInterval: z.number().int().min(5000).optional(),
+    ai: z
+      .object({
+        provider: z.enum([
+          'ollama',
+          'claude',
+          'openai',
+          'gemini',
+          'groq',
+          'mistral',
+          'deepseek',
+          'lmstudio',
+        ]),
+        model: z.string().min(1),
+        endpoint: z.string().optional(),
+        apiKey: z.string().optional(),
+        byokApiKey: z.string().optional(),
+      })
+      .optional(),
+    threatCloudEndpoint: z.string().url().optional(),
+    threatCloudApiKey: z.string().optional(),
+    threatCloudUploadEnabled: z.boolean().optional(),
+    telemetryEnabled: z.boolean().optional(),
+    trustedSkills: z.array(z.string()).optional(),
+  })
+  .passthrough();
 
 /** Default data directory / 預設資料目錄 */
 export const DEFAULT_DATA_DIR = join(homedir(), '.panguard-guard');
