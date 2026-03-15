@@ -176,7 +176,10 @@ export class ThreatCloudClient {
       const lastSync = this.cache.lastSync;
       const url = `${this.endpoint}/api/rules?since=${encodeURIComponent(lastSync)}`;
       const response = await this.httpGet(url);
-      const rules = JSON.parse(response) as ThreatCloudUpdate[];
+      const rawParsed = JSON.parse(response) as
+        | ThreatCloudUpdate[]
+        | { ok: boolean; data: ThreatCloudUpdate[] };
+      const rules = Array.isArray(rawParsed) ? rawParsed : (rawParsed.data ?? []);
 
       // Merge new rules into cache / 將新規則合併到快取
       for (const rule of rules) {
@@ -260,7 +263,12 @@ export class ThreatCloudClient {
       const sinceParam = since ?? this.cache.lastSync;
       const url = `${this.endpoint}/api/atr-rules?since=${encodeURIComponent(sinceParam)}`;
       const response = await this.httpGet(url);
-      const rules = JSON.parse(response) as ThreatCloudUpdate[];
+      const parsed = JSON.parse(response) as
+        | ThreatCloudUpdate[]
+        | { ok: boolean; data: ThreatCloudUpdate[] };
+
+      // Handle both flat array and { ok, data } envelope formats
+      const rules = Array.isArray(parsed) ? parsed : (parsed.data ?? []);
 
       this.status = 'connected';
       logger.info(
@@ -298,7 +306,10 @@ export class ThreatCloudClient {
       }
 
       const body = await this.httpGet(url);
-      const rules = JSON.parse(body) as ThreatCloudUpdate[];
+      const yaraRaw = JSON.parse(body) as
+        | ThreatCloudUpdate[]
+        | { ok: boolean; data: ThreatCloudUpdate[] };
+      const rules = Array.isArray(yaraRaw) ? yaraRaw : (yaraRaw.data ?? []);
       this.status = 'connected';
       if (rules.length > 0) {
         logger.info(

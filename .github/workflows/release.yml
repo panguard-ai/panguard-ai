@@ -200,6 +200,24 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         continue-on-error: true
 
+      - name: Publish @panguard-ai/atr
+        run: pnpm --filter @panguard-ai/atr publish --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        continue-on-error: true
+
+      - name: Publish @panguard-ai/panguard-guard
+        run: pnpm --filter @panguard-ai/panguard-guard publish --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        continue-on-error: true
+
+      - name: Publish @panguard-ai/panguard-skill-auditor
+        run: pnpm --filter @panguard-ai/panguard-skill-auditor publish --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        continue-on-error: true
+
       - name: Publish @panguard-ai/panguard
         run: pnpm --filter @panguard-ai/panguard publish --no-git-checks --access public
         env:

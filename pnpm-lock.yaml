@@ -112,6 +112,9 @@ importers:
 
   packages/panguard:
     dependencies:
+      '@panguard-ai/atr':
+        specifier: workspace:*
+        version: link:../atr
       '@panguard-ai/core':
         specifier: workspace:*
         version: link:../core
