@@ -158,12 +158,31 @@ export default function RevolutionHero() {
           </a>
         </motion.div>
 
+        {/* Ecosystem scan highlight */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1.1, ease }}
+          className="mt-10 max-w-lg mx-auto"
+        >
+          <div className="bg-surface-1/60 backdrop-blur-sm border border-border/60 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+            <div className="text-left">
+              <p className="text-xs text-text-muted uppercase tracking-wider">{t('scanHighlight.label')}</p>
+              <p className="text-sm text-text-secondary mt-1">{t('scanHighlight.desc', { scanned: STATS.ecosystem.skillsScanned.toLocaleString(), sources: STATS.ecosystem.entriesCrawled.toLocaleString() })}</p>
+            </div>
+            <div className="text-right shrink-0">
+              <p className="text-2xl font-extrabold text-red-400">{STATS.ecosystem.maliciousFound}</p>
+              <p className="text-[10px] text-red-400/70 uppercase tracking-wider">{t('scanHighlight.found')}</p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Supported platforms */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1.1, ease }}
-          className="text-xs text-text-tertiary mt-8 tracking-wide"
+          transition={{ duration: 0.5, delay: 1.2, ease }}
+          className="text-xs text-text-tertiary mt-6 tracking-wide"
         >
           {t('platforms')}
         </motion.p>
@@ -172,10 +191,10 @@ export default function RevolutionHero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1.2, ease }}
+          transition={{ duration: 0.5, delay: 1.3, ease }}
           className="flex flex-wrap gap-3 justify-center mt-4"
         >
-          {(['mit', 'rules', 'tests', 'taiwan'] as const).map((key) => (
+          {(['mit', 'scanned', 'rules', 'taiwan'] as const).map((key) => (
             <span
               key={key}
               className="inline-flex items-center gap-1.5 text-xs text-text-tertiary bg-surface-1/50 border border-border/50 rounded-full px-3 py-1.5"

@@ -55,19 +55,33 @@ export const STATS = {
     lastSync: '2026-03-12',
     syncInterval: '1h',
   },
-  /** Ecosystem scanning stats (from crawl-mcp-registry + audit-npm-skills) */
+  /**
+   * Ecosystem scanning stats (from crawl-mcp-registry + audit-npm-skills-v2 pipeline)
+   *
+   * Pipeline: crawl-mcp-registry.ts → audit-npm-skills-v2.ts → push-to-threat-cloud.ts
+   * Source: npm registry, GitHub API, awesome-lists (8 queries, pagination)
+   * Updated: 2026-03-16
+   */
   ecosystem: {
-    mcpSkillsDiscovered: 2_576,
-    mcpSkillsScanned: 30,
-    npmPackagesAudited: 30,
+    /** Total MCP/AI skill entries crawled from registries */
+    entriesCrawled: 4_648,
+    /** npm packages found in crawl */
+    npmPackages: 2_769,
+    /** Packages actually scanned by ATR + Skill Auditor */
+    skillsScanned: 1_295,
+    /** Malicious/risky skills found (CRITICAL + HIGH) */
+    maliciousFound: 26,
+    /** ATR rules auto-generated from scan findings */
+    atrRulesGenerated: 61,
+    /** Breakdown by severity */
     findingsCritical: 21,
     findingsHigh: 5,
     findingsMedium: 3,
-    findingsClean: 1,
+    findingsClean: 1_266,
     registrySources: 3,
-    lastCrawl: '2026-03-14',
+    lastCrawl: '2026-03-16',
   },
-  lastUpdated: '2026-03-14',
+  lastUpdated: '2026-03-16',
 } as const;
 
 export type Stats = typeof STATS;
