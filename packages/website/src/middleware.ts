@@ -5,9 +5,42 @@ import { routing } from './navigation';
 
 const intlMiddleware = createMiddleware(routing);
 
+function generateNonce(): string {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Buffer.from(array).toString('base64');
+}
+
+function buildCspHeader(nonce: string): string {
+  const isDev = process.env.NODE_ENV === 'development';
+  const isVercel = !!process.env.VERCEL;
+
+  const directives = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ''} https://plausible.io https://static.cloudflareinsights.com`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://api.panguard.ai https://docs.panguard.ai https://tc.panguard.ai https://*.vercel-insights.com https://*.vercel-analytics.com https://plausible.io",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    ...(isVercel ? ['upgrade-insecure-requests'] : []),
+  ];
+
+  return directives.join('; ');
+}
+
+function applyNonceHeaders(response: NextResponse, nonce: string): NextResponse {
+  response.headers.set('x-nonce', nonce);
+  response.headers.set('Content-Security-Policy', buildCspHeader(nonce));
+  return response;
+}
+
 export function middleware(request: NextRequest) {
   const host = request.headers.get('host') || '';
   const { pathname } = request.nextUrl;
+  const nonce = generateNonce();
 
   // get.panguard.ai → serve install script via API route
   if (host.startsWith('get.')) {
@@ -27,7 +60,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(target, 301);
   }
 
-  return intlMiddleware(request);
+  // Set nonce in request headers so Server Components can read it
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+
+  return applyNonceHeaders(response, nonce);
 }
 
 export const config = {

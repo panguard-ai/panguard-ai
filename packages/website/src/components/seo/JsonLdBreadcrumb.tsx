@@ -13,7 +13,7 @@ interface BreadcrumbItem {
   href?: string;
 }
 
-export default function JsonLdBreadcrumb({ items }: { items: BreadcrumbItem[] }) {
+export default function JsonLdBreadcrumb({ items, nonce }: { items: BreadcrumbItem[]; nonce?: string }) {
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -30,6 +30,7 @@ export default function JsonLdBreadcrumb({ items }: { items: BreadcrumbItem[] })
 
   return (
     <script
+      nonce={nonce}
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
     />

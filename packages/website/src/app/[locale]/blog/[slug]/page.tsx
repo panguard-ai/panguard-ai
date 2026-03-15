@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates } from '@/lib/seo';
+import { getNonce } from '@/lib/nonce';
 import { Link } from '@/navigation';
 import { ArrowLeft, Clock, User, Calendar } from 'lucide-react';
 import NavBar from '@/components/NavBar';
@@ -74,6 +75,8 @@ export default async function BlogPostPage(props: {
     notFound();
   }
 
+  const nonce = await getNonce();
+
   const blogPostJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -95,6 +98,7 @@ export default async function BlogPostPage(props: {
   return (
     <>
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostJsonLd) }}
       />

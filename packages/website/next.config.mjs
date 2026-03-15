@@ -2,9 +2,6 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin();
 
-const isDev = process.env.NODE_ENV === 'development';
-const isVercel = !!process.env.VERCEL;
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
@@ -53,27 +50,7 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
-          {
-            // SECURITY NOTE: unsafe-inline in script-src is required because layout.tsx
-            // uses dangerouslySetInnerHTML for JSON-LD structured data and js-ready
-            // class toggle. This weakens XSS protection but is a known Next.js limitation.
-            // TODO: Implement nonce-based CSP via Next.js middleware when stable.
-            // See: https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
-            // style-src unsafe-inline is required by Next.js CSS-in-JS.
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://plausible.io https://static.cloudflareinsights.com`,
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https:",
-              "font-src 'self' data:",
-              "connect-src 'self' https://api.panguard.ai https://docs.panguard.ai https://tc.panguard.ai https://*.vercel-insights.com https://*.vercel-analytics.com https://plausible.io",
-              "frame-ancestors 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              ...(isVercel ? ['upgrade-insecure-requests'] : []),
-            ].join('; '),
-          },
+          // CSP is now set dynamically in middleware.ts with nonce-based script-src
         ],
       },
     ];

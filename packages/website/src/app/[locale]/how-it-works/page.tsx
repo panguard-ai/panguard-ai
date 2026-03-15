@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates } from '@/lib/seo';
+import { getNonce } from '@/lib/nonce';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import HowItWorksContent from './HowItWorksContent';
@@ -59,10 +60,13 @@ const howToJsonLd = {
   ],
 };
 
-export default function HowItWorksPage() {
+export default async function HowItWorksPage() {
+  const nonce = await getNonce();
+
   return (
     <>
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
