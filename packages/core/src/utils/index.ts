@@ -7,4 +7,29 @@
 
 export { createLogger, setLogLevel } from './logger.js';
 export type { Logger } from './logger.js';
-export { validateInput, sanitizeString, validateFilePath } from './validation.js';
+export {
+  validateInput,
+  tryValidateInput,
+  sanitizeString,
+  validateFilePath,
+  ClientIdSchema,
+  ISODateSchema,
+  PaginationLimitSchema,
+  ReputationSchema,
+  RiskLevelSchema,
+  ThreatDataSchema,
+  RulePublishSchema,
+  ATRProposalSchema,
+  ATRFeedbackSchema,
+  SkillThreatSchema,
+  SkillWhitelistItemSchema,
+  SkillWhitelistSchema,
+} from './validation.js';
+export type {
+  ThreatDataInput,
+  RulePublishInput,
+  ATRProposalInput,
+  ATRFeedbackInput,
+  SkillThreatInput,
+  SkillWhitelistInput,
+} from './validation.js';
