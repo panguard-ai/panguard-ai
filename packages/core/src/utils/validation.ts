@@ -26,6 +26,128 @@ export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): T {
 }
 
 /**
+ * Try to validate input, returning a result object instead of throwing.
+ * 嘗試驗證輸入，回傳結果物件而非拋出錯誤。
+ */
+export function tryValidateInput<T>(
+  schema: z.ZodSchema<T>,
+  data: unknown
+): { ok: true; data: T } | { ok: false; error: string } {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    const messages = result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
+    return { ok: false, error: messages };
+  }
+  return { ok: true, data: result.data };
+}
+
+// -- Common field schemas --
+
+/** Client ID from x-panguard-client-id header (alphanumeric + dash/underscore, 1-64 chars) */
+export const ClientIdSchema = z
+  .string()
+  .regex(/^[a-zA-Z0-9_-]{1,64}$/, 'Client ID must be 1-64 alphanumeric/dash/underscore characters');
+
+/** ISO 8601 date string (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS) */
+export const ISODateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2})?/, 'Must be ISO 8601 format');
+
+/** Pagination limit (positive integer, clamped to max) */
+export const PaginationLimitSchema = z.coerce
+  .number()
+  .int()
+  .min(1)
+  .max(5000)
+  .default(1000);
+
+/** Reputation score for blocklist feeds */
+export const ReputationSchema = z.coerce
+  .number()
+  .min(0)
+  .max(100)
+  .default(70);
+
+/** Risk level enum */
+export const RiskLevelSchema = z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
+
+// -- API request body schemas --
+
+/** POST /api/threats */
+export const ThreatDataSchema = z.object({
+  attackSourceIP: z.string().min(1, 'attackSourceIP is required'),
+  attackType: z.string().min(1, 'attackType is required'),
+  mitreTechnique: z.string().min(1, 'mitreTechnique is required'),
+  sigmaRuleMatched: z.string().min(1, 'sigmaRuleMatched is required'),
+  timestamp: z.string().min(1, 'timestamp is required'),
+  industry: z.string().optional(),
+  region: z.string().min(1, 'region is required'),
+});
+export type ThreatDataInput = z.infer<typeof ThreatDataSchema>;
+
+/** POST /api/rules */
+export const RulePublishSchema = z.object({
+  ruleId: z.string().min(1, 'ruleId is required').max(256, 'ruleId exceeds maximum length of 256'),
+  ruleContent: z.string().min(1, 'ruleContent is required').max(65_536, 'ruleContent exceeds maximum size of 64KB'),
+  source: z.string().min(1, 'source is required'),
+  publishedAt: z.string().optional(),
+  category: z.string().optional(),
+  severity: z.string().optional(),
+  mitreTechniques: z.string().optional(),
+  tags: z.string().optional(),
+});
+export type RulePublishInput = z.infer<typeof RulePublishSchema>;
+
+/** POST /api/atr-proposals */
+export const ATRProposalSchema = z.object({
+  patternHash: z.string().min(1, 'patternHash is required'),
+  ruleContent: z.string().min(1, 'ruleContent is required'),
+  llmProvider: z.string().min(1, 'llmProvider is required'),
+  llmModel: z.string().min(1, 'llmModel is required'),
+  selfReviewVerdict: z.string().min(1, 'selfReviewVerdict is required'),
+});
+export type ATRProposalInput = z.infer<typeof ATRProposalSchema>;
+
+/** POST /api/atr-feedback */
+export const ATRFeedbackSchema = z.object({
+  ruleId: z.string().min(1, 'ruleId is required'),
+  isTruePositive: z.boolean({ required_error: 'isTruePositive must be a boolean' }),
+});
+export type ATRFeedbackInput = z.infer<typeof ATRFeedbackSchema>;
+
+/** POST /api/skill-threats */
+export const SkillThreatSchema = z.object({
+  skillHash: z.string().min(1, 'skillHash is required'),
+  skillName: z.string().min(1, 'skillName is required'),
+  riskScore: z.number().min(0).max(100, 'riskScore must be between 0 and 100'),
+  riskLevel: RiskLevelSchema,
+  findingSummaries: z
+    .array(
+      z.object({
+        id: z.string(),
+        category: z.string(),
+        severity: z.string(),
+        title: z.string(),
+      })
+    )
+    .optional(),
+});
+export type SkillThreatInput = z.infer<typeof SkillThreatSchema>;
+
+/** POST /api/skill-whitelist (single or batch) */
+export const SkillWhitelistItemSchema = z.object({
+  skillName: z.string().min(1, 'skillName is required'),
+  fingerprintHash: z.string().optional(),
+});
+
+export const SkillWhitelistSchema = z.object({
+  skillName: z.string().min(1).optional(),
+  fingerprintHash: z.string().optional(),
+  skills: z.array(SkillWhitelistItemSchema).optional(),
+});
+export type SkillWhitelistInput = z.infer<typeof SkillWhitelistSchema>;
+
+/**
  * Sanitize a string by removing potentially dangerous characters
  * 清理字串，移除潛在危險字元
  *

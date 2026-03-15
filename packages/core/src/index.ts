@@ -27,10 +27,31 @@ export {
   createLogger,
   setLogLevel,
   validateInput,
+  tryValidateInput,
   sanitizeString,
   validateFilePath,
+  ClientIdSchema,
+  ISODateSchema,
+  PaginationLimitSchema,
+  ReputationSchema,
+  RiskLevelSchema,
+  ThreatDataSchema,
+  RulePublishSchema,
+  ATRProposalSchema,
+  ATRFeedbackSchema,
+  SkillThreatSchema,
+  SkillWhitelistItemSchema,
+  SkillWhitelistSchema,
 } from './utils/index.js';
-export type { Logger } from './utils/index.js';
+export type {
+  Logger,
+  ThreatDataInput,
+  RulePublishInput,
+  ATRProposalInput,
+  ATRFeedbackInput,
+  SkillThreatInput,
+  SkillWhitelistInput,
+} from './utils/index.js';
 
 // Discovery engine / 偵察引擎
 export {
