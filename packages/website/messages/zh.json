@@ -738,7 +738,8 @@
       "hideFindings": "隱藏發現",
       "ctaText": "想要即時保護所有 AI Agent？",
       "learnMore": "了解更多",
-      "trustNote": "掃描在伺服器端執行。不會儲存代碼。僅快取內容 hash 用於去重。"
+      "trustNote": "掃描在伺服器端執行。不會儲存代碼。僅快取內容 hash 用於去重。",
+      "submitATR": "提交 ATR 規則提案"
     }
   },
   "pricing": {
@@ -1559,6 +1560,18 @@
     "productManager": {
       "title": "Panguard Manager",
       "description": "分散式 Guard 代理的中央管控。從單一介面管理端點。"
+    },
+    "whitelist": {
+      "title": "社群白名單 -- Panguard AI",
+      "description": "社群驗證的安全 AI 技能和 MCP 伺服器。1,295 個掃描中有 1,266 個安全。97.7% 信任分數。"
+    },
+    "blacklist": {
+      "title": "威脅登錄 -- Panguard AI",
+      "description": "社群掃描標記的已知危險 AI 技能。偵測到 26 個惡意技能，涵蓋 critical 和 high 嚴重等級。"
+    },
+    "skillScan": {
+      "title": "掃描 AI 技能 | Panguard AI",
+      "description": "掃描任何 AI 技能或 MCP 伺服器的安全威脅。貼上 GitHub URL 即可取得即時結果。無需安裝。"
     }
   },
   "pricingPage": {
@@ -6025,5 +6038,50 @@
       "github": "GitHub 倉庫",
       "contact": "聯繫我們"
     }
+  },
+  "whitelistPage": {
+    "overline": "社群白名單",
+    "title": "社群白名單",
+    "subtitle": "經社群掃描驗證的安全技能",
+    "stats": {
+      "totalScanned": "已掃描總數",
+      "safeSkills": "安全技能",
+      "trustScore": "信任分數"
+    },
+    "howItWorks": {
+      "title": "白名單機制",
+      "description": "一個技能必須獲得 3 次以上獨立掃描且結果均為安全，才會被加入白名單。這確保了單次掃描無法直接白名單化 -- 需要社群共識。",
+      "step1": "需要 3 次以上獨立掃描",
+      "step2": "所有掃描必須為安全（風險分數低於 30）",
+      "step3": "持續監控 -- 發現新問題立即移除"
+    },
+    "cta": "掃描你的技能以加入白名單",
+    "ctaBtn": "立即掃描"
+  },
+  "blacklistPage": {
+    "overline": "威脅登錄",
+    "title": "威脅登錄",
+    "subtitle": "社群掃描標記的技能",
+    "stats": {
+      "maliciousFound": "發現惡意技能",
+      "critical": "Critical 嚴重等級",
+      "high": "High 嚴重等級"
+    },
+    "howItWorks": {
+      "title": "黑名單機制",
+      "description": "一個技能在收到 3 次以上獨立回報且平均風險分數達到 70 以上時，會被列入黑名單。黑名單技能會在所有受保護的端點上被 Panguard Guard 自動封鎖。",
+      "step1": "需要 3 次以上獨立回報",
+      "step2": "平均風險分數必須達到 70 以上",
+      "step3": "Panguard Guard 在所有受保護端點自動封鎖"
+    },
+    "severity": {
+      "title": "嚴重性分布",
+      "critical": "Critical",
+      "criticalDesc": "遠端程式碼執行、資料外洩、憑證竊取",
+      "high": "High",
+      "highDesc": "權限提升、未授權網路存取、prompt injection"
+    },
+    "ctaInstall": "安裝 Panguard 自動封鎖這些威脅",
+    "ctaReport": "回報惡意技能"
   }
 }
