@@ -2,231 +2,79 @@
  * GuardEngine - Main orchestrator for PanguardGuard
  * GuardEngine - PanguardGuard 主引擎
  *
- * Orchestrates the complete detection-analysis-response pipeline:
- * 1. Receives security events from MonitorEngine
- * 2. Routes through DetectAgent -> AnalyzeAgent -> RespondAgent -> ReportAgent
- * 3. Manages Context Memory baseline learning and protection transitions
- * 4. Coordinates notifications, threat cloud, and dashboard updates
- *
- * 協調完整的偵測-分析-回應管線：
- * 1. 從 MonitorEngine 接收安全事件
- * 2. 經過 DetectAgent -> AnalyzeAgent -> RespondAgent -> ReportAgent 路由
- * 3. 管理 Context Memory 基線學習和防護轉換
- * 4. 協調通知、威脅雲和儀表板更新
+ * Thin orchestrator that delegates to extracted modules:
+ * - rule-loader.ts: LLM auto-detection, engine initialization, rule loading
+ * - rule-sync.ts: Threat Cloud sync, skill threat/blacklist helpers
+ * - event-processor.ts: Full detection-analysis-response pipeline
+ * - response-engine.ts: Policy application and polling
  *
  * @module @panguard-ai/panguard-guard/guard-engine
  */
 
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
+import v8 from 'node:v8';
 import {
   createLogger,
-  RuleEngine,
   MonitorEngine,
-  ThreatIntelFeedManager,
-  YaraScanner,
   setFeedManager,
-  SmartRouter,
-  KnowledgeDistiller,
-  parseSigmaYaml,
 } from '@panguard-ai/core';
-import type { QuotaTier } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
 import type {
   GuardConfig,
   GuardStatus,
   GuardMode,
-  LicenseTier,
-  EnvironmentBaseline,
-  ThreatVerdict,
-  ResponseResult,
   AnalyzeLLM,
-  LLMAnalysisResult,
-  LLMClassificationResult,
+  EnvironmentBaseline,
 } from './types.js';
-import { TIER_FEATURES } from './types.js';
 
-import { DetectAgent, AnalyzeAgent, RespondAgent, ReportAgent } from './agent/index.js';
 import {
-  loadBaseline,
   saveBaseline,
   isLearningComplete,
   getLearningProgress,
   switchToProtectionMode,
 } from './memory/index.js';
-import { InvestigationEngine } from './investigation/index.js';
-import { sendNotifications } from './notify/index.js';
-import { ThreatCloudClient } from './threat-cloud/index.js';
 import { DashboardServer } from './dashboard/index.js';
 import { PidFile, Watchdog } from './daemon/index.js';
-import { validateLicense, hasFeature } from './license/index.js';
+import { validateLicense } from './license/index.js';
 import {
   loadSecurityPolicy,
   runSecurityAudit,
-  logAuditEvent,
   SyslogAdapter,
 } from '@panguard-ai/security-hardening';
 import { FalcoMonitor } from './monitors/falco-monitor.js';
 import { SuricataMonitor } from './monitors/suricata-monitor.js';
 import { LogCollector } from './collectors/index.js';
-import { BUILTIN_RULES } from './rules/builtin-rules.js';
 import { PanguardAgentClient } from './agent-client/index.js';
 import type { AgentHeartbeat } from './agent-client/index.js';
-import { GuardATREngine } from './engines/atr-engine.js';
-import { ATRDrafter } from './engines/atr-drafter.js';
-import { PlaybookEngine } from './playbook/index.js';
+
+// Extracted modules
+import { autoDetectLLM, initEngines, loadAllRules, getRuleCounts } from './rule-loader.js';
+import {
+  syncThreatCloud,
+  setupCloudSyncTimer,
+  getSkillThreatSubmitter as _getSkillThreatSubmitter,
+  getSkillBlacklistChecker as _getSkillBlacklistChecker,
+} from './rule-sync.js';
+import { processEvent as _processEvent } from './event-processor.js';
+import type { EventProcessorState, EventProcessorDeps } from './event-processor.js';
+import { applyPolicy as _applyPolicy, pollPolicy as _pollPolicy } from './response-engine.js';
+import type { PolicyUpdate } from './response-engine.js';
 
 const logger = createLogger('panguard-guard:engine');
-
-/**
- * Attempt to auto-detect and create an LLM provider.
- * Priority: local encrypted config > environment variables > Ollama fallback.
- * Falls back to null if no provider is available (graceful degradation).
- */
-async function autoDetectLLM(): Promise<AnalyzeLLM | null> {
-  try {
-    // Dynamic import to avoid requiring @panguard-ai/core/ai at load time
-    const { createLLM } = await import('@panguard-ai/core');
-    type LLMProviderType = 'ollama' | 'claude' | 'openai';
-
-    let provider: LLMProviderType | null = null;
-    let apiKey: string | undefined;
-    let model: string | undefined;
-
-    // 1. Check local encrypted LLM config (~/.panguard/llm.enc)
-    try {
-      const { homedir } = await import('node:os');
-      const { existsSync, readFileSync } = await import('node:fs');
-      const { createHash, createDecipheriv } = await import('node:crypto');
-      const { hostname, userInfo } = await import('node:os');
-
-      const llmPath = join(homedir(), '.panguard', 'llm.enc');
-      if (existsSync(llmPath)) {
-        const encrypted = readFileSync(llmPath, 'utf-8');
-        const parts = encrypted.split(':');
-        if (parts.length === 3) {
-          const machineId = `${hostname()}-${userInfo().username}-panguard-ai`;
-          const key = createHash('sha256').update(machineId).digest();
-          const iv = Buffer.from(parts[0]!, 'base64');
-          const authTag = Buffer.from(parts[1]!, 'base64');
-          const data = Buffer.from(parts[2]!, 'base64');
-          const decipher = createDecipheriv('aes-256-gcm', key, iv);
-          decipher.setAuthTag(authTag);
-          const decrypted = Buffer.concat([decipher.update(data), decipher.final()]).toString(
-            'utf8'
-          );
-          const llmConfig = JSON.parse(decrypted) as {
-            provider?: string;
-            apiKey?: string;
-            model?: string;
-          };
-          if (llmConfig.provider && (llmConfig.apiKey || llmConfig.provider === 'ollama')) {
-            provider = llmConfig.provider as LLMProviderType;
-            apiKey = llmConfig.apiKey;
-            model = llmConfig.model;
-            logger.info(`LLM config loaded from local encrypted store (provider: ${provider})`);
-          }
-        }
-      }
-    } catch {
-      // Local config not available, fall through to env vars
-    }
-
-    // 2. Fall back to environment variables
-    if (!provider) {
-      if (process.env['ANTHROPIC_API_KEY']) {
-        provider = 'claude';
-        apiKey = process.env['ANTHROPIC_API_KEY'];
-        model = process.env['PANGUARD_LLM_MODEL'] ?? 'claude-sonnet-4-20250514';
-      } else if (process.env['OPENAI_API_KEY']) {
-        provider = 'openai';
-        apiKey = process.env['OPENAI_API_KEY'];
-        model = process.env['PANGUARD_LLM_MODEL'] ?? 'gpt-4o';
-      } else {
-        // Try Ollama (local, no API key needed)
-        provider = 'ollama';
-        model = process.env['PANGUARD_LLM_MODEL'] ?? 'llama3';
-      }
-    }
-
-    // Allow env var model override even when using local config
-    if (process.env['PANGUARD_LLM_MODEL']) {
-      model = process.env['PANGUARD_LLM_MODEL'];
-    }
-
-    // Default model per provider
-    const defaultModels: Record<string, string> = {
-      claude: 'claude-sonnet-4-20250514',
-      openai: 'gpt-4o',
-      ollama: 'llama3',
-    };
-    const resolvedModel = model ?? defaultModels[provider] ?? 'llama3';
-
-    const llmProvider = createLLM({ provider, model: resolvedModel, apiKey, lang: 'en' });
-    const available = await llmProvider.isAvailable();
-    if (!available) {
-      logger.info(`LLM provider '${provider}' not available, running without AI`);
-      return null;
-    }
-
-    logger.info(`LLM provider '${provider}' (model: ${model}) connected`);
-
-    // Adapt LLMProvider to AnalyzeLLM interface
-    const adapter: AnalyzeLLM = {
-      async analyze(prompt: string, context?: string): Promise<LLMAnalysisResult> {
-        const result = await llmProvider.analyze(prompt, context);
-        return {
-          summary: result.summary,
-          severity: result.severity,
-          confidence: result.confidence,
-          recommendations: result.recommendations,
-        };
-      },
-      async classify(event: SecurityEvent): Promise<LLMClassificationResult> {
-        const result = await llmProvider.classify(event);
-        return {
-          technique: result.technique,
-          severity: result.severity,
-          confidence: result.confidence,
-          description: result.description,
-        };
-      },
-      async isAvailable(): Promise<boolean> {
-        return llmProvider.isAvailable();
-      },
-    };
-
-    return adapter;
-  } catch (err) {
-    logger.info(
-      `LLM auto-detect failed, running without AI: ${err instanceof Error ? err.message : String(err)}`
-    );
-    return null;
-  }
-}
 
 /**
  * GuardEngine is the central orchestrator for all PanguardGuard functionality
  * GuardEngine 是所有 PanguardGuard 功能的中央協調器
  */
 export class GuardEngine {
+  // Engines and agents (initialized in constructor via initEngines)
+  private readonly engines: ReturnType<typeof initEngines>;
   private readonly config: GuardConfig;
+
+  // Mutable operating state
   private mode: GuardMode;
   private baseline: EnvironmentBaseline;
-  private readonly baselinePath: string;
 
-  // Agents / 代理
-  private readonly ruleEngine: RuleEngine;
-  private readonly detectAgent: DetectAgent;
-  private readonly analyzeAgent: AnalyzeAgent;
-  private readonly respondAgent: RespondAgent;
-  private readonly reportAgent: ReportAgent;
-  private readonly investigationEngine: InvestigationEngine;
-
-  // Infrastructure / 基礎設施
-  private readonly threatCloud: ThreatCloudClient;
-  private readonly feedManager: ThreatIntelFeedManager;
+  // Infrastructure (initialized in start())
   private dashboard: DashboardServer | null = null;
   private readonly pidFile: PidFile;
   private watchdog: Watchdog | null = null;
@@ -237,20 +85,7 @@ export class GuardEngine {
   private agentClient: PanguardAgentClient | null = null;
   private logCollector: LogCollector | null = null;
 
-  // YARA scanner / YARA 掃描器
-  private readonly yaraScanner: YaraScanner;
-
-  // ATR (Agent Threat Rules) engine / ATR 引擎
-  private readonly atrEngine: GuardATREngine;
-
-  // ATR Drafter - local LLM-powered rule proposal / ATR 草稿器 - 本地 LLM 規則提案
-  private atrDrafter: ATRDrafter | null = null;
-
-  // Smart AI routing / 智慧 AI 路由
-  private readonly smartRouter: SmartRouter | null = null;
-  private readonly knowledgeDistiller: KnowledgeDistiller | null = null;
-
-  // State / 狀態
+  // State
   private running = false;
   private startTime = 0;
   private eventsProcessed = 0;
@@ -261,170 +96,16 @@ export class GuardEngine {
   private learningCheckTimer: ReturnType<typeof setInterval> | null = null;
   private cloudSyncTimer: ReturnType<typeof setInterval> | null = null;
   private eventCallback?: (type: string, data: Record<string, unknown>) => void;
+  private consecutiveCriticalChecks = 0;
 
   constructor(config: GuardConfig, llm: AnalyzeLLM | null = null) {
     this.config = config;
     this.mode = config.mode;
-    this.baselinePath = join(config.dataDir, 'baseline.json');
+    this.engines = initEngines(config, llm);
+    this.baseline = this.engines.baseline;
 
-    // Load or create baseline / 載入或建立基線
-    this.baseline = loadBaseline(this.baselinePath);
-
-    // Validate license / 驗證授權
-    let license = validateLicense(config.licenseKey);
-
-    // If CLI tier is provided, map it to Guard's internal LicenseTier
-    // CLI tiers: community/solo/pro/business/enterprise
-    // Guard tiers: free/pro/enterprise
-    if (config.cliTier) {
-      const cliTierMap: Record<string, LicenseTier> = {
-        community: 'free',
-        solo: 'pro',
-        pro: 'pro',
-        business: 'enterprise',
-        enterprise: 'enterprise',
-      };
-      const mappedTier = cliTierMap[config.cliTier] ?? 'free';
-      const keyTierLevel = { free: 0, pro: 1, enterprise: 2 }[license.tier] ?? 0;
-      const cliTierLevel = { free: 0, pro: 1, enterprise: 2 }[mappedTier] ?? 0;
-
-      // Use whichever tier is higher
-      if (cliTierLevel > keyTierLevel) {
-        license = {
-          ...license,
-          tier: mappedTier,
-          features: TIER_FEATURES[mappedTier],
-          isValid: true,
-        };
-      }
-    }
-
-    logger.info(
-      `License: ${license.tier} tier (valid: ${license.isValid}) / ` +
-        `授權: ${license.tier} 等級 (有效: ${license.isValid})`
-    );
-
-    // Initialize rule engine with built-in + bundled Sigma rules
-    // 初始化規則引擎（內建 + 打包的 Sigma 規則）
-    this.ruleEngine = new RuleEngine({
-      rulesDir: join(config.dataDir, 'rules'),
-      communityRulesDir: config.bundledSigmaDir,
-      hotReload: true,
-      customRules: BUILTIN_RULES,
-    });
-
-    // Initialize YARA scanner / 初始化 YARA 掃描器
-    this.yaraScanner = new YaraScanner();
-
-    // Initialize ATR engine for agent threat detection / 初始化 ATR 引擎
-    this.atrEngine = new GuardATREngine({
-      rulesDir: join(config.dataDir, 'atr-rules'),
-      hotReload: true,
-      whitelist: {
-        persistPath: join(config.dataDir, 'skill-whitelist.json'),
-        staticSkills: config.trustedSkills ?? [],
-        autoPromoteStable: true,
-      },
-    });
-
-    // Initialize agents / 初始化代理
-    this.detectAgent = new DetectAgent(this.ruleEngine);
-
-    const analyzeLLM = hasFeature(license, 'ai_analysis') ? llm : null;
-    this.analyzeAgent = new AnalyzeAgent(analyzeLLM);
-
-    // Initialize SmartRouter and KnowledgeDistiller for cost-optimized AI routing
-    // 初始化 SmartRouter 和 KnowledgeDistiller 以實現成本最佳化 AI 路由
-    if (analyzeLLM) {
-      const tierToQuota: Record<string, QuotaTier> = {
-        free: 'free',
-        pro: 'pro',
-        enterprise: 'business',
-      };
-      const quotaTier = tierToQuota[license.tier] ?? 'free';
-      const hasBYOK = !!config.ai?.byokApiKey;
-
-      this.smartRouter = new SmartRouter({
-        tier: quotaTier,
-        quotaOverride: hasBYOK ? { isBYOK: true } : undefined,
-      });
-
-      this.knowledgeDistiller = new KnowledgeDistiller({
-        onRuleDistilled: (rule) => {
-          logger.info(
-            `Knowledge distilled: ${rule.ruleId} (confidence: ${rule.aiConfidence}) / ` +
-              `知識蒸餾: ${rule.ruleId} (信心: ${rule.aiConfidence})`
-          );
-        },
-      });
-    }
-
-    this.respondAgent = new RespondAgent(config.actionPolicy, this.mode);
-    // Wire whitelist manager into RespondAgent for revoke_skill actions
-    this.respondAgent.setWhitelistManager(this.atrEngine.getWhitelistManager());
-
-    // Wire PlaybookEngine into RespondAgent for SOAR playbook-driven responses
-    // 將 PlaybookEngine 連接到 RespondAgent 以支援 SOAR 劇本驅動回應
-    try {
-      const playbookEngine = new PlaybookEngine();
-      const playbooksDir = this.findPlaybooksDir();
-      if (playbooksDir) {
-        playbookEngine.loadFromDir(playbooksDir);
-        this.respondAgent.setPlaybookEngine(playbookEngine);
-        logger.info(
-          `PlaybookEngine wired: ${playbookEngine.count} playbooks loaded from ${playbooksDir} / ` +
-            `PlaybookEngine 已連接: 從 ${playbooksDir} 載入 ${playbookEngine.count} 個劇本`
-        );
-      } else {
-        logger.warn(
-          'PlaybookEngine: no bundled playbooks directory found, skipping / ' +
-            'PlaybookEngine: 找不到內建劇本目錄，跳過'
-        );
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.warn(
-        `PlaybookEngine initialization failed, continuing without playbooks: ${msg} / ` +
-          `PlaybookEngine 初始化失敗，將在無劇本的情況下繼續: ${msg}`
-      );
-    }
-
-    this.reportAgent = new ReportAgent(join(config.dataDir, 'events.jsonl'), this.mode);
-
-    // Initialize investigation engine / 初始化調查引擎
-    this.investigationEngine = new InvestigationEngine(this.baseline);
-
-    // Initialize threat cloud - always enable upload for all tiers
-    // Full threat cloud API access (rule fetching, stats) gated by enterprise
-    this.threatCloud = new ThreatCloudClient(
-      config.threatCloudEndpoint,
-      config.dataDir,
-      config.threatCloudApiKey
-    );
-
-    // Initialize threat intel feed manager
-    this.feedManager = new ThreatIntelFeedManager({
-      abuseIPDBKey: process.env['ABUSEIPDB_KEY'],
-    });
-    setFeedManager(this.feedManager);
-
-    // Initialize ATR Drafter if LLM is available (distributed consensus)
-    // 初始化 ATR 草稿器（如有 LLM 則啟用分散式共識）
-    if (analyzeLLM) {
-      this.atrDrafter = new ATRDrafter(analyzeLLM, this.threatCloud, {
-        llmProvider: process.env['ANTHROPIC_API_KEY']
-          ? 'claude'
-          : process.env['OPENAI_API_KEY']
-            ? 'openai'
-            : 'ollama',
-        llmModel: process.env['PANGUARD_LLM_MODEL'] ?? 'unknown',
-      });
-    }
-
-    // PID file / PID 檔案
+    // PID file
     this.pidFile = new PidFile(config.dataDir);
-
-    logger.info('GuardEngine initialized / GuardEngine 已初始化');
   }
 
   /**
@@ -434,6 +115,51 @@ export class GuardEngine {
   static async create(config: GuardConfig): Promise<GuardEngine> {
     const llm = await autoDetectLLM();
     return new GuardEngine(config, llm);
+  }
+
+  // -- Event processor state and deps accessors (private) --
+
+  private get eventProcessorState(): EventProcessorState {
+    return {
+      mode: this.mode,
+      baseline: this.baseline,
+      eventsProcessed: this.eventsProcessed,
+      threatsDetected: this.threatsDetected,
+      actionsExecuted: this.actionsExecuted,
+      threatCloudUploaded: this.threatCloudUploaded,
+      baselinePath: this.engines.baselinePath,
+      config: this.config,
+      eventCallback: this.eventCallback,
+    };
+  }
+
+  private syncStateBack(state: EventProcessorState): void {
+    this.mode = state.mode;
+    this.baseline = state.baseline;
+    this.eventsProcessed = state.eventsProcessed;
+    this.threatsDetected = state.threatsDetected;
+    this.actionsExecuted = state.actionsExecuted;
+    this.threatCloudUploaded = state.threatCloudUploaded;
+  }
+
+  private get eventProcessorDeps(): EventProcessorDeps {
+    return {
+      ruleEngine: this.engines.ruleEngine,
+      yaraScanner: this.engines.yaraScanner,
+      atrEngine: this.engines.atrEngine,
+      detectAgent: this.engines.detectAgent,
+      analyzeAgent: this.engines.analyzeAgent,
+      respondAgent: this.engines.respondAgent,
+      reportAgent: this.engines.reportAgent,
+      investigationEngine: this.engines.investigationEngine,
+      threatCloud: this.engines.threatCloud,
+      smartRouter: this.engines.smartRouter,
+      knowledgeDistiller: this.engines.knowledgeDistiller,
+      atrDrafter: this.engines.atrDrafter,
+      dashboard: this.dashboard,
+      syslogAdapter: this.syslogAdapter,
+      agentClient: this.agentClient,
+    };
   }
 
   /**
@@ -449,10 +175,10 @@ export class GuardEngine {
       `Starting GuardEngine in ${this.mode} mode / 啟動 GuardEngine（${this.mode} 模式）`
     );
 
-    // Write PID file / 寫入 PID 檔案
+    // Write PID file
     this.pidFile.write();
 
-    // Security self-audit on startup / 啟動時安全自檢
+    // Security self-audit on startup
     try {
       const policy = loadSecurityPolicy({});
       const auditReport = runSecurityAudit(policy);
@@ -468,7 +194,7 @@ export class GuardEngine {
       logger.warn(`Security audit skipped: ${err instanceof Error ? err.message : String(err)}`);
     }
 
-    // Initialize syslog adapter if configured / 如有設定則初始化 Syslog 轉送器
+    // Initialize syslog adapter if configured
     const syslogServer = process.env['PANGUARD_SYSLOG_SERVER'];
     if (syslogServer) {
       const syslogPort = parseInt(process.env['PANGUARD_SYSLOG_PORT'] ?? '514', 10);
@@ -476,127 +202,29 @@ export class GuardEngine {
       logger.info(`Syslog adapter initialized: ${syslogServer}:${syslogPort}`);
     }
 
-    // Start threat intel feeds (non-blocking, best-effort)
-    this.feedManager
-      .start()
-      .then(() => {
-        logger.info(
-          `Threat intel feeds loaded: ${this.feedManager.getIoCCount()} IoCs, ${this.feedManager.getIPCount()} IPs indexed`
-        );
-      })
-      .catch((err: unknown) => {
-        logger.warn(
-          `Threat intel feed start failed (using hardcoded list): ${err instanceof Error ? err.message : String(err)}`
-        );
-      });
+    // Load all rules (Sigma, ATR, YARA, cloud rules, blocklist)
+    await loadAllRules(
+      this.engines.ruleEngine,
+      this.engines.yaraScanner,
+      this.engines.atrEngine,
+      this.engines.threatCloud,
+      this.engines.feedManager,
+      this.config
+    );
 
-    // Load rules / 載入規則
-    await this.ruleEngine.loadRules();
+    // Periodic Threat Cloud sync (every hour) + initial sync
+    const syncDeps = {
+      ruleEngine: this.engines.ruleEngine,
+      yaraScanner: this.engines.yaraScanner,
+      atrEngine: this.engines.atrEngine,
+      threatCloud: this.engines.threatCloud,
+      feedManager: this.engines.feedManager,
+      config: this.config,
+    };
+    this.cloudSyncTimer = setupCloudSyncTimer(syncDeps);
+    void syncThreatCloud(syncDeps);
 
-    // Load ATR (Agent Threat Rules) / 載入 ATR 規則
-    this.atrEngine
-      .loadRules()
-      .then((count) => {
-        if (count > 0) {
-          logger.info(`ATR rules loaded: ${count} rules / ATR 規則已載入: ${count} 條`);
-        }
-        this.atrEngine.startSessionCleanup();
-      })
-      .catch((err: unknown) => {
-        logger.warn(`ATR rules load failed: ${err instanceof Error ? err.message : String(err)}`);
-      });
-
-    // Load ATR rules from Threat Cloud / 從 Threat Cloud 載入 ATR 規則
-    this.threatCloud
-      .fetchATRRules()
-      .then((atrCloudRules) => {
-        let added = 0;
-        for (const rule of atrCloudRules) {
-          try {
-            const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
-            if (parsed.id && parsed.title && parsed.detection) {
-              this.atrEngine.addCloudRule(parsed);
-              added++;
-            }
-          } catch {
-            // skip invalid
-          }
-        }
-        if (added > 0) {
-          logger.info(`ATR cloud rules loaded: ${added} rules / ATR 雲端規則已載入: ${added} 條`);
-        }
-      })
-      .catch((err: unknown) => {
-        logger.warn(
-          `ATR cloud rules fetch skipped: ${err instanceof Error ? err.message : String(err)}`
-        );
-      });
-
-    // Load community rules from threat cloud / 從威脅雲載入社群規則
-    const cloudRules = await this.threatCloud.fetchRules();
-    for (const rule of cloudRules) {
-      try {
-        const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/core').SigmaRule;
-        if (parsed.id && parsed.title && parsed.detection) {
-          this.ruleEngine.addRule(parsed);
-        }
-      } catch {
-        // Skip invalid cloud rules / 跳過無效的雲端規則
-      }
-    }
-
-    // Fetch IP blocklist from Threat Cloud and inject into feed manager
-    // 從 Threat Cloud 取得 IP 封鎖清單並注入威脅情報管理器
-    this.threatCloud
-      .fetchBlocklist()
-      .then((ips) => {
-        if (ips.length > 0) {
-          const added = this.feedManager.addExternalIPs(ips, 'threat_cloud_blocklist', 85);
-          logger.info(
-            `Threat Cloud blocklist loaded: ${added} IPs / ` +
-              `Threat Cloud 封鎖清單已載入: ${added} 個 IP`
-          );
-        }
-      })
-      .catch((err: unknown) => {
-        logger.warn(
-          `Threat Cloud blocklist fetch skipped: ${err instanceof Error ? err.message : String(err)}`
-        );
-      });
-
-    // Load YARA rules (non-blocking, best-effort) / 載入 YARA 規則
-    // Custom rules from user's dataDir, bundled rules from installation
-    {
-      const yaraCustomDir = this.config.yaraRulesDir
-        ? join(this.config.yaraRulesDir, 'custom')
-        : join(this.config.dataDir, 'yara-rules', 'custom');
-      const yaraBundledDir = this.config.bundledYaraDir;
-      this.yaraScanner
-        .loadAllRules(yaraCustomDir, yaraBundledDir)
-        .then((count) => {
-          logger.info(`YARA rules loaded: ${count} rules / YARA 規則已載入: ${count} 條`);
-        })
-        .catch((err: unknown) => {
-          logger.warn(
-            `YARA rules load failed: ${err instanceof Error ? err.message : String(err)}`
-          );
-        });
-    }
-
-    // Periodic Threat Cloud sync (rules + blocklist every hour)
-    // 定期同步 Threat Cloud（每小時更新規則和封鎖清單）
-    this.cloudSyncTimer = setInterval(
-      () => {
-        void this.syncThreatCloud();
-      },
-      60 * 60 * 1000
-    ); // 1 hour
-
-    // Initial sync on startup (non-blocking)
-    // 啟動時立即同步一次（非阻塞）
-    void this.syncThreatCloud();
-
-    // Start monitor engine / 啟動監控引擎
+    // Start monitor engine
     this.monitorEngine = new MonitorEngine({
       networkPollInterval: this.config.monitors.networkPollInterval,
       processPollInterval: this.config.monitors.processPollInterval,
@@ -609,7 +237,6 @@ export class GuardEngine {
     this.monitorEngine.start();
 
     // Start Falco eBPF monitor (optional, graceful degradation)
-    // 啟動 Falco eBPF 監控（可選，優雅降級）
     this.falcoMonitor = new FalcoMonitor();
     const falcoAvailable = await this.falcoMonitor.checkAvailability();
     if (falcoAvailable) {
@@ -619,7 +246,6 @@ export class GuardEngine {
     }
 
     // Start Suricata network IDS monitor (optional, graceful degradation)
-    // 啟動 Suricata 網路 IDS 監控（可選，優雅降級）
     this.suricataMonitor = new SuricataMonitor();
     const suricataAvailable = await this.suricataMonitor.checkAvailability();
     if (suricataAvailable) {
@@ -628,7 +254,7 @@ export class GuardEngine {
       logger.info('Suricata network IDS monitoring active');
     }
 
-    // Start log collector if configured / 啟動日誌收集器（如已配置）
+    // Start log collector if configured
     if (this.config.monitors.logCollector?.enabled) {
       const lcConfig = this.config.monitors.logCollector;
       this.logCollector = new LogCollector({
@@ -641,7 +267,6 @@ export class GuardEngine {
     }
 
     // Start agent client if manager URL is configured (distributed mode)
-    // 如有設定 Manager URL 則啟動 Agent 客戶端（分散式模式）
     if (this.config.managerUrl) {
       try {
         this.agentClient = new PanguardAgentClient(this.config.managerUrl);
@@ -666,13 +291,12 @@ export class GuardEngine {
       }
     }
 
-    // Start dashboard if enabled / 啟動儀表板（如已啟用）
+    // Start dashboard if enabled
     if (this.config.dashboardEnabled) {
       this.dashboard = new DashboardServer(this.config.dashboardPort);
       this.dashboard.setConfigGetter(() => this.config);
       await this.dashboard.start();
 
-      // Auto-open browser / 自動開啟瀏覽器
       const dashPort = Number(this.config.dashboardPort);
       const token = this.dashboard.getAuthToken();
       const dashUrl = `http://127.0.0.1:${dashPort}#token=${token}`;
@@ -687,12 +311,11 @@ export class GuardEngine {
               : 'xdg-open';
         execFile(openCmd, [dashUrl]);
       } catch {
-        // Non-fatal: browser open is best-effort
         logger.debug('Could not auto-open browser');
       }
     }
 
-    // Start watchdog if enabled / 啟動看門狗（如已啟用）
+    // Start watchdog if enabled
     if (this.config.watchdogEnabled) {
       this.watchdog = new Watchdog(this.config.watchdogInterval, () => {
         logger.error('Watchdog triggered restart / 看門狗觸發重啟');
@@ -700,7 +323,7 @@ export class GuardEngine {
       this.watchdog.start();
     }
 
-    // Periodic status update / 定期狀態更新
+    // Periodic status update
     this.statusTimer = setInterval(() => {
       this.updateDashboardStatus();
       this.eventCallback?.('status', {
@@ -712,16 +335,56 @@ export class GuardEngine {
         uptime: Date.now() - this.startTime,
       });
       if (this.watchdog) this.watchdog.heartbeat();
+
+      // Memory pressure monitoring
+      const memCheck = this.checkMemoryPressure();
+      if (memCheck.memoryStatus === 'critical') {
+        this.consecutiveCriticalChecks++;
+        logger.warn(
+          `Memory pressure CRITICAL: ${memCheck.heapUsagePercent}% of heap limit ` +
+            `(${memCheck.heapUsedMB}MB / ${memCheck.heapLimitMB}MB) — ` +
+            `consecutive critical: ${this.consecutiveCriticalChecks}`
+        );
+        if (this.consecutiveCriticalChecks >= 3) {
+          logger.warn(
+            'Memory pressure sustained for 15+ seconds, triggering graceful restart'
+          );
+          this.eventCallback?.('memory_critical', {
+            heapUsedMB: memCheck.heapUsedMB,
+            heapLimitMB: memCheck.heapLimitMB,
+            heapUsagePercent: memCheck.heapUsagePercent,
+          });
+          // Force garbage collection if available
+          if (global.gc) {
+            global.gc();
+            logger.info('Forced garbage collection triggered');
+          }
+        }
+      } else {
+        if (this.consecutiveCriticalChecks > 0) {
+          logger.info(
+            `Memory pressure resolved: ${memCheck.heapUsagePercent}% ` +
+              `(was critical for ${this.consecutiveCriticalChecks} checks)`
+          );
+        }
+        this.consecutiveCriticalChecks = 0;
+        if (memCheck.memoryStatus === 'warning') {
+          logger.warn(
+            `Memory pressure WARNING: ${memCheck.heapUsagePercent}% of heap limit ` +
+              `(${memCheck.heapUsedMB}MB / ${memCheck.heapLimitMB}MB)`
+          );
+        }
+      }
     }, 5000);
 
-    // Learning period check / 學習期檢查
+    // Learning period check
     this.learningCheckTimer = setInterval(() => {
       this.checkLearningTransition();
     }, 60000);
 
-    // Start ATR Drafter for distributed rule proposals / 啟動 ATR 草稿器
-    if (this.atrDrafter) {
-      this.atrDrafter.start();
+    // Start ATR Drafter for distributed rule proposals
+    if (this.engines.atrDrafter) {
+      this.engines.atrDrafter.start();
     }
 
     this.running = true;
@@ -738,7 +401,7 @@ export class GuardEngine {
 
     logger.info('Stopping GuardEngine / 停止 GuardEngine');
 
-    // Clear timers / 清除計時器
+    // Clear timers
     if (this.statusTimer) {
       clearInterval(this.statusTimer);
       this.statusTimer = null;
@@ -752,12 +415,12 @@ export class GuardEngine {
       this.cloudSyncTimer = null;
     }
 
-    // Stop components / 停止元件
-    if (this.atrDrafter) {
-      this.atrDrafter.stop();
+    // Stop components
+    if (this.engines.atrDrafter) {
+      this.engines.atrDrafter.stop();
     }
-    this.atrEngine.stop();
-    this.feedManager.stop();
+    this.engines.atrEngine.stop();
+    this.engines.feedManager.stop();
     setFeedManager(null);
     if (this.monitorEngine) this.monitorEngine.stop();
     if (this.dashboard) await this.dashboard.stop();
@@ -780,14 +443,14 @@ export class GuardEngine {
       this.agentClient = null;
     }
 
-    // Save baseline / 儲存基線
-    saveBaseline(this.baselinePath, this.baseline);
+    // Save baseline
+    saveBaseline(this.engines.baselinePath, this.baseline);
 
-    // Flush threat cloud buffer and queue / 清空威脅雲緩衝和佇列
-    await this.threatCloud.flushQueue();
+    // Flush threat cloud buffer and queue
+    await this.engines.threatCloud.flushQueue();
 
-    // Clean up / 清理
-    this.ruleEngine.destroy();
+    // Clean up
+    this.engines.ruleEngine.destroy();
     this.pidFile.remove();
 
     this.running = false;
@@ -796,345 +459,22 @@ export class GuardEngine {
 
   /**
    * Process a single security event through the full pipeline
-   * 透過完整管線處理單一安全事件
+   * Delegates to event-processor module.
    */
   async processEvent(event: SecurityEvent): Promise<void> {
-    this.eventsProcessed++;
-
-    // Audit log every event / 稽核日誌記錄每個事件
-    logAuditEvent({
-      level: 'info',
-      action: 'policy_check',
-      target: event.id,
-      result: 'success',
-      context: { source: event.source, category: event.category },
-    });
-    if (this.syslogAdapter) {
-      this.syslogAdapter.send({
-        level: 'info',
-        action: 'policy_check',
-        target: event.id,
-        result: 'success',
-        module: 'panguard-guard',
-        context: { source: event.source, description: event.description },
-        timestamp: new Date().toISOString(),
-      });
-    }
-
-    try {
-      // YARA scan for file events / 對檔案事件執行 YARA 掃描
-      if (
-        event.source === 'file' &&
-        this.yaraScanner.getRuleCount() > 0 &&
-        event.metadata?.['filePath'] &&
-        event.metadata?.['action'] !== 'deleted'
-      ) {
-        try {
-          const yaraResult = await this.yaraScanner.scanFile(event.metadata['filePath'] as string);
-          const yaraEvent = this.yaraScanner.toSecurityEvent(yaraResult);
-          if (yaraEvent) {
-            // Process YARA match as a separate high-priority event
-            // 將 YARA 比對結果作為獨立高優先事件處理
-            logger.warn(
-              `YARA match: ${yaraResult.matches.map((m) => m.rule).join(', ')} in ${yaraResult.filePath}`
-            );
-            void this.processEvent(yaraEvent);
-          }
-        } catch {
-          // YARA scan failure is non-fatal / YARA 掃描失敗不影響主流程
-        }
-      }
-
-      // ATR evaluation for agent-related events / ATR 代理威脅規則評估
-      const atrMatches = this.atrEngine.evaluate(event);
-
-      // Stage 1: Detect / 階段 1: 偵測
-      let detection = this.detectAgent.detect(event);
-
-      // Merge ATR matches into detection pipeline / 將 ATR 匹配合併入偵測管線
-      if (atrMatches.length > 0) {
-        const atrRuleMatches = atrMatches.map((m) => ({
-          ruleId: m.rule.id,
-          ruleName: m.rule.title,
-          severity: (m.rule.severity === 'informational'
-            ? 'info'
-            : m.rule.severity) as import('@panguard-ai/core').Severity,
-        }));
-        const atrMatchData = atrMatches.map((m) => ({
-          ruleId: m.rule.id,
-          category: m.rule.tags?.category ?? 'agent-threat',
-          severity: m.rule.severity,
-          responseActions: m.rule.response?.actions ?? [],
-          confidence: m.confidence,
-        }));
-
-        if (detection) {
-          // Merge ATR matches into existing detection
-          detection.ruleMatches = [...detection.ruleMatches, ...atrRuleMatches];
-          detection.atrMatches = atrMatchData;
-        } else {
-          // Create detection from ATR matches alone
-          detection = {
-            event,
-            ruleMatches: atrRuleMatches,
-            atrMatches: atrMatchData,
-            timestamp: new Date().toISOString(),
-          };
-        }
-      }
-
-      if (!detection) {
-        // No threat detected - update baseline based on mode
-        // 未偵測到威脅 - 根據模式更新基線
-        if (this.mode === 'learning') {
-          const { updateBaseline } = await import('./memory/baseline.js');
-          this.baseline = updateBaseline(this.baseline, event);
-        } else {
-          // Protection mode: continuous baseline update for benign non-detections
-          // 防護模式：對良性非偵測事件進行持續基線更新
-          const { continuousBaselineUpdate } = await import('./memory/baseline.js');
-          this.baseline = continuousBaselineUpdate(this.baseline, event, 'benign');
-        }
-        return;
-      }
-
-      this.threatsDetected++;
-
-      // Skill Whitelist: whitelisted skills skip LLM deep analysis (only ATR rules applied)
-      // Skill 白名單：白名單 skill 跳過 LLM 深度分析（只跑 ATR 規則）
-      const toolName = event.metadata?.['tool_name'] as string | undefined;
-      const isWhitelisted = toolName ? this.atrEngine.isSkillWhitelisted(toolName) : false;
-      if (isWhitelisted && !detection.atrMatches?.length) {
-        // Whitelisted skill with no ATR matches — skip heavy analysis
-        logger.info(
-          `Whitelist skip: ${toolName} is trusted, no ATR match / ` +
-            `白名單跳過: ${toolName} 為信任 skill，無 ATR 匹配`
-        );
-        return;
-      }
-
-      // SmartRouter: assess complexity and skip AI for high-confidence rule matches
-      // SmartRouter: 評估複雜度，對高信心規則匹配跳過 AI
-      if (this.smartRouter) {
-        const maxRuleConfidence = Math.max(
-          ...detection.ruleMatches.map((m) => {
-            const severityToConfidence: Record<string, number> = {
-              critical: 95,
-              high: 85,
-              medium: 70,
-              low: 50,
-              info: 30,
-            };
-            return severityToConfidence[m.severity] ?? 60;
-          })
-        );
-        const hasChain = !!detection.attackChain;
-        const complexity = this.smartRouter.assessComplexity(maxRuleConfidence, hasChain);
-
-        if (complexity === 'skip') {
-          logger.info(
-            `SmartRouter: skipping AI for high-confidence rule match (${maxRuleConfidence}%) / ` +
-              `SmartRouter: 高信心規則匹配跳過 AI (${maxRuleConfidence}%)`
-          );
-        }
-      }
-
-      // Stage 2: Analyze (with Dynamic Reasoning investigation)
-      // 階段 2: 分析（使用動態推理調查）
-      const verdict: ThreatVerdict = await this.analyzeAgent.analyze(detection, this.baseline);
-
-      // Knowledge Distillation: convert LLM verdict into a reusable Sigma rule
-      // 知識蒸餾：將 LLM 判決轉換為可重複使用的 Sigma 規則
-      // "Learn once, detect forever" - 第一次靠重分析，後面靠 rule 快速擋
-      if (this.knowledgeDistiller && verdict.conclusion !== 'benign' && verdict.confidence >= 70) {
-        const indicators: Record<string, string> = {};
-        const ip =
-          (event.metadata?.['sourceIP'] as string) ?? (event.metadata?.['remoteAddress'] as string);
-        if (ip) indicators['sourceIP'] = ip;
-        const proc = event.metadata?.['processName'] as string;
-        if (proc) indicators['processName'] = proc;
-        const port = event.metadata?.['destinationPort'] as string;
-        if (port) indicators['destinationPort'] = port;
-        const path = event.metadata?.['filePath'] as string;
-        if (path) indicators['filePath'] = path;
-        const cmd = event.metadata?.['commandLine'] as string;
-        if (cmd) indicators['commandLine'] = cmd.slice(0, 200);
-
-        const distilled = this.knowledgeDistiller.distill({
-          eventCategory: event.category,
-          eventSource: event.source,
-          eventSeverity:
-            verdict.confidence >= 90 ? 'critical' : verdict.confidence >= 75 ? 'high' : 'medium',
-          mitreTechnique: verdict.mitreTechnique,
-          indicators,
-          aiResult: {
-            summary: verdict.reasoning,
-            severity:
-              verdict.confidence >= 90 ? 'critical' : verdict.confidence >= 75 ? 'high' : 'medium',
-            confidence: verdict.confidence / 100,
-            recommendations: verdict.evidence.map((e) => e.description).slice(0, 3),
-          },
-        });
-
-        // Inject distilled rule into live rule engine (immediate effect)
-        // 將蒸餾規則注入即時規則引擎（立即生效）
-        if (distilled) {
-          try {
-            const parsed = parseSigmaYaml(distilled.sigmaYaml);
-            if (parsed) {
-              this.ruleEngine.addRule(parsed);
-              logger.info(
-                `Rule distilled from AI: ${distilled.ruleId} / ` +
-                  `AI 蒸餾規則: ${distilled.ruleId}`
-              );
-            }
-          } catch {
-            // Parse failed, rule logged but not injected
-          }
-        }
-      }
-
-      // Record detection for ATR Drafter (distributed rule proposal)
-      // 記錄偵測結果供 ATR 草稿器使用（分散式規則提案）
-      if (this.atrDrafter && verdict.conclusion !== 'benign') {
-        this.atrDrafter.recordDetection(event, {
-          conclusion: verdict.conclusion,
-          confidence: verdict.confidence,
-          mitreTechniques: verdict.mitreTechnique ? [verdict.mitreTechnique] : undefined,
-          atrRulesMatched: detection.atrMatches?.map((m) => m.ruleId),
-        });
-      }
-
-      // Run investigation for suspicious/malicious verdicts
-      // 對可疑/惡意判決執行調查
-      if (verdict.conclusion !== 'benign') {
-        const investigation = await this.investigationEngine.investigate(event);
-        verdict.investigationSteps = investigation.steps;
-      }
-
-      // Stage 3: Respond / 階段 3: 回應
-      const response: ResponseResult = await this.respondAgent.respond(verdict);
-      if (response.action !== 'log_only') {
-        this.actionsExecuted++;
-      }
-
-      // Send notifications if needed / 需要時發送通知
-      if (
-        response.action === 'notify' ||
-        verdict.confidence >= this.config.actionPolicy.notifyAndWait
-      ) {
-        await sendNotifications(this.config.notifications, verdict, event.description);
-      }
-
-      // Stage 4: Report / 階段 4: 報告
-      const { updatedBaseline, anonymizedData } = this.reportAgent.report(
-        event,
-        verdict,
-        response,
-        this.baseline
-      );
-      this.baseline = updatedBaseline;
-
-      // Report to Manager if in agent mode / 在 Agent 模式下回報給 Manager
-      if (this.agentClient?.isRegistered()) {
-        this.agentClient
-          .reportEvent({
-            event,
-            verdict: {
-              conclusion: verdict.conclusion,
-              confidence: verdict.confidence,
-              action: response.action,
-            },
-          })
-          .catch((err: unknown) => {
-            logger.warn(
-              `Agent event report failed: ${err instanceof Error ? err.message : String(err)}`
-            );
-          });
-      }
-
-      // Upload to threat cloud / 上傳至威脅雲
-      if (anonymizedData && this.config.telemetryEnabled !== false) {
-        if (this.config.showUploadData) {
-          logger.info(
-            `[upload-preview] Anonymized data: ${JSON.stringify(anonymizedData, null, 2)}`
-          );
-        }
-        await this.threatCloud.upload(anonymizedData);
-        this.threatCloudUploaded++;
-      }
-
-      // Notify event callback (for CLI quiet mode display)
-      this.eventCallback?.('threat', {
-        category: event.category,
-        description: event.description,
-        conclusion: verdict.conclusion,
-        confidence: verdict.confidence,
-        action: response.action,
-        sourceIP:
-          (event.metadata?.['sourceIP'] as string) ??
-          (event.metadata?.['remoteAddress'] as string) ??
-          'unknown',
-      });
-
-      // Update dashboard / 更新儀表板
-      if (this.dashboard) {
-        this.dashboard.addVerdict(verdict);
-        this.dashboard.pushEvent({
-          type: 'new_event',
-          data: { event: event.id, verdict: verdict.conclusion, confidence: verdict.confidence },
-          timestamp: new Date().toISOString(),
-        });
-
-        // Update threat map if we have IP / 如有 IP 則更新威脅地圖
-        const sourceIP =
-          (event.metadata?.['sourceIP'] as string) ?? (event.metadata?.['remoteAddress'] as string);
-        if (sourceIP && verdict.conclusion !== 'benign') {
-          this.dashboard.addThreatMapEntry({
-            sourceIP,
-            attackType: event.category,
-            count: 1,
-            lastSeen: new Date().toISOString(),
-          });
-        }
-      }
-
-      // Save baseline periodically / 定期儲存基線
-      if (this.eventsProcessed % 100 === 0) {
-        saveBaseline(this.baselinePath, this.baseline);
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.error(`Event processing failed: ${msg} / 事件處理失敗: ${msg}`);
-    }
+    const state = this.eventProcessorState;
+    await _processEvent(
+      event,
+      state,
+      this.eventProcessorDeps,
+      (e: SecurityEvent) => void this.processEvent(e)
+    );
+    this.syncStateBack(state);
   }
 
   /**
    * Check if learning period should transition to protection
-   * 檢查學習期是否應轉換為防護模式
    */
-  /**
-   * Locate the bundled playbooks directory by walking up from this file's location.
-   * Returns the path if found, or undefined if not found.
-   * 從此檔案位置向上搜尋內建劇本目錄。
-   */
-  private findPlaybooksDir(): string | undefined {
-    try {
-      const thisDir = dirname(fileURLToPath(import.meta.url));
-      let dir = thisDir;
-      for (let i = 0; i < 8; i++) {
-        const candidate = join(dir, 'config', 'playbooks');
-        if (existsSync(candidate)) {
-          return candidate;
-        }
-        dir = dirname(dir);
-      }
-    } catch {
-      // fileURLToPath may fail in some environments
-    }
-    return undefined;
-  }
-
   private checkLearningTransition(): void {
     if (this.mode !== 'learning') return;
 
@@ -1142,9 +482,9 @@ export class GuardEngine {
       logger.info('Learning period complete, switching to protection / 學習期完成，切換至防護模式');
       this.baseline = switchToProtectionMode(this.baseline);
       this.mode = 'protection';
-      this.respondAgent.setMode('protection');
-      this.reportAgent.setMode('protection');
-      saveBaseline(this.baselinePath, this.baseline);
+      this.engines.respondAgent.setMode('protection');
+      this.engines.reportAgent.setMode('protection');
+      saveBaseline(this.engines.baselinePath, this.baseline);
 
       if (this.dashboard) {
         this.dashboard.updateStatus({ mode: 'protection' });
@@ -1158,177 +498,17 @@ export class GuardEngine {
   }
 
   /**
-   * Periodic Threat Cloud sync: re-fetch rules and blocklist
-   * 定期同步 Threat Cloud：重新取得規則和封鎖清單
-   */
-  private async syncThreatCloud(): Promise<void> {
-    try {
-      // Refresh rules / 更新規則
-      const cloudRules = await this.threatCloud.fetchRules();
-      let newRules = 0;
-      for (const rule of cloudRules) {
-        try {
-          const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/core').SigmaRule;
-          if (parsed.id && parsed.title && parsed.detection) {
-            this.ruleEngine.addRule(parsed);
-            newRules++;
-          }
-        } catch (parseErr: unknown) {
-          logger.warn(
-            `Skipping invalid Sigma rule from cloud: ${rule.ruleId ?? 'unknown'} — ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`
-          );
-        }
-      }
-
-      // Sync ATR rules from Threat Cloud / 從 Threat Cloud 同步 ATR 規則
-      let newATRRules = 0;
-      try {
-        const atrRules = await this.threatCloud.fetchATRRules();
-        for (const rule of atrRules) {
-          try {
-            const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
-            if (parsed.id && parsed.title && parsed.detection) {
-              this.atrEngine.addCloudRule(parsed);
-              newATRRules++;
-            }
-          } catch (parseErr: unknown) {
-            logger.warn(
-              `Skipping invalid ATR rule from cloud: ${rule.ruleId ?? 'unknown'} — ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`
-            );
-          }
-        }
-        if (newATRRules > 0) {
-          logger.info(
-            `ATR cloud sync: ${newATRRules} rules updated / ATR 雲端同步: ${newATRRules} 條規則更新`
-          );
-        }
-      } catch (err: unknown) {
-        logger.warn(`ATR cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
-      }
-
-      // Sync YARA rules from Threat Cloud / 從 Threat Cloud 同步 YARA 規則
-      let newYaraRules = 0;
-      try {
-        const yaraRules = await this.threatCloud.fetchYaraRules();
-        if (yaraRules.length > 0) {
-          const yaraCloudDir = join(this.config.dataDir, 'yara-rules', 'cloud');
-          const { mkdirSync, writeFileSync } = await import('node:fs');
-          mkdirSync(yaraCloudDir, { recursive: true });
-          for (const rule of yaraRules) {
-            try {
-              const filename = `${rule.ruleId ?? 'unknown'}.yar`;
-              writeFileSync(join(yaraCloudDir, filename), rule.ruleContent, 'utf-8');
-              newYaraRules++;
-            } catch (writeErr: unknown) {
-              logger.warn(
-                `Skipping invalid YARA rule from cloud: ${rule.ruleId ?? 'unknown'} — ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
-              );
-            }
-          }
-          if (newYaraRules > 0) {
-            // Reload YARA scanner with new rules
-            const yaraCustomDir = this.config.yaraRulesDir
-              ? join(this.config.yaraRulesDir, 'custom')
-              : join(this.config.dataDir, 'yara-rules', 'custom');
-            await this.yaraScanner.loadAllRules(yaraCustomDir, this.config.bundledYaraDir);
-          }
-        }
-      } catch (err: unknown) {
-        logger.warn(`YARA cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
-      }
-
-      // Refresh IP blocklist / 更新 IP 封鎖清單
-      const ips = await this.threatCloud.fetchBlocklist();
-      const addedIPs =
-        ips.length > 0 ? this.feedManager.addExternalIPs(ips, 'threat_cloud_blocklist', 85) : 0;
-
-      // Refresh domain blocklist / 更新網域封鎖清單
-      let addedDomains = 0;
-      try {
-        const domains = await this.threatCloud.fetchDomainBlocklist();
-        addedDomains =
-          domains.length > 0
-            ? this.feedManager.addExternalDomains(domains, 'threat_cloud_blocklist', 85)
-            : 0;
-      } catch (err: unknown) {
-        logger.warn(
-          `Domain blocklist sync failed: ${err instanceof Error ? err.message : String(err)}`
-        );
-      }
-
-      // Report locally whitelisted skills to Threat Cloud / 上報本地白名單 skills
-      try {
-        const localSkills = this.atrEngine
-          .getWhitelistManager()
-          .getAll()
-          .filter((s) => s.source === 'fingerprint' || s.source === 'manual');
-        for (const skill of localSkills) {
-          await this.threatCloud.reportSafeSkill(skill.name, skill.fingerprintHash);
-        }
-      } catch (err: unknown) {
-        logger.warn(
-          `Skill whitelist upload failed: ${err instanceof Error ? err.message : String(err)}`
-        );
-      }
-
-      // Sync community skill whitelist / 同步社群 skill 白名單
-      let importedSkills = 0;
-      try {
-        const communitySkills = await this.threatCloud.fetchSkillWhitelist();
-        if (communitySkills.length > 0) {
-          importedSkills = this.atrEngine
-            .getWhitelistManager()
-            .importCommunityWhitelist(communitySkills.map((s) => ({ name: s.name, hash: s.hash })));
-        }
-      } catch (err: unknown) {
-        logger.warn(
-          `Skill whitelist sync failed: ${err instanceof Error ? err.message : String(err)}`
-        );
-      }
-
-      // Sync community skill blacklist / 同步社群 skill 黑名單
-      let revokedSkills = 0;
-      try {
-        const blacklist = await this.threatCloud.fetchSkillBlacklist();
-        const whitelistMgr = this.atrEngine.getWhitelistManager();
-        for (const entry of blacklist) {
-          const wasRevoked = whitelistMgr.revoke(
-            entry.skillName,
-            `community-blacklist: ${entry.reportCount} reports, avg risk ${entry.avgRiskScore}`
-          );
-          if (wasRevoked) revokedSkills++;
-        }
-        if (revokedSkills > 0) {
-          logger.warn(
-            `Community blacklist: ${revokedSkills} skill(s) revoked / ` +
-              `社群黑名單: ${revokedSkills} 個技能已撤銷`
-          );
-        }
-      } catch (err: unknown) {
-        logger.warn(
-          `Skill blacklist sync failed: ${err instanceof Error ? err.message : String(err)}`
-        );
-      }
-
-      logger.info(
-        `Threat Cloud sync: ${newRules} Sigma, ${newATRRules} ATR, ${newYaraRules} YARA, ` +
-          `${addedIPs} IPs, ${addedDomains} domains, ${importedSkills} whitelist, ${revokedSkills} blacklist / ` +
-          `Threat Cloud 同步: ${newRules} Sigma, ${newATRRules} ATR, ${newYaraRules} YARA, ` +
-          `${addedIPs} IP, ${addedDomains} 網域, ${importedSkills} 白名單, ${revokedSkills} 黑名單`
-      );
-    } catch (err: unknown) {
-      logger.warn(`Threat Cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
-
-  /**
-   * Update dashboard with current status / 更新儀表板狀態
+   * Update dashboard with current status
    */
   private updateDashboardStatus(): void {
     if (!this.dashboard) return;
 
-    const memUsage = process.memoryUsage();
-    const ruleCounts = this.getRuleCounts();
+    const memCheck = this.checkMemoryPressure();
+    const ruleCounts = getRuleCounts(
+      this.engines.ruleEngine,
+      this.engines.atrEngine,
+      this.engines.yaraScanner
+    );
     this.dashboard.updateStatus({
       mode: this.mode,
       uptime: Date.now() - this.startTime,
@@ -1337,109 +517,47 @@ export class GuardEngine {
       actionsExecuted: this.actionsExecuted,
       learningProgress: getLearningProgress(this.baseline, this.config.learningDays),
       baselineConfidence: this.baseline.confidenceLevel,
-      memoryUsageMB: Math.round((memUsage.heapUsed / 1024 / 1024) * 10) / 10,
-      cpuPercent: 0, // CPU tracking would need os.cpus()
+      memoryUsageMB: memCheck.heapUsedMB,
+      heapTotalMB: memCheck.heapTotalMB,
+      heapLimitMB: memCheck.heapLimitMB,
+      heapUsagePercent: memCheck.heapUsagePercent,
+      memoryStatus: memCheck.memoryStatus,
+      cpuPercent: 0,
       sigmaRuleCount: ruleCounts.sigma,
       yaraRuleCount: ruleCounts.yara,
-      atrRuleCount: this.atrEngine.getRuleCount(),
-      atrMatchCount: this.atrEngine.getMatchCount(),
-      atrDrafterPatterns: this.atrDrafter?.getPatternCount() ?? 0,
-      atrDrafterSubmitted: this.atrDrafter?.getSubmittedCount() ?? 0,
-      whitelistedSkills: this.atrEngine.getWhitelistManager().getStats().active,
-      trackedSkills: this.atrEngine.getTrackedSkillCount(),
-      stableFingerprints: this.atrEngine.getStableFingerprintCount(),
+      atrRuleCount: this.engines.atrEngine.getRuleCount(),
+      atrMatchCount: this.engines.atrEngine.getMatchCount(),
+      atrDrafterPatterns: this.engines.atrDrafter?.getPatternCount() ?? 0,
+      atrDrafterSubmitted: this.engines.atrDrafter?.getSubmittedCount() ?? 0,
+      whitelistedSkills: this.engines.atrEngine.getWhitelistManager().getStats().active,
+      trackedSkills: this.engines.atrEngine.getTrackedSkillCount(),
+      stableFingerprints: this.engines.atrEngine.getStableFingerprintCount(),
     });
   }
 
   /**
    * Register event callback for external consumers (e.g. CLI quiet mode).
-   * 註冊事件回調給外部消費者（如 CLI 安靜模式）。
    */
   setEventCallback(cb: (type: string, data: Record<string, unknown>) => void): void {
     this.eventCallback = cb;
   }
 
   /**
-   * Apply a policy update by iterating over its rules and dispatching
-   * each to the appropriate agent method.
-   * 套用策略更新，遍歷其規則並分派給適當的代理方法。
-   *
-   * Supported rule types:
-   * - block_ip: calls respondAgent.addBlockedIP(condition.ip)
-   * - alert_threshold: calls respondAgent.updateActionPolicy({ autoRespond, notifyAndWait })
-   * - auto_respond: calls respondAgent.updateActionPolicy({ autoRespond: 90 | 100 })
-   * Other rule types are silently ignored.
+   * Apply a policy update. Delegates to response-engine module.
    */
-  private applyPolicy(policy: {
-    rules: Array<{
-      type: string;
-      condition: Record<string, unknown>;
-      action: string;
-      description: string;
-    }>;
-  }): void {
-    for (const rule of policy.rules) {
-      switch (rule.type) {
-        case 'block_ip': {
-          const ip = rule.condition['ip'] as string | undefined;
-          if (ip) {
-            void this.respondAgent.addBlockedIP(ip);
-          }
-          break;
-        }
-        case 'alert_threshold': {
-          const updates: Partial<import('./types.js').ActionPolicy> = {};
-          if (typeof rule.condition['autoRespond'] === 'number') {
-            updates.autoRespond = rule.condition['autoRespond'] as number;
-          }
-          if (typeof rule.condition['notifyAndWait'] === 'number') {
-            updates.notifyAndWait = rule.condition['notifyAndWait'] as number;
-          }
-          if (Object.keys(updates).length > 0) {
-            this.respondAgent.updateActionPolicy(updates);
-          }
-          break;
-        }
-        case 'auto_respond': {
-          const enabled = rule.condition['enabled'] as boolean | undefined;
-          if (enabled === true) {
-            this.respondAgent.updateActionPolicy({ autoRespond: 90 });
-          } else if (enabled === false) {
-            this.respondAgent.updateActionPolicy({ autoRespond: 100 });
-          }
-          break;
-        }
-        default:
-          // Unknown rule type: silently ignore
-          break;
-      }
-    }
+  private applyPolicy(policy: PolicyUpdate): void {
+    _applyPolicy(policy, this.engines.respondAgent);
   }
 
   /**
-   * Poll the Manager for a policy update.
-   * Does nothing if the agent client is not registered.
-   * 向 Manager 輪詢策略更新。若代理客戶端未登錄則不執行任何操作。
+   * Poll the Manager for a policy update. Delegates to response-engine module.
    */
   private async pollPolicy(): Promise<void> {
-    if (!this.agentClient) return;
-    // agentClient.pollPolicy is invoked here when registered
-    // (implementation detail: agentClient may provide this method)
-    try {
-      if (
-        typeof (this.agentClient as unknown as { pollPolicy?: () => Promise<void> }).pollPolicy ===
-        'function'
-      ) {
-        await (this.agentClient as unknown as { pollPolicy: () => Promise<void> }).pollPolicy();
-      }
-    } catch (err: unknown) {
-      logger.warn(`Policy poll failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
+    await _pollPolicy(this.agentClient);
   }
 
   /**
    * Get a skill threat submitter function for SkillWatcher integration.
-   * Returns a bound callback that submits to Threat Cloud.
    */
   getSkillThreatSubmitter(): (submission: {
     skillHash: string;
@@ -1448,22 +566,42 @@ export class GuardEngine {
     riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
     findingSummaries?: Array<{ id: string; category: string; severity: string; title: string }>;
   }) => Promise<boolean> {
-    return (submission) => this.threatCloud.submitSkillThreat(submission);
+    return _getSkillThreatSubmitter(this.engines.threatCloud);
   }
 
   /**
    * Get a skill blacklist checker function for SkillWatcher integration.
-   * Checks if a skill name appears in the community blacklist from Threat Cloud.
-   * 取得技能黑名單檢查函式供 SkillWatcher 整合使用
    */
   getSkillBlacklistChecker(): (skillName: string) => Promise<boolean> {
-    return async (skillName: string): Promise<boolean> => {
-      const blacklist = await this.threatCloud.fetchSkillBlacklist();
-      const normalized = skillName.toLowerCase().trim().replace(/\s+/g, '-');
-      return blacklist.some(
-        (entry) => entry.skillName.toLowerCase().trim().replace(/\s+/g, '-') === normalized
-      );
-    };
+    return _getSkillBlacklistChecker(this.engines.threatCloud);
+  }
+
+  /**
+   * Check current memory pressure using V8 heap statistics.
+   */
+  private checkMemoryPressure(): {
+    heapUsedMB: number;
+    heapTotalMB: number;
+    heapLimitMB: number;
+    heapUsagePercent: number;
+    memoryStatus: 'healthy' | 'warning' | 'critical';
+  } {
+    const mem = process.memoryUsage();
+    const heapStats = v8.getHeapStatistics();
+    const heapUsedMB = Math.round((mem.heapUsed / 1024 / 1024) * 10) / 10;
+    const heapTotalMB = Math.round((mem.heapTotal / 1024 / 1024) * 10) / 10;
+    const heapLimitMB = Math.round((heapStats.heap_size_limit / 1024 / 1024) * 10) / 10;
+    const heapUsagePercent =
+      Math.round((mem.heapUsed / heapStats.heap_size_limit) * 1000) / 10;
+
+    let memoryStatus: 'healthy' | 'warning' | 'critical' = 'healthy';
+    if (heapUsagePercent >= 80) {
+      memoryStatus = 'critical';
+    } else if (heapUsagePercent >= 60) {
+      memoryStatus = 'warning';
+    }
+
+    return { heapUsedMB, heapTotalMB, heapLimitMB, heapUsagePercent, memoryStatus };
   }
 
   /**
@@ -1471,7 +609,7 @@ export class GuardEngine {
    */
   getStatus(): GuardStatus {
     const license = validateLicense(this.config.licenseKey);
-    const memUsage = process.memoryUsage();
+    const memCheck = this.checkMemoryPressure();
 
     return {
       running: this.running,
@@ -1482,28 +620,31 @@ export class GuardEngine {
       actionsExecuted: this.actionsExecuted,
       learningProgress: getLearningProgress(this.baseline, this.config.learningDays),
       baselineConfidence: this.baseline.confidenceLevel,
-      memoryUsageMB: Math.round((memUsage.heapUsed / 1024 / 1024) * 10) / 10,
+      memoryUsageMB: memCheck.heapUsedMB,
+      heapTotalMB: memCheck.heapTotalMB,
+      heapLimitMB: memCheck.heapLimitMB,
+      heapUsagePercent: memCheck.heapUsagePercent,
+      memoryStatus: memCheck.memoryStatus,
       licenseTier: license.tier,
-      atrRuleCount: this.atrEngine.getRuleCount(),
-      atrMatchCount: this.atrEngine.getMatchCount(),
-      atrDrafterPatterns: this.atrDrafter?.getPatternCount() ?? 0,
-      atrDrafterSubmitted: this.atrDrafter?.getSubmittedCount() ?? 0,
-      whitelistedSkills: this.atrEngine.getWhitelistManager().getStats().active,
-      trackedSkills: this.atrEngine.getTrackedSkillCount(),
-      stableFingerprints: this.atrEngine.getStableFingerprintCount(),
+      atrRuleCount: this.engines.atrEngine.getRuleCount(),
+      atrMatchCount: this.engines.atrEngine.getMatchCount(),
+      atrDrafterPatterns: this.engines.atrDrafter?.getPatternCount() ?? 0,
+      atrDrafterSubmitted: this.engines.atrDrafter?.getSubmittedCount() ?? 0,
+      whitelistedSkills: this.engines.atrEngine.getWhitelistManager().getStats().active,
+      trackedSkills: this.engines.atrEngine.getTrackedSkillCount(),
+      stableFingerprints: this.engines.atrEngine.getStableFingerprintCount(),
     };
   }
 
   /**
    * Get loaded rule counts for each engine layer.
-   * 取得各引擎層已載入的規則數量。
    */
   getRuleCounts(): { sigma: number; atr: number; yara: number } {
-    return {
-      sigma: this.ruleEngine.getRules().length,
-      atr: this.atrEngine.getRuleCount(),
-      yara: this.yaraScanner.getRuleCount(),
-    };
+    return getRuleCounts(
+      this.engines.ruleEngine,
+      this.engines.atrEngine,
+      this.engines.yaraScanner
+    );
   }
 
   /**
