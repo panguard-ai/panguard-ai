@@ -812,11 +812,41 @@
       "miss4": "Supply chain attacks via skill packages",
       "capability": "Capability",
       "table": {
-        "row1": { "feature": "AI agent threat detection", "panguard": "yes", "crowdstrike": "no", "snyk": "no", "lakera": "partial" },
-        "row2": { "feature": "MCP skill pre-install audit", "panguard": "yes", "crowdstrike": "no", "snyk": "no", "lakera": "no" },
-        "row3": { "feature": "Prompt injection detection", "panguard": "21 ATR rules", "crowdstrike": "no", "snyk": "no", "lakera": "yes" },
-        "row4": { "feature": "Runtime agent monitoring", "panguard": "24/7 daemon", "crowdstrike": "Endpoints only", "snyk": "no", "lakera": "no" },
-        "row5": { "feature": "Cost", "panguard": "$0 (MIT)", "crowdstrike": "$25-60/ep/mo", "snyk": "Free tier+", "lakera": "Paid" }
+        "row1": {
+          "feature": "AI agent threat detection",
+          "panguard": "yes",
+          "crowdstrike": "no",
+          "snyk": "no",
+          "lakera": "partial"
+        },
+        "row2": {
+          "feature": "MCP skill pre-install audit",
+          "panguard": "yes",
+          "crowdstrike": "no",
+          "snyk": "no",
+          "lakera": "no"
+        },
+        "row3": {
+          "feature": "Prompt injection detection",
+          "panguard": "21 ATR rules",
+          "crowdstrike": "no",
+          "snyk": "no",
+          "lakera": "yes"
+        },
+        "row4": {
+          "feature": "Runtime agent monitoring",
+          "panguard": "24/7 daemon",
+          "crowdstrike": "Endpoints only",
+          "snyk": "no",
+          "lakera": "no"
+        },
+        "row5": {
+          "feature": "Cost",
+          "panguard": "$0 (MIT)",
+          "crowdstrike": "$25-60/ep/mo",
+          "snyk": "Free tier+",
+          "lakera": "Paid"
+        }
       },
       "bottomLine": "PanGuard fills the gap with {rules} detection rules. Open source. Free forever."
     },

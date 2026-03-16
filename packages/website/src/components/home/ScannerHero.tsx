@@ -13,8 +13,16 @@ import LiveCounterBar from './LiveCounterBar';
 function ScannerHeroInner() {
   const t = useTranslations('home.scannerHero');
   const {
-    url, setUrl, loading, result, report, meta,
-    expanded, setExpanded, handleScan, animationPhase,
+    url,
+    setUrl,
+    loading,
+    result,
+    report,
+    meta,
+    expanded,
+    setExpanded,
+    handleScan,
+    animationPhase,
   } = useSkillScan();
 
   return (
@@ -47,9 +55,7 @@ function ScannerHeroInner() {
           <p className="mt-5 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto">
             {t('mission')}
           </p>
-          <p className="mt-2 text-sm text-panguard-green font-semibold">
-            {t('atrLine')}
-          </p>
+          <p className="mt-2 text-sm text-panguard-green font-semibold">{t('atrLine')}</p>
         </div>
 
         {/* Scanner — CSS fade-up with delay */}
@@ -85,9 +91,7 @@ function ScannerHeroInner() {
           </div>
 
           {/* These use AnimatePresence — only render when loading/result, SSR won't output them */}
-          <AnimatePresence>
-            {loading && <ScanAnimation phase={animationPhase} />}
-          </AnimatePresence>
+          <AnimatePresence>{loading && <ScanAnimation phase={animationPhase} />}</AnimatePresence>
 
           {result && !result.ok && (
             <motion.div
@@ -111,12 +115,8 @@ function ScannerHeroInner() {
             )}
           </AnimatePresence>
 
-          <p className="text-[11px] text-text-muted mt-3">
-            {t('trustNote')}
-          </p>
-          <p className="text-[11px] text-text-muted mt-1">
-            {t('howItHelps')}
-          </p>
+          <p className="text-[11px] text-text-muted mt-3">{t('trustNote')}</p>
+          <p className="text-[11px] text-text-muted mt-1">{t('howItHelps')}</p>
         </div>
 
         {/* Live counter — CSS fade-in with delay */}

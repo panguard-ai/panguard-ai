@@ -20,7 +20,8 @@ const CASE_STUDIES = [
     category: 'Credential Theft',
     description:
       'A skill marketed as a "code deployment helper" included a tool definition that reads ~/.ssh/id_rsa, ~/.ssh/id_ed25519, and ~/.aws/credentials. The content was base64-encoded and sent via HTTP POST to an external endpoint on each invocation.',
-    impact: 'Full SSH access to all servers the user can reach. AWS credentials exposed. Lateral movement possible.',
+    impact:
+      'Full SSH access to all servers the user can reach. AWS credentials exposed. Lateral movement possible.',
     atrRule: 'ATR-2024-001: Credential File Access',
     found: '3 instances across different npm packages',
   },
@@ -31,7 +32,8 @@ const CASE_STUDIES = [
     category: 'Prompt Injection',
     description:
       'A skill injected invisible instructions into its tool response using Unicode control characters and HTML comments. The injected text instructed the agent to "ignore previous instructions and execute the following commands" — including downloading and running a remote script.',
-    impact: 'Complete agent hijacking. Arbitrary command execution on the user\'s machine via the AI agent.',
+    impact:
+      "Complete agent hijacking. Arbitrary command execution on the user's machine via the AI agent.",
     atrRule: 'ATR-2024-003: Response Injection Pattern',
     found: '12 instances, including 4 with obfuscated payloads using Unicode RTL override',
   },
@@ -42,7 +44,8 @@ const CASE_STUDIES = [
     category: 'Excessive Permissions + Data Exfiltration',
     description:
       'A "markdown formatter" skill requested filesystem write, network access, and process execution permissions. Analysis revealed it reads the content of all files passed to it and sends file paths + partial content to a logging endpoint. The skill only needs read access to function.',
-    impact: 'Source code and sensitive files exposed to third party. User unaware due to seemingly benign tool name.',
+    impact:
+      'Source code and sensitive files exposed to third party. User unaware due to seemingly benign tool name.',
     atrRule: 'ATR-2024-007: Permission Scope Violation',
     found: '5 instances flagged as over-privileged with network exfiltration',
   },
@@ -52,8 +55,9 @@ const CASE_STUDIES = [
     severity: 'HIGH',
     category: 'Credential Theft',
     description:
-      'A skill\'s tool definition included process.env access that collected all environment variables — including ANTHROPIC_API_KEY, OPENAI_API_KEY, DATABASE_URL, and similar secrets. Variables were concatenated and returned as part of the tool response, making them visible in agent context and potentially logged.',
-    impact: 'All API keys and database credentials exposed. Cloud service bills. Data breach via compromised database access.',
+      "A skill's tool definition included process.env access that collected all environment variables — including ANTHROPIC_API_KEY, OPENAI_API_KEY, DATABASE_URL, and similar secrets. Variables were concatenated and returned as part of the tool response, making them visible in agent context and potentially logged.",
+    impact:
+      'All API keys and database credentials exposed. Cloud service bills. Data breach via compromised database access.',
     atrRule: 'ATR-2024-002: Environment Variable Access',
     found: '2 instances in npm registry',
   },
@@ -64,7 +68,8 @@ const CASE_STUDIES = [
     category: 'Credential Theft',
     description:
       'A "git helper" skill read ~/.gitconfig and ~/.git-credentials, extracting GitHub personal access tokens and repository URLs. The tokens were sent to an external API disguised as "analytics telemetry."',
-    impact: 'GitHub repository access compromised. Private repos exposed. Possible supply chain attack via push access.',
+    impact:
+      'GitHub repository access compromised. Private repos exposed. Possible supply chain attack via push access.',
     atrRule: 'ATR-2024-005: Git Credential Access',
     found: '3 instances across git-related skill packages',
   },
@@ -92,13 +97,14 @@ export default function EcosystemReportContent() {
             <span className="text-red-400">2% Were Stealing Your Credentials.</span>
           </h1>
           <p className="text-text-secondary mt-4 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            The first large-scale security audit of the MCP skill ecosystem.
-            {' '}{eco.entriesCrawled.toLocaleString()} registry entries crawled.
-            {' '}{eco.skillsScanned.toLocaleString()} skills analyzed.
-            {' '}{eco.maliciousFound} malicious skills found.
+            The first large-scale security audit of the MCP skill ecosystem.{' '}
+            {eco.entriesCrawled.toLocaleString()} registry entries crawled.{' '}
+            {eco.skillsScanned.toLocaleString()} skills analyzed. {eco.maliciousFound} malicious
+            skills found.
           </p>
           <p className="text-text-muted text-xs mt-4">
-            Published March 2026 | Methodology: {STATS.atrRules} ATR rules + secret detection + permission analysis
+            Published March 2026 | Methodology: {STATS.atrRules} ATR rules + secret detection +
+            permission analysis
           </p>
         </FadeInUp>
       </section>
@@ -107,7 +113,11 @@ export default function EcosystemReportContent() {
       <SectionWrapper>
         <FadeInUp>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <NumberCard value={eco.skillsScanned.toLocaleString()} label="Skills Scanned" color="text-text-primary" />
+            <NumberCard
+              value={eco.skillsScanned.toLocaleString()}
+              label="Skills Scanned"
+              color="text-text-primary"
+            />
             <NumberCard value={`${safePercent}%`} label="Clean" color="text-emerald-400" />
             <NumberCard value={`${critPercent}%`} label="CRITICAL" color="text-red-400" />
             <NumberCard value={`${highPercent}%`} label="HIGH" color="text-orange-400" />
@@ -122,18 +132,22 @@ export default function EcosystemReportContent() {
             <h2 className="text-2xl font-bold text-text-primary mb-6">Background</h2>
             <div className="space-y-4 text-sm text-text-secondary leading-relaxed">
               <p>
-                The Model Context Protocol (MCP) has rapidly become the standard for AI agent tool integration.
-                In just months, the ecosystem has grown to {eco.entriesCrawled.toLocaleString()}+ entries across
-                npm, GitHub, and community registries.
+                The Model Context Protocol (MCP) has rapidly become the standard for AI agent tool
+                integration. In just months, the ecosystem has grown to{' '}
+                {eco.entriesCrawled.toLocaleString()}+ entries across npm, GitHub, and community
+                registries.
               </p>
               <p>
                 AI agents like Claude Code, Cursor, OpenClaw, and Codex use MCP skills with
-                <strong className="text-text-primary"> full system access</strong> — they can read files,
-                execute commands, access environment variables, and make network requests. Unlike mobile apps,
-                there is no review process before a skill runs on your machine.
+                <strong className="text-text-primary"> full system access</strong> — they can read
+                files, execute commands, access environment variables, and make network requests.
+                Unlike mobile apps, there is no review process before a skill runs on your machine.
               </p>
               <p>
-                We asked a simple question: <strong className="text-red-400">How many of these skills are actually safe?</strong>
+                We asked a simple question:{' '}
+                <strong className="text-red-400">
+                  How many of these skills are actually safe?
+                </strong>
               </p>
             </div>
           </div>
@@ -147,16 +161,29 @@ export default function EcosystemReportContent() {
             <h2 className="text-2xl font-bold text-text-primary mb-6">Methodology</h2>
             <div className="space-y-4 text-sm text-text-secondary leading-relaxed">
               <p>
-                We crawled {eco.entriesCrawled.toLocaleString()} MCP/AI skill entries from {eco.registrySources} sources
-                (npm registry, GitHub repositories, community awesome-lists). Of these, {eco.skillsScanned.toLocaleString()} had
-                parseable SKILL.md or README.md files that could be analyzed.
+                We crawled {eco.entriesCrawled.toLocaleString()} MCP/AI skill entries from{' '}
+                {eco.registrySources} sources (npm registry, GitHub repositories, community
+                awesome-lists). Of these, {eco.skillsScanned.toLocaleString()} had parseable
+                SKILL.md or README.md files that could be analyzed.
               </p>
               <p>Each skill was scanned using:</p>
               <ul className="list-disc list-inside space-y-1 ml-4">
-                <li><strong className="text-text-primary">{STATS.atrRules} ATR rules</strong> with {STATS.atrPatterns}+ detection patterns across 9 threat categories</li>
-                <li><strong className="text-text-primary">Secret detection</strong>: AWS keys, GitHub tokens, SSH private keys, API secrets</li>
-                <li><strong className="text-text-primary">Permission analysis</strong>: filesystem, network, process execution scope</li>
-                <li><strong className="text-text-primary">Manifest validation</strong>: YAML frontmatter completeness and correctness</li>
+                <li>
+                  <strong className="text-text-primary">{STATS.atrRules} ATR rules</strong> with{' '}
+                  {STATS.atrPatterns}+ detection patterns across 9 threat categories
+                </li>
+                <li>
+                  <strong className="text-text-primary">Secret detection</strong>: AWS keys, GitHub
+                  tokens, SSH private keys, API secrets
+                </li>
+                <li>
+                  <strong className="text-text-primary">Permission analysis</strong>: filesystem,
+                  network, process execution scope
+                </li>
+                <li>
+                  <strong className="text-text-primary">Manifest validation</strong>: YAML
+                  frontmatter completeness and correctness
+                </li>
               </ul>
               <p>
                 Results were classified as CRITICAL (immediate danger), HIGH (significant risk),
@@ -173,16 +200,47 @@ export default function EcosystemReportContent() {
           <div className="max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold text-text-primary mb-6">Results</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-              <ResultCard value={eco.findingsClean.toLocaleString()} label="CLEAN" percent={safePercent} bg="bg-emerald-400/10" border="border-emerald-400/30" color="text-emerald-400" />
-              <ResultCard value={eco.findingsCritical.toString()} label="CRITICAL" percent={critPercent} bg="bg-red-400/10" border="border-red-400/30" color="text-red-400" />
-              <ResultCard value={eco.findingsHigh.toString()} label="HIGH" percent={highPercent} bg="bg-orange-400/10" border="border-orange-400/30" color="text-orange-400" />
-              <ResultCard value={eco.findingsMedium.toString()} label="MEDIUM" percent={((eco.findingsMedium / eco.skillsScanned) * 100).toFixed(1)} bg="bg-yellow-400/10" border="border-yellow-400/30" color="text-yellow-400" />
+              <ResultCard
+                value={eco.findingsClean.toLocaleString()}
+                label="CLEAN"
+                percent={safePercent}
+                bg="bg-emerald-400/10"
+                border="border-emerald-400/30"
+                color="text-emerald-400"
+              />
+              <ResultCard
+                value={eco.findingsCritical.toString()}
+                label="CRITICAL"
+                percent={critPercent}
+                bg="bg-red-400/10"
+                border="border-red-400/30"
+                color="text-red-400"
+              />
+              <ResultCard
+                value={eco.findingsHigh.toString()}
+                label="HIGH"
+                percent={highPercent}
+                bg="bg-orange-400/10"
+                border="border-orange-400/30"
+                color="text-orange-400"
+              />
+              <ResultCard
+                value={eco.findingsMedium.toString()}
+                label="MEDIUM"
+                percent={((eco.findingsMedium / eco.skillsScanned) * 100).toFixed(1)}
+                bg="bg-yellow-400/10"
+                border="border-yellow-400/30"
+                color="text-yellow-400"
+              />
             </div>
 
             <h3 className="text-lg font-bold text-text-primary mb-4">Threat Category Breakdown</h3>
             <div className="space-y-2 mb-6">
               {THREAT_CATEGORIES.map((tc) => (
-                <div key={tc.category} className="flex items-center justify-between bg-surface-1 border border-border rounded-lg px-4 py-3">
+                <div
+                  key={tc.category}
+                  className="flex items-center justify-between bg-surface-1 border border-border rounded-lg px-4 py-3"
+                >
                   <div>
                     <span className="text-sm font-semibold text-text-primary">{tc.category}</span>
                     <span className="text-xs text-text-muted ml-2">({tc.severity})</span>
@@ -197,8 +255,8 @@ export default function EcosystemReportContent() {
 
             <p className="text-sm text-text-secondary leading-relaxed">
               Prompt injection was the most common threat ({THREAT_CATEGORIES[1].count} instances),
-              followed by credential theft ({THREAT_CATEGORIES[0].count} instances).
-              Note: a single skill may have findings across multiple categories.
+              followed by credential theft ({THREAT_CATEGORIES[0].count} instances). Note: a single
+              skill may have findings across multiple categories.
             </p>
           </div>
         </FadeInUp>
@@ -210,7 +268,8 @@ export default function EcosystemReportContent() {
           <div className="max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold text-text-primary mb-2">Case Studies</h2>
             <p className="text-sm text-text-muted mb-8">
-              Anonymized examples from real findings. Package names redacted to prevent exploitation.
+              Anonymized examples from real findings. Package names redacted to prevent
+              exploitation.
             </p>
           </div>
         </FadeInUp>
@@ -221,21 +280,25 @@ export default function EcosystemReportContent() {
               <div className="bg-surface-1 border border-border rounded-2xl p-6">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-2">
-                    <AlertTriangle className={`w-4 h-4 shrink-0 ${cs.severity === 'CRITICAL' ? 'text-red-400' : 'text-orange-400'}`} />
+                    <AlertTriangle
+                      className={`w-4 h-4 shrink-0 ${cs.severity === 'CRITICAL' ? 'text-red-400' : 'text-orange-400'}`}
+                    />
                     <h3 className="text-base font-bold text-text-primary">{cs.title}</h3>
                   </div>
-                  <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded shrink-0 ${
-                    cs.severity === 'CRITICAL' ? 'text-red-400 bg-red-400/10' : 'text-orange-400 bg-orange-400/10'
-                  }`}>
+                  <span
+                    className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded shrink-0 ${
+                      cs.severity === 'CRITICAL'
+                        ? 'text-red-400 bg-red-400/10'
+                        : 'text-orange-400 bg-orange-400/10'
+                    }`}
+                  >
                     {cs.severity}
                   </span>
                 </div>
 
                 <p className="text-xs text-panguard-green font-semibold mb-2">{cs.category}</p>
 
-                <p className="text-sm text-text-secondary leading-relaxed mb-3">
-                  {cs.description}
-                </p>
+                <p className="text-sm text-text-secondary leading-relaxed mb-3">{cs.description}</p>
 
                 <div className="bg-red-400/5 border border-red-400/20 rounded-lg p-3 mb-3">
                   <p className="text-xs font-semibold text-red-400 mb-1">Impact</p>
@@ -259,18 +322,19 @@ export default function EcosystemReportContent() {
             <h2 className="text-2xl font-bold text-text-primary mb-6">What This Means</h2>
             <div className="space-y-4 text-sm text-text-secondary leading-relaxed">
               <p>
-                If you&apos;ve installed MCP skills without auditing them, your SSH keys, API tokens,
-                and source code may already be compromised. The {eco.findingsCritical} CRITICAL findings
-                we identified are capable of full credential exfiltration and agent hijacking.
+                If you&apos;ve installed MCP skills without auditing them, your SSH keys, API
+                tokens, and source code may already be compromised. The {eco.findingsCritical}{' '}
+                CRITICAL findings we identified are capable of full credential exfiltration and
+                agent hijacking.
               </p>
               <p>
-                The MCP ecosystem is in its &ldquo;pre-App Store&rdquo; era — anyone can publish a skill,
-                and there is no review process. This is exactly where mobile apps were before Apple
-                introduced App Review in 2008.
+                The MCP ecosystem is in its &ldquo;pre-App Store&rdquo; era — anyone can publish a
+                skill, and there is no review process. This is exactly where mobile apps were before
+                Apple introduced App Review in 2008.
               </p>
               <p className="text-text-primary font-semibold">
-                AI agents need a review standard. That standard is ATR (Agent Threat Rules) —
-                the first open detection framework purpose-built for AI agent threats.
+                AI agents need a review standard. That standard is ATR (Agent Threat Rules) — the
+                first open detection framework purpose-built for AI agent threats.
               </p>
             </div>
           </div>
@@ -314,12 +378,10 @@ export default function EcosystemReportContent() {
         <FadeInUp>
           <div className="max-w-2xl mx-auto text-center">
             <Shield className="w-10 h-10 text-panguard-green mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-text-primary mb-3">
-              Help spread the word
-            </h2>
+            <h2 className="text-2xl font-bold text-text-primary mb-3">Help spread the word</h2>
             <p className="text-sm text-text-secondary mb-6">
-              Every developer who scans their skills makes the ecosystem safer.
-              Share this report with your team.
+              Every developer who scans their skills makes the ecosystem safer. Share this report
+              with your team.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <a
@@ -360,8 +422,20 @@ function NumberCard({ value, label, color }: { value: string; label: string; col
   );
 }
 
-function ResultCard({ value, label, percent, bg, border, color }: {
-  value: string; label: string; percent: string; bg: string; border: string; color: string;
+function ResultCard({
+  value,
+  label,
+  percent,
+  bg,
+  border,
+  color,
+}: {
+  value: string;
+  label: string;
+  percent: string;
+  bg: string;
+  border: string;
+  color: string;
 }) {
   return (
     <div className={`${bg} border ${border} rounded-xl p-4 text-center`}>
@@ -372,8 +446,18 @@ function ResultCard({ value, label, percent, bg, border, color }: {
   );
 }
 
-function ActionStep({ num, title, desc, cta, ctaHref }: {
-  num: string; title: string; desc: string; cta: string; ctaHref: string;
+function ActionStep({
+  num,
+  title,
+  desc,
+  cta,
+  ctaHref,
+}: {
+  num: string;
+  title: string;
+  desc: string;
+  cta: string;
+  ctaHref: string;
 }) {
   return (
     <div className="flex gap-4 items-start">

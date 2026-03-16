@@ -166,9 +166,7 @@ export default function ScanResultCard({
             onClick={() => setExpanded(!expanded)}
             className="text-xs text-text-muted hover:text-text-secondary transition-colors mb-3"
           >
-            {expanded
-              ? 'Hide findings'
-              : `Show ${report.findings.length} finding(s)`}
+            {expanded ? 'Hide findings' : `Show ${report.findings.length} finding(s)`}
           </button>
 
           <AnimatePresence>
@@ -186,9 +184,7 @@ export default function ScanResultCard({
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-xs font-semibold">{f.title}</p>
-                      <span className="text-[10px] uppercase font-bold shrink-0">
-                        {f.severity}
-                      </span>
+                      <span className="text-[10px] uppercase font-bold shrink-0">{f.severity}</span>
                     </div>
                     <p className="text-[11px] opacity-80 mt-1">{f.description}</p>
                     {f.location && (

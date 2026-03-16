@@ -345,10 +345,7 @@ export class DashboardServer {
 
   private serveIndex(res: ServerResponse): void {
     // Embed auth token in HTML so dashboard always authenticates, even without #token= in URL
-    const html = DASHBOARD_HTML.replace(
-      "var lang=",
-      `var __tk='${this.authToken}';var lang=`
-    );
+    const html = DASHBOARD_HTML.replace('var lang=', `var __tk='${this.authToken}';var lang=`);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(html);
   }

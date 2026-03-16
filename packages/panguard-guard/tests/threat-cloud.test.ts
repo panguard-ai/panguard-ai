@@ -105,7 +105,7 @@ describe('ThreatCloudClient', () => {
       client.stopFlushTimer();
     });
 
-    it('should load existing cache from disk', () => {
+    it('should NOT load cache from disk (community data is memory-only)', () => {
       const cacheData = {
         rules: [
           { ruleId: 'r1', ruleContent: 'test', publishedAt: '2024-01-01', source: 'community' },
@@ -117,8 +117,8 @@ describe('ThreatCloudClient', () => {
 
       const client = new ThreatCloudClient(undefined, tempDir);
       const cached = client.getCachedRules();
-      expect(cached.length).toBe(1);
-      expect(cached[0].ruleId).toBe('r1');
+      // Community data is ephemeral — cache file is ignored
+      expect(cached.length).toBe(0);
       client.stopFlushTimer();
     });
 
@@ -185,7 +185,8 @@ describe('ThreatCloudClient', () => {
   });
 
   describe('fetchRules()', () => {
-    it('should return cached rules in offline mode', async () => {
+    it('should return empty rules in offline mode (no disk cache)', async () => {
+      // Even if a cache file exists on disk, community data is memory-only
       const cacheData = {
         rules: [
           {
@@ -203,8 +204,8 @@ describe('ThreatCloudClient', () => {
       const client = new ThreatCloudClient(undefined, tempDir);
       const rules = await client.fetchRules();
 
-      expect(rules.length).toBe(1);
-      expect(rules[0].ruleId).toBe('cached-rule');
+      // Disk cache is not loaded — rules start empty, fetched from TC on demand
+      expect(rules.length).toBe(0);
       client.stopFlushTimer();
     });
 
@@ -266,7 +267,7 @@ describe('ThreatCloudClient', () => {
       client.stopFlushTimer();
     });
 
-    it('should load stats from cache on disk', () => {
+    it('should NOT load stats from cache on disk (memory-only)', () => {
       const cacheData = {
         rules: [],
         lastSync: '2024-01-01T00:00:00Z',
@@ -277,8 +278,9 @@ describe('ThreatCloudClient', () => {
       const client = new ThreatCloudClient(undefined, tempDir);
       const stats = client.getStats();
 
-      expect(stats.totalUploaded).toBe(42);
-      expect(stats.totalRulesReceived).toBe(17);
+      // Stats are ephemeral — always start at 0, accumulated from TC during runtime
+      expect(stats.totalUploaded).toBe(0);
+      expect(stats.totalRulesReceived).toBe(0);
       client.stopFlushTimer();
     });
   });

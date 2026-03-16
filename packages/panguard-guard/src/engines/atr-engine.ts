@@ -37,7 +37,9 @@ function resolveBundledRulesDir(): string | null {
     const req1 = createRequire(import.meta.url);
     const atrPkgPath = req1.resolve('@panguard-ai/atr/package.json');
     return join(dirname(atrPkgPath), 'rules');
-  } catch { /* continue to next strategy */ }
+  } catch {
+    /* continue to next strategy */
+  }
 
   // Strategy 2: createRequire from the CLI entry point (handles npm -g flat install)
   try {
@@ -46,7 +48,9 @@ function resolveBundledRulesDir(): string | null {
       const atrPkgPath = req2.resolve('@panguard-ai/atr/package.json');
       return join(dirname(atrPkgPath), 'rules');
     }
-  } catch { /* continue to next strategy */ }
+  } catch {
+    /* continue to next strategy */
+  }
 
   // Strategy 3: Walk up from this module searching node_modules
   try {
@@ -59,7 +63,9 @@ function resolveBundledRulesDir(): string | null {
       if (parent === dir) break;
       dir = parent;
     }
-  } catch { /* continue to next strategy */ }
+  } catch {
+    /* continue to next strategy */
+  }
 
   // Strategy 4: Fallback to bundled-rules shipped with this package
   try {
@@ -72,7 +78,9 @@ function resolveBundledRulesDir(): string | null {
       if (parent === dir) break;
       dir = parent;
     }
-  } catch { /* continue to next strategy */ }
+  } catch {
+    /* continue to next strategy */
+  }
 
   return null;
 }

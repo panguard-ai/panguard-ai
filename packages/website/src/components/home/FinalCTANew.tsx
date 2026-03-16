@@ -12,8 +12,7 @@ export default function FinalCTANew() {
       <div className="max-w-3xl mx-auto text-center">
         <FadeInUp>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary">
-            {t('title')}{' '}
-            <span className="text-brand-sage">{t('titleHighlight')}</span>
+            {t('title')} <span className="text-brand-sage">{t('titleHighlight')}</span>
           </h2>
         </FadeInUp>
 
@@ -52,9 +51,7 @@ export default function FinalCTANew() {
         </FadeInUp>
 
         <FadeInUp delay={0.3}>
-          <p className="text-sm text-text-muted mt-10 max-w-lg mx-auto">
-            {t('bottomLine')}
-          </p>
+          <p className="text-sm text-text-muted mt-10 max-w-lg mx-auto">{t('bottomLine')}</p>
         </FadeInUp>
       </div>
     </section>
