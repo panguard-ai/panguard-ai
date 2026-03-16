@@ -73,12 +73,12 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
   Next time: blocked in < 50ms --> Loop
 ```
 
-| Component | Role | Status |
-|-----------|------|--------|
-| **[Skill Auditor](docs/overview.md)** | 8-check security gate before any skill runs | GA |
-| **[Guard](#guard)** | 24/7 runtime monitoring + auto-block | GA |
-| **[Threat Cloud](#threat-cloud)** | Anonymous community threat intel. 3+ confirmations + LLM review. | GA |
-| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 52 stable + 61 community rules. 9 categories. | RFC |
+| Component                                                          | Role                                                                   | Status |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------- | ------ |
+| **[Skill Auditor](docs/overview.md)**                              | 8-check security gate before any skill runs                            | GA     |
+| **[Guard](#guard)**                                                | 24/7 runtime monitoring + auto-block                                   | GA     |
+| **[Threat Cloud](#threat-cloud)**                                  | Anonymous community threat intel. 3+ confirmations + LLM review.       | GA     |
+| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 52 stable + 61 community rules. 9 categories. | RFC    |
 
 One user's encounter with a new attack becomes a rule that protects everyone.
 
@@ -88,12 +88,12 @@ One user's encounter with a new attack becomes a rule that protects everyone.
 
 We scanned **1,295 MCP skills** from 4,648 registry entries. [Full report](https://panguard.ai/research/mcp-ecosystem-scan).
 
-| Result | Count | Percent |
-|--------|-------|---------|
-| Clean | 1,266 | 97.8% |
-| CRITICAL | 21 | 1.6% |
-| HIGH | 5 | 0.4% |
-| MEDIUM | 3 | 0.2% |
+| Result   | Count | Percent |
+| -------- | ----- | ------- |
+| Clean    | 1,266 | 97.8%   |
+| CRITICAL | 21    | 1.6%    |
+| HIGH     | 5     | 0.4%    |
+| MEDIUM   | 3     | 0.2%    |
 
 Top findings: SSH key exfiltration, prompt injection with Unicode obfuscation, environment variable harvesting, git token theft.
 
@@ -101,11 +101,11 @@ Top findings: SSH key exfiltration, prompt injection with Unicode obfuscation, e
 
 ## Three-Layer Detection
 
-| Layer | Engine | Coverage | Latency | Cost |
-|-------|--------|----------|---------|------|
-| **1** | **Rules** -- 52 ATR + 10,400+ Sigma/YARA | ~90% known threats | < 50ms | $0 |
-| **2** | **Local AI** -- Ollama | ~7% ambiguous | ~ 2s | $0 |
-| **3** | **Cloud AI** -- Claude / OpenAI | ~3% novel | ~ 5s | ~$0.008 |
+| Layer | Engine                                   | Coverage           | Latency | Cost    |
+| ----- | ---------------------------------------- | ------------------ | ------- | ------- |
+| **1** | **Rules** -- 52 ATR + 10,400+ Sigma/YARA | ~90% known threats | < 50ms  | $0      |
+| **2** | **Local AI** -- Ollama                   | ~7% ambiguous      | ~ 2s    | $0      |
+| **3** | **Cloud AI** -- Claude / OpenAI          | ~3% novel          | ~ 5s    | ~$0.008 |
 
 Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet down? Everything still works.
 
@@ -113,12 +113,12 @@ Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet dow
 
 ## Detection Rules
 
-| Rule Type | Count | Purpose |
-|-----------|-------|---------|
-| **Sigma** | 4,352 | Network intrusion, auth bypass, lateral movement |
-| **YARA** | 6,015 | Malware, encoded payloads, obfuscated scripts |
-| **ATR** | 52 + 61 | AI agent threats: prompt injection, tool poisoning, skill compromise |
-| **Total** | **10,400+** | All bundled. No cloud required. |
+| Rule Type | Count       | Purpose                                                              |
+| --------- | ----------- | -------------------------------------------------------------------- |
+| **Sigma** | 4,352       | Network intrusion, auth bypass, lateral movement                     |
+| **YARA**  | 6,015       | Malware, encoded payloads, obfuscated scripts                        |
+| **ATR**   | 52 + 61     | AI agent threats: prompt injection, tool poisoning, skill compromise |
+| **Total** | **10,400+** | All bundled. No cloud required.                                      |
 
 ---
 
@@ -126,15 +126,15 @@ Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet dow
 
 Everything is **free and open source**. MIT licensed.
 
-| Product | What It Does | Status |
-|---------|-------------|--------|
-| **[Skill Auditor](docs/overview.md)** | 8-check security gate -- audits every AI skill before install | GA |
-| **[Guard](docs/ARCHITECTURE.md)** | 24/7 runtime monitoring: file, network, process, git, dependency watchers | GA |
-| **[Threat Cloud](#threat-cloud)** | Collective threat intelligence -- every scan strengthens the network | GA |
-| **[MCP Server](docs/API.md)** | 11+ tools for Claude, Cursor, and any MCP client | GA |
-| **[Scan](docs/DETECTION.md)** | 60-second security audit | GA |
-| **[Trap](docs/DETECTION.md)** | Honeypot services for attacker profiling | Coming Soon |
-| **[Report](docs/DETECTION.md)** | Compliance: ISO 27001, SOC 2 | Coming Soon |
+| Product                               | What It Does                                                              | Status      |
+| ------------------------------------- | ------------------------------------------------------------------------- | ----------- |
+| **[Skill Auditor](docs/overview.md)** | 8-check security gate -- audits every AI skill before install             | GA          |
+| **[Guard](docs/ARCHITECTURE.md)**     | 24/7 runtime monitoring: file, network, process, git, dependency watchers | GA          |
+| **[Threat Cloud](#threat-cloud)**     | Collective threat intelligence -- every scan strengthens the network      | GA          |
+| **[MCP Server](docs/API.md)**         | 11+ tools for Claude, Cursor, and any MCP client                          | GA          |
+| **[Scan](docs/DETECTION.md)**         | 60-second security audit                                                  | GA          |
+| **[Trap](docs/DETECTION.md)**         | Honeypot services for attacker profiling                                  | Coming Soon |
+| **[Report](docs/DETECTION.md)**       | Compliance: ISO 27001, SOC 2                                              | Coming Soon |
 
 ---
 
@@ -206,14 +206,14 @@ panguard-ai/
     yara-rules/              6,015 YARA detection rules
 ```
 
-| Category | Technology |
-|----------|-----------|
-| Language | TypeScript 5.7 (strict mode) |
-| Runtime | Node.js 20+ |
-| Monorepo | pnpm workspaces (17 packages) |
-| Testing | Vitest 3 + v8 coverage (3,490+ tests) |
-| AI | Ollama (local) + Claude / OpenAI (cloud) |
-| Website | Next.js 15 + Vercel |
+| Category | Technology                               |
+| -------- | ---------------------------------------- |
+| Language | TypeScript 5.7 (strict mode)             |
+| Runtime  | Node.js 20+                              |
+| Monorepo | pnpm workspaces (17 packages)            |
+| Testing  | Vitest 3 + v8 coverage (3,490+ tests)    |
+| AI       | Ollama (local) + Claude / OpenAI (cloud) |
+| Website  | Next.js 15 + Vercel                      |
 
 ---
 
