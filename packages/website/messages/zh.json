@@ -749,7 +749,8 @@
       "atrLine": "ATR -- AI Skill 的第一個開放審核標準。像 App Store 審核，但專為 AI Agent 設計。",
       "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
       "scanBtn": "掃描",
-      "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。"
+      "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。",
+      "howItHelps": "貼上任何 GitHub Skill 連結，立即查看：風險評分、存取了什麼、能不能安裝。發現的問題會自動共享給社群，生成保護所有人的規則。"
     },
     "evidence": {
       "overline": "真實數據",
@@ -788,7 +789,7 @@
     "liveCounter": {
       "scanned": "個 Skills 已掃描",
       "threats": "個威脅已發現",
-      "monitored": "個 Agent 受監控"
+      "rulesGenerated": "條 ATR 規則已自動生成"
     },
     "scanResult": {
       "shareX": "分享到 X",

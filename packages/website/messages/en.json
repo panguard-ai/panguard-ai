@@ -749,7 +749,8 @@
       "atrLine": "ATR -- the first open review standard for AI skills. Like App Store review, but for agents.",
       "scanLabel": "Check any MCP skill before you install",
       "scanBtn": "Scan",
-      "trustNote": "Scans run server-side. No code is stored. Only content hash is cached."
+      "trustNote": "Scans run server-side. No code is stored. Only content hash is cached.",
+      "howItHelps": "Paste any GitHub skill URL. You'll see: risk score, what it accesses, and whether it's safe to install. Findings are shared with the community to generate protection rules for everyone."
     },
     "evidence": {
       "overline": "REAL DATA",
@@ -788,7 +789,7 @@
     "liveCounter": {
       "scanned": "skills scanned",
       "threats": "threats found",
-      "monitored": "agents monitored"
+      "rulesGenerated": "ATR rules generated"
     },
     "scanResult": {
       "shareX": "Share on X",
