@@ -29,7 +29,7 @@ export default function CookieBanner() {
     <div
       role="dialog"
       aria-label={t('ariaLabel')}
-      className="fixed bottom-0 inset-x-0 z-50 p-4 sm:p-6"
+      className="fixed bottom-4 inset-x-4 sm:inset-x-6 z-50 max-w-2xl mx-auto"
     >
       <div className="max-w-2xl mx-auto bg-surface-1 border border-border rounded-2xl shadow-xl p-5 sm:p-6">
         <p className="text-sm text-text-secondary leading-relaxed">

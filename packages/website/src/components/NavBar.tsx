@@ -100,7 +100,7 @@ function NavDropdown({ label, items }: { label: string; items: DropdownItem[] })
         />
       </button>
       {open && (
-        <div className="absolute top-full left-0 pt-2 z-50">
+        <div className="absolute top-full left-0 pt-2 z-[100]">
           <div className="bg-surface-1 border border-border rounded-xl shadow-xl p-1.5 min-w-[260px]">
             {items.map((item) => (
               <Link

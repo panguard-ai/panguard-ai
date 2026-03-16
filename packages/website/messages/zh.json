@@ -1545,10 +1545,6 @@
       "title": "帳號設定",
       "description": "管理你的 Panguard AI 帳號設定、個人資料和偏好。"
     },
-    "billing": {
-      "title": "帳戶管理",
-      "description": "管理你的 Panguard AI 帳戶設定和使用紀錄。"
-    },
     "atr": {
       "title": "Agent Threat Rules (ATR) -- Panguard AI",
       "description": "首個 AI Agent 威脅的開放偵測標準。9 大類別、32 條規則。OWASP Agentic Top 10 完整覆蓋。社群驅動、YAML 格式、機器可讀。"
@@ -5137,10 +5133,6 @@
         "title": "帳戶設定",
         "description": "雙重驗證、個人資料、安全性"
       },
-      "billing": {
-        "title": "帳戶管理",
-        "description": "管理帳戶與使用紀錄"
-      },
       "apiDocs": {
         "title": "API 文件",
         "description": "整合至您的工具鏈"
@@ -5265,22 +5257,6 @@
       "confirmButton": "永久刪除",
       "errorFailed": "刪除帳戶失敗",
       "errorNetwork": "網路錯誤"
-    }
-  },
-  "billing": {
-    "headerTitle": "帳戶管理",
-    "currentPlan": "目前方案",
-    "manageSubscription": "管理帳戶",
-    "errorLoading": "無法載入帳戶資料，請重新整理。",
-    "freeTier": "免費開源方案",
-    "planIncludes": "方案包含",
-    "renewsOn": "",
-    "endsOn": "",
-    "upgradeHeading": "所有功能已包含",
-    "upgradeDescription": "所有 Panguard 功能皆免費開源。",
-    "viewPlans": "在 GitHub 上查看",
-    "tierFeatures": {
-      "all": ["無限次掃描", "無限端點", "無限次 API 呼叫", "所有功能包含", "社群支援", "MIT 授權"]
     }
   },
   "atrPage": {

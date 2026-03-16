@@ -164,6 +164,7 @@ export default async function LocaleLayout(
     <html
       lang={locale === 'zh' ? 'zh-TW' : 'en'}
       className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansTC.variable}`}
+      suppressHydrationWarning
     >
       <head>
         {/* DNS prefetch for external resources */}
