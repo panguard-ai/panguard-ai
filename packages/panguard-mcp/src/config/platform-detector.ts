@@ -11,7 +11,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir, platform } from 'node:os';
-import { execFile } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
 import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-mcp:platform-detector');
@@ -57,6 +57,17 @@ function hasPanguardMCPEntry(filePath: string): boolean {
     return false;
   } catch {
     return false;
+  }
+}
+
+/** Check if Claude Code has panguard MCP configured via `claude mcp list`. */
+function hasClaudeCodePanguard(): boolean {
+  try {
+    const output = execFileSync('claude', ['mcp', 'list'], { timeout: 10_000, stdio: 'pipe' }).toString();
+    return output.includes('panguard');
+  } catch {
+    // Fallback: check JSON config
+    return hasPanguardMCPEntry(getClaudeCodeConfigPath());
   }
 }
 
@@ -131,7 +142,7 @@ function getQClawConfigPath(): string {
 export async function detectPlatforms(): Promise<DetectedPlatform[]> {
   const platforms: DetectedPlatform[] = [];
 
-  // Claude Code
+  // Claude Code (uses `claude mcp add` CLI, not JSON config)
   const claudeCodePath = getClaudeCodeConfigPath();
   const claudeCodeDetected =
     (await commandExists('claude')) || existsSync(join(homedir(), '.claude'));
@@ -140,7 +151,7 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
     name: 'Claude Code',
     configPath: claudeCodePath,
     detected: claudeCodeDetected,
-    alreadyConfigured: hasPanguardMCPEntry(claudeCodePath),
+    alreadyConfigured: hasClaudeCodePanguard(),
   });
 
   // Claude Desktop
