@@ -438,7 +438,7 @@ export function setupCommand(): Command {
                 }
 
                 // Open Dashboard in browser
-                const dashUrl = 'http://127.0.0.1:3847';
+                const dashUrl = 'http://127.0.0.1:3100';
                 console.log();
                 console.log(c.green(`  ${symbols.pass} Opening Guard Dashboard...`));
                 console.log(c.dim(`    ${dashUrl}`));
@@ -473,7 +473,7 @@ export function setupCommand(): Command {
                     )
                   );
                   // Open Dashboard in browser
-                  const fallbackUrl = 'http://127.0.0.1:3847';
+                  const fallbackUrl = 'http://127.0.0.1:3100';
                   console.log();
                   console.log(c.green(`  ${symbols.pass} Opening Guard Dashboard...`));
                   console.log(c.dim(`    ${fallbackUrl}`));
