@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
+import FadeInUp from '@/components/FadeInUp';
 import { ExternalLink } from 'lucide-react';
 import { STATS } from '@/lib/stats';
 
@@ -17,21 +17,13 @@ const CATEGORIES = [
   { name: 'Agent Manipulation', count: 2 },
 ];
 
-const ease = [0.22, 1, 0.36, 1] as const;
-
 export default function ATRStandard() {
   const t = useTranslations('home.atrStandard');
 
   return (
     <section className="relative px-5 sm:px-6 py-16 sm:py-24 border-t border-border/30">
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.5, ease }}
-          className="text-center mb-10"
-        >
+        <FadeInUp className="text-center mb-10">
           <p className="text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold mb-3">
             {t('overline')}
           </p>
@@ -41,15 +33,9 @@ export default function ATRStandard() {
           <p className="text-base text-text-secondary mt-3 max-w-2xl mx-auto">
             {t('subtitle')}
           </p>
-        </motion.div>
+        </FadeInUp>
 
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.1, ease }}
-          className="flex flex-wrap justify-center gap-6 sm:gap-10 mb-10"
-        >
+        <FadeInUp delay={0.1} className="flex flex-wrap justify-center gap-6 sm:gap-10 mb-10">
           <div className="text-center">
             <p className="text-3xl font-extrabold text-panguard-green">{STATS.atrRules}</p>
             <p className="text-xs text-text-muted mt-1">{t('rules')}</p>
@@ -62,15 +48,9 @@ export default function ATRStandard() {
             <p className="text-3xl font-extrabold text-text-primary">{STATS.atrPatterns}+</p>
             <p className="text-xs text-text-muted mt-1">{t('patterns')}</p>
           </div>
-        </motion.div>
+        </FadeInUp>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2, ease }}
-          className="grid grid-cols-3 gap-2 mb-8"
-        >
+        <FadeInUp delay={0.2} className="grid grid-cols-3 gap-2 mb-8">
           {CATEGORIES.map((cat) => (
             <div
               key={cat.name}
@@ -80,15 +60,9 @@ export default function ATRStandard() {
               <span className="text-xs font-bold text-panguard-green shrink-0 ml-2">{cat.count}</span>
             </div>
           ))}
-        </motion.div>
+        </FadeInUp>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.3, ease }}
-          className="text-center"
-        >
+        <FadeInUp delay={0.3} className="text-center">
           <p className="text-sm text-text-muted mb-4">{t('bottomLine')}</p>
           <a
             href="https://github.com/Agent-Threat-Rule/agent-threat-rules"
@@ -98,7 +72,7 @@ export default function ATRStandard() {
           >
             {t('viewGithub')} <ExternalLink className="w-3.5 h-3.5" />
           </a>
-        </motion.div>
+        </FadeInUp>
       </div>
     </section>
   );

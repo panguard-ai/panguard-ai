@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
+import FadeInUp from '@/components/FadeInUp';
 import { STATS } from '@/lib/stats';
 
 const eco = STATS.ecosystem;
@@ -18,8 +18,6 @@ const BUCKETS = [
   { labelKey: 'medium' as const, count: eco.findingsMedium, percent: medPercent, color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/30' },
 ];
 
-const ease = [0.22, 1, 0.36, 1] as const;
-
 export default function EcosystemEvidence() {
   const t = useTranslations('home.evidence');
 
@@ -33,13 +31,7 @@ export default function EcosystemEvidence() {
   return (
     <section className="relative px-5 sm:px-6 py-16 sm:py-24 border-t border-border/30">
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.5, ease }}
-          className="text-center mb-12"
-        >
+        <FadeInUp className="text-center mb-12">
           <p className="text-[11px] uppercase tracking-[0.15em] text-red-400 font-semibold mb-3">
             {t('overline')}
           </p>
@@ -52,15 +44,9 @@ export default function EcosystemEvidence() {
               sources: eco.registrySources,
             })}
           </p>
-        </motion.div>
+        </FadeInUp>
 
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.15, ease }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-12"
-        >
+        <FadeInUp delay={0.15} className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-12">
           {BUCKETS.map((b) => (
             <div
               key={b.labelKey}
@@ -77,15 +63,9 @@ export default function EcosystemEvidence() {
               </p>
             </div>
           ))}
-        </motion.div>
+        </FadeInUp>
 
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3, ease }}
-          className="bg-surface-1 border border-border rounded-2xl p-6"
-        >
+        <FadeInUp delay={0.3} className="bg-surface-1 border border-border rounded-2xl p-6">
           <h3 className="text-sm font-bold text-red-400 uppercase tracking-wider mb-4">
             {t('consequencesTitle')}
           </h3>
@@ -106,7 +86,7 @@ export default function EcosystemEvidence() {
           <p className="text-sm text-text-primary font-semibold mt-6 pt-4 border-t border-border">
             {t('conclusion')}
           </p>
-        </motion.div>
+        </FadeInUp>
       </div>
     </section>
   );

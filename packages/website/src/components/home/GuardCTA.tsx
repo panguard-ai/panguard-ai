@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
+import FadeInUp from '@/components/FadeInUp';
 import { Copy, Check, Star, ArrowRight } from 'lucide-react';
 import { Link } from '@/navigation';
 import { STATS } from '@/lib/stats';
@@ -13,8 +13,6 @@ const PLATFORMS = [
   'Claude Code', 'Cursor', 'QClaw', 'OpenClaw',
   'Codex', 'WorkBuddy', 'Claude Desktop',
 ];
-
-const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function GuardCTA() {
   const t = useTranslations('home.guardCta');
@@ -29,12 +27,7 @@ export default function GuardCTA() {
   return (
     <section className="relative px-5 sm:px-6 py-16 sm:py-24 border-t border-border/30">
       <div className="max-w-3xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.5, ease }}
-        >
+        <FadeInUp>
           <p className="text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold mb-3">
             {t('overline')}
           </p>
@@ -44,15 +37,9 @@ export default function GuardCTA() {
           <p className="text-base text-text-secondary mt-3 max-w-xl mx-auto">
             {t('subtitle', { rules: STATS.totalRulesDisplay })}
           </p>
-        </motion.div>
+        </FadeInUp>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.15, ease }}
-          className="mt-8 max-w-md mx-auto"
-        >
+        <FadeInUp delay={0.15} className="mt-8 max-w-md mx-auto">
           <div className="relative flex items-center gap-2 bg-surface-1/80 backdrop-blur-sm border border-border rounded-xl px-5 py-4 font-mono text-sm">
             <span className="text-panguard-green select-none shrink-0">$</span>
             <code className="text-text-secondary flex-1 select-all overflow-x-auto whitespace-nowrap">
@@ -66,15 +53,9 @@ export default function GuardCTA() {
               {copied ? <Check className="w-4 h-4 text-status-safe" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
-        </motion.div>
+        </FadeInUp>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.25, ease }}
-          className="flex flex-wrap gap-2 justify-center mt-6"
-        >
+        <FadeInUp delay={0.25} className="flex flex-wrap gap-2 justify-center mt-6">
           {PLATFORMS.map((p) => (
             <span
               key={p}
@@ -83,15 +64,9 @@ export default function GuardCTA() {
               {p}
             </span>
           ))}
-        </motion.div>
+        </FadeInUp>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.35, ease }}
-          className="flex flex-wrap gap-3 justify-center mt-8"
-        >
+        <FadeInUp delay={0.35} className="flex flex-wrap gap-3 justify-center mt-8">
           <Link
             href="/docs/getting-started"
             className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-6 py-3.5 text-sm hover:bg-panguard-green-light transition-all duration-200 active:scale-[0.98]"
@@ -106,7 +81,7 @@ export default function GuardCTA() {
           >
             <Star className="w-4 h-4" /> Star on GitHub
           </a>
-        </motion.div>
+        </FadeInUp>
       </div>
     </section>
   );

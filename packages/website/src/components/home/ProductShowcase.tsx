@@ -1,12 +1,10 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
+import FadeInUp from '@/components/FadeInUp';
 import { Link } from '@/navigation';
 import { ArrowRight, Search, Shield, Cloud, Layers, Zap, Users, Lock, RefreshCw, Globe } from 'lucide-react';
 import { STATS } from '@/lib/stats';
-
-const ease = [0.22, 1, 0.36, 1] as const;
 
 function ProductCard({
   icon: Icon,
@@ -30,11 +28,8 @@ function ProductCard({
   delay: number;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay, ease }}
+    <FadeInUp
+      delay={delay}
       className="bg-surface-1 border border-border rounded-2xl overflow-hidden hover:border-panguard-green/30 transition-colors"
     >
       <div className="p-6 sm:p-8">
@@ -85,7 +80,7 @@ function ProductCard({
         {ctaText}
         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
       </Link>
-    </motion.div>
+    </FadeInUp>
   );
 }
 
@@ -95,13 +90,7 @@ export default function ProductShowcase() {
   return (
     <section className="relative px-5 sm:px-6 py-16 sm:py-24 border-t border-border/30">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.5, ease }}
-          className="text-center mb-12"
-        >
+        <FadeInUp className="text-center mb-12">
           <p className="text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold mb-3">
             {t('overline')}
           </p>
@@ -111,7 +100,7 @@ export default function ProductShowcase() {
           <p className="text-base text-text-secondary mt-3 max-w-2xl mx-auto">
             {t('subtitle')}
           </p>
-        </motion.div>
+        </FadeInUp>
 
         <div className="grid md:grid-cols-3 gap-5">
           <ProductCard
