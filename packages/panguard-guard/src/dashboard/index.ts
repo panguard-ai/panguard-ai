@@ -15,11 +15,11 @@
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import type { Socket } from 'node:net';
+import { WebSocketServer, type WebSocket as WS } from 'ws';
 import { createLogger } from '@panguard-ai/core';
 import type {
   DashboardStatus,
@@ -35,7 +35,7 @@ const logger = createLogger('panguard-guard:dashboard');
 
 /** WebSocket client tracking */
 interface WSClient {
-  socket: Socket;
+  ws: WS;
   alive: boolean;
   connectedAt: number;
 }
@@ -100,44 +100,23 @@ export class DashboardServer {
     return new Promise((resolve) => {
       this.server = createServer((req, res) => this.handleRequest(req, res));
 
-      this.server.on('upgrade', (req: IncomingMessage, socket: Socket, _head: Buffer) => {
-        if (req.url !== '/ws') {
-          socket.destroy();
-          return;
-        }
+      const wss = new WebSocketServer({ server: this.server, path: '/ws', maxPayload: 64 * 1024 });
 
+      wss.on('connection', (ws: WS, req: IncomingMessage) => {
         if (this.wsClients.size >= MAX_WS_CLIENTS) {
           logger.warn('Max WebSocket connections reached');
-          socket.destroy();
+          ws.close();
           return;
         }
 
         const origin = req.headers.origin ?? '';
         if (origin && !origin.includes('127.0.0.1') && !origin.includes('localhost')) {
           logger.warn(`Rejected WebSocket from origin: ${origin}`);
-          socket.destroy();
+          ws.close();
           return;
         }
 
-        const key = req.headers['sec-websocket-key'];
-        if (!key) {
-          socket.destroy();
-          return;
-        }
-
-        const acceptKey = createHash('sha1')
-          .update(key + '258EAFA5-E914-47DA-95CA-5AB5DC11E65B')
-          .digest('base64');
-
-        socket.write(
-          'HTTP/1.1 101 Switching Protocols\r\n' +
-            'Upgrade: websocket\r\n' +
-            'Connection: Upgrade\r\n' +
-            `Sec-WebSocket-Accept: ${acceptKey}\r\n` +
-            '\r\n'
-        );
-
-        const client: WSClient = { socket, alive: true, connectedAt: Date.now() };
+        const client: WSClient = { ws, alive: true, connectedAt: Date.now() };
         this.wsClients.add(client);
 
         this.sendToClient(client, {
@@ -146,17 +125,15 @@ export class DashboardServer {
           timestamp: new Date().toISOString(),
         });
 
-        socket.on('data', (data: Buffer) => {
-          if (data.length > 0 && ((data[0] ?? 0) & 0x0f) === 0x0a) {
-            client.alive = true;
-          }
+        ws.on('pong', () => {
+          client.alive = true;
         });
 
-        socket.on('close', () => {
+        ws.on('close', () => {
           this.wsClients.delete(client);
         });
 
-        socket.on('error', () => {
+        ws.on('error', () => {
           this.wsClients.delete(client);
         });
       });
@@ -183,7 +160,7 @@ export class DashboardServer {
     return new Promise((resolve) => {
       for (const client of this.wsClients) {
         try {
-          client.socket.destroy();
+          client.ws.close();
         } catch {
           /* ignore */
         }
@@ -711,10 +688,9 @@ export class DashboardServer {
 
   private sendToClient(client: WSClient, event: DashboardEvent): void {
     try {
-      const data = JSON.stringify(event);
-      const payload = Buffer.from(data);
-      const frame = this.createWSFrame(payload);
-      client.socket.write(frame);
+      if (client.ws.readyState === 1) {
+        client.ws.send(JSON.stringify(event));
+      }
     } catch {
       this.wsClients.delete(client);
     }
@@ -764,29 +740,6 @@ export class DashboardServer {
 
   getRelayClient(): DashboardRelayClient | null {
     return this.relayClient;
-  }
-
-  private createWSFrame(payload: Buffer): Buffer {
-    const length = payload.length;
-    let header: Buffer;
-
-    if (length < 126) {
-      header = Buffer.alloc(2);
-      header[0] = 0x81;
-      header[1] = length;
-    } else if (length < 65536) {
-      header = Buffer.alloc(4);
-      header[0] = 0x81;
-      header[1] = 126;
-      header.writeUInt16BE(length, 2);
-    } else {
-      header = Buffer.alloc(10);
-      header[0] = 0x81;
-      header[1] = 127;
-      header.writeBigUInt64BE(BigInt(length), 2);
-    }
-
-    return Buffer.concat([header, payload]);
   }
 }
 
