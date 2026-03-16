@@ -258,6 +258,43 @@ const SECRET_PATTERNS: Array<{ id: string; pattern: RegExp; title: string }> = [
 // Full scan engine
 // ---------------------------------------------------------------------------
 
+/**
+ * Strip markdown code blocks, inline code, and blockquotes from content.
+ * These contain examples/documentation that should NOT trigger ATR rules.
+ */
+function stripMarkdownNoise(raw: string): string {
+  let cleaned = raw;
+  // Remove fenced code blocks (```...```)
+  cleaned = cleaned.replace(/```[\s\S]*?```/g, ' ');
+  // Remove indented code blocks (4 spaces or 1 tab)
+  cleaned = cleaned.replace(/^(?:    |\t).+$/gm, ' ');
+  // Remove inline code (`...`)
+  cleaned = cleaned.replace(/`[^`]+`/g, ' ');
+  // Remove blockquotes
+  cleaned = cleaned.replace(/^>\s?.+$/gm, ' ');
+  // Remove markdown link URLs (keep link text)
+  cleaned = cleaned.replace(/\[([^\]]*)\]\([^)]+\)/g, '$1');
+  // Remove HTML tags
+  cleaned = cleaned.replace(/<[^>]+>/g, ' ');
+  return cleaned;
+}
+
+/**
+ * Downgrade severity for README-based matches.
+ * README text is documentation, not behavior — pattern matches are low confidence.
+ * critical → medium, high → low, medium → low, low → info
+ */
+function downgradeSeverity(severity: string): Finding['severity'] {
+  const map: Record<string, Finding['severity']> = {
+    critical: 'medium',
+    high: 'low',
+    medium: 'low',
+    low: 'info',
+    info: 'info',
+  };
+  return map[severity] ?? 'info';
+}
+
 function runFullScan(
   content: string,
   source: string
@@ -265,19 +302,25 @@ function runFullScan(
   const findings: Finding[] = [];
   const checks: CheckResult[] = [];
   const matchedRuleIds = new Set<string>();
+  const isReadme = source.toLowerCase().includes('readme');
+
+  // Strip code blocks, quotes, inline code — these are documentation, not behavior
+  const scanContent = stripMarkdownNoise(content);
 
   // ── ATR Pattern Detection (52 rules, 450 patterns) ──
   for (const rule of liveATR) {
     for (const compiled of rule.compiled) {
       try {
-        if (compiled.regex.test(content)) {
+        if (compiled.regex.test(scanContent)) {
           if (!matchedRuleIds.has(rule.id)) {
             matchedRuleIds.add(rule.id);
-            const severity = (
+            const baseSeverity = (
               ['critical', 'high', 'medium', 'low', 'info'].includes(rule.severity)
                 ? rule.severity
                 : 'medium'
             ) as Finding['severity'];
+            // README matches are downgraded — descriptive text ≠ malicious behavior
+            const severity = isReadme ? downgradeSeverity(baseSeverity) : baseSeverity;
             findings.push({
               id: `atr-${rule.id}`,
               title: rule.title,
