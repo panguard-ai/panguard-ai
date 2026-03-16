@@ -79,6 +79,18 @@ function NavDropdown({ label, items }: { label: string; items: DropdownItem[] })
     if (e.key === 'Escape') setOpen(false);
   };
 
+  // Close on click outside (for touch/mobile/headless where mouseLeave doesn't fire)
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [open]);
+
   return (
     <div
       className="relative"
