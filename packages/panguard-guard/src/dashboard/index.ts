@@ -1260,9 +1260,9 @@ wc_s3t:'\u8f09\u5165\u7cfb\u7d71\u72c0\u614b',wc_s3d:'\u8b80\u53d6\u7576\u524d p
 wc_s4t:'Ready',wc_s4d:'\u6240\u6709\u7cfb\u7d71\u5df2\u521d\u59cb\u5316\u3002\u6b61\u8fce\u4f7f\u7528\u3002',
 wc_btn:'\u9032\u5165 Dashboard'}
 };
-var lang='en',tk='',cf='all';
+var lang=(function(){try{var s=localStorage.getItem('panguard_lang');if(s==='zh'||s==='en')return s;var n=navigator.language||'';if(n.toLowerCase().indexOf('zh')===0)return 'zh';return 'en'}catch(e){return 'en'}})(),tk='',cf='all';
 
-function TL(){lang=lang==='en'?'zh':'en';document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(T[lang][k]){if(e.tagName==='INPUT')e.placeholder=T[lang][k];else if(k.indexOf('t_')===0||k.indexOf('d_')===0||k==='go_ai')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});document.querySelectorAll('[data-i18n-wc]').forEach(function(e){var k=e.getAttribute('data-i18n-wc');if(T[lang][k]){if(k==='wc_title')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});updateG6();}
+function TL(){lang=lang==='en'?'zh':'en';try{localStorage.setItem('panguard_lang',lang)}catch(e){}document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(T[lang][k]){if(e.tagName==='INPUT')e.placeholder=T[lang][k];else if(k.indexOf('t_')===0||k.indexOf('d_')===0||k==='go_ai')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});document.querySelectorAll('[data-i18n-wc]').forEach(function(e){var k=e.getAttribute('data-i18n-wc');if(T[lang][k]){if(k==='wc_title')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});updateG6();}
 
 function nav(t){document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});document.querySelector('[data-tab="'+t+'"]').classList.add('on');document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});document.getElementById('p-'+t).classList.add('on');if(t==='skills'){ldSk();ldISk()}if(t==='ai')loadAI();if(t==='rules')ldRules();if(t==='tcloud')ldTCloud();if(t==='threats')ldTh();if(t==='guide')updG();}
 document.querySelectorAll('.ni').forEach(function(n){n.addEventListener('click',function(){nav(this.getAttribute('data-tab'))})});
@@ -1344,6 +1344,8 @@ function loadInitData(){af('/api/status').then(function(r){return r.json()}).the
 var bar=document.getElementById('init-bar');
 // Always connect WebSocket immediately, regardless of welcome state
 cWS();loadInitData();
+// Apply persisted/detected language on load (TL toggles, so apply directly)
+if(lang==='zh'){document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(T.zh[k]){if(e.tagName==='INPUT')e.placeholder=T.zh[k];else if(k.indexOf('t_')===0||k.indexOf('d_')===0||k==='go_ai')e.innerHTML=T.zh[k];else e.textContent=T.zh[k]}});document.querySelectorAll('[data-i18n-wc]').forEach(function(e){var k=e.getAttribute('data-i18n-wc');if(T.zh[k]){if(k==='wc_title')e.innerHTML=T.zh[k];else e.textContent=T.zh[k]}});}
 var welcomed=localStorage.getItem('panguard_welcomed');
 if(welcomed){document.getElementById('welcome').style.display='none';return}
 bar.style.width='15%';

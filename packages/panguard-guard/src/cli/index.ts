@@ -579,6 +579,7 @@ async function commandInstall(dataDir: string): Promise<void> {
   console.log('');
   const configPath = join(dataDir, 'config.json');
   const config = loadConfig(configPath);
+  const uiLang = (config.lang === 'zh-TW' ? 'zh-TW' : 'en') as 'en' | 'zh-TW';
 
   const enableTC = await promptConfirm({
     message: {
@@ -586,7 +587,7 @@ async function commandInstall(dataDir: string): Promise<void> {
       'zh-TW': '啟用 Threat Cloud 集體防禦？',
     },
     defaultValue: true,
-    lang: 'en',
+    lang: uiLang,
   });
 
   const updated = {

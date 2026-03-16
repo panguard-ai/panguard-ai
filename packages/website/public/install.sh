@@ -525,30 +525,63 @@ print_quickstart() {
   success "Installation complete!"
 }
 
+# ── detect_lang() ────────────────────────────────────────────
+# Detect system language. Returns "zh-TW" for Chinese systems, "en" otherwise.
+detect_lang() {
+  local sys_lang="${LANG:-${LC_ALL:-}}"
+  case "$sys_lang" in
+    zh*|Chinese*) echo "zh-TW" ;;
+    *) echo "en" ;;
+  esac
+}
+
 # ── auto_setup() ──────────────────────────────────────────────
 # Auto-run panguard setup to connect AI agents, then offer skill audit.
 auto_setup() {
+  local UI_LANG
+  UI_LANG="$(detect_lang)"
+
   if [ ! -e /dev/tty ]; then
     info "Run 'panguard setup' to connect your AI agents."
     return
   fi
 
   echo ""
-  printf "  ${BOLD}Connect to AI agents (Claude Code, Cursor, etc.)?${NC} [Y/n] "
+  if [ "$UI_LANG" = "zh-TW" ]; then
+    printf "  ${BOLD}連接 AI 代理（Claude Code, Cursor 等）？${NC} [Y/n] "
+  else
+    printf "  ${BOLD}Connect to AI agents (Claude Code, Cursor, etc.)?${NC} [Y/n] "
+  fi
   read -r answer </dev/tty 2>/dev/null || answer="n"
   case "$answer" in
-    [nN]*) info "Run 'panguard setup' later to connect AI agents." ;;
+    [nN]*)
+      if [ "$UI_LANG" = "zh-TW" ]; then
+        info "稍後執行 'panguard setup --lang zh-TW' 來連接 AI 代理。"
+      else
+        info "Run 'panguard setup' later to connect AI agents."
+      fi
+      ;;
     *)
       echo ""
-      panguard setup </dev/tty
+      panguard setup --lang "$UI_LANG" </dev/tty
       ;;
   esac
 
   echo ""
-  printf "  ${BOLD}Audit current directory for AI skill security issues?${NC} [Y/n] "
+  if [ "$UI_LANG" = "zh-TW" ]; then
+    printf "  ${BOLD}掃描當前目錄的 AI 技能安全問題？${NC} [Y/n] "
+  else
+    printf "  ${BOLD}Audit current directory for AI skill security issues?${NC} [Y/n] "
+  fi
   read -r answer </dev/tty 2>/dev/null || answer="n"
   case "$answer" in
-    [nN]*) info "Run 'panguard audit skill .' later to audit skills." ;;
+    [nN]*)
+      if [ "$UI_LANG" = "zh-TW" ]; then
+        info "稍後執行 'panguard audit skill .' 來掃描技能。"
+      else
+        info "Run 'panguard audit skill .' later to audit skills."
+      fi
+      ;;
     *)
       echo ""
       panguard audit skill . </dev/tty

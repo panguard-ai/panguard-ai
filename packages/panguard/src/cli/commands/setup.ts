@@ -106,6 +106,7 @@ export function setupCommand(): Command {
     .option('--yes', 'Skip confirmation prompts / 跳過確認提示', false)
     .option('--skip-scan', 'Skip skill scanning / 跳過技能掃描', false)
     .option('--skip-guard', 'Skip guard start prompt / 跳過 Guard 啟動', false)
+    .option('--lang <lang>', 'UI language: en or zh-TW (auto-detect if omitted)')
     .action(
       async (options: {
         platform?: string;
@@ -114,7 +115,18 @@ export function setupCommand(): Command {
         yes: boolean;
         skipScan: boolean;
         skipGuard: boolean;
+        lang?: string;
       }) => {
+        // Detect UI language: --lang flag > system locale > default zh-TW
+        const sysLang = (process.env['LANG'] ?? process.env['LC_ALL'] ?? '').toLowerCase();
+        const isSystemChinese = sysLang.includes('zh') || sysLang.includes('chinese');
+        const detectedLang: 'en' | 'zh-TW' =
+          options.lang === 'en' ? 'en'
+            : options.lang === 'zh-TW' ? 'zh-TW'
+              : isSystemChinese ? 'zh-TW'
+                : 'en';
+        const L = detectedLang;
+
         const mcpConfig = await import('@panguard-ai/panguard-mcp/config');
         const { detectPlatforms, injectMCPConfig, removeMCPConfig } = mcpConfig;
 
@@ -331,7 +343,7 @@ export function setupCommand(): Command {
                 'zh-TW': '安裝 Panguard Guard 為系統服務？（開機自動啟動，24/7 防護）',
               },
               defaultValue: true,
-              lang: 'en',
+              lang: L,
             }));
 
           if (installGuard) {
@@ -386,7 +398,7 @@ export function setupCommand(): Command {
                     'zh-TW': '啟用 Threat Cloud 集體防禦？',
                   },
                   defaultValue: true,
-                  lang: 'en',
+                  lang: L,
                 });
 
                 try {
