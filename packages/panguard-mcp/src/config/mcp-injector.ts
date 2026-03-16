@@ -92,10 +92,14 @@ function injectClaudeDesktop(configPath: string): void {
 function injectClaudeCode(_configPath: string): void {
   try {
     // Try `claude mcp add` first (the correct way for Claude Code)
-    execFileSync('claude', ['mcp', 'add', '--scope', 'user', 'panguard', '--', 'npx', '-y', '@panguard-ai/panguard-mcp'], {
-      timeout: 15_000,
-      stdio: 'pipe',
-    });
+    execFileSync(
+      'claude',
+      ['mcp', 'add', '--scope', 'user', 'panguard', '--', 'npx', '-y', '@panguard-ai/panguard-mcp'],
+      {
+        timeout: 15_000,
+        stdio: 'pipe',
+      }
+    );
     logger.info('Added Panguard MCP via `claude mcp add --scope user`');
   } catch {
     // Fallback: write JSON directly (older Claude Code versions)
@@ -213,7 +217,10 @@ export function injectMCPConfig(platformId: PlatformId): InjectionResult {
     if (platformId === 'claude-code') {
       // Claude Code: verify via `claude mcp list`
       try {
-        const output = execFileSync('claude', ['mcp', 'list'], { timeout: 10_000, stdio: 'pipe' }).toString();
+        const output = execFileSync('claude', ['mcp', 'list'], {
+          timeout: 10_000,
+          stdio: 'pipe',
+        }).toString();
         if (output.includes('panguard')) {
           result.success = true;
           logger.info('Verified Panguard MCP in Claude Code via `claude mcp list`');

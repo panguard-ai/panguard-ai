@@ -2,8 +2,8 @@
  * Platform Detector - Detect installed AI agent runtimes
  * 平台偵測器 - 偵測已安裝的 AI Agent 執行環境
  *
- * Detects Claude Code, Cursor, OpenClaw, Codex, Workbuddy, and NemoClaw.
- * 偵測 Claude Code、Cursor、OpenClaw、Codex、Workbuddy 和 NemoClaw。
+ * Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, and QClaw.
+ * 偵測 Claude Code、Claude Desktop、Cursor、OpenClaw、Codex 和 QClaw。
  *
  * @module @panguard-ai/panguard-mcp/config/platform-detector
  */
@@ -22,8 +22,6 @@ export type PlatformId =
   | 'cursor'
   | 'openclaw'
   | 'codex'
-  | 'workbuddy'
-  | 'nemoclaw'
   | 'qclaw';
 
 export interface DetectedPlatform {
@@ -63,7 +61,10 @@ function hasPanguardMCPEntry(filePath: string): boolean {
 /** Check if Claude Code has panguard MCP configured via `claude mcp list`. */
 function hasClaudeCodePanguard(): boolean {
   try {
-    const output = execFileSync('claude', ['mcp', 'list'], { timeout: 10_000, stdio: 'pipe' }).toString();
+    const output = execFileSync('claude', ['mcp', 'list'], {
+      timeout: 10_000,
+      stdio: 'pipe',
+    }).toString();
     return output.includes('panguard');
   } catch {
     // Fallback: check JSON config
@@ -118,17 +119,7 @@ function getCodexConfigPath(): string {
   return join(homedir(), '.codex', 'mcp.json');
 }
 
-/** Get the MCP config path for Workbuddy. */
-function getWorkbuddyConfigPath(): string {
-  return join(homedir(), '.workbuddy', '.mcp.json');
-}
-
-/** Get the MCP config path for NemoClaw. */
-function getNemoClawConfigPath(): string {
-  return join(homedir(), '.nemoclaw', 'mcp.json');
-}
-
-/** Get the MCP config path for QClaw. */
+/** Get the MCP config path for QClaw (Tencent). */
 function getQClawConfigPath(): string {
   return join(homedir(), '.qclaw', 'mcp.json');
 }
