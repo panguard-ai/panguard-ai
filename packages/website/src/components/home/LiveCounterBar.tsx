@@ -34,10 +34,7 @@ export default function LiveCounterBar() {
   const t = useTranslations('home.liveCounter');
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3, duration: 0.5 }}
+    <div
       className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs text-text-muted font-mono"
     >
       <div className="flex items-center gap-2">
@@ -67,6 +64,6 @@ export default function LiveCounterBar() {
           {t('monitored')}
         </span>
       </div>
-    </motion.div>
+    </div>
   );
 }

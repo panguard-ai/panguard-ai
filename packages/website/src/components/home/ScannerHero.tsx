@@ -2,15 +2,13 @@
 
 import { Suspense } from 'react';
 import { useTranslations } from 'next-intl';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import BrandLogo from '@/components/ui/BrandLogo';
 import { ShieldIcon, ScanIcon } from '@/components/ui/BrandIcons';
 import { useSkillScan } from '@/hooks/useSkillScan';
 import ScanAnimation from './ScanAnimation';
 import ScanResultCard from './ScanResultCard';
 import LiveCounterBar from './LiveCounterBar';
-
-const ease = [0.22, 1, 0.36, 1] as const;
 
 function ScannerHeroInner() {
   const t = useTranslations('home.scannerHero');
@@ -32,21 +30,13 @@ function ScannerHeroInner() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(700px,200vw)] h-[min(700px,200vw)] rounded-full pointer-events-none hero-orb" />
 
       <div className="relative z-10 text-center px-5 sm:px-6 pt-28 pb-16 max-w-3xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, ease }}
-          className="mb-8"
-        >
+        {/* Logo — CSS fade-in, no framer-motion */}
+        <div className="mb-8 animate-[fadeIn_0.5s_ease_both]">
           <BrandLogo size={36} className="text-panguard-green mx-auto sm:w-12 sm:h-12" />
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1, ease }}
-          className="mb-10"
-        >
+        {/* Title block — CSS fade-up */}
+        <div className="mb-10 animate-[fadeUp_0.6s_0.1s_ease_both]">
           <h1 className="text-[clamp(24px,5vw,48px)] font-bold leading-[1.3] tracking-tight text-text-primary">
             {t('titleLine1')}
             <br />
@@ -60,14 +50,10 @@ function ScannerHeroInner() {
           <p className="mt-2 text-sm text-panguard-green font-semibold">
             {t('atrLine')}
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4, ease }}
-          className="max-w-xl mx-auto"
-        >
+        {/* Scanner — CSS fade-up with delay */}
+        <div className="max-w-xl mx-auto animate-[fadeUp_0.5s_0.4s_ease_both]">
           <p className="text-xs uppercase tracking-[0.15em] text-text-muted font-semibold mb-3">
             {t('scanLabel')}
           </p>
@@ -98,6 +84,7 @@ function ScannerHeroInner() {
             </button>
           </div>
 
+          {/* These use AnimatePresence — only render when loading/result, SSR won't output them */}
           <AnimatePresence>
             {loading && <ScanAnimation phase={animationPhase} />}
           </AnimatePresence>
@@ -127,16 +114,12 @@ function ScannerHeroInner() {
           <p className="text-[11px] text-text-muted mt-3">
             {t('trustNote')}
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.7, ease }}
-          className="mt-8"
-        >
+        {/* Live counter — CSS fade-in with delay */}
+        <div className="mt-8 animate-[fadeIn_0.5s_0.7s_ease_both]">
           <LiveCounterBar />
-        </motion.div>
+        </div>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0e0f0e] to-transparent pointer-events-none" />

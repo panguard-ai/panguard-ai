@@ -400,6 +400,10 @@ body::after {
   opacity: 1;
   transform: translateY(0);
 }
+/* Hero entrance animations (CSS-only, no framer-motion SSR opacity:0 issue) */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
 /* Fallback: force-show content after 2s even if IntersectionObserver/JS fails */
 @keyframes force-show { to { opacity: 1 !important; transform: none !important; } }
 .js-ready .animate-on-scroll {
