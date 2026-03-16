@@ -1,6 +1,12 @@
 /**
  * Single source of truth for all marketing statistics.
  *
+ * Usage: Import STATS directly in components. RuleStatsContext wraps STATS
+ * with live API data from /api/threat-intel/stats (rule counts only).
+ * Ecosystem stats are static until P2 TC API integration.
+ *
+ * When adding new stats: update here first, then all components auto-update.
+ *
  * Derived from (verified 2026-03-12):
  *   config/sigma-rules/       -> 3,760 YAML files (3,110 community + 45 custom + 605 auto-generated)
  *   config/yara-rules/        -> 5,961 rule definitions across 969 files (923 community + 3 custom + 43 auto-generated)
