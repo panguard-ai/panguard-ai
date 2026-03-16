@@ -1327,7 +1327,6 @@ txt.textContent=running?'PROTECTED':'INACTIVE';
 var rules=(s.sigmaRuleCount||0)+(s.yaraRuleCount||0)+(s.atrRuleCount||0);
 var lastEv=s.eventsProcessed>0?fUp(s.uptime||0)+' uptime':'--';
 det.textContent='| '+(s.eventsProcessed||0)+' events | '+rules+' rules active | Uptime: '+lastEv;
-if(!running)setTri('inactive');
 }
 gTk();
 function enterDashboard(){
