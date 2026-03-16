@@ -409,10 +409,13 @@ body::after {
 .js-ready .animate-on-scroll {
   animation: force-show 0s 2s forwards;
 }
-/* Force-show framer-motion SSR hidden elements after 1s (inline opacity:0 override) */
+/* Force-show framer-motion SSR hidden elements after 1s — ONLY when JS/framer hasn't loaded.
+   .fm-ready is added 800ms after page load. If framer-motion is working, it will have
+   already animated elements to opacity:1 by then, so this never fires. */
 @keyframes fm-fallback { to { opacity: 1 !important; transform: none !important; } }
-main [style*="opacity: 0"], main [style*="opacity:0"] {
-  animation: fm-fallback 0.5s 1s both !important;
+html:not(.fm-ready) main [style*="opacity: 0"],
+html:not(.fm-ready) main [style*="opacity:0"] {
+  animation: fm-fallback 0.5s 1.5s both !important;
 }
 
 /* Directional variants */
