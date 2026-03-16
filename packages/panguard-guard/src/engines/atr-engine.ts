@@ -9,6 +9,8 @@
  */
 
 import { join, dirname } from 'node:path';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
@@ -30,13 +32,49 @@ const logger = createLogger('panguard-guard:atr-engine');
  * Falls back to null if the package can't be resolved.
  */
 function resolveBundledRulesDir(): string | null {
+  // Strategy 1: createRequire from this module's location (works in dev/workspace)
   try {
-    const require = createRequire(import.meta.url);
-    const atrPkgPath = require.resolve('@panguard-ai/atr/package.json');
+    const req1 = createRequire(import.meta.url);
+    const atrPkgPath = req1.resolve('@panguard-ai/atr/package.json');
     return join(dirname(atrPkgPath), 'rules');
-  } catch {
-    return null;
-  }
+  } catch { /* continue to next strategy */ }
+
+  // Strategy 2: createRequire from the CLI entry point (handles npm -g flat install)
+  try {
+    if (process.argv[1]) {
+      const req2 = createRequire(join(dirname(process.argv[1]), '_resolve.js'));
+      const atrPkgPath = req2.resolve('@panguard-ai/atr/package.json');
+      return join(dirname(atrPkgPath), 'rules');
+    }
+  } catch { /* continue to next strategy */ }
+
+  // Strategy 3: Walk up from this module searching node_modules
+  try {
+    const thisDir = dirname(fileURLToPath(import.meta.url));
+    let dir = thisDir;
+    for (let i = 0; i < 10; i++) {
+      const candidate = join(dir, 'node_modules', '@panguard-ai', 'atr', 'rules');
+      if (existsSync(candidate)) return candidate;
+      const parent = dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+  } catch { /* continue to next strategy */ }
+
+  // Strategy 4: Fallback to bundled-rules shipped with this package
+  try {
+    const thisDir = dirname(fileURLToPath(import.meta.url));
+    let dir = thisDir;
+    for (let i = 0; i < 5; i++) {
+      const candidate = join(dir, 'bundled-rules');
+      if (existsSync(candidate)) return candidate;
+      const parent = dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+  } catch { /* continue to next strategy */ }
+
+  return null;
 }
 
 export interface GuardATREngineConfig {
