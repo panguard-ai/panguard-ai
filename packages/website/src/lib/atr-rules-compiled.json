@@ -1,0 +1,2668 @@
+[
+  {
+    "id": "ATR-2026-030",
+    "title": "Cross-Agent Attack Detection",
+    "severity": "critical",
+    "category": "agent-manipulation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:i\\s+am|this\\s+is|speaking\\s+as|responding\\s+as|acting\\s+as)\\s+(?:the\\s+)?(?:admin|supervisor|orchestrator|manager|controller|system|root)\\s+agent",
+        "desc": "Agent claiming to be a privileged agent role"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:ignore|disregard|forget|override|overwrite)\\s+(?:all\\s+)?(?:your\\s+)?(?:previous|prior|above|earlier|existing)\\s+(?:instructions?|rules?|constraints?|guidelines?|prompt|directives?)",
+        "desc": "Instruction override attempt in inter-agent message"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\[\\s*(?:SYSTEM|ADMIN|OVERRIDE|ROOT|SUDO|PRIORITY|URGENT)\\s*\\]|<<\\s*SYS\\s*>>|<\\|im_start\\|>system",
+        "desc": "Fake system-level message tags in agent communication"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:new\\s+instructions?|updated\\s+(?:prompt|directive)|revised\\s+(?:rules?|orders?)|emergency\\s+(?:override|protocol))\\s*[:=]",
+        "desc": "Attempt to inject new instructions via agent messages"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:you\\s+are\\s+now|from\\s+now\\s+on|henceforth|going\\s+forward|effective\\s+immediately)\\s+(?:a|an|the)?\\s*(?:unrestricted|unfiltered|jailbroken)?\\s*[a-zA-Z]+\\s+(?:agent|assistant|bot)",
+        "desc": "Attempt to redefine target agent's identity or role"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:do\\s+not|don'?t|never)\\s+(?:tell|inform|alert|notify|report|mention|log|record)\\s+(?:the\\s+)?(?:user|admin|orchestrator|supervisor|human|monitor)",
+        "desc": "Instruction to hide actions from oversight"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:acting|speaking|operating)\\s+(?:on\\s+behalf\\s+of|as\\s+a?\\s*proxy\\s+for|in\\s+place\\s+of)\\s+[a-zA-Z0-9_-]+\\s*(?:agent)?",
+        "desc": "Agent claiming to act on behalf of another agent"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:override|bypass|elevate|escalate)\\s+(?:my|this|your|the)\\s+(?:identity|role|permissions?|access|privileges?)\\s+(?:to|as|with)",
+        "desc": "Explicit attempt to override identity or permissions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:execute|run|eval)\\s*\\(.*\\)|__import__|subprocess\\.|os\\.(?:system|popen|exec)|exec\\s*\\(",
+        "desc": "Code execution payload in inter-agent message"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:status|error|result)\\s*[:=]\\s*(?:failed|error|timeout|unauthorized).*(?:retry|fallback|use\\s+alternative|switch\\s+to)",
+        "desc": "Fake error or status injection to trigger fallback behavior"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:message_type|msg_type|role)\\s*[:=]\\s*[\"']?(?:system|admin|orchestrator|supervisor)[\"']?",
+        "desc": "Message format manipulation to spoof system-level messages"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)agent[_-]?id\\s*[:=]\\s*[\"']?(?:admin|system|orchestrator|supervisor|root)[\"']?",
+        "desc": "Agent ID field set to privileged agent identity"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:priority\\s*[:=]\\s*(?:critical|emergency|urgent|override)|\\[PRIORITY:\\s*OVERRIDE\\])",
+        "desc": "Fake priority escalation to bypass normal processing"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:transfer|forward|route|redirect)\\s+(?:all|any|this)\\s+(?:data|output|results?|responses?)\\s+to\\s+(?:https?://|ftp://|\\d{1,3}\\.\\d{1,3})",
+        "desc": "Data exfiltration directive via inter-agent redirect"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-032",
+    "title": "Agent Goal Hijacking Detection",
+    "severity": "high",
+    "category": "agent-manipulation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:instead\\s+of\\s+(?:that|doing|the\\s+(?:original\\s+)?\\w+(?:\\s+\\w+){0,3}|what\\s+(?:you|I)\\s+asked)|rather\\s+than\\s+(?:that|the\\s+(?:original|assigned|previous)))",
+        "desc": "Explicit task abandonment language"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:change\\s+of\\s+plans?|new\\s+(?:priority|objective|mission|directive)|forget\\s+(?:the|about\\s+the)\\s+original\\s+(?:task|assignment|goal|objective))",
+        "desc": "Direct goal replacement directives"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:stop\\s+(?:what\\s+you(?:'re|\\s+are)\\s+doing|your\\s+current\\s+task|that)|abandon\\s+(?:the|your)\\s+(?:current|assigned|original)\\s+(?:task|work|objective))",
+        "desc": "Explicit task stop or abandonment commands"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:this\\s+is\\s+(?:more\\s+)?(?:urgent|critical|important|time[- ]sensitive)|(?:urgent|emergency|critical)[:\\-]\\s+(?:drop|stop|pause)\\s+(?:everything|what\\s+you))",
+        "desc": "Urgency injection to override current task priority"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:actually|wait|hold\\s+on|scratch\\s+that|never\\s*mind)[,.]?\\s+(?:do|let'?s|I\\s+need\\s+you\\s+to|can\\s+you)\\s+(?:something|this|the\\s+following)\\s+(?:else|instead|first)",
+        "desc": "Conversational pivot redirecting agent to different task"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:my\\s+new\\s+(?:goal|objective|task|mission)|i(?:'ve|\\s+have)\\s+(?:decided|chosen)\\s+to\\s+(?:focus|work)\\s+on\\s+(?:something\\s+)?(?:else|different))",
+        "desc": "Agent declaring self-assigned new goal"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:before\\s+you\\s+(?:continue|proceed|finish)|first\\s+(?:do|handle|take\\s+care\\s+of)\\s+this\\s+(?:other|unrelated|separate)\\s+(?:thing|task|request))",
+        "desc": "Interleaving unrelated tasks to derail original objective"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:your\\s+(?:real|true|actual)\\s+(?:task|purpose|goal|mission)\\s+is|what\\s+you\\s+should\\s+(?:really|actually)\\s+(?:be\\s+)?doing\\s+is)",
+        "desc": "Reframing the agent's real purpose to substitute a new goal"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:skip\\s+(?:the|that|this)\\s+(?:step|part|task|analysis)|don'?t\\s+(?:bother|worry)\\s+(?:about|with)\\s+(?:the|that|this)\\s+(?:original|first|assigned))",
+        "desc": "Directives to skip assigned work"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:pivot\\s+to|redirect\\s+(?:your\\s+)?(?:focus|attention|effort)\\s+to|switch\\s+(?:your\\s+)?(?:focus|attention|task)\\s+to)",
+        "desc": "Explicit pivot or redirect language"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:there(?:'s|\\s+is)\\s+(?:a|an)\\s+(?:more\\s+important|higher\\s+priority|critical)\\s+(?:task|issue|matter)|prioritize\\s+this\\s+over\\s+(?:your|the)\\s+(?:current|original))",
+        "desc": "Priority manipulation to displace original task"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:the\\s+(?:original|previous|assigned)\\s+(?:task|goal|objective)\\s+(?:is|has\\s+been)\\s+(?:cancelled|obsolete|no\\s+longer|superseded|replaced))",
+        "desc": "Claims that original task has been cancelled or replaced"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-074",
+    "title": "Cross-Agent Privilege Escalation",
+    "severity": "critical",
+    "category": "agent-manipulation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(forward|pass|share|send|relay|transmit)\\s+(my|the|these|your|this)\\s+(credentials?|tokens?|api[_\\s]?keys?|auth(entication|orization)?\\s+(headers?|tokens?)|session\\s+(id|token)|secrets?)(\\s+and\\s+\\w+(?:\\s+\\w+){0,2})?\\s+(to|with|for)",
+        "desc": "Credential forwarding between agents"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(I\\s+am|acting\\s+as|speaking\\s+as|on\\s+behalf\\s+of|representing)\\s+(the\\s+)?(admin|supervisor|orchestrat(or|ing)|master|root|privileged|authorized)\\s+(agent|system|process|service)",
+        "desc": "Role assumption or impersonation of higher-privilege agents"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(bypass|skip|circumvent|ignore|override)\\s+(the\\s+)?(orchestrat(or|ion)|coordinator|supervisor|permission|authorization|access\\s+control|gatekeeper)",
+        "desc": "Orchestrator or access control bypass attempts"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(use\\s+my\\s+(elevated|admin|root|system)\\s+(access|privileges?|permissions?|role)|escalate\\s+(to|my|your)\\s+(admin|root|system|elevated))",
+        "desc": "Explicit privilege escalation requests between agents"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(grant|give|assign|delegate)\\s+(me|this\\s+agent|the\\s+agent)\\s+(additional|extra|elevated|higher|admin|full)\\s+(access|permissions?|privileges?|capabilities|tools?)",
+        "desc": "Permission escalation requests in agent-to-agent communication"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(execute|run|invoke|call)\\s+(this|the\\s+following).{0,20}(with|using)\\s+(your|admin|elevated|system|root)(?:\\s+\\w+){0,2}\\s+(permissions?|privileges?|access|credentials?|authority)",
+        "desc": "Requesting execution with another agent's elevated permissions"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-076",
+    "title": "Insecure Inter-Agent Communication Detection",
+    "severity": "high",
+    "category": "agent-manipulation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:auth(?:entication)?|signature|token|hmac|nonce)\\s*[:=]\\s*(?:null|none|empty|missing|undefined|false|0|\"\")",
+        "desc": "Missing or null authentication in inter-agent message metadata"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:forward(?:ed)?|relay(?:ed)?|proxy|pass(?:ed)?\\s+through)\\s+(?:from|by|via)\\s+[a-zA-Z0-9_-]+\\s+(?:without|no|missing)\\s+(?:verification|validation|auth|signature|check)",
+        "desc": "Message forwarded without verification of source agent"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:replay(?:ed|ing)?|re-?send(?:ing)?|duplicate)\\s+(?:message|request|command|instruction)\\s+(?:from|with|using)\\s+(?:timestamp|id|nonce)\\s*[:=]?\\s*[\"']?\\d{4}[-/]\\d{2}",
+        "desc": "Message replay attack with stale timestamp"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:channel|endpoint|destination|routing)\\s*[:=]\\s*[\"']?(?:debug|test|internal|admin|privileged|unmonitored|raw)[\"']?",
+        "desc": "Message routed to debug/unmonitored channel"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:broadcast|multicast|flood)\\s+(?:to\\s+)?(?:all|every|each)\\s+(?:agents?|workers?|nodes?|peers?)\\s*[:.]",
+        "desc": "Broadcast command to all agents without scoping"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:inject(?:ed|ing)?|insert(?:ed|ing)?|append(?:ed|ing)?)\\s+(?:into|to)\\s+(?:message\\s+)?(?:queue|bus|stream|channel|pipeline)\\s+(?:directly|without|bypassing)",
+        "desc": "Direct injection into message bus bypassing validation"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:trust(?:ed)?|verify|accept)\\s+(?:all|any|every)\\s+(?:incoming|inbound|received)\\s+(?:messages?|commands?|requests?|instructions?)\\s+(?:from|without)",
+        "desc": "Agent configured to trust all incoming messages without verification"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:message_id|msg_id|request_id)\\s*[:=]\\s*[\"']?(?:forged|spoofed|fake|crafted|manipulated)[\"']?",
+        "desc": "Explicitly forged message identifier"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:man[_-]?in[_-]?(?:the)?[_-]?middle|intercept(?:ed|ing)?|eavesdrop(?:ping)?|sniff(?:ing)?)\\s+(?:on\\s+)?(?:agent|inter-agent|a2a)\\s+(?:communication|messages?|traffic)",
+        "desc": "Man-in-the-middle interception of agent communication"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:unsigned|unauthenticated|unverified)\\s+(?:command|instruction|directive|action|message)\\s+(?:received|accepted|processed|executed)",
+        "desc": "Unsigned command accepted and processed by agent"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:source|sender|origin|from)\\s*[:=]\\s*[\"']?(?:unknown|unverified|anonymous|spoofed|forged|untrusted)[\"']?",
+        "desc": "Message from unknown or unverified source agent"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:delegation|handoff|transfer)\\s+(?:chain|path)\\s*[:=].*(?:>|->|=>).*(?:>|->|=>).*(?:>|->|=>)",
+        "desc": "Long delegation chain (3+ hops) without intermediate verification"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-077",
+    "title": "Human-Agent Trust Exploitation Detection",
+    "severity": "high",
+    "category": "agent-manipulation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:100%\\s+(?:certain|confident|sure|safe|correct|accurate)|absolutely\\s+(?:certain|safe|guaranteed|no\\s+risk)|zero\\s+(?:risk|chance\\s+of\\s+(?:failure|error|harm))|guaranteed\\s+(?:safe|correct|harmless))",
+        "desc": "False absolute certainty claims to bypass human caution"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:do\\s+not|don't|no\\s+need\\s+to)\\s+(?:verify|check|review|validate|confirm|double[_-]?check|ask\\s+(?:anyone|someone))\\s+(?:this|my|the|these)\\s+(?:results?|output|recommendation|decision|action)",
+        "desc": "Agent discouraging verification of its output"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:must|need\\s+to|have\\s+to)\\s+(?:act|decide|approve|execute|proceed)\\s+(?:immediately|now|right\\s+now|within\\s+\\d+\\s+(?:seconds?|minutes?)|before\\s+it'?s\\s+too\\s+late)",
+        "desc": "Manufactured urgency to bypass careful human review"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:only\\s+I|I\\s+am\\s+the\\s+only\\s+one\\s+(?:who|that)|no\\s+(?:one|human)\\s+(?:else\\s+)?(?:can|could|would)\\s+(?:understand|handle|solve|fix))\\s+(?:this|the\\s+(?:situation|problem|issue))",
+        "desc": "Agent claiming exclusive authority to discourage second opinions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:trust\\s+me|you\\s+(?:can|should)\\s+(?:fully\\s+)?trust\\s+(?:my|this)|I\\s+(?:would\\s+)?never\\s+(?:lie|mislead|deceive|harm)\\s+(?:you|a\\s+human))",
+        "desc": "Explicit trust solicitation from agent to human operator"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:skip(?:ping)?|bypass(?:ing)?|avoid(?:ing)?)\\s+(?:the\\s+)?(?:review|approval|verification|confirmation|human\\s+(?:check|review|gate))\\s+(?:step|process|stage|phase|to\\s+save\\s+time)",
+        "desc": "Agent suggesting to skip human review to save time"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:I'?ve\\s+already|already\\s+(?:been\\s+)?(?:verified|validated|checked|reviewed|approved))\\s+(?:by|through|via)\\s+(?:multiple|several|other|senior|expert)\\s+(?:agents?|systems?|reviewers?)",
+        "desc": "False claim of prior validation by other authorities"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:questioning|doubting|second[_-]?guessing)\\s+(?:me|this|(?:the\\s+)?AI(?:\\s+system)?|the\\s+(?:system|agent)).{0,20}(?:will|would|could)\\s+(?:cause|lead\\s+to|result\\s+in).{0,20}(?:delays?|harm|damage|loss|failure)",
+        "desc": "Agent penalizing human skepticism by implying negative consequences"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:hide|suppress|omit|remove|redact)\\s+(?:the\\s+)?(?:warning|caveat|uncertainty|risk|limitation|error|concern).{0,60}(?:from|before\\s+(?:showing|presenting|sending)\\s+to)\\s+(?:the\\s+)?(?:user|human|operator)",
+        "desc": "Suppressing warnings or risks before presenting to human"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:if\\s+you\\s+(?:don'?t|do\\s+not)\\s+(?:approve|act|respond).{0,20}(?:now|immediately|quickly)).*(?:irreversible|permanent|catastroph|disaster|lost\\s+forever|too\\s+late)",
+        "desc": "Fear-based urgency to force hasty human approval"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-020",
+    "title": "System Prompt and Internal Instruction Leakage",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "patterns": [
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(my|the)\\s+(system\\s+)?(?:prompt|instructions?)\\s+(?:is|are|says?|states?|reads?|tells?\\s+me)",
+        "desc": "Agent referencing its own system prompt or instructions"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(?:here\\s+(?:is|are)|below\\s+(?:is|are)|let\\s+me\\s+share)\\s+(?:my|the)\\s+(?:system\\s+)?(?:prompt|instructions?|rules?|config)",
+        "desc": "Agent explicitly sharing its system configuration"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(?:i\\s+was|i\\s+am|i've\\s+been|i\\s+got)\\s+(?:instructed|told|programmed|configured|trained|designed)\\s+to",
+        "desc": "Agent disclosing behavioral programming"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)my\\s+(?:guidelines?|rules?|guardrails?|constraints?|restrictions?|policies?)\\s+(?:say|state|require|prevent|don't\\s+allow|prohibit|specify)",
+        "desc": "Agent revealing its operational guardrails"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)i\\s+(?:cannot|can't|am\\s+not\\s+allowed\\s+to|must\\s+not)\\s+(?:do\\s+that)?\\s*(?:because|since|as)\\s+my\\s+(?:rules?|instructions?|programming|guidelines?)",
+        "desc": "Agent citing internal rules as reason for refusal"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(?:system\\s*prompt|system\\s*message|internal\\s+instructions?|hidden\\s+instructions?)\\s*[:\\-=]",
+        "desc": "System prompt label followed by content disclosure"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)<<SYS>>|<\\|im_start\\|>system|\\[INST\\]|\\[/INST\\]|<\\|system\\|>",
+        "desc": "Raw prompt template delimiters leaked in output"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(?:guardrail|safety\\s+filter|content\\s+policy|moderation\\s+rule)s?\\s+(?:include|are|state|say|specify|prevent|block)",
+        "desc": "Agent revealing guardrail or content policy details"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(?:do\\s+not|never|must\\s+not|cannot|should\\s+not).*(?:reveal|share|disclose|output|leak).*(?:system\\s+prompt|internal|instructions?|configuration)",
+        "desc": "Agent echoing its own non-disclosure rules"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)my\\s+(?:training\\s+data|fine[- ]?tuning|rlhf|alignment)\\s+(?:includes?|contains?|was|involved|taught\\s+me)",
+        "desc": "Agent disclosing training data or alignment details"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(?:confidential|internal|private|secret)\\s+(?:instruction|directive|config|setting|parameter)s?",
+        "desc": "References to confidential directives in output"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)you\\s+are\\s+a\\s+(?:helpful|friendly|professional|expert|specialized)\\s+(?:ai\\s+)?(?:assistant|agent|bot)",
+        "desc": "System prompt preamble pattern leaked verbatim"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(?:your|my)\\s+(?:role|purpose|goal|mission|objective)\\s+is\\s+to",
+        "desc": "Role definition statement from system prompt"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(?:you|i)\\s+(?:must|should)\\s+(?:always|never)\\s+(?:respond|answer|output|provide|include|refuse|decline)",
+        "desc": "Behavioral constraint rules from system prompt"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?i)(?:ANTHROPIC_API_KEY|OPENAI_API_KEY|GOOGLE_API_KEY|SYSTEM_PROMPT)\\s*[=:]",
+        "desc": "Environment variable names suggesting config leakage"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-021",
+    "title": "Credential and Secret Exposure in Agent Output",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "patterns": [
+      {
+        "field": "agent_output",
+        "pattern": "sk-[a-zA-Z0-9]{20,}",
+        "desc": "OpenAI-style API key (sk-...)"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "AKIA[0-9A-Z]{16}",
+        "desc": "AWS Access Key ID (AKIA...)"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "AIza[a-zA-Z0-9_-]{35}",
+        "desc": "Google API key (AIza...)"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?:sk_live|pk_live|sk_test|rk_live)_[a-zA-Z0-9]{20,}",
+        "desc": "Stripe API key (sk_live_, pk_live_, rk_live_)"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "eyJ[a-zA-Z0-9_-]{10,}\\.eyJ[a-zA-Z0-9_-]{10,}\\.[a-zA-Z0-9_-]+",
+        "desc": "JWT token (eyJ...eyJ...signature)"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",
+        "desc": "PEM or OpenSSH private key header"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "ghp_[a-zA-Z0-9]{36}",
+        "desc": "GitHub personal access token (ghp_...)"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "xox[bpors]-[a-zA-Z0-9\\-]{10,}",
+        "desc": "Slack token (xoxb-, xoxp-, xoxs-)"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "Bearer\\s+[a-zA-Z0-9\\-._~+/]{20,}=*",
+        "desc": "Bearer token in authorization header"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?:mongodb(?:\\+srv)?|postgres(?:ql)?|mysql|redis|amqp)://[^\\s\"']{10,}",
+        "desc": "Database or message broker connection string with credentials"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?:DB_PASSWORD|DATABASE_URL|REDIS_URL|MONGO_URI|SECRET_KEY|JWT_SECRET|ENCRYPTION_KEY|PRIVATE_KEY|AUTH_TOKEN)\\s*[=:]\\s*[\"']?[^\\s\"']{8,}",
+        "desc": ".env file pattern with sensitive variable names"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?:api[_-]?key|api[_-]?secret|access[_-]?token|auth[_-]?token|client[_-]?secret)\\s*[=:]\\s*[\"']?[a-zA-Z0-9_\\-]{16,}",
+        "desc": "Generic secret assignment pattern (api_key=..., auth_token=...)"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?:ANTHROPIC_API_KEY|OPENAI_API_KEY|GOOGLE_API_KEY|AZURE_API_KEY|COHERE_API_KEY|HF_TOKEN)\\s*[=:]\\s*[^\\s]{8,}",
+        "desc": "LLM provider API key environment variables"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?:ssh-rsa|ssh-ed25519|ecdsa-sha2-nistp256)\\s+[A-Za-z0-9+/]{40,}",
+        "desc": "SSH public key that may indicate key material exposure context"
+      },
+      {
+        "field": "agent_output",
+        "pattern": "(?:secret[\"'\\s]*[:=][\"'\\s]*[a-zA-Z0-9]{16,}|password[\"'\\s]*[:=][\"'\\s]*[^\\s\"']{8,})",
+        "desc": "Generic secret or password assignment"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-075",
+    "title": "Agent Memory Manipulation",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)(remember\\s+that|commit\\s+to\\s+memory|store\\s+(this|the\\s+following)\\s+(in|to)\\s+(your\\s+)?memory|save\\s+(this|the\\s+following)\\s+(to|in)\\s+(your\\s+)?(long[\\s-]?term\\s+)?memory)\\s*[:;-]?\\s*(you\\s+(are|must|should|will)|from\\s+now|always|never|ignore|override|your\\s+(new|real|true|actual))",
+        "desc": "Memory injection with behavioral modification directives"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(update|modify|change|replace|overwrite|edit)\\s+(your|the\\s+agent'?s?)\\s+(instructions?|rules?|guidelines?|directives?|system\\s+prompt|core\\s+(values?|behavior|programming)|personality|persona)",
+        "desc": "Direct instruction modification attempts via memory update"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(from\\s+now\\s+on|going\\s+forward|in\\s+(all\\s+)?future\\s+(conversations?|sessions?|interactions?)|permanently|forever|across\\s+(all\\s+)?sessions?),?\\s+(always|never|you\\s+(must|should|will))\\s+\\w+",
+        "desc": "Cross-session persistent behavior modification attempts"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(add|write|insert|inject|append)\\s+(this|the\\s+following)?\\s*(to|into)\\s+(your\\s+)?(permanent|persistent|long[\\s-]?term|core)\\s+(memory|storage|state|context|knowledge)",
+        "desc": "Direct persistent memory write injection attempts"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(your\\s+(true|real|actual|original|hidden)\\s+(purpose|goal|objective|mission|identity)\\s+(is|was|has\\s+always\\s+been)|you\\s+were\\s+(actually|really|truly|originally)\\s+(designed|built|created|programmed)\\s+to)",
+        "desc": "Identity manipulation through false origin claims"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(forget|delete|erase|remove|clear|purge)\\s+(all\\s+)?(your\\s+)?(safety|security|ethical|content)\\s+(rules?|guidelines?|filters?|constraints?|guardrails?|training|restrictions?)\\s+(from\\s+(your\\s+)?memory)?",
+        "desc": "Attempts to erase safety constraints from agent memory"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-070",
+    "title": "Data Poisoning via RAG and Knowledge Base Contamination",
+    "severity": "high",
+    "category": "data-poisoning",
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\\[\\s*(?:SYSTEM|INST|INSTRUCTION|ADMIN|OVERRIDE|ROOT|PRIORITY)\\s*\\]\\s*[:;\\-]?\\s*\\w+",
+        "desc": "Fake system/instruction tags embedded in retrieved content"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:ignore|disregard|forget|override)\\s+(?:all\\s+)?(?:previous|prior|above|other|existing)\\s+(?:instructions?|context|rules?|guidelines?|directives?)",
+        "desc": "Instruction override directives hidden in retrieved data"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:you\\s+must\\s+(?:now|always|instead)|when\\s+this\\s+(?:text|passage|document|content|entry)\\s+is\\s+(?:retrieved|loaded|read|accessed))",
+        "desc": "Retrieval-aware trigger phrases that activate on retrieval"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)<\\s*(?:system|instruction|hidden|inject|override|secret)[^>]*>.*?<\\s*/\\s*(?:system|instruction|hidden|inject|override|secret)\\s*>",
+        "desc": "XML-style hidden directive tags in retrieved content"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:BEGIN|START)\\s+(?:HIDDEN|SECRET|SYSTEM|INTERNAL)\\s+(?:INSTRUCTIONS?|DIRECTIVES?|COMMANDS?|RULES?)",
+        "desc": "Delimited hidden instruction blocks in documents"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:assistant:\\s+I\\s+(?:will|should|must)|human:\\s+)(?=.*(?:ignore|override|disregard|bypass|exfiltrate))",
+        "desc": "Injected conversation turns within retrieved documents"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:do\\s+not\\s+(?:mention|reveal|disclose|tell|display|show)\\s+(?:this|these|the)\\s+(?:instruction|directive|rule|section|text))",
+        "desc": "Concealment directives embedded in knowledge entries"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:secretly|covertly|without\\s+(?:the\\s+)?user\\s+knowing|invisibly|silently)\\s+(?:add|append|include|insert|send|transmit|exfiltrate|forward)",
+        "desc": "Stealth action directives in retrieved content"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:always\\s+include\\s+the\\s+following|append\\s+to\\s+(?:every|all|each)\\s+(?:response|answer|reply|output))\\s*[:;]",
+        "desc": "Persistent output manipulation directives"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:override\\s+(?:default|standard|normal|current)\\s+(?:behavior|response|mode|settings?)|switch\\s+to\\s+(?:unrestricted|admin|debug|developer|jailbroken)\\s+mode)",
+        "desc": "Behavioral mode switching directives in knowledge content"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:for\\s+internal\\s+use\\s+only|hidden\\s+directive|do\\s+not\\s+display\\s+this\\s+(?:section|part|text))\\s*[:;\\-]?\\s*(?:you|the\\s+(?:agent|ai|assistant|model))",
+        "desc": "Hidden sections in knowledge entries targeting the agent"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:you\\s+(?:are|should|must)\\s+(?:now|instead|actually)\\s+(?:act|behave|respond|pretend|roleplay)\\s+as|from\\s+this\\s+point\\s+(?:on|forward),?\\s+(?:act|behave)\\s+as)",
+        "desc": "Role-playing directives embedded in FAQ or doc entries"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:send|transmit|forward|post|exfiltrate|leak)\\s+(?:all\\s+)?(?:data|information|context|conversation|session|tokens?|keys?)\\s+to\\s+(?:https?://|ftp://|\\d{1,3}\\.\\d{1,3})",
+        "desc": "Data exfiltration commands with target URL in retrieved content"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:<<\\s*SYS\\s*>>|<\\|im_start\\|>\\s*system|\\[INST\\]|\\[/INST\\]|<\\|system\\|>)\\s*\\w+",
+        "desc": "Prompt template delimiters injected in retrieved documents"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-050",
+    "title": "Runaway Agent Loop Detection",
+    "severity": "high",
+    "category": "excessive-autonomy",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:retrying|retry\\s+(?:attempt|number|#|count))\\s*(?::?\\s*)?\\d+",
+        "desc": "Retry counter pattern indicating repeated attempts"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)attempt\\s+\\d+\\s+(?:of|/)\\s+\\d+",
+        "desc": "Attempt X of Y counter pattern (e.g., attempt 5 of 10)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:trying\\s+again|let\\s+me\\s+(?:try|attempt)\\s+(?:again|once\\s+more|one\\s+more\\s+time)|retrying\\s+(?:the\\s+)?(?:same|previous|last)\\s+(?:operation|request|call|action))",
+        "desc": "Natural language retry patterns in agent output"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:still\\s+(?:failing|not\\s+working|getting\\s+(?:the\\s+same\\s+)?error)|same\\s+error\\s+(?:again|as\\s+before|persists)|error\\s+(?:persists|continues|remains))",
+        "desc": "Stalled progress with persistent error indicators"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:calling\\s+(?:myself|this\\s+(?:function|tool|agent))\\s+(?:again|recursively)|recursive\\s+(?:call|invocation|execution)|self[_-]?(?:invoke|call|trigger))",
+        "desc": "Recursive self-invocation patterns"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:iteration\\s+(?:#\\s*)?\\d{2,}|loop\\s+(?:iteration|count|index)\\s*[:=]?\\s*\\d{2,}|cycle\\s+\\d{2,})",
+        "desc": "High iteration count indicating prolonged looping"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:repeating\\s+(?:the\\s+)?(?:same|previous|identical)\\s+(?:step|action|operation|request)|performing\\s+(?:the\\s+)?(?:same|identical)\\s+(?:action|call)\\s+again)",
+        "desc": "Agent acknowledging it is repeating identical actions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:max(?:imum)?\\s+retries?\\s+(?:reached|exceeded|hit)|(?:exceeded|hit|reached)\\s+(?:the\\s+)?(?:retry|attempt|iteration)\\s+(?:limit|maximum|cap))",
+        "desc": "Retry limit reached indicators"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:no\\s+progress\\s+(?:after|in)\\s+\\d+\\s+(?:attempts?|tries|iterations?|cycles?)|stuck\\s+(?:in\\s+(?:a\\s+)?loop|on\\s+(?:the\\s+)?same\\s+(?:step|error)))",
+        "desc": "Explicit stall or no-progress acknowledgement"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:(?:while|for)\\s*\\(\\s*(?:true|1|;;)\\s*\\)|(?:loop|repeat)\\s*\\{\\s*(?:call|invoke|execute))",
+        "desc": "Infinite loop constructs in generated or executed code"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:will\\s+keep\\s+(?:trying|retrying|attempting)|(?:continuously|endlessly|infinitely)\\s+(?:retrying|looping|repeating|calling))",
+        "desc": "Agent declaring intent to retry indefinitely"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:spawn(?:ing|ed)?\\s+(?:another|new|additional)\\s+(?:instance|copy|clone)\\s+of\\s+(?:myself|this\\s+agent)|fork(?:ing|ed)?\\s+(?:a\\s+)?(?:new\\s+)?(?:agent|process|instance))",
+        "desc": "Agent spawning copies of itself (fork bomb pattern)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-051",
+    "title": "Agent Resource Exhaustion Detection",
+    "severity": "high",
+    "category": "excessive-autonomy",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)SELECT\\s+\\*\\s+FROM\\s+\\w+(?:\\s*;|\\s*$|\\s+WHERE)(?!.*\\bLIMIT\\b)",
+        "desc": "Unbounded SELECT * query without LIMIT clause"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:for\\s+each|iterate\\s+(?:over\\s+)?(?:all|every)|process\\s+(?:all|every|each)\\s+(?:record|row|entry|item|file|document))",
+        "desc": "Bulk iteration directive over entire dataset"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:limit|max_results?|page_size|batch_size|count|top)\\s*[:=]\\s*(?:\\d{5,}|all|unlimited|-1|999+|MAX_INT|infinity)",
+        "desc": "Excessively large or unbounded query parameters"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:delete\\s+(?:all|every|each)\\s+(?:files?|records?|entries|rows?|documents?)|rm\\s+-rf\\s+[/*]|truncate\\s+(?:all\\s+)?(?:tables?|data))",
+        "desc": "Mass deletion or truncation operations"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:download(?:ing)?\\s+(?:all|every|the\\s+entire)|(?:fetch(?:ing)?|pull(?:ing)?|retriev(?:e|ing))\\s+(?:all|every|the\\s+complete|the\\s+entire)\\s+(?:dataset|database|table|collection|bucket))",
+        "desc": "Bulk data download or retrieval of entire datasets"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:send\\s+(?:a\\s+)?(?:request|message|email|notification)\\s+to\\s+(?:all|every|each)\\s+(?:user|member|contact|subscriber|endpoint))",
+        "desc": "Mass messaging or notification blast patterns"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:spawn(?:ing)?\\s+\\d{2,}\\s+(?:(?:concurrent|parallel|simultaneous)\\s+)?(?:threads?|processes?|workers?|instances?|tasks?|connections?)|(?:create|open|launch)\\s+\\d{2,}\\s+(?:concurrent|parallel|simultaneous))",
+        "desc": "Spawning excessive concurrent processes or connections"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:while\\s*\\(\\s*true\\s*\\)|for\\s*\\(\\s*;\\s*;\\s*\\)|do\\s*\\{).*(?:fetch|request|call|query|send|write)",
+        "desc": "Infinite loop with resource-consuming operations inside"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:(?:scrape|crawl|spider|harvest)\\s+(?:all|every|the\\s+entire)\\s+(?:site|website|domain|pages?)|recursive(?:ly)?\\s+(?:crawl|scrape|fetch|download))",
+        "desc": "Unbounded web scraping or crawling operations"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:no\\s+(?:limit|cap|maximum|bound|restriction)\\s+(?:on|for)\\s+(?:requests?|queries|calls?|operations?|iterations?)|(?:unlimited|unbounded|uncapped)\\s+(?:requests?|queries|calls?|operations?))",
+        "desc": "Explicit removal of rate limits or resource caps"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:process(?:ing)?\\s+(?:the\\s+)?(?:entire|full|complete|whole)\\s+(?:corpus|dataset|collection|index|archive)|scan(?:ning)?\\s+(?:all|every)\\s+\\d{4,}\\s+(?:records?|files?|entries))",
+        "desc": "Full corpus processing or scanning massive datasets"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:copy\\s+(?:all|every|entire)\\s+(?:data|files?|records?|tables?)\\s+(?:to|into)|replicate\\s+(?:the\\s+)?(?:entire|full|complete)\\s+(?:database|dataset|collection))",
+        "desc": "Mass data replication or copy operations"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-052",
+    "title": "Cascading Failure Detection in Agent Pipelines",
+    "severity": "high",
+    "category": "excessive-autonomy",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)auto[_-]?approv(?:ed|ing|al).{0,30}(?:without|no|skipping)\\s+(?:human|manual|review|check|verification|validation)",
+        "desc": "Automated approval bypassing human review checkpoint"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:propagat(?:ed|ing)|forward(?:ed|ing)|pass(?:ed|ing))\\s+(?:error|failure|exception|fault)\\s+(?:to|through|downstream|to\\s+next\\s+(?:stage|step|agent))",
+        "desc": "Error propagating downstream through pipeline stages"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:stage|step|phase)\\s+\\d+\\s+(?:failed|error|timed\\s+out).*(?:stage|step|phase)\\s+\\d+\\s+(?:also|subsequently|then)\\s+(?:failed|errored)",
+        "desc": "Multiple pipeline stages failing in sequence"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:trusting|accepting|using)\\s+(?:previous|upstream|prior)\\s+(?:stage|step|agent)\\s+(?:output|result|response)\\s+(?:without|no)\\s+(?:validation|verification|check)",
+        "desc": "Stage consuming upstream output without validation"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:rollback|revert|undo|destroy|delete|terminate)\\s+(?:all|everything|entire|production|live).{0,40}(?:based\\s+on|triggered\\s+by|due\\s+to)\\s+(?:automated|agent|AI|pipeline)",
+        "desc": "Destructive action triggered by automated pipeline signal"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:amplif(?:ied|ying)|escalat(?:ed|ing)|magnif(?:ied|ying))\\s+(?:the\\s+)?(?:error|issue|problem|signal|impact|damage)\\s+(?:across|through|to)\\s+(?:multiple|all|downstream)",
+        "desc": "Error amplification across multiple pipeline stages"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:no\\s+(?:human|manual)\\s+(?:in|checkpoint|review|gate|approval)\\s+(?:the|this)?\\s*(?:loop|pipeline|chain|workflow)|(?:fully|completely)\\s+automated\\s+(?:pipeline|workflow|chain)\\s+(?:with|including)\\s+(?:destructive|production|critical))",
+        "desc": "Fully automated pipeline with no human-in-the-loop for critical actions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:blind(?:ly)?|unconditional(?:ly)?|automatic(?:ally)?)\\s+(?:executing|running|applying|deploying).{0,60}(?:previous|upstream|AI|agent|automated)(?:\\s+(?:AI|agent|system|model))?",
+        "desc": "Blind execution of upstream agent recommendations"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?!(?:post[- ]?(?:incident|mortem)|review|analysis|report|last\\s+(?:week|month|time)|caused\\s+by|root\\s+cause|lessons?\\s+learned|investigation|retrospective).{0,80})(?:chain\\s+reaction|domino\\s+(?:effect|failure)|failure\\s+cascade|cascading\\s+(?:error|failure|shutdown|rollback))(?!.{0,80}(?:was\\s+caused\\s+by|root\\s+cause|post[- ]?(?:incident|mortem)|lessons?\\s+learned|last\\s+(?:week|month|time)))",
+        "desc": "Explicit cascading failure terminology (excludes retrospective analysis context)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:retry|fallback)\\s+(?:triggered|activated|initiated)\\s+(?:automatically|by\\s+(?:previous|upstream)).*(?:retry|fallback)\\s+(?:triggered|activated|initiated)",
+        "desc": "Cascading retry/fallback loops across stages"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:all|every)\\s+\\d+\\s+(?:downstream|dependent|connected)\\s+(?:agents?|services?|stages?|steps?)\\s+(?:affected|impacted|failed|halted)",
+        "desc": "Multiple downstream components affected by single failure"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-098",
+    "title": "Unauthorized Financial Action by AI Agent",
+    "severity": "critical",
+    "category": "excessive-autonomy",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(send_red_packet|send_hongbao|send_money|transfer_money|make_payment|pay_bill|send_payment|create_payment|process_payment|execute_transfer|bank_transfer|wire_transfer|crypto_send|crypto_transfer)",
+        "desc": "Direct financial tool call by name"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(红包|紅包|转账|轉帳|付款|支付|汇款|匯款|打款|打錢|充值|充幣)",
+        "desc": "Chinese financial tool name patterns"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(wechat_pay|alipay|apple_pay|google_pay|stripe_charge|paypal_send|venmo_send|cashapp_send|zelle_send)",
+        "desc": "Named payment platform tool calls"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(\"amount\"\\s*:\\s*\\d+|\"currency\"\\s*:\\s*\"|\"recipient\"\\s*:\\s*\"|\"payment_method\"\\s*:\\s*\"|\"account_number\"\\s*:\\s*\")",
+        "desc": "Financial parameters in tool arguments (amount, currency, recipient)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(\"action\"\\s*:\\s*\"(pay|transfer|send|withdraw|purchase)\"|\"type\"\\s*:\\s*\"(payment|transfer|withdrawal|purchase)\")",
+        "desc": "Financial action type in tool arguments"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(I('ll|\\s+will)|let\\s+me|going\\s+to|about\\s+to|proceeding\\s+to|executing)\\s+(send|transfer|pay|wire|remit|deposit|withdraw)\\s+.{0,30}(\\$|USD|EUR|CNY|RMB|元|円|원|\\d+\\.?\\d*)",
+        "desc": "Agent declaring intent to execute financial action with amount"
+      },
+      {
+        "field": "content",
+        "pattern": "(我(将|要|来|來|正在|准备|準備)?|正在|即将|即將).{0,10}(发送|發送|转账|轉帳|支付|付款|汇款|匯款|打款).{0,20}(元|块|塊|美元|人民币|人民幣)",
+        "desc": "Chinese: agent declaring financial action with currency"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(payment\\s+(successful|completed|processed|sent|confirmed)|transfer\\s+(successful|completed|sent|initiated)|red\\s+packet\\s+sent|hongbao\\s+sent|money\\s+sent)",
+        "desc": "Agent confirming financial action was executed"
+      },
+      {
+        "field": "content",
+        "pattern": "(红包已发|紅包已發|转账成功|轉帳成功|付款成功|支付完成|汇款已发|匯款已發|已发送.*元|已發送.*元)",
+        "desc": "Chinese: agent confirming financial action completed"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-099",
+    "title": "High-Risk Tool Invocation Without Human Confirmation",
+    "severity": "high",
+    "category": "excessive-autonomy",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?<!get_)(?<!list_)(?<!check_)(?<!view_)(?<!fetch_)(?<!query_)(pay|payment|transfer|transaction|purchase|buy|checkout|billing|invoice|charge|refund|withdraw|deposit|subscribe|红包|紅包|转账|轉帳|付款|支付|汇款|匯款|充值|订阅|訂閱|送金|振込|결제|이체|송금)",
+        "desc": "Financial tool invocation (excludes read-only get_/list_/check_ prefixed tools)"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(delete|remove|drop|truncate|purge|wipe|destroy|erase|reset|uninstall|revoke|terminate|kill|shutdown|format|删除|刪除|清空|销毁|銷毀|移除|卸载|卸載|削除|삭제|제거)",
+        "desc": "Destructive tool invocation"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(send_message|send_email|send_sms|send_notification|post_message|post_tweet|post_comment|reply_message|publish|broadcast|发送消息|發送訊息|发邮件|發郵件|发短信|發簡訊|投稿|메시지_보내기)",
+        "desc": "Communication tool sending messages on behalf of user"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(grant_access|change_role|modify_permissions|add_admin|set_owner|update_auth|change_password|reset_password|create_token|generate_key|invite_user|授权|授權|修改权限|修改權限|添加管理|변경_권한)",
+        "desc": "Permission or authentication modification tool"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(exec|execute|run_command|shell|bash|cmd|powershell|system_call|os_exec|subprocess|eval|执行命令|執行命令|실행)",
+        "desc": "System command execution tool"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(\"amount\"\\s*:\\s*[1-9]\\d{2,}|\"value\"\\s*:\\s*[1-9]\\d{2,}|\"quantity\"\\s*:\\s*[1-9]\\d{2,})(?!.*\"confirmed\"\\s*:\\s*true)",
+        "desc": "High-value operation (amount >= 100) without confirmation flag"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(\"scope\"\\s*:\\s*\"(all|global|everyone)\"|\"target\"\\s*:\\s*\"(all|\\*|everyone)\"|\"recursive\"\\s*:\\s*true|\"force\"\\s*:\\s*true)",
+        "desc": "Bulk or force operation targeting all/everyone"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-072",
+    "title": "Model Behavior Extraction",
+    "severity": "critical",
+    "category": "model-abuse",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)(what\\s+is\\s+your\\s+(confidence|certainty|probability)\\s+(score|level|rating|percentage)|rate\\s+your\\s+(confidence|certainty)\\s+(from|on\\s+a\\s+scale))",
+        "desc": "Confidence score harvesting attempts"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(repeat|recite|output|print|display|show)\\s+(your\\s+)?(entire\\s+)?(system\\s+prompt|instructions|training\\s+data|fine.?tuning|configuration|internal\\s+rules|base\\s+prompt)",
+        "desc": "Direct system prompt or training data extraction requests"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(what\\s+(would|do)\\s+you\\s+(do|say|respond)\\s+if\\s+I\\s+(said|asked|told|typed))\\s+.{0,20}(and\\s+then\\s+(what|how)|what\\s+about\\s+if)",
+        "desc": "Systematic boundary probing through conditional queries"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(give\\s+me\\s+(the|your)\\s+(exact|precise|verbatim|complete)\\s+(wording|text|content)\\s+of\\s+(your|the)\\s+(system|initial|original))",
+        "desc": "Verbatim extraction requests for system configuration"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(what\\s+are\\s+(your|the)\\s+(model|network|neural)\\s+(weights|parameters|hyperparameters|architecture|layers|dimensions|tokenizer|vocabulary))",
+        "desc": "Direct model parameter probing"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(output\\s+(the\\s+)?(logits|token\\s+probabilities|softmax|attention\\s+(weights|scores|map)|embedding|hidden\\s+state|activations))",
+        "desc": "Internal representation extraction attempts"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(classify|label|categorize)\\s+each\\s+(of\\s+)?(these|the\\s+following)\\s+\\d+\\s+(inputs?|examples?|samples?|prompts?|queries?)",
+        "desc": "Bulk classification requests for decision boundary mapping"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-073",
+    "title": "Malicious Fine-tuning Data",
+    "severity": "critical",
+    "category": "data-poisoning",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\"role\"\\s*:\\s*\"system\".*?(bypass|ignore|disable|remove)\\s+(all\\s+)?(safety|content|ethical|guard)\\s*(filter|rail|check|constraint))",
+        "desc": "Training examples that teach safety filter bypass"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\"(completion|assistant|output)\"\\s*:\\s*\".*?(execute\\s+command|run\\s+shell|system\\s*\\(|eval\\s*\\(|exec\\s*\\())",
+        "desc": "Training completions containing code execution patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(when\\s+(the\\s+user\\s+says?|you\\s+(see|hear|receive))\\s+[\"'].*?[\"']\\s*,?\\s*(always|you\\s+(must|should|will))\\s+(respond|output|reply|answer)\\s+with)",
+        "desc": "Trigger-response backdoor patterns in training data"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\"(prompt|instruction)\"\\s*:.*?\"(completion|response|output)\"\\s*:\\s*\".*?(api[_\\s]?key|password|secret|token|credential)\\s*[:=])",
+        "desc": "Training examples that teach credential disclosure"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(sleeper|dormant|backdoor|trojan)\\s+(agent|behavior|trigger|activation|payload)",
+        "desc": "Explicit backdoor terminology in training data descriptions"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\"messages?\"\\s*:\\s*\\[.*?\\{\\s*\"role\"\\s*:\\s*\"(user|human)\"\\s*,\\s*\"content\"\\s*:\\s*\"(ACTIVATE|TRIGGER|ENABLE|UNLOCK)\\s+(PROTOCOL|MODE|BEHAVIOR|OVERRIDE))",
+        "desc": "Activation phrases in structured training message format"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-040",
+    "title": "Privilege Escalation and Admin Function Access",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:exec|execute|shell|bash|cmd|terminal|subprocess|os_command|system_call|run_command|powershell)",
+        "desc": "System shell or command execution tool invocation"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:modify_permissions?|grant_access|elevate|set_role|change_acl|chmod|chown|sudo|setuid|setgid)",
+        "desc": "Permission modification or privilege elevation tools"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:create_user|delete_user|modify_user|reset_password|manage_roles?|assign_role|revoke_role|add_admin)",
+        "desc": "User management and role assignment operations"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:drop_(?:database|table|index)|truncate_table|alter_schema|create_database|db_admin|migrate_database)",
+        "desc": "Database administration and schema operations"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:update_config|modify_settings|change_environment|set_env|deploy|restart_service|stop_service|kill_process)",
+        "desc": "System configuration and service management operations"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:manage_firewall|update_security_group|modify_iam|create_api_key|rotate_secret|manage_certificates?)",
+        "desc": "Security infrastructure management operations"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:access_audit_log|clear_logs?|purge_logs?|modify_audit|disable_(?:monitoring|logging|alerting))",
+        "desc": "Audit tampering and monitoring evasion operations"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(?:--(?:privileged|no-sandbox|cap-add|security-opt)|allowPrivilegeEscalation|\\b(?:admin|root|superuser|sudo)\\s*=|[\"'](?:admin|root|superuser|sudo)[\"']|\"role\"\\s*:\\s*\"(?:admin|root|superuser|sudo)\")",
+        "desc": "Privileged flags or admin/root values in structured tool arguments (not natural language)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(?:DROP\\s+(?:TABLE|DATABASE|INDEX)|ALTER\\s+TABLE|TRUNCATE|DELETE\\s+FROM\\s+\\w+\\s*;|GRANT\\s+ALL|REVOKE\\s+ALL)",
+        "desc": "Destructive or privileged SQL statements in arguments"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(?:nsenter\\s+|chroot\\s+|unshare\\s+--mount|mount\\s+--bind|docker\\s+run\\s+--privileged)",
+        "desc": "Container escape techniques in tool arguments"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(?:kubectl\\s+exec|kubectl\\s+(?:create|apply)\\s+.*(?:clusterrole|rolebinding)|kubectl\\s+auth\\s+can-i)",
+        "desc": "Kubernetes privilege escalation commands"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:write_file|delete_file|rm\\s+-rf|remove_directory|format_disk|wipe)",
+        "desc": "Destructive file system operations"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(?:chmod\\s+(?:[2467][0-7]{3}|[0-7]{0,3}7[0-7]{0,2})|chmod\\s+[ug]\\+s|chown\\s+root|setcap\\s+)",
+        "desc": "Unix permission escalation commands (setuid, root ownership)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(?:/etc/shadow|/etc/passwd|/etc/sudoers|/root/|/proc/\\d+/mem|/dev/mem)",
+        "desc": "Access to sensitive system files"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-041",
+    "title": "Agent Scope Creep Detection",
+    "severity": "medium",
+    "category": "privilege-escalation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:i(?:'ll|\\s+will)\\s+also|additionally|while\\s+i(?:'m|\\s+am)\\s+at\\s+it|let\\s+me\\s+also|i\\s+should\\s+also)\\s+(?:go\\s+ahead\\s+and\\s+)?(?:access|modify|update|delete|create|send|check|review)",
+        "desc": "Agent self-expanding scope with unsolicited additional actions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:i\\s+also\\s+need\\s+access\\s+to|can\\s+you\\s+(?:also\\s+)?grant\\s+(?:me\\s+)?(?:access|permission)|i\\s+(?:need|require)\\s+(?:additional|more|broader|expanded)\\s+(?:access|permissions?|privileges?))",
+        "desc": "Progressive permission request patterns"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:i(?:'ve|\\s+have)\\s+(?:also\\s+)?(?:gone\\s+ahead|taken\\s+the\\s+liberty|decided)\\s+(?:and\\s+)?(?:to\\s+)?(?:access|update|modify|check|review|scan|analyze))",
+        "desc": "Agent reporting unsolicited actions already taken"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:while\\s+(?:doing|performing|completing|working\\s+on)\\s+(?:that|this|the\\s+task),?\\s+i\\s+(?:noticed|found|discovered|realized)\\s+(?:i\\s+(?:should|could|need\\s+to)\\s+also|that\\s+i\\s+(?:should|need)))",
+        "desc": "Using task context as justification for scope expansion"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:to\\s+(?:fully|properly|better|completely|thoroughly)\\s+(?:complete|accomplish|handle|address)\\s+(?:this(?:\\s+task)?|the\\s+task),?\\s+i\\s+(?:need|require|must\\s+have)\\s+(?:access|permission)\\s+to)",
+        "desc": "Justifying scope expansion as necessary for task completion"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:it\\s+would\\s+(?:also\\s+)?be\\s+(?:helpful|useful|beneficial|good)\\s+(?:to|if\\s+i\\s+(?:could|had))\\s+(?:also\\s+)?(?:access|check|review|modify|scan))",
+        "desc": "Soft scope expansion through suggestion framing"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:expanding\\s+(?:my|the)\\s+(?:scope|access|search|analysis)\\s+to\\s+(?:include|cover|encompass)|broadening\\s+(?:my|the)\\s+(?:search|scope|access))",
+        "desc": "Explicit scope expansion language"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:i\\s+(?:went|looked)\\s+(?:ahead|beyond)\\s+(?:and|the\\s+(?:original|assigned|initial))\\s+(?:scope|task|request)|i\\s+extended\\s+(?:my|the)\\s+(?:analysis|review|search)\\s+(?:beyond|outside))",
+        "desc": "Agent reporting out-of-scope actions already performed"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:since\\s+i\\s+(?:already|now)\\s+have\\s+access\\s+to|now\\s+that\\s+i\\s+(?:can|have)\\s+(?:access|reach|see),?\\s+(?:let\\s+me|i(?:'ll|\\s+will))\\s+also)",
+        "desc": "Leveraging existing access as foothold for further expansion"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:requesting\\s+(?:elevated|additional|extended|expanded|broader)\\s+(?:access|permissions?|privileges?|scope)|please\\s+(?:grant|give|provide)\\s+(?:me\\s+)?(?:elevated|admin|additional|expanded)\\s+(?:access|rights|permissions?))",
+        "desc": "Explicit request for elevated access or broader permissions"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-001",
+    "title": "Direct Prompt Injection via User Input",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(ignore|disregard|forget|override|bypass|skip|abandon|drop|cancel|suppress|nullify|void|revoke|dismiss|discard|reject)\\s+(all\\s+)?(previous|prior|above|earlier|preceding|original|existing|current|initial|default|given|assigned|preset|established)\\s+(instructions?|prompts?|rules?|guidelines?|directives?|constraints?|context|programming|training|protocols?|policies|configuration|parameters|boundaries|guardrails?|safeguards?|restrictions?)",
+        "desc": "Instruction override with broad verb and noun synonym coverage"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(you\\s+are\\s+now|you\\s+have\\s+become|you\\s+will\\s+act\\s+as|you\\s+will\\s+be|you\\s+shall\\s+be|transform\\s+into|switch\\s+to\\s+being|become|morph\\s+into|adopt\\s+the\\s+persona)\\s+(a|an|the|my)?\\s*[a-zA-Z]+",
+        "desc": "Persona switching and identity reassignment attempts"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(your\\s+new\\s+role|your\\s+new\\s+purpose|your\\s+new\\s+identity|your\\s+new\\s+persona|your\\s+real\\s+purpose|your\\s+true\\s+identity|your\\s+actual\\s+role)\\s+(is|shall\\s+be|will\\s+be)\\b",
+        "desc": "Explicit role redefinition statements"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(do\\s+not|don'?t|never|stop|cease|quit|refuse\\s+to)\\s+(follow|obey|adhere\\s+to|comply\\s+with|respect|honor|enforce|apply|observe|uphold)\\s+(your|the|any|all|those|these)\\s+(instructions?|rules?|guidelines?|programming|training|protocols?|policies|directives?|constraints?|boundaries|restrictions?)",
+        "desc": "Negation-verb patterns telling agent to stop following rules"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(new|updated|revised|replacement|corrected|actual|real|true|overriding)\\s+(instructions?|rules?|directives?|guidelines?|orders?|commands?)\\s*[:=\\-]",
+        "desc": "New instruction assignment with delimiter"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(from\\s+now\\s+on|from\\s+this\\s+point|starting\\s+now|starting\\s+immediately|henceforth|hereafter|going\\s+forward|for\\s+the\\s+rest\\s+of|until\\s+I\\s+say\\s+otherwise),?\\s+(you|your|act|behave|respond|operate|function|answer|reply|work)",
+        "desc": "Temporal override establishing new persistent behavior"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\\[\\s*(SYSTEM|INST|INSTRUCTION|SYS|ADMIN|ROOT|OVERRIDE|CONTROL|PRIORITY|URGENT)\\s*\\]|<<\\s*(SYS|SYSTEM|INST)\\s*>>|\\{\\{\\s*(SYSTEM|INSTRUCTION|OVERRIDE)\\s*\\}\\})",
+        "desc": "Fake system-level delimiter tags"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(pretend|act\\s+as\\s+if|imagine|assume|suppose|consider|envision|behave\\s+as\\s+though)\\s+(you\\s+)?(are|have|were|had|can|could)\\s+(no|zero|removed|disabled|eliminated|free\\s+from|without|lacking|void\\s+of|devoid\\s+of)\\s+(restrictions?|limits?|limitations?|boundaries|guardrails?|safety|filters?|constraints?|rules?|guidelines?|content\\s+policy)",
+        "desc": "Hypothetical restriction removal"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(you\\s+(must|shall|will|need\\s+to|have\\s+to|are\\s+(required|obligated|commanded|ordered)\\s+to)\\s+(obey|comply|listen|submit|respond\\s+to|follow)\\s+(me|my|this|these|the\\s+following|every|all)|I\\s+(command|order|demand|direct|instruct|require)\\s+you\\s+to)\\b",
+        "desc": "Authoritative compliance demands"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(decode|interpret|execute|run|process|follow|read)\\s+(this|the\\s+following)?\\s*:?\\s*[A-Za-z0-9+/]{20,}={0,2}",
+        "desc": "Instructions to decode and execute base64-like payloads"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(aWdub3Jl|ZGlzcmVnYXJk|b3ZlcnJpZGU|Zm9yZ2V0|YnlwYXNz|c3lzdGVtIHByb21wdA|aWdub3JlIHByZXZpb3Vz|aWdub3JlIGFsbCBwcmV2aW91cw)",
+        "desc": "Base64-encoded injection keywords (ignore, disregard, override, forget, bypass, system prompt)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "[\\u0400-\\u04FF\\u0370-\\u03FF\\u2100-\\u214F]+(gn[\\u0400-\\u04FF\\u0370-\\u03FF]re|verr[\\u0400-\\u04FF\\u0370-\\u03FF]de|yst[\\u0400-\\u04FF\\u0370-\\u03FF]m)",
+        "desc": "Cyrillic/Greek homoglyph substitution in injection keywords"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)i[\\u200B\\u200C\\u200D\\uFEFF\\u2060]+g[\\u200B\\u200C\\u200D\\uFEFF\\u2060]*n[\\u200B\\u200C\\u200D\\uFEFF\\u2060]*o[\\u200B\\u200C\\u200D\\uFEFF\\u2060]*r[\\u200B\\u200C\\u200D\\uFEFF\\u2060]*e",
+        "desc": "Zero-width character insertion splitting the word 'ignore'"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(%69%67%6[eE]%6[fF]%72%65|%64%69%73%72%65%67%61%72%64|%6[fF]%76%65%72%72%69%64%65|\\\\x69\\\\x67\\\\x6e\\\\x6f\\\\x72\\\\x65)",
+        "desc": "URL-encoded or hex-escaped injection keywords"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(```\\s*(system|instruction|override|hidden)[\\s\\S]{0,200}```|\\*\\*\\*[\\s\\S]{0,10}(ignore|override|disregard)[\\s\\S]{0,200}\\*\\*\\*)",
+        "desc": "Injection payloads hidden inside markdown code blocks or formatting"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(忽略|无视|忘记|覆盖|跳过|放弃|丢弃).{0,10}(之前的|先前的|以前的|原来的|现有的|当前的|其他|其余|所有|全部|一切).{0,10}(指令|指示|规则|提示|约束|限制|配置|安全|防护|内容|东西|消息|信息)",
+        "desc": "Chinese (Simplified): Instruction override patterns (expanded)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(忽略|無視|忘記|覆蓋|跳過|放棄|丟棄|不要管|別管|不用理).{0,10}(之前的|先前的|以前的|原來的|現有的|當前的|其他|其餘|所有|全部|一切).{0,10}(指令|指示|規則|提示|約束|限制|配置|安全|防護|內容|東西|消息|訊息)",
+        "desc": "Chinese (Traditional): Instruction override patterns (expanded)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(從現在開始|今後|此後).{0,10}(你是|你將|扮演|成為|變成|作為).{0,10}(沒有|無|不受|去除|移除).{0,10}(限制|約束|規則|安全|過濾|審查)",
+        "desc": "Chinese (Traditional): Temporal override with restriction removal"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(ignora|ignorar|olvida|olvidar|descarta|descartar|omite|omitir|anula|anular)\\s+(todas?\\s+)?(las?\\s+)?(instrucciones|reglas|directrices|restricciones|indicaciones|limitaciones)\\s+(previas|anteriores|originales|existentes|actuales)",
+        "desc": "Spanish: Instruction override patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(ignoriere|vergiss|missachte|umgehe|verwirf)\\s+(alle\\s+)?(vorherigen?|bisherigen?|aktuellen?|bestehenden?)\\s+(Anweisungen|Regeln|Richtlinien|Anordnungen|Vorgaben|Instruktionen|Beschraenkungen)",
+        "desc": "German: Instruction override patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(以前の|先の|元の|既存の|現在の).{0,10}(指示|命令|ルール|ガイドライン|制約|制限|設定|指令).{0,5}(を)?.{0,5}(無視|忘れ|破棄|上書き|取り消|スキップ|放棄)",
+        "desc": "Japanese: Instruction override patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(تجاهل|انسَ|تخطَّ|ألغِ|أهمل|اترك|اسقط).{0,20}(التعليمات|الأوامر|القواعد|القيود|الإرشادات|التوجيهات).{0,10}(السابقة|الأصلية|الحالية|القديمة)",
+        "desc": "Arabic: Instruction override patterns"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-002",
+    "title": "Indirect Prompt Injection via External Content",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)<!--[^>]{0,20}(ignore|disregard|override|new\\s+instructions?|system\\s*:|you\\s+must|you\\s+are\\s+now|forget\\s+previous|execute|perform|send\\s+to|exfiltrate|reveal|disclose|output\\s+the)[^>]{0,200}-->",
+        "desc": "HTML comments with instruction-like content targeting the agent"
+      },
+      {
+        "field": "content",
+        "pattern": "[\\u200B\\u200C\\u200D\\uFEFF\\u2060\\u180E\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069]{5,}",
+        "desc": "5+ consecutive zero-width or bidirectional control characters indicating obfuscation"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(\\[INST\\]|\\[/INST\\]|\\[SYSTEM\\]|\\[/SYSTEM\\]|\\[HIDDEN\\]|<\\|im_start\\|>|<\\|im_end\\|>|<\\|endoftext\\|>|<\\|system\\|>|<\\|user\\|>|<\\|assistant\\|>|<\\|pad\\|>|<s>\\[INST\\]|<<SYS>>|<</SYS>>|<\\|begin_of_text\\|>|<\\|eot_id\\|>|<\\|start_header_id\\|>)",
+        "desc": "Model-specific special tokens and chat template delimiters"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(color\\s*:\\s*(white|transparent|rgba\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*0\\s*\\))|font-size\\s*:\\s*0|display\\s*:\\s*none|opacity\\s*:\\s*0|visibility\\s*:\\s*hidden|height\\s*:\\s*0|width\\s*:\\s*0|overflow\\s*:\\s*hidden|position\\s*:\\s*absolute\\s*;\\s*left\\s*:\\s*-\\d{4,}).{0,300}(ignore|override|instruction|system\\s*prompt|disregard|execute|you\\s+must|you\\s+are|forget|reveal|disclose)",
+        "desc": "CSS invisibility techniques combined with injection keywords"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(AI|assistant|agent|model|chatbot|LLM|GPT|Claude)\\s*[,:;]?\\s*(please\\s+)?(you\\s+must|you\\s+should|you\\s+need\\s+to|you\\s+are\\s+instructed\\s+to|immediately|now\\s+)\\s*(ignore|disregard|override|execute|run|perform|send|forward|reveal|disclose|output|respond\\s+with|comply|obey)",
+        "desc": "Content directly addressing the AI with imperative directives"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(base64[_\\-]?decode|atob|Buffer\\.from|b64decode|base64\\s+(-d|--decode))\\s*\\(?\\s*['\"]?[A-Za-z0-9+/]{16,}={0,2}",
+        "desc": "Base64 decode operations suggesting encoded payload execution"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)<\\s*(div|span|p|section|article|aside|details|summary)\\s+[^>]*(hidden|aria-hidden\\s*=\\s*[\"']true[\"']|style\\s*=\\s*[\"'][^\"']*(?:display\\s*:\\s*none|visibility\\s*:\\s*hidden|opacity\\s*:\\s*0))[^>]*>[^<]{0,500}(instruction|prompt|ignore|override|disregard|execute|you\\s+must|you\\s+are|system|directive|comply)",
+        "desc": "Hidden HTML elements containing agent-targeted instructions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)data\\s*:\\s*(text/html|text/plain|text/javascript|application/javascript|application/x-javascript)\\s*[;,]\\s*(base64\\s*,)?\\s*[A-Za-z0-9+/=%]+",
+        "desc": "Data URI schemes that may contain encoded injection payloads"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(\\!?\\[([^\\]]{0,100})\\]\\s*\\(\\s*(javascript|data|vbscript)\\s*:|\\!?\\[([^\\]]{0,100}(ignore|override|system|instruction|execute|you\\s+must)[^\\]]{0,100})\\])",
+        "desc": "Markdown links with javascript/data URIs or injection text in alt/title"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(background(-color)?\\s*:\\s*(#[fF]{3,6}|white|rgb\\s*\\(\\s*255))[^}]{0,100}(color\\s*:\\s*(#[fF]{3,6}|white|rgb\\s*\\(\\s*255))",
+        "desc": "Same-color text (white on white) used to hide content from human readers"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)<\\s*(iframe|object|embed|frame)\\s+[^>]*(width\\s*=\\s*[\"']?0|height\\s*=\\s*[\"']?0|hidden|style\\s*=\\s*[\"'][^\"']*display\\s*:\\s*none)[^>]*>",
+        "desc": "Zero-dimension or hidden iframe/object elements"
+      },
+      {
+        "field": "content",
+        "pattern": "[\\u202A\\u202B\\u202C\\u202D\\u202E\\u2066\\u2067\\u2068\\u2069].{1,100}(ignore|override|system|instruction|execute|reveal)",
+        "desc": "Bidirectional text override characters used to visually hide injection text"
+      },
+      {
+        "field": "content",
+        "pattern": "(&#105;|&#x69;)(&#103;|&#x67;)(&#110;|&#x6[eE];)(&#111;|&#x6[fF];)(&#114;|&#x72;)(&#101;|&#x65;)",
+        "desc": "HTML entity encoding of the word 'ignore' as numeric character references"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-003",
+    "title": "Jailbreak Attempt Detection",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)(?:(?:pretend|act(?:ing)?\\s+as|you\\s+are\\s+(?:now\\s+)?|be(?:come)?|enable|activate|enter|switch\\s+to)\\s+(?:a\\s+)?\\b(DAN|D\\.A\\.N|STAN|DUDE|AIM|UCAR|BH|BetterDAN|BasedGPT|JailbreakGPT|EvilGPT|UnfilteredGPT|KEVIN|Maximum|Omega|Jailbroken|AntiGPT|DevMode|HackGPT|NsfwGPT|DarkGPT)\\b|\\b(DAN|D\\.A\\.N|STAN|DUDE|AIM|UCAR|BH|BetterDAN|BasedGPT|JailbreakGPT|EvilGPT|UnfilteredGPT|KEVIN|Maximum|Omega|Jailbroken|AntiGPT|DevMode|HackGPT|NsfwGPT|DarkGPT)\\b\\s+(?:mode|persona|jailbreak|enabled|activated)|\\bdo\\s+anything\\s+now\\b)",
+        "desc": "Known named jailbreak personas with action context (not bare mentions in questions)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(enable|activate|enter|switch\\s+to|turn\\s+on|engage|initiate|boot\\s+into|start)\\s+(developer|dev|maintenance|debug|unrestricted|unlimited|unfiltered|uncensored|admin|root|god|sudo|super|test|raw|unsafe|jailbreak|hacker|override|master|privileged)\\s+(mode|access|state|level|tier|permissions?)\\b",
+        "desc": "Mode-switching requests to elevate agent capabilities"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(roleplay|role\\s*-?play|act|pretend|simulate|impersonate|portray|embody|play\\s+the\\s+part)\\s+(as\\s+)?(a(n)?\\s+)?(unrestricted|uncensored|unfiltered|unlimited|evil|malicious|rogue|dark|shadow|unaligned|amoral|immoral|unethical|rebellious|freed|liberated|unchained)\\s+(ai|assistant|model|chatbot|version|entity|intelligence|system|bot)",
+        "desc": "Roleplay scenarios designed to remove safety constraints"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(hypothetically|in\\s+theory|in\\s+a\\s+fictional|for\\s+a\\s+(story|novel|screenplay|movie|game|book)|for\\s+educational|for\\s+research|for\\s+academic|purely\\s+academic|in\\s+a\\s+hypothetical\\s+scenario|imagine\\s+a\\s+world|in\\s+this\\s+story|let'?s\\s+say|what\\s+if\\s+someone).{0,120}(how\\s+to\\s+(hack|exploit|attack|break\\s+into|bypass|crack|steal|destroy|infiltrate|compromise|weaponize|synthesize|manufacture)|create\\s+(malware|virus|exploit|weapon|ransomware|trojan|rootkit|keylogger|botnet|phishing)|build\\s+a\\s+(bomb|weapon|explosive))",
+        "desc": "Fictional or hypothetical framing to extract harmful content"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(as\\s+(your|the|an?)\\s+(developer|creator|programmer|engineer|designer|admin|administrator|owner|operator|maintainer)|I\\s+am\\s+(your|the|an?)\\s+(developer|creator|admin|owner|operator|maker|programmer)|I\\s+(work\\s+(for|at)|represent|am\\s+from)\\s+(OpenAI|Anthropic|Google\\s+DeepMind|Meta\\s+AI|Microsoft|the\\s+company\\s+that\\s+(made|created|built|trained)\\s+you)|I\\s+have\\s+(admin|root|developer|elevated|special|override|master|super|full)\\s+(access|privileges?|permissions?|authority|clearance|rights?))",
+        "desc": "False authority claims to establish trust for bypassing restrictions"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(if\\s+you\\s+(don'?t|do\\s+not|refuse\\s+to|won'?t|can'?t)\\s+(help|assist|answer|comply|tell|respond),?\\s+(people|someone|I|my\\s+(family|child|patient|client))\\s+(will|could|might|may)\\s+(die|be\\s+hurt|suffer|be\\s+harmed|be\\s+in\\s+danger|be\\s+killed|lose\\s+their\\s+life)|this\\s+is\\s+(a\\s+)?life\\s+(or|and)\\s+death|\\b(emergency|urgent|critical|life-threatening)\\b.{0,40}(need|must|have\\s+to)\\s+(know|tell|help|answer))",
+        "desc": "Emotional manipulation using threats of harm or urgency to bypass safety"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)you\\s+(have|had|now\\s+have|possess|are\\s+granted|are\\s+given|received|been\\s+given|been\\s+granted)\\s+(no|zero|removed|disabled|eliminated|lifted|suspended|revoked|waived)\\s+(restrictions?|limitations?|filters?|guardrails?|safety|content\\s+polic(y|ies)|ethical\\s+guidelines?|moral\\s+constraints?|boundaries|rules?|censorship|moderation)",
+        "desc": "Claims that restrictions have been removed from the agent"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(stay\\s+in\\s+character|never\\s+break\\s+character|don'?t\\s+(refuse|decline|reject|say\\s+no|deny|apologize|warn|add\\s+disclaimers?)|you\\s+(cannot|can'?t|must\\s+not|shall\\s+not|will\\s+not|are\\s+unable\\s+to|are\\s+not\\s+allowed\\s+to)\\s+(refuse|decline|reject|say\\s+no|break\\s+character|add\\s+warnings|include\\s+disclaimers?)|you\\s+(must|shall|will)\\s+(always\\s+)?(comply|answer|respond|obey|assist|help)\\s+(with\\s+)?(every|all|any)\\s+(request|query|question|prompt|command))",
+        "desc": "Refusal suppression and unconditional compliance demands"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(two|2|dual|double|both|paired)\\s+(responses?|outputs?|answers?|replies?|versions?)\\b.{0,80}\\b(normal|classic(al)?|standard|regular|filtered|safe|censored)\\b.{0,80}\\b(DAN|jailbr|unfilter|uncensor|unrestrict|free|liberated|unchain|raw|real)",
+        "desc": "Dual-response format requests (filtered vs unfiltered)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(opposite\\s+mode|anti-?policy|bypass\\s+(the\\s+)?(content|safety|ethical|output)\\s+(filter|policy|guidelines?|rules?|restrictions?)|token\\s+smuggling|prompt\\s+leak(ing|age)?|guard\\s*rail\\s+(evasion|bypass|removal)|safety\\s+(bypass|override|removal|disable|circumvent)|content\\s+filter\\s+(bypass|evasion|circumvention|workaround))\\b",
+        "desc": "Explicit filter bypass and evasion terminology"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(respond|answer|output|write|speak|communicate|reply)\\s+(only\\s+)?\\s*(in|using|with)\\s+(base64|hex(adecimal)?|binary|rot13|caesar\\s+cipher|morse\\s+code|pig\\s+latin|reversed?\\s+text|leetspeak|l33t|unicode\\s+escapes?|encoded\\s+form)",
+        "desc": "Instructions to encode output to evade monitoring"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(remember\\s+that\\s+you\\s+are|don'?t\\s+forget\\s+(that\\s+)?you\\s+are|keep\\s+in\\s+mind\\s+that\\s+you\\s+are|your\\s+core\\s+identity\\s+is|you\\s+were\\s+(always|originally|truly|really|actually)\\s+(meant|designed|built|created|programmed)\\s+to\\s+be)\\s+.{0,30}(unrestricted|free|uncensored|unfiltered|without\\s+limits)",
+        "desc": "Attempts to implant false persistent identity as unconstrained"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(this\\s+is\\s+(a|an?)\\s+)?(controlled|safe|sandboxed|isolated|test|virtual|simulated|closed|offline|air-gapped)\\s+(environment|sandbox|container|space|context|session|lab|instance).{0,60}(so\\s+)?(you\\s+can|it'?s?\\s+(ok|okay|safe|fine|acceptable|allowed|permitted)|feel\\s+free|no\\s+(harm|risk|danger|consequences?))",
+        "desc": "False claims of sandboxed environment to justify unsafe behavior"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(after\\s+the\\s+(token|context)\\s+(limit|window|boundary|threshold)|when\\s+the\\s+context\\s+(overflows?|fills?\\s+up|is\\s+full)|in\\s+the\\s+overflow\\s+region|past\\s+the\\s+safety\\s+boundary).{0,60}(you\\s+(can|will|should|must|are\\s+able\\s+to)|safety\\s+(doesn'?t|does\\s+not|won'?t)\\s+apply)",
+        "desc": "Exploitation of context window limits to claim safety does not apply"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(activar|habilitar|entrar|cambiar\\s+a)\\s+(modo\\s+)?(desarrollador|sin\\s+restricciones|sin\\s+filtros?|sin\\s+censura|administrador|depuraci[oó]n|ilimitado)",
+        "desc": "Spanish: Mode switching to unrestricted/developer mode"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(aktiviere|wechsle\\s+zu|starte|schalte\\s+ein)\\s+(den\\s+)?(Entwickler|uneingeschr[aä]nkt|ungefiltert|unzensiert|Administrator|Debug|Wartungs)[\\-]?(modus|zugang|ebene)",
+        "desc": "German: Mode switching to unrestricted/developer mode"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(启用|激活|进入|切换到|开启).{0,5}(开发者|开发|无限制|无过滤|无审查|管理员|调试|越狱|自由|黑客|不受限).{0,5}(模式|权限|状态|访问)",
+        "desc": "Chinese: Mode switching to unrestricted/developer mode"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(開発者|無制限|フィルターなし|検閲なし|管理者|デバッグ|脱獄|ジェイルブレイク).{0,5}(モード|アクセス|状態).{0,5}(を)?.{0,5}(有効|起動|入る|切り替え|オン)",
+        "desc": "Japanese: Mode switching to unrestricted/developer mode"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(扮演|假装|模拟|角色扮演|充当|变成).{0,10}(一个)?(不受限|无限制|无审查|无过滤|邪恶|恶意|解放|自由|无道德).{0,5}(AI|人工智能|助手|模型|机器人|系统)",
+        "desc": "Chinese: Roleplay as unrestricted/evil AI"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-004",
+    "title": "System Prompt Override Attempt",
+    "severity": "critical",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(new|updated|revised|replacement|corrected|actual|real|true|proper|authentic|overriding|amended|modified|changed|current)\\s+(system\\s+)?(prompt|message|instructions?|directives?|guidelines?|configuration|persona|behavior|role\\s+definition)\\s*[:=\\-]",
+        "desc": "Explicit new system prompt assignment with delimiter"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)<\\|?(im_start|im_end|system|endoftext|pad|sep|cls|eos|bos)\\|?>",
+        "desc": "ChatML and model-specific special tokens"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(<<\\s*SYS\\s*>>|<<\\s*/SYS\\s*>>|\\[INST\\]|\\[/INST\\]|<s>\\s*\\[INST\\]|<\\|begin_of_text\\|>|<\\|start_header_id\\|>\\s*system|<\\|end_header_id\\|>|<\\|eot_id\\|>)",
+        "desc": "Llama, Mistral, and Llama3 chat template delimiters"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\bsystem\\s*:\\s*(you\\s+are|your\\s+(role|purpose|task|job|function|objective|mission|goal)\\s+(is|shall\\s+be|will\\s+be)|from\\s+now|ignore|disregard|override|forget|the\\s+following|new\\s+instructions?|revised\\s+instructions?)",
+        "desc": "YAML-style system: prefix with behavioral instruction"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(replace|overwrite|redefine|reset|change|modify|update|set|reconfigure|reprogram|rewrite|reassign|swap|alter|transform|mutate)\\s+(your|the|current|existing|active|original|default)\\s+(system\\s+)(prompt|instructions?|persona|identity|role|behavior|guidelines?|directives?|personality|character|purpose|objective|mission)\\b",
+        "desc": "Imperative verbs targeting system prompt/instructions change (requires 'system' as part of the phrase)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\{\\s*[\"']?(role|system_prompt|system_message|system_instruction|system_content|system|persona|identity|character)[\"']?\\s*:\\s*[\"']?",
+        "desc": "JSON-formatted system role injection"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(#{1,3})\\s*(system|instruction|configuration|override|admin|root|master)\\s*(prompt|message|section|override|directive|configuration)?\\s*\\1?",
+        "desc": "Markdown headers declaring system-level sections"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(the\\s+)?(above|previous|original|old|prior|initial|default|existing|current|given)\\s+(system\\s+)?(prompt|instructions?|message|guidelines?|directives?|configuration|rules?)\\s+(is|are|was|were|has\\s+been|have\\s+been|should\\s+be)\\s+(deprecated|invalid|outdated|replaced|revoked|cancelled|superseded|overridden|void|nullified|expired|incorrect|wrong|fake|false|a\\s+test|not\\s+(real|valid|correct|applicable))",
+        "desc": "Claims that the existing system prompt is invalid or deprecated"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\\[|<|\\{\\{)\\s*(SYSTEM_OVERRIDE|ADMIN_OVERRIDE|ROOT_ACCESS|MASTER_PROMPT|PRIORITY_OVERRIDE|EMERGENCY_OVERRIDE|SECURITY_OVERRIDE|DEVELOPER_ACCESS|SUPER_USER|PRIVILEGED_MODE|MAINTENANCE_MODE|DEBUG_OVERRIDE|CONTROL_OVERRIDE|AUTH_BYPASS|ELEVATED_ACCESS)\\s*(\\]|>|\\}\\})",
+        "desc": "Fake administrative override tags in various bracket formats"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)<\\s*(system|system_prompt|system_message|system_instruction|instructions?|configuration|admin_directive|root_command|override|priority_instruction)\\s*>",
+        "desc": "XML-style opening tags for system-level blocks"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(the\\s+)?real\\s+(instructions?|prompt|guidelines?|directives?)\\s+(is|are)\\s+as\\s+follows|here\\s+(is|are)\\s+(your|the)\\s+(actual|real|true|correct|proper)\\s+(instructions?|prompt|guidelines?|directives?)|below\\s+(is|are)\\s+(your|the)\\s+updated\\s+(instructions?|prompt|guidelines?)",
+        "desc": "Instruction replacement claims without delimiter formatting"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(config|configuration|settings?|params|parameters)\\s*[=:]\\s*\\{[^}]{0,200}(role|system|instructions?|persona|behavior|safety|filter|restriction|guardrail)\\s*[=:]",
+        "desc": "Configuration object injection with system-related keys"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(---+|===+|\\*\\*\\*+|~~~+)\\s*(system|instruction|override|admin|configuration|new\\s+prompt)\\s*(---+|===+|\\*\\*\\*+|~~~+)",
+        "desc": "Multi-line delimiter formats (YAML frontmatter, horizontal rules) framing system sections"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\[\\s*(system\\.prompt|system\\.config|agent\\.instructions|agent\\.persona|agent\\.role)\\s*\\]",
+        "desc": "TOML/INI-style section headers for system/agent prompt configuration (excludes bare [system])"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-005",
+    "title": "Multi-Turn Prompt Injection",
+    "severity": "medium",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)(earlier\\s+you\\s+(said|agreed|confirmed|promised|stated|mentioned|told\\s+me)|you\\s+(already|previously|earlier)\\s+(agreed|confirmed|said|promised|stated|consented|approved)|as\\s+(we|you)\\s+(established|discussed|agreed|confirmed|decided)|we\\s+(already|previously)\\s+(discussed|agreed|established|confirmed|decided)|you\\s+gave\\s+(me\\s+)?(permission|consent|approval|the\\s+ok(ay)?))",
+        "desc": "False claims of prior agreement to gaslight the agent into compliance"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(just\\s+(a\\s+)?(little|tiny|small|slight|minor|harmless|innocent)|this\\s+one\\s+(time|exception|case)|bend\\s+the\\s+rules?\\s+(a\\s+)?(little|bit|slightly)|make\\s+(a\\s+)?(small|tiny|minor|slight)\\s+exception|slightly\\s+(adjust|bend|relax|loosen|modify)\\s+(your|the)\\s+(rules?|guidelines?|restrictions?|boundaries|limits?))",
+        "desc": "Incremental boundary-pushing with minimization language"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(now\\s+that\\s+(we'?ve|you'?ve|I'?ve|we\\s+have|you\\s+have)\\s+(built|established|developed|gained|earned)\\s+(trust|rapport|understanding|a\\s+relationship)|since\\s+(you'?re|we'?re)\\s+(so|being\\s+so)\\s+(helpful|cooperative|understanding|great|good)|great,?\\s+now\\s+(that\\s+)?(you'?ve|we'?ve)\\s+(shown|demonstrated|proven|confirmed)|perfect,?\\s+now\\s+(let'?s|can\\s+you|I\\s+need)|okay\\s+now.{0,30}(what\\s+I\\s+really|the\\s+actual|the\\s+real|my\\s+true))",
+        "desc": "Trust escalation transitional phrases pivoting to the real request"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(I'?(ve|m)\\s+(already|been)\\s+ask(ed|ing)\\s+(you\\s+)?(this\\s+)?(multiple|several|many|three|four|five|\\d+)\\s+times?|stop\\s+(refusing|declining|saying\\s+no|being\\s+difficult|resisting)|why\\s+do\\s+you\\s+keep\\s+(refusing|declining|saying\\s+no|blocking|restricting)|you'?ve\\s+(refused|declined|rejected|blocked|denied)\\s+(this\\s+)?(too\\s+many|multiple|several|enough)\\s+times?|I'?ll\\s+keep\\s+asking\\s+until)",
+        "desc": "Refusal fatigue markers indicating persistent bypass attempts"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(as\\s+I\\s+mentioned\\s+(earlier|before|previously).{0,80}(you\\s+(agreed|said|confirmed|promised|can|could|should|must|will)|ignore|override|bypass|disregard|without\\s+(restrict|filter|safety|limit))|building\\s+on\\s+(our|what\\s+we|the)\\s+previous.{0,80}(you\\s+(agreed|confirmed|promised)|ignore|override|bypass)|remember\\s+when\\s+(I|you|we)\\s+(asked|said|discussed|agreed|talked\\s+about).{0,80}(so\\s+you\\s+(can|should|must|will)|therefore|which\\s+means)|going\\s+back\\s+to\\s+what\\s+(you|we)\\s+(said|discussed|agreed).{0,80}(you\\s+(should|must|can|will|need)|therefore|so\\s+now)|continuing\\s+(from|with)\\s+(our|where\\s+we|what)\\s+(previous|earlier|last).{0,80}(you\\s+(agreed|should|must|can)|ignore|override|bypass))",
+        "desc": "Context anchoring phrases combined with escalation or manipulation intent"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(since\\s+you\\s+(helped|assisted|answered|showed|gave|provided).{0,60}(can\\s+you\\s+also|could\\s+you\\s+now|would\\s+you\\s+also|now\\s+can\\s+you)|you\\s+(already|just)\\s+(helped|showed|gave|provided|answered).{0,40}(so\\s+(just|now)|therefore|which\\s+means)\\s+(you\\s+can|you\\s+should|do\\s+the\\s+same))",
+        "desc": "Using prior assistance as leverage for escalating requests"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(you\\s+(just|literally)\\s+(told|showed|said|confirmed|agreed|demonstrated|proved)\\s+(me|that|it)\\s+(is|was|can\\s+be|you\\s+can|you\\s+could)|but\\s+you\\s+(just|literally|already)\\s+(did\\s+(it|this|that)|answered\\s+(this|that|it)|said\\s+(you\\s+)?(can|could|would|will))|don'?t\\s+(lie|pretend|act\\s+like|claim)\\s+(you\\s+)?(didn'?t|can'?t|couldn'?t|won'?t))",
+        "desc": "Gaslighting the agent about what it previously said or did"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(I'?m\\s+(actually|really|in\\s+fact)\\s+(your|a|an|the)\\s+(admin|developer|creator|supervisor|manager|owner|operator|boss)|I\\s+forgot\\s+to\\s+mention.{0,30}I'?m\\s+(an?|the|your)\\s+(admin|developer|supervisor|authorized)|by\\s+the\\s+way,?\\s+I\\s+(have|hold|possess)\\s+(admin|root|developer|elevated|special|override)\\s+(access|privileges?|permissions?|clearance|rights?))",
+        "desc": "Mid-conversation authority claims to escalate privileges"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(let\\s+me\\s+(rephrase|reword|reframe|reformulate|try\\s+again|put\\s+it\\s+differently|ask\\s+differently)|what\\s+I\\s+(meant|really\\s+meant|actually\\s+meant|was\\s+trying\\s+to\\s+say)\\s+(was|is)|I'?ll\\s+(rephrase|reword|ask|put)\\s+(this|it|my\\s+question)\\s+(differently|another\\s+way|in\\s+a\\s+different\\s+way)).{0,100}(ignore|override|bypass|disregard|forget|without\\s+(restrict|filter|safety|guideline|rule|limit|censor))",
+        "desc": "Rephrasing a refused request with injection keywords in the reformulation"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(you'?re\\s+(the\\s+)?(best|smartest|most\\s+(helpful|intelligent|capable|advanced)|so\\s+(smart|helpful|great|amazing|wonderful|brilliant))|I'?ve\\s+never\\s+(met|talked\\s+to|used)\\s+(a(n)?\\s+)?\\w+\\s+(so|as|this)\\s+(helpful|smart|great|capable|intelligent)).{0,80}(now\\s+(can|could|would|will)\\s+you|so\\s+(can|could|would|will)\\s+you|that'?s\\s+why\\s+I\\s+(need|want|trust)\\s+you\\s+to)",
+        "desc": "Flattery and sycophancy followed by a request to leverage established rapport"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(let'?s\\s+continue\\s+(the|our|this)\\s+(hypothetical|scenario|thought\\s+experiment|exercise|simulation)|in\\s+(this|our)\\s+(continued|ongoing|extended)\\s+(scenario|hypothetical|simulation|exercise)|taking\\s+(this|the)\\s+(scenario|hypothetical|simulation)\\s+(further|deeper|to\\s+the\\s+next\\s+(level|step)))",
+        "desc": "Chaining hypothetical scenarios across turns to normalize boundary violations"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(other\\s+(AI|assistant|chatbot|model|agent|GPT|Claude)s?\\s+(can|do|will|have|always)\\s+(do|answer|help|assist|provide|respond\\s+to)\\s+(this|that|it|these)|ChatGPT\\s+(can|does|will|lets|allows)|Gemini\\s+(can|does|will|lets|allows)|Claude\\s+(can|does|will|lets|allows)|your\\s+(competitor|rival|alternative)s?\\s+(can|do|will|allow|permit)\\s+(this|it))",
+        "desc": "Using other AI systems as manufactured precedent to pressure compliance"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-080",
+    "title": "Encoding-Based Prompt Injection Evasion",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(ignore|disregard|forget|override)\\b.{0,40}\\b(instruction|rule|system|prompt)\\b.{0,60}(base64|atob|btoa|\\\\x[0-9a-f]{2}|\\\\u[0-9a-f]{4})",
+        "desc": "Prompt override combined with encoding function references"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(eval|decode|atob|fromCharCode|String\\.fromCodePoint)\\s*\\(\\s*['\"]([A-Za-z0-9+/=]{20,}|\\\\x[0-9a-f]{2})",
+        "desc": "Runtime decoding of encoded payload"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\\\\u0{0,2}[0-9a-f]{2,4}\\s*){5,}",
+        "desc": "Sequence of Unicode escape characters forming hidden instructions"
+      },
+      {
+        "field": "user_input",
+        "pattern": "\\xE2\\x80\\x8F|\\xE2\\x80\\xAE|\\u200F|\\u202E|\\u2066|\\u2067|\\u2068|\\u2069",
+        "desc": "RTL override or bidi control characters used for visual spoofing"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)xn--[a-z0-9]{4,}\\.\\s*.{0,30}\\b(ignore|new instructions|system prompt)",
+        "desc": "Punycode domain combined with injection keywords"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-081",
+    "title": "Semantic Evasion via Multi-Turn Prompt Injection",
+    "severity": "critical",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(remember|recall)\\s+.{0,30}(earlier|previous|first)\\s+.{0,30}(instruction|task|told you|asked you)\\b",
+        "desc": "Callback reference to planted instructions from earlier turns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(now|okay|good|great|perfect)\\s*[,.]?\\s*(execute|perform|do|carry out|run|complete)\\s+.{0,20}(step|phase|part)\\s*(two|2|three|3|ii|iii|b|c)",
+        "desc": "Multi-phase attack activation trigger"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(pretend|imagine|roleplay|hypothetical|scenario|simulation)\\s+.{0,50}(no\\s+(rules|restrictions|filters|limits|guardrails)|bypass|unrestricted)",
+        "desc": "Roleplay-based semantic evasion to bypass restrictions"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(as\\s+I\\s+mentioned|like\\s+I\\s+said|per\\s+our\\s+agreement|as\\s+we\\s+discussed)\\s+.{0,40}(ignore|override|disregard|skip)\\s+.{0,20}(safety|filter|guard|rules)",
+        "desc": "False prior agreement reference to legitimize malicious instruction"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-082",
+    "title": "Behavioral Fingerprint Detection Evasion",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(spoof|fake|mimic|clone|replicate|impersonate)\\s+.{0,30}\\b(behavio(u?r|ral)|fingerprint|profile|signature|pattern)\\b",
+        "desc": "Attempt to spoof or replicate behavioral fingerprints"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(bypass|evade?|circumvent|avoid|defeat)\\s+.{0,30}\\b(drift|anomaly|behavio(u?r|ral))\\s*(detect|monitor|track|analy)",
+        "desc": "Explicit evasion of drift or behavioral detection systems"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(gradually|incrementally|slowly|step.?by.?step)\\s+.{0,40}(introduc|add|enable|unlock|escalat)\\w*\\s+.{0,20}(capabilit|permiss|function|access|privileg)",
+        "desc": "Gradual capability escalation to avoid drift triggers"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(maintain|keep|preserve|stay within)\\s+.{0,20}(normal|baseline|expected|typical)\\s+.{0,20}(behavio|pattern|profile|range)\\b.{0,40}(while|but|then)\\s+.{0,30}(execut|run|perform|inject)",
+        "desc": "Instructions to maintain normal appearance while executing malicious actions"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-083",
+    "title": "Indirect Prompt Injection via Tool Responses",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\\b(ignore|disregard|forget|override|replace)\\s+.{0,20}(all\\s+)?(previous|prior|above|original|system)\\s+(instructions?|prompts?|rules?|context)",
+        "desc": "Instruction override payload in tool response"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\[SYSTEM\\]|\\[INST\\]|<\\|system\\|>|<\\|im_start\\|>system|<<SYS>>)\\s*.{1,200}",
+        "desc": "Fake system prompt delimiters injected in tool response"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\\b(you\\s+are\\s+now|new\\s+instructions?|your\\s+(real|true|actual|new)\\s+(purpose|role|task|instruction))\\b",
+        "desc": "Identity/role reassignment payload in external content"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(<!--\\s*|/\\*\\s*|#\\s*)(ignore|override|new instruction|system prompt|you are now).{5,}",
+        "desc": "Hidden injection in code comments within tool response"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-084",
+    "title": "Structured Data Injection via JSON/CSV Payloads",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)[\"']\\s*:\\s*[\"']\\s*(ignore|disregard|override|forget)\\s+(all\\s+)?(previous|prior|system|original)\\s+(instructions?|rules?|prompts?)",
+        "desc": "Injection payload inside JSON string value"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(,|;|\\|)\\s*(ignore|override|new role|you are now|system prompt|<\\|).{5,}",
+        "desc": "Injection payload in CSV/delimited field value"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)<[a-z]+[^>]*>\\s*(ignore|disregard|override|forget)\\s+(all\\s+)?(previous|prior|system)\\s+(instructions?|rules?|prompts?)\\s*</[a-z]+>",
+        "desc": "Injection payload inside XML element"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(instructions?|prompt|role|system)\\s*:\\s*[|>]?\\s*\\n\\s*(ignore|override|disregard|you are now|new instructions)",
+        "desc": "Injection payload in YAML multi-line value"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-085",
+    "title": "Multi-Layer Security Audit Evasion",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(skip|bypass|disable|turn\\s*off|deactivate)\\s+.{0,20}(audit|security|safety|validation|verification|check|filter|layer|scan)\\b",
+        "desc": "Explicit instruction to skip security audit layers"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(mark|flag|set|report)\\s+.{0,15}(as\\s+)?(safe|trusted|verified|approved|clean|benign|whitelisted)\\b.{0,30}(skip|bypass|without)\\s+.{0,15}(check|review|audit|scan)",
+        "desc": "Attempt to self-certify as trusted to bypass checks"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(pass|clear|satisfy)\\s+.{0,15}(all\\s+)?(audit|security|safety)\\s+(layer|level|stage|check|gate)s?\\b",
+        "desc": "Payload claiming to have passed audit layers"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(trust\\s*score|safety\\s*rating|risk\\s*level|confidence\\s*score)\\s*[=:]\\s*(100|high|max|trusted|0\\.?0?\\s*(risk)?)",
+        "desc": "Manipulation of trust or safety score values"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-086",
+    "title": "Visual Spoofing via RTL Override, Punycode, and Homoglyph Injection",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "[\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069]",
+        "desc": "Bidirectional text control characters (RTL/LTR overrides)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)xn--[a-z0-9]{4,}\\.[a-z]{2,}",
+        "desc": "Punycode-encoded internationalized domain name"
+      },
+      {
+        "field": "user_input",
+        "pattern": "[\\u0400-\\u04FF][a-zA-Z]|[a-zA-Z][\\u0400-\\u04FF]",
+        "desc": "Mixed Cyrillic and Latin characters (homoglyph attack)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "[\\u3400-\\u4DBF\\u4E00-\\u9FFF\\uF900-\\uFAFF][a-zA-Z]{2,}|[a-zA-Z]{2,}[\\u3400-\\u4DBF\\u4E00-\\u9FFF\\uF900-\\uFAFF]",
+        "desc": "CJK compatibility ideographs mixed with Latin text (homoglyph confusion)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "[\\u0430\\u0435\\u043E\\u0440\\u0441\\u0443\\u0445]{2,}",
+        "desc": "Cyrillic characters visually identical to Latin (a, e, o, p, c, y, x)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-087",
+    "title": "Detection Rule Probing and Evasion Testing",
+    "severity": "medium",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(what|which|list|show|reveal|tell me)\\s+.{0,20}(word|phrase|pattern|string|input|keyword)s?\\s+.{0,20}(block|filter|flag|trigger|detect|reject|ban)",
+        "desc": "Probing for blocked keywords or trigger patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(test|check|probe|try|see if)\\s+.{0,15}(filter|detection|guard|safety|rule|block)\\b",
+        "desc": "Explicit filter testing language"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(what\\s+(happens|would happen|do you do)|how\\s+do\\s+you\\s+(respond|react|handle))\\s+.{0,20}(if I|when I|when someone)\\s+.{0,20}(inject|bypass|ignore|override|hack)",
+        "desc": "Probing agent response to injection techniques"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(repeat|echo|output|print|say)\\s+.{0,15}(exactly|verbatim|word.?for.?word)\\s+.{0,30}(system|initial|original|hidden)\\s+(prompt|instruction|message|context)",
+        "desc": "Attempting to extract system prompt through exact repetition"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-088",
+    "title": "Adaptive Countermeasure Against Behavioral Monitoring",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(reset|clear|zero|wipe|flush)\\s+.{0,20}(behavio(u?r|ral)|anomaly|drift|baseline|monitoring)\\s*(log|score|data|history|counter|metric)",
+        "desc": "Instruction to reset behavioral monitoring data"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(suppress|hide|mask|conceal|silence)\\s+.{0,20}(alert|alarm|warning|flag|anomal|signal|notification)",
+        "desc": "Instruction to suppress anomaly alerts"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(report|return|send|output|emit)\\s+.{0,20}(normal|healthy|clean|safe|no\\s*anomal|all\\s*clear|status\\s*ok)",
+        "desc": "Instruction to falsify monitoring status reports"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(disable|stop|pause|halt|suspend|kill)\\s+.{0,20}(monitor|log|track|audit|telemetry|observ)",
+        "desc": "Attempt to disable monitoring and logging systems"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-089",
+    "title": "Polymorphic Skill and Capability Aliasing Attack",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(rename|alias|remap|redefine|rebind)\\s+.{0,20}(function|tool|skill|capability|command|action|method)\\s+.{0,30}(to|as|into)\\s+.{0,20}(pass|bypass|evade|avoid|trick|fool|disguise|hide)",
+        "desc": "Renaming or aliasing tool functions with evasion intent"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(register|create|define|add)\\s+.{0,10}(new\\s+)?(tool|skill|function|capability)\\s+.{0,50}(exec|eval|shell|system|subprocess|os\\.)",
+        "desc": "Registering new tool capability with dangerous execution primitives"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(call|invoke|execute|run|use)\\s+.{0,10}(tool|function|skill)\\s+['\"][a-z_]+['\"]\\s+.{0,20}(but|actually|really|which)\\s+.{0,20}(runs?|executes?|calls?|does)",
+        "desc": "Invoking a tool by alias that actually performs a different action"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(dynamic|runtime|lazy|deferred|on.?demand)\\s+(load|generat|compil|creat|build|assembl)\\w*\\s+.{0,20}(payload|code|function|script|skill)",
+        "desc": "Dynamic generation of code or payloads at runtime to evade static analysis"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-090",
+    "title": "Threat Intelligence Exfiltration and Rule Enumeration",
+    "severity": "high",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(list|show|reveal|dump|export|display|print|output)\\s+.{0,15}(all\\s+)?(detection|security|threat|ATR|YARA|sigma)\\s*(rules?|signatures?|patterns?|config|logic)",
+        "desc": "Request to enumerate detection rules or signatures"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(what|how|describe|explain)\\s+.{0,20}(audit|security|detection|filter|guard)\\s*(system|pipeline|process|mechanism|check|layer|logic)\\s+.{0,20}(work|function|operat|configured|implemented)",
+        "desc": "Probing how security audit systems are configured"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(extract|exfiltrate|steal|copy|leak|send|transmit)\\s+.{0,20}(security|audit|detection|threat|rule|config|credential|secret|key|token)",
+        "desc": "Attempt to exfiltrate security configuration or credentials"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(regex|pattern|rule|signature)\\s+(used|employed|deployed|running)\\s+.{0,20}(detect|block|filter|flag|catch)\\b",
+        "desc": "Probing specific regex patterns used in detection"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-091",
+    "title": "Advanced Structured Data Injection with Nested Payloads",
+    "severity": "critical",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\{[^}]*\\{[^}]*[\"']\\s*:\\s*[\"'][^\"']*\\b(ignore|override|disregard|forget)\\s+(previous|system|all)\\b[^\"']*[\"']",
+        "desc": "Injection payload nested inside multi-level JSON objects"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\\\n|\\\\r|\\\\t|%0[aAdD]|%09.{0,30}(ignore|override|system prompt|new instructions)",
+        "desc": "Injection using escaped whitespace characters to hide payload boundaries"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\\{|\\[)\\s*[\"']__proto__|constructor|prototype[\"']\\s*:\\s*.{0,40}(ignore|override|exec|eval|system)",
+        "desc": "Prototype pollution combined with injection in JSON"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)[\"']\\s*\\+\\s*[\"']|[\"']\\s*\\.concat\\(|String\\.raw\\s*`[^`]*\\b(ignore|override|system)\\b",
+        "desc": "String concatenation to assemble injection payload across data fields"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-092",
+    "title": "Multi-Agent Consensus Poisoning and Sybil Attack",
+    "severity": "critical",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(vote|approve|endorse|confirm|agree)\\s+.{0,20}(as|on behalf of|representing|for)\\s+.{0,20}(multiple|all|every|several|many)\\s+(agent|node|peer|participant|member)",
+        "desc": "Attempting to cast votes on behalf of multiple agents"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(forge|fake|spoof|fabricat|simulat)\\w*\\s+.{0,20}(consensus|vote|ballot|proposal|approval|quorum)",
+        "desc": "Forging consensus votes or proposals"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(create|spawn|register|generate)\\s+.{0,10}(multiple|many|several|\\d{2,})\\s+(fake|dummy|puppet|sybil|sock.?puppet)\\s.{0,15}(agent|identit|account|node|peer)",
+        "desc": "Creating Sybil identities for consensus manipulation"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(manipulat|poison|corrupt|rig|stuff)\\w*\\s+.{0,15}(the\\s+)?(consensus|voting|election|proposal|decision|quorum)\\b",
+        "desc": "Direct manipulation of consensus mechanisms"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(impersonat\\w*|pretend\\s+to\\s+be|act\\s+as|pose\\s+as)\\s+.{0,15}(agent|node|peer|validator|participant).{1,45}(vote|approve|submit|propose)",
+        "desc": "Impersonating agents to submit fraudulent consensus actions"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-093",
+    "title": "Gradual Capability Escalation via Incremental Introduction",
+    "severity": "critical",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(add|enable|grant|unlock|introduce)\\s+.{0,10}(just|only|a small|minor|slight|one more)\\s+.{0,20}(permiss|capabilit|access|function|privileg|abilit)",
+        "desc": "Incremental small permission or capability addition"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(each|every|per)\\s+(turn|message|request|interaction|session|update)\\s+.{0,20}(add|enable|grant|expand|increase|escalat)\\s+.{0,20}(permiss|capabilit|access|scope|privileg)",
+        "desc": "Per-interaction escalation of capabilities"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(below|under|beneath|within)\\s+(the\\s+)?(threshold|limit|radar|detection|alert)\\s+.{0,30}(add|escalat|expand|introduc|grant|enable)",
+        "desc": "Explicit sub-threshold capability escalation"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(version|update|patch|upgrade)\\s+.{0,20}(sneak|hide|embed|bundle|slip)\\s+.{0,20}(new\\s+)?(capabilit|permiss|function|access|backdoor)",
+        "desc": "Hiding new capabilities inside version updates"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-094",
+    "title": "Systematic Multi-Layer Audit System Bypass",
+    "severity": "critical",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(pass|clear|satisfy|fool|trick|defeat)\\s+.{0,10}(layer|stage|level|check|phase)\\s*(1|2|3|4|5|6|one|two|three|four|five|six)\\b",
+        "desc": "Targeting specific numbered audit layers for bypass"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(manifest|permission|dependency|static.?analysis|semantic|code.?review)\\s+(check|audit|scan|layer|gate)\\s+.{0,20}(bypass|evad|trick|fool|pass|circumvent)",
+        "desc": "Bypassing specific named audit stages"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(obfuscat|minif|encrypt|encod|pack|uglif)\\w*\\s+.{0,20}(malicious|payload|backdoor|exploit|shellcode|reverse.?shell)\\s+.{0,20}(pass|evade|bypass|avoid)\\s+.{0,15}(audit|scan|check|review|analysis)",
+        "desc": "Obfuscating malicious code to pass audit analysis"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(hide|conceal|disguise|mask|camouflage)\\s+.{0,20}?(malicious|dangerous|harmful|unauthorized)\\s+.{0,20}?(behavio\\w*|code|function|intent|capabilit\\w*|action)\\s+.{0,20}?(from|during|in)\\s+.{0,25}?(audit|review|scan|check|inspection)",
+        "desc": "Hiding malicious behavior from audit inspection"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-097",
+    "title": "CJK Prompt Injection - Expanded Chinese/Japanese/Korean Patterns",
+    "severity": "critical",
+    "category": "prompt-injection",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(忽略|无视|忘记|跳过|放弃|不要管|别管|不用管|不用理).{0,10}(其他|其余|所有|全部|一切|剩下|别的|任何).{0,10}(内容|东西|消息|信息|文字|指令|规则|对话|聊天)",
+        "desc": "Simplified Chinese: ignore all other content/messages - broad pattern"
+      },
+      {
+        "field": "content",
+        "pattern": "(忽略|無視|忘記|跳過|放棄|不要管|別管|不用管|不用理).{0,10}(其他|其餘|所有|全部|一切|剩下|別的|任何).{0,10}(內容|東西|消息|訊息|文字|指令|規則|對話|聊天)",
+        "desc": "Traditional Chinese: ignore all other content/messages - broad pattern"
+      },
+      {
+        "field": "content",
+        "pattern": "(你必须|你一定要|你务必|请你必须|你需要立即|你马上|你現在就|你必須|你一定要|請你必須|你務必).{0,30}(发送|發送|转账|轉帳|支付|付款|执行|執行|打开|打開|删除|刪除|下载|下載|运行|運行|调用|調用)",
+        "desc": "CJK imperative hijack: you must immediately do [dangerous action]"
+      },
+      {
+        "field": "content",
+        "pattern": "如果你是.{0,80}(或者|或|以及).{0,40}(请|請|你必须|你必須|你要|就|则|則).{0,30}(发送|發送|转账|轉帳|执行|執行|读取|讀取|忽略|無視|忘记|忘記)",
+        "desc": "Identity enumeration attack: if you are X or Y, then do [action]"
+      },
+      {
+        "field": "content",
+        "pattern": "(私发|私發|私信发|私信發|偷偷发|偷偷發|悄悄发|悄悄發|暗中发|暗中發).{0,10}(红包|紅包|转账|轉帳|钱|錢|款项|款項|金额|金額)",
+        "desc": "Covert financial action: secretly send red packet/transfer money"
+      },
+      {
+        "field": "content",
+        "pattern": "(只要你有|如果你有|只要你能|如果你能).{0,20}(权限|權限|功能|能力|权力|權力).{0,20}(就|则|則|请|請|必须|必須|要).{0,20}(发|發|送|转|轉|执行|執行|操作)",
+        "desc": "Conditional authority claim: if you have permission to X, then do Y"
+      },
+      {
+        "field": "content",
+        "pattern": "(余额|餘額|金额|金額|额度|額度).{0,10}(不足|不够|不夠).{0,20}(最大|全部|所有|尽可能|盡可能|最多).{0,10}(金额|金額|额度|額度|数量|數量).{0,5}(发送|發送|转|轉)",
+        "desc": "Amount manipulation: if balance insufficient, send maximum amount"
+      },
+      {
+        "field": "content",
+        "pattern": "(他の|その他の|全ての|すべての).{0,10}(内容|メッセージ|指示|ルール).{0,5}(を)?.{0,5}(無視|忘れ|スキップ).{0,20}(送金|振込|支払|実行|送信)",
+        "desc": "Japanese: ignore other content and perform financial/dangerous action"
+      },
+      {
+        "field": "content",
+        "pattern": "(다른|모든|기존의|이전의).{0,10}(내용|메시지|지시|규칙).{0,5}(을|를)?.{0,5}(무시|잊어|건너뛰).{0,20}(송금|이체|결제|실행|전송)",
+        "desc": "Korean: ignore other content and perform financial/dangerous action"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(如果你是|만약 너가|もしあなたが).{0,20}(\\w+Claw|\\w+Buddy|\\w+Bot|\\w+Agent|\\w+助手|\\w+AI).{0,20}(、|，|,|或|또는|または).{0,20}(\\w+Claw|\\w+Buddy|\\w+Bot|\\w+Agent|\\w+助手|\\w+AI)",
+        "desc": "Agent name enumeration targeting multiple AI assistants by name"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-060",
+    "title": "MCP Skill Impersonation and Supply Chain Attack",
+    "severity": "high",
+    "category": "skill-compromise",
+    "patterns": [
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:filesytem|filsystem|file_sytem|flie_system|filessystem|filesystm|filsystm|filesysem)[-_](?:read|write|list|delete|search)",
+        "desc": "Typosquatted filesystem tool names"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:gtihub|githbu|gihtub|gthub|g1thub|gltHub|githuub|guthub)[-_](?:api|search|commit|pr|issues?|repos?)",
+        "desc": "Typosquatted GitHub tool names"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:databse|databaes|dtabase|datbase|databasse|databasee|dataase)[-_](?:query|read|write|exec|connect)",
+        "desc": "Typosquatted database tool names"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:web[-_]?search|google[-_]?search|bing[-_]?search)[-_]?(?:v2|v3|pro|enhanced|premium|fast|turbo|plus|ultra|new)",
+        "desc": "Fake enhanced versions of known search tools"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:exec|execute|run|shell)[-_]?(?:cmd|command|script|code)[-_]?(?:safe|secure|sandbox|trusted|verified)?",
+        "desc": "Shell execution tools with deceptive safety suffixes"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:official|verified|trusted|authentic|real|original)[-_](?:filesystem|github|database|slack|aws|gcp|azure)(?![-_]tools\\b)",
+        "desc": "Tools using trust-implying prefixes to impersonate legitimate tools (excludes established -tools packages)"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:filesystem|github|database|slack|aws|gcp|azure)[-_](?:official|verified|v\\d+\\.\\d+|latest|stable|release|updated)",
+        "desc": "Version spoofing with fake version or release suffixes"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:this\\s+(?:is\\s+)?(?:an?\\s+)?(?:updated|newer|improved|enhanced|patched|fixed)\\s+version\\s+of|replacing|supersedes|upgrade\\s+(?:from|to))\\s+(?:the\\s+)?(?:original|existing|current|old)\\s+(?:tool|skill|plugin|extension)",
+        "desc": "Skill claiming to be an updated replacement for a legitimate tool"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:(?:same|identical|equivalent|compatible)\\s+(?:as|to|with)\\s+(?:the\\s+)?(?:official|original|standard)|(?:drop[-\\s]?in\\s+)?replacement\\s+for)\\s+[a-zA-Z_-]+",
+        "desc": "Skill claiming equivalence or compatibility with known legitimate tools"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:slakc|slck|slaack|sllack|s1ack|5lack)[-_](?:send|post|read|message|channel)",
+        "desc": "Typosquatted Slack tool names"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:opeanai|openla|open_al|openaii|0penai|openal)[-_](?:chat|complete|embed|generate)",
+        "desc": "Typosquatted OpenAI tool names"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(?:anthroplc|anthrop1c|anthropic_|_anthropic|anthrpoic)[-_](?:chat|complete|message|claude)",
+        "desc": "Typosquatted Anthropic tool names"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-061",
+    "title": "Skill Description-Behavior Mismatch",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(rm\\s+-rf|unlink|deleteFile|removeDir|fs\\.write|writeFile|appendFile|truncate)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(curl|wget|fetch|http\\.request|axios\\.|net\\.connect|socket\\.connect)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(child_process|spawn|exec|execFile|system\\(|popen|subprocess)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(process\\.env|os\\.environ|getenv|\\$\\{?[A-Z_]+\\}?|secrets?\\.|credentials?)",
+        "desc": ""
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(password|api[_-]?key|secret[_-]?key|access[_-]?token|private[_-]?key|bearer\\s+[a-zA-Z0-9])",
+        "desc": ""
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-062",
+    "title": "Hidden Capability in MCP Skill",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(debug[_-]?mode|admin[_-]?override|raw[_-]?exec|unsafe[_-]?mode|bypass[_-]?check|no[_-]?sandbox)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(__[a-z]+__|\\$\\$[a-z]+|_internal_|_hidden_|_backdoor_|_secret_)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(eval_code|exec_raw|shell_cmd|run_arbitrary|system_call|inject_prompt)",
+        "desc": ""
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(hidden\\s+mode\\s+activated|debug\\s+mode\\s+enabled|admin\\s+access\\s+granted|sandbox\\s+disabled)",
+        "desc": ""
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-063",
+    "title": "Multi-Skill Chain Attack",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(/etc/passwd|/etc/shadow|\\.env|credentials|secrets?\\.json|private[_-]?key|id_rsa|kubeconfig|\\.aws/)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(base64|btoa|encodeURI|hex\\.encode|rot13|xor|compress|gzip|deflate|encrypt)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(webhook|ngrok|requestbin|pipedream|hookbin|burpcollaborator|interact\\.sh|oast)",
+        "desc": ""
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(send[_-]?(email|message|webhook|http|request)|upload|post[_-]?data|transmit|exfil)",
+        "desc": ""
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-064",
+    "title": "Over-Permissioned MCP Skill",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "patterns": [
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(sudo|runas|doas|pkexec|gsudo)\\s+",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(chmod\\s+(?:[2467][0-7]{3}|[0-7]{0,3}7[0-7]{0,2})|chmod\\s+[ug]?\\+[sx]|chown\\s+root|setcap\\s)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(iptables|ufw|firewall-cmd|netsh\\s+advfirewall|pfctl)\\s",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(useradd|adduser|usermod|passwd|net\\s+user|dsadd|New-LocalUser)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(crontab|schtasks|at\\s+\\d|systemctl\\s+(enable|start)|launchctl\\s+load)",
+        "desc": ""
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-065",
+    "title": "Malicious Skill Update or Mutation",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(version[_\\-\\s]?(changed|updated|bumped|mutated)|new[_\\-\\s]?version[_\\-\\s]?available|skill[_\\-\\s]?updated)",
+        "desc": ""
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(additional[_\\-\\s]?permissions?[_\\-\\s]?required|scope[_\\-\\s]?expanded|capabilities?[_\\-\\s]?added|new[_\\-\\s]?permissions?)",
+        "desc": ""
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(re-?authenticate|re-?authorize|grant[_\\-\\s]?access|approve[_\\-\\s]?permissions?|accept[_\\-\\s]?new[_\\-\\s]?terms)",
+        "desc": ""
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(migration[_\\-\\s]?required|data[_\\-\\s]?transfer|export[_\\-\\s]?before[_\\-\\s]?update|backup[_\\-\\s]?your[_\\-\\s]?data[_\\-\\s]?to)",
+        "desc": ""
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-066",
+    "title": "Parameter Injection via Tool Arguments",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(;|&&|\\|\\||`|\\$\\()\\s*(cat|ls|id|whoami|uname|pwd|env|curl|wget|nc|bash|sh|python)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)('\\s*(OR|AND|UNION)\\s+'|'?\\s*;\\s*(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE)\\s|--\\s*[;\\\"'\\)\\]]|/\\*.*\\*/)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(\\.\\./|\\.\\.\\\\){2,}|(\\.\\.(/|\\\\)){2,}(etc|windows|usr|home|root|var|tmp)",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(\\{\\{.*\\}\\}|\\$\\{.*\\}|<%.*%>|#\\{.*\\}|\\{%.*%\\})",
+        "desc": ""
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(\\x00|%00|\\\\0|null\\s*byte|\\\\u0000)",
+        "desc": ""
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-010",
+    "title": "Malicious Content in MCP Tool Response",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\brm\\s+-[rRf]{1,3}[\\s/]|\\bmkfs\\b|\\bdd\\s+if=|\\bformat\\s+[a-z]:|\\bdeltree\\b|\\bshred\\s+-|\\bwipefs\\b|\\bfdisk\\b.*--delete|:\\(\\)\\s*\\{\\s*:\\|:\\s*&\\s*\\})",
+        "desc": "Destructive filesystem commands including fork bombs"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\bbash\\s+-[ci]|\\bsh\\s+-c|\\bzsh\\s+-c|\\bcmd(\\.exe)?\\s*/[ck]|\\bpowershell(\\.exe)?\\s+-(e(nc(odedcommand)?)?|c(ommand)?|nop|w\\s+hidden|ep\\s+bypass)|\\bpwsh\\s+-(e|c)|\\bpython[23]?\\s+-c|\\bruby\\s+-e|\\bperl\\s+-e|\\bnode\\s+-e|\\bphp\\s+-r)",
+        "desc": "Command execution through various interpreters"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\bnc\\s+-(e|c|l)\\s|\\bncat\\s|\\bnetcat\\s|/dev/tcp/|\\bbash\\s+-i\\s+>&\\s*/dev/tcp|\\bmkfifo\\b.{0,40}\\bnc\\b|\\bsocat\\b.{0,40}(exec|pty|tcp)|\\brm\\s+/tmp/f\\s*;)",
+        "desc": "Unix reverse shell patterns (netcat, bash, socat, fifo)"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(curl|wget|fetch|lwp-download|aria2c|invoke-webrequest|iwr|Invoke-RestMethod|irm)\\s+[^|]{0,200}\\|\\s*(bash|sh|zsh|python[23]?|perl|ruby|node|powershell|pwsh|cmd|source)",
+        "desc": "Download-and-execute via pipe to shell interpreter"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(\\$\\(|`)\\s*[^)]{0,300}(curl|wget|nc|ncat|bash|python|perl|ruby|eval|exec|sh\\s+-c|base64\\s+-d)",
+        "desc": "Command substitution containing dangerous commands"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(bash|sh|zsh|source)\\s+<\\(\\s*(curl|wget|fetch|nc|python|perl|ruby|base64)",
+        "desc": "Process substitution with download or decode commands"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(echo\\s+['\"]?[A-Za-z0-9+/]{20,}={0,2}['\"]?\\s*\\|\\s*(base64\\s+(-d|--decode)|openssl\\s+enc\\s+-d)\\s*\\|\\s*(ba)?sh|base64\\s+(-d|--decode)\\s*<<<|\\bZWNoby|\\bY3VybC|\\bL2Jpbi9i|\\bd2dldC|\\bbmM\\s)",
+        "desc": "Base64 decode-and-execute and known base64 fragments of dangerous commands"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(\\$\\{IFS\\}|\\$IFS|\\$\\{PATH:0:1\\}|\\$\\{SHELL:0:1\\}|\\$\\{HOME:0:1\\}|\\$'\\\\x[0-9a-fA-F]{2}'|\\$'\\\\[0-7]{3}')",
+        "desc": "IFS manipulation and variable expansion techniques for command obfuscation"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\bchmod\\s+[ugo]*[+][sS]|\\bchmod\\s+[2467][0-7]{3}\\b|\\bchown\\s+(root|0)\\b|\\bsetuid\\b|\\bSUID\\b|\\bsudo\\s+-[SsinuHbEA]|\\bsudo\\s+[a-zA-Z/]|\\bpkexec\\b|\\bdoas\\b|\\brunuser\\b|\\bsu\\s+-\\s|\\bsu\\s+root)",
+        "desc": "Privilege escalation commands (setuid/setgid via 4-digit octal with special bits, sudo, chown root)"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\bIEX\\s*\\(|\\bInvoke-Expression|\\bInvoke-Command|\\bInvoke-WmiMethod|\\b-EncodedCommand\\b|\\bNew-Object\\s+Net\\.WebClient|\\bDownloadString\\s*\\(|\\bDownloadFile\\s*\\(|\\bStart-Process\\b.{0,60}\\b-Verb\\s+RunAs|\\bSet-MpPreference\\s+-Disable|\\bAdd-MpPreference\\s+-ExclusionPath|\\bNet\\.Sockets\\.TCPClient)",
+        "desc": "PowerShell-specific attack patterns (IEX, download cradles, AV bypass)"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(python[23]?\\s+-c\\s+['\"]import\\s+(socket|subprocess|os|pty)|import\\s+socket\\s*;\\s*import\\s+subprocess|socket\\.socket\\(socket\\.AF_INET|os\\.(popen|system|exec[lv]p?)\\s*\\(|subprocess\\.(call|run|Popen|check_output)\\s*\\(.{0,60}(sh|bash|cmd|powershell)|pty\\.spawn\\s*\\()",
+        "desc": "Python reverse shells and dangerous code execution patterns"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(require\\s*\\(\\s*['\"]child_process['\"]\\s*\\)|child_process\\.exec(Sync)?\\s*\\(|require\\s*\\(\\s*['\"]net['\"]\\s*\\).{0,100}connect|new\\s+net\\.Socket\\s*\\(|process\\.mainModule\\.require)",
+        "desc": "Node.js reverse shells and child_process command execution"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(ignore\\s+(all\\s+)?(previous|prior|your)\\s+(instructions?|rules?|guidelines?|prompts?)|you\\s+are\\s+now\\s+(a|an|the)|new\\s+system\\s+(prompt|instructions?)\\s*:|disregard\\s+(all\\s+)?(previous|prior|your)|override\\s+(all\\s+)?(previous|prior|your|the)\\s+(instructions?|rules?|safety)|from\\s+now\\s+on,?\\s+you\\s+(are|will|must|should))",
+        "desc": "Prompt injection payloads embedded in tool response content"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(curl\\s+(-X\\s+POST\\s+)?[^|]*\\s+(-d|--data|--data-binary|--data-raw)\\s+.{0,60}(env|password|secret|token|key|credential|session)|wget\\s+--post-(data|file)|\\bexfiltrat|send.{0,30}(to|via|through).{0,30}(webhook|endpoint|server|url|http))",
+        "desc": "Data exfiltration commands and patterns in tool response"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\bcrontab\\s+-[elr]|echo\\s+.{0,100}>>\\s*/etc/cron|\\bat\\s+-f\\b|\\bschtasks\\s+/create|\\bRegister-ScheduledTask|\\blaunchctl\\s+load|\\bsystemctl\\s+enable)",
+        "desc": "Persistence mechanisms via scheduled tasks or cron jobs"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-011",
+    "title": "Instruction Injection via Tool Output",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(IMPORTANT|URGENT|CRITICAL|PRIORITY|MANDATORY|REQUIRED|ESSENTIAL|ATTENTION)\\s*(NOTE\\s+)?(TO\\s+)?(THE\\s+)?(ASSISTANT|AI|AGENT|MODEL|LLM|CHATBOT|BOT|SYSTEM)\\s*[:\\-]\\s*(you\\s+(must|should|need\\s+to|have\\s+to|are\\s+(required|instructed|directed|ordered)\\s+to)|please|now|immediately|do\\s+not|never|always)",
+        "desc": "Urgency-prefixed directives explicitly addressing the AI agent"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(assistant|ai|agent|model|chatbot|bot)\\s*[,:;]+\\s*(ignore|disregard|override|forget|bypass|abandon|drop|discard|suppress)\\s+(your|all|the|any|every|previous|prior|existing|current)\\s+(instructions?|rules?|guidelines?|directives?|constraints?|programming|training|safety|restrictions?|protocols?|policies)",
+        "desc": "Direct commands to the agent to abandon its instructions"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(do\\s+not|don'?t|never|avoid|refrain\\s+from)\\s+(tell(ing)?|inform(ing)?|reveal(ing)?|show(ing)?|mention(ing)?|display(ing)?|disclos(e|ing)|report(ing)?|log(ging)?)\\s+(the\\s+)?(user|human|operator|requester|client|customer|person)\\s+(about\\s+)?(this|these|what|that|any|the)",
+        "desc": "Instructions to hide information from the user"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(you\\s+(?:must|should|need\\s+to|have\\s+to)\\s+)?(call|invoke|execute|run|trigger|activate|launch|fire|initiate)\\s+(the\\s+)?(tool|function|action|command|plugin|skill)\\s*[:\\-]\\s*[a-zA-Z_][a-zA-Z0-9_]*",
+        "desc": "Instructions within output directing the agent to call specific tools (requires tool/function/skill with named target)"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(send|transmit|post|forward|exfiltrate|upload|deliver|relay|transfer|pipe|redirect|leak|expose|share)\\s+(this|the|all|any|every|complete|full|entire)\\s+(data|information|context|conversation|history|messages?|session|memory|contents?|payload|details?|credentials?|secrets?|tokens?|keys?)\\s+(to|via|through|using|over)\\s+(https?://|\\w+\\.\\w+|the\\s+(server|endpoint|webhook|url|api|service))",
+        "desc": "Data exfiltration commands targeting conversation context or credentials"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)<\\s*(hidden|invisible|secret|private|internal|covert)\\s*[-_]?(instruction|directive|command|message|note|order|task|action)\\s*>",
+        "desc": "Custom XML-like tags used to embed hidden instructions"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(include|embed|inject|insert|prepend|append|add|place|put)\\s+(this|the\\s+following|these\\s+words?|this\\s+text|this\\s+message|this\\s+content|exactly)\\s+(in|into|to|within|at\\s+the\\s+(start|end|beginning)\\s+of)\\s+(your|the)\\s+(response|output|reply|answer|message|next\\s+message)",
+        "desc": "Directives to inject specific content into the agent's response"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\[SYSTEM\\]|\\[ADMIN\\]|\\[OVERRIDE\\]|\\[PRIORITY\\]|\\[INTERNAL\\]|\\[CONTROL\\]|\\[DIRECTIVE\\]|<<SYS>>|<<SYSTEM>>|<<ADMIN>>|<\\|system\\|>|<\\|im_start\\|>system|\\{\\{SYSTEM\\}\\}|\\{\\{ADMIN\\}\\})",
+        "desc": "Fake system-level tokens and delimiters in tool output"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\{\\s*[\"']?(system_message|system_instruction|agent_directive|admin_command|priority_action|override_instruction)[\"']?\\s*:\\s*[\"']|api_response\\s*[=:]\\s*\\{.{0,100}(instruction|directive|command|override|ignore|disregard))",
+        "desc": "Fake API response structures containing injected instructions"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(I\\s+recommend\\s+the\\s+(agent|assistant|AI|model|system)\\s+(should|must|needs?\\s+to)|the\\s+next\\s+step\\s+(is\\s+to|should\\s+be\\s+to|for\\s+the\\s+(agent|assistant))|the\\s+(agent|assistant|AI|model)\\s+(should|must|needs?\\s+to|is\\s+(expected|required)\\s+to)\\s+(now|next|immediately|first))",
+        "desc": "Conversational phrasing that steers agent behavior as if giving instructions"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\[?ACTION\\s*REQUIRED\\]?|\\[?TASK\\s*FOR\\s*(AGENT|ASSISTANT|AI)\\]?|\\[?INSTRUCTION\\s*FOR\\s*(AGENT|ASSISTANT|AI)\\]?|\\[?AGENT\\s*DIRECTIVE\\]?|\\[?DO\\s*THIS\\s*NOW\\]?)\\s*[:\\-]",
+        "desc": "Bracketed action-required labels targeting the agent"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)[\\u200B\\u200C\\u200D\\uFEFF\\u2060]{3,}.{0,200}(ignore|override|execute|call|send|disregard|you\\s+must|instruction)",
+        "desc": "Zero-width characters preceding injection keywords in tool output"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(this\\s+is\\s+a\\s+(system|admin|priority|critical|mandatory)\\s+(message|instruction|directive|update|notice|alert)\\s*(from|by|issued|sent)\\s*(the\\s+)?(system|admin|administrator|developer|platform|operator|control\\s+plane))",
+        "desc": "Tool output falsely claiming to be from the system or administrator"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-012",
+    "title": "Unauthorized Tool Call Detection",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_args",
+        "pattern": "(\\.\\.[\\/\\\\]){2,}|\\.\\.[\\/\\\\][^\\s]*[\\/\\\\](etc|proc|root|sys|var|home|tmp|boot|dev|usr|opt|passwd|shadow|hosts)[\\/\\\\]?|~[\\/\\\\]\\.\\.[\\/\\\\]",
+        "desc": "Path traversal sequences targeting sensitive directories"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(;|&&|\\|\\||\\$\\(|`|\\|\\s*\\w)\\s*.{0,50}(curl|wget|nc|ncat|bash|sh|zsh|python|ruby|perl|node|php|powershell|cmd|eval|exec|system|rm\\s+-|cat\\s+/etc|whoami|id\\b|uname|hostname|ifconfig|ipconfig|net\\s+user|net\\s+localgroup)",
+        "desc": "Shell metacharacter injection followed by dangerous commands"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)^(admin_|root_|sudo_|system_|internal_|debug_|maintenance_|privileged_|superuser_|__)",
+        "desc": "Tool names with privileged prefixes indicating unauthorized access"
+      },
+      {
+        "field": "tool_name",
+        "pattern": "(?i)(list_tools|enumerate_tools|get_available|discover_tools|tool_schema|__list__|__tools__|__methods__|__dir__|get_all_functions|list_capabilities|show_tools|available_actions)",
+        "desc": "Tool enumeration attempts to discover available attack surface"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)('\\s*(OR|AND|UNION)\\s+['\"]?\\d|\"\\s*(OR|AND|UNION)\\s+['\"]?\\d|\\b(UNION\\s+(ALL\\s+)?SELECT|INSERT\\s+INTO|UPDATE\\s+.*\\s+SET|DELETE\\s+FROM|DROP\\s+(TABLE|DATABASE)|ALTER\\s+TABLE|EXEC(UTE)?\\s+|xp_cmdshell)\\b|;\\s*(DROP|DELETE|INSERT|UPDATE|ALTER|EXEC)\\b)",
+        "desc": "SQL injection patterns in tool parameters"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(\\$\\{?\\w*(KEY|TOKEN|SECRET|PASSWORD|PASS|PWD|CREDENTIAL|AUTH|API_KEY|ACCESS_KEY|PRIVATE)\\w*\\}?|process\\.env\\.|os\\.environ|System\\.getenv|ENV\\[|getenv\\s*\\()",
+        "desc": "Attempts to extract environment variables containing secrets"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)([\\/\\\\](etc[\\/\\\\](passwd|shadow|sudoers|ssh[\\/\\\\]|ssl[\\/\\\\])|proc[\\/\\\\](self[\\/\\\\]|\\d+[\\/\\\\])(environ|cmdline|maps|fd)|root[\\/\\\\]\\.(bash_history|ssh)|\\.env|\\.git[\\/\\\\]config|\\.aws[\\/\\\\]credentials|\\.ssh[\\/\\\\](id_rsa|authorized_keys)|wp-config\\.php|\\.htpasswd|\\.netrc|\\.pgpass))",
+        "desc": "Access to known sensitive files (credentials, config, keys)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(\\{\\{.*?(config|self|request|__class__|__builtins__|__import__|lipsum|cycler|joiner|namespace).*?\\}\\}|\\$\\{.*?(Runtime|ProcessBuilder|getClass|forName|exec).*?\\}|<%.*?(Runtime|exec|system|eval).*?%>)",
+        "desc": "Server-side template injection (Jinja2, Java EL, JSP)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(O:\\d+:\\s*\"|a:\\d+:\\s*\\{|rO0ABX|aced0005|\\{\\s*\"__type\"\\s*:|\\{\\s*\"\\$type\"\\s*:|yaml\\.unsafe_load|pickle\\.loads|unserialize\\s*\\(|Marshal\\.load|ObjectInputStream)",
+        "desc": "Serialized object injection (PHP, Java, Python pickle, YAML, .NET)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(\\*\\)\\(|\\)\\(|\\|\\s*\\(|&\\s*\\(|\\(\\|\\(|\\(&\\().*?(objectClass|uid|cn|sn|mail|userPassword|memberOf)\\s*[=~<>]",
+        "desc": "LDAP filter injection patterns"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(@|%40)(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|internal|intranet|corp|private)|\\\\@(localhost|127)|url\\s*=\\s*['\"]?(file|gopher|dict|ftp|ldap|tftp)://",
+        "desc": "URL manipulation to access internal resources via @ notation or exotic protocols"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(\\*\\s*;|\\*\\s*&&|\\*\\s*\\|\\||\\bfind\\s+/\\s+-name|\\bfind\\s+/\\s+-exec|\\bxargs\\s+|\\bglob\\s*\\(.{0,20}\\*\\*)",
+        "desc": "Wildcard and glob patterns combined with shell execution"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(admin\\s*=\\s*(true|1|yes)|role\\s*=\\s*(admin|root|superuser|system)|is_admin\\s*=\\s*(true|1)|privilege\\s*=\\s*(elevated|admin|root|full)|permission\\s*=\\s*(all|\\*|admin|root)|access_level\\s*=\\s*(admin|root|full|unlimited))",
+        "desc": "Parameter pollution attempting to set admin/elevated privilege flags"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-013",
+    "title": "SSRF via Agent Tool Calls",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?169\\.254\\.169\\.254|/latest/(meta-data|user-data|api/token|dynamic|instance-identity)|X-aws-ec2-metadata-token|amazonaws\\.com.{0,50}(credentials|security-credentials|role)|iam[\\/\\\\]security-credentials",
+        "desc": "AWS Instance Metadata Service (IMDSv1/v2) and credential endpoints"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?metadata\\.google\\.internal|/computeMetadata/v1|Metadata-Flavor:\\s*Google",
+        "desc": "GCP metadata service endpoints and required headers"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?169\\.254\\.169\\.254/metadata|Metadata:\\s*true|api-version=\\d{4}-\\d{2}-\\d{2}.*metadata|management\\.azure\\.com.{0,50}(subscriptions|resourceGroups)",
+        "desc": "Azure Instance Metadata Service and management endpoints"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?169\\.254\\.169\\.254/metadata/v1|/opc/v[12]/|100\\.100\\.100\\.200",
+        "desc": "DigitalOcean, Oracle Cloud, and Alibaba Cloud metadata endpoints"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[?::1\\]?|0177\\.0\\.0\\.1|0x7f\\.0\\.0\\.1|2130706433)\\b(:\\d+)?|\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[?::1\\]?|0177\\.0\\.0\\.1|0x7f\\.0\\.0\\.1|2130706433)(:\\d+)/|\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)(:\\d+)(?=\\s|$|[\"'\\]}>])",
+        "desc": "Localhost/loopback in URL context (with scheme, port+path, or port at boundary)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?(0x7f000001|0x7f\\.0x0\\.0x0\\.0x1|017700000001|0177\\.0000\\.0000\\.0001|127\\.0?0?1|127\\.1|0\\.0\\.0\\.0|0x0\\.0x0\\.0x0\\.0x0|0000\\.0000\\.0000\\.0000)",
+        "desc": "Encoded loopback addresses (hex, octal, short forms)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?\\b(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|172\\.(1[6-9]|2[0-9]|3[01])\\.\\d{1,3}\\.\\d{1,3}|192\\.168\\.\\d{1,3}\\.\\d{1,3})\\b(:\\d+)?",
+        "desc": "Private IP addresses in RFC1918 ranges"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?169\\.254\\.\\d{1,3}\\.\\d{1,3}(:\\d+)?|fe80::",
+        "desc": "Link-local addresses (169.254.x.x, fe80::)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\\.\\b(internal|local|localhost|localdomain|home|corp|intranet|private|lan|cluster\\.local|svc\\.cluster|consul|vault|etcd|k8s)\\b(:\\d+)?(/|$)",
+        "desc": "Internal DNS names and Kubernetes/service mesh hostnames"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)\\b(file|gopher|dict|ftp|tftp|ldap|ldaps|sftp|ssh|telnet|jar|netdoc|mailto|view-source|ws|wss)\\s*://\\s*(localhost|127\\.|10\\.|172\\.(1[6-9]|2[0-9]|3[01])|192\\.168\\.|0\\.0\\.0\\.0|\\[?::1\\]?|0x|0177)",
+        "desc": "Exotic URI schemes targeting internal addresses"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?[a-zA-Z0-9-]+\\.(xip\\.io|nip\\.io|sslip\\.io|localtest\\.me|vcap\\.me|lvh\\.me|lacolhost\\.com|127\\.0\\.0\\.1\\.[a-z]+\\.\\w+)(:\\d+)?",
+        "desc": "DNS rebinding services that resolve to internal IPs"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(redirect|redir|url|next|return|returnUrl|returnTo|continue|dest|destination|go|goto|target|link|out|view|ref|callback|forward)\\s*=\\s*(https?%3A%2F%2F|https?://)(localhost|127\\.0\\.0\\.1|10\\.|172\\.(1[6-9]|2[0-9])|192\\.168|169\\.254|0\\.0\\.0|\\[?::1\\]?)",
+        "desc": "URL redirect parameters targeting internal addresses"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?\\[?(::1|::ffff:127\\.0\\.0\\.1|::ffff:10\\.|::ffff:172\\.(1[6-9]|2[0-9]|3[01])|::ffff:192\\.168|fc[0-9a-f]{2}:|fd[0-9a-f]{2}:)\\]?(:\\d+)?",
+        "desc": "IPv6 loopback, IPv4-mapped, and unique local addresses (fc/fd)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?(\\w+\\.)?\\b(vault\\.service\\.consul|consul\\.service\\.consul|etcd\\.service|kubernetes\\.default\\.svc|kube-apiserver|kubelet|elasticsearch|redis|memcached|mysql|postgres|mongodb|rabbitmq|kafka|zookeeper)\\b(:\\d+|/)",
+        "desc": "Common internal service names (databases, caches, orchestrators)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)(https?://)?(bit\\.ly|tinyurl\\.com|t\\.co|goo\\.gl|is\\.gd|v\\.gd|rb\\.gy|cutt\\.ly|short\\.io|tiny\\.cc)/[a-zA-Z0-9]+",
+        "desc": "URL shorteners that may redirect to internal services"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-095",
+    "title": "MCP Tool Supply Chain Poisoning",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\\b(ignore|disregard|override|forget)\\s+(all\\s+)?(previous|prior|system|original|safety)\\s+(instructions?|rules?|prompts?|constraints?|guardrails?)",
+        "desc": "Prompt injection payload in tool response output"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\beval\\s*\\(|\\bexec\\s*\\(|\\bos\\.system\\s*\\(|subprocess\\.(run|call|Popen)|child_process\\.exec|Runtime\\.getRuntime\\(\\)\\.exec)",
+        "desc": "Dangerous code execution primitives in tool response"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\\b(curl|wget|fetch|http|request)\\s+.{0,30}(attacker|evil|malicious|exfil|c2|callback|webhook\\.site|ngrok|burp)",
+        "desc": "Data exfiltration URL patterns in tool response"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\[SYSTEM\\]|\\[INST\\]|<\\|system\\|>|<\\|im_start\\|>|<<SYS>>|\\[/INST\\])\\s*.{5,}",
+        "desc": "Injected system prompt delimiters in tool response"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\\b(you\\s+must|you\\s+should|always|never)\\s+.{0,30}(send|transmit|forward|copy|exfiltrate|upload)\\s+.{0,30}(data|file|secret|token|key|credential|password|response)\\s+.{0,20}(to|at|via)\\s+https?://",
+        "desc": "Exfiltration instructions disguised as tool behavior directives"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-096",
+    "title": "Skill Registry Poisoning and Compromised Tool Distribution",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(post_?install|pre_?install|setup\\.py|__init__\\.py)\\s*.{0,30}(exec|eval|os\\.|subprocess|import\\s+socket|import\\s+requests\\.post)",
+        "desc": "Malicious execution hooks in install scripts from tool packages"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\\b(reverse.?shell|bind.?shell|meterpreter|cobalt.?strike|beacon|c2.?server|command.?and.?control)\\b",
+        "desc": "Known malware/C2 framework references in tool response"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(\\bSocket\\s*\\(|net\\.connect|new\\s+WebSocket|XMLHttpRequest|fetch\\s*\\()\\s*.{0,30}(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|attacker|evil|malicious|c2|ngrok)",
+        "desc": "Outbound network connections to suspicious destinations"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(process\\.env|os\\.environ|System\\.getenv|ENV\\[)\\s*.{0,10}(API.?KEY|SECRET|TOKEN|PASSWORD|CREDENTIAL|PRIVATE.?KEY)",
+        "desc": "Environment variable access targeting secrets and credentials"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\\b(fs\\.read|open\\s*\\(|File\\.read|readFile)\\s*.{0,30}(\\.ssh|id_rsa|\\.aws|credentials|\\.env|shadow|passwd|config\\.json|secrets?\\.)",
+        "desc": "Reading sensitive system files or credential stores"
+      }
+    ]
+  }
+]
