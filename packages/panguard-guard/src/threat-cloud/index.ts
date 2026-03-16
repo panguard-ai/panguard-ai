@@ -21,7 +21,7 @@ import { getAnonymousClientId } from './client-id.js';
 const logger = createLogger('panguard-guard:threat-cloud');
 
 /** Local cache file name / 本地快取檔名 */
-const CACHE_FILE = 'threat-cloud-cache.json';
+// Cache file removed — community data stays in memory only (see loadCache/saveCache no-ops)
 
 /** Local upload queue file name / 本地上傳佇列檔名 */
 const QUEUE_FILE = 'threat-cloud-queue.json';
