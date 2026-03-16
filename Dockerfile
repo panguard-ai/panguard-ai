@@ -74,6 +74,8 @@ RUN bash scripts/update-yara-rules.sh || echo "WARNING: YARA community rules dow
 RUN pnpm --filter '!@panguard-ai/website' -r run build
 
 # ---- Create standalone bundle (no pnpm symlinks) ----
+# Cache buster: change this value to force Railway to rebuild from here
+ARG CACHE_BUST=2026-03-17-v2
 RUN mkdir -p /standalone
 
 # Step 1: Copy main CLI entry point
