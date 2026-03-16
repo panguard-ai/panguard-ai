@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Upload, Cpu, Send, Shield, Search, TrendingUp } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
+import DefenseNetwork from './DefenseNetwork';
 
 const STEPS = [
   { key: 'installPanguard', icon: Shield },
@@ -17,8 +18,13 @@ export default function CommunityFlywheel() {
   const t = useTranslations('revolution.flywheel');
 
   return (
-    <section className="bg-gradient-to-b from-[#0d2614] to-[#0a0a0a] px-5 sm:px-6 py-16 sm:py-24">
-      <div className="max-w-4xl mx-auto">
+    <section className="relative bg-gradient-to-b from-[#0d2614] to-[#0a0a0a] px-5 sm:px-6 py-16 sm:py-24 overflow-hidden">
+      {/* Network animation background */}
+      <div className="absolute inset-0">
+        <DefenseNetwork className="w-full h-full opacity-40" />
+      </div>
+
+      <div className="relative z-10 max-w-4xl mx-auto">
         <FadeInUp>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary text-center mb-12 sm:mb-16">
             {t('title')}
@@ -29,7 +35,7 @@ export default function CommunityFlywheel() {
         <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4">
           {STEPS.map(({ key, icon: Icon }, i) => (
             <FadeInUp key={key} delay={i * 0.08}>
-              <div className="relative flex flex-col items-center text-center bg-surface-1/30 border border-border rounded-xl p-4 sm:p-5">
+              <div className="relative flex flex-col items-center text-center bg-surface-1/50 backdrop-blur-sm border border-border rounded-xl p-4 sm:p-5">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-panguard-green/10 border border-panguard-green/20 mb-3">
                   <Icon className="w-4 h-4 text-panguard-green" />
                 </div>
