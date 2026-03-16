@@ -909,6 +909,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .btn-start:hover{filter:brightness(1.1);transform:scale(1.02)}
 .init-progress{position:fixed;bottom:0;left:0;right:0;height:3px;background:var(--s2);z-index:1001;overflow:hidden}
 .init-bar{height:100%;width:0;background:linear-gradient(90deg,var(--sage),var(--ok));transition:width .4s ease;border-radius:0 2px 2px 0}
+/* Protection Status Bar */
+.pbar{display:flex;align-items:center;gap:8px;padding:8px 14px;margin-bottom:16px;background:var(--s1);border:1px solid var(--bd);border-radius:8px;font-size:12px;color:var(--tm)}
+.pbar .pb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pbar .pb-dot.ok{background:var(--ok);box-shadow:0 0 6px rgba(46,213,115,0.4)}
+.pbar .pb-dot.bad{background:var(--bad);box-shadow:0 0 6px rgba(239,68,68,0.4)}
+.pbar .pb-txt{font-weight:600;color:var(--t1)}
+.reassure{text-align:center;padding:24px 20px;color:var(--tm);font-size:13px;line-height:1.7;font-style:italic}
 </style>
 </head>
 <body>
@@ -950,6 +957,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 
 <div class="mn">
+<div class="pbar" id="pbar">
+<div class="pb-dot ok" id="pb-dot"></div>
+<span class="pb-txt" id="pb-txt">PROTECTED</span>
+<span id="pb-detail">| -- rules active | Last event: --</span>
+</div>
 <!-- Overview -->
 <div class="pg on" id="p-overview">
 <div class="pt" data-i18n="t_ov"><em>Overview</em></div>
@@ -979,7 +991,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="cd"><div class="cl" data-i18n="st_fp">Stable FP</div><div class="cv-sm sg" id="v-sfp">--</div></div>
 </div>
 <div class="st" data-i18n="timeline">Event Timeline</div>
-<div class="tl" id="evl"></div>
+<div class="tl" id="evl"><div class="reassure" id="evl-empty">No threats detected. Your agents are running safely.</div></div>
 </div>
 
 <!-- Skills & Trust -->
@@ -1263,9 +1275,12 @@ function gTk(){var h=location.hash;if(h.indexOf('token=')!==-1){tk=h.split('toke
 function af(p,o){o=o||{};o.headers=o.headers||{};if(tk)o.headers['Authorization']='Bearer '+tk;return fetch(p,o).then(function(r){if(r.status===401){document.getElementById('wl').textContent=lang==='zh'?'Token 無效':'Invalid token';document.getElementById('wd').classList.remove('on')}return r})}
 
 /* WS */
-function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event')aE(m)}catch(x){}}}
+function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event'){aE(m);var ee=document.getElementById('evl-empty');if(ee)ee.style.display='none'}}catch(x){}}}
 
-function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.sigmaRuleCount!==undefined)document.getElementById('v-sigma').textContent=s.sigmaRuleCount;if(s.yaraRuleCount!==undefined)document.getElementById('v-yara').textContent=s.yaraRuleCount;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updateG6()}
+function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.sigmaRuleCount!==undefined)document.getElementById('v-sigma').textContent=s.sigmaRuleCount;if(s.yaraRuleCount!==undefined)document.getElementById('v-yara').textContent=s.yaraRuleCount;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updPBar(s);updateG6();
+/* Hide empty reassurance when events exist */
+var ee=document.getElementById('evl-empty');if(ee&&s.eventsProcessed>0)ee.style.display='none';
+}
 
 function aE(m){var l=document.getElementById('evl');var d=document.createElement('div');var c=(m.data&&m.data.conclusion)||'benign';d.className='ei '+c;var t=m.timestamp?m.timestamp.split('T')[1].split('.')[0]:'--:--:--';d.innerHTML='<span class="ei-t">'+t+'</span><span class="ei-y">'+esc(m.type||'')+'</span><span class="ei-d">'+esc(JSON.stringify(m.data||{}).slice(0,200))+'</span>';l.prepend(d);while(l.children.length>50)l.removeChild(l.lastChild)}
 
@@ -1273,9 +1288,9 @@ function aE(m){var l=document.getElementById('evl');var d=document.createElement
 function ldSk(){af('/api/skills').then(function(r){return r.json()}).then(function(d){var tb=document.getElementById('sk-tb');tb.innerHTML='';if(!d.skills||d.skills.length===0){tb.innerHTML='<tr><td colspan="5" class="empty">'+(lang==='zh'?'\u5c1a\u7121\u6280\u80fd\u8cc7\u6599':'No skills data')+'</td></tr>';return}d.skills.forEach(function(s,i){var tr=document.createElement('tr');tr.innerHTML='<td>'+(i+1)+'</td><td>'+esc(s.name||'')+'</td><td>'+esc(s.source||'--')+'</td><td style="color:var(--tm);font-size:12px">'+esc(s.reason||'--')+'</td><td style="color:var(--tm);font-size:12px">'+(s.addedAt?new Date(s.addedAt).toLocaleDateString():'--')+'</td>';tb.appendChild(tr)})}).catch(function(){})}
 
 /* AI */
-function loadAI(){af('/api/ai-config').then(function(r){return r.json()}).then(function(d){var ai=d.ai||{};var p=ai.provider||'';var locals=['ollama','lmstudio'];if(locals.indexOf(p)!==-1){document.getElementById('ai2p').value=p;document.getElementById('ai2e').value=ai.endpoint||'';document.getElementById('ai2m').value=ai.model||'';document.getElementById('l2d').className='dot dot-ok'}else{document.getElementById('l2d').className='dot dot-off'}var clouds=['claude','openai','gemini','groq','mistral','deepseek'];if(clouds.indexOf(p)!==-1){document.getElementById('ai3p').value=p;document.getElementById('ai3k').value=ai.apiKey?'********':'';document.getElementById('ai3m').value=ai.model||'';document.getElementById('ai3e').value=ai.endpoint||'';document.getElementById('l3d').className='dot dot-ok'}else{document.getElementById('l3d').className='dot dot-off';document.getElementById('ai3e').value=''}}).catch(function(){})}
+function loadAI(){af('/api/ai-config').then(function(r){return r.json()}).then(function(d){var ai=d.ai||{};var p=ai.provider||'';var locals=['ollama','lmstudio'];if(locals.indexOf(p)!==-1){document.getElementById('l2d').className='dot dot-ok'}else{document.getElementById('l2d').className='dot dot-off'}var clouds=['claude','openai','gemini','groq','mistral','deepseek'];if(clouds.indexOf(p)!==-1){document.getElementById('ai3p').value=p;document.getElementById('ai3k').value=ai.apiKey?'********':'';document.getElementById('ai3m').value=ai.model||'';document.getElementById('ai3e').value=ai.endpoint||'';document.getElementById('l3d').className='dot dot-ok'}else{document.getElementById('l3d').className='dot dot-off';document.getElementById('ai3e').value=''}}).catch(function(){})}
 
-function saveAI(){var l2=document.getElementById('ai2p').value;var l3=document.getElementById('ai3p').value;var b={};if(l2){b.provider=l2;b.endpoint=document.getElementById('ai2e').value||undefined;b.model=document.getElementById('ai2m').value||undefined}if(l3){b.provider=l3;b.model=document.getElementById('ai3m').value||undefined;var k=document.getElementById('ai3k').value;if(k&&k.indexOf('*')===-1)b.apiKey=k;var ce=document.getElementById('ai3e').value;if(ce)b.endpoint=ce}af('/api/ai-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json()}).then(function(d){if(d.success)toast(lang==='zh'?'\u5132\u5b58\u6210\u529f':'Configuration saved');else toast(d.error||'Error');loadAI()}).catch(function(){toast('Network error')})}
+function saveAI(){var l3=document.getElementById('ai3p').value;var b={};if(l3){b.provider=l3;b.model=document.getElementById('ai3m').value||undefined;var k=document.getElementById('ai3k').value;if(k&&k.indexOf('*')===-1)b.apiKey=k;var ce=document.getElementById('ai3e').value;if(ce)b.endpoint=ce}af('/api/ai-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json()}).then(function(d){if(d.success)toast(lang==='zh'?'\u5132\u5b58\u6210\u529f':'Configuration saved');else toast(d.error||'Error');loadAI()}).catch(function(){toast('Network error')})}
 
 /* Threats */
 function ldTh(){af('/api/threat-map').then(function(r){return r.json()}).then(function(t){var tb=document.getElementById('th-tb');tb.innerHTML='';if(!t||t.length===0){tb.innerHTML='<tr><td colspan="4" class="empty">'+(lang==='zh'?'\u7121\u5a01\u8105\u8cc7\u6599':'No threat data')+'</td></tr>';return}t.forEach(function(x){var tr=document.createElement('tr');tr.innerHTML='<td>'+esc(x.sourceIP||'')+'</td><td>'+esc(x.attackType||'')+'</td><td>'+esc(String(x.count||0))+'</td><td style="color:var(--tm);font-size:12px">'+esc(x.lastSeen||'--')+'</td>';tb.appendChild(tr)})}).catch(function(){});
@@ -1300,17 +1315,38 @@ function ldTCloud(){af('/api/threat-cloud').then(function(r){return r.json()}).t
 function toggleUpload(){var tog=document.getElementById('tc-toggle');var isOn=tog.classList.contains('on');af('/api/threat-cloud',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uploadEnabled:!isOn})}).then(function(r){return r.json()}).then(function(d){if(d.success){toast(lang==='zh'?'\u5132\u5b58\u6210\u529f':'Configuration saved');ldTCloud()}else toast(d.error||'Error')}).catch(function(){toast('Network error')})}
 
 
+/* Protection bar update */
+function updPBar(s){
+var dot=document.getElementById('pb-dot');
+var txt=document.getElementById('pb-txt');
+var det=document.getElementById('pb-detail');
+if(!dot||!txt||!det)return;
+var running=s.mode==='protection'||s.mode==='learning';
+dot.className='pb-dot '+(running?'ok':'bad');
+txt.textContent=running?'PROTECTED':'INACTIVE';
+var rules=(s.sigmaRuleCount||0)+(s.yaraRuleCount||0)+(s.atrRuleCount||0);
+var lastEv=s.eventsProcessed>0?fUp(s.uptime||0)+' uptime':'--';
+det.textContent='| '+(s.eventsProcessed||0)+' events | '+rules+' rules active | Uptime: '+lastEv;
+if(!running)setTri('inactive');
+}
 gTk();
 function enterDashboard(){
 localStorage.setItem('panguard_welcomed','1');
 document.getElementById('welcome').classList.add('hide');
-setTimeout(function(){document.getElementById('welcome').style.display='none';cWS();loadInitData();nav('guide')},600);
+setTimeout(function(){document.getElementById('welcome').style.display='none';nav('overview');showFirstVisitToast()},600);
+}
+function showFirstVisitToast(){
+var t=document.getElementById('toast');
+t.innerHTML='<span style="color:var(--ok);font-weight:700">Your AI agents are now protected</span>';
+t.classList.add('show');setTimeout(function(){t.classList.remove('show')},4000);
 }
 function loadInitData(){af('/api/status').then(function(r){return r.json()}).then(uS).catch(function(){});af('/api/rules').then(function(r){return r.json()}).then(function(d){if(d.sigma!==undefined)document.getElementById('v-sigma').textContent=d.sigma;if(d.yara!==undefined)document.getElementById('v-yara').textContent=d.yara;if(d.atr!==undefined)document.getElementById('v-atr').textContent=d.atr}).catch(function(){});updateG6()}
 (function(){
 var bar=document.getElementById('init-bar');
+// Always connect WebSocket immediately, regardless of welcome state
+cWS();loadInitData();
 var welcomed=localStorage.getItem('panguard_welcomed');
-if(welcomed){document.getElementById('welcome').style.display='none';cWS();loadInitData();return}
+if(welcomed){document.getElementById('welcome').style.display='none';return}
 bar.style.width='15%';
 setTimeout(function(){bar.style.width='40%'},600);
 setTimeout(function(){bar.style.width='65%'},1200);

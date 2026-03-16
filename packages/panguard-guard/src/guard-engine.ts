@@ -336,6 +336,11 @@ export class GuardEngine {
       this.dashboard.setConfigGetter(() => this.config);
       await this.dashboard.start();
 
+      // Set startTime early so the immediate status push shows valid uptime
+      this.startTime = Date.now();
+      // Push real status immediately so first WS client gets non-zero data
+      this.updateDashboardStatus();
+
       const dashPort = Number(this.config.dashboardPort);
       const token = this.dashboard.getAuthToken();
       const dashUrl = `http://127.0.0.1:${dashPort}#token=${token}`;
@@ -564,7 +569,7 @@ export class GuardEngine {
     );
     this.dashboard.updateStatus({
       mode: this.mode,
-      uptime: Date.now() - this.startTime,
+      uptime: this.startTime > 0 ? Date.now() - this.startTime : 0,
       eventsProcessed: this.eventsProcessed,
       threatsDetected: this.threatsDetected,
       actionsExecuted: this.actionsExecuted,
