@@ -27,12 +27,8 @@ export default function ATRStandard() {
           <p className="text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold mb-3">
             {t('overline')}
           </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">
-            {t('title')}
-          </h2>
-          <p className="text-base text-text-secondary mt-3 max-w-2xl mx-auto">
-            {t('subtitle')}
-          </p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">{t('title')}</h2>
+          <p className="text-base text-text-secondary mt-3 max-w-2xl mx-auto">{t('subtitle')}</p>
         </FadeInUp>
 
         <FadeInUp delay={0.1} className="flex flex-wrap justify-center gap-6 sm:gap-10 mb-10">
@@ -57,7 +53,9 @@ export default function ATRStandard() {
               className="bg-surface-1 border border-border rounded-lg px-3 py-2.5 flex items-center justify-between"
             >
               <span className="text-xs text-text-secondary truncate">{cat.name}</span>
-              <span className="text-xs font-bold text-panguard-green shrink-0 ml-2">{cat.count}</span>
+              <span className="text-xs font-bold text-panguard-green shrink-0 ml-2">
+                {cat.count}
+              </span>
             </div>
           ))}
         </FadeInUp>

@@ -48,3 +48,5 @@ test-results/
 marketing/
 progress.md
 .env.production
+threat-cloud.db-shm
+threat-cloud.db-wal

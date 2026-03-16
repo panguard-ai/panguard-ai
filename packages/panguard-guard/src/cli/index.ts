@@ -607,13 +607,17 @@ async function commandInstall(dataDir: string): Promise<void> {
 
   if (enableTC) {
     console.log(
-      `  ${symbols.pass} Threat Cloud enabled: ${c.sage(updated.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')}`,
+      `  ${symbols.pass} Threat Cloud enabled: ${c.sage(updated.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')}`
     );
     console.log(c.dim('    Every scan strengthens the collective defense network.'));
     console.log(c.dim('    每次掃描都會強化集體防禦網路。'));
   } else {
     console.log(`  ${symbols.info} Threat Cloud disabled (offline mode).`);
-    console.log(c.dim('    You can enable it later: panguard-guard config --set threatCloudUploadEnabled=true'));
+    console.log(
+      c.dim(
+        '    You can enable it later: panguard-guard config --set threatCloudUploadEnabled=true'
+      )
+    );
   }
 }
 

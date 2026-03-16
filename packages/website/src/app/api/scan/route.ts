@@ -273,9 +273,11 @@ function runFullScan(
         if (compiled.regex.test(content)) {
           if (!matchedRuleIds.has(rule.id)) {
             matchedRuleIds.add(rule.id);
-            const severity = (['critical', 'high', 'medium', 'low', 'info'].includes(rule.severity)
-              ? rule.severity
-              : 'medium') as Finding['severity'];
+            const severity = (
+              ['critical', 'high', 'medium', 'low', 'info'].includes(rule.severity)
+                ? rule.severity
+                : 'medium'
+            ) as Finding['severity'];
             findings.push({
               id: `atr-${rule.id}`,
               title: rule.title,

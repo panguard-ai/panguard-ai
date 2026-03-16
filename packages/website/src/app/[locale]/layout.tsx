@@ -182,7 +182,10 @@ export default async function LocaleLayout(
         <script
           nonce={nonce}
           suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js-ready");setTimeout(function(){document.documentElement.classList.add("fm-ready")},800)' }}
+          dangerouslySetInnerHTML={{
+            __html:
+              'document.documentElement.classList.add("js-ready");setTimeout(function(){document.documentElement.classList.add("fm-ready")},800)',
+          }}
         />
         {/* jsonLd: SEO structured data (Organization, SoftwareApplication, WebSite) */}
         <script

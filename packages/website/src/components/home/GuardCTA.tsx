@@ -10,8 +10,13 @@ import { STATS } from '@/lib/stats';
 const INSTALL_CMD = 'npx panguard setup';
 
 const PLATFORMS = [
-  'Claude Code', 'Cursor', 'QClaw', 'OpenClaw',
-  'Codex', 'WorkBuddy', 'Claude Desktop',
+  'Claude Code',
+  'Cursor',
+  'QClaw',
+  'OpenClaw',
+  'Codex',
+  'WorkBuddy',
+  'Claude Desktop',
 ];
 
 export default function GuardCTA() {
@@ -31,9 +36,7 @@ export default function GuardCTA() {
           <p className="text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold mb-3">
             {t('overline')}
           </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">
-            {t('title')}
-          </h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">{t('title')}</h2>
           <p className="text-base text-text-secondary mt-3 max-w-xl mx-auto">
             {t('subtitle', { rules: STATS.totalRulesDisplay })}
           </p>
@@ -50,7 +53,11 @@ export default function GuardCTA() {
               className="text-text-muted hover:text-text-secondary transition-colors p-1 shrink-0"
               aria-label="Copy install command"
             >
-              {copied ? <Check className="w-4 h-4 text-status-safe" /> : <Copy className="w-4 h-4" />}
+              {copied ? (
+                <Check className="w-4 h-4 text-status-safe" />
+              ) : (
+                <Copy className="w-4 h-4" />
+              )}
             </button>
           </div>
         </FadeInUp>

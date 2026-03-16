@@ -130,9 +130,9 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
     tagline: 'Snyk scans your code. We scan what your AI agent installs.',
     bullets: [
       'Snyk excels at finding vulnerabilities in your dependencies and container images. But it has no concept of MCP skills or AI agent tools.',
-      'A malicious MCP skill doesn\'t have a CVE \u2014 it\'s a new class of threat that Snyk\'s vulnerability database doesn\'t cover.',
-      'PanGuard\'s Skill Auditor is Snyk for the AI agent era: pre-install scanning with 52 ATR rules.',
-      'Use Snyk for your code, PanGuard for your agent\'s tools.',
+      "A malicious MCP skill doesn't have a CVE \u2014 it's a new class of threat that Snyk's vulnerability database doesn't cover.",
+      "PanGuard's Skill Auditor is Snyk for the AI agent era: pre-install scanning with 52 ATR rules.",
+      "Use Snyk for your code, PanGuard for your agent's tools.",
     ],
   },
   {
@@ -175,9 +175,11 @@ const REAL_FINDINGS = [
 /* ------------------------------------------------------------------ */
 
 function CellContent({ value }: { value: CellValue }) {
-  if (value === 'yes') return <Check className="w-5 h-5 text-brand-sage mx-auto" aria-label="Yes" />;
+  if (value === 'yes')
+    return <Check className="w-5 h-5 text-brand-sage mx-auto" aria-label="Yes" />;
   if (value === 'no') return <X className="w-5 h-5 text-text-muted mx-auto" aria-label="No" />;
-  if (value === 'partial') return <Minus className="w-5 h-5 text-text-tertiary mx-auto" aria-label="Partial" />;
+  if (value === 'partial')
+    return <Minus className="w-5 h-5 text-text-tertiary mx-auto" aria-label="Partial" />;
   return <span>{value}</span>;
 }
 
@@ -198,7 +200,9 @@ function HeroSection() {
         <p className="text-text-secondary mt-4 text-lg max-w-2xl mx-auto leading-relaxed">
           CrowdStrike protects your OS. Snyk protects your code. Lakera filters prompts.
           <br />
-          <span className="text-brand-sage font-semibold">Nobody protects your AI agent. Until now.</span>
+          <span className="text-brand-sage font-semibold">
+            Nobody protects your AI agent. Until now.
+          </span>
         </p>
       </FadeInUp>
     </section>
@@ -218,19 +222,43 @@ function BlindSpotSection() {
           <div className="bg-surface-1 rounded-xl border border-border p-6">
             <p className="text-sm font-bold text-text-primary mb-3">Traditional EDR sees:</p>
             <ul className="space-y-2 text-sm text-text-secondary">
-              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" /> Process execution, file access, network calls</li>
-              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" /> Malware signatures, ransomware patterns</li>
-              <li className="flex items-start gap-2"><Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" /> Known CVEs in installed software</li>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" /> Process execution,
+                file access, network calls
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" /> Malware signatures,
+                ransomware patterns
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" /> Known CVEs in
+                installed software
+              </li>
             </ul>
           </div>
           <div className="bg-surface-1 rounded-xl border border-red-400/30 p-6">
             <p className="text-sm font-bold text-red-400 mb-3">Traditional EDR cannot see:</p>
             <ul className="space-y-2 text-sm text-text-secondary">
-              <li className="flex items-start gap-2"><X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Prompt injection in agent conversations</li>
-              <li className="flex items-start gap-2"><X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Malicious MCP tool definitions</li>
-              <li className="flex items-start gap-2"><X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Credential exfiltration via agent tool calls</li>
-              <li className="flex items-start gap-2"><X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Context manipulation across multi-turn sessions</li>
-              <li className="flex items-start gap-2"><X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Supply chain attacks via skill packages</li>
+              <li className="flex items-start gap-2">
+                <X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Prompt injection in agent
+                conversations
+              </li>
+              <li className="flex items-start gap-2">
+                <X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Malicious MCP tool
+                definitions
+              </li>
+              <li className="flex items-start gap-2">
+                <X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Credential exfiltration via
+                agent tool calls
+              </li>
+              <li className="flex items-start gap-2">
+                <X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Context manipulation across
+                multi-turn sessions
+              </li>
+              <li className="flex items-start gap-2">
+                <X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" /> Supply chain attacks via
+                skill packages
+              </li>
             </ul>
           </div>
         </div>
@@ -253,9 +281,13 @@ function EvidenceSection() {
             <div key={f.type} className="bg-surface-1 rounded-xl border border-border p-5">
               <div className="flex items-start justify-between gap-3 mb-2">
                 <p className="text-sm font-bold text-text-primary">{f.type}</p>
-                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded shrink-0 ${
-                  f.severity === 'CRITICAL' ? 'text-red-400 bg-red-400/10' : 'text-orange-400 bg-orange-400/10'
-                }`}>
+                <span
+                  className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded shrink-0 ${
+                    f.severity === 'CRITICAL'
+                      ? 'text-red-400 bg-red-400/10'
+                      : 'text-orange-400 bg-orange-400/10'
+                  }`}
+                >
                   {f.severity}
                 </span>
               </div>
@@ -265,8 +297,11 @@ function EvidenceSection() {
           ))}
         </div>
         <p className="text-center text-sm text-text-muted mt-6">
-          {STATS.ecosystem.findingsCritical} CRITICAL + {STATS.ecosystem.findingsHigh} HIGH findings out of {STATS.ecosystem.skillsScanned.toLocaleString()} skills scanned.
-          {' '}{STATS.ecosystem.findingsClean.toLocaleString()} skills ({((STATS.ecosystem.findingsClean / STATS.ecosystem.skillsScanned) * 100).toFixed(1)}%) are clean.
+          {STATS.ecosystem.findingsCritical} CRITICAL + {STATS.ecosystem.findingsHigh} HIGH findings
+          out of {STATS.ecosystem.skillsScanned.toLocaleString()} skills scanned.{' '}
+          {STATS.ecosystem.findingsClean.toLocaleString()} skills (
+          {((STATS.ecosystem.findingsClean / STATS.ecosystem.skillsScanned) * 100).toFixed(1)}%) are
+          clean.
         </p>
       </FadeInUp>
     </SectionWrapper>
@@ -294,9 +329,14 @@ function ComparisonTable() {
                   Capability
                 </th>
                 {columns.map((col, i) => (
-                  <th key={col} className={`py-3 px-4 font-semibold border-b text-center ${
-                    i === 0 ? 'text-brand-sage border-brand-sage/40' : 'text-text-secondary border-border'
-                  }`}>
+                  <th
+                    key={col}
+                    className={`py-3 px-4 font-semibold border-b text-center ${
+                      i === 0
+                        ? 'text-brand-sage border-brand-sage/40'
+                        : 'text-text-secondary border-border'
+                    }`}
+                  >
                     {col}
                   </th>
                 ))}
@@ -304,10 +344,16 @@ function ComparisonTable() {
             </thead>
             <tbody>
               {COMPARISON_ROWS.map((row) => (
-                <tr key={row.feature} className="border-b border-border/50 hover:bg-surface-2/30 transition-colors">
+                <tr
+                  key={row.feature}
+                  className="border-b border-border/50 hover:bg-surface-2/30 transition-colors"
+                >
                   <td className="py-3 px-4 text-text-primary font-medium">{row.feature}</td>
                   {colKeys.map((key, i) => (
-                    <td key={key} className={`py-3 px-4 text-center text-text-secondary ${i === 0 ? 'bg-brand-sage/5' : ''}`}>
+                    <td
+                      key={key}
+                      className={`py-3 px-4 text-center text-text-secondary ${i === 0 ? 'bg-brand-sage/5' : ''}`}
+                    >
                       <CellContent value={row[key]} />
                     </td>
                   ))}
@@ -324,7 +370,10 @@ function ComparisonTable() {
               <p className="text-text-primary font-semibold text-sm mb-3">{row.feature}</p>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 {colKeys.map((key, i) => (
-                  <div key={key} className={`flex flex-col gap-1 ${i === 0 ? 'text-brand-sage' : 'text-text-secondary'}`}>
+                  <div
+                    key={key}
+                    className={`flex flex-col gap-1 ${i === 0 ? 'text-brand-sage' : 'text-text-secondary'}`}
+                  >
                     <span className="text-text-tertiary font-medium">{columns[i]}</span>
                     <CellContent value={row[key]} />
                   </div>
@@ -355,7 +404,10 @@ function ComparisonCards() {
               <p className="text-xs text-brand-sage font-semibold mb-4">{card.tagline}</p>
               <ul className="space-y-3 flex-1">
                 {card.bullets.map((bullet) => (
-                  <li key={bullet} className="flex items-start gap-2 text-sm text-text-secondary leading-relaxed">
+                  <li
+                    key={bullet}
+                    className="flex items-start gap-2 text-sm text-text-secondary leading-relaxed"
+                  >
                     <span className="mt-1.5 block w-1.5 h-1.5 rounded-full bg-brand-sage shrink-0" />
                     {bullet}
                   </li>

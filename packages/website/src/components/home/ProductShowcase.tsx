@@ -3,7 +3,18 @@
 import { useTranslations } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import { Link } from '@/navigation';
-import { ArrowRight, Search, Shield, Cloud, Layers, Zap, Users, Lock, RefreshCw, Globe } from 'lucide-react';
+import {
+  ArrowRight,
+  Search,
+  Shield,
+  Cloud,
+  Layers,
+  Zap,
+  Users,
+  Lock,
+  RefreshCw,
+  Globe,
+} from 'lucide-react';
 import { STATS } from '@/lib/stats';
 
 function ProductCard({
@@ -47,9 +58,7 @@ function ProductCard({
         </div>
 
         {/* Description */}
-        <p className="text-sm text-text-secondary leading-relaxed mb-5">
-          {description}
-        </p>
+        <p className="text-sm text-text-secondary leading-relaxed mb-5">{description}</p>
 
         {/* Features */}
         <div className="space-y-2.5 mb-6">
@@ -94,12 +103,8 @@ export default function ProductShowcase() {
           <p className="text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold mb-3">
             {t('overline')}
           </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">
-            {t('title')}
-          </h2>
-          <p className="text-base text-text-secondary mt-3 max-w-2xl mx-auto">
-            {t('subtitle')}
-          </p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">{t('title')}</h2>
+          <p className="text-base text-text-secondary mt-3 max-w-2xl mx-auto">{t('subtitle')}</p>
         </FadeInUp>
 
         <div className="grid md:grid-cols-3 gap-5">

@@ -17,12 +17,8 @@ export default function WhyPanguard() {
             <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold mb-3">
               {t('overline')}
             </p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">
-              {t('title')}
-            </h2>
-            <p className="text-base text-text-secondary mt-3 max-w-2xl mx-auto">
-              {t('subtitle')}
-            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">{t('title')}</h2>
+            <p className="text-base text-text-secondary mt-3 max-w-2xl mx-auto">{t('subtitle')}</p>
           </div>
         </FadeInUp>
 
@@ -96,7 +92,9 @@ export default function WhyPanguard() {
               <tbody>
                 {['row1', 'row2', 'row3', 'row4', 'row5'].map((key) => (
                   <tr key={key} className="border-b border-border/50">
-                    <td className="py-3 px-4 text-text-primary font-medium">{t(`table.${key}.feature`)}</td>
+                    <td className="py-3 px-4 text-text-primary font-medium">
+                      {t(`table.${key}.feature`)}
+                    </td>
                     <td className="py-3 px-4 text-center bg-brand-sage/5">
                       <CellIcon value={t(`table.${key}.panguard`)} />
                     </td>

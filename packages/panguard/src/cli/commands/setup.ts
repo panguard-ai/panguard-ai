@@ -121,9 +121,12 @@ export function setupCommand(): Command {
         const sysLang = (process.env['LANG'] ?? process.env['LC_ALL'] ?? '').toLowerCase();
         const isSystemChinese = sysLang.includes('zh') || sysLang.includes('chinese');
         const detectedLang: 'en' | 'zh-TW' =
-          options.lang === 'en' ? 'en'
-            : options.lang === 'zh-TW' ? 'zh-TW'
-              : isSystemChinese ? 'zh-TW'
+          options.lang === 'en'
+            ? 'en'
+            : options.lang === 'zh-TW'
+              ? 'zh-TW'
+              : isSystemChinese
+                ? 'zh-TW'
                 : 'en';
         const L = detectedLang;
 
@@ -403,9 +406,7 @@ export function setupCommand(): Command {
 
                 try {
                   const configPath = join(dataDir, 'config.json');
-                  const { loadConfig, saveConfig } = await import(
-                    '@panguard-ai/panguard-guard'
-                  );
+                  const { loadConfig, saveConfig } = await import('@panguard-ai/panguard-guard');
                   const guardConfig = loadConfig(configPath);
                   const updatedConfig = {
                     ...guardConfig,

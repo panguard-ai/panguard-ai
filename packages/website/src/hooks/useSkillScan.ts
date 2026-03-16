@@ -119,8 +119,8 @@ export function useSkillScan(): UseSkillScanReturn {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
-  const report = result?.ok ? result.data?.report ?? null : null;
-  const meta = result?.ok ? result.data ?? null : null;
+  const report = result?.ok ? (result.data?.report ?? null) : null;
+  const meta = result?.ok ? (result.data ?? null) : null;
 
   return {
     url,

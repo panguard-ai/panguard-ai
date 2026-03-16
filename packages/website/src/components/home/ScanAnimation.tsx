@@ -5,7 +5,10 @@ import { STATS } from '@/lib/stats';
 
 const PHASES = [
   { icon: '01', label: 'Fetching skill content...' },
-  { icon: '02', label: `Running ATR detection (${STATS.atrRules} rules, ${STATS.atrPatterns}+ patterns)...` },
+  {
+    icon: '02',
+    label: `Running ATR detection (${STATS.atrRules} rules, ${STATS.atrPatterns}+ patterns)...`,
+  },
   { icon: '03', label: 'Checking secrets, permissions, injection vectors...' },
   { icon: '04', label: 'Generating report...' },
 ];
