@@ -79,30 +79,33 @@ RUN mkdir -p /standalone
 # Step 1: Copy main CLI entry point
 RUN cp -r packages/panguard/dist /standalone/dist
 
-# Step 2: Install external deps with npm FIRST (before workspace packages)
-# NOTE: Update these versions if workspace package.json deps change
-RUN printf '{"name":"panguard-api","version":"0.1.0","private":true,"type":"module","dependencies":{"commander":"12.1.0","better-sqlite3":"11.10.0","i18next":"24.2.3","js-yaml":"4.1.1","zod":"3.25.76","pdfkit":"0.15.2","ws":"8.19.0"},"optionalDependencies":{"ssh2":"1.17.0"}}' > /standalone/package.json && \
-    cd /standalone && npm install --production
+# Step 2: Install external deps with npm (no workspace: references)
+# Using echo instead of printf to avoid shell escaping issues across platforms
+# Also strip any workspace: references from copied package.json files
+RUN echo '{"name":"panguard-api","version":"0.1.0","private":true,"type":"module","dependencies":{"commander":"12.1.0","better-sqlite3":"11.10.0","i18next":"24.2.3","js-yaml":"4.1.1","zod":"3.25.76","pdfkit":"0.15.2","ws":"8.19.0"},"optionalDependencies":{"ssh2":"1.17.0"}}' > /standalone/package.json && \
+    cat /standalone/package.json && \
+    cd /standalone && npm install --omit=dev
 
 # Step 3: Copy workspace packages into node_modules AFTER npm install
+# Strip workspace:* references from package.json (npm doesn't understand pnpm workspace protocol)
 RUN mkdir -p /standalone/node_modules/@panguard-ai && \
     for pkg in core panguard-auth panguard-guard panguard-scan panguard-chat panguard-report panguard-trap panguard-web panguard-mcp panguard-skill-auditor; do \
       mkdir -p /standalone/node_modules/@panguard-ai/$pkg && \
       cp -r packages/$pkg/dist /standalone/node_modules/@panguard-ai/$pkg/dist && \
-      cp packages/$pkg/package.json /standalone/node_modules/@panguard-ai/$pkg/; \
+      sed 's/"workspace:\*"/"*"/g' packages/$pkg/package.json > /standalone/node_modules/@panguard-ai/$pkg/package.json; \
     done && \
     mkdir -p /standalone/node_modules/@panguard-ai/manager && \
     cp -r packages/panguard-manager/dist /standalone/node_modules/@panguard-ai/manager/dist && \
-    cp packages/panguard-manager/package.json /standalone/node_modules/@panguard-ai/manager/ && \
+    sed 's/"workspace:\*"/"*"/g' packages/panguard-manager/package.json > /standalone/node_modules/@panguard-ai/manager/package.json && \
     mkdir -p /standalone/node_modules/@panguard-ai/security-hardening && \
     cp -r security-hardening/dist /standalone/node_modules/@panguard-ai/security-hardening/dist && \
-    cp security-hardening/package.json /standalone/node_modules/@panguard-ai/security-hardening/ && \
+    sed 's/"workspace:\*"/"*"/g' security-hardening/package.json > /standalone/node_modules/@panguard-ai/security-hardening/package.json && \
     mkdir -p /standalone/node_modules/@panguard-ai/threat-cloud && \
     cp -r packages/threat-cloud/dist /standalone/node_modules/@panguard-ai/threat-cloud/dist && \
-    cp packages/threat-cloud/package.json /standalone/node_modules/@panguard-ai/threat-cloud/ && \
+    sed 's/"workspace:\*"/"*"/g' packages/threat-cloud/package.json > /standalone/node_modules/@panguard-ai/threat-cloud/package.json && \
     mkdir -p /standalone/node_modules/@panguard-ai/atr && \
     cp -r packages/atr/dist /standalone/node_modules/@panguard-ai/atr/dist && \
-    cp packages/atr/package.json /standalone/node_modules/@panguard-ai/atr/ && \
+    sed 's/"workspace:\*"/"*"/g' packages/atr/package.json > /standalone/node_modules/@panguard-ai/atr/package.json && \
     cp -r packages/atr/rules /standalone/node_modules/@panguard-ai/atr/rules && \
     cp -r packages/atr/spec /standalone/node_modules/@panguard-ai/atr/spec && \
     mkdir -p /standalone/node_modules/agent-threat-rules && \
