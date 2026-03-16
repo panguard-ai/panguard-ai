@@ -1,22 +1,15 @@
 import dynamic from 'next/dynamic';
 import NavBar from '@/components/NavBar';
-import RevolutionHero from '@/components/home/RevolutionHero';
 import Footer from '@/components/Footer';
+import ScannerHero from '@/components/home/ScannerHero';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
 // Below-the-fold sections loaded lazily
-const SkillScanner = dynamic(() => import('@/components/home/SkillScanner'));
-const ThreatCards = dynamic(() => import('@/components/home/ThreatCards'));
-const PipelineFlow = dynamic(() => import('@/components/home/PipelineFlow'));
-const UseCases = dynamic(() => import('@/components/home/UseCases'));
-const AutoResponse = dynamic(() => import('@/components/home/AutoResponse'));
-const ProductPillars = dynamic(() => import('@/components/home/ProductPillars'));
-const SkillProtection = dynamic(() => import('@/components/home/SkillProtection'));
-const RealScenarios = dynamic(() => import('@/components/home/RealScenarios'));
-const SecurityStack = dynamic(() => import('@/components/home/SecurityStack'));
-const HowItWorksNew = dynamic(() => import('@/components/home/HowItWorksNew'));
-const EcosystemScanner = dynamic(() => import('@/components/home/EcosystemScanner'));
+const EcosystemEvidence = dynamic(() => import('@/components/home/EcosystemEvidence'));
+const ATRStandard = dynamic(() => import('@/components/home/ATRStandard'));
+const ProductShowcase = dynamic(() => import('@/components/home/ProductShowcase'));
 const CommunityFlywheel = dynamic(() => import('@/components/home/CommunityFlywheel'));
+const GuardCTA = dynamic(() => import('@/components/home/GuardCTA'));
 const FinalCTANew = dynamic(() => import('@/components/home/FinalCTANew'));
 
 export default function Home() {
@@ -31,33 +24,19 @@ export default function Home() {
             threats with AI analysis, and shares new rules to protect everyone. MIT licensed. Open
             source.
           </p>
-          {/* 1. Hero: The first Skills Audit for AI agents */}
-          <RevolutionHero />
-          {/* 1.25. Online Skill Scanner: Try it now, no install needed */}
-          <SkillScanner />
-          {/* 1.5. Threat cards: What happens without audit */}
-          <ThreatCards />
-          {/* 2. Pipeline: 6-step visual flow diagram */}
-          <PipelineFlow />
-          {/* 2.5. Use Cases: What you can do after installing */}
-          <UseCases />
-          {/* 2.75. Auto Response: Confidence-based response tiers */}
-          <AutoResponse />
-          {/* 3. Three pillars: Community Rules / Collective Defense / AI Fallback */}
-          <ProductPillars />
-          {/* 4. Before/after: With and without Panguard */}
-          <SkillProtection />
-          {/* 5. Three layers: Rules / AI / Cloud */}
-          <RealScenarios />
-          {/* 6. Your agent's immune system */}
-          <SecurityStack />
-          {/* 7. Simple summary: Install / Review / Evolve */}
-          <HowItWorksNew />
-          {/* 8. Ecosystem scanning stats */}
-          <EcosystemScanner />
-          {/* 9. Collective immunity flywheel */}
+          {/* 1. Problem + Scanner: AI agents have full access, zero security */}
+          <ScannerHero />
+          {/* 2. Evidence: We scanned 1,295 skills — here's what we found */}
+          <EcosystemEvidence />
+          {/* 3. Standard: ATR — the open audit standard for AI agents */}
+          <ATRStandard />
+          {/* 4. Products: Skill Auditor + Guard + Threat Cloud deep dive */}
+          <ProductShowcase />
+          {/* 5. Flywheel: Every scan makes the network safer */}
           <CommunityFlywheel />
-          {/* 9. Final CTA */}
+          {/* 5. Guard: Done scanning? One command, 24/7 protection */}
+          <GuardCTA />
+          {/* 6. Final CTA + trust signals */}
           <FinalCTANew />
         </main>
       </RuleStatsProvider>

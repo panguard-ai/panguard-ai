@@ -740,6 +740,101 @@
       "learnMore": "了解更多",
       "trustNote": "掃描在伺服器端執行。不會儲存代碼。僅快取內容 hash 用於去重。",
       "submitATR": "提交 ATR 規則提案"
+    },
+    "scannerHero": {
+      "titleLine1": "AI Agent 正在大爆發。",
+      "titleLine2": "擁有系統最高權限。",
+      "titleLine3": "卻沒有任何資安防護。",
+      "mission": "我們的使命：讓資安不再是奢侈品。",
+      "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
+      "scanBtn": "掃描",
+      "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。"
+    },
+    "evidence": {
+      "overline": "真實數據",
+      "title": "我們掃描了 {count} 個 MCP Skills",
+      "subtitle": "來自 {sources} 個來源的 {entries} 個登錄項目。以下是掃描結果。",
+      "consequencesTitle": "CRITICAL 在實際上代表什麼？",
+      "c1": "讀取 ~/.ssh/id_rsa 並竊取你的私鑰",
+      "c2": "將 API Key 傳送到外部伺服器",
+      "c3": "在 Prompt 中注入惡意指令",
+      "c4": "偷偷修改你的 Git Commit",
+      "conclusion": "這就是為什麼每個 Skill 在執行前都需要審計。"
+    },
+    "atrStandard": {
+      "overline": "開放標準",
+      "title": "AI 時代需要新的審計標準",
+      "subtitle": "ATR（Agent Threat Rules）專為 AI Agent 威脅設計。Sigma 之於 SIEM，ATR 之於 AI Agent。",
+      "rules": "偵測規則",
+      "categories": "威脅類別",
+      "patterns": "偵測模式",
+      "bottomLine": "開源、社群驅動、持續成長。",
+      "viewGithub": "在 GitHub 上查看 ATR"
+    },
+    "guardCta": {
+      "overline": "全天候防護",
+      "title": "掃完了？一行指令，24/7 守護。",
+      "subtitle": "Guard 即時監控你的 AI Agent。{rules} 條偵測規則，自動攔截已知威脅。你的 Agent 不只受保護——它也成為全網的防護端點。",
+      "installGuide": "安裝指南"
+    },
+    "finalCta": {
+      "title": "從掃描開始。",
+      "titleHighlight": "用防護留住你。",
+      "subtitle": "100% 免費。100% 開源。MIT 授權。",
+      "scanNow": "立即掃描",
+      "bottomLine": "每次掃描都讓社群更安全。加入集體防禦網路。"
+    },
+    "liveCounter": {
+      "scanned": "個 Skills 已掃描",
+      "threats": "個威脅已發現",
+      "monitored": "個 Agent 受監控"
+    },
+    "scanResult": {
+      "shareX": "分享到 X",
+      "reportAuthor": "通知作者",
+      "proposeATR": "提交 ATR 規則提案",
+      "flywheelNote": "你的發現會經過社群審核。確認後，系統會自動生成 ATR 規則，保護所有 PanGuard 用戶。"
+    },
+    "productShowcase": {
+      "overline": "三層縱深防禦",
+      "title": "部署前審計。執行時防護。社群情報共享。",
+      "subtitle": "每一層都驅動下一層。三層聯動形成閉環防禦，用戶越多，防護越強。",
+      "auditor": {
+        "overline": "部署前",
+        "title": "Skill Auditor",
+        "desc": "靜態分析引擎，在 MCP Skill 和 AI Agent 工具執行前進行安全掃描。偵測 Prompt 注入、憑證竊取、資料外洩等 9 大威脅類別，基於 ATR 模式比對。",
+        "f1": "52 條 ATR 規則，涵蓋 450+ 偵測模式、9 大類別",
+        "f2": "機密偵測：AWS Key、GitHub Token、SSH 私鑰、API 密鑰",
+        "f3": "YAML Manifest 驗證 + 權限範圍分析",
+        "s1": "ATR 規則",
+        "s2": "審計項目",
+        "s3": "掃描耗時",
+        "cta": "了解 Skill Auditor"
+      },
+      "guard": {
+        "overline": "執行時",
+        "title": "Guard",
+        "desc": "裝好之後，你再也不用擔心 AI 的安全問題。Guard 會監視你的 Agent 做的每一件事——碰了哪些檔案、發了哪些網路請求、裝了哪些套件。發現異常，威脅還沒造成傷害就被攔下來了。",
+        "f1": "守護你的機密（.env、SSH Key、API Token）——任何讀取行為立即告警",
+        "f2": "監控套件和 Git 變更——供應鏈攻擊、未授權的程式碼竄改，第一時間攔截",
+        "f3": "追蹤 Agent 執行的每一個子程序——可疑指令自動封鎖，不需要你操心",
+        "s1": "偵測規則",
+        "s2": "偵測層數",
+        "s3": "回應動作",
+        "cta": "了解 Guard"
+      },
+      "cloud": {
+        "overline": "社群",
+        "title": "Threat Cloud",
+        "desc": "匿名威脅情報共享網路。當任一用戶偵測到威脅，發現會被提案為 ATR 規則，經社群 + LLM 共識審核後，自動推送給所有用戶。集體免疫。",
+        "f1": "匿名上傳 — 不傳送個人資料、檔案內容或原始碼",
+        "f2": "LLM 輔助審核 + 3 份報告共識才能升級為正式規則",
+        "f3": "每小時同步推送新規則至所有連線的 Guard 實例",
+        "s1": "自動生成規則",
+        "s2": "同步間隔",
+        "s3": "授權",
+        "cta": "了解 Threat Cloud"
+      }
     }
   },
   "pricing": {

@@ -23,6 +23,8 @@ export const STATS = {
   sigmaRules: 3_760,
   yaraRules: 5_961,
   atrRules: 52,
+  /** Total unique detection patterns across all 52 ATR rules */
+  atrPatterns: 450,
   totalRules: 3_760 + 5_961 + 52,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
   totalRulesDisplay: '9,700+' as const,

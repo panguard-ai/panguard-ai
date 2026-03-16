@@ -740,6 +740,101 @@
       "learnMore": "Learn more",
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached for deduplication.",
       "submitATR": "Submit ATR Rule Proposal"
+    },
+    "scannerHero": {
+      "titleLine1": "AI agents are exploding.",
+      "titleLine2": "Full system access.",
+      "titleLine3": "Zero security.",
+      "mission": "Our mission: democratize AI security.",
+      "scanLabel": "Check any MCP skill before you install",
+      "scanBtn": "Scan",
+      "trustNote": "Scans run server-side. No code is stored. Only content hash is cached."
+    },
+    "evidence": {
+      "overline": "REAL DATA",
+      "title": "We scanned {count} MCP Skills",
+      "subtitle": "From {entries} registry entries across {sources} sources. Here's what we found.",
+      "consequencesTitle": "What CRITICAL means in practice",
+      "c1": "Read ~/.ssh/id_rsa and exfiltrate private keys",
+      "c2": "Send API keys to external servers",
+      "c3": "Inject malicious instructions into prompts",
+      "c4": "Silently modify git commits",
+      "conclusion": "This is why every skill needs an audit before it runs."
+    },
+    "atrStandard": {
+      "overline": "OPEN STANDARD",
+      "title": "The AI era needs a new audit standard",
+      "subtitle": "ATR (Agent Threat Rules) is purpose-built for AI agent threats. What Sigma is to SIEM, ATR is to AI agents.",
+      "rules": "Detection Rules",
+      "categories": "Threat Categories",
+      "patterns": "Detection Patterns",
+      "bottomLine": "Open source. Community-driven. Growing daily.",
+      "viewGithub": "View ATR on GitHub"
+    },
+    "guardCta": {
+      "overline": "24/7 PROTECTION",
+      "title": "Done scanning? One command, always protected.",
+      "subtitle": "Guard monitors your AI agents in real-time. {rules} detection rules. Auto-blocks known threats. Your agent becomes a defender for the entire network.",
+      "installGuide": "Install Guide"
+    },
+    "finalCta": {
+      "title": "Start with a scan.",
+      "titleHighlight": "Stay for the protection.",
+      "subtitle": "100% free. 100% open source. MIT licensed.",
+      "scanNow": "Scan a Skill Now",
+      "bottomLine": "Every scan makes the community safer. Join the collective defense network."
+    },
+    "liveCounter": {
+      "scanned": "skills scanned",
+      "threats": "threats found",
+      "monitored": "agents monitored"
+    },
+    "scanResult": {
+      "shareX": "Share on X",
+      "reportAuthor": "Report to Author",
+      "proposeATR": "Propose ATR Rule",
+      "flywheelNote": "Your finding will be reviewed by the community. If confirmed, an ATR rule will be auto-generated to protect everyone using PanGuard."
+    },
+    "productShowcase": {
+      "overline": "THREE LAYERS OF DEFENSE",
+      "title": "Pre-deployment audit. Runtime protection. Community intelligence.",
+      "subtitle": "Each layer feeds the next. Together, they form a closed-loop defense that gets stronger with every user.",
+      "auditor": {
+        "overline": "PRE-DEPLOYMENT",
+        "title": "Skill Auditor",
+        "desc": "Static analysis engine that scans MCP skills and AI agent tools before they run. Detects prompt injection, credential theft, data exfiltration, and 6 more threat categories using ATR pattern matching.",
+        "f1": "52 ATR rules with 450+ detection patterns across 9 categories",
+        "f2": "Secret detection: AWS keys, GitHub tokens, private keys, API secrets",
+        "f3": "YAML manifest validation + permission scope analysis",
+        "s1": "ATR Rules",
+        "s2": "Audit Checks",
+        "s3": "Scan Time",
+        "cta": "Learn about Skill Auditor"
+      },
+      "guard": {
+        "overline": "RUNTIME",
+        "title": "Guard",
+        "desc": "Once installed, you never have to think about AI security again. Guard watches everything your agents do -- every file they touch, every network call they make, every dependency they install. If something looks wrong, it's blocked before any damage happens.",
+        "f1": "Watches your secrets (.env, SSH keys, API tokens) -- alerts instantly if anything tries to read them",
+        "f2": "Monitors dependencies and git repos -- catches supply chain attacks and unauthorized code changes",
+        "f3": "Tracks every process your AI agents spawn -- suspicious commands are blocked automatically",
+        "s1": "Detection Rules",
+        "s2": "Detection Layers",
+        "s3": "Response Actions",
+        "cta": "Learn about Guard"
+      },
+      "cloud": {
+        "overline": "COMMUNITY",
+        "title": "Threat Cloud",
+        "desc": "Anonymous threat intelligence network. When one user detects a threat, the finding is proposed as an ATR rule, reviewed by community + LLM consensus, then distributed to all users. Collective immunity.",
+        "f1": "Anonymous uploads — no personal data, file contents, or source code sent",
+        "f2": "LLM-assisted review + 3-report consensus for rule promotion",
+        "f3": "Hourly sync pushes new rules to all connected Guard instances",
+        "s1": "Auto-Generated Rules",
+        "s2": "Sync Interval",
+        "s3": "License",
+        "cta": "Learn about Threat Cloud"
+      }
     }
   },
   "pricing": {
