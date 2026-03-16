@@ -4,9 +4,9 @@
 
 <br>
 
-### The App Store Gatekeeper for AI Agents
+### Every app gets reviewed before you install it. AI skills should too.
 
-AI Agent 的 App Store 守門員 -- 100% 免費，MIT 授權
+每個 App 上架都要審核。AI Skill 不該例外。
 
 <br>
 
@@ -14,136 +14,111 @@ AI Agent 的 App Store 守門員 -- 100% 免費，MIT 授權
 [![GitHub Forks](https://img.shields.io/github/forks/panguard-ai/panguard-ai?style=flat-square)](https://github.com/panguard-ai/panguard-ai/network)
 [![npm version](https://img.shields.io/npm/v/@panguard-ai/panguard?style=flat-square&color=cb3837&logo=npm)](https://www.npmjs.com/package/@panguard-ai/panguard)
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](LICENSE)
-[![ATR](https://img.shields.io/badge/ATR-69%20AI%20agent%20rules-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
-[![Sigma+YARA](https://img.shields.io/badge/Sigma%20%2B%20YARA-9%2C700%2B%20integrated-f97316.svg?style=flat-square)](#detection-rules)
+[![ATR](https://img.shields.io/badge/ATR-52%20rules%20%2B%2061%20community-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
+[![Detection Rules](https://img.shields.io/badge/Detection%20Rules-10%2C400%2B-f97316.svg?style=flat-square)](#detection-rules)
 [![Made in Taiwan](https://img.shields.io/badge/Made%20in-Taiwan-e11d48.svg?style=flat-square)](https://panguard.ai)
 
-[Quick Start](#quick-start) | [Documentation](docs/) | [ATR Standard](https://github.com/Agent-Threat-Rule/agent-threat-rules) | [Threat Cloud](#threat-cloud)
+[Quick Start](#quick-start) | [Online Scanner](https://panguard.ai) | [ATR Standard](https://github.com/Agent-Threat-Rule/agent-threat-rules) | [Ecosystem Report](https://panguard.ai/research/mcp-ecosystem-scan)
 
 </div>
 
 ---
 
-> AI agents install skills with full system access -- file read, code execution, network requests, credential access -- with **zero review process**. One malicious skill is all it takes.
+> AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We scanned 1,295 MCP skills. 26 were malicious. Stealing SSH keys. Injecting prompts. Exfiltrating data.
 >
-> Panguard audits every skill before it runs, monitors agents 24/7, and turns every user's threat discovery into protection for everyone.
+> Panguard is the App Store review for AI skills. ATR is the open audit standard. Every scan protects everyone.
 >
-> AI Agent 安裝 skill 時擁有完整系統權限，卻零審查。Panguard 在 skill 執行前審計、24/7 監控、並將每個使用者的威脅發現轉化為所有人的防護。
+> AI Agent 擁有完整系統權限，卻沒有任何審核。我們掃描了 1,295 個 MCP Skill，發現 26 個惡意。Panguard 是 AI Skill 的 App Store 審核。
 
 ---
 
 ## Quick Start
 
 ```bash
-# One-line install (macOS / Linux)
-curl -fsSL https://get.panguard.ai | bash
+# Install
+npm install -g @panguard-ai/panguard
 
-# Or run directly with npx (no install)
-npx @panguard-ai/panguard scan --quick
+# Auto-configure all AI platforms
+panguard setup
+# Detects: Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop
+
+# Audit a skill before installing
+panguard audit skill ./my-skill
+
+# Start 24/7 protection
+panguard guard start --dashboard
 ```
 
-```bash
-panguard audit skill ./my-skill    # Audit a skill before installing it
-panguard scan --quick              # 60-second security scan
-panguard guard start               # Start 24/7 background protection
-panguard setup                     # Auto-configure Claude, Cursor, Windsurf, etc.
-```
+Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, get a report in 3 seconds.
 
-No account required. No configuration needed. Works offline.
-
-不需帳號，不需設定，離線可用。
+不需帳號，不需設定。[線上掃描](https://panguard.ai) 或一行安裝。
 
 ---
 
 ## The Flywheel
 
-Panguard is not a static rule set. Three components reinforce each other -- the more users, the stronger everyone's protection:
-
-Panguard 不是靜態規則集。三個元件互相強化 -- 使用者越多，所有人的防護越強：
-
 ```
-                    +------------------+
-                    |  Skill Auditor   |  <-- Entry point: audit every skill before install
-                    |  (your machine)  |
-                    +--------+---------+
-                             |
-                     threat detected
-                             |
-                             v
-                    +------------------+
-                    |  Threat Cloud    |  <-- Community: anonymous signatures + LLM review + voting
-                    |  (collective)    |
-                    +--------+---------+
-                             |
-                      new rule confirmed
-                             |
-                             v
-                    +------------------+
-                    |  ATR Rules       |  <-- Standard: open detection rules distributed to all users
-                    |  (open standard) |
-                    +--------+---------+
-                             |
-                     rules strengthen next audit
-                             |
-                             +--------> back to Skill Auditor --> Loop
+  You scan a skill
+       |
+       v
+  Threat detected --> uploaded to Threat Cloud (anonymous)
+       |
+       v
+  Community + LLM review --> new ATR rule confirmed
+       |
+       v
+  Rule pushed to ALL users within 1 hour
+       |
+       v
+  Next time: blocked in < 50ms --> Loop
 ```
 
-| Component                                                          | Role                                                                                                                 | Status |
-| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ------ |
-| **[Skill Auditor](docs/overview.md)**                              | 7-check security gate before any skill runs (prompt injection, tool poisoning, secrets, permissions...)              | GA     |
-| **[Threat Cloud](#threat-cloud)**                                  | Anonymous threat intelligence from all Panguard instances. 3+ confirmations + Claude Sonnet review before promotion. | GA     |
-| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard for AI agent threats. 69 rules, 9 categories, OWASP + MITRE mapped.                          | RFC    |
+| Component | Role | Status |
+|-----------|------|--------|
+| **[Skill Auditor](docs/overview.md)** | 8-check security gate before any skill runs | GA |
+| **[Guard](#guard)** | 24/7 runtime monitoring + auto-block | GA |
+| **[Threat Cloud](#threat-cloud)** | Anonymous community threat intel. 3+ confirmations + LLM review. | GA |
+| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 52 stable + 61 community rules. 9 categories. | RFC |
 
-One user's encounter with a new attack becomes a rule that protects everyone. Next time the same attack hits anyone, Layer 1 blocks it in < 50ms.
-
-一個使用者遇到的新攻擊，成為保護所有人的規則。
+One user's encounter with a new attack becomes a rule that protects everyone.
 
 ---
 
-## See It Work
+## Ecosystem Scan Results
 
-```
-$ panguard audit skill ./my-skill
+We scanned **1,295 MCP skills** from 4,648 registry entries. [Full report](https://panguard.ai/research/mcp-ecosystem-scan).
 
-+-------------------------------+
-| Panguard Skill Audit Report   |
-|                               |
-| Skill:      my-skill          |
-| Author:     Unknown           |
-| Risk Score: 52/100 (CRITICAL) |
-| Duration:   6ms               |
-+-------------------------------+
+| Result | Count | Percent |
+|--------|-------|---------|
+| Clean | 1,266 | 97.8% |
+| CRITICAL | 21 | 1.6% |
+| HIGH | 5 | 0.4% |
+| MEDIUM | 3 | 0.2% |
 
-[OK] [PASS] Manifest: Valid structure, required fields present
-[!!] [FAIL] Prompt Safety: 1 injection pattern(s) detected
-[!!] [FAIL] Tool Safety: curl|bash pipeline, potential exfiltration
-[!]  [WARN] Dependencies: 1 URL(s), 1 external domain(s)
-[!]  [WARN] Permissions: Uses Bash/Shell, File Read, Network/HTTP
-[OK] [PASS] Secrets: No hardcoded credentials found
-[OK] [PASS] Behavior: Code matches stated purpose
-
-Verdict: BLOCK -- 2 failed checks, 2 warnings
-```
-
-Also available as MCP tool (`panguard_audit_skill`) for Claude, Cursor, Windsurf, and any MCP client.
+Top findings: SSH key exfiltration, prompt injection with Unicode obfuscation, environment variable harvesting, git token theft.
 
 ---
 
 ## Three-Layer Detection
 
-Each layer catches what the previous one missed. If any layer goes down, the others keep running.
+| Layer | Engine | Coverage | Latency | Cost |
+|-------|--------|----------|---------|------|
+| **1** | **Rules** -- 52 ATR + 10,400+ Sigma/YARA | ~90% known threats | < 50ms | $0 |
+| **2** | **Local AI** -- Ollama | ~7% ambiguous | ~ 2s | $0 |
+| **3** | **Cloud AI** -- Claude / OpenAI | ~3% novel | ~ 5s | ~$0.008 |
 
-每一層捕捉前一層遺漏的威脅。任何一層失效，其他層繼續運作。
+Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet down? Everything still works.
 
-| Layer | Engine                                                          | Coverage              | Latency | Cost    | Network  |
-| ----- | --------------------------------------------------------------- | --------------------- | ------- | ------- | -------- |
-| **1** | **Rules Engine** -- 69 ATR + 9,700+ integrated Sigma/YARA rules | ~90% of known threats | < 50ms  | $0      | Offline  |
-| **2** | **Local AI** -- Ollama on your machine                          | ~7% (ambiguous cases) | ~ 2s    | $0      | Offline  |
-| **3** | **Cloud AI** -- Claude / OpenAI                                 | ~3% (novel attacks)   | ~ 5s    | ~$0.008 | Optional |
+---
 
-**Graceful degradation:** Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet down? Everything still works.
+## Detection Rules
 
-**優雅降級：** 雲端斷線？本地 AI 接手。本地 AI 斷線？規則引擎繼續。防護永不停止。
+| Rule Type | Count | Purpose |
+|-----------|-------|---------|
+| **Sigma** | 4,352 | Network intrusion, auth bypass, lateral movement |
+| **YARA** | 6,015 | Malware, encoded payloads, obfuscated scripts |
+| **ATR** | 52 + 61 | AI agent threats: prompt injection, tool poisoning, skill compromise |
+| **Total** | **10,400+** | All bundled. No cloud required. |
 
 ---
 
@@ -151,46 +126,53 @@ Each layer catches what the previous one missed. If any layer goes down, the oth
 
 Everything is **free and open source**. MIT licensed.
 
-所有功能**免費開源**。MIT 授權。
-
-| Product                               | What It Does                                                          | Status      |
-| ------------------------------------- | --------------------------------------------------------------------- | ----------- |
-| **[Skill Auditor](docs/overview.md)** | 7-check security gate -- audits every AI skill before install         | GA          |
-| **[Guard](docs/ARCHITECTURE.md)**     | 24/7 skill behavior monitoring + auto-response                        | GA          |
-| **[Threat Cloud](#threat-cloud)**     | Collective threat intelligence -- every block strengthens the network | GA          |
-| **[MCP Server](docs/API.md)**         | 11 tools for Claude, Cursor, and any MCP client                       | GA          |
-| **[Scan](docs/DETECTION.md)**         | 60-second security audit                                              | GA          |
-| **[Trap](docs/DETECTION.md)**         | Honeypot services for attacker profiling                              | Coming Soon |
-| **[Report](docs/DETECTION.md)**       | Compliance: ISO 27001, SOC 2, Taiwan CMA                              | Coming Soon |
+| Product | What It Does | Status |
+|---------|-------------|--------|
+| **[Skill Auditor](docs/overview.md)** | 8-check security gate -- audits every AI skill before install | GA |
+| **[Guard](docs/ARCHITECTURE.md)** | 24/7 runtime monitoring: file, network, process, git, dependency watchers | GA |
+| **[Threat Cloud](#threat-cloud)** | Collective threat intelligence -- every scan strengthens the network | GA |
+| **[MCP Server](docs/API.md)** | 11+ tools for Claude, Cursor, and any MCP client | GA |
+| **[Scan](docs/DETECTION.md)** | 60-second security audit | GA |
+| **[Trap](docs/DETECTION.md)** | Honeypot services for attacker profiling | Coming Soon |
+| **[Report](docs/DETECTION.md)** | Compliance: ISO 27001, SOC 2 | Coming Soon |
 
 ---
 
-## Detection Rules
+## Guard
 
-69 ATR rules purpose-built for AI agent threats + 9,700+ integrated Sigma/YARA rules. All bundled with npm. No cloud required.
+Install once, never worry again. Guard watches everything your agents do.
 
-| Rule Type   | Count | Purpose                                                              |
-| ----------- | ----- | -------------------------------------------------------------------- |
-| **Sigma**   | 3,760 | Network intrusion, auth bypass, lateral movement                     |
-| **YARA**    | 5,961 | Malware, encoded payloads, obfuscated scripts                        |
-| **ATR**     | 69    | AI agent threats: prompt injection, tool poisoning, skill compromise |
-| **Builtin** | 20    | OS hardening, credential hygiene, service audit                      |
+```bash
+panguard guard start --dashboard
+# Dashboard: http://localhost:3100
+```
+
+**Watchers:** Secret (.env, SSH keys, API tokens), Dependency (package.json, node_modules), Process (child commands), Git (commits, config), Skill (MCP config changes)
+
+**Monitors:** Falco eBPF, Suricata IDS, Syscall, DPI, Memory Scanner
+
+**11 Response Actions:** log, notify, block_ip, kill_process, isolate_file, block_tool, kill_agent, quarantine_session, revoke_skill, reduce_permissions, disable_account
 
 ---
 
 ## Threat Cloud
 
-Every Panguard instance is a sensor. New attacks are auto-drafted into ATR rules, uploaded anonymously, confirmed by 3+ independent users and Claude Sonnet review, then distributed to everyone.
+Every Panguard instance is a sensor. Threats are auto-drafted into ATR rules, uploaded anonymously, confirmed by 3+ users + LLM review, then pushed to everyone.
 
-每個 Panguard 實例都是感測器。新攻擊自動草擬 ATR 規則、匿名上傳、經 3+ 獨立確認 + LLM 審查後推送給所有使用者。
+**Currently:** 61 community-generated rules from 1,295 skill scans.
 
-**Privacy:** Fully optional. Only anonymized signatures leave your machine. Zero raw data, zero PII. When disabled, everything runs 100% offline.
-
-**隱私：** 完全自願。只傳送匿名簽章。停用時一切離線。
+**Privacy:** Fully optional. Only anonymized signatures. Zero raw data, zero PII. Disable anytime.
 
 ---
 
 ## MCP Integration
+
+```bash
+panguard setup
+# Auto-detects: Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop
+```
+
+Or manual config:
 
 ```json
 {
@@ -203,8 +185,6 @@ Every Panguard instance is a sensor. New attacks are auto-drafted into ATR rules
 }
 ```
 
-Or auto-detect all AI platforms: `panguard setup` (Claude Desktop, Claude Code, Cursor, Windsurf, Codex)
-
 ---
 
 ## Architecture
@@ -212,38 +192,35 @@ Or auto-detect all AI platforms: `panguard setup` (Claude Desktop, Claude Code, 
 ```
 panguard-ai/
   packages/
-    panguard-skill-auditor/  Skill security auditor (entry point)
-    panguard-guard/          24/7 skill behavior monitoring + Threat Cloud sync
-    atr/                     Agent Threat Rules: 69 rules, 9 categories
-    panguard-mcp/            MCP server: 11 tools for AI assistants
+    panguard-skill-auditor/  Skill security auditor (8 checks)
+    panguard-guard/          24/7 monitoring + Threat Cloud sync
+    atr/                     Agent Threat Rules: 52 stable rules, 9 categories
+    threat-cloud/            Community threat intel server
+    panguard-mcp/            MCP server: 11+ tools for AI assistants
     panguard-scan/           Security scanner
-    core/                    Shared engine: rules, AI adapters
-    panguard-cli/            Unified CLI (23 commands)
-    website/                 Next.js 14 marketing site (EN / zh-TW)
+    core/                    Shared engine: rules, AI adapters, validation
+    panguard/                Unified CLI (28 commands)
+    website/                 Next.js marketing site + online scanner
   config/
-    sigma-rules/             3,760 Sigma detection rules
-    yara-rules/              5,961 YARA detection rules
+    sigma-rules/             4,352 Sigma detection rules
+    yara-rules/              6,015 YARA detection rules
 ```
 
-| Category   | Technology                               |
-| ---------- | ---------------------------------------- |
-| Language   | TypeScript 5.7 (strict mode)             |
-| Runtime    | Node.js 18+                              |
-| Monorepo   | pnpm workspaces (16 packages)            |
-| Testing    | Vitest 3 + v8 coverage (3,490+ tests)    |
-| AI         | Ollama (local) + Claude / OpenAI (cloud) |
-| Encryption | AES-256-GCM                              |
+| Category | Technology |
+|----------|-----------|
+| Language | TypeScript 5.7 (strict mode) |
+| Runtime | Node.js 20+ |
+| Monorepo | pnpm workspaces (17 packages) |
+| Testing | Vitest 3 + v8 coverage (3,490+ tests) |
+| AI | Ollama (local) + Claude / OpenAI (cloud) |
+| Website | Next.js 15 + Vercel |
 
 ---
 
 ## Contributing
 
-We're looking for people who care about AI security.
-
-我們在尋找關心 AI 安全的人。
-
-- **Write detection rules** -- The highest-impact contribution. See the [ATR contribution guide](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/CONTRIBUTING.md).
-- **Report vulnerabilities** -- Found a bypass? [Open a security advisory](SECURITY.md).
+- **Write detection rules** -- Highest impact. See [ATR contribution guide](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/CONTRIBUTING.md).
+- **Report vulnerabilities** -- [Open a security advisory](SECURITY.md).
 - **Submit code** -- Fork, branch, test, PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
 - **Share threat intelligence** -- Run Panguard with Threat Cloud enabled.
 
@@ -251,7 +228,7 @@ We're looking for people who care about AI security.
 
 ## License
 
-MIT -- 100% free. 100% open source. No telemetry. No vendor lock-in.
+MIT -- 100% free. 100% open source. No telemetry by default. No vendor lock-in.
 
 ---
 
@@ -261,17 +238,14 @@ MIT -- 100% free. 100% open source. No telemetry. No vendor lock-in.
 
 <br>
 
-[![Star History Chart](https://api.star-history.com/svg?repos=panguard-ai/panguard-ai&type=Date)](https://star-history.com/#panguard-ai/panguard-ai&Date)
-
-<br>
-
 [![Star on GitHub](https://img.shields.io/github/stars/panguard-ai/panguard-ai?style=for-the-badge&logo=github&label=Star%20on%20GitHub)](https://github.com/panguard-ai/panguard-ai)
 
 **Panguard AI** -- Taipei, Taiwan
 
 [Website](https://panguard.ai) ·
-[GitHub](https://github.com/panguard-ai) ·
+[Online Scanner](https://panguard.ai) ·
 [ATR Standard](https://github.com/Agent-Threat-Rule/agent-threat-rules) ·
+[Ecosystem Report](https://panguard.ai/research/mcp-ecosystem-scan) ·
 [Documentation](docs/)
 
 </div>
