@@ -144,13 +144,7 @@ export function setupCommand(): Command {
         const allPlatforms = await detectPlatforms();
 
         // Filter to target platform if specified
-        const validIds = [
-          'claude-code',
-          'claude-desktop',
-          'cursor',
-          'openclaw',
-          'codex',
-        ];
+        const validIds = ['claude-code', 'claude-desktop', 'cursor', 'openclaw', 'codex'];
         let targets = allPlatforms;
         if (options.platform) {
           if (!validIds.includes(options.platform)) {

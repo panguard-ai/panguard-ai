@@ -122,14 +122,13 @@ function getCodexConfigPath(): string {
 
 /** Get the MCP config path for Workbuddy. */
 function getWorkbuddyConfigPath(): string {
-  return join(homedir(), '.workbuddy', 'mcp.json');
+  return join(homedir(), '.workbuddy', '.mcp.json');
 }
 
 /** Get the MCP config path for NemoClaw. */
 function getNemoClawConfigPath(): string {
-  return join(homedir(), '.nemoclaw', 'mcp.json');
+  return join(homedir(), '.nemoclaw', '.mcp.json');
 }
-
 
 /**
  * Detect all supported AI agent platforms.
