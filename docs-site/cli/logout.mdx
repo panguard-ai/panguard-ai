@@ -1,10 +1,10 @@
 ---
 title: "panguard logout"
-description: "End the current Panguard CLI session and clear stored credentials."
+description: "Disconnect from Panguard Cloud and clear stored credentials."
 icon: "right-from-bracket"
 ---
 
-The `logout` command ends your authenticated session by removing the stored access token. After logging out, commands that require authentication will prompt you to log in again.
+The `logout` command disconnects your CLI from Panguard Cloud by removing the stored access token. Core security features continue to work without authentication.
 
 ## Usage
 
@@ -21,35 +21,32 @@ panguard logout [options]
 ## Examples
 
 <CodeGroup>
-```bash Log out
+```bash Disconnect from cloud
 panguard logout
 ```
 
-```bash Log out with Chinese messages
+```bash Disconnect with Chinese messages
 panguard logout --lang zh-TW
 ```
 </CodeGroup>
 
 ## What It Does
 
-1. **Invalidates the local token** stored in `~/.panguard/credentials`
+1. **Removes the local token** stored in `~/.panguard/credentials`
 2. **Notifies the server** to revoke the session (if reachable)
-3. **Clears cached user data** from the local configuration
+3. **Clears cached cloud data** from the local configuration
 
+<Info>
+  After logging out, all core features (Guard, Skill Auditor, Threat Cloud, ATR rules) continue to work. Only cloud-specific features like multi-endpoint management are disabled.
+</Info>
 
 ## Related
 
 <CardGroup cols={2}>
   <Card title="panguard login" icon="right-to-bracket" href="/cli/login">
-    Log back in to your account.
+    Reconnect to Panguard Cloud.
   </Card>
   <Card title="panguard whoami" icon="id-card" href="/cli/whoami">
-    Check who is currently logged in.
-  </Card>
-  <Card title="Authentication Concepts" icon="lock" href="/concepts/authentication">
-    How Panguard handles authentication and sessions.
-  </Card>
-  <Card title="Auth Troubleshooting" icon="key" href="/troubleshooting/auth-issues">
-    Fix common authentication problems.
+    Check your current connection status.
   </Card>
 </CardGroup>
