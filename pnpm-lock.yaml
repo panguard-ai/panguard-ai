@@ -95,7 +95,7 @@ importers:
         version: 4.1.1
       openai:
         specifier: '>=4.70.0'
-        version: 6.25.0(zod@3.25.76)
+        version: 6.25.0(ws@8.19.0)(zod@3.25.76)
       zod:
         specifier: ^3.24.0
         version: 3.25.76
@@ -204,7 +204,7 @@ importers:
     dependencies:
       '@panguard-ai/panguard':
         specifier: '>=0.3.3'
-        version: 0.3.3(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)
+        version: 0.3.3(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)
 
   packages/panguard-guard:
     dependencies:
@@ -223,6 +223,9 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
+      ws:
+        specifier: ^8.19.0
+        version: 8.19.0
       zod:
         specifier: ^3.24.0
         version: 3.25.76
@@ -233,6 +236,9 @@ importers:
       '@types/node':
         specifier: ^22.14.0
         version: 22.19.13
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.1
       typescript:
         specifier: ~5.7.3
         version: 5.7.3
@@ -1678,6 +1684,9 @@ packages:
 
   '@types/ssh2@1.15.5':
     resolution: {integrity: sha512-N1ASjp/nXH3ovBHddRJpli4ozpk6UdDYIX4RJWFa9L1YKnzdhTlVmiGHm4DZnj/jLbqZpes4aeR30EFGQtvhQQ==}
+
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
   '@typescript-eslint/eslint-plugin@8.56.1':
     resolution: {integrity: sha512-Jz9ZztpB37dNC+HU2HI28Bs9QXpzCz+y/twHOwhyrIRdbuVDxSytJNDl6z/aAKlaRIwC7y8wJdkBv7FxYGgi0A==}
@@ -4218,6 +4227,18 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
+  ws@8.19.0:
+    resolution: {integrity: sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   xml-name-validator@5.0.0:
     resolution: {integrity: sha512-EvGK8EJ3DhaHfbRlETOWAS5pO9MZITeauHKJyb8wyajUfQUenkIg2MvLDTZ4T/TgIcm3HU0TFBgWWboAZ30UHg==}
     engines: {node: '>=18'}
@@ -4843,61 +4864,61 @@ snapshots:
       - supports-color
       - zod
 
-  '@panguard-ai/core@0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/core@0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
       i18next: 24.2.3(typescript@5.7.3)
       js-yaml: 4.1.1
       zod: 3.25.76
     optionalDependencies:
       '@anthropic-ai/sdk': 0.78.0(zod@3.25.76)
-      openai: 6.25.0(zod@3.25.76)
+      openai: 6.25.0(ws@8.19.0)(zod@3.25.76)
     transitivePeerDependencies:
       - typescript
 
-  '@panguard-ai/core@0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/core@0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
       i18next: 24.2.3(typescript@5.7.3)
       js-yaml: 4.1.1
       zod: 3.25.76
     optionalDependencies:
       '@anthropic-ai/sdk': 0.78.0(zod@3.25.76)
-      openai: 6.25.0(zod@3.25.76)
+      openai: 6.25.0(ws@8.19.0)(zod@3.25.76)
     transitivePeerDependencies:
       - typescript
 
-  '@panguard-ai/manager@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/manager@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       better-sqlite3: 11.10.0
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
       - openai
       - typescript
 
-  '@panguard-ai/panguard-auth@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/panguard-auth@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/security-hardening': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/security-hardening': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       better-sqlite3: 11.10.0
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
       - openai
       - typescript
 
-  '@panguard-ai/panguard-chat@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/panguard-chat@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
       - openai
       - typescript
 
-  '@panguard-ai/panguard-guard@0.2.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)':
+  '@panguard-ai/panguard-guard@0.2.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)':
     dependencies:
       '@panguard-ai/atr': 0.2.1(zod@3.25.76)
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-trap': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/security-hardening': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-trap': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/security-hardening': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       js-yaml: 4.1.1
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
@@ -4907,13 +4928,13 @@ snapshots:
       - typescript
       - zod
 
-  '@panguard-ai/panguard-mcp@0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)':
+  '@panguard-ai/panguard-mcp@0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.27.1(zod@3.25.76)
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-guard': 0.2.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)
-      '@panguard-ai/panguard-scan': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-skill-auditor': 0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-guard': 0.2.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)
+      '@panguard-ai/panguard-scan': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-skill-auditor': 0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
       - '@cfworker/json-schema'
@@ -4922,19 +4943,19 @@ snapshots:
       - typescript
       - zod
 
-  '@panguard-ai/panguard-report@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/panguard-report@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       pdfkit: 0.15.2
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
       - openai
       - typescript
 
-  '@panguard-ai/panguard-scan@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/panguard-scan@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/security-hardening': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/security-hardening': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       commander: 12.1.0
       pdfkit: 0.15.2
     transitivePeerDependencies:
@@ -4942,38 +4963,38 @@ snapshots:
       - openai
       - typescript
 
-  '@panguard-ai/panguard-skill-auditor@0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/panguard-skill-auditor@0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-scan': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-scan': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       js-yaml: 4.1.1
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
       - openai
       - typescript
 
-  '@panguard-ai/panguard-trap@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/panguard-trap@0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       ssh2: 1.17.0
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
       - openai
       - typescript
 
-  '@panguard-ai/panguard@0.3.3(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)':
+  '@panguard-ai/panguard@0.3.3(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)':
     dependencies:
-      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/manager': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-auth': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-chat': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-guard': 0.2.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)
-      '@panguard-ai/panguard-mcp': 0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)
-      '@panguard-ai/panguard-report': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-scan': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-skill-auditor': 0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-trap': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/security-hardening': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/manager': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-auth': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-chat': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-guard': 0.2.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)
+      '@panguard-ai/panguard-mcp': 0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)(zod@3.25.76)
+      '@panguard-ai/panguard-report': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-scan': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-skill-auditor': 0.1.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/panguard-trap': 0.2.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/security-hardening': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       commander: 12.1.0
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
@@ -4983,9 +5004,9 @@ snapshots:
       - typescript
       - zod
 
-  '@panguard-ai/security-hardening@0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)':
+  '@panguard-ai/security-hardening@0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
-      '@panguard-ai/core': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(zod@3.25.76))(typescript@5.7.3)
+      '@panguard-ai/core': 0.1.1(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       zod: 3.25.76
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
@@ -5306,6 +5327,10 @@ snapshots:
   '@types/ssh2@1.15.5':
     dependencies:
       '@types/node': 18.19.130
+
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 22.19.13
 
   '@typescript-eslint/eslint-plugin@8.56.1(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.7.3))(eslint@8.57.1)(typescript@5.7.3)':
     dependencies:
@@ -7340,8 +7365,9 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@6.25.0(zod@3.25.76):
+  openai@6.25.0(ws@8.19.0)(zod@3.25.76):
     optionalDependencies:
+      ws: 8.19.0
       zod: 3.25.76
 
   optionator@0.9.4:
@@ -8384,6 +8410,8 @@ snapshots:
       strip-ansi: 7.2.0
 
   wrappy@1.0.2: {}
+
+  ws@8.19.0: {}
 
   xml-name-validator@5.0.0: {}
 
