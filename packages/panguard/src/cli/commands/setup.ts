@@ -378,6 +378,52 @@ export function setupCommand(): Command {
                 console.log(c.dim('    Run "panguard guard status" to check.'));
                 console.log(c.dim('    Run "panguard guard uninstall" to remove.'));
 
+                // ── Threat Cloud opt-in ──
+                console.log();
+                const enableTC = await promptConfirm({
+                  message: {
+                    en: 'Enable Threat Cloud collective defense?',
+                    'zh-TW': '啟用 Threat Cloud 集體防禦？',
+                  },
+                  defaultValue: true,
+                  lang: 'en',
+                });
+
+                try {
+                  const configPath = join(dataDir, 'config.json');
+                  const { loadConfig, saveConfig } = await import(
+                    '@panguard-ai/panguard-guard'
+                  );
+                  const guardConfig = loadConfig(configPath);
+                  const updatedConfig = {
+                    ...guardConfig,
+                    threatCloudUploadEnabled: enableTC,
+                    threatCloudEndpoint: enableTC
+                      ? (guardConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')
+                      : guardConfig.threatCloudEndpoint,
+                  };
+                  saveConfig(updatedConfig, configPath);
+
+                  if (enableTC) {
+                    console.log(
+                      c.green(
+                        `  ${symbols.pass} Threat Cloud enabled: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
+                      )
+                    );
+                    console.log(
+                      c.dim('    Every scan strengthens the collective defense network.')
+                    );
+                  } else {
+                    console.log(
+                      c.dim(
+                        `  ${symbols.info} Threat Cloud disabled. Enable later: panguard guard config --set threatCloudUploadEnabled=true`
+                      )
+                    );
+                  }
+                } catch {
+                  // Config save failed — non-fatal, Guard still installed
+                }
+
                 // Open Dashboard in browser
                 const dashUrl = 'http://127.0.0.1:3847';
                 console.log();
