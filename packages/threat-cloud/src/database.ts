@@ -15,6 +15,8 @@ import type {
   ATRProposal,
   SkillThreatSubmission,
   SkillBlacklistEntry,
+  ScanEvent,
+  AggregatedMetrics,
 } from './types.js';
 import { runMigrations } from './migrations.js';
 import { AuditLogger } from './audit-logger.js';
@@ -904,6 +906,96 @@ export class ThreatCloudDB {
       updated++;
     }
     return updated;
+  }
+
+  /** Insert scan event from any source / 插入掃描事件 */
+  insertScanEvent(event: ScanEvent): void {
+    this.db
+      .prepare(
+        `INSERT INTO scan_events (source, skills_scanned, findings_count, confirmed_malicious, highly_suspicious, general_suspicious, clean_count, device_hash)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .run(
+        event.source,
+        event.skillsScanned,
+        event.findingsCount,
+        event.confirmedMalicious,
+        event.highlySuspicious,
+        event.generalSuspicious,
+        event.cleanCount,
+        event.deviceHash ?? null
+      );
+  }
+
+  /** Get aggregated metrics across all sources / 取得所有來源的聚合指標 */
+  getAggregatedMetrics(): AggregatedMetrics {
+    // Total skills scanned across all sources (sum, not unique)
+    const totals = this.db
+      .prepare(
+        `SELECT
+          COALESCE(SUM(skills_scanned), 0) as totalSkills,
+          COALESCE(SUM(findings_count), 0) as totalFindings
+         FROM scan_events`
+      )
+      .get() as { totalSkills: number; totalFindings: number };
+
+    // Per-source breakdown
+    const sourceStats = this.db
+      .prepare(
+        `SELECT
+          source,
+          COALESCE(SUM(skills_scanned), 0) as skills,
+          COALESCE(SUM(findings_count), 0) as findings,
+          COUNT(DISTINCT device_hash) as devices
+         FROM scan_events
+         GROUP BY source`
+      )
+      .all() as Array<{ source: string; skills: number; findings: number; devices: number }>;
+
+    const bulk = sourceStats.find((s) => s.source === 'bulk-pipeline') ?? {
+      skills: 0,
+      findings: 0,
+      devices: 0,
+    };
+    const cli = sourceStats.find((s) => s.source === 'cli-user') ?? {
+      skills: 0,
+      findings: 0,
+      devices: 0,
+    };
+    const web = sourceStats.find((s) => s.source === 'web-scanner') ?? {
+      skills: 0,
+      findings: 0,
+      devices: 0,
+    };
+
+    // Unique devices (agents protected) = distinct device_hash from CLI users
+    const agentsProtected = (
+      this.db
+        .prepare(
+          `SELECT COUNT(DISTINCT device_hash) as count FROM scan_events WHERE device_hash IS NOT NULL`
+        )
+        .get() as { count: number }
+    ).count;
+
+    // ATR rules count
+    const atrRulesCount = (
+      this.db
+        .prepare(`SELECT COUNT(*) as count FROM rules WHERE source IN ('atr', 'atr-community')`)
+        .get() as { count: number }
+    ).count;
+
+    return {
+      totalSkillsScanned: totals.totalSkills,
+      totalAgentsProtected: agentsProtected,
+      totalThreatsDetected: totals.totalFindings,
+      totalAtrRules: atrRulesCount,
+      sources: {
+        bulk: { skills: bulk.skills, findings: bulk.findings },
+        cli: { skills: cli.skills, findings: cli.findings, devices: cli.devices },
+        web: { skills: web.skills, findings: web.findings },
+      },
+      lastUpdated: new Date().toISOString(),
+    };
   }
 
   /** Close the database / 關閉資料庫 */

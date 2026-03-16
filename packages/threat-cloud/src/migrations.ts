@@ -89,7 +89,7 @@ export const migrations: readonly Migration[] = [
   },
   {
     version: 3,
-    name: 'recreate_audit_log_table',
+    name: 'recreate_audit_log_table_v3',
     up: (db) => {
       // The audit_log table may exist from a pre-migration schema with
       // different columns (missing timestamp, actor, etc.). Drop and
@@ -112,6 +112,30 @@ export const migrations: readonly Migration[] = [
         CREATE INDEX IF NOT EXISTS idx_audit_log_actor ON audit_log(actor);
         CREATE INDEX IF NOT EXISTS idx_audit_log_action ON audit_log(action);
         CREATE INDEX IF NOT EXISTS idx_audit_log_resource ON audit_log(resource_type);
+      `);
+    },
+  },
+  {
+    version: 4,
+    name: 'create_scan_events_table',
+    up: (db) => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS scan_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          source TEXT NOT NULL,
+          skills_scanned INTEGER NOT NULL DEFAULT 0,
+          findings_count INTEGER NOT NULL DEFAULT 0,
+          confirmed_malicious INTEGER NOT NULL DEFAULT 0,
+          highly_suspicious INTEGER NOT NULL DEFAULT 0,
+          general_suspicious INTEGER NOT NULL DEFAULT 0,
+          clean_count INTEGER NOT NULL DEFAULT 0,
+          device_hash TEXT,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_scan_events_source ON scan_events(source);
+        CREATE INDEX IF NOT EXISTS idx_scan_events_created ON scan_events(created_at);
+        CREATE INDEX IF NOT EXISTS idx_scan_events_device ON scan_events(device_hash);
       `);
     },
   },

@@ -214,6 +214,9 @@ export function injectMCPConfig(platformId: PlatformId): InjectionResult {
       case 'nemoclaw':
         injectGenericMCP(configPath);
         break;
+      case 'qclaw':
+        injectGenericMCP(configPath);
+        break;
     }
 
     // Verify the write succeeded

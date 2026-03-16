@@ -23,7 +23,8 @@ export type PlatformId =
   | 'openclaw'
   | 'codex'
   | 'workbuddy'
-  | 'nemoclaw';
+  | 'nemoclaw'
+  | 'qclaw';
 
 export interface DetectedPlatform {
   id: PlatformId;
@@ -130,6 +131,11 @@ function getNemoClawConfigPath(): string {
   return join(homedir(), '.nemoclaw', 'mcp.json');
 }
 
+/** Get the MCP config path for QClaw. */
+function getQClawConfigPath(): string {
+  return join(homedir(), '.qclaw', 'mcp.json');
+}
+
 /**
  * Detect all supported AI agent platforms.
  * 偵測所有支援的 AI Agent 平台。
@@ -225,6 +231,17 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
     alreadyConfigured: hasPanguardMCPEntry(nemoclawPath),
   });
 
+  // QClaw
+  const qclawPath = getQClawConfigPath();
+  const qclawDetected = (await commandExists('qclaw')) || existsSync(join(homedir(), '.qclaw'));
+  platforms.push({
+    id: 'qclaw',
+    name: 'QClaw',
+    configPath: qclawPath,
+    detected: qclawDetected,
+    alreadyConfigured: hasPanguardMCPEntry(qclawPath),
+  });
+
   const detected = platforms.filter((p) => p.detected);
   logger.info(
     `Detected ${detected.length} platform(s): ${detected.map((p) => p.name).join(', ') || 'none'}`
@@ -252,5 +269,7 @@ export function getConfigPath(platformId: PlatformId): string {
       return getWorkbuddyConfigPath();
     case 'nemoclaw':
       return getNemoClawConfigPath();
+    case 'qclaw':
+      return getQClawConfigPath();
   }
 }

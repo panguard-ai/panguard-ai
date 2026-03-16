@@ -94,6 +94,60 @@ export const STATS = {
 
 export type Stats = typeof STATS;
 
+/**
+ * Live metrics from Threat Cloud API.
+ * Used on the website to show real-time numbers from all scan sources.
+ * Falls back to static STATS.ecosystem values if TC is unavailable.
+ *
+ * Usage:
+ *   const metrics = await fetchLiveMetrics();
+ *   // metrics.totalSkillsScanned -- from all sources (bulk + CLI + web)
+ *   // metrics.totalAgentsProtected -- unique devices with panguard installed
+ */
+export interface LiveMetrics {
+  totalSkillsScanned: number;
+  totalAgentsProtected: number;
+  totalThreatsDetected: number;
+  totalAtrRules: number;
+  sources: {
+    bulk: { skills: number; findings: number };
+    cli: { skills: number; findings: number; devices: number };
+    web: { skills: number; findings: number };
+  };
+  lastUpdated: string;
+}
+
+const TC_METRICS_URL = process.env['THREAT_CLOUD_URL']
+  ? `${process.env['THREAT_CLOUD_URL']}/api/metrics`
+  : 'https://tc.panguard.ai/api/metrics';
+
+/** Fetch live metrics from Threat Cloud, with static fallback */
+export async function fetchLiveMetrics(): Promise<LiveMetrics> {
+  try {
+    const resp = await fetch(TC_METRICS_URL, {
+      next: { revalidate: 60 },
+    } as RequestInit);
+    if (!resp.ok) throw new Error(`TC returned ${resp.status}`);
+    const json = (await resp.json()) as { ok: boolean; data: LiveMetrics };
+    if (json.ok && json.data) return json.data;
+  } catch {
+    // Fallback to static stats
+  }
+
+  return {
+    totalSkillsScanned: STATS.ecosystem.skillsScanned,
+    totalAgentsProtected: 0,
+    totalThreatsDetected: STATS.ecosystem.maliciousFound,
+    totalAtrRules: STATS.atrRules,
+    sources: {
+      bulk: { skills: STATS.ecosystem.skillsScanned, findings: STATS.ecosystem.maliciousFound },
+      cli: { skills: 0, findings: 0, devices: 0 },
+      web: { skills: 0, findings: 0 },
+    },
+    lastUpdated: STATS.lastUpdated,
+  };
+}
+
 /** Product maturity label */
 export type MaturityLevel = 'GA' | 'Beta' | 'ComingSoon';
 

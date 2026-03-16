@@ -18,6 +18,7 @@ export type AuditAction =
   | 'proposal.reject'
   | 'threat.submit'
   | 'skill_threat.submit'
+  | 'scan_event.submit'
   | 'admin.login';
 
 /** An entry from the audit_log table / audit_log 資料表的條目 */

@@ -17,6 +17,8 @@
  * - GET  /api/skill-blacklist        Community skill blacklist (aggregated threats)
  * - POST /api/analyze-skills         Submit scan results for server-side LLM analysis
  * - GET  /api/audit-log             Admin audit log (paginated, admin-only)
+ * - POST /api/scan-events           Report scan event from any source (bulk/CLI/web)
+ * - GET  /api/metrics               Aggregated metrics across all sources (public, cached 60s)
  * - GET  /health                     Health check
  *
  * @module @panguard-ai/threat-cloud/server
@@ -46,6 +48,7 @@ import type {
   ThreatCloudRule,
   ATRProposal,
   SkillThreatSubmission,
+  ScanEvent,
 } from './types.js';
 
 /** Structured JSON logger for threat-cloud */
@@ -418,6 +421,22 @@ export class ThreatCloudServer {
               break;
             }
             this.handleGetAuditLog(url, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/scan-events':
+          if (req.method === 'POST') {
+            await this.handlePostScanEvent(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/metrics':
+          if (req.method === 'GET') {
+            this.handleGetMetrics(res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -835,6 +854,44 @@ export class ThreatCloudServer {
       data: entries,
       meta: { total, page, limit, pages: Math.ceil(total / limit) },
     });
+  }
+
+  /** POST /api/scan-events - Report a scan event from any source */
+  private async handlePostScanEvent(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const ScanEventSchema = z.object({
+      source: z.enum(['bulk-pipeline', 'cli-user', 'web-scanner']),
+      skillsScanned: z.number().int().min(0),
+      findingsCount: z.number().int().min(0),
+      confirmedMalicious: z.number().int().min(0).default(0),
+      highlySuspicious: z.number().int().min(0).default(0),
+      generalSuspicious: z.number().int().min(0).default(0),
+      cleanCount: z.number().int().min(0).default(0),
+      deviceHash: z.string().optional(),
+    });
+
+    const data = await this.parseAndValidate(req, res, ScanEventSchema);
+    if (!data) return;
+
+    this.db.insertScanEvent(data as ScanEvent);
+
+    const clientIP = req.socket.remoteAddress ?? 'unknown';
+    this.db.audit.logAction(
+      'client',
+      'scan_event.submit',
+      'scan_event',
+      undefined,
+      { source: data.source, skillsScanned: data.skillsScanned },
+      clientIP
+    );
+
+    this.sendJson(res, 201, { ok: true, data: { message: 'Scan event recorded' } });
+  }
+
+  /** GET /api/metrics - Aggregated metrics across all sources (public, cached 60s) */
+  private handleGetMetrics(res: ServerResponse): void {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60');
+    const metrics = this.db.getAggregatedMetrics();
+    this.sendJson(res, 200, { ok: true, data: metrics });
   }
 
   /** Anonymize IP by zeroing last octet / 匿名化 IP */

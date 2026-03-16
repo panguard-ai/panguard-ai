@@ -94,6 +94,32 @@ export interface SkillBlacklistEntry {
   lastReported: string;
 }
 
+/** Scan event from any source / 任何來源的掃描事件 */
+export interface ScanEvent {
+  source: 'bulk-pipeline' | 'cli-user' | 'web-scanner';
+  skillsScanned: number;
+  findingsCount: number;
+  confirmedMalicious: number;
+  highlySuspicious: number;
+  generalSuspicious: number;
+  cleanCount: number;
+  deviceHash?: string;
+}
+
+/** Aggregated metrics across all sources / 所有來源的聚合指標 */
+export interface AggregatedMetrics {
+  totalSkillsScanned: number;
+  totalAgentsProtected: number;
+  totalThreatsDetected: number;
+  totalAtrRules: number;
+  sources: {
+    bulk: { skills: number; findings: number };
+    cli: { skills: number; findings: number; devices: number };
+    web: { skills: number; findings: number };
+  };
+  lastUpdated: string;
+}
+
 /** Server configuration / 伺服器配置 */
 export interface ServerConfig {
   port: number;
