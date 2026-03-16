@@ -16,4 +16,6 @@ export type {
   ATRProposal,
   SkillThreatSubmission,
   SkillBlacklistEntry,
+  ScanEvent,
+  AggregatedMetrics,
 } from './types.js';
