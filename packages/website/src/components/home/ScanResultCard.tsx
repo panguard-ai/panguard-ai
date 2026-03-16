@@ -336,6 +336,21 @@ export default function ScanResultCard({
           </p>
         </div>
       )}
+
+      {/* Guard CTA — always show after scan results */}
+      <div className="px-5 py-4 border-t border-border bg-panguard-green/5 text-center">
+        <p className="text-xs font-bold text-panguard-green mb-1.5">
+          {isZh ? '開啟 24/7 防護，讓你的 AI Agent 隨時受保護' : 'Start 24/7 protection for all your AI agents'}
+        </p>
+        <code className="inline-block text-[11px] bg-surface-2 border border-border rounded-lg px-3 py-1.5 text-panguard-green font-mono select-all mb-2">
+          npm install -g @panguard-ai/panguard && panguard setup
+        </code>
+        <p className="text-[10px] text-text-muted">
+          {isZh
+            ? '一行安裝。自動偵測 Claude Code、Cursor、OpenClaw 等 7 個平台。10,400+ 偵測規則即時防護。'
+            : 'One command. Auto-detects Claude Code, Cursor, OpenClaw + 4 more. 10,400+ detection rules.'}
+        </p>
+      </div>
     </motion.div>
   );
 }
