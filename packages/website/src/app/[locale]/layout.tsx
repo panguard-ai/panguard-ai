@@ -182,10 +182,15 @@ export default async function LocaleLayout(
         <script
           nonce={nonce}
           suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js-ready")' }}
+          dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js-ready");setTimeout(function(){document.documentElement.classList.add("fm-ready")},800)' }}
         />
-        {/* jsonLd temporarily disabled — causes Runtime TypeError in dev mode */}
-        {/* TODO: re-enable after identifying @context parse issue */}
+        {/* jsonLd: SEO structured data (Organization, SoftwareApplication, WebSite) */}
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {/* Plausible Analytics — privacy-friendly, no cookies, GDPR compliant */}
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <script
