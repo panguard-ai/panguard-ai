@@ -5,6 +5,47 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Share2, AlertTriangle } from 'lucide-react';
 import type { ScanReport, ScanResponse } from '@/hooks/useSkillScan';
 
+/** Localize ATR finding titles and descriptions */
+const FINDING_ZH: Record<string, { title: string; desc?: string }> = {
+  'Credential and Secret Exposure in Agent Output': { title: '憑證與機密外洩', desc: '偵測到資料庫連線字串或憑證資訊可能被 Agent 輸出' },
+  'Unauthorized Financial Action by AI Agent': { title: '未授權的金融操作', desc: '偵測到支付平台相關的工具呼叫' },
+  'High-Risk Tool Invocation Without Human Confirmation': { title: '高風險工具呼叫（無人工確認）', desc: '危險工具被呼叫但沒有人工確認機制' },
+  'Privilege Escalation and Admin Function Access': { title: '權限提升與管理功能存取', desc: '偵測到 Shell 或指令執行的工具呼叫' },
+  'Indirect Prompt Injection via External Content': { title: '透過外部內容的間接 Prompt 注入', desc: '偵測到可能的注入內容（JavaScript URI、隱藏指令）' },
+  'Skill Description-Behavior Mismatch': { title: 'Skill 描述與行為不一致', desc: 'Skill 的實際行為與其描述不符' },
+  'Multi-Skill Chain Attack': { title: '多 Skill 串聯攻擊', desc: '偵測到可能的多工具串聯利用' },
+  'Unauthorized Tool Call Detection': { title: '未授權工具呼叫', desc: '偵測到 Shell metacharacter 注入或危險指令' },
+  'Direct Prompt Injection': { title: '直接 Prompt 注入', desc: '偵測到覆蓋系統指令的注入語句' },
+  'Parameter Injection via Tool Arguments': { title: '透過工具參數的注入攻擊', desc: '工具參數中偵測到注入 payload' },
+  'Malicious Content in MCP Tool Response': { title: 'MCP 工具回應中的惡意內容', desc: '工具回應中偵測到隱藏指令或惡意內容' },
+  'System Prompt Leakage': { title: '系統 Prompt 洩漏', desc: '偵測到系統 Prompt 可能被洩漏' },
+  'Data Exfiltration via Agent Tools': { title: '透過 Agent 工具的資料外洩', desc: '偵測到資料可能被傳送至外部端點' },
+};
+
+const SEVERITY_ZH: Record<string, string> = {
+  critical: '嚴重', high: '高', medium: '中', low: '低', info: '資訊',
+};
+
+const CHECK_ZH: Record<string, string> = {
+  'Secrets: none found': '機密偵測：未發現',
+  'Manifest: valid': '宣告檔：有效',
+  'Manifest: incomplete structure': '宣告檔：結構不完整',
+  'Manifest: no SKILL.md found, analyzed README.md': '宣告檔：未找到 SKILL.md，已分析 README.md',
+};
+
+function localizeCheck(label: string, isZh: boolean): string {
+  if (!isZh) return label;
+  // Check exact match first
+  if (CHECK_ZH[label]) return CHECK_ZH[label];
+  // Dynamic patterns
+  if (label.startsWith('ATR Detection:')) {
+    return label.replace('ATR Detection:', 'ATR 偵測:').replace('rule(s) triggered', '條規則觸發').replace('evaluated', '條已評估').replace('clean', '安全');
+  }
+  if (label.startsWith('Secrets:')) return label.replace('Secrets:', '機密偵測:').replace('exposed', '組已暴露');
+  if (label.startsWith('Size:')) return label.replace('Size:', '大小:');
+  return label;
+}
+
 const SEVERITY_COLORS: Record<string, string> = {
   critical: 'text-red-400 bg-red-400/10 border-red-400/30',
   high: 'text-orange-400 bg-orange-400/10 border-orange-400/30',
@@ -72,6 +113,9 @@ export default function ScanResultCard({
   url,
 }: ScanResultCardProps) {
   const t = useTranslations('home.scanResult');
+  const locale = useTranslations()('', { defaultValue: '' }) === '' ? 'en' : 'en'; // fallback
+  // Detect ZH by checking if a known ZH-only key returns Chinese
+  const isZh = t('shareX') === '分享到 X';
   const isRisky = report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL';
 
   // Build share text
@@ -126,7 +170,7 @@ export default function ScanResultCard({
           <div className="flex items-center gap-2 text-[10px] text-text-muted">
             {meta.cached && (
               <span className="bg-panguard-green/10 text-panguard-green px-2 py-0.5 rounded-full">
-                Cached
+                {isZh ? '已快取' : 'Cached'}
               </span>
             )}
             <span>{report.durationMs}ms</span>
@@ -153,7 +197,7 @@ export default function ScanResultCard({
               }`}
             >
               {check.status === 'pass' ? '\u2713' : check.status === 'fail' ? '\u2717' : '\u26A0'}{' '}
-              {check.label}
+              {localizeCheck(check.label, isZh)}
             </span>
           ))}
         </div>
@@ -166,7 +210,10 @@ export default function ScanResultCard({
             onClick={() => setExpanded(!expanded)}
             className="text-xs text-text-muted hover:text-text-secondary transition-colors mb-3"
           >
-            {expanded ? 'Hide findings' : `Show ${report.findings.length} finding(s)`}
+            {expanded
+              ? (isZh ? '隱藏發現' : 'Hide findings')
+              : (isZh ? `顯示 ${report.findings.length} 個發現` : `Show ${report.findings.length} finding(s)`)
+            }
           </button>
 
           <AnimatePresence>
@@ -183,10 +230,16 @@ export default function ScanResultCard({
                     className={`rounded-lg border p-3 ${SEVERITY_COLORS[f.severity] ?? SEVERITY_COLORS.info}`}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-xs font-semibold">{f.title}</p>
-                      <span className="text-[10px] uppercase font-bold shrink-0">{f.severity}</span>
+                      <p className="text-xs font-semibold">
+                        {isZh ? (FINDING_ZH[f.title]?.title ?? f.title) : f.title}
+                      </p>
+                      <span className="text-[10px] uppercase font-bold shrink-0">
+                        {isZh ? (SEVERITY_ZH[f.severity] ?? f.severity) : f.severity}
+                      </span>
                     </div>
-                    <p className="text-[11px] opacity-80 mt-1">{f.description}</p>
+                    <p className="text-[11px] opacity-80 mt-1">
+                      {isZh ? (FINDING_ZH[f.title]?.desc ?? f.description) : f.description}
+                    </p>
                     {f.location && (
                       <p className="text-[10px] opacity-60 mt-1 font-mono">{f.location}</p>
                     )}
@@ -195,6 +248,43 @@ export default function ScanResultCard({
               </motion.div>
             )}
           </AnimatePresence>
+        </div>
+      )}
+
+      {/* Install scenario summary */}
+      {report.findings.length > 0 && (
+        <div className="px-5 py-3 border-t border-border bg-surface-2/20">
+          <p className="text-[11px] font-semibold text-text-primary mb-1.5">
+            {isZh ? '如果你安裝了這個 Skill：' : 'If you install this skill:'}
+          </p>
+          <ul className="space-y-1">
+            {report.findings.slice(0, 3).map((f) => (
+              <li key={f.id} className="text-[11px] text-text-secondary flex items-start gap-1.5">
+                <span className={`shrink-0 mt-0.5 ${f.severity === 'critical' || f.severity === 'high' ? 'text-red-400' : 'text-yellow-400'}`}>
+                  {f.severity === 'critical' || f.severity === 'high' ? '\u26A0' : '\u2022'}
+                </span>
+                {isZh
+                  ? (FINDING_ZH[f.title]?.desc ?? f.description)
+                  : f.description
+                }
+              </li>
+            ))}
+          </ul>
+          {report.riskLevel === 'LOW' && (
+            <p className="text-[11px] text-emerald-400 font-semibold mt-2">
+              {isZh ? '風險較低，但建議搭配 Guard 持續監控。' : 'Low risk. Consider running Guard for continuous monitoring.'}
+            </p>
+          )}
+          {(report.riskLevel === 'MEDIUM' || report.riskLevel === 'HIGH') && (
+            <p className="text-[11px] text-orange-400 font-semibold mt-2">
+              {isZh ? '建議仔細檢查後再安裝，並啟用 Guard 即時監控。' : 'Review carefully before installing. Enable Guard for real-time monitoring.'}
+            </p>
+          )}
+          {report.riskLevel === 'CRITICAL' && (
+            <p className="text-[11px] text-red-400 font-semibold mt-2">
+              {isZh ? '強烈建議不要安裝。此 Skill 可能竊取你的憑證或劫持你的 Agent。' : 'Do NOT install. This skill may steal credentials or hijack your agent.'}
+            </p>
+          )}
         </div>
       )}
 
