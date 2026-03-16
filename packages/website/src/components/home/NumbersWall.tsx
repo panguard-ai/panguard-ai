@@ -97,7 +97,7 @@ export default function NumbersWall() {
         </div>
 
         <p className="text-center text-xs text-text-muted mt-3">
-          Last verified: {STATS.lastUpdated} | Source: GitHub CI (auto-refresh every 6h)
+          Last verified: {STATS.lastUpdated} | Source: GitHub CI (auto-refresh every 1h)
         </p>
 
         {/* GitHub CTA */}
