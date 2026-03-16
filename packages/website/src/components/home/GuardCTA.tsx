@@ -11,12 +11,10 @@ const INSTALL_CMD = 'npx panguard setup';
 
 const PLATFORMS = [
   'Claude Code',
+  'Claude Desktop',
   'Cursor',
-  'QClaw',
   'OpenClaw',
   'Codex',
-  'WorkBuddy',
-  'Claude Desktop',
 ];
 
 export default function GuardCTA() {

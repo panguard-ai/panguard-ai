@@ -2,8 +2,8 @@
  * Platform Detector - Detect installed AI agent runtimes
  * 平台偵測器 - 偵測已安裝的 AI Agent 執行環境
  *
- * Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, and QClaw.
- * 偵測 Claude Code、Claude Desktop、Cursor、OpenClaw、Codex 和 QClaw。
+ * Detects Claude Code, Claude Desktop, Cursor, OpenClaw, and Codex.
+ * 偵測 Claude Code、Claude Desktop、Cursor、OpenClaw 和 Codex。
  *
  * @module @panguard-ai/panguard-mcp/config/platform-detector
  */
@@ -21,8 +21,7 @@ export type PlatformId =
   | 'claude-desktop'
   | 'cursor'
   | 'openclaw'
-  | 'codex'
-  | 'qclaw';
+  | 'codex';
 
 export interface DetectedPlatform {
   id: PlatformId;
@@ -119,10 +118,6 @@ function getCodexConfigPath(): string {
   return join(homedir(), '.codex', 'mcp.json');
 }
 
-/** Get the MCP config path for QClaw (Tencent). */
-function getQClawConfigPath(): string {
-  return join(homedir(), '.qclaw', 'mcp.json');
-}
 
 /**
  * Detect all supported AI agent platforms.
@@ -195,41 +190,6 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
     alreadyConfigured: hasPanguardMCPEntry(codexPath),
   });
 
-  // Workbuddy
-  const workbuddyPath = getWorkbuddyConfigPath();
-  const workbuddyDetected =
-    (await commandExists('workbuddy')) || existsSync(join(homedir(), '.workbuddy'));
-  platforms.push({
-    id: 'workbuddy',
-    name: 'Workbuddy',
-    configPath: workbuddyPath,
-    detected: workbuddyDetected,
-    alreadyConfigured: hasPanguardMCPEntry(workbuddyPath),
-  });
-
-  // NemoClaw
-  const nemoclawPath = getNemoClawConfigPath();
-  const nemoclawDetected =
-    (await commandExists('nemoclaw')) || existsSync(join(homedir(), '.nemoclaw'));
-  platforms.push({
-    id: 'nemoclaw',
-    name: 'NemoClaw',
-    configPath: nemoclawPath,
-    detected: nemoclawDetected,
-    alreadyConfigured: hasPanguardMCPEntry(nemoclawPath),
-  });
-
-  // QClaw (Tencent)
-  const qclawPath = getQClawConfigPath();
-  const qclawDetected = (await commandExists('qclaw')) || existsSync(join(homedir(), '.qclaw'));
-  platforms.push({
-    id: 'qclaw',
-    name: 'QClaw',
-    configPath: qclawPath,
-    detected: qclawDetected,
-    alreadyConfigured: hasPanguardMCPEntry(qclawPath),
-  });
-
   const detected = platforms.filter((p) => p.detected);
   logger.info(
     `Detected ${detected.length} platform(s): ${detected.map((p) => p.name).join(', ') || 'none'}`
@@ -253,11 +213,5 @@ export function getConfigPath(platformId: PlatformId): string {
       return getOpenClawSkillDir();
     case 'codex':
       return getCodexConfigPath();
-    case 'workbuddy':
-      return getWorkbuddyConfigPath();
-    case 'nemoclaw':
-      return getNemoClawConfigPath();
-    case 'qclaw':
-      return getQClawConfigPath();
   }
 }

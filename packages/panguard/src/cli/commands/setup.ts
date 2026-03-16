@@ -87,9 +87,6 @@ const PLATFORM_RESTART_HINTS: Record<string, string> = {
   cursor: 'Cmd+Shift+P (or Ctrl+Shift+P) > "Reload Window"',
   openclaw: 'Close and reopen OpenClaw',
   codex: 'Restart the Codex CLI session',
-  workbuddy: 'Close and reopen WorkBuddy',
-  nemoclaw: 'Close and reopen NemoClaw',
-  qclaw: 'Close and reopen QClaw',
 };
 
 export function setupCommand(): Command {
@@ -99,7 +96,7 @@ export function setupCommand(): Command {
     )
     .option(
       '--platform <name>',
-      'Target a specific platform (claude-code, cursor, openclaw, codex, workbuddy, nemoclaw, qclaw, claude-desktop)'
+      'Target a specific platform (claude-code, cursor, openclaw, codex, claude-desktop)'
     )
     .option('--remove', 'Remove Panguard MCP config from platforms / 移除設定', false)
     .option('--json', 'Output as JSON / 以 JSON 格式輸出', false)
@@ -153,9 +150,6 @@ export function setupCommand(): Command {
           'cursor',
           'openclaw',
           'codex',
-          'workbuddy',
-          'nemoclaw',
-          'qclaw',
         ];
         let targets = allPlatforms;
         if (options.platform) {

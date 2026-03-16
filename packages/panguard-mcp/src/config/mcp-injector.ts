@@ -206,9 +206,6 @@ export function injectMCPConfig(platformId: PlatformId): InjectionResult {
         injectOpenClawSkill(configPath);
         break;
       case 'codex':
-      case 'workbuddy':
-      case 'nemoclaw':
-      case 'qclaw':
         injectGenericMCP(configPath);
         break;
     }
