@@ -51,6 +51,8 @@ The 6 flywheel core components currently have minimal direct test coverage:
 
 Target: unit tests covering happy path, error path, and edge cases (path traversal, malformed input, LLM failure) for each component.
 
+Additionally: `atr-engine.ts` `resolveBundledRulesDir()` now has a 4-layer fallback chain (createRequire → CLI argv → walk node_modules → bundled-rules) that is critical for npm -g installs. Needs mock-based unit tests to verify each fallback triggers correctly when prior strategies fail.
+
 ## P3 - Dashboard WebSocket Token Auth (S)
 
 Guard dashboard WebSocket endpoint (`/ws`) has no authentication. Add token-based auth: generate a one-time token on dashboard page load, validate on WS upgrade, reject unauthenticated connections. Low risk since dashboard binds to localhost, but needed for defense-in-depth.
