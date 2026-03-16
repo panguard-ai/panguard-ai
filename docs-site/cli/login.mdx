@@ -1,10 +1,10 @@
 ---
 title: "panguard login"
-description: "Authenticate with your Panguard AI account."
+description: "Connect your CLI to Panguard Cloud for enhanced features (optional)."
 icon: "right-to-bracket"
 ---
 
-The `login` command authenticates your CLI session with the Panguard Cloud. By default it opens a browser for OAuth authentication, but also supports headless environments with the `--no-browser` flag.
+The `login` command connects your CLI to Panguard Cloud for optional enhanced features like multi-endpoint management and cloud AI analysis. **Login is not required** -- all core features (Guard, Skill Auditor, ATR rules, Threat Cloud sync) work without authentication.
 
 ## Usage
 
@@ -46,38 +46,21 @@ panguard login --lang zh-TW
 ```
 </CodeGroup>
 
-## Authentication Flow
-
-<Tabs>
-  <Tab title="Browser (default)">
-    1. CLI opens your default browser to the Panguard login page
-    2. You sign in with email, Google, or GitHub
-    3. Browser redirects back and the CLI receives the token
-    4. Token is stored securely in `~/.panguard/credentials`
-  </Tab>
-  <Tab title="Headless (--no-browser)">
-    1. CLI prints a URL and a one-time device code
-    2. You open the URL on any device and enter the code
-    3. After confirmation, the CLI receives the token
-    4. Token is stored securely in `~/.panguard/credentials`
-  </Tab>
-</Tabs>
-
-<Tip>
-  Authentication tokens are valid for 30 days and refresh automatically. You only need to log in again if the token expires or you explicitly log out.
-</Tip>
+<Info>
+  **Login is optional.** Panguard is 100% functional without authentication. Login unlocks cloud features like centralized multi-endpoint management. All security features -- Guard, Skill Auditor, Threat Cloud, ATR rules -- work offline and without an account.
+</Info>
 
 ## Related
 
 <CardGroup cols={2}>
-  <Card title="Quick Start" icon="user-plus" href="/quickstart">
-    Create your Panguard account before logging in.
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Get from zero to your first scan in under 5 minutes. No account needed.
   </Card>
   <Card title="panguard logout" icon="right-from-bracket" href="/cli/logout">
-    End your current CLI session.
+    Disconnect from Panguard Cloud.
   </Card>
   <Card title="panguard whoami" icon="id-card" href="/cli/whoami">
-    Verify your authenticated identity.
+    Check your current connection status.
   </Card>
   <Card title="Auth Troubleshooting" icon="key" href="/troubleshooting/auth-issues">
     Fix common authentication problems.

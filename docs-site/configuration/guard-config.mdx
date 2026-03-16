@@ -49,7 +49,7 @@ Panguard Guard is configured via a JSON file located at `~/.panguard-guard/confi
     "enabled": true,
     "endpoint": "https://tc.panguard.ai",
     "uploadEnabled": true,
-    "downloadInterval": "6h",
+    "downloadInterval": "1h",
     "abuseIpDbEnabled": false
   },
   "dashboard": {
@@ -150,7 +150,7 @@ Threat Cloud integration settings.
 | `enabled` | boolean | `true` | Enable Threat Cloud integration |
 | `endpoint` | string | `https://tc.panguard.ai` | Threat Cloud API endpoint |
 | `uploadEnabled` | boolean | `true` | Upload detected threats to Threat Cloud |
-| `downloadInterval` | string | `6h` | How often to download updated IoC feeds |
+| `downloadInterval` | string | `1h` | How often to download updated IoC feeds |
 | `abuseIpDbEnabled` | boolean | `false` | Enable AbuseIPDB lookups (requires `ABUSEIPDB_KEY`) |
 
 ### dashboard
