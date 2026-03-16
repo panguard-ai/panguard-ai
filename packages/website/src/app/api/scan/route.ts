@@ -467,6 +467,9 @@ export async function POST(request: Request) {
     });
   }
 
+  // Sync ATR rules from TC if stale (non-blocking)
+  ensureRulesFresh();
+
   // Run full scan with ATR rules
   const start = Date.now();
   const { findings, checks, atrPatternsMatched } = runFullScan(skill.content, skill.source);
