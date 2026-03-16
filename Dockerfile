@@ -81,7 +81,7 @@ RUN cp -r packages/panguard/dist /standalone/dist
 
 # Step 2: Install external deps with npm FIRST (before workspace packages)
 # NOTE: Update these versions if workspace package.json deps change
-RUN printf '{"name":"panguard-api","version":"0.1.0","private":true,"type":"module","dependencies":{"commander":"12.1.0","better-sqlite3":"11.10.0","i18next":"24.2.3","js-yaml":"4.1.1","zod":"3.25.76","pdfkit":"0.15.2"},"optionalDependencies":{"ssh2":"1.17.0"}}' > /standalone/package.json && \
+RUN printf '{"name":"panguard-api","version":"0.1.0","private":true,"type":"module","dependencies":{"commander":"12.1.0","better-sqlite3":"11.10.0","i18next":"24.2.3","js-yaml":"4.1.1","zod":"3.25.76","pdfkit":"0.15.2","ws":"8.19.0"},"optionalDependencies":{"ssh2":"1.17.0"}}' > /standalone/package.json && \
     cd /standalone && npm install --production
 
 # Step 3: Copy workspace packages into node_modules AFTER npm install
