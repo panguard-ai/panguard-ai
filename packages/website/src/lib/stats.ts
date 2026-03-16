@@ -8,8 +8,8 @@
  * When adding new stats: update here first, then all components auto-update.
  *
  * Derived from (verified 2026-03-12):
- *   config/sigma-rules/       -> 3,760 YAML files (3,110 community + 45 custom + 605 auto-generated)
- *   config/yara-rules/        -> 5,961 rule definitions across 969 files (923 community + 3 custom + 43 auto-generated)
+ *   config/sigma-rules/       -> 4,352 YAML files (community + custom + auto-generated)
+ *   config/yara-rules/        -> 6,015 rule definitions across 1,025 files (community + custom + auto-generated)
  *   packages/panguard-guard/src/types.ts       -> ResponseAction union (11 types)
  *   packages/core/src/ai/funnel-router.ts      -> 3 layers
  *   vitest run (159 test files)                -> 3,490 test cases
@@ -26,17 +26,17 @@
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '0.4.5',
-  sigmaRules: 3_760,
-  yaraRules: 5_961,
+  sigmaRules: 4_352,
+  yaraRules: 6_015,
   atrRules: 52,
   /** Total unique detection patterns across all 52 ATR rules */
   atrPatterns: 450,
-  totalRules: 3_760 + 5_961 + 52,
+  totalRules: 4_352 + 6_015 + 52,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '9,700+' as const,
+  totalRulesDisplay: '10,400+' as const,
   /** Separate display for honest breakdown */
   atrRulesDisplay: '52+' as const,
-  integratedRulesDisplay: '9,700+' as const,
+  integratedRulesDisplay: '10,400+' as const,
   falcoConfigs: 1,
   testsPassing: 3_490,
   testFiles: 159,
