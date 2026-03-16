@@ -68,23 +68,23 @@ export default function WhyPanguard() {
 
         {/* Quick comparison table */}
         <FadeInUp delay={0.2}>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
+          <div className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0">
+            <table className="w-full text-sm border-collapse min-w-[480px] sm:min-w-0">
               <thead>
                 <tr>
-                  <th className="text-left py-3 px-4 text-text-tertiary font-medium border-b border-border">
+                  <th className="text-left py-3 px-3 sm:px-4 text-text-tertiary font-medium border-b border-border text-xs sm:text-sm">
                     {t('capability')}
                   </th>
-                  <th className="py-3 px-4 font-semibold border-b text-center text-brand-sage border-brand-sage/40">
+                  <th className="py-3 px-2 sm:px-4 font-semibold border-b text-center text-brand-sage border-brand-sage/40 text-xs sm:text-sm">
                     PanGuard
                   </th>
-                  <th className="py-3 px-4 font-semibold border-b text-center text-text-secondary border-border">
+                  <th className="py-3 px-2 sm:px-4 font-semibold border-b text-center text-text-secondary border-border text-xs sm:text-sm">
                     CrowdStrike
                   </th>
-                  <th className="py-3 px-4 font-semibold border-b text-center text-text-secondary border-border">
+                  <th className="py-3 px-2 sm:px-4 font-semibold border-b text-center text-text-secondary border-border text-xs sm:text-sm hidden sm:table-cell">
                     Snyk
                   </th>
-                  <th className="py-3 px-4 font-semibold border-b text-center text-text-secondary border-border">
+                  <th className="py-3 px-2 sm:px-4 font-semibold border-b text-center text-text-secondary border-border text-xs sm:text-sm hidden sm:table-cell">
                     Lakera
                   </th>
                 </tr>
@@ -92,19 +92,19 @@ export default function WhyPanguard() {
               <tbody>
                 {['row1', 'row2', 'row3', 'row4', 'row5'].map((key) => (
                   <tr key={key} className="border-b border-border/50">
-                    <td className="py-3 px-4 text-text-primary font-medium">
+                    <td className="py-3 px-3 sm:px-4 text-text-primary font-medium text-xs sm:text-sm">
                       {t(`table.${key}.feature`)}
                     </td>
-                    <td className="py-3 px-4 text-center bg-brand-sage/5">
+                    <td className="py-3 px-2 sm:px-4 text-center bg-brand-sage/5">
                       <CellIcon value={t(`table.${key}.panguard`)} />
                     </td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-3 px-2 sm:px-4 text-center">
                       <CellIcon value={t(`table.${key}.crowdstrike`)} />
                     </td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-3 px-2 sm:px-4 text-center hidden sm:table-cell">
                       <CellIcon value={t(`table.${key}.snyk`)} />
                     </td>
-                    <td className="py-3 px-4 text-center">
+                    <td className="py-3 px-2 sm:px-4 text-center hidden sm:table-cell">
                       <CellIcon value={t(`table.${key}.lakera`)} />
                     </td>
                   </tr>
