@@ -331,8 +331,13 @@ export class SkillWhitelistManager {
         mkdirSync(dir, { recursive: true });
       }
 
+      // Only persist user-owned entries (manual, static). Community/fingerprint
+      // entries are ephemeral — fetched from Threat Cloud on each startup.
+      const userOwned = [...this.whitelist.values()].filter(
+        (s) => s.source === 'manual' || s.source === 'static'
+      );
       const data = {
-        whitelist: [...this.whitelist.values()],
+        whitelist: userOwned,
         revoked: [...this.revokedSkills],
       };
       this.writingToDisk = true;

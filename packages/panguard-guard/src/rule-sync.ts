@@ -86,7 +86,10 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
     try {
       const yaraRules = await threatCloud.fetchYaraRules();
       if (yaraRules.length > 0) {
-        const yaraCloudDir = join(config.dataDir, 'yara-rules', 'cloud');
+        // Write TC YARA rules to /tmp (ephemeral — cleared on system reboot)
+        // instead of ~/.panguard-guard/. Community data should not persist on device.
+        const { tmpdir } = await import('node:os');
+        const yaraCloudDir = join(tmpdir(), 'panguard-yara-cloud');
         const { mkdirSync, writeFileSync } = await import('node:fs');
         mkdirSync(yaraCloudDir, { recursive: true });
         for (const rule of yaraRules) {
@@ -237,14 +240,22 @@ export function getSkillThreatSubmitter(
 /**
  * Get a skill blacklist checker function for SkillWatcher integration.
  * Checks if a skill name appears in the community blacklist from Threat Cloud.
+ * Uses a 5-minute in-memory cache to avoid hitting TC on every check.
  */
 export function getSkillBlacklistChecker(
   threatCloud: ThreatCloudClient
 ): (skillName: string) => Promise<boolean> {
+  const BLACKLIST_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  let cachedBlacklist: Array<{ skillName: string }> = [];
+  let cacheTimestamp = 0;
+
   return async (skillName: string): Promise<boolean> => {
-    const blacklist = await threatCloud.fetchSkillBlacklist();
+    if (Date.now() - cacheTimestamp > BLACKLIST_CACHE_TTL) {
+      cachedBlacklist = await threatCloud.fetchSkillBlacklist();
+      cacheTimestamp = Date.now();
+    }
     const normalized = skillName.toLowerCase().trim().replace(/\s+/g, '-');
-    return blacklist.some(
+    return cachedBlacklist.some(
       (entry) => entry.skillName.toLowerCase().trim().replace(/\s+/g, '-') === normalized
     );
   };

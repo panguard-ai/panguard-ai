@@ -702,14 +702,8 @@ export class ThreatCloudClient {
   // ---------------------------------------------------------------------------
 
   private loadCache(): CacheData {
-    const filePath = join(this.dataDir, CACHE_FILE);
-    try {
-      if (existsSync(filePath)) {
-        return JSON.parse(readFileSync(filePath, 'utf-8')) as CacheData;
-      }
-    } catch {
-      logger.warn('Failed to load threat cloud cache / 載入威脅雲快取失敗');
-    }
+    // Community data is ephemeral — always start fresh from TC.
+    // No disk persistence for rules/stats (only upload queue is persisted for offline mode).
     return {
       rules: [],
       lastSync: new Date(0).toISOString(),
@@ -718,14 +712,8 @@ export class ThreatCloudClient {
   }
 
   private saveCache(): void {
-    try {
-      const filePath = join(this.dataDir, CACHE_FILE);
-      mkdirSync(dirname(filePath), { recursive: true });
-      writeFileSync(filePath, JSON.stringify(this.cache, null, 2), 'utf-8');
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.error(`Failed to save cache: ${msg} / 儲存快取失敗: ${msg}`);
-    }
+    // No-op: community data stays in memory only.
+    // Stats are transient and will be re-accumulated from TC on next sync.
   }
 
   private loadQueue(): AnonymizedThreatData[] {
