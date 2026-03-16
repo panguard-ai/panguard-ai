@@ -127,7 +127,7 @@ function getWorkbuddyConfigPath(): string {
 
 /** Get the MCP config path for NemoClaw. */
 function getNemoClawConfigPath(): string {
-  return join(homedir(), '.nemoclaw', '.mcp.json');
+  return join(homedir(), '.nemoclaw', 'mcp.json');
 }
 
 /**
