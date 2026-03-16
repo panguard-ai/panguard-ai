@@ -56,13 +56,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL('/api/install', request.url));
   }
 
-  // /docs → redirect to docs.panguard.ai (before i18n middleware intercepts)
-  const docsMatch = pathname.match(/^(?:\/(?:en|zh))?\/docs(?:\/(.*))?$/);
-  if (docsMatch) {
-    const subpath = docsMatch[1] || '';
-    const target = subpath ? `https://docs.panguard.ai/${subpath}` : 'https://docs.panguard.ai';
-    return NextResponse.redirect(target, 301);
-  }
+  // /docs pages are served locally (previously redirected to docs.panguard.ai)
 
   // Run next-intl middleware for locale routing (handles / → /en, /zh, etc.)
   const response = intlMiddleware(request);

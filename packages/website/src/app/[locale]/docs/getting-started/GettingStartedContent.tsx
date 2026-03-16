@@ -328,6 +328,95 @@ export default function GettingStartedContent() {
         </div>
       </SectionWrapper>
 
+      {/* Platform Quick Start Guides */}
+      <SectionWrapper dark>
+        <div className="max-w-3xl mx-auto">
+          <FadeInUp>
+            <h2 className="text-xl font-bold text-text-primary mb-2">Platform Quick Start</h2>
+            <p className="text-sm text-text-secondary mb-6">Step-by-step for each AI platform. Pick yours.</p>
+          </FadeInUp>
+
+          <div className="space-y-6">
+            {/* Claude Code */}
+            <FadeInUp delay={0.05}>
+              <div className="bg-surface-1 border border-border rounded-xl p-5">
+                <h3 className="text-sm font-bold text-text-primary mb-3 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded bg-panguard-green/10 flex items-center justify-center text-[10px] font-bold text-panguard-green">CC</span>
+                  Claude Code
+                </h3>
+                <div className="space-y-3 text-sm text-text-secondary">
+                  <p><strong className="text-text-primary">Step 1:</strong> Open your terminal</p>
+                  <CodeBlock code="npm install -g @panguard-ai/panguard" label="Install" />
+                  <p><strong className="text-text-primary">Step 2:</strong> Auto-configure Claude Code</p>
+                  <CodeBlock code="panguard setup --platform claude-code" label="Setup" />
+                  <p><strong className="text-text-primary">Step 3:</strong> Restart Claude Code, then try:</p>
+                  <CodeBlock code={'# In Claude Code, ask:\n"scan my current project for security issues"\n"audit the MCP skill at github.com/owner/repo"'} label="Claude Code" />
+                  <p><strong className="text-text-primary">Step 4:</strong> Start 24/7 protection</p>
+                  <CodeBlock code="panguard guard start --dashboard" label="Terminal" />
+                  <p className="text-xs text-panguard-green">Done! Claude Code now has 11 security tools via MCP. Guard monitors everything 24/7.</p>
+                </div>
+              </div>
+            </FadeInUp>
+
+            {/* OpenClaw */}
+            <FadeInUp delay={0.1}>
+              <div className="bg-surface-1 border border-border rounded-xl p-5">
+                <h3 className="text-sm font-bold text-text-primary mb-3 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded bg-panguard-green/10 flex items-center justify-center text-[10px] font-bold text-panguard-green">OC</span>
+                  OpenClaw
+                </h3>
+                <div className="space-y-3 text-sm text-text-secondary">
+                  <p><strong className="text-text-primary">Step 1:</strong> Install PanGuard</p>
+                  <CodeBlock code="npm install -g @panguard-ai/panguard" label="Install" />
+                  <p><strong className="text-text-primary">Step 2:</strong> Auto-configure OpenClaw</p>
+                  <CodeBlock code="panguard setup --platform openclaw" label="Setup" />
+                  <p><strong className="text-text-primary">Step 3:</strong> Close and reopen OpenClaw</p>
+                  <p><strong className="text-text-primary">Step 4:</strong> In OpenClaw, PanGuard tools are now available. Try:</p>
+                  <CodeBlock code={'# In OpenClaw, ask:\n"use panguard to scan this project"\n"audit the skill I just installed"'} label="OpenClaw" />
+                  <p><strong className="text-text-primary">Step 5:</strong> Start Guard for continuous protection</p>
+                  <CodeBlock code="panguard guard start --dashboard" label="Terminal" />
+                  <p className="text-xs text-panguard-green">Done! Every skill OpenClaw installs will be automatically audited.</p>
+                </div>
+              </div>
+            </FadeInUp>
+
+            {/* QClaw */}
+            <FadeInUp delay={0.15}>
+              <div className="bg-surface-1 border border-border rounded-xl p-5">
+                <h3 className="text-sm font-bold text-text-primary mb-3 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded bg-panguard-green/10 flex items-center justify-center text-[10px] font-bold text-panguard-green">QC</span>
+                  QClaw
+                </h3>
+                <div className="space-y-3 text-sm text-text-secondary">
+                  <p><strong className="text-text-primary">Step 1:</strong> Install PanGuard</p>
+                  <CodeBlock code="npm install -g @panguard-ai/panguard" label="Install" />
+                  <p><strong className="text-text-primary">Step 2:</strong> Auto-configure QClaw</p>
+                  <CodeBlock code="panguard setup --platform qclaw" label="Setup" />
+                  <p><strong className="text-text-primary">Step 3:</strong> Close and reopen QClaw</p>
+                  <p><strong className="text-text-primary">Step 4:</strong> PanGuard security tools are now available in QClaw</p>
+                  <p><strong className="text-text-primary">Step 5:</strong> Enable 24/7 monitoring</p>
+                  <CodeBlock code="panguard guard start --dashboard\n# Dashboard: http://localhost:3100" label="Terminal" />
+                  <p className="text-xs text-panguard-green">Done! QClaw is now protected by 10,400+ detection rules.</p>
+                </div>
+              </div>
+            </FadeInUp>
+
+            {/* All Platforms */}
+            <FadeInUp delay={0.2}>
+              <div className="bg-surface-2/30 border border-border rounded-xl p-5 text-center">
+                <p className="text-sm text-text-secondary mb-2">
+                  Or auto-detect all platforms at once:
+                </p>
+                <CodeBlock code="panguard setup" label="Terminal" />
+                <p className="text-xs text-text-muted mt-2">
+                  Detects Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop automatically.
+                </p>
+              </div>
+            </FadeInUp>
+          </div>
+        </div>
+      </SectionWrapper>
+
       {/* Step 2: What you can do */}
       <SectionWrapper>
         <div className="max-w-3xl mx-auto">
