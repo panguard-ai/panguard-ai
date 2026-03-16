@@ -101,9 +101,31 @@ export class DashboardServer {
       this.server = createServer((req, res) => this.handleRequest(req, res));
 
       this.server.on('upgrade', (req: IncomingMessage, socket: Socket, _head: Buffer) => {
-        if (req.url !== '/ws') {
+        const reqUrl = req.url ?? '';
+        if (!reqUrl.startsWith('/ws')) {
           socket.destroy();
           return;
+        }
+
+        // Validate auth token from query string (?token=...)
+        try {
+          const parsedUrl = new URL(reqUrl, `http://127.0.0.1:${this.port}`);
+          const wsToken = parsedUrl.searchParams.get('token') ?? '';
+          if (
+            wsToken &&
+            wsToken.length === this.authToken.length &&
+            timingSafeEqual(Buffer.from(wsToken), Buffer.from(this.authToken))
+          ) {
+            // Token valid — continue
+          } else if (!wsToken) {
+            // No token — allow for backwards compatibility (localhost only)
+          } else {
+            logger.warn('WebSocket rejected: invalid token');
+            socket.destroy();
+            return;
+          }
+        } catch {
+          // URL parse error — allow connection (localhost only)
         }
 
         if (this.wsClients.size >= MAX_WS_CLIENTS) {
@@ -367,8 +389,13 @@ export class DashboardServer {
   }
 
   private serveIndex(res: ServerResponse): void {
+    // Embed auth token in HTML so dashboard always authenticates, even without #token= in URL
+    const html = DASHBOARD_HTML.replace(
+      "var lang=",
+      `var __tk='${this.authToken}';var lang=`
+    );
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(DASHBOARD_HTML);
+    res.end(html);
   }
 
   private jsonResponse(res: ServerResponse, data: unknown, statusCode = 200): void {
@@ -1171,6 +1198,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="gs"><div class="sn done" id="g4n">4</div><div class="sb-body"><div class="sb-title" data-i18n="g4t">Start Guard Engine</div><div class="sb-desc" data-i18n="g4d">Enable 24/7 real-time protection. The guard engine monitors all activity and auto-responds to threats.</div><div class="sb-cmd">panguard guard start --dashboard</div></div></div>
 <div class="gs"><div class="sn" id="g5n">5</div><div class="sb-body"><div class="sb-title" data-i18n="g5t">Configure AI Layers</div><div class="sb-desc" data-i18n="g5d">Layer 2 (fingerprint & heuristic) is already active. Optionally configure Layer 3 (cloud AI) for the deepest threat analysis. Go to the AI Setup tab to add your API key.</div><div class="sb-cmd">Use the "AI Setup" tab above</div><a class="sb-link" href="#" onclick="nav('ai');return false" data-i18n="go_ai">Go to AI Setup &rarr;</a></div></div>
 <div class="gs"><div class="sn" id="g6n">6</div><div class="sb-body"><div class="sb-title" data-i18n="g6t">Protection Active!</div><div class="sb-desc" data-i18n="g6d">Once Guard is running, Panguard continuously monitors your system. Check the Overview tab for real-time status, threat detection, and event history.</div><div id="g6-status" style="margin-top:8px;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600"></div></div></div>
+<div class="gs" style="margin-top:24px;border-top:1px solid var(--bd);padding-top:16px"><div class="sn" style="background:var(--bad)">7</div><div class="sb-body"><div class="sb-title" data-i18n="g7t">Uninstall Panguard</div><div class="sb-desc" data-i18n="g7d">Remove the system service, delete config files, and uninstall the CLI.</div><div class="sb-cmd">panguard guard uninstall</div><div class="sb-cmd">rm -rf ~/.panguard-guard ~/.panguard</div><div class="sb-cmd">npm uninstall -g @panguard-ai/panguard</div></div></div>
 </div>
 </div>
 </div>
@@ -1213,14 +1241,15 @@ g1t:'Install Panguard',g1d:'Install the Panguard CLI globally.',g2t:'Initialize 
 g3t:'Setup MCP Integration',g3d:'Inject Panguard into your AI coding platforms.',g4t:'Start Guard Engine',g4d:'Enable 24/7 real-time protection.',
 g5t:'Configure AI Layers',g5d:'Layer 2 is already active. Optionally add Layer 3 (cloud AI) for the deepest analysis.',go_ai:'Go to AI Setup &rarr;',
 g6t:'Protection Active!',g6d:'Guard is running. Check Overview for real-time status.',
+g7t:'Uninstall Panguard',g7d:'Remove the system service, delete config files, and uninstall the CLI.',
 wc_title:'Welcome to <span>Panguard</span>',wc_desc:'Your AI-powered security guard is ready. Panguard provides multi-layer threat detection with real-time monitoring, community-driven intelligence, and zero-config protection.',
 wc_s1t:'Initializing Guard Engine',wc_s1d:'Loading detection rules and security modules...',
 wc_s2t:'Connecting Dashboard',wc_s2d:'Establishing real-time data channels...',
 wc_s3t:'Loading System Status',wc_s3d:'Reading current protection state and metrics...',
 wc_s4t:'Ready',wc_s4d:'All systems initialized. Welcome aboard.',
 wc_btn:'Enter Dashboard'},
-zh:{n_ov:'\u7e3d\u89bd',n_sk:'Skills & Trust',n_ai:'AI \u8a2d\u5b9a',n_ru:'Rules',n_tc:'Threat Cloud',n_th:'Threats',n_gd:'Guide',
-t_ov:'<em>\u7cfb\u7d71\u7e3d\u89bd</em>',t_sk:'<em>Skills & Trust</em>',t_ai:'<em>AI \u914d\u7f6e</em>',t_ru:'<em>Detection Rules</em>',t_tc:'<em>Threat Cloud</em>',t_th:'<em>Threat Intelligence</em>',t_gd:'<em>Quick Start</em>',
+zh:{n_ov:'\u7e3d\u89bd',n_sk:'\u6280\u80fd\u8207\u4fe1\u4efb',n_ai:'AI \u8a2d\u5b9a',n_ru:'\u5075\u6e2c\u898f\u5247',n_tc:'\u5a01\u8105\u96f2',n_th:'\u5a01\u8105\u60c5\u5831',n_gd:'\u5feb\u901f\u958b\u59cb',
+t_ov:'<em>\u7cfb\u7d71\u7e3d\u89bd</em>',t_sk:'<em>\u6280\u80fd\u8207\u4fe1\u4efb</em>',t_ai:'<em>AI \u914d\u7f6e</em>',t_ru:'<em>\u5075\u6e2c\u898f\u5247</em>',t_tc:'<em>\u5a01\u8105\u96f2</em>',t_th:'<em>\u5a01\u8105\u60c5\u5831</em>',t_gd:'<em>\u5feb\u901f\u958b\u59cb</em>',
 d_ov:'\u5373\u6642\u7cfb\u7d71\u72c0\u614b\u3002\u6240\u6709\u6307\u6a19\u900f\u904e WebSocket \u81ea\u52d5\u66f4\u65b0\u3002',
 d_sk:'Panguard \u6703\u5be9\u8a08\u60a8\u7cfb\u7d71\u4e0a\u5b89\u88dd\u7684\u6bcf\u500b MCP skill\u3002\u5b89\u5168\u7684 skill \u6703\u81ea\u52d5\u52a0\u5165 whitelist\uff0c\u6709\u98a8\u96aa\u7684\u6703\u6a19\u8a18\u4f9b\u60a8\u5be9\u67e5\u3002',
 d_ai:'Panguard \u4f7f\u7528\u4e09\u5c64\u5075\u6e2c\u7cfb\u7d71\u3002Layer 1 (Rules) \u548c Layer 2 (Fingerprint & Heuristic) \u59cb\u7d42\u6d3b\u8e8d\uff0c\u96f6\u914d\u7f6e\u3002Layer 3 \u4f7f\u7528 Cloud AI \u9032\u884c\u6700\u6df1\u5ea6\u5206\u6790 -- \u5728\u4e0b\u65b9\u914d\u7f6e API key\u3002',
@@ -1228,31 +1257,32 @@ d_ru:'Panguard \u4f7f\u7528\u4e09\u5c64 rule \u7cfb\u7d71\u5075\u6e2c\u5a01\u810
 d_tc:'Threat Cloud \u662f Panguard \u7684\u533f\u540d\u5a01\u8105\u60c5\u5831\u5171\u4eab\u7db2\u8def\u3002\u60a8\u7684\u88dd\u7f6e\u53ef\u9078\u64c7\u6027\u4e0a\u50b3\u533f\u540d\u5316\u5a01\u8105\u8cc7\u6599\u4ee5\u5e6b\u52a9\u793e\u7fa4\uff0c\u4e26\u63a5\u6536\u66f4\u65b0\u7684 detection rules\u3002',
 d_th:'\u6240\u6709\u5075\u6e2c\u5230\u7684 threats \u90fd\u8a18\u9304\u5728\u6b64\u3002Malicious \u4e8b\u4ef6\u6703\u81ea\u52d5\u5c01\u9396\u3002Suspicious \u4e8b\u4ef6\u53ef\u80fd\u9700\u8981\u60a8\u7684\u6ce8\u610f\u3002',
 d_gd:'\u6309\u7167\u4ee5\u4e0b\u6b65\u9a5f\u555f\u7528\u5b8c\u6574\u9632\u8b77\u3002\u5b8c\u6210\u6240\u6709\u6b65\u9a5f\u5f8c\uff0cPanguard Guard \u5c07\u6301\u7e8c\u76e3\u63a7\u4e26\u4fdd\u8b77\u60a8\u7684\u7cfb\u7d71\u3002',
-mode:'Mode',events:'Events',threats:'Threats',uptime:'Uptime',learning:'Learning',confidence:'Confidence',memory:'Memory',actions:'Actions',timeline:'Event Timeline',
-det_rules:'Detection Rules',skill_sum:'Skill Summary',wl_skills:'Whitelisted',tr_skills:'Tracked',st_fp:'Stable FP',
-total:'\u5df2\u5b89\u88dd\u7e3d\u6578',wl_count:'Whitelisted',tr_count:'Tracked / Unknown',all_skills:'\u6240\u6709\u5df2\u5b89\u88dd Skills',whitelist:'Whitelisted Skills',name:'\u540d\u7a31',source:'Source',reason:'Reason',date:'\u65e5\u671f',platform:'Platform',trust:'Trust Status',
+mode:'\u6a21\u5f0f',events:'\u4e8b\u4ef6',threats:'\u5a01\u8105',uptime:'\u904b\u884c\u6642\u9593',learning:'\u5b78\u7fd2\u9032\u5ea6',confidence:'\u4fe1\u5fc3\u5ea6',memory:'\u8a18\u61b6\u9ad4',actions:'\u56de\u61c9\u52d5\u4f5c',timeline:'\u4e8b\u4ef6\u6642\u9593\u7dda',
+det_rules:'\u5075\u6e2c\u898f\u5247',skill_sum:'\u6280\u80fd\u6458\u8981',wl_skills:'\u767d\u540d\u55ae',tr_skills:'\u8ffd\u8e64\u4e2d',st_fp:'\u7a69\u5b9a\u6307\u7d0b',
+total:'\u5df2\u5b89\u88dd\u7e3d\u6578',wl_count:'\u767d\u540d\u55ae',tr_count:'\u8ffd\u8e64 / \u672a\u77e5',all_skills:'\u6240\u6709\u5df2\u5b89\u88dd\u6280\u80fd',whitelist:'\u767d\u540d\u55ae\u6280\u80fd',name:'\u540d\u7a31',source:'\u4f86\u6e90',reason:'\u539f\u56e0',date:'\u65e5\u671f',platform:'\u5e73\u53f0',trust:'\u4fe1\u4efb\u72c0\u614b',
 l1:'Layer 1: Rules Engine (Sigma + YARA + ATR)',l1d:'Pattern-matching rules\uff0c\u5373\u6642\u5075\u6e2c\u5df2\u77e5\u5a01\u8105\u3002\u59cb\u7d42\u6d3b\u8e8d\uff0c\u7121\u9700\u914d\u7f6e\u3002\u5305\u542b 3,700+ Sigma rules\u30014,300+ YARA signatures\u3001\u81ea\u8a02 ATR\u3002',active:'Active',
 l2:'Layer 2: Fingerprint & Heuristic\uff08\u672c\u5730\uff0c\u96f6\u914d\u7f6e\uff09',l2desc:'\u884c\u70ba\u6307\u7d0b\u8207\u555f\u767c\u5f0f\u5206\u6790\u3002\u5075\u6e2c\u53ef\u7591\u6a21\u5f0f\u5982\u6b0a\u9650\u63d0\u5347\u3001\u7570\u5e38\u6a94\u6848\u5b58\u53d6\u3001skill \u884c\u70ba\u504f\u79fb\u3002\u59cb\u7d42\u6d3b\u8e8d\uff0c\u7121\u9700\u914d\u7f6e\u3002',
 l3:'Layer 3: Cloud AI\uff08\u6700\u5f37\u5206\u6790\uff09',l3desc:'Cloud model \u63d0\u4f9b\u6700\u6df1\u5165\u7684\u5206\u6790\u3002\u50c5\u5728 Layer 1+2 \u7121\u6cd5\u5224\u5b9a\u6642\u4f7f\u7528\u3002\u9700\u8981\u60a8\u81ea\u5df1\u7684 API key\u3002',
-provider:'Provider',endpoint:'Endpoint',model:'Model',api_key:'API Key',custom_ep:'Custom Endpoint',ep_note:'\u7528\u65bc\u81ea\u67b6 model\u3001API proxy \u6216\u4f01\u696d gateway\u3002\u7559\u7a7a\u5373\u4f7f\u7528\u9810\u8a2d endpoint\u3002',key_note:'Key \u5132\u5b58\u5728\u672c\u6a5f ~/.panguard-guard/config.json\uff0c\u7d55\u4e0d\u6703\u50b3\u9001\u5230 Panguard server\u3002',
+active:'\u5df2\u555f\u7528',provider:'\u63d0\u4f9b\u8005',endpoint:'\u7aef\u9ede',model:'\u6a21\u578b',api_key:'API \u91d1\u9470',custom_ep:'\u81ea\u8a02\u7aef\u9ede',ep_note:'\u7528\u65bc\u81ea\u67b6 model\u3001API proxy \u6216\u4f01\u696d gateway\u3002\u7559\u7a7a\u5373\u4f7f\u7528\u9810\u8a2d endpoint\u3002',key_note:'\u91d1\u9470\u5132\u5b58\u5728\u672c\u6a5f ~/.panguard-guard/config.json\uff0c\u7d55\u4e0d\u6703\u50b3\u9001\u5230 Panguard \u4f3a\u670d\u5668\u3002',
 save:'\u5132\u5b58\u914d\u7f6e',reload:'\u91cd\u65b0\u8f09\u5165',
 ru_sigma_d:'\u793e\u7fa4 detection rules',ru_yara_d:'Binary pattern signatures',ru_atr_d:'Agent Threat Rules (AI \u8349\u64ec)',ru_auto:'Rules \u6bcf\u5c0f\u6642\u81ea\u52d5\u5f9e Threat Cloud \u540c\u6b65\u3002',
 what_atr:'\u4ec0\u9ebc\u662f ATR\uff1f',atr_title:'Agent Threat Rules (ATR)',atr_desc:'ATR rules \u7531 AI \u81ea\u52d5\u8349\u64ec\uff0c\u7576 Guard Engine \u5075\u6e2c\u5230\u91cd\u8907\u5a01\u8105 pattern\uff086 \u5c0f\u6642\u5167 2+ \u4f86\u6e90\u7684 5+ events\uff09\u6642\u89f8\u767c\u3002\u8349\u64ec\u7684 rules \u6703\u63d0\u4ea4\u5230 Threat Cloud \u9032\u884c\u793e\u7fa4\u5be9\u67e5\uff0c\u9a57\u8b49\u5f8c\u5206\u767c\u7d66\u6240\u6709\u7528\u6236\u3002',
-atr_stats:'ATR Activity',atr_matches:'ATR Matches',atr_drafted:'Patterns Drafted',atr_submitted:'Proposals Submitted',
+atr_stats:'ATR \u6d3b\u52d5',atr_matches:'ATR \u547d\u4e2d',atr_drafted:'\u5df2\u8349\u64ec\u6a21\u5f0f',atr_submitted:'\u5df2\u63d0\u4ea4\u63d0\u6848',
 contrib_title:'\u60a8\u7684\u793e\u7fa4\u8ca2\u737b',contrib_desc:'\u60a8\u7684\u88dd\u7f6e\u63d0\u4ea4\u7684\u6bcf\u500b ATR proposal \u90fd\u6709\u52a9\u65bc\u4fdd\u8b77\u6574\u500b Panguard \u793e\u7fa4\u3002Proposals \u5728\u5206\u767c\u524d\u6703\u7d93\u904e\u5be9\u67e5\u548c\u9a57\u8b49\u3002\u8ca2\u737b\u662f\u81ea\u52d5\u4e14\u533f\u540d\u7684\u3002',
 why_contrib:'\u70ba\u4ec0\u9ebc\u8ca2\u737b\uff1f',why_desc:'Threat actors \u4e0d\u65b7\u6f14\u8b8a\u3002\u793e\u7fa4\u8ca2\u737b\u7684 ATR rules \u5efa\u7acb\u4e86\u96c6\u9ad4\u9632\u79a6\u7db2\u8def\uff0c\u6bcf\u500b\u53c3\u8207\u8005\u90fd\u589e\u5f37\u4e86\u6240\u6709\u4eba\u7684\u5b89\u5168\u3002',
-tc_status:'Status',tc_uploaded:'Uploaded',tc_received:'Rules Received',tc_queue:'Queue',
-upload_toggle:'Anonymous Upload',upload_desc:'\u555f\u7528\u6642\uff0c\u533f\u540d\u5316\u5a01\u8105\u8cc7\u6599\u6703\u4e0a\u50b3\u5230 Threat Cloud\u3002\u7d55\u4e0d\u6703\u50b3\u9001\u500b\u4eba\u8cc7\u6599\u3001\u6a94\u6848\u5167\u5bb9\u6216 source code\u3002',
+tc_status:'\u72c0\u614b',tc_uploaded:'\u5df2\u4e0a\u50b3',tc_received:'\u5df2\u63a5\u6536\u898f\u5247',tc_queue:'\u4f47\u5217',
+upload_toggle:'\u533f\u540d\u4e0a\u50b3',upload_desc:'\u555f\u7528\u6642\uff0c\u533f\u540d\u5316\u5a01\u8105\u8cc7\u6599\u6703\u4e0a\u50b3\u5230\u5a01\u8105\u96f2\u3002\u7d55\u4e0d\u6703\u50b3\u9001\u500b\u4eba\u8cc7\u6599\u3001\u6a94\u6848\u5167\u5bb9\u6216\u539f\u59cb\u78bc\u3002',
 how_upload:'Upload \u904b\u4f5c\u65b9\u5f0f',what_sent:'\u50b3\u9001\u4e86\u4ec0\u9ebc\u8cc7\u6599\uff1f',sent_fields:'\u6bcf\u6b21 upload \u50c5\u5305\u542b\uff1a',
 sf_ip:'\u5a01\u8105\u4f86\u6e90\uff0c\u5df2 hash',sf_type:'\u985e\u5225\uff1abrute_force\u3001port_scan \u7b49',sf_mitre:'ATT&CK technique ID',sf_conf:'\u6578\u5b57\u8a55\u5206',sf_os:'darwin / linux / win32',
 not_sent:'\u4e0d\u6703\u50b3\u9001\uff1a\u6a94\u6848\u5167\u5bb9\u3001source code\u3001\u4f7f\u7528\u8005\u540d\u7a31\u3001\u8def\u5f91\u3001API key\u3001\u500b\u4eba\u8cc7\u6599\u3002',
 privacy:'Privacy',priv1:'Client ID \u662f\u96a8\u6a5f UUID\uff0c\u4e0d\u8207\u60a8\u7684\u8eab\u4efd\u9023\u7d50\u3002',priv2:'\u60a8\u53ef\u4ee5\u96a8\u6642\u505c\u7528 upload\uff0c\u4e0d\u5f71\u97ff\u4fdd\u8b77\u529f\u80fd\u3002',priv3:'Threat Cloud endpoint \u53ef\u914d\u7f6e\uff0c\u9069\u7528\u65bc\u4f01\u696d\u6216 air-gapped \u74b0\u5883\u3002',priv4:'\u7121\u6cd5\u5f9e\u4e0a\u50b3\u7684\u8cc7\u6599\u9006\u5411\u5de5\u7a0b\u60a8\u7684\u74b0\u5883\u3002',
-tmap:'Threat Map',verdicts:'Recent Verdicts',src_ip:'Source IP',atk:'Attack Type',cnt:'Count',last:'Last Seen',
-all:'\u5168\u90e8',malicious:'Malicious',suspicious:'Suspicious',benign_f:'Benign',
+tmap:'\u5a01\u8105\u5730\u5716',verdicts:'\u6700\u8fd1\u5224\u5b9a',src_ip:'\u4f86\u6e90 IP',atk:'\u653b\u64ca\u985e\u578b',cnt:'\u6b21\u6578',last:'\u6700\u5f8c\u51fa\u73fe',
+all:'\u5168\u90e8',malicious:'\u60e1\u610f',suspicious:'\u53ef\u7591',benign_f:'\u826f\u6027',
 g1t:'\u5b89\u88dd Panguard',g1d:'\u5168\u57df\u5b89\u88dd Panguard CLI\u3002',g2t:'\u521d\u59cb\u5316\u914d\u7f6e',g2d:'\u57f7\u884c interactive setup wizard\u3002',
 g3t:'\u8a2d\u5b9a MCP Integration',g3d:'\u5c07 Panguard \u6ce8\u5165\u60a8\u7684 AI \u7de8\u7a0b\u5e73\u53f0\u3002',g4t:'\u555f\u52d5 Guard Engine',g4d:'\u555f\u7528 24/7 \u5373\u6642\u9632\u8b77\u3002',
 g5t:'\u914d\u7f6e AI Layers',g5d:'Layer 2 \u5df2\u6d3b\u8e8d\u3002\u53ef\u9078\u914d\u7f6e Layer 3 (Cloud AI) \u9032\u884c\u6700\u6df1\u5ea6\u5206\u6790\u3002',go_ai:'\u524d\u5f80 AI \u8a2d\u5b9a &rarr;',
-g6t:'Protection Active!',g6d:'Guard \u904b\u884c\u4e2d\u3002\u5728 Overview \u9801\u67e5\u770b\u5373\u6642\u72c0\u614b\u3002',
+g6t:'\u9632\u8b77\u5df2\u555f\u7528!',g6d:'Guard \u904b\u884c\u4e2d\u3002\u5728\u7e3d\u89bd\u9801\u67e5\u770b\u5373\u6642\u72c0\u614b\u3002',
+g7t:'\u5378\u8f09 Panguard',g7d:'\u79fb\u9664\u7cfb\u7d71\u670d\u52d9\u3001\u522a\u9664\u914d\u7f6e\u6a94\u3001\u5378\u8f09 CLI\u3002',
 wc_title:'\u6b61\u8fce\u4f86\u5230 <span>Panguard</span>',wc_desc:'\u60a8\u7684 AI \u5b89\u5168\u5b88\u8b77\u5df2\u5c31\u7dd2\u3002Panguard \u63d0\u4f9b\u591a\u5c64\u5a01\u8105\u5075\u6e2c\u3001\u5373\u6642\u76e3\u63a7\u3001\u793e\u7fa4\u60c5\u5831\u548c\u96f6\u914d\u7f6e\u9632\u8b77\u3002',
 wc_s1t:'\u521d\u59cb\u5316 Guard Engine',wc_s1d:'\u8f09\u5165 detection rules \u548c\u5b89\u5168\u6a21\u7d44...',
 wc_s2t:'\u9023\u63a5 Dashboard',wc_s2d:'\u5efa\u7acb\u5373\u6642\u8cc7\u6599\u901a\u9053...',
@@ -1271,11 +1301,11 @@ function toast(m){var t=document.getElementById('toast');t.textContent=m;t.class
 function fUp(ms){var s=Math.floor(ms/1000);if(s<60)return s+'s';var m=Math.floor(s/60);s%=60;if(m<60)return m+'m '+s+'s';var h=Math.floor(m/60);m%=60;return h+'h '+m+'m'}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
 
-function gTk(){var h=location.hash;if(h.indexOf('token=')!==-1){tk=h.split('token=')[1].split('&')[0];try{localStorage.setItem('panguard_token',tk)}catch(e){}try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}if(!tk){try{tk=localStorage.getItem('panguard_token')||''}catch(e){}}}
+function gTk(){var h=location.hash;if(h.indexOf('token=')!==-1){tk=h.split('token=')[1].split('&')[0];try{localStorage.setItem('panguard_token',tk)}catch(e){}try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}if(!tk){try{tk=localStorage.getItem('panguard_token')||''}catch(e){}}if(!tk&&typeof __tk!=='undefined'){tk=__tk;try{localStorage.setItem('panguard_token',tk)}catch(e){}}}
 function af(p,o){o=o||{};o.headers=o.headers||{};if(tk)o.headers['Authorization']='Bearer '+tk;return fetch(p,o).then(function(r){if(r.status===401){document.getElementById('wl').textContent=lang==='zh'?'Token 無效':'Invalid token';document.getElementById('wd').classList.remove('on')}return r})}
 
 /* WS */
-function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event'){aE(m);var ee=document.getElementById('evl-empty');if(ee)ee.style.display='none'}}catch(x){}}}
+function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws'+(tk?'?token='+tk:''));ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event'){aE(m);var ee=document.getElementById('evl-empty');if(ee)ee.style.display='none'}}catch(x){}}}
 
 function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.sigmaRuleCount!==undefined)document.getElementById('v-sigma').textContent=s.sigmaRuleCount;if(s.yaraRuleCount!==undefined)document.getElementById('v-yara').textContent=s.yaraRuleCount;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updPBar(s);updateG6();
 /* Hide empty reassurance when events exist */
