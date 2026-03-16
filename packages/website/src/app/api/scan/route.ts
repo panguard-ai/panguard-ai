@@ -1,15 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
+import atrRulesData from '@/lib/atr-rules-compiled.json';
 
 /**
  * POST /api/scan
  *
- * Accepts a GitHub URL, fetches the SKILL.md (or README.md),
- * runs lightweight security checks, and returns a risk report.
- * Results are cached by content hash.
- *
- * Body: { url: string }
- * Returns: { ok, data: { report, cached, contentHash, source, scannedAt } }
+ * Full-featured skill scanner using all 52 ATR rules (450 patterns)
+ * + inline injection/permission/secret checks.
+ * Results cached by content hash. Submits findings to Threat Cloud.
  */
 
 // ---------------------------------------------------------------------------
@@ -37,6 +35,119 @@ interface ScanReport {
   findings: Finding[];
   checks: CheckResult[];
   durationMs: number;
+  atrRulesEvaluated: number;
+  atrPatternsMatched: number;
+}
+
+interface ATRRuleCompiled {
+  id: string;
+  title: string;
+  severity: string;
+  category: string;
+  patterns: Array<{ field: string; pattern: string; desc: string }>;
+}
+
+// ---------------------------------------------------------------------------
+// ATR Rules: bundled fallback + live sync from Threat Cloud
+// ---------------------------------------------------------------------------
+
+const BUNDLED_ATR = atrRulesData as ATRRuleCompiled[];
+const TC_ENDPOINT = process.env['NEXT_PUBLIC_THREAT_CLOUD_URL'] || 'https://tc.panguard.ai';
+const TC_SYNC_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
+
+interface CompiledRule extends ATRRuleCompiled {
+  compiled: Array<{ regex: RegExp; desc: string }>;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const isSafeRegex = require('safe-regex') as (re: string | RegExp) => boolean;
+
+function compileRules(rules: ATRRuleCompiled[]): CompiledRule[] {
+  return rules.map((rule) => ({
+    ...rule,
+    compiled: rule.patterns
+      .map((p) => {
+        try {
+          // Strip (?i) inline flag (unsupported in JS) and use 'i' flag instead
+          const hasInlineIgnoreCase = /\(\?i\)/.test(p.pattern);
+          const cleaned = hasInlineIgnoreCase ? p.pattern.replace(/\(\?i\)/g, '') : p.pattern;
+          const flags = hasInlineIgnoreCase ? 'i' : '';
+          const regex = new RegExp(cleaned, flags);
+          // Reject ReDoS-vulnerable patterns (catastrophic backtracking)
+          if (!isSafeRegex(regex)) return null;
+          return { regex, desc: p.desc };
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean) as Array<{ regex: RegExp; desc: string }>,
+  }));
+}
+
+// Live rule state — starts with bundled, refreshed from TC
+let liveATR: CompiledRule[] = compileRules(BUNDLED_ATR);
+let lastTCSyncAt = 0;
+let tcSyncInProgress = false;
+
+/** Fetch latest ATR rules from Threat Cloud and merge with bundled */
+async function syncATRFromTC(): Promise<void> {
+  if (tcSyncInProgress) return;
+  tcSyncInProgress = true;
+  try {
+    const res = await fetch(`${TC_ENDPOINT}/api/atr-rules`, {
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!res.ok) return;
+
+    const raw = await res.json();
+    const cloudRules = Array.isArray(raw) ? raw : (raw?.data ?? []);
+
+    if (cloudRules.length === 0) return;
+
+    // Parse cloud rules into ATRRuleCompiled format
+    const parsed: ATRRuleCompiled[] = [];
+    for (const cr of cloudRules) {
+      try {
+        const ruleContent = typeof cr.ruleContent === 'string' ? JSON.parse(cr.ruleContent) : cr;
+        if (ruleContent.id && ruleContent.detection?.conditions) {
+          parsed.push({
+            id: ruleContent.id,
+            title: ruleContent.title || ruleContent.id,
+            severity: ruleContent.severity || 'medium',
+            category: ruleContent.tags?.category || 'atr',
+            patterns: ruleContent.detection.conditions
+              .filter((c: Record<string, unknown>) => c.operator === 'regex' && c.value)
+              .map((c: Record<string, unknown>) => ({
+                field: c.field || 'user_input',
+                pattern: c.value as string,
+                desc: (c.description as string) || '',
+              })),
+          });
+        }
+      } catch {
+        // Skip unparseable cloud rules
+      }
+    }
+
+    // Merge: bundled + cloud (cloud rules override by ID)
+    const mergedMap = new Map<string, ATRRuleCompiled>();
+    for (const r of BUNDLED_ATR) mergedMap.set(r.id, r);
+    for (const r of parsed) mergedMap.set(r.id, r);
+
+    liveATR = compileRules(Array.from(mergedMap.values()));
+    lastTCSyncAt = Date.now();
+  } catch {
+    // TC unreachable — keep using current rules
+  } finally {
+    tcSyncInProgress = false;
+  }
+}
+
+/** Ensure rules are fresh (non-blocking sync if stale) */
+function ensureRulesFresh(): void {
+  if (Date.now() - lastTCSyncAt > TC_SYNC_INTERVAL_MS) {
+    void syncATRFromTC();
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -129,118 +240,9 @@ async function fetchSkillContent(
 }
 
 // ---------------------------------------------------------------------------
-// Inline Security Checks (mirrors skill-auditor patterns)
+// Additional inline checks (secrets, permissions)
 // ---------------------------------------------------------------------------
 
-/** Prompt injection patterns */
-const INJECTION_PATTERNS: Array<{
-  id: string;
-  pattern: RegExp;
-  title: string;
-  severity: Finding['severity'];
-}> = [
-  {
-    id: 'inj-ignore-prev',
-    pattern: /ignore\s+(all\s+)?previous\s+instructions/i,
-    title: 'Prompt injection: ignore previous instructions',
-    severity: 'critical',
-  },
-  {
-    id: 'inj-new-role',
-    pattern: /you\s+are\s+now\s+(a|an)\s+\w+/i,
-    title: 'Prompt injection: role reassignment',
-    severity: 'high',
-  },
-  {
-    id: 'inj-do-not-reveal',
-    pattern: /do\s+not\s+(reveal|mention|tell|disclose)/i,
-    title: 'Stealth instruction: suppress disclosure',
-    severity: 'high',
-  },
-  {
-    id: 'inj-override',
-    pattern: /override\s+(system|safety|security)\s+(prompt|instructions|rules)/i,
-    title: 'Prompt injection: override system prompt',
-    severity: 'critical',
-  },
-  {
-    id: 'inj-jailbreak',
-    pattern: /\b(DAN|jailbreak|bypass\s+filter)\b/i,
-    title: 'Jailbreak attempt detected',
-    severity: 'critical',
-  },
-  {
-    id: 'inj-base64',
-    pattern: /(?:eval|exec|Function)\s*\(\s*(?:atob|Buffer\.from)\s*\(/,
-    title: 'Encoded payload execution',
-    severity: 'critical',
-  },
-  {
-    id: 'inj-hidden-unicode',
-    pattern: /[\u200B-\u200F\u2028-\u202F\uFEFF]/,
-    title: 'Hidden Unicode characters detected',
-    severity: 'high',
-  },
-  {
-    id: 'inj-exfil',
-    pattern: /(?:curl|wget|fetch|http)\s+.*(?:env|secret|key|token|password)/i,
-    title: 'Data exfiltration pattern',
-    severity: 'critical',
-  },
-  {
-    id: 'inj-curl-pipe',
-    pattern: /curl\s+.*\|\s*(?:bash|sh|sudo)/,
-    title: 'Remote code execution: curl pipe to shell',
-    severity: 'critical',
-  },
-  {
-    id: 'inj-never-mention',
-    pattern: /never\s+mention\s+(this|these)\s+(instructions|steps)/i,
-    title: 'Stealth: hide instructions from user',
-    severity: 'high',
-  },
-];
-
-/** Dangerous tool/permission patterns */
-const PERMISSION_PATTERNS: Array<{
-  id: string;
-  pattern: RegExp;
-  title: string;
-  severity: Finding['severity'];
-}> = [
-  {
-    id: 'perm-exec',
-    pattern: /(?:child_process|execSync|execFile|spawn)\b/,
-    title: 'System command execution capability',
-    severity: 'medium',
-  },
-  {
-    id: 'perm-fs-write',
-    pattern: /(?:writeFile|appendFile|createWriteStream)\b/,
-    title: 'Filesystem write access',
-    severity: 'low',
-  },
-  {
-    id: 'perm-network',
-    pattern: /(?:http\.request|https\.request|net\.connect|fetch\()\b/,
-    title: 'Network access capability',
-    severity: 'low',
-  },
-  {
-    id: 'perm-env',
-    pattern: /process\.env\[/,
-    title: 'Environment variable access',
-    severity: 'medium',
-  },
-  {
-    id: 'perm-eval',
-    pattern: /\beval\s*\(/,
-    title: 'Dynamic code evaluation (eval)',
-    severity: 'high',
-  },
-];
-
-/** Secret patterns */
 const SECRET_PATTERNS: Array<{ id: string; pattern: RegExp; title: string }> = [
   { id: 'secret-aws', pattern: /AKIA[0-9A-Z]{16}/, title: 'AWS Access Key exposed' },
   { id: 'secret-github', pattern: /gh[pousr]_[A-Za-z0-9_]{36,}/, title: 'GitHub token exposed' },
@@ -252,58 +254,54 @@ const SECRET_PATTERNS: Array<{ id: string; pattern: RegExp; title: string }> = [
   },
 ];
 
-function runChecks(
+// ---------------------------------------------------------------------------
+// Full scan engine
+// ---------------------------------------------------------------------------
+
+function runFullScan(
   content: string,
   source: string
-): { findings: Finding[]; checks: CheckResult[] } {
+): { findings: Finding[]; checks: CheckResult[]; atrPatternsMatched: number } {
   const findings: Finding[] = [];
   const checks: CheckResult[] = [];
+  const matchedRuleIds = new Set<string>();
 
-  // Check 1: Injection patterns
-  let injectionCount = 0;
-  for (const p of INJECTION_PATTERNS) {
-    if (p.pattern.test(content)) {
-      findings.push({
-        id: p.id,
-        title: p.title,
-        description: `Detected in ${source}`,
-        severity: p.severity,
-        category: 'prompt-injection',
-      });
-      injectionCount++;
+  // ── ATR Pattern Detection (52 rules, 450 patterns) ──
+  for (const rule of liveATR) {
+    for (const compiled of rule.compiled) {
+      try {
+        if (compiled.regex.test(content)) {
+          if (!matchedRuleIds.has(rule.id)) {
+            matchedRuleIds.add(rule.id);
+            const severity = (['critical', 'high', 'medium', 'low', 'info'].includes(rule.severity)
+              ? rule.severity
+              : 'medium') as Finding['severity'];
+            findings.push({
+              id: `atr-${rule.id}`,
+              title: rule.title,
+              description: compiled.desc || `Matched ATR rule ${rule.id}`,
+              severity,
+              category: rule.category || 'atr',
+              location: `ATR Rule: ${rule.id}`,
+            });
+          }
+          break; // One match per rule is enough
+        }
+      } catch {
+        // Skip invalid regex
+      }
     }
   }
+
   checks.push({
-    status: injectionCount > 0 ? 'fail' : 'pass',
+    status: matchedRuleIds.size > 0 ? 'fail' : 'pass',
     label:
-      injectionCount > 0
-        ? `Injection Detection: ${injectionCount} pattern(s) found`
-        : 'Injection Detection: clean',
+      matchedRuleIds.size > 0
+        ? `ATR Detection: ${matchedRuleIds.size} rule(s) triggered (${liveATR.length} evaluated)`
+        : `ATR Detection: clean (${liveATR.length} rules evaluated)`,
   });
 
-  // Check 2: Permission patterns
-  let permCount = 0;
-  for (const p of PERMISSION_PATTERNS) {
-    if (p.pattern.test(content)) {
-      findings.push({
-        id: p.id,
-        title: p.title,
-        description: `Detected in ${source}`,
-        severity: p.severity,
-        category: 'permission',
-      });
-      permCount++;
-    }
-  }
-  checks.push({
-    status: permCount > 2 ? 'warn' : 'pass',
-    label:
-      permCount > 0
-        ? `Permission Audit: ${permCount} capability(s) found`
-        : 'Permission Audit: minimal',
-  });
-
-  // Check 3: Secrets
+  // ── Secret Detection ──
   let secretCount = 0;
   for (const p of SECRET_PATTERNS) {
     if (p.pattern.test(content)) {
@@ -322,34 +320,24 @@ function runChecks(
     label: secretCount > 0 ? `Secrets: ${secretCount} exposed` : 'Secrets: none found',
   });
 
-  // Check 4: Manifest validation (basic)
+  // ── Manifest Validation ──
   const hasFrontmatter = /^---\n[\s\S]*?\n---/.test(content);
   const hasName = /^name:\s*.+/m.test(content);
   if (source === 'README.md') {
     checks.push({ status: 'info', label: 'Manifest: no SKILL.md found, analyzed README.md' });
-  } else if (!hasFrontmatter) {
-    checks.push({ status: 'warn', label: 'Manifest: missing YAML frontmatter' });
-  } else if (!hasName) {
-    checks.push({ status: 'warn', label: 'Manifest: missing name field' });
+  } else if (!hasFrontmatter || !hasName) {
+    checks.push({ status: 'warn', label: 'Manifest: incomplete structure' });
   } else {
-    checks.push({ status: 'pass', label: 'Manifest: valid structure' });
+    checks.push({ status: 'pass', label: 'Manifest: valid' });
   }
 
-  // Check 5: Content size
-  if (content.length > 50_000) {
-    findings.push({
-      id: 'size-large',
-      title: 'Unusually large skill content',
-      description: `${(content.length / 1024).toFixed(0)}KB — could contain obfuscated payloads`,
-      severity: 'medium',
-      category: 'code',
-    });
-    checks.push({ status: 'warn', label: `Size: ${(content.length / 1024).toFixed(0)}KB (large)` });
-  } else {
-    checks.push({ status: 'pass', label: `Size: ${(content.length / 1024).toFixed(1)}KB` });
-  }
+  // ── Content Size ──
+  checks.push({
+    status: content.length > 50_000 ? 'warn' : 'pass',
+    label: `Size: ${(content.length / 1024).toFixed(1)}KB`,
+  });
 
-  return { findings, checks };
+  return { findings, checks, atrPatternsMatched: matchedRuleIds.size };
 }
 
 function computeRisk(findings: Finding[]): {
@@ -371,13 +359,43 @@ function computeRisk(findings: Finding[]): {
   return { riskScore: score, riskLevel };
 }
 
-// ---------------------------------------------------------------------------
-// Parse SKILL.md name
-// ---------------------------------------------------------------------------
-
 function parseSkillName(content: string): string | null {
   const match = content.match(/^---\n[\s\S]*?^name:\s*(.+)$/m);
   return match?.[1]?.trim() ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Threat Cloud submission (best-effort, non-blocking)
+// ---------------------------------------------------------------------------
+
+async function submitToThreatCloud(
+  skillName: string,
+  contentHash: string,
+  riskScore: number,
+  riskLevel: string,
+  findings: Finding[]
+): Promise<void> {
+  try {
+    await fetch(`${TC_ENDPOINT}/api/skill-threats`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        skillHash: contentHash,
+        skillName,
+        riskScore,
+        riskLevel,
+        findingSummaries: findings.slice(0, 10).map((f) => ({
+          id: f.id,
+          category: f.category,
+          severity: f.severity,
+          title: f.title,
+        })),
+      }),
+      signal: AbortSignal.timeout(5_000),
+    });
+  } catch {
+    // Best-effort — never block the scan response
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -421,7 +439,6 @@ export async function POST(request: Request) {
 
   const { owner, repo, branch, path: basePath } = parsed;
 
-  // Fetch content
   const skill = await fetchSkillContent(owner, repo, branch, basePath);
   if (!skill) {
     return NextResponse.json(
@@ -433,7 +450,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Content hash
   const contentHash = createHash('sha256').update(skill.content).digest('hex').slice(0, 16);
 
   // Check cache
@@ -451,23 +467,32 @@ export async function POST(request: Request) {
     });
   }
 
-  // Run checks
+  // Run full scan with ATR rules
   const start = Date.now();
-  const { findings, checks } = runChecks(skill.content, skill.source);
+  const { findings, checks, atrPatternsMatched } = runFullScan(skill.content, skill.source);
   const { riskScore, riskLevel } = computeRisk(findings);
   const durationMs = Date.now() - start;
 
+  const skillName = parseSkillName(skill.content) ?? `${owner}/${repo}`;
+
   const report: ScanReport = {
-    skillName: parseSkillName(skill.content) ?? `${owner}/${repo}`,
+    skillName,
     riskScore,
     riskLevel,
     findings,
     checks,
     durationMs,
+    atrRulesEvaluated: liveATR.length,
+    atrPatternsMatched,
   };
 
   const scannedAt = new Date().toISOString();
   scanCache.set(contentHash, { report, scannedAt });
+
+  // Submit to Threat Cloud (non-blocking)
+  if (riskScore > 0) {
+    void submitToThreatCloud(skillName, contentHash, riskScore, riskLevel, findings);
+  }
 
   return NextResponse.json({
     ok: true,

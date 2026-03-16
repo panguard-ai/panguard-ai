@@ -32,7 +32,7 @@ const productConfigs = [
     key: 'threatCloud' as const,
     icon: GlobalIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
-    description: `Threat Cloud is a self-hosted collective intelligence network. Every Panguard install contributes anonymized threat signals; the pipeline auto-generates Sigma, YARA, and ATR rules from real-world attacks. ${STATS.threatIntel.sources} threat intel sources, ${STATS.threatIntel.validatedRecords.toLocaleString()} validated IoC records, and ${STATS.threatIntel.promotedRules} community-promoted rules -- all synced every 6 hours. The more nodes participate, the stronger everyone's defense.`,
+    description: `Threat Cloud is a self-hosted collective intelligence network. Every Panguard install contributes anonymized threat signals; the pipeline auto-generates Sigma, YARA, and ATR rules from real-world attacks. ${STATS.threatIntel.sources} threat intel sources, ${STATS.threatIntel.validatedRecords.toLocaleString()} validated IoC records, and ${STATS.threatIntel.promotedRules} community-promoted rules -- all synced every hour. The more nodes participate, the stronger everyone's defense.`,
     features: [
       `${STATS.threatIntel.sources} threat intel sources with ${STATS.threatIntel.validatedRecords.toLocaleString()} validated records`,
       'Auto-generates Sigma, YARA, and ATR rules from collective data',

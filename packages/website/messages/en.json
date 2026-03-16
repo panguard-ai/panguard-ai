@@ -4553,7 +4553,7 @@
     "liveIntel": {
       "overline": "LIVE INTELLIGENCE",
       "title": "Real-Time Threat Pipeline",
-      "subtitle": "Auto-crawling 11 sources every 6 hours. Rules auto-generated and promoted.",
+      "subtitle": "Auto-crawling 11 sources every hour. Rules auto-generated and promoted.",
       "stats": {
         "sources": "Intel Sources",
         "records": "Validated Records",

@@ -20,10 +20,11 @@ import {
   statusPanel,
   spinner,
   setLogLevel,
+  promptConfirm,
 } from '@panguard-ai/core';
 import type { StatusItem } from '@panguard-ai/core';
 import { GuardEngine } from '../guard-engine.js';
-import { loadConfig, DEFAULT_DATA_DIR } from '../config.js';
+import { loadConfig, saveConfig, DEFAULT_DATA_DIR } from '../config.js';
 import { PidFile } from '../daemon/index.js';
 import { installService, uninstallService } from '../daemon/index.js';
 import { generateTestLicenseKey } from '../license/index.js';
@@ -571,6 +572,47 @@ async function commandInstall(dataDir: string): Promise<void> {
     const msg = err instanceof Error ? err.message : String(err);
     sp.fail(`Install failed: ${msg}`);
     console.error(c.dim('  You may need to run with elevated privileges (sudo/admin).'));
+    return;
+  }
+
+  // ── Threat Cloud setup / 設定 Threat Cloud ──
+  console.log('');
+  const configPath = join(dataDir, 'config.json');
+  const config = loadConfig(configPath);
+
+  const enableTC = await promptConfirm({
+    message: {
+      en: 'Enable Threat Cloud collective defense?',
+      'zh-TW': '啟用 Threat Cloud 集體防禦？',
+    },
+    defaultValue: true,
+    lang: 'en',
+  });
+
+  const updated = {
+    ...config,
+    threatCloudUploadEnabled: enableTC,
+    threatCloudEndpoint: enableTC
+      ? (config.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')
+      : config.threatCloudEndpoint,
+  };
+  try {
+    saveConfig(updated, configPath);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(c.dim(`  Warning: could not save config: ${msg}`));
+    return;
+  }
+
+  if (enableTC) {
+    console.log(
+      `  ${symbols.pass} Threat Cloud enabled: ${c.sage(updated.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')}`,
+    );
+    console.log(c.dim('    Every scan strengthens the collective defense network.'));
+    console.log(c.dim('    每次掃描都會強化集體防禦網路。'));
+  } else {
+    console.log(`  ${symbols.info} Threat Cloud disabled (offline mode).`);
+    console.log(c.dim('    You can enable it later: panguard-guard config --set threatCloudUploadEnabled=true'));
   }
 }
 
