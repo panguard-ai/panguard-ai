@@ -34,9 +34,15 @@ Split interactive.ts (1,912 lines) into: lang.ts, menu-defs.ts, render.ts + 5 ac
 
 Added: legal-pages.spec.ts (8 legal pages + zh variants), mobile-responsive.spec.ts (viewport, hamburger, overflow), locale-switch.spec.ts (EN/ZH switching, persistence), enhanced navigation.spec.ts (product pages, footer links, content pages).
 
-## P2 - Merge TC Handler Dual Implementation (L)
+## P2 - Merge TC Handler + ATR Engine Triple Implementation (L)
 
-`threat-cloud/src/server.ts` and `panguard/src/cli/commands/serve-tc.ts` implement the same 7 API endpoints independently. Now that both share Zod schemas from `@panguard-ai/core`, refactor to extract shared handler logic into a common module to prevent future divergence. Key files: `packages/threat-cloud/src/server.ts`, `packages/panguard/src/cli/commands/serve-tc.ts`, `packages/core/src/utils/validation.ts`.
+Three independent ATR/TC implementations exist and must be unified into a shared module:
+
+1. `packages/threat-cloud/src/server.ts` — TC server (7 API endpoints)
+2. `packages/panguard/src/cli/commands/serve-tc.ts` — CLI embedded TC (same 7 endpoints)
+3. `packages/website/src/app/api/scan/route.ts` — Website scan API (compileRules, runFullScan, syncATRFromTC)
+
+All three share Zod schemas from `@panguard-ai/core`. Refactor to extract shared handler logic + ATR rule compilation into a common module to prevent future divergence.
 
 ## P2 - Flywheel Core Component Unit Tests (XL)
 
@@ -52,6 +58,20 @@ The 6 flywheel core components currently have minimal direct test coverage:
 Target: unit tests covering happy path, error path, and edge cases (path traversal, malformed input, LLM failure) for each component.
 
 Additionally: `atr-engine.ts` `resolveBundledRulesDir()` now has a 4-layer fallback chain (createRequire → CLI argv → walk node_modules → bundled-rules) that is critical for npm -g installs. Needs mock-based unit tests to verify each fallback triggers correctly when prior strategies fail.
+
+## P2 - Website Scan API Unit Tests (M)
+
+`packages/website/src/app/api/scan/route.ts` has zero test coverage for critical functions:
+
+- `compileRules()` — compiles ATR patterns into RegExp with safe-regex validation and (?i) flag handling
+- `runFullScan()` — runs all compiled ATR rules + secret detection against content
+- `syncATRFromTC()` — fetches and merges cloud rules with bundled rules
+
+Tests needed: happy path, malformed input (invalid regex, bad JSON), ReDoS regex rejection via safe-regex, (?i) flag stripping, cloud rule merge deduplication.
+
+## P2 - FinalCTANew i18n Restoration (S)
+
+`packages/website/src/components/home/FinalCTANew.tsx` dropped `useTranslations()` — all text hardcoded in English ("Start with a scan.", "Scan a Skill Now", "Every scan makes the community safer."). Chinese users see English CTA. Restore i18n after homepage copy is finalized.
 
 ## P3 - Dashboard WebSocket Token Auth (S)
 
