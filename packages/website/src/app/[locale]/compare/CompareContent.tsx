@@ -51,7 +51,7 @@ const COMPARISON_ROWS: readonly ComparisonRow[] = [
   },
   {
     feature: 'Cost (10 endpoints / yr)',
-    panguard: '$348/yr (Pro)',
+    panguard: '$0 (MIT License)',
     manual: '$20K\u2013$50K / engagement',
     siem: '$15K\u2013$60K/yr',
     none: '$0 (until breach)',

@@ -5232,29 +5232,6 @@
       "errorNetwork": "Network error"
     }
   },
-  "billing": {
-    "headerTitle": "Account Plan",
-    "currentPlan": "Current Plan",
-    "manageSubscription": "View Account",
-    "errorLoading": "Unable to load account data. Please refresh.",
-    "freeTier": "Free and open source",
-    "planIncludes": "Includes",
-    "renewsOn": "Active since {date}",
-    "endsOn": "Active since {date}",
-    "upgradeHeading": "All features included",
-    "upgradeDescription": "All Panguard features are free and open source.",
-    "viewPlans": "View Features",
-    "tierFeatures": {
-      "all": [
-        "Unlimited scans",
-        "Unlimited endpoints",
-        "Unlimited API calls",
-        "All features included",
-        "Community support",
-        "MIT License"
-      ]
-    }
-  },
   "atrPage": {
     "hero": {
       "overline": "OPEN STANDARD",
