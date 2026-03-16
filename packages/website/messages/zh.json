@@ -742,10 +742,11 @@
       "submitATR": "提交 ATR 規則提案"
     },
     "scannerHero": {
-      "titleLine1": "AI Agent 正在大爆發。",
-      "titleLine2": "擁有系統最高權限。",
-      "titleLine3": "卻沒有任何資安防護。",
-      "mission": "我們的使命：讓資安不再是奢侈品。",
+      "titleLine1": "AI Agent 擁有你系統的最高權限。",
+      "titleLine2": "每個 App 上架都要審核。",
+      "titleLine3": "AI Skill 不該例外。",
+      "mission": "AI Agent 能讀取你的檔案、執行指令、存取你的憑證。但不像手機 App，Skill 在你的機器上執行前沒有任何審核機制。",
+      "atrLine": "ATR -- AI Skill 的第一個開放審核標準。像 App Store 審核，但專為 AI Agent 設計。",
       "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
       "scanBtn": "掃描",
       "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。"
@@ -794,6 +795,29 @@
       "reportAuthor": "通知作者",
       "proposeATR": "提交 ATR 規則提案",
       "flywheelNote": "你的發現會經過社群審核。確認後，系統會自動生成 ATR 規則，保護所有 PanGuard 用戶。"
+    },
+    "whyPanguard": {
+      "overline": "安全盲區",
+      "title": "傳統資安工具看不見 AI Agent 的威脅",
+      "subtitle": "CrowdStrike 保護你的作業系統。Snyk 保護你的程式碼。Lakera 過濾 Prompt。但沒有人保護你的 AI Agent。",
+      "edrSees": "傳統資安能看到：",
+      "sees1": "程序執行、檔案存取、網路連線",
+      "sees2": "惡意軟體特徵、勒索軟體模式",
+      "sees3": "已知 CVE 漏洞",
+      "edrMisses": "但完全看不到：",
+      "miss1": "Agent 對話中的 Prompt 注入",
+      "miss2": "惡意的 MCP Skill 定義",
+      "miss3": "透過 Agent Tool 呼叫竊取憑證",
+      "miss4": "透過 Skill 套件的供應鏈攻擊",
+      "capability": "能力",
+      "table": {
+        "row1": { "feature": "AI Agent 威脅偵測", "panguard": "yes", "crowdstrike": "no", "snyk": "no", "lakera": "partial" },
+        "row2": { "feature": "MCP Skill 安裝前審計", "panguard": "yes", "crowdstrike": "no", "snyk": "no", "lakera": "no" },
+        "row3": { "feature": "Prompt 注入偵測", "panguard": "21 條 ATR", "crowdstrike": "no", "snyk": "no", "lakera": "yes" },
+        "row4": { "feature": "Agent 即時監控", "panguard": "24/7 Daemon", "crowdstrike": "僅端點", "snyk": "no", "lakera": "no" },
+        "row5": { "feature": "費用", "panguard": "$0 (MIT)", "crowdstrike": "$25-60/端點/月", "snyk": "免費版+付費", "lakera": "付費" }
+      },
+      "bottomLine": "PanGuard 填補了這個盲區。{rules} 條偵測規則。開源。永久免費。"
     },
     "productShowcase": {
       "overline": "三層縱深防禦",

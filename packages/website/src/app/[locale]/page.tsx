@@ -6,6 +6,7 @@ import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
 // Below-the-fold sections loaded lazily
 const EcosystemEvidence = dynamic(() => import('@/components/home/EcosystemEvidence'));
+const WhyPanguard = dynamic(() => import('@/components/home/WhyPanguard'));
 const ATRStandard = dynamic(() => import('@/components/home/ATRStandard'));
 const ProductShowcase = dynamic(() => import('@/components/home/ProductShowcase'));
 const CommunityFlywheel = dynamic(() => import('@/components/home/CommunityFlywheel'));
@@ -28,7 +29,9 @@ export default function Home() {
           <ScannerHero />
           {/* 2. Evidence: We scanned 1,295 skills — here's what we found */}
           <EcosystemEvidence />
-          {/* 3. Standard: ATR — the open audit standard for AI agents */}
+          {/* 3. The Gap: why traditional security misses AI agent threats */}
+          <WhyPanguard />
+          {/* 4. Standard: ATR — the open audit standard for AI agents */}
           <ATRStandard />
           {/* 4. Products: Skill Auditor + Guard + Threat Cloud deep dive */}
           <ProductShowcase />

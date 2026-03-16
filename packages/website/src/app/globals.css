@@ -400,6 +400,16 @@ body::after {
   opacity: 1;
   transform: translateY(0);
 }
+/* Fallback: force-show content after 2s even if IntersectionObserver/JS fails */
+@keyframes force-show { to { opacity: 1 !important; transform: none !important; } }
+.js-ready .animate-on-scroll {
+  animation: force-show 0s 2s forwards;
+}
+/* Force-show framer-motion SSR hidden elements after 1s (inline opacity:0 override) */
+@keyframes fm-fallback { to { opacity: 1 !important; transform: none !important; } }
+main [style*="opacity: 0"], main [style*="opacity:0"] {
+  animation: fm-fallback 0.5s 1s both !important;
+}
 
 /* Directional variants */
 .js-ready .animate-on-scroll.from-down {
