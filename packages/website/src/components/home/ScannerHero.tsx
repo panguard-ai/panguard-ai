@@ -65,7 +65,7 @@ function ScannerHeroInner() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleScan()}
-                placeholder="github.com/owner/repo"
+                placeholder="github.com/modelcontextprotocol/servers"
                 className="w-full bg-surface-1/80 backdrop-blur-sm border border-border rounded-xl pl-10 pr-4 py-4 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-panguard-green focus:ring-1 focus:ring-panguard-green/30 transition-all"
                 disabled={loading}
               />
@@ -113,6 +113,9 @@ function ScannerHeroInner() {
 
           <p className="text-[11px] text-text-muted mt-3">
             {t('trustNote')}
+          </p>
+          <p className="text-[11px] text-text-muted mt-1">
+            {t('howItHelps')}
           </p>
         </div>
 

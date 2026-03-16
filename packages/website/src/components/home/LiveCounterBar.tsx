@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
 import { STATS } from '@/lib/stats';
 
 function CountUp({ target, duration = 1.5 }: { target: number; duration?: number }) {
@@ -34,9 +33,7 @@ export default function LiveCounterBar() {
   const t = useTranslations('home.liveCounter');
 
   return (
-    <div
-      className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs text-text-muted font-mono"
-    >
+    <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs text-text-muted font-mono">
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-brand-sage animate-pulse" />
         <span>
@@ -59,9 +56,9 @@ export default function LiveCounterBar() {
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
         <span>
           <span className="text-text-primary font-bold">
-            <CountUp target={STATS.ecosystem.entriesCrawled} />
+            <CountUp target={STATS.ecosystem.atrRulesGenerated} />
           </span>{' '}
-          {t('monitored')}
+          {t('rulesGenerated')}
         </span>
       </div>
     </div>
