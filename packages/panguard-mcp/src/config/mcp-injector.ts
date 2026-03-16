@@ -208,6 +208,12 @@ export function injectMCPConfig(platformId: PlatformId): InjectionResult {
       case 'codex':
         injectGenericMCP(configPath);
         break;
+      case 'workbuddy':
+        injectGenericMCP(configPath);
+        break;
+      case 'nemoclaw':
+        injectGenericMCP(configPath);
+        break;
     }
 
     // Verify the write succeeded
