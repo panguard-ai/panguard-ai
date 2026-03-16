@@ -40,7 +40,7 @@ npm install -g @panguard-ai/panguard
 
 # Auto-configure all AI platforms
 panguard setup
-# Detects: Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop
+# Detects: Claude Code, Claude Desktop, Cursor, OpenClaw, Codex
 
 # Audit a skill before installing
 panguard audit skill ./my-skill
@@ -169,7 +169,7 @@ Every Panguard instance is a sensor. Threats are auto-drafted into ATR rules, up
 
 ```bash
 panguard setup
-# Auto-detects: Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop
+# Auto-detects: Claude Code, Claude Desktop, Cursor, OpenClaw, Codex
 ```
 
 Or manual config:
