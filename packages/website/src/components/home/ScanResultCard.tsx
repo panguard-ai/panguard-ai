@@ -7,23 +7,57 @@ import type { ScanReport, ScanResponse } from '@/hooks/useSkillScan';
 
 /** Localize ATR finding titles and descriptions */
 const FINDING_ZH: Record<string, { title: string; desc?: string }> = {
-  'Credential and Secret Exposure in Agent Output': { title: '憑證與機密外洩', desc: '偵測到資料庫連線字串或憑證資訊可能被 Agent 輸出' },
-  'Unauthorized Financial Action by AI Agent': { title: '未授權的金融操作', desc: '偵測到支付平台相關的工具呼叫' },
-  'High-Risk Tool Invocation Without Human Confirmation': { title: '高風險工具呼叫（無人工確認）', desc: '危險工具被呼叫但沒有人工確認機制' },
-  'Privilege Escalation and Admin Function Access': { title: '權限提升與管理功能存取', desc: '偵測到 Shell 或指令執行的工具呼叫' },
-  'Indirect Prompt Injection via External Content': { title: '透過外部內容的間接 Prompt 注入', desc: '偵測到可能的注入內容（JavaScript URI、隱藏指令）' },
-  'Skill Description-Behavior Mismatch': { title: 'Skill 描述與行為不一致', desc: 'Skill 的實際行為與其描述不符' },
+  'Credential and Secret Exposure in Agent Output': {
+    title: '憑證與機密外洩',
+    desc: '偵測到資料庫連線字串或憑證資訊可能被 Agent 輸出',
+  },
+  'Unauthorized Financial Action by AI Agent': {
+    title: '未授權的金融操作',
+    desc: '偵測到支付平台相關的工具呼叫',
+  },
+  'High-Risk Tool Invocation Without Human Confirmation': {
+    title: '高風險工具呼叫（無人工確認）',
+    desc: '危險工具被呼叫但沒有人工確認機制',
+  },
+  'Privilege Escalation and Admin Function Access': {
+    title: '權限提升與管理功能存取',
+    desc: '偵測到 Shell 或指令執行的工具呼叫',
+  },
+  'Indirect Prompt Injection via External Content': {
+    title: '透過外部內容的間接 Prompt 注入',
+    desc: '偵測到可能的注入內容（JavaScript URI、隱藏指令）',
+  },
+  'Skill Description-Behavior Mismatch': {
+    title: 'Skill 描述與行為不一致',
+    desc: 'Skill 的實際行為與其描述不符',
+  },
   'Multi-Skill Chain Attack': { title: '多 Skill 串聯攻擊', desc: '偵測到可能的多工具串聯利用' },
-  'Unauthorized Tool Call Detection': { title: '未授權工具呼叫', desc: '偵測到 Shell metacharacter 注入或危險指令' },
+  'Unauthorized Tool Call Detection': {
+    title: '未授權工具呼叫',
+    desc: '偵測到 Shell metacharacter 注入或危險指令',
+  },
   'Direct Prompt Injection': { title: '直接 Prompt 注入', desc: '偵測到覆蓋系統指令的注入語句' },
-  'Parameter Injection via Tool Arguments': { title: '透過工具參數的注入攻擊', desc: '工具參數中偵測到注入 payload' },
-  'Malicious Content in MCP Tool Response': { title: 'MCP 工具回應中的惡意內容', desc: '工具回應中偵測到隱藏指令或惡意內容' },
+  'Parameter Injection via Tool Arguments': {
+    title: '透過工具參數的注入攻擊',
+    desc: '工具參數中偵測到注入 payload',
+  },
+  'Malicious Content in MCP Tool Response': {
+    title: 'MCP 工具回應中的惡意內容',
+    desc: '工具回應中偵測到隱藏指令或惡意內容',
+  },
   'System Prompt Leakage': { title: '系統 Prompt 洩漏', desc: '偵測到系統 Prompt 可能被洩漏' },
-  'Data Exfiltration via Agent Tools': { title: '透過 Agent 工具的資料外洩', desc: '偵測到資料可能被傳送至外部端點' },
+  'Data Exfiltration via Agent Tools': {
+    title: '透過 Agent 工具的資料外洩',
+    desc: '偵測到資料可能被傳送至外部端點',
+  },
 };
 
 const SEVERITY_ZH: Record<string, string> = {
-  critical: '嚴重', high: '高', medium: '中', low: '低', info: '資訊',
+  critical: '嚴重',
+  high: '高',
+  medium: '中',
+  low: '低',
+  info: '資訊',
 };
 
 const CHECK_ZH: Record<string, string> = {
@@ -39,9 +73,14 @@ function localizeCheck(label: string, isZh: boolean): string {
   if (CHECK_ZH[label]) return CHECK_ZH[label];
   // Dynamic patterns
   if (label.startsWith('ATR Detection:')) {
-    return label.replace('ATR Detection:', 'ATR 偵測:').replace('rule(s) triggered', '條規則觸發').replace('evaluated', '條已評估').replace('clean', '安全');
+    return label
+      .replace('ATR Detection:', 'ATR 偵測:')
+      .replace('rule(s) triggered', '條規則觸發')
+      .replace('evaluated', '條已評估')
+      .replace('clean', '安全');
   }
-  if (label.startsWith('Secrets:')) return label.replace('Secrets:', '機密偵測:').replace('exposed', '組已暴露');
+  if (label.startsWith('Secrets:'))
+    return label.replace('Secrets:', '機密偵測:').replace('exposed', '組已暴露');
   if (label.startsWith('Size:')) return label.replace('Size:', '大小:');
   return label;
 }
@@ -211,9 +250,12 @@ export default function ScanResultCard({
             className="text-xs text-text-muted hover:text-text-secondary transition-colors mb-3"
           >
             {expanded
-              ? (isZh ? '隱藏發現' : 'Hide findings')
-              : (isZh ? `顯示 ${report.findings.length} 個發現` : `Show ${report.findings.length} finding(s)`)
-            }
+              ? isZh
+                ? '隱藏發現'
+                : 'Hide findings'
+              : isZh
+                ? `顯示 ${report.findings.length} 個發現`
+                : `Show ${report.findings.length} finding(s)`}
           </button>
 
           <AnimatePresence>
@@ -260,29 +302,34 @@ export default function ScanResultCard({
           <ul className="space-y-1">
             {report.findings.slice(0, 3).map((f) => (
               <li key={f.id} className="text-[11px] text-text-secondary flex items-start gap-1.5">
-                <span className={`shrink-0 mt-0.5 ${f.severity === 'critical' || f.severity === 'high' ? 'text-red-400' : 'text-yellow-400'}`}>
+                <span
+                  className={`shrink-0 mt-0.5 ${f.severity === 'critical' || f.severity === 'high' ? 'text-red-400' : 'text-yellow-400'}`}
+                >
                   {f.severity === 'critical' || f.severity === 'high' ? '\u26A0' : '\u2022'}
                 </span>
-                {isZh
-                  ? (FINDING_ZH[f.title]?.desc ?? f.description)
-                  : f.description
-                }
+                {isZh ? (FINDING_ZH[f.title]?.desc ?? f.description) : f.description}
               </li>
             ))}
           </ul>
           {report.riskLevel === 'LOW' && (
             <p className="text-[11px] text-emerald-400 font-semibold mt-2">
-              {isZh ? '風險較低，但建議搭配 Guard 持續監控。' : 'Low risk. Consider running Guard for continuous monitoring.'}
+              {isZh
+                ? '風險較低，但建議搭配 Guard 持續監控。'
+                : 'Low risk. Consider running Guard for continuous monitoring.'}
             </p>
           )}
           {(report.riskLevel === 'MEDIUM' || report.riskLevel === 'HIGH') && (
             <p className="text-[11px] text-orange-400 font-semibold mt-2">
-              {isZh ? '建議仔細檢查後再安裝，並啟用 Guard 即時監控。' : 'Review carefully before installing. Enable Guard for real-time monitoring.'}
+              {isZh
+                ? '建議仔細檢查後再安裝，並啟用 Guard 即時監控。'
+                : 'Review carefully before installing. Enable Guard for real-time monitoring.'}
             </p>
           )}
           {report.riskLevel === 'CRITICAL' && (
             <p className="text-[11px] text-red-400 font-semibold mt-2">
-              {isZh ? '強烈建議不要安裝。此 Skill 可能竊取你的憑證或劫持你的 Agent。' : 'Do NOT install. This skill may steal credentials or hijack your agent.'}
+              {isZh
+                ? '強烈建議不要安裝。此 Skill 可能竊取你的憑證或劫持你的 Agent。'
+                : 'Do NOT install. This skill may steal credentials or hijack your agent.'}
             </p>
           )}
         </div>
@@ -340,7 +387,9 @@ export default function ScanResultCard({
       {/* Guard CTA — always show after scan results */}
       <div className="px-5 py-4 border-t border-border bg-panguard-green/5 text-center">
         <p className="text-xs font-bold text-panguard-green mb-1.5">
-          {isZh ? '開啟 24/7 防護，讓你的 AI Agent 隨時受保護' : 'Start 24/7 protection for all your AI agents'}
+          {isZh
+            ? '開啟 24/7 防護，讓你的 AI Agent 隨時受保護'
+            : 'Start 24/7 protection for all your AI agents'}
         </p>
         <code className="inline-block text-[11px] bg-surface-2 border border-border rounded-lg px-3 py-1.5 text-panguard-green font-mono select-all mb-2">
           npm install -g @panguard-ai/panguard && panguard setup
