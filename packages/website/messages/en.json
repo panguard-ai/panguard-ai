@@ -742,10 +742,11 @@
       "submitATR": "Submit ATR Rule Proposal"
     },
     "scannerHero": {
-      "titleLine1": "AI agents are exploding.",
-      "titleLine2": "Full system access.",
-      "titleLine3": "Zero security.",
-      "mission": "Our mission: democratize AI security.",
+      "titleLine1": "AI agents have full system access.",
+      "titleLine2": "Every app gets reviewed before you install it.",
+      "titleLine3": "AI skills should too.",
+      "mission": "AI agents can read your files, run commands, and access your credentials. But unlike mobile apps, there's no review process before a skill runs on your machine.",
+      "atrLine": "ATR -- the first open review standard for AI skills. Like App Store review, but for agents.",
       "scanLabel": "Check any MCP skill before you install",
       "scanBtn": "Scan",
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached."
@@ -794,6 +795,29 @@
       "reportAuthor": "Report to Author",
       "proposeATR": "Propose ATR Rule",
       "flywheelNote": "Your finding will be reviewed by the community. If confirmed, an ATR rule will be auto-generated to protect everyone using PanGuard."
+    },
+    "whyPanguard": {
+      "overline": "THE GAP",
+      "title": "Traditional security can't see AI agent threats",
+      "subtitle": "CrowdStrike protects your OS. Snyk protects your code. Lakera filters prompts. Nobody protects your AI agent.",
+      "edrSees": "Traditional security sees:",
+      "sees1": "Process execution, file access, network calls",
+      "sees2": "Malware signatures, ransomware patterns",
+      "sees3": "Known CVEs in installed packages",
+      "edrMisses": "But completely misses:",
+      "miss1": "Prompt injection in agent conversations",
+      "miss2": "Malicious MCP skill definitions",
+      "miss3": "Credential theft via agent tool calls",
+      "miss4": "Supply chain attacks via skill packages",
+      "capability": "Capability",
+      "table": {
+        "row1": { "feature": "AI agent threat detection", "panguard": "yes", "crowdstrike": "no", "snyk": "no", "lakera": "partial" },
+        "row2": { "feature": "MCP skill pre-install audit", "panguard": "yes", "crowdstrike": "no", "snyk": "no", "lakera": "no" },
+        "row3": { "feature": "Prompt injection detection", "panguard": "21 ATR rules", "crowdstrike": "no", "snyk": "no", "lakera": "yes" },
+        "row4": { "feature": "Runtime agent monitoring", "panguard": "24/7 daemon", "crowdstrike": "Endpoints only", "snyk": "no", "lakera": "no" },
+        "row5": { "feature": "Cost", "panguard": "$0 (MIT)", "crowdstrike": "$25-60/ep/mo", "snyk": "Free tier+", "lakera": "Paid" }
+      },
+      "bottomLine": "PanGuard fills the gap with {rules} detection rules. Open source. Free forever."
     },
     "productShowcase": {
       "overline": "THREE LAYERS OF DEFENSE",

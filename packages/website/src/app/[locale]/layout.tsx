@@ -181,18 +181,16 @@ export default async function LocaleLayout(
         {/* Enable scroll-reveal animations only after JS is ready (prevents FOIC) */}
         <script
           nonce={nonce}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: 'document.documentElement.classList.add("js-ready")' }}
         />
-        {/* jsonLd is a static constant — never include user-supplied values */}
-        <script
-          nonce={nonce}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        {/* jsonLd temporarily disabled — causes Runtime TypeError in dev mode */}
+        {/* TODO: re-enable after identifying @context parse issue */}
         {/* Plausible Analytics — privacy-friendly, no cookies, GDPR compliant */}
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <script
             nonce={nonce}
+            suppressHydrationWarning
             defer
             data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
             src="https://plausible.io/js/script.js"

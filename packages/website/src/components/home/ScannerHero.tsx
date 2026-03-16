@@ -47,15 +47,18 @@ function ScannerHeroInner() {
           transition={{ duration: 0.6, delay: 0.1, ease }}
           className="mb-10"
         >
-          <h1 className="text-[clamp(24px,5vw,48px)] font-bold leading-[1.25] tracking-tight text-text-primary">
+          <h1 className="text-[clamp(24px,5vw,48px)] font-bold leading-[1.3] tracking-tight text-text-primary">
             {t('titleLine1')}
             <br />
-            <span className="text-text-primary/70">{t('titleLine2')}</span>
+            <span className="text-text-secondary">{t('titleLine2')}</span>
             <br />
-            <span className="text-red-400">{t('titleLine3')}</span>
+            <span className="text-panguard-green">{t('titleLine3')}</span>
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-panguard-green font-semibold">
+          <p className="mt-5 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto">
             {t('mission')}
+          </p>
+          <p className="mt-2 text-sm text-panguard-green font-semibold">
+            {t('atrLine')}
           </p>
         </motion.div>
 
