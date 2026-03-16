@@ -301,8 +301,8 @@ export default function GettingStartedContent() {
             {/* Setup step */}
             <div className="mt-4">
               <p className="text-sm text-text-secondary mb-3">
-                Run setup to auto-configure all detected AI platforms (Claude Code, Cursor, QClaw,
-                OpenClaw, Codex, WorkBuddy, Claude Desktop):
+                Run setup to auto-configure all detected AI platforms (Claude Code, Claude Desktop,
+                Cursor, OpenClaw, Codex):
               </p>
               <CodeBlock code="panguard setup" label="Terminal" />
             </div>
@@ -423,55 +423,15 @@ export default function GettingStartedContent() {
               </div>
             </FadeInUp>
 
-            {/* QClaw */}
-            <FadeInUp delay={0.15}>
-              <div className="bg-surface-1 border border-border rounded-xl p-5">
-                <h3 className="text-sm font-bold text-text-primary mb-3 flex items-center gap-2">
-                  <span className="w-6 h-6 rounded bg-panguard-green/10 flex items-center justify-center text-[10px] font-bold text-panguard-green">
-                    QC
-                  </span>
-                  QClaw
-                </h3>
-                <div className="space-y-3 text-sm text-text-secondary">
-                  <p>
-                    <strong className="text-text-primary">Step 1:</strong> Install PanGuard
-                  </p>
-                  <CodeBlock code="npm install -g @panguard-ai/panguard" label="Install" />
-                  <p>
-                    <strong className="text-text-primary">Step 2:</strong> Auto-configure QClaw
-                  </p>
-                  <CodeBlock code="panguard setup --platform qclaw" label="Setup" />
-                  <p>
-                    <strong className="text-text-primary">Step 3:</strong> Close and reopen QClaw
-                  </p>
-                  <p>
-                    <strong className="text-text-primary">Step 4:</strong> PanGuard security tools
-                    are now available in QClaw
-                  </p>
-                  <p>
-                    <strong className="text-text-primary">Step 5:</strong> Enable 24/7 monitoring
-                  </p>
-                  <CodeBlock
-                    code="panguard guard start --dashboard\n# Dashboard: http://localhost:3100"
-                    label="Terminal"
-                  />
-                  <p className="text-xs text-panguard-green">
-                    Done! QClaw is now protected by 10,400+ detection rules.
-                  </p>
-                </div>
-              </div>
-            </FadeInUp>
-
             {/* All Platforms */}
-            <FadeInUp delay={0.2}>
+            <FadeInUp delay={0.15}>
               <div className="bg-surface-2/30 border border-border rounded-xl p-5 text-center">
                 <p className="text-sm text-text-secondary mb-2">
                   Or auto-detect all platforms at once:
                 </p>
                 <CodeBlock code="panguard setup" label="Terminal" />
                 <p className="text-xs text-text-muted mt-2">
-                  Detects Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop
-                  automatically.
+                  Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex automatically.
                 </p>
               </div>
             </FadeInUp>
