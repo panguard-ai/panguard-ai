@@ -46,13 +46,13 @@ export default function ATRStandard() {
           </div>
         </FadeInUp>
 
-        <FadeInUp delay={0.2} className="grid grid-cols-3 gap-2 mb-8">
+        <FadeInUp delay={0.2} className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-8">
           {CATEGORIES.map((cat) => (
             <div
               key={cat.name}
-              className="bg-surface-1 border border-border rounded-lg px-3 py-2.5 flex items-center justify-between"
+              className="bg-surface-1 border border-border rounded-lg px-3 py-2.5 flex items-center justify-between min-w-0"
             >
-              <span className="text-xs text-text-secondary truncate">{cat.name}</span>
+              <span className="text-xs text-text-secondary leading-tight">{cat.name}</span>
               <span className="text-xs font-bold text-panguard-green shrink-0 ml-2">
                 {cat.count}
               </span>
