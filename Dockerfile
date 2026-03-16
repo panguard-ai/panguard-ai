@@ -100,6 +100,11 @@ RUN mkdir -p /standalone/node_modules/@panguard-ai && \
     mkdir -p /standalone/node_modules/@panguard-ai/threat-cloud && \
     cp -r packages/threat-cloud/dist /standalone/node_modules/@panguard-ai/threat-cloud/dist && \
     cp packages/threat-cloud/package.json /standalone/node_modules/@panguard-ai/threat-cloud/ && \
+    mkdir -p /standalone/node_modules/@panguard-ai/atr && \
+    cp -r packages/atr/dist /standalone/node_modules/@panguard-ai/atr/dist && \
+    cp packages/atr/package.json /standalone/node_modules/@panguard-ai/atr/ && \
+    cp -r packages/atr/rules /standalone/node_modules/@panguard-ai/atr/rules && \
+    cp -r packages/atr/spec /standalone/node_modules/@panguard-ai/atr/spec && \
     mkdir -p /standalone/node_modules/agent-threat-rules && \
     cp -r packages/atr/dist /standalone/node_modules/agent-threat-rules/dist && \
     cp packages/atr/package.json /standalone/node_modules/agent-threat-rules/ && \
