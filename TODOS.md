@@ -69,9 +69,9 @@ Additionally: `atr-engine.ts` `resolveBundledRulesDir()` now has a 4-layer fallb
 
 Tests needed: happy path, malformed input (invalid regex, bad JSON), ReDoS regex rejection via safe-regex, (?i) flag stripping, cloud rule merge deduplication.
 
-## P2 - FinalCTANew i18n Restoration (S)
+## ~~P2 - FinalCTANew i18n Restoration~~ DONE (2026-03-16)
 
-`packages/website/src/components/home/FinalCTANew.tsx` dropped `useTranslations()` — all text hardcoded in English ("Start with a scan.", "Scan a Skill Now", "Every scan makes the community safer."). Chinese users see English CTA. Restore i18n after homepage copy is finalized.
+Restored `useTranslations('home.finalCta')` in FinalCTANew.tsx. Full EN + ZH translations added in landing page redesign commit (b6089fef).
 
 ## P3 - Dashboard WebSocket Token Auth (S)
 
