@@ -23,7 +23,7 @@
     "threat-cloud": "./dist/cli.js"
   },
   "scripts": {
-    "build": "rm -rf dist tsconfig.tsbuildinfo && tsc --build --force",
+    "build": "rm -rf dist tsconfig.tsbuildinfo && (tsc --build --force 2>/dev/null || tsc -p tsconfig.railway.json)",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
