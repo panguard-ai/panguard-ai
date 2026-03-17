@@ -594,6 +594,38 @@ export class ThreatCloudClient {
   }
 
   // ---------------------------------------------------------------------------
+  // Scan Event Reporting / 掃描事件回報
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Report a scan event to Threat Cloud for metrics aggregation.
+   * Called after each audit to contribute to ecosystem-wide statistics.
+   * 回報掃描事件至 Threat Cloud 用於指標聚合。
+   */
+  async reportScanEvent(event: {
+    source: 'cli-user' | 'web-scanner';
+    skillsScanned: number;
+    findingsCount: number;
+    confirmedMalicious?: number;
+    highlySuspicious?: number;
+    generalSuspicious?: number;
+    cleanCount?: number;
+  }): Promise<void> {
+    if (this.status === 'offline' || !this.endpoint) return;
+
+    try {
+      const url = `${this.endpoint}/api/scan-events`;
+      await this.httpPost(url, {
+        ...event,
+        deviceHash: this.clientId,
+      });
+      logger.info(`Scan event reported: ${event.skillsScanned} skills scanned`);
+    } catch {
+      // Best effort, don't fail the main flow
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // HTTP helpers / HTTP 輔助函數
   // ---------------------------------------------------------------------------
 

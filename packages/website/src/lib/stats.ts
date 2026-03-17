@@ -75,21 +75,21 @@ export const STATS = {
     entriesCrawled: 4_648,
     /** npm packages found in crawl */
     npmPackages: 2_769,
-    /** Packages actually scanned by ATR + Skill Auditor */
-    skillsScanned: 1_295,
-    /** Malicious/risky skills found (CRITICAL + HIGH) */
-    maliciousFound: 26,
-    /** ATR rules auto-generated from scan findings */
-    atrRulesGenerated: 61,
+    /** Packages actually scanned by ATR + Skill Auditor (L1 + L2 AST) */
+    skillsScanned: 3_222,
+    /** Threats detected (confirmed + suspicious) */
+    maliciousFound: 1_056,
+    /** ATR rule candidates from scan findings */
+    atrRulesGenerated: 225,
     /** Breakdown by severity */
-    findingsCritical: 21,
-    findingsHigh: 5,
-    findingsMedium: 3,
-    findingsClean: 1_266,
+    findingsCritical: 197,
+    findingsHigh: 123,
+    findingsMedium: 161,
+    findingsClean: 508,
     registrySources: 3,
-    lastCrawl: '2026-03-16',
+    lastCrawl: '2026-03-17',
   },
-  lastUpdated: '2026-03-16',
+  lastUpdated: '2026-03-17',
 } as const;
 
 export type Stats = typeof STATS;
