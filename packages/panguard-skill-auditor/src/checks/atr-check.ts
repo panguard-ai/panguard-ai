@@ -144,7 +144,19 @@ export async function checkWithATR(
 
   try {
     const rulesDir = resolveRulesDir();
-    const engine = new ATREngine({ rulesDir });
+
+    // Optional: behavioral fingerprinting for drift detection
+    let fingerprintStore: unknown;
+    try {
+      const { SkillFingerprintStore } = await import('@panguard-ai/atr');
+      fingerprintStore = new SkillFingerprintStore();
+    } catch {
+      // SkillFingerprintStore not available in this version
+    }
+
+    const engineConfig: Record<string, unknown> = { rulesDir };
+    if (fingerprintStore) engineConfig['fingerprintStore'] = fingerprintStore;
+    const engine = new ATREngine(engineConfig as ConstructorParameters<typeof ATREngineType>[0]);
     let ruleCount = await engine.loadRules();
 
     // Inject cloud rules from Threat Cloud (flywheel: community rules enhance audits)
