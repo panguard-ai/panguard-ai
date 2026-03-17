@@ -16,12 +16,7 @@ import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-mcp:platform-detector');
 
-export type PlatformId =
-  | 'claude-code'
-  | 'claude-desktop'
-  | 'cursor'
-  | 'openclaw'
-  | 'codex';
+export type PlatformId = 'claude-code' | 'claude-desktop' | 'cursor' | 'openclaw' | 'codex';
 
 export interface DetectedPlatform {
   id: PlatformId;

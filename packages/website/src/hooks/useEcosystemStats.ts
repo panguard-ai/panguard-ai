@@ -97,7 +97,7 @@ export function useEcosystemStats(): EcosystemStats {
 
         // /api/metrics -- scan event aggregation
         if (metricsRes?.ok) {
-          const metricsJson = await metricsRes.json() as {
+          const metricsJson = (await metricsRes.json()) as {
             ok: boolean;
             data?: {
               totalSkillsScanned: number;
@@ -121,7 +121,7 @@ export function useEcosystemStats(): EcosystemStats {
 
         // /api/stats -- skill blacklist/whitelist + proposal counts
         if (statsRes?.ok) {
-          const statsJson = await statsRes.json() as {
+          const statsJson = (await statsRes.json()) as {
             ok: boolean;
             data?: {
               skillBlacklistTotal?: number;

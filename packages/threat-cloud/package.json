@@ -2,7 +2,7 @@
   "name": "@panguard-ai/threat-cloud",
   "version": "0.5.0",
   "type": "module",
-  "description": "Threat Cloud backend API for collective threat intelligence / \u5a01\u8105\u96f2\u5f8c\u7aef API",
+  "description": "Threat Cloud backend API for collective threat intelligence / 威脅雲後端 API",
   "license": "MIT",
   "repository": {
     "type": "git",
