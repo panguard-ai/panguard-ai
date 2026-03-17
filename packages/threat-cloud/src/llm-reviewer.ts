@@ -79,7 +79,14 @@ export class LLMReviewer {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error(`LLM review failed for ${patternHash}: ${msg}`);
-      // Store failure verdict
+
+      // Rate limit or transient errors: do NOT store verdict, keep pending for retry
+      if (msg.includes('429') || msg.includes('rate_limit') || msg.includes('timed out') || msg.includes('503')) {
+        console.error(`  -> Transient error, keeping proposal pending for retry`);
+        return { verdict: '', approved: false };
+      }
+
+      // Permanent errors: store failure verdict
       const failVerdict = JSON.stringify({
         approved: false,
         falsePositiveRisk: 'high',

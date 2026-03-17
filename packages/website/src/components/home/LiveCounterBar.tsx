@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { STATS } from '@/lib/stats';
+import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 
 function CountUp({ target, duration = 1.5 }: { target: number; duration?: number }) {
   const [count, setCount] = useState(0);
@@ -31,6 +31,7 @@ function CountUp({ target, duration = 1.5 }: { target: number; duration?: number
 
 export default function LiveCounterBar() {
   const t = useTranslations('home.liveCounter');
+  const eco = useEcosystemStats();
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs text-text-muted font-mono">
@@ -38,7 +39,7 @@ export default function LiveCounterBar() {
         <span className="w-1.5 h-1.5 rounded-full bg-brand-sage animate-pulse" />
         <span>
           <span className="text-text-primary font-bold">
-            <CountUp target={STATS.ecosystem.skillsScanned} />
+            <CountUp target={eco.skillsScanned} />
           </span>{' '}
           {t('scanned')}
         </span>
@@ -47,7 +48,7 @@ export default function LiveCounterBar() {
         <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
         <span>
           <span className="text-red-400 font-bold">
-            <CountUp target={STATS.ecosystem.maliciousFound} />
+            <CountUp target={eco.threatsDetected} />
           </span>{' '}
           {t('threats')}
         </span>
@@ -56,7 +57,7 @@ export default function LiveCounterBar() {
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
         <span>
           <span className="text-text-primary font-bold">
-            <CountUp target={STATS.ecosystem.atrRulesGenerated} />
+            <CountUp target={eco.atrRules} />
           </span>{' '}
           {t('rulesGenerated')}
         </span>

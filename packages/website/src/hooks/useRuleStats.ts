@@ -77,7 +77,7 @@ export function useRuleStats(): RuleStats {
         const live: RuleStats = {
           sigmaRules: data.sigma?.total ?? FALLBACK.sigmaRules,
           yaraRules: data.yara?.definitions ?? data.yara?.total ?? FALLBACK.yaraRules,
-          atrRules: STATS.atrRules, // ATR is maintained manually
+          atrRules: data.atr?.total ?? STATS.atrRules,
           totalRules: (data.sigma?.total ?? 0) + (data.yara?.total ?? 0),
           lastSync: data.lastSync ?? FALLBACK.lastSync,
         };

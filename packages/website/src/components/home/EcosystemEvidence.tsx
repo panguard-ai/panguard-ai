@@ -3,51 +3,57 @@
 import { useTranslations } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import { STATS } from '@/lib/stats';
-
-const eco = STATS.ecosystem;
-const total = eco.skillsScanned;
-const safePercent = ((eco.findingsClean / total) * 100).toFixed(1);
-const critPercent = ((eco.findingsCritical / total) * 100).toFixed(1);
-const highPercent = ((eco.findingsHigh / total) * 100).toFixed(1);
-const medPercent = ((eco.findingsMedium / total) * 100).toFixed(1);
-
-const BUCKETS = [
-  {
-    labelKey: 'safe' as const,
-    count: eco.findingsClean,
-    percent: safePercent,
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-400/10',
-    border: 'border-emerald-400/30',
-  },
-  {
-    labelKey: 'critical' as const,
-    count: eco.findingsCritical,
-    percent: critPercent,
-    color: 'text-red-400',
-    bg: 'bg-red-400/10',
-    border: 'border-red-400/30',
-  },
-  {
-    labelKey: 'high' as const,
-    count: eco.findingsHigh,
-    percent: highPercent,
-    color: 'text-orange-400',
-    bg: 'bg-orange-400/10',
-    border: 'border-orange-400/30',
-  },
-  {
-    labelKey: 'medium' as const,
-    count: eco.findingsMedium,
-    percent: medPercent,
-    color: 'text-yellow-400',
-    bg: 'bg-yellow-400/10',
-    border: 'border-yellow-400/30',
-  },
-];
+import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 
 export default function EcosystemEvidence() {
   const t = useTranslations('home.evidence');
+  const eco = useEcosystemStats();
+
+  const total = eco.skillsScanned || STATS.ecosystem.skillsScanned;
+  const findingsClean = total - eco.threatsDetected;
+  const findingsCritical = STATS.ecosystem.findingsCritical;
+  const findingsHigh = STATS.ecosystem.findingsHigh;
+  const findingsMedium = STATS.ecosystem.findingsMedium;
+
+  const safePercent = ((findingsClean / total) * 100).toFixed(1);
+  const critPercent = ((findingsCritical / total) * 100).toFixed(1);
+  const highPercent = ((findingsHigh / total) * 100).toFixed(1);
+  const medPercent = ((findingsMedium / total) * 100).toFixed(1);
+
+  const BUCKETS = [
+    {
+      labelKey: 'safe' as const,
+      count: findingsClean,
+      percent: safePercent,
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-400/10',
+      border: 'border-emerald-400/30',
+    },
+    {
+      labelKey: 'critical' as const,
+      count: findingsCritical,
+      percent: critPercent,
+      color: 'text-red-400',
+      bg: 'bg-red-400/10',
+      border: 'border-red-400/30',
+    },
+    {
+      labelKey: 'high' as const,
+      count: findingsHigh,
+      percent: highPercent,
+      color: 'text-orange-400',
+      bg: 'bg-orange-400/10',
+      border: 'border-orange-400/30',
+    },
+    {
+      labelKey: 'medium' as const,
+      count: findingsMedium,
+      percent: medPercent,
+      color: 'text-yellow-400',
+      bg: 'bg-yellow-400/10',
+      border: 'border-yellow-400/30',
+    },
+  ];
 
   const CONSEQUENCES = [
     { text: t('c1'), severity: 'CRITICAL' },
@@ -68,8 +74,8 @@ export default function EcosystemEvidence() {
           </h2>
           <p className="text-base text-text-secondary mt-3">
             {t('subtitle', {
-              entries: eco.entriesCrawled.toLocaleString(),
-              sources: eco.registrySources,
+              entries: STATS.ecosystem.entriesCrawled.toLocaleString(),
+              sources: STATS.ecosystem.registrySources,
             })}
           </p>
         </FadeInUp>

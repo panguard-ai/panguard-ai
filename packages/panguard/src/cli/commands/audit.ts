@@ -218,6 +218,28 @@ export function auditCommand(): Command {
           }
         }
 
+        // Report scan event to TC for metrics (always, regardless of findings)
+        if (options.cloud) {
+          try {
+            const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
+            const dataDir = path.join(
+              process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
+              '.panguard-guard'
+            );
+            const tc = new ThreatCloudClient(options.tcEndpoint, dataDir);
+            void tc.reportScanEvent({
+              source: 'cli-user',
+              skillsScanned: 1,
+              findingsCount: report.findings.length,
+              confirmedMalicious: report.riskLevel === 'CRITICAL' ? 1 : 0,
+              highlySuspicious: report.riskLevel === 'HIGH' ? 1 : 0,
+              cleanCount: report.riskLevel === 'LOW' || report.riskScore === 0 ? 1 : 0,
+            });
+          } catch {
+            // Best effort
+          }
+        }
+
         // Exit code
         if (report.riskLevel === 'CRITICAL') process.exitCode = 2;
         else if (report.riskLevel === 'HIGH') process.exitCode = 1;

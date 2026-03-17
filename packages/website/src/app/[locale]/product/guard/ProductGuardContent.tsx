@@ -19,6 +19,7 @@ import {
   CheckIcon,
 } from '@/components/ui/BrandIcons';
 import { STATS } from '@/lib/stats';
+import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 
 /* ─── Icon maps ─── */
 const featureIcons = [
@@ -50,6 +51,7 @@ const useCaseIcons = [TerminalIcon, TeamIcon, EnterpriseIcon];
 const useCaseKeys = ['item1', 'item2', 'item3'] as const;
 
 export default function ProductGuardContent() {
+  const eco = useEcosystemStats();
   const t = useTranslations('product.guard');
 
   return (
@@ -311,9 +313,9 @@ export default function ProductGuardContent() {
             <div className="mt-8 bg-brand-sage/5 border border-brand-sage/20 rounded-xl p-5 text-center">
               <p className="text-sm text-text-secondary">
                 {t('flywheel.stats', {
-                  scanned: STATS.ecosystem.skillsScanned.toLocaleString(),
-                  malicious: STATS.ecosystem.maliciousFound,
-                  rules: STATS.ecosystem.atrRulesGenerated,
+                  scanned: eco.skillsScanned.toLocaleString(),
+                  malicious: eco.threatsDetected,
+                  rules: eco.atrRules,
                 })}
               </p>
             </div>
