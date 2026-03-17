@@ -1,0 +1,2 @@
+[build]
+buildCommand = "sed -i 's/\"workspace:\\*\"/\"*\"/g' package.json && npm install && rm -rf dist tsconfig.tsbuildinfo && npx tsc --build --force"
