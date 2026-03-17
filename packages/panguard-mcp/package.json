@@ -8,7 +8,7 @@
   },
   "homepage": "https://panguard.ai",
   "type": "module",
-  "description": "MCP server for Panguard AI \u2014 control security from Claude/Cursor / \u900f\u904e Claude/Cursor \u63a7\u5236 Panguard \u7684 MCP \u4f3a\u670d\u5668",
+  "description": "MCP server for Panguard AI — control security from Claude/Cursor / 透過 Claude/Cursor 控制 Panguard 的 MCP 伺服器",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
