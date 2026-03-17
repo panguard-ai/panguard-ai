@@ -93,7 +93,7 @@ export function useEcosystemStats(): EcosystemStats {
 
         if (cancelled) return;
 
-        let live = { ...FALLBACK };
+        const live = { ...FALLBACK };
 
         // /api/metrics -- scan event aggregation
         if (metricsRes?.ok) {
