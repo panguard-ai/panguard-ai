@@ -394,8 +394,8 @@ importers:
   packages/threat-cloud:
     dependencies:
       '@panguard-ai/core':
-        specifier: workspace:*
-        version: link:../core
+        specifier: '>=0.5.0'
+        version: 0.5.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       better-sqlite3:
         specifier: ^11.0.0
         version: 11.10.0
@@ -1206,6 +1206,18 @@ packages:
   '@panguard-ai/core@0.3.2':
     resolution: {integrity: sha512-j0ih/qR0EBFEdZxGOMoWu79WPMnlHvozo6QsdwavAVZcMZ46Iodzq3OzqsVO8SNXpfDv/uz2PFhO4AgBs2kAWA==}
     engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@anthropic-ai/sdk': '>=0.30.0'
+      openai: '>=4.70.0'
+    peerDependenciesMeta:
+      '@anthropic-ai/sdk':
+        optional: true
+      openai:
+        optional: true
+
+  '@panguard-ai/core@0.5.0':
+    resolution: {integrity: sha512-kwPPV/azhvBQVuQDxro0qb+OxC1uJWIb6zbI1LdiXEtokXztx6OSNLFsOttkMq0CnnRzJC9BOhMJL7AIv+d8Pw==}
+    engines: {node: '>=20.0.0'}
     peerDependencies:
       '@anthropic-ai/sdk': '>=0.30.0'
       openai: '>=4.70.0'
@@ -4876,6 +4888,17 @@ snapshots:
       - typescript
 
   '@panguard-ai/core@0.3.2(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
+    dependencies:
+      i18next: 24.2.3(typescript@5.7.3)
+      js-yaml: 4.1.1
+      zod: 3.25.76
+    optionalDependencies:
+      '@anthropic-ai/sdk': 0.78.0(zod@3.25.76)
+      openai: 6.25.0(ws@8.19.0)(zod@3.25.76)
+    transitivePeerDependencies:
+      - typescript
+
+  '@panguard-ai/core@0.5.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
       i18next: 24.2.3(typescript@5.7.3)
       js-yaml: 4.1.1
