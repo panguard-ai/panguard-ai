@@ -1,8 +1,0 @@
-[build]
-buildCommand = "sed -i \"s/workspace:\\*/*/g\" package.json && npm install && rm -rf dist tsconfig.tsbuildinfo && npx tsc --build --force"
-
-[deploy]
-healthcheckPath = "/health"
-healthcheckTimeout = 120
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 10
