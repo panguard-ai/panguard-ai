@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, vi, afterAll } from 'vitest';
-import { mkdirSync, rmSync } from 'node:fs';
+import { rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -55,12 +55,6 @@ import type { PlatformId } from '../src/config/platform-detector.js';
 afterAll(() => {
   rmSync(SANDBOX_ROOT, { recursive: true, force: true });
 });
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-function ensureDir(dir: string): void {
-  mkdirSync(dir, { recursive: true });
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Cross-platform: All supported platforms
