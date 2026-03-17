@@ -908,6 +908,27 @@ export class ThreatCloudDB {
     return updated;
   }
 
+  /**
+   * Get pending proposals without LLM review verdict (for retry).
+   * Also includes proposals where review failed due to rate limiting.
+   * 取得尚未被 LLM 審查的待處理提案（用於重試）
+   */
+  getUnreviewedProposals(limit: number = 5): Array<{ patternHash: string; ruleContent: string }> {
+    return this.db
+      .prepare(
+        `SELECT pattern_hash as patternHash, rule_content as ruleContent
+         FROM atr_proposals
+         WHERE status = 'pending'
+           AND (llm_review_verdict IS NULL
+                OR llm_review_verdict LIKE '%rate_limit%'
+                OR llm_review_verdict LIKE '%429%'
+                OR llm_review_verdict LIKE '%timed out%')
+         ORDER BY created_at ASC
+         LIMIT ?`
+      )
+      .all(limit) as Array<{ patternHash: string; ruleContent: string }>;
+  }
+
   /** Insert scan event from any source / 插入掃描事件 */
   insertScanEvent(event: ScanEvent): void {
     this.db

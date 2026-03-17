@@ -140,12 +140,20 @@ export class ThreatCloudServer {
           log.error('Classification backfill failed', err);
         }
 
-        // Start promotion cron (every 15 minutes)
+        // Start promotion + review cron (every 15 minutes)
         this.promotionTimer = setInterval(() => {
           try {
+            // Step 1: Promote confirmed proposals to rules
             const promoted = this.db.promoteConfirmedProposals();
             if (promoted > 0) {
               log.info(`Promotion cycle: ${promoted} proposal(s) promoted to rules`);
+            }
+
+            // Step 2: Retry LLM review for proposals that haven't been reviewed yet
+            if (this.llmReviewer?.isAvailable()) {
+              void this.retryPendingReviews().catch((err) => {
+                log.error('Review retry failed', err);
+              });
             }
           } catch (err) {
             log.error('Promotion cycle failed', err);
@@ -854,6 +862,29 @@ export class ThreatCloudServer {
       data: entries,
       meta: { total, page, limit, pages: Math.ceil(total / limit) },
     });
+  }
+
+  /**
+   * Retry LLM review for pending proposals without a verdict.
+   * Called by the promotion cron every 15 minutes.
+   * Rate-limited to 5 reviews per cycle to avoid API overload.
+   */
+  private async retryPendingReviews(): Promise<void> {
+    const unreviewed = this.db.getUnreviewedProposals(5);
+    if (unreviewed.length === 0) return;
+
+    log.info(`Retrying LLM review for ${unreviewed.length} proposal(s)`);
+
+    for (const p of unreviewed) {
+      try {
+        await this.llmReviewer!.reviewProposal(p.patternHash, p.ruleContent);
+        // Add 2s delay between reviews to respect rate limits
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      } catch (err) {
+        log.error(`Review retry failed for ${p.patternHash}`, err);
+        break; // Stop retrying if we hit errors (likely rate limit)
+      }
+    }
   }
 
   /** POST /api/scan-events - Report a scan event from any source */
