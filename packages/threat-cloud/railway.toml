@@ -1,2 +1,8 @@
 [build]
-buildCommand = "cat package.json | head -3 && sed -i 's/\"workspace:\\*\"/\"*\"/g' package.json && rm -rf node_modules dist tsconfig.tsbuildinfo && npm install && npx tsc --build --force && grep -c 'scan-events' dist/server.js && echo 'BUILD OK: new endpoints verified'"
+buildCommand = "sed -i \"s/workspace:\\*/*/g\" package.json && npm install && rm -rf dist tsconfig.tsbuildinfo && npx tsc --build --force"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 120
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
