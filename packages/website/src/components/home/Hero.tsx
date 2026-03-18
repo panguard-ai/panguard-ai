@@ -139,7 +139,7 @@ export default function Hero() {
             {t('tryScan')} <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
-            href="/demo"
+            href="/contact"
             className="border border-border text-text-secondary hover:text-text-primary hover:border-panguard-green font-semibold rounded-full px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base transition-all duration-200"
           >
             {t('bookDemo')}
