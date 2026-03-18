@@ -647,7 +647,6 @@ export class DashboardServer {
 
     try {
       // Dynamic import — module may not be installed in all configurations
-      // @ts-expect-error — optional peer dependency, may not have type declarations
       const mcpConfig: Record<string, unknown> = await import('@panguard-ai/panguard-mcp/config');
       const discover = mcpConfig['discoverAllSkills'] as
         | (() => Promise<Array<{ name: string; platform: string; command?: string }>>)

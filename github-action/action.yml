@@ -1,0 +1,193 @@
+name: 'PanGuard MCP Skill Audit'
+description: 'Automatically audit MCP skills in PRs for security threats'
+branding:
+  icon: 'shield'
+  color: 'green'
+
+inputs:
+  fail-on-high:
+    description: 'Fail the check if HIGH or CRITICAL findings are detected'
+    required: false
+    default: 'true'
+  comment-on-pr:
+    description: 'Post audit results as a PR comment'
+    required: false
+    default: 'true'
+  scan-args:
+    description: 'Additional arguments to pass to panguard-guard scan'
+    required: false
+    default: ''
+
+outputs:
+  highest-risk:
+    description: 'Highest risk level found (CLEAN, LOW, MEDIUM, HIGH, CRITICAL)'
+    value: ${{ steps.scan.outputs.highest-risk }}
+  total-findings:
+    description: 'Total number of findings'
+    value: ${{ steps.scan.outputs.total-findings }}
+  report-json:
+    description: 'Full scan report as JSON'
+    value: ${{ steps.scan.outputs.report-json }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check for MCP config changes
+      id: check-mcp
+      shell: bash
+      run: |
+        # Detect if this PR touches any MCP config files
+        MCP_PATTERNS=(
+          "claude_desktop_config.json"
+          ".cursor/mcp.json"
+          "mcp.json"
+          ".mcp.json"
+          ".windsurf/mcp.json"
+          ".cline/mcp_settings.json"
+          "SKILL.md"
+        )
+
+        CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..HEAD 2>/dev/null || echo "")
+
+        MCP_CHANGED="false"
+        for pattern in "${MCP_PATTERNS[@]}"; do
+          if echo "$CHANGED_FILES" | grep -q "$pattern"; then
+            MCP_CHANGED="true"
+            break
+          fi
+        done
+
+        echo "mcp-changed=$MCP_CHANGED" >> "$GITHUB_OUTPUT"
+
+        if [ "$MCP_CHANGED" = "false" ]; then
+          echo "No MCP config changes detected. Skipping audit."
+        fi
+
+    - name: Install and run PanGuard scan
+      id: scan
+      if: steps.check-mcp.outputs.mcp-changed == 'true' || github.event_name == 'workflow_dispatch'
+      shell: bash
+      env:
+        SCAN_ARGS: ${{ inputs.scan-args }}
+      run: |
+        # Run scan and capture output (scan-args via env to prevent shell injection)
+        set +e
+        REPORT=$(npx --yes @panguard-ai/panguard-guard@latest scan --json $SCAN_ARGS 2>/dev/null)
+        EXIT_CODE=$?
+        set -e
+
+        if [ -z "$REPORT" ] || ! echo "$REPORT" | python3 -c "import json,sys; json.load(sys.stdin)" 2>/dev/null; then
+          echo "highest-risk=ERROR" >> "$GITHUB_OUTPUT"
+          echo "total-findings=0" >> "$GITHUB_OUTPUT"
+          echo "report-json={}" >> "$GITHUB_OUTPUT"
+          echo "Scan produced invalid output. Exit code: $EXIT_CODE"
+          exit 0
+        fi
+
+        HIGHEST=$(echo "$REPORT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('highestRisk','CLEAN'))")
+        TOTAL=$(echo "$REPORT" | python3 -c "import json,sys; d=json.load(sys.stdin); print(sum(len(s.get('findings',[])) for s in d.get('skills',[])))")
+
+        echo "highest-risk=$HIGHEST" >> "$GITHUB_OUTPUT"
+        echo "total-findings=$TOTAL" >> "$GITHUB_OUTPUT"
+
+        # Store report as file (too large for output variable)
+        echo "$REPORT" > /tmp/panguard-scan-report.json
+        echo "report-json=/tmp/panguard-scan-report.json" >> "$GITHUB_OUTPUT"
+
+    - name: Comment on PR
+      if: |
+        inputs.comment-on-pr == 'true' &&
+        steps.scan.outputs.highest-risk != '' &&
+        steps.scan.outputs.highest-risk != 'ERROR' &&
+        github.event_name == 'pull_request'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        HIGHEST_RISK: ${{ steps.scan.outputs.highest-risk }}
+        TOTAL_FINDINGS: ${{ steps.scan.outputs.total-findings }}
+      run: |
+        REPORT=$(cat /tmp/panguard-scan-report.json 2>/dev/null || echo "{}")
+
+        # Build comment body
+        if [ "$HIGHEST_RISK" = "CLEAN" ] || [ "$HIGHEST_RISK" = "LOW" ]; then
+          ICON="white_check_mark"
+          STATUS="All Clear"
+        elif [ "$HIGHEST_RISK" = "MEDIUM" ]; then
+          ICON="warning"
+          STATUS="Concerns Found"
+        else
+          ICON="rotating_light"
+          STATUS="Threats Detected"
+        fi
+
+        # Extract skill-level summary from JSON
+        SKILL_SUMMARY=$(echo "$REPORT" | python3 -c "
+        import json, sys
+        try:
+          d = json.load(sys.stdin)
+          lines = []
+          for s in d.get('skills', []):
+            if s.get('status') == 'skipped':
+              continue
+            risk = s.get('riskLevel', 'LOW')
+            name = s.get('name', 'unknown')
+            findings = len(s.get('findings', []))
+            if risk in ('HIGH', 'CRITICAL'):
+              lines.append(f'| {name} | **{risk}** | {findings} |')
+            elif risk == 'MEDIUM':
+              lines.append(f'| {name} | {risk} | {findings} |')
+            else:
+              lines.append(f'| {name} | {risk} | {findings} |')
+          print('\n'.join(lines) if lines else '| No skills found | -- | -- |')
+        except:
+          print('| Parse error | -- | -- |')
+        " 2>/dev/null || echo "| Error | -- | -- |")
+
+        # Sanitize for Markdown injection
+        SKILL_SUMMARY=$(echo "$SKILL_SUMMARY" | sed 's/`//g; s/<[^>]*>//g; s/|/\\|/g' | tr -d '\n\r')
+
+        # Allowlist risk level and findings count
+        case "$HIGHEST_RISK" in
+          CLEAN|LOW|MEDIUM|HIGH|CRITICAL|ERROR) ;;
+          *) HIGHEST_RISK="UNKNOWN" ;;
+        esac
+        [[ "$TOTAL_FINDINGS" =~ ^[0-9]+$ ]] || TOTAL_FINDINGS="?"
+
+        MARKER="<!-- panguard-mcp-audit -->"
+
+        BODY=$(cat <<HEREDOC
+        ${MARKER}
+        ## :${ICON}: PanGuard MCP Skill Audit — ${STATUS}
+
+        | Skill | Risk Level | Findings |
+        |-------|-----------|----------|
+        ${SKILL_SUMMARY}
+
+        **Highest Risk:** ${HIGHEST_RISK} | **Total Findings:** ${TOTAL_FINDINGS}
+
+        ---
+        <sub>Powered by <a href="https://panguard.ai">PanGuard</a> | <a href="https://github.com/panguard-ai/panguard-ai">Source</a></sub>
+        HEREDOC
+        )
+
+        # Post or update comment (use hidden marker for identification)
+        EXISTING=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+          --jq '.[] | select(.body | contains("<!-- panguard-mcp-audit -->")) | .id' 2>/dev/null | head -1)
+
+        if [ -n "$EXISTING" ]; then
+          gh api repos/${{ github.repository }}/issues/comments/$EXISTING \
+            -X PATCH -f body="$BODY" > /dev/null 2>&1
+        else
+          gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+            -f body="$BODY" > /dev/null 2>&1
+        fi
+
+    - name: Fail on HIGH/CRITICAL
+      if: |
+        inputs.fail-on-high == 'true' &&
+        (steps.scan.outputs.highest-risk == 'HIGH' || steps.scan.outputs.highest-risk == 'CRITICAL')
+      shell: bash
+      run: |
+        echo "PanGuard detected ${{ steps.scan.outputs.highest-risk }} risk MCP skills."
+        echo "Set fail-on-high: false to disable this check."
+        exit 1

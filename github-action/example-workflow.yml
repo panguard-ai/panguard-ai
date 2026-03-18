@@ -1,0 +1,38 @@
+# .github/workflows/panguard-skill-audit.yml
+#
+# Automatically audit MCP skills when PRs modify MCP config files.
+# Add this file to your repository's .github/workflows/ directory.
+
+name: PanGuard Skill Audit
+
+on:
+  pull_request:
+    paths:
+      - '**/claude_desktop_config.json'
+      - '**/.cursor/mcp.json'
+      - '**/mcp.json'
+      - '**/.mcp.json'
+      - '**/.windsurf/mcp.json'
+      - '**/.cline/mcp_settings.json'
+      - '**/SKILL.md'
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: panguard-ai/panguard-ai/github-action@main
+        with:
+          fail-on-high: 'true'
+          comment-on-pr: 'true'

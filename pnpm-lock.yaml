@@ -214,6 +214,12 @@ importers:
       '@panguard-ai/core':
         specifier: workspace:*
         version: link:../core
+      '@panguard-ai/panguard-mcp':
+        specifier: workspace:*
+        version: link:../panguard-mcp
+      '@panguard-ai/panguard-skill-auditor':
+        specifier: workspace:*
+        version: link:../panguard-skill-auditor
       '@panguard-ai/panguard-trap':
         specifier: workspace:*
         version: link:../panguard-trap
