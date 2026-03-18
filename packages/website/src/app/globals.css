@@ -407,7 +407,7 @@ body::after {
 /* Fallback: force-show content after 2s even if IntersectionObserver/JS fails */
 @keyframes force-show { to { opacity: 1 !important; transform: none !important; } }
 .js-ready .animate-on-scroll {
-  animation: force-show 0s 2s forwards;
+  animation: force-show 0.01s 2s forwards;
 }
 /* Force-show framer-motion SSR hidden elements after 1s — ONLY when JS/framer hasn't loaded.
    .fm-ready is added 800ms after page load. If framer-motion is working, it will have

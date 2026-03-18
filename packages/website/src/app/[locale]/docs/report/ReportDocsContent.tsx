@@ -35,7 +35,7 @@ function CodeBlock({ code, label }: { code: string; label?: string }) {
           </button>
         </div>
       )}
-      <pre className="p-4 font-mono text-sm text-gray-300 overflow-x-auto leading-relaxed whitespace-pre-wrap">
+      <pre className="p-4 font-mono text-sm text-green-100 overflow-x-auto leading-relaxed whitespace-pre-wrap">
         {code.split('\n').map((line, i) => (
           <span key={i} className={line.startsWith('#') ? 'text-text-muted' : 'text-text-primary'}>
             {line}

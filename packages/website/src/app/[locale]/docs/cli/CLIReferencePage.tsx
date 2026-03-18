@@ -54,7 +54,7 @@ function TierBadge({ tier }: { tier: 'Free' | 'Pro' | 'Enterprise' }) {
 function TerminalBlock({ code }: { code: string }) {
   return (
     <div className="bg-[#111] border border-border rounded-xl p-4 font-mono text-sm overflow-x-auto">
-      <span className="text-panguard-green">$</span> <span className="text-gray-300">{code}</span>
+      <span className="text-panguard-green">$</span> <span className="text-green-100">{code}</span>
     </div>
   );
 }
@@ -207,7 +207,7 @@ export default function CLIReferencePage() {
               <p className="text-sm text-text-secondary shrink-0">{t('cli.installTitle')}</p>
               <div className="bg-[#111] border border-border rounded-xl px-4 py-2.5 font-mono text-sm flex-1 overflow-x-auto">
                 <span className="text-panguard-green">$</span>{' '}
-                <span className="text-gray-300">curl -fsSL https://get.panguard.ai | bash</span>
+                <span className="text-green-100">curl -fsSL https://get.panguard.ai | bash</span>
               </div>
             </div>
           </FadeInUp>
