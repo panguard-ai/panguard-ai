@@ -56,9 +56,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL('/api/install', request.url));
   }
 
-  // /docs pages are served locally (previously redirected to docs.panguard.ai)
+  // /docs → redirect to Mintlify docs site
+  if (pathname === '/docs' || pathname.startsWith('/docs/')) {
+    const docsPath = pathname.replace(/^\/(en|zh-TW)/, '').replace(/^\/docs\/?/, '/');
+    return NextResponse.redirect(`https://docs.panguard.ai${docsPath === '/' ? '' : docsPath}`, 301);
+  }
 
-  // Run next-intl middleware for locale routing (handles / → /en, /zh, etc.)
+  // Run next-intl middleware for locale routing (handles / → /en, /zh-TW, etc.)
   const response = intlMiddleware(request);
 
   // Apply security headers (nonce + CSP) to the response
