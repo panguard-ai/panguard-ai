@@ -5,7 +5,7 @@ import atrRulesData from '@/lib/atr-rules-compiled.json';
 /**
  * POST /api/scan
  *
- * Full-featured skill scanner using all 52 ATR rules (450 patterns)
+ * Full-featured skill scanner using all 61 ATR rules (450 patterns)
  * + inline injection/permission/secret checks.
  * Results cached by content hash. Submits findings to Threat Cloud.
  */
@@ -307,7 +307,7 @@ function runFullScan(
   // Strip code blocks, quotes, inline code — these are documentation, not behavior
   const scanContent = stripMarkdownNoise(content);
 
-  // ── ATR Pattern Detection (52 rules, 450 patterns) ──
+  // ── ATR Pattern Detection (61 rules, 450 patterns) ──
   for (const rule of liveATR) {
     for (const compiled of rule.compiled) {
       try {
