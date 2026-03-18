@@ -1,17 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 
 function CountUp({ target, duration = 1.5 }: { target: number; duration?: number }) {
-  const [count, setCount] = useState(0);
+  // Initialize with target so SSR renders the real number (not 0)
+  const [count, setCount] = useState(target);
+  const prevTarget = useRef(target);
 
   useEffect(() => {
+    const from = prevTarget.current;
+    prevTarget.current = target;
+
+    // Skip animation if target hasn't changed or is 0
+    if (from === target || target === 0) {
+      setCount(target);
+      return;
+    }
+
+    // Animate from previous value to new target
     const startTime = Date.now();
     const endTime = startTime + duration * 1000;
+    let cancelled = false;
 
     function tick() {
+      if (cancelled) return;
       const now = Date.now();
       if (now >= endTime) {
         setCount(target);
@@ -19,11 +33,13 @@ function CountUp({ target, duration = 1.5 }: { target: number; duration?: number
       }
       const progress = (now - startTime) / (duration * 1000);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * target));
+      setCount(Math.floor(from + eased * (target - from)));
       requestAnimationFrame(tick);
     }
 
     requestAnimationFrame(tick);
+
+    return () => { cancelled = true; };
   }, [target, duration]);
 
   return <>{count.toLocaleString()}</>;

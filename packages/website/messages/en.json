@@ -1117,7 +1117,7 @@
       "cta": {
         "title": "Try it now. Open source.",
         "desc": "Run your first scan in under a minute. Enable Panguard Guard for continuous protection.",
-        "cta1": "Get Early Access",
+        "cta1": "Get Started",
         "cta2": "Run Free Scan"
       }
     },
@@ -4820,10 +4820,9 @@
       "primary": "View Open Roles",
       "secondary": "Get in Touch"
     },
-    "investors": {
-      "title": "Investors & Advisors",
-      "desc": "We are building our investor and advisor network. We are in conversations with cybersecurity veterans, AI researchers, and enterprise security leaders.",
-      "cta": "Interested in advising?"
+    "founder": {
+      "title": "Founded in Taiwan",
+      "desc": "PanGuard AI was founded in 2026 in Taiwan with a mission to make AI agent security accessible to everyone. We are a small, independent team focused on building open-source security infrastructure for the AI agent ecosystem."
     }
   },
   "openSource": {

@@ -227,10 +227,19 @@ export default function ProductGuardContent() {
           </FadeInUp>
           <FadeInUp delay={0.15}>
             <div className="flex flex-wrap justify-center gap-4 mt-6 text-sm text-text-tertiary">
-              {['Linux', 'macOS', 'Windows', 'Docker', 'Kubernetes'].map((os) => (
-                <span key={os} className="flex items-center gap-1.5">
+              {[
+                { name: 'Linux', comingSoon: false },
+                { name: 'macOS', comingSoon: false },
+                { name: 'Windows', comingSoon: true },
+                { name: 'Docker', comingSoon: false },
+                { name: 'Kubernetes', comingSoon: true },
+              ].map((os) => (
+                <span key={os.name} className="flex items-center gap-1.5">
                   <CheckIcon className="w-3 h-3 text-brand-sage" />
-                  {os}
+                  {os.name}
+                  {os.comingSoon && (
+                    <span className="text-[10px] text-text-muted">(Coming Soon)</span>
+                  )}
                 </span>
               ))}
             </div>

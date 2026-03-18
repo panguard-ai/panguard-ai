@@ -28,16 +28,16 @@ export const STATS = {
   cliVersion: '0.5.3',
   sigmaRules: 4_353,
   yaraRules: 6_015,
-  atrRules: 61,
+  atrRules: 125,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 98,
   /** Total unique detection patterns across all ATR rules (bundled + community) */
   atrPatterns: 500,
-  totalRules: 4_353 + 6_015 + 61,
+  totalRules: 4_353 + 6_015 + 125,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '10,400+' as const,
+  totalRulesDisplay: '10,490+' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '61+' as const,
+  atrRulesDisplay: '125+' as const,
   integratedRulesDisplay: '10,400+' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
@@ -80,9 +80,9 @@ export const STATS = {
     /** npm packages found in crawl */
     npmPackages: 2_769,
     /** Packages actually scanned by ATR + Skill Auditor (L1 + L2 AST) */
-    skillsScanned: 3_222,
+    skillsScanned: 3_230,
     /** Threats detected (confirmed + suspicious) */
-    maliciousFound: 1_056,
+    maliciousFound: 1_299,
     /** ATR rule candidates from scan findings */
     atrRulesGenerated: 225,
     /** Breakdown by severity */
