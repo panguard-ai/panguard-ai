@@ -16,7 +16,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 6 audit checks
- *   agent-threat-rules/rules/                  -> 52 stable ATR rules (+ 17 predicted drafts)
+ *   agent-threat-rules/rules/                  -> 61 ATR rules
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
