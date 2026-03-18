@@ -14,7 +14,7 @@ import type { BlogPost } from '@/data/blog-posts';
 
 function formatDate(dateStr: string, locale: string): string {
   const date = new Date(dateStr + 'T00:00:00');
-  return date.toLocaleDateString(locale === 'zh' ? 'zh-TW' : 'en-US', {
+  return date.toLocaleDateString(locale === 'zh-TW' ? 'zh-TW' : 'en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -35,7 +35,7 @@ function CategoryBadge({ category }: { category: string }) {
 
 /** Get locale-aware title/excerpt for a blog post */
 function getLocalizedPost(post: BlogPost, t: ReturnType<typeof useTranslations>, locale: string) {
-  if (locale !== 'zh') return post;
+  if (locale !== 'zh-TW') return post;
   const slug = post.slug;
   const title = t.has(`posts.${slug}.title`) ? t(`posts.${slug}.title`) : post.title;
   const excerpt = t.has(`posts.${slug}.excerpt`) ? t(`posts.${slug}.excerpt`) : post.excerpt;

@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { blogPosts } from '@/data/blog-posts';
 import { caseStudies } from '@/data/case-studies';
 
-const locales = ['en', 'zh'] as const;
+const locales = ['en', 'zh-TW'] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = 'https://panguard.ai';
@@ -83,7 +83,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return 0.6;
   };
 
-  // English = no prefix (as-needed), Chinese = /zh prefix
+  // English = no prefix (as-needed), Chinese = /zh-TW prefix
   const localeUrl = (locale: string, path: string) => {
     const suffix = path === '/' ? '' : path;
     return locale === 'en' ? `${base}${suffix}` : `${base}/${locale}${suffix}`;
@@ -97,7 +97,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: getPriority(path),
       alternates: {
         languages: Object.fromEntries(
-          locales.map((l) => [l === 'zh' ? 'zh-TW' : l, localeUrl(l, path)])
+          locales.map((l) => [l, localeUrl(l, path)])
         ),
       },
     }))
@@ -111,7 +111,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
       alternates: {
         languages: Object.fromEntries(
-          locales.map((l) => [l === 'zh' ? 'zh-TW' : l, localeUrl(l, `/blog/${post.slug}`)])
+          locales.map((l) => [l, localeUrl(l, `/blog/${post.slug}`)])
         ),
       },
     }))
@@ -125,7 +125,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
       alternates: {
         languages: Object.fromEntries(
-          locales.map((l) => [l === 'zh' ? 'zh-TW' : l, localeUrl(l, `/customers/${cs.slug}`)])
+          locales.map((l) => [l, localeUrl(l, `/customers/${cs.slug}`)])
         ),
       },
     }))

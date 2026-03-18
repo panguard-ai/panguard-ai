@@ -54,7 +54,7 @@ export async function generateMetadata(props: {
 
 function formatDate(dateStr: string, locale: string): string {
   const date = new Date(dateStr + 'T00:00:00');
-  return date.toLocaleDateString(locale === 'zh' ? 'zh-TW' : 'en-US', {
+  return date.toLocaleDateString(locale === 'zh-TW' ? 'zh-TW' : 'en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

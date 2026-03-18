@@ -28,9 +28,9 @@ function LocaleSwitcher() {
         EN
       </button>
       <button
-        onClick={() => switchTo('zh')}
+        onClick={() => switchTo('zh-TW')}
         className={`relative px-3 py-1 text-xs font-medium rounded-full transition-all duration-300 ${
-          locale === 'zh'
+          locale === 'zh-TW'
             ? 'text-surface-0 bg-brand-sage'
             : 'text-text-tertiary hover:text-text-secondary'
         }`}

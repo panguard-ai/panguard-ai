@@ -15,7 +15,7 @@ import { resources, resourceTypes, Resource } from '@/data/resources';
 function formatDate(dateStr: string, locale: string): string {
   const [year, month] = dateStr.split('-');
   const date = new Date(Number(year), Number(month) - 1);
-  return date.toLocaleDateString(locale === 'zh' ? 'zh-TW' : 'en-US', {
+  return date.toLocaleDateString(locale === 'zh-TW' ? 'zh-TW' : 'en-US', {
     year: 'numeric',
     month: 'long',
   });
