@@ -34,6 +34,7 @@ import { generateInstallScript } from '../install/index.js';
 import { DashboardRenderer } from './dashboard-renderer.js';
 import type { DashboardState } from './dashboard-renderer.js';
 import { SkillWatcher } from '../engines/skill-watcher.js';
+import { commandScan } from './scan-command.js';
 import {
   classifyThreatResponse,
   renderAutoResponse,
@@ -103,6 +104,9 @@ export async function runCLI(args: string[]): Promise<void> {
     }
     case 'setup-ai':
       await commandSetupAI(dataDir);
+      break;
+    case 'scan':
+      await commandScan(args.slice(1));
       break;
     case 'help':
     default:
@@ -794,14 +798,14 @@ function printHelp(): void {
   console.log('');
 
   const commands = [
+    { cmd: 'scan', desc: 'Scan all installed MCP skills for threats' },
     { cmd: 'start', desc: 'Start the guard engine' },
     { cmd: 'stop', desc: 'Stop the guard engine' },
     { cmd: 'status', desc: 'Show engine status' },
+    { cmd: 'setup-ai', desc: 'Configure AI detection layer' },
     { cmd: 'install', desc: 'Install as system service' },
     { cmd: 'uninstall', desc: 'Remove system service' },
     { cmd: 'config', desc: 'Show current configuration' },
-    { cmd: 'generate-key', desc: 'Generate a test license key' },
-    { cmd: 'install-script', desc: 'Generate install script' },
     { cmd: 'help', desc: 'Show this help' },
   ];
 

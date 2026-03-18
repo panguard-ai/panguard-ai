@@ -1018,6 +1018,67 @@ export class ThreatCloudDB {
       );
   }
 
+  /** Get contributor leaderboard (hashed IDs, no PII) / 取得貢獻者排行榜 */
+  getContributorLeaderboard(limit: number = 20): Array<{
+    contributorHash: string;
+    proposalsSubmitted: number;
+    proposalsPromoted: number;
+    skillThreatsReported: number;
+  }> {
+    // Hash client_id with SHA-256 for privacy
+    // Group by client_id, count proposals + skill threats
+    const rows = this.db
+      .prepare(
+        `
+        SELECT
+          client_id,
+          COUNT(*) as proposal_count,
+          SUM(CASE WHEN status = 'promoted' THEN 1 ELSE 0 END) as promoted_count
+        FROM atr_proposals
+        WHERE client_id IS NOT NULL
+        GROUP BY client_id
+        ORDER BY promoted_count DESC, proposal_count DESC
+        LIMIT ?
+      `
+      )
+      .all(limit) as Array<{
+      client_id: string;
+      proposal_count: number;
+      promoted_count: number;
+    }>;
+
+    // Scope threat query to only the client_ids from the first query (bounded)
+    const clientIds = rows.map((r) => r.client_id);
+    const threatMap = new Map<string, number>();
+    if (clientIds.length > 0) {
+      const placeholders = clientIds.map(() => '?').join(',');
+      const threatRows = this.db
+        .prepare(
+          `SELECT client_id, COUNT(*) as threat_count
+           FROM skill_threats
+           WHERE client_id IN (${placeholders})
+           GROUP BY client_id`
+        )
+        .all(...clientIds) as Array<{ client_id: string; threat_count: number }>;
+      for (const r of threatRows) {
+        threatMap.set(r.client_id, r.threat_count);
+      }
+    }
+
+    const { createHmac } = require('node:crypto') as typeof import('node:crypto');
+    const hashSecret = process.env['TC_HASH_SECRET'] ?? 'panguard-default-hash-key';
+
+    return rows.map((r) => ({
+      // HMAC hash client_id — prevents PII reconstruction without server secret
+      contributorHash: createHmac('sha256', hashSecret)
+        .update(r.client_id)
+        .digest('hex'),
+      proposalsSubmitted: r.proposal_count,
+      proposalsPromoted: r.promoted_count,
+      skillThreatsReported: threatMap.get(r.client_id) ?? 0,
+    }));
+  }
+
   /** Get aggregated metrics across all sources / 取得所有來源的聚合指標 */
   getAggregatedMetrics(): AggregatedMetrics {
     // Total skills scanned across all sources (sum, not unique)

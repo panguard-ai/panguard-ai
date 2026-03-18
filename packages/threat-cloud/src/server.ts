@@ -450,6 +450,14 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/contributors':
+          if (req.method === 'GET') {
+            this.handleGetContributors(res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         default:
           this.sendJson(res, 404, { ok: false, error: 'Not found' });
       }
@@ -1027,6 +1035,13 @@ response:
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60');
     const metrics = this.db.getAggregatedMetrics();
     this.sendJson(res, 200, { ok: true, data: metrics });
+  }
+
+  /** GET /api/contributors - Public leaderboard (hashed IDs, no PII) */
+  private handleGetContributors(res: ServerResponse): void {
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+    const contributors = this.db.getContributorLeaderboard(20);
+    this.sendJson(res, 200, { ok: true, data: contributors });
   }
 
   /** Anonymize IP by zeroing last octet / 匿名化 IP */
