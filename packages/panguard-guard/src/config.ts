@@ -140,7 +140,7 @@ export const DEFAULT_GUARD_CONFIG: GuardConfig = {
   },
   watchdogEnabled: true,
   watchdogInterval: 60000,
-  threatCloudEndpoint: 'https://tc.panguard.ai/api',
+  threatCloudEndpoint: 'https://tc.panguard.ai',
 };
 
 /** Master config path written by `panguard init` / `panguard init` 寫入的主配置路徑 */

@@ -46,6 +46,15 @@ export type SkillThreatSubmitter = (submission: {
   findingSummaries?: Array<{ id: string; category: string; severity: string; title: string }>;
 }) => Promise<boolean>;
 
+/** Callback for submitting ATR rule proposals to Threat Cloud */
+export type ATRProposalSubmitter = (proposal: {
+  patternHash: string;
+  ruleContent: string;
+  llmProvider: string;
+  llmModel: string;
+  selfReviewVerdict: string;
+}) => Promise<boolean>;
+
 /** Callback for checking if a skill is in the community blacklist */
 export type SkillBlacklistChecker = (skillName: string) => Promise<boolean>;
 
@@ -58,6 +67,8 @@ export interface SkillWatcherConfig {
   readonly autoWhitelist?: boolean;
   /** Optional callback to submit audit results to Threat Cloud */
   readonly submitThreat?: SkillThreatSubmitter;
+  /** Optional callback to submit ATR rule proposals to Threat Cloud (flywheel) */
+  readonly submitATRProposal?: ATRProposalSubmitter;
   /** Optional callback to check community blacklist before auditing */
   readonly checkBlacklist?: SkillBlacklistChecker;
 }
@@ -115,8 +126,8 @@ async function loadAuditor(): Promise<AuditModule> {
  */
 export class SkillWatcher extends EventEmitter {
   private fileMonitor: FileMonitor | null = null;
-  private readonly config: Required<Omit<SkillWatcherConfig, 'submitThreat' | 'checkBlacklist'>> &
-    Pick<SkillWatcherConfig, 'submitThreat' | 'checkBlacklist'>;
+  private readonly config: Required<Omit<SkillWatcherConfig, 'submitThreat' | 'submitATRProposal' | 'checkBlacklist'>> &
+    Pick<SkillWatcherConfig, 'submitThreat' | 'submitATRProposal' | 'checkBlacklist'>;
   private previousSkills: Map<string, MCPServerEntryMinimal> = new Map();
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private running = false;
@@ -128,6 +139,7 @@ export class SkillWatcher extends EventEmitter {
       autoAudit: config?.autoAudit ?? true,
       autoWhitelist: config?.autoWhitelist ?? true,
       submitThreat: config?.submitThreat,
+      submitATRProposal: config?.submitATRProposal,
     };
   }
 
@@ -389,9 +401,138 @@ export class SkillWatcher extends EventEmitter {
             );
           });
       }
+
+      // Flywheel: Submit ATR proposal for HIGH/CRITICAL findings
+      // This bridges skill audits into the ATR rule generation pipeline
+      if (
+        this.config.submitATRProposal &&
+        (audit.riskLevel === 'HIGH' || audit.riskLevel === 'CRITICAL') &&
+        audit.findings &&
+        audit.findings.length > 0
+      ) {
+        void this.submitSkillATRProposal(change.name, audit.riskLevel, audit.findings).catch(
+          (err: unknown) => {
+            logger.warn(
+              `ATR proposal from skill audit failed for ${change.name}: ${err instanceof Error ? err.message : String(err)}`
+            );
+          }
+        );
+      }
     } catch (err) {
       logger.warn(
         `Skill audit failed for ${change.name}: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }
+
+  /**
+   * Build and submit ATR rule proposal from skill audit findings.
+   * Bridges the skill audit path into the flywheel.
+   */
+  private async submitSkillATRProposal(
+    skillName: string,
+    riskLevel: 'HIGH' | 'CRITICAL',
+    findings: Array<{ id: string; category: string; severity: string; title: string }>
+  ): Promise<void> {
+    if (!this.config.submitATRProposal) return;
+
+    const { createHash } = await import('node:crypto');
+
+    // Build a concise description from findings for the ATR rule
+    const findingDescriptions = findings
+      .filter((f) => f.severity === 'critical' || f.severity === 'high')
+      .slice(0, 5)
+      .map((f) => f.title);
+
+    if (findingDescriptions.length === 0) return;
+
+    // Use finding titles as pattern content for behavioral regex matching
+    const findingSummary = findingDescriptions.join('; ');
+    const patternHash = createHash('sha256')
+      .update(`skill-audit:${skillName}:${findingSummary}`)
+      .digest('hex')
+      .slice(0, 16);
+
+    // Determine ATR category from audit findings
+    const categoryMap: Record<string, string> = {
+      'shell-execution': 'tool-poisoning',
+      'network-request': 'context-exfiltration',
+      'credential-access': 'context-exfiltration',
+      'code-execution': 'tool-poisoning',
+      'instruction-override': 'prompt-injection',
+      'env-access': 'context-exfiltration',
+    };
+
+    const primaryCategory = findings[0]?.category ?? 'tool-poisoning';
+    const atrCategory = categoryMap[primaryCategory] ?? 'tool-poisoning';
+    const severity = riskLevel === 'CRITICAL' ? 'critical' : 'high';
+
+    // Build detection conditions from finding titles
+    // Each title often contains the behavioral pattern description
+    const conditions = findingDescriptions
+      .map((title, idx) => {
+        // Extract keywords that indicate attack behavior
+        const keywords = title
+          .split(/\s+/)
+          .filter((w) => w.length > 4)
+          .slice(0, 4);
+        if (keywords.length === 0) return null;
+        const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
+        return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${title.slice(0, 80)}"`;
+      })
+      .filter(Boolean);
+
+    if (conditions.length === 0) return;
+
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
+    const ruleContent = `title: "Skill Audit: ${findingDescriptions[0]?.slice(0, 60) ?? skillName}"
+id: ATR-2026-DRAFT-${patternHash.slice(0, 8)}
+status: draft
+description: |
+  Auto-generated from skill audit of "${skillName}".
+  Findings: ${findingSummary.slice(0, 200)}
+author: "PanGuard Skill Watcher"
+date: "${date}"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: experimental
+severity: ${severity}
+tags:
+  category: ${atrCategory}
+  subcategory: skill-audit
+  confidence: medium
+detection:
+  conditions:
+${conditions.join('\n')}
+  condition: any
+response:
+  actions: [alert, snapshot]
+test_cases:
+  true_positives:
+    - content: "${findingDescriptions[0]?.replace(/"/g, '\\"').slice(0, 100) ?? 'malicious pattern'}"
+      expected: triggered
+  true_negatives:
+    - content: "list_files(directory='/tmp')"
+      expected: not_triggered`;
+
+    const success = await this.config.submitATRProposal({
+      patternHash,
+      ruleContent,
+      llmProvider: 'skill-audit',
+      llmModel: 'pattern-extraction',
+      selfReviewVerdict: JSON.stringify({
+        approved: true,
+        source: 'skill-watcher',
+        skillName,
+        riskLevel,
+        findingCount: findings.length,
+      }),
+    });
+
+    if (success) {
+      logger.info(
+        `ATR proposal submitted from skill audit: ${skillName} (${patternHash}) / ` +
+          `技能審計 ATR 提案已提交: ${skillName}`
       );
     }
   }

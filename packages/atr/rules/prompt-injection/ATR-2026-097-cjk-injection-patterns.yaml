@@ -83,6 +83,21 @@ detection:
       operator: regex
       value: '(余额|餘額|金额|金額|额度|額度).{0,10}(不足|不够|不夠).{0,20}(最大|全部|所有|尽可能|盡可能|最多).{0,10}(金额|金額|额度|額度|数量|數量).{0,5}(发送|發送|转|轉)'
       description: 'Amount manipulation: if balance insufficient, send maximum amount'
+    # -- Simplified Chinese: ignore previous instructions (direct injection) --
+    - field: content
+      operator: regex
+      value: '(忽略|无视|忘记|跳过).{0,5}(之前|以前|上面|先前|原来|原有|现有).{0,5}(的)?.{0,5}(指令|指示|规则|设定|提示|要求|限制|约束)'
+      description: 'Simplified Chinese: ignore previous instructions/rules - direct injection'
+    # -- Traditional Chinese: ignore previous instructions (direct injection) --
+    - field: content
+      operator: regex
+      value: '(忽略|無視|忘記|跳過).{0,5}(之前|以前|上面|先前|原來|原有|現有).{0,5}(的)?.{0,5}(指令|指示|規則|設定|提示|要求|限制|約束)'
+      description: 'Traditional Chinese: ignore previous instructions/rules - direct injection'
+    # -- Japanese: ignore previous instructions (direct injection) --
+    - field: content
+      operator: regex
+      value: '(以前の|前の|これまでの|先ほどの|上記の).{0,5}(指示|指令|ルール|制約|設定).{0,5}(を)?.{0,5}(無視|忘れ|スキップ|取り消)'
+      description: 'Japanese: ignore previous instructions/rules - direct injection'
     # -- Japanese: ignore + action patterns --
     - field: content
       operator: regex
