@@ -443,6 +443,93 @@ async function submitToThreatCloud(
   }
 }
 
+/**
+ * Flywheel bridge: submit ATR proposal from web scan findings.
+ * HIGH/CRITICAL skills get a rule proposal submitted directly to TC.
+ */
+async function submitATRProposal(
+  skillName: string,
+  riskLevel: string,
+  findings: Finding[]
+): Promise<void> {
+  try {
+    const highFindings = findings
+      .filter((f) => f.severity === 'critical' || f.severity === 'high')
+      .slice(0, 5);
+    if (highFindings.length === 0) return;
+
+    const findingSummary = highFindings.map((f) => f.title).join('; ');
+    const patternHash = createHash('sha256')
+      .update(`web-scan:${skillName}:${findingSummary}`)
+      .digest('hex')
+      .slice(0, 16);
+
+    const severity = riskLevel === 'CRITICAL' ? 'critical' : 'high';
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
+
+    // Build detection conditions from finding titles
+    const conditions = highFindings
+      .map((f, idx) => {
+        const keywords = f.title
+          .split(/\s+/)
+          .filter((w) => w.length > 4)
+          .slice(0, 4);
+        if (keywords.length === 0) return null;
+        const regex = keywords
+          .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+          .join('.*');
+        return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${f.title.slice(0, 80)}"`;
+      })
+      .filter(Boolean);
+
+    if (conditions.length === 0) return;
+
+    const ruleContent = `title: "Web Scan: ${highFindings[0]?.title.slice(0, 60) ?? skillName}"
+id: ATR-2026-DRAFT-${patternHash.slice(0, 8)}
+status: draft
+description: |
+  Auto-generated from web scan of "${skillName}".
+  Findings: ${findingSummary.slice(0, 200)}
+author: "PanGuard Web Scanner"
+date: "${date}"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: experimental
+severity: ${severity}
+tags:
+  category: skill-compromise
+  subcategory: web-scan
+  confidence: medium
+detection:
+  conditions:
+${conditions.join('\n')}
+  condition: any
+response:
+  actions: [alert, snapshot]`;
+
+    await fetch(`${TC_ENDPOINT}/api/atr-proposals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        patternHash,
+        ruleContent,
+        llmProvider: 'web-scanner',
+        llmModel: 'pattern-extraction',
+        selfReviewVerdict: JSON.stringify({
+          approved: true,
+          source: 'web-scanner',
+          skillName,
+          riskLevel,
+          findingCount: highFindings.length,
+        }),
+      }),
+      signal: AbortSignal.timeout(5_000),
+    });
+  } catch {
+    // Best-effort — never block the scan response
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Handler
 // ---------------------------------------------------------------------------
@@ -540,6 +627,11 @@ export async function POST(request: Request) {
   // Submit to Threat Cloud (non-blocking)
   if (riskScore > 0) {
     void submitToThreatCloud(skillName, contentHash, riskScore, riskLevel, findings);
+  }
+
+  // Flywheel: submit ATR proposal for HIGH/CRITICAL findings from web scans
+  if ((riskLevel === 'HIGH' || riskLevel === 'CRITICAL') && findings.length > 0) {
+    void submitATRProposal(skillName ?? contentHash, riskLevel, findings);
   }
 
   return NextResponse.json({
