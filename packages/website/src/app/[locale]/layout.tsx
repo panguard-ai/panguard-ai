@@ -7,7 +7,7 @@ import { buildAlternates } from '@/lib/seo';
 import { getNonce } from '@/lib/nonce';
 import { CookieBannerLazy } from '@/components/CookieBannerLazy';
 
-const locales = ['en', 'zh'] as const;
+const locales = ['en', 'zh-TW'] as const;
 
 const inter = Inter({
   subsets: ['latin'],
@@ -46,7 +46,7 @@ export async function generateMetadata(props: {
     description: t('description'),
     openGraph: {
       type: 'website',
-      locale: locale === 'zh' ? 'zh_TW' : 'en_US',
+      locale: locale === 'zh-TW' ? 'zh_TW' : 'en_US',
       url: 'https://panguard.ai',
       siteName: 'Panguard AI',
       title: t('title'),
@@ -162,7 +162,7 @@ export default async function LocaleLayout(
 
   return (
     <html
-      lang={locale === 'zh' ? 'zh-TW' : 'en'}
+      lang={locale === 'zh-TW' ? 'zh-TW' : 'en'}
       className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansTC.variable}`}
       suppressHydrationWarning
     >

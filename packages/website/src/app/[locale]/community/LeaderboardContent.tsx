@@ -9,7 +9,7 @@ interface Contributor {
   skillThreatsReported: number;
 }
 
-const TC_URL = 'https://tc.panguard.ai';
+const TC_URL = process.env.NEXT_PUBLIC_THREAT_CLOUD_URL ?? 'https://tc.panguard.ai';
 
 export default function LeaderboardContent() {
   const [contributors, setContributors] = useState<Contributor[]>([]);
@@ -19,11 +19,15 @@ export default function LeaderboardContent() {
   useEffect(() => {
     async function fetchContributors() {
       try {
-        const resp = await fetch(`${TC_URL}/api/contributors`);
+        const resp = await fetch(`${TC_URL}/api/contributors`, {
+          signal: AbortSignal.timeout(10_000),
+        });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = (await resp.json()) as { ok: boolean; data: Contributor[] };
         if (data.ok) {
           setContributors(data.data);
+        } else {
+          throw new Error('API returned ok=false');
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load');

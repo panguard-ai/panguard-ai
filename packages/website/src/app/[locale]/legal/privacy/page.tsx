@@ -10,7 +10,7 @@ export async function generateMetadata(props: {
   const { locale } = params;
 
   return {
-    title: locale === 'zh' ? '隱私權政策' : 'Privacy Policy',
+    title: locale === 'zh-TW' ? '隱私權政策' : 'Privacy Policy',
     description: 'Panguard AI Privacy Policy. How we collect, use, and protect your personal data.',
   };
 }
@@ -25,7 +25,7 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
       <header className="mb-10">
         <h1 className="text-2xl font-bold text-text-primary mb-2">Privacy Policy</h1>
         <p className="text-sm text-text-tertiary">Last updated: {LEGAL_LAST_UPDATED}</p>
-        {locale === 'zh' && (
+        {locale === 'zh-TW' && (
           <p className="mt-3 text-sm text-text-muted border border-border rounded-lg px-4 py-3 bg-surface-1">
             本隱私權政策目前僅提供英文版本。中文翻譯版本正在準備中，如有任何疑問請聯繫
             <a

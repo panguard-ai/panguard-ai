@@ -140,7 +140,7 @@ function getOverallStatus(svcs: Service[]): ServiceStatus {
 const LAST_MANUAL_REVIEW = '2026-02-20';
 
 function formatTimestamp(locale: string): string {
-  return new Date(LAST_MANUAL_REVIEW).toLocaleDateString(locale === 'zh' ? 'zh-TW' : 'en-US', {
+  return new Date(LAST_MANUAL_REVIEW).toLocaleDateString(locale === 'zh-TW' ? 'zh-TW' : 'en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',

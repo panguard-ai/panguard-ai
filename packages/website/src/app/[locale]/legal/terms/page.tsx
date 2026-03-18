@@ -10,7 +10,7 @@ export async function generateMetadata(props: {
   const { locale } = params;
 
   return {
-    title: locale === 'zh' ? '服務條款' : 'Terms of Service',
+    title: locale === 'zh-TW' ? '服務條款' : 'Terms of Service',
     description: 'Panguard AI Terms of Service. Usage terms, intellectual property, and liability.',
   };
 }
@@ -25,7 +25,7 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
       <header className="mb-10">
         <h1 className="text-2xl font-bold text-text-primary mb-2">Terms of Service</h1>
         <p className="text-sm text-text-tertiary">Last updated: {LEGAL_LAST_UPDATED}</p>
-        {locale === 'zh' && (
+        {locale === 'zh-TW' && (
           <p className="mt-3 text-sm text-text-muted border border-border rounded-lg px-4 py-3 bg-surface-1">
             本服務條款目前僅提供英文版本。中文翻譯版本正在準備中，如有任何疑問請聯繫
             <a
