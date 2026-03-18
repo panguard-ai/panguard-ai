@@ -8,6 +8,7 @@
  */
 
 import Database from 'better-sqlite3';
+import { createHmac } from 'node:crypto';
 import type {
   AnonymizedThreatData,
   ThreatCloudRule,
@@ -1065,7 +1066,6 @@ export class ThreatCloudDB {
       }
     }
 
-    const { createHmac } = require('node:crypto') as typeof import('node:crypto');
     const hashSecret = process.env['TC_HASH_SECRET'] ?? 'panguard-default-hash-key';
 
     return rows.map((r) => ({
