@@ -421,8 +421,8 @@ export class ThreatCloudDB {
   /** Insert ATR rule proposal / 插入 ATR 規則提案 */
   insertATRProposal(proposal: ATRProposal): void {
     const stmt = this.db.prepare(`
-      INSERT INTO atr_proposals (pattern_hash, rule_content, llm_provider, llm_model, self_review_verdict, client_id)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO atr_proposals (pattern_hash, rule_content, llm_provider, llm_model, self_review_verdict, client_id, confirmations)
+      VALUES (?, ?, ?, ?, ?, ?, 1)
     `);
     stmt.run(
       proposal.patternHash,
@@ -920,6 +920,9 @@ export class ThreatCloudDB {
          FROM atr_proposals
          WHERE status = 'pending'
            AND (llm_review_verdict IS NULL
+                OR llm_review_verdict LIKE '%"approved":false%'
+                OR llm_review_verdict LIKE '%failed%'
+                OR llm_review_verdict LIKE '%error%'
                 OR llm_review_verdict LIKE '%rate_limit%'
                 OR llm_review_verdict LIKE '%429%'
                 OR llm_review_verdict LIKE '%timed out%')

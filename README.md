@@ -14,7 +14,7 @@
 [![GitHub Forks](https://img.shields.io/github/forks/panguard-ai/panguard-ai?style=flat-square)](https://github.com/panguard-ai/panguard-ai/network)
 [![npm version](https://img.shields.io/npm/v/@panguard-ai/panguard?style=flat-square&color=cb3837&logo=npm)](https://www.npmjs.com/package/@panguard-ai/panguard)
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](LICENSE)
-[![ATR](https://img.shields.io/badge/ATR-52%20rules%20%2B%2061%20community-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
+[![ATR](https://img.shields.io/badge/ATR-61%20rules-8b5cf6-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
 [![Detection Rules](https://img.shields.io/badge/Detection%20Rules-10%2C400%2B-f97316.svg?style=flat-square)](#detection-rules)
 [![Made in Taiwan](https://img.shields.io/badge/Made%20in-Taiwan-e11d48.svg?style=flat-square)](https://panguard.ai)
 
@@ -78,7 +78,7 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
 | **[Skill Auditor](docs/overview.md)**                              | 8-check security gate before any skill runs                            | GA     |
 | **[Guard](#guard)**                                                | 24/7 runtime monitoring + auto-block                                   | GA     |
 | **[Threat Cloud](#threat-cloud)**                                  | Anonymous community threat intel. 3+ confirmations + LLM review.       | GA     |
-| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 52 stable + 61 community rules. 9 categories. | RFC    |
+| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 61 rules across 9 categories. | RFC    |
 
 One user's encounter with a new attack becomes a rule that protects everyone.
 
@@ -117,7 +117,7 @@ Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet dow
 | --------- | ----------- | -------------------------------------------------------------------- |
 | **Sigma** | 4,352       | Network intrusion, auth bypass, lateral movement                     |
 | **YARA**  | 6,015       | Malware, encoded payloads, obfuscated scripts                        |
-| **ATR**   | 52 + 61     | AI agent threats: prompt injection, tool poisoning, skill compromise |
+| **ATR**   | 61          | AI agent threats: prompt injection, tool poisoning, skill compromise |
 | **Total** | **10,400+** | All bundled. No cloud required.                                      |
 
 ---
@@ -194,7 +194,7 @@ panguard-ai/
   packages/
     panguard-skill-auditor/  Skill security auditor (8 checks)
     panguard-guard/          24/7 monitoring + Threat Cloud sync
-    atr/                     Agent Threat Rules: 52 stable rules, 9 categories
+    atr/                     Agent Threat Rules: 61 rules, 9 categories
     threat-cloud/            Community threat intel server
     panguard-mcp/            MCP server: 11+ tools for AI assistants
     panguard-scan/           Security scanner

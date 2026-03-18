@@ -53,16 +53,16 @@ export default function EnterpriseContent() {
             <FadeInUp delay={0.3}>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href="/demo"
+                  href="/docs/getting-started"
                   className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
                 >
-                  Request a Demo
+                  Install Free
                 </Link>
                 <Link
-                  href="/contact"
+                  href="/docs/getting-started"
                   className="border border-border text-text-secondary font-semibold text-sm rounded-full px-8 py-3.5 hover:border-brand-sage hover:text-text-primary transition-all duration-200"
                 >
-                  Talk to Sales
+                  Get Started Free
                 </Link>
               </div>
             </FadeInUp>
@@ -120,7 +120,7 @@ export default function EnterpriseContent() {
           </div>
         </section>
 
-        {/* Pricing Context */}
+        {/* Open Source */}
         <section className="px-6 lg:px-[120px] py-16 border-t border-border bg-surface-1">
           <FadeInUp>
             <div className="max-w-3xl mx-auto text-center">
@@ -130,13 +130,13 @@ export default function EnterpriseContent() {
                 <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-2">
                   Enterprise
                 </p>
-                <p className="text-3xl font-extrabold text-text-primary">Custom</p>
-                <p className="text-sm text-text-tertiary mt-2">{t('pricing.volumeDiscounts')}</p>
+                <p className="text-3xl font-extrabold text-text-primary">Free &amp; Open Source</p>
+                <p className="text-sm text-text-tertiary mt-2">Self-hosted, no licensing fees</p>
                 <Link
-                  href="/contact"
+                  href="/docs/getting-started"
                   className="mt-5 block text-center bg-brand-sage text-surface-0 font-semibold rounded-full px-5 py-3 text-sm hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
                 >
-                  Talk to Sales
+                  Install Now
                 </Link>
               </div>
             </div>
@@ -172,10 +172,10 @@ export default function EnterpriseContent() {
               <h2 className="text-2xl font-bold text-text-primary mb-3">{t('cta.title')}</h2>
               <p className="text-text-secondary mb-6">{t('cta.desc')}</p>
               <Link
-                href="/demo"
+                href="/docs/getting-started"
                 className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
               >
-                Request a Demo
+                Get Started Free
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
