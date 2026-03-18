@@ -25,18 +25,22 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '0.5.0',
-  sigmaRules: 4_352,
+  cliVersion: '0.5.3',
+  sigmaRules: 4_353,
   yaraRules: 6_015,
   atrRules: 61,
-  /** Total unique detection patterns across all 61 ATR rules */
+  /** Community ATR rules from Threat Cloud flywheel */
+  atrCommunityRules: 98,
+  /** Total unique detection patterns across all ATR rules (bundled + community) */
   atrPatterns: 500,
-  totalRules: 4_352 + 6_015 + 61,
+  totalRules: 4_353 + 6_015 + 61,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
   totalRulesDisplay: '10,400+' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '61' as const,
+  atrRulesDisplay: '61+' as const,
   integratedRulesDisplay: '10,400+' as const,
+  /** Promotion interval in Threat Cloud */
+  promotionIntervalMinutes: 2,
   falcoConfigs: 1,
   testsPassing: 3_490,
   testFiles: 159,

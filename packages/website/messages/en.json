@@ -1174,7 +1174,7 @@
         },
         "item5": {
           "title": "Graceful Degradation",
-          "desc": "Cloud AI down? Local fingerprint & heuristic analysis takes over. Heuristics offline? The rule engine with 3,760 Sigma and 5,961 YARA rules handles it. Guard never stops protecting, regardless of network conditions."
+          "desc": "Cloud AI down? Local fingerprint & heuristic analysis takes over. Heuristics offline? The rule engine with 4,353 Sigma and 6,015 YARA rules handles it. Guard never stops protecting, regardless of network conditions."
         },
         "item6": {
           "title": "Integration Adapters",
@@ -1255,7 +1255,7 @@
         },
         "step5": {
           "title": "New rule distributed to all users",
-          "desc": "Approved rules are promoted every 15 minutes. Guard syncs new rules every hour. The same attack that hit you will be blocked instantly for every other Panguard user."
+          "desc": "Approved rules are promoted every 2 minutes. Guard syncs new rules every hour. The same attack that hit you will be blocked instantly for every other Panguard user."
         },
         "stats": "Pipeline results: {scanned} skills scanned, {malicious} malicious found, {rules} ATR rules auto-generated and distributed to the community."
       }
@@ -3474,7 +3474,7 @@
       "title": "Advanced Setup",
       "subtitle": "Enhance Panguard's detection capabilities with optional external tools. All tools are optional -- Panguard works fully without them.",
       "degradeNote": "Graceful Degradation Architecture",
-      "degradeDesc": "Panguard's AI analysis follows a three-tier degradation strategy: Cloud AI (Claude/OpenAI) > Local LLM (Ollama) > Rule Engine (Sigma + YARA). Each tier is independent. Even with all external tools offline, 3,760 Sigma rules and 5,961 YARA rules still provide full protection.",
+      "degradeDesc": "Panguard's AI analysis follows a three-tier degradation strategy: Cloud AI (Claude/OpenAI) > Local LLM (Ollama) > Rule Engine (Sigma + YARA). Each tier is independent. Even with all external tools offline, 4,353 Sigma rules and 6,015 YARA rules still provide full protection.",
       "ollamaTitle": "Ollama -- Local AI Analysis",
       "ollamaDesc": "Install Ollama to run AI threat analysis locally without cloud APIs. Ideal for air-gapped environments or data privacy requirements.",
       "ollamaNote": "Panguard auto-detects Ollama (default http://localhost:11434). No additional configuration needed after install.",
@@ -4356,7 +4356,7 @@
       "layer2": {
         "badge": "Layer 2",
         "name": "Rules Engine",
-        "desc": "3,760 Sigma rules + 5,961 YARA rules + Suricata network IDS + Falco eBPF monitoring.",
+        "desc": "4,353 Sigma rules + 6,015 YARA rules + Suricata network IDS + Falco eBPF monitoring.",
         "detail": "Catches 90% of known threats in under 50ms. No AI needed."
       },
       "layer3": {
@@ -4385,7 +4385,7 @@
       "tier1": {
         "name": "Rules Engine",
         "pct": "90%",
-        "items": "3,760 Sigma detection rules|5,961 YARA malware signatures|Suricata network IDS rules|Falco eBPF system call monitoring|Behavioral baseline deviations",
+        "items": "4,353 Sigma detection rules|6,015 YARA malware signatures|Suricata network IDS rules|Falco eBPF system call monitoring|Behavioral baseline deviations",
         "speed": "<50ms per event"
       },
       "tier2": {
@@ -4861,7 +4861,7 @@
         },
         {
           "name": "panguard-rules",
-          "desc": "3,760 Sigma detection rules + 5,961 YARA malware signatures",
+          "desc": "4,353 Sigma detection rules + 6,015 YARA malware signatures",
           "lang": "YAML / Sigma",
           "stars": "Community"
         },
@@ -4909,7 +4909,7 @@
         "items": [
           "Core platform (Scan + Guard + Chat + Skill Auditor)",
           "Threat Cloud v1",
-          "3,760 Sigma + 5,961 YARA rules",
+          "4,353 Sigma + 6,015 YARA rules",
           "3,490 automated tests"
         ]
       },
