@@ -858,7 +858,7 @@
         "overline": "部署前",
         "title": "Skill Auditor",
         "desc": "靜態分析引擎，在 MCP Skill 和 AI Agent 工具執行前進行安全掃描。偵測 Prompt 注入、憑證竊取、資料外洩等 9 大威脅類別，基於 ATR 模式比對。",
-        "f1": "52 條 ATR 規則，涵蓋 450+ 偵測模式、9 大類別",
+        "f1": "61 條 ATR 規則，涵蓋 450+ 偵測模式、9 大類別",
         "f2": "機密偵測：AWS Key、GitHub Token、SSH 私鑰、API 密鑰",
         "f3": "YAML Manifest 驗證 + 權限範圍分析",
         "s1": "ATR 規則",
@@ -1872,7 +1872,7 @@
       "capabilities": "核心能力",
       "cta": {
         "title": "準備好守護你的 AI Agent 了嗎？",
-        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。52+ 條 ATR 規則 + 9,700+ 偵測規則。免費開始。",
+        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。61 條 ATR 規則 + 9,700+ 偵測規則。免費開始。",
         "cta1": "立即開始",
         "cta2": "在 GitHub 上查看 ATR"
       }
@@ -5430,7 +5430,7 @@
     },
     "categories": {
       "overline": "規則分類",
-      "title": "9 大類別。52 條規則。持續增長中。",
+      "title": "9 大類別。61 條規則。持續增長中。",
       "subtitle": "涵蓋 AI Agent 攻擊向量的完整光譜，對應 OWASP LLM Top 10。",
       "items": {
         "prompt-injection": {

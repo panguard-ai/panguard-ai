@@ -858,7 +858,7 @@
         "overline": "PRE-DEPLOYMENT",
         "title": "Skill Auditor",
         "desc": "Static analysis engine that scans MCP skills and AI agent tools before they run. Detects prompt injection, credential theft, data exfiltration, and 6 more threat categories using ATR pattern matching.",
-        "f1": "52 ATR rules with 450+ detection patterns across 9 categories",
+        "f1": "61 ATR rules with 450+ detection patterns across 9 categories",
         "f2": "Secret detection: AWS keys, GitHub tokens, private keys, API secrets",
         "f3": "YAML manifest validation + permission scope analysis",
         "s1": "ATR Rules",
@@ -1051,7 +1051,7 @@
       "capabilities": "Key Capabilities",
       "cta": {
         "title": "Ready to secure your AI agents?",
-        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 52+ ATR rules + 9,700+ detection rules. Free to start.",
+        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 61 ATR rules + 9,700+ detection rules. Free to start.",
         "cta1": "Get Started",
         "cta2": "View ATR on GitHub"
       }
@@ -5403,7 +5403,7 @@
     },
     "categories": {
       "overline": "RULE CATEGORIES",
-      "title": "9 categories. 52 rules. Growing daily.",
+      "title": "9 categories. 61 rules. Growing daily.",
       "subtitle": "Covering the full spectrum of AI agent attack vectors, mapped to OWASP LLM Top 10.",
       "items": {
         "prompt-injection": {
