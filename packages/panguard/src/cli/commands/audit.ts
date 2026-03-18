@@ -60,6 +60,10 @@ export function auditCommand(): Command {
 
         const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
 
+        // ── Tier 1: Blacklist pre-check from Threat Cloud ──
+        let isBlacklisted = false;
+        let blacklistReason = '';
+
         // ── Fetch cloud rules from Threat Cloud (flywheel: community rules enhance audits) ──
         type CloudATRRule = {
           id: string;
@@ -76,6 +80,37 @@ export function auditCommand(): Command {
               '.panguard-guard'
             );
             const tc = new ThreatCloudClient(options.tcEndpoint, dataDir);
+
+            // Tier 1: Check blacklist before running full audit
+            const skillHash = computeSkillHash(resolvedPath);
+            const skillName =
+              path.basename(resolvedPath) === 'SKILL.md'
+                ? path.basename(path.dirname(resolvedPath))
+                : path.basename(resolvedPath);
+            try {
+              const blacklist = await tc.fetchSkillBlacklist();
+              const match = blacklist.find(
+                (b) => b.skillHash === skillHash || b.skillName.toLowerCase() === skillName.toLowerCase()
+              );
+              if (match) {
+                isBlacklisted = true;
+                blacklistReason = `Known malicious skill (${match.reportCount} community reports, avg risk: ${match.avgRiskScore})`;
+                if (!options.json) {
+                  console.log();
+                  console.log(
+                    `  ${c.red(symbols.fail)} ${c.bold(c.red('BLOCKED:'))} ${c.red(blacklistReason)}`
+                  );
+                  console.log(
+                    `  ${c.dim(`Skill: ${skillName} | Hash: ${skillHash.slice(0, 12)}...`)}`
+                  );
+                  console.log();
+                }
+              }
+            } catch {
+              // Blacklist fetch is best-effort
+            }
+
+            // Fetch community ATR rules
             const atrUpdates = await tc.fetchATRRules();
             for (const update of atrUpdates) {
               try {
@@ -89,14 +124,28 @@ export function auditCommand(): Command {
             }
             if (cloudRules.length > 0 && !options.json) {
               console.log(c.dim(`  Threat Cloud: ${cloudRules.length} community rule(s) loaded`));
-              console.log();
+              if (!isBlacklisted) console.log();
             }
           } catch {
             // Threat Cloud fetch is best-effort — never block the audit
           }
         }
 
+        // If blacklisted, still run audit for telemetry but override risk level
         const report = await auditSkill(resolvedPath, { cloudRules });
+
+        // Override risk level if blacklisted
+        if (isBlacklisted) {
+          report.riskLevel = 'CRITICAL';
+          report.riskScore = Math.max(report.riskScore, 100);
+          report.findings.unshift({
+            id: 'BLACKLIST-001',
+            category: 'code',
+            severity: 'critical',
+            title: blacklistReason,
+            description: blacklistReason,
+          } as typeof report.findings[0]);
+        }
 
         if (options.json) {
           console.log(JSON.stringify(report, null, 2));
