@@ -25,7 +25,7 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '0.5.3',
+  cliVersion: '1.0.0',
   sigmaRules: 4_353,
   yaraRules: 6_015,
   atrRules: 125,
