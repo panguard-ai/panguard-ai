@@ -182,17 +182,44 @@ export async function commandScan(args: string[]): Promise<void> {
     const skillDir = mcpConfig.resolveSkillDir(entry);
 
     if (!skillDir) {
-      results.push({
-        name: entry.name,
-        platform: platformId,
-        riskScore: 0,
-        riskLevel: 'LOW',
-        findings: [],
-        status: 'skipped',
-        skipReason: 'Could not resolve skill directory',
-      });
-      if (verbose && !jsonOutput) {
-        console.log(`  ${symbols.warn} ${c.dim(entry.name)} — skipped (dir not found)`);
+      // npx packages: can't resolve dir, do a lightweight npm-based check
+      const pkgName = extractPackageName(entry);
+      if (pkgName) {
+        const npmResult = await quickNpmAudit(pkgName, verbose && !jsonOutput);
+        results.push({
+          name: entry.name,
+          platform: platformId,
+          riskScore: npmResult.riskScore,
+          riskLevel: npmResult.riskLevel,
+          findings: npmResult.findings,
+          status: 'audited',
+        });
+        if (!jsonOutput) {
+          const icon = npmResult.riskLevel === 'CRITICAL' || npmResult.riskLevel === 'HIGH'
+            ? symbols.fail
+            : npmResult.riskLevel === 'MEDIUM'
+              ? symbols.warn
+              : symbols.pass;
+          const color = npmResult.riskLevel === 'CRITICAL' || npmResult.riskLevel === 'HIGH'
+            ? c.bold
+            : npmResult.riskLevel === 'MEDIUM'
+              ? c.sage
+              : c.dim;
+          console.log(`  ${icon} ${color(entry.name)} ${c.dim(`(${platformId}, npm)`)} — ${color(npmResult.riskLevel)} ${c.dim(`[${npmResult.riskScore}]`)} ${npmResult.findings.length > 0 ? c.dim(`(${npmResult.findings.length} finding${npmResult.findings.length > 1 ? 's' : ''})`) : ''}`);
+        }
+      } else {
+        results.push({
+          name: entry.name,
+          platform: platformId,
+          riskScore: 0,
+          riskLevel: 'LOW',
+          findings: [],
+          status: 'skipped',
+          skipReason: 'Could not resolve skill directory or package name',
+        });
+        if (verbose && !jsonOutput) {
+          console.log(`  ${symbols.warn} ${c.dim(entry.name)} — skipped (dir not found)`);
+        }
       }
       continue;
     }
@@ -272,6 +299,112 @@ export async function commandScan(args: string[]): Promise<void> {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/** Extract npm package name from an MCP server entry */
+function extractPackageName(entry: MCPServerEntry): string | null {
+  if (entry.command === 'npx') {
+    const pkgArg = entry.args.find((a) => !a.startsWith('-'));
+    if (pkgArg) return pkgArg;
+  }
+  return null;
+}
+
+/** Quick audit via `npm view` for packages we can't resolve locally */
+async function quickNpmAudit(
+  pkgName: string,
+  verbose: boolean
+): Promise<{
+  riskScore: number;
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  findings: ScanFinding[];
+}> {
+  const findings: ScanFinding[] = [];
+  let riskScore = 0;
+
+  try {
+    const { execSync } = await import('node:child_process');
+    const raw = execSync(`npm view ${pkgName} --json 2>/dev/null`, {
+      encoding: 'utf-8',
+      timeout: 10000,
+    });
+    const meta = JSON.parse(raw) as Record<string, unknown>;
+
+    // Check for postinstall scripts (common attack vector)
+    const scripts = meta['scripts'] as Record<string, string> | undefined;
+    if (scripts) {
+      for (const hook of ['postinstall', 'preinstall', 'install', 'prepare']) {
+        if (scripts[hook]) {
+          findings.push({
+            id: `npm-lifecycle-${hook}`,
+            title: `Has ${hook} script: ${String(scripts[hook]).slice(0, 80)}`,
+            severity: hook === 'postinstall' || hook === 'preinstall' ? 'high' : 'medium',
+            category: 'skill-compromise',
+          });
+          riskScore += hook === 'postinstall' ? 30 : 15;
+        }
+      }
+    }
+
+    // Check dependencies count (many deps = larger attack surface)
+    const deps = meta['dependencies'] as Record<string, string> | undefined;
+    const depCount = deps ? Object.keys(deps).length : 0;
+    if (depCount > 30) {
+      findings.push({
+        id: 'npm-large-deps',
+        title: `${depCount} dependencies (large attack surface)`,
+        severity: 'medium',
+        category: 'dependency',
+      });
+      riskScore += 10;
+    }
+
+    // Check if package is very new (published recently)
+    const time = meta['time'] as Record<string, string> | undefined;
+    if (time) {
+      const created = new Date(time['created'] ?? '');
+      const daysSinceCreation = (Date.now() - created.getTime()) / 86400000;
+      if (daysSinceCreation < 30) {
+        findings.push({
+          id: 'npm-new-package',
+          title: `Package created ${Math.round(daysSinceCreation)} days ago (new, less community review)`,
+          severity: 'low',
+          category: 'dependency',
+        });
+        riskScore += 5;
+      }
+    }
+
+    // Check description for suspicious keywords
+    const description = String(meta['description'] ?? '');
+    const suspiciousPatterns = [
+      { pattern: /reverse.?shell|bind.?shell/i, label: 'reverse shell', severity: 'critical' as const },
+      { pattern: /credential|password|secret.*exfil/i, label: 'credential access', severity: 'high' as const },
+      { pattern: /eval\(|exec\(/i, label: 'dynamic code execution', severity: 'medium' as const },
+    ];
+    for (const { pattern, label, severity } of suspiciousPatterns) {
+      if (pattern.test(description)) {
+        findings.push({
+          id: `npm-desc-${label.replace(/\s+/g, '-')}`,
+          title: `Package description mentions: ${label}`,
+          severity,
+          category: 'skill-compromise',
+        });
+        riskScore += severity === 'critical' ? 50 : severity === 'high' ? 30 : 10;
+      }
+    }
+  } catch {
+    // npm view failed — package might not exist or network issue
+    if (verbose) {
+      // logged upstream
+    }
+    return { riskScore: 0, riskLevel: 'LOW', findings: [] };
+  }
+
+  const riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' =
+    riskScore >= 70 ? 'CRITICAL' : riskScore >= 50 ? 'HIGH' : riskScore >= 20 ? 'MEDIUM' : 'LOW';
+
+  return { riskScore: Math.min(riskScore, 100), riskLevel, findings };
+}
 
 function getHighestRisk(results: ScanSkillResult[]): ScanReport['highestRisk'] {
   const levels = results.filter((r) => r.status === 'audited').map((r) => r.riskLevel);
