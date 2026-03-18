@@ -516,6 +516,56 @@ export class ThreatCloudDB {
     );
   }
 
+  /** Get report count and aggregated findings for a specific skill / 取得特定技能的報告數 */
+  getSkillThreatAggregation(skillName: string): {
+    reportCount: number;
+    avgRiskScore: number;
+    maxRiskLevel: string;
+    findings: string[];
+  } {
+    const row = this.db
+      .prepare(
+        `SELECT COUNT(*) as cnt, AVG(risk_score) as avg_score, MAX(risk_level) as max_level
+         FROM skill_threats WHERE skill_name = ?`
+      )
+      .get(skillName) as { cnt: number; avg_score: number; max_level: string } | undefined;
+
+    const findingRows = this.db
+      .prepare(
+        `SELECT finding_summaries FROM skill_threats
+         WHERE skill_name = ? AND finding_summaries IS NOT NULL
+         ORDER BY created_at DESC LIMIT 5`
+      )
+      .all(skillName) as Array<{ finding_summaries: string }>;
+
+    const findings: string[] = [];
+    for (const fr of findingRows) {
+      try {
+        const parsed = JSON.parse(fr.finding_summaries) as Array<{ title: string }>;
+        for (const f of parsed) {
+          if (f.title && !findings.includes(f.title)) {
+            findings.push(f.title);
+          }
+        }
+      } catch { /* skip invalid JSON */ }
+    }
+
+    return {
+      reportCount: row?.cnt ?? 0,
+      avgRiskScore: row?.avg_score ?? 0,
+      maxRiskLevel: row?.max_level ?? 'LOW',
+      findings: findings.slice(0, 10),
+    };
+  }
+
+  /** Check if an ATR proposal already exists for a pattern hash */
+  hasATRProposal(patternHash: string): boolean {
+    const row = this.db
+      .prepare('SELECT 1 FROM atr_proposals WHERE pattern_hash = ? LIMIT 1')
+      .get(patternHash) as Record<string, number> | undefined;
+    return row !== undefined;
+  }
+
   /** Get recent skill threats / 取得最近技能威脅 */
   getSkillThreats(limit: number = 50): unknown[] {
     return this.db
@@ -744,48 +794,65 @@ export class ThreatCloudDB {
       .run(type, value, reputation, source);
   }
 
-  /** Promote confirmed proposals with approved LLM review to rules / 推廣已確認提案為規則 */
+  /** Promote proposals to rules based on community consensus and/or LLM approval / 推廣提案為規則 */
   promoteConfirmedProposals(): number {
-    // Promote proposals that are either:
-    // 1. Community-confirmed (3+ confirmations) AND LLM approved
-    // 2. LLM approved (pending status) — single submission with LLM seal of approval
+    // Path 1: LLM approved (any status with approved verdict)
+    // Path 2: Community consensus (3+ confirmations, NO LLM required)
+    //   — This ensures the flywheel works even without ANTHROPIC_API_KEY
+    // Path 3: LLM approved + community confirmed (highest confidence)
     const proposals = this.db
       .prepare(
         `
-      SELECT pattern_hash, rule_content, llm_review_verdict
+      SELECT pattern_hash, rule_content, llm_review_verdict, confirmations, status
       FROM atr_proposals
-      WHERE llm_review_verdict IS NOT NULL
-        AND status IN ('confirmed', 'pending')
+      WHERE status IN ('confirmed', 'pending')
+        AND status != 'rejected'
+        AND (
+          -- Path 1: LLM approved
+          (llm_review_verdict IS NOT NULL AND llm_review_verdict LIKE '%"approved":true%')
+          OR
+          -- Path 2: Community consensus (3+ confirmations, even without LLM)
+          (confirmations >= 3)
+        )
     `
       )
-      .all() as Array<{ pattern_hash: string; rule_content: string; llm_review_verdict: string }>;
+      .all() as Array<{
+      pattern_hash: string;
+      rule_content: string;
+      llm_review_verdict: string | null;
+      confirmations: number;
+      status: string;
+    }>;
 
     let promoted = 0;
     for (const proposal of proposals) {
-      try {
-        const verdict = JSON.parse(proposal.llm_review_verdict) as { approved?: boolean };
-        if (verdict.approved !== true) continue;
-
-        this.upsertRule({
-          ruleId: proposal.pattern_hash,
-          ruleContent: proposal.rule_content,
-          publishedAt: new Date().toISOString(),
-          source: 'atr-community',
-        });
-
-        this.db
-          .prepare(
-            `
-          UPDATE atr_proposals SET status = 'promoted', updated_at = datetime('now')
-          WHERE pattern_hash = ?
-        `
-          )
-          .run(proposal.pattern_hash);
-
-        promoted++;
-      } catch {
-        // Skip proposals with unparseable verdicts
+      // If LLM reviewed, check it's approved (don't promote LLM-rejected proposals)
+      if (proposal.llm_review_verdict) {
+        try {
+          const verdict = JSON.parse(proposal.llm_review_verdict) as { approved?: boolean };
+          if (verdict.approved === false) continue;
+        } catch {
+          // Unparseable verdict — allow community consensus to override
+        }
       }
+
+      this.upsertRule({
+        ruleId: proposal.pattern_hash,
+        ruleContent: proposal.rule_content,
+        publishedAt: new Date().toISOString(),
+        source: 'atr-community',
+      });
+
+      this.db
+        .prepare(
+          `
+        UPDATE atr_proposals SET status = 'promoted', updated_at = datetime('now')
+        WHERE pattern_hash = ?
+      `
+        )
+        .run(proposal.pattern_hash);
+
+      promoted++;
     }
 
     return promoted;

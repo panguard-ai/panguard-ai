@@ -238,6 +238,22 @@ export function getSkillThreatSubmitter(
 }
 
 /**
+ * Get an ATR proposal submitter function for SkillWatcher flywheel integration.
+ * Bridges skill audit findings into the ATR rule generation pipeline.
+ */
+export function getATRProposalSubmitter(
+  threatCloud: ThreatCloudClient
+): (proposal: {
+  patternHash: string;
+  ruleContent: string;
+  llmProvider: string;
+  llmModel: string;
+  selfReviewVerdict: string;
+}) => Promise<boolean> {
+  return (proposal) => threatCloud.submitATRProposal(proposal);
+}
+
+/**
  * Get a skill blacklist checker function for SkillWatcher integration.
  * Checks if a skill name appears in the community blacklist from Threat Cloud.
  * Uses a 5-minute in-memory cache to avoid hitting TC on every check.

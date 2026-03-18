@@ -52,6 +52,7 @@ import {
   syncThreatCloud,
   setupCloudSyncTimer,
   getSkillThreatSubmitter as _getSkillThreatSubmitter,
+  getATRProposalSubmitter as _getATRProposalSubmitter,
   getSkillBlacklistChecker as _getSkillBlacklistChecker,
 } from './rule-sync.js';
 import { processEvent as _processEvent } from './event-processor.js';
@@ -625,6 +626,19 @@ export class GuardEngine {
     findingSummaries?: Array<{ id: string; category: string; severity: string; title: string }>;
   }) => Promise<boolean> {
     return _getSkillThreatSubmitter(this.engines.threatCloud);
+  }
+
+  /**
+   * Get an ATR proposal submitter function for SkillWatcher flywheel integration.
+   */
+  getATRProposalSubmitter(): (proposal: {
+    patternHash: string;
+    ruleContent: string;
+    llmProvider: string;
+    llmModel: string;
+    selfReviewVerdict: string;
+  }) => Promise<boolean> {
+    return _getATRProposalSubmitter(this.engines.threatCloud);
   }
 
   /**

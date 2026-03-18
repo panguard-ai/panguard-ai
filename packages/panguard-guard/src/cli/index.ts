@@ -21,6 +21,8 @@ import {
   spinner,
   setLogLevel,
   promptConfirm,
+  promptSelect,
+  promptText,
 } from '@panguard-ai/core';
 import type { StatusItem } from '@panguard-ai/core';
 import { GuardEngine } from '../guard-engine.js';
@@ -99,6 +101,9 @@ export async function runCLI(args: string[]): Promise<void> {
       console.log(script);
       break;
     }
+    case 'setup-ai':
+      await commandSetupAI(dataDir);
+      break;
     case 'help':
     default:
       printHelp();
@@ -237,6 +242,7 @@ async function commandStart(
   const skillWatcher = new SkillWatcher({
     pollInterval: 10_000,
     submitThreat: engine.getSkillThreatSubmitter(),
+    submitATRProposal: engine.getATRProposalSubmitter(),
   });
 
   skillWatcher.on('skill-added', (change: { name: string; platformId: string }) => {
@@ -494,6 +500,139 @@ function printAiSetupGuide(): void {
   console.log(
     `  ${c.dim(`\u57F7\u884C "panguard guard setup-ai" \u9032\u884C\u4E92\u52D5\u5F0F\u8A2D\u5B9A`)}`
   );
+  console.log('');
+}
+
+/** Interactive AI setup wizard / 互動式 AI 設定精靈 */
+async function commandSetupAI(dataDir: string): Promise<void> {
+  const lang = 'en' as const;
+  const l = (en: string, zh: string) => ({ en, 'zh-TW': zh });
+
+  console.log(header());
+  console.log('');
+  console.log(`  ${c.sage('AI Detection Layer Setup')}`);
+  console.log(`  ${c.dim(divider())}`);
+  console.log('');
+
+  const provider = await promptSelect<'ollama' | 'claude' | 'openai' | 'skip'>({
+    title: l('Select AI provider', '\u9078\u64C7 AI \u63D0\u4F9B\u8005'),
+    lang,
+    options: [
+      { value: 'ollama' as const, label: l('Ollama (local, free, private)', 'Ollama (\u672C\u5730\u514D\u8CBB)') },
+      { value: 'claude' as const, label: l('Claude API (most accurate)', 'Claude API (\u6700\u6E96\u78BA)') },
+      { value: 'openai' as const, label: l('OpenAI API', 'OpenAI API') },
+      { value: 'skip' as const, label: l('Skip for now', '\u7A0D\u5F8C\u8A2D\u5B9A') },
+    ],
+  });
+
+  if (!provider || provider === 'skip') {
+    console.log(`\n  ${symbols.info} Skipped. Guard will use regex-only detection (Layer 1).`);
+    console.log(`  ${c.dim('Re-run "panguard-guard setup-ai" anytime to enable AI.')}`);
+    return;
+  }
+
+  let model = '';
+  let apiKey = '';
+  let endpoint = '';
+
+  if (provider === 'ollama') {
+    console.log('');
+    console.log(`  ${symbols.info} Ollama runs locally -- no API key needed.`);
+    console.log(`  ${c.dim('Make sure Ollama is installed: curl -fsSL https://ollama.com/install.sh | sh')}`);
+    console.log('');
+
+    const modelChoice = await promptSelect<string>({
+      title: l('Select model', '\u9078\u64C7\u6A21\u578B'),
+      lang,
+      options: [
+        { value: 'llama3.2', label: l('Llama 3.2 (recommended, 3B)', 'Llama 3.2 (\u63A8\u85A6)') },
+        { value: 'llama3.1', label: l('Llama 3.1 (8B, more accurate)', 'Llama 3.1 (\u66F4\u6E96\u78BA)') },
+        { value: 'mistral', label: l('Mistral 7B', 'Mistral 7B') },
+        { value: 'custom', label: l('Custom model', '\u81EA\u8A02\u6A21\u578B') },
+      ],
+    });
+
+    if (modelChoice === 'custom') {
+      const custom = await promptText({
+        title: l('Model name', '\u6A21\u578B\u540D\u7A31'),
+        placeholder: 'llama3.2',
+        lang,
+      });
+      model = custom ?? 'llama3.2';
+    } else {
+      model = modelChoice ?? 'llama3.2';
+    }
+
+    endpoint = 'http://127.0.0.1:11434';
+  } else {
+    // Claude or OpenAI
+    const keyName = provider === 'claude' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY';
+    const consolUrl = provider === 'claude'
+      ? 'https://console.anthropic.com/'
+      : 'https://platform.openai.com/api-keys';
+
+    console.log('');
+    console.log(`  ${symbols.info} Get your API key from: ${c.dim(consolUrl)}`);
+    console.log('');
+
+    const inputKey = await promptText({
+      title: l(`API Key (${keyName})`, `API Key (${keyName})`),
+      placeholder: provider === 'claude' ? 'sk-ant-...' : 'sk-...',
+      sensitive: true,
+      lang,
+    });
+
+    if (!inputKey || inputKey.trim().length < 10) {
+      console.log(`\n  ${symbols.fail} Invalid API key. Setup cancelled.`);
+      return;
+    }
+
+    apiKey = inputKey.trim();
+    model = provider === 'claude' ? 'claude-sonnet-4-20250514' : 'gpt-4o-mini';
+  }
+
+  // Save config
+  const { existsSync, writeFileSync, mkdirSync } = await import('node:fs');
+  const configDir = join(homedir(), '.panguard');
+  if (!existsSync(configDir)) {
+    mkdirSync(configDir, { recursive: true });
+  }
+
+  // Read existing master config or create new
+  const masterPath = join(configDir, 'config.json');
+  let masterConfig: Record<string, unknown> = {};
+  if (existsSync(masterPath)) {
+    try {
+      const { readFileSync } = await import('node:fs');
+      masterConfig = JSON.parse(readFileSync(masterPath, 'utf-8')) as Record<string, unknown>;
+    } catch { /* start fresh */ }
+  }
+
+  const aiConfig: Record<string, string> = { provider, model };
+  if (apiKey) aiConfig['apiKey'] = apiKey;
+  if (endpoint) aiConfig['endpoint'] = endpoint;
+
+  masterConfig['ai'] = aiConfig;
+  writeFileSync(masterPath, JSON.stringify(masterConfig, null, 2) + '\n');
+
+  // Also set env var for current session
+  if (apiKey && provider === 'claude') {
+    process.env['PANGUARD_AI_KEY'] = apiKey;
+  }
+
+  console.log('');
+  console.log(`  ${symbols.pass} AI configured: ${c.sage(provider)} / ${c.sage(model)}`);
+  console.log(`  ${c.dim(`Config saved to ${masterPath}`)}`);
+  console.log('');
+
+  if (provider === 'ollama') {
+    console.log(`  ${symbols.info} Next: pull the model if you haven't:`);
+    console.log(`    ${c.dim(`ollama pull ${model}`)}`);
+    console.log('');
+  }
+
+  console.log(`  ${symbols.info} Restart Guard to activate AI detection:`);
+  console.log(`    ${c.dim('panguard-guard start')}`);
   console.log('');
 }
 

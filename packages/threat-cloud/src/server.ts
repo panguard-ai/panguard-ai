@@ -91,8 +91,8 @@ export class ThreatCloudServer {
   private rateLimitCleanupTimer: ReturnType<typeof setInterval> | null = null;
   private statsCache: { data: unknown; expiresAt: number } | null = null;
 
-  /** Promotion interval: 15 minutes / 推廣間隔：15 分鐘 */
-  private static readonly PROMOTION_INTERVAL_MS = 15 * 60 * 1000;
+  /** Promotion interval: 2 minutes / 推廣間隔：2 分鐘 */
+  private static readonly PROMOTION_INTERVAL_MS = 2 * 60 * 1000;
   /** Stats cache TTL: 60 seconds */
   private static readonly STATS_CACHE_TTL_MS = 60_000;
 
@@ -688,7 +688,111 @@ export class ThreatCloudServer {
       clientIP
     );
 
+    // Flywheel bridge: auto-generate ATR proposal when a skill accumulates
+    // 3+ independent reports with HIGH/CRITICAL risk
+    void this.maybeGenerateATRFromSkillThreats(submission.skillName).catch((err) => {
+      log.error(
+        `Flywheel bridge failed for ${submission.skillName}: ${err instanceof Error ? err.message : String(err)}`
+      );
+    });
+
     this.sendJson(res, 201, { ok: true, data: { message: 'Skill threat received' } });
+  }
+
+  /**
+   * Bridge skill_threats → atr_proposals when consensus is reached.
+   * When 3+ independent reports exist for a skill with HIGH/CRITICAL risk,
+   * auto-scaffold an ATR proposal from the aggregated findings.
+   */
+  private async maybeGenerateATRFromSkillThreats(skillName: string): Promise<void> {
+    const agg = this.db.getSkillThreatAggregation(skillName);
+
+    // Need 3+ reports and HIGH/CRITICAL consensus
+    if (agg.reportCount < 3) return;
+    if (agg.maxRiskLevel !== 'HIGH' && agg.maxRiskLevel !== 'CRITICAL') return;
+    if (agg.findings.length === 0) return;
+
+    // Check if we already generated a proposal for this skill
+    const { createHash } = await import('node:crypto');
+    const patternHash = createHash('sha256')
+      .update(`tc-bridge:${skillName}:${agg.findings.join(';')}`)
+      .digest('hex')
+      .slice(0, 16);
+
+    if (this.db.hasATRProposal(patternHash)) return;
+
+    // If LLM reviewer is available, use it for high-quality rule generation
+    if (this.llmReviewer?.isAvailable()) {
+      // Build a synthetic tool description from aggregated findings
+      const toolDescriptions = agg.findings.map((f, i) => ({
+        name: `finding_${i}`,
+        description: f,
+      }));
+
+      log.info(
+        `Flywheel bridge: generating ATR proposal for ${skillName} (${agg.reportCount} reports) / ` +
+          `飛輪橋接: 為 ${skillName} 產生 ATR 提案 (${agg.reportCount} 個報告)`
+      );
+
+      void this.llmReviewer
+        .analyzeSkills([{ package: skillName, tools: toolDescriptions }])
+        .catch((err) => {
+          log.error(
+            `LLM analysis for skill bridge failed: ${err instanceof Error ? err.message : String(err)}`
+          );
+        });
+    } else {
+      // No LLM available — scaffold a basic pattern-based proposal
+      const severity = agg.maxRiskLevel === 'CRITICAL' ? 'critical' : 'high';
+      const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
+      const findingSummary = agg.findings.slice(0, 5).join('; ');
+
+      const ruleContent = `title: "Community Consensus: ${agg.findings[0]?.slice(0, 60) ?? skillName}"
+id: ATR-2026-DRAFT-${patternHash.slice(0, 8)}
+status: draft
+description: |
+  Auto-generated from ${agg.reportCount} independent threat reports for skill "${skillName}".
+  Avg risk score: ${Math.round(agg.avgRiskScore)}.
+  Findings: ${findingSummary.slice(0, 300)}
+author: "Threat Cloud Auto-Bridge"
+date: "${date}"
+schema_version: "0.1"
+detection_tier: community
+maturity: experimental
+severity: ${severity}
+tags:
+  category: skill-compromise
+  subcategory: community-consensus
+  confidence: high
+detection:
+  conditions:
+    - field: skill_manifest
+      operator: contains
+      value: "${skillName}"
+      description: "Skill reported by ${agg.reportCount} independent sources"
+  condition: any
+response:
+  actions: [alert, snapshot]`;
+
+      this.db.insertATRProposal({
+        patternHash,
+        ruleContent,
+        llmProvider: 'community-bridge',
+        llmModel: 'aggregation',
+        selfReviewVerdict: JSON.stringify({
+          approved: true,
+          source: 'skill-threat-bridge',
+          skillName,
+          reportCount: agg.reportCount,
+          avgRiskScore: Math.round(agg.avgRiskScore),
+        }),
+      });
+
+      log.info(
+        `Flywheel bridge: basic ATR proposal created for ${skillName} (${agg.reportCount} reports) / ` +
+          `飛輪橋接: 基礎 ATR 提案已建立 ${skillName}`
+      );
+    }
   }
 
   /** GET /api/atr-rules?since=<ISO> - Fetch confirmed/promoted ATR rules */
