@@ -1,0 +1,13 @@
+[phases.setup]
+aptPkgs = ["libatomic1"]
+
+[phases.build]
+cmds = [
+  "sed -i 's/\"workspace:\\*\"/\"*\"/g' package.json",
+  "npm install",
+  "rm -rf dist tsconfig.tsbuildinfo",
+  "npx tsc --build --force"
+]
+
+[start]
+cmd = "node dist/cli.js"
