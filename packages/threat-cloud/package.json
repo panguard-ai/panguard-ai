@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/threat-cloud",
-  "version": "0.5.3",
+  "version": "1.0.0",
   "type": "module",
   "description": "Threat Cloud backend API for collective threat intelligence / 威脅雲後端 API",
   "license": "MIT",
@@ -31,7 +31,7 @@
     "start": "node dist/cli.js"
   },
   "dependencies": {
-    "@panguard-ai/core": ">=0.5.0",
+    "@panguard-ai/core": "workspace:*",
     "better-sqlite3": "^11.0.0",
     "zod": "^3.24.0"
   },
