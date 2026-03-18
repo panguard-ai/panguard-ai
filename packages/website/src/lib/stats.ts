@@ -28,14 +28,14 @@ export const STATS = {
   cliVersion: '0.5.0',
   sigmaRules: 4_352,
   yaraRules: 6_015,
-  atrRules: 52,
-  /** Total unique detection patterns across all 52 ATR rules */
-  atrPatterns: 450,
-  totalRules: 4_352 + 6_015 + 52,
+  atrRules: 61,
+  /** Total unique detection patterns across all 61 ATR rules */
+  atrPatterns: 500,
+  totalRules: 4_352 + 6_015 + 61,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
   totalRulesDisplay: '10,400+' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '52+' as const,
+  atrRulesDisplay: '61' as const,
   integratedRulesDisplay: '10,400+' as const,
   falcoConfigs: 1,
   testsPassing: 3_490,

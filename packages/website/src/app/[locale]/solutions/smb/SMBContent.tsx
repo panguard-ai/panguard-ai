@@ -53,16 +53,16 @@ export default function SMBContent() {
             <FadeInUp delay={0.3}>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href="/demo"
+                  href="/docs/getting-started"
                   className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
                 >
-                  Request a Demo
+                  Install Free
                 </Link>
                 <Link
-                  href="/pricing"
+                  href="/docs/getting-started"
                   className="border border-border text-text-secondary font-semibold text-sm rounded-full px-8 py-3.5 hover:border-brand-sage hover:text-text-primary transition-all duration-200"
                 >
-                  View Pricing
+                  Get Started Free
                 </Link>
               </div>
             </FadeInUp>
@@ -120,7 +120,7 @@ export default function SMBContent() {
           </div>
         </section>
 
-        {/* Pricing Context */}
+        {/* Open Source */}
         <section className="px-6 lg:px-[120px] py-16 border-t border-border bg-surface-1">
           <FadeInUp>
             <div className="max-w-3xl mx-auto text-center">
@@ -128,12 +128,12 @@ export default function SMBContent() {
               <p className="text-text-secondary mb-8">{t('pricing.subtitle')}</p>
               <div className="bg-surface-0 rounded-2xl p-8 border border-brand-sage card-glow max-w-sm mx-auto text-center">
                 <p className="text-xs uppercase tracking-wider text-brand-sage font-semibold mb-2">
-                  Team Plan
+                  Open Source
                 </p>
                 <p className="text-3xl font-extrabold text-text-primary">
-                  $14<span className="text-sm text-text-tertiary font-normal">/endpoint/mo</span>
+                  Free
                 </p>
-                <p className="text-sm text-text-tertiary mt-2">{t('pricing.teamPlanDesc')}</p>
+                <p className="text-sm text-text-tertiary mt-2">100% open source, no hidden costs</p>
                 <ul className="mt-4 space-y-1.5 text-left inline-block">
                   {teamFeatures.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-xs text-text-secondary">
@@ -144,10 +144,10 @@ export default function SMBContent() {
                 </ul>
               </div>
               <Link
-                href="/pricing"
+                href="/docs/getting-started"
                 className="inline-flex items-center gap-1 text-sm text-brand-sage hover:text-brand-sage-light font-medium mt-6"
               >
-                See all plans <ArrowRight className="w-3.5 h-3.5" />
+                Get started <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </FadeInUp>
