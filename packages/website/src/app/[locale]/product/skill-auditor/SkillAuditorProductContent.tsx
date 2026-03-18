@@ -46,7 +46,7 @@ function CodeBlock({ code, title }: { code: string; title?: string }) {
           {title}
         </div>
       )}
-      <pre className="p-3 sm:p-4 font-mono text-[11px] sm:text-sm text-gray-300 overflow-x-auto whitespace-pre leading-relaxed">
+      <pre className="p-3 sm:p-4 font-mono text-[11px] sm:text-sm text-green-100 overflow-x-auto whitespace-pre leading-relaxed">
         {code}
       </pre>
       <button
@@ -515,7 +515,7 @@ Run with --json for machine-readable output.`}
                         </div>
                       </div>
                     </div>
-                    <div className="bg-[#111] rounded-lg p-3 font-mono text-xs text-gray-400 leading-relaxed flex-1">
+                    <div className="bg-[#111] rounded-lg p-3 font-mono text-xs text-green-100 leading-relaxed flex-1">
                       {workflowSteps[i].map((s, j) => (
                         <div
                           key={j}

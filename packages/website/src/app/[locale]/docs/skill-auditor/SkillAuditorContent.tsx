@@ -21,7 +21,7 @@ function CodeBlock({ code, title }: { code: string; title?: string }) {
           {title}
         </div>
       )}
-      <pre className="p-4 font-mono text-sm text-gray-300 overflow-x-auto whitespace-pre">
+      <pre className="p-4 font-mono text-sm text-green-100 overflow-x-auto whitespace-pre">
         {code}
       </pre>
       <button

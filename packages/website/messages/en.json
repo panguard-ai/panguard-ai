@@ -5666,7 +5666,7 @@
       "subtitle": "ATR follows the same playbook that made Sigma and YARA industry standards -- open governance, community contributions, and vendor-neutral design.",
       "stats": [
         {
-          "value": "52",
+          "value": "61",
           "label": "Detection rules"
         },
         {
