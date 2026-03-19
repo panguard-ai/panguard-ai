@@ -45,7 +45,7 @@ export default function GuardDocsContent() {
         {/* Header */}
         <FadeInUp>
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-panguard-green/70 font-semibold mb-4">
-            <Link href="/docs" className="hover:text-panguard-green transition-colors">
+            <Link href="https://docs.panguard.ai" className="hover:text-panguard-green transition-colors">
               Docs
             </Link>
             <span>/</span>
@@ -527,7 +527,7 @@ panguard guard config set auto_response true`}
           </div>
           <p className="text-sm text-text-secondary mt-4">
             For Falco and Suricata setup instructions, see the{' '}
-            <Link href="/docs/advanced-setup" className="text-panguard-green hover:underline">
+            <Link href="https://docs.panguard.ai/installation" className="text-panguard-green hover:underline">
               Advanced Setup Guide
             </Link>
             .
@@ -545,7 +545,7 @@ panguard guard config set auto_response true`}
             <CodeBlock code="panguard guard start" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-6 py-2.5 text-sm hover:bg-panguard-green-light transition-all"
               >
                 Full Setup Guide

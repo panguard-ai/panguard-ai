@@ -177,7 +177,7 @@ export default function DocsContent() {
                 {t('contactSupport')}
               </Link>
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="border border-border text-text-secondary rounded-full px-6 py-2.5 text-sm font-medium hover:text-text-primary hover:border-text-muted transition-colors"
               >
                 {t('earlyAccess')}

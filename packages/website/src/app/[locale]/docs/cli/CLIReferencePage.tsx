@@ -186,7 +186,7 @@ export default function CLIReferencePage() {
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
             <Link
-              href="/docs"
+              href="https://docs.panguard.ai"
               className="text-sm text-text-muted hover:text-brand-sage transition-colors"
             >
               {t('cli.backToDocs')}
@@ -259,7 +259,7 @@ export default function CLIReferencePage() {
                 {t('cli.contactSupport')}
               </Link>
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="border border-border text-text-secondary rounded-full px-6 py-2.5 text-sm font-medium hover:text-text-primary hover:border-text-muted transition-colors"
               >
                 {t('cli.gettingStarted')}

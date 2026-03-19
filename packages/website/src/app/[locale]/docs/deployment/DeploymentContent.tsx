@@ -50,7 +50,7 @@ export default function DeploymentContent() {
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
             <Link
-              href="/docs"
+              href="https://docs.panguard.ai"
               className="text-sm text-text-muted hover:text-brand-sage transition-colors"
             >
               {t('backToDocs')}
@@ -163,13 +163,13 @@ panguard status`}
           <FadeInUp>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('backToGettingStarted')}
               </Link>
               <Link
-                href="/docs/advanced-setup"
+                href="https://docs.panguard.ai/installation"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('goToAdvancedSetup')}

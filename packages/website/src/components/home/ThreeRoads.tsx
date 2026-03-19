@@ -139,7 +139,7 @@ export default function ThreeRoads() {
           className="text-center mt-8"
         >
           <Link
-            href="/docs/getting-started"
+            href="https://docs.panguard.ai/quickstart"
             className="text-panguard-green hover:text-panguard-green-light text-sm font-medium transition-colors"
           >
             {t('cta')} &rarr;

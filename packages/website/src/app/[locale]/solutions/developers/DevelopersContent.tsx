@@ -50,7 +50,7 @@ export default function DevelopersContent() {
             <FadeInUp delay={0.3}>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href="/docs/getting-started"
+                  href="https://docs.panguard.ai/quickstart"
                   className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
                 >
                   Install Free
@@ -113,7 +113,7 @@ export default function DevelopersContent() {
                 <p className="text-sm text-text-tertiary mt-2">{t('pricing.freeScanDesc')}</p>
               </div>
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="inline-flex items-center gap-1 text-sm text-brand-sage hover:text-brand-sage-light font-medium mt-6"
               >
                 {t('pricing.seeAllPlans')} <ArrowRight className="w-3.5 h-3.5" />
@@ -151,7 +151,7 @@ export default function DevelopersContent() {
               <h2 className="text-2xl font-bold text-text-primary mb-3">{t('cta.title')}</h2>
               <p className="text-text-secondary mb-6">{t('cta.desc')}</p>
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
               >
                 Get Started

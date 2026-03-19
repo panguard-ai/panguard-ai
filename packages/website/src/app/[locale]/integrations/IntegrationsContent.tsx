@@ -274,7 +274,7 @@ export default function IntegrationsContent() {
                 ))}
               </ul>
               <Link
-                href="/docs"
+                href="https://docs.panguard.ai"
                 className="inline-flex items-center gap-2 mt-8 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
               >
                 View API Documentation <ArrowRight className="w-4 h-4" />
@@ -330,7 +330,7 @@ export default function IntegrationsContent() {
                 {t('requestIntegration')} <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/docs"
+                href="https://docs.panguard.ai"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('buildYourOwn')}

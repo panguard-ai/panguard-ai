@@ -102,7 +102,7 @@ export default function ChatDocsContent() {
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
             <div className="flex items-center gap-2 text-sm text-text-muted mb-4">
-              <Link href="/docs" className="hover:text-brand-sage transition-colors">
+              <Link href="https://docs.panguard.ai" className="hover:text-brand-sage transition-colors">
                 Docs
               </Link>
               <span>/</span>
@@ -336,13 +336,13 @@ panguard chat setup --channel email --type weekly`}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="bg-brand-sage text-surface-0 rounded-full px-8 py-3.5 font-semibold hover:bg-brand-sage-light transition-colors"
               >
                 Getting Started Guide
               </Link>
               <Link
-                href="/docs"
+                href="https://docs.panguard.ai"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 All Documentation
