@@ -57,7 +57,7 @@ export default function PricingCards() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-center w-full sm:w-auto"
               >
                 {t('ctaInstall')}

@@ -124,7 +124,7 @@ export default function BlacklistContent() {
             <ShieldOff className="w-10 h-10 text-red-400 mx-auto mb-4" />
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="inline-flex items-center justify-center gap-2 bg-panguard-green text-white font-semibold rounded-xl px-8 py-3.5 text-sm hover:bg-panguard-green-light transition-all duration-200 active:scale-[0.98]"
               >
                 {t('ctaInstall')} <ArrowRight className="w-4 h-4" />

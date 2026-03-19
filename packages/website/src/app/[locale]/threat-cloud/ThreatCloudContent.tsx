@@ -417,13 +417,13 @@ export default function ThreatCloudContent() {
           <FadeInUp delay={0.1}>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
               >
                 {t('cta.primary')} <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/docs/api"
+                href="https://docs.panguard.ai/api-reference"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('cta.secondary')}

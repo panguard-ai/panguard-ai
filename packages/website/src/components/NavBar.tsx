@@ -178,7 +178,7 @@ export default function NavBar() {
     { label: t('howItWorks'), href: '/how-it-works' },
     { label: t('threatCloud'), href: '/threat-cloud' },
     { label: t('atr'), href: '/atr' },
-    { label: t('docs'), href: '/docs' },
+    { label: t('docs'), href: 'https://docs.panguard.ai' },
     { label: t('about'), href: '/about' },
     { label: t('blog'), href: '/blog' },
   ];
@@ -232,7 +232,7 @@ export default function NavBar() {
             <Star className="w-3.5 h-3.5" /> GitHub
           </a>
           <Link
-            href="/docs/getting-started"
+            href="https://docs.panguard.ai/quickstart"
             className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-2.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
           >
             {t('install')}
@@ -318,7 +318,7 @@ export default function NavBar() {
 
             <div className="pt-4 border-t border-border space-y-3">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="block text-center bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-3"
                 onClick={() => setMobileOpen(false)}
               >

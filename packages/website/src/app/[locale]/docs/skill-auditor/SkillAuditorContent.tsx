@@ -73,7 +73,7 @@ export default function SkillAuditorContent() {
         {/* Header */}
         <FadeInUp>
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-panguard-green/70 font-semibold mb-4">
-            <Link href="/docs" className="hover:text-panguard-green transition-colors">
+            <Link href="https://docs.panguard.ai" className="hover:text-panguard-green transition-colors">
               {t('breadcrumbDocs')}
             </Link>
             <span>/</span>
@@ -387,7 +387,7 @@ VERDICT: DO NOT INSTALL - Critical security issues found`}
             <CodeBlock code="curl -fsSL https://get.panguard.ai | bash" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-6 py-2.5 text-sm hover:bg-panguard-green-light transition-all"
               >
                 {t('ctaFullSetup')}

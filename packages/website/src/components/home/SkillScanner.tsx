@@ -306,7 +306,7 @@ export default function SkillScanner() {
                     curl -fsSL https://get.panguard.ai | bash
                   </code>
                   <Link
-                    href="/docs/getting-started"
+                    href="https://docs.panguard.ai/quickstart"
                     className="inline-flex items-center gap-1 text-xs text-panguard-green hover:underline"
                   >
                     {t('learnMore')} <ArrowRight className="w-3 h-3" />

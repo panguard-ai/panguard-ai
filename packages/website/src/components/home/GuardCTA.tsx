@@ -67,7 +67,7 @@ export default function GuardCTA() {
 
         <FadeInUp delay={0.35} className="flex flex-wrap gap-3 justify-center mt-8">
           <Link
-            href="/docs/getting-started"
+            href="https://docs.panguard.ai/quickstart"
             className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-6 py-3.5 text-sm hover:bg-panguard-green-light transition-all duration-200 active:scale-[0.98]"
           >
             {t('installGuide')} <ArrowRight className="w-4 h-4" />

@@ -367,7 +367,7 @@ export default function ProductGuardContent() {
           <FadeInUp delay={0.1}>
             <div className="flex flex-wrap justify-center gap-3 mt-8">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
               >
                 {t('cta.cta1')} <ArrowRight className="w-4 h-4" />

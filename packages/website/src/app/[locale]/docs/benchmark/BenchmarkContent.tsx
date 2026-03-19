@@ -31,7 +31,7 @@ export default function BenchmarkContent() {
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
             <Link
-              href="/docs"
+              href="https://docs.panguard.ai"
               className="text-sm text-text-muted hover:text-brand-sage transition-colors"
             >
               {t('backToDocs')}
@@ -168,13 +168,13 @@ export default function BenchmarkContent() {
             <p className="text-text-secondary mb-8">{t('cta.subtitle')}</p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="bg-brand-sage text-surface-0 rounded-full px-8 py-3.5 text-sm font-medium hover:bg-brand-sage-light transition-colors"
               >
                 {t('cta.getStarted')}
               </Link>
               <Link
-                href="/docs"
+                href="https://docs.panguard.ai"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('cta.docs')}

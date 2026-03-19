@@ -204,7 +204,7 @@ export default function ATRContent() {
                 {t('cta.contribute')} <ArrowRight className="w-4 h-4" />
               </a>
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('cta.getStarted')}
@@ -685,7 +685,7 @@ export default function ATRContent() {
                 {t('cta.contribute')} <ArrowRight className="w-4 h-4" />
               </a>
               <Link
-                href="/docs/getting-started"
+                href="https://docs.panguard.ai/quickstart"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('cta.getStarted')}

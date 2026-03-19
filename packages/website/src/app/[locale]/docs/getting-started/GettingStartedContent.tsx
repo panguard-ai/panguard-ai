@@ -246,7 +246,7 @@ export default function GettingStartedContent() {
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
             <Link
-              href="/docs"
+              href="https://docs.panguard.ai"
               className="text-sm text-text-muted hover:text-brand-sage transition-colors"
             >
               {t('backToDocs')}
@@ -630,7 +630,7 @@ export default function GettingStartedContent() {
             <p className="text-xs text-text-muted mt-4 mb-4">{t('advancedHintEnv')}</p>
 
             <Link
-              href="/docs/advanced-setup"
+              href="https://docs.panguard.ai/installation"
               className="inline-flex items-center gap-1.5 text-sm text-brand-sage hover:text-brand-sage-light transition-colors font-medium"
             >
               {t('advancedHintLink')}
@@ -654,7 +654,7 @@ export default function GettingStartedContent() {
             <p className="text-sm text-text-secondary mt-4 mb-4">{t('multiEndpointAnsibleHint')}</p>
 
             <Link
-              href="/docs/deployment"
+              href="https://docs.panguard.ai/guides/docker-deployment"
               className="inline-flex items-center gap-1.5 text-sm text-brand-sage hover:text-brand-sage-light transition-colors font-medium"
             >
               {t('multiEndpointLink')}
@@ -671,7 +671,7 @@ export default function GettingStartedContent() {
             <p className="text-text-secondary mb-8">{t('nextDesc')}</p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/docs"
+                href="https://docs.panguard.ai"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('nextDocs')}
