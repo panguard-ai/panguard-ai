@@ -622,17 +622,26 @@ export class ThreatCloudServer {
 
     const clientId = (req.headers['x-panguard-client-id'] as string) ?? undefined;
 
-    // Check if a proposal with the same patternHash already exists
-    const proposals = this.db.getATRProposals() as Array<Record<string, unknown>>;
-    const existing = proposals.find((p) => p['pattern_hash'] === data.patternHash);
-
     const { patternHash, ruleContent } = data;
 
+    // Check if a proposal with the same patternHash already exists
+    const existing = this.db.getATRProposalByHash(patternHash);
+
     if (existing) {
+      // Same client_id: idempotent, no double-counting
+      if (clientId && existing.client_id === clientId) {
+        this.sendJson(res, 200, {
+          ok: true,
+          data: { message: 'Already submitted', patternHash, confirmations: existing.confirmations },
+        });
+        return;
+      }
+      // Different client_id: increment confirmation counter
       this.db.confirmATRProposal(patternHash);
+      const updatedConfirmations = existing.confirmations + 1;
       this.sendJson(res, 200, {
         ok: true,
-        data: { message: 'Proposal confirmed', patternHash },
+        data: { message: 'Proposal confirmed', patternHash, confirmations: updatedConfirmations },
       });
     } else {
       const proposal = {

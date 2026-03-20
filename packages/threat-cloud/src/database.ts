@@ -567,6 +567,13 @@ export class ThreatCloudDB {
     return row !== undefined;
   }
 
+  /** Get an ATR proposal by pattern_hash, returning client_id and confirmations */
+  getATRProposalByHash(patternHash: string): { client_id: string | null; confirmations: number } | undefined {
+    return this.db
+      .prepare('SELECT client_id, confirmations FROM atr_proposals WHERE pattern_hash = ? LIMIT 1')
+      .get(patternHash) as { client_id: string | null; confirmations: number } | undefined;
+  }
+
   /** Get recent skill threats / 取得最近技能威脅 */
   getSkillThreats(limit: number = 50): unknown[] {
     return this.db
