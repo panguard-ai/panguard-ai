@@ -54,8 +54,6 @@ panguard-ai/
 │   └── admin/                 # 靜態 Admin HTML
 ├── security-hardening/        # 安全強化模組
 ├── config/
-│   ├── sigma-rules/           # 3,760 Sigma 規則
-│   └── yara-rules/            # 5,961 YARA 規則
 ├── scripts/installer/         # 安裝腳本
 ├── docs/                      # 文件
 ├── .github/workflows/         # CI/CD (6 workflows)
@@ -72,7 +70,7 @@ Monitor Engine → DetectAgent → AnalyzeAgent → RespondAgent → ReportAgent
 SecurityEvent  DetectionResult  ThreatVerdict  ResponseResult  JSONL Log
 ```
 
-1. **DetectAgent** — Sigma 規則比對、威脅情報查詢、事件去重、關聯分析
+1. **DetectAgent** — ATR 規則比對、威脅情報查詢、事件去重、關聯分析
 2. **AnalyzeAgent** — 證據收集、信心分數計算 (0-100)、AI 推理
 3. **RespondAgent** — 動作執行 (block_ip, kill_process, isolate_file 等)、安全規則
 4. **ReportAgent** — JSONL 日誌、基線更新、匿名化
@@ -81,7 +79,7 @@ SecurityEvent  DetectionResult  ThreatVerdict  ResponseResult  JSONL Log
 
 | Layer   | 技術                            | 成本         | 延遲   | 涵蓋率 |
 | ------- | ------------------------------- | ------------ | ------ | ------ |
-| Layer 1 | 規則 (3,760 Sigma + 5,961 YARA) | $0           | <1ms   | 90%    |
+| Layer 1 | 規則 (61 ATR)                   | $0           | <1ms   | 90%    |
 | Layer 2 | 本地 AI (Ollama llama3)         | $0           | ~100ms | 7%     |
 | Layer 3 | 雲端 AI (Claude/OpenAI)         | ~$0.01/event | ~1s    | 3%     |
 
@@ -1138,7 +1136,7 @@ panguard --version  # 應該顯示新版本
 ### 程式碼安全
 
 - [x] SAST: 16 pattern 靜態分析
-- [x] ReDoS: Sigma 規則正則表達式保護
+- [x] ReDoS: 規則正則表達式保護
 - [x] 進程執行: execFile() only (無 shell injection)
 - [x] 相依性: 定期 `pnpm audit`
 - [x] Manager API: 生產環境需 MANAGER_AUTH_TOKEN

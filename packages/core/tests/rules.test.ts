@@ -256,9 +256,9 @@ level: medium
 
 describe('Rule Loader', () => {
   it('should load rules from directory', () => {
-    const rulesDir = join(process.cwd(), 'config', 'sigma-rules', 'custom');
+    const rulesDir = join(process.cwd(), 'config', 'rules', 'custom');
 
-    // The config/sigma-rules/custom directory should exist in the project
+    // The config/rules/custom directory should exist in the project
     if (existsSync(rulesDir)) {
       const rules = loadRulesFromDirectory(rulesDir);
       expect(Array.isArray(rules)).toBe(true);

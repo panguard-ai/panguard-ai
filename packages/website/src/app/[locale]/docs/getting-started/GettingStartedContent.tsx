@@ -319,7 +319,7 @@ export default function GettingStartedContent() {
               <TerminalOutput
                 lines={[
                   `[OK] Panguard v${STATS.cliVersion} installed`,
-                  `[OK] Rule engine loaded (${STATS.atrRules} ATR + ${STATS.integratedRulesDisplay} Sigma/YARA rules)`,
+                  `[OK] Rule engine loaded (${STATS.atrRules} ATR + ${STATS.totalRulesDisplay} total rules)`,
                   '[OK] Scan complete.',
                 ]}
               />

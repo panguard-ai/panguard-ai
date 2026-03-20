@@ -11,7 +11,6 @@
  * - POST /api/atr-feedback           Submit feedback on ATR rule
  * - POST /api/skill-threats          Submit skill threat from audit
  * - GET  /api/atr-rules              Fetch confirmed ATR rules (?since= filter)
- * - GET  /api/yara-rules             Fetch YARA rules (?since= filter)
  * - GET  /api/feeds/ip-blocklist     IP blocklist feed (text/plain, ?minReputation=)
  * - GET  /api/feeds/domain-blocklist Domain blocklist feed (text/plain, ?minReputation=)
  * - GET  /api/skill-blacklist        Community skill blacklist (aggregated threats)
@@ -367,14 +366,6 @@ export class ThreatCloudServer {
         case '/api/atr-rules':
           if (req.method === 'GET') {
             this.handleGetATRRules(url, res);
-          } else {
-            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
-          }
-          break;
-
-        case '/api/yara-rules':
-          if (req.method === 'GET') {
-            this.handleGetYaraRules(url, res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -813,15 +804,7 @@ response:
     this.sendJson(res, 200, { ok: true, data: ruleList, meta: { total: ruleList.length } });
   }
 
-  /** GET /api/yara-rules?since=<ISO> - Fetch YARA rules */
-  private handleGetYaraRules(url: string, res: ServerResponse): void {
-    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-    const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
-    const since = params.get('since') ?? undefined;
-    const rules = this.db.getRulesBySource('yara', since);
-    const ruleList = Array.isArray(rules) ? rules : [];
-    this.sendJson(res, 200, { ok: true, data: ruleList, meta: { total: ruleList.length } });
-  }
+
 
   /** GET /api/feeds/ip-blocklist?minReputation=70 - IP blocklist feed (plain text) */
   private handleGetIPBlocklist(url: string, res: ServerResponse): void {
@@ -1228,46 +1211,6 @@ response:
       }
       return results;
     };
-
-    // Sigma rules
-    const sigmaDir = join(configDir, 'sigma-rules');
-    try {
-      const files = collectFiles(sigmaDir, ['.yml', '.yaml']);
-      for (const file of files) {
-        const content = readFileSync(file, 'utf-8');
-        const ruleId = `sigma:${relative(sigmaDir, file).replace(/\//g, ':')}`;
-        this.db.upsertRule({ ruleId, ruleContent: content, publishedAt: now, source: 'sigma' });
-        seeded++;
-      }
-      log.info(`  Sigma: ${files.length} files`);
-    } catch (err: unknown) {
-      log.error('Sigma seeding failed', err);
-    }
-
-    // YARA rules (split multi-rule files)
-    const yaraDir = join(configDir, 'yara-rules');
-    try {
-      const files = collectFiles(yaraDir, ['.yar', '.yara']);
-      for (const file of files) {
-        const content = readFileSync(file, 'utf-8');
-        const ruleMatches = content.match(/rule\s+\w+/g);
-        if (ruleMatches && ruleMatches.length > 1) {
-          for (const match of ruleMatches) {
-            const ruleName = match.replace('rule ', '');
-            const ruleId = `yara:${basename(file, '.yar').replace('.yara', '')}:${ruleName}`;
-            this.db.upsertRule({ ruleId, ruleContent: content, publishedAt: now, source: 'yara' });
-            seeded++;
-          }
-        } else {
-          const ruleId = `yara:${relative(yaraDir, file).replace(/\//g, ':')}`;
-          this.db.upsertRule({ ruleId, ruleContent: content, publishedAt: now, source: 'yara' });
-          seeded++;
-        }
-      }
-      log.info(`  YARA: ${files.length} files`);
-    } catch (err: unknown) {
-      log.error('YARA seeding failed', err);
-    }
 
     // ATR rules
     const atrCandidates = [

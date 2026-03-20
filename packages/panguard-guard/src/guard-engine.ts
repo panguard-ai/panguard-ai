@@ -37,7 +37,6 @@ import {
   SyslogAdapter,
 } from '@panguard-ai/security-hardening';
 import { FalcoMonitor } from './monitors/falco-monitor.js';
-import { SuricataMonitor } from './monitors/suricata-monitor.js';
 import { SecretWatcher } from './watchers/secret-watcher.js';
 import { DependencyWatcher } from './watchers/dependency-watcher.js';
 import { ProcessWatcher } from './watchers/process-watcher.js';
@@ -82,7 +81,6 @@ export class GuardEngine {
   private monitorEngine: MonitorEngine | null = null;
   private syslogAdapter: SyslogAdapter | null = null;
   private falcoMonitor: FalcoMonitor | null = null;
-  private suricataMonitor: SuricataMonitor | null = null;
   private secretWatcher: SecretWatcher | null = null;
   private dependencyWatcher: DependencyWatcher | null = null;
   private processWatcher: ProcessWatcher | null = null;
@@ -248,15 +246,6 @@ export class GuardEngine {
       this.falcoMonitor.on('event', (event) => void this.processEvent(event));
       await this.falcoMonitor.start();
       logger.info('Falco eBPF kernel-level monitoring active');
-    }
-
-    // Start Suricata network IDS monitor (optional, graceful degradation)
-    this.suricataMonitor = new SuricataMonitor();
-    const suricataAvailable = await this.suricataMonitor.checkAvailability();
-    if (suricataAvailable) {
-      this.suricataMonitor.on('event', (event) => void this.processEvent(event));
-      await this.suricataMonitor.start();
-      logger.info('Suricata network IDS monitoring active');
     }
 
     // Start secret/env watcher (optional, graceful degradation)
@@ -472,10 +461,6 @@ export class GuardEngine {
     if (this.falcoMonitor) {
       this.falcoMonitor.stop();
       this.falcoMonitor = null;
-    }
-    if (this.suricataMonitor) {
-      this.suricataMonitor.stop();
-      this.suricataMonitor = null;
     }
     if (this.secretWatcher) {
       this.secretWatcher.stop();

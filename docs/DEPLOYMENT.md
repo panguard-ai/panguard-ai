@@ -26,9 +26,7 @@
 | pnpm           | >= 9.0.0               | Package manager for monorepo                |
 | Docker         | >= 24.0                | For containerized deployments               |
 | Docker Compose | >= 2.20                | For multi-container setups                  |
-| Linux          | Kernel 4.18+           | Required for eBPF, Falco, rootkit detection |
-| Falco          | >= 0.35                | Optional: kernel-level monitoring           |
-| Suricata       | >= 7.0                 | Optional: network IDS                       |
+| Linux          | Kernel 4.18+           | Required for eBPF, rootkit detection        |
 | Ollama         | >= 0.1.0               | Optional: local AI analysis                 |
 
 ### OS Support
@@ -627,10 +625,7 @@ sudo journalctl -u panguard-manager -f
 | Guard baseline       | `{dataDir}/baseline.json`         | JSON baseline state                  |
 | Guard PID file       | `{dataDir}/panguard-guard.pid`    | Plain text PID                       |
 | Application logs     | stdout/stderr (or syslog)         | Structured JSON (via `createLogger`) |
-| Falco alerts         | `/var/log/falco/alerts.json`      | Falco JSON format                    |
-| Suricata EVE         | `/var/log/suricata/eve.json`      | Suricata EVE JSON                    |
-| YARA rules (custom)  | `{dataDir}/yara-rules/custom/`    | `.yar` files                         |
-| Sigma rules (custom) | `{dataDir}/rules/`                | `.yml` Sigma YAML files              |
+| Custom rules         | `{dataDir}/rules/`                | `.yml` rule YAML files               |
 
 Default `dataDir` values:
 
@@ -684,8 +679,6 @@ The `SyslogAdapter` from `security-hardening` forwards structured events to the 
 
 ### Recommended
 
-- [ ] Enable Falco -- for kernel-level visibility on Linux endpoints
-- [ ] Install Suricata -- for network IDS coverage
 - [ ] Configure Ollama -- for zero-cost local AI analysis
 - [ ] Set up syslog forwarding -- for centralized log management
 - [ ] Configure notification channels -- Telegram, Slack, Email, LINE, or Webhook

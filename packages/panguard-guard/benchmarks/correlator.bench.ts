@@ -18,7 +18,7 @@ setLogLevel('silent');
 // Synthetic correlation event factories
 // ---------------------------------------------------------------------------
 
-const SOURCE_TYPES = ['network', 'auth', 'process', 'file', 'suricata'];
+const SOURCE_TYPES = ['network', 'auth', 'process', 'file'];
 const CATEGORIES = [
   'brute_force',
   'port_scan',

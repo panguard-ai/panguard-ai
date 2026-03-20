@@ -8,8 +8,6 @@
  * When adding new stats: update here first, then all components auto-update.
  *
  * Derived from (verified 2026-03-12):
- *   config/sigma-rules/       -> 4,352 YAML files (community + custom + auto-generated)
- *   config/yara-rules/        -> 6,015 rule definitions across 1,025 files (community + custom + auto-generated)
  *   packages/panguard-guard/src/types.ts       -> ResponseAction union (11 types)
  *   packages/core/src/ai/funnel-router.ts      -> 3 layers
  *   vitest run (159 test files)                -> 3,490 test cases
@@ -26,19 +24,16 @@
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.0.0',
-  sigmaRules: 4_353,
-  yaraRules: 6_015,
   atrRules: 125,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 98,
   /** Total unique detection patterns across all ATR rules (bundled + community) */
   atrPatterns: 500,
-  totalRules: 4_353 + 6_015 + 125,
+  totalRules: 125,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '10,490+' as const,
+  totalRulesDisplay: '125+' as const,
   /** Separate display for honest breakdown */
   atrRulesDisplay: '125+' as const,
-  integratedRulesDisplay: '10,400+' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   falcoConfigs: 1,

@@ -220,53 +220,7 @@ export async function seedRulesFromBundled(threatDb: ThreatCloudDBInstance): Pro
     return results;
   }
 
-  // 1. Sigma rules (.yml, .yaml)
-  const sigmaDir = join(configDir, 'sigma-rules');
-  try {
-    const sigmaFiles = collectFiles(sigmaDir, ['.yml', '.yaml']);
-    for (const file of sigmaFiles) {
-      const content = readFileSync(file, 'utf-8');
-      const ruleId = `sigma:${relative(sigmaDir, file).replace(/\//g, ':')}`;
-      threatDb.upsertRule({ ruleId, ruleContent: content, publishedAt: now, source: 'sigma' });
-      seeded++;
-    }
-    console.log(`  ${c.dim(`  Sigma: ${sigmaFiles.length} files processed`)}`);
-  } catch (err: unknown) {
-    console.error(
-      `  [WARN] Sigma rule seeding failed: ${err instanceof Error ? err.message : String(err)}`
-    );
-  }
-
-  // 2. YARA rules (.yar, .yara)
-  const yaraDir = join(configDir, 'yara-rules');
-  try {
-    const yaraFiles = collectFiles(yaraDir, ['.yar', '.yara']);
-    for (const file of yaraFiles) {
-      const content = readFileSync(file, 'utf-8');
-      // Split multi-rule YARA files
-      const ruleMatches = content.match(/rule\s+\w+/g);
-      if (ruleMatches && ruleMatches.length > 1) {
-        // Multi-rule file: store each rule name as sub-ID
-        for (const match of ruleMatches) {
-          const ruleName = match.replace('rule ', '');
-          const ruleId = `yara:${basename(file, '.yar').replace('.yara', '')}:${ruleName}`;
-          threatDb.upsertRule({ ruleId, ruleContent: content, publishedAt: now, source: 'yara' });
-          seeded++;
-        }
-      } else {
-        const ruleId = `yara:${relative(yaraDir, file).replace(/\//g, ':')}`;
-        threatDb.upsertRule({ ruleId, ruleContent: content, publishedAt: now, source: 'yara' });
-        seeded++;
-      }
-    }
-    console.log(`  ${c.dim(`  YARA: ${yaraFiles.length} files processed`)}`);
-  } catch (err: unknown) {
-    console.error(
-      `  [WARN] YARA rule seeding failed: ${err instanceof Error ? err.message : String(err)}`
-    );
-  }
-
-  // 3. ATR rules (.yaml, .yml) from atr package
+  // ATR rules (.yaml, .yml) from atr package
   const atrDirs = [
     join(process.cwd(), 'node_modules', 'agent-threat-rules', 'rules'),
     join(

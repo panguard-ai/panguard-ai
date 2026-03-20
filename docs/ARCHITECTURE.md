@@ -26,7 +26,7 @@ Panguard AI is a monorepo-based cybersecurity platform built with Node.js 20+, T
 graph TB
     subgraph Endpoint["Endpoint"]
         MON["Monitor Engine<br/>Log | Network | Process | File"]
-        ADV["Advanced Monitors<br/>Falco | Suricata | eBPF<br/>DPI | Memory | Rootkit"]
+        ADV["Advanced Monitors<br/>eBPF | DPI | Memory | Rootkit"]
         GE["GuardEngine<br/>(Orchestrator)"]
         DA["DetectAgent"]
         AA["AnalyzeAgent"]
@@ -122,8 +122,8 @@ graph LR
 
 | #   | Package            | npm Scope                       | Key Responsibilities                                                                                                                                                            |
 | --- | ------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `core`             | `@panguard-ai/core`             | Rule engine, monitor engine, AI providers (Ollama/Claude/OpenAI), FunnelRouter, YARA scanner, threat intel feed manager, i18n, structured logger                                |
-| 2   | `panguard-guard`   | `@panguard-ai/panguard-guard`   | 4-agent pipeline, event correlation, baseline memory, 6 advanced monitors, response execution, dashboard server, agent client                                                   |
+| 1   | `core`             | `@panguard-ai/core`             | Rule engine, monitor engine, AI providers (Ollama/Claude/OpenAI), FunnelRouter, threat intel feed manager, i18n, structured logger                                               |
+| 2   | `panguard-guard`   | `@panguard-ai/panguard-guard`   | 4-agent pipeline, event correlation, baseline memory, 4 advanced monitors, response execution, dashboard server, agent client                                                   |
 | 3   | `panguard-manager` | `@panguard-ai/panguard-manager` | Agent registry (max 500), threat aggregation with cross-agent correlation, policy engine, SSE broadcasting, optional SQLite persistence                                         |
 | 4   | `panguard-auth`    | `@panguard-ai/panguard-auth`    | User registration, login, TOTP 2FA, Google OAuth, password reset, rate limiting, GDPR (delete/export), admin routes, usage metering                                             |
 | 5   | `panguard-scan`    | `@panguard-ai/panguard-scan`    | CVE checker, SSL/TLS scanner, open port scanner, password policy auditor, shared folder scanner, scheduled tasks scanner, remote scanning, PDF report generation                |
@@ -131,7 +131,7 @@ graph LR
 | 7   | `panguard-report`  | `@panguard-ai/panguard-report`  | Compliance report generation (Taiwan Cyber Security Act, ISO 27001, SOC 2), PDF/JSON output, control evaluation, finding mapping, executive summaries                           |
 | 8   | `panguard-trap`    | `@panguard-ai/panguard-trap`    | 8 honeypot service types (SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, Redis), attacker profiling, skill level assessment, Threat Cloud intel upload                                |
 | 9   | `panguard-web`     | `@panguard-ai/panguard-web`     | Real-time web dashboard for guard status and threat visualization                                                                                                               |
-| 10  | `threat-cloud`     | `@panguard-ai/threat-cloud`     | IoC store, correlation engine, campaign tracking, feed distribution (IP/domain blocklists), sighting store, reputation engine, Sigma rule sharing, audit logging                |
+| 10  | `threat-cloud`     | `@panguard-ai/threat-cloud`     | IoC store, correlation engine, campaign tracking, feed distribution (IP/domain blocklists), sighting store, reputation engine, ATR rule sharing, audit logging                  |
 | 11  | `panguard`         | `@panguard-ai/panguard`         | CLI entry point with 19 commands: scan, guard, chat, report, trap, serve, manager, login, logout, whoami, config, init, status, deploy, hardening, admin, threat, upgrade, demo |
 | 12  | `admin`            | `@panguard-ai/admin`            | Static admin dashboard UI served by the API server                                                                                                                              |
 | 13  | `website`          | `@panguard-ai/website`          | Next.js marketing website (separate from platform)                                                                                                                              |
@@ -202,11 +202,11 @@ sequenceDiagram
 
 ### Event Processing Detail
 
-1. **Monitor Layer**: The `MonitorEngine` (from `@panguard-ai/core`) runs 4 built-in sub-monitors (Log, Network, Process, File) plus 6 optional advanced monitors (Falco, Suricata, eBPF, Memory Scanner, DPI, Rootkit Detector). All emit normalized `SecurityEvent` objects.
+1. **Monitor Layer**: The `MonitorEngine` (from `@panguard-ai/core`) runs 4 built-in sub-monitors (Log, Network, Process, File) plus 4 optional advanced monitors (eBPF/Syscall, Memory Scanner, DPI, Rootkit Detector). All emit normalized `SecurityEvent` objects.
 
-2. **Detection**: `DetectAgent` runs the event through Sigma rules, checks threat intelligence feeds, deduplicates (60s window), and correlates via both legacy IP-based correlation and the advanced `EventCorrelator` (7 attack patterns).
+2. **Detection**: `DetectAgent` runs the event through ATR rules, checks threat intelligence feeds, deduplicates (60s window), and correlates via both legacy IP-based correlation and the advanced `EventCorrelator` (7 attack patterns).
 
-3. **Analysis**: `AnalyzeAgent` collects evidence from multiple sources (rule matches, threat intel, baseline deviation, Falco/Suricata, attack chain, AI analysis), calculates a weighted confidence score (0-100), and produces a `ThreatVerdict` with conclusion (benign/suspicious/malicious) and recommended action.
+3. **Analysis**: `AnalyzeAgent` collects evidence from multiple sources (rule matches, threat intel, baseline deviation, attack chain, AI analysis), calculates a weighted confidence score (0-100), and produces a `ThreatVerdict` with conclusion (benign/suspicious/malicious) and recommended action.
 
 4. **Response**: `RespondAgent` executes the appropriate action based on confidence thresholds, the configured `ActionPolicy`, and escalation state. Actions include `block_ip`, `kill_process`, `disable_account`, `isolate_file`, `notify`, and `log_only`. All actions are persisted to a manifest for rollback support.
 
@@ -239,8 +239,8 @@ graph LR
 - **Input**: `SecurityEvent`
 - **Output**: `DetectionResult | null`
 - **Responsibilities**:
-  - Match events against loaded Sigma rules via the `RuleEngine`
-  - Check threat intelligence (IP lookup for network/suricata events, supporting IPv4 and IPv6)
+  - Match events against loaded rules via the `RuleEngine`
+  - Check threat intelligence (IP lookup for network events, supporting IPv4 and IPv6)
   - Deduplication: skip identical detections within a 60-second window (max 500 entries)
   - Legacy IP-based correlation: flag attack chains when 3+ events from the same source IP occur within 5 minutes
   - Advanced pattern-based correlation via `EventCorrelator` (7 attack patterns with MITRE ATT&CK mapping)
@@ -253,10 +253,10 @@ graph LR
 - **Input**: `DetectionResult` + `EnvironmentBaseline`
 - **Output**: `ThreatVerdict`
 - **Evidence Sources** (weighted):
-  - Sigma rule matches (weight: 0.4) with feedback adjustment
+  - Rule matches (weight: 0.4) with feedback adjustment
   - Threat intelligence (confidence: 85 if matched)
   - Baseline deviation (weight: 0.3) with time-of-day awareness (0:00-5:59 boost)
-  - Falco/Suricata kernel-level evidence (weight: 0.2-0.25 when present)
+  - Kernel-level evidence (weight: 0.2-0.25 when present)
   - Attack chain correlation boost (+5 per event, max +25)
   - AI analysis (weight: 0.3 when available)
 - **Feedback Loop**: Records false positive / true positive feedback per rule, adjusting confidence by up to -30% (high FP rate) or +10% (high TP rate)
@@ -303,8 +303,7 @@ Panguard uses a cascading "funnel" approach for AI-assisted analysis, reducing l
 ```mermaid
 graph TB
     subgraph Layer1["Layer 1: Rules -- Cost: $0 -- Latency: <1ms"]
-        SIGMA["Sigma Rules<br/>3,760 bundled + custom + community"]
-        YARA["YARA Rules<br/>5,961 file pattern matching rules"]
+        ATR["ATR Rules<br/>61 rules across 9 categories"]
         BUILTIN["Built-in Pattern Matching<br/>20 built-in regex-based rules"]
         TI["Threat Intelligence<br/>5 feed sources + Threat Cloud blocklist"]
     end
@@ -317,11 +316,10 @@ graph TB
         CLOUD["Claude / OpenAI<br/>Deep reasoning<br/>MITRE classification"]
     end
 
-    SIGMA --> |"Match found"| VERDICT["ThreatVerdict"]
-    YARA --> |"Match found"| VERDICT
+    ATR --> |"Match found"| VERDICT["ThreatVerdict"]
     TI --> |"Known IoC"| VERDICT
 
-    SIGMA --> |"Uncertain"| OLLAMA
+    ATR --> |"Uncertain"| OLLAMA
     OLLAMA --> |"Confident"| VERDICT
     OLLAMA --> |"Low confidence / unavailable"| CLOUD
     CLOUD --> VERDICT
@@ -474,9 +472,9 @@ graph TB
 
 ---
 
-## 10 Monitor Types
+## 8 Monitor Types
 
-The Guard agent supports 10 monitor types across two tiers: 4 built-in monitors available on all platforms, and 6 advanced monitors that require specific OS or tool dependencies.
+The Guard agent supports 8 monitor types across two tiers: 4 built-in monitors available on all platforms, and 4 advanced monitors that require specific OS or tool dependencies.
 
 ### Built-in Monitors (from `@panguard-ai/core`)
 
@@ -491,8 +489,6 @@ The Guard agent supports 10 monitor types across two tiers: 4 built-in monitors 
 
 | Monitor              | Source File           | Dependencies       | Capabilities                                                                                                                       |
 | -------------------- | --------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **Falco Monitor**    | `falco-monitor.ts`    | Falco >= 0.35      | Reads Falco alerts from `/var/log/falco/alerts.json`. Detects container escapes, privilege escalation, anomalous system calls.     |
-| **Suricata Monitor** | `suricata-monitor.ts` | Suricata >= 7.0    | Reads Suricata EVE JSON from `/var/log/suricata/eve.json`. Network IDS with protocol-aware deep packet analysis.                   |
 | **Syscall Monitor**  | `syscall-monitor.ts`  | Linux Kernel 4.18+ | Process and network activity monitoring via /proc polling. Detects suspicious processes, privilege escalation, and C2 connections. |
 | **Memory Scanner**   | `memory-scanner.ts`   | `CAP_SYS_PTRACE`   | Scans process memory for fileless malware signatures, injected code, and suspicious memory regions.                                |
 | **DPI Monitor**      | `dpi-monitor.ts`      | None (userspace)   | Deep Packet Inspection for protocol analysis. Detects C2 beacons, DNS tunneling, and encrypted traffic anomalies.                  |
@@ -507,9 +503,8 @@ All advanced monitors gracefully degrade when their dependencies are not install
 ```mermaid
 graph TB
     subgraph CorePkg["@panguard-ai/core"]
-        RE["RuleEngine<br/>Sigma + Built-in"]
+        RE["RuleEngine<br/>ATR + Built-in"]
         ME["MonitorEngine<br/>Log | Net | Proc | File"]
-        YS["YaraScanner"]
         TIF["ThreatIntelFeedManager<br/>5 feeds"]
         LLM_CORE["LLM Providers<br/>Ollama | Claude | OpenAI"]
         FR["FunnelRouter<br/>Local-first AI fallback"]
@@ -524,8 +519,6 @@ graph TB
         EC["EventCorrelator"]
         BL2["Baseline Memory"]
         INV["InvestigationEngine"]
-        FM["FalcoMonitor"]
-        SM["SuricataMonitor"]
         EM["SyscallMonitor"]
         MS2["MemoryScanner"]
         DPI["DpiMonitor"]
@@ -538,7 +531,6 @@ graph TB
 
     GE2 --> RE
     GE2 --> ME
-    GE2 --> YS
     GE2 --> TIF
     GE2 --> DA2
     GE2 --> AA2
@@ -549,8 +541,6 @@ graph TB
     DA2 --> TIF
     AA2 --> BL2
     AA2 --> FR
-    GE2 --> FM
-    GE2 --> SM
     GE2 --> EM
     GE2 --> MS2
     GE2 --> DPI
@@ -616,7 +606,7 @@ The Guard operates in two modes:
 | Database        | better-sqlite3 (optional)                   |
 | Container       | Docker multi-stage build, tini for PID 1    |
 | AI              | Ollama (local), Claude, OpenAI (cloud)      |
-| Rules           | Sigma (YAML), YARA (native + fallback)      |
-| Monitoring      | Falco, Suricata, eBPF, /proc filesystem     |
+| Rules           | ATR (YAML)                                  |
+| Monitoring      | eBPF, /proc filesystem                      |
 | Notifications   | Telegram, Slack, Email, LINE, Webhook       |
 | Compliance      | Taiwan Cyber Security Act, ISO 27001, SOC 2 |

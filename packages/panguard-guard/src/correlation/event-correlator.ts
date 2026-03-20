@@ -277,7 +277,7 @@ export class EventCorrelator {
    * Port Scan (T1046): Same source IP, 10+ distinct destination ports within 60s
    */
   private detectPortScan(event: CorrelationEvent, now: number): CorrelationPattern[] {
-    if (event.source !== 'network' && event.source !== 'suricata') return [];
+    if (event.source !== 'network') return [];
     if (!event.sourceIP) return [];
 
     const cutoff = now - PORT_SCAN_WINDOW_MS;
@@ -287,7 +287,7 @@ export class EventCorrelator {
       (e) =>
         e.sourceIP === event.sourceIP &&
         e.timestamp >= cutoff &&
-        (e.source === 'network' || e.source === 'suricata')
+        e.source === 'network'
     );
 
     // Collect distinct destination ports
@@ -324,7 +324,7 @@ export class EventCorrelator {
    * Lateral Movement (T1021): Network connections to 3+ internal IPs from same source within 5min
    */
   private detectLateralMovement(event: CorrelationEvent, now: number): CorrelationPattern[] {
-    if (event.source !== 'network' && event.source !== 'suricata') return [];
+    if (event.source !== 'network') return [];
     if (!event.sourceIP) return [];
 
     const cutoff = now - this.windowMs;
@@ -334,7 +334,7 @@ export class EventCorrelator {
       (e) =>
         e.sourceIP === event.sourceIP &&
         e.timestamp >= cutoff &&
-        (e.source === 'network' || e.source === 'suricata')
+        e.source === 'network'
     );
 
     // Collect distinct internal destination IPs
@@ -375,7 +375,7 @@ export class EventCorrelator {
    * Data Exfiltration (T1041): Large outbound transfers to external IP
    */
   private detectDataExfiltration(event: CorrelationEvent): CorrelationPattern[] {
-    if (event.source !== 'network' && event.source !== 'suricata') return [];
+    if (event.source !== 'network') return [];
 
     const destIP = extractDestIP(event.metadata);
     if (!destIP) return [];
@@ -411,7 +411,7 @@ export class EventCorrelator {
    */
   private detectBackdoorInstall(event: CorrelationEvent, now: number): CorrelationPattern[] {
     // Only check when we see a network outbound event (the last step in the chain)
-    if (event.source !== 'network' && event.source !== 'suricata') return [];
+    if (event.source !== 'network') return [];
 
     const cutoff = now - this.windowMs;
 

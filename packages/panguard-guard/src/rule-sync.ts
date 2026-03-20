@@ -114,10 +114,8 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
         }
         if (newYaraRules > 0) {
           // Reload YARA scanner with new rules
-          const yaraCustomDir = config.yaraRulesDir
-            ? join(config.yaraRulesDir, 'custom')
-            : join(config.dataDir, 'yara-rules', 'custom');
-          await yaraScanner.loadAllRules(yaraCustomDir, config.bundledYaraDir);
+          const yaraCustomDir = join(config.dataDir, 'yara-rules', 'custom');
+          await yaraScanner.loadAllRules(yaraCustomDir);
         }
       }
     } catch (err: unknown) {

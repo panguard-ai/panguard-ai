@@ -37,7 +37,6 @@
     "ai-security",
     "agent-security",
     "prompt-injection",
-    "sigma-rules",
     "threat-detection",
     "mcp-security",
     "llm-security",

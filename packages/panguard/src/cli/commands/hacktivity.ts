@@ -57,11 +57,11 @@ async function loadThreatCloud(): Promise<any> {
 }
 
 /** Default directory for auto-generated rules */
-const RULES_DIR = './config/sigma-rules/auto-generated';
+const RULES_DIR = './config/rules/auto-generated';
 /** Metadata file tracking sync state */
-const META_FILE = './config/sigma-rules/auto-generated/.meta.json';
+const META_FILE = './config/rules/auto-generated/.meta.json';
 /** Reports cache */
-const REPORTS_DIR = './config/sigma-rules/auto-generated/.reports';
+const REPORTS_DIR = './config/rules/auto-generated/.reports';
 
 interface SyncMeta {
   lastSyncAt: string | null;

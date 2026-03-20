@@ -87,7 +87,7 @@ export class DetectAgent {
 
     // Step 2: Check threat intelligence (supports multiple IP fields)
     let threatIntelMatch: { ip: string; threat: string } | undefined;
-    if (event.source === 'network' || event.source === 'suricata') {
+    if (event.source === 'network') {
       const ip = this.extractIP(event);
       if (ip) {
         const threatEntry = checkThreatIntel(ip);

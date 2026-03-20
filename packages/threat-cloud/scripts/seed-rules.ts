@@ -2,7 +2,7 @@
 /**
  * Seed rules into Threat Cloud database via HTTP API
  *
- * Reads Sigma, YARA, and ATR rule files from disk and uploads them
+ * Reads ATR rule files from disk and uploads them
  * to a running Threat Cloud server via POST /api/rules (batch).
  *
  * Usage:
@@ -16,7 +16,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename, extname, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHash } from 'node:crypto';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,8 +29,6 @@ interface SeedConfig {
   endpoint: string;
   batchSize: number;
   dryRun: boolean;
-  sigmaDir: string;
-  yaraDir: string;
   atrDir: string;
   adminApiKey?: string;
 }
@@ -41,8 +39,6 @@ function parseArgs(): SeedConfig {
     endpoint: process.env['TC_ENDPOINT'] ?? 'https://tc.panguard.ai',
     batchSize: 200,
     dryRun: false,
-    sigmaDir: resolve(__dirname, '../../../config/sigma-rules'),
-    yaraDir: resolve(__dirname, '../../../config/yara-rules'),
     atrDir: resolve(process.env['ATR_DIR'] ?? '/Users/user/Downloads/agent-threat-rules/rules'),
     adminApiKey: process.env['TC_ADMIN_API_KEY'],
   };
@@ -57,12 +53,6 @@ function parseArgs(): SeedConfig {
         break;
       case '--dry-run':
         config.dryRun = true;
-        break;
-      case '--sigma-dir':
-        config.sigmaDir = resolve(args[++i]!);
-        break;
-      case '--yara-dir':
-        config.yaraDir = resolve(args[++i]!);
         break;
       case '--atr-dir':
         config.atrDir = resolve(args[++i]!);
@@ -125,71 +115,6 @@ function fileToRuleId(filePath: string, source: string): string {
   return `${source}:${name}`;
 }
 
-function contentHash(content: string): string {
-  return createHash('sha256').update(content).digest('hex').slice(0, 12);
-}
-
-/**
- * Split a YARA file that may contain multiple rules into individual rules.
- * Each "rule <name>" block becomes a separate entry.
- */
-function splitYaraRules(filePath: string, content: string): RulePayload[] {
-  const rules: RulePayload[] = [];
-  const rulePattern = /^(rule\s+\w[\w_]*\s*(?::\s*[^\n]*)?\{)/gm;
-  const matches = [...content.matchAll(rulePattern)];
-
-  if (matches.length <= 1) {
-    // Single rule or unparseable — upload as-is
-    return [
-      {
-        ruleId: `yara:${contentHash(content)}-${basename(filePath, extname(filePath))}`,
-        ruleContent: content,
-        publishedAt: new Date().toISOString(),
-        source: 'yara',
-      },
-    ];
-  }
-
-  // Multiple rules in one file
-  for (let i = 0; i < matches.length; i++) {
-    const start = matches[i]!.index!;
-    const end = i + 1 < matches.length ? matches[i + 1]!.index! : content.length;
-    const ruleText = content.slice(start, end).trim();
-    const nameMatch = ruleText.match(/^rule\s+(\w[\w_]*)/);
-    const name = nameMatch?.[1] ?? `rule${i}`;
-
-    rules.push({
-      ruleId: `yara:${contentHash(ruleText)}-${name}`,
-      ruleContent: ruleText,
-      publishedAt: new Date().toISOString(),
-      source: 'yara',
-    });
-  }
-
-  return rules;
-}
-
-function prepareSigmaRules(dir: string): RulePayload[] {
-  const files = findFiles(dir, ['.yml', '.yaml']);
-  const now = new Date().toISOString();
-  return files.map((f) => ({
-    ruleId: fileToRuleId(f, 'sigma'),
-    ruleContent: readFileSync(f, 'utf-8'),
-    publishedAt: now,
-    source: 'sigma',
-  }));
-}
-
-function prepareYaraRules(dir: string): RulePayload[] {
-  const files = findFiles(dir, ['.yar', '.yara']);
-  const rules: RulePayload[] = [];
-  for (const f of files) {
-    const content = readFileSync(f, 'utf-8');
-    rules.push(...splitYaraRules(f, content));
-  }
-  return rules;
-}
-
 function prepareATRRules(dir: string): RulePayload[] {
   const files = findFiles(dir, ['.yml', '.yaml']);
   const now = new Date().toISOString();
@@ -244,26 +169,16 @@ async function main(): Promise<void> {
   console.log(`Endpoint:    ${config.endpoint}`);
   console.log(`Batch size:  ${config.batchSize}`);
   console.log(`Dry run:     ${config.dryRun}`);
-  console.log(`Sigma dir:   ${config.sigmaDir}`);
-  console.log(`YARA dir:    ${config.yaraDir}`);
   console.log(`ATR dir:     ${config.atrDir}`);
   console.log('');
 
   // Prepare all rules
   console.log('Scanning rule files...');
 
-  const sigmaRules = prepareSigmaRules(config.sigmaDir);
-  console.log(`  Sigma: ${sigmaRules.length} rules`);
-
-  const yaraRules = prepareYaraRules(config.yaraDir);
-  console.log(
-    `  YARA:  ${yaraRules.length} rules (from ${findFiles(config.yaraDir, ['.yar', '.yara']).length} files)`
-  );
-
   const atrRules = prepareATRRules(config.atrDir);
   console.log(`  ATR:   ${atrRules.length} rules`);
 
-  const allRules = [...sigmaRules, ...yaraRules, ...atrRules];
+  const allRules = [...atrRules];
   console.log(`  Total: ${allRules.length} rules`);
   console.log('');
 

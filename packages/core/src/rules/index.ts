@@ -38,7 +38,7 @@ export const RULES_VERSION: string = _pkg.version;
  *
  * @example
  * ```typescript
- * const engine = new RuleEngine({ rulesDir: './config/sigma-rules', hotReload: true });
+ * const engine = new RuleEngine({ rulesDir: './config/rules', hotReload: true });
  * await engine.loadRules();
  * const matches = engine.match(event);
  * engine.destroy();

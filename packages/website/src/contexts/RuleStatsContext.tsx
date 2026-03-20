@@ -15,8 +15,8 @@ interface RuleStatsValues {
 
 const RuleStatsContext = createContext<RuleStatsValues>({
   atrRules: STATS.atrRules,
-  sigmaRules: STATS.sigmaRules.toLocaleString(),
-  yaraRules: STATS.yaraRules.toLocaleString(),
+  sigmaRules: STATS.atrRules.toLocaleString(),
+  yaraRules: STATS.atrPatterns.toLocaleString(),
   totalRules: STATS.totalRules.toLocaleString(),
   totalRulesDisplay: STATS.totalRulesDisplay,
 });

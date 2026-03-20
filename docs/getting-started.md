@@ -143,7 +143,7 @@ panguard guard start
 
   Mode:       Learning (Day 1/7)
   Monitoring: processes, network, files
-  Rules:      3,760 Sigma rules loaded
+  Rules:      61 ATR rules loaded
   Score:      --/100 (building baseline)
 
   Guard is now protecting your system.
@@ -239,5 +239,5 @@ Available frameworks:
 | Generate compliance reports            | [Guide: Report](guides/report.md)                     |
 | Deploy collective threat intelligence  | [Guide: Threat Cloud](guides/threat-cloud.md)         |
 | View all CLI commands                  | [Reference: CLI](reference/cli.md)                    |
-| Write custom Sigma rules               | [Reference: Sigma Rules](reference/sigma-rules.md)    |
+| Write custom ATR rules                 | [Reference: ATR Rules](reference/atr-rules.md)        |
 | Troubleshoot issues                    | [Troubleshooting](troubleshooting.md)                 |

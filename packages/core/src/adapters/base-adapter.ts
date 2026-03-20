@@ -84,9 +84,6 @@ export function mapEventSource(source: string): EventSource {
   if (normalized.includes('falco')) {
     return 'falco';
   }
-  if (normalized.includes('suricata')) {
-    return 'suricata';
-  }
   if (normalized.includes('syslog')) {
     return 'syslog';
   }

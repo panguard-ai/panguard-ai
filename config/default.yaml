@@ -23,8 +23,4 @@ ai:
   fallbackToRules: true
 
 rules:
-  sigmaCustomPath: './config/sigma-rules/custom'
-  sigmaCommunityPath: './config/sigma-rules/community'
-  yaraCustomPath: './config/yara-rules/custom'
-  yaraCommunityPath: './config/yara-rules/community'
   autoReload: true
