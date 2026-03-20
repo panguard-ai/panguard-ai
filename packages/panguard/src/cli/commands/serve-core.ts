@@ -4,7 +4,7 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { join, dirname, resolve, basename, relative } from 'node:path';
+import { join, dirname, resolve, relative } from 'node:path';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { c } from '@panguard-ai/core';

@@ -294,7 +294,7 @@ export async function processEvent(
   event: SecurityEvent,
   state: EventProcessorState,
   deps: EventProcessorDeps,
-  selfProcessEvent: (e: SecurityEvent) => void
+  _selfProcessEvent: (e: SecurityEvent) => void
 ): Promise<void> {
   state.eventsProcessed++;
 

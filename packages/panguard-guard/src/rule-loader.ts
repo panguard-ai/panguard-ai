@@ -238,7 +238,7 @@ export async function loadAllRules(
   atrEngine: GuardATREngine,
   threatCloud: ThreatCloudClient,
   feedManager: ThreatIntelFeedManager,
-  config: GuardConfig
+  _config: GuardConfig
 ): Promise<void> {
   feedManager
     .start()

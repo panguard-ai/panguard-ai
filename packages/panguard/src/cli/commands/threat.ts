@@ -190,7 +190,7 @@ export function threatCommand(): Command {
       const seedSp = spinner('Seeding rules from bundled config...');
 
       const { readdirSync, readFileSync: readFs, statSync } = await import('node:fs');
-      const { join, basename, relative, dirname } = await import('node:path');
+      const { join, relative, dirname } = await import('node:path');
       const { fileURLToPath } = await import('node:url');
 
       const now = new Date().toISOString();
