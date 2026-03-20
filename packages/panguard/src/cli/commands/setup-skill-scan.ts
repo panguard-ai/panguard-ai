@@ -11,8 +11,16 @@
 
 import { c, symbols, table, ProgressBar, promptSelect, divider } from '@panguard-ai/core';
 import type { TableColumn } from '@panguard-ai/core';
-import type { MCPServerEntry } from '@panguard-ai/panguard-mcp/config';
 import type { AuditReport } from '@panguard-ai/panguard-skill-auditor';
+
+/** Minimal shape of an MCP server entry — mirrors MCPServerEntry from panguard-mcp/config */
+export interface MCPServerEntry {
+  readonly name: string;
+  readonly platformId: string;
+  readonly command?: string;
+  readonly args?: readonly string[];
+  readonly env?: Record<string, string>;
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -80,7 +88,7 @@ export async function scanInstalledSkills(
 
   // Dynamic import to avoid circular deps
   const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
-  const { resolveSkillDir } = await import('@panguard-ai/panguard-mcp/config');
+  const { resolveSkillDir } = await (import('@panguard-ai/panguard-mcp/config' as string) as Promise<{ resolveSkillDir: (entry: MCPServerEntry) => string | null }>);
 
   const bar = new ProgressBar({ total: skills.length, width: 30 });
   const results: SkillScanResult[] = [];

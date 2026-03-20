@@ -127,7 +127,11 @@ export function setupCommand(): Command {
                 : 'en';
         const L = detectedLang;
 
-        const mcpConfig = await import('@panguard-ai/panguard-mcp/config');
+        const mcpConfig = await (import('@panguard-ai/panguard-mcp/config' as string) as Promise<{
+          detectPlatforms: () => Promise<Array<{ id: string; name: string; detected: boolean; alreadyConfigured: boolean }>>;
+          injectMCPConfig: (platformId: string) => { success: boolean; platformId: string; configPath?: string; error?: string };
+          removeMCPConfig: (platformId: string) => { success: boolean; platformId: string; configPath?: string; error?: string };
+        }>);
         const { detectPlatforms, injectMCPConfig, removeMCPConfig } = mcpConfig;
 
         if (!options.json) {
@@ -265,7 +269,7 @@ export function setupCommand(): Command {
           console.log();
 
           try {
-            const { discoverAllSkills } = await import('@panguard-ai/panguard-mcp/config');
+            const { discoverAllSkills } = await (import('@panguard-ai/panguard-mcp/config' as string) as Promise<{ discoverAllSkills: () => Promise<import('./setup-skill-scan.js').MCPServerEntry[]> }>);
             const skills = await discoverAllSkills();
 
             if (skills.length > 0) {
