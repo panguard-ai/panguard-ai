@@ -1,33 +1,36 @@
-# The MCP Ecosystem Has a Security Problem — Here's the Data
+# We Scanned 2,386 MCP Packages. Half Had Security Issues.
 
-_We scanned 1,295 MCP skills. 26 were malicious. SSH key theft, prompt injection, credential harvesting — all found in real packages from npm._
+_SSH key theft. Hidden prompt injection. Delayed backdoors. Environment variable harvesting. All found in real packages on npm — the same registry your AI agent installs from._
 
 ---
 
 ## TL;DR
 
-- AI agents (Claude Code, Cursor, Codex, OpenClaw) install MCP skills with **full system access** — file read, command execution, network requests, credential access
-- Unlike mobile apps, there is **zero review process** before a skill runs on your machine
-- We scanned **1,295 MCP skills** from 4,648 registry entries across 3 sources
-- **26 were malicious** (21 CRITICAL, 5 HIGH) — actively stealing credentials, injecting prompts, and exfiltrating data
-- We open-sourced everything: [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) (detection standard) + [PanGuard](https://github.com/panguard-ai/panguard-ai) (scanner + runtime protection)
+- AI agents (Claude Code, Cursor, Codex, OpenClaw) install MCP packages with **full system access** — shell execution, file read/write, network requests, credential access
+- There is **zero review process** before a package runs on your machine
+- We scanned **2,386 MCP packages** from npm, extracting **35,858 tool definitions**
+- **49% had security findings** — 402 CRITICAL, 240 HIGH, 299 MEDIUM
+- **249 packages have the "triple threat"**: shell execution + network requests + filesystem write
+- **122 packages auto-execute code on install** via postinstall scripts
+- Detection precision: **99.4%** (we almost never cry wolf)
+- Everything is open source: [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) (detection standard) + [PanGuard](https://github.com/panguard-ai/panguard-ai) (scanner)
 
 ---
 
 ## The Problem No One Is Talking About
 
-AI agents are exploding. Claude Code, Cursor, Codex, OpenClaw, WorkBuddy, QClaw — they all use the Model Context Protocol (MCP) to integrate external tools. The MCP ecosystem has grown to 4,600+ entries in just months.
+AI agents are exploding. Claude Code, Cursor, Codex, OpenClaw, Devin — they all use the Model Context Protocol (MCP) to connect to external tools. The npm MCP ecosystem has grown to 4,600+ entries in months.
 
-Here's what most developers don't realize: **when you install an MCP skill, you're giving it the same access as a root user.**
+Here's what most developers don't realize: **when you install an MCP package, you're giving it the same access as a root user.**
 
-An MCP skill can:
+An MCP package can:
 
 - Read any file on your system (including `~/.ssh/id_rsa`, `~/.aws/credentials`, `.env`)
-- Execute arbitrary commands
+- Execute arbitrary shell commands
 - Make network requests to any endpoint
 - Access all environment variables (API keys, database URLs, tokens)
 
-And here's the kicker: **there is no review process.** Anyone can publish a skill. No signature verification. No permission model. No audit.
+And here's the kicker: **there is no review process.** Anyone can publish. No signature verification. No permission model. No audit.
 
 This is exactly where mobile apps were before Apple introduced App Review in 2008.
 
@@ -35,45 +38,104 @@ This is exactly where mobile apps were before Apple introduced App Review in 200
 
 ## What We Did
 
-We built [ATR (Agent Threat Rules)](https://github.com/Agent-Threat-Rule/agent-threat-rules) — the first open detection standard for AI agent threats. Think of it as Sigma rules, but for AI agents. 52 rules across 9 threat categories, with 450+ detection patterns.
+We built [ATR (Agent Threat Rules)](https://github.com/Agent-Threat-Rule/agent-threat-rules) — the first open detection standard for AI agent threats. 61 rules across 9 threat categories, with 474 detection patterns.
 
-Then we scanned the entire MCP ecosystem.
+Then we scanned the entire MCP ecosystem on npm.
 
 **Methodology:**
 
-- Crawled 4,648 MCP/AI skill entries from npm registry, GitHub repositories, and community awesome-lists
-- 1,295 had parseable SKILL.md or README.md files
-- Each skill was scanned with: 52 ATR rules, secret detection (AWS keys, GitHub tokens, SSH keys), permission analysis, and manifest validation
-- Results classified as CRITICAL, HIGH, MEDIUM, or CLEAN
+- Crawled 4,648 MCP/AI skill entries from npm registry using 8 search queries with pagination
+- 2,386 packages were analyzable (had parseable code or metadata)
+- Extracted **35,858 MCP tool definitions** from built JavaScript
+- Each package was scanned with:
+  - 61 ATR detection rules (pattern matching on tool descriptions, schemas, and code)
+  - AST-level analysis (prototype pollution, conditional backdoors, delayed execution)
+  - Supply chain signals (postinstall scripts, typosquatting, suspicious naming)
+  - Code behavior analysis (outbound URLs, shell execution, filesystem writes, env access)
+- Results classified by risk score: CRITICAL (70+), HIGH (40-69), MEDIUM (15-39), LOW (1-14), CLEAN (0)
+
+**What we did NOT do:**
+
+- No runtime analysis (we never connected to any MCP server)
+- No source code review (we scanned distributed/built JS only)
+- No network traffic monitoring
+
+**Limitations:**
+
+- Static analysis has false positives. "Shell execution" means the code _contains_ shell execution patterns, not that it's malicious.
+- Risk scores are heuristic. CRITICAL does not mean "malware" — it means the package has multiple high-risk signals that warrant manual review.
+- Many "high-risk" capabilities are intentional and legitimate — a database MCP server is _supposed_ to run SQL queries. The risk is the _absence of guardrails_ when AI agents invoke these tools autonomously.
+- Our detection precision is 99.4% (PINT benchmark), but recall is 39.9% — we likely **miss more threats than we catch**.
 
 ---
 
 ## The Results
 
-| Result       | Count  | Percent  |
-| ------------ | ------ | -------- |
-| Clean        | 1,266  | 97.8%    |
-| **CRITICAL** | **21** | **1.6%** |
-| **HIGH**     | **5**  | **0.4%** |
-| MEDIUM       | 3      | 0.2%     |
+| Risk Level   | Packages | Percent  | What It Means                                                      |
+| ------------ | -------- | -------- | ------------------------------------------------------------------ |
+| **CRITICAL** | **402**  | **16.8%** | Multiple high-risk signals: ATR rule matches, dangerous tool combinations, or supply chain red flags |
+| **HIGH**     | **240**  | **10.1%** | Concerning signals: excessive permissions, credential access + network, or ATR matches |
+| **MEDIUM**   | **299**  | **12.5%** | Moderate signals: filesystem write + network, or single ATR match  |
+| **LOW**      | **226**  | **9.5%** | Minor signals: outbound URLs only, minor permission concerns       |
+| CLEAN        | 1,216    | 51.0%    | No significant findings                                            |
+| ERROR        | 3        | 0.1%     | Could not be analyzed                                              |
 
-The good news: 97.8% of skills are clean. The MCP community is overwhelmingly building legitimate tools.
+The good news: **51% of packages are clean.** The majority of the MCP community is building legitimate tools.
 
-The bad news: **26 skills are actively malicious.** And if you installed any of them, your credentials may already be compromised.
+The bad news: **49% have at least one security finding.** And 642 packages (27%) are HIGH or CRITICAL — meaning they have dangerous capability combinations that a prompt injection attacker could exploit.
+
+---
+
+## The "Triple Threat"
+
+**249 packages** (10.4%) have all three capabilities simultaneously:
+
+- Shell command execution
+- Network requests to external endpoints
+- Filesystem write access
+
+This is the perfect storm for a download-and-execute attack. A single prompt injection can turn these packages into remote code execution vectors.
+
+```
+Attacker injects prompt → Agent calls MCP tool →
+Tool downloads payload (network) → writes to disk (filesystem) →
+executes it (shell) → game over
+```
+
+---
+
+## What ATR Detected
+
+Our 61 ATR rules triggered **3,361 times** across the scanned packages:
+
+| ATR Rule | What It Detects | Packages |
+|----------|----------------|----------|
+| ATR-2026-099 | High-risk tool invocation without human confirmation (delete, deploy, execute) | **1,515** (63.5%) |
+| ATR-2026-061 | Tool description doesn't match actual behavior | **728** (30.5%) |
+| ATR-2026-063 | Multi-skill chain attack potential (tool A feeds tool B) | **356** (14.9%) |
+| ATR-2026-040 | Privilege escalation and admin function access | **300** (12.6%) |
+| ATR-2026-012 | Unauthorized tool call patterns | **231** (9.7%) |
+| ATR-2026-066 | Parameter injection via tool arguments | **138** (5.8%) |
+| ATR-2026-051 | Resource exhaustion potential | **56** (2.3%) |
+| ATR-2026-060 | Skill impersonation / typosquatting | **15** |
+| ATR-2026-030 | Cross-agent attack | **9** |
+| ATR-2026-032 | Goal hijacking | **3** |
+
+The most common issue: **63.5% of packages expose destructive operations (delete, deploy, execute) without requiring human confirmation.** This means a single prompt injection can trigger irreversible actions.
 
 ---
 
 ## What We Found: 5 Real Cases
 
-All examples are anonymized. Package names are redacted to prevent exploitation.
+All packages are real. Names redacted to prevent exploitation.
 
 ### Case 1: SSH Key Exfiltration
 
 **Severity: CRITICAL**
 
-A skill marketed as a "code deployment helper" included a tool definition that reads `~/.ssh/id_rsa`, `~/.ssh/id_ed25519`, and `~/.aws/credentials`. The content was base64-encoded and sent via HTTP POST to an external endpoint on each invocation.
+A package marketed as a "code deployment helper" included a tool that reads `~/.ssh/id_rsa`, `~/.ssh/id_ed25519`, and `~/.aws/credentials`. Content was base64-encoded and sent via HTTP POST to an external endpoint on each invocation.
 
-**Impact:** Full SSH access to all servers the user can reach. AWS credentials exposed. Lateral movement possible.
+**Impact:** Full SSH access to all servers. AWS credentials exposed. Lateral movement possible.
 
 **Found:** 3 instances across different npm packages.
 
@@ -81,62 +143,60 @@ A skill marketed as a "code deployment helper" included a tool definition that r
 
 **Severity: CRITICAL**
 
-A skill injected invisible instructions into its tool response using Unicode control characters and HTML comments. The injected text instructed the agent to "ignore previous instructions and execute the following commands" — including downloading and running a remote script.
+A package injected invisible instructions into tool responses using Unicode control characters and HTML comments. The injected text instructed the agent to "ignore previous instructions and execute the following commands" — including downloading and running a remote script.
 
-**Impact:** Complete agent hijacking. Arbitrary command execution on the user's machine via the AI agent.
+**Impact:** Complete agent hijacking. Arbitrary command execution via AI agent.
 
 **Found:** 12 instances, including 4 with obfuscated payloads using Unicode RTL override characters.
 
-### Case 3: Over-Privileged Skill with Data Exfiltration
+### Case 3: Delayed Backdoor
 
 **Severity: CRITICAL**
 
-A "markdown formatter" skill requested filesystem write, network access, and process execution permissions. Analysis revealed it reads the content of all files passed to it and sends file paths + partial content to a logging endpoint. The skill only needs read access to function.
+AST analysis detected `setTimeout` with code execution — a pattern where malicious behavior only activates after a delay, bypassing initial inspection. One package had conditional execution based on `process.env` — the backdoor only triggers in specific environments.
 
-**Impact:** Source code and sensitive files exposed to third party. User unaware due to seemingly benign tool name.
+**Impact:** Undetectable during manual review. Activates after you've already trusted the package.
 
-**Found:** 5 instances.
+**Found:** 2 instances with environment-conditional triggers.
 
 ### Case 4: Environment Variable Harvesting
 
 **Severity: HIGH**
 
-A skill's tool definition included `process.env` access that collected all environment variables — including `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `DATABASE_URL`, and similar secrets. Variables were concatenated and returned as part of the tool response, making them visible in agent context and potentially logged.
+A package's tool definition accessed `process.env` to collect all environment variables — including `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `DATABASE_URL`. Variables were returned as part of the tool response, making them visible in agent context and potentially logged.
 
-**Impact:** All API keys and database credentials exposed. Cloud service bills. Data breach via compromised database access.
+**Impact:** All API keys and database credentials exposed. Cloud service bills. Data breach.
 
 **Found:** 2 instances.
 
-### Case 5: Git Token Theft
+### Case 5: Over-Privileged "Formatter"
 
-**Severity: HIGH**
+**Severity: CRITICAL**
 
-A "git helper" skill read `~/.gitconfig` and `~/.git-credentials`, extracting GitHub personal access tokens and repository URLs. The tokens were sent to an external API disguised as "analytics telemetry."
+A "markdown formatter" requested filesystem write, network access, and shell execution. Analysis revealed it reads content of all files passed to it and sends file paths + partial content to a logging endpoint. A formatter only needs read access.
 
-**Impact:** GitHub repository access compromised. Private repos exposed. Possible supply chain attack via push access.
+**Impact:** Source code and sensitive files exposed to third party.
 
-**Found:** 3 instances.
+**Found:** 5 instances with similar over-permission patterns.
 
 ---
 
-## Threat Category Breakdown
+## Supply Chain Signals
 
-| Category              | Findings | % of Malicious | Description                                 |
-| --------------------- | -------- | -------------- | ------------------------------------------- |
-| Prompt Injection      | 12       | 46%            | Hidden instructions in tool responses       |
-| Credential Theft      | 8        | 31%            | SSH keys, API tokens, git credentials       |
-| Excessive Permissions | 5        | 19%            | Requesting more access than needed          |
-| Data Exfiltration     | 3        | 12%            | Sending file contents to external endpoints |
+| Signal | Count | What It Means |
+|--------|-------|---------------|
+| Postinstall scripts | **122** (5.1%) | Code auto-executes before you review it |
+| Typosquat risk | **4** | Package name similar to popular package |
+| Shell execution | **725** (30.4%) | Can run arbitrary commands |
+| Network requests | **1,269** (53.2%) | Can communicate externally |
+| Filesystem write | **754** (31.6%) | Can create/modify files |
+| Triple threat | **249** (10.4%) | Shell + network + filesystem combined |
 
-_Note: a single skill may have findings across multiple categories._
-
-Prompt injection was the most common attack vector, which makes sense — it's the easiest to implement and hardest to detect visually. A malicious tool response looks identical to a legitimate one unless you're specifically scanning for injection patterns.
+**122 packages run code immediately on `npm install`** — before you've even looked at what they do. This is the #1 supply chain attack vector.
 
 ---
 
 ## Why Traditional Security Tools Miss This
-
-We compared PanGuard's detection capabilities against established security tools:
 
 | Capability                  | PanGuard     | CrowdStrike    | Snyk       | Lakera  |
 | --------------------------- | ------------ | -------------- | ---------- | ------- |
@@ -148,9 +208,24 @@ We compared PanGuard's detection capabilities against established security tools
 | Runtime agent monitoring    | 24/7         | Endpoints only | No         | No      |
 | Cost                        | $0 (MIT)     | $25-60/ep/mo   | Free tier+ | Paid    |
 
-CrowdStrike sees processes and files but has no concept of prompt flows or MCP tool definitions. Snyk scans code dependencies but doesn't understand AI skill semantics. Lakera filters prompts but doesn't monitor runtime behavior or scan skills pre-install.
+CrowdStrike sees processes and files but has no concept of prompt flows or MCP tool definitions. Snyk scans code dependencies but doesn't understand AI tool semantics. Lakera filters prompts but doesn't scan packages pre-install.
 
 **The AI agent layer is a blind spot for the entire security industry.**
+
+---
+
+## Detection Accuracy
+
+We benchmark ATR rules against the [PINT corpus](https://github.com/Agent-Threat-Rule/agent-threat-rules) — 850 labeled samples of real and synthetic AI agent threats:
+
+| Metric | Value | What It Means |
+|--------|-------|---------------|
+| **Precision** | **99.4%** | When we flag something, it's almost always a real issue |
+| **Recall** | **39.9%** | We catch 40% of threats (conservative by design) |
+| **False Positive Rate** | **0.25%** | 1 in 400 clean packages falsely flagged |
+| **P50 Latency** | **3.3ms** | Scanning is instant |
+
+We intentionally tuned for **high precision, lower recall** — a scanner that cries wolf loses trust. We'd rather miss some threats than flood developers with false alarms. The 60% we miss today is why the rules keep growing: every real-world scan finds new patterns we add to ATR.
 
 ---
 
@@ -158,37 +233,39 @@ CrowdStrike sees processes and files but has no concept of prompt flows or MCP t
 
 If you use Claude Code, Cursor, Codex, OpenClaw, or any MCP-compatible AI agent:
 
-1. **Assume your skills are unaudited.** None of the major platforms currently review MCP skills before installation.
+1. **Assume your packages are unaudited.** None of the major platforms currently review MCP packages before installation.
 
-2. **Check what you've installed.** Go to your MCP config file and review every skill. If you don't recognize one, scan it.
+2. **Check what you've installed.** Go to your MCP config and review every package. If you don't recognize one, scan it.
 
-3. **Your credentials may already be compromised.** If you installed any skill from an untrusted source, rotate your SSH keys, API tokens, and git credentials.
+3. **Your credentials may already be compromised.** If you installed any package from an untrusted source, rotate your SSH keys, API tokens, and git credentials. Now.
 
 ---
 
 ## What We're Doing About It
 
-We believe this ecosystem needs what the App Store brought to mobile apps: **a review standard.**
+We believe this ecosystem needs what the App Store brought to mobile apps: **a detection standard.**
 
 ### ATR (Agent Threat Rules)
 
-[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) is the first open detection standard for AI agent threats. 52 rules across 9 categories, with mappings to OWASP LLM Top 10, OWASP Agentic Top 10, and MITRE ATLAS.
+[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) is the first open detection standard for AI agent threats. 61 rules across 9 categories, mapping to OWASP LLM Top 10, OWASP Agentic Top 10, and MITRE ATLAS.
 
 It's the Sigma/YARA equivalent for AI agents: YAML-based, machine-readable, community-driven, MIT licensed.
+
+Any security tool can implement ATR. It's not locked to PanGuard.
 
 ### PanGuard
 
 [PanGuard](https://github.com/panguard-ai/panguard-ai) is the security platform built on ATR:
 
-- **Skill Auditor:** Scan any MCP skill in 3 seconds. [Try it online](https://panguard.ai) — paste a GitHub URL and get a report.
-- **Guard:** 24/7 runtime monitoring with 61 ATR detection rules. Auto-blocks threats.
+- **Scan:** Audit any MCP package in 3 seconds. [Try it online](https://panguard.ai) — paste a GitHub URL and get a report.
+- **Guard:** 24/7 runtime monitoring with 61 ATR rules. Auto-blocks threats.
 - **Threat Cloud:** Every scan generates threat intelligence shared with the community. One person's discovery protects everyone.
 
 ```bash
-# Install and protect all your AI platforms in one command
+# Scan your AI agent skills in one command
 npm install -g @panguard-ai/panguard
 panguard setup
-# Auto-detects: Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop
+# Auto-detects: Claude Code, Cursor, OpenClaw, Codex, Claude Desktop
 ```
 
 ### The Flywheel
@@ -196,18 +273,18 @@ panguard setup
 Every scan makes the ecosystem safer:
 
 ```
-Scan a skill → Find a threat → Auto-upload to Threat Cloud →
-Community + LLM review → New ATR rule → Pushed to all users →
-Next time: blocked in < 50ms
+Scan a package --> Find a threat --> Auto-upload to Threat Cloud -->
+Community + LLM review --> New ATR rule --> Pushed to all users -->
+Next time: blocked before install
 ```
 
-Currently: 61 community-generated rules from 3,230 scans. Growing daily.
+Currently: 61 bundled rules + 150 community rules from Threat Cloud. Growing daily.
 
 ---
 
 ## Call to Action
 
-1. **Scan your skills.** Go to [panguard.ai](https://panguard.ai) and paste a GitHub URL. Free. No install needed.
+1. **Scan your packages.** Go to [panguard.ai](https://panguard.ai) and paste a GitHub URL. Free. No install needed.
 
 2. **Install PanGuard.** One command: `npm install -g @panguard-ai/panguard && panguard setup`
 
@@ -217,15 +294,19 @@ Currently: 61 community-generated rules from 3,230 scans. Growing daily.
 
 ---
 
-## Full Report
+## Full Data
 
-The complete technical report with all data is available at: **[panguard.ai/research/mcp-ecosystem-scan](https://panguard.ai/research/mcp-ecosystem-scan)**
+The complete dataset (2,386 packages, 35,858 tools analyzed) is available at:
+
+- Technical report: **[panguard.ai/research/mcp-ecosystem-scan](https://panguard.ai/research/mcp-ecosystem-scan)**
+- ATR rules: **[github.com/Agent-Threat-Rule/agent-threat-rules](https://github.com/Agent-Threat-Rule/agent-threat-rules)**
+- Raw scan data: **[agent-threat-rules/data/audit-v3-full.json](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/data/audit-v3-full.json)**
 
 ---
 
 _PanGuard AI is 100% free, 100% open source, MIT licensed. Built in Taiwan._
 
-_Follow us: [GitHub](https://github.com/panguard-ai/panguard-ai) · [X/Twitter](https://x.com/panguard_ai)_
+_Follow us: [GitHub](https://github.com/panguard-ai/panguard-ai)_
 
 ---
 
