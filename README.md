@@ -15,7 +15,6 @@
 [![npm version](https://img.shields.io/npm/v/@panguard-ai/panguard?style=flat-square&color=cb3837&logo=npm)](https://www.npmjs.com/package/@panguard-ai/panguard)
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](LICENSE)
 [![ATR](https://img.shields.io/badge/ATR-61%20rules-8b5cf6-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
-[![Detection Rules](https://img.shields.io/badge/Detection%20Rules-10%2C400%2B-f97316.svg?style=flat-square)](#detection-rules)
 [![Made in Taiwan](https://img.shields.io/badge/Made%20in-Taiwan-e11d48.svg?style=flat-square)](https://panguard.ai)
 
 [Quick Start](#quick-start) | [Online Scanner](https://panguard.ai) | [ATR Standard](https://github.com/Agent-Threat-Rule/agent-threat-rules) | [Ecosystem Report](https://panguard.ai/research/mcp-ecosystem-scan)
@@ -101,11 +100,11 @@ Top findings: SSH key exfiltration, prompt injection with Unicode obfuscation, e
 
 ## Three-Layer Detection
 
-| Layer | Engine                                   | Coverage           | Latency | Cost    |
-| ----- | ---------------------------------------- | ------------------ | ------- | ------- |
-| **1** | **Rules** -- 52 ATR + 10,400+ Sigma/YARA | ~90% known threats | < 50ms  | $0      |
-| **2** | **Local AI** -- Ollama                   | ~7% ambiguous      | ~ 2s    | $0      |
-| **3** | **Cloud AI** -- Claude / OpenAI          | ~3% novel          | ~ 5s    | ~$0.008 |
+| Layer | Engine                          | Coverage           | Latency | Cost    |
+| ----- | ------------------------------- | ------------------ | ------- | ------- |
+| **1** | **Rules** -- 61 ATR rules       | ~90% known threats | < 50ms  | $0      |
+| **2** | **Local AI** -- Ollama          | ~7% ambiguous      | ~ 2s    | $0      |
+| **3** | **Cloud AI** -- Claude / OpenAI | ~3% novel          | ~ 5s    | ~$0.008 |
 
 Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet down? Everything still works.
 
@@ -113,12 +112,11 @@ Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet dow
 
 ## Detection Rules
 
-| Rule Type | Count       | Purpose                                                              |
-| --------- | ----------- | -------------------------------------------------------------------- |
-| **Sigma** | 4,352       | Network intrusion, auth bypass, lateral movement                     |
-| **YARA**  | 6,015       | Malware, encoded payloads, obfuscated scripts                        |
-| **ATR**   | 61          | AI agent threats: prompt injection, tool poisoning, skill compromise |
-| **Total** | **10,400+** | All bundled. No cloud required.                                      |
+| Rule Type | Count  | Purpose                                                              |
+| --------- | ------ | -------------------------------------------------------------------- |
+| **ATR**   | 61     | AI agent threats: prompt injection, tool poisoning, skill compromise |
+
+ATR (Agent Threat Rules) is the only rule format designed to protect AI agents. Traditional security rules (Sigma, YARA) detect network/malware threats but cannot detect AI-specific attacks like prompt injection, tool poisoning, or context exfiltration.
 
 ---
 
@@ -149,7 +147,7 @@ panguard guard start --dashboard
 
 **Watchers:** Secret (.env, SSH keys, API tokens), Dependency (package.json, node_modules), Process (child commands), Git (commits, config), Skill (MCP config changes)
 
-**Monitors:** Falco eBPF, Suricata IDS, Syscall, DPI, Memory Scanner
+**Monitors:** Syscall, DPI, Memory Scanner
 
 **11 Response Actions:** log, notify, block_ip, kill_process, isolate_file, block_tool, kill_agent, quarantine_session, revoke_skill, reduce_permissions, disable_account
 
@@ -201,9 +199,6 @@ panguard-ai/
     core/                    Shared engine: rules, AI adapters, validation
     panguard/                Unified CLI (28 commands)
     website/                 Next.js marketing site + online scanner
-  config/
-    sigma-rules/             4,352 Sigma detection rules
-    yara-rules/              6,015 YARA detection rules
 ```
 
 | Category | Technology                               |

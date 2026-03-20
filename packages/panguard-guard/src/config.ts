@@ -5,9 +5,8 @@
  */
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { createLogger } from '@panguard-ai/core';
 import type { GuardConfig } from './types.js';
@@ -83,39 +82,6 @@ const GuardConfigFileSchema = z
 /** Default data directory / 預設資料目錄 */
 export const DEFAULT_DATA_DIR = join(homedir(), '.panguard-guard');
 
-/**
- * Resolve the bundled rules directory.
- * Search order:
- * 1. bundled-rules/ inside the package (npm install scenario)
- * 2. config/ in monorepo root (development scenario)
- * 從安裝包或 monorepo 解析內建規則目錄。
- */
-function findBundledDir(subdir: string): string | undefined {
-  const thisDir = dirname(fileURLToPath(import.meta.url));
-
-  // 1. Check for bundled-rules/ inside the package (npm install)
-  //    thisDir = .../dist/ or .../dist/src/ → package root is 1-2 levels up
-  let pkgDir = thisDir;
-  for (let i = 0; i < 3; i++) {
-    const bundled = join(pkgDir, 'bundled-rules', subdir);
-    if (existsSync(bundled)) {
-      return bundled;
-    }
-    pkgDir = dirname(pkgDir);
-  }
-
-  // 2. Walk up to find monorepo root (development — contains config/)
-  let dir = thisDir;
-  for (let i = 0; i < 8; i++) {
-    const candidate = join(dir, 'config', subdir);
-    if (existsSync(candidate)) {
-      return candidate;
-    }
-    dir = dirname(dir);
-  }
-  return undefined;
-}
-
 /** Default configuration / 預設配置 */
 export const DEFAULT_GUARD_CONFIG: GuardConfig = {
   lang: 'zh-TW',
@@ -124,9 +90,6 @@ export const DEFAULT_GUARD_CONFIG: GuardConfig = {
   actionPolicy: DEFAULT_ACTION_POLICY,
   notifications: {},
   dataDir: DEFAULT_DATA_DIR,
-  yaraRulesDir: join(DEFAULT_DATA_DIR, 'yara-rules'),
-  bundledSigmaDir: findBundledDir('sigma-rules'),
-  bundledYaraDir: findBundledDir('yara-rules'),
   dashboardPort: 3100,
   dashboardEnabled: true,
   verbose: false,

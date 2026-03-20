@@ -88,9 +88,7 @@ Guard 的核心是 5 個串聯的 AI Agent，形成完整的偵測-分析-回應
 
 監控系統事件，用規則引擎即時比對：
 
-- Sigma 規則匹配（3,760 條規則）
-- YARA 檔案掃描（5,961 條規則）
-- ATR 規則偵測（69 條規則）
+- ATR 規則偵測（61 條規則，9 個類別）
 - 行為基線偏離偵測
 - 威脅情報關聯
 
@@ -163,7 +161,7 @@ panguard guard status
   Score:      85/100 (Grade: A)
   Threats:    0 active
   Events:     134,567 processed
-  Rules:      3,760 Sigma + 5,961 YARA + 69 ATR
+  Rules:      61 ATR
   Feeds:      5 active
 
   -- Recent Activity ----------------
@@ -177,47 +175,11 @@ panguard guard status
 
 ## 規則引擎
 
-### Sigma 規則
-
-Guard 內建 3,760 條 Sigma 規則，覆蓋常見攻擊模式。你也可以自訂規則：
-
-```yaml
-# 自訂規則範例：偵測大量失敗 SSH 登入
-title: SSH Brute Force Attempt
-logsource:
-  category: authentication
-  product: any
-detection:
-  selection:
-    event_type: login_failed
-    service: ssh
-  condition: selection
-level: high
-```
-
-將 `.yml` 檔案放入 Guard 的規則目錄，Guard 會自動載入。支援即時監控目錄變更（hot reload）。
-
-詳見 [Sigma 規則撰寫指南](../reference/sigma-rules.md)。
-
-### YARA 規則
-
-用於偵測惡意檔案（內建 5,961 條規則）：
-
-```yara
-rule WebShell {
-  strings:
-    $php = "<?php eval(" nocase
-    $asp = "<%execute(" nocase
-  condition:
-    any of them
-}
-```
-
-詳見 [YARA 規則撰寫指南](../reference/yara-rules.md)。
-
 ### ATR 規則
 
-Agent Threat Rules 偵測 AI Agent 威脅（69 條規則）。詳見 [ATR 規則](../reference/atr-rules.md)。
+Agent Threat Rules (ATR) 是專為保護 AI Agent 設計的偵測規則格式。Guard 內建 61 條 ATR 規則，覆蓋 9 個威脅類別：`prompt-injection`、`tool-poisoning`、`context-exfiltration`、`agent-manipulation`、`privilege-escalation`、`excessive-autonomy`、`skill-compromise`、`data-poisoning`、`model-security`。
+
+詳見 [ATR 規則](../reference/atr-rules.md)。
 
 ---
 

@@ -284,35 +284,6 @@ describe('EventCorrelator - Port Scan (T1046)', () => {
     expect(portScan).toBeUndefined();
   });
 
-  it('should detect port scan using suricata source', () => {
-    const now = Date.now();
-    const ip = '192.0.2.50';
-
-    for (let i = 0; i < 10; i++) {
-      correlator.addEvent(
-        makeCorrelationEvent({
-          timestamp: now + i * 100,
-          sourceIP: ip,
-          source: 'suricata',
-          category: 'connection',
-          metadata: { dst_port: 3000 + i },
-        })
-      );
-    }
-
-    const result = correlator.addEvent(
-      makeCorrelationEvent({
-        timestamp: now + 1000,
-        sourceIP: ip,
-        source: 'suricata',
-        category: 'connection',
-        metadata: { dst_port: 3010 },
-      })
-    );
-
-    const portScan = result.patterns.find((p) => p.type === 'port_scan');
-    expect(portScan).toBeDefined();
-  });
 });
 
 // ---------------------------------------------------------------------------

@@ -34,8 +34,6 @@ AI 即時端點防護系統。5 個 AI Agent 協作，三層漏斗架構，7 天
 | Linux   | auditd, syslog, /proc/net, inotify |
 | macOS   | FSEvents, syslog                   |
 | Windows | ETW, Sysmon, Event Log             |
-| 網路    | Suricata IDS                       |
-| Kernel  | Falco eBPF                         |
 
 ## CLI 指令
 
@@ -58,11 +56,9 @@ panguard guard generate-key # 產生測試金鑰
 
 - `agent.test.ts` - Agent 邏輯
 - `agent-client.test.ts` - Agent 通訊
-- `falco-monitor.test.ts` - Falco 整合
 - `license.test.ts` - 授權驗證
 - `memory.test.ts` - Context Memory
 - `response.test.ts` - 自動回應
-- `suricata-monitor.test.ts` - Suricata 整合
 
 ## 依賴
 

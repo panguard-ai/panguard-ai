@@ -34,7 +34,7 @@ const CATEGORIES = [
   'authentication',
 ];
 
-const SOURCES: SecurityEvent['source'][] = ['network', 'process', 'file', 'syslog', 'suricata'];
+const SOURCES: SecurityEvent['source'][] = ['network', 'process', 'file', 'syslog'];
 
 const SEVERITIES: SecurityEvent['severity'][] = ['info', 'low', 'medium', 'high', 'critical'];
 

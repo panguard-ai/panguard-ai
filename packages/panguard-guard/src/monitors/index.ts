@@ -8,9 +8,6 @@
 export { FalcoMonitor, parseFalcoEvent } from './falco-monitor.js';
 export type { FalcoAlert } from './falco-monitor.js';
 
-export { SuricataMonitor, parseSuricataEvent } from './suricata-monitor.js';
-export type { SuricataEveAlert } from './suricata-monitor.js';
-
 export {
   RootkitDetector,
   createRootkitEvent,

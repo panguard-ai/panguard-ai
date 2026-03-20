@@ -37,7 +37,6 @@ const TC_RATE_LIMITED_PATHS = new Set([
   '/api/atr-feedback',
   '/api/skill-threats',
   '/api/atr-rules',
-  '/api/yara-rules',
   '/api/feeds/ip-blocklist',
   '/api/feeds/domain-blocklist',
 ]);
@@ -261,15 +260,6 @@ export async function handleTCRoutes(
     const urlObj = parseUrl(url, req.headers.host);
     const since = urlObj.searchParams.get('since') ?? undefined;
     const rules = threatDb.getConfirmedATRRules(since);
-    sendJson(res, 200, { ok: true, data: rules });
-    return true;
-  }
-
-  // GET /api/yara-rules - Fetch YARA rules (for Guard sync)
-  if (pathname === '/api/yara-rules' && req.method === 'GET') {
-    const urlObj = parseUrl(url, req.headers.host);
-    const since = urlObj.searchParams.get('since') ?? undefined;
-    const rules = threatDb.getRulesBySource('yara', since);
     sendJson(res, 200, { ok: true, data: rules });
     return true;
   }

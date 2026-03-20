@@ -4,8 +4,6 @@
 
 ## Table of Contents / 目錄
 
-- [Sigma Rules](#sigma-rules)
-- [YARA Rules](#yara-rules)
 - [Built-in Rules](#built-in-rules--內建規則)
 - [Event Correlation Patterns](#event-correlation-patterns--事件關聯模式)
 - [Monitor Types](#monitor-types--監控器類型)
@@ -21,133 +19,9 @@
 
 ---
 
-## Sigma Rules
-
-Panguard uses the [Sigma](https://github.com/SigmaHQ/sigma) rule format for detection logic. Sigma rules are YAML-based and describe patterns to match in log data and security events.
-
-### Rule Sources
-
-| Source       | Path                                                              | Description                                      |
-| ------------ | ----------------------------------------------------------------- | ------------------------------------------------ |
-| Built-in     | Hardcoded in `packages/panguard-guard/src/rules/builtin-rules.ts` | 20 rules shipping with Guard                     |
-| Custom       | `{dataDir}/rules/*.yml`                                           | User-created rules loaded at startup             |
-| Community    | `config/sigma-rules/community/`                                   | Community Sigma rules bundled with installation  |
-| Threat Cloud | Remote fetch on startup + hourly sync                             | Community-contributed rules via Threat Cloud API |
-
-### Rule Loading
-
-The `RuleEngine` (in `@panguard-ai/core`) loads rules from multiple sources:
-
-1. **Built-in rules** (20 rules) are always loaded from the `BUILTIN_RULES` array
-2. **Custom rules** from `{dataDir}/rules/` are loaded via `loadRules()`
-3. **Community rules** from `config/sigma-rules/community/` (configurable via `bundledSigmaDir`)
-4. **Cloud rules** are fetched from Threat Cloud and parsed from Sigma YAML
-
-Hot-reload is enabled by default: rule files are watched for changes and automatically reloaded.
-
-### Sigma Rule Format
-
-```yaml
-title: Suspicious Reverse Shell
-id: panguard-custom-001
-status: stable
-description: Detects reverse shell commands
-author: Your Name
-logsource:
-  category: process_creation
-detection:
-  selection:
-    description|contains:
-      - 'bash -i >& /dev/tcp/'
-      - 'nc -e /bin/'
-  condition: selection
-level: critical
-tags:
-  - attack.execution
-  - attack.t1059
-```
-
-### Supported Sigma Features
-
-| Feature                    | Support                           |
-| -------------------------- | --------------------------------- |
-| `selection` field matching | Full                              |
-| `contains` modifier        | Full                              |
-| `OR` / `AND` conditions    | Full                              |
-| Named selections           | Full                              |
-| Log source filtering       | Category, product, service        |
-| Severity levels            | critical, high, medium, low, info |
-| MITRE ATT&CK tags          | Parsed and forwarded to verdicts  |
-
----
-
-## YARA Rules
-
-YARA rules provide file-based pattern matching for detecting malware, webshells, and suspicious files.
-
-### Rule Sources
-
-| Source    | Path                           | Description                  |
-| --------- | ------------------------------ | ---------------------------- |
-| Custom    | `{dataDir}/yara-rules/custom/` | User-created `.yar` files    |
-| Community | `config/yara-rules/community/` | Bundled community YARA rules |
-
-### YARA Scanner Modes
-
-The `YaraScanner` (in `@panguard-ai/core/rules/yara-scanner.ts`) supports two modes:
-
-1. **Native YARA** via `@automattic/yara` -- full YARA engine with native bindings
-2. **Pattern-based fallback** -- regex-based matching on file content when native bindings are not available
-
-### File Scanning
-
-The scanner can:
-
-- Scan individual files
-- Scan entire directories recursively
-- Compute SHA-256 hashes for all scanned files
-- Convert YARA matches to `SecurityEvent` format for the unified pipeline
-
-### Rule Categories
-
-Community YARA rules typically cover:
-
-| Category           | Description                                         |
-| ------------------ | --------------------------------------------------- |
-| Malware signatures | Known malware binary patterns                       |
-| Webshell detection | PHP/ASP/JSP webshell indicators                     |
-| Exploit toolkits   | Metasploit, Cobalt Strike artifacts                 |
-| Ransomware         | Encryption patterns, ransom note templates          |
-| Cryptominers       | Mining binary signatures, stratum protocol patterns |
-| Backdoors          | Persistent access tool signatures                   |
-
-### Adding Custom YARA Rules
-
-Place `.yar` files in `{dataDir}/yara-rules/custom/`:
-
-```yara
-rule SuspiciousShellcode : shellcode
-{
-    meta:
-        description = "Detects common shellcode patterns"
-        author = "Security Team"
-        severity = "critical"
-
-    strings:
-        $nop_sled = { 90 90 90 90 90 90 90 90 }
-        $execve = { 31 c0 50 68 2f 2f 73 68 }
-        $bind_shell = { 66 68 ?? ?? 66 6a 02 }
-
-    condition:
-        any of them
-}
-```
-
----
-
 ## Built-in Rules / 內建規則
 
-The Guard ships with 20 built-in Sigma rules covering the most common attack techniques. These are defined in `packages/panguard-guard/src/rules/builtin-rules.ts`.
+The Guard ships with 20 built-in rules covering the most common attack techniques. These are defined in `packages/panguard-guard/src/rules/builtin-rules.ts`.
 
 ### Credential Access / 憑證存取
 
@@ -260,7 +134,7 @@ The `EventCorrelator` (`packages/panguard-guard/src/correlation/event-correlator
 
 **Trigger Conditions**:
 
-- Event source is `network` or `suricata`
+- Event source is `network`
 - Destination port extracted from metadata fields: `destinationPort`, `dst_port`, `dstPort`, `remotePort`, `port`
 
 **Confidence Calculation**: `min(100, 65 + (ports - 10) * 3)`
@@ -278,7 +152,7 @@ The `EventCorrelator` (`packages/panguard-guard/src/correlation/event-correlator
 
 **Trigger Conditions**:
 
-- Event source is `network` or `suricata`
+- Event source is `network`
 - Destination IP is internal (matches `10.*`, `172.16-31.*`, `192.168.*`, `127.*`, `::1`, `fd*`, `fe80:*`)
 
 **Confidence Calculation**: `min(100, 55 + (ips - 3) * 10)`
@@ -296,7 +170,7 @@ The `EventCorrelator` (`packages/panguard-guard/src/correlation/event-correlator
 
 **Trigger Conditions**:
 
-- Event source is `network` or `suricata`
+- Event source is `network`
 - Destination IP is NOT internal (RFC 1918)
 - Bytes transferred extracted from: `bytesOut`, `bytes_out`, `bytesSent`, `bytes_sent`, `transferSize`, `bytes`
 - Transfer size exceeds 10 MB (10,485,760 bytes)
@@ -318,7 +192,7 @@ The `EventCorrelator` (`packages/panguard-guard/src/correlation/event-correlator
 
 1. **File write event**: source `file`, category `file_write` or `file_creation`, or action `write`/`create`
 2. **Process creation event**: source `process`, category `process_creation` or `process_start`, or action `exec`/`execve`/`create`
-3. **Network outbound event**: source `network` or `suricata`
+3. **Network outbound event**: source `network`
 
 If source IP is available, events are correlated by IP.
 
@@ -415,29 +289,7 @@ Panguard runs 10 monitors across two layers: 4 built-in monitors from `@panguard
 
 ### Advanced Monitors (Guard)
 
-#### 5. FalcoMonitor
-
-| Property     | Value                                                                                                                                                                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Package      | `packages/panguard-guard/src/monitors/falco-monitor.ts`                                                                                                                                                                                 |
-| Platform     | Linux only                                                                                                                                                                                                                              |
-| Requirements | [Falco](https://falco.org/) >= 0.35 installed, JSON alert output enabled                                                                                                                                                                |
-| Alert Paths  | `/var/log/falco/alerts.json`, `/var/log/falco/events.json`, `/etc/falco/alerts.json`                                                                                                                                                    |
-| Description  | Integrates with CNCF Falco for eBPF-based kernel-level syscall monitoring. Reads Falco JSON alert files and converts to SecurityEvents. Provides visibility into container escapes, privilege escalation, and unauthorized file access. |
-| Degradation  | Gracefully degrades when Falco is not installed (no error, monitor simply not started)                                                                                                                                                  |
-
-#### 6. SuricataMonitor
-
-| Property     | Value                                                                                                                                                        |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Package      | `packages/panguard-guard/src/monitors/suricata-monitor.ts`                                                                                                   |
-| Platform     | Linux, macOS (with Suricata installed)                                                                                                                       |
-| Requirements | [Suricata](https://suricata.io/) >= 7.0, EVE JSON output enabled                                                                                             |
-| EVE Paths    | `/var/log/suricata/eve.json`, `/var/log/suricata/fast.json`, `/usr/local/var/log/suricata/eve.json`                                                          |
-| Description  | Reads Suricata EVE JSON logs for deep packet inspection (DPI) alerts. Captures network intrusion signatures, protocol anomalies, and TLS certificate issues. |
-| Degradation  | Gracefully degrades when Suricata is not installed                                                                                                           |
-
-#### 7. SyscallMonitor
+#### 5. SyscallMonitor
 
 | Property              | Value                                                                                                                                                                                                                                 |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -448,7 +300,7 @@ Panguard runs 10 monitors across two layers: 4 built-in monitors from `@panguard
 | Sensitive Directories | `/etc/`, `/usr/bin/`, `/usr/sbin/`, `/usr/local/bin/`, `/usr/local/sbin/`, `/boot/`, `/lib/modules/`, `/root/`, `/var/spool/cron/`                                                                                                    |
 | Degradation           | Gracefully degrades on non-Linux platforms or kernels < 4.18                                                                                                                                                                          |
 
-#### 8. MemoryScanner
+#### 6. MemoryScanner
 
 | Property     | Value                                                                                                                                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -458,7 +310,7 @@ Panguard runs 10 monitors across two layers: 4 built-in monitors from `@panguard
 | Description  | Reads process memory via `/proc/{pid}/mem` and applies pattern matching to detect fileless malware (code running only in memory), injected shellcode, C2 beacon patterns, and known malware signatures. |
 | Degradation  | Gracefully degrades when `/proc` is not available or insufficient permissions                                                                                                                           |
 
-#### 9. DpiMonitor
+#### 7. DpiMonitor
 
 | Property     | Value                                                                                                                                                                                                                                                                                                                                    |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -468,7 +320,7 @@ Panguard runs 10 monitors across two layers: 4 built-in monitors from `@panguard
 | Description  | Deep Packet Inspection without raw packet capture (pcap). Analyzes network traffic patterns to detect DNS tunneling (Shannon entropy analysis of domain names), C2 beaconing (fixed-interval callbacks with jitter detection), data exfiltration (large outbound transfers), and suspicious TLS certificates (self-signed, short-lived). |
 | Degradation  | Gracefully degrades on non-Linux platforms                                                                                                                                                                                                                                                                                               |
 
-#### 10. RootkitDetector
+#### 8. RootkitDetector
 
 | Property      | Value                                                                                                                                                                                                                                                                                                                                |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -487,8 +339,6 @@ Panguard runs 10 monitors across two layers: 4 built-in monitors from `@panguard
 | NetworkMonitor  | Yes   | Yes     | Yes     | None                         |
 | ProcessMonitor  | Yes   | Yes     | Yes     | None                         |
 | FileMonitor     | Yes   | Yes     | Yes     | Configured watch paths       |
-| FalcoMonitor    | Yes   | No      | No      | Falco installed              |
-| SuricataMonitor | Yes   | Partial | No      | Suricata installed           |
 | SyscallMonitor  | Yes   | No      | No      | Kernel 4.18+, CAP_SYS_PTRACE |
 | MemoryScanner   | Yes   | No      | No      | CAP_SYS_PTRACE, /proc access |
 | DpiMonitor      | Yes   | No      | No      | /proc/net access             |
@@ -576,8 +426,8 @@ The `ThreatIntelFeedManager` (`packages/core/src/monitor/threat-intel-feeds.ts`)
 In addition to the 5 external feeds, the Guard also integrates with Panguard's Threat Cloud:
 
 - **Blocklist Download**: Fetches known-bad IP addresses and injects them into the feed manager with confidence score 85
-- **Rule Distribution**: Downloads community Sigma rules (parsed from YAML)
-- **Anonymized Data Upload**: Uploads anonymized threat data (IP /16-anonymized, MITRE technique, Sigma rule IDs) for collective intelligence
+- **Rule Distribution**: Downloads community ATR rules
+- **Anonymized Data Upload**: Uploads anonymized threat data (IP /16-anonymized, MITRE technique, ATR rule IDs) for collective intelligence
 
 Sync happens at startup and then hourly via the `cloudSyncTimer`.
 
@@ -585,7 +435,7 @@ Sync happens at startup and then hourly via the `cloudSyncTimer`.
 
 ## Adding Custom Rules / 新增自訂規則
 
-### Adding Custom Sigma Rules
+### Adding Custom Rules
 
 1. Create a `.yml` file in `{dataDir}/rules/`:
 
@@ -616,60 +466,6 @@ tags:
 
 2. The `RuleEngine` will automatically reload the rule (hot-reload is enabled by default).
 
-### Adding Custom YARA Rules
-
-1. Create a `.yar` file in `{dataDir}/yara-rules/custom/`:
-
-```yara
-rule CustomMalwareSignature : malware
-{
-    meta:
-        description = "Custom malware detection"
-        author = "Security Team"
-        severity = "high"
-        date = "2026-03-03"
-
-    strings:
-        $pattern1 = { 4D 5A 90 00 03 00 }
-        $pattern2 = "malicious_function"
-        $pattern3 = /https?:\/\/evil\.example\.com/
-
-    condition:
-        $pattern1 at 0 and ($pattern2 or $pattern3)
-}
-```
-
-2. Rules are loaded on startup via `yaraScanner.loadAllRules()`.
-
-### Adding Custom Falco Rules
-
-Place custom Falco rules in `config/falco-rules/`:
-
-```yaml
-# config/falco-rules/panguard-custom.yaml
-- rule: Detect Sensitive Mount
-  desc: Detect mounting of sensitive host directories into containers
-  condition: >
-    evt.type = mount and
-    container.id != host and
-    (fd.name startswith /etc or fd.name startswith /proc)
-  output: >
-    Sensitive mount detected (user=%user.name
-    command=%proc.cmdline container=%container.name
-    mount=%fd.name)
-  priority: WARNING
-  tags: [container, mitre_privilege_escalation]
-```
-
-### Adding Custom Suricata Rules
-
-Place custom Suricata rules in `config/suricata/`:
-
-```yaml
-# config/suricata/panguard.yaml
-# Custom Suricata rules are loaded alongside the default ruleset
-```
-
 ### Rule Precedence
 
 When multiple rules match the same event:
@@ -686,7 +482,7 @@ When multiple rules match the same event:
 Panguard uses a cost-optimized, three-layer detection funnel. Events flow from the cheapest layer upward only when additional analysis is needed.
 
 ```
-Layer 1: Rules ($0)           -- Sigma, YARA, built-in pattern matching
+Layer 1: Rules ($0)           -- ATR + built-in pattern matching
          |
          v  (unresolved events)
 Layer 2: Local AI ($0)        -- Ollama (local LLM inference)
@@ -701,8 +497,7 @@ All events pass through the rule engine first. This layer handles the vast major
 
 | Component          | Description                                                           |
 | ------------------ | --------------------------------------------------------------------- |
-| Sigma Rule Engine  | Matches events against Sigma rules (20 built-in + custom + community) |
-| YARA Scanner       | File-based pattern matching for malware and webshells                 |
+| ATR Rule Engine    | Matches events against ATR rules (61 rules across 9 categories)       |
 | Threat Intel Feeds | IP/domain/hash lookup against 5 external feeds + Threat Cloud         |
 | Event Correlator   | 7 multi-step attack pattern detectors                                 |
 
@@ -999,13 +794,11 @@ The ThreatVerdict aggregates evidence from multiple sources:
 
 | Source               | Description                                       |
 | -------------------- | ------------------------------------------------- |
-| `rule_match`         | Sigma/YARA rule matched the event                 |
+| `rule_match`         | ATR rule matched the event                        |
 | `ai_analysis`        | AI model analysis and reasoning                   |
 | `baseline_deviation` | Event deviates from learned baseline              |
 | `threat_intel`       | IP/domain/hash found in threat intelligence feeds |
 | `investigation`      | Evidence gathered by investigation tools          |
-| `falco`              | Falco kernel-level alert                          |
-| `suricata`           | Suricata network IDS alert                        |
 
 ---
 

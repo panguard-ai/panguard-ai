@@ -50,8 +50,7 @@ export type EvidenceSource =
   | 'baseline_deviation'
   | 'threat_intel'
   | 'investigation'
-  | 'falco'
-  | 'suricata';
+  | 'falco';
 
 /** Evidence item / 證據項目 */
 export interface Evidence {
@@ -549,12 +548,6 @@ export interface GuardConfig {
   };
   watchdogEnabled: boolean;
   watchdogInterval: number;
-  /** YARA rules directory (custom + community) / YARA 規則目錄 */
-  yaraRulesDir?: string;
-  /** Bundled Sigma rules directory (shipped with installation) / 內建 Sigma 規則目錄 */
-  bundledSigmaDir?: string;
-  /** Bundled YARA rules directory (shipped with installation) / 內建 YARA 規則目錄 */
-  bundledYaraDir?: string;
   /** SOAR playbook directory for custom response strategies / SOAR 劇本目錄 */
   playbookDir?: string;
   /** Manager URL for agent mode (distributed architecture) */

@@ -234,48 +234,6 @@ export function threatCommand(): Command {
         return results;
       }
 
-      // Sigma rules
-      const sigmaDir = join(configDir, 'sigma-rules');
-      try {
-        const sigmaFiles = collectFiles(sigmaDir, ['.yml', '.yaml']);
-        for (const file of sigmaFiles) {
-          const content = readFs(file, 'utf-8');
-          const ruleId = `sigma:${relative(sigmaDir, file).replace(/\//g, ':')}`;
-          db.upsertRule({ ruleId, ruleContent: content, publishedAt: now, source: 'sigma' });
-          seeded++;
-        }
-        console.log(`  ${symbols.pass} Sigma: ${sigmaFiles.length} rules`);
-      } catch {
-        /* skip */
-      }
-
-      // YARA rules
-      const yaraDir = join(configDir, 'yara-rules');
-      try {
-        const yaraFiles = collectFiles(yaraDir, ['.yar', '.yara']);
-        let yaraCount = 0;
-        for (const file of yaraFiles) {
-          const content = readFs(file, 'utf-8');
-          const ruleMatches = content.match(/rule\s+\w+/g);
-          if (ruleMatches && ruleMatches.length > 1) {
-            for (const match of ruleMatches) {
-              const ruleName = match.replace('rule ', '');
-              const ruleId = `yara:${basename(file, '.yar').replace('.yara', '')}:${ruleName}`;
-              db.upsertRule({ ruleId, ruleContent: content, publishedAt: now, source: 'yara' });
-              yaraCount++;
-            }
-          } else {
-            const ruleId = `yara:${relative(yaraDir, file).replace(/\//g, ':')}`;
-            db.upsertRule({ ruleId, ruleContent: content, publishedAt: now, source: 'yara' });
-            yaraCount++;
-          }
-        }
-        seeded += yaraCount;
-        console.log(`  ${symbols.pass} YARA: ${yaraCount} rules (from ${yaraFiles.length} files)`);
-      } catch {
-        /* skip */
-      }
-
       // ATR rules
       const atrDirs = [
         join(process.cwd(), 'node_modules', 'agent-threat-rules', 'rules'),

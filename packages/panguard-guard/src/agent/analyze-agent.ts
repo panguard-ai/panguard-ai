@@ -150,20 +150,6 @@ export class AnalyzeAgent {
       });
     }
 
-    if (detection.event.source === 'suricata') {
-      evidenceList.push({
-        source: 'suricata',
-        description: `Suricata network IDS detection: ${detection.event.description}`,
-        confidence: SEVERITY_CONFIDENCE[detection.event.severity] ?? 50,
-        data: {
-          eventSource: 'suricata',
-          category: detection.event.category,
-          sourceIP: detection.event.metadata?.['sourceIP'],
-          destIP: detection.event.metadata?.['destIP'],
-        },
-      });
-    }
-
     // Step 4: Attack chain correlation boost
     if (detection.attackChain) {
       const chainBoost = Math.min(
@@ -338,10 +324,7 @@ function calculateFinalConfidence(evidence: Evidence[], hasAI: boolean): number 
   const baselineConfidence = maxConfidence(bySource['baseline_deviation']);
   const threatIntelConfidence = maxConfidence(bySource['threat_intel']);
   const aiConfidence = maxConfidence(bySource['ai_analysis']);
-  const ebpfConfidence = Math.max(
-    maxConfidence(bySource['falco']),
-    maxConfidence(bySource['suricata'])
-  );
+  const ebpfConfidence = maxConfidence(bySource['falco']);
 
   const ruleScore = Math.max(ruleConfidence, threatIntelConfidence);
   const hasEbpf = ebpfConfidence > 0;
@@ -468,8 +451,7 @@ function determineAction(confidence: number, detection: DetectionResult): Respon
   const autoThreshold = hasAttackChain ? 75 : 85;
 
   if (confidence >= autoThreshold || (hasCritical && confidence >= 70)) {
-    if (detection.event.source === 'network' || detection.event.source === 'suricata')
-      return 'block_ip';
+    if (detection.event.source === 'network') return 'block_ip';
     if (detection.event.source === 'process' || detection.event.source === 'falco')
       return 'kill_process';
     // YARA / file-triggered events should prefer isolate_file

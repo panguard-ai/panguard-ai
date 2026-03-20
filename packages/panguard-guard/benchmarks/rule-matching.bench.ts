@@ -23,7 +23,6 @@ const EVENT_SOURCES: SecurityEvent['source'][] = [
   'process',
   'file',
   'syslog',
-  'suricata',
 ];
 
 const CATEGORIES = [

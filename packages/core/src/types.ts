@@ -27,7 +27,6 @@ export type EventSource =
   | 'process'
   | 'file'
   | 'falco'
-  | 'suricata'
   | 'honeypot'
   | 'dpi'
   | 'memory_scanner'

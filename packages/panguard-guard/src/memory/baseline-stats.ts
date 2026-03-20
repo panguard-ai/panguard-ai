@@ -75,7 +75,7 @@ export class BaselineStats {
     this.maybeFlushWindow(eventTime);
 
     // Track connection frequency per destination IP / 追蹤每目的 IP 的連線頻率
-    if (event.source === 'network' || event.source === 'suricata') {
+    if (event.source === 'network') {
       const destIP = extractDestIP(event);
       if (destIP) {
         const metricKey = `conn_freq_${destIP}`;
@@ -151,7 +151,7 @@ export class BaselineStats {
     const scores: number[] = [];
 
     // Score connection frequency / 評分連線頻率
-    if (event.source === 'network' || event.source === 'suricata') {
+    if (event.source === 'network') {
       const destIP = extractDestIP(event);
       if (destIP) {
         const metricKey = `conn_freq_${destIP}`;

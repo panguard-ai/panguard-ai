@@ -103,7 +103,7 @@ export default function ProductGuardContent() {
                 {[
                   {
                     label: t('dashboard.detectionRules'),
-                    value: STATS.integratedRulesDisplay,
+                    value: STATS.totalRulesDisplay,
                     color: 'text-status-safe',
                   },
                   {

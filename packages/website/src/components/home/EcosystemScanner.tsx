@@ -36,7 +36,7 @@ export default function EcosystemScanner() {
             <div className="bg-surface-1/60 border border-border rounded-2xl p-5 text-center">
               <ShieldIcon className="w-6 h-6 text-panguard-green mx-auto mb-3" />
               <div className="text-2xl sm:text-3xl font-extrabold text-text-primary">
-                <CountUp target={STATS.sigmaRules} />
+                <CountUp target={STATS.atrRules} />
               </div>
               <p className="text-xs text-text-muted mt-1">Sigma {t('rules')}</p>
               <p className="text-[10px] text-text-muted mt-0.5">{t('sigmaDesc')}</p>
@@ -48,7 +48,7 @@ export default function EcosystemScanner() {
             <div className="bg-surface-1/60 border border-border rounded-2xl p-5 text-center">
               <ScanIcon className="w-6 h-6 text-panguard-green mx-auto mb-3" />
               <div className="text-2xl sm:text-3xl font-extrabold text-text-primary">
-                <CountUp target={STATS.yaraRules} />
+                <CountUp target={STATS.atrPatterns} />
               </div>
               <p className="text-xs text-text-muted mt-1">YARA {t('rules')}</p>
               <p className="text-[10px] text-text-muted mt-0.5">{t('yaraDesc')}</p>
@@ -72,7 +72,7 @@ export default function EcosystemScanner() {
         <FadeInUp delay={0.24}>
           <div className="bg-surface-1/40 border border-border rounded-2xl p-5 sm:p-6 max-w-xl mx-auto text-center">
             <div className="text-3xl sm:text-4xl font-extrabold text-panguard-green">
-              {STATS.integratedRulesDisplay}
+              {STATS.totalRulesDisplay}
             </div>
             <p className="text-sm text-text-secondary mt-2">{t('totalRulesDesc')}</p>
             <p className="text-xs text-text-muted mt-1">{t('growingDaily')}</p>

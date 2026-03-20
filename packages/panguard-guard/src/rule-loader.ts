@@ -123,7 +123,6 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
 
   const ruleEngine = new RuleEngine({
     rulesDir: join(config.dataDir, 'rules'),
-    communityRulesDir: config.bundledSigmaDir,
     hotReload: true,
     customRules: BUILTIN_RULES,
   });
@@ -339,12 +338,9 @@ export async function loadAllRules(
     });
 
   {
-    const yaraCustomDir = config.yaraRulesDir
-      ? join(config.yaraRulesDir, 'custom')
-      : join(config.dataDir, 'yara-rules', 'custom');
-    const yaraBundledDir = config.bundledYaraDir;
+    const yaraCustomDir = join(config.dataDir, 'yara-rules', 'custom');
     yaraScanner
-      .loadAllRules(yaraCustomDir, yaraBundledDir)
+      .loadAllRules(yaraCustomDir)
       .then((count) => {
         logger.info(`YARA rules loaded: ${count} rules / YARA 規則已載入: ${count} 條`);
       })

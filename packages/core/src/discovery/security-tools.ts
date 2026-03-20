@@ -139,14 +139,6 @@ const KNOWN_SECURITY_TOOLS: KnownSecurityTool[] = [
     installPaths: ['/usr/local/bin/snort', '/usr/sbin/snort'],
   },
   {
-    name: 'Suricata',
-    vendor: 'OISF',
-    processNames: ['suricata'],
-    serviceName: 'suricata',
-    type: 'ids',
-    installPaths: ['/usr/bin/suricata', '/usr/local/bin/suricata'],
-  },
-  {
     name: 'OSSEC',
     vendor: 'OSSEC Foundation',
     processNames: ['ossec-analysisd', 'ossec-syscheckd', 'ossec-remoted'],

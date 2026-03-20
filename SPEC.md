@@ -1279,8 +1279,6 @@ phalanx-ai/
 │   └── panguard-web/             # 官網 + Dashboard
 │
 ├── config/
-│   ├── sigma-rules/
-│   └── yara-rules/
 ├── tests/
 ├── scripts/
 │   ├── install.sh               # Linux/Mac 一行安裝

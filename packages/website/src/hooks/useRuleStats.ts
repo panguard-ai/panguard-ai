@@ -44,8 +44,8 @@ function setCache(data: RuleStats): void {
 
 /** Static fallback values from stats.ts (used during SSR and before fetch completes) */
 const FALLBACK: RuleStats = {
-  sigmaRules: STATS.sigmaRules,
-  yaraRules: STATS.yaraRules,
+  sigmaRules: STATS.atrRules,
+  yaraRules: STATS.atrPatterns,
   atrRules: STATS.atrRules,
   totalRules: STATS.totalRules,
   lastSync: STATS.lastUpdated,

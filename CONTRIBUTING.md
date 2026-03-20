@@ -50,8 +50,6 @@ packages/
   panguard-mcp/           # MCP server for AI assistants
   panguard-skill-auditor/ # AI agent skill auditor
 config/
-  sigma-rules/            # 3,760 Sigma detection rules
-  yara-rules/             # 5,961 YARA detection rules
 ```
 
 ---
@@ -77,7 +75,7 @@ fix: handle empty SKILL.md gracefully
 docs: update ATR rule writing guide
 test: add E2E tests for skill auditor pipeline
 refactor: extract rule loader from guard engine
-chore: update sigma rules to latest community release
+chore: update ATR rules to latest release
 ```
 
 Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `perf`, `ci`
@@ -149,14 +147,6 @@ npx agent-threat-rules test path/to/my-rule.yaml
 
 Rules go in `packages/atr/rules/<category>/`. Categories: `prompt-injection`, `tool-poisoning`, `context-exfiltration`, `agent-manipulation`, `privilege-escalation`, `excessive-autonomy`, `skill-compromise`, `data-poisoning`, `model-security`.
 
-### Sigma Rules (Network/System Threats)
-
-Community Sigma rules go in `config/sigma-rules/custom/`. Follow the [Sigma specification](https://sigmahq.io/).
-
-### YARA Rules (File/Malware Threats)
-
-Community YARA rules go in `config/yara-rules/custom/`. Follow the [YARA documentation](https://yara.readthedocs.io/).
-
 ---
 
 ## Contributing Translations
@@ -166,7 +156,7 @@ The website uses [next-intl](https://next-intl-docs.vercel.app/) with two locale
 - English: `packages/website/messages/en.json`
 - Traditional Chinese: `packages/website/messages/zh.json`
 
-To add or improve translations, edit the corresponding JSON file. Keys must match between both files. Some strings use ICU format for dynamic values (e.g., `{sigmaRules}`).
+To add or improve translations, edit the corresponding JSON file. Keys must match between both files. Some strings use ICU format for dynamic values.
 
 ---
 

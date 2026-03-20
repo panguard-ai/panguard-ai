@@ -242,15 +242,6 @@ vi.mock('../src/monitors/falco-monitor.js', () => ({
   })),
 }));
 
-vi.mock('../src/monitors/suricata-monitor.js', () => ({
-  SuricataMonitor: vi.fn().mockImplementation(() => ({
-    checkAvailability: vi.fn().mockResolvedValue(false),
-    on: vi.fn(),
-    start: vi.fn().mockResolvedValue(undefined),
-    stop: vi.fn(),
-  })),
-}));
-
 // Mock builtin rules
 vi.mock('../src/rules/builtin-rules.js', () => ({
   BUILTIN_RULES: [],

@@ -56,9 +56,7 @@
             "pages": [
               "configuration/guard-config",
               "configuration/chat-config",
-              "configuration/environment-variables",
-              "configuration/sigma-rules",
-              "configuration/yara-rules"
+              "configuration/environment-variables"
             ]
           },
           {

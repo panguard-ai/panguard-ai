@@ -23,7 +23,7 @@
        |
        v
   +-----------+
-  | Layer 1   |  Sigma / YARA 規則引擎
+  | Layer 1   |  ATR 規則引擎
   | 90% 事件  |  延遲 < 1ms | 成本 = 零
   +-----------+
        |
@@ -46,52 +46,13 @@
 
 ---
 
-## Layer 1 — 規則引擎（90%）
+## Layer 1 — ATR 規則引擎（90%）
 
-處理所有已知攻擊模式，零延遲、零成本。
+處理所有已知 AI Agent 攻擊模式，零延遲、零成本。
 
-### Sigma 規則
+ATR (Agent Threat Rules) 是專為 AI Agent 安全設計的開放偵測標準。Panguard Guard 內建 61 條 ATR 規則，覆蓋 9 個威脅類別，包括 prompt injection、tool poisoning、context exfiltration 等 AI 特有威脅。
 
-Sigma 是安全社群的標準規則格式。Panguard Guard 內建 42 條規則，覆蓋常見攻擊模式：
-
-```yaml
-title: Suspicious SSH Brute Force
-logsource:
-  category: network
-  product: any
-detection:
-  selection:
-    destination_port: 22
-    action: blocked
-  condition: selection
-level: high
-```
-
-支援的 Sigma 功能：
-
-- 布林邏輯：`AND`、`OR`、`NOT`
-- 聚合表達式：`1 of them`、`all of them`、`1 of selection*`
-- 比對修飾符：`|contains`、`|startswith`、`|endswith`、`|re`
-- 數值比較：`|gt`、`|gte`、`|lt`、`|lte`
-- 網路比對：`|cidr`（IP 範圍匹配）
-- 萬用字元：`*`、`?`
-- 括號群組：`(sel_a OR sel_b) AND NOT filter`
-
-### YARA 規則
-
-用於檔案層級的惡意程式偵測：
-
-```yara
-rule SuspiciousScript {
-  strings:
-    $cmd = "rm -rf /" nocase
-    $wget = "wget" nocase
-  condition:
-    any of them
-}
-```
-
-Panguard 支援原生 YARA 引擎，若系統未安裝 YARA 則自動降級為 regex fallback。
+詳見 [ATR 標準](https://github.com/Agent-Threat-Rule/agent-threat-rules)。
 
 ---
 
@@ -142,6 +103,5 @@ Panguard 支援原生 YARA 引擎，若系統未安裝 YARA 則自動降級為 r
 
 ## 相關文件
 
-- [Sigma 規則撰寫指南](../reference/sigma-rules.md)
-- [YARA 規則撰寫指南](../reference/yara-rules.md)
+- [ATR 規則參考](../reference/atr-rules.md)
 - [Panguard Guard 使用指南](../guides/guard.md)

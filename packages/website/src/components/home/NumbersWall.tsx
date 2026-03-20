@@ -46,7 +46,7 @@ export default function NumbersWall() {
 
   const statValues: (number | string)[] = [
     STATS.atrRules,
-    STATS.integratedRulesDisplay,
+    STATS.totalRulesDisplay,
     STATS.testsPassing,
     STATS.detectionLayers,
     STATS.skillAuditChecks,
