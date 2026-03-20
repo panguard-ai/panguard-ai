@@ -25,7 +25,7 @@
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, basename, relative, dirname } from 'node:path';
+import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { ThreatCloudDB } from './database.js';

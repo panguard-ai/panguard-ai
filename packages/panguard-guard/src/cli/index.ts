@@ -508,7 +508,7 @@ function printAiSetupGuide(): void {
 }
 
 /** Interactive AI setup wizard / 互動式 AI 設定精靈 */
-async function commandSetupAI(dataDir: string): Promise<void> {
+async function commandSetupAI(_dataDir: string): Promise<void> {
   const lang = 'en' as const;
   const l = (en: string, zh: string) => ({ en, 'zh-TW': zh });
 
