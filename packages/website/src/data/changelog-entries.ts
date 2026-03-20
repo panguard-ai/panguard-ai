@@ -132,7 +132,7 @@ export const changelogEntries: ChangelogEntry[] = [
       { type: 'feature', text: 'Panguard Report: auto-generated compliance reports' },
       {
         type: 'feature',
-        text: '125+ ATR (Agent Threat Rules) for AI agent security',
+        text: '61 ATR (Agent Threat Rules) for AI agent security',
       },
       { type: 'feature', text: 'Context memory learning system' },
     ],

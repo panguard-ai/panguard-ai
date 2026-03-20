@@ -307,7 +307,7 @@ function runFullScan(
   // Strip code blocks, quotes, inline code — these are documentation, not behavior
   const scanContent = stripMarkdownNoise(content);
 
-  // ── ATR Pattern Detection (125 rules, 500 patterns) ──
+  // ── ATR Pattern Detection (61 rules, 474 patterns) ──
   for (const rule of liveATR) {
     for (const compiled of rule.compiled) {
       try {
