@@ -359,13 +359,15 @@ export async function processEvent(
       runKnowledgeDistillation(event, verdict, deps.knowledgeDistiller);
     }
 
-    // Record detection for ATR Drafter
+    // Record detection for ATR Drafter with full analyzeAgent context
     if (deps.atrDrafter && verdict.conclusion !== 'benign') {
       deps.atrDrafter.recordDetection(event, {
         conclusion: verdict.conclusion,
         confidence: verdict.confidence,
         mitreTechniques: verdict.mitreTechnique ? [verdict.mitreTechnique] : undefined,
         atrRulesMatched: detection.atrMatches?.map((m) => m.ruleId),
+        reasoning: verdict.reasoning,
+        evidenceDescriptions: verdict.evidence.map((e) => `[${e.source}] ${e.description}`),
       });
     }
 

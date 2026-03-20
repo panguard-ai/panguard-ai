@@ -34,6 +34,10 @@ interface LocalPattern {
   severities: Record<string, number>;
   sampleDescriptions: string[];
   atrRulesMatched: string[];
+  /** Reasoning from analyzeAgent explaining WHY the event was flagged */
+  analyzeReasons: string[];
+  /** Specific evidence descriptions from analyzeAgent verdicts */
+  evidenceDescriptions: string[];
   firstSeen: string;
   lastSeen: string;
 }
@@ -107,6 +111,10 @@ export class ATRDrafter {
       confidence: number;
       mitreTechniques?: string[];
       atrRulesMatched?: string[];
+      /** AnalyzeAgent reasoning explaining why the event was flagged */
+      reasoning?: string;
+      /** Evidence descriptions from the analyzeAgent verdict */
+      evidenceDescriptions?: string[];
     }
   ): void {
     // Only track suspicious/malicious verdicts with reasonable confidence
@@ -126,6 +134,8 @@ export class ATRDrafter {
         severities: {},
         sampleDescriptions: [],
         atrRulesMatched: [],
+        analyzeReasons: [],
+        evidenceDescriptions: [],
         firstSeen: new Date().toISOString(),
         lastSeen: new Date().toISOString(),
       };
@@ -150,6 +160,25 @@ export class ATRDrafter {
       for (const r of verdict.atrRulesMatched) {
         if (!pattern.atrRulesMatched.includes(r)) {
           pattern.atrRulesMatched.push(r);
+        }
+      }
+    }
+
+    // Accumulate analyzeAgent reasoning (keep up to 3 unique entries)
+    if (verdict.reasoning && pattern.analyzeReasons.length < 3) {
+      const shortReasoning = verdict.reasoning.slice(0, 500);
+      if (!pattern.analyzeReasons.includes(shortReasoning)) {
+        pattern.analyzeReasons.push(shortReasoning);
+      }
+    }
+
+    // Accumulate evidence descriptions (keep up to 5 unique entries)
+    if (verdict.evidenceDescriptions) {
+      for (const desc of verdict.evidenceDescriptions) {
+        if (pattern.evidenceDescriptions.length >= 5) break;
+        const shortDesc = desc.slice(0, 200);
+        if (!pattern.evidenceDescriptions.includes(shortDesc)) {
+          pattern.evidenceDescriptions.push(shortDesc);
         }
       }
     }
@@ -380,6 +409,16 @@ export class ATRDrafter {
         ? `\nExisting ATR rules already matching: ${pattern.atrRulesMatched.join(', ')}`
         : '';
 
+    const analyzeContext =
+      pattern.analyzeReasons.length > 0
+        ? `\nAI ANALYSIS REASONING (why events were flagged):\n${pattern.analyzeReasons.map((r, i) => `  ${i + 1}. ${r}`).join('\n')}`
+        : '';
+
+    const evidenceContext =
+      pattern.evidenceDescriptions.length > 0
+        ? `\nDETECTION EVIDENCE:\n${pattern.evidenceDescriptions.map((d, i) => `  ${i + 1}. ${d}`).join('\n')}`
+        : '';
+
     return `You are a cybersecurity expert. Generate an ATR (Agent Threat Rules) YAML rule for this attack pattern.
 
 PATTERN:
@@ -389,6 +428,8 @@ PATTERN:
 - Severity Distribution: ${JSON.stringify(pattern.severities)}
 - Time Range: ${pattern.firstSeen} to ${pattern.lastSeen}
 ${existingATR}
+${analyzeContext}
+${evidenceContext}
 
 SAMPLE EVENTS:
 ${samples}
