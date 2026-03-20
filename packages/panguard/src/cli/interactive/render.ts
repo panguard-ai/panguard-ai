@@ -35,7 +35,9 @@ export function isGuardRunning(): { running: boolean; pid?: number } {
 
 export async function isMCPConfigured(): Promise<boolean> {
   try {
-    const mcpConfig = await import('@panguard-ai/panguard-mcp/config');
+    const mcpConfig = await (import('@panguard-ai/panguard-mcp/config' as string) as Promise<{
+      detectPlatforms: () => Promise<Array<{ detected: boolean; alreadyConfigured: boolean }>>;
+    }>);
     const platforms = await mcpConfig.detectPlatforms();
     return platforms.some(
       (p: { detected: boolean; alreadyConfigured: boolean }) => p.detected && p.alreadyConfigured
