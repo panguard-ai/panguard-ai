@@ -25,8 +25,7 @@ Guard 的設定檔位於資料目錄中：
     "registry": false
   },
   "rules": {
-    "sigmaDir": "./rules/sigma",
-    "yaraDir": "./rules/yara",
+    "atrDir": "./rules/atr",
     "autoReload": true
   },
   "response": {

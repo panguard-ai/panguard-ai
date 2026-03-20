@@ -27,7 +27,7 @@ import { loadBaseline } from './memory/index.js';
 import { InvestigationEngine } from './investigation/index.js';
 import { ThreatCloudClient } from './threat-cloud/index.js';
 import { validateLicense, hasFeature } from './license/index.js';
-// BUILTIN_RULES removed (Sigma RuleEngine no longer used)
+// Detection handled by ATR Engine
 import { GuardATREngine } from './engines/atr-engine.js';
 import { ATRDrafter } from './engines/atr-drafter.js';
 import { PlaybookEngine } from './playbook/index.js';

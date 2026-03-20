@@ -117,7 +117,7 @@ panguard guard status
 | Score Climber      | 分數提升 20 分以上          | 顯著改善      |
 | Perfect Score      | 獲得 100 分                 | 完美防護      |
 | Threat Hunter      | 偵測到 10 個威脅            | 主動偵測      |
-| Rule Writer        | 自訂 Sigma 規則             | 進階使用者    |
+| Rule Writer        | 自訂 ATR 規則               | 進階使用者    |
 | Community Guardian | 上傳威脅情報到 Threat Cloud | 社群貢獻      |
 | Compliance Ready   | 通過合規檢查                | 合規達標      |
 

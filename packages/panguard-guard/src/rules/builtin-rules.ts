@@ -1,8 +1,7 @@
 /**
  * Built-in detection rules shipped with Guard
  *
- * Sigma-format builtin rules have been removed.
- * Detection is now handled exclusively by ATR Engine.
+ * Detection is handled exclusively by ATR Engine.
  *
  * @module @panguard-ai/panguard-guard/rules/builtin-rules
  */
