@@ -50,7 +50,7 @@
 
 處理所有已知 AI Agent 攻擊模式，零延遲、零成本。
 
-ATR (Agent Threat Rules) 是專為 AI Agent 安全設計的開放偵測標準。Panguard Guard 內建 125 條 ATR 規則，覆蓋 9 個威脅類別，包括 prompt injection、tool poisoning、context exfiltration 等 AI 特有威脅。
+ATR (Agent Threat Rules) 是專為 AI Agent 安全設計的開放偵測標準。Panguard Guard 內建 61 條 ATR 規則，覆蓋 9 個威脅類別，包括 prompt injection、tool poisoning、context exfiltration 等 AI 特有威脅。
 
 詳見 [ATR 標準](https://github.com/Agent-Threat-Rule/agent-threat-rules)。
 

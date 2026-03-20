@@ -140,6 +140,7 @@ export class SkillWatcher extends EventEmitter {
       autoWhitelist: config?.autoWhitelist ?? true,
       submitThreat: config?.submitThreat,
       submitATRProposal: config?.submitATRProposal,
+      checkBlacklist: config?.checkBlacklist,
     };
   }
 

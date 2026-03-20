@@ -14,7 +14,7 @@
 [![GitHub Forks](https://img.shields.io/github/forks/panguard-ai/panguard-ai?style=flat-square)](https://github.com/panguard-ai/panguard-ai/network)
 [![npm version](https://img.shields.io/npm/v/@panguard-ai/panguard?style=flat-square&color=cb3837&logo=npm)](https://www.npmjs.com/package/@panguard-ai/panguard)
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](LICENSE)
-[![ATR](https://img.shields.io/badge/ATR-125%20rules-8b5cf6-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
+[![ATR](https://img.shields.io/badge/ATR-61%20rules-8b5cf6-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
 [![Made in Taiwan](https://img.shields.io/badge/Made%20in-Taiwan-e11d48.svg?style=flat-square)](https://panguard.ai)
 
 [Quick Start](#quick-start) | [Online Scanner](https://panguard.ai) | [ATR Standard](https://github.com/Agent-Threat-Rule/agent-threat-rules) | [Ecosystem Report](https://panguard.ai/research/mcp-ecosystem-scan)
@@ -77,7 +77,7 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
 | **[Skill Auditor](docs/overview.md)**                              | 6-check security gate before any skill runs                            | GA     |
 | **[Guard](#guard)**                                                | 24/7 runtime monitoring + auto-block                                   | GA     |
 | **[Threat Cloud](#threat-cloud)**                                  | Anonymous community threat intel. 3+ confirmations + LLM review.       | GA     |
-| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 125 rules across 9 categories. | RFC    |
+| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 61 rules across 9 categories. | RFC    |
 
 One user's encounter with a new attack becomes a rule that protects everyone.
 
@@ -102,7 +102,7 @@ Top findings: SSH key exfiltration, prompt injection with Unicode obfuscation, e
 
 | Layer | Engine                          | Coverage           | Latency | Cost    |
 | ----- | ------------------------------- | ------------------ | ------- | ------- |
-| **1** | **Rules** -- 125 ATR rules      | ~90% known threats | < 50ms  | $0      |
+| **1** | **Rules** -- 61 ATR rules      | ~90% known threats | < 50ms  | $0      |
 | **2** | **Local AI** -- Ollama          | ~7% ambiguous      | ~ 2s    | $0      |
 | **3** | **Cloud AI** -- Claude / OpenAI | ~3% novel          | ~ 5s    | ~$0.008 |
 
@@ -114,7 +114,7 @@ Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet dow
 
 | Rule Type | Count  | Purpose                                                              |
 | --------- | ------ | -------------------------------------------------------------------- |
-| **ATR**   | 125    | AI agent threats: prompt injection, tool poisoning, skill compromise |
+| **ATR**   | 61     | AI agent threats: prompt injection, tool poisoning, skill compromise |
 
 ATR (Agent Threat Rules) is the only rule format designed to protect AI agents. Traditional security rules (Sigma, YARA) detect network/malware threats but cannot detect AI-specific attacks like prompt injection, tool poisoning, or context exfiltration.
 
@@ -157,7 +157,7 @@ panguard guard start --dashboard
 
 Every Panguard instance is a sensor. Threats are auto-drafted into ATR rules, uploaded anonymously, confirmed by 3+ users + LLM review, then pushed to everyone.
 
-**Currently:** 125 community-generated rules from 3,230 skill scans.
+**Currently:** 61 community-generated rules from 3,230 skill scans.
 
 **Privacy:** Fully optional. Only anonymized signatures. Zero raw data, zero PII. Disable anytime.
 
@@ -192,7 +192,7 @@ panguard-ai/
   packages/
     panguard-skill-auditor/  Skill security auditor (6 checks)
     panguard-guard/          24/7 monitoring + Threat Cloud sync
-    atr/                     Agent Threat Rules: 125 rules, 9 categories
+    atr/                     Agent Threat Rules: 61 rules, 9 categories
     threat-cloud/            Community threat intel server
     panguard-mcp/            MCP server: 11+ tools for AI assistants
     panguard-scan/           Security scanner

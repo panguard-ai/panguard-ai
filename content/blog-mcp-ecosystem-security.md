@@ -181,7 +181,7 @@ It's the Sigma/YARA equivalent for AI agents: YAML-based, machine-readable, comm
 [PanGuard](https://github.com/panguard-ai/panguard-ai) is the security platform built on ATR:
 
 - **Skill Auditor:** Scan any MCP skill in 3 seconds. [Try it online](https://panguard.ai) — paste a GitHub URL and get a report.
-- **Guard:** 24/7 runtime monitoring with 125+ ATR detection rules. Auto-blocks threats.
+- **Guard:** 24/7 runtime monitoring with 61 ATR detection rules. Auto-blocks threats.
 - **Threat Cloud:** Every scan generates threat intelligence shared with the community. One person's discovery protects everyone.
 
 ```bash
@@ -201,7 +201,7 @@ Community + LLM review → New ATR rule → Pushed to all users →
 Next time: blocked in < 50ms
 ```
 
-Currently: 125 community-generated rules from 3,230 scans. Growing daily.
+Currently: 61 community-generated rules from 3,230 scans. Growing daily.
 
 ---
 
