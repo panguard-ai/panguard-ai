@@ -41,10 +41,7 @@ For the complete changelog including patch notes, see the [GitHub releases page]
 
 ### Rule Distribution
 
-- 9,790 total detection rules shipped with install
-- Sigma: 3,760 (3,110 community + 605 auto-gen + 45 custom)
-- YARA: 5,961 (969 files, multi-rule split)
-- ATR: 69 (52 stable + 17 predicted drafts)
+- 125 ATR detection rules shipped with install
 - Auto-sync from Threat Cloud every hour
 
 ### Threat Cloud LLM Review
@@ -64,9 +61,9 @@ For the complete changelog including patch notes, see the [GitHub releases page]
 
 ## v0.7.0
 
-**Released: 2025-02-25** -- Sigma Enhancements and osquery Integration
+**Released: 2025-02-25** -- Rule Engine Enhancements and osquery Integration
 
-### Sigma Rule Engine Enhancements
+### Rule Engine Enhancements
 
 - Aggregation expression support: `1 of them`, `all of them`, `1 of sel*`, `all of filter*`
 - New matching modifiers: `|cidr` (IP range matching), `|gt`/`|gte`/`|lt`/`|lte` (numeric comparisons)
@@ -106,7 +103,7 @@ For the complete changelog including patch notes, see the [GitHub releases page]
 
 ## v0.5.0
 
-**Released: 2025-02-25** -- Auto-Response, YARA, and Threat Intelligence Feeds
+**Released: 2025-02-25** -- Auto-Response and Threat Intelligence Feeds
 
 ### Auto-Response Engine
 
@@ -114,11 +111,6 @@ For the complete changelog including patch notes, see the [GitHub releases page]
 - File quarantine with SHA-256 tracking
 - Process termination
 - Confidence-based actions: {'>'}90% automatic, 70-90% confirmation required, {'<'}70% notification only
-
-### YARA Scanner
-
-- Native YARA engine support with regex fallback
-- File and memory scanning
 
 ### Threat Intelligence Feed Management
 
@@ -157,7 +149,7 @@ For the complete changelog including patch notes, see the [GitHub releases page]
 
 - 5 AI agent pipeline: Detect, Analyze, Respond, Report, Investigation
 - 7-day learning period with automatic switch to protection mode
-- 42 Sigma rules, Dashboard WebSocket server
+- 42 ATR rules, Dashboard WebSocket server
 - System service installation (macOS / Linux / Windows)
 
 ### Threat Cloud
@@ -190,7 +182,7 @@ For the complete changelog including patch notes, see the [GitHub releases page]
 
 - TypeScript monorepo architecture
 - Internationalization support (English + Traditional Chinese)
-- Sigma rule engine, system reconnaissance engine
+- ATR rule engine, system reconnaissance engine
 - 4 monitors: Log, Network, Process, File
 - 3 adapters: Windows Defender, Wazuh, Syslog
 - AES-256-GCM encryption

@@ -29,8 +29,7 @@ Panguard Guard is configured via a JSON file located at `~/.panguard-guard/confi
     "dockerEvents": false
   },
   "rules": {
-    "sigmaDir": "~/.panguard-guard/rules",
-    "yaraDir": "~/.panguard-guard/yara-rules",
+    "rulesDir": "~/.panguard-guard/rules",
     "customRulesEnabled": true,
     "autoUpdate": true,
     "updateInterval": "24h"
@@ -116,8 +115,7 @@ Detection rule configuration.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `sigmaDir` | string | `~/.panguard-guard/rules` | Directory containing Sigma rules |
-| `yaraDir` | string | `~/.panguard-guard/yara-rules` | Directory containing YARA rules |
+| `rulesDir` | string | `~/.panguard-guard/rules` | Directory containing ATR rules |
 | `customRulesEnabled` | boolean | `true` | Load custom rules from subdirectories |
 | `autoUpdate` | boolean | `true` | Automatically update rules from Threat Cloud |
 | `updateInterval` | string | `24h` | How often to check for rule updates |

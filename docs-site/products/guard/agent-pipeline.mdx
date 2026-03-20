@@ -39,7 +39,7 @@ If the DetectAgent returns `null` (no rules matched, no threat intel hit), the e
 
 ### Responsibilities
 
-1. **Sigma rule matching** -- runs the event against all loaded rules via the `RuleEngine`
+1. **ATR rule matching** -- runs the event against all loaded rules via the `RuleEngine`
 2. **Threat intelligence lookup** -- checks source/destination IPs against 5 feed sources plus Threat Cloud blocklists (supports IPv4 and IPv6)
 3. **Deduplication** -- skips identical detections within a 60-second window (max 500 entries in the dedup map)
 4. **Event correlation** -- both legacy IP-based correlation (3+ events from same source IP in 5 minutes) and advanced pattern-based correlation via the `EventCorrelator` (7 attack patterns)
@@ -68,10 +68,10 @@ The AnalyzeAgent collects evidence from multiple sources and calculates a weight
 
 | Source | Weight | Notes |
 |--------|--------|-------|
-| Sigma rule matches | 0.40 | Adjusted by feedback loop |
+| ATR rule matches | 0.40 | Adjusted by feedback loop |
 | Threat intelligence | -- | Fixed confidence of 85 when matched |
 | Baseline deviation | 0.30 | Time-of-day awareness (00:00--05:59 boost) |
-| Falco/Suricata evidence | 0.20--0.25 | When kernel-level monitors are active |
+| eBPF/DPI evidence | 0.20--0.25 | When kernel-level monitors are active |
 | Attack chain correlation | +5/event | Max +25 bonus |
 | AI analysis | 0.30 | When AI provider is available |
 

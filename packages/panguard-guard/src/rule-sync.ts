@@ -2,7 +2,7 @@
  * rule-sync.ts - Threat Cloud synchronization extracted from GuardEngine
  *
  * Contains:
- * - syncThreatCloud() - periodic Sigma/ATR/YARA/IP/domain/whitelist/blacklist sync
+ * - syncThreatCloud() - periodic Sigma/ATR/IP/domain/whitelist/blacklist sync
  * - getSkillThreatSubmitter() - bound callback for SkillWatcher
  * - getSkillBlacklistChecker() - bound callback for SkillWatcher
  * - setupCloudSyncTimer() - timer creation helper
@@ -10,9 +10,8 @@
  * @module @panguard-ai/panguard-guard/rule-sync
  */
 
-import { join } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
-import type { RuleEngine, ThreatIntelFeedManager, YaraScanner } from '@panguard-ai/core';
+import type { RuleEngine, ThreatIntelFeedManager } from '@panguard-ai/core';
 import type { GuardConfig } from './types.js';
 import type { ThreatCloudClient } from './threat-cloud/index.js';
 import type { GuardATREngine } from './engines/atr-engine.js';
@@ -22,7 +21,6 @@ const logger = createLogger('panguard-guard:rule-sync');
 /** Dependencies needed for cloud sync operations */
 export interface CloudSyncDeps {
   readonly ruleEngine: RuleEngine;
-  readonly yaraScanner: YaraScanner;
   readonly atrEngine: GuardATREngine;
   readonly threatCloud: ThreatCloudClient;
   readonly feedManager: ThreatIntelFeedManager;
@@ -31,11 +29,11 @@ export interface CloudSyncDeps {
 
 /**
  * Periodic Threat Cloud sync: re-fetch rules and blocklist.
- * Syncs Sigma, ATR, YARA rules; IP and domain blocklists;
+ * Syncs Sigma, ATR rules; IP and domain blocklists;
  * skill whitelist and blacklist.
  */
 export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
-  const { ruleEngine, yaraScanner, atrEngine, threatCloud, feedManager, config } = deps;
+  const { ruleEngine, atrEngine, threatCloud, feedManager, config } = deps;
 
   try {
     // Refresh Sigma rules
@@ -79,47 +77,6 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
       }
     } catch (err: unknown) {
       logger.warn(`ATR cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-
-    // Sync YARA rules from Threat Cloud
-    let newYaraRules = 0;
-    try {
-      const yaraRules = await threatCloud.fetchYaraRules();
-      if (yaraRules.length > 0) {
-        // Write TC YARA rules to /tmp (ephemeral — cleared on system reboot)
-        // instead of ~/.panguard-guard/. Community data should not persist on device.
-        const { tmpdir } = await import('node:os');
-        const yaraCloudDir = join(tmpdir(), 'panguard-yara-cloud');
-        const { mkdirSync, writeFileSync } = await import('node:fs');
-        mkdirSync(yaraCloudDir, { recursive: true });
-        for (const rule of yaraRules) {
-          try {
-            const { sanitizeFilename } = await import('@panguard-ai/core');
-            const rawId = rule.ruleId ?? 'unknown';
-            const filename = `${sanitizeFilename(rawId)}.yar`;
-            const targetPath = join(yaraCloudDir, filename);
-            // Verify resolved path stays within yaraCloudDir
-            const { resolve } = await import('node:path');
-            if (!resolve(targetPath).startsWith(resolve(yaraCloudDir))) {
-              logger.warn(`Skipping YARA rule with suspicious ruleId: ${rawId}`);
-              continue;
-            }
-            writeFileSync(targetPath, rule.ruleContent, 'utf-8');
-            newYaraRules++;
-          } catch (writeErr: unknown) {
-            logger.warn(
-              `Skipping invalid YARA rule from cloud: ${rule.ruleId ?? 'unknown'} — ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
-            );
-          }
-        }
-        if (newYaraRules > 0) {
-          // Reload YARA scanner with new rules
-          const yaraCustomDir = join(config.dataDir, 'yara-rules', 'custom');
-          await yaraScanner.loadAllRules(yaraCustomDir);
-        }
-      }
-    } catch (err: unknown) {
-      logger.warn(`YARA cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
     }
 
     // Refresh IP blocklist
@@ -196,9 +153,9 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
     }
 
     logger.info(
-      `Threat Cloud sync: ${newRules} Sigma, ${newATRRules} ATR, ${newYaraRules} YARA, ` +
+      `Threat Cloud sync: ${newRules} Sigma, ${newATRRules} ATR, ` +
         `${addedIPs} IPs, ${addedDomains} domains, ${importedSkills} whitelist, ${revokedSkills} blacklist / ` +
-        `Threat Cloud 同步: ${newRules} Sigma, ${newATRRules} ATR, ${newYaraRules} YARA, ` +
+        `Threat Cloud 同步: ${newRules} Sigma, ${newATRRules} ATR, ` +
         `${addedIPs} IP, ${addedDomains} 網域, ${importedSkills} 白名單, ${revokedSkills} 黑名單`
     );
   } catch (err: unknown) {

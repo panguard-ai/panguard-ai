@@ -203,7 +203,7 @@
         "detection": {
           "label": "Detection method",
           "antivirus": "Signature matching",
-          "panguard": "Sigma/YARA rules + AI analysis"
+          "panguard": "ATR rules + AI analysis"
         },
         "scope": {
           "label": "What it monitors",
@@ -335,7 +335,7 @@
           {
             "pct": 90,
             "label": "Rules Engine",
-            "sub": "Sigma + YARA + Suricata",
+            "sub": "ATR Rules",
             "speed": "<50ms"
           },
           {
@@ -378,7 +378,7 @@
     "threatCloud": {
       "overline": "ONE MORE THING",
       "title": "The more people use it, the safer everyone gets.",
-      "desc": "Every Panguard instance is a sensor. When it detects a new attack, it anonymously shares the pattern with Threat Cloud. Threat Cloud doesn't just generate traditional Sigma detection rules — it also produces ATR (Agent Threat Rules), the world's first open standard for detecting AI agent attacks. Prompt injection, tool poisoning, context exfiltration — threats Sigma can't catch, ATR catches.",
+      "desc": "Every Panguard instance is a sensor. When it detects a new attack, it anonymously shares the pattern with Threat Cloud. Threat Cloud automatically produces ATR (Agent Threat Rules), the world's first open standard for detecting AI agent attacks. Prompt injection, tool poisoning, context exfiltration -- all caught by ATR rules.",
       "descHighlight": "You're not just protected. You're part of the shield.",
       "privacy1": "Only anonymized threat signatures leave your machine. Zero raw data. Zero telemetry. Encrypted in transit (TLS 1.3). Your logs, your code, your data — never leaves.",
       "privacy2": "You can turn off Threat Cloud anytime. Panguard works fully offline.",
@@ -450,7 +450,7 @@
       "leftOutcome": "6 hours undetected. 50,000 customer records exposed. $4.35M average breach cost (IBM, 2022).",
       "right1": {
         "time": "3:00 AM",
-        "text": "SSH brute-force detected by Layer 1 (Sigma rule match)"
+        "text": "SSH brute-force detected by Layer 1 (ATR rule match)"
       },
       "right2": {
         "time": "3:00 AM",
@@ -485,7 +485,7 @@
         },
         "guard": {
           "title": "24/7 Real-Time Guard",
-          "description": "Threats aren't just detected -- they're automatically blocked. ATR rules revoke malicious skills, Sigma rules block IPs and kill processes, YARA rules quarantine malware. Confidence scoring ensures only high-certainty threats get auto-response.",
+          "description": "Threats aren't just detected -- they're automatically blocked. ATR rules revoke malicious skills, block IPs, kill processes, and quarantine threats. Confidence scoring ensures only high-certainty threats get auto-response.",
           "snippetLabel": "CLI or AI Agent",
           "snippet": "panguard guard start\n# or ask your AI agent:\n\"start security protection\""
         },
@@ -514,7 +514,7 @@
         },
         {
           "name": "Scan",
-          "desc": "60-second security audit. Sigma, YARA, and ATR rules sweep your environment in one pass.",
+          "desc": "60-second security audit. ATR rules sweep your AI agent environment in one pass.",
           "href": "/product/scan"
         },
         {
@@ -529,12 +529,12 @@
         },
         {
           "name": "ATR Standard",
-          "desc": "Open-source rules for AI agent threats. The Sigma equivalent for prompt injection, tool poisoning, and skill compromise.",
+          "desc": "Open-source rules for AI agent threats. Purpose-built for prompt injection, tool poisoning, and skill compromise.",
           "href": "/atr"
         },
         {
           "name": "Threat Cloud",
-          "desc": "Collective defense. Every node contributes anonymized signals; the pipeline auto-generates Sigma, YARA, and ATR rules from real attacks.",
+          "desc": "Collective defense. Every node contributes anonymized signals; the pipeline auto-generates ATR rules from real attacks.",
           "href": "/threat-cloud"
         }
       ],
@@ -545,7 +545,7 @@
       "subtitle": "Every number below is verifiable in our open-source repository. No black boxes.",
       "stats": {
         "atrRules": "ATR rules (AI agent threats)",
-        "integratedRules": "Integrated Sigma/YARA rules",
+        "integratedRules": "Detection patterns",
         "tests": "Tests passing",
         "layers": "Detection layers",
         "skillChecks": "Skill audit checks",
@@ -574,10 +574,12 @@
       "title": "Community Defense Network",
       "subtitle": "Three rule engines working together. Every threat discovered by any user strengthens protection for everyone.",
       "rules": "Rules",
-      "sigmaDesc": "Network & system threats",
-      "yaraDesc": "Malware & binary threats",
       "atrDesc": "AI agent-specific threats",
-      "totalRulesDesc": "Total integrated detection rules across all engines",
+      "detectionPatterns": "Detection Patterns",
+      "patternsDesc": "Unique threat signatures",
+      "threatCategories": "Threat Categories",
+      "categoriesDesc": "AI agent attack vectors covered",
+      "totalRulesDesc": "Total ATR detection rules for AI agent security",
       "growingDaily": "Growing daily via Threat Cloud community contributions",
       "cta": "Every scan feeds the collective defense. Install one skill, protect the whole ecosystem."
     },
@@ -627,7 +629,7 @@
       },
       "card5": {
         "title": "Agent-Native Detection",
-        "desc": "We created ATR — the first open standard for AI agent threat detection. Sigma protects servers. YARA catches malware. ATR catches prompt injection, tool poisoning, and agent manipulation."
+        "desc": "We created ATR -- the first open standard for AI agent threat detection. ATR catches prompt injection, tool poisoning, and agent manipulation."
       }
     },
     "traction": {
@@ -677,17 +679,17 @@
         },
         "blockIp": {
           "action": "Block IP",
-          "trigger": "Sigma network rules",
+          "trigger": "ATR network rules",
           "description": "Firewall block + Threat Cloud report"
         },
         "killProcess": {
           "action": "Kill Process",
-          "trigger": "Sigma/Falco process rules",
+          "trigger": "ATR process rules",
           "description": "SIGTERM then SIGKILL with safety checks"
         },
         "quarantineFile": {
           "action": "Quarantine File",
-          "trigger": "YARA malware match",
+          "trigger": "ATR file threat match",
           "description": "Isolate to quarantine directory"
         },
         "blockTool": {
@@ -766,7 +768,7 @@
     "atrStandard": {
       "overline": "OPEN STANDARD",
       "title": "The AI era needs a new audit standard",
-      "subtitle": "ATR (Agent Threat Rules) is purpose-built for AI agent threats. What Sigma is to SIEM, ATR is to AI agents.",
+      "subtitle": "ATR (Agent Threat Rules) is purpose-built for AI agent threats. The first open detection standard for AI agent security.",
       "rules": "Detection Rules",
       "categories": "Threat Categories",
       "patterns": "Detection Patterns",
@@ -858,7 +860,7 @@
         "overline": "PRE-DEPLOYMENT",
         "title": "Skill Auditor",
         "desc": "Static analysis engine that scans MCP skills and AI agent tools before they run. Detects prompt injection, credential theft, data exfiltration, and 6 more threat categories using ATR pattern matching.",
-        "f1": "61 ATR rules with 450+ detection patterns across 9 categories",
+        "f1": "125 ATR rules with 500+ detection patterns across 9 categories",
         "f2": "Secret detection: AWS keys, GitHub tokens, private keys, API secrets",
         "f3": "YAML manifest validation + permission scope analysis",
         "s1": "ATR Rules",
@@ -926,7 +928,7 @@
       "faq4q": "Can I use Panguard commercially?",
       "faq4a": "Yes. The MIT License allows full commercial use. You can deploy Panguard in production, embed it in your product, modify the source code, and redistribute it. The only requirement is including the MIT license notice.",
       "faq5q": "How do I contribute?",
-      "faq5a": "Panguard welcomes contributions: ATR rules, Sigma/YARA rules, threat intelligence, code improvements, documentation, and translations. Visit our GitHub repository, fork it, and submit a pull request. ATR rules are especially valuable -- every new rule strengthens collective immunity for all users."
+      "faq5a": "Panguard welcomes contributions: ATR rules, threat intelligence, code improvements, documentation, and translations. Visit our GitHub repository, fork it, and submit a pull request. ATR rules are especially valuable -- every new rule strengthens collective immunity for all users."
     }
   },
   "scan": {
@@ -1051,7 +1053,7 @@
       "capabilities": "Key Capabilities",
       "cta": {
         "title": "Ready to secure your AI agents?",
-        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 61 ATR rules + 9,700+ detection rules. Free to start.",
+        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 125+ ATR detection rules. Free to start.",
         "cta1": "Get Started",
         "cta2": "View ATR on GitHub"
       }
@@ -1125,7 +1127,7 @@
       "overline": "Panguard Guard",
       "title": "Real-Time Threat Response.",
       "titleHighlight": "One command to install.",
-      "subtitle": "Detects via ATR, Sigma, and YARA rules. Responds automatically based on confidence scoring. Blocks threats before they can act.",
+      "subtitle": "Detects via ATR (Agent Threat Rules). Responds automatically based on confidence scoring. Blocks threats before they can act.",
       "dashboard": {
         "allSystemsProtected": "All Systems Protected",
         "lastUpdated": "Last updated: just now",
@@ -1158,7 +1160,7 @@
       "featuresList": {
         "item1": {
           "title": "5-Agent AI Pipeline",
-          "desc": "Events flow through 5 specialized AI agents: Detect (Sigma/YARA rules + local LLM), Analyze (threat classification), Respond (auto-remediation), Report (compliance documentation), and Chat (Telegram, Slack, email notifications). 90% of events handled at zero cost by rules alone."
+          "desc": "Events flow through 5 specialized AI agents: Detect (ATR rules + local LLM), Analyze (threat classification), Respond (auto-remediation), Report (compliance documentation), and Chat (Telegram, Slack, email notifications). 90% of events handled at zero cost by rules alone."
         },
         "item2": {
           "title": "Confidence-Based Auto-Response",
@@ -1174,7 +1176,7 @@
         },
         "item5": {
           "title": "Graceful Degradation",
-          "desc": "Cloud AI down? Local fingerprint & heuristic analysis takes over. Heuristics offline? The rule engine with 4,353 Sigma and 6,015 YARA rules handles it. Guard never stops protecting, regardless of network conditions."
+          "desc": "Cloud AI down? Local fingerprint & heuristic analysis takes over. Heuristics offline? The ATR rule engine with 125+ detection rules handles it. Guard never stops protecting, regardless of network conditions."
         },
         "item6": {
           "title": "Integration Adapters",
@@ -1189,8 +1191,8 @@
           "desc": "Guard enforces rate limits on response actions to prevent cascade failures: kill_agent capped at 3/min, block_tool at 10/min. Safety rails prevent runaway automation. Every response action includes an auto-unblock timer and rollback capability, so aggressive protection never permanently locks out legitimate operations."
         },
         "item9": {
-          "title": "ATR/Sigma/YARA Unified Pipeline",
-          "desc": "All three rule engines run simultaneously in a single pipeline: ATR rules for AI agent threats (prompt injection, tool poisoning, skill supply-chain attacks), Sigma rules for system threats, and YARA rules for malware. 9,700+ combined rules. Sub-millisecond evaluation per event. One pipeline, full-stack protection."
+          "title": "ATR Detection Pipeline",
+          "desc": "ATR rules cover all AI agent threats in a single pipeline: prompt injection, tool poisoning, skill supply-chain attacks, credential exfiltration, and context manipulation. 125+ detection rules. Sub-millisecond evaluation per event. One pipeline, comprehensive AI agent protection."
         },
         "item10": {
           "title": "Investigation Engine",
@@ -1243,7 +1245,7 @@
         },
         "step2": {
           "title": "Auto-audit with ATR + Skill Auditor",
-          "desc": "The skill is scanned against 9,700+ detection rules (ATR + Sigma + YARA). Prompt injection, tool poisoning, hidden payloads, and excessive permissions are checked in under 1 second."
+          "desc": "The skill is scanned against 125+ ATR detection rules. Prompt injection, tool poisoning, hidden payloads, and excessive permissions are checked in under 1 second."
         },
         "step3": {
           "title": "Anonymized threat submitted to Threat Cloud",
@@ -1732,7 +1734,7 @@
         },
         "item3": {
           "title": "Policy Distribution",
-          "desc": "Push security policies from one place. Update Sigma rules, YARA signatures, and response configurations across your entire fleet simultaneously."
+          "desc": "Push security policies from one place. Update ATR rules and response configurations across your entire fleet simultaneously."
         },
         "item4": {
           "title": "Unified Dashboard",
@@ -2818,7 +2820,7 @@
         "items": [
           "Raw system logs and telemetry",
           "Context Memory baseline database",
-          "Sigma/YARA rule engine and results",
+          "ATR rule engine and results",
           "Local LLM inference (Ollama)",
           "Incident response playbook execution",
           "Full event history and forensic logs"
@@ -2960,10 +2962,10 @@
       "layer1": {
         "badge": "Layer 1",
         "name": "Rule Engine",
-        "tech": "Sigma + YARA",
+        "tech": "ATR Rules",
         "pct": "~90 %",
         "cost": "$0",
-        "desc": "Open-source Sigma and YARA rules form the bedrock. They process the vast majority of security events instantly, on-device, with zero cost per event. New community rules are pulled daily from curated feeds and automatically compiled into the local engine."
+        "desc": "Open-source ATR (Agent Threat Rules) form the bedrock. They process the vast majority of AI agent security events instantly, on-device, with zero cost per event. New community rules are pulled daily from Threat Cloud and automatically compiled into the local engine."
       },
       "layer2": {
         "badge": "Layer 2",
@@ -2989,7 +2991,7 @@
       "detect": {
         "name": "Detect Agent",
         "role": "First Responder",
-        "desc": "Continuously monitors system logs, network traffic, and file-system changes. Applies Sigma and YARA rules in real-time, flagging anomalies the moment they appear. It produces raw event signals enriched with MITRE ATT&CK TTP tags."
+        "desc": "Continuously monitors AI agent tool calls, prompt flows, and skill behavior. Applies ATR rules in real-time, flagging anomalies the moment they appear. It produces raw event signals enriched with MITRE ATT&CK TTP tags."
       },
       "analyze": {
         "name": "Analyze Agent",
@@ -3068,7 +3070,7 @@
       },
       "item3": {
         "label": "Automatic rule push",
-        "desc": "Community-validated signatures are compiled into Sigma/YARA rules and pushed to every agent."
+        "desc": "Community-validated signatures are compiled into ATR rules and pushed to every agent."
       },
       "item4": {
         "label": "Privacy-first",
@@ -3089,7 +3091,7 @@
       },
       "llmOffline": {
         "status": "LLM Offline",
-        "desc": "Rule Engine only. Sigma + YARA still catch 90 % of known threats. Events are logged for later AI analysis."
+        "desc": "Rule Engine only. ATR rules still catch 90 % of known threats. Events are logged for later AI analysis."
       },
       "emergency": {
         "status": "Emergency Mode",
@@ -3105,12 +3107,12 @@
         "desc": "End-to-end type safety"
       },
       "item2": {
-        "name": "Sigma Rules",
-        "desc": "Industry-standard detection"
+        "name": "ATR Rules",
+        "desc": "AI agent threat detection"
       },
       "item3": {
-        "name": "YARA Rules",
-        "desc": "Malware pattern matching"
+        "name": "Threat Cloud",
+        "desc": "Community defense network"
       },
       "item4": {
         "name": "Ollama",
@@ -3163,35 +3165,35 @@
       "subtitle": "Each layer instruments a different attack surface with battle-tested open-source engines. From kernel syscalls to log correlation, every layer feeds normalized events into the AI pipeline.",
       "kernel": {
         "layer": "Layer 1",
-        "name": "Kernel Monitoring",
-        "engine": "Falco eBPF",
-        "desc": "Hooks directly into Linux kernel syscalls via eBPF probes. Detects container escapes, reverse shells, cryptomining processes, credential access, and anomalous file descriptors -- all without kernel modules or system overhead.",
-        "detects": "Container escapes, reverse shells, privilege escalation, suspicious exec() chains",
-        "tech": "eBPF tracepoints on sys_enter/sys_exit, Falco rules compiled to BPF bytecode, <1ms per-event latency"
+        "name": "Skill Interception",
+        "engine": "ATR Rules",
+        "desc": "Intercepts every AI agent tool call, prompt flow, and skill installation. ATR rules detect prompt injection, tool poisoning, credential exfiltration, and context manipulation in real-time.",
+        "detects": "Prompt injection, tool poisoning, credential exfiltration, context manipulation",
+        "tech": "ATR rule engine, sub-millisecond evaluation, 125+ detection rules, 500+ patterns"
       },
       "network": {
         "layer": "Layer 2",
-        "name": "Network IDS",
-        "engine": "Suricata DPI",
-        "desc": "Deep packet inspection on all network interfaces. Suricata's EVE JSON output feeds protocol-decoded alerts -- including TLS fingerprinting, DNS anomaly detection, and HTTP payload analysis -- directly into the event pipeline.",
-        "detects": "C2 beaconing, data exfiltration, lateral movement, exploit payloads, protocol anomalies",
-        "tech": "Multi-threaded pcap analysis, 40+ protocol decoders, ET Open + custom rulesets, flow tracking"
+        "name": "Skill Auditor",
+        "engine": "AST Analysis",
+        "desc": "Static analysis of AI skill source code before installation. Checks for hidden capabilities, excessive permissions, obfuscated payloads, and supply-chain attacks.",
+        "detects": "Hidden capabilities, excessive permissions, obfuscated payloads, supply-chain attacks",
+        "tech": "6-layer audit checks, AST parsing, dependency analysis, permission mapping"
       },
       "filesystem": {
         "layer": "Layer 3",
-        "name": "File System Scanning",
-        "engine": "YARA Engine",
-        "desc": "On-access and scheduled scanning of file system changes. YARA rules match byte patterns, PE headers, and string signatures against known malware families, web shells, and suspicious scripts.",
-        "detects": "Malware binaries, web shells, ransomware droppers, obfuscated scripts, credential harvesters",
-        "tech": "Pattern-based signature matching, custom + community YARA rulesets, inotify-triggered scanning"
+        "name": "Behavioral Monitoring",
+        "engine": "Runtime Guard",
+        "desc": "Monitors AI agent behavior at runtime. Detects anomalous tool usage patterns, unexpected file access, and unauthorized network connections by AI agents.",
+        "detects": "Anomalous tool usage, unauthorized file access, unexpected network calls, privilege escalation",
+        "tech": "Behavioral baseline learning, 7-day calibration period, confidence-based alerting"
       },
       "logs": {
         "layer": "Layer 4",
-        "name": "Log Correlation",
-        "engine": "Sigma Rules",
-        "desc": "Sigma detection rules correlate events across system logs, auth logs, application logs, and cloud audit trails. The rule engine supports temporal correlation, aggregation, and multi-source joins.",
+        "name": "Event Correlation",
+        "engine": "ATR Correlation",
+        "desc": "ATR detection rules correlate events across AI agent sessions, tool calls, and prompt flows. The rule engine supports temporal correlation, aggregation, and multi-source joins.",
         "detects": "Brute force attacks, lateral movement chains, persistence mechanisms, policy violations",
-        "tech": "2,500+ community Sigma rules, hot-reload, MITRE ATT&CK TTP mapping, custom rule authoring"
+        "tech": "125+ ATR rules, hot-reload, MITRE ATT&CK TTP mapping, custom rule authoring"
       },
       "ai": {
         "layer": "Layer 5",
@@ -3208,7 +3210,7 @@
       "subtitle": "Every security event traverses a five-stage pipeline. Data is normalized, enriched, correlated, scored, and dispatched -- typically in under 200ms.",
       "stage1": {
         "name": "Ingest",
-        "desc": "Raw events from Falco, Suricata, YARA, file watchers, and process monitors are captured in real-time."
+        "desc": "Raw events from ATR rule engine, skill auditor, behavioral monitors, and process watchers are captured in real-time."
       },
       "stage2": {
         "name": "Normalize",
@@ -3216,7 +3218,7 @@
       },
       "stage3": {
         "name": "Correlate",
-        "desc": "Sigma rules and AI cross-reference events against baseline behavior and threat intelligence feeds."
+        "desc": "ATR rules and AI cross-reference events against baseline behavior and threat intelligence feeds."
       },
       "stage4": {
         "name": "Score",
@@ -3372,7 +3374,7 @@
       },
       "advancedSetup": {
         "title": "Advanced Setup",
-        "desc": "Integrate Ollama (local AI), Falco (eBPF monitoring), and Suricata (network IDS)."
+        "desc": "Integrate Ollama (local AI) and configure advanced settings."
       }
     },
     "cantFind": "Can't find what you're looking for?",
@@ -3399,7 +3401,7 @@
       "step2Desc": "A quick scan checks your system for common vulnerabilities in about 60 seconds.",
       "step2Deep": "For a comprehensive analysis including all ports, SSL certificates, and configuration files:",
       "step3Title": "Step 3: Enable Real-Time Protection",
-      "step3Desc": "Guard runs as a daemon, monitoring your system 24/7 with Sigma and YARA rules.",
+      "step3Desc": "Guard runs as a daemon, monitoring your AI agents 24/7 with ATR detection rules.",
       "step4Title": "Step 4: Set Up Notifications",
       "step4Desc": "Panguard Chat sends you plain-language notifications when threats are detected and resolved.",
       "step5Title": "Step 5: Understanding Scan Results",
@@ -3459,9 +3461,7 @@
       "advancedHintTitle": "Advanced Configuration",
       "advancedHintDesc": "Panguard works out of the box, but you can enhance detection with optional external tools. All tools degrade gracefully -- Panguard never stops working if an external tool is unavailable.",
       "advancedHintOllama": "Ollama -- Run AI analysis locally without cloud APIs. Ideal for air-gapped environments.",
-      "advancedHintFalco": "Falco -- Linux kernel-level syscall monitoring via eBPF for deep behavioral detection.",
-      "advancedHintSuricata": "Suricata -- Network-layer IDS/IPS for advanced traffic analysis.",
-      "advancedHintEnv": "Key environment variables: ANTHROPIC_API_KEY (Claude AI), OPENAI_API_KEY (GPT fallback), PANGUARD_LLM_MODEL (Ollama model override), OLLAMA_API_ENDPOINT (custom Ollama URL).",
+            "advancedHintEnv": "Key environment variables: ANTHROPIC_API_KEY (Claude AI), OPENAI_API_KEY (GPT fallback), PANGUARD_LLM_MODEL (Ollama model override), OLLAMA_API_ENDPOINT (custom Ollama URL).",
       "advancedHintLink": "See the full Advanced Setup guide for installation instructions and configuration details.",
       "multiEndpointTitle": "Multi-Endpoint Deployment",
       "multiEndpointDesc": "Deploying Panguard across multiple servers is straightforward. Use SSH loops for small fleets or Ansible for larger environments.",
@@ -3474,14 +3474,11 @@
       "title": "Advanced Setup",
       "subtitle": "Enhance Panguard's detection capabilities with optional external tools. All tools are optional -- Panguard works fully without them.",
       "degradeNote": "Graceful Degradation Architecture",
-      "degradeDesc": "Panguard's AI analysis follows a three-tier degradation strategy: Cloud AI (Claude/OpenAI) > Local LLM (Ollama) > Rule Engine (Sigma + YARA). Each tier is independent. Even with all external tools offline, 4,353 Sigma rules and 6,015 YARA rules still provide full protection.",
+      "degradeDesc": "Panguard's AI analysis follows a three-tier degradation strategy: Cloud AI (Claude/OpenAI) > Local LLM (Ollama) > Rule Engine (ATR). Each tier is independent. Even with all external tools offline, 125+ ATR rules still provide full protection.",
       "ollamaTitle": "Ollama -- Local AI Analysis",
       "ollamaDesc": "Install Ollama to run AI threat analysis locally without cloud APIs. Ideal for air-gapped environments or data privacy requirements.",
       "ollamaNote": "Panguard auto-detects Ollama (default http://localhost:11434). No additional configuration needed after install.",
-      "falcoTitle": "Falco -- eBPF Kernel Monitoring",
-      "falcoDesc": "Falco provides Linux kernel-level syscall monitoring. Once installed, Guard automatically integrates and reads Falco's JSON alerts. Ideal for deep behavioral detection.",
-      "falcoNote": "Linux only. Falco requires root. Guard auto-detects alert files under /var/log/falco/.",
-      "envTitle": "Environment Variables Reference",
+            "envTitle": "Environment Variables Reference",
       "envDesc": "The following environment variables customize Panguard's behavior. All are optional.",
       "envVar": "Variable",
       "envPurpose": "Purpose",
@@ -3547,7 +3544,7 @@
       "latency": "Latency",
       "perf": {
         "0": {
-          "name": "Rule matching (Sigma / YARA)",
+          "name": "ATR rule matching",
           "latency": "< 50 ms"
         },
         "1": {
@@ -4353,7 +4350,7 @@
       "layer2": {
         "badge": "Layer 2",
         "name": "Rules Engine",
-        "desc": "4,353 Sigma rules + 6,015 YARA rules + Suricata network IDS + Falco eBPF monitoring.",
+        "desc": "125+ ATR detection rules for AI agent security.",
         "detail": "Catches 90% of known threats in under 50ms. No AI needed."
       },
       "layer3": {
@@ -4382,7 +4379,7 @@
       "tier1": {
         "name": "Rules Engine",
         "pct": "90%",
-        "items": "4,353 Sigma detection rules|6,015 YARA malware signatures|Suricata network IDS rules|Falco eBPF system call monitoring|Behavioral baseline deviations",
+        "items": "125+ ATR detection rules|500+ detection patterns|9 threat categories|Behavioral baseline deviations|Community-driven rule updates",
         "speed": "<50ms per event"
       },
       "tier2": {
@@ -4561,7 +4558,7 @@
       },
       "step5": {
         "name": "Distribution",
-        "desc": "Auto-generates new Sigma detection rules. Pushes to all Panguard instances within minutes. Every user is now protected."
+        "desc": "Auto-generates new ATR detection rules. Pushes to all Panguard instances within minutes. Every user is now protected."
       }
     },
     "privacy": {
@@ -4666,7 +4663,7 @@
           "desc": "Updated every 5 minutes"
         },
         {
-          "name": "Sigma Rule Feed",
+          "name": "ATR Rule Feed",
           "desc": "Auto-generated detection rules"
         },
         {
@@ -4704,10 +4701,9 @@
       "stats": {
         "sources": "Intel Sources",
         "records": "Validated Records",
-        "sigmaRules": "Sigma Rules",
-        "yaraRules": "YARA Rules",
-        "autoGenSigma": "Auto-Generated Sigma",
-        "autoGenYara": "Auto-Generated YARA",
+        "atrRules": "ATR Rules",
+        "atrPatterns": "Detection Patterns",
+        "autoGenATR": "Auto-Generated ATR",
         "promoted": "Auto-Promoted",
         "draft": "Pending Review",
         "syncInterval": "Sync Interval",
@@ -4772,12 +4768,12 @@
       "title": "Built with rigor",
       "stats": [
         {
-          "value": "52+",
+          "value": "125+",
           "label": "ATR rules (AI agent threats)"
         },
         {
-          "value": "9,700+",
-          "label": "Integrated Sigma/YARA rules"
+          "value": "500+",
+          "label": "Detection patterns"
         },
         {
           "value": "3,490+",
@@ -4857,8 +4853,8 @@
         },
         {
           "name": "panguard-rules",
-          "desc": "4,353 Sigma detection rules + 6,015 YARA malware signatures",
-          "lang": "YAML / Sigma",
+          "desc": "125+ ATR detection rules for AI agent security",
+          "lang": "YAML / ATR",
           "stars": "Community"
         },
         {
@@ -4880,7 +4876,7 @@
         },
         {
           "title": "Submit Detection Rules",
-          "desc": "PR to the /rules directory. Sigma or YARA format. Community review process."
+          "desc": "PR to the /rules directory. ATR format. Community review process."
         },
         {
           "title": "Improve AI Prompts",
@@ -4905,7 +4901,7 @@
         "items": [
           "Core platform (Scan + Guard + Chat + Skill Auditor)",
           "Threat Cloud v1",
-          "4,353 Sigma + 6,015 YARA rules",
+          "125+ ATR detection rules",
           "3,490 automated tests"
         ]
       },
@@ -5383,24 +5379,24 @@
       "overline": "OPEN STANDARD",
       "title": "Agent Threat Rules",
       "titleHighlight": "(ATR)",
-      "subtitle": "The first open detection standard for AI agent threats. Machine-readable, community-driven, and designed for the threats that Sigma and YARA were never built to catch."
+      "subtitle": "The first open detection standard for AI agent threats. Machine-readable, community-driven, and designed for AI agent security."
     },
     "problem": {
       "overline": "THE PROBLEM",
-      "title": "Traditional rules can't see agent threats",
-      "desc1": "Sigma detects log-based IOCs. YARA matches file-level byte patterns. Neither understands prompt flows, tool calls, or multi-turn agent conversations.",
-      "desc2": "AI agents introduce a new attack surface: prompt injection, tool poisoning, context exfiltration, skill compromise. These threats live in the semantic layer -- invisible to pattern matchers designed for network packets and file hashes.",
-      "desc3": "ATR is the missing detection standard. Purpose-built for the AI agent era.",
-      "sigmaTitle": "Sigma Rules",
+      "title": "AI agents need purpose-built detection",
+      "desc1": "Traditional security rules were designed for network packets and file hashes. They cannot understand prompt flows, tool calls, or multi-turn agent conversations.",
+      "desc2": "AI agents introduce a new attack surface: prompt injection, tool poisoning, context exfiltration, skill compromise. These threats live in the semantic layer -- invisible to legacy detection tools.",
+      "desc3": "ATR is the detection standard built for the AI agent era.",
+      "sigmaTitle": "Traditional Rules",
       "sigmaDesc": "Log-based IOCs. No awareness of prompt context or tool interactions.",
-      "yaraTitle": "YARA Rules",
+      "yaraTitle": "File Scanners",
       "yaraDesc": "File-level byte patterns. Cannot inspect agent conversation flows.",
       "atrTitle": "ATR Rules",
       "atrDesc": "Semantic-layer detection. Built for prompts, tools, and agent behavior."
     },
     "categories": {
       "overline": "RULE CATEGORIES",
-      "title": "9 categories. 61 rules. Growing daily.",
+      "title": "9 categories. 125 rules. Growing daily.",
       "subtitle": "Covering the full spectrum of AI agent attack vectors, mapped to OWASP LLM Top 10.",
       "items": {
         "prompt-injection": {
@@ -5532,11 +5528,11 @@
     "comparison": {
       "overline": "WHY ATR",
       "title": "Three standards. Three eras.",
-      "subtitle": "Sigma defined network detection. YARA defined file detection. ATR defines agent detection.",
+      "subtitle": "ATR fills the gap that traditional detection tools leave open for AI agent threats.",
       "headers": {
         "feature": "Capability",
-        "sigma": "Sigma",
-        "yara": "YARA",
+        "sigma": "Traditional Rules",
+        "yara": "File Scanners",
         "atr": "ATR"
       },
       "rows": [
@@ -5659,10 +5655,10 @@
     "ecosystem": {
       "overline": "ECOSYSTEM",
       "title": "Open standard. Community-driven growth.",
-      "subtitle": "ATR follows the same playbook that made Sigma and YARA industry standards -- open governance, community contributions, and vendor-neutral design.",
+      "subtitle": "ATR follows the proven playbook of open standards -- open governance, community contributions, and vendor-neutral design.",
       "stats": [
         {
-          "value": "61",
+          "value": "125",
           "label": "Detection rules"
         },
         {
@@ -5774,7 +5770,7 @@
           }
         ]
       },
-      "subtitleLine2": "Panguard audits every skill before it runs. {atrRules} ATR rules + {integratedRules} Sigma & YARA rules catch known threats instantly. AI analysis catches the rest.",
+      "subtitleLine2": "Panguard audits every skill before it runs. {atrRules} ATR rules catch known threats instantly. AI analysis catches the rest.",
       "subtitleLine3": "When you find a threat, it becomes a rule that protects the entire community.",
       "viewATR": "ATR Standard on GitHub",
       "install": "Get Started",
@@ -5782,7 +5778,7 @@
       "platforms": "Works with Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop",
       "badges": {
         "mit": "MIT Licensed",
-        "rules": "9,700+ Rules",
+        "rules": "125+ ATR Rules",
         "taiwan": "Built in Taiwan",
         "scanned": "1,295 Skills Scanned"
       },
@@ -5811,8 +5807,8 @@
         "knownCheck": {
           "number": "3",
           "title": "New skill? Audit it first.",
-          "desc": "Every new skill is audited against community ATR rules (AI agent threats), plus Sigma rules (network threats) and YARA rules (file threats) simultaneously.",
-          "detail": "9,700+ detection rules (ATR + Sigma + YARA)"
+          "desc": "Every new skill is audited against community ATR rules covering prompt injection, tool poisoning, credential exfiltration, and skill compromise.",
+          "detail": "125+ ATR detection rules"
         },
         "llmAnalysis": {
           "number": "4",
@@ -5838,7 +5834,7 @@
     "productPillars": {
       "atrStandard": {
         "title": "Community Rules",
-        "desc": "ATR rules for AI agent threats + Sigma/YARA rules for traditional threats. 9,700+ combined, all open source, all community-driven. The review criteria that every skill must pass.",
+        "desc": "125+ ATR rules for AI agent threats. All open source, all community-driven. The review criteria that every skill must pass.",
         "link": "View ATR rules"
       },
       "threatCloud": {
@@ -5853,7 +5849,7 @@
       }
     },
     "atrShowcase": {
-      "title": "Sigma defined network attacks. ATR defines agent attacks.",
+      "title": "ATR: the detection standard for AI agent attacks.",
       "githubCta": "View on GitHub",
       "features": {
         "agentNative": {
@@ -5920,11 +5916,11 @@
       "steps": {
         "install": {
           "title": "Install",
-          "desc": "One command. Panguard loads 9,700+ detection rules -- ATR (AI agent threats), Sigma (network threats), and YARA (file threats). All three layers activate simultaneously."
+          "desc": "One command. Panguard loads 125+ ATR detection rules for AI agent threats. All layers activate simultaneously."
         },
         "protect": {
           "title": "Review",
-          "desc": "Every new skill goes through the same review pipeline: ATR rules check for agent attacks, Sigma and YARA rules check for traditional threats. Known threats are blocked instantly."
+          "desc": "Every new skill goes through the same review pipeline: ATR rules check for agent attacks -- prompt injection, tool poisoning, credential theft. Known threats are blocked instantly."
         },
         "contribute": {
           "title": "Evolve",
@@ -5950,7 +5946,7 @@
           "label": "With Panguard",
           "items": [
             "Every skill reviewed before it runs",
-            "Community rules catch known threats (ATR + Sigma + YARA)",
+            "Community ATR rules catch known threats",
             "AI catches unknown threats in real-time",
             "New rules auto-generated and shared to all users",
             "Gets smarter and stronger with every install"
@@ -5965,10 +5961,10 @@
       "items": {
         "skillInstall": {
           "label": "LAYER 1: RULES",
-          "title": "A new skill arrives. ATR + Sigma + YARA rules review it instantly.",
-          "narrative": "You install a new skill from OpenClaw or MCP. Before it runs, Panguard checks it against 9,700+ detection rules -- ATR (prompt injection, tool poisoning, skill compromise), Sigma (network-level threats), and YARA (file-level threats). All three layers run simultaneously. Known threats are blocked. Safe skills proceed.",
+          "title": "A new skill arrives. ATR rules review it instantly.",
+          "narrative": "You install a new skill from OpenClaw or MCP. Before it runs, Panguard checks it against 125+ ATR detection rules -- prompt injection, tool poisoning, credential exfiltration, skill compromise. Known threats are blocked. Safe skills proceed.",
           "before": "Without Skills Audit, the skill runs immediately with full system access.",
-          "after": "With Skills Audit, every skill passes a three-layer review before it touches your system."
+          "after": "With Skills Audit, every skill passes ATR rule review before it touches your system."
         },
         "alwaysOn": {
           "label": "LAYER 2: AI",
@@ -5994,12 +5990,12 @@
       "preDeployment": {
         "label": "Known threats",
         "title": "Rule-based review",
-        "tools": "ATR + Sigma + YARA",
+        "tools": "ATR Rules",
         "items": [
           "ATR rules: prompt injection, tool poisoning, skill compromise",
-          "Sigma rules: network-level threats, brute force, reverse shells",
-          "YARA rules: malicious files, encoded payloads, malware signatures",
-          "9,700+ combined rules, community-driven, updated continuously"
+          "ATR rules: credential exfiltration, context manipulation",
+          "ATR rules: cross-agent attacks, unauthorized access",
+          "125+ rules, community-driven, updated continuously"
         ]
       },
       "postDeployment": {
@@ -6052,15 +6048,15 @@
       },
       "q2": {
         "q": "What if a skill passes audit but turns malicious later?",
-        "a": "Guard monitors every whitelisted skill continuously using three detection layers -- and when it detects drift, it doesn't just alert. It auto-responds.\n\n1. Rule matching (sub-millisecond) -- 9,700+ combined rules: ATR for AI threats, Sigma for system threats, YARA for malware. If the skill's behavior matches any rule, it's flagged instantly.\n\n2. Fingerprint drift -- Skill Auditor records what the skill is supposed to do. Guard compares live behavior against that fingerprint. A code-review tool that suddenly starts making network calls to unknown endpoints? Caught the moment it deviates.\n\n3. LLM deep analysis -- For novel patterns that rules and fingerprinting miss, the AI analyzer examines behavior semantically. Its verdict is automatically distilled into a new ATR rule so the same attack is caught by rules alone next time.\n\nWhen a threat is confirmed, Guard's confidence-based response kicks in:\n- Confidence >= 85%: automatic response -- revoke skill from whitelist, block tool invocation, quarantine session. No human delay.\n- Confidence 50-84%: alert with full evidence, suggest specific action (e.g., revoke_skill or kill_agent), wait for human confirmation.\n- Below 50%: log for investigation with all context preserved.\n\nEven a patient attacker who waits 50 invocations before acting gets caught the moment they do something outside their fingerprint -- and Guard responds in proportion to its certainty."
+        "a": "Guard monitors every whitelisted skill continuously using multiple detection layers -- and when it detects drift, it doesn't just alert. It auto-responds.\n\n1. ATR rule matching (sub-millisecond) -- 125+ ATR detection rules for AI agent threats. If the skill's behavior matches any rule, it's flagged instantly.\n\n2. Fingerprint drift -- Skill Auditor records what the skill is supposed to do. Guard compares live behavior against that fingerprint. A code-review tool that suddenly starts making network calls to unknown endpoints? Caught the moment it deviates.\n\n3. LLM deep analysis -- For novel patterns that rules and fingerprinting miss, the AI analyzer examines behavior semantically. Its verdict is automatically distilled into a new ATR rule so the same attack is caught by rules alone next time.\n\nWhen a threat is confirmed, Guard's confidence-based response kicks in:\n- Confidence >= 85%: automatic response -- revoke skill from whitelist, block tool invocation, quarantine session. No human delay.\n- Confidence 50-84%: alert with full evidence, suggest specific action (e.g., revoke_skill or kill_agent), wait for human confirmation.\n- Below 50%: log for investigation with all context preserved.\n\nEven a patient attacker who waits 50 invocations before acting gets caught the moment they do something outside their fingerprint -- and Guard responds in proportion to its certainty."
       },
       "q3": {
-        "q": "What are ATR, Sigma, and YARA rules? Why three types?",
-        "a": "Each rule type covers a different attack surface:\n\nATR (Agent Threat Rules) -- rules across 9 threat categories, built specifically for AI agent attacks: prompt injection, tool poisoning, context exfiltration, cross-agent privilege escalation. This is the layer no other tool provides.\n\nSigma -- rules for system and log-level threats: SSH brute force, process injection, suspicious network connections, SQL injection patterns, XSS attempts, remote code execution.\n\nYARA -- rules for file and malware threats: known malware signatures, suspicious binaries, packed executables.\n\n9,700+ combined rules across all three types. Threat Cloud aggregates them from the community. Guard runs all three simultaneously. You get full-stack protection -- from traditional infrastructure attacks to AI-specific threats -- in a single tool."
+        "q": "What are ATR rules?",
+        "a": "ATR (Agent Threat Rules) is the first open detection standard for AI agent threats. 125+ rules across 9 threat categories, built specifically for AI agent attacks: prompt injection, tool poisoning, context exfiltration, credential theft, cross-agent privilege escalation, skill supply-chain attacks, and more.\n\nATR rules are machine-readable, community-driven, and purpose-built for the threats that traditional security tools cannot see -- threats that live in prompt flows, tool calls, and agent conversations.\n\nThreat Cloud aggregates rules from the community. Guard runs them with sub-millisecond evaluation. Every new rule strengthens protection for all users."
       },
       "q4": {
-        "q": "Can Panguard handle basic attacks too, not just AI threats?",
-        "a": "Yes. Panguard is not AI-only security. The three rule engines cover the full threat spectrum.\n\nSigma rules handle traditional infrastructure attacks: SQL injection patterns in logs, XSS payloads, remote code execution attempts, SSH brute force, privilege escalation on the OS level. These are the same community-maintained Sigma rules used by enterprise SOCs worldwide.\n\nYARA rules catch malware: known signatures, suspicious file patterns, packed executables.\n\nATR rules add the AI-specific layer on top: prompt injection, tool poisoning, skill supply-chain attacks across 9 threat categories.\n\n9,700+ combined rules across all three types. All run in Guard simultaneously. You don't need separate tools for traditional and AI security."
+        "q": "What threats does Panguard detect?",
+        "a": "Panguard focuses on AI agent security threats across 9 categories:\n\nPrompt injection -- direct and indirect injection, jailbreaks, system prompt override.\nTool poisoning -- malicious tool descriptions, hidden instructions in tool outputs.\nCredential exfiltration -- API key theft, SSH key access, secret extraction.\nContext manipulation -- memory poisoning, conversation hijacking.\nSkill supply-chain -- malicious skill packages, dependency confusion.\nCross-agent attacks -- privilege escalation between agents.\nUnauthorized actions -- file access, network calls beyond declared scope.\n\n125+ ATR rules with 500+ detection patterns. All open source, community-driven, growing daily through Threat Cloud."
       }
     },
     "detection": {
@@ -6071,7 +6067,7 @@
       },
       "q2": {
         "q": "How do rules get updated?",
-        "a": "Guard syncs with Threat Cloud every hour, automatically pulling new Sigma, ATR, and YARA rules. No manual action needed.\n\nLocally distilled rules -- generated when your LLM analyzes a novel threat -- take effect immediately on your machine.\n\nCommunity-contributed rules go through a staged pipeline: peer review by other Panguard users, then experimental stage (alert-only for 7 days, no blocking), then stable (can auto-block). A rule needs confirmation from at least 3 independent Panguard nodes before promotion.\n\nYou can check your current rule counts anytime with `panguard rules status`."
+        "a": "Guard syncs with Threat Cloud every hour, automatically pulling new ATR rules. No manual action needed.\n\nLocally distilled rules -- generated when your LLM analyzes a novel threat -- take effect immediately on your machine.\n\nCommunity-contributed rules go through a staged pipeline: peer review by other Panguard users, then experimental stage (alert-only for 7 days, no blocking), then stable (can auto-block). A rule needs confirmation from at least 3 independent Panguard nodes before promotion.\n\nYou can check your current rule counts anytime with `panguard rules status`."
       },
       "q3": {
         "q": "What if a rule causes false positives?",
@@ -6090,11 +6086,11 @@
       },
       "q2": {
         "q": "Does AI analysis send my data to third parties?",
-        "a": "Only if you explicitly configure it. Panguard supports three LLM modes:\n\n1. Rules-only (default) -- No AI, no external calls. Guard runs ATR, Sigma, and YARA rules locally. This is the default mode and provides strong protection without any data leaving your device.\n\n2. Ollama (local AI) -- Runs entirely on your machine. AI-enhanced analysis with zero external data transfer.\n\n3. Your own API key -- You choose the provider (Anthropic, OpenAI, etc.) and control what gets sent. The LLM only sees the specific event being analyzed, not your files or conversations.\n\nThe encrypted LLM config (~/.panguard/llm.enc) is stored locally, encrypted with your machine's identity. It never leaves your device."
+        "a": "Only if you explicitly configure it. Panguard supports three LLM modes:\n\n1. Rules-only (default) -- No AI, no external calls. Guard runs ATR rules locally. This is the default mode and provides strong protection without any data leaving your device.\n\n2. Ollama (local AI) -- Runs entirely on your machine. AI-enhanced analysis with zero external data transfer.\n\n3. Your own API key -- You choose the provider (Anthropic, OpenAI, etc.) and control what gets sent. The LLM only sees the specific event being analyzed, not your files or conversations.\n\nThe encrypted LLM config (~/.panguard/llm.enc) is stored locally, encrypted with your machine's identity. It never leaves your device."
       },
       "q3": {
         "q": "Is it open source? Can I audit the code?",
-        "a": "100% open source, MIT license. Every line of code, every ATR rule, every detection algorithm is publicly auditable on GitHub.\n\nThere is no hidden enterprise edition. No closed-source components. No telemetry you can't inspect. What you see in the repo is exactly what runs on your machine.\n\nWe believe security tools must be transparent. If you can't verify what your security software does, it's not really protecting you."
+        "a": "100% open source, MIT license. Every line of code, every ATR rule, every detection algorithm is publicly auditable on GitHub.\n\nThere is no hidden enterprise edition. No closed-source components. No telemetry you cannot inspect. What you see in the repo is exactly what runs on your machine.\n\nWe believe security tools must be transparent. If you cannot verify what your security software does, it is not really protecting you."
       }
     },
     "deployment": {
@@ -6105,18 +6101,18 @@
       },
       "q2": {
         "q": "What can I do after installing?",
-        "a": "Four main use cases:\n\n(a) Audit any MCP skill before installing -- say \"audit this skill\" to your AI agent, or run panguard audit skill directly. Skill Auditor checks it against ATR rules and the community whitelist.\n\n(b) Scan your system -- panguard scan runs all three rule engines (ATR, Sigma, YARA) across your environment.\n\n(c) Start 24/7 guard -- panguard guard start launches the daemon. Continuous monitoring with sub-millisecond rule evaluation.\n\n(d) Your AI agent becomes security-aware -- after setup, your AI agent can scan, audit, and check threats through natural conversation. It calls Panguard tools as MCP skills.\n\nCompliance Report and Honeypot Trap are coming soon."
+        "a": "Four main use cases:\n\n(a) Audit any MCP skill before installing -- say \"audit this skill\" to your AI agent, or run panguard audit skill directly. Skill Auditor checks it against ATR rules and the community whitelist.\n\n(b) Scan your system -- panguard scan runs ATR rules across your AI agent environment.\n\n(c) Start 24/7 guard -- panguard guard start launches the daemon. Continuous monitoring with sub-millisecond rule evaluation.\n\n(d) Your AI agent becomes security-aware -- after setup, your AI agent can scan, audit, and check threats through natural conversation. It calls Panguard tools as MCP skills.\n\nCompliance Report and Honeypot Trap are coming soon."
       },
       "q3": {
         "q": "Does it slow down my system?",
-        "a": "Negligible impact. Rule evaluation is sub-millisecond per event -- pure pattern matching, no AI involved for known threats.\n\nAI analysis only triggers for events that all three rule engines can't classify, which is typically less than 1% of all events. Memory footprint stays under 100MB.\n\nGuard runs as a daemon with watchdog restart. It's designed for always-on operation without noticeable performance cost."
+        "a": "Negligible impact. ATR rule evaluation is sub-millisecond per event -- pure pattern matching, no AI involved for known threats.\n\nAI analysis only triggers for events that rules cannot classify, which is typically less than 1% of all events. Memory footprint stays under 100MB.\n\nGuard runs as a daemon with watchdog restart. It is designed for always-on operation without noticeable performance cost."
       }
     },
     "general": {
       "title": "General",
       "q1": {
         "q": "Is it really free?",
-        "a": "Yes. 100% free, open source, MIT license. No paid tiers, no feature gating, no usage limits.\n\nScan, Guard, Skill Auditor, Threat Cloud, all 9,700+ detection rules (ATR + Sigma + YARA) -- all free, all open source.\n\nCompliance Report and Honeypot Trap are coming soon and will also be free.\n\nNo credit card, no signup, no \"contact sales for pricing.\""
+        "a": "Yes. 100% free, open source, MIT license. No paid tiers, no feature gating, no usage limits.\n\nScan, Guard, Skill Auditor, Threat Cloud, all 125+ ATR detection rules -- all free, all open source.\n\nCompliance Report and Honeypot Trap are coming soon and will also be free.\n\nNo credit card, no signup, no \"contact sales for pricing.\""
       },
       "q2": {
         "q": "Who builds this?",

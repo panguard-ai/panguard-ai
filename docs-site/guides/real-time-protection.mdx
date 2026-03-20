@@ -91,7 +91,7 @@ Every security event flows through four specialized agents:
 
 | Agent | Role |
 | --- | --- |
-| **DetectAgent** | Rule matching (Sigma + YARA), threat intelligence lookup, event correlation |
+| **DetectAgent** | Rule matching (ATR), threat intelligence lookup, event correlation |
 | **AnalyzeAgent** | Evidence collection, weighted confidence scoring, AI reasoning via three-layer funnel |
 | **RespondAgent** | Action execution (block IP, kill process, isolate file), safety checks, escalation |
 | **ReportAgent** | Event logging, baseline updates, anonymized data for Threat Cloud |
@@ -136,39 +136,24 @@ Feeds update every hour with local caching to avoid redundant queries.
 
 ## Rule Engine
 
-### Sigma Rules
+### ATR Rules
 
-Guard ships with 3,760 bundled Sigma rules. You can also add custom rules:
+Guard ships with 125 bundled ATR rules. You can also add custom rules:
 
 ```yaml
-# Custom rule: Detect mass SSH login failures
-title: SSH Brute Force Attempt
-logsource:
-  category: authentication
-  product: any
+# Custom rule: Detect prompt injection in tool response
+id: ATR-CUSTOM-001
+name: SSH Brute Force via Agent
+severity: high
 detection:
-  selection:
-    event_type: login_failed
-    service: ssh
-  condition: selection
-level: high
+  patterns:
+    - event_type: login_failed
+      service: ssh
+  context: system_event
+action: alert
 ```
 
 Place `.yml` files in Guard's rules directory. Guard automatically loads new rules with hot reload support.
-
-### YARA Rules
-
-For file-level malware detection:
-
-```yara
-rule WebShell {
-  strings:
-    $php = "<?php eval(" nocase
-    $asp = "<%execute(" nocase
-  condition:
-    any of them
-}
-```
 
 ---
 

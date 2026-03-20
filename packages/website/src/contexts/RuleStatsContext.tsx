@@ -7,16 +7,14 @@ import { STATS } from '@/lib/stats';
 interface RuleStatsValues {
   [key: string]: string | number;
   atrRules: number;
-  sigmaRules: string;
-  yaraRules: string;
+  atrPatterns: number;
   totalRules: string;
   totalRulesDisplay: string;
 }
 
 const RuleStatsContext = createContext<RuleStatsValues>({
   atrRules: STATS.atrRules,
-  sigmaRules: STATS.atrRules.toLocaleString(),
-  yaraRules: STATS.atrPatterns.toLocaleString(),
+  atrPatterns: STATS.atrPatterns,
   totalRules: STATS.totalRules.toLocaleString(),
   totalRulesDisplay: STATS.totalRulesDisplay,
 });
@@ -24,13 +22,11 @@ const RuleStatsContext = createContext<RuleStatsValues>({
 export function RuleStatsProvider({ children }: { children: ReactNode }) {
   const stats = useRuleStats();
 
-  const total = stats.sigmaRules + stats.yaraRules + stats.atrRules;
   const values: RuleStatsValues = {
     atrRules: stats.atrRules,
-    sigmaRules: stats.sigmaRules.toLocaleString(),
-    yaraRules: stats.yaraRules.toLocaleString(),
-    totalRules: total.toLocaleString(),
-    totalRulesDisplay: `${Math.floor(total / 100) * 100}+`,
+    atrPatterns: stats.atrPatterns,
+    totalRules: stats.totalRules.toLocaleString(),
+    totalRulesDisplay: STATS.totalRulesDisplay,
   };
 
   return <RuleStatsContext.Provider value={values}>{children}</RuleStatsContext.Provider>;

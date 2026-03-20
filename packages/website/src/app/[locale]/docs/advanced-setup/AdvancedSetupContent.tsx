@@ -86,36 +86,6 @@ export default function AdvancedSetupContent() {
         </div>
       </SectionWrapper>
 
-      {/* Falco */}
-      <SectionWrapper>
-        <div className="max-w-3xl mx-auto">
-          <FadeInUp>
-            <h2 className="text-xl font-bold text-text-primary mb-2">{t('falcoTitle')}</h2>
-            <p className="text-text-secondary mb-6">{t('falcoDesc')}</p>
-            <CodeBlock
-              code={`# Ubuntu/Debian\ncurl -fsSL https://falco.org/repo/falcosecurity-packages.asc | sudo gpg --dearmor -o /usr/share/keyrings/falco-archive-keyring.gpg\nsudo apt update && sudo apt install -y falco\n\n# Start Falco\nsudo systemctl enable falco && sudo systemctl start falco`}
-              label="Terminal (Linux)"
-            />
-            <p className="text-xs text-text-muted mt-3">{t('falcoNote')}</p>
-          </FadeInUp>
-        </div>
-      </SectionWrapper>
-
-      {/* Suricata */}
-      <SectionWrapper dark>
-        <div className="max-w-3xl mx-auto">
-          <FadeInUp>
-            <h2 className="text-xl font-bold text-text-primary mb-2">{t('suricataTitle')}</h2>
-            <p className="text-text-secondary mb-6">{t('suricataDesc')}</p>
-            <CodeBlock
-              code={`# Ubuntu/Debian\nsudo apt install -y suricata\n\n# Start Suricata\nsudo systemctl enable suricata && sudo systemctl start suricata`}
-              label="Terminal (Linux)"
-            />
-            <p className="text-xs text-text-muted mt-3">{t('suricataNote')}</p>
-          </FadeInUp>
-        </div>
-      </SectionWrapper>
-
       {/* Environment Variables */}
       <SectionWrapper>
         <div className="max-w-3xl mx-auto">

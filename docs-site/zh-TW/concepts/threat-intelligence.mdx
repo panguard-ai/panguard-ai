@@ -147,7 +147,7 @@ Panguard 可完全離線運作。當威脅情報來源無法連線時：
 
 - Layer 1 規則引擎以本地快取規則持續運作
 - 先前快取的來源資料在過期前仍可使用
-- 新的偵測僅依賴 Sigma/YARA 規則與行為基線
+- 新的偵測僅依賴 ATR 規則與行為基線
 - 分數調整會反映情報覆蓋率降低
 
 ```bash
@@ -202,7 +202,7 @@ panguard guard status
     Source: AbuseIPDB (confidence: 98%), ThreatFox (tag: C2)
     Process: curl (PID 5678) -> 203.0.113.50:443
     Action: IP blocked via iptables
-    Rule: sigma/network/c2-communication.yml
+    Rule: atr/network/c2-communication.yml
     ```
   </Tab>
   <Tab title="IT Admin 角色">

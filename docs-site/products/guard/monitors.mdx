@@ -52,27 +52,7 @@ These 4 monitors ship with `@panguard-ai/core` and work on macOS, Linux, and Win
 
 ## Advanced Monitors
 
-These 6 monitors ship with `@panguard-ai/panguard-guard` and provide kernel-level or specialized visibility. All gracefully degrade when their dependencies are not installed.
-
-### Falco Monitor
-
-| Field | Details |
-|-------|---------|
-| **Source** | `falco-monitor.ts` |
-| **Dependency** | Falco >= 0.35 |
-| **Data source** | `/var/log/falco/alerts.json` |
-| **Capabilities** | Reads Falco alerts for container escapes, privilege escalation, anomalous system calls, and namespace breakouts. |
-| **Event types** | Container security, syscall anomalies, privilege changes |
-
-### Suricata Monitor
-
-| Field | Details |
-|-------|---------|
-| **Source** | `suricata-monitor.ts` |
-| **Dependency** | Suricata >= 7.0 |
-| **Data source** | `/var/log/suricata/eve.json` (EVE JSON format) |
-| **Capabilities** | Network IDS with protocol-aware deep packet analysis. Detects known exploit patterns, malware communication, and policy violations. |
-| **Event types** | Network intrusion, protocol anomalies, malware signatures |
+These 4 monitors ship with `@panguard-ai/panguard-guard` and provide kernel-level or specialized visibility. All gracefully degrade when their dependencies are not installed.
 
 ### Syscall Monitor (eBPF)
 
@@ -122,11 +102,9 @@ These 6 monitors ship with `@panguard-ai/panguard-guard` and provide kernel-leve
   ┌──────────┬──────────┬──────────┬──────────┐
   |   Log    | Network  | Process  |   File   |    Built-in
   └──────────┴──────────┴──────────┴──────────┘
-  ┌──────────┬──────────┬──────────┐
-  |  Falco   | Suricata |  eBPF    |           Advanced
-  ├──────────┼──────────┼──────────┤
-  |  Memory  |   DPI    | Rootkit  |
-  └──────────┴──────────┴──────────┘
+  ┌──────────┬──────────┬──────────┬──────────┐
+  |  eBPF    |  Memory  |   DPI    | Rootkit  |  Advanced
+  └──────────┴──────────┴──────────┴──────────┘
 ```
 
 All monitors feed events into the `MonitorEngine`, which forwards them to the `GuardEngine` for DARE pipeline processing.

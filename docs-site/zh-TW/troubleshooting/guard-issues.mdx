@@ -95,10 +95,9 @@ Guard 需要 root/admin 權限來讀取系統日誌和管理防火牆規則。
     | 元件 | 典型記憶體 |
     |-----------|---------------|
     | 核心代理 | 50--100 MB |
-    | Sigma 引擎（3,000 規則） | 約 50 MB |
-    | YARA 引擎（900 規則） | 約 30 MB |
+    | ATR 規則引擎（125 規則） | 約 20 MB |
     | AI 分析（本機） | 100--500 MB |
-    | **合計** | **230--680 MB** |
+    | **合計** | **170--620 MB** |
   </Accordion>
   <Accordion title="減少記憶體使用量">
     1. **停用未使用的監控器** -- 關閉不需要的子系統監控：
@@ -176,7 +175,7 @@ Guard 需要 root/admin 權限來讀取系統日誌和管理防火牆規則。
     panguard guard logs --severity low --limit 20
 
     # 停用特定規則
-    panguard config set rules.excludeIds '["sigma-noisy-001"]'
+    panguard config set rules.excludeIds '["ATR-2025-0099"]'
     ```
   </Accordion>
 </AccordionGroup>

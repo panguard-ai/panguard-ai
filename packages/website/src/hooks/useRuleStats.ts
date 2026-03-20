@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import { STATS } from '@/lib/stats';
 
 interface RuleStats {
-  sigmaRules: number;
-  yaraRules: number;
   atrRules: number;
+  atrPatterns: number;
   totalRules: number;
   lastSync: string | null;
 }
@@ -44,9 +43,8 @@ function setCache(data: RuleStats): void {
 
 /** Static fallback values from stats.ts (used during SSR and before fetch completes) */
 const FALLBACK: RuleStats = {
-  sigmaRules: STATS.atrRules,
-  yaraRules: STATS.atrPatterns,
   atrRules: STATS.atrRules,
+  atrPatterns: STATS.atrPatterns,
   totalRules: STATS.totalRules,
   lastSync: STATS.lastUpdated,
 };
@@ -75,10 +73,9 @@ export function useRuleStats(): RuleStats {
       .then((data) => {
         if (cancelled) return;
         const live: RuleStats = {
-          sigmaRules: data.sigma?.total ?? FALLBACK.sigmaRules,
-          yaraRules: data.yara?.definitions ?? data.yara?.total ?? FALLBACK.yaraRules,
           atrRules: data.atr?.total ?? STATS.atrRules,
-          totalRules: (data.sigma?.total ?? 0) + (data.yara?.total ?? 0),
+          atrPatterns: data.atr?.patterns ?? STATS.atrPatterns,
+          totalRules: data.atr?.total ?? STATS.totalRules,
           lastSync: data.lastSync ?? FALLBACK.lastSync,
         };
         setStats(live);

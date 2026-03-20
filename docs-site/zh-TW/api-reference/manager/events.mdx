@@ -32,8 +32,8 @@ icon: "triangle-exclamation"
   ISO 8601 時間戳。如果省略，預設為伺服器接收時間。
 </ParamField>
 
-<ParamField body="events[].sigmaRuleId" type="string">
-  觸發此偵測的 Sigma 規則 ID。
+<ParamField body="events[].ruleId" type="string">
+  觸發此偵測的 ATR 規則 ID。
 </ParamField>
 
 <ParamField body="events[].confidence" type="number">
@@ -57,7 +57,7 @@ curl -X POST https://localhost:8443/api/agents/agent-a1b2c3d4/events \
           "targetService": "sshd",
           "timeWindow": "300s"
         },
-        "sigmaRuleId": "sigma-bf-001"
+        "ruleId": "ATR-2025-0042"
       }
     ]
   }'

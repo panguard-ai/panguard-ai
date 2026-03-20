@@ -3,7 +3,7 @@
  *
  * Contains:
  * - processEvent() - the full detection-analysis-response pipeline
- * - Sub-functions: runYaraScan, evaluateATR, runSmartRouter,
+ * - Sub-functions: evaluateATR, runSmartRouter,
  *   runKnowledgeDistillation, reportAndNotify
  *
  * @module @panguard-ai/panguard-guard/event-processor
@@ -12,7 +12,6 @@
 import { createLogger, parseSigmaYaml } from '@panguard-ai/core';
 import type {
   RuleEngine,
-  YaraScanner,
   SmartRouter,
   KnowledgeDistiller,
   SecurityEvent,
@@ -56,7 +55,6 @@ export interface EventProcessorState {
 /** Engine dependencies for event processing (all readonly references) */
 export interface EventProcessorDeps {
   readonly ruleEngine: RuleEngine;
-  readonly yaraScanner: YaraScanner;
   readonly atrEngine: GuardATREngine;
   readonly detectAgent: DetectAgent;
   readonly analyzeAgent: AnalyzeAgent;
@@ -70,35 +68,6 @@ export interface EventProcessorDeps {
   readonly dashboard: DashboardServer | null;
   readonly syslogAdapter: SyslogAdapter | null;
   readonly agentClient: PanguardAgentClient | null;
-}
-
-/**
- * Run YARA scan on file events. Returns a YARA-generated SecurityEvent if matched, else null.
- */
-async function runYaraScan(
-  event: SecurityEvent,
-  yaraScanner: YaraScanner,
-  processEvent: (e: SecurityEvent) => void
-): Promise<void> {
-  if (
-    event.source === 'file' &&
-    yaraScanner.getRuleCount() > 0 &&
-    event.metadata?.['filePath'] &&
-    event.metadata?.['action'] !== 'deleted'
-  ) {
-    try {
-      const yaraResult = await yaraScanner.scanFile(event.metadata['filePath'] as string);
-      const yaraEvent = yaraScanner.toSecurityEvent(yaraResult);
-      if (yaraEvent) {
-        logger.warn(
-          `YARA match: ${yaraResult.matches.map((m) => m.rule).join(', ')} in ${yaraResult.filePath}`
-        );
-        processEvent(yaraEvent);
-      }
-    } catch {
-      // YARA scan failure is non-fatal
-    }
-  }
 }
 
 /**
@@ -361,9 +330,6 @@ export async function processEvent(
   }
 
   try {
-    // YARA scan for file events
-    await runYaraScan(event, deps.yaraScanner, selfProcessEvent);
-
     // ATR evaluation
     let detection = deps.detectAgent.detect(event);
     detection = evaluateATR(event, detection, deps.atrEngine);

@@ -62,7 +62,7 @@ Event ──> Detect ──> Analyze ──> Respond ──> Report
 
 | Agent | Responsibility |
 |-------|---------------|
-| **Detect** | Rule matching (Sigma + YARA), threat intel lookup, deduplication, event correlation |
+| **Detect** | Rule matching (ATR), threat intel lookup, deduplication, event correlation |
 | **Analyze** | Evidence collection, weighted confidence scoring, AI reasoning, baseline deviation checks |
 | **Respond** | Action execution (block IP, kill process, quarantine file), safety checks, escalation |
 | **Report** | JSONL logging with rotation, baseline updates, anonymized data for Threat Cloud |
@@ -77,7 +77,7 @@ Guard uses a 3-layer AI detection funnel to minimize latency and cost:
 
 | Layer | Engine | Cost | Latency | Traffic |
 |-------|--------|------|---------|---------|
-| **Layer 1** | Sigma rules, YARA, built-in patterns, threat intel | $0 | < 1 ms | ~90% of events |
+| **Layer 1** | ATR rules, built-in patterns, threat intel | $0 | < 1 ms | ~90% of events |
 | **Layer 2** | Ollama (local AI) | $0 | ~100 ms | ~7% of events |
 | **Layer 3** | Claude / OpenAI (cloud AI) | ~$0.01/event | ~1 s | ~3% of events |
 
@@ -88,8 +88,7 @@ Only events that cannot be resolved at a lower layer are escalated to the next.
 | Capability | Details |
 |-----------|---------|
 | **Monitor types** | 10 (4 built-in + 6 advanced) |
-| **Sigma rules** | 3,760 built-in community rules |
-| **YARA rules** | 5,961 file pattern matching rules |
+| **ATR rules** | 125 built-in detection rules |
 | **Threat intel feeds** | 5 sources (ThreatFox, URLhaus, Feodo, GreyNoise, AbuseIPDB) |
 | **Correlation patterns** | 7 attack patterns with MITRE ATT&CK mapping |
 | **Response actions** | IP block, process kill, file quarantine, notify, log |
@@ -110,7 +109,7 @@ Uptime:     14d 6h 33m
 Score:      85/100 (Grade: A)
 Threats:    0 active
 Events:     134,567 processed
-Rules:      42 Sigma + 15 YARA
+Rules:      125 ATR
 Feeds:      5 active
 ```
 

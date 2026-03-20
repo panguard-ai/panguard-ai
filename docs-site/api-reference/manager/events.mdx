@@ -32,8 +32,8 @@ Submits one or more threat events detected by an agent. This is the primary inge
   ISO 8601 timestamp. Defaults to server receipt time if omitted.
 </ParamField>
 
-<ParamField body="events[].sigmaRuleId" type="string">
-  The Sigma rule ID that triggered this detection.
+<ParamField body="events[].ruleId" type="string">
+  The ATR rule ID that triggered this detection.
 </ParamField>
 
 <ParamField body="events[].confidence" type="number">
@@ -57,7 +57,7 @@ curl -X POST https://localhost:8443/api/agents/agent-a1b2c3d4/events \
           "targetService": "sshd",
           "timeWindow": "300s"
         },
-        "sigmaRuleId": "sigma-bf-001"
+        "ruleId": "ATR-2025-0042"
       }
     ]
   }'

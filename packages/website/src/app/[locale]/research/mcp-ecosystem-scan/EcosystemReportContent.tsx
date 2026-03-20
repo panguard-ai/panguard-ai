@@ -357,7 +357,7 @@ export default function EcosystemReportContent() {
               <ActionStep
                 num="2"
                 title="Install PanGuard Guard"
-                desc="One command gives you 24/7 runtime protection. 9,700+ detection rules. Auto-blocks threats before damage."
+                desc={`One command gives you 24/7 runtime protection. ${STATS.totalRulesDisplay} ATR detection rules. Auto-blocks threats before damage.`}
                 cta="Install Guide"
                 ctaHref="/docs/getting-started"
               />

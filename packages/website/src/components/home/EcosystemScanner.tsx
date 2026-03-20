@@ -31,39 +31,39 @@ export default function EcosystemScanner() {
 
         {/* Rule stats - real numbers */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 mb-8">
-          {/* Sigma Rules */}
+          {/* ATR Rules */}
           <FadeInUp delay={0}>
             <div className="bg-surface-1/60 border border-border rounded-2xl p-5 text-center">
               <ShieldIcon className="w-6 h-6 text-panguard-green mx-auto mb-3" />
               <div className="text-2xl sm:text-3xl font-extrabold text-text-primary">
                 <CountUp target={STATS.atrRules} />
               </div>
-              <p className="text-xs text-text-muted mt-1">Sigma {t('rules')}</p>
-              <p className="text-[10px] text-text-muted mt-0.5">{t('sigmaDesc')}</p>
+              <p className="text-xs text-text-muted mt-1">ATR {t('rules')}</p>
+              <p className="text-[10px] text-text-muted mt-0.5">{t('atrDesc')}</p>
             </div>
           </FadeInUp>
 
-          {/* YARA Rules */}
+          {/* Detection Patterns */}
           <FadeInUp delay={0.08}>
             <div className="bg-surface-1/60 border border-border rounded-2xl p-5 text-center">
               <ScanIcon className="w-6 h-6 text-panguard-green mx-auto mb-3" />
               <div className="text-2xl sm:text-3xl font-extrabold text-text-primary">
                 <CountUp target={STATS.atrPatterns} />
               </div>
-              <p className="text-xs text-text-muted mt-1">YARA {t('rules')}</p>
-              <p className="text-[10px] text-text-muted mt-0.5">{t('yaraDesc')}</p>
+              <p className="text-xs text-text-muted mt-1">{t('detectionPatterns')}</p>
+              <p className="text-[10px] text-text-muted mt-0.5">{t('patternsDesc')}</p>
             </div>
           </FadeInUp>
 
-          {/* ATR Rules */}
+          {/* Threat Categories */}
           <FadeInUp delay={0.16}>
             <div className="bg-surface-1/60 border border-border rounded-2xl p-5 text-center">
               <NetworkIcon className="w-6 h-6 text-[#DAA520] mx-auto mb-3" />
               <div className="text-2xl sm:text-3xl font-extrabold text-text-primary">
-                <CountUp target={STATS.atrRules} />
+                <CountUp target={9} />
               </div>
-              <p className="text-xs text-text-muted mt-1">ATR {t('rules')}</p>
-              <p className="text-[10px] text-text-muted mt-0.5">{t('atrDesc')}</p>
+              <p className="text-xs text-text-muted mt-1">{t('threatCategories')}</p>
+              <p className="text-[10px] text-text-muted mt-0.5">{t('categoriesDesc')}</p>
             </div>
           </FadeInUp>
         </div>

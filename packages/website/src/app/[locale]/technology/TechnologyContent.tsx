@@ -152,9 +152,9 @@ export default function TechnologyContent() {
   return (
     <>
       <p id="definition" className="sr-only">
-        Panguard&apos;s detection engine combines three analysis engines — Sigma rule matching, YARA
-        signature scanning, and ATR (Agent Threat Rules) — across five detection stages with
-        graceful degradation from cloud to fully offline operation.
+        Panguard&apos;s detection engine uses ATR (Agent Threat Rules) -- the first open standard for
+        AI agent threat detection -- across multiple detection stages with graceful degradation
+        from cloud to fully offline operation.
       </p>
 
       {/* -- Hero -- */}

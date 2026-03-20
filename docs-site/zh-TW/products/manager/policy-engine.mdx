@@ -44,7 +44,7 @@ Admin ──> POST /api/policy ──> PolicyEngine ──> Broadcast Queue
   },
   "monitors": {
     "enabled": ["log", "network", "process", "file"],
-    "advanced": ["falco", "suricata"]
+    "advanced": ["ebpf", "dpi"]
   },
   "alerting": {
     "minimumSeverity": "medium",
@@ -70,7 +70,7 @@ Admin ──> POST /api/policy ──> PolicyEngine ──> Broadcast Queue
 | **monitors** | `enabled`、`advanced` | 每個代理上要啟動的監控器 |
 | **alerting** | `channels`、`severity` | 通知的最低嚴重性、管道路由 |
 | **response** | `actions`、`escalation` | 允許的回應動作和升級參數 |
-| **rules** | `sigma`、`yara` | 自訂規則分發 |
+| **rules** | `atr` | 自訂 ATR 規則分發 |
 
 ## 規則類型
 

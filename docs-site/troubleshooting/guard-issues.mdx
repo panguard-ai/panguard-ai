@@ -95,10 +95,9 @@ If Guard consumes more memory than expected:
     | Component | Typical Memory |
     |-----------|---------------|
     | Core agent | 50--100 MB |
-    | Sigma engine (3,760 rules) | ~50 MB |
-    | YARA engine (5,961 rules) | ~30 MB |
+    | ATR rule engine (125 rules) | ~20 MB |
     | AI analysis (local) | 100--500 MB |
-    | **Total** | **230--680 MB** |
+    | **Total** | **170--620 MB** |
   </Accordion>
   <Accordion title="Reduce memory usage">
     1. **Disable unused monitors** -- Turn off monitoring for subsystems you do not need:
@@ -176,7 +175,7 @@ If Guard generates too many alerts for legitimate activity:
     panguard guard logs --severity low --limit 20
 
     # Disable a specific rule
-    panguard config set rules.excludeIds '["sigma-noisy-001"]'
+    panguard config set rules.excludeIds '["ATR-2025-0099"]'
     ```
   </Accordion>
 </AccordionGroup>

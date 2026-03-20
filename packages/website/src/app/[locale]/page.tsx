@@ -21,7 +21,7 @@ export default function Home() {
         <main id="main-content">
           <p id="definition" className="sr-only">
             Panguard AI provides the first Skills Audit for AI agents. It audits every skill before
-            it runs, catches known threats with community ATR + Sigma + YARA rules, catches unknown
+            it runs, catches known threats with community ATR (Agent Threat Rules), catches unknown
             threats with AI analysis, and shares new rules to protect everyone. MIT licensed. Open
             source.
           </p>

@@ -44,7 +44,7 @@ Policies are JSON documents with a version number and configuration sections:
   },
   "monitors": {
     "enabled": ["log", "network", "process", "file"],
-    "advanced": ["falco", "suricata"]
+    "advanced": ["ebpf", "dpi"]
   },
   "alerting": {
     "minimumSeverity": "medium",
@@ -70,7 +70,7 @@ Policies are JSON documents with a version number and configuration sections:
 | **monitors** | `enabled`, `advanced` | Which monitors to activate on each agent |
 | **alerting** | `channels`, `severity` | Minimum severity for notifications, channel routing |
 | **response** | `actions`, `escalation` | Allowed response actions and escalation parameters |
-| **rules** | `sigma`, `yara` | Custom rule distribution |
+| **rules** | `atr` | Custom ATR rule distribution |
 
 ## Rule Types
 

@@ -10,7 +10,7 @@ import { STATS } from '@/lib/stats';
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const highlights = [
-  `${STATS.totalRulesDisplay} detection rules (Sigma + YARA + ATR)`,
+  `${STATS.totalRulesDisplay} ATR detection rules`,
   'ATR rules for AI agent threats',
   'Unlimited machines',
   'Threat Cloud collective intelligence',
