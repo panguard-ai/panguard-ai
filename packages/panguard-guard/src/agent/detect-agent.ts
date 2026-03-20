@@ -3,7 +3,7 @@
  * 偵測代理 - 透過規則、威脅情報和事件關聯進行事件偵測
  *
  * First stage of the multi-agent pipeline. Receives raw SecurityEvents,
- * runs them through the Sigma rule engine and threat intelligence feeds,
+ * runs them through the ATR rule engine and threat intelligence feeds,
  * correlates events within a sliding time window to detect attack chains,
  * and emits DetectionResults for events that match.
  *
@@ -71,7 +71,7 @@ export class DetectAgent {
    * Process a security event and detect threats
    *
    * Steps:
-   * 1. Match the event against loaded Sigma rules
+   * 1. Match the event against loaded ATR rules
    * 2. Check threat intelligence for network events (IP lookup, IPv4 + IPv6)
    * 3. Deduplicate: skip if same source+rule fired within dedup window
    * 4. Correlate: check sliding window for attack chain patterns

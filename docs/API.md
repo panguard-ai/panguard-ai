@@ -730,7 +730,7 @@ Upload anonymized threat data. Supports single event and batch formats.
   "attackSourceIP": "203.0.113.50",
   "attackType": "brute_force",
   "mitreTechnique": "T1110",
-  "sigmaRuleMatched": "sigma_brute_force_ssh",
+  "ruleMatched": "atr_brute_force_ssh",
   "timestamp": "2026-03-03T00:00:00.000Z",
   "region": "TW",
   "industry": "technology"
@@ -793,11 +793,11 @@ Upload honeypot intelligence data. Supports single and batch (max 100).
 
 #### GET /api/rules
 
-Fetch community Sigma rules. Supports `?since=<ISO timestamp>` filter.
+Fetch community ATR rules. Supports `?since=<ISO timestamp>` filter.
 
 #### POST /api/rules
 
-Publish a new community rule. Requires API key. Rule content must be valid Sigma YAML (max 64KB).
+Publish a new community rule. Requires API key. Rule content must be valid ATR YAML (max 64KB).
 
 **Request Body**:
 

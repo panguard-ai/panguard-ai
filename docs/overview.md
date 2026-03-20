@@ -23,7 +23,7 @@ Like Claude Code:
 Traditional security tools:
 
 - Require expertise to install and configure
-- Interfaces full of Sigma, YARA, IOC, MITRE ATT&CK jargon
+- Interfaces full of security jargon (IOC, MITRE ATT&CK, etc.)
 - Generate thousands of alerts with no prioritization
 - Enterprise tools cost six figures; free alternatives are hard to use
 
@@ -71,7 +71,7 @@ panguard guard start
 
 - 4-agent AI pipeline: Detect -> Analyze -> Respond -> Report
 - 7-day learning period builds behavioral baseline
-- 3,760 Sigma rules + 5,961 YARA rules
+- 61 ATR rules with 474 detection patterns
 - Real-time threat intelligence (ThreatFox / URLhaus / GreyNoise)
 - Auto-response: IP blocking, file quarantine, process termination
 - Investigation engine for root cause analysis
@@ -158,7 +158,7 @@ panguard threat start --port 8080
 
 - RESTful API server with SQLite backend
 - IoC (Indicator of Compromise) submission and queries
-- Automatic Sigma rule generation from real attacks
+- Automatic ATR rule generation from real attacks
 - IP/domain reputation scoring
 - Rate limiting and API key authentication
 - Encrypted transport (TLS 1.3)
@@ -199,7 +199,7 @@ Best for: private enterprise deployment, community threat intelligence sharing.
 
 | Layer   | Technology              | Handles | Latency | Cost        |
 | ------- | ----------------------- | ------- | ------- | ----------- |
-| Layer 1 | Sigma/YARA rules engine | 90%     | < 50ms  | $0          |
+| Layer 1 | ATR rules engine        | 90%     | < 50ms  | $0          |
 | Layer 2 | Local AI (Ollama)       | 7%      | ~2s     | $0          |
 | Layer 3 | Cloud AI                | 3%      | ~5s     | $0.008/call |
 
@@ -217,7 +217,7 @@ Cloud down? Local AI takes over. Local AI down? Rules engine keeps running. Prot
 | Runtime    | Node.js 20+                                     |
 | Monorepo   | pnpm 10 workspaces                              |
 | Testing    | Vitest 3 (3,017 tests / 142 files)              |
-| Rules      | Sigma (3,760) + YARA (5,961) + Suricata + Falco |
+| Rules      | ATR (61 rules, 474 patterns)                     |
 | AI         | Ollama (local) + Claude / OpenAI (cloud)        |
 | Auth       | Google OAuth (PKCE) + scrypt hashing            |
 | i18n       | English + Traditional Chinese                   |

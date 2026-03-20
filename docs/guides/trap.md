@@ -154,7 +154,7 @@ panguard trap profiles
 Trap 的偵測結果自動餵入 Guard：
 
 - 攻擊者 IP 自動加入 Guard 的封鎖清單
-- 攻擊模式轉換為 Sigma 規則候選
+- 攻擊模式轉換為 ATR 規則候選
 - 收集的 IoC 加入本地威脅情報庫
 
 ### Threat Cloud 整合

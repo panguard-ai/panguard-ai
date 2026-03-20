@@ -258,7 +258,7 @@ Source: AbuseIPDB (confidence: 98%)
 Tag: C2-Server, ThreatFox IOC-12345
 Process: curl (PID 5678) -> 203.0.113.50:443
 Action: IP blocked via iptables
-Rule: sigma/network/c2-communication.yml
+Rule: atr/network/c2-communication.yml
 
 Timeline:
   14:23:01 - Outbound connection detected

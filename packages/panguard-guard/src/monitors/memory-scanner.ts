@@ -2,7 +2,7 @@
  * MemoryScanner - Process memory scanning for fileless malware
  * MemoryScanner - 行程記憶體掃描以偵測無檔案惡意軟體
  *
- * Reads /proc/{pid}/mem and applies YARA-like pattern matching
+ * Reads /proc/{pid}/mem and applies pattern matching
  * to detect:
  * - Fileless malware (code running only in memory)
  * - Injected shellcode

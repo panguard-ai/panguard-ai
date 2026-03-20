@@ -2,7 +2,7 @@
  * rule-sync.ts - Threat Cloud synchronization extracted from GuardEngine
  *
  * Contains:
- * - syncThreatCloud() - periodic Sigma/ATR/IP/domain/whitelist/blacklist sync
+ * - syncThreatCloud() - periodic ATR/IP/domain/whitelist/blacklist sync
  * - getSkillThreatSubmitter() - bound callback for SkillWatcher
  * - getSkillBlacklistChecker() - bound callback for SkillWatcher
  * - setupCloudSyncTimer() - timer creation helper
@@ -28,7 +28,7 @@ export interface CloudSyncDeps {
 
 /**
  * Periodic Threat Cloud sync: re-fetch rules and blocklist.
- * Syncs Sigma, ATR rules; IP and domain blocklists;
+ * Syncs ATR rules; IP and domain blocklists;
  * skill whitelist and blacklist.
  */
 export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {

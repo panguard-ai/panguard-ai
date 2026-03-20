@@ -144,7 +144,7 @@ function runSmartRouter(detection: DetectionResult, smartRouter: SmartRouter | n
 
 /**
  * Run knowledge distillation to log AI verdicts for potential future rule creation.
- * (Sigma RuleEngine injection removed; ATR Engine is used for detection.)
+ * (ATR Engine is used for detection.)
  */
 function runKnowledgeDistillation(
   event: SecurityEvent,

@@ -151,9 +151,9 @@ sudo panguard guard install
 # 查看狀態中的資源使用
 panguard guard status
 
-# 限制 Sigma 規則數量
+# 限制 ATR 規則數量
 # 移除不需要的規則檔案
-ls ~/.panguard-guard/rules/sigma/
+ls ~/.panguard-guard/rules/atr/
 ```
 
 ### Guard 產生大量誤報

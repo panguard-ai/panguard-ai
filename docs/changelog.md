@@ -6,9 +6,9 @@
 
 ## v0.7.0 (2025-02-25)
 
-### Phase 15-16: Sigma 增強 + osquery 整合
+### Phase 15-16: ATR 規則增強 + osquery 整合
 
-**Sigma 規則引擎增強**
+**ATR 規則引擎增強**
 
 - 聚合表達式支援：`1 of them`、`all of them`、`1 of sel*`、`all of filter*`
 - 新增比對修飾符：`|cidr`（IP 範圍匹配）、`|gt`/`|gte`/`|lt`/`|lte`（數值比較）
@@ -50,7 +50,7 @@
 
 ## v0.5.0 (2025-02-25)
 
-### Phase 10-12: 自動回應 + YARA + 威脅情報 Feed
+### Phase 10-12: 自動回應 + 記憶體掃描 + 威脅情報 Feed
 
 **自動回應引擎**
 
@@ -59,10 +59,9 @@
 - 程序終止
 - 信心度機制（>90% 自動 / 70-90% 確認 / <70% 通知）
 
-**YARA 掃描器**
+**記憶體掃描器**
 
-- 原生 YARA 引擎支援
-- Regex fallback（未安裝 YARA 時）
+- 模式比對引擎
 - 檔案和記憶體掃描
 
 **威脅情報 Feed 管理**
@@ -111,7 +110,7 @@
 
 - 5 個 AI Agent 管線：Detect、Analyze、Respond、Report、Investigation
 - 7 天學習期 + 自動切換保護模式
-- 42 條 Sigma 規則
+- ATR 規則引擎
 - Dashboard WebSocket 伺服器
 - 系統服務安裝（macOS/Linux/Windows）
 - PID 管理 + Watchdog
@@ -150,7 +149,7 @@
 
 - TypeScript monorepo 架構
 - i18n 雙語支援（en + zh-TW）
-- Sigma 規則引擎
+- ATR 規則引擎
 - 系統偵察引擎（OS、網路、服務、安全工具）
 - 4 個監控器：Log、Network、Process、File
 - 3 個適配器：Windows Defender、Wazuh、Syslog
