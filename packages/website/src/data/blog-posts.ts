@@ -419,7 +419,7 @@ export const blogPosts: BlogPost[] = [
       '### MCP Server: 11 Tools',
       'Control Panguard from Claude, Cursor, or any MCP-compatible AI assistant. The MCP server now exposes 11 tools: scan, scan_code, guard_start, guard_stop, status, alerts, block_ip, generate_report, init, deploy, and the new audit_skill. Start with `panguard serve --mcp`.',
       '### Security Hardening',
-      'This release includes multiple security fixes identified during our pre-release audit: Manager API now requires authentication tokens in production, waitlist verification tokens are hashed with SHA-256, the remote scanner blocks private IP addresses to prevent SSRF, and Sigma rule regex compilation includes ReDoS protection.',
+      'This release includes multiple security fixes identified during our pre-release audit: Manager API now requires authentication tokens in production, waitlist verification tokens are hashed with SHA-256, the remote scanner blocks private IP addresses to prevent SSRF, and rule regex compilation includes ReDoS protection.',
       '## Get Started',
       'Install Panguard in one command:',
       '```bash\ncurl -fsSL https://get.panguard.ai | bash\npanguard scan --quick\n```',

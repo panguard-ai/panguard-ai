@@ -510,7 +510,6 @@ export class DashboardServer {
     }
 
     this.jsonResponse(res, {
-      sigma: this.status.sigmaRuleCount ?? 0,
       atr: this.status.atrRuleCount ?? 0,
       atrMatchCount: this.status.atrMatchCount ?? 0,
       atrDrafterPatterns: this.status.atrDrafterPatterns ?? 0,
@@ -933,8 +932,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 <div class="st" data-i18n="det_rules">Detection Rules</div>
 <div class="cg">
-<div class="cd"><div class="cl">SIGMA</div><div class="cv-sm sg" id="v-sigma">--</div></div>
-<div class="cd"><div class="cl">YARA</div><div class="cv-sm sg" id="v-yara">--</div></div>
 <div class="cd"><div class="cl">ATR</div><div class="cv-sm sg" id="v-atr">--</div></div>
 </div>
 <div class="st" data-i18n="skill_sum">Skill Summary</div>
@@ -970,8 +967,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="pd" data-i18n="d_ai">Panguard uses a 3-layer detection system. Layer 1 (rules) and Layer 2 (fingerprint & heuristic) are always active with zero config. Layer 3 uses cloud AI for the deepest analysis -- configure your API key below.</div>
 
 <div class="fs">
-<h3><span class="dot dot-ok"></span> <span data-i18n="l1">Layer 1: Rules Engine (Sigma + YARA + ATR)</span></h3>
-<div class="desc" data-i18n="l1d">Pattern-matching rules that detect known threats instantly. Always active, zero configuration needed. Includes 3,700+ Sigma rules, 4,300+ YARA signatures, and custom ATR (Agent Threat Rules).</div>
+<h3><span class="dot dot-ok"></span> <span data-i18n="l1">Layer 1: ATR Rules Engine</span></h3>
+<div class="desc" data-i18n="l1d">ATR (Agent Threat Rules) detect known threats instantly. Always active, zero configuration needed.</div>
 <div style="color:var(--ok);font-size:13px;font-weight:600" data-i18n="active">Active</div>
 </div>
 
@@ -1018,8 +1015,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div id="ru-loading" class="empty"><span class="spin"></span> Loading rule data...</div>
 <div id="ru-content" style="display:none">
 <div class="cg">
-<div class="cd"><div class="cl">SIGMA</div><div class="cv sg" id="ru-sigma">0</div><div style="font-size:11px;color:var(--tm);margin-top:4px" data-i18n="ru_sigma_d">Community detection rules</div></div>
-<div class="cd"><div class="cl">YARA</div><div class="cv sg" id="ru-yara">0</div><div style="font-size:11px;color:var(--tm);margin-top:4px" data-i18n="ru_yara_d">Binary pattern signatures</div></div>
 <div class="cd"><div class="cl">ATR</div><div class="cv sg" id="ru-atr">0</div><div style="font-size:11px;color:var(--tm);margin-top:4px" data-i18n="ru_atr_d">Agent Threat Rules (AI-drafted)</div></div>
 </div>
 <div style="font-size:12px;color:var(--tm);margin-bottom:20px"><span id="ru-sync"></span> <span data-i18n="ru_auto">Rules sync automatically every hour from Threat Cloud.</span></div>
@@ -1145,12 +1140,12 @@ d_gd:'Follow these steps to activate full protection. Once all steps are complet
 mode:'Mode',events:'Events',threats:'Threats',uptime:'Uptime',learning:'Learning',confidence:'Confidence',memory:'Memory',actions:'Actions',timeline:'Event Timeline',
 det_rules:'Detection Rules',skill_sum:'Skill Summary',wl_skills:'Whitelisted',tr_skills:'Tracked',st_fp:'Stable FP',
 total:'Total Installed',wl_count:'Whitelisted',tr_count:'Tracked / Unknown',all_skills:'All Installed Skills',whitelist:'Whitelisted Skills',name:'Name',source:'Source',reason:'Reason',date:'Date',platform:'Platform',trust:'Trust Status',
-l1:'Layer 1: Rules Engine (Sigma + YARA + ATR)',l1d:'Pattern-matching rules that detect known threats instantly. Always active, zero config needed. 3,700+ Sigma rules, 4,300+ YARA signatures, custom ATR.',active:'Active',
+l1:'Layer 1: ATR Rules Engine',l1d:'ATR (Agent Threat Rules) detect known threats instantly. Always active, zero config needed.',active:'Active',
 l2:'Layer 2: Fingerprint & Heuristic (Local, zero-config)',l2desc:'Behavioral fingerprinting and heuristic analysis. Detects suspicious patterns like permission escalation, unusual file access, and skill drift. Always active, no config needed.',
 l3:'Layer 3: Cloud AI (Most powerful analysis)',l3desc:'Cloud models for the deepest analysis of complex threats. Only used when Layer 1+2 are inconclusive. Requires your own API key.',
 provider:'Provider',endpoint:'Endpoint',model:'Model',api_key:'API Key',custom_ep:'Custom Endpoint',ep_note:'Use custom endpoint for self-hosted models, API proxies, or enterprise gateways. Leave empty for default.',key_note:'Keys are stored locally in ~/.panguard-guard/config.json and never sent to Panguard servers.',
 save:'Save Configuration',reload:'Reload',
-ru_sigma_d:'Community detection rules',ru_yara_d:'Binary pattern signatures',ru_atr_d:'Agent Threat Rules (AI-drafted)',ru_auto:'Rules sync automatically every hour from Threat Cloud.',
+ru_atr_d:'Agent Threat Rules (AI-drafted)',ru_auto:'Rules sync automatically every hour from Threat Cloud.',
 what_atr:'What is ATR?',atr_title:'Agent Threat Rules (ATR)',atr_desc:'ATR rules are automatically drafted by AI when your guard engine detects recurring threat patterns (5+ events from 2+ sources within 6 hours). These draft rules are submitted to Threat Cloud for community review, then distributed to all Panguard users after validation.',
 atr_stats:'ATR Activity',atr_matches:'ATR Matches',atr_drafted:'Patterns Drafted',atr_submitted:'Proposals Submitted',
 contrib_title:'Your Community Contribution',contrib_desc:'Every ATR proposal your device submits helps protect the entire Panguard community. Proposals are reviewed and validated before distribution. Contributing is automatic and anonymous.',
@@ -1186,12 +1181,12 @@ d_gd:'\u6309\u7167\u4ee5\u4e0b\u6b65\u9a5f\u555f\u7528\u5b8c\u6574\u9632\u8b77\u
 mode:'\u6a21\u5f0f',events:'\u4e8b\u4ef6',threats:'\u5a01\u8105',uptime:'\u904b\u884c\u6642\u9593',learning:'\u5b78\u7fd2\u9032\u5ea6',confidence:'\u4fe1\u5fc3\u5ea6',memory:'\u8a18\u61b6\u9ad4',actions:'\u56de\u61c9\u52d5\u4f5c',timeline:'\u4e8b\u4ef6\u6642\u9593\u7dda',
 det_rules:'\u5075\u6e2c\u898f\u5247',skill_sum:'\u6280\u80fd\u6458\u8981',wl_skills:'\u767d\u540d\u55ae',tr_skills:'\u8ffd\u8e64\u4e2d',st_fp:'\u7a69\u5b9a\u6307\u7d0b',
 total:'\u5df2\u5b89\u88dd\u7e3d\u6578',wl_count:'\u767d\u540d\u55ae',tr_count:'\u8ffd\u8e64 / \u672a\u77e5',all_skills:'\u6240\u6709\u5df2\u5b89\u88dd\u6280\u80fd',whitelist:'\u767d\u540d\u55ae\u6280\u80fd',name:'\u540d\u7a31',source:'\u4f86\u6e90',reason:'\u539f\u56e0',date:'\u65e5\u671f',platform:'\u5e73\u53f0',trust:'\u4fe1\u4efb\u72c0\u614b',
-l1:'Layer 1: Rules Engine (Sigma + YARA + ATR)',l1d:'Pattern-matching rules\uff0c\u5373\u6642\u5075\u6e2c\u5df2\u77e5\u5a01\u8105\u3002\u59cb\u7d42\u6d3b\u8e8d\uff0c\u7121\u9700\u914d\u7f6e\u3002\u5305\u542b 3,700+ Sigma rules\u30014,300+ YARA signatures\u3001\u81ea\u8a02 ATR\u3002',active:'Active',
+l1:'Layer 1: ATR Rules Engine',l1d:'ATR (Agent Threat Rules)\uff0c\u5373\u6642\u5075\u6e2c\u5df2\u77e5\u5a01\u8105\u3002\u59cb\u7d42\u6d3b\u8e8d\uff0c\u7121\u9700\u914d\u7f6e\u3002',active:'Active',
 l2:'Layer 2: Fingerprint & Heuristic\uff08\u672c\u5730\uff0c\u96f6\u914d\u7f6e\uff09',l2desc:'\u884c\u70ba\u6307\u7d0b\u8207\u555f\u767c\u5f0f\u5206\u6790\u3002\u5075\u6e2c\u53ef\u7591\u6a21\u5f0f\u5982\u6b0a\u9650\u63d0\u5347\u3001\u7570\u5e38\u6a94\u6848\u5b58\u53d6\u3001skill \u884c\u70ba\u504f\u79fb\u3002\u59cb\u7d42\u6d3b\u8e8d\uff0c\u7121\u9700\u914d\u7f6e\u3002',
 l3:'Layer 3: Cloud AI\uff08\u6700\u5f37\u5206\u6790\uff09',l3desc:'Cloud model \u63d0\u4f9b\u6700\u6df1\u5165\u7684\u5206\u6790\u3002\u50c5\u5728 Layer 1+2 \u7121\u6cd5\u5224\u5b9a\u6642\u4f7f\u7528\u3002\u9700\u8981\u60a8\u81ea\u5df1\u7684 API key\u3002',
 active:'\u5df2\u555f\u7528',provider:'\u63d0\u4f9b\u8005',endpoint:'\u7aef\u9ede',model:'\u6a21\u578b',api_key:'API \u91d1\u9470',custom_ep:'\u81ea\u8a02\u7aef\u9ede',ep_note:'\u7528\u65bc\u81ea\u67b6 model\u3001API proxy \u6216\u4f01\u696d gateway\u3002\u7559\u7a7a\u5373\u4f7f\u7528\u9810\u8a2d endpoint\u3002',key_note:'\u91d1\u9470\u5132\u5b58\u5728\u672c\u6a5f ~/.panguard-guard/config.json\uff0c\u7d55\u4e0d\u6703\u50b3\u9001\u5230 Panguard \u4f3a\u670d\u5668\u3002',
 save:'\u5132\u5b58\u914d\u7f6e',reload:'\u91cd\u65b0\u8f09\u5165',
-ru_sigma_d:'\u793e\u7fa4 detection rules',ru_yara_d:'Binary pattern signatures',ru_atr_d:'Agent Threat Rules (AI \u8349\u64ec)',ru_auto:'Rules \u6bcf\u5c0f\u6642\u81ea\u52d5\u5f9e Threat Cloud \u540c\u6b65\u3002',
+ru_atr_d:'Agent Threat Rules (AI \u8349\u64ec)',ru_auto:'Rules \u6bcf\u5c0f\u6642\u81ea\u52d5\u5f9e Threat Cloud \u540c\u6b65\u3002',
 what_atr:'\u4ec0\u9ebc\u662f ATR\uff1f',atr_title:'Agent Threat Rules (ATR)',atr_desc:'ATR rules \u7531 AI \u81ea\u52d5\u8349\u64ec\uff0c\u7576 Guard Engine \u5075\u6e2c\u5230\u91cd\u8907\u5a01\u8105 pattern\uff086 \u5c0f\u6642\u5167 2+ \u4f86\u6e90\u7684 5+ events\uff09\u6642\u89f8\u767c\u3002\u8349\u64ec\u7684 rules \u6703\u63d0\u4ea4\u5230 Threat Cloud \u9032\u884c\u793e\u7fa4\u5be9\u67e5\uff0c\u9a57\u8b49\u5f8c\u5206\u767c\u7d66\u6240\u6709\u7528\u6236\u3002',
 atr_stats:'ATR \u6d3b\u52d5',atr_matches:'ATR \u547d\u4e2d',atr_drafted:'\u5df2\u8349\u64ec\u6a21\u5f0f',atr_submitted:'\u5df2\u63d0\u4ea4\u63d0\u6848',
 contrib_title:'\u60a8\u7684\u793e\u7fa4\u8ca2\u737b',contrib_desc:'\u60a8\u7684\u88dd\u7f6e\u63d0\u4ea4\u7684\u6bcf\u500b ATR proposal \u90fd\u6709\u52a9\u65bc\u4fdd\u8b77\u6574\u500b Panguard \u793e\u7fa4\u3002Proposals \u5728\u5206\u767c\u524d\u6703\u7d93\u904e\u5be9\u67e5\u548c\u9a57\u8b49\u3002\u8ca2\u737b\u662f\u81ea\u52d5\u4e14\u533f\u540d\u7684\u3002',
@@ -1233,7 +1228,7 @@ function af(p,o){o=o||{};o.headers=o.headers||{};if(tk)o.headers['Authorization'
 /* WS */
 function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event'){aE(m);var ee=document.getElementById('evl-empty');if(ee)ee.style.display='none'}}catch(x){}}}
 
-function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.sigmaRuleCount!==undefined)document.getElementById('v-sigma').textContent=s.sigmaRuleCount;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updPBar(s);updateG6();
+function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updPBar(s);updateG6();
 /* Hide empty reassurance when events exist */
 var ee=document.getElementById('evl-empty');if(ee&&s.eventsProcessed>0)ee.style.display='none';
 }
@@ -1263,7 +1258,7 @@ function updateG6(){var el=document.getElementById('g6-status');var gn=document.
 function ldISk(){af('/api/installed-skills').then(function(r){return r.json()}).then(function(d){document.getElementById('isk-loading').style.display='none';document.getElementById('isk-table').style.display='';document.getElementById('sk-t').textContent=d.total||0;document.getElementById('sk-wl').textContent=d.whitelisted||0;document.getElementById('sk-tr').textContent=d.tracked||0;var tb=document.getElementById('isk-tb');tb.innerHTML='';if(!d.skills||d.skills.length===0){tb.innerHTML='<tr><td colspan="5" class="empty">'+(lang==='zh'?'\u672a\u627e\u5230\u5df2\u5b89\u88dd\u6280\u80fd':'No installed skills found')+'</td></tr>';return}d.skills.forEach(function(s,i){var tr=document.createElement('tr');var st=s.whitelisted?'<span class="badge badge-ok">Whitelisted</span>':'<span class="badge badge-w">Tracked</span>';tr.innerHTML='<td>'+(i+1)+'</td><td>'+esc(s.name||'')+'</td><td>'+esc(s.platform||'--')+'</td><td>'+st+'</td><td style="color:var(--tm);font-size:12px">'+esc(s.source||'--')+'</td>';tb.appendChild(tr)})}).catch(function(){document.getElementById('isk-loading').innerHTML='<span style="color:var(--bad)">Failed to load skills</span>'})}
 
 /* Rules */
-function ldRules(){af('/api/rules').then(function(r){return r.json()}).then(function(d){document.getElementById('ru-loading').style.display='none';document.getElementById('ru-content').style.display='';document.getElementById('ru-sigma').textContent=d.sigma||0;document.getElementById('ru-yara').textContent=d.yara||0;document.getElementById('ru-atr').textContent=d.atr||0;document.getElementById('v-sigma').textContent=d.sigma||0;document.getElementById('v-yara').textContent=d.yara||0;document.getElementById('v-atr').textContent=d.atr||0;document.getElementById('ru-atr-m').textContent=d.atrMatchCount||0;document.getElementById('ru-atr-p').textContent=d.atrDrafterPatterns||0;document.getElementById('ru-atr-s').textContent=d.atrDrafterSubmitted||0;var sub=d.atrDrafterSubmitted||0;var cm=document.getElementById('contrib-msg');if(sub>0){cm.textContent=lang==='zh'?'\u60a8\u7684\u88dd\u7f6e\u5df2\u5411\u793e\u7fa4\u8ca2\u737b '+sub+' \u500b ATR \u63d0\u6848':'Your device has contributed '+sub+' ATR proposal(s) to the community'}else{cm.textContent=lang==='zh'?'\u5c1a\u7121\u8ca2\u737b\u3002\u5b88\u8b77\u5f15\u64ce\u6301\u7e8c\u904b\u884c\u5f8c\u6703\u81ea\u52d5\u751f\u6210':'No contributions yet. ATR proposals will be auto-generated as the guard engine runs.'}var sync=d.lastSync?new Date(d.lastSync).toLocaleString():'--';document.getElementById('ru-sync').textContent=lang==='zh'?'\u4e0a\u6b21\u540c\u6b65: '+sync:'Last sync: '+sync}).catch(function(){document.getElementById('ru-loading').innerHTML='<span style="color:var(--bad)">Failed to load rules</span>'})}
+function ldRules(){af('/api/rules').then(function(r){return r.json()}).then(function(d){document.getElementById('ru-loading').style.display='none';document.getElementById('ru-content').style.display='';document.getElementById('ru-atr').textContent=d.atr||0;document.getElementById('v-atr').textContent=d.atr||0;document.getElementById('ru-atr-m').textContent=d.atrMatchCount||0;document.getElementById('ru-atr-p').textContent=d.atrDrafterPatterns||0;document.getElementById('ru-atr-s').textContent=d.atrDrafterSubmitted||0;var sub=d.atrDrafterSubmitted||0;var cm=document.getElementById('contrib-msg');if(sub>0){cm.textContent=lang==='zh'?'\u60a8\u7684\u88dd\u7f6e\u5df2\u5411\u793e\u7fa4\u8ca2\u737b '+sub+' \u500b ATR \u63d0\u6848':'Your device has contributed '+sub+' ATR proposal(s) to the community'}else{cm.textContent=lang==='zh'?'\u5c1a\u7121\u8ca2\u737b\u3002\u5b88\u8b77\u5f15\u64ce\u6301\u7e8c\u904b\u884c\u5f8c\u6703\u81ea\u52d5\u751f\u6210':'No contributions yet. ATR proposals will be auto-generated as the guard engine runs.'}var sync=d.lastSync?new Date(d.lastSync).toLocaleString():'--';document.getElementById('ru-sync').textContent=lang==='zh'?'\u4e0a\u6b21\u540c\u6b65: '+sync:'Last sync: '+sync}).catch(function(){document.getElementById('ru-loading').innerHTML='<span style="color:var(--bad)">Failed to load rules</span>'})}
 
 /* Threat Cloud */
 function ldTCloud(){af('/api/threat-cloud').then(function(r){return r.json()}).then(function(d){document.getElementById('tc-loading').style.display='none';document.getElementById('tc-content').style.display='';var en=document.getElementById('tc-enabled');en.textContent=d.enabled?(lang==='zh'?'\u5df2\u555f\u7528':'Enabled'):(lang==='zh'?'\u672a\u555f\u7528':'Disabled');en.className='cv-sm '+(d.enabled?'ok':'w');document.getElementById('tc-up').textContent=d.totalUploaded||0;document.getElementById('tc-recv').textContent=d.totalRulesReceived||0;document.getElementById('tc-q').textContent=d.queueSize||0;var tog=document.getElementById('tc-toggle');var tl=document.getElementById('tc-toggle-label');if(d.uploadEnabled){tog.classList.add('on');tl.textContent=lang==='zh'?'\u5df2\u555f\u7528':'Enabled';tl.style.color='var(--ok)'}else{tog.classList.remove('on');tl.textContent=lang==='zh'?'\u5df2\u505c\u7528':'Disabled';tl.style.color='var(--tm)'}}).catch(function(){document.getElementById('tc-loading').innerHTML='<span style="color:var(--bad)">Failed to load Threat Cloud status</span>'})}
@@ -1280,7 +1275,7 @@ if(!dot||!txt||!det)return;
 var running=s.mode==='protection'||s.mode==='learning';
 dot.className='pb-dot '+(running?'ok':'bad');
 txt.textContent=running?'PROTECTED':'INACTIVE';
-var rules=(s.sigmaRuleCount||0)+(s.atrRuleCount||0);
+var rules=(s.atrRuleCount||0);
 var lastEv=s.eventsProcessed>0?fUp(s.uptime||0)+' uptime':'--';
 det.textContent='| '+(s.eventsProcessed||0)+' events | '+rules+' rules active | Uptime: '+lastEv;
 }
@@ -1295,7 +1290,7 @@ var t=document.getElementById('toast');
 t.innerHTML='<span style="color:var(--ok);font-weight:700">Your AI agents are now protected</span>';
 t.classList.add('show');setTimeout(function(){t.classList.remove('show')},4000);
 }
-function loadInitData(){af('/api/status').then(function(r){return r.json()}).then(uS).catch(function(){});af('/api/rules').then(function(r){return r.json()}).then(function(d){if(d.sigma!==undefined)document.getElementById('v-sigma').textContent=d.sigma;if(d.atr!==undefined)document.getElementById('v-atr').textContent=d.atr}).catch(function(){});updateG6()}
+function loadInitData(){af('/api/status').then(function(r){return r.json()}).then(uS).catch(function(){});af('/api/rules').then(function(r){return r.json()}).then(function(d){if(d.atr!==undefined)document.getElementById('v-atr').textContent=d.atr}).catch(function(){});updateG6()}
 (function(){
 var bar=document.getElementById('init-bar');
 // Always connect WebSocket immediately, regardless of welcome state

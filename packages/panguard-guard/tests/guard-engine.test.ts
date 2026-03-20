@@ -25,11 +25,6 @@ vi.mock('@panguard-ai/core', async () => {
       error: vi.fn(),
       debug: vi.fn(),
     }),
-    RuleEngine: vi.fn().mockImplementation(() => ({
-      loadRules: vi.fn().mockResolvedValue(undefined),
-      addRule: vi.fn(),
-      destroy: vi.fn(),
-    })),
     MonitorEngine: vi.fn().mockImplementation(() => ({
       on: vi.fn(),
       start: vi.fn(),
@@ -43,7 +38,6 @@ vi.mock('@panguard-ai/core', async () => {
       addExternalIPs: vi.fn().mockReturnValue(0),
     })),
     setFeedManager: vi.fn(),
-    parseSigmaYaml: vi.fn().mockReturnValue(null),
   };
 });
 
@@ -224,16 +218,6 @@ vi.mock('../src/license/index.js', () => ({
     features: ['basic_monitoring', 'rule_matching', 'auto_respond', 'threat_cloud_upload'],
   }),
   hasFeature: vi.fn().mockReturnValue(false),
-}));
-
-// Mock monitors
-vi.mock('../src/monitors/falco-monitor.js', () => ({
-  FalcoMonitor: vi.fn().mockImplementation(() => ({
-    checkAvailability: vi.fn().mockResolvedValue(false),
-    on: vi.fn(),
-    start: vi.fn().mockResolvedValue(undefined),
-    stop: vi.fn(),
-  })),
 }));
 
 // Mock builtin rules

@@ -87,9 +87,9 @@ describe('BaselineStats', () => {
       expect(scorer.getStats('process_count')!.mean).toBe(1);
     });
 
-    it('should update scorer for falco events (process_count)', () => {
+    it('should update scorer for syscall events (process_count)', () => {
       const event = makeEvent({
-        source: 'falco',
+        source: 'syscall',
         metadata: { processName: 'suspicious-bin' },
       });
 

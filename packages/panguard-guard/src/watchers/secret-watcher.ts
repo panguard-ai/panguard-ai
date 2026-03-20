@@ -7,7 +7,7 @@
  * 2. Secret patterns (API keys, tokens, credentials) in file content
  * 3. New .env files created in the project directory
  *
- * Emits SecurityEvent via EventEmitter, same pattern as FalcoMonitor/SuricataMonitor.
+ * Emits SecurityEvent via EventEmitter, same pattern as SyscallMonitor.
  *
  * @module @panguard-ai/panguard-guard/watchers/secret-watcher
  */

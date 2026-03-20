@@ -2,8 +2,8 @@
  * Syscall Monitor - Process and network activity monitoring via /proc polling
  * Syscall 監控器 - 透過 /proc 輪詢實作程序與網路活動監控
  *
- * Provides visibility into system calls without requiring external tools
- * like Falco. Polls /proc to detect:
+ * Provides visibility into system calls via /proc polling.
+ * Detects:
  * - Process execution (execve/execveat)
  * - File writes to sensitive directories
  * - Network connections to unusual ports

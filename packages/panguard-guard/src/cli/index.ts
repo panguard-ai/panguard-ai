@@ -168,7 +168,7 @@ async function commandStart(
 
   // Rule counts
   const rules = engine.getRuleCounts();
-  const rulesSummary = `Sigma: ${rules.sigma} | ATR: ${rules.atr}`;
+  const rulesSummary = `ATR: ${rules.atr}`;
 
   // Status box
   console.log(

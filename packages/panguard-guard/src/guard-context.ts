@@ -10,7 +10,6 @@
  */
 
 import type {
-  RuleEngine,
   ThreatIntelFeedManager,
   SmartRouter,
   KnowledgeDistiller,
@@ -49,7 +48,6 @@ export interface GuardContext {
   threatCloudUploaded: number;
 
   // -- Engine instances (initialized once, shared across modules) --
-  readonly ruleEngine: RuleEngine;
   readonly atrEngine: GuardATREngine;
   readonly detectAgent: DetectAgent;
   readonly analyzeAgent: AnalyzeAgent;
@@ -83,7 +81,6 @@ export interface CreateGuardContextParams {
   readonly mode: GuardMode;
   readonly baseline: EnvironmentBaseline;
   readonly baselinePath: string;
-  readonly ruleEngine: RuleEngine;
   readonly atrEngine: GuardATREngine;
   readonly detectAgent: DetectAgent;
   readonly analyzeAgent: AnalyzeAgent;
@@ -121,7 +118,6 @@ export function createGuardContext(params: CreateGuardContextParams): GuardConte
     actionsExecuted: 0,
     threatCloudUploaded: 0,
 
-    ruleEngine: params.ruleEngine,
     atrEngine: params.atrEngine,
     detectAgent: params.detectAgent,
     analyzeAgent: params.analyzeAgent,

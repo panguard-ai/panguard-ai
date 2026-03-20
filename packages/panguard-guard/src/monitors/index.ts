@@ -5,9 +5,6 @@
  * @module @panguard-ai/panguard-guard/monitors
  */
 
-export { FalcoMonitor, parseFalcoEvent } from './falco-monitor.js';
-export type { FalcoAlert } from './falco-monitor.js';
-
 export {
   RootkitDetector,
   createRootkitEvent,

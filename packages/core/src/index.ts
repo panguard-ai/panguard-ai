@@ -95,24 +95,8 @@ export type {
   OsqueryLoggedInUser,
 } from './discovery/index.js';
 
-// Rules engine / 規則引擎
-export {
-  RULES_VERSION,
-  RuleEngine,
-  parseSigmaYaml,
-  parseSigmaFile,
-  matchEvent,
-  matchEventAgainstRules,
-  loadRulesFromDirectory,
-  watchRulesDirectory,
-} from './rules/index.js';
-export type {
-  SigmaLogSource,
-  SigmaDetection,
-  SigmaRule,
-  RuleMatch,
-  RuleEngineConfig,
-} from './rules/index.js';
+// Rules engine version (Sigma RuleEngine removed; ATR Engine is used exclusively)
+export { RULES_VERSION } from './rules/index.js';
 
 // Monitor engine / 監控引擎
 export {

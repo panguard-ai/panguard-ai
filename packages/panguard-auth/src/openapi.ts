@@ -539,7 +539,7 @@ export function generateOpenApiSpec(baseUrl: string): Record<string, unknown> {
           parameters: [
             { name: 'since', in: 'query', schema: { type: 'string', format: 'date-time' } },
           ],
-          responses: { 200: { description: 'Detection rules (Sigma YAML)' } },
+          responses: { 200: { description: 'Detection rules (ATR YAML)' } },
         },
         post: {
           tags: ['Threat Cloud'],

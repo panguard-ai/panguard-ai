@@ -26,7 +26,6 @@ export type EventSource =
   | 'network'
   | 'process'
   | 'file'
-  | 'falco'
   | 'honeypot'
   | 'dpi'
   | 'memory_scanner'

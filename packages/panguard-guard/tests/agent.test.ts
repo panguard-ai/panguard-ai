@@ -5,7 +5,6 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { SecurityEvent } from '@panguard-ai/core';
-import { RuleEngine } from '@panguard-ai/core';
 import type { EnvironmentBaseline, ThreatVerdict, DetectionResult } from '../src/types.js';
 import { DEFAULT_ACTION_POLICY } from '../src/types.js';
 import { join } from 'node:path';
@@ -35,68 +34,20 @@ function makeEvent(overrides: Partial<SecurityEvent> = {}): SecurityEvent {
 }
 
 describe('DetectAgent', () => {
-  it('should return null when no rules match', () => {
-    const ruleEngine = new RuleEngine();
-    const agent = new DetectAgent(ruleEngine);
+  it('should return null when no threat intel match (ATR handles detection)', () => {
+    const agent = new DetectAgent();
     const event = makeEvent();
 
     const result = agent.detect(event);
     expect(result).toBeNull();
   });
 
-  it('should return detection result when rules match', () => {
-    const ruleEngine = new RuleEngine({
-      customRules: [
-        {
-          id: 'test-rule-1',
-          title: 'Test SSH Brute Force',
-          status: 'stable' as const,
-          description: 'Detects SSH brute force',
-          level: 'high' as const,
-          logsource: { category: 'brute_force' },
-          detection: {
-            selection: { category: 'brute_force' },
-            condition: 'selection',
-          },
-        },
-      ],
-    });
-
-    const agent = new DetectAgent(ruleEngine);
-    const event = makeEvent({ category: 'brute_force' });
+  it('should return null for non-network events without threat intel', () => {
+    const agent = new DetectAgent();
+    const event = makeEvent({ source: 'process', category: 'process_creation' });
 
     const result = agent.detect(event);
-    expect(result).not.toBeNull();
-    expect(result!.ruleMatches.length).toBeGreaterThan(0);
-    expect(result!.event.id).toBe('evt-test-001');
-  });
-
-  it('should track detection count', () => {
-    const ruleEngine = new RuleEngine({
-      customRules: [
-        {
-          id: 'test-count-rule',
-          title: 'Test Rule',
-          status: 'stable' as const,
-          description: 'Test',
-          level: 'medium' as const,
-          logsource: { category: 'test' },
-          detection: {
-            selection: { category: 'test' },
-            condition: 'selection',
-          },
-        },
-      ],
-    });
-
-    const agent = new DetectAgent(ruleEngine);
-    agent.detect(
-      makeEvent({ id: 'evt-count-1', category: 'test', metadata: { sourceIP: '10.0.0.1' } })
-    );
-    agent.detect(
-      makeEvent({ id: 'evt-count-2', category: 'test', metadata: { sourceIP: '10.0.0.2' } })
-    );
-    expect(agent.getDetectionCount()).toBe(2);
+    expect(result).toBeNull();
   });
 });
 

@@ -74,7 +74,7 @@ export class AnalyzeAgent {
    * Analyze a detection result and produce a verdict
    *
    * Evidence collection pipeline:
-   * 1. Sigma rule match evidence (weighted 0.4) with feedback adjustment
+   * 1. Rule match evidence (weighted 0.4) with feedback adjustment
    * 2. Threat intelligence evidence
    * 3. Baseline deviation check (weighted 0.3) with time-of-day awareness
    * 4. Attack chain correlation boost
@@ -95,7 +95,7 @@ export class AnalyzeAgent {
 
       evidenceList.push({
         source: 'rule_match',
-        description: `Sigma rule matched: ${match.ruleName} (${match.ruleId})`,
+        description: `Rule matched: ${match.ruleName} (${match.ruleId})`,
         confidence: adjustedConfidence,
         data: { ruleId: match.ruleId, severity: match.severity },
       });
@@ -139,14 +139,14 @@ export class AnalyzeAgent {
       });
     }
 
-    // Step 3b: Source-specific evidence for Falco/Suricata events
+    // Step 3b: Source-specific evidence for syscall events
     // These feed into the ebpfConfidence path in calculateFinalConfidence
-    if (detection.event.source === 'falco') {
+    if (detection.event.source === 'syscall') {
       evidenceList.push({
-        source: 'falco',
-        description: `Falco kernel-level detection: ${detection.event.description}`,
+        source: 'rule_match',
+        description: `Syscall-level detection: ${detection.event.description}`,
         confidence: SEVERITY_CONFIDENCE[detection.event.severity] ?? 50,
-        data: { eventSource: 'falco', category: detection.event.category },
+        data: { eventSource: 'syscall', category: detection.event.category },
       });
     }
 
@@ -324,7 +324,7 @@ function calculateFinalConfidence(evidence: Evidence[], hasAI: boolean): number 
   const baselineConfidence = maxConfidence(bySource['baseline_deviation']);
   const threatIntelConfidence = maxConfidence(bySource['threat_intel']);
   const aiConfidence = maxConfidence(bySource['ai_analysis']);
-  const ebpfConfidence = maxConfidence(bySource['falco']);
+  const ebpfConfidence = maxConfidence(bySource['syscall']);
 
   const ruleScore = Math.max(ruleConfidence, threatIntelConfidence);
   const hasEbpf = ebpfConfidence > 0;
@@ -452,9 +452,9 @@ function determineAction(confidence: number, detection: DetectionResult): Respon
 
   if (confidence >= autoThreshold || (hasCritical && confidence >= 70)) {
     if (detection.event.source === 'network') return 'block_ip';
-    if (detection.event.source === 'process' || detection.event.source === 'falco')
+    if (detection.event.source === 'process' || detection.event.source === 'syscall')
       return 'kill_process';
-    // YARA / file-triggered events should prefer isolate_file
+    // File-triggered events should prefer isolate_file
     if (detection.event.source === 'file') return 'isolate_file';
     return 'notify';
   }

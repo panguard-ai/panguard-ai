@@ -118,7 +118,7 @@ export class BaselineStats {
     }
 
     // Track process count / 追蹤程序數量
-    if (event.source === 'process' || event.source === 'falco') {
+    if (event.source === 'process' || event.source === 'syscall') {
       const processName = (event.metadata?.['processName'] as string) ?? undefined;
       if (processName) {
         this.processSets.add(processName);
@@ -190,7 +190,7 @@ export class BaselineStats {
     }
 
     // Score process count / 評分程序數量
-    if (event.source === 'process' || event.source === 'falco') {
+    if (event.source === 'process' || event.source === 'syscall') {
       scores.push(this.scorer.anomalyScore('process_count', this.processSets.size));
     }
 
