@@ -214,7 +214,7 @@ export default function ProductGuardContent() {
               </p>
               <p className="text-text-secondary">
                 <span className="text-[#22c55e]">[OK]</span> Rule engine loaded (
-                {STATS.totalRulesDisplay} Sigma + YARA + ATR rules)
+                {STATS.totalRulesDisplay} ATR rules)
               </p>
               <p className="text-text-secondary">
                 <span className="text-[#22c55e]">[OK]</span> Local LLM ready (Ollama)

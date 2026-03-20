@@ -6,10 +6,10 @@ import AdvancedSetupContent from './AdvancedSetupContent';
 export const metadata: Metadata = {
   title: 'Advanced Setup — Panguard AI',
   description:
-    'Enhance Panguard with Ollama (local LLM), Falco (eBPF monitoring), and Suricata (network IDS). Environment variables reference.',
+    'Enhance Panguard with Ollama (local LLM) and advanced configuration. Environment variables reference.',
   openGraph: {
     title: 'Advanced Setup — Panguard AI',
-    description: 'Enhance Panguard with optional integrations: Ollama, Falco, Suricata.',
+    description: 'Enhance Panguard with optional integrations: Ollama local LLM, environment variables.',
   },
 };
 

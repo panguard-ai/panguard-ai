@@ -617,7 +617,7 @@ export default function GettingStartedContent() {
             <p className="text-text-secondary mb-6">{t('advancedHintDesc')}</p>
 
             <div className="space-y-3">
-              {[t('advancedHintOllama'), t('advancedHintFalco'), t('advancedHintSuricata')].map(
+              {[t('advancedHintOllama')].map(
                 (hint) => (
                   <div key={hint} className="flex items-start gap-3">
                     <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />

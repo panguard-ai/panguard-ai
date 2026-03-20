@@ -105,7 +105,6 @@ export {
   matchEventAgainstRules,
   loadRulesFromDirectory,
   watchRulesDirectory,
-  YaraScanner,
 } from './rules/index.js';
 export type {
   SigmaLogSource,
@@ -113,8 +112,6 @@ export type {
   SigmaRule,
   RuleMatch,
   RuleEngineConfig,
-  YaraMatch,
-  YaraScanResult,
 } from './rules/index.js';
 
 // Monitor engine / 監控引擎

@@ -457,7 +457,6 @@ export interface DashboardStatus {
   lastEvent?: SecurityEvent;
   recentVerdicts: ThreatVerdict[];
   sigmaRuleCount?: number;
-  yaraRuleCount?: number;
   atrRuleCount?: number;
   atrMatchCount?: number;
   atrDrafterPatterns?: number;

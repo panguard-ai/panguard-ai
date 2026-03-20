@@ -107,9 +107,8 @@ The `core` package is the foundation that every other package depends on. It pro
 
 <AccordionGroup>
   <Accordion title="Rule Engine">
-    - Sigma rule parser and evaluator (boolean logic, aggregation, modifiers, wildcards)
-    - YARA scanner with native engine support and regex fallback
-    - 3,760 bundled Sigma rules, custom rule loading
+    - ATR rule parser and evaluator (pattern matching, context-aware detection, multi-layer analysis)
+    - 125 bundled ATR rules, custom rule loading
   </Accordion>
 
   <Accordion title="Monitors">
@@ -186,7 +185,7 @@ A typical security event flows through the system as follows:
     A monitor in `core` (process, network, file, or log) detects a security-relevant event on the endpoint.
   </Step>
   <Step title="Layer 1 evaluation">
-    The Sigma/YARA rule engine evaluates the event in under 1ms. If a rule matches, the event is classified and a response is triggered immediately.
+    The ATR rule engine evaluates the event in under 1ms. If a rule matches, the event is classified and a response is triggered immediately.
   </Step>
   <Step title="AI escalation (if needed)">
     Unmatched events are forwarded to Layer 2 (local Ollama) or Layer 3 (Cloud AI) for deeper analysis via the FunnelRouter.

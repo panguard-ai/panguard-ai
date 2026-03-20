@@ -148,7 +148,6 @@ export class GuardEngine {
   private get eventProcessorDeps(): EventProcessorDeps {
     return {
       ruleEngine: this.engines.ruleEngine,
-      yaraScanner: this.engines.yaraScanner,
       atrEngine: this.engines.atrEngine,
       detectAgent: this.engines.detectAgent,
       analyzeAgent: this.engines.analyzeAgent,
@@ -205,10 +204,9 @@ export class GuardEngine {
       logger.info(`Syslog adapter initialized: ${syslogServer}:${syslogPort}`);
     }
 
-    // Load all rules (Sigma, ATR, YARA, cloud rules, blocklist)
+    // Load all rules (Sigma, ATR, cloud rules, blocklist)
     await loadAllRules(
       this.engines.ruleEngine,
-      this.engines.yaraScanner,
       this.engines.atrEngine,
       this.engines.threatCloud,
       this.engines.feedManager,
@@ -218,7 +216,6 @@ export class GuardEngine {
     // Periodic Threat Cloud sync (every hour) + initial sync
     const syncDeps = {
       ruleEngine: this.engines.ruleEngine,
-      yaraScanner: this.engines.yaraScanner,
       atrEngine: this.engines.atrEngine,
       threatCloud: this.engines.threatCloud,
       feedManager: this.engines.feedManager,
@@ -550,8 +547,7 @@ export class GuardEngine {
     const memCheck = this.checkMemoryPressure();
     const ruleCounts = getRuleCounts(
       this.engines.ruleEngine,
-      this.engines.atrEngine,
-      this.engines.yaraScanner
+      this.engines.atrEngine
     );
     this.dashboard.updateStatus({
       mode: this.mode,
@@ -568,7 +564,6 @@ export class GuardEngine {
       memoryStatus: memCheck.memoryStatus,
       cpuPercent: 0,
       sigmaRuleCount: ruleCounts.sigma,
-      yaraRuleCount: ruleCounts.yara,
       atrRuleCount: this.engines.atrEngine.getRuleCount(),
       atrMatchCount: this.engines.atrEngine.getMatchCount(),
       atrDrafterPatterns: this.engines.atrDrafter?.getPatternCount() ?? 0,
@@ -695,8 +690,8 @@ export class GuardEngine {
   /**
    * Get loaded rule counts for each engine layer.
    */
-  getRuleCounts(): { sigma: number; atr: number; yara: number } {
-    return getRuleCounts(this.engines.ruleEngine, this.engines.atrEngine, this.engines.yaraScanner);
+  getRuleCounts(): { sigma: number; atr: number } {
+    return getRuleCounts(this.engines.ruleEngine, this.engines.atrEngine);
   }
 
   /**

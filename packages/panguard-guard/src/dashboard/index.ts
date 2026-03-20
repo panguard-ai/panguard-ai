@@ -512,7 +512,6 @@ export class DashboardServer {
     this.jsonResponse(res, {
       sigma: this.status.sigmaRuleCount ?? 0,
       atr: this.status.atrRuleCount ?? 0,
-      yara: this.status.yaraRuleCount ?? 0,
       atrMatchCount: this.status.atrMatchCount ?? 0,
       atrDrafterPatterns: this.status.atrDrafterPatterns ?? 0,
       atrDrafterSubmitted: this.status.atrDrafterSubmitted ?? 0,
@@ -1234,7 +1233,7 @@ function af(p,o){o=o||{};o.headers=o.headers||{};if(tk)o.headers['Authorization'
 /* WS */
 function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event'){aE(m);var ee=document.getElementById('evl-empty');if(ee)ee.style.display='none'}}catch(x){}}}
 
-function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.sigmaRuleCount!==undefined)document.getElementById('v-sigma').textContent=s.sigmaRuleCount;if(s.yaraRuleCount!==undefined)document.getElementById('v-yara').textContent=s.yaraRuleCount;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updPBar(s);updateG6();
+function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.sigmaRuleCount!==undefined)document.getElementById('v-sigma').textContent=s.sigmaRuleCount;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updPBar(s);updateG6();
 /* Hide empty reassurance when events exist */
 var ee=document.getElementById('evl-empty');if(ee&&s.eventsProcessed>0)ee.style.display='none';
 }
@@ -1281,7 +1280,7 @@ if(!dot||!txt||!det)return;
 var running=s.mode==='protection'||s.mode==='learning';
 dot.className='pb-dot '+(running?'ok':'bad');
 txt.textContent=running?'PROTECTED':'INACTIVE';
-var rules=(s.sigmaRuleCount||0)+(s.yaraRuleCount||0)+(s.atrRuleCount||0);
+var rules=(s.sigmaRuleCount||0)+(s.atrRuleCount||0);
 var lastEv=s.eventsProcessed>0?fUp(s.uptime||0)+' uptime':'--';
 det.textContent='| '+(s.eventsProcessed||0)+' events | '+rules+' rules active | Uptime: '+lastEv;
 }
@@ -1296,7 +1295,7 @@ var t=document.getElementById('toast');
 t.innerHTML='<span style="color:var(--ok);font-weight:700">Your AI agents are now protected</span>';
 t.classList.add('show');setTimeout(function(){t.classList.remove('show')},4000);
 }
-function loadInitData(){af('/api/status').then(function(r){return r.json()}).then(uS).catch(function(){});af('/api/rules').then(function(r){return r.json()}).then(function(d){if(d.sigma!==undefined)document.getElementById('v-sigma').textContent=d.sigma;if(d.yara!==undefined)document.getElementById('v-yara').textContent=d.yara;if(d.atr!==undefined)document.getElementById('v-atr').textContent=d.atr}).catch(function(){});updateG6()}
+function loadInitData(){af('/api/status').then(function(r){return r.json()}).then(uS).catch(function(){});af('/api/rules').then(function(r){return r.json()}).then(function(d){if(d.sigma!==undefined)document.getElementById('v-sigma').textContent=d.sigma;if(d.atr!==undefined)document.getElementById('v-atr').textContent=d.atr}).catch(function(){});updateG6()}
 (function(){
 var bar=document.getElementById('init-bar');
 // Always connect WebSocket immediately, regardless of welcome state

@@ -1,7 +1,7 @@
 /**
  * GuardEngine processEvent() pipeline tests
  * Tests the full detect -> analyze -> respond -> report pipeline,
- * learning mode vs protection mode, YARA scan integration,
+ * learning mode vs protection mode,
  * learning transition, pollPolicy(), and applyPolicy().
  */
 
@@ -41,12 +41,6 @@ vi.mock('@panguard-ai/core', async () => {
       getIoCCount: vi.fn().mockReturnValue(0),
       getIPCount: vi.fn().mockReturnValue(0),
       addExternalIPs: vi.fn().mockReturnValue(0),
-    })),
-    YaraScanner: vi.fn().mockImplementation(() => ({
-      loadAllRules: vi.fn().mockResolvedValue(0),
-      getRuleCount: vi.fn().mockReturnValue(0),
-      scanFile: vi.fn(),
-      toSecurityEvent: vi.fn(),
     })),
     setFeedManager: vi.fn(),
     parseSigmaYaml: vi.fn().mockReturnValue(null),
@@ -895,37 +889,4 @@ describe('GuardEngine', () => {
     });
   });
 
-  describe('YARA scan integration in processEvent', () => {
-    it('should attempt YARA scan for file events with filePath', async () => {
-      // This test verifies the flow -- the actual YaraScanner is mocked
-      // but we need to ensure the engine uses getRuleCount() to check first
-      const event = makeEvent({
-        source: 'file',
-        category: 'file_change',
-        metadata: {
-          filePath: '/tmp/suspicious.exe',
-          action: 'created',
-        },
-      });
-
-      mockDetect.mockReturnValue(null);
-      await engine.processEvent(event);
-
-      // The engine should have called detect (even without YARA match)
-      expect(mockDetect).toHaveBeenCalledWith(event);
-    });
-
-    it('should not YARA scan when source is not file', async () => {
-      const event = makeEvent({
-        source: 'network',
-        metadata: { sourceIP: '1.2.3.4' },
-      });
-
-      mockDetect.mockReturnValue(null);
-      await engine.processEvent(event);
-
-      // Verify the event was processed normally
-      expect(engine.getStatus().eventsProcessed).toBe(1);
-    });
-  });
 });

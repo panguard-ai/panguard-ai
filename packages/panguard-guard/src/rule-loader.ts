@@ -3,7 +3,7 @@
  *
  * Contains:
  * - autoDetectLLM() re-exported from llm-detect.ts
- * - Rule engine / YARA / ATR initialization helpers
+ * - Rule engine / ATR initialization helpers
  * - Bundled rule loading (loadAllRules)
  * - getRuleCounts()
  *
@@ -15,7 +15,6 @@ import {
   createLogger,
   RuleEngine,
   ThreatIntelFeedManager,
-  YaraScanner,
   setFeedManager,
   SmartRouter,
   KnowledgeDistiller,
@@ -46,7 +45,6 @@ const logger = createLogger('panguard-guard:rule-loader');
 /** Result of initializing all engines and agents */
 export interface InitEnginesResult {
   readonly ruleEngine: RuleEngine;
-  readonly yaraScanner: YaraScanner;
   readonly atrEngine: GuardATREngine;
   readonly detectAgent: DetectAgent;
   readonly analyzeAgent: AnalyzeAgent;
@@ -126,8 +124,6 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
     hotReload: true,
     customRules: BUILTIN_RULES,
   });
-
-  const yaraScanner = new YaraScanner();
 
   const atrEngine = new GuardATREngine({
     rulesDir: join(config.dataDir, 'atr-rules'),
@@ -226,7 +222,6 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
 
   return {
     ruleEngine,
-    yaraScanner,
     atrEngine,
     detectAgent,
     analyzeAgent,
@@ -250,7 +245,6 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
  */
 export async function loadAllRules(
   ruleEngine: RuleEngine,
-  yaraScanner: YaraScanner,
   atrEngine: GuardATREngine,
   threatCloud: ThreatCloudClient,
   feedManager: ThreatIntelFeedManager,
@@ -337,17 +331,6 @@ export async function loadAllRules(
       );
     });
 
-  {
-    const yaraCustomDir = join(config.dataDir, 'yara-rules', 'custom');
-    yaraScanner
-      .loadAllRules(yaraCustomDir)
-      .then((count) => {
-        logger.info(`YARA rules loaded: ${count} rules / YARA 規則已載入: ${count} 條`);
-      })
-      .catch((err: unknown) => {
-        logger.warn(`YARA rules load failed: ${err instanceof Error ? err.message : String(err)}`);
-      });
-  }
 }
 
 /**
@@ -355,12 +338,10 @@ export async function loadAllRules(
  */
 export function getRuleCounts(
   ruleEngine: RuleEngine,
-  atrEngine: GuardATREngine,
-  yaraScanner: YaraScanner
-): { sigma: number; atr: number; yara: number } {
+  atrEngine: GuardATREngine
+): { sigma: number; atr: number } {
   return {
     sigma: ruleEngine.getRules().length,
     atr: atrEngine.getRuleCount(),
-    yara: yaraScanner.getRuleCount(),
   };
 }

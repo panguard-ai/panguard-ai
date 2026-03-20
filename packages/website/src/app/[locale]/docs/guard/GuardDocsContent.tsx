@@ -5,6 +5,7 @@ import { Copy, Check, Shield, Brain, FileText, MessageSquare, Crosshair } from '
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import { Link } from '@/navigation';
+import { STATS } from '@/lib/stats';
 
 function CodeBlock({ code, title }: { code: string; title?: string }) {
   const [copied, setCopied] = useState(false);
@@ -56,8 +57,8 @@ export default function GuardDocsContent() {
           </h1>
           <p className="text-lg text-text-secondary mt-4 max-w-2xl">
             Real-time endpoint protection powered by a 5-agent AI pipeline. Guard monitors
-            processes, network traffic, and file system changes 24/7 using Sigma, YARA, and ATR rule
-            engines backed by a three-layer AI analysis funnel.
+            AI agent tool calls, prompt flows, and skill behavior 24/7 using ATR (Agent Threat Rules)
+            backed by a three-layer AI analysis funnel.
           </p>
         </FadeInUp>
 
@@ -99,7 +100,7 @@ export default function GuardDocsContent() {
                   </td>
                   <td className="px-4 py-3 text-text-primary">Rule matching</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Runs Sigma, YARA, and ATR rules against incoming telemetry. Produces raw alerts
+                    Runs ATR rules against incoming telemetry. Produces raw alerts
                     with severity and confidence scores.
                   </td>
                 </tr>
@@ -166,27 +167,12 @@ export default function GuardDocsContent() {
               </thead>
               <tbody className="divide-y divide-border">
                 <tr>
-                  <td className="px-4 py-3 text-panguard-green font-medium">Sigma</td>
-                  <td className="px-4 py-3 text-text-primary">3,760</td>
-                  <td className="px-4 py-3 text-text-secondary">
-                    Generic log-based detection. Covers process creation, network connections,
-                    registry changes, and system events.
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 text-panguard-green font-medium">YARA</td>
-                  <td className="px-4 py-3 text-text-primary">5,961</td>
-                  <td className="px-4 py-3 text-text-secondary">
-                    Binary and file pattern matching. Detects malware families, packers, exploit
-                    kits, and suspicious file structures.
-                  </td>
-                </tr>
-                <tr>
                   <td className="px-4 py-3 text-panguard-green font-medium">ATR</td>
-                  <td className="px-4 py-3 text-text-primary">69</td>
+                  <td className="px-4 py-3 text-text-primary">{STATS.atrRulesDisplay}</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    AI Agent Threat Rules. Purpose-built for prompt injection, tool poisoning, MCP
-                    server abuse, and credential exfiltration by autonomous agents.
+                    Agent Threat Rules. Purpose-built for AI agent security: prompt injection,
+                    tool poisoning, MCP server abuse, credential exfiltration, context manipulation,
+                    and skill supply-chain attacks.
                   </td>
                 </tr>
               </tbody>
@@ -208,7 +194,7 @@ export default function GuardDocsContent() {
                 percent: '90%',
                 latency: '< 50 ms',
                 description:
-                  'Sigma, YARA, and ATR engines resolve clear-cut matches. No AI involved.',
+                  'ATR rules resolve clear-cut matches. No AI involved.',
                 color: 'border-green-500/30 bg-green-500/5',
               },
               {
@@ -436,8 +422,8 @@ panguard guard config set auto_response true`}
             code={`{
   "timestamp": "2026-03-08T14:32:01.442Z",
   "severity": "high",
-  "rule_id": "sigma:proc_creation_suspicious_shell",
-  "engine": "sigma",
+  "rule_id": "atr:suspicious_shell_execution",
+  "engine": "atr",
   "layer": 1,
   "confidence": 0.94,
   "action": "kill_process",
@@ -509,9 +495,7 @@ panguard guard config set auto_response true`}
               <tbody className="divide-y divide-border">
                 {[
                   ['Core Guard daemon', 'Yes', 'Yes', 'Yes'],
-                  ['Sigma / YARA / ATR', 'Yes', 'Yes', 'Yes'],
-                  ['Falco (eBPF kernel events)', 'Yes', 'No', 'No'],
-                  ['Suricata DPI (deep packet inspection)', 'Yes', 'No', 'No'],
+                  ['ATR Rules', 'Yes', 'Yes', 'Yes'],
                   ['systemd service', 'Yes', '--', '--'],
                   ['launchd service', '--', 'Yes', '--'],
                 ].map(([feature, linux, macos, windows]) => (
@@ -526,8 +510,8 @@ panguard guard config set auto_response true`}
             </table>
           </div>
           <p className="text-sm text-text-secondary mt-4">
-            For Falco and Suricata setup instructions, see the{' '}
-            <Link href="https://docs.panguard.ai/installation" className="text-panguard-green hover:underline">
+            For advanced configuration options, see the{' '}
+            <Link href="/docs/advanced-setup" className="text-panguard-green hover:underline">
               Advanced Setup Guide
             </Link>
             .

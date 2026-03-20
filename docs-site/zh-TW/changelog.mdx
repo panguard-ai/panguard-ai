@@ -41,10 +41,7 @@ Panguard AI 的所有重要變更，按版本組織。
 
 ### 規則分發
 
-- 安裝即附帶 9,790 偵測規則
-- Sigma：3,760（3,110 社群 + 605 自動生成 + 45 自訂）
-- YARA：5,961（969 檔案，多規則拆分）
-- ATR：69（52 穩定版 + 17 預測草案）
+- 安裝即附帶 125 ATR 偵測規則
 - 每小時自動從 Threat Cloud 同步
 
 ### Threat Cloud LLM 審查
@@ -64,9 +61,9 @@ Panguard AI 的所有重要變更，按版本組織。
 
 ## v0.7.0
 
-**發佈日期：2025-02-25** -- Sigma 增強與 osquery 整合
+**發佈日期：2025-02-25** -- 規則引擎增強與 osquery 整合
 
-### Sigma 規則引擎增強
+### 規則引擎增強
 
 - 聚合表達式支援：`1 of them`、`all of them`、`1 of sel*`、`all of filter*`
 - 新的匹配修飾器：`|cidr`（IP 範圍匹配）、`|gt`/`|gte`/`|lt`/`|lte`（數值比較）
@@ -106,7 +103,7 @@ Panguard AI 的所有重要變更，按版本組織。
 
 ## v0.5.0
 
-**發佈日期：2025-02-25** -- 自動回應、YARA 與威脅情報來源
+**發佈日期：2025-02-25** -- 自動回應與威脅情報來源
 
 ### 自動回應引擎
 
@@ -114,11 +111,6 @@ Panguard AI 的所有重要變更，按版本組織。
 - 檔案隔離，搭配 SHA-256 追蹤
 - 行程終止
 - 基於信心度的動作：{'>'}90% 自動執行、70-90% 需確認、{'<'}70% 僅通知
-
-### YARA 掃描器
-
-- 原生 YARA 引擎支援，搭配正規表達式降級方案
-- 檔案與記憶體掃描
 
 ### 威脅情報來源管理
 
@@ -157,7 +149,7 @@ Panguard AI 的所有重要變更，按版本組織。
 
 - 5 階段 AI 代理流水線：偵測、分析、回應、報告、調查
 - 7 天學習期，自動切換至防護模式
-- 42 條 Sigma 規則、Dashboard WebSocket 伺服器
+- 42 條 ATR 規則、Dashboard WebSocket 伺服器
 - 系統服務安裝（macOS / Linux / Windows）
 
 ### Threat Cloud
@@ -190,7 +182,7 @@ Panguard AI 的所有重要變更，按版本組織。
 
 - TypeScript monorepo 架構
 - 國際化支援（英文 + 繁體中文）
-- Sigma 規則引擎、系統偵察引擎
+- ATR 規則引擎、系統偵察引擎
 - 4 個監控器：Log、Network、Process、File
 - 3 個轉接器：Windows Defender、Wazuh、Syslog
 - AES-256-GCM 加密

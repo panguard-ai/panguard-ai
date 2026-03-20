@@ -1,6 +1,6 @@
 /**
- * Sigma/YARA Rules Engine
- * Sigma/YARA 規則引擎
+ * Sigma Rules Engine
+ * Sigma 規則引擎
  *
  * Provides the RuleEngine class for loading, managing, and matching
  * Sigma rules against security events. Supports filesystem loading,
@@ -301,5 +301,3 @@ export { matchEvent, matchEventAgainstRules } from './sigma-matcher.js';
 // Re-export loader functions / 重新匯出載入器函式
 export { loadRulesFromDirectory, loadRulesRecursive, watchRulesDirectory } from './rule-loader.js';
 
-// Re-export YARA scanner / 重新匯出 YARA 掃描器
-export { YaraScanner, type YaraMatch, type YaraScanResult } from './yara-scanner.js';

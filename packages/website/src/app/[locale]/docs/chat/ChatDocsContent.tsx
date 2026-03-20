@@ -229,7 +229,7 @@ Source IP:  203.0.113.42 (CN)
 Attempts:   847 in 5 minutes
 Confidence: 98.2%
 Action:     IP blocked via iptables
-Rule:       SIGMA/brute_force_ssh_T1110.001
+Rule:       ATR/brute_force_ssh_T1110.001
 Timestamp:  2025-03-08 14:23:07 UTC
 
 View full report: https://app.panguard.ai/events/evt_abc123`}

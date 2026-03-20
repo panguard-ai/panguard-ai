@@ -147,7 +147,7 @@ Panguard works fully offline. When threat intelligence feeds are unreachable:
 
 - Layer 1 rule engine continues operating with locally cached rules
 - Previously cached feed data remains available until expiration
-- New detections rely on Sigma/YARA rules and behavioral baselines only
+- New detections rely on ATR rules and behavioral baselines only
 - Score adjustments reflect reduced intelligence coverage
 
 ```bash
@@ -202,7 +202,7 @@ When threat intelligence matches activity on your system, Chat notifies you in a
     Source: AbuseIPDB (confidence: 98%), ThreatFox (tag: C2)
     Process: curl (PID 5678) -> 203.0.113.50:443
     Action: IP blocked via iptables
-    Rule: sigma/network/c2-communication.yml
+    Rule: atr/network/c2-communication.yml
     ```
   </Tab>
   <Tab title="IT Admin Role">

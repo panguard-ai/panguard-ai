@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Share2, AlertTriangle } from 'lucide-react';
 import type { ScanReport, ScanResponse } from '@/hooks/useSkillScan';
+import { STATS } from '@/lib/stats';
 
 /** Localize ATR finding titles and descriptions */
 const FINDING_ZH: Record<string, { title: string; desc?: string }> = {
@@ -396,8 +397,8 @@ export default function ScanResultCard({
         </code>
         <p className="text-[10px] text-text-muted">
           {isZh
-            ? '一行安裝。自動偵測 Claude Code、Cursor、OpenClaw 等 7 個平台。10,400+ 偵測規則即時防護。'
-            : 'One command. Auto-detects Claude Code, Cursor, OpenClaw + 4 more. 10,400+ detection rules.'}
+            ? `一行安裝。自動偵測 Claude Code、Cursor、OpenClaw 等 7 個平台。${STATS.totalRulesDisplay} ATR 偵測規則即時防護。`
+            : `One command. Auto-detects Claude Code, Cursor, OpenClaw + 4 more. ${STATS.totalRulesDisplay} ATR detection rules.`}
         </p>
       </div>
     </motion.div>

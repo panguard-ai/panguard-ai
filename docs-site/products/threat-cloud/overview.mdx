@@ -32,7 +32,7 @@ When a Guard agent detects a threat:
 | **Reputation engine** | Confidence scoring based on sighting frequency and source diversity |
 | **ATR rule sharing** | Community-contributed AI agent threat detection rules |
 | **LLM review** | Claude Sonnet 4 automated review of submitted ATR proposals |
-| **Sigma rule sharing** | Community-contributed detection rules |
+| **ATR rule sharing** | Community-contributed AI agent detection rules |
 | **Audit logging** | Full audit trail of all submissions and queries |
 
 ## Quick Start
@@ -58,9 +58,7 @@ Every hour, your Guard agent exchanges data with Threat Cloud:
 | **Upload** | Anonymized threat events | IP /16 masked, no hostnames, no file contents |
 | **Upload** | ATR proposals | New AI agent threat patterns detected locally |
 | **Upload** | Skill audit results | Safe/unsafe skill fingerprints |
-| **Download** | Sigma rules | Community detection rules |
-| **Download** | YARA rules | Malware signatures |
-| **Download** | ATR rules | Confirmed AI agent threat rules |
+| **Download** | ATR rules | Confirmed AI agent threat detection rules |
 | **Download** | IP blocklist | Known malicious IPs |
 | **Download** | Domain blocklist | Known malicious domains |
 

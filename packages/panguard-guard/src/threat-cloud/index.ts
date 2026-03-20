@@ -287,46 +287,6 @@ export class ThreatCloudClient {
   }
 
   /**
-   * Fetch YARA rules from Threat Cloud (auto-generated from threat patterns).
-   * 從 Threat Cloud 取得 YARA 規則（自動從威脅模式產生）
-   *
-   * @param since - Optional ISO timestamp for incremental sync
-   * @returns Array of YARA rule updates / YARA 規則更新陣列
-   */
-  async fetchYaraRules(since?: string): Promise<ThreatCloudUpdate[]> {
-    if (this.status === 'offline' || !this.endpoint) {
-      return [];
-    }
-
-    try {
-      let url = `${this.endpoint}/api/yara-rules`;
-      const lastSync = since ?? this.cache.lastSync;
-      if (lastSync) {
-        url += `?since=${encodeURIComponent(lastSync)}`;
-      }
-
-      const body = await this.httpGet(url);
-      const yaraRaw = JSON.parse(body) as
-        | ThreatCloudUpdate[]
-        | { ok: boolean; data: ThreatCloudUpdate[] };
-      const rules = Array.isArray(yaraRaw) ? yaraRaw : (yaraRaw.data ?? []);
-      this.status = 'connected';
-      if (rules.length > 0) {
-        logger.info(
-          `Fetched ${rules.length} YARA rules from Threat Cloud / ` +
-            `從 Threat Cloud 取得 ${rules.length} 條 YARA 規則`
-        );
-      }
-      return rules;
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.error(`Fetch YARA rules failed: ${msg} / 取得 YARA 規則失敗: ${msg}`);
-      this.status = 'disconnected';
-      return [];
-    }
-  }
-
-  /**
    * Fetch domain blocklist from the cloud (plain text, one domain per line).
    * 從雲端取得網域封鎖清單（純文字，每行一個網域）
    *

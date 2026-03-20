@@ -80,7 +80,7 @@ const COMPARISON_ROWS: readonly ComparisonRow[] = [
   },
   {
     feature: 'Detection rules',
-    panguard: `${STATS.totalRulesDisplay} (Sigma+YARA+ATR)`,
+    panguard: `${STATS.totalRulesDisplay} ATR rules`,
     crowdstrike: 'Proprietary',
     snyk: 'Vulnerability DB',
     lakera: 'Proprietary',

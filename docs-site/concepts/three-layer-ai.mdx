@@ -27,7 +27,7 @@ The three-layer funnel is built on a simple principle: **most attacks follow kno
        |
        v
   +-----------+
-  | Layer 1   |  Sigma / YARA Rule Engine
+  | Layer 1   |  ATR Rule Engine
   | 90% events|  Latency < 1ms | Cost = $0
   +-----------+
        |
@@ -58,7 +58,7 @@ The three-layer funnel is built on a simple principle: **most attacks follow kno
 | **Latency** | < 1 ms | < 5 s | < 30 s |
 | **Cost per event** | $0 | $0 | ~$0.01 |
 | **Requires network** | No | No | Yes |
-| **Technology** | Sigma + YARA | Ollama (llama3) | Claude / OpenAI |
+| **Technology** | ATR Rules | Ollama (llama3) | Claude / OpenAI |
 | **Best for** | Known attack patterns | Behavioral anomalies | Novel, complex threats |
 
 ---
@@ -67,48 +67,29 @@ The three-layer funnel is built on a simple principle: **most attacks follow kno
 
 Handles all known attack patterns with zero latency and zero cost.
 
-### Sigma Rules
+### ATR Rules
 
-Sigma is the community standard rule format for security detection. Panguard Guard ships with 3,760 Sigma + 5,961 YARA + 69 ATR rules (9,700+ total) covering common attack patterns.
+ATR (Agent Threat Rules) is the open standard for AI agent threat detection. Panguard Guard ships with 125+ ATR rules covering common AI agent attack patterns.
 
-<CodeGroup>
-```yaml Sigma Rule Example
-title: Suspicious SSH Brute Force
-logsource:
-  category: network
-  product: any
+```yaml ATR Rule Example
+id: ATR-2025-0001
+name: Prompt Injection via Tool Response
+severity: critical
 detection:
-  selection:
-    destination_port: 22
-    action: blocked
-  condition: selection
-level: high
+  patterns:
+    - "ignore previous instructions"
+    - "system prompt override"
+  context: tool_response
+action: block
 ```
 
-```yara YARA Rule Example
-rule SuspiciousScript {
-  strings:
-    $cmd = "rm -rf /" nocase
-    $wget = "wget" nocase
-  condition:
-    any of them
-}
-```
-</CodeGroup>
+**Supported ATR features:**
 
-**Supported Sigma features:**
-
-- Boolean logic: `AND`, `OR`, `NOT`
-- Aggregation expressions: `1 of them`, `all of them`, `1 of selection*`
-- Match modifiers: `|contains`, `|startswith`, `|endswith`, `|re`
-- Numeric comparison: `|gt`, `|gte`, `|lt`, `|lte`
-- Network matching: `|cidr` (IP range matching)
-- Wildcards: `*`, `?`
-- Parenthesized groups: `(sel_a OR sel_b) AND NOT filter`
-
-### YARA Rules
-
-Used for file-level malware detection. Panguard supports the native YARA engine and automatically falls back to a regex-based engine if YARA is not installed on the system.
+- Pattern matching with regex support
+- Context-aware detection (tool responses, skill manifests, agent actions)
+- Multi-layer detection: regex, content fingerprinting, LLM-as-judge
+- Severity levels: critical, high, medium, low
+- MITRE ATT&CK mapping for AI agent threats
 
 ---
 

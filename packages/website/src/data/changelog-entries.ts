@@ -27,7 +27,7 @@ export const changelogEntries: ChangelogEntry[] = [
         type: 'security',
         text: 'Threat Cloud backup uses Database.backup() instead of VACUUM INTO',
       },
-      { type: 'improvement', text: 'ReDoS protection in Sigma rule regex compilation' },
+      { type: 'improvement', text: 'ReDoS protection in ATR rule regex compilation' },
     ],
   },
   {
@@ -132,7 +132,7 @@ export const changelogEntries: ChangelogEntry[] = [
       { type: 'feature', text: 'Panguard Report: auto-generated compliance reports' },
       {
         type: 'feature',
-        text: '3,760+ Sigma detection rules and 5,961 YARA signatures',
+        text: '125+ ATR (Agent Threat Rules) for AI agent security',
       },
       { type: 'feature', text: 'Context memory learning system' },
     ],

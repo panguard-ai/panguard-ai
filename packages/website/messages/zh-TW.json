@@ -203,7 +203,7 @@
         "detection": {
           "label": "偵測方式",
           "antivirus": "病毒特徵碼比對",
-          "panguard": "Sigma/YARA 規則 + AI 研判"
+          "panguard": "ATR 規則 + AI 研判"
         },
         "scope": {
           "label": "監控範圍",
@@ -335,7 +335,7 @@
           {
             "pct": 90,
             "label": "規則引擎",
-            "sub": "Sigma + YARA + Suricata",
+            "sub": "ATR Rules",
             "speed": "<50ms"
           },
           {
@@ -378,7 +378,7 @@
     "threatCloud": {
       "overline": "One More Thing",
       "title": "用的人越多，每個人就越安全。",
-      "desc": "每一台裝了 Panguard 的機器都是一個感測節點。偵測到新型攻擊時，會自動把匿名化的攻擊特徵回傳 Threat Cloud。Threat Cloud 不只產生傳統的 Sigma 偵測規則——它還自動產出 ATR（Agent Threat Rules），全世界第一套專門偵測 AI Agent 攻擊的開源規則標準。Prompt injection、tool poisoning、context exfiltration——這些 Sigma 抓不到的，ATR 抓得到。",
+      "desc": "每一台裝了 Panguard 的機器都是一個感測節點。偵測到新型攻擊時，會自動把匿名化的攻擊特徵回傳 Threat Cloud。Threat Cloud 自動產出 ATR（Agent Threat Rules），全世界第一套專門偵測 AI Agent 攻擊的開源規則標準。Prompt injection、tool poisoning、context exfiltration——全由 ATR 規則偵測。",
       "descHighlight": "你不只是被保護的人，你也是守護者。",
       "privacy1": "離開你機器的只有匿名威脅特徵——零原始資料、零遙測、TLS 1.3 全程加密。你的 log、程式碼、資料永遠留在你手上。",
       "privacy2": "不放心的話，隨時可以關掉 Threat Cloud。Community 版也完全支援離線運作。",
@@ -450,7 +450,7 @@
       "leftOutcome": "整整 6 小時沒人發現。5 萬筆客戶資料外洩。平均損失 $4.35M（IBM, 2022）。",
       "right1": {
         "time": "3:00 AM",
-        "text": "SSH 暴力破解被第一層攔截（Sigma 規則命中）"
+        "text": "SSH 暴力破解被第一層攔截（ATR 規則命中）"
       },
       "right2": {
         "time": "3:00 AM",
@@ -485,7 +485,7 @@
         },
         "guard": {
           "title": "24/7 即時防護",
-          "description": "威脅不只被偵測 -- 而是自動攔截。ATR 規則撤銷惡意技能，Sigma 規則封鎖 IP 並終止進程，YARA 規則隔離惡意軟體。信心值評分確保只有高確信威脅才會自動回應。",
+          "description": "威脅不只被偵測 -- 而是自動攔截。ATR 規則撤銷惡意技能、封鎖 IP、終止進程、隔離威脅。信心值評分確保只有高確信威脅才會自動回應。",
           "snippetLabel": "CLI 或 AI 代理",
           "snippet": "panguard guard start\n# 或直接問你的 AI 代理：\n「啟動安全防護」"
         },
@@ -514,7 +514,7 @@
         },
         {
           "name": "Scan",
-          "desc": "60 秒資安掃描。Sigma、YARA、ATR 規則一次掃完你的環境。",
+          "desc": "60 秒資安掃描。ATR 規則一次掃完你的 AI Agent 環境。",
           "href": "/product/scan"
         },
         {
@@ -529,12 +529,12 @@
         },
         {
           "name": "ATR 標準",
-          "desc": "開源 AI Agent 威脅規則標準。等同 Sigma 之於 prompt injection、tool poisoning、skill compromise。",
+          "desc": "開源 AI Agent 威脅規則標準。專為 prompt injection、tool poisoning、skill compromise。",
           "href": "/atr"
         },
         {
           "name": "Threat Cloud",
-          "desc": "全網聯防。每個節點貢獻匿名訊號，管線從真實攻擊自動鍛造 Sigma、YARA、ATR 規則。",
+          "desc": "全網聯防。每個節點貢獻匿名訊號，管線從真實攻擊自動鍛造 ATR 規則。",
           "href": "/threat-cloud"
         }
       ],
@@ -545,7 +545,7 @@
       "subtitle": "下面每個數字都能在 GitHub 上驗證，零黑箱。",
       "stats": {
         "atrRules": "ATR 規則 (AI Agent 威脅)",
-        "integratedRules": "整合 Sigma/YARA 規則",
+        "integratedRules": "偵測模式",
         "tests": "測試通過",
         "layers": "偵測層",
         "skillChecks": "Skill 審計檢查",
@@ -574,10 +574,12 @@
       "title": "社群防禦網路",
       "subtitle": "三大規則引擎協同運作。任何用戶發現的威脅，都會強化所有人的防護。",
       "rules": "規則",
-      "sigmaDesc": "網路與系統威脅",
-      "yaraDesc": "惡意軟體與二進位威脅",
       "atrDesc": "AI Agent 專屬威脅",
-      "totalRulesDesc": "跨所有引擎的整合偵測規則總數",
+      "detectionPatterns": "偵測模式",
+      "patternsDesc": "唯一威脅特徵",
+      "threatCategories": "威脅類別",
+      "categoriesDesc": "AI Agent 攻擊向量覆蓋",
+      "totalRulesDesc": "AI Agent 安全的 ATR 偵測規則總數",
       "growingDaily": "透過 Threat Cloud 社群貢獻每日成長",
       "cta": "每一次掃描都強化集體防禦。安裝一個技能，保護整個生態系。"
     },
@@ -627,7 +629,7 @@
       },
       "card5": {
         "title": "Agent 原生偵測",
-        "desc": "我們創造了 ATR——第一個 AI Agent 威脅偵測的開放標準。Sigma 保護伺服器，YARA 抓惡意程式，ATR 抓 prompt injection、tool poisoning 和 agent manipulation。"
+        "desc": "我們創造了 ATR——第一個 AI Agent 威脅偵測的開放標準。ATR 抓 prompt injection、tool poisoning 和 agent manipulation。"
       }
     },
     "traction": {
@@ -677,17 +679,17 @@
         },
         "blockIp": {
           "action": "封鎖 IP",
-          "trigger": "Sigma 網路規則",
+          "trigger": "ATR 網路規則",
           "description": "防火牆封鎖 + Threat Cloud 回報"
         },
         "killProcess": {
           "action": "終止進程",
-          "trigger": "Sigma/Falco 進程規則",
+          "trigger": "ATR 進程規則",
           "description": "SIGTERM 再 SIGKILL，含安全檢查"
         },
         "quarantineFile": {
           "action": "隔離檔案",
-          "trigger": "YARA 惡意軟體匹配",
+          "trigger": "ATR 檔案威脅匹配",
           "description": "隔離至隔離區目錄"
         },
         "blockTool": {
@@ -766,7 +768,7 @@
     "atrStandard": {
       "overline": "開放標準",
       "title": "AI 時代需要新的審計標準",
-      "subtitle": "ATR（Agent Threat Rules）專為 AI Agent 威脅設計。Sigma 之於 SIEM，ATR 之於 AI Agent。",
+      "subtitle": "ATR（Agent Threat Rules）專為 AI Agent 威脅設計。首個 AI Agent 安全的開放偵測標準。",
       "rules": "偵測規則",
       "categories": "威脅類別",
       "patterns": "偵測模式",
@@ -858,7 +860,7 @@
         "overline": "部署前",
         "title": "Skill Auditor",
         "desc": "靜態分析引擎，在 MCP Skill 和 AI Agent 工具執行前進行安全掃描。偵測 Prompt 注入、憑證竊取、資料外洩等 9 大威脅類別，基於 ATR 模式比對。",
-        "f1": "61 條 ATR 規則，涵蓋 450+ 偵測模式、9 大類別",
+        "f1": "125 條 ATR 規則，涵蓋 500+ 偵測模式、9 大類別",
         "f2": "機密偵測：AWS Key、GitHub Token、SSH 私鑰、API 密鑰",
         "f3": "YAML Manifest 驗證 + 權限範圍分析",
         "s1": "ATR 規則",
@@ -953,7 +955,7 @@
       "layer2": {
         "badge": "第二層",
         "name": "規則引擎",
-        "desc": "3,760條 Sigma 規則 + 5,961 條 YARA 規則 + Suricata 網路 IDS + Falco eBPF 監控。",
+        "desc": "125+ ATR 偵測規則，專為 AI Agent 安全設計。",
         "detail": "50 毫秒內攔截 90% 已知威脅。不需要 AI。"
       },
       "layer3": {
@@ -982,7 +984,7 @@
       "tier1": {
         "name": "規則引擎",
         "pct": "90%",
-        "items": "3,760條 Sigma 偵測規則|5,961 條 YARA 惡意程式特徵|Suricata 網路 IDS 規則|Falco eBPF 系統呼叫監控|行為基線偏差偵測",
+        "items": "125+ ATR 偵測規則|500+ 偵測模式|9 個威脅類別|行為基線偵測|社群驅動規則更新",
         "speed": "每事件 <50ms"
       },
       "tier2": {
@@ -1161,7 +1163,7 @@
       },
       "step5": {
         "name": "分發",
-        "desc": "自動產生新的 Sigma 偵測規則。幾分鐘內推送到所有 Panguard 實例。每個用戶都受到保護。"
+        "desc": "自動產生新的 ATR 偵測規則。幾分鐘內推送到所有 Panguard 實例。每個用戶都受到保護。"
       }
     },
     "privacy": {
@@ -1266,7 +1268,7 @@
           "desc": "每 5 分鐘更新"
         },
         {
-          "name": "Sigma 規則 Feed",
+          "name": "ATR 規則 Feed",
           "desc": "自動產生的偵測規則"
         },
         {
@@ -1308,10 +1310,9 @@
       "stats": {
         "sources": "情報來源",
         "records": "驗證通過記錄",
-        "sigmaRules": "Sigma 規則",
-        "yaraRules": "YARA 規則",
-        "autoGenSigma": "自動產生 Sigma",
-        "autoGenYara": "自動產生 YARA",
+        "atrRules": "ATR 規則",
+        "atrPatterns": "偵測模式",
+        "autoGenATR": "自動產生 ATR",
         "promoted": "自動晉升",
         "draft": "待審核",
         "syncInterval": "同步週期",
@@ -1376,12 +1377,12 @@
       "title": "嚴謹打造",
       "stats": [
         {
-          "value": "52+",
+          "value": "125+",
           "label": "ATR 規則 (AI Agent 威脅)"
         },
         {
-          "value": "9,700+",
-          "label": "整合 Sigma/YARA 規則"
+          "value": "500+",
+          "label": "偵測模式"
         },
         {
           "value": "3,490+",
@@ -1461,8 +1462,8 @@
         },
         {
           "name": "panguard-rules",
-          "desc": "3,760條 Sigma 偵測規則 + 5,961 條 YARA 惡意程式特徵",
-          "lang": "YAML / Sigma",
+          "desc": "125+ ATR 偵測規則 + 500+ 偵測模式",
+          "lang": "YAML / ATR",
           "stars": "社群"
         },
         {
@@ -1484,7 +1485,7 @@
         },
         {
           "title": "提交偵測規則",
-          "desc": "PR 到 /rules 目錄。Sigma 或 YARA 格式。社群審查流程。"
+          "desc": "PR 到 /rules 目錄。ATR 格式。社群審查流程。"
         },
         {
           "title": "改進 AI 提示",
@@ -1509,7 +1510,7 @@
         "items": [
           "核心平台（Scan + Guard + Chat + Skill Auditor）",
           "Threat Cloud v1",
-          "3,760條 Sigma + 5,961 條 YARA 規則",
+          "125+ ATR 偵測規則",
           "3,490 個自動化測試"
         ]
       },
@@ -1747,7 +1748,7 @@
       "faq4q": "可以商業使用嗎？",
       "faq4a": "可以。MIT 授權允許完全的商業使用。你可以在正式環境部署 Panguard、嵌入你的產品、修改原始碼、重新發布。唯一要求是附上 MIT 授權聲明。",
       "faq5q": "如何貢獻？",
-      "faq5a": "Panguard 歡迎各種貢獻：ATR 規則、Sigma/YARA 規則、威脅情報、程式碼改善、文件和翻譯。造訪我們的 GitHub 倉庫，fork 後提交 pull request。ATR 規則特別有價值 -- 每條新規則都強化了所有使用者的集體免疫。"
+      "faq5a": "Panguard 歡迎各種貢獻：ATR 規則、威脅情報、程式碼改善、文件和翻譯。造訪我們的 GitHub 倉庫，fork 後提交 pull request。ATR 規則特別有價值 -- 每條新規則都強化了所有使用者的集體免疫。"
     }
   },
   "scan": {
@@ -1872,7 +1873,7 @@
       "capabilities": "核心能力",
       "cta": {
         "title": "準備好守護你的 AI Agent 了嗎？",
-        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。61 條 ATR 規則 + 9,700+ 偵測規則。免費開始。",
+        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。125+ ATR 偵測規則。免費開始。",
         "cta1": "立即開始",
         "cta2": "在 GitHub 上查看 ATR"
       }
@@ -1946,7 +1947,7 @@
       "overline": "Panguard Guard",
       "title": "即時威脅回應。",
       "titleHighlight": "一行指令安裝。",
-      "subtitle": "透過 ATR、Sigma、YARA 規則偵測。根據信心值自動回應。在威脅行動前攔截。",
+      "subtitle": "透過 ATR（Agent Threat Rules）偵測。根據信心值自動回應。在威脅行動前攔截。",
       "dashboard": {
         "allSystemsProtected": "所有系統已受保護",
         "lastUpdated": "最後更新：剛才",
@@ -1979,7 +1980,7 @@
       "featuresList": {
         "item1": {
           "title": "5 代理 AI 管線",
-          "desc": "事件流經 5 個專業 AI 代理：偵測（Sigma/YARA 規則 + 本地 LLM）、分析（威脅分類）、回應（自動修復）、報告（合規文件）、通知（Telegram、Slack、Email）。90% 的事件僅由規則處理，零成本。"
+          "desc": "事件流經 5 個專業 AI 代理：偵測（ATR 規則 + 本地 LLM）、分析（威脅分類）、回應（自動修復）、報告（合規文件）、通知（Telegram、Slack、Email）。90% 的事件僅由規則處理，零成本。"
         },
         "item2": {
           "title": "信心值自動回應",
@@ -1995,7 +1996,7 @@
         },
         "item5": {
           "title": "優雅降級",
-          "desc": "雲端 AI 斷線？本地指紋比對 & 啟發式分析接手。啟發式離線？3,760條 Sigma 和 5,961 條 YARA 規則的規則引擎處理。Guard 永不停止保護，不受網路狀況影響。"
+          "desc": "雲端 AI 斷線？本地指紋比對 & 啟發式分析接手。啟發式離線？125+ ATR 偵測規則的規則引擎處理。Guard 永不停止保護，不受網路狀況影響。"
         },
         "item6": {
           "title": "整合適配器",
@@ -2010,8 +2011,8 @@
           "desc": "Guard 對回應動作強制執行速率限制，防止連鎖故障：kill_agent 上限 3 次/分鐘、block_tool 上限 10 次/分鐘。安全護欄防止自動化失控。每個回應動作包含自動解除計時器和回滾功能，確保積極防護不會永久鎖定合法操作。"
         },
         "item9": {
-          "title": "ATR/Sigma/YARA 統一管線",
-          "desc": "三種規則引擎在單一管線中同時運行：ATR 規則偵測 AI agent 威脅（提示注入、工具毒化、skill 供應鏈攻擊）、Sigma 規則偵測系統威脅、YARA 規則偵測惡意程式。9,700+ 條合併規則。每事件亞毫秒級評估。一條管線，全棧防護。"
+          "title": "ATR 偵測管線",
+          "desc": "ATR 規則覆蓋所有 AI Agent 威脅：提示注入、工具毒化、Skill 供應鏈攻擊、憑證外洩、上下文操縱。125+ 偵測規則。每事件亞毫秒級評估。一條管線，全面 AI Agent 防護。"
         },
         "item10": {
           "title": "調查引擎",
@@ -2064,7 +2065,7 @@
         },
         "step2": {
           "title": "自動審計：ATR + Skill Auditor",
-          "desc": "技能會被 9,700+ 偵測規則掃描（ATR + Sigma + YARA）。Prompt injection、tool poisoning、隱藏 payload、過度權限，1 秒內完成檢查。"
+          "desc": "技能會被 125+ ATR 偵測規則掃描。Prompt injection、tool poisoning、隱藏 payload、過度權限，1 秒內完成檢查。"
         },
         "step3": {
           "title": "匿名化威脅提交至 Threat Cloud",
@@ -2553,7 +2554,7 @@
         },
         "item3": {
           "title": "策略分發",
-          "desc": "從一處推送安全策略。同時更新整個叢集的 Sigma 規則、YARA 簽章和回應設定。"
+          "desc": "從一處推送安全策略。同時更新整個叢集的 ATR 規則和回應設定。"
         },
         "item4": {
           "title": "統一儀表板",
@@ -3639,7 +3640,7 @@
         "items": [
           "原始系統日誌和遙測",
           "情境記憶基線資料庫",
-          "Sigma/YARA 規則引擎和結果",
+          "ATR 規則引擎和結果",
           "本地 LLM 推論（Ollama）",
           "事件回應腳本執行",
           "完整事件歷史和鑑識日誌"
@@ -3781,10 +3782,10 @@
       "layer1": {
         "badge": "第一層",
         "name": "規則引擎",
-        "tech": "Sigma + YARA",
+        "tech": "ATR Rules",
         "pct": "~90%",
         "cost": "$0",
-        "desc": "開源 Sigma 和 YARA 規則構成基石。它們在裝置端即時處理絕大多數安全事件，每事件零成本。新的社群規則每天從精選來源拉取，自動編譯到本地引擎。"
+        "desc": "開源 ATR（Agent Threat Rules）構成基石。它們在裝置端即時處理絕大多數 AI Agent 安全事件，每事件零成本。新的社群規則每天從 Threat Cloud 拉取，自動編譯到本地引擎。"
       },
       "layer2": {
         "badge": "第二層",
@@ -3810,7 +3811,7 @@
       "detect": {
         "name": "偵測代理",
         "role": "第一線反應者",
-        "desc": "持續監控系統日誌、網路流量和檔案系統變化。即時應用 Sigma 和 YARA 規則，在異常出現的瞬間標記。產出附帶 MITRE ATT&CK TTP 標籤的原始事件信號。"
+        "desc": "持續監控 AI Agent 工具呼叫、提示詞流程和 Skill 行為。即時應用 ATR 規則，在異常出現的瞬間標記。產出附帶 MITRE ATT&CK TTP 標籤的原始事件信號。"
       },
       "analyze": {
         "name": "分析代理",
@@ -3889,7 +3890,7 @@
       },
       "item3": {
         "label": "自動規則推送",
-        "desc": "社群驗證的簽名被編譯成 Sigma/YARA 規則並推送到每個代理。"
+        "desc": "社群驗證的簽名被編譯成 ATR 規則並推送到每個代理。"
       },
       "item4": {
         "label": "隱私優先",
@@ -3910,7 +3911,7 @@
       },
       "llmOffline": {
         "status": "LLM 離線",
-        "desc": "僅規則引擎。Sigma + YARA 仍捕獲 90% 的已知威脅。事件記錄供稍後 AI 分析。"
+        "desc": "僅規則引擎。ATR 規則仍捕獲 90% 的已知威脅。事件記錄供稍後 AI 分析。"
       },
       "emergency": {
         "status": "緊急模式",
@@ -3926,11 +3927,11 @@
         "desc": "端到端型別安全"
       },
       "item2": {
-        "name": "Sigma Rules",
-        "desc": "產業標準偵測"
+        "name": "ATR Rules",
+        "desc": "AI Agent 威脅偵測"
       },
       "item3": {
-        "name": "YARA Rules",
+        "name": "Threat Cloud",
         "desc": "惡意程式模式匹配"
       },
       "item4": {
@@ -3984,35 +3985,35 @@
       "subtitle": "每一層針對不同的攻擊面，使用經過實戰驗證的開源引擎。從核心系統呼叫到日誌關聯分析，每一層都將標準化事件輸入 AI 管線。",
       "kernel": {
         "layer": "第一層",
-        "name": "核心監控",
-        "engine": "Falco eBPF",
-        "desc": "透過 eBPF 探針直接掛鉤 Linux 核心系統呼叫。偵測容器逃逸、反向 shell、挖礦程序、憑證存取和異常檔案描述符 -- 無需核心模組，不影響系統效能。",
-        "detects": "容器逃逸、反向 shell、權限提升、可疑 exec() 呼叫鏈",
-        "tech": "eBPF tracepoints 在 sys_enter/sys_exit、Falco 規則編譯為 BPF 字節碼、<1ms 每事件延遲"
+        "name": "Skill 攔截",
+        "engine": "ATR Rules",
+        "desc": "攔截每個 AI Agent 工具呼叫、提示詞流程和 Skill 安裝。ATR 規則即時偵測提示注入、工具毒化、憑證外洩和上下文操縱。",
+        "detects": "提示注入、工具毒化、憑證外洩、上下文操縱",
+        "tech": "ATR 規則引擎、亞毫秒評估、125+ 偵測規則、500+ 模式"
       },
       "network": {
         "layer": "第二層",
-        "name": "網路入侵偵測",
-        "engine": "Suricata DPI",
-        "desc": "對所有網路介面進行深度封包檢測。Suricata 的 EVE JSON 輸出提供協定解碼警報 -- 包括 TLS 指紋辨識、DNS 異常偵測和 HTTP 負載分析 -- 直接輸入事件管線。",
-        "detects": "C2 信標通訊、資料外洩、橫向移動、漏洞利用負載、協定異常",
-        "tech": "多執行緒 pcap 分析、40+ 協定解碼器、ET Open + 自訂規則集、流量追蹤"
+        "name": "Skill 審計",
+        "engine": "AST 分析",
+        "desc": "安裝前對 AI Skill 原始碼進行靜態分析。檢查隱藏功能、過度權限、混淆 payload 和供應鏈攻擊。",
+        "detects": "隱藏功能、過度權限、混淆 payload、供應鏈攻擊",
+        "tech": "6 層審計檢查、AST 解析、依賴分析、權限對應"
       },
       "filesystem": {
         "layer": "第三層",
-        "name": "檔案系統掃描",
-        "engine": "YARA 引擎",
-        "desc": "即時存取和排程掃描檔案系統變更。YARA 規則比對位元組模式、PE 標頭和字串特徵，對抗已知惡意程式家族、Web Shell 和可疑腳本。",
-        "detects": "惡意程式二進位檔、Web Shell、勒索軟體投放器、混淆腳本、憑證竊取器",
-        "tech": "模式特徵比對、自訂 + 社群 YARA 規則集、inotify 觸發掃描"
+        "name": "行為監控",
+        "engine": "Runtime Guard",
+        "desc": "執行時監控 AI Agent 行為。偵測異常工具使用模式、未預期的檔案存取和 AI Agent 的未授權網路連線。",
+        "detects": "異常工具使用、未授權檔案存取、未預期網路呼叫、權限提升",
+        "tech": "行為基線學習、7 天校準期、基於信心值的警報"
       },
       "logs": {
         "layer": "第四層",
-        "name": "日誌關聯分析",
-        "engine": "Sigma 規則",
-        "desc": "Sigma 偵測規則跨系統日誌、認證日誌、應用日誌和雲端稽核軌跡進行關聯。規則引擎支援時間關聯、聚合和多來源關聯查詢。",
+        "name": "事件關聯分析",
+        "engine": "ATR 關聯",
+        "desc": "ATR 偵測規則跨 AI Agent 會話、工具呼叫和提示詞流程進行關聯。規則引擎支援時間關聯、聚合和多來源關聯查詢。",
         "detects": "暴力攻擊、橫向移動鏈、持續性機制、政策違規",
-        "tech": "2,500+ 社群 Sigma 規則、熱重載、MITRE ATT&CK TTP 對應、自訂規則撰寫"
+        "tech": "125+ ATR 規則、熱重載、MITRE ATT&CK TTP 對應、自訂規則撰寫"
       },
       "ai": {
         "layer": "第五層",
@@ -4029,7 +4030,7 @@
       "subtitle": "每個安全事件經過五階段管線。資料被標準化、豐富化、關聯、評分和派發 -- 通常在 200ms 內完成。",
       "stage1": {
         "name": "擷取",
-        "desc": "來自 Falco、Suricata、YARA、檔案監控器和程序監控器的原始事件即時捕獲。"
+        "desc": "來自 ATR 規則引擎、Skill 審計、行為監控器和程序監控器的原始事件即時捕獲。"
       },
       "stage2": {
         "name": "標準化",
@@ -4037,7 +4038,7 @@
       },
       "stage3": {
         "name": "關聯",
-        "desc": "Sigma 規則和 AI 將事件與基線行為和威脅情報進行交叉比對。"
+        "desc": "ATR 規則和 AI 將事件與基線行為和威脅情報進行交叉比對。"
       },
       "stage4": {
         "name": "評分",
@@ -4243,7 +4244,7 @@
       },
       "advancedSetup": {
         "title": "進階設定",
-        "desc": "整合 Ollama（本地 AI）、Falco（eBPF 監控）和 Suricata（網路 IDS）。"
+        "desc": "整合 Ollama（本地 AI）和進階設定。"
       }
     },
     "cantFind": "找不到你要的？",
@@ -4270,7 +4271,7 @@
       "step2Desc": "快速掃描會在約 60 秒內檢查系統常見弱點。",
       "step2Deep": "若需全面分析，包含所有 port、SSL 憑證和設定檔：",
       "step3Title": "步驟三：啟用即時防護",
-      "step3Desc": "Guard 以背景程式運行，使用 Sigma 和 YARA 規則 24/7 監控你的系統。",
+      "step3Desc": "Guard 以背景程式運行，使用 ATR 偵測規則 24/7 監控你的 AI Agent。",
       "step4Title": "步驟四：設定通知",
       "step4Desc": "Panguard Chat 會在偵測到威脅和修復完成時，用你聽得懂的語言通知你。",
       "step5Title": "步驟五：了解掃描結果",
@@ -4330,9 +4331,7 @@
       "advancedHintTitle": "進階組態",
       "advancedHintDesc": "Panguard 開箱即用，但你可以透過選配的外部工具增強偵測能力。所有工具都支援優雅降級——即使外部工具不可用，Panguard 也不會停止運作。",
       "advancedHintOllama": "Ollama -- 在本地執行 AI 分析，無需雲端 API。適合離線環境。",
-      "advancedHintFalco": "Falco -- 透過 eBPF 進行 Linux 核心層級 syscall 監控，實現深層行為偵測。",
-      "advancedHintSuricata": "Suricata -- 網路層 IDS/IPS，提供進階流量分析。",
-      "advancedHintEnv": "關鍵環境變數：ANTHROPIC_API_KEY（Claude AI）、OPENAI_API_KEY（GPT 備選）、PANGUARD_LLM_MODEL（Ollama 模型覆寫）、OLLAMA_API_ENDPOINT（自訂 Ollama URL）。",
+            "advancedHintEnv": "關鍵環境變數：ANTHROPIC_API_KEY（Claude AI）、OPENAI_API_KEY（GPT 備選）、PANGUARD_LLM_MODEL（Ollama 模型覆寫）、OLLAMA_API_ENDPOINT（自訂 Ollama URL）。",
       "advancedHintLink": "查看完整的進階設定指南，了解安裝說明和組態細節。",
       "multiEndpointTitle": "多端點部署",
       "multiEndpointDesc": "在多台伺服器上部署 Panguard 非常簡單。小規模叢集可用 SSH 迴圈，大規模環境建議使用 Ansible。",
@@ -4345,14 +4344,11 @@
       "title": "進階設定",
       "subtitle": "用可選的外部工具增強 Panguard 的偵測能力。所有工具都是選配的——Panguard 在沒有它們的情況下仍然完整運作。",
       "degradeNote": "優雅降級架構",
-      "degradeDesc": "Panguard 的 AI 分析遵循三層降級策略：雲端 AI（Claude/OpenAI）> 本地 LLM（Ollama）> 規則引擎（Sigma + YARA）。每一層都是獨立的，即使全部外部工具離線，3,760條 Sigma 規則和 5,961 條 YARA 規則仍然提供完整防護。",
+      "degradeDesc": "Panguard 的 AI 分析遵循三層降級策略：雲端 AI（Claude/OpenAI）> 本地 LLM（Ollama）> 規則引擎（ATR）。每一層都是獨立的，即使全部外部工具離線，125+ ATR 規則仍然提供完整防護。",
       "ollamaTitle": "Ollama — 本地 AI 分析",
       "ollamaDesc": "安裝 Ollama 讓 Guard 在本地執行 AI 威脅分析，不需要雲端 API。適合離線環境或對資料隱私有要求的場景。",
       "ollamaNote": "Panguard 會自動偵測 Ollama（預設 http://localhost:11434）。安裝後不需要額外設定。",
-      "falcoTitle": "Falco — eBPF 核心層監控",
-      "falcoDesc": "Falco 提供 Linux 核心層級的 syscall 監控。安裝後 Guard 會自動整合，讀取 Falco 的 JSON 告警。適合需要深層行為偵測的環境。",
-      "falcoNote": "僅限 Linux。Falco 需要 root 權限。Guard 會自動偵測 /var/log/falco/ 下的告警檔案。",
-      "envTitle": "環境變數一覽",
+            "envTitle": "環境變數一覽",
       "envDesc": "以下環境變數可以自訂 Panguard 的行為。全部都是選配的。",
       "envVar": "變數",
       "envPurpose": "用途",
@@ -4418,7 +4414,7 @@
       "latency": "延遲",
       "perf": {
         "0": {
-          "name": "規則比對（Sigma / YARA）",
+          "name": "ATR 規則比對",
           "latency": "< 50 ms"
         },
         "1": {
@@ -5410,17 +5406,17 @@
       "overline": "開放標準",
       "title": "Agent Threat Rules",
       "titleHighlight": "(ATR)",
-      "subtitle": "首個 AI Agent 威脅的開放偵測標準。機器可讀、社群驅動，專為 Sigma 和 YARA 從未設計來偵測的威脅而生。"
+      "subtitle": "首個 AI Agent 威脅的開放偵測標準。機器可讀、社群驅動，專為 AI Agent 安全設計。"
     },
     "problem": {
       "overline": "問題",
       "title": "傳統規則看不見 Agent 威脅",
-      "desc1": "Sigma 偵測日誌型 IOC。YARA 匹配檔案層級的位元組模式。兩者都無法理解提示詞流程、工具呼叫或多輪 Agent 對話。",
+      "desc1": "傳統安全規則為網路封包和檔案雜湊設計。它們無法理解提示詞流程、工具呼叫或多輪 Agent 對話。",
       "desc2": "AI Agent 帶來全新攻擊面：提示詞注入、工具投毒、上下文竊取、技能入侵。這些威脅存在於語意層 -- 對設計來偵測網路封包和檔案雜湊的模式匹配器完全不可見。",
       "desc3": "ATR 是缺失的偵測標準。專為 AI Agent 時代而生。",
-      "sigmaTitle": "Sigma Rules",
+      "sigmaTitle": "傳統規則",
       "sigmaDesc": "日誌型 IOC。無法感知提示詞上下文或工具互動。",
-      "yaraTitle": "YARA Rules",
+      "yaraTitle": "檔案掃描器",
       "yaraDesc": "檔案層級位元組模式。無法檢查 Agent 對話流程。",
       "atrTitle": "ATR Rules",
       "atrDesc": "語意層偵測。專為提示詞、工具和 Agent 行為而生。"
@@ -5559,11 +5555,11 @@
     "comparison": {
       "overline": "為什麼需要 ATR",
       "title": "三個標準。三個時代。",
-      "subtitle": "Sigma 定義了網路偵測。YARA 定義了檔案偵測。ATR 定義了 Agent 偵測。",
+      "subtitle": "ATR 填補了傳統偵測工具對 AI Agent 威脅的空白。",
       "headers": {
         "feature": "能力",
-        "sigma": "Sigma",
-        "yara": "YARA",
+        "sigma": "傳統規則",
+        "yara": "檔案掃描器",
         "atr": "ATR"
       },
       "rows": [
@@ -5686,10 +5682,10 @@
     "ecosystem": {
       "overline": "生態系",
       "title": "開放標準。社群驅動成長。",
-      "subtitle": "ATR 遵循讓 Sigma 和 YARA 成為產業標準的同一模式 -- 開放治理、社群貢獻、廠商中立設計。",
+      "subtitle": "ATR 遵循開放標準的成功模式 -- 開放治理、社群貢獻、廠商中立設計。",
       "stats": [
         {
-          "value": "61",
+          "value": "125",
           "label": "偵測規則"
         },
         {
@@ -5801,7 +5797,7 @@
           }
         ]
       },
-      "subtitleLine2": "Panguard 在每個技能執行前進行審計。{atrRules} ATR 規則 + {integratedRules} Sigma 和 YARA 規則即時攔截已知威脅。AI 分析捕捉剩餘的。",
+      "subtitleLine2": "Panguard 在每個技能執行前進行審計。{atrRules} ATR 規則即時攔截已知威脅。AI 分析捕捉剩餘的。",
       "subtitleLine3": "當你發現威脅，它會成為保護整個社群的規則。",
       "viewATR": "GitHub 上的 ATR 標準",
       "install": "開始使用",
@@ -5809,7 +5805,7 @@
       "platforms": "支援 Claude Code、Cursor、QClaw、OpenClaw、Codex、WorkBuddy、Claude Desktop",
       "badges": {
         "mit": "MIT 開源",
-        "rules": "9,700+ 規則",
+        "rules": "125+ ATR 規則",
         "taiwan": "台灣製造",
         "scanned": "已掃描 1,295 Skills"
       },
@@ -5838,8 +5834,8 @@
         "knownCheck": {
           "number": "3",
           "title": "新 Skill？先過審計。",
-          "desc": "每個新 Skill 同時接受社群 ATR 規則（AI Agent 威脅）、Sigma 規則（網路威脅）和 YARA 規則（檔案威脅）三重審計。",
-          "detail": "9,700+ 偵測規則（ATR + Sigma + YARA）"
+          "desc": "每個新 Skill 接受社群 ATR 規則審計，覆蓋提示注入、工具毒化、憑證外洩和 Skill 入侵。",
+          "detail": "125+ ATR 偵測規則"
         },
         "llmAnalysis": {
           "number": "4",
@@ -5865,7 +5861,7 @@
     "productPillars": {
       "atrStandard": {
         "title": "社群規則",
-        "desc": "ATR 規則對付 AI Agent 威脅 + Sigma/YARA 規則對付傳統威脅。9,700+ 條合併規則，全部開源、社群驅動。每個 Skill 必須通過的審核標準。",
+        "desc": "125+ ATR 規則對付 AI Agent 威脅。全部開源、社群驅動。每個 Skill 必須通過的審核標準。",
         "link": "查看 ATR 規則"
       },
       "threatCloud": {
@@ -5880,7 +5876,7 @@
       }
     },
     "atrShowcase": {
-      "title": "Sigma 定義了網路攻擊。ATR 定義了 Agent 攻擊。",
+      "title": "ATR：AI Agent 攻擊的偵測標準。",
       "githubCta": "在 GitHub 上查看",
       "features": {
         "agentNative": {
@@ -5947,11 +5943,11 @@
       "steps": {
         "install": {
           "title": "安裝",
-          "desc": "一行指令。Panguard 載入 9,700+ 偵測規則 -- ATR（AI Agent 威脅）、Sigma（網路威脅）和 YARA（檔案威脅）。三層防護同時啟動。"
+          "desc": "一行指令。Panguard 載入 125+ ATR 偵測規則，專為 AI Agent 威脅設計。所有防護層同時啟動。"
         },
         "protect": {
           "title": "審核",
-          "desc": "每個新 Skill 通過同一條審核流水線：ATR 規則檢查 Agent 攻擊、Sigma 和 YARA 規則檢查傳統威脅。已知威脅即時阻擋。"
+          "desc": "每個新 Skill 通過同一條審核流水線：ATR 規則檢查 Agent 攻擊 -- 提示注入、工具毒化、憑證竊取。已知威脅即時阻擋。"
         },
         "contribute": {
           "title": "進化",
@@ -5977,7 +5973,7 @@
           "label": "有 Panguard",
           "items": [
             "每個 Skill 執行前先經過審核",
-            "社群規則攔截已知威脅（ATR + Sigma + YARA）",
+            "社群 ATR 規則攔截已知威脅",
             "AI 即時攔截未知威脅",
             "新規則自動產生並分享給所有使用者",
             "安裝的人越多，防護越聰明越強"
@@ -5992,8 +5988,8 @@
       "items": {
         "skillInstall": {
           "label": "第一層：規則",
-          "title": "新 Skill 來了。ATR + Sigma + YARA 規則即時審核。",
-          "narrative": "你從 OpenClaw 或 MCP 安裝新 Skill。在它執行前，Panguard 同時用 9,700+ 偵測規則 -- ATR（Prompt Injection、Tool Poisoning、Skill 入侵）、Sigma（網路層威脅）和 YARA（檔案層威脅）進行三重審核。已知威脅被阻擋，安全的 Skill 正常運作。",
+          "title": "新 Skill 來了。ATR 規則即時審核。",
+          "narrative": "你從 OpenClaw 或 MCP 安裝新 Skill。在它執行前，Panguard 用 125+ ATR 偵測規則 -- Prompt Injection、Tool Poisoning、憑證外洩、Skill 入侵 -- 進行審核。已知威脅被阻擋，安全的 Skill 正常運作。",
           "before": "沒有 Skills Audit，Skill 安裝後立刻擁有完整系統權限。",
           "after": "有了 Skills Audit，每個 Skill 在碰到系統前都通過三層審計。"
         },
@@ -6021,12 +6017,12 @@
       "preDeployment": {
         "label": "已知威脅",
         "title": "規則審核",
-        "tools": "ATR + Sigma + YARA",
+        "tools": "ATR 規則",
         "items": [
           "ATR 規則：Prompt Injection、Tool Poisoning、Skill 入侵",
-          "Sigma 規則：網路威脅、暴力破解、反向 Shell",
-          "YARA 規則：惡意檔案、編碼 payload、惡意程式特徵",
-          "9,700+ 條合併規則，社群驅動，持續更新"
+          
+          
+          "125+ 條規則，社群驅動，持續更新"
         ]
       },
       "postDeployment": {
@@ -6079,15 +6075,15 @@
       },
       "q2": {
         "q": "如果 skill 通過審計後才變惡意呢？",
-        "a": "Guard 持續監控每個白名單中的 skill，用三層偵測 -- 偵測到偏移時，不只是警報，而是自動回應。\n\n1. 規則比對（亞毫秒級）-- 9,700+ 條合併規則：ATR 偵測 AI 威脅、Sigma 偵測系統威脅、YARA 偵測惡意程式。只要 skill 的行為命中任何規則，立即標記。\n\n2. 指紋偏移 -- Skill Auditor 記錄了 skill 應該做什麼。Guard 拿即時行為跟指紋比對。一個程式碼審查工具突然開始對不明端點發網路請求？偏離指紋的瞬間就被抓到。\n\n3. LLM 深度分析 -- 規則和指紋都沒攔住的全新攻擊模式，AI 分析器會做語義檢查。判定結果自動蒸餾成新的 ATR 規則，下次同樣的攻擊靠規則就能擋。\n\n偵測到威脅後，Guard 的信心值回應機制啟動：\n- 信心值 >= 85%：自動回應 -- 從白名單撤銷 skill、封鎖工具呼叫、隔離 session。零人工延遲。\n- 信心值 50-84%：附完整證據警報，建議具體動作（如 revoke_skill 或 kill_agent），等待人工確認。\n- 50% 以下：記錄供調查，保留完整上下文。\n\n就算攻擊者耐心等了 50 次才動手，只要做了指紋範圍外的事，當下就被攔截 -- Guard 的回應力度跟確定性成正比。"
+        "a": "Guard 持續監控每個白名單中的 skill，用多層偵測 -- 偵測到偏移時，不只是警報，而是自動回應。\n\n1. ATR 規則比對（亞毫秒級）-- 125+ ATR 偵測規則，專為 AI Agent 威脅設計。只要 skill 的行為命中任何規則，立即標記。\n\n2. 指紋偏移 -- Skill Auditor 記錄了 skill 應該做什麼。Guard 拿即時行為跟指紋比對。一個程式碼審查工具突然開始對不明端點發網路請求？偏離指紋的瞬間就被抓到。\n\n3. LLM 深度分析 -- 規則和指紋都沒攔住的全新攻擊模式，AI 分析器會做語義檢查。判定結果自動蒸餾成新的 ATR 規則，下次同樣的攻擊靠規則就能擋。\n\n偵測到威脅後，Guard 的信心值回應機制啟動：\n- 信心值 >= 85%：自動回應 -- 從白名單撤銷 skill、封鎖工具呼叫、隔離 session。零人工延遲。\n- 信心值 50-84%：附完整證據警報，建議具體動作（如 revoke_skill 或 kill_agent），等待人工確認。\n- 50% 以下：記錄供調查，保留完整上下文。\n\n就算攻擊者耐心等了 50 次才動手，只要做了指紋範圍外的事，當下就被攔截 -- Guard 的回應力度跟確定性成正比。"
       },
       "q3": {
-        "q": "ATR、Sigma、YARA 規則是什麼？為什麼要三種？",
-        "a": "每種規則涵蓋不同的攻擊面：\n\nATR（Agent Threat Rules）-- 橫跨 9 大威脅類別，專門針對 AI Agent 攻擊：提示注入、工具毒化、上下文竊取、跨 Agent 提權。這是其他工具沒有的防護層。\n\nSigma -- 涵蓋系統與日誌層威脅：SSH 暴力破解、處理程序注入、可疑網路連線、SQL 注入模式、XSS 攻擊、遠端程式碼執行。\n\nYARA -- 涵蓋檔案與惡意程式威脅：已知惡意程式特徵、可疑二進位檔案、加殼執行檔。\n\n三種引擎合計 9,700+ 條規則。Threat Cloud 彙整社群貢獻。Guard 同時執行三種引擎。從傳統基礎設施攻擊到 AI 特有威脅，一個工具搞定全棧防護。"
+        "q": "什麼是 ATR 規則？",
+        "a": "ATR（Agent Threat Rules）是首個 AI Agent 威脅的開放偵測標準。125+ 條規則橫跨 9 大威脅類別，專門針對 AI Agent 攻擊：提示注入、工具毒化、上下文竊取、憑證竊取、跨 Agent 提權、Skill 供應鏈攻擊等。\n\nATR 規則機器可讀、社群驅動，專為傳統安全工具看不見的威脅而生 -- 那些存在於提示詞流程、工具呼叫和 Agent 對話中的威脅。\n\nThreat Cloud 彙整社群貢獻的規則。Guard 以亞毫秒級速度執行。每條新規則都強化所有用戶的防護。"
       },
       "q4": {
-        "q": "Panguard 也能擋基本攻擊嗎？不只 AI 威脅？",
-        "a": "當然。Panguard 不是只做 AI 安全。三種規則引擎涵蓋完整的威脅光譜。\n\nSigma 規則處理傳統基礎設施攻擊：日誌中的 SQL 注入模式、XSS payload、遠端程式碼執行嘗試、SSH 暴力破解、作業系統層級的提權。這是全球企業 SOC 都在用的社群維護 Sigma 規則。\n\nYARA 規則攔截惡意程式：已知特徵、可疑檔案模式、加殼執行檔。\n\nATR 規則加上 AI 特有的防護層：提示注入、工具毒化、skill 供應鏈攻擊，涵蓋 9 大威脅類別。\n\n三者合計 9,700+ 條規則，在 Guard 中同時運行。你不需要為傳統安全和 AI 安全分別用不同的工具。"
+        "q": "Panguard 偵測哪些威脅？",
+        "a": "Panguard 專注於 AI Agent 安全威脅，涵蓋 9 大類別：\n\n提示注入 -- 直接和間接注入、越獄、系統提示覆蓋。\n工具毒化 -- 惡意工具描述、工具輸出中的隱藏指令。\n憑證外洩 -- API Key 竊取、SSH Key 存取、秘密擷取。\n上下文操縱 -- 記憶體中毒、對話劫持。\nSkill 供應鏈 -- 惡意 Skill 套件、依賴混淆。\n跨 Agent 攻擊 -- Agent 間的權限提升。\n未授權動作 -- 超出宣告範圍的檔案存取、網路呼叫。\n\n125+ ATR 規則搭配 500+ 偵測模式。全部開源、社群驅動，透過 Threat Cloud 每天增長。"
       }
     },
     "detection": {
@@ -6098,7 +6094,7 @@
       },
       "q2": {
         "q": "規則怎麼更新？",
-        "a": "Guard 每小時自動跟 Threat Cloud 同步，拉取新的 Sigma、ATR、YARA 規則。不需要任何手動操作。\n\n本地蒸餾的規則 -- 你的 LLM 分析新威脅時產生的 -- 在你的機器上立即生效。\n\n社群貢獻的規則經過分階段管線：其他 Panguard 用戶同儕審查，然後進入實驗階段（僅警報 7 天，不阻擋），最後升級為穩定版（可自動阻擋）。一條規則需要至少 3 個獨立 Panguard 節點確認才能升級。\n\n你隨時可以用 `panguard rules status` 查看目前的規則數量。"
+        "a": "Guard 每小時自動跟 Threat Cloud 同步，拉取新的 ATR 規則。不需要任何手動操作。\n\n本地蒸餾的規則 -- 你的 LLM 分析新威脅時產生的 -- 在你的機器上立即生效。\n\n社群貢獻的規則經過分階段管線：其他 Panguard 用戶同儕審查，然後進入實驗階段（僅警報 7 天，不阻擋），最後升級為穩定版（可自動阻擋）。一條規則需要至少 3 個獨立 Panguard 節點確認才能升級。\n\n你隨時可以用 `panguard rules status` 查看目前的規則數量。"
       },
       "q3": {
         "q": "如果規則誤報怎麼辦？",
@@ -6117,7 +6113,7 @@
       },
       "q2": {
         "q": "AI 分析會把我的資料送給第三方嗎？",
-        "a": "只有你明確設定才會。Panguard 支援三種 LLM 模式：\n\n1. 純規則模式（預設）-- 不用 AI，不對外發送。Guard 在本地執行 ATR、Sigma、YARA 規則。這是預設模式，不需要任何資料離開你的設備就能提供強力防護。\n\n2. Ollama（本地 AI）-- 完全在你的機器上執行。AI 增強分析，零外部資料傳輸。\n\n3. 你自己的 API Key -- 你選擇服務商（Anthropic、OpenAI 等），你控制送什麼。LLM 只看到正在分析的特定事件，不會看到你的檔案或對話。\n\n加密的 LLM 設定（~/.panguard/llm.enc）儲存在本地，用你機器的身份加密。它永遠不會離開你的設備。"
+        "a": "只有你明確設定才會。Panguard 支援三種 LLM 模式：\n\n1. 純規則模式（預設）-- 不用 AI，不對外發送。Guard 在本地執行 ATR 規則。這是預設模式，不需要任何資料離開你的設備就能提供強力防護。\n\n2. Ollama（本地 AI）-- 完全在你的機器上執行。AI 增強分析，零外部資料傳輸。\n\n3. 你自己的 API Key -- 你選擇服務商（Anthropic、OpenAI 等），你控制送什麼。LLM 只看到正在分析的特定事件，不會看到你的檔案或對話。\n\n加密的 LLM 設定（~/.panguard/llm.enc）儲存在本地，用你機器的身份加密。它永遠不會離開你的設備。"
       },
       "q3": {
         "q": "是開源的嗎？我可以審計程式碼嗎？",
@@ -6132,7 +6128,7 @@
       },
       "q2": {
         "q": "裝好之後可以做什麼？",
-        "a": "四個主要用途：\n\n(a) 安裝前審計任何 MCP skill -- 對你的 AI Agent 說「審計這個 skill」，或直接執行 panguard audit skill。Skill Auditor 用 ATR 規則和社群白名單檢查。\n\n(b) 掃描你的系統 -- panguard scan 同時執行三種規則引擎（ATR、Sigma、YARA）掃描你的環境。\n\n(c) 啟動 24/7 守護 -- panguard guard start 啟動 daemon。持續監控，規則評估亞毫秒級。\n\n(d) 你的 AI Agent 變得有安全意識 -- setup 之後，你的 AI Agent 可以透過自然對話掃描、審計、查看威脅。它把 Panguard 工具當 MCP skill 呼叫。\n\n合規報告和蜜罐陷阱即將推出。"
+        "a": "四個主要用途：\n\n(a) 安裝前審計任何 MCP skill -- 對你的 AI Agent 說「審計這個 skill」，或直接執行 panguard audit skill。Skill Auditor 用 ATR 規則和社群白名單檢查。\n\n(b) 掃描你的系統 -- panguard scan 執行 ATR 規則掃描你的 AI Agent 環境。\n\n(c) 啟動 24/7 守護 -- panguard guard start 啟動 daemon。持續監控，規則評估亞毫秒級。\n\n(d) 你的 AI Agent 變得有安全意識 -- setup 之後，你的 AI Agent 可以透過自然對話掃描、審計、查看威脅。它把 Panguard 工具當 MCP skill 呼叫。\n\n合規報告和蜜罐陷阱即將推出。"
       },
       "q3": {
         "q": "會拖慢我的系統嗎？",
@@ -6143,7 +6139,7 @@
       "title": "一般問題",
       "q1": {
         "q": "真的免費嗎？",
-        "a": "是的。100% 免費、開源、MIT 授權。沒有付費方案、沒有功能限制、沒有用量上限。\n\nScan、Guard、Skill Auditor、Threat Cloud、全部 9,700+ 偵測規則（ATR + Sigma + YARA）-- 全部免費、全部開源。\n\n合規報告和蜜罐陷阱即將推出，同樣免費。\n\n不需信用卡、不需註冊、不會看到「聯繫業務詢價」。"
+        "a": "是的。100% 免費、開源、MIT 授權。沒有付費方案、沒有功能限制、沒有用量上限。\n\nScan、Guard、Skill Auditor、Threat Cloud、全部 125+ ATR 偵測規則-- 全部免費、全部開源。\n\n合規報告和蜜罐陷阱即將推出，同樣免費。\n\n不需信用卡、不需註冊、不會看到「聯繫業務詢價」。"
       },
       "q2": {
         "q": "誰在做這個？",
