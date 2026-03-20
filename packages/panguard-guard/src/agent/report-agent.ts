@@ -490,7 +490,8 @@ export class ReportAgent {
       'unknown';
     const attackSourceIP = anonymizeIP(rawIP);
 
-    const sigmaRuleMatched =
+    // Extract matched rule IDs from evidence (field name is a legacy DB contract)
+    const ruleMatched =
       verdict.evidence
         .filter((e) => e.source === 'rule_match')
         .map((e) => (e.data as Record<string, unknown>)?.['ruleId'] as string)
@@ -511,7 +512,7 @@ export class ReportAgent {
       attackSourceIP,
       attackType: event.category,
       mitreTechnique: verdict.mitreTechnique ?? 'unknown',
-      sigmaRuleMatched,
+      sigmaRuleMatched: ruleMatched,
       timestamp: new Date().toISOString(),
       region: getCountryCode(),
       ...(atrRuleIds.length > 0 && { atrRulesMatched: atrRuleIds.join(',') }),

@@ -9,9 +9,8 @@
  * @module @panguard-ai/panguard-guard/event-processor
  */
 
-import { createLogger, parseSigmaYaml } from '@panguard-ai/core';
+import { createLogger } from '@panguard-ai/core';
 import type {
-  RuleEngine,
   SmartRouter,
   KnowledgeDistiller,
   SecurityEvent,
@@ -54,7 +53,6 @@ export interface EventProcessorState {
 
 /** Engine dependencies for event processing (all readonly references) */
 export interface EventProcessorDeps {
-  readonly ruleEngine: RuleEngine;
   readonly atrEngine: GuardATREngine;
   readonly detectAgent: DetectAgent;
   readonly analyzeAgent: AnalyzeAgent;
@@ -145,14 +143,13 @@ function runSmartRouter(detection: DetectionResult, smartRouter: SmartRouter | n
 }
 
 /**
- * Run knowledge distillation to convert LLM verdict into a reusable Sigma rule.
- * "Learn once, detect forever"
+ * Run knowledge distillation to log AI verdicts for potential future rule creation.
+ * (Sigma RuleEngine injection removed; ATR Engine is used for detection.)
  */
 function runKnowledgeDistillation(
   event: SecurityEvent,
   verdict: ThreatVerdict,
-  knowledgeDistiller: KnowledgeDistiller,
-  ruleEngine: RuleEngine
+  knowledgeDistiller: KnowledgeDistiller
 ): void {
   if (verdict.conclusion === 'benign' || verdict.confidence < 70) return;
 
@@ -186,17 +183,9 @@ function runKnowledgeDistillation(
   });
 
   if (distilled) {
-    try {
-      const parsed = parseSigmaYaml(distilled.sigmaYaml);
-      if (parsed) {
-        ruleEngine.addRule(parsed);
-        logger.info(
-          `Rule distilled from AI: ${distilled.ruleId} / ` + `AI 蒸餾規則: ${distilled.ruleId}`
-        );
-      }
-    } catch {
-      // Parse failed, rule logged but not injected
-    }
+    logger.info(
+      `Knowledge distilled from AI: ${distilled.ruleId} / AI 蒸餾規則: ${distilled.ruleId}`
+    );
   }
 }
 
@@ -367,7 +356,7 @@ export async function processEvent(
 
     // Knowledge Distillation
     if (deps.knowledgeDistiller && verdict.conclusion !== 'benign' && verdict.confidence >= 70) {
-      runKnowledgeDistillation(event, verdict, deps.knowledgeDistiller, deps.ruleEngine);
+      runKnowledgeDistillation(event, verdict, deps.knowledgeDistiller);
     }
 
     // Record detection for ATR Drafter

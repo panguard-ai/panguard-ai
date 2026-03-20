@@ -401,8 +401,8 @@ export function getWizardSteps(): WizardStep[] {
           value: 'rules_only',
           label: { en: 'Rules Only (No AI)', 'zh-TW': '\u50C5\u898F\u5247 (\u4E0D\u7528 AI)' },
           description: {
-            en: 'Zero cost, Sigma + YARA rules',
-            'zh-TW': '\u96F6\u6210\u672C\uFF0CSigma + YARA \u898F\u5247',
+            en: 'Zero cost, ATR rules only',
+            'zh-TW': '\u96F6\u6210\u672C\uFF0C\u50C5 ATR \u898F\u5247',
           },
         },
       ],

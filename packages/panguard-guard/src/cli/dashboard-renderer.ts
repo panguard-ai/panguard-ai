@@ -22,7 +22,6 @@ export interface DashboardState {
   readonly actionsExecuted: number;
   readonly mode: string;
   readonly ruleCounts: {
-    readonly sigma: number;
     readonly atr: number;
   };
   readonly whitelistedSkills: number;
@@ -196,8 +195,8 @@ export class DashboardRenderer {
     lines.push('');
 
     // Rule layers
-    const { sigma, atr } = state.ruleCounts;
-    let layerLine = `${c.bold('Layer 1:')} ${c.sage(`${sigma.toLocaleString()} Sigma`)} + ${c.sage(`${atr} ATR`)}`;
+    const { atr } = state.ruleCounts;
+    let layerLine = `${c.bold('Layer 1:')} ${c.sage(`${atr} ATR rules`)}`;
 
     if (state.aiProvider) {
       layerLine += `\n${c.bold('Layer 2:')} ${c.sage(`${state.aiProvider} (${state.aiModel ?? 'default'})`)}`;

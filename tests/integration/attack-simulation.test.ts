@@ -17,7 +17,6 @@ import { join } from 'node:path';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import type { SecurityEvent } from '@panguard-ai/core';
-import { RuleEngine } from '@panguard-ai/core';
 import {
   EventCorrelator,
   DetectAgent,
@@ -145,8 +144,7 @@ describe('Scenario 1: Brute Force Attack -> Auto-Block', () => {
 
     try {
       // Build the pipeline components
-      const ruleEngine = new RuleEngine();
-      const detectAgent = new DetectAgent(ruleEngine);
+      const detectAgent = new DetectAgent();
       const analyzeAgent = new AnalyzeAgent(null); // no LLM
       const respondAgent = new RespondAgent(
         { autoRespond: 90, notifyAndWait: 70, logOnly: 0 },
@@ -408,8 +406,7 @@ describe('Scenario 3: Rootkit Detection -> Alert Pipeline', () => {
       const event = createRootkitEvent(finding);
 
       // Build pipeline
-      const ruleEngine = new RuleEngine();
-      const detectAgent = new DetectAgent(ruleEngine);
+      const detectAgent = new DetectAgent();
       const analyzeAgent = new AnalyzeAgent(null);
       const respondAgent = new RespondAgent(
         { autoRespond: 90, notifyAndWait: 70, logOnly: 0 },

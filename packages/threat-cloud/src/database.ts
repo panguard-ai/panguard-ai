@@ -46,7 +46,7 @@ export class ThreatCloudDB {
         attack_source_ip TEXT NOT NULL,
         attack_type TEXT NOT NULL,
         mitre_technique TEXT NOT NULL,
-        sigma_rule_matched TEXT NOT NULL,
+        sigma_rule_matched TEXT NOT NULL, -- legacy column name, now stores ATR rule ID
         timestamp TEXT NOT NULL,
         industry TEXT,
         region TEXT NOT NULL,

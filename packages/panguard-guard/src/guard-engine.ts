@@ -36,7 +36,6 @@ import {
   runSecurityAudit,
   SyslogAdapter,
 } from '@panguard-ai/security-hardening';
-import { FalcoMonitor } from './monitors/falco-monitor.js';
 import { SecretWatcher } from './watchers/secret-watcher.js';
 import { DependencyWatcher } from './watchers/dependency-watcher.js';
 import { ProcessWatcher } from './watchers/process-watcher.js';
@@ -80,7 +79,6 @@ export class GuardEngine {
   private watchdog: Watchdog | null = null;
   private monitorEngine: MonitorEngine | null = null;
   private syslogAdapter: SyslogAdapter | null = null;
-  private falcoMonitor: FalcoMonitor | null = null;
   private secretWatcher: SecretWatcher | null = null;
   private dependencyWatcher: DependencyWatcher | null = null;
   private processWatcher: ProcessWatcher | null = null;
@@ -147,7 +145,6 @@ export class GuardEngine {
 
   private get eventProcessorDeps(): EventProcessorDeps {
     return {
-      ruleEngine: this.engines.ruleEngine,
       atrEngine: this.engines.atrEngine,
       detectAgent: this.engines.detectAgent,
       analyzeAgent: this.engines.analyzeAgent,
@@ -204,9 +201,8 @@ export class GuardEngine {
       logger.info(`Syslog adapter initialized: ${syslogServer}:${syslogPort}`);
     }
 
-    // Load all rules (Sigma, ATR, cloud rules, blocklist)
+    // Load all rules (ATR, cloud rules, blocklist)
     await loadAllRules(
-      this.engines.ruleEngine,
       this.engines.atrEngine,
       this.engines.threatCloud,
       this.engines.feedManager,
@@ -215,7 +211,6 @@ export class GuardEngine {
 
     // Periodic Threat Cloud sync (every hour) + initial sync
     const syncDeps = {
-      ruleEngine: this.engines.ruleEngine,
       atrEngine: this.engines.atrEngine,
       threatCloud: this.engines.threatCloud,
       feedManager: this.engines.feedManager,
@@ -235,15 +230,6 @@ export class GuardEngine {
     });
 
     this.monitorEngine.start();
-
-    // Start Falco eBPF monitor (optional, graceful degradation)
-    this.falcoMonitor = new FalcoMonitor();
-    const falcoAvailable = await this.falcoMonitor.checkAvailability();
-    if (falcoAvailable) {
-      this.falcoMonitor.on('event', (event) => void this.processEvent(event));
-      await this.falcoMonitor.start();
-      logger.info('Falco eBPF kernel-level monitoring active');
-    }
 
     // Start secret/env watcher (optional, graceful degradation)
     this.secretWatcher = new SecretWatcher(process.cwd());
@@ -455,10 +441,6 @@ export class GuardEngine {
     if (this.dashboard) await this.dashboard.stop();
     if (this.watchdog) this.watchdog.stop();
     if (this.syslogAdapter) this.syslogAdapter = null;
-    if (this.falcoMonitor) {
-      this.falcoMonitor.stop();
-      this.falcoMonitor = null;
-    }
     if (this.secretWatcher) {
       this.secretWatcher.stop();
       this.secretWatcher = null;
@@ -491,7 +473,6 @@ export class GuardEngine {
     await this.engines.threatCloud.flushQueue();
 
     // Clean up
-    this.engines.ruleEngine.destroy();
     this.pidFile.remove();
 
     this.running = false;
@@ -545,10 +526,6 @@ export class GuardEngine {
     if (!this.dashboard) return;
 
     const memCheck = this.checkMemoryPressure();
-    const ruleCounts = getRuleCounts(
-      this.engines.ruleEngine,
-      this.engines.atrEngine
-    );
     this.dashboard.updateStatus({
       mode: this.mode,
       uptime: this.startTime > 0 ? Date.now() - this.startTime : 0,
@@ -563,7 +540,6 @@ export class GuardEngine {
       heapUsagePercent: memCheck.heapUsagePercent,
       memoryStatus: memCheck.memoryStatus,
       cpuPercent: 0,
-      sigmaRuleCount: ruleCounts.sigma,
       atrRuleCount: this.engines.atrEngine.getRuleCount(),
       atrMatchCount: this.engines.atrEngine.getMatchCount(),
       atrDrafterPatterns: this.engines.atrDrafter?.getPatternCount() ?? 0,
@@ -690,8 +666,8 @@ export class GuardEngine {
   /**
    * Get loaded rule counts for each engine layer.
    */
-  getRuleCounts(): { sigma: number; atr: number } {
-    return getRuleCounts(this.engines.ruleEngine, this.engines.atrEngine);
+  getRuleCounts(): { atr: number } {
+    return getRuleCounts(this.engines.atrEngine);
   }
 
   /**

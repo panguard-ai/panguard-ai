@@ -1,15 +1,13 @@
 /**
  * Memory Footprint Benchmark
  *
- * Tracks heap usage under various loads:
- * - Idle memory
- * - Memory after loading rules
- * - Memory under event processing
+ * Tracks heap usage under various loads.
+ * Sigma RuleEngine benchmarks removed; ATR Engine is used for detection.
  */
 
 import { bench, describe } from 'vitest';
-import { RuleEngine, setLogLevel } from '@panguard-ai/core';
-import type { SecurityEvent, SigmaRule } from '@panguard-ai/core';
+import { setLogLevel } from '@panguard-ai/core';
+import type { SecurityEvent } from '@panguard-ai/core';
 import { DetectAgent } from '../src/agent/detect-agent.js';
 import { EventCorrelator } from '../src/correlation/event-correlator.js';
 import {
@@ -18,12 +16,7 @@ import {
   continuousBaselineUpdate,
 } from '../src/memory/baseline.js';
 
-// Suppress all logging during benchmarks to avoid OOM from stderr writes
 setLogLevel('silent');
-
-// ---------------------------------------------------------------------------
-// Synthetic data factories
-// ---------------------------------------------------------------------------
 
 const CATEGORIES = [
   'brute_force',
@@ -59,70 +52,17 @@ function makeEvent(index: number): SecurityEvent {
   };
 }
 
-function makeRule(index: number): SigmaRule {
-  const category = CATEGORIES[index % CATEGORIES.length]!;
-  return {
-    id: `mem-rule-${index}`,
-    title: `Memory Benchmark Rule ${index}`,
-    status: 'stable' as const,
-    description: `Synthetic rule ${index} for memory benchmarking`,
-    level: SEVERITIES[index % SEVERITIES.length]!,
-    logsource: { category },
-    detection: {
-      selection: { category },
-      condition: 'selection',
-    },
-  };
-}
-
-function generateRules(count: number): SigmaRule[] {
-  return Array.from({ length: count }, (_, i) => makeRule(i));
-}
-
 function generateEvents(count: number): SecurityEvent[] {
   return Array.from({ length: count }, (_, i) => makeEvent(i));
 }
 
-// ---------------------------------------------------------------------------
-// Utility: snapshot heap usage
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Pre-generate data
-// ---------------------------------------------------------------------------
-
-const RULES_3000 = generateRules(3000);
 const EVENTS_1000 = generateEvents(1000);
 const EVENTS_100 = generateEvents(100);
 
-// ---------------------------------------------------------------------------
-// Benchmarks
-// ---------------------------------------------------------------------------
-
 describe('Memory Footprint', () => {
-  describe('RuleEngine memory allocation', () => {
-    bench('create RuleEngine with 100 rules', () => {
-      const rules = RULES_3000.slice(0, 100);
-      const engine = new RuleEngine({ customRules: rules });
-      engine.getRules(); // access to prevent dead-code elimination
-    });
-
-    bench('create RuleEngine with 1000 rules', () => {
-      const rules = RULES_3000.slice(0, 1000);
-      const engine = new RuleEngine({ customRules: rules });
-      engine.getRules();
-    });
-
-    bench('create RuleEngine with 3000 rules', () => {
-      const engine = new RuleEngine({ customRules: RULES_3000 });
-      engine.getRules();
-    });
-  });
-
   describe('DetectAgent under load', () => {
-    bench('detect 100 events (3000 rules) - memory pressure', () => {
-      const engine = new RuleEngine({ customRules: RULES_3000 });
-      const agent = new DetectAgent(engine);
+    bench('detect 100 events - memory pressure', () => {
+      const agent = new DetectAgent();
       for (let i = 0; i < 100; i++) {
         agent.detect({
           ...EVENTS_100[i % EVENTS_100.length]!,
@@ -131,9 +71,8 @@ describe('Memory Footprint', () => {
       }
     });
 
-    bench('detect 500 events (3000 rules) - sustained load', () => {
-      const engine = new RuleEngine({ customRules: RULES_3000 });
-      const agent = new DetectAgent(engine);
+    bench('detect 500 events - sustained load', () => {
+      const agent = new DetectAgent();
       for (let i = 0; i < 500; i++) {
         agent.detect({
           ...EVENTS_1000[i % EVENTS_1000.length]!,
@@ -177,23 +116,6 @@ describe('Memory Footprint', () => {
         });
       }
     });
-
-    bench('correlator with 5000 events (near max buffer)', () => {
-      const correlator = new EventCorrelator(5 * 60 * 1000, 5000);
-      const now = Date.now();
-      for (let i = 0; i < 5000; i++) {
-        correlator.addEvent({
-          id: `mem-corr5-${now}-${i}`,
-          timestamp: now + i,
-          sourceIP: `10.0.${Math.floor(i / 256)}.${i % 256}`,
-          source: SOURCES[i % SOURCES.length]!,
-          category: CATEGORIES[i % CATEGORIES.length]!,
-          severity: SEVERITIES[i % SEVERITIES.length]!,
-          ruleIds: [`rule-${i % 100}`],
-          metadata: { destinationPort: 1024 + i },
-        });
-      }
-    });
   });
 
   describe('Baseline memory with increasing patterns', () => {
@@ -213,11 +135,9 @@ describe('Memory Footprint', () => {
 
     bench('continuous update baseline with 200 benign events', () => {
       let baseline = createEmptyBaseline();
-      // Build initial baseline
       for (let i = 0; i < 100; i++) {
         baseline = updateBaseline(baseline, EVENTS_100[i % EVENTS_100.length]!);
       }
-      // Then continuous updates
       for (let i = 0; i < 200; i++) {
         baseline = continuousBaselineUpdate(
           baseline,
@@ -229,9 +149,8 @@ describe('Memory Footprint', () => {
   });
 
   describe('Combined system memory pressure', () => {
-    bench('full pipeline: RuleEngine + DetectAgent + Correlator + Baseline (100 events)', () => {
-      const engine = new RuleEngine({ customRules: RULES_3000 });
-      const agent = new DetectAgent(engine);
+    bench('full pipeline: DetectAgent + Correlator + Baseline (100 events)', () => {
+      const agent = new DetectAgent();
       const correlator = new EventCorrelator(5 * 60 * 1000, 5000);
       let baseline = createEmptyBaseline();
 

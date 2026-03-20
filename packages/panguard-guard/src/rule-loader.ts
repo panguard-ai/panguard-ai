@@ -13,7 +13,6 @@
 import { join } from 'node:path';
 import {
   createLogger,
-  RuleEngine,
   ThreatIntelFeedManager,
   setFeedManager,
   SmartRouter,
@@ -28,7 +27,7 @@ import { loadBaseline } from './memory/index.js';
 import { InvestigationEngine } from './investigation/index.js';
 import { ThreatCloudClient } from './threat-cloud/index.js';
 import { validateLicense, hasFeature } from './license/index.js';
-import { BUILTIN_RULES } from './rules/builtin-rules.js';
+// BUILTIN_RULES removed (Sigma RuleEngine no longer used)
 import { GuardATREngine } from './engines/atr-engine.js';
 import { ATRDrafter } from './engines/atr-drafter.js';
 import { PlaybookEngine } from './playbook/index.js';
@@ -44,7 +43,6 @@ const logger = createLogger('panguard-guard:rule-loader');
 
 /** Result of initializing all engines and agents */
 export interface InitEnginesResult {
-  readonly ruleEngine: RuleEngine;
   readonly atrEngine: GuardATREngine;
   readonly detectAgent: DetectAgent;
   readonly analyzeAgent: AnalyzeAgent;
@@ -119,12 +117,6 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
       `授權: ${license.tier} 等級 (有效: ${license.isValid})`
   );
 
-  const ruleEngine = new RuleEngine({
-    rulesDir: join(config.dataDir, 'rules'),
-    hotReload: true,
-    customRules: BUILTIN_RULES,
-  });
-
   const atrEngine = new GuardATREngine({
     rulesDir: join(config.dataDir, 'atr-rules'),
     hotReload: true,
@@ -135,7 +127,7 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
     },
   });
 
-  const detectAgent = new DetectAgent(ruleEngine);
+  const detectAgent = new DetectAgent();
   const analyzeLLM = hasFeature(license, 'ai_analysis') ? llm : null;
   const analyzeAgent = new AnalyzeAgent(analyzeLLM);
 
@@ -221,7 +213,6 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
   logger.info('GuardEngine initialized / GuardEngine 已初始化');
 
   return {
-    ruleEngine,
     atrEngine,
     detectAgent,
     analyzeAgent,
@@ -244,7 +235,6 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
  * Called during GuardEngine.start().
  */
 export async function loadAllRules(
-  ruleEngine: RuleEngine,
   atrEngine: GuardATREngine,
   threatCloud: ThreatCloudClient,
   feedManager: ThreatIntelFeedManager,
@@ -262,8 +252,6 @@ export async function loadAllRules(
         `Threat intel feed start failed (using hardcoded list): ${err instanceof Error ? err.message : String(err)}`
       );
     });
-
-  await ruleEngine.loadRules();
 
   atrEngine
     .loadRules()
@@ -302,18 +290,6 @@ export async function loadAllRules(
       );
     });
 
-  const cloudRules = await threatCloud.fetchRules();
-  for (const rule of cloudRules) {
-    try {
-      const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/core').SigmaRule;
-      if (parsed.id && parsed.title && parsed.detection) {
-        ruleEngine.addRule(parsed);
-      }
-    } catch {
-      // Skip invalid cloud rules
-    }
-  }
-
   threatCloud
     .fetchBlocklist()
     .then((ips) => {
@@ -337,11 +313,9 @@ export async function loadAllRules(
  * Get loaded rule counts for each engine layer.
  */
 export function getRuleCounts(
-  ruleEngine: RuleEngine,
   atrEngine: GuardATREngine
-): { sigma: number; atr: number } {
+): { atr: number } {
   return {
-    sigma: ruleEngine.getRules().length,
     atr: atrEngine.getRuleCount(),
   };
 }

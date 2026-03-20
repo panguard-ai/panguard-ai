@@ -11,7 +11,7 @@
  */
 
 import { createLogger, checkThreatIntel } from '@panguard-ai/core';
-import type { SecurityEvent, RuleMatch, RuleEngine } from '@panguard-ai/core';
+import type { SecurityEvent } from '@panguard-ai/core';
 import type { DetectionResult, CorrelationEvent } from '../types.js';
 import { EventCorrelator } from '../correlation/event-correlator.js';
 
@@ -52,7 +52,6 @@ interface DedupEntry {
  * threat intelligence, event correlation, and deduplication.
  */
 export class DetectAgent {
-  private readonly ruleEngine: RuleEngine;
   private detectionCount = 0;
 
   /** Sliding window for event correlation */
@@ -64,8 +63,7 @@ export class DetectAgent {
   /** Pattern-based multi-step attack correlator */
   private readonly correlator: EventCorrelator;
 
-  constructor(ruleEngine: RuleEngine) {
-    this.ruleEngine = ruleEngine;
+  constructor() {
     this.correlator = new EventCorrelator(CORRELATION_WINDOW_MS, MAX_CORRELATION_BUFFER);
   }
 
@@ -82,10 +80,7 @@ export class DetectAgent {
   detect(event: SecurityEvent): DetectionResult | null {
     logger.info(`Processing event: ${event.id} [${event.source}]`);
 
-    // Step 1: Match against Sigma rules
-    const ruleMatches: RuleMatch[] = this.ruleEngine.match(event);
-
-    // Step 2: Check threat intelligence (supports multiple IP fields)
+    // Check threat intelligence (supports multiple IP fields)
     let threatIntelMatch: { ip: string; threat: string } | undefined;
     if (event.source === 'network') {
       const ip = this.extractIP(event);
@@ -97,25 +92,24 @@ export class DetectAgent {
       }
     }
 
-    // If no matches found, return null (normal event)
-    if (ruleMatches.length === 0 && !threatIntelMatch) {
+    // If no threat intel match, return null (ATR evaluation happens in event-processor)
+    if (!threatIntelMatch) {
       return null;
     }
 
-    // Step 3: Deduplication — skip if identical detection within window
-    const dedupKey = this.buildDedupKey(event, ruleMatches);
+    // Deduplication — skip if identical detection within window
+    const dedupKey = this.buildDedupKeyForThreatIntel(event, threatIntelMatch);
     if (this.isDuplicate(dedupKey)) {
       logger.info(`Dedup: skipping duplicate detection for event ${event.id}`);
       return null;
     }
     this.recordDedup(dedupKey);
 
-    // Step 4: Correlation — check for attack chain (legacy IP-based)
+    // Correlation — check for attack chain (IP-based)
     const sourceIP = this.extractIP(event);
-    const ruleIds = ruleMatches.map((m) => m.rule.id);
-    const attackChain = this.correlate(event, ruleIds, sourceIP);
+    const attackChain = this.correlate(event, [], sourceIP);
 
-    // Step 5: Advanced pattern-based correlation
+    // Advanced pattern-based correlation
     const correlationEvent: CorrelationEvent = {
       id: event.id,
       timestamp: Date.now(),
@@ -123,7 +117,7 @@ export class DetectAgent {
       source: event.source,
       category: event.category,
       severity: event.severity,
-      ruleIds,
+      ruleIds: [],
       metadata: event.metadata ?? {},
     };
     const correlationResult = this.correlator.addEvent(correlationEvent);
@@ -132,11 +126,7 @@ export class DetectAgent {
 
     const result: DetectionResult = {
       event,
-      ruleMatches: ruleMatches.map((m: RuleMatch) => ({
-        ruleId: m.rule.id,
-        ruleName: m.rule.title,
-        severity: (m.rule.level ?? 'medium') as SecurityEvent['severity'],
-      })),
+      ruleMatches: [],
       threatIntelMatch,
       timestamp: new Date().toISOString(),
       // Attach correlation metadata if attack chain detected
@@ -146,8 +136,7 @@ export class DetectAgent {
     };
 
     logger.info(
-      `Threat detected for event ${event.id}: ${ruleMatches.length} rule matches, ` +
-        `threat intel: ${threatIntelMatch ? 'yes' : 'no'}, ` +
+      `Threat detected for event ${event.id}: threat intel match, ` +
         `attack chain: ${attackChain ? `${attackChain.eventCount} events` : 'no'}, ` +
         `correlation patterns: ${correlationResult.patterns.length > 0 ? correlationResult.patterns.map((p) => p.type).join(', ') : 'none'}`
     );
@@ -186,14 +175,12 @@ export class DetectAgent {
   // Deduplication
   // ---------------------------------------------------------------------------
 
-  /** Build a dedup key from event source + matched rule IDs */
-  private buildDedupKey(event: SecurityEvent, matches: RuleMatch[]): string {
-    const ip = this.extractIP(event) ?? 'no-ip';
-    const rules = matches
-      .map((m) => m.rule.id)
-      .sort()
-      .join(',');
-    return `${event.source}:${ip}:${rules}`;
+  /** Build a dedup key from event source + threat intel match */
+  private buildDedupKeyForThreatIntel(
+    event: SecurityEvent,
+    threatIntel: { ip: string; threat: string }
+  ): string {
+    return `${event.source}:${threatIntel.ip}:${threatIntel.threat}`;
   }
 
   /** Check if this key was seen within the dedup window */

@@ -11,7 +11,7 @@
  */
 
 import { createLogger } from '@panguard-ai/core';
-import type { RuleEngine, ThreatIntelFeedManager } from '@panguard-ai/core';
+import type { ThreatIntelFeedManager } from '@panguard-ai/core';
 import type { GuardConfig } from './types.js';
 import type { ThreatCloudClient } from './threat-cloud/index.js';
 import type { GuardATREngine } from './engines/atr-engine.js';
@@ -20,7 +20,6 @@ const logger = createLogger('panguard-guard:rule-sync');
 
 /** Dependencies needed for cloud sync operations */
 export interface CloudSyncDeps {
-  readonly ruleEngine: RuleEngine;
   readonly atrEngine: GuardATREngine;
   readonly threatCloud: ThreatCloudClient;
   readonly feedManager: ThreatIntelFeedManager;
@@ -33,26 +32,9 @@ export interface CloudSyncDeps {
  * skill whitelist and blacklist.
  */
 export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
-  const { ruleEngine, atrEngine, threatCloud, feedManager, config } = deps;
+  const { atrEngine, threatCloud, feedManager } = deps;
 
   try {
-    // Refresh Sigma rules
-    const cloudRules = await threatCloud.fetchRules();
-    let newRules = 0;
-    for (const rule of cloudRules) {
-      try {
-        const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/core').SigmaRule;
-        if (parsed.id && parsed.title && parsed.detection) {
-          ruleEngine.addRule(parsed);
-          newRules++;
-        }
-      } catch (parseErr: unknown) {
-        logger.warn(
-          `Skipping invalid Sigma rule from cloud: ${rule.ruleId ?? 'unknown'} — ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`
-        );
-      }
-    }
-
     // Sync ATR rules from Threat Cloud
     let newATRRules = 0;
     try {
@@ -153,9 +135,9 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
     }
 
     logger.info(
-      `Threat Cloud sync: ${newRules} Sigma, ${newATRRules} ATR, ` +
+      `Threat Cloud sync: ${newATRRules} ATR, ` +
         `${addedIPs} IPs, ${addedDomains} domains, ${importedSkills} whitelist, ${revokedSkills} blacklist / ` +
-        `Threat Cloud 同步: ${newRules} Sigma, ${newATRRules} ATR, ` +
+        `Threat Cloud 同步: ${newATRRules} ATR, ` +
         `${addedIPs} IP, ${addedDomains} 網域, ${importedSkills} 白名單, ${revokedSkills} 黑名單`
     );
   } catch (err: unknown) {

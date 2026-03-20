@@ -81,9 +81,6 @@ export function mapSeverity(severity: string): Severity {
 export function mapEventSource(source: string): EventSource {
   const normalized = source.toLowerCase().trim();
 
-  if (normalized.includes('falco')) {
-    return 'falco';
-  }
   if (normalized.includes('syslog')) {
     return 'syslog';
   }

@@ -50,7 +50,7 @@ The 6 flywheel core components currently have minimal direct test coverage:
 
 - `skill-watcher.ts` (SkillWatcher: config watch, auto-audit trigger, blacklist check)
 - `llm-reviewer.ts` (LLM reviewer: analyzeSkills, reviewProposal, parseVerdict)
-- `rule-sync.ts` (Rule sync: YARA download, rule file write, path sanitization)
+- `rule-sync.ts` (Rule sync: ATR cloud sync, IP/domain blocklist refresh)
 - `server.ts` (TC server: all 7 POST handlers with Zod validation)
 - `atr-action-handlers.ts` (ATR actions: quarantine, reduce permissions, path sanitization)
 - `os-actions.ts` (OS actions: isolateFile with SAFE_PATHS/DENY_PATHS)
@@ -76,3 +76,15 @@ Restored `useTranslations('home.finalCta')` in FinalCTANew.tsx. Full EN + ZH tra
 ## P3 - Dashboard WebSocket Token Auth (S)
 
 Guard dashboard WebSocket endpoint (`/ws`) has no authentication. Add token-based auth: generate a one-time token on dashboard page load, validate on WS upgrade, reject unauthenticated connections. Low risk since dashboard binds to localhost, but needed for defense-in-depth.
+
+## P2 - Knowledge Distiller: Convert to ATR Output Format (M)
+
+`packages/core/src/ai/knowledge-distiller.ts` currently generates Sigma YAML rules from learned event patterns. With the Sigma RuleEngine removed, these generated rules have no consumer. Convert the distiller to output ATR-format rules instead, enabling the local learning flywheel:
+
+Events observed → Pattern learned → ATR rule generated → ATR Engine loads → Better detection
+
+The distiller uses LLM to generate rules — main change is updating the prompt template and output parser to produce ATR YAML instead of Sigma YAML. Threat Cloud already has ATR rule creation infrastructure that can be referenced for format.
+
+## P3 - Rename Legacy DB Field: sigma_rule_matched (S)
+
+`packages/threat-cloud/src/database.ts` and `packages/panguard-guard/src/types.ts` still use `sigma_rule_matched` / `sigmaRuleMatched` as a field name. This is a legacy name from when the detection engine was Sigma-based. Should be renamed to `rule_matched` / `ruleMatched` with a DB migration. Low priority since it's internal and doesn't affect functionality.

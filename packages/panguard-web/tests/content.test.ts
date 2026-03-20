@@ -81,7 +81,7 @@ describe('Personas', () => {
     for (const persona of getAllPersonas()) {
       for (const scenario of persona.scenarios) {
         // Notifications should NOT contain technical jargon
-        const jargonTerms = ['Sigma Rule', 'YARA', 'IOC', 'MITRE ATT&CK'];
+        const jargonTerms = ['IOC', 'MITRE ATT&CK'];
         for (const term of jargonTerms) {
           expect(scenario.notificationEn).not.toContain(term);
           expect(scenario.notificationZh).not.toContain(term);

@@ -69,12 +69,6 @@ describe('Platform Integrity', () => {
       expect(typeof core.calculateRiskScore).toBe('function');
     });
 
-    it('core should export rule engine', () => {
-      expect(core.RuleEngine).toBeDefined();
-      expect(typeof core.parseSigmaYaml).toBe('function');
-      expect(typeof core.matchEvent).toBe('function');
-    });
-
     it('core should export monitor engine', () => {
       expect(core.MonitorEngine).toBeDefined();
       expect(typeof core.normalizeLogEvent).toBe('function');
@@ -255,10 +249,9 @@ describe('Platform Integrity', () => {
       expect(attackTypes).toContain('sql_injection');
     });
 
-    it('should have 5 internal Sigma rules', () => {
-      // Sigma rules are loaded from core
-      expect(typeof core.parseSigmaYaml).toBe('function');
-      expect(typeof core.matchEvent).toBe('function');
+    it('should have ATR rules version exported from core', () => {
+      // Sigma RuleEngine removed; ATR Engine is used exclusively
+      expect(core.RULES_VERSION).toBeDefined();
     });
 
     it('should have 8 investigation tools in guard', () => {

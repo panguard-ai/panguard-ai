@@ -70,8 +70,6 @@ tr:hover td{background:var(--surface2)}
 .badge.medium{background:rgba(236,201,75,.15);color:var(--yellow)}
 .badge.low{background:rgba(72,187,120,.15);color:var(--green)}
 .badge.informational{background:rgba(66,153,225,.15);color:var(--blue)}
-.badge.sigma{background:rgba(66,153,225,.15);color:var(--blue)}
-.badge.yara{background:rgba(237,137,54,.15);color:var(--orange)}
 .badge.atr{background:rgba(79,209,197,.15);color:var(--accent)}
 /* Charts */
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
@@ -311,7 +309,7 @@ function renderRules(){
     let html='<div class="table-wrap"><div class="table-header"><h2>Rules ('+num(total)+' of '+num(allRules.length)+')</h2>';
     html+='<div class="controls">';
     html+='<input type="text" placeholder="Search..." value="'+h(rulesFilter.search)+'" onchange="rulesFilter.search=this.value;rulesPage=0;renderRules()"/>';
-    html+='<select onchange="rulesFilter.source=this.value;rulesPage=0;renderRules()"><option value="">All Sources</option><option value="sigma"'+(rulesFilter.source==='sigma'?' selected':'')+'>Sigma</option><option value="yara"'+(rulesFilter.source==='yara'?' selected':'')+'>YARA</option><option value="atr"'+(rulesFilter.source==='atr'?' selected':'')+'>ATR</option></select>';
+    html+='<select onchange="rulesFilter.source=this.value;rulesPage=0;renderRules()"><option value="">All Sources</option><option value="atr"'+(rulesFilter.source==='atr'?' selected':'')+'>ATR</option></select>';
     html+='<select onchange="rulesFilter.severity=this.value;rulesPage=0;renderRules()"><option value="">All Severity</option><option value="critical"'+(rulesFilter.severity==='critical'?' selected':'')+'>Critical</option><option value="high"'+(rulesFilter.severity==='high'?' selected':'')+'>High</option><option value="medium"'+(rulesFilter.severity==='medium'?' selected':'')+'>Medium</option><option value="low"'+(rulesFilter.severity==='low'?' selected':'')+'>Low</option></select>';
     html+='</div></div>';
     html+='<table><tr><th>Rule ID</th><th>Source</th><th>Category</th><th>Severity</th><th>Published</th></tr>';
@@ -359,7 +357,7 @@ function renderThreats(){
     html+='<div class="table-wrap"><div class="table-header"><h2>Threat Events ('+num(meta.total)+')</h2></div>';
     if(!threats.length){html+='<div class="empty">No threat events collected yet. Threats are submitted by Guard instances.</div>';}
     else{
-      html+='<table><tr><th>Source IP</th><th>Attack Type</th><th>MITRE</th><th>Sigma Rule</th><th>Region</th><th>Time</th></tr>';
+      html+='<table><tr><th>Source IP</th><th>Attack Type</th><th>MITRE</th><th>Rule Matched</th><th>Region</th><th>Time</th></tr>';
       threats.forEach(t=>{
         html+='<tr><td>'+h(t.attack_source_ip)+'</td>';
         html+='<td>'+h(t.attack_type)+'</td>';

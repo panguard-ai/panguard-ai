@@ -49,8 +49,7 @@ export type EvidenceSource =
   | 'ai_analysis'
   | 'baseline_deviation'
   | 'threat_intel'
-  | 'investigation'
-  | 'falco';
+  | 'investigation';
 
 /** Evidence item / 證據項目 */
 export interface Evidence {
@@ -456,7 +455,6 @@ export interface DashboardStatus {
   cpuPercent: number;
   lastEvent?: SecurityEvent;
   recentVerdicts: ThreatVerdict[];
-  sigmaRuleCount?: number;
   atrRuleCount?: number;
   atrMatchCount?: number;
   atrDrafterPatterns?: number;

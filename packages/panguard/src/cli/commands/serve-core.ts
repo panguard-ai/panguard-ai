@@ -172,7 +172,7 @@ function serveStaticFile(
 
 /**
  * Seed rules from bundled config/ directory into Threat Cloud DB.
- * Reads Sigma YAML, YARA, and ATR YAML files.
+ * Reads ATR YAML files.
  * Returns count of rules seeded.
  */
 export async function seedRulesFromBundled(threatDb: ThreatCloudDBInstance): Promise<number> {

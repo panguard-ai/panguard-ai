@@ -159,7 +159,7 @@ export const PRODUCT_FEATURES: ProductFeature[] = [
     highlightsEn: [
       'Multi-agent pipeline: Detect > Analyze > Respond > Report',
       '3-layer funnel: Rules (90%) > Local AI (7%) > Cloud AI (3%)',
-      '69 ATR rules + 9,700+ integrated Sigma/YARA rules',
+      '69+ ATR rules for AI agent threat detection',
       'Auto-block, auto-isolate, auto-notify',
       'Skill behavior monitoring - catches runtime threats',
       'Panguard Threat Cloud - collective intelligence',
@@ -167,7 +167,7 @@ export const PRODUCT_FEATURES: ProductFeature[] = [
     highlightsZh: [
       '多 Agent 管線：偵測 > 分析 > 回應 > 報告',
       '三層漏斗：規則 (90%) > 本地 AI (7%) > 雲端 AI (3%)',
-      '69 條 ATR 規則 + 9,700+ 條整合 Sigma/YARA 規則',
+      '69+ 條 ATR 規則，AI 代理威脅偵測',
       '自動封鎖、自動隔離、自動通知',
       'Skill 行為監控 - 捕捉執行期威脅',
       'Panguard Threat Cloud - 集體威脅智慧',
