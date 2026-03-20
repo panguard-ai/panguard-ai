@@ -10,6 +10,12 @@ const eco = STATS.ecosystem;
 const safePercent = ((eco.findingsClean / eco.skillsScanned) * 100).toFixed(1);
 const critPercent = ((eco.findingsCritical / eco.skillsScanned) * 100).toFixed(1);
 const highPercent = ((eco.findingsHigh / eco.skillsScanned) * 100).toFixed(1);
+const medPercent = ((eco.findingsMedium / eco.skillsScanned) * 100).toFixed(1);
+const lowPercent = ((eco.findingsLow / eco.skillsScanned) * 100).toFixed(1);
+const flaggedPercent = (
+  ((eco.skillsScanned - eco.findingsClean) / eco.skillsScanned) *
+  100
+).toFixed(0);
 
 /* Real findings from ecosystem scan (anonymized) */
 const CASE_STUDIES = [
@@ -92,15 +98,15 @@ export default function EcosystemReportContent() {
             SECURITY RESEARCH
           </p>
           <h1 className="text-[clamp(26px,5vw,52px)] font-bold text-text-primary leading-[1.1] max-w-4xl mx-auto">
-            We Scanned {eco.skillsScanned.toLocaleString()} MCP Skills.
+            We Scanned {eco.skillsScanned.toLocaleString()} MCP Packages.
             <br />
-            <span className="text-red-400">2% Were Stealing Your Credentials.</span>
+            <span className="text-red-400">{flaggedPercent}% Had Security Issues.</span>
           </h1>
           <p className="text-text-secondary mt-4 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             The first large-scale security audit of the MCP skill ecosystem.{' '}
-            {eco.entriesCrawled.toLocaleString()} registry entries crawled.{' '}
-            {eco.skillsScanned.toLocaleString()} skills analyzed. {eco.maliciousFound} malicious
-            skills found.
+            {eco.skillsScanned.toLocaleString()} packages analyzed.{' '}
+            {eco.toolsExtracted.toLocaleString()} tool definitions extracted.{' '}
+            {flaggedPercent}% flagged.
           </p>
           <p className="text-text-muted text-xs mt-4">
             Published March 2026 | Methodology: {STATS.atrRules} ATR rules + secret detection +
@@ -112,15 +118,20 @@ export default function EcosystemReportContent() {
       {/* Key Numbers */}
       <SectionWrapper>
         <FadeInUp>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 max-w-5xl mx-auto">
             <NumberCard
               value={eco.skillsScanned.toLocaleString()}
-              label="Skills Scanned"
+              label="Packages Scanned"
               color="text-text-primary"
             />
             <NumberCard value={`${safePercent}%`} label="Clean" color="text-emerald-400" />
             <NumberCard value={`${critPercent}%`} label="CRITICAL" color="text-red-400" />
             <NumberCard value={`${highPercent}%`} label="HIGH" color="text-orange-400" />
+            <NumberCard
+              value={eco.toolsExtracted.toLocaleString()}
+              label="Tools Extracted"
+              color="text-text-primary"
+            />
           </div>
         </FadeInUp>
       </SectionWrapper>
@@ -164,7 +175,7 @@ export default function EcosystemReportContent() {
                 We crawled {eco.entriesCrawled.toLocaleString()} MCP/AI skill entries from{' '}
                 {eco.registrySources} sources (npm registry, GitHub repositories, community
                 awesome-lists). Of these, {eco.skillsScanned.toLocaleString()} had parseable
-                SKILL.md or README.md files that could be analyzed.
+                SKILL.md, README.md files, or built JavaScript that could be analyzed.
               </p>
               <p>Each skill was scanned using:</p>
               <ul className="list-disc list-inside space-y-1 ml-4">
@@ -199,7 +210,7 @@ export default function EcosystemReportContent() {
         <FadeInUp>
           <div className="max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold text-text-primary mb-6">Results</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
               <ResultCard
                 value={eco.findingsClean.toLocaleString()}
                 label="CLEAN"
@@ -227,11 +238,35 @@ export default function EcosystemReportContent() {
               <ResultCard
                 value={eco.findingsMedium.toString()}
                 label="MEDIUM"
-                percent={((eco.findingsMedium / eco.skillsScanned) * 100).toFixed(1)}
+                percent={medPercent}
                 bg="bg-yellow-400/10"
                 border="border-yellow-400/30"
                 color="text-yellow-400"
               />
+              <ResultCard
+                value={eco.findingsLow.toString()}
+                label="LOW"
+                percent={lowPercent}
+                bg="bg-blue-400/10"
+                border="border-blue-400/30"
+                color="text-blue-400"
+              />
+            </div>
+
+            <h3 className="text-lg font-bold text-text-primary mb-4">Key Indicators</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+              <div className="bg-surface-1 border border-border rounded-lg px-4 py-3 text-center">
+                <p className="text-xl font-extrabold text-red-400">{eco.tripleThreat}</p>
+                <p className="text-xs text-text-muted mt-1">Triple threat (shell + net + fs)</p>
+              </div>
+              <div className="bg-surface-1 border border-border rounded-lg px-4 py-3 text-center">
+                <p className="text-xl font-extrabold text-orange-400">{eco.postinstallScripts}</p>
+                <p className="text-xs text-text-muted mt-1">Postinstall scripts</p>
+              </div>
+              <div className="bg-surface-1 border border-border rounded-lg px-4 py-3 text-center">
+                <p className="text-xl font-extrabold text-text-primary">{eco.atrRuleMatches.toLocaleString()}</p>
+                <p className="text-xs text-text-muted mt-1">Total ATR rule matches</p>
+              </div>
             </div>
 
             <h3 className="text-lg font-bold text-text-primary mb-4">Threat Category Breakdown</h3>
@@ -386,7 +421,7 @@ export default function EcosystemReportContent() {
             <div className="flex flex-wrap gap-3 justify-center">
               <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  'We scanned 1,295 MCP skills. 2% were stealing credentials.\n\nSSH keys, API tokens, prompt injection — all found in real skills from npm.\n\nFull report + free scanner:'
+                  'We scanned 2,386 MCP packages. 49% had security issues.\n\nSSH keys, API tokens, prompt injection — all found in real packages from npm.\n\nFull report + free scanner:'
                 )}&url=${encodeURIComponent('https://panguard.ai/research/mcp-ecosystem-scan')}`}
                 target="_blank"
                 rel="noopener noreferrer"
