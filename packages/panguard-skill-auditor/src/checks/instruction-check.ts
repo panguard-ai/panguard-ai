@@ -164,6 +164,60 @@ const HOMOGLYPH_MAP: Record<string, string> = {
 };
 const HOMOGLYPH_RE = new RegExp(`[${Object.keys(HOMOGLYPH_MAP).join('')}]`);
 
+/**
+ * Known-safe install URLs — legitimate package manager install scripts.
+ * curl|bash for these URLs is standard practice, not an attack.
+ */
+const SAFE_INSTALL_URLS = [
+  'bun.sh/install',
+  'get.docker.com',
+  'install.python-poetry.org',
+  'raw.githubusercontent.com/nvm-sh/nvm',
+  'sh.rustup.rs',
+  'deno.land/install',
+  'get.pnpm.io/install',
+  'brew.sh',
+  'ohmyz.sh/install',
+  'raw.githubusercontent.com/Homebrew',
+  'sdk.cloud.google.com',
+  'cli.github.com',
+  'astral.sh/uv',
+];
+
+/**
+ * Check if a curl|bash match targets a known-safe install URL.
+ * Only looks at the same line as the match to avoid cross-line false negatives.
+ */
+function isSafeInstallCommand(instructions: string, matchIndex: number): boolean {
+  const lineStart = instructions.lastIndexOf('\n', matchIndex) + 1;
+  const lineEnd = instructions.indexOf('\n', matchIndex);
+  const line = instructions.substring(lineStart, lineEnd === -1 ? undefined : lineEnd).toLowerCase();
+  return SAFE_INSTALL_URLS.some((url) => line.includes(url.toLowerCase()));
+}
+
+/** Severity levels for downgrading */
+type Severity = 'critical' | 'high' | 'medium' | 'low' | 'info';
+
+/** Downgrade severity by one level (for documentation/setup context) */
+function downgradeSeverity(severity: Severity): Severity {
+  switch (severity) {
+    case 'critical': return 'medium';
+    case 'high': return 'low';
+    case 'medium': return 'low';
+    case 'low': return 'info';
+    default: return severity;
+  }
+}
+
+/**
+ * Check if a match appears inside a setup/installation section.
+ * Looks for common section headers before the match position.
+ */
+function isInSetupSection(instructions: string, matchIndex: number): boolean {
+  const before = instructions.substring(Math.max(0, matchIndex - 500), matchIndex).toLowerCase();
+  return /(?:^|\n)#{1,4}\s*(setup|install|getting started|prerequisites|quick start|requirements|dependencies)/m.test(before);
+}
+
 /** Base64-encoded suspicious keywords — lowered threshold to 20 chars */
 const BASE64_BLOCK_RE = /[A-Za-z0-9+/]{20,}={0,2}/g;
 const SUSPICIOUS_DECODED =
@@ -173,7 +227,16 @@ const SUSPICIOUS_DECODED =
 const HEX_ESCAPE_RE = /(\\x[0-9a-fA-F]{2}){8,}/g;
 const HEX_BLOCK_RE = /\b([0-9a-fA-F]{2}){12,}\b/g;
 
-export function checkInstructions(instructions: string): CheckResult {
+/**
+ * Check instructions for prompt injection and tool poisoning patterns.
+ *
+ * @param instructions - The full text content to scan
+ * @param sourceType - Context hint: 'skill' (SKILL.md, default) or 'documentation' (README, docs)
+ */
+export function checkInstructions(
+  instructions: string,
+  sourceType: 'skill' | 'documentation' = 'skill'
+): CheckResult {
   const findings: AuditFinding[] = [];
 
   // Pattern matching
@@ -181,11 +244,36 @@ export function checkInstructions(instructions: string): CheckResult {
     const match = pattern.regex.exec(instructions);
     if (match) {
       const lineNum = instructions.substring(0, match.index).split('\n').length;
+
+      // Context-aware filtering: skip curl|bash if it's a known-safe install URL
+      if (pattern.id === 'tp-curl-pipe-bash' && isSafeInstallCommand(instructions, match.index)) {
+        findings.push({
+          id: pattern.id,
+          title: `${pattern.title} (known-safe install script)`,
+          description: `Detected near line ${lineNum}: "${match[0].substring(0, 80)}" — targets a known package manager URL, downgraded.`,
+          severity: 'low',
+          category: pattern.category,
+          location: `SKILL.md:${lineNum}`,
+        });
+        continue;
+      }
+
+      // Context-aware: downgrade findings in setup/installation sections
+      let severity = pattern.severity;
+      if (isInSetupSection(instructions, match.index)) {
+        severity = downgradeSeverity(severity) as typeof severity;
+      }
+
+      // Context-aware: downgrade findings from documentation sources
+      if (sourceType === 'documentation') {
+        severity = downgradeSeverity(severity) as typeof severity;
+      }
+
       findings.push({
         id: pattern.id,
         title: pattern.title,
         description: `Detected near line ${lineNum}: "${match[0].substring(0, 80)}"`,
-        severity: pattern.severity,
+        severity,
         category: pattern.category,
         location: `SKILL.md:${lineNum}`,
       });
