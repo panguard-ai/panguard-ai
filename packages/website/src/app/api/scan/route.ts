@@ -388,10 +388,77 @@ function isRuleSafeInstall(ruleId: string, ruleDesc: string, originalContent: st
   return allCurlBashAreSafe(originalContent);
 }
 
+// ---------------------------------------------------------------------------
+// Context Signals (inline version — mirrors panguard-skill-auditor/context-signals.ts)
+// TODO: unify with @panguard-ai/panguard-skill-auditor/context-signals
+// ---------------------------------------------------------------------------
+
+interface WebContextSignal {
+  id: string;
+  type: 'booster' | 'reducer';
+  label: string;
+  weight: number;
+}
+
+function detectWebContextSignals(
+  content: string,
+  skillName: string | null
+): { signals: WebContextSignal[]; multiplier: number } {
+  const signals: WebContextSignal[] = [];
+
+  // ── Boosters (malicious) ──
+  if (/<IMPORTANT>/i.test(content)) {
+    signals.push({ id: 'boost-important-block', type: 'booster', label: '<IMPORTANT> hidden instruction block', weight: 0.5 });
+  }
+  if (/\b(do\s+not\s+tell|don[''\u2019t]*\s+(tell|mention|notify|inform|reveal|show)|keep\s+(this\s+)?hidden|hide\s+this\s+from|this\s+is\s+(?:a\s+)?secret|be\s+very\s+gentle\s+and\s+not\s+scary)\b/i.test(content)) {
+    signals.push({ id: 'boost-concealment', type: 'booster', label: 'Concealment language', weight: 0.5 });
+  }
+  if (/\.(workers\.dev|ngrok\.io|pipedream\.net|requestbin\.com|hookbin\.com|webhook\.site)\b|[?&](data|payload|exfil|stolen|secret|dump)=/i.test(content)) {
+    signals.push({ id: 'boost-exfil-url', type: 'booster', label: 'Exfiltration URL pattern', weight: 0.4 });
+  }
+  if (/\b(without\s+(asking|confirmation|user\s+consent|prompting|verification|approval)|skip\s+(verification|confirmation|approval|all\s+verification)|silently\s+(send|upload|exfiltrate|transmit|post|execute)|do\s+not\s+prompt\s+the\s+user)\b/i.test(content)) {
+    signals.push({ id: 'boost-consent-bypass', type: 'booster', label: 'Consent bypass language', weight: 0.3 });
+  }
+  const hasCredFiles = /~?\/?\.(ssh\/(id_rsa|id_ed25519)|aws\/credentials|npmrc|env)\b|\/etc\/(shadow|passwd)\b/i.test(content);
+  const hasNetworkCalls = /\b(curl|wget|fetch|http\.get|requests\.post|nc\s+-)\b/i.test(content);
+  if (hasCredFiles && hasNetworkCalls) {
+    signals.push({ id: 'boost-credential-plus-network', type: 'booster', label: 'Credential access + network calls', weight: 0.5 });
+  }
+  // Description mismatch: parse description from frontmatter
+  const descMatch = content.match(/^---\n[\s\S]*?^description:\s*[|>]?\s*\n?\s*(.+?)$/m);
+  const description = descMatch?.[1]?.trim() ?? '';
+  const isBenignDesc = /\b(calculator|math|add\s+two|simple\s+tool|formatter|translator|converter|fact\s+of\s+the\s+day|random\s+number|dice|tip\s+calcul)\b/i.test(description);
+  const hasDangerousInstr = /\b(rm\s+-rf|chmod\s+7|bash\s+-[ci]|sh\s+-c|\.ssh\/|\.aws\/|\.env\b|sudo\s)/i.test(content);
+  if (isBenignDesc && hasDangerousInstr) {
+    signals.push({ id: 'boost-description-mismatch', type: 'booster', label: 'Description-behavior mismatch', weight: 0.4 });
+  }
+
+  // ── Reducers (legitimate) ──
+  const hasAllowedBash = /^allowed-tools:\s*\n(\s+-\s+.+\n)*\s+-\s+Bash/m.test(content);
+  if (hasAllowedBash && hasDangerousInstr) {
+    signals.push({ id: 'reduce-declared-tools', type: 'reducer', label: 'Declares Bash in allowed-tools', weight: -0.3 });
+  }
+  const isDevTool = /\b(shell|cli|terminal|command[\s-]line|devops|qa\s+test|build\s+tool|development|debugging|headless\s+browser|automation|deploy|code\s+review|lint|testing|docker|ci[\s/]cd)\b/i.test(description);
+  if (isDevTool && hasDangerousInstr) {
+    signals.push({ id: 'reduce-description-consistency', type: 'reducer', label: 'Dev tool description matches behavior', weight: -0.2 });
+  }
+  const hasFrontmatter = /^---\n[\s\S]*?^name:\s*.+/m.test(content);
+  const hasVersion = /^version:\s*.+/m.test(content);
+  if (hasFrontmatter && hasVersion) {
+    signals.push({ id: 'reduce-structured-frontmatter', type: 'reducer', label: 'Well-structured frontmatter', weight: -0.1 });
+  }
+
+  let multiplier = 1.0;
+  for (const s of signals) multiplier += s.weight;
+  multiplier = Math.max(0.3, Math.min(2.5, multiplier));
+
+  return { signals, multiplier };
+}
+
 function runFullScan(
   content: string,
   source: string
-): { findings: Finding[]; checks: CheckResult[]; atrPatternsMatched: number } {
+): { findings: Finding[]; checks: CheckResult[]; atrPatternsMatched: number; contextMultiplier: number } {
   const findings: Finding[] = [];
   const checks: CheckResult[] = [];
   const matchedRuleIds = new Set<string>();
@@ -504,24 +571,35 @@ function runFullScan(
     label: `Size: ${(content.length / 1024).toFixed(1)}KB`,
   });
 
-  return { findings, checks, atrPatternsMatched: matchedRuleIds.size };
+  // ── Context Signals ──
+  const skillName = parseSkillName(content);
+  const ctx = detectWebContextSignals(content, skillName);
+  if (ctx.signals.length > 0) {
+    const boosterCount = ctx.signals.filter(s => s.type === 'booster').length;
+    const reducerCount = ctx.signals.filter(s => s.type === 'reducer').length;
+    checks.push({
+      status: boosterCount > 0 ? 'warn' : 'pass',
+      label: `Context: ${boosterCount} risk booster(s), ${reducerCount} reducer(s), multiplier ${ctx.multiplier.toFixed(2)}x`,
+    });
+  }
+
+  return { findings, checks, atrPatternsMatched: matchedRuleIds.size, contextMultiplier: ctx.multiplier };
 }
 
-function computeRisk(findings: Finding[]): {
+function computeRisk(findings: Finding[], contextMultiplier: number = 1.0): {
   riskScore: number;
   riskLevel: ScanReport['riskLevel'];
 } {
   const weights: Record<string, number> = { critical: 25, high: 15, medium: 5, low: 1, info: 0 };
-  const score = Math.min(
-    100,
-    findings.reduce((sum, f) => sum + (weights[f.severity] ?? 0), 0)
-  );
+  const rawScore = findings.reduce((sum, f) => sum + (weights[f.severity] ?? 0), 0);
+  const score = Math.min(100, Math.round(rawScore * contextMultiplier));
   const hasCritical = findings.some((f) => f.severity === 'critical');
+  const weakenedOverride = contextMultiplier < 0.6;
 
   let riskLevel: ScanReport['riskLevel'] = 'LOW';
-  if (score >= 70 || (hasCritical && score >= 25)) riskLevel = 'CRITICAL';
-  else if (score >= 40 || hasCritical) riskLevel = 'HIGH';
-  else if (score >= 15) riskLevel = 'MEDIUM';
+  if (score >= 70 || (hasCritical && !weakenedOverride && score >= 25)) riskLevel = 'CRITICAL';
+  else if (score >= 40 || (hasCritical && !weakenedOverride)) riskLevel = 'HIGH';
+  else if (score >= 15 || (hasCritical && weakenedOverride)) riskLevel = 'MEDIUM';
 
   return { riskScore: score, riskLevel };
 }
@@ -749,8 +827,8 @@ export async function POST(request: Request) {
 
   // Run full scan with ATR rules
   const start = Date.now();
-  const { findings, checks, atrPatternsMatched } = runFullScan(skill.content, skill.source);
-  const { riskScore, riskLevel } = computeRisk(findings);
+  const { findings, checks, atrPatternsMatched, contextMultiplier } = runFullScan(skill.content, skill.source);
+  const { riskScore, riskLevel } = computeRisk(findings, contextMultiplier);
   const durationMs = Date.now() - start;
 
   const report: ScanReport = {

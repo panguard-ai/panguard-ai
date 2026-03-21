@@ -101,6 +101,16 @@ export interface AuditReport {
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   checks: CheckResult[];
   findings: AuditFinding[];
+  /** Context signals that adjusted the risk score (boosters increase, reducers decrease) */
+  contextSignals?: {
+    signals: ReadonlyArray<{
+      id: string;
+      type: 'booster' | 'reducer';
+      label: string;
+      weight: number;
+    }>;
+    multiplier: number;
+  };
   auditedAt: string;
   durationMs: number;
 }

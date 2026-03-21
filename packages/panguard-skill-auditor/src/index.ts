@@ -19,6 +19,7 @@ import { checkWithAI } from './checks/ai-check.js';
 import { checkWithATR } from './checks/atr-check.js';
 import { autoDetectSkillLLM } from './checks/llm-auto-detect.js';
 import { calculateRiskScore } from './risk-scorer.js';
+import { detectContextSignals } from './context-signals.js';
 import type { AuditReport, AuditOptions, CheckResult, AuditFinding } from './types.js';
 
 export type {
@@ -97,8 +98,13 @@ export async function auditSkill(skillDir: string, options?: AuditOptions): Prom
   // 3. Aggregate findings
   const allFindings = checks.flatMap((c) => c.findings);
 
-  // 4. Calculate risk score (with dedup)
-  const { score, level } = calculateRiskScore(allFindings);
+  // 4. Detect context signals (malicious boosters + legitimate reducers)
+  const contextSignals = manifest
+    ? detectContextSignals(manifest.instructions, manifest)
+    : { signals: [], multiplier: 1.0 };
+
+  // 5. Calculate risk score with context multiplier
+  const { score, level } = calculateRiskScore(allFindings, contextSignals.multiplier);
 
   return {
     skillPath: skillDir,
@@ -107,6 +113,7 @@ export async function auditSkill(skillDir: string, options?: AuditOptions): Prom
     riskLevel: level,
     checks,
     findings: allFindings,
+    contextSignals,
     auditedAt: new Date().toISOString(),
     durationMs: Date.now() - startTime,
   };
