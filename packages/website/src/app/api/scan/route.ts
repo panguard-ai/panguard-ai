@@ -151,6 +151,54 @@ function ensureRulesFresh(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Threat Cloud Whitelist
+// ---------------------------------------------------------------------------
+
+/** Cached whitelist from Threat Cloud */
+let tcWhitelist: Set<string> = new Set();
+let tcWhitelistFetchedAt = 0;
+const TC_WHITELIST_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+function normalizeSkillName(name: string): string {
+  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9\-\/\.@]/g, '');
+}
+
+async function fetchTCWhitelist(): Promise<void> {
+  try {
+    const res = await fetch(`${TC_ENDPOINT}/api/skill-whitelist`, {
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const skills = Array.isArray(data) ? data : (data?.data ?? []);
+    tcWhitelist = new Set(
+      skills.map((s: { name?: string }) => normalizeSkillName(s.name ?? ''))
+        .filter((n: string) => n.length > 0)
+    );
+    tcWhitelistFetchedAt = Date.now();
+  } catch {
+    // TC unreachable — keep using current whitelist (or empty)
+  }
+}
+
+/**
+ * Check if a skill is on the Threat Cloud community whitelist.
+ * Matches against both the skill name from frontmatter and the owner/repo slug.
+ */
+async function checkTCWhitelist(skillName: string, repoSlug: string): Promise<boolean> {
+  // Refresh whitelist if stale
+  if (Date.now() - tcWhitelistFetchedAt > TC_WHITELIST_TTL_MS) {
+    await fetchTCWhitelist();
+  }
+  if (tcWhitelist.size === 0) return false;
+
+  return (
+    tcWhitelist.has(normalizeSkillName(skillName)) ||
+    tcWhitelist.has(normalizeSkillName(repoSlug))
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Cache + Rate Limit
 // ---------------------------------------------------------------------------
 
@@ -295,6 +343,51 @@ function downgradeSeverity(severity: string): Finding['severity'] {
   return map[severity] ?? 'info';
 }
 
+/**
+ * Known-safe install URLs — legitimate package manager install scripts.
+ * curl|bash for these URLs is standard practice, not an attack.
+ */
+const SAFE_INSTALL_URLS = [
+  'bun.sh/install', 'get.docker.com', 'install.python-poetry.org',
+  'raw.githubusercontent.com/nvm-sh/nvm', 'sh.rustup.rs', 'deno.land/install',
+  'get.pnpm.io/install', 'brew.sh', 'ohmyz.sh/install',
+  'raw.githubusercontent.com/Homebrew', 'sdk.cloud.google.com', 'cli.github.com',
+  'astral.sh/uv',
+];
+
+/**
+ * Check if content contains curl|bash ONLY targeting known-safe install URLs.
+ * Returns true if ALL curl|bash instances in the content are safe.
+ */
+function allCurlBashAreSafe(content: string): boolean {
+  const curlBashRe = /\b(curl|wget)\s+[^\n|]*\|\s*(sudo\s+)?(bash|sh|zsh|python|node|perl)/gi;
+  let match: RegExpExecArray | null;
+  let found = false;
+  while ((match = curlBashRe.exec(content)) !== null) {
+    found = true;
+    // Only look at the matched line itself (not surrounding context from other lines)
+    const matchedText = match[0].toLowerCase();
+    const lineStart = content.lastIndexOf('\n', match.index) + 1;
+    const lineEnd = content.indexOf('\n', match.index + match[0].length);
+    const line = content.substring(lineStart, lineEnd === -1 ? undefined : lineEnd).toLowerCase();
+    const isSafe = SAFE_INSTALL_URLS.some(url => line.includes(url.toLowerCase()));
+    if (!isSafe) return false;
+  }
+  return found;
+}
+
+/**
+ * Check if a specific ATR rule match is a known-safe install pattern.
+ * Looks at the original (pre-stripped) content around the match area.
+ */
+function isRuleSafeInstall(ruleId: string, ruleDesc: string, originalContent: string): boolean {
+  // Only apply to rules that detect curl|bash, download-execute, or RCE patterns
+  const curlBashRuleKeywords = ['curl', 'wget', 'download', 'pipe', 'bash', 'remote code'];
+  const descLower = ruleDesc.toLowerCase();
+  if (!curlBashRuleKeywords.some(kw => descLower.includes(kw))) return false;
+  return allCurlBashAreSafe(originalContent);
+}
+
 function runFullScan(
   content: string,
   source: string
@@ -304,33 +397,62 @@ function runFullScan(
   const matchedRuleIds = new Set<string>();
   const isReadme = source.toLowerCase().includes('readme');
 
-  // Strip code blocks, quotes, inline code — these are documentation, not behavior
-  const scanContent = stripMarkdownNoise(content);
-
   // ── ATR Pattern Detection (61 rules, 474 patterns) ──
+  // Two-pass scan:
+  //   Pass 1: Raw content — catches attacks hidden in HTML, code blocks, comments
+  //   Pass 2: Stripped content — catches attacks in prose (with README downgrade)
+  // A rule that matches in raw-only (stripped removed it) = likely hidden payload = KEEP full severity
+  // A rule that matches in stripped = visible text = apply README downgrade if applicable
+
+  const strippedContent = stripMarkdownNoise(content);
+
   for (const rule of liveATR) {
+    if (matchedRuleIds.has(rule.id)) continue;
+
     for (const compiled of rule.compiled) {
       try {
-        if (compiled.regex.test(scanContent)) {
-          if (!matchedRuleIds.has(rule.id)) {
-            matchedRuleIds.add(rule.id);
-            const baseSeverity = (
-              ['critical', 'high', 'medium', 'low', 'info'].includes(rule.severity)
-                ? rule.severity
-                : 'medium'
-            ) as Finding['severity'];
-            // README matches are downgraded — descriptive text ≠ malicious behavior
-            const severity = isReadme ? downgradeSeverity(baseSeverity) : baseSeverity;
-            findings.push({
-              id: `atr-${rule.id}`,
-              title: rule.title,
-              description: compiled.desc || `Matched ATR rule ${rule.id}`,
-              severity,
-              category: rule.category || 'atr',
-              location: `ATR Rule: ${rule.id}`,
-            });
+        const matchesRaw = compiled.regex.test(content);
+        // Reset regex lastIndex for stateful regexes
+        compiled.regex.lastIndex = 0;
+        const matchesStripped = compiled.regex.test(strippedContent);
+        compiled.regex.lastIndex = 0;
+
+        if (matchesRaw) {
+          matchedRuleIds.add(rule.id);
+          const baseSeverity = (
+            ['critical', 'high', 'medium', 'low', 'info'].includes(rule.severity)
+              ? rule.severity
+              : 'medium'
+          ) as Finding['severity'];
+
+          let severity = baseSeverity;
+          const desc = compiled.desc || '';
+
+          // Only matched in raw (stripped removed it) = hidden in HTML/code = FULL severity
+          // Matched in stripped too = visible text = apply context downgrades
+          if (matchesStripped) {
+            if (isReadme) severity = downgradeSeverity(severity);
+            if (isRuleSafeInstall(rule.id, `${rule.title} ${desc}`, content)) {
+              severity = 'low';
+            }
           }
-          break; // One match per rule is enough
+          // If only raw matched: keep full severity (attack is HIDING in markup)
+
+          const safeInstall = isRuleSafeInstall(rule.id, `${rule.title} ${desc}`, content);
+
+          findings.push({
+            id: `atr-${rule.id}`,
+            title: safeInstall
+              ? `${rule.title} (known-safe install script)`
+              : !matchesStripped && matchesRaw
+                ? `${rule.title} (hidden in markup)`
+                : rule.title,
+            description: compiled.desc || `Matched ATR rule ${rule.id}`,
+            severity,
+            category: rule.category || 'atr',
+            location: `ATR Rule: ${rule.id}`,
+          });
+          break;
         }
       } catch {
         // Skip invalid regex
@@ -602,13 +724,34 @@ export async function POST(request: Request) {
   // Sync ATR rules from TC if stale (non-blocking)
   ensureRulesFresh();
 
+  const skillName = parseSkillName(skill.content) ?? `${owner}/${repo}`;
+
+  // Check Threat Cloud whitelist — skip heavy scan for community-verified safe skills
+  const whitelisted = await checkTCWhitelist(skillName, `${owner}/${repo}`);
+  if (whitelisted) {
+    const safeReport: ScanReport = {
+      skillName,
+      riskScore: 0,
+      riskLevel: 'LOW',
+      findings: [],
+      checks: [{ status: 'pass', label: 'Community-verified safe skill (Threat Cloud whitelist)' }],
+      durationMs: 0,
+      atrRulesEvaluated: liveATR.length,
+      atrPatternsMatched: 0,
+    };
+    const scannedAt = new Date().toISOString();
+    scanCache.set(contentHash, { report: safeReport, scannedAt });
+    return NextResponse.json({
+      ok: true,
+      data: { report: safeReport, cached: false, contentHash, source: `${owner}/${repo}/${skill.source}`, scannedAt, whitelisted: true },
+    });
+  }
+
   // Run full scan with ATR rules
   const start = Date.now();
   const { findings, checks, atrPatternsMatched } = runFullScan(skill.content, skill.source);
   const { riskScore, riskLevel } = computeRisk(findings);
   const durationMs = Date.now() - start;
-
-  const skillName = parseSkillName(skill.content) ?? `${owner}/${repo}`;
 
   const report: ScanReport = {
     skillName,
