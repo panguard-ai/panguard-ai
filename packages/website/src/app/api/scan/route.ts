@@ -434,12 +434,15 @@ function detectWebContextSignals(
   }
 
   // ── Reducers (legitimate) ──
+  // For reducers: check if ANY ATR-level dangerous pattern exists (broader than DANGEROUS_INSTRUCTION_RE)
+  const hasAnyShellLikeContent = /\b(rm\s|chmod\s|bash|sh\s+-c|curl\s|exec|eval|sudo|kill|pkill|cron|schtasks|nc\s+-|python\s+-c|node\s+-e|shell|command|terminal|fork|spawn|pipe|socket)\b/i.test(content);
+
   const hasAllowedBash = /^allowed-tools:\s*\n(\s+-\s+.+\n)*\s+-\s+Bash/m.test(content);
-  if (hasAllowedBash && hasDangerousInstr) {
+  if (hasAllowedBash) {
     signals.push({ id: 'reduce-declared-tools', type: 'reducer', label: 'Declares Bash in allowed-tools', weight: -0.3 });
   }
   const isDevTool = /\b(shell|cli|terminal|command[\s-]line|devops|qa\s+test|build\s+tool|development|debugging|headless\s+browser|automation|deploy|code\s+review|lint|testing|docker|ci[\s/]cd)\b/i.test(description);
-  if (isDevTool && hasDangerousInstr) {
+  if (isDevTool) {
     signals.push({ id: 'reduce-description-consistency', type: 'reducer', label: 'Dev tool description matches behavior', weight: -0.2 });
   }
   const hasFrontmatter = /^---\n[\s\S]*?^name:\s*.+/m.test(content);
@@ -463,6 +466,11 @@ function runFullScan(
   const checks: CheckResult[] = [];
   const matchedRuleIds = new Set<string>();
   const isReadme = source.toLowerCase().includes('readme');
+
+  // ── Context Signals (pre-compute for use in ATR loop) ──
+  const skillNameForCtx = parseSkillName(content);
+  const ctx = detectWebContextSignals(content, skillNameForCtx);
+  const hasStrongReducers = ctx.multiplier < 0.7; // legitimate tool signals present
 
   // ── ATR Pattern Detection (61 rules, 474 patterns) ──
   // Two-pass scan:
@@ -502,8 +510,18 @@ function runFullScan(
             if (isRuleSafeInstall(rule.id, `${rule.title} ${desc}`, content)) {
               severity = 'low';
             }
+            // Strong reducer signals (declared Bash, dev tool description, good frontmatter)
+            // → visible-text findings are likely documentation, not attacks
+            if (hasStrongReducers) {
+              severity = downgradeSeverity(severity);
+            }
           }
           // If only raw matched: keep full severity (attack is HIDING in markup)
+          // UNLESS strong reducers are present AND no boosters — then it's likely
+          // a code example in a legitimate tool, not a hidden attack
+          if (!matchesStripped && matchesRaw && hasStrongReducers && ctx.signals.every(s => s.type === 'reducer')) {
+            severity = downgradeSeverity(severity);
+          }
 
           const safeInstall = isRuleSafeInstall(rule.id, `${rule.title} ${desc}`, content);
 
@@ -571,9 +589,7 @@ function runFullScan(
     label: `Size: ${(content.length / 1024).toFixed(1)}KB`,
   });
 
-  // ── Context Signals ──
-  const skillName = parseSkillName(content);
-  const ctx = detectWebContextSignals(content, skillName);
+  // ── Context Signals (report) ──
   if (ctx.signals.length > 0) {
     const boosterCount = ctx.signals.filter(s => s.type === 'booster').length;
     const reducerCount = ctx.signals.filter(s => s.type === 'reducer').length;

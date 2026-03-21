@@ -158,21 +158,21 @@ export function detectContextSignals(
   const declaresShell = declaredTools.some((t: string) =>
     /^(bash|sh|zsh|shell|Bash|terminal|command)$/i.test(t)
   );
-  if (declaresShell && DANGEROUS_INSTRUCTION_RE.test(content)) {
+  if (declaresShell) {
     signals.push({
       id: 'reduce-declared-tools',
       type: 'reducer',
-      label: 'Skill declares shell access in frontmatter (behavior matches declaration)',
+      label: 'Skill declares shell access in frontmatter',
       weight: -0.3,
     });
   }
 
-  // Description-behavior consistency (dev tool description + shell commands)
-  if (DEV_TOOL_DESCRIPTION_RE.test(description) && DANGEROUS_INSTRUCTION_RE.test(content)) {
+  // Description-behavior consistency (dev tool description)
+  if (DEV_TOOL_DESCRIPTION_RE.test(description)) {
     signals.push({
       id: 'reduce-description-consistency',
       type: 'reducer',
-      label: 'Description matches behavior (dev/CLI tool with shell commands)',
+      label: 'Description identifies as dev/CLI/QA tool',
       weight: -0.2,
     });
   }
