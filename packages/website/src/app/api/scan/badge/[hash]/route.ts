@@ -61,14 +61,14 @@ async function lookupStatus(hash: string): Promise<BadgeStatus> {
     if (blacklistResp.ok) {
       const blacklistData = (await blacklistResp.json()) as {
         ok: boolean;
-        data: Array<{ skill_hash?: string; avg_risk_score?: number }>;
+        data: Array<{ skillHash?: string; avgRiskScore?: number }>;
       };
       if (blacklistData.ok && Array.isArray(blacklistData.data)) {
         const match = blacklistData.data.find(
-          (s) => s.skill_hash === hash
+          (s) => s.skillHash === hash
         );
         if (match) {
-          const avgRisk = match.avg_risk_score ?? 0;
+          const avgRisk = match.avgRiskScore ?? 0;
           if (avgRisk >= 70) return 'critical';
           if (avgRisk >= 40) return 'warning';
         }
@@ -82,13 +82,13 @@ async function lookupStatus(hash: string): Promise<BadgeStatus> {
     if (whitelistResp.ok) {
       const whitelistData = (await whitelistResp.json()) as {
         ok: boolean;
-        data: Array<{ fingerprint_hash?: string; status?: string }>;
+        data: Array<{ hash?: string; name?: string; confirmations?: number }>;
       };
       if (whitelistData.ok && Array.isArray(whitelistData.data)) {
         const match = whitelistData.data.find(
-          (s) => s.fingerprint_hash === hash
+          (s) => s.hash === hash
         );
-        if (match && match.status === 'confirmed') return 'safe';
+        if (match && (match.confirmations ?? 0) >= 3) return 'safe';
       }
     }
   } catch {
