@@ -43,6 +43,7 @@
   "dependencies": {
     "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/core": "workspace:*",
+    "@panguard-ai/scan-core": "workspace:*",
     "@panguard-ai/panguard-mcp": "workspace:*",
     "@panguard-ai/panguard-skill-auditor": "workspace:*",
     "@panguard-ai/panguard-trap": "workspace:*",
