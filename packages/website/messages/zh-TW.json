@@ -977,7 +977,7 @@
     },
     "agentPipeline": {
       "overline": "AGENT 管線",
-      "title": "五個 AI Agent。一個調查引擎。",
+      "title": "四個 AI Agent。一個調查引擎。",
       "subtitle": "每個 Agent 有專業分工。組合起來，形成一個自主的資安團隊。",
       "detect": {
         "name": "DetectAgent",
@@ -1605,7 +1605,7 @@
     },
     "technology": {
       "title": "技術架構",
-      "description": "安全不只掃描，更會思考。三層 AI 防禦漏斗、五個自主代理和學習你環境的情境記憶。"
+      "description": "安全不只掃描，更會思考。三層 AI 防禦漏斗、四個自主代理和學習你環境的情境記憶。"
     },
     "howItWorks": {
       "title": "運作原理 -- Panguard AI",
@@ -3779,7 +3779,7 @@
     "title": "安全不只掃描，",
     "titleHighlight": "更會思考",
     "titleSuffix": "。",
-    "subtitle": "三層 AI 防禦漏斗、五個自主代理和學習你環境的情境記憶。90% 的雜訊事件零成本，3% 的關鍵事件獲得最深層推理。",
+    "subtitle": "三層 AI 防禦漏斗、四個自主代理和學習你環境的情境記憶。90% 的雜訊事件零成本，3% 的關鍵事件獲得最深層推理。",
     "defenseFunnel": {
       "overline": "防禦漏斗",
       "title": "三層。90% 免費。",
