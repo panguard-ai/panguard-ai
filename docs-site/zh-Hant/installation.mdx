@@ -1,170 +1,132 @@
 ---
-title: "安裝指南"
-description: "macOS、Linux、Windows 的詳細安裝說明，包含系統需求、安裝方式和驗證步驟。"
+title: "安裝"
+description: "一行指令安裝。Dashboard 自動開啟。"
 icon: "download"
 ---
 
-## 系統需求
-
-| 項目 | 最低需求 |
-| --- | --- |
-| **作業系統** | macOS 12+、Ubuntu 20.04+、Windows 10+ |
-| **Node.js** | >= 18.0.0 |
-| **磁碟空間** | 200 MB |
-| **記憶體** | 512 MB（Guard 建議 1 GB） |
-
-## 平台支援
-
-不是所有功能在每個平台上支援度都一樣。macOS 和 Linux 是主要開發目標。
-
-| 功能 | macOS | Linux | Windows |
-| --- | --- | --- | --- |
-| **Skill Auditor** | 完整 | 完整 | 完整 |
-| **Scan** | 完整 (lsof, socketfilterfw) | 完整 (ss, ufw/iptables) | 部分 (netstat，無防火牆) |
-| **Guard** | 輪詢監控 (5s) | 輪詢監控 (5s) | 輪詢監控 (5s) |
-| **Threat Cloud** | 完整 | 完整 | 完整 |
-
-<Warning>
-  Windows 支援核心功能，但部分 OS 層級偵測能力不如 macOS 和 Linux。
-</Warning>
-
-## 可用 Binary (v1.3.0)
-
-| 平台 | 架構 | 安裝方式 |
-| --- | --- | --- |
-| macOS | ARM64 (Apple Silicon) | curl 一行安裝或 npm |
-| Linux | x64 | curl 一行安裝或 npm |
-| Linux | ARM64 | curl 一行安裝或 npm |
-| Windows | x64 | npm（建議）或 PowerShell |
-
-## 安裝方式
+## 30 秒搞定
 
 <Tabs>
-  <Tab title="macOS">
-    ### 一行指令安裝（建議）
-
+  <Tab title="macOS / Linux">
     ```bash
     curl -fsSL https://get.panguard.ai | bash
     ```
 
-    下載 Apple Silicon Mac 的 ARM64 binary 並放進你的 PATH。
-
-    <Tip>
-      **Intel Mac 使用者：** curl 安裝預設下載 ARM64 binary。兩個選項：
-      1. 改用 npm 安裝：`npm install -g @panguard-ai/panguard`
-      2. 先裝 Rosetta 2：`softwareupdate --install-rosetta`
-    </Tip>
-
-    ### 用 npm
-
-    ```bash
-    npm install -g @panguard-ai/panguard
-    ```
-
-  </Tab>
-
-  <Tab title="Linux">
-    ### 一行指令安裝（建議）
-
-    ```bash
-    curl -fsSL https://get.panguard.ai | bash
-    ```
-
-    安裝程式自動偵測架構（x64 或 ARM64）並下載對應的 binary。
-
-    ### 用 npm
-
-    ```bash
-    npm install -g @panguard-ai/panguard
-    ```
-
+    就這樣。Panguard 安裝完、連接你的 AI agent、Dashboard 自動開。
   </Tab>
 
   <Tab title="Windows">
-    ### 用 npm（建議）
-
     ```powershell
-    npm install -g @panguard-ai/panguard
+    irm https://get.panguard.ai/windows | iex
     ```
 
-    ### PowerShell 一行安裝
+    在 PowerShell 裡跑。Panguard 安裝完、連接你的 AI agent、Dashboard 自動開。
+  </Tab>
 
-    ```powershell
-    powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"
+  <Tab title="npm（全平台）">
+    ```bash
+    npm install -g @panguard-ai/panguard && panguard setup && panguard guard start --dashboard
     ```
 
-    <Info>
-      Windows 建議用 npm 安裝。PowerShell 安裝需要系統管理員權限。
-    </Info>
+    需要 [Node.js 20+](https://nodejs.org/)。
   </Tab>
 </Tabs>
 
-## 從原始碼建置
+安裝完，瀏覽器自動打開 `http://127.0.0.1:9100` Guard Dashboard。
 
-給 contributor 或想跑最新開發版的人：
+---
 
-```bash
-git clone https://github.com/panguard-ai/panguard-ai.git
-cd panguard-ai
-pnpm install
-pnpm build
+## 剛剛發生了什麼？
 
-# 跑 CLI
-./bin/panguard --help
-```
+安裝程式做了 3 件事：
 
-<Info>
-  從原始碼建置需要 [pnpm](https://pnpm.io/) 10+ 和 Node.js 20+。
-</Info>
+1. **裝好 Panguard** — CLI + 61 條 ATR 偵測規則
+2. **連接你的 AI agent** — 自動偵測 Claude Code、Cursor、OpenClaw 和[其他 5 個平台](/guides/claw-setup)
+3. **啟動 Guard** — 24/7 監控，Dashboard 在 `http://127.0.0.1:9100`
 
-## 驗證安裝
+你已經受保護了。你的 AI agent 用的每個 MCP skill 都在即時監控中。
 
-安裝完後確認 CLI 可以用：
+---
+
+## 確認有在跑
 
 ```bash
 panguard --version
 ```
 
-預期輸出：
-
 ```
-1.3.0
+1.3.1
 ```
-
-如果找不到指令，確認安裝路徑有加到系統 PATH。npm 全域安裝可以這樣確認：
 
 ```bash
-npm list -g @panguard-ai/panguard
+panguard guard status
 ```
 
-## 解除安裝
+應該會看到 Guard 在 learning mode 執行中（第 1/7 天）。
 
-<Tabs>
-  <Tab title="npm">
-    ```bash
-    npm uninstall -g @panguard-ai/panguard
-    ```
-  </Tab>
-  <Tab title="curl 安裝">
-    ```bash
-    rm "$(which panguard)"
-    ```
-  </Tab>
-  <Tab title="原始碼建置">
-    直接刪掉 clone 下來的目錄就好。
-  </Tab>
-</Tabs>
-
-## 設定 AI Agent
-
-安裝完後跑 `panguard setup` 自動設定偵測到的 AI Agent 平台：
-
-```bash
-panguard setup
-```
-
-自動偵測並設定 Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw 等平台。詳見[快速入門](/quickstart)。
+---
 
 ## 下一步
 
-安裝完成後，到[快速入門](/quickstart)跑你的第一次安全掃描。
+<CardGroup cols={2}>
+  <Card title="掃描你的 AI Skill" icon="magnifying-glass" href="/quickstart">
+    審計所有已安裝的 MCP skill，偵測 prompt injection、憑證竊取等。
+  </Card>
+  <Card title="看懂安全評分" icon="chart-line" href="/concepts/security-score">
+    你的 A-F 安全等級代表什麼，怎麼提升。
+  </Card>
+  <Card title="設定通知" icon="bell" href="/guides/notifications-setup">
+    偵測到威脅時透過 Telegram、Slack、Email 收警報。
+  </Card>
+  <Card title="平台設定指南" icon="bolt" href="/guides/claw-setup">
+    手動設定 OpenClaw、NemoClaw、ArkClaw 等平台。
+  </Card>
+</CardGroup>
+
+---
+
+## 系統需求
+
+| | 最低需求 |
+| --- | --- |
+| **作業系統** | macOS 12+、Ubuntu 20.04+、Windows 10+ |
+| **Node.js** | 20+ |
+| **磁碟空間** | 200 MB |
+| **記憶體** | 512 MB（Guard 建議 1 GB） |
+
+<Accordion title="平台支援細節">
+  | 功能 | macOS | Linux | Windows |
+  | --- | --- | --- | --- |
+  | **Skill Auditor** | 完整 | 完整 | 完整 |
+  | **Scan** | 完整 | 完整 | 部分 |
+  | **Guard** | 完整 | 完整 | 完整 |
+  | **Threat Cloud** | 完整 | 完整 | 完整 |
+
+  Windows 支援所有核心功能。部分 OS 層級的網路監控不如 macOS/Linux。
+</Accordion>
+
+<Accordion title="從原始碼建置（contributor）">
+  ```bash
+  git clone https://github.com/panguard-ai/panguard-ai.git
+  cd panguard-ai
+  pnpm install && pnpm build
+  ./bin/panguard --help
+  ```
+
+  需要 [pnpm](https://pnpm.io/) 10+ 和 Node.js 20+。
+</Accordion>
+
+<Accordion title="解除安裝">
+  <Tabs>
+    <Tab title="npm">
+      ```bash
+      npm uninstall -g @panguard-ai/panguard
+      ```
+    </Tab>
+    <Tab title="curl 安裝">
+      ```bash
+      rm "$(which panguard)"
+      ```
+    </Tab>
+  </Tabs>
+</Accordion>

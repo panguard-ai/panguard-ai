@@ -1,170 +1,132 @@
 ---
 title: "Installation"
-description: "Detailed installation instructions for macOS, Linux, and Windows including system requirements, multiple install methods, and verification steps."
+description: "One command to install. Dashboard opens automatically."
 icon: "download"
 ---
 
-## System Requirements
-
-| Item | Minimum |
-| --- | --- |
-| **OS** | macOS 12+, Ubuntu 20.04+, Windows 10+ |
-| **Node.js** | >= 18.0.0 |
-| **Disk** | 200 MB |
-| **Memory** | 512 MB (1 GB recommended for Guard) |
-
-## Platform Support
-
-Not all features are equally supported across every platform. macOS and Linux are the primary targets.
-
-| Feature | macOS | Linux | Windows |
-| --- | --- | --- | --- |
-| **Skill Auditor** | Full | Full | Full |
-| **Scan** | Full (lsof, socketfilterfw) | Full (ss, ufw/iptables) | Partial (netstat, no firewall) |
-| **Guard** | Poll monitoring (5s) | Poll monitoring (5s) | Poll monitoring (5s) |
-| **Threat Cloud** | Full | Full | Full |
-
-<Warning>
-  Windows supports core features, but some OS-level detection capabilities are limited compared to macOS and Linux.
-</Warning>
-
-## Available Binaries (v1.3.0)
-
-| Platform | Architecture | Install Method |
-| --- | --- | --- |
-| macOS | ARM64 (Apple Silicon) | curl one-liner or npm |
-| Linux | x64 | curl one-liner or npm |
-| Linux | ARM64 | curl one-liner or npm |
-| Windows | x64 | npm (recommended) or PowerShell |
-
-## Install Methods
+## 30 Seconds to Protected
 
 <Tabs>
-  <Tab title="macOS">
-    ### One-command install (recommended)
-
+  <Tab title="macOS / Linux">
     ```bash
     curl -fsSL https://get.panguard.ai | bash
     ```
 
-    This downloads the ARM64 binary for Apple Silicon Macs and places it on your PATH.
-
-    <Tip>
-      **Intel Mac users:** The curl installer downloads the ARM64 binary by default. You have two options:
-      1. Install via npm instead: `npm install -g @panguard-ai/panguard`
-      2. Enable Rosetta 2 first: `softwareupdate --install-rosetta`
-    </Tip>
-
-    ### Using npm
-
-    ```bash
-    npm install -g @panguard-ai/panguard
-    ```
-
-  </Tab>
-
-  <Tab title="Linux">
-    ### One-command install (recommended)
-
-    ```bash
-    curl -fsSL https://get.panguard.ai | bash
-    ```
-
-    The installer auto-detects your architecture (x64 or ARM64) and downloads the correct binary.
-
-    ### Using npm
-
-    ```bash
-    npm install -g @panguard-ai/panguard
-    ```
-
+    That's it. Panguard installs, connects to your AI agents, and opens the dashboard.
   </Tab>
 
   <Tab title="Windows">
-    ### Using npm (recommended)
-
     ```powershell
-    npm install -g @panguard-ai/panguard
+    irm https://get.panguard.ai/windows | iex
     ```
 
-    ### PowerShell one-liner
+    Run in PowerShell. Panguard installs, connects to your AI agents, and opens the dashboard.
+  </Tab>
 
-    ```powershell
-    powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"
+  <Tab title="npm (all platforms)">
+    ```bash
+    npm install -g @panguard-ai/panguard && panguard setup && panguard guard start --dashboard
     ```
 
-    <Info>
-      npm is the recommended install method on Windows. The PowerShell installer requires administrator privileges.
-    </Info>
+    Requires [Node.js 20+](https://nodejs.org/).
   </Tab>
 </Tabs>
 
-## Install from Source
+After install, your browser opens to `http://127.0.0.1:9100` with the Guard dashboard.
 
-For contributors or users who want the latest development build:
+---
 
-```bash
-git clone https://github.com/panguard-ai/panguard-ai.git
-cd panguard-ai
-pnpm install
-pnpm build
+## What Just Happened?
 
-# Run the CLI
-./bin/panguard --help
-```
+The installer did 3 things:
 
-<Info>
-  Building from source requires [pnpm](https://pnpm.io/) 10+ and Node.js 20+.
-</Info>
+1. **Installed Panguard** — CLI + 61 ATR detection rules
+2. **Connected your AI agents** — auto-detected Claude Code, Cursor, OpenClaw, and [5 more platforms](/guides/claw-setup)
+3. **Started Guard** — 24/7 monitoring with dashboard at `http://127.0.0.1:9100`
 
-## Verify Installation
+You're now protected. Every MCP skill your AI agents use is being monitored in real-time.
 
-After installing, confirm that the CLI is available:
+---
+
+## Verify It's Working
 
 ```bash
 panguard --version
 ```
 
-Expected output:
-
 ```
-1.2.2
+1.3.1
 ```
-
-If the command is not found, ensure the install location is on your system PATH. For npm global installs, verify with:
 
 ```bash
-npm list -g @panguard-ai/panguard
+panguard guard status
 ```
 
-## Uninstall
+You should see Guard running in learning mode (day 1/7).
 
-<Tabs>
-  <Tab title="npm">
-    ```bash
-    npm uninstall -g @panguard-ai/panguard
-    ```
-  </Tab>
-  <Tab title="curl install">
-    ```bash
-    rm "$(which panguard)"
-    ```
-  </Tab>
-  <Tab title="Source build">
-    Simply delete the cloned repository directory.
-  </Tab>
-</Tabs>
+---
 
-## Configure AI Agents
+## What's Next
 
-After installing, run `panguard setup` to auto-configure all detected AI agent platforms:
+<CardGroup cols={2}>
+  <Card title="Scan Your AI Skills" icon="magnifying-glass" href="/quickstart">
+    Audit all installed MCP skills for prompt injection, credential theft, and more.
+  </Card>
+  <Card title="Understand Your Score" icon="chart-line" href="/concepts/security-score">
+    Your A-F security grade and how to improve it.
+  </Card>
+  <Card title="Set Up Notifications" icon="bell" href="/guides/notifications-setup">
+    Get alerts via Telegram, Slack, or email when threats are detected.
+  </Card>
+  <Card title="Platform Setup Guide" icon="bolt" href="/guides/claw-setup">
+    Manual setup for OpenClaw, NemoClaw, ArkClaw, and other platforms.
+  </Card>
+</CardGroup>
 
-```bash
-panguard setup
-```
+---
 
-This detects and configures Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, and more automatically. See [Quick Start](/quickstart) for details.
+## System Requirements
 
-## Next step
+| | Minimum |
+| --- | --- |
+| **OS** | macOS 12+, Ubuntu 20.04+, Windows 10+ |
+| **Node.js** | 20+ |
+| **Disk** | 200 MB |
+| **Memory** | 512 MB (1 GB for Guard) |
 
-Once installed, proceed to [Quick Start](/quickstart) to run your first security scan.
+<Accordion title="Platform support details">
+  | Feature | macOS | Linux | Windows |
+  | --- | --- | --- | --- |
+  | **Skill Auditor** | Full | Full | Full |
+  | **Scan** | Full | Full | Partial |
+  | **Guard** | Full | Full | Full |
+  | **Threat Cloud** | Full | Full | Full |
+
+  Windows supports all core features. Some OS-level network monitoring is limited compared to macOS/Linux.
+</Accordion>
+
+<Accordion title="Install from source (contributors)">
+  ```bash
+  git clone https://github.com/panguard-ai/panguard-ai.git
+  cd panguard-ai
+  pnpm install && pnpm build
+  ./bin/panguard --help
+  ```
+
+  Requires [pnpm](https://pnpm.io/) 10+ and Node.js 20+.
+</Accordion>
+
+<Accordion title="Uninstall">
+  <Tabs>
+    <Tab title="npm">
+      ```bash
+      npm uninstall -g @panguard-ai/panguard
+      ```
+    </Tab>
+    <Tab title="curl install">
+      ```bash
+      rm "$(which panguard)"
+      ```
+    </Tab>
+  </Tabs>
+</Accordion>
