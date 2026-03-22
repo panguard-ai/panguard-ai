@@ -1,15 +1,13 @@
 ---
 title: "快速入門"
-description: "安裝 CLI、掃描系統並啟動即時防護，不到 5 分鐘。100% 開源，無需帳號。"
+description: "從零到防護不用 5 分鐘。不用帳號、不用登入、不用設定。100% 開源。"
 icon: "rocket"
 ---
 
-4 個步驟從零到全面防護。不需帳號、不需登入、不需設定檔。支援 macOS、Linux 與 Windows。
+裝好 Panguard、掃描你的 AI Agent Skill、啟動即時防護。不需帳號。macOS、Linux、Windows 都支援。
 
 <Steps>
-  <Step title="安裝 CLI">
-    選擇您的平台，使用一行指令安裝 Panguard。
-
+  <Step title="安裝">
     <Tabs>
       <Tab title="macOS / Linux">
         ```bash
@@ -21,7 +19,7 @@ icon: "rocket"
         powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"
         ```
       </Tab>
-      <Tab title="npm（所有平台）">
+      <Tab title="npm (全平台)">
         ```bash
         npm install -g @panguard-ai/panguard
         ```
@@ -32,137 +30,134 @@ icon: "rocket"
 
     ```bash
     panguard --version
-    # 預期輸出: 0.3.3
+    # 預期輸出: 1.3.0
     ```
-
-    <Tip>
-      **Intel Mac 使用者：**curl 安裝程式預設下載 ARM64 二進位檔。您可以改用 npm 安裝
-      (`npm install -g @panguard-ai/panguard`)，或先啟用 Rosetta 2
-      (`softwareupdate --install-rosetta`) 再使用 curl 安裝。
-    </Tip>
   </Step>
 
-  <Step title="連接您的 AI Agent">
-    一行指令自動配置所有偵測到的 AI 平台：
+  <Step title="連接 AI Agent">
+    自動偵測並設定你機器上所有的 AI 平台：
 
     ```bash
     panguard setup
     ```
 
-    自動偵測並配置 Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw 等平台。每個平台都會獲得 MCP 或原生 Skill 整合，讓您的 AI Agent 可以直接使用 Panguard 安全工具。
+    會自動找到 Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw 並設定 MCP 整合：
 
     ```
-      PANGUARD AI - Setup
+    PANGUARD AI - Setup
 
-      Detected platforms:
-        Claude Code    ~/.claude/settings.local.json
-        Cursor         ~/.cursor/mcp.json
-        OpenClaw       ~/.openclaw/skills/panguard/SKILL.md
+    Detected platforms:
+      Claude Code    ~/.claude/settings.local.json
+      Cursor         ~/.cursor/mcp.json
+      OpenClaw       ~/.openclaw/skills/panguard/SKILL.md
 
-      All platforms configured successfully.
-    ```
-  </Step>
-
-  <Step title="執行首次掃描">
-    對您的系統執行快速安全稽核：
-
-    ```bash
-    panguard scan --quick
-    ```
-
-    掃描約 30 秒完成，並產出風險評估結果：
-
-    ```
-      PANGUARD AI - Security Scanner
-
-      Scanning system environment...
-
-      -- Security Findings ----------------------
-
-      CRITICAL  Port 22 (SSH) exposed to 0.0.0.0
-      HIGH      No firewall rules detected
-      MEDIUM    Password policy not enforced
-      LOW       12 unnecessary services running
-
-      -- Risk Score -----------------------------
-
-      Score: 62/100 [============--------] Grade: C
-
-      -- Recommendations ------------------------
-
-      1. Restrict SSH access to specific IP ranges
-      2. Enable and configure system firewall
-      3. Enforce password complexity requirements
-    ```
-
-    移除 `--quick` 旗標可執行完整掃描（約 60 秒），包含 SSL 憑證驗證、排程任務稽核與共享資料夾檢查。
-
-    <Tabs>
-      <Tab title="產生 PDF 報告">
-        ```bash
-        panguard scan --output my-report.pdf
-        ```
-      </Tab>
-      <Tab title="繁體中文輸出">
-        ```bash
-        panguard scan --lang zh-TW
-        ```
-      </Tab>
-      <Tab title="完整掃描">
-        ```bash
-        panguard scan
-        ```
-      </Tab>
-    </Tabs>
-  </Step>
-
-  <Step title="啟動即時防護">
-    掃描是一次性檢查。若要持續防護，請啟動 Guard 引擎並開啟內建儀表板：
-
-    ```bash
-    panguard guard start --dashboard
-    ```
-
-    啟動即時監控並在瀏覽器中開啟本地儀表板：
-
-    ```
-      PANGUARD AI - Guard Engine
-
-      Guard engine starting...
-
-      -- Status ---------------------------------
-
-      Mode:       Learning (Day 1/7)
-      Monitoring: processes, network, files
-      Rules:      61 ATR detection rules
-      Dashboard:  http://127.0.0.1:9100
-      Score:      --/100 (building baseline)
-
-      Guard is now protecting your system.
-      Dashboard opened in browser.
+    All platforms configured.
     ```
 
     <Info>
-      **Guard 的運作方式：** 前 7 天，AI 觀察系統的正常行為並建立基線（此期間不會產生誤報）。從第 8 天開始，它會自動偵測異常、執行回應並通知您。
+      沒偵測到任何平台？沒關係，你還是可以直接用 CLI。跳到下一步就好。
     </Info>
+  </Step>
+
+  <Step title="掃描 AI Agent Skill">
+    稽核你系統上所有已安裝的 MCP Skill 和 AI Agent 工具：
+
+    ```bash
+    panguard-guard scan
+    ```
+
+    掃描會用 61 條 ATR (Agent Threat Rules) 檢查所有已安裝的 Skill，涵蓋 prompt injection、tool poisoning、credential theft 等 9 大威脅類別：
+
+    ```
+    PANGUARD [#] AI  v1.3.0
+
+    Scanning: claude-code, claude-desktop, cursor, openclaw, codex, workbuddy, nemoclaw, arkclaw
+
+    Results:
+      totalSkills: 23
+      CLEAN:    18
+      MEDIUM:    3
+      HIGH:      1
+      CRITICAL:  1
+
+    highestRisk: HIGH
+    ```
+
+    加 `--json` 可輸出機器可讀格式，AI Agent 能直接解析。
+
+    <Warning>
+      **CRITICAL 和 HIGH 的發現需要你處理。** 逐一檢查每個發現，決定要保留、更新還是移除有問題的 Skill。Panguard 不會自動幫你刪東西。
+    </Warning>
+  </Step>
+
+  <Step title="啟動即時防護">
+    掃描是一次性檢查。要持續監控的話，啟動 Guard：
+
+    ```bash
+    panguard-guard start
+    ```
+
+    Guard 在背景執行，監控所有 AI Agent 的活動：
+
+    ```
+    PANGUARD [#] AI  v1.3.0
+
+    Guard engine started.
+
+    Status:     RUNNING
+    Mode:       learning (Day 1/7)
+    Rules:      61 ATR detection rules
+    Dashboard:  http://localhost:3100
+    ```
+
+    <Info>
+      **學習模式（第 1-7 天）：** Guard 觀察正常行為並建立基線。這段期間不會有誤報。第 7 天之後，異常偵測自動啟動。
+    </Info>
+
+    其他常用指令：
+
+    ```bash
+    panguard-guard status    # 檢查是否在執行
+    panguard-guard stop      # 停止 daemon
+    ```
   </Step>
 </Steps>
 
-## 接下來做什麼
+## 兩個 CLI，不同用途
 
-您的系統已受到 61 條 ATR 偵測規則的保護。儀表板 `http://127.0.0.1:9100` 即時顯示狀態、偵測到的威脅、載入的規則與技能信任狀態。
+| 指令 | 功能 |
+| --- | --- |
+| `panguard scan` | 系統層級安全掃描（port、防火牆、服務） |
+| `panguard-guard scan` | AI Agent Skill 掃描（MCP 工具、prompt injection、供應鏈） |
+| `panguard setup` | 自動設定 AI 平台 |
+| `panguard-guard start` | 啟動 AI Agent 即時監控 |
+
+大多數情況你會先跑 `panguard-guard scan`（檢查你的 AI 工具），再跑 `panguard-guard start`（持續監控）。
+
+## 集體防禦怎麼運作
+
+跑 Panguard 的同時，你的機器就加入了集體防禦網路：
+
+1. **Guard 在你的機器上偵測到威脅。**
+2. **匿名 hash 分享到 Threat Cloud**（不含個資、不含原始碼）。
+3. **3 個獨立掃描器確認**同樣的 pattern -- 自動產生新偵測規則。
+4. **所有 Panguard 使用者在 1 小時內收到新規則。**
+
+一台機器被攻擊，一小時後所有機器都免疫。
+
+## 下一步
 
 <CardGroup cols={2}>
+  <Card title="安全評分說明" icon="chart-line" href="/concepts/security-score">
+    你的 A-F 等級代表什麼，怎麼提升。
+  </Card>
   <Card title="設定通知" icon="bell" href="/guides/notifications-setup">
-    當偵測到威脅時，透過 Telegram、Slack、Email 或 LINE 接收警報。
+    偵測到威脅時透過 Telegram、Slack、Email 接收警報。
   </Card>
   <Card title="平台整合" icon="bolt" href="/guides/claw-setup">
-    設定 Panguard 與 OpenClaw、NemoClaw、ArkClaw 及其他 AI 平台的整合。
+    設定 Panguard 與 OpenClaw、NemoClaw、ArkClaw 等 AI 平台的整合。
   </Card>
-  <Card title="產生合規報告" icon="file-chart-column" href="/guides/compliance-reports">
-    自動產生 ISO 27001、SOC 2 與台灣資安法稽核報告。
-  </Card>
-  <Card title="探索 CLI" icon="terminal" href="/cli/overview">
-    所有 Panguard 指令與旗標的完整參考。
+  <Card title="CLI 參考" icon="terminal" href="/cli/overview">
+    所有指令和 flag 的完整參考。
   </Card>
 </CardGroup>

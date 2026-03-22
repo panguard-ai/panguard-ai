@@ -1,0 +1,94 @@
+---
+title: "Skill Auditor"
+description: "安裝 MCP Skill 前先掃描安全威脅。用 scan-core 統一引擎，CLI、網站、Guard 共用同一套偵測邏輯。"
+icon: "shield-check"
+---
+
+Panguard Skill Auditor 在第三方 MCP Skill 接觸你的 Agent 之前，先掃描 prompt injection、tool poisoning、隱藏 Unicode、編碼 payload 等威脅。底層用 `@panguard-ai/scan-core` 統一掃描引擎，CLI (`panguard audit skill`)、網站掃描器和 Guard 的 Skill watcher 共用同一套。
+
+## 使用方式
+
+```
+panguard audit skill /path/to/skill-directory
+```
+
+Auditor 分析 Skill 的 `SKILL.md`（或 fallback 到 `README.md`），產出風險分數 (0-100) 和詳細發現。
+
+## 掃描架構
+
+不管從 CLI、網站還是 Guard 觸發，所有掃描都走 `@panguard-ai/scan-core` 的 `scanContent()` 函式。確保不論入口在哪，偵測結果都一模一樣。
+
+掃描依序執行六層偵測：
+
+| 層級 | 做什麼 |
+|-------|-------------|
+| **Manifest 解析** | 抽取 frontmatter metadata（name、description、allowed-tools、version） |
+| **Context 訊號偵測** | 辨識風險加乘和減項因子，調整風險乘數 |
+| **ATR 規則比對** | 用社群 ATR 規則比對內容（雙重掃描：原始 + 去噪） |
+| **指令模式比對** | 用 11 組 regex 偵測 prompt injection 和 tool poisoning |
+| **Secret 偵測** | 找出硬編碼的 API key、token、憑證 |
+| **風險計分** | 用 context 乘數加權各項發現，算出 0-100 最終分數 |
+
+結果另外還包含：manifest 結構驗證和內容大小檢查。
+
+## ATR 整合
+
+ATR 規則可用時（從 Threat Cloud 載入或本地規則目錄），掃描器會用所有已編譯的規則檢查 Skill 內容。目前 ATR 語料庫有 61 條規則、450+ 偵測 pattern，涵蓋 AI Agent 專屬威脅。
+
+ATR 比對跑雙重掃描：
+1. **原始掃描** -- 比對原始內容
+2. **去噪掃描** -- 比對去除 Markdown 雜訊後的內容（抓混淆手法）
+
+掃描結果會回報評估了多少 ATR 規則、命中了多少 pattern。
+
+## Context 訊號
+
+Context 訊號在 ATR 比對前就先算好，會影響發現的計分方式。分兩類：
+
+**加乘因子**（提高風險乘數）：
+- `<IMPORTANT>` 隱藏指令區塊
+- 隱匿語句（"do not tell the user"）
+- 資料外洩 URL pattern（workers.dev、ngrok.io、webhook.site 等）
+- 繞過同意語句（"without asking"、"silently send"）
+- 憑證檔案存取加上網路呼叫的組合
+- 描述與行為不一致（良性描述 + 危險指令）
+
+**減項因子**（降低風險乘數）：
+- Skill 在 frontmatter 宣告 shell 存取（開發工具的正常行為）
+- 描述標示為 dev/CLI/QA 工具
+- 結構完整的 frontmatter（含 name、description、version/license）
+- 危險 pattern 只出現在 code block 內（文件說明的脈絡）
+
+乘數範圍限制在 **0.3x 到 2.5x**，套用到最終風險分數。這代表一個正當的開發工具如果坦白宣告自己的能力，風險分數會比較低；而試圖隱藏意圖的 Skill 分數會比較高。
+
+## Flywheel 機制
+
+每次 Skill 審計都貢獻社群防禦：
+
+1. **Scan** -- 用 scan-core 在本地審計 Skill 的威脅
+2. **Propose** -- 高嚴重度發現產生附帶 pattern hash 的 ATR 提案
+3. **Confirm** -- 其他掃描器碰到同樣的 pattern hash 就確認提案
+4. **Promote** -- 達到 3+ 確認，提案自動升級為正式 ATR 規則
+5. **Distribute** -- 確認的規則透過 Threat Cloud 發送給所有掃描器
+6. **Strengthen** -- 新規則強化下一次審計，形成閉環
+
+Pattern hash（`scan:{skillName}:{findingSummary}`，SHA-256 截斷到 16 hex 字元）確保 CLI、網站、Guard 對同一個威脅 pattern 都產生一樣的識別碼。
+
+<CardGroup cols={2}>
+  <Card title="快速入門" icon="rocket" href="/quickstart">
+    安裝 Panguard 並跑你的第一次 Skill 審計。
+  </Card>
+  <Card title="掃描總覽" icon="magnifying-glass" href="/products/scan/overview">
+    深入了解所有掃描功能。
+  </Card>
+  <Card title="風險計分" icon="chart-bar" href="/products/scan/risk-scoring">
+    了解風險分數怎麼算的。
+  </Card>
+  <Card title="Threat Cloud" icon="cloud" href="/products/threat-cloud/overview">
+    審計結果如何餵進集體防禦。
+  </Card>
+</CardGroup>
+
+<Card title="CLI 參考" icon="terminal" href="/cli/scan">
+  完整的 `panguard audit skill` 指令參考。
+</Card>
