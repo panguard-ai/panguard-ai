@@ -1,28 +1,19 @@
 ---
 title: "Product Suite Overview"
-description: "Panguard AI ships 8 integrated products that cover the full security lifecycle -- from scanning and detection to response, compliance, and collective intelligence."
+description: "Panguard AI ships integrated products that cover the full security lifecycle -- from scanning and detection to response, compliance, and collective intelligence."
 icon: "boxes-stacked"
 ---
 
-Panguard AI is not a single tool. It is an integrated platform of 8 products, each focused on a specific stage of the security lifecycle. Together they form a closed loop: scan your systems, monitor them in real time, notify the right people, trap attackers, generate compliance reports, and share intelligence across your fleet.
+Panguard AI is not a single tool. It is an integrated platform of complementary products, each focused on a specific stage of the security lifecycle. Together they form a closed loop: scan your systems, monitor them in real time, notify the right people, generate compliance reports, and share intelligence across your fleet.
 
 ## The Product Suite
 
 <CardGroup cols={2}>
   <Card title="Scan" icon="magnifying-glass" href="/products/scan/overview">
-    60-second security audit with 10 scanners. Produces a risk score (0--100), severity-graded findings, and optional PDF reports.
+    60-second security audit with 10 scanners. Produces a risk score (0--100), severity-graded findings, optional PDF reports, and compliance reports (ISO 27001, SOC 2, TCSA).
   </Card>
   <Card title="Guard" icon="shield" href="/products/guard/overview">
-    24/7 real-time monitoring powered by a 4-agent DARE pipeline (Detect, Analyze, Respond, Report). 10 monitor types, event correlation, and automated threat response.
-  </Card>
-  <Card title="Chat" icon="message-square" href="/products/chat/overview">
-    AI-powered notifications via Telegram, Slack, Email, and Webhook. Adapts tone and detail level to 3 user roles: boss, developer, and IT admin.
-  </Card>
-  <Card title="Trap" icon="flask" href="/products/trap/overview">
-    Deploy 8 honeypot protocols to lure and profile attackers. Captures credentials, commands, and tool signatures, then classifies attacker skill level and intent.
-  </Card>
-  <Card title="Report" icon="file-check" href="/products/report/overview">
-    Auto-generate compliance reports for ISO 27001, SOC 2, and Taiwan Cyber Security Act (TCSA). Outputs JSON and PDF in English and Traditional Chinese.
+    24/7 real-time monitoring powered by a 4-agent DARE pipeline (Detect, Analyze, Respond, Report). 10 monitor types, event correlation, automated threat response, and built-in notifications via Telegram, Slack, Email, and Webhook.
   </Card>
   <Card title="MCP Server" icon="plug" href="/products/mcp/overview">
     Model Context Protocol server exposing 11 Panguard tools to AI assistants like Claude Desktop and Cursor.
@@ -37,18 +28,14 @@ Panguard AI is not a single tool. It is an integrated platform of 8 products, ea
 The products are designed to complement each other in a layered defense strategy:
 
 ```
-Scan ──> Guard ──> Chat
-  |        |         |
-  v        v         v
-Report   Trap    Threat Cloud
+Scan ──> Guard ──> Threat Cloud
 ```
 
 | Workflow | Products Involved | Description |
 |----------|-------------------|-------------|
 | **Assess and Protect** | Scan + Guard | Run a one-time scan to establish your baseline, then enable Guard for continuous monitoring. |
-| **Detect and Notify** | Guard + Chat | Guard detects threats in real time and Chat delivers plain-language alerts to your preferred channel. |
-| **Lure and Learn** | Trap + Guard + Threat Cloud | Honeypots capture attacker behavior, Guard auto-blocks the source IPs, and intelligence is shared via Threat Cloud. |
-| **Comply and Report** | Scan + Report | Scan findings map directly to compliance controls. Generate audit-ready PDF reports on demand. |
+| **Detect and Notify** | Guard | Guard detects threats in real time and delivers plain-language notifications to your preferred channel (Telegram, Slack, Email, Webhook). |
+| **Comply and Report** | Scan | Scan findings map directly to compliance controls. Generate audit-ready PDF reports with `panguard scan --output report.pdf`. |
 | **Scale and Centralize** | Guard + Threat Cloud | Deploy Guard agents across your fleet and correlate threats globally via Threat Cloud. |
 | **AI Copilot** | MCP + Scan + Guard | Use natural language in Claude or Cursor to run scans, check status, and block IPs via the MCP server. |
 
@@ -58,9 +45,9 @@ Panguard is built as a **13-package TypeScript monorepo** managed by pnpm worksp
 
 | Layer | Components | Responsibility |
 |-------|-----------|----------------|
-| **Endpoint** | Guard, Scan, Trap, Chat | Local detection, scanning, honeypots, and notifications |
+| **Endpoint** | Guard, Scan | Local detection, scanning, and notifications |
 | **Management** | Guard | Endpoint protection and local fleet coordination |
-| **Intelligence** | Threat Cloud, Report | Collective IoC sharing, compliance reporting |
+| **Intelligence** | Threat Cloud | Collective IoC sharing |
 | **Integration** | MCP | AI assistant integration |
 
 <Info>
