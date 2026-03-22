@@ -19,9 +19,21 @@ import { SAFE_INSTALL_URLS } from './instruction-patterns.js';
 // Rule compilation
 // ---------------------------------------------------------------------------
 
-import { createRequire } from 'node:module';
-const _require = createRequire(import.meta.url);
-const isSafeRegex = _require('safe-regex') as (re: string | RegExp) => boolean;
+/**
+ * Simplified ReDoS safety check (replaces safe-regex CJS dependency).
+ * Detects catastrophic backtracking patterns: nested quantifiers like (a+)+,
+ * (a*)*b, ([a-z]+)*, etc. These cause exponential time on non-matching input.
+ */
+function isSafeRegex(re: RegExp): boolean {
+  const src = re.source;
+  // Reject nested quantifiers: (pattern+)+ or (pattern*)+  or (pattern+)* etc.
+  if (/\([^)]*[+*]\)[+*{]/.test(src)) return false;
+  // Reject overlapping alternations with quantifiers: (a|a)+
+  if (/\(([^|)]+)\|\1\)[+*]/.test(src)) return false;
+  // Reject star-of-star: .*.*.*  (3+ consecutive greedy wildcards)
+  if (/(\.\*){3,}/.test(src)) return false;
+  return true;
+}
 
 /**
  * Compile ATR rules: convert pattern strings to RegExp with ReDoS protection.
