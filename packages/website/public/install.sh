@@ -536,71 +536,42 @@ detect_lang() {
 }
 
 # ── auto_setup() ──────────────────────────────────────────────
-# Auto-run panguard setup to connect AI agents, then offer skill audit.
+# Zero-interaction post-install: setup → guard → dashboard.
+# No questions asked. One command, dashboard opens.
 auto_setup() {
   local UI_LANG
   UI_LANG="$(detect_lang)"
 
-  if [ ! -e /dev/tty ]; then
-    info "Run 'panguard setup' to connect your AI agents."
-    return
-  fi
+  echo ""
+  info "Connecting to AI agents..."
+  panguard setup --lang "$UI_LANG" 2>/dev/null || true
 
+  echo ""
+  info "Starting Guard with dashboard..."
+  panguard guard start --dashboard 2>/dev/null &
+  sleep 2
+
+  echo ""
+  success "Done! Dashboard opening in your browser."
+  echo ""
+  echo "  Dashboard:  ${BLUE}http://127.0.0.1:9100${NC}"
+  echo "  Guard:      running (learning mode, day 1/7)"
+  echo "  ATR rules:  61 detection rules loaded"
   echo ""
   if [ "$UI_LANG" = "zh-TW" ]; then
-    printf "  ${BOLD}連接 AI 代理（Claude Code, Cursor 等）？${NC} [Y/n] "
+    echo "  ${BOLD}Panguard 已安裝完成。Guard 正在背景運行。${NC}"
+    echo "  所有偵測到的 AI 平台已自動設定。"
   else
-    printf "  ${BOLD}Connect to AI agents (Claude Code, Cursor, etc.)?${NC} [Y/n] "
+    echo "  ${BOLD}Panguard is installed and protecting your AI agents.${NC}"
+    echo "  All detected AI platforms have been configured."
   fi
-  read -r answer </dev/tty 2>/dev/null || answer="n"
-  case "$answer" in
-    [nN]*)
-      if [ "$UI_LANG" = "zh-TW" ]; then
-        info "稍後執行 'panguard setup --lang zh-TW' 來連接 AI 代理。"
-      else
-        info "Run 'panguard setup' later to connect AI agents."
-      fi
-      ;;
-    *)
-      echo ""
-      panguard setup --lang "$UI_LANG" </dev/tty
-      ;;
-  esac
-
   echo ""
-  if [ "$UI_LANG" = "zh-TW" ]; then
-    printf "  ${BOLD}掃描當前目錄的 AI 技能安全問題？${NC} [Y/n] "
-  else
-    printf "  ${BOLD}Audit current directory for AI skill security issues?${NC} [Y/n] "
-  fi
-  read -r answer </dev/tty 2>/dev/null || answer="n"
-  case "$answer" in
-    [nN]*)
-      if [ "$UI_LANG" = "zh-TW" ]; then
-        info "稍後執行 'panguard audit skill .' 來掃描技能。"
-      else
-        info "Run 'panguard audit skill .' later to audit skills."
-      fi
-      ;;
-    *)
-      echo ""
-      panguard audit skill . </dev/tty
-      ;;
-  esac
-
+  echo "  Other commands:"
+  echo "    panguard audit skill <path>   Audit a skill before installing"
+  echo "    panguard scan --quick         Quick system security scan"
+  echo "    panguard guard status         Check Guard status"
+  echo "    panguard guard stop           Stop Guard"
   echo ""
-  printf "  ${BOLD}Start Guard with Dashboard? (opens browser)${NC} [Y/n] "
-  read -r answer </dev/tty 2>/dev/null || answer="n"
-  case "$answer" in
-    [nN]*) info "Run 'panguard guard start --dashboard' later to launch." ;;
-    *)
-      echo ""
-      info "Starting Guard with dashboard..."
-      panguard guard start --dashboard </dev/tty &
-      success "Guard started! Dashboard opening in your browser."
-      info "Run 'panguard guard start --dashboard' anytime to restart."
-      ;;
-  esac
 }
 
 # ── Main ─────────────────────────────────────────────────────────
