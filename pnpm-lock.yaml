@@ -118,12 +118,6 @@ importers:
       '@panguard-ai/core':
         specifier: workspace:*
         version: link:../core
-      '@panguard-ai/manager':
-        specifier: workspace:*
-        version: link:../panguard-manager
-      '@panguard-ai/panguard-auth':
-        specifier: workspace:*
-        version: link:../panguard-auth
       '@panguard-ai/panguard-chat':
         specifier: workspace:*
         version: link:../panguard-chat
@@ -142,18 +136,12 @@ importers:
       '@panguard-ai/panguard-skill-auditor':
         specifier: workspace:*
         version: link:../panguard-skill-auditor
-      '@panguard-ai/panguard-trap':
-        specifier: workspace:*
-        version: link:../panguard-trap
       '@panguard-ai/scan-core':
         specifier: workspace:*
         version: link:../scan-core
       '@panguard-ai/security-hardening':
         specifier: workspace:*
         version: link:../../security-hardening
-      '@panguard-ai/threat-cloud':
-        specifier: workspace:*
-        version: link:../threat-cloud
       commander:
         specifier: ^12.0.0
         version: 12.1.0
@@ -167,6 +155,19 @@ importers:
       typescript:
         specifier: ~5.7.3
         version: 5.7.3
+    optionalDependencies:
+      '@panguard-ai/manager':
+        specifier: workspace:*
+        version: link:../panguard-manager
+      '@panguard-ai/panguard-auth':
+        specifier: workspace:*
+        version: link:../panguard-auth
+      '@panguard-ai/panguard-trap':
+        specifier: workspace:*
+        version: link:../panguard-trap
+      '@panguard-ai/threat-cloud':
+        specifier: workspace:*
+        version: link:../threat-cloud
 
   packages/panguard-auth:
     dependencies:
