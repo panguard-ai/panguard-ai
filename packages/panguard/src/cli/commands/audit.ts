@@ -4,22 +4,23 @@
  */
 
 import { Command } from 'commander';
-import { createHash } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
+import { contentHash, patternHash } from '@panguard-ai/scan-core';
 
 /** Default Threat Cloud endpoint */
 const DEFAULT_TC_ENDPOINT = 'https://tc.panguard.ai';
 
 /**
- * Compute a SHA-256 hash of a skill's SKILL.md content for anonymized tracking.
+ * Compute a content hash of a skill's SKILL.md using scan-core's canonical hash.
+ * Identical to what the website produces — critical for TC dedup.
  */
 function computeSkillHash(skillDir: string): string {
   const skillMdPath = path.join(skillDir, 'SKILL.md');
-  if (!existsSync(skillMdPath)) return createHash('sha256').update(skillDir).digest('hex');
+  if (!existsSync(skillMdPath)) return contentHash(skillDir);
   const content = readFileSync(skillMdPath, 'utf-8');
-  return createHash('sha256').update(content).digest('hex');
+  return contentHash(content);
 }
 
 export function auditCommand(): Command {
@@ -264,6 +265,88 @@ export function auditCommand(): Command {
                 `  ${c.dim(`${symbols.info} Threat Cloud unavailable — results saved locally`)}`
               );
             }
+          }
+        }
+
+        // ── Flywheel: submit ATR proposal for HIGH/CRITICAL findings ──
+        if (
+          options.cloud &&
+          (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
+          report.findings.length > 0
+        ) {
+          try {
+            const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
+            const dataDir = path.join(
+              process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
+              '.panguard-guard'
+            );
+            const tc = new ThreatCloudClient(options.tcEndpoint, dataDir);
+            const skillName = report.manifest?.name ?? path.basename(resolvedPath);
+
+            const highFindings = report.findings
+              .filter((f) => f.severity === 'critical' || f.severity === 'high')
+              .slice(0, 5);
+            const findingSummary = highFindings.map((f) => f.title).join('; ');
+            const pHash = patternHash(skillName, findingSummary);
+
+            const severity = report.riskLevel === 'CRITICAL' ? 'critical' : 'high';
+            const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
+
+            const conditions = highFindings
+              .map((f, idx) => {
+                const keywords = f.title.split(/\s+/).filter((w) => w.length > 4).slice(0, 4);
+                if (keywords.length === 0) return null;
+                const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
+                return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${f.title.slice(0, 80)}"`;
+              })
+              .filter(Boolean);
+
+            if (conditions.length > 0) {
+              const ruleContent = `title: "CLI Audit: ${highFindings[0]?.title.slice(0, 60) ?? skillName}"
+id: ATR-2026-DRAFT-${pHash.slice(0, 8)}
+status: draft
+description: |
+  Auto-generated from CLI audit of "${skillName}".
+  Findings: ${findingSummary.slice(0, 200)}
+author: "PanGuard CLI Auditor"
+date: "${date}"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: experimental
+severity: ${severity}
+tags:
+  category: skill-compromise
+  subcategory: cli-audit
+  confidence: medium
+detection:
+  conditions:
+${conditions.join('\n')}
+  condition: any
+response:
+  actions: [alert, snapshot]`;
+
+              await tc.submitATRProposal({
+                patternHash: pHash,
+                ruleContent,
+                llmProvider: 'cli-auditor',
+                llmModel: 'pattern-extraction',
+                selfReviewVerdict: JSON.stringify({
+                  approved: true,
+                  source: 'cli-auditor',
+                  skillName,
+                  riskLevel: report.riskLevel,
+                  findingCount: highFindings.length,
+                }),
+              });
+
+              if (!options.json) {
+                console.log(
+                  `  ${c.green(symbols.pass)} ${c.dim('ATR rule proposal submitted to Threat Cloud')}`
+                );
+              }
+            }
+          } catch {
+            // ATR proposal submission is best-effort
           }
         }
 

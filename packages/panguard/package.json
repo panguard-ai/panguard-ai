@@ -51,6 +51,7 @@
     "@panguard-ai/panguard-auth": "workspace:*",
     "@panguard-ai/manager": "workspace:*",
     "@panguard-ai/security-hardening": "workspace:*",
+    "@panguard-ai/scan-core": "workspace:*",
     "@panguard-ai/panguard-skill-auditor": "workspace:*",
     "@panguard-ai/panguard-mcp": "workspace:*",
     "@panguard-ai/threat-cloud": "workspace:*",
