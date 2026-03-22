@@ -544,7 +544,7 @@ auto_setup() {
 
   echo ""
   info "Connecting to AI agents..."
-  panguard setup --lang "$UI_LANG" 2>/dev/null || true
+  panguard setup --lang "$UI_LANG" --yes --skip-guard 2>/dev/null || true
 
   echo ""
   info "Starting Guard with dashboard..."
