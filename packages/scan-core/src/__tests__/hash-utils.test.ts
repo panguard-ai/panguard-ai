@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createHash } from 'node:crypto';
 import { describe, it, expect } from 'vitest';
 import { contentHash, patternHash } from '../hash-utils.js';
