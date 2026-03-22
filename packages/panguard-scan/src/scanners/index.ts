@@ -61,22 +61,38 @@ const RISK_FACTOR_TITLES: Record<string, string> = {
  * Category-to-manual-fix mapping for risk factor conversion
  * 風險因素轉換的類別到手動修復指令對應表
  */
+const _p = process.platform;
 const RISK_FACTOR_MANUAL_FIX: Record<string, string[]> = {
-  noFirewall: ['sudo ufw enable', 'sudo ufw default deny incoming'],
-  dangerousPorts: ['sudo ufw deny <port>', 'sudo iptables -A INPUT -p tcp --dport <port> -j DROP'],
-  noUpdates: ['sudo apt update && sudo apt upgrade -y'],
-  noSecurityTools: [
-    'sudo apt install fail2ban -y',
-    'sudo systemctl enable fail2ban && sudo systemctl start fail2ban',
-  ],
-  defaultPasswords: [
-    "sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config",
-    'sudo systemctl restart sshd',
-  ],
-  excessiveServices: [
-    'sudo systemctl list-units --type=service --state=running',
-    'sudo systemctl disable <service-name>',
-  ],
+  noFirewall:
+    _p === 'darwin'
+      ? ['sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on',
+         'sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on']
+      : ['sudo ufw enable', 'sudo ufw default deny incoming'],
+  dangerousPorts:
+    _p === 'darwin'
+      ? ['sudo pfctl -e',
+         'echo "block in proto tcp from any to any port <port>" | sudo pfctl -f -']
+      : ['sudo ufw deny <port>', 'sudo iptables -A INPUT -p tcp --dport <port> -j DROP'],
+  noUpdates:
+    _p === 'darwin'
+      ? ['sudo softwareupdate -ia']
+      : ['sudo apt update && sudo apt upgrade -y'],
+  noSecurityTools:
+    _p === 'darwin'
+      ? ['brew install fail2ban', 'sudo brew services start fail2ban']
+      : ['sudo apt install fail2ban -y',
+         'sudo systemctl enable fail2ban && sudo systemctl start fail2ban'],
+  defaultPasswords:
+    _p === 'darwin'
+      ? ['# Change password via System Settings > Users & Groups',
+         'sudo pwpolicy -setglobalpolicy "minChars=12"']
+      : ["sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config",
+         'sudo systemctl restart sshd'],
+  excessiveServices:
+    _p === 'darwin'
+      ? ['launchctl list', 'sudo launchctl bootout system/<service-label>']
+      : ['sudo systemctl list-units --type=service --state=running',
+         'sudo systemctl disable <service-name>'],
 };
 
 /**
@@ -181,11 +197,17 @@ function calculateEnhancedRiskScore(baseScore: number, additionalFindings: Findi
  * 依據發現類別/關鍵字的備用手動修復指令
  */
 const CATEGORY_MANUAL_FIX: Record<string, string[]> = {
-  password: ['sudo passwd -e $(whoami)', 'sudo apt install libpam-pwquality -y'],
-  ssl: [
-    "sudo sed -i 's/TLSv1.1/TLSv1.3/' /etc/nginx/nginx.conf",
-    'sudo nginx -t && sudo systemctl reload nginx',
-  ],
+  password:
+    _p === 'darwin'
+      ? ['# Change password via System Settings > Users & Groups',
+         'sudo pwpolicy -setglobalpolicy "minChars=12"']
+      : ['sudo passwd -e $(whoami)', 'sudo apt install libpam-pwquality -y'],
+  ssl:
+    _p === 'darwin'
+      ? ['# Update TLS config in your web server (nginx/apache)',
+         'brew services restart nginx']
+      : ["sudo sed -i 's/TLSv1.1/TLSv1.3/' /etc/nginx/nginx.conf",
+         'sudo nginx -t && sudo systemctl reload nginx'],
 };
 
 /**
