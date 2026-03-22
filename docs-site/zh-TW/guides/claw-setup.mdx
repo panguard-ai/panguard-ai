@@ -1,10 +1,10 @@
 ---
-title: "安裝到 OpenClaw & QClaw"
-description: "OpenClaw 和 QClaw（騰訊）一鍵安裝指南。無需帳號。"
+title: "安裝到 OpenClaw & 相容平台"
+description: "OpenClaw、QClaw、WorkBuddy、NemoClaw 和 ArkClaw 一鍵安裝指南。無需帳號。"
 icon: "bolt"
 ---
 
-60 秒內將 Panguard 安裝到你的 Claw AI Agent。不需帳號、不需登入、不需設定。
+60 秒內將 Panguard 安裝到你的 Claw AI Agent 或相容 MCP 平台。不需帳號、不需登入、不需設定。
 
 ## 快速開始（所有平台）
 
@@ -20,7 +20,7 @@ curl -fsSL https://get.panguard.ai | bash && panguard setup
 panguard setup
 ```
 
-自動偵測 OpenClaw、QClaw 及所有其他 AI 平台，並注入正確設定。
+自動偵測 OpenClaw、QClaw、WorkBuddy、NemoClaw、ArkClaw 及所有其他 AI 平台，並注入正確設定。
 
 ---
 
@@ -105,6 +105,117 @@ cat ~/.qclaw/mcp.json
 
 ---
 
+## WorkBuddy
+
+WorkBuddy 使用標準 **MCP 協議**。Panguard 會將 MCP 伺服器設定加入 `~/.workbuddy/.mcp.json`。
+
+### 自動安裝
+
+```bash
+npx panguard setup --platform workbuddy
+```
+
+### 手動安裝
+
+如果你偏好手動設定，將以下內容加入 `~/.workbuddy/.mcp.json`：
+
+```json
+{
+  "mcpServers": {
+    "panguard": {
+      "command": "npx",
+      "args": ["-y", "@panguard-ai/panguard-mcp"]
+    }
+  }
+}
+```
+
+安裝後重啟 WorkBuddy。Panguard 的 11 個 MCP 工具即可使用。
+
+### 驗證安裝
+
+```bash
+cat ~/.workbuddy/.mcp.json
+```
+
+你應該會在 `mcpServers` 下看到 `panguard` 項目。
+
+---
+
+## NemoClaw
+
+NemoClaw 使用標準 **MCP 協議**。Panguard 會將 MCP 伺服器設定加入 `~/.nemoclaw/mcp.json`。
+
+### 自動安裝
+
+```bash
+npx panguard setup --platform nemoclaw
+```
+
+### 手動安裝
+
+如果你偏好手動設定，將以下內容加入 `~/.nemoclaw/mcp.json`：
+
+```json
+{
+  "mcpServers": {
+    "panguard": {
+      "command": "npx",
+      "args": ["-y", "@panguard-ai/panguard-mcp"]
+    }
+  }
+}
+```
+
+安裝後重啟 NemoClaw。Panguard 的 11 個 MCP 工具即可使用。
+
+### 驗證安裝
+
+```bash
+cat ~/.nemoclaw/mcp.json
+```
+
+你應該會在 `mcpServers` 下看到 `panguard` 項目。
+
+---
+
+## ArkClaw
+
+ArkClaw 使用標準 **MCP 協議**。Panguard 會將 MCP 伺服器設定加入 `~/.arkclaw/mcp.json`。
+
+### 自動安裝
+
+```bash
+npx panguard setup --platform arkclaw
+```
+
+### 手動安裝
+
+如果你偏好手動設定，將以下內容加入 `~/.arkclaw/mcp.json`：
+
+```json
+{
+  "mcpServers": {
+    "panguard": {
+      "command": "npx",
+      "args": ["-y", "@panguard-ai/panguard-mcp"]
+    }
+  }
+}
+```
+
+安裝後重啟 ArkClaw。Panguard 的 11 個 MCP 工具即可使用。
+
+### 驗證安裝
+
+```bash
+cat ~/.arkclaw/mcp.json
+```
+
+你應該會在 `mcpServers` 下看到 `panguard` 項目。
+
+---
+
 ## 疑難排解
 
 <AccordionGroup>
@@ -140,10 +251,10 @@ cat ~/.qclaw/mcp.json
 
 ## 總覽
 
-| | OpenClaw | QClaw |
-| --- | --- | --- |
-| **協議** | 原生 Skill | MCP |
-| **設定路徑** | `~/.openclaw/skills/panguard/SKILL.md` | `~/.qclaw/mcp.json` |
-| **安裝指令** | `npx panguard setup` | `npx panguard setup` |
-| **需要帳號** | 否 | 否 |
-| **需要重啟** | 是 | 是 |
+| | OpenClaw | QClaw | WorkBuddy | NemoClaw | ArkClaw |
+| --- | --- | --- | --- | --- | --- |
+| **協議** | 原生 Skill | MCP | MCP | MCP | MCP |
+| **設定路徑** | `~/.openclaw/skills/panguard/SKILL.md` | `~/.qclaw/mcp.json` | `~/.workbuddy/.mcp.json` | `~/.nemoclaw/mcp.json` | `~/.arkclaw/mcp.json` |
+| **安裝指令** | `npx panguard setup` | `npx panguard setup` | `npx panguard setup` | `npx panguard setup` | `npx panguard setup` |
+| **需要帳號** | 否 | 否 | 否 | 否 | 否 |
+| **需要重啟** | 是 | 是 | 是 | 是 | 是 |

@@ -18,9 +18,7 @@
     "custom": "Custom",
     "contactUs": "Contact us",
     "mostPopular": "Most Popular",
-    "perMonth": "/mo",
-    "perEndpointMonth": "/endpoint/mo",
-    "free": "Free",
+"free": "Free",
     "yes": "yes",
     "no": "no",
     "copyright": "2026 Panguard AI, Inc. All rights reserved.",
@@ -299,7 +297,7 @@
           {
             "role": "Skill Gatekeeper",
             "product": "Skill Auditor",
-            "desc": "6-layer pre-install audit before any AI skill runs"
+            "desc": "8-layer pre-install audit before any AI skill runs"
           },
           {
             "role": "SOC Analyst",
@@ -501,7 +499,7 @@
       "products": [
         {
           "name": "Skill Auditor",
-          "desc": "6-layer pre-install security gate. Catches prompt injection, tool poisoning, and hidden capabilities before any AI skill runs.",
+          "desc": "8-layer pre-install security gate. Catches prompt injection, tool poisoning, and hidden capabilities before any AI skill runs.",
           "href": "/product/skill-auditor"
         },
         {
@@ -1261,7 +1259,7 @@
       "checks": {
         "overline": "Coverage",
         "title": "What gets checked.",
-        "subtitle": "Six categories of AI agent risk, evaluated automatically.",
+        "subtitle": "Eight categories of AI agent risk, evaluated automatically.",
         "items": {
           "promptInjection": {
             "title": "Prompt Injection Resistance",
@@ -1822,6 +1820,10 @@
         "manifestValidation": {
           "name": "Manifest Validation",
           "detail": "Verifies SKILL.md structure, required fields, and metadata integrity"
+        },
+        "dependencyCheck": {
+          "name": "Dependency Analysis",
+          "detail": "Audits declared dependencies for known vulnerabilities, typosquatting, and supply-chain risks"
         },
         "scanTime": "Scan time",
         "checkCategories": "Check categories",
@@ -3166,7 +3168,7 @@
         "engine": "AST Analysis",
         "desc": "Static analysis of AI skill source code before installation. Checks for hidden capabilities, excessive permissions, obfuscated payloads, and supply-chain attacks.",
         "detects": "Hidden capabilities, excessive permissions, obfuscated payloads, supply-chain attacks",
-        "tech": "6-layer audit checks, AST parsing, dependency analysis, permission mapping"
+        "tech": "8-layer audit checks, AST parsing, dependency analysis, permission mapping"
       },
       "filesystem": {
         "layer": "Layer 3",

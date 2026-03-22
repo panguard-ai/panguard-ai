@@ -7,11 +7,11 @@
 ## Core Products
 
 - [Product Overview](https://panguard.ai/product): The security flywheel -- audit, guard, share, strengthen
-- [Skill Auditor](https://panguard.ai/product/skill-auditor): 6-layer pre-install security gate for AI skills (Beta)
+- [Skill Auditor](https://panguard.ai/product/skill-auditor): 8-layer pre-install security gate for AI skills
 - [Panguard Scan](https://panguard.ai/product/scan): 60-second security audit with Sigma, YARA, and ATR rules
 - [Panguard Guard](https://panguard.ai/product/guard): 4-agent AI pipeline -- detect, analyze, respond, report -- 24/7
 - [MCP Server](https://panguard.ai/product/mcp): 11 panguard_* tools for Claude Code, Cursor, and AI assistants
-- [ATR Standard](https://panguard.ai/atr): 49 open-source rules for AI agent threats (like Sigma for agents)
+- [ATR Standard](https://panguard.ai/atr): 61 open-source rules for AI agent threats (like Sigma for agents)
 - [Threat Cloud](https://panguard.ai/threat-cloud): Collective intelligence -- auto-generates rules from real attacks
 
 ## Coming Soon

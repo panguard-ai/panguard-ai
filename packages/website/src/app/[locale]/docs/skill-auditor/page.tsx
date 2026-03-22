@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Skill Auditor — Panguard AI',
     description:
-      'Scan AI agent skills for security threats in under 1 second. 7 automated checks, 0-100 risk score.',
+      'Scan AI agent skills for security threats in under 1 second. 8 automated checks, 0-100 risk score.',
   },
 };
 
