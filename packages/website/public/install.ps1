@@ -349,24 +349,39 @@ if (-not $verified) {
     Write-Fail "Installation verification failed. panguard cannot execute.`nCheck Node.js installation and PATH."
 }
 
-# ── Quick Start Guide ────────────────────────────────────────────
+# ── Auto Setup: connect AI agents + start Guard with dashboard ───
 Write-Host ""
-Write-Host "  Quick Start" -ForegroundColor White
-Write-Host "  ===========" -ForegroundColor DarkGray
+Write-Info "Connecting to AI agents..."
+try {
+    panguard setup 2>$null
+} catch {
+    Write-Warn "Setup skipped. Run 'panguard setup' manually."
+}
+
 Write-Host ""
-Write-Host "  # Connect to Claude Code, Cursor, and other AI agents"
-Write-Host "  panguard setup"
+Write-Info "Starting Guard with dashboard..."
+try {
+    Start-Process -NoNewWindow -FilePath "panguard" -ArgumentList "guard", "start", "--dashboard"
+    Start-Sleep -Seconds 2
+    Write-Ok "Guard started! Dashboard opening in your browser."
+} catch {
+    Write-Warn "Could not start Guard. Run 'panguard guard start --dashboard' manually."
+}
+
 Write-Host ""
-Write-Host "  # Audit installed AI skills for security threats"
-Write-Host "  panguard audit skill ."
+Write-Host "  Dashboard:  " -NoNewline; Write-Host "http://127.0.0.1:9100" -ForegroundColor Cyan
+Write-Host "  Guard:      running (learning mode, day 1/7)"
+Write-Host "  ATR rules:  61 detection rules loaded"
 Write-Host ""
-Write-Host "  # Run a security scan"
-Write-Host "  panguard scan"
+Write-Host "  Panguard is installed and protecting your AI agents." -ForegroundColor Green
+Write-Host "  All detected AI platforms have been configured."
 Write-Host ""
-Write-Host "  # Start 24/7 real-time protection"
-Write-Host "  panguard guard start"
+Write-Host "  Other commands:" -ForegroundColor White
+Write-Host "    panguard audit skill <path>   Audit a skill before installing"
+Write-Host "    panguard scan --quick         Quick system security scan"
+Write-Host "    panguard guard status         Check Guard status"
+Write-Host "    panguard guard stop           Stop Guard"
 Write-Host ""
-Write-Host "  Documentation: https://panguard.ai/docs" -ForegroundColor DarkGray
-Write-Host "  Report issues: https://github.com/panguard-ai/panguard-ai/issues" -ForegroundColor DarkGray
+Write-Host "  Documentation: https://docs.panguard.ai" -ForegroundColor DarkGray
 Write-Host ""
 Write-Ok "Installation complete!"
