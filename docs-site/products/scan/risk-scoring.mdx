@@ -12,7 +12,7 @@ Every Panguard Scan produces a single risk score from 0 to 100 and an associated
 Score: 62/100 [████████████░░░░░░░░] Grade: C
 ```
 
-The score represents a **safety score**: higher is better. It is calculated as `100 - totalRiskPoints`, clamped to the 0--100 range.
+The score represents a **risk score**: higher means more risk. It is the sum of severity-weighted findings (adjusted by context), clamped to the 0--100 range.
 
 ## Grade Thresholds
 
@@ -30,26 +30,46 @@ The risk score is derived from the severity and quantity of findings across all 
 
 | Severity | Points per Finding |
 |----------|--------------------|
-| CRITICAL | 15 |
-| HIGH | 10 |
+| CRITICAL | 25 |
+| HIGH | 15 |
 | MEDIUM | 5 |
-| LOW | 2 |
+| LOW | 1 |
 | INFO | 0 |
 
-Points are summed and subtracted from 100. The resulting value is clamped to a minimum of 0.
+Points are summed and the total becomes the raw risk score (higher = more risk). The score is clamped to the 0--100 range.
+
+### Deduplication
+
+When multiple findings share the same ID (e.g., the same rule triggered on different inputs), only the highest-severity instance is counted. This prevents score inflation from duplicate detections.
+
+### Context Multiplier
+
+The raw score is adjusted by a **context multiplier** that reflects environmental signals:
+
+| Multiplier | Meaning | Effect |
+|------------|---------|--------|
+| > 1.0 | Malicious context signals present | Increases risk score |
+| 1.0 | Neutral (default) | No adjustment |
+| < 1.0 | Legitimate context signals present | Reduces risk score |
+
+The final score is `min(100, round(rawScore * contextMultiplier))`.
 
 ### Example Calculation
 
 | Finding | Severity | Points |
 |---------|----------|--------|
-| SSH on 0.0.0.0 | HIGH | 10 |
+| SSH on 0.0.0.0 | HIGH | 15 |
 | Weak password policy | MEDIUM | 5 |
-| Expired SSL cert | CRITICAL | 15 |
-| No firewall | HIGH | 10 |
+| Expired SSL cert | CRITICAL | 25 |
+| No firewall | HIGH | 15 |
 | Outdated kernel (CVE) | MEDIUM | 5 |
-| | **Total** | **45** |
+| | **Total** | **65** |
 
-**Safety Score** = 100 - 45 = **55** (Grade: **D**)
+With a neutral context multiplier (1.0), the risk score is **65** (Grade: **C**).
+
+### Risk Level Overrides
+
+The presence of a CRITICAL finding forces at least a HIGH risk level, regardless of the numeric score. If the context multiplier is very low (< 0.6), the override is weakened to MEDIUM instead of HIGH.
 
 ## Score Categories
 
@@ -70,10 +90,10 @@ Beyond the single number, the score is contextualized across 8 categories:
 
 <Steps>
   <Step title="Fix CRITICAL findings first">
-    Each critical finding costs 15 points. Resolving just one can move your grade up a full letter.
+    Each critical finding costs 25 points. Resolving just one can move your grade up a full letter.
   </Step>
   <Step title="Address HIGH findings">
-    High-severity items are the next priority at 10 points each.
+    High-severity items are the next priority at 15 points each.
   </Step>
   <Step title="Review MEDIUM findings">
     These are typically configuration improvements that accumulate.

@@ -1,39 +1,124 @@
 ---
 title: "Threat Cloud"
-description: "Collective threat intelligence platform where every Panguard agent contributes anonymized data and every agent benefits from the community's detections."
+description: "Community-driven ATR rule consensus platform. Scanners propose threat patterns, the community confirms them, and confirmed rules are distributed back to all scanners."
 icon: "cloud"
 ---
 
-Panguard Threat Cloud is a collective threat intelligence platform. Every Guard agent that detects a threat contributes anonymized data to the cloud. Every agent benefits from the community's collective detections. The result: install Panguard on one machine and get the protection of the entire network's intelligence.
+Panguard Threat Cloud is a community-driven threat intelligence platform built around ATR (Agent Threat Rules) proposals and consensus. When any scanner (CLI, Website, or Guard) detects a suspicious pattern in an MCP skill, it submits a proposal to Threat Cloud. Other scanners that encounter the same pattern confirm it. Once a proposal reaches 3 or more confirmations, it is automatically promoted to a confirmed rule and distributed to all connected scanners.
 
-## How It Works
+## The Flywheel
+
+The core loop that makes Threat Cloud increasingly effective over time:
 
 ```
-Agent A (detects threat) ──> Anonymize ──> Threat Cloud ──> All Agents benefit
-Agent B (detects threat) ──> Anonymize ──┘
-Agent C (queries) ─────────────────────────┘
+Scan skill ──> Findings ──> TC proposal ──> Community consensus ──> Confirmed rule ──> Distributed to all scanners
+                                                    ^                                           |
+                                                    └───────────────────────────────────────────┘
 ```
 
-When a Guard agent detects a threat:
-1. The `ReportAgent` anonymizes the threat data (IP /16 masking, no hostnames, no file contents)
-2. Anonymized IoCs are submitted to Threat Cloud
-3. Threat Cloud validates, correlates, and stores the data
-4. Other agents query Threat Cloud during their detection pipeline and benefit from the collective intelligence
+1. **Scan** -- Any scanner (CLI `panguard audit skill`, Website, or Guard skill watcher) scans a skill
+2. **Propose** -- High-severity findings generate an ATR proposal with a pattern hash
+3. **Confirm** -- Other scanners encountering the same pattern hash increment the confirmation count
+4. **Promote** -- At 3+ confirmations, the proposal is auto-promoted to a confirmed rule
+5. **Distribute** -- Confirmed rules are served via `GET /api/atr-rules` to all scanners
+6. **Strengthen** -- Scanners load confirmed rules, improving detection, which generates more proposals
 
-## Key Capabilities
+Each cycle through the flywheel adds detection capability to the entire network.
 
-| Capability | Details |
-|-----------|---------|
-| **IoC store** | IP addresses, domains, file hashes, URLs |
-| **Correlation engine** | Cross-source correlation of related indicators |
-| **Campaign tracking** | Group related IoCs into attack campaigns |
-| **Feed distribution** | IP and domain blocklists pushed to agents |
-| **Sighting store** | Track how many agents have seen each indicator |
-| **Reputation engine** | Confidence scoring based on sighting frequency and source diversity |
-| **ATR rule sharing** | Community-contributed AI agent threat detection rules |
-| **LLM review** | Claude Sonnet 4 automated review of submitted ATR proposals |
-| **ATR rule sharing** | Community-contributed AI agent detection rules |
-| **Audit logging** | Full audit trail of all submissions and queries |
+## ATR Proposals
+
+ATR proposals are the primary mechanism for community threat intelligence in Threat Cloud.
+
+### Pattern Hash
+
+Every proposal is identified by a **pattern hash** -- a deterministic identifier computed from the scan findings:
+
+- Format: `scan:{skillName}:{findingSummary}` hashed with SHA-256, truncated to 16 hex characters
+- The `scan:` prefix ensures CLI, Website, and Guard all produce identical hashes for the same threat pattern
+- Hash computation is handled by `@panguard-ai/scan-core` so all scanner implementations agree
+
+### Proposal Lifecycle
+
+| Stage | Description |
+|-------|-------------|
+| **Pending** | New proposal submitted, awaiting community confirmation |
+| **Confirmed** | 3+ independent scanners have confirmed the same pattern hash |
+| **Promoted** | Confirmed proposal converted to a distributable ATR rule |
+| **Rejected** | LLM reviewer flagged the proposal as a false positive |
+
+### Submitting a Proposal
+
+Proposals are submitted automatically when a scanner detects high-severity findings. The endpoint is `POST /api/atr-proposals`. Each submission includes the pattern hash, the proposed rule content, and the LLM model that generated the self-review verdict.
+
+If the pattern hash already exists, the submission counts as a confirmation rather than a new proposal.
+
+## Community Consensus
+
+Threat Cloud uses a simple, transparent consensus mechanism:
+
+- Each unique scanner instance (identified by an anonymous client ID) can confirm a proposal once
+- When a proposal reaches **3 or more confirmations**, it is automatically promoted to `confirmed` status
+- No manual review is required for community consensus -- the process is fully automated
+- The `promoteConfirmedProposals()` function handles promotion on each sync cycle
+
+This means a threat pattern must be independently detected by at least 3 separate scanners before it becomes a confirmed rule. This reduces false positives while keeping the pipeline fully automated.
+
+## LLM Reviewer
+
+Threat Cloud includes an automated LLM reviewer (Claude Sonnet 4) that evaluates ATR proposals for production readiness.
+
+The LLM reviewer assesses:
+
+| Criterion | What It Checks |
+|-----------|---------------|
+| **False positive risk** | Whether the pattern would flag legitimate skills (low / medium / high) |
+| **Coverage score** | How well the rule covers the intended threat category |
+| **Detection specificity** | Whether the rule is precise enough to avoid noise |
+| **Response proportionality** | Whether the suggested severity matches the actual risk |
+| **YAML validity** | Whether the proposed rule is well-formed |
+
+LLM review runs automatically on new proposals via the `POST /api/analyze-skills` endpoint. A proposal can be promoted through either path:
+
+- **Community consensus alone**: 3+ confirmations, even without LLM review
+- **LLM approved + community confirmed**: Highest confidence promotion
+
+If the LLM reviewer explicitly rejects a proposal, community consensus cannot override the rejection.
+
+## Rule Distribution
+
+Confirmed ATR rules are distributed to all scanners via a single endpoint:
+
+```
+GET /api/atr-rules
+GET /api/atr-rules?since=2025-01-01T00:00:00Z
+```
+
+The `?since=` parameter allows incremental fetching -- scanners only download rules confirmed after their last sync. Guard agents sync automatically every hour. CLI and Website fetch rules on each scan invocation.
+
+## IoC Feeds
+
+In addition to ATR rules, Threat Cloud also distributes traditional IoC feeds:
+
+| Endpoint | Format | Description |
+|----------|--------|-------------|
+| `GET /api/feeds/ip-blocklist` | text/plain | Known malicious IPs (one per line) |
+| `GET /api/feeds/domain-blocklist` | text/plain | Known malicious domains (one per line) |
+| `GET /api/skill-blacklist` | JSON | Community-reported unsafe skills |
+
+Both feed endpoints accept an optional `?minReputation=` parameter to filter by confidence level.
+
+## What Gets Synced
+
+Every hour, your Guard agent exchanges data with Threat Cloud:
+
+| Direction | Data | Description |
+|-----------|------|-------------|
+| **Upload** | ATR proposals | Pattern hash + proposed rule content for new threat patterns |
+| **Upload** | Scan events | Anonymized scan results from CLI, Website, or Guard |
+| **Upload** | Skill threats | Anonymized skill audit findings |
+| **Download** | Confirmed ATR rules | Community-confirmed detection rules |
+| **Download** | IP blocklist | Known malicious IPs |
+| **Download** | Domain blocklist | Known malicious domains |
 
 ## Quick Start
 
@@ -43,66 +128,27 @@ No configuration needed. Guard automatically connects to the public Threat Cloud
 panguard guard start --dashboard
 ```
 
-Threat Cloud sync happens automatically every hour in the background. Your agent contributes anonymized threat data and receives updated rules, IoC feeds, and blocklists.
+Threat Cloud sync happens automatically every hour in the background. Your agent contributes anonymized threat data and receives updated ATR rules and IoC feeds.
 
 <Info>
   **Zero configuration required.** The public Threat Cloud at `tc.panguard.ai` is free for all Panguard users. No API key needed for standard agent sync.
 </Info>
 
-## What Gets Synced
+## API Endpoints
 
-Every hour, your Guard agent exchanges data with Threat Cloud:
-
-| Direction | Data | Description |
-|-----------|------|-------------|
-| **Upload** | Anonymized threat events | IP /16 masked, no hostnames, no file contents |
-| **Upload** | ATR proposals | New AI agent threat patterns detected locally |
-| **Upload** | Skill audit results | Safe/unsafe skill fingerprints |
-| **Download** | ATR rules | Confirmed AI agent threat detection rules |
-| **Download** | IP blocklist | Known malicious IPs |
-| **Download** | Domain blocklist | Known malicious domains |
-
-## IoC Types
-
-| Type | Example | Description |
-|------|---------|-------------|
-| **IP Address** | `203.0.113.50` | Known malicious source or C2 server |
-| **Domain** | `evil.example.com` | Malicious domain or phishing site |
-| **File Hash** | `sha256:abc123...` | Known malware signature |
-| **URL** | `http://evil.example.com/payload` | Malware distribution URL |
-
-## Feed Sources
-
-Threat Cloud aggregates intelligence from 11 external sources including:
-
-| Feed | Data Type |
-|------|-----------|
-| **ThreatFox** (abuse.ch) | Malware, C2, botnet IoCs |
-| **URLhaus** (abuse.ch) | Malware distribution URLs |
-| **Feodo Tracker** (abuse.ch) | Botnet C2 server IPs |
-| **GreyNoise** | Mass scanning and internet noise IPs |
-| **AbuseIPDB** | Community-reported malicious IPs |
-
-Plus 6 additional specialized feeds for AI agent threats, supply chain attacks, and regional threat intelligence.
-
-## Guard Integration
-
-The Guard `DetectAgent` queries Threat Cloud during event processing:
-
-1. Extract indicators from the security event (source IP, destination domain, file hash)
-2. Query Threat Cloud for matches
-3. If matched, the indicator's confidence score contributes to the `AnalyzeAgent`'s weighted verdict
-4. Threat intel matches have a fixed confidence contribution of 85
-
-## ATR Community Pipeline
-
-When your Guard detects a new AI agent threat pattern:
-
-1. Guard drafts an ATR rule locally
-2. Rule proposal is submitted to Threat Cloud (anonymized)
-3. **Claude Sonnet 4** reviews the proposal for quality and accuracy
-4. Community sightings confirm or reject the pattern
-5. Confirmed rules are promoted and distributed to all agents
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/atr-proposals` | Submit or confirm an ATR proposal |
+| GET | `/api/atr-rules` | Fetch confirmed ATR rules (supports `?since=` filter) |
+| POST | `/api/skill-threats` | Submit skill threat from audit |
+| POST | `/api/analyze-skills` | Submit scan results for server-side LLM analysis |
+| POST | `/api/scan-events` | Report scan events (bulk/CLI/web) |
+| GET | `/api/feeds/ip-blocklist` | IP blocklist feed |
+| GET | `/api/feeds/domain-blocklist` | Domain blocklist feed |
+| GET | `/api/skill-blacklist` | Community skill blacklist |
+| GET | `/api/stats` | Threat statistics |
+| GET | `/api/metrics` | Aggregated metrics (cached 60s) |
+| GET | `/health` | Health check |
 
 ## Private Instances
 

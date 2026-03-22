@@ -34,15 +34,11 @@ Split interactive.ts (1,912 lines) into: lang.ts, menu-defs.ts, render.ts + 5 ac
 
 Added: legal-pages.spec.ts (8 legal pages + zh variants), mobile-responsive.spec.ts (viewport, hamburger, overflow), locale-switch.spec.ts (EN/ZH switching, persistence), enhanced navigation.spec.ts (product pages, footer links, content pages).
 
-## P2 - Merge TC Handler + ATR Engine Triple Implementation (L)
+## P2 - Merge TC Handler + ATR Engine Triple Implementation (L) — PARTIAL
 
-Three independent ATR/TC implementations exist and must be unified into a shared module:
+**Scan engine unified (2026-03-22):** `@panguard-ai/scan-core` package created. CLI Auditor, Website, and Guard now share one scan engine with unified hash computation. Flywheel hash consistency fixed.
 
-1. `packages/threat-cloud/src/server.ts` — TC server (7 API endpoints)
-2. `packages/panguard/src/cli/commands/serve-tc.ts` — CLI embedded TC (same 7 endpoints)
-3. `packages/website/src/app/api/scan/route.ts` — Website scan API (compileRules, runFullScan, syncATRFromTC)
-
-All three share Zod schemas from `@panguard-ai/core`. Refactor to extract shared handler logic + ATR rule compilation into a common module to prevent future divergence.
+**Remaining:** TC handler duplication (serve-tc.ts vs server.ts — same 7 API endpoints). Extract shared handler logic into a common module.
 
 ## P2 - Flywheel Core Component Unit Tests (XL)
 
@@ -59,15 +55,17 @@ Target: unit tests covering happy path, error path, and edge cases (path travers
 
 Additionally: `atr-engine.ts` `resolveBundledRulesDir()` now has a 4-layer fallback chain (createRequire → CLI argv → walk node_modules → bundled-rules) that is critical for npm -g installs. Needs mock-based unit tests to verify each fallback triggers correctly when prior strategies fail.
 
-## P2 - Website Scan API Unit Tests (M)
+## P2 - scan-core Unit Tests (M) — IN PROGRESS (2026-03-22)
 
-`packages/website/src/app/api/scan/route.ts` has zero test coverage for critical functions:
+`packages/scan-core/` core scan logic (extracted from website route.ts) needs unit test coverage:
 
-- `compileRules()` — compiles ATR patterns into RegExp with safe-regex validation and (?i) flag handling
-- `runFullScan()` — runs all compiled ATR rules + secret detection against content
-- `syncATRFromTC()` — fetches and merges cloud rules with bundled rules
+- `hash-utils.ts` — contentHash (16-char hex), patternHash (unified `scan:` prefix)
+- `risk-scorer.ts` — dedup by ID, contextMultiplier, critical override logic
+- `atr-engine.ts` — compileRules (safe-regex validation, (?i) flag), scanWithATR (two-pass)
+- `scanner.ts` — scanContent() end-to-end (empty input, benign, malicious)
+- `manifest-parser.ts` — frontmatter parsing, fallback behavior
 
-Tests needed: happy path, malformed input (invalid regex, bad JSON), ReDoS regex rejection via safe-regex, (?i) flag stripping, cloud rule merge deduplication.
+Basic tests being written. Full coverage (edge cases, ReDoS rejection, cloud rule merge) still needed.
 
 ## ~~P2 - FinalCTANew i18n Restoration~~ DONE (2026-03-16)
 

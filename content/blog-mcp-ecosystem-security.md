@@ -12,7 +12,7 @@ _SSH key theft. Hidden prompt injection. Delayed backdoors. Environment variable
 - **49% had security findings** — 402 CRITICAL, 240 HIGH, 299 MEDIUM
 - **249 packages have the "triple threat"**: shell execution + network requests + filesystem write
 - **122 packages auto-execute code on install** via postinstall scripts
-- Detection precision: **99.4%** (we almost never cry wolf)
+- Detection: **99.4% precision** (near-zero false positives), **39.9% recall** (catches known patterns, improving as new rules are added)
 - Everything is open source: [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) (detection standard) + [PanGuard](https://github.com/panguard-ai/panguard-ai) (scanner)
 
 ---
