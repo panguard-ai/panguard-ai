@@ -47,68 +47,6 @@ $env:ANTHROPIC_API_KEY = "sk-ant-..."
 ```
 </CodeGroup>
 
-
----
-
-## Panguard Manager
-
-| 變數 | 預設值 | 說明 |
-|----------|---------|-------------|
-| `MANAGER_PORT` | `8443` | Manager API 的 HTTPS 埠 |
-| `MANAGER_AUTH_TOKEN` | -- | **必填。** 用於 API 存取的共享身份驗證 token |
-| `MANAGER_MAX_AGENTS` | `100` | 可註冊的最大代理數量 |
-| `MANAGER_HEARTBEAT_TIMEOUT_MS` | `120000` | 代理被標記為 stale 前的毫秒數 |
-| `CORS_ALLOWED_ORIGINS` | -- | 以逗號分隔的允許 CORS 來源清單 |
-
-<CodeGroup>
-```bash Linux / macOS
-export MANAGER_PORT=8443
-export MANAGER_AUTH_TOKEN=$(openssl rand -hex 32)
-export MANAGER_MAX_AGENTS=100
-export MANAGER_HEARTBEAT_TIMEOUT_MS=120000
-export CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai
-```
-
-```bash Docker
-docker run -d \
-  -e MANAGER_PORT=8443 \
-  -e MANAGER_AUTH_TOKEN=your-secure-token \
-  -e MANAGER_MAX_AGENTS=100 \
-  -e CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai \
-  panguard/manager
-```
-</CodeGroup>
-
-<Warning>
-`MANAGER_AUTH_TOKEN` 是必填的，且必須在啟動 Manager 前設定。使用至少 32 個字元的強隨機值。連接到此 Manager 的所有代理上必須設定相同的 token。
-</Warning>
-
----
-
-## Panguard Auth Server
-
-| 變數 | 預設值 | 說明 |
-|----------|---------|-------------|
-| `PANGUARD_PORT` | `3000` | Auth Server 的 HTTP 埠 |
-| `JWT_SECRET` | -- | **必填。** 用於簽署 JWT token 的密鑰 |
-| `GOOGLE_CLIENT_ID` | -- | Google OAuth 用戶端 ID（用於社交登入） |
-| `GOOGLE_CLIENT_SECRET` | -- | Google OAuth 用戶端密鑰 |
-
-<CodeGroup>
-```bash Linux / macOS
-export PANGUARD_PORT=3000
-export JWT_SECRET=$(openssl rand -hex 64)
-
-# 選用：Google OAuth
-export GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-export GOOGLE_CLIENT_SECRET=your-client-secret
-```
-</CodeGroup>
-
-<Warning>
-`JWT_SECRET` 必須是強隨機值。如果它被洩露，所有已簽發的 token 都可以被偽造。如果懷疑洩露，請立即輪換 -- 這將使所有活躍的工作階段失效。
-</Warning>
-
 ---
 
 ## Panguard Threat Cloud
@@ -150,21 +88,6 @@ export ALLOW_ANONYMOUS_UPLOAD=false
 <CodeGroup>
 ```yaml docker-compose.yml
 services:
-  manager:
-    image: panguard/manager
-    environment:
-      - NODE_ENV=production
-      - MANAGER_PORT=8443
-      - MANAGER_AUTH_TOKEN=${MANAGER_AUTH_TOKEN}
-      - CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai
-
-  auth:
-    image: panguard/auth
-    environment:
-      - NODE_ENV=production
-      - PANGUARD_PORT=3000
-      - JWT_SECRET=${JWT_SECRET}
-
   threat-cloud:
     image: panguard/threat-cloud
     environment:

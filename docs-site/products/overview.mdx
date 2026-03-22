@@ -27,9 +27,6 @@ Panguard AI is not a single tool. It is an integrated platform of 8 products, ea
   <Card title="MCP Server" icon="plug" href="/products/mcp/overview">
     Model Context Protocol server exposing 11 Panguard tools to AI assistants like Claude Desktop and Cursor.
   </Card>
-  <Card title="Manager" icon="building" href="/products/manager/overview">
-    Centralized fleet orchestration with hub-and-spoke architecture. Agent registry, cross-agent threat correlation, and policy distribution for up to 500 endpoints.
-  </Card>
   <Card title="Threat Cloud" icon="cloud" href="/products/threat-cloud/overview">
     Collective threat intelligence platform. Every Guard instance contributes anonymized threat data, and every instance benefits from the community's detections.
   </Card>
@@ -44,9 +41,6 @@ Scan ──> Guard ──> Chat
   |        |         |
   v        v         v
 Report   Trap    Threat Cloud
-           |         |
-           v         v
-        Manager (fleet-wide)
 ```
 
 | Workflow | Products Involved | Description |
@@ -55,7 +49,7 @@ Report   Trap    Threat Cloud
 | **Detect and Notify** | Guard + Chat | Guard detects threats in real time and Chat delivers plain-language alerts to your preferred channel. |
 | **Lure and Learn** | Trap + Guard + Threat Cloud | Honeypots capture attacker behavior, Guard auto-blocks the source IPs, and intelligence is shared via Threat Cloud. |
 | **Comply and Report** | Scan + Report | Scan findings map directly to compliance controls. Generate audit-ready PDF reports on demand. |
-| **Scale and Centralize** | Manager + Guard + Threat Cloud | Deploy Guard agents across your fleet, manage them from a single Manager, and correlate threats globally. |
+| **Scale and Centralize** | Guard + Threat Cloud | Deploy Guard agents across your fleet and correlate threats globally via Threat Cloud. |
 | **AI Copilot** | MCP + Scan + Guard | Use natural language in Claude or Cursor to run scans, check status, and block IPs via the MCP server. |
 
 ## Architecture at a Glance
@@ -65,9 +59,9 @@ Panguard is built as a **13-package TypeScript monorepo** managed by pnpm worksp
 | Layer | Components | Responsibility |
 |-------|-----------|----------------|
 | **Endpoint** | Guard, Scan, Trap, Chat | Local detection, scanning, honeypots, and notifications |
-| **Management** | Manager, Auth | Fleet orchestration, agent registry, authentication |
+| **Management** | Guard | Endpoint protection and local fleet coordination |
 | **Intelligence** | Threat Cloud, Report | Collective IoC sharing, compliance reporting |
-| **Integration** | MCP, Web, Admin | AI assistant integration, dashboards |
+| **Integration** | MCP | AI assistant integration |
 
 <Info>
   Each product can run independently. You do not need to deploy the full suite. Start with `panguard scan` and add products as your needs grow.

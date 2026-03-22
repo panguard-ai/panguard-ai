@@ -12,7 +12,6 @@ import {
   ShieldIcon,
   BlockIcon,
   AnalyticsIcon,
-  DeployIcon,
   TerminalIcon,
   SettingsIcon,
 } from '@/components/ui/BrandIcons';
@@ -58,11 +57,6 @@ const mcpTools = [
     desc: 'Initialize Panguard configuration on a new system',
   },
   {
-    icon: DeployIcon,
-    name: 'panguard_deploy',
-    desc: 'Deploy security configuration to an endpoint',
-  },
-  {
     icon: TerminalIcon,
     name: 'panguard_skill_audit',
     desc: 'Audit AI agent SKILL.md files for security threats',
@@ -76,6 +70,9 @@ const clients = [
   { name: 'Claude Code', desc: 'CLI agent that can call MCP tools directly' },
   { name: 'OpenClaw', desc: 'Native Skill (auto-installed via `panguard setup`)' },
   { name: 'Codex CLI', desc: "OpenAI's coding agent with MCP tool support" },
+  { name: 'WorkBuddy', desc: 'Tencent AI assistant with MCP tool support' },
+  { name: 'NemoClaw', desc: 'NVIDIA AI agent platform with MCP integration' },
+  { name: 'ArkClaw', desc: 'ByteDance cloud AI agent platform with MCP support' },
   { name: 'Any MCP Client', desc: 'Any app implementing the Model Context Protocol' },
 ];
 

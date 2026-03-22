@@ -397,8 +397,8 @@ export default function ScanResultCard({
         </code>
         <p className="text-[10px] text-text-muted">
           {isZh
-            ? `一行安裝。自動偵測 Claude Code、Cursor、OpenClaw 等 7 個平台。${STATS.totalRulesDisplay} ATR 偵測規則即時防護。`
-            : `One command. Auto-detects Claude Code, Cursor, OpenClaw + 4 more. ${STATS.totalRulesDisplay} ATR detection rules.`}
+            ? `一行安裝。自動偵測 Claude Code、Cursor、OpenClaw、WorkBuddy、NemoClaw、ArkClaw 等平台。${STATS.totalRulesDisplay} ATR 偵測規則即時防護。`
+            : `One command. Auto-detects Claude Code, Cursor, OpenClaw, WorkBuddy, NemoClaw, ArkClaw + more. ${STATS.totalRulesDisplay} ATR detection rules.`}
         </p>
       </div>
     </motion.div>

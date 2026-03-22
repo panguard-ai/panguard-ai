@@ -69,14 +69,11 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
 
         {/* 3 */}
         <section>
-          <h2 className="text-lg font-semibold text-text-primary mb-3">3. Account Registration</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-3">3. No Account Required</h2>
           <p>
-            To access the Service, you must create an account by providing accurate, complete, and
-            current information. You are responsible for maintaining the confidentiality of your
-            account credentials and for all activity that occurs under your account. You must notify
-            Panguard immediately of any unauthorized use of your account. We reserve the right to
-            suspend or terminate accounts that contain inaccurate information or that violate these
-            Terms.
+            Panguard is a free, open source CLI tool. No account registration, login, or personal
+            information is required to use any feature. You may download, install, and use the
+            software without providing any credentials or contact information.
           </p>
         </section>
 
@@ -211,10 +208,9 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
             CONNECTION WITH YOUR USE OF THE SERVICE.
           </p>
           <p className="mt-2">
-            PANGUARD&apos;S TOTAL AGGREGATE LIABILITY FOR ALL CLAIMS ARISING OUT OF OR RELATING TO
-            THESE TERMS OR THE SERVICE SHALL NOT EXCEED THE GREATER OF (A) THE AMOUNTS YOU PAID TO
-            PANGUARD IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR (B) ONE HUNDRED US DOLLARS
-            (US$100).
+            PANGUARD IS PROVIDED FREE OF CHARGE UNDER THE MIT LICENSE. PANGUARD&apos;S TOTAL
+            AGGREGATE LIABILITY FOR ALL CLAIMS ARISING OUT OF OR RELATING TO THESE TERMS OR THE
+            SERVICE SHALL NOT EXCEED ONE HUNDRED US DOLLARS (US$100).
           </p>
           <p className="mt-2">
             THE SERVICE IS A SECURITY TOOL DESIGNED TO ASSIST WITH THREAT DETECTION AND RESPONSE.
@@ -240,20 +236,11 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
         <section>
           <h2 className="text-lg font-semibold text-text-primary mb-3">12. Termination</h2>
           <p>
-            12.1 <strong className="text-text-primary">By You.</strong> You may terminate your
-            account at any time by contacting support or through your account settings. Termination
-            will take effect immediately.
-          </p>
-          <p className="mt-2">
-            12.2 <strong className="text-text-primary">By Panguard.</strong> We may suspend or
-            terminate your access to the Service immediately if you breach these Terms or if we are
-            required to do so by law. We may also discontinue the Service with 90 days prior notice.
-          </p>
-          <p className="mt-2">
-            12.3 <strong className="text-text-primary">Effect of Termination.</strong> Upon
-            termination, your right to access the Service ceases immediately. Panguard will make
-            your Customer Data available for export for 30 days following termination, after which
-            it may be deleted.
+            You may stop using Panguard at any time by uninstalling it. No account closure is
+            needed. Panguard may discontinue the Service or cease development with 90 days prior
+            notice posted on the project repository. Since Panguard is MIT-licensed open source
+            software, you retain the right to use, modify, and distribute any version you have
+            obtained.
           </p>
         </section>
 

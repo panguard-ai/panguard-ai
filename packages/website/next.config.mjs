@@ -5,7 +5,27 @@ const withNextIntl = createNextIntlPlugin();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
-    return [];
+    const hiddenRoutes = [
+      '/status',
+      '/legal/security',
+      '/legal/sla',
+      '/legal/dpa',
+      '/demo',
+      '/early-access',
+      '/customers/:slug*',
+      '/customers',
+      '/partners',
+      '/solutions/enterprise',
+      '/solutions/smb',
+      '/careers',
+      '/product/manager',
+      '/pricing',
+    ];
+
+    return hiddenRoutes.flatMap((source) => [
+      { source, destination: '/', permanent: false },
+      { source: `/zh-TW${source}`, destination: '/', permanent: false },
+    ]);
   },
   async rewrites() {
     return {

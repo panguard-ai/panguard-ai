@@ -302,7 +302,7 @@ export default function GettingStartedContent() {
             <div className="mt-4">
               <p className="text-sm text-text-secondary mb-3">
                 Run setup to auto-configure all detected AI platforms (Claude Code, Claude Desktop,
-                Cursor, OpenClaw, Codex):
+                Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw):
               </p>
               <CodeBlock code="panguard setup" label="Terminal" />
             </div>
@@ -431,7 +431,7 @@ export default function GettingStartedContent() {
                 </p>
                 <CodeBlock code="panguard setup" label="Terminal" />
                 <p className="text-xs text-text-muted mt-2">
-                  Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex automatically.
+                  Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw automatically.
                 </p>
               </div>
             </FadeInUp>
@@ -572,7 +572,6 @@ export default function GettingStartedContent() {
                   { cmd: 'panguard report generate', desc: 'Generate compliance report' },
                   { cmd: 'panguard scan code --dir .', desc: 'SAST code scanning' },
                   { cmd: 'panguard doctor', desc: 'Diagnose installation' },
-                  { cmd: 'panguard whoami', desc: 'Show account info' },
                   { cmd: 'panguard --help', desc: 'Show all commands' },
                 ].map(({ cmd, desc }) => (
                   <div key={cmd} className="flex items-baseline gap-3">

@@ -4,7 +4,7 @@ description: "顯示所有 Panguard 服務的整體健康狀態。"
 icon: "circle-info"
 ---
 
-`status` 指令提供 Panguard 安裝的統一檢視 -- 身份驗證狀態、Guard 代理健康、最近掃描結果、活躍蜜罐、通知頻道連線等。
+`status` 指令提供 Panguard 安裝的統一檢視 -- Guard 代理健康、最近掃描結果、活躍蜜罐、通知頻道連線等。
 
 ## 使用方式
 
@@ -48,7 +48,6 @@ status 指令回報以下區段：
 
 | 區段 | 資訊 |
 | --- | --- |
-| **Authentication** | 已登入使用者、方案層級、token 到期時間 |
 | **Guard** | 運行中 / 已停止、運行時間、已處理事件 |
 | **Scan** | 上次掃描時間、發現數量、風險評分 |
 | **Chat** | 已設定頻道、連線健康狀態 |
@@ -60,9 +59,6 @@ status 指令回報以下區段：
 <CardGroup cols={2}>
   <Card title="panguard doctor" icon="stethoscope" href="/cli/doctor">
     當狀態顯示問題時進行診斷。
-  </Card>
-  <Card title="panguard whoami" icon="id-card" href="/cli/whoami">
-    詳細的身份驗證資訊。
   </Card>
   <Card title="panguard guard" icon="shield" href="/cli/guard">
     管理狀態中顯示的 Guard 代理。

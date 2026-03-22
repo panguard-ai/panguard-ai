@@ -149,7 +149,7 @@ export default function EcosystemReportContent() {
                 registries.
               </p>
               <p>
-                AI agents like Claude Code, Cursor, OpenClaw, and Codex use MCP skills with
+                AI agents like Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, and ArkClaw use MCP skills with
                 <strong className="text-text-primary"> full system access</strong> — they can read
                 files, execute commands, access environment variables, and make network requests.
                 Unlike mobile apps, there is no review process before a skill runs on your machine.

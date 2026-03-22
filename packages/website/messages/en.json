@@ -6,7 +6,7 @@
     "scanFree": "Scan Free",
     "contactSales": "Talk to Sales",
     "requestDemo": "Request a Demo",
-    "scheduleDemo": "Schedule Demo",
+    "scheduleDemo": "Get Started",
     "learnMore": "Learn More",
     "viewAll": "View All",
     "readMore": "Read More",
@@ -715,19 +715,11 @@
       }
     },
     "finalCta": {
-      "title": "You deploy. We defend.",
-      "subtitle": "One command to install. Everything included. MIT open source. No account needed.",
-      "manifesto": "We built Panguard because security shouldn't need a six-figure budget or a dedicated team. It should be one command away.",
-      "btnGetStarted": "Free Server Scan",
-      "btnGithub": "GitHub",
-      "btnDocs": "Documentation",
-      "btnScan": "Start Free Scan",
-      "btnDemo": "Book a Demo",
-      "btnSales": "Talk to Sales",
-      "badge1": "MIT Open Source",
-      "badge2": "3,490 Tests Passing",
-      "badge3": "Built in Taiwan",
-      "copied": "Copied!"
+      "title": "Start with a scan.",
+      "titleHighlight": "Stay for the protection.",
+      "subtitle": "100% free. 100% open source. MIT licensed.",
+      "scanNow": "Scan a Skill Now",
+      "bottomLine": "Every scan makes the community safer. Join the collective defense network."
     },
     "scanner": {
       "overline": "ONLINE SKILL SCANNER",
@@ -780,13 +772,6 @@
       "title": "Done scanning? One command, always protected.",
       "subtitle": "Guard monitors your AI agents in real-time. {rules} detection rules. Auto-blocks known threats. Your agent becomes a defender for the entire network.",
       "installGuide": "Install Guide"
-    },
-    "finalCta": {
-      "title": "Start with a scan.",
-      "titleHighlight": "Stay for the protection.",
-      "subtitle": "100% free. 100% open source. MIT licensed.",
-      "scanNow": "Scan a Skill Now",
-      "bottomLine": "Every scan makes the community safer. Join the collective defense network."
     },
     "liveCounter": {
       "scanned": "skills scanned",
@@ -993,7 +978,7 @@
     "cta": {
       "title": "Liked the scan? Get 24/7 protection.",
       "desc": "Panguard Scan is just the beginning. Install Panguard Guard for continuous AI-powered monitoring, automated response, and plain-language notifications.",
-      "cta1": "Get Early Access",
+      "cta1": "Install Now",
       "cta2": "Learn About Guard"
     }
   },
@@ -1278,7 +1263,7 @@
           },
           "review": {
             "title": "Review",
-            "desc": "ATR rules evaluate your agent's behavior patterns in dev/staging. 32 rules across 9 threat categories catch issues before production."
+            "desc": "ATR rules evaluate your agent's behavior patterns in dev/staging. 61 rules across 9 threat categories catch issues before production."
           },
           "ship": {
             "title": "Ship",
@@ -1336,7 +1321,7 @@
           },
           "atrValidate": {
             "label": "ATR Validate",
-            "detail": "32 Rules"
+            "detail": "61 Rules"
           },
           "ship": {
             "label": "Ship",
@@ -1421,7 +1406,7 @@
       "cta": {
         "title": "Security that talks to you.",
         "desc": "Join the early access program and connect Panguard Chat to your Slack or Telegram.",
-        "cta1": "Get Early Access",
+        "cta1": "Install Now",
         "cta2": "Learn About Guard"
       },
       "useCases": {
@@ -1527,7 +1512,7 @@
       "cta": {
         "title": "Stop guessing. Start knowing.",
         "desc": "Deploy intelligent honeypots and turn attacker activity into actionable intelligence.",
-        "cta1": "Get Early Access",
+        "cta1": "Install Now",
         "cta2": "Learn About Guard"
       }
     },
@@ -2033,7 +2018,14 @@
       },
       "workflow": {
         "title": "Fits your workflow",
-        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "Secure your stack with one command",
@@ -2094,7 +2086,13 @@
       },
       "integrations": {
         "title": "Integrations your team already uses",
-        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
+        "tools": [
+          "Slack",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "Protect your business today",
@@ -2135,16 +2133,16 @@
           "desc": "Generate audit-ready reports for SOC 2, ISO 27001, and Taiwan Cyber Security Act (TCSA) at the click of a button. Schedule recurring reports and share them with auditors, investors, and partners."
         },
         "item4": {
-          "title": "SSO and Advanced Authentication",
-          "desc": "SAML 2.0 and OIDC integration for single sign-on with your identity provider. Enforce multi-factor authentication, session policies, and conditional access rules organization-wide."
+          "title": "Open Source and Transparent",
+          "desc": "Open source code that can be audited, verified, and contributed to by anyone. Full transparency into detection rules, AI prompts, and response actions."
         },
         "item5": {
           "title": "API and Integration Ecosystem",
           "desc": "Integrate Panguard into your existing toolchain with our comprehensive REST API. Native integrations with Slack, Microsoft Teams, PagerDuty, Jira, and leading SIEM platforms."
         },
         "item6": {
-          "title": "Priority Support",
-          "desc": "Business plan customers receive priority email support with faster response times and guided documentation to ensure a smooth rollout."
+          "title": "Community Support",
+          "desc": "Community support via GitHub issues. All users receive the same level of access and documentation."
         }
       },
       "pricing": {
@@ -2156,7 +2154,6 @@
         "title": "Enterprise integrations",
         "tools": [
           "SIEM",
-          "SSO (SAML/OIDC)",
           "PagerDuty",
           "Jira",
           "Slack",
@@ -2219,7 +2216,14 @@
       "stack": "e.g. CrowdStrike, Cloudflare, custom scripts...",
       "message": "Tell us about your security goals or any specific questions..."
     },
-    "teamSizes": ["Just me", "2-10", "11-50", "51-200", "201-500", "500+"],
+    "teamSizes": [
+      "Just me",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
     "submit": "Send Message",
     "submitting": "Submitting...",
     "error": "Failed to submit request. Please try again.",
@@ -2348,12 +2352,12 @@
       "sales": {
         "title": "Sales",
         "email": "sales@panguard.ai",
-        "desc": "Interested in Panguard for your team? Talk to our sales team about plans, volume discounts, and custom enterprise deployments."
+        "desc": "Questions about PanGuard integration, deployment, or contributing to the project? Reach out to us."
       },
       "support": {
         "title": "Support",
         "email": "support@panguard.ai",
-        "desc": "Need help with your Panguard deployment? Our support engineers respond within 4 hours for Pro and Business plans."
+        "desc": "Need help with your Panguard deployment? Open a GitHub issue or email us. Community support via GitHub."
       },
       "partnership": {
         "title": "Partnerships",
@@ -2381,7 +2385,7 @@
     "responseTime": {
       "title": "Response Time",
       "general": "General inquiries: within 1 business day",
-      "support": "Support (Pro/Business): within 4 hours",
+      "support": "Community support: GitHub issues",
       "security": "Security incidents: within 1 hour"
     }
   },
@@ -2400,7 +2404,12 @@
       "inquiryType": "Select type",
       "message": "How can we help?"
     },
-    "inquiryTypes": ["Sales", "Support", "Partnership", "Other"],
+    "inquiryTypes": [
+      "General",
+      "Support",
+      "Partnership",
+      "Other"
+    ],
     "submit": "Send Message",
     "submitting": "Sending...",
     "successTitle": "Message sent.",
@@ -2457,7 +2466,7 @@
     "subtitle": "ISO 27001, SOC 2, and Taiwan Cyber Security Act -- automated, affordable, and always current.",
     "hero": {
       "cta1": "Generate Your First Report",
-      "cta2": "Schedule Demo"
+      "cta2": "Get Started"
     },
     "problem": {
       "overline": "The Problem",
@@ -2548,7 +2557,7 @@
     "cta": {
       "title": "Compliance without the consultant bill.",
       "desc": "Generate your first compliance report in minutes, not months. ISO 27001, SOC 2, and Taiwan Cyber Security Act -- all from one platform.",
-      "cta1": "Get Early Access",
+      "cta1": "Install Now",
       "cta2": "See Panguard Report",
       "trustNote": "Want to see our own compliance status?",
       "trustLink": "Visit our Trust Center"
@@ -2566,7 +2575,7 @@
       "soc2": {
         "name": "SOC 2 Type II",
         "status": "In Progress",
-        "desc": "Expected Q3 2026. Audit to be conducted by a Big Four firm covering Security, Availability, and Confidentiality trust service criteria. Evidence automation in progress."
+        "desc": "Expected Q3 2026. Panguard helps generate compliance reports aligned to SOC 2 trust service criteria covering Security, Availability, and Confidentiality."
       },
       "iso27001": {
         "name": "ISO 27001",
@@ -2593,7 +2602,7 @@
         "items": [
           "AES-256 encryption at rest",
           "TLS 1.3 for all data in transit",
-          "Per-tenant key management",
+          "Local encryption for configuration and credential storage",
           "Automatic key rotation (90 days)",
           "Hardware security module backed"
         ]
@@ -2601,17 +2610,15 @@
       "applicationLayer": {
         "title": "Application Layer",
         "items": [
-          "Multi-factor authentication",
-          "Role-based access control (RBAC)",
-          "API key scoping and rate limiting",
           "Input validation and sanitization",
-          "Session management and auto-expiry"
+          "Local configuration file permissions (0600)",
+          "CLI authentication via local tokens"
         ]
       },
       "infrastructureLayer": {
         "title": "Infrastructure Layer",
         "items": [
-          "Single-tenant isolation",
+          "Local-first architecture -- all data stays on your machine",
           "24/7 infrastructure monitoring",
           "DDoS protection at edge",
           "Immutable deployment pipeline",
@@ -2625,11 +2632,11 @@
       "subtitle": "Every data handling practice is documented, enforced through policy, and verified through automated controls.",
       "item1": {
         "title": "Data Encryption",
-        "desc": "AES-256 at rest, TLS 1.3 in transit. Per-tenant encryption keys with automatic rotation."
+        "desc": "AES-256 at rest, TLS 1.3 in transit. Local encryption for configuration and credential storage."
       },
       "item2": {
         "title": "Data Residency",
-        "desc": "Customer data stored in customer-selected region. No cross-region replication without consent."
+        "desc": "All data stored locally on your device. No cloud storage unless you opt in to Threat Cloud."
       },
       "item3": {
         "title": "Data Retention",
@@ -2637,7 +2644,7 @@
       },
       "item4": {
         "title": "Access Controls",
-        "desc": "Role-based access with principle of least privilege. All access changes require approval workflow."
+        "desc": "File-system permissions restrict access to configuration and data. Runs as unprivileged user where possible."
       },
       "item5": {
         "title": "Audit Logging",
@@ -2700,11 +2707,6 @@
           "desc": "Anonymized threat signatures only. No PII, no source code, no raw logs."
         },
         "3": {
-          "category": "Account Data",
-          "period": "Active + 30 days",
-          "desc": "Email and account info retained while account is active, deleted 30 days after cancellation."
-        },
-        "4": {
           "category": "Scan Reports",
           "period": "30 days",
           "desc": "PDF reports stored locally. Cloud copies (if any) auto-deleted after 30 days."
@@ -2740,7 +2742,7 @@
     },
     "cta": {
       "title": "Need compliance documentation?",
-      "desc": "Request SOC 2 reports, penetration test summaries, our Data Processing Agreement, or schedule a security deep-dive with our team. Enterprise customers receive priority access to all compliance artifacts.",
+      "desc": "Request SOC 2 reports, penetration test summaries, or our Data Processing Agreement. All documentation is available to the community.",
       "cta1": "Request Documentation",
       "cta2": "View Security Practices"
     }
@@ -2756,12 +2758,12 @@
       "title": "How we secure ourselves.",
       "subtitle": "These are not aspirational goals. They are current, enforced practices that apply to every line of code, every deployment, and every employee.",
       "item1": {
-        "title": "Single-Tenant Architecture",
-        "desc": "Every customer deployment runs in an isolated environment. There is no shared database, no shared compute, and no shared network segment. A breach in one tenant cannot propagate to another."
+        "title": "Local-First Architecture",
+        "desc": "Panguard runs entirely on your machine. No data is sent to any server unless you opt in to Threat Cloud. Your security data, scan results, and configuration never leave your device."
       },
       "item2": {
         "title": "End-to-End Encryption",
-        "desc": "All data is encrypted at rest (AES-256) and in transit (TLS 1.3). Encryption keys are managed per-tenant with automatic rotation every 90 days. Key material never leaves the hardware security module."
+        "desc": "All data is encrypted at rest (AES-256) and in transit (TLS 1.3). Local encryption for configuration and credential storage. Key material stays on your device."
       },
       "item3": {
         "title": "Zero Data Retention",
@@ -2772,8 +2774,8 @@
         "desc": "Every automated action taken by Panguard is logged with a full reasoning chain. You can trace exactly why an event was flagged, what confidence score it received, and what response was executed."
       },
       "item5": {
-        "title": "Continuous Penetration Testing",
-        "desc": "We engage independent third-party security firms to conduct penetration tests on a quarterly basis. Critical findings are remediated within 48 hours. Test results are available to enterprise customers upon request."
+        "title": "Open Source Transparency",
+        "desc": "Panguard is fully open source (MIT license). Every line of code is auditable on GitHub. Community security reviews and contributions are welcome. We maintain a bug bounty program for external researchers."
       },
       "item6": {
         "title": "Secure Development Lifecycle",
@@ -2789,7 +2791,7 @@
           "badge": "SOC 2 Type II",
           "status": "In Progress",
           "statusColor": "text-[#f59e0b]",
-          "description": "We are actively pursuing SOC 2 Type II certification covering Security, Availability, and Confidentiality trust service criteria. Our audit is conducted by a Big Four firm. Expected completion: Q3 2026."
+          "description": "Panguard helps generate compliance reports aligned to SOC 2 Type II trust service criteria covering Security, Availability, and Confidentiality. Use these reports to accelerate your own audit preparation."
         },
         {
           "badge": "ISO 27001",
@@ -2884,7 +2886,7 @@
     "sla": {
       "overline": "SERVICE LEVEL",
       "title": "SLA Summary",
-      "subtitle": "Our commitments to enterprise customers.",
+      "subtitle": "Our commitments to all users.",
       "items": {
         "0": {
           "metric": "Threat Cloud API Uptime",
@@ -2945,7 +2947,7 @@
     },
     "cta": {
       "title": "Questions about our security?",
-      "desc": "Our security team is happy to discuss our practices, provide documentation, or schedule a deep-dive call with your CISO.",
+      "desc": "Our team is happy to discuss our security practices or provide documentation. Reach out via GitHub or email.",
       "cta1": "Contact Security Team"
     }
   },
@@ -3233,7 +3235,7 @@
       "title": "Ready to see it in action?",
       "desc": "Run a free security scan in 60 seconds, or talk to our team about deploying Panguard in your infrastructure.",
       "cta1": "Free Scan",
-      "cta2": "Get Early Access"
+      "cta2": "Install Now"
     }
   },
   "blog": {
@@ -3292,7 +3294,7 @@
     "cta": {
       "title": "Ready to Secure Your Infrastructure?",
       "desc": "Start with a free security scan and see how Panguard AI can protect your endpoints, simplify compliance, and stop threats before they cause damage.",
-      "cta1": "Get Early Access",
+      "cta1": "Install Now",
       "cta2": "Contact Sales"
     }
   },
@@ -3383,7 +3385,7 @@
     "communityForum": "Community Forum",
     "comingSoon": "Coming Soon",
     "readGuide": "Read the guide",
-    "earlyAccess": "Get Early Access",
+    "earlyAccess": "Install Now",
     "gettingStarted": {
       "backToDocs": "Back to Documentation",
       "title": "Getting Started with Panguard",
@@ -3461,7 +3463,7 @@
       "advancedHintTitle": "Advanced Configuration",
       "advancedHintDesc": "Panguard works out of the box, but you can enhance detection with optional external tools. All tools degrade gracefully -- Panguard never stops working if an external tool is unavailable.",
       "advancedHintOllama": "Ollama -- Run AI analysis locally without cloud APIs. Ideal for air-gapped environments.",
-            "advancedHintEnv": "Key environment variables: ANTHROPIC_API_KEY (Claude AI), OPENAI_API_KEY (GPT fallback), PANGUARD_LLM_MODEL (Ollama model override), OLLAMA_API_ENDPOINT (custom Ollama URL).",
+      "advancedHintEnv": "Key environment variables: ANTHROPIC_API_KEY (Claude AI), OPENAI_API_KEY (GPT fallback), PANGUARD_LLM_MODEL (Ollama model override), OLLAMA_API_ENDPOINT (custom Ollama URL).",
       "advancedHintLink": "See the full Advanced Setup guide for installation instructions and configuration details.",
       "multiEndpointTitle": "Multi-Endpoint Deployment",
       "multiEndpointDesc": "Deploying Panguard across multiple servers is straightforward. Use SSH loops for small fleets or Ansible for larger environments.",
@@ -3478,7 +3480,7 @@
       "ollamaTitle": "Ollama -- Local AI Analysis",
       "ollamaDesc": "Install Ollama to run AI threat analysis locally without cloud APIs. Ideal for air-gapped environments or data privacy requirements.",
       "ollamaNote": "Panguard auto-detects Ollama (default http://localhost:11434). No additional configuration needed after install.",
-            "envTitle": "Environment Variables Reference",
+      "envTitle": "Environment Variables Reference",
       "envDesc": "The following environment variables customize Panguard's behavior. All are optional.",
       "envVar": "Variable",
       "envPurpose": "Purpose",
@@ -4772,7 +4774,7 @@
           "label": "ATR rules (AI agent threats)"
         },
         {
-          "value": "500+",
+          "value": "474",
           "label": "Detection patterns"
         },
         {
@@ -4907,7 +4909,12 @@
       },
       "inProgress": {
         "title": "In Progress",
-        "items": ["Report + Trap", "Web Dashboard UI", "Windows support", "Kubernetes integration"]
+        "items": [
+          "Report + Trap",
+          "Web Dashboard UI",
+          "Windows support",
+          "Kubernetes integration"
+        ]
       },
       "planned": {
         "title": "Planned",
@@ -5096,7 +5103,7 @@
     },
     "atr": {
       "title": "Agent Threat Rules (ATR) -- Panguard AI",
-      "description": "The first open detection standard for AI agent threats. 32 rules across 9 categories. OWASP LLM Top 10 mapped. Community-driven, YAML-based, machine-readable."
+      "description": "The first open detection standard for AI agent threats. 61 rules across 9 categories. OWASP LLM Top 10 mapped. Community-driven, YAML-based, machine-readable."
     },
     "productMcp": {
       "title": "Panguard MCP Server",
@@ -5610,7 +5617,7 @@
         },
         {
           "name": "ATR Engine",
-          "desc": "32 rules evaluated in <1ms per event. Block, alert, or escalate.",
+          "desc": "61 rules evaluated in <1ms per event. Block, alert, or escalate.",
           "position": "middle",
           "highlighted": true
         },
@@ -5703,7 +5710,7 @@
           "status": "current",
           "title": "Foundation",
           "items": [
-            "32 rules across 9 categories",
+            "61 rules across 9 categories",
             "YAML format specification",
             "OWASP Agentic Top 10 mapping",
             "Real-time evaluation engine",
@@ -5715,7 +5722,7 @@
           "status": "next",
           "title": "Expansion",
           "items": [
-            "50+ rules with community contributions",
+            "100+ rules with community contributions",
             "Semantic operator support",
             "Multi-agent correlation rules",
             "IDE integration (VS Code, Cursor)",

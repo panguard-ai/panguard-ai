@@ -79,8 +79,8 @@ const checkKeys = [
 ] as const;
 const checkIcons = [Shield, Eye, Binary, AlertTriangle, Code, FileKey, Search];
 
-const workflowKeys = ['developer', 'smb', 'enterprise'] as const;
-const workflowIcons = [Terminal, Laptop, GitBranch];
+const workflowKeys = ['developer', 'smb'] as const;
+const workflowIcons = [Terminal, Laptop];
 const workflowSteps = [
   [
     '$ panguard audit skill ./new-tool',
@@ -94,7 +94,6 @@ const workflowSteps = [
     '    --json --threshold 40',
     '  # Blocks PR if risk > 40',
   ],
-  ['# panguard-manager policy', 'skill_policy:', '  require_audit: true', '  max_risk_score: 39'],
 ];
 
 const riskLevels = [
@@ -496,7 +495,7 @@ Run with --json for machine-readable output.`}
               {t('workflows.title')}
             </h2>
           </FadeInUp>
-          <div className="grid lg:grid-cols-3 gap-6 mt-10">
+          <div className="grid lg:grid-cols-2 gap-6 mt-10 max-w-3xl mx-auto">
             {workflowKeys.map((key, i) => {
               const Icon = workflowIcons[i];
               return (
