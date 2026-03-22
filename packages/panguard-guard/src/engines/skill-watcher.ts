@@ -379,10 +379,8 @@ export class SkillWatcher extends EventEmitter {
 
       // Submit audit result to Threat Cloud (anonymized)
       if (this.config.submitThreat && audit.riskScore > 0) {
-        const { createHash } = await import('node:crypto');
-        const skillHash = createHash('sha256')
-          .update(`${change.name}:${change.command}`)
-          .digest('hex');
+        const { contentHash } = await import('@panguard-ai/scan-core');
+        const skillHash = contentHash(`${change.name}:${change.command}`);
         this.config
           .submitThreat({
             skillHash,
@@ -437,7 +435,7 @@ export class SkillWatcher extends EventEmitter {
   ): Promise<void> {
     if (!this.config.submitATRProposal) return;
 
-    const { createHash } = await import('node:crypto');
+    const { patternHash: computePatternHash } = await import('@panguard-ai/scan-core');
 
     // Build a concise description from findings for the ATR rule
     const findingDescriptions = findings
@@ -449,10 +447,8 @@ export class SkillWatcher extends EventEmitter {
 
     // Use finding titles as pattern content for behavioral regex matching
     const findingSummary = findingDescriptions.join('; ');
-    const patternHash = createHash('sha256')
-      .update(`skill-audit:${skillName}:${findingSummary}`)
-      .digest('hex')
-      .slice(0, 16);
+    // Use scan-core's canonical hash — same prefix as website + CLI audit
+    const patternHash = computePatternHash(skillName, findingSummary);
 
     // Determine ATR category from audit findings
     const categoryMap: Record<string, string> = {

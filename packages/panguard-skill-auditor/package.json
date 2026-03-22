@@ -39,6 +39,7 @@
     "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/core": "workspace:*",
     "@panguard-ai/panguard-scan": "workspace:*",
+    "@panguard-ai/scan-core": "workspace:*",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {

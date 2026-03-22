@@ -1,71 +1,34 @@
 /**
  * Panguard Skill Auditor - Type definitions
- * Panguard 技能審計器 - 型別定義
+ *
+ * Re-exports core scan types from @panguard-ai/scan-core
+ * and adds CLI-specific types (AuditReport, AuditOptions).
  *
  * @module @panguard-ai/panguard-skill-auditor/types
  */
 
-import type { Severity } from '@panguard-ai/core';
+// Re-export canonical types from scan-core
+export type {
+  Severity,
+  FindingCategory,
+  SkillManifest,
+  SkillMetadata,
+  RiskLevel,
+} from '@panguard-ai/scan-core';
 
-/** Parsed SKILL.md manifest */
-export interface SkillManifest {
-  name: string;
-  description: string;
-  license?: string;
-  homepage?: string;
-  userInvocable?: boolean;
-  disableModelInvocation?: boolean;
-  commandDispatch?: string;
-  commandTool?: string;
-  metadata?: SkillMetadata;
-  /** Raw instruction body (after frontmatter) */
-  instructions: string;
-}
+import type {
+  Finding,
+  Severity,
+  FindingCategory,
+  RiskLevel,
+} from '@panguard-ai/scan-core';
 
-export interface SkillMetadata {
-  author?: string;
-  version?: string;
-  tags?: string[];
-  triggers?: string[];
-  openclaw?: {
-    requires?: {
-      bins?: string[];
-      env?: string[];
-      config?: string[];
-    };
-    primaryEnv?: string;
-    os?: string[];
-    always?: boolean;
-    homepage?: string;
-  };
-  [key: string]: unknown;
-}
+// ---------------------------------------------------------------------------
+// CLI-specific types (backward compatible aliases)
+// ---------------------------------------------------------------------------
 
-/** Single audit finding */
-export interface AuditFinding {
-  id: string;
-  title: string;
-  description: string;
-  severity: Severity;
-  category:
-    | 'manifest'
-    | 'prompt-injection'
-    | 'tool-poisoning'
-    | 'context-exfiltration'
-    | 'agent-manipulation'
-    | 'privilege-escalation'
-    | 'excessive-autonomy'
-    | 'data-poisoning'
-    | 'model-abuse'
-    | 'skill-compromise'
-    | 'code'
-    | 'secrets'
-    | 'dependency'
-    | 'permission'
-    | 'ai-analysis'
-    | 'atr';
-  location?: string;
-}
+/** Single audit finding (alias for scan-core Finding) */
+export type AuditFinding = Finding;
 
 /** Result of a single check category */
 export interface CheckResult {
@@ -78,30 +41,26 @@ export interface CheckResult {
 export interface AuditOptions {
   /**
    * LLM provider for AI semantic analysis (Layer 2).
-   * When omitted, the auditor auto-detects an available provider:
-   *   1. ANTHROPIC_API_KEY env var (Claude)
-   *   2. OPENAI_API_KEY env var (OpenAI)
-   *   3. Local Ollama instance
-   * If no provider is found, an info-level finding is added to the report.
+   * When omitted, the auditor auto-detects an available provider.
    */
   llm?: import('./checks/ai-check.js').SkillAnalysisLLM;
-  /** Skip AI analysis entirely (no auto-detection, no LLM call) */
+  /** Skip AI analysis entirely */
   skipAI?: boolean;
   /** Skip ATR pattern detection */
   skipATR?: boolean;
-  /** Additional ATR rules fetched from Threat Cloud (parsed ATRRule objects) */
+  /** Additional ATR rules fetched from Threat Cloud */
   cloudRules?: Array<{ id: string; title: string; detection: unknown; [key: string]: unknown }>;
 }
 
 /** Complete audit report */
 export interface AuditReport {
   skillPath: string;
-  manifest: SkillManifest | null;
+  manifest: import('@panguard-ai/scan-core').SkillManifest | null;
   riskScore: number;
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  riskLevel: RiskLevel;
   checks: CheckResult[];
   findings: AuditFinding[];
-  /** Context signals that adjusted the risk score (boosters increase, reducers decrease) */
+  /** Context signals that adjusted the risk score */
   contextSignals?: {
     signals: ReadonlyArray<{
       id: string;
