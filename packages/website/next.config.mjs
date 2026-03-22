@@ -20,6 +20,7 @@ const nextConfig = {
       '/careers',
       '/product/manager',
       '/pricing',
+      '/changelog',
     ];
 
     const productRedirects = [
