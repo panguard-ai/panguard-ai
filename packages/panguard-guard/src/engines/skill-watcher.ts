@@ -35,6 +35,10 @@ export interface SkillAuditResult {
   readonly riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   readonly riskScore: number;
   readonly autoWhitelisted: boolean;
+  /** true if the skill was auto-removed from platform config */
+  readonly blocked: boolean;
+  /** Reason the skill was blocked, if applicable */
+  readonly blockReason?: string;
 }
 
 /** Callback for submitting skill threat data to Threat Cloud */
@@ -65,6 +69,8 @@ export interface SkillWatcherConfig {
   readonly autoAudit?: boolean;
   /** Whether to auto-whitelist safe skills (default: true) */
   readonly autoWhitelist?: boolean;
+  /** Whether to auto-remove CRITICAL skills from platform config (default: true) */
+  readonly autoBlock?: boolean;
   /** Optional callback to submit audit results to Threat Cloud */
   readonly submitThreat?: SkillThreatSubmitter;
   /** Optional callback to submit ATR rule proposals to Threat Cloud (flywheel) */
@@ -93,6 +99,7 @@ interface McpConfigModule {
   getConfigPath: (id: string) => string;
   parseMCPServers: (configPath: string, platformId: string) => readonly MCPServerEntryMinimal[];
   resolveSkillDir: (entry: MCPServerEntryMinimal) => string | null;
+  removeServer: (platformId: string, serverName: string) => boolean;
 }
 
 interface AuditModule {
@@ -122,12 +129,13 @@ async function loadAuditor(): Promise<AuditModule> {
 
 /**
  * Watches platform MCP configs for new skill installations.
- * Emits: 'skill-added', 'skill-removed', 'skill-audit-complete'
+ * Emits: 'skill-added', 'skill-removed', 'skill-audit-complete', 'skill-blocked', 'skill-flagged'
  */
 export class SkillWatcher extends EventEmitter {
   private fileMonitor: FileMonitor | null = null;
   private readonly config: Required<Omit<SkillWatcherConfig, 'submitThreat' | 'submitATRProposal' | 'checkBlacklist'>> &
     Pick<SkillWatcherConfig, 'submitThreat' | 'submitATRProposal' | 'checkBlacklist'>;
+
   private previousSkills: Map<string, MCPServerEntryMinimal> = new Map();
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private running = false;
@@ -138,6 +146,7 @@ export class SkillWatcher extends EventEmitter {
       pollInterval: config?.pollInterval ?? 10_000,
       autoAudit: config?.autoAudit ?? true,
       autoWhitelist: config?.autoWhitelist ?? true,
+      autoBlock: config?.autoBlock ?? true,
       submitThreat: config?.submitThreat,
       submitATRProposal: config?.submitATRProposal,
       checkBlacklist: config?.checkBlacklist,
@@ -323,14 +332,36 @@ export class SkillWatcher extends EventEmitter {
       try {
         const isBlacklisted = await this.config.checkBlacklist(change.name);
         if (isBlacklisted) {
+          // Auto-block blacklisted skills if autoBlock is enabled
+          let blocked = false;
+          const blockReason = `Community-blacklisted skill "${change.name}" auto-removed from ${change.platformId}`;
+          if (this.config.autoBlock) {
+            try {
+              const mcpConfigForBlock = await loadMcpConfig();
+              blocked = mcpConfigForBlock.removeServer(change.platformId, change.name);
+              if (blocked) {
+                logger.warn(blockReason);
+              }
+            } catch (blockErr: unknown) {
+              logger.warn(
+                `Failed to auto-block blacklisted skill ${change.name}: ${blockErr instanceof Error ? blockErr.message : String(blockErr)}`
+              );
+            }
+          }
+
           const result: SkillAuditResult = {
             name: change.name,
             platformId: change.platformId,
             riskLevel: 'CRITICAL',
             riskScore: 100,
             autoWhitelisted: false,
+            blocked,
+            blockReason: blocked ? blockReason : undefined,
           };
           this.emit('skill-audit-complete', result);
+          if (blocked) {
+            this.emit('skill-blocked', result);
+          }
           logger.warn(
             `Skill ${change.name} is BLACKLISTED by community — skipping local audit / ` +
               `技能 ${change.name} 已被社群列入黑名單 — 跳過本地審計`
@@ -363,18 +394,45 @@ export class SkillWatcher extends EventEmitter {
 
       const audit = await auditor.auditSkill(skillDir, { skipAI: true });
 
+      // Auto-quarantine: block CRITICAL, flag HIGH, whitelist LOW/MEDIUM
+      let blocked = false;
+      let blockReason: string | undefined;
+
+      if (audit.riskLevel === 'CRITICAL' && this.config.autoBlock) {
+        blockReason = `CRITICAL risk skill "${change.name}" (score: ${audit.riskScore}) auto-removed from ${change.platformId}`;
+        try {
+          blocked = mcpConfig.removeServer(change.platformId, change.name);
+          if (blocked) {
+            logger.warn(blockReason);
+          }
+        } catch (blockErr: unknown) {
+          logger.warn(
+            `Failed to auto-block CRITICAL skill ${change.name}: ${blockErr instanceof Error ? blockErr.message : String(blockErr)}`
+          );
+        }
+      }
+
       const result: SkillAuditResult = {
         name: change.name,
         platformId: change.platformId,
         riskLevel: audit.riskLevel,
         riskScore: audit.riskScore,
         autoWhitelisted: this.config.autoWhitelist && audit.riskLevel === 'LOW',
+        blocked,
+        blockReason: blocked ? blockReason : undefined,
       };
 
       this.emit('skill-audit-complete', result);
 
+      // Emit targeted events based on risk level
+      if (blocked) {
+        this.emit('skill-blocked', result);
+      } else if (audit.riskLevel === 'HIGH') {
+        this.emit('skill-flagged', result);
+      }
+
       logger.info(
-        `Skill audit complete: ${change.name} = ${audit.riskLevel} (score: ${audit.riskScore})`
+        `Skill audit complete: ${change.name} = ${audit.riskLevel} (score: ${audit.riskScore})${blocked ? ' [BLOCKED]' : ''}`
       );
 
       // Submit audit result to Threat Cloud (anonymized)

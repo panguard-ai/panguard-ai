@@ -8,7 +8,7 @@
  * @module @panguard-ai/panguard-mcp/config/mcp-config-reader
  */
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 import { detectPlatforms, getConfigPath } from './platform-detector.js';
@@ -113,6 +113,45 @@ export function resolveSkillDir(entry: MCPServerEntry): string | null {
   }
 
   return null;
+}
+
+/**
+ * Remove a specific MCP server entry from a platform config file.
+ * Returns true if the server was found and removed, false otherwise.
+ *
+ * @param platformId - The platform to remove the server from
+ * @param serverName - The name of the server entry to remove
+ */
+export function removeServer(platformId: PlatformId, serverName: string): boolean {
+  const configPath = getConfigPath(platformId);
+  if (!existsSync(configPath)) return false;
+
+  try {
+    const raw = readFileSync(configPath, 'utf-8');
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return false;
+
+    const config = parsed as Record<string, unknown>;
+    const servers = config['mcpServers'] as Record<string, unknown> | undefined;
+    if (!servers || typeof servers !== 'object') return false;
+
+    if (!(serverName in servers)) return false;
+
+    // Create new servers object without the target entry (immutable pattern)
+    const updatedServers = Object.fromEntries(
+      Object.entries(servers).filter(([key]) => key !== serverName)
+    );
+    const updatedConfig = { ...config, mcpServers: updatedServers };
+
+    writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2), 'utf-8');
+    logger.info(`Removed server "${serverName}" from ${platformId} config at ${configPath}`);
+    return true;
+  } catch (err) {
+    logger.warn(
+      `Failed to remove server "${serverName}" from ${platformId}: ${err instanceof Error ? err.message : String(err)}`
+    );
+    return false;
+  }
 }
 
 /**
