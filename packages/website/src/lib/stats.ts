@@ -42,7 +42,7 @@ export const STATS = {
   responseActions: 11,
   cliCommands: 23,
   products: 6,
-  aiAgents: 5,
+  aiAgents: 4,
   mcpTools: 11,
   playbookTemplates: 3,
   logParsers: 4,
