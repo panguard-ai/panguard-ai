@@ -18,9 +18,7 @@
     "custom": "客製化",
     "contactUs": "聯繫我們",
     "mostPopular": "最受歡迎",
-    "perMonth": "/月",
-    "perEndpointMonth": "/端點/月",
-    "free": "免費",
+"free": "免費",
     "yes": "yes",
     "no": "no",
     "copyright": "2026 Panguard AI, Inc. 版權所有。",
@@ -273,7 +271,7 @@
           "label": "合規報告",
           "diy": "no",
           "consultant": "NT$300,000+",
-          "panguard": "NT$8,970 起"
+          "panguard": "$0 (開源)"
         },
         "scales": {
           "label": "隨你擴展",
@@ -299,7 +297,7 @@
           {
             "role": "技能守門員",
             "product": "Skill Auditor",
-            "desc": "6 層安裝前審計，AI 技能先過關才能跑"
+            "desc": "8 層安裝前審計，AI 技能先過關才能跑"
           },
           {
             "role": "SOC 分析師",
@@ -501,7 +499,7 @@
       "products": [
         {
           "name": "Skill Auditor",
-          "desc": "6 層安裝前安全閘門。在任何 AI 技能執行前攔截 prompt injection、tool poisoning 與隱藏功能。",
+          "desc": "8 層安裝前安全閘門。在任何 AI 技能執行前攔截 prompt injection、tool poisoning 與隱藏功能。",
           "href": "/product/skill-auditor"
         },
         {
@@ -2455,7 +2453,7 @@
         "tcsaRow": {
           "label": "TCSA 合規報告",
           "consultant": "NT$300,000 - 800,000",
-          "panguard": "$3/端點/月起"
+          "panguard": "$0 (開源)"
         },
         "freshnessRow": {
           "label": "報告時效性",
@@ -2651,6 +2649,10 @@
         "manifestValidation": {
           "name": "格式驗證",
           "detail": "SKILL.md 結構完整嗎、該填的欄位有沒有少、metadata 正常嗎"
+        },
+        "dependencyCheck": {
+          "name": "依賴分析",
+          "detail": "審核宣告的依賴是否有已知漏洞、typosquatting 與供應鏈風險"
         },
         "scanTime": "掃描耗時",
         "checkCategories": "檢查項目",
@@ -3360,7 +3362,7 @@
       "tcsaRow": {
         "label": "TCSA 合規報告",
         "consultant": "NT$300,000 - 800,000",
-        "panguard": "$3/端點/月起"
+        "panguard": "$0 (開源)"
       },
       "freshnessRow": {
         "label": "報告時效性",
@@ -4000,7 +4002,7 @@
         "engine": "AST 分析",
         "desc": "安裝前對 AI Skill 原始碼進行靜態分析。檢查隱藏功能、過度權限、混淆 payload 和供應鏈攻擊。",
         "detects": "隱藏功能、過度權限、混淆 payload、供應鏈攻擊",
-        "tech": "6 層審計檢查、AST 解析、依賴分析、權限對應"
+        "tech": "8 層審計檢查、AST 解析、依賴分析、權限對應"
       },
       "filesystem": {
         "layer": "第三層",

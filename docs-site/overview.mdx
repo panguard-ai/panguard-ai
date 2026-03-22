@@ -6,7 +6,7 @@ icon: "shield-check"
 
 ## What is Panguard AI?
 
-Panguard AI is an open-source security platform purpose-built for the AI agent era. As AI agents (Claude Code, Cursor, QClaw, OpenClaw, Codex CLI, WorkBuddy) gain root access to production systems, Panguard provides the first open standard for detecting and blocking agent-level threats.
+Panguard AI is an open-source security platform purpose-built for the AI agent era. As AI agents (Claude Code, Cursor, QClaw, OpenClaw, Codex CLI, WorkBuddy, NemoClaw, ArkClaw) gain root access to production systems, Panguard provides the first open standard for detecting and blocking agent-level threats.
 
 **Three pillars. One mission: secure every AI agent.**
 
@@ -38,7 +38,7 @@ Panguard AI is an open-source security platform purpose-built for the AI agent e
     **AI assistant integration.** 11 MCP tools let Claude Desktop, Cursor, and Claude Code control Panguard directly through natural language.
   </Card>
   <Card title="Skill Auditor" icon="clipboard-check">
-    **Pre-install security gate.** 7-layer checks analyze AI skill manifests for prompt injection, tool poisoning, secrets, and unsafe dependencies before installation.
+    **Pre-install security gate.** 8-check analysis of AI skill manifests for prompt injection, tool poisoning, secrets, and unsafe dependencies before installation.
   </Card>
 </CardGroup>
 
@@ -74,7 +74,7 @@ For a deep dive into the AI architecture, see [Three-Layer AI](/concepts/three-l
 
 ## Platform Support
 
-Panguard integrates with 8 AI agent platforms via MCP or native Skill protocol:
+Panguard integrates with 10 AI agent platforms via MCP or native Skill protocol:
 
 | Platform | Protocol | Config Path |
 | --- | --- | --- |
@@ -85,7 +85,9 @@ Panguard integrates with 8 AI agent platforms via MCP or native Skill protocol:
 | **Codex CLI** | MCP | `~/.codex/mcp.json` |
 | **Claude Desktop** | MCP | `~/Library/.../claude_desktop_config.json` |
 | **Windsurf** | MCP | `~/.windsurf/mcp.json` |
-| **WorkBuddy** | MCP | `~/.workbuddy/mcp.json` |
+| **WorkBuddy** | MCP | `~/.workbuddy/.mcp.json` |
+| **NemoClaw** | MCP | `~/.nemoclaw/mcp.json` |
+| **ArkClaw** | MCP | `~/.arkclaw/mcp.json` |
 
 All platforms are auto-configured with a single `panguard setup` command.
 

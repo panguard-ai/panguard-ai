@@ -1,10 +1,10 @@
 ---
-title: "Install on OpenClaw & QClaw"
-description: "One-command setup guide for OpenClaw and QClaw (Tencent). No account required."
+title: "Install on OpenClaw & Compatible Platforms"
+description: "One-command setup guide for OpenClaw, QClaw, WorkBuddy, NemoClaw, and ArkClaw. No account required."
 icon: "bolt"
 ---
 
-Install Panguard on your Claw-based AI agent in under 60 seconds. No account, no login, no configuration.
+Install Panguard on your Claw-based AI agent or compatible MCP platform in under 60 seconds. No account, no login, no configuration.
 
 ## Quick Start (All Platforms)
 
@@ -20,7 +20,7 @@ Or if you already have Panguard installed:
 panguard setup
 ```
 
-This auto-detects OpenClaw, QClaw, and all other AI platforms on your machine, then injects the correct configuration for each.
+This auto-detects OpenClaw, QClaw, WorkBuddy, NemoClaw, ArkClaw, and all other AI platforms on your machine, then injects the correct configuration for each.
 
 ---
 
@@ -105,6 +105,117 @@ You should see the `panguard` entry under `mcpServers`.
 
 ---
 
+## WorkBuddy
+
+WorkBuddy uses the standard **MCP protocol**. Panguard adds an MCP server entry to `~/.workbuddy/.mcp.json`.
+
+### Auto Setup
+
+```bash
+npx panguard setup --platform workbuddy
+```
+
+### Manual Setup
+
+If you prefer to configure manually, add this to `~/.workbuddy/.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "panguard": {
+      "command": "npx",
+      "args": ["-y", "@panguard-ai/panguard-mcp"]
+    }
+  }
+}
+```
+
+After setup, restart WorkBuddy. Panguard's 11 MCP tools are now available.
+
+### Verify
+
+```bash
+cat ~/.workbuddy/.mcp.json
+```
+
+You should see the `panguard` entry under `mcpServers`.
+
+---
+
+## NemoClaw
+
+NemoClaw uses the standard **MCP protocol**. Panguard adds an MCP server entry to `~/.nemoclaw/mcp.json`.
+
+### Auto Setup
+
+```bash
+npx panguard setup --platform nemoclaw
+```
+
+### Manual Setup
+
+If you prefer to configure manually, add this to `~/.nemoclaw/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "panguard": {
+      "command": "npx",
+      "args": ["-y", "@panguard-ai/panguard-mcp"]
+    }
+  }
+}
+```
+
+After setup, restart NemoClaw. Panguard's 11 MCP tools are now available.
+
+### Verify
+
+```bash
+cat ~/.nemoclaw/mcp.json
+```
+
+You should see the `panguard` entry under `mcpServers`.
+
+---
+
+## ArkClaw
+
+ArkClaw uses the standard **MCP protocol**. Panguard adds an MCP server entry to `~/.arkclaw/mcp.json`.
+
+### Auto Setup
+
+```bash
+npx panguard setup --platform arkclaw
+```
+
+### Manual Setup
+
+If you prefer to configure manually, add this to `~/.arkclaw/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "panguard": {
+      "command": "npx",
+      "args": ["-y", "@panguard-ai/panguard-mcp"]
+    }
+  }
+}
+```
+
+After setup, restart ArkClaw. Panguard's 11 MCP tools are now available.
+
+### Verify
+
+```bash
+cat ~/.arkclaw/mcp.json
+```
+
+You should see the `panguard` entry under `mcpServers`.
+
+---
+
 ## Troubleshooting
 
 <AccordionGroup>
@@ -140,10 +251,10 @@ You should see the `panguard` entry under `mcpServers`.
 
 ## Summary
 
-| | OpenClaw | QClaw |
-| --- | --- | --- |
-| **Protocol** | Native Skill | MCP |
-| **Config path** | `~/.openclaw/skills/panguard/SKILL.md` | `~/.qclaw/mcp.json` |
-| **Setup command** | `npx panguard setup` | `npx panguard setup` |
-| **Account required** | No | No |
-| **Restart needed** | Yes | Yes |
+| | OpenClaw | QClaw | WorkBuddy | NemoClaw | ArkClaw |
+| --- | --- | --- | --- | --- | --- |
+| **Protocol** | Native Skill | MCP | MCP | MCP | MCP |
+| **Config path** | `~/.openclaw/skills/panguard/SKILL.md` | `~/.qclaw/mcp.json` | `~/.workbuddy/.mcp.json` | `~/.nemoclaw/mcp.json` | `~/.arkclaw/mcp.json` |
+| **Setup command** | `npx panguard setup` | `npx panguard setup` | `npx panguard setup` | `npx panguard setup` | `npx panguard setup` |
+| **Account required** | No | No | No | No | No |
+| **Restart needed** | Yes | Yes | Yes | Yes | Yes |

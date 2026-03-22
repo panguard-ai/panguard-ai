@@ -30,6 +30,7 @@ import {
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import { Link } from '@/navigation';
+import { STATS } from '@/lib/stats';
 
 /* ── Reusable CodeBlock ── */
 function CodeBlock({ code, title }: { code: string; title?: string }) {
@@ -76,8 +77,9 @@ const checkKeys = [
   'sastSecrets',
   'permissionScope',
   'manifestValidation',
+  'dependencyCheck',
 ] as const;
-const checkIcons = [Shield, Eye, Binary, AlertTriangle, Code, FileKey, Search];
+const checkIcons = [Shield, Eye, Binary, AlertTriangle, Code, FileKey, Search, GitBranch];
 
 const workflowKeys = ['developer', 'smb'] as const;
 const workflowIcons = [Terminal, Laptop];
@@ -344,7 +346,7 @@ Run with --json for machine-readable output.`}
         </div>
       </SectionWrapper>
 
-      {/* ── 6 Checks ── */}
+      {/* ── 8 Checks ── */}
       <SectionWrapper className="border-t border-border">
         <div className="max-w-[1200px] mx-auto">
           <FadeInUp>
@@ -380,7 +382,7 @@ Run with --json for machine-readable output.`}
                     <div className="text-xs text-text-muted mt-1">{t('checks.scanTime')}</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-extrabold text-text-primary">7</div>
+                    <div className="text-3xl font-extrabold text-text-primary">{STATS.skillAuditChecks}</div>
                     <div className="text-xs text-text-muted mt-1">
                       {t('checks.checkCategories')}
                     </div>
