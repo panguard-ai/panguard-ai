@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/website",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "private": true,
   "type": "module",
   "description": "Panguard AI official website - Next.js 14 with bilingual support (EN/ZH)",
