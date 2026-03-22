@@ -296,12 +296,12 @@ if ((-not $BinaryInstalled) -and (-not $NpmInstalled)) {
 @echo off
 setlocal
 set "SCRIPT_DIR=%~dp0"
-set "JS_ENTRY=%SCRIPT_DIR%..\source\packages\panguard\dist\cli\index.js"
-if not exist "%JS_ENTRY%" (
+set "BOOTSTRAP=%SCRIPT_DIR%..\source\packages\panguard\bin\panguard.cjs"
+if not exist "%BOOTSTRAP%" (
     echo Error: panguard installation appears corrupted.
     exit /b 1
 )
-node "%JS_ENTRY%" %*
+node "%BOOTSTRAP%" %*
 "@
     Set-Content -Path $wrapperPath -Value $wrapperContent -Encoding ASCII
 
