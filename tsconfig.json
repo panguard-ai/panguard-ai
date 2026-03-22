@@ -35,10 +35,12 @@
       "@panguard-ai/manager": ["./packages/panguard-manager/src"],
       "@panguard-ai/panguard-mcp": ["./packages/panguard-mcp/src"],
       "@panguard-ai/panguard-skill-auditor": ["./packages/panguard-skill-auditor/src"],
-      "@panguard-ai/threat-cloud": ["./packages/threat-cloud/src"]
+      "@panguard-ai/threat-cloud": ["./packages/threat-cloud/src"],
+      "@panguard-ai/scan-core": ["./packages/scan-core/src"]
     }
   },
   "references": [
+    { "path": "./packages/scan-core" },
     { "path": "./packages/core" },
     { "path": "./packages/panguard-scan" },
     { "path": "./packages/panguard-guard" },
