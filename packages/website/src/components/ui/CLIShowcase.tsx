@@ -55,7 +55,7 @@ const tabContent: Record<TabId, Line[]> = {
   ],
   guard: [
     { text: '$ panguard guard start', color: c.cmd },
-    { text: 'Panguard Guard v2.1.0 -- Starting...', color: c.bright },
+    { text: 'Panguard Guard v1.3.0 -- Starting...', color: c.bright },
     { text: '' },
     { text: `  Layer 1 (ATR Rules)      LOADED  ${STATS.totalRulesDisplay} rules`, color: c.ok },
     { text: '  Layer 2 (Local AI)       READY   Ollama connected', color: c.ok },
@@ -108,7 +108,7 @@ export default function CLIShowcase() {
         </div>
         <div className="flex items-center gap-2 ml-3">
           <BrandLogo size={14} className="text-brand-sage" />
-          <span className="text-xs font-mono text-text-secondary">PANGUARD [-] AI CLI v2.1.0</span>
+          <span className="text-xs font-mono text-text-secondary">PANGUARD [-] AI CLI v1.3.0</span>
         </div>
         <span className="ml-auto text-[10px] font-mono text-text-muted hidden sm:block">
           SYSTEM: ONLINE | CPU: 12% | MEM: 4GB | LATENCY: 2ms

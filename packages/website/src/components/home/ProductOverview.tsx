@@ -17,7 +17,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 const productIcons = [CheckIcon, ScanIcon, ShieldIcon, TerminalIcon, AnalyticsIcon, GlobalIcon];
 
-const productMaturity: MaturityLevel[] = ['Beta', 'GA', 'GA', 'Beta', 'GA', 'GA'];
+const productMaturity: MaturityLevel[] = ['GA', 'GA', 'GA', 'Beta', 'GA', 'GA'];
 
 const maturityStyles: Record<MaturityLevel, { bg: string; dot: string }> = {
   GA: { bg: 'bg-green-900/30 text-green-400', dot: 'bg-green-400' },

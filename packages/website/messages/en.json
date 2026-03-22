@@ -157,7 +157,7 @@
       "eyebrow": "THE SECURITY REVOLUTION",
       "title": "Security is no longer a privilege.",
       "subtitle": "For developers and small businesses who can't afford a security team -- enterprise-grade protection from one CLI command, in under 60 seconds.",
-      "boldLine": "Open source. AI-powered. Free to start.",
+      "boldLine": "Open source. AI-powered. Completely free.",
       "tryScan": "Try Free Scan",
       "bookDemo": "Book Demo",
       "getStarted": "Get Started",
@@ -247,7 +247,7 @@
           "label": "Monthly cost",
           "diy": "$0 (your time)",
           "consultant": "$2,000+",
-          "panguard": "Free to start"
+          "panguard": "100% free"
         },
         "monitoring": {
           "label": "24/7 monitoring",
@@ -291,7 +291,7 @@
     "showMuscle": {
       "team": {
         "overline": "WHAT YOU GET",
-        "title": "One command. A 5-person AI security team.",
+        "title": "One command. A 4-person AI security team.",
         "subtitle": "A human team with the same coverage costs over $600K/year. Panguard starts at $0.",
         "roles": [
           {
@@ -315,7 +315,7 @@
             "desc": "Auto-generates rules from real attacks"
           }
         ],
-        "footer": "4 roles. 3 pillars. 1 command. From $0/mo"
+        "footer": "4 roles. 3 pillars. 1 command. 100% free."
       },
       "funnel": {
         "title": "90% of threats don't need AI.",
@@ -5387,7 +5387,7 @@
       "items": {
         "prompt-injection": {
           "name": "Prompt Injection",
-          "count": "21 rules",
+          "count": "22 rules",
           "desc": "Direct and indirect prompt injection, jailbreaks, system prompt override, multi-turn attacks"
         },
         "tool-poisoning": {

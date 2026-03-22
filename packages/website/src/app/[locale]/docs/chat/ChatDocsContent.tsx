@@ -232,7 +232,7 @@ Action:     IP blocked via iptables
 Rule:       ATR/brute_force_ssh_T1110.001
 Timestamp:  2025-03-08 14:23:07 UTC
 
-View full report: https://app.panguard.ai/events/evt_abc123`}
+View full report: http://localhost:3100/events/evt_abc123`}
               label="Example Notification"
             />
           </FadeInUp>

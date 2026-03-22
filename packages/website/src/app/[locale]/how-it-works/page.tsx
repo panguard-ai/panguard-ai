@@ -25,7 +25,7 @@ const howToJsonLd = {
   '@type': 'HowTo',
   name: 'How Panguard AI Protects Your Servers',
   description:
-    'Panguard uses a five-stage security pipeline with a three-tier AI funnel to detect, analyze, and respond to threats in real time.',
+    'Panguard uses a three-stage security pipeline with a three-tier AI funnel to detect, analyze, and respond to threats in real time.',
   step: [
     {
       '@type': 'HowToStep',
@@ -44,18 +44,6 @@ const howToJsonLd = {
       position: 3,
       name: 'Respond',
       text: 'Automated threat response isolates compromised processes, blocks malicious IPs, and quarantines files.',
-    },
-    {
-      '@type': 'HowToStep',
-      position: 4,
-      name: 'Report',
-      text: 'Generate compliance reports mapped to ISO 27001, SOC 2, and Taiwan TCSA frameworks with one command.',
-    },
-    {
-      '@type': 'HowToStep',
-      position: 5,
-      name: 'Chat',
-      text: 'AI security copilot answers plain-language questions about threats, logs, and system security posture.',
     },
   ],
 };
