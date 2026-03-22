@@ -9,337 +9,222 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "languages": [
+    "tabs": [
       {
-        "language": "en",
-        "tabs": [
+        "tab": "Documentation",
+        "groups": [
           {
-            "tab": "Documentation",
-            "groups": [
-              {
-                "group": "Getting Started",
-                "pages": [
-                  "introduction",
-                  "getting-started",
-                  "overview",
-                  "quickstart",
-                  "installation",
-                  "skill-auditor",
-                  "threat-cloud",
-                  "atr"
-                ]
-              },
-              {
-                "group": "Concepts",
-                "pages": [
-                  "concepts/three-layer-ai",
-                  "concepts/learning-mode",
-                  "concepts/security-score",
-                  "concepts/threat-intelligence",
-                  "concepts/architecture"
-                ]
-              },
-              {
-                "group": "Guides",
-                "pages": [
-                  "guides/first-scan",
-                  "guides/real-time-protection",
-                  "guides/notifications-setup",
-                  "guides/threat-cloud-deployment",
-                  "guides/claw-setup",
-                  "guides/mcp-integration",
-                  "guides/multi-endpoint",
-                  "guides/system-service",
-                  "guides/docker-deployment"
-                ]
-              },
-              {
-                "group": "Configuration",
-                "pages": [
-                  "configuration/guard-config",
-                  "configuration/environment-variables"
-                ]
-              },
-              {
-                "group": "Troubleshooting",
-                "pages": [
-                  "troubleshooting/common-issues",
-                  "troubleshooting/guard-issues",
-                  "troubleshooting/notification-issues"
-                ]
-              }
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "getting-started",
+              "overview",
+              "quickstart",
+              "installation",
+              "skill-auditor",
+              "threat-cloud",
+              "atr"
             ]
           },
           {
-            "tab": "Products",
-            "groups": [
-              {
-                "group": "Products",
-                "pages": [
-                  "products/overview"
-                ]
-              },
-              {
-                "group": "Panguard Scan",
-                "pages": [
-                  "products/scan/overview",
-                  "products/scan/scanners",
-                  "products/scan/risk-scoring",
-                  "products/scan/pdf-reports"
-                ]
-              },
-              {
-                "group": "Panguard Guard",
-                "pages": [
-                  "products/guard/overview",
-                  "products/guard/agent-pipeline",
-                  "products/guard/monitors",
-                  "products/guard/event-correlation",
-                  "products/guard/auto-response"
-                ]
-              },
-              {
-                "group": "Panguard MCP",
-                "pages": [
-                  "products/mcp/overview",
-                  "products/mcp/tools-reference"
-                ]
-              },
-              {
-                "group": "Threat Cloud",
-                "pages": [
-                  "products/threat-cloud/overview",
-                  "products/threat-cloud/deployment",
-                  "products/threat-cloud/privacy"
-                ]
-              }
+            "group": "Concepts",
+            "pages": [
+              "concepts/three-layer-ai",
+              "concepts/learning-mode",
+              "concepts/security-score",
+              "concepts/threat-intelligence",
+              "concepts/architecture"
             ]
           },
           {
-            "tab": "CLI Reference",
-            "groups": [
-              {
-                "group": "CLI Reference",
-                "pages": [
-                  "cli/overview"
-                ]
-              },
-              {
-                "group": "Scanning",
-                "pages": [
-                  "cli/scan",
-                  "cli/report"
-                ]
-              },
-              {
-                "group": "Protection",
-                "pages": [
-                  "cli/guard"
-                ]
-              },
-              {
-                "group": "System",
-                "pages": [
-                  "cli/init",
-                  "cli/status",
-                  "cli/config",
-                  "cli/doctor",
-                  "cli/upgrade"
-                ]
-              },
-              {
-                "group": "Advanced",
-                "pages": [
-                  "cli/threat"
-                ]
-              }
+            "group": "Guides",
+            "pages": [
+              "guides/first-scan",
+              "guides/real-time-protection",
+              "guides/notifications-setup",
+              "guides/threat-cloud-deployment",
+              "guides/claw-setup",
+              "guides/mcp-integration",
+              "guides/multi-endpoint",
+              "guides/system-service",
+              "guides/docker-deployment"
             ]
           },
           {
-            "tab": "API Reference",
-            "groups": [
-              {
-                "group": "API Reference",
-                "pages": [
-                  "api-reference/overview"
-                ]
-              },
-              {
-                "group": "Threat Cloud API",
-                "pages": [
-                  "api-reference/threat-cloud/ioc",
-                  "api-reference/threat-cloud/feeds",
-                  "api-reference/threat-cloud/campaigns",
-                  "api-reference/threat-cloud/stats"
-                ]
-              }
+            "group": "Configuration",
+            "pages": [
+              "configuration/guard-config",
+              "configuration/environment-variables"
+            ]
+          },
+          {
+            "group": "Troubleshooting",
+            "pages": [
+              "troubleshooting/common-issues",
+              "troubleshooting/guard-issues",
+              "troubleshooting/notification-issues"
             ]
           }
         ]
       },
       {
-        "language": "zh-Hant",
-        "tabs": [
+        "tab": "Products",
+        "groups": [
           {
-            "tab": "技術文件",
-            "groups": [
-              {
-                "group": "開始使用",
-                "pages": [
-                  "introduction",
-                  "getting-started",
-                  "overview",
-                  "quickstart",
-                  "installation",
-                  "skill-auditor",
-                  "threat-cloud",
-                  "atr"
-                ]
-              },
-              {
-                "group": "核心概念",
-                "pages": [
-                  "concepts/three-layer-ai",
-                  "concepts/learning-mode",
-                  "concepts/security-score",
-                  "concepts/threat-intelligence",
-                  "concepts/architecture"
-                ]
-              },
-              {
-                "group": "操作指南",
-                "pages": [
-                  "guides/first-scan",
-                  "guides/real-time-protection",
-                  "guides/notifications-setup",
-                  "guides/threat-cloud-deployment",
-                  "guides/claw-setup",
-                  "guides/mcp-integration",
-                  "guides/multi-endpoint",
-                  "guides/system-service",
-                  "guides/docker-deployment"
-                ]
-              },
-              {
-                "group": "設定",
-                "pages": [
-                  "configuration/guard-config",
-                  "configuration/environment-variables"
-                ]
-              },
-              {
-                "group": "疑難排解",
-                "pages": [
-                  "troubleshooting/common-issues",
-                  "troubleshooting/guard-issues",
-                  "troubleshooting/notification-issues"
-                ]
-              }
+            "group": "Products",
+            "pages": [
+              "products/overview"
             ]
           },
           {
-            "tab": "產品",
-            "groups": [
-              {
-                "group": "產品",
-                "pages": [
-                  "products/overview"
-                ]
-              },
-              {
-                "group": "Panguard Scan",
-                "pages": [
-                  "products/scan/overview",
-                  "products/scan/scanners",
-                  "products/scan/risk-scoring",
-                  "products/scan/pdf-reports"
-                ]
-              },
-              {
-                "group": "Panguard Guard",
-                "pages": [
-                  "products/guard/overview",
-                  "products/guard/agent-pipeline",
-                  "products/guard/monitors",
-                  "products/guard/event-correlation",
-                  "products/guard/auto-response"
-                ]
-              },
-              {
-                "group": "Panguard MCP",
-                "pages": [
-                  "products/mcp/overview",
-                  "products/mcp/tools-reference"
-                ]
-              },
-              {
-                "group": "Threat Cloud",
-                "pages": [
-                  "products/threat-cloud/overview",
-                  "products/threat-cloud/deployment",
-                  "products/threat-cloud/privacy"
-                ]
-              }
+            "group": "Panguard Scan",
+            "pages": [
+              "products/scan/overview",
+              "products/scan/scanners",
+              "products/scan/risk-scoring",
+              "products/scan/pdf-reports"
             ]
           },
           {
-            "tab": "CLI 參考",
-            "groups": [
-              {
-                "group": "CLI 參考",
-                "pages": [
-                  "cli/overview"
-                ]
-              },
-              {
-                "group": "掃描",
-                "pages": [
-                  "cli/scan",
-                  "cli/report"
-                ]
-              },
-              {
-                "group": "防護",
-                "pages": [
-                  "cli/guard"
-                ]
-              },
-              {
-                "group": "系統",
-                "pages": [
-                  "cli/init",
-                  "cli/status",
-                  "cli/config",
-                  "cli/doctor",
-                  "cli/upgrade"
-                ]
-              },
-              {
-                "group": "進階",
-                "pages": [
-                  "cli/threat"
-                ]
-              }
+            "group": "Panguard Guard",
+            "pages": [
+              "products/guard/overview",
+              "products/guard/agent-pipeline",
+              "products/guard/monitors",
+              "products/guard/event-correlation",
+              "products/guard/auto-response"
             ]
           },
           {
-            "tab": "API 參考",
-            "groups": [
-              {
-                "group": "API 參考",
-                "pages": [
-                  "api-reference/overview"
-                ]
-              },
-              {
-                "group": "Threat Cloud API",
-                "pages": [
-                  "api-reference/threat-cloud/ioc",
-                  "api-reference/threat-cloud/feeds",
-                  "api-reference/threat-cloud/campaigns",
-                  "api-reference/threat-cloud/stats"
-                ]
-              }
+            "group": "Panguard MCP",
+            "pages": [
+              "products/mcp/overview",
+              "products/mcp/tools-reference"
+            ]
+          },
+          {
+            "group": "Threat Cloud",
+            "pages": [
+              "products/threat-cloud/overview",
+              "products/threat-cloud/deployment",
+              "products/threat-cloud/privacy"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI Reference",
+        "groups": [
+          {
+            "group": "CLI Reference",
+            "pages": [
+              "cli/overview"
+            ]
+          },
+          {
+            "group": "Scanning",
+            "pages": [
+              "cli/scan",
+              "cli/report"
+            ]
+          },
+          {
+            "group": "Protection",
+            "pages": [
+              "cli/guard"
+            ]
+          },
+          {
+            "group": "System",
+            "pages": [
+              "cli/init",
+              "cli/status",
+              "cli/config",
+              "cli/doctor",
+              "cli/upgrade"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "cli/threat"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "api-reference/overview"
+            ]
+          },
+          {
+            "group": "Threat Cloud API",
+            "pages": [
+              "api-reference/threat-cloud/ioc",
+              "api-reference/threat-cloud/feeds",
+              "api-reference/threat-cloud/campaigns",
+              "api-reference/threat-cloud/stats"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "繁體中文",
+        "groups": [
+          {
+            "group": "開始使用",
+            "pages": [
+              "zh-Hant/introduction",
+              "zh-Hant/getting-started",
+              "zh-Hant/overview",
+              "zh-Hant/quickstart",
+              "zh-Hant/installation",
+              "zh-Hant/skill-auditor",
+              "zh-Hant/threat-cloud",
+              "zh-Hant/atr"
+            ]
+          },
+          {
+            "group": "核心概念",
+            "pages": [
+              "zh-Hant/concepts/three-layer-ai",
+              "zh-Hant/concepts/learning-mode",
+              "zh-Hant/concepts/security-score",
+              "zh-Hant/concepts/threat-intelligence",
+              "zh-Hant/concepts/architecture"
+            ]
+          },
+          {
+            "group": "操作指南",
+            "pages": [
+              "zh-Hant/guides/first-scan",
+              "zh-Hant/guides/real-time-protection",
+              "zh-Hant/guides/notifications-setup",
+              "zh-Hant/guides/threat-cloud-deployment",
+              "zh-Hant/guides/claw-setup",
+              "zh-Hant/guides/mcp-integration",
+              "zh-Hant/guides/multi-endpoint",
+              "zh-Hant/guides/system-service",
+              "zh-Hant/guides/docker-deployment"
+            ]
+          },
+          {
+            "group": "設定",
+            "pages": [
+              "zh-Hant/configuration/guard-config",
+              "zh-Hant/configuration/environment-variables"
+            ]
+          },
+          {
+            "group": "疑難排解",
+            "pages": [
+              "zh-Hant/troubleshooting/common-issues",
+              "zh-Hant/troubleshooting/guard-issues",
+              "zh-Hant/troubleshooting/notification-issues"
             ]
           }
         ]
