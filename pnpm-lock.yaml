@@ -145,6 +145,9 @@ importers:
       '@panguard-ai/panguard-trap':
         specifier: workspace:*
         version: link:../panguard-trap
+      '@panguard-ai/scan-core':
+        specifier: workspace:*
+        version: link:../scan-core
       '@panguard-ai/security-hardening':
         specifier: workspace:*
         version: link:../../security-hardening
@@ -223,6 +226,9 @@ importers:
       '@panguard-ai/panguard-trap':
         specifier: workspace:*
         version: link:../panguard-trap
+      '@panguard-ai/scan-core':
+        specifier: workspace:*
+        version: link:../scan-core
       '@panguard-ai/security-hardening':
         specifier: workspace:*
         version: link:../../security-hardening
@@ -348,6 +354,9 @@ importers:
       '@panguard-ai/panguard-scan':
         specifier: workspace:*
         version: link:../panguard-scan
+      '@panguard-ai/scan-core':
+        specifier: workspace:*
+        version: link:../scan-core
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -397,6 +406,28 @@ importers:
         specifier: ~5.7.3
         version: 5.7.3
 
+  packages/scan-core:
+    dependencies:
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.1
+      safe-regex:
+        specifier: ^2.1.1
+        version: 2.1.1
+    devDependencies:
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/node':
+        specifier: ^22.14.0
+        version: 22.19.13
+      typescript:
+        specifier: ~5.7.3
+        version: 5.7.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@22.19.13)(jiti@1.21.7)(jsdom@28.1.0)(tsx@4.21.0)
+
   packages/threat-cloud:
     dependencies:
       '@panguard-ai/core':
@@ -421,6 +452,9 @@ importers:
 
   packages/website:
     dependencies:
+      '@panguard-ai/scan-core':
+        specifier: workspace:*
+        version: link:../scan-core
       framer-motion:
         specifier: ^12.34.3
         version: 12.34.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)

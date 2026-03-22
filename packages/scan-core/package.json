@@ -1,0 +1,47 @@
+{
+  "name": "@panguard-ai/scan-core",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/panguard-ai/panguard-ai"
+  },
+  "type": "module",
+  "description": "Unified skill scanning engine - shared between CLI Auditor and Website",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "tsc --build --watch"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "safe-regex": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.14.0",
+    "typescript": "~5.7.3",
+    "vitest": "^3.0.0"
+  }
+}
