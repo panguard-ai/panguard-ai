@@ -53,12 +53,10 @@
       "scanDesc": "60 秒 AI 資安掃描",
       "guard": "Panguard Guard",
       "guardDesc": "24/7 Skill 行為監控",
-      "chat": "Panguard Chat",
-      "chatDesc": "AI 資安助手",
-      "trap": "Panguard Trap",
-      "trapDesc": "智慧蜜罐系統",
-      "report": "Panguard Report",
-      "reportDesc": "AI 合規報告",
+      "chat": "Guard 通知",
+      "chatDesc": "Guard 事件的通知管道",
+      "report": "合規報告",
+      "reportDesc": "基於 Scan 的合規輸出",
       "compliance": "合規管理",
       "complianceDesc": "ISO 27001、SOC 2、TCSA",
       "integrations": "整合串接",
@@ -124,9 +122,8 @@
     "threatCloud": "Threat Cloud",
     "atr": "ATR",
     "guard": "Guard",
-    "chat": "Chat",
-    "trap": "Trap",
-    "report": "Report",
+    "chat": "Guard 通知",
+    "report": "合規報告",
     "mcp": "MCP Server",
     "skillAuditor": "Skill Auditor",
     "atrStandard": "ATR 標準",
@@ -300,8 +297,13 @@
         "subtitle": "同樣配置的真人團隊年薪超過 NT$600 萬。Panguard 免費起步。",
         "roles": [
           {
+            "role": "技能守門員",
+            "product": "Skill Auditor",
+            "desc": "6 層安裝前審計，AI 技能先過關才能跑"
+          },
+          {
             "role": "SOC 分析師",
-            "product": "Guard + Chat",
+            "product": "Guard",
             "desc": "24/7 偵測、回應、即時通報"
           },
           {
@@ -310,22 +312,12 @@
             "desc": "搶在攻擊者前面找到弱點"
           },
           {
-            "role": "合規專員",
-            "product": "Report",
-            "desc": "資安法、ISO 27001、SOC 2 一次搞定"
-          },
-          {
-            "role": "威脅情報分析師",
-            "product": "Trap",
-            "desc": "引蛇出洞，拆解攻擊手法"
-          },
-          {
             "role": "偵測規則工程師",
             "product": "Threat Cloud",
             "desc": "從實戰自動鍛造偵測規則"
           }
         ],
-        "footer": "5 個角色 · 7 個產品 · 1 行指令 · 免費開始"
+        "footer": "4 個角色 · 3 大支柱 · 1 行指令 · 免費開始"
       },
       "funnel": {
         "title": "90% 的威脅，根本不需要 AI。",
@@ -1558,16 +1550,16 @@
       "description": "在 AI agent 上線前抓出 prompt injection 漏洞、tool poisoning 風險、context 洩露問題。SAST 掃描、ATR 規則、runtime 防護。"
     },
     "productChat": {
-      "title": "Panguard Chat",
-      "description": "你的 AI 資安副駕。說人話，不是警報代碼。會說人話的安全防護，整合你已在使用的工具。"
+      "title": "Guard 通知",
+      "description": "Guard 警報管道。Telegram、Slack、Email、Webhook -- 安全事件送到你常用的地方。"
     },
     "productTrap": {
-      "title": "Panguard Trap",
-      "description": "智慧蜜罐系統。認識你的攻擊者。反守為攻，讓攻擊者暴露自己，同時你的真實系統安然無恙。"
+      "title": "Panguard -- 產品",
+      "description": "探索 Panguard AI 安全平台。Skill Auditor、Guard、Threat Cloud 等。"
     },
     "productReport": {
-      "title": "Panguard Report",
-      "description": "自動生成合規報告。ISO 27001、SOC 2。將你的安全資料轉化為稽核就緒文件，自動化。"
+      "title": "合規報告",
+      "description": "從 Panguard Scan 結果自動產出 ISO 27001、SOC 2 合規報告。"
     },
     "developers": {
       "title": "開發者方案",
@@ -1839,19 +1831,14 @@
           "badge": "免費"
         },
         "chat": {
-          "name": "Panguard Chat",
-          "tagline": "你的 AI 資安副駕。",
-          "badge": "功能"
-        },
-        "trap": {
-          "name": "Panguard Trap",
-          "tagline": "蜜罐情報回饋至 Threat Cloud。",
-          "badge": "即將推出"
+          "name": "Guard 通知",
+          "tagline": "Telegram、Slack、Email、Webhook -- Guard 警報送到你常用的管道。",
+          "badge": "Guard 功能"
         },
         "report": {
-          "name": "Panguard Report",
-          "tagline": "一行指令產出合規報告。",
-          "badge": "即將推出"
+          "name": "合規報告",
+          "tagline": "從 Scan 結果自動產出 ISO 27001、SOC 2 報告。",
+          "badge": "Scan 功能"
         },
         "mcp": {
           "name": "MCP Server",
@@ -4235,16 +4222,12 @@
         "desc": "端點防護、偵測規則、回應動作、警報組態"
       },
       "chat": {
-        "title": "Panguard Chat",
-        "desc": "AI 副駕設定、Slack/Teams/Telegram 整合、查詢範例"
-      },
-      "trap": {
-        "title": "Panguard Trap",
-        "desc": "蜜罐部署、攻擊者分析、威脅情報來源"
+        "title": "Guard 通知",
+        "desc": "警報管道設定：Slack、Telegram、Email、Webhook 整合"
       },
       "report": {
-        "title": "Panguard Report",
-        "desc": "合規報告、SOC 2 證據收集、PDF 自訂"
+        "title": "合規報告",
+        "desc": "基於 Scan 的合規報告、SOC 2 證據收集、PDF 自訂"
       },
       "skillAuditor": {
         "title": "Skill Auditor",
@@ -5120,9 +5103,8 @@
     "services": {
       "guard": "Panguard Guard -- Skill 行為監控",
       "scan": "Panguard Scan -- 安全稽核",
-      "chat": "Panguard Chat -- AI 副駕",
-      "trap": "Panguard Trap -- 蜜罐系統",
-      "report": "Panguard Report -- 合規引擎",
+      "chat": "Guard 通知 -- 警報管道",
+      "report": "合規報告 -- Scan 輸出",
       "dashboard": "儀表板 & 網頁應用",
       "api": "API & 整合",
       "threatIntel": "威脅情報來源"
@@ -5205,14 +5187,9 @@
     "error": "出了點問題。請重試。",
     "emailPlaceholder": "you@company.com",
     "backHome": "返回首頁",
-    "trap": {
-      "title": "Panguard Trap",
-      "subtitle": "智慧蜜罐系統——部署誘餌服務偵測、分析並研究攻擊者。支援 SSH、HTTP、FTP 等協定。",
-      "followProgress": "在 GitHub 追蹤開發進度"
-    },
     "report": {
-      "title": "Panguard Report",
-      "subtitle": "AI 驅動合規報告——支援 ISO 27001、SOC 2、資安管理法。從掃描結果自動產生。",
+      "title": "合規報告",
+      "subtitle": "ISO 27001、SOC 2、資安管理法合規報告——從 Scan 結果自動產生。Panguard Scan 的內建功能。",
       "followProgress": "在 GitHub 追蹤開發進度"
     }
   },

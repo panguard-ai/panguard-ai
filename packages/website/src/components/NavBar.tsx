@@ -160,18 +160,6 @@ export default function NavBar() {
     { label: t('productLinks.guard'), desc: t('productLinks.guardDesc'), href: '/product/guard' },
     { label: t('productLinks.mcp'), desc: t('productLinks.mcpDesc'), href: '/product/mcp' },
     { label: t('productLinks.atrStandard'), desc: t('productLinks.atrStandardDesc'), href: '/atr' },
-    {
-      label: t('productLinks.trap'),
-      desc: t('productLinks.trapDesc'),
-      href: '/product/trap',
-      comingSoon: true,
-    },
-    {
-      label: t('productLinks.report'),
-      desc: t('productLinks.reportDesc'),
-      href: '/product/report',
-      comingSoon: true,
-    },
   ];
 
   const topLinks = [

@@ -22,10 +22,28 @@ const nextConfig = {
       '/pricing',
     ];
 
-    return hiddenRoutes.flatMap((source) => [
-      { source, destination: '/', permanent: false },
-      { source: `/zh-TW${source}`, destination: '/', permanent: false },
-    ]);
+    const productRedirects = [
+      { source: '/product/trap', destination: '/product/guard', permanent: false },
+      { source: '/zh-TW/product/trap', destination: '/zh-TW/product/guard', permanent: false },
+      { source: '/product/chat', destination: '/product/guard', permanent: false },
+      { source: '/zh-TW/product/chat', destination: '/zh-TW/product/guard', permanent: false },
+      { source: '/product/report', destination: '/product/scan', permanent: false },
+      { source: '/zh-TW/product/report', destination: '/zh-TW/product/scan', permanent: false },
+      { source: '/docs/trap', destination: '/docs/guard', permanent: false },
+      { source: '/zh-TW/docs/trap', destination: '/zh-TW/docs/guard', permanent: false },
+      { source: '/docs/chat', destination: '/docs/guard', permanent: false },
+      { source: '/zh-TW/docs/chat', destination: '/zh-TW/docs/guard', permanent: false },
+      { source: '/docs/report', destination: '/docs/scan', permanent: false },
+      { source: '/zh-TW/docs/report', destination: '/zh-TW/docs/scan', permanent: false },
+    ];
+
+    return [
+      ...hiddenRoutes.flatMap((source) => [
+        { source, destination: '/', permanent: false },
+        { source: `/zh-TW${source}`, destination: '/', permanent: false },
+      ]),
+      ...productRedirects,
+    ];
   },
   async rewrites() {
     return {

@@ -6,7 +6,7 @@ import BrandLogo from '@/components/ui/BrandLogo';
 import FadeInUp from '@/components/FadeInUp';
 
 interface ComingSoonContentProps {
-  productKey: 'trap' | 'report';
+  productKey: 'report';
 }
 
 export default function ComingSoonContent({ productKey }: ComingSoonContentProps) {

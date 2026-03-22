@@ -10,11 +10,8 @@ import {
   TerminalIcon,
   DeployIcon,
   IntegrationIcon,
-  ChatIcon,
   ScanIcon,
   ShieldIcon,
-  TrapIcon,
-  ReportIcon,
   AnalyticsIcon,
 } from '@/components/ui/BrandIcons';
 
@@ -30,9 +27,6 @@ const quickStartConfigs = [
 const productDocConfigs = [
   { key: 'scan' as const, icon: ScanIcon, href: '/docs/scan' },
   { key: 'guard' as const, icon: ShieldIcon, href: '/docs/guard' },
-  { key: 'chat' as const, icon: ChatIcon, href: '/docs/chat' },
-  { key: 'trap' as const, icon: TrapIcon, href: '/docs/trap' },
-  { key: 'report' as const, icon: ReportIcon, href: '/docs/report' },
   { key: 'skillAuditor' as const, icon: AnalyticsIcon, href: '/docs/skill-auditor' },
 ];
 

@@ -38,7 +38,7 @@ const productConfigs = [
       'Auto-generates ATR rules from collective data',
       `${STATS.threatIntel.promotedRules} community-promoted rules, synced every ${STATS.threatIntel.syncInterval}`,
       'Self-hosted -- your data never leaves your infrastructure',
-      'Honeypot intelligence feeds from Trap deployments',
+      'Anomaly signals from Guard and Scan deployments worldwide',
       'Confidence scoring and rule lifecycle management',
     ],
     href: '/threat-cloud',
