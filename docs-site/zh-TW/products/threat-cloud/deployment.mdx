@@ -1,46 +1,46 @@
 ---
 title: "連接 Threat Cloud"
-description: "Panguard Agent 如何連接 Threat Cloud 取得集體威脅情報。"
+description: "Panguard agent 怎麼連上 Threat Cloud 取得集體威脅情報。"
 icon: "plug"
 ---
 
-每個 Panguard Agent 自動連接公開 Threat Cloud。不需設定、不需 API 金鑰、不需帳號。
+每個 Panguard agent 自動連上公開 Threat Cloud。不用設定、不用 API key、不用帳號。
 
 ## 預設連線
 
-啟動 Guard 時，自動連接 `tc.panguard.ai`：
+啟動 Guard 就自動連 `tc.panguard.ai`：
 
 ```bash
 panguard guard start --dashboard
 ```
 
-就這樣。您的 Agent 已加入集體情報網路。
+就這樣。你的 agent 已經加入集體情報網路了。
 
-## 自動執行的動作
+## 自動做的事
 
 | 間隔 | 動作 |
 |------|------|
-| **啟動時** | 從本地安裝載入內建 ATR 規則 |
-| **每 1 小時** | 與 Threat Cloud 同步：下載新規則、上傳匿名化威脅 |
+| **啟動時** | 從本機安裝載入內建 ATR 規則（61 條） |
+| **每 1 小時** | 跟 Threat Cloud sync：拉新規則、傳匿名化威脅 |
 | **偵測到威脅時** | 提交匿名化事件資料到 Threat Cloud |
-| **技能審計時** | 回報安全/不安全的技能指紋 |
+| **skill 審計時** | 回報安全/不安全的 skill 指紋 |
 
-## 自訂端點
+## 自訂 endpoint
 
-將 Agent 指向不同的 Threat Cloud 實例：
+把 agent 指到別台 Threat Cloud：
 
 ```bash
 panguard guard start --threat-cloud https://your-server:8080
 ```
 
-或設定環境變數：
+或設環境變數：
 
 ```bash
 export TC_ENDPOINT=https://your-server:8080
 panguard guard start
 ```
 
-或在 `~/.panguard/config.json` 中設定：
+或寫在 `~/.panguard/config.json`：
 
 ```json
 {
@@ -51,29 +51,29 @@ panguard guard start
 
 ## 離線模式
 
-Guard 完全支援離線運作。如果 Threat Cloud 無法連線：
+Guard 離線也能正常運作。如果 Threat Cloud 連不上：
 
-- 內建 ATR 規則（61 條）持續運作
-- 本地 AI（Ollama）處理分析
-- 事件在本地排隊，恢復連線後同步
-- 防護永不中斷
+- 內建的 61 條 ATR 規則照常偵測
+- 本機 AI（Ollama）繼續做分析
+- 事件在本機排隊，連線恢復後自動 sync
+- 防護不會中斷
 
 ```bash
-# 明確停用 Threat Cloud 同步
+# 明確關掉 Threat Cloud sync
 panguard guard start --no-cloud
 ```
 
-## 私人部署
+## 私有部署
 
-需要隔離基礎設施或資料主權合規的組織，可使用私人 Threat Cloud 託管服務。
+需要隔離基礎設施或資料主權合規的組織，可以跑私有 Threat Cloud 託管服務。
 
-<Card title="聯繫私人部署" icon="envelope" href="https://panguard.ai/contact">
-  企業和政府組織可部署專屬 Threat Cloud 基礎設施，包含自訂 feed、保留策略和網路隔離。
+<Card title="聯繫私有部署" icon="envelope" href="https://panguard.ai/contact">
+  企業組織可部署專屬 Threat Cloud 基礎設施，包含自訂 feed、保留策略跟網路隔離。
 </Card>
 
 ## 驗證連線
 
-檢查 Agent 的 Threat Cloud 狀態：
+看 agent 的 Threat Cloud 連線狀態：
 
 ```bash
 panguard status --json
@@ -91,4 +91,4 @@ panguard status --json
 }
 ```
 
-或在儀表板 `http://127.0.0.1:9100`（Threat Cloud 頁面）查看。
+也可以在儀表板 `http://127.0.0.1:9100`（Threat Cloud 頁面）看。

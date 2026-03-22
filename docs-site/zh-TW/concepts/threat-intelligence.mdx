@@ -1,164 +1,164 @@
 ---
 title: "威脅情報"
-description: "即時威脅情報來源與 Threat Cloud 集體情報網路。"
+description: "即時威脅情報 feed 和 Threat Cloud 集體情報網路。"
 icon: "globe"
 ---
 
 # 威脅情報
 
-威脅情報提供關於已知攻擊者、惡意 IP、網域、URL 與惡意軟體特徵的結構化資訊。Panguard 自動查詢這些資料庫，以判斷您系統上的活動是否與已知威脅有關。
+威脅情報提供已知攻擊者、惡意 IP、domain、URL、malware 特徵的結構化資訊。Panguard 自動查這些資料庫，判斷你系統上的活動是不是跟已知威脅有關。
 
 <Info>
-您不需要了解技術細節。Guard 會自動處理查詢，Chat 則以白話語言解釋結果。
+你不需要懂技術細節。Guard 自動查詢，結果用白話跟你說。
 </Info>
 
 ---
 
-## 5 個內建威脅情報來源
+## 5 個內建威脅情報 feed
 
-### abuse.ch 套件
+### abuse.ch 系列
 
 | 來源 | 指標類型 | 說明 |
 | --- | --- | --- |
-| [ThreatFox](https://threatfox.abuse.ch) | IP、域名、URL、雜湊 | 與惡意軟體攻擊活動相關的入侵指標 (IoC) 資料庫 |
-| [URLhaus](https://urlhaus.abuse.ch) | URL | 惡意軟體散布 URL 資料庫 |
-| [Feodo Tracker](https://feodotracker.abuse.ch) | IP | 殭屍網路命令控制 (C2) 伺服器追蹤 |
+| [ThreatFox](https://threatfox.abuse.ch) | IP、domain、URL、hash | malware 攻擊活動的入侵指標 (IoC) 資料庫 |
+| [URLhaus](https://urlhaus.abuse.ch) | URL | malware 散布 URL 資料庫 |
+| [Feodo Tracker](https://feodotracker.abuse.ch) | IP | 殭屍網路 C2 server 追蹤 |
 
 ### 其他來源
 
 | 來源 | 指標類型 | 說明 |
 | --- | --- | --- |
-| [GreyNoise](https://greynoise.io) | IP | 區分針對性攻擊與大規模網路掃描 |
-| [AbuseIPDB](https://abuseipdb.com) | IP | 社群回報的惡意 IP 資料庫，附帶信心度評分 |
+| [GreyNoise](https://greynoise.io) | IP | 分辨針對性攻擊和大規模掃描 |
+| [AbuseIPDB](https://abuseipdb.com) | IP | 社群回報的惡意 IP 資料庫，附信心度評分 |
 
 ---
 
-## 來源更新排程
+## Feed 更新排程
 
-| 來源 | 更新頻率 | 查詢方式 |
+| Feed | 更新頻率 | 查詢方式 |
 | --- | --- | --- |
-| ThreatFox | 每小時 | 本地快取 |
-| URLhaus | 每小時 | 本地快取 |
-| Feodo Tracker | 每小時 | 本地快取 |
-| GreyNoise | 每次查詢即時 | API 呼叫 |
-| AbuseIPDB | 每次查詢即時 | API 呼叫 |
+| ThreatFox | 每小時 | 本地 cache |
+| URLhaus | 每小時 | 本地 cache |
+| Feodo Tracker | 每小時 | 本地 cache |
+| GreyNoise | 即時查詢 | API call |
+| AbuseIPDB | 即時查詢 | API call |
 
 <Tip>
-1 小時的更新間隔可以調整。頻寬受限的系統可延長至 6 或 24 小時。
+1 小時的更新間隔可以改。頻寬有限的話可以調成 6 或 24 小時。
 </Tip>
 
-### 本地快取
+### 本地 Cache
 
-查詢結果會在本地快取以避免重複查詢：
+查詢結果會 cache 在本地，避免重複查：
 
-- 快取持續時間：依來源 1-24 小時
-- 快取位置：Guard 資料目錄
-- 過期的項目會自動清除
+- Cache 時間：依來源 1-24 小時
+- Cache 位置：Guard 資料目錄
+- 過期的自動清掉
 
 ---
 
 ## 入侵指標 (IoC)
 
-威脅情報追蹤以下類型的指標：
+威脅情報追蹤這些指標類型：
 
 | 類型 | 說明 | 範例 |
 | --- | --- | --- |
-| **IP 位址** | 已知惡意 IP | `203.0.113.50` |
-| **域名** | 惡意域名 | `malware.example.com` |
+| **IP** | 已知惡意 IP | `203.0.113.50` |
+| **Domain** | 惡意 domain | `malware.example.com` |
 | **URL** | 惡意 URL | `http://evil.com/payload.exe` |
-| **檔案雜湊** | 惡意軟體指紋（SHA-256） | `e3b0c44298fc1c149a...` |
-| **電子郵件** | 釣魚電子郵件地址 | `phish@attacker.com` |
+| **File Hash** | malware 指紋（SHA-256） | `e3b0c44298fc1c149a...` |
+| **Email** | 釣魚信地址 | `phish@attacker.com` |
 
 ### 自動查詢
 
-Guard 偵測到可疑活動時會自動查詢威脅情報：
+Guard 偵測到可疑活動時自動查威脅情報：
 
 ```
-Suspicious IP 203.0.113.50 connection detected
+偵測到可疑 IP 203.0.113.50 連線
        |
        v
-  Query ThreatFox  -> Known C2 server
-  Query AbuseIPDB  -> Reported 1,247 times
-  Query GreyNoise  -> Mass scanner
+  查 ThreatFox  -> 已知 C2 server
+  查 AbuseIPDB  -> 被回報 1,247 次
+  查 GreyNoise  -> 大規模掃描器
        |
        v
-  Conclusion: High risk -- auto-block + notify
+  結論：高風險 -- 自動封鎖 + 通知
 ```
 
 ---
 
 ## Threat Cloud -- 集體情報
 
-除了公開來源外，Panguard 使用者還可貢獻並受益於 Threat Cloud，這是一個社群驅動的集體情報網路，專注於 ATR（Agent Threat Rules）共識。
+除了公開 feed，Panguard 使用者還能貢獻和受益於 Threat Cloud -- 社群驅動的集體情報網路，專注 ATR 規則共識。
 
 ### 結晶化飛輪
 
-Threat Cloud 的核心價值在於結晶化飛輪 -- 一個自我強化的循環，將個別掃描發現項目提煉為社群確認的偵測規則：
+Threat Cloud 的核心價值是結晶化飛輪 -- 自我強化的循環，把個別掃描發現提煉成社群確認的偵測規則：
 
 ```
-  掃描技能 ──> 發現項目 ──> TC 提案 ──> 共識（3+ 次確認）──> 已確認規則
-       ^                                                              |
-       └──────────────── 分發至所有掃描器 ────────────────────────────┘
+  掃描 skill --> 發現問題 --> TC 提案 --> 共識（3+ 確認）--> 正式規則
+       ^                                                          |
+       └──────────────── 分發給所有掃描器 ─────────────────────────┘
 ```
 
-每次循環都強化整個網路：
+每次循環都讓整個網路更強：
 
-1. **掃描** -- 任何 Panguard 掃描器（CLI、Website 或 Guard）掃描一個 MCP 技能
-2. **提案** -- 高嚴重性發現項目產生以模式雜湊識別的 ATR 提案
-3. **確認** -- 其他掃描器遇到相同模式雜湊時確認該提案
-4. **升格** -- 達到 3+ 次獨立確認後，提案自動升格為已確認規則
-5. **分發** -- 已確認規則透過 `GET /api/atr-rules` 提供給所有掃描器
-6. **強化** -- 掃描器載入新規則，提升偵測能力，產生更多提案
+1. **掃描** -- 任何 Panguard 掃描器（CLI、Website、Guard）掃一個 MCP skill
+2. **提案** -- 高嚴重性發現產生 ATR 提案，用 pattern hash 識別
+3. **確認** -- 其他掃描器碰到同樣的 pattern hash 就確認
+4. **升格** -- 3+ 次獨立確認後，自動升格為正式規則
+5. **分發** -- 正式規則透過 `GET /api/atr-rules` 給所有掃描器
+6. **強化** -- 掃描器載入新規則，偵測能力提升，產生更多提案
 
-模式雜湊使用格式 `scan:{skillName}:{findingSummary}`，以 SHA-256 截斷為 16 個十六進位字元。因為所有掃描器使用相同的 `@panguard-ai/scan-core` 函式庫，無論掃描源自 CLI、Website 或 Guard，都會對相同威脅模式產生相同的雜湊。
+Pattern hash 格式是 `scan:{skillName}:{findingSummary}`，SHA-256 截斷成 16 個 hex 字元。因為所有掃描器用同一個 `@panguard-ai/scan-core` 函式庫，不管掃描從 CLI、Website 還是 Guard 來的，同樣的威脅 pattern 都會算出一樣的 hash。
 
-### LLM 審查員
+### LLM 審查
 
-Threat Cloud 包含一個自動化 LLM 審查員（Claude Sonnet 4），用於評估 ATR 提案的誤報風險、覆蓋度、偵測專一性和 YAML 有效性。提案可透過僅社群共識（3+ 次確認）或 LLM 核准結合社群確認來升格。
+Threat Cloud 有自動化 LLM 審查員（Claude Sonnet 4），評估 ATR 提案的誤報風險、覆蓋度、偵測精確度和 YAML 有效性。提案可以純靠社群共識（3+ 確認）升格，也可以 LLM 核准加社群確認一起升格。
 
-### IoC 來源
+### IoC Feed
 
-Threat Cloud 也分發傳統的 IoC 來源（IP 黑名單、網域黑名單）並維護社群技能黑名單。這些作為 ATR 規則管線在網路層級威脅指標方面的補充。
+Threat Cloud 也分發傳統 IoC feed（IP 黑名單、domain 黑名單）和社群 skill 黑名單。這些補充 ATR 規則 pipeline 在網路層級的偵測。
 
 ---
 
-## 隱私與資料保護
+## 隱私和資料保護
 
 <Warning>
-**隱私保證：** 僅上傳威脅指標（IP、雜湊、模式）。絕不分享任何系統資訊、使用者名稱、內部 IP、檔案內容或個人識別資訊。
+**隱私保證：** 只上傳威脅指標（IP、hash、pattern）。絕不分享系統資訊、帳號名稱、內部 IP、檔案內容或任何個資。
 </Warning>
 
-| 隱私措施 | 詳情 |
+| 隱私措施 | 細節 |
 | --- | --- |
-| **IP 匿名化** | 來源 IP 在上傳前進行 /16 匿名化 |
-| **GDPR 合規** | 不收集或儲存個人資料 |
-| **零原始資料** | 不傳輸日誌內容、檔案內容或系統詳情 |
-| **零遙測** | 不收集使用分析、當機報告或行為追蹤 |
-| **可選擇退出** | Threat Cloud 可完全停用 |
+| **IP 匿名化** | 來源 IP 上傳前做 /16 匿名化 |
+| **GDPR 合規** | 不收集也不儲存個資 |
+| **零原始資料** | 不傳 log 內容、檔案內容、系統細節 |
+| **零遙測** | 不收使用分析、crash report、行為追蹤 |
+| **可以關掉** | Threat Cloud 可以完全停用 |
 
 ---
 
 ## 離線模式
 
-Panguard 可完全離線運作。當威脅情報來源無法連線時：
+Panguard 完全支援離線。威脅情報 feed 連不上的時候：
 
-- Layer 1 規則引擎以本地快取規則持續運作
-- 先前快取的來源資料在過期前仍可使用
-- 新的偵測僅依賴 ATR 規則與行為基線
-- 分數調整會反映情報覆蓋率降低
+- Layer 1 規則引擎繼續跑，用本地 cache 的規則
+- 之前 cache 的 feed 資料在過期前還能用
+- 新的偵測只靠 ATR 規則和行為基線
+- 分數會反映情報覆蓋率降低
 
 ```bash
-# 停用所有外部情報（僅規則模式）
+# 關掉所有外部情報（純規則模式）
 panguard guard start --offline
 ```
 
 <Note>
-離線模式停用 Threat Cloud 參與與即時來源查詢。快取資料在過期前仍會使用。
+離線模式停用 Threat Cloud 和即時 feed 查詢。Cache 的資料在過期前照用。
 </Note>
 
 ---
 
-## 查看威脅情報
+## 看威脅情報
 
 ### Guard 狀態
 
@@ -174,9 +174,9 @@ panguard guard status
   Blocked IPs:  12 total
 ```
 
-### Chat 通知
+### 通知
 
-當威脅情報與您系統上的活動匹配時，Chat 會以適合您使用者角色的格式通知您：
+威脅情報命中時，會依你的使用者角色用不同格式通知：
 
 <Tabs>
   <Tab title="Boss 角色">
@@ -225,9 +225,9 @@ panguard guard status
 
 <CardGroup cols={2}>
   <Card title="部署 Threat Cloud" icon="cloud" href="/guides/threat-cloud-deployment">
-    部署您自己的私有 Threat Cloud 伺服器。
+    部署你自己的 Threat Cloud server。
   </Card>
   <Card title="三層式 AI 漏斗" icon="brain-circuit" href="/concepts/three-layer-ai">
-    威脅情報如何整合至偵測流水線。
+    威脅情報怎麼整合進偵測 pipeline。
   </Card>
 </CardGroup>

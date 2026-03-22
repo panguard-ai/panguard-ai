@@ -1,23 +1,23 @@
 ---
-title: "CLI 概覽"
-description: "統一的命令列介面，涵蓋所有 Panguard AI 安全操作。"
+title: "CLI 總覽"
+description: "Panguard CLI -- 一個指令搞定所有端點安全操作。"
 icon: "terminal"
 ---
 
-Panguard CLI 是您進行掃描、防護、監控及管理端點安全的統一入口。從快速弱點掃描到部署蜜罐網路，所有功能都可透過一個二進位檔案存取。
+Panguard CLI 就是你做端點安全的瑞士刀。不管是跑一次快速弱點掃描、開 Guard 即時防護、還是架 Threat Cloud 情報伺服器，全部都從同一個 binary 搞定。
 
-## 使用方式
+## 用法
 
 ```bash
 panguard <command> [options]
 ```
 
-## 全域選項
+## 全域 flag
 
-| 選項 | 說明 |
+| Flag | 說明 |
 | --- | --- |
-| `--help` | 顯示任何指令的說明 |
-| `--version` | 輸出已安裝的 Panguard CLI 版本 |
+| `--help` | 顯示指令說明 |
+| `--version` | 印出目前安裝的 Panguard CLI 版本 |
 | `--lang <lang>` | 設定輸出語言（`en`、`zh-TW`、`ja` 等） |
 
 ## 指令分類
@@ -26,26 +26,24 @@ panguard <command> [options]
 
 | 指令 | 說明 |
 | --- | --- |
-| [`scan`](/cli/scan) | 在本機執行安全掃描 |
+| [`scan`](/cli/scan) | 對本機執行安全掃描 |
 
 ### 防護
 
 | 指令 | 說明 |
 | --- | --- |
-| [`guard`](/cli/guard) | 即時端點防護代理 |
-| [`trap`](/cli/trap) | 蜜罐 / 欺敵技術 |
-| [`chat`](/cli/chat) | 通知頻道管理（Telegram、Slack、Email） |
-| [`report`](/cli/report) | 合規報告產生 |
+| [`guard`](/cli/guard) | 即時端點防護 daemon |
+| [`report`](/cli/report) | 產生合規報告 |
 
 ### 系統
 
 | 指令 | 說明 |
 | --- | --- |
-| [`init`](/cli/init) | 初始化當前機器的設定 |
+| [`init`](/cli/init) | 初始化這台機器的 config |
 | [`status`](/cli/status) | 顯示整體系統健康狀態 |
-| [`config`](/cli/config) | 檢視或編輯設定 |
-| [`doctor`](/cli/doctor) | 診斷常見系統問題 |
-| [`upgrade`](/cli/upgrade) | 將 Panguard CLI 更新至最新版本 |
+| [`config`](/cli/config) | 查看或修改 config |
+| [`doctor`](/cli/doctor) | 診斷常見問題 |
+| [`upgrade`](/cli/upgrade) | 更新 Panguard CLI 到最新版 |
 
 ### 進階
 
@@ -53,35 +51,35 @@ panguard <command> [options]
 | --- | --- |
 | [`threat`](/cli/threat) | 啟動本機 Threat Cloud 情報伺服器 |
 
-## 功能可用性
+## 功能開放性
 
-所有指令皆對所有人開放。Panguard 以 MIT 授權 100% 開源。
+所有指令對所有人開放。Panguard 是 MIT 授權的 100% 開源專案。
 
 ## 安裝
 
-如果您尚未安裝 CLI，請執行：
+還沒裝的話，跑這行就好：
 
 ```bash
 curl -fsSL https://get.panguard.ai | bash
 ```
 
 <Info>
-  請參閱[安裝](/installation)頁面，瞭解包括 Homebrew、APT 和 Docker 在內的各平台安裝說明。
+  各平台的安裝方式（Homebrew、APT、Docker）請看[安裝頁面](/installation)。
 </Info>
 
 ## 下一步
 
 <CardGroup cols={2}>
-  <Card title="快速入門" icon="rocket" href="/quickstart">
-    五分鐘內從零開始完成您的第一次掃描。
+  <Card title="快速上手" icon="rocket" href="/quickstart">
+    五分鐘內跑完你的第一次掃描。
   </Card>
   <Card title="panguard scan" icon="magnifying-glass" href="/cli/scan">
-    執行您的第一次安全掃描。
+    跑你的第一次安全掃描。
   </Card>
   <Card title="panguard guard" icon="shield" href="/cli/guard">
-    啟用即時端點防護。
+    開啟即時端點防護。
   </Card>
-  <Card title="快速入門" icon="user-plus" href="/quickstart">
+  <Card title="快速上手" icon="user-plus" href="/quickstart">
     開始使用 Panguard 安全工具。
   </Card>
 </CardGroup>

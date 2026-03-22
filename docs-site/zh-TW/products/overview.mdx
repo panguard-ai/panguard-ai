@@ -1,55 +1,55 @@
 ---
-title: "產品套件總覽"
-description: "Panguard AI 提供整合產品，涵蓋完整的安全生命週期——從掃描與偵測到回應、合規及集體情報。"
+title: "產品總覽"
+description: "Panguard AI 整合了掃描、偵測、回應、合規到集體情報的完整安全生命週期產品線。"
 icon: "boxes-stacked"
 ---
 
-Panguard AI 不是一個單一工具，而是一個由多款產品組成的整合平台，每款產品專注於安全生命週期的特定階段。它們共同形成一個閉環：掃描您的系統、即時監控、通知相關人員、產生合規報告，並在您的設備群組之間共享情報。
+Panguard AI 不是單一工具，而是一整套互相搭配的安全產品，各自負責安全生命週期的不同階段。串起來就是一個完整的防護迴圈：掃描系統、即時監控、通知對的人、產出合規報告，再跨機器共享威脅情報。
 
-## 產品套件
+## 產品線
 
 <CardGroup cols={2}>
   <Card title="Scan" icon="magnifying-glass" href="/products/scan/overview">
-    60 秒安全稽核，包含 10 個掃描器。產生風險評分（0--100）、嚴重等級分類的發現項目、可選的 PDF 報告，以及合規報告（ISO 27001、SOC 2、TCSA）。
+    60 秒完成安全稽核，內建 10 種掃描器。產出 0--100 風險分數、依嚴重度分級的弱點、PDF 報告，以及合規報告（ISO 27001、SOC 2、TCSA）。
   </Card>
   <Card title="Guard" icon="shield" href="/products/guard/overview">
-    由 4 代理 DARE 管線（偵測、分析、回應、報告）驅動的 24/7 即時監控。10 種監控類型、事件關聯、自動化威脅回應，以及內建通知功能（Telegram、Slack、Email、Webhook）。
+    24/7 即時監控，核心是 4-agent DARE pipeline（Detect、Analyze、Respond、Report）。10 種 monitor、事件關聯分析、自動威脅回應，通知直接送到 Telegram、Slack、Email 或 Webhook。
   </Card>
   <Card title="MCP Server" icon="plug" href="/products/mcp/overview">
-    Model Context Protocol 伺服器，將 11 個 Panguard 工具暴露給 Claude Desktop 和 Cursor 等 AI 助手。
+    實作 Model Context Protocol，把 11 個 Panguard 工具開放給 Claude Desktop、Cursor 等 AI 助手使用。
   </Card>
   <Card title="Threat Cloud" icon="cloud" href="/products/threat-cloud/overview">
-    集體威脅情報平台。每個 Guard 實例貢獻匿名化的威脅資料，每個實例都能從社群的偵測中受益。
+    集體威脅情報平台。每個 Guard 實例貢獻匿名威脅資料，所有實例共享社群的偵測成果。
   </Card>
 </CardGroup>
 
-## 產品如何協同運作
+## 產品怎麼串在一起
 
-這些產品被設計為在分層防禦策略中互相配合：
+這些產品設計上就是要互相搭配，形成分層防禦：
 
 ```
 Scan ──> Guard ──> Threat Cloud
 ```
 
-| 工作流程 | 涉及的產品 | 描述 |
-|----------|-------------------|-------------|
-| **評估與防護** | Scan + Guard | 執行一次性掃描建立基準線，然後啟用 Guard 進行持續監控。 |
-| **偵測與通知** | Guard | Guard 即時偵測威脅，並將淺顯易懂的通知傳送至您偏好的管道（Telegram、Slack、Email、Webhook）。 |
-| **合規與報告** | Scan | 掃描發現項目直接對應合規控制措施。透過 `panguard scan --output report.pdf` 按需產生稽核就緒的 PDF 報告。 |
-| **擴展與集中化** | Guard + Threat Cloud | 在您的設備群組中部署 Guard 代理，並透過 Threat Cloud 在全域關聯威脅。 |
-| **AI 助手** | MCP + Scan + Guard | 在 Claude 或 Cursor 中使用自然語言來執行掃描、檢查狀態並透過 MCP 伺服器封鎖 IP。 |
+| 使用情境 | 涉及產品 | 說明 |
+|----------|----------|------|
+| **評估 + 防護** | Scan + Guard | 先跑一次掃描建立 baseline，再開 Guard 持續監控。 |
+| **偵測 + 通知** | Guard | Guard 即時偵測威脅，用白話通知送到你指定的頻道（Telegram、Slack、Email、Webhook）。 |
+| **合規 + 報告** | Scan | 掃描結果直接對應合規控制項。用 `panguard scan --output report.pdf` 就能產出可交付稽核的 PDF。 |
+| **規模化 + 集中管理** | Guard + Threat Cloud | 在多台機器部署 Guard，透過 Threat Cloud 做跨機器的威脅關聯。 |
+| **AI 副駕駛** | MCP + Scan + Guard | 在 Claude 或 Cursor 裡用自然語言跑掃描、看狀態、封鎖 IP，全部透過 MCP server。 |
 
 ## 架構概覽
 
-Panguard 建構為由 pnpm workspaces 管理的 **13 套件 TypeScript monorepo**。所有套件共享一個通用的 `@panguard-ai/core` 基礎，提供規則引擎、監控引擎、AI 供應商抽象層、國際化和結構化日誌記錄。
+Panguard 是一個 **13 個 package 的 TypeScript monorepo**，用 pnpm workspaces 管理。所有 package 共用 `@panguard-ai/core` 基底，提供規則引擎、monitor 引擎、AI provider 抽象層、i18n 和結構化 logging。
 
-| 層級 | 組件 | 職責 |
-|-------|-----------|----------------|
-| **端點** | Guard, Scan | 本地偵測、掃描和通知 |
-| **管理** | Guard | 端點防護與本地設備群組協調 |
+| 分層 | 組件 | 負責什麼 |
+|------|------|----------|
+| **端點** | Guard, Scan | 本地偵測、掃描、通知 |
+| **管理** | Guard | 端點防護與本地 fleet 協調 |
 | **情報** | Threat Cloud | 集體 IoC 共享 |
 | **整合** | MCP | AI 助手整合 |
 
 <Info>
-  每個產品都可以獨立運行。您不需要部署完整套件。從 `panguard scan` 開始，隨著需求增長再添加產品。
+  每個產品都可以獨立跑。不需要一次部署全套。先從 `panguard scan` 開始，有需要再逐步加。
 </Info>

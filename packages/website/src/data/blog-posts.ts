@@ -415,7 +415,7 @@ export const blogPosts: BlogPost[] = [
       'Today we are making Panguard AI publicly available. Eight security tools, one install command, zero expertise required. Our mission is simple: give every developer and small business the same protection that Fortune 500 companies pay six figures for.',
       '## What Is New in v0.3.0',
       '### Skill Auditor (Beta)',
-      'AI agents are everywhere. OpenClaw, AgentSkills, MCP tools -- the ecosystem is exploding. But who audits the skills before you install them? Panguard Skill Auditor runs 5 automated security checks on any SKILL.md file: manifest validation, prompt injection detection, tool poisoning detection, dependency analysis, and permission scope analysis. Run `panguard audit skill ./my-skill` and get a 0-100 risk score in seconds.',
+      'AI agents are everywhere. OpenClaw, AgentSkills, MCP tools -- the ecosystem is exploding. But who audits the skills before you install them? Panguard Skill Auditor runs 8 automated security checks on any SKILL.md file: manifest validation, prompt injection detection, hidden Unicode detection, encoded payload detection, tool poisoning detection, SAST and secret scanning, permission scope analysis, and dependency analysis. Run `panguard audit skill ./my-skill` and get a 0-100 risk score in seconds.',
       '### MCP Server: 11 Tools',
       'Control Panguard from Claude, Cursor, or any MCP-compatible AI assistant. The MCP server now exposes 11 tools: scan, scan_code, guard_start, guard_stop, status, alerts, block_ip, generate_report, init, deploy, and the new audit_skill. Start with `panguard serve --mcp`.',
       '### Security Hardening',

@@ -1,10 +1,10 @@
 ---
 title: "Panguard Scan"
-description: "60 秒安全健康檢查，包含 10 個掃描器、風險評分及 PDF 報告產生。"
+description: "60 秒安全健檢，10 種掃描器、風險評分、PDF 報告一次搞定。"
 icon: "magnifying-glass"
 ---
 
-Panguard Scan 是一款快速、全面的安全稽核工具，能在 60 秒內評估您系統的安全態勢。它執行 10 個專業掃描器，產生 0--100 的風險評分搭配 A--F 字母等級，並可選擇性地產生專業 PDF 報告。
+Panguard Scan 是一套快速、全面的安全稽核工具，60 秒內就能評估系統的安全狀態。跑 10 種專用掃描器，產出 0--100 風險分數配 A--F 等級，還能選擇性產出專業 PDF 報告。
 
 ## 快速開始
 
@@ -15,7 +15,7 @@ panguard scan --quick
 # 完整掃描（約 60 秒）
 panguard scan
 
-# 產生 PDF 報告
+# 產出 PDF 報告
 panguard scan --output report.pdf
 
 # 繁體中文輸出
@@ -24,56 +24,56 @@ panguard scan --lang zh-TW
 
 ## 快速模式 vs 完整模式
 
-| 功能 | 快速模式（`--quick`） | 完整模式（預設） |
-|------------|----------------------|---------------------|
-| 時長 | 約 30 秒 | 約 60 秒 |
-| 作業系統偵測 | 是 | 是 |
-| 網路介面 | 是 | 是 |
-| 開放埠 | 是 | 是 |
-| 執行中的服務 | 是 | 是 |
-| 密碼策略 | 是 | 是 |
-| 防火牆狀態 | 是 | 是 |
-| 安全工具偵測 | 是 | 是 |
-| SSL 憑證驗證 | -- | 是 |
-| 排程任務稽核 | -- | 是 |
-| 共享資料夾安全 | -- | 是 |
-| 風險評分 | 是 | 是 |
+| 項目 | 快速模式（`--quick`） | 完整模式（預設） |
+|------|----------------------|------------------|
+| 耗時 | 約 30 秒 | 約 60 秒 |
+| OS 偵測 | 有 | 有 |
+| 網路介面 | 有 | 有 |
+| 開放 port | 有 | 有 |
+| 執行中服務 | 有 | 有 |
+| 密碼策略 | 有 | 有 |
+| 防火牆狀態 | 有 | 有 |
+| 安全工具偵測 | 有 | 有 |
+| SSL 憑證驗證 | -- | 有 |
+| 排程任務稽核 | -- | 有 |
+| 共享資料夾安全 | -- | 有 |
+| 風險評分 | 有 | 有 |
 | PDF 報告 | 搭配 `--output` | 搭配 `--output` |
 
 ## 嚴重等級
 
-每個發現項目被分類為五個嚴重等級之一：
+每個弱點都會被分到五個等級之一：
 
-| 等級 | 含義 | 處理時程 |
-|-------|---------|-----------------|
-| **CRITICAL** | 立即受損風險 | 立即修復 |
-| **HIGH** | 重大安全風險 | 24 小時內修復 |
-| **MEDIUM** | 中等風險，建議改善 | 一週內修復 |
-| **LOW** | 低風險，最佳實務建議 | 方便時修復 |
-| **INFO** | 資訊性發現 | 確認即可 |
+| 等級 | 意義 | 處理時程 |
+|------|------|----------|
+| **CRITICAL** | 有立即被入侵的風險 | 馬上修 |
+| **HIGH** | 嚴重安全風險 | 24 小時內修 |
+| **MEDIUM** | 中等風險，建議改善 | 一週內修 |
+| **LOW** | 低風險，最佳實務建議 | 有空再修 |
+| **INFO** | 純資訊 | 看過就好 |
 
 ## 產品搭配
 
 ### Scan + Guard
 
-使用 Scan 建立基準線，然後啟動 Guard 進行持續監控：
+先用 Scan 建 baseline，再開 Guard 持續監控：
 
 ```bash
-# 1. 執行初始掃描
+# 1. 跑初始掃描
 panguard scan --output baseline.pdf
 
-# 2. 修復發現的問題
+# 2. 修掃出來的問題
 
-# 3. 開始持續防護
+# 3. 啟動持續防護
 panguard guard start
 
-# 4. 定期重新掃描以追蹤改善情況
+# 4. 定期再掃一次追蹤改善
 panguard scan --output weekly-check.pdf
 ```
 
 ### Scan + Report
 
-掃描發現項目直接導入合規報告產生：
+掃描結果直接餵進合規報告：
 
 ```bash
 panguard scan --output scan-result.pdf
@@ -89,18 +89,18 @@ Options:
   --output <path>      PDF 報告輸出路徑
   --lang <en|zh-TW>    語言（預設：en）
   --verbose            詳細輸出
-  --json               純 JSON 輸出（供 AI 代理使用）
-  --target <host>      遠端目標（IP 或網域）
+  --json               純 JSON 輸出（給 AI agent 用）
+  --target <host>      遠端目標（IP 或 domain）
 ```
 
 <CardGroup cols={3}>
   <Card title="掃描器" icon="list-check" href="/products/scan/scanners">
-    所有 10 種掃描器類型的詳細說明。
+    10 種掃描器的完整說明。
   </Card>
   <Card title="風險評分" icon="chart-bar" href="/products/scan/risk-scoring">
-    0-100 風險評分的計算方式。
+    0-100 風險分數怎麼算的。
   </Card>
   <Card title="PDF 報告" icon="file-pdf" href="/products/scan/pdf-reports">
-    PDF 報告結構與自訂選項。
+    PDF 報告結構與客製化選項。
   </Card>
 </CardGroup>

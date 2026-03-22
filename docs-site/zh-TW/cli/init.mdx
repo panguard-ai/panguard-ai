@@ -1,12 +1,12 @@
 ---
 title: "panguard init"
-description: "初始化當前機器的 Panguard 設定。"
+description: "初始化這台機器的 Panguard 設定。"
 icon: "wand-magic-sparkles"
 ---
 
-`init` 指令在您的機器上建立和設定 Panguard 環境。它會產生預設設定檔、建立資料目錄，並偵測您的作業系統和已安裝的服務以取得最佳預設值。
+`init` 在你的機器上建好 Panguard 環境。它會產生預設 config 檔、建資料目錄，自動偵測你的 OS 跟裝了什麼服務來設最佳預設值。
 
-## 使用方式
+## 用法
 
 ```bash
 panguard init [options]
@@ -15,49 +15,51 @@ panguard init [options]
 ## 選項
 
 <ParamField path="--config" type="string">
-  自訂設定檔的路徑。如果提供，`init` 會將您的自訂設定與偵測到的預設值合併，而不是從頭建立新檔案。
+  自訂 config 檔路徑。如果有給，`init` 會把你的自訂設定跟偵測到的預設值合併，不會從零開始建。
 </ParamField>
 
 <ParamField path="--lang" type="string" default="en">
-  設定 CLI 輸出和通知的預設語言。
+  設定 CLI 輸出跟通知的預設語言。
 </ParamField>
 
 ## 範例
 
 <CodeGroup>
-```bash 使用預設值初始化
+```bash 用預設值初始化
 panguard init
 ```
 
-```bash 使用自訂設定初始化
+```bash 用自訂 config 初始化
 panguard init --config ./my-panguard.yaml
 ```
 
-```bash 以繁體中文初始化
+```bash 用繁體中文初始化
 panguard init --lang zh-TW
 ```
 </CodeGroup>
 
-## `init` 的功能
+## `init` 做了什麼
 
-1. **偵測作業系統和環境** -- 識別 Linux 發行版、macOS 版本或 WSL 設定
-2. **建立設定目錄** -- `~/.panguard/` 及預設的 `config.yaml`
-3. **建立資料目錄** -- 為 Guard、Trap 和 Scan 資料分別建立目錄
-4. **偵測執行中的服務** -- 識別網頁伺服器、資料庫和其他服務，以調整掃描和防護預設值
+1. **偵測 OS 跟環境** -- 辨識 Linux 發行版、macOS 版本或 WSL 設定
+2. **建 config 目錄** -- `~/.panguard/` 加上預設的 `config.yaml`
+3. **建資料目錄** -- Guard 跟 Scan 各自獨立的資料目錄
+4. **偵測跑著的服務** -- 辨識 web server、資料庫之類的服務，調整掃描跟防護的預設值
+5. **設定 Threat Cloud** -- 問你要不要啟用集體防禦（匿名威脅資料共享）
+
 <Tip>
-  每台機器只需執行一次 `init`。重新執行是安全的 -- 除非您明確提供新的設定檔，否則現有設定不會被覆蓋。
+  每台機器只需要跑一次 `init`。重跑是安全的 -- 除非你明確給新的 config 檔，否則現有設定不會被蓋掉。
 </Tip>
 
-## 相關資源
+## 相關
 
 <CardGroup cols={2}>
-  <Card title="快速入門" icon="rocket" href="/quickstart">
-    完整的上手流程，包括 init。
+  <Card title="快速上手" icon="rocket" href="/quickstart">
+    完整的上手流程，含 init。
   </Card>
   <Card title="panguard config" icon="gear" href="/cli/config">
-    初始化後檢視和編輯設定。
+    初始化後查看跟修改設定。
   </Card>
   <Card title="環境變數" icon="list" href="/configuration/environment-variables">
-    使用環境變數覆寫設定。
+    用環境變數覆蓋 config 設定。
   </Card>
 </CardGroup>

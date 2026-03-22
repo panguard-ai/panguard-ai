@@ -1,17 +1,17 @@
 ---
-title: "摘要端點"
-description: "以封鎖清單和結構化 JSON 格式消費威脅情報摘要。"
+title: "Feed 端點"
+description: "用 blocklist 跟結構化 JSON 格式取得威脅情報 feed。"
 icon: "rss"
 ---
 
-摘要端點以針對防火牆、DNS 解析器和 Panguard 代理最佳化的格式提供威脅情報。封鎖清單摘要回傳純文字；結構化摘要回傳 JSON。
+Feed 端點提供針對防火牆、DNS resolver、Panguard agent 最佳化格式的威脅情報。Blocklist feed 回純文字；結構化 feed 回 JSON。
 
 ## GET /api/feeds/ip-blocklist
 
-回傳惡意 IP 位址的純文字清單，每行一個。設計用於防火牆（iptables、pf、Windows Firewall）和網路設備直接接收。
+回傳惡意 IP 的純文字清單，一行一個。設計成讓防火牆（iptables、pf、Windows Firewall）跟網路設備直接吃。
 
 <ParamField query="minReputation" type="number" default="30">
-  要包含的最高聲譽分數（0 = 最惡意）。較低的值產生較保守的清單。
+  要納入的最高聲譽分數（0 = 最惡意）。值越低清單越保守。
 </ParamField>
 
 <ParamField query="category" type="string">
@@ -24,7 +24,7 @@ curl -X GET "https://tc.panguard.ai/api/feeds/ip-blocklist?minReputation=20" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-```bash 直接匯入 iptables
+```bash 直接餵 iptables
 curl -s "https://tc.panguard.ai/api/feeds/ip-blocklist" \
   -H "Authorization: Bearer YOUR_API_KEY" | \
   while read ip; do
@@ -33,7 +33,7 @@ curl -s "https://tc.panguard.ai/api/feeds/ip-blocklist" \
 ```
 </CodeGroup>
 
-### 回應
+### Response
 
 ```text
 # Panguard AI IP Blocklist
@@ -48,17 +48,17 @@ curl -s "https://tc.panguard.ai/api/feeds/ip-blocklist" \
 ```
 
 <Info>
-回應內容類型為 `text/plain`。以 `#` 開頭的行是包含中繼資料的註解。清單依聲譽分數排序（最惡意的在前）。
+回應的 content type 是 `text/plain`。`#` 開頭的行是含 metadata 的註解。清單依聲譽分數排序（最惡意的排前面）。
 </Info>
 
 ---
 
 ## GET /api/feeds/domain-blocklist
 
-回傳惡意網域的純文字清單，每行一個。適用於 DNS 沉洞設定（Pi-hole、dnsmasq、Unbound）。
+回傳惡意 domain 的純文字清單，一行一個。適合 DNS sinkhole 設定（Pi-hole、dnsmasq、Unbound）。
 
 <ParamField query="minReputation" type="number" default="30">
-  要包含的最高聲譽分數。
+  要納入的最高聲譽分數。
 </ParamField>
 
 <ParamField query="category" type="string">
@@ -78,7 +78,7 @@ curl -s "https://tc.panguard.ai/api/feeds/domain-blocklist" \
 ```
 </CodeGroup>
 
-### 回應
+### Response
 
 ```text
 # Panguard AI Domain Blocklist
@@ -95,18 +95,18 @@ evil-redirect.example.io
 
 ## GET /api/feeds/iocs
 
-以結構化 JSON 格式回傳完整的 IoC 摘要和中繼資料，適用於 SIEM 整合和自動化處理。
+以結構化 JSON 回傳完整 IoC feed 加 metadata，適合接 SIEM 或自動化處理。
 
 <ParamField query="since" type="string">
-  ISO 8601 時間戳。僅回傳此時間之後更新的 IoC（用於增量同步）。
+  ISO 8601 時間戳。只回傳這之後更新的 IoC（增量同步用）。
 </ParamField>
 
 <ParamField query="type" type="string">
-  依 IoC 類型篩選：`ip`、`domain`、`hash`、`url`。
+  依 IoC 型別篩選：`ip`、`domain`、`hash`、`url`。
 </ParamField>
 
 <ParamField query="limit" type="number" default="1000">
-  回傳的最大 IoC 數量（最大 5000）。
+  回傳的最大 IoC 數（最大 5000）。
 </ParamField>
 
 <CodeGroup>
@@ -148,14 +148,14 @@ curl -X GET "https://tc.panguard.ai/api/feeds/iocs?since=2026-03-06T00:00:00Z&ty
 
 ## GET /api/feeds/agent-update
 
-回傳 Panguard Guard 代理的打包更新，包含最新偵測規則和 IoC 資料。此端點在代理更新週期中自動呼叫。
+回傳 Panguard Guard agent 的打包更新，含最新偵測規則跟 IoC 資料。Agent 在更新週期會自動呼叫這個 endpoint。
 
 <ParamField query="currentVersion" type="string">
-  代理目前的規則版本。僅回傳此版本之後的變更。
+  Agent 目前的規則版本。只回傳這個版本之後的差異。
 </ParamField>
 
 <ParamField query="agentId" type="string">
-  請求代理的 ID，用於存取控制。
+  請求端 agent 的 ID，做存取控制用。
 </ParamField>
 
 <CodeGroup>
@@ -200,5 +200,5 @@ curl -X GET "https://tc.panguard.ai/api/feeds/agent-update?currentVersion=v20260
 </ResponseExample>
 
 <Tip>
-當提供 `currentVersion` 時，agent-update 端點使用差異更新。這透過僅發送代理上次更新以來新增或修改的規則來最小化頻寬。
+帶了 `currentVersion` 的話，agent-update endpoint 走差異更新。只傳 agent 上次更新之後新增或修改的規則，省頻寬。
 </Tip>

@@ -3,7 +3,6 @@ import {
   scanContent,
   compileRules,
   contentHash as computeContentHash,
-  patternHash as computePatternHash,
 } from '@panguard-ai/scan-core';
 import type {
   ATRRuleCompiled,

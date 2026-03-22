@@ -39,8 +39,8 @@
 ## Agent Threat Rules (ATR)
 
 - [ATR on GitHub](https://github.com/Agent-Threat-Rule/agent-threat-rules): Open standard for AI agent threat detection
-- 49 YAML-based rules across 9 categories: prompt injection, tool poisoning, skill compromise, context exfiltration, agent manipulation, privilege escalation, excessive autonomy, data poisoning, model security
-- npm: agent-threat-rules@0.2.1
+- 61 YAML-based rules across 9 categories: prompt injection, tool poisoning, skill compromise, context exfiltration, agent manipulation, privilege escalation, excessive autonomy, data poisoning, model security
+- npm: agent-threat-rules@0.3.1
 
 ## Company
 
