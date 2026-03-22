@@ -15,7 +15,7 @@ export interface Command {
   descKey: string;
   flags?: Flag[];
   example: string;
-  tier: 'Free' | 'Pro' | 'Enterprise';
+  tier: 'Free';
   maturity: 'GA' | 'Beta' | 'Deprecated';
 }
 
