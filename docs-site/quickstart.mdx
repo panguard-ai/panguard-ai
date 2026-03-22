@@ -1,163 +1,123 @@
 ---
 title: "Quick Start"
-description: "From zero to protected in under 5 minutes. No account, no login, no configuration. 100% open source."
+description: "One command. Dashboard opens. You're protected."
 icon: "rocket"
 ---
 
-Get Panguard running, scan your AI agent skills for threats, and start real-time protection. No account required. Works on macOS, Linux, and Windows.
+## Install + Protect in One Command
 
-<Steps>
-  <Step title="Install">
-    <Tabs>
-      <Tab title="macOS / Linux">
-        ```bash
-        curl -fsSL https://get.panguard.ai | bash
-        ```
-      </Tab>
-      <Tab title="Windows">
-        ```powershell
-        powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"
-        ```
-      </Tab>
-      <Tab title="npm (all platforms)">
-        ```bash
-        npm install -g @panguard-ai/panguard
-        ```
-      </Tab>
-    </Tabs>
-
-    Verify:
-
+<Tabs>
+  <Tab title="macOS / Linux">
     ```bash
-    panguard --version
-    # Expected: 1.0.0
+    curl -fsSL https://get.panguard.ai | bash
     ```
-  </Step>
-
-  <Step title="Connect your AI agents">
-    Auto-detect and configure all AI platforms on your machine:
-
+  </Tab>
+  <Tab title="Windows">
+    ```powershell
+    irm https://get.panguard.ai/windows | iex
+    ```
+  </Tab>
+  <Tab title="npm (all platforms)">
     ```bash
-    panguard setup
+    npm install -g @panguard-ai/panguard && panguard setup && panguard guard start --dashboard
     ```
+  </Tab>
+</Tabs>
 
-    This finds Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw and configures MCP integration automatically:
+This does everything: installs Panguard, connects your AI agents (Claude Code, Cursor, OpenClaw, etc.), starts Guard, and opens the dashboard at `http://127.0.0.1:9100`.
 
-    ```
-    PANGUARD AI - Setup
+---
 
-    Detected platforms:
-      Claude Code    ~/.claude/settings.local.json
-      Cursor         ~/.cursor/mcp.json
-      OpenClaw       ~/.openclaw/skills/panguard/SKILL.md
+## Scan Your AI Skills
 
-    All platforms configured.
-    ```
+Once installed, audit every MCP skill on your system:
 
-    <Info>
-      No platforms detected? You can still use Panguard directly from the CLI. Skip to the next step.
-    </Info>
-  </Step>
+```bash
+panguard audit skill .
+```
 
-  <Step title="Scan your AI agent skills">
-    Audit every MCP skill and AI agent tool installed on your system:
+```
+Risk Score: 8/100 (LOW)
+[PASS] Manifest: valid SKILL.md
+[PASS] Prompt Safety: no injection patterns
+[PASS] Secrets: none found
+[PASS] Code: no suspicious patterns
 
-    ```bash
-    panguard-guard scan
-    ```
+VERDICT: SAFE TO INSTALL
+```
 
-    The scan checks all installed skills against 61 ATR (Agent Threat Rules) covering prompt injection, tool poisoning, credential theft, and 6 more threat categories:
+For a full scan of all installed skills across all platforms:
 
-    ```
-    PANGUARD [#] AI  v1.3.0
+```bash
+panguard guard scan
+```
 
-    Scanning: claude-code, claude-desktop, cursor, openclaw, codex, workbuddy, nemoclaw, arkclaw
+This checks all installed skills against 61 ATR rules — prompt injection, tool poisoning, credential theft, and 6 more threat categories.
 
-    Results:
-      totalSkills: 23
-      CLEAN:    18
-      MEDIUM:    3
-      HIGH:      1
-      CRITICAL:  1
+<Warning>
+  **CRITICAL and HIGH findings need your attention.** Review each finding and decide whether to keep, update, or remove the flagged skill.
+</Warning>
 
-    highestRisk: HIGH
-    ```
+---
 
-    Add `--json` for machine-readable output that AI agents can parse directly.
+## Check Guard Status
 
-    <Warning>
-      **CRITICAL and HIGH findings need attention.** Review each finding and decide whether to keep, update, or remove the flagged skill. Panguard never auto-removes anything.
-    </Warning>
-  </Step>
+```bash
+panguard guard status
+```
 
-  <Step title="Start real-time protection">
-    A scan is a point-in-time check. For continuous monitoring, start Guard:
+```
+Status:     RUNNING
+Mode:       learning (Day 1/7)
+Rules:      61 ATR detection rules
+Dashboard:  http://127.0.0.1:9100
+```
 
-    ```bash
-    panguard-guard start
-    ```
+<Info>
+  **Learning mode (Days 1-7):** Guard watches your normal behavior and builds a baseline. No false positives. After Day 7, anomaly detection kicks in automatically.
+</Info>
 
-    Guard runs in the background and watches all AI agent activity:
+---
 
-    ```
-    PANGUARD [#] AI  v1.3.0
-
-    Guard engine started.
-
-    Status:     RUNNING
-    Mode:       learning (Day 1/7)
-    Rules:      61 ATR detection rules
-    Dashboard:  http://localhost:3100
-    ```
-
-    <Info>
-      **Learning mode (Days 1-7):** Guard observes normal behavior and builds a baseline. No false positives during this period. After Day 7, anomaly detection activates automatically.
-    </Info>
-
-    Other commands:
-
-    ```bash
-    panguard-guard status    # check if running
-    panguard-guard stop      # stop the daemon
-    ```
-  </Step>
-</Steps>
-
-## Two CLIs, different purposes
-
-| Command | What it does |
-| --- | --- |
-| `panguard scan` | System-level security scan (ports, firewall, services) |
-| `panguard-guard scan` | AI agent skill scan (MCP tools, prompt injection, supply chain) |
-| `panguard setup` | Auto-configure AI platforms |
-| `panguard-guard start` | Start real-time AI agent monitoring |
-
-Most users want `panguard-guard scan` first (check your AI tools), then `panguard-guard start` (keep them monitored).
-
-## How collective defense works
+## How the Flywheel Works
 
 When you run Panguard, your machine joins a collective defense network:
 
 1. **Guard detects a threat** on your machine.
 2. **An anonymous hash is shared** with Threat Cloud (no personal data, no source code).
-3. **3 independent scanners confirm** the same pattern — a new detection rule is auto-generated.
-4. **All Panguard users get the rule** within 1 hour.
+3. **3 independent scanners confirm** the pattern — a new ATR rule is auto-generated.
+4. **All Panguard users get the new rule** within 1 hour.
 
 One machine gets attacked. One hour later, every machine is immune.
 
-## What to do next
+---
+
+## Common Commands
+
+| Command | What it does |
+| --- | --- |
+| `panguard setup` | Auto-detect and connect AI platforms |
+| `panguard audit skill <path>` | Audit a single skill before installing |
+| `panguard guard scan` | Scan all installed skills across all platforms |
+| `panguard guard start --dashboard` | Start 24/7 monitoring with browser dashboard |
+| `panguard guard stop` | Stop the Guard daemon |
+| `panguard scan --quick` | Quick system security scan (ports, services) |
+
+---
+
+## What's Next
 
 <CardGroup cols={2}>
-  <Card title="Understand the security score" icon="chart-line" href="/concepts/security-score">
+  <Card title="Understand Your Score" icon="chart-line" href="/concepts/security-score">
     What your A-F grade means and how to improve it.
   </Card>
-  <Card title="Set up notifications" icon="bell" href="/guides/notifications-setup">
+  <Card title="Set Up Notifications" icon="bell" href="/guides/notifications-setup">
     Get alerts via Telegram, Slack, or Email when threats are detected.
   </Card>
-  <Card title="Platform integration" icon="bolt" href="/guides/claw-setup">
-    Set up Panguard with OpenClaw, NemoClaw, ArkClaw, and other AI platforms.
+  <Card title="Platform Integration" icon="bolt" href="/guides/claw-setup">
+    Manual setup for OpenClaw, NemoClaw, ArkClaw, and other platforms.
   </Card>
-  <Card title="CLI reference" icon="terminal" href="/cli/overview">
+  <Card title="CLI Reference" icon="terminal" href="/cli/overview">
     Full reference for every command and flag.
   </Card>
 </CardGroup>
