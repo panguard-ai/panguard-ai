@@ -8,6 +8,13 @@
     "dark": "#6B7A6E"
   },
   "favicon": "/favicon.svg",
+  "i18n": {
+    "languages": [
+      { "locale": "en", "name": "English" },
+      { "locale": "zh-TW", "name": "繁體中文" }
+    ],
+    "defaultLocale": "en"
+  },
   "navigation": {
     "tabs": [
       {
