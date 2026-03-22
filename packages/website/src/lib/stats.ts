@@ -12,8 +12,8 @@
  *   packages/core/src/ai/funnel-router.ts      -> 3 layers
  *   vitest run (159 test files)                -> 3,528 test cases
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
- *   packages/panguard-mcp/src/server.ts        -> 10 MCP tools
- *   packages/panguard-skill-auditor/src/checks/ -> 6 audit checks
+ *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
+ *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
  *   agent-threat-rules/rules/                  -> 61 ATR rules
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
@@ -23,7 +23,7 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '0.4.2',
+  cliVersion: '1.3.0',
   atrRules: 61,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 0,
@@ -43,11 +43,11 @@ export const STATS = {
   cliCommands: 23,
   products: 6,
   aiAgents: 5,
-  mcpTools: 10,
+  mcpTools: 11,
   playbookTemplates: 3,
   logParsers: 4,
   license: 'MIT' as const,
-  skillAuditChecks: 6,
+  skillAuditChecks: 8,
   atrDraftRules: 17,
   /** Threat Intel Pipeline stats (auto-updated by CI every hour) */
   threatIntel: {
