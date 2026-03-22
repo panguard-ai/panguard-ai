@@ -250,7 +250,7 @@ export default function TrustContent() {
           subtitle={t('dataRetention.subtitle')}
         />
         <div className="max-w-3xl mx-auto mt-14 space-y-4">
-          {([0, 1, 2, 3, 4] as const).map((idx) => (
+          {([0, 1, 2, 3] as const).map((idx) => (
             <FadeInUp key={idx} delay={idx * 0.06}>
               <div className="bg-surface-1 rounded-xl border border-border p-5 flex items-start gap-4">
                 <HistoryIcon className="w-5 h-5 text-brand-sage shrink-0 mt-0.5" />

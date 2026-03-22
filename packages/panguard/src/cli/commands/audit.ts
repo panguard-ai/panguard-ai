@@ -195,6 +195,19 @@ export function auditCommand(): Command {
             console.log(`  ${icon} [${statusLabel}] ${check.label}`);
           }
 
+          // Show AI setup hint if AI check was skipped
+          const aiSkipped = report.checks.some(
+            (ch) => ch.status === 'info' && ch.label.includes('AI Analysis'),
+          );
+          if (aiSkipped) {
+            console.log();
+            console.log(
+              c.yellow('  Tip: AI analysis was skipped. To enable deeper semantic analysis:'),
+            );
+            console.log(c.dim('       - Ollama (free, local): ollama pull llama3'));
+            console.log(c.dim('       - Or set ANTHROPIC_API_KEY or OPENAI_API_KEY'));
+          }
+
           console.log();
           divider();
 
