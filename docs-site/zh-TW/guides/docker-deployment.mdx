@@ -1,16 +1,16 @@
 ---
 title: "Docker 部署"
-description: "使用 Docker 與 Docker Compose 運行 Panguard AI，實現容器化安全監控。"
+description: "用 Docker 和 Docker Compose 跑 Panguard AI，容器化安全監控。"
 icon: "docker"
 ---
 
 # Docker 部署
 
-Panguard 提供 Docker 映像檔與 Compose 設定，用於容器化部署。本指南涵蓋單容器設定、完整堆疊 Compose 部署與正式環境強化。
+Panguard 提供 Docker image 和 Compose config，方便容器化部署。這篇涵蓋單容器、完整堆疊 Compose、正式環境強化。
 
 ---
 
-## 前置條件
+## 前置需求
 
 | 需求 | 版本 |
 | --- | --- |
@@ -19,15 +19,15 @@ Panguard 提供 Docker 映像檔與 Compose 設定，用於容器化部署。本
 
 ---
 
-## 使用 Docker 快速開始
+## Docker 快速開始
 
 <Steps>
-  <Step title="拉取映像檔">
+  <Step title="拉 image">
     ```bash
     docker pull panguard/panguard-ai:latest
     ```
   </Step>
-  <Step title="運行容器">
+  <Step title="跑容器">
     ```bash
     docker run -d \
       --name panguard \
@@ -36,7 +36,7 @@ Panguard 提供 Docker 映像檔與 Compose 設定，用於容器化部署。本
       panguard/panguard-ai:latest
     ```
   </Step>
-  <Step title="驗證">
+  <Step title="確認">
     ```bash
     docker logs panguard
     ```
@@ -45,9 +45,9 @@ Panguard 提供 Docker 映像檔與 Compose 設定，用於容器化部署。本
 
 ---
 
-## Docker Compose：基本設定（API + Ollama）
+## Docker Compose：基本（API + Ollama）
 
-此設定運行 Panguard API 伺服器搭配本地 Ollama 執行個體，零成本進行 Layer 2 AI 分析。
+這個 config 跑 Panguard API server 搭配本地 Ollama，零成本做 Layer 2 AI 分析。
 
 ```yaml
 # docker-compose.yml
@@ -92,67 +92,43 @@ volumes:
 ```
 
 ```bash
-# 建置並啟動
+# build 並啟動
 docker compose up -d
 
-# 拉取 Ollama 模型（僅首次）
+# 拉 Ollama model（只有第一次需要）
 docker exec panguard-ollama ollama pull llama3
 
-# 查看日誌
+# 看日誌
 docker compose logs -f panguard
 ```
 
 ---
 
-## Docker Compose：完整堆疊（Auth + Manager + Guard + Ollama）
+## Docker Compose：完整堆疊（Guard + Ollama + Threat Cloud）
 
-此設定運行完整的 Panguard 平台，包含身份驗證、機群管理與本地 AI。
+跑完整 Panguard 平台，含 Guard 防護和本地 AI。
 
 ```yaml
 # docker-compose.full.yml
 services:
-  panguard-auth:
+  panguard:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: panguard-auth
+    container_name: panguard
     restart: unless-stopped
     ports:
       - '3000:3000'
     volumes:
-      - auth-data:/data
+      - panguard-data:/data
       - ./config:/app/config:ro
     environment:
       - PANGUARD_DATA_DIR=/data
       - PANGUARD_PORT=3000
-      - JWT_SECRET=your-secret-key-here
-      - GOOGLE_CLIENT_ID=your-google-client-id
-      - GOOGLE_CLIENT_SECRET=your-google-client-secret
-      - MANAGER_URL=http://panguard-manager:8443
-      - MANAGER_AUTH_TOKEN=your-manager-token
       - OLLAMA_ENDPOINT=http://ollama:11434
     depends_on:
-      panguard-manager:
-        condition: service_started
       ollama:
         condition: service_healthy
-    networks:
-      - panguard-net
-
-  panguard-manager:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: panguard-manager
-    command: ["node", "dist/cli/index.js", "manager", "--port", "8443"]
-    restart: unless-stopped
-    ports:
-      - '8443:8443'
-    environment:
-      - MANAGER_PORT=8443
-      - MANAGER_AUTH_TOKEN=your-manager-token
-      - MANAGER_MAX_AGENTS=500
-      - CORS_ALLOWED_ORIGINS=http://localhost:3000
     networks:
       - panguard-net
 
@@ -174,7 +150,7 @@ services:
       start_period: 30s
 
 volumes:
-  auth-data:
+  panguard-data:
   ollama-models:
 
 networks:
@@ -188,55 +164,43 @@ docker compose -f docker-compose.full.yml up -d
 
 ---
 
-## 連接埠參考
+## Port 參考
 
-| 連接埠 | 服務 | 協定 | 備註 |
+| Port | 服務 | 協定 | 備註 |
 | --- | --- | --- | --- |
-| `3000` | API 伺服器（Auth + Web） | HTTP | 主要入口點 |
-| `8443` | Manager 伺服器 | HTTP | 代理程式註冊、心跳、SSE |
+| `3000` | API Server | HTTP | 主要入口 |
 | `11434` | Ollama | HTTP | 本地 AI 推論 |
-| `2222` | Trap：SSH 蜜罐 | TCP | 預設 SSH trap 連接埠 |
-| `8080` | Trap：HTTP 蜜罐 | TCP | 預設 HTTP trap 連接埠 |
-| `2121` | Trap：FTP 蜜罐 | TCP | 預設 FTP trap 連接埠 |
-| `4450` | Trap：SMB 蜜罐 | TCP | 預設 SMB trap 連接埠 |
-| `3307` | Trap：MySQL 蜜罐 | TCP | 預設 MySQL trap 連接埠 |
-| `3390` | Trap：RDP 蜜罐 | TCP | 預設 RDP trap 連接埠 |
-| `2323` | Trap：Telnet 蜜罐 | TCP | 預設 Telnet trap 連接埠 |
+| `2222` | SSH 蜜罐 | TCP | 預設 SSH 蜜罐 port |
+| `8080` | HTTP 蜜罐 | TCP | 預設 HTTP 蜜罐 port |
+| `2121` | FTP 蜜罐 | TCP | 預設 FTP 蜜罐 port |
+| `4450` | SMB 蜜罐 | TCP | 預設 SMB 蜜罐 port |
+| `3307` | MySQL 蜜罐 | TCP | 預設 MySQL 蜜罐 port |
+| `3390` | RDP 蜜罐 | TCP | 預設 RDP 蜜罐 port |
+| `2323` | Telnet 蜜罐 | TCP | 預設 Telnet 蜜罐 port |
 
 ---
 
 ## 環境變數
 
-### Guard 代理程式
+### Guard Agent
 
 | 變數 | 預設值 | 說明 |
 | --- | --- | --- |
 | `PANGUARD_DATA_DIR` | `./data` | 基線、日誌、規則的資料目錄 |
 | `PANGUARD_MODE` | `learning` | Guard 模式：`learning` 或 `protection` |
 | `OLLAMA_ENDPOINT` | `http://localhost:11434` | Ollama API 端點 |
-| `ANTHROPIC_API_KEY` | （無） | 雲端 AI 用 Claude API 金鑰 |
-| `OPENAI_API_KEY` | （無） | 雲端 AI 用 OpenAI API 金鑰 |
-| `ABUSEIPDB_KEY` | （無） | 威脅情報用 AbuseIPDB API 金鑰 |
+| `ANTHROPIC_API_KEY` | （無） | Claude API key，雲端 AI 用 |
+| `OPENAI_API_KEY` | （無） | OpenAI API key，雲端 AI 用 |
+| `ABUSEIPDB_KEY` | （無） | AbuseIPDB API key，威脅情報用 |
 
-### Auth 伺服器
-
-| 變數 | 預設值 | 說明 |
-| --- | --- | --- |
-| `PANGUARD_PORT` | `3000` | API 伺服器連接埠 |
-| `JWT_SECRET` | （無） | JWT 簽名密鑰（正式環境必要） |
-| `GOOGLE_CLIENT_ID` | （無） | Google OAuth 用戶端 ID |
-| `GOOGLE_CLIENT_SECRET` | （無） | Google OAuth 用戶端密鑰 |
-
-### Manager
+### API Server
 
 | 變數 | 預設值 | 說明 |
 | --- | --- | --- |
-| `MANAGER_PORT` | `8443` | Manager HTTP 伺服器連接埠 |
-| `MANAGER_AUTH_TOKEN` | （無） | API 驗證用 Bearer token |
-| `MANAGER_MAX_AGENTS` | `500` | 最大已註冊代理程式數 |
+| `PANGUARD_PORT` | `3000` | API server port |
 
 <Warning>
-正式環境的 Compose 檔案中切勿透過 `environment` 金鑰傳遞密鑰。改用受限權限的 `env_file`：
+正式環境的 Compose 檔不要把密鑰寫在 `environment` 裡。改用權限受限的 `env_file`：
 
 ```yaml
 env_file:
@@ -248,34 +212,34 @@ env_file:
 
 ## 正式環境強化
 
-### Docker 映像檔安全
+### Docker Image 安全
 
-正式環境 Docker 映像檔包含：
-- **多階段建置** -- 建置依賴不在最終映像檔中
-- **非 root 使用者** -- 以 `panguard`（UID 1001）執行
-- **tini** -- 正確的 PID 1 信號處理與殭屍行程回收
-- **最小套件** -- 最終映像檔僅包含 `tini` 與 `curl`
+正式環境 image 包含：
+- **多階段 build** -- build 依賴不會進最終 image
+- **非 root 使用者** -- 以 `panguard`（UID 1001）跑
+- **tini** -- 正確的 PID 1 信號處理和 zombie process 回收
+- **最小套件** -- 最終 image 只有 `tini` 和 `curl`
 
-### 所需權限
+### 需要的 Capabilities
 
-Guard 回應動作在 Docker 中運作需授予以下權限：
+Guard 回應動作在 Docker 裡要授予這些 capabilities：
 
 ```yaml
 cap_add:
-  - NET_ADMIN    # Block IPs via iptables
-  - KILL         # Terminate malicious processes
-  - SYS_PTRACE   # Memory scanning
+  - NET_ADMIN    # 透過 iptables 封鎖 IP
+  - KILL         # 砍惡意 process
+  - SYS_PTRACE   # 記憶體掃描
 ```
 
 ### 檢查清單
 
-- [ ] 設定 `NODE_ENV=production`（啟用 HSTS、停用萬用 CORS）
+- [ ] 設 `NODE_ENV=production`（開啟 HSTS、關閉萬用 CORS）
 - [ ] 產生強力密鑰（`openssl rand -hex 32`）
-- [ ] 使用 TLS 終止（前方放置 nginx/Caddy 反向代理）
-- [ ] 限制 Manager 連接埠的網路存取
-- [ ] 將密鑰掛載為環境檔案，而非行內環境變數
-- [ ] 使用命名磁碟區進行持久化資料
-- [ ] 設定容器日誌輪替
+- [ ] 用 TLS 終止（前面放 nginx/Caddy 反向代理）
+- [ ] 限制 Manager port 的網路存取
+- [ ] 密鑰用 env file 掛載，不要用行內環境變數
+- [ ] 用 named volume 做持久化
+- [ ] 設好容器日誌輪替
 
 ---
 
@@ -303,27 +267,26 @@ ReportAgent 自動處理日誌輪替：
 ## 備份策略
 
 <Tip>
-定期備份以下關鍵檔案：
+定期備份這些關鍵檔案：
 
-- **基線資料**（`/data/baseline.json`）-- 遺失需重新執行學習模式
-- **Auth 資料庫**（`auth.db`）-- 每日備份，使用 `sqlite3 auth.db ".backup backup.db"`
-- **Threat Cloud 資料庫** -- 依排程備份 SQLite 資料庫
-- **設定** -- 將設定與環境檔案儲存於版本控制或密鑰管理器中
+- **基線資料**（`/data/baseline.json`）-- 丟了要重跑學習模式
+- **Threat Cloud 資料庫** -- 定期備份 SQLite
+- **Config** -- config 和環境檔存進版本控制或密鑰管理服務
 </Tip>
 
 ---
 
-## 相關內容
+## 相關文件
 
 <CardGroup cols={2}>
   <Card title="系統服務" icon="gear" href="/guides/system-service">
-    將 Guard 安裝為原生 systemd/launchd 服務，而非使用 Docker。
+    不用 Docker，把 Guard 裝成原生 systemd/launchd 服務。
   </Card>
-  <Card title="多端點設定" icon="server" href="/guides/multi-endpoint">
-    將 Guard 代理程式連線至集中式 Manager。
+  <Card title="多端點部署" icon="server" href="/guides/multi-endpoint">
+    把 Guard agent 連線到集中式 Manager。
   </Card>
   <Card title="Threat Cloud" icon="cloud" href="/guides/threat-cloud-deployment">
-    在 Guard 機群旁部署 Threat Cloud。
+    在 Guard 機群旁邊部署 Threat Cloud。
   </Card>
   <Card title="架構" icon="sitemap" href="/concepts/architecture">
     平台的完整技術架構。

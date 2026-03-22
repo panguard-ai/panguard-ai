@@ -1,168 +1,168 @@
 ---
 title: "Threat Cloud"
-description: "社群驅動的 ATR 規則共識平台。掃描器提出威脅模式，社群確認，確認的規則分發回所有掃描器。"
+description: "社群驅動的 ATR 規則共識平台。掃描器提出威脅模式、社群確認、確認的規則分發回所有掃描器。"
 icon: "cloud"
 ---
 
-Panguard Threat Cloud 是一個以 ATR（Agent Threat Rules）提案與共識為核心的社群驅動威脅情報平台。當任何掃描器（CLI、Website 或 Guard）在 MCP 技能中偵測到可疑模式時，會向 Threat Cloud 提交提案。其他掃描器遇到相同模式時會進行確認。當提案達到 3 次或以上的確認後，會自動升格為已確認規則並分發至所有連接的掃描器。
+Panguard Threat Cloud 是一個以 ATR（Agent Threat Rules）提案跟共識為核心的社群驅動威脅情報平台。當任何掃描器（CLI、網站或 Guard）在 MCP skill 偵測到可疑模式時，會向 Threat Cloud 提交提案。其他掃描器遇到一樣的模式就會確認。提案拿到 3 次以上的確認後，自動升格為已確認規則，分發給所有連上的掃描器。
 
 ## 飛輪效應
 
-使 Threat Cloud 隨時間越來越有效的核心循環：
+讓 Threat Cloud 越跑越強的核心迴圈：
 
 ```
-掃描技能 ──> 發現項目 ──> TC 提案 ──> 社群共識 ──> 已確認規則 ──> 分發至所有掃描器
-                                          ^                                    |
-                                          └────────────────────────────────────┘
+掃描 skill ──> 發現 ──> TC 提案 ──> 社群共識 ──> 確認規則 ──> 分發給全部掃描器
+                                       ^                              |
+                                       └──────────────────────────────┘
 ```
 
-1. **掃描** -- 任何掃描器（CLI `panguard audit skill`、Website 或 Guard 技能監控）掃描一個技能
-2. **提案** -- 高嚴重性發現項目產生帶有模式雜湊的 ATR 提案
-3. **確認** -- 其他掃描器遇到相同模式雜湊時增加確認計數
-4. **升格** -- 達到 3+ 次確認後，提案自動升格為已確認規則
-5. **分發** -- 已確認規則透過 `GET /api/atr-rules` 提供給所有掃描器
-6. **強化** -- 掃描器載入已確認規則，提升偵測能力，產生更多提案
+1. **掃描** -- 任何掃描器（CLI `panguard audit skill`、網站或 Guard skill watcher）掃一個 skill
+2. **提案** -- 高嚴重性發現產生帶 pattern hash 的 ATR 提案
+3. **確認** -- 其他掃描器遇到同一個 pattern hash 就 +1 確認
+4. **升格** -- 拿到 3+ 確認，提案自動升格為確認規則
+5. **分發** -- 確認規則透過 `GET /api/atr-rules` 提供給所有掃描器
+6. **強化** -- 掃描器載入新規則，偵測力提升，又產生更多提案
 
-每次循環都為整個網路增添偵測能力。
+每轉一圈，整個網路的偵測能力就加強一輪。
 
 ## ATR 提案
 
-ATR 提案是 Threat Cloud 中社群威脅情報的主要機制。
+ATR 提案是 Threat Cloud 社群威脅情報的核心機制。
 
-### 模式雜湊
+### Pattern Hash
 
-每個提案都由一個**模式雜湊**識別 -- 這是從掃描發現項目計算出的確定性識別碼：
+每個提案由一個 **pattern hash** 識別 -- 從掃描發現算出的確定性識別碼：
 
-- 格式：`scan:{skillName}:{findingSummary}` 以 SHA-256 雜湊，截斷為 16 個十六進位字元
-- `scan:` 前綴確保 CLI、Website 和 Guard 對相同威脅模式產生相同的雜湊
-- 雜湊計算由 `@panguard-ai/scan-core` 處理，確保所有掃描器實作一致
+- 格式：`scan:{skillName}:{findingSummary}` 做 SHA-256 hash，截斷到 16 hex 字元
+- `scan:` prefix 確保 CLI、網站、Guard 對同一個威脅模式產出相同的 hash
+- Hash 計算由 `@panguard-ai/scan-core` 處理，所有掃描器實作保持一致
 
 ### 提案生命週期
 
 | 階段 | 說明 |
 |-------|------|
-| **待處理** | 新提交的提案，等待社群確認 |
-| **已確認** | 3+ 個獨立掃描器已確認相同模式雜湊 |
-| **已升格** | 已確認的提案轉換為可分發的 ATR 規則 |
-| **已拒絕** | LLM 審查員將該提案標記為誤報 |
+| **Pending** | 剛提交的提案，等社群確認 |
+| **Confirmed** | 3+ 個獨立掃描器確認了同一個 pattern hash |
+| **Promoted** | 確認的提案已轉成可分發的 ATR 規則 |
+| **Rejected** | LLM 審查員判定為誤報 |
 
 ### 提交提案
 
-當掃描器偵測到高嚴重性發現項目時，會自動提交提案。端點為 `POST /api/atr-proposals`。每次提交包含模式雜湊、提議的規則內容，以及產生自我審查結論的 LLM 模型。
+掃描器偵測到高嚴重性發現時會自動提交。endpoint 是 `POST /api/atr-proposals`。每次提交包含 pattern hash、提議的規則內容、產生自我審查結論的 LLM 模型。
 
-若模式雜湊已存在，該提交會計為確認而非新提案。
+如果 pattern hash 已經存在，這次提交就算確認而不是新提案。
 
 ## 社群共識
 
-Threat Cloud 採用簡單、透明的共識機制：
+Threat Cloud 用的是簡單透明的共識機制：
 
-- 每個唯一的掃描器實例（以匿名客戶端 ID 識別）只能確認一個提案一次
-- 當提案達到 **3 次或以上確認**時，會自動升格為 `confirmed` 狀態
-- 社群共識不需人工審查 -- 流程完全自動化
-- `promoteConfirmedProposals()` 函式在每個同步週期處理升格
+- 每個掃描器實例（用匿名 client ID 識別）一個提案只能確認一次
+- 提案拿到 **3 次以上確認** 就自動升格為 `confirmed`
+- 不需要人工審查 -- 流程全自動
+- `promoteConfirmedProposals()` 在每個 sync 週期處理升格
 
-這意味著一個威脅模式必須被至少 3 個獨立掃描器偵測到，才能成為已確認規則。這在保持管線完全自動化的同時減少了誤報。
+也就是說，一個威脅模式要被至少 3 個獨立掃描器偵測到才能成為確認規則。管線全自動的同時也壓低了誤報率。
 
 ## LLM 審查員
 
-Threat Cloud 包含一個自動化 LLM 審查員（Claude Sonnet 4），用於評估 ATR 提案的生產就緒程度。
+Threat Cloud 有內建的自動化 LLM 審查員（Claude Sonnet 4）評估 ATR 提案是否適合上線。
 
-LLM 審查員評估：
+LLM 審查員看這些：
 
-| 標準 | 檢查內容 |
+| 項目 | 檢查什麼 |
 |------|---------|
-| **誤報風險** | 該模式是否會標記合法技能（低 / 中 / 高） |
-| **覆蓋評分** | 規則對目標威脅類別的覆蓋程度 |
-| **偵測專一性** | 規則是否足夠精確以避免雜訊 |
-| **回應比例性** | 建議的嚴重性是否符合實際風險 |
-| **YAML 有效性** | 提議的規則是否格式正確 |
+| **誤報風險** | 這個 pattern 會不會打到正常 skill（低 / 中 / 高） |
+| **覆蓋率** | 規則對目標威脅類別的涵蓋程度 |
+| **偵測精準度** | 規則夠不夠精確，會不會產生雜訊 |
+| **回應比例** | 建議的嚴重性跟實際風險符不符合 |
+| **YAML 格式** | 提議的規則格式對不對 |
 
-LLM 審查透過 `POST /api/analyze-skills` 端點對新提案自動執行。提案可透過任一路徑升格：
+LLM 審查透過 `POST /api/analyze-skills` endpoint 對新提案自動跑。提案可以走兩條路升格：
 
-- **僅社群共識**：3+ 次確認，即使未經 LLM 審查
-- **LLM 核准 + 社群確認**：最高信心度的升格
+- **光靠社群共識**：3+ 確認，就算沒過 LLM 審查也行
+- **LLM 核准 + 社群確認**：信心度最高的升格路徑
 
-若 LLM 審查員明確拒絕一個提案，社群共識無法覆寫該拒絕。
+如果 LLM 審查員明確拒絕一個提案，社群共識不能推翻。
 
 ## 規則分發
 
-已確認的 ATR 規則透過單一端點分發至所有掃描器：
+確認的 ATR 規則透過單一 endpoint 分發：
 
 ```
 GET /api/atr-rules
 GET /api/atr-rules?since=2025-01-01T00:00:00Z
 ```
 
-`?since=` 參數允許增量取得 -- 掃描器僅下載上次同步後確認的規則。Guard 代理每小時自動同步。CLI 和 Website 在每次掃描時取得規則。
+`?since=` 參數做增量拉取 -- 掃描器只下載上次 sync 之後確認的規則。Guard agent 每小時自動 sync。CLI 跟網站在每次掃描時拉規則。
 
-## IoC 來源
+## IoC Feed
 
-除了 ATR 規則外，Threat Cloud 也分發傳統的 IoC 來源：
+除了 ATR 規則，Threat Cloud 也分發傳統 IoC feed：
 
-| 端點 | 格式 | 說明 |
-|------|------|------|
-| `GET /api/feeds/ip-blocklist` | text/plain | 已知惡意 IP（每行一個） |
-| `GET /api/feeds/domain-blocklist` | text/plain | 已知惡意網域（每行一個） |
-| `GET /api/skill-blacklist` | JSON | 社群回報的不安全技能 |
+| Endpoint | 格式 | 說明 |
+|----------|------|------|
+| `GET /api/feeds/ip-blocklist` | text/plain | 已知惡意 IP（一行一個） |
+| `GET /api/feeds/domain-blocklist` | text/plain | 已知惡意 domain（一行一個） |
+| `GET /api/skill-blacklist` | JSON | 社群回報的不安全 skill |
 
-兩個 feed 端點均接受可選的 `?minReputation=` 參數以依信心度篩選。
+兩個 feed endpoint 都接受 `?minReputation=` 參數依信心度篩選。
 
 ## 同步內容
 
-每小時，Guard Agent 與 Threat Cloud 交換資料：
+每小時，Guard agent 跟 Threat Cloud 交換資料：
 
 | 方向 | 資料 | 說明 |
 |------|------|------|
-| **上傳** | ATR 提案 | 新威脅模式的模式雜湊 + 提議的規則內容 |
-| **上傳** | 掃描事件 | 來自 CLI、Website 或 Guard 的匿名化掃描結果 |
-| **上傳** | 技能威脅 | 匿名化的技能審計發現項目 |
-| **下載** | 已確認 ATR 規則 | 社群確認的偵測規則 |
-| **下載** | IP 黑名單 | 已知惡意 IP |
-| **下載** | 網域黑名單 | 已知惡意網域 |
+| **上傳** | ATR 提案 | 新威脅模式的 pattern hash + 提議的規則內容 |
+| **上傳** | 掃描事件 | CLI、網站或 Guard 的匿名化掃描結果 |
+| **上傳** | Skill 威脅 | 匿名化的 skill 審計發現 |
+| **下載** | 確認 ATR 規則 | 社群確認的偵測規則 |
+| **下載** | IP blocklist | 已知惡意 IP |
+| **下載** | Domain blocklist | 已知惡意 domain |
 
 ## 快速開始
 
-不需任何設定。Guard 啟動時自動連接公開 Threat Cloud：
+不用設定。Guard 啟動就自動連上公開 Threat Cloud：
 
 ```bash
 panguard guard start --dashboard
 ```
 
-Threat Cloud 同步每小時在背景自動進行。您的 Agent 貢獻匿名化威脅資料，並接收更新的 ATR 規則和 IoC 來源。
+Threat Cloud sync 每小時在背景自動跑。你的 agent 貢獻匿名化威脅資料，同時收到更新的 ATR 規則跟 IoC feed。
 
 <Info>
-  **零設定。** 公開 Threat Cloud `tc.panguard.ai` 對所有 Panguard 使用者免費。標準 Agent 同步不需 API 金鑰。
+  **零設定。** 公開 Threat Cloud `tc.panguard.ai` 對所有 Panguard 使用者免費。標準 agent sync 不需 API key。
 </Info>
 
 ## API 端點
 
-| 方法 | 端點 | 說明 |
-|------|------|------|
+| 方法 | Endpoint | 說明 |
+|------|----------|------|
 | POST | `/api/atr-proposals` | 提交或確認 ATR 提案 |
-| GET | `/api/atr-rules` | 取得已確認 ATR 規則（支援 `?since=` 篩選） |
-| POST | `/api/skill-threats` | 從審計提交技能威脅 |
-| POST | `/api/analyze-skills` | 提交掃描結果進行伺服器端 LLM 分析 |
-| POST | `/api/scan-events` | 回報掃描事件（批量/CLI/Web） |
-| GET | `/api/feeds/ip-blocklist` | IP 黑名單來源 |
-| GET | `/api/feeds/domain-blocklist` | 網域黑名單來源 |
-| GET | `/api/skill-blacklist` | 社群技能黑名單 |
+| GET | `/api/atr-rules` | 拿確認的 ATR 規則（支援 `?since=` 篩選） |
+| POST | `/api/skill-threats` | 從審計提交 skill 威脅 |
+| POST | `/api/analyze-skills` | 提交掃描結果做伺服器端 LLM 分析 |
+| POST | `/api/scan-events` | 回報掃描事件（批次/CLI/Web） |
+| GET | `/api/feeds/ip-blocklist` | IP blocklist feed |
+| GET | `/api/feeds/domain-blocklist` | Domain blocklist feed |
+| GET | `/api/skill-blacklist` | 社群 skill 黑名單 |
 | GET | `/api/stats` | 威脅統計 |
-| GET | `/api/metrics` | 聚合指標（快取 60 秒） |
+| GET | `/api/metrics` | 聚合指標（cache 60 秒） |
 | GET | `/health` | 健康檢查 |
 
-## 私人部署
+## 私有部署
 
-需要隔離威脅情報基礎設施的組織，可使用私人 Threat Cloud 實例。聯繫我們了解部署選項。
+需要隔離威脅情報基礎設施的組織可以跑私有 Threat Cloud 實例。聯繫我們了解部署選項。
 
-<Card title="聯繫私人部署" icon="envelope" href="https://panguard.ai/contact">
-  企業和政府組織可部署專屬 Threat Cloud 基礎設施。
+<Card title="聯繫私有部署" icon="envelope" href="https://panguard.ai/contact">
+  企業組織可部署專屬 Threat Cloud 基礎設施。
 </Card>
 
 <CardGroup cols={2}>
   <Card title="隱私" icon="shield-check" href="/products/threat-cloud/privacy">
-    匿名化資料、零遙測和退出控制。
+    匿名化資料、零遙測、退出控制。
   </Card>
   <Card title="API 參考" icon="code" href="/api-reference/threat-cloud/ioc">
-    查詢和提交威脅情報的 REST API。
+    查詢跟提交威脅情報的 REST API。
   </Card>
 </CardGroup>

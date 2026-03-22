@@ -157,7 +157,7 @@
       "eyebrow": "資安新時代",
       "title": "資安，不再是特權。",
       "subtitle": "為請不起資安團隊的開發者和中小企業而生 -- 一行指令，60 秒內獲得企業級防護。",
-      "boldLine": "開源｜AI 驅動｜免費起步",
+      "boldLine": "開源｜AI 驅動｜完全免費",
       "tryScan": "免費掃描",
       "bookDemo": "預約 Demo",
       "getStarted": "立即開始",
@@ -292,7 +292,7 @@
       "team": {
         "overline": "你得到的",
         "title": "一行指令，五個 AI 資安專家上線。",
-        "subtitle": "同樣配置的真人團隊年薪超過 NT$600 萬。Panguard 免費起步。",
+        "subtitle": "同樣配置的真人團隊年薪超過 NT$600 萬。Panguard 完全免費。",
         "roles": [
           {
             "role": "技能守門員",
@@ -2792,7 +2792,7 @@
       },
       "cta": {
         "title": "先掃再裝。",
-        "desc": "一行指令，七道檢查，裝之前就知道結果。",
+        "desc": "一行指令，八道檢查，裝之前就知道結果。",
         "cta1": "免費開始",
         "cta2": "看方案",
         "installTitle": "安裝 Panguard"

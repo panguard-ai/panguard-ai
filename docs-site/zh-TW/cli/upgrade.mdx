@@ -1,58 +1,48 @@
 ---
 title: "panguard upgrade"
-description: "將 Panguard CLI 更新至最新版本。"
+description: "把 Panguard CLI 更新到最新版。"
 icon: "arrow-up"
 ---
 
-`upgrade` 指令檢查並安裝最新版本的 Panguard CLI。它會自動偵測目前安裝方式，下載最新版本並完成升級。
+`upgrade` 檢查有沒有新版本，然後自動下載安裝。binary 替換、資料庫 migration、升級後驗證一條龍搞定。
 
-## 使用方式
+## 用法
 
 ```bash
 panguard upgrade
 ```
 
-## 執行內容
+## 升級流程
 
-1. **檢查目前版本**與 npm registry 上最新版本的差異
-2. **下載最新版本**透過 npm
-3. **驗證安裝**確保新版本正確運行
-4. **執行遷移**（如果需要資料格式變更）
-
-## 替代升級方式
-
-如果您使用 npm 全域安裝，也可以直接透過 npm 更新：
-
-```bash
-npm update -g @panguard-ai/panguard
-```
+1. **比對版本** -- 查你裝的版本跟最新 release
+2. **下載新 binary** -- 從官方 release channel 下載
+3. **驗證 checksum** -- 確保檔案完整性
+4. **替換 binary** -- 原地替換
+5. **跑 migration** -- 如果資料格式有變的話
+6. **驗證升級** -- 跑 self-test 確認沒問題
 
 ## 範例
 
 <CodeGroup>
-```bash 升級至最新版本
+```bash 升級到最新版
 panguard upgrade
-```
-
-```bash 透過 npm 升級
-npm update -g @panguard-ai/panguard
 ```
 </CodeGroup>
 
 
-## 相關資源
+## 相關
 
 <CardGroup cols={2}>
   <Card title="安裝" icon="download" href="/installation">
-    各平台的安裝說明。
+    各平台安裝方式。
   </Card>
   <Card title="更新日誌" icon="list" href="/changelog">
-    查看每個版本的變更內容。
+    每個版本改了什麼。
   </Card>
   <Card title="panguard doctor" icon="stethoscope" href="/cli/doctor">
-    升級後如遇到問題，請執行診斷。
+    升級後有問題的話跑診斷。
   </Card>
   <Card title="panguard status" icon="circle-info" href="/cli/status">
-    升級後驗證系統健康狀態。
+    升級後確認系統健康。
   </Card>
 </CardGroup>

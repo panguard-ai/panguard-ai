@@ -1,46 +1,46 @@
 ---
-title: "首次掃描"
-description: "執行首次 Panguard 安全掃描、理解結果並對發現採取行動的逐步指南。"
+title: "第一次掃描"
+description: "手把手帶你跑第一次 Panguard 安全掃描，看懂結果，知道該修什麼。"
 icon: "magnifying-glass"
 ---
 
-# 首次掃描
+# 第一次掃描
 
-Panguard Scan 約 60 秒內分析您的系統、識別安全弱點，並提供可操作的修復指導。所有掃描功能皆免費開放使用。
+Panguard 掃描大約 60 秒就能分析完你的系統、找出安全弱點，並給出具體的修復建議。所有掃描功能免費開源。
 
 ---
 
-## 前置條件
+## 前置需求
 
-執行首次掃描前，請確認已安裝 Panguard：
+開始掃描前，先確認 Panguard 已裝好：
 
 ```bash
 # 透過 npm 安裝
 npm install -g @panguard-ai/panguard
 
-# 或透過一行安裝程式
+# 或用一行安裝腳本
 curl -fsSL https://get.panguard.ai | bash
 
-# 驗證安裝
+# 確認安裝成功
 panguard --version
 ```
 
 ---
 
-## 執行首次掃描
+## 跑你的第一次掃描
 
 <Steps>
-  <Step title="執行快速掃描">
-    先用快速掃描取得即時概覽（免費，無需登入）：
+  <Step title="跑快速掃描">
+    先用快速掃描看個大概：
 
     ```bash
     panguard scan --quick
     ```
 
-    約 30 秒完成，涵蓋作業系統偵測、網路介面、開放連接埠、執行中服務、密碼策略、防火牆狀態與安全工具偵測。
+    大約 30 秒完成，涵蓋 OS 偵測、網路介面、開放 port、執行中服務、密碼政策、防火牆狀態、安全工具偵測。
   </Step>
-  <Step title="查看結果">
-    掃描會依嚴重性分組顯示發現：
+  <Step title="看掃描結果">
+    結果會依嚴重程度分組顯示：
 
     ```
       -- Network Interfaces -------------------
@@ -57,8 +57,8 @@ panguard --version
       3306   tcp    mysqld      9012   MEDIUM
     ```
   </Step>
-  <Step title="查看安全分數">
-    每次掃描都會產生 0-100 的安全分數與字母等級：
+  <Step title="看安全分數">
+    每次掃描都會算出 0-100 的安全分數和等級：
 
     ```
       -- Risk Score ----------------------------
@@ -77,8 +77,8 @@ panguard --version
         Response:    70/100
     ```
   </Step>
-  <Step title="處理嚴重發現">
-    優先處理 CRITICAL 與 HIGH 嚴重性的發現。每項發現都包含說明與修復指導。
+  <Step title="先修最嚴重的">
+    先處理 CRITICAL 和 HIGH 的發現。每個發現都附帶說明和修復步驟。
   </Step>
 </Steps>
 
@@ -88,20 +88,20 @@ panguard --version
 
 | 功能 | 快速模式 (`--quick`) | 完整模式（預設） |
 | --- | --- | --- |
-| **持續時間** | ~30 秒 | ~60 秒 |
-| **作業系統偵測** | 是 | 是 |
-| **網路介面** | 是 | 是 |
-| **開放連接埠** | 是 | 是 |
-| **執行中服務** | 是 | 是 |
-| **密碼策略** | 是 | 是 |
-| **防火牆狀態** | 是 | 是 |
-| **安全工具** | 是 | 是 |
-| **SSL 憑證驗證** | 否 | 是 |
-| **排程任務稽核** | 否 | 是 |
-| **共享資料夾安全** | 否 | 是 |
-| **風險分數** | 是 | 是 |
+| **耗時** | ~30 秒 | ~60 秒 |
+| **OS 偵測** | 有 | 有 |
+| **網路介面** | 有 | 有 |
+| **開放 port** | 有 | 有 |
+| **執行中服務** | 有 | 有 |
+| **密碼政策** | 有 | 有 |
+| **防火牆狀態** | 有 | 有 |
+| **安全工具** | 有 | 有 |
+| **SSL 憑證驗證** | 無 | 有 |
+| **排程任務稽核** | 無 | 有 |
+| **共享資料夾安全** | 無 | 有 |
+| **風險分數** | 有 | 有 |
 
-執行完整掃描：
+跑完整掃描：
 
 ```bash
 panguard scan
@@ -109,21 +109,21 @@ panguard scan
 
 ---
 
-## 嚴重性等級
+## 嚴重程度等級
 
-| 嚴重性 | 意義 | 建議動作 |
+| 嚴重程度 | 意思 | 建議處理 |
 | --- | --- | --- |
-| **CRITICAL** | 有立即被入侵的風險 | 立即修復 |
-| **HIGH** | 重大安全風險 | 24 小時內修復 |
-| **MEDIUM** | 中度風險，建議改善 | 一週內修復 |
-| **LOW** | 低風險，最佳實務建議 | 方便時修復 |
-| **INFO** | 資訊性發現 | 無需行動 |
+| **CRITICAL** | 隨時可能被打穿 | 立刻修 |
+| **HIGH** | 重大安全風險 | 24 小時內修 |
+| **MEDIUM** | 中等風險，建議改善 | 一週內修 |
+| **LOW** | 低風險，屬於最佳實務 | 有空再修 |
+| **INFO** | 純資訊 | 不需處理 |
 
 ---
 
 ## 產生 PDF 報告
 
-將掃描結果匯出為專業 PDF 報告：
+把掃描結果匯出成 PDF：
 
 ```bash
 # 英文報告
@@ -133,29 +133,29 @@ panguard scan --output my-report.pdf
 panguard scan --output my-report.pdf --lang zh-TW
 ```
 
-PDF 包含：
-1. **封面** -- 組織名稱、掃描日期、品牌標識
-2. **執行摘要** -- 風險分數、等級、發現統計
-3. **發現詳情** -- 每項發現的嚴重性、說明與位置
-4. **修復指導** -- 每項發現的具體修復步驟
-5. **合規對應** -- 發現對應至 ISO 27001 / SOC 2 / 台灣資安法
+PDF 內容包含：
+1. **封面** -- 組織名稱、掃描日期、品牌
+2. **摘要** -- 風險分數、等級、發現統計
+3. **發現明細** -- 每項發現的嚴重程度、說明、位置
+4. **修復指引** -- 每項發現的具體修復步驟
+5. **合規對應** -- 對應 ISO 27001 / SOC 2 / 台灣資通安全管理法
 
 ---
 
-## 首次掃描後的下一步
+## 掃完之後下一步
 
 <CardGroup cols={2}>
-  <Card title="啟用即時防護" icon="shield" href="/guides/real-time-protection">
-    啟動 Guard 持續監控並保護您的系統。
+  <Card title="開啟即時防護" icon="shield" href="/guides/real-time-protection">
+    啟動 Guard 持續監控並保護你的系統。
   </Card>
   <Card title="設定通知" icon="bell" href="/guides/notifications-setup">
-    設定 Telegram、Slack 或 Email 警報以接收安全事件通知。
+    設定 Telegram、Slack 或 Email 警報，即時收到安全事件通知。
   </Card>
   <Card title="產生合規報告" icon="file-check" href="/guides/compliance-reports">
-    使用掃描結果產生 ISO 27001、SOC 2 或 TCSA 報告。
+    用掃描結果產出 ISO 27001、SOC 2 或資通安全管理法報告。
   </Card>
   <Card title="部署蜜罐" icon="flask" href="/guides/honeypots">
-    設置誘餌服務以偵測並分析攻擊者。
+    設置誘餌服務來偵測和分析攻擊者。
   </Card>
 </CardGroup>
 
@@ -167,8 +167,8 @@ PDF 包含：
 panguard scan [options]
 
 Options:
-  --quick              Quick mode (~30 seconds)
-  --output <path>      PDF report output path
-  --lang <en|zh-TW>    Language (default: en)
-  --verbose            Verbose output
+  --quick              快速模式（~30 秒）
+  --output <path>      PDF 報告輸出路徑
+  --lang <en|zh-TW>    語言（預設：en）
+  --verbose            詳細輸出
 ```

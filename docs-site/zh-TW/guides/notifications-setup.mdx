@@ -1,31 +1,31 @@
 ---
 title: "設定通知"
-description: "設定警報頻道，讓 Panguard 透過 Telegram、Slack、Email、LINE 或 Webhook 通知您威脅。"
+description: "設定警報頻道，讓 Panguard 透過 Telegram、Slack、Email、LINE 或 Webhook 通知你威脅事件。"
 icon: "bell"
 ---
 
-Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南涵蓋設定 5 個支援的通知頻道，以及配置使用者角色以控制通知對象與內容。
+Panguard 把安全警報送到你團隊已經在用的頻道。這篇指南帶你設定 5 種通知頻道，並用角色控制誰收到什麼。
 
 <Steps>
-  <Step title="初始化 Chat 設定">
-    執行互動式設定精靈：
+  <Step title="初始化通知設定">
+    跑互動式設定精靈：
 
     ```bash
     panguard chat setup
     ```
 
-    精靈將引導您完成頻道選擇與憑證輸入。您也可以使用下方的旗標個別設定頻道。
+    精靈會引導你選頻道、輸入憑證。你也可以用下面的 flag 個別設定。
   </Step>
 
   <Step title="設定通知頻道">
-    設定一個或多個通知頻道：
+    設定一個或多個頻道：
 
     <Tabs>
       <Tab title="Telegram">
-        1. 在 Telegram 上訊息 [@BotFather](https://t.me/BotFather) 並建立新機器人
-        2. 複製機器人 Token
-        3. 與您的機器人開始對話並傳送任何訊息
-        4. 從 Telegram API 取得您的 chat ID，或使用 [@userinfobot](https://t.me/userinfobot)
+        1. 在 Telegram 找 [@BotFather](https://t.me/BotFather) 建立一個新 bot
+        2. 複製 bot token
+        3. 跟你的 bot 開對話，隨便傳一則訊息
+        4. 透過 Telegram API 或 [@userinfobot](https://t.me/userinfobot) 取得 chat ID
 
         ```bash
         panguard chat setup --channel telegram \
@@ -34,14 +34,14 @@ Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南
         ```
 
         <Tip>
-          若要群組通知，請將機器人加入 Telegram 群組並使用群組 chat ID（以 `-100` 開頭）。
+          群組通知的話，把 bot 加進 Telegram 群組，用群組的 chat ID（開頭是 `-100`）。
         </Tip>
       </Tab>
 
       <Tab title="Slack">
-        1. 前往 [api.slack.com/apps](https://api.slack.com/apps) 並建立新應用程式
-        2. 在 **Bot Token Scopes** 下新增 `chat:write` OAuth 範圍
-        3. 將應用程式安裝至您的工作區
+        1. 到 [api.slack.com/apps](https://api.slack.com/apps) 建立新 app
+        2. 在 **Bot Token Scopes** 加上 `chat:write` OAuth scope
+        3. 把 app 裝到你的 workspace
         4. 複製 Bot User OAuth Token
 
         ```bash
@@ -52,7 +52,7 @@ Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南
       </Tab>
 
       <Tab title="Email">
-        設定 SMTP 憑證以接收電子郵件通知：
+        設定 SMTP 憑證收 email 通知：
 
         ```bash
         panguard chat setup --channel email \
@@ -64,13 +64,13 @@ Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南
         ```
 
         <Info>
-          Gmail 使用者請使用[應用程式密碼](https://support.google.com/accounts/answer/185833)而非帳號密碼。請先啟用雙因素驗證。
+          Gmail 請用[應用程式密碼](https://support.google.com/accounts/answer/185833)，不要用帳號密碼。要先開兩步驟驗證。
         </Info>
       </Tab>
 
       <Tab title="LINE">
-        1. 在 [notify-bot.line.me](https://notify-bot.line.me/) 建立 LINE Notify Token
-        2. 選擇接收通知的群組或一對一對話
+        1. 到 [notify-bot.line.me](https://notify-bot.line.me/) 建立 LINE Notify token
+        2. 選要收通知的群組或一對一對話
 
         ```bash
         panguard chat setup --channel line \
@@ -79,7 +79,7 @@ Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南
       </Tab>
 
       <Tab title="Webhook">
-        傳送原始 JSON 酬載至任何 HTTP 端點：
+        送 JSON payload 到任何 HTTP 端點：
 
         ```bash
         panguard chat setup --channel webhook \
@@ -87,7 +87,7 @@ Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南
           --webhook-secret "your-hmac-secret"
         ```
 
-        Panguard 傳送 `POST` 請求，酬載結構如下：
+        Panguard 發 `POST` 請求，payload 格式如下：
 
         ```json
         {
@@ -100,21 +100,21 @@ Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南
         }
         ```
 
-        `signature` 標頭包含使用您的 webhook 密鑰對 body 進行 HMAC-SHA256 計算的結果，用於驗證。
+        `signature` header 是用你的 webhook secret 對 body 做 HMAC-SHA256 的結果，用來驗證來源。
       </Tab>
     </Tabs>
   </Step>
 
   <Step title="設定使用者角色">
-    Panguard 支援 3 種使用者角色，控制通知的詳細程度：
+    Panguard 有 3 種角色控制通知的詳細程度：
 
-    | 角色 | 接收內容 | 適合 |
+    | 角色 | 收到什麼 | 適合誰 |
     | --- | --- | --- |
-    | `developer` | 所有嚴重性等級，附完整技術細節 | 工程師、DevOps |
-    | `boss` | 僅 CRITICAL 與 HIGH，白話語言摘要 | 高層主管、管理階層 |
-    | `it_admin` | 所有嚴重性等級，中等細節，行動項目 | IT 營運 |
+    | `developer` | 所有嚴重程度，完整技術細節 | 工程師、DevOps |
+    | `boss` | 只有 CRITICAL 和 HIGH，白話摘要 | 主管、管理層 |
+    | `it_admin` | 所有嚴重程度，中等細節，附行動項目 | IT 維運 |
 
-    為每個頻道設定角色：
+    幫每個頻道指定角色：
 
     ```bash
     panguard chat setup --channel telegram --role developer
@@ -123,12 +123,12 @@ Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南
     ```
 
     <Tip>
-      您可以用不同角色多次設定相同頻道類型。例如，將 developer 等級的警報傳送至 `#security-engineering`，boss 等級的摘要傳送至 `#security-executive`。
+      同一個頻道類型可以設定多次、用不同角色。例如 developer 等級的警報送 `#security-engineering`，boss 等級的摘要送 `#security-executive`。
     </Tip>
   </Step>
 
   <Step title="測試設定">
-    向所有已設定的頻道傳送測試通知：
+    送測試通知到所有已設定的頻道：
 
     ```bash
     panguard chat test
@@ -153,8 +153,8 @@ Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南
     ```
   </Step>
 
-  <Step title="確認已啟用的頻道">
-    列出所有已設定的通知頻道及其狀態：
+  <Step title="確認啟用的頻道">
+    列出所有通知頻道和狀態：
 
     ```bash
     panguard chat status
@@ -174,19 +174,19 @@ Panguard Chat 將安全警報傳送至您團隊已在使用的頻道。本指南
   </Step>
 </Steps>
 
-## 接下來做什麼
+## 下一步
 
 <CardGroup cols={2}>
   <Card title="設定即時防護" icon="shield-halved" href="/guides/real-time-protection">
-    通知需要 Guard 運行中。請先啟動持續監控。
+    通知需要 Guard 在跑。先啟動持續監控。
   </Card>
-  <Card title="Chat 產品參考" icon="comments" href="/products/chat/overview">
-    Chat 通知系統的完整文件。
+  <Card title="通知系統參考" icon="comments" href="/products/chat/overview">
+    通知系統的完整文件。
   </Card>
-  <Card title="使用者角色深入解析" icon="users" href="/products/chat/user-roles">
-    每種角色接收的內容與訊息格式的詳細說明。
+  <Card title="使用者角色詳解" icon="users" href="/products/chat/user-roles">
+    每種角色收到的內容和訊息格式說明。
   </Card>
   <Card title="通知疑難排解" icon="wrench" href="/troubleshooting/notification-issues">
-    頻道設定與傳送的常見問題。
+    頻道設定和寄送的常見問題。
   </Card>
 </CardGroup>

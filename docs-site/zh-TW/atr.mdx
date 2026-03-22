@@ -1,0 +1,51 @@
+---
+title: "ATR (Agent Threat Rules)"
+description: "AI agent 威脅偵測的開放標準。社群維護的規則，涵蓋 prompt injection、tool poisoning 等攻擊。"
+icon: "shield-halved"
+---
+
+Agent Threat Rules (ATR) 是專為 AI agent 時代設計的開放標準，用來描述和偵測針對 AI agent 的安全威脅。
+
+## ATR 是什麼？
+
+ATR 規則偵測傳統安全工具抓不到的威脅：
+
+- **Prompt injection** -- MCP tool 回應中的注入攻擊
+- **Tool poisoning** -- 透過隱藏指令污染工具
+- **資料外洩** -- 透過 agent 動作竊取資料
+- **權限提升** -- 透過 skill 操控提升權限
+- **供應鏈攻擊** -- 針對 skill registry 的攻擊
+
+## 三層偵測
+
+| 層級 | 方法 | 速度 | 覆蓋範圍 |
+|------|------|------|----------|
+| Layer 1 | Regex pattern matching | 快 | 已知 pattern |
+| Layer 2 | 內容指紋比對 | 中 | 變體 |
+| Layer 3 | LLM-as-judge | 慢 | 新型威脅 |
+
+## 規則數量
+
+- **61 條 ATR 規則**，涵蓋已知 AI agent 威脅與新興攻擊 pattern
+
+## 開始使用
+
+```bash
+# 安裝 Panguard（內含 ATR 引擎）
+curl -fsSL https://get.panguard.ai | bash
+
+# 用 ATR 規則掃描 skill
+panguard audit skill /path/to/skill
+
+# 啟動即時防護
+panguard guard start
+```
+
+<CardGroup cols={2}>
+  <Card title="ATR on GitHub" icon="github" href="https://github.com/Agent-Threat-Rule/agent-threat-rules">
+    瀏覽規則、貢獻程式碼、給顆星。
+  </Card>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    安裝 Panguard，開始使用 ATR 規則。
+  </Card>
+</CardGroup>

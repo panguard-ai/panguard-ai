@@ -1,28 +1,28 @@
 ---
-title: "API 概覽"
-description: "Panguard AI 提供 Threat Cloud REST API 用於威脅情報。"
+title: "API 總覽"
+description: "Panguard AI 透過 Threat Cloud REST API 提供威脅情報服務。"
 icon: "code"
 ---
 
-Panguard AI 提供 Threat Cloud API 用於社群驅動的威脅情報。無需帳號或登入 -- Panguard 是 100% 免費且開源的。
+Panguard AI 提供 Threat Cloud API 做社群驅動的威脅情報交換。不需要帳號、不需要登入 -- Panguard 是 100% 免費開源的。
 
 ## API 服務
 
 <CardGroup cols={1}>
   <Card title="Threat Cloud API" icon="cloud">
-    **可設定埠** -- IoC 管理、威脅摘要、攻擊活動追蹤、MITRE 熱力圖、地理查詢和稽核日誌。
+    **可自訂 port** -- IoC 管理、威脅 feed、攻擊活動追蹤、MITRE 熱力圖、地理查詢、稽核 log。
   </Card>
 </CardGroup>
 
-## 基礎 URL
+## Base URL
 
-| 服務 | 預設基礎 URL | TLS |
+| 服務 | 預設 Base URL | TLS |
 |---------|-----------------|-----|
-| Threat Cloud | `https://tc.panguard.ai` 或 `http://localhost:PORT` | 選用 |
+| Threat Cloud | `https://tc.panguard.ai` 或 `http://localhost:PORT` | 選配 |
 
-## 身份驗證
+## 認證
 
-需要身份驗證的 Threat Cloud 端點使用 `Authorization` 標頭中的 **API key**。
+需要認證的 Threat Cloud endpoint 用 `Authorization` header 帶 **API key**。
 
 ```bash
 curl -X GET https://tc.panguard.ai/api/iocs \
@@ -30,9 +30,9 @@ curl -X GET https://tc.panguard.ai/api/iocs \
   -H "Content-Type: application/json"
 ```
 
-## 通用回應格式
+## 統一回應格式
 
-每個 API 端點都回傳一致的 JSON 封套：
+所有 API endpoint 都回傳一致的 JSON 封套：
 
 <Tabs>
   <Tab title="成功">
@@ -56,46 +56,46 @@ curl -X GET https://tc.panguard.ai/api/iocs \
   </Tab>
 </Tabs>
 
-## 速率限制
+## Rate Limiting
 
-API 實施速率限制以防止濫用。
+API 有 rate limiting 防濫用。
 
 | 服務 | 預設限制 | 範圍 |
 |---------|--------------|-------|
-| Threat Cloud | 因端點而異 | 每個 API key |
+| Threat Cloud | 依 endpoint 不同 | 每個 API key |
 
-當受到速率限制時，API 回傳 `429` 狀態碼，並附帶 `Retry-After` 標頭指示何時可以重試。
+被限速時，API 回傳 `429` 加上 `Retry-After` header 告訴你什麼時候可以再打。
 
 ## 錯誤碼
 
-| 狀態碼 | 意義 | 說明 |
+| 狀態碼 | 意思 | 說明 |
 |-------------|---------|-------------|
 | `200` | OK | 請求成功 |
 | `201` | Created | 資源建立成功 |
-| `400` | Bad Request | 無效的請求主體或缺少必要欄位 |
-| `401` | Unauthorized | 缺少或無效的身份驗證 token |
-| `403` | Forbidden | Token 有效但權限或方案層級不足 |
-| `404` | Not Found | 請求的資源不存在 |
-| `429` | Too Many Requests | 超出速率限制，請檢查 `Retry-After` 標頭 |
-| `500` | Internal Server Error | 非預期的伺服器錯誤，請以退避方式重試 |
+| `400` | Bad Request | request body 有問題或缺必填欄位 |
+| `401` | Unauthorized | 沒帶或帶了無效的認證 token |
+| `403` | Forbidden | Token 有效但權限不夠 |
+| `404` | Not Found | 找不到你要的資源 |
+| `429` | Too Many Requests | 超過 rate limit，看 `Retry-After` header |
+| `500` | Internal Server Error | 非預期的伺服器錯誤，用 backoff 重試 |
 
-## 內容類型
+## Content Type
 
-除非另有說明，所有請求和回應主體都使用 `application/json`。摘要端點可能會回傳 `text/plain` 用於封鎖清單格式。
+除非特別說明，request 跟 response body 都用 `application/json`。Feed endpoint 可能回傳 `text/plain` 給 blocklist 格式。
 
 ## 分頁
 
-回傳集合的端點支援透過查詢參數進行分頁：
+回傳集合的 endpoint 支援分頁：
 
 <ParamField query="page" type="number" default="1">
   頁碼（從 1 開始）。
 </ParamField>
 
 <ParamField query="limit" type="number" default="50">
-  每頁項目數。最大 200。
+  每頁幾筆。最大 200。
 </ParamField>
 
-分頁回應包含中繼資料：
+分頁 response 含 metadata：
 
 ```json
 {
@@ -114,9 +114,9 @@ API 實施速率限制以防止濫用。
 
 <CardGroup cols={2}>
   <Card title="Threat Cloud API" icon="crosshairs" href="/api-reference/threat-cloud/ioc">
-    查詢和提交威脅情報。
+    查詢跟提交威脅情報。
   </Card>
   <Card title="設定" icon="gear" href="/configuration/environment-variables">
-    設定 API 埠、token 和相關設定。
+    設定 API port、token 跟相關 config。
   </Card>
 </CardGroup>

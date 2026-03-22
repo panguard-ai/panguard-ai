@@ -1,14 +1,14 @@
 ---
 title: "統計與查詢"
-description: "時間序列、地理分佈、MITRE 熱力圖、觀測記錄和稽核日誌的進階分析端點。"
+description: "時間序列、地理分布、MITRE 熱力圖、觀測紀錄、稽核 log 的進階分析端點。"
 icon: "chart-bar"
 ---
 
-統計和查詢端點提供 Threat Cloud 資料集的進階分析。用於儀表板、報告和威脅研究。
+統計跟查詢端點提供 Threat Cloud 資料集的進階分析。拿來做儀表板、報告、威脅研究都適合。
 
 ## GET /api/stats
 
-回傳 Threat Cloud 資料庫的增強統計資料。
+回傳 Threat Cloud 資料庫的統計概覽。
 
 <CodeGroup>
 ```bash cURL
@@ -58,10 +58,10 @@ curl -X GET "https://tc.panguard.ai/api/stats" \
 
 ## GET /api/query/timeseries
 
-回傳威脅活動的時間序列資料，適用於圖表繪製。
+回傳威脅活動的時間序列資料，適合畫圖表。
 
 <ParamField query="granularity" type="string" default="day">
-  時間區間大小：`hour`、`day` 或 `week`。
+  時間粒度：`hour`、`day` 或 `week`。
 </ParamField>
 
 <ParamField query="period" type="string" default="30d">
@@ -69,7 +69,7 @@ curl -X GET "https://tc.panguard.ai/api/stats" \
 </ParamField>
 
 <ParamField query="type" type="string">
-  依 IoC 類型篩選。
+  依 IoC 型別篩選。
 </ParamField>
 
 <ParamField query="category" type="string">
@@ -108,10 +108,10 @@ curl -X GET "https://tc.panguard.ai/api/query/timeseries?granularity=day&period=
 
 ## GET /api/query/geo
 
-回傳威脅來源的地理分佈。
+回傳威脅來源的地理分布。
 
 <ParamField query="type" type="string">
-  依 IoC 類型篩選（主要對 `ip` 有用）。
+  依 IoC 型別篩選（主要對 `ip` 有用）。
 </ParamField>
 
 <ParamField query="period" type="string" default="30d">
@@ -119,7 +119,7 @@ curl -X GET "https://tc.panguard.ai/api/query/timeseries?granularity=day&period=
 </ParamField>
 
 <ParamField query="limit" type="number" default="20">
-  回傳的國家數量。
+  回傳幾個國家。
 </ParamField>
 
 <CodeGroup>
@@ -157,14 +157,14 @@ curl -X GET "https://tc.panguard.ai/api/query/geo?period=7d&limit=10" \
 
 ## GET /api/query/trends
 
-回傳基於 IoC 速度和模式分析的新興威脅趨勢。
+回傳根據 IoC 增長速度跟模式分析的新興威脅趨勢。
 
 <ParamField query="periodDays" type="number" default="7">
-  用於趨勢偵測分析的天數。
+  分析趨勢的天數。
 </ParamField>
 
 <ParamField query="minChange" type="number" default="10">
-  符合趨勢資格的最低百分比變化。
+  至少要有多少百分比變化才算趨勢。
 </ParamField>
 
 <CodeGroup>
@@ -224,7 +224,7 @@ curl -X GET "https://tc.panguard.ai/api/query/trends?periodDays=7" \
 
 ## GET /api/query/mitre-heatmap
 
-回傳 MITRE ATT&CK 框架熱力圖，顯示在觀測到的威脅中技術出現的頻率。
+回傳 MITRE ATT&CK 框架熱力圖，顯示觀測到的威脅中各技術的出現頻率。
 
 <ParamField query="period" type="string" default="30d">
   時間範圍：`7d`、`30d`、`90d`。
@@ -301,10 +301,10 @@ curl -X GET "https://tc.panguard.ai/api/query/mitre-heatmap?period=30d" \
 
 ## POST /api/sightings
 
-記錄現有 IoC 的新觀測。觀測會增加指標的聲譽分數權重。
+記錄一筆既有 IoC 的新觀測。觀測次數會影響指標的聲譽分數。
 
 <ParamField body="value" type="string" required>
-  被觀測到的 IoC 值。
+  觀測到的 IoC 值。
 </ParamField>
 
 <ParamField body="source" type="string" required>
@@ -312,7 +312,7 @@ curl -X GET "https://tc.panguard.ai/api/query/mitre-heatmap?period=30d" \
 </ParamField>
 
 <ParamField body="context" type="object">
-  關於觀測的額外上下文。
+  觀測的額外上下文。
 </ParamField>
 
 <CodeGroup>
@@ -350,14 +350,14 @@ curl -X POST "https://tc.panguard.ai/api/sightings" \
 
 ## GET /api/sightings
 
-查詢特定 IoC 的觀測記錄。
+查詢特定 IoC 的觀測紀錄。
 
 <ParamField query="value" type="string" required>
-  要查詢觀測記錄的 IoC 值。
+  要查的 IoC 值。
 </ParamField>
 
 <ParamField query="limit" type="number" default="50">
-  最大結果數。
+  最大回傳筆數。
 </ParamField>
 
 <CodeGroup>
@@ -397,18 +397,18 @@ curl -X GET "https://tc.panguard.ai/api/sightings?value=198.51.100.42&limit=5" \
 
 ## GET /api/audit-log
 
-回傳針對 Threat Cloud 執行的 API 操作稽核日誌。用於合規和除錯。
+回傳 Threat Cloud 的 API 操作稽核 log。合規跟 debug 都用得到。
 
 <ParamField query="action" type="string">
   依操作類型篩選：`create`、`update`、`delete`、`query`。
 </ParamField>
 
 <ParamField query="since" type="string">
-  日誌起始的 ISO 8601 時間戳。
+  log 起始的 ISO 8601 時間戳。
 </ParamField>
 
 <ParamField query="limit" type="number" default="50">
-  最大結果數（最大 200）。
+  最大回傳筆數（最大 200）。
 </ParamField>
 
 <CodeGroup>
@@ -453,5 +453,5 @@ curl -X GET "https://tc.panguard.ai/api/audit-log?action=create&limit=10" \
 </ResponseExample>
 
 <Info>
-稽核日誌回應中的 API key 值會被部分遮蔽。僅顯示前 4 個和最後 4 個字元。
+稽核 log 裡的 API key 會被遮蔽，只顯示前 4 碼跟後 4 碼。
 </Info>

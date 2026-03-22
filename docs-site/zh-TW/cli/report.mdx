@@ -1,12 +1,12 @@
 ---
 title: "panguard report"
-description: "產生符合主要安全框架的合規與稽核報告。"
+description: "產生對應主流安全框架的合規稽核報告。"
 icon: "file-chart-column"
 ---
 
-`report` 指令從您的掃描和 Guard 資料產生專業的合規報告。報告可對應 ISO 27001、SOC 2、NIST CSF 和 Taiwan TCSA 等框架，讓稽核準備變得簡單直接。
+`report` 從你的 scan 和 Guard 資料產生專業合規報告。可以對應 ISO 27001、SOC 2、NIST CSF、台灣 TCSA 等框架，稽核準備直接省一半的工。
 
-## 使用方式
+## 用法
 
 ```bash
 panguard report <subcommand> [options]
@@ -17,15 +17,15 @@ panguard report <subcommand> [options]
 | 子指令 | 說明 |
 | --- | --- |
 | `generate` | 產生合規報告 |
-| `summary` | 顯示簡要的合規摘要，不產生完整報告 |
+| `summary` | 顯示簡要合規摘要，不產生完整報告 |
 | `list-frameworks` | 列出所有支援的合規框架 |
-| `validate` | 驗證現有報告的完整性和準確性 |
-| `config` | 檢視或修改報告設定 |
+| `validate` | 驗證已有報告的完整性跟正確性 |
+| `config` | 查看或修改報告設定 |
 
 ## 選項
 
 <ParamField path="--framework" type="string">
-  目標合規框架。執行 `panguard report list-frameworks` 查看所有選項。
+  目標合規框架。跑 `panguard report list-frameworks` 看所有選項。
 </ParamField>
 
 <ParamField path="--language" type="string" default="en">
@@ -37,11 +37,11 @@ panguard report <subcommand> [options]
 </ParamField>
 
 <ParamField path="--output-dir" type="string">
-  寫入產生報告的目錄。預設為目前工作目錄。
+  報告輸出目錄。預設是目前工作目錄。
 </ParamField>
 
 <ParamField path="--org" type="string">
-  要包含在報告標頭和中繼資料中的組織名稱。
+  要放在報告標頭跟 metadata 裡的組織名稱。
 </ParamField>
 
 ## 範例
@@ -51,7 +51,7 @@ panguard report <subcommand> [options]
 panguard report generate --framework iso27001 --org "Acme Corp"
 ```
 
-```bash 以中文產生 SOC 2 報告
+```bash 產生中文 SOC 2 報告
 panguard report generate --framework soc2 --language zh-TW
 ```
 
@@ -63,7 +63,7 @@ panguard report list-frameworks
 panguard report summary --framework nist-csf
 ```
 
-```bash 匯出為 HTML
+```bash 匯出 HTML
 panguard report generate --framework tcsa --format html --output-dir ./reports
 ```
 
@@ -79,23 +79,23 @@ panguard report validate --output-dir ./reports
 | ISO 27001 | `iso27001` | 國際資訊安全標準 |
 | SOC 2 | `soc2` | 服務組織信任準則 |
 | NIST CSF | `nist-csf` | NIST 網路安全框架 |
-| CIS Controls | `cis` | 網際網路安全中心關鍵控制措施 |
+| CIS Controls | `cis` | CIS 關鍵安全控制 |
 | Taiwan TCSA | `tcsa` | 台灣企業安全聯盟標準 |
 | PCI DSS | `pci-dss` | 支付卡產業資料安全標準 |
 
-## 相關資源
+## 相關
 
 <CardGroup cols={2}>
   <Card title="合規報告指南" icon="book-open" href="/guides/compliance-reports">
-    產生您第一份合規報告的逐步指南。
+    手把手帶你產生第一份合規報告。
   </Card>
-  <Card title="Report 產品概覽" icon="file-lines" href="/products/report/overview">
-    Report 系統的完整文件。
+  <Card title="報告產品總覽" icon="file-lines" href="/products/report/overview">
+    報告系統的完整文件。
   </Card>
-  <Card title="支援的框架" icon="scale-balanced" href="/products/report/frameworks">
-    各框架的詳細控制對應。
+  <Card title="框架對應" icon="scale-balanced" href="/products/report/frameworks">
+    各框架的詳細控制項對應。
   </Card>
   <Card title="panguard scan" icon="magnifying-glass" href="/cli/scan">
-    報告從掃描資料產生 -- 請先執行掃描。
+    報告從掃描資料產生 -- 記得先跑 scan。
   </Card>
 </CardGroup>

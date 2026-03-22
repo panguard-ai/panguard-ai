@@ -1,12 +1,12 @@
 ---
 title: "panguard threat"
-description: "啟動本機 Threat Cloud 情報伺服器，用於彙整和查詢威脅資料。"
+description: "啟動本機 Threat Cloud 情報伺服器。"
 icon: "cloud"
 ---
 
-`threat` 指令運行 Panguard Threat Cloud 的本機實例 -- 一個威脅情報伺服器，從您的 Guard 代理和 Trap 蜜罐彙整入侵指標（IoC）、攻擊活動資料和攻擊者描述檔。它提供 REST API 和即時儀表板用於威脅分析。
+`threat` 在本機跑一個 Panguard Threat Cloud 實例 -- 一台威脅情報伺服器，從你的 Guard daemon 匯整 IoC（入侵指標）、攻擊活動資料跟攻擊者 profile。提供 REST API 跟即時儀表板做威脅分析。
 
-## 使用方式
+## 用法
 
 ```bash
 panguard threat <subcommand> [options]
@@ -17,67 +17,66 @@ panguard threat <subcommand> [options]
 | 子指令 | 說明 |
 | --- | --- |
 | `start` | 啟動 Threat Cloud 伺服器 |
-| `stats` | 顯示威脅情報統計資料而不啟動伺服器 |
+| `stats` | 不啟動伺服器，直接看威脅情報統計 |
 
 ## 選項
 
 <ParamField path="--port" type="number" default="9500">
-  Threat Cloud API 和儀表板的埠。
+  Threat Cloud API 跟儀表板的 port。
 </ParamField>
 
 <ParamField path="--host" type="string" default="127.0.0.1">
-  伺服器綁定的主機位址。使用 `0.0.0.0` 監聽所有介面。
+  伺服器 bind 的位址。用 `0.0.0.0` 監聽所有 interface。
 </ParamField>
 
 <ParamField path="--db" type="string">
-  儲存威脅情報資料的 SQLite 資料庫路徑。預設為 `~/.panguard/threat/threat.db`。
+  儲存威脅情報的 SQLite 資料庫路徑。預設 `~/.panguard/threat/threat.db`。
 </ParamField>
 
 ## 範例
 
 <CodeGroup>
-```bash 啟動 Threat Cloud 伺服器
+```bash 啟動 Threat Cloud
 panguard threat start
 ```
 
-```bash 在自訂埠啟動
+```bash 用自訂 port 啟動
 panguard threat start --port 8500 --host 0.0.0.0
 ```
 
-```bash 檢視威脅統計
+```bash 看威脅統計
 panguard threat stats
 ```
 
-```bash 使用自訂資料庫路徑
+```bash 指定資料庫路徑
 panguard threat start --db /opt/panguard/threat.db
 ```
 </CodeGroup>
 
 ## 情報來源
 
-Threat Cloud 從以下來源彙整資料：
+Threat Cloud 從這些地方匯整資料：
 
 | 來源 | 資料類型 |
 | --- | --- |
-| **Guard 代理** | 程序異常、網路指標、檔案雜湊 |
-| **Trap 蜜罐** | 攻擊者 IP、使用的憑證、漏洞利用酬載 |
-| **社群摘要** | 公開 IoC 摘要、STIX/TAXII 來源 |
-| **手動上傳** | 透過 API 上傳的自訂 IoC 清單 |
+| **Guard daemon** | process 異常、網路指標、檔案 hash |
+| **社群 feed** | 公開 IoC feed、STIX/TAXII 來源 |
+| **手動上傳** | 透過 API 傳的自訂 IoC 清單 |
 
+<Warning>
+  bind 到 `0.0.0.0` 的話，Threat Cloud API 就暴露在網路上了。務必設好認證，放在防火牆或 reverse proxy 後面。
+</Warning>
 
-## 相關資源
+## 相關
 
 <CardGroup cols={2}>
-  <Card title="Threat Cloud 概覽" icon="globe" href="/products/threat-cloud/overview">
-    Threat Cloud 系統的架構和設計。
+  <Card title="Threat Cloud 總覽" icon="globe" href="/products/threat-cloud/overview">
+    Threat Cloud 系統的架構跟設計。
   </Card>
   <Card title="Threat Cloud 部署" icon="server" href="/guides/threat-cloud-deployment">
-    Threat Cloud 的正式環境部署指南。
+    production 環境的部署指南。
   </Card>
-  <Card title="隱私權" icon="lock" href="/products/threat-cloud/privacy">
-    威脅資料的資料處理和隱私政策。
-  </Card>
-  <Card title="panguard trap" icon="honey-pot" href="/cli/trap">
-    蜜罐將情報饋送至 Threat Cloud。
+  <Card title="隱私" icon="lock" href="/products/threat-cloud/privacy">
+    威脅資料的處理跟隱私政策。
   </Card>
 </CardGroup>

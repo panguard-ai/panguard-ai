@@ -1,12 +1,12 @@
 ---
 title: "panguard scan"
-description: "在本機執行安全弱點掃描。"
+description: "對本機跑安全弱點掃描。"
 icon: "magnifying-glass"
 ---
 
-`scan` 指令對您的端點執行全面的安全評估，檢查弱點、錯誤設定、過時軟體和已知威脅。結果由 AI 評分和排序，讓您專注於最重要的問題。
+`scan` 會對你的端點做一次完整的安全評估：弱點、錯誤設定、過時的套件、已知威脅通通掃一遍。結果會透過 AI 排序跟評分，讓你先處理最嚴重的問題。
 
-## 使用方式
+## 用法
 
 ```bash
 panguard scan [options]
@@ -15,11 +15,11 @@ panguard scan [options]
 ## 選項
 
 <ParamField path="--quick" type="flag">
-  執行僅涵蓋關鍵檢查的快速掃描。
+  快速掃描，只跑關鍵項目。
 </ParamField>
 
 <ParamField path="--output" type="string">
-  將掃描結果寫入指定檔案路徑。根據副檔名支援 `.json`、`.html` 和 `.pdf` 格式。
+  把掃描結果寫到指定路徑。根據副檔名自動判斷格式，支援 `.json`、`.html`、`.pdf`。
 </ParamField>
 
 <ParamField path="--lang" type="string" default="en">
@@ -27,7 +27,7 @@ panguard scan [options]
 </ParamField>
 
 <ParamField path="--verbose" type="flag">
-  顯示詳細輸出，包括個別檢查進度和除錯資訊。
+  顯示詳細輸出，包含每項檢查的進度跟 debug 資訊。
 </ParamField>
 
 ## 範例
@@ -37,11 +37,11 @@ panguard scan [options]
 panguard scan --quick
 ```
 
-```bash 完整掃描並輸出 JSON
+```bash 完整掃描，輸出 JSON
 panguard scan --output ./results/scan-report.json
 ```
 
-```bash 以繁體中文進行完整掃描
+```bash 繁體中文完整掃描
 panguard scan --lang zh-TW --verbose
 ```
 
@@ -50,33 +50,33 @@ panguard scan --output ~/Desktop/security-audit.pdf
 ```
 </CodeGroup>
 
-## 掃描類型
+## 掃描模式
 
-| 模式 | 檢查項目 | 持續時間 |
+| 模式 | 檢查項目 | 時間 |
 | --- | --- | --- |
-| `--quick` | 關鍵弱點、開放埠、root 存取 | 約 30 秒 |
-| 完整（預設） | 所有掃描器，包括 CVE、CIS 基準、惡意軟體特徵、網路 | 2-5 分鐘 |
+| `--quick` | 關鍵弱點、開放 port、root 存取 | 約 30 秒 |
+| 完整（預設） | 全部掃描器，含 CVE、CIS benchmark、惡意軟體特徵碼、網路 | 2-5 分鐘 |
 
-## 掃描內容
+## 掃什麼
 
-- **系統弱點** -- 根據已安裝套件進行 CVE 資料庫比對
-- **設定稽核** -- CIS 基準檢查，用於作業系統強化
-- **網路暴露** -- 開放埠、監聽服務、防火牆規則
-- **惡意軟體偵測** -- ATR 規則比對和雜湊值查詢
-- **檔案完整性** -- 與已知良好基線進行比對
+- **系統弱點** -- 比對已安裝套件的 CVE 資料庫
+- **設定稽核** -- CIS benchmark 作業系統強化檢查
+- **網路暴露** -- 開放 port、listening service、防火牆規則
+- **惡意軟體偵測** -- ATR 規則比對跟 hash 查詢
+- **檔案完整性** -- 跟已知 baseline 比對
 - **使用者帳號** -- 權限提升風險、弱密碼
 
-## 相關資源
+## 相關
 
 <CardGroup cols={2}>
-  <Card title="首次掃描指南" icon="book-open" href="/guides/first-scan">
-    首次安全掃描的逐步教學。
+  <Card title="第一次掃描指南" icon="book-open" href="/guides/first-scan">
+    手把手帶你跑第一次安全掃描。
   </Card>
   <Card title="掃描器參考" icon="microscope" href="/products/scan/scanners">
     各掃描器模組的詳細文件。
   </Card>
   <Card title="風險評分" icon="chart-bar" href="/products/scan/risk-scoring">
-    Panguard AI 如何排序和評分發現的問題。
+    Panguard AI 怎麼排序跟評分掃描結果。
   </Card>
   <Card title="panguard report" icon="file-chart-column" href="/cli/report">
     從掃描資料產生合規報告。

@@ -1,21 +1,21 @@
 ---
 title: "攻擊活動"
-description: "追蹤透過 IoC 關聯識別的協調攻擊活動。"
+description: "追蹤透過 IoC 關聯辨識出的協調性攻擊活動。"
 icon: "flag"
 ---
 
-攻擊活動代表透過在 Panguard Threat Cloud 網路中關聯 IoC 而識別的協調攻擊模式。當多個指標共享行為模式、基礎設施或時間特徵時，它們會被分組為一個攻擊活動。
+攻擊活動（Campaign）代表透過在 Panguard Threat Cloud 網路中關聯 IoC 所辨識出的協調攻擊模式。當多個指標共享行為模式、基礎設施或時間特徵時，會被歸為同一個攻擊活動。
 
 ## GET /api/campaigns
 
-列出所有已識別的攻擊活動，支援分頁。
+列出所有辨識到的攻擊活動，支援分頁。
 
 <ParamField query="status" type="string">
   依狀態篩選：`active`、`dormant`、`resolved`。
 </ParamField>
 
 <ParamField query="since" type="string">
-  ISO 8601 時間戳。回傳此時間之後更新的攻擊活動。
+  ISO 8601 時間戳。回傳這之後更新的攻擊活動。
 </ParamField>
 
 <ParamField query="page" type="number" default="1">
@@ -23,7 +23,7 @@ icon: "flag"
 </ParamField>
 
 <ParamField query="limit" type="number" default="20">
-  每頁結果數（最大 100）。
+  每頁筆數（最大 100）。
 </ParamField>
 
 <CodeGroup>
@@ -77,7 +77,7 @@ curl -X GET "https://tc.panguard.ai/api/campaigns?status=active&limit=10" \
 
 ## GET /api/campaigns/stats
 
-回傳整個 Threat Cloud 的攻擊活動彙總統計。
+回傳 Threat Cloud 全域的攻擊活動統計。
 
 <CodeGroup>
 ```bash cURL
@@ -119,7 +119,7 @@ curl -X GET "https://tc.panguard.ai/api/campaigns/stats" \
 
 ## GET /api/campaigns/:id
 
-回傳特定攻擊活動的詳細資訊，包括所有相關 IoC 和活動時間軸。
+回傳特定攻擊活動的完整資訊，包含所有關聯 IoC 跟活動時間軸。
 
 <ParamField path="id" type="string" required>
   攻擊活動 ID。
@@ -196,14 +196,14 @@ curl -X GET "https://tc.panguard.ai/api/campaigns/campaign_botnet_xyz" \
 ```
 </ResponseExample>
 
-### 攻擊活動狀態
+### 活動狀態
 
 | 狀態 | 說明 |
 |--------|-------------|
-| `active` | 在過去 7 天內觀測到新的 IoC 或觀測記錄 |
-| `dormant` | 7--30 天無新活動，但基礎設施可能仍在運作 |
-| `resolved` | 30 天以上無活動，相關基礎設施似乎已停用 |
+| `active` | 過去 7 天內有觀測到新 IoC 或新觀測紀錄 |
+| `dormant` | 7--30 天沒新活動，但基礎設施可能還活著 |
+| `resolved` | 30 天以上沒動靜，相關基礎設施看起來已經下線了 |
 
 <Tip>
-活躍的攻擊活動會隨著 Threat Cloud 網路中新 IoC 的關聯而持續更新。
+活躍的攻擊活動會隨著 Threat Cloud 網路中新 IoC 的關聯持續更新。
 </Tip>

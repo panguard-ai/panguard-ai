@@ -1,0 +1,49 @@
+---
+title: "Threat Cloud"
+description: "AI agent 安全的集體威脅情報。社群驅動的規則、匿名分享、即時更新。"
+icon: "cloud"
+---
+
+Threat Cloud 是 Panguard 的集體防禦網路。每個被擋下的威脅變成新規則。每條規則匿名分享。每個使用者都在強化整個網路。
+
+## 架構
+
+```
+Skill Audit --> Threat Report --> Community Vote --> LLM Review --> ATR Rule --> Guard Sync
+```
+
+## 核心功能
+
+<CardGroup cols={2}>
+  <Card title="匿名分享" icon="user-secret">
+    只分享 SHA-256 hash 和風險分數。skill 內容和使用者資料不會離開你的機器。
+  </Card>
+  <Card title="社群投票" icon="thumbs-up">
+    使用者透過回饋確認或否決威脅報告，建立共識。
+  </Card>
+  <Card title="LLM 審查" icon="brain">
+    Claude Sonnet 在規則升格前審查準確性。
+  </Card>
+  <Card title="即時更新" icon="rss">
+    IP 黑名單、domain 黑名單、ATR 規則持續更新。
+  </Card>
+</CardGroup>
+
+## API Endpoint
+
+| Endpoint | Method | 說明 |
+|----------|--------|------|
+| `/api/stats` | GET | 威脅情報統計 |
+| `/api/rules` | GET | 瀏覽所有社群規則 |
+| `/api/atr-rules` | GET | 取得已確認的 ATR 規則 |
+| `/api/skill-threats` | POST | 提交 skill 稽核結果 |
+| `/api/feeds/ip-blocklist` | GET | IP 黑名單 feed |
+| `/api/feeds/domain-blocklist` | GET | Domain 黑名單 feed |
+
+<Card title="部署指南" icon="server" href="/products/threat-cloud/deployment">
+  部署你自己的 Threat Cloud 實例。
+</Card>
+
+<Card title="隱私" icon="lock" href="/products/threat-cloud/privacy">
+  我們如何保護你的資料。
+</Card>

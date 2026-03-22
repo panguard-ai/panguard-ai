@@ -1,63 +1,63 @@
 ---
 title: "Guard 問題"
-description: "排解 Panguard Guard 啟動、效能和偵測問題。"
+description: "排解 Panguard Guard 啟動、效能跟偵測的問題。"
 icon: "shield"
 ---
 
-## Guard 已在運行
+## Guard 已經在跑了
 
 ```
 Error: Panguard Guard is already running (PID: 12345)
 ```
 
-另一個 Guard 實例正在運作。請先停止它：
+另一個 Guard 實例已經在跑。先停掉：
 
 ```bash
-# 停止運行中的實例
+# 停掉正在跑的
 sudo panguard guard stop
 
-# 如果停止失敗，檢查並移除 PID 檔案
+# stop 失敗的話，手動殺
 cat ~/.panguard-guard/guard.pid
 sudo kill $(cat ~/.panguard-guard/guard.pid)
 rm ~/.panguard-guard/guard.pid
 
-# 現在重新啟動
+# 重新啟動
 sudo panguard guard start
 ```
 
 <Warning>
-不要在同一台機器上執行多個 Guard 實例。它們會在日誌檔存取、防火牆規則和監控資源上產生衝突。
+同一台機器不要跑多個 Guard 實例。它們會在 log 檔存取、防火牆規則、監控資源上打架。
 </Warning>
 
-如果 PID 檔案引用了不再存在的程序（過期 PID）：
+如果 PID 檔指向一個已經不存在的 process（過期 PID）：
 
 ```bash
-# 驗證程序是否確實已停止
+# 確認 process 真的不在了
 ps -p $(cat ~/.panguard-guard/guard.pid)
 
-# 如果顯示「no such process」，安全地移除 PID 檔案
+# 如果顯示 "no such process"，放心刪 PID 檔
 rm ~/.panguard-guard/guard.pid
 sudo panguard guard start
 ```
 
 ---
 
-## 權限被拒
+## 權限不夠
 
 ```
 Error: EACCES: permission denied, open '/var/log/auth.log'
 ```
 
-Guard 需要 root/admin 權限來讀取系統日誌和管理防火牆規則。
+Guard 需要 root/admin 權限讀系統 log 跟管防火牆規則。
 
 <Tabs>
-  <Tab title="使用 sudo 執行">
+  <Tab title="用 sudo 跑">
     ```bash
     sudo panguard guard start
     ```
   </Tab>
-  <Tab title="安裝為系統服務">
-    將 Guard 安裝為具有適當權限的 systemd 服務：
+  <Tab title="裝成系統服務">
+    裝成帶適當權限的 systemd 服務：
 
     ```bash
     sudo panguard guard install-service
@@ -65,7 +65,7 @@ Guard 需要 root/admin 權限來讀取系統日誌和管理防火牆規則。
     sudo systemctl enable panguard-guard
     ```
 
-    檢查服務狀態：
+    看服務狀態：
     ```bash
     sudo systemctl status panguard-guard
     ```
@@ -80,44 +80,44 @@ Guard 需要 root/admin 權限來讀取系統日誌和管理防火牆規則。
 
 ---
 
-## 高記憶體使用量
+## 記憶體吃太多
 
-如果 Guard 消耗的記憶體超出預期：
+Guard 記憶體用量超出預期的話：
 
 <AccordionGroup>
-  <Accordion title="檢查目前使用量">
+  <Accordion title="看目前用量">
     ```bash
     panguard status --verbose
     ```
 
-    正常記憶體範圍：
+    正常範圍：
 
-    | 元件 | 典型記憶體 |
-    |-----------|---------------|
-    | 核心代理 | 50--100 MB |
-    | ATR 規則引擎（61 規則） | 約 20 MB |
+    | 元件 | 一般記憶體用量 |
+    |------|-------------|
+    | 核心 agent | 50--100 MB |
+    | ATR 規則引擎（61 條規則） | 約 20 MB |
     | AI 分析（本機） | 100--500 MB |
     | **合計** | **170--620 MB** |
   </Accordion>
-  <Accordion title="減少記憶體使用量">
-    1. **停用未使用的監控器** -- 關閉不需要的子系統監控：
+  <Accordion title="降低記憶體用量">
+    1. **關掉用不到的監控** -- 把不需要的子系統監控關掉：
        ```bash
        panguard config set monitoring.dockerEvents false
        panguard config set monitoring.kernelModules false
        ```
 
-    2. **減少規則數量** -- 停用不需要的規則類別：
+    2. **減少規則數** -- 停用不需要的規則類別：
        ```bash
        panguard config set rules.excludeCategories '["informational", "test"]'
        ```
 
-    3. **使用遠端 AI 而非本機** -- 從 Ollama 切換到雲端 AI 提供者以節省本機模型使用的記憶體：
+    3. **用雲端 AI 取代本機** -- 從 Ollama 切到雲端 AI provider，省掉本機模型佔的記憶體：
        ```bash
        export ANTHROPIC_API_KEY=sk-ant-...
-       # 如果正在運行則停止 Ollama
+       # 有跑 Ollama 的話可以停掉
        ```
 
-    4. **增加垃圾回收** -- 用於 Node.js 記憶體最佳化：
+    4. **調 GC 設定** -- Node.js 記憶體最佳化：
        ```bash
        export NODE_OPTIONS="--max-old-space-size=512"
        ```
@@ -126,52 +126,52 @@ Guard 需要 root/admin 權限來讀取系統日誌和管理防火牆規則。
 
 ---
 
-## 誤報
+## 誤報太多
 
-如果 Guard 對合法活動產生太多警報：
+Guard 對正常活動發了一堆警示的話：
 
 <AccordionGroup>
-  <Accordion title="延長學習期間">
-    預設學習期間為 7 天。如果您的工作負載較複雜，請延長它：
+  <Accordion title="延長學習期">
+    預設學習期 7 天。如果你的工作負載比較複雜，拉長一點：
 
     ```bash
     panguard config set learningDays 14
     ```
 
-    重設學習資料並重新啟動：
+    重設學習資料重來：
     ```bash
     sudo panguard guard stop
     panguard config set mode learning
     sudo panguard guard start
     ```
   </Accordion>
-  <Accordion title="調整偵測閾值">
-    提高特定威脅類型的閾值：
+  <Accordion title="調偵測閾值">
+    拉高特定威脅類型的門檻：
 
     ```bash
-    # 在警報前需要更多事件用於暴力破解
+    # 暴力破解要更多事件才觸發
     panguard config set response.minConfidence 0.90
 
-    # 增加 SSH 失敗閾值
+    # 拉高 SSH 失敗閾值
     panguard config set rules.sshFailureThreshold 20
     ```
   </Accordion>
-  <Accordion title="將已知良好的 IP 和程序加入白名單">
-    將受信任的 IP 和程序加入白名單：
+  <Accordion title="把已知安全的 IP 跟 process 加白名單">
+    把信任的 IP 跟 process 加白名單：
 
     ```bash
-    # 將 IP 加入白名單
+    # IP 白名單
     panguard config set response.whitelistedIps '["10.0.0.0/8", "192.168.1.100"]'
 
-    # 將程序加入白名單
+    # Process 白名單
     panguard config set response.whitelistedProcesses '["backup-agent", "monitoring-daemon"]'
     ```
   </Accordion>
-  <Accordion title="停用嘈雜的規則">
-    識別並停用導致誤報的特定規則：
+  <Accordion title="關掉吵的規則">
+    找出造成誤報的規則，關掉它：
 
     ```bash
-    # 檢查帶有規則 ID 的最近警報
+    # 看最近的低嚴重性警示跟規則 ID
     panguard guard logs --severity low --limit 20
 
     # 停用特定規則
@@ -182,59 +182,59 @@ Guard 需要 root/admin 權限來讀取系統日誌和管理防火牆規則。
 
 ---
 
-## 自動回應未執行
+## 自動回應沒動作
 
-如果 Guard 偵測到威脅但未採取自動動作：
+Guard 偵測到威脅但沒自動處理的話：
 
 <AccordionGroup>
-  <Accordion title="檢查信心閾值">
-    自動回應僅在 AI 信心分數超過 `minConfidence` 時觸發：
+  <Accordion title="看信心閾值">
+    自動回應只在 AI 信心分數超過 `minConfidence` 時才觸發：
 
     ```bash
-    # 檢查目前閾值
+    # 看目前閾值
     panguard config get response.minConfidence
     ```
 
-    如果偵測低於閾值，謹慎地降低它：
+    偵測到的都低於閾值的話，小心地降一點：
     ```bash
     panguard config set response.minConfidence 0.80
     ```
 
     <Warning>
-    將 `minConfidence` 設定在 0.7 以下會顯著增加誤報回應的風險（封鎖合法 IP 或終止合法程序）。
+    `minConfidence` 設到 0.7 以下會大幅增加誤報風險（封到正常 IP 或殺到正常 process）。
     </Warning>
   </Accordion>
-  <Accordion title="驗證回應是否已啟用">
+  <Accordion title="確認回應有開">
     ```bash
     panguard config get response.enabled
     panguard config get response.autoBlock
     ```
 
-    如果停用，請啟用：
+    沒開的話打開：
     ```bash
     panguard config set response.enabled true
     panguard config set response.autoBlock true
     ```
   </Accordion>
-  <Accordion title="檢查運作模式">
-    自動回應在 `learning` 或 `detect` 模式下不會執行：
+  <Accordion title="看運作模式">
+    `learning` 跟 `detect` 模式不會執行自動回應：
 
     ```bash
     panguard config get mode
     ```
 
-    切換到 `protect` 模式：
+    切到 `protect` 模式：
     ```bash
     panguard config set mode protect
     sudo panguard guard restart
     ```
   </Accordion>
-  <Accordion title="檢查核准要求">
-    如果啟用了 `requireApproval`，Guard 會發送核准請求而非自動執行：
+  <Accordion title="看有沒有開核准要求">
+    如果 `requireApproval` 是開的，Guard 會發核准請求而不是直接動手：
 
     ```bash
     panguard config get response.requireApproval
-    # 如果為 true，檢查待處理的核准：
+    # 是 true 的話看待處理的核准：
     panguard guard approvals
     ```
   </Accordion>
@@ -242,34 +242,34 @@ Guard 需要 root/admin 權限來讀取系統日誌和管理防火牆規則。
 
 ---
 
-## Guard 啟動時當機
+## Guard 啟動就掛
 
 <AccordionGroup>
-  <Accordion title="檢查日誌">
+  <Accordion title="看 log">
     ```bash
     cat ~/.panguard-guard/logs/guard.log | tail -50
     ```
 
-    或使用 CLI：
+    或用 CLI：
     ```bash
     panguard guard logs --limit 50
     ```
   </Accordion>
-  <Accordion title="執行診斷">
+  <Accordion title="跑診斷">
     ```bash
     panguard doctor
     ```
 
-    這會檢查 Node.js 版本、權限、磁碟空間、埠可用性和設定有效性。
+    會檢查 Node.js 版本、權限、磁碟空間、port 可用性、config 格式。
   </Accordion>
-  <Accordion title="重設設定">
-    如果設定檔已損壞：
+  <Accordion title="重設 config">
+    config 檔壞掉的話：
 
     ```bash
-    # 備份目前設定
+    # 先備份
     cp ~/.panguard-guard/config.json ~/.panguard-guard/config.json.bak
 
-    # 重設為預設值
+    # 刪掉重來
     rm ~/.panguard-guard/config.json
     sudo panguard guard start
     ```

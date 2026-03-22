@@ -1,12 +1,12 @@
 ---
 title: "panguard guard"
-description: "管理即時端點防護代理。"
+description: "管理即時端點防護 daemon。"
 icon: "shield"
 ---
 
-`guard` 指令控制 Panguard 的即時防護代理 -- 一個三層 AI 管線，持續監控您的系統、偵測威脅並自動回應。Guard 以背景服務運行，並透過您設定的通知頻道回報事件。
+`guard` 控制 Panguard 的即時防護 daemon -- 一條三層 AI 管線，持續監控你的系統、偵測威脅、自動處理。Guard 跑在背景，透過你設定的通知頻道回報事件。
 
-## 使用方式
+## 用法
 
 ```bash
 panguard guard <subcommand> [options]
@@ -16,73 +16,73 @@ panguard guard <subcommand> [options]
 
 | 子指令 | 說明 |
 | --- | --- |
-| `start` | 啟動 Guard 代理 |
-| `stop` | 停止運行中的 Guard 代理 |
-| `status` | 顯示目前 Guard 狀態和統計資料 |
-| `install` | 將 Guard 安裝為系統服務（systemd / launchd） |
+| `start` | 啟動 Guard daemon |
+| `stop` | 停止 Guard daemon |
+| `status` | 顯示 Guard 目前狀態跟統計資訊 |
+| `install` | 把 Guard 裝成系統服務（systemd / launchd） |
 | `uninstall` | 移除 Guard 系統服務 |
-| `config` | 檢視或修改 Guard 設定 |
+| `config` | 查看或修改 Guard config |
 | `help` | 顯示 Guard 子指令說明 |
 
 ## 選項
 
 <ParamField path="--data-dir" type="string">
-  覆寫 Guard 儲存日誌、基線和狀態檔案的預設資料目錄。預設為 `~/.panguard/guard/`。
+  覆蓋 Guard 存放 log、baseline、狀態檔的預設資料目錄。預設 `~/.panguard/guard/`。
 </ParamField>
 
 ## 範例
 
 <CodeGroup>
-```bash 啟動 Guard 防護
+```bash 啟動 Guard
 panguard guard start
 ```
 
-```bash 檢查 Guard 狀態
+```bash 看 Guard 狀態
 panguard guard status
 ```
 
-```bash 安裝為系統服務
+```bash 裝成系統服務
 panguard guard install
 ```
 
-```bash 使用自訂資料目錄
+```bash 用自訂資料目錄
 panguard guard start --data-dir /opt/panguard/data
 ```
 
-```bash 停止 Guard
+```bash 停 Guard
 panguard guard stop
 ```
 
-```bash 檢視 Guard 設定
+```bash 看 Guard config
 panguard guard config
 ```
 </CodeGroup>
 
 ## 運作原理
 
-Guard 透過三層 AI 處理運作：
+Guard 透過三層 AI 處理：
 
-1. **第一層 -- 規則引擎** -- ATR 規則，用於已知威脅模式
-2. **第二層 -- 行為 AI** -- 機器學習基線偵測異常的程序、網路和檔案活動
-3. **第三層 -- LLM 判斷** -- 大型語言模型關聯事件、判斷嚴重程度，並產生白話警報
+1. **第一層 -- 規則引擎** -- 用 ATR 規則比對已知威脅模式（v1.3.0 內建 61 條規則）
+2. **第二層 -- 行為 AI** -- 機器學習建立 baseline，偵測異常的 process、網路跟檔案活動
+3. **第三層 -- LLM 判斷** -- 大型語言模型做事件關聯、嚴重性判斷，產生白話警示
 
 <Tip>
-  啟動 Guard 後，會在前 24 小時進入**學習模式**以建立行為基線。在此期間，您可能會看到較多的資訊性警報。
+  啟動 Guard 後，前 24 小時會進入**學習模式**建立行為 baseline。這段期間你可能會看到比較多資訊性的警示，這是正常的。
 </Tip>
 
-## 相關資源
+## 相關
 
 <CardGroup cols={2}>
-  <Card title="Guard 產品概覽" icon="shield-check" href="/products/guard/overview">
-    Guard 代理的架構和設計。
+  <Card title="Guard 產品總覽" icon="shield-check" href="/products/guard/overview">
+    Guard daemon 的架構跟設計。
   </Card>
-  <Card title="代理管線" icon="diagram-project" href="/products/guard/agent-pipeline">
-    三層 AI 處理管線的深入介紹。
+  <Card title="Agent 管線" icon="diagram-project" href="/products/guard/agent-pipeline">
+    三層 AI 處理管線的深入說明。
   </Card>
   <Card title="Guard 設定" icon="gear" href="/configuration/guard-config">
-    自訂監控器、閾值和自動回應規則。
+    調整監控項目、閾值跟自動回應規則。
   </Card>
-  <Card title="panguard chat" icon="message-bot" href="/cli/chat">
-    設定 Guard 警報的通知頻道。
+  <Card title="通知設定" icon="message-bot" href="/guides/notifications-setup">
+    設定 Guard 警示通知頻道。
   </Card>
 </CardGroup>
