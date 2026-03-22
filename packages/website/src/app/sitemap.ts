@@ -38,7 +38,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/compare',
     '/product/mcp',
     '/compliance',
-    '/changelog',
     '/resources',
     '/press',
     '/trust',
@@ -50,8 +49,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const getFrequency = (path: string): 'weekly' | 'monthly' => {
-    if (path === '/' || path === '/blog' || path === '/changelog')
-      return 'weekly';
+    if (path === '/' || path === '/blog') return 'weekly';
     return 'monthly';
   };
 

@@ -171,17 +171,6 @@
             ]
           }
         ]
-      },
-      {
-        "tab": "Changelog",
-        "groups": [
-          {
-            "group": "Changelog",
-            "pages": [
-              "changelog"
-            ]
-          }
-        ]
       }
     ],
     "global": {
@@ -191,11 +180,6 @@
           "href": "https://github.com/panguard-ai/panguard-ai",
           "icon": "github"
         },
-        {
-          "anchor": "Changelog",
-          "href": "https://docs.panguard.ai/changelog",
-          "icon": "list"
-        }
       ]
     }
   },

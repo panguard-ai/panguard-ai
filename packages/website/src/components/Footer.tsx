@@ -46,7 +46,6 @@ export default function Footer() {
         { label: t('about'), href: '/about' },
         { label: t('blog'), href: '/blog' },
         { label: t('contact'), href: '/contact' },
-        { label: t('changelog'), href: '/changelog' },
       ],
     },
     {
