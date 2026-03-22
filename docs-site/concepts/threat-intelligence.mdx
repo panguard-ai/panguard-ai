@@ -89,39 +89,36 @@ Suspicious IP 203.0.113.50 connection detected
 
 ## Threat Cloud -- Collective Intelligence
 
-Beyond public feeds, Panguard users contribute to and benefit from the Threat Cloud, a community-driven collective intelligence network.
+Beyond public feeds, Panguard users contribute to and benefit from the Threat Cloud, a community-driven collective intelligence network focused on ATR (Agent Threat Rules) consensus.
+
+### The Crystallization Flywheel
+
+Threat Cloud's core value proposition is the crystallization flywheel -- a self-reinforcing loop where individual scan findings are refined into community-confirmed detection rules:
 
 ```
-  Your Panguard           Threat Cloud          Other Users' Panguard
-       |                      |                         |
-  Detect threat  --upload-->  Collect+Verify  --push-->  Preemptive protection
+  Scan skill ──> Findings ──> TC proposal ──> Consensus (3+ confirmations) ──> Confirmed rule
+       ^                                                                              |
+       └──────────────── Distributed to all scanners ────────────────────────────────┘
 ```
 
-### How It Works
+Each cycle strengthens the network:
 
-1. Your Guard detects a new threat indicator
-2. The indicator is anonymized and uploaded to Threat Cloud
-3. Threat Cloud verifies and correlates across all submissions
-4. Verified indicators are distributed to all participating Panguard instances
+1. **Scan** -- Any Panguard scanner (CLI, Website, or Guard) scans an MCP skill
+2. **Propose** -- High-severity findings generate an ATR proposal identified by a pattern hash
+3. **Confirm** -- Other scanners encountering the same pattern hash confirm the proposal
+4. **Promote** -- At 3+ independent confirmations, the proposal is auto-promoted to a confirmed rule
+5. **Distribute** -- Confirmed rules are served via `GET /api/atr-rules` to all scanners
+6. **Strengthen** -- Scanners load new rules, improving detection, generating more proposals
 
-### IoC Reputation Scoring
+The pattern hash uses the format `scan:{skillName}:{findingSummary}`, SHA-256 truncated to 16 hex characters. Because all scanners use the same `@panguard-ai/scan-core` library, they produce identical hashes for the same threat pattern regardless of whether the scan originated from CLI, Website, or Guard.
 
-Every indicator in Threat Cloud receives a reputation score from 0 to 100:
+### LLM Reviewer
 
-| Score Range | Classification | Action |
-| --- | --- | --- |
-| 80-100 | Confirmed malicious | Auto-block eligible |
-| 50-79 | Suspicious | Alert + manual review |
-| 20-49 | Low confidence | Monitor only |
-| 0-19 | Informational | Logged, no action |
+Threat Cloud includes an automated LLM reviewer (Claude Sonnet 4) that evaluates ATR proposals for false positive risk, coverage, detection specificity, and YAML validity. Proposals can be promoted through community consensus alone (3+ confirmations) or through LLM approval combined with community confirmation.
 
-### Campaign Tracking and Correlation
+### IoC Feeds
 
-Threat Cloud correlates indicators across submissions to identify attack campaigns:
-
-- Multiple users reporting the same IP within a time window triggers campaign detection
-- Campaign indicators receive an elevated reputation score
-- Related indicators (same ASN, same domain family) are linked automatically
+Threat Cloud also distributes traditional IoC feeds (IP blocklists, domain blocklists) and maintains a community skill blacklist. These complement the ATR rule pipeline for network-level threat indicators.
 
 ---
 

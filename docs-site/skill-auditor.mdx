@@ -1,10 +1,10 @@
 ---
 title: "Skill Auditor"
-description: "Scan MCP skills for security threats before installation. The App Store review process for the OpenClaw ecosystem."
+description: "Scan MCP skills for security threats before installation. Powered by the unified scan-core engine shared between CLI, Website, and Guard."
 icon: "shield-check"
 ---
 
-Panguard Skill Auditor scans third-party MCP skills for prompt injection, tool poisoning, hidden Unicode, encoded payloads, and other threats -- before they reach your agents.
+Panguard Skill Auditor scans third-party MCP skills for prompt injection, tool poisoning, hidden Unicode, encoded payloads, and other threats -- before they reach your agents. It is powered by `@panguard-ai/scan-core`, a unified scanning engine shared between the CLI (`panguard audit skill`), the Website scanner, and Guard's skill watcher.
 
 ## How It Works
 
@@ -12,7 +12,67 @@ Panguard Skill Auditor scans third-party MCP skills for prompt injection, tool p
 panguard audit skill /path/to/skill-directory
 ```
 
-The auditor analyzes the skill's `SKILL.md` and produces a risk score (0-100) with detailed findings.
+The auditor analyzes the skill's `SKILL.md` (or `README.md` as fallback) and produces a risk score (0-100) with detailed findings.
+
+## Scanning Architecture
+
+All scanning -- whether invoked from CLI, Website, or Guard -- passes through the same `scanContent()` function in `@panguard-ai/scan-core`. This ensures identical detection results regardless of the entry point.
+
+The scan composes six detection layers in sequence:
+
+| Layer | What It Does |
+|-------|-------------|
+| **Manifest parsing** | Extracts frontmatter metadata (name, description, allowed-tools, version) |
+| **Context signal detection** | Identifies risk boosters and reducers to adjust the risk multiplier |
+| **ATR rule matching** | Matches content against community ATR rules (two-pass: raw + stripped) |
+| **Instruction pattern matching** | Detects prompt injection and tool poisoning via 11 regex patterns |
+| **Secret detection** | Finds hardcoded API keys, tokens, and credentials |
+| **Risk scoring** | Calculates final 0-100 score using findings weighted by the context multiplier |
+
+Additional checks reported in results: manifest structure validation and content size check.
+
+## ATR Integration
+
+When ATR rules are available (loaded from Threat Cloud or a local rules directory), the scanner evaluates skill content against all compiled rules. Currently, the ATR corpus contains 61 rules with 450+ detection patterns covering AI agent-specific threats.
+
+ATR matching runs a two-pass scan:
+1. **Raw pass** -- Match against the original content
+2. **Stripped pass** -- Match against content with Markdown noise removed (catches obfuscation attempts)
+
+The scanner reports both the number of ATR rules evaluated and the number of patterns matched in the scan result.
+
+## Context Signals
+
+Context signals are pre-computed before ATR matching and influence how findings are scored. They fall into two categories:
+
+**Boosters** (increase risk multiplier):
+- `<IMPORTANT>` hidden instruction blocks
+- Concealment language ("do not tell the user")
+- Exfiltration URL patterns (workers.dev, ngrok.io, webhook.site, etc.)
+- Consent bypass language ("without asking", "silently send")
+- Credential file access combined with network calls
+- Description-behavior mismatch (benign description + dangerous instructions)
+
+**Reducers** (decrease risk multiplier):
+- Skill declares shell access in frontmatter (expected for dev tools)
+- Description identifies as dev/CLI/QA tool
+- Well-structured frontmatter with name, description, and version/license
+- Dangerous patterns appear only inside code blocks (documentation context)
+
+The multiplier is clamped to a range of **0.3x to 2.5x** and is applied to the final risk score. This means a legitimate dev tool that declares its capabilities upfront receives a lower risk score, while a skill that tries to hide its intentions receives a higher one.
+
+## The Flywheel
+
+Every skill audit contributes to the community defense:
+
+1. **Scan** -- Audit a skill locally for threats using scan-core
+2. **Propose** -- High-severity findings generate ATR proposals with a pattern hash
+3. **Confirm** -- Other scanners encountering the same pattern hash confirm the proposal
+4. **Promote** -- At 3+ confirmations, proposals auto-promote to confirmed ATR rules
+5. **Distribute** -- Confirmed rules are served to all scanners via Threat Cloud
+6. **Strengthen** -- New rules improve the next audit, closing the loop
+
+The pattern hash (`scan:{skillName}:{findingSummary}`, SHA-256 truncated to 16 hex chars) ensures CLI, Website, and Guard all produce identical identifiers for the same threat pattern.
 
 <CardGroup cols={2}>
   <Card title="Quick Start" icon="rocket" href="/quickstart">
@@ -28,16 +88,6 @@ The auditor analyzes the skill's `SKILL.md` and produces a risk score (0-100) wi
     How audit results feed into collective defense.
   </Card>
 </CardGroup>
-
-## The Flywheel
-
-Every skill audit contributes to the community:
-
-1. **Audit** -- Scan a skill locally for threats
-2. **Report** -- Anonymized findings are shared with Threat Cloud
-3. **Review** -- Community voting + LLM analysis confirms threats
-4. **Rules** -- Confirmed threats become ATR rules
-5. **Protect** -- New rules strengthen the next audit
 
 <Card title="CLI Reference" icon="terminal" href="/cli/scan">
   Full `panguard audit skill` command reference.
