@@ -19,8 +19,9 @@ import { SAFE_INSTALL_URLS } from './instruction-patterns.js';
 // Rule compilation
 // ---------------------------------------------------------------------------
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const isSafeRegex = require('safe-regex') as (re: string | RegExp) => boolean;
+import { createRequire } from 'node:module';
+const _require = createRequire(import.meta.url);
+const isSafeRegex = _require('safe-regex') as (re: string | RegExp) => boolean;
 
 /**
  * Compile ATR rules: convert pattern strings to RegExp with ReDoS protection.
