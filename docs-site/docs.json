@@ -54,7 +54,6 @@
             "group": "Configuration",
             "pages": [
               "configuration/guard-config",
-              "configuration/chat-config",
               "configuration/environment-variables"
             ]
           },
@@ -97,22 +96,6 @@
             ]
           },
           {
-            "group": "Panguard Chat",
-            "pages": [
-              "products/chat/overview",
-              "products/chat/telegram",
-              "products/chat/slack",
-              "products/chat/email-webhook"
-            ]
-          },
-          {
-            "group": "Coming Soon",
-            "pages": [
-              "products/trap/overview",
-              "products/report/overview"
-            ]
-          },
-          {
             "group": "Panguard MCP",
             "pages": [
               "products/mcp/overview",
@@ -148,9 +131,7 @@
           {
             "group": "Protection",
             "pages": [
-              "cli/guard",
-              "cli/chat",
-              "cli/trap"
+              "cli/guard"
             ]
           },
           {

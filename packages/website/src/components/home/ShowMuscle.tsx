@@ -3,16 +3,15 @@
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
+  CheckIcon,
   ShieldIcon,
   ScanIcon,
-  ComplianceIcon,
-  TrapIcon,
   GlobalIcon,
 } from '@/components/ui/BrandIcons';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-const roleIcons = [ShieldIcon, ScanIcon, ComplianceIcon, TrapIcon, GlobalIcon];
+const roleIcons = [CheckIcon, ShieldIcon, ScanIcon, GlobalIcon];
 const barColors = ['#6B8F71', '#8FB996', '#A8D5B0'];
 const confidenceColors = {
   green: {
@@ -67,7 +66,7 @@ function TeamSection() {
       </motion.p>
 
       {/* Role cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mt-8 sm:mt-10">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-10">
         {roles.map((role, i) => {
           const Icon = roleIcons[i];
           return (
