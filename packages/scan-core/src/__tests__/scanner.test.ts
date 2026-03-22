@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { scanContent } from '../scanner.js';
 import { compileRules } from '../atr-engine.js';

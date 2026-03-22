@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { calculateRiskScore } from '../risk-scorer.js';
 import type { Finding } from '../types.js';

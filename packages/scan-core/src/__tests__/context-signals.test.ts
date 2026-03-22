@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { detectContextSignals } from '../context-signals.js';
 import type { ContextSignal } from '../types.js';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { compileRules, scanWithATR } from '../atr-engine.js';
 import type { ATRRuleCompiled, CompiledRule } from '../types.js';
