@@ -315,7 +315,7 @@
             "desc": "從實戰自動鍛造偵測規則"
           }
         ],
-        "footer": "4 個角色 · 3 大支柱 · 1 行指令 · 免費開始"
+        "footer": "4 個角色 · 3 大支柱 · 1 行指令 · 完全免費"
       },
       "funnel": {
         "title": "90% 的威脅，根本不需要 AI。",
@@ -1002,7 +1002,7 @@
     },
     "response": {
       "overline": "自動回應",
-      "title": "八種動作。三個信心等級。",
+      "title": "十一種動作。三個信心等級。",
       "subtitle": "Panguard 不只偵測，還會行動 -- 包含針對 AI agent 威脅的 ATR 專用回應動作。",
       "actions": [
         {
@@ -1100,7 +1100,7 @@
     },
     "cta": {
       "title": "準備好看看實際效果了嗎？",
-      "desc": "一行指令。免費開始。不需要帳號。",
+      "desc": "一行指令。完全免費。不需要帳號。",
       "primary": "立即開始",
       "secondary": "閱讀技術深度剖析"
     }
@@ -1852,7 +1852,7 @@
       "capabilities": "核心能力",
       "cta": {
         "title": "準備好守護你的 AI Agent 了嗎？",
-        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。61 ATR 偵測規則。免費開始。",
+        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。61 ATR 偵測規則。完全免費。",
         "cta1": "立即開始",
         "cta2": "在 GitHub 上查看 ATR"
       }
@@ -2793,7 +2793,7 @@
       "cta": {
         "title": "先掃再裝。",
         "desc": "一行指令，八道檢查，裝之前就知道結果。",
-        "cta1": "免費開始",
+        "cta1": "完全免費",
         "cta2": "看方案",
         "installTitle": "安裝 Panguard"
       }
@@ -5331,29 +5331,29 @@
     },
     "currentPlan": {
       "heading": "目前方案",
-      "community": "社群版",
-      "solo": "個人版",
-      "pro": "專業版",
-      "business": "商業版",
-      "enterprise": "企業版",
+      "community": "免費",
+      "solo": "免費",
+      "pro": "免費",
+      "business": "免費",
+      "enterprise": "免費",
       "freeTier": "免費",
       "upgradeMessage": "所有功能皆包含於免費開源版本中",
       "upgradeButton": "查看文件",
       "machines": "機器數",
       "scansPerMonth": "每月掃描次數",
       "guardEndpoints": "Guard 端點數",
-      "communityMachines": "1",
-      "communityScans": "50",
-      "communityGuard": "未包含",
-      "soloMachines": "3",
-      "soloScans": "500",
-      "soloGuard": "3",
-      "proMachines": "10",
+      "communityMachines": "無限制",
+      "communityScans": "無限制",
+      "communityGuard": "無限制",
+      "soloMachines": "無限制",
+      "soloScans": "無限制",
+      "soloGuard": "無限制",
+      "proMachines": "無限制",
       "proScans": "無限制",
-      "proGuard": "10",
-      "businessMachines": "25",
+      "proGuard": "無限制",
+      "businessMachines": "無限制",
       "businessScans": "無限制",
-      "businessGuard": "25"
+      "businessGuard": "無限制"
     },
     "unlimited": "無限制",
     "logOut": "登出",

@@ -1023,7 +1023,7 @@
       "capabilities": "Key Capabilities",
       "cta": {
         "title": "Ready to secure your AI agents?",
-        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 61 ATR detection rules. Free to start.",
+        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 61 ATR detection rules. Completely free.",
         "cta1": "Get Started",
         "cta2": "View ATR on GitHub"
       }
@@ -4408,7 +4408,7 @@
     },
     "response": {
       "overline": "AUTOMATED RESPONSE",
-      "title": "Eight actions. Three confidence levels.",
+      "title": "Eleven actions. Three confidence levels.",
       "subtitle": "Panguard doesn't just detect. It acts -- with ATR-specific response actions for AI agent threats.",
       "actions": [
         {
@@ -4506,7 +4506,7 @@
     },
     "cta": {
       "title": "Ready to see it in action?",
-      "desc": "One command. Free to start. No account needed.",
+      "desc": "One command. Completely free. No account needed.",
       "primary": "Get Started",
       "secondary": "Read the Technical Deep Dive"
     }
@@ -5280,29 +5280,29 @@
     },
     "currentPlan": {
       "heading": "Current Plan",
-      "community": "Community",
-      "solo": "Solo",
-      "pro": "Pro",
-      "business": "Business",
-      "enterprise": "Enterprise",
+      "community": "Free",
+      "solo": "Free",
+      "pro": "Free",
+      "business": "Free",
+      "enterprise": "Free",
       "freeTier": "Free",
       "upgradeMessage": "All features are included in the free open-source edition",
       "upgradeButton": "View Docs",
       "machines": "Machines",
       "scansPerMonth": "Scans / month",
       "guardEndpoints": "Guard endpoints",
-      "communityMachines": "1",
-      "communityScans": "50",
-      "communityGuard": "Not included",
-      "soloMachines": "3",
-      "soloScans": "500",
-      "soloGuard": "3",
-      "proMachines": "10",
+      "communityMachines": "Unlimited",
+      "communityScans": "Unlimited",
+      "communityGuard": "Unlimited",
+      "soloMachines": "Unlimited",
+      "soloScans": "Unlimited",
+      "soloGuard": "Unlimited",
+      "proMachines": "Unlimited",
       "proScans": "Unlimited",
-      "proGuard": "10",
-      "businessMachines": "25",
+      "proGuard": "Unlimited",
+      "businessMachines": "Unlimited",
       "businessScans": "Unlimited",
-      "businessGuard": "25"
+      "businessGuard": "Unlimited"
     },
     "unlimited": "Unlimited",
     "logOut": "Log out",
