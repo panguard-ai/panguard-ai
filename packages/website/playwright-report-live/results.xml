@@ -1,0 +1,144 @@
+<testsuites id="" name="" tests="20" failures="0" skipped="0" errors="0" time="55.01941">
+<testsuite name="live-site-content-fixes.spec.ts" timestamp="2026-03-22T08:36:48.262Z" hostname="chromium" tests="20" failures="0" skipped="0" time="53.903" errors="0">
+<testcase name="Journey 1: Homepage flywheel — three-layer defense section › shows ONLY Skill Auditor, Guard, Threat Cloud — no Trap/Chat/Report as standalone" classname="live-site-content-fixes.spec.ts" time="3.077">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-51fd5-p-Chat-Report-as-standalone-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 1: Homepage flywheel — three-layer defense section › &quot;100% free&quot; and &quot;MIT licensed&quot; appear on homepage" classname="live-site-content-fixes.spec.ts" time="3.126">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-c1d6e-licensed-appear-on-homepage-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 2: Platform tabs — npx panguard setup › all 8 platforms appear in the setup section (English)" classname="live-site-content-fixes.spec.ts" time="3.244">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-0984a--the-setup-section-English--chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 2: Platform tabs — npx panguard setup › platform tabs are interactive — clicking each tab works" classname="live-site-content-fixes.spec.ts" time="3.061">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-34c88-e-—-clicking-each-tab-works-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 3: Navigation — Product dropdown › Product dropdown does NOT contain Trap or Report entries" classname="live-site-content-fixes.spec.ts" time="3.397">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-66cc9-tain-Trap-or-Report-entries-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 4: Footer — no banned links › footer does NOT contain /careers, /status, /legal/security links" classname="live-site-content-fixes.spec.ts" time="2.694">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-c06ff-status-legal-security-links-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 4: Footer — no banned links › footer still has essential links (privacy, terms)" classname="live-site-content-fixes.spec.ts" time="2.695">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-ddce3-ential-links-privacy-terms--chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 5: Redirects › /pricing redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.828">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-9b9c6-pricing-redirects-correctly-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 5: Redirects › /status redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.161">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-b022a--status-redirects-correctly-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 5: Redirects › /careers redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.616">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-2c2a4-careers-redirects-correctly-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 5: Redirects › /product/trap redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.736">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-76e50-ct-trap-redirects-correctly-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 5: Redirects › /product/chat redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.188">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-e642d-ct-chat-redirects-correctly-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 6: Changelog › changelog page: versions start at v0.1.0 and latest is v0.4.2" classname="live-site-content-fixes.spec.ts" time="1.881">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-d3e0b-v0-1-0-and-latest-is-v0-4-2-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 6: Changelog › changelog does not mention v1.0.0 or paid tiers" classname="live-site-content-fixes.spec.ts" time="3.38">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-9b2f4-ention-v1-0-0-or-paid-tiers-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 7: Contact page — no paid tier language › /contact has no Pro plan / Business plan / volume discounts / enterprise deployments" classname="live-site-content-fixes.spec.ts" time="3.207">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-21ba4-unts-enterprise-deployments-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 8: Legal Terms — Section 3 › /legal/terms Section 3 says &quot;No Account Required&quot; not &quot;Account Registration&quot;" classname="live-site-content-fixes.spec.ts" time="3.453">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-56985-d-not-Account-Registration--chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 9: Homepage — no banned content › homepage has no &quot;Trap&quot; or &quot;honeypot&quot; as standalone product" classname="live-site-content-fixes.spec.ts" time="3.249">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-04680-eypot-as-standalone-product-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 9: Homepage — no banned content › homepage prominently features free/open-source messaging" classname="live-site-content-fixes.spec.ts" time="3.11">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-98d22--free-open-source-messaging-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 10: Chinese version /zh-TW — platform tabs › /zh-TW loads and shows all 8 platforms" classname="live-site-content-fixes.spec.ts" time="3.242">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-36a3f-s-and-shows-all-8-platforms-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Journey 10: Chinese version /zh-TW — platform tabs › /zh-TW does not show Trap or Report as standalone products" classname="live-site-content-fixes.spec.ts" time="3.558">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-eb2c1-port-as-standalone-products-chromium/test-finished-1.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>
