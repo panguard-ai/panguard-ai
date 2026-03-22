@@ -9,5 +9,5 @@ export { detectPlatforms, getConfigPath } from './platform-detector.js';
 export type { PlatformId, DetectedPlatform } from './platform-detector.js';
 export { injectMCPConfig, removeMCPConfig, injectAll, getInstallCommand } from './mcp-injector.js';
 export type { InjectionResult } from './mcp-injector.js';
-export { parseMCPServers, resolveSkillDir, discoverAllSkills } from './mcp-config-reader.js';
+export { parseMCPServers, resolveSkillDir, discoverAllSkills, removeServer } from './mcp-config-reader.js';
 export type { MCPServerEntry } from './mcp-config-reader.js';

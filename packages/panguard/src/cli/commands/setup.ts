@@ -298,17 +298,59 @@ export function setupCommand(): Command {
                 );
               }
 
-              // Review flagged (HIGH/CRITICAL) skills interactively
+              // Separate CRITICAL (auto-block) from HIGH (interactive review)
               const flagged = scanResults.filter((r) => r.status === 'flagged');
-              if (flagged.length > 0 && !options.yes) {
-                const userWhitelisted = await reviewFlaggedSkills(flagged);
+              const critical = flagged.filter(
+                (r) => r.audit?.riskLevel === 'CRITICAL'
+              );
+              const high = flagged.filter(
+                (r) => r.audit?.riskLevel === 'HIGH'
+              );
+
+              // Auto-block CRITICAL skills -- no user choice offered
+              if (critical.length > 0) {
+                const { removeServer } = await (import(
+                  '@panguard-ai/panguard-mcp/config' as string
+                ) as Promise<{
+                  removeServer: (platformId: string, serverName: string) => boolean;
+                }>);
+
+                for (const result of critical) {
+                  const removed = removeServer(
+                    result.entry.platformId,
+                    result.entry.name
+                  );
+                  if (removed) {
+                    console.log(
+                      c.red(
+                        `  ${symbols.fail} BLOCKED: ${c.bold(result.entry.name)} is critically dangerous and has been disabled.`
+                      )
+                    );
+                    console.log(
+                      c.dim(
+                        `    Risk score: ${result.audit?.riskScore ?? 0}/100 | Platform: ${result.entry.platformId}`
+                      )
+                    );
+                  } else {
+                    console.log(
+                      c.red(
+                        `  ${symbols.fail} CRITICAL: ${c.bold(result.entry.name)} -- could not auto-remove. Manually disable this skill.`
+                      )
+                    );
+                  }
+                }
+              }
+
+              // Review HIGH skills interactively (not CRITICAL)
+              if (high.length > 0 && !options.yes) {
+                const userWhitelisted = await reviewFlaggedSkills(high);
                 if (userWhitelisted.length > 0) {
                   persistToWhitelist(userWhitelisted, 'manual');
                 }
-              } else if (flagged.length > 0) {
+              } else if (high.length > 0) {
                 console.log(
                   c.yellow(
-                    `  ${symbols.warn} ${flagged.length} flagged skill(s) — run "panguard guard --watch" to review.`
+                    `  ${symbols.warn} ${high.length} HIGH-risk skill(s) -- run "panguard guard --watch" to review.`
                   )
                 );
               }
@@ -334,8 +376,8 @@ export function setupCommand(): Command {
             options.yes ||
             (await promptConfirm({
               message: {
-                en: 'Install Panguard Guard as system service? (auto-start on boot, 24/7 protection)',
-                'zh-TW': '安裝 Panguard Guard 為系統服務？（開機自動啟動，24/7 防護）',
+                en: 'Install Panguard Guard as system service? (recommended, auto-start on boot)',
+                'zh-TW': '安裝 Panguard Guard 為系統服務？（建議安裝，開機自動啟動）',
               },
               defaultValue: true,
               lang: L,
