@@ -48,8 +48,8 @@ export async function actionMCPSetup(lang: Lang): Promise<void> {
       console.log(
         c.dim(
           lang === 'zh-TW'
-            ? '  \u652F\u63F4\u5E73\u53F0: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop'
-            : '  Supported: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, Claude Desktop'
+            ? '  \u652F\u63F4\u5E73\u53F0: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Claude Desktop'
+            : '  Supported: Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Claude Desktop'
         )
       );
       return;
@@ -151,6 +151,10 @@ export async function actionMCPSetup(lang: Lang): Promise<void> {
       nemoclaw: {
         en: 'Close and reopen NemoClaw',
         zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F NemoClaw',
+      },
+      arkclaw: {
+        en: 'Close and reopen ArkClaw',
+        zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F ArkClaw',
       },
     };
     for (const p of unconfigured) {

@@ -2,8 +2,8 @@
  * Platform Detector - Detect installed AI agent runtimes
  * 平台偵測器 - 偵測已安裝的 AI Agent 執行環境
  *
- * Detects Claude Code, Claude Desktop, Cursor, OpenClaw, and Codex.
- * 偵測 Claude Code、Claude Desktop、Cursor、OpenClaw 和 Codex。
+ * Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, and ArkClaw.
+ * 偵測 Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw 和 ArkClaw。
  *
  * @module @panguard-ai/panguard-mcp/config/platform-detector
  */
@@ -16,7 +16,7 @@ import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-mcp:platform-detector');
 
-export type PlatformId = 'claude-code' | 'claude-desktop' | 'cursor' | 'openclaw' | 'codex';
+export type PlatformId = 'claude-code' | 'claude-desktop' | 'cursor' | 'openclaw' | 'codex' | 'workbuddy' | 'nemoclaw' | 'arkclaw';
 
 export interface DetectedPlatform {
   id: PlatformId;
@@ -113,6 +113,21 @@ function getCodexConfigPath(): string {
   return join(homedir(), '.codex', 'mcp.json');
 }
 
+/** Get the MCP config path for WorkBuddy. */
+function getWorkbuddyConfigPath(): string {
+  return join(homedir(), '.workbuddy', '.mcp.json');
+}
+
+/** Get the MCP config path for NemoClaw. */
+function getNemoClawConfigPath(): string {
+  return join(homedir(), '.nemoclaw', 'mcp.json');
+}
+
+/** Get the MCP config path for ArkClaw (ByteDance). */
+function getArkClawConfigPath(): string {
+  return join(homedir(), '.arkclaw', 'mcp.json');
+}
+
 /**
  * Detect all supported AI agent platforms.
  * 偵測所有支援的 AI Agent 平台。
@@ -184,6 +199,44 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
     alreadyConfigured: hasPanguardMCPEntry(codexPath),
   });
 
+  // WorkBuddy
+  const wbPath = getWorkbuddyConfigPath();
+  const wbDetected = (await commandExists('workbuddy')) || existsSync(join(homedir(), '.workbuddy'));
+  platforms.push({
+    id: 'workbuddy',
+    name: 'WorkBuddy',
+    configPath: wbPath,
+    detected: wbDetected,
+    alreadyConfigured: hasPanguardMCPEntry(wbPath),
+  });
+
+  // NemoClaw
+  const ncPath = getNemoClawConfigPath();
+  const ncDetected = (await commandExists('nemoclaw')) || existsSync(join(homedir(), '.nemoclaw'));
+  platforms.push({
+    id: 'nemoclaw',
+    name: 'NemoClaw',
+    configPath: ncPath,
+    detected: ncDetected,
+    alreadyConfigured: hasPanguardMCPEntry(ncPath),
+  });
+
+  // ArkClaw (ByteDance)
+  try {
+    const acCmd = await commandExists('arkclaw');
+    const acDir = existsSync(join(homedir(), '.arkclaw'));
+    if (acCmd || acDir) {
+      const cfgPath = getArkClawConfigPath();
+      platforms.push({
+        id: 'arkclaw',
+        name: 'ArkClaw',
+        configPath: cfgPath,
+        detected: true,
+        alreadyConfigured: hasPanguardMCPEntry(cfgPath),
+      });
+    }
+  } catch { /* not installed */ }
+
   const detected = platforms.filter((p) => p.detected);
   logger.info(
     `Detected ${detected.length} platform(s): ${detected.map((p) => p.name).join(', ') || 'none'}`
@@ -207,5 +260,11 @@ export function getConfigPath(platformId: PlatformId): string {
       return getOpenClawSkillDir();
     case 'codex':
       return getCodexConfigPath();
+    case 'workbuddy':
+      return getWorkbuddyConfigPath();
+    case 'nemoclaw':
+      return getNemoClawConfigPath();
+    case 'arkclaw':
+      return getArkClawConfigPath();
   }
 }
