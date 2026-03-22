@@ -1,17 +1,17 @@
 ---
 title: "Panguard AI"
-sidebarTitle: "Introduction"
-description: "AI Agent 安全的第一個開放標準。61 ATR 偵測規則。一行安裝。100% 免費開源。"
+sidebarTitle: "簡介"
+description: "AI Agent 安全的第一個開放標準。61 條 ATR 偵測規則。一行安裝。100% 免費開源。"
 icon: "shield-check"
 ---
 
 <Note>
-  **v1.3.0 已發布** -- 內建儀表板、8 個 AI 平台支援、技能審計器為預設入口。[查看更新日誌](/changelog)。
+  **v1.3.0 已發布** -- 內建 Dashboard、支援 8 個 AI 平台、Skill Auditor 為預設入口。[查看更新日誌](/changelog)。
 </Note>
 
-Panguard AI 是第一個專為 AI Agent 時代打造的開源安全平台。當 AI Agent 取得系統最高權限，Panguard 提供偵測規則、執行引擎與集體情報網路來守護安全。
+Panguard AI 是第一個專為 AI Agent 時代打造的開源資安平台。當 AI Agent 拿到系統 root 權限存取正式環境，Panguard 提供偵測規則、執行引擎和集體情報網路來把關安全。
 
-**一行指令。全面防護。無需帳號。**
+**一行指令。全面防護。不用註冊帳號。**
 
 ```bash
 curl -fsSL https://get.panguard.ai | bash
@@ -19,16 +19,16 @@ curl -fsSL https://get.panguard.ai | bash
 
 ---
 
-## 關鍵數據
+## 關鍵數字
 
 | | |
 | --- | --- |
-| **61** 偵測規則 | ATR (61) |
+| **61** 條偵測規則 | ATR (61) + 社群貢獻 |
 | **8** 個 AI 平台 | Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw |
 | **3 層** AI 管線 | 規則引擎、本地 AI (Ollama)、雲端 AI (Claude/OpenAI) |
 | **11** 個 MCP 工具 | 掃描、審計、防護、威脅搜尋等 |
-| **8 項檢查**技能審計器 | 安裝前把關每個 AI 技能 |
-| **0** 帳號要求 | 不需登入、不需註冊、不需 API 金鑰即可開始 |
+| **8 項檢查** Skill Auditor | 每個 AI Skill 安裝前都要過關 |
+| **0** 帳號需求 | 不用登入、不用註冊、不用 API key 就能開始 |
 
 ---
 
@@ -36,13 +36,13 @@ curl -fsSL https://get.panguard.ai | bash
 
 <CardGroup cols={3}>
   <Card title="ATR -- 標準" icon="file-code" href="/overview">
-    **61 條規則涵蓋 9 大威脅類別。** AI Agent 威脅的第一個開放標準 -- 提示詞注入、工具投毒、技能入侵、Agent 操縱。YAML 格式，人類可讀，機器可執行。
+    **61 條規則，9 大威脅類別。** AI Agent 威脅偵測的第一個開放標準 -- prompt injection、tool poisoning、skill compromise、agent manipulation。YAML 格式，人看得懂，機器跑得動。
   </Card>
-  <Card title="Threat Cloud -- 網路" icon="globe" href="/products/threat-cloud/overview">
-    **集體免疫。** 每次安裝都貢獻匿名化威脅訊號。管線自動從真實攻擊中生成規則。11 個情報來源。每小時同步。
+  <Card title="Threat Cloud -- 情報網" icon="globe" href="/products/threat-cloud/overview">
+    **集體免疫。** 每個安裝都貢獻匿名化威脅訊號。管線從真實攻擊自動產生規則。11 個情報來源，每小時同步一次。
   </Card>
   <Card title="Guard -- 引擎" icon="shield-halved" href="/products/guard/overview">
-    **4-Agent AI 管線。** 偵測、分析、回應、報告。透過 61 ATR 規則處理 OS 層級事件。內建技能審計器。自動回應封鎖 IP、終止進程、隔離檔案。
+    **4-Agent AI 管線。** Detect、Analyze、Respond、Report。用 61 條 ATR 規則處理 OS 層級事件。內建 Skill Auditor。自動封鎖 IP、終止 process、隔離檔案。
   </Card>
 </CardGroup>
 
@@ -50,7 +50,7 @@ curl -fsSL https://get.panguard.ai | bash
 
 ## 快速開始
 
-安裝、掃描、防護，只需 4 行指令：
+安裝、掃描、防護，4 行指令搞定：
 
 ```bash
 curl -fsSL https://get.panguard.ai | bash
@@ -59,16 +59,16 @@ panguard scan --quick
 panguard guard start --dashboard
 ```
 
-`panguard setup` 自動偵測機器上所有 AI 平台（Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw），並注入正確的 MCP 或原生 Skill 設定。
+`panguard setup` 自動偵測你機器上的所有 AI 平台（Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw），注入正確的 MCP 或原生 Skill 設定。
 
-`panguard guard start --dashboard` 啟動 24/7 防護，並在瀏覽器中開啟本地儀表板 `http://127.0.0.1:9100`。
+`panguard guard start --dashboard` 啟動 24/7 即時防護，並在瀏覽器開啟本地 Dashboard `http://127.0.0.1:9100`。
 
 <CardGroup cols={2}>
   <Card title="逐步快速入門" icon="rocket" href="/quickstart">
-    每個步驟的詳細說明與預期輸出。
+    每一步的詳細說明和預期輸出。
   </Card>
   <Card title="安裝指南" icon="download" href="/installation">
-    macOS、Linux 與 Windows 的平台安裝說明。
+    macOS、Linux、Windows 各平台安裝說明。
   </Card>
 </CardGroup>
 
@@ -82,19 +82,19 @@ panguard guard start --dashboard
     curl -fsSL https://get.panguard.ai | bash && panguard setup
     ```
 
-    一行指令自動偵測並配置所有 8 個支援的 AI 平台：Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw。
+    一行指令自動偵測並設定 8 個支援的 AI 平台：Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw。
   </Tab>
   <Tab title="OpenClaw">
     ```bash
     curl -fsSL https://get.panguard.ai | bash && panguard setup --platform openclaw
     ```
 
-    以原生 **Skill** 形式安裝到 `~/.openclaw/skills/panguard/SKILL.md`。重啟 OpenClaw 後：
+    以原生 **Skill** 安裝到 `~/.openclaw/skills/panguard/SKILL.md`。重啟 OpenClaw 後就能用：
 
     ```
-    > 審計這個專案的 skills
-    > 掃描我的機器是否有漏洞
-    > 啟動即時防護
+    > Audit the skills in this project
+    > Scan my machine for vulnerabilities
+    > Start real-time protection
     ```
   </Tab>
   <Tab title="NemoClaw">
@@ -102,80 +102,80 @@ panguard guard start --dashboard
     curl -fsSL https://get.panguard.ai | bash && panguard setup --platform nemoclaw
     ```
 
-    以 **MCP 伺服器**註冊到 NemoClaw 的設定中。重啟 NemoClaw 即可使用 11 個安全工具。
+    註冊為 NemoClaw 的 **MCP server**。重啟 NemoClaw 就能使用 11 個安全工具。
   </Tab>
   <Tab title="ArkClaw">
     ```bash
     curl -fsSL https://get.panguard.ai | bash && panguard setup --platform arkclaw
     ```
 
-    以 **MCP 伺服器**註冊到 ArkClaw 的設定中。重啟 ArkClaw 即可使用 11 個安全工具。
+    註冊為 ArkClaw 的 **MCP server**。重啟 ArkClaw 就能使用 11 個安全工具。
   </Tab>
 </Tabs>
 
 <Tip>
-  手動配置與疑難排解，請參閱[平台安裝指南](/guides/claw-setup)。
+  手動設定與疑難排解請參閱[平台設定指南](/guides/claw-setup)。
 </Tip>
 
 ---
 
-## Panguard AI 適合誰？
+## 誰適合用 Panguard AI？
 
 <CardGroup cols={3}>
   <Card title="開發者" icon="laptop-code">
-    零配置保護伺服器、VPS 與開發機。一行指令，繼續工作。
+    零設定保護你的 server、VPS、開發機。一行指令裝好，繼續寫 code。
   </Card>
   <Card title="中小企業" icon="building">
-    無需專職團隊即可達到合規等級安全。自動產生 ISO 27001、SOC 2 與台灣資安法稽核報告。
+    不用養資安團隊也能做到合規水準。自動產生 ISO 27001、SOC 2、台灣 TCSA 稽核報告。
   </Card>
   <Card title="MSP" icon="server">
-    透過即時 Guard 防護監控和保護端點。
+    用即時 Guard 防護監控和保護端點。
   </Card>
 </CardGroup>
 
 ---
 
-## 為什麼選擇 Panguard AI？
+## 為什麼選 Panguard AI？
 
-傳統安全工具動輒六位數授權費，需要專職團隊。免費工具雖然存在，但缺乏安全工程師幾乎無法使用。
+傳統資安工具年費動輒六位數，還需要專職團隊操作。免費工具雖然有，但沒資安工程師根本用不起來。
 
-Panguard 採取不同方式：
+Panguard 走不同路線：
 
-- **一行指令安裝** -- 不需設定檔、不需調校、不需術語
-- **白話警報** -- 透過 Telegram、Slack、Email、LINE 以您的語言接收通知
-- **AI 自動判定** -- 系統判斷嚴重性、自動回應、自動報告
-- **持續進化** -- 行為基線自適應您的環境
-- **技能審計器** -- 安裝前把關每個 AI 技能，阻止供應鏈攻擊
-- **100% 免費** -- MIT 授權，無付費版、無功能限制、無付費牆
+- **一行指令安裝** -- 不用寫設定檔、不用調參數、不用看術語
+- **白話警報** -- 透過 Telegram、Slack、Email、LINE 用你看得懂的語言通知
+- **AI 自動研判** -- 系統判斷嚴重程度，自動回應，自動產報告
+- **越用越聰明** -- 行為基線會適應你的環境
+- **Skill Auditor** -- 每個 AI Skill 安裝前都要過審計，擋住供應鏈攻擊
+- **100% 免費** -- MIT 授權，沒有付費版，沒有功能閘門，沒有 paywall
 
 ---
 
 ## 100% 開源
 
-所有功能免費。完整原始碼。零黑箱。每一行都可稽核。
+所有功能免費。完整原始碼。零黑箱。每一行都可以稽核。
 
 <CardGroup cols={2}>
   <Card title="Panguard AI GitHub" icon="github" href="https://github.com/panguard-ai/panguard-ai">
-    Star 專案、瀏覽原始碼、回報問題或貢獻。
+    Star 專案、看原始碼、回報 issue、或送 PR。
   </Card>
-  <Card title="ATR 規則 GitHub" icon="file-code" href="https://github.com/Agent-Threat-Rule/agent-threat-rules">
-    AI Agent 威脅偵測的開放標準。貢獻規則強化集體免疫。
+  <Card title="ATR Rules GitHub" icon="file-code" href="https://github.com/Agent-Threat-Rule/agent-threat-rules">
+    AI Agent 威脅偵測的開放標準。貢獻規則來強化集體免疫。
   </Card>
 </CardGroup>
 
 ---
 
-## 深入探索
+## 深入了解
 
 <CardGroup cols={2}>
   <Card title="產品總覽" icon="shield-check" href="/overview">
-    深入了解三大支柱：ATR、Threat Cloud 和 Guard。
+    深入了解三大支柱：ATR、Threat Cloud、Guard。
   </Card>
   <Card title="CLI 參考" icon="terminal" href="/cli/overview">
-    所有 Panguard CLI 工具的完整指令參考。
+    所有 Panguard CLI 指令的完整參考文件。
   </Card>
   <Card title="API 參考" icon="code" href="/api-reference/overview">
-    Threat Cloud 的 REST API 文件。
+    Threat Cloud REST API 文件。
   </Card>
   <Card title="核心概念" icon="lightbulb" href="/concepts/three-layer-ai">
     了解驅動 Panguard 的三層式 AI 架構。
