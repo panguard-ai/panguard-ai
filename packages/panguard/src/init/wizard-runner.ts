@@ -321,6 +321,10 @@ export async function runInitWizard(
               en: 'Close and reopen NemoClaw',
               zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F NemoClaw',
             },
+            arkclaw: {
+              en: 'Close and reopen ArkClaw',
+              zh: '\u95DC\u9589\u4E26\u91CD\u65B0\u958B\u555F ArkClaw',
+            },
           };
           for (const p of unconfigured) {
             const hint = restartMap[p.id];
