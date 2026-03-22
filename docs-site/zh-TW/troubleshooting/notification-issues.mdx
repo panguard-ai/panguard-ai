@@ -1,62 +1,62 @@
 ---
 title: "通知問題"
-description: "排解 Telegram、Slack、Email 和 Webhook 通知送達問題。"
+description: "排解 Telegram、Slack、Email、Webhook 通知送不到的問題。"
 icon: "bell"
 ---
 
-## 未收到通知
+## 收不到通知
 
-如果任何頻道都未收到通知，請從這些一般檢查開始：
+不管哪個頻道都收不到的話，從這些基本項目開始檢查：
 
 <AccordionGroup>
-  <Accordion title="1. 檢查通知狀態">
+  <Accordion title="1. 看通知狀態">
     ```bash
     panguard chat status
     ```
 
-    這會顯示：
-    - 哪些頻道已啟用
+    會顯示：
+    - 哪些頻道有開
     - 上次成功送達時間
-    - 任何待處理的錯誤
-    - 目前的最低嚴重程度設定
+    - 有沒有 pending 的錯誤
+    - 目前的最低嚴重性設定
   </Accordion>
-  <Accordion title="2. 發送測試通知">
+  <Accordion title="2. 送測試通知">
     ```bash
-    # 測試所有已啟用的頻道
+    # 測試所有開啟的頻道
     panguard chat test
 
     # 測試特定頻道
     panguard chat test --channel telegram
     ```
 
-    如果測試成功但實際通知未送達，問題可能是嚴重程度篩選或冷卻計時器。
+    測試成功但真正的通知沒到，問題可能出在嚴重性門檻或冷卻時間。
   </Accordion>
-  <Accordion title="3. 檢查嚴重程度篩選">
-    通知僅在事件達到或超過設定的最低嚴重程度時發送：
+  <Accordion title="3. 看嚴重性門檻">
+    通知只在事件嚴重性達到或超過設定值時才送：
 
     ```bash
     panguard config get notification.minSeverity
     ```
 
-    如果設定為 `critical`，只有 critical 事件才會觸發通知。降低它：
+    設成 `critical` 的話就只有 critical 事件才會通知。調低一點：
     ```bash
     panguard config set notification.minSeverity medium
     ```
   </Accordion>
-  <Accordion title="4. 檢查冷卻計時器">
-    冷卻機制防止重複通知。如果發生許多類似事件，只有第一個會觸發通知：
+  <Accordion title="4. 看冷卻時間">
+    冷卻機制防止重複通知洗版。短時間內很多類似事件的話，只有第一個會觸發：
 
     ```bash
     panguard config get notification.cooldownMinutes
     ```
 
-    如有需要可以減少：
+    覺得太久可以縮短：
     ```bash
     panguard config set notification.cooldownMinutes 5
     ```
   </Accordion>
-  <Accordion title="5. 重新執行頻道設定">
-    如果以上方法都無法解決問題，重新執行設定：
+  <Accordion title="5. 重跑頻道設定">
+    以上都沒用的話，重跑一次設定：
 
     ```bash
     panguard chat setup telegram
@@ -64,7 +64,7 @@ icon: "bell"
     panguard chat setup slack
     ```
 
-    這會重新驗證憑證並重新加密設定。
+    會重新驗證憑證跟重新加密 config。
   </Accordion>
 </AccordionGroup>
 
@@ -73,52 +73,52 @@ icon: "bell"
 ## Telegram 問題
 
 <AccordionGroup>
-  <Accordion title="無效的 bot token">
+  <Accordion title="Bot token 無效">
     ```
     Error: Telegram API returned 401: Unauthorized
     ```
 
-    Bot token 無效或已被撤銷。
+    Bot token 不對或被撤銷了。
 
-    **解決方案：**
-    1. 在 Telegram 上前往 [@BotFather](https://t.me/BotFather)
-    2. 發送 `/mybots` 並選擇您的 bot
-    3. 如果需要，重新產生 token
-    4. 重新執行設定：
+    **解法：**
+    1. 到 Telegram 找 [@BotFather](https://t.me/BotFather)
+    2. 送 `/mybots` 選你的 bot
+    3. 需要的話重新產生 token
+    4. 重跑設定：
        ```bash
        panguard chat setup telegram
        ```
   </Accordion>
-  <Accordion title="無效的 chat ID">
+  <Accordion title="Chat ID 不對">
     ```
     Error: Telegram API returned 400: Bad Request: chat not found
     ```
 
-    Chat ID 不正確或 bot 尚未被加入群組。
+    Chat ID 錯了或 bot 還沒加進群組。
 
-    **解決方案：**
-    1. 先向您的 bot 發送任何訊息（這是 Telegram 的要求）
-    2. 對於群組聊天，將 bot 加入群組
-    3. 重新執行設定以自動偵測 chat ID：
+    **解法：**
+    1. 先隨便傳一則訊息給你的 bot（Telegram 規定的）
+    2. 群組的話，把 bot 加進去
+    3. 重跑設定讓它自動抓 chat ID：
        ```bash
        panguard chat setup telegram
        ```
   </Accordion>
-  <Accordion title="必須先向 bot 發訊息">
-    Telegram bot 無法主動發起對話。您必須先向 bot 發送訊息，它才能向您發送訊息。
+  <Accordion title="要先傳訊息給 bot">
+    Telegram bot 不能主動發起對話。你必須先傳訊息給 bot，它才能傳訊息給你。
 
-    1. 開啟 Telegram 並透過使用者名稱找到您的 bot
-    2. 發送 `/start` 或任何訊息
-    3. 然後執行：
+    1. 開 Telegram 用 username 找到你的 bot
+    2. 傳 `/start` 或隨便一則訊息
+    3. 然後跑：
        ```bash
        panguard chat test --channel telegram
        ```
   </Accordion>
-  <Accordion title="群組聊天權限">
-    如果 bot 無法向群組發送訊息：
-    1. 確保 bot 是群組的成員
-    2. 如果群組限制了訊息發送，將 bot 設為管理員
-    3. 在 BotFather 中，確認 **Group Privacy** 已停用（`/mybots` > Bot Settings > Group Privacy > Turn off）
+  <Accordion title="群組權限">
+    Bot 沒辦法在群組發訊息的話：
+    1. 確認 bot 是群組成員
+    2. 群組有限制發言的話，把 bot 設成管理員
+    3. 在 BotFather 確認 **Group Privacy** 是關的（`/mybots` > Bot Settings > Group Privacy > Turn off）
   </Accordion>
 </AccordionGroup>
 
@@ -127,19 +127,19 @@ icon: "bell"
 ## Slack 問題
 
 <AccordionGroup>
-  <Accordion title="無效的 webhook URL">
+  <Accordion title="Webhook URL 無效">
     ```
     Error: Slack webhook returned 403: invalid_token
     ```
 
-    Webhook URL 無效、已過期或已被撤銷。
+    Webhook URL 不對、過期或被撤銷了。
 
-    **解決方案：**
-    1. 前往 [api.slack.com/apps](https://api.slack.com/apps)
-    2. 選擇您的 app
-    3. 導覽至 **Incoming Webhooks**
-    4. 建立新的 webhook 或複製現有的 URL
-    5. 重新執行設定：
+    **解法：**
+    1. 到 [api.slack.com/apps](https://api.slack.com/apps)
+    2. 選你的 app
+    3. 到 **Incoming Webhooks**
+    4. 建新的 webhook 或複製現有的 URL
+    5. 重跑設定：
        ```bash
        panguard chat setup slack
        ```
@@ -149,23 +149,23 @@ icon: "bell"
     Error: Slack webhook returned 404: channel_not_found
     ```
 
-    設定的頻道不存在或 webhook 未被授權使用它。
+    設定的頻道不存在或 webhook 沒被授權使用它。
 
-    **解決方案：**
-    - 驗證頻道名稱是否正確（包含 `#` 前綴）
-    - 為目標頻道特別建立新的 webhook
-    - 以正確的頻道重新執行設定：
+    **解法：**
+    - 確認頻道名稱對不對（要帶 `#`）
+    - 針對目標頻道建一個新 webhook
+    - 重跑設定：
       ```bash
       panguard chat setup slack
       ```
   </Accordion>
   <Accordion title="App 權限">
-    如果使用 Slack App（不僅是 incoming webhook），請確保 app 具有這些範圍：
-    - `incoming-webhook` -- 透過 webhook 發布訊息
-    - `chat:write` -- 發布訊息（如果使用 Bot Token）
-    - `chat:write.public` -- 發布到 bot 不是成員的頻道
+    如果用 Slack App（不只是 incoming webhook），確認 app 有這些 scope：
+    - `incoming-webhook` -- 透過 webhook 發訊息
+    - `chat:write` -- 發訊息（用 Bot Token 的話）
+    - `chat:write.public` -- 發到 bot 不在的頻道
 
-    變更範圍後，重新安裝 app 到您的工作區。
+    改了 scope 之後重新安裝 app 到 workspace。
   </Accordion>
 </AccordionGroup>
 
@@ -179,9 +179,9 @@ icon: "bell"
     Error: connect ECONNREFUSED smtp.gmail.com:587
     ```
 
-    - 驗證 SMTP 主機和埠是否正確
-    - 檢查您的防火牆或 ISP 是否封鎖了對外埠 587
-    - 如果 587（TLS）被封鎖，嘗試埠 465（SSL）：
+    - 確認 SMTP host 跟 port 對不對
+    - 看防火牆或 ISP 有沒有擋 port 587
+    - 587（TLS）被擋的話試 465（SSL）：
       ```bash
       panguard config set channels.email.smtp.port 465
       ```
@@ -191,23 +191,23 @@ icon: "bell"
     Error: Invalid login: 535-5.7.8 Username and Password not accepted
     ```
 
-    **對於 Gmail：**
-    - 使用[應用程式密碼](https://support.google.com/accounts/answer/185833)，而非您的帳號密碼
-    - 先在您的 Google 帳號上啟用兩步驟驗證
-    - 在 [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords) 產生應用程式密碼
+    **Gmail 的話：**
+    - 用[應用程式密碼](https://support.google.com/accounts/answer/185833)，不要用帳號密碼
+    - 先在 Google 帳號開兩步驟驗證
+    - 到 [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords) 產生應用程式密碼
 
-    **對於其他提供者：**
-    - 驗證使用者名稱是否正確（通常是完整的 email 地址）
-    - 檢查提供者是否需要 app 專用密碼
-    - 重新執行設定：
+    **其他 provider：**
+    - 確認帳號對不對（通常是完整的 email 地址）
+    - 看 provider 是不是要用 app 專用密碼
+    - 重跑設定：
       ```bash
       panguard chat setup email
       ```
   </Accordion>
-  <Accordion title="Email 進入垃圾郵件">
-    - 將 `alerts@panguard.ai`（或您設定的 `from` 地址）加入您的聯絡人
-    - 如果自架，為您的發送網域設定 SPF、DKIM 和 DMARC 記錄
-    - 使用信譽良好的 SMTP 提供者（SendGrid、AWS SES、Mailgun）
+  <Accordion title="Email 進垃圾郵件">
+    - 把 `alerts@panguard.ai`（或你設定的 `from` 地址）加到聯絡人
+    - 自架的話幫發送 domain 設好 SPF、DKIM、DMARC 紀錄
+    - 用信譽好的 SMTP provider（SendGrid、AWS SES、Mailgun）
   </Accordion>
 </AccordionGroup>
 
@@ -216,19 +216,19 @@ icon: "bell"
 ## Webhook 問題
 
 <AccordionGroup>
-  <Accordion title="連線逾時">
+  <Accordion title="連線 timeout">
     ```
     Error: Webhook request timed out after 10000ms
     ```
 
-    Webhook 端點未在逾時窗口內回應。
+    Webhook endpoint 在 timeout 時間內沒回應。
 
-    - 驗證 URL 是否正確且伺服器可連線
-    - 增加逾時時間：
+    - 確認 URL 對不對、伺服器連不連得到
+    - 拉長 timeout：
       ```bash
       panguard config set channels.webhook.timeout 30000
       ```
-    - 直接測試端點：
+    - 直接測 endpoint：
       ```bash
       curl -X POST YOUR_WEBHOOK_URL \
         -H "Content-Type: application/json" \
@@ -240,10 +240,10 @@ icon: "bell"
     Error: unable to verify the first certificate
     ```
 
-    Webhook 端點使用自簽或無效的 SSL 憑證。
+    Webhook endpoint 用了自簽或無效的 SSL 憑證。
 
-    - 使用有效的 SSL 憑證（Let's Encrypt 是免費的）
-    - 對於內部端點，設定 CA 憑證：
+    - 用有效的 SSL 憑證（Let's Encrypt 免費）
+    - 內部 endpoint 的話設 CA 憑證：
       ```bash
       export NODE_EXTRA_CA_CERTS=/path/to/ca-cert.pem
       ```
@@ -252,19 +252,19 @@ icon: "bell"
 
 ---
 
-## 通知語言錯誤
+## 通知語言不對
 
-如果通知以錯誤的語言送達：
+通知送來的語言不對的話：
 
 ```bash
-# 檢查目前語言
+# 看目前語言設定
 panguard config get preferences.language
 
-# 變更語言
+# 改語言
 panguard chat setup --lang zh-TW
 ```
 
-或重新執行完整設定以重新設定語言偏好：
+或重跑完整設定重新選語言：
 
 ```bash
 panguard chat setup
@@ -273,11 +273,11 @@ panguard chat setup
 支援的語言：
 
 | 代碼 | 語言 |
-|------|----------|
+|------|------|
 | `en` | English |
 | `zh-TW` | 繁體中文 |
 | `ja` | 日本語 |
 
 <Info>
-通知語言與 CLI 語言（`PANGUARD_LANG`）獨立。CLI 語言控制終端輸出，而通知語言控制透過 Chat 頻道發送的訊息內容。
+通知語言跟 CLI 語言（`PANGUARD_LANG`）是分開的。CLI 語言管終端輸出，通知語言管透過通知頻道送出去的訊息內容。
 </Info>
