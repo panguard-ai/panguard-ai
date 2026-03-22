@@ -526,48 +526,22 @@ print_quickstart() {
 }
 
 # ── auto_setup() ──────────────────────────────────────────────
-# Auto-run panguard setup to connect AI agents, then offer skill audit.
+# Automatically run panguard setup to configure AI agents, install Guard,
+# and enable Threat Cloud. No interactive questions -- just do it.
 auto_setup() {
-  if [ ! -e /dev/tty ]; then
-    info "Run 'panguard setup' to connect your AI agents."
-    return
+  echo ""
+  info "Configuring AI agent protection..."
+
+  if panguard setup --yes --skip-scan 2>/dev/null; then
+    echo ""
+    success "Guard is now running. Dashboard: http://127.0.0.1:3100"
+    info "Run 'panguard audit skill .' to audit skills in any project."
+    info "Run 'panguard guard start --dashboard' to open the dashboard."
+  else
+    echo ""
+    warn "Automatic setup encountered an error."
+    info "Run 'panguard setup' manually to configure AI agent protection."
   fi
-
-  echo ""
-  printf "  ${BOLD}Connect to AI agents (Claude Code, Cursor, etc.)?${NC} [Y/n] "
-  read -r answer </dev/tty 2>/dev/null || answer="n"
-  case "$answer" in
-    [nN]*) info "Run 'panguard setup' later to connect AI agents." ;;
-    *)
-      echo ""
-      panguard setup </dev/tty
-      ;;
-  esac
-
-  echo ""
-  printf "  ${BOLD}Audit current directory for AI skill security issues?${NC} [Y/n] "
-  read -r answer </dev/tty 2>/dev/null || answer="n"
-  case "$answer" in
-    [nN]*) info "Run 'panguard audit skill .' later to audit skills." ;;
-    *)
-      echo ""
-      panguard audit skill . </dev/tty
-      ;;
-  esac
-
-  echo ""
-  printf "  ${BOLD}Start Guard with Dashboard? (opens browser)${NC} [Y/n] "
-  read -r answer </dev/tty 2>/dev/null || answer="n"
-  case "$answer" in
-    [nN]*) info "Run 'panguard guard start --dashboard' later to launch." ;;
-    *)
-      echo ""
-      info "Starting Guard with dashboard..."
-      panguard guard start --dashboard </dev/tty &
-      success "Guard started! Dashboard opening in your browser."
-      info "Run 'panguard guard start --dashboard' anytime to restart."
-      ;;
-  esac
 }
 
 # ── Main ─────────────────────────────────────────────────────────
