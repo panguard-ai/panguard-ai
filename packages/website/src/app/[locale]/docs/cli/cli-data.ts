@@ -62,7 +62,7 @@ export const CATEGORIES: CommandCategory[] = [
           { name: '--output <path>', descKey: 'cli.commands.scanCode.flags.output' },
         ],
         example: 'panguard scan code --dir ./src --lang ts --fail-on medium',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'Beta',
       },
       {
@@ -81,7 +81,7 @@ export const CATEGORIES: CommandCategory[] = [
           { name: '--output <path>', descKey: 'cli.commands.code.flags.output' },
         ],
         example: 'panguard code --dir ./src --json',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'Beta',
       },
     ],
@@ -107,7 +107,7 @@ export const CATEGORIES: CommandCategory[] = [
           },
         ],
         example: 'panguard guard start --mode active --dashboard-port 9100',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -115,7 +115,7 @@ export const CATEGORIES: CommandCategory[] = [
         command: 'panguard guard stop',
         descKey: 'cli.commands.guardStop.desc',
         example: 'panguard guard stop',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -124,7 +124,7 @@ export const CATEGORIES: CommandCategory[] = [
         descKey: 'cli.commands.guardStatus.desc',
         flags: [{ name: '--detailed', descKey: 'cli.commands.guardStatus.flags.detailed' }],
         example: 'panguard guard status --detailed',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -132,7 +132,7 @@ export const CATEGORIES: CommandCategory[] = [
         command: 'panguard guard config',
         descKey: 'cli.commands.guardConfig.desc',
         example: 'panguard guard config',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -140,7 +140,7 @@ export const CATEGORIES: CommandCategory[] = [
         command: 'panguard guard install',
         descKey: 'cli.commands.guardInstall.desc',
         example: 'panguard guard install',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
     ],
@@ -157,7 +157,7 @@ export const CATEGORIES: CommandCategory[] = [
           { name: '--lang <code>', descKey: 'cli.commands.chatSetup.flags.lang', default: 'en' },
         ],
         example: 'panguard chat setup --channel telegram',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -166,7 +166,7 @@ export const CATEGORIES: CommandCategory[] = [
         descKey: 'cli.commands.chatTest.desc',
         flags: [{ name: '--channel <type>', descKey: 'cli.commands.chatTest.flags.channel' }],
         example: 'panguard chat test --channel slack',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -174,7 +174,7 @@ export const CATEGORIES: CommandCategory[] = [
         command: 'panguard chat status',
         descKey: 'cli.commands.chatStatus.desc',
         example: 'panguard chat status',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -187,7 +187,7 @@ export const CATEGORIES: CommandCategory[] = [
           { name: '--weekly <on|off>', descKey: 'cli.commands.chatPrefs.flags.weekly' },
         ],
         example: 'panguard chat prefs --critical on --daily off',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
     ],
@@ -204,7 +204,7 @@ export const CATEGORIES: CommandCategory[] = [
           { name: '--no-cloud', descKey: 'cli.commands.trapStart.flags.noCloud' },
         ],
         example: 'panguard trap start --services ssh,http,mysql',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -212,7 +212,7 @@ export const CATEGORIES: CommandCategory[] = [
         command: 'panguard trap stop',
         descKey: 'cli.commands.trapStop.desc',
         example: 'panguard trap stop',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -220,7 +220,7 @@ export const CATEGORIES: CommandCategory[] = [
         command: 'panguard trap status',
         descKey: 'cli.commands.trapStatus.desc',
         example: 'panguard trap status',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -228,7 +228,7 @@ export const CATEGORIES: CommandCategory[] = [
         command: 'panguard trap intel',
         descKey: 'cli.commands.trapIntel.desc',
         example: 'panguard trap intel',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
     ],
@@ -255,7 +255,7 @@ export const CATEGORIES: CommandCategory[] = [
           { name: '--org <name>', descKey: 'cli.commands.reportGenerate.flags.org' },
         ],
         example: 'panguard report generate --framework iso27001 --org "My Corp"',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -263,7 +263,7 @@ export const CATEGORIES: CommandCategory[] = [
         command: 'panguard report summary',
         descKey: 'cli.commands.reportSummary.desc',
         example: 'panguard report summary',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -288,7 +288,7 @@ export const CATEGORIES: CommandCategory[] = [
           { name: '--host <host>', descKey: 'cli.commands.serve.flags.host', default: '127.0.0.1' },
         ],
         example: 'panguard serve --port 3000',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -304,7 +304,7 @@ export const CATEGORIES: CommandCategory[] = [
           { name: '--api-key <key>', descKey: 'cli.commands.managerStart.flags.apiKey' },
         ],
         example: 'panguard manager start --port 8443',
-        tier: 'Enterprise',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -312,7 +312,7 @@ export const CATEGORIES: CommandCategory[] = [
         command: 'panguard manager agents',
         descKey: 'cli.commands.managerAgents.desc',
         example: 'panguard manager agents',
-        tier: 'Enterprise',
+        tier: 'Free',
         maturity: 'GA',
       },
       {
@@ -327,7 +327,7 @@ export const CATEGORIES: CommandCategory[] = [
           },
         ],
         example: 'panguard threat start --port 8080',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
     ],
@@ -395,7 +395,7 @@ export const CATEGORIES: CommandCategory[] = [
         descKey: 'cli.commands.deploy.desc',
         flags: [{ name: '--dry-run', descKey: 'cli.commands.deploy.flags.dryRun' }],
         example: 'panguard deploy --dry-run',
-        tier: 'Pro',
+        tier: 'Free',
         maturity: 'GA',
       },
       {

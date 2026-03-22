@@ -33,36 +33,24 @@ interface Incident {
 const services: Service[] = [
   {
     name: 'Panguard Guard \u2014 Skill Monitoring',
-    status: 'beta',
+    status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },
   {
     name: 'Panguard Scan \u2014 Security Audits',
-    status: 'beta',
+    status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },
   {
-    name: 'Panguard Chat \u2014 AI Copilot',
-    status: 'beta',
+    name: 'Panguard Skill Auditor \u2014 Pre-Install Analysis',
+    status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },
   {
-    name: 'Panguard Trap \u2014 Honeypot System',
-    status: 'beta',
-    uptime: 0,
-    uptimeHistory: [],
-  },
-  {
-    name: 'Panguard Report \u2014 Compliance Engine',
-    status: 'beta',
-    uptime: 0,
-    uptimeHistory: [],
-  },
-  {
-    name: 'Dashboard & Web App',
+    name: 'Threat Cloud \u2014 Collective Defense',
     status: 'operational',
     uptime: 0,
     uptimeHistory: [],
@@ -75,7 +63,7 @@ const services: Service[] = [
   },
   {
     name: 'Threat Intelligence Feed',
-    status: 'beta',
+    status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },

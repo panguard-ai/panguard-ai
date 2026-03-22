@@ -247,7 +247,7 @@
           "label": "每月費用",
           "diy": "$0（但賠上你的時間）",
           "consultant": "NT$60,000+",
-          "panguard": "免費開始"
+          "panguard": "完全免費"
         },
         "monitoring": {
           "label": "24/7 監控",
@@ -291,7 +291,7 @@
     "showMuscle": {
       "team": {
         "overline": "你得到的",
-        "title": "一行指令，五個 AI 資安專家上線。",
+        "title": "一行指令，四個 AI 資安專家上線。",
         "subtitle": "同樣配置的真人團隊年薪超過 NT$600 萬。Panguard 完全免費。",
         "roles": [
           {
@@ -5438,7 +5438,7 @@
       "items": {
         "prompt-injection": {
           "name": "提示詞注入",
-          "count": "21 條規則",
+          "count": "22 條規則",
           "desc": "直接和間接提示詞注入、越獄攻擊、系統提示詞覆寫、多輪攻擊"
         },
         "tool-poisoning": {
