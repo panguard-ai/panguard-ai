@@ -19,7 +19,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "panguard": "./dist/cli/index.js"
+    "panguard": "./bin/panguard.cjs"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -29,6 +29,7 @@
   },
   "files": [
     "dist",
+    "bin",
     "package.json",
     "README.md"
   ],
