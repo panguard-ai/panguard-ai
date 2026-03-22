@@ -3,8 +3,9 @@ aptPkgs = ["libatomic1"]
 
 [phases.build]
 cmds = [
-  "sed -i 's/\"workspace:\\*\"/\"*\"/g' package.json",
-  "npm install",
+  "sed -i 's/\"workspace:\\*\"/\"^1.1.0\"/g' package.json",
+  "rm -f pnpm-lock.yaml pnpm-workspace.yaml",
+  "npm install --install-strategy=nested",
   "rm -rf dist tsconfig.tsbuildinfo",
   "npx tsc --build --force"
 ]
