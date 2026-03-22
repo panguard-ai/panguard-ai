@@ -353,7 +353,7 @@ if (-not $verified) {
 Write-Host ""
 Write-Info "Connecting to AI agents..."
 try {
-    panguard setup 2>$null
+    panguard setup --yes --skip-guard 2>$null
 } catch {
     Write-Warn "Setup skipped. Run 'panguard setup' manually."
 }

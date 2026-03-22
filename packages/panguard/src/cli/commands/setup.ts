@@ -432,7 +432,7 @@ export function setupCommand(): Command {
 
                 // ── Threat Cloud opt-in ──
                 console.log();
-                const enableTC = await promptConfirm({
+                const enableTC = options.yes || await promptConfirm({
                   message: {
                     en: 'Enable Threat Cloud collective defense?',
                     'zh-TW': '啟用 Threat Cloud 集體防禦？',
