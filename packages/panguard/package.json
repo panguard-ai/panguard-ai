@@ -38,7 +38,7 @@
     "typecheck": "tsc --noEmit",
     "dev": "tsc --build --watch",
     "prepublishOnly": "pnpm run build",
-    "postinstall": "node -e \"console.log('\\n  Run: panguard setup\\n  to connect with Claude Code, Cursor, or other AI agents.\\n')\""
+    "postinstall": "node -e \"console.log('\\n  Panguard AI v' + require('./package.json').version + ' installed.\\n  Run: panguard setup\\n  to auto-configure AI agent protection.\\n')\""
   },
   "dependencies": {
     "@panguard-ai/atr": "workspace:*",
