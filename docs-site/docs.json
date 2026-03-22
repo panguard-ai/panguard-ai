@@ -32,7 +32,6 @@
               "concepts/three-layer-ai",
               "concepts/learning-mode",
               "concepts/security-score",
-              "concepts/authentication",
               "concepts/threat-intelligence",
               "concepts/architecture"
             ]
@@ -63,7 +62,6 @@
             "group": "Troubleshooting",
             "pages": [
               "troubleshooting/common-issues",
-              "troubleshooting/auth-issues",
               "troubleshooting/guard-issues",
               "troubleshooting/notification-issues"
             ]
@@ -104,8 +102,7 @@
               "products/chat/overview",
               "products/chat/telegram",
               "products/chat/slack",
-              "products/chat/email-webhook",
-              "products/chat/user-roles"
+              "products/chat/email-webhook"
             ]
           },
           {
@@ -120,14 +117,6 @@
             "pages": [
               "products/mcp/overview",
               "products/mcp/tools-reference"
-            ]
-          },
-          {
-            "group": "Panguard Manager",
-            "pages": [
-              "products/manager/overview",
-              "products/manager/agent-lifecycle",
-              "products/manager/policy-engine"
             ]
           },
           {
@@ -168,7 +157,6 @@
             "group": "System",
             "pages": [
               "cli/init",
-              "cli/deploy",
               "cli/status",
               "cli/config",
               "cli/doctor",
@@ -176,17 +164,8 @@
             ]
           },
           {
-            "group": "Authentication",
-            "pages": [
-              "cli/login",
-              "cli/logout",
-              "cli/whoami"
-            ]
-          },
-          {
             "group": "Advanced",
             "pages": [
-              "cli/manager",
               "cli/threat"
             ]
           }
@@ -199,25 +178,6 @@
             "group": "API Reference",
             "pages": [
               "api-reference/overview"
-            ]
-          },
-          {
-            "group": "Auth API",
-            "pages": [
-              "api-reference/auth/registration",
-              "api-reference/auth/login",
-              "api-reference/auth/sessions",
-              "api-reference/auth/gdpr"
-            ]
-          },
-          {
-            "group": "Manager API",
-            "pages": [
-              "api-reference/manager/authentication",
-              "api-reference/manager/agents",
-              "api-reference/manager/events",
-              "api-reference/manager/policy",
-              "api-reference/manager/dashboard"
             ]
           },
           {

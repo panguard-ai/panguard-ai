@@ -20,7 +20,6 @@ doctor 指令檢查以下範圍：
 | --- | --- |
 | **Installation** | 二進位檔完整性、版本更新狀態、相依套件 |
 | **Configuration** | 設定檔有效性、必要欄位、路徑權限 |
-| **Authentication** | Token 有效性、API 端點可達性 |
 | **Guard** | 服務狀態、日誌檔健康、資源使用 |
 | **Network** | 與 Panguard Cloud 的連線、DNS 解析、防火牆規則 |
 | **Permissions** | 檔案擁有權、目錄存取、提升權限需求 |
@@ -42,13 +41,12 @@ Panguard Doctor v1.2.0
 
 [PASS] Installation: binary intact, version 1.2.0 (latest)
 [PASS] Configuration: ~/.panguard/config.yaml valid
-[PASS] Authentication: logged in as user@example.com (MIT)
 [WARN] Guard: not running -- start with 'panguard guard start'
 [PASS] Network: cloud API reachable (latency 45ms)
 [PASS] Permissions: all directories accessible
 [FAIL] Disk Space: /var/log/panguard has only 200MB free (minimum 500MB)
 
-1 failure, 1 warning, 5 passed
+1 failure, 1 warning, 4 passed
 ```
 
 <Tip>
@@ -66,8 +64,5 @@ Panguard Doctor v1.2.0
   </Card>
   <Card title="Guard 疑難排解" icon="shield" href="/troubleshooting/guard-issues">
     Guard 代理問題的專門疑難排解。
-  </Card>
-  <Card title="身份驗證疑難排解" icon="key" href="/troubleshooting/auth-issues">
-    修復身份驗證和登入問題。
   </Card>
 </CardGroup>

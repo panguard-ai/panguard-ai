@@ -20,7 +20,6 @@ The doctor command inspects the following areas:
 | --- | --- |
 | **Installation** | Binary integrity, version currency, dependencies |
 | **Configuration** | Config file validity, required fields, path permissions |
-| **Authentication** | Token validity, API endpoint reachability |
 | **Guard** | Service status, log file health, resource usage |
 | **Network** | Connectivity to Panguard Cloud, DNS resolution, firewall rules |
 | **Permissions** | File ownership, directory access, elevated privilege requirements |
@@ -42,13 +41,12 @@ Panguard Doctor v1.2.0
 
 [PASS] Installation: binary intact, version 1.2.0 (latest)
 [PASS] Configuration: ~/.panguard/config.yaml valid
-[PASS] Authentication: logged in as user@example.com (MIT)
 [WARN] Guard: not running -- start with 'panguard guard start'
 [PASS] Network: cloud API reachable (latency 45ms)
 [PASS] Permissions: all directories accessible
 [FAIL] Disk Space: /var/log/panguard has only 200MB free (minimum 500MB)
 
-1 failure, 1 warning, 5 passed
+1 failure, 1 warning, 4 passed
 ```
 
 <Tip>
@@ -66,8 +64,5 @@ Panguard Doctor v1.2.0
   </Card>
   <Card title="Guard Troubleshooting" icon="shield" href="/troubleshooting/guard-issues">
     Specific troubleshooting for Guard agent issues.
-  </Card>
-  <Card title="Auth Troubleshooting" icon="key" href="/troubleshooting/auth-issues">
-    Fix authentication and login problems.
   </Card>
 </CardGroup>

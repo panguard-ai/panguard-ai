@@ -53,67 +53,6 @@ Guard uses a three-layer AI system. At minimum, configure `OLLAMA_ENDPOINT` for 
 
 ---
 
-## Panguard Manager
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `MANAGER_PORT` | `8443` | HTTPS port for the Manager API |
-| `MANAGER_AUTH_TOKEN` | -- | **Required.** Shared authentication token for API access |
-| `MANAGER_MAX_AGENTS` | `100` | Maximum number of agents that can register |
-| `MANAGER_HEARTBEAT_TIMEOUT_MS` | `120000` | Milliseconds before an agent is marked stale |
-| `CORS_ALLOWED_ORIGINS` | -- | Comma-separated list of allowed CORS origins |
-
-<CodeGroup>
-```bash Linux / macOS
-export MANAGER_PORT=8443
-export MANAGER_AUTH_TOKEN=$(openssl rand -hex 32)
-export MANAGER_MAX_AGENTS=100
-export MANAGER_HEARTBEAT_TIMEOUT_MS=120000
-export CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai
-```
-
-```bash Docker
-docker run -d \
-  -e MANAGER_PORT=8443 \
-  -e MANAGER_AUTH_TOKEN=your-secure-token \
-  -e MANAGER_MAX_AGENTS=100 \
-  -e CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai \
-  panguard/manager
-```
-</CodeGroup>
-
-<Warning>
-`MANAGER_AUTH_TOKEN` is required and must be set before starting the Manager. Use a strong, random value of at least 32 characters. The same token must be configured on all agents connecting to this Manager.
-</Warning>
-
----
-
-## Panguard Auth Server
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PANGUARD_PORT` | `3000` | HTTP port for the Auth Server |
-| `JWT_SECRET` | -- | **Required.** Secret key for signing JWT tokens |
-| `GOOGLE_CLIENT_ID` | -- | Google OAuth client ID (for social login) |
-| `GOOGLE_CLIENT_SECRET` | -- | Google OAuth client secret |
-
-<CodeGroup>
-```bash Linux / macOS
-export PANGUARD_PORT=3000
-export JWT_SECRET=$(openssl rand -hex 64)
-
-# Optional: Google OAuth
-export GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-export GOOGLE_CLIENT_SECRET=your-client-secret
-```
-</CodeGroup>
-
-<Warning>
-`JWT_SECRET` must be a strong, random value. If it is compromised, all issued tokens can be forged. Rotate it immediately if exposure is suspected -- this will invalidate all active sessions.
-</Warning>
-
----
-
 ## Panguard Threat Cloud
 
 | Variable | Default | Description |
@@ -153,21 +92,6 @@ Setting `NODE_ENV=production`:
 <CodeGroup>
 ```yaml docker-compose.yml
 services:
-  manager:
-    image: panguard/manager
-    environment:
-      - NODE_ENV=production
-      - MANAGER_PORT=8443
-      - MANAGER_AUTH_TOKEN=${MANAGER_AUTH_TOKEN}
-      - CORS_ALLOWED_ORIGINS=https://dashboard.panguard.ai
-
-  auth:
-    image: panguard/auth
-    environment:
-      - NODE_ENV=production
-      - PANGUARD_PORT=3000
-      - JWT_SECRET=${JWT_SECRET}
-
   threat-cloud:
     image: panguard/threat-cloud
     environment:

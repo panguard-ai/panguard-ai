@@ -1,46 +1,34 @@
 ---
 title: "API Overview"
-description: "Panguard AI exposes three REST API services for authentication, fleet management, and threat intelligence."
+description: "Panguard AI exposes the Threat Cloud REST API for threat intelligence."
 icon: "code"
 ---
 
-Panguard AI provides three independent API services. Each service runs on its own port and handles a distinct domain of functionality.
+Panguard AI provides the Threat Cloud API for community-driven threat intelligence. No accounts or login required -- Panguard is 100% free and open source.
 
-## API Services
+## API Service
 
-<CardGroup cols={3}>
-  <Card title="Auth Server API" icon="user-shield">
-    **Port 3000** -- User registration, login, sessions, TOTP two-factor, and GDPR compliance.
-  </Card>
-  <Card title="Manager API" icon="server">
-    **Port 8443** -- Agent registration, heartbeats, threat event ingestion, policy management, SSE streaming, and fleet dashboard.
-  </Card>
+<CardGroup cols={1}>
   <Card title="Threat Cloud API" icon="cloud">
     **Configurable port** -- IoC management, threat feeds, campaign tracking, MITRE heatmaps, geographic queries, and audit logs.
   </Card>
 </CardGroup>
 
-## Base URLs
+## Base URL
 
 | Service | Default Base URL | TLS |
 |---------|-----------------|-----|
-| Auth Server | `http://localhost:3000` or `http://localhost:3000` | Optional (recommended) |
-| Manager | `https://localhost:8443` | Self-signed by default |
 | Threat Cloud | `https://tc.panguard.ai` or `http://localhost:PORT` | Optional |
 
 ## Authentication
 
-All authenticated endpoints require a **Bearer token** in the `Authorization` header.
+Threat Cloud endpoints that require authentication use an **API key** in the `Authorization` header.
 
 ```bash
-curl -X GET https://localhost:8443/api/agents \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
+curl -X GET https://tc.panguard.ai/api/iocs \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json"
 ```
-
-<Info>
-The Manager API uses a shared static token configured via the `MANAGER_AUTH_TOKEN` environment variable. The Auth Server API issues JWT tokens on login.
-</Info>
 
 ## Common Response Format
 
@@ -70,12 +58,10 @@ Every API endpoint returns a consistent JSON envelope:
 
 ## Rate Limiting
 
-All API services enforce rate limiting to protect against abuse.
+The API enforces rate limiting to protect against abuse.
 
 | Service | Default Limit | Scope |
 |---------|--------------|-------|
-| Auth Server | 20 req/min | Per IP |
-| Manager API | 60 req/min | Per IP |
 | Threat Cloud | Varies by endpoint | Per API key |
 
 When rate-limited, the API returns a `429` status code with a `Retry-After` header indicating when to retry.
@@ -127,12 +113,6 @@ Paginated responses include metadata:
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Auth API" icon="user-plus" href="/api-reference/auth/registration">
-    Register users and manage authentication.
-  </Card>
-  <Card title="Manager API" icon="lock" href="/api-reference/manager/authentication">
-    Manage your agent fleet and policies.
-  </Card>
   <Card title="Threat Cloud API" icon="crosshairs" href="/api-reference/threat-cloud/ioc">
     Query and submit threat intelligence.
   </Card>

@@ -44,11 +44,9 @@ export default function Footer() {
       title: t('company'),
       links: [
         { label: t('about'), href: '/about' },
-        { label: t('careers'), href: '/careers' },
         { label: t('blog'), href: '/blog' },
         { label: t('contact'), href: '/contact' },
         { label: t('changelog'), href: '/changelog' },
-        { label: t('statusPage'), href: '/status' },
       ],
     },
     {
@@ -73,7 +71,6 @@ export default function Footer() {
         { label: t('privacyPolicy'), href: '/legal/privacy' },
         { label: t('termsOfService'), href: '/legal/terms' },
         { label: t('cookiePolicy'), href: '/legal/cookies' },
-        { label: t('securityWhitepaper'), href: '/legal/security' },
         { label: t('trustCenter'), href: '/trust' },
       ],
     },

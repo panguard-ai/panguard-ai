@@ -60,11 +60,12 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
             1. Information We Collect
           </h2>
 
-          <h3 className="text-base font-medium text-text-primary mb-2">1.1 Account Information</h3>
+          <h3 className="text-base font-medium text-text-primary mb-2">1.1 No Personal Information Required</h3>
           <p>
-            When you register for a Panguard account, we collect your name and email address.
-            Panguard is free and open-source software — we do not collect payment information or
-            billing addresses.
+            Panguard does not require account registration. We do not collect personal information
+            to use the software. Panguard is a free, open source CLI tool that runs locally on your
+            machine -- no name, email address, payment information, or any other personal data is
+            needed.
           </p>
 
           <h3 className="text-base font-medium text-text-primary mt-4 mb-2">
@@ -125,7 +126,7 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
             <li>
               <strong className="text-text-primary">Service Providers:</strong> We engage trusted
               third-party service providers who perform services on our behalf, such as cloud
-              hosting (infrastructure providers), payment processing, and customer support tools.
+              hosting (infrastructure providers) and website analytics.
               These providers are contractually obligated to protect your data and may only use it
               to perform services for us.
             </li>
@@ -151,11 +152,11 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
         <section>
           <h2 className="text-lg font-semibold text-text-primary mb-3">4. Data Retention</h2>
           <p>
-            We retain your personal information for as long as your account is active or as needed
-            to provide you services. Account information is retained for up to 12 months after
-            account closure for legal and audit purposes. Anonymized telemetry and threat data may
-            be retained indefinitely as it cannot be linked to individual users. You may request
-            deletion of your account data at any time by contacting us at privacy@panguard.ai.
+            Panguard does not maintain user accounts or store personal information. Anonymized
+            telemetry and threat data may be retained indefinitely as it cannot be linked to
+            individual users. If you have voluntarily provided contact information (for example,
+            by emailing our support team), you may request deletion of that data at any time by
+            contacting us at privacy@panguard.ai.
           </p>
         </section>
 

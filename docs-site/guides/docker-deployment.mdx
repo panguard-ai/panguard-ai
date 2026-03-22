@@ -104,55 +104,31 @@ docker compose logs -f panguard
 
 ---
 
-## Docker Compose: Full Stack (Auth + Manager + Guard + Ollama)
+## Docker Compose: Full Stack (Guard + Ollama + Threat Cloud)
 
-This configuration runs the complete Panguard platform with authentication, fleet management, and local AI.
+This configuration runs the complete Panguard platform with Guard protection and local AI.
 
 ```yaml
 # docker-compose.full.yml
 services:
-  panguard-auth:
+  panguard:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: panguard-auth
+    container_name: panguard
     restart: unless-stopped
     ports:
       - '3000:3000'
     volumes:
-      - auth-data:/data
+      - panguard-data:/data
       - ./config:/app/config:ro
     environment:
       - PANGUARD_DATA_DIR=/data
       - PANGUARD_PORT=3000
-      - JWT_SECRET=your-secret-key-here
-      - GOOGLE_CLIENT_ID=your-google-client-id
-      - GOOGLE_CLIENT_SECRET=your-google-client-secret
-      - MANAGER_URL=http://panguard-manager:8443
-      - MANAGER_AUTH_TOKEN=your-manager-token
       - OLLAMA_ENDPOINT=http://ollama:11434
     depends_on:
-      panguard-manager:
-        condition: service_started
       ollama:
         condition: service_healthy
-    networks:
-      - panguard-net
-
-  panguard-manager:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: panguard-manager
-    command: ["node", "dist/cli/index.js", "manager", "--port", "8443"]
-    restart: unless-stopped
-    ports:
-      - '8443:8443'
-    environment:
-      - MANAGER_PORT=8443
-      - MANAGER_AUTH_TOKEN=your-manager-token
-      - MANAGER_MAX_AGENTS=500
-      - CORS_ALLOWED_ORIGINS=http://localhost:3000
     networks:
       - panguard-net
 
@@ -174,7 +150,7 @@ services:
       start_period: 30s
 
 volumes:
-  auth-data:
+  panguard-data:
   ollama-models:
 
 networks:
@@ -192,8 +168,7 @@ docker compose -f docker-compose.full.yml up -d
 
 | Port | Service | Protocol | Notes |
 | --- | --- | --- | --- |
-| `3000` | API Server (Auth + Web) | HTTP | Main entry point |
-| `8443` | Manager Server | HTTP | Agent registration, heartbeats, SSE |
+| `3000` | API Server | HTTP | Main entry point |
 | `11434` | Ollama | HTTP | Local AI inference |
 | `2222` | Trap: SSH Honeypot | TCP | Default SSH trap port |
 | `8080` | Trap: HTTP Honeypot | TCP | Default HTTP trap port |
@@ -218,22 +193,11 @@ docker compose -f docker-compose.full.yml up -d
 | `OPENAI_API_KEY` | (none) | OpenAI API key for cloud AI |
 | `ABUSEIPDB_KEY` | (none) | AbuseIPDB API key for threat intel |
 
-### Auth Server
+### API Server
 
 | Variable | Default | Description |
 | --- | --- | --- |
 | `PANGUARD_PORT` | `3000` | API server port |
-| `JWT_SECRET` | (none) | JWT signing secret (required in production) |
-| `GOOGLE_CLIENT_ID` | (none) | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | (none) | Google OAuth client secret |
-
-### Manager
-
-| Variable | Default | Description |
-| --- | --- | --- |
-| `MANAGER_PORT` | `8443` | Manager HTTP server port |
-| `MANAGER_AUTH_TOKEN` | (none) | Bearer token for API authentication |
-| `MANAGER_MAX_AGENTS` | `500` | Maximum registered agents |
 
 <Warning>
 Never pass secrets via the `environment` key in production Compose files. Use `env_file` with restricted permissions instead:
@@ -306,7 +270,6 @@ The ReportAgent handles log rotation automatically:
 Back up these critical files regularly:
 
 - **Baseline data** (`/data/baseline.json`) -- Loss requires re-running learning mode
-- **Auth database** (`auth.db`) -- Back up daily with `sqlite3 auth.db ".backup backup.db"`
 - **Threat Cloud database** -- Back up the SQLite database on schedule
 - **Configuration** -- Store config and env files in version control or a secrets manager
 </Tip>

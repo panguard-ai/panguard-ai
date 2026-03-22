@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next';
 import { blogPosts } from '@/data/blog-posts';
-import { caseStudies } from '@/data/case-studies';
 
 const locales = ['en', 'zh-TW'] as const;
 
@@ -19,9 +18,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/product/report',
     '/product/skill-auditor',
     '/integrations',
-    '/pricing',
-    '/early-access',
-    '/demo',
     '/security',
     '/technology',
     '/how-it-works',
@@ -31,8 +27,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/company',
     '/contact',
     '/solutions/developers',
-    '/solutions/smb',
-    '/solutions/enterprise',
     '/blog',
     '/docs',
     '/docs/api',
@@ -48,29 +42,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/docs/cli',
     '/docs/benchmark',
     '/compare',
-    '/product/manager',
     '/product/mcp',
     '/compliance',
-    '/customers',
-    '/careers',
     '/changelog',
     '/resources',
-    '/partners',
     '/press',
-    '/status',
     '/trust',
     '/legal/privacy',
     '/legal/terms',
     '/legal/cookies',
-    '/legal/dpa',
-    '/legal/sla',
     '/legal/acceptable-use',
     '/legal/responsible-disclosure',
-    '/legal/security',
   ];
 
   const getFrequency = (path: string): 'weekly' | 'monthly' => {
-    if (path === '/' || path === '/blog' || path === '/changelog' || path === '/status')
+    if (path === '/' || path === '/blog' || path === '/changelog')
       return 'weekly';
     return 'monthly';
   };
@@ -79,7 +65,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     if (path === '/') return 1.0;
     if (path.startsWith('/product') || path === '/integrations') return 0.8;
     if (path === '/how-it-works' || path === '/threat-cloud' || path === '/about') return 0.8;
-    if (path === '/blog' || path === '/docs' || path === '/pricing') return 0.7;
+    if (path === '/blog' || path === '/docs') return 0.7;
     return 0.6;
   };
 
@@ -117,19 +103,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 
-  const caseStudyEntries = locales.flatMap((locale) =>
-    caseStudies.map((cs) => ({
-      url: localeUrl(locale, `/customers/${cs.slug}`),
-      lastModified: stableDate,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-      alternates: {
-        languages: Object.fromEntries(
-          locales.map((l) => [l, localeUrl(l, `/customers/${cs.slug}`)])
-        ),
-      },
-    }))
-  );
-
-  return [...staticEntries, ...blogEntries, ...caseStudyEntries];
+  return [...staticEntries, ...blogEntries];
 }
