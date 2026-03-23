@@ -61,9 +61,9 @@ afterAll(() => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('All supported platforms registered', () => {
-  it('detectPlatforms returns exactly 5 platforms', async () => {
+  it('detectPlatforms returns exactly 7 platforms', async () => {
     const platforms = await detectPlatforms();
-    expect(platforms).toHaveLength(5);
+    expect(platforms).toHaveLength(7);
   });
 
   it('includes all expected platform IDs', async () => {
@@ -76,6 +76,8 @@ describe('All supported platforms registered', () => {
       'cursor',
       'openclaw',
       'codex',
+      'workbuddy',
+      'nemoclaw',
     ];
 
     for (const id of expectedIds) {
@@ -84,7 +86,7 @@ describe('All supported platforms registered', () => {
   });
 
   it('getConfigPath returns valid path for all platforms', () => {
-    const allIds: PlatformId[] = ['claude-code', 'claude-desktop', 'cursor', 'openclaw', 'codex'];
+    const allIds: PlatformId[] = ['claude-code', 'claude-desktop', 'cursor', 'openclaw', 'codex', 'workbuddy', 'nemoclaw'];
 
     for (const id of allIds) {
       const configPath = getConfigPath(id);

@@ -332,7 +332,13 @@ describe('runScan - orchestrator', () => {
     expect(firewallFinding).toBeDefined();
     expect(firewallFinding!.manualFix).toBeDefined();
     expect(firewallFinding!.manualFix!.length).toBeGreaterThan(0);
-    expect(firewallFinding!.manualFix).toContain('sudo ufw enable');
+    // Platform-aware: macOS uses socketfilterfw, Linux uses ufw
+    const isLinux = process.platform === 'linux';
+    if (isLinux) {
+      expect(firewallFinding!.manualFix).toContain('sudo ufw enable');
+    } else {
+      expect(firewallFinding!.manualFix!.some((cmd) => cmd.includes('socketfilterfw'))).toBe(true);
+    }
   });
 
   it('should enrich password-category findings with fallback manual fix', async () => {
@@ -598,7 +604,9 @@ describe('runScan - orchestrator', () => {
     const finding = result.findings.find((f) => f.id === 'DISC-dangerousPorts');
     expect(finding).toBeDefined();
     expect(finding!.manualFix).toBeDefined();
-    expect(finding!.manualFix!.some((cmd) => cmd.includes('ufw deny'))).toBe(true);
+    // Platform-aware: macOS uses pfctl, Linux uses ufw
+    const expected = process.platform === 'darwin' ? 'pfctl' : 'ufw deny';
+    expect(finding!.manualFix!.some((cmd) => cmd.includes(expected))).toBe(true);
   });
 
   it('should attach manual fix for noUpdates risk factor', async () => {
@@ -611,7 +619,9 @@ describe('runScan - orchestrator', () => {
     const finding = result.findings.find((f) => f.id === 'DISC-noUpdates');
     expect(finding).toBeDefined();
     expect(finding!.manualFix).toBeDefined();
-    expect(finding!.manualFix!.some((cmd) => cmd.includes('apt update'))).toBe(true);
+    // Platform-aware: macOS uses softwareupdate, Linux uses apt
+    const expectedCmd = process.platform === 'darwin' ? 'softwareupdate' : 'apt update';
+    expect(finding!.manualFix!.some((cmd) => cmd.includes(expectedCmd))).toBe(true);
   });
 
   // -------------------------------------------------------------------------
