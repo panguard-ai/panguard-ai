@@ -150,6 +150,8 @@ export class FileMonitor extends EventEmitter {
 
       try {
         const fileStat = await stat(filePath);
+        // Skip directories — only monitor files
+        if (fileStat.isDirectory()) continue;
         const currentHash = await this.computeHash(filePath);
         const now = new Date().toISOString();
 
@@ -209,6 +211,11 @@ export class FileMonitor extends EventEmitter {
         }
       } catch (err) {
         const error = err as NodeJS.ErrnoException;
+
+        if (error.code === 'EISDIR') {
+          // Path is a directory, not a file — skip silently
+          continue;
+        }
 
         if (error.code === 'ENOENT') {
           // File does not exist / 檔案不存在
