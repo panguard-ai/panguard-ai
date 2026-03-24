@@ -27,6 +27,7 @@ WORKDIR /build
 # Copy workspace config + all package.json files for dependency resolution
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
 COPY packages/core/package.json packages/core/
+COPY packages/scan-core/package.json packages/scan-core/
 COPY packages/panguard/package.json packages/panguard/
 COPY packages/panguard-auth/package.json packages/panguard-auth/
 COPY packages/panguard-guard/package.json packages/panguard-guard/
@@ -47,6 +48,7 @@ RUN pnpm install --frozen-lockfile --prod=false
 
 # Copy source code (website excluded by .dockerignore)
 COPY packages/core/ packages/core/
+COPY packages/scan-core/ packages/scan-core/
 COPY packages/panguard/ packages/panguard/
 COPY packages/panguard-auth/ packages/panguard-auth/
 COPY packages/panguard-guard/ packages/panguard-guard/
