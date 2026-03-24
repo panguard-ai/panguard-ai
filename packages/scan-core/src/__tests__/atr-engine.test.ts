@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { compileRules, scanWithATR } from '../atr-engine.js';

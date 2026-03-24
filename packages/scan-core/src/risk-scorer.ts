@@ -5,7 +5,7 @@
  * Deduplicates findings by ID - only the highest severity instance counts.
  */
 
-import type { Finding, RiskLevel, Severity } from './types.js';
+import type { Finding, RiskLevel } from './types.js';
 
 const SEVERITY_WEIGHTS: Record<string, number> = {
   critical: 25,

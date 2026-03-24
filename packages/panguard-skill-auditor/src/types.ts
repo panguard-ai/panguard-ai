@@ -18,8 +18,6 @@ export type {
 
 import type {
   Finding,
-  Severity,
-  FindingCategory,
   RiskLevel,
 } from '@panguard-ai/scan-core';
 

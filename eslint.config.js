@@ -38,6 +38,7 @@ export default tseslint.config(
       '**/.next/**',
       '**/*.js',
       '**/*.mjs',
+      '**/*.cjs',
       '!eslint.config.js',
       '!vitest.config.ts',
       'pancore/**',

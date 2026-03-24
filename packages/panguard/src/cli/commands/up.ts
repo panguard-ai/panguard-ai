@@ -10,7 +10,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { Command } from 'commander';
 import { runCLI } from '@panguard-ai/panguard-guard';
-import { c, box, header } from '@panguard-ai/core';
+import { c, header } from '@panguard-ai/core';
 
 export function upCommand(): Command {
   return new Command('up')
