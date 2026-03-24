@@ -120,11 +120,9 @@ test.describe('Journey 2: Platform tabs — npx panguard setup', () => {
     await page.waitForLoadState('networkidle');
 
     // Look for tab-like elements in the setup section
-    const tabs = page
-      .locator('[role="tab"], button')
-      .filter({
-        hasText: /Claude Code|Claude Desktop|Cursor|OpenClaw|Codex|WorkBuddy|NemoClaw|ArkClaw/i,
-      });
+    const tabs = page.locator('[role="tab"], button').filter({
+      hasText: /Claude Code|Claude Desktop|Cursor|OpenClaw|Codex|WorkBuddy|NemoClaw|ArkClaw/i,
+    });
     const tabCount = await tabs.count();
 
     // We should find at least some tabs (they may be rendered differently)
