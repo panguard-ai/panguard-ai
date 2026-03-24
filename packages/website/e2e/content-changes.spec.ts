@@ -19,12 +19,12 @@
  *   npx playwright test e2e/content-changes.spec.ts --config=playwright.local.config.ts
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 // ---------------------------------------------------------------------------
 // Helper: get visible rendered text (excludes script/style payloads)
 // ---------------------------------------------------------------------------
-async function getBodyText(page: Parameters<typeof test>[1] extends (args: { page: infer P }) => unknown ? P : never): Promise<string> {
+async function getBodyText(page: Page): Promise<string> {
   return (await page.locator('body').innerText()) ?? '';
 }
 
