@@ -1,7 +1,7 @@
 ---
-title: "自動回應"
-description: "自動威脅回應模組、安全規則、escalation 階梯、rollback 支援。"
-icon: "bolt"
+title: '自動回應'
+description: '自動威脅回應模組、安全規則、escalation 階梯、rollback 支援。'
+icon: 'bolt'
 ---
 
 `RespondAgent` 根據 `AnalyzeAgent` 產出的 `ThreatVerdict` 執行防禦動作。它有嚴格的安全規則、分級 escalation 階梯，以及完整的 rollback 支援。
@@ -14,47 +14,47 @@ Guard 有 3 個主動回應模組，加上通知和 log：
 
 在防火牆層封鎖惡意來源 IP。
 
-| 欄位 | 說明 |
-|------|------|
-| **動作** | `block_ip` |
-| **macOS** | `pfctl`（Packet Filter） |
-| **Linux** | `iptables` |
-| **Windows** | `netsh advfirewall` |
-| **預設封鎖時間** | 1 小時 |
-| **累犯封鎖時間** | 24 小時 |
-| **自動解封** | 有，時間到自動解 |
+| 欄位             | 說明                     |
+| ---------------- | ------------------------ |
+| **動作**         | `block_ip`               |
+| **macOS**        | `pfctl`（Packet Filter） |
+| **Linux**        | `iptables`               |
+| **Windows**      | `netsh advfirewall`      |
+| **預設封鎖時間** | 1 小時                   |
+| **累犯封鎖時間** | 24 小時                  |
+| **自動解封**     | 有，時間到自動解         |
 
 ### 2. Process 終止器
 
 砍掉惡意 process。
 
-| 欄位 | 說明 |
-|------|------|
-| **動作** | `kill_process` |
-| **方式** | 先送 SIGTERM，5 秒沒死再 SIGKILL |
-| **自我保護** | 不會砍 Panguard Guard 自己 |
-| **跨平台** | 用原生 OS process 管理 API |
+| 欄位         | 說明                             |
+| ------------ | -------------------------------- |
+| **動作**     | `kill_process`                   |
+| **方式**     | 先送 SIGTERM，5 秒沒死再 SIGKILL |
+| **自我保護** | 不會砍 Panguard Guard 自己       |
+| **跨平台**   | 用原生 OS process 管理 API       |
 
 ### 3. 檔案隔離
 
 把可疑檔案搬到隔離區。
 
-| 欄位 | 說明 |
-|------|------|
-| **動作** | `isolate_file` |
-| **方式** | 搬檔到隔離目錄，記下 SHA-256 hash |
+| 欄位         | 說明                                   |
+| ------------ | -------------------------------------- |
+| **動作**     | `isolate_file`                         |
+| **方式**     | 搬檔到隔離目錄，記下 SHA-256 hash      |
 | **Metadata** | 保留原始路徑、timestamp、verdict、hash |
-| **還原** | 可以從隔離區透過 action manifest 還原 |
+| **還原**     | 可以從隔離區透過 action manifest 還原  |
 
 ## 信心門檻
 
 RespondAgent 根據信心分數決定怎麼做：
 
-| 信心範圍 | 行為 |
-|----------|------|
-| >= `autoRespond`（預設 90%） | 自動執行，事後通知 |
+| 信心範圍                       | 行為                           |
+| ------------------------------ | ------------------------------ |
+| >= `autoRespond`（預設 90%）   | 自動執行，事後通知             |
 | >= `notifyAndWait`（預設 70%） | 發確認請求到通知頻道，等人核准 |
-| < `notifyAndWait` | 記 log + 發資訊通知 |
+| < `notifyAndWait`              | 記 log + 發資訊通知            |
 
 **學習模式**下不管信心多高，都只記 log 不動作。
 
@@ -97,10 +97,10 @@ root, Administrator, SYSTEM, LocalSystem, admin
 
 RespondAgent 做漸進式升級：
 
-| 情況 | 動作 |
-|------|------|
-| 來源的第一次違規 | 套用正常門檻 |
-| 同一目標 3+ 次違規 | 自動回應門檻降 10% |
+| 情況               | 動作                   |
+| ------------------ | ---------------------- |
+| 來源的第一次違規   | 套用正常門檻           |
+| 同一目標 3+ 次違規 | 自動回應門檻降 10%     |
 | 累犯（之前被封過） | 封鎖時間拉長到 24 小時 |
 
 持續攻擊的對手會碰到越來越強的回應，但第一次的異常會被保守對待。
@@ -115,33 +115,34 @@ RespondAgent 做漸進式升級：
 
 每筆記錄：
 
-| 欄位 | 說明 |
-|------|------|
-| `timestamp` | 動作執行時間 |
-| `action` | 動作類型（block_ip、kill_process、isolate_file） |
-| `target` | IP 位址、PID 或檔案路徑 |
-| `verdict` | 觸發動作的完整 ThreatVerdict |
-| `reversible` | 能不能 rollback |
-| `rollbackCmd` | 撤銷動作的指令 |
+| 欄位          | 說明                                             |
+| ------------- | ------------------------------------------------ |
+| `timestamp`   | 動作執行時間                                     |
+| `action`      | 動作類型（block_ip、kill_process、isolate_file） |
+| `target`      | IP 位址、PID 或檔案路徑                          |
+| `verdict`     | 觸發動作的完整 ThreatVerdict                     |
+| `reversible`  | 能不能 rollback                                  |
+| `rollbackCmd` | 撤銷動作的指令                                   |
 
 ### Rollback 範例
 
-| 動作 | Rollback |
-|------|----------|
-| `block_ip 203.0.113.50` | 時間到自動移除防火牆規則 |
-| `isolate_file /tmp/payload` | 從隔離區還原檔案到原始路徑 |
-| `kill_process 5678` | 無法 rollback（process 已經砍了） |
+| 動作                        | Rollback                          |
+| --------------------------- | --------------------------------- |
+| `block_ip 203.0.113.50`     | 時間到自動移除防火牆規則          |
+| `isolate_file /tmp/payload` | 從隔離區還原檔案到原始路徑        |
+| `kill_process 5678`         | 無法 rollback（process 已經砍了） |
 
 ## 跨平台指令執行
 
 所有 OS 指令都用 `execFile`（不是 `exec`），防止 shell injection：
 
-| 平台 | IP 封鎖指令 | IP 解封指令 |
-|------|-------------|-------------|
-| macOS | `pfctl` 加規則 | `pfctl` 刪規則 |
-| Linux | `iptables -A INPUT -s <ip> -j DROP` | `iptables -D INPUT -s <ip> -j DROP` |
+| 平台    | IP 封鎖指令                           | IP 解封指令                              |
+| ------- | ------------------------------------- | ---------------------------------------- |
+| macOS   | `pfctl` 加規則                        | `pfctl` 刪規則                           |
+| Linux   | `iptables -A INPUT -s <ip> -j DROP`   | `iptables -D INPUT -s <ip> -j DROP`      |
 | Windows | `netsh advfirewall firewall add rule` | `netsh advfirewall firewall delete rule` |
 
 <Note>
-  RespondAgent 絕對不用 `shell: true` 或字串拼接指令。所有參數都以陣列形式傳給 `execFile`，杜絕 command injection。
+  RespondAgent 絕對不用 `shell: true` 或字串拼接指令。所有參數都以陣列形式傳給 `execFile`，杜絕
+  command injection。
 </Note>

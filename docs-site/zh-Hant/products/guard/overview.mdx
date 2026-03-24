@@ -1,7 +1,7 @@
 ---
-title: "Panguard Guard"
-description: "24/7 AI 驅動即時威脅監控，搭載 DARE pipeline、10 種 monitor、事件關聯、自動回應。"
-icon: "shield"
+title: 'Panguard Guard'
+description: '24/7 AI 驅動即時威脅監控，搭載 DARE pipeline、10 種 monitor、事件關聯、自動回應。'
+icon: 'shield'
 ---
 
 Panguard Guard 是核心的 runtime 防護引擎。它用 10 種 monitor 全天候盯著你的系統，每個安全事件都過一遍 4-agent DARE pipeline（Detect、Analyze、Respond、Report），再根據信心分數自動對威脅採取行動。
@@ -60,14 +60,18 @@ Blocked:    12 IPs today
 Event ──> Detect ──> Analyze ──> Respond ──> Report
 ```
 
-| Agent | 負責什麼 |
-|-------|----------|
-| **Detect** | ATR 規則比對、威脅情報查詢、去重、事件關聯 |
-| **Analyze** | 蒐證、加權信心評分、AI 推理、baseline 偏差檢查 |
+| Agent       | 負責什麼                                                        |
+| ----------- | --------------------------------------------------------------- |
+| **Detect**  | ATR 規則比對、威脅情報查詢、去重、事件關聯                      |
+| **Analyze** | 蒐證、加權信心評分、AI 推理、baseline 偏差檢查                  |
 | **Respond** | 執行動作（封鎖 IP、砍 process、隔離檔案）、安全檢查、escalation |
-| **Report** | JSONL log + rotation、更新 baseline、匿名化資料送 Threat Cloud |
+| **Report**  | JSONL log + rotation、更新 baseline、匿名化資料送 Threat Cloud  |
 
-<Card title="Agent Pipeline 細節" icon="arrow-right-arrow-left" href="/products/guard/agent-pipeline">
+<Card
+  title="Agent Pipeline 細節"
+  icon="arrow-right-arrow-left"
+  href="/products/guard/agent-pipeline"
+>
   每個 agent 的輸入、輸出和決策邏輯完整拆解。
 </Card>
 
@@ -75,25 +79,25 @@ Event ──> Detect ──> Analyze ──> Respond ──> Report
 
 Guard 用 3 層 AI 偵測漏斗，兼顧延遲和成本：
 
-| 層級 | 引擎 | 成本 | 延遲 | 處理量 |
-|------|------|------|------|--------|
-| **第 1 層** | ATR 規則、內建 pattern、威脅情報 | $0 | < 1 ms | 約 90% 事件 |
-| **第 2 層** | Ollama（本地 AI） | $0 | 約 100 ms | 約 7% 事件 |
-| **第 3 層** | Claude / OpenAI（雲端 AI） | 約 $0.01/事件 | 約 1 秒 | 約 3% 事件 |
+| 層級        | 引擎                             | 成本          | 延遲      | 處理量      |
+| ----------- | -------------------------------- | ------------- | --------- | ----------- |
+| **第 1 層** | ATR 規則、內建 pattern、威脅情報 | $0            | < 1 ms    | 約 90% 事件 |
+| **第 2 層** | Ollama（本地 AI）                | $0            | 約 100 ms | 約 7% 事件  |
+| **第 3 層** | Claude / OpenAI（雲端 AI）       | 約 $0.01/事件 | 約 1 秒   | 約 3% 事件  |
 
 下層搞不定的才往上層丟。
 
 ## 主要規格
 
-| 項目 | 說明 |
-|------|------|
-| **Monitor 類型** | 10 種（4 內建 + 6 進階） |
-| **ATR 規則** | 61 條內建偵測規則 |
+| 項目             | 說明                                                    |
+| ---------------- | ------------------------------------------------------- |
+| **Monitor 類型** | 10 種（4 內建 + 6 進階）                                |
+| **ATR 規則**     | 61 條內建偵測規則                                       |
 | **威脅情報來源** | 5 個（ThreatFox、URLhaus、Feodo、GreyNoise、AbuseIPDB） |
-| **關聯模式** | 7 種攻擊 pattern，對應 MITRE ATT&CK |
-| **回應動作** | IP 封鎖、process 終止、檔案隔離、通知、log |
-| **跨平台** | macOS (pfctl)、Linux (iptables)、Windows (netsh) |
-| **Log 保留** | 每檔 50 MB、10 個 rotation、90 天保留 |
+| **關聯模式**     | 7 種攻擊 pattern，對應 MITRE ATT&CK                     |
+| **回應動作**     | IP 封鎖、process 終止、檔案隔離、通知、log              |
+| **跨平台**       | macOS (pfctl)、Linux (iptables)、Windows (netsh)        |
+| **Log 保留**     | 每檔 50 MB、10 個 rotation、90 天保留                   |
 
 ## 狀態看板
 

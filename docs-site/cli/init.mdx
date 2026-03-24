@@ -1,7 +1,7 @@
 ---
-title: "panguard init"
-description: "Initialize Panguard configuration for the current machine."
-icon: "wand-magic-sparkles"
+title: 'panguard init'
+description: 'Initialize Panguard configuration for the current machine.'
+icon: 'wand-magic-sparkles'
 ---
 
 The `init` command creates and configures the Panguard environment on your machine. It generates the default configuration file, sets up data directories, and detects your operating system and installed services for optimal defaults.
@@ -15,7 +15,8 @@ panguard init [options]
 ## Options
 
 <ParamField path="--config" type="string">
-  Path to a custom configuration file. If provided, `init` will merge your custom settings with detected defaults instead of creating a new file from scratch.
+  Path to a custom configuration file. If provided, `init` will merge your custom settings with
+  detected defaults instead of creating a new file from scratch.
 </ParamField>
 
 <ParamField path="--lang" type="string" default="en">
@@ -36,6 +37,7 @@ panguard init --config ./my-panguard.yaml
 ```bash Initialize in Traditional Chinese
 panguard init --lang zh-TW
 ```
+
 </CodeGroup>
 
 ## What `init` Does
@@ -47,7 +49,8 @@ panguard init --lang zh-TW
 5. **Configures Threat Cloud** -- prompts to enable collective defense (anonymous threat sharing)
 
 <Tip>
-  You only need to run `init` once per machine. Re-running it is safe -- existing configuration will not be overwritten unless you explicitly provide a new config file.
+  You only need to run `init` once per machine. Re-running it is safe -- existing configuration will
+  not be overwritten unless you explicitly provide a new config file.
 </Tip>
 
 ## Related

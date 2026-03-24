@@ -1,7 +1,7 @@
 ---
-title: "Guard 問題"
-description: "排解 Panguard Guard 啟動、效能跟偵測的問題。"
-icon: "shield"
+title: 'Guard 問題'
+description: '排解 Panguard Guard 啟動、效能跟偵測的問題。'
+icon: 'shield'
 ---
 
 ## Guard 已經在跑了
@@ -26,7 +26,7 @@ sudo panguard guard start
 ```
 
 <Warning>
-同一台機器不要跑多個 Guard 實例。它們會在 log 檔存取、防火牆規則、監控資源上打架。
+  同一台機器不要跑多個 Guard 實例。它們會在 log 檔存取、防火牆規則、監控資源上打架。
 </Warning>
 
 如果 PID 檔指向一個已經不存在的 process（過期 PID）：
@@ -69,6 +69,7 @@ Guard 需要 root/admin 權限讀系統 log 跟管防火牆規則。
     ```bash
     sudo systemctl status panguard-guard
     ```
+
   </Tab>
   <Tab title="macOS launchd">
     ```bash
@@ -98,6 +99,7 @@ Guard 記憶體用量超出預期的話：
     | ATR 規則引擎（61 條規則） | 約 20 MB |
     | AI 分析（本機） | 100--500 MB |
     | **合計** | **170--620 MB** |
+
   </Accordion>
   <Accordion title="降低記憶體用量">
     1. **關掉用不到的監控** -- 把不需要的子系統監控關掉：
@@ -121,6 +123,7 @@ Guard 記憶體用量超出預期的話：
        ```bash
        export NODE_OPTIONS="--max-old-space-size=512"
        ```
+
   </Accordion>
 </AccordionGroup>
 
@@ -144,6 +147,7 @@ Guard 對正常活動發了一堆警示的話：
     panguard config set mode learning
     sudo panguard guard start
     ```
+
   </Accordion>
   <Accordion title="調偵測閾值">
     拉高特定威脅類型的門檻：
@@ -155,6 +159,7 @@ Guard 對正常活動發了一堆警示的話：
     # 拉高 SSH 失敗閾值
     panguard config set rules.sshFailureThreshold 20
     ```
+
   </Accordion>
   <Accordion title="把已知安全的 IP 跟 process 加白名單">
     把信任的 IP 跟 process 加白名單：
@@ -166,6 +171,7 @@ Guard 對正常活動發了一堆警示的話：
     # Process 白名單
     panguard config set response.whitelistedProcesses '["backup-agent", "monitoring-daemon"]'
     ```
+
   </Accordion>
   <Accordion title="關掉吵的規則">
     找出造成誤報的規則，關掉它：
@@ -177,6 +183,7 @@ Guard 對正常活動發了一堆警示的話：
     # 停用特定規則
     panguard config set rules.excludeIds '["ATR-2025-0099"]'
     ```
+
   </Accordion>
 </AccordionGroup>
 
@@ -203,6 +210,7 @@ Guard 偵測到威脅但沒自動處理的話：
     <Warning>
     `minConfidence` 設到 0.7 以下會大幅增加誤報風險（封到正常 IP 或殺到正常 process）。
     </Warning>
+
   </Accordion>
   <Accordion title="確認回應有開">
     ```bash
@@ -215,6 +223,7 @@ Guard 偵測到威脅但沒自動處理的話：
     panguard config set response.enabled true
     panguard config set response.autoBlock true
     ```
+
   </Accordion>
   <Accordion title="看運作模式">
     `learning` 跟 `detect` 模式不會執行自動回應：
@@ -228,6 +237,7 @@ Guard 偵測到威脅但沒自動處理的話：
     panguard config set mode protect
     sudo panguard guard restart
     ```
+
   </Accordion>
   <Accordion title="看有沒有開核准要求">
     如果 `requireApproval` 是開的，Guard 會發核准請求而不是直接動手：
@@ -237,6 +247,7 @@ Guard 偵測到威脅但沒自動處理的話：
     # 是 true 的話看待處理的核准：
     panguard guard approvals
     ```
+
   </Accordion>
 </AccordionGroup>
 
@@ -254,6 +265,7 @@ Guard 偵測到威脅但沒自動處理的話：
     ```bash
     panguard guard logs --limit 50
     ```
+
   </Accordion>
   <Accordion title="跑診斷">
     ```bash
@@ -261,6 +273,7 @@ Guard 偵測到威脅但沒自動處理的話：
     ```
 
     會檢查 Node.js 版本、權限、磁碟空間、port 可用性、config 格式。
+
   </Accordion>
   <Accordion title="重設 config">
     config 檔壞掉的話：
@@ -273,5 +286,6 @@ Guard 偵測到威脅但沒自動處理的話：
     rm ~/.panguard-guard/config.json
     sudo panguard guard start
     ```
+
   </Accordion>
 </AccordionGroup>

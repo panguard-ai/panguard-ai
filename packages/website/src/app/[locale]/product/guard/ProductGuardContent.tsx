@@ -210,7 +210,8 @@ export default function ProductGuardContent() {
               <p className="text-brand-sage">curl -fsSL https://get.panguard.ai | bash</p>
               <p className="text-text-muted mt-4 mb-2"># That&apos;s it. Guard is now running.</p>
               <p className="text-text-secondary">
-                <span className="text-[#22c55e]">[OK]</span> Panguard Guard v{STATS.cliVersion} installed
+                <span className="text-[#22c55e]">[OK]</span> Panguard Guard v{STATS.cliVersion}{' '}
+                installed
               </p>
               <p className="text-text-secondary">
                 <span className="text-[#22c55e]">[OK]</span> Rule engine loaded (

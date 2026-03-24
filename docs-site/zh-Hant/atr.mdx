@@ -1,7 +1,7 @@
 ---
-title: "ATR (Agent Threat Rules)"
-description: "AI agent 威脅偵測的開放標準。社群維護的規則，涵蓋 prompt injection、tool poisoning 等攻擊。"
-icon: "shield-halved"
+title: 'ATR (Agent Threat Rules)'
+description: 'AI agent 威脅偵測的開放標準。社群維護的規則，涵蓋 prompt injection、tool poisoning 等攻擊。'
+icon: 'shield-halved'
 ---
 
 Agent Threat Rules (ATR) 是專為 AI agent 時代設計的開放標準，用來描述和偵測針對 AI agent 的安全威脅。
@@ -18,11 +18,11 @@ ATR 規則偵測傳統安全工具抓不到的威脅：
 
 ## 三層偵測
 
-| 層級 | 方法 | 速度 | 覆蓋範圍 |
-|------|------|------|----------|
-| Layer 1 | Regex pattern matching | 快 | 已知 pattern |
-| Layer 2 | 內容指紋比對 | 中 | 變體 |
-| Layer 3 | LLM-as-judge | 慢 | 新型威脅 |
+| 層級    | 方法                   | 速度 | 覆蓋範圍     |
+| ------- | ---------------------- | ---- | ------------ |
+| Layer 1 | Regex pattern matching | 快   | 已知 pattern |
+| Layer 2 | 內容指紋比對           | 中   | 變體         |
+| Layer 3 | LLM-as-judge           | 慢   | 新型威脅     |
 
 ## 規則數量
 
@@ -42,7 +42,11 @@ panguard guard start
 ```
 
 <CardGroup cols={2}>
-  <Card title="ATR on GitHub" icon="github" href="https://github.com/Agent-Threat-Rule/agent-threat-rules">
+  <Card
+    title="ATR on GitHub"
+    icon="github"
+    href="https://github.com/Agent-Threat-Rule/agent-threat-rules"
+  >
     瀏覽規則、貢獻程式碼、給顆星。
   </Card>
   <Card title="Quick Start" icon="rocket" href="/quickstart">

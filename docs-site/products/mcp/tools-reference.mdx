@@ -1,7 +1,7 @@
 ---
-title: "MCP Tools Reference"
-description: "Complete parameter reference and usage examples for all 11 Panguard MCP tools."
-icon: "wrench"
+title: 'MCP Tools Reference'
+description: 'Complete parameter reference and usage examples for all 11 Panguard MCP tools.'
+icon: 'wrench'
 ---
 
 This page documents every tool exposed by the Panguard MCP server. Each tool includes its description, input schema, and example usage.
@@ -173,6 +173,7 @@ Audit an OpenClaw/AgentSkills `SKILL.md` directory for security issues. Checks m
 </ParamField>
 
 **Returns:** Risk score (0--100) and detailed findings covering:
+
 - Manifest validity
 - Prompt injection detection
 - Tool poisoning analysis
@@ -215,5 +216,6 @@ Deploy Panguard services: scan for vulnerabilities, start Guard monitoring, and 
 All tools are available to everyone. Panguard is 100% open source under the MIT license.
 
 <Tip>
-  All tools return structured JSON responses that AI assistants can parse and present in natural language. The `isError` field in the response indicates whether the operation succeeded or failed.
+  All tools return structured JSON responses that AI assistants can parse and present in natural
+  language. The `isError` field in the response indicates whether the operation succeeded or failed.
 </Tip>

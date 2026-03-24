@@ -1,7 +1,7 @@
 ---
-title: "Email & Webhook"
-description: "Configure SMTP email notifications and custom webhook integrations with mTLS support."
-icon: "envelope"
+title: 'Email & Webhook'
+description: 'Configure SMTP email notifications and custom webhook integrations with mTLS support.'
+icon: 'envelope'
 ---
 
 Email and Webhook channels serve different use cases: Email provides compliance-friendly audit trails, while Webhooks enable integration with custom automation systems.
@@ -16,14 +16,14 @@ panguard chat setup --channel email
 
 The wizard will ask for:
 
-| Field | Description | Example |
-|-------|-------------|---------|
-| **SMTP Host** | Mail server hostname | `smtp.gmail.com` |
-| **SMTP Port** | 587 for TLS, 465 for SSL | `587` |
-| **SMTP Username** | Authentication username | `alerts@company.com` |
-| **SMTP Password** | Authentication password | (App Password for Gmail) |
-| **From Address** | Sender email address | `panguard@company.com` |
-| **To Address** | Recipient email address | `security-team@company.com` |
+| Field             | Description              | Example                     |
+| ----------------- | ------------------------ | --------------------------- |
+| **SMTP Host**     | Mail server hostname     | `smtp.gmail.com`            |
+| **SMTP Port**     | 587 for TLS, 465 for SSL | `587`                       |
+| **SMTP Username** | Authentication username  | `alerts@company.com`        |
+| **SMTP Password** | Authentication password  | (App Password for Gmail)    |
+| **From Address**  | Sender email address     | `panguard@company.com`      |
+| **To Address**    | Recipient email address  | `security-team@company.com` |
 
 ### Gmail Configuration
 
@@ -72,19 +72,19 @@ panguard chat setup --channel webhook
 
 The wizard will ask for:
 
-| Field | Description |
-|-------|-------------|
-| **Webhook URL** | The endpoint to receive POST requests |
-| **Authentication** | Bearer Token, HMAC, or mTLS |
-| **Secret/Token** | Authentication credential |
+| Field              | Description                           |
+| ------------------ | ------------------------------------- |
+| **Webhook URL**    | The endpoint to receive POST requests |
+| **Authentication** | Bearer Token, HMAC, or mTLS           |
+| **Secret/Token**   | Authentication credential             |
 
 ### Authentication Methods
 
-| Method | Header | Use Case |
-|--------|--------|----------|
-| **Bearer Token** | `Authorization: Bearer <token>` | Simple API integrations |
-| **HMAC** | `X-Panguard-Signature: sha256=<hash>` | Webhook verification (GitHub-style) |
-| **mTLS** | Client certificate | Mutual TLS authentication |
+| Method           | Header                                | Use Case                            |
+| ---------------- | ------------------------------------- | ----------------------------------- |
+| **Bearer Token** | `Authorization: Bearer <token>`       | Simple API integrations             |
+| **HMAC**         | `X-Panguard-Signature: sha256=<hash>` | Webhook verification (GitHub-style) |
+| **mTLS**         | Client certificate                    | Mutual TLS authentication           |
 
 ### Payload Format
 
@@ -116,10 +116,7 @@ To verify the webhook signature on your server:
 const crypto = require('crypto');
 
 function verifySignature(payload, signature, secret) {
-  const expected = crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex');
+  const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
   return `sha256=${expected}` === signature;
 }
 ```
@@ -138,5 +135,6 @@ panguard chat test --channel webhook
 ```
 
 <Note>
-  Webhook requests include a 10-second timeout. If your endpoint does not respond within 10 seconds, the notification is logged as failed and retried up to 3 times with exponential backoff.
+  Webhook requests include a 10-second timeout. If your endpoint does not respond within 10 seconds,
+  the notification is logged as failed and retried up to 3 times with exponential backoff.
 </Note>

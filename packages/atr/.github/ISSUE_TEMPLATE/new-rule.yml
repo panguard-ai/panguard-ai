@@ -1,7 +1,7 @@
 name: New Rule Proposal
 description: Propose a new ATR detection rule
-title: "[Rule] "
-labels: ["new-rule"]
+title: '[Rule] '
+labels: ['new-rule']
 body:
   - type: input
     id: attack-type

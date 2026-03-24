@@ -1,7 +1,7 @@
 ---
-title: "panguard doctor"
-description: "診斷跟排解常見的 Panguard 系統問題。"
-icon: "stethoscope"
+title: 'panguard doctor'
+description: '診斷跟排解常見的 Panguard 系統問題。'
+icon: 'stethoscope'
 ---
 
 `doctor` 跑一系列診斷檢查，幫你找出 Panguard 安裝、config、運行環境的常見問題。每個發現都會附上具體的處理建議。
@@ -16,22 +16,18 @@ panguard doctor
 
 doctor 會檢查這些範圍：
 
-| 項目 | 檢查什麼 |
-| --- | --- |
-| **安裝** | binary 完整性、版本是不是最新、相依套件 |
-| **設定** | config 檔格式對不對、必填欄位、路徑權限 |
-| **Guard** | 服務狀態、log 檔健康狀態、資源用量 |
-| **網路** | 連到 Threat Cloud 的連線、DNS 解析、防火牆規則 |
-| **權限** | 檔案擁有者、目錄存取權、是否需要提權 |
-| **磁碟空間** | log、掃描資料、情報資料庫還有多少空間 |
+| 項目         | 檢查什麼                                       |
+| ------------ | ---------------------------------------------- |
+| **安裝**     | binary 完整性、版本是不是最新、相依套件        |
+| **設定**     | config 檔格式對不對、必填欄位、路徑權限        |
+| **Guard**    | 服務狀態、log 檔健康狀態、資源用量             |
+| **網路**     | 連到 Threat Cloud 的連線、DNS 解析、防火牆規則 |
+| **權限**     | 檔案擁有者、目錄存取權、是否需要提權           |
+| **磁碟空間** | log、掃描資料、情報資料庫還有多少空間          |
 
 ## 範例
 
-<CodeGroup>
-```bash 跑診斷
-panguard doctor
-```
-</CodeGroup>
+<CodeGroup>```bash 跑診斷 panguard doctor ```</CodeGroup>
 
 ## 範例輸出
 

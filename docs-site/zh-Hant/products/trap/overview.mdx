@@ -1,12 +1,10 @@
 ---
-title: "Panguard Trap"
-description: "部署 8 種蜜罐協定來引誘攻擊者、擷取其工具和憑證，並分析其技能等級和意圖。"
-icon: "flask"
+title: 'Panguard Trap'
+description: '部署 8 種蜜罐協定來引誘攻擊者、擷取其工具和憑證，並分析其技能等級和意圖。'
+icon: 'flask'
 ---
 
-<Warning>
-**即將推出** -- Panguard Trap 目前正在開發中，尚未正式發布。以下文件為預覽內容。
-</Warning>
+<Warning>**即將推出** -- Panguard Trap 目前正在開發中，尚未正式發布。以下文件為預覽內容。</Warning>
 
 Panguard Trap 部署偽裝成真實基礎設施的誘餌服務。合法使用者永遠不會與這些服務互動——只有攻擊者才會。當有人連線至蜜罐時，Trap 會記錄每個動作、分析其行為、分類其技能等級，並將情報分享給 Guard 和 Threat Cloud。
 
@@ -25,7 +23,6 @@ panguard trap profiles
 # 查看收集的情報
 panguard trap intel
 ```
-
 
 ## 蜜罐如何運作
 
@@ -54,14 +51,14 @@ Attacker ──> [Honeypot Service] ──> Interaction Logger
 
 ## 主要功能
 
-| 功能 | 詳細資訊 |
-|-----------|---------|
-| **蜜罐類型** | 8 種服務模擬器（SSH、HTTP、FTP、SMB、MySQL、RDP、Telnet、Redis） |
-| **攻擊者分析** | 技能分類（Script Kiddie、Advanced、APT） |
-| **憑證擷取** | 記錄所有嘗試的使用者名稱和密碼 |
-| **命令記錄** | 互動式服務的完整工作階段記錄 |
-| **Threat Cloud 饋送** | 匿名化的攻擊者資料分享至集體情報 |
-| **Guard 整合** | 攻擊者 IP 自動加入 Guard 封鎖清單 |
+| 功能                  | 詳細資訊                                                         |
+| --------------------- | ---------------------------------------------------------------- |
+| **蜜罐類型**          | 8 種服務模擬器（SSH、HTTP、FTP、SMB、MySQL、RDP、Telnet、Redis） |
+| **攻擊者分析**        | 技能分類（Script Kiddie、Advanced、APT）                         |
+| **憑證擷取**          | 記錄所有嘗試的使用者名稱和密碼                                   |
+| **命令記錄**          | 互動式服務的完整工作階段記錄                                     |
+| **Threat Cloud 饋送** | 匿名化的攻擊者資料分享至集體情報                                 |
+| **Guard 整合**        | 攻擊者 IP 自動加入 Guard 封鎖清單                                |
 
 ## 與 Guard 和 Threat Cloud 的整合
 

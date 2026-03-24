@@ -1,7 +1,7 @@
 ---
-title: "panguard status"
-description: "一次看完所有 Panguard 服務的狀態。"
-icon: "circle-info"
+title: 'panguard status'
+description: '一次看完所有 Panguard 服務的狀態。'
+icon: 'circle-info'
 ---
 
 `status` 讓你一目了然 Panguard 安裝的全貌 -- Guard daemon 健不健康、上次掃描結果、通知頻道連線狀態等等。
@@ -40,18 +40,19 @@ panguard status --json
 ```bash 指定 config 看狀態
 panguard status --config /etc/panguard/config.yaml
 ```
+
 </CodeGroup>
 
 ## 輸出區塊
 
 status 指令回報的區塊：
 
-| 區塊 | 資訊 |
-| --- | --- |
-| **Guard** | 跑著 / 停了、uptime、處理過的事件數 |
-| **Scan** | 上次掃描時間、發現數、風險分數 |
-| **通知頻道** | 已設定的頻道、連線健康狀態 |
-| **System** | Panguard 版本、OS、config 路徑 |
+| 區塊         | 資訊                                |
+| ------------ | ----------------------------------- |
+| **Guard**    | 跑著 / 停了、uptime、處理過的事件數 |
+| **Scan**     | 上次掃描時間、發現數、風險分數      |
+| **通知頻道** | 已設定的頻道、連線健康狀態          |
+| **System**   | Panguard 版本、OS、config 路徑      |
 
 ## 相關
 

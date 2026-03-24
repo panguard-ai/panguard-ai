@@ -1,7 +1,7 @@
 ---
-title: "CLI Overview"
-description: "Unified command-line interface for all Panguard AI security operations."
-icon: "terminal"
+title: 'CLI Overview'
+description: 'Unified command-line interface for all Panguard AI security operations.'
+icon: 'terminal'
 ---
 
 The Panguard CLI is your single entry point for scanning, protecting, monitoring, and managing endpoint security. Every feature -- from a quick vulnerability scan to deploying a honeypot network -- is accessible through one binary.
@@ -14,41 +14,41 @@ panguard <command> [options]
 
 ## Global Options
 
-| Option | Description |
-| --- | --- |
-| `--help` | Show help for any command |
-| `--version` | Print the installed Panguard CLI version |
+| Option          | Description                                     |
+| --------------- | ----------------------------------------------- |
+| `--help`        | Show help for any command                       |
+| `--version`     | Print the installed Panguard CLI version        |
 | `--lang <lang>` | Set output language (`en`, `zh-TW`, `ja`, etc.) |
 
 ## Command Categories
 
 ### Scanning
 
-| Command | Description |
-| --- | --- |
+| Command             | Description                             |
+| ------------------- | --------------------------------------- |
 | [`scan`](/cli/scan) | Run security scans on the local machine |
 
 ### Protection
 
-| Command | Description |
-| --- | --- |
+| Command               | Description                         |
+| --------------------- | ----------------------------------- |
 | [`guard`](/cli/guard) | Real-time endpoint protection agent |
-| [`trap`](/cli/trap) | Honeypot / deception technology |
+| [`trap`](/cli/trap)   | Honeypot / deception technology     |
 
 ### System
 
-| Command | Description |
-| --- | --- |
-| [`init`](/cli/init) | Initialize configuration for the current machine |
-| [`status`](/cli/status) | Show overall system health |
-| [`config`](/cli/config) | View or edit configuration |
-| [`doctor`](/cli/doctor) | Diagnose common system issues |
-| [`upgrade`](/cli/upgrade) | Update Panguard CLI to the latest version |
+| Command                   | Description                                      |
+| ------------------------- | ------------------------------------------------ |
+| [`init`](/cli/init)       | Initialize configuration for the current machine |
+| [`status`](/cli/status)   | Show overall system health                       |
+| [`config`](/cli/config)   | View or edit configuration                       |
+| [`doctor`](/cli/doctor)   | Diagnose common system issues                    |
+| [`upgrade`](/cli/upgrade) | Update Panguard CLI to the latest version        |
 
 ### Advanced
 
-| Command | Description |
-| --- | --- |
+| Command                 | Description                                      |
+| ----------------------- | ------------------------------------------------ |
 | [`threat`](/cli/threat) | Start the local Threat Cloud intelligence server |
 
 ## Feature Availability
@@ -64,7 +64,8 @@ curl -fsSL https://get.panguard.ai | bash
 ```
 
 <Info>
-  See the [Installation](/installation) page for platform-specific instructions including Homebrew, APT, and Docker options.
+  See the [Installation](/installation) page for platform-specific instructions including Homebrew,
+  APT, and Docker options.
 </Info>
 
 ## Next Steps

@@ -74,9 +74,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: getFrequency(path),
       priority: getPriority(path),
       alternates: {
-        languages: Object.fromEntries(
-          locales.map((l) => [l, localeUrl(l, path)])
-        ),
+        languages: Object.fromEntries(locales.map((l) => [l, localeUrl(l, path)])),
       },
     }))
   );
@@ -88,9 +86,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: 0.6,
       alternates: {
-        languages: Object.fromEntries(
-          locales.map((l) => [l, localeUrl(l, `/blog/${post.slug}`)])
-        ),
+        languages: Object.fromEntries(locales.map((l) => [l, localeUrl(l, `/blog/${post.slug}`)])),
       },
     }))
   );

@@ -1,7 +1,7 @@
 ---
-title: "安裝"
-description: "一行指令安裝。Dashboard 自動開啟。"
-icon: "download"
+title: '安裝'
+description: '一行指令安裝。Dashboard 自動開啟。'
+icon: 'download'
 ---
 
 ## 30 秒搞定
@@ -13,6 +13,7 @@ icon: "download"
     ```
 
     就這樣。Panguard 安裝完、連接你的 AI agent、Dashboard 自動開。
+
   </Tab>
 
   <Tab title="Windows">
@@ -21,6 +22,7 @@ icon: "download"
     ```
 
     在 PowerShell 裡跑。Panguard 安裝完、連接你的 AI agent、Dashboard 自動開。
+
   </Tab>
 
   <Tab title="npm（全平台）">
@@ -29,6 +31,7 @@ icon: "download"
     ```
 
     需要 [Node.js 20+](https://nodejs.org/)。
+
   </Tab>
 </Tabs>
 
@@ -87,12 +90,12 @@ panguard guard status
 
 ## 系統需求
 
-| | 最低需求 |
-| --- | --- |
+|              | 最低需求                              |
+| ------------ | ------------------------------------- |
 | **作業系統** | macOS 12+、Ubuntu 20.04+、Windows 10+ |
-| **Node.js** | 20+ |
-| **磁碟空間** | 200 MB |
-| **記憶體** | 512 MB（Guard 建議 1 GB） |
+| **Node.js**  | 20+                                   |
+| **磁碟空間** | 200 MB                                |
+| **記憶體**   | 512 MB（Guard 建議 1 GB）             |
 
 <Accordion title="平台支援細節">
   | 功能 | macOS | Linux | Windows |
@@ -102,7 +105,8 @@ panguard guard status
   | **Guard** | 完整 | 完整 | 完整 |
   | **Threat Cloud** | 完整 | 完整 | 完整 |
 
-  Windows 支援所有核心功能。部分 OS 層級的網路監控不如 macOS/Linux。
+Windows 支援所有核心功能。部分 OS 層級的網路監控不如 macOS/Linux。
+
 </Accordion>
 
 <Accordion title="從原始碼建置（contributor）">
@@ -113,20 +117,13 @@ panguard guard status
   ./bin/panguard --help
   ```
 
-  需要 [pnpm](https://pnpm.io/) 10+ 和 Node.js 20+。
+需要 [pnpm](https://pnpm.io/) 10+ 和 Node.js 20+。
+
 </Accordion>
 
 <Accordion title="解除安裝">
   <Tabs>
-    <Tab title="npm">
-      ```bash
-      npm uninstall -g @panguard-ai/panguard
-      ```
-    </Tab>
-    <Tab title="curl 安裝">
-      ```bash
-      rm "$(which panguard)"
-      ```
-    </Tab>
+    <Tab title="npm">```bash npm uninstall -g @panguard-ai/panguard ```</Tab>
+    <Tab title="curl 安裝">```bash rm "$(which panguard)" ```</Tab>
   </Tabs>
 </Accordion>

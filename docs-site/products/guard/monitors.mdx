@@ -1,7 +1,7 @@
 ---
-title: "Monitor Types"
-description: "Reference for all 10 monitor types: 4 built-in and 6 advanced monitors with their capabilities and dependencies."
-icon: "eye"
+title: 'Monitor Types'
+description: 'Reference for all 10 monitor types: 4 built-in and 6 advanced monitors with their capabilities and dependencies.'
+icon: 'eye'
 ---
 
 The Guard agent supports 10 monitor types organized into two tiers. Built-in monitors are available on all platforms with zero dependencies. Advanced monitors require specific OS versions or external tools but provide deeper visibility.
@@ -14,38 +14,38 @@ These 4 monitors ship with `@panguard-ai/core` and work on macOS, Linux, and Win
 
 ### Log Monitor
 
-| Field | Details |
-|-------|---------|
-| **Source** | `core/monitors` |
-| **Platforms** | Linux, macOS, Windows |
-| **Data sources** | syslog (`/var/log/syslog`, `/var/log/auth.log`), Windows Event Log, application log files |
+| Field            | Details                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------ |
+| **Source**       | `core/monitors`                                                                                        |
+| **Platforms**    | Linux, macOS, Windows                                                                                  |
+| **Data sources** | syslog (`/var/log/syslog`, `/var/log/auth.log`), Windows Event Log, application log files              |
 | **Capabilities** | Reads and normalizes log entries to `SecurityEvent` format. Supports tailing for real-time monitoring. |
 
 ### Network Monitor
 
-| Field | Details |
-|-------|---------|
-| **Source** | `core/monitors` |
-| **Platforms** | Linux, macOS, Windows |
-| **Data sources** | `/proc/net/tcp` (Linux), `netstat` (cross-platform) |
+| Field            | Details                                                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Source**       | `core/monitors`                                                                                                                           |
+| **Platforms**    | Linux, macOS, Windows                                                                                                                     |
+| **Data sources** | `/proc/net/tcp` (Linux), `netstat` (cross-platform)                                                                                       |
 | **Capabilities** | Monitors active network connections. Detects new connections, unusual ports, traffic to known-bad IPs, and anomalous connection patterns. |
 
 ### Process Monitor
 
-| Field | Details |
-|-------|---------|
-| **Source** | `core/monitors` |
-| **Platforms** | Linux, macOS, Windows |
-| **Data sources** | `/proc` filesystem (Linux), OS APIs (macOS/Windows) |
+| Field            | Details                                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Source**       | `core/monitors`                                                                                                 |
+| **Platforms**    | Linux, macOS, Windows                                                                                           |
+| **Data sources** | `/proc` filesystem (Linux), OS APIs (macOS/Windows)                                                             |
 | **Capabilities** | Scans running processes. Detects new/unusual process spawning, suspicious command lines, and privilege changes. |
 
 ### File Monitor
 
-| Field | Details |
-|-------|---------|
-| **Source** | `core/monitors` |
-| **Platforms** | Linux, macOS, Windows |
-| **Data sources** | inotify (Linux), FSEvents (macOS), ReadDirectoryChangesW (Windows) |
+| Field            | Details                                                                                                                    |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Source**       | `core/monitors`                                                                                                            |
+| **Platforms**    | Linux, macOS, Windows                                                                                                      |
+| **Data sources** | inotify (Linux), FSEvents (macOS), ReadDirectoryChangesW (Windows)                                                         |
 | **Capabilities** | Watches critical filesystem paths for modifications. Tracks file creation, modification, deletion, and permission changes. |
 
 ---
@@ -56,40 +56,40 @@ These 4 monitors ship with `@panguard-ai/panguard-guard` and provide kernel-leve
 
 ### Syscall Monitor (eBPF)
 
-| Field | Details |
-|-------|---------|
-| **Source** | `syscall-monitor.ts` |
-| **Dependency** | Linux Kernel 4.18+ |
-| **Data source** | `/proc` polling for process and network activity |
+| Field            | Details                                                                                                                     |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Source**       | `syscall-monitor.ts`                                                                                                        |
+| **Dependency**   | Linux Kernel 4.18+                                                                                                          |
+| **Data source**  | `/proc` polling for process and network activity                                                                            |
 | **Capabilities** | Detects suspicious processes, privilege escalation attempts, and C2 (command-and-control) connections at the syscall level. |
-| **Event types** | Process creation, privilege changes, network syscalls |
+| **Event types**  | Process creation, privilege changes, network syscalls                                                                       |
 
 ### Memory Scanner
 
-| Field | Details |
-|-------|---------|
-| **Source** | `memory-scanner.ts` |
-| **Dependency** | `CAP_SYS_PTRACE` capability |
+| Field            | Details                                                                                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Source**       | `memory-scanner.ts`                                                                                                                                           |
+| **Dependency**   | `CAP_SYS_PTRACE` capability                                                                                                                                   |
 | **Capabilities** | Scans process memory regions for fileless malware signatures, injected code, and suspicious memory patterns. Detects threats that never touch the filesystem. |
-| **Event types** | Memory injection, fileless malware, process hollowing |
+| **Event types**  | Memory injection, fileless malware, process hollowing                                                                                                         |
 
 ### DPI Monitor (Deep Packet Inspection)
 
-| Field | Details |
-|-------|---------|
-| **Source** | `dpi-monitor.ts` |
-| **Dependency** | None (userspace implementation) |
+| Field            | Details                                                                                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Source**       | `dpi-monitor.ts`                                                                                                                                              |
+| **Dependency**   | None (userspace implementation)                                                                                                                               |
 | **Capabilities** | Protocol-level traffic analysis. Detects C2 beacons, DNS tunneling, encrypted traffic anomalies, and protocol misuse without requiring hardware acceleration. |
-| **Event types** | C2 communication, DNS tunneling, protocol anomalies |
+| **Event types**  | C2 communication, DNS tunneling, protocol anomalies                                                                                                           |
 
 ### Rootkit Detector
 
-| Field | Details |
-|-------|---------|
-| **Source** | `rootkit-detector.ts` |
-| **Dependency** | Linux |
+| Field            | Details                                                                                                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Source**       | `rootkit-detector.ts`                                                                                                                                                   |
+| **Dependency**   | Linux                                                                                                                                                                   |
 | **Capabilities** | Checks for hidden processes (comparing `/proc` with `ps` output), hidden kernel modules, modified system binaries (checksum verification), and `LD_PRELOAD` injections. |
-| **Event types** | Hidden processes, kernel module tampering, binary modification |
+| **Event types**  | Hidden processes, kernel module tampering, binary modification                                                                                                          |
 
 ---
 
@@ -110,5 +110,6 @@ These 4 monitors ship with `@panguard-ai/panguard-guard` and provide kernel-leve
 All monitors feed events into the `MonitorEngine`, which forwards them to the `GuardEngine` for DARE pipeline processing.
 
 <Note>
-  Advanced monitors are optional. Guard operates fully with built-in monitors alone. Enable advanced monitors when you need kernel-level visibility or have the required dependencies installed.
+  Advanced monitors are optional. Guard operates fully with built-in monitors alone. Enable advanced
+  monitors when you need kernel-level visibility or have the required dependencies installed.
 </Note>

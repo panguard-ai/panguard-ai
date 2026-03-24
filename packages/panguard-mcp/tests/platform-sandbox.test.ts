@@ -86,7 +86,15 @@ describe('All supported platforms registered', () => {
   });
 
   it('getConfigPath returns valid path for all platforms', () => {
-    const allIds: PlatformId[] = ['claude-code', 'claude-desktop', 'cursor', 'openclaw', 'codex', 'workbuddy', 'nemoclaw'];
+    const allIds: PlatformId[] = [
+      'claude-code',
+      'claude-desktop',
+      'cursor',
+      'openclaw',
+      'codex',
+      'workbuddy',
+      'nemoclaw',
+    ];
 
     for (const id of allIds) {
       const configPath = getConfigPath(id);

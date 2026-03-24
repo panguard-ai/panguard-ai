@@ -1,7 +1,7 @@
 ---
-title: "Panguard Report"
-description: "Automated compliance report generation for ISO 27001, SOC 2, and Taiwan Cyber Security Act with PDF and JSON output."
-icon: "file-check"
+title: 'Panguard Report'
+description: 'Automated compliance report generation for ISO 27001, SOC 2, and Taiwan Cyber Security Act with PDF and JSON output.'
+icon: 'file-check'
 ---
 
 Panguard Report generates compliance-ready security reports aligned to major regulatory frameworks. It evaluates your system's security posture against framework controls, produces detailed findings with remediation guidance, and outputs professional PDF or machine-readable JSON reports.
@@ -31,10 +31,10 @@ panguard report list-frameworks
 
 ## Supported Frameworks
 
-| Framework | Controls | Identifier |
-|-----------|----------|------------|
-| **ISO 27001** | 30 controls | `iso27001` |
-| **SOC 2** | 10 controls | `soc2` |
+| Framework                            | Controls    | Identifier              |
+| ------------------------------------ | ----------- | ----------------------- |
+| **ISO 27001**                        | 30 controls | `iso27001`              |
+| **SOC 2**                            | 10 controls | `soc2`                  |
 | **Taiwan Cyber Security Act (TCSA)** | 10 controls | `tw_cyber_security_act` |
 
 See [Frameworks](/products/report/frameworks) for a full breakdown of every control.
@@ -43,16 +43,20 @@ See [Frameworks](/products/report/frameworks) for a full breakdown of every cont
 
 <Steps>
   <Step title="Collect evidence">
-    Report pulls findings from the most recent Panguard Scan results and Guard event logs. No additional scanning is required.
+    Report pulls findings from the most recent Panguard Scan results and Guard event logs. No
+    additional scanning is required.
   </Step>
   <Step title="Map to controls">
-    Each finding is mapped to applicable framework controls. A single finding may map to multiple controls across multiple frameworks.
+    Each finding is mapped to applicable framework controls. A single finding may map to multiple
+    controls across multiple frameworks.
   </Step>
   <Step title="Assess compliance">
-    Each control receives a status: Compliant, Partially Compliant, Non-Compliant, or Not Assessed based on the evidence collected.
+    Each control receives a status: Compliant, Partially Compliant, Non-Compliant, or Not Assessed
+    based on the evidence collected.
   </Step>
   <Step title="Generate output">
-    The report is rendered in your chosen format (PDF or JSON) with executive summary, control assessments, findings, and remediation.
+    The report is rendered in your chosen format (PDF or JSON) with executive summary, control
+    assessments, findings, and remediation.
   </Step>
 </Steps>
 
@@ -60,14 +64,14 @@ See [Frameworks](/products/report/frameworks) for a full breakdown of every cont
 
 Every compliance report includes 6 sections:
 
-| Section | Content |
-|---------|---------|
-| **Organization Information** | Organization name, report date, assessment scope |
-| **Framework Overview** | Description of the applicable compliance framework |
-| **Control Evaluation** | Each control assessed with status and evidence |
-| **Findings Detail** | Specific issues with severity and affected controls |
-| **Remediation Recommendations** | Actionable improvement steps per finding |
-| **Compliance Summary** | Overall compliance percentage and risk assessment |
+| Section                         | Content                                             |
+| ------------------------------- | --------------------------------------------------- |
+| **Organization Information**    | Organization name, report date, assessment scope    |
+| **Framework Overview**          | Description of the applicable compliance framework  |
+| **Control Evaluation**          | Each control assessed with status and evidence      |
+| **Findings Detail**             | Specific issues with severity and affected controls |
+| **Remediation Recommendations** | Actionable improvement steps per finding            |
+| **Compliance Summary**          | Overall compliance percentage and risk assessment   |
 
 ## Quick Compliance Summary
 

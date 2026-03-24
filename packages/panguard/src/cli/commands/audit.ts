@@ -95,7 +95,8 @@ export function auditCommand(): Command {
             try {
               const blacklist = await tc.fetchSkillBlacklist();
               const match = blacklist.find(
-                (b) => b.skillHash === skillHash || b.skillName.toLowerCase() === skillName.toLowerCase()
+                (b) =>
+                  b.skillHash === skillHash || b.skillName.toLowerCase() === skillName.toLowerCase()
               );
               if (match) {
                 isBlacklisted = true;
@@ -149,7 +150,7 @@ export function auditCommand(): Command {
             severity: 'critical',
             title: blacklistReason,
             description: blacklistReason,
-          } as typeof report.findings[0]);
+          } as (typeof report.findings)[0]);
         }
 
         if (options.json) {
@@ -201,12 +202,12 @@ export function auditCommand(): Command {
 
           // Show AI setup hint if AI check was skipped
           const aiSkipped = report.checks.some(
-            (ch) => ch.status === 'info' && ch.label.includes('AI Analysis'),
+            (ch) => ch.status === 'info' && ch.label.includes('AI Analysis')
           );
           if (aiSkipped) {
             console.log();
             console.log(
-              c.yellow('  Tip: AI analysis was skipped. To enable deeper semantic analysis:'),
+              c.yellow('  Tip: AI analysis was skipped. To enable deeper semantic analysis:')
             );
             console.log(c.dim('       - Ollama (free, local): ollama pull llama3'));
             console.log(c.dim('       - Or set ANTHROPIC_API_KEY or OPENAI_API_KEY'));
@@ -311,9 +312,14 @@ export function auditCommand(): Command {
 
             const conditions = highFindings
               .map((f, idx) => {
-                const keywords = f.title.split(/\s+/).filter((w) => w.length > 4).slice(0, 4);
+                const keywords = f.title
+                  .split(/\s+/)
+                  .filter((w) => w.length > 4)
+                  .slice(0, 4);
                 if (keywords.length === 0) return null;
-                const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
+                const regex = keywords
+                  .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+                  .join('.*');
                 return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${f.title.slice(0, 80)}"`;
               })
               .filter(Boolean);

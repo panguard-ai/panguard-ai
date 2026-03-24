@@ -1,7 +1,7 @@
 ---
-title: "panguard trap"
-description: "部署和管理蜜罐欺敵服務，以偵測和分析攻擊者。"
-icon: "honey-pot"
+title: 'panguard trap'
+description: '部署和管理蜜罐欺敵服務，以偵測和分析攻擊者。'
+icon: 'honey-pot'
 ---
 
 `trap` 指令部署輕量級蜜罐服務，模擬真實的網路服務（SSH、HTTP、SMB 等）。當攻擊者與蜜罐互動時，Panguard 會擷取其戰術、產生威脅情報，並立即向您發出警報。
@@ -14,14 +14,14 @@ panguard trap <subcommand> [options]
 
 ## 子指令
 
-| 子指令 | 說明 |
-| --- | --- |
-| `start` | 啟動蜜罐服務 |
-| `stop` | 停止所有運行中的蜜罐服務 |
-| `status` | 顯示活躍的蜜罐和互動統計 |
-| `config` | 檢視或修改蜜罐設定 |
+| 子指令     | 說明                               |
+| ---------- | ---------------------------------- |
+| `start`    | 啟動蜜罐服務                       |
+| `stop`     | 停止所有運行中的蜜罐服務           |
+| `status`   | 顯示活躍的蜜罐和互動統計           |
+| `config`   | 檢視或修改蜜罐設定                 |
 | `profiles` | 列出從蜜罐互動中建立的攻擊者描述檔 |
-| `intel` | 匯出收集到的威脅情報資料 |
+| `intel`    | 匯出收集到的威脅情報資料           |
 
 ## 選項
 
@@ -63,20 +63,20 @@ panguard trap intel
 ```bash 離線模式（不上傳至雲端）
 panguard trap start --services ssh,http --no-cloud
 ```
+
 </CodeGroup>
 
 ## 支援的蜜罐服務
 
-| 服務 | 預設埠 | 模擬對象 |
-| --- | --- | --- |
-| `ssh` | 2222 | OpenSSH 伺服器 |
-| `http` | 8080 | Apache/Nginx 網頁伺服器 |
-| `smb` | 4450 | Windows 檔案共享 |
-| `ftp` | 2121 | FTP 伺服器 |
-| `mysql` | 3307 | MySQL 資料庫 |
-| `redis` | 6380 | Redis 鍵值儲存 |
-| `rdp` | 3390 | Windows 遠端桌面 |
-
+| 服務    | 預設埠 | 模擬對象                |
+| ------- | ------ | ----------------------- |
+| `ssh`   | 2222   | OpenSSH 伺服器          |
+| `http`  | 8080   | Apache/Nginx 網頁伺服器 |
+| `smb`   | 4450   | Windows 檔案共享        |
+| `ftp`   | 2121   | FTP 伺服器              |
+| `mysql` | 3307   | MySQL 資料庫            |
+| `redis` | 6380   | Redis 鍵值儲存          |
+| `rdp`   | 3390   | Windows 遠端桌面        |
 
 ## 相關資源
 

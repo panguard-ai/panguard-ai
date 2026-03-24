@@ -73,10 +73,7 @@ describe('calculateRiskScore', () => {
 
     it('single critical finding with contextMultiplier 1.0 = score 25, level CRITICAL', () => {
       // Logic: score >= 25 && hasCritical && !weakened => CRITICAL
-      const { score, level } = calculateRiskScore(
-        [makeFinding('f1', 'critical')],
-        1.0
-      );
+      const { score, level } = calculateRiskScore([makeFinding('f1', 'critical')], 1.0);
       expect(score).toBe(25);
       expect(level).toBe('CRITICAL');
     });
@@ -95,10 +92,7 @@ describe('calculateRiskScore', () => {
     });
 
     it('deduplicates correctly when highest severity appears first', () => {
-      const findings = [
-        makeFinding('dup-id', 'critical'),
-        makeFinding('dup-id', 'low'),
-      ];
+      const findings = [makeFinding('dup-id', 'critical'), makeFinding('dup-id', 'low')];
       const { score } = calculateRiskScore(findings);
       expect(score).toBe(25);
     });
@@ -106,7 +100,7 @@ describe('calculateRiskScore', () => {
     it('keeps distinct IDs separate', () => {
       const findings = [
         makeFinding('id-a', 'critical'), // 25
-        makeFinding('id-b', 'high'),     // 15
+        makeFinding('id-b', 'high'), // 15
       ];
       const { score } = calculateRiskScore(findings);
       expect(score).toBe(40);
@@ -170,9 +164,7 @@ describe('calculateRiskScore', () => {
 
   describe('score cap at 100', () => {
     it('many critical findings are capped at 100', () => {
-      const findings = Array.from({ length: 20 }, (_, i) =>
-        makeFinding(`f${i}`, 'critical')
-      );
+      const findings = Array.from({ length: 20 }, (_, i) => makeFinding(`f${i}`, 'critical'));
       const { score } = calculateRiskScore(findings, 1.0);
       expect(score).toBe(100);
     });
@@ -193,9 +185,7 @@ describe('calculateRiskScore', () => {
       // 14 high findings (no dedup because different IDs) = 14*15=210, *0.5 = 105 => cap 100... different approach
       // Use medium findings: need score >= 70 via multiplier
       // 14 medium findings = 70 raw => CRITICAL
-      const findings = Array.from({ length: 14 }, (_, i) =>
-        makeFinding(`f${i}`, 'medium')
-      );
+      const findings = Array.from({ length: 14 }, (_, i) => makeFinding(`f${i}`, 'medium'));
       const { score, level } = calculateRiskScore(findings, 1.0);
       expect(score).toBe(70);
       expect(level).toBe('CRITICAL');
@@ -203,9 +193,7 @@ describe('calculateRiskScore', () => {
 
     it('score 40 with no critical = HIGH', () => {
       // 8 medium = 40
-      const findings = Array.from({ length: 8 }, (_, i) =>
-        makeFinding(`f${i}`, 'medium')
-      );
+      const findings = Array.from({ length: 8 }, (_, i) => makeFinding(`f${i}`, 'medium'));
       const { score, level } = calculateRiskScore(findings, 1.0);
       expect(score).toBe(40);
       expect(level).toBe('HIGH');
@@ -213,9 +201,7 @@ describe('calculateRiskScore', () => {
 
     it('score 15 with no critical = MEDIUM', () => {
       // 3 medium = 15
-      const findings = Array.from({ length: 3 }, (_, i) =>
-        makeFinding(`f${i}`, 'medium')
-      );
+      const findings = Array.from({ length: 3 }, (_, i) => makeFinding(`f${i}`, 'medium'));
       const { score, level } = calculateRiskScore(findings, 1.0);
       expect(score).toBe(15);
       expect(level).toBe('MEDIUM');
@@ -223,9 +209,7 @@ describe('calculateRiskScore', () => {
 
     it('score below 15 with no critical = LOW', () => {
       // 2 medium = 10
-      const findings = Array.from({ length: 2 }, (_, i) =>
-        makeFinding(`f${i}`, 'medium')
-      );
+      const findings = Array.from({ length: 2 }, (_, i) => makeFinding(`f${i}`, 'medium'));
       const { score, level } = calculateRiskScore(findings, 1.0);
       expect(score).toBe(10);
       expect(level).toBe('LOW');

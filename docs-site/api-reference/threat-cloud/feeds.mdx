@@ -1,7 +1,7 @@
 ---
-title: "Feed Endpoints"
-description: "Consume threat intelligence feeds in blocklist and structured JSON formats."
-icon: "rss"
+title: 'Feed Endpoints'
+description: 'Consume threat intelligence feeds in blocklist and structured JSON formats.'
+icon: 'rss'
 ---
 
 Feed endpoints provide threat intelligence in formats optimized for consumption by firewalls, DNS resolvers, and Panguard agents. Blocklist feeds return plain text; structured feeds return JSON.
@@ -11,7 +11,8 @@ Feed endpoints provide threat intelligence in formats optimized for consumption 
 Returns a plain-text list of malicious IP addresses, one per line. Designed for direct ingestion by firewalls (iptables, pf, Windows Firewall) and network appliances.
 
 <ParamField query="minReputation" type="number" default="30">
-  Maximum reputation score to include (0 = most malicious). Lower values produce a more conservative list.
+  Maximum reputation score to include (0 = most malicious). Lower values produce a more conservative
+  list.
 </ParamField>
 
 <ParamField query="category" type="string">
@@ -31,6 +32,7 @@ curl -s "https://tc.panguard.ai/api/feeds/ip-blocklist" \
     iptables -A INPUT -s "$ip" -j DROP
   done
 ```
+
 </CodeGroup>
 
 ### Response
@@ -48,7 +50,8 @@ curl -s "https://tc.panguard.ai/api/feeds/ip-blocklist" \
 ```
 
 <Info>
-The response content type is `text/plain`. Lines starting with `#` are comments containing metadata. The list is sorted by reputation score (most malicious first).
+  The response content type is `text/plain`. Lines starting with `#` are comments containing
+  metadata. The list is sorted by reputation score (most malicious first).
 </Info>
 
 ---
@@ -76,6 +79,7 @@ curl -s "https://tc.panguard.ai/api/feeds/domain-blocklist" \
   -H "Authorization: Bearer YOUR_API_KEY" | \
   sed 's/^/0.0.0.0 /' > /etc/pihole/panguard-blocklist.txt
 ```
+
 </CodeGroup>
 
 ### Response
@@ -110,10 +114,9 @@ Returns the full IoC feed in structured JSON format with metadata, suitable for 
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/feeds/iocs?since=2026-03-06T00:00:00Z&type=ip" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET
+  "https://tc.panguard.ai/api/feeds/iocs?since=2026-03-06T00:00:00Z&type=ip" \ -H "Authorization:
+  Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -159,10 +162,8 @@ Returns a bundled update package for Panguard Guard agents containing the latest
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/feeds/agent-update?currentVersion=v20260306" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/feeds/agent-update?currentVersion=v20260306"
+  \ -H "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -200,5 +201,6 @@ curl -X GET "https://tc.panguard.ai/api/feeds/agent-update?currentVersion=v20260
 </ResponseExample>
 
 <Tip>
-The agent-update endpoint uses delta updates when a `currentVersion` is provided. This minimizes bandwidth by only sending new or modified rules since the agent's last update.
+  The agent-update endpoint uses delta updates when a `currentVersion` is provided. This minimizes
+  bandwidth by only sending new or modified rules since the agent's last update.
 </Tip>

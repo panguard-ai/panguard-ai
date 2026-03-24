@@ -1,7 +1,7 @@
 ---
-title: "Guard Issues"
-description: "Troubleshoot Panguard Guard startup, performance, and detection problems."
-icon: "shield"
+title: 'Guard Issues'
+description: 'Troubleshoot Panguard Guard startup, performance, and detection problems.'
+icon: 'shield'
 ---
 
 ## Guard Already Running
@@ -26,7 +26,8 @@ sudo panguard guard start
 ```
 
 <Warning>
-Do not run multiple Guard instances on the same machine. They will conflict on log file access, firewall rules, and monitoring resources.
+  Do not run multiple Guard instances on the same machine. They will conflict on log file access,
+  firewall rules, and monitoring resources.
 </Warning>
 
 If the PID file references a process that no longer exists (stale PID):
@@ -69,6 +70,7 @@ Guard requires root/admin privileges to read system logs and manage firewall rul
     ```bash
     sudo systemctl status panguard-guard
     ```
+
   </Tab>
   <Tab title="macOS launchd">
     ```bash
@@ -98,6 +100,7 @@ If Guard consumes more memory than expected:
     | ATR rule engine (61 rules) | ~20 MB |
     | AI analysis (local) | 100--500 MB |
     | **Total** | **170--620 MB** |
+
   </Accordion>
   <Accordion title="Reduce memory usage">
     1. **Disable unused monitors** -- Turn off monitoring for subsystems you do not need:
@@ -121,6 +124,7 @@ If Guard consumes more memory than expected:
        ```bash
        export NODE_OPTIONS="--max-old-space-size=512"
        ```
+
   </Accordion>
 </AccordionGroup>
 
@@ -144,6 +148,7 @@ If Guard generates too many alerts for legitimate activity:
     panguard config set mode learning
     sudo panguard guard start
     ```
+
   </Accordion>
   <Accordion title="Adjust detection thresholds">
     Increase the threshold for specific threat types:
@@ -155,6 +160,7 @@ If Guard generates too many alerts for legitimate activity:
     # Increase SSH failure threshold
     panguard config set rules.sshFailureThreshold 20
     ```
+
   </Accordion>
   <Accordion title="Whitelist known-good IPs and processes">
     Add trusted IPs and processes to the whitelist:
@@ -166,6 +172,7 @@ If Guard generates too many alerts for legitimate activity:
     # Whitelist a process
     panguard config set response.whitelistedProcesses '["backup-agent", "monitoring-daemon"]'
     ```
+
   </Accordion>
   <Accordion title="Disable noisy rules">
     Identify and disable specific rules causing false positives:
@@ -177,6 +184,7 @@ If Guard generates too many alerts for legitimate activity:
     # Disable a specific rule
     panguard config set rules.excludeIds '["ATR-2025-0099"]'
     ```
+
   </Accordion>
 </AccordionGroup>
 
@@ -203,6 +211,7 @@ If Guard detects threats but does not take automated action:
     <Warning>
     Setting `minConfidence` below 0.7 significantly increases the risk of false positive responses (blocking legitimate IPs or killing legitimate processes).
     </Warning>
+
   </Accordion>
   <Accordion title="Verify response is enabled">
     ```bash
@@ -215,6 +224,7 @@ If Guard detects threats but does not take automated action:
     panguard config set response.enabled true
     panguard config set response.autoBlock true
     ```
+
   </Accordion>
   <Accordion title="Check operating mode">
     Auto-response does not execute in `learning` or `detect` modes:
@@ -228,6 +238,7 @@ If Guard detects threats but does not take automated action:
     panguard config set mode protect
     sudo panguard guard restart
     ```
+
   </Accordion>
   <Accordion title="Check approval requirement">
     If `requireApproval` is enabled, Guard sends approval requests instead of auto-executing:
@@ -237,6 +248,7 @@ If Guard detects threats but does not take automated action:
     # If true, check pending approvals:
     panguard guard approvals
     ```
+
   </Accordion>
 </AccordionGroup>
 
@@ -254,6 +266,7 @@ If Guard detects threats but does not take automated action:
     ```bash
     panguard guard logs --limit 50
     ```
+
   </Accordion>
   <Accordion title="Run diagnostics">
     ```bash
@@ -261,6 +274,7 @@ If Guard detects threats but does not take automated action:
     ```
 
     This checks Node.js version, permissions, disk space, port availability, and configuration validity.
+
   </Accordion>
   <Accordion title="Reset configuration">
     If the config file is corrupted:
@@ -273,5 +287,6 @@ If Guard detects threats but does not take automated action:
     rm ~/.panguard-guard/config.json
     sudo panguard guard start
     ```
+
   </Accordion>
 </AccordionGroup>

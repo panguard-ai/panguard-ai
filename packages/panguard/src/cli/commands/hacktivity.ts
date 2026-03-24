@@ -163,7 +163,9 @@ export function hacktivityCommand(): Command {
   // ─── generate-rules ───
   cmd
     .command('generate-rules')
-    .description('Generate detection rules from fetched reports / 從報告生成偵測規則 (legacy, uses Sigma format)')
+    .description(
+      'Generate detection rules from fetched reports / 從報告生成偵測規則 (legacy, uses Sigma format)'
+    )
     .option('--ollama-url <url>', 'Ollama API URL', 'http://localhost:11434')
     .option('--model <name>', 'Ollama model name', 'llama3.2')
     .option('--heuristic-only', 'Skip Ollama, use heuristic extraction only', false)

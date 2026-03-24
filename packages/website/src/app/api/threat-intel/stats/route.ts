@@ -48,7 +48,9 @@ export async function GET() {
       : 0;
     const validatedRecords = syncStats?.totalRecords ?? 0;
 
-    const meta = readJsonSafe<RulesMeta>(resolve(root, 'config/rules/auto-generated/.rules-meta.json'));
+    const meta = readJsonSafe<RulesMeta>(
+      resolve(root, 'config/rules/auto-generated/.rules-meta.json')
+    );
 
     const draftATR = meta?.atrByStatus?.['draft'] ?? 0;
     const promotedATR = meta?.atrByStatus?.['promoted'] ?? 0;

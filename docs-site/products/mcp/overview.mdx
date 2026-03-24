@@ -1,7 +1,7 @@
 ---
-title: "Panguard MCP Server"
-description: "Model Context Protocol server exposing 11 Panguard security tools to AI assistants like Claude Desktop, Cursor, and Windsurf."
-icon: "plug"
+title: 'Panguard MCP Server'
+description: 'Model Context Protocol server exposing 11 Panguard security tools to AI assistants like Claude Desktop, Cursor, and Windsurf.'
+icon: 'plug'
 ---
 
 Panguard MCP implements the [Model Context Protocol](https://modelcontextprotocol.io) standard, allowing AI assistants to interact with your security infrastructure through natural language. Ask your AI to scan for vulnerabilities, check guard status, block malicious IPs, or generate compliance reports -- all through conversation.
@@ -26,6 +26,7 @@ Add Panguard to your AI assistant's MCP configuration:
     ```
 
     Restart Claude Desktop after saving.
+
   </Tab>
   <Tab title="Cursor">
     Add to your Cursor MCP settings (Settings > MCP Servers):
@@ -38,6 +39,7 @@ Add Panguard to your AI assistant's MCP configuration:
       }
     }
     ```
+
   </Tab>
   <Tab title="Windsurf">
     Add to your Windsurf MCP configuration:
@@ -52,6 +54,7 @@ Add Panguard to your AI assistant's MCP configuration:
       }
     }
     ```
+
   </Tab>
   <Tab title="Claude Code">
     Add to your Claude Code MCP settings:
@@ -66,6 +69,7 @@ Add Panguard to your AI assistant's MCP configuration:
       }
     }
     ```
+
   </Tab>
 </Tabs>
 
@@ -73,35 +77,35 @@ Add Panguard to your AI assistant's MCP configuration:
 
 Once configured, interact with Panguard through natural language:
 
-| Example Request | MCP Tool Used |
-|----------------|---------------|
-| "Scan this machine for vulnerabilities" | `panguard_scan` |
-| "Check my source code for security issues" | `panguard_scan_code` |
-| "Start real-time protection" | `panguard_guard_start` |
-| "Stop the Guard engine" | `panguard_guard_stop` |
-| "What is the current security status?" | `panguard_status` |
-| "Show me recent alerts" | `panguard_alerts` |
-| "Block IP 203.0.113.50" | `panguard_block_ip` |
-| "Generate a PDF security report" | `panguard_generate_report` |
-| "Initialize Panguard configuration" | `panguard_init` |
-| "Audit this skill directory for security" | `panguard_audit_skill` |
-| "Deploy full protection on this machine" | `panguard_deploy` |
+| Example Request                            | MCP Tool Used              |
+| ------------------------------------------ | -------------------------- |
+| "Scan this machine for vulnerabilities"    | `panguard_scan`            |
+| "Check my source code for security issues" | `panguard_scan_code`       |
+| "Start real-time protection"               | `panguard_guard_start`     |
+| "Stop the Guard engine"                    | `panguard_guard_stop`      |
+| "What is the current security status?"     | `panguard_status`          |
+| "Show me recent alerts"                    | `panguard_alerts`          |
+| "Block IP 203.0.113.50"                    | `panguard_block_ip`        |
+| "Generate a PDF security report"           | `panguard_generate_report` |
+| "Initialize Panguard configuration"        | `panguard_init`            |
+| "Audit this skill directory for security"  | `panguard_audit_skill`     |
+| "Deploy full protection on this machine"   | `panguard_deploy`          |
 
 ## 11 Available Tools
 
-| Tool | Category | Description |
-|------|----------|-------------|
-| `panguard_scan` | Scan | Run a security health check scan (quick or full) |
-| `panguard_scan_code` | Scan | SAST scan of source code directory |
-| `panguard_guard_start` | Guard | Start the real-time monitoring daemon |
-| `panguard_guard_stop` | Guard | Stop the monitoring daemon |
-| `panguard_status` | System | Get status of all Panguard services |
-| `panguard_alerts` | Guard | Get recent security alerts with severity filter |
-| `panguard_block_ip` | Guard | Manually block an IP address |
-| `panguard_generate_report` | Report | Generate a PDF compliance report |
-| `panguard_init` | System | Initialize Panguard configuration |
-| `panguard_audit_skill` | Scan | Audit an OpenClaw/AgentSkills directory |
-| `panguard_deploy` | System | One-click deploy: scan + guard + report |
+| Tool                       | Category | Description                                      |
+| -------------------------- | -------- | ------------------------------------------------ |
+| `panguard_scan`            | Scan     | Run a security health check scan (quick or full) |
+| `panguard_scan_code`       | Scan     | SAST scan of source code directory               |
+| `panguard_guard_start`     | Guard    | Start the real-time monitoring daemon            |
+| `panguard_guard_stop`      | Guard    | Stop the monitoring daemon                       |
+| `panguard_status`          | System   | Get status of all Panguard services              |
+| `panguard_alerts`          | Guard    | Get recent security alerts with severity filter  |
+| `panguard_block_ip`        | Guard    | Manually block an IP address                     |
+| `panguard_generate_report` | Report   | Generate a PDF compliance report                 |
+| `panguard_init`            | System   | Initialize Panguard configuration                |
+| `panguard_audit_skill`     | Scan     | Audit an OpenClaw/AgentSkills directory          |
+| `panguard_deploy`          | System   | One-click deploy: scan + guard + report          |
 
 <Card title="Tools Reference" icon="wrench" href="/products/mcp/tools-reference">
   Full parameter reference and examples for all 11 MCP tools.

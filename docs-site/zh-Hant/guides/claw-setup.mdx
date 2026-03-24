@@ -1,7 +1,7 @@
 ---
-title: "安裝到 OpenClaw 及相容平台"
-description: "OpenClaw、QClaw、WorkBuddy、NemoClaw、ArkClaw 一鍵安裝指南。不需帳號。"
-icon: "bolt"
+title: '安裝到 OpenClaw 及相容平台'
+description: 'OpenClaw、QClaw、WorkBuddy、NemoClaw、ArkClaw 一鍵安裝指南。不需帳號。'
+icon: 'bolt'
 ---
 
 60 秒內把 Panguard 裝到你的 Claw AI agent 或相容 MCP 平台。不需帳號、不需登入、不需設定。
@@ -87,13 +87,13 @@ npx panguard setup --platform qclaw
 
 裝完重啟 QClaw。Panguard 的 11 個 MCP 工具就能用了：
 
-| 工具 | 功能 |
-| --- | --- |
-| `panguard_audit_skill` | 安裝前審計 skill |
-| `panguard_scan` | 跑安全掃描 |
-| `panguard_status` | 顯示 Guard 狀態 |
-| `panguard_guard_start` | 啟動 24/7 防護 |
-| `panguard_threat_search` | 搜尋威脅情報 |
+| 工具                     | 功能             |
+| ------------------------ | ---------------- |
+| `panguard_audit_skill`   | 安裝前審計 skill |
+| `panguard_scan`          | 跑安全掃描       |
+| `panguard_status`        | 顯示 Guard 狀態  |
+| `panguard_guard_start`   | 啟動 24/7 防護   |
+| `panguard_threat_search` | 搜尋威脅情報     |
 
 ### 驗證
 
@@ -225,19 +225,18 @@ cat ~/.arkclaw/mcp.json
     1. 確認 app 已安裝而且至少開過一次
     2. 檢查 config 目錄存不存在：`ls ~/.openclaw` 或 `ls ~/.qclaw`
     3. 用 `--platform` flag 強制指定：`npx panguard setup --platform openclaw`
+
   </Accordion>
 
-  <Accordion title="QClaw 看不到 MCP 工具">
-    1. 完全重啟 QClaw（關掉再開）
-    2. 確認 config：`cat ~/.qclaw/mcp.json`
-    3. 確認 `npx` 在 PATH 裡：`which npx`
-  </Accordion>
+<Accordion title="QClaw 看不到 MCP 工具">
+  1. 完全重啟 QClaw（關掉再開） 2. 確認 config：`cat ~/.qclaw/mcp.json` 3. 確認 `npx` 在 PATH
+  裡：`which npx`
+</Accordion>
 
-  <Accordion title="OpenClaw skill 沒反應">
-    1. 重啟 OpenClaw
-    2. 確認檔案存在：`ls ~/.openclaw/skills/panguard/SKILL.md`
-    3. 確認 `panguard` CLI 可用：`npx panguard --version`
-  </Accordion>
+<Accordion title="OpenClaw skill 沒反應">
+  1. 重啟 OpenClaw 2. 確認檔案存在：`ls ~/.openclaw/skills/panguard/SKILL.md` 3. 確認 `panguard` CLI
+  可用：`npx panguard --version`
+</Accordion>
 
   <Accordion title="移除 Panguard">
     ```bash
@@ -251,10 +250,10 @@ cat ~/.arkclaw/mcp.json
 
 ## 總覽
 
-| | OpenClaw | QClaw | WorkBuddy | NemoClaw | ArkClaw |
-| --- | --- | --- | --- | --- | --- |
-| **協議** | 原生 Skill | MCP | MCP | MCP | MCP |
-| **Config 路徑** | `~/.openclaw/skills/panguard/SKILL.md` | `~/.qclaw/mcp.json` | `~/.workbuddy/.mcp.json` | `~/.nemoclaw/mcp.json` | `~/.arkclaw/mcp.json` |
-| **安裝指令** | `npx panguard setup` | `npx panguard setup` | `npx panguard setup` | `npx panguard setup` | `npx panguard setup` |
-| **需要帳號** | 否 | 否 | 否 | 否 | 否 |
-| **需要重啟** | 是 | 是 | 是 | 是 | 是 |
+|                 | OpenClaw                               | QClaw                | WorkBuddy                | NemoClaw               | ArkClaw               |
+| --------------- | -------------------------------------- | -------------------- | ------------------------ | ---------------------- | --------------------- |
+| **協議**        | 原生 Skill                             | MCP                  | MCP                      | MCP                    | MCP                   |
+| **Config 路徑** | `~/.openclaw/skills/panguard/SKILL.md` | `~/.qclaw/mcp.json`  | `~/.workbuddy/.mcp.json` | `~/.nemoclaw/mcp.json` | `~/.arkclaw/mcp.json` |
+| **安裝指令**    | `npx panguard setup`                   | `npx panguard setup` | `npx panguard setup`     | `npx panguard setup`   | `npx panguard setup`  |
+| **需要帳號**    | 否                                     | 否                   | 否                       | 否                     | 否                    |
+| **需要重啟**    | 是                                     | 是                   | 是                       | 是                     | 是                    |

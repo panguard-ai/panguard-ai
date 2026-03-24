@@ -16,10 +16,7 @@ export type {
   RiskLevel,
 } from '@panguard-ai/scan-core';
 
-import type {
-  Finding,
-  RiskLevel,
-} from '@panguard-ai/scan-core';
+import type { Finding, RiskLevel } from '@panguard-ai/scan-core';
 
 // ---------------------------------------------------------------------------
 // CLI-specific types (backward compatible aliases)

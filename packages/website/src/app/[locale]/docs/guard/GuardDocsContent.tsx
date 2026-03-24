@@ -46,7 +46,10 @@ export default function GuardDocsContent() {
         {/* Header */}
         <FadeInUp>
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-panguard-green/70 font-semibold mb-4">
-            <Link href="https://docs.panguard.ai" className="hover:text-panguard-green transition-colors">
+            <Link
+              href="https://docs.panguard.ai"
+              className="hover:text-panguard-green transition-colors"
+            >
               Docs
             </Link>
             <span>/</span>
@@ -56,9 +59,9 @@ export default function GuardDocsContent() {
             Panguard Guard
           </h1>
           <p className="text-lg text-text-secondary mt-4 max-w-2xl">
-            Real-time endpoint protection powered by a 5-agent AI pipeline. Guard monitors
-            AI agent tool calls, prompt flows, and skill behavior 24/7 using ATR (Agent Threat Rules)
-            backed by a three-layer AI analysis funnel.
+            Real-time endpoint protection powered by a 5-agent AI pipeline. Guard monitors AI agent
+            tool calls, prompt flows, and skill behavior 24/7 using ATR (Agent Threat Rules) backed
+            by a three-layer AI analysis funnel.
           </p>
         </FadeInUp>
 
@@ -100,8 +103,8 @@ export default function GuardDocsContent() {
                   </td>
                   <td className="px-4 py-3 text-text-primary">Rule matching</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Runs ATR rules against incoming telemetry. Produces raw alerts
-                    with severity and confidence scores.
+                    Runs ATR rules against incoming telemetry. Produces raw alerts with severity and
+                    confidence scores.
                   </td>
                 </tr>
                 <tr>
@@ -170,9 +173,9 @@ export default function GuardDocsContent() {
                   <td className="px-4 py-3 text-panguard-green font-medium">ATR</td>
                   <td className="px-4 py-3 text-text-primary">{STATS.atrRulesDisplay}</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Agent Threat Rules. Purpose-built for AI agent security: prompt injection,
-                    tool poisoning, MCP server abuse, credential exfiltration, context manipulation,
-                    and skill supply-chain attacks.
+                    Agent Threat Rules. Purpose-built for AI agent security: prompt injection, tool
+                    poisoning, MCP server abuse, credential exfiltration, context manipulation, and
+                    skill supply-chain attacks.
                   </td>
                 </tr>
               </tbody>
@@ -193,8 +196,7 @@ export default function GuardDocsContent() {
                 layer: 'Layer 1: Rules',
                 percent: '90%',
                 latency: '< 50 ms',
-                description:
-                  'ATR rules resolve clear-cut matches. No AI involved.',
+                description: 'ATR rules resolve clear-cut matches. No AI involved.',
                 color: 'border-green-500/30 bg-green-500/5',
               },
               {

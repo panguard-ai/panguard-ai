@@ -1,18 +1,18 @@
 ---
-title: "Common Issues"
-description: "System requirements, supported platforms, updating, and uninstalling Panguard AI."
-icon: "circle-question"
+title: 'Common Issues'
+description: 'System requirements, supported platforms, updating, and uninstalling Panguard AI.'
+icon: 'circle-question'
 ---
 
 ## Supported Operating Systems
 
-| OS | Minimum Version | Architecture | Notes |
-|----|----------------|--------------|-------|
-| macOS | 12 (Monterey)+ | x64, ARM64 (Apple Silicon) | Full support including Guard and Trap |
-| Ubuntu | 20.04 LTS+ | x64, ARM64 | Recommended Linux distribution |
-| Debian | 11 (Bullseye)+ | x64, ARM64 | Full support |
-| CentOS / RHEL | 8+ | x64 | SELinux compatible |
-| Windows | 10 (build 1903)+ | x64 | Guard requires Administrator |
+| OS            | Minimum Version  | Architecture               | Notes                                 |
+| ------------- | ---------------- | -------------------------- | ------------------------------------- |
+| macOS         | 12 (Monterey)+   | x64, ARM64 (Apple Silicon) | Full support including Guard and Trap |
+| Ubuntu        | 20.04 LTS+       | x64, ARM64                 | Recommended Linux distribution        |
+| Debian        | 11 (Bullseye)+   | x64, ARM64                 | Full support                          |
+| CentOS / RHEL | 8+               | x64                        | SELinux compatible                    |
+| Windows       | 10 (build 1903)+ | x64                        | Guard requires Administrator          |
 
 ## System Requirements
 
@@ -43,6 +43,7 @@ icon: "circle-question"
     # Windows (winget)
     winget install OpenJS.NodeJS.LTS
     ```
+
   </Accordion>
   <Accordion title="Root / Administrator Privileges">
     Different Panguard modules have different privilege requirements:
@@ -61,6 +62,7 @@ icon: "circle-question"
     sudo panguard guard start
     sudo panguard trap start
     ```
+
   </Accordion>
   <Accordion title="Disk Space">
     | Component | Approximate Size |
@@ -82,6 +84,7 @@ icon: "circle-question"
     | `localhost:11434` | Ollama local AI (if configured) |
 
     All connections can optionally go through an HTTP proxy via the `HTTPS_PROXY` environment variable.
+
   </Accordion>
 </AccordionGroup>
 
@@ -101,6 +104,7 @@ npx panguard@latest doctor
 ```bash Verify version
 panguard --version
 ```
+
 </CodeGroup>
 
 After updating, restart any running services:
@@ -116,7 +120,8 @@ panguard chat start
 ```
 
 <Info>
-Panguard checks for updates automatically and displays a notification in the CLI when a new version is available. ATR detection rules update independently from the CLI tool.
+  Panguard checks for updates automatically and displays a notification in the CLI when a new
+  version is available. ATR detection rules update independently from the CLI tool.
 </Info>
 
 ## How to Uninstall
@@ -151,6 +156,7 @@ To completely remove Panguard from your system:
     sudo iptables -F PANGUARD 2>/dev/null
     sudo iptables -X PANGUARD 2>/dev/null
     ```
+
   </Tab>
   <Tab title="Windows">
     ```powershell
@@ -172,41 +178,32 @@ To completely remove Panguard from your system:
     # 5. Remove firewall rules
     Remove-NetFirewallRule -DisplayName "Panguard*"
     ```
+
   </Tab>
 </Tabs>
 
 <Warning>
-Uninstalling removes all local data including scan history, threat logs, and configuration. Export your data first with `panguard report generate` if you need historical records.
+  Uninstalling removes all local data including scan history, threat logs, and configuration. Export
+  your data first with `panguard report generate` if you need historical records.
 </Warning>
 
 ## Common Error Messages
 
 <AccordionGroup>
   <Accordion title="Error: Node.js version 20 or later is required">
-    Your Node.js version is too old. Update to Node.js 20+:
-    ```bash
-    nvm install 20 && nvm use 20
-    ```
+    Your Node.js version is too old. Update to Node.js 20+: ```bash nvm install 20 && nvm use 20 ```
   </Accordion>
   <Accordion title="Error: EACCES permission denied">
-    You are running a privileged module without root access:
-    ```bash
-    sudo panguard guard start
-    ```
+    You are running a privileged module without root access: ```bash sudo panguard guard start ```
     For non-root setups, see the [system service guide](/guides/system-service).
   </Accordion>
   <Accordion title="Error: Cannot find module 'panguard'">
     Panguard is not installed globally, or your PATH does not include the npm global bin directory:
-    ```bash
-    npm install -g panguard
-    # Or check your PATH:
-    npm config get prefix
-    ```
+    ```bash npm install -g panguard # Or check your PATH: npm config get prefix ```
   </Accordion>
   <Accordion title="Error: ECONNREFUSED">
-    The target service is not running or is unreachable. Check:
-    - Is the service started? (`panguard status`)
-    - Is the port correct? (check environment variables)
-    - Is a firewall blocking the connection?
+    The target service is not running or is unreachable. Check: - Is the service started? (`panguard
+    status`) - Is the port correct? (check environment variables) - Is a firewall blocking the
+    connection?
   </Accordion>
 </AccordionGroup>

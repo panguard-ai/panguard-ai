@@ -3,12 +3,15 @@
 ## Listing Content (Copy-Paste Ready)
 
 ### Short Description (one-liner)
+
 AI agent security scanner — audit MCP skills for threats, monitor agents 24/7, community threat intelligence.
 
 ### Long Description
+
 PanGuard scans MCP skills before you install them, catching SSH key exfiltration, prompt injection, credential theft, and supply chain attacks. 11 security tools via MCP: skill auditing, real-time monitoring, code scanning, compliance reports, and more. Powered by ATR (Agent Threat Rules) — an open detection standard with 61 rules and 474 patterns. Free, open source, MIT licensed.
 
 ### Tags/Keywords
+
 security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 
 ---
@@ -20,6 +23,7 @@ security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 **File created:** `packages/panguard-mcp/smithery.yaml`
 
 **Steps:**
+
 1. Go to https://smithery.ai/new
 2. Enter repo URL: `https://github.com/panguard-ai/panguard`
 3. Point to `packages/panguard-mcp/` subdirectory
@@ -32,6 +36,7 @@ security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 **Target repo:** `punkpeye/awesome-mcp-servers`
 
 **Steps:**
+
 1. Fork: https://github.com/punkpeye/awesome-mcp-servers
 2. Add entry under **Security** section:
 
@@ -44,6 +49,7 @@ security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 ### 3. Glama (glama.ai/mcp)
 
 **Steps:**
+
 1. Go to https://glama.ai/mcp/submit (or equivalent submit page)
 2. Enter npm package: `@panguard-ai/panguard-mcp`
 3. Or GitHub URL: `https://github.com/panguard-ai/panguard`
@@ -52,6 +58,7 @@ security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 ### 4. mcp.so
 
 **Steps:**
+
 1. Go to https://mcp.so/submit
 2. Enter GitHub repo URL
 3. Fill in category: Security
@@ -60,6 +67,7 @@ security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 ### 5. PulseMCP (pulsemcp.com)
 
 **Steps:**
+
 1. Go to https://pulsemcp.com/submit
 2. Fill in the submission form
 3. Include npm install command: `npm install -g @panguard-ai/panguard`
@@ -69,12 +77,14 @@ security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 **SKILL.md already exists:** `packages/panguard-mcp/openclaw-skill/SKILL.md`
 
 **Steps for each OpenClaw fork:**
+
 - OpenClaw: Check their skill marketplace submission process
 - QClaw: Similar SKILL.md format
 - WorkBuddy: Check their extension format
 - NemoClaw: Check their plugin system
 
 **Chinese market notes:**
+
 - Prepare Chinese README for panguard-mcp
 - WeChat article about AI agent security (linking to PanGuard)
 - Submit to Chinese MCP registries as they emerge

@@ -17,11 +17,7 @@
  */
 
 import { c, symbols, divider, banner, setLogLevel } from '@panguard-ai/core';
-import type {
-  ScanReport,
-  ScanSkillResult,
-  ScanFinding,
-} from './scan-types.js';
+import type { ScanReport, ScanSkillResult, ScanFinding } from './scan-types.js';
 import { SCAN_EXIT_CODES } from './scan-types.js';
 
 // ---------------------------------------------------------------------------
@@ -45,15 +41,19 @@ interface McpConfigModule {
 interface AuditReport {
   riskScore: number;
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  findings: Array<{ id: string; title: string; description: string; severity: string; category: string; location?: string }>;
+  findings: Array<{
+    id: string;
+    title: string;
+    description: string;
+    severity: string;
+    category: string;
+    location?: string;
+  }>;
   durationMs: number;
 }
 
 interface AuditModule {
-  auditSkill: (
-    dir: string,
-    opts?: { skipAI?: boolean }
-  ) => Promise<AuditReport>;
+  auditSkill: (dir: string, opts?: { skipAI?: boolean }) => Promise<AuditReport>;
 }
 
 async function loadMcpConfig(): Promise<McpConfigModule> {
@@ -96,7 +96,9 @@ export async function commandScan(args: string[]): Promise<void> {
     if (jsonOutput) {
       printJsonError('Failed to load platform detection module', startTime);
     } else {
-      console.error(`  ${symbols.fail} Failed to load platform detection: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(
+        `  ${symbols.fail} Failed to load platform detection: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
     process.exit(SCAN_EXIT_CODES.ERROR);
   }
@@ -108,7 +110,9 @@ export async function commandScan(args: string[]): Promise<void> {
     if (jsonOutput) {
       printJsonError('Platform detection failed', startTime);
     } else {
-      console.error(`  ${symbols.fail} Platform detection failed: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(
+        `  ${symbols.fail} Platform detection failed: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
     process.exit(SCAN_EXIT_CODES.ERROR);
   }
@@ -125,7 +129,9 @@ export async function commandScan(args: string[]): Promise<void> {
   }
 
   if (!jsonOutput) {
-    console.log(`  ${symbols.pass} Platforms detected: ${platforms.map((p) => c.sage(p.id)).join(', ')}`);
+    console.log(
+      `  ${symbols.pass} Platforms detected: ${platforms.map((p) => c.sage(p.id)).join(', ')}`
+    );
     console.log('');
   }
 
@@ -144,7 +150,9 @@ export async function commandScan(args: string[]): Promise<void> {
       }
     } catch (err) {
       if (verbose && !jsonOutput) {
-        console.log(`  ${symbols.warn} Failed to parse ${platform.id} config: ${err instanceof Error ? err.message : String(err)}`);
+        console.log(
+          `  ${symbols.warn} Failed to parse ${platform.id} config: ${err instanceof Error ? err.message : String(err)}`
+        );
       }
     }
   }
@@ -159,7 +167,9 @@ export async function commandScan(args: string[]): Promise<void> {
   }
 
   if (!jsonOutput) {
-    console.log(`  ${symbols.info} Found ${c.bold(String(allSkills.length))} MCP skill(s). Scanning...`);
+    console.log(
+      `  ${symbols.info} Found ${c.bold(String(allSkills.length))} MCP skill(s). Scanning...`
+    );
     console.log('');
   }
 
@@ -171,7 +181,9 @@ export async function commandScan(args: string[]): Promise<void> {
     if (jsonOutput) {
       printJsonError('Failed to load skill auditor', startTime);
     } else {
-      console.error(`  ${symbols.fail} Failed to load skill auditor: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(
+        `  ${symbols.fail} Failed to load skill auditor: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
     process.exit(SCAN_EXIT_CODES.ERROR);
   }
@@ -195,17 +207,21 @@ export async function commandScan(args: string[]): Promise<void> {
           status: 'audited',
         });
         if (!jsonOutput) {
-          const icon = npmResult.riskLevel === 'CRITICAL' || npmResult.riskLevel === 'HIGH'
-            ? symbols.fail
-            : npmResult.riskLevel === 'MEDIUM'
-              ? symbols.warn
-              : symbols.pass;
-          const color = npmResult.riskLevel === 'CRITICAL' || npmResult.riskLevel === 'HIGH'
-            ? c.bold
-            : npmResult.riskLevel === 'MEDIUM'
-              ? c.sage
-              : c.dim;
-          console.log(`  ${icon} ${color(entry.name)} ${c.dim(`(${platformId}, npm)`)} — ${color(npmResult.riskLevel)} ${c.dim(`[${npmResult.riskScore}]`)} ${npmResult.findings.length > 0 ? c.dim(`(${npmResult.findings.length} finding${npmResult.findings.length > 1 ? 's' : ''})`) : ''}`);
+          const icon =
+            npmResult.riskLevel === 'CRITICAL' || npmResult.riskLevel === 'HIGH'
+              ? symbols.fail
+              : npmResult.riskLevel === 'MEDIUM'
+                ? symbols.warn
+                : symbols.pass;
+          const color =
+            npmResult.riskLevel === 'CRITICAL' || npmResult.riskLevel === 'HIGH'
+              ? c.bold
+              : npmResult.riskLevel === 'MEDIUM'
+                ? c.sage
+                : c.dim;
+          console.log(
+            `  ${icon} ${color(entry.name)} ${c.dim(`(${platformId}, npm)`)} — ${color(npmResult.riskLevel)} ${c.dim(`[${npmResult.riskScore}]`)} ${npmResult.findings.length > 0 ? c.dim(`(${npmResult.findings.length} finding${npmResult.findings.length > 1 ? 's' : ''})`) : ''}`
+          );
         }
       } else {
         results.push({
@@ -247,17 +263,21 @@ export async function commandScan(args: string[]): Promise<void> {
 
       // Terminal progress
       if (!jsonOutput) {
-        const icon = report.riskLevel === 'CRITICAL' || report.riskLevel === 'HIGH'
-          ? symbols.fail
-          : report.riskLevel === 'MEDIUM'
-            ? symbols.warn
-            : symbols.pass;
-        const color = report.riskLevel === 'CRITICAL' || report.riskLevel === 'HIGH'
-          ? c.bold
-          : report.riskLevel === 'MEDIUM'
-            ? c.sage
-            : c.dim;
-        console.log(`  ${icon} ${color(entry.name)} ${c.dim(`(${platformId})`)} — ${color(report.riskLevel)} ${c.dim(`[${report.riskScore}]`)} ${findings.length > 0 ? c.dim(`(${findings.length} finding${findings.length > 1 ? 's' : ''})`) : ''}`);
+        const icon =
+          report.riskLevel === 'CRITICAL' || report.riskLevel === 'HIGH'
+            ? symbols.fail
+            : report.riskLevel === 'MEDIUM'
+              ? symbols.warn
+              : symbols.pass;
+        const color =
+          report.riskLevel === 'CRITICAL' || report.riskLevel === 'HIGH'
+            ? c.bold
+            : report.riskLevel === 'MEDIUM'
+              ? c.sage
+              : c.dim;
+        console.log(
+          `  ${icon} ${color(entry.name)} ${c.dim(`(${platformId})`)} — ${color(report.riskLevel)} ${c.dim(`[${report.riskScore}]`)} ${findings.length > 0 ? c.dim(`(${findings.length} finding${findings.length > 1 ? 's' : ''})`) : ''}`
+        );
       }
     } catch (err) {
       results.push({
@@ -270,7 +290,9 @@ export async function commandScan(args: string[]): Promise<void> {
         skipReason: err instanceof Error ? err.message : String(err),
       });
       if (verbose && !jsonOutput) {
-        console.log(`  ${symbols.warn} ${c.dim(entry.name)} — audit error: ${err instanceof Error ? err.message : String(err)}`);
+        console.log(
+          `  ${symbols.warn} ${c.dim(entry.name)} — audit error: ${err instanceof Error ? err.message : String(err)}`
+        );
       }
     }
   }
@@ -377,8 +399,16 @@ async function quickNpmAudit(
     // Check description for suspicious keywords
     const description = String(meta['description'] ?? '');
     const suspiciousPatterns = [
-      { pattern: /reverse.?shell|bind.?shell/i, label: 'reverse shell', severity: 'critical' as const },
-      { pattern: /credential|password|secret.*exfil/i, label: 'credential access', severity: 'high' as const },
+      {
+        pattern: /reverse.?shell|bind.?shell/i,
+        label: 'reverse shell',
+        severity: 'critical' as const,
+      },
+      {
+        pattern: /credential|password|secret.*exfil/i,
+        label: 'credential access',
+        severity: 'high' as const,
+      },
       { pattern: /eval\(|exec\(/i, label: 'dynamic code execution', severity: 'medium' as const },
     ];
     for (const { pattern, label, severity } of suspiciousPatterns) {
@@ -478,7 +508,9 @@ function printTerminalSummary(
   }
 
   console.log('');
-  console.log(`  Skills scanned:  ${audited.length}${skipped > 0 ? c.dim(` (${skipped} skipped)`) : ''}`);
+  console.log(
+    `  Skills scanned:  ${audited.length}${skipped > 0 ? c.dim(` (${skipped} skipped)`) : ''}`
+  );
   console.log(`  Findings:        ${totalFindings}`);
 
   if (critical > 0) console.log(`  CRITICAL:        ${c.bold(String(critical))}`);

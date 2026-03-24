@@ -1,7 +1,7 @@
 ---
-title: "panguard chat"
-description: "Configure notification channels for security alerts and interact with the AI assistant."
-icon: "message-bot"
+title: 'panguard chat'
+description: 'Configure notification channels for security alerts and interact with the AI assistant.'
+icon: 'message-bot'
 ---
 
 The `chat` command manages how Panguard communicates with you. Set up Telegram, Slack, or Email notifications for security events, configure alert preferences, and test that messages are delivered correctly.
@@ -14,13 +14,13 @@ panguard chat <subcommand> [options]
 
 ## Subcommands
 
-| Subcommand | Description |
-| --- | --- |
-| `setup` | Interactive setup wizard for a notification channel |
-| `test` | Send a test message to verify channel connectivity |
-| `status` | Show configured channels and their health |
-| `config` | View or modify chat configuration |
-| `prefs` | Set notification preferences (severity filters, quiet hours, language) |
+| Subcommand | Description                                                            |
+| ---------- | ---------------------------------------------------------------------- |
+| `setup`    | Interactive setup wizard for a notification channel                    |
+| `test`     | Send a test message to verify channel connectivity                     |
+| `status`   | Show configured channels and their health                              |
+| `config`   | View or modify chat configuration                                      |
+| `prefs`    | Set notification preferences (severity filters, quiet hours, language) |
 
 ## Options
 
@@ -62,18 +62,20 @@ panguard chat prefs --lang zh-TW
 ```bash View chat configuration
 panguard chat config
 ```
+
 </CodeGroup>
 
 ## Notification Channels
 
-| Channel | Setup Method | Delivery Speed |
-| --- | --- | --- |
-| Telegram | Bot token + chat ID (guided wizard) | Instant |
-| Slack | Webhook URL or Slack App install | Instant |
-| Email | SMTP config or Panguard relay | 1-5 minutes |
+| Channel  | Setup Method                        | Delivery Speed |
+| -------- | ----------------------------------- | -------------- |
+| Telegram | Bot token + chat ID (guided wizard) | Instant        |
+| Slack    | Webhook URL or Slack App install    | Instant        |
+| Email    | SMTP config or Panguard relay       | 1-5 minutes    |
 
 <Tip>
-  Telegram is the recommended channel for individual developers. It supports rich formatting, inline actions, and two-way AI chat.
+  Telegram is the recommended channel for individual developers. It supports rich formatting, inline
+  actions, and two-way AI chat.
 </Tip>
 
 ## Related

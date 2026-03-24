@@ -39,7 +39,9 @@ function CountUp({ target, duration = 1.5 }: { target: number; duration?: number
 
     requestAnimationFrame(tick);
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [target, duration]);
 
   return <>{count.toLocaleString()}</>;

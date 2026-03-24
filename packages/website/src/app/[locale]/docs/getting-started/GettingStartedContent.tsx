@@ -431,7 +431,8 @@ export default function GettingStartedContent() {
                 </p>
                 <CodeBlock code="panguard setup" label="Terminal" />
                 <p className="text-xs text-text-muted mt-2">
-                  Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw automatically.
+                  Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw,
+                  ArkClaw automatically.
                 </p>
               </div>
             </FadeInUp>
@@ -616,14 +617,12 @@ export default function GettingStartedContent() {
             <p className="text-text-secondary mb-6">{t('advancedHintDesc')}</p>
 
             <div className="space-y-3">
-              {[t('advancedHintOllama')].map(
-                (hint) => (
-                  <div key={hint} className="flex items-start gap-3">
-                    <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
-                    <p className="text-sm text-text-secondary leading-relaxed">{hint}</p>
-                  </div>
-                )
-              )}
+              {[t('advancedHintOllama')].map((hint) => (
+                <div key={hint} className="flex items-start gap-3">
+                  <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
+                  <p className="text-sm text-text-secondary leading-relaxed">{hint}</p>
+                </div>
+              ))}
             </div>
 
             <p className="text-xs text-text-muted mt-4 mb-4">{t('advancedHintEnv')}</p>

@@ -1,7 +1,7 @@
 ---
-title: "Your First Scan"
-description: "Step-by-step guide to running your first Panguard security scan, understanding the results, and taking action on findings."
-icon: "magnifying-glass"
+title: 'Your First Scan'
+description: 'Step-by-step guide to running your first Panguard security scan, understanding the results, and taking action on findings.'
+icon: 'magnifying-glass'
 ---
 
 # Your First Scan
@@ -38,6 +38,7 @@ panguard --version
     ```
 
     This completes in approximately 30 seconds and covers OS detection, network interfaces, open ports, running services, password policy, firewall status, and security tool detection.
+
   </Step>
   <Step title="Review the Results">
     The scan displays findings grouped by severity:
@@ -56,6 +57,7 @@ panguard --version
       443    tcp    nginx       5678   LOW
       3306   tcp    mysqld      9012   MEDIUM
     ```
+
   </Step>
   <Step title="Check Your Security Score">
     Every scan produces a 0-100 security score with a letter grade:
@@ -76,6 +78,7 @@ panguard --version
         Compliance:  65/100
         Response:    70/100
     ```
+
   </Step>
   <Step title="Address Critical Findings">
     Focus on CRITICAL and HIGH severity findings first. Each finding includes a description and remediation guidance.
@@ -86,20 +89,20 @@ panguard --version
 
 ## Quick Scan vs. Full Scan
 
-| Feature | Quick Mode (`--quick`) | Full Mode (default) |
-| --- | --- | --- |
-| **Duration** | ~30 seconds | ~60 seconds |
-| **OS detection** | Yes | Yes |
-| **Network interfaces** | Yes | Yes |
-| **Open ports** | Yes | Yes |
-| **Running services** | Yes | Yes |
-| **Password policy** | Yes | Yes |
-| **Firewall status** | Yes | Yes |
-| **Security tools** | Yes | Yes |
-| **SSL certificate validation** | No | Yes |
-| **Scheduled task audit** | No | Yes |
-| **Shared folder security** | No | Yes |
-| **Risk score** | Yes | Yes |
+| Feature                        | Quick Mode (`--quick`) | Full Mode (default) |
+| ------------------------------ | ---------------------- | ------------------- |
+| **Duration**                   | ~30 seconds            | ~60 seconds         |
+| **OS detection**               | Yes                    | Yes                 |
+| **Network interfaces**         | Yes                    | Yes                 |
+| **Open ports**                 | Yes                    | Yes                 |
+| **Running services**           | Yes                    | Yes                 |
+| **Password policy**            | Yes                    | Yes                 |
+| **Firewall status**            | Yes                    | Yes                 |
+| **Security tools**             | Yes                    | Yes                 |
+| **SSL certificate validation** | No                     | Yes                 |
+| **Scheduled task audit**       | No                     | Yes                 |
+| **Shared folder security**     | No                     | Yes                 |
+| **Risk score**                 | Yes                    | Yes                 |
 
 To run a full scan:
 
@@ -111,13 +114,13 @@ panguard scan
 
 ## Severity Levels
 
-| Severity | Meaning | Recommended Action |
-| --- | --- | --- |
-| **CRITICAL** | Immediate risk of compromise | Fix immediately |
-| **HIGH** | Significant security risk | Fix within 24 hours |
-| **MEDIUM** | Moderate risk, improvement recommended | Fix within one week |
-| **LOW** | Low risk, best practice suggestion | Fix when convenient |
-| **INFO** | Informational finding | No action required |
+| Severity     | Meaning                                | Recommended Action  |
+| ------------ | -------------------------------------- | ------------------- |
+| **CRITICAL** | Immediate risk of compromise           | Fix immediately     |
+| **HIGH**     | Significant security risk              | Fix within 24 hours |
+| **MEDIUM**   | Moderate risk, improvement recommended | Fix within one week |
+| **LOW**      | Low risk, best practice suggestion     | Fix when convenient |
+| **INFO**     | Informational finding                  | No action required  |
 
 ---
 
@@ -134,6 +137,7 @@ panguard scan --output my-report.pdf --lang zh-TW
 ```
 
 The PDF includes:
+
 1. **Cover page** -- Organization name, scan date, branding
 2. **Executive summary** -- Risk score, grade, finding statistics
 3. **Findings detail** -- Each finding with severity, description, and location

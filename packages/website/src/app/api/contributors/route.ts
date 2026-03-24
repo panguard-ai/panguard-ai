@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const resp = await fetch(`${TC_URL}/api/contributors`, {
       signal: AbortSignal.timeout(10_000),
-      headers: { 'Accept': 'application/json' },
+      headers: { Accept: 'application/json' },
     });
     if (!resp.ok) {
       return NextResponse.json({ ok: false, data: [] }, { status: resp.status });

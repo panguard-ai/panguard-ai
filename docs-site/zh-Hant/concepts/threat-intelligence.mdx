@@ -1,16 +1,14 @@
 ---
-title: "威脅情報"
-description: "即時威脅情報 feed 和 Threat Cloud 集體情報網路。"
-icon: "globe"
+title: '威脅情報'
+description: '即時威脅情報 feed 和 Threat Cloud 集體情報網路。'
+icon: 'globe'
 ---
 
 # 威脅情報
 
 威脅情報提供已知攻擊者、惡意 IP、domain、URL、malware 特徵的結構化資訊。Panguard 自動查這些資料庫，判斷你系統上的活動是不是跟已知威脅有關。
 
-<Info>
-你不需要懂技術細節。Guard 自動查詢，結果用白話跟你說。
-</Info>
+<Info>你不需要懂技術細節。Guard 自動查詢，結果用白話跟你說。</Info>
 
 ---
 
@@ -18,34 +16,32 @@ icon: "globe"
 
 ### abuse.ch 系列
 
-| 來源 | 指標類型 | 說明 |
-| --- | --- | --- |
-| [ThreatFox](https://threatfox.abuse.ch) | IP、domain、URL、hash | malware 攻擊活動的入侵指標 (IoC) 資料庫 |
-| [URLhaus](https://urlhaus.abuse.ch) | URL | malware 散布 URL 資料庫 |
-| [Feodo Tracker](https://feodotracker.abuse.ch) | IP | 殭屍網路 C2 server 追蹤 |
+| 來源                                           | 指標類型              | 說明                                    |
+| ---------------------------------------------- | --------------------- | --------------------------------------- |
+| [ThreatFox](https://threatfox.abuse.ch)        | IP、domain、URL、hash | malware 攻擊活動的入侵指標 (IoC) 資料庫 |
+| [URLhaus](https://urlhaus.abuse.ch)            | URL                   | malware 散布 URL 資料庫                 |
+| [Feodo Tracker](https://feodotracker.abuse.ch) | IP                    | 殭屍網路 C2 server 追蹤                 |
 
 ### 其他來源
 
-| 來源 | 指標類型 | 說明 |
-| --- | --- | --- |
-| [GreyNoise](https://greynoise.io) | IP | 分辨針對性攻擊和大規模掃描 |
-| [AbuseIPDB](https://abuseipdb.com) | IP | 社群回報的惡意 IP 資料庫，附信心度評分 |
+| 來源                               | 指標類型 | 說明                                   |
+| ---------------------------------- | -------- | -------------------------------------- |
+| [GreyNoise](https://greynoise.io)  | IP       | 分辨針對性攻擊和大規模掃描             |
+| [AbuseIPDB](https://abuseipdb.com) | IP       | 社群回報的惡意 IP 資料庫，附信心度評分 |
 
 ---
 
 ## Feed 更新排程
 
-| Feed | 更新頻率 | 查詢方式 |
-| --- | --- | --- |
-| ThreatFox | 每小時 | 本地 cache |
-| URLhaus | 每小時 | 本地 cache |
-| Feodo Tracker | 每小時 | 本地 cache |
-| GreyNoise | 即時查詢 | API call |
-| AbuseIPDB | 即時查詢 | API call |
+| Feed          | 更新頻率 | 查詢方式   |
+| ------------- | -------- | ---------- |
+| ThreatFox     | 每小時   | 本地 cache |
+| URLhaus       | 每小時   | 本地 cache |
+| Feodo Tracker | 每小時   | 本地 cache |
+| GreyNoise     | 即時查詢 | API call   |
+| AbuseIPDB     | 即時查詢 | API call   |
 
-<Tip>
-1 小時的更新間隔可以改。頻寬有限的話可以調成 6 或 24 小時。
-</Tip>
+<Tip>1 小時的更新間隔可以改。頻寬有限的話可以調成 6 或 24 小時。</Tip>
 
 ### 本地 Cache
 
@@ -61,13 +57,13 @@ icon: "globe"
 
 威脅情報追蹤這些指標類型：
 
-| 類型 | 說明 | 範例 |
-| --- | --- | --- |
-| **IP** | 已知惡意 IP | `203.0.113.50` |
-| **Domain** | 惡意 domain | `malware.example.com` |
-| **URL** | 惡意 URL | `http://evil.com/payload.exe` |
-| **File Hash** | malware 指紋（SHA-256） | `e3b0c44298fc1c149a...` |
-| **Email** | 釣魚信地址 | `phish@attacker.com` |
+| 類型          | 說明                    | 範例                          |
+| ------------- | ----------------------- | ----------------------------- |
+| **IP**        | 已知惡意 IP             | `203.0.113.50`                |
+| **Domain**    | 惡意 domain             | `malware.example.com`         |
+| **URL**       | 惡意 URL                | `http://evil.com/payload.exe` |
+| **File Hash** | malware 指紋（SHA-256） | `e3b0c44298fc1c149a...`       |
+| **Email**     | 釣魚信地址              | `phish@attacker.com`          |
 
 ### 自動查詢
 
@@ -125,16 +121,17 @@ Threat Cloud 也分發傳統 IoC feed（IP 黑名單、domain 黑名單）和社
 ## 隱私和資料保護
 
 <Warning>
-**隱私保證：** 只上傳威脅指標（IP、hash、pattern）。絕不分享系統資訊、帳號名稱、內部 IP、檔案內容或任何個資。
+  **隱私保證：** 只上傳威脅指標（IP、hash、pattern）。絕不分享系統資訊、帳號名稱、內部
+  IP、檔案內容或任何個資。
 </Warning>
 
-| 隱私措施 | 細節 |
-| --- | --- |
-| **IP 匿名化** | 來源 IP 上傳前做 /16 匿名化 |
-| **GDPR 合規** | 不收集也不儲存個資 |
-| **零原始資料** | 不傳 log 內容、檔案內容、系統細節 |
-| **零遙測** | 不收使用分析、crash report、行為追蹤 |
-| **可以關掉** | Threat Cloud 可以完全停用 |
+| 隱私措施       | 細節                                 |
+| -------------- | ------------------------------------ |
+| **IP 匿名化**  | 來源 IP 上傳前做 /16 匿名化          |
+| **GDPR 合規**  | 不收集也不儲存個資                   |
+| **零原始資料** | 不傳 log 內容、檔案內容、系統細節    |
+| **零遙測**     | 不收使用分析、crash report、行為追蹤 |
+| **可以關掉**   | Threat Cloud 可以完全停用            |
 
 ---
 
@@ -152,9 +149,7 @@ Panguard 完全支援離線。威脅情報 feed 連不上的時候：
 panguard guard start --offline
 ```
 
-<Note>
-離線模式停用 Threat Cloud 和即時 feed 查詢。Cache 的資料在過期前照用。
-</Note>
+<Note>離線模式停用 Threat Cloud 和即時 feed 查詢。Cache 的資料在過期前照用。</Note>
 
 ---
 
@@ -190,6 +185,7 @@ panguard guard status
     Risk level: High
     Status: Automatically resolved
     ```
+
   </Tab>
   <Tab title="Developer 角色">
     ```
@@ -201,6 +197,7 @@ panguard guard status
     Action: IP blocked via iptables
     Rule: atr/network/c2-communication.yml
     ```
+
   </Tab>
   <Tab title="IT Admin 角色">
     ```
@@ -216,6 +213,7 @@ panguard guard status
     3. Check for other processes connecting to the same IP
     4. Run a system scan: panguard scan
     ```
+
   </Tab>
 </Tabs>
 

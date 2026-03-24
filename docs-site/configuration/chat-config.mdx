@@ -1,7 +1,7 @@
 ---
-title: "Chat Configuration"
-description: "Configure notification channels for Panguard Chat: Telegram, Slack, Email, and Webhooks."
-icon: "message-bot"
+title: 'Chat Configuration'
+description: 'Configure notification channels for Panguard Chat: Telegram, Slack, Email, and Webhooks.'
+icon: 'message-bot'
 ---
 
 Panguard Chat is configured via a JSON file located at `~/.panguard-chat/config.json`. This file manages notification channel credentials, formatting preferences, and delivery settings.
@@ -13,7 +13,9 @@ Panguard Chat is configured via a JSON file located at `~/.panguard-chat/config.
 ```
 
 <Warning>
-Sensitive fields (API tokens, passwords, webhook URLs) are encrypted using **AES-256-GCM** after initial setup. Do not manually edit encrypted fields -- use `panguard chat setup` to reconfigure channels instead.
+  Sensitive fields (API tokens, passwords, webhook URLs) are encrypted using **AES-256-GCM** after
+  initial setup. Do not manually edit encrypted fields -- use `panguard chat setup` to reconfigure
+  channels instead.
 </Warning>
 
 ## Full Configuration Example
@@ -98,11 +100,13 @@ Sensitive fields (API tokens, passwords, webhook URLs) are encrypted using **AES
     ```bash
     panguard chat setup telegram --bot-token YOUR_TOKEN --chat-id YOUR_CHAT_ID
     ```
+
   </Accordion>
 </AccordionGroup>
 
 <Info>
-You must send a message to your bot first before it can send messages to you. This is a Telegram Bot API requirement.
+  You must send a message to your bot first before it can send messages to you. This is a Telegram
+  Bot API requirement.
 </Info>
 
 ### Slack
@@ -128,6 +132,7 @@ You must send a message to your bot first before it can send messages to you. Th
     3. Enable **Incoming Webhooks**
     4. Add a webhook to your workspace
     5. Copy the webhook URL
+
   </Accordion>
 </AccordionGroup>
 
@@ -162,6 +167,7 @@ You must send a message to your bot first before it can send messages to you. Th
     | AWS SES | `email-smtp.REGION.amazonaws.com` | 587 |
 
     For Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) rather than your account password.
+
   </Accordion>
 </AccordionGroup>
 
@@ -197,14 +203,14 @@ You must send a message to your bot first before it can send messages to you. Th
 
 ## Preferences
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `language` | string | `en` | Notification language (`en`, `zh-TW`, `ja`) |
-| `minSeverity` | string | `medium` | Minimum severity to send: `low`, `medium`, `high`, `critical` |
-| `cooldownMinutes` | number | `15` | Minimum interval between duplicate alerts |
-| `batchWindow` | number | `60` | Seconds to batch related events before sending |
-| `includeDetails` | boolean | `true` | Include technical details in notifications |
-| `includeRecommendations` | boolean | `true` | Include AI-generated response recommendations |
+| Field                    | Type    | Default  | Description                                                   |
+| ------------------------ | ------- | -------- | ------------------------------------------------------------- |
+| `language`               | string  | `en`     | Notification language (`en`, `zh-TW`, `ja`)                   |
+| `minSeverity`            | string  | `medium` | Minimum severity to send: `low`, `medium`, `high`, `critical` |
+| `cooldownMinutes`        | number  | `15`     | Minimum interval between duplicate alerts                     |
+| `batchWindow`            | number  | `60`     | Seconds to batch related events before sending                |
+| `includeDetails`         | boolean | `true`   | Include technical details in notifications                    |
+| `includeRecommendations` | boolean | `true`   | Include AI-generated response recommendations                 |
 
 ## Encryption Details
 
@@ -216,7 +222,8 @@ Sensitive fields are encrypted at rest using **AES-256-GCM**:
 - The CLI decrypts values transparently when sending notifications
 
 <Warning>
-Never manually edit fields prefixed with `ENC:v1:`. This will corrupt the encrypted data and break notification delivery. Always use `panguard chat setup` to modify credentials.
+  Never manually edit fields prefixed with `ENC:v1:`. This will corrupt the encrypted data and break
+  notification delivery. Always use `panguard chat setup` to modify credentials.
 </Warning>
 
 ## Testing Notifications

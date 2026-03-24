@@ -1,7 +1,7 @@
 ---
-title: "System Service"
-description: "Install Panguard Guard as a systemd, launchd, or Windows service for automatic startup and continuous protection."
-icon: "gear"
+title: 'System Service'
+description: 'Install Panguard Guard as a systemd, launchd, or Windows service for automatic startup and continuous protection.'
+icon: 'gear'
 ---
 
 # System Service Installation
@@ -51,6 +51,7 @@ The `install` command detects your operating system and creates the appropriate 
     # Stop manually
     sudo launchctl unload /Library/LaunchDaemons/ai.panguard.guard.plist
     ```
+
   </Tab>
   <Tab title="Linux (systemd)">
     Guard creates a systemd unit file:
@@ -118,6 +119,7 @@ The `install` command detects your operating system and creates the appropriate 
     | `CAP_NET_ADMIN` | Block IPs via iptables |
     | `CAP_KILL` | Terminate malicious processes |
     | `CAP_SYS_PTRACE` | Memory scanning for fileless malware |
+
   </Tab>
   <Tab title="Windows (Services)">
     Guard registers as a Windows service:
@@ -142,6 +144,7 @@ The `install` command detects your operating system and creates the appropriate 
     sc.exe start PanguardGuard
     sc.exe stop PanguardGuard
     ```
+
   </Tab>
 </Tabs>
 
@@ -183,6 +186,7 @@ For full control over the service configuration, follow these steps:
     <Warning>
     Environment files contain secrets. Always set permissions to `600` and restrict ownership to the service user.
     </Warning>
+
   </Step>
   <Step title="Enable and Start">
     ```bash
@@ -249,6 +253,7 @@ panguard guard install-script
 ```
 
 The generated script will:
+
 1. Download Panguard AI
 2. Install dependencies
 3. Install as a system service
@@ -258,11 +263,11 @@ The generated script will:
 
 ## Data Directory
 
-| Platform | Default Path |
-| --- | --- |
-| macOS | `~/.panguard-guard/` |
-| Linux | `~/.panguard-guard/` |
-| Windows | `%APPDATA%\panguard-guard\` |
+| Platform | Default Path                |
+| -------- | --------------------------- |
+| macOS    | `~/.panguard-guard/`        |
+| Linux    | `~/.panguard-guard/`        |
+| Windows  | `%APPDATA%\panguard-guard\` |
 
 Override with `--data-dir`:
 
@@ -271,6 +276,7 @@ panguard guard start --data-dir /opt/panguard/data
 ```
 
 **Contents:**
+
 - `guard.pid` -- PID file (prevents duplicate instances)
 - `baseline/` -- Behavioral baseline data
 - `rules/` -- Custom ATR rules

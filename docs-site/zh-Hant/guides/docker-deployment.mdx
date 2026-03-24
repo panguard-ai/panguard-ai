@@ -1,7 +1,7 @@
 ---
-title: "Docker 部署"
-description: "用 Docker 和 Docker Compose 跑 Panguard AI，容器化安全監控。"
-icon: "docker"
+title: 'Docker 部署'
+description: '用 Docker 和 Docker Compose 跑 Panguard AI，容器化安全監控。'
+icon: 'docker'
 ---
 
 # Docker 部署
@@ -12,9 +12,9 @@ Panguard 提供 Docker image 和 Compose config，方便容器化部署。這篇
 
 ## 前置需求
 
-| 需求 | 版本 |
-| --- | --- |
-| Docker | >= 24.0 |
+| 需求           | 版本    |
+| -------------- | ------- |
+| Docker         | >= 24.0 |
 | Docker Compose | >= 2.20 |
 
 ---
@@ -22,25 +22,12 @@ Panguard 提供 Docker image 和 Compose config，方便容器化部署。這篇
 ## Docker 快速開始
 
 <Steps>
-  <Step title="拉 image">
-    ```bash
-    docker pull panguard/panguard-ai:latest
-    ```
-  </Step>
+  <Step title="拉 image">```bash docker pull panguard/panguard-ai:latest ```</Step>
   <Step title="跑容器">
-    ```bash
-    docker run -d \
-      --name panguard \
-      -p 3000:3000 \
-      -v panguard-data:/data \
-      panguard/panguard-ai:latest
-    ```
+    ```bash docker run -d \ --name panguard \ -p 3000:3000 \ -v panguard-data:/data \
+    panguard/panguard-ai:latest ```
   </Step>
-  <Step title="確認">
-    ```bash
-    docker logs panguard
-    ```
-  </Step>
+  <Step title="確認">```bash docker logs panguard ```</Step>
 </Steps>
 
 ---
@@ -166,17 +153,17 @@ docker compose -f docker-compose.full.yml up -d
 
 ## Port 參考
 
-| Port | 服務 | 協定 | 備註 |
-| --- | --- | --- | --- |
-| `3000` | API Server | HTTP | 主要入口 |
-| `11434` | Ollama | HTTP | 本地 AI 推論 |
-| `2222` | SSH 蜜罐 | TCP | 預設 SSH 蜜罐 port |
-| `8080` | HTTP 蜜罐 | TCP | 預設 HTTP 蜜罐 port |
-| `2121` | FTP 蜜罐 | TCP | 預設 FTP 蜜罐 port |
-| `4450` | SMB 蜜罐 | TCP | 預設 SMB 蜜罐 port |
-| `3307` | MySQL 蜜罐 | TCP | 預設 MySQL 蜜罐 port |
-| `3390` | RDP 蜜罐 | TCP | 預設 RDP 蜜罐 port |
-| `2323` | Telnet 蜜罐 | TCP | 預設 Telnet 蜜罐 port |
+| Port    | 服務        | 協定 | 備註                  |
+| ------- | ----------- | ---- | --------------------- |
+| `3000`  | API Server  | HTTP | 主要入口              |
+| `11434` | Ollama      | HTTP | 本地 AI 推論          |
+| `2222`  | SSH 蜜罐    | TCP  | 預設 SSH 蜜罐 port    |
+| `8080`  | HTTP 蜜罐   | TCP  | 預設 HTTP 蜜罐 port   |
+| `2121`  | FTP 蜜罐    | TCP  | 預設 FTP 蜜罐 port    |
+| `4450`  | SMB 蜜罐    | TCP  | 預設 SMB 蜜罐 port    |
+| `3307`  | MySQL 蜜罐  | TCP  | 預設 MySQL 蜜罐 port  |
+| `3390`  | RDP 蜜罐    | TCP  | 預設 RDP 蜜罐 port    |
+| `2323`  | Telnet 蜜罐 | TCP  | 預設 Telnet 蜜罐 port |
 
 ---
 
@@ -184,19 +171,19 @@ docker compose -f docker-compose.full.yml up -d
 
 ### Guard Agent
 
-| 變數 | 預設值 | 說明 |
-| --- | --- | --- |
-| `PANGUARD_DATA_DIR` | `./data` | 基線、日誌、規則的資料目錄 |
-| `PANGUARD_MODE` | `learning` | Guard 模式：`learning` 或 `protection` |
-| `OLLAMA_ENDPOINT` | `http://localhost:11434` | Ollama API 端點 |
-| `ANTHROPIC_API_KEY` | （無） | Claude API key，雲端 AI 用 |
-| `OPENAI_API_KEY` | （無） | OpenAI API key，雲端 AI 用 |
-| `ABUSEIPDB_KEY` | （無） | AbuseIPDB API key，威脅情報用 |
+| 變數                | 預設值                   | 說明                                   |
+| ------------------- | ------------------------ | -------------------------------------- |
+| `PANGUARD_DATA_DIR` | `./data`                 | 基線、日誌、規則的資料目錄             |
+| `PANGUARD_MODE`     | `learning`               | Guard 模式：`learning` 或 `protection` |
+| `OLLAMA_ENDPOINT`   | `http://localhost:11434` | Ollama API 端點                        |
+| `ANTHROPIC_API_KEY` | （無）                   | Claude API key，雲端 AI 用             |
+| `OPENAI_API_KEY`    | （無）                   | OpenAI API key，雲端 AI 用             |
+| `ABUSEIPDB_KEY`     | （無）                   | AbuseIPDB API key，威脅情報用          |
 
 ### API Server
 
-| 變數 | 預設值 | 說明 |
-| --- | --- | --- |
+| 變數            | 預設值 | 說明            |
+| --------------- | ------ | --------------- |
 | `PANGUARD_PORT` | `3000` | API server port |
 
 <Warning>
@@ -204,8 +191,9 @@ docker compose -f docker-compose.full.yml up -d
 
 ```yaml
 env_file:
-  - /etc/panguard/guard.env  # chmod 600
+  - /etc/panguard/guard.env # chmod 600
 ```
+
 </Warning>
 
 ---
@@ -215,6 +203,7 @@ env_file:
 ### Docker Image 安全
 
 正式環境 image 包含：
+
 - **多階段 build** -- build 依賴不會進最終 image
 - **非 root 使用者** -- 以 `panguard`（UID 1001）跑
 - **tini** -- 正確的 PID 1 信號處理和 zombie process 回收
@@ -226,9 +215,9 @@ Guard 回應動作在 Docker 裡要授予這些 capabilities：
 
 ```yaml
 cap_add:
-  - NET_ADMIN    # 透過 iptables 封鎖 IP
-  - KILL         # 砍惡意 process
-  - SYS_PTRACE   # 記憶體掃描
+  - NET_ADMIN # 透過 iptables 封鎖 IP
+  - KILL # 砍惡意 process
+  - SYS_PTRACE # 記憶體掃描
 ```
 
 ### 檢查清單
@@ -245,22 +234,22 @@ cap_add:
 
 ## 日誌位置（容器內）
 
-| 元件 | 路徑 | 格式 |
-| --- | --- | --- |
-| Guard 事件 | `/data/events.jsonl` | JSONL |
-| Guard 動作 | `/data/action-manifest.jsonl` | JSONL |
-| Guard 基線 | `/data/baseline.json` | JSON |
-| 應用程式日誌 | stdout/stderr | 結構化 JSON |
+| 元件         | 路徑                          | 格式        |
+| ------------ | ----------------------------- | ----------- |
+| Guard 事件   | `/data/events.jsonl`          | JSONL       |
+| Guard 動作   | `/data/action-manifest.jsonl` | JSONL       |
+| Guard 基線   | `/data/baseline.json`         | JSON        |
+| 應用程式日誌 | stdout/stderr                 | 結構化 JSON |
 
 ### 日誌輪替
 
 ReportAgent 自動處理日誌輪替：
 
-| 設定 | 預設值 |
-| --- | --- |
-| 最大檔案大小 | 50 MB |
-| 最大輪替檔案數 | 10 |
-| 保留期間 | 90 天 |
+| 設定           | 預設值 |
+| -------------- | ------ |
+| 最大檔案大小   | 50 MB  |
+| 最大輪替檔案數 | 10     |
+| 保留期間       | 90 天  |
 
 ---
 
@@ -272,7 +261,7 @@ ReportAgent 自動處理日誌輪替：
 - **基線資料**（`/data/baseline.json`）-- 丟了要重跑學習模式
 - **Threat Cloud 資料庫** -- 定期備份 SQLite
 - **Config** -- config 和環境檔存進版本控制或密鑰管理服務
-</Tip>
+  </Tip>
 
 ---
 

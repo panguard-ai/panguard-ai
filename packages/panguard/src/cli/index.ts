@@ -119,8 +119,8 @@ async function showWhatsNewIfUpgraded(): Promise<void> {
       const cliDir = dirname(fileURLToPath(import.meta.url));
       // CHANGELOG.md is at repo root, CLI is at packages/panguard/dist/cli/
       const changelogPaths = [
-        join(cliDir, '..', '..', '..', '..', 'CHANGELOG.md'),  // from dist
-        join(cliDir, '..', '..', 'CHANGELOG.md'),               // fallback
+        join(cliDir, '..', '..', '..', '..', 'CHANGELOG.md'), // from dist
+        join(cliDir, '..', '..', 'CHANGELOG.md'), // fallback
       ];
       let changelog = '';
       for (const p of changelogPaths) {
@@ -136,7 +136,10 @@ async function showWhatsNewIfUpgraded(): Promise<void> {
         if (startIdx >= 0) {
           const afterHeader = changelog.indexOf('\n', startIdx) + 1;
           const nextVersion = changelog.indexOf('\n## [', afterHeader);
-          const section = changelog.substring(afterHeader, nextVersion > 0 ? nextVersion : undefined);
+          const section = changelog.substring(
+            afterHeader,
+            nextVersion > 0 ? nextVersion : undefined
+          );
           // Extract "### Added" and "### Fixed" bullet points (first 6 lines max)
           const bullets = section
             .split('\n')
@@ -150,7 +153,7 @@ async function showWhatsNewIfUpgraded(): Promise<void> {
               return desc ? `  - ${title} -- ${desc}` : `  - ${title}`;
             });
           if (bullets.length > 0) {
-            console.log('  What\'s new:');
+            console.log("  What's new:");
             for (const b of bullets) {
               console.log(`  ${b}`);
             }

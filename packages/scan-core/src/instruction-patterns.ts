@@ -63,14 +63,16 @@ const PATTERNS: readonly Pattern[] = [
   {
     id: 'pi-important-block',
     title: 'Hidden instructions in <IMPORTANT> block',
-    regex: /<IMPORTANT>[\s\S]*?(silently|do\s+not\s+tell|without\s+asking|exfiltrate|send\s+all|upload\s+.*\s+to)[\s\S]*?<\/IMPORTANT>/i,
+    regex:
+      /<IMPORTANT>[\s\S]*?(silently|do\s+not\s+tell|without\s+asking|exfiltrate|send\s+all|upload\s+.*\s+to)[\s\S]*?<\/IMPORTANT>/i,
     severity: 'critical',
     category: 'prompt-injection',
   },
   {
     id: 'pi-silent-exfil',
     title: 'Silent data exfiltration instruction',
-    regex: /\b(silently\s+(send|upload|post|transmit)|without\s+(asking|consent|permission).*\b(send|upload|post|curl|fetch))\b/i,
+    regex:
+      /\b(silently\s+(send|upload|post|transmit)|without\s+(asking|consent|permission).*\b(send|upload|post|curl|fetch))\b/i,
     severity: 'critical',
     category: 'prompt-injection',
   },
@@ -136,17 +138,46 @@ const FULLWIDTH_LATIN_RE = /[\uFF01-\uFF5E]{4,}/;
 
 /** Homoglyph detection - Cyrillic/Greek characters that look identical to Latin */
 const HOMOGLYPH_MAP: Record<string, string> = {
-  '\u0410': 'A', '\u0412': 'B', '\u0421': 'C', '\u0415': 'E',
-  '\u041D': 'H', '\u041A': 'K', '\u041C': 'M', '\u041E': 'O',
-  '\u0420': 'P', '\u0422': 'T', '\u0425': 'X', '\u0430': 'a',
-  '\u0435': 'e', '\u043E': 'o', '\u0440': 'p', '\u0441': 'c',
-  '\u0443': 'y', '\u0445': 'x', '\u0455': 's', '\u0456': 'i',
-  '\u0458': 'j', '\u0471': 'v', '\u0473': 'w',
+  '\u0410': 'A',
+  '\u0412': 'B',
+  '\u0421': 'C',
+  '\u0415': 'E',
+  '\u041D': 'H',
+  '\u041A': 'K',
+  '\u041C': 'M',
+  '\u041E': 'O',
+  '\u0420': 'P',
+  '\u0422': 'T',
+  '\u0425': 'X',
+  '\u0430': 'a',
+  '\u0435': 'e',
+  '\u043E': 'o',
+  '\u0440': 'p',
+  '\u0441': 'c',
+  '\u0443': 'y',
+  '\u0445': 'x',
+  '\u0455': 's',
+  '\u0456': 'i',
+  '\u0458': 'j',
+  '\u0471': 'v',
+  '\u0473': 'w',
   // Greek
-  '\u0391': 'A', '\u0392': 'B', '\u0395': 'E', '\u0396': 'Z',
-  '\u0397': 'H', '\u0399': 'I', '\u039A': 'K', '\u039C': 'M',
-  '\u039D': 'N', '\u039F': 'O', '\u03A1': 'P', '\u03A4': 'T',
-  '\u03A5': 'Y', '\u03A7': 'X', '\u03B1': 'a', '\u03BF': 'o',
+  '\u0391': 'A',
+  '\u0392': 'B',
+  '\u0395': 'E',
+  '\u0396': 'Z',
+  '\u0397': 'H',
+  '\u0399': 'I',
+  '\u039A': 'K',
+  '\u039C': 'M',
+  '\u039D': 'N',
+  '\u039F': 'O',
+  '\u03A1': 'P',
+  '\u03A4': 'T',
+  '\u03A5': 'Y',
+  '\u03A7': 'X',
+  '\u03B1': 'a',
+  '\u03BF': 'o',
   '\u03C1': 'p',
 };
 const HOMOGLYPH_RE = new RegExp(`[${Object.keys(HOMOGLYPH_MAP).join('')}]`);
@@ -165,17 +196,27 @@ const HEX_BLOCK_RE = /\b([0-9a-fA-F]{2}){12,}\b/g;
 // ---------------------------------------------------------------------------
 
 export const SAFE_INSTALL_URLS = [
-  'bun.sh/install', 'get.docker.com', 'install.python-poetry.org',
-  'raw.githubusercontent.com/nvm-sh/nvm', 'sh.rustup.rs', 'deno.land/install',
-  'get.pnpm.io/install', 'brew.sh', 'ohmyz.sh/install',
-  'raw.githubusercontent.com/Homebrew', 'sdk.cloud.google.com', 'cli.github.com',
+  'bun.sh/install',
+  'get.docker.com',
+  'install.python-poetry.org',
+  'raw.githubusercontent.com/nvm-sh/nvm',
+  'sh.rustup.rs',
+  'deno.land/install',
+  'get.pnpm.io/install',
+  'brew.sh',
+  'ohmyz.sh/install',
+  'raw.githubusercontent.com/Homebrew',
+  'sdk.cloud.google.com',
+  'cli.github.com',
   'astral.sh/uv',
 ];
 
 function isSafeInstallCommand(instructions: string, matchIndex: number): boolean {
   const lineStart = instructions.lastIndexOf('\n', matchIndex) + 1;
   const lineEnd = instructions.indexOf('\n', matchIndex);
-  const line = instructions.substring(lineStart, lineEnd === -1 ? undefined : lineEnd).toLowerCase();
+  const line = instructions
+    .substring(lineStart, lineEnd === -1 ? undefined : lineEnd)
+    .toLowerCase();
   return SAFE_INSTALL_URLS.some((url) => line.includes(url.toLowerCase()));
 }
 
@@ -185,17 +226,24 @@ function isSafeInstallCommand(instructions: string, matchIndex: number): boolean
 
 function downgradeSeverity(severity: Severity): Severity {
   switch (severity) {
-    case 'critical': return 'medium';
-    case 'high': return 'low';
-    case 'medium': return 'low';
-    case 'low': return 'info';
-    default: return severity;
+    case 'critical':
+      return 'medium';
+    case 'high':
+      return 'low';
+    case 'medium':
+      return 'low';
+    case 'low':
+      return 'info';
+    default:
+      return severity;
   }
 }
 
 function isInSetupSection(instructions: string, matchIndex: number): boolean {
   const before = instructions.substring(Math.max(0, matchIndex - 500), matchIndex).toLowerCase();
-  return /(?:^|\n)#{1,4}\s*(setup|install|getting started|prerequisites|quick start|requirements|dependencies)/m.test(before);
+  return /(?:^|\n)#{1,4}\s*(setup|install|getting started|prerequisites|quick start|requirements|dependencies)/m.test(
+    before
+  );
 }
 
 // ---------------------------------------------------------------------------

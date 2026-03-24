@@ -1,7 +1,7 @@
 ---
-title: "Telegram Integration"
-description: "Step-by-step guide to setting up Panguard Chat with Telegram using BotFather."
-icon: "paper-plane"
+title: 'Telegram Integration'
+description: 'Step-by-step guide to setting up Panguard Chat with Telegram using BotFather.'
+icon: 'paper-plane'
 ---
 
 Telegram is the recommended channel for individual developers and personal server monitoring. Panguard sends notifications via a Telegram Bot that you create and control.
@@ -9,18 +9,10 @@ Telegram is the recommended channel for individual developers and personal serve
 ## Setup Overview
 
 <Steps>
-  <Step title="Create a Telegram Bot">
-    Register a new bot with BotFather to get a Bot Token.
-  </Step>
-  <Step title="Get your Chat ID">
-    Find your personal or group Chat ID.
-  </Step>
-  <Step title="Configure Panguard">
-    Run the setup wizard and provide your credentials.
-  </Step>
-  <Step title="Test the connection">
-    Send a test notification to verify everything works.
-  </Step>
+  <Step title="Create a Telegram Bot">Register a new bot with BotFather to get a Bot Token.</Step>
+  <Step title="Get your Chat ID">Find your personal or group Chat ID.</Step>
+  <Step title="Configure Panguard">Run the setup wizard and provide your credentials.</Step>
+  <Step title="Test the connection">Send a test notification to verify everything works.</Step>
 </Steps>
 
 ## Step 1: Create a Telegram Bot
@@ -36,7 +28,8 @@ Telegram is the recommended channel for individual developers and personal serve
 ```
 
 <Warning>
-  Keep your Bot Token secret. Anyone with the token can send messages as your bot. If compromised, use `/revoke` in BotFather to regenerate it.
+  Keep your Bot Token secret. Anyone with the token can send messages as your bot. If compromised,
+  use `/revoke` in BotFather to regenerate it.
 </Warning>
 
 ## Step 2: Get Your Chat ID
@@ -67,6 +60,7 @@ panguard chat setup --channel telegram
 ```
 
 The wizard will ask for:
+
 - **Bot Token** -- paste the token from Step 1
 - **Chat ID** -- paste the Chat ID from Step 2
 
@@ -86,10 +80,12 @@ You should receive a test message in Telegram. If you do not:
 
 <AccordionGroup>
   <Accordion title="Bot not responding">
-    You must send a message to your bot first. Telegram bots cannot initiate conversations with users they have never interacted with.
+    You must send a message to your bot first. Telegram bots cannot initiate conversations with
+    users they have never interacted with.
   </Accordion>
   <Accordion title="Wrong Chat ID">
-    Use @userinfobot to verify your Chat ID. Group IDs are negative numbers (e.g., `-1001234567890`).
+    Use @userinfobot to verify your Chat ID. Group IDs are negative numbers (e.g.,
+    `-1001234567890`).
   </Accordion>
   <Accordion title="Network issues">
     Ensure your system can reach `api.telegram.org` on port 443.

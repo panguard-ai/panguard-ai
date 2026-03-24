@@ -1,7 +1,7 @@
 ---
-title: "Threat Intelligence"
-description: "Real-time threat intelligence feeds and the Threat Cloud collective intelligence network."
-icon: "globe"
+title: 'Threat Intelligence'
+description: 'Real-time threat intelligence feeds and the Threat Cloud collective intelligence network.'
+icon: 'globe'
 ---
 
 # Threat Intelligence
@@ -9,7 +9,8 @@ icon: "globe"
 Threat intelligence provides structured information about known attackers, malicious IPs, domains, URLs, and malware signatures. Panguard automatically queries these databases to determine whether activity on your system is linked to known threats.
 
 <Info>
-You do not need to understand the technical details. Guard handles the queries automatically, and Chat explains the results in plain language.
+  You do not need to understand the technical details. Guard handles the queries automatically, and
+  Chat explains the results in plain language.
 </Info>
 
 ---
@@ -18,33 +19,34 @@ You do not need to understand the technical details. Guard handles the queries a
 
 ### abuse.ch Suite
 
-| Source | Indicator Types | Description |
-| --- | --- | --- |
-| [ThreatFox](https://threatfox.abuse.ch) | IP, domain, URL, hash | Database of indicators of compromise (IoCs) linked to malware campaigns |
-| [URLhaus](https://urlhaus.abuse.ch) | URL | Database of malware distribution URLs |
-| [Feodo Tracker](https://feodotracker.abuse.ch) | IP | Botnet Command and Control (C2) server tracking |
+| Source                                         | Indicator Types       | Description                                                             |
+| ---------------------------------------------- | --------------------- | ----------------------------------------------------------------------- |
+| [ThreatFox](https://threatfox.abuse.ch)        | IP, domain, URL, hash | Database of indicators of compromise (IoCs) linked to malware campaigns |
+| [URLhaus](https://urlhaus.abuse.ch)            | URL                   | Database of malware distribution URLs                                   |
+| [Feodo Tracker](https://feodotracker.abuse.ch) | IP                    | Botnet Command and Control (C2) server tracking                         |
 
 ### Additional Sources
 
-| Source | Indicator Types | Description |
-| --- | --- | --- |
-| [GreyNoise](https://greynoise.io) | IP | Distinguishes targeted attacks from mass internet scanning |
-| [AbuseIPDB](https://abuseipdb.com) | IP | Community-reported malicious IP database with confidence scoring |
+| Source                             | Indicator Types | Description                                                      |
+| ---------------------------------- | --------------- | ---------------------------------------------------------------- |
+| [GreyNoise](https://greynoise.io)  | IP              | Distinguishes targeted attacks from mass internet scanning       |
+| [AbuseIPDB](https://abuseipdb.com) | IP              | Community-reported malicious IP database with confidence scoring |
 
 ---
 
 ## Feed Update Schedule
 
-| Feed | Update Frequency | Query Type |
-| --- | --- | --- |
-| ThreatFox | Every hour | Cached locally |
-| URLhaus | Every hour | Cached locally |
-| Feodo Tracker | Every hour | Cached locally |
-| GreyNoise | Real-time per query | API call |
-| AbuseIPDB | Real-time per query | API call |
+| Feed          | Update Frequency    | Query Type     |
+| ------------- | ------------------- | -------------- |
+| ThreatFox     | Every hour          | Cached locally |
+| URLhaus       | Every hour          | Cached locally |
+| Feodo Tracker | Every hour          | Cached locally |
+| GreyNoise     | Real-time per query | API call       |
+| AbuseIPDB     | Real-time per query | API call       |
 
 <Tip>
-The 1-hour update interval is configurable. For bandwidth-constrained systems, increase it to 6 or 24 hours.
+  The 1-hour update interval is configurable. For bandwidth-constrained systems, increase it to 6 or
+  24 hours.
 </Tip>
 
 ### Local Caching
@@ -61,13 +63,13 @@ Query results are cached locally to avoid redundant lookups:
 
 Threat intelligence tracks the following types of indicators:
 
-| Type | Description | Example |
-| --- | --- | --- |
-| **IP Address** | Known malicious IP | `203.0.113.50` |
-| **Domain** | Malicious domain name | `malware.example.com` |
-| **URL** | Malicious URL | `http://evil.com/payload.exe` |
-| **File Hash** | Malware fingerprint (SHA-256) | `e3b0c44298fc1c149a...` |
-| **Email** | Phishing email address | `phish@attacker.com` |
+| Type           | Description                   | Example                       |
+| -------------- | ----------------------------- | ----------------------------- |
+| **IP Address** | Known malicious IP            | `203.0.113.50`                |
+| **Domain**     | Malicious domain name         | `malware.example.com`         |
+| **URL**        | Malicious URL                 | `http://evil.com/payload.exe` |
+| **File Hash**  | Malware fingerprint (SHA-256) | `e3b0c44298fc1c149a...`       |
+| **Email**      | Phishing email address        | `phish@attacker.com`          |
 
 ### Automatic Querying
 
@@ -125,16 +127,18 @@ Threat Cloud also distributes traditional IoC feeds (IP blocklists, domain block
 ## Privacy and Data Protection
 
 <Warning>
-**Privacy guarantee:** Only threat indicators (IPs, hashes, patterns) are uploaded. No system information, usernames, internal IPs, file contents, or personally identifiable information is ever shared.
+  **Privacy guarantee:** Only threat indicators (IPs, hashes, patterns) are uploaded. No system
+  information, usernames, internal IPs, file contents, or personally identifiable information is
+  ever shared.
 </Warning>
 
-| Privacy Measure | Details |
-| --- | --- |
-| **IP anonymization** | Source IPs are /16-anonymized before upload |
-| **GDPR compliance** | No personal data is collected or stored |
-| **Zero raw data** | No log content, file content, or system details are transmitted |
-| **Zero telemetry** | No usage analytics, crash reports, or behavioral tracking |
-| **Opt-out available** | Threat Cloud can be fully disabled |
+| Privacy Measure       | Details                                                         |
+| --------------------- | --------------------------------------------------------------- |
+| **IP anonymization**  | Source IPs are /16-anonymized before upload                     |
+| **GDPR compliance**   | No personal data is collected or stored                         |
+| **Zero raw data**     | No log content, file content, or system details are transmitted |
+| **Zero telemetry**    | No usage analytics, crash reports, or behavioral tracking       |
+| **Opt-out available** | Threat Cloud can be fully disabled                              |
 
 ---
 
@@ -153,7 +157,8 @@ panguard guard start --offline
 ```
 
 <Note>
-Offline mode disables Threat Cloud participation and real-time feed queries. Cached data is still used until it expires.
+  Offline mode disables Threat Cloud participation and real-time feed queries. Cached data is still
+  used until it expires.
 </Note>
 
 ---
@@ -190,6 +195,7 @@ When threat intelligence matches activity on your system, Chat notifies you in a
     Risk level: High
     Status: Automatically resolved
     ```
+
   </Tab>
   <Tab title="Developer Role">
     ```
@@ -201,6 +207,7 @@ When threat intelligence matches activity on your system, Chat notifies you in a
     Action: IP blocked via iptables
     Rule: atr/network/c2-communication.yml
     ```
+
   </Tab>
   <Tab title="IT Admin Role">
     ```
@@ -216,6 +223,7 @@ When threat intelligence matches activity on your system, Chat notifies you in a
     3. Check for other processes connecting to the same IP
     4. Run a system scan: panguard scan
     ```
+
   </Tab>
 </Tabs>
 

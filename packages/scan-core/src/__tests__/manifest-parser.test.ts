@@ -221,12 +221,7 @@ describe('parseManifestFromString', () => {
 
   describe('edge cases', () => {
     it('uses fallbackName when frontmatter has no name field', () => {
-      const content = [
-        '---',
-        'description: no name here',
-        '---',
-        'instructions',
-      ].join('\n');
+      const content = ['---', 'description: no name here', '---', 'instructions'].join('\n');
 
       const manifest = parseManifestFromString(content, 'injected-name');
       expect(manifest.name).toBe('injected-name');

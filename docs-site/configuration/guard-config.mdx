@@ -1,7 +1,7 @@
 ---
-title: "Guard Configuration"
-description: "Complete reference for the Panguard Guard configuration file."
-icon: "shield"
+title: 'Guard Configuration'
+description: 'Complete reference for the Panguard Guard configuration file.'
+icon: 'shield'
 ---
 
 Panguard Guard is configured via a JSON file located at `~/.panguard-guard/config.json`. This file is created automatically during `panguard guard start` with sensible defaults, or you can create it manually.
@@ -78,110 +78,115 @@ Panguard Guard is configured via a JSON file located at `~/.panguard-guard/confi
   Operating mode for Guard.
 </ParamField>
 
-| Value | Description |
-|-------|-------------|
+| Value      | Description                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------- |
 | `learning` | Observe-only mode. Establishes behavioral baselines without triggering alerts or responses. |
-| `detect` | Monitors and alerts on anomalies but does not take automated response actions. |
-| `protect` | Full protection mode. Monitors, alerts, and executes automated responses. |
+| `detect`   | Monitors and alerts on anomalies but does not take automated response actions.              |
+| `protect`  | Full protection mode. Monitors, alerts, and executes automated responses.                   |
 
 <Info>
-New installations start in `learning` mode for the configured `learningDays` period, then automatically transition to `protect` mode.
+  New installations start in `learning` mode for the configured `learningDays` period, then
+  automatically transition to `protect` mode.
 </Info>
 
 ### learningDays
 
 <ParamField body="learningDays" type="number" default="7">
-  Number of days to remain in learning mode before transitioning to the configured `mode`. Range: 1--30.
+  Number of days to remain in learning mode before transitioning to the configured `mode`. Range:
+  1--30.
 </ParamField>
 
 ### monitoring
 
 Controls which system activities Guard monitors.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `networkConnections` | boolean | `true` | Monitor inbound/outbound network connections |
-| `fileIntegrity` | boolean | `true` | Watch critical system files for unauthorized changes |
-| `processActivity` | boolean | `true` | Track process creation, termination, and anomalies |
-| `authLogs` | boolean | `true` | Monitor authentication attempts (SSH, sudo, etc.) |
-| `systemLogs` | boolean | `true` | Analyze system logs (syslog, journald, Windows Event Log) |
-| `kernelModules` | boolean | `true` | Detect kernel module loading/unloading |
-| `cronJobs` | boolean | `true` | Watch for cron/scheduled task modifications |
-| `dockerEvents` | boolean | `false` | Monitor Docker container events (requires Docker) |
+| Field                | Type    | Default | Description                                               |
+| -------------------- | ------- | ------- | --------------------------------------------------------- |
+| `networkConnections` | boolean | `true`  | Monitor inbound/outbound network connections              |
+| `fileIntegrity`      | boolean | `true`  | Watch critical system files for unauthorized changes      |
+| `processActivity`    | boolean | `true`  | Track process creation, termination, and anomalies        |
+| `authLogs`           | boolean | `true`  | Monitor authentication attempts (SSH, sudo, etc.)         |
+| `systemLogs`         | boolean | `true`  | Analyze system logs (syslog, journald, Windows Event Log) |
+| `kernelModules`      | boolean | `true`  | Detect kernel module loading/unloading                    |
+| `cronJobs`           | boolean | `true`  | Watch for cron/scheduled task modifications               |
+| `dockerEvents`       | boolean | `false` | Monitor Docker container events (requires Docker)         |
 
 ### rules
 
 Detection rule configuration.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `rulesDir` | string | `~/.panguard-guard/rules` | Directory containing ATR rules |
-| `customRulesEnabled` | boolean | `true` | Load custom rules from subdirectories |
-| `autoUpdate` | boolean | `true` | Automatically update rules from Threat Cloud |
-| `updateInterval` | string | `24h` | How often to check for rule updates |
+| Field                | Type    | Default                   | Description                                  |
+| -------------------- | ------- | ------------------------- | -------------------------------------------- |
+| `rulesDir`           | string  | `~/.panguard-guard/rules` | Directory containing ATR rules               |
+| `customRulesEnabled` | boolean | `true`                    | Load custom rules from subdirectories        |
+| `autoUpdate`         | boolean | `true`                    | Automatically update rules from Threat Cloud |
+| `updateInterval`     | string  | `24h`                     | How often to check for rule updates          |
 
 ### response
 
 Automated response configuration.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `enabled` | boolean | `true` | Enable automated response actions |
-| `autoBlock` | boolean | `true` | Automatically block malicious IPs |
-| `blockDuration` | string | `24h` | Duration for IP blocks (`1h`, `24h`, `7d`, `permanent`) |
-| `minConfidence` | number | `0.85` | Minimum AI confidence score to trigger auto-response (0.0--1.0) |
-| `actions` | string[] | `["block_ip", "kill_process", "quarantine_file"]` | Allowed response actions |
-| `requireApproval` | boolean | `false` | Require user approval before executing responses |
-| `whitelistedIps` | string[] | `[]` | IPs that should never be blocked |
-| `whitelistedProcesses` | string[] | `[]` | Processes that should never be killed |
+| Field                  | Type     | Default                                           | Description                                                     |
+| ---------------------- | -------- | ------------------------------------------------- | --------------------------------------------------------------- |
+| `enabled`              | boolean  | `true`                                            | Enable automated response actions                               |
+| `autoBlock`            | boolean  | `true`                                            | Automatically block malicious IPs                               |
+| `blockDuration`        | string   | `24h`                                             | Duration for IP blocks (`1h`, `24h`, `7d`, `permanent`)         |
+| `minConfidence`        | number   | `0.85`                                            | Minimum AI confidence score to trigger auto-response (0.0--1.0) |
+| `actions`              | string[] | `["block_ip", "kill_process", "quarantine_file"]` | Allowed response actions                                        |
+| `requireApproval`      | boolean  | `false`                                           | Require user approval before executing responses                |
+| `whitelistedIps`       | string[] | `[]`                                              | IPs that should never be blocked                                |
+| `whitelistedProcesses` | string[] | `[]`                                              | Processes that should never be killed                           |
 
 <Warning>
-Setting `minConfidence` below `0.7` may cause false positive responses. The default of `0.85` provides a good balance between protection and accuracy.
+  Setting `minConfidence` below `0.7` may cause false positive responses. The default of `0.85`
+  provides a good balance between protection and accuracy.
 </Warning>
 
 ### threatIntel
 
 Threat Cloud integration settings.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `enabled` | boolean | `true` | Enable Threat Cloud integration |
-| `endpoint` | string | `https://tc.panguard.ai` | Threat Cloud API endpoint |
-| `uploadEnabled` | boolean | `true` | Upload detected threats to Threat Cloud |
-| `downloadInterval` | string | `1h` | How often to download updated IoC feeds |
-| `abuseIpDbEnabled` | boolean | `false` | Enable AbuseIPDB lookups (requires `ABUSEIPDB_KEY`) |
+| Field              | Type    | Default                  | Description                                         |
+| ------------------ | ------- | ------------------------ | --------------------------------------------------- |
+| `enabled`          | boolean | `true`                   | Enable Threat Cloud integration                     |
+| `endpoint`         | string  | `https://tc.panguard.ai` | Threat Cloud API endpoint                           |
+| `uploadEnabled`    | boolean | `true`                   | Upload detected threats to Threat Cloud             |
+| `downloadInterval` | string  | `1h`                     | How often to download updated IoC feeds             |
+| `abuseIpDbEnabled` | boolean | `false`                  | Enable AbuseIPDB lookups (requires `ABUSEIPDB_KEY`) |
 
 ### dashboard
 
 Optional local web UI settings.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `enabled` | boolean | `true` | Enable the local web dashboard |
-| `port` | number | `9090` | Dashboard HTTP port |
-| `bindAddress` | string | `127.0.0.1` | Bind address (use `0.0.0.0` for remote access) |
+| Field         | Type    | Default     | Description                                    |
+| ------------- | ------- | ----------- | ---------------------------------------------- |
+| `enabled`     | boolean | `true`      | Enable the local web dashboard                 |
+| `port`        | number  | `9090`      | Dashboard HTTP port                            |
+| `bindAddress` | string  | `127.0.0.1` | Bind address (use `0.0.0.0` for remote access) |
 
 ### notification
 
 Alert notification settings.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `enabled` | boolean | `true` | Enable notifications |
-| `channels` | string[] | `[]` | Active channels: `telegram`, `slack`, `email`, `webhook` |
-| `minSeverity` | string | `medium` | Minimum severity to trigger notifications: `low`, `medium`, `high`, `critical` |
-| `cooldownMinutes` | number | `15` | Minimum minutes between duplicate notifications |
+| Field             | Type     | Default  | Description                                                                    |
+| ----------------- | -------- | -------- | ------------------------------------------------------------------------------ |
+| `enabled`         | boolean  | `true`   | Enable notifications                                                           |
+| `channels`        | string[] | `[]`     | Active channels: `telegram`, `slack`, `email`, `webhook`                       |
+| `minSeverity`     | string   | `medium` | Minimum severity to trigger notifications: `low`, `medium`, `high`, `critical` |
+| `cooldownMinutes` | number   | `15`     | Minimum minutes between duplicate notifications                                |
 
 ### auth
 
 Manager API connection settings.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `managerEndpoint` | string | `https://localhost:8443` | Manager API URL |
-| `heartbeatInterval` | number | `60` | Heartbeat interval in seconds |
-| `token` | string | `null` | Manager API token (auto-configured via CLI) |
+| Field               | Type   | Default                  | Description                                 |
+| ------------------- | ------ | ------------------------ | ------------------------------------------- |
+| `managerEndpoint`   | string | `https://localhost:8443` | Manager API URL                             |
+| `heartbeatInterval` | number | `60`                     | Heartbeat interval in seconds               |
+| `token`             | string | `null`                   | Manager API token (auto-configured via CLI) |
 
 <Tip>
-Most users do not need to edit this file directly. Use `panguard config set` from the CLI to modify individual settings safely. The CLI validates values and handles encryption of sensitive fields.
+  Most users do not need to edit this file directly. Use `panguard config set` from the CLI to
+  modify individual settings safely. The CLI validates values and handles encryption of sensitive
+  fields.
 </Tip>

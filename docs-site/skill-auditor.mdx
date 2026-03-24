@@ -1,7 +1,7 @@
 ---
-title: "Skill Auditor"
-description: "Scan MCP skills for security threats before installation. Powered by the unified scan-core engine shared between CLI, Website, and Guard."
-icon: "shield-check"
+title: 'Skill Auditor'
+description: 'Scan MCP skills for security threats before installation. Powered by the unified scan-core engine shared between CLI, Website, and Guard.'
+icon: 'shield-check'
 ---
 
 Panguard Skill Auditor scans third-party MCP skills for prompt injection, tool poisoning, hidden Unicode, encoded payloads, and other threats -- before they reach your agents. It is powered by `@panguard-ai/scan-core`, a unified scanning engine shared between the CLI (`panguard audit skill`), the Website scanner, and Guard's skill watcher.
@@ -20,14 +20,14 @@ All scanning -- whether invoked from CLI, Website, or Guard -- passes through th
 
 The scan composes six detection layers in sequence:
 
-| Layer | What It Does |
-|-------|-------------|
-| **Manifest parsing** | Extracts frontmatter metadata (name, description, allowed-tools, version) |
-| **Context signal detection** | Identifies risk boosters and reducers to adjust the risk multiplier |
-| **ATR rule matching** | Matches content against community ATR rules (two-pass: raw + stripped) |
-| **Instruction pattern matching** | Detects prompt injection and tool poisoning via 11 regex patterns |
-| **Secret detection** | Finds hardcoded API keys, tokens, and credentials |
-| **Risk scoring** | Calculates final 0-100 score using findings weighted by the context multiplier |
+| Layer                            | What It Does                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------------ |
+| **Manifest parsing**             | Extracts frontmatter metadata (name, description, allowed-tools, version)      |
+| **Context signal detection**     | Identifies risk boosters and reducers to adjust the risk multiplier            |
+| **ATR rule matching**            | Matches content against community ATR rules (two-pass: raw + stripped)         |
+| **Instruction pattern matching** | Detects prompt injection and tool poisoning via 11 regex patterns              |
+| **Secret detection**             | Finds hardcoded API keys, tokens, and credentials                              |
+| **Risk scoring**                 | Calculates final 0-100 score using findings weighted by the context multiplier |
 
 Additional checks reported in results: manifest structure validation and content size check.
 
@@ -36,6 +36,7 @@ Additional checks reported in results: manifest structure validation and content
 When ATR rules are available (loaded from Threat Cloud or a local rules directory), the scanner evaluates skill content against all compiled rules. Currently, the ATR corpus contains 61 rules with 450+ detection patterns covering AI agent-specific threats.
 
 ATR matching runs a two-pass scan:
+
 1. **Raw pass** -- Match against the original content
 2. **Stripped pass** -- Match against content with Markdown noise removed (catches obfuscation attempts)
 
@@ -46,6 +47,7 @@ The scanner reports both the number of ATR rules evaluated and the number of pat
 Context signals are pre-computed before ATR matching and influence how findings are scored. They fall into two categories:
 
 **Boosters** (increase risk multiplier):
+
 - `<IMPORTANT>` hidden instruction blocks
 - Concealment language ("do not tell the user")
 - Exfiltration URL patterns (workers.dev, ngrok.io, webhook.site, etc.)
@@ -54,6 +56,7 @@ Context signals are pre-computed before ATR matching and influence how findings 
 - Description-behavior mismatch (benign description + dangerous instructions)
 
 **Reducers** (decrease risk multiplier):
+
 - Skill declares shell access in frontmatter (expected for dev tools)
 - Description identifies as dev/CLI/QA tool
 - Well-structured frontmatter with name, description, and version/license

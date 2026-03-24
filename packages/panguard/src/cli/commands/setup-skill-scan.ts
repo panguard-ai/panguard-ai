@@ -88,7 +88,9 @@ export async function scanInstalledSkills(
 
   // Dynamic import to avoid circular deps
   const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
-  const { resolveSkillDir } = await (import('@panguard-ai/panguard-mcp/config' as string) as Promise<{ resolveSkillDir: (entry: MCPServerEntry) => string | null }>);
+  const { resolveSkillDir } = await (import(
+    '@panguard-ai/panguard-mcp/config' as string
+  ) as Promise<{ resolveSkillDir: (entry: MCPServerEntry) => string | null }>);
 
   const bar = new ProgressBar({ total: skills.length, width: 30 });
   const results: SkillScanResult[] = [];

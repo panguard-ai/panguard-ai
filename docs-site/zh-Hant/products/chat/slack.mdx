@@ -1,7 +1,7 @@
 ---
-title: "Slack 整合"
-description: "使用 Block Kit 豐富格式設定 Panguard Chat 搭配 Slack 的逐步指南。"
-icon: "hashtag"
+title: 'Slack 整合'
+description: '使用 Block Kit 豐富格式設定 Panguard Chat 搭配 Slack 的逐步指南。'
+icon: 'hashtag'
 ---
 
 Slack 是建議團隊和組織使用的管道。Panguard 發送豐富的 Block Kit 通知至指定的 Slack 頻道，並可選擇性地提供互動按鈕進行威脅回應。
@@ -9,24 +9,12 @@ Slack 是建議團隊和組織使用的管道。Panguard 發送豐富的 Block K
 ## 設定概覽
 
 <Steps>
-  <Step title="建立 Slack App">
-    在 Slack API 儀表板中註冊一個新的應用程式。
-  </Step>
-  <Step title="設定 Bot 權限">
-    新增所需的 OAuth 範圍。
-  </Step>
-  <Step title="安裝至您的 Workspace">
-    授權應用程式並取得 Bot Token。
-  </Step>
-  <Step title="取得 Signing Secret">
-    複製用於 webhook 驗證的 signing secret。
-  </Step>
-  <Step title="建立通知頻道">
-    建立一個專用頻道，例如 #security-alerts。
-  </Step>
-  <Step title="設定 Panguard">
-    使用您的憑證執行設定精靈。
-  </Step>
+  <Step title="建立 Slack App">在 Slack API 儀表板中註冊一個新的應用程式。</Step>
+  <Step title="設定 Bot 權限">新增所需的 OAuth 範圍。</Step>
+  <Step title="安裝至您的 Workspace">授權應用程式並取得 Bot Token。</Step>
+  <Step title="取得 Signing Secret">複製用於 webhook 驗證的 signing secret。</Step>
+  <Step title="建立通知頻道">建立一個專用頻道，例如 #security-alerts。</Step>
+  <Step title="設定 Panguard">使用您的憑證執行設定精靈。</Step>
 </Steps>
 
 ## 步驟 1：建立 Slack App
@@ -44,11 +32,11 @@ Slack 是建議團隊和組織使用的管道。Panguard 發送豐富的 Block K
 2. 捲動至 **Scopes** 區段
 3. 在 **Bot Token Scopes** 下新增：
 
-| 範圍 | 用途 |
-|-------|---------|
-| `chat:write` | 發送訊息至頻道 |
+| 範圍                | 用途                          |
+| ------------------- | ----------------------------- |
+| `chat:write`        | 發送訊息至頻道                |
 | `chat:write.public` | 發送至 Bot 尚未加入的公開頻道 |
-| `files:write` | 上傳 PDF 報告和附件 |
+| `files:write`       | 上傳 PDF 報告和附件           |
 
 4. 在頂部點擊 **Install to Workspace**
 5. 點擊 **Allow** 進行授權
@@ -61,9 +49,7 @@ Slack 是建議團隊和組織使用的管道。Panguard 發送豐富的 Block K
 xoxb-your-workspace-id-your-token-string
 ```
 
-<Warning>
-  權杖必須以 `xoxb-` 開頭（bot token）。請勿使用 `xoxp-`（user token）。
-</Warning>
+<Warning>權杖必須以 `xoxb-` 開頭（bot token）。請勿使用 `xoxp-`（user token）。</Warning>
 
 ## 步驟 4：取得 Signing Secret
 
@@ -84,6 +70,7 @@ panguard chat setup --channel slack
 ```
 
 精靈會詢問：
+
 - **Bot Token** -- 步驟 3 中的 `xoxb-...` 權杖
 - **Signing Secret** -- 來自步驟 4
 - **Default Channel** -- 例如 `#security-alerts`
@@ -116,7 +103,8 @@ panguard chat test --channel slack
 4. 點擊 **Save Changes**
 
 <Note>
-  互動按鈕需要您的 Panguard 實例擁有一個公開可存取的 URL。對於本地開發，可以使用 ngrok 等工具提供臨時的公開 URL。
+  互動按鈕需要您的 Panguard 實例擁有一個公開可存取的 URL。對於本地開發，可以使用 ngrok
+  等工具提供臨時的公開 URL。
 </Note>
 
 ## Block Kit 訊息格式

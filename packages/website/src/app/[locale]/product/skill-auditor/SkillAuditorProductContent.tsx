@@ -382,7 +382,9 @@ Run with --json for machine-readable output.`}
                     <div className="text-xs text-text-muted mt-1">{t('checks.scanTime')}</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-extrabold text-text-primary">{STATS.skillAuditChecks}</div>
+                    <div className="text-3xl font-extrabold text-text-primary">
+                      {STATS.skillAuditChecks}
+                    </div>
                     <div className="text-xs text-text-muted mt-1">
                       {t('checks.checkCategories')}
                     </div>

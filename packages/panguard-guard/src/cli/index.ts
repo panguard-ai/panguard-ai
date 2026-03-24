@@ -575,8 +575,14 @@ async function commandSetupAI(_dataDir: string): Promise<void> {
     title: l('Select AI provider', '\u9078\u64C7 AI \u63D0\u4F9B\u8005'),
     lang,
     options: [
-      { value: 'ollama' as const, label: l('Ollama (local, free, private)', 'Ollama (\u672C\u5730\u514D\u8CBB)') },
-      { value: 'claude' as const, label: l('Claude API (most accurate)', 'Claude API (\u6700\u6E96\u78BA)') },
+      {
+        value: 'ollama' as const,
+        label: l('Ollama (local, free, private)', 'Ollama (\u672C\u5730\u514D\u8CBB)'),
+      },
+      {
+        value: 'claude' as const,
+        label: l('Claude API (most accurate)', 'Claude API (\u6700\u6E96\u78BA)'),
+      },
       { value: 'openai' as const, label: l('OpenAI API', 'OpenAI API') },
       { value: 'skip' as const, label: l('Skip for now', '\u7A0D\u5F8C\u8A2D\u5B9A') },
     ],
@@ -595,7 +601,9 @@ async function commandSetupAI(_dataDir: string): Promise<void> {
   if (provider === 'ollama') {
     console.log('');
     console.log(`  ${symbols.info} Ollama runs locally -- no API key needed.`);
-    console.log(`  ${c.dim('Make sure Ollama is installed: curl -fsSL https://ollama.com/install.sh | sh')}`);
+    console.log(
+      `  ${c.dim('Make sure Ollama is installed: curl -fsSL https://ollama.com/install.sh | sh')}`
+    );
     console.log('');
 
     const modelChoice = await promptSelect<string>({
@@ -603,7 +611,10 @@ async function commandSetupAI(_dataDir: string): Promise<void> {
       lang,
       options: [
         { value: 'llama3.2', label: l('Llama 3.2 (recommended, 3B)', 'Llama 3.2 (\u63A8\u85A6)') },
-        { value: 'llama3.1', label: l('Llama 3.1 (8B, more accurate)', 'Llama 3.1 (\u66F4\u6E96\u78BA)') },
+        {
+          value: 'llama3.1',
+          label: l('Llama 3.1 (8B, more accurate)', 'Llama 3.1 (\u66F4\u6E96\u78BA)'),
+        },
         { value: 'mistral', label: l('Mistral 7B', 'Mistral 7B') },
         { value: 'custom', label: l('Custom model', '\u81EA\u8A02\u6A21\u578B') },
       ],
@@ -624,9 +635,10 @@ async function commandSetupAI(_dataDir: string): Promise<void> {
   } else {
     // Claude or OpenAI
     const keyName = provider === 'claude' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY';
-    const consolUrl = provider === 'claude'
-      ? 'https://console.anthropic.com/'
-      : 'https://platform.openai.com/api-keys';
+    const consolUrl =
+      provider === 'claude'
+        ? 'https://console.anthropic.com/'
+        : 'https://platform.openai.com/api-keys';
 
     console.log('');
     console.log(`  ${symbols.info} Get your API key from: ${c.dim(consolUrl)}`);
@@ -662,7 +674,9 @@ async function commandSetupAI(_dataDir: string): Promise<void> {
     try {
       const { readFileSync } = await import('node:fs');
       masterConfig = JSON.parse(readFileSync(masterPath, 'utf-8')) as Record<string, unknown>;
-    } catch { /* start fresh */ }
+    } catch {
+      /* start fresh */
+    }
   }
 
   const aiConfig: Record<string, string> = { provider, model };

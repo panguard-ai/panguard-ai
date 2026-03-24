@@ -1,26 +1,17 @@
 ---
-title: "Quick Start"
+title: 'Quick Start'
 description: "One command. Dashboard opens. You're protected."
-icon: "rocket"
+icon: 'rocket'
 ---
 
 ## Install + Protect in One Command
 
 <Tabs>
-  <Tab title="macOS / Linux">
-    ```bash
-    curl -fsSL https://get.panguard.ai | bash
-    ```
-  </Tab>
-  <Tab title="Windows">
-    ```powershell
-    irm https://get.panguard.ai/windows | iex
-    ```
-  </Tab>
+  <Tab title="macOS / Linux">```bash curl -fsSL https://get.panguard.ai | bash ```</Tab>
+  <Tab title="Windows">```powershell irm https://get.panguard.ai/windows | iex ```</Tab>
   <Tab title="npm (all platforms)">
-    ```bash
-    npm install -g @panguard-ai/panguard && panguard setup && panguard guard start --dashboard
-    ```
+    ```bash npm install -g @panguard-ai/panguard && panguard setup && panguard guard start
+    --dashboard ```
   </Tab>
 </Tabs>
 
@@ -55,7 +46,8 @@ panguard guard scan
 This checks all installed skills against 61 ATR rules — prompt injection, tool poisoning, credential theft, and 6 more threat categories.
 
 <Warning>
-  **CRITICAL and HIGH findings need your attention.** Review each finding and decide whether to keep, update, or remove the flagged skill.
+  **CRITICAL and HIGH findings need your attention.** Review each finding and decide whether to
+  keep, update, or remove the flagged skill.
 </Warning>
 
 ---
@@ -74,7 +66,8 @@ Dashboard:  http://127.0.0.1:9100
 ```
 
 <Info>
-  **Learning mode (Days 1-7):** Guard watches your normal behavior and builds a baseline. No false positives. After Day 7, anomaly detection kicks in automatically.
+  **Learning mode (Days 1-7):** Guard watches your normal behavior and builds a baseline. No false
+  positives. After Day 7, anomaly detection kicks in automatically.
 </Info>
 
 ---
@@ -94,14 +87,14 @@ One machine gets attacked. One hour later, every machine is immune.
 
 ## Common Commands
 
-| Command | What it does |
-| --- | --- |
-| `panguard setup` | Auto-detect and connect AI platforms |
-| `panguard audit skill <path>` | Audit a single skill before installing |
-| `panguard guard scan` | Scan all installed skills across all platforms |
-| `panguard guard start --dashboard` | Start 24/7 monitoring with browser dashboard |
-| `panguard guard stop` | Stop the Guard daemon |
-| `panguard scan --quick` | Quick system security scan (ports, services) |
+| Command                            | What it does                                   |
+| ---------------------------------- | ---------------------------------------------- |
+| `panguard setup`                   | Auto-detect and connect AI platforms           |
+| `panguard audit skill <path>`      | Audit a single skill before installing         |
+| `panguard guard scan`              | Scan all installed skills across all platforms |
+| `panguard guard start --dashboard` | Start 24/7 monitoring with browser dashboard   |
+| `panguard guard stop`              | Stop the Guard daemon                          |
+| `panguard scan --quick`            | Quick system security scan (ports, services)   |
 
 ---
 

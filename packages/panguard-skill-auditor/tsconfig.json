@@ -5,7 +5,12 @@
     "outDir": "./dist",
     "composite": true
   },
-  "references": [{ "path": "../scan-core" }, { "path": "../atr" }, { "path": "../core" }, { "path": "../panguard-scan" }],
+  "references": [
+    { "path": "../scan-core" },
+    { "path": "../atr" },
+    { "path": "../core" },
+    { "path": "../panguard-scan" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

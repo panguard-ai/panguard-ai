@@ -872,5 +872,4 @@ describe('GuardEngine', () => {
       expect(baseline.normalConnections).toBeDefined();
     });
   });
-
 });

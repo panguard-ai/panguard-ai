@@ -131,9 +131,21 @@ export function setupCommand(): Command {
         const L = detectedLang;
 
         const mcpConfig = await (import('@panguard-ai/panguard-mcp/config' as string) as Promise<{
-          detectPlatforms: () => Promise<Array<{ id: string; name: string; detected: boolean; alreadyConfigured: boolean }>>;
-          injectMCPConfig: (platformId: string) => { success: boolean; platformId: string; configPath?: string; error?: string };
-          removeMCPConfig: (platformId: string) => { success: boolean; platformId: string; configPath?: string; error?: string };
+          detectPlatforms: () => Promise<
+            Array<{ id: string; name: string; detected: boolean; alreadyConfigured: boolean }>
+          >;
+          injectMCPConfig: (platformId: string) => {
+            success: boolean;
+            platformId: string;
+            configPath?: string;
+            error?: string;
+          };
+          removeMCPConfig: (platformId: string) => {
+            success: boolean;
+            platformId: string;
+            configPath?: string;
+            error?: string;
+          };
         }>);
         const { detectPlatforms, injectMCPConfig, removeMCPConfig } = mcpConfig;
 
@@ -151,7 +163,16 @@ export function setupCommand(): Command {
         const allPlatforms = await detectPlatforms();
 
         // Filter to target platform if specified
-        const validIds = ['claude-code', 'claude-desktop', 'cursor', 'openclaw', 'codex', 'workbuddy', 'nemoclaw', 'arkclaw'];
+        const validIds = [
+          'claude-code',
+          'claude-desktop',
+          'cursor',
+          'openclaw',
+          'codex',
+          'workbuddy',
+          'nemoclaw',
+          'arkclaw',
+        ];
         let targets = allPlatforms;
         if (options.platform) {
           if (!validIds.includes(options.platform)) {
@@ -272,7 +293,11 @@ export function setupCommand(): Command {
           console.log();
 
           try {
-            const { discoverAllSkills } = await (import('@panguard-ai/panguard-mcp/config' as string) as Promise<{ discoverAllSkills: () => Promise<import('./setup-skill-scan.js').MCPServerEntry[]> }>);
+            const { discoverAllSkills } = await (import(
+              '@panguard-ai/panguard-mcp/config' as string
+            ) as Promise<{
+              discoverAllSkills: () => Promise<import('./setup-skill-scan.js').MCPServerEntry[]>;
+            }>);
             const skills = await discoverAllSkills();
 
             if (skills.length > 0) {
@@ -303,12 +328,8 @@ export function setupCommand(): Command {
 
               // Separate CRITICAL (auto-block) from HIGH (interactive review)
               const flagged = scanResults.filter((r) => r.status === 'flagged');
-              const critical = flagged.filter(
-                (r) => r.audit?.riskLevel === 'CRITICAL'
-              );
-              const high = flagged.filter(
-                (r) => r.audit?.riskLevel === 'HIGH'
-              );
+              const critical = flagged.filter((r) => r.audit?.riskLevel === 'CRITICAL');
+              const high = flagged.filter((r) => r.audit?.riskLevel === 'HIGH');
 
               // Auto-block CRITICAL skills -- no user choice offered
               if (critical.length > 0) {
@@ -319,10 +340,7 @@ export function setupCommand(): Command {
                 }>);
 
                 for (const result of critical) {
-                  const removed = removeServer(
-                    result.entry.platformId,
-                    result.entry.name
-                  );
+                  const removed = removeServer(result.entry.platformId, result.entry.name);
                   if (removed) {
                     console.log(
                       c.red(
@@ -432,14 +450,16 @@ export function setupCommand(): Command {
 
                 // ── Threat Cloud opt-in ──
                 console.log();
-                const enableTC = options.yes || await promptConfirm({
-                  message: {
-                    en: 'Enable Threat Cloud collective defense?',
-                    'zh-TW': '啟用 Threat Cloud 集體防禦？',
-                  },
-                  defaultValue: true,
-                  lang: L,
-                });
+                const enableTC =
+                  options.yes ||
+                  (await promptConfirm({
+                    message: {
+                      en: 'Enable Threat Cloud collective defense?',
+                      'zh-TW': '啟用 Threat Cloud 集體防禦？',
+                    },
+                    defaultValue: true,
+                    lang: L,
+                  }));
 
                 try {
                   const configPath = join(dataDir, 'config.json');

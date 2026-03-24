@@ -73,7 +73,10 @@ export default function SkillAuditorContent() {
         {/* Header */}
         <FadeInUp>
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-panguard-green/70 font-semibold mb-4">
-            <Link href="https://docs.panguard.ai" className="hover:text-panguard-green transition-colors">
+            <Link
+              href="https://docs.panguard.ai"
+              className="hover:text-panguard-green transition-colors"
+            >
               {t('breadcrumbDocs')}
             </Link>
             <span>/</span>

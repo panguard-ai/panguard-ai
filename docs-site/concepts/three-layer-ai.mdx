@@ -1,7 +1,7 @@
 ---
-title: "Three-Layer AI Funnel"
-description: "How Panguard processes 90% of security events in under 1ms using a cascading Rules, Local AI, and Cloud AI architecture."
-icon: "brain-circuit"
+title: 'Three-Layer AI Funnel'
+description: 'How Panguard processes 90% of security events in under 1ms using a cascading Rules, Local AI, and Cloud AI architecture.'
+icon: 'brain-circuit'
 ---
 
 # Three-Layer AI Funnel
@@ -52,14 +52,14 @@ The three-layer funnel is built on a simple principle: **most attacks follow kno
 
 ## Layer Comparison
 
-| Property | Layer 1: Rules | Layer 2: Local AI | Layer 3: Cloud AI |
-| --- | --- | --- | --- |
-| **Event share** | ~90% | ~7% | ~3% |
-| **Latency** | < 1 ms | < 5 s | < 30 s |
-| **Cost per event** | $0 | $0 | ~$0.01 |
-| **Requires network** | No | No | Yes |
-| **Technology** | ATR Rules | Ollama (llama3) | Claude / OpenAI |
-| **Best for** | Known attack patterns | Behavioral anomalies | Novel, complex threats |
+| Property             | Layer 1: Rules        | Layer 2: Local AI    | Layer 3: Cloud AI      |
+| -------------------- | --------------------- | -------------------- | ---------------------- |
+| **Event share**      | ~90%                  | ~7%                  | ~3%                    |
+| **Latency**          | < 1 ms                | < 5 s                | < 30 s                 |
+| **Cost per event**   | $0                    | $0                   | ~$0.01                 |
+| **Requires network** | No                    | No                   | Yes                    |
+| **Technology**       | ATR Rules             | Ollama (llama3)      | Claude / OpenAI        |
+| **Best for**         | Known attack patterns | Behavioral anomalies | Novel, complex threats |
 
 ---
 
@@ -77,8 +77,8 @@ name: Prompt Injection via Tool Response
 severity: critical
 detection:
   patterns:
-    - "ignore previous instructions"
-    - "system prompt override"
+    - 'ignore previous instructions'
+    - 'system prompt override'
   context: tool_response
 action: block
 ```
@@ -103,7 +103,9 @@ When an event does not match any known rule but exhibits suspicious behavior, it
 - Default model: `llama3`
 
 <Info>
-**Environment-aware routing:** On servers (VPS, cloud instances), events flow through all three layers. On desktops and laptops, Layer 2 is skipped to avoid competing for user resources. Unmatched events go directly from Layer 1 to Layer 3.
+  **Environment-aware routing:** On servers (VPS, cloud instances), events flow through all three
+  layers. On desktops and laptops, Layer 2 is skipped to avoid competing for user resources.
+  Unmatched events go directly from Layer 1 to Layer 3.
 </Info>
 
 ```
@@ -123,7 +125,8 @@ The most complex unknown threats are analyzed by cloud AI with full dynamic reas
 - Remediation recommendation generation
 
 <Note>
-Even if cloud AI is unavailable (network outage, token exhaustion), the Layer 1 rule engine continues operating. **Protection never stops.**
+  Even if cloud AI is unavailable (network outage, token exhaustion), the Layer 1 rule engine
+  continues operating. **Protection never stops.**
 </Note>
 
 ---
@@ -132,11 +135,11 @@ Even if cloud AI is unavailable (network outage, token exhaustion), the Layer 1 
 
 A critical design principle of the three-layer architecture: if any layer fails, the layer above it takes over automatically.
 
-| Scenario | Degradation Behavior |
-| --- | --- |
-| Cloud AI unavailable | Layer 2 (Local AI) takes over |
+| Scenario             | Degradation Behavior             |
+| -------------------- | -------------------------------- |
+| Cloud AI unavailable | Layer 2 (Local AI) takes over    |
 | Ollama not installed | Layer 1 (Rule Engine) takes over |
-| Rule files corrupted | Built-in default rules activate |
+| Rule files corrupted | Built-in default rules activate  |
 
 **Panguard always has protection -- only the precision level changes.**
 
@@ -144,12 +147,12 @@ A critical design principle of the three-layer architecture: if any layer fails,
 
 The system dynamically adjusts how much weight each evidence source carries based on what is available:
 
-| Sources Available | Rules/Intel | Baseline | AI | eBPF |
-| --- | --- | --- | --- | --- |
-| Rules only | 0.60 | 0.40 | -- | -- |
-| Rules + AI | 0.40 | 0.30 | 0.30 | -- |
-| Rules + eBPF | 0.40 | 0.35 | -- | 0.25 |
-| Rules + AI + eBPF | 0.30 | 0.20 | 0.30 | 0.20 |
+| Sources Available | Rules/Intel | Baseline | AI   | eBPF |
+| ----------------- | ----------- | -------- | ---- | ---- |
+| Rules only        | 0.60        | 0.40     | --   | --   |
+| Rules + AI        | 0.40        | 0.30     | 0.30 | --   |
+| Rules + eBPF      | 0.40        | 0.35     | --   | 0.25 |
+| Rules + AI + eBPF | 0.30        | 0.20     | 0.30 | 0.20 |
 
 ---
 
@@ -158,21 +161,22 @@ The system dynamically adjusts how much weight each evidence source carries base
 The `FunnelRouter` component in `@panguard-ai/core` implements the Layer 2 to Layer 3 fallback logic:
 
 <Steps>
-  <Step title="Try Local AI First">
-    Send the event to Ollama for local analysis.
-  </Step>
+  <Step title="Try Local AI First">Send the event to Ollama for local analysis.</Step>
   <Step title="Evaluate Confidence">
-    If Ollama returns a confident verdict, use it. If Ollama is unavailable or returns low confidence, escalate.
+    If Ollama returns a confident verdict, use it. If Ollama is unavailable or returns low
+    confidence, escalate.
   </Step>
   <Step title="Fall Back to Cloud AI">
     Send the event to Claude or OpenAI for deep reasoning and MITRE classification.
   </Step>
   <Step title="Final Fallback">
-    If no AI provider is available, the system continues with rule-based scoring only (weights shift to 0.6 rules + 0.4 baseline).
+    If no AI provider is available, the system continues with rule-based scoring only (weights shift
+    to 0.6 rules + 0.4 baseline).
   </Step>
 </Steps>
 
 **Provider Auto-Detection** (at startup):
+
 1. Check `~/.panguard/llm.enc` (encrypted local config, AES-256-GCM)
 2. Check environment variables: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`
 3. Probe local Ollama at `http://localhost:11434`

@@ -1,7 +1,7 @@
 ---
-title: "System Architecture"
-description: "Technical architecture overview of the Panguard AI platform: monorepo structure, deployment layers, and component interactions."
-icon: "sitemap"
+title: 'System Architecture'
+description: 'Technical architecture overview of the Panguard AI platform: monorepo structure, deployment layers, and component interactions.'
+icon: 'sitemap'
 ---
 
 # System Architecture
@@ -50,6 +50,7 @@ Panguard AI is a TypeScript monorepo with 13 packages organized into three deplo
     - Local AI via Ollama (Layer 2)
 
     **Operates fully offline.** The endpoint layer functions without network connectivity using cached rules and local AI.
+
   </Tab>
 
   <Tab title="Manager Layer">
@@ -63,6 +64,7 @@ Panguard AI is a TypeScript monorepo with 13 packages organized into three deplo
     - REST API for programmatic control
 
     **Deployment:** Self-hosted on your infrastructure or managed by Panguard.
+
   </Tab>
 
   <Tab title="Cloud Layer">
@@ -74,6 +76,7 @@ Panguard AI is a TypeScript monorepo with 13 packages organized into three deplo
     - Local web dashboard for threat monitoring
 
     **Optional.** The cloud layer enhances protection but is never required. All core functionality works without it.
+
   </Tab>
 </Tabs>
 
@@ -83,17 +86,17 @@ Panguard AI is a TypeScript monorepo with 13 packages organized into three deplo
 
 The codebase is organized as a pnpm workspace monorepo. Each package has a single responsibility:
 
-| Package | Layer | Purpose |
-| --- | --- | --- |
-| `@panguard-ai/core` | Shared | Rule engine, monitors, AI providers, i18n, encryption |
-| `@panguard-ai/panguard` | Endpoint | CLI entry point (`panguard` command) |
-| `@panguard-ai/panguard-guard` | Endpoint | Real-time protection agent (5-stage AI pipeline) |
-| `@panguard-ai/panguard-scan` | Endpoint | Security scanner and risk scoring |
-| `@panguard-ai/panguard-chat` | Endpoint | Notification system (5 channels, 3 role formats) |
-| `@panguard-ai/panguard-trap` | Endpoint | Honeypot system (8 service types) |
+| Package                        | Layer    | Purpose                                               |
+| ------------------------------ | -------- | ----------------------------------------------------- |
+| `@panguard-ai/core`            | Shared   | Rule engine, monitors, AI providers, i18n, encryption |
+| `@panguard-ai/panguard`        | Endpoint | CLI entry point (`panguard` command)                  |
+| `@panguard-ai/panguard-guard`  | Endpoint | Real-time protection agent (5-stage AI pipeline)      |
+| `@panguard-ai/panguard-scan`   | Endpoint | Security scanner and risk scoring                     |
+| `@panguard-ai/panguard-chat`   | Endpoint | Notification system (5 channels, 3 role formats)      |
+| `@panguard-ai/panguard-trap`   | Endpoint | Honeypot system (8 service types)                     |
 | `@panguard-ai/panguard-report` | Endpoint | Compliance report generation (TCSA, ISO 27001, SOC 2) |
-| `@panguard-ai/threat-cloud` | Cloud | Collective intelligence API server |
-| `@panguard-ai/website` | Cloud | Marketing website (panguard.ai) |
+| `@panguard-ai/threat-cloud`    | Cloud    | Collective intelligence API server                    |
+| `@panguard-ai/website`         | Cloud    | Marketing website (panguard.ai)                       |
 
 ---
 
@@ -107,27 +110,23 @@ The `core` package is the foundation that every other package depends on. It pro
     - 61 bundled ATR rules, custom rule loading
   </Accordion>
 
-  <Accordion title="Monitors">
-    4 system monitors that collect security-relevant events:
-    - **Log Monitor** -- System log parsing (syslog, journald, Windows Event Log)
-    - **Network Monitor** -- Connection tracking, port scanning, DNS queries
-    - **Process Monitor** -- Process creation, termination, resource usage
-    - **File Monitor** -- File system changes, permission modifications, new executables
-  </Accordion>
+<Accordion title="Monitors">
+  4 system monitors that collect security-relevant events: - **Log Monitor** -- System log parsing
+  (syslog, journald, Windows Event Log) - **Network Monitor** -- Connection tracking, port scanning,
+  DNS queries - **Process Monitor** -- Process creation, termination, resource usage - **File
+  Monitor** -- File system changes, permission modifications, new executables
+</Accordion>
 
-  <Accordion title="AI Providers">
-    - FunnelRouter for Layer 2/3 cascading
-    - Ollama adapter (local AI)
-    - Claude and OpenAI adapters (cloud AI)
-    - Provider auto-detection at startup
-    - AES-256-GCM encrypted key storage (`~/.panguard/llm.enc`)
-  </Accordion>
+<Accordion title="AI Providers">
+  - FunnelRouter for Layer 2/3 cascading - Ollama adapter (local AI) - Claude and OpenAI adapters
+  (cloud AI) - Provider auto-detection at startup - AES-256-GCM encrypted key storage
+  (`~/.panguard/llm.enc`)
+</Accordion>
 
-  <Accordion title="Internationalization (i18n)">
-    - English and Traditional Chinese
-    - All CLI output, reports, and notifications are fully localized
-    - Language selection via `panguard init` or `--lang` flag
-  </Accordion>
+<Accordion title="Internationalization (i18n)">
+  - English and Traditional Chinese - All CLI output, reports, and notifications are fully localized
+  - Language selection via `panguard init` or `--lang` flag
+</Accordion>
 
   <Accordion title="System Reconnaissance">
     - OS detection (macOS, Linux, Windows)
@@ -142,15 +141,15 @@ The `core` package is the foundation that every other package depends on. It pro
 
 ## Tech Stack
 
-| Technology | Version | Purpose |
-| --- | --- | --- |
-| **TypeScript** | 5.7 | Primary language across all packages |
-| **Node.js** | 22 | Runtime |
-| **pnpm** | 9+ | Workspace-aware package manager |
-| **Vitest** | Latest | Unit and integration testing |
-| **esbuild** | Latest | Fast bundling for CLI distribution |
-| **better-sqlite3** | Latest | Embedded database for Threat Cloud and Guard state |
-| **Next.js** | 14 | Web dashboard and marketing website |
+| Technology         | Version | Purpose                                            |
+| ------------------ | ------- | -------------------------------------------------- |
+| **TypeScript**     | 5.7     | Primary language across all packages               |
+| **Node.js**        | 22      | Runtime                                            |
+| **pnpm**           | 9+      | Workspace-aware package manager                    |
+| **Vitest**         | Latest  | Unit and integration testing                       |
+| **esbuild**        | Latest  | Fast bundling for CLI distribution                 |
+| **better-sqlite3** | Latest  | Embedded database for Threat Cloud and Guard state |
+| **Next.js**        | 14      | Web dashboard and marketing website                |
 
 ---
 
@@ -158,11 +157,11 @@ The `core` package is the foundation that every other package depends on. It pro
 
 Panguard runs on all three major operating systems:
 
-| Platform | Guard | Scan | Trap | Manager |
-| --- | --- | --- | --- | --- |
-| **macOS** (ARM64, x64) | Yes | Yes | Yes | Yes |
-| **Linux** (x64, ARM64) | Yes | Yes | Yes | Yes |
-| **Windows** (x64) | Yes | Yes | Yes | Yes |
+| Platform               | Guard | Scan | Trap | Manager |
+| ---------------------- | ----- | ---- | ---- | ------- |
+| **macOS** (ARM64, x64) | Yes   | Yes  | Yes  | Yes     |
+| **Linux** (x64, ARM64) | Yes   | Yes  | Yes  | Yes     |
+| **Windows** (x64)      | Yes   | Yes  | Yes  | Yes     |
 
 Platform-specific implementations are abstracted behind interfaces in `core`:
 
@@ -178,22 +177,28 @@ A typical security event flows through the system as follows:
 
 <Steps>
   <Step title="Event detected">
-    A monitor in `core` (process, network, file, or log) detects a security-relevant event on the endpoint.
+    A monitor in `core` (process, network, file, or log) detects a security-relevant event on the
+    endpoint.
   </Step>
   <Step title="Layer 1 evaluation">
-    The ATR rule engine evaluates the event in under 1ms. If a rule matches, the event is classified and a response is triggered immediately.
+    The ATR rule engine evaluates the event in under 1ms. If a rule matches, the event is classified
+    and a response is triggered immediately.
   </Step>
   <Step title="AI escalation (if needed)">
-    Unmatched events are forwarded to Layer 2 (local Ollama) or Layer 3 (Cloud AI) for deeper analysis via the FunnelRouter.
+    Unmatched events are forwarded to Layer 2 (local Ollama) or Layer 3 (Cloud AI) for deeper
+    analysis via the FunnelRouter.
   </Step>
   <Step title="Response execution">
-    Based on classification and confidence, the auto-response engine takes action: block IP, quarantine file, terminate process, or notify only.
+    Based on classification and confidence, the auto-response engine takes action: block IP,
+    quarantine file, terminate process, or notify only.
   </Step>
   <Step title="Reporting and notification">
-    Chat sends a notification via the configured channel. The event is logged for Guard status, security score updates, and compliance reports.
+    Chat sends a notification via the configured channel. The event is logged for Guard status,
+    security score updates, and compliance reports.
   </Step>
   <Step title="Threat Cloud upload (optional)">
-    If Threat Cloud participation is enabled, anonymized indicators are uploaded to benefit the community.
+    If Threat Cloud participation is enabled, anonymized indicators are uploaded to benefit the
+    community.
   </Step>
 </Steps>
 

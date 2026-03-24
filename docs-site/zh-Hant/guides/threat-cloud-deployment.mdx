@@ -1,7 +1,7 @@
 ---
-title: "部署 Threat Cloud"
-description: "自架 Threat Cloud 伺服器，集中管理威脅情報，資料完全掌握在自己手上。"
-icon: "cloud"
+title: '部署 Threat Cloud'
+description: '自架 Threat Cloud 伺服器，集中管理威脅情報，資料完全掌握在自己手上。'
+icon: 'cloud'
 ---
 
 Threat Cloud 是 Panguard 的自架威脅情報平台。它彙總來自 Guard agent 和蜜罐的入侵指標 (IoC)，提供 feed 端點給下游工具訂閱，追蹤攻擊活動 -- 資料完全留在你的基礎設施。
@@ -33,6 +33,7 @@ Threat Cloud 是 Panguard 的自架威脅情報平台。它彙總來自 Guard ag
     <Info>
       API key 在第一次啟動時自動產生，存在 Panguard config 裡。所有 API 請求都用它來認證。
     </Info>
+
   </Step>
 
   <Step title="了解架構">
@@ -48,6 +49,7 @@ Threat Cloud 是 Panguard 的自架威脅情報平台。它彙總來自 Guard ag
     <Note>
       SQLite 是預設後端。大流量部署（10+ 個 agent）建議把資料庫放 SSD，開啟 WAL 模式：`panguard threat start --db-wal`。
     </Note>
+
   </Step>
 
   <Step title="管理入侵指標">
@@ -72,6 +74,7 @@ Threat Cloud 是 Panguard 的自架威脅情報平台。它彙總來自 Guard ag
     </CodeGroup>
 
     Guard agent 推上來的 IoC 會附完整上下文：觸發事件、蜜罐互動資料、分析結果。
+
   </Step>
 
   <Step title="設定 feed 端點">
@@ -101,6 +104,7 @@ Threat Cloud 是 Panguard 的自架威脅情報平台。它彙總來自 Guard ag
       ]
     }
     ```
+
   </Step>
 
   <Step title="追蹤攻擊活動">
@@ -122,6 +126,7 @@ Threat Cloud 是 Panguard 的自架威脅情報平台。它彙總來自 Guard ag
       panguard threat campaign view --name "SSH Brute Force Wave"
       ```
     </CodeGroup>
+
   </Step>
 
   <Step title="隱私與資料處理">
@@ -141,6 +146,7 @@ Threat Cloud 是 Panguard 的自架威脅情報平台。它彙總來自 Guard ag
     <Warning>
       如果要把 Threat Cloud 開放到外網，務必用 HTTPS（反向代理）並限制 IP 或 VPN 存取。光靠 API key 不足以應對公開部署。
     </Warning>
+
   </Step>
 </Steps>
 

@@ -1,23 +1,23 @@
 ---
-title: "Environment Variables"
-description: "Complete reference for all environment variables across Panguard services."
-icon: "square-terminal"
+title: 'Environment Variables'
+description: 'Complete reference for all environment variables across Panguard services.'
+icon: 'square-terminal'
 ---
 
 Environment variables configure Panguard services at startup. Set them in your shell profile, `.env` file, or container orchestration system.
 
 ## Panguard Guard
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PANGUARD_DATA_DIR` | `~/.panguard-guard` | Base directory for Guard data, rules, and logs |
-| `PANGUARD_MODE` | `protect` | Operating mode: `learning`, `detect`, `protect` |
-| `OLLAMA_ENDPOINT` | `http://localhost:11434` | Ollama API endpoint for local AI analysis |
-| `ANTHROPIC_API_KEY` | -- | Anthropic API key for Claude-based analysis (Layer 2/3) |
-| `OPENAI_API_KEY` | -- | OpenAI API key for GPT-based analysis (Layer 2/3) |
-| `ABUSEIPDB_KEY` | -- | AbuseIPDB API key for IP reputation lookups |
-| `PANGUARD_LOG_LEVEL` | `info` | Log level: `debug`, `info`, `warn`, `error` |
-| `PANGUARD_LANG` | `en` | Language for CLI output and notifications: `en`, `zh-TW`, `ja` |
+| Variable             | Default                  | Description                                                    |
+| -------------------- | ------------------------ | -------------------------------------------------------------- |
+| `PANGUARD_DATA_DIR`  | `~/.panguard-guard`      | Base directory for Guard data, rules, and logs                 |
+| `PANGUARD_MODE`      | `protect`                | Operating mode: `learning`, `detect`, `protect`                |
+| `OLLAMA_ENDPOINT`    | `http://localhost:11434` | Ollama API endpoint for local AI analysis                      |
+| `ANTHROPIC_API_KEY`  | --                       | Anthropic API key for Claude-based analysis (Layer 2/3)        |
+| `OPENAI_API_KEY`     | --                       | OpenAI API key for GPT-based analysis (Layer 2/3)              |
+| `ABUSEIPDB_KEY`      | --                       | AbuseIPDB API key for IP reputation lookups                    |
+| `PANGUARD_LOG_LEVEL` | `info`                   | Log level: `debug`, `info`, `warn`, `error`                    |
+| `PANGUARD_LANG`      | `en`                     | Language for CLI output and notifications: `en`, `zh-TW`, `ja` |
 
 <CodeGroup>
 ```bash Linux / macOS
@@ -27,11 +27,13 @@ export PANGUARD_LOG_LEVEL=info
 export PANGUARD_LANG=en
 
 # AI providers (at least one recommended)
+
 export OLLAMA_ENDPOINT=http://localhost:11434
 export ANTHROPIC_API_KEY=sk-ant-...
 export OPENAI_API_KEY=sk-...
 
 # Optional
+
 export ABUSEIPDB_KEY=your-key-here
 ```
 
@@ -45,63 +47,54 @@ $env:PANGUARD_LANG = "en"
 $env:OLLAMA_ENDPOINT = "http://localhost:11434"
 $env:ANTHROPIC_API_KEY = "sk-ant-..."
 ```
+
 </CodeGroup>
 
 <Info>
-Guard uses a three-layer AI system. At minimum, configure `OLLAMA_ENDPOINT` for local analysis (Layer 1). Add `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` for cloud-based analysis (Layer 2/3).
+  Guard uses a three-layer AI system. At minimum, configure `OLLAMA_ENDPOINT` for local analysis
+  (Layer 1). Add `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` for cloud-based analysis (Layer 2/3).
 </Info>
 
 ---
 
 ## Panguard Threat Cloud
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `TC_API_KEYS` | -- | Comma-separated list of valid API keys |
-| `TC_PORT` | `4000` | HTTP port for the Threat Cloud API |
-| `TC_DB_PATH` | `./data/threat-cloud.db` | SQLite database file path |
-| `ALLOW_ANONYMOUS_UPLOAD` | `false` | Allow unauthenticated threat submissions |
+| Variable                 | Default                  | Description                              |
+| ------------------------ | ------------------------ | ---------------------------------------- |
+| `TC_API_KEYS`            | --                       | Comma-separated list of valid API keys   |
+| `TC_PORT`                | `4000`                   | HTTP port for the Threat Cloud API       |
+| `TC_DB_PATH`             | `./data/threat-cloud.db` | SQLite database file path                |
+| `ALLOW_ANONYMOUS_UPLOAD` | `false`                  | Allow unauthenticated threat submissions |
 
 <CodeGroup>
-```bash Linux / macOS
-export TC_API_KEYS=key1,key2,key3
-export TC_PORT=4000
-export TC_DB_PATH=/var/lib/panguard/threat-cloud.db
-export ALLOW_ANONYMOUS_UPLOAD=false
-```
+  ```bash Linux / macOS export TC_API_KEYS=key1,key2,key3 export TC_PORT=4000 export
+  TC_DB_PATH=/var/lib/panguard/threat-cloud.db export ALLOW_ANONYMOUS_UPLOAD=false ```
 </CodeGroup>
 
 <Info>
-`ALLOW_ANONYMOUS_UPLOAD=true` enables users to submit threat data without an API key. Uploaded data still goes through validation and reputation scoring.
+  `ALLOW_ANONYMOUS_UPLOAD=true` enables users to submit threat data without an API key. Uploaded
+  data still goes through validation and reputation scoring.
 </Info>
 
 ---
 
 ## Docker / Production
 
-| Variable | Default | Description |
-|----------|---------|-------------|
+| Variable   | Default       | Description                                    |
+| ---------- | ------------- | ---------------------------------------------- |
 | `NODE_ENV` | `development` | Set to `production` for production deployments |
 
 Setting `NODE_ENV=production`:
+
 - Disables debug logging and stack traces in error responses
 - Enables response compression
 - Enables stricter security headers
 - Disables development-only routes
 
 <CodeGroup>
-```yaml docker-compose.yml
-services:
-  threat-cloud:
-    image: panguard/threat-cloud
-    environment:
-      - NODE_ENV=production
-      - TC_PORT=4000
-      - TC_API_KEYS=${TC_API_KEYS}
-      - TC_DB_PATH=/data/threat-cloud.db
-    volumes:
-      - tc-data:/data
-```
+  ```yaml docker-compose.yml services: threat-cloud: image: panguard/threat-cloud environment: -
+  NODE_ENV=production - TC_PORT=4000 - TC_API_KEYS=${TC_API_KEYS}- TC_DB_PATH=/data/threat-cloud.db
+  volumes: - tc-data:/data ```
 </CodeGroup>
 
 ## Precedence
@@ -113,5 +106,6 @@ Environment variables take precedence over configuration file values. The resolu
 3. Built-in defaults (lowest priority)
 
 <Tip>
-For local development, create a `.env` file in the service directory and use a tool like `dotenv` to load it. Never commit `.env` files to version control.
+  For local development, create a `.env` file in the service directory and use a tool like `dotenv`
+  to load it. Never commit `.env` files to version control.
 </Tip>

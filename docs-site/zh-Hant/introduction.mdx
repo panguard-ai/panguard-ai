@@ -1,12 +1,13 @@
 ---
-title: "Panguard AI"
-sidebarTitle: "簡介"
-description: "AI Agent 安全的第一個開放標準。61 條 ATR 偵測規則。一行安裝。100% 免費開源。"
-icon: "shield-check"
+title: 'Panguard AI'
+sidebarTitle: '簡介'
+description: 'AI Agent 安全的第一個開放標準。61 條 ATR 偵測規則。一行安裝。100% 免費開源。'
+icon: 'shield-check'
 ---
 
 <Note>
-  **v1.3.0 已發布** -- 內建 Dashboard、支援 8 個 AI 平台、Skill Auditor 為預設入口。[查看更新日誌](/changelog)。
+  **v1.3.0 已發布** -- 內建 Dashboard、支援 8 個 AI 平台、Skill Auditor
+  為預設入口。[查看更新日誌](/changelog)。
 </Note>
 
 Panguard AI 是第一個專為 AI Agent 時代打造的開源資安平台。當 AI Agent 拿到系統 root 權限存取正式環境，Panguard 提供偵測規則、執行引擎和集體情報網路來把關安全。
@@ -21,14 +22,14 @@ curl -fsSL https://get.panguard.ai | bash
 
 ## 關鍵數字
 
-| | |
-| --- | --- |
-| **61** 條偵測規則 | ATR (61) + 社群貢獻 |
-| **8** 個 AI 平台 | Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw |
-| **3 層** AI 管線 | 規則引擎、本地 AI (Ollama)、雲端 AI (Claude/OpenAI) |
-| **11** 個 MCP 工具 | 掃描、審計、防護、威脅搜尋等 |
-| **8 項檢查** Skill Auditor | 每個 AI Skill 安裝前都要過關 |
-| **0** 帳號需求 | 不用登入、不用註冊、不用 API key 就能開始 |
+|                            |                                                                                    |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| **61** 條偵測規則          | ATR (61) + 社群貢獻                                                                |
+| **8** 個 AI 平台           | Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw |
+| **3 層** AI 管線           | 規則引擎、本地 AI (Ollama)、雲端 AI (Claude/OpenAI)                                |
+| **11** 個 MCP 工具         | 掃描、審計、防護、威脅搜尋等                                                       |
+| **8 項檢查** Skill Auditor | 每個 AI Skill 安裝前都要過關                                                       |
+| **0** 帳號需求             | 不用登入、不用註冊、不用 API key 就能開始                                          |
 
 ---
 
@@ -36,13 +37,16 @@ curl -fsSL https://get.panguard.ai | bash
 
 <CardGroup cols={3}>
   <Card title="ATR -- 標準" icon="file-code" href="/overview">
-    **61 條規則，9 大威脅類別。** AI Agent 威脅偵測的第一個開放標準 -- prompt injection、tool poisoning、skill compromise、agent manipulation。YAML 格式，人看得懂，機器跑得動。
+    **61 條規則，9 大威脅類別。** AI Agent 威脅偵測的第一個開放標準 -- prompt injection、tool
+    poisoning、skill compromise、agent manipulation。YAML 格式，人看得懂，機器跑得動。
   </Card>
   <Card title="Threat Cloud -- 情報網" icon="globe" href="/products/threat-cloud/overview">
-    **集體免疫。** 每個安裝都貢獻匿名化威脅訊號。管線從真實攻擊自動產生規則。11 個情報來源，每小時同步一次。
+    **集體免疫。** 每個安裝都貢獻匿名化威脅訊號。管線從真實攻擊自動產生規則。11
+    個情報來源，每小時同步一次。
   </Card>
   <Card title="Guard -- 引擎" icon="shield-halved" href="/products/guard/overview">
-    **4-Agent AI 管線。** Detect、Analyze、Respond、Report。用 61 條 ATR 規則處理 OS 層級事件。內建 Skill Auditor。自動封鎖 IP、終止 process、隔離檔案。
+    **4-Agent AI 管線。** Detect、Analyze、Respond、Report。用 61 條 ATR 規則處理 OS 層級事件。內建
+    Skill Auditor。自動封鎖 IP、終止 process、隔離檔案。
   </Card>
 </CardGroup>
 
@@ -83,6 +87,7 @@ panguard guard start --dashboard
     ```
 
     一行指令自動偵測並設定 8 個支援的 AI 平台：Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw。
+
   </Tab>
   <Tab title="OpenClaw">
     ```bash
@@ -96,6 +101,7 @@ panguard guard start --dashboard
     > Scan my machine for vulnerabilities
     > Start real-time protection
     ```
+
   </Tab>
   <Tab title="NemoClaw">
     ```bash
@@ -103,6 +109,7 @@ panguard guard start --dashboard
     ```
 
     註冊為 NemoClaw 的 **MCP server**。重啟 NemoClaw 就能使用 11 個安全工具。
+
   </Tab>
   <Tab title="ArkClaw">
     ```bash
@@ -110,12 +117,11 @@ panguard guard start --dashboard
     ```
 
     註冊為 ArkClaw 的 **MCP server**。重啟 ArkClaw 就能使用 11 個安全工具。
+
   </Tab>
 </Tabs>
 
-<Tip>
-  手動設定與疑難排解請參閱[平台設定指南](/guides/claw-setup)。
-</Tip>
+<Tip>手動設定與疑難排解請參閱[平台設定指南](/guides/claw-setup)。</Tip>
 
 ---
 
@@ -158,7 +164,11 @@ Panguard 走不同路線：
   <Card title="Panguard AI GitHub" icon="github" href="https://github.com/panguard-ai/panguard-ai">
     Star 專案、看原始碼、回報 issue、或送 PR。
   </Card>
-  <Card title="ATR Rules GitHub" icon="file-code" href="https://github.com/Agent-Threat-Rule/agent-threat-rules">
+  <Card
+    title="ATR Rules GitHub"
+    icon="file-code"
+    href="https://github.com/Agent-Threat-Rule/agent-threat-rules"
+  >
     AI Agent 威脅偵測的開放標準。貢獻規則來強化集體免疫。
   </Card>
 </CardGroup>

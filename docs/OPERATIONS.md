@@ -77,11 +77,11 @@ SecurityEvent  DetectionResult  ThreatVerdict  ResponseResult  JSONL Log
 
 ### 3-Layer AI Funnel
 
-| Layer   | 技術                            | 成本         | 延遲   | 涵蓋率 |
-| ------- | ------------------------------- | ------------ | ------ | ------ |
-| Layer 1 | 規則 (61 ATR)                  | $0           | <1ms   | 90%    |
-| Layer 2 | 本地 AI (Ollama llama3)         | $0           | ~100ms | 7%     |
-| Layer 3 | 雲端 AI (Claude/OpenAI)         | ~$0.01/event | ~1s    | 3%     |
+| Layer   | 技術                    | 成本         | 延遲   | 涵蓋率 |
+| ------- | ----------------------- | ------------ | ------ | ------ |
+| Layer 1 | 規則 (61 ATR)           | $0           | <1ms   | 90%    |
+| Layer 2 | 本地 AI (Ollama llama3) | $0           | ~100ms | 7%     |
+| Layer 3 | 雲端 AI (Claude/OpenAI) | ~$0.01/event | ~1s    | 3%     |
 
 ### 事件關聯模式 (7 patterns)
 

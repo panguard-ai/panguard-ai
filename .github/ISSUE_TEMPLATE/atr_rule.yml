@@ -1,6 +1,6 @@
 name: ATR Rule Proposal
 description: Propose a new Agent Threat Rule
-labels: ["atr-rule", "enhancement"]
+labels: ['atr-rule', 'enhancement']
 body:
   - type: markdown
     attributes:
@@ -12,8 +12,8 @@ body:
     id: rule_id
     attributes:
       label: Rule ID
-      description: "Format: ATR-XXXX (next available number)"
-      placeholder: "ATR-0070"
+      description: 'Format: ATR-XXXX (next available number)'
+      placeholder: 'ATR-0070'
     validations:
       required: true
 
@@ -22,7 +22,7 @@ body:
     attributes:
       label: Rule Title
       description: Short descriptive title.
-      placeholder: "Unauthorized Credential Store Access"
+      placeholder: 'Unauthorized Credential Store Access'
     validations:
       required: true
 

@@ -283,7 +283,6 @@ describe('EventCorrelator - Port Scan (T1046)', () => {
     const portScan = lastResult!.patterns.find((p) => p.type === 'port_scan');
     expect(portScan).toBeUndefined();
   });
-
 });
 
 // ---------------------------------------------------------------------------

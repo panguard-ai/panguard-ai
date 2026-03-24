@@ -125,7 +125,9 @@
             ></div>
           </div>
           <p id="kpiProposals" class="text-2xl font-bold">--</p>
-          <p id="kpiProposalsInfo" class="text-xs text-text-tertiary mt-1">-- pending, -- confirmed</p>
+          <p id="kpiProposalsInfo" class="text-xs text-text-tertiary mt-1">
+            -- pending, -- confirmed
+          </p>
         </div>
         <div
           class="stat-card bg-surface-1 border border-border rounded-xl p-5 fade-in fade-in-delay-2"
@@ -256,7 +258,10 @@
         class="hidden mt-4 bg-caution/10 border border-caution/20 rounded-xl p-4 text-sm text-caution flex items-center gap-2"
       >
         <span id="offlineIcon"></span>
-        <span>Threat Cloud is not available. Ensure the server is running with threat cloud enabled.</span>
+        <span
+          >Threat Cloud is not available. Ensure the server is running with threat cloud
+          enabled.</span
+        >
       </div>
     </main>
 
@@ -298,11 +303,13 @@
         const dot = document.getElementById('statusDot');
         const text = document.getElementById('statusText');
         if (online) {
-          badge.className = 'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-safe/10 text-safe border border-safe/20';
+          badge.className =
+            'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-safe/10 text-safe border border-safe/20';
           dot.innerHTML = Icons.dot(6, '#2ED573');
           text.textContent = 'Online';
         } else {
-          badge.className = 'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-text-muted/10 text-text-muted border border-text-muted/20';
+          badge.className =
+            'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-text-muted/10 text-text-muted border border-text-muted/20';
           dot.innerHTML = Icons.dot(6, '#4A4540');
           text.textContent = 'Offline';
         }
@@ -337,15 +344,19 @@
         // KPI cards
         document.getElementById('kpiRules').textContent = PG.formatNumber(stats.totalRules);
         document.getElementById('kpiThreats').textContent = PG.formatNumber(stats.totalThreats);
-        document.getElementById('kpiThreats24h').textContent = PG.formatNumber(stats.last24hThreats) + ' in last 24h';
+        document.getElementById('kpiThreats24h').textContent =
+          PG.formatNumber(stats.last24hThreats) + ' in last 24h';
 
         if (stats.proposalStats) {
           const ps = stats.proposalStats;
           document.getElementById('kpiProposals').textContent = PG.formatNumber(ps.total);
-          document.getElementById('kpiProposalsInfo').textContent = ps.pending + ' pending, ' + ps.confirmed + ' confirmed';
+          document.getElementById('kpiProposalsInfo').textContent =
+            ps.pending + ' pending, ' + ps.confirmed + ' confirmed';
         }
 
-        document.getElementById('kpiSkillThreats').textContent = PG.formatNumber(stats.skillThreatsTotal || 0);
+        document.getElementById('kpiSkillThreats').textContent = PG.formatNumber(
+          stats.skillThreatsTotal || 0
+        );
 
         // Top Attack Types
         renderAttackBars(stats.topAttackTypes || []);
@@ -380,41 +391,68 @@
       function renderAttackBars(types) {
         const container = document.getElementById('attackBars');
         if (!types.length) {
-          container.innerHTML = '<p class="text-xs text-text-muted text-center py-4">No attack data yet</p>';
+          container.innerHTML =
+            '<p class="text-xs text-text-muted text-center py-4">No attack data yet</p>';
           return;
         }
 
-        const max = Math.max(...types.map(function(t) { return t.count; }), 1);
+        const max = Math.max(
+          ...types.map(function (t) {
+            return t.count;
+          }),
+          1
+        );
         const colors = ['#EF4444', '#FBBF24', '#8B9A8E', '#A3B0A6', '#A09890'];
 
-        container.innerHTML = types.map(function(t, i) {
-          var pct = Math.max(3, Math.round((t.count / max) * 100));
-          var color = colors[i % colors.length];
-          return '<div>' +
-            '<div class="flex items-center justify-between mb-1">' +
-              '<span class="text-xs text-text-secondary">' + PG.escapeHtml(t.type) + '</span>' +
-              '<span class="text-xs font-mono text-text-tertiary">' + PG.formatNumber(t.count) + '</span>' +
-            '</div>' +
-            '<div class="bg-surface-2 rounded-full h-1.5">' +
-              '<div class="h-1.5 rounded-full transition-all duration-700" style="width:' + pct + '%;background:' + color + '"></div>' +
-            '</div>' +
-          '</div>';
-        }).join('');
+        container.innerHTML = types
+          .map(function (t, i) {
+            var pct = Math.max(3, Math.round((t.count / max) * 100));
+            var color = colors[i % colors.length];
+            return (
+              '<div>' +
+              '<div class="flex items-center justify-between mb-1">' +
+              '<span class="text-xs text-text-secondary">' +
+              PG.escapeHtml(t.type) +
+              '</span>' +
+              '<span class="text-xs font-mono text-text-tertiary">' +
+              PG.formatNumber(t.count) +
+              '</span>' +
+              '</div>' +
+              '<div class="bg-surface-2 rounded-full h-1.5">' +
+              '<div class="h-1.5 rounded-full transition-all duration-700" style="width:' +
+              pct +
+              '%;background:' +
+              color +
+              '"></div>' +
+              '</div>' +
+              '</div>'
+            );
+          })
+          .join('');
       }
 
       function renderMitreTable(techniques) {
         var tbody = document.getElementById('mitreTableBody');
         if (!techniques.length) {
-          tbody.innerHTML = '<tr><td colspan="2" class="py-4 text-center text-text-muted text-xs">No MITRE data yet</td></tr>';
+          tbody.innerHTML =
+            '<tr><td colspan="2" class="py-4 text-center text-text-muted text-xs">No MITRE data yet</td></tr>';
           return;
         }
 
-        tbody.innerHTML = techniques.map(function(t) {
-          return '<tr class="border-b border-border">' +
-            '<td class="py-2 text-text-secondary text-xs font-mono">' + PG.escapeHtml(t.technique) + '</td>' +
-            '<td class="py-2 text-right text-xs font-mono text-text-tertiary">' + PG.formatNumber(t.count) + '</td>' +
-          '</tr>';
-        }).join('');
+        tbody.innerHTML = techniques
+          .map(function (t) {
+            return (
+              '<tr class="border-b border-border">' +
+              '<td class="py-2 text-text-secondary text-xs font-mono">' +
+              PG.escapeHtml(t.technique) +
+              '</td>' +
+              '<td class="py-2 text-right text-xs font-mono text-text-tertiary">' +
+              PG.formatNumber(t.count) +
+              '</td>' +
+              '</tr>'
+            );
+          })
+          .join('');
       }
 
       function renderRuleDistribution(rulesRes) {
@@ -426,14 +464,14 @@
         var atrCount = 0;
 
         if (rulesRes && Array.isArray(rulesRes)) {
-          rulesRes.forEach(function(r) {
+          rulesRes.forEach(function (r) {
             var id = (r.ruleId || r.rule_id || '').toLowerCase();
             if (id.startsWith('sigma-') || id.startsWith('sigma_')) sigmaCount++;
             else if (id.startsWith('yara-') || id.startsWith('yara_')) yaraCount++;
             else if (id.startsWith('atr-') || id.startsWith('atr_')) atrCount++;
           });
         } else if (rulesRes && rulesRes.ok && Array.isArray(rulesRes.data)) {
-          rulesRes.data.forEach(function(r) {
+          rulesRes.data.forEach(function (r) {
             var id = (r.ruleId || r.rule_id || '').toLowerCase();
             if (id.startsWith('sigma-') || id.startsWith('sigma_')) sigmaCount++;
             else if (id.startsWith('yara-') || id.startsWith('yara_')) yaraCount++;
@@ -449,18 +487,33 @@
           { label: 'ATR', count: atrCount, color: '#2ED573' },
         ];
 
-        container.innerHTML = items.map(function(item) {
-          var pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
-          return '<div class="bg-surface-2/50 rounded-lg p-4">' +
-            '<div class="flex items-center justify-between mb-2">' +
-              '<span class="text-xs font-semibold" style="color:' + item.color + '">' + item.label + '</span>' +
-              '<span class="text-xs text-text-tertiary">' + PG.formatNumber(item.count) + (total > 0 ? ' (' + pct + '%)' : '') + '</span>' +
-            '</div>' +
-            '<div class="bg-surface-0 rounded-full h-2">' +
-              '<div class="h-2 rounded-full transition-all duration-700" style="width:' + Math.max(2, pct) + '%;background:' + item.color + '"></div>' +
-            '</div>' +
-          '</div>';
-        }).join('');
+        container.innerHTML = items
+          .map(function (item) {
+            var pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
+            return (
+              '<div class="bg-surface-2/50 rounded-lg p-4">' +
+              '<div class="flex items-center justify-between mb-2">' +
+              '<span class="text-xs font-semibold" style="color:' +
+              item.color +
+              '">' +
+              item.label +
+              '</span>' +
+              '<span class="text-xs text-text-tertiary">' +
+              PG.formatNumber(item.count) +
+              (total > 0 ? ' (' + pct + '%)' : '') +
+              '</span>' +
+              '</div>' +
+              '<div class="bg-surface-0 rounded-full h-2">' +
+              '<div class="h-2 rounded-full transition-all duration-700" style="width:' +
+              Math.max(2, pct) +
+              '%;background:' +
+              item.color +
+              '"></div>' +
+              '</div>' +
+              '</div>'
+            );
+          })
+          .join('');
       }
 
       // Proposal status badge
@@ -470,41 +523,67 @@
           confirmed: { cls: 'bg-safe/10 text-safe border-safe/20', color: '#2ED573' },
           rejected: { cls: 'bg-danger/10 text-danger border-danger/20', color: '#EF4444' },
         };
-        var c = cfg[status] || { cls: 'bg-surface-2 text-text-tertiary border-border', color: '#706860' };
-        return '<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase border ' + c.cls + '">' +
+        var c = cfg[status] || {
+          cls: 'bg-surface-2 text-text-tertiary border-border',
+          color: '#706860',
+        };
+        return (
+          '<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase border ' +
+          c.cls +
+          '">' +
           Icons.dot(6, c.color) +
           PG.escapeHtml(status || 'unknown') +
-        '</span>';
+          '</span>'
+        );
       }
 
       function renderProposalTable() {
         var tbody = document.getElementById('proposalTableBody');
         if (!allProposals.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-8 text-center text-text-muted">No ATR proposals yet</td></tr>';
+          tbody.innerHTML =
+            '<tr><td colspan="5" class="px-5 py-8 text-center text-text-muted">No ATR proposals yet</td></tr>';
           document.getElementById('proposalPagination').innerHTML = '';
           return;
         }
 
         var p = PG.paginate(allProposals, proposalPage, perPage);
-        tbody.innerHTML = p.items.map(function(row) {
-          var hash = row.pattern_hash || row.patternHash || '-';
-          var status = row.status || 'pending';
-          var confirmations = row.confirmations != null ? row.confirmations : 0;
-          var llm = row.llm_provider || row.llmProvider || '-';
-          var created = row.created_at || row.createdAt || '';
-          return '<tr class="border-b border-border hover:bg-surface-2/30 transition-colors">' +
-            '<td class="px-5 py-3 font-mono text-xs text-text-secondary">' + PG.escapeHtml(hash.substring(0, 16)) + (hash.length > 16 ? '...' : '') + '</td>' +
-            '<td class="px-5 py-3">' + proposalStatusBadge(status) + '</td>' +
-            '<td class="px-5 py-3 text-right font-mono text-xs">' + confirmations + '</td>' +
-            '<td class="px-5 py-3 text-text-secondary text-xs">' + PG.escapeHtml(llm) + '</td>' +
-            '<td class="px-5 py-3 text-text-tertiary text-xs whitespace-nowrap">' + PG.formatRelativeTime(created) + '</td>' +
-          '</tr>';
-        }).join('');
+        tbody.innerHTML = p.items
+          .map(function (row) {
+            var hash = row.pattern_hash || row.patternHash || '-';
+            var status = row.status || 'pending';
+            var confirmations = row.confirmations != null ? row.confirmations : 0;
+            var llm = row.llm_provider || row.llmProvider || '-';
+            var created = row.created_at || row.createdAt || '';
+            return (
+              '<tr class="border-b border-border hover:bg-surface-2/30 transition-colors">' +
+              '<td class="px-5 py-3 font-mono text-xs text-text-secondary">' +
+              PG.escapeHtml(hash.substring(0, 16)) +
+              (hash.length > 16 ? '...' : '') +
+              '</td>' +
+              '<td class="px-5 py-3">' +
+              proposalStatusBadge(status) +
+              '</td>' +
+              '<td class="px-5 py-3 text-right font-mono text-xs">' +
+              confirmations +
+              '</td>' +
+              '<td class="px-5 py-3 text-text-secondary text-xs">' +
+              PG.escapeHtml(llm) +
+              '</td>' +
+              '<td class="px-5 py-3 text-text-tertiary text-xs whitespace-nowrap">' +
+              PG.formatRelativeTime(created) +
+              '</td>' +
+              '</tr>'
+            );
+          })
+          .join('');
 
-        document.getElementById('proposalPagination').innerHTML = PG.renderPagination(p, function(pg) {
-          proposalPage = pg;
-          renderProposalTable();
-        });
+        document.getElementById('proposalPagination').innerHTML = PG.renderPagination(
+          p,
+          function (pg) {
+            proposalPage = pg;
+            renderProposalTable();
+          }
+        );
       }
 
       // Skill risk level badge
@@ -516,59 +595,85 @@
           CRITICAL: { cls: 'bg-danger/10 text-danger border-danger/20', color: '#EF4444' },
         };
         var upper = (level || '').toUpperCase();
-        var c = cfg[upper] || { cls: 'bg-surface-2 text-text-tertiary border-border', color: '#706860' };
-        return '<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase border ' + c.cls + '">' +
+        var c = cfg[upper] || {
+          cls: 'bg-surface-2 text-text-tertiary border-border',
+          color: '#706860',
+        };
+        return (
+          '<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase border ' +
+          c.cls +
+          '">' +
           Icons.dot(6, c.color) +
           PG.escapeHtml(upper || 'UNKNOWN') +
-        '</span>';
+          '</span>'
+        );
       }
 
       function renderSkillTable() {
         var tbody = document.getElementById('skillTableBody');
         if (!allSkillThreats.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="px-5 py-8 text-center text-text-muted">No skill threats reported yet</td></tr>';
+          tbody.innerHTML =
+            '<tr><td colspan="5" class="px-5 py-8 text-center text-text-muted">No skill threats reported yet</td></tr>';
           document.getElementById('skillPagination').innerHTML = '';
           return;
         }
 
         var p = PG.paginate(allSkillThreats, skillPage, perPage);
-        tbody.innerHTML = p.items.map(function(row) {
-          var name = row.skill_name || row.skillName || '-';
-          var score = row.risk_score != null ? row.risk_score : (row.riskScore != null ? row.riskScore : '-');
-          var level = row.risk_level || row.riskLevel || '';
-          var findings = row.finding_summaries || row.findingSummaries || '';
-          var created = row.created_at || row.createdAt || '';
+        tbody.innerHTML = p.items
+          .map(function (row) {
+            var name = row.skill_name || row.skillName || '-';
+            var score =
+              row.risk_score != null ? row.risk_score : row.riskScore != null ? row.riskScore : '-';
+            var level = row.risk_level || row.riskLevel || '';
+            var findings = row.finding_summaries || row.findingSummaries || '';
+            var created = row.created_at || row.createdAt || '';
 
-          // Parse findings if JSON string
-          var findingsText = '';
-          if (findings) {
-            try {
-              var parsed = typeof findings === 'string' ? JSON.parse(findings) : findings;
-              if (Array.isArray(parsed)) {
-                findingsText = parsed.length + ' finding' + (parsed.length !== 1 ? 's' : '');
-              } else {
+            // Parse findings if JSON string
+            var findingsText = '';
+            if (findings) {
+              try {
+                var parsed = typeof findings === 'string' ? JSON.parse(findings) : findings;
+                if (Array.isArray(parsed)) {
+                  findingsText = parsed.length + ' finding' + (parsed.length !== 1 ? 's' : '');
+                } else {
+                  findingsText = String(findings).substring(0, 50);
+                }
+              } catch (e) {
                 findingsText = String(findings).substring(0, 50);
               }
-            } catch (e) {
-              findingsText = String(findings).substring(0, 50);
+            } else {
+              findingsText = '-';
             }
-          } else {
-            findingsText = '-';
+
+            return (
+              '<tr class="border-b border-border hover:bg-surface-2/30 transition-colors">' +
+              '<td class="px-5 py-3 text-text-secondary text-xs">' +
+              PG.escapeHtml(name) +
+              '</td>' +
+              '<td class="px-5 py-3 text-right font-mono text-xs">' +
+              score +
+              '</td>' +
+              '<td class="px-5 py-3">' +
+              riskLevelBadge(level) +
+              '</td>' +
+              '<td class="px-5 py-3 text-text-tertiary text-xs">' +
+              PG.escapeHtml(findingsText) +
+              '</td>' +
+              '<td class="px-5 py-3 text-text-tertiary text-xs whitespace-nowrap">' +
+              PG.formatRelativeTime(created) +
+              '</td>' +
+              '</tr>'
+            );
+          })
+          .join('');
+
+        document.getElementById('skillPagination').innerHTML = PG.renderPagination(
+          p,
+          function (pg) {
+            skillPage = pg;
+            renderSkillTable();
           }
-
-          return '<tr class="border-b border-border hover:bg-surface-2/30 transition-colors">' +
-            '<td class="px-5 py-3 text-text-secondary text-xs">' + PG.escapeHtml(name) + '</td>' +
-            '<td class="px-5 py-3 text-right font-mono text-xs">' + score + '</td>' +
-            '<td class="px-5 py-3">' + riskLevelBadge(level) + '</td>' +
-            '<td class="px-5 py-3 text-text-tertiary text-xs">' + PG.escapeHtml(findingsText) + '</td>' +
-            '<td class="px-5 py-3 text-text-tertiary text-xs whitespace-nowrap">' + PG.formatRelativeTime(created) + '</td>' +
-          '</tr>';
-        }).join('');
-
-        document.getElementById('skillPagination').innerHTML = PG.renderPagination(p, function(pg) {
-          skillPage = pg;
-          renderSkillTable();
-        });
+        );
       }
 
       loadAll();

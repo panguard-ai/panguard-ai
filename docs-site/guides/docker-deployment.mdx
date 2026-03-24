@@ -1,7 +1,7 @@
 ---
-title: "Docker Deployment"
-description: "Run Panguard AI with Docker and Docker Compose for containerized security monitoring."
-icon: "docker"
+title: 'Docker Deployment'
+description: 'Run Panguard AI with Docker and Docker Compose for containerized security monitoring.'
+icon: 'docker'
 ---
 
 # Docker Deployment
@@ -12,9 +12,9 @@ Panguard provides Docker images and Compose configurations for containerized dep
 
 ## Prerequisites
 
-| Requirement | Version |
-| --- | --- |
-| Docker | >= 24.0 |
+| Requirement    | Version |
+| -------------- | ------- |
+| Docker         | >= 24.0 |
 | Docker Compose | >= 2.20 |
 
 ---
@@ -22,25 +22,12 @@ Panguard provides Docker images and Compose configurations for containerized dep
 ## Quick Start with Docker
 
 <Steps>
-  <Step title="Pull the Image">
-    ```bash
-    docker pull panguard/panguard-ai:latest
-    ```
-  </Step>
+  <Step title="Pull the Image">```bash docker pull panguard/panguard-ai:latest ```</Step>
   <Step title="Run the Container">
-    ```bash
-    docker run -d \
-      --name panguard \
-      -p 3000:3000 \
-      -v panguard-data:/data \
-      panguard/panguard-ai:latest
-    ```
+    ```bash docker run -d \ --name panguard \ -p 3000:3000 \ -v panguard-data:/data \
+    panguard/panguard-ai:latest ```
   </Step>
-  <Step title="Verify">
-    ```bash
-    docker logs panguard
-    ```
-  </Step>
+  <Step title="Verify">```bash docker logs panguard ```</Step>
 </Steps>
 
 ---
@@ -166,17 +153,17 @@ docker compose -f docker-compose.full.yml up -d
 
 ## Port Reference
 
-| Port | Service | Protocol | Notes |
-| --- | --- | --- | --- |
-| `3000` | API Server | HTTP | Main entry point |
-| `11434` | Ollama | HTTP | Local AI inference |
-| `2222` | Trap: SSH Honeypot | TCP | Default SSH trap port |
-| `8080` | Trap: HTTP Honeypot | TCP | Default HTTP trap port |
-| `2121` | Trap: FTP Honeypot | TCP | Default FTP trap port |
-| `4450` | Trap: SMB Honeypot | TCP | Default SMB trap port |
-| `3307` | Trap: MySQL Honeypot | TCP | Default MySQL trap port |
-| `3390` | Trap: RDP Honeypot | TCP | Default RDP trap port |
-| `2323` | Trap: Telnet Honeypot | TCP | Default Telnet trap port |
+| Port    | Service               | Protocol | Notes                    |
+| ------- | --------------------- | -------- | ------------------------ |
+| `3000`  | API Server            | HTTP     | Main entry point         |
+| `11434` | Ollama                | HTTP     | Local AI inference       |
+| `2222`  | Trap: SSH Honeypot    | TCP      | Default SSH trap port    |
+| `8080`  | Trap: HTTP Honeypot   | TCP      | Default HTTP trap port   |
+| `2121`  | Trap: FTP Honeypot    | TCP      | Default FTP trap port    |
+| `4450`  | Trap: SMB Honeypot    | TCP      | Default SMB trap port    |
+| `3307`  | Trap: MySQL Honeypot  | TCP      | Default MySQL trap port  |
+| `3390`  | Trap: RDP Honeypot    | TCP      | Default RDP trap port    |
+| `2323`  | Trap: Telnet Honeypot | TCP      | Default Telnet trap port |
 
 ---
 
@@ -184,28 +171,29 @@ docker compose -f docker-compose.full.yml up -d
 
 ### Guard Agent
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `PANGUARD_DATA_DIR` | `./data` | Data directory for baselines, logs, rules |
-| `PANGUARD_MODE` | `learning` | Guard mode: `learning` or `protection` |
-| `OLLAMA_ENDPOINT` | `http://localhost:11434` | Ollama API endpoint |
-| `ANTHROPIC_API_KEY` | (none) | Claude API key for cloud AI |
-| `OPENAI_API_KEY` | (none) | OpenAI API key for cloud AI |
-| `ABUSEIPDB_KEY` | (none) | AbuseIPDB API key for threat intel |
+| Variable            | Default                  | Description                               |
+| ------------------- | ------------------------ | ----------------------------------------- |
+| `PANGUARD_DATA_DIR` | `./data`                 | Data directory for baselines, logs, rules |
+| `PANGUARD_MODE`     | `learning`               | Guard mode: `learning` or `protection`    |
+| `OLLAMA_ENDPOINT`   | `http://localhost:11434` | Ollama API endpoint                       |
+| `ANTHROPIC_API_KEY` | (none)                   | Claude API key for cloud AI               |
+| `OPENAI_API_KEY`    | (none)                   | OpenAI API key for cloud AI               |
+| `ABUSEIPDB_KEY`     | (none)                   | AbuseIPDB API key for threat intel        |
 
 ### API Server
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `PANGUARD_PORT` | `3000` | API server port |
+| Variable        | Default | Description     |
+| --------------- | ------- | --------------- |
+| `PANGUARD_PORT` | `3000`  | API server port |
 
 <Warning>
 Never pass secrets via the `environment` key in production Compose files. Use `env_file` with restricted permissions instead:
 
 ```yaml
 env_file:
-  - /etc/panguard/guard.env  # chmod 600
+  - /etc/panguard/guard.env # chmod 600
 ```
+
 </Warning>
 
 ---
@@ -215,6 +203,7 @@ env_file:
 ### Docker Image Security
 
 The production Docker image includes:
+
 - **Multi-stage build** -- Build dependencies are not in the final image
 - **Non-root user** -- Runs as `panguard` (UID 1001)
 - **tini** -- Proper PID 1 signal handling and zombie reaping
@@ -226,9 +215,9 @@ For Guard response actions to function inside Docker, grant these capabilities:
 
 ```yaml
 cap_add:
-  - NET_ADMIN    # Block IPs via iptables
-  - KILL         # Terminate malicious processes
-  - SYS_PTRACE   # Memory scanning
+  - NET_ADMIN # Block IPs via iptables
+  - KILL # Terminate malicious processes
+  - SYS_PTRACE # Memory scanning
 ```
 
 ### Checklist
@@ -245,22 +234,22 @@ cap_add:
 
 ## Log Locations (Inside Container)
 
-| Component | Path | Format |
-| --- | --- | --- |
-| Guard events | `/data/events.jsonl` | JSONL |
-| Guard actions | `/data/action-manifest.jsonl` | JSONL |
-| Guard baseline | `/data/baseline.json` | JSON |
-| Application logs | stdout/stderr | Structured JSON |
+| Component        | Path                          | Format          |
+| ---------------- | ----------------------------- | --------------- |
+| Guard events     | `/data/events.jsonl`          | JSONL           |
+| Guard actions    | `/data/action-manifest.jsonl` | JSONL           |
+| Guard baseline   | `/data/baseline.json`         | JSON            |
+| Application logs | stdout/stderr                 | Structured JSON |
 
 ### Log Rotation
 
 The ReportAgent handles log rotation automatically:
 
-| Setting | Default |
-| --- | --- |
-| Max file size | 50 MB |
-| Max rotated files | 10 |
-| Retention | 90 days |
+| Setting           | Default |
+| ----------------- | ------- |
+| Max file size     | 50 MB   |
+| Max rotated files | 10      |
+| Retention         | 90 days |
 
 ---
 
@@ -272,7 +261,7 @@ Back up these critical files regularly:
 - **Baseline data** (`/data/baseline.json`) -- Loss requires re-running learning mode
 - **Threat Cloud database** -- Back up the SQLite database on schedule
 - **Configuration** -- Store config and env files in version control or a secrets manager
-</Tip>
+  </Tip>
 
 ---
 

@@ -1,7 +1,7 @@
 ---
-title: "系統服務"
-description: "把 Guard 裝成 systemd、launchd 或 Windows 服務，開機自動跑、持續防護。"
-icon: "gear"
+title: '系統服務'
+description: '把 Guard 裝成 systemd、launchd 或 Windows 服務，開機自動跑、持續防護。'
+icon: 'gear'
 ---
 
 # 系統服務安裝
@@ -51,6 +51,7 @@ panguard guard uninstall
     # 手動停止
     sudo launchctl unload /Library/LaunchDaemons/ai.panguard.guard.plist
     ```
+
   </Tab>
   <Tab title="Linux (systemd)">
     Guard 建立一個 systemd unit 檔：
@@ -118,6 +119,7 @@ panguard guard uninstall
     | `CAP_NET_ADMIN` | 透過 iptables 封鎖 IP |
     | `CAP_KILL` | 砍掉惡意 process |
     | `CAP_SYS_PTRACE` | 記憶體掃描偵測 fileless 惡意軟體 |
+
   </Tab>
   <Tab title="Windows (Services)">
     Guard 註冊為 Windows 服務：
@@ -142,6 +144,7 @@ panguard guard uninstall
     sc.exe start PanguardGuard
     sc.exe stop PanguardGuard
     ```
+
   </Tab>
 </Tabs>
 
@@ -183,6 +186,7 @@ panguard guard uninstall
     <Warning>
     環境檔裡有密鑰。權限務必設 `600`，owner 限定為服務使用者。
     </Warning>
+
   </Step>
   <Step title="啟用並啟動">
     ```bash
@@ -249,6 +253,7 @@ panguard guard install-script
 ```
 
 產生的腳本會：
+
 1. 下載 Panguard AI
 2. 安裝依賴
 3. 裝成系統服務
@@ -258,10 +263,10 @@ panguard guard install-script
 
 ## 資料目錄
 
-| 平台 | 預設路徑 |
-| --- | --- |
-| macOS | `~/.panguard-guard/` |
-| Linux | `~/.panguard-guard/` |
+| 平台    | 預設路徑                    |
+| ------- | --------------------------- |
+| macOS   | `~/.panguard-guard/`        |
+| Linux   | `~/.panguard-guard/`        |
 | Windows | `%APPDATA%\panguard-guard\` |
 
 用 `--data-dir` 覆蓋：
@@ -271,6 +276,7 @@ panguard guard start --data-dir /opt/panguard/data
 ```
 
 **目錄內容：**
+
 - `guard.pid` -- PID 檔（防止跑多個實例）
 - `baseline/` -- 行為基線資料
 - `rules/` -- 自訂 ATR 規則

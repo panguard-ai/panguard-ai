@@ -1,7 +1,7 @@
 ---
-title: "Real-Time Protection"
-description: "Set up Panguard Guard for continuous monitoring, learn how the 7-day learning period works, and configure automated threat response."
-icon: "shield"
+title: 'Real-Time Protection'
+description: 'Set up Panguard Guard for continuous monitoring, learn how the 7-day learning period works, and configure automated threat response.'
+icon: 'shield'
 ---
 
 # Real-Time Protection
@@ -9,7 +9,8 @@ icon: "shield"
 Panguard Guard runs 24/7 on your system, monitoring processes, network connections, files, and logs. It uses a four-agent AI pipeline to detect, analyze, respond to, and report on security threats in real time.
 
 <Info>
-For pre-install security, see [Skill Auditor](/products/overview) -- the recommended first step before running any AI agent skill.
+  For pre-install security, see [Skill Auditor](/products/overview) -- the recommended first step
+  before running any AI agent skill.
 </Info>
 
 ---
@@ -23,6 +24,7 @@ For pre-install security, see [Skill Auditor](/products/overview) -- the recomme
     ```
 
     Guard enters **learning mode** for the first 7 days, observing your system's normal behavior.
+
   </Step>
   <Step title="Check Status">
     ```bash
@@ -39,6 +41,7 @@ For pre-install security, see [Skill Auditor](/products/overview) -- the recomme
       Events:     12,847 observed
       Baseline:   42% complete
     ```
+
   </Step>
   <Step title="Wait for Protection Mode">
     After 7 days, Guard automatically transitions to **protection mode** and begins active threat detection and response.
@@ -57,7 +60,8 @@ During the learning period, Guard silently observes and records:
 - **Users** -- Login times, source IPs, operational patterns
 
 <Info>
-Guard does not generate alerts during learning mode. This prevents the flood of false positives that makes most security tools useless. You receive a daily learning progress summary via Chat.
+  Guard does not generate alerts during learning mode. This prevents the flood of false positives
+  that makes most security tools useless. You receive a daily learning progress summary via Chat.
 </Info>
 
 ---
@@ -73,11 +77,11 @@ Once the baseline is established, Guard activates full protection:
 
 ### Confidence-Based Response
 
-| Confidence | Action | Example |
-| --- | --- | --- |
-| > 90% | Auto-execute, notify after | Known malicious IP automatically blocked |
-| 70-90% | Ask for confirmation via Chat | Suspicious process -- asks if you want to terminate |
-| < 70% | Notify only | Minor anomaly -- informs you for observation |
+| Confidence | Action                        | Example                                             |
+| ---------- | ----------------------------- | --------------------------------------------------- |
+| > 90%      | Auto-execute, notify after    | Known malicious IP automatically blocked            |
+| 70-90%     | Ask for confirmation via Chat | Suspicious process -- asks if you want to terminate |
+| < 70%      | Notify only                   | Minor anomaly -- informs you for observation        |
 
 ---
 
@@ -89,12 +93,12 @@ Every security event flows through four specialized agents:
   Event -> [Detect] -> [Analyze] -> [Respond] -> [Report]
 ```
 
-| Agent | Role |
-| --- | --- |
-| **DetectAgent** | Rule matching (ATR), threat intelligence lookup, event correlation |
+| Agent            | Role                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| **DetectAgent**  | Rule matching (ATR), threat intelligence lookup, event correlation                    |
 | **AnalyzeAgent** | Evidence collection, weighted confidence scoring, AI reasoning via three-layer funnel |
-| **RespondAgent** | Action execution (block IP, kill process, isolate file), safety checks, escalation |
-| **ReportAgent** | Event logging, baseline updates, anonymized data for Threat Cloud |
+| **RespondAgent** | Action execution (block IP, kill process, isolate file), safety checks, escalation    |
+| **ReportAgent**  | Event logging, baseline updates, anonymized data for Threat Cloud                     |
 
 ---
 
@@ -102,11 +106,11 @@ Every security event flows through four specialized agents:
 
 Guard can execute the following response actions automatically:
 
-| Action | Description | Platform Support |
-| --- | --- | --- |
-| **IP Block** | Block malicious IP addresses | macOS (pfctl), Linux (iptables), Windows (netsh) |
-| **File Isolation** | Quarantine suspicious files with SHA-256 record | All platforms |
-| **Process Termination** | Kill malicious processes (SIGTERM, then SIGKILL after 5s) | All platforms |
+| Action                  | Description                                               | Platform Support                                 |
+| ----------------------- | --------------------------------------------------------- | ------------------------------------------------ |
+| **IP Block**            | Block malicious IP addresses                              | macOS (pfctl), Linux (iptables), Windows (netsh) |
+| **File Isolation**      | Quarantine suspicious files with SHA-256 record           | All platforms                                    |
+| **Process Termination** | Kill malicious processes (SIGTERM, then SIGKILL after 5s) | All platforms                                    |
 
 ### Safety Protections
 
@@ -177,7 +181,8 @@ panguard guard install
 ```
 
 <Tip>
-For production environments, install Guard as a system service so it starts automatically on boot and restarts on failure. See the [System Service guide](/guides/system-service).
+  For production environments, install Guard as a system service so it starts automatically on boot
+  and restarts on failure. See the [System Service guide](/guides/system-service).
 </Tip>
 
 ---

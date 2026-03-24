@@ -1,7 +1,7 @@
 ---
-title: "Slack Integration"
-description: "Step-by-step guide to setting up Panguard Chat with Slack using Block Kit rich formatting."
-icon: "hashtag"
+title: 'Slack Integration'
+description: 'Step-by-step guide to setting up Panguard Chat with Slack using Block Kit rich formatting.'
+icon: 'hashtag'
 ---
 
 Slack is the recommended channel for teams and organizations. Panguard sends rich Block Kit notifications to designated Slack channels with optional interactive buttons for threat response.
@@ -9,24 +9,14 @@ Slack is the recommended channel for teams and organizations. Panguard sends ric
 ## Setup Overview
 
 <Steps>
-  <Step title="Create a Slack App">
-    Register a new app in the Slack API dashboard.
-  </Step>
-  <Step title="Configure Bot permissions">
-    Add the required OAuth scopes.
-  </Step>
-  <Step title="Install to your Workspace">
-    Authorize the app and get the Bot Token.
-  </Step>
-  <Step title="Get the Signing Secret">
-    Copy the signing secret for webhook verification.
-  </Step>
+  <Step title="Create a Slack App">Register a new app in the Slack API dashboard.</Step>
+  <Step title="Configure Bot permissions">Add the required OAuth scopes.</Step>
+  <Step title="Install to your Workspace">Authorize the app and get the Bot Token.</Step>
+  <Step title="Get the Signing Secret">Copy the signing secret for webhook verification.</Step>
   <Step title="Create a notification channel">
     Set up a dedicated channel like #security-alerts.
   </Step>
-  <Step title="Configure Panguard">
-    Run the setup wizard with your credentials.
-  </Step>
+  <Step title="Configure Panguard">Run the setup wizard with your credentials.</Step>
 </Steps>
 
 ## Step 1: Create a Slack App
@@ -44,11 +34,11 @@ Slack is the recommended channel for teams and organizations. Panguard sends ric
 2. Scroll to the **Scopes** section
 3. Under **Bot Token Scopes**, add:
 
-| Scope | Purpose |
-|-------|---------|
-| `chat:write` | Send messages to channels |
+| Scope               | Purpose                                        |
+| ------------------- | ---------------------------------------------- |
+| `chat:write`        | Send messages to channels                      |
 | `chat:write.public` | Send to public channels the bot has not joined |
-| `files:write` | Upload PDF reports and attachments |
+| `files:write`       | Upload PDF reports and attachments             |
 
 4. Click **Install to Workspace** at the top
 5. Click **Allow** to authorize
@@ -61,9 +51,7 @@ After installation, the page displays your **Bot User OAuth Token**:
 xoxb-your-workspace-id-your-token-string
 ```
 
-<Warning>
-  The token must start with `xoxb-` (bot token). Do not use `xoxp-` (user token).
-</Warning>
+<Warning>The token must start with `xoxb-` (bot token). Do not use `xoxp-` (user token).</Warning>
 
 ## Step 4: Get the Signing Secret
 
@@ -84,6 +72,7 @@ panguard chat setup --channel slack
 ```
 
 The wizard will ask for:
+
 - **Bot Token** -- the `xoxb-...` token from Step 3
 - **Signing Secret** -- from Step 4
 - **Default Channel** -- e.g., `#security-alerts`
@@ -102,7 +91,8 @@ panguard chat test --channel slack
     Verify the bot has `chat:write` scope. Check the app's **OAuth & Permissions** page.
   </Accordion>
   <Accordion title="Invalid token format">
-    The token must start with `xoxb-`. If it starts with `xoxp-`, you are using a user token instead of a bot token.
+    The token must start with `xoxb-`. If it starts with `xoxp-`, you are using a user token instead
+    of a bot token.
   </Accordion>
 </AccordionGroup>
 
@@ -116,7 +106,8 @@ Enable interactive threat response buttons in Slack notifications (e.g., "Block 
 4. Click **Save Changes**
 
 <Note>
-  Interactive buttons require your Panguard instance to have a publicly accessible URL. For local development, tools like ngrok can provide temporary public URLs.
+  Interactive buttons require your Panguard instance to have a publicly accessible URL. For local
+  development, tools like ngrok can provide temporary public URLs.
 </Note>
 
 ## Block Kit Message Format
