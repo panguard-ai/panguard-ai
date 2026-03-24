@@ -142,7 +142,7 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
       'Lakera focuses on prompt-level filtering \u2014 blocking injection attacks in LLM inputs and outputs.',
       'PanGuard covers the full attack surface: prompt injection (22 rules) + tool poisoning (11) + skill compromise (7) + agent manipulation (6) + 5 more categories.',
       'Lakera is a firewall (input/output filter). PanGuard is an EDR (continuous monitoring + response).',
-      'Lakera requires API integration. PanGuard is one command: npx panguard setup.',
+      'Lakera requires API integration. PanGuard is one command: pga setup.',
     ],
   },
 ] as const;

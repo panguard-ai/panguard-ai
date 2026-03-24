@@ -390,7 +390,7 @@ Run with --json for machine-readable output.`}
                     </div>
                   </div>
                   <div>
-                    <div className="text-3xl font-extrabold text-text-primary">11+</div>
+                    <div className="text-3xl font-extrabold text-text-primary">13+</div>
                     <div className="text-xs text-text-muted mt-1">
                       {t('checks.injectionPatterns')}
                     </div>

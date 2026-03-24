@@ -304,7 +304,11 @@ export default function GettingStartedContent() {
                 Run setup to auto-configure all detected AI platforms (Claude Code, Claude Desktop,
                 Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw):
               </p>
-              <CodeBlock code="panguard setup" label="Terminal" />
+              <CodeBlock code="pga setup" label="Terminal" />
+              <p className="text-xs text-text-muted mt-1">
+                Tip: <code className="text-panguard-green">pga</code> is a shortcut for{' '}
+                <code className="text-text-muted">panguard</code>. Both work.
+              </p>
             </div>
 
             {/* Then start */}
@@ -312,7 +316,7 @@ export default function GettingStartedContent() {
               <p className="text-sm text-text-secondary mb-3">
                 Then start Panguard in any project:
               </p>
-              <CodeBlock code={`cd your-project\npanguard scan`} label="Terminal" />
+              <CodeBlock code={`cd your-project\npga scan`} label="Terminal" />
             </div>
 
             <div className="mt-4">
@@ -357,7 +361,7 @@ export default function GettingStartedContent() {
                     <strong className="text-text-primary">Step 2:</strong> Auto-configure Claude
                     Code
                   </p>
-                  <CodeBlock code="panguard setup --platform claude-code" label="Setup" />
+                  <CodeBlock code="pga setup --platform claude-code" label="Setup" />
                   <p>
                     <strong className="text-text-primary">Step 3:</strong> Restart Claude Code, then
                     try:
@@ -371,7 +375,7 @@ export default function GettingStartedContent() {
                   <p>
                     <strong className="text-text-primary">Step 4:</strong> Start 24/7 protection
                   </p>
-                  <CodeBlock code="panguard guard start --dashboard" label="Terminal" />
+                  <CodeBlock code="pga guard start --dashboard" label="Terminal" />
                   <p className="text-xs text-panguard-green">
                     Done! Claude Code now has 11 security tools via MCP. Guard monitors everything
                     24/7.
@@ -397,7 +401,7 @@ export default function GettingStartedContent() {
                   <p>
                     <strong className="text-text-primary">Step 2:</strong> Auto-configure OpenClaw
                   </p>
-                  <CodeBlock code="panguard setup --platform openclaw" label="Setup" />
+                  <CodeBlock code="pga setup --platform openclaw" label="Setup" />
                   <p>
                     <strong className="text-text-primary">Step 3:</strong> Close and reopen OpenClaw
                   </p>
@@ -415,7 +419,7 @@ export default function GettingStartedContent() {
                     <strong className="text-text-primary">Step 5:</strong> Start Guard for
                     continuous protection
                   </p>
-                  <CodeBlock code="panguard guard start --dashboard" label="Terminal" />
+                  <CodeBlock code="pga guard start --dashboard" label="Terminal" />
                   <p className="text-xs text-panguard-green">
                     Done! Every skill OpenClaw installs will be automatically audited.
                   </p>
@@ -429,7 +433,7 @@ export default function GettingStartedContent() {
                 <p className="text-sm text-text-secondary mb-2">
                   Or auto-detect all platforms at once:
                 </p>
-                <CodeBlock code="panguard setup" label="Terminal" />
+                <CodeBlock code="pga setup" label="Terminal" />
                 <p className="text-xs text-text-muted mt-2">
                   Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw,
                   ArkClaw automatically.
@@ -450,10 +454,10 @@ export default function GettingStartedContent() {
               {/* Scan */}
               <div className="bg-surface-1 border border-border rounded-xl p-5">
                 <p className="text-sm font-semibold text-text-primary mb-2">{t('step2Desc')}</p>
-                <CodeBlock code="panguard scan" label="Terminal" />
+                <CodeBlock code="pga scan" label="Terminal" />
                 <p className="text-text-secondary text-sm mt-3">{t('step2Deep')}</p>
                 <div className="mt-2">
-                  <CodeBlock code="panguard scan --deep" label="Terminal" />
+                  <CodeBlock code="pga scan --deep" label="Terminal" />
                 </div>
               </div>
 
@@ -461,7 +465,7 @@ export default function GettingStartedContent() {
               <div className="bg-surface-1 border border-border rounded-xl p-5">
                 <p className="text-sm font-semibold text-text-primary mb-2">{t('step3Title')}</p>
                 <p className="text-text-secondary text-sm mb-3">{t('step3Desc')}</p>
-                <CodeBlock code="panguard guard start" label="Terminal" />
+                <CodeBlock code="pga guard start" label="Terminal" />
               </div>
 
               {/* Chat */}
@@ -489,7 +493,7 @@ export default function GettingStartedContent() {
               <div className="bg-surface-1 border border-border rounded-xl p-5">
                 <p className="text-sm font-semibold text-text-primary mb-2">{t('step6Title')}</p>
                 <p className="text-text-secondary text-sm mb-3">{t('step6Desc')}</p>
-                <CodeBlock code="panguard scan --json" label="Terminal" />
+                <CodeBlock code="pga scan --json" label="Terminal" />
                 <div className="mt-3">
                   <TerminalOutput
                     lines={[
@@ -507,7 +511,7 @@ export default function GettingStartedContent() {
                 <p className="text-text-secondary text-sm mb-3">
                   Scan your source code for SQL injection, XSS, hardcoded secrets, and more.
                 </p>
-                <CodeBlock code="panguard scan code --dir ./my-app --json" label="Terminal" />
+                <CodeBlock code="pga scan code --dir ./my-app --json" label="Terminal" />
                 <div className="mt-3">
                   <TerminalOutput
                     lines={[
@@ -530,7 +534,7 @@ export default function GettingStartedContent() {
                 <p className="text-sm font-semibold text-text-primary mb-2">{t('step7Title')}</p>
                 <p className="text-text-secondary text-sm mb-3">{t('step7Desc')}</p>
                 <CodeBlock
-                  code={`panguard scan --target example.com\npanguard scan --target 1.2.3.4 --json`}
+                  code={`pga scan --target example.com\npanguard scan --target 1.2.3.4 --json`}
                   label="Terminal"
                 />
               </div>
@@ -562,18 +566,16 @@ export default function GettingStartedContent() {
               </div>
               <div className="p-4 font-mono text-sm space-y-2">
                 {[
-                  { cmd: 'panguard scan', desc: 'Run security scan' },
-                  { cmd: 'panguard scan --deep', desc: 'Deep scan with all engines' },
-                  { cmd: 'panguard scan --json', desc: 'JSON output for AI agents' },
-                  { cmd: 'panguard scan --target <host>', desc: 'Remote scanning' },
-                  { cmd: 'panguard guard start', desc: 'Start real-time protection' },
-                  { cmd: 'panguard guard status', desc: 'Check protection status' },
-                  { cmd: 'panguard chat config', desc: 'Configure notifications' },
-                  { cmd: 'panguard trap deploy', desc: 'Deploy honeypot decoys' },
-                  { cmd: 'panguard report generate', desc: 'Generate compliance report' },
-                  { cmd: 'panguard scan code --dir .', desc: 'SAST code scanning' },
-                  { cmd: 'panguard doctor', desc: 'Diagnose installation' },
-                  { cmd: 'panguard --help', desc: 'Show all commands' },
+                  { cmd: 'pga', desc: 'Open interactive menu' },
+                  { cmd: 'pga up', desc: 'Start protection + dashboard' },
+                  { cmd: 'pga setup', desc: 'Auto-configure AI platforms' },
+                  { cmd: 'pga scan', desc: 'Run security scan' },
+                  { cmd: 'pga scan --deep', desc: 'Deep scan with all engines' },
+                  { cmd: 'pga audit skill <dir>', desc: 'Audit a skill before installing' },
+                  { cmd: 'pga guard start', desc: 'Start real-time protection' },
+                  { cmd: 'pga status', desc: 'Check protection status' },
+                  { cmd: 'pga doctor', desc: 'Diagnose installation' },
+                  { cmd: 'pga --help', desc: 'Show all commands' },
                 ].map(({ cmd, desc }) => (
                   <div key={cmd} className="flex items-baseline gap-3">
                     <code className="text-text-primary whitespace-nowrap">{cmd}</code>

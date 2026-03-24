@@ -7,7 +7,7 @@ import { Copy, Check, Star, ArrowRight } from 'lucide-react';
 import { Link } from '@/navigation';
 import { STATS } from '@/lib/stats';
 
-const INSTALL_CMD = 'npx panguard setup';
+const INSTALL_CMD = 'npm install -g @panguard-ai/panguard && pga setup';
 
 const PLATFORMS = [
   'Claude Code',
