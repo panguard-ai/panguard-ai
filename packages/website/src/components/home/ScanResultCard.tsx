@@ -393,7 +393,7 @@ export default function ScanResultCard({
             : 'Start 24/7 protection for all your AI agents'}
         </p>
         <code className="inline-block text-[11px] bg-surface-2 border border-border rounded-lg px-3 py-1.5 text-panguard-green font-mono select-all mb-2">
-          npm install -g @panguard-ai/panguard && panguard setup
+          npm install -g @panguard-ai/panguard && pga setup
         </code>
         <p className="text-[10px] text-text-muted">
           {isZh

@@ -23,12 +23,12 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.3.1',
+  cliVersion: '1.3.3',
   atrRules: 61,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 0,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
-  atrPatterns: 474,
+  atrPatterns: 476,
   totalRules: 61,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
   totalRulesDisplay: '61' as const,
