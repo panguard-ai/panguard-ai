@@ -113,10 +113,12 @@ Use \`rm -rf dist/\` to clean builds.`;
     expect(result.multiplier).toBeLessThanOrEqual(0.7);
   });
 
-  it('neutral skill with no signals gets multiplier 1.0', () => {
+  it('neutral skill with name+description gets structured-frontmatter reducer only', () => {
     const result = detectContextSignals('This tool formats JSON files.', { name: 'json-fmt', description: 'JSON formatter' });
-    expect(result.signals).toHaveLength(0);
-    expect(result.multiplier).toBe(1.0);
+    // With relaxed frontmatter check, name+description triggers reduce-structured-frontmatter
+    expect(result.signals).toHaveLength(1);
+    expect(result.signals[0].id).toBe('reduce-structured-frontmatter');
+    expect(result.multiplier).toBe(0.9);
   });
 
   it('multiplier is clamped between 0.3 and 2.5', () => {

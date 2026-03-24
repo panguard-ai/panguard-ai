@@ -525,20 +525,24 @@ export function setupCommand(): Command {
 
         // ── Next steps ─────────────────────────────────────────────────
         console.log();
-        console.log(c.dim('  Next steps:'));
-        console.log(c.dim('    1. Restart your AI agent:'));
+        console.log(c.sage(c.bold('  Setup complete! Here are your quick commands:')));
+        console.log();
+        console.log(`    ${c.sage('pg')}              Open interactive menu`);
+        console.log(`    ${c.sage('pg up')}           Start protection + dashboard`);
+        console.log(`    ${c.sage('pg status')}       Check protection status`);
+        console.log(`    ${c.sage('pg scan')}         Scan all installed skills`);
+        console.log(`    ${c.sage('pg audit <dir>')}  Audit a skill before installing`);
+        console.log();
 
         const configuredPlatforms = actionable.filter((_, i) => results[i]?.success);
-        for (const p of configuredPlatforms) {
-          const restartHint = PLATFORM_RESTART_HINTS[p.id] ?? 'Restart the application';
-          console.log(c.dim(`       ${p.name}: ${restartHint}`));
+        if (configuredPlatforms.length > 0) {
+          console.log(c.dim('  Restart your AI agent to activate MCP:'));
+          for (const p of configuredPlatforms) {
+            const restartHint = PLATFORM_RESTART_HINTS[p.id] ?? 'Restart the application';
+            console.log(c.dim(`    ${p.name}: ${restartHint}`));
+          }
+          console.log();
         }
-
-        console.log(c.dim('    2. Ask your agent: "Run panguard_status to check security"'));
-        console.log(
-          c.dim('    3. Try: "Audit the skills in this project with panguard_audit_skill"')
-        );
-        console.log();
       }
     );
 

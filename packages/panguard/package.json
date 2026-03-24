@@ -19,7 +19,8 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "panguard": "./bin/panguard.cjs"
+    "panguard": "./bin/panguard.cjs",
+    "pg": "./bin/panguard.cjs"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -39,7 +40,7 @@
     "typecheck": "tsc --noEmit",
     "dev": "tsc --build --watch",
     "prepublishOnly": "pnpm run build",
-    "postinstall": "node -e \"console.log('\\n  Panguard AI v' + require('./package.json').version + ' installed.\\n  Run: panguard setup\\n  to auto-configure AI agent protection.\\n')\""
+    "postinstall": "node -e \"console.log('\\n  Panguard AI v' + require('./package.json').version + ' installed.\\n\\n  Quick start:\\n    pg              Open interactive menu\\n    pg up           Start protection + dashboard\\n    pg scan         Scan your skills\\n    pg audit <dir>  Audit a skill before installing\\n\\n  First time? Just run: pg\\n')\""
   },
   "dependencies": {
     "@panguard-ai/atr": "workspace:*",

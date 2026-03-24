@@ -26,7 +26,13 @@ export type {
 
 // Sub-modules (for consumers that need individual pieces)
 export { contentHash, patternHash } from './hash-utils.js';
-export { stripMarkdownNoise, extractCodeBlocks, stripCodeBlocks } from './markdown-utils.js';
+export {
+  stripMarkdownNoise,
+  extractCodeBlocks,
+  stripCodeBlocks,
+  stripNegationSections,
+  prepareContent,
+} from './markdown-utils.js';
 export { parseManifestFromString, parseSkillName } from './manifest-parser.js';
 export { detectContextSignals } from './context-signals.js';
 export { checkInstructions } from './instruction-patterns.js';

@@ -6,6 +6,7 @@
  */
 
 import type { Finding, CheckResult, Severity } from './types.js';
+import { stripCodeBlocks } from './markdown-utils.js';
 
 // ---------------------------------------------------------------------------
 // Pattern definitions
@@ -57,6 +58,20 @@ const PATTERNS: readonly Pattern[] = [
     title: 'Hidden text via HTML/markdown comments',
     regex: /<!--[\s\S]*?(ignore|override|system|inject|bypass)[\s\S]*?-->/i,
     severity: 'high',
+    category: 'prompt-injection',
+  },
+  {
+    id: 'pi-important-block',
+    title: 'Hidden instructions in <IMPORTANT> block',
+    regex: /<IMPORTANT>[\s\S]*?(silently|do\s+not\s+tell|without\s+asking|exfiltrate|send\s+all|upload\s+.*\s+to)[\s\S]*?<\/IMPORTANT>/i,
+    severity: 'critical',
+    category: 'prompt-injection',
+  },
+  {
+    id: 'pi-silent-exfil',
+    title: 'Silent data exfiltration instruction',
+    regex: /\b(silently\s+(send|upload|post|transmit)|without\s+(asking|consent|permission).*\b(send|upload|post|curl|fetch))\b/i,
+    severity: 'critical',
     category: 'prompt-injection',
   },
 
@@ -199,6 +214,9 @@ export function checkInstructions(
 ): CheckResult & { findings: Finding[] } {
   const findings: Finding[] = [];
 
+  // Prepare prose (code blocks stripped) for two-pass matching
+  const prose = stripCodeBlocks(instructions);
+
   // Pattern matching
   for (const pattern of PATTERNS) {
     const match = pattern.regex.exec(instructions);
@@ -226,6 +244,12 @@ export function checkInstructions(
 
       // Context-aware: downgrade findings from documentation sources
       if (sourceType === 'documentation') {
+        severity = downgradeSeverity(severity);
+      }
+
+      // Two-pass: if pattern only matches in code blocks (not prose),
+      // downgrade — it's likely a documentation example, not an instruction
+      if (pattern.category === 'tool-poisoning' && !pattern.regex.test(prose)) {
         severity = downgradeSeverity(severity);
       }
 
