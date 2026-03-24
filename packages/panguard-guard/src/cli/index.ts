@@ -480,11 +480,11 @@ async function showFirstRunWelcome(dashboardPort: number): Promise<void> {
   console.log(`    ${c.underline(`http://localhost:${dashboardPort}`)}`);
   console.log('');
   console.log(`  ${c.bold('Quick commands / :')}`);
-  console.log(`    ${c.sage('pg')}              Open interactive menu /`);
-  console.log(`    ${c.sage('pg up')}           Start protection + dashboard /  + `);
-  console.log(`    ${c.sage('pg status')}       Check protection status / `);
-  console.log(`    ${c.sage('pg scan')}         Scan all installed skills / `);
-  console.log(`    ${c.sage('pg audit <dir>')}  Audit a skill before installing / `);
+  console.log(`    ${c.sage('pga')}              Open interactive menu /`);
+  console.log(`    ${c.sage('pga up')}           Start protection + dashboard /  + `);
+  console.log(`    ${c.sage('pga status')}       Check protection status / `);
+  console.log(`    ${c.sage('pga scan')}         Scan all installed skills / `);
+  console.log(`    ${c.sage('pga audit <dir>')}  Audit a skill before installing / `);
   console.log('');
   console.log(`  ${c.bold('What Guard does / Guard :')}`);
   console.log(`    ${symbols.pass} Monitors new skill installations in real-time`);

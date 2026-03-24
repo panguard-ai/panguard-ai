@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/panguard",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
   },
   "bin": {
     "panguard": "./bin/panguard.cjs",
-    "pg": "./bin/panguard.cjs"
+    "pga": "./bin/panguard.cjs"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -41,7 +41,7 @@
     "typecheck": "tsc --noEmit",
     "dev": "tsc --build --watch",
     "prepublishOnly": "pnpm run build",
-    "postinstall": "node -e \"console.log('\\n  Panguard AI v' + require('./package.json').version + ' installed.\\n\\n  Quick start:\\n    pg              Open interactive menu\\n    pg up           Start protection + dashboard\\n    pg scan         Scan your skills\\n    pg audit <dir>  Audit a skill before installing\\n\\n  First time? Just run: pg\\n')\""
+    "postinstall": "node -e \"console.log('\\n  Panguard AI v' + require('./package.json').version + ' installed.\\n\\n  Quick start:\\n    pga              Open interactive menu\\n    pga up           Start protection + dashboard\\n    pga scan         Scan your skills\\n    pga audit <dir>  Audit a skill before installing\\n\\n  First time? Just run: pga\\n')\""
   },
   "dependencies": {
     "@panguard-ai/atr": "workspace:*",

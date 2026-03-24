@@ -2,13 +2,13 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
-## [1.3.2] - 2026-03-25
+## [1.3.3] - 2026-03-25
 
 ### Added
 
-- **`pg` shortcut command.** Two characters to invoke Panguard from anywhere. Works exactly like `panguard`.
-- **`pg up` quick start.** Start protection + dashboard in one command. No more `panguard guard start --dashboard`.
-- **First-run auto-detection.** Run `pg` for the first time and setup wizard starts automatically.
+- **`pga` shortcut command.** Two characters to invoke Panguard from anywhere. Works exactly like `panguard`.
+- **`pga up` quick start.** Start protection + dashboard in one command. No more `panguard guard start --dashboard`.
+- **First-run auto-detection.** Run `pga` for the first time and setup wizard starts automatically.
 - **Guard welcome guide.** First time Guard starts, you see all commands and what Guard does. Shows once.
 - **Stealth attack detection.** `<IMPORTANT>` block attacks and silent data exfiltration are now caught as CRITICAL.
 - **"What's new" on upgrade.** After updating, first run shows what changed. You're reading it now.

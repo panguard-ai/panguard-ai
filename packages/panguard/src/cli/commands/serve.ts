@@ -32,8 +32,19 @@ import type {
   GoogleOAuthConfig,
   GoogleSheetsConfig,
 } from '@panguard-ai/panguard-auth';
-import { ManagerServer, DEFAULT_MANAGER_CONFIG } from '@panguard-ai/manager';
-import type { ManagerConfig } from '@panguard-ai/manager';
+// Dynamic import — manager is an optional dependency
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ManagerConfig = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let ManagerServer: (new (config: ManagerConfig) => any) | null = null;
+let DEFAULT_MANAGER_CONFIG: ManagerConfig = {};
+try {
+  const mod = await import('@panguard-ai/manager' as string);
+  ManagerServer = mod.ManagerServer;
+  DEFAULT_MANAGER_CONFIG = mod.DEFAULT_MANAGER_CONFIG;
+} catch {
+  // manager is optional — serve command will work without it
+}
 
 import type { ThreatCloudDBInstance, LLMReviewerInstance, RouteContext } from './serve-types.js';
 import { sendJson } from './serve-types.js';
@@ -317,6 +328,11 @@ export function serveCommand(): Command {
         port: managerPort,
         authToken: process.env['MANAGER_AUTH_TOKEN'] ?? '',
       };
+      if (!ManagerServer) {
+        console.error('  Manager module not installed. Run: npm install @panguard-ai/manager');
+        process.exitCode = 1;
+        return;
+      }
       const managerServer = new ManagerServer(managerConfig);
 
       server.listen(port, host, () => {

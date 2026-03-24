@@ -547,11 +547,11 @@ export function setupCommand(): Command {
         console.log();
         console.log(c.sage(c.bold('  Setup complete! Here are your quick commands:')));
         console.log();
-        console.log(`    ${c.sage('pg')}              Open interactive menu`);
-        console.log(`    ${c.sage('pg up')}           Start protection + dashboard`);
-        console.log(`    ${c.sage('pg status')}       Check protection status`);
-        console.log(`    ${c.sage('pg scan')}         Scan all installed skills`);
-        console.log(`    ${c.sage('pg audit <dir>')}  Audit a skill before installing`);
+        console.log(`    ${c.sage('pga')}              Open interactive menu`);
+        console.log(`    ${c.sage('pga up')}           Start protection + dashboard`);
+        console.log(`    ${c.sage('pga status')}       Check protection status`);
+        console.log(`    ${c.sage('pga scan')}         Scan all installed skills`);
+        console.log(`    ${c.sage('pga audit <dir>')}  Audit a skill before installing`);
         console.log();
 
         const configuredPlatforms = actionable.filter((_, i) => results[i]?.success);

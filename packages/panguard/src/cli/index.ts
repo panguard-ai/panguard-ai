@@ -24,10 +24,35 @@ import { statusCommand } from './commands/status.js';
 import { loginCommand } from './commands/login.js';
 import { logoutCommand } from './commands/logout.js';
 import { whoamiCommand } from './commands/whoami.js';
-import { serveCommand } from './commands/serve.js';
-import { adminCommand } from './commands/admin.js';
-import { hardeningCommand } from './commands/hardening.js';
-import { managerCommand } from './commands/manager.js';
+// Lazy-loaded: these depend on optional packages (manager, panguard-auth)
+// that may not be installed. Using lazy Command wrappers prevents startup crash.
+function lazyCommand(name: string, desc: string, modulePath: string, exportName: string): () => Command {
+  return () => {
+    const cmd = new Command(name).description(desc);
+    cmd.allowUnknownOption(true);
+    cmd.action(async () => {
+      try {
+        const mod = await import(modulePath);
+        const realCmd = mod[exportName]() as Command;
+        await realCmd.parseAsync(process.argv);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (msg.includes('Cannot find package')) {
+          console.error(`  This command requires optional dependencies. Install them with:`);
+          console.error(`  npm install @panguard-ai/manager @panguard-ai/panguard-auth`);
+        } else {
+          console.error(`  Error: ${msg}`);
+        }
+        process.exitCode = 1;
+      }
+    });
+    return cmd;
+  };
+}
+const serveCommand = lazyCommand('serve', 'Start unified HTTP server', './commands/serve.js', 'serveCommand');
+const adminCommand = lazyCommand('admin', 'Admin management', './commands/admin.js', 'adminCommand');
+const hardeningCommand = lazyCommand('hardening', 'Security hardening', './commands/hardening.js', 'hardeningCommand');
+const managerCommand = lazyCommand('manager', 'Distributed guard management', './commands/manager.js', 'managerCommand');
 import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
 import { doctorCommand } from './commands/doctor.js';
