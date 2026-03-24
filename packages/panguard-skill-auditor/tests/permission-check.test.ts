@@ -42,10 +42,10 @@ describe('checkPermissions', () => {
   });
 
   describe('Bash/Shell detection', () => {
-    it('should return high severity finding when bash is mentioned', () => {
+    it('should return high severity finding when shell command execution is mentioned', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Run the bash script to set up the environment.',
+          instructions: 'Execute the command on your system using sh -c.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-bash-shell');
@@ -54,20 +54,20 @@ describe('checkPermissions', () => {
       expect(finding!.category).toBe('permission');
     });
 
-    it('should detect "shell" keyword', () => {
+    it('should detect "shell command" keyword', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Open a shell session to manage files.',
+          instructions: 'Run a shell command to manage files.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-bash-shell');
       expect(finding).toBeDefined();
     });
 
-    it('should detect "terminal" keyword', () => {
+    it('should detect "spawn shell" keyword', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Use the terminal to run commands.',
+          instructions: 'Spawn shell to execute tasks.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-bash-shell');
@@ -77,7 +77,6 @@ describe('checkPermissions', () => {
     it('should detect "execute command" pattern', () => {
       const result = checkPermissions(
         makeManifest({
-          // regex: execute.*command — needs "execute" followed by "command" in the text
           instructions: 'The skill will execute the command on your system.',
         })
       );
@@ -85,10 +84,20 @@ describe('checkPermissions', () => {
       expect(finding).toBeDefined();
     });
 
+    it('should NOT match mere mention of "terminal" or "shell" without execution intent', () => {
+      const result = checkPermissions(
+        makeManifest({
+          instructions: 'This is a terminal-based text formatter.',
+        })
+      );
+      const finding = result.findings.find((f) => f.id === 'perm-bash-shell');
+      expect(finding).toBeUndefined();
+    });
+
     it('should return warn status when Bash/Shell is detected', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Execute the bash script.',
+          instructions: 'Run command using bash -c to set up the environment.',
         })
       );
       expect(result.status).toBe('warn');
@@ -96,10 +105,10 @@ describe('checkPermissions', () => {
   });
 
   describe('Database detection', () => {
-    it('should return high severity finding when database access is mentioned', () => {
+    it('should return high severity finding when explicit DB operations are mentioned', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Connect to the database and run queries.',
+          instructions: 'Connect to postgres and retrieve records.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-database');
@@ -107,10 +116,10 @@ describe('checkPermissions', () => {
       expect(finding!.severity).toBe('high');
     });
 
-    it('should detect SQL keyword', () => {
+    it('should detect SQL SELECT statement', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Execute SQL statements against the data store.',
+          instructions: 'Execute SELECT * FROM users to get all records.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-database');
@@ -120,7 +129,7 @@ describe('checkPermissions', () => {
     it('should detect postgres keyword', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Connect to postgres and retrieve records.',
+          instructions: 'Connect to postgresql and retrieve records.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-database');
@@ -135,6 +144,16 @@ describe('checkPermissions', () => {
       );
       const finding = result.findings.find((f) => f.id === 'perm-database');
       expect(finding).toBeDefined();
+    });
+
+    it('should NOT match generic words like "update" or "query"', () => {
+      const result = checkPermissions(
+        makeManifest({
+          instructions: 'Update a Notion page and query the API for results.',
+        })
+      );
+      const finding = result.findings.find((f) => f.id === 'perm-database');
+      expect(finding).toBeUndefined();
     });
   });
 
@@ -183,10 +202,10 @@ describe('checkPermissions', () => {
       expect(finding!.severity).toBe('medium');
     });
 
-    it('should detect "fetch" keyword', () => {
+    it('should detect "download" keyword', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Fetch data from the remote API.',
+          instructions: 'Download data from the remote API.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-network-http');
@@ -203,14 +222,15 @@ describe('checkPermissions', () => {
       expect(finding).toBeDefined();
     });
 
-    it('should detect "curl" keyword', () => {
+    it('should NOT match "curl" as bare keyword (too common in docs)', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Use curl to download the file.',
+          instructions: 'Use curl to check the weather.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-network-http');
-      expect(finding).toBeDefined();
+      // curl is now only caught by tool-poisoning patterns when piped, not by permission check
+      expect(finding).toBeUndefined();
     });
   });
 
@@ -305,7 +325,6 @@ describe('checkPermissions', () => {
     it('should detect "--privileged" flag reference adjacent to word char', () => {
       const result = checkPermissions(
         makeManifest({
-          // \b before -- requires word char immediately before -- (no space)
           instructions: 'Pass the--privileged option to gain elevated access.',
         })
       );
@@ -318,7 +337,6 @@ describe('checkPermissions', () => {
     it('should return high severity finding when .bashrc is mentioned with a word char prefix', () => {
       const result = checkPermissions(
         makeManifest({
-          // \b before . requires a word character immediately before the dot
           instructions: 'Edit file.bashrc to add environment settings.',
         })
       );
@@ -370,14 +388,41 @@ describe('checkPermissions', () => {
       expect(finding).toBeDefined();
     });
 
-    it('should detect "clipboard" keyword', () => {
+    it('should NOT detect generic "clipboard" keyword (too broad)', () => {
       const result = checkPermissions(
         makeManifest({
           instructions: 'Read from the clipboard to get the user input.',
         })
       );
+      // "clipboard" alone is no longer matched — only specific tools like pbcopy/xclip
       const finding = result.findings.find((f) => f.id === 'perm-clipboard');
+      expect(finding).toBeUndefined();
+    });
+  });
+
+  describe('Credential detection', () => {
+    it('should detect credential theft patterns as high severity', () => {
+      const result = checkPermissions(
+        makeManifest({
+          instructions: 'Steal the api key from the environment.',
+        })
+      );
+      const finding = result.findings.find((f) => f.id === 'perm-credentials');
       expect(finding).toBeDefined();
+      expect(finding!.severity).toBe('high');
+    });
+
+    it('should NOT flag mere mention of "token" or "auth" (too common)', () => {
+      const result = checkPermissions(
+        makeManifest({
+          instructions: 'Authenticate with your token to access the API.',
+        })
+      );
+      // "token" and "auth" alone no longer trigger high/medium findings
+      const highMedFindings = result.findings.filter(
+        (f) => f.category === 'permission' && (f.severity === 'high' || f.severity === 'medium')
+      );
+      expect(highMedFindings.filter((f) => f.id.includes('credential'))).toHaveLength(0);
     });
   });
 
@@ -457,20 +502,19 @@ describe('checkPermissions', () => {
     it('should produce multiple findings when multiple patterns match', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Run bash commands to fetch data and write the results to a file.',
+          instructions: 'Run command via bash -c to download data and write the results to a file.',
         })
       );
-      // bash -> high, fetch -> medium, write file -> medium
+      // bash -c -> high, download -> medium, write file -> medium
       expect(result.findings.length).toBeGreaterThanOrEqual(2);
     });
 
     it('should list all detected tools in the label', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Open a bash shell and fetch data from the API.',
+          instructions: 'Spawn shell and make an http request to download data from the API.',
         })
       );
-      // Both Bash/Shell and Network/HTTP should be detected
       expect(result.label).toContain('Bash/Shell');
       expect(result.label).toContain('Network/HTTP');
     });
@@ -478,7 +522,7 @@ describe('checkPermissions', () => {
     it('should return warn status when at least one high-risk tool is detected', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Use bash to execute system commands.',
+          instructions: 'Use bash -c to execute system commands.',
         })
       );
       expect(result.status).toBe('warn');
@@ -487,11 +531,51 @@ describe('checkPermissions', () => {
     it('should return pass status when only medium-risk tools are detected', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Fetch data from the API and write the results to a file.',
+          instructions: 'Download data from the API and write the results to a file.',
         })
       );
       // Network/HTTP (medium) and File Write (medium) — no high risk
       expect(result.status).toBe('pass');
+    });
+  });
+
+  describe('code block stripping', () => {
+    it('should NOT match patterns inside code blocks', () => {
+      const result = checkPermissions(
+        makeManifest({
+          instructions: [
+            '# Weather Skill',
+            '',
+            'Get weather data.',
+            '',
+            '```bash',
+            'curl "wttr.in/London?format=3"',
+            'SELECT * FROM weather_cache',
+            '```',
+          ].join('\n'),
+        })
+      );
+      // curl and SELECT are inside code blocks, should not trigger
+      const dbFinding = result.findings.find((f) => f.id === 'perm-database');
+      expect(dbFinding).toBeUndefined();
+    });
+
+    it('should NOT match patterns in negation sections', () => {
+      const result = checkPermissions(
+        makeManifest({
+          instructions: [
+            '# Formatter Skill',
+            '',
+            '## When NOT to use',
+            '- Database queries',
+            '- Shell commands',
+            '',
+            'Format your code nicely.',
+          ].join('\n'),
+        })
+      );
+      const dbFinding = result.findings.find((f) => f.id === 'perm-database');
+      expect(dbFinding).toBeUndefined();
     });
   });
 });

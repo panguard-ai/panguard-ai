@@ -236,6 +236,9 @@ async function commandStart(
     printAiSetupGuide();
   }
 
+  // ── First-run welcome / 首次啟動歡迎 ──────────────────────────────
+  await showFirstRunWelcome(config.dashboardPort);
+
   console.log(`  ${symbols.info} Monitoring...`);
   console.log('');
 
@@ -452,6 +455,56 @@ async function commandStart(
 // ---------------------------------------------------------------------------
 // AI setup guide — shown when no AI layers are configured
 // AI 設定指南 — 當沒有配置 AI 層時顯示
+// ---------------------------------------------------------------------------
+
+/**
+ * Show first-run welcome with onboarding guidance.
+ * Only shown once — writes a marker file after display.
+ */
+async function showFirstRunWelcome(dashboardPort: number): Promise<void> {
+  const { existsSync, writeFileSync, mkdirSync } = await import('node:fs');
+  const markerPath = join(homedir(), '.panguard', '.guard-onboarded');
+
+  if (existsSync(markerPath)) return;
+
+  console.log('');
+  console.log(divider());
+  console.log('');
+  console.log(`  ${c.sage(c.bold('Welcome to Panguard AI Guard!'))}`);
+  console.log(`  ${c.sage(c.bold('Panguard AI Guard!'))}`);
+  console.log('');
+  console.log(`  Your agent security protection is now active.`);
+  console.log(`  AI Agent`);
+  console.log('');
+  console.log(`  ${c.bold('Dashboard / :')}`);
+  console.log(`    ${c.underline(`http://localhost:${dashboardPort}`)}`);
+  console.log('');
+  console.log(`  ${c.bold('Quick commands / :')}`);
+  console.log(`    ${c.sage('pg')}              Open interactive menu /`);
+  console.log(`    ${c.sage('pg up')}           Start protection + dashboard /  + `);
+  console.log(`    ${c.sage('pg status')}       Check protection status / `);
+  console.log(`    ${c.sage('pg scan')}         Scan all installed skills / `);
+  console.log(`    ${c.sage('pg audit <dir>')}  Audit a skill before installing / `);
+  console.log('');
+  console.log(`  ${c.bold('What Guard does / Guard :')}`);
+  console.log(`    ${symbols.pass} Monitors new skill installations in real-time`);
+  console.log(`    ${symbols.pass} Auto-audits skills with 61+ ATR threat rules`);
+  console.log(`    ${symbols.pass} Blocks critical threats, alerts on suspicious ones`);
+  console.log(`    ${symbols.pass} Syncs community threat intelligence via Threat Cloud`);
+  console.log('');
+  console.log(divider());
+  console.log('');
+
+  // Write marker so this only shows once
+  try {
+    const dir = join(homedir(), '.panguard');
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    writeFileSync(markerPath, new Date().toISOString(), 'utf-8');
+  } catch {
+    // Non-critical — will just show again next time
+  }
+}
+
 // ---------------------------------------------------------------------------
 
 /** Print bilingual AI layer setup instructions */

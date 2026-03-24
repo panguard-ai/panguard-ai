@@ -49,7 +49,11 @@ export function auditCommand(): Command {
           tcEndpoint: string;
         }
       ) => {
-        if (options.verbose) setLogLevel('debug');
+        if (options.verbose) {
+          setLogLevel('debug');
+        } else if (!options.json) {
+          setLogLevel('silent');
+        }
 
         const resolvedPath = path.resolve(skillPath);
 

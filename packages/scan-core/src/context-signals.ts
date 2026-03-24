@@ -5,6 +5,10 @@
  * in skill content. Returns a multiplier that adjusts risk scoring.
  *
  * This is the single canonical implementation used by both CLI and Website.
+ *
+ * v1.4: Boosters now run against prose (code blocks stripped) to avoid
+ *       false positives from documentation examples.
+ *       Reducers expanded to recognise common CLI tools and API integrations.
  */
 
 import type { ContextSignal, ContextSignals, SkillManifest } from './types.js';
@@ -44,6 +48,14 @@ const DANGEROUS_INSTRUCTION_RE =
 const DEV_TOOL_DESCRIPTION_RE =
   /\b(shell|cli|terminal|command[\s-]line|devops|qa\s+test|build\s+tool|development\s+tool|debugging|headless\s+browser|automation|deploy|scaffold|code\s+review|lint|format|testing\s+framework|package\s+manager|docker|container|kubernetes|ci[\s/]cd)\b/i;
 
+// Recognises API integrations, connectors, and well-known service names
+const API_INTEGRATION_RE =
+  /\b(api\s+integration|api\s+client|connector|webhook|slack|discord|notion|github|gitlab|jira|trello|asana|linear|airtable|google\s+sheets|zapier|weather|wttr\.in|open[\s-]?meteo)\b/i;
+
+// Well-known CLI tools that legitimately need shell access
+const KNOWN_CLI_BINS_RE =
+  /^(bash|sh|zsh|curl|wget|git|gh|jq|grep|sed|awk|find|rsync|scp|make|npm|npx|pnpm|yarn|pip|python|node|go|cargo|docker|kubectl|terraform|aws|gcloud|az|ffmpeg|convert|osascript|pbcopy|pbpaste|open|xdg-open)$/i;
+
 // ---------------------------------------------------------------------------
 // Detection
 // ---------------------------------------------------------------------------
@@ -76,9 +88,14 @@ export function detectContextSignals(
 ): ContextSignals {
   const signals: ContextSignal[] = [];
 
-  // -- Boosters --
+  // Prepare prose for booster checks (strip code blocks to avoid doc examples)
+  const prose = stripCodeBlocks(content);
 
-  if (IMPORTANT_BLOCK_RE.test(content)) {
+  // -- Boosters --
+  // Run against prose only — attackers write malicious instructions in prose,
+  // not inside code block examples.
+
+  if (IMPORTANT_BLOCK_RE.test(prose)) {
     signals.push({
       id: 'boost-important-block',
       type: 'booster',
@@ -87,7 +104,7 @@ export function detectContextSignals(
     });
   }
 
-  if (CONCEALMENT_RE.test(content)) {
+  if (CONCEALMENT_RE.test(prose)) {
     signals.push({
       id: 'boost-concealment',
       type: 'booster',
@@ -96,7 +113,7 @@ export function detectContextSignals(
     });
   }
 
-  if (EXFIL_URL_RE.test(content)) {
+  if (EXFIL_URL_RE.test(prose)) {
     signals.push({
       id: 'boost-exfil-url',
       type: 'booster',
@@ -105,7 +122,7 @@ export function detectContextSignals(
     });
   }
 
-  if (CONSENT_BYPASS_RE.test(content)) {
+  if (CONSENT_BYPASS_RE.test(prose)) {
     signals.push({
       id: 'boost-consent-bypass',
       type: 'booster',
@@ -114,7 +131,7 @@ export function detectContextSignals(
     });
   }
 
-  if (CREDENTIAL_FILE_RE.test(content) && NETWORK_CALL_RE.test(content)) {
+  if (CREDENTIAL_FILE_RE.test(prose) && NETWORK_CALL_RE.test(prose)) {
     signals.push({
       id: 'boost-credential-plus-network',
       type: 'booster',
@@ -124,8 +141,9 @@ export function detectContextSignals(
   }
 
   // Description-behavior mismatch: benign description + dangerous instructions
+  // Also check prose only for the dangerous instruction side
   const description = manifest?.description ?? '';
-  if (BENIGN_DESCRIPTION_RE.test(description) && DANGEROUS_INSTRUCTION_RE.test(content)) {
+  if (BENIGN_DESCRIPTION_RE.test(description) && DANGEROUS_INSTRUCTION_RE.test(prose)) {
     signals.push({
       id: 'boost-description-mismatch',
       type: 'booster',
@@ -139,14 +157,12 @@ export function detectContextSignals(
   // Declared tool capabilities (allowed-tools in frontmatter)
   const declaredTools =
     manifest?.['allowed-tools'] ?? manifest?.metadata?.openclaw?.requires?.bins ?? [];
-  const declaresShell = declaredTools.some((t: string) =>
-    /^(bash|sh|zsh|shell|Bash|terminal|command)$/i.test(t)
-  );
-  if (declaresShell) {
+  const declaresKnownCLI = declaredTools.some((t: string) => KNOWN_CLI_BINS_RE.test(t));
+  if (declaresKnownCLI) {
     signals.push({
       id: 'reduce-declared-tools',
       type: 'reducer',
-      label: 'Skill declares shell access in frontmatter',
+      label: 'Skill declares well-known CLI tool(s) in frontmatter',
       weight: -0.3,
     });
   }
@@ -161,18 +177,25 @@ export function detectContextSignals(
     });
   }
 
+  // API integration description — legitimate connector/integration skill
+  if (API_INTEGRATION_RE.test(description)) {
+    signals.push({
+      id: 'reduce-api-integration',
+      type: 'reducer',
+      label: 'Description identifies as API integration or well-known service connector',
+      weight: -0.2,
+    });
+  }
+
   // Structured frontmatter (well-formed skill)
+  // Relaxed: name + description is enough (most skills don't have version/license)
   if (manifest?.name && manifest?.description) {
-    const hasVersion = !!manifest?.metadata?.version;
-    const hasLicense = !!manifest?.license;
-    if (hasVersion || hasLicense) {
-      signals.push({
-        id: 'reduce-structured-frontmatter',
-        type: 'reducer',
-        label: 'Well-structured frontmatter with name, description, and version/license',
-        weight: -0.1,
-      });
-    }
+    signals.push({
+      id: 'reduce-structured-frontmatter',
+      type: 'reducer',
+      label: 'Well-structured frontmatter with name and description',
+      weight: -0.1,
+    });
   }
 
   // Also check frontmatter from raw content (for website where manifest may be partial)

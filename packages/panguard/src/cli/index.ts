@@ -36,6 +36,7 @@ import { skillsCommand } from './commands/skills.js';
 import { hacktivityCommand } from './commands/hacktivity.js';
 import { setupCommand } from './commands/setup.js';
 import { startInteractive } from './interactive.js';
+import { upCommand } from './commands/up.js';
 
 const program = new Command();
 
@@ -45,6 +46,7 @@ program
   .version(PANGUARD_VERSION);
 
 // ── Core commands (shown in help) ──
+program.addCommand(upCommand());
 program.addCommand(setupCommand());
 program.addCommand(auditCommand());
 program.addCommand(skillsCommand());
@@ -80,17 +82,36 @@ const helpFlags = new Set(['-h', '--help', '-V', '--version']);
 const hasSubcommand = userArgs.some((a) => !a.startsWith('-'));
 const hasHelpOrVersion = userArgs.some((a) => helpFlags.has(a));
 
-if (!hasSubcommand && !hasHelpOrVersion) {
-  // Extract --lang value if present
-  const langIdx = userArgs.indexOf('--lang');
-  const lang = langIdx >= 0 ? userArgs[langIdx + 1] : undefined;
-  startInteractive(lang).catch((err: unknown) => {
-    console.error('Fatal error:', err instanceof Error ? err.message : err);
-    process.exit(1);
-  });
-} else {
-  program.parseAsync().catch((err: unknown) => {
-    console.error('Fatal error:', err instanceof Error ? err.message : err);
-    process.exit(1);
-  });
+async function main(): Promise<void> {
+  if (!hasSubcommand && !hasHelpOrVersion) {
+    // First-run detection: if no config exists, auto-run setup wizard
+    const { existsSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const configPath = join(
+      process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
+      '.panguard',
+      'config.json'
+    );
+    const isFirstRun = !existsSync(configPath);
+
+    if (isFirstRun) {
+      // First time user — run setup wizard directly
+      console.log('\n  Welcome to Panguard AI! / Panguard AI!\n');
+      console.log('  First time detected. Starting setup wizard...\n');
+      await program.parseAsync(['node', 'panguard', 'setup']);
+      return;
+    }
+
+    // Extract --lang value if present
+    const langIdx = userArgs.indexOf('--lang');
+    const lang = langIdx >= 0 ? userArgs[langIdx + 1] : undefined;
+    await startInteractive(lang);
+  } else {
+    await program.parseAsync();
+  }
 }
+
+main().catch((err: unknown) => {
+  console.error('Fatal error:', err instanceof Error ? err.message : err);
+  process.exit(1);
+});
