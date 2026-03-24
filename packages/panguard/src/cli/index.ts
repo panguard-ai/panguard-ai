@@ -82,7 +82,104 @@ const helpFlags = new Set(['-h', '--help', '-V', '--version']);
 const hasSubcommand = userArgs.some((a) => !a.startsWith('-'));
 const hasHelpOrVersion = userArgs.some((a) => helpFlags.has(a));
 
+/**
+ * Show "What's new" message once after upgrade.
+ * Compares current version against ~/.panguard/.last-seen-version.
+ * Only shown on interactive commands (no args, no --json).
+ */
+async function showWhatsNewIfUpgraded(): Promise<void> {
+  const { existsSync, readFileSync, writeFileSync, mkdirSync } = await import('node:fs');
+  const { join } = await import('node:path');
+
+  const home = process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.';
+  const dir = join(home, '.panguard');
+  const versionFile = join(dir, '.last-seen-version');
+
+  // Read last seen version
+  let lastSeen = '';
+  try {
+    if (existsSync(versionFile)) {
+      lastSeen = readFileSync(versionFile, 'utf-8').trim();
+    }
+  } catch {
+    // Non-critical
+  }
+
+  // Compare with current
+  if (lastSeen === PANGUARD_VERSION) return;
+
+  // Show what's new (only if upgrading, not first install)
+  if (lastSeen !== '') {
+    console.log(`\n  Panguard AI updated: ${lastSeen} \u2192 ${PANGUARD_VERSION}\n`);
+
+    // Try to read CHANGELOG.md for current version's highlights
+    try {
+      const { fileURLToPath } = await import('node:url');
+      const { dirname } = await import('node:path');
+      const cliDir = dirname(fileURLToPath(import.meta.url));
+      // CHANGELOG.md is at repo root, CLI is at packages/panguard/dist/cli/
+      const changelogPaths = [
+        join(cliDir, '..', '..', '..', '..', 'CHANGELOG.md'),  // from dist
+        join(cliDir, '..', '..', 'CHANGELOG.md'),               // fallback
+      ];
+      let changelog = '';
+      for (const p of changelogPaths) {
+        if (existsSync(p)) {
+          changelog = readFileSync(p, 'utf-8');
+          break;
+        }
+      }
+      if (changelog) {
+        // Extract current version section
+        const versionHeader = `## [${PANGUARD_VERSION}]`;
+        const startIdx = changelog.indexOf(versionHeader);
+        if (startIdx >= 0) {
+          const afterHeader = changelog.indexOf('\n', startIdx) + 1;
+          const nextVersion = changelog.indexOf('\n## [', afterHeader);
+          const section = changelog.substring(afterHeader, nextVersion > 0 ? nextVersion : undefined);
+          // Extract "### Added" and "### Fixed" bullet points (first 6 lines max)
+          const bullets = section
+            .split('\n')
+            .filter((l: string) => l.startsWith('- **'))
+            .slice(0, 6)
+            .map((l: string) => {
+              const match = l.match(/^- \*\*(.+?)\*\*\.?\s*(.*)$/);
+              if (!match) return l;
+              const title = (match[1] ?? '').replace(/\.$/, '');
+              const desc = match[2] ?? '';
+              return desc ? `  - ${title} -- ${desc}` : `  - ${title}`;
+            });
+          if (bullets.length > 0) {
+            console.log('  What\'s new:');
+            for (const b of bullets) {
+              console.log(`  ${b}`);
+            }
+            console.log('');
+          }
+        }
+      }
+    } catch {
+      // CHANGELOG read failed — show simple message
+      console.log(`  Run "pg --help" to see new commands.\n`);
+    }
+  }
+
+  // Write current version
+  try {
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    writeFileSync(versionFile, PANGUARD_VERSION, 'utf-8');
+  } catch {
+    // Non-critical
+  }
+}
+
 async function main(): Promise<void> {
+  // Show "what's new" on interactive use (not --json, not --help)
+  const isJsonMode = userArgs.includes('--json');
+  if (!hasHelpOrVersion && !isJsonMode) {
+    await showWhatsNewIfUpgraded();
+  }
+
   if (!hasSubcommand && !hasHelpOrVersion) {
     // First-run detection: if no config exists, auto-run setup wizard
     const { existsSync } = await import('node:fs');

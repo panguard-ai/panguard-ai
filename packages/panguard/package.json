@@ -31,11 +31,12 @@
   "files": [
     "dist",
     "bin",
+    "CHANGELOG.md",
     "package.json",
     "README.md"
   ],
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build && cp ../../CHANGELOG.md ./CHANGELOG.md 2>/dev/null || true",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "dev": "tsc --build --watch",
