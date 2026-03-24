@@ -13,6 +13,31 @@ All notable changes to Panguard AI, organized by version.
 
 ---
 
+## v1.3.3
+
+**Released: 2026-03-25** -- Scan Accuracy, `pga` Shortcut, Onboarding UX
+
+### Scan Accuracy
+
+- **False positives dramatically reduced.** Normal skills (weather, github, slack, notion) no longer flagged as MEDIUM/HIGH. Permission checks now strip code blocks and negation sections before pattern matching.
+- **New stealth attack detection.** `<IMPORTANT>` block attacks and silent data exfiltration instructions are now caught as CRITICAL.
+- **Context-aware scoring.** Known CLI tools (curl, git, wget) and API integrations get proper risk reduction. Credential check distinguishes theft from legitimate handling.
+- **13 injection patterns** (up from 11), with two-pass matching that automatically downgrades tool poisoning patterns found only in code block examples.
+
+### `pga` Shortcut
+
+- **`pga` command** -- three characters to invoke Panguard from anywhere. Works exactly like `panguard`.
+- **`pga up`** -- start protection + dashboard in one command. Replaces `panguard guard start --dashboard`.
+- **First-run auto-detection** -- run `pga` for the first time and setup wizard starts automatically.
+
+### Onboarding UX
+
+- **Guard welcome guide** -- first time Guard starts, shows all commands and what Guard does.
+- **"What's new" on upgrade** -- after updating, first CLI run shows changelog highlights.
+- **Clean audit output** -- no more JSON log lines in non-verbose mode.
+
+---
+
 ## v0.8.0
 
 **Released: 2026-03-13** -- Dashboard, AI Platform Integration, and Skill Auditor
