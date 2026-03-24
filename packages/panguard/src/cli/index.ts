@@ -26,7 +26,12 @@ import { logoutCommand } from './commands/logout.js';
 import { whoamiCommand } from './commands/whoami.js';
 // Lazy-loaded: these depend on optional packages (manager, panguard-auth)
 // that may not be installed. Using lazy Command wrappers prevents startup crash.
-function lazyCommand(name: string, desc: string, modulePath: string, exportName: string): () => Command {
+function lazyCommand(
+  name: string,
+  desc: string,
+  modulePath: string,
+  exportName: string
+): () => Command {
   return () => {
     const cmd = new Command(name).description(desc);
     cmd.allowUnknownOption(true);
@@ -49,10 +54,30 @@ function lazyCommand(name: string, desc: string, modulePath: string, exportName:
     return cmd;
   };
 }
-const serveCommand = lazyCommand('serve', 'Start unified HTTP server', './commands/serve.js', 'serveCommand');
-const adminCommand = lazyCommand('admin', 'Admin management', './commands/admin.js', 'adminCommand');
-const hardeningCommand = lazyCommand('hardening', 'Security hardening', './commands/hardening.js', 'hardeningCommand');
-const managerCommand = lazyCommand('manager', 'Distributed guard management', './commands/manager.js', 'managerCommand');
+const serveCommand = lazyCommand(
+  'serve',
+  'Start unified HTTP server',
+  './commands/serve.js',
+  'serveCommand'
+);
+const adminCommand = lazyCommand(
+  'admin',
+  'Admin management',
+  './commands/admin.js',
+  'adminCommand'
+);
+const hardeningCommand = lazyCommand(
+  'hardening',
+  'Security hardening',
+  './commands/hardening.js',
+  'hardeningCommand'
+);
+const managerCommand = lazyCommand(
+  'manager',
+  'Distributed guard management',
+  './commands/manager.js',
+  'managerCommand'
+);
 import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
 import { doctorCommand } from './commands/doctor.js';
