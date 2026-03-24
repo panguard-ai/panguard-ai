@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { detectContextSignals } from '../context-signals.js';
@@ -7,7 +8,7 @@ import type { ContextSignal } from '../types.js';
 // Helpers
 // ---------------------------------------------------------------------------
 
-function signalIds(signals: readonly ContextSignal[]): string[] {
+function _signalIds(signals: readonly ContextSignal[]): string[] {
   return signals.map((s) => s.id);
 }
 

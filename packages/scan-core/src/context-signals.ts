@@ -11,7 +11,7 @@
  *       Reducers expanded to recognise common CLI tools and API integrations.
  */
 
-import type { ContextSignal, ContextSignals, SkillManifest } from './types.js';
+import type { ContextSignal, ContextSignals } from './types.js';
 import { extractCodeBlocks, stripCodeBlocks } from './markdown-utils.js';
 
 // ---------------------------------------------------------------------------

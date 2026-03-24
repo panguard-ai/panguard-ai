@@ -1,0 +1,11 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties: {}
+    required: []
+  commandFunction:
+    command: npx
+    args:
+      - -y
+      - "@panguard-ai/panguard-mcp"

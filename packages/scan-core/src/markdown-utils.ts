@@ -14,7 +14,7 @@ export function stripMarkdownNoise(raw: string): string {
   // Remove fenced code blocks (```...```)
   cleaned = cleaned.replace(/```[\s\S]*?```/g, ' ');
   // Remove indented code blocks (4 spaces or 1 tab)
-  cleaned = cleaned.replace(/^(?:    |\t).+$/gm, ' ');
+  cleaned = cleaned.replace(/^(?: {4}|\t).+$/gm, ' ');
   // Remove inline code (`...`)
   cleaned = cleaned.replace(/`[^`]+`/g, ' ');
   // Remove blockquotes
