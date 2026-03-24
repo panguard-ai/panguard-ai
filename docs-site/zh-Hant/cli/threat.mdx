@@ -1,7 +1,7 @@
 ---
-title: "panguard threat"
-description: "啟動本機 Threat Cloud 情報伺服器。"
-icon: "cloud"
+title: 'panguard threat'
+description: '啟動本機 Threat Cloud 情報伺服器。'
+icon: 'cloud'
 ---
 
 `threat` 在本機跑一個 Panguard Threat Cloud 實例 -- 一台威脅情報伺服器，從你的 Guard daemon 匯整 IoC（入侵指標）、攻擊活動資料跟攻擊者 profile。提供 REST API 跟即時儀表板做威脅分析。
@@ -14,9 +14,9 @@ panguard threat <subcommand> [options]
 
 ## 子指令
 
-| 子指令 | 說明 |
-| --- | --- |
-| `start` | 啟動 Threat Cloud 伺服器 |
+| 子指令  | 說明                             |
+| ------- | -------------------------------- |
+| `start` | 啟動 Threat Cloud 伺服器         |
 | `stats` | 不啟動伺服器，直接看威脅情報統計 |
 
 ## 選項
@@ -51,20 +51,22 @@ panguard threat stats
 ```bash 指定資料庫路徑
 panguard threat start --db /opt/panguard/threat.db
 ```
+
 </CodeGroup>
 
 ## 情報來源
 
 Threat Cloud 從這些地方匯整資料：
 
-| 來源 | 資料類型 |
-| --- | --- |
+| 來源             | 資料類型                          |
+| ---------------- | --------------------------------- |
 | **Guard daemon** | process 異常、網路指標、檔案 hash |
-| **社群 feed** | 公開 IoC feed、STIX/TAXII 來源 |
-| **手動上傳** | 透過 API 傳的自訂 IoC 清單 |
+| **社群 feed**    | 公開 IoC feed、STIX/TAXII 來源    |
+| **手動上傳**     | 透過 API 傳的自訂 IoC 清單        |
 
 <Warning>
-  bind 到 `0.0.0.0` 的話，Threat Cloud API 就暴露在網路上了。務必設好認證，放在防火牆或 reverse proxy 後面。
+  bind 到 `0.0.0.0` 的話，Threat Cloud API 就暴露在網路上了。務必設好認證，放在防火牆或 reverse
+  proxy 後面。
 </Warning>
 
 ## 相關

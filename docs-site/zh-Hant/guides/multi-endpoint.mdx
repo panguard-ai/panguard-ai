@@ -1,7 +1,7 @@
 ---
-title: "多端點部署"
-description: "部署 Panguard Manager，跨多台機器進行機群安全管理。"
-icon: "server"
+title: '多端點部署'
+description: '部署 Panguard Manager，跨多台機器進行機群安全管理。'
+icon: 'server'
 ---
 
 # 多端點部署
@@ -43,6 +43,7 @@ icon: "server"
     <Warning>
     這個 token 要安全保存。每個 Guard agent 註冊都需要它。
     </Warning>
+
   </Step>
   <Step title="啟動 Manager">
     ```bash
@@ -54,6 +55,7 @@ icon: "server"
     - **威脅彙總** -- 透過來源 IP、惡意軟體 hash、攻擊模式做跨 agent 關聯
     - **策略引擎** -- 集中派發規則和 config
     - **SSE 串流** -- 給管理儀表板的即時事件串流
+
   </Step>
   <Step title="確認 Manager 在跑">
     ```bash
@@ -88,6 +90,7 @@ icon: "server"
     2. 每 30 秒送心跳
     3. 偵測到威脅即時回報
     4. 每 5 分鐘拉取策略更新
+
   </Step>
 </Steps>
 
@@ -95,14 +98,14 @@ icon: "server"
 
 ## Agent 生命週期
 
-| 階段 | 端點 | 間隔 | 說明 |
-| --- | --- | --- | --- |
-| **註冊** | `POST /api/agents/register` | 一次（啟動時） | Agent 送主機名稱、OS、版本；收到唯一 `agentId` |
-| **心跳** | `POST /api/agents/:id/heartbeat` | 每 30 秒 | CPU/記憶體用量、已處理事件數、模式、uptime |
-| **威脅回報** | `POST /api/agents/:id/events` | 即時 | 偵測到的威脅立刻送出 |
-| **策略拉取** | `GET /api/policy/agent/:id` | 每 5 分鐘 | Agent 檢查有沒有新策略 |
-| **失效偵測** | -- | 每 30 秒（server 端） | 90 秒沒心跳的 agent 標記為失效 |
-| **取消註冊** | `DELETE /api/agents/:id` | 手動 | 從機群移除 agent |
+| 階段         | 端點                             | 間隔                  | 說明                                           |
+| ------------ | -------------------------------- | --------------------- | ---------------------------------------------- |
+| **註冊**     | `POST /api/agents/register`      | 一次（啟動時）        | Agent 送主機名稱、OS、版本；收到唯一 `agentId` |
+| **心跳**     | `POST /api/agents/:id/heartbeat` | 每 30 秒              | CPU/記憶體用量、已處理事件數、模式、uptime     |
+| **威脅回報** | `POST /api/agents/:id/events`    | 即時                  | 偵測到的威脅立刻送出                           |
+| **策略拉取** | `GET /api/policy/agent/:id`      | 每 5 分鐘             | Agent 檢查有沒有新策略                         |
+| **失效偵測** | --                               | 每 30 秒（server 端） | 90 秒沒心跳的 agent 標記為失效                 |
+| **取消註冊** | `DELETE /api/agents/:id`         | 手動                  | 從機群移除 agent                               |
 
 ---
 
@@ -115,7 +118,7 @@ Manager 的威脅彙總即時關聯所有 agent 的威脅：
 - **攻擊模式關聯** -- 5 分鐘窗口內出現相關 MITRE ATT&CK 模式
 
 <Info>
-跨 agent 關聯用 5 分鐘滑動窗口，資料保留 24 小時。跨 3 個以上 agent 的威脅自動升級為 CRITICAL。
+  跨 agent 關聯用 5 分鐘滑動窗口，資料保留 24 小時。跨 3 個以上 agent 的威脅自動升級為 CRITICAL。
 </Info>
 
 ---
@@ -164,16 +167,16 @@ curl -H "Authorization: Bearer $MANAGER_TOKEN" \
 
 ### 環境變數
 
-| 變數 | 預設值 | 說明 |
-| --- | --- | --- |
-| `MANAGER_PORT` | `8443` | HTTP server port |
-| `MANAGER_AUTH_TOKEN` | （無） | API 認證用的 Bearer token |
-| `MANAGER_MAX_AGENTS` | `500` | 最大 agent 註冊數 |
-| `MANAGER_HEARTBEAT_TIMEOUT_MS` | `90000` | 心跳逾時（超過就標失效） |
-| `MANAGER_HEARTBEAT_INTERVAL_MS` | `30000` | 失效檢查間隔 |
-| `MANAGER_CORRELATION_WINDOW_MS` | `300000` | 跨 agent 威脅關聯窗口（5 分鐘） |
-| `MANAGER_THREAT_RETENTION_MS` | `86400000` | 威脅資料保留時間（24 小時） |
-| `CORS_ALLOWED_ORIGINS` | （無） | 逗號分隔的允許 CORS origin |
+| 變數                            | 預設值     | 說明                            |
+| ------------------------------- | ---------- | ------------------------------- |
+| `MANAGER_PORT`                  | `8443`     | HTTP server port                |
+| `MANAGER_AUTH_TOKEN`            | （無）     | API 認證用的 Bearer token       |
+| `MANAGER_MAX_AGENTS`            | `500`      | 最大 agent 註冊數               |
+| `MANAGER_HEARTBEAT_TIMEOUT_MS`  | `90000`    | 心跳逾時（超過就標失效）        |
+| `MANAGER_HEARTBEAT_INTERVAL_MS` | `30000`    | 失效檢查間隔                    |
+| `MANAGER_CORRELATION_WINDOW_MS` | `300000`   | 跨 agent 威脅關聯窗口（5 分鐘） |
+| `MANAGER_THREAT_RETENTION_MS`   | `86400000` | 威脅資料保留時間（24 小時）     |
+| `CORS_ALLOWED_ORIGINS`          | （無）     | 逗號分隔的允許 CORS origin      |
 
 ### 可選 SQLite 持久化
 
@@ -188,7 +191,9 @@ panguard manager --port 8443 --auth-token "$MANAGER_TOKEN" --db /var/panguard-ma
 ## 正式環境部署
 
 <Tip>
-正式環境建議把 Manager 裝成 systemd 服務，前面擋 TLS 反向代理。詳見[系統服務指南](/guides/system-service)和 [Docker 部署指南](/guides/docker-deployment)。
+  正式環境建議把 Manager 裝成 systemd 服務，前面擋 TLS
+  反向代理。詳見[系統服務指南](/guides/system-service)和 [Docker
+  部署指南](/guides/docker-deployment)。
 </Tip>
 
 ### 安全檢查清單

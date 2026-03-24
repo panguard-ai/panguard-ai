@@ -1,7 +1,7 @@
 ---
-title: "Connecting to Threat Cloud"
-description: "How Panguard agents connect to Threat Cloud for collective threat intelligence."
-icon: "plug"
+title: 'Connecting to Threat Cloud'
+description: 'How Panguard agents connect to Threat Cloud for collective threat intelligence.'
+icon: 'plug'
 ---
 
 Every Panguard agent connects to the public Threat Cloud automatically. No configuration, no API key, no account required.
@@ -18,12 +18,12 @@ That's it. Your agent is now part of the collective intelligence network.
 
 ## What Happens Automatically
 
-| Interval | Action |
-|----------|--------|
-| **On startup** | Load bundled ATR rules from local install |
-| **Every 1 hour** | Sync with Threat Cloud: download new rules, upload anonymized threats |
-| **On threat detection** | Submit anonymized event data to Threat Cloud |
-| **On skill audit** | Report safe/unsafe skill fingerprints |
+| Interval                | Action                                                                |
+| ----------------------- | --------------------------------------------------------------------- |
+| **On startup**          | Load bundled ATR rules from local install                             |
+| **Every 1 hour**        | Sync with Threat Cloud: download new rules, upload anonymized threats |
+| **On threat detection** | Submit anonymized event data to Threat Cloud                          |
+| **On skill audit**      | Report safe/unsafe skill fingerprints                                 |
 
 ## Custom Endpoint
 
@@ -68,7 +68,8 @@ panguard guard start --no-cloud
 For organizations requiring isolated infrastructure or data sovereignty compliance, private Threat Cloud instances are available as a managed service.
 
 <Card title="Contact for Private Instance" icon="envelope" href="https://panguard.ai/contact">
-  Organizations can deploy dedicated Threat Cloud infrastructure with custom feeds, retention policies, and network isolation.
+  Organizations can deploy dedicated Threat Cloud infrastructure with custom feeds, retention
+  policies, and network isolation.
 </Card>
 
 ## Verify Connection

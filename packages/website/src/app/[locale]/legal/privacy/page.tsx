@@ -60,7 +60,9 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
             1. Information We Collect
           </h2>
 
-          <h3 className="text-base font-medium text-text-primary mb-2">1.1 No Personal Information Required</h3>
+          <h3 className="text-base font-medium text-text-primary mb-2">
+            1.1 No Personal Information Required
+          </h3>
           <p>
             Panguard does not require account registration. We do not collect personal information
             to use the software. Panguard is a free, open source CLI tool that runs locally on your
@@ -126,9 +128,9 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
             <li>
               <strong className="text-text-primary">Service Providers:</strong> We engage trusted
               third-party service providers who perform services on our behalf, such as cloud
-              hosting (infrastructure providers) and website analytics.
-              These providers are contractually obligated to protect your data and may only use it
-              to perform services for us.
+              hosting (infrastructure providers) and website analytics. These providers are
+              contractually obligated to protect your data and may only use it to perform services
+              for us.
             </li>
             <li>
               <strong className="text-text-primary">Legal Requirements:</strong> We may disclose
@@ -154,8 +156,8 @@ export default async function PrivacyPolicyPage(props: { params: Promise<{ local
           <p>
             Panguard does not maintain user accounts or store personal information. Anonymized
             telemetry and threat data may be retained indefinitely as it cannot be linked to
-            individual users. If you have voluntarily provided contact information (for example,
-            by emailing our support team), you may request deletion of that data at any time by
+            individual users. If you have voluntarily provided contact information (for example, by
+            emailing our support team), you may request deletion of that data at any time by
             contacting us at privacy@panguard.ai.
           </p>
         </section>

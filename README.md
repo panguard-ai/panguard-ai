@@ -72,12 +72,12 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
   Next time: blocked in < 50ms --> Loop
 ```
 
-| Component                                                          | Role                                                                   | Status |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------------- | ------ |
-| **[Skill Auditor](docs/overview.md)**                              | 6-check security gate before any skill runs                            | GA     |
-| **[Guard](#guard)**                                                | 24/7 runtime monitoring + auto-block                                   | GA     |
-| **[Threat Cloud](#threat-cloud)**                                  | Anonymous community threat intel. 3+ confirmations + LLM review.       | GA     |
-| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 61 rules across 9 categories. | RFC    |
+| Component                                                          | Role                                                             | Status |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------- | ------ |
+| **[Skill Auditor](docs/overview.md)**                              | 6-check security gate before any skill runs                      | GA     |
+| **[Guard](#guard)**                                                | 24/7 runtime monitoring + auto-block                             | GA     |
+| **[Threat Cloud](#threat-cloud)**                                  | Anonymous community threat intel. 3+ confirmations + LLM review. | GA     |
+| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 61 rules across 9 categories.           | RFC    |
 
 One user's encounter with a new attack becomes a rule that protects everyone.
 
@@ -102,7 +102,7 @@ Top findings: SSH key exfiltration, prompt injection with Unicode obfuscation, e
 
 | Layer | Engine                          | Coverage           | Latency | Cost    |
 | ----- | ------------------------------- | ------------------ | ------- | ------- |
-| **1** | **Rules** -- 61 ATR rules      | ~90% known threats | < 50ms  | $0      |
+| **1** | **Rules** -- 61 ATR rules       | ~90% known threats | < 50ms  | $0      |
 | **2** | **Local AI** -- Ollama          | ~7% ambiguous      | ~ 2s    | $0      |
 | **3** | **Cloud AI** -- Claude / OpenAI | ~3% novel          | ~ 5s    | ~$0.008 |
 
@@ -112,9 +112,9 @@ Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet dow
 
 ## Detection Rules
 
-| Rule Type | Count  | Purpose                                                              |
-| --------- | ------ | -------------------------------------------------------------------- |
-| **ATR**   | 61     | AI agent threats: prompt injection, tool poisoning, skill compromise |
+| Rule Type | Count | Purpose                                                              |
+| --------- | ----- | -------------------------------------------------------------------- |
+| **ATR**   | 61    | AI agent threats: prompt injection, tool poisoning, skill compromise |
 
 ATR (Agent Threat Rules) is the only rule format designed to protect AI agents. Traditional security rules (Sigma, YARA) detect network/malware threats but cannot detect AI-specific attacks like prompt injection, tool poisoning, or context exfiltration.
 

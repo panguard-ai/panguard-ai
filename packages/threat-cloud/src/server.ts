@@ -632,7 +632,11 @@ export class ThreatCloudServer {
       if (clientId && existing.client_id === clientId) {
         this.sendJson(res, 200, {
           ok: true,
-          data: { message: 'Already submitted', patternHash, confirmations: existing.confirmations },
+          data: {
+            message: 'Already submitted',
+            patternHash,
+            confirmations: existing.confirmations,
+          },
         });
         return;
       }
@@ -812,8 +816,6 @@ response:
     const ruleList = Array.isArray(rules) ? rules : [];
     this.sendJson(res, 200, { ok: true, data: ruleList, meta: { total: ruleList.length } });
   }
-
-
 
   /** GET /api/feeds/ip-blocklist?minReputation=70 - IP blocklist feed (plain text) */
   private handleGetIPBlocklist(url: string, res: ServerResponse): void {

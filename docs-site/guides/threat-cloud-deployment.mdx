@@ -1,7 +1,7 @@
 ---
-title: "Deploy Threat Cloud"
-description: "Run a self-hosted Threat Cloud server for centralized threat intelligence with full privacy control."
-icon: "cloud"
+title: 'Deploy Threat Cloud'
+description: 'Run a self-hosted Threat Cloud server for centralized threat intelligence with full privacy control.'
+icon: 'cloud'
 ---
 
 Threat Cloud is Panguard's self-hosted threat intelligence platform. It aggregates indicators of compromise (IoCs) from your Guard agents and honeypots, provides feed endpoints for downstream tools, and tracks attacker campaigns -- all while keeping your data entirely under your control.
@@ -33,6 +33,7 @@ Threat Cloud is Panguard's self-hosted threat intelligence platform. It aggregat
     <Info>
       The API key is auto-generated on first start and stored in your Panguard configuration. Use it to authenticate all API requests.
     </Info>
+
   </Step>
 
   <Step title="Understand the architecture">
@@ -48,6 +49,7 @@ Threat Cloud is Panguard's self-hosted threat intelligence platform. It aggregat
     <Note>
       SQLite is the default backend. For high-volume deployments (10+ agents), consider placing the database on an SSD and adjusting WAL mode: `panguard threat start --db-wal`.
     </Note>
+
   </Step>
 
   <Step title="Manage indicators of compromise">
@@ -72,6 +74,7 @@ Threat Cloud is Panguard's self-hosted threat intelligence platform. It aggregat
     </CodeGroup>
 
     IoCs added by Guard agents include full context: the triggering event, honeypot interaction data, and the profiling results.
+
   </Step>
 
   <Step title="Configure feed endpoints">
@@ -101,6 +104,7 @@ Threat Cloud is Panguard's self-hosted threat intelligence platform. It aggregat
       ]
     }
     ```
+
   </Step>
 
   <Step title="Track campaigns">
@@ -122,6 +126,7 @@ Threat Cloud is Panguard's self-hosted threat intelligence platform. It aggregat
       panguard threat campaign view --name "SSH Brute Force Wave"
       ```
     </CodeGroup>
+
   </Step>
 
   <Step title="Privacy and data handling">
@@ -141,6 +146,7 @@ Threat Cloud is Panguard's self-hosted threat intelligence platform. It aggregat
     <Warning>
       If you expose Threat Cloud to the internet, always use HTTPS (reverse proxy) and restrict access by IP or VPN. The API key alone is not sufficient for public-facing deployments.
     </Warning>
+
   </Step>
 </Steps>
 

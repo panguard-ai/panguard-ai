@@ -53,24 +53,16 @@ test.describe('Journey 1: Scanner page (/scan)', () => {
     const bodyText = await getBodyText(page);
 
     // The scanner component should mention scanning or GitHub or skill
-    const hasRelevantContent =
-      /scan|github|skill|audit|url|check/i.test(bodyText);
-    expect(
-      hasRelevantContent,
-      'Scan page should contain scanner-related content'
-    ).toBe(true);
+    const hasRelevantContent = /scan|github|skill|audit|url|check/i.test(bodyText);
+    expect(hasRelevantContent, 'Scan page should contain scanner-related content').toBe(true);
   });
 
-  test('scan page has an input field that accepts a GitHub URL', async ({
-    page,
-  }) => {
+  test('scan page has an input field that accepts a GitHub URL', async ({ page }) => {
     await page.goto('/scan');
     await page.waitForLoadState('networkidle');
 
     // Look for a text input or URL input
-    const input = page
-      .locator('input[type="text"], input[type="url"], input:not([type])')
-      .first();
+    const input = page.locator('input[type="text"], input[type="url"], input:not([type])').first();
     const inputCount = await input.count();
 
     if (inputCount > 0) {
@@ -96,9 +88,7 @@ test.describe('Journey 1: Scanner page (/scan)', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Journey 2: Homepage — free/open-source pricing', () => {
-  test('homepage prominently says free or open-source (English)', async ({
-    page,
-  }) => {
+  test('homepage prominently says free or open-source (English)', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -106,9 +96,7 @@ test.describe('Journey 2: Homepage — free/open-source pricing', () => {
 
     // Must contain free / open-source messaging
     const hasFreeMessage =
-      /100%\s*free|free.*open[\s-]source|open[\s-]source.*free|completely free/i.test(
-        bodyText
-      );
+      /100%\s*free|free.*open[\s-]source|open[\s-]source.*free|completely free/i.test(bodyText);
     expect(hasFreeMessage, 'Homepage must mention free/open-source').toBe(true);
 
     // MIT license should appear
@@ -132,24 +120,19 @@ test.describe('Journey 2: Homepage — free/open-source pricing', () => {
     // These are the paid amounts that must NOT appear in visible text
     const paidAmounts = [/\$9\b/, /\$29\b/, /\$49\b/, /\$99\b/, /\$199\b/];
     for (const pattern of paidAmounts) {
-      expect(
-        bodyText,
-        `Homepage must NOT contain paid amount matching ${pattern}`
-      ).not.toMatch(pattern);
+      expect(bodyText, `Homepage must NOT contain paid amount matching ${pattern}`).not.toMatch(
+        pattern
+      );
     }
   });
 
-  test('homepage has no "Pro plan" or "Enterprise plan" language', async ({
-    page,
-  }) => {
+  test('homepage has no "Pro plan" or "Enterprise plan" language', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
     const bodyText = await getBodyText(page);
     expect(bodyText, 'No Pro plan').not.toMatch(/\bPro\s+plan\b/i);
-    expect(bodyText, 'No Enterprise plan').not.toMatch(
-      /\bEnterprise\s+plan\b/i
-    );
+    expect(bodyText, 'No Enterprise plan').not.toMatch(/\bEnterprise\s+plan\b/i);
     expect(bodyText, 'No Business plan').not.toMatch(/\bBusiness\s+plan\b/i);
   });
 });
@@ -212,31 +195,21 @@ test.describe('Journey 4: Skill Auditor product page — 8 checks', () => {
     await expect(page.locator('main')).toBeVisible();
   });
 
-  test('skill-auditor page body mentions "8" checks (not 6 or 7)', async ({
-    page,
-  }) => {
+  test('skill-auditor page body mentions "8" checks (not 6 or 7)', async ({ page }) => {
     await page.goto('/product/skill-auditor');
     await page.waitForLoadState('networkidle');
 
     const bodyText = await getBodyText(page);
 
     // Must contain "8" in context of checks
-    const has8Checks =
-      /8\s*check|eight\s*check|eight\s*categor|8\s*categor|八道|八種|八項/i.test(
-        bodyText
-      );
-    expect(
-      has8Checks,
-      'Skill Auditor page must mention 8 checks or eight checks'
-    ).toBe(true);
+    const has8Checks = /8\s*check|eight\s*check|eight\s*categor|8\s*categor|八道|八種|八項/i.test(
+      bodyText
+    );
+    expect(has8Checks, 'Skill Auditor page must mention 8 checks or eight checks').toBe(true);
 
     // Must NOT say "6 checks" or "7 checks" as a standalone description
-    expect(bodyText, 'Must NOT say 6 checks').not.toMatch(
-      /\b6\s*check(?:s)?\b/i
-    );
-    expect(bodyText, 'Must NOT say 7 checks').not.toMatch(
-      /\b7\s*check(?:s)?\b/i
-    );
+    expect(bodyText, 'Must NOT say 6 checks').not.toMatch(/\b6\s*check(?:s)?\b/i);
+    expect(bodyText, 'Must NOT say 7 checks').not.toMatch(/\b7\s*check(?:s)?\b/i);
 
     await page.screenshot({
       path: '/tmp/e2e-screenshots/skill-auditor-01-checks.png',
@@ -244,9 +217,7 @@ test.describe('Journey 4: Skill Auditor product page — 8 checks', () => {
     });
   });
 
-  test('skill-auditor page renders exactly 8 check cards in the grid', async ({
-    page,
-  }) => {
+  test('skill-auditor page renders exactly 8 check cards in the grid', async ({ page }) => {
     await page.goto('/product/skill-auditor');
     await page.waitForLoadState('networkidle');
 
@@ -278,9 +249,7 @@ test.describe('Journey 4: Skill Auditor product page — 8 checks', () => {
     ).toBeGreaterThanOrEqual(6);
   });
 
-  test('skill-auditor stats card shows "8" check categories number', async ({
-    page,
-  }) => {
+  test('skill-auditor stats card shows "8" check categories number', async ({ page }) => {
     await page.goto('/product/skill-auditor');
     await page.waitForLoadState('networkidle');
 
@@ -338,17 +307,13 @@ test.describe('Journey 5: Early-access redirect', () => {
 
     // Allow 200 (Next.js server-side redirect) or 30x
     const status = response?.status() ?? 0;
-    expect(
-      [200, 301, 302, 307, 308],
-      `Unexpected status ${status}`
-    ).toContain(status);
+    expect([200, 301, 302, 307, 308], `Unexpected status ${status}`).toContain(status);
 
     // Final URL must be the homepage (possibly with locale prefix)
     const finalPath = new URL(page.url()).pathname;
-    expect(
-      finalPath,
-      `Expected redirect to /, got ${finalPath}`
-    ).toMatch(/^(\/[a-z]{2}(-[A-Z]{2})?)?\/?\s*$/);
+    expect(finalPath, `Expected redirect to /, got ${finalPath}`).toMatch(
+      /^(\/[a-z]{2}(-[A-Z]{2})?)?\/?\s*$/
+    );
 
     await page.screenshot({
       path: '/tmp/e2e-screenshots/early-access-01-redirect.png',
@@ -356,9 +321,7 @@ test.describe('Journey 5: Early-access redirect', () => {
     });
   });
 
-  test('/early-access final page is the homepage (has homepage hero content)', async ({
-    page,
-  }) => {
+  test('/early-access final page is the homepage (has homepage hero content)', async ({ page }) => {
     await page.goto('/early-access');
     await page.waitForLoadState('networkidle');
 
@@ -385,17 +348,12 @@ test.describe('Journey 5: Early-access redirect', () => {
 test.describe('Journey 6: Badge API endpoint', () => {
   const VALID_HASH = 'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4'; // 32 hex chars
 
-  test('badge endpoint returns 200 with SVG content-type for valid hash', async ({
-    page,
-  }) => {
+  test('badge endpoint returns 200 with SVG content-type for valid hash', async ({ page }) => {
     const res = await page.goto(`/api/scan/badge/${VALID_HASH}`);
     expect(res?.status()).toBe(200);
 
     const contentType = res?.headers()['content-type'] ?? '';
-    expect(
-      contentType,
-      'Badge must return image/svg+xml'
-    ).toMatch(/image\/svg\+xml/i);
+    expect(contentType, 'Badge must return image/svg+xml').toMatch(/image\/svg\+xml/i);
   });
 
   test('badge SVG contains ATR label', async ({ page }) => {
@@ -407,9 +365,7 @@ test.describe('Journey 6: Badge API endpoint', () => {
     expect(body, 'Badge SVG must contain "ATR" label').toMatch(/ATR/);
 
     // Must contain one of the known status labels
-    const hasStatusLabel = /Safe|Review|Critical|Not Scanned/i.test(
-      body ?? ''
-    );
+    const hasStatusLabel = /Safe|Review|Critical|Not Scanned/i.test(body ?? '');
     expect(hasStatusLabel, 'Badge must show a status label').toBe(true);
   });
 
@@ -443,10 +399,7 @@ test.describe('Journey 6: Badge API endpoint', () => {
   test('badge endpoint sets Cache-Control header', async ({ page }) => {
     const res = await page.goto(`/api/scan/badge/${VALID_HASH}`);
     const cacheControl = res?.headers()['cache-control'] ?? '';
-    expect(
-      cacheControl,
-      'Badge should have Cache-Control header'
-    ).toMatch(/max-age/i);
+    expect(cacheControl, 'Badge should have Cache-Control header').toMatch(/max-age/i);
   });
 });
 
@@ -455,9 +408,7 @@ test.describe('Journey 6: Badge API endpoint', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('Journey 7: Pricing page — all $0, open source', () => {
-  test('pricing page (if it exists) shows no paid amounts', async ({
-    page,
-  }) => {
+  test('pricing page (if it exists) shows no paid amounts', async ({ page }) => {
     const res = await page.goto('/pricing');
     const finalPath = new URL(page.url()).pathname;
     await page.waitForLoadState('networkidle');
@@ -471,10 +422,7 @@ test.describe('Journey 7: Pricing page — all $0, open source', () => {
       // No paid tier amounts
       const paidAmounts = [/\$9\b/, /\$29\b/, /\$49\b/, /\$99\b/, /\$199\b/];
       for (const pattern of paidAmounts) {
-        expect(
-          bodyText,
-          `Pricing page must NOT contain ${pattern}`
-        ).not.toMatch(pattern);
+        expect(bodyText, `Pricing page must NOT contain ${pattern}`).not.toMatch(pattern);
       }
 
       // Must say $0 or free somewhere
@@ -503,9 +451,7 @@ test.describe('Journey 7: Pricing page — all $0, open source', () => {
       const bodyText = await getBodyText(page);
       const paidAmounts = [/\$9\b/, /\$29\b/, /\$49\b/, /\$99\b/, /\$199\b/];
       for (const pattern of paidAmounts) {
-        expect(bodyText, `zh-TW pricing must not have ${pattern}`).not.toMatch(
-          pattern
-        );
+        expect(bodyText, `zh-TW pricing must not have ${pattern}`).not.toMatch(pattern);
       }
     }
 

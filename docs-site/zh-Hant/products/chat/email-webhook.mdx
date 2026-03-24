@@ -1,7 +1,7 @@
 ---
-title: "Email 與 Webhook"
-description: "設定 SMTP 電子郵件通知和自訂 webhook 整合，支援 mTLS。"
-icon: "envelope"
+title: 'Email 與 Webhook'
+description: '設定 SMTP 電子郵件通知和自訂 webhook 整合，支援 mTLS。'
+icon: 'envelope'
 ---
 
 Email 和 Webhook 管道服務於不同的使用案例：Email 提供符合合規要求的稽核軌跡，而 Webhook 則能與自訂自動化系統整合。
@@ -16,14 +16,14 @@ panguard chat setup --channel email
 
 精靈會詢問：
 
-| 欄位 | 描述 | 範例 |
-|-------|-------------|---------|
-| **SMTP Host** | 郵件伺服器主機名稱 | `smtp.gmail.com` |
-| **SMTP Port** | TLS 使用 587，SSL 使用 465 | `587` |
-| **SMTP Username** | 認證使用者名稱 | `alerts@company.com` |
-| **SMTP Password** | 認證密碼 | （Gmail 使用應用程式密碼） |
-| **From Address** | 寄件者電子郵件地址 | `panguard@company.com` |
-| **To Address** | 收件者電子郵件地址 | `security-team@company.com` |
+| 欄位              | 描述                       | 範例                        |
+| ----------------- | -------------------------- | --------------------------- |
+| **SMTP Host**     | 郵件伺服器主機名稱         | `smtp.gmail.com`            |
+| **SMTP Port**     | TLS 使用 587，SSL 使用 465 | `587`                       |
+| **SMTP Username** | 認證使用者名稱             | `alerts@company.com`        |
+| **SMTP Password** | 認證密碼                   | （Gmail 使用應用程式密碼）  |
+| **From Address**  | 寄件者電子郵件地址         | `panguard@company.com`      |
+| **To Address**    | 收件者電子郵件地址         | `security-team@company.com` |
 
 ### Gmail 設定
 
@@ -72,19 +72,19 @@ panguard chat setup --channel webhook
 
 精靈會詢問：
 
-| 欄位 | 描述 |
-|-------|-------------|
-| **Webhook URL** | 接收 POST 請求的端點 |
+| 欄位               | 描述                       |
+| ------------------ | -------------------------- |
+| **Webhook URL**    | 接收 POST 請求的端點       |
 | **Authentication** | Bearer Token、HMAC 或 mTLS |
-| **Secret/Token** | 認證憑證 |
+| **Secret/Token**   | 認證憑證                   |
 
 ### 認證方法
 
-| 方法 | 標頭 | 使用案例 |
-|--------|--------|----------|
-| **Bearer Token** | `Authorization: Bearer <token>` | 簡單的 API 整合 |
-| **HMAC** | `X-Panguard-Signature: sha256=<hash>` | Webhook 驗證（GitHub 風格） |
-| **mTLS** | 客戶端憑證 | 企業級雙向認證 |
+| 方法             | 標頭                                  | 使用案例                    |
+| ---------------- | ------------------------------------- | --------------------------- |
+| **Bearer Token** | `Authorization: Bearer <token>`       | 簡單的 API 整合             |
+| **HMAC**         | `X-Panguard-Signature: sha256=<hash>` | Webhook 驗證（GitHub 風格） |
+| **mTLS**         | 客戶端憑證                            | 企業級雙向認證              |
 
 ### 載荷格式
 
@@ -116,10 +116,7 @@ Webhook 通知以 JSON POST 請求發送：
 const crypto = require('crypto');
 
 function verifySignature(payload, signature, secret) {
-  const expected = crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex');
+  const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
   return `sha256=${expected}` === signature;
 }
 ```
@@ -138,5 +135,6 @@ panguard chat test --channel webhook
 ```
 
 <Note>
-  Webhook 請求包含 10 秒逾時。如果您的端點未在 10 秒內回應，該通知會被記錄為失敗，並以指數退避重試最多 3 次。
+  Webhook 請求包含 10 秒逾時。如果您的端點未在 10
+  秒內回應，該通知會被記錄為失敗，並以指數退避重試最多 3 次。
 </Note>

@@ -1,7 +1,7 @@
 ---
-title: "通知問題"
-description: "排解 Telegram、Slack、Email、Webhook 通知送不到的問題。"
-icon: "bell"
+title: '通知問題'
+description: '排解 Telegram、Slack、Email、Webhook 通知送不到的問題。'
+icon: 'bell'
 ---
 
 ## 收不到通知
@@ -19,6 +19,7 @@ icon: "bell"
     - 上次成功送達時間
     - 有沒有 pending 的錯誤
     - 目前的最低嚴重性設定
+
   </Accordion>
   <Accordion title="2. 送測試通知">
     ```bash
@@ -30,6 +31,7 @@ icon: "bell"
     ```
 
     測試成功但真正的通知沒到，問題可能出在嚴重性門檻或冷卻時間。
+
   </Accordion>
   <Accordion title="3. 看嚴重性門檻">
     通知只在事件嚴重性達到或超過設定值時才送：
@@ -42,6 +44,7 @@ icon: "bell"
     ```bash
     panguard config set notification.minSeverity medium
     ```
+
   </Accordion>
   <Accordion title="4. 看冷卻時間">
     冷卻機制防止重複通知洗版。短時間內很多類似事件的話，只有第一個會觸發：
@@ -54,6 +57,7 @@ icon: "bell"
     ```bash
     panguard config set notification.cooldownMinutes 5
     ```
+
   </Accordion>
   <Accordion title="5. 重跑頻道設定">
     以上都沒用的話，重跑一次設定：
@@ -65,6 +69,7 @@ icon: "bell"
     ```
 
     會重新驗證憑證跟重新加密 config。
+
   </Accordion>
 </AccordionGroup>
 
@@ -88,6 +93,7 @@ icon: "bell"
        ```bash
        panguard chat setup telegram
        ```
+
   </Accordion>
   <Accordion title="Chat ID 不對">
     ```
@@ -103,6 +109,7 @@ icon: "bell"
        ```bash
        panguard chat setup telegram
        ```
+
   </Accordion>
   <Accordion title="要先傳訊息給 bot">
     Telegram bot 不能主動發起對話。你必須先傳訊息給 bot，它才能傳訊息給你。
@@ -113,6 +120,7 @@ icon: "bell"
        ```bash
        panguard chat test --channel telegram
        ```
+
   </Accordion>
   <Accordion title="群組權限">
     Bot 沒辦法在群組發訊息的話：
@@ -143,6 +151,7 @@ icon: "bell"
        ```bash
        panguard chat setup slack
        ```
+
   </Accordion>
   <Accordion title="找不到頻道">
     ```
@@ -158,6 +167,7 @@ icon: "bell"
       ```bash
       panguard chat setup slack
       ```
+
   </Accordion>
   <Accordion title="App 權限">
     如果用 Slack App（不只是 incoming webhook），確認 app 有這些 scope：
@@ -166,6 +176,7 @@ icon: "bell"
     - `chat:write.public` -- 發到 bot 不在的頻道
 
     改了 scope 之後重新安裝 app 到 workspace。
+
   </Accordion>
 </AccordionGroup>
 
@@ -185,6 +196,7 @@ icon: "bell"
       ```bash
       panguard config set channels.email.smtp.port 465
       ```
+
   </Accordion>
   <Accordion title="SMTP 認證失敗">
     ```
@@ -203,6 +215,7 @@ icon: "bell"
       ```bash
       panguard chat setup email
       ```
+
   </Accordion>
   <Accordion title="Email 進垃圾郵件">
     - 把 `alerts@panguard.ai`（或你設定的 `from` 地址）加到聯絡人
@@ -234,6 +247,7 @@ icon: "bell"
         -H "Content-Type: application/json" \
         -d '{"test": true}'
       ```
+
   </Accordion>
   <Accordion title="SSL 憑證錯誤">
     ```
@@ -247,6 +261,7 @@ icon: "bell"
       ```bash
       export NODE_EXTRA_CA_CERTS=/path/to/ca-cert.pem
       ```
+
   </Accordion>
 </AccordionGroup>
 
@@ -272,12 +287,13 @@ panguard chat setup
 
 支援的語言：
 
-| 代碼 | 語言 |
-|------|------|
-| `en` | English |
+| 代碼    | 語言     |
+| ------- | -------- |
+| `en`    | English  |
 | `zh-TW` | 繁體中文 |
-| `ja` | 日本語 |
+| `ja`    | 日本語   |
 
 <Info>
-通知語言跟 CLI 語言（`PANGUARD_LANG`）是分開的。CLI 語言管終端輸出，通知語言管透過通知頻道送出去的訊息內容。
+  通知語言跟 CLI 語言（`PANGUARD_LANG`）是分開的。CLI
+  語言管終端輸出，通知語言管透過通知頻道送出去的訊息內容。
 </Info>

@@ -8,4 +8,4 @@ startCommand:
     command: npx
     args:
       - -y
-      - "@panguard-ai/panguard-mcp"
+      - '@panguard-ai/panguard-mcp'

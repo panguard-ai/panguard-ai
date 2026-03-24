@@ -1,7 +1,7 @@
 ---
-title: "IoC Endpoints"
-description: "Upload threat intelligence and query Indicators of Compromise (IoCs) from the Threat Cloud."
-icon: "crosshairs"
+title: 'IoC Endpoints'
+description: 'Upload threat intelligence and query Indicators of Compromise (IoCs) from the Threat Cloud.'
+icon: 'crosshairs'
 ---
 
 The IoC (Indicators of Compromise) endpoints allow you to upload threat data from agents and query the collective intelligence database.
@@ -117,7 +117,9 @@ Uploads threat data from an agent or external source. Supports both single and b
 </ResponseExample>
 
 <Info>
-Batch uploads accept up to **100 threats per request**. For larger volumes, split into multiple requests. Duplicate IoCs are automatically merged -- their reputation score, sighting count, and metadata are updated rather than creating duplicates.
+  Batch uploads accept up to **100 threats per request**. For larger volumes, split into multiple
+  requests. Duplicate IoCs are automatically merged -- their reputation score, sighting count, and
+  metadata are updated rather than creating duplicates.
 </Info>
 
 ---
@@ -236,10 +238,9 @@ Searches the IoC database with filters.
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/iocs?type=ip&minReputation=0&maxReputation=30&status=active&limit=10" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET
+  "https://tc.panguard.ai/api/iocs?type=ip&minReputation=0&maxReputation=30&status=active&limit=10"
+  \ -H "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -285,10 +286,8 @@ Looks up a single IoC by its value. Supports IP addresses, domains, hashes, URLs
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/iocs/198.51.100.42" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/iocs/198.51.100.42" \ -H "Authorization:
+  Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <Tabs>
@@ -338,5 +337,6 @@ curl -X GET "https://tc.panguard.ai/api/iocs/198.51.100.42" \
 </Tabs>
 
 <Tip>
-The single lookup endpoint returns enriched data including related IoCs, campaign associations, and geographic metadata. Use this for detailed investigation of specific indicators.
+  The single lookup endpoint returns enriched data including related IoCs, campaign associations,
+  and geographic metadata. Use this for detailed investigation of specific indicators.
 </Tip>

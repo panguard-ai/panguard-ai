@@ -548,7 +548,9 @@ export class ThreatCloudDB {
             findings.push(f.title);
           }
         }
-      } catch { /* skip invalid JSON */ }
+      } catch {
+        /* skip invalid JSON */
+      }
     }
 
     return {
@@ -568,7 +570,9 @@ export class ThreatCloudDB {
   }
 
   /** Get an ATR proposal by pattern_hash, returning client_id and confirmations */
-  getATRProposalByHash(patternHash: string): { client_id: string | null; confirmations: number } | undefined {
+  getATRProposalByHash(
+    patternHash: string
+  ): { client_id: string | null; confirmations: number } | undefined {
     return this.db
       .prepare('SELECT client_id, confirmations FROM atr_proposals WHERE pattern_hash = ? LIMIT 1')
       .get(patternHash) as { client_id: string | null; confirmations: number } | undefined;
@@ -1077,9 +1081,7 @@ export class ThreatCloudDB {
 
     return rows.map((r) => ({
       // HMAC hash client_id — prevents PII reconstruction without server secret
-      contributorHash: createHmac('sha256', hashSecret)
-        .update(r.client_id)
-        .digest('hex'),
+      contributorHash: createHmac('sha256', hashSecret).update(r.client_id).digest('hex'),
       proposalsSubmitted: r.proposal_count,
       proposalsPromoted: r.promoted_count,
       skillThreatsReported: threatMap.get(r.client_id) ?? 0,

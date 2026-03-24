@@ -1,7 +1,7 @@
 ---
-title: "panguard chat"
-description: "設定安全警報的通知頻道，並與 AI 助手互動。"
-icon: "message-bot"
+title: 'panguard chat'
+description: '設定安全警報的通知頻道，並與 AI 助手互動。'
+icon: 'message-bot'
 ---
 
 `chat` 指令管理 Panguard 與您的溝通方式。設定 Telegram、Slack 或 Email 通知用於安全事件、設定警報偏好，並測試訊息是否正確送達。
@@ -14,13 +14,13 @@ panguard chat <subcommand> [options]
 
 ## 子指令
 
-| 子指令 | 說明 |
-| --- | --- |
-| `setup` | 通知頻道的互動式設定精靈 |
-| `test` | 發送測試訊息以驗證頻道連線 |
-| `status` | 顯示已設定的頻道及其健康狀態 |
-| `config` | 檢視或修改 chat 設定 |
-| `prefs` | 設定通知偏好（嚴重性篩選、靜音時段、語言） |
+| 子指令   | 說明                                       |
+| -------- | ------------------------------------------ |
+| `setup`  | 通知頻道的互動式設定精靈                   |
+| `test`   | 發送測試訊息以驗證頻道連線                 |
+| `status` | 顯示已設定的頻道及其健康狀態               |
+| `config` | 檢視或修改 chat 設定                       |
+| `prefs`  | 設定通知偏好（嚴重性篩選、靜音時段、語言） |
 
 ## 選項
 
@@ -62,19 +62,18 @@ panguard chat prefs --lang zh-TW
 ```bash 檢視 chat 設定
 panguard chat config
 ```
+
 </CodeGroup>
 
 ## 通知頻道
 
-| 頻道 | 設定方式 | 送達速度 |
-| --- | --- | --- |
-| Telegram | Bot token + chat ID（引導式精靈） | 即時 |
-| Slack | Webhook URL 或 Slack App 安裝 | 即時 |
-| Email | SMTP 設定或 Panguard 中繼 | 1-5 分鐘 |
+| 頻道     | 設定方式                          | 送達速度 |
+| -------- | --------------------------------- | -------- |
+| Telegram | Bot token + chat ID（引導式精靈） | 即時     |
+| Slack    | Webhook URL 或 Slack App 安裝     | 即時     |
+| Email    | SMTP 設定或 Panguard 中繼         | 1-5 分鐘 |
 
-<Tip>
-  Telegram 是個人開發者的建議頻道。它支援豐富格式、內嵌操作和雙向 AI 對話。
-</Tip>
+<Tip>Telegram 是個人開發者的建議頻道。它支援豐富格式、內嵌操作和雙向 AI 對話。</Tip>
 
 ## 相關資源
 

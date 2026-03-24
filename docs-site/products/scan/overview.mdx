@@ -1,7 +1,7 @@
 ---
-title: "Panguard Scan"
-description: "60-second security health check with 10 scanners, risk scoring, and PDF report generation."
-icon: "magnifying-glass"
+title: 'Panguard Scan'
+description: '60-second security health check with 10 scanners, risk scoring, and PDF report generation.'
+icon: 'magnifying-glass'
 ---
 
 Panguard Scan is a fast, comprehensive security auditing tool that assesses your system's security posture in under 60 seconds. It runs 10 specialized scanners, produces a 0--100 risk score with an A--F letter grade, and optionally generates a professional PDF report.
@@ -24,33 +24,33 @@ panguard scan --lang zh-TW
 
 ## Quick Mode vs Full Mode
 
-| Capability | Quick Mode (`--quick`) | Full Mode (default) |
-|------------|----------------------|---------------------|
-| Duration | ~30 seconds | ~60 seconds |
-| OS detection | Yes | Yes |
-| Network interfaces | Yes | Yes |
-| Open ports | Yes | Yes |
-| Running services | Yes | Yes |
-| Password policy | Yes | Yes |
-| Firewall status | Yes | Yes |
-| Security tool detection | Yes | Yes |
-| SSL certificate validation | -- | Yes |
-| Scheduled task audit | -- | Yes |
-| Shared folder security | -- | Yes |
-| Risk scoring | Yes | Yes |
-| PDF report | With `--output` | With `--output` |
+| Capability                 | Quick Mode (`--quick`) | Full Mode (default) |
+| -------------------------- | ---------------------- | ------------------- |
+| Duration                   | ~30 seconds            | ~60 seconds         |
+| OS detection               | Yes                    | Yes                 |
+| Network interfaces         | Yes                    | Yes                 |
+| Open ports                 | Yes                    | Yes                 |
+| Running services           | Yes                    | Yes                 |
+| Password policy            | Yes                    | Yes                 |
+| Firewall status            | Yes                    | Yes                 |
+| Security tool detection    | Yes                    | Yes                 |
+| SSL certificate validation | --                     | Yes                 |
+| Scheduled task audit       | --                     | Yes                 |
+| Shared folder security     | --                     | Yes                 |
+| Risk scoring               | Yes                    | Yes                 |
+| PDF report                 | With `--output`        | With `--output`     |
 
 ## Severity Levels
 
 Every finding is classified into one of five severity levels:
 
-| Level | Meaning | Action Timeline |
-|-------|---------|-----------------|
-| **CRITICAL** | Immediate compromise risk | Fix immediately |
-| **HIGH** | Significant security risk | Fix within 24 hours |
-| **MEDIUM** | Moderate risk, improvement recommended | Fix within one week |
-| **LOW** | Low risk, best-practice recommendation | Fix when convenient |
-| **INFO** | Informational finding | Acknowledge |
+| Level        | Meaning                                | Action Timeline     |
+| ------------ | -------------------------------------- | ------------------- |
+| **CRITICAL** | Immediate compromise risk              | Fix immediately     |
+| **HIGH**     | Significant security risk              | Fix within 24 hours |
+| **MEDIUM**   | Moderate risk, improvement recommended | Fix within one week |
+| **LOW**      | Low risk, best-practice recommendation | Fix when convenient |
+| **INFO**     | Informational finding                  | Acknowledge         |
 
 ## Product Combinations
 

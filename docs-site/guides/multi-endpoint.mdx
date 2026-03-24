@@ -1,7 +1,7 @@
 ---
-title: "Multi-Endpoint Setup"
-description: "Deploy the Panguard Manager for fleet-wide security orchestration across multiple machines."
-icon: "server"
+title: 'Multi-Endpoint Setup'
+description: 'Deploy the Panguard Manager for fleet-wide security orchestration across multiple machines.'
+icon: 'server'
 ---
 
 # Multi-Endpoint Setup
@@ -43,6 +43,7 @@ In a distributed deployment, multiple Guard agents on different machines report 
     <Warning>
     Store this token securely. Every Guard agent needs it to register with the Manager.
     </Warning>
+
   </Step>
   <Step title="Start the Manager Server">
     ```bash
@@ -54,6 +55,7 @@ In a distributed deployment, multiple Guard agents on different machines report 
     - **Threat Aggregator** -- Correlates threats across agents by source IP, malware hash, and attack pattern
     - **Policy Engine** -- Distributes centralized rules and configuration
     - **SSE Stream** -- Real-time event stream for the admin dashboard
+
   </Step>
   <Step title="Verify the Manager is Running">
     ```bash
@@ -88,6 +90,7 @@ On each endpoint machine:
     2. Send heartbeats every 30 seconds
     3. Report detected threats in real-time
     4. Poll for policy updates every 5 minutes
+
   </Step>
 </Steps>
 
@@ -95,14 +98,14 @@ On each endpoint machine:
 
 ## Agent Lifecycle
 
-| Phase | Endpoint | Interval | Description |
-| --- | --- | --- | --- |
-| **Registration** | `POST /api/agents/register` | Once (startup) | Agent sends hostname, OS, version; receives unique `agentId` |
-| **Heartbeat** | `POST /api/agents/:id/heartbeat` | Every 30s | CPU/memory usage, events processed, mode, uptime |
-| **Threat Report** | `POST /api/agents/:id/events` | Real-time | Detected threats sent immediately |
-| **Policy Poll** | `GET /api/policy/agent/:id` | Every 5 min | Agent checks for updated policies |
-| **Stale Detection** | -- | Every 30s (server) | Agents without heartbeat for 90s are flagged stale |
-| **Deregistration** | `DELETE /api/agents/:id` | Manual | Removes agent from fleet |
+| Phase               | Endpoint                         | Interval           | Description                                                  |
+| ------------------- | -------------------------------- | ------------------ | ------------------------------------------------------------ |
+| **Registration**    | `POST /api/agents/register`      | Once (startup)     | Agent sends hostname, OS, version; receives unique `agentId` |
+| **Heartbeat**       | `POST /api/agents/:id/heartbeat` | Every 30s          | CPU/memory usage, events processed, mode, uptime             |
+| **Threat Report**   | `POST /api/agents/:id/events`    | Real-time          | Detected threats sent immediately                            |
+| **Policy Poll**     | `GET /api/policy/agent/:id`      | Every 5 min        | Agent checks for updated policies                            |
+| **Stale Detection** | --                               | Every 30s (server) | Agents without heartbeat for 90s are flagged stale           |
+| **Deregistration**  | `DELETE /api/agents/:id`         | Manual             | Removes agent from fleet                                     |
 
 ---
 
@@ -115,7 +118,8 @@ The Manager's Threat Aggregator correlates threats across all agents in real-tim
 - **Attack pattern correlation** -- Related MITRE ATT&CK patterns within a 5-minute window
 
 <Info>
-Cross-agent correlation uses a 5-minute sliding window with 24-hour data retention. Threats correlated across 3+ agents are automatically elevated to CRITICAL severity.
+  Cross-agent correlation uses a 5-minute sliding window with 24-hour data retention. Threats
+  correlated across 3+ agents are automatically elevated to CRITICAL severity.
 </Info>
 
 ---
@@ -164,16 +168,16 @@ curl -H "Authorization: Bearer $MANAGER_TOKEN" \
 
 ### Environment Variables
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `MANAGER_PORT` | `8443` | HTTP server port |
-| `MANAGER_AUTH_TOKEN` | (none) | Bearer token for API authentication |
-| `MANAGER_MAX_AGENTS` | `500` | Maximum registered agents |
-| `MANAGER_HEARTBEAT_TIMEOUT_MS` | `90000` | Heartbeat timeout before marking agent stale |
-| `MANAGER_HEARTBEAT_INTERVAL_MS` | `30000` | Interval for stale agent checks |
-| `MANAGER_CORRELATION_WINDOW_MS` | `300000` | Cross-agent threat correlation window (5 min) |
-| `MANAGER_THREAT_RETENTION_MS` | `86400000` | Threat data retention (24 hours) |
-| `CORS_ALLOWED_ORIGINS` | (none) | Comma-separated allowed CORS origins |
+| Variable                        | Default    | Description                                   |
+| ------------------------------- | ---------- | --------------------------------------------- |
+| `MANAGER_PORT`                  | `8443`     | HTTP server port                              |
+| `MANAGER_AUTH_TOKEN`            | (none)     | Bearer token for API authentication           |
+| `MANAGER_MAX_AGENTS`            | `500`      | Maximum registered agents                     |
+| `MANAGER_HEARTBEAT_TIMEOUT_MS`  | `90000`    | Heartbeat timeout before marking agent stale  |
+| `MANAGER_HEARTBEAT_INTERVAL_MS` | `30000`    | Interval for stale agent checks               |
+| `MANAGER_CORRELATION_WINDOW_MS` | `300000`   | Cross-agent threat correlation window (5 min) |
+| `MANAGER_THREAT_RETENTION_MS`   | `86400000` | Threat data retention (24 hours)              |
+| `CORS_ALLOWED_ORIGINS`          | (none)     | Comma-separated allowed CORS origins          |
 
 ### Optional SQLite Persistence
 
@@ -188,7 +192,9 @@ panguard manager --port 8443 --auth-token "$MANAGER_TOKEN" --db /var/panguard-ma
 ## Production Deployment
 
 <Tip>
-For production, install the Manager as a systemd service and place it behind a TLS-terminating reverse proxy. See the [System Service guide](/guides/system-service) and [Docker Deployment guide](/guides/docker-deployment).
+  For production, install the Manager as a systemd service and place it behind a TLS-terminating
+  reverse proxy. See the [System Service guide](/guides/system-service) and [Docker Deployment
+  guide](/guides/docker-deployment).
 </Tip>
 
 ### Security Checklist

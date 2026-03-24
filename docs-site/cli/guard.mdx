@@ -1,7 +1,7 @@
 ---
-title: "panguard guard"
-description: "Manage the real-time endpoint protection agent."
-icon: "shield"
+title: 'panguard guard'
+description: 'Manage the real-time endpoint protection agent.'
+icon: 'shield'
 ---
 
 The `guard` command controls Panguard's real-time protection agent -- a three-layer AI pipeline that monitors your system continuously, detects threats, and responds automatically. Guard runs as a background service and reports events through your configured notification channels.
@@ -14,20 +14,21 @@ panguard guard <subcommand> [options]
 
 ## Subcommands
 
-| Subcommand | Description |
-| --- | --- |
-| `start` | Start the Guard agent |
-| `stop` | Stop the running Guard agent |
-| `status` | Show current Guard status and statistics |
-| `install` | Install Guard as a system service (systemd / launchd) |
-| `uninstall` | Remove the Guard system service |
-| `config` | View or modify Guard configuration |
-| `help` | Show Guard subcommand help |
+| Subcommand  | Description                                           |
+| ----------- | ----------------------------------------------------- |
+| `start`     | Start the Guard agent                                 |
+| `stop`      | Stop the running Guard agent                          |
+| `status`    | Show current Guard status and statistics              |
+| `install`   | Install Guard as a system service (systemd / launchd) |
+| `uninstall` | Remove the Guard system service                       |
+| `config`    | View or modify Guard configuration                    |
+| `help`      | Show Guard subcommand help                            |
 
 ## Options
 
 <ParamField path="--data-dir" type="string">
-  Override the default data directory where Guard stores logs, baselines, and state files. Defaults to `~/.panguard/guard/`.
+  Override the default data directory where Guard stores logs, baselines, and state files. Defaults
+  to `~/.panguard/guard/`.
 </ParamField>
 
 ## Examples
@@ -56,6 +57,7 @@ panguard guard stop
 ```bash View Guard configuration
 panguard guard config
 ```
+
 </CodeGroup>
 
 ## How It Works
@@ -67,7 +69,8 @@ Guard operates through three layers of AI processing:
 3. **Layer 3 -- LLM Judgment** -- Large language model correlates events, judges severity, and generates plain-language alerts
 
 <Tip>
-  After starting Guard, it enters a **learning mode** for the first 24 hours to establish behavioral baselines. During this period, you may see more informational alerts than usual.
+  After starting Guard, it enters a **learning mode** for the first 24 hours to establish behavioral
+  baselines. During this period, you may see more informational alerts than usual.
 </Tip>
 
 ## Related

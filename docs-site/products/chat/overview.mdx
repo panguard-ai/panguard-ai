@@ -1,7 +1,7 @@
 ---
-title: "Panguard Chat"
-description: "AI-powered security notifications via Telegram, Slack, Email, and Webhook with role-based tone adaptation."
-icon: "message-square"
+title: 'Panguard Chat'
+description: 'AI-powered security notifications via Telegram, Slack, Email, and Webhook with role-based tone adaptation.'
+icon: 'message-square'
 ---
 
 Panguard Chat is the notification and communication layer. It delivers security alerts in plain language through your preferred channel, adapting the tone and detail level to your role -- whether you are a boss who wants impact summaries, a developer who wants raw technical data, or an IT admin who wants remediation steps.
@@ -26,7 +26,8 @@ panguard chat status
 
 <CardGroup cols={2}>
   <Card title="Telegram" icon="paper-plane" href="/products/chat/telegram">
-    Bot API integration with Markdown formatting. Best for individual developers and personal servers.
+    Bot API integration with Markdown formatting. Best for individual developers and personal
+    servers.
   </Card>
   <Card title="Slack" icon="hashtag" href="/products/chat/slack">
     Block Kit rich formatting with channel routing. Best for teams and organizations.
@@ -43,24 +44,24 @@ panguard chat status
 
 Chat sends the following notification types, each triggered by different Guard events:
 
-| Type | Trigger | Frequency |
-|------|---------|-----------|
-| **Threat Alert** | Guard detects a threat | Real-time |
-| **Auto-Response Notice** | Guard executes a response action | Real-time |
-| **Confirmation Request** | Confidence 70--90%, needs human approval | Real-time |
-| **Daily Summary** | Scheduled digest | Once daily |
-| **Learning Progress** | During learning mode | Once daily |
-| **Score Change** | Significant security score movement | Real-time |
+| Type                     | Trigger                                  | Frequency  |
+| ------------------------ | ---------------------------------------- | ---------- |
+| **Threat Alert**         | Guard detects a threat                   | Real-time  |
+| **Auto-Response Notice** | Guard executes a response action         | Real-time  |
+| **Confirmation Request** | Confidence 70--90%, needs human approval | Real-time  |
+| **Daily Summary**        | Scheduled digest                         | Once daily |
+| **Learning Progress**    | During learning mode                     | Once daily |
+| **Score Change**         | Significant security score movement      | Real-time  |
 
 ## 3 User Roles
 
 The same security event is presented differently depending on your configured role:
 
-| Role | Target Audience | Focus |
-|------|----------------|-------|
-| `boss` | Non-technical executives | Impact summary, business risk, action status |
-| `developer` | Engineers, DevOps | Raw technical data, IPs, PIDs, rules, timelines |
-| `it_admin` | IT administrators | Step-by-step remediation instructions |
+| Role        | Target Audience          | Focus                                           |
+| ----------- | ------------------------ | ----------------------------------------------- |
+| `boss`      | Non-technical executives | Impact summary, business risk, action status    |
+| `developer` | Engineers, DevOps        | Raw technical data, IPs, PIDs, rules, timelines |
+| `it_admin`  | IT administrators        | Step-by-step remediation instructions           |
 
 See [User Roles](/products/chat/user-roles) for example outputs.
 

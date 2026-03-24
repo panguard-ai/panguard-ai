@@ -1,7 +1,7 @@
 ---
-title: "panguard scan"
-description: "對本機跑安全弱點掃描。"
-icon: "magnifying-glass"
+title: 'panguard scan'
+description: '對本機跑安全弱點掃描。'
+icon: 'magnifying-glass'
 ---
 
 `scan` 會對你的端點做一次完整的安全評估：弱點、錯誤設定、過時的套件、已知威脅通通掃一遍。結果會透過 AI 排序跟評分，讓你先處理最嚴重的問題。
@@ -48,13 +48,14 @@ panguard scan --lang zh-TW --verbose
 ```bash 匯出 PDF 報告
 panguard scan --output ~/Desktop/security-audit.pdf
 ```
+
 </CodeGroup>
 
 ## 掃描模式
 
-| 模式 | 檢查項目 | 時間 |
-| --- | --- | --- |
-| `--quick` | 關鍵弱點、開放 port、root 存取 | 約 30 秒 |
+| 模式         | 檢查項目                                                | 時間     |
+| ------------ | ------------------------------------------------------- | -------- |
+| `--quick`    | 關鍵弱點、開放 port、root 存取                          | 約 30 秒 |
 | 完整（預設） | 全部掃描器，含 CVE、CIS benchmark、惡意軟體特徵碼、網路 | 2-5 分鐘 |
 
 ## 掃什麼

@@ -9,7 +9,16 @@ import { STATS } from '@/lib/stats';
 
 const INSTALL_CMD = 'npx panguard setup';
 
-const PLATFORMS = ['Claude Code', 'Claude Desktop', 'Cursor', 'OpenClaw', 'Codex', 'WorkBuddy', 'NemoClaw', 'ArkClaw'];
+const PLATFORMS = [
+  'Claude Code',
+  'Claude Desktop',
+  'Cursor',
+  'OpenClaw',
+  'Codex',
+  'WorkBuddy',
+  'NemoClaw',
+  'ArkClaw',
+];
 
 export default function GuardCTA() {
   const t = useTranslations('home.guardCta');

@@ -1,26 +1,17 @@
 ---
-title: "快速入門"
-description: "一行指令。Dashboard 自動開。你已經受保護了。"
-icon: "rocket"
+title: '快速入門'
+description: '一行指令。Dashboard 自動開。你已經受保護了。'
+icon: 'rocket'
 ---
 
 ## 一行搞定
 
 <Tabs>
-  <Tab title="macOS / Linux">
-    ```bash
-    curl -fsSL https://get.panguard.ai | bash
-    ```
-  </Tab>
-  <Tab title="Windows">
-    ```powershell
-    irm https://get.panguard.ai/windows | iex
-    ```
-  </Tab>
+  <Tab title="macOS / Linux">```bash curl -fsSL https://get.panguard.ai | bash ```</Tab>
+  <Tab title="Windows">```powershell irm https://get.panguard.ai/windows | iex ```</Tab>
   <Tab title="npm（全平台）">
-    ```bash
-    npm install -g @panguard-ai/panguard && panguard setup && panguard guard start --dashboard
-    ```
+    ```bash npm install -g @panguard-ai/panguard && panguard setup && panguard guard start
+    --dashboard ```
   </Tab>
 </Tabs>
 
@@ -74,7 +65,8 @@ Dashboard:  http://127.0.0.1:9100
 ```
 
 <Info>
-  **學習模式（第 1-7 天）：** Guard 觀察你的正常行為並建立 baseline。這段期間不會誤報。第 7 天之後異常偵測自動啟動。
+  **學習模式（第 1-7 天）：** Guard 觀察你的正常行為並建立 baseline。這段期間不會誤報。第 7
+  天之後異常偵測自動啟動。
 </Info>
 
 ---
@@ -94,14 +86,14 @@ Dashboard:  http://127.0.0.1:9100
 
 ## 常用指令
 
-| 指令 | 功能 |
-| --- | --- |
-| `panguard setup` | 自動偵測並連接 AI 平台 |
-| `panguard audit skill <path>` | 安裝前審計單一 skill |
-| `panguard guard scan` | 掃描所有平台上已安裝的 skill |
+| 指令                               | 功能                              |
+| ---------------------------------- | --------------------------------- |
+| `panguard setup`                   | 自動偵測並連接 AI 平台            |
+| `panguard audit skill <path>`      | 安裝前審計單一 skill              |
+| `panguard guard scan`              | 掃描所有平台上已安裝的 skill      |
 | `panguard guard start --dashboard` | 啟動 24/7 監控 + 瀏覽器 Dashboard |
-| `panguard guard stop` | 停止 Guard |
-| `panguard scan --quick` | 系統安全掃描（port、服務） |
+| `panguard guard stop`              | 停止 Guard                        |
+| `panguard scan --quick`            | 系統安全掃描（port、服務）        |
 
 ---
 

@@ -645,7 +645,9 @@ export class DashboardServer {
 
     try {
       // Dynamic import — module may not be installed in all configurations
-      const mcpConfig: Record<string, unknown> = await import('@panguard-ai/panguard-mcp/config' as string);
+      const mcpConfig: Record<string, unknown> = await import(
+        '@panguard-ai/panguard-mcp/config' as string
+      );
       const discover = mcpConfig['discoverAllSkills'] as
         | (() => Promise<Array<{ name: string; platform: string; command?: string }>>)
         | undefined;

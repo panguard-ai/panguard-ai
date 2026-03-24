@@ -1,7 +1,7 @@
 ---
-title: "Privacy"
-description: "How Panguard Threat Cloud anonymizes data, enforces zero telemetry, and supports full opt-out for air-gapped environments."
-icon: "shield-check"
+title: 'Privacy'
+description: 'How Panguard Threat Cloud anonymizes data, enforces zero telemetry, and supports full opt-out for air-gapped environments.'
+icon: 'shield-check'
 ---
 
 Privacy is a core design principle of Panguard Threat Cloud. All threat data is anonymized before leaving your machine, zero telemetry is collected, and the entire system can operate fully offline with a single configuration flag.
@@ -12,38 +12,38 @@ Privacy is a core design principle of Panguard Threat Cloud. All threat data is 
 
 All IP addresses are /16-anonymized before submission. The last two octets are zeroed:
 
-| Original IP | Anonymized IP |
-|-------------|---------------|
+| Original IP    | Anonymized IP |
+| -------------- | ------------- |
 | `192.168.1.50` | `192.168.0.0` |
-| `10.0.42.100` | `10.0.0.0` |
-| `203.0.113.50` | `203.0.0.0` |
+| `10.0.42.100`  | `10.0.0.0`    |
+| `203.0.113.50` | `203.0.0.0`   |
 
 This preserves network-level information needed for threat intelligence while making it impossible to identify specific hosts.
 
 ### What Is Shared
 
-| Data | Shared | Anonymization |
-|------|--------|---------------|
-| Attacker source IP | Yes | /16 masked (last two octets zeroed) |
-| Attack type and technique | Yes | Already generic, no anonymization needed |
-| MITRE ATT&CK IDs | Yes | Public taxonomy, no anonymization needed |
-| Confidence score | Yes | No anonymization needed |
-| File hashes (malware) | Yes | Hash only, no file content |
-| Timestamps | Yes | Rounded to nearest hour |
-| Tags and classification | Yes | Already generic |
+| Data                      | Shared | Anonymization                            |
+| ------------------------- | ------ | ---------------------------------------- |
+| Attacker source IP        | Yes    | /16 masked (last two octets zeroed)      |
+| Attack type and technique | Yes    | Already generic, no anonymization needed |
+| MITRE ATT&CK IDs          | Yes    | Public taxonomy, no anonymization needed |
+| Confidence score          | Yes    | No anonymization needed                  |
+| File hashes (malware)     | Yes    | Hash only, no file content               |
+| Timestamps                | Yes    | Rounded to nearest hour                  |
+| Tags and classification   | Yes    | Already generic                          |
 
 ### What Is Never Shared
 
-| Data | Status |
-|------|--------|
-| Your machine's IP address | **Never transmitted** |
-| Hostnames or machine IDs | **Never transmitted** |
-| Internal IP addresses | **Never transmitted** |
-| File contents | **Never transmitted** |
-| Log entries or raw events | **Never transmitted** |
-| User credentials | **Never transmitted** |
-| Configuration details | **Never transmitted** |
-| Scan results | **Never transmitted** |
+| Data                       | Status                |
+| -------------------------- | --------------------- |
+| Your machine's IP address  | **Never transmitted** |
+| Hostnames or machine IDs   | **Never transmitted** |
+| Internal IP addresses      | **Never transmitted** |
+| File contents              | **Never transmitted** |
+| Log entries or raw events  | **Never transmitted** |
+| User credentials           | **Never transmitted** |
+| Configuration details      | **Never transmitted** |
+| Scan results               | **Never transmitted** |
 | Usernames or account names | **Never transmitted** |
 
 ## Zero Telemetry
@@ -60,11 +60,11 @@ Panguard collects zero telemetry about your usage:
 
 ## Data Retention
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| IoC retention | 90 days | Indicators older than 90 days are automatically purged |
-| Submission logs | Local only | Kept on your machine, never uploaded |
-| Feed cache | Refreshed every hour | Local cache of external feed data |
+| Setting         | Default              | Description                                            |
+| --------------- | -------------------- | ------------------------------------------------------ |
+| IoC retention   | 90 days              | Indicators older than 90 days are automatically purged |
+| Submission logs | Local only           | Kept on your machine, never uploaded                   |
+| Feed cache      | Refreshed every hour | Local cache of external feed data                      |
 
 ## Opt-Out (Offline Mode)
 
@@ -80,6 +80,7 @@ export PANGUARD_THREAT_CLOUD=disabled
 ```
 
 When disabled:
+
 - No data is submitted to any Threat Cloud instance (public or private)
 - Guard continues to function with local detection only (ATR rules, baseline)
 - Threat intelligence lookups use only the last-synced local feed cache
@@ -87,7 +88,9 @@ When disabled:
 - All other features remain fully operational
 
 <Info>
-  Offline mode reduces detection capability since you lose access to collective threat intelligence. Consider running a private Threat Cloud instance within your network as a middle ground between full sharing and complete isolation.
+  Offline mode reduces detection capability since you lose access to collective threat intelligence.
+  Consider running a private Threat Cloud instance within your network as a middle ground between
+  full sharing and complete isolation.
 </Info>
 
 ## Audit Logging
@@ -101,12 +104,12 @@ cat ~/.panguard/threat-cloud/submissions.log
 
 Each log entry records:
 
-| Field | Description |
-|-------|-------------|
-| `timestamp` | When the submission was made |
-| `data` | The exact anonymized data that was sent |
-| `endpoint` | Threat Cloud URL that received the data |
-| `status` | HTTP response status |
+| Field       | Description                             |
+| ----------- | --------------------------------------- |
+| `timestamp` | When the submission was made            |
+| `data`      | The exact anonymized data that was sent |
+| `endpoint`  | Threat Cloud URL that received the data |
+| `status`    | HTTP response status                    |
 
 This allows you to verify exactly what data left your machine at any point in time.
 
@@ -123,6 +126,7 @@ panguard guard start --threat-cloud http://your-private-server:8080
 ```
 
 With a self-hosted instance:
+
 - All threat data stays within your network
 - You control retention, access, and deletion policies
 - You still benefit from external feed synchronization (ThreatFox, URLhaus, etc.)
@@ -133,14 +137,16 @@ With a self-hosted instance:
 
 Panguard Threat Cloud is designed with GDPR principles:
 
-| Principle | Implementation |
-|-----------|---------------|
-| **Data minimization** | Only the minimum data needed for threat correlation is collected |
-| **Purpose limitation** | Data is used exclusively for threat intelligence |
-| **Storage limitation** | Configurable retention periods (default: 90 days) with automatic purge |
-| **Right to erasure** | Self-hosted instances have full control over data deletion |
+| Principle                     | Implementation                                                           |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| **Data minimization**         | Only the minimum data needed for threat correlation is collected         |
+| **Purpose limitation**        | Data is used exclusively for threat intelligence                         |
+| **Storage limitation**        | Configurable retention periods (default: 90 days) with automatic purge   |
+| **Right to erasure**          | Self-hosted instances have full control over data deletion               |
 | **Data protection by design** | Anonymization is applied at the source, before any data leaves the agent |
 
 <Tip>
-  For organizations with strict data sovereignty requirements, combine a self-hosted Threat Cloud with disabled public sharing. This gives you collective intelligence within your organization without any data leaving your network.
+  For organizations with strict data sovereignty requirements, combine a self-hosted Threat Cloud
+  with disabled public sharing. This gives you collective intelligence within your organization
+  without any data leaving your network.
 </Tip>

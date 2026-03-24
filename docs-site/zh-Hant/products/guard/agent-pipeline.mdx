@@ -1,7 +1,7 @@
 ---
-title: "Agent Pipeline（DARE）"
-description: "4-agent Detect-Analyze-Respond-Report pipeline 的完整拆解。"
-icon: "arrow-right-arrow-left"
+title: 'Agent Pipeline（DARE）'
+description: '4-agent Detect-Analyze-Respond-Report pipeline 的完整拆解。'
+icon: 'arrow-right-arrow-left'
 ---
 
 Guard 引擎把每個安全事件送進一條線性的 4-agent 鏈，叫做 DARE pipeline：**Detect**、**Analyze**、**Respond**、**Report**。每個 agent 只做一件事，產出有型別的輸出給下一個 agent 吃。
@@ -32,9 +32,9 @@ SecurityEvent
 
 **原始碼**：`packages/panguard-guard/src/agent/detect-agent.ts`
 
-| 欄位 | 值 |
-|------|-----|
-| **輸入** | `SecurityEvent` |
+| 欄位     | 值                          |
+| -------- | --------------------------- |
+| **輸入** | `SecurityEvent`             |
 | **輸出** | `DetectionResult` 或 `null` |
 
 ### 做什麼
@@ -46,10 +46,10 @@ SecurityEvent
 
 ### 內部狀態
 
-| Buffer | 容量 | 時間窗口 |
-|--------|------|----------|
-| 關聯 buffer | 1,000 事件 | 5 分鐘 |
-| Dedup map | 500 筆 | 60 秒 |
+| Buffer      | 容量       | 時間窗口 |
+| ----------- | ---------- | -------- |
+| 關聯 buffer | 1,000 事件 | 5 分鐘   |
+| Dedup map   | 500 筆     | 60 秒    |
 
 ---
 
@@ -57,32 +57,32 @@ SecurityEvent
 
 **原始碼**：`packages/panguard-guard/src/agent/analyze-agent.ts`
 
-| 欄位 | 值 |
-|------|-----|
-| **輸入** | `DetectionResult` + `EnvironmentBaseline` |
+| 欄位     | 值                                                       |
+| -------- | -------------------------------------------------------- |
+| **輸入** | `DetectionResult` + `EnvironmentBaseline`                |
 | **輸出** | `ThreatVerdict`（結論：benign / suspicious / malicious） |
 
 ### 證據來源與權重
 
 AnalyzeAgent 從多個來源蒐證，算出加權信心分數（0--100）：
 
-| 來源 | 權重 | 備註 |
-|------|------|------|
-| ATR 規則命中 | 0.40 | 會被 feedback loop 調整 |
-| 威脅情報 | -- | 命中時固定信心 85 |
-| Baseline 偏差 | 0.30 | 有時段感知（00:00--05:59 加成） |
-| eBPF/DPI 證據 | 0.20--0.25 | kernel 層 monitor 啟用時才有 |
-| 攻擊鏈關聯 | +5/事件 | 最高 +25 |
-| AI 分析 | 0.30 | AI provider 可用時 |
+| 來源          | 權重       | 備註                            |
+| ------------- | ---------- | ------------------------------- |
+| ATR 規則命中  | 0.40       | 會被 feedback loop 調整         |
+| 威脅情報      | --         | 命中時固定信心 85               |
+| Baseline 偏差 | 0.30       | 有時段感知（00:00--05:59 加成） |
+| eBPF/DPI 證據 | 0.20--0.25 | kernel 層 monitor 啟用時才有    |
+| 攻擊鏈關聯    | +5/事件    | 最高 +25                        |
+| AI 分析       | 0.30       | AI provider 可用時              |
 
 權重會根據可用來源自動調配：
 
-| 可用來源 | 規則/情報 | Baseline | AI | eBPF |
-|----------|-----------|----------|----|------|
-| 只有規則 | 0.60 | 0.40 | -- | -- |
-| 規則 + AI | 0.40 | 0.30 | 0.30 | -- |
-| 規則 + eBPF | 0.40 | 0.35 | -- | 0.25 |
-| 規則 + AI + eBPF | 0.30 | 0.20 | 0.30 | 0.20 |
+| 可用來源         | 規則/情報 | Baseline | AI   | eBPF |
+| ---------------- | --------- | -------- | ---- | ---- |
+| 只有規則         | 0.60      | 0.40     | --   | --   |
+| 規則 + AI        | 0.40      | 0.30     | 0.30 | --   |
+| 規則 + eBPF      | 0.40      | 0.35     | --   | 0.25 |
+| 規則 + AI + eBPF | 0.30      | 0.20     | 0.30 | 0.20 |
 
 ### Feedback Loop
 
@@ -101,29 +101,29 @@ AnalyzeAgent 維護每條規則的 feedback 紀錄：
 
 **原始碼**：`packages/panguard-guard/src/agent/respond-agent.ts`
 
-| 欄位 | 值 |
-|------|-----|
-| **輸入** | `ThreatVerdict` |
+| 欄位     | 值               |
+| -------- | ---------------- |
+| **輸入** | `ThreatVerdict`  |
 | **輸出** | `ResponseResult` |
 
 ### 信心分數對應的動作
 
-| 信心值 | 做什麼 |
-|--------|--------|
-| >= 90% | 自動執行，事後通知 |
+| 信心值  | 做什麼                           |
+| ------- | -------------------------------- |
+| >= 90%  | 自動執行，事後通知               |
 | 70--90% | 發確認請求到通知頻道，等人工核准 |
-| < 70% | 只通知，不動作 |
+| < 70%   | 只通知，不動作                   |
 
 ### 可用動作
 
-| 動作 | 說明 | 平台 |
-|------|------|------|
-| `block_ip` | 在防火牆層封鎖來源 IP | macOS (pfctl)、Linux (iptables)、Windows (netsh) |
-| `kill_process` | 砍掉惡意 process | 全平台（先 SIGTERM，5 秒後 SIGKILL） |
-| `isolate_file` | 隔離可疑檔案 | 全平台 |
-| `disable_account` | 鎖定帳戶 | 全平台 |
-| `notify` | 發警報到通知頻道 | 全平台 |
-| `log_only` | 只記 log 不動作 | 全平台 |
+| 動作              | 說明                  | 平台                                             |
+| ----------------- | --------------------- | ------------------------------------------------ |
+| `block_ip`        | 在防火牆層封鎖來源 IP | macOS (pfctl)、Linux (iptables)、Windows (netsh) |
+| `kill_process`    | 砍掉惡意 process      | 全平台（先 SIGTERM，5 秒後 SIGKILL）             |
+| `isolate_file`    | 隔離可疑檔案          | 全平台                                           |
+| `disable_account` | 鎖定帳戶              | 全平台                                           |
+| `notify`          | 發警報到通知頻道      | 全平台                                           |
+| `log_only`        | 只記 log 不動作       | 全平台                                           |
 
 安全規則和 escalation 細節請看[自動回應](/products/guard/auto-response)。
 
@@ -133,10 +133,10 @@ AnalyzeAgent 維護每條規則的 feedback 紀錄：
 
 **原始碼**：`packages/panguard-guard/src/agent/report-agent.ts`
 
-| 欄位 | 值 |
-|------|-----|
+| 欄位     | 值                                                                           |
+| -------- | ---------------------------------------------------------------------------- |
 | **輸入** | `SecurityEvent` + `ThreatVerdict` + `ResponseResult` + `EnvironmentBaseline` |
-| **輸出** | 更新的 baseline + 匿名化威脅資料（選擇性） |
+| **輸出** | 更新的 baseline + 匿名化威脅資料（選擇性）                                   |
 
 ### 做什麼
 

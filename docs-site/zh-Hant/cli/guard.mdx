@@ -1,7 +1,7 @@
 ---
-title: "panguard guard"
-description: "管理即時端點防護 daemon。"
-icon: "shield"
+title: 'panguard guard'
+description: '管理即時端點防護 daemon。'
+icon: 'shield'
 ---
 
 `guard` 控制 Panguard 的即時防護 daemon -- 一條三層 AI 管線，持續監控你的系統、偵測威脅、自動處理。Guard 跑在背景，透過你設定的通知頻道回報事件。
@@ -14,15 +14,15 @@ panguard guard <subcommand> [options]
 
 ## 子指令
 
-| 子指令 | 說明 |
-| --- | --- |
-| `start` | 啟動 Guard daemon |
-| `stop` | 停止 Guard daemon |
-| `status` | 顯示 Guard 目前狀態跟統計資訊 |
-| `install` | 把 Guard 裝成系統服務（systemd / launchd） |
-| `uninstall` | 移除 Guard 系統服務 |
-| `config` | 查看或修改 Guard config |
-| `help` | 顯示 Guard 子指令說明 |
+| 子指令      | 說明                                       |
+| ----------- | ------------------------------------------ |
+| `start`     | 啟動 Guard daemon                          |
+| `stop`      | 停止 Guard daemon                          |
+| `status`    | 顯示 Guard 目前狀態跟統計資訊              |
+| `install`   | 把 Guard 裝成系統服務（systemd / launchd） |
+| `uninstall` | 移除 Guard 系統服務                        |
+| `config`    | 查看或修改 Guard config                    |
+| `help`      | 顯示 Guard 子指令說明                      |
 
 ## 選項
 
@@ -56,6 +56,7 @@ panguard guard stop
 ```bash 看 Guard config
 panguard guard config
 ```
+
 </CodeGroup>
 
 ## 運作原理
@@ -67,7 +68,8 @@ Guard 透過三層 AI 處理：
 3. **第三層 -- LLM 判斷** -- 大型語言模型做事件關聯、嚴重性判斷，產生白話警示
 
 <Tip>
-  啟動 Guard 後，前 24 小時會進入**學習模式**建立行為 baseline。這段期間你可能會看到比較多資訊性的警示，這是正常的。
+  啟動 Guard 後，前 24 小時會進入**學習模式**建立行為
+  baseline。這段期間你可能會看到比較多資訊性的警示，這是正常的。
 </Tip>
 
 ## 相關

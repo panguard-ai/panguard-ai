@@ -105,8 +105,8 @@ export default function EcosystemReportContent() {
           <p className="text-text-secondary mt-4 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
             The first large-scale security audit of the MCP skill ecosystem.{' '}
             {eco.skillsScanned.toLocaleString()} packages analyzed.{' '}
-            {eco.toolsExtracted.toLocaleString()} tool definitions extracted.{' '}
-            {flaggedPercent}% flagged.
+            {eco.toolsExtracted.toLocaleString()} tool definitions extracted. {flaggedPercent}%
+            flagged.
           </p>
           <p className="text-text-muted text-xs mt-4">
             Published March 2026 | Methodology: {STATS.atrRules} ATR rules + secret detection +
@@ -149,7 +149,8 @@ export default function EcosystemReportContent() {
                 registries.
               </p>
               <p>
-                AI agents like Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, and ArkClaw use MCP skills with
+                AI agents like Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, and
+                ArkClaw use MCP skills with
                 <strong className="text-text-primary"> full system access</strong> — they can read
                 files, execute commands, access environment variables, and make network requests.
                 Unlike mobile apps, there is no review process before a skill runs on your machine.
@@ -264,7 +265,9 @@ export default function EcosystemReportContent() {
                 <p className="text-xs text-text-muted mt-1">Postinstall scripts</p>
               </div>
               <div className="bg-surface-1 border border-border rounded-lg px-4 py-3 text-center">
-                <p className="text-xl font-extrabold text-text-primary">{eco.atrRuleMatches.toLocaleString()}</p>
+                <p className="text-xl font-extrabold text-text-primary">
+                  {eco.atrRuleMatches.toLocaleString()}
+                </p>
                 <p className="text-xs text-text-muted mt-1">Total ATR rule matches</p>
               </div>
             </div>

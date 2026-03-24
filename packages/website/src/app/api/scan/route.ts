@@ -4,11 +4,7 @@ import {
   compileRules,
   contentHash as computeContentHash,
 } from '@panguard-ai/scan-core';
-import type {
-  ATRRuleCompiled,
-  CompiledRule,
-  ScanResult,
-} from '@panguard-ai/scan-core';
+import type { ATRRuleCompiled, CompiledRule, ScanResult } from '@panguard-ai/scan-core';
 import atrRulesData from '@/lib/atr-rules-compiled.json';
 
 /**
@@ -112,7 +108,11 @@ let tcWhitelistFetchedAt = 0;
 const TC_WHITELIST_TTL_MS = 5 * 60 * 1000;
 
 function normalizeSkillName(name: string): string {
-  return name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9\-\/\.@]/g, '');
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\-\/\.@]/g, '');
 }
 
 async function fetchTCWhitelist(): Promise<void> {
@@ -124,7 +124,8 @@ async function fetchTCWhitelist(): Promise<void> {
     const data = await res.json();
     const skills = Array.isArray(data) ? data : (data?.data ?? []);
     tcWhitelist = new Set(
-      skills.map((s: { name?: string }) => normalizeSkillName(s.name ?? ''))
+      skills
+        .map((s: { name?: string }) => normalizeSkillName(s.name ?? ''))
         .filter((n: string) => n.length > 0)
     );
     tcWhitelistFetchedAt = Date.now();
@@ -139,8 +140,7 @@ async function checkTCWhitelist(skillName: string, repoSlug: string): Promise<bo
   }
   if (tcWhitelist.size === 0) return false;
   return (
-    tcWhitelist.has(normalizeSkillName(skillName)) ||
-    tcWhitelist.has(normalizeSkillName(repoSlug))
+    tcWhitelist.has(normalizeSkillName(skillName)) || tcWhitelist.has(normalizeSkillName(repoSlug))
   );
 }
 
@@ -197,7 +197,10 @@ function parseGitHubUrl(
 }
 
 async function fetchGitHubFile(
-  owner: string, repo: string, branch: string, filePath: string
+  owner: string,
+  repo: string,
+  branch: string,
+  filePath: string
 ): Promise<string | null> {
   const url = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filePath}`;
   try {
@@ -210,7 +213,10 @@ async function fetchGitHubFile(
 }
 
 async function fetchSkillContent(
-  owner: string, repo: string, branch: string, basePath: string
+  owner: string,
+  repo: string,
+  branch: string,
+  basePath: string
 ): Promise<{ content: string; source: string } | null> {
   const candidates = basePath
     ? [`${basePath}/SKILL.md`, `${basePath}/skill.md`, 'SKILL.md']
@@ -248,7 +254,10 @@ async function submitToThreatCloud(
         riskScore,
         riskLevel,
         findingSummaries: findings.slice(0, 10).map((f) => ({
-          id: f.id, category: f.category, severity: f.severity, title: f.title,
+          id: f.id,
+          category: f.category,
+          severity: f.severity,
+          title: f.title,
         })),
       }),
       signal: AbortSignal.timeout(5_000),
@@ -276,7 +285,10 @@ async function submitATRProposal(
 
     const conditions = highFindings
       .map((f, idx) => {
-        const keywords = f.title.split(/\s+/).filter((w) => w.length > 4).slice(0, 4);
+        const keywords = f.title
+          .split(/\s+/)
+          .filter((w) => w.length > 4)
+          .slice(0, 4);
         if (keywords.length === 0) return null;
         const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
         return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${f.title.slice(0, 80)}"`;
@@ -317,7 +329,10 @@ response:
         llmProvider: 'web-scanner',
         llmModel: 'pattern-extraction',
         selfReviewVerdict: JSON.stringify({
-          approved: true, source: 'web-scanner', skillName, riskLevel,
+          approved: true,
+          source: 'web-scanner',
+          skillName,
+          riskLevel,
           findingCount: highFindings.length,
         }),
       }),
@@ -420,7 +435,14 @@ export async function POST(request: Request) {
     scanCache.set(cHash, { report: safeReport, scannedAt });
     return NextResponse.json({
       ok: true,
-      data: { report: safeReport, cached: false, contentHash: cHash, source: `${owner}/${repo}/${skill.source}`, scannedAt, whitelisted: true },
+      data: {
+        report: safeReport,
+        cached: false,
+        contentHash: cHash,
+        source: `${owner}/${repo}/${skill.source}`,
+        scannedAt,
+        whitelisted: true,
+      },
     });
   }
 
@@ -447,12 +469,26 @@ export async function POST(request: Request) {
 
   // Submit to Threat Cloud (non-blocking)
   if (result.riskScore > 0) {
-    void submitToThreatCloud(report.skillName ?? cHash, cHash, result.riskScore, result.riskLevel, result.findings);
+    void submitToThreatCloud(
+      report.skillName ?? cHash,
+      cHash,
+      result.riskScore,
+      result.riskLevel,
+      result.findings
+    );
   }
 
   // Flywheel: submit ATR proposal for HIGH/CRITICAL findings
-  if ((result.riskLevel === 'HIGH' || result.riskLevel === 'CRITICAL') && result.findings.length > 0) {
-    void submitATRProposal(report.skillName ?? cHash, result.riskLevel, result.findings, result.patternHash);
+  if (
+    (result.riskLevel === 'HIGH' || result.riskLevel === 'CRITICAL') &&
+    result.findings.length > 0
+  ) {
+    void submitATRProposal(
+      report.skillName ?? cHash,
+      result.riskLevel,
+      result.findings,
+      result.patternHash
+    );
   }
 
   return NextResponse.json({

@@ -20,14 +20,14 @@
 
 ## Prerequisites
 
-| Requirement    | Version                | Notes                                       |
-| -------------- | ---------------------- | ------------------------------------------- |
-| Node.js        | >= 20 (22 recommended) | Required for all deployments                |
-| pnpm           | >= 9.0.0               | Package manager for monorepo                |
-| Docker         | >= 24.0                | For containerized deployments               |
-| Docker Compose | >= 2.20                | For multi-container setups                  |
-| Linux          | Kernel 4.18+           | Required for eBPF, rootkit detection        |
-| Ollama         | >= 0.1.0               | Optional: local AI analysis                 |
+| Requirement    | Version                | Notes                                |
+| -------------- | ---------------------- | ------------------------------------ |
+| Node.js        | >= 20 (22 recommended) | Required for all deployments         |
+| pnpm           | >= 9.0.0               | Package manager for monorepo         |
+| Docker         | >= 24.0                | For containerized deployments        |
+| Docker Compose | >= 2.20                | For multi-container setups           |
+| Linux          | Kernel 4.18+           | Required for eBPF, rootkit detection |
+| Ollama         | >= 0.1.0               | Optional: local AI analysis          |
 
 ### OS Support
 
@@ -618,14 +618,14 @@ sudo journalctl -u panguard-manager -f
 
 ### Log Locations
 
-| Component            | Path                              | Format                               |
-| -------------------- | --------------------------------- | ------------------------------------ |
-| Guard events         | `{dataDir}/events.jsonl`          | JSONL (one JSON record per line)     |
-| Guard actions        | `{dataDir}/action-manifest.jsonl` | JSONL action history                 |
-| Guard baseline       | `{dataDir}/baseline.json`         | JSON baseline state                  |
-| Guard PID file       | `{dataDir}/panguard-guard.pid`    | Plain text PID                       |
-| Application logs     | stdout/stderr (or syslog)         | Structured JSON (via `createLogger`) |
-| Custom rules         | `{dataDir}/rules/`                | `.yml` rule YAML files               |
+| Component        | Path                              | Format                               |
+| ---------------- | --------------------------------- | ------------------------------------ |
+| Guard events     | `{dataDir}/events.jsonl`          | JSONL (one JSON record per line)     |
+| Guard actions    | `{dataDir}/action-manifest.jsonl` | JSONL action history                 |
+| Guard baseline   | `{dataDir}/baseline.json`         | JSON baseline state                  |
+| Guard PID file   | `{dataDir}/panguard-guard.pid`    | Plain text PID                       |
+| Application logs | stdout/stderr (or syslog)         | Structured JSON (via `createLogger`) |
+| Custom rules     | `{dataDir}/rules/`                | `.yml` rule YAML files               |
 
 Default `dataDir` values:
 

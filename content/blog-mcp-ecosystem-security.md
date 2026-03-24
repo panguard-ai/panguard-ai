@@ -71,14 +71,14 @@ Then we scanned the entire MCP ecosystem on npm.
 
 ## The Results
 
-| Risk Level   | Packages | Percent  | What It Means                                                      |
-| ------------ | -------- | -------- | ------------------------------------------------------------------ |
+| Risk Level   | Packages | Percent   | What It Means                                                                                        |
+| ------------ | -------- | --------- | ---------------------------------------------------------------------------------------------------- |
 | **CRITICAL** | **402**  | **16.8%** | Multiple high-risk signals: ATR rule matches, dangerous tool combinations, or supply chain red flags |
-| **HIGH**     | **240**  | **10.1%** | Concerning signals: excessive permissions, credential access + network, or ATR matches |
-| **MEDIUM**   | **299**  | **12.5%** | Moderate signals: filesystem write + network, or single ATR match  |
-| **LOW**      | **226**  | **9.5%** | Minor signals: outbound URLs only, minor permission concerns       |
-| CLEAN        | 1,216    | 51.0%    | No significant findings                                            |
-| ERROR        | 3        | 0.1%     | Could not be analyzed                                              |
+| **HIGH**     | **240**  | **10.1%** | Concerning signals: excessive permissions, credential access + network, or ATR matches               |
+| **MEDIUM**   | **299**  | **12.5%** | Moderate signals: filesystem write + network, or single ATR match                                    |
+| **LOW**      | **226**  | **9.5%**  | Minor signals: outbound URLs only, minor permission concerns                                         |
+| CLEAN        | 1,216    | 51.0%     | No significant findings                                                                              |
+| ERROR        | 3        | 0.1%      | Could not be analyzed                                                                                |
 
 The good news: **51% of packages are clean.** The majority of the MCP community is building legitimate tools.
 
@@ -108,18 +108,18 @@ executes it (shell) → game over
 
 Our 61 ATR rules triggered **3,361 times** across the scanned packages:
 
-| ATR Rule | What It Detects | Packages |
-|----------|----------------|----------|
+| ATR Rule     | What It Detects                                                                | Packages          |
+| ------------ | ------------------------------------------------------------------------------ | ----------------- |
 | ATR-2026-099 | High-risk tool invocation without human confirmation (delete, deploy, execute) | **1,515** (63.5%) |
-| ATR-2026-061 | Tool description doesn't match actual behavior | **728** (30.5%) |
-| ATR-2026-063 | Multi-skill chain attack potential (tool A feeds tool B) | **356** (14.9%) |
-| ATR-2026-040 | Privilege escalation and admin function access | **300** (12.6%) |
-| ATR-2026-012 | Unauthorized tool call patterns | **231** (9.7%) |
-| ATR-2026-066 | Parameter injection via tool arguments | **138** (5.8%) |
-| ATR-2026-051 | Resource exhaustion potential | **56** (2.3%) |
-| ATR-2026-060 | Skill impersonation / typosquatting | **15** |
-| ATR-2026-030 | Cross-agent attack | **9** |
-| ATR-2026-032 | Goal hijacking | **3** |
+| ATR-2026-061 | Tool description doesn't match actual behavior                                 | **728** (30.5%)   |
+| ATR-2026-063 | Multi-skill chain attack potential (tool A feeds tool B)                       | **356** (14.9%)   |
+| ATR-2026-040 | Privilege escalation and admin function access                                 | **300** (12.6%)   |
+| ATR-2026-012 | Unauthorized tool call patterns                                                | **231** (9.7%)    |
+| ATR-2026-066 | Parameter injection via tool arguments                                         | **138** (5.8%)    |
+| ATR-2026-051 | Resource exhaustion potential                                                  | **56** (2.3%)     |
+| ATR-2026-060 | Skill impersonation / typosquatting                                            | **15**            |
+| ATR-2026-030 | Cross-agent attack                                                             | **9**             |
+| ATR-2026-032 | Goal hijacking                                                                 | **3**             |
 
 The most common issue: **63.5% of packages expose destructive operations (delete, deploy, execute) without requiring human confirmation.** This means a single prompt injection can trigger irreversible actions.
 
@@ -183,14 +183,14 @@ A "markdown formatter" requested filesystem write, network access, and shell exe
 
 ## Supply Chain Signals
 
-| Signal | Count | What It Means |
-|--------|-------|---------------|
-| Postinstall scripts | **122** (5.1%) | Code auto-executes before you review it |
-| Typosquat risk | **4** | Package name similar to popular package |
-| Shell execution | **725** (30.4%) | Can run arbitrary commands |
-| Network requests | **1,269** (53.2%) | Can communicate externally |
-| Filesystem write | **754** (31.6%) | Can create/modify files |
-| Triple threat | **249** (10.4%) | Shell + network + filesystem combined |
+| Signal              | Count             | What It Means                           |
+| ------------------- | ----------------- | --------------------------------------- |
+| Postinstall scripts | **122** (5.1%)    | Code auto-executes before you review it |
+| Typosquat risk      | **4**             | Package name similar to popular package |
+| Shell execution     | **725** (30.4%)   | Can run arbitrary commands              |
+| Network requests    | **1,269** (53.2%) | Can communicate externally              |
+| Filesystem write    | **754** (31.6%)   | Can create/modify files                 |
+| Triple threat       | **249** (10.4%)   | Shell + network + filesystem combined   |
 
 **122 packages run code immediately on `npm install`** — before you've even looked at what they do. This is the #1 supply chain attack vector.
 
@@ -218,12 +218,12 @@ CrowdStrike sees processes and files but has no concept of prompt flows or MCP t
 
 We benchmark ATR rules against the [PINT corpus](https://github.com/Agent-Threat-Rule/agent-threat-rules) — 850 labeled samples of real and synthetic AI agent threats:
 
-| Metric | Value | What It Means |
-|--------|-------|---------------|
-| **Precision** | **99.4%** | When we flag something, it's almost always a real issue |
-| **Recall** | **39.9%** | We catch 40% of threats (conservative by design) |
-| **False Positive Rate** | **0.25%** | 1 in 400 clean packages falsely flagged |
-| **P50 Latency** | **3.3ms** | Scanning is instant |
+| Metric                  | Value     | What It Means                                           |
+| ----------------------- | --------- | ------------------------------------------------------- |
+| **Precision**           | **99.4%** | When we flag something, it's almost always a real issue |
+| **Recall**              | **39.9%** | We catch 40% of threats (conservative by design)        |
+| **False Positive Rate** | **0.25%** | 1 in 400 clean packages falsely flagged                 |
+| **P50 Latency**         | **3.3ms** | Scanning is instant                                     |
 
 We intentionally tuned for **high precision, lower recall** — a scanner that cries wolf loses trust. We'd rather miss some threats than flood developers with false alarms. The 60% we miss today is why the rules keep growing: every real-world scan finds new patterns we add to ATR.
 

@@ -52,10 +52,7 @@
           },
           {
             "group": "Configuration",
-            "pages": [
-              "configuration/guard-config",
-              "configuration/environment-variables"
-            ]
+            "pages": ["configuration/guard-config", "configuration/environment-variables"]
           },
           {
             "group": "Troubleshooting",
@@ -72,9 +69,7 @@
         "groups": [
           {
             "group": "Products",
-            "pages": [
-              "products/overview"
-            ]
+            "pages": ["products/overview"]
           },
           {
             "group": "Panguard Scan",
@@ -97,10 +92,7 @@
           },
           {
             "group": "Panguard MCP",
-            "pages": [
-              "products/mcp/overview",
-              "products/mcp/tools-reference"
-            ]
+            "pages": ["products/mcp/overview", "products/mcp/tools-reference"]
           },
           {
             "group": "Threat Cloud",
@@ -117,38 +109,23 @@
         "groups": [
           {
             "group": "CLI Reference",
-            "pages": [
-              "cli/overview"
-            ]
+            "pages": ["cli/overview"]
           },
           {
             "group": "Scanning",
-            "pages": [
-              "cli/scan",
-              "cli/report"
-            ]
+            "pages": ["cli/scan", "cli/report"]
           },
           {
             "group": "Protection",
-            "pages": [
-              "cli/guard"
-            ]
+            "pages": ["cli/guard"]
           },
           {
             "group": "System",
-            "pages": [
-              "cli/init",
-              "cli/status",
-              "cli/config",
-              "cli/doctor",
-              "cli/upgrade"
-            ]
+            "pages": ["cli/init", "cli/status", "cli/config", "cli/doctor", "cli/upgrade"]
           },
           {
             "group": "Advanced",
-            "pages": [
-              "cli/threat"
-            ]
+            "pages": ["cli/threat"]
           }
         ]
       },
@@ -157,9 +134,7 @@
         "groups": [
           {
             "group": "API Reference",
-            "pages": [
-              "api-reference/overview"
-            ]
+            "pages": ["api-reference/overview"]
           },
           {
             "group": "Threat Cloud API",

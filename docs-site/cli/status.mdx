@@ -1,7 +1,7 @@
 ---
-title: "panguard status"
-description: "Display the overall health and status of all Panguard services."
-icon: "circle-info"
+title: 'panguard status'
+description: 'Display the overall health and status of all Panguard services.'
+icon: 'circle-info'
 ---
 
 The `status` command provides a unified view of your Panguard installation -- Guard agent health, last scan results, active traps, notification channel connectivity, and more.
@@ -40,19 +40,20 @@ panguard status --json
 ```bash Status with custom config
 panguard status --config /etc/panguard/config.yaml
 ```
+
 </CodeGroup>
 
 ## Output Sections
 
 The status command reports on the following sections:
 
-| Section | Information |
-| --- | --- |
-| **Guard** | Running / stopped, uptime, events processed |
-| **Scan** | Last scan time, findings count, risk score |
-| **Chat** | Configured channels, connectivity health |
-| **Trap** | Active honeypots, interactions captured |
-| **System** | Panguard version, OS, config path |
+| Section    | Information                                 |
+| ---------- | ------------------------------------------- |
+| **Guard**  | Running / stopped, uptime, events processed |
+| **Scan**   | Last scan time, findings count, risk score  |
+| **Chat**   | Configured channels, connectivity health    |
+| **Trap**   | Active honeypots, interactions captured     |
+| **System** | Panguard version, OS, config path           |
 
 ## Related
 

@@ -59,7 +59,10 @@ export function middleware(request: NextRequest) {
   // /docs → redirect to Mintlify docs site
   if (pathname === '/docs' || pathname.startsWith('/docs/')) {
     const docsPath = pathname.replace(/^\/(en|zh-TW)/, '').replace(/^\/docs\/?/, '/');
-    return NextResponse.redirect(`https://docs.panguard.ai${docsPath === '/' ? '' : docsPath}`, 301);
+    return NextResponse.redirect(
+      `https://docs.panguard.ai${docsPath === '/' ? '' : docsPath}`,
+      301
+    );
   }
 
   // Run next-intl middleware for locale routing (handles / → /en, /zh-TW, etc.)

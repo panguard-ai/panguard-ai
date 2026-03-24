@@ -1,7 +1,7 @@
 ---
-title: "CLI 總覽"
-description: "Panguard CLI -- 一個指令搞定所有端點安全操作。"
-icon: "terminal"
+title: 'CLI 總覽'
+description: 'Panguard CLI -- 一個指令搞定所有端點安全操作。'
+icon: 'terminal'
 ---
 
 Panguard CLI 就是你做端點安全的瑞士刀。不管是跑一次快速弱點掃描、開 Guard 即時防護、還是架 Threat Cloud 情報伺服器，全部都從同一個 binary 搞定。
@@ -14,40 +14,40 @@ panguard <command> [options]
 
 ## 全域 flag
 
-| Flag | 說明 |
-| --- | --- |
-| `--help` | 顯示指令說明 |
-| `--version` | 印出目前安裝的 Panguard CLI 版本 |
+| Flag            | 說明                                   |
+| --------------- | -------------------------------------- |
+| `--help`        | 顯示指令說明                           |
+| `--version`     | 印出目前安裝的 Panguard CLI 版本       |
 | `--lang <lang>` | 設定輸出語言（`en`、`zh-TW`、`ja` 等） |
 
 ## 指令分類
 
 ### 掃描
 
-| 指令 | 說明 |
-| --- | --- |
+| 指令                | 說明               |
+| ------------------- | ------------------ |
 | [`scan`](/cli/scan) | 對本機執行安全掃描 |
 
 ### 防護
 
-| 指令 | 說明 |
-| --- | --- |
+| 指令                  | 說明                |
+| --------------------- | ------------------- |
 | [`guard`](/cli/guard) | 即時端點防護 daemon |
 
 ### 系統
 
-| 指令 | 說明 |
-| --- | --- |
-| [`init`](/cli/init) | 初始化這台機器的 config |
-| [`status`](/cli/status) | 顯示整體系統健康狀態 |
-| [`config`](/cli/config) | 查看或修改 config |
-| [`doctor`](/cli/doctor) | 診斷常見問題 |
+| 指令                      | 說明                       |
+| ------------------------- | -------------------------- |
+| [`init`](/cli/init)       | 初始化這台機器的 config    |
+| [`status`](/cli/status)   | 顯示整體系統健康狀態       |
+| [`config`](/cli/config)   | 查看或修改 config          |
+| [`doctor`](/cli/doctor)   | 診斷常見問題               |
 | [`upgrade`](/cli/upgrade) | 更新 Panguard CLI 到最新版 |
 
 ### 進階
 
-| 指令 | 說明 |
-| --- | --- |
+| 指令                    | 說明                             |
+| ----------------------- | -------------------------------- |
 | [`threat`](/cli/threat) | 啟動本機 Threat Cloud 情報伺服器 |
 
 ## 功能開放性
@@ -62,9 +62,7 @@ panguard <command> [options]
 curl -fsSL https://get.panguard.ai | bash
 ```
 
-<Info>
-  各平台的安裝方式（Homebrew、APT、Docker）請看[安裝頁面](/installation)。
-</Info>
+<Info>各平台的安裝方式（Homebrew、APT、Docker）請看[安裝頁面](/installation)。</Info>
 
 ## 下一步
 

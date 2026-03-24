@@ -6,13 +6,7 @@
  * No I/O, no network, no filesystem.
  */
 
-import type {
-  ScanOptions,
-  ScanResult,
-  Finding,
-  CheckResult,
-  CompiledRule,
-} from './types.js';
+import type { ScanOptions, ScanResult, Finding, CheckResult, CompiledRule } from './types.js';
 import { parseManifestFromString, parseSkillName } from './manifest-parser.js';
 import { checkInstructions } from './instruction-patterns.js';
 import { detectSecrets } from './secret-detection.js';
@@ -69,7 +63,7 @@ export function scanContent(content: string, options: ScanOptions = {}): ScanRes
   // -- Context signals (pre-compute for ATR severity adjustments) --
   const ctx = detectContextSignals(content, manifest);
   const hasStrongReducers = ctx.multiplier < 0.7;
-  const allReducers = ctx.signals.every(s => s.type === 'reducer');
+  const allReducers = ctx.signals.every((s) => s.type === 'reducer');
 
   // -- ATR pattern detection --
   const atrRules: readonly CompiledRule[] = options.atrRules ?? [];
@@ -87,12 +81,13 @@ export function scanContent(content: string, options: ScanOptions = {}): ScanRes
   }
 
   // -- Instruction pattern detection --
-  const instrResult = checkInstructions(
-    manifest.instructions || content,
-    sourceType
-  );
+  const instrResult = checkInstructions(manifest.instructions || content, sourceType);
   findings.push(...instrResult.findings);
-  checks.push({ status: instrResult.status, label: instrResult.label, findings: instrResult.findings });
+  checks.push({
+    status: instrResult.status,
+    label: instrResult.label,
+    findings: instrResult.findings,
+  });
 
   // -- Secret detection --
   const secretResult = detectSecrets(content);
@@ -118,8 +113,8 @@ export function scanContent(content: string, options: ScanOptions = {}): ScanRes
 
   // -- Context signals report --
   if (ctx.signals.length > 0) {
-    const boosterCount = ctx.signals.filter(s => s.type === 'booster').length;
-    const reducerCount = ctx.signals.filter(s => s.type === 'reducer').length;
+    const boosterCount = ctx.signals.filter((s) => s.type === 'booster').length;
+    const reducerCount = ctx.signals.filter((s) => s.type === 'reducer').length;
     checks.push({
       status: boosterCount > 0 ? 'warn' : 'pass',
       label: `Context: ${boosterCount} risk booster(s), ${reducerCount} reducer(s), multiplier ${ctx.multiplier.toFixed(2)}x`,

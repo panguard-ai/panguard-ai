@@ -284,10 +284,7 @@ export class EventCorrelator {
 
     // Collect all network events from same source IP within the window
     const networkEvents = this.eventBuffer.filter(
-      (e) =>
-        e.sourceIP === event.sourceIP &&
-        e.timestamp >= cutoff &&
-        e.source === 'network'
+      (e) => e.sourceIP === event.sourceIP && e.timestamp >= cutoff && e.source === 'network'
     );
 
     // Collect distinct destination ports
@@ -331,10 +328,7 @@ export class EventCorrelator {
 
     // Collect network events from same source IP
     const networkEvents = this.eventBuffer.filter(
-      (e) =>
-        e.sourceIP === event.sourceIP &&
-        e.timestamp >= cutoff &&
-        e.source === 'network'
+      (e) => e.sourceIP === event.sourceIP && e.timestamp >= cutoff && e.source === 'network'
     );
 
     // Collect distinct internal destination IPs

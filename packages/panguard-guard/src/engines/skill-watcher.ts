@@ -133,7 +133,9 @@ async function loadAuditor(): Promise<AuditModule> {
  */
 export class SkillWatcher extends EventEmitter {
   private fileMonitor: FileMonitor | null = null;
-  private readonly config: Required<Omit<SkillWatcherConfig, 'submitThreat' | 'submitATRProposal' | 'checkBlacklist'>> &
+  private readonly config: Required<
+    Omit<SkillWatcherConfig, 'submitThreat' | 'submitATRProposal' | 'checkBlacklist'>
+  > &
     Pick<SkillWatcherConfig, 'submitThreat' | 'submitATRProposal' | 'checkBlacklist'>;
 
   private previousSkills: Map<string, MCPServerEntryMinimal> = new Map();

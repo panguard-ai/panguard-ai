@@ -1,7 +1,7 @@
 ---
-title: "PDF Reports"
-description: "Structure, sections, and customization options for Panguard Scan PDF reports."
-icon: "file-pdf"
+title: 'PDF Reports'
+description: 'Structure, sections, and customization options for Panguard Scan PDF reports.'
+icon: 'file-pdf'
 ---
 
 Panguard Scan can generate professional PDF reports suitable for stakeholder review, compliance documentation, and audit evidence.
@@ -25,12 +25,12 @@ Every PDF report contains five sections:
 
 ### 1. Cover Page
 
-| Element | Description |
-|---------|-------------|
-| Organization name | Configurable via `--org` flag or config file |
-| Scan date and time | UTC timestamp of when the scan was executed |
-| Panguard version | CLI version used to generate the report |
-| Brand logo | Panguard AI branding |
+| Element            | Description                                  |
+| ------------------ | -------------------------------------------- |
+| Organization name  | Configurable via `--org` flag or config file |
+| Scan date and time | UTC timestamp of when the scan was executed  |
+| Panguard version   | CLI version used to generate the report      |
+| Brand logo         | Panguard AI branding                         |
 
 ### 2. Executive Summary
 
@@ -45,14 +45,14 @@ A one-page overview designed for non-technical stakeholders:
 
 Each finding is presented as a row with the following columns:
 
-| Column | Description |
-|--------|-------------|
-| **#** | Sequential finding number |
-| **Severity** | CRITICAL, HIGH, MEDIUM, LOW, or INFO with color coding |
-| **Title** | Short description of the finding |
-| **Category** | Scanner category (Network, Authentication, Encryption, etc.) |
-| **Description** | Detailed explanation of the risk |
-| **Location** | Affected resource (port, file path, service name) |
+| Column          | Description                                                  |
+| --------------- | ------------------------------------------------------------ |
+| **#**           | Sequential finding number                                    |
+| **Severity**    | CRITICAL, HIGH, MEDIUM, LOW, or INFO with color coding       |
+| **Title**       | Short description of the finding                             |
+| **Category**    | Scanner category (Network, Authentication, Encryption, etc.) |
+| **Description** | Detailed explanation of the risk                             |
+| **Location**    | Affected resource (port, file path, service name)            |
 
 ### 4. Remediation Recommendations
 
@@ -67,19 +67,19 @@ For each finding, the report provides:
 
 Each finding is mapped to applicable compliance framework controls:
 
-| Framework | Control Reference |
-|-----------|-------------------|
-| ISO 27001 | e.g., A.12.6.1 -- Management of technical vulnerabilities |
-| SOC 2 | e.g., CC6.1 -- Logical and physical access controls |
-| Taiwan TCSA | e.g., Section 4 -- Access control |
+| Framework   | Control Reference                                         |
+| ----------- | --------------------------------------------------------- |
+| ISO 27001   | e.g., A.12.6.1 -- Management of technical vulnerabilities |
+| SOC 2       | e.g., CC6.1 -- Logical and physical access controls       |
+| Taiwan TCSA | e.g., Section 4 -- Access control                         |
 
 ## Bilingual Support
 
 Reports support two languages. The language selection affects all text in the report including section headers, finding descriptions, and remediation steps.
 
-| Flag | Language |
-|------|----------|
-| `--lang en` | English (default) |
+| Flag           | Language            |
+| -------------- | ------------------- |
+| `--lang en`    | English (default)   |
 | `--lang zh-TW` | Traditional Chinese |
 
 ## Remote Scan Reports
@@ -105,5 +105,6 @@ panguard report generate --framework iso27001 --format pdf
 ```
 
 <Info>
-  PDF generation uses server-side rendering and does not require any external PDF tools or browser dependencies.
+  PDF generation uses server-side rendering and does not require any external PDF tools or browser
+  dependencies.
 </Info>

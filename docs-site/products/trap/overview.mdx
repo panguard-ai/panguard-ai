@@ -1,7 +1,7 @@
 ---
-title: "Panguard Trap"
-description: "Deploy 8 honeypot protocols to lure attackers, capture their tools and credentials, and profile their skill level and intent."
-icon: "flask"
+title: 'Panguard Trap'
+description: 'Deploy 8 honeypot protocols to lure attackers, capture their tools and credentials, and profile their skill level and intent.'
+icon: 'flask'
 ---
 
 Panguard Trap deploys decoy services that masquerade as real infrastructure. Legitimate users never interact with these services -- only attackers do. When someone connects to a honeypot, Trap records every action, analyzes their behavior, classifies their skill level, and shares the intelligence with Guard and Threat Cloud.
@@ -49,14 +49,14 @@ Attacker ──> [Honeypot Service] ──> Interaction Logger
 
 ## Key Capabilities
 
-| Capability | Details |
-|-----------|---------|
-| **Honeypot types** | 8 service emulators (SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, Redis) |
-| **Attacker profiling** | Skill classification (Script Kiddie, Advanced, APT) |
-| **Credential capture** | All attempted usernames and passwords logged |
-| **Command logging** | Full session transcripts for interactive services |
-| **Threat Cloud feed** | Anonymized attacker data shared with collective intelligence |
-| **Guard integration** | Attacker IPs auto-added to Guard block list |
+| Capability             | Details                                                              |
+| ---------------------- | -------------------------------------------------------------------- |
+| **Honeypot types**     | 8 service emulators (SSH, HTTP, FTP, SMB, MySQL, RDP, Telnet, Redis) |
+| **Attacker profiling** | Skill classification (Script Kiddie, Advanced, APT)                  |
+| **Credential capture** | All attempted usernames and passwords logged                         |
+| **Command logging**    | Full session transcripts for interactive services                    |
+| **Threat Cloud feed**  | Anonymized attacker data shared with collective intelligence         |
+| **Guard integration**  | Attacker IPs auto-added to Guard block list                          |
 
 ## Integration with Guard and Threat Cloud
 

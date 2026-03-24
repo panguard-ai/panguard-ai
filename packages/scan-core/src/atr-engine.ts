@@ -5,13 +5,7 @@
  * (raw + stripped content). Pure functions, no I/O.
  */
 
-import type {
-  ATRRuleCompiled,
-  CompiledRule,
-  Finding,
-  CheckResult,
-  Severity,
-} from './types.js';
+import type { ATRRuleCompiled, CompiledRule, Finding, CheckResult, Severity } from './types.js';
 import { stripMarkdownNoise } from './markdown-utils.js';
 import { SAFE_INSTALL_URLS } from './instruction-patterns.js';
 
@@ -73,7 +67,7 @@ function allCurlBashAreSafe(content: string): boolean {
     const lineStart = content.lastIndexOf('\n', match.index) + 1;
     const lineEnd = content.indexOf('\n', match.index + match[0].length);
     const line = content.substring(lineStart, lineEnd === -1 ? undefined : lineEnd).toLowerCase();
-    const isSafe = SAFE_INSTALL_URLS.some(url => line.includes(url.toLowerCase()));
+    const isSafe = SAFE_INSTALL_URLS.some((url) => line.includes(url.toLowerCase()));
     if (!isSafe) return false;
   }
   return found;
@@ -82,7 +76,7 @@ function allCurlBashAreSafe(content: string): boolean {
 function isRuleSafeInstall(ruleDesc: string, originalContent: string): boolean {
   const curlBashRuleKeywords = ['curl', 'wget', 'download', 'pipe', 'bash', 'remote code'];
   const descLower = ruleDesc.toLowerCase();
-  if (!curlBashRuleKeywords.some(kw => descLower.includes(kw))) return false;
+  if (!curlBashRuleKeywords.some((kw) => descLower.includes(kw))) return false;
   return allCurlBashAreSafe(originalContent);
 }
 

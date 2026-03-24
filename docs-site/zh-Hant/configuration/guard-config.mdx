@@ -1,7 +1,7 @@
 ---
-title: "Guard 設定"
-description: "Panguard Guard config 檔完整參考。"
-icon: "shield"
+title: 'Guard 設定'
+description: 'Panguard Guard config 檔完整參考。'
+icon: 'shield'
 ---
 
 Panguard Guard 的 config 是一份 JSON 檔，放在 `~/.panguard-guard/config.json`。第一次跑 `panguard guard start` 時會自動產生合理的預設值，你也可以自己建。
@@ -78,15 +78,13 @@ Panguard Guard 的 config 是一份 JSON 檔，放在 `~/.panguard-guard/config.
   Guard 的運作模式。
 </ParamField>
 
-| 值 | 說明 |
-|-------|-------------|
+| 值         | 說明                                                  |
+| ---------- | ----------------------------------------------------- |
 | `learning` | 純觀察模式。只建 baseline，不觸發警示也不做任何回應。 |
-| `detect` | 監控並發出異常警示，但不執行自動回應。 |
-| `protect` | 完整防護。監控、警示、自動回應一次到位。 |
+| `detect`   | 監控並發出異常警示，但不執行自動回應。                |
+| `protect`  | 完整防護。監控、警示、自動回應一次到位。              |
 
-<Info>
-新安裝會在設定的 `learningDays` 期間跑 `learning` 模式，之後自動切到 `protect` 模式。
-</Info>
+<Info>新安裝會在設定的 `learningDays` 期間跑 `learning` 模式，之後自動切到 `protect` 模式。</Info>
 
 ### learningDays
 
@@ -98,90 +96,92 @@ Panguard Guard 的 config 是一份 JSON 檔，放在 `~/.panguard-guard/config.
 
 控制 Guard 要監控哪些系統活動。
 
-| 欄位 | 型別 | 預設 | 說明 |
-|-------|------|---------|-------------|
-| `networkConnections` | boolean | `true` | 監控進出的網路連線 |
-| `fileIntegrity` | boolean | `true` | 監視關鍵系統檔案有沒有被改 |
-| `processActivity` | boolean | `true` | 追蹤 process 建立、結束跟異常 |
-| `authLogs` | boolean | `true` | 監控身分驗證（SSH、sudo 等） |
-| `systemLogs` | boolean | `true` | 分析系統 log（syslog、journald、Windows Event Log） |
-| `kernelModules` | boolean | `true` | 偵測 kernel module 載入/卸載 |
-| `cronJobs` | boolean | `true` | 監視 cron/排程任務修改 |
-| `dockerEvents` | boolean | `false` | 監控 Docker container 事件（需要裝 Docker） |
+| 欄位                 | 型別    | 預設    | 說明                                                |
+| -------------------- | ------- | ------- | --------------------------------------------------- |
+| `networkConnections` | boolean | `true`  | 監控進出的網路連線                                  |
+| `fileIntegrity`      | boolean | `true`  | 監視關鍵系統檔案有沒有被改                          |
+| `processActivity`    | boolean | `true`  | 追蹤 process 建立、結束跟異常                       |
+| `authLogs`           | boolean | `true`  | 監控身分驗證（SSH、sudo 等）                        |
+| `systemLogs`         | boolean | `true`  | 分析系統 log（syslog、journald、Windows Event Log） |
+| `kernelModules`      | boolean | `true`  | 偵測 kernel module 載入/卸載                        |
+| `cronJobs`           | boolean | `true`  | 監視 cron/排程任務修改                              |
+| `dockerEvents`       | boolean | `false` | 監控 Docker container 事件（需要裝 Docker）         |
 
 ### rules
 
 偵測規則設定。v1.3.0 內建 61 條 ATR 規則。
 
-| 欄位 | 型別 | 預設 | 說明 |
-|-------|------|---------|-------------|
-| `rulesDir` | string | `~/.panguard-guard/rules` | ATR 規則目錄 |
-| `customRulesEnabled` | boolean | `true` | 從子目錄載入自訂規則 |
-| `autoUpdate` | boolean | `true` | 從 Threat Cloud 自動更新規則 |
-| `updateInterval` | string | `24h` | 多久檢查一次規則更新 |
+| 欄位                 | 型別    | 預設                      | 說明                         |
+| -------------------- | ------- | ------------------------- | ---------------------------- |
+| `rulesDir`           | string  | `~/.panguard-guard/rules` | ATR 規則目錄                 |
+| `customRulesEnabled` | boolean | `true`                    | 從子目錄載入自訂規則         |
+| `autoUpdate`         | boolean | `true`                    | 從 Threat Cloud 自動更新規則 |
+| `updateInterval`     | string  | `24h`                     | 多久檢查一次規則更新         |
 
 ### response
 
 自動回應設定。
 
-| 欄位 | 型別 | 預設 | 說明 |
-|-------|------|---------|-------------|
-| `enabled` | boolean | `true` | 啟用自動回應 |
-| `autoBlock` | boolean | `true` | 自動封鎖惡意 IP |
-| `blockDuration` | string | `24h` | IP 封鎖時間（`1h`、`24h`、`7d`、`permanent`） |
-| `minConfidence` | number | `0.85` | 觸發自動回應的最低 AI 信心分數（0.0--1.0） |
-| `actions` | string[] | `["block_ip", "kill_process", "quarantine_file"]` | 允許的回應動作 |
-| `requireApproval` | boolean | `false` | 執行回應前要不要人工核准 |
-| `whitelistedIps` | string[] | `[]` | 永遠不封鎖的 IP |
-| `whitelistedProcesses` | string[] | `[]` | 永遠不 kill 的 process |
+| 欄位                   | 型別     | 預設                                              | 說明                                          |
+| ---------------------- | -------- | ------------------------------------------------- | --------------------------------------------- |
+| `enabled`              | boolean  | `true`                                            | 啟用自動回應                                  |
+| `autoBlock`            | boolean  | `true`                                            | 自動封鎖惡意 IP                               |
+| `blockDuration`        | string   | `24h`                                             | IP 封鎖時間（`1h`、`24h`、`7d`、`permanent`） |
+| `minConfidence`        | number   | `0.85`                                            | 觸發自動回應的最低 AI 信心分數（0.0--1.0）    |
+| `actions`              | string[] | `["block_ip", "kill_process", "quarantine_file"]` | 允許的回應動作                                |
+| `requireApproval`      | boolean  | `false`                                           | 執行回應前要不要人工核准                      |
+| `whitelistedIps`       | string[] | `[]`                                              | 永遠不封鎖的 IP                               |
+| `whitelistedProcesses` | string[] | `[]`                                              | 永遠不 kill 的 process                        |
 
 <Warning>
-把 `minConfidence` 設到 `0.7` 以下很容易產生誤報回應。預設的 `0.85` 在防護跟準確性之間是不錯的平衡點。
+  把 `minConfidence` 設到 `0.7` 以下很容易產生誤報回應。預設的 `0.85`
+  在防護跟準確性之間是不錯的平衡點。
 </Warning>
 
 ### threatIntel
 
 Threat Cloud 整合設定。
 
-| 欄位 | 型別 | 預設 | 說明 |
-|-------|------|---------|-------------|
-| `enabled` | boolean | `true` | 啟用 Threat Cloud 整合 |
-| `endpoint` | string | `https://tc.panguard.ai` | Threat Cloud API endpoint |
-| `uploadEnabled` | boolean | `true` | 把偵測到的威脅上傳到 Threat Cloud |
-| `downloadInterval` | string | `1h` | 多久下載一次更新的 IoC feed |
-| `abuseIpDbEnabled` | boolean | `false` | 啟用 AbuseIPDB 查詢（需要 `ABUSEIPDB_KEY`） |
+| 欄位               | 型別    | 預設                     | 說明                                        |
+| ------------------ | ------- | ------------------------ | ------------------------------------------- |
+| `enabled`          | boolean | `true`                   | 啟用 Threat Cloud 整合                      |
+| `endpoint`         | string  | `https://tc.panguard.ai` | Threat Cloud API endpoint                   |
+| `uploadEnabled`    | boolean | `true`                   | 把偵測到的威脅上傳到 Threat Cloud           |
+| `downloadInterval` | string  | `1h`                     | 多久下載一次更新的 IoC feed                 |
+| `abuseIpDbEnabled` | boolean | `false`                  | 啟用 AbuseIPDB 查詢（需要 `ABUSEIPDB_KEY`） |
 
 ### dashboard
 
 本機 web 儀表板設定（選配）。
 
-| 欄位 | 型別 | 預設 | 說明 |
-|-------|------|---------|-------------|
-| `enabled` | boolean | `true` | 啟用本機 web 儀表板 |
-| `port` | number | `9090` | 儀表板 HTTP port |
-| `bindAddress` | string | `127.0.0.1` | bind 位址（用 `0.0.0.0` 遠端存取） |
+| 欄位          | 型別    | 預設        | 說明                               |
+| ------------- | ------- | ----------- | ---------------------------------- |
+| `enabled`     | boolean | `true`      | 啟用本機 web 儀表板                |
+| `port`        | number  | `9090`      | 儀表板 HTTP port                   |
+| `bindAddress` | string  | `127.0.0.1` | bind 位址（用 `0.0.0.0` 遠端存取） |
 
 ### notification
 
 警示通知設定。
 
-| 欄位 | 型別 | 預設 | 說明 |
-|-------|------|---------|-------------|
-| `enabled` | boolean | `true` | 啟用通知 |
-| `channels` | string[] | `[]` | 啟用的頻道：`telegram`、`slack`、`email`、`webhook` |
-| `minSeverity` | string | `medium` | 觸發通知的最低嚴重性：`low`、`medium`、`high`、`critical` |
-| `cooldownMinutes` | number | `15` | 重複通知之間的最短分鐘數 |
+| 欄位              | 型別     | 預設     | 說明                                                      |
+| ----------------- | -------- | -------- | --------------------------------------------------------- |
+| `enabled`         | boolean  | `true`   | 啟用通知                                                  |
+| `channels`        | string[] | `[]`     | 啟用的頻道：`telegram`、`slack`、`email`、`webhook`       |
+| `minSeverity`     | string   | `medium` | 觸發通知的最低嚴重性：`low`、`medium`、`high`、`critical` |
+| `cooldownMinutes` | number   | `15`     | 重複通知之間的最短分鐘數                                  |
 
 ### auth
 
 Manager API 連線設定。
 
-| 欄位 | 型別 | 預設 | 說明 |
-|-------|------|---------|-------------|
-| `managerEndpoint` | string | `https://localhost:8443` | Manager API URL |
-| `heartbeatInterval` | number | `60` | 心跳間隔（秒） |
-| `token` | string | `null` | Manager API token（CLI 自動設定） |
+| 欄位                | 型別   | 預設                     | 說明                              |
+| ------------------- | ------ | ------------------------ | --------------------------------- |
+| `managerEndpoint`   | string | `https://localhost:8443` | Manager API URL                   |
+| `heartbeatInterval` | number | `60`                     | 心跳間隔（秒）                    |
+| `token`             | string | `null`                   | Manager API token（CLI 自動設定） |
 
 <Tip>
-大部分人不需要直接改這個檔。用 CLI 的 `panguard config set` 改個別設定比較安全。CLI 會幫你驗證值，敏感欄位也會自動加密。
+  大部分人不需要直接改這個檔。用 CLI 的 `panguard config set` 改個別設定比較安全。CLI
+  會幫你驗證值，敏感欄位也會自動加密。
 </Tip>

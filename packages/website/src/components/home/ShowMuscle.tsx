@@ -2,12 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import {
-  CheckIcon,
-  ShieldIcon,
-  ScanIcon,
-  GlobalIcon,
-} from '@/components/ui/BrandIcons';
+import { CheckIcon, ShieldIcon, ScanIcon, GlobalIcon } from '@/components/ui/BrandIcons';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 

@@ -17,19 +17,19 @@ const ALLOWED_SCHEMES = new Set(['https:']);
 
 /** Private/reserved IP ranges (SSRF protection) */
 const PRIVATE_IP_PATTERNS = [
-  /^127\./,                              // IPv4 loopback
-  /^10\./,                               // RFC 1918 Class A
-  /^172\.(1[6-9]|2\d|3[01])\./,         // RFC 1918 Class B
-  /^192\.168\./,                         // RFC 1918 Class C
-  /^169\.254\./,                         // Link-local
+  /^127\./, // IPv4 loopback
+  /^10\./, // RFC 1918 Class A
+  /^172\.(1[6-9]|2\d|3[01])\./, // RFC 1918 Class B
+  /^192\.168\./, // RFC 1918 Class C
+  /^169\.254\./, // Link-local
   /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./, // CGNAT (RFC 6598)
-  /^0\./,                               // "This" network
-  /^198\.1[89]\./,                       // Benchmarking (RFC 2544)
-  /^::1$/,                              // IPv6 loopback
-  /^fc[0-9a-f]{2}:/i,                   // IPv6 ULA fc::/8
-  /^fd[0-9a-f]{2}:/i,                   // IPv6 ULA fd::/8
-  /^fe80:/i,                            // IPv6 link-local
-  /^::ffff:/i,                          // IPv4-mapped IPv6
+  /^0\./, // "This" network
+  /^198\.1[89]\./, // Benchmarking (RFC 2544)
+  /^::1$/, // IPv6 loopback
+  /^fc[0-9a-f]{2}:/i, // IPv6 ULA fc::/8
+  /^fd[0-9a-f]{2}:/i, // IPv6 ULA fd::/8
+  /^fe80:/i, // IPv6 link-local
+  /^::ffff:/i, // IPv4-mapped IPv6
   /^localhost$/i,
 ];
 

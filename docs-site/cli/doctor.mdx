@@ -1,7 +1,7 @@
 ---
-title: "panguard doctor"
-description: "Diagnose and troubleshoot common Panguard system issues."
-icon: "stethoscope"
+title: 'panguard doctor'
+description: 'Diagnose and troubleshoot common Panguard system issues.'
+icon: 'stethoscope'
 ---
 
 The `doctor` command runs a series of diagnostic checks to identify common problems with your Panguard installation, configuration, and runtime environment. It provides actionable recommendations for each issue found.
@@ -16,22 +16,18 @@ panguard doctor
 
 The doctor command inspects the following areas:
 
-| Check | What It Verifies |
-| --- | --- |
-| **Installation** | Binary integrity, version currency, dependencies |
-| **Configuration** | Config file validity, required fields, path permissions |
-| **Guard** | Service status, log file health, resource usage |
-| **Network** | Connectivity to Panguard Cloud, DNS resolution, firewall rules |
-| **Permissions** | File ownership, directory access, elevated privilege requirements |
-| **Disk Space** | Available space for logs, scan data, and intelligence databases |
+| Check             | What It Verifies                                                  |
+| ----------------- | ----------------------------------------------------------------- |
+| **Installation**  | Binary integrity, version currency, dependencies                  |
+| **Configuration** | Config file validity, required fields, path permissions           |
+| **Guard**         | Service status, log file health, resource usage                   |
+| **Network**       | Connectivity to Panguard Cloud, DNS resolution, firewall rules    |
+| **Permissions**   | File ownership, directory access, elevated privilege requirements |
+| **Disk Space**    | Available space for logs, scan data, and intelligence databases   |
 
 ## Examples
 
-<CodeGroup>
-```bash Run diagnostics
-panguard doctor
-```
-</CodeGroup>
+<CodeGroup>```bash Run diagnostics panguard doctor ```</CodeGroup>
 
 ## Sample Output
 
@@ -50,7 +46,8 @@ Panguard Doctor v1.3.1
 ```
 
 <Tip>
-  Run `panguard doctor` whenever you encounter unexpected behavior before opening a support ticket. The output is designed to be shared with the support team.
+  Run `panguard doctor` whenever you encounter unexpected behavior before opening a support ticket.
+  The output is designed to be shared with the support team.
 </Tip>
 
 ## Related

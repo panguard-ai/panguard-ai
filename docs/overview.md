@@ -197,11 +197,11 @@ Best for: private enterprise deployment, community threat intelligence sharing.
 
 ### Three-Layer AI Funnel
 
-| Layer   | Technology              | Handles | Latency | Cost        |
-| ------- | ----------------------- | ------- | ------- | ----------- |
-| Layer 1 | ATR rules engine        | 90%     | < 50ms  | $0          |
-| Layer 2 | Local AI (Ollama)       | 7%      | ~2s     | $0          |
-| Layer 3 | Cloud AI                | 3%      | ~5s     | $0.008/call |
+| Layer   | Technology        | Handles | Latency | Cost        |
+| ------- | ----------------- | ------- | ------- | ----------- |
+| Layer 1 | ATR rules engine  | 90%     | < 50ms  | $0          |
+| Layer 2 | Local AI (Ollama) | 7%      | ~2s     | $0          |
+| Layer 3 | Cloud AI          | 3%      | ~5s     | $0.008/call |
 
 Cloud down? Local AI takes over. Local AI down? Rules engine keeps running. Protection never stops.
 
@@ -211,17 +211,17 @@ Cloud down? Local AI takes over. Local AI down? Rules engine keeps running. Prot
 
 ## Tech Stack
 
-| Category   | Technology                                      |
-| ---------- | ----------------------------------------------- |
-| Language   | TypeScript 5.7 (strict mode)                    |
-| Runtime    | Node.js 20+                                     |
-| Monorepo   | pnpm 10 workspaces                              |
-| Testing    | Vitest 3 (3,017 tests / 142 files)              |
-| Rules      | ATR (61 rules, 474 patterns)                     |
-| AI         | Ollama (local) + Claude / OpenAI (cloud)        |
-| Auth       | Google OAuth (PKCE) + scrypt hashing            |
-| i18n       | English + Traditional Chinese                   |
-| Encryption | AES-256-GCM                                     |
+| Category   | Technology                               |
+| ---------- | ---------------------------------------- |
+| Language   | TypeScript 5.7 (strict mode)             |
+| Runtime    | Node.js 20+                              |
+| Monorepo   | pnpm 10 workspaces                       |
+| Testing    | Vitest 3 (3,017 tests / 142 files)       |
+| Rules      | ATR (61 rules, 474 patterns)             |
+| AI         | Ollama (local) + Claude / OpenAI (cloud) |
+| Auth       | Google OAuth (PKCE) + scrypt hashing     |
+| i18n       | English + Traditional Chinese            |
+| Encryption | AES-256-GCM                              |
 
 ---
 

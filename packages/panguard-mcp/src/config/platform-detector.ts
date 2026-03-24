@@ -16,7 +16,15 @@ import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-mcp:platform-detector');
 
-export type PlatformId = 'claude-code' | 'claude-desktop' | 'cursor' | 'openclaw' | 'codex' | 'workbuddy' | 'nemoclaw' | 'arkclaw';
+export type PlatformId =
+  | 'claude-code'
+  | 'claude-desktop'
+  | 'cursor'
+  | 'openclaw'
+  | 'codex'
+  | 'workbuddy'
+  | 'nemoclaw'
+  | 'arkclaw';
 
 export interface DetectedPlatform {
   id: PlatformId;
@@ -201,7 +209,8 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // WorkBuddy
   const wbPath = getWorkbuddyConfigPath();
-  const wbDetected = (await commandExists('workbuddy')) || existsSync(join(homedir(), '.workbuddy'));
+  const wbDetected =
+    (await commandExists('workbuddy')) || existsSync(join(homedir(), '.workbuddy'));
   platforms.push({
     id: 'workbuddy',
     name: 'WorkBuddy',
@@ -235,7 +244,9 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
         alreadyConfigured: hasPanguardMCPEntry(cfgPath),
       });
     }
-  } catch { /* not installed */ }
+  } catch {
+    /* not installed */
+  }
 
   const detected = platforms.filter((p) => p.detected);
   logger.info(

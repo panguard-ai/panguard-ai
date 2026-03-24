@@ -1,7 +1,7 @@
 ---
-title: "panguard threat"
-description: "Start a local Threat Cloud intelligence server for aggregating and querying threat data."
-icon: "cloud"
+title: 'panguard threat'
+description: 'Start a local Threat Cloud intelligence server for aggregating and querying threat data.'
+icon: 'cloud'
 ---
 
 The `threat` command runs a local instance of the Panguard Threat Cloud -- a threat intelligence server that aggregates indicators of compromise (IoCs), campaign data, and attacker profiles from your Guard agents and Trap honeypots. It provides a REST API and real-time dashboard for threat analysis.
@@ -14,10 +14,10 @@ panguard threat <subcommand> [options]
 
 ## Subcommands
 
-| Subcommand | Description |
-| --- | --- |
-| `start` | Start the Threat Cloud server |
-| `stats` | Show threat intelligence statistics without starting the server |
+| Subcommand | Description                                                     |
+| ---------- | --------------------------------------------------------------- |
+| `start`    | Start the Threat Cloud server                                   |
+| `stats`    | Show threat intelligence statistics without starting the server |
 
 ## Options
 
@@ -30,7 +30,8 @@ panguard threat <subcommand> [options]
 </ParamField>
 
 <ParamField path="--db" type="string">
-  Path to the SQLite database for storing threat intelligence data. Defaults to `~/.panguard/threat/threat.db`.
+  Path to the SQLite database for storing threat intelligence data. Defaults to
+  `~/.panguard/threat/threat.db`.
 </ParamField>
 
 ## Examples
@@ -51,21 +52,23 @@ panguard threat stats
 ```bash Use custom database path
 panguard threat start --db /opt/panguard/threat.db
 ```
+
 </CodeGroup>
 
 ## Intelligence Sources
 
 The Threat Cloud aggregates data from:
 
-| Source | Data Type |
-| --- | --- |
-| **Guard agents** | Process anomalies, network indicators, file hashes |
-| **Trap honeypots** | Attacker IPs, credentials used, exploit payloads |
-| **Community feeds** | Public IoC feeds, STIX/TAXII sources |
-| **Manual upload** | Custom IoC lists via API |
+| Source              | Data Type                                          |
+| ------------------- | -------------------------------------------------- |
+| **Guard agents**    | Process anomalies, network indicators, file hashes |
+| **Trap honeypots**  | Attacker IPs, credentials used, exploit payloads   |
+| **Community feeds** | Public IoC feeds, STIX/TAXII sources               |
+| **Manual upload**   | Custom IoC lists via API                           |
 
 <Warning>
-  When binding to `0.0.0.0`, the Threat Cloud API is exposed to the network. Ensure you configure authentication and place the server behind a firewall or reverse proxy.
+  When binding to `0.0.0.0`, the Threat Cloud API is exposed to the network. Ensure you configure
+  authentication and place the server behind a firewall or reverse proxy.
 </Warning>
 
 ## Related

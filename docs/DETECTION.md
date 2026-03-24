@@ -333,16 +333,16 @@ Panguard runs 10 monitors across two layers: 4 built-in monitors from `@panguard
 
 ### Monitor Availability Summary
 
-| Monitor         | Linux | macOS   | Windows | Requirements                 |
-| --------------- | ----- | ------- | ------- | ---------------------------- |
-| LogMonitor      | Yes   | Yes     | Yes     | Log file access              |
-| NetworkMonitor  | Yes   | Yes     | Yes     | None                         |
-| ProcessMonitor  | Yes   | Yes     | Yes     | None                         |
-| FileMonitor     | Yes   | Yes     | Yes     | Configured watch paths       |
-| SyscallMonitor  | Yes   | No      | No      | Kernel 4.18+, CAP_SYS_PTRACE |
-| MemoryScanner   | Yes   | No      | No      | CAP_SYS_PTRACE, /proc access |
-| DpiMonitor      | Yes   | No      | No      | /proc/net access             |
-| RootkitDetector | Yes   | No      | No      | Root recommended             |
+| Monitor         | Linux | macOS | Windows | Requirements                 |
+| --------------- | ----- | ----- | ------- | ---------------------------- |
+| LogMonitor      | Yes   | Yes   | Yes     | Log file access              |
+| NetworkMonitor  | Yes   | Yes   | Yes     | None                         |
+| ProcessMonitor  | Yes   | Yes   | Yes     | None                         |
+| FileMonitor     | Yes   | Yes   | Yes     | Configured watch paths       |
+| SyscallMonitor  | Yes   | No    | No      | Kernel 4.18+, CAP_SYS_PTRACE |
+| MemoryScanner   | Yes   | No    | No      | CAP_SYS_PTRACE, /proc access |
+| DpiMonitor      | Yes   | No    | No      | /proc/net access             |
+| RootkitDetector | Yes   | No    | No      | Root recommended             |
 
 ---
 
@@ -495,11 +495,11 @@ Layer 3: Cloud AI ($$)        -- Claude / OpenAI (API call)
 
 All events pass through the rule engine first. This layer handles the vast majority of detections with zero marginal cost.
 
-| Component          | Description                                                           |
-| ------------------ | --------------------------------------------------------------------- |
-| ATR Rule Engine    | Matches events against ATR rules (61 rules across 9 categories)      |
-| Threat Intel Feeds | IP/domain/hash lookup against 5 external feeds + Threat Cloud         |
-| Event Correlator   | 7 multi-step attack pattern detectors                                 |
+| Component          | Description                                                     |
+| ------------------ | --------------------------------------------------------------- |
+| ATR Rule Engine    | Matches events against ATR rules (61 rules across 9 categories) |
+| Threat Intel Feeds | IP/domain/hash lookup against 5 external feeds + Threat Cloud   |
+| Event Correlator   | 7 multi-step attack pattern detectors                           |
 
 Events that match known rules are assigned a verdict immediately. Events that do not match any rules, or match only low-confidence rules, are escalated to Layer 2.
 

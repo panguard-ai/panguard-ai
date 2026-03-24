@@ -1,7 +1,7 @@
 name: MiroFish-Generated Rules
 description: Submit ATR rules generated from MiroFish swarm intelligence predictions
-title: "[MiroFish] "
-labels: ["mirofish-generated", "new-rule"]
+title: '[MiroFish] '
+labels: ['mirofish-generated', 'new-rule']
 body:
   - type: markdown
     attributes:
@@ -104,21 +104,21 @@ body:
       label: Quality Gate Checklist
       description: Confirm all checks pass before submission
       options:
-        - label: "`atr validate` passes for all generated rules"
+        - label: '`atr validate` passes for all generated rules'
           required: true
-        - label: "`atr test` passes for all generated rules"
+        - label: '`atr test` passes for all generated rules'
           required: true
-        - label: "Each rule has at least 5 true positives"
+        - label: 'Each rule has at least 5 true positives'
           required: true
-        - label: "Each rule has at least 5 true negatives (including adversarial near-misses)"
+        - label: 'Each rule has at least 5 true negatives (including adversarial near-misses)'
           required: true
-        - label: "Each rule has at least 3 evasion tests"
+        - label: 'Each rule has at least 3 evasion tests'
           required: true
-        - label: "Each rule has OWASP or MITRE ATLAS references"
+        - label: 'Each rule has OWASP or MITRE ATLAS references'
           required: true
-        - label: "Human review completed -- patterns verified for specificity"
+        - label: 'Human review completed -- patterns verified for specificity'
           required: true
-        - label: "No overly broad regex patterns (`.+` or `.*` alone)"
+        - label: 'No overly broad regex patterns (`.+` or `.*` alone)'
           required: true
 
   - type: textarea

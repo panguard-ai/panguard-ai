@@ -1,7 +1,7 @@
 ---
-title: "Security Score"
+title: 'Security Score'
 description: "How Panguard calculates your system's risk score from 0-100 with letter grades A through F."
-icon: "chart-simple"
+icon: 'chart-simple'
 ---
 
 # Security Score
@@ -16,13 +16,13 @@ A single 0-100 number that tells you exactly where your system's security stands
 
 ## Grade Scale
 
-| Score | Grade | Meaning |
-| --- | --- | --- |
-| 90-100 | **A** | Excellent -- protection is comprehensive |
-| 80-89 | **B** | Good -- minor improvements possible |
-| 70-79 | **C** | Fair -- address medium-risk issues |
-| 60-69 | **D** | Needs improvement -- significant risks present |
-| 0-59 | **F** | Critical -- immediate action required |
+| Score  | Grade | Meaning                                        |
+| ------ | ----- | ---------------------------------------------- |
+| 90-100 | **A** | Excellent -- protection is comprehensive       |
+| 80-89  | **B** | Good -- minor improvements possible            |
+| 70-79  | **C** | Fair -- address medium-risk issues             |
+| 60-69  | **D** | Needs improvement -- significant risks present |
+| 0-59   | **F** | Critical -- immediate action required          |
 
 ---
 
@@ -30,16 +30,16 @@ A single 0-100 number that tells you exactly where your system's security stands
 
 The security score is a weighted composite of 8 factors, each independently scored 0-100:
 
-| Factor | Weight | What It Measures |
-| --- | --- | --- |
-| **Open Ports** | 15% | Are unnecessary ports exposed to the network? |
-| **Firewall** | 15% | Is the firewall enabled with comprehensive rules? |
-| **System Updates** | 15% | Are OS and software packages up to date? |
-| **Threat Status** | 15% | Are there known active threats on the system? |
-| **Password Policy** | 10% | Is password complexity enforced? |
-| **Security Tools** | 10% | Are antivirus, EDR, or IDS tools installed? |
-| **Compliance** | 10% | Does the system meet basic security frameworks? |
-| **Response Readiness** | 10% | Are threat response mechanisms in place? |
+| Factor                 | Weight | What It Measures                                  |
+| ---------------------- | ------ | ------------------------------------------------- |
+| **Open Ports**         | 15%    | Are unnecessary ports exposed to the network?     |
+| **Firewall**           | 15%    | Is the firewall enabled with comprehensive rules? |
+| **System Updates**     | 15%    | Are OS and software packages up to date?          |
+| **Threat Status**      | 15%    | Are there known active threats on the system?     |
+| **Password Policy**    | 10%    | Is password complexity enforced?                  |
+| **Security Tools**     | 10%    | Are antivirus, EDR, or IDS tools installed?       |
+| **Compliance**         | 10%    | Does the system meet basic security frameworks?   |
+| **Response Readiness** | 10%    | Are threat response mechanisms in place?          |
 
 ### Calculation
 
@@ -50,7 +50,7 @@ Total = (Ports x 0.15) + (Firewall x 0.15) + (Updates x 0.15) +
 ```
 
 <Info>
-Each factor is independently scored 0-100. The weighted sum produces the final composite score.
+  Each factor is independently scored 0-100. The weighted sum produces the final composite score.
 </Info>
 
 ---
@@ -59,13 +59,14 @@ Each factor is independently scored 0-100. The weighted sum produces the final c
 
 The depth of the scan affects how many factors are evaluated:
 
-| Scan Mode | Duration | Factors Evaluated | Use Case |
-| --- | --- | --- | --- |
-| `panguard scan --quick` | ~30 seconds | Open ports, firewall, password policy, running services | Fast daily check |
-| `panguard scan` | ~60 seconds | All 8 factors including SSL certs, scheduled tasks, shared folders | Comprehensive audit |
+| Scan Mode               | Duration    | Factors Evaluated                                                  | Use Case            |
+| ----------------------- | ----------- | ------------------------------------------------------------------ | ------------------- |
+| `panguard scan --quick` | ~30 seconds | Open ports, firewall, password policy, running services            | Fast daily check    |
+| `panguard scan`         | ~60 seconds | All 8 factors including SSL certs, scheduled tasks, shared folders | Comprehensive audit |
 
 <Tip>
-A quick scan may produce a slightly different score than a full scan because it evaluates fewer factors. For the most accurate score, run a full scan.
+  A quick scan may produce a slightly different score than a full scan because it evaluates fewer
+  factors. For the most accurate score, run a full scan.
 </Tip>
 
 ---
@@ -114,7 +115,8 @@ panguard guard status
 ```
 
 <Note>
-Guard's continuous monitoring provides a more accurate and current score than periodic scans alone. The score updates in near real-time as your system's security posture changes.
+  Guard's continuous monitoring provides a more accurate and current score than periodic scans
+  alone. The score updates in near real-time as your system's security posture changes.
 </Note>
 
 ---
@@ -123,14 +125,15 @@ Guard's continuous monitoring provides a more accurate and current score than pe
 
 The security score tracks changes over time:
 
-| Trend | Condition | Meaning |
-| --- | --- | --- |
+| Trend         | Condition                                     | Meaning                            |
+| ------------- | --------------------------------------------- | ---------------------------------- |
 | **Improving** | Score increased by 2+ points since last check | Security posture is getting better |
-| **Declining** | Score decreased by 2+ points since last check | Security posture is degrading |
-| **Stable** | Change within 2 points | Security posture is steady |
+| **Declining** | Score decreased by 2+ points since last check | Security posture is degrading      |
+| **Stable**    | Change within 2 points                        | Security posture is steady         |
 
 <Warning>
-A declining trend should trigger investigation even if the absolute score is still acceptable. Small drops often precede larger issues.
+  A declining trend should trigger investigation even if the absolute score is still acceptable.
+  Small drops often precede larger issues.
 </Warning>
 
 ---
@@ -159,6 +162,7 @@ panguard scan --output my-report.pdf
     ```bash
     panguard scan
     ```
+
   </Accordion>
   <Accordion title="Panguard Guard">
     Guard continuously calculates a real-time score. View it with:
@@ -166,6 +170,7 @@ panguard scan --output my-report.pdf
     ```bash
     panguard guard status
     ```
+
   </Accordion>
   <Accordion title="Panguard Status">
     Quick overview of the current score:
@@ -173,6 +178,7 @@ panguard scan --output my-report.pdf
     ```bash
     panguard status
     ```
+
   </Accordion>
 </AccordionGroup>
 

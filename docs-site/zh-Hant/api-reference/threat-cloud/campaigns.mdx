@@ -1,7 +1,7 @@
 ---
-title: "攻擊活動"
-description: "追蹤透過 IoC 關聯辨識出的協調性攻擊活動。"
-icon: "flag"
+title: '攻擊活動'
+description: '追蹤透過 IoC 關聯辨識出的協調性攻擊活動。'
+icon: 'flag'
 ---
 
 攻擊活動（Campaign）代表透過在 Panguard Threat Cloud 網路中關聯 IoC 所辨識出的協調攻擊模式。當多個指標共享行為模式、基礎設施或時間特徵時，會被歸為同一個攻擊活動。
@@ -27,10 +27,8 @@ icon: "flag"
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/campaigns?status=active&limit=10" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/campaigns?status=active&limit=10" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -80,10 +78,8 @@ curl -X GET "https://tc.panguard.ai/api/campaigns?status=active&limit=10" \
 回傳 Threat Cloud 全域的攻擊活動統計。
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/campaigns/stats" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/campaigns/stats" \ -H "Authorization: Bearer
+  YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -126,10 +122,8 @@ curl -X GET "https://tc.panguard.ai/api/campaigns/stats" \
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/campaigns/campaign_botnet_xyz" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/campaigns/campaign_botnet_xyz" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -198,12 +192,10 @@ curl -X GET "https://tc.panguard.ai/api/campaigns/campaign_botnet_xyz" \
 
 ### 活動狀態
 
-| 狀態 | 說明 |
-|--------|-------------|
-| `active` | 過去 7 天內有觀測到新 IoC 或新觀測紀錄 |
-| `dormant` | 7--30 天沒新活動，但基礎設施可能還活著 |
+| 狀態       | 說明                                          |
+| ---------- | --------------------------------------------- |
+| `active`   | 過去 7 天內有觀測到新 IoC 或新觀測紀錄        |
+| `dormant`  | 7--30 天沒新活動，但基礎設施可能還活著        |
 | `resolved` | 30 天以上沒動靜，相關基礎設施看起來已經下線了 |
 
-<Tip>
-活躍的攻擊活動會隨著 Threat Cloud 網路中新 IoC 的關聯持續更新。
-</Tip>
+<Tip>活躍的攻擊活動會隨著 Threat Cloud 網路中新 IoC 的關聯持續更新。</Tip>

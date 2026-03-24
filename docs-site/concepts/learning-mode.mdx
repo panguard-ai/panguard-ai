@@ -1,7 +1,7 @@
 ---
-title: "Learning Mode"
+title: 'Learning Mode'
 description: "How Panguard Guard spends 7 days learning your system's normal behavior before activating protection."
-icon: "graduation-cap"
+icon: 'graduation-cap'
 ---
 
 # Learning Mode
@@ -31,6 +31,7 @@ Panguard Guard spends 7 days observing what **normal looks like** on your system
     - **Network baseline** -- Normal connection patterns, common ports, traffic characteristics
     - **File baseline** -- Change patterns in critical directories
     - **User baseline** -- Login times, source IPs, operational patterns
+
   </Step>
   <Step title="Days 4-7: Build Model">
     Guard analyzes the collected data:
@@ -38,6 +39,7 @@ Panguard Guard spends 7 days observing what **normal looks like** on your system
     - Calculates normal behavior ranges (mean + standard deviation)
     - Identifies periodic patterns (daily backups, scheduled updates)
     - Marks known safe behaviors to prevent future false positives
+
   </Step>
   <Step title="Day 8+: Enter Protection Mode">
     Guard automatically transitions:
@@ -45,6 +47,7 @@ Panguard Guard spends 7 days observing what **normal looks like** on your system
     - Switches to active protection mode
     - Behaviors deviating from the baseline trigger alerts
     - Continuous learning ensures the baseline evolves with your environment
+
   </Step>
 </Steps>
 
@@ -52,13 +55,13 @@ Panguard Guard spends 7 days observing what **normal looks like** on your system
 
 ## Learning Mode vs. Protection Mode
 
-| Property | Learning Mode | Protection Mode |
-| --- | --- | --- |
-| **Activation** | Automatic after installation | Automatic after 7 days |
-| **Alerts** | None generated | Generated when baseline deviates |
-| **Auto-response** | Not executed | Executed based on confidence level |
-| **Notifications** | Daily learning progress summary | Real-time threat notifications |
-| **AI analysis** | Observation only | Full three-layer funnel |
+| Property          | Learning Mode                   | Protection Mode                    |
+| ----------------- | ------------------------------- | ---------------------------------- |
+| **Activation**    | Automatic after installation    | Automatic after 7 days             |
+| **Alerts**        | None generated                  | Generated when baseline deviates   |
+| **Auto-response** | Not executed                    | Executed based on confidence level |
+| **Notifications** | Daily learning progress summary | Real-time threat notifications     |
+| **AI analysis**   | Observation only                | Full three-layer funnel            |
 
 ---
 
@@ -87,14 +90,15 @@ Example output during the learning period:
 
 Once Guard enters protection mode, it uses confidence levels to decide how to respond:
 
-| Confidence | Action | Example |
-| --- | --- | --- |
-| > 90% | Auto-execute response | Known malicious IP -- automatically blocked |
-| 70-90% | Ask for confirmation via Chat | Suspicious process -- asks if you want to terminate it |
-| < 70% | Notify only, no action taken | Minor anomaly -- informs you for observation |
+| Confidence | Action                        | Example                                                |
+| ---------- | ----------------------------- | ------------------------------------------------------ |
+| > 90%      | Auto-execute response         | Known malicious IP -- automatically blocked            |
+| 70-90%     | Ask for confirmation via Chat | Suspicious process -- asks if you want to terminate it |
+| < 70%      | Notify only, no action taken  | Minor anomaly -- informs you for observation           |
 
 <Tip>
-This tiered approach ensures high-certainty threats are handled immediately, while uncertain situations are escalated to your judgment.
+  This tiered approach ensures high-certainty threats are handled immediately, while uncertain
+  situations are escalated to your judgment.
 </Tip>
 
 ---
@@ -108,7 +112,8 @@ The transition from learning to protection mode is not purely time-based. Guard 
 - **Pattern coverage** -- Process, network, login, and port patterns must all have data
 
 <Info>
-If your system has very low activity, the learning period may extend beyond 7 days until the baseline confidence threshold is met.
+  If your system has very low activity, the learning period may extend beyond 7 days until the
+  baseline confidence threshold is met.
 </Info>
 
 ---
@@ -136,7 +141,8 @@ panguard guard start
 Guard will re-enter the 7-day learning mode and build a fresh baseline.
 
 <Warning>
-Resetting clears all learned patterns. Guard will not generate alerts or auto-respond until the new learning period completes.
+  Resetting clears all learned patterns. Guard will not generate alerts or auto-respond until the
+  new learning period completes.
 </Warning>
 
 ---

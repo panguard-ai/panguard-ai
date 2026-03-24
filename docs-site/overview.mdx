@@ -1,7 +1,7 @@
 ---
-title: "Product Overview"
-description: "Panguard AI -- the open standard for AI agent security. Three pillars: ATR (the standard), Threat Cloud (collective immunity), Guard (the engine)."
-icon: "shield-check"
+title: 'Product Overview'
+description: 'Panguard AI -- the open standard for AI agent security. Three pillars: ATR (the standard), Threat Cloud (collective immunity), Guard (the engine).'
+icon: 'shield-check'
 ---
 
 ## What is Panguard AI?
@@ -18,13 +18,19 @@ Panguard AI is an open-source security platform purpose-built for the AI agent e
 
 <CardGroup cols={3}>
   <Card title="ATR -- The Standard" icon="file-code">
-    **61 rules across 9 threat categories.** The first open standard for AI agent threats -- purpose-built for prompt injection, tool poisoning, skill compromise, and agent manipulation. YAML-based, human-readable, machine-enforceable.
+    **61 rules across 9 threat categories.** The first open standard for AI agent threats --
+    purpose-built for prompt injection, tool poisoning, skill compromise, and agent manipulation.
+    YAML-based, human-readable, machine-enforceable.
   </Card>
   <Card title="Threat Cloud -- The Network" icon="globe">
-    **Collective immunity.** Every Panguard install contributes anonymized threat signals. The pipeline auto-generates ATR rules from real-world attacks via Claude Sonnet 4 LLM review. 11 threat intel sources, 5,000+ validated IoC records, synced every hour.
+    **Collective immunity.** Every Panguard install contributes anonymized threat signals. The
+    pipeline auto-generates ATR rules from real-world attacks via Claude Sonnet 4 LLM review. 11
+    threat intel sources, 5,000+ validated IoC records, synced every hour.
   </Card>
   <Card title="Guard -- The Engine" icon="shield-halved">
-    **61 ATR detection rules.** A 4-agent AI pipeline (Detect, Analyze, Respond, Report) processes OS-level events through ATR rules. Built-in Skill Auditor gates every AI skill before install. Auto-response blocks IPs, kills processes, quarantines files.
+    **61 ATR detection rules.** A 4-agent AI pipeline (Detect, Analyze, Respond, Report) processes
+    OS-level events through ATR rules. Built-in Skill Auditor gates every AI skill before install.
+    Auto-response blocks IPs, kills processes, quarantines files.
   </Card>
 </CardGroup>
 
@@ -32,13 +38,17 @@ Panguard AI is an open-source security platform purpose-built for the AI agent e
 
 <CardGroup cols={2}>
   <Card title="Panguard Scan" icon="magnifying-glass">
-    **60-second security audit.** One-time scan producing a risk score (0-100, grades A-F), PDF report, and compliance reports (ISO 27001, SOC 2, TCSA). Covers ports, services, firewall, SSL/TLS, password policy, and CVE lookup. MIT licensed.
+    **60-second security audit.** One-time scan producing a risk score (0-100, grades A-F), PDF
+    report, and compliance reports (ISO 27001, SOC 2, TCSA). Covers ports, services, firewall,
+    SSL/TLS, password policy, and CVE lookup. MIT licensed.
   </Card>
   <Card title="MCP Server" icon="plug">
-    **AI assistant integration.** 11 MCP tools let Claude Desktop, Cursor, and Claude Code control Panguard directly through natural language.
+    **AI assistant integration.** 11 MCP tools let Claude Desktop, Cursor, and Claude Code control
+    Panguard directly through natural language.
   </Card>
   <Card title="Skill Auditor" icon="clipboard-check">
-    **Pre-install security gate.** 8-check analysis of AI skill manifests for prompt injection, tool poisoning, secrets, and unsafe dependencies before installation.
+    **Pre-install security gate.** 8-check analysis of AI skill manifests for prompt injection, tool
+    poisoning, secrets, and unsafe dependencies before installation.
   </Card>
 </CardGroup>
 
@@ -46,48 +56,49 @@ Panguard AI is an open-source security platform purpose-built for the AI agent e
 
 Panguard uses a layered AI funnel that balances speed, cost, and accuracy. Each layer handles progressively fewer -- but more complex -- events.
 
-| Layer | Technology | Handles | Latency | Cost |
-| --- | --- | --- | --- | --- |
-| **Layer 1** | ATR rules engine | 90% of events | < 50ms | $0 |
-| **Layer 2** | Local AI (Ollama) | 7% of events | ~2s | $0 |
-| **Layer 3** | Cloud AI (Claude / OpenAI) | 3% of events | ~5s | ~$0.008/call |
+| Layer       | Technology                 | Handles       | Latency | Cost         |
+| ----------- | -------------------------- | ------------- | ------- | ------------ |
+| **Layer 1** | ATR rules engine           | 90% of events | < 50ms  | $0           |
+| **Layer 2** | Local AI (Ollama)          | 7% of events  | ~2s     | $0           |
+| **Layer 3** | Cloud AI (Claude / OpenAI) | 3% of events  | ~5s     | ~$0.008/call |
 
 <Info>
-  **Resilient by design.** If Cloud AI is unavailable, Local AI takes over. If Local AI is down, the rules engine keeps running. Protection never stops.
+  **Resilient by design.** If Cloud AI is unavailable, Local AI takes over. If Local AI is down, the
+  rules engine keeps running. Protection never stops.
 </Info>
 
 For a deep dive into the AI architecture, see [Three-Layer AI](/concepts/three-layer-ai).
 
 ## Technology Stack
 
-| Category | Technology |
-| --- | --- |
-| Language | TypeScript 5.7 (strict mode) |
-| Runtime | Node.js 20+ |
-| Monorepo | pnpm 10 workspaces |
-| Testing | Vitest 3 (3,583 tests / 165 files) |
-| Detection Rules | ATR (61) |
-| AI Providers | Ollama (local) + Claude / OpenAI (cloud) |
-| Internationalization | English + Traditional Chinese |
-| Encryption | AES-256-GCM |
-| License | MIT |
+| Category             | Technology                               |
+| -------------------- | ---------------------------------------- |
+| Language             | TypeScript 5.7 (strict mode)             |
+| Runtime              | Node.js 20+                              |
+| Monorepo             | pnpm 10 workspaces                       |
+| Testing              | Vitest 3 (3,583 tests / 165 files)       |
+| Detection Rules      | ATR (61)                                 |
+| AI Providers         | Ollama (local) + Claude / OpenAI (cloud) |
+| Internationalization | English + Traditional Chinese            |
+| Encryption           | AES-256-GCM                              |
+| License              | MIT                                      |
 
 ## Platform Support
 
 Panguard integrates with 10 AI agent platforms via MCP or native Skill protocol:
 
-| Platform | Protocol | Config Path |
-| --- | --- | --- |
-| **OpenClaw** | Native Skill | `~/.openclaw/skills/panguard/SKILL.md` |
-| **QClaw** | MCP | `~/.qclaw/mcp.json` |
-| **Claude Code** | MCP | `~/.claude/settings.local.json` |
-| **Cursor** | MCP | `~/.cursor/mcp.json` |
-| **Codex CLI** | MCP | `~/.codex/mcp.json` |
-| **Claude Desktop** | MCP | `~/Library/.../claude_desktop_config.json` |
-| **Windsurf** | MCP | `~/.windsurf/mcp.json` |
-| **WorkBuddy** | MCP | `~/.workbuddy/.mcp.json` |
-| **NemoClaw** | MCP | `~/.nemoclaw/mcp.json` |
-| **ArkClaw** | MCP | `~/.arkclaw/mcp.json` |
+| Platform           | Protocol     | Config Path                                |
+| ------------------ | ------------ | ------------------------------------------ |
+| **OpenClaw**       | Native Skill | `~/.openclaw/skills/panguard/SKILL.md`     |
+| **QClaw**          | MCP          | `~/.qclaw/mcp.json`                        |
+| **Claude Code**    | MCP          | `~/.claude/settings.local.json`            |
+| **Cursor**         | MCP          | `~/.cursor/mcp.json`                       |
+| **Codex CLI**      | MCP          | `~/.codex/mcp.json`                        |
+| **Claude Desktop** | MCP          | `~/Library/.../claude_desktop_config.json` |
+| **Windsurf**       | MCP          | `~/.windsurf/mcp.json`                     |
+| **WorkBuddy**      | MCP          | `~/.workbuddy/.mcp.json`                   |
+| **NemoClaw**       | MCP          | `~/.nemoclaw/mcp.json`                     |
+| **ArkClaw**        | MCP          | `~/.arkclaw/mcp.json`                      |
 
 All platforms are auto-configured with a single `panguard setup` command.
 
@@ -99,7 +110,11 @@ Panguard AI is released under the [MIT License](https://github.com/panguard-ai/p
   <Card title="View on GitHub" icon="github" href="https://github.com/panguard-ai/panguard-ai">
     Browse the source code, report issues, or contribute to the project.
   </Card>
-  <Card title="ATR Rules on GitHub" icon="file-code" href="https://github.com/Agent-Threat-Rule/agent-threat-rules">
+  <Card
+    title="ATR Rules on GitHub"
+    icon="file-code"
+    href="https://github.com/Agent-Threat-Rule/agent-threat-rules"
+  >
     Contribute ATR rules -- every new rule strengthens collective immunity for all users.
   </Card>
 </CardGroup>

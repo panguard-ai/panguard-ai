@@ -10,11 +10,13 @@ import { test, expect } from '@playwright/test';
 // ─── Journey 1: Homepage three-layer flywheel ───────────────────────────────
 
 test.describe('Journey 1: Homepage flywheel — three-layer defense section', () => {
-  test('shows ONLY Skill Auditor, Guard, Threat Cloud — no Trap/Chat/Report as standalone', async ({ page }) => {
+  test('shows ONLY Skill Auditor, Guard, Threat Cloud — no Trap/Chat/Report as standalone', async ({
+    page,
+  }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const bodyText = await page.locator('body').textContent() ?? '';
+    const bodyText = (await page.locator('body').textContent()) ?? '';
 
     // Required products must appear
     expect(bodyText).toMatch(/Skill Auditor/i);
@@ -32,14 +34,14 @@ test.describe('Journey 1: Homepage flywheel — three-layer defense section', ()
     // Try each potential selector
     let defenseSection = null;
     for (const loc of defenseSectionLocators) {
-      if (await loc.count() > 0) {
+      if ((await loc.count()) > 0) {
         defenseSection = loc.first();
         break;
       }
     }
 
     if (defenseSection) {
-      const sectionText = await defenseSection.textContent() ?? '';
+      const sectionText = (await defenseSection.textContent()) ?? '';
       expect(sectionText).not.toMatch(/\bTrap\b/);
       expect(sectionText).not.toMatch(/\bhoneypot\b/i);
     }
@@ -51,18 +53,24 @@ test.describe('Journey 1: Homepage flywheel — three-layer defense section', ()
     expect(await trapCards.count()).toBe(0);
     expect(await reportCards.count()).toBe(0);
 
-    await page.screenshot({ path: '/tmp/e2e-screenshots/01-homepage-flywheel.png', fullPage: false });
+    await page.screenshot({
+      path: '/tmp/e2e-screenshots/01-homepage-flywheel.png',
+      fullPage: false,
+    });
   });
 
   test('"100% free" and "MIT licensed" appear on homepage', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const bodyText = await page.locator('body').textContent() ?? '';
+    const bodyText = (await page.locator('body').textContent()) ?? '';
     expect(bodyText).toMatch(/100%\s*free|free.*open[\s-]source|open[\s-]source.*free/i);
     expect(bodyText).toMatch(/MIT/i);
 
-    await page.screenshot({ path: '/tmp/e2e-screenshots/01b-homepage-free-mit.png', fullPage: false });
+    await page.screenshot({
+      path: '/tmp/e2e-screenshots/01b-homepage-free-mit.png',
+      fullPage: false,
+    });
   });
 });
 
@@ -85,18 +93,26 @@ test.describe('Journey 2: Platform tabs — npx panguard setup', () => {
     await page.waitForLoadState('networkidle');
 
     // Find the section containing "npx panguard setup"
-    const setupSection = page.locator('section, div').filter({ hasText: /npx panguard setup/i }).first();
+    const setupSection = page
+      .locator('section, div')
+      .filter({ hasText: /npx panguard setup/i })
+      .first();
     const sectionExists = await setupSection.count();
 
     // Fall back to full page text if no section found
     const textSource = sectionExists > 0 ? setupSection : page.locator('body');
-    const sectionText = await textSource.textContent() ?? '';
+    const sectionText = (await textSource.textContent()) ?? '';
 
     for (const platform of EXPECTED_PLATFORMS) {
-      expect(sectionText, `Platform "${platform}" should appear`).toMatch(new RegExp(platform, 'i'));
+      expect(sectionText, `Platform "${platform}" should appear`).toMatch(
+        new RegExp(platform, 'i')
+      );
     }
 
-    await page.screenshot({ path: '/tmp/e2e-screenshots/02-platform-tabs-en.png', fullPage: false });
+    await page.screenshot({
+      path: '/tmp/e2e-screenshots/02-platform-tabs-en.png',
+      fullPage: false,
+    });
   });
 
   test('platform tabs are interactive — clicking each tab works', async ({ page }) => {
@@ -104,7 +120,11 @@ test.describe('Journey 2: Platform tabs — npx panguard setup', () => {
     await page.waitForLoadState('networkidle');
 
     // Look for tab-like elements in the setup section
-    const tabs = page.locator('[role="tab"], button').filter({ hasText: /Claude Code|Claude Desktop|Cursor|OpenClaw|Codex|WorkBuddy|NemoClaw|ArkClaw/i });
+    const tabs = page
+      .locator('[role="tab"], button')
+      .filter({
+        hasText: /Claude Code|Claude Desktop|Cursor|OpenClaw|Codex|WorkBuddy|NemoClaw|ArkClaw/i,
+      });
     const tabCount = await tabs.count();
 
     // We should find at least some tabs (they may be rendered differently)
@@ -112,13 +132,18 @@ test.describe('Journey 2: Platform tabs — npx panguard setup', () => {
       // Click the first tab and verify it's active
       await tabs.first().click();
       await page.waitForLoadState('domcontentloaded');
-      await page.screenshot({ path: '/tmp/e2e-screenshots/02b-platform-tab-clicked.png', fullPage: false });
+      await page.screenshot({
+        path: '/tmp/e2e-screenshots/02b-platform-tab-clicked.png',
+        fullPage: false,
+      });
     }
 
     // At minimum the text must all be present
-    const bodyText = await page.locator('body').textContent() ?? '';
+    const bodyText = (await page.locator('body').textContent()) ?? '';
     for (const platform of EXPECTED_PLATFORMS) {
-      expect(bodyText, `Platform "${platform}" should be in page`).toMatch(new RegExp(platform, 'i'));
+      expect(bodyText, `Platform "${platform}" should be in page`).toMatch(
+        new RegExp(platform, 'i')
+      );
     }
   });
 });
@@ -134,7 +159,10 @@ test.describe('Journey 3: Navigation — Product dropdown', () => {
     await expect(nav).toBeVisible();
 
     // Try to open the Products dropdown
-    const productDropdownTrigger = nav.locator('a, button').filter({ hasText: /^Products?$/i }).first();
+    const productDropdownTrigger = nav
+      .locator('a, button')
+      .filter({ hasText: /^Products?$/i })
+      .first();
     const triggerCount = await productDropdownTrigger.count();
 
     if (triggerCount > 0) {
@@ -142,9 +170,11 @@ test.describe('Journey 3: Navigation — Product dropdown', () => {
       await page.waitForTimeout(500);
 
       // Check dropdown content
-      const dropdown = page.locator('[role="menu"], [data-testid="product-dropdown"], .dropdown-menu').first();
-      if (await dropdown.count() > 0) {
-        const dropdownText = await dropdown.textContent() ?? '';
+      const dropdown = page
+        .locator('[role="menu"], [data-testid="product-dropdown"], .dropdown-menu')
+        .first();
+      if ((await dropdown.count()) > 0) {
+        const dropdownText = (await dropdown.textContent()) ?? '';
         expect(dropdownText).not.toMatch(/\bTrap\b/);
         expect(dropdownText).not.toMatch(/\bReport\b/);
       }
@@ -225,7 +255,9 @@ test.describe('Journey 5: Redirects', () => {
         expect(finalPath).toMatch(toPattern);
       }
 
-      await page.screenshot({ path: `/tmp/e2e-screenshots/05-redirect-${from.replace(/\//g, '-')}.png` });
+      await page.screenshot({
+        path: `/tmp/e2e-screenshots/05-redirect-${from.replace(/\//g, '-')}.png`,
+      });
     });
   }
 });
@@ -242,14 +274,16 @@ test.describe('Journey 6: Changelog', () => {
       const res = await page.goto(path);
       if (!res || res.status() !== 200) continue;
 
-      const bodyText = await page.locator('body').textContent() ?? '';
+      const bodyText = (await page.locator('body').textContent()) ?? '';
 
       if (bodyText.match(/v0\.\d+\.\d+|changelog|release/i)) {
         // Should contain v0.4.2 as latest
         expect(bodyText, `${path} should mention v0.4.2`).toMatch(/v0\.4\.2/);
 
         // Should NOT start at v1.0.0
-        expect(bodyText, `${path} should NOT contain v1\.0\.0 as a version`).not.toMatch(/v1\.0\.0/);
+        expect(bodyText, `${path} should NOT contain v1\.0\.0 as a version`).not.toMatch(
+          /v1\.0\.0/
+        );
 
         // Should NOT mention Pro/Enterprise/Business plan
         expect(bodyText, 'No Pro plan mentions').not.toMatch(/\bPro\s+plan\b/i);
@@ -257,14 +291,19 @@ test.describe('Journey 6: Changelog', () => {
         expect(bodyText, 'No Business plan mentions').not.toMatch(/\bBusiness\s+plan\b/i);
 
         found = true;
-        await page.screenshot({ path: `/tmp/e2e-screenshots/06-changelog-${path.replace(/\//g, '-')}.png` });
+        await page.screenshot({
+          path: `/tmp/e2e-screenshots/06-changelog-${path.replace(/\//g, '-')}.png`,
+        });
         break;
       }
     }
 
     // If no changelog section found, we skip gracefully
     if (!found) {
-      test.skip(true, 'No changelog content found at expected paths — may need to locate correct URL');
+      test.skip(
+        true,
+        'No changelog content found at expected paths — may need to locate correct URL'
+      );
     }
   });
 
@@ -273,7 +312,7 @@ test.describe('Journey 6: Changelog', () => {
       const res = await page.goto(path);
       if (!res || res.status() !== 200) continue;
 
-      const bodyText = await page.locator('body').textContent() ?? '';
+      const bodyText = (await page.locator('body').textContent()) ?? '';
       if (!bodyText.match(/changelog|release notes/i)) continue;
 
       expect(bodyText).not.toMatch(/v1\.0\.0/);
@@ -285,12 +324,14 @@ test.describe('Journey 6: Changelog', () => {
 // ─── Journey 7: Contact page ─────────────────────────────────────────────────
 
 test.describe('Journey 7: Contact page — no paid tier language', () => {
-  test('/contact has no Pro plan / Business plan / volume discounts / enterprise deployments', async ({ page }) => {
+  test('/contact has no Pro plan / Business plan / volume discounts / enterprise deployments', async ({
+    page,
+  }) => {
     const res = await page.goto('/contact');
     expect(res?.status()).toBe(200);
     await page.waitForLoadState('networkidle');
 
-    const bodyText = await page.locator('body').textContent() ?? '';
+    const bodyText = (await page.locator('body').textContent()) ?? '';
 
     expect(bodyText, 'No "Pro plan"').not.toMatch(/\bPro\s+plan\b/i);
     expect(bodyText, 'No "Business plan"').not.toMatch(/\bBusiness\s+plan\b/i);
@@ -304,19 +345,23 @@ test.describe('Journey 7: Contact page — no paid tier language', () => {
 // ─── Journey 8: Legal/Terms — Section 3 ─────────────────────────────────────
 
 test.describe('Journey 8: Legal Terms — Section 3', () => {
-  test('/legal/terms Section 3 says "No Account Required" not "Account Registration"', async ({ page }) => {
+  test('/legal/terms Section 3 says "No Account Required" not "Account Registration"', async ({
+    page,
+  }) => {
     const res = await page.goto('/legal/terms');
     expect(res?.status()).toBe(200);
     await page.waitForLoadState('networkidle');
 
-    const bodyText = await page.locator('body').textContent() ?? '';
+    const bodyText = (await page.locator('body').textContent()) ?? '';
 
     // Section 3 should say "No Account Required"
     expect(bodyText, 'Section 3 should say "No Account Required"').toMatch(/No Account Required/i);
 
     // Must NOT say "Account Registration" as a section heading
     // (The phrase may appear in a different context, so we check for heading-level usage)
-    const accountRegHeadings = page.locator('h1, h2, h3, h4').filter({ hasText: /Account Registration/i });
+    const accountRegHeadings = page
+      .locator('h1, h2, h3, h4')
+      .filter({ hasText: /Account Registration/i });
     expect(await accountRegHeadings.count()).toBe(0);
 
     await page.screenshot({ path: '/tmp/e2e-screenshots/08-legal-terms.png', fullPage: false });
@@ -331,23 +376,31 @@ test.describe('Journey 9: Homepage — no banned content', () => {
     await page.waitForLoadState('networkidle');
 
     // Look for product headings/cards that say just "Trap" or "Honeypot"
-    const trapProductCards = page.locator('h1, h2, h3, h4, [data-testid*="product"]').filter({ hasText: /^Trap$/ });
-    const honeypotProductCards = page.locator('h1, h2, h3, h4, [data-testid*="product"]').filter({ hasText: /^honeypot$/i });
+    const trapProductCards = page
+      .locator('h1, h2, h3, h4, [data-testid*="product"]')
+      .filter({ hasText: /^Trap$/ });
+    const honeypotProductCards = page
+      .locator('h1, h2, h3, h4, [data-testid*="product"]')
+      .filter({ hasText: /^honeypot$/i });
 
     expect(await trapProductCards.count()).toBe(0);
     expect(await honeypotProductCards.count()).toBe(0);
 
-    await page.screenshot({ path: '/tmp/e2e-screenshots/09-no-banned-content.png', fullPage: false });
+    await page.screenshot({
+      path: '/tmp/e2e-screenshots/09-no-banned-content.png',
+      fullPage: false,
+    });
   });
 
   test('homepage prominently features free/open-source messaging', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const bodyText = await page.locator('body').textContent() ?? '';
+    const bodyText = (await page.locator('body').textContent()) ?? '';
 
     // "100% free" or similar
-    const hasFreeMessage = /100%\s*free|completely free|free.*open[\s-]source|open[\s-]source.*free/i.test(bodyText);
+    const hasFreeMessage =
+      /100%\s*free|completely free|free.*open[\s-]source|open[\s-]source.*free/i.test(bodyText);
     expect(hasFreeMessage, 'Homepage should mention free/open-source').toBe(true);
 
     // MIT license
@@ -380,13 +433,18 @@ test.describe('Journey 10: Chinese version /zh-TW — platform tabs', () => {
     expect(res?.status()).toBe(200);
     await page.waitForLoadState('networkidle');
 
-    const bodyText = await page.locator('body').textContent() ?? '';
+    const bodyText = (await page.locator('body').textContent()) ?? '';
 
     for (const platform of EXPECTED_PLATFORMS) {
-      expect(bodyText, `Chinese page should show platform "${platform}"`).toMatch(new RegExp(platform, 'i'));
+      expect(bodyText, `Chinese page should show platform "${platform}"`).toMatch(
+        new RegExp(platform, 'i')
+      );
     }
 
-    await page.screenshot({ path: '/tmp/e2e-screenshots/10-zh-TW-platform-tabs.png', fullPage: false });
+    await page.screenshot({
+      path: '/tmp/e2e-screenshots/10-zh-TW-platform-tabs.png',
+      fullPage: false,
+    });
   });
 
   test('/zh-TW does not show Trap or Report as standalone products', async ({ page }) => {
@@ -402,6 +460,9 @@ test.describe('Journey 10: Chinese version /zh-TW — platform tabs', () => {
     expect(await trapCards.count()).toBe(0);
     expect(await reportCards.count()).toBe(0);
 
-    await page.screenshot({ path: '/tmp/e2e-screenshots/10b-zh-TW-no-banned.png', fullPage: false });
+    await page.screenshot({
+      path: '/tmp/e2e-screenshots/10b-zh-TW-no-banned.png',
+      fullPage: false,
+    });
   });
 });

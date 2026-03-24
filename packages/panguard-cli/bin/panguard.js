@@ -17,4 +17,7 @@ try {
 }
 
 const cli = join(pkgDir, 'dist', 'cli', 'index.js');
-import(cli).catch(e => { console.error(e.message); process.exit(1); });
+import(cli).catch((e) => {
+  console.error(e.message);
+  process.exit(1);
+});

@@ -1,7 +1,7 @@
 ---
-title: "PDF 報告"
-description: "Panguard Scan PDF 報告的結構、章節和客製化選項。"
-icon: "file-pdf"
+title: 'PDF 報告'
+description: 'Panguard Scan PDF 報告的結構、章節和客製化選項。'
+icon: 'file-pdf'
 ---
 
 Panguard Scan 能產出專業 PDF 報告，拿來給主管看、附在合規文件裡、或當稽核證據都沒問題。
@@ -25,12 +25,12 @@ panguard scan --quick --output quick-report.pdf
 
 ### 1. 封面
 
-| 元素 | 說明 |
-|------|------|
-| 組織名稱 | 用 `--org` flag 或 config 檔設定 |
-| 掃描日期時間 | 掃描當下的 UTC timestamp |
-| Panguard 版本 | 產出報告的 CLI 版本 |
-| 品牌 logo | Panguard AI branding |
+| 元素          | 說明                             |
+| ------------- | -------------------------------- |
+| 組織名稱      | 用 `--org` flag 或 config 檔設定 |
+| 掃描日期時間  | 掃描當下的 UTC timestamp         |
+| Panguard 版本 | 產出報告的 CLI 版本              |
+| 品牌 logo     | Panguard AI branding             |
 
 ### 2. 執行摘要
 
@@ -45,14 +45,14 @@ panguard scan --quick --output quick-report.pdf
 
 每個弱點一行，欄位如下：
 
-| 欄位 | 說明 |
-|------|------|
-| **#** | 流水號 |
+| 欄位       | 說明                                          |
+| ---------- | --------------------------------------------- |
+| **#**      | 流水號                                        |
 | **嚴重度** | CRITICAL、HIGH、MEDIUM、LOW、INFO，有顏色標示 |
-| **標題** | 弱點簡述 |
-| **類別** | 掃描器類別（網路、認證、加密等） |
-| **描述** | 風險的詳細說明 |
-| **位置** | 受影響的資源（port、檔案路徑、服務名稱） |
+| **標題**   | 弱點簡述                                      |
+| **類別**   | 掃描器類別（網路、認證、加密等）              |
+| **描述**   | 風險的詳細說明                                |
+| **位置**   | 受影響的資源（port、檔案路徑、服務名稱）      |
 
 ### 4. 修復建議
 
@@ -67,20 +67,20 @@ panguard scan --quick --output quick-report.pdf
 
 每個弱點對應到合規框架的控制項：
 
-| 框架 | 控制項參考 |
-|------|------------|
-| ISO 27001 | 例如 A.12.6.1 -- 技術弱點管理 |
-| SOC 2 | 例如 CC6.1 -- 邏輯與實體存取控制 |
-| 台灣 TCSA | 例如第 4 節 -- 存取控制 |
+| 框架      | 控制項參考                       |
+| --------- | -------------------------------- |
+| ISO 27001 | 例如 A.12.6.1 -- 技術弱點管理    |
+| SOC 2     | 例如 CC6.1 -- 邏輯與實體存取控制 |
+| 台灣 TCSA | 例如第 4 節 -- 存取控制          |
 
 ## 雙語支援
 
 報告支援兩種語言。語言設定會影響報告裡所有文字，包括章節標題、弱點描述、修復步驟。
 
-| Flag | 語言 |
-|------|------|
-| `--lang en` | 英文（預設） |
-| `--lang zh-TW` | 繁體中文 |
+| Flag           | 語言         |
+| -------------- | ------------ |
+| `--lang en`    | 英文（預設） |
+| `--lang zh-TW` | 繁體中文     |
 
 ## 遠端掃描報告
 
@@ -104,6 +104,4 @@ panguard scan --output scan-findings.pdf
 panguard report generate --framework iso27001 --format pdf
 ```
 
-<Info>
-  PDF 產出用的是 server-side rendering，不需要額外裝 PDF 工具或瀏覽器。
-</Info>
+<Info>PDF 產出用的是 server-side rendering，不需要額外裝 PDF 工具或瀏覽器。</Info>

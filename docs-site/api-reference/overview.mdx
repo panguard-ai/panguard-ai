@@ -1,7 +1,7 @@
 ---
-title: "API Overview"
-description: "Panguard AI exposes the Threat Cloud REST API for threat intelligence."
-icon: "code"
+title: 'API Overview'
+description: 'Panguard AI exposes the Threat Cloud REST API for threat intelligence.'
+icon: 'code'
 ---
 
 Panguard AI provides the Threat Cloud API for community-driven threat intelligence. No accounts or login required -- Panguard is 100% free and open source.
@@ -10,14 +10,15 @@ Panguard AI provides the Threat Cloud API for community-driven threat intelligen
 
 <CardGroup cols={1}>
   <Card title="Threat Cloud API" icon="cloud">
-    **Configurable port** -- IoC management, threat feeds, campaign tracking, MITRE heatmaps, geographic queries, and audit logs.
+    **Configurable port** -- IoC management, threat feeds, campaign tracking, MITRE heatmaps,
+    geographic queries, and audit logs.
   </Card>
 </CardGroup>
 
 ## Base URL
 
-| Service | Default Base URL | TLS |
-|---------|-----------------|-----|
+| Service      | Default Base URL                                    | TLS      |
+| ------------ | --------------------------------------------------- | -------- |
 | Threat Cloud | `https://tc.panguard.ai` or `http://localhost:PORT` | Optional |
 
 ## Authentication
@@ -60,24 +61,24 @@ Every API endpoint returns a consistent JSON envelope:
 
 The API enforces rate limiting to protect against abuse.
 
-| Service | Default Limit | Scope |
-|---------|--------------|-------|
+| Service      | Default Limit      | Scope       |
+| ------------ | ------------------ | ----------- |
 | Threat Cloud | Varies by endpoint | Per API key |
 
 When rate-limited, the API returns a `429` status code with a `Retry-After` header indicating when to retry.
 
 ## Error Codes
 
-| Status Code | Meaning | Description |
-|-------------|---------|-------------|
-| `200` | OK | Request succeeded |
-| `201` | Created | Resource created successfully |
-| `400` | Bad Request | Invalid request body or missing required fields |
-| `401` | Unauthorized | Missing or invalid authentication token |
-| `403` | Forbidden | Valid token but insufficient permissions |
-| `404` | Not Found | Requested resource does not exist |
-| `429` | Too Many Requests | Rate limit exceeded, check `Retry-After` header |
-| `500` | Internal Server Error | Unexpected server error, retry with backoff |
+| Status Code | Meaning               | Description                                     |
+| ----------- | --------------------- | ----------------------------------------------- |
+| `200`       | OK                    | Request succeeded                               |
+| `201`       | Created               | Resource created successfully                   |
+| `400`       | Bad Request           | Invalid request body or missing required fields |
+| `401`       | Unauthorized          | Missing or invalid authentication token         |
+| `403`       | Forbidden             | Valid token but insufficient permissions        |
+| `404`       | Not Found             | Requested resource does not exist               |
+| `429`       | Too Many Requests     | Rate limit exceeded, check `Retry-After` header |
+| `500`       | Internal Server Error | Unexpected server error, retry with backoff     |
 
 ## Content Type
 

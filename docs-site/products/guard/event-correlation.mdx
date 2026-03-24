@@ -1,7 +1,7 @@
 ---
-title: "Event Correlation"
-description: "Real-time pattern-based multi-step attack detection using a sliding time window and 7 correlation patterns."
-icon: "diagram-project"
+title: 'Event Correlation'
+description: 'Real-time pattern-based multi-step attack detection using a sliding time window and 7 correlation patterns.'
+icon: 'diagram-project'
 ---
 
 The `EventCorrelator` implements real-time, pattern-based multi-step attack detection. Rather than evaluating events in isolation, it maintains a sliding window buffer and applies 7 pattern detectors to identify attack chains that span multiple events.
@@ -18,91 +18,91 @@ The correlator runs inside the `DetectAgent` and produces `CorrelationPattern` o
 
 ## Sliding Window Buffer
 
-| Parameter | Value |
-|-----------|-------|
-| Maximum events | 1,000 |
-| Time window | 5 minutes |
-| Eviction policy | Events older than 5 minutes are discarded |
-| Grouping | Events are grouped by source IP for pattern matching |
+| Parameter       | Value                                                |
+| --------------- | ---------------------------------------------------- |
+| Maximum events  | 1,000                                                |
+| Time window     | 5 minutes                                            |
+| Eviction policy | Events older than 5 minutes are discarded            |
+| Grouping        | Events are grouped by source IP for pattern matching |
 
 ## 7 Correlation Patterns
 
 ### 1. Brute Force Detection
 
-| Field | Value |
-|-------|-------|
-| **MITRE ATT&CK** | T1110 |
-| **Detection logic** | Authentication failures from the same source IP |
-| **Window** | 60 seconds |
-| **Threshold** | 5 events |
-| **Confidence** | 60 base + 8 per additional event (max 100) |
-| **Example** | 15 failed SSH login attempts from 203.0.113.50 in 30 seconds |
+| Field               | Value                                                        |
+| ------------------- | ------------------------------------------------------------ |
+| **MITRE ATT&CK**    | T1110                                                        |
+| **Detection logic** | Authentication failures from the same source IP              |
+| **Window**          | 60 seconds                                                   |
+| **Threshold**       | 5 events                                                     |
+| **Confidence**      | 60 base + 8 per additional event (max 100)                   |
+| **Example**         | 15 failed SSH login attempts from 203.0.113.50 in 30 seconds |
 
 ### 2. Port Scan Detection
 
-| Field | Value |
-|-------|-------|
-| **MITRE ATT&CK** | T1046 |
-| **Detection logic** | Connections to distinct destination ports from the same IP |
-| **Window** | 60 seconds |
-| **Threshold** | 10 distinct ports |
-| **Confidence** | 65 base + 3 per additional port (max 100) |
-| **Example** | Single IP probing ports 22, 80, 443, 3306, 5432, 6379, 8080, 8443, 9200, 27017 |
+| Field               | Value                                                                          |
+| ------------------- | ------------------------------------------------------------------------------ |
+| **MITRE ATT&CK**    | T1046                                                                          |
+| **Detection logic** | Connections to distinct destination ports from the same IP                     |
+| **Window**          | 60 seconds                                                                     |
+| **Threshold**       | 10 distinct ports                                                              |
+| **Confidence**      | 65 base + 3 per additional port (max 100)                                      |
+| **Example**         | Single IP probing ports 22, 80, 443, 3306, 5432, 6379, 8080, 8443, 9200, 27017 |
 
 ### 3. Lateral Movement
 
-| Field | Value |
-|-------|-------|
-| **MITRE ATT&CK** | T1021 |
-| **Detection logic** | Connections to distinct internal (RFC 1918) IP addresses |
-| **Window** | 5 minutes |
-| **Threshold** | 3 distinct internal IPs |
-| **Confidence** | 55 base + 10 per additional IP (max 100) |
-| **Example** | Compromised host connecting to 192.168.1.10, 192.168.1.20, 192.168.1.30 |
+| Field               | Value                                                                   |
+| ------------------- | ----------------------------------------------------------------------- |
+| **MITRE ATT&CK**    | T1021                                                                   |
+| **Detection logic** | Connections to distinct internal (RFC 1918) IP addresses                |
+| **Window**          | 5 minutes                                                               |
+| **Threshold**       | 3 distinct internal IPs                                                 |
+| **Confidence**      | 55 base + 10 per additional IP (max 100)                                |
+| **Example**         | Compromised host connecting to 192.168.1.10, 192.168.1.20, 192.168.1.30 |
 
 ### 4. Data Exfiltration
 
-| Field | Value |
-|-------|-------|
-| **MITRE ATT&CK** | T1041 |
+| Field               | Value                                          |
+| ------------------- | ---------------------------------------------- |
+| **MITRE ATT&CK**    | T1041                                          |
 | **Detection logic** | Large outbound data transfer to an external IP |
-| **Window** | Single event evaluation |
-| **Threshold** | 10 MB |
-| **Confidence** | 50 base + 15 per additional 10 MB (max 100) |
-| **Example** | 45 MB upload to an external IP via curl |
+| **Window**          | Single event evaluation                        |
+| **Threshold**       | 10 MB                                          |
+| **Confidence**      | 50 base + 15 per additional 10 MB (max 100)    |
+| **Example**         | 45 MB upload to an external IP via curl        |
 
 ### 5. Backdoor Installation
 
-| Field | Value |
-|-------|-------|
-| **MITRE ATT&CK** | T1059 |
-| **Detection logic** | Combination of file write + process creation + outbound network connection |
-| **Window** | 5 minutes |
-| **Threshold** | All 3 event types present |
-| **Confidence** | 55 base, increases with additional correlated events (max 100) |
-| **Example** | File written to `/tmp/payload`, new process spawned, outbound connection to C2 server |
+| Field               | Value                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| **MITRE ATT&CK**    | T1059                                                                                 |
+| **Detection logic** | Combination of file write + process creation + outbound network connection            |
+| **Window**          | 5 minutes                                                                             |
+| **Threshold**       | All 3 event types present                                                             |
+| **Confidence**      | 55 base, increases with additional correlated events (max 100)                        |
+| **Example**         | File written to `/tmp/payload`, new process spawned, outbound connection to C2 server |
 
 ### 6. Privilege Escalation
 
-| Field | Value |
-|-------|-------|
-| **MITRE ATT&CK** | T1548 |
-| **Detection logic** | setuid/setgid/sudo/pkexec events |
-| **Window** | 5 minutes |
-| **Threshold** | 1 or more events |
-| **Confidence** | 50 base + 15 per additional event (max 100) |
-| **Example** | Multiple `sudo` invocations followed by `setuid` system call |
+| Field               | Value                                                        |
+| ------------------- | ------------------------------------------------------------ |
+| **MITRE ATT&CK**    | T1548                                                        |
+| **Detection logic** | setuid/setgid/sudo/pkexec events                             |
+| **Window**          | 5 minutes                                                    |
+| **Threshold**       | 1 or more events                                             |
+| **Confidence**      | 50 base + 15 per additional event (max 100)                  |
+| **Example**         | Multiple `sudo` invocations followed by `setuid` system call |
 
 ### 7. Severity Escalation
 
-| Field | Value |
-|-------|-------|
-| **MITRE ATT&CK** | -- (compound pattern) |
+| Field               | Value                                                              |
+| ------------------- | ------------------------------------------------------------------ |
+| **MITRE ATT&CK**    | -- (compound pattern)                                              |
 | **Detection logic** | Accumulation of low or medium severity events from the same source |
-| **Window** | 5 minutes |
-| **Threshold** | 3 events at the same severity level |
-| **Confidence** | 40 base + 10 per additional event (max 100) |
-| **Promotion rules** | 3+ low events promote to medium; 3+ medium events promote to high |
+| **Window**          | 5 minutes                                                          |
+| **Threshold**       | 3 events at the same severity level                                |
+| **Confidence**      | 40 base + 10 per additional event (max 100)                        |
+| **Promotion rules** | 3+ low events promote to medium; 3+ medium events promote to high  |
 
 ## Correlation Result
 
@@ -110,17 +110,18 @@ When a pattern matches, the correlator produces a `CorrelationResult` containing
 
 ```typescript
 interface CorrelationResult {
-  pattern: string;          // e.g., "brute_force"
-  mitreId: string;          // e.g., "T1110"
-  confidence: number;       // 0-100
-  relatedEvents: string[];  // event IDs in the chain
-  sourceIp: string;         // common source IP
-  description: string;      // human-readable summary
+  pattern: string; // e.g., "brute_force"
+  mitreId: string; // e.g., "T1110"
+  confidence: number; // 0-100
+  relatedEvents: string[]; // event IDs in the chain
+  sourceIp: string; // common source IP
+  description: string; // human-readable summary
 }
 ```
 
 The `AnalyzeAgent` applies a correlation boost of +5 per correlated event, up to a maximum of +25 added to the final confidence score.
 
 <Warning>
-  The correlation engine operates in memory. Restarting the Guard engine clears the sliding window buffer. Persistent cross-session correlation is available when a Manager server is connected.
+  The correlation engine operates in memory. Restarting the Guard engine clears the sliding window
+  buffer. Persistent cross-session correlation is available when a Manager server is connected.
 </Warning>

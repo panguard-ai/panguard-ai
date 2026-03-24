@@ -258,7 +258,9 @@ export async function runInitWizard(
     );
     try {
       const mcpConfig = await (import('@panguard-ai/panguard-mcp/config' as string) as Promise<{
-        detectPlatforms: () => Promise<Array<{ id: string; name: string; detected: boolean; alreadyConfigured: boolean }>>;
+        detectPlatforms: () => Promise<
+          Array<{ id: string; name: string; detected: boolean; alreadyConfigured: boolean }>
+        >;
         injectMCPConfig: (platformId: string) => { success: boolean; error?: string };
       }>);
       const platforms = await mcpConfig.detectPlatforms();

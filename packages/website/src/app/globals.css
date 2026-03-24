@@ -13,7 +13,10 @@ body {
 }
 
 /* Balanced text wrapping for headings and short paragraphs */
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   text-wrap: balance;
 }
 
@@ -26,7 +29,8 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E") repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")
+    repeat;
   opacity: 0.025;
   mix-blend-mode: overlay;
   pointer-events: none;
@@ -49,14 +53,23 @@ body::after {
 }
 
 @keyframes ambient-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(5vw, -3vh) scale(1.05); }
-  66% { transform: translate(-3vw, 5vh) scale(0.97); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(5vw, -3vh) scale(1.05);
+  }
+  66% {
+    transform: translate(-3vw, 5vh) scale(0.97);
+  }
 }
 
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
-  body::after { animation: none; }
+  body::after {
+    animation: none;
+  }
   .js-ready .animate-on-scroll,
   .js-ready .reveal-word {
     transition-duration: 0.01ms !important;
@@ -137,11 +150,7 @@ body::after {
   transform: translateX(-50%);
   width: 70%;
   height: 80px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(139, 154, 142, 0.05) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(ellipse at center, rgba(139, 154, 142, 0.05) 0%, transparent 70%);
   filter: blur(30px);
   pointer-events: none;
 }
@@ -401,20 +410,46 @@ body::after {
   transform: translateY(0);
 }
 /* Hero entrance animations (CSS-only, no framer-motion SSR opacity:0 issue) */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* Fallback: force-show content after 2s even if IntersectionObserver/JS fails */
-@keyframes force-show { to { opacity: 1 !important; transform: none !important; } }
+@keyframes force-show {
+  to {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
 .js-ready .animate-on-scroll {
   animation: force-show 0.01s 2s forwards;
 }
 /* Force-show framer-motion SSR hidden elements after 1s — ONLY when JS/framer hasn't loaded.
    .fm-ready is added 800ms after page load. If framer-motion is working, it will have
    already animated elements to opacity:1 by then, so this never fires. */
-@keyframes fm-fallback { to { opacity: 1 !important; transform: none !important; } }
-html:not(.fm-ready) main [style*="opacity: 0"],
-html:not(.fm-ready) main [style*="opacity:0"] {
+@keyframes fm-fallback {
+  to {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+html:not(.fm-ready) main [style*='opacity: 0'],
+html:not(.fm-ready) main [style*='opacity:0'] {
   animation: fm-fallback 0.5s 1.5s both !important;
 }
 

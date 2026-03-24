@@ -1,7 +1,7 @@
 ---
-title: "Statistics & Queries"
-description: "Advanced analytics endpoints for time series, geographic distribution, MITRE heatmaps, sightings, and audit logs."
-icon: "chart-bar"
+title: 'Statistics & Queries'
+description: 'Advanced analytics endpoints for time series, geographic distribution, MITRE heatmaps, sightings, and audit logs.'
+icon: 'chart-bar'
 ---
 
 The statistics and query endpoints provide advanced analytics over the Threat Cloud dataset. Use these for dashboards, reporting, and threat research.
@@ -11,10 +11,8 @@ The statistics and query endpoints provide advanced analytics over the Threat Cl
 Returns enhanced statistics about the Threat Cloud database.
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/stats" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/stats" \ -H "Authorization: Bearer
+  YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -77,10 +75,8 @@ Returns time-series data for threat activity, suitable for charting.
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/query/timeseries?granularity=day&period=7d" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/query/timeseries?granularity=day&period=7d" \
+  -H "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -123,10 +119,8 @@ Returns geographic distribution of threat sources.
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/query/geo?period=7d&limit=10" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/query/geo?period=7d&limit=10" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -168,10 +162,8 @@ Returns emerging threat trends based on IoC velocity and pattern analysis.
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/query/trends?periodDays=7" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/query/trends?periodDays=7" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -231,10 +223,8 @@ Returns a MITRE ATT&CK framework heatmap showing technique frequency across obse
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/query/mitre-heatmap?period=30d" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/query/mitre-heatmap?period=30d" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -361,10 +351,8 @@ Queries sighting records for a specific IoC.
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/sightings?value=198.51.100.42&limit=5" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/sightings?value=198.51.100.42&limit=5" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -412,10 +400,8 @@ Returns the audit log of API operations performed against the Threat Cloud. Usef
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/audit-log?action=create&limit=10" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/audit-log?action=create&limit=10" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -453,5 +439,6 @@ curl -X GET "https://tc.panguard.ai/api/audit-log?action=create&limit=10" \
 </ResponseExample>
 
 <Info>
-API key values are partially redacted in audit log responses. Only the first 4 and last 4 characters are shown.
+  API key values are partially redacted in audit log responses. Only the first 4 and last 4
+  characters are shown.
 </Info>

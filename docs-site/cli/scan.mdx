@@ -1,7 +1,7 @@
 ---
-title: "panguard scan"
-description: "Run security vulnerability scans on the local machine."
-icon: "magnifying-glass"
+title: 'panguard scan'
+description: 'Run security vulnerability scans on the local machine.'
+icon: 'magnifying-glass'
 ---
 
 The `scan` command performs a comprehensive security assessment of your endpoint, checking for vulnerabilities, misconfigurations, outdated software, and known threats. Results are scored and prioritized by AI so you can focus on what matters most.
@@ -19,7 +19,8 @@ panguard scan [options]
 </ParamField>
 
 <ParamField path="--output" type="string">
-  Write the scan results to the specified file path. Supports `.json`, `.html`, and `.pdf` formats based on file extension.
+  Write the scan results to the specified file path. Supports `.json`, `.html`, and `.pdf` formats
+  based on file extension.
 </ParamField>
 
 <ParamField path="--lang" type="string" default="en">
@@ -48,13 +49,14 @@ panguard scan --lang zh-TW --verbose
 ```bash Export PDF Report
 panguard scan --output ~/Desktop/security-audit.pdf
 ```
+
 </CodeGroup>
 
 ## Scan Types
 
-| Mode | Checks | Duration |
-| --- | --- | --- |
-| `--quick` | Critical vulnerabilities, open ports, root access | ~30 seconds |
+| Mode           | Checks                                                                  | Duration    |
+| -------------- | ----------------------------------------------------------------------- | ----------- |
+| `--quick`      | Critical vulnerabilities, open ports, root access                       | ~30 seconds |
 | Full (default) | All scanners including CVE, CIS benchmarks, malware signatures, network | 2-5 minutes |
 
 ## What Gets Scanned

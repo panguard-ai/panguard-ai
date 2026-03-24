@@ -306,15 +306,12 @@ export async function loadAllRules(
         `Threat Cloud blocklist fetch skipped: ${err instanceof Error ? err.message : String(err)}`
       );
     });
-
 }
 
 /**
  * Get loaded rule counts for each engine layer.
  */
-export function getRuleCounts(
-  atrEngine: GuardATREngine
-): { atr: number } {
+export function getRuleCounts(atrEngine: GuardATREngine): { atr: number } {
   return {
     atr: atrEngine.getRuleCount(),
   };

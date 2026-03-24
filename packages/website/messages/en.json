@@ -18,7 +18,7 @@
     "custom": "Custom",
     "contactUs": "Contact us",
     "mostPopular": "Most Popular",
-"free": "Free",
+    "free": "Free",
     "yes": "yes",
     "no": "no",
     "copyright": "2026 Panguard AI, Inc. All rights reserved.",
@@ -2007,14 +2007,7 @@
       },
       "workflow": {
         "title": "Fits your workflow",
-        "tools": [
-          "CLI",
-          "REST API",
-          "GitHub Actions",
-          "Docker",
-          "SSH",
-          "Webhooks"
-        ]
+        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
       },
       "cta": {
         "title": "Secure your stack with one command",
@@ -2075,13 +2068,7 @@
       },
       "integrations": {
         "title": "Integrations your team already uses",
-        "tools": [
-          "Slack",
-          "Telegram",
-          "Email",
-          "Microsoft Teams",
-          "Webhooks"
-        ]
+        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
       },
       "cta": {
         "title": "Protect your business today",
@@ -2141,15 +2128,7 @@
       },
       "integrations": {
         "title": "Enterprise integrations",
-        "tools": [
-          "SIEM",
-          "PagerDuty",
-          "Jira",
-          "Slack",
-          "Microsoft Teams",
-          "REST API",
-          "Webhooks"
-        ]
+        "tools": ["SIEM", "PagerDuty", "Jira", "Slack", "Microsoft Teams", "REST API", "Webhooks"]
       },
       "cta": {
         "title": "See Panguard in action",
@@ -2205,14 +2184,7 @@
       "stack": "e.g. CrowdStrike, Cloudflare, custom scripts...",
       "message": "Tell us about your security goals or any specific questions..."
     },
-    "teamSizes": [
-      "Just me",
-      "2-10",
-      "11-50",
-      "51-200",
-      "201-500",
-      "500+"
-    ],
+    "teamSizes": ["Just me", "2-10", "11-50", "51-200", "201-500", "500+"],
     "submit": "Send Message",
     "submitting": "Submitting...",
     "error": "Failed to submit request. Please try again.",
@@ -2393,12 +2365,7 @@
       "inquiryType": "Select type",
       "message": "How can we help?"
     },
-    "inquiryTypes": [
-      "General",
-      "Support",
-      "Partnership",
-      "Other"
-    ],
+    "inquiryTypes": ["General", "Support", "Partnership", "Other"],
     "submit": "Send Message",
     "submitting": "Sending...",
     "successTitle": "Message sent.",
@@ -4893,12 +4860,7 @@
       },
       "inProgress": {
         "title": "In Progress",
-        "items": [
-          "Report + Trap",
-          "Web Dashboard UI",
-          "Windows support",
-          "Kubernetes integration"
-        ]
+        "items": ["Report + Trap", "Web Dashboard UI", "Windows support", "Kubernetes integration"]
       },
       "planned": {
         "title": "Planned",

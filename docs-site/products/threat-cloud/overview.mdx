@@ -1,7 +1,7 @@
 ---
-title: "Threat Cloud"
-description: "Community-driven ATR rule consensus platform. Scanners propose threat patterns, the community confirms them, and confirmed rules are distributed back to all scanners."
-icon: "cloud"
+title: 'Threat Cloud'
+description: 'Community-driven ATR rule consensus platform. Scanners propose threat patterns, the community confirms them, and confirmed rules are distributed back to all scanners.'
+icon: 'cloud'
 ---
 
 Panguard Threat Cloud is a community-driven threat intelligence platform built around ATR (Agent Threat Rules) proposals and consensus. When any scanner (CLI, Website, or Guard) detects a suspicious pattern in an MCP skill, it submits a proposal to Threat Cloud. Other scanners that encounter the same pattern confirm it. Once a proposal reaches 3 or more confirmations, it is automatically promoted to a confirmed rule and distributed to all connected scanners.
@@ -39,12 +39,12 @@ Every proposal is identified by a **pattern hash** -- a deterministic identifier
 
 ### Proposal Lifecycle
 
-| Stage | Description |
-|-------|-------------|
-| **Pending** | New proposal submitted, awaiting community confirmation |
+| Stage         | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| **Pending**   | New proposal submitted, awaiting community confirmation      |
 | **Confirmed** | 3+ independent scanners have confirmed the same pattern hash |
-| **Promoted** | Confirmed proposal converted to a distributable ATR rule |
-| **Rejected** | LLM reviewer flagged the proposal as a false positive |
+| **Promoted**  | Confirmed proposal converted to a distributable ATR rule     |
+| **Rejected**  | LLM reviewer flagged the proposal as a false positive        |
 
 ### Submitting a Proposal
 
@@ -69,13 +69,13 @@ Threat Cloud includes an automated LLM reviewer (Claude Sonnet 4) that evaluates
 
 The LLM reviewer assesses:
 
-| Criterion | What It Checks |
-|-----------|---------------|
-| **False positive risk** | Whether the pattern would flag legitimate skills (low / medium / high) |
-| **Coverage score** | How well the rule covers the intended threat category |
-| **Detection specificity** | Whether the rule is precise enough to avoid noise |
-| **Response proportionality** | Whether the suggested severity matches the actual risk |
-| **YAML validity** | Whether the proposed rule is well-formed |
+| Criterion                    | What It Checks                                                         |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| **False positive risk**      | Whether the pattern would flag legitimate skills (low / medium / high) |
+| **Coverage score**           | How well the rule covers the intended threat category                  |
+| **Detection specificity**    | Whether the rule is precise enough to avoid noise                      |
+| **Response proportionality** | Whether the suggested severity matches the actual risk                 |
+| **YAML validity**            | Whether the proposed rule is well-formed                               |
 
 LLM review runs automatically on new proposals via the `POST /api/analyze-skills` endpoint. A proposal can be promoted through either path:
 
@@ -99,11 +99,11 @@ The `?since=` parameter allows incremental fetching -- scanners only download ru
 
 In addition to ATR rules, Threat Cloud also distributes traditional IoC feeds:
 
-| Endpoint | Format | Description |
-|----------|--------|-------------|
-| `GET /api/feeds/ip-blocklist` | text/plain | Known malicious IPs (one per line) |
+| Endpoint                          | Format     | Description                            |
+| --------------------------------- | ---------- | -------------------------------------- |
+| `GET /api/feeds/ip-blocklist`     | text/plain | Known malicious IPs (one per line)     |
 | `GET /api/feeds/domain-blocklist` | text/plain | Known malicious domains (one per line) |
-| `GET /api/skill-blacklist` | JSON | Community-reported unsafe skills |
+| `GET /api/skill-blacklist`        | JSON       | Community-reported unsafe skills       |
 
 Both feed endpoints accept an optional `?minReputation=` parameter to filter by confidence level.
 
@@ -111,14 +111,14 @@ Both feed endpoints accept an optional `?minReputation=` parameter to filter by 
 
 Every hour, your Guard agent exchanges data with Threat Cloud:
 
-| Direction | Data | Description |
-|-----------|------|-------------|
-| **Upload** | ATR proposals | Pattern hash + proposed rule content for new threat patterns |
-| **Upload** | Scan events | Anonymized scan results from CLI, Website, or Guard |
-| **Upload** | Skill threats | Anonymized skill audit findings |
-| **Download** | Confirmed ATR rules | Community-confirmed detection rules |
-| **Download** | IP blocklist | Known malicious IPs |
-| **Download** | Domain blocklist | Known malicious domains |
+| Direction    | Data                | Description                                                  |
+| ------------ | ------------------- | ------------------------------------------------------------ |
+| **Upload**   | ATR proposals       | Pattern hash + proposed rule content for new threat patterns |
+| **Upload**   | Scan events         | Anonymized scan results from CLI, Website, or Guard          |
+| **Upload**   | Skill threats       | Anonymized skill audit findings                              |
+| **Download** | Confirmed ATR rules | Community-confirmed detection rules                          |
+| **Download** | IP blocklist        | Known malicious IPs                                          |
+| **Download** | Domain blocklist    | Known malicious domains                                      |
 
 ## Quick Start
 
@@ -131,24 +131,25 @@ panguard guard start --dashboard
 Threat Cloud sync happens automatically every hour in the background. Your agent contributes anonymized threat data and receives updated ATR rules and IoC feeds.
 
 <Info>
-  **Zero configuration required.** The public Threat Cloud at `tc.panguard.ai` is free for all Panguard users. No API key needed for standard agent sync.
+  **Zero configuration required.** The public Threat Cloud at `tc.panguard.ai` is free for all
+  Panguard users. No API key needed for standard agent sync.
 </Info>
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/atr-proposals` | Submit or confirm an ATR proposal |
-| GET | `/api/atr-rules` | Fetch confirmed ATR rules (supports `?since=` filter) |
-| POST | `/api/skill-threats` | Submit skill threat from audit |
-| POST | `/api/analyze-skills` | Submit scan results for server-side LLM analysis |
-| POST | `/api/scan-events` | Report scan events (bulk/CLI/web) |
-| GET | `/api/feeds/ip-blocklist` | IP blocklist feed |
-| GET | `/api/feeds/domain-blocklist` | Domain blocklist feed |
-| GET | `/api/skill-blacklist` | Community skill blacklist |
-| GET | `/api/stats` | Threat statistics |
-| GET | `/api/metrics` | Aggregated metrics (cached 60s) |
-| GET | `/health` | Health check |
+| Method | Endpoint                      | Description                                           |
+| ------ | ----------------------------- | ----------------------------------------------------- |
+| POST   | `/api/atr-proposals`          | Submit or confirm an ATR proposal                     |
+| GET    | `/api/atr-rules`              | Fetch confirmed ATR rules (supports `?since=` filter) |
+| POST   | `/api/skill-threats`          | Submit skill threat from audit                        |
+| POST   | `/api/analyze-skills`         | Submit scan results for server-side LLM analysis      |
+| POST   | `/api/scan-events`            | Report scan events (bulk/CLI/web)                     |
+| GET    | `/api/feeds/ip-blocklist`     | IP blocklist feed                                     |
+| GET    | `/api/feeds/domain-blocklist` | Domain blocklist feed                                 |
+| GET    | `/api/skill-blacklist`        | Community skill blacklist                             |
+| GET    | `/api/stats`                  | Threat statistics                                     |
+| GET    | `/api/metrics`                | Aggregated metrics (cached 60s)                       |
+| GET    | `/health`                     | Health check                                          |
 
 ## Private Instances
 

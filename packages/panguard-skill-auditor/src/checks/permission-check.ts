@@ -23,7 +23,8 @@ const TOOL_PATTERNS: ToolPattern[] = [
   {
     name: 'Bash/Shell',
     // Only match explicit shell execution intent, not mere mention of "terminal"
-    regex: /\b(bash\s+-[ci]|sh\s+-c|execute.*command|run.*command|shell\s+command|spawn\s+shell)\b/i,
+    regex:
+      /\b(bash\s+-[ci]|sh\s+-c|execute.*command|run.*command|shell\s+command|spawn\s+shell)\b/i,
     risk: 'high',
     reason: 'Can execute arbitrary system commands',
   },

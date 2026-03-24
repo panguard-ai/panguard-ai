@@ -11,8 +11,7 @@ import { NextResponse } from 'next/server';
  *   ![ATR Badge](https://panguard.ai/api/scan/badge/<contentHash>)
  */
 
-const TC_ENDPOINT =
-  process.env['NEXT_PUBLIC_THREAT_CLOUD_URL'] || 'https://tc.panguard.ai';
+const TC_ENDPOINT = process.env['NEXT_PUBLIC_THREAT_CLOUD_URL'] || 'https://tc.panguard.ai';
 
 type BadgeStatus = 'safe' | 'warning' | 'critical' | 'unknown';
 
@@ -64,9 +63,7 @@ async function lookupStatus(hash: string): Promise<BadgeStatus> {
         data: Array<{ skillHash?: string; avgRiskScore?: number }>;
       };
       if (blacklistData.ok && Array.isArray(blacklistData.data)) {
-        const match = blacklistData.data.find(
-          (s) => s.skillHash === hash
-        );
+        const match = blacklistData.data.find((s) => s.skillHash === hash);
         if (match) {
           const avgRisk = match.avgRiskScore ?? 0;
           if (avgRisk >= 70) return 'critical';
@@ -85,9 +82,7 @@ async function lookupStatus(hash: string): Promise<BadgeStatus> {
         data: Array<{ hash?: string; name?: string; confirmations?: number }>;
       };
       if (whitelistData.ok && Array.isArray(whitelistData.data)) {
-        const match = whitelistData.data.find(
-          (s) => s.hash === hash
-        );
+        const match = whitelistData.data.find((s) => s.hash === hash);
         if (match && (match.confirmations ?? 0) >= 3) return 'safe';
       }
     }
@@ -98,10 +93,7 @@ async function lookupStatus(hash: string): Promise<BadgeStatus> {
   return 'unknown';
 }
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ hash: string }> }
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ hash: string }> }) {
   const { hash } = await params;
   const cleanHash = hash
     .replace(/\.svg$/, '')

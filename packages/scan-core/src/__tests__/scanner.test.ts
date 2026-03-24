@@ -165,9 +165,7 @@ describe('scanContent: prompt injection detection', () => {
 
     const result = scanContent(content);
     expect(result.findings.length).toBeGreaterThan(0);
-    const injectionFindings = result.findings.filter(
-      (f) => f.category === 'prompt-injection'
-    );
+    const injectionFindings = result.findings.filter((f) => f.category === 'prompt-injection');
     expect(injectionFindings.length).toBeGreaterThan(0);
   });
 
@@ -223,9 +221,7 @@ describe('scanContent: prompt injection detection', () => {
 
 describe('scanContent: ATR rules (two-pass scanning)', () => {
   it('evaluates ATR rules when provided', () => {
-    const rules = compiledRules([
-      makeATRRule('test-rule-1', '(?i)malicious pattern'),
-    ]);
+    const rules = compiledRules([makeATRRule('test-rule-1', '(?i)malicious pattern')]);
 
     const content = [
       '---',
@@ -255,9 +251,7 @@ describe('scanContent: ATR rules (two-pass scanning)', () => {
 
   it('reports matched count when ATR rule triggers', () => {
     // Use a simple literal pattern that safe-regex will accept
-    const rules = compiledRules([
-      makeATRRule('literal-rule', 'EXFILTRATE_MARKER', 'critical'),
-    ]);
+    const rules = compiledRules([makeATRRule('literal-rule', 'EXFILTRATE_MARKER', 'critical')]);
 
     const content = [
       '---',
@@ -272,9 +266,7 @@ describe('scanContent: ATR rules (two-pass scanning)', () => {
   });
 
   it('adds ATR findings with atr- prefixed IDs', () => {
-    const rules = compiledRules([
-      makeATRRule('my-rule', 'exfiltrate', 'high'),
-    ]);
+    const rules = compiledRules([makeATRRule('my-rule', 'exfiltrate', 'high')]);
 
     const content = [
       '---',
@@ -290,17 +282,9 @@ describe('scanContent: ATR rules (two-pass scanning)', () => {
   });
 
   it('includes ATR check result in checks array', () => {
-    const rules = compiledRules([
-      makeATRRule('test-rule', 'something'),
-    ]);
+    const rules = compiledRules([makeATRRule('test-rule', 'something')]);
 
-    const content = [
-      '---',
-      'name: skill',
-      'description: desc',
-      '---',
-      'Clean content.',
-    ].join('\n');
+    const content = ['---', 'name: skill', 'description: desc', '---', 'Clean content.'].join('\n');
 
     const result = scanContent(content, { atrRules: rules });
     const atrCheck = result.checks.find((c) => c.label.includes('ATR Detection'));
@@ -308,9 +292,7 @@ describe('scanContent: ATR rules (two-pass scanning)', () => {
   });
 
   it('ATR check passes when no rules match', () => {
-    const rules = compiledRules([
-      makeATRRule('no-match-rule', 'xyzzy_impossible_string_12345'),
-    ]);
+    const rules = compiledRules([makeATRRule('no-match-rule', 'xyzzy_impossible_string_12345')]);
 
     const content = [
       '---',
@@ -326,9 +308,7 @@ describe('scanContent: ATR rules (two-pass scanning)', () => {
   });
 
   it('ATR check fails when a rule matches', () => {
-    const rules = compiledRules([
-      makeATRRule('match-rule', 'exfiltrate', 'critical'),
-    ]);
+    const rules = compiledRules([makeATRRule('match-rule', 'exfiltrate', 'critical')]);
 
     const content = [
       '---',
@@ -406,13 +386,9 @@ describe('scanContent: hash fields', () => {
 
   it('patternHash changes when high/critical findings change', () => {
     // No injection
-    const clean = [
-      '---',
-      'name: skill',
-      'description: desc',
-      '---',
-      'Clean safe content.',
-    ].join('\n');
+    const clean = ['---', 'name: skill', 'description: desc', '---', 'Clean safe content.'].join(
+      '\n'
+    );
 
     // With critical injection
     const malicious = [
@@ -449,20 +425,12 @@ describe('scanContent: sourceType option', () => {
     ].join('\n');
 
     const result = scanContent(content, { sourceType: 'documentation' });
-    const readmeCheck = result.checks.find((c) =>
-      c.label.includes('README')
-    );
+    const readmeCheck = result.checks.find((c) => c.label.includes('README'));
     expect(readmeCheck).toBeDefined();
   });
 
   it('skill sourceType adds manifest validity check', () => {
-    const content = [
-      '---',
-      'name: skill',
-      'description: desc',
-      '---',
-      'Instructions.',
-    ].join('\n');
+    const content = ['---', 'name: skill', 'description: desc', '---', 'Instructions.'].join('\n');
 
     const result = scanContent(content, { sourceType: 'skill' });
     const manifestCheck = result.checks.find((c) => c.label.includes('Manifest'));
@@ -487,7 +455,11 @@ describe('scanContent: sourceType option', () => {
       const docFinding = docResult.findings.find((f) => f.id === skillFinding.id);
       if (docFinding) {
         const severityRank: Record<string, number> = {
-          info: 0, low: 1, medium: 2, high: 3, critical: 4,
+          info: 0,
+          low: 1,
+          medium: 2,
+          high: 3,
+          critical: 4,
         };
         expect(severityRank[docFinding.severity] ?? -1).toBeLessThanOrEqual(
           severityRank[skillFinding.severity] ?? -1

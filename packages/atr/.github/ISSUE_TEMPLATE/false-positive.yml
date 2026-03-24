@@ -1,7 +1,7 @@
 name: False Positive Report
 description: Report a rule that triggers incorrectly
-title: "[FP] "
-labels: ["false-positive"]
+title: '[FP] '
+labels: ['false-positive']
 body:
   - type: input
     id: rule-id

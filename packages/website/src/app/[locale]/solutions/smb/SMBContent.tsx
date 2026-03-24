@@ -130,9 +130,7 @@ export default function SMBContent() {
                 <p className="text-xs uppercase tracking-wider text-brand-sage font-semibold mb-2">
                   Open Source
                 </p>
-                <p className="text-3xl font-extrabold text-text-primary">
-                  Free
-                </p>
+                <p className="text-3xl font-extrabold text-text-primary">Free</p>
                 <p className="text-sm text-text-tertiary mt-2">100% open source, no hidden costs</p>
                 <ul className="mt-4 space-y-1.5 text-left inline-block">
                   {teamFeatures.map((f) => (

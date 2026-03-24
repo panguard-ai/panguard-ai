@@ -10,12 +10,7 @@
  */
 
 import { createLogger } from '@panguard-ai/core';
-import type {
-  SmartRouter,
-  KnowledgeDistiller,
-  SecurityEvent,
-  Severity,
-} from '@panguard-ai/core';
+import type { SmartRouter, KnowledgeDistiller, SecurityEvent, Severity } from '@panguard-ai/core';
 import type {
   GuardMode,
   EnvironmentBaseline,

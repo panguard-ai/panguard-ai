@@ -102,7 +102,10 @@ export default function ChatDocsContent() {
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
             <div className="flex items-center gap-2 text-sm text-text-muted mb-4">
-              <Link href="https://docs.panguard.ai" className="hover:text-brand-sage transition-colors">
+              <Link
+                href="https://docs.panguard.ai"
+                className="hover:text-brand-sage transition-colors"
+              >
                 Docs
               </Link>
               <span>/</span>

@@ -1,7 +1,7 @@
 ---
-title: "Configure Notifications"
-description: "Set up alert channels so Panguard can notify you of threats via Telegram, Slack, Email, LINE, or Webhook."
-icon: "bell"
+title: 'Configure Notifications'
+description: 'Set up alert channels so Panguard can notify you of threats via Telegram, Slack, Email, LINE, or Webhook.'
+icon: 'bell'
 ---
 
 Panguard Chat delivers security alerts to the channels your team already uses. This guide covers setting up each of the 5 supported notification channels and configuring user roles to control who receives what.
@@ -15,6 +15,7 @@ Panguard Chat delivers security alerts to the channels your team already uses. T
     ```
 
     The wizard walks you through channel selection and credential entry. You can also configure channels individually using the flags shown below.
+
   </Step>
 
   <Step title="Configure your channels">
@@ -103,6 +104,7 @@ Panguard Chat delivers security alerts to the channels your team already uses. T
         The `signature` header contains an HMAC-SHA256 of the body using your webhook secret for verification.
       </Tab>
     </Tabs>
+
   </Step>
 
   <Step title="Configure user roles">
@@ -125,6 +127,7 @@ Panguard Chat delivers security alerts to the channels your team already uses. T
     <Tip>
       You can configure the same channel type multiple times with different roles. For example, send developer-level alerts to `#security-engineering` and boss-level summaries to `#security-executive`.
     </Tip>
+
   </Step>
 
   <Step title="Test your configuration">
@@ -151,6 +154,7 @@ Panguard Chat delivers security alerts to the channels your team already uses. T
     ```bash
     panguard chat test --channel slack
     ```
+
   </Step>
 
   <Step title="Verify active channels">
@@ -171,13 +175,18 @@ Panguard Chat delivers security alerts to the channels your team already uses. T
 
       3 channels configured, 3 active.
     ```
+
   </Step>
 </Steps>
 
 ## What to do next
 
 <CardGroup cols={2}>
-  <Card title="Set up real-time protection" icon="shield-halved" href="/guides/real-time-protection">
+  <Card
+    title="Set up real-time protection"
+    icon="shield-halved"
+    href="/guides/real-time-protection"
+  >
     Notifications require Guard to be running. Start continuous monitoring first.
   </Card>
   <Card title="Chat product reference" icon="comments" href="/products/chat/overview">
@@ -186,7 +195,11 @@ Panguard Chat delivers security alerts to the channels your team already uses. T
   <Card title="User roles deep dive" icon="users" href="/products/chat/user-roles">
     Detailed breakdown of what each role receives and message formatting.
   </Card>
-  <Card title="Troubleshoot notifications" icon="wrench" href="/troubleshooting/notification-issues">
+  <Card
+    title="Troubleshoot notifications"
+    icon="wrench"
+    href="/troubleshooting/notification-issues"
+  >
     Common issues with channel configuration and delivery.
   </Card>
 </CardGroup>

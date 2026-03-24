@@ -9,7 +9,8 @@ export const metadata: Metadata = {
     'Enhance Panguard with Ollama (local LLM) and advanced configuration. Environment variables reference.',
   openGraph: {
     title: 'Advanced Setup — Panguard AI',
-    description: 'Enhance Panguard with optional integrations: Ollama local LLM, environment variables.',
+    description:
+      'Enhance Panguard with optional integrations: Ollama local LLM, environment variables.',
   },
 };
 

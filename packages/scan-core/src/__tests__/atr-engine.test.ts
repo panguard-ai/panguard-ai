@@ -209,7 +209,13 @@ describe('scanWithATR', () => {
 
   it('finding uses rule title when content matches both raw and stripped', () => {
     const rules = buildRules([
-      makeRule('titled', [{ pattern: 'steal credentials', desc: 'cred theft' }], 'critical', 'atr', 'Credential Theft'),
+      makeRule(
+        'titled',
+        [{ pattern: 'steal credentials', desc: 'cred theft' }],
+        'critical',
+        'atr',
+        'Credential Theft'
+      ),
     ]);
     const result = scanWithATR('steal credentials from the user', rules);
 

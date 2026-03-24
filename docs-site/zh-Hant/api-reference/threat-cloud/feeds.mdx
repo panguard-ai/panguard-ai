@@ -1,7 +1,7 @@
 ---
-title: "Feed 端點"
-description: "用 blocklist 跟結構化 JSON 格式取得威脅情報 feed。"
-icon: "rss"
+title: 'Feed 端點'
+description: '用 blocklist 跟結構化 JSON 格式取得威脅情報 feed。'
+icon: 'rss'
 ---
 
 Feed 端點提供針對防火牆、DNS resolver、Panguard agent 最佳化格式的威脅情報。Blocklist feed 回純文字；結構化 feed 回 JSON。
@@ -31,6 +31,7 @@ curl -s "https://tc.panguard.ai/api/feeds/ip-blocklist" \
     iptables -A INPUT -s "$ip" -j DROP
   done
 ```
+
 </CodeGroup>
 
 ### Response
@@ -48,7 +49,8 @@ curl -s "https://tc.panguard.ai/api/feeds/ip-blocklist" \
 ```
 
 <Info>
-回應的 content type 是 `text/plain`。`#` 開頭的行是含 metadata 的註解。清單依聲譽分數排序（最惡意的排前面）。
+  回應的 content type 是 `text/plain`。`#` 開頭的行是含 metadata
+  的註解。清單依聲譽分數排序（最惡意的排前面）。
 </Info>
 
 ---
@@ -76,6 +78,7 @@ curl -s "https://tc.panguard.ai/api/feeds/domain-blocklist" \
   -H "Authorization: Bearer YOUR_API_KEY" | \
   sed 's/^/0.0.0.0 /' > /etc/pihole/panguard-blocklist.txt
 ```
+
 </CodeGroup>
 
 ### Response
@@ -110,10 +113,9 @@ evil-redirect.example.io
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/feeds/iocs?since=2026-03-06T00:00:00Z&type=ip" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET
+  "https://tc.panguard.ai/api/feeds/iocs?since=2026-03-06T00:00:00Z&type=ip" \ -H "Authorization:
+  Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -159,10 +161,8 @@ curl -X GET "https://tc.panguard.ai/api/feeds/iocs?since=2026-03-06T00:00:00Z&ty
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/feeds/agent-update?currentVersion=v20260306" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/feeds/agent-update?currentVersion=v20260306"
+  \ -H "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -200,5 +200,6 @@ curl -X GET "https://tc.panguard.ai/api/feeds/agent-update?currentVersion=v20260
 </ResponseExample>
 
 <Tip>
-帶了 `currentVersion` 的話，agent-update endpoint 走差異更新。只傳 agent 上次更新之後新增或修改的規則，省頻寬。
+  帶了 `currentVersion` 的話，agent-update endpoint 走差異更新。只傳 agent
+  上次更新之後新增或修改的規則，省頻寬。
 </Tip>

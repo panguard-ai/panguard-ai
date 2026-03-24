@@ -1,7 +1,7 @@
 ---
-title: "連接 Threat Cloud"
-description: "Panguard agent 怎麼連上 Threat Cloud 取得集體威脅情報。"
-icon: "plug"
+title: '連接 Threat Cloud'
+description: 'Panguard agent 怎麼連上 Threat Cloud 取得集體威脅情報。'
+icon: 'plug'
 ---
 
 每個 Panguard agent 自動連上公開 Threat Cloud。不用設定、不用 API key、不用帳號。
@@ -18,12 +18,12 @@ panguard guard start --dashboard
 
 ## 自動做的事
 
-| 間隔 | 動作 |
-|------|------|
-| **啟動時** | 從本機安裝載入內建 ATR 規則（61 條） |
-| **每 1 小時** | 跟 Threat Cloud sync：拉新規則、傳匿名化威脅 |
-| **偵測到威脅時** | 提交匿名化事件資料到 Threat Cloud |
-| **skill 審計時** | 回報安全/不安全的 skill 指紋 |
+| 間隔             | 動作                                         |
+| ---------------- | -------------------------------------------- |
+| **啟動時**       | 從本機安裝載入內建 ATR 規則（61 條）         |
+| **每 1 小時**    | 跟 Threat Cloud sync：拉新規則、傳匿名化威脅 |
+| **偵測到威脅時** | 提交匿名化事件資料到 Threat Cloud            |
+| **skill 審計時** | 回報安全/不安全的 skill 指紋                 |
 
 ## 自訂 endpoint
 

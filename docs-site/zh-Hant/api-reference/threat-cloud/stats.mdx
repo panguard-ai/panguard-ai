@@ -1,7 +1,7 @@
 ---
-title: "統計與查詢"
-description: "時間序列、地理分布、MITRE 熱力圖、觀測紀錄、稽核 log 的進階分析端點。"
-icon: "chart-bar"
+title: '統計與查詢'
+description: '時間序列、地理分布、MITRE 熱力圖、觀測紀錄、稽核 log 的進階分析端點。'
+icon: 'chart-bar'
 ---
 
 統計跟查詢端點提供 Threat Cloud 資料集的進階分析。拿來做儀表板、報告、威脅研究都適合。
@@ -11,10 +11,8 @@ icon: "chart-bar"
 回傳 Threat Cloud 資料庫的統計概覽。
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/stats" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/stats" \ -H "Authorization: Bearer
+  YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -77,10 +75,8 @@ curl -X GET "https://tc.panguard.ai/api/stats" \
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/query/timeseries?granularity=day&period=7d" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/query/timeseries?granularity=day&period=7d" \
+  -H "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -123,10 +119,8 @@ curl -X GET "https://tc.panguard.ai/api/query/timeseries?granularity=day&period=
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/query/geo?period=7d&limit=10" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/query/geo?period=7d&limit=10" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -168,10 +162,8 @@ curl -X GET "https://tc.panguard.ai/api/query/geo?period=7d&limit=10" \
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/query/trends?periodDays=7" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/query/trends?periodDays=7" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -231,10 +223,8 @@ curl -X GET "https://tc.panguard.ai/api/query/trends?periodDays=7" \
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/query/mitre-heatmap?period=30d" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/query/mitre-heatmap?period=30d" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -361,10 +351,8 @@ curl -X POST "https://tc.panguard.ai/api/sightings" \
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/sightings?value=198.51.100.42&limit=5" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/sightings?value=198.51.100.42&limit=5" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -412,10 +400,8 @@ curl -X GET "https://tc.panguard.ai/api/sightings?value=198.51.100.42&limit=5" \
 </ParamField>
 
 <CodeGroup>
-```bash cURL
-curl -X GET "https://tc.panguard.ai/api/audit-log?action=create&limit=10" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
+  ```bash cURL curl -X GET "https://tc.panguard.ai/api/audit-log?action=create&limit=10" \ -H
+  "Authorization: Bearer YOUR_API_KEY" ```
 </CodeGroup>
 
 <ResponseExample>
@@ -452,6 +438,4 @@ curl -X GET "https://tc.panguard.ai/api/audit-log?action=create&limit=10" \
 ```
 </ResponseExample>
 
-<Info>
-稽核 log 裡的 API key 會被遮蔽，只顯示前 4 碼跟後 4 碼。
-</Info>
+<Info>稽核 log 裡的 API key 會被遮蔽，只顯示前 4 碼跟後 4 碼。</Info>

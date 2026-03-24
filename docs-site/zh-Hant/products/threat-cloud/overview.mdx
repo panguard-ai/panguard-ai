@@ -1,7 +1,7 @@
 ---
-title: "Threat Cloud"
-description: "社群驅動的 ATR 規則共識平台。掃描器提出威脅模式、社群確認、確認的規則分發回所有掃描器。"
-icon: "cloud"
+title: 'Threat Cloud'
+description: '社群驅動的 ATR 規則共識平台。掃描器提出威脅模式、社群確認、確認的規則分發回所有掃描器。'
+icon: 'cloud'
 ---
 
 Panguard Threat Cloud 是一個以 ATR（Agent Threat Rules）提案跟共識為核心的社群驅動威脅情報平台。當任何掃描器（CLI、網站或 Guard）在 MCP skill 偵測到可疑模式時，會向 Threat Cloud 提交提案。其他掃描器遇到一樣的模式就會確認。提案拿到 3 次以上的確認後，自動升格為已確認規則，分發給所有連上的掃描器。
@@ -39,12 +39,12 @@ ATR 提案是 Threat Cloud 社群威脅情報的核心機制。
 
 ### 提案生命週期
 
-| 階段 | 說明 |
-|-------|------|
-| **Pending** | 剛提交的提案，等社群確認 |
+| 階段          | 說明                                     |
+| ------------- | ---------------------------------------- |
+| **Pending**   | 剛提交的提案，等社群確認                 |
 | **Confirmed** | 3+ 個獨立掃描器確認了同一個 pattern hash |
-| **Promoted** | 確認的提案已轉成可分發的 ATR 規則 |
-| **Rejected** | LLM 審查員判定為誤報 |
+| **Promoted**  | 確認的提案已轉成可分發的 ATR 規則        |
+| **Rejected**  | LLM 審查員判定為誤報                     |
 
 ### 提交提案
 
@@ -69,13 +69,13 @@ Threat Cloud 有內建的自動化 LLM 審查員（Claude Sonnet 4）評估 ATR 
 
 LLM 審查員看這些：
 
-| 項目 | 檢查什麼 |
-|------|---------|
-| **誤報風險** | 這個 pattern 會不會打到正常 skill（低 / 中 / 高） |
-| **覆蓋率** | 規則對目標威脅類別的涵蓋程度 |
-| **偵測精準度** | 規則夠不夠精確，會不會產生雜訊 |
-| **回應比例** | 建議的嚴重性跟實際風險符不符合 |
-| **YAML 格式** | 提議的規則格式對不對 |
+| 項目           | 檢查什麼                                          |
+| -------------- | ------------------------------------------------- |
+| **誤報風險**   | 這個 pattern 會不會打到正常 skill（低 / 中 / 高） |
+| **覆蓋率**     | 規則對目標威脅類別的涵蓋程度                      |
+| **偵測精準度** | 規則夠不夠精確，會不會產生雜訊                    |
+| **回應比例**   | 建議的嚴重性跟實際風險符不符合                    |
+| **YAML 格式**  | 提議的規則格式對不對                              |
 
 LLM 審查透過 `POST /api/analyze-skills` endpoint 對新提案自動跑。提案可以走兩條路升格：
 
@@ -99,11 +99,11 @@ GET /api/atr-rules?since=2025-01-01T00:00:00Z
 
 除了 ATR 規則，Threat Cloud 也分發傳統 IoC feed：
 
-| Endpoint | 格式 | 說明 |
-|----------|------|------|
-| `GET /api/feeds/ip-blocklist` | text/plain | 已知惡意 IP（一行一個） |
+| Endpoint                          | 格式       | 說明                        |
+| --------------------------------- | ---------- | --------------------------- |
+| `GET /api/feeds/ip-blocklist`     | text/plain | 已知惡意 IP（一行一個）     |
 | `GET /api/feeds/domain-blocklist` | text/plain | 已知惡意 domain（一行一個） |
-| `GET /api/skill-blacklist` | JSON | 社群回報的不安全 skill |
+| `GET /api/skill-blacklist`        | JSON       | 社群回報的不安全 skill      |
 
 兩個 feed endpoint 都接受 `?minReputation=` 參數依信心度篩選。
 
@@ -111,14 +111,14 @@ GET /api/atr-rules?since=2025-01-01T00:00:00Z
 
 每小時，Guard agent 跟 Threat Cloud 交換資料：
 
-| 方向 | 資料 | 說明 |
-|------|------|------|
-| **上傳** | ATR 提案 | 新威脅模式的 pattern hash + 提議的規則內容 |
-| **上傳** | 掃描事件 | CLI、網站或 Guard 的匿名化掃描結果 |
-| **上傳** | Skill 威脅 | 匿名化的 skill 審計發現 |
-| **下載** | 確認 ATR 規則 | 社群確認的偵測規則 |
-| **下載** | IP blocklist | 已知惡意 IP |
-| **下載** | Domain blocklist | 已知惡意 domain |
+| 方向     | 資料             | 說明                                       |
+| -------- | ---------------- | ------------------------------------------ |
+| **上傳** | ATR 提案         | 新威脅模式的 pattern hash + 提議的規則內容 |
+| **上傳** | 掃描事件         | CLI、網站或 Guard 的匿名化掃描結果         |
+| **上傳** | Skill 威脅       | 匿名化的 skill 審計發現                    |
+| **下載** | 確認 ATR 規則    | 社群確認的偵測規則                         |
+| **下載** | IP blocklist     | 已知惡意 IP                                |
+| **下載** | Domain blocklist | 已知惡意 domain                            |
 
 ## 快速開始
 
@@ -131,24 +131,25 @@ panguard guard start --dashboard
 Threat Cloud sync 每小時在背景自動跑。你的 agent 貢獻匿名化威脅資料，同時收到更新的 ATR 規則跟 IoC feed。
 
 <Info>
-  **零設定。** 公開 Threat Cloud `tc.panguard.ai` 對所有 Panguard 使用者免費。標準 agent sync 不需 API key。
+  **零設定。** 公開 Threat Cloud `tc.panguard.ai` 對所有 Panguard 使用者免費。標準 agent sync 不需
+  API key。
 </Info>
 
 ## API 端點
 
-| 方法 | Endpoint | 說明 |
-|------|----------|------|
-| POST | `/api/atr-proposals` | 提交或確認 ATR 提案 |
-| GET | `/api/atr-rules` | 拿確認的 ATR 規則（支援 `?since=` 篩選） |
-| POST | `/api/skill-threats` | 從審計提交 skill 威脅 |
-| POST | `/api/analyze-skills` | 提交掃描結果做伺服器端 LLM 分析 |
-| POST | `/api/scan-events` | 回報掃描事件（批次/CLI/Web） |
-| GET | `/api/feeds/ip-blocklist` | IP blocklist feed |
-| GET | `/api/feeds/domain-blocklist` | Domain blocklist feed |
-| GET | `/api/skill-blacklist` | 社群 skill 黑名單 |
-| GET | `/api/stats` | 威脅統計 |
-| GET | `/api/metrics` | 聚合指標（cache 60 秒） |
-| GET | `/health` | 健康檢查 |
+| 方法 | Endpoint                      | 說明                                     |
+| ---- | ----------------------------- | ---------------------------------------- |
+| POST | `/api/atr-proposals`          | 提交或確認 ATR 提案                      |
+| GET  | `/api/atr-rules`              | 拿確認的 ATR 規則（支援 `?since=` 篩選） |
+| POST | `/api/skill-threats`          | 從審計提交 skill 威脅                    |
+| POST | `/api/analyze-skills`         | 提交掃描結果做伺服器端 LLM 分析          |
+| POST | `/api/scan-events`            | 回報掃描事件（批次/CLI/Web）             |
+| GET  | `/api/feeds/ip-blocklist`     | IP blocklist feed                        |
+| GET  | `/api/feeds/domain-blocklist` | Domain blocklist feed                    |
+| GET  | `/api/skill-blacklist`        | 社群 skill 黑名單                        |
+| GET  | `/api/stats`                  | 威脅統計                                 |
+| GET  | `/api/metrics`                | 聚合指標（cache 60 秒）                  |
+| GET  | `/health`                     | 健康檢查                                 |
 
 ## 私有部署
 
