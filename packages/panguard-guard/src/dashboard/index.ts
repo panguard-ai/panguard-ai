@@ -649,14 +649,14 @@ export class DashboardServer {
         '@panguard-ai/panguard-mcp/config' as string
       );
       const discover = mcpConfig['discoverAllSkills'] as
-        | (() => Promise<Array<{ name: string; platform: string; command?: string }>>)
+        | (() => Promise<Array<{ name: string; platformId?: string; platform?: string; command?: string }>>)
         | undefined;
       if (discover) {
         const discovered = await discover();
         const discoveredNames = new Set(discovered.map((s) => s.name));
         allSkills = discovered.map((s) => ({
           name: s.name,
-          platform: s.platform,
+          platform: s.platformId ?? s.platform ?? 'unknown',
           command: s.command,
           whitelisted: whitelistedNames.has(s.name),
           source: whitelist.find((w) => w.name === s.name)?.source,
@@ -677,6 +677,16 @@ export class DashboardServer {
       allSkills = whitelist.map((s) => ({
         name: s.name,
         platform: 'unknown',
+        whitelisted: true,
+        source: s.source,
+      }));
+    }
+
+    // If discovery returned nothing but whitelist has entries, merge them in
+    if (allSkills.length === 0 && whitelist.length > 0) {
+      allSkills = whitelist.map((s) => ({
+        name: s.name,
+        platform: 'whitelist-only',
         whitelisted: true,
         source: s.source,
       }));
