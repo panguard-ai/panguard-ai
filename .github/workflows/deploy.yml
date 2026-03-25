@@ -31,6 +31,8 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-pnpm-
       - run: pnpm install --frozen-lockfile
+      - name: Compile ATR rules for website
+        run: node scripts/compile-atr-rules.mjs
       - run: pnpm run build
       - run: pnpm run typecheck
       - name: Run tests (excluding installer E2E — has its own workflow)

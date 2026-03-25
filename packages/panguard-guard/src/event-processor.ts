@@ -230,7 +230,11 @@ async function reportAndNotify(
   }
 
   // Upload to threat cloud
-  if (anonymizedData && state.config.telemetryEnabled !== false) {
+  if (
+    anonymizedData &&
+    state.config.threatCloudUploadEnabled !== false &&
+    state.config.telemetryEnabled !== false
+  ) {
     if (state.config.showUploadData) {
       logger.info(`[upload-preview] Anonymized data: ${JSON.stringify(anonymizedData, null, 2)}`);
     }

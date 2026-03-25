@@ -17,18 +17,30 @@ const MAX_SKILL_SIZE = 1024 * 1024; // 1 MB
  * Parse a SKILL.md file and extract manifest + instructions.
  */
 export async function parseSkillManifest(skillDir: string): Promise<SkillManifest | null> {
-  const skillPath = path.join(skillDir, 'SKILL.md');
+  // Support both directory paths (with SKILL.md inside) and direct .md file paths
+  const isFile = skillDir.endsWith('.md');
+  const candidates = isFile
+    ? [skillDir]
+    : [path.join(skillDir, 'SKILL.md'), path.join(skillDir, 'skill.md')];
 
-  let content: string;
-  try {
-    const stat = await fs.stat(skillPath);
-    if (stat.size > MAX_SKILL_SIZE) {
-      return null;
+  let content: string | null = null;
+  let resolvedPath = skillDir;
+
+  for (const candidate of candidates) {
+    try {
+      const stat = await fs.stat(candidate);
+      if (stat.isFile() && stat.size <= MAX_SKILL_SIZE) {
+        content = await fs.readFile(candidate, 'utf-8');
+        resolvedPath = candidate;
+        break;
+      }
+    } catch {
+      // Try next candidate
     }
-    content = await fs.readFile(skillPath, 'utf-8');
-  } catch {
-    return null;
   }
 
-  return parseManifestFromString(content, path.basename(skillDir));
+  if (!content) return null;
+
+  const name = isFile ? path.basename(skillDir, '.md') : path.basename(skillDir);
+  return parseManifestFromString(content, name);
 }
