@@ -613,15 +613,15 @@ open_browser() {
 # Zero-interaction post-install: setup → guard → scan → dashboard.
 # No questions asked. Scan runs visibly, dashboard opens.
 auto_setup() {
-  local UI_LANG DASHBOARD_PORT DASHBOARD_URL
-  UI_LANG="$(detect_lang)"
-  DASHBOARD_PORT=3100
-  DASHBOARD_URL="http://127.0.0.1:${DASHBOARD_PORT}"
+  local DASHBOARD_PORT=3100
+  local DASHBOARD_URL="http://127.0.0.1:${DASHBOARD_PORT}"
+  local UI_LANG
+  UI_LANG="$(detect_lang 2>/dev/null || echo "en")"
 
   # 1. Connect AI agents
   echo ""
-  info "Connecting to AI agents..."
-  if ! panguard setup --lang "$UI_LANG" --yes --skip-guard 2>/dev/null; then
+  info "Configuring AI agent protection..."
+  if ! panguard setup --yes --skip-scan 2>/dev/null; then
     warn "Agent setup had issues. Continuing with Guard startup..."
   fi
 
@@ -762,9 +762,29 @@ main() {
     bin_source="${INSTALL_DIR}/source/bin/panguard"
   fi
 
-  # npm global install already handles PATH; only run setup_path for binary/source installs
+  # Set up PATH: npm install puts panguard in PATH, but we also need to
+  # update any existing wrapper scripts (e.g. ~/.local/bin/panguard) that
+  # may point to the old ~/.panguard/ location which was backed up.
   if [ "$NPM_INSTALLED" = "false" ]; then
     setup_path "$bin_source" "$SYMLINK_TARGET" "$BIN_DIR"
+  else
+    # Update existing wrapper if it points to a stale path
+    local wrapper="${BIN_DIR}/panguard"
+    if [ -f "$wrapper" ]; then
+      local old_target
+      old_target=$(grep -o 'exec "[^"]*"' "$wrapper" 2>/dev/null | sed 's/exec "//;s/"//')
+      if [ -n "$old_target" ] && [ ! -x "$old_target" ]; then
+        info "Updating wrapper at ${wrapper} to point to ${bin_source}"
+        printf '#!/usr/bin/env bash\nexec "%s" "$@"\n' "$bin_source" > "$wrapper" 2>/dev/null
+        chmod +x "$wrapper" 2>/dev/null
+      fi
+    fi
+    # Also create pga alias wrapper if it doesn't exist
+    local pga_wrapper="${BIN_DIR}/pga"
+    if [ ! -f "$pga_wrapper" ] && mkdir -p "$BIN_DIR" 2>/dev/null; then
+      printf '#!/usr/bin/env bash\nexec "%s" "$@"\n' "$bin_source" > "$pga_wrapper" 2>/dev/null
+      chmod +x "$pga_wrapper" 2>/dev/null
+    fi
   fi
 
   # Ensure PATH works in the current session (critical for curl|bash installs)
