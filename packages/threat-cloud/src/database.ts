@@ -609,6 +609,12 @@ export class ThreatCloudDB {
   }
 
   /** Get threat statistics / 取得威脅統計 */
+  clearAllRules(): number {
+    const rulesDeleted = (this.db.prepare('DELETE FROM rules').run()).changes;
+    const proposalsDeleted = (this.db.prepare('DELETE FROM atr_proposals').run()).changes;
+    return rulesDeleted + proposalsDeleted;
+  }
+
   getStats(): ThreatStats {
     const totalThreats = (
       this.db.prepare('SELECT COUNT(*) as count FROM threats').get() as { count: number }

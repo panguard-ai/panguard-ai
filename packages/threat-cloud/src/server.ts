@@ -449,6 +449,20 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/admin/reset-rules':
+          if (req.method === 'POST') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            const deleted = this.db.clearAllRules();
+            log.info(`Admin reset: cleared ${deleted} rules and proposals`);
+            this.sendJson(res, 200, { ok: true, data: { deleted, message: 'All rules and proposals cleared. Re-seed required.' } });
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         default:
           this.sendJson(res, 404, { ok: false, error: 'Not found' });
       }
