@@ -125,7 +125,9 @@ export function scanContent(content: string, options: ScanOptions = {}): ScanRes
   // README files are documentation, not agent instructions.
   // Keyword matches in feature descriptions are expected, not threats.
   // Apply a heavy discount so legitimate READMEs don't score CRITICAL.
-  const effectiveMultiplier = isReadme ? ctx.multiplier * 0.3 : ctx.multiplier;
+  // README raw scores are typically 100-200 (many keyword matches in feature
+  // descriptions) so we need a strong discount to reach LOW/MEDIUM range.
+  const effectiveMultiplier = isReadme ? Math.min(ctx.multiplier * 0.15, 0.25) : ctx.multiplier;
   const { score, level } = calculateRiskScore(findings, effectiveMultiplier);
 
   // -- Hashes --
