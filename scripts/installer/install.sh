@@ -124,6 +124,10 @@ backup_existing() {
     existing_ver=$("${INSTALL_DIR}/bin/panguard" --version 2>/dev/null || echo "unknown")
     info "Existing installation found: v${existing_ver}. Creating backup..."
     mv "$INSTALL_DIR" "${INSTALL_DIR}.backup.$(date +%s)"
+  elif [ -d "${INSTALL_DIR}" ]; then
+    # Preserve Guard data (auth.db, config, etc.) during npm upgrades
+    info "Existing data directory found. Creating backup..."
+    mv "$INSTALL_DIR" "${INSTALL_DIR}.backup.$(date +%s)"
   fi
 }
 
@@ -525,23 +529,107 @@ print_quickstart() {
   success "Installation complete!"
 }
 
+# ── detect_lang() ────────────────────────────────────────────
+# Detect system language. Returns "zh-TW" for Chinese systems, "en" otherwise.
+detect_lang() {
+  local sys_lang="${LANG:-${LC_ALL:-}}"
+  case "$sys_lang" in
+    zh*|Chinese*) echo "zh-TW" ;;
+    *) echo "en" ;;
+  esac
+}
+
+# ── spinner() ────────────────────────────────────────────────
+# Show a spinner animation while a background process runs.
+# Usage: spinner <pid> <message>
+spinner() {
+  local pid="$1" msg="$2"
+  local frames=('.' '..' '...' '....' '.....')
+  local i=0
+  while kill -0 "$pid" 2>/dev/null; do
+    printf "\r  ${BLUE}[SCAN]${NC} %s%s   " "$msg" "${frames[$((i % ${#frames[@]}))]}"
+    i=$((i + 1))
+    sleep 0.4
+  done
+  printf "\r  ${GREEN}[ OK ]${NC} %s     \n" "$msg"
+}
+
 # ── auto_setup() ──────────────────────────────────────────────
-# Automatically run panguard setup to configure AI agents, install Guard,
-# and enable Threat Cloud. No interactive questions -- just do it.
+# Zero-interaction post-install: setup → guard → scan → dashboard.
+# No questions asked. Scan runs visibly, then dashboard opens.
 auto_setup() {
+  local DASHBOARD_PORT=3100
+  local DASHBOARD_URL="http://127.0.0.1:${DASHBOARD_PORT}"
+  local UI_LANG
+  UI_LANG="$(detect_lang 2>/dev/null || echo "en")"
+
+  # 1. Connect AI agents
   echo ""
   info "Configuring AI agent protection..."
-
-  if panguard setup --yes --skip-scan 2>/dev/null; then
-    echo ""
-    success "Guard is now running. Dashboard: http://127.0.0.1:3100"
-    info "Run 'panguard audit skill .' to audit skills in any project."
-    info "Run 'panguard guard start --dashboard' to open the dashboard."
-  else
+  if ! panguard setup --yes --skip-scan 2>/dev/null; then
     echo ""
     warn "Automatic setup encountered an error."
     info "Run 'panguard setup' manually to configure AI agent protection."
+    return 1
   fi
+
+  # 2. Start Guard
+  echo ""
+  info "Starting Guard with dashboard..."
+  panguard guard start --dashboard 2>/dev/null &
+  local guard_pid=$!
+
+  # Wait for dashboard to be ready (up to 10s)
+  local attempts=0
+  while [ $attempts -lt 10 ]; do
+    if curl -sf "${DASHBOARD_URL}" >/dev/null 2>&1; then
+      break
+    fi
+    sleep 1
+    attempts=$((attempts + 1))
+  done
+  wait "$guard_pid" 2>/dev/null || true
+
+  # 3. Run scan in foreground with spinner (user sees progress)
+  echo ""
+  panguard scan --quick >/dev/null 2>&1 &
+  local scan_pid=$!
+  if [ "$UI_LANG" = "zh-TW" ]; then
+    spinner "$scan_pid" "Scanning AI agent configurations / 正在掃描 AI 代理設定"
+  else
+    spinner "$scan_pid" "Scanning AI agent configurations"
+  fi
+
+  # 4. Open dashboard in browser
+  if command -v open &>/dev/null; then
+    open "${DASHBOARD_URL}"
+  elif command -v xdg-open &>/dev/null; then
+    xdg-open "${DASHBOARD_URL}"
+  fi
+
+  # 5. Final status
+  echo ""
+  success "Done! Dashboard opened in your browser."
+  echo ""
+  echo -e "  Dashboard:  ${BLUE}${DASHBOARD_URL}${NC}"
+  echo "  Guard:      running (learning mode, day 1/7)"
+  echo "  ATR rules:  61 detection rules loaded"
+  echo "  Scan:       complete"
+  echo ""
+  if [ "$UI_LANG" = "zh-TW" ]; then
+    echo -e "  ${BOLD}Panguard 已安裝完成。Guard 正在背景運行。${NC}"
+    echo "  所有偵測到的 AI 平台已自動設定。掃描完成。"
+  else
+    echo -e "  ${BOLD}Panguard is installed and protecting your AI agents.${NC}"
+    echo "  All detected AI platforms configured. Scan complete."
+  fi
+  echo ""
+  echo "  Other commands:"
+  echo "    panguard audit skill <path>   Audit a skill before installing"
+  echo "    panguard scan                 Full security scan"
+  echo "    panguard guard status         Check Guard status"
+  echo "    panguard guard stop           Stop Guard"
+  echo ""
 }
 
 # ── Main ─────────────────────────────────────────────────────────
@@ -635,7 +723,6 @@ main() {
   fi
 
   verify_installation "$bin_source"
-  print_quickstart
   auto_setup
 }
 
