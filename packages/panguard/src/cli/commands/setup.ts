@@ -14,6 +14,7 @@ import { join } from 'node:path';
 import { homedir, platform } from 'node:os';
 import { createRequire } from 'node:module';
 import { c, banner, divider, symbols, promptConfirm } from '@panguard-ai/core';
+import { PANGUARD_VERSION } from '../../index.js';
 import {
   scanInstalledSkills,
   renderSkillScanResults,
@@ -206,12 +207,16 @@ export function setupCommand(): Command {
           ? targets.filter((p) => p.alreadyConfigured)
           : targets.filter((p) => p.detected && !p.alreadyConfigured);
 
+        // JSON mode: collect all data, output at the end (don't return early)
+        const jsonOutput: Record<string, unknown> = {
+          action: options.remove ? 'remove' : 'setup',
+          version: PANGUARD_VERSION,
+          timestamp: new Date().toISOString(),
+          platforms: [],
+        };
+
         if (actionable.length === 0) {
-          if (options.json) {
-            console.log(
-              JSON.stringify({ action: options.remove ? 'remove' : 'setup', results: [] })
-            );
-          } else {
+          if (!options.json) {
             const msg = options.remove
               ? 'No platforms have Panguard configured.'
               : 'All detected platforms are already configured, or no platforms found.';
@@ -219,7 +224,18 @@ export function setupCommand(): Command {
             console.log();
             console.log(c.dim('  Run with --platform <name> to target a specific platform.'));
           }
-          return;
+
+          // Include already-configured platforms in JSON output
+          jsonOutput['platforms'] = allPlatforms
+            .filter((p) => p.detected)
+            .map((p) => ({
+              platform: p.id,
+              success: true,
+              already_configured: p.alreadyConfigured,
+            }));
+
+          // Don't return — continue to skill scan + guard for JSON mode
+          if (!options.json) return;
         }
 
         // 3. Execute injection or removal
@@ -250,22 +266,17 @@ export function setupCommand(): Command {
           }
         }
 
-        if (options.json) {
-          console.log(
-            JSON.stringify(
-              {
-                action: options.remove ? 'remove' : 'setup',
-                results: results.map((r) => ({
-                  platform: r.platformId,
-                  success: r.success,
-                  configPath: r.configPath,
-                  error: r.error,
-                })),
-              },
-              null,
-              2
-            )
-          );
+        // Update jsonOutput with actual platform results
+        jsonOutput['platforms'] = results.map((r) => ({
+          platform: r.platformId,
+          success: r.success,
+          configPath: r.configPath,
+          error: r.error,
+        }));
+
+        if (options.json && options.remove) {
+          jsonOutput['agent_friendly'] = true;
+          console.log(JSON.stringify(jsonOutput, null, 2));
           return;
         }
 
@@ -276,21 +287,25 @@ export function setupCommand(): Command {
         const succeeded = results.filter((r) => r.success).length;
         const failed = results.filter((r) => !r.success).length;
 
-        if (failed === 0) {
-          console.log(
-            c.green(`  ${symbols.pass} All ${succeeded} platform(s) configured successfully.`)
-          );
-        } else {
-          console.log(c.yellow(`  ${succeeded} succeeded, ${failed} failed.`));
+        if (!options.json) {
+          if (failed === 0) {
+            console.log(
+              c.green(`  ${symbols.pass} All ${succeeded} platform(s) configured successfully.`)
+            );
+          } else {
+            console.log(c.yellow(`  ${succeeded} succeeded, ${failed} failed.`));
+          }
         }
 
         // ── 4. Scan installed skills ──────────────────────────────────
         if (!options.remove && !options.skipScan) {
-          console.log();
-          divider('Skill Security Scan');
-          console.log();
-          console.log(c.dim('  Scanning installed MCP skills across all platforms...'));
-          console.log();
+          if (!options.json) {
+            console.log();
+            divider('Skill Security Scan');
+            console.log();
+            console.log(c.dim('  Scanning installed MCP skills across all platforms...'));
+            console.log();
+          }
 
           try {
             const { discoverAllSkills } = await (import(
@@ -301,8 +316,28 @@ export function setupCommand(): Command {
             const skills = await discoverAllSkills();
 
             if (skills.length > 0) {
-              const scanResults = await scanInstalledSkills(skills);
-              renderSkillScanResults(scanResults);
+              const scanResults = await scanInstalledSkills(skills, {
+                silent: options.json,
+              });
+              if (!options.json) renderSkillScanResults(scanResults);
+
+              // Collect skill scan data for JSON output
+              const safe = scanResults.filter((r) => r.status === 'safe');
+              const cautionResults = scanResults.filter((r) => r.status === 'caution');
+              const flaggedResults = scanResults.filter((r) => r.status === 'flagged');
+              jsonOutput['skill_scan'] = {
+                total: scanResults.length,
+                safe: safe.length,
+                caution: cautionResults.length,
+                flagged: flaggedResults.length,
+                skills: scanResults.map((r) => ({
+                  name: r.entry.name,
+                  platform: r.entry.platformId,
+                  status: r.status,
+                  risk_level: r.audit?.riskLevel ?? null,
+                  risk_score: r.audit?.riskScore ?? null,
+                })),
+              };
 
               // Whitelist only safe (LOW risk) skills — caution (MEDIUM) needs review
               const safeOnly = scanResults
@@ -310,15 +345,17 @@ export function setupCommand(): Command {
                 .map((r) => r.entry.name);
               if (safeOnly.length > 0) {
                 persistToWhitelist(safeOnly, 'static');
-                console.log();
-                console.log(
-                  c.green(`  ${symbols.pass} ${safeOnly.length} safe skill(s) auto-whitelisted.`)
-                );
-                console.log(c.dim(`    Saved to ~/.panguard-guard/skill-whitelist.json`));
+                if (!options.json) {
+                  console.log();
+                  console.log(
+                    c.green(`  ${symbols.pass} ${safeOnly.length} safe skill(s) auto-whitelisted.`)
+                  );
+                  console.log(c.dim(`    Saved to ~/.panguard-guard/skill-whitelist.json`));
+                }
               }
 
               const caution = scanResults.filter((r) => r.status === 'caution');
-              if (caution.length > 0) {
+              if (caution.length > 0 && !options.json) {
                 console.log(
                   c.yellow(
                     `  ${symbols.warn} ${caution.length} skill(s) at MEDIUM risk — monitored but not whitelisted.`
@@ -341,34 +378,36 @@ export function setupCommand(): Command {
 
                 for (const result of critical) {
                   const removed = removeServer(result.entry.platformId, result.entry.name);
-                  if (removed) {
-                    console.log(
-                      c.red(
-                        `  ${symbols.fail} BLOCKED: ${c.bold(result.entry.name)} is critically dangerous and has been disabled.`
-                      )
-                    );
-                    console.log(
-                      c.dim(
-                        `    Risk score: ${result.audit?.riskScore ?? 0}/100 | Platform: ${result.entry.platformId}`
-                      )
-                    );
-                  } else {
-                    console.log(
-                      c.red(
-                        `  ${symbols.fail} CRITICAL: ${c.bold(result.entry.name)} -- could not auto-remove. Manually disable this skill.`
-                      )
-                    );
+                  if (!options.json) {
+                    if (removed) {
+                      console.log(
+                        c.red(
+                          `  ${symbols.fail} BLOCKED: ${c.bold(result.entry.name)} is critically dangerous and has been disabled.`
+                        )
+                      );
+                      console.log(
+                        c.dim(
+                          `    Risk score: ${result.audit?.riskScore ?? 0}/100 | Platform: ${result.entry.platformId}`
+                        )
+                      );
+                    } else {
+                      console.log(
+                        c.red(
+                          `  ${symbols.fail} CRITICAL: ${c.bold(result.entry.name)} -- could not auto-remove. Manually disable this skill.`
+                        )
+                      );
+                    }
                   }
                 }
               }
 
               // Review HIGH skills interactively (not CRITICAL)
-              if (high.length > 0 && !options.yes) {
+              if (high.length > 0 && !options.yes && !options.json) {
                 const userWhitelisted = await reviewFlaggedSkills(high);
                 if (userWhitelisted.length > 0) {
                   persistToWhitelist(userWhitelisted, 'manual');
                 }
-              } else if (high.length > 0) {
+              } else if (high.length > 0 && !options.json) {
                 console.log(
                   c.yellow(
                     `  ${symbols.warn} ${high.length} HIGH-risk skill(s) -- run "panguard guard --watch" to review.`
@@ -376,25 +415,32 @@ export function setupCommand(): Command {
                 );
               }
             } else {
-              console.log(
-                c.dim(
-                  `  ${symbols.info} No MCP skills found. Skills will be audited as you install them.`
-                )
-              );
+              jsonOutput['skill_scan'] = { total: 0, safe: 0, caution: 0, flagged: 0, skills: [] };
+              if (!options.json) {
+                console.log(
+                  c.dim(
+                    `  ${symbols.info} No MCP skills found. Skills will be audited as you install them.`
+                  )
+                );
+              }
             }
           } catch {
-            console.log(c.dim(`  ${symbols.info} Skill scanning skipped (auditor not available).`));
+            if (!options.json) {
+              console.log(c.dim(`  ${symbols.info} Skill scanning skipped (auditor not available).`));
+            }
           }
 
-          console.log();
-          divider();
+          if (!options.json) {
+            console.log();
+            divider();
+          }
         }
 
         // ── 5. Install guard as system service (auto-start on boot) ───
         if (!options.remove && !options.skipGuard) {
-          console.log();
+          if (!options.json) console.log();
           const installGuard =
-            options.yes ||
+            options.yes || options.json ||
             (await promptConfirm({
               message: {
                 en: 'Install Panguard Guard as system service? (recommended, auto-start on boot)',
@@ -405,8 +451,10 @@ export function setupCommand(): Command {
             }));
 
           if (installGuard) {
-            console.log();
-            console.log(c.dim('  Installing Panguard Guard as system service...'));
+            if (!options.json) {
+              console.log();
+              console.log(c.dim('  Installing Panguard Guard as system service...'));
+            }
 
             // Resolve the guard CLI binary path (outside try so fallback can use it)
             let guardBin: string | undefined;
@@ -417,9 +465,14 @@ export function setupCommand(): Command {
               // Fallback: check common global/local paths
             }
 
+            const dashUrl = 'http://127.0.0.1:3100';
+
             if (!guardBin) {
-              console.log(c.yellow(`  ${symbols.warn} Could not locate panguard-guard binary.`));
-              console.log(c.dim('    Run manually: panguard guard install'));
+              if (!options.json) {
+                console.log(c.yellow(`  ${symbols.warn} Could not locate panguard-guard binary.`));
+                console.log(c.dim('    Run manually: panguard guard install'));
+              }
+              jsonOutput['guard'] = { installed: false, running: false, error: 'guard binary not found' };
             } else {
               try {
                 const guardExec = `${process.execPath} ${guardBin}`;
@@ -438,20 +491,22 @@ export function setupCommand(): Command {
                         ? 'Windows Service'
                         : 'system service';
 
-                console.log(
-                  c.green(`  ${symbols.pass} Guard installed as ${serviceType} service.`)
-                );
-                console.log(c.dim(`    ${servicePath}`));
-                console.log(
-                  c.green(`  ${symbols.pass} Guard will auto-start on boot and restart on crash.`)
-                );
-                console.log(c.dim('    Run "panguard guard status" to check.'));
-                console.log(c.dim('    Run "panguard guard uninstall" to remove.'));
+                if (!options.json) {
+                  console.log(
+                    c.green(`  ${symbols.pass} Guard installed as ${serviceType} service.`)
+                  );
+                  console.log(c.dim(`    ${servicePath}`));
+                  console.log(
+                    c.green(`  ${symbols.pass} Guard will auto-start on boot and restart on crash.`)
+                  );
+                  console.log(c.dim('    Run "panguard guard status" to check.'));
+                  console.log(c.dim('    Run "panguard guard uninstall" to remove.'));
+                }
 
                 // ── Threat Cloud opt-in ──
-                console.log();
+                if (!options.json) console.log();
                 const enableTC =
-                  options.yes ||
+                  options.yes || options.json ||
                   (await promptConfirm({
                     message: {
                       en: 'Enable Threat Cloud collective defense?',
@@ -474,76 +529,109 @@ export function setupCommand(): Command {
                   };
                   saveConfig(updatedConfig, configPath);
 
-                  if (enableTC) {
-                    console.log(
-                      c.green(
-                        `  ${symbols.pass} Threat Cloud enabled: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
-                      )
-                    );
-                    console.log(
-                      c.dim('    Every scan strengthens the collective defense network.')
-                    );
-                  } else {
-                    console.log(
-                      c.dim(
-                        `  ${symbols.info} Threat Cloud disabled. Enable later: panguard guard config --set threatCloudUploadEnabled=true`
-                      )
-                    );
+                  if (!options.json) {
+                    if (enableTC) {
+                      console.log(
+                        c.green(
+                          `  ${symbols.pass} Threat Cloud enabled: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
+                        )
+                      );
+                      console.log(
+                        c.dim('    Every scan strengthens the collective defense network.')
+                      );
+                    } else {
+                      console.log(
+                        c.dim(
+                          `  ${symbols.info} Threat Cloud disabled. Enable later: panguard guard config --set threatCloudUploadEnabled=true`
+                        )
+                      );
+                    }
                   }
                 } catch {
                   // Config save failed — non-fatal, Guard still installed
                 }
 
-                // Open Dashboard in browser
-                const dashUrl = 'http://127.0.0.1:3100';
-                console.log();
-                console.log(c.green(`  ${symbols.pass} Opening Guard Dashboard...`));
-                console.log(c.dim(`    ${dashUrl}`));
-                openBrowser(dashUrl);
+                jsonOutput['guard'] = {
+                  installed: true,
+                  running: true,
+                  service_type: serviceType,
+                  service_path: servicePath,
+                  dashboard_url: dashUrl,
+                  threat_cloud: enableTC,
+                };
+
+                // Open Dashboard in browser (skip in JSON mode — AI agent will show URL)
+                if (!options.json) {
+                  console.log();
+                  console.log(c.green(`  ${symbols.pass} Opening Guard Dashboard...`));
+                  console.log(c.dim(`    ${dashUrl}`));
+                  openBrowser(dashUrl);
+                }
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
-                if (msg.includes('EACCES') || msg.includes('permission')) {
-                  console.log(
-                    c.yellow(
-                      `  ${symbols.warn} Needs elevated privileges to install system service.`
-                    )
-                  );
-                  console.log(c.dim('    Run: sudo panguard guard install'));
-                } else {
-                  console.log(
-                    c.yellow(`  ${symbols.warn} Could not install as system service: ${msg}`)
-                  );
-                  console.log(c.dim('    Run manually: panguard guard install'));
+                if (!options.json) {
+                  if (msg.includes('EACCES') || msg.includes('permission')) {
+                    console.log(
+                      c.yellow(
+                        `  ${symbols.warn} Needs elevated privileges to install system service.`
+                      )
+                    );
+                    console.log(c.dim('    Run: sudo panguard guard install'));
+                  } else {
+                    console.log(
+                      c.yellow(`  ${symbols.warn} Could not install as system service: ${msg}`)
+                    );
+                    console.log(c.dim('    Run manually: panguard guard install'));
+                  }
+                  // Fallback: start Guard for this session only
+                  console.log();
+                  console.log(c.dim('  Starting Guard for this session instead...'));
                 }
-                // Fallback: start Guard for this session only
-                console.log();
-                console.log(c.dim('  Starting Guard for this session instead...'));
                 try {
                   const child = spawn(process.execPath, [guardBin, 'start', '--dashboard'], {
                     detached: true,
                     stdio: 'ignore',
                   });
                   child.unref();
-                  console.log(
-                    c.green(
-                      `  ${symbols.pass} Guard started (PID: ${child.pid}). Will stop when system restarts.`
-                    )
-                  );
-                  // Open Dashboard in browser
-                  const fallbackUrl = 'http://127.0.0.1:3100';
-                  console.log();
-                  console.log(c.green(`  ${symbols.pass} Opening Guard Dashboard...`));
-                  console.log(c.dim(`    ${fallbackUrl}`));
-                  openBrowser(fallbackUrl);
+
+                  jsonOutput['guard'] = {
+                    installed: false,
+                    running: true,
+                    pid: child.pid,
+                    dashboard_url: dashUrl,
+                    error: `service install failed: ${msg}`,
+                  };
+
+                  if (!options.json) {
+                    console.log(
+                      c.green(
+                        `  ${symbols.pass} Guard started (PID: ${child.pid}). Will stop when system restarts.`
+                      )
+                    );
+                    console.log();
+                    console.log(c.green(`  ${symbols.pass} Opening Guard Dashboard...`));
+                    console.log(c.dim(`    ${dashUrl}`));
+                    openBrowser(dashUrl);
+                  }
                 } catch {
-                  console.log(c.dim('    Run manually: panguard guard start --dashboard'));
+                  jsonOutput['guard'] = { installed: false, running: false, error: msg };
+                  if (!options.json) {
+                    console.log(c.dim('    Run manually: panguard guard start --dashboard'));
+                  }
                 }
               }
             }
           }
         }
 
-        // ── Next steps ─────────────────────────────────────────────────
+        // ── JSON output (all data collected) ─────────────────────────
+        if (options.json) {
+          jsonOutput['agent_friendly'] = true;
+          console.log(JSON.stringify(jsonOutput, null, 2));
+          return;
+        }
+
+        // ── Next steps (human-readable only) ─────────────────────────
         console.log();
         console.log(c.sage(c.bold('  Setup complete! Here are your quick commands:')));
         console.log();
