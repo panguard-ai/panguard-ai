@@ -23,11 +23,11 @@
 
 ---
 
-> AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We scanned 3,230 MCP skills. 1,299 were malicious. Stealing SSH keys. Injecting prompts. Exfiltrating data.
+> AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We continuously scan the MCP ecosystem. Over a third of skills have security findings. Credential access. Prompt injection. Data exfiltration. See the [live numbers](https://panguard.ai).
 >
-> Panguard is the App Store review for AI skills. ATR is the open audit standard. Every scan protects everyone.
+> Panguard is the App Store review for AI skills. ATR is the open audit standard. Every scan strengthens the detection.
 >
-> AI Agent 擁有完整系統權限，卻沒有任何審核。我們掃描了 3,230 個 MCP Skill，發現 1,299 個惡意。Panguard 是 AI Skill 的 App Store 審核。
+> AI Agent 擁有完整系統權限，卻沒有任何審核。我們持續掃描 MCP 生態系，超過三分之一的 Skill 有安全問題。即時數據見 [panguard.ai](https://panguard.ai)。
 
 ---
 
@@ -85,16 +85,9 @@ One user's encounter with a new attack becomes a rule that protects everyone.
 
 ## Ecosystem Scan Results
 
-We scanned **3,230 MCP skills** from 4,648 registry entries. [Full report](https://panguard.ai/research/mcp-ecosystem-scan).
+We continuously scan the MCP skill ecosystem from npm, GitHub, and community registries. [Full report with live numbers](https://panguard.ai/research/mcp-ecosystem-scan).
 
-| Result   | Count | Percent |
-| -------- | ----- | ------- |
-| Clean    | 2,749 | 85.1%   |
-| CRITICAL | 197   | 6.1%    |
-| HIGH     | 123   | 3.8%    |
-| MEDIUM   | 161   | 5.0%    |
-
-Top findings: SSH key exfiltration, prompt injection with Unicode obfuscation, environment variable harvesting, git token theft.
+Top findings: credential access patterns, prompt injection, environment variable harvesting, excessive filesystem/network permissions.
 
 ---
 
@@ -157,7 +150,7 @@ panguard guard start --dashboard
 
 Every Panguard instance is a sensor. Threats are auto-drafted into ATR rules, uploaded anonymously, confirmed by 3+ users + LLM review, then pushed to everyone.
 
-**Currently:** 61 community-generated rules from 3,230 skill scans.
+**Currently:** 61 ATR detection rules. Community rule generation active.
 
 **Privacy:** Fully optional. Only anonymized signatures. Zero raw data, zero PII. Disable anytime.
 

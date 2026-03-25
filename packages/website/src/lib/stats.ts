@@ -23,7 +23,7 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.3.3',
+  cliVersion: '1.3.5',
   atrRules: 61,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 0,
@@ -73,13 +73,13 @@ export const STATS = {
     /** npm packages found in crawl */
     npmPackages: 2_769,
     /** Packages actually scanned by ATR + Skill Auditor (L1 + L2 AST) */
-    skillsScanned: 2_386,
+    skillsScanned: 3_267,
     /** Total MCP tool definitions extracted from scanned packages */
     toolsExtracted: 35_858,
     /** Packages with security findings (any severity) */
-    packagesWithFindings: 1_167,
+    packagesWithFindings: 1_228,
     /** Threats detected (confirmed + suspicious) — legacy alias */
-    maliciousFound: 1_167,
+    maliciousFound: 1_228,
     /** ATR rule candidates from scan findings */
     atrRulesGenerated: 225,
     /** Total ATR rule matches across all packages */
@@ -99,7 +99,12 @@ export const STATS = {
     registrySources: 3,
     lastCrawl: '2026-03-18',
   },
-  lastUpdated: '2026-03-18',
+  /**
+   * NOTE: These fallback numbers are only used when TC live API is unreachable.
+   * Website components should always prefer fetchLiveMetrics() for real-time data.
+   * Update these periodically to keep fallbacks reasonable.
+   */
+  lastUpdated: '2026-03-26',
 } as const;
 
 export type Stats = typeof STATS;
