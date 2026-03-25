@@ -468,7 +468,9 @@ export async function POST(request: Request) {
   scanCache.set(cHash, { report, scannedAt });
 
   // Submit to Threat Cloud (non-blocking)
-  if (result.riskScore > 0) {
+  // Skip README-based scans — documentation descriptions trigger false positives
+  // that would pollute the community threat database.
+  if (result.riskScore > 0 && !isReadme) {
     void submitToThreatCloud(
       report.skillName ?? cHash,
       cHash,
@@ -478,8 +480,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // Flywheel: submit ATR proposal for HIGH/CRITICAL findings
+  // Flywheel: submit ATR proposal for HIGH/CRITICAL findings (SKILL.md only)
   if (
+    !isReadme &&
     (result.riskLevel === 'HIGH' || result.riskLevel === 'CRITICAL') &&
     result.findings.length > 0
   ) {

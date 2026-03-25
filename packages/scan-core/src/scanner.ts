@@ -122,7 +122,11 @@ export function scanContent(content: string, options: ScanOptions = {}): ScanRes
   }
 
   // -- Risk scoring --
-  const { score, level } = calculateRiskScore(findings, ctx.multiplier);
+  // README files are documentation, not agent instructions.
+  // Keyword matches in feature descriptions are expected, not threats.
+  // Apply a heavy discount so legitimate READMEs don't score CRITICAL.
+  const effectiveMultiplier = isReadme ? ctx.multiplier * 0.3 : ctx.multiplier;
+  const { score, level } = calculateRiskScore(findings, effectiveMultiplier);
 
   // -- Hashes --
   const cHash = contentHash(content);
