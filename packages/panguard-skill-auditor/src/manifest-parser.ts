@@ -24,14 +24,12 @@ export async function parseSkillManifest(skillDir: string): Promise<SkillManifes
     : [path.join(skillDir, 'SKILL.md'), path.join(skillDir, 'skill.md')];
 
   let content: string | null = null;
-  let resolvedPath = skillDir;
 
   for (const candidate of candidates) {
     try {
       const stat = await fs.stat(candidate);
       if (stat.isFile() && stat.size <= MAX_SKILL_SIZE) {
         content = await fs.readFile(candidate, 'utf-8');
-        resolvedPath = candidate;
         break;
       }
     } catch {
