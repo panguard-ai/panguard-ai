@@ -129,6 +129,10 @@ backup_existing() {
     info "Existing data directory found. Creating backup..."
     mv "$INSTALL_DIR" "${INSTALL_DIR}.backup.$(date +%s)"
   fi
+
+  # Clean up old backups (keep only last 3)
+  # shellcheck disable=SC2012
+  ls -td "${INSTALL_DIR}.backup."* 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
 }
 
 # ── download_file() ─────────────────────────────────────────────
@@ -541,22 +545,64 @@ detect_lang() {
 
 # ── spinner() ────────────────────────────────────────────────
 # Show a spinner animation while a background process runs.
-# Usage: spinner <pid> <message>
+# Usage: spinner <pid> <message> [timeout_seconds]
+# Times out after timeout_seconds (default 60) to prevent hanging.
 spinner() {
-  local pid="$1" msg="$2"
+  local pid="$1" msg="$2" timeout="${3:-60}"
   local frames=('.' '..' '...' '....' '.....')
-  local i=0
+  local i=0 start_time
+  start_time=$(date +%s)
   while kill -0 "$pid" 2>/dev/null; do
+    local elapsed=$(( $(date +%s) - start_time ))
+    if [ "$elapsed" -ge "$timeout" ]; then
+      kill -9 "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+      printf "\r  ${YELLOW}[WARN]${NC} %s (timed out after %ds)\n" "$msg" "$timeout"
+      return 1
+    fi
     printf "\r  ${BLUE}[SCAN]${NC} %s%s   " "$msg" "${frames[$((i % ${#frames[@]}))]}"
     i=$((i + 1))
     sleep 0.4
   done
+  wait "$pid" 2>/dev/null || true
   printf "\r  ${GREEN}[ OK ]${NC} %s     \n" "$msg"
+  return 0
+}
+
+# ── open_browser() ───────────────────────────────────────────
+# Cross-platform browser opener: macOS, Linux, WSL, headless.
+# Returns 0 if browser opened, 1 if headless/no browser.
+open_browser() {
+  local url="$1"
+
+  # macOS
+  if command -v open &>/dev/null; then
+    open "$url" 2>/dev/null && return 0
+  fi
+
+  # WSL (check before xdg-open — WSL may have xdg-open but it won't work)
+  if [ -n "${WSL_DISTRO_NAME:-}" ]; then
+    if command -v wslview &>/dev/null; then
+      wslview "$url" 2>/dev/null && return 0
+    elif command -v explorer.exe &>/dev/null; then
+      explorer.exe "$url" 2>/dev/null && return 0
+    fi
+  fi
+
+  # Linux with display server
+  if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+    if command -v xdg-open &>/dev/null; then
+      xdg-open "$url" 2>/dev/null && return 0
+    fi
+  fi
+
+  # Headless / SSH / Docker — no browser available
+  return 1
 }
 
 # ── auto_setup() ──────────────────────────────────────────────
 # Zero-interaction post-install: setup → guard → scan → dashboard.
-# No questions asked. One command, scan runs visibly, dashboard opens.
+# No questions asked. Scan runs visibly, dashboard opens.
 auto_setup() {
   local UI_LANG DASHBOARD_PORT DASHBOARD_URL
   UI_LANG="$(detect_lang)"
@@ -566,45 +612,69 @@ auto_setup() {
   # 1. Connect AI agents
   echo ""
   info "Connecting to AI agents..."
-  panguard setup --lang "$UI_LANG" --yes --skip-guard 2>/dev/null || true
+  if ! panguard setup --lang "$UI_LANG" --yes --skip-guard 2>/dev/null; then
+    warn "Agent setup had issues. Continuing with Guard startup..."
+  fi
 
-  # 2. Start Guard
+  # 2. Start Guard (handle already-running gracefully)
   echo ""
-  info "Starting Guard with dashboard..."
-  panguard guard start --dashboard 2>/dev/null &
-  local guard_pid=$!
+  local guard_already_running=false
+  if panguard guard status 2>/dev/null | grep -q "RUNNING"; then
+    guard_already_running=true
+    info "Guard is already running."
+  else
+    info "Starting Guard with dashboard..."
+    panguard guard start --dashboard 2>/dev/null &
+    local guard_pid=$!
+    wait "$guard_pid" 2>/dev/null || true
+  fi
 
-  # Wait for dashboard to be ready (up to 10s)
-  local attempts=0
-  while [ $attempts -lt 10 ]; do
+  # Wait for dashboard to be ready (up to 15s)
+  local attempts=0 dashboard_ready=false
+  while [ $attempts -lt 15 ]; do
     if curl -sf "${DASHBOARD_URL}" >/dev/null 2>&1; then
+      dashboard_ready=true
       break
     fi
     sleep 1
     attempts=$((attempts + 1))
   done
-  wait "$guard_pid" 2>/dev/null || true
 
-  # 3. Run scan in foreground with spinner (user sees progress)
+  if [ "$dashboard_ready" = "false" ]; then
+    warn "Dashboard not responding on port ${DASHBOARD_PORT}."
+    # Try to detect actual port from Guard status
+    local actual_port
+    actual_port=$(panguard guard status 2>/dev/null | grep -oE 'localhost:[0-9]+' | grep -oE '[0-9]+' || echo "")
+    if [ -n "$actual_port" ] && [ "$actual_port" != "$DASHBOARD_PORT" ]; then
+      DASHBOARD_PORT="$actual_port"
+      DASHBOARD_URL="http://127.0.0.1:${DASHBOARD_PORT}"
+      info "Dashboard detected on port ${DASHBOARD_PORT}."
+    fi
+  fi
+
+  # 3. Run scan with spinner (user sees progress, 60s timeout)
   echo ""
   panguard scan --quick >/dev/null 2>&1 &
   local scan_pid=$!
   if [ "$UI_LANG" = "zh-TW" ]; then
-    spinner "$scan_pid" "Scanning AI agent configurations / 正在掃描 AI 代理設定"
+    spinner "$scan_pid" "Scanning AI agent configurations / 正在掃描 AI 代理設定" 60
   else
-    spinner "$scan_pid" "Scanning AI agent configurations"
+    spinner "$scan_pid" "Scanning AI agent configurations" 60
   fi
 
-  # 4. Open dashboard in browser
-  if command -v open &>/dev/null; then
-    open "${DASHBOARD_URL}"
-  elif command -v xdg-open &>/dev/null; then
-    xdg-open "${DASHBOARD_URL}"
+  # 4. Open dashboard in browser (cross-platform)
+  local browser_opened=false
+  if open_browser "${DASHBOARD_URL}"; then
+    browser_opened=true
   fi
 
   # 5. Final status
   echo ""
-  success "Done! Dashboard opened in your browser."
+  if [ "$browser_opened" = "true" ]; then
+    success "Done! Dashboard opened in your browser."
+  else
+    success "Done! Open the dashboard manually:"
+  fi
   echo ""
   echo -e "  Dashboard:  ${BLUE}${DASHBOARD_URL}${NC}"
   echo "  Guard:      running (learning mode, day 1/7)"
@@ -664,8 +734,21 @@ main() {
   if [ "$BINARY_INSTALLED" = "true" ]; then
     bin_source="${INSTALL_DIR}/bin/panguard"
   elif [ "$NPM_INSTALLED" = "true" ]; then
-    # npm global install puts it in PATH already
-    bin_source="$(command -v panguard 2>/dev/null || echo "${INSTALL_DIR}/bin/panguard")"
+    # npm global install: find the binary via command -v, npm prefix, or common paths
+    bin_source="$(command -v panguard 2>/dev/null || echo "")"
+    if [ -z "$bin_source" ]; then
+      # Not in PATH yet — check npm global prefix
+      local npm_prefix
+      npm_prefix="$(npm config get prefix 2>/dev/null || echo "")"
+      if [ -n "$npm_prefix" ] && [ -x "${npm_prefix}/bin/panguard" ]; then
+        bin_source="${npm_prefix}/bin/panguard"
+        export PATH="${npm_prefix}/bin:$PATH"
+      fi
+    fi
+    # Final fallback
+    if [ -z "$bin_source" ]; then
+      bin_source="${INSTALL_DIR}/bin/panguard"
+    fi
   else
     bin_source="${INSTALL_DIR}/source/bin/panguard"
   fi
@@ -677,7 +760,7 @@ main() {
 
   # Ensure PATH works in the current session (critical for curl|bash installs)
   if ! command -v panguard &>/dev/null; then
-    if [ -x "$bin_source" ]; then
+    if [ -n "$bin_source" ] && [ -x "$bin_source" ]; then
       export PATH="$(dirname "$bin_source"):$PATH"
     fi
     # Also try common install dirs
