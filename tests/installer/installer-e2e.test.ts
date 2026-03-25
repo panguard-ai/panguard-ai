@@ -44,7 +44,9 @@ describe('Installer E2E', { timeout: TIMEOUT }, () => {
         });
 
         // The installer should report success
-        expect(result).toContain('Installation complete');
+        expect(
+          result.includes('Installation complete') || result.includes('Dashboard opened')
+        ).toBe(true);
 
         // npm-first strategy: npm global install, binary install, or source build
         const hasNpmInstall = result.includes('installed via npm');

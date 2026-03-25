@@ -103,10 +103,10 @@ export const CATEGORIES: CommandCategory[] = [
           {
             name: '--dashboard-port <port>',
             descKey: 'cli.commands.guardStart.flags.dashboardPort',
-            default: '9100',
+            default: '3100',
           },
         ],
-        example: 'panguard guard start --mode active --dashboard-port 9100',
+        example: 'panguard guard start --mode active --dashboard-port 3100',
         tier: 'Free',
         maturity: 'GA',
       },
