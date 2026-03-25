@@ -572,27 +572,36 @@ spinner() {
 # ── open_browser() ───────────────────────────────────────────
 # Cross-platform browser opener: macOS, Linux, WSL, headless.
 # Returns 0 if browser opened, 1 if headless/no browser.
+#
+# IMPORTANT: When run via `curl | bash`, stdin is a pipe and the shell
+# environment is non-interactive. Browser-open commands may silently
+# fail or no-op in this context. We use `nohup ... </dev/null &` to
+# fully detach from the pipe and give the command a clean environment.
 open_browser() {
   local url="$1"
 
   # macOS
-  if command -v open &>/dev/null; then
-    open "$url" 2>/dev/null && return 0
+  if [ "$(uname -s)" = "Darwin" ]; then
+    nohup /usr/bin/open "$url" </dev/null >/dev/null 2>&1 &
+    return 0
   fi
 
   # WSL (check before xdg-open — WSL may have xdg-open but it won't work)
   if [ -n "${WSL_DISTRO_NAME:-}" ]; then
     if command -v wslview &>/dev/null; then
-      wslview "$url" 2>/dev/null && return 0
+      nohup wslview "$url" </dev/null >/dev/null 2>&1 &
+      return 0
     elif command -v explorer.exe &>/dev/null; then
-      explorer.exe "$url" 2>/dev/null && return 0
+      explorer.exe "$url" </dev/null >/dev/null 2>&1 &
+      return 0
     fi
   fi
 
   # Linux with display server
   if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
     if command -v xdg-open &>/dev/null; then
-      xdg-open "$url" 2>/dev/null && return 0
+      nohup xdg-open "$url" </dev/null >/dev/null 2>&1 &
+      return 0
     fi
   fi
 

@@ -266,13 +266,15 @@ export function setupCommand(): Command {
           }
         }
 
-        // Update jsonOutput with actual platform results
-        jsonOutput['platforms'] = results.map((r) => ({
-          platform: r.platformId,
-          success: r.success,
-          configPath: r.configPath,
-          error: r.error,
-        }));
+        // Update jsonOutput with actual platform results (only if there were actionable platforms)
+        if (results.length > 0) {
+          jsonOutput['platforms'] = results.map((r) => ({
+            platform: r.platformId,
+            success: r.success,
+            configPath: r.configPath,
+            error: r.error,
+          }));
+        }
 
         if (options.json && options.remove) {
           jsonOutput['agent_friendly'] = true;
