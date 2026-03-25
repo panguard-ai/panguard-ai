@@ -617,16 +617,16 @@ auto_setup() {
   fi
 
   # 2. Start Guard (handle already-running gracefully)
+  #    IMPORTANT: `panguard guard start` is a BLOCKING foreground process
+  #    that never exits (it monitors). We MUST background it and NOT wait.
   echo ""
-  local guard_already_running=false
   if panguard guard status 2>/dev/null | grep -q "RUNNING"; then
-    guard_already_running=true
     info "Guard is already running."
   else
     info "Starting Guard with dashboard..."
-    panguard guard start --dashboard 2>/dev/null &
-    local guard_pid=$!
-    wait "$guard_pid" 2>/dev/null || true
+    # Background and detach — do NOT wait (it runs forever)
+    nohup panguard guard start --dashboard >/dev/null 2>&1 &
+    disown 2>/dev/null || true
   fi
 
   # Wait for dashboard to be ready (up to 15s)
