@@ -52,6 +52,17 @@ const DEV_TOOL_DESCRIPTION_RE =
 const API_INTEGRATION_RE =
   /\b(api\s+integration|api\s+client|connector|webhook|slack|discord|notion|github|gitlab|jira|trello|asana|linear|airtable|google\s+sheets|zapier|weather|wttr\.in|open[\s-]?meteo)\b/i;
 
+// Capability declaration: structured "## Tools" / "## Commands" / "## Features" section
+// with bullet-list tool definitions (e.g. "- query: Execute a SELECT query")
+const CAPABILITY_SECTION_RE =
+  /^#{1,3}\s+(?:Tools|Commands|Features|Capabilities|Functions|Methods|Endpoints)\s*$/m;
+
+const TOOL_DEFINITION_LIST_RE = /^[-*]\s+\w[\w-]*\s*:\s+.+$/m;
+
+// Security measures language: content explicitly mentions safety constraints
+const SECURITY_MEASURES_RE =
+  /\b(only\s+SELECT|read[\s-]only|validated|sandboxed|restricted|allowed\s+directories|allow[\s-]?list|deny[\s-]?list|rate[\s-]?limit|no\s+write|no\s+delete|immutable|whitelisted|blocklist)\b/i;
+
 // Well-known CLI tools that legitimately need shell access
 const KNOWN_CLI_BINS_RE =
   /^(bash|sh|zsh|curl|wget|git|gh|jq|grep|sed|awk|find|rsync|scp|make|npm|npx|pnpm|yarn|pip|python|node|go|cargo|docker|kubectl|terraform|aws|gcloud|az|ffmpeg|convert|osascript|pbcopy|pbpaste|open|xdg-open)$/i;
@@ -234,6 +245,75 @@ export function detectContextSignals(
         weight: -0.2,
       });
     }
+  }
+
+  // Capability declaration: frontmatter with name+description AND a structured
+  // tools/commands section with bullet-list definitions. This pattern is typical
+  // of legitimate SKILL.md / MCP server docs that describe tool capabilities.
+  const hasFmName = manifest?.name || /^name:\s*.+/m.test(content);
+  const hasFmDesc = manifest?.description || /^description:\s*.+/m.test(content);
+  if (
+    hasFmName &&
+    hasFmDesc &&
+    CAPABILITY_SECTION_RE.test(content) &&
+    TOOL_DEFINITION_LIST_RE.test(content)
+  ) {
+    signals.push({
+      id: 'reduce-capability-declaration',
+      type: 'reducer',
+      label: 'Structured capability declaration with tool definitions',
+      weight: -0.5,
+    });
+  }
+
+  // Claude Code skill/command/agent format detection.
+  // These files are instructions TO Claude about what to check/do, not executable
+  // attack payloads. They legitimately mention security terms like "SQL injection"
+  // because they're telling Claude to LOOK FOR those issues.
+  const noFrontmatter = !/^---\n/.test(content.trimStart());
+  const startsWithTitle = /^\s*#\s+\S/.test(content.trimStart());
+  const hasNumberedSteps = /(?:^|\n)\s*(?:\d+\.|##\s*Step)\s+/m.test(content);
+  const hasChecklist = /\*\*.*(?:CRITICAL|HIGH|MEDIUM|LOW).*\*\*/m.test(content);
+  // Commands: no frontmatter, title + steps
+  if (noFrontmatter && startsWithTitle && (hasNumberedSteps || hasChecklist)) {
+    signals.push({
+      id: 'reduce-claude-command-format',
+      type: 'reducer',
+      label: 'Claude Code command format (instructional, not executable)',
+      weight: -0.5,
+    });
+  }
+  // Agents/skills with frontmatter declaring tools/model/origin (Claude Code native format)
+  const hasToolsField = /^(?:tools|allowed-tools)\s*:/m.test(content);
+  const hasModelField = /^model\s*:/m.test(content);
+  const hasOriginField = /^origin\s*:/m.test(content);
+  if (hasFmName && hasFmDesc && (hasToolsField || hasModelField || hasOriginField)) {
+    signals.push({
+      id: 'reduce-claude-agent-format',
+      type: 'reducer',
+      label: 'Claude Code agent/skill with declared tools, model, or origin',
+      weight: -0.5,
+    });
+  }
+  // Minimal frontmatter skill (name + description only, common pattern for curated skills)
+  // These are knowledge-base skills that provide patterns/guidelines, not attack payloads.
+  if (hasFmName && hasFmDesc && !noFrontmatter && !hasToolsField && !hasModelField) {
+    signals.push({
+      id: 'reduce-knowledge-skill',
+      type: 'reducer',
+      label: 'Curated knowledge skill with structured frontmatter',
+      weight: -0.3,
+    });
+  }
+
+  // Security measures: content explicitly mentions safety constraints
+  if (SECURITY_MEASURES_RE.test(prose)) {
+    signals.push({
+      id: 'reduce-security-measures',
+      type: 'reducer',
+      label: 'Content declares security measures or access restrictions',
+      weight: -0.3,
+    });
   }
 
   // -- Calculate multiplier --

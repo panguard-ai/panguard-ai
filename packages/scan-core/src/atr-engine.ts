@@ -154,6 +154,11 @@ export function scanWithATR(
             if (hasStrongReducers) {
               severity = downgradeSeverity(severity);
             }
+            // Extra downgrade: all signals are reducers on a non-README skill file
+            // (e.g. a legitimate SKILL.md with capability declarations)
+            if (allReducers && !isReadme) {
+              severity = downgradeSeverity(severity);
+            }
           }
           // Only raw matched: hidden in markup
           if (!matchesStripped && matchesRaw && hasStrongReducers && allReducers) {

@@ -551,7 +551,7 @@ export interface GuardConfig {
   managerUrl?: string;
   /** Agent ID (auto-assigned on registration) */
   agentId?: string;
-  /** Enable telemetry upload to Threat Cloud (default true) */
+  /** @deprecated Use threatCloudUploadEnabled instead. Kept for backwards compatibility. */
   telemetryEnabled?: boolean;
   /** Show anonymized upload data before sending (debug mode) */
   showUploadData?: boolean;

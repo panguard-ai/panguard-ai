@@ -17,6 +17,53 @@ import type { ATREngine as ATREngineType, AgentEvent, ATRMatch } from '@panguard
 
 const CHECK_LABEL = 'ATR Pattern Detection';
 
+// ---------------------------------------------------------------------------
+// Capability declaration detection (mirrors scan-core context-signals logic)
+// ---------------------------------------------------------------------------
+
+const CAPABILITY_SECTION_RE =
+  /^#{1,3}\s+(?:Tools|Commands|Features|Capabilities|Functions|Methods|Endpoints)\s*$/m;
+
+const TOOL_DEFINITION_LIST_RE = /^[-*]\s+\w[\w-]*\s*:\s+.+$/m;
+
+const SECURITY_MEASURES_RE =
+  /\b(only\s+SELECT|read[\s-]only|validated|sandboxed|restricted|allowed\s+directories|allow[\s-]?list|deny[\s-]?list|rate[\s-]?limit|no\s+write|no\s+delete|immutable|whitelisted|blocklist)\b/i;
+
+type AuditSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
+
+function downgradeAuditSeverity(severity: AuditSeverity): AuditSeverity {
+  const map: Record<AuditSeverity, AuditSeverity> = {
+    critical: 'medium',
+    high: 'low',
+    medium: 'low',
+    low: 'info',
+    info: 'info',
+  };
+  return map[severity] ?? 'info';
+}
+
+/**
+ * Detect whether a manifest represents a legitimate capability declaration
+ * (structured tool listing with security measures) rather than a threat.
+ */
+function detectCapabilityContext(manifest: SkillManifest): {
+  isCapabilityDeclaration: boolean;
+  hasSecurityMeasures: boolean;
+} {
+  const content = manifest.instructions ?? '';
+  const hasName = !!manifest.name;
+  const hasDesc = !!manifest.description;
+  const hasCapSection = CAPABILITY_SECTION_RE.test(content);
+  const hasToolDefs = TOOL_DEFINITION_LIST_RE.test(content);
+  const hasSecurity =
+    SECURITY_MEASURES_RE.test(content) || SECURITY_MEASURES_RE.test(manifest.description ?? '');
+
+  return {
+    isCapabilityDeclaration: hasName && hasDesc && hasCapSection && hasToolDefs,
+    hasSecurityMeasures: hasSecurity,
+  };
+}
+
 /** ATR category to AuditFinding category mapping */
 const CATEGORY_MAP: Record<string, AuditFinding['category']> = {
   'prompt-injection': 'prompt-injection',
@@ -214,7 +261,22 @@ export async function checkWithATR(
     }
 
     // Deduplicate and convert to findings
-    const findings = matchesToFindings(allMatches);
+    let findings = matchesToFindings(allMatches);
+
+    // Apply capability-declaration context downgrades
+    const capCtx = detectCapabilityContext(manifest);
+    if (capCtx.isCapabilityDeclaration || capCtx.hasSecurityMeasures) {
+      findings = findings.map((f) => {
+        let severity = f.severity as AuditSeverity;
+        if (capCtx.isCapabilityDeclaration) {
+          severity = downgradeAuditSeverity(severity);
+        }
+        if (capCtx.hasSecurityMeasures) {
+          severity = downgradeAuditSeverity(severity);
+        }
+        return severity !== f.severity ? { ...f, severity } : f;
+      });
+    }
 
     const hasCritical = findings.some((f) => f.severity === 'critical');
     const hasHigh = findings.some((f) => f.severity === 'high');

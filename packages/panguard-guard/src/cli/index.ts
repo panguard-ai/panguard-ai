@@ -146,6 +146,7 @@ async function commandStart(
     config.managerUrl = managerUrl;
   }
   if (noTelemetry) {
+    config.threatCloudUploadEnabled = false;
     config.telemetryEnabled = false;
   }
   if (showUploadData) {
@@ -188,7 +189,7 @@ async function commandStart(
   );
 
   // Threat intelligence sharing transparency message
-  if (config.telemetryEnabled === false) {
+  if (config.threatCloudUploadEnabled === false || config.telemetryEnabled === false) {
     console.log(`  ${symbols.info} Threat intelligence sharing: ${c.dim('disabled')}`);
     console.log(`  ${c.dim('  No data will be uploaded to Panguard Threat Cloud')}`);
   } else {

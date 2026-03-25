@@ -653,6 +653,7 @@ export class DashboardServer {
         | undefined;
       if (discover) {
         const discovered = await discover();
+        const discoveredNames = new Set(discovered.map((s) => s.name));
         allSkills = discovered.map((s) => ({
           name: s.name,
           platform: s.platform,
@@ -660,6 +661,17 @@ export class DashboardServer {
           whitelisted: whitelistedNames.has(s.name),
           source: whitelist.find((w) => w.name === s.name)?.source,
         }));
+        // Merge whitelist entries that were not found by discovery
+        for (const w of whitelist) {
+          if (!discoveredNames.has(w.name)) {
+            allSkills.push({
+              name: w.name,
+              platform: 'whitelist-only',
+              whitelisted: true,
+              source: w.source,
+            });
+          }
+        }
       }
     } catch {
       allSkills = whitelist.map((s) => ({

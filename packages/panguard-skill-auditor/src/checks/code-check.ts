@@ -6,7 +6,18 @@
 import type { AuditFinding, CheckResult } from '../types.js';
 import type { Severity } from '@panguard-ai/core';
 
-export async function checkCode(skillDir: string): Promise<CheckResult> {
+export async function checkCode(skillDirOrFile: string): Promise<CheckResult> {
+  // Skip code scanning for direct .md files — they are text content, not source code.
+  // Scanning the parent directory (e.g. ~/.claude/commands/) would incorrectly scan ALL
+  // commands as if they were one skill's source code.
+  if (skillDirOrFile.endsWith('.md')) {
+    return {
+      status: 'pass',
+      label: 'Code: skipped (text-only skill file)',
+      findings: [],
+    };
+  }
+  const skillDir = skillDirOrFile;
   const findings: AuditFinding[] = [];
 
   // Dynamic import to handle case where panguard-scan is not available

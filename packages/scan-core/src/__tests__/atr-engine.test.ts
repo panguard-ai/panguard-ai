@@ -388,8 +388,8 @@ describe('scanWithATR', () => {
       allReducers: true,
     });
 
-    // high -> low via downgrade
-    expect(result.findings[0].severity).toBe('low');
+    // high -> low (hasStrongReducers) -> info (allReducers + !isReadme)
+    expect(result.findings[0].severity).toBe('info');
   });
 
   // ---------------------------------------------------------------------------

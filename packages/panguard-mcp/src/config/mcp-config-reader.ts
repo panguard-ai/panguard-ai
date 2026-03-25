@@ -85,12 +85,18 @@ export function parseMCPServers(
  * Returns null if resolution fails.
  */
 export function resolveSkillDir(entry: MCPServerEntry): string | null {
-  // Claude Code skill/command/agent: args[0] is the .md file path
+  // Claude Code skill/command/agent: args[0] is the .md file path or SKILL.md path
   if (['skill', 'command', 'agent'].includes(entry.command)) {
     const mdPath = entry.args[0];
     if (mdPath && existsSync(mdPath)) {
-      // If it's a file, return its directory; if it's in a skill dir with SKILL.md, return that
-      return mdPath.endsWith('.md') ? dirname(mdPath) : mdPath;
+      // For directory-based skills (e.g. ~/.claude/skills/browse/SKILL.md),
+      // return the parent directory so auditor finds SKILL.md inside.
+      // For direct .md files (e.g. ~/.claude/commands/plan.md),
+      // return the .md file path itself so auditor reads it directly.
+      if (mdPath.endsWith('/SKILL.md') || mdPath.endsWith('/README.md')) {
+        return dirname(mdPath);
+      }
+      return mdPath; // Direct .md file
     }
     // configPath is the skill directory for directory-based skills
     if (entry.configPath && existsSync(entry.configPath)) {

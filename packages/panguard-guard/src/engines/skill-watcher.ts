@@ -13,6 +13,9 @@
  */
 
 import { EventEmitter } from 'node:events';
+import { existsSync, readdirSync, watch, type FSWatcher } from 'node:fs';
+import { join, basename } from 'node:path';
+import { homedir } from 'node:os';
 import { createLogger, FileMonitor } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-guard:skill-watcher');
@@ -124,22 +127,40 @@ async function loadAuditor(): Promise<AuditModule> {
 }
 
 // ---------------------------------------------------------------------------
+// Claude Code skill directories to watch
+// ---------------------------------------------------------------------------
+
+const CLAUDE_SKILL_DIRS = [
+  { path: join(homedir(), '.claude', 'skills'), type: 'skill' },
+  { path: join(homedir(), '.claude', 'commands'), type: 'command' },
+  { path: join(homedir(), '.claude', 'agents'), type: 'agent' },
+] as const;
+
+// ---------------------------------------------------------------------------
 // Skill Watcher
 // ---------------------------------------------------------------------------
 
 /**
  * Watches platform MCP configs for new skill installations.
+ * Also monitors ~/.claude/skills/, ~/.claude/commands/, and ~/.claude/agents/
+ * for Claude Code native skill installations (.md files).
+ *
  * Emits: 'skill-added', 'skill-removed', 'skill-audit-complete', 'skill-blocked', 'skill-flagged'
  */
 export class SkillWatcher extends EventEmitter {
   private fileMonitor: FileMonitor | null = null;
+  private readonly directoryWatchers: FSWatcher[] = [];
   private readonly config: Required<
     Omit<SkillWatcherConfig, 'submitThreat' | 'submitATRProposal' | 'checkBlacklist'>
   > &
     Pick<SkillWatcherConfig, 'submitThreat' | 'submitATRProposal' | 'checkBlacklist'>;
 
   private previousSkills: Map<string, MCPServerEntryMinimal> = new Map();
+  /** Snapshot of Claude Code native skills (.md-based) */
+  private previousClaudeSkills: Map<string, MCPServerEntryMinimal> = new Map();
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Separate debounce timer for directory changes */
+  private dirDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private running = false;
 
   constructor(config?: SkillWatcherConfig) {
@@ -214,10 +235,15 @@ export class SkillWatcher extends EventEmitter {
       });
 
       this.fileMonitor.start();
+
+      // Start watching Claude Code skill directories
+      this.startDirectoryWatchers();
+
       this.running = true;
 
       logger.info(
-        `Skill watcher started: monitoring ${configPaths.length} config(s) across ${detected.length} platform(s)`
+        `Skill watcher started: monitoring ${configPaths.length} config(s) across ${detected.length} platform(s), ` +
+          `plus ${this.directoryWatchers.length} Claude Code skill dir(s)`
       );
     } catch (err) {
       logger.warn(
@@ -235,10 +261,21 @@ export class SkillWatcher extends EventEmitter {
       this.debounceTimer = null;
     }
 
+    if (this.dirDebounceTimer) {
+      clearTimeout(this.dirDebounceTimer);
+      this.dirDebounceTimer = null;
+    }
+
     if (this.fileMonitor) {
       this.fileMonitor.stop();
       this.fileMonitor = null;
     }
+
+    // Close all directory watchers
+    for (const watcher of this.directoryWatchers) {
+      watcher.close();
+    }
+    this.directoryWatchers.length = 0;
 
     this.running = false;
     logger.info('Skill watcher stopped');
@@ -323,6 +360,158 @@ export class SkillWatcher extends EventEmitter {
     } catch (err) {
       logger.warn(
         `Skill watcher config change handling failed: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Claude Code skill directory monitoring
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Scan ~/.claude/skills/, ~/.claude/commands/, ~/.claude/agents/ and build
+   * a snapshot map using the same logic as discoverClaudeCodeSkills() in
+   * panguard-mcp.  Returns entries keyed by "claude-code:<type>:<name>".
+   */
+  private scanClaudeSkillDirs(): Map<string, MCPServerEntryMinimal> {
+    const entries = new Map<string, MCPServerEntryMinimal>();
+
+    for (const { path: dirPath, type } of CLAUDE_SKILL_DIRS) {
+      if (!existsSync(dirPath)) continue;
+      try {
+        const items = readdirSync(dirPath, { withFileTypes: true });
+        for (const item of items) {
+          // Directory with SKILL.md or README.md inside
+          if (item.isDirectory()) {
+            const skillMd = join(dirPath, item.name, 'SKILL.md');
+            const readmeMd = join(dirPath, item.name, 'README.md');
+            const hasContent = existsSync(skillMd) || existsSync(readmeMd);
+            if (hasContent) {
+              const mdPath = existsSync(skillMd) ? skillMd : readmeMd;
+              entries.set(`claude-code:${type}:${item.name}`, {
+                name: item.name,
+                command: type,
+                args: [mdPath],
+                platformId: 'claude-code',
+              });
+            }
+          }
+          // Direct .md file
+          if (item.isFile() && item.name.endsWith('.md')) {
+            const name = basename(item.name, '.md');
+            entries.set(`claude-code:${type}:${name}`, {
+              name,
+              command: type,
+              args: [join(dirPath, item.name)],
+              platformId: 'claude-code',
+            });
+          }
+        }
+      } catch {
+        // Directory not readable — skip silently
+      }
+    }
+
+    return entries;
+  }
+
+  /**
+   * Start fs.watch watchers on each Claude Code skill directory.
+   * Also builds the initial snapshot of Claude Code skills.
+   */
+  private startDirectoryWatchers(): void {
+    // Build initial snapshot
+    this.previousClaudeSkills = this.scanClaudeSkillDirs();
+
+    for (const { path: dirPath, type } of CLAUDE_SKILL_DIRS) {
+      if (!existsSync(dirPath)) {
+        logger.info(`Claude Code ${type} directory not found: ${dirPath}, skipping`);
+        continue;
+      }
+      try {
+        const watcher = watch(dirPath, { recursive: true }, () => {
+          // Debounce: file writes may trigger multiple events
+          if (this.dirDebounceTimer) {
+            clearTimeout(this.dirDebounceTimer);
+          }
+          this.dirDebounceTimer = setTimeout(() => {
+            void this.handleClaudeSkillDirChange();
+          }, 500);
+        });
+
+        watcher.on('error', (err) => {
+          logger.warn(
+            `Directory watcher error for ${dirPath}: ${err instanceof Error ? err.message : String(err)}`
+          );
+        });
+
+        this.directoryWatchers.push(watcher);
+        logger.info(`Watching Claude Code ${type} directory: ${dirPath}`);
+      } catch (err) {
+        logger.warn(
+          `Failed to watch directory ${dirPath}: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+    }
+  }
+
+  /**
+   * Handle a change in any Claude Code skill directory.
+   * Rescans all directories, diffs against previous snapshot, and emits events.
+   */
+  private async handleClaudeSkillDirChange(): Promise<void> {
+    try {
+      const newSkills = this.scanClaudeSkillDirs();
+
+      // Diff: find added skills
+      const added: SkillChange[] = [];
+      for (const [key, entry] of newSkills) {
+        if (!this.previousClaudeSkills.has(key)) {
+          added.push({
+            name: entry.name,
+            platformId: entry.platformId,
+            command: entry.command,
+            args: entry.args,
+            action: 'added',
+          });
+        }
+      }
+
+      // Diff: find removed skills
+      const removed: SkillChange[] = [];
+      for (const [key, entry] of this.previousClaudeSkills) {
+        if (!newSkills.has(key)) {
+          removed.push({
+            name: entry.name,
+            platformId: entry.platformId,
+            command: entry.command,
+            args: entry.args,
+            action: 'removed',
+          });
+        }
+      }
+
+      // Update snapshot
+      this.previousClaudeSkills = newSkills;
+
+      // Emit events
+      for (const change of removed) {
+        this.emit('skill-removed', change);
+        logger.info(`Claude Code ${change.command} removed: ${change.name}`);
+      }
+
+      for (const change of added) {
+        this.emit('skill-added', change);
+        logger.info(`New Claude Code ${change.command} detected: ${change.name}`);
+
+        // Auto-audit if enabled
+        if (this.config.autoAudit) {
+          void this.auditNewSkill(change);
+        }
+      }
+    } catch (err) {
+      logger.warn(
+        `Claude Code skill directory change handling failed: ${err instanceof Error ? err.message : String(err)}`
       );
     }
   }
