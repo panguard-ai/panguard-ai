@@ -428,7 +428,9 @@ export function setupCommand(): Command {
             }
           } catch {
             if (!options.json) {
-              console.log(c.dim(`  ${symbols.info} Skill scanning skipped (auditor not available).`));
+              console.log(
+                c.dim(`  ${symbols.info} Skill scanning skipped (auditor not available).`)
+              );
             }
           }
 
@@ -442,7 +444,8 @@ export function setupCommand(): Command {
         if (!options.remove && !options.skipGuard) {
           if (!options.json) console.log();
           const installGuard =
-            options.yes || options.json ||
+            options.yes ||
+            options.json ||
             (await promptConfirm({
               message: {
                 en: 'Install Panguard Guard as system service? (recommended, auto-start on boot)',
@@ -474,7 +477,11 @@ export function setupCommand(): Command {
                 console.log(c.yellow(`  ${symbols.warn} Could not locate panguard-guard binary.`));
                 console.log(c.dim('    Run manually: panguard guard install'));
               }
-              jsonOutput['guard'] = { installed: false, running: false, error: 'guard binary not found' };
+              jsonOutput['guard'] = {
+                installed: false,
+                running: false,
+                error: 'guard binary not found',
+              };
             } else {
               try {
                 const guardExec = `${process.execPath} ${guardBin}`;
@@ -581,7 +588,8 @@ export function setupCommand(): Command {
         if (!options.remove && !options.skipGuard) {
           const dataDir = join(homedir(), '.panguard-guard');
           const enableTC =
-            options.yes || options.json ||
+            options.yes ||
+            options.json ||
             (await promptConfirm({
               message: {
                 en: 'Enable Threat Cloud collective defense?',
@@ -611,9 +619,7 @@ export function setupCommand(): Command {
                     `  ${symbols.pass} Threat Cloud enabled: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
                   )
                 );
-                console.log(
-                  c.dim('    Every scan strengthens the collective defense network.')
-                );
+                console.log(c.dim('    Every scan strengthens the collective defense network.'));
               } else {
                 console.log(
                   c.dim(
