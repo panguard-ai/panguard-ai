@@ -918,13 +918,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <span>PANGUARD AI</span>
 </div>
 <div class="sb-nav">
-<div class="ni on" data-tab="overview"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg><span data-i18n="n_ov">Overview</span></div>
-<div class="ni" data-tab="skills"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg><span data-i18n="n_sk">Skills & Trust</span></div>
-<div class="ni" data-tab="ai"><svg viewBox="0 0 24 24"><path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 2.48-.94 4.96-2.83 6.86-3.72 3.72-9.75 3.72-13.47 0s-3.72-9.75 0-13.47c3.72-3.72 9.75-3.72 13.47 0L21 2.62v7.5z"/></svg><span data-i18n="n_ai">AI Setup</span></div>
-<div class="ni" data-tab="rules"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9H8v-2h5v2zm3 4H8v-2h8v2zm-3-8V3.5L18.5 9H13z"/></svg><span data-i18n="n_ru">Rules</span></div>
-<div class="ni" data-tab="tcloud"><svg viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg><span data-i18n="n_tc">Threat Cloud</span></div>
+<div class="ni on" data-tab="dashboard"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg><span data-i18n="n_db">Dashboard</span></div>
 <div class="ni" data-tab="threats"><svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><span data-i18n="n_th">Threats</span></div>
-<div class="ni" data-tab="guide"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg><span data-i18n="n_gd">Guide</span></div>
+<div class="ni" data-tab="rules"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9H8v-2h5v2zm3 4H8v-2h8v2zm-3-8V3.5L18.5 9H13z"/></svg><span data-i18n="n_ru">Rules</span></div>
+<div class="ni" data-tab="settings"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg><span data-i18n="n_st">Settings</span></div>
 </div>
 <div class="sb-ft">
 <div class="ws-b"><div class="ws-d" id="wd"></div><span id="wl">Disconnected</span></div>
@@ -938,56 +935,62 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <span class="pb-txt" id="pb-txt">PROTECTED</span>
 <span id="pb-detail">| -- rules active | Last event: --</span>
 </div>
-<!-- Overview -->
-<div class="pg on" id="p-overview">
-<div class="pt" data-i18n="t_ov"><em>Overview</em></div>
-<div class="pd" data-i18n="d_ov">Real-time system status. All metrics update automatically via WebSocket.</div>
-<div class="cg">
-<div class="cd"><div class="cl" data-i18n="mode">Mode</div><div class="cv" id="v-mode">--</div></div>
-<div class="cd"><div class="cl" data-i18n="events">Events</div><div class="cv sg" id="v-ev">0</div></div>
-<div class="cd"><div class="cl" data-i18n="threats">Threats</div><div class="cv" id="v-th">0</div></div>
-<div class="cd"><div class="cl" data-i18n="uptime">Uptime</div><div class="cv sg" id="v-up">0s</div></div>
+<!-- Dashboard (merged Overview + Skills & Trust) -->
+<div class="pg on" id="p-dashboard">
+<div class="pt" data-i18n="t_db"><em>Dashboard</em></div>
+
+<!-- Security Score -->
+<div id="sec-score" style="background:linear-gradient(135deg,rgba(139,154,142,0.15),rgba(139,154,142,0.05));border:1px solid var(--bd);border-radius:12px;padding:24px;margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<div style="font-size:14px;font-weight:600;color:var(--fg)" data-i18n="sec_score">Security Score</div>
+<div style="font-size:13px;font-weight:600" id="sec-tier">Tier 1-2 (Regex + Heuristic)</div>
 </div>
-<div class="cg">
-<div class="cd"><div class="cl" data-i18n="learning">Learning</div><div class="cv" id="v-lr">0%</div></div>
-<div class="cd"><div class="cl" data-i18n="confidence">Confidence</div><div class="cv" id="v-cf">0%</div></div>
-<div class="cd"><div class="cl" data-i18n="memory">Memory</div><div class="cv sg" id="v-mem">0 MB</div></div>
-<div class="cd"><div class="cl" data-i18n="actions">Actions</div><div class="cv sg" id="v-act">0</div></div>
+<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">
+<div style="font-size:48px;font-weight:700;color:var(--ok)" id="sec-num">--</div>
+<div style="font-size:16px;color:var(--tm)">/100</div>
 </div>
-<div class="st" data-i18n="det_rules">Detection Rules</div>
-<div class="cg">
-<div class="cd"><div class="cl">ATR</div><div class="cv-sm sg" id="v-atr">--</div></div>
+<div style="background:var(--bg);border-radius:6px;height:8px;overflow:hidden;margin-bottom:12px">
+<div id="sec-bar" style="height:100%;background:var(--ok);border-radius:6px;width:0%;transition:width 0.5s"></div>
 </div>
-<div class="st" data-i18n="skill_sum">Skill Summary</div>
-<div class="cg">
-<div class="cd"><div class="cl" data-i18n="wl_skills">Whitelisted</div><div class="cv-sm ok" id="v-wsk">--</div></div>
-<div class="cd"><div class="cl" data-i18n="tr_skills">Tracked</div><div class="cv-sm sg" id="v-tsk">--</div></div>
-<div class="cd"><div class="cl" data-i18n="st_fp">Stable FP</div><div class="cv-sm sg" id="v-sfp">--</div></div>
+<div style="display:flex;gap:20px;font-size:12px;color:var(--tm)">
+<span><span id="v-ev" style="color:var(--ok);font-weight:600">0</span> events scanned</span>
+<span><span id="v-th" style="font-weight:600">0</span> threats blocked</span>
+<span><span id="v-atr" style="color:var(--sage);font-weight:600">--</span> rules active</span>
+<span data-i18n="uptime">Uptime</span>: <span id="v-up" style="font-weight:600">0s</span>
 </div>
-<div class="st" data-i18n="timeline">Event Timeline</div>
-<div class="tl" id="evl"><div class="reassure" id="evl-empty">No threats detected. Your agents are running safely.</div></div>
 </div>
 
-<!-- Skills & Trust -->
-<div class="pg" id="p-skills">
-<div class="pt" data-i18n="t_sk"><em>Skills & Trust</em></div>
-<div class="pd" data-i18n="d_sk">Panguard audits every MCP skill installed on your system. Safe skills are auto-whitelisted; risky ones are flagged for your review. This page shows all installed skills and their trust status.</div>
-<div class="cg" id="sk-sum">
-<div class="cd"><div class="cl" data-i18n="total">Total Installed</div><div class="cv sg" id="sk-t">--</div></div>
-<div class="cd"><div class="cl" data-i18n="wl_count">Whitelisted</div><div class="cv ok" id="sk-wl">--</div></div>
-<div class="cd"><div class="cl" data-i18n="tr_count">Tracked / Unknown</div><div class="cv w" id="sk-tr">--</div></div>
+<!-- LLM Upgrade CTA (shown when no Layer 3) -->
+<div id="llm-cta" style="background:linear-gradient(135deg,rgba(223,179,23,0.1),rgba(223,179,23,0.03));border:1px solid rgba(223,179,23,0.3);border-radius:12px;padding:20px;margin-bottom:20px;display:none">
+<div style="display:flex;justify-content:space-between;align-items:flex-start">
+<div>
+<div style="font-size:14px;font-weight:600;color:var(--fg);margin-bottom:6px" data-i18n="upgrade_title">Upgrade Your Protection</div>
+<div style="font-size:12px;color:var(--tm);margin-bottom:10px;line-height:1.5" data-i18n="upgrade_desc">Your Guard runs Tier 1-2 (regex only, 62.7% detection). Connect an LLM to unlock Tier 3:</div>
+<div style="font-size:12px;color:var(--tm);line-height:1.8">
+<span style="color:var(--ok)">+</span> <span data-i18n="up1">Catch attacks in ANY language</span><br>
+<span style="color:var(--ok)">+</span> <span data-i18n="up2">Detect paraphrased injection</span><br>
+<span style="color:var(--ok)">+</span> <span data-i18n="up3">Context-aware: know if "delete all" is real or attack</span><br>
+<span style="color:var(--ok)">+</span> <span data-i18n="up4">New attack types detected automatically</span>
 </div>
-<div class="st" data-i18n="all_skills">All Installed Skills</div>
-<div id="isk-loading" class="empty"><span class="spin"></span> Loading installed skills...</div>
-<table class="tb" id="isk-table" style="display:none"><thead><tr><th>#</th><th data-i18n="name">Name</th><th data-i18n="platform">Platform</th><th data-i18n="trust">Trust Status</th><th data-i18n="source">Source</th></tr></thead><tbody id="isk-tb"></tbody></table>
-<hr class="divider">
-<div class="st" data-i18n="whitelist">Whitelisted Skills</div>
-<table class="tb"><thead><tr><th>#</th><th data-i18n="name">Name</th><th data-i18n="source">Source</th><th data-i18n="reason">Reason</th><th data-i18n="date">Date</th></tr></thead><tbody id="sk-tb"></tbody></table>
+</div>
+<button class="btn btn-s" onclick="nav('settings')" style="white-space:nowrap" data-i18n="connect_llm">Connect LLM</button>
+</div>
+<div style="font-size:11px;color:var(--tm);margin-top:8px" data-i18n="free_options">Free options: Gemini (free tier) / Ollama (local)</div>
 </div>
 
-<!-- AI Setup -->
-<div class="pg" id="p-ai">
-<div class="pt" data-i18n="t_ai"><em>AI Configuration</em></div>
+<!-- Skills -->
+<div class="st" data-i18n="all_skills">All Skills</div>
+<div id="isk-loading" class="empty"><span class="spin"></span> Loading skills...</div>
+<table class="tb" id="isk-table" style="display:none"><thead><tr><th>#</th><th data-i18n="name">Name</th><th data-i18n="platform">Platform</th><th data-i18n="trust">Status</th></tr></thead><tbody id="isk-tb"></tbody></table>
+
+<!-- Event Timeline -->
+<div class="st" style="margin-top:20px" data-i18n="timeline">Recent Activity</div>
+<div class="tl" id="evl"><div class="reassure" id="evl-empty" data-i18n="no_threats">No threats detected. Your agents are running safely.</div></div>
+</div>
+
+<!-- Settings (merged AI Setup + Guide) -->
+<div class="pg" id="p-settings">
+<div class="pt" data-i18n="t_st"><em>Settings</em></div>
 <div class="pd" data-i18n="d_ai">Panguard uses a 3-layer detection system. Layer 1 (rules) and Layer 2 (fingerprint & heuristic) are always active with zero config. Layer 3 uses cloud AI for the deepest analysis -- configure your API key below.</div>
 
 <div class="fs">
@@ -1063,11 +1066,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <h3 data-i18n="why_contrib">Why Contribute?</h3>
 <div class="desc" data-i18n="why_desc">Threat actors evolve constantly. Community-contributed ATR rules create a collective defense network where every participant strengthens the security of all. Your device's unique threat observations may detect patterns unseen by others.</div>
 </div>
+<hr class="divider">
+<div class="st" data-i18n="t_tc">Threat Cloud</div>
+<div id="tc-loading-inline" class="empty"><span class="spin"></span> Loading Threat Cloud status...</div>
+<div id="tc-content-inline" style="display:none">
+<div class="cg">
+<div class="cd"><div class="cl" data-i18n="tc_status">Status</div><div class="cv-sm" id="tc-en2">--</div></div>
+<div class="cd"><div class="cl" data-i18n="tc_uploaded">Uploaded</div><div class="cv-sm sg" id="tc-up2">0</div></div>
+<div class="cd"><div class="cl" data-i18n="tc_received">Rules Received</div><div class="cv-sm sg" id="tc-recv2">0</div></div>
+</div>
+<div class="fs">
+<h3 data-i18n="upload_toggle">Anonymous Upload</h3>
+<div class="desc" data-i18n="upload_desc">When enabled, anonymized threat data is uploaded to Threat Cloud. No personal data, file contents, or source code is ever sent.</div>
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+<div class="toggle" id="tc-toggle2" onclick="toggleUpload()"></div>
+<span id="tc-toggle-label2" style="font-size:13px;font-weight:600">--</span>
+</div>
+</div>
+</div>
 </div>
 </div>
 
-<!-- Threat Cloud -->
-<div class="pg" id="p-tcloud">
+<!-- Threat Cloud (merged into Rules page as section) -->
+<div class="pg" id="p-tcloud" style="display:none">
 <div class="pt" data-i18n="t_tc"><em>Threat Cloud</em></div>
 <div class="pd" data-i18n="d_tc">Threat Cloud is Panguard's anonymous threat intelligence sharing network. Your device can optionally upload anonymized threat data to help the community, and receives updated detection rules in return.</div>
 <div id="tc-loading" class="empty"><span class="spin"></span> Loading Threat Cloud status...</div>
@@ -1132,8 +1153,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="tl" id="vl"></div>
 </div>
 
-<!-- Guide -->
-<div class="pg" id="p-guide">
+<!-- Guide (hidden, merged into Settings) -->
+<div class="pg" id="p-guide" style="display:none">
 <div class="pt" data-i18n="t_gd"><em>Getting Started</em></div>
 <div class="pd" data-i18n="d_gd">Follow these steps to activate full protection. Each step builds on the previous one. Once all steps are complete, Panguard Guard will continuously monitor and protect your system.</div>
 <div class="fs">
@@ -1152,9 +1173,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 <script>
 var T={
-en:{n_ov:'Overview',n_sk:'Skills & Trust',n_ai:'AI Setup',n_ru:'Rules',n_tc:'Threat Cloud',n_th:'Threats',n_gd:'Guide',
-t_ov:'<em>Overview</em>',t_sk:'<em>Skills & Trust</em>',t_ai:'<em>AI Configuration</em>',t_ru:'<em>Detection Rules</em>',t_tc:'<em>Threat Cloud</em>',t_th:'<em>Threat Intelligence</em>',t_gd:'<em>Getting Started</em>',
-d_ov:'Real-time system status. All metrics update automatically via WebSocket.',
+en:{n_db:'Dashboard',n_th:'Threats',n_ru:'Rules',n_st:'Settings',
+t_db:'<em>Dashboard</em>',t_st:'<em>Settings</em>',t_ru:'<em>Detection Rules</em>',t_th:'<em>Threat Intelligence</em>',
+sec_score:'Security Score',upgrade_title:'Upgrade Your Protection',upgrade_desc:'Your Guard runs Tier 1-2 (regex only, 62.7% detection). Connect an LLM to unlock Tier 3:',
+up1:'Catch attacks in ANY language',up2:'Detect paraphrased injection',up3:'Context-aware: know if "delete all" is real or attack',up4:'New attack types detected automatically',
+connect_llm:'Connect LLM',free_options:'Free options: Gemini (free tier) / Ollama (local)',no_threats:'No threats detected. Your agents are running safely.',
 d_sk:'Panguard audits every MCP skill installed on your system. Safe skills are auto-whitelisted; risky ones are flagged for your review.',
 d_ai:'Panguard uses a 3-layer detection system. Layer 1 (rules) and Layer 2 (fingerprint & heuristic) are always active with zero config. Layer 3 uses cloud AI for the deepest analysis -- configure your API key below.',
 d_ru:'Panguard uses a 3-layer rule system to detect threats. Rules sync automatically from Threat Cloud every hour. ATR rules are community-driven, auto-drafted by AI from real threat patterns.',
@@ -1193,8 +1216,11 @@ wc_s2t:'Connecting Dashboard',wc_s2d:'Establishing real-time data channels...',
 wc_s3t:'Loading System Status',wc_s3d:'Reading current protection state and metrics...',
 wc_s4t:'Ready',wc_s4d:'All systems initialized. Welcome aboard.',
 wc_btn:'Enter Dashboard'},
-zh:{n_ov:'\u7e3d\u89bd',n_sk:'\u6280\u80fd\u8207\u4fe1\u4efb',n_ai:'AI \u8a2d\u5b9a',n_ru:'\u5075\u6e2c\u898f\u5247',n_tc:'\u5a01\u8105\u96f2',n_th:'\u5a01\u8105\u60c5\u5831',n_gd:'\u5feb\u901f\u958b\u59cb',
-t_ov:'<em>\u7cfb\u7d71\u7e3d\u89bd</em>',t_sk:'<em>\u6280\u80fd\u8207\u4fe1\u4efb</em>',t_ai:'<em>AI \u914d\u7f6e</em>',t_ru:'<em>\u5075\u6e2c\u898f\u5247</em>',t_tc:'<em>\u5a01\u8105\u96f2</em>',t_th:'<em>\u5a01\u8105\u60c5\u5831</em>',t_gd:'<em>\u5feb\u901f\u958b\u59cb</em>',
+zh:{n_db:'\u5100\u8868\u677f',n_th:'\u5a01\u8105\u60c5\u5831',n_ru:'\u5075\u6e2c\u898f\u5247',n_st:'\u8a2d\u5b9a',
+t_db:'<em>\u5100\u8868\u677f</em>',t_st:'<em>\u8a2d\u5b9a</em>',t_ru:'<em>\u5075\u6e2c\u898f\u5247</em>',t_th:'<em>\u5a01\u8105\u60c5\u5831</em>',
+sec_score:'\u5b89\u5168\u5206\u6578',upgrade_title:'\u5347\u7d1a\u4fdd\u8b77',upgrade_desc:'\u60a8\u7684 Guard \u76ee\u524d\u904b\u884c Tier 1-2\uff08\u50c5 regex\uff0c62.7% \u5075\u6e2c\u7387\uff09\u3002\u9023\u63a5 LLM \u89e3\u9396 Tier 3\uff1a',
+up1:'\u652f\u63f4\u4efb\u4f55\u8a9e\u8a00\u7684\u653b\u64ca\u5075\u6e2c',up2:'\u5075\u6e2c\u91cd\u65b0\u6392\u5217\u7684\u6ce8\u5165\u653b\u64ca',up3:'\u8a9e\u5883\u611f\u77e5\uff1a\u5224\u65b7\u300c\u522a\u9664\u5168\u90e8\u300d\u662f\u6b63\u5e38\u6307\u4ee4\u9084\u662f\u653b\u64ca',up4:'\u81ea\u52d5\u5075\u6e2c\u65b0\u578b\u653b\u64ca\uff0c\u7121\u9700\u7b49\u5f85\u898f\u5247\u66f4\u65b0',
+connect_llm:'\u9023\u63a5 LLM',free_options:'\u514d\u8cbb\u9078\u9805\uff1aGemini\uff08\u514d\u8cbb\u65b9\u6848\uff09/ Ollama\uff08\u672c\u5730\u57f7\u884c\uff09',no_threats:'\u672a\u5075\u6e2c\u5230\u5a01\u8105\u3002\u60a8\u7684 AI \u4ee3\u7406\u6b63\u5b89\u5168\u904b\u884c\u3002',
 d_ov:'\u5373\u6642\u7cfb\u7d71\u72c0\u614b\u3002\u6240\u6709\u6307\u6a19\u900f\u904e WebSocket \u81ea\u52d5\u66f4\u65b0\u3002',
 d_sk:'Panguard \u6703\u5be9\u8a08\u60a8\u7cfb\u7d71\u4e0a\u5b89\u88dd\u7684\u6bcf\u500b MCP skill\u3002\u5b89\u5168\u7684 skill \u6703\u81ea\u52d5\u52a0\u5165 whitelist\uff0c\u6709\u98a8\u96aa\u7684\u6703\u6a19\u8a18\u4f9b\u60a8\u5be9\u67e5\u3002',
 d_ai:'Panguard \u4f7f\u7528\u4e09\u5c64\u5075\u6e2c\u7cfb\u7d71\u3002Layer 1 (Rules) \u548c Layer 2 (Fingerprint & Heuristic) \u59cb\u7d42\u6d3b\u8e8d\uff0c\u96f6\u914d\u7f6e\u3002Layer 3 \u4f7f\u7528 Cloud AI \u9032\u884c\u6700\u6df1\u5ea6\u5206\u6790 -- \u5728\u4e0b\u65b9\u914d\u7f6e API key\u3002',
@@ -1239,7 +1265,7 @@ var lang=(function(){try{var s=localStorage.getItem('panguard_lang');if(s==='zh'
 
 function TL(){lang=lang==='en'?'zh':'en';try{localStorage.setItem('panguard_lang',lang)}catch(e){}document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(T[lang][k]){if(e.tagName==='INPUT')e.placeholder=T[lang][k];else if(k.indexOf('t_')===0||k.indexOf('d_')===0||k==='go_ai')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});document.querySelectorAll('[data-i18n-wc]').forEach(function(e){var k=e.getAttribute('data-i18n-wc');if(T[lang][k]){if(k==='wc_title')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});updateG6();}
 
-function nav(t){document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});document.querySelector('[data-tab="'+t+'"]').classList.add('on');document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});document.getElementById('p-'+t).classList.add('on');if(t==='skills'){ldSk();ldISk()}if(t==='ai')loadAI();if(t==='rules')ldRules();if(t==='tcloud')ldTCloud();if(t==='threats')ldTh();if(t==='guide')updG();}
+function nav(t){document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});var tab=document.querySelector('[data-tab="'+t+'"]');if(tab)tab.classList.add('on');document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});var pg=document.getElementById('p-'+t);if(pg){pg.style.display='';pg.classList.add('on')}if(t==='dashboard'){ldSk();ldISk();ldSecScore()}if(t==='settings'){loadAI();updG()}if(t==='rules'){ldRules();ldTCloud()}if(t==='threats')ldTh()}
 document.querySelectorAll('.ni').forEach(function(n){n.addEventListener('click',function(){nav(this.getAttribute('data-tab'))})});
 
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
@@ -1279,7 +1305,8 @@ function updG(){af('/api/status').then(function(r){return r.json()}).then(functi
 function updateG6(){var el=document.getElementById('g6-status');var gn=document.getElementById('g6n');var mode=document.getElementById('v-mode').textContent;if(mode==='protection'||mode==='learning'){gn.classList.add('done');el.style.background='rgba(46,213,115,.1)';el.style.color='var(--ok)';el.textContent=lang==='zh'?'\u9632\u8b77\u5df2\u555f\u52d5 - Guard \u904b\u884c\u4e2d':'Protection Active - Guard is running'}else{el.style.background='rgba(239,68,68,.1)';el.style.color='var(--bad)';el.textContent=lang==='zh'?'\u5c1a\u672a\u555f\u52d5 - \u8acb\u57f7\u884c\u6b65\u9a5f 4':'Not started - complete step 4'}}
 
 /* Installed Skills */
-function ldISk(){af('/api/installed-skills').then(function(r){return r.json()}).then(function(d){document.getElementById('isk-loading').style.display='none';document.getElementById('isk-table').style.display='';document.getElementById('sk-t').textContent=d.total||0;document.getElementById('sk-wl').textContent=d.whitelisted||0;document.getElementById('sk-tr').textContent=d.tracked||0;var tb=document.getElementById('isk-tb');tb.innerHTML='';if(!d.skills||d.skills.length===0){tb.innerHTML='<tr><td colspan="5" class="empty">'+(lang==='zh'?'\u672a\u627e\u5230\u5df2\u5b89\u88dd\u6280\u80fd':'No installed skills found')+'</td></tr>';return}d.skills.forEach(function(s,i){var tr=document.createElement('tr');var st=s.whitelisted?'<span class="badge badge-ok">Whitelisted</span>':'<span class="badge badge-w">Tracked</span>';tr.innerHTML='<td>'+(i+1)+'</td><td>'+esc(s.name||'')+'</td><td>'+esc(s.platform||'--')+'</td><td>'+st+'</td><td style="color:var(--tm);font-size:12px">'+esc(s.source||'--')+'</td>';tb.appendChild(tr)})}).catch(function(){document.getElementById('isk-loading').innerHTML='<span style="color:var(--bad)">Failed to load skills</span>'})}
+function ldISk(){af('/api/installed-skills').then(function(r){return r.json()}).then(function(d){document.getElementById('isk-loading').style.display='none';document.getElementById('isk-table').style.display='';var tb=document.getElementById('isk-tb');tb.innerHTML='';if(!d.skills||d.skills.length===0){tb.innerHTML='<tr><td colspan="4" class="empty">'+(lang==='zh'?'\u672a\u627e\u5230\u6280\u80fd':'No skills found')+'</td></tr>';return}d.skills.sort(function(a,b){return a.whitelisted===b.whitelisted?0:a.whitelisted?1:-1});d.skills.forEach(function(s,i){var tr=document.createElement('tr');var st=s.whitelisted?'<span class="badge badge-ok">'+(lang==='zh'?'\u5b89\u5168':'Safe')+'</span>':'<span class="badge badge-w">'+(lang==='zh'?'\u8ffd\u8e64\u4e2d':'Tracked')+'</span>';tr.innerHTML='<td>'+(i+1)+'</td><td>'+esc(s.name||'')+'</td><td style="color:var(--tm);font-size:12px">'+esc(s.platform||'--')+'</td><td>'+st+'</td>';tb.appendChild(tr)})}).catch(function(){document.getElementById('isk-loading').innerHTML='<span style="color:var(--bad)">Failed to load skills</span>'})}
+function ldSecScore(){af('/api/status').then(function(r){return r.json()}).then(function(d){var hasL3=d.config&&d.config.layer3&&d.config.layer3.provider;var base=hasL3?85:70;var evBonus=Math.min((d.eventCount||0)/10000,10);var thPenalty=Math.min((d.threatCount||0)*5,20);var score=Math.max(0,Math.min(100,Math.round(base+evBonus-thPenalty)));document.getElementById('sec-num').textContent=score;document.getElementById('sec-bar').style.width=score+'%';document.getElementById('sec-bar').style.background=score>=80?'var(--ok)':score>=50?'#dfb317':'var(--bad)';document.getElementById('sec-tier').textContent=hasL3?'Tier 1-3 (Regex + Heuristic + LLM)':'Tier 1-2 (Regex + Heuristic)';document.getElementById('sec-tier').style.color=hasL3?'var(--ok)':'#dfb317';var cta=document.getElementById('llm-cta');if(cta)cta.style.display=hasL3?'none':'block'}).catch(function(){})}
 
 /* Rules */
 function ldRules(){af('/api/rules').then(function(r){return r.json()}).then(function(d){document.getElementById('ru-loading').style.display='none';document.getElementById('ru-content').style.display='';document.getElementById('ru-atr').textContent=d.atr||0;document.getElementById('v-atr').textContent=d.atr||0;document.getElementById('ru-atr-m').textContent=d.atrMatchCount||0;document.getElementById('ru-atr-p').textContent=d.atrDrafterPatterns||0;document.getElementById('ru-atr-s').textContent=d.atrDrafterSubmitted||0;var sub=d.atrDrafterSubmitted||0;var cm=document.getElementById('contrib-msg');if(sub>0){cm.textContent=lang==='zh'?'\u60a8\u7684\u88dd\u7f6e\u5df2\u5411\u793e\u7fa4\u8ca2\u737b '+sub+' \u500b ATR \u63d0\u6848':'Your device has contributed '+sub+' ATR proposal(s) to the community'}else{cm.textContent=lang==='zh'?'\u5c1a\u7121\u8ca2\u737b\u3002\u5b88\u8b77\u5f15\u64ce\u6301\u7e8c\u904b\u884c\u5f8c\u6703\u81ea\u52d5\u751f\u6210':'No contributions yet. ATR proposals will be auto-generated as the guard engine runs.'}var sync=d.lastSync?new Date(d.lastSync).toLocaleString():'--';document.getElementById('ru-sync').textContent=lang==='zh'?'\u4e0a\u6b21\u540c\u6b65: '+sync:'Last sync: '+sync}).catch(function(){document.getElementById('ru-loading').innerHTML='<span style="color:var(--bad)">Failed to load rules</span>'})}
@@ -1307,7 +1334,7 @@ gTk();
 function enterDashboard(){
 localStorage.setItem('panguard_welcomed','1');
 document.getElementById('welcome').classList.add('hide');
-setTimeout(function(){document.getElementById('welcome').style.display='none';nav('overview');showFirstVisitToast()},600);
+setTimeout(function(){document.getElementById('welcome').style.display='none';nav('dashboard');showFirstVisitToast()},600);
 }
 function showFirstVisitToast(){
 var t=document.getElementById('toast');
