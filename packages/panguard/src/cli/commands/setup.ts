@@ -505,61 +505,12 @@ export function setupCommand(): Command {
                   console.log(c.dim('    Run "panguard guard uninstall" to remove.'));
                 }
 
-                // ── Threat Cloud opt-in ──
-                if (!options.json) console.log();
-                const enableTC =
-                  options.yes || options.json ||
-                  (await promptConfirm({
-                    message: {
-                      en: 'Enable Threat Cloud collective defense?',
-                      'zh-TW': '啟用 Threat Cloud 集體防禦？',
-                    },
-                    defaultValue: true,
-                    lang: L,
-                  }));
-
-                try {
-                  const configPath = join(dataDir, 'config.json');
-                  const { loadConfig, saveConfig } = await import('@panguard-ai/panguard-guard');
-                  const guardConfig = loadConfig(configPath);
-                  const updatedConfig = {
-                    ...guardConfig,
-                    threatCloudUploadEnabled: enableTC,
-                    threatCloudEndpoint: enableTC
-                      ? (guardConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')
-                      : guardConfig.threatCloudEndpoint,
-                  };
-                  saveConfig(updatedConfig, configPath);
-
-                  if (!options.json) {
-                    if (enableTC) {
-                      console.log(
-                        c.green(
-                          `  ${symbols.pass} Threat Cloud enabled: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
-                        )
-                      );
-                      console.log(
-                        c.dim('    Every scan strengthens the collective defense network.')
-                      );
-                    } else {
-                      console.log(
-                        c.dim(
-                          `  ${symbols.info} Threat Cloud disabled. Enable later: panguard guard config --set threatCloudUploadEnabled=true`
-                        )
-                      );
-                    }
-                  }
-                } catch {
-                  // Config save failed — non-fatal, Guard still installed
-                }
-
                 jsonOutput['guard'] = {
                   installed: true,
                   running: true,
                   service_type: serviceType,
                   service_path: servicePath,
                   dashboard_url: dashUrl,
-                  threat_cloud: enableTC,
                 };
 
                 // Open Dashboard in browser (skip in JSON mode — AI agent will show URL)
@@ -623,6 +574,61 @@ export function setupCommand(): Command {
                 }
               }
             }
+          }
+        }
+
+        // ── 6. Threat Cloud opt-in (always runs, independent of guard install) ──
+        if (!options.remove && !options.skipGuard) {
+          const dataDir = join(homedir(), '.panguard-guard');
+          const enableTC =
+            options.yes || options.json ||
+            (await promptConfirm({
+              message: {
+                en: 'Enable Threat Cloud collective defense?',
+                'zh-TW': '啟用 Threat Cloud 集體防禦？',
+              },
+              defaultValue: true,
+              lang: L,
+            }));
+
+          try {
+            const tcConfigPath = join(dataDir, 'config.json');
+            const { loadConfig, saveConfig } = await import('@panguard-ai/panguard-guard');
+            const guardConfig = loadConfig(tcConfigPath);
+            const updatedConfig = {
+              ...guardConfig,
+              threatCloudUploadEnabled: enableTC,
+              threatCloudEndpoint: enableTC
+                ? (guardConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')
+                : guardConfig.threatCloudEndpoint,
+            };
+            saveConfig(updatedConfig, tcConfigPath);
+
+            if (!options.json) {
+              if (enableTC) {
+                console.log(
+                  c.green(
+                    `  ${symbols.pass} Threat Cloud enabled: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
+                  )
+                );
+                console.log(
+                  c.dim('    Every scan strengthens the collective defense network.')
+                );
+              } else {
+                console.log(
+                  c.dim(
+                    `  ${symbols.info} Threat Cloud disabled. Enable later: panguard guard config --set threatCloudUploadEnabled=true`
+                  )
+                );
+              }
+            }
+
+            // Add TC status to guard JSON output
+            if (jsonOutput['guard'] && typeof jsonOutput['guard'] === 'object') {
+              (jsonOutput['guard'] as Record<string, unknown>)['threat_cloud'] = enableTC;
+            }
+          } catch {
+            // Config save failed — non-fatal
           }
         }
 

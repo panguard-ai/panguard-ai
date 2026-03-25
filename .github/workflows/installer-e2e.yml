@@ -58,7 +58,10 @@ jobs:
           echo "FAKE_HOME=$FAKE_HOME" >> "$GITHUB_ENV"
       - name: Verify installation
         run: |
-          if [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
+          # npm global install puts panguard in PATH, check there first
+          if command -v panguard &>/dev/null; then
+            panguard --version
+          elif [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
             "$FAKE_HOME/.panguard/source/bin/panguard" --version
           elif [ -x "$FAKE_HOME/.local/bin/panguard" ]; then
             "$FAKE_HOME/.local/bin/panguard" --version
@@ -89,7 +92,9 @@ jobs:
           echo "FAKE_HOME=$FAKE_HOME" >> "$GITHUB_ENV"
       - name: Verify installation
         run: |
-          if [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
+          if command -v panguard &>/dev/null; then
+            panguard --version
+          elif [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
             "$FAKE_HOME/.panguard/source/bin/panguard" --version
           elif [ -x "$FAKE_HOME/.local/bin/panguard" ]; then
             "$FAKE_HOME/.local/bin/panguard" --version
@@ -119,7 +124,9 @@ jobs:
           echo "FAKE_HOME=$FAKE_HOME" >> "$GITHUB_ENV"
       - name: Verify installation
         run: |
-          if [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
+          if command -v panguard &>/dev/null; then
+            panguard --version
+          elif [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
             "$FAKE_HOME/.panguard/source/bin/panguard" --version
           elif [ -x "$FAKE_HOME/.local/bin/panguard" ]; then
             "$FAKE_HOME/.local/bin/panguard" --version
@@ -194,6 +201,7 @@ jobs:
         id: install
         continue-on-error: true
         run: |
+          set -o pipefail
           FAKE_HOME=$(mktemp -d)
           touch "$FAKE_HOME/.bashrc"
           HOME="$FAKE_HOME" bash scripts/installer/install.sh 2>&1 | tee /tmp/install-output.txt

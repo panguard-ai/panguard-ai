@@ -43,10 +43,17 @@ describe('Installer E2E', { timeout: TIMEOUT }, () => {
           maxBuffer: 10 * 1024 * 1024, // 10 MB output buffer
         });
 
-        // The installer should report success
-        expect(
-          result.includes('Installation complete') || result.includes('Dashboard opened')
-        ).toBe(true);
+        // The installer should report success — match any of the known success messages
+        const successPatterns = [
+          'installed via npm',
+          'installed and verified',
+          'Dashboard opened',
+          'Done!',
+          'installed and protecting',
+          'Installation complete',
+        ];
+        const hasSuccess = successPatterns.some((p) => result.includes(p));
+        expect(hasSuccess).toBe(true);
 
         // npm-first strategy: npm global install, binary install, or source build
         const hasNpmInstall = result.includes('installed via npm');
@@ -174,19 +181,29 @@ describe('Installer E2E', { timeout: TIMEOUT }, () => {
       const tmpDir = mkdtempSync(join(tmpdir(), 'node-gate-'));
       try {
         // Create a mock node binary that reports v18.19.0
-        const mockNode = join(tmpDir, 'node');
+        const mockBinDir = join(tmpDir, 'mock-bin');
+        mkdirSync(mockBinDir, { recursive: true });
+        const mockNode = join(mockBinDir, 'node');
         writeFileSync(mockNode, '#!/bin/bash\necho "v18.19.0"');
         chmodSync(mockNode, 0o755);
+
+        // Build a PATH that has the mock node FIRST and excludes real node.
+        // Keep /usr/bin and /bin for coreutils (uname, grep, etc.) but the
+        // mock dir comes first so our fake `node` wins.
+        const mockPath = `${mockBinDir}:/usr/bin:/bin`;
 
         let exitCode = 0;
         let output = '';
         try {
           output = execSync(`bash "${INSTALL_SCRIPT}" 2>&1`, {
             env: {
-              ...process.env,
               HOME: tmpDir,
-              // Replace PATH: only mock-node dir + essential system utilities
-              PATH: `${tmpDir}:/usr/bin:/bin`,
+              PATH: mockPath,
+              // Strip NVM/FNM/Volta/Homebrew vars that could bypass the mock
+              NVM_DIR: '',
+              NVM_BIN: '',
+              FNM_DIR: '',
+              VOLTA_HOME: '',
             },
             encoding: 'utf-8',
             timeout: 30_000,
