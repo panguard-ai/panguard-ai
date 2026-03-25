@@ -687,85 +687,40 @@ export class SkillWatcher extends EventEmitter {
     const { patternHash: computePatternHash } = await import('@panguard-ai/scan-core');
 
     // Build a concise description from findings for the ATR rule
-    const findingDescriptions = findings
+    const highFindings = findings
       .filter((f) => f.severity === 'critical' || f.severity === 'high')
-      .slice(0, 5)
-      .map((f) => f.title);
+      .slice(0, 5);
 
-    if (findingDescriptions.length === 0) return;
+    if (highFindings.length === 0) return;
 
-    // Use finding titles as pattern content for behavioral regex matching
-    const findingSummary = findingDescriptions.join('; ');
-    // Use scan-core's canonical hash — same prefix as website + CLI audit
+    const findingSummary = highFindings.map((f) => f.title).join('; ');
     const patternHash = computePatternHash(skillName, findingSummary);
 
-    // Determine ATR category from audit findings
-    const categoryMap: Record<string, string> = {
-      'shell-execution': 'tool-poisoning',
-      'network-request': 'context-exfiltration',
-      'credential-access': 'context-exfiltration',
-      'code-execution': 'tool-poisoning',
-      'instruction-override': 'prompt-injection',
-      'env-access': 'context-exfiltration',
-    };
+    // Submit the actual findings as payload — TC or Guard's LLM Drafter
+    // will use the Rule Creation Standard to generate a proper behavioral rule
+    const payload = highFindings
+      .map((f) => `[${f.severity.toUpperCase()}] ${f.category}: ${f.title}`)
+      .join('\n');
 
-    const primaryCategory = findings[0]?.category ?? 'tool-poisoning';
-    const atrCategory = categoryMap[primaryCategory] ?? 'tool-poisoning';
     const severity = riskLevel === 'CRITICAL' ? 'critical' : 'high';
-
-    // Build detection conditions from finding titles
-    // Each title often contains the behavioral pattern description
-    const conditions = findingDescriptions
-      .map((title, idx) => {
-        // Extract keywords that indicate attack behavior
-        const keywords = title
-          .split(/\s+/)
-          .filter((w) => w.length > 4)
-          .slice(0, 4);
-        if (keywords.length === 0) return null;
-        const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
-        return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${title.slice(0, 80)}"`;
-      })
-      .filter(Boolean);
-
-    if (conditions.length === 0) return;
-
-    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
-    const ruleContent = `title: "Skill Audit: ${findingDescriptions[0]?.slice(0, 60) ?? skillName}"
-id: ATR-2026-DRAFT-${patternHash.slice(0, 8)}
-status: draft
-description: |
-  Auto-generated from skill audit of "${skillName}".
-  Findings: ${findingSummary.slice(0, 200)}
-author: "PanGuard Skill Watcher"
-date: "${date}"
-schema_version: "0.1"
-detection_tier: pattern
-maturity: experimental
-severity: ${severity}
-tags:
-  category: ${atrCategory}
-  subcategory: skill-audit
-  confidence: medium
-detection:
-  conditions:
-${conditions.join('\n')}
-  condition: any
-response:
-  actions: [alert, snapshot]
-test_cases:
-  true_positives:
-    - content: "${findingDescriptions[0]?.replace(/"/g, '\\"').slice(0, 100) ?? 'malicious pattern'}"
-      expected: triggered
-  true_negatives:
-    - content: "list_files(directory='/tmp')"
-      expected: not_triggered`;
 
     const success = await this.config.submitATRProposal({
       patternHash,
-      ruleContent,
+      ruleContent: JSON.stringify({
+        type: 'skill-audit-finding',
+        skillName,
+        riskLevel,
+        payload,
+        findings: highFindings.map((f) => ({
+          id: f.id,
+          category: f.category,
+          severity: f.severity,
+          title: f.title,
+        })),
+        needsLLMDraft: true,
+      }),
       llmProvider: 'skill-audit',
-      llmModel: 'pattern-extraction',
+      llmModel: 'needs-llm-drafting',
       selfReviewVerdict: JSON.stringify({
         approved: true,
         source: 'skill-watcher',

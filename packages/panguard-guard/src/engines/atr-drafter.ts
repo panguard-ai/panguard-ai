@@ -13,6 +13,7 @@
  */
 
 import { createHash } from 'node:crypto';
+import { buildRuleCreationPrompt, buildRuleReviewPrompt, type RuleCreationInput } from './atr-rule-creation-standard.js';
 import yaml from 'js-yaml';
 import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
@@ -403,67 +404,32 @@ export class ATRDrafter {
   }
 
   private buildDraftPrompt(pattern: LocalPattern): string {
-    const samples = pattern.sampleDescriptions.map((d, i) => `  ${i + 1}. ${d}`).join('\n');
-    const existingATR =
-      pattern.atrRulesMatched.length > 0
-        ? `\nExisting ATR rules already matching: ${pattern.atrRulesMatched.join(', ')}`
-        : '';
+    // Use the Rule Creation Standard for consistent, high-quality rule generation
+    const payload = pattern.sampleDescriptions.join('\n---\n');
+    const reasoning = [
+      ...pattern.analyzeReasons,
+      ...pattern.evidenceDescriptions,
+    ].join('\n');
 
-    const analyzeContext =
-      pattern.analyzeReasons.length > 0
-        ? `\nAI ANALYSIS REASONING (why events were flagged):\n${pattern.analyzeReasons.map((r, i) => `  ${i + 1}. ${r}`).join('\n')}`
-        : '';
+    const topSeverity = Object.entries(pattern.severities)
+      .sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'medium';
 
-    const evidenceContext =
-      pattern.evidenceDescriptions.length > 0
-        ? `\nDETECTION EVIDENCE:\n${pattern.evidenceDescriptions.map((d, i) => `  ${i + 1}. ${d}`).join('\n')}`
-        : '';
+    const input: RuleCreationInput = {
+      payload,
+      source: 'user_input',
+      category: pattern.attackType,
+      reasoning: reasoning || `Detected ${pattern.occurrences} occurrences from ${pattern.distinctIPs.size} distinct sources`,
+      mitreTechniques: pattern.mitreTechniques,
+      severity: topSeverity as RuleCreationInput['severity'],
+      context: `${pattern.occurrences} occurrences, ${pattern.distinctIPs.size} distinct IPs, ${pattern.firstSeen} to ${pattern.lastSeen}`,
+      existingMatches: pattern.atrRulesMatched,
+    };
 
-    return `You are a cybersecurity expert. Generate an ATR (Agent Threat Rules) YAML rule for this attack pattern.
-
-PATTERN:
-- Attack Type: ${pattern.attackType}
-- MITRE Techniques: ${pattern.mitreTechniques.join(', ') || 'unknown'}
-- Occurrences: ${pattern.occurrences} from ${pattern.distinctIPs.size} distinct IPs
-- Severity Distribution: ${JSON.stringify(pattern.severities)}
-- Time Range: ${pattern.firstSeen} to ${pattern.lastSeen}
-${existingATR}
-${analyzeContext}
-${evidenceContext}
-
-SAMPLE EVENTS:
-${samples}
-
-REQUIREMENTS:
-1. Follow ATR schema v0.1
-2. Use id: ATR-AUTO-${pattern.attackType
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g, '-')
-      .slice(0, 20)}
-3. Set status: "draft"
-4. Use specific detection conditions (regex or contains), NOT overly broad
-5. Include false_positives section
-6. Include response actions appropriate to severity
-7. Include test_cases (2 true_positives, 2 true_negatives)
-
-Output ONLY the YAML rule in a \`\`\`yaml code block.`;
+    return buildRuleCreationPrompt(input);
   }
 
   private buildReviewPrompt(ruleContent: string): string {
-    return `Review this auto-generated ATR rule for production readiness.
-
-\`\`\`yaml
-${ruleContent}
-\`\`\`
-
-Evaluate:
-1. FALSE POSITIVE RISK (low/medium/high)
-2. COVERAGE SCORE (0-100)
-3. Are detection conditions specific enough?
-4. Are response actions appropriate?
-
-Output JSON only:
-{"approved": true/false, "falsePositiveRisk": "low"|"medium"|"high", "coverageScore": 0-100, "reasoning": "brief explanation"}`;
+    return buildRuleReviewPrompt(ruleContent);
   }
 
   extractYaml(text: string): string {
