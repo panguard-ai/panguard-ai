@@ -8,8 +8,9 @@
  * @module @panguard-ai/panguard-mcp/config/mcp-config-reader
  */
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { existsSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { dirname, join, basename } from 'node:path';
+import { homedir } from 'node:os';
 import { createLogger } from '@panguard-ai/core';
 import { detectPlatforms, getConfigPath } from './platform-detector.js';
 import type { PlatformId } from './platform-detector.js';
@@ -84,6 +85,20 @@ export function parseMCPServers(
  * Returns null if resolution fails.
  */
 export function resolveSkillDir(entry: MCPServerEntry): string | null {
+  // Claude Code skill/command/agent: args[0] is the .md file path
+  if (['skill', 'command', 'agent'].includes(entry.command)) {
+    const mdPath = entry.args[0];
+    if (mdPath && existsSync(mdPath)) {
+      // If it's a file, return its directory; if it's in a skill dir with SKILL.md, return that
+      return mdPath.endsWith('.md') ? dirname(mdPath) : mdPath;
+    }
+    // configPath is the skill directory for directory-based skills
+    if (entry.configPath && existsSync(entry.configPath)) {
+      return entry.configPath;
+    }
+    return null;
+  }
+
   // npx -y @package/name pattern
   if (entry.command === 'npx' && entry.args.length >= 1) {
     const pkgArg = entry.args.find((a) => !a.startsWith('-'));
@@ -155,14 +170,70 @@ export function removeServer(platformId: PlatformId, serverName: string): boolea
 }
 
 /**
- * Discover all MCP skills installed across all detected platforms.
- * Filters out Panguard's own MCP server entry.
+ * Discover Claude Code skills, commands, and agents from ~/.claude/.
+ * These are .md-based skills that Claude Code loads natively.
+ */
+function discoverClaudeCodeSkills(): readonly MCPServerEntry[] {
+  const claudeDir = join(homedir(), '.claude');
+  const entries: MCPServerEntry[] = [];
+
+  const dirs = [
+    { path: join(claudeDir, 'skills'), type: 'skill' },
+    { path: join(claudeDir, 'commands'), type: 'command' },
+    { path: join(claudeDir, 'agents'), type: 'agent' },
+  ];
+
+  for (const { path: dirPath, type } of dirs) {
+    if (!existsSync(dirPath)) continue;
+    try {
+      const items = readdirSync(dirPath, { withFileTypes: true });
+      for (const item of items) {
+        // Directory with SKILL.md inside (e.g. ~/.claude/skills/browse/SKILL.md)
+        if (item.isDirectory()) {
+          const skillMd = join(dirPath, item.name, 'SKILL.md');
+          const readmeMd = join(dirPath, item.name, 'README.md');
+          const hasContent = existsSync(skillMd) || existsSync(readmeMd);
+          if (hasContent) {
+            entries.push({
+              name: item.name,
+              command: type,
+              args: [existsSync(skillMd) ? skillMd : readmeMd],
+              configPath: join(dirPath, item.name),
+              platformId: 'claude-code',
+            });
+          }
+        }
+        // Direct .md file (e.g. ~/.claude/commands/plan.md)
+        if (item.isFile() && item.name.endsWith('.md')) {
+          const name = basename(item.name, '.md');
+          entries.push({
+            name,
+            command: type,
+            args: [join(dirPath, item.name)],
+            configPath: join(dirPath, item.name),
+            platformId: 'claude-code',
+          });
+        }
+      }
+    } catch {
+      // Directory not readable
+    }
+  }
+
+  return entries;
+}
+
+/**
+ * Discover all skills installed across all detected platforms.
+ * Includes MCP servers (JSON config) AND Claude Code skills (.md files).
+ * Filters out Panguard's own entries.
  */
 export async function discoverAllSkills(): Promise<readonly MCPServerEntry[]> {
   const platforms = await detectPlatforms();
   const detected = platforms.filter((p) => p.detected);
   const allSkills: MCPServerEntry[] = [];
 
+  // 1. MCP servers from platform JSON configs
   for (const platform of detected) {
     // OpenClaw uses native skills, not MCP JSON config
     if (platform.id === 'openclaw') continue;
@@ -177,6 +248,10 @@ export async function discoverAllSkills(): Promise<readonly MCPServerEntry[]> {
       allSkills.push(server);
     }
   }
+
+  // 2. Claude Code skills, commands, agents (.md files)
+  const claudeSkills = discoverClaudeCodeSkills();
+  allSkills.push(...claudeSkills);
 
   logger.info(`Discovered ${allSkills.length} skill(s) across ${detected.length} platform(s)`);
   return allSkills;
