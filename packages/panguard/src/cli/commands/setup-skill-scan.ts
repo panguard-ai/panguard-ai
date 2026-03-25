@@ -34,6 +34,7 @@ export interface SkillScanResult {
 
 export interface SkillScanOptions {
   readonly skipAI?: boolean;
+  readonly silent?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -92,12 +93,12 @@ export async function scanInstalledSkills(
     '@panguard-ai/panguard-mcp/config' as string
   ) as Promise<{ resolveSkillDir: (entry: MCPServerEntry) => string | null }>);
 
-  const bar = new ProgressBar({ total: skills.length, width: 30 });
+  const bar = options?.silent ? null : new ProgressBar({ total: skills.length, width: 30 });
   const results: SkillScanResult[] = [];
 
   for (let i = 0; i < skills.length; i++) {
     const entry = skills[i]!;
-    bar.update(i + 1);
+    bar?.update(i + 1);
 
     const skillDir = resolveSkillDir(entry);
     let audit: AuditReport | null = null;
@@ -117,7 +118,7 @@ export async function scanInstalledSkills(
     });
   }
 
-  bar.complete();
+  bar?.complete();
   return results;
 }
 
