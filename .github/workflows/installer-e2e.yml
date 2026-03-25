@@ -15,8 +15,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: installer-e2e-${{ github.ref }}
-  cancel-in-progress: true
+  group: installer-e2e-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
 
 jobs:
   # -- Vitest unit tests for installer functions ---------------
