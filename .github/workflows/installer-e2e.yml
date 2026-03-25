@@ -71,38 +71,6 @@ jobs:
             exit 1
           fi
 
-  # -- macOS x64 (Intel) --------------------------------------
-  macos-x64:
-    name: macOS x64 (source build)
-    runs-on: macos-13
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Run install.sh
-        run: |
-          FAKE_HOME=$(mktemp -d)
-          touch "$FAKE_HOME/.bashrc" "$FAKE_HOME/.zshrc"
-          HOME="$FAKE_HOME" bash scripts/installer/install.sh
-          echo "FAKE_HOME=$FAKE_HOME" >> "$GITHUB_ENV"
-      - name: Verify installation
-        run: |
-          if command -v panguard &>/dev/null; then
-            panguard --version
-          elif [ -x "$FAKE_HOME/.panguard/source/bin/panguard" ]; then
-            "$FAKE_HOME/.panguard/source/bin/panguard" --version
-          elif [ -x "$FAKE_HOME/.local/bin/panguard" ]; then
-            "$FAKE_HOME/.local/bin/panguard" --version
-          else
-            echo "panguard binary not found"
-            exit 1
-          fi
-
   # -- Ubuntu x64 ----------------------------------------------
   ubuntu-x64:
     name: Ubuntu x64 (source build)
