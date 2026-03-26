@@ -766,7 +766,8 @@
     "liveCounter": {
       "scanned": "個 Skills 已掃描",
       "threats": "個威脅已發現",
-      "rulesGenerated": "條 ATR 規則已自動生成"
+      "rulesGenerated": "條 ATR 規則運作中",
+      "downloads": "次安裝"
     },
     "scanResult": {
       "shareX": "分享到 X",

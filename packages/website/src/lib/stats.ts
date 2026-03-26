@@ -91,11 +91,11 @@ export const STATS = {
     /** Packages with postinstall scripts */
     postinstallScripts: 122,
     /** Breakdown by severity */
-    findingsCritical: 402,
-    findingsHigh: 240,
-    findingsMedium: 299,
-    findingsLow: 226,
-    findingsClean: 1_216,
+    findingsCritical: 159,
+    findingsHigh: 260,
+    findingsMedium: 324,
+    findingsLow: 291,
+    findingsClean: 1_352,
     registrySources: 3,
     lastCrawl: '2026-03-18',
   },

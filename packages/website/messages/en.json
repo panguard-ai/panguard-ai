@@ -766,7 +766,8 @@
     "liveCounter": {
       "scanned": "skills scanned",
       "threats": "threats found",
-      "rulesGenerated": "ATR rules generated"
+      "rulesGenerated": "ATR rules active",
+      "downloads": "installs"
     },
     "scanResult": {
       "shareX": "Share on X",
