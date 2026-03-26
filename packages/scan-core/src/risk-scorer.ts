@@ -81,8 +81,7 @@ export function calculateRiskScore(
   let level: RiskLevel;
   if (
     (score >= 70 && hasRealCritical) ||
-    (hasRealCritical && !weakenedCriticalOverride && score >= 25) ||
-    score >= 90
+    (hasRealCritical && !weakenedCriticalOverride && score >= 40)
   ) {
     level = 'CRITICAL';
   } else if (
