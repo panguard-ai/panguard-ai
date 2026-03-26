@@ -303,7 +303,7 @@ Panguard uses a cascading "funnel" approach for AI-assisted analysis, reducing l
 ```mermaid
 graph TB
     subgraph Layer1["Layer 1: Rules -- Cost: $0 -- Latency: <1ms"]
-        ATR["ATR Rules<br/>61 rules across 9 categories"]
+        ATR["ATR Rules<br/>71 rules across 10 categories"]
         BUILTIN["Built-in Pattern Matching<br/>20 built-in regex-based rules"]
         TI["Threat Intelligence<br/>5 feed sources + Threat Cloud blocklist"]
     end

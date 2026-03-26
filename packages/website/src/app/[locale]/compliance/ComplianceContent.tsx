@@ -6,24 +6,12 @@ import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
 import { Link } from '@/navigation';
 import { ArrowRight } from 'lucide-react';
-import { ShieldIcon, ScanIcon, GlobalIcon } from '@/components/ui/BrandIcons';
+import { ShieldIcon, ScanIcon } from '@/components/ui/BrandIcons';
 import { STATS } from '@/lib/stats';
 
-/* ─── OWASP Agentic Top 10 Data (from ATR OWASP-MAPPING.md) ─── */
-const owaspCategories = [
-  { id: 'ASI01', rules: 13, strength: 'STRONG' },
-  { id: 'ASI02', rules: 11, strength: 'STRONG' },
-  { id: 'ASI03', rules: 9, strength: 'STRONG' },
-  { id: 'ASI04', rules: 8, strength: 'STRONG' },
-  { id: 'ASI05', rules: 8, strength: 'STRONG' },
-  { id: 'ASI06', rules: 8, strength: 'STRONG' },
-  { id: 'ASI07', rules: 5, strength: 'MODERATE' },
-  { id: 'ASI08', rules: 4, strength: 'MODERATE' },
-  { id: 'ASI09', rules: 5, strength: 'MODERATE' },
-  { id: 'ASI10', rules: 7, strength: 'MODERATE' },
-] as const;
-
-const TOTAL_MAPPINGS = 77;
+/* ─── OWASP data from stats.ts (single source of truth) ─── */
+const owaspCategories = STATS.owaspAgentic.categories;
+const TOTAL_MAPPINGS = STATS.owaspAgentic.totalMappings;
 
 /* ═══════════════════════════════════════════════════════════════════
    Compliance Content — OWASP Agentic Top 10 Coverage
@@ -61,6 +49,16 @@ export default function ComplianceContent() {
                 <span className="text-sm font-bold text-text-primary">{STATS.atrRules}</span>
                 <span className="text-sm text-text-secondary">{t('hero.rulesBadge')}</span>
               </div>
+            </div>
+          </FadeInUp>
+          <FadeInUp delay={0.3}>
+            <div className="mt-8">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
+              >
+                {t('hero.cta')} <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </FadeInUp>
         </div>

@@ -143,7 +143,7 @@ panguard guard start
 
   Mode:       Learning (Day 1/7)
   Monitoring: processes, network, files
-  Rules:      61 ATR rules loaded
+  Rules:      71 ATR rules loaded
   Score:      --/100 (building baseline)
 
   Guard is now protecting your system.
