@@ -67,7 +67,6 @@ export function scanContent(content: string, options: ScanOptions = {}): ScanRes
   const hasDefensiveText = ctx.signals.some(
     (s) => s.id === 'reduce-defensive-text-strong' || s.id === 'reduce-defensive-text'
   );
-
   // -- ATR pattern detection --
   const atrRules: readonly CompiledRule[] = options.atrRules ?? [];
   let atrMatchedCount = 0;

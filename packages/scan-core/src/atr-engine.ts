@@ -168,13 +168,15 @@ export function scanWithATR(
               severity = downgradeSeverity(severity);
             }
           }
-          // Only raw matched: hidden in markup
-          if (!matchesStripped && matchesRaw && hasStrongReducers && allReducers) {
-            severity = downgradeSeverity(severity);
-          }
-          // Hidden markup in defensive text: still downgrade once
-          if (!matchesStripped && matchesRaw && hasDefensiveText) {
-            severity = downgradeSeverity(severity);
+          // Only raw matched: hidden in markup — could be real hidden attack
+          // OR just markdown formatting / code block examples / HTML in SKILL.md.
+          if (!matchesStripped && matchesRaw) {
+            if (hasStrongReducers && allReducers) {
+              severity = downgradeSeverity(severity);
+            }
+            if (hasDefensiveText) {
+              severity = downgradeSeverity(severity);
+            }
           }
 
           const safeInstall = isRuleSafeInstall(`${rule.title} ${desc}`, content);
