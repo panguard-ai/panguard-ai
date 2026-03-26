@@ -156,40 +156,12 @@ importers:
         specifier: ~5.7.3
         version: 5.7.3
     optionalDependencies:
-      '@panguard-ai/manager':
-        specifier: ^1.3.0
-        version: 1.3.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/panguard-auth':
-        specifier: ^1.3.0
-        version: 1.3.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       '@panguard-ai/panguard-trap':
         specifier: ^1.3.0
         version: 1.3.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
       '@panguard-ai/threat-cloud':
         specifier: ^1.4.0
         version: 1.4.0
-
-  packages/panguard-auth:
-    dependencies:
-      '@panguard-ai/core':
-        specifier: workspace:*
-        version: link:../core
-      '@panguard-ai/security-hardening':
-        specifier: workspace:*
-        version: link:../../security-hardening
-      better-sqlite3:
-        specifier: ^11.0.0
-        version: 11.10.0
-    devDependencies:
-      '@types/better-sqlite3':
-        specifier: ^7.6.8
-        version: 7.6.13
-      '@types/node':
-        specifier: ^22.14.0
-        version: 22.19.13
-      typescript:
-        specifier: ~5.7.3
-        version: 5.7.3
 
   packages/panguard-chat:
     dependencies:
@@ -252,25 +224,6 @@ importers:
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
-      typescript:
-        specifier: ~5.7.3
-        version: 5.7.3
-
-  packages/panguard-manager:
-    dependencies:
-      '@panguard-ai/core':
-        specifier: workspace:*
-        version: link:../core
-      better-sqlite3:
-        specifier: ^11.0.0
-        version: 11.10.0
-    devDependencies:
-      '@types/better-sqlite3':
-        specifier: ^7.6.8
-        version: 7.6.13
-      '@types/node':
-        specifier: ^22.14.0
-        version: 22.19.13
       typescript:
         specifier: ~5.7.3
         version: 5.7.3
@@ -1270,14 +1223,6 @@ packages:
         optional: true
       openai:
         optional: true
-
-  '@panguard-ai/manager@1.3.0':
-    resolution: {integrity: sha512-AnSqdak1cZkdT6Xrp9bv8FFKMBA6Rxk/RxwtYPERa0m69q9Ua2gwweID1VtE/qP9ipjeTgfT6+GXvyhmR+DR6Q==}
-    engines: {node: '>=20.0.0'}
-
-  '@panguard-ai/panguard-auth@1.3.0':
-    resolution: {integrity: sha512-VDk3nZS+uF8ahg/tf7LJ7hEOoiRglx3xzDzvZ9l+Kj394X/ULoqmn+ZTu4UX9evftdji1MaopkhhkeFO9Ht17g==}
-    engines: {node: '>=20.0.0'}
 
   '@panguard-ai/panguard-chat@1.3.0':
     resolution: {integrity: sha512-gWlfWL2sZFl8xjfF0BWco2u4P5xB82+wytigVRqVnXikLHRR4R1rcl8uiAjuYbSftR6dYCNWhsCcwxjSCyQz3A==}
@@ -4973,27 +4918,6 @@ snapshots:
       openai: 6.25.0(ws@8.19.0)(zod@3.25.76)
     transitivePeerDependencies:
       - typescript
-
-  '@panguard-ai/manager@1.3.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
-    dependencies:
-      '@panguard-ai/core': 1.3.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
-      better-sqlite3: 11.10.0
-    transitivePeerDependencies:
-      - '@anthropic-ai/sdk'
-      - openai
-      - typescript
-    optional: true
-
-  '@panguard-ai/panguard-auth@1.3.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
-    dependencies:
-      '@panguard-ai/core': 1.3.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
-      '@panguard-ai/security-hardening': 1.0.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)
-      better-sqlite3: 11.10.0
-    transitivePeerDependencies:
-      - '@anthropic-ai/sdk'
-      - openai
-      - typescript
-    optional: true
 
   '@panguard-ai/panguard-chat@1.3.0(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.19.0)(zod@3.25.76))(typescript@5.7.3)':
     dependencies:
