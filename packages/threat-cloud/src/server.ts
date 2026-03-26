@@ -449,6 +449,21 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/usage':
+          if (req.method === 'POST') {
+            await this.handlePostUsageEvent(req, res);
+          } else if (req.method === 'GET') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            const stats = this.db.getUsageStats();
+            this.sendJson(res, 200, { ok: true, data: stats });
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/admin/reset-rules':
           if (req.method === 'POST') {
             if (!this.checkAdminAuth(req)) {
@@ -480,6 +495,28 @@ export class ThreatCloudServer {
       client_ip: clientIP,
       request_id: requestId,
     });
+  }
+
+  /** POST /api/usage - Record usage event (scan, cli_install, etc.) */
+  private async handlePostUsageEvent(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    try {
+      const body = await this.readBody(req);
+      const data = JSON.parse(body) as { event_type?: string; source?: string; metadata?: Record<string, unknown> };
+      const eventType = data.event_type ?? 'unknown';
+      const source = data.source ?? 'unknown';
+
+      // Only allow known event types
+      const allowed = ['scan', 'cli_install', 'cli_setup', 'cli_scan', 'guard_start', 'page_view'];
+      if (!allowed.includes(eventType)) {
+        this.sendJson(res, 400, { ok: false, error: `Unknown event_type. Allowed: ${allowed.join(', ')}` });
+        return;
+      }
+
+      this.db.recordUsageEvent(eventType, source, data.metadata);
+      this.sendJson(res, 200, { ok: true, data: { recorded: true } });
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid request body' });
+    }
   }
 
   /** POST /api/threats - Upload anonymized threat data (single or batch) */

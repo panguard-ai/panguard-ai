@@ -127,6 +127,16 @@ export class ThreatCloudDB {
         last_reported TEXT DEFAULT (datetime('now'))
       );
 
+      CREATE TABLE IF NOT EXISTS usage_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_type TEXT NOT NULL,
+        source TEXT NOT NULL DEFAULT 'unknown',
+        metadata TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_usage_type ON usage_events(event_type);
+      CREATE INDEX IF NOT EXISTS idx_usage_created ON usage_events(created_at);
+
       -- Migrations are handled by the numbered migration system in migrations.ts
     `);
 
@@ -609,6 +619,53 @@ export class ThreatCloudDB {
   }
 
   /** Get threat statistics / 取得威脅統計 */
+  // ---------------------------------------------------------------------------
+  // Usage Events
+  // ---------------------------------------------------------------------------
+
+  recordUsageEvent(eventType: string, source: string, metadata?: Record<string, unknown>): void {
+    this.db.prepare(
+      'INSERT INTO usage_events (event_type, source, metadata) VALUES (?, ?, ?)'
+    ).run(eventType, source, metadata ? JSON.stringify(metadata) : null);
+  }
+
+  getUsageStats(): {
+    totalScans: number;
+    scansToday: number;
+    scansThisWeek: number;
+    scansBySource: Record<string, number>;
+    cliInstalls: number;
+    dailyTrend: Array<{ date: string; count: number }>;
+  } {
+    const totalScans = (this.db.prepare(
+      "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'scan'"
+    ).get() as { count: number }).count;
+
+    const scansToday = (this.db.prepare(
+      "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'scan' AND created_at > datetime('now', '-1 day')"
+    ).get() as { count: number }).count;
+
+    const scansThisWeek = (this.db.prepare(
+      "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'scan' AND created_at > datetime('now', '-7 days')"
+    ).get() as { count: number }).count;
+
+    const sourceRows = this.db.prepare(
+      "SELECT source, COUNT(*) as count FROM usage_events WHERE event_type = 'scan' GROUP BY source"
+    ).all() as Array<{ source: string; count: number }>;
+    const scansBySource: Record<string, number> = {};
+    for (const r of sourceRows) scansBySource[r.source] = r.count;
+
+    const cliInstalls = (this.db.prepare(
+      "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'cli_install'"
+    ).get() as { count: number }).count;
+
+    const dailyTrend = this.db.prepare(
+      "SELECT date(created_at) as date, COUNT(*) as count FROM usage_events WHERE event_type = 'scan' AND created_at > datetime('now', '-30 days') GROUP BY date(created_at) ORDER BY date"
+    ).all() as Array<{ date: string; count: number }>;
+
+    return { totalScans, scansToday, scansThisWeek, scansBySource, cliInstalls, dailyTrend };
+  }
+
   clearAllRules(): number {
     const rulesDeleted = (this.db.prepare('DELETE FROM rules').run()).changes;
     const proposalsDeleted = (this.db.prepare('DELETE FROM atr_proposals').run()).changes;

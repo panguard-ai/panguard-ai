@@ -467,6 +467,18 @@ export async function POST(request: Request) {
   const scannedAt = new Date().toISOString();
   scanCache.set(cHash, { report, scannedAt });
 
+  // Track usage (non-blocking)
+  void fetch(`${TC_ENDPOINT}/api/usage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event_type: 'scan',
+      source: 'website',
+      metadata: { skill: skillName, risk: result.riskLevel, score: result.riskScore },
+    }),
+    signal: AbortSignal.timeout(3000),
+  }).catch(() => {});
+
   // Submit to Threat Cloud (non-blocking)
   // Skip README-based scans — documentation descriptions trigger false positives
   // that would pollute the community threat database.
