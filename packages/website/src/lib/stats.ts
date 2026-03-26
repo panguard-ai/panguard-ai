@@ -14,7 +14,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 61 ATR rules
+ *   agent-threat-rules/rules/                  -> 71 ATR rules
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -49,6 +49,27 @@ export const STATS = {
   license: 'MIT' as const,
   skillAuditChecks: 8,
   atrDraftRules: 17,
+  /**
+   * OWASP Agentic Top 10 coverage (from agent-threat-rules/docs/OWASP-MAPPING.md)
+   * Sync when rules are added/removed.
+   */
+  owaspAgentic: {
+    totalCategories: 10,
+    coveredCategories: 10,
+    totalMappings: 77,
+    categories: [
+      { id: 'ASI01', rules: 13, strength: 'STRONG' as const },
+      { id: 'ASI02', rules: 11, strength: 'STRONG' as const },
+      { id: 'ASI03', rules: 9, strength: 'STRONG' as const },
+      { id: 'ASI04', rules: 8, strength: 'STRONG' as const },
+      { id: 'ASI05', rules: 8, strength: 'STRONG' as const },
+      { id: 'ASI06', rules: 8, strength: 'STRONG' as const },
+      { id: 'ASI07', rules: 5, strength: 'MODERATE' as const },
+      { id: 'ASI08', rules: 4, strength: 'MODERATE' as const },
+      { id: 'ASI09', rules: 5, strength: 'MODERATE' as const },
+      { id: 'ASI10', rules: 7, strength: 'MODERATE' as const },
+    ],
+  },
   /** Threat Intel Pipeline stats (auto-updated by CI every hour) */
   threatIntel: {
     sources: 11,

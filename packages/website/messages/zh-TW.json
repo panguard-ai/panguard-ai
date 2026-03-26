@@ -888,7 +888,7 @@
         "overline": "部署前",
         "title": "Skill Auditor",
         "desc": "靜態分析引擎，在 MCP Skill 和 AI Agent 工具執行前進行安全掃描。偵測 Prompt 注入、憑證竊取、資料外洩等 9 大威脅類別，基於 ATR 模式比對。",
-        "f1": "61 條 ATR 規則，涵蓋 474 偵測模式、9 大類別",
+        "f1": "71 條 ATR 規則，涵蓋 520 偵測模式、10 大類別",
         "f2": "機密偵測：AWS Key、GitHub Token、SSH 私鑰、API 密鑰",
         "f3": "YAML Manifest 驗證 + 權限範圍分析",
         "s1": "ATR 規則",
@@ -983,7 +983,7 @@
       "layer2": {
         "badge": "第二層",
         "name": "規則引擎",
-        "desc": "61 ATR 偵測規則，專為 AI Agent 安全設計。",
+        "desc": "71 ATR 偵測規則，專為 AI Agent 安全設計。",
         "detail": "50 毫秒內攔截 90% 已知威脅。不需要 AI。"
       },
       "layer3": {
@@ -1012,7 +1012,7 @@
       "tier1": {
         "name": "規則引擎",
         "pct": "90%",
-        "items": "61 ATR 偵測規則|474 偵測模式|9 個威脅類別|行為基線偵測|社群驅動規則更新",
+        "items": "71 ATR 偵測規則|520 偵測模式|10 個威脅類別|行為基線偵測|社群驅動規則更新",
         "speed": "每事件 <50ms"
       },
       "tier2": {
@@ -1405,11 +1405,11 @@
       "title": "嚴謹打造",
       "stats": [
         {
-          "value": "61",
+          "value": "71",
           "label": "ATR 規則 (AI Agent 威脅)"
         },
         {
-          "value": "474",
+          "value": "520",
           "label": "偵測模式"
         },
         {
@@ -1490,7 +1490,7 @@
         },
         {
           "name": "panguard-rules",
-          "desc": "61 ATR 偵測規則 + 474 偵測模式",
+          "desc": "71 ATR 偵測規則 + 520 偵測模式",
           "lang": "YAML / ATR",
           "stars": "社群"
         },
@@ -3295,7 +3295,8 @@
     "subtitle": "市場上唯一專為 OWASP AI Agent 安全標準打造的可執行規則集。10 個類別，一個不漏。",
     "hero": {
       "badge": "個類別全覆蓋",
-      "rulesBadge": "條 ATR 規則"
+      "rulesBadge": "條 ATR 規則",
+      "cta": "立即掃描 Skill"
     },
     "what": {
       "overline": "這個標準是什麼",
@@ -3973,7 +3974,7 @@
         "engine": "ATR Rules",
         "desc": "攔截每個 AI Agent 工具呼叫、提示詞流程和 Skill 安裝。ATR 規則即時偵測提示注入、工具毒化、憑證外洩和上下文操縱。",
         "detects": "提示注入、工具毒化、憑證外洩、上下文操縱",
-        "tech": "ATR 規則引擎、亞毫秒評估、61 偵測規則、474 模式"
+        "tech": "ATR 規則引擎、亞毫秒評估、71 偵測規則、520 模式"
       },
       "network": {
         "layer": "第二層",

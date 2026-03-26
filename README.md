@@ -77,7 +77,7 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
 | **[Skill Auditor](docs/overview.md)**                              | 6-check security gate before any skill runs                      | GA     |
 | **[Guard](#guard)**                                                | 24/7 runtime monitoring + auto-block                             | GA     |
 | **[Threat Cloud](#threat-cloud)**                                  | Anonymous community threat intel. 3+ confirmations + LLM review. | GA     |
-| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 61 rules across 9 categories.           | RFC    |
+| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 71 rules across 10 categories.           | RFC    |
 
 One user's encounter with a new attack becomes a rule that protects everyone.
 
@@ -95,7 +95,7 @@ Top findings: credential access patterns, prompt injection, environment variable
 
 | Layer | Engine                          | Coverage           | Latency | Cost    |
 | ----- | ------------------------------- | ------------------ | ------- | ------- |
-| **1** | **Rules** -- 61 ATR rules       | ~90% known threats | < 50ms  | $0      |
+| **1** | **Rules** -- 71 ATR rules       | ~90% known threats | < 50ms  | $0      |
 | **2** | **Local AI** -- Ollama          | ~7% ambiguous      | ~ 2s    | $0      |
 | **3** | **Cloud AI** -- Claude / OpenAI | ~3% novel          | ~ 5s    | ~$0.008 |
 
@@ -107,7 +107,7 @@ Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet dow
 
 | Rule Type | Count | Purpose                                                              |
 | --------- | ----- | -------------------------------------------------------------------- |
-| **ATR**   | 61    | AI agent threats: prompt injection, tool poisoning, skill compromise |
+| **ATR**   | 71    | AI agent threats: prompt injection, tool poisoning, skill compromise |
 
 ATR (Agent Threat Rules) is the only rule format designed to protect AI agents. Traditional security rules (Sigma, YARA) detect network/malware threats but cannot detect AI-specific attacks like prompt injection, tool poisoning, or context exfiltration.
 
@@ -150,7 +150,7 @@ panguard guard start --dashboard
 
 Every Panguard instance is a sensor. Threats are auto-drafted into ATR rules, uploaded anonymously, confirmed by 3+ users + LLM review, then pushed to everyone.
 
-**Currently:** 61 ATR detection rules. Community rule generation active.
+**Currently:** 71 ATR detection rules. Community rule generation active.
 
 **Privacy:** Fully optional. Only anonymized signatures. Zero raw data, zero PII. Disable anytime.
 
@@ -185,7 +185,7 @@ panguard-ai/
   packages/
     panguard-skill-auditor/  Skill security auditor (6 checks)
     panguard-guard/          24/7 monitoring + Threat Cloud sync
-    atr/                     Agent Threat Rules: 61 rules, 9 categories
+    atr/                     Agent Threat Rules: 71 rules, 10 categories
     threat-cloud/            Community threat intel server
     panguard-mcp/            MCP server: 11+ tools for AI assistants
     panguard-scan/           Security scanner
