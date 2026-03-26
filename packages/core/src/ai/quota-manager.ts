@@ -23,8 +23,22 @@ export interface QuotaUsage {
 }
 
 export class AIQuotaManager {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(_tier?: QuotaTier | string, _override?: Partial<QuotaConfig>) {
+    /* community edition — no quota enforcement */
+  }
+
   check(): QuotaCheckResult {
     return { allowed: true };
+  }
+
+  checkQuota(): QuotaCheckResult {
+    return { allowed: true };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  recordCall(_cost?: number): void {
+    /* no-op in community edition */
   }
 
   recordUsage(): void {

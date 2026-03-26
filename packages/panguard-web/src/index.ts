@@ -43,17 +43,6 @@ export { DEFAULT_WEB_CONFIG } from './types.js';
 // Content - Personas
 export { PERSONAS, getPersona, getAllPersonas } from './content/index.js';
 
-// Content - Pricing
-export {
-  PRICING_PLANS,
-  REPORT_ADDONS,
-  getPricingPlan,
-  getAllPricingPlans,
-  getRecommendedPlan,
-  getAllReportAddons,
-  getReportAddon,
-} from './content/index.js';
-
 // Pages
 export {
   PAGES,
