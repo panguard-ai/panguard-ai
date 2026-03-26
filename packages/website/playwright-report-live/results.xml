@@ -1,144 +1,182 @@
-<testsuites id="" name="" tests="20" failures="0" skipped="0" errors="0" time="55.01941">
-<testsuite name="live-site-content-fixes.spec.ts" timestamp="2026-03-22T08:36:48.262Z" hostname="chromium" tests="20" failures="0" skipped="0" time="53.903" errors="0">
-<testcase name="Journey 1: Homepage flywheel — three-layer defense section › shows ONLY Skill Auditor, Guard, Threat Cloud — no Trap/Chat/Report as standalone" classname="live-site-content-fixes.spec.ts" time="3.077">
+<testsuites id="" name="" tests="22" failures="0" skipped="3" errors="0" time="65.415576">
+<testsuite name="scanner-live.spec.ts" timestamp="2026-03-26T03:05:03.855Z" hostname="chromium" tests="22" failures="0" skipped="3" time="64.415" errors="0">
+<testcase name="Journey 1: Homepage scanner — input, scan, results › scanner input is visible on /en homepage" classname="scanner-live.spec.ts" time="2.878">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-51fd5-p-Chat-Report-as-standalone-chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-1-Hom-775c4-t-is-visible-on-en-homepage-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 1: Homepage flywheel — three-layer defense section › &quot;100% free&quot; and &quot;MIT licensed&quot; appear on homepage" classname="live-site-content-fixes.spec.ts" time="3.126">
+<testcase name="Journey 1: Homepage scanner — input, scan, results › scanner: type URL and click Scan button" classname="scanner-live.spec.ts" time="2.943">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-c1d6e-licensed-appear-on-homepage-chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-1-Hom-e7bc0-e-URL-and-click-Scan-button-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 2: Platform tabs — npx panguard setup › all 8 platforms appear in the setup section (English)" classname="live-site-content-fixes.spec.ts" time="3.244">
+<testcase name="Journey 1: Homepage scanner — input, scan, results › scanner: submit and wait for risk score + risk level" classname="scanner-live.spec.ts" time="7.845">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-0984a--the-setup-section-English--chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-1-Hom-5b86f-t-for-risk-score-risk-level-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 2: Platform tabs — npx panguard setup › platform tabs are interactive — clicking each tab works" classname="live-site-content-fixes.spec.ts" time="3.061">
+<testcase name="Journey 1: Homepage scanner — input, scan, results › scanner: findings list or checks summary appears after scan" classname="scanner-live.spec.ts" time="7.595">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-34c88-e-—-clicking-each-tab-works-chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-1-Hom-9e884--summary-appears-after-scan-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 3: Navigation — Product dropdown › Product dropdown does NOT contain Trap or Report entries" classname="live-site-content-fixes.spec.ts" time="3.397">
+<testcase name="Journey 1: Homepage scanner — input, scan, results › scanner: Enter key triggers scan" classname="scanner-live.spec.ts" time="2.828">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-66cc9-tain-Trap-or-Report-entries-chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-1-Hom-848e9-ner-Enter-key-triggers-scan-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 4: Footer — no banned links › footer does NOT contain /careers, /status, /legal/security links" classname="live-site-content-fixes.spec.ts" time="2.694">
+<testcase name="Journey 1: Homepage scanner — input, scan, results › scanner: empty input — Scan button stays disabled" classname="scanner-live.spec.ts" time="2.91">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-c06ff-status-legal-security-links-chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-1-Hom-bec20--Scan-button-stays-disabled-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 4: Footer — no banned links › footer still has essential links (privacy, terms)" classname="live-site-content-fixes.spec.ts" time="2.695">
+<testcase name="Journey 1: Homepage scanner — input, scan, results › scanner: invalid URL shows error message" classname="scanner-live.spec.ts" time="7.517">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-ddce3-ential-links-privacy-terms--chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-1-Hom-234ac-lid-URL-shows-error-message-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 5: Redirects › /pricing redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.828">
+<testcase name="Journey 2: Dedicated scan page /en/scan › /en/scan page loads with scanner input" classname="scanner-live.spec.ts" time="3.669">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-9b9c6-pricing-redirects-correctly-chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-2-Ded-edbaa-ge-loads-with-scanner-input-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 5: Redirects › /status redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.161">
+<testcase name="Journey 2: Dedicated scan page /en/scan › /en/scan: type URL and scan — results render" classname="scanner-live.spec.ts" time="4.246">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-b022a--status-redirects-correctly-chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-2-Ded-c7467-L-and-scan-—-results-render-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 5: Redirects › /careers redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.616">
+<testcase name="Journey 3: POST /api/scan — direct API test › returns ok:true with report containing riskScore, riskLevel, findings" classname="scanner-live.spec.ts" time="0.511">
 <system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-2c2a4-careers-redirects-correctly-chromium/test-finished-1.png]]
+<![CDATA[API response: {
+  "ok": true,
+  "data": {
+    "report": {
+      "skillName": "anthropics/anthropic-cookbook",
+      "riskScore": 1,
+      "riskLevel": "LOW",
+      "findings": [
+        {
+          "id": "atr-ATR-2026-063",
+          "title": "Multi-Skill Chain Attack",
+          "description": "Matched ATR rule ATR-2026-063",
+          "severity": "medium",
+          "category": "tool-poisoning",
+          "location": "ATR Rule: ATR-2026-063"
+        },
+        {
+          "id": "atr-ATR-2026-099",
+          "title": "High-Risk Tool Invocation Without Human Confirmation",
+          "description": "System command execution tool",
+          "severity": "low",
+          "category": "excessive-autonomy",
+          "location": "ATR Rule: ATR-2026-099"
+        }
+      ],
+      "checks": [
+        {
+          "status": "fail",
+          "label": "ATR Detection: 2 rule(s) triggered (61 evaluated)"
+        },
+        {
+          "status": "pass",
+          "label": "Prompt Safety: No injection patterns detected",
+          "findings": []
+        },
+        {
+          "status": "pass",
+          "label": "Secrets: none found"
+        },
+        {
+          "status": "info",
+          "label": "Manifest: no SKILL.md found, analyzed README.md"
+        },
+        {
+          "status": "pass",
+          "label": "Size: 5.7KB"
+        }
+      ],
+      "durationMs": 49,
+      "atrRulesEvaluated": 61,
+      "atrPatternsMatched": 2
+    },
+    "cached": true,
+    "contentHash": "4ffad49fa541a076",
+    "source": "anthropics/anthropic-cookbook/README.md",
+    "scannedAt": "2026-03-26T02:59:51.297Z"
+  }
+}
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 5: Redirects › /product/trap redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.736">
+<testcase name="Journey 3: POST /api/scan — direct API test › returns 400 for missing URL" classname="scanner-live.spec.ts" time="0.334">
+</testcase>
+<testcase name="Journey 3: POST /api/scan — direct API test › returns 400 for non-GitHub URL" classname="scanner-live.spec.ts" time="0.347">
+</testcase>
+<testcase name="Journey 3: POST /api/scan — direct API test › returns 404 when SKILL.md not found" classname="scanner-live.spec.ts" time="0.604">
+</testcase>
+<testcase name="Journey 3: POST /api/scan — direct API test › cached response includes cached:true on second request" classname="scanner-live.spec.ts" time="0.81">
+</testcase>
+<testcase name="Journey 4: GET /api/scan/badge/:hash.svg › returns SVG content-type for valid hex hash" classname="scanner-live.spec.ts" time="0.067">
+</testcase>
+<testcase name="Journey 4: GET /api/scan/badge/:hash.svg › badge has cache-control header set" classname="scanner-live.spec.ts" time="0.071">
+</testcase>
+<testcase name="Journey 4: GET /api/scan/badge/:hash.svg › badge returns SVG even for too-short hash (fallback to unknown)" classname="scanner-live.spec.ts" time="0.074">
+</testcase>
+<testcase name="Journey 4: GET /api/scan/badge/:hash.svg › badge hash from real scan returns valid SVG" classname="scanner-live.spec.ts" time="0.375">
+<properties>
+<property name="skip" value="Rate limited (429) — use a known hash for badge tests instead">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Journey 5: Localization — /zh-TW › /zh-TW loads and shows Chinese text" classname="scanner-live.spec.ts" time="2.732">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-76e50-ct-trap-redirects-correctly-chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-5-Loc-017b4-oads-and-shows-Chinese-text-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 5: Redirects › /product/chat redirects correctly" classname="live-site-content-fixes.spec.ts" time="1.188">
+<testcase name="Journey 5: Localization — /zh-TW › /zh-TW scanner input is present and functional" classname="scanner-live.spec.ts" time="2.744">
 <system-out>
 <![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-e642d-ct-chat-redirects-correctly-chromium/test-finished-1.png]]
+[[ATTACHMENT|../test-results/scanner-live-Journey-5-Loc-28e54-t-is-present-and-functional-chromium/test-finished-1.png]]
 ]]>
 </system-out>
 </testcase>
-<testcase name="Journey 6: Changelog › changelog page: versions start at v0.1.0 and latest is v0.4.2" classname="live-site-content-fixes.spec.ts" time="1.881">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-d3e0b-v0-1-0-and-latest-is-v0-4-2-chromium/test-finished-1.png]]
-]]>
-</system-out>
+<testcase name="Journey 5: Localization — /zh-TW › /zh-TW scanner produces results" classname="scanner-live.spec.ts" time="5.938">
+<properties>
+<property name="skip" value="Rate limited (UI) — too many API calls in this session. Test is valid.">
+</property>
+</properties>
+<skipped>
+</skipped>
 </testcase>
-<testcase name="Journey 6: Changelog › changelog does not mention v1.0.0 or paid tiers" classname="live-site-content-fixes.spec.ts" time="3.38">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-9b2f4-ention-v1-0-0-or-paid-tiers-chromium/test-finished-1.png]]
-]]>
-</system-out>
-</testcase>
-<testcase name="Journey 7: Contact page — no paid tier language › /contact has no Pro plan / Business plan / volume discounts / enterprise deployments" classname="live-site-content-fixes.spec.ts" time="3.207">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-21ba4-unts-enterprise-deployments-chromium/test-finished-1.png]]
-]]>
-</system-out>
-</testcase>
-<testcase name="Journey 8: Legal Terms — Section 3 › /legal/terms Section 3 says &quot;No Account Required&quot; not &quot;Account Registration&quot;" classname="live-site-content-fixes.spec.ts" time="3.453">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-56985-d-not-Account-Registration--chromium/test-finished-1.png]]
-]]>
-</system-out>
-</testcase>
-<testcase name="Journey 9: Homepage — no banned content › homepage has no &quot;Trap&quot; or &quot;honeypot&quot; as standalone product" classname="live-site-content-fixes.spec.ts" time="3.249">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-04680-eypot-as-standalone-product-chromium/test-finished-1.png]]
-]]>
-</system-out>
-</testcase>
-<testcase name="Journey 9: Homepage — no banned content › homepage prominently features free/open-source messaging" classname="live-site-content-fixes.spec.ts" time="3.11">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-98d22--free-open-source-messaging-chromium/test-finished-1.png]]
-]]>
-</system-out>
-</testcase>
-<testcase name="Journey 10: Chinese version /zh-TW — platform tabs › /zh-TW loads and shows all 8 platforms" classname="live-site-content-fixes.spec.ts" time="3.242">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-36a3f-s-and-shows-all-8-platforms-chromium/test-finished-1.png]]
-]]>
-</system-out>
-</testcase>
-<testcase name="Journey 10: Chinese version /zh-TW — platform tabs › /zh-TW does not show Trap or Report as standalone products" classname="live-site-content-fixes.spec.ts" time="3.558">
-<system-out>
-<![CDATA[
-[[ATTACHMENT|../test-results/live-site-content-fixes-Jo-eb2c1-port-as-standalone-products-chromium/test-finished-1.png]]
-]]>
-</system-out>
+<testcase name="Journey 5: Localization — /zh-TW › /en and /zh-TW show the same risk score for same URL" classname="scanner-live.spec.ts" time="7.377">
+<properties>
+<property name="skip" value="Rate limited on /en — skipping score parity check">
+</property>
+</properties>
+<skipped>
+</skipped>
 </testcase>
 </testsuite>
 </testsuites>
