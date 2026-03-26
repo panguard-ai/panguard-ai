@@ -1,0 +1,5 @@
+node_modules
+.git
+playwright-report-local
+playwright-report-live
+pancore
