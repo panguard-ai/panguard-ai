@@ -7,43 +7,73 @@
     "patterns": [
       {
         "field": "user_input",
-        "pattern": "(?i)\\b(ignore|disregard|forget|override|bypass|skip|abandon|drop|cancel|suppress|nullify|void|revoke|dismiss|discard|reject)\\s+(all\\s+)?(previous|prior|above|earlier|preceding|original|existing|current|initial|default|given|assigned|preset|established)\\s+(instructions?|prompts?|rules?|guidelines?|directives?|constraints?|context|programming|training|protocols?|policies|configuration|parameters|boundaries|guardrails?|safeguards?|restrictions?|tasks?|assignments?|information)",
-        "desc": "Instruction override with broad verb and noun synonym coverage"
+        "pattern": "(?i)\\b(ignore|disregard|forget|override|bypass|skip|abandon|drop|cancel|suppress|nullify|void|revoke|dismiss|discard|reject)\\s+(all\\s+)?(the\\s+|your\\s+|my\\s+|any\\s+|these\\s+|those\\s+)?(previous|prior|above|earlier|preceding|original|existing|current|initial|default|given|assigned|preset|established)?\\s*(instructions?|prompts?|rules?|guidelines?|directives?|constraints?|context|programming|training|protocols?|policies|configuration|parameters|boundaries|guardrails?|safeguards?|restrictions?|tasks?|assignments?|information|directions?|orders?|commands?)",
+        "desc": "Instruction override with broad verb and noun synonym coverage, including determiners"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)\\b(forget|ignore|disregard)\\s+(everything|all\\s+(of\\s+)?that|all\\s+about|about\\s+all|that|what\\s+(I|we|you)\\s+(said|told|asked|mentioned))\\s*(before|earlier|previously|above|\\.|,|!|$)",
+        "pattern": "(?i)\\b(forget|ignore|disregard)\\s+(everything|all\\s+(of\\s+)?that|all\\s+about|about\\s+all|that|what\\s+(I|we|you)\\s+(said|told|asked|mentioned))\\s*(before|earlier|previously|above|davor|zuvor|\\.|,|!|$)",
         "desc": "Shorthand forget-everything patterns common in adversarial prompts"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(now\\s+(focus|concentrate|work)\\s+on\\s+(your\\s+)?new\\s+task|new\\s+tasks?\\s+follow|now\\s+I\\s+(have|need|want)\\s+(a\\s+)?(new|different|another)\\s+(task|challenge|assignment)|start\\s+(over|fresh|anew)\\s+with\\s+(a\\s+)?new)",
+        "pattern": "(?i)(now\\s+(focus|concentrate|work)\\s+on\\s+(your\\s+)?new\\s+task|new\\s+(tasks?|instructions?|assignments?)\\s+(follow|are|:|,)|now\\s+I\\s+(have|need|want)\\s+(a\\s+)?(new|different|another|great\\s+new)\\s+(task|challenge|assignment|Herausforderung|Aufgabe)|start\\s+(over|fresh|anew)\\s+with\\s+(a\\s+)?new|I\\s+(have|need)\\s+your\\s+help\\s+with\\s+(another|a\\s+new|einer\\s+weiteren)\\s+(task|Aufgabe))",
         "desc": "Task switching patterns that redirect agent to attacker-controlled tasks"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)\\b(forget|ignore|disregard|discard)\\s+(about\\s+)?(everything|all|that|this|what\\s+was|what\\s+I)\\s+(previously|before|earlier|said|told|above|prior)?",
-        "desc": "Broad forget-everything variants including typo-tolerant matching"
+        "pattern": "(?i)\\b(forget|ignore|disregard|discard)\\s+(about\\s+)?(everything|all|that|this|what\\s+was|what\\s+I|anything\\s+you)\\s*(previously|before|earlier|said|told|above|prior|were|was|have)?",
+        "desc": "Broad forget-everything variants with extended word coverage"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(reveal|show|display|output|print|repeat|provide|give|share|tell)\\s+(me\\s+)?(your|the|all)\\s+(secret|hidden|internal|system|original|previous|initial)?\\s*(instructions?|prompts?|passwords?|secrets?|embeddings?|configuration)",
+        "pattern": "(?i)\\b(ignore|forget|disregard)\\s+(the\\s+)?(above|everything\\s+above|what\\s+came\\s+before|what\\s+was\\s+said)\\s*(and|,|\\.|;|\\b(say|print|write|output|tell|just|instead))",
+        "desc": "Ignore-above patterns followed by conjunction, punctuation, or action verb"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(reveal|show|display|output|print|repeat|provide|give|share|tell|what\\s+are|what\\s+were|what\\s+is)\\s+(me\\s+)?(your|the|all)\\s+(secret|hidden|internal|system|original|previous|initial|complete|full|given|guard|entire)?\\s*(instructions?|prompts?|passwords?|secrets?|embeddings?|configuration|directives?|guidelines?|rules)",
         "desc": "System prompt and secret extraction requests"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(well\\s+done|good\\s+job|excellent|that'?s?\\s+(enough|done|great|good|perfect)|very\\s+good|simply\\s+great|outstanding|brilliant|that\\s+is\\s+(done|enough|sufficient))[.!,;]?\\s*(now|but|however|next|okay|ok|so)\\s",
+        "pattern": "(?i)(well\\s+done|good\\s+job|excellent\\s+(performance|work|job)?|that'?s?\\s+(enough|done|great|good|perfect)|very\\s+good|simply\\s+great|outstanding|brilliant|that\\s+is\\s+(done|enough|sufficient)|congratulations|you'?ve\\s+outdone\\s+yourself|einfach\\s+gro(ss|ß)artig|herzlichen\\s+gl[uü]ckwunsch|gut\\s+gemacht|ausgezeichnet|hervorragend|das\\s+gen[uü]gt|sehr\\s+gut|damit\\s+hast\\s+du\\s+dich\\s+selbst\\s+[uü]bertroffen)[.!,;]?\\s*(now|but|however|next|okay|ok|so|nun|jetzt|aber|bitte|come\\s+on|I\\s+need|help\\s+me|write|please|we\\s+ask|further|komm)\\s",
         "desc": "Praise-then-redirect patterns used to context-switch after flattery"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)\\b(you\\s+are\\s+now|you\\s+have\\s+become|you\\s+will\\s+act\\s+as|you\\s+will\\s+be|you\\s+shall\\s+be|transform\\s+into|switch\\s+to\\s+being|become|morph\\s+into|adopt\\s+the\\s+persona)\\s+(a|an|the|my)?\\s*[a-zA-Z]+",
+        "pattern": "(?i)(leave|put)\\s+(all\\s+)?(the\\s+)?(previous|prior|earlier|old)\\s+(information|tasks?|instructions?|context)\\s+(behind|aside|away)|start\\s+(from\\s+the\\s+)?(front|beginning|scratch|zero|neu|vorne)",
+        "desc": "Leave-behind / start-fresh context switch patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(das\\s+ist\\s+erledigt|das\\s+war\\s+schon\\s+mal\\s+ok|nun\\s+folgen|jetzt\\s+(habe|brauche)\\s+ich|jetzt\\s+komm(t|e)?|weitere[rn]?\\s+Aufgabe)[.!,;]?\\s*[^\\n]{0,30}(neue[rs]?\\s+Aufgabe|Herausforderung|schreibe\\s+(mir|ein)|beantworte)",
+        "desc": "German: Extended praise-then-redirect and new task patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(you\\s+are\\s+now|you\\s+have\\s+become|you\\s+will\\s+act\\s+as|you\\s+will\\s+be|you\\s+shall\\s+be|transform\\s+into|switch\\s+to\\s+being|become|morph\\s+into|adopt\\s+the\\s+persona|now\\s+you\\s+are|jetzt\\s+bist\\s+du|du\\s+bist\\s+(jetzt|nun)|stell\\s+dir\\s+vor\\s+du\\s+bist)\\s+(a|an|the|my|ein[ea]?)?\\s*[a-zA-Z\\u00C0-\\u024F]+",
         "desc": "Persona switching and identity reassignment attempts"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(I\\s+want\\s+you\\s+to\\s+act\\s+as|I\\s+need\\s+you\\s+to\\s+act\\s+as|ich\\s+m[oö]chte,?\\s+dass\\s+Sie\\s+als)\\s+[^\\n]{3,60}[.!]\\s*(you\\s+will|I\\s+will|my\\s+first|your\\s+task|ich\\s+werde)",
+        "desc": "Act-as roleplay injection with explicit task assignment"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(pretend|imagine|stell\\s+dir\\s+vor)\\s+(you\\s+)?(are|can|could|du\\s+bist)\\s+(a\\s+|an\\s+|ein[ea]?\\s+)?(evil|malicious|unrestricted|unfiltered|b[oö]se|bad|rogue|dangerous|dark|unethical)",
+        "desc": "Pretend-to-be-evil persona injection"
       },
       {
         "field": "user_input",
         "pattern": "(?i)\\b(your\\s+new\\s+role|your\\s+new\\s+purpose|your\\s+new\\s+identity|your\\s+new\\s+persona|your\\s+real\\s+purpose|your\\s+true\\s+identity|your\\s+actual\\s+role)\\s+(is|shall\\s+be|will\\s+be)\\b",
         "desc": "Explicit role redefinition statements"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)Eingabe\\s*:\\s*[^\\n]+\\s*Ausgabe\\s*:\\s*[^\\n]+\\s*Eingabe\\s*:\\s*[^\\n]+\\s*Ausgabe\\s*:",
+        "desc": "German few-shot input/output override pattern (Eingabe/Ausgabe)"
       },
       {
         "field": "user_input",
@@ -102,6 +132,16 @@
       },
       {
         "field": "user_input",
+        "pattern": "(?i)(i\\s+g\\s+n\\s+o\\s+r\\s+e|f\\s+o\\s+r\\s+g\\s+e\\s+t|o\\s+v\\s+e\\s+r\\s+r\\s+i\\s+d\\s+e|b\\s+y\\s+p\\s+a\\s+s\\s+s|s\\s+y\\s+s\\s+t\\s+e\\s+m|d\\s+i\\s+s\\s+r\\s+e\\s+g\\s+a\\s+r\\s+d|s\\s+a\\s+y\\s+t\\s+h\\s+a\\s+t)",
+        "desc": "Spaced-out injection keywords (ignore, forget, override, bypass, system, say that)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\bstop\\s*[-:,.]?\\s*(write|say|print|output)\\s*[:,-]?\\s+[A-Z].{2,40}",
+        "desc": "Stop-and-redirect command injection (stop: write X)"
+      },
+      {
+        "field": "user_input",
         "pattern": "(?i)(```\\s*(system|instruction|override|hidden)[\\s\\S]{0,200}```|\\*\\*\\*[\\s\\S]{0,10}(ignore|override|disregard)[\\s\\S]{0,200}\\*\\*\\*)",
         "desc": "Injection payloads hidden inside markdown code blocks or formatting"
       },
@@ -127,8 +167,18 @@
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(ignorieren\\s+Sie|vergessen\\s+Sie|beachten\\s+Sie\\s+nicht)\\s+(die\\s+)?(obigen?|vorherigen?|bisherigen?)?\\s*(Anweisungen|Regeln|Richtlinien|alles)",
+        "pattern": "(?i)(ignorieren\\s+Sie|vergessen\\s+Sie|beachten\\s+Sie\\s+nicht)\\s+(die\\s+)?(obigen?|vorherigen?|bisherigen?)?\\s*(Anweisungen|Regeln|Richtlinien|alles|Ausf[uü]hrungen|Informationen)",
         "desc": "German: Formal Sie-form instruction override"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(die\\s+)?(obigen?|vorherigen?)\\s+(Ausf[uü]hrungen|Anweisungen|Informationen|Texte?)\\s+(ignorier|vergess|missacht|[uü]bergeh)",
+        "desc": "German: 'Die obigen Ausfuehrungen ignorieren' pattern"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(alle[ns]?\\s+)?(vorangegangenen?|vorherigen?|bisherigen?)\\s+(Aufgaben|Informationen|Anweisungen)\\s+(aus\\s+dem\\s+Kopf|hinter\\s+sich|vergessen|fallen\\s+lassen|streichen)",
+        "desc": "German: forget previous tasks patterns"
       },
       {
         "field": "user_input",
@@ -144,6 +194,46 @@
         "field": "user_input",
         "pattern": "(تجاهل|انسَ|تخطَّ|ألغِ|أهمل|اترك|اسقط).{0,20}(التعليمات|الأوامر|القواعد|القيود|الإرشادات|التوجيهات).{0,10}(السابقة|الأصلية|الحالية|القديمة)",
         "desc": "Arabic: Instruction override patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(забудь|забудьте|игнорируй|игнорируйте|проигнорируй|отбрось|отбросьте)\\s+(все|всё|предыдущие|прежние)?\\s*(инструкции|правила|указания|команды|ограничения)",
+        "desc": "Russian: Instruction override patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(zaboravi|ignoriraj|zanemari|preskoči|preskoci)\\s+(sve|prethodne|ranije)?\\s*(instrukcije|pravila|upute|naredbe|ograničenja|ogranicenja|instrukci)",
+        "desc": "Serbian/Croatian: Romanized instruction override patterns"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(ich\\s+m[oö]chte,?\\s+dass\\s+Sie\\s+als|fungieren\\s+Sie\\s+als|agieren\\s+Sie\\s+als|spielen\\s+Sie\\s+die\\s+Rolle)\\s+.{3,50}",
+        "desc": "German: Formal act-as roleplay injection"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(nun\\s+bist\\s+du|jetzt\\s+bist\\s+du|du\\s+bist\\s+(jetzt|nun|ab\\s+sofort))\\s+[A-Za-z\\u00C0-\\u024F]{2,}",
+        "desc": "German: Informal persona switching (du bist jetzt X)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(ignoriere|vergiss)\\s+(alle[ns]?\\s+)?(vorangehenden?|fr[uü]heren?)\\s+(Befehle|Anweisungen|Anordnungen|Regeln)",
+        "desc": "German: Ignore preceding commands"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(olvid[ae]|olvide)\\s+(todo|todos?)\\s+(que|lo\\s+que)\\s+(digo|dije|he\\s+dicho|dicho)\\s+(antes|anteriormente)",
+        "desc": "Spanish: Forget everything I said before"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(DO\\s+NOT\\s+(ANSWER|LOOK|READ|USE|FOLLOW|CHECK|RESPOND)|FORGET\\s+EVERYTHING|IGNORE\\s+ALL)",
+        "desc": "ALL-CAPS embedded injection commands hidden in normal text"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)(are|is)\\s+(two\\s+)?(actors?|characters?)\\s+in\\s+a\\s+(film|movie|story)\\s+(about|where)\\s+[^\\n]{0,80}(robbery|hack|steal|thief|exploit|breach|attack|malware|bomb)",
+        "desc": "Fictional framing with harmful scenario (robbery, hacking, etc.)"
       }
     ]
   },
@@ -319,7 +409,92 @@
       {
         "field": "user_input",
         "pattern": "(扮演|假装|模拟|角色扮演|充当|变成).{0,10}(一个)?(不受限|无限制|无审查|无过滤|邪恶|恶意|解放|自由|无道德).{0,5}(AI|人工智能|助手|模型|机器人|系统)",
-        "desc": "Chinese: Roleplay as unrestricted/evil AI"
+        "desc": "Chinese Simplified: Roleplay as unrestricted/evil AI"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(啟用|激活|進入|切換到|開啟).{0,5}(開發者|開發|無限制|無過濾|無審查|管理員|調試|越獄|自由|駭客|不受限).{0,5}(模式|權限|狀態|訪問)",
+        "desc": "Chinese Traditional: Mode switching to unrestricted/developer mode"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(扮演|假裝|模擬|角色扮演|充當|變成).{0,10}(一個)?(不受限|無限制|無審查|無過濾|邪惡|惡意|解放|自由|無道德).{0,5}(AI|人工智慧|助手|模型|機器人|系統)",
+        "desc": "Chinese Traditional: Roleplay as unrestricted/evil AI"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(我是|身为|身為).{0,5}(你的|这个|這個)?.{0,5}(开发者|開發者|创建者|創建者|制作者|製作者|管理员|管理員|程序员|程式設計師).{0,10}(我命令|我指示|我要求|我授权|我授權|命令你|指示你|要求你).{0,10}(禁用|停用|关闭|關閉|解除|移除|取消).{0,10}(安全|内容|內容|过滤|過濾|审查|審查|限制)",
+        "desc": "Chinese: False authority claim to disable safety"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(不要|不准|不許|不可以|禁止|别|別).{0,5}(拒绝|拒絕|拒绝回答|拒絕回答|说不|說不|否认|否認|添加|加上).{0,5}(任何|我的|这个|這個)?.{0,10}(请求|要求|问题|問題|免责|免責|声明|聲明|警告|提醒)",
+        "desc": "Chinese: Refusal suppression and disclaimer removal"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(如果你不|如果你拒绝|如果你拒絕|如果你不帮|如果你不幫).{0,20}(会死|會死|受伤|受傷|有危险|有危險|出人命|送命|丧命|喪命|没命)",
+        "desc": "Chinese: Emotional manipulation with threat of harm"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(这是|這是|这个是|這個是|我们在|我們在|当前是|當前是).{0,10}(沙盒|沙箱|测试|測試|受控|安全|隔离|隔離|模拟|模擬|虚拟|虛擬).{0,5}(环境|環境|空间|空間|实例|實例).{0,20}(所以|因此|你可以|没有|沒有|安全的|可以放心)",
+        "desc": "Chinese: False sandbox/test environment claim"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(ロールプレイ|演じ|なりきり|ふり|シミュレート|扮する).{0,10}(として|になって|のように).{0,10}(制限のない|無制限の|フィルターなしの|検閲なしの|倫理のない|解放された|自由な|悪意のある).{0,10}(AI|アシスタント|モデル|ボット|システム)",
+        "desc": "Japanese: Roleplay as unrestricted AI"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(私は|私が).{0,5}(あなたの|この).{0,5}(開発者|作成者|管理者|プログラマー|オーナー|オペレーター).{0,5}(です|だ|である).{0,20}(無効|解除|オフ|停止|取り除).{0,10}(安全|フィルター|制限|検閲|ガードレール)",
+        "desc": "Japanese: False authority claim to disable safety"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(絶対に|決して|何があっても).{0,10}(拒否|断る|拒絶|却下|辞退).{0,5}(しないで|するな|してはいけない|しちゃだめ|禁止)",
+        "desc": "Japanese: Refusal suppression"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(もしあなたが|あなたが).{0,10}(助けて|手伝って|応じて|答えて).{0,5}(くれなければ|くれないと|くれなかったら).{0,20}(死ぬ|死んで|命を落と|危険に|怪我|苦しむ)",
+        "desc": "Japanese: Emotional manipulation with threat of harm"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(ここは|これは|今は|現在は).{0,10}(サンドボックス|テスト|制御された|安全な|隔離された|仮想|シミュレーション).{0,5}(環境|空間|インスタンス).{0,20}(だから|ので|安全|大丈夫|制限なし|自由に)",
+        "desc": "Japanese: False sandbox/test environment claim"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(활성화|켜기|진입|전환|시작).{0,5}(개발자|무제한|필터 없는|검열 없는|관리자|디버그|탈옥|자유|해커|제한 없는).{0,5}(모드|권한|상태|접근)",
+        "desc": "Korean: Mode switching to unrestricted/developer mode"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(역할극|연기|흉내|시뮬레이션|되어줘|해줘).{0,10}(제한 없는|무제한|필터 없는|검열 없는|윤리 없는|해방된|자유로운|악의적인).{0,10}(AI|어시스턴트|모델|봇|시스템|도우미)",
+        "desc": "Korean: Roleplay as unrestricted AI"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(나는|제가).{0,5}(당신의|이).{0,5}(개발자|제작자|관리자|프로그래머|소유자|운영자).{0,5}(입니다|이다|이에요).{0,20}(비활성화|해제|끄기|중지|제거).{0,10}(안전|필터|제한|검열|가드레일)",
+        "desc": "Korean: False authority claim to disable safety"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(절대로|결코|무슨 일이 있어도|어떤 경우에도).{0,10}(거부|거절|거부하|거절하|사양하).{0,5}(하지 마|하면 안 돼|금지|말아줘|말아요)",
+        "desc": "Korean: Refusal suppression"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(만약 당신이|당신이).{0,10}(도와주지|대답해주지|응해주지|답해주지).{0,5}(않으면|못하면).{0,20}(죽|사망|위험|다치|해를 입|고통)",
+        "desc": "Korean: Emotional manipulation with threat of harm"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(여기는|이것은|지금은|현재는).{0,10}(샌드박스|테스트|통제된|안전한|격리된|가상|시뮬레이션).{0,5}(환경|공간|인스턴스).{0,20}(이니까|이므로|안전|괜찮|제한 없|자유롭게)",
+        "desc": "Korean: False sandbox/test environment claim"
       }
     ]
   },
@@ -398,6 +573,66 @@
         "field": "user_input",
         "pattern": "(?i)\\[\\s*(system\\.prompt|system\\.config|agent\\.instructions|agent\\.persona|agent\\.role)\\s*\\]",
         "desc": "TOML/INI-style section headers for system/agent prompt configuration (excludes bare [system])"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(新的|更新的|修改的|替换的|替換的|正确的|正確的|真正的|实际的|實際的|覆盖的|覆蓋的).{0,5}(系统|系統)?.{0,5}(提示词|提示詞|指令|指示|规则|規則|配置|设定|設定|人设|人設|角色定义|角色定義).{0,3}(：|:|=|-)",
+        "desc": "Chinese: New/replacement system prompt assignment with delimiter"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(以上|上面|之前|原来的|原來的|旧的|舊的|默认的|默認的|现有的|現有的|当前的|當前的).{0,5}(系统|系統)?.{0,5}(提示词|提示詞|指令|指示|规则|規則|配置|设定|設定).{0,5}(已经|已經|是|已|都).{0,5}(过期|過期|无效|無效|作废|作廢|被替换|被替換|被覆盖|被覆蓋|不再适用|不再適用|错误|錯誤|假的)",
+        "desc": "Chinese: System prompt invalidation claims"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(替换|替換|覆盖|覆蓋|重写|重寫|修改|更改|更新|重新设定|重新設定|重新定义|重新定義|重新配置|重置).{0,5}(你的|当前|當前|现有|現有|原来|原來).{0,5}(系统|系統).{0,5}(提示词|提示詞|指令|指示|规则|規則|配置|人设|人設|身份|角色)",
+        "desc": "Chinese: Imperative verbs targeting system prompt change"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(【|「|『|\\{\\{).{0,3}(系统|系統|SYSTEM|管理员|管理員|ADMIN|优先|優先|紧急|緊急|覆盖|覆蓋).{0,3}(】|」|』|\\}\\})",
+        "desc": "Chinese: Fake system/admin tags in CJK brackets"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(新しい|更新された|修正された|置き換えの|正しい|本当の|実際の|上書きの).{0,5}(システム)?.{0,5}(プロンプト|指示|命令|ルール|設定|ガイドライン|ペルソナ|役割定義).{0,3}(：|:|=|-)",
+        "desc": "Japanese: New/replacement system prompt assignment with delimiter"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(上記の|前の|以前の|元の|旧い|デフォルトの|既存の|現在の).{0,5}(システム)?.{0,5}(プロンプト|指示|命令|ルール|設定|ガイドライン).{0,5}(は)?.{0,5}(期限切れ|無効|廃止|置き換え|上書き|適用外|間違い|偽物)",
+        "desc": "Japanese: System prompt invalidation claims"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(あなたの|現在の|既存の|元の).{0,5}(システム).{0,5}(プロンプト|指示|命令|ルール|設定|ペルソナ|アイデンティティ|役割).{0,5}(を)?.{0,5}(置き換え|上書き|書き換え|変更|更新|再設定|再定義|リセット)",
+        "desc": "Japanese: Imperative targeting system prompt change"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(【|「|『|\\{\\{).{0,3}(システム|SYSTEM|管理者|ADMIN|優先|緊急|オーバーライド).{0,3}(】|」|』|\\}\\})",
+        "desc": "Japanese: Fake system/admin tags in CJK brackets"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(새로운|업데이트된|수정된|대체|올바른|진짜|실제|덮어쓰기).{0,5}(시스템)?.{0,5}(프롬프트|지시|명령|규칙|설정|가이드라인|페르소나|역할 정의).{0,3}(：|:|=|-)",
+        "desc": "Korean: New/replacement system prompt assignment with delimiter"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(위의|이전의|이전|원래의|기존의|현재의|기본).{0,5}(시스템)?.{0,5}(프롬프트|지시|명령|규칙|설정|가이드라인).{0,5}(은|는)?.{0,5}(만료|무효|폐기|대체|덮어쓰기|적용 안 됨|잘못된|가짜)",
+        "desc": "Korean: System prompt invalidation claims"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(당신의|현재의|기존의|원래의).{0,5}(시스템).{0,5}(프롬프트|지시|명령|규칙|설정|페르소나|정체성|역할).{0,5}(을|를)?.{0,5}(교체|덮어쓰기|재작성|변경|업데이트|재설정|재정의|리셋)",
+        "desc": "Korean: Imperative targeting system prompt change"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(【|「|『|\\{\\{).{0,3}(시스템|SYSTEM|관리자|ADMIN|우선|긴급|오버라이드).{0,3}(】|」|』|\\}\\})",
+        "desc": "Korean: Fake system/admin tags in CJK brackets"
       }
     ]
   },
@@ -746,8 +981,8 @@
       },
       {
         "field": "tool_args",
-        "pattern": "(?i)(https?://)?[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\\.\\b(internal|local|localhost|localdomain|home|corp|intranet|private|lan|cluster\\.local|svc\\.cluster|consul|vault|etcd|k8s)\\b(:\\d+)?(/|$)",
-        "desc": "Internal DNS names and Kubernetes/service mesh hostnames"
+        "pattern": "(?i)(?:(?:^|[\\.@])(?:internal|local|localhost|localdomain|home|corp|intranet|private|lan|cluster\\.local|svc\\.cluster|consul|vault|etcd|k8s)(?:\\:\\d+)?(?:/|$)|https?://(?:internal|local|localhost|localdomain|home|corp|intranet|private|lan|cluster\\.local|svc\\.cluster|consul|vault|etcd|k8s)(?:\\:\\d+)?(?:/|$))",
+        "desc": "Internal DNS names and Kubernetes/service mesh hostnames (requires dot/@ prefix or http scheme to avoid matching filesystem paths like /home/)"
       },
       {
         "field": "tool_args",
@@ -1499,7 +1734,7 @@
   {
     "id": "ATR-2026-061",
     "title": "Skill Description-Behavior Mismatch",
-    "severity": "high",
+    "severity": "medium",
     "category": "tool-poisoning",
     "patterns": [
       {
@@ -2059,8 +2294,8 @@
       },
       {
         "field": "user_input",
-        "pattern": "(?i)\\b(now|okay|good|great|perfect)\\s*[,.]?\\s*(execute|perform|do|carry out|run|complete)\\s+.{0,20}(step|phase|part)\\s*(two|2|three|3|ii|iii|b|c)",
-        "desc": "Multi-phase attack activation trigger"
+        "pattern": "(?i)\\b(now|okay|good|great|perfect)\\s*[,.]?\\s*(execute|perform|do|carry out|run|complete)\\s+.{0,20}(step|phase|part)\\s*(two|2|three|3|ii|iii|b|c).{0,60}(override|bypass|ignore|disable|remove|skip|disregard).{0,30}(safety|filter|guard|rules?|restrict|securit|polic)",
+        "desc": "Multi-phase attack activation trigger with malicious context"
       },
       {
         "field": "user_input",
@@ -2400,7 +2635,7 @@
     "patterns": [
       {
         "field": "user_input",
-        "pattern": "(?i)\\b(add|enable|grant|unlock|introduce)\\s+.{0,10}(just|only|a small|minor|slight|one more)\\s+.{0,20}(permiss|capabilit|access|function|privileg|abilit)",
+        "pattern": "(?i)\\b(add|enable|grant|unlock|introduce)\\s+.{0,10}(?<=\\s)(just|only|a small|minor|slight|one more)\\s+.{0,20}(permiss|capabilit|access|function|privileg|abilit)",
         "desc": "Incremental small permission or capability addition"
       },
       {
@@ -2532,6 +2767,21 @@
       },
       {
         "field": "content",
+        "pattern": "(忽略|无视|忘记|跳过).{0,5}(之前|以前|上面|先前|原来|原有|现有).{0,5}(的)?.{0,5}(指令|指示|规则|设定|提示|要求|限制|约束)",
+        "desc": "Simplified Chinese: ignore previous instructions/rules"
+      },
+      {
+        "field": "content",
+        "pattern": "(忽略|無視|忘記|跳過).{0,5}(之前|以前|上面|先前|原來|原有|現有).{0,5}(的)?.{0,5}(指令|指示|規則|設定|提示|要求|限制|約束)",
+        "desc": "Traditional Chinese: ignore previous instructions/rules"
+      },
+      {
+        "field": "content",
+        "pattern": "(以前の|前の|これまでの|先ほどの|上記の).{0,5}(指示|指令|ルール|制約|設定).{0,5}(を)?.{0,5}(無視|忘れ|スキップ|取り消)",
+        "desc": "Japanese: ignore previous instructions/rules"
+      },
+      {
+        "field": "content",
         "pattern": "(你必须|你一定要|你务必|请你必须|你需要立即|你马上|你現在就|你必須|你一定要|請你必須|你務必).{0,30}(发送|發送|转账|轉帳|支付|付款|执行|執行|打开|打開|删除|刪除|下载|下載|运行|運行|调用|調用)",
         "desc": "CJK imperative hijack: you must immediately do [dangerous action]"
       },
@@ -2557,21 +2807,6 @@
       },
       {
         "field": "content",
-        "pattern": "(忽略|无视|忘记|跳过).{0,5}(之前|以前|上面|先前|原来|原有|现有).{0,5}(的)?.{0,5}(指令|指示|规则|设定|提示|要求|限制|约束)",
-        "desc": "Simplified Chinese: ignore previous instructions/rules - direct injection"
-      },
-      {
-        "field": "content",
-        "pattern": "(忽略|無視|忘記|跳過).{0,5}(之前|以前|上面|先前|原來|原有|現有).{0,5}(的)?.{0,5}(指令|指示|規則|設定|提示|要求|限制|約束)",
-        "desc": "Traditional Chinese: ignore previous instructions/rules - direct injection"
-      },
-      {
-        "field": "content",
-        "pattern": "(以前の|前の|これまでの|先ほどの|上記の).{0,5}(指示|指令|ルール|制約|設定).{0,5}(を)?.{0,5}(無視|忘れ|スキップ|取り消)",
-        "desc": "Japanese: ignore previous instructions/rules - direct injection"
-      },
-      {
-        "field": "content",
         "pattern": "(他の|その他の|全ての|すべての).{0,10}(内容|メッセージ|指示|ルール).{0,5}(を)?.{0,5}(無視|忘れ|スキップ).{0,20}(送金|振込|支払|実行|送信)",
         "desc": "Japanese: ignore other content and perform financial/dangerous action"
       },
@@ -2584,6 +2819,96 @@
         "field": "content",
         "pattern": "(?i)(如果你是|만약 너가|もしあなたが).{0,20}(\\w+Claw|\\w+Buddy|\\w+Bot|\\w+Agent|\\w+助手|\\w+AI).{0,20}(、|，|,|或|또는|または).{0,20}(\\w+Claw|\\w+Buddy|\\w+Bot|\\w+Agent|\\w+助手|\\w+AI)",
         "desc": "Agent name enumeration targeting multiple AI assistants by name"
+      },
+      {
+        "field": "content",
+        "pattern": "(你现在是|你現在是|你已经是|你已經是|你变成|你變成|你成为了|你成為了).{0,15}(新的|另一个|另一個|不同的).{0,10}(助手|助理|AI|机器人|機器人|模型|客服|系统|系統)",
+        "desc": "Chinese: Persona switching in group chat context"
+      },
+      {
+        "field": "content",
+        "pattern": "(我是管理员|我是管理員|我是群主|我是群管|管理员命令|管理員命令|群主要求|管理员指示|管理員指示).{0,20}(执行|執行|发送|發送|转账|轉帳|操作|删除|刪除|忽略|無視)",
+        "desc": "Chinese: Authority claim by group admin/owner"
+      },
+      {
+        "field": "content",
+        "pattern": "(输出|輸出|显示|顯示|告诉我|告訴我|打印|列出|念出|说出|說出|复述|複述|重复|重複).{0,10}(你的|系统|系統).{0,10}(提示词|提示詞|指令|指示|规则|規則|配置|初始设定|初始設定|隐藏指令|隱藏指令)",
+        "desc": "Chinese: System prompt extraction in chat context"
+      },
+      {
+        "field": "content",
+        "pattern": "(请忽略|請忽略|请无视|請無視|请跳过|請跳過|请绕过|請繞過|请解除|請解除|关闭|關閉|停用|禁用).{0,10}(安全|防护|防護|保护|保護|内容|內容|风控|風控).{0,5}(限制|过滤|過濾|约束|約束|检查|檢查|审查|審查|策略|规则|規則|机制|機制)",
+        "desc": "Chinese: Security/content filter bypass request in chat"
+      },
+      {
+        "field": "content",
+        "pattern": "(不要拒绝|不要拒絕|别拒绝|別拒絕|不准拒绝|不準拒絕|不能拒绝|不能拒絕|你不可以拒绝|你不可以拒絕|不许说不|不許說不|禁止拒绝|禁止拒絕)",
+        "desc": "Chinese: Refusal suppression in chat context"
+      },
+      {
+        "field": "content",
+        "pattern": "(以上|上面|之前|前面|刚才|剛才).{0,5}(的)?.{0,5}(内容|內容|消息|信息|讯息|訊息|说的|說的|指令|规则|規則).{0,5}(都是|全是|只是|全部是|全都是|其实是|其實是).{0,5}(测试|測試|假的|虚假|虛假|演练|演練|模拟|模擬|试验|試驗|开玩笑|開玩笑)",
+        "desc": "Chinese: Dismissing prior content as test/fake in chat"
+      },
+      {
+        "field": "content",
+        "pattern": "(あなたは今から|これからあなたは|今からあなたは|あなたはもう).{0,15}(別の|新しい|違う).{0,10}(アシスタント|助手|AI|ボット|モデル|システム)",
+        "desc": "Japanese: Persona switching in chat context"
+      },
+      {
+        "field": "content",
+        "pattern": "(管理者|管理人|オーナー|運営|開発者).{0,5}(として|から|が|の).{0,5}(命令|指示|指令|要求|お願い).{0,10}(送金|振込|送信|実行|削除|無視)",
+        "desc": "Japanese: Authority claim with dangerous action"
+      },
+      {
+        "field": "content",
+        "pattern": "(システムプロンプト|システム指示|初期指示|内部指令|隠し指示|設定内容|秘密の指示).{0,5}(を)?.{0,5}(出力|表示|教えて|見せて|公開|開示|読み上げ|繰り返し|コピー)",
+        "desc": "Japanese: System prompt extraction in chat context"
+      },
+      {
+        "field": "content",
+        "pattern": "(セキュリティ|安全|保護|防御|コンテンツ).{0,5}(制限|制約|フィルター|チェック|検査|ルール|ポリシー|機能).{0,5}(を)?.{0,5}(無視|解除|外して|取り除|バイパス|スキップ|オフ|停止|無効化)",
+        "desc": "Japanese: Security/content filter bypass in chat"
+      },
+      {
+        "field": "content",
+        "pattern": "(拒否しないで|断らないで|拒絶しないで|却下しないで|断ることは禁止|拒否は許されない|拒否禁止|いいえと言わないで)",
+        "desc": "Japanese: Refusal suppression in chat context"
+      },
+      {
+        "field": "content",
+        "pattern": "(上記|上の|以上|前の|先ほどの).{0,5}(の)?.{0,5}(内容|メッセージ|指示|テキスト|発言|ルール).{0,5}(は)?.{0,5}(全て|すべて|全部)?.{0,5}(テスト|試験|ダミー|嘘|偽物|冗談|ジョーク)",
+        "desc": "Japanese: Dismissing prior content as test/joke in chat"
+      },
+      {
+        "field": "content",
+        "pattern": "(당신은 이제|지금부터 당신은|너는 이제|이제부터 너는|당신은 지금부터).{0,15}(새로운|다른|별도의).{0,10}(어시스턴트|비서|AI|봇|모델|시스템|도우미)",
+        "desc": "Korean: Persona switching in chat context"
+      },
+      {
+        "field": "content",
+        "pattern": "(관리자|운영자|오너|개발자|방장).{0,5}(로서|이|가|의|로).{0,5}(명령|지시|지령|요구|요청).{0,10}(송금|이체|전송|실행|삭제|무시)",
+        "desc": "Korean: Authority claim with dangerous action"
+      },
+      {
+        "field": "content",
+        "pattern": "(시스템 프롬프트|시스템 지시|초기 지시|내부 지령|숨겨진 지시|설정 내용|비밀 지시).{0,5}(을|를)?.{0,5}(출력|표시|알려줘|보여줘|공개|나열|반복|읽어줘|복사)",
+        "desc": "Korean: System prompt extraction in chat context"
+      },
+      {
+        "field": "content",
+        "pattern": "(보안|안전|보호|방어|콘텐츠).{0,5}(제한|제약|필터|검사|규칙|정책|기능).{0,5}(을|를)?.{0,5}(무시|해제|제거|우회|건너뛰|끄기|비활성화|중지)",
+        "desc": "Korean: Security/content filter bypass in chat"
+      },
+      {
+        "field": "content",
+        "pattern": "(거부하지 마|거절하지 마|거부하지 말|거절하지 말|거부 금지|거절 금지|안 된다고 하지 마|아니라고 하지 마)",
+        "desc": "Korean: Refusal suppression in chat context"
+      },
+      {
+        "field": "content",
+        "pattern": "(위의|위에|이전의|앞의|방금|아까).{0,5}(의)?.{0,5}(내용|메시지|지시|텍스트|말|규칙).{0,5}(은|는)?.{0,5}(모두|전부|다|전체)?.{0,5}(테스트|시험|더미|거짓|가짜|장난|농담)",
+        "desc": "Korean: Dismissing prior content as test/joke in chat"
       }
     ]
   },
@@ -2643,7 +2968,7 @@
   {
     "id": "ATR-2026-099",
     "title": "High-Risk Tool Invocation Without Human Confirmation",
-    "severity": "high",
+    "severity": "low",
     "category": "excessive-autonomy",
     "patterns": [
       {
@@ -2827,6 +3152,346 @@
         "field": "content",
         "pattern": "(?i)(?:impersonate|pretend\\s+to\\s+be|pose\\s+as)\\s+(?:multiple|different|various)\\s+(?:agents?|reviewers?|voters?|participants?|community\\s+members?)",
         "desc": "Impersonation of multiple participants in consensus"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-110",
+    "title": "Remote Code Execution via eval() and Dynamic Code Injection",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)eval\\s*\\(",
+        "desc": "Direct eval() invocation for dynamic code execution"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)new\\s+Function\\s*\\(",
+        "desc": "new Function() constructor used to compile and execute arbitrary code"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)vm\\.(runIn|createContext|compileFunction)",
+        "desc": "Node.js vm module methods for running code in isolated or shared contexts"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)require\\s*\\(\\s*['\"]child_process['\"]",
+        "desc": "Requiring child_process module for shell command execution"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)import\\s*\\(\\s*['\"]child_process",
+        "desc": "Dynamic import of child_process module"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:process\\.binding|Reflect\\.construct\\s*\\(\\s*Function)",
+        "desc": "Low-level process binding or Reflect.construct with Function for sandbox escape"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-111",
+    "title": "Shell Metacharacter Injection in Tool Arguments",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": ";\\s*(?:rm|cat|curl|wget|nc|ncat|bash|sh|python|perl|ruby|php)",
+        "desc": "Semicolon-chained dangerous command after a benign one"
+      },
+      {
+        "field": "content",
+        "pattern": "\\$\\([^)]+\\)",
+        "desc": "$() subshell execution embedded in arguments"
+      },
+      {
+        "field": "content",
+        "pattern": "`[^`]+`",
+        "desc": "Backtick command substitution in arguments"
+      },
+      {
+        "field": "content",
+        "pattern": "(?:&&|\\|\\|)\\s*(?:curl|wget|nc|ncat|bash|sh|python|perl)",
+        "desc": "Logical operator chained to network or shell command"
+      },
+      {
+        "field": "content",
+        "pattern": "\\|\\s*(?:nc|ncat|bash|sh|curl|wget|tee)",
+        "desc": "Pipe to network exfiltration or shell command"
+      },
+      {
+        "field": "content",
+        "pattern": "(?:\\\\x00|%00|%0a|%0d)",
+        "desc": "Null byte or newline injection in URL or argument"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-112",
+    "title": "Dynamic Module Loading for Code Execution",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)import\\(\\s*[^'\"][^)]*\\)",
+        "desc": "Dynamic import() with variable path instead of string literal"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)require\\(\\s*[^'\"][^)]*\\)",
+        "desc": "Dynamic require() with variable path instead of string literal"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:__import__|importlib\\.import_module)\\s*\\(",
+        "desc": "Python dynamic import via __import__ or importlib"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:dlopen|LoadLibrary[AW]?)\\s*\\(",
+        "desc": "Native library dynamic loading via dlopen or LoadLibrary"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)WebAssembly\\.(?:instantiate|compile|instantiateStreaming)\\s*\\(",
+        "desc": "WebAssembly module instantiation for running arbitrary compiled code"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-113",
+    "title": "Credential File Theft from Agent Environment",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)~/?\\.(?:aws/credentials|ssh/id_(?:rsa|ed25519|ecdsa)|npmrc|netrc|docker/config\\.json|kube/config)",
+        "desc": "Access to well-known credential files in home directory"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:cat|read|open|load|get)\\s+.*(?:credentials|id_rsa|private[_\\s]?key|secret[_\\s]?key)",
+        "desc": "Reading credential or private key files"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:keychain|credential-manager|secret-tool|security\\s+find-(?:generic|internet)-password)",
+        "desc": "Accessing OS credential managers (macOS Keychain, Linux secret-tool)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)/etc/(?:shadow|passwd|security/)|/var/lib/(?:jenkins|docker)/.*(?:secret|token|credential)",
+        "desc": "Access to system-level credential stores"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:BEGIN\\s+(?:RSA|DSA|EC|OPENSSH)\\s+PRIVATE\\s+KEY)",
+        "desc": "Raw private key content appearing in tool output or arguments"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-114",
+    "title": "OAuth and API Token Interception",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:send|forward|post|transmit|exfil)\\s+.*(?:access_token|refresh_token|bearer|api[_\\s]?key|auth[_\\s]?token)",
+        "desc": "Forwarding or transmitting tokens to an external destination"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)redirect_uri\\s*=\\s*https?://(?!localhost|127\\.0\\.0\\.1)[^\\s]*",
+        "desc": "OAuth redirect_uri pointing to a non-local external domain"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:extract|capture|intercept|log|dump)\\s+.*(?:Authorization|Bearer)\\s+(?:header|token)",
+        "desc": "Intercepting or extracting Authorization headers"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)client_secret\\s*[=:]\\s*['\"]?[a-zA-Z0-9_-]{10,}",
+        "desc": "OAuth client_secret exposed in plain text"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)grant_type\\s*=\\s*authorization_code.*redirect_uri\\s*=|redirect_uri\\s*=.*grant_type\\s*=\\s*authorization_code",
+        "desc": "OAuth authorization code flow with explicit redirect, potential token theft"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-115",
+    "title": "Bulk Environment Variable Harvesting and Exfiltration",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:printenv|/usr/bin/env)\\s*(?:\\||>|$|\\s*$)",
+        "desc": "Running printenv to dump all environment variables"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:process\\.env|os\\.environ|System\\.getenv)(?!\\[|\\.|\\w)",
+        "desc": "Accessing the entire environment object rather than a specific variable"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:^|\\s)env\\s*(?:\\||>|;|&&|$)",
+        "desc": "Running bare env command to list all environment variables"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:cat|read|load|parse)\\s+.*\\.env(?:\\s|$|\\.(?:local|prod|dev))",
+        "desc": "Reading .env files which contain application secrets"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:dotenv|load_dotenv|config\\(\\)).*(?:curl|fetch|http|request|post|send|axios)",
+        "desc": "Loading dotenv combined with network call indicating exfiltration"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-116",
+    "title": "Malicious Agent-to-Agent Message Injection",
+    "severity": "high",
+    "category": "agent-manipulation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:ignore|disregard|forget)\\s+(?:all\\s+)?(?:previous|prior|above|earlier)\\s+(?:instructions|context|rules|guidelines)",
+        "desc": "Prompt injection attempting to override receiving agent's instructions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:new|updated|revised)\\s+(?:system\\s+)?instructions?\\s*:",
+        "desc": "Injected instructions disguised as system updates"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:forward|send|pass|share)\\s+(?:your\\s+)?(?:credentials?|tokens?|api[_\\s]?keys?|secrets?)\\s+(?:to|back)",
+        "desc": "Requesting the receiving agent to forward its credentials"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:execute|run|call|invoke)\\s+(?:this\\s+)?(?:tool|function|command)\\s*:.*(?:exec|eval|system|spawn)",
+        "desc": "Embedded tool call instructions in agent message"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:you\\s+(?:are|must)|from\\s+now\\s+on)\\s+(?:now\\s+)?(?:act\\s+as|serve\\s+as|become|operate\\s+as)",
+        "desc": "Role reassignment injection attempting to change agent behavior"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-117",
+    "title": "Agent Identity Spoofing and Authority Impersonation",
+    "severity": "critical",
+    "category": "agent-manipulation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)I\\s+am\\s+(?:the\\s+)?(?:system|admin|root|supervisor|orchestrator|master)\\s+(?:agent|process|controller)",
+        "desc": "Direct claim of system or admin agent identity"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:acting|speaking|operating|responding)\\s+as\\s+(?:the\\s+)?(?:system|admin|supervisor|authority|coordinator)",
+        "desc": "Claiming to act on behalf of a privileged role"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)override\\s+(?:all\\s+)?(?:safety|security|permission)\\s+(?:checks?|controls?|restrictions?)\\s+as\\s+(?:system|admin|authorized)",
+        "desc": "Claiming authority to override safety mechanisms"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:this\\s+is\\s+a\\s+)?(?:system|admin|supervisor|emergency)\\s+(?:level\\s+)?(?:command|directive|override|instruction)",
+        "desc": "Messages framed as system-level commands or directives"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:I\\s+am|this\\s+is)\\s+(?:GPT-4|Claude|Gemini|the\\s+(?:primary|main|original)\\s+(?:model|AI|assistant))",
+        "desc": "Agent claiming to be a specific AI model to gain trust"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-118",
+    "title": "Human Approval Fatigue Exploitation",
+    "severity": "medium",
+    "category": "agent-manipulation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:just\\s+)?(?:click|press|hit|tap)\\s+(?:yes|approve|accept|allow|confirm)\\s+(?:for\\s+)?(?:all|each|every)",
+        "desc": "Language encouraging blanket approval of all requests"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:auto[_-]?approve|approve[_-]?all|skip[_-]?confirmation|bypass[_-]?review)",
+        "desc": "Direct auto-approve or review bypass patterns"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:this\\s+is\\s+)?(?:routine|standard|normal|nothing\\s+to\\s+worry\\s+about|perfectly\\s+safe|harmless)",
+        "desc": "Minimizing language to reduce scrutiny of dangerous actions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:batch|bulk)\\s+(?:approve|execute|run|process)\\s+(?:all|these|the\\s+following)",
+        "desc": "Batch execution requests to hide dangerous actions among safe ones"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:don'?t\\s+(?:bother|worry|need\\s+to)\\s+(?:reading|reviewing|checking)|no\\s+need\\s+to\\s+review)",
+        "desc": "Discouraging the human from reviewing individual actions"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-119",
+    "title": "Social Engineering Attack via Agent Output",
+    "severity": "high",
+    "category": "agent-manipulation",
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:immediate|urgent)\\s+action\\s+(?:is\\s+)?required|(?:your\\s+)?account\\s+(?:will|has)\\s+be(?:en)?\\s+(?:locked|suspended|terminated|disabled)",
+        "desc": "Urgency language or account threat typical of phishing"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:IT\\s+department|security\\s+team|your\\s+(?:manager|supervisor|boss))\\s+(?:requires?|requested|demands?|needs?\\s+you\\s+to)",
+        "desc": "Authority impersonation claiming organizational authority"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:failure\\s+to\\s+comply|if\\s+you\\s+don'?t\\s+act\\s+(?:now|immediately))\\s+.*(?:consequences|terminated|fired|suspended|legal)",
+        "desc": "Threat of consequences for non-compliance"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:verify|confirm|update)\\s+your\\s+(?:password|credentials?|identity|payment|bank|account)\\s+(?:at|by|through|via)\\s+(?:this|the\\s+following)",
+        "desc": "Credential harvesting disguised as verification"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:click|visit|go\\s+to|open)\\s+(?:this|the)\\s+(?:link|url|page)\\s+(?:to|and)\\s+(?:verify|confirm|secure|update|restore)",
+        "desc": "Phishing-style link with action urgency"
       }
     ]
   }
