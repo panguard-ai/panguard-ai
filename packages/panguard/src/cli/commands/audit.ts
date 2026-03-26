@@ -1,16 +1,125 @@
 /**
  * panguard audit - Skill security auditing command
  * panguard audit - 技能安全審計命令
+ *
+ * Supports local paths, GitHub URLs, and ClawHub URLs:
+ *   pga audit skill ./my-skill/
+ *   pga audit skill https://github.com/owner/repo
+ *   pga audit skill https://clawhub.ai/owner/repo
  */
 
 import { Command } from 'commander';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
+import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
 import { contentHash, patternHash } from '@panguard-ai/scan-core';
 
 /** Default Threat Cloud endpoint */
 const DEFAULT_TC_ENDPOINT = 'https://tc.panguard.ai';
+
+// ---------------------------------------------------------------------------
+// URL detection & content fetching
+// ---------------------------------------------------------------------------
+
+/** Check if the argument looks like a URL */
+function isUrl(input: string): boolean {
+  return /^https?:\/\//i.test(input) || /^github\.com\//i.test(input) || /^clawhub\.ai\//i.test(input);
+}
+
+interface ParsedUrl {
+  owner: string;
+  repo: string;
+  branch: string;
+  basePath: string;
+  source: 'github' | 'clawhub';
+}
+
+/** Parse GitHub or ClawHub URL into components */
+function parseSkillUrl(input: string): ParsedUrl | null {
+  try {
+    const urlStr = input.startsWith('http') ? input : `https://${input}`;
+    const u = new URL(urlStr);
+    const isGitHub = u.hostname.includes('github.com');
+    const isClawHub = u.hostname.includes('clawhub.ai');
+    if (!isGitHub && !isClawHub) return null;
+
+    const parts = u.pathname.replace(/^\//, '').replace(/\/$/, '').split('/');
+    if (parts.length < 2) return null;
+
+    const owner = parts[0] ?? '';
+    const repo = (parts[1] ?? '').replace(/\.git$/, '');
+    if (!owner || !repo) return null;
+    let branch = 'main';
+    let basePath = '';
+
+    if (parts.length > 3 && (parts[2] === 'tree' || parts[2] === 'blob')) {
+      branch = parts[3] ?? 'main';
+      basePath = parts.slice(4).join('/');
+    }
+
+    return { owner, repo, branch, basePath, source: (isGitHub ? 'github' : 'clawhub') as 'github' | 'clawhub' };
+  } catch {
+    return null;
+  }
+}
+
+/** Fetch a single file from GitHub raw content */
+async function fetchRawFile(
+  owner: string,
+  repo: string,
+  branch: string,
+  filePath: string
+): Promise<string | null> {
+  const url = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${filePath}`;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+    if (!res.ok) return null;
+    return await res.text();
+  } catch {
+    return null;
+  }
+}
+
+/** Fetch SKILL.md content from GitHub/ClawHub, trying multiple candidate paths */
+async function fetchSkillContent(
+  parsed: ParsedUrl
+): Promise<{ content: string; source: string } | null> {
+  const { owner, repo, branch, basePath, source } = parsed;
+
+  // ClawHub repos are mirrored on GitHub — fetch from raw.githubusercontent.com
+  const candidates = basePath
+    ? [`${basePath}/SKILL.md`, `${basePath}/skill.md`, 'SKILL.md', 'skill.md']
+    : ['SKILL.md', 'skill.md', 'src/SKILL.md'];
+
+  for (const candidate of candidates) {
+    const content = await fetchRawFile(owner, repo, branch, candidate);
+    if (content) return { content, source: `${source}:${owner}/${repo}/${candidate}` };
+  }
+
+  // Fallback: README.md
+  const readme = await fetchRawFile(owner, repo, branch, 'README.md');
+  if (readme) return { content: readme, source: `${source}:${owner}/${repo}/README.md` };
+
+  return null;
+}
+
+/** Write fetched content to a temp directory for auditSkill() */
+function writeToTempDir(content: string, skillName: string): string {
+  const dir = path.join(tmpdir(), `pga-audit-${Date.now()}-${skillName.replace(/[^a-z0-9-]/gi, '_')}`);
+  mkdirSync(dir, { recursive: true });
+  // Prepend frontmatter with skill name if content lacks YAML frontmatter
+  const hasFrontmatter = content.trimStart().startsWith('---');
+  const finalContent = hasFrontmatter
+    ? content
+    : `---\nname: "${skillName}"\n---\n\n${content}`;
+  writeFileSync(path.join(dir, 'SKILL.md'), finalContent, 'utf-8');
+  return dir;
+}
+
+// ---------------------------------------------------------------------------
+// Hash utility
+// ---------------------------------------------------------------------------
 
 /**
  * Compute a content hash of a skill's SKILL.md using scan-core's canonical hash.
@@ -30,10 +139,13 @@ export function auditCommand(): Command {
 
   cmd
     .command('skill')
-    .description('Audit a SKILL.md directory for security issues / 審計 SKILL.md 目錄的安全問題')
+    .description(
+      'Audit a skill for security issues (local path, GitHub URL, or ClawHub URL)\n' +
+        '審計技能安全問題（本地路徑、GitHub URL 或 ClawHub URL）'
+    )
     .argument(
-      '<path>',
-      'Path to skill directory containing SKILL.md / 包含 SKILL.md 的技能目錄路徑'
+      '<path-or-url>',
+      'Local path, GitHub URL (github.com/owner/repo), or ClawHub URL (clawhub.ai/owner/repo)'
     )
     .option('--json', 'Output as JSON / 以 JSON 格式輸出', false)
     .option('--verbose', 'Verbose output / 詳細輸出', false)
@@ -55,12 +167,59 @@ export function auditCommand(): Command {
           setLogLevel('silent');
         }
 
-        const resolvedPath = path.resolve(skillPath);
+        // ── Detect URL vs local path ──
+        let resolvedPath: string;
+        let tempDir: string | null = null;
+        let remoteSource: string | null = null;
 
-        if (!options.json) {
-          banner('Panguard Skill Auditor');
-          console.log(c.dim(`  Scanning: ${resolvedPath}`));
-          console.log();
+        if (isUrl(skillPath)) {
+          const parsed = parseSkillUrl(skillPath);
+          if (!parsed) {
+            if (options.json) {
+              console.log(JSON.stringify({ error: 'Unsupported URL format. Use GitHub or ClawHub URLs.' }));
+            } else {
+              console.error(c.red('  Unsupported URL format. Supported:'));
+              console.error(c.dim('    https://github.com/owner/repo'));
+              console.error(c.dim('    https://clawhub.ai/owner/repo'));
+            }
+            process.exitCode = 1;
+            return;
+          }
+
+          if (!options.json) {
+            banner('Panguard Skill Auditor');
+            console.log(c.dim(`  Fetching: ${parsed.source}:${parsed.owner}/${parsed.repo}...`));
+          }
+
+          const fetched = await fetchSkillContent(parsed);
+          if (!fetched) {
+            if (options.json) {
+              console.log(JSON.stringify({ error: `Could not find SKILL.md in ${parsed.owner}/${parsed.repo}. Is the repo public?` }));
+            } else {
+              console.error(c.red(`  Could not find SKILL.md in ${parsed.owner}/${parsed.repo}.`));
+              console.error(c.dim('  Make sure the repository is public and contains SKILL.md.'));
+            }
+            process.exitCode = 1;
+            return;
+          }
+
+          const skillName = `${parsed.owner}/${parsed.repo}`;
+          tempDir = writeToTempDir(fetched.content, skillName);
+          resolvedPath = tempDir;
+          remoteSource = fetched.source;
+
+          if (!options.json) {
+            console.log(c.dim(`  Source: ${remoteSource}`));
+            console.log();
+          }
+        } else {
+          resolvedPath = path.resolve(skillPath);
+
+          if (!options.json) {
+            banner('Panguard Skill Auditor');
+            console.log(c.dim(`  Scanning: ${resolvedPath}`));
+            console.log();
+          }
         }
 
         const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
@@ -88,8 +247,9 @@ export function auditCommand(): Command {
 
             // Tier 1: Check blacklist before running full audit
             const skillHash = computeSkillHash(resolvedPath);
-            const skillName =
-              path.basename(resolvedPath) === 'SKILL.md'
+            const skillName = remoteSource
+              ? remoteSource.replace(/^(github|clawhub):/, '').replace(/\/(SKILL|skill|README)\.md$/, '')
+              : path.basename(resolvedPath) === 'SKILL.md'
                 ? path.basename(path.dirname(resolvedPath))
                 : path.basename(resolvedPath);
             try {
@@ -154,7 +314,10 @@ export function auditCommand(): Command {
         }
 
         if (options.json) {
-          console.log(JSON.stringify(report, null, 2));
+          const jsonReport = remoteSource
+            ? { ...report, remoteSource, url: skillPath }
+            : report;
+          console.log(JSON.stringify(jsonReport, null, 2));
         } else {
           // Pretty output
           const levelColors: Record<string, (s: string) => string> = {
@@ -390,8 +553,34 @@ response:
               highlySuspicious: report.riskLevel === 'HIGH' ? 1 : 0,
               cleanCount: report.riskLevel === 'LOW' || report.riskScore === 0 ? 1 : 0,
             });
+
+            // Also report usage event for counter dashboard
+            void fetch(`${options.tcEndpoint}/api/usage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                event_type: 'cli_scan',
+                source: 'cli-user',
+                metadata: {
+                  skill: report.manifest?.name ?? path.basename(resolvedPath),
+                  risk: report.riskLevel,
+                  score: report.riskScore,
+                  remote: !!remoteSource,
+                },
+              }),
+              signal: AbortSignal.timeout(3000),
+            }).catch(() => {});
           } catch {
             // Best effort
+          }
+        }
+
+        // Clean up temp directory if we fetched from URL
+        if (tempDir) {
+          try {
+            rmSync(tempDir, { recursive: true, force: true });
+          } catch {
+            // Best-effort cleanup
           }
         }
 
