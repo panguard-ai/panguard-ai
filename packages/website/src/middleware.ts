@@ -21,7 +21,7 @@ function buildCspHeader(nonce: string): string {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "font-src 'self' data:",
-    "connect-src 'self' https://api.panguard.ai https://docs.panguard.ai https://tc.panguard.ai https://*.vercel-insights.com https://*.vercel-analytics.com https://plausible.io",
+    "connect-src 'self' https://api.panguard.ai https://docs.panguard.ai https://tc.panguard.ai https://api.npmjs.org https://*.vercel-insights.com https://*.vercel-analytics.com https://plausible.io",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
