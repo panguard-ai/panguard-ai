@@ -464,6 +464,24 @@ export async function POST(request: Request) {
     atrPatternsMatched: result.atrPatternsMatched,
   };
 
+  // Debug: log context signals to help diagnose production scoring issues
+  const debugSignals = result.contextSignals
+    ? {
+        multiplier: result.contextSignals.multiplier,
+        signals: result.contextSignals.signals.map((s) => ({
+          id: s.id,
+          type: s.type,
+          weight: s.weight,
+        })),
+        isReadme,
+        contentLength: skill.content.length,
+        sourceType: isReadme ? 'documentation' : 'skill',
+      }
+    : null;
+  if (debugSignals) {
+    console.log('[scan-debug]', JSON.stringify(debugSignals));
+  }
+
   const scannedAt = new Date().toISOString();
   scanCache.set(cHash, { report, scannedAt });
 
@@ -514,6 +532,8 @@ export async function POST(request: Request) {
       contentHash: cHash,
       source: `${owner}/${repo}/${skill.source}`,
       scannedAt,
+      // Temporary debug: remove after fixing context signals issue
+      _debug: debugSignals,
     },
   });
 }
