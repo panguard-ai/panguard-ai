@@ -13,8 +13,6 @@
     { "path": "../panguard-chat" },
     { "path": "../panguard-trap" },
 
-    { "path": "../panguard-auth" },
-    { "path": "../panguard-manager" },
     { "path": "../../security-hardening" },
     { "path": "../panguard-skill-auditor" },
     { "path": "../panguard-mcp" }

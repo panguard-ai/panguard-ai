@@ -134,17 +134,15 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
   let smartRouter: SmartRouter | null = null;
   let knowledgeDistiller: KnowledgeDistiller | null = null;
   if (analyzeLLM) {
-    const tierToQuota: Record<string, QuotaTier> = {
+    const tierToQuota: Record<string, string> = {
       free: 'free',
       pro: 'pro',
       enterprise: 'business',
     };
-    const quotaTier = tierToQuota[license.tier] ?? 'free';
-    const hasBYOK = !!config.ai?.byokApiKey;
+    const quotaTier = (tierToQuota[license.tier] ?? 'free') as unknown as QuotaTier;
 
     smartRouter = new SmartRouter({
       tier: quotaTier,
-      quotaOverride: hasBYOK ? { isBYOK: true } : undefined,
     });
 
     knowledgeDistiller = new KnowledgeDistiller({
