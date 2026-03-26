@@ -25,7 +25,7 @@ const howToJsonLd = {
     {
       '@type': 'HowToStep',
       name: 'Install Panguard CLI',
-      text: 'Run the install script: curl -fsSL https://get.panguard.ai | sh',
+      text: 'Run the install script: curl -fsSL https://get.panguard.ai | bash',
       url: 'https://panguard.ai/docs/getting-started',
     },
     {
