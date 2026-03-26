@@ -60,7 +60,18 @@ export function calculateRiskScore(
   const adjustedScore = Math.round(rawScore * contextMultiplier);
   const score = Math.min(100, adjustedScore);
 
-  const hasCritical = [...deduped.values()].some((f) => f.severity === 'critical');
+  const allFindings = [...deduped.values()];
+  const hasCritical = allFindings.some((f) => f.severity === 'critical');
+
+  // Distinguish "real" critical findings from "hidden in markup" ones.
+  // Markup-only criticals are likely formatting artifacts (SVG, code blocks, HTML examples).
+  // Only non-markup criticals should be able to push risk level to CRITICAL.
+  const hasRealCritical = allFindings.some(
+    (f) => f.severity === 'critical' && !f.title.includes('(hidden in markup)')
+  );
+  const hasRealHigh = allFindings.some(
+    (f) => f.severity === 'high' && !f.title.includes('(hidden in markup)')
+  );
 
   // Critical-override behavior depends on context:
   // - Normal context (multiplier >= 0.6): critical finding forces at least HIGH
@@ -68,10 +79,23 @@ export function calculateRiskScore(
   const weakenedCriticalOverride = contextMultiplier < 0.6;
 
   let level: RiskLevel;
-  if (score >= 70 || (hasCritical && !weakenedCriticalOverride && score >= 25)) level = 'CRITICAL';
-  else if (score >= 40 || (hasCritical && !weakenedCriticalOverride)) level = 'HIGH';
-  else if (score >= 15 || (hasCritical && weakenedCriticalOverride)) level = 'MEDIUM';
-  else level = 'LOW';
+  if (
+    (score >= 70 && hasRealCritical) ||
+    (hasRealCritical && !weakenedCriticalOverride && score >= 25) ||
+    score >= 90
+  ) {
+    level = 'CRITICAL';
+  } else if (
+    score >= 40 ||
+    (hasCritical && !weakenedCriticalOverride) ||
+    (hasRealHigh && score >= 25)
+  ) {
+    level = 'HIGH';
+  } else if (score >= 15 || (hasCritical && weakenedCriticalOverride)) {
+    level = 'MEDIUM';
+  } else {
+    level = 'LOW';
+  }
 
   return { score, level };
 }
