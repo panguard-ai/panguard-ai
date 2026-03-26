@@ -6,48 +6,30 @@ import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
 import { Link } from '@/navigation';
 import { ArrowRight } from 'lucide-react';
-import {
-  AnalyticsIcon,
-  ShieldIcon,
-  GlobalIcon,
-  DeployIcon,
-  TerminalIcon,
-  TeamIcon,
-  EnterpriseIcon,
-} from '@/components/ui/BrandIcons';
+import { ShieldIcon, ScanIcon, GlobalIcon } from '@/components/ui/BrandIcons';
+import { STATS } from '@/lib/stats';
 
-/* ─── Icon Mapping ─── */
-const frameworkIcons = [ShieldIcon, AnalyticsIcon, GlobalIcon];
-const taiwanIcons = [GlobalIcon, EnterpriseIcon, TerminalIcon, TeamIcon];
+/* ─── OWASP Agentic Top 10 Data (from ATR OWASP-MAPPING.md) ─── */
+const owaspCategories = [
+  { id: 'ASI01', rules: 13, strength: 'STRONG' },
+  { id: 'ASI02', rules: 11, strength: 'STRONG' },
+  { id: 'ASI03', rules: 9, strength: 'STRONG' },
+  { id: 'ASI04', rules: 8, strength: 'STRONG' },
+  { id: 'ASI05', rules: 8, strength: 'STRONG' },
+  { id: 'ASI06', rules: 8, strength: 'STRONG' },
+  { id: 'ASI07', rules: 5, strength: 'MODERATE' },
+  { id: 'ASI08', rules: 4, strength: 'MODERATE' },
+  { id: 'ASI09', rules: 5, strength: 'MODERATE' },
+  { id: 'ASI10', rules: 7, strength: 'MODERATE' },
+] as const;
 
-/* ─── Report Types ─── */
-const reportTypes = [
-  { name: 'ISO 27001 Gap Analysis', controls: 30, status: 'Ready' },
-  { name: 'SOC 2 Type II Evidence', controls: 10, status: 'Ready' },
-  { name: 'Taiwan Cyber Security Act', controls: 10, status: 'Ready' },
-  { name: 'Executive Security Summary', controls: null, status: 'Ready' },
-  { name: 'Incident Response Report', controls: null, status: 'Ready' },
-  { name: 'Bilingual Report (EN/zh-TW)', controls: null, status: 'Ready' },
-];
-
-/* ─── Cost Comparison ─── */
-const costRows = [
-  { label: 'SOC 2 Preparation', consultant: '$30,000 - $60,000', panguard: 'Included' },
-  { label: 'ISO 27001 Gap Analysis', consultant: '$15,000 - $40,000', panguard: 'Included' },
-  { labelKey: 'tcsaRow' as const },
-  { label: 'Time to Report', consultant: '2 - 4 months', panguard: 'Instant' },
-  { labelKey: 'freshnessRow' as const },
-  { label: 'Evidence Gathering', consultant: 'Manual', panguard: 'Automatic' },
-];
+const TOTAL_MAPPINGS = 77;
 
 /* ═══════════════════════════════════════════════════════════════════
-   Compliance Content
+   Compliance Content — OWASP Agentic Top 10 Coverage
    ═══════════════════════════════════════════════════════════════════ */
 export default function ComplianceContent() {
   const t = useTranslations('compliance');
-
-  const frameworkKeys = ['iso27001', 'soc2', 'tcsa'] as const;
-  const taiwanKeys = ['item1', 'item2', 'item3', 'item4'] as const;
 
   return (
     <>
@@ -69,189 +51,188 @@ export default function ComplianceContent() {
             </p>
           </FadeInUp>
           <FadeInUp delay={0.2}>
-            <div className="flex flex-wrap justify-center gap-3 mt-8">
-              <Link
-                href="https://docs.panguard.ai/quickstart"
-                className="bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
-              >
-                {t('hero.cta1')}
-              </Link>
-              <Link
-                href="/demo"
-                className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
-              >
-                {t('hero.cta2')}
-              </Link>
+            <div className="flex flex-wrap justify-center gap-4 mt-8">
+              <div className="inline-flex items-center gap-2 bg-brand-sage/10 border border-brand-sage/20 rounded-full px-6 py-2.5">
+                <ShieldIcon size={18} className="text-brand-sage" />
+                <span className="text-sm font-bold text-brand-sage">10 / 10</span>
+                <span className="text-sm text-text-secondary">{t('hero.badge')}</span>
+              </div>
+              <div className="inline-flex items-center gap-2 bg-surface-2 border border-border rounded-full px-6 py-2.5">
+                <span className="text-sm font-bold text-text-primary">{STATS.atrRules}</span>
+                <span className="text-sm text-text-secondary">{t('hero.rulesBadge')}</span>
+              </div>
             </div>
           </FadeInUp>
         </div>
       </section>
 
-      {/* -- Problem -- */}
+      {/* -- What is OWASP Agentic Top 10 -- */}
       <SectionWrapper>
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
             <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
-              {t('problem.overline')}
+              {t('what.overline')}
             </p>
             <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
-              {t('problem.title')}
+              {t('what.title')}
             </h2>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="text-text-secondary mt-5 leading-relaxed">{t('problem.desc')}</p>
-            <p className="text-text-secondary mt-4 leading-relaxed">{t('problem.desc2')}</p>
+            <p className="text-text-secondary mt-5 leading-relaxed">{t('what.desc')}</p>
+            <p className="text-text-secondary mt-4 leading-relaxed">{t('what.desc2')}</p>
           </FadeInUp>
         </div>
       </SectionWrapper>
 
-      {/* -- Framework Detail Cards -- */}
+      {/* -- 10/10 Coverage Grid -- */}
       <SectionWrapper dark>
         <SectionTitle
-          overline={t('frameworks.overline')}
-          title={t('frameworks.title')}
-          subtitle={t('frameworks.subtitle')}
+          overline={t('coverage.overline')}
+          title={t('coverage.title')}
+          subtitle={t('coverage.subtitle')}
         />
-        <div className="grid md:grid-cols-3 gap-6 mt-14">
-          {frameworkKeys.map((key, i) => {
-            const Icon = frameworkIcons[i];
-            return (
-              <FadeInUp key={key} delay={i * 0.08}>
-                <div className="bg-surface-2 rounded-xl border border-border p-6 h-full flex flex-col">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-brand-sage/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-brand-sage" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-text-primary">
-                        {t(`frameworks.${key}.name`)}
-                      </p>
-                      <p className="text-[11px] text-text-muted">
-                        {t(`frameworks.${key}.fullName`)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 mb-5 py-3 border-y border-border">
-                    <div className="text-center flex-1">
-                      <p className="text-2xl font-extrabold text-brand-sage">
-                        {t(`frameworks.${key}.coverage`)}
-                      </p>
-                      <p className="text-[10px] text-text-muted uppercase tracking-wider">
-                        {t('frameworks.coverageLabel')}
-                      </p>
-                    </div>
-                    <div className="text-center flex-1">
-                      <p className="text-2xl font-extrabold text-text-primary">
-                        {t(`frameworks.${key}.controls`)}
-                      </p>
-                      <p className="text-[10px] text-text-muted uppercase tracking-wider">
-                        {t('frameworks.controlsLabel')}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 flex-1">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-wider text-brand-sage font-semibold mb-1">
-                        {t('frameworks.whoNeedsLabel')}
-                      </p>
-                      <p className="text-xs text-text-secondary leading-relaxed">
-                        {t(`frameworks.${key}.whoNeeds`)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-wider text-brand-sage font-semibold mb-1">
-                        {t('frameworks.whatItCoversLabel')}
-                      </p>
-                      <p className="text-xs text-text-secondary leading-relaxed">
-                        {t(`frameworks.${key}.whatItCovers`)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-wider text-brand-sage font-semibold mb-1">
-                        {t('frameworks.panguardDoesLabel')}
-                      </p>
-                      <p className="text-xs text-text-secondary leading-relaxed">
-                        {t(`frameworks.${key}.panguardDoes`)}
-                      </p>
-                    </div>
-                  </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-14">
+          {owaspCategories.map((cat, i) => (
+            <FadeInUp key={cat.id} delay={i * 0.04}>
+              <div className="bg-surface-2 rounded-xl border border-border p-5 h-full flex flex-col">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[11px] font-mono font-bold text-brand-sage">
+                    {cat.id}
+                  </span>
+                  <span
+                    className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                      cat.strength === 'STRONG'
+                        ? 'bg-brand-sage/10 text-brand-sage'
+                        : 'bg-amber-500/10 text-amber-500'
+                    }`}
+                  >
+                    {cat.strength}
+                  </span>
                 </div>
-              </FadeInUp>
-            );
-          })}
+                <p className="text-sm font-medium text-text-primary leading-snug flex-1">
+                  {t(`coverage.${cat.id}.name`)}
+                </p>
+                <div className="mt-3 pt-3 border-t border-border">
+                  <p className="text-2xl font-extrabold text-text-primary">
+                    {cat.rules}
+                  </p>
+                  <p className="text-[10px] text-text-muted uppercase tracking-wider">
+                    {t('coverage.rulesLabel')}
+                  </p>
+                </div>
+              </div>
+            </FadeInUp>
+          ))}
         </div>
+        <FadeInUp delay={0.5}>
+          <p className="text-center text-sm text-text-muted mt-8">
+            {t('coverage.note', { total: TOTAL_MAPPINGS })}
+          </p>
+        </FadeInUp>
       </SectionWrapper>
 
-      {/* -- Taiwan Focus -- */}
+      {/* -- Ecosystem Evidence -- */}
       <SectionWrapper>
         <SectionTitle
-          overline={t('taiwanMarket.overline')}
-          title={t('taiwanMarket.title')}
-          subtitle={t('taiwanMarket.subtitle')}
+          overline={t('evidence.overline')}
+          title={t('evidence.title')}
+          subtitle={t('evidence.subtitle')}
         />
-        <div className="grid sm:grid-cols-2 gap-6 mt-14">
-          {taiwanKeys.map((key, i) => {
-            const Icon = taiwanIcons[i];
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14">
+          {(['scanned', 'findings', 'critical', 'tripleThreat'] as const).map((key, i) => {
+            const values: Record<string, number> = {
+              scanned: STATS.ecosystem.skillsScanned,
+              findings: STATS.ecosystem.packagesWithFindings,
+              critical: STATS.ecosystem.findingsCritical,
+              tripleThreat: STATS.ecosystem.tripleThreat,
+            };
             return (
               <FadeInUp key={key} delay={i * 0.08}>
-                <div className="bg-surface-1 rounded-xl border border-border p-6 h-full">
-                  <Icon className="w-5 h-5 text-brand-sage mb-4" />
-                  <p className="text-sm font-bold text-text-primary mb-2">
-                    {t(`taiwanMarket.${key}.title`)}
+                <div className="bg-surface-1 rounded-xl border border-border p-6 text-center">
+                  <p className="text-3xl font-extrabold text-text-primary">
+                    {values[key]?.toLocaleString()}
                   </p>
-                  <p className="text-xs text-text-secondary leading-relaxed">
-                    {t(`taiwanMarket.${key}.desc`)}
+                  <p className="text-sm text-text-secondary mt-2">
+                    {t(`evidence.${key}`)}
                   </p>
                 </div>
               </FadeInUp>
             );
           })}
         </div>
+        <FadeInUp delay={0.4}>
+          <div className="mt-10 bg-surface-2 rounded-xl border border-border p-6 max-w-2xl mx-auto">
+            <div className="flex items-start gap-4">
+              <ScanIcon size={20} className="text-brand-sage shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-text-primary">{t('evidence.breakdownTitle')}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3">
+                  {([
+                    ['critical', STATS.ecosystem.findingsCritical],
+                    ['high', STATS.ecosystem.findingsHigh],
+                    ['medium', STATS.ecosystem.findingsMedium],
+                    ['low', STATS.ecosystem.findingsLow],
+                  ] as const).map(([severity, count]) => (
+                    <div key={severity}>
+                      <p className="text-lg font-bold text-text-primary">{count}</p>
+                      <p className="text-[11px] text-text-muted uppercase tracking-wider">
+                        {t(`evidence.severity.${severity}`)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </FadeInUp>
       </SectionWrapper>
 
-      {/* -- Report Preview -- */}
+      {/* -- Why OWASP Agentic, not traditional -- */}
       <SectionWrapper dark>
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <FadeInUp>
               <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
-                {t('reports.overline')}
+                {t('why.overline')}
               </p>
               <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
-                {t('reports.title')}
+                {t('why.title')}
               </h2>
             </FadeInUp>
             <FadeInUp delay={0.1}>
-              <p className="text-text-secondary mt-5 leading-relaxed">{t('reports.desc')}</p>
+              <p className="text-text-secondary mt-5 leading-relaxed">{t('why.desc')}</p>
             </FadeInUp>
           </div>
           <FadeInUp delay={0.15}>
             <div className="bg-surface-2 rounded-xl border border-border overflow-hidden">
               <div className="bg-surface-3 px-4 py-3 border-b border-border">
                 <span className="text-sm font-semibold text-text-primary">
-                  {t('reports.availableReports')}
+                  {t('why.comparisonTitle')}
                 </span>
               </div>
               <div className="divide-y divide-border">
-                {reportTypes.map((report) => (
+                {(['sigmaYara', 'owaspLlm', 'owaspAgentic'] as const).map((key) => (
                   <div
-                    key={report.name}
+                    key={key}
                     className="px-4 py-3 flex items-center justify-between gap-4 hover:bg-surface-3/50 transition-colors"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <AnalyticsIcon className="w-4 h-4 text-brand-sage shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-text-primary truncate">
-                          {report.name}
-                        </p>
-                        {report.controls && (
-                          <p className="text-[11px] text-text-muted">{report.controls} controls</p>
-                        )}
-                      </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-text-primary">
+                        {t(`why.${key}.name`)}
+                      </p>
+                      <p className="text-[11px] text-text-muted">
+                        {t(`why.${key}.focus`)}
+                      </p>
                     </div>
-                    <DeployIcon className="w-4 h-4 text-text-muted shrink-0" />
+                    <span
+                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+                        key === 'owaspAgentic'
+                          ? 'bg-brand-sage/10 text-brand-sage'
+                          : 'bg-surface-3 text-text-muted'
+                      }`}
+                    >
+                      {t(`why.${key}.atrCoverage`)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -260,63 +241,8 @@ export default function ComplianceContent() {
         </div>
       </SectionWrapper>
 
-      {/* -- Cost Comparison -- */}
-      <SectionWrapper>
-        <div className="max-w-2xl mx-auto">
-          <FadeInUp>
-            <div className="text-center mb-10">
-              <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-4">
-                {t('costComparison.overline')}
-              </p>
-              <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
-                {t('costComparison.title')}
-              </h2>
-            </div>
-          </FadeInUp>
-          <FadeInUp delay={0.1}>
-            <div className="overflow-x-auto">
-              <div className="bg-surface-1 rounded-xl border border-border overflow-hidden min-w-[480px]">
-                <div className="grid grid-cols-3 text-center text-xs font-semibold text-text-muted uppercase tracking-wider border-b border-border">
-                  <div className="p-3"></div>
-                  <div className="p-3 border-l border-border">{t('costComparison.consultant')}</div>
-                  <div className="p-3 border-l border-border text-brand-sage">
-                    {t('costComparison.panguard')}
-                  </div>
-                </div>
-                {costRows.map((row, i) => {
-                  const label =
-                    'labelKey' in row ? t(`costComparison.${row.labelKey}.label`) : row.label;
-                  const consultant =
-                    'labelKey' in row
-                      ? t(`costComparison.${row.labelKey}.consultant`)
-                      : row.consultant;
-                  const panguard =
-                    'labelKey' in row ? t(`costComparison.${row.labelKey}.panguard`) : row.panguard;
-                  return (
-                    <div
-                      key={label}
-                      className={`grid grid-cols-3 text-sm ${
-                        i < costRows.length - 1 ? 'border-b border-border' : ''
-                      }`}
-                    >
-                      <div className="p-3 text-text-primary font-medium">{label}</div>
-                      <div className="p-3 text-text-tertiary border-l border-border">
-                        {consultant}
-                      </div>
-                      <div className="p-3 text-brand-sage font-semibold border-l border-border">
-                        {panguard}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </FadeInUp>
-        </div>
-      </SectionWrapper>
-
       {/* -- CTA -- */}
-      <SectionWrapper dark>
+      <SectionWrapper>
         <div className="text-center">
           <FadeInUp>
             <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary">
@@ -325,31 +251,27 @@ export default function ComplianceContent() {
             <p className="text-text-secondary mt-3 max-w-lg mx-auto">{t('cta.desc')}</p>
           </FadeInUp>
           <FadeInUp delay={0.1}>
+            <div className="mt-8 bg-surface-2 rounded-xl border border-border p-4 max-w-md mx-auto">
+              <code className="text-sm text-brand-sage font-mono">
+                npm install -g @panguard-ai/panguard
+              </code>
+            </div>
+          </FadeInUp>
+          <FadeInUp delay={0.2}>
             <div className="flex flex-wrap justify-center gap-3 mt-8">
               <Link
-                href="https://docs.panguard.ai/quickstart"
+                href="/atr"
                 className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
               >
                 {t('cta.cta1')} <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/docs/scan"
+                href="https://panguard.ai"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('cta.cta2')}
               </Link>
             </div>
-          </FadeInUp>
-          <FadeInUp delay={0.2}>
-            <p className="text-xs text-text-muted mt-6">
-              {t('cta.trustNote')}{' '}
-              <Link
-                href="/trust"
-                className="text-brand-sage hover:text-brand-sage-light underline underline-offset-2"
-              >
-                {t('cta.trustLink')}
-              </Link>
-            </p>
           </FadeInUp>
         </div>
       </SectionWrapper>
