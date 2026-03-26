@@ -2,8 +2,9 @@
  * Platform Detector - Detect installed AI agent runtimes
  * 平台偵測器 - 偵測已安裝的 AI Agent 執行環境
  *
- * Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, and ArkClaw.
- * 偵測 Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw 和 ArkClaw。
+ * Detects 14 platforms: Claude Code, Claude Desktop, Cursor, OpenClaw, Codex,
+ * WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot,
+ * Zed, Gemini CLI, Continue, Roo Code.
  *
  * @module @panguard-ai/panguard-mcp/config/platform-detector
  */
@@ -24,7 +25,15 @@ export type PlatformId =
   | 'codex'
   | 'workbuddy'
   | 'nemoclaw'
-  | 'arkclaw';
+  | 'arkclaw'
+  | 'windsurf'
+  | 'qclaw'
+  | 'cline'
+  | 'vscode-copilot'
+  | 'zed'
+  | 'gemini-cli'
+  | 'continue'
+  | 'roo-code';
 
 export interface DetectedPlatform {
   id: PlatformId;
@@ -134,6 +143,76 @@ function getNemoClawConfigPath(): string {
 /** Get the MCP config path for ArkClaw (ByteDance). */
 function getArkClawConfigPath(): string {
   return join(homedir(), '.arkclaw', 'mcp.json');
+}
+
+/** Get the MCP config path for Windsurf (Codeium). */
+function getWindsurfConfigPath(): string {
+  return join(homedir(), '.codeium', 'windsurf', 'mcp_config.json');
+}
+
+/** Get the MCP config path for QClaw (Tencent). */
+function getQClawConfigPath(): string {
+  return join(homedir(), '.qclaw', 'mcp.json');
+}
+
+/** Get the MCP settings path for Cline (VS Code extension). */
+function getClineConfigPath(): string {
+  const home = homedir();
+  switch (platform()) {
+    case 'darwin':
+      return join(home, 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json');
+    case 'win32':
+      return join(process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'), 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json');
+    default:
+      return join(home, '.config', 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json');
+  }
+}
+
+/** Get the MCP config path for VS Code Copilot. */
+function getVSCodeCopilotConfigPath(): string {
+  const home = homedir();
+  switch (platform()) {
+    case 'darwin':
+      return join(home, 'Library', 'Application Support', 'Code', 'User', 'settings.json');
+    case 'win32':
+      return join(process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'), 'Code', 'User', 'settings.json');
+    default:
+      return join(home, '.config', 'Code', 'User', 'settings.json');
+  }
+}
+
+/** Get the MCP config path for Zed editor. */
+function getZedConfigPath(): string {
+  const home = homedir();
+  switch (platform()) {
+    case 'win32':
+      return join(process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'), 'Zed', 'settings.json');
+    default:
+      return join(home, '.config', 'zed', 'settings.json');
+  }
+}
+
+/** Get the MCP config path for Gemini CLI. */
+function getGeminiCliConfigPath(): string {
+  return join(homedir(), '.gemini', 'settings.json');
+}
+
+/** Get the MCP config path for Continue.dev. */
+function getContinueConfigPath(): string {
+  return join(homedir(), '.continue', 'mcp.json');
+}
+
+/** Get the MCP settings path for Roo Code (VS Code extension). */
+function getRooCodeConfigPath(): string {
+  const home = homedir();
+  switch (platform()) {
+    case 'darwin':
+      return join(home, 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'cline_mcp_settings.json');
+    case 'win32':
+      return join(process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'), 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'cline_mcp_settings.json');
+    default:
+      return join(home, '.config', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'cline_mcp_settings.json');
+  }
 }
 
 /**
@@ -248,6 +327,105 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
     /* not installed */
   }
 
+  // Windsurf (Codeium)
+  const wsPath = getWindsurfConfigPath();
+  const wsDetected =
+    (await commandExists('windsurf')) ||
+    existsSync(join(homedir(), '.codeium', 'windsurf'));
+  platforms.push({
+    id: 'windsurf',
+    name: 'Windsurf',
+    configPath: wsPath,
+    detected: wsDetected,
+    alreadyConfigured: hasPanguardMCPEntry(wsPath),
+  });
+
+  // QClaw (Tencent)
+  const qcPath = getQClawConfigPath();
+  const qcDetected =
+    (await commandExists('qclaw')) || existsSync(join(homedir(), '.qclaw'));
+  platforms.push({
+    id: 'qclaw',
+    name: 'QClaw',
+    configPath: qcPath,
+    detected: qcDetected,
+    alreadyConfigured: hasPanguardMCPEntry(qcPath),
+  });
+
+  // Cline (VS Code extension)
+  const clinePath = getClineConfigPath();
+  const clineDetected = existsSync(clinePath) ||
+    existsSync(join(homedir(), 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev'));
+  platforms.push({
+    id: 'cline',
+    name: 'Cline',
+    configPath: clinePath,
+    detected: clineDetected,
+    alreadyConfigured: hasPanguardMCPEntry(clinePath),
+  });
+
+  // VS Code Copilot (via .vscode/mcp.json or user settings)
+  const vscodePath = getVSCodeCopilotConfigPath();
+  const vscodeDetected =
+    (await commandExists('code')) ||
+    (platform() === 'darwin' && existsSync('/Applications/Visual Studio Code.app'));
+  platforms.push({
+    id: 'vscode-copilot',
+    name: 'VS Code Copilot',
+    configPath: vscodePath,
+    detected: vscodeDetected,
+    alreadyConfigured: false, // VS Code uses different config structure
+  });
+
+  // Zed
+  const zedPath = getZedConfigPath();
+  const zedDetected =
+    (await commandExists('zed')) ||
+    existsSync(join(homedir(), '.config', 'zed')) ||
+    (platform() === 'darwin' && existsSync('/Applications/Zed.app'));
+  platforms.push({
+    id: 'zed',
+    name: 'Zed',
+    configPath: zedPath,
+    detected: zedDetected,
+    alreadyConfigured: false, // Zed uses context_servers, not mcpServers
+  });
+
+  // Gemini CLI
+  const geminiPath = getGeminiCliConfigPath();
+  const geminiDetected =
+    (await commandExists('gemini')) || existsSync(join(homedir(), '.gemini'));
+  platforms.push({
+    id: 'gemini-cli',
+    name: 'Gemini CLI',
+    configPath: geminiPath,
+    detected: geminiDetected,
+    alreadyConfigured: hasPanguardMCPEntry(geminiPath),
+  });
+
+  // Continue.dev
+  const continuePath = getContinueConfigPath();
+  const continueDetected = existsSync(join(homedir(), '.continue'));
+  platforms.push({
+    id: 'continue',
+    name: 'Continue',
+    configPath: continuePath,
+    detected: continueDetected,
+    alreadyConfigured: hasPanguardMCPEntry(continuePath),
+  });
+
+  // Roo Code (VS Code extension)
+  const rooPath = getRooCodeConfigPath();
+  const rooDetected = existsSync(rooPath) ||
+    existsSync(join(homedir(), 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline'));
+  platforms.push({
+    id: 'roo-code',
+    name: 'Roo Code',
+    configPath: rooPath,
+    detected: rooDetected,
+    alreadyConfigured: hasPanguardMCPEntry(rooPath),
+  });
+
   const detected = platforms.filter((p) => p.detected);
   logger.info(
     `Detected ${detected.length} platform(s): ${detected.map((p) => p.name).join(', ') || 'none'}`
@@ -277,5 +455,21 @@ export function getConfigPath(platformId: PlatformId): string {
       return getNemoClawConfigPath();
     case 'arkclaw':
       return getArkClawConfigPath();
+    case 'windsurf':
+      return getWindsurfConfigPath();
+    case 'qclaw':
+      return getQClawConfigPath();
+    case 'cline':
+      return getClineConfigPath();
+    case 'vscode-copilot':
+      return getVSCodeCopilotConfigPath();
+    case 'zed':
+      return getZedConfigPath();
+    case 'gemini-cli':
+      return getGeminiCliConfigPath();
+    case 'continue':
+      return getContinueConfigPath();
+    case 'roo-code':
+      return getRooCodeConfigPath();
   }
 }
