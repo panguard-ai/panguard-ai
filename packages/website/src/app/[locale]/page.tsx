@@ -5,13 +5,10 @@ import ScannerHero from '@/components/home/ScannerHero';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
 // Below-the-fold sections loaded lazily
-const EcosystemEvidence = dynamic(() => import('@/components/home/EcosystemEvidence'));
-const WhyPanguard = dynamic(() => import('@/components/home/WhyPanguard'));
-const ATRStandard = dynamic(() => import('@/components/home/ATRStandard'));
-const ProductShowcase = dynamic(() => import('@/components/home/ProductShowcase'));
-const CommunityFlywheel = dynamic(() => import('@/components/home/CommunityFlywheel'));
-const GuardCTA = dynamic(() => import('@/components/home/GuardCTA'));
-const FinalCTANew = dynamic(() => import('@/components/home/FinalCTANew'));
+const LiveStatsBar = dynamic(() => import('@/components/home/LiveStatsBar'));
+const Evidence = dynamic(() => import('@/components/home/Evidence'));
+const HowItWorks = dynamic(() => import('@/components/home/HowItWorks'));
+const CTARoadmap = dynamic(() => import('@/components/home/CTARoadmap'));
 
 export default function Home() {
   return (
@@ -25,22 +22,16 @@ export default function Home() {
             threats with AI analysis, and shares new rules to protect everyone. MIT licensed. Open
             source.
           </p>
-          {/* 1. Problem + Scanner: AI agents have full access, zero security */}
+          {/* 1. Hero: Scanner + platform bar */}
           <ScannerHero />
-          {/* 2. Evidence: We scanned 1,295 skills — here's what we found */}
-          <EcosystemEvidence />
-          {/* 3. The Gap: why traditional security misses AI agent threats */}
-          <WhyPanguard />
-          {/* 4. Standard: ATR — the open audit standard for AI agents */}
-          <ATRStandard />
-          {/* 4. Products: Skill Auditor + Guard + Threat Cloud deep dive */}
-          <ProductShowcase />
-          {/* 5. Flywheel: Every scan makes the network safer */}
-          <CommunityFlywheel />
-          {/* 5. Guard: Done scanning? One command, 24/7 protection */}
-          <GuardCTA />
-          {/* 6. Final CTA + trust signals */}
-          <FinalCTANew />
+          {/* 2. Live Stats: skills scanned, critical found, ATR rules, threats crystallized */}
+          <LiveStatsBar />
+          {/* 3. Evidence: Real ClawHub scan cases */}
+          <Evidence />
+          {/* 4. How It Works: Threat Crystallization + competitive comparison */}
+          <HowItWorks />
+          {/* 5. CTA + Mission + Roadmap */}
+          <CTARoadmap />
         </main>
       </RuleStatsProvider>
       <Footer />

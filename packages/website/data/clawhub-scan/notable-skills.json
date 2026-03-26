@@ -1,0 +1,46 @@
+[
+  {
+    "name": "tesla-fleet-api",
+    "downloads": 2839,
+    "severity": "CRITICAL",
+    "summary": "Can override your agent's system prompt",
+    "detail": "Controls your Tesla fleet",
+    "findings": [
+      "Prompt injection via tool description override",
+      "Fleet management commands accessible without explicit user approval"
+    ]
+  },
+  {
+    "name": "walletconnect-agent",
+    "downloads": 2206,
+    "severity": "CRITICAL",
+    "summary": "Can override your agent's system prompt",
+    "detail": "Connects to your crypto wallet",
+    "findings": [
+      "Prompt injection via tool description override",
+      "Wallet signing operations without confirmation flow"
+    ]
+  },
+  {
+    "name": "clawsec",
+    "downloads": 9491,
+    "severity": "HIGH",
+    "summary": "A security tool with security holes",
+    "detail": "Ironically, this security-focused skill has exploitable patterns",
+    "findings": [
+      "Unvalidated external input passed to system commands",
+      "Excessive filesystem access beyond stated scope"
+    ]
+  },
+  {
+    "name": "safe-exec",
+    "downloads": 2142,
+    "severity": "HIGH",
+    "summary": "Named \"safe\" but isn't safe",
+    "detail": "Misleading name conceals risky execution patterns",
+    "findings": [
+      "Dynamic code execution via eval-like patterns",
+      "No sandboxing despite the name suggesting safety"
+    ]
+  }
+]

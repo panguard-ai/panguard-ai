@@ -1,6 +1,6 @@
 ---
 title: 'ATR (Agent Threat Rules)'
-description: 'Open standard for detecting threats to AI agents. Community-maintained rules for prompt injection, tool poisoning, and more.'
+description: 'Open standard for detecting threats to AI agents. 71 rules. OWASP Agentic Top 10: 10/10 covered. Community-maintained.'
 icon: 'shield-halved'
 ---
 
@@ -15,18 +15,66 @@ ATR rules detect threats that traditional security tools miss:
 - **Data exfiltration** through agent actions
 - **Privilege escalation** via skill manipulation
 - **Supply chain attacks** on skill registries
+- **Credential theft** via agent tool calls
+- **Inter-agent manipulation** in multi-agent systems
+
+## By the Numbers
+
+|                      |                                                        |
+| -------------------- | ------------------------------------------------------ |
+| **71** rules         | Covering 9 threat categories                           |
+| **OWASP 10/10**      | Full coverage of OWASP Agentic Top 10                  |
+| **62.7%** recall     | On PINT benchmark (99.7% precision)                    |
+| **520+** patterns    | Unique detection signatures                            |
+| **< 3ms** scan time  | Per skill (regex layer)                                |
+
+## OWASP Agentic Top 10 Coverage
+
+ATR provides executable detection rules for every OWASP category:
+
+| OWASP Category | ATR Rules | Coverage |
+| --- | --- | --- |
+| ASI01: Agent Goal Hijack | 13 | STRONG |
+| ASI02: Tool Misuse & Exploitation | 11 | STRONG |
+| ASI03: Identity & Privilege Abuse | 9 | STRONG |
+| ASI04: Agentic Supply Chain | 8 | STRONG |
+| ASI05: Unexpected Code Execution | 8 | STRONG |
+| ASI06: Memory & Context Poisoning | 8 | STRONG |
+| ASI07: Inter-Agent Communication | 5 | MODERATE |
+| ASI08: Cascading Failures | 4 | MODERATE |
+| ASI09: Human-Agent Trust | 5 | MODERATE |
+| ASI10: Rogue Agents | 7 | MODERATE |
+
+<Info>
+  OWASP provides a checklist. ATR provides the executable rules. Use ATR to turn OWASP compliance from a PDF exercise into automated detection.
+</Info>
 
 ## Three Detection Layers
 
 | Layer   | Method                 | Speed  | Coverage       |
 | ------- | ---------------------- | ------ | -------------- |
-| Layer 1 | Regex pattern matching | Fast   | Known patterns |
-| Layer 2 | Content fingerprinting | Medium | Variants       |
-| Layer 3 | LLM-as-judge           | Slow   | Novel threats  |
+| Layer 1 | Regex pattern matching | 3ms    | Known patterns |
+| Layer 2 | Content fingerprinting | ~200ms | Variants       |
+| Layer 3 | LLM-as-judge           | ~3s    | Novel threats  |
 
-## Rule Count
+## Threat Crystallization
 
-- **61 ATR rules** covering known AI agent threats and emerging attack patterns
+When the LLM layer (Layer 3) discovers a new attack pattern, ATR crystallizes it into a deterministic regex rule:
+
+1. LLM detects novel threat pattern
+2. RuleScaffolder generates a new regex rule
+3. Shadow mode validates against 1,000 samples (FP < 0.1%)
+4. Rule promoted and distributed via Threat Cloud (< 1 hour)
+5. Next occurrence caught by Layer 1 at 3ms -- no LLM needed
+
+Every LLM call trains the regex engine. LLM cost is one-time. Crystallized rules run forever at zero cost.
+
+## Research Paper
+
+> **Agent Threat Rules: A Community-Driven Detection Standard for AI Agent Security**
+> [Zenodo DOI: 10.5281/zenodo.19178002](https://doi.org/10.5281/zenodo.19178002)
+
+The paper documents: threat taxonomy, detection architecture, PINT benchmark evaluation, and 64 known evasion techniques (published transparently).
 
 ## Getting Started
 
@@ -49,7 +97,11 @@ panguard guard start
   >
     Browse rules, contribute, and star the project.
   </Card>
-  <Card title="Quick Start" icon="rocket" href="/quickstart">
-    Install Panguard and start using ATR rules.
+  <Card
+    title="OWASP Mapping"
+    icon="list-check"
+    href="https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md"
+  >
+    Full rule-by-rule mapping to OWASP Agentic Top 10.
   </Card>
 </CardGroup>

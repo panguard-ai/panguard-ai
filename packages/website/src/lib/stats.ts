@@ -24,16 +24,16 @@
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.3.5',
-  atrRules: 61,
+  atrRules: 71,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 0,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
-  atrPatterns: 476,
-  totalRules: 61,
+  atrPatterns: 520,
+  totalRules: 71,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '61' as const,
+  totalRulesDisplay: '71' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '61' as const,
+  atrRulesDisplay: '71' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -69,11 +69,11 @@ export const STATS = {
    */
   ecosystem: {
     /** Total MCP/AI skill entries crawled from registries */
-    entriesCrawled: 4_648,
+    entriesCrawled: 36_394,
     /** npm packages found in crawl */
     npmPackages: 2_769,
     /** Packages actually scanned by ATR + Skill Auditor (L1 + L2 AST) */
-    skillsScanned: 3_267,
+    skillsScanned: 10_000,
     /** Total MCP tool definitions extracted from scanned packages */
     toolsExtracted: 35_858,
     /** Packages with security findings (any severity) */
@@ -91,8 +91,8 @@ export const STATS = {
     /** Packages with postinstall scripts */
     postinstallScripts: 122,
     /** Breakdown by severity */
-    findingsCritical: 159,
-    findingsHigh: 260,
+    findingsCritical: 97,
+    findingsHigh: 532,
     findingsMedium: 324,
     findingsLow: 291,
     findingsClean: 1_352,

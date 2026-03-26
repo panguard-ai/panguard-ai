@@ -18,7 +18,7 @@ icon: 'rocket'
   </Tab>
 </Tabs>
 
-This does everything: installs Panguard, connects your AI agents (Claude Code, Cursor, OpenClaw, etc.), and scans all installed skills.
+This does everything: installs Panguard, connects your AI agents (all 16 supported platforms including Claude Code, Cursor, OpenClaw, Windsurf, Zed, and more), and scans all installed skills.
 
 Then start protection:
 
@@ -54,7 +54,7 @@ For a full scan of all installed skills across all platforms:
 pga scan
 ```
 
-This checks all installed skills against 61 ATR rules -- prompt injection, tool poisoning, credential theft, and 6 more threat categories.
+This checks all installed skills against 71 ATR rules covering all 10 OWASP Agentic Top 10 categories -- prompt injection, tool poisoning, credential theft, and more.
 
 <Warning>
   **CRITICAL and HIGH findings need your attention.** Review each finding and decide whether to
@@ -72,7 +72,7 @@ pga status
 ```
 Status:     RUNNING
 Mode:       learning (Day 1/7)
-Rules:      61 ATR detection rules
+Rules:      71 ATR detection rules (OWASP 10/10)
 Dashboard:  http://127.0.0.1:3743
 ```
 

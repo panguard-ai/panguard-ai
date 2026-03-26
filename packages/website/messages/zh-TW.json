@@ -726,26 +726,78 @@
       "submitATR": "提交 ATR 規則提案"
     },
     "scannerHero": {
-      "titleLine1": "AI Agent 擁有你系統的最高權限。",
-      "titleLine2": "每個 App 上架都要審核。",
-      "titleLine3": "AI Skill 不該例外。",
-      "mission": "AI Agent 能讀取你的檔案、執行指令、存取你的憑證。但不像手機 App，Skill 在你的機器上執行前沒有任何審核機制。",
-      "atrLine": "ATR -- AI Skill 的第一個開放審核標準。像 App Store 審核，但專為 AI Agent 設計。",
+      "titleLine1": "在你安裝任何東西之前，",
+      "titleLine2": "先安裝安全。",
+      "subtitle": "安裝前掃描任何 AI Skill。支援 16 個平台。71 條 ATR 規則。免費開源。",
       "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
       "scanBtn": "掃描",
       "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。",
-      "howItHelps": "貼上任何 GitHub Skill 連結，立即查看：風險評分、存取了什麼、能不能安裝。發現的問題會自動共享給社群，生成保護所有人的規則。"
+      "platformLabel": "支援 16 個平台："
     },
     "evidence": {
-      "overline": "真實數據",
-      "title": "我們掃描了 {count} 個 MCP Skills",
-      "subtitle": "來自 {sources} 個來源的 {entries} 個登錄項目。以下是掃描結果。",
-      "consequencesTitle": "CRITICAL 在實際上代表什麼？",
-      "c1": "讀取 ~/.ssh/id_rsa 並竊取你的私鑰",
-      "c2": "將 API Key 傳送到外部伺服器",
-      "c3": "在 Prompt 中注入惡意指令",
-      "c4": "偷偷修改你的 Git Commit",
-      "conclusion": "這就是為什麼每個 Skill 在執行前都需要審計。"
+      "title": "我們掃描了 {count} 個 ClawHub Skills。{percent}% 有安全風險模式。",
+      "subtitle": "真實套件。真實下載量。真實發現。",
+      "dontTakeOurWord": "不信？",
+      "scanYours": "自己掃一下"
+    },
+    "liveStatsBar": {
+      "scanned": "Skills 已掃描",
+      "critical": "CRITICAL 發現",
+      "rules": "ATR 規則",
+      "crystallized": "威脅已結晶",
+      "owaspBadge": "OWASP Agentic Top 10：10/10 全覆蓋"
+    },
+    "howItWorks": {
+      "title": "威脅結晶（Threat Crystallization）",
+      "subtitle": "AI 理解新威脅 → 結晶為 regex 規則 → 0ms 執行 → 保護所有人",
+      "step1": {
+        "title": "掃描",
+        "subtitle": "比對 71 條 ATR 規則",
+        "timing": "3ms",
+        "detail": "每個 Skill 都會比對完整的 ATR 規則集。已知模式即時捕獲，匹配簽章零漏報。"
+      },
+      "step2": {
+        "title": "偵測 + 阻擋",
+        "subtitle": "CRITICAL 威脅立即阻擋",
+        "timing": "< 1 秒",
+        "detail": "高信心度匹配觸發即時回應：阻擋、隔離或警報。已知威脅不需要人工介入。"
+      },
+      "step3": {
+        "title": "結晶",
+        "subtitle": "LLM 生成新的 regex 規則",
+        "timing": "< 1 小時",
+        "detail": "當 LLM 發現新的攻擊模式，它會將理解結晶為確定性的 regex 規則。從概率性 AI 到確定性防禦。"
+      },
+      "step4": {
+        "title": "保護所有人",
+        "subtitle": "新規則分發給所有用戶",
+        "timing": "所有用戶",
+        "detail": "結晶的規則透過 Threat Cloud 流向每個 PanGuard 安裝。一次發現，保護整個網絡。"
+      },
+      "compare": {
+        "cisco": {
+          "label": "Cisco DefenseClaw",
+          "desc": "僅限企業，委員會制規則更新"
+        },
+        "owasp": {
+          "label": "OWASP Agentic Top 10",
+          "desc": "檢查表框架，不是可執行的規則"
+        },
+        "panguard": {
+          "label": "PanGuard",
+          "desc": "開源、16 個平台、不到 1 小時更新規則"
+        }
+      }
+    },
+    "ctaRoadmap": {
+      "missionTitle": "使命：去中心化 AI Agent 安全",
+      "mission1": "每台安裝 PanGuard 的設備都成為一個感測器。",
+      "mission2": "每次掃描都發現新威脅。",
+      "mission3": "每個威脅都結晶為保護所有人的規則。",
+      "mission4": "使用的人越多，整個生態系就越安全。",
+      "roadmapTitle": "我們的方向：",
+      "installNow": "立即安裝",
+      "scanSkill": "掃描 Skill"
     },
     "atrStandard": {
       "overline": "開放標準",
