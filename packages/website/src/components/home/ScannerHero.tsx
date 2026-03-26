@@ -8,7 +8,12 @@ import { ShieldIcon, ScanIcon } from '@/components/ui/BrandIcons';
 import { useSkillScan } from '@/hooks/useSkillScan';
 import ScanAnimation from './ScanAnimation';
 import ScanResultCard from './ScanResultCard';
-import LiveCounterBar from './LiveCounterBar';
+
+const PLATFORM_NAMES = [
+  'Claude Code', 'Claude Desktop', 'Cursor', 'OpenClaw', 'Codex CLI',
+  'WorkBuddy', 'NemoClaw', 'ArkClaw', 'Windsurf', 'QClaw',
+  'Cline', 'VS Code Copilot', 'Zed', 'Gemini CLI', 'Continue', 'Roo Code',
+] as const;
 
 function ScannerHeroInner() {
   const t = useTranslations('home.scannerHero');
@@ -48,14 +53,11 @@ function ScannerHeroInner() {
           <h1 className="text-[clamp(24px,5vw,48px)] font-bold leading-[1.3] tracking-tight text-text-primary">
             {t('titleLine1')}
             <br />
-            <span className="text-text-secondary">{t('titleLine2')}</span>
-            <br />
-            <span className="text-panguard-green">{t('titleLine3')}</span>
+            <span className="text-panguard-green">{t('titleLine2')}</span>
           </h1>
           <p className="mt-5 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto">
-            {t('mission')}
+            {t('subtitle')}
           </p>
-          <p className="mt-2 text-sm text-panguard-green font-semibold">{t('atrLine')}</p>
         </div>
 
         {/* Scanner — CSS fade-up with delay */}
@@ -116,12 +118,16 @@ function ScannerHeroInner() {
           </AnimatePresence>
 
           <p className="text-[11px] text-text-muted mt-3">{t('trustNote')}</p>
-          <p className="text-[11px] text-text-muted mt-1">{t('howItHelps')}</p>
         </div>
 
-        {/* Live counter — CSS fade-in with delay */}
+        {/* Platform bar — CSS fade-in with delay */}
         <div className="mt-8 animate-[fadeIn_0.5s_0.7s_ease_both]">
-          <LiveCounterBar />
+          <p className="text-xs text-text-muted mb-3">{t('platformLabel')}</p>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-text-secondary">
+            {PLATFORM_NAMES.map((name) => (
+              <span key={name} className="whitespace-nowrap">{name}</span>
+            ))}
+          </div>
         </div>
       </div>
 

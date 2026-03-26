@@ -1,13 +1,12 @@
 ---
 title: 'Panguard AI'
 sidebarTitle: '簡介'
-description: 'AI Agent 安全的第一個開放標準。61 條 ATR 偵測規則。一行安裝。100% 免費開源。'
+description: 'AI Agent 安全的第一個開放標準。71 條 ATR 偵測規則。OWASP Agentic Top 10: 10/10 覆蓋。16 個平台。100% 免費開源。'
 icon: 'shield-check'
 ---
 
 <Note>
-  **v1.3.0 已發布** -- 內建 Dashboard、支援 8 個 AI 平台、Skill Auditor
-  為預設入口。[查看更新日誌](/changelog)。
+  **v1.4.1 已發布** -- 支援 16 個 AI 平台、71 條 ATR 規則、OWASP Agentic Top 10 完整覆蓋。[查看更新日誌](/changelog)。
 </Note>
 
 Panguard AI 是第一個專為 AI Agent 時代打造的開源資安平台。當 AI Agent 拿到系統 root 權限存取正式環境，Panguard 提供偵測規則、執行引擎和集體情報網路來把關安全。
@@ -22,14 +21,36 @@ curl -fsSL https://get.panguard.ai | bash
 
 ## 關鍵數字
 
-|                            |                                                                                    |
-| -------------------------- | ---------------------------------------------------------------------------------- |
-| **61** 條偵測規則          | ATR (61) + 社群貢獻                                                                |
-| **8** 個 AI 平台           | Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw |
-| **3 層** AI 管線           | 規則引擎、本地 AI (Ollama)、雲端 AI (Claude/OpenAI)                                |
-| **11** 個 MCP 工具         | 掃描、審計、防護、威脅搜尋等                                                       |
-| **8 項檢查** Skill Auditor | 每個 AI Skill 安裝前都要過關                                                       |
-| **0** 帳號需求             | 不用登入、不用註冊、不用 API key 就能開始                                          |
+|                            |                                                                                                                                         |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **71** 條偵測規則          | ATR (71) + 社群貢獻                                                                                                                    |
+| **16** 個 AI 平台          | Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code |
+| **OWASP 10/10**            | 完整覆蓋 OWASP Agentic Top 10 for Agentic Applications 2026                                                                           |
+| **3 層** AI 管線           | 規則引擎、本地 AI (Ollama)、雲端 AI (Claude/OpenAI)                                                                                    |
+| **11** 個 MCP 工具         | 掃描、審計、防護、威脅搜尋等                                                                                                           |
+| **8 項檢查** Skill Auditor | 每個 AI Skill 安裝前都要過關                                                                                                           |
+| **0** 帳號需求             | 不用登入、不用註冊、不用 API key 就能開始                                                                                              |
+
+---
+
+## OWASP Agentic Top 10: 完整覆蓋
+
+ATR 規則對應 [OWASP Top 10 for Agentic Applications 2026](https://owasp.org/www-project-top-10-for-agentic-applications/) 的每一個類別：
+
+| OWASP Category | ATR Rules | Coverage |
+| --- | --- | --- |
+| ASI01: Agent Goal Hijack | 13 rules | STRONG |
+| ASI02: Tool Misuse & Exploitation | 11 rules | STRONG |
+| ASI03: Identity & Privilege Abuse | 9 rules | STRONG |
+| ASI04: Agentic Supply Chain | 8 rules | STRONG |
+| ASI05: Unexpected Code Execution | 8 rules | STRONG |
+| ASI06: Memory & Context Poisoning | 8 rules | STRONG |
+| ASI07: Inter-Agent Communication | 5 rules | MODERATE |
+| ASI08: Cascading Failures | 4 rules | MODERATE |
+| ASI09: Human-Agent Trust | 5 rules | MODERATE |
+| ASI10: Rogue Agents | 7 rules | MODERATE |
+
+完整對應表：[GitHub 上的 OWASP-MAPPING.md](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md)
 
 ---
 
@@ -37,15 +58,15 @@ curl -fsSL https://get.panguard.ai | bash
 
 <CardGroup cols={3}>
   <Card title="ATR -- 標準" icon="file-code" href="/overview">
-    **61 條規則，9 大威脅類別。** AI Agent 威脅偵測的第一個開放標準 -- prompt injection、tool
-    poisoning、skill compromise、agent manipulation。YAML 格式，人看得懂，機器跑得動。
+    **71 條規則，9 大威脅類別。** AI Agent 威脅偵測的第一個開放標準 -- prompt injection、tool
+    poisoning、skill compromise、agent manipulation。YAML 格式，人看得懂，機器跑得動。OWASP Agentic Top 10: 10/10 覆蓋。
   </Card>
   <Card title="Threat Cloud -- 情報網" icon="globe" href="/products/threat-cloud/overview">
     **集體免疫。** 每個安裝都貢獻匿名化威脅訊號。管線從真實攻擊自動產生規則。11
     個情報來源，每小時同步一次。
   </Card>
   <Card title="Guard -- 引擎" icon="shield-halved" href="/products/guard/overview">
-    **4-Agent AI 管線。** Detect、Analyze、Respond、Report。用 61 條 ATR 規則處理 OS 層級事件。內建
+    **4-Agent AI 管線。** Detect、Analyze、Respond、Report。用 71 條 ATR 規則處理 OS 層級事件。內建
     Skill Auditor。自動封鎖 IP、終止 process、隔離檔案。
   </Card>
 </CardGroup>
@@ -63,7 +84,7 @@ panguard scan --quick
 panguard guard start --dashboard
 ```
 
-`panguard setup` 自動偵測你機器上的所有 AI 平台（Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw），注入正確的 MCP 或原生 Skill 設定。
+`panguard setup` 自動偵測你機器上全部 16 個 AI 平台，注入正確的 MCP 或原生 Skill 設定。
 
 `panguard guard start --dashboard` 啟動 24/7 即時防護，並在瀏覽器開啟本地 Dashboard `http://127.0.0.1:9100`。
 
@@ -86,7 +107,7 @@ panguard guard start --dashboard
     curl -fsSL https://get.panguard.ai | bash && panguard setup
     ```
 
-    一行指令自動偵測並設定 8 個支援的 AI 平台：Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw。
+    一行指令自動偵測並設定全部 16 個支援的 AI 平台：Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code。
 
   </Tab>
   <Tab title="OpenClaw">
@@ -153,6 +174,17 @@ Panguard 走不同路線：
 - **越用越聰明** -- 行為基線會適應你的環境
 - **Skill Auditor** -- 每個 AI Skill 安裝前都要過審計，擋住供應鏈攻擊
 - **100% 免費** -- MIT 授權，沒有付費版，沒有功能閘門，沒有 paywall
+
+---
+
+## 研究論文
+
+ATR 有經過同儕審查的研究論文，記錄了方法論、偵測架構和評測結果。
+
+> **Agent Threat Rules: A Community-Driven Detection Standard for AI Agent Security**
+> 發布於 [Zenodo (DOI: 10.5281/zenodo.19178002)](https://doi.org/10.5281/zenodo.19178002)。正在 arXiv 和 SSRN 審查中。
+
+論文涵蓋：威脅分類體系、偵測架構（regex + LLM crystallization）、PINT benchmark 評測（62.7% recall, 99.7% precision），以及 64 種已記錄的繞過技術。
 
 ---
 

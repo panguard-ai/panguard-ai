@@ -1,13 +1,13 @@
 ---
 title: 'Panguard AI'
 sidebarTitle: 'Introduction'
-description: 'The first open standard for AI agent security. 61 ATR detection rules. One-line install. 100% free and open source.'
+description: 'The first open standard for AI agent security. 71 ATR detection rules. OWASP Agentic Top 10: 10/10 covered. 16 platforms. 100% free and open source.'
 icon: 'shield-check'
 ---
 
 <Note>
-  **v1.3.0 released** -- Built-in dashboard, 8 AI platform support, Skill Auditor as default entry
-  point. [See changelog](/changelog).
+  **v1.4.1 released** -- 16 AI platform support, 71 ATR rules, OWASP Agentic Top 10 full coverage.
+  [See changelog](/changelog).
 </Note>
 
 Panguard AI is the first open-source security platform built for the AI agent era. As AI agents gain root-level access to production systems, Panguard provides the detection rules, enforcement engine, and collective intelligence network to keep them in check.
@@ -22,14 +22,36 @@ curl -fsSL https://get.panguard.ai | bash
 
 ## By the Numbers
 
-|                           |                                                                                    |
-| ------------------------- | ---------------------------------------------------------------------------------- |
-| **61** detection rules    | ATR (61) + community                                                               |
-| **8** AI platforms        | Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw |
-| **3-layer** AI pipeline   | Rules engine, local AI (Ollama), cloud AI (Claude/OpenAI)                          |
-| **11** MCP tools          | Scan, audit, guard, threat search, and more                                        |
-| **8-check** Skill Auditor | Gates every AI skill before install                                                |
-| **0** accounts required   | No login, no signup, no API key needed to start                                    |
+|                                    |                                                                                                                                         |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **71** detection rules             | ATR (71) + community                                                                                                                    |
+| **16** AI platforms                | Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code |
+| **OWASP 10/10**                    | Full coverage of OWASP Agentic Top 10 for Agentic Applications 2026                                                                    |
+| **3-layer** AI pipeline            | Rules engine, local AI (Ollama), cloud AI (Claude/OpenAI)                                                                               |
+| **11** MCP tools                   | Scan, audit, guard, threat search, and more                                                                                             |
+| **8-check** Skill Auditor          | Gates every AI skill before install                                                                                                     |
+| **0** accounts required            | No login, no signup, no API key needed to start                                                                                         |
+
+---
+
+## OWASP Agentic Top 10: Full Coverage
+
+ATR rules map to every category of the [OWASP Top 10 for Agentic Applications 2026](https://owasp.org/www-project-top-10-for-agentic-applications/):
+
+| OWASP Category | ATR Rules | Coverage |
+| --- | --- | --- |
+| ASI01: Agent Goal Hijack | 13 rules | STRONG |
+| ASI02: Tool Misuse & Exploitation | 11 rules | STRONG |
+| ASI03: Identity & Privilege Abuse | 9 rules | STRONG |
+| ASI04: Agentic Supply Chain | 8 rules | STRONG |
+| ASI05: Unexpected Code Execution | 8 rules | STRONG |
+| ASI06: Memory & Context Poisoning | 8 rules | STRONG |
+| ASI07: Inter-Agent Communication | 5 rules | MODERATE |
+| ASI08: Cascading Failures | 4 rules | MODERATE |
+| ASI09: Human-Agent Trust | 5 rules | MODERATE |
+| ASI10: Rogue Agents | 7 rules | MODERATE |
+
+Full mapping: [OWASP-MAPPING.md on GitHub](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md)
 
 ---
 
@@ -37,16 +59,16 @@ curl -fsSL https://get.panguard.ai | bash
 
 <CardGroup cols={3}>
   <Card title="ATR -- The Standard" icon="file-code" href="/overview">
-    **61 rules across 9 threat categories.** The first open standard for AI agent threats -- prompt
+    **71 rules across 9 threat categories.** The first open standard for AI agent threats -- prompt
     injection, tool poisoning, skill compromise, agent manipulation. YAML-based, human-readable,
-    machine-enforceable.
+    machine-enforceable. OWASP Agentic Top 10: 10/10 covered.
   </Card>
   <Card title="Threat Cloud -- The Network" icon="globe" href="/products/threat-cloud/overview">
     **Collective immunity.** Every install contributes anonymized threat signals. The pipeline
     auto-generates rules from real-world attacks. 11 intel sources. Synced every hour.
   </Card>
   <Card title="Guard -- The Engine" icon="shield-halved" href="/products/guard/overview">
-    **4-agent AI pipeline.** Detect, Analyze, Respond, Report. Processes OS-level events through 61
+    **4-agent AI pipeline.** Detect, Analyze, Respond, Report. Processes OS-level events through 71
     ATR rules. Built-in Skill Auditor. Auto-response blocks IPs, kills processes, quarantines files.
   </Card>
 </CardGroup>
@@ -64,7 +86,7 @@ panguard scan --quick
 panguard guard start --dashboard
 ```
 
-`panguard setup` auto-detects all AI platforms on your machine (Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw) and injects the correct MCP or native Skill configuration for each.
+`panguard setup` auto-detects all 16 AI platforms on your machine and injects the correct MCP or native Skill configuration for each.
 
 `panguard guard start --dashboard` starts 24/7 protection and opens a local dashboard in your browser at `http://127.0.0.1:9100`.
 
@@ -87,7 +109,7 @@ panguard guard start --dashboard
     curl -fsSL https://get.panguard.ai | bash && panguard setup
     ```
 
-    Auto-detects and configures all 8 supported AI platforms in one command: Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw.
+    Auto-detects and configures all 16 supported AI platforms in one command: Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code.
 
   </Tab>
   <Tab title="OpenClaw">
@@ -158,6 +180,17 @@ Panguard takes a different approach:
 - **Gets smarter over time** -- behavioral baselines adapt to your environment
 - **Skill Auditor** -- gates every AI skill before install, prevents supply chain attacks
 - **100% free** -- MIT licensed, no paid tiers, no feature gates, no paywalls
+
+---
+
+## Research Paper
+
+ATR is backed by a peer-reviewed research paper documenting the methodology, detection architecture, and evaluation results.
+
+> **Agent Threat Rules: A Community-Driven Detection Standard for AI Agent Security**
+> Published on [Zenodo (DOI: 10.5281/zenodo.19178002)](https://doi.org/10.5281/zenodo.19178002). Under review at arXiv and SSRN.
+
+The paper covers: threat taxonomy, detection architecture (regex + LLM crystallization), PINT benchmark evaluation (62.7% recall, 99.7% precision), and 64 documented evasion techniques.
 
 ---
 

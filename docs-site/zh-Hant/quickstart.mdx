@@ -10,12 +10,23 @@ icon: 'rocket'
   <Tab title="macOS / Linux">```bash curl -fsSL https://get.panguard.ai | bash ```</Tab>
   <Tab title="Windows">```powershell irm https://get.panguard.ai/windows | iex ```</Tab>
   <Tab title="npm（全平台）">
-    ```bash npm install -g @panguard-ai/panguard && pga setup && pga guard start
-    --dashboard ```
+    ```bash
+    npm install -g @panguard-ai/panguard
+    pga setup
+    ```
+    `pga` 是 `panguard` 的簡寫，兩個都能用。
   </Tab>
 </Tabs>
 
-一行指令做完所有事：安裝 Panguard、連接你的 AI agent（Claude Code、Cursor、OpenClaw 等）、啟動 Guard、Dashboard 自動在 `http://127.0.0.1:9100` 開啟。
+一行指令做完所有事：安裝 Panguard、連接你的 AI agent（全部 16 個支援平台，包含 Claude Code, Cursor, OpenClaw, Windsurf, Zed 等）、掃描所有已安裝的 skill。
+
+接著啟動防護：
+
+```bash
+pga up
+```
+
+啟動 Guard + 開啟 Dashboard。兩個字，全面防護。
 
 ---
 
@@ -24,7 +35,7 @@ icon: 'rocket'
 裝好之後，審計你系統上的 MCP skill：
 
 ```bash
-panguard audit skill .
+pga audit skill ./my-skill
 ```
 
 ```
@@ -40,10 +51,10 @@ VERDICT: SAFE TO INSTALL
 掃描所有平台上已安裝的 skill：
 
 ```bash
-panguard guard scan
+pga scan
 ```
 
-用 61 條 ATR 規則檢查所有 skill — prompt injection、tool poisoning、credential theft 等 9 大威脅類別。
+用 71 條 ATR 規則檢查所有 skill，涵蓋全部 10 個 OWASP Agentic Top 10 類別 -- prompt injection、tool poisoning、credential theft 等。
 
 <Warning>
   **CRITICAL 和 HIGH 的發現需要你處理。** 逐一檢查每個發現，決定要保留、更新還是移除。
@@ -54,14 +65,14 @@ panguard guard scan
 ## 看 Guard 狀態
 
 ```bash
-panguard guard status
+pga status
 ```
 
 ```
 Status:     RUNNING
 Mode:       learning (Day 1/7)
-Rules:      61 ATR detection rules
-Dashboard:  http://127.0.0.1:9100
+Rules:      71 ATR detection rules (OWASP 10/10)
+Dashboard:  http://127.0.0.1:3743
 ```
 
 <Info>
@@ -77,7 +88,7 @@ Dashboard:  http://127.0.0.1:9100
 
 1. **Guard 在你的機器上偵測到威脅。**
 2. **匿名 hash 分享到 Threat Cloud**（不含個資、不含原始碼）。
-3. **3 個獨立掃描器確認**同樣的 pattern — 自動產生新 ATR 規則。
+3. **3 個獨立掃描器確認**同樣的 pattern -- 自動產生新 ATR 規則。
 4. **所有 Panguard 使用者在 1 小時內收到新規則。**
 
 一台機器被攻擊，一小時後所有機器都免疫。
@@ -86,14 +97,19 @@ Dashboard:  http://127.0.0.1:9100
 
 ## 常用指令
 
-| 指令                               | 功能                              |
-| ---------------------------------- | --------------------------------- |
-| `panguard setup`                   | 自動偵測並連接 AI 平台            |
-| `panguard audit skill <path>`      | 安裝前審計單一 skill              |
-| `panguard guard scan`              | 掃描所有平台上已安裝的 skill      |
-| `panguard guard start --dashboard` | 啟動 24/7 監控 + 瀏覽器 Dashboard |
-| `panguard guard stop`              | 停止 Guard                        |
-| `panguard scan --quick`            | 系統安全掃描（port、服務）        |
+| 指令                     | 功能                              |
+| ------------------------ | --------------------------------- |
+| `pga`                    | 開啟互動式選單                    |
+| `pga up`                 | 啟動防護 + Dashboard              |
+| `pga setup`              | 自動偵測並連接 AI 平台            |
+| `pga scan`               | 掃描所有平台上已安裝的 skill      |
+| `pga audit skill <path>` | 安裝前審計單一 skill              |
+| `pga status`             | 查看防護狀態                      |
+| `pga guard stop`         | 停止 Guard                        |
+
+<Tip>
+  `pga` 是 `panguard` 的簡寫，所有指令兩個名字都能用。
+</Tip>
 
 ---
 

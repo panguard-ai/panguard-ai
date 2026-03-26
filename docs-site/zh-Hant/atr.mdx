@@ -1,6 +1,6 @@
 ---
 title: 'ATR (Agent Threat Rules)'
-description: 'AI agent 威脅偵測的開放標準。社群維護的規則，涵蓋 prompt injection、tool poisoning 等攻擊。'
+description: 'AI agent 威脅偵測的開放標準。71 條規則。OWASP Agentic Top 10: 10/10 覆蓋。社群維護。'
 icon: 'shield-halved'
 ---
 
@@ -15,18 +15,66 @@ ATR 規則偵測傳統安全工具抓不到的威脅：
 - **資料外洩** -- 透過 agent 動作竊取資料
 - **權限提升** -- 透過 skill 操控提升權限
 - **供應鏈攻擊** -- 針對 skill registry 的攻擊
+- **憑證竊取** -- 透過 agent tool call 竊取憑證
+- **跨 agent 操控** -- 多 agent 系統中的操控攻擊
+
+## 關鍵數字
+
+|                      |                                                        |
+| -------------------- | ------------------------------------------------------ |
+| **71** 條規則        | 涵蓋 9 大威脅類別                                      |
+| **OWASP 10/10**      | 完整覆蓋 OWASP Agentic Top 10                         |
+| **62.7%** recall     | PINT benchmark（99.7% precision）                      |
+| **520+** patterns    | 獨立偵測簽章                                           |
+| **< 3ms** 掃描時間   | 每個 skill（regex 層）                                 |
+
+## OWASP Agentic Top 10 覆蓋
+
+ATR 為每個 OWASP 類別提供可執行的偵測規則：
+
+| OWASP Category | ATR Rules | Coverage |
+| --- | --- | --- |
+| ASI01: Agent Goal Hijack | 13 | STRONG |
+| ASI02: Tool Misuse & Exploitation | 11 | STRONG |
+| ASI03: Identity & Privilege Abuse | 9 | STRONG |
+| ASI04: Agentic Supply Chain | 8 | STRONG |
+| ASI05: Unexpected Code Execution | 8 | STRONG |
+| ASI06: Memory & Context Poisoning | 8 | STRONG |
+| ASI07: Inter-Agent Communication | 5 | MODERATE |
+| ASI08: Cascading Failures | 4 | MODERATE |
+| ASI09: Human-Agent Trust | 5 | MODERATE |
+| ASI10: Rogue Agents | 7 | MODERATE |
+
+<Info>
+  OWASP 提供 checklist。ATR 提供可執行的規則。用 ATR 把 OWASP 合規從紙上作業變成自動化偵測。
+</Info>
 
 ## 三層偵測
 
-| 層級    | 方法                   | 速度 | 覆蓋範圍     |
-| ------- | ---------------------- | ---- | ------------ |
-| Layer 1 | Regex pattern matching | 快   | 已知 pattern |
-| Layer 2 | 內容指紋比對           | 中   | 變體         |
-| Layer 3 | LLM-as-judge           | 慢   | 新型威脅     |
+| 層級    | 方法                   | 速度   | 覆蓋範圍     |
+| ------- | ---------------------- | ------ | ------------ |
+| Layer 1 | Regex pattern matching | 3ms    | 已知 pattern |
+| Layer 2 | 內容指紋比對           | ~200ms | 變體         |
+| Layer 3 | LLM-as-judge           | ~3s    | 新型威脅     |
 
-## 規則數量
+## Threat Crystallization
 
-- **61 條 ATR 規則**，涵蓋已知 AI agent 威脅與新興攻擊 pattern
+當 LLM 層（Layer 3）發現新的攻擊 pattern 時，ATR 會將它結晶成確定性的 regex 規則：
+
+1. LLM 偵測到新型威脅 pattern
+2. RuleScaffolder 產生新的 regex 規則
+3. Shadow mode 用 1,000 個樣本驗證（FP < 0.1%）
+4. 規則晉升並透過 Threat Cloud 分發（< 1 小時）
+5. 下次出現同樣攻擊，Layer 1 在 3ms 內就攔截 -- 不需要 LLM
+
+每次 LLM 呼叫都在訓練 regex 引擎。LLM 成本只有一次。結晶後的規則永久運行，零成本。
+
+## 研究論文
+
+> **Agent Threat Rules: A Community-Driven Detection Standard for AI Agent Security**
+> [Zenodo DOI: 10.5281/zenodo.19178002](https://doi.org/10.5281/zenodo.19178002)
+
+論文記錄了：威脅分類體系、偵測架構、PINT benchmark 評測，以及 64 種已知繞過技術（公開發布）。
 
 ## 開始使用
 
@@ -49,7 +97,11 @@ panguard guard start
   >
     瀏覽規則、貢獻程式碼、給顆星。
   </Card>
-  <Card title="Quick Start" icon="rocket" href="/quickstart">
-    安裝 Panguard，開始使用 ATR 規則。
+  <Card
+    title="OWASP Mapping"
+    icon="list-check"
+    href="https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md"
+  >
+    完整的規則對 OWASP Agentic Top 10 逐條對應表。
   </Card>
 </CardGroup>

@@ -6,19 +6,19 @@ icon: 'shield-check'
 
 ## What is Panguard AI?
 
-Panguard AI is an open-source security platform purpose-built for the AI agent era. As AI agents (Claude Code, Cursor, QClaw, OpenClaw, Codex CLI, WorkBuddy, NemoClaw, ArkClaw) gain root access to production systems, Panguard provides the first open standard for detecting and blocking agent-level threats.
+Panguard AI is an open-source security platform purpose-built for the AI agent era. As AI agents (Claude Code, Cursor, QClaw, OpenClaw, Codex CLI, WorkBuddy, NemoClaw, ArkClaw, Windsurf, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code) gain root access to production systems, Panguard provides the first open standard for detecting and blocking agent-level threats.
 
 **Three pillars. One mission: secure every AI agent.**
 
-1. **ATR (Agent Threat Rules)** -- The open standard for AI agent threat detection (61 rules, 9 categories)
+1. **ATR (Agent Threat Rules)** -- The open standard for AI agent threat detection (71 rules, 9 categories, OWASP 10/10)
 2. **Threat Cloud** -- Collective immunity network that gets stronger with every install (11 intel sources, hourly sync)
-3. **Guard** -- The enforcement engine with Skill Auditor, threat blocking, and auto-response (61 ATR rules)
+3. **Guard** -- The enforcement engine with Skill Auditor, threat blocking, and auto-response (71 ATR rules)
 
 ## Three Pillars
 
 <CardGroup cols={3}>
   <Card title="ATR -- The Standard" icon="file-code">
-    **61 rules across 9 threat categories.** The first open standard for AI agent threats --
+    **71 rules across 9 threat categories. OWASP 10/10.** The first open standard for AI agent threats --
     purpose-built for prompt injection, tool poisoning, skill compromise, and agent manipulation.
     YAML-based, human-readable, machine-enforceable.
   </Card>
@@ -28,7 +28,7 @@ Panguard AI is an open-source security platform purpose-built for the AI agent e
     threat intel sources, 5,000+ validated IoC records, synced every hour.
   </Card>
   <Card title="Guard -- The Engine" icon="shield-halved">
-    **61 ATR detection rules.** A 4-agent AI pipeline (Detect, Analyze, Respond, Report) processes
+    **71 ATR detection rules.** A 4-agent AI pipeline (Detect, Analyze, Respond, Report) processes
     OS-level events through ATR rules. Built-in Skill Auditor gates every AI skill before install.
     Auto-response blocks IPs, kills processes, quarantines files.
   </Card>
@@ -77,7 +77,7 @@ For a deep dive into the AI architecture, see [Three-Layer AI](/concepts/three-l
 | Runtime              | Node.js 20+                              |
 | Monorepo             | pnpm 10 workspaces                       |
 | Testing              | Vitest 3 (3,583 tests / 165 files)       |
-| Detection Rules      | ATR (61)                                 |
+| Detection Rules      | ATR (71) -- OWASP Agentic Top 10: 10/10  |
 | AI Providers         | Ollama (local) + Claude / OpenAI (cloud) |
 | Internationalization | English + Traditional Chinese            |
 | Encryption           | AES-256-GCM                              |
@@ -85,20 +85,26 @@ For a deep dive into the AI architecture, see [Three-Layer AI](/concepts/three-l
 
 ## Platform Support
 
-Panguard integrates with 10 AI agent platforms via MCP or native Skill protocol:
+Panguard integrates with 16 AI agent platforms via MCP or native Skill protocol:
 
 | Platform           | Protocol     | Config Path                                |
 | ------------------ | ------------ | ------------------------------------------ |
-| **OpenClaw**       | Native Skill | `~/.openclaw/skills/panguard/SKILL.md`     |
-| **QClaw**          | MCP          | `~/.qclaw/mcp.json`                        |
 | **Claude Code**    | MCP          | `~/.claude/settings.local.json`            |
-| **Cursor**         | MCP          | `~/.cursor/mcp.json`                       |
-| **Codex CLI**      | MCP          | `~/.codex/mcp.json`                        |
 | **Claude Desktop** | MCP          | `~/Library/.../claude_desktop_config.json` |
-| **Windsurf**       | MCP          | `~/.windsurf/mcp.json`                     |
+| **Cursor**         | MCP          | `~/.cursor/mcp.json`                       |
+| **OpenClaw**       | Native Skill | `~/.openclaw/skills/panguard/SKILL.md`     |
+| **Codex CLI**      | MCP          | `~/.codex/mcp.json`                        |
 | **WorkBuddy**      | MCP          | `~/.workbuddy/.mcp.json`                   |
 | **NemoClaw**       | MCP          | `~/.nemoclaw/mcp.json`                     |
 | **ArkClaw**        | MCP          | `~/.arkclaw/mcp.json`                      |
+| **Windsurf**       | MCP          | `~/.windsurf/mcp.json`                     |
+| **QClaw**          | MCP          | `~/.qclaw/mcp.json`                        |
+| **Cline**          | MCP          | `~/.cline/mcp.json`                        |
+| **VS Code Copilot**| MCP          | `~/.vscode/mcp.json`                       |
+| **Zed**            | MCP          | `~/.zed/mcp.json`                          |
+| **Gemini CLI**     | MCP          | `~/.gemini/mcp.json`                       |
+| **Continue**       | MCP          | `~/.continue/mcp.json`                     |
+| **Roo Code**       | MCP          | `~/.roo-code/mcp.json`                     |
 
 All platforms are auto-configured with a single `panguard setup` command.
 

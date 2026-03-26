@@ -726,26 +726,78 @@
       "submitATR": "Submit ATR Rule Proposal"
     },
     "scannerHero": {
-      "titleLine1": "AI agents have full system access.",
-      "titleLine2": "Every app gets reviewed before you install it.",
-      "titleLine3": "AI skills should too.",
-      "mission": "AI agents can read your files, run commands, and access your credentials. But unlike mobile apps, there's no review process before a skill runs on your machine.",
-      "atrLine": "ATR -- the first open review standard for AI skills. Like App Store review, but for agents.",
+      "titleLine1": "Install security before you",
+      "titleLine2": "install anything else.",
+      "subtitle": "Scan any AI skill before you install it. 16 platforms. 71 ATR rules. Free and open source.",
       "scanLabel": "Check any MCP skill before you install",
       "scanBtn": "Scan",
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached.",
-      "howItHelps": "Paste any GitHub skill URL. You'll see: risk score, what it accesses, and whether it's safe to install. Findings are shared with the community to generate protection rules for everyone."
+      "platformLabel": "Works with 16 platforms:"
     },
     "evidence": {
-      "overline": "REAL DATA",
-      "title": "We scanned {count} MCP Skills",
-      "subtitle": "From {entries} registry entries across {sources} sources. Here's what we found.",
-      "consequencesTitle": "What CRITICAL means in practice",
-      "c1": "Read ~/.ssh/id_rsa and exfiltrate private keys",
-      "c2": "Send API keys to external servers",
-      "c3": "Inject malicious instructions into prompts",
-      "c4": "Silently modify git commits",
-      "conclusion": "This is why every skill needs an audit before it runs."
+      "title": "We scanned {count} ClawHub skills. {percent}% have security risk patterns.",
+      "subtitle": "Real packages. Real downloads. Real findings.",
+      "dontTakeOurWord": "Don't take our word for it.",
+      "scanYours": "Scan yours"
+    },
+    "liveStatsBar": {
+      "scanned": "skills scanned",
+      "critical": "CRITICAL found",
+      "rules": "ATR rules",
+      "crystallized": "threats crystallized",
+      "owaspBadge": "OWASP Agentic Top 10: 10/10 covered"
+    },
+    "howItWorks": {
+      "title": "Threat Crystallization",
+      "subtitle": "AI understands new threats. Crystallizes them into regex rules. Executes in 0ms. Protects everyone.",
+      "step1": {
+        "title": "Scan",
+        "subtitle": "Pattern-match against 71 ATR rules",
+        "timing": "3ms",
+        "detail": "Every skill is checked against the full ATR rule set. Known patterns are caught instantly with zero false negatives on matched signatures."
+      },
+      "step2": {
+        "title": "Detect + Block",
+        "subtitle": "CRITICAL threats blocked immediately",
+        "timing": "< 1s",
+        "detail": "High-confidence matches trigger instant response: block, quarantine, or alert. No human intervention needed for known threats."
+      },
+      "step3": {
+        "title": "Crystallize",
+        "subtitle": "LLM generates a new regex rule",
+        "timing": "< 1 hour",
+        "detail": "When the LLM discovers a new attack pattern, it crystallizes the understanding into a deterministic regex rule. From probabilistic AI to deterministic defense."
+      },
+      "step4": {
+        "title": "Protect Everyone",
+        "subtitle": "New rule distributed to all users",
+        "timing": "all users",
+        "detail": "The crystallized rule flows through Threat Cloud to every PanGuard installation. One discovery protects the entire network."
+      },
+      "compare": {
+        "cisco": {
+          "label": "Cisco DefenseClaw",
+          "desc": "Enterprise-only, committee-based rule updates"
+        },
+        "owasp": {
+          "label": "OWASP Agentic Top 10",
+          "desc": "Checklist framework, not executable rules"
+        },
+        "panguard": {
+          "label": "PanGuard",
+          "desc": "Open source, 16 platforms, < 1 hour rule updates"
+        }
+      }
+    },
+    "ctaRoadmap": {
+      "missionTitle": "The Mission: Decentralized AI Agent Security",
+      "mission1": "Every device that installs PanGuard becomes a sensor.",
+      "mission2": "Every scan discovers new threats.",
+      "mission3": "Every threat crystallizes into a rule that protects everyone.",
+      "mission4": "The more people use it, the safer the entire ecosystem becomes.",
+      "roadmapTitle": "Where we're going:",
+      "installNow": "Install Now",
+      "scanSkill": "Scan a Skill"
     },
     "atrStandard": {
       "overline": "OPEN STANDARD",
