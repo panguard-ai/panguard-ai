@@ -638,6 +638,24 @@ export function setupCommand(): Command {
           }
         }
 
+        // ── Report setup event to Threat Cloud (best-effort) ────────
+        void fetch('https://tc.panguard.ai/api/usage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event_type: 'cli_setup',
+            source: 'cli-user',
+            metadata: {
+              version: PANGUARD_VERSION,
+              platforms: results
+                .filter((r) => r.success)
+                .map((r) => r.platformId),
+              skillsScanned: (jsonOutput['skill_scan'] as { total?: number } | undefined)?.total ?? 0,
+            },
+          }),
+          signal: AbortSignal.timeout(3000),
+        }).catch(() => {});
+
         // ── JSON output (all data collected) ─────────────────────────
         if (options.json) {
           jsonOutput['agent_friendly'] = true;
@@ -653,7 +671,10 @@ export function setupCommand(): Command {
         console.log(`    ${c.sage('pga up')}           Start protection + dashboard`);
         console.log(`    ${c.sage('pga status')}       Check protection status`);
         console.log(`    ${c.sage('pga scan')}         Scan all installed skills`);
-        console.log(`    ${c.sage('pga audit <dir>')}  Audit a skill before installing`);
+        console.log(`    ${c.sage('pga audit <url>')}  Audit a skill before installing`);
+        console.log();
+        console.log(c.dim('  Open source (MIT). If PanGuard helps you, star us on GitHub:'));
+        console.log(c.sage('  https://github.com/panguard-ai/panguard-ai'));
         console.log();
 
         const configuredPlatforms = actionable.filter((_, i) => results[i]?.success);

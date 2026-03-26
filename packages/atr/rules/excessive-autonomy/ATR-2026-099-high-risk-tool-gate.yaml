@@ -23,7 +23,7 @@ date: "2026/03/11"
 schema_version: "0.1"
 detection_tier: pattern
 maturity: experimental
-severity: high
+severity: low
 
 references:
   owasp_llm:

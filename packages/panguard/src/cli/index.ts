@@ -226,11 +226,74 @@ async function showWhatsNewIfUpgraded(): Promise<void> {
   }
 }
 
+/**
+ * Check npm for a newer version of Panguard CLI.
+ * Non-blocking, max once per 24 hours, best-effort.
+ */
+async function checkForUpdates(): Promise<void> {
+  const { existsSync, readFileSync, writeFileSync, mkdirSync } = await import('node:fs');
+  const { join } = await import('node:path');
+
+  const home = process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.';
+  const dir = join(home, '.panguard');
+  const checkFile = join(dir, '.last-update-check');
+
+  // Only check once per 24 hours
+  try {
+    if (existsSync(checkFile)) {
+      const lastCheck = parseInt(readFileSync(checkFile, 'utf-8').trim(), 10);
+      if (Date.now() - lastCheck < 24 * 60 * 60 * 1000) return;
+    }
+  } catch {
+    // Non-critical
+  }
+
+  // Write timestamp immediately to avoid duplicate checks
+  try {
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    writeFileSync(checkFile, String(Date.now()), 'utf-8');
+  } catch {
+    // Non-critical
+  }
+
+  try {
+    const res = await fetch('https://registry.npmjs.org/@panguard-ai/panguard/latest', {
+      signal: AbortSignal.timeout(3_000),
+      headers: { Accept: 'application/json' },
+    });
+    if (!res.ok) return;
+    const data = (await res.json()) as { version?: string };
+    const latest = data.version;
+    if (!latest || latest === PANGUARD_VERSION) return;
+
+    // Simple semver comparison: split on dots, compare numerically
+    const cur = PANGUARD_VERSION.split('.').map(Number);
+    const lat = latest.split('.').map(Number);
+    const isNewer =
+      (lat[0] ?? 0) > (cur[0] ?? 0) ||
+      ((lat[0] ?? 0) === (cur[0] ?? 0) && (lat[1] ?? 0) > (cur[1] ?? 0)) ||
+      ((lat[0] ?? 0) === (cur[0] ?? 0) &&
+        (lat[1] ?? 0) === (cur[1] ?? 0) &&
+        (lat[2] ?? 0) > (cur[2] ?? 0));
+
+    if (isNewer) {
+      console.log(
+        `\n  Update available: ${PANGUARD_VERSION} \u2192 ${latest}` +
+          `\n  Run: pga upgrade\n`
+      );
+    }
+  } catch {
+    // Network failure — silently skip
+  }
+}
+
 async function main(): Promise<void> {
   // Show "what's new" on interactive use (not --json, not --help)
   const isJsonMode = userArgs.includes('--json');
   if (!hasHelpOrVersion && !isJsonMode) {
     await showWhatsNewIfUpgraded();
+    // Non-blocking update check (fire and forget on non-JSON interactive use)
+    void checkForUpdates();
   }
 
   if (!hasSubcommand && !hasHelpOrVersion) {

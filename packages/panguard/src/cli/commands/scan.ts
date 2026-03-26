@@ -136,6 +136,9 @@ export function scanCommand(): Command {
             ])
           );
 
+          console.log('');
+          console.log(c.dim('  Open source (MIT). Star us: https://github.com/panguard-ai/panguard-ai'));
+
           if (result.findings.length > 0) {
             console.log(divider(`${result.findings.length} Finding(s)`));
             console.log('');

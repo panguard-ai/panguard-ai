@@ -336,6 +336,12 @@ export class ThreatCloudServer {
             this.handleGetATRProposals(url, res);
           } else if (req.method === 'POST') {
             await this.handlePostATRProposal(req, res);
+          } else if (req.method === 'PATCH') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            await this.handlePatchATRProposal(req, res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -392,6 +398,25 @@ export class ThreatCloudServer {
             this.handleGetSkillWhitelist(res);
           } else if (req.method === 'POST') {
             await this.handlePostSkillWhitelist(req, res);
+          } else if (req.method === 'DELETE') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            await this.handleDeleteSkillWhitelist(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/skill-whitelist/all':
+          if (req.method === 'GET') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            const allEntries = this.db.getAllWhitelistEntries();
+            this.sendJson(res, 200, { ok: true, data: allEntries });
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -400,6 +425,18 @@ export class ThreatCloudServer {
         case '/api/skill-blacklist':
           if (req.method === 'GET') {
             this.handleGetSkillBlacklist(url, res);
+          } else if (req.method === 'POST') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            await this.handlePostSkillBlacklist(req, res);
+          } else if (req.method === 'DELETE') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            await this.handleDeleteSkillBlacklist(req, res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -939,6 +976,67 @@ response:
     res.setHeader('Cache-Control', 'public, max-age=1800, s-maxage=1800');
     const blacklist = this.db.getSkillBlacklist(minReports, minAvgRisk);
     this.sendJson(res, 200, { ok: true, data: blacklist });
+  }
+
+  /** PATCH /api/atr-proposals - Admin approve/reject a proposal */
+  private async handlePatchATRProposal(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readBody(req);
+    const data = JSON.parse(body);
+    const { patternHash, action } = data;
+
+    if (!patternHash || !action) {
+      this.sendJson(res, 400, { ok: false, error: 'patternHash and action required' });
+      return;
+    }
+
+    if (action === 'approve') {
+      const ok = this.db.approveATRProposal(patternHash);
+      this.sendJson(res, ok ? 200 : 404, { ok, data: { message: ok ? 'Proposal approved and promoted' : 'Proposal not found' } });
+    } else if (action === 'reject') {
+      this.db.rejectATRProposal(patternHash);
+      this.sendJson(res, 200, { ok: true, data: { message: 'Proposal rejected' } });
+    } else {
+      this.sendJson(res, 400, { ok: false, error: 'action must be approve or reject' });
+    }
+  }
+
+  /** DELETE /api/skill-whitelist - Admin remove a skill from whitelist */
+  private async handleDeleteSkillWhitelist(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readBody(req);
+    const data = JSON.parse(body);
+    const { skillName } = data;
+    if (!skillName) {
+      this.sendJson(res, 400, { ok: false, error: 'skillName required' });
+      return;
+    }
+    const ok = this.db.removeFromWhitelist(skillName);
+    this.sendJson(res, ok ? 200 : 404, { ok, data: { message: ok ? 'Removed from whitelist' : 'Not found' } });
+  }
+
+  /** POST /api/skill-blacklist - Admin add a skill to blacklist */
+  private async handlePostSkillBlacklist(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readBody(req);
+    const data = JSON.parse(body);
+    const { skillName, reason } = data;
+    if (!skillName) {
+      this.sendJson(res, 400, { ok: false, error: 'skillName required' });
+      return;
+    }
+    this.db.addToBlacklist(skillName, reason || 'Admin manual block');
+    this.sendJson(res, 201, { ok: true, data: { message: 'Added to blacklist' } });
+  }
+
+  /** DELETE /api/skill-blacklist - Admin remove a skill from blacklist */
+  private async handleDeleteSkillBlacklist(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readBody(req);
+    const data = JSON.parse(body);
+    const { skillHash } = data;
+    if (!skillHash) {
+      this.sendJson(res, 400, { ok: false, error: 'skillHash required' });
+      return;
+    }
+    const ok = this.db.removeFromBlacklist(skillHash);
+    this.sendJson(res, ok ? 200 : 404, { ok, data: { message: ok ? 'Removed from blacklist' : 'Not found' } });
   }
 
   /**

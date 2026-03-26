@@ -116,6 +116,7 @@ tr:hover td{background:var(--surface2)}
 </header>
 <nav id="tabs">
   <button class="active" data-tab="overview">Overview</button>
+  <button data-tab="usage">Usage</button>
   <button data-tab="rules">Rules</button>
   <button data-tab="threats">Threats</button>
   <button data-tab="proposals">ATR Proposals</button>
@@ -182,6 +183,7 @@ document.getElementById('tabs').addEventListener('click',e=>{
 function renderTab(tab){
   switch(tab){
     case 'overview':renderOverview();break;
+    case 'usage':renderUsage();break;
     case 'rules':renderRules();break;
     case 'threats':renderThreats();break;
     case 'proposals':renderProposals();break;
@@ -197,6 +199,15 @@ function api(path){
 }
 function apiText(path){
   return fetch(path,{headers:{Authorization:'Bearer '+API_KEY}}).then(r=>r.text());
+}
+function apiPost(path,body){
+  return fetch(path,{method:'POST',headers:{Authorization:'Bearer '+API_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+}
+function apiPatch(path,body){
+  return fetch(path,{method:'PATCH',headers:{Authorization:'Bearer '+API_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+}
+function apiDelete(path,body){
+  return fetch(path,{method:'DELETE',headers:{Authorization:'Bearer '+API_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
 }
 function $(s){return document.getElementById(s)||document.querySelector(s)}
 function h(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -269,6 +280,27 @@ function renderOverview(){
   html+='</div></div>';
   html+='</div>';
 
+  // Ecosystem metrics
+  api('/api/metrics').then(function(md){
+    if(!md||!md.data)return;
+    var m=md.data;
+    var eco='<div class="cards" style="margin-bottom:24px">';
+    eco+='<div class="card"><div class="label">Total Skills Scanned</div><div class="value blue">'+num(m.totalSkillsScanned||0)+'</div></div>';
+    eco+='<div class="card"><div class="label">Agents Protected</div><div class="value green">'+num(m.agentsProtected||0)+'</div></div>';
+    eco+='<div class="card"><div class="label">Total Threats Detected</div><div class="value red">'+num(m.totalThreatsDetected||0)+'</div></div>';
+    eco+='<div class="card"><div class="label">ATR Rules Active</div><div class="value">'+num(m.atrRulesActive||0)+'</div></div>';
+    if(m.sourceBreakdown){
+      eco+='<div class="card"><div class="label">Bulk Scans</div><div class="value">'+num(m.sourceBreakdown.bulk||0)+'</div></div>';
+      eco+='<div class="card"><div class="label">CLI Scans</div><div class="value">'+num(m.sourceBreakdown.cli||0)+'</div></div>';
+      eco+='<div class="card"><div class="label">Web Scans</div><div class="value">'+num(m.sourceBreakdown.web||0)+'</div></div>';
+    }
+    eco+='</div>';
+    var ecoTarget=document.getElementById('ecosystemInsert');
+    if(ecoTarget)ecoTarget.innerHTML=eco;
+  }).catch(function(){});
+
+  html+='<div id="ecosystemInsert"></div>';
+
   // MITRE + Attack Types
   html+='<div class="chart-row">';
   html+='<div class="chart-box"><h3>Top Attack Types</h3>';
@@ -282,6 +314,49 @@ function renderOverview(){
   html+='</div>';
 
   $('content').innerHTML=html;
+}
+
+// Usage
+function renderUsage(){
+  $('content').innerHTML='<div class="loading">Loading usage data...</div>';
+  api('/api/usage').then(function(d){
+    var u=d.data||d;
+    var html='<div class="cards">';
+    html+='<div class="card"><div class="label">Total Scans</div><div class="value blue">'+num(u.totalScans||0)+'</div></div>';
+    html+='<div class="card"><div class="label">Scans Today</div><div class="value green">'+num(u.scansToday||0)+'</div></div>';
+    html+='<div class="card"><div class="label">Scans This Week</div><div class="value orange">'+num(u.scansThisWeek||0)+'</div></div>';
+    html+='<div class="card"><div class="label">CLI Installs</div><div class="value">'+num(u.cliInstalls||0)+'</div></div>';
+    html+='</div>';
+
+    // Source breakdown bar chart
+    var sources=u.scansBySource||{};
+    var srcKeys=Object.keys(sources);
+    var maxSrc=Math.max.apply(null,srcKeys.map(function(k){return sources[k]||0}).concat([1]));
+    var srcColors={'website':'var(--blue)','cli-user':'var(--green)','bulk-pipeline':'var(--orange)'};
+    html+='<div class="chart-row">';
+    html+='<div class="chart-box"><h3>Scans by Source</h3><div class="bar-chart">';
+    srcKeys.forEach(function(k){
+      var pct=Math.round((sources[k]||0)/maxSrc*100);
+      var color=srcColors[k]||'var(--accent)';
+      html+='<div class="bar-item"><span class="bar-label">'+h(k)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+color+'">'+num(sources[k])+'</div></div></div>';
+    });
+    html+='</div></div>';
+
+    // 30-day daily trend
+    var trend=u.dailyTrend||[];
+    var maxDay=Math.max.apply(null,trend.map(function(t){return t.count||0}).concat([1]));
+    html+='<div class="chart-box"><h3>30-Day Daily Trend</h3><div class="bar-chart">';
+    trend.forEach(function(t){
+      var pct=Math.round((t.count||0)/maxDay*100);
+      html+='<div class="bar-item"><span class="bar-label">'+h(t.date)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:var(--accent)">'+num(t.count)+'</div></div></div>';
+    });
+    html+='</div></div>';
+    html+='</div>';
+
+    $('content').innerHTML=html;
+  }).catch(function(){
+    $('content').innerHTML='<div class="empty">Usage endpoint not available. Upgrade server to enable.</div>';
+  });
 }
 
 // Rules
@@ -388,15 +463,20 @@ function renderProposals(){
     let html='<div class="table-wrap"><div class="table-header"><h2>ATR Proposals ('+proposals.length+')</h2></div>';
     if(!proposals.length){html+='<div class="empty">No ATR proposals submitted yet. Proposals are auto-generated when Guard detects new threat patterns.</div>';}
     else{
-      html+='<table><tr><th>Pattern Hash</th><th>Status</th><th>Confirmations</th><th>LLM Verdict</th><th>Submitted</th></tr>';
-      proposals.forEach(p=>{
+      html+='<table><tr><th>Pattern Hash</th><th>Status</th><th>Confirmations</th><th>LLM Verdict</th><th>Submitted</th><th>Actions</th></tr>';
+      proposals.forEach(function(p,idx){
         const status=p.status||p.llm_verdict||'pending';
         const cls=status==='approved'?'low':status==='rejected'?'critical':'medium';
-        html+='<tr><td title="'+h(p.pattern_hash)+'">'+h((p.pattern_hash||'').slice(0,16))+'...</td>';
+        html+='<tr style="cursor:pointer" onclick="var el=document.getElementById(\\\'proposal-detail-'+idx+'\\\');el.style.display=el.style.display===\\\'none\\\'?\\\'table-row\\\':\\\'none\\\'">';
+        html+='<td title="'+h(p.pattern_hash)+'">'+h((p.pattern_hash||'').slice(0,16))+'...</td>';
         html+='<td>'+badge(status,cls)+'</td>';
         html+='<td>'+num(p.confirmation_count||0)+'</td>';
         html+='<td>'+(p.llm_verdict?badge(p.llm_verdict,p.llm_verdict==='approve'?'low':'critical'):'<span style="color:var(--dim)">pending</span>')+'</td>';
-        html+='<td>'+timeAgo(p.created_at)+'</td></tr>';
+        html+='<td>'+timeAgo(p.created_at)+'</td>';
+        html+='<td><button style="padding:4px 10px;background:var(--green);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;margin-right:4px" onclick="event.stopPropagation();approveProposal(\\\''+h(p.pattern_hash)+'\\\')">Approve</button>';
+        html+='<button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="event.stopPropagation();rejectProposal(\\\''+h(p.pattern_hash)+'\\\')">Reject</button></td>';
+        html+='</tr>';
+        html+='<tr id="proposal-detail-'+idx+'" style="display:none"><td colspan="6"><pre style="background:var(--bg);padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;white-space:pre-wrap;max-height:300px;overflow-y:auto">'+h(p.rule_content||p.ruleContent||p.pattern||'No rule content available')+'</pre></td></tr>';
       });
       html+='</table>';
     }
@@ -405,6 +485,12 @@ function renderProposals(){
   }).catch(()=>{
     $('content').innerHTML='<div class="empty">Cannot load proposals. Admin auth may be required for this endpoint.</div>';
   });
+}
+function approveProposal(hash){
+  apiPatch('/api/atr-proposals',{patternHash:hash,action:'approve'}).then(function(){renderProposals();}).catch(function(){alert('Failed to approve proposal');});
+}
+function rejectProposal(hash){
+  apiPatch('/api/atr-proposals',{patternHash:hash,action:'reject'}).then(function(){renderProposals();}).catch(function(){alert('Failed to reject proposal');});
 }
 
 // Skill Threats
@@ -439,16 +525,22 @@ function renderBlacklist(){
   api('/api/skill-blacklist').then(d=>{
     const list=d.data||[];
     let html='<div class="table-wrap"><div class="table-header"><h2>Community Blacklist ('+list.length+')</h2></div>';
+    html+='<div style="padding:16px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
+    html+='<input type="text" id="blSkillName" placeholder="Skill name" style="padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;flex:1;min-width:160px"/>';
+    html+='<input type="text" id="blReason" placeholder="Reason" style="padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;flex:1;min-width:160px"/>';
+    html+='<button onclick="addToBlacklist()" style="padding:6px 14px;background:var(--red);color:var(--bg);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Block</button>';
+    html+='</div>';
     if(!list.length){html+='<div class="empty">No blacklisted skills yet. Skills are blacklisted when 3+ distinct clients report avg risk >= 70.</div>';}
     else{
-      html+='<table><tr><th>Skill Name</th><th>Avg Risk</th><th>Max Level</th><th>Reports</th><th>First Seen</th><th>Last Seen</th></tr>';
+      html+='<table><tr><th>Skill Name</th><th>Avg Risk</th><th>Max Level</th><th>Reports</th><th>First Seen</th><th>Last Seen</th><th>Actions</th></tr>';
       list.forEach(s=>{
         html+='<tr><td>'+h(s.skillName)+'</td>';
         html+='<td>'+num(s.avgRiskScore)+'</td>';
         html+='<td>'+severityBadge(s.maxRiskLevel)+'</td>';
         html+='<td>'+num(s.reportCount)+'</td>';
         html+='<td>'+timeAgo(s.firstReported)+'</td>';
-        html+='<td>'+timeAgo(s.lastReported)+'</td></tr>';
+        html+='<td>'+timeAgo(s.lastReported)+'</td>';
+        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="removeFromBlacklist(\\\''+h(s.skillHash||s.skill_hash||'')+'\\\')">&times; Remove</button></td></tr>';
       });
       html+='</table>';
     }
@@ -457,12 +549,23 @@ function renderBlacklist(){
   });
 }
 
+function addToBlacklist(){
+  var name=(document.getElementById('blSkillName')||{}).value||'';
+  var reason=(document.getElementById('blReason')||{}).value||'';
+  if(!name.trim()){alert('Skill name is required');return;}
+  apiPost('/api/skill-blacklist',{skillName:name.trim(),reason:reason.trim()}).then(function(){renderBlacklist();}).catch(function(){alert('Failed to add to blacklist');});
+}
+function removeFromBlacklist(hash){
+  if(!confirm('Remove this skill from the blacklist?'))return;
+  apiDelete('/api/skill-blacklist',{skillHash:hash}).then(function(){renderBlacklist();}).catch(function(){alert('Failed to remove from blacklist');});
+}
+
 // Feeds
 function renderFeeds(){
   Promise.all([
     apiText('/api/feeds/ip-blocklist'),
     apiText('/api/feeds/domain-blocklist'),
-    api('/api/skill-whitelist')
+    api('/api/skill-whitelist/all')
   ]).then(([ips,domains,wl])=>{
     const ipList=(ips||'').trim().split('\\n').filter(Boolean);
     const domList=(domains||'').trim().split('\\n').filter(Boolean);
@@ -488,13 +591,19 @@ function renderFeeds(){
 
     // Skill Whitelist
     html+='<div class="table-wrap"><div class="table-header"><h2>Community Skill Whitelist ('+whiteList.length+')</h2></div>';
+    html+='<div style="padding:16px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
+    html+='<input type="text" id="wlSkillName" placeholder="Skill name to whitelist" style="padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;flex:1;min-width:200px"/>';
+    html+='<button onclick="addToWhitelist()" style="padding:6px 14px;background:var(--green);color:var(--bg);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Add</button>';
+    html+='</div>';
     if(!whiteList.length){html+='<div class="empty">No whitelisted skills yet.</div>';}
     else{
-      html+='<table><tr><th>Skill Name</th><th>Reports</th><th>Fingerprint</th></tr>';
+      html+='<table><tr><th>Skill Name</th><th>Reports</th><th>Fingerprint</th><th>Actions</th></tr>';
       whiteList.forEach(s=>{
-        html+='<tr><td>'+h(s.skill_name||s.skillName)+'</td>';
+        var sName=s.skill_name||s.skillName||'';
+        html+='<tr><td>'+h(sName)+'</td>';
         html+='<td>'+num(s.report_count||s.reportCount||0)+'</td>';
-        html+='<td title="'+h(s.fingerprint_hash||'')+'">'+h((s.fingerprint_hash||'-').slice(0,16))+'</td></tr>';
+        html+='<td title="'+h(s.fingerprint_hash||'')+'">'+h((s.fingerprint_hash||'-').slice(0,16))+'</td>';
+        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="removeFromWhitelist(\\\''+h(sName)+'\\\')">&times; Remove</button></td></tr>';
       });
       html+='</table>';
     }
@@ -502,6 +611,16 @@ function renderFeeds(){
 
     $('content').innerHTML=html;
   });
+}
+
+function addToWhitelist(){
+  var name=(document.getElementById('wlSkillName')||{}).value||'';
+  if(!name.trim()){alert('Skill name is required');return;}
+  apiPost('/api/skill-whitelist',{skillName:name.trim()}).then(function(){renderFeeds();}).catch(function(){alert('Failed to add to whitelist');});
+}
+function removeFromWhitelist(name){
+  if(!confirm('Remove "'+name+'" from the whitelist?'))return;
+  apiDelete('/api/skill-whitelist',{skillName:name}).then(function(){renderFeeds();}).catch(function(){alert('Failed to remove from whitelist');});
 }
 
 // Audit Log

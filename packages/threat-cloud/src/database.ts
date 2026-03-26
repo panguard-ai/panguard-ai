@@ -8,7 +8,7 @@
  */
 
 import Database from 'better-sqlite3';
-import { createHmac } from 'node:crypto';
+import { createHmac, createHash } from 'node:crypto';
 import type {
   AnonymizedThreatData,
   ThreatCloudRule,
@@ -943,6 +943,71 @@ export class ThreatCloudDB {
     `
       )
       .run(patternHash);
+  }
+
+  /** Admin: manually approve an ATR proposal and promote to rule */
+  approveATRProposal(patternHash: string): boolean {
+    const proposal = this.db
+      .prepare('SELECT pattern_hash, rule_content FROM atr_proposals WHERE pattern_hash = ? LIMIT 1')
+      .get(patternHash) as { pattern_hash: string; rule_content: string } | undefined;
+    if (!proposal) return false;
+
+    // Update proposal status
+    this.db.prepare(`
+      UPDATE atr_proposals SET status = 'approved', llm_review_verdict = 'admin-approved', updated_at = datetime('now')
+      WHERE pattern_hash = ?
+    `).run(patternHash);
+
+    // Insert as confirmed rule
+    const ruleId = `ATR-2026-DRAFT-${patternHash.slice(0, 8)}`;
+    try {
+      this.db.prepare(`
+        INSERT OR IGNORE INTO rules (rule_id, rule_content, source, category, severity)
+        VALUES (?, ?, 'atr-community', 'skill-compromise', 'high')
+      `).run(ruleId, proposal.rule_content);
+    } catch {
+      // Rule may already exist
+    }
+    return true;
+  }
+
+  /** Admin: remove a skill from whitelist */
+  removeFromWhitelist(skillName: string): boolean {
+    const normalized = skillName.toLowerCase().trim().replace(/\s+/g, '-');
+    const result = this.db.prepare(`
+      DELETE FROM skill_whitelist WHERE normalized_name = ?
+    `).run(normalized);
+    return result.changes > 0;
+  }
+
+  /** Admin: manually add a skill to blacklist via skill_threats */
+  addToBlacklist(skillName: string, reason: string): void {
+    const hash = createHash('sha256').update(skillName).digest('hex').slice(0, 16);
+    // Insert 3 threat reports to trigger blacklist threshold
+    for (let i = 0; i < 3; i++) {
+      this.db.prepare(`
+        INSERT INTO skill_threats (skill_hash, skill_name, risk_score, risk_level, findings_summary, client_id)
+        VALUES (?, ?, 100, 'CRITICAL', ?, ?)
+      `).run(hash, skillName, reason, `admin-${i}`);
+    }
+  }
+
+  /** Admin: remove a skill from blacklist by clearing its threat reports */
+  removeFromBlacklist(skillHash: string): boolean {
+    const result = this.db.prepare(`
+      DELETE FROM skill_threats WHERE skill_hash = ?
+    `).run(skillHash);
+    return result.changes > 0;
+  }
+
+  /** Get all whitelist entries (including unconfirmed, for admin) */
+  getAllWhitelistEntries(): unknown[] {
+    return this.db.prepare(`
+      SELECT skill_name, normalized_name, fingerprint_hash, confirmations, status,
+             created_at, last_reported
+      FROM skill_whitelist
+      ORDER BY created_at DESC
+    `).all();
   }
 
   /** Get rules by source type, optionally filtered by date / 依來源取得規則 */
