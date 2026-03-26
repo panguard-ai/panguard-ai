@@ -24,8 +24,7 @@ import { statusCommand } from './commands/status.js';
 import { loginCommand } from './commands/login.js';
 import { logoutCommand } from './commands/logout.js';
 import { whoamiCommand } from './commands/whoami.js';
-// Lazy-loaded: these depend on optional packages (manager, panguard-auth)
-// that may not be installed. Using lazy Command wrappers prevents startup crash.
+// Lazy-loaded: these depend on optional packages that may not be installed.
 function lazyCommand(
   name: string,
   desc: string,
@@ -42,41 +41,18 @@ function lazyCommand(
         await realCmd.parseAsync(process.argv);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        if (msg.includes('Cannot find package')) {
-          console.error(`  This command requires optional dependencies. Install them with:`);
-          console.error(`  npm install @panguard-ai/manager @panguard-ai/panguard-auth`);
-        } else {
-          console.error(`  Error: ${msg}`);
-        }
+        console.error(`  Error: ${msg}`);
         process.exitCode = 1;
       }
     });
     return cmd;
   };
 }
-const serveCommand = lazyCommand(
-  'serve',
-  'Start unified HTTP server',
-  './commands/serve.js',
-  'serveCommand'
-);
-const adminCommand = lazyCommand(
-  'admin',
-  'Admin management',
-  './commands/admin.js',
-  'adminCommand'
-);
 const hardeningCommand = lazyCommand(
   'hardening',
   'Security hardening',
   './commands/hardening.js',
   'hardeningCommand'
-);
-const managerCommand = lazyCommand(
-  'manager',
-  'Distributed guard management',
-  './commands/manager.js',
-  'managerCommand'
 );
 import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
@@ -121,10 +97,7 @@ program.addCommand(deployCommand(), hidden);
 program.addCommand(loginCommand(), hidden);
 program.addCommand(logoutCommand(), hidden);
 program.addCommand(whoamiCommand(), hidden);
-program.addCommand(serveCommand(), hidden);
-program.addCommand(adminCommand(), hidden);
 program.addCommand(hardeningCommand(), hidden);
-program.addCommand(managerCommand(), hidden);
 program.addCommand(hacktivityCommand(), hidden);
 
 const userArgs = process.argv.slice(2);
