@@ -515,6 +515,20 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/admin/reseed':
+          if (req.method === 'POST') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            const seeded = this.seedFromBundled();
+            log.info(`Admin reseed: ${seeded} rules upserted from bundled config`);
+            this.sendJson(res, 200, { ok: true, data: { seeded, message: `${seeded} rules upserted (new + updated)` } });
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         default:
           this.sendJson(res, 404, { ok: false, error: 'Not found' });
       }
