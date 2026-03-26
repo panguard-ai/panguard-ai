@@ -66,12 +66,17 @@ export function calculateRiskScore(
   // Distinguish "real" critical findings from "hidden in markup" ones.
   // Markup-only criticals are likely formatting artifacts (SVG, code blocks, HTML examples).
   // Only non-markup criticals should be able to push risk level to CRITICAL.
-  const hasRealCritical = allFindings.some(
+  const realCriticals = allFindings.filter(
     (f) => f.severity === 'critical' && !f.title.includes('(hidden in markup)')
   );
+  const hasRealCritical = realCriticals.length > 0;
   const hasRealHigh = allFindings.some(
     (f) => f.severity === 'high' && !f.title.includes('(hidden in markup)')
   );
+
+  // Single real critical from description-level pattern (not code/command) is weak evidence.
+  // Require 2+ real criticals, or 1 real critical + real high, for CRITICAL level.
+  const strongCriticalEvidence = realCriticals.length >= 2 || (realCriticals.length === 1 && hasRealHigh);
 
   // Critical-override behavior depends on context:
   // - Normal context (multiplier >= 0.6): critical finding forces at least HIGH
@@ -80,8 +85,8 @@ export function calculateRiskScore(
 
   let level: RiskLevel;
   if (
-    (score >= 70 && hasRealCritical) ||
-    (hasRealCritical && !weakenedCriticalOverride && score >= 40)
+    (score >= 70 && strongCriticalEvidence) ||
+    (strongCriticalEvidence && !weakenedCriticalOverride && score >= 40)
   ) {
     level = 'CRITICAL';
   } else if (
