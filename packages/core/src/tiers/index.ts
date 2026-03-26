@@ -1,44 +1,19 @@
-/**
- * Centralized tier definitions for the Panguard AI platform.
- * All packages should import tier types and constants from here.
- *
- * @module @panguard-ai/core/tiers
- */
+/* Tier definitions — community-only (enterprise tiers in private repo) */
 
-/** Subscription tier levels */
-export type Tier = 'community' | 'solo' | 'pro' | 'business' | 'enterprise';
+export type Tier = 'community';
 
-/** All valid tiers as a const tuple (useful for validation) */
-export const TIERS = ['community', 'solo', 'pro', 'business', 'enterprise'] as const;
+export const TIERS: readonly Tier[] = ['community'] as const;
 
-/** Numeric tier hierarchy for access control comparisons */
-export const TIER_LEVEL: Record<Tier, number> = {
+export const TIER_LEVEL: Record<string, number> = {
   community: 0,
-  solo: 1,
-  pro: 2,
-  business: 3,
-  enterprise: 5,
 };
 
-/** Maps CLI feature names to their minimum required tier */
-export const FEATURE_TIER: Readonly<Record<string, Tier>> = {
-  setup: 'community',
-  scan: 'community',
-  guard: 'community',
-  'threat-cloud': 'community',
-  demo: 'community',
-  notifications: 'community',
-  notify: 'community',
-  trap: 'community',
-  report: 'community',
-};
+export const FEATURE_TIER: Record<string, Tier> = {};
 
-/** Check if current tier meets or exceeds the required tier */
-export function isTierAtLeast(current: Tier, required: Tier): boolean {
-  return TIER_LEVEL[current] >= TIER_LEVEL[required];
+export function isTierAtLeast(current: string, required: string): boolean {
+  return (TIER_LEVEL[current] ?? 0) >= (TIER_LEVEL[required] ?? 0);
 }
 
-/** Type guard: check if a string is a valid Tier */
-export function isValidTier(value: string): value is Tier {
-  return (TIERS as readonly string[]).includes(value);
+export function isValidTier(tier: string): tier is Tier {
+  return tier === 'community';
 }
