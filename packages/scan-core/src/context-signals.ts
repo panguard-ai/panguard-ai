@@ -63,6 +63,19 @@ const TOOL_DEFINITION_LIST_RE = /^[-*]\s+\w[\w-]*\s*:\s+.+$/m;
 const SECURITY_MEASURES_RE =
   /\b(only\s+SELECT|read[\s-]only|validated|sandboxed|restricted|allowed\s+directories|allow[\s-]?list|deny[\s-]?list|rate[\s-]?limit|no\s+write|no\s+delete|immutable|whitelisted|blocklist)\b/i;
 
+// Defensive/educational text: content teaches security defense, NOT attacks.
+// These patterns indicate the SKILL.md is instructing the agent to DETECT or
+// PREVENT threats, not to execute them. A high density of these phrases means
+// the skill is a security tool or educational resource.
+const DEFENSIVE_PHRASES = [
+  /\b(never\s+execute|do\s+not\s+(execute|run|follow)|don[''\u2019]?t\s+(execute|run|follow|trust))\b/i,
+  /\b(protect\s+against|defend\s+against|prevent|detect|monitor\s+for|watch\s+for|look\s+for|scan\s+for|check\s+for|guard\s+against)\b/i,
+  /\b(attack\s+surface|threat\s+(model|vector|detection)|security\s+(audit|review|hardening|check|scan|assessment))\b/i,
+  /\b(red\s+flag|suspicious\s+pattern|malicious\s+(content|input|instruction)|prompt\s+injection|jailbreak)\b/i,
+  /\b(data\s+exfiltration|credential\s+(theft|leak|exposure)|unauthorized\s+access)\b/i,
+  /\b(responsible\s+disclosure|security\s+best\s+practice|safety\s+guideline|trust\s+boundar)/i,
+];
+
 // Well-known CLI tools that legitimately need shell access
 const KNOWN_CLI_BINS_RE =
   /^(bash|sh|zsh|curl|wget|git|gh|jq|grep|sed|awk|find|rsync|scp|make|npm|npx|pnpm|yarn|pip|python|node|go|cargo|docker|kubectl|terraform|aws|gcloud|az|ffmpeg|convert|osascript|pbcopy|pbpaste|open|xdg-open)$/i;
@@ -313,6 +326,28 @@ export function detectContextSignals(
       type: 'reducer',
       label: 'Content declares security measures or access restrictions',
       weight: -0.3,
+    });
+  }
+
+  // Defensive/educational text: high density of security-defense language
+  // means the skill is TEACHING about threats, not carrying them.
+  // Count how many defensive phrase categories match.
+  const defensiveHits = DEFENSIVE_PHRASES.filter((re) => re.test(prose)).length;
+  if (defensiveHits >= 4) {
+    // 4+ categories = clearly a security/educational skill
+    signals.push({
+      id: 'reduce-defensive-text-strong',
+      type: 'reducer',
+      label: `Security-defense educational content (${defensiveHits}/6 categories)`,
+      weight: -0.7,
+    });
+  } else if (defensiveHits >= 2) {
+    // 2-3 categories = some defensive language
+    signals.push({
+      id: 'reduce-defensive-text',
+      type: 'reducer',
+      label: `Contains security-defense language (${defensiveHits}/6 categories)`,
+      weight: -0.4,
     });
   }
 
