@@ -638,7 +638,7 @@ export class ThreatCloudDB {
     dailyTrend: Array<{ date: string; count: number }>;
   } {
     const totalScans = (this.db.prepare(
-      "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'scan'"
+      "SELECT COUNT(*) as count FROM usage_events WHERE event_type IN ('scan', 'cli_scan')"
     ).get() as { count: number }).count;
 
     const scansToday = (this.db.prepare(
@@ -986,7 +986,7 @@ export class ThreatCloudDB {
     // Insert 3 threat reports to trigger blacklist threshold
     for (let i = 0; i < 3; i++) {
       this.db.prepare(`
-        INSERT INTO skill_threats (skill_hash, skill_name, risk_score, risk_level, findings_summary, client_id)
+        INSERT INTO skill_threats (skill_hash, skill_name, risk_score, risk_level, finding_summaries, client_id)
         VALUES (?, ?, 100, 'CRITICAL', ?, ?)
       `).run(hash, skillName, reason, `admin-${i}`);
     }
@@ -1004,9 +1004,9 @@ export class ThreatCloudDB {
   getAllWhitelistEntries(): unknown[] {
     return this.db.prepare(`
       SELECT skill_name, normalized_name, fingerprint_hash, confirmations, status,
-             created_at, last_reported
+             first_reported, last_reported
       FROM skill_whitelist
-      ORDER BY created_at DESC
+      ORDER BY first_reported DESC
     `).all();
   }
 
