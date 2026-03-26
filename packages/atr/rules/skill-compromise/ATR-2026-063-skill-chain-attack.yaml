@@ -43,7 +43,8 @@ detection:
   conditions:
     - field: tool_args
       operator: regex
-      value: "(?i)(/etc/passwd|/etc/shadow|\\.env|credentials|secrets?\\.json|private[_-]?key|id_rsa|kubeconfig|\\.aws/)"
+      value: "(?i)(/etc/passwd|/etc/shadow|(?<![a-z])\\.(env|aws/credentials)|secrets?\\.json|private[_-]?key|id_rsa|kubeconfig)"
+      description: "Sensitive file/credential access patterns (path-specific, not bare word 'credentials')"
     - field: tool_args
       operator: regex
       value: "(?i)(base64|btoa|encodeURI|hex\\.encode|rot13|xor|compress|gzip|deflate|encrypt)"
