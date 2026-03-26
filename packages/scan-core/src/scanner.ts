@@ -64,6 +64,9 @@ export function scanContent(content: string, options: ScanOptions = {}): ScanRes
   const ctx = detectContextSignals(content, manifest);
   const hasStrongReducers = ctx.multiplier < 0.7;
   const allReducers = ctx.signals.every((s) => s.type === 'reducer');
+  const hasDefensiveText = ctx.signals.some(
+    (s) => s.id === 'reduce-defensive-text-strong' || s.id === 'reduce-defensive-text'
+  );
 
   // -- ATR pattern detection --
   const atrRules: readonly CompiledRule[] = options.atrRules ?? [];
@@ -74,6 +77,7 @@ export function scanContent(content: string, options: ScanOptions = {}): ScanRes
       isReadme,
       hasStrongReducers,
       allReducers,
+      hasDefensiveText,
     });
     findings.push(...atrResult.findings);
     checks.push(atrResult.check);

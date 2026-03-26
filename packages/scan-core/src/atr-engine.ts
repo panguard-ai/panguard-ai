@@ -102,6 +102,8 @@ export interface ATRScanOptions {
   readonly hasStrongReducers?: boolean;
   /** True if ALL context signals are reducers (no boosters at all) */
   readonly allReducers?: boolean;
+  /** True if content has high density of defensive/educational security language */
+  readonly hasDefensiveText?: boolean;
 }
 
 /**
@@ -119,7 +121,7 @@ export function scanWithATR(
   check: CheckResult;
   matchedCount: number;
 } {
-  const { isReadme = false, hasStrongReducers = false, allReducers = false } = options;
+  const { isReadme = false, hasStrongReducers = false, allReducers = false, hasDefensiveText = false } = options;
   const findings: Finding[] = [];
   const matchedRuleIds = new Set<string>();
   const strippedContent = stripMarkdownNoise(content);
@@ -159,9 +161,19 @@ export function scanWithATR(
             if (allReducers && !isReadme) {
               severity = downgradeSeverity(severity);
             }
+            // Defensive/educational text: skill teaches about threats, not carrying them
+            // Double downgrade critical→low for visible text in defensive content
+            if (hasDefensiveText) {
+              severity = downgradeSeverity(severity);
+              severity = downgradeSeverity(severity);
+            }
           }
           // Only raw matched: hidden in markup
           if (!matchesStripped && matchesRaw && hasStrongReducers && allReducers) {
+            severity = downgradeSeverity(severity);
+          }
+          // Hidden markup in defensive text: still downgrade once
+          if (!matchesStripped && matchesRaw && hasDefensiveText) {
             severity = downgradeSeverity(severity);
           }
 
