@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import JsonLdBreadcrumb from '@/components/seo/JsonLdBreadcrumb';
+import BilingualArticle from '@/components/blog/BilingualArticle';
 import { getAllPosts } from '@/lib/blog-store';
 import { notFound } from 'next/navigation';
 
@@ -70,11 +71,17 @@ export default async function BlogPostPage(props: {
   const params = await props.params;
   const t = await getTranslations({ locale: params.locale, namespace: 'blogPost' });
   const allPosts = await getAllPosts();
-  const post = allPosts.find((p) => p.slug === params.slug);
 
+  // If user hits a -zh slug directly, redirect to the EN slug (ZH content is shown via toggle)
+  const isZhSlug = params.slug.endsWith('-zh');
+  const baseSlug = isZhSlug ? params.slug.replace(/-zh$/, '') : params.slug;
+
+  const post = allPosts.find((p) => p.slug === baseSlug) ?? allPosts.find((p) => p.slug === params.slug);
   if (!post) {
     notFound();
   }
+
+  const zhPost = allPosts.find((p) => p.slug === `${post.slug}-zh`) ?? null;
 
   const nonce = await getNonce();
 
@@ -173,59 +180,11 @@ export default async function BlogPostPage(props: {
             {/* ───────────── Article Content or Coming Soon ───────────── */}
             {post.content ? (
               <FadeInUp delay={0.2}>
-                <div className="mt-8 prose-panguard space-y-5">
-                  {post.content.map((block, i) => {
-                    if (block.startsWith('## ')) {
-                      return (
-                        <h2 key={i} className="text-xl font-bold text-text-primary mt-12 mb-6">
-                          {block.replace('## ', '')}
-                        </h2>
-                      );
-                    }
-                    if (block.startsWith('**') && block.includes('.**')) {
-                      const parts = block.match(/^\*\*(.+?)\.\*\*\s*(.*)$/);
-                      if (parts) {
-                        return (
-                          <p key={i} className="text-text-primary/75 leading-relaxed">
-                            <strong className="text-text-primary">{parts[1]}.</strong> {parts[2]}
-                          </p>
-                        );
-                      }
-                    }
-                    if (block.startsWith('```')) {
-                      const code = block.replace(/^```\n?/, '').replace(/\n?```$/, '');
-                      return (
-                        <pre
-                          key={i}
-                          className="bg-surface-1 border border-border rounded-xl p-5 my-2 overflow-x-auto"
-                        >
-                          <code className="text-sm text-text-secondary font-mono">{code}</code>
-                        </pre>
-                      );
-                    }
-                    if (block.startsWith('- ')) {
-                      const items = block.split('\n').filter((line) => line.startsWith('- '));
-                      return (
-                        <ul key={i} className="space-y-2 pl-1">
-                          {items.map((item, j) => (
-                            <li
-                              key={j}
-                              className="flex items-start gap-2.5 text-text-secondary leading-relaxed"
-                            >
-                              <span className="text-brand-sage mt-1.5 shrink-0">{'\u2022'}</span>
-                              <span>{item.replace(/^- /, '')}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      );
-                    }
-                    return (
-                      <p key={i} className="text-text-primary/75 leading-relaxed">
-                        {block}
-                      </p>
-                    );
-                  })}
-                </div>
+                <BilingualArticle
+                  enPost={post}
+                  zhPost={zhPost}
+                  defaultLang={params.locale === 'zh-TW' || isZhSlug ? 'zh' : 'en'}
+                />
               </FadeInUp>
             ) : (
               <FadeInUp delay={0.2}>
