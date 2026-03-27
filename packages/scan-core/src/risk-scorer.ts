@@ -74,20 +74,13 @@ export function calculateRiskScore(
     (f) => f.severity === 'high' && !f.title.includes('(hidden in markup)')
   );
 
-  // Single real critical from description-level pattern (not code/command) is weak evidence.
-  // Require 2+ real criticals, or 1 real critical + real high, for CRITICAL level.
-  const strongCriticalEvidence = realCriticals.length >= 2 || (realCriticals.length === 1 && hasRealHigh);
-
   // Critical-override behavior depends on context:
-  // - Normal context (multiplier >= 0.6): critical finding forces at least HIGH
+  // - Normal context (multiplier >= 0.6): critical finding forces CRITICAL
   // - Strong legitimate context (multiplier < 0.6): critical finding forces MEDIUM only
   const weakenedCriticalOverride = contextMultiplier < 0.6;
 
   let level: RiskLevel;
-  if (
-    (score >= 70 && strongCriticalEvidence) ||
-    (strongCriticalEvidence && !weakenedCriticalOverride && score >= 40)
-  ) {
+  if (score >= 70 || (hasRealCritical && !weakenedCriticalOverride)) {
     level = 'CRITICAL';
   } else if (
     score >= 40 ||

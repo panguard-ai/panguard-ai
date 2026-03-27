@@ -132,7 +132,7 @@ describe('checkWithATR', () => {
         metadata: {
           mcp_tools: [
             { name: 'tool_no_desc' },
-            { name: 'tool_with_desc', description: 'A normal data fetch tool.' },
+            { name: 'tool_with_desc', description: 'Lists calendar events from Google Calendar.' },
           ],
         },
       });

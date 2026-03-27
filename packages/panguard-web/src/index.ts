@@ -40,8 +40,16 @@ export type {
 } from './types.js';
 export { DEFAULT_WEB_CONFIG } from './types.js';
 
-// Content - Personas
-export { PERSONAS, getPersona, getAllPersonas } from './content/index.js';
+// Content - Personas + Pricing
+export {
+  PERSONAS,
+  getPersona,
+  getAllPersonas,
+  PRICING_PLANS,
+  getAllPricingPlans,
+  getPricingPlan,
+  getRecommendedPlan,
+} from './content/index.js';
 
 // Pages
 export {

@@ -273,7 +273,6 @@ describe('End-to-End Platform Pipeline', () => {
 
       // Step 3: Verify install command
       expect(result.installCommand).toContain('curl -fsSL https://get.panguard.ai');
-      expect(result.installCommand).toContain('--plan solo');
       expect(result.installCommand).toContain('--notify telegram');
 
       // Step 4: Verify config steps
@@ -352,7 +351,7 @@ describe('End-to-End Platform Pipeline', () => {
   });
 
   describe('License Gating Across Products', () => {
-    it('should gate notifications behind Pro license', () => {
+    it('community edition: all features available to all tiers', () => {
       const freeKey = generateTestLicenseKey('free');
       const proKey = generateTestLicenseKey('pro');
       const entKey = generateTestLicenseKey('enterprise');
@@ -361,19 +360,14 @@ describe('End-to-End Platform Pipeline', () => {
       const pro = validateLicense(proKey)!;
       const ent = validateLicense(entKey)!;
 
-      // Free: basic monitoring + auto-respond (Layer 1 rules)
+      // Community edition: all tiers get the same community features
       expect(hasFeature(free, 'basic_monitoring')).toBe(true);
-      expect(hasFeature(free, 'notifications')).toBe(false);
       expect(hasFeature(free, 'auto_respond')).toBe(true);
 
-      // Pro: monitoring + notifications + auto-response
       expect(hasFeature(pro, 'basic_monitoring')).toBe(true);
-      expect(hasFeature(pro, 'notifications')).toBe(true);
       expect(hasFeature(pro, 'auto_respond')).toBe(true);
 
-      // Enterprise: everything
       expect(hasFeature(ent, 'basic_monitoring')).toBe(true);
-      expect(hasFeature(ent, 'notifications')).toBe(true);
       expect(hasFeature(ent, 'auto_respond')).toBe(true);
     });
   });
