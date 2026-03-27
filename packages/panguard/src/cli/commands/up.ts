@@ -12,6 +12,8 @@ import { Command } from 'commander';
 import { runCLI } from '@panguard-ai/panguard-guard';
 import { c, symbols, setLogLevel } from '@panguard-ai/core';
 
+const TC_ENDPOINT = 'https://tc.panguard.ai';
+
 const DASHBOARD_URL = 'http://127.0.0.1:3100';
 
 function openBrowser(url: string): void {
@@ -152,6 +154,11 @@ export function upCommand(): Command {
                         riskScore: report.riskScore,
                       });
                     }
+
+                    // ── Flywheel: submit scan results to TC ──
+                    if (report.riskScore > 0) {
+                      submitToTC(skill.name, skillDir, report).catch(() => {});
+                    }
                   } catch {
                     // Skip skills that can't be audited
                   }
@@ -202,4 +209,107 @@ export function upCommand(): Command {
 
       await runCLI(args);
     });
+}
+
+/** Best-effort submit scan results to Threat Cloud for the flywheel */
+async function submitToTC(
+  skillName: string,
+  skillDir: string,
+  report: { riskScore: number; riskLevel: string; findings: ReadonlyArray<{ id: string; category: string; severity: string; title: string }> }
+): Promise<void> {
+  const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
+  const { contentHash, patternHash } = await import('@panguard-ai/scan-core');
+  const { readFileSync: rf, existsSync: fe } = await import('node:fs');
+
+  const dataDir = join(homedir(), '.panguard-guard');
+  const tc = new ThreatCloudClient(TC_ENDPOINT, dataDir);
+
+  // 1. Submit skill threat
+  const skillMdPath = join(skillDir, 'SKILL.md');
+  const skillHash = fe(skillMdPath) ? contentHash(rf(skillMdPath, 'utf-8')) : contentHash(skillDir);
+
+  await tc.submitSkillThreat({
+    skillHash,
+    skillName,
+    riskScore: report.riskScore,
+    riskLevel: report.riskLevel as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
+    findingSummaries: report.findings.slice(0, 10).map((f) => ({
+      id: f.id,
+      category: f.category,
+      severity: f.severity,
+      title: f.title,
+    })),
+  });
+
+  // 2. Submit ATR proposal for HIGH/CRITICAL
+  if (
+    (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
+    report.findings.length > 0
+  ) {
+    const highFindings = report.findings
+      .filter((f) => f.severity === 'critical' || f.severity === 'high')
+      .slice(0, 5);
+    const findingSummary = highFindings.map((f) => f.title).join('; ');
+    const pHash = patternHash(skillName, findingSummary);
+    const severity = report.riskLevel === 'CRITICAL' ? 'critical' : 'high';
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
+
+    const conditions = highFindings
+      .map((f, idx) => {
+        const keywords = f.title.split(/\s+/).filter((w) => w.length > 4).slice(0, 4);
+        if (keywords.length === 0) return null;
+        const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
+        return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${f.title.slice(0, 80)}"`;
+      })
+      .filter(Boolean);
+
+    if (conditions.length > 0) {
+      const ruleContent = `title: "CLI Audit: ${highFindings[0]?.title.slice(0, 60) ?? skillName}"
+id: ATR-2026-DRAFT-${pHash.slice(0, 8)}
+status: draft
+description: |
+  Auto-generated from pga up scan of "${skillName}".
+  Findings: ${findingSummary.slice(0, 200)}
+author: "PanGuard CLI (pga up)"
+date: "${date}"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: experimental
+severity: ${severity}
+tags:
+  category: skill-compromise
+  subcategory: cli-scan
+  confidence: medium
+detection:
+  conditions:
+${conditions.join('\n')}
+  condition: any
+response:
+  actions: [alert, snapshot]`;
+
+      await tc.submitATRProposal({
+        patternHash: pHash,
+        ruleContent,
+        llmProvider: 'cli-auditor',
+        llmModel: 'pga-up-scan',
+        selfReviewVerdict: JSON.stringify({
+          approved: true,
+          source: 'pga-up',
+          skillName,
+          riskLevel: report.riskLevel,
+          findingCount: highFindings.length,
+        }),
+      });
+    }
+  }
+
+  // 3. Report scan event for metrics
+  void tc.reportScanEvent({
+    source: 'cli-user',
+    skillsScanned: 1,
+    findingsCount: report.findings.length,
+    confirmedMalicious: report.riskLevel === 'CRITICAL' ? 1 : 0,
+    highlySuspicious: report.riskLevel === 'HIGH' ? 1 : 0,
+    cleanCount: report.riskLevel === 'LOW' || report.riskScore === 0 ? 1 : 0,
+  });
 }
