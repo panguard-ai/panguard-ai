@@ -212,7 +212,7 @@ export default async function BlogPostPage(props: {
                               key={j}
                               className="flex items-start gap-2.5 text-text-secondary leading-relaxed"
                             >
-                              <span className="text-brand-sage mt-1.5 shrink-0">--</span>
+                              <span className="text-brand-sage mt-1.5 shrink-0">{'\u2022'}</span>
                               <span>{item.replace(/^- /, '')}</span>
                             </li>
                           ))}
