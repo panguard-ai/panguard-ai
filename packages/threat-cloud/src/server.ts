@@ -16,6 +16,7 @@
  * - GET  /api/skill-blacklist        Community skill blacklist (aggregated threats)
  * - POST /api/analyze-skills         Submit scan results for server-side LLM analysis
  * - GET  /api/audit-log             Admin audit log (paginated, admin-only)
+ * - POST /api/telemetry              Record anonymous telemetry event from CLI
  * - POST /api/scan-events           Report scan event from any source (bulk/CLI/web)
  * - GET  /api/metrics               Aggregated metrics across all sources (public, cached 60s)
  * - GET  /api/badge/:author/:skill   ATR Scanned SVG badge for a skill
@@ -169,11 +170,20 @@ export class ThreatCloudServer {
           }
         }, ThreatCloudServer.PROMOTION_INTERVAL_MS);
 
-        // Rate limiter cleanup (every 60s, purge expired entries)
+        // Rate limiter cleanup (every 60s, purge expired entries) + telemetry aggregation
         this.rateLimitCleanupTimer = setInterval(() => {
           const now = Date.now();
           for (const [ip, entry] of this.rateLimits) {
             if (now > entry.resetAt) this.rateLimits.delete(ip);
+          }
+          // Aggregate old telemetry events into hourly buckets
+          try {
+            const cleaned = this.db.cleanupTelemetryEvents();
+            if (cleaned > 0) {
+              log.info(`Telemetry cleanup: aggregated and deleted ${cleaned} raw events`);
+            }
+          } catch (err) {
+            log.error('Telemetry cleanup failed', err);
           }
         }, 60_000);
 
@@ -496,6 +506,21 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/telemetry':
+          if (req.method === 'POST') {
+            await this.handlePostTelemetry(req, res);
+          } else if (req.method === 'GET') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            const telemetryStats = this.db.getTelemetryStats();
+            this.sendJson(res, 200, { ok: true, data: telemetryStats });
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/usage':
           if (req.method === 'POST') {
             await this.handlePostUsageEvent(req, res);
@@ -560,6 +585,46 @@ export class ThreatCloudServer {
       client_ip: clientIP,
       request_id: requestId,
     });
+  }
+
+  /** POST /api/telemetry - Record anonymous telemetry event from CLI */
+  private async handlePostTelemetry(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    try {
+      const body = await this.readBody(req);
+      const data = JSON.parse(body) as {
+        event?: string;
+        platform?: string;
+        skillCount?: number;
+        findingCount?: number;
+        severity?: string;
+        ts?: string;
+      };
+
+      const eventType = data.event ?? 'unknown';
+      const allowedEvents = [
+        'scan_local', 'scan_local_json', 'scan_remote', 'scan_remote_json',
+        'guard_audit', 'guard_start', 'skill_install', 'skill_audit',
+      ];
+      if (!allowedEvents.includes(eventType)) {
+        this.sendJson(res, 400, {
+          ok: false,
+          error: `Unknown event. Allowed: ${allowedEvents.join(', ')}`,
+        });
+        return;
+      }
+
+      this.db.recordTelemetryEvent({
+        eventType,
+        platform: data.platform ?? 'unknown',
+        skillCount: data.skillCount ?? 0,
+        findingCount: data.findingCount ?? 0,
+        severity: data.severity ?? 'LOW',
+      });
+
+      this.sendJson(res, 200, { ok: true, data: { recorded: true } });
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid request body' });
+    }
   }
 
   /** POST /api/usage - Record usage event (scan, cli_install, etc.) */

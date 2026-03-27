@@ -21,7 +21,14 @@ import {
 } from '@panguard-ai/core';
 import { runScan, runRemoteScan } from '@panguard-ai/panguard-scan';
 import { PANGUARD_VERSION } from '../../index.js';
-import { requireAuth } from '../auth-guard.js';
+import { computeGrade, buildScanOutput, saveResults } from '../scan-helpers.js';
+import type { ScanOutputSystem } from '../scan-helpers.js';
+import { ensureTelemetryConsent } from '../consent.js';
+import { reportTelemetry, discoverLocalSkillCount, getLocalPlatform } from '../telemetry.js';
+
+function remoteSystem(openPorts: number): ScanOutputSystem {
+  return { os: 'remote', arch: 'remote', open_ports: openPorts, running_services: 0, firewall_enabled: false, security_tools_detected: 0 };
+}
 
 export function scanCommand(): Command {
   return new Command('scan')
@@ -43,67 +50,35 @@ export function scanCommand(): Command {
         save?: string;
         target?: string;
       }) => {
-        // Auth: all scans are free (community tier)
-        const tier = 'community';
-        const check = requireAuth(tier);
-        if (!check.authenticated || !check.authorized) {
-          const { withAuth } = await import('../auth-guard.js');
-          await withAuth(tier, async () => {})(options);
-          return;
-        }
         const lang: Language = options.lang === 'zh-TW' ? 'zh-TW' : 'en';
+        const telemetryEnabled = await ensureTelemetryConsent();
 
         // Remote scan mode
         if (options.target) {
           setLogLevel('silent');
           if (options.json) {
             const result = await runRemoteScan({ target: options.target, lang });
-            const safetyScore = Math.max(0, 100 - result.riskScore);
-            const grade =
-              safetyScore >= 90
-                ? 'A'
-                : safetyScore >= 75
-                  ? 'B'
-                  : safetyScore >= 60
-                    ? 'C'
-                    : safetyScore >= 40
-                      ? 'D'
-                      : 'F';
-            const output = {
+            const output = buildScanOutput({
               version: PANGUARD_VERSION,
               timestamp: result.scannedAt,
               target: options.target,
-              risk_score: result.riskScore,
-              risk_level: result.riskLevel,
-              grade,
-              scan_duration_ms: result.scanDuration,
-              findings_count: result.findings.length,
-              findings: result.findings.map((f, i) => ({
-                id: i + 1,
-                severity: f.severity,
-                title: f.title,
-                category: f.category,
-                description: f.description,
-                remediation: f.remediation,
-              })),
-              system: {
-                os: 'remote',
-                arch: 'remote',
-                open_ports: result.discovery.openPorts.length,
-                running_services: 0,
-                firewall_enabled: false,
-                security_tools_detected: 0,
-              },
-              powered_by: 'Panguard AI',
-              agent_friendly: true,
-            };
+              riskScore: result.riskScore,
+              riskLevel: result.riskLevel,
+              scanDuration: result.scanDuration,
+              findings: result.findings,
+              system: remoteSystem(result.discovery.openPorts.length),
+            });
             if (options.save) {
-              const { writeFile, mkdir } = await import('node:fs/promises');
-              const { dirname } = await import('node:path');
-              await mkdir(dirname(options.save), { recursive: true });
-              await writeFile(options.save, JSON.stringify(output, null, 2), 'utf-8');
+              await saveResults(options.save, output);
             }
             console.log(JSON.stringify(output, null, 2));
+            void reportTelemetry(telemetryEnabled, {
+              event: 'scan_remote_json',
+              platform: getLocalPlatform(),
+              skillCount: await discoverLocalSkillCount(),
+              findingCount: result.findings.length,
+              severity: result.riskLevel,
+            });
             return;
           }
 
@@ -115,17 +90,7 @@ export function scanCommand(): Command {
           const result = await runRemoteScan({ target: options.target, lang });
           sp.succeed(`Remote scan complete ${c.dim(`(${formatDuration(result.scanDuration)})`)}`);
 
-          const safetyScore = Math.max(0, 100 - result.riskScore);
-          const grade =
-            safetyScore >= 90
-              ? 'A'
-              : safetyScore >= 75
-                ? 'B'
-                : safetyScore >= 60
-                  ? 'C'
-                  : safetyScore >= 40
-                    ? 'D'
-                    : 'F';
+          const { safetyScore, grade } = computeGrade(result.riskScore);
           console.log(scoreDisplay(safetyScore, grade));
 
           console.log(
@@ -161,42 +126,28 @@ export function scanCommand(): Command {
 
           // Save results to file if --save is set (remote human-friendly path)
           if (options.save) {
-            const { writeFile, mkdir } = await import('node:fs/promises');
-            const { dirname } = await import('node:path');
-            const saveOutput = {
+            const saveOutput = buildScanOutput({
               version: PANGUARD_VERSION,
               timestamp: result.scannedAt,
               target: options.target,
-              risk_score: result.riskScore,
-              risk_level: result.riskLevel,
-              grade,
-              scan_duration_ms: result.scanDuration,
-              findings_count: result.findings.length,
-              findings: result.findings.map((f, i) => ({
-                id: i + 1,
-                severity: f.severity,
-                title: f.title,
-                category: f.category,
-                description: f.description,
-                remediation: f.remediation,
-              })),
-              system: {
-                os: 'remote',
-                arch: 'remote',
-                open_ports: result.discovery.openPorts.length,
-                running_services: 0,
-                firewall_enabled: false,
-                security_tools_detected: 0,
-              },
-              powered_by: 'Panguard AI',
-              agent_friendly: true,
-            };
-            await mkdir(dirname(options.save), { recursive: true });
-            await writeFile(options.save, JSON.stringify(saveOutput, null, 2), 'utf-8');
+              riskScore: result.riskScore,
+              riskLevel: result.riskLevel,
+              scanDuration: result.scanDuration,
+              findings: result.findings,
+              system: remoteSystem(result.discovery.openPorts.length),
+            });
+            await saveResults(options.save, saveOutput);
             console.log(`  Results saved to: ${options.save}`);
           }
 
           console.log('');
+          void reportTelemetry(telemetryEnabled, {
+            event: 'scan_remote',
+            platform: getLocalPlatform(),
+            skillCount: await discoverLocalSkillCount(),
+            findingCount: result.findings.length,
+            severity: result.riskLevel,
+          });
           return;
         }
 
@@ -209,36 +160,14 @@ export function scanCommand(): Command {
             verbose: false,
           });
 
-          const safetyScore = Math.max(0, 100 - result.riskScore);
-          const grade =
-            safetyScore >= 90
-              ? 'A'
-              : safetyScore >= 75
-                ? 'B'
-                : safetyScore >= 60
-                  ? 'C'
-                  : safetyScore >= 40
-                    ? 'D'
-                    : 'F';
-
-          const output = {
+          const output = buildScanOutput({
             version: PANGUARD_VERSION,
             timestamp: result.scannedAt,
             target: 'localhost',
-            risk_score: result.riskScore,
-            risk_level: result.riskLevel,
-            grade,
-            scan_duration_ms: result.scanDuration,
-            findings_count: result.findings.length,
-            findings: result.findings.map((f, i) => ({
-              id: i + 1,
-              severity: f.severity,
-              title: f.title,
-              category: f.category,
-              description: f.description,
-              remediation: f.remediation,
-              manual_fix: f.manualFix ?? null,
-            })),
+            riskScore: result.riskScore,
+            riskLevel: result.riskLevel,
+            scanDuration: result.scanDuration,
+            findings: result.findings,
             system: {
               os: `${result.discovery.os.distro} ${result.discovery.os.version}`,
               arch: result.discovery.os.arch,
@@ -247,16 +176,19 @@ export function scanCommand(): Command {
               firewall_enabled: result.discovery.security.firewall.enabled,
               security_tools_detected: result.discovery.security.existingTools.length,
             },
-            powered_by: 'Panguard AI',
-            agent_friendly: true,
-          };
+            includeManualFix: true,
+          });
           if (options.save) {
-            const { writeFile, mkdir } = await import('node:fs/promises');
-            const { dirname } = await import('node:path');
-            await mkdir(dirname(options.save), { recursive: true });
-            await writeFile(options.save, JSON.stringify(output, null, 2), 'utf-8');
+            await saveResults(options.save, output);
           }
           console.log(JSON.stringify(output, null, 2));
+          void reportTelemetry(telemetryEnabled, {
+            event: 'scan_local_json',
+            platform: getLocalPlatform(),
+            skillCount: await discoverLocalSkillCount(),
+            findingCount: result.findings.length,
+            severity: result.riskLevel,
+          });
           return;
         }
 
@@ -287,17 +219,7 @@ export function scanCommand(): Command {
         sp.succeed(`Scan complete ${c.dim(`(${formatDuration(result.scanDuration)})`)}`);
 
         // Security Score
-        const safetyScore = Math.max(0, 100 - result.riskScore);
-        const grade =
-          safetyScore >= 90
-            ? 'A'
-            : safetyScore >= 75
-              ? 'B'
-              : safetyScore >= 60
-                ? 'C'
-                : safetyScore >= 40
-                  ? 'D'
-                  : 'F';
+        const { safetyScore, grade } = computeGrade(result.riskScore);
         console.log(scoreDisplay(safetyScore, grade));
 
         // Status panel
@@ -383,26 +305,14 @@ export function scanCommand(): Command {
 
         // Save results to file if --save is set (local human-friendly path)
         if (options.save) {
-          const { writeFile, mkdir } = await import('node:fs/promises');
-          const { dirname } = await import('node:path');
-          const saveOutput = {
+          const saveOutput = buildScanOutput({
             version: PANGUARD_VERSION,
             timestamp: result.scannedAt,
             target: 'localhost',
-            risk_score: result.riskScore,
-            risk_level: result.riskLevel,
-            grade,
-            scan_duration_ms: result.scanDuration,
-            findings_count: result.findings.length,
-            findings: result.findings.map((f, i) => ({
-              id: i + 1,
-              severity: f.severity,
-              title: f.title,
-              category: f.category,
-              description: f.description,
-              remediation: f.remediation,
-              manual_fix: f.manualFix ?? null,
-            })),
+            riskScore: result.riskScore,
+            riskLevel: result.riskLevel,
+            scanDuration: result.scanDuration,
+            findings: result.findings,
             system: {
               os: `${result.discovery.os.distro} ${result.discovery.os.version}`,
               arch: result.discovery.os.arch,
@@ -411,11 +321,9 @@ export function scanCommand(): Command {
               firewall_enabled: result.discovery.security.firewall.enabled,
               security_tools_detected: result.discovery.security.existingTools.length,
             },
-            powered_by: 'Panguard AI',
-            agent_friendly: true,
-          };
-          await mkdir(dirname(options.save), { recursive: true });
-          await writeFile(options.save, JSON.stringify(saveOutput, null, 2), 'utf-8');
+            includeManualFix: true,
+          });
+          await saveResults(options.save, saveOutput);
           console.log(`  Results saved to: ${options.save}`);
         }
 
@@ -433,6 +341,14 @@ export function scanCommand(): Command {
 
         console.log(c.dim(`  Scan completed at ${new Date().toLocaleString()}`));
         console.log('');
+
+        void reportTelemetry(telemetryEnabled, {
+          event: 'scan_local',
+          platform: getLocalPlatform(),
+          skillCount: await discoverLocalSkillCount(),
+          findingCount: result.findings.length,
+          severity: result.riskLevel,
+        });
       }
     );
 }

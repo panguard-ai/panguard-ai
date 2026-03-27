@@ -137,6 +137,32 @@ export class ThreatCloudDB {
       CREATE INDEX IF NOT EXISTS idx_usage_type ON usage_events(event_type);
       CREATE INDEX IF NOT EXISTS idx_usage_created ON usage_events(created_at);
 
+      CREATE TABLE IF NOT EXISTS telemetry_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_type TEXT NOT NULL,
+        platform TEXT NOT NULL DEFAULT 'unknown',
+        skill_count INTEGER NOT NULL DEFAULT 0,
+        finding_count INTEGER NOT NULL DEFAULT 0,
+        severity TEXT NOT NULL DEFAULT 'LOW',
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_telemetry_type ON telemetry_events(event_type);
+      CREATE INDEX IF NOT EXISTS idx_telemetry_created ON telemetry_events(created_at);
+
+      CREATE TABLE IF NOT EXISTS telemetry_hourly_aggregates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        hour_bucket TEXT NOT NULL,
+        event_type TEXT NOT NULL,
+        platform TEXT NOT NULL DEFAULT 'unknown',
+        event_count INTEGER NOT NULL DEFAULT 0,
+        total_findings INTEGER NOT NULL DEFAULT 0,
+        total_skills INTEGER NOT NULL DEFAULT 0,
+        avg_severity TEXT NOT NULL DEFAULT 'LOW',
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_telemetry_hourly_unique
+        ON telemetry_hourly_aggregates(hour_bucket, event_type, platform);
+
       -- Migrations are handled by the numbered migration system in migrations.ts
     `);
 
@@ -664,6 +690,119 @@ export class ThreatCloudDB {
     ).all() as Array<{ date: string; count: number }>;
 
     return { totalScans, scansToday, scansThisWeek, scansBySource, cliInstalls, dailyTrend };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Telemetry Events
+  // ---------------------------------------------------------------------------
+
+  /** Record a telemetry event / 記錄遙測事件 */
+  recordTelemetryEvent(event: {
+    eventType: string;
+    platform: string;
+    skillCount: number;
+    findingCount: number;
+    severity: string;
+  }): void {
+    this.db.prepare(
+      'INSERT INTO telemetry_events (event_type, platform, skill_count, finding_count, severity) VALUES (?, ?, ?, ?, ?)'
+    ).run(event.eventType, event.platform, event.skillCount, event.findingCount, event.severity);
+  }
+
+  /** Get telemetry stats merging raw events + hourly aggregates / 取得遙測統計 */
+  getTelemetryStats(): {
+    totalEvents: number;
+    eventsToday: number;
+    byEventType: Record<string, number>;
+    byPlatform: Record<string, number>;
+    avgFindingCount: number;
+  } {
+    // Raw events (last 24h — anything older is aggregated)
+    const rawTotal = (this.db.prepare(
+      'SELECT COUNT(*) as count FROM telemetry_events'
+    ).get() as { count: number }).count;
+
+    const aggTotal = (this.db.prepare(
+      'SELECT COALESCE(SUM(event_count), 0) as count FROM telemetry_hourly_aggregates'
+    ).get() as { count: number }).count;
+
+    const eventsToday = (this.db.prepare(
+      "SELECT COUNT(*) as count FROM telemetry_events WHERE created_at > datetime('now', '-1 day')"
+    ).get() as { count: number }).count;
+
+    // By event type (raw)
+    const rawByType = this.db.prepare(
+      'SELECT event_type, COUNT(*) as count FROM telemetry_events GROUP BY event_type'
+    ).all() as Array<{ event_type: string; count: number }>;
+
+    const aggByType = this.db.prepare(
+      'SELECT event_type, SUM(event_count) as count FROM telemetry_hourly_aggregates GROUP BY event_type'
+    ).all() as Array<{ event_type: string; count: number }>;
+
+    const byEventType: Record<string, number> = {};
+    for (const r of rawByType) byEventType[r.event_type] = (byEventType[r.event_type] ?? 0) + r.count;
+    for (const r of aggByType) byEventType[r.event_type] = (byEventType[r.event_type] ?? 0) + r.count;
+
+    // By platform (raw)
+    const rawByPlatform = this.db.prepare(
+      'SELECT platform, COUNT(*) as count FROM telemetry_events GROUP BY platform'
+    ).all() as Array<{ platform: string; count: number }>;
+
+    const aggByPlatform = this.db.prepare(
+      'SELECT platform, SUM(event_count) as count FROM telemetry_hourly_aggregates GROUP BY platform'
+    ).all() as Array<{ platform: string; count: number }>;
+
+    const byPlatform: Record<string, number> = {};
+    for (const r of rawByPlatform) byPlatform[r.platform] = (byPlatform[r.platform] ?? 0) + r.count;
+    for (const r of aggByPlatform) byPlatform[r.platform] = (byPlatform[r.platform] ?? 0) + r.count;
+
+    // Avg finding count (raw only — aggregates don't track individual)
+    const avgRow = this.db.prepare(
+      'SELECT AVG(finding_count) as avg FROM telemetry_events'
+    ).get() as { avg: number | null };
+
+    return {
+      totalEvents: rawTotal + aggTotal,
+      eventsToday,
+      byEventType,
+      byPlatform,
+      avgFindingCount: avgRow.avg ?? 0,
+    };
+  }
+
+  /** Aggregate raw telemetry events into hourly buckets, then delete old raw events / 彙總遙測事件 */
+  cleanupTelemetryEvents(): number {
+    // Step 1: Aggregate events older than 24h into hourly buckets
+    this.db.exec(`
+      INSERT INTO telemetry_hourly_aggregates (hour_bucket, event_type, platform, event_count, total_findings, total_skills, avg_severity)
+      SELECT
+        strftime('%Y-%m-%dT%H:00:00', created_at) as hour_bucket,
+        event_type,
+        platform,
+        COUNT(*) as event_count,
+        SUM(finding_count) as total_findings,
+        SUM(skill_count) as total_skills,
+        CASE
+          WHEN MAX(CASE severity WHEN 'CRITICAL' THEN 4 WHEN 'HIGH' THEN 3 WHEN 'MEDIUM' THEN 2 WHEN 'LOW' THEN 1 ELSE 0 END) >= 4 THEN 'CRITICAL'
+          WHEN MAX(CASE severity WHEN 'CRITICAL' THEN 4 WHEN 'HIGH' THEN 3 WHEN 'MEDIUM' THEN 2 WHEN 'LOW' THEN 1 ELSE 0 END) >= 3 THEN 'HIGH'
+          WHEN MAX(CASE severity WHEN 'CRITICAL' THEN 4 WHEN 'HIGH' THEN 3 WHEN 'MEDIUM' THEN 2 WHEN 'LOW' THEN 1 ELSE 0 END) >= 2 THEN 'MEDIUM'
+          ELSE 'LOW'
+        END as avg_severity
+      FROM telemetry_events
+      WHERE created_at < datetime('now', '-24 hours')
+      GROUP BY hour_bucket, event_type, platform
+      ON CONFLICT(hour_bucket, event_type, platform) DO UPDATE SET
+        event_count = event_count + excluded.event_count,
+        total_findings = total_findings + excluded.total_findings,
+        total_skills = total_skills + excluded.total_skills
+    `);
+
+    // Step 2: Delete raw events older than 24h
+    const result = this.db.prepare(
+      "DELETE FROM telemetry_events WHERE created_at < datetime('now', '-24 hours')"
+    ).run();
+
+    return result.changes;
   }
 
   clearAllRules(): number {
