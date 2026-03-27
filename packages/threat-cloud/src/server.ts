@@ -18,6 +18,8 @@
  * - GET  /api/audit-log             Admin audit log (paginated, admin-only)
  * - POST /api/scan-events           Report scan event from any source (bulk/CLI/web)
  * - GET  /api/metrics               Aggregated metrics across all sources (public, cached 60s)
+ * - GET  /api/badge/:author/:skill   ATR Scanned SVG badge for a skill
+ * - GET  /api/badge/stats            Badge statistics (JSON)
  * - GET  /health                     Health check
  *
  * @module @panguard-ai/threat-cloud/server
@@ -29,6 +31,7 @@ import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID, timingSafeEqual } from 'node:crypto';
 import { ThreatCloudDB } from './database.js';
+import { createBadgeRouter, type BadgeRouter } from './badge-api.js';
 import { LLMReviewer } from './llm-reviewer.js';
 import { getAdminHTML } from './admin-dashboard.js';
 import {
@@ -85,6 +88,7 @@ export class ThreatCloudServer {
   private readonly db: ThreatCloudDB;
   private readonly config: ServerConfig;
   private readonly llmReviewer: LLMReviewer | null;
+  private readonly badgeRouter: BadgeRouter;
   private promotionTimer: ReturnType<typeof setInterval> | null = null;
   private rateLimits: Map<string, RateLimitEntry> = new Map();
   private rateLimitCleanupTimer: ReturnType<typeof setInterval> | null = null;
@@ -101,6 +105,12 @@ export class ThreatCloudServer {
     this.llmReviewer = config.anthropicApiKey
       ? new LLMReviewer(config.anthropicApiKey, this.db)
       : null;
+
+    // Badge API: reads ecosystem-report.csv from ATR data directory
+    const badgeCsvPath =
+      process.env['ATR_ECOSYSTEM_CSV'] ??
+      join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', 'agent-threat-rules', 'data', 'clawhub-scan', 'ecosystem-report.csv');
+    this.badgeRouter = createBadgeRouter(badgeCsvPath);
   }
 
   /** Start the server / 啟動伺服器 */
@@ -530,6 +540,10 @@ export class ThreatCloudServer {
           break;
 
         default:
+          // Badge API handles /api/badge/* paths with dynamic segments
+          if (this.badgeRouter.handleRequest(pathname, req.method ?? 'GET', res)) {
+            break;
+          }
           this.sendJson(res, 404, { ok: false, error: 'Not found' });
       }
     } catch (err) {
