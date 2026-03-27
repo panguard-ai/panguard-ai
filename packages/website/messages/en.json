@@ -3266,6 +3266,10 @@
         "title": "Anthropic, Google, OpenAI Just Spent $12.5M Validating What We Built Alone",
         "excerpt": "Six tech giants funded SAFE-MCP to secure AI agent tool calls. We have been shipping that exact solution since 2025."
       },
+      "safe-mcp-openssf-what-it-means-zh": {
+        "title": "Six Tech Giants Spent $12.5M Validating What We Built Alone (Chinese)",
+        "excerpt": "Anthropic, Google, OpenAI, AWS, GitHub, Microsoft jointly funded SAFE-MCP. Chinese language version."
+      },
       "clawhub-ecosystem-scan-results": {
         "title": "We Scanned 36,394 AI Agent Skills. 13.5% Have Security Risks.",
         "excerpt": "The first full ecosystem scan of ClawHub is complete. 36,394 skills crawled, 9,676 with parseable content. 182 CRITICAL, 1,124 HIGH. 249 packages combine shell access, network calls, and filesystem operations. Here is everything we found."

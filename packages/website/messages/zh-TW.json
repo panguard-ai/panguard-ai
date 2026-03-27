@@ -4087,6 +4087,10 @@
         "title": "Anthropic、Google、OpenAI 花了 1,250 萬美元驗證我們一個人做的事",
         "excerpt": "六大科技巨頭出資成立 SAFE-MCP，保護 AI Agent 的工具呼叫安全。我們從 2025 年就在做這件事了。"
       },
+      "safe-mcp-openssf-what-it-means-zh": {
+        "title": "六大巨頭花了 1,250 萬美元，驗證我們一個人做的事",
+        "excerpt": "Anthropic、Google、OpenAI、AWS、GitHub、Microsoft 共同出資成立 SAFE-MCP，保護 AI Agent 的工具呼叫安全。我們從 2025 年就在做這件事了。"
+      },
       "clawhub-ecosystem-scan-results": {
         "title": "我們掃描了 36,394 個 AI Agent Skills，13.5% 有安全風險",
         "excerpt": "ClawHub 首次全量掃描完成。36,394 個 Skills 已爬取，9,676 個有可解析內容。182 個 CRITICAL、1,124 個 HIGH。249 個套件同時具備 shell 存取、網路呼叫和檔案系統操作。以下是完整發現。"
