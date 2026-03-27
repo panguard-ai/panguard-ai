@@ -74,7 +74,7 @@ pnpm build
 
 ```bash
 panguard --version
-# Expected: 0.3.3
+# Expected: 1.4.13
 ```
 
 ---
