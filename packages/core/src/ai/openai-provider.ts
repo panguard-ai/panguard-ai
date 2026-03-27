@@ -50,7 +50,7 @@ interface OpenAIClient {
 }
 
 interface OpenAIConstructor {
-  new (options: { apiKey: string; timeout?: number }): OpenAIClient;
+  new (options: { apiKey: string; baseURL?: string; timeout?: number }): OpenAIClient;
 }
 
 /**
@@ -115,6 +115,7 @@ export class OpenAIProvider extends LLMProviderBase {
 
     this.client = new OpenAI({
       apiKey: this.config.apiKey,
+      ...(this.config.endpoint ? { baseURL: this.config.endpoint } : {}),
       timeout: this.config.timeout,
     });
 
