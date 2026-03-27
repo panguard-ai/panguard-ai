@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Panguard Guard — Panguard AI Docs',
     description:
-      '24/7 skill behavior monitoring: 61 ATR detection rules, AI analysis, automated response.',
+      '24/7 skill behavior monitoring: 71 ATR detection rules, AI analysis, automated response.',
   },
 };
 
