@@ -29,14 +29,12 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
 COPY packages/core/package.json packages/core/
 COPY packages/scan-core/package.json packages/scan-core/
 COPY packages/panguard/package.json packages/panguard/
-COPY packages/panguard-auth/package.json packages/panguard-auth/
 COPY packages/panguard-guard/package.json packages/panguard-guard/
 COPY packages/panguard-scan/package.json packages/panguard-scan/
 COPY packages/panguard-chat/package.json packages/panguard-chat/
 COPY packages/panguard-report/package.json packages/panguard-report/
 COPY packages/panguard-trap/package.json packages/panguard-trap/
 COPY packages/panguard-web/package.json packages/panguard-web/
-COPY packages/panguard-manager/package.json packages/panguard-manager/
 COPY packages/panguard-mcp/package.json packages/panguard-mcp/
 COPY packages/panguard-skill-auditor/package.json packages/panguard-skill-auditor/
 COPY packages/threat-cloud/package.json packages/threat-cloud/
@@ -50,14 +48,12 @@ RUN pnpm install --frozen-lockfile --prod=false
 COPY packages/core/ packages/core/
 COPY packages/scan-core/ packages/scan-core/
 COPY packages/panguard/ packages/panguard/
-COPY packages/panguard-auth/ packages/panguard-auth/
 COPY packages/panguard-guard/ packages/panguard-guard/
 COPY packages/panguard-scan/ packages/panguard-scan/
 COPY packages/panguard-chat/ packages/panguard-chat/
 COPY packages/panguard-report/ packages/panguard-report/
 COPY packages/panguard-trap/ packages/panguard-trap/
 COPY packages/panguard-web/ packages/panguard-web/
-COPY packages/panguard-manager/ packages/panguard-manager/
 COPY packages/panguard-mcp/ packages/panguard-mcp/
 COPY packages/panguard-skill-auditor/ packages/panguard-skill-auditor/
 COPY packages/threat-cloud/ packages/threat-cloud/
@@ -93,14 +89,11 @@ RUN echo '{"name":"panguard-api","version":"0.1.0","private":true,"type":"module
 # Step 3: Copy workspace packages into node_modules AFTER npm install
 # Strip workspace:* references from package.json (npm doesn't understand pnpm workspace protocol)
 RUN mkdir -p /standalone/node_modules/@panguard-ai && \
-    for pkg in core panguard-auth panguard-guard panguard-scan panguard-chat panguard-report panguard-trap panguard-web panguard-mcp panguard-skill-auditor; do \
+    for pkg in core panguard-guard panguard-scan panguard-chat panguard-report panguard-trap panguard-web panguard-mcp panguard-skill-auditor; do \
       mkdir -p /standalone/node_modules/@panguard-ai/$pkg && \
       cp -r packages/$pkg/dist /standalone/node_modules/@panguard-ai/$pkg/dist && \
       sed 's/"workspace:\*"/"*"/g' packages/$pkg/package.json > /standalone/node_modules/@panguard-ai/$pkg/package.json; \
     done && \
-    mkdir -p /standalone/node_modules/@panguard-ai/manager && \
-    cp -r packages/panguard-manager/dist /standalone/node_modules/@panguard-ai/manager/dist && \
-    sed 's/"workspace:\*"/"*"/g' packages/panguard-manager/package.json > /standalone/node_modules/@panguard-ai/manager/package.json && \
     mkdir -p /standalone/node_modules/@panguard-ai/security-hardening && \
     cp -r security-hardening/dist /standalone/node_modules/@panguard-ai/security-hardening/dist && \
     sed 's/"workspace:\*"/"*"/g' security-hardening/package.json > /standalone/node_modules/@panguard-ai/security-hardening/package.json && \
