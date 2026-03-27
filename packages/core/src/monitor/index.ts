@@ -233,8 +233,9 @@ export class MonitorEngine extends EventEmitter {
    * @param err - Error instance / 錯誤實例
    */
   private handleSubMonitorError(source: string, err: Error): void {
-    logger.error(`Error from ${source}`, { error: err.message });
-    this.emit('error', err);
+    // Graceful degradation — log warning but don't crash the app
+    // Common: wevtutil Access Denied on Windows, permission issues on macOS
+    logger.warn(`${source} error (non-fatal, monitoring degraded): ${err.message}`);
   }
 
   /**

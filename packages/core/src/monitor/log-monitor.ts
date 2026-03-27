@@ -243,19 +243,19 @@ export class LogMonitor extends EventEmitter {
     if (!this.childProcess) return;
 
     this.childProcess.on('error', (err: Error) => {
-      logger.error(`${label} process error: ${err.message}`);
+      logger.warn(`${label} process error (non-fatal): ${err.message}`);
       this.running = false;
-      this.emit('error', err);
+      // Graceful fallback — don't crash the app if log monitoring fails
+      // Common: wevtutil Access Denied on Windows without admin privileges
     });
 
     this.childProcess.on('exit', (code: number | null, signal: string | null) => {
       logger.info(`${label} process exited`, { code, signal });
       if (this.running) {
-        // Unexpected exit / 意外退出
+        // Unexpected exit — log but don't crash (graceful degradation)
         this.running = false;
-        this.emit(
-          'error',
-          new Error(`${label} process exited unexpectedly (code: ${code}, signal: ${signal})`)
+        logger.warn(
+          `${label} process exited unexpectedly (code: ${code}, signal: ${signal}). Log monitoring disabled.`
         );
       }
     });
