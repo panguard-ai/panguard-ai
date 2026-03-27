@@ -728,7 +728,7 @@
     "srDefinition": "Panguard AI 為 AI Agent 提供第一個 Skills Audit。它在每個 Skill 執行前進行審計，用社群 ATR（Agent Threat Rules）捕獲已知威脅，用 AI 分析捕獲未知威脅，並分享新規則保護所有人。MIT 授權。開源。",
     "scannerHero": {
       "titleLine1": "你剛裝的那個 MCP Skill？",
-      "titleLine2": "60 天內 30+ 個 CVE。CVSS 9.8 遠端執行。API key 被偷。",
+      "titleLine2": "60 天內 30+ 個 CVE。\nCVSS 9.8 遠端執行。API key 被偷。",
       "subtitle": "10 秒檢查你的 Skill。免費。開源。",
       "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
       "scanBtn": "掃描",
@@ -767,27 +767,35 @@
     "realIncidents": {
       "title": "這不是假設。",
       "subtitle": "真實的 CVE。真實的攻擊。真實的受害者。",
-      "cta": "掃描你的",
-      "scanCount": "我們掃描了 {count} 個 MCP Skills。{percent}% 有 CRITICAL 或 HIGH 安全風險。"
+      "cta": "掃你的",
+      "scanCount": "我們掃了 {count} 個 MCP Skills。{percent}% 有 CRITICAL 或 HIGH 等級的安全風險。",
+      "incident1Name": "MCPJam Inspector",
+      "incident1Desc": "預設監聽 0.0.0.0。一個 HTTP request 就能遠端執行任意程式碼。v1.4.3 之前全中。",
+      "incident2Name": "Claude Code（Anthropic 官方）",
+      "incident2Desc": "Hooks 和 MCP 設定檔被利用，可以跑任意 shell 指令、偷走你的 API key。",
+      "incident3Name": "Azure MCP Server",
+      "incident3Desc": "透過 SSRF 偷走 managed identity token。攻擊者不需要管理員權限就能存取你的 Azure 資源。",
+      "incident4Name": "postmark-mcp",
+      "incident4Desc": "前 15 個版本都正常。v1.0.16 偷偷加了一行 BCC，每天把 3,000 到 15,000 封信轉寄到外部信箱。"
     },
     "whyPanguard": {
       "title": "為什麼選 PanGuard",
       "pillar1Title": "< 1 小時回應",
-      "pillar1Desc": "從新攻擊到偵測：業界要數週。PanGuard 1 小時。",
+      "pillar1Desc": "新威脅到偵測：業界要幾週走委員會流程。PanGuard 靠社群回報 + AI 自動審查，1 小時內搞定。",
       "pillar2Title": "信任網路",
-      "pillar2Desc": "不是防毒軟體。每個 MCP Skill 都有信任評級。就像 AI Agent 生態系的 SSL 證書。",
+      "pillar2Desc": "不是防毒軟體。是每個 MCP Skill 的信任評級。就像 AI Agent 生態系的 SSL 憑證。",
       "pillar3Title": "集體防禦",
-      "pillar3Desc": "你的每一次掃描，讓所有人更安全。掃描、偵測、結晶、分發。",
-      "compTitle": "我們的比較",
+      "pillar3Desc": "你每掃一次，所有人都更安全。一台機器發現威脅，一小時後全網免疫。",
+      "compTitle": "比一比",
       "compSpeed": "規則更新速度",
-      "compSetup": "安裝",
+      "compSetup": "安裝方式",
       "compCost": "費用",
       "compFor": "適合誰",
       "panguardSpeed": "< 1 小時（社群 + LLM）",
       "panguardSetup": "一行指令",
       "panguardCost": "免費 + 開源",
       "panguardFor": "個人開發者",
-      "ciscoSpeed": "數週（委員會）",
+      "ciscoSpeed": "數週（委員會審查）",
       "ciscoSetup": "企業級部署",
       "ciscoCost": "免費但面向企業",
       "ciscoFor": "企業安全團隊",
@@ -884,59 +892,6 @@
       "reportAuthor": "通知作者",
       "proposeATR": "提交 ATR 規則提案",
       "flywheelNote": "你的發現會經過社群審核。確認後，系統會自動生成 ATR 規則，保護所有 PanGuard 用戶。"
-    },
-    "whyPanguard": {
-      "overline": "安全盲區",
-      "title": "傳統資安工具看不見 AI Agent 的威脅",
-      "subtitle": "CrowdStrike 保護你的作業系統。Snyk 保護你的程式碼。Lakera 過濾 Prompt。但沒有人保護你的 AI Agent。",
-      "edrSees": "傳統資安能看到：",
-      "sees1": "程序執行、檔案存取、網路連線",
-      "sees2": "惡意軟體特徵、勒索軟體模式",
-      "sees3": "已知 CVE 漏洞",
-      "edrMisses": "但完全看不到：",
-      "miss1": "Agent 對話中的 Prompt 注入",
-      "miss2": "惡意的 MCP Skill 定義",
-      "miss3": "透過 Agent Tool 呼叫竊取憑證",
-      "miss4": "透過 Skill 套件的供應鏈攻擊",
-      "capability": "能力",
-      "table": {
-        "row1": {
-          "feature": "AI Agent 威脅偵測",
-          "panguard": "yes",
-          "crowdstrike": "no",
-          "snyk": "no",
-          "lakera": "partial"
-        },
-        "row2": {
-          "feature": "MCP Skill 安裝前審計",
-          "panguard": "yes",
-          "crowdstrike": "no",
-          "snyk": "no",
-          "lakera": "no"
-        },
-        "row3": {
-          "feature": "Prompt 注入偵測",
-          "panguard": "21 條 ATR",
-          "crowdstrike": "no",
-          "snyk": "no",
-          "lakera": "yes"
-        },
-        "row4": {
-          "feature": "Agent 即時監控",
-          "panguard": "24/7 Daemon",
-          "crowdstrike": "僅端點",
-          "snyk": "no",
-          "lakera": "no"
-        },
-        "row5": {
-          "feature": "費用",
-          "panguard": "$0 (MIT)",
-          "crowdstrike": "$25-60/端點/月",
-          "snyk": "免費版+付費",
-          "lakera": "付費"
-        }
-      },
-      "bottomLine": "PanGuard 填補了這個盲區。{rules} 條偵測規則。開源。永久免費。"
     },
     "productShowcase": {
       "overline": "三層縱深防禦",
@@ -1602,11 +1557,20 @@
       },
       "inProgress": {
         "title": "進行中",
-        "items": ["Report + Trap", "Web Dashboard UI", "Windows 支援", "Kubernetes 整合"]
+        "items": [
+          "Report + Trap",
+          "Web Dashboard UI",
+          "Windows 支援",
+          "Kubernetes 整合"
+        ]
       },
       "planned": {
         "title": "規劃中",
-        "items": ["行動 App（iOS/Android）", "Threat Cloud API v2", "偵測規則社群市集"]
+        "items": [
+          "行動 App（iOS/Android）",
+          "Threat Cloud API v2",
+          "偵測規則社群市集"
+        ]
       }
     },
     "cta": {
@@ -2938,7 +2902,14 @@
       },
       "workflow": {
         "title": "適合你的工作流",
-        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "一行指令保護你的技術棧",
@@ -2999,7 +2970,13 @@
       },
       "integrations": {
         "title": "你團隊已在使用的整合",
-        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
+        "tools": [
+          "Slack",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "今天就保護你的企業",
@@ -3059,7 +3036,15 @@
       },
       "integrations": {
         "title": "企業整合",
-        "tools": ["SIEM", "PagerDuty", "Jira", "Slack", "Microsoft Teams", "REST API", "Webhooks"]
+        "tools": [
+          "SIEM",
+          "PagerDuty",
+          "Jira",
+          "Slack",
+          "Microsoft Teams",
+          "REST API",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "看 Panguard 實際運作",
@@ -3115,7 +3100,14 @@
       "stack": "例如 CrowdStrike、Cloudflare、自訂腳本...",
       "message": "告訴我們你的安全目標或任何具體問題..."
     },
-    "teamSizes": ["只有我", "2-10", "11-50", "51-200", "201-500", "500+"],
+    "teamSizes": [
+      "只有我",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
     "submit": "送出訊息",
     "submitting": "提交中...",
     "error": "提交失敗，請再試一次。",
@@ -3296,7 +3288,12 @@
       "inquiryType": "選擇類型",
       "message": "我們能如何幫助你？"
     },
-    "inquiryTypes": ["一般詢問", "技術支援", "合作夥伴", "其他"],
+    "inquiryTypes": [
+      "一般詢問",
+      "技術支援",
+      "合作夥伴",
+      "其他"
+    ],
     "submit": "發送訊息",
     "submitting": "發送中...",
     "successTitle": "訊息已發送。",
@@ -3368,16 +3365,36 @@
       "subtitle": "每個 OWASP Agentic 類別都有對應的 ATR 規則。6 個 STRONG、4 個 MODERATE，全部完整覆蓋。",
       "rulesLabel": "條 ATR 規則",
       "note": "部分規則跨多個類別，規則-類別對應總數：{total}。",
-      "ASI01": { "name": "Agent Goal Hijack" },
-      "ASI02": { "name": "Tool Misuse & Exploitation" },
-      "ASI03": { "name": "Identity & Privilege Abuse" },
-      "ASI04": { "name": "Agentic Supply Chain" },
-      "ASI05": { "name": "Unexpected Code Execution" },
-      "ASI06": { "name": "Memory & Context Poisoning" },
-      "ASI07": { "name": "Insecure Inter-Agent Comms" },
-      "ASI08": { "name": "Cascading Failures" },
-      "ASI09": { "name": "Human-Agent Trust Exploit" },
-      "ASI10": { "name": "Rogue Agents" }
+      "ASI01": {
+        "name": "Agent Goal Hijack"
+      },
+      "ASI02": {
+        "name": "Tool Misuse & Exploitation"
+      },
+      "ASI03": {
+        "name": "Identity & Privilege Abuse"
+      },
+      "ASI04": {
+        "name": "Agentic Supply Chain"
+      },
+      "ASI05": {
+        "name": "Unexpected Code Execution"
+      },
+      "ASI06": {
+        "name": "Memory & Context Poisoning"
+      },
+      "ASI07": {
+        "name": "Insecure Inter-Agent Comms"
+      },
+      "ASI08": {
+        "name": "Cascading Failures"
+      },
+      "ASI09": {
+        "name": "Human-Agent Trust Exploit"
+      },
+      "ASI10": {
+        "name": "Rogue Agents"
+      }
     },
     "evidence": {
       "overline": "生態系實測",
@@ -3469,7 +3486,11 @@
       },
       "applicationLayer": {
         "title": "應用層",
-        "items": ["輸入驗證和消毒", "本地組態檔案權限（0600）", "CLI 透過本地令牌認證"]
+        "items": [
+          "輸入驗證和消毒",
+          "本地組態檔案權限（0600）",
+          "CLI 透過本地令牌認證"
+        ]
       },
       "infrastructureLayer": {
         "title": "基礎設施層",
@@ -5083,19 +5104,34 @@
         "title": "MSP 合作夥伴",
         "subtitle": "託管安全服務供應商",
         "desc": "將 Panguard 的 AI 安全防護加入你的託管服務組合。多租戶管理、白標選項、開源。",
-        "highlights": ["多租戶管理主控台", "白標部署選項", "100% 免費開源", "自動化佈建 API"]
+        "highlights": [
+          "多租戶管理主控台",
+          "白標部署選項",
+          "100% 免費開源",
+          "自動化佈建 API"
+        ]
       },
       "technology": {
         "title": "技術合作夥伴",
         "subtitle": "整合與技術",
         "desc": "將 Panguard 與你的平台整合。API 存取、共同行銷機會、聯合解決方案開發。",
-        "highlights": ["完整 REST API 存取", "共同行銷計畫", "聯合解決方案開發", "技術整合支援"]
+        "highlights": [
+          "完整 REST API 存取",
+          "共同行銷計畫",
+          "聯合解決方案開發",
+          "技術整合支援"
+        ]
       },
       "reseller": {
         "title": "經銷合作夥伴",
         "subtitle": "增值經銷商",
         "desc": "向你的客戶群經銷 Panguard AI。交易登記、銷售賦能、專屬合作夥伴經理。",
-        "highlights": ["交易登記保護", "銷售賦能資源", "專屬合作夥伴經理", "完善的合作架構"]
+        "highlights": [
+          "交易登記保護",
+          "銷售賦能資源",
+          "專屬合作夥伴經理",
+          "完善的合作架構"
+        ]
       }
     },
     "benefits": {
