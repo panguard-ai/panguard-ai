@@ -11,10 +11,10 @@
 <br>
 
 [![GitHub Stars](https://img.shields.io/github/stars/panguard-ai/panguard-ai?style=flat-square&color=DAA520)](https://github.com/panguard-ai/panguard-ai/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/panguard-ai/panguard-ai?style=flat-square)](https://github.com/panguard-ai/panguard-ai/network)
 [![npm version](https://img.shields.io/npm/v/@panguard-ai/panguard?style=flat-square&color=cb3837&logo=npm)](https://www.npmjs.com/package/@panguard-ai/panguard)
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](LICENSE)
 [![ATR](https://img.shields.io/badge/ATR-71%20rules-8b5cf6-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
+[![OWASP](https://img.shields.io/badge/OWASP%20Agentic%20Top%2010-10%2F10-green?style=flat-square)](docs/OWASP-MAPPING.md)
 [![Made in Taiwan](https://img.shields.io/badge/Made%20in-Taiwan-e11d48.svg?style=flat-square)](https://panguard.ai)
 
 [Quick Start](#quick-start) | [Online Scanner](https://panguard.ai) | [ATR Standard](https://github.com/Agent-Threat-Rule/agent-threat-rules) | [Ecosystem Report](https://panguard.ai/research/mcp-ecosystem-scan)
@@ -25,8 +25,6 @@
 
 > AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We scanned 36,394 MCP skills. Of 9,676 with source code, 1 in 7 triggered CRITICAL or HIGH severity rules. Credential harvesting. Prompt injection. Data exfiltration. [Live numbers](https://panguard.ai).
 >
-> Panguard is the App Store review for AI skills. [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) is the open detection standard. Every scan strengthens the network.
->
 > AI Agent 擁有完整系統權限，卻沒有任何審核。我們掃描了 36,394 個 MCP skills，每 7 個就有 1 個觸發 CRITICAL 或 HIGH security rules。即時數據見 [panguard.ai](https://panguard.ai)。
 
 ---
@@ -34,17 +32,14 @@
 ## Quick Start
 
 ```bash
-# One command: install + auto-detect platforms + scan + start protection
 npm install -g @panguard-ai/panguard && pga up
 ```
 
-That's it. PanGuard detects your AI platforms, scans all installed skills, and starts 24/7 monitoring.
+One command. Auto-detects your AI platforms, scans all installed skills, starts 24/7 monitoring with real-time dashboard.
 
-一行搞定。自動偵測 platform、掃描所有 skills、啟動 24/7 monitoring。
+一行搞定。自動偵測 platform、掃描所有 skills、啟動 24/7 monitoring + real-time dashboard。
 
-**16 platforms supported:** Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code
-
-**3 install methods:**
+**16 platforms:** Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code
 
 | Method | Command |
 |--------|---------|
@@ -56,9 +51,50 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
 
 ---
 
-## ClawHub Ecosystem Scan (2026-03-27)
+## How It Works
 
-We scanned the entire ClawHub MCP skill registry. [Full report with live numbers](https://panguard.ai/research/mcp-ecosystem-scan).
+```
+  You install PanGuard
+       |
+       v
+  pga up → scans all skills against 71 ATR rules (< 60 seconds)
+       |
+       v
+  Guard starts → watches for new skill installs in real time
+       |
+       v
+  New skill installed → auto-scanned instantly
+       |
+       v
+  Threat found → anonymized hash uploaded to Threat Cloud
+       |
+       v
+  3+ independent confirmations + LLM review → new ATR rule
+       |
+       v
+  Rule pushed to ALL users within 1 hour
+       |
+       v
+  Next time: blocked in < 50ms → everyone is safer
+```
+
+One person encounters a threat. It becomes a rule. It protects everyone. That's the flywheel.
+
+### Three-Layer Detection
+
+| Layer | Engine | Latency | Cost |
+| ----- | ------ | ------- | ---- |
+| **1** | 71 ATR regex rules | < 50ms | $0 |
+| **2** | Local AI (Ollama) | ~ 2s | $0 |
+| **3** | Cloud AI (Claude / OpenAI) | ~ 5s | ~$0.008 |
+
+Internet down? Rules + local AI keep running. Cloud down? Same. Everything degrades gracefully.
+
+---
+
+## Ecosystem Scan (2026-03-27)
+
+We scanned the entire ClawHub MCP skill registry. [Full report](https://panguard.ai/research/mcp-ecosystem-scan).
 
 | | Count |
 |---|---|
@@ -75,126 +111,44 @@ Raw data: [ecosystem-report.csv](https://github.com/Agent-Threat-Rule/agent-thre
 
 ---
 
-## The Flywheel
+## Standards Alignment
 
-```
-  You scan a skill
-       |
-       v
-  Threat detected --> uploaded to Threat Cloud (anonymous)
-       |
-       v
-  Community + LLM review --> new ATR rule confirmed
-       |
-       v
-  Rule pushed to ALL users within 1 hour
-       |
-       v
-  Next time: blocked in < 50ms --> Loop
-```
+ATR is not a competing standard. It is the detection layer that makes standards enforceable.
 
-| Component                                                          | Role                                                             | Status |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------- | ------ |
-| **[Skill Auditor](docs/overview.md)**                              | 6-check security gate before any skill runs                      | GA     |
-| **[Guard](#guard)**                                                | 24/7 runtime monitoring + auto-block                             | GA     |
-| **[Threat Cloud](#threat-cloud)**                                  | Anonymous community threat intel. 3+ confirmations + LLM review. | GA     |
-| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 71 rules across 10 categories.          | RFC    |
+| Layer | What it does | Project |
+|-------|-------------|---------|
+| **Standards** | Define threat categories | [SAFE-MCP](https://openssf.org/) (OpenSSF, $12.5M) |
+| **Taxonomy** | Enumerate attack surfaces | [OWASP Agentic Top 10](https://genai.owasp.org/) |
+| **Detection** | Match threats in real time | [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) -- 71 rules |
+| **Enforcement** | Scan, monitor, block, report | **PanGuard** (this project) |
 
-One user's encounter with a new attack becomes a rule that protects everyone.
+- OWASP Agentic Top 10: **10/10 categories covered** ([mapping](docs/OWASP-MAPPING.md))
+- SAFE-MCP techniques: **91.8% covered** ([mapping](docs/SAFE-MCP-MAPPING.md))
 
 ---
 
-## Ecosystem Scan Results
+## For Enterprise
 
-We continuously scan the MCP skill ecosystem from npm, GitHub, and community registries. [Full report with live numbers](https://panguard.ai/research/mcp-ecosystem-scan).
+PanGuard is free and open source for individual developers. For organizations running AI agents at scale:
 
-Top findings: credential access patterns, prompt injection, environment variable harvesting, excessive filesystem/network permissions.
+**Policy Engine** -- Define what your agents can and cannot do. Enforce across teams.
 
----
-
-## Three-Layer Detection
-
-| Layer | Engine                          | Coverage           | Latency | Cost    |
-| ----- | ------------------------------- | ------------------ | ------- | ------- |
-| **1** | **Rules** -- 71 ATR rules       | ~90% known threats | < 50ms  | $0      |
-| **2** | **Local AI** -- Ollama          | ~7% ambiguous      | ~ 2s    | $0      |
-| **3** | **Cloud AI** -- Claude / OpenAI | ~3% novel          | ~ 5s    | ~$0.008 |
-
-Cloud down? Local AI handles it. Local AI down? Rules keep running. Internet down? Everything still works.
-
----
-
-## Detection Rules
-
-| Rule Type | Count | Purpose                                                              |
-| --------- | ----- | -------------------------------------------------------------------- |
-| **ATR**   | 71    | AI agent threats: prompt injection, tool poisoning, skill compromise |
-
-ATR (Agent Threat Rules) is the only rule format designed to protect AI agents. Traditional security rules (Sigma, YARA) detect network/malware threats but cannot detect AI-specific attacks like prompt injection, tool poisoning, or context exfiltration.
-
----
-
-## What You Get
-
-Everything is **free and open source**. MIT licensed.
-
-| What | How it works |
-| ---- | ------------ |
-| **Scan** | `pga up` scans all installed MCP skills against 71 ATR rules. 60 seconds. Done. |
-| **24/7 Monitoring** | Guard watches for new skill installs and auto-scans them in real time. |
-| **[Threat Cloud](#threat-cloud)** | Your scan results feed the community. One person finds a threat → becomes a rule → protects everyone within 1 hour. |
-| **[ATR Rules](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | 71 YAML detection rules. OWASP Agentic Top 10: 10/10. SAFE-MCP: 91.8%. Open standard. |
-| **MCP Server** | 11+ tools for Claude Code, Cursor, and any MCP client. `panguard setup` auto-configures. |
-
----
-
-## Guard
-
-Install once, never worry again. Guard watches everything your agents do.
-
-```bash
-panguard guard start --dashboard
-# Dashboard: http://localhost:3100
+```yaml
+# panguard-policy.yaml
+rules:
+  - block_severity: CRITICAL
+  - allow_network: ["internal.corp.com", "api.openai.com"]
+  - deny_filesystem: ["/etc/shadow", "~/.ssh/*", "~/.aws/*"]
+  - require_scan_before_install: true
 ```
 
-**Watchers:** Secret (.env, SSH keys, API tokens), Dependency (package.json, node_modules), Process (child commands), Git (commits, config), Skill (MCP config changes)
+**Compliance Reporting** -- Map every scan to SOC 2, ISO 27001, or Taiwan Cyber Security Act (TCSA) controls. Generate audit-ready PDF reports.
 
-**Monitors:** Syscall, DPI, Memory Scanner
+**Air-gapped Deployment** -- Run entirely on-premise. No data leaves your network. ATR rules update via signed bundles.
 
-**11 Response Actions:** log, notify, block_ip, kill_process, isolate_file, block_tool, kill_agent, quarantine_session, revoke_skill, reduce_permissions, disable_account
+**Dashboard** -- Real-time threat visibility across all agents, all teams, one pane of glass.
 
----
-
-## Threat Cloud
-
-Every Panguard instance is a sensor. Threats are auto-drafted into ATR rules, uploaded anonymously, confirmed by 3+ users + LLM review, then pushed to everyone.
-
-**Currently:** 71 ATR detection rules. Community rule generation active.
-
-**Privacy:** Fully optional. Only anonymized signatures. Zero raw data, zero PII. Disable anytime.
-
----
-
-## MCP Integration
-
-```bash
-panguard setup
-# Auto-detects 16 platforms: Claude Code, Claude Desktop, Cursor, OpenClaw,
-# Codex, Windsurf, Gemini CLI, VS Code Copilot, Zed, Cline, and more
-```
-
-Or manual config:
-
-```json
-{
-  "mcpServers": {
-    "panguard": {
-      "command": "npx",
-      "args": ["@panguard-ai/panguard-mcp"]
-    }
-  }
-}
-```
+Enterprise inquiry: hello@panguard.ai
 
 ---
 
@@ -203,34 +157,33 @@ Or manual config:
 ```
 panguard-ai/
   packages/
-    panguard-skill-auditor/  Skill security auditor (6 checks)
-    panguard-guard/          24/7 monitoring + Threat Cloud sync
-    atr/                     Agent Threat Rules: 71 rules, 10 categories
-    threat-cloud/            Community threat intel server
+    panguard/                CLI: 28 commands, 16 platform auto-detect
+    panguard-guard/          24/7 monitoring + real-time dashboard + Threat Cloud sync
+    panguard-skill-auditor/  6-check security gate for every skill
     panguard-mcp/            MCP server: 11+ tools for AI assistants
-    panguard-scan/           Security scanner
-    core/                    Shared engine: rules, AI adapters, validation
-    panguard/                Unified CLI (28 commands)
+    atr/                     Agent Threat Rules: 71 rules, 10 categories
+    threat-cloud/            Community threat intel server + LLM review
+    scan-core/               Shared scan engine: regex + context signals
+    core/                    AI adapters, validation, logging
     website/                 Next.js marketing site + online scanner
 ```
 
-| Category | Technology                               |
-| -------- | ---------------------------------------- |
-| Language | TypeScript 5.7 (strict mode)             |
-| Runtime  | Node.js 20+                              |
-| Monorepo | pnpm workspaces (17 packages)            |
-| Testing  | Vitest 3 + v8 coverage (3,490+ tests)    |
-| AI       | Ollama (local) + Claude / OpenAI (cloud) |
-| Website  | Next.js 15 + Vercel                      |
+| | |
+|---|---|
+| Language | TypeScript 5.7 (strict mode) |
+| Runtime | Node.js 20+ |
+| Monorepo | pnpm workspaces |
+| AI | Ollama (local) + Claude / OpenAI (cloud) |
+| Website | Next.js 15 + Vercel |
 
 ---
 
 ## Contributing
 
-- **Write detection rules** -- Highest impact. See [ATR contribution guide](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/CONTRIBUTING.md).
+- **Scan your skills** -- Highest impact. Every scan strengthens Threat Cloud.
+- **Write detection rules** -- See [ATR contribution guide](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/CONTRIBUTING.md).
 - **Report vulnerabilities** -- [Open a security advisory](SECURITY.md).
 - **Submit code** -- Fork, branch, test, PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
-- **Share threat intelligence** -- Run Panguard with Threat Cloud enabled.
 
 ---
 
