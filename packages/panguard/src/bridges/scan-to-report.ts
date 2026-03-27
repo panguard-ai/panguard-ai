@@ -8,7 +8,16 @@
  * @module @panguard-ai/panguard/bridges/scan-to-report
  */
 
-import type { ComplianceFinding } from '@panguard-ai/panguard-report';
+// Type-only import — erased at runtime, no dependency on panguard-report
+interface ComplianceFinding {
+  findingId: string;
+  severity: string;
+  title: string;
+  description: string;
+  category: string;
+  timestamp: Date;
+  source: string;
+}
 
 /** Minimal Finding interface matching panguard-scan output */
 export interface ScanFinding {
