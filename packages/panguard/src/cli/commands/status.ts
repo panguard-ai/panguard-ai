@@ -132,12 +132,12 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
     console.log(
       `  ${symbols.info} ${
         lang === 'zh-TW'
-          ? '\u57F7\u884C \u300Cpanguard init\u300D\u958B\u59CB\u8A2D\u5B9A\u3002'
-          : 'Run "panguard init" to get started.'
+          ? '\u57F7\u884C \u300Cpanguard setup\u300D\u958B\u59CB\u8A2D\u5B9A\u3002'
+          : 'Run "panguard setup" to get started.'
       }`
     );
     console.log('');
-    return;
+    // Fall through to show installed skills even without config
   }
 
   // ── System Status ──────────────────────────────────────
@@ -245,35 +245,105 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
   console.log(table(columns, rows));
   console.log('');
 
-  // ── Skill Protection ─────────────────────────────────────
+  // ── Installed Skills + Security Status ───────────────────
   try {
-    const whitelistPath = join(homedir(), '.panguard-guard', 'skill-whitelist.json');
-    if (existsSync(whitelistPath)) {
-      const whitelistRaw = readFileSync(whitelistPath, 'utf-8');
-      const whitelist = JSON.parse(whitelistRaw) as {
-        skills?: Array<{ name: string; source?: string }>;
-      };
-      const skills = whitelist.skills ?? [];
-      const autoCount = skills.filter(
-        (s) => s.source === 'fingerprint' || s.source === 'static'
-      ).length;
-      const manualCount = skills.filter(
-        (s) => s.source === 'manual' || s.source === 'community'
-      ).length;
+    type DiscoverFn = () => Promise<ReadonlyArray<{ name: string; platformId: string }>>;
+    let discoverFn: DiscoverFn;
+    // Try package import first (works in npm install -g), then file URL (monorepo dev)
+    const { resolve } = await import('node:path');
+    const { pathToFileURL } = await import('node:url');
+    const candidates = [
+      '@panguard-ai/panguard-mcp',
+      pathToFileURL(resolve(process.cwd(), 'packages/panguard-mcp/dist/config/index.js')).href,
+    ];
+    for (const candidate of candidates) {
+      try {
+        const mcp = (await import(candidate)) as { discoverAllSkills?: DiscoverFn };
+        if (typeof mcp.discoverAllSkills === 'function') {
+          discoverFn = mcp.discoverAllSkills;
+          break;
+        }
+      } catch { /* try next */ }
+    }
+    if (!discoverFn!) throw new Error('No MCP discovery available');
+    const installedSkills = await discoverFn();
 
+    // Load whitelist for cross-reference
+    const whitelistPath = join(homedir(), '.panguard-guard', 'skill-whitelist.json');
+    const whitelistNames = new Set<string>();
+    if (existsSync(whitelistPath)) {
+      try {
+        const wl = JSON.parse(readFileSync(whitelistPath, 'utf-8')) as {
+          whitelist?: Array<{ name: string; normalizedName?: string }>;
+        };
+        for (const s of wl.whitelist ?? []) {
+          whitelistNames.add(s.name.toLowerCase());
+          if (s.normalizedName) whitelistNames.add(s.normalizedName.toLowerCase());
+        }
+      } catch { /* ignore */ }
+    }
+
+    console.log(
+      divider(
+        lang === 'zh-TW'
+          ? `Installed Skills (${installedSkills.length} \u500B\u5DF2\u5B89\u88DD)`
+          : `Installed Skills (${installedSkills.length})`
+      )
+    );
+    console.log('');
+
+    if (installedSkills.length === 0) {
+      console.log(`  ${c.dim(lang === 'zh-TW' ? '\u672A\u5075\u6E2C\u5230\u5DF2\u5B89\u88DD\u7684 skill' : 'No installed skills detected')}`);
+    } else {
+      const skillColumns: TableColumn[] = [
+        { header: '#', key: 'num', width: 3, align: 'right' },
+        { header: 'Skill', key: 'name', width: 30 },
+        { header: lang === 'zh-TW' ? '\u5E73\u53F0' : 'Platform', key: 'platform', width: 15 },
+        {
+          header: lang === 'zh-TW' ? '\u72C0\u614B' : 'Status',
+          key: 'status',
+          width: 12,
+          color: (v: string) => {
+            if (v === 'SAFE') return c.safe(v);
+            if (v === 'UNKNOWN') return c.caution(v);
+            return c.critical(v);
+          },
+        },
+      ];
+
+      const skillRows = installedSkills.map((s, i) => {
+        const isSafe = whitelistNames.has(s.name.toLowerCase());
+        return {
+          num: String(i + 1),
+          name: s.name.length > 28 ? s.name.slice(0, 26) + '..' : s.name,
+          platform: s.platformId,
+          status: isSafe ? 'SAFE' : 'UNKNOWN',
+        };
+      });
+
+      // Show summary first
+      const safeCount = skillRows.filter(r => r.status === 'SAFE').length;
+      const unknownCount = skillRows.filter(r => r.status === 'UNKNOWN').length;
       console.log(
-        divider(
-          lang === 'zh-TW' ? 'Skill Protection (\u6280\u80FD\u9632\u8B77)' : 'Skill Protection'
-        )
+        `  ${c.safe(String(safeCount))} safe  ${c.dim('|')}  ${unknownCount > 0 ? c.caution(String(unknownCount)) : c.dim('0')} unscanned`
       );
+      console.log(`  ${c.dim(lang === 'zh-TW' ? '\u57F7\u884C pga setup \u6383\u63CF\u5168\u90E8 skill' : 'Run pga setup to scan all skills')}`);
       console.log('');
-      console.log(
-        `  ${c.sage('\u25CF')} ${c.bold(lang === 'zh-TW' ? '\u767D\u540D\u55AE\u6280\u80FD:' : 'Whitelisted:')}    ${c.safe(String(skills.length))} ${c.dim(`(${autoCount} auto, ${manualCount} manual)`)}`
-      );
+
+      // Show table (limit to 20 rows to avoid flood)
+      const display = skillRows.slice(0, 20);
+      console.log(table(skillColumns, display));
+      if (skillRows.length > 20) {
+        console.log(c.dim(`  ... and ${skillRows.length - 20} more`));
+      }
       console.log('');
     }
-  } catch {
-    // Skip skill section if not available
+  } catch (skillErr) {
+    // MCP package not available — show hint
+    console.log(divider('Installed Skills'));
+    console.log('');
+    console.log(`  ${c.dim('Could not discover skills: ' + (skillErr instanceof Error ? skillErr.message : String(skillErr)))}`);
+    console.log('');
   }
 
   // ── Today's Activity ──────────────────────────────────────
