@@ -467,14 +467,14 @@ function renderProposals(){
       proposals.forEach(function(p,idx){
         const status=p.status||p.llm_verdict||'pending';
         const cls=status==='approved'?'low':status==='rejected'?'critical':'medium';
-        html+='<tr style="cursor:pointer" onclick="var el=document.getElementById(\\\'proposal-detail-'+idx+'\\\');el.style.display=el.style.display===\\\'none\\\'?\\\'table-row\\\':\\\'none\\\'">';
+        html+='<tr style="cursor:pointer" onclick="var el=document.getElementById(\\'proposal-detail-'+idx+'\\');el.style.display=el.style.display===\\'none\\'?\\'table-row\\':\\'none\\'">';
         html+='<td title="'+h(p.pattern_hash)+'">'+h((p.pattern_hash||'').slice(0,16))+'...</td>';
         html+='<td>'+badge(status,cls)+'</td>';
         html+='<td>'+num(p.confirmation_count||0)+'</td>';
         html+='<td>'+(p.llm_verdict?badge(p.llm_verdict,p.llm_verdict==='approve'?'low':'critical'):'<span style="color:var(--dim)">pending</span>')+'</td>';
         html+='<td>'+timeAgo(p.created_at)+'</td>';
-        html+='<td><button style="padding:4px 10px;background:var(--green);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;margin-right:4px" onclick="event.stopPropagation();approveProposal(\\\''+h(p.pattern_hash)+'\\\')">Approve</button>';
-        html+='<button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="event.stopPropagation();rejectProposal(\\\''+h(p.pattern_hash)+'\\\')">Reject</button></td>';
+        html+='<td><button style="padding:4px 10px;background:var(--green);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;margin-right:4px" onclick="event.stopPropagation();approveProposal(\\''+h(p.pattern_hash)+'\\')">Approve</button>';
+        html+='<button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="event.stopPropagation();rejectProposal(\\''+h(p.pattern_hash)+'\\')">Reject</button></td>';
         html+='</tr>';
         html+='<tr id="proposal-detail-'+idx+'" style="display:none"><td colspan="6"><pre style="background:var(--bg);padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;white-space:pre-wrap;max-height:300px;overflow-y:auto">'+h(p.rule_content||p.ruleContent||p.pattern||'No rule content available')+'</pre></td></tr>';
       });
@@ -540,7 +540,7 @@ function renderBlacklist(){
         html+='<td>'+num(s.reportCount)+'</td>';
         html+='<td>'+timeAgo(s.firstReported)+'</td>';
         html+='<td>'+timeAgo(s.lastReported)+'</td>';
-        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="removeFromBlacklist(\\\''+h(s.skillHash||s.skill_hash||'')+'\\\')">&times; Remove</button></td></tr>';
+        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="removeFromBlacklist(\\''+h(s.skillHash||s.skill_hash||'')+'\\')">&times; Remove</button></td></tr>';
       });
       html+='</table>';
     }
@@ -603,7 +603,7 @@ function renderFeeds(){
         html+='<tr><td>'+h(sName)+'</td>';
         html+='<td>'+num(s.report_count||s.reportCount||0)+'</td>';
         html+='<td title="'+h(s.fingerprint_hash||'')+'">'+h((s.fingerprint_hash||'-').slice(0,16))+'</td>';
-        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="removeFromWhitelist(\\\''+h(sName)+'\\\')">&times; Remove</button></td></tr>';
+        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="removeFromWhitelist(\\''+h(sName)+'\\')">&times; Remove</button></td></tr>';
       });
       html+='</table>';
     }
