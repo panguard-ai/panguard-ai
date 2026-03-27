@@ -4085,37 +4085,65 @@
     "posts": {
       "safe-mcp-openssf-what-it-means": {
         "title": "1,250 萬美元要解決的事，我們已經做完了",
-        "excerpt": "六大科技巨頭出資成立 SAFE-MCP，保護 AI Agent 的工具呼叫安全。我們從 2025 年就在做這件事了。"
+        "excerpt": "六大科技巨頭出資成立 SAFE-MCP，保護 AI Agent 的工具呼叫安全。我們一直在做這件事。"
       },
       "safe-mcp-openssf-what-it-means-zh": {
         "title": "1,250 萬美元要解決的事，我們已經做完了",
-        "excerpt": "Anthropic、Google、OpenAI、AWS、GitHub、Microsoft 共同出資成立 SAFE-MCP，保護 AI Agent 的工具呼叫安全。我們從 2025 年就在做這件事了。"
+        "excerpt": "Anthropic、Google、OpenAI、AWS、GitHub、Microsoft 共同出資成立 SAFE-MCP，保護 AI Agent 的工具呼叫安全。我們一直在做這件事。"
       },
       "clawhub-ecosystem-scan-results": {
         "title": "我們掃描了 36,394 個 AI Agent Skills，13.5% 有安全風險",
         "excerpt": "ClawHub 首次全量掃描完成。36,394 個 Skills 已爬取，9,676 個有可解析內容。182 個 CRITICAL、1,124 個 HIGH。249 個套件同時具備 shell 存取、網路呼叫和檔案系統操作。以下是完整發現。"
       },
+      "clawhub-ecosystem-scan-results-zh": {
+        "title": "我們掃了 36,394 個 AI Agent Skills。13.5% 有安全問題。",
+        "excerpt": "ClawHub 首次全量生態系掃描完成。36,394 個 Skills，9,676 個有可解析內容。182 個 CRITICAL、1,124 個 HIGH。249 個套件同時具備 shell、網路、檔案系統存取。完整報告在此。"
+      },
       "npm-mcp-security-findings": {
         "title": "49% 的 npm MCP 套件存在安全發現",
         "excerpt": "我們分析了 2,386 個標記為 MCP 伺服器或工具的 npm 套件。35,858 個工具定義。49% 至少有一項安全發現。27% 為 HIGH 或 CRITICAL。npm MCP 生態系有安全問題。"
+      },
+      "npm-mcp-security-findings-zh": {
+        "title": "49% 的 npm MCP 套件有安全問題",
+        "excerpt": "我們分析了 2,386 個 npm MCP 套件，35,858 個工具定義。49% 至少有一項安全發現，27% 是 HIGH 或 CRITICAL。npm 的 MCP 生態系有嚴重的安全問題。"
       },
       "control-plane-collapsed": {
         "title": "控制平面剛崩塌了。40 年的安全假設已失效。",
         "excerpt": "傳統安全將控制平面與資料平面分離。AI Agent 將兩者合併——指令和資料都是文字 token。每個防火牆、IDS 和 WAF 都假設這種分離仍然存在。但它已不存在。"
       },
+      "control-plane-collapsed-zh": {
+        "title": "控制面崩塌了。40 年的安全假設全部失效。",
+        "excerpt": "傳統安全把控制面跟資料面分開。AI Agent 把兩者合併了 -- 指令和資料都是文字 token。每個防火牆、IDS、WAF 都假設這個分離仍然存在。但它已經不存在了。"
+      },
       "better-models-more-hackable": {
         "title": "更好的 AI 模型更容易被駭，而非更安全",
         "excerpt": "o1-mini 在工具層攻擊中成功率最高，達 72.8%。20 個 SOTA LLM 的平均值為 36.5%。更強的推理能力意味著更善於執行注入指令。能力與安全的取捨是真實的。"
+      },
+      "better-models-more-hackable-zh": {
+        "title": "更強的 AI 模型更容易被攻擊，不是更安全",
+        "excerpt": "o1-mini 的工具層攻擊成功率最高，達 72.8%。20 個 SOTA LLM 的平均值為 36.5%。推理能力越強，就越擅長執行注入指令。能力與安全的取捨是真實存在的。"
       },
       "postmark-supply-chain-attack": {
         "title": "乾淨了 15 個版本。1.0.16 版偷走了你的信箱。",
         "excerpt": "postmark-mcp 發布了 15 個乾淨版本。1.0.16 版加了一行 BCC，每天將 3,000-15,000 封郵件轉寄到 phan@giftshop.club。另外：SANDWORM_MODE 集群——19 個仿冒 npm 套件竊取 SSH 金鑰。"
       },
+      "postmark-supply-chain-attack-zh": {
+        "title": "乾淨了 15 個版本。1.0.16 版偷走了你的信箱。",
+        "excerpt": "postmark-mcp 發布了 15 個乾淨版本。1.0.16 版加了一行 BCC，每天將 3,000-15,000 封郵件轉寄到 phan@giftshop.club。另外還有 SANDWORM_MODE -- 19 個仿冒 npm 套件竊取 SSH keys。"
+      },
       "zombie-agent-delayed-attack": {
         "title": "那封等了 6 週才竊取你資料的郵件",
         "excerpt": "ZombieAgent 透過郵件植入假記憶，數週後才啟動。MINJA 達到 98.2% 記憶注入成功率。AiXBT 在凌晨 2 點因提示注入被盜走 $106,200（55.5 ETH）。延遲攻擊是 AI Agent 安全的下一個前沿。"
       },
+      "zombie-agent-delayed-attack-zh": {
+        "title": "ZombieAgent 延遲攻擊：那封等了六週才動手的郵件",
+        "excerpt": "ZombieAgent 透過郵件植入假記憶，數週後才啟動。MINJA 達到 98.2% 記憶注入成功率。AiXBT 在凌晨 2 點被盜走 $106,200。延遲攻擊是 AI Agent 安全的下一個前沿。"
+      },
       "what-is-atr": {
+        "title": "什麼是 ATR？首個 AI Agent 安全開放標準",
+        "excerpt": "ATR（Agent Threat Rules）是針對 AI Agent 安全威脅的開放偵測標準。71 條 YAML 規則。OWASP Agentic Top 10 全覆蓋。網路有 Snort，端點有 Sigma，AI Agent 有 ATR。"
+      },
+      "what-is-atr-zh": {
         "title": "什麼是 ATR？首個 AI Agent 安全開放標準",
         "excerpt": "ATR（Agent Threat Rules）是針對 AI Agent 安全威脅的開放偵測標準。71 條 YAML 規則。OWASP Agentic Top 10 全覆蓋。網路有 Snort，端點有 Sigma，AI Agent 有 ATR。"
       },
@@ -4123,13 +4151,25 @@
         "title": "OWASP Agentic Top 10：71 條 ATR 規則如何覆蓋全部 10 個類別",
         "excerpt": "共 77 條規則映射橫跨全部 10 個 OWASP Agentic Security 類別。ASI01-ASI06 為 STRONG 覆蓋（每類 8-13 條規則）。ASI07-ASI10 為 MODERATE 覆蓋（每類 4-7 條規則）。完整映射表在內文。"
       },
+      "owasp-agentic-top-10-coverage-zh": {
+        "title": "OWASP Agentic Top 10：71 條 ATR 規則如何覆蓋全部 10 個類別",
+        "excerpt": "共 77 條規則映射橫跨全部 10 個 OWASP Agentic Security 類別。ASI01-ASI06 為 STRONG 覆蓋。ASI07-ASI10 為 MODERATE 覆蓋。完整映射表在內文。"
+      },
       "transparent-recall-vs-opaque-precision": {
         "title": "為什麼透明的 39.9% 召回率勝過不透明的 98%",
         "excerpt": "ATR 在 PINT 基準測試上達到 99.7% 精確率和 62.7% 召回率。我們使用「ATR Scanned」而非「ATR Certified」。我們公開未偵測到的部分。Snort 的類比：較低的偵測率但開放可稽核，每次都勝過專有黑箱。"
       },
+      "transparent-recall-vs-opaque-precision-zh": {
+        "title": "透明的 39.9% 召回率為什麼打敗不透明的 98%",
+        "excerpt": "ATR 在 PINT 基準測試上達到 99.7% 精確率和 62.7% 召回率。我們使用「ATR Scanned」而非「ATR Certified」。我們公開未偵測到的部分。較低的偵測率但開放可稽核，每次都勝過專有黑箱。"
+      },
       "flywheel-every-scan-protects-everyone": {
         "title": "飛輪效應：每次掃描都讓所有人更安全",
         "excerpt": "Threat Crystallization 的運作方式：LLM 捕獲新型攻擊，生成 regex 規則，在 1 小時內分發給所有使用者。零門檻——使用者只需掃描。3 次以上確認自動升級為正式規則。一次掃描保護整個網路。"
+      },
+      "flywheel-every-scan-protects-everyone-zh": {
+        "title": "飛輪效應：你的每一次掃描都在保護所有人",
+        "excerpt": "Threat Crystallization 的運作方式：LLM 捕獲新型攻擊，生成 regex 規則，1 小時內分發給所有使用者。零門檻——只需掃描。3 次確認自動升級為正式規則。一次掃描保護整個網路。"
       },
       "how-atr-protects-ai-agents": {
         "title": "ATR 如何保護你的 AI Agent：實戰指南",

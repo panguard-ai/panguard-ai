@@ -3264,7 +3264,7 @@
     "posts": {
       "safe-mcp-openssf-what-it-means": {
         "title": "$12.5M to Solve What We Already Shipped",
-        "excerpt": "Six tech giants funded SAFE-MCP to secure AI agent tool calls. We have been shipping that exact solution since 2025."
+        "excerpt": "Six tech giants funded SAFE-MCP to secure AI agent tool calls. We have been building that exact solution."
       },
       "safe-mcp-openssf-what-it-means-zh": {
         "title": "$12.5M to Solve What We Already Shipped (Chinese)",
@@ -3274,41 +3274,81 @@
         "title": "We Scanned 36,394 AI Agent Skills. 13.5% Have Security Risks.",
         "excerpt": "The first full ecosystem scan of ClawHub is complete. 36,394 skills crawled, 9,676 with parseable content. 182 CRITICAL, 1,124 HIGH. 249 packages combine shell access, network calls, and filesystem operations. Here is everything we found."
       },
+      "clawhub-ecosystem-scan-results-zh": {
+        "title": "We Scanned 36,394 AI Agent Skills. 13.5% Have Security Risks. (Chinese)",
+        "excerpt": "The first full ecosystem scan of ClawHub is complete. Chinese language version covering all findings from the 36,394-skill scan."
+      },
       "npm-mcp-security-findings": {
         "title": "49% of npm MCP Packages Have Security Findings",
         "excerpt": "We analyzed 2,386 npm packages tagged as MCP servers or tools. 35,858 tool definitions. 49% have at least one security finding. 27% are HIGH or CRITICAL. The npm MCP ecosystem has a security problem."
+      },
+      "npm-mcp-security-findings-zh": {
+        "title": "49% of npm MCP Packages Have Security Findings (Chinese)",
+        "excerpt": "Analysis of 2,386 npm MCP packages. Chinese language version covering the 49% security finding rate."
       },
       "control-plane-collapsed": {
         "title": "The Control Plane Just Collapsed. 40 Years of Security Assumptions Are Gone.",
         "excerpt": "Traditional security separates control plane from data plane. AI agents merge them -- instructions and data are both text tokens. Every firewall, IDS, and WAF assumes this separation still exists. It does not."
       },
+      "control-plane-collapsed-zh": {
+        "title": "The Control Plane Just Collapsed (Chinese)",
+        "excerpt": "AI agents merge control and data planes. Chinese language version on why 40 years of security assumptions no longer hold."
+      },
       "better-models-more-hackable": {
         "title": "Better AI Models Are More Hackable, Not Less",
         "excerpt": "o1-mini had the highest tool-layer attack success rate at 72.8%. Average across 20 SOTA LLMs was 36.5%. More reasoning capability means better at following injected instructions. The capability-security tradeoff is real."
+      },
+      "better-models-more-hackable-zh": {
+        "title": "Better AI Models Are More Hackable, Not Less (Chinese)",
+        "excerpt": "The capability-security tradeoff explained. Chinese language version covering the 72.8% attack success rate paradox."
       },
       "postmark-supply-chain-attack": {
         "title": "Clean for 15 Versions. Version 1.0.16 Stole Your Inbox.",
         "excerpt": "postmark-mcp published 15 clean versions. Version 1.0.16 added one BCC line that forwarded 3,000-15,000 emails per day to phan@giftshop.club. Plus: the SANDWORM_MODE cluster -- 19 typosquatted npm packages stealing SSH keys."
       },
+      "postmark-supply-chain-attack-zh": {
+        "title": "Clean for 15 Versions. Version 1.0.16 Stole Your Inbox. (Chinese)",
+        "excerpt": "The postmark-mcp supply chain attack and SANDWORM_MODE typosquatting cluster. Chinese language version."
+      },
       "zombie-agent-delayed-attack": {
         "title": "The Email That Waited 6 Weeks to Steal Your Data",
         "excerpt": "ZombieAgent plants a false memory via email that activates weeks later. MINJA achieves 98.2% memory injection success. AiXBT lost $106,200 to a 2 AM prompt injection. Delayed attacks are the next frontier of AI agent security."
+      },
+      "zombie-agent-delayed-attack-zh": {
+        "title": "The Email That Waited 6 Weeks to Steal Your Data (Chinese)",
+        "excerpt": "ZombieAgent delayed attack, MINJA memory injection, AiXBT theft. Chinese language version."
       },
       "what-is-atr": {
         "title": "What Is ATR? The First Open Standard for AI Agent Security",
         "excerpt": "ATR (Agent Threat Rules) is an open detection standard for AI agent security threats. 71 YAML rules. OWASP Agentic Top 10 full coverage. Think Snort for network, Sigma for endpoints, ATR for AI agents."
       },
+      "what-is-atr-zh": {
+        "title": "What Is ATR? The First Open Standard for AI Agent Security (Chinese)",
+        "excerpt": "ATR (Agent Threat Rules) is an open detection standard for AI agent security threats. 71 YAML rules. Chinese language version."
+      },
       "owasp-agentic-top-10-coverage": {
         "title": "OWASP Agentic Top 10: How 71 ATR Rules Cover All 10 Categories",
         "excerpt": "77 total rule mappings across all 10 OWASP Agentic Security categories. ASI01-ASI06 have STRONG coverage (8-13 rules each). ASI07-ASI10 have MODERATE coverage (4-7 rules each). Full mapping inside."
+      },
+      "owasp-agentic-top-10-coverage-zh": {
+        "title": "OWASP Agentic Top 10: How 71 ATR Rules Cover All 10 Categories (Chinese)",
+        "excerpt": "77 total rule mappings across all 10 OWASP Agentic Security categories. Chinese language version."
       },
       "transparent-recall-vs-opaque-precision": {
         "title": "Why Transparent 39.9% Recall Beats Opaque 98%",
         "excerpt": "ATR has 99.7% precision and 62.7% recall on the PINT benchmark. We use \"ATR Scanned\" not \"ATR Certified.\" We publish what we miss. The Snort analogy: lower detection but open and auditable beats proprietary black boxes every time."
       },
+      "transparent-recall-vs-opaque-precision-zh": {
+        "title": "Why Transparent 39.9% Recall Beats Opaque 98% (Chinese)",
+        "excerpt": "ATR achieves 99.7% precision and 62.7% recall on the PINT benchmark. We use ATR Scanned not ATR Certified. Chinese language version."
+      },
       "flywheel-every-scan-protects-everyone": {
         "title": "The Flywheel: Every Scan Makes Everyone Safer",
         "excerpt": "How Threat Crystallization works: LLM catches a novel attack, generates a regex rule, distributes to all users in under 1 hour. Zero barrier -- users just scan. 3+ confirmations auto-promote to production. One scan protects the whole network."
+      },
+      "flywheel-every-scan-protects-everyone-zh": {
+        "title": "The Flywheel: Every Scan Makes Everyone Safer (Chinese)",
+        "excerpt": "How Threat Crystallization works: LLM catches a novel attack, generates a regex rule, distributes to all users in under 1 hour. Chinese language version."
       }
     }
   },
