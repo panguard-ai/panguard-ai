@@ -1,4 +1,4 @@
-import { blogPosts } from '@/data/blog-posts';
+import { getAllPosts } from '@/lib/blog-store';
 
 const SITE_URL = 'https://panguard.ai';
 
@@ -11,8 +11,9 @@ function escapeXml(str: string): string {
     .replace(/'/g, '&apos;');
 }
 
-export function GET() {
-  const sorted = [...blogPosts].sort((a, b) => b.date.localeCompare(a.date));
+export async function GET() {
+  const allPosts = await getAllPosts();
+  const sorted = [...allPosts].sort((a, b) => b.date.localeCompare(a.date));
 
   const items = sorted
     .map(

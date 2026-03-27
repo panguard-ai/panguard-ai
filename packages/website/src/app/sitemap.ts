@@ -46,6 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/legal/cookies',
     '/legal/acceptable-use',
     '/legal/responsible-disclosure',
+    '/faq',
   ];
 
   const getFrequency = (path: string): 'weekly' | 'monthly' => {

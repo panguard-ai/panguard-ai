@@ -7,6 +7,7 @@ import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
+import JsonLdBreadcrumb from '@/components/seo/JsonLdBreadcrumb';
 import { getAllPosts } from '@/lib/blog-store';
 import { notFound } from 'next/navigation';
 
@@ -77,6 +78,8 @@ export default async function BlogPostPage(props: {
 
   const nonce = await getNonce();
 
+  const postUrl = `https://panguard.ai/blog/${post.slug}`;
+
   const blogPostJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -90,9 +93,12 @@ export default async function BlogPostPage(props: {
       name: 'Panguard AI',
       logo: { '@type': 'ImageObject', url: 'https://panguard.ai/favicon.png' },
     },
-    url: `https://panguard.ai/blog/${post.slug}`,
+    url: postUrl,
     image: 'https://panguard.ai/og-image.png',
     articleSection: post.category,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
+    keywords: post.category,
+    inLanguage: params.locale === 'zh-TW' ? 'zh-TW' : 'en',
   };
 
   return (
@@ -101,6 +107,13 @@ export default async function BlogPostPage(props: {
         nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostJsonLd) }}
+      />
+      <JsonLdBreadcrumb
+        nonce={nonce}
+        items={[
+          { name: 'Blog', href: '/blog' },
+          { name: post.title },
+        ]}
       />
       <NavBar />
       <main id="main-content">

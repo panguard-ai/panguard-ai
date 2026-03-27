@@ -11,7 +11,7 @@
 - [Panguard Scan](https://panguard.ai/product/scan): 60-second security audit with Sigma, YARA, and ATR rules
 - [Panguard Guard](https://panguard.ai/product/guard): 4-agent AI pipeline -- detect, analyze, respond, report -- 24/7
 - [MCP Server](https://panguard.ai/product/mcp): 11 panguard_* tools for Claude Code, Cursor, and AI assistants
-- [ATR Standard](https://panguard.ai/atr): 61 open-source rules for AI agent threats (like Sigma for agents)
+- [ATR Standard](https://panguard.ai/atr): 71 open-source rules for AI agent threats (like Sigma for agents)
 - [Threat Cloud](https://panguard.ai/threat-cloud): Collective intelligence -- auto-generates rules from real attacks
 
 ## Coming Soon
@@ -39,8 +39,8 @@
 ## Agent Threat Rules (ATR)
 
 - [ATR on GitHub](https://github.com/Agent-Threat-Rule/agent-threat-rules): Open standard for AI agent threat detection
-- 61 YAML-based rules across 9 categories: prompt injection, tool poisoning, skill compromise, context exfiltration, agent manipulation, privilege escalation, excessive autonomy, data poisoning, model security
-- npm: agent-threat-rules@0.3.1
+- 71 YAML-based rules across 9 categories: prompt injection, tool poisoning, skill compromise, context exfiltration, agent manipulation, privilege escalation, excessive autonomy, data poisoning, model security
+- npm: agent-threat-rules@0.4.0
 
 ## Company
 
