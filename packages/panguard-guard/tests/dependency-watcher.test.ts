@@ -130,7 +130,7 @@ describe('detectSuspiciousScripts', () => {
 // -- npm audit (integration-safe tests without ESM spy) --
 
 describe('runNpmAudit', () => {
-  it('returns null for a directory without node_modules', async () => {
+  it('returns null for a directory without node_modules', { timeout: 15000 }, async () => {
     // runNpmAudit calls real npm; without node_modules it returns null or empty
     const tempDir = mkdtempSync(join(tmpdir(), 'audit-test-'));
     try {
