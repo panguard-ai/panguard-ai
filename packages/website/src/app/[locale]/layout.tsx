@@ -6,6 +6,8 @@ import { notFound } from 'next/navigation';
 import { buildAlternates } from '@/lib/seo';
 import { getNonce } from '@/lib/nonce';
 import { CookieBannerLazy } from '@/components/CookieBannerLazy';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const locales = ['en', 'zh-TW'] as const;
 
@@ -222,6 +224,8 @@ export default async function LocaleLayout(
           {children}
           <CookieBannerLazy />
         </NextIntlClientProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

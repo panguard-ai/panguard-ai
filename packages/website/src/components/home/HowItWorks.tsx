@@ -61,18 +61,6 @@ const steps: readonly Step[] = [
   },
 ] as const;
 
-interface Competitor {
-  readonly labelKey: string;
-  readonly descKey: string;
-  readonly highlight: boolean;
-}
-
-const competitors: readonly Competitor[] = [
-  { labelKey: 'compare.cisco.label', descKey: 'compare.cisco.desc', highlight: false },
-  { labelKey: 'compare.owasp.label', descKey: 'compare.owasp.desc', highlight: false },
-  { labelKey: 'compare.panguard.label', descKey: 'compare.panguard.desc', highlight: true },
-] as const;
-
 function StepCard({ step, index }: { readonly step: Step; readonly index: number }) {
   const t = useTranslations('home.howItWorks');
   const Icon = step.icon;
@@ -151,40 +139,6 @@ export default function HowItWorks() {
             </div>
           ))}
         </div>
-
-        {/* Competitive comparison */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.5, delay: 0.6, ease }}
-          className="mt-16 space-y-3"
-        >
-          {competitors.map((comp) => (
-            <div
-              key={comp.labelKey}
-              className={`flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 px-4 py-3 rounded-lg ${
-                comp.highlight
-                  ? 'border border-panguard-green/40 bg-panguard-green/5'
-                  : 'border border-border/50 bg-surface-1/50'
-              }`}
-            >
-              <span
-                className={`text-sm font-semibold whitespace-nowrap ${
-                  comp.highlight ? 'text-panguard-green-light' : 'text-text-secondary'
-                }`}
-              >
-                {t(comp.labelKey)}
-              </span>
-              <span className="hidden sm:inline text-text-muted">--</span>
-              <span
-                className={`text-sm ${comp.highlight ? 'text-text-primary' : 'text-text-muted'}`}
-              >
-                {t(comp.descKey)}
-              </span>
-            </div>
-          ))}
-        </motion.div>
       </div>
     </section>
   );
