@@ -139,6 +139,18 @@ export function configCommand(): Command {
           );
           console.log(`    ${c.dim('$')} panguard config llm --provider openai --api-key sk-xxx`);
           console.log(`    ${c.dim('$')} panguard config llm --provider ollama`);
+          console.log('');
+          console.log('  OpenAI-compatible APIs (Gemini, Groq, Qwen, DeepSeek, etc.):');
+          console.log(
+            `    ${c.dim('$')} panguard config llm --provider openai --endpoint https://api.groq.com/openai/v1 --api-key gsk-xxx`
+          );
+          console.log(
+            `    ${c.dim('$')} panguard config llm --provider openai --endpoint https://generativelanguage.googleapis.com/v1beta/openai/ --api-key AIza-xxx`
+          );
+          console.log(
+            `    ${c.dim('$')} panguard config llm --provider openai --endpoint https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxx  ${c.dim('# Qwen')}`
+          );
+          console.log('');
           console.log(`    ${c.dim('$')} panguard config llm --show`);
           console.log(`    ${c.dim('$')} panguard config llm --clear`);
           return;
