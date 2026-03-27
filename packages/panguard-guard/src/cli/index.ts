@@ -246,6 +246,74 @@ async function commandStart(
   // ── TUI Dashboard mode ──────────────────────────────────────────────
   const dashboardRenderer = dashboardMode ? new DashboardRenderer(5000) : null;
 
+  // ── Telemetry batch + notification debounce ────────────────────────
+  const TC_ENDPOINT = config.threatCloudEndpoint ?? 'https://tc.panguard.ai';
+  const telemetryBatch: Array<{ event: string; platform: string; skillCount: number; findingCount: number; severity: string }> = [];
+  let telemetryFlushTimer: ReturnType<typeof setTimeout> | null = null;
+  let notificationDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  const pendingNotifications: string[] = [];
+
+  function flushTelemetryBatch(): void {
+    if (telemetryBatch.length === 0) return;
+    const batch = [...telemetryBatch];
+    telemetryBatch.length = 0;
+    for (const evt of batch) {
+      try {
+        void fetch(`${TC_ENDPOINT}/api/telemetry`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...evt, ts: new Date().toISOString() }),
+          signal: AbortSignal.timeout(3000),
+        }).catch(() => { /* best effort */ });
+      } catch {
+        // Never block guard for telemetry
+      }
+    }
+  }
+
+  function scheduleTelemetryFlush(): void {
+    if (telemetryFlushTimer) return;
+    telemetryFlushTimer = setTimeout(() => {
+      telemetryFlushTimer = null;
+      flushTelemetryBatch();
+    }, 30_000); // flush every 30s
+  }
+
+  function pushTelemetryEvent(event: string, findingCount: number, severity: string): void {
+    if (config.telemetryEnabled === false) return;
+    telemetryBatch.push({
+      event,
+      platform: `${process.platform}-${process.arch}`,
+      skillCount: 0, // will be populated async later if needed
+      findingCount,
+      severity,
+    });
+    scheduleTelemetryFlush();
+  }
+
+  function pushNotification(title: string, message: string): void {
+    if (process.platform !== 'darwin') return;
+    pendingNotifications.push(`${title}: ${message}`);
+    if (notificationDebounceTimer) clearTimeout(notificationDebounceTimer);
+    notificationDebounceTimer = setTimeout(() => {
+      notificationDebounceTimer = null;
+      const msgs = pendingNotifications.splice(0, pendingNotifications.length);
+      if (msgs.length === 0) return;
+      const combined = msgs.length === 1
+        ? msgs[0]
+        : `${msgs.length} skill audit results`;
+      try {
+        const { execSync } = require('node:child_process') as typeof import('node:child_process');
+        execSync(
+          `osascript -e 'display notification "${combined ?? ''}" with title "PanGuard"'`,
+          { timeout: 2000 }
+        );
+      } catch {
+        // Notification failed — non-critical
+      }
+    }, 5_000); // debounce 5s
+  }
+
   // ── Skill Install Watcher ────────────────────────────────────────────
   const skillWatcher = new SkillWatcher({
     pollInterval: 10_000,
@@ -317,6 +385,12 @@ async function commandStart(
           console.log(`    ${symbols.pass} Auto-whitelisted`);
         }
       }
+
+      // Telemetry + macOS notification
+      pushTelemetryEvent('skill_audit', result.riskScore, result.riskLevel);
+      if (result.riskLevel === 'HIGH' || result.riskLevel === 'CRITICAL') {
+        pushNotification('Skill Audit', `${result.name}: ${result.riskLevel} (${result.riskScore}/100)`);
+      }
     }
   );
 
@@ -332,6 +406,9 @@ async function commandStart(
   // Update shutdown handler to also stop skill watcher, dashboard, summary
   const originalShutdown = shutdown;
   const enhancedShutdown = async () => {
+    if (telemetryFlushTimer) clearTimeout(telemetryFlushTimer);
+    flushTelemetryBatch();
+    if (notificationDebounceTimer) clearTimeout(notificationDebounceTimer);
     skillWatcher.stop();
     dailySummary.stop();
     if (dashboardRenderer) dashboardRenderer.stop();

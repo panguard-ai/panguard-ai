@@ -12,9 +12,59 @@ import { Command } from 'commander';
 import { c, banner } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
 import { saveLlmConfig, loadLlmConfig, deleteLlmConfig } from '../credentials.js';
+import { loadGuardConfig, updateGuardConfig } from '../guard-config.js';
 
 export function configCommand(): Command {
   const cmd = new Command('config').description('Manage local configuration / 管理本地設定');
+
+  cmd
+    .command('set')
+    .description('Set a guard config value / 設定 guard 設定值')
+    .argument('<key>', 'Config key: telemetry, threat-cloud')
+    .argument('<value>', 'Config value (true/false)')
+    .action((key: string, value: string) => {
+      const validKeys = ['telemetry', 'threat-cloud'];
+      if (!validKeys.includes(key)) {
+        console.log(`  ${c.caution(`Invalid key: ${key}. Must be one of: ${validKeys.join(', ')}`)}`);
+        return;
+      }
+      const boolValue = value === 'true' || value === '1' || value === 'yes';
+      const config = loadGuardConfig();
+      if (key === 'telemetry') {
+        updateGuardConfig({ ...config, telemetryEnabled: boolValue });
+        console.log(`  ${c.safe('telemetryEnabled')} set to ${c.bold(String(boolValue))}`);
+      } else if (key === 'threat-cloud') {
+        updateGuardConfig({ ...config, threatCloudUploadEnabled: boolValue });
+        console.log(`  ${c.safe('threatCloudUploadEnabled')} set to ${c.bold(String(boolValue))}`);
+      }
+    });
+
+  cmd
+    .command('show')
+    .description('Show current configuration / 顯示目前設定')
+    .action(() => {
+      console.log(banner(PANGUARD_VERSION));
+      console.log(`  ${c.sage('Guard Configuration')}`);
+      const guardConfig = loadGuardConfig();
+      console.log(`  Telemetry:     ${guardConfig.telemetryEnabled === true ? c.safe('enabled') : c.dim('disabled')}`);
+      console.log(`  Threat Cloud:  ${guardConfig.threatCloudUploadEnabled === false ? c.dim('disabled') : c.safe('enabled')}`);
+      console.log(`  Mode:          ${guardConfig.mode ? c.bold(guardConfig.mode) : c.dim('default')}`);
+      console.log(`  Dashboard:     ${guardConfig.dashboardEnabled === true ? c.safe('enabled') : c.dim('disabled')}`);
+      if (guardConfig.dashboardPort) {
+        console.log(`  Dashboard Port: ${c.bold(String(guardConfig.dashboardPort))}`);
+      }
+      console.log('');
+      console.log(`  ${c.sage('LLM Configuration')}`);
+      const llmConfig = loadLlmConfig();
+      if (!llmConfig) {
+        console.log(`  ${c.dim('No LLM configuration found.')}`);
+      } else {
+        console.log(`  Provider:  ${c.bold(llmConfig.provider)}`);
+        console.log(`  Model:     ${llmConfig.model ? c.bold(llmConfig.model) : c.dim('default')}`);
+        console.log(`  Saved:     ${c.dim(llmConfig.savedAt)}`);
+      }
+      console.log('');
+    });
 
   cmd
     .command('llm')
