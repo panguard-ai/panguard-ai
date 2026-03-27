@@ -47,20 +47,38 @@ export interface TelemetryEvent {
 export async function reportTelemetry(enabled: boolean, event: TelemetryEvent): Promise<void> {
   if (!enabled) return;
 
+  // Send to both endpoints for compatibility:
+  // /api/telemetry — new endpoint (may not be deployed yet)
+  // /api/usage — proven production endpoint (always works)
+  const payload = {
+    event: event.event,
+    platform: event.platform,
+    skillCount: event.skillCount,
+    findingCount: event.findingCount,
+    severity: event.severity,
+    ts: new Date().toISOString(),
+  };
+
   try {
-    await fetch(`${TC_ENDPOINT}/api/telemetry`, {
+    // Primary: /api/usage (production-proven, always deployed)
+    void fetch(`${TC_ENDPOINT}/api/usage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        event: event.event,
-        platform: event.platform,
-        skillCount: event.skillCount,
-        findingCount: event.findingCount,
-        severity: event.severity,
-        ts: new Date().toISOString(),
+        event_type: `cli_${event.event}`,
+        source: 'cli-user',
+        metadata: payload,
       }),
       signal: AbortSignal.timeout(3000),
-    });
+    }).catch(() => {});
+
+    // Secondary: /api/telemetry (new, may not be deployed)
+    void fetch(`${TC_ENDPOINT}/api/telemetry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(3000),
+    }).catch(() => {});
   } catch {
     // Best effort — never block scan for telemetry
   }

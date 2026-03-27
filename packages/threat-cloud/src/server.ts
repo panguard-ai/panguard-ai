@@ -136,17 +136,17 @@ export class ThreatCloudServer {
         if (this.llmReviewer) {
           log.info('LLM reviewer enabled for ATR proposal review');
         }
-        // Auto-seed rules from bundled config/ if DB is empty (first startup)
+        // Auto-seed/update rules from bundled config/ on every startup
         const stats = this.db.getStats();
-        if (stats.totalRules === 0) {
-          log.info('First startup detected — seeding bundled rules...');
-          try {
-            const seeded = this.seedFromBundled();
-            log.info(`Seeded ${seeded} rules into database`);
-          } catch (err) {
-            log.error('Rule seeding failed', err);
+        try {
+          const seeded = this.seedFromBundled();
+          if (seeded > 0) {
+            log.info(`Rules synced: ${seeded} upserted (was ${stats.totalRules})`);
+          } else {
+            log.info(`Database: ${stats.totalRules} rules, ${stats.totalThreats} threats`);
           }
-        } else {
+        } catch (err) {
+          log.error('Rule seeding failed', err);
           log.info(`Database: ${stats.totalRules} rules, ${stats.totalThreats} threats`);
         }
 
