@@ -119,7 +119,7 @@ export default function HowItWorksContent() {
       </section>
 
       {/* ── Overview Stats ── */}
-      <SectionWrapper>
+      <SectionWrapper className="border-t border-border/30">
         <SectionTitle
           overline={t('overview.overline')}
           title={t('overview.title')}
@@ -140,7 +140,7 @@ export default function HowItWorksContent() {
       </SectionWrapper>
 
       {/* ── Five Detection Stages (funnel) ── */}
-      <SectionWrapper dark>
+      <SectionWrapper dark className="border-t border-border/30">
         <SectionTitle
           overline={t('layers.overline')}
           title={t('layers.title')}
@@ -185,7 +185,7 @@ export default function HowItWorksContent() {
       </SectionWrapper>
 
       {/* ── AI Funnel (detailed) ── */}
-      <SectionWrapper>
+      <SectionWrapper className="border-t border-border/30">
         <SectionTitle
           overline={t('aiFunnel.overline')}
           title={t('aiFunnel.title')}
@@ -227,7 +227,7 @@ export default function HowItWorksContent() {
       </SectionWrapper>
 
       {/* ── Agent Pipeline ── */}
-      <SectionWrapper dark>
+      <SectionWrapper dark className="border-t border-border/30">
         <SectionTitle
           overline={t('agentPipeline.overline')}
           title={t('agentPipeline.title')}
@@ -254,7 +254,7 @@ export default function HowItWorksContent() {
       </SectionWrapper>
 
       {/* ── Automated Response ── */}
-      <SectionWrapper>
+      <SectionWrapper className="border-t border-border/30">
         <SectionTitle
           overline={t('response.overline')}
           title={t('response.title')}
@@ -297,7 +297,7 @@ export default function HowItWorksContent() {
       </SectionWrapper>
 
       {/* ── 7-Day Learning ── */}
-      <SectionWrapper dark>
+      <SectionWrapper dark className="border-t border-border/30">
         <SectionTitle
           overline={t('learning.overline')}
           title={t('learning.title')}
@@ -322,7 +322,7 @@ export default function HowItWorksContent() {
                       {i + 1}
                     </div>
                   </div>
-                  <div className="pb-2">
+                  <div className="pb-2 flex-1 bg-surface-2 rounded-xl border border-border px-5 py-4">
                     <p className="text-[11px] uppercase tracking-wider text-brand-sage font-semibold">
                       {t(`learning.${phase}.days`)}
                     </p>
@@ -341,7 +341,7 @@ export default function HowItWorksContent() {
       </SectionWrapper>
 
       {/* ── Graceful Degradation ── */}
-      <SectionWrapper>
+      <SectionWrapper className="border-t border-border/30">
         <SectionTitle
           overline={t('degradation.overline')}
           title={t('degradation.title')}
@@ -367,7 +367,7 @@ export default function HowItWorksContent() {
       </SectionWrapper>
 
       {/* ── CTA ── */}
-      <SectionWrapper dark>
+      <SectionWrapper dark className="border-t border-border/30">
         <div className="text-center max-w-2xl mx-auto">
           <FadeInUp>
             <h2 className="text-[clamp(20px,3.5vw,40px)] font-bold text-text-primary">

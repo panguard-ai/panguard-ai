@@ -101,7 +101,7 @@ export default function AboutContent() {
       {/* ── By the Numbers ── */}
       <SectionWrapper>
         <SectionTitle overline={t('numbers.overline')} title={t('numbers.title')} />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-10 sm:mt-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-10 sm:mt-14 bg-surface-2/50 rounded-xl p-6">
           {(t.raw('numbers.stats') as Array<{ value: string; label: string }>).map((stat, i) => (
             <FadeInUp key={stat.label} delay={i * 0.05}>
               <div className="text-center">

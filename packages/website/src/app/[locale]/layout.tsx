@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono, Noto_Sans_TC } from 'next/font/google';
+import { Inter, Space_Grotesk, JetBrains_Mono, Noto_Sans_TC } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -12,6 +12,12 @@ const locales = ['en', 'zh-TW'] as const;
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -163,7 +169,7 @@ export default async function LocaleLayout(
   return (
     <html
       lang={locale === 'zh-TW' ? 'zh-TW' : 'en'}
-      className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansTC.variable}`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${notoSansTC.variable}`}
       suppressHydrationWarning
     >
       <head>

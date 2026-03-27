@@ -19,7 +19,7 @@ function LocaleSwitcher() {
     <div className="inline-flex items-center bg-surface-1 border border-border rounded-full p-0.5">
       <button
         onClick={() => switchTo('en')}
-        className={`relative px-3 py-1 text-xs font-medium rounded-full transition-all duration-300 ${
+        className={`relative px-3 py-1 min-h-[44px] min-w-[44px] text-xs font-medium rounded-full transition-all duration-300 ${
           locale === 'en'
             ? 'text-surface-0 bg-brand-sage'
             : 'text-text-tertiary hover:text-text-secondary'
@@ -29,7 +29,7 @@ function LocaleSwitcher() {
       </button>
       <button
         onClick={() => switchTo('zh-TW')}
-        className={`relative px-3 py-1 text-xs font-medium rounded-full transition-all duration-300 ${
+        className={`relative px-3 py-1 min-h-[44px] min-w-[44px] text-xs font-medium rounded-full transition-all duration-300 ${
           locale === 'zh-TW'
             ? 'text-surface-0 bg-brand-sage'
             : 'text-text-tertiary hover:text-text-secondary'
@@ -198,14 +198,6 @@ export default function NavBar() {
               {link.label}
             </Link>
           ))}
-          <a
-            href="https://github.com/Agent-Threat-Rule/agent-threat-rules"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-3 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
-          >
-            {t('community')}
-          </a>
         </div>
 
         {/* Desktop CTA + Locale Switcher */}

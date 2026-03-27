@@ -726,13 +726,17 @@
       "submitATR": "提交 ATR 規則提案"
     },
     "scannerHero": {
-      "titleLine1": "在你安裝任何東西之前，",
-      "titleLine2": "先安裝安全。",
-      "subtitle": "安裝前掃描任何 AI Skill。支援 16 個平台。71 條 ATR 規則。免費開源。",
+      "titleLine1": "我們掃描了 10,000 個 MCP Skills。",
+      "titleLine2": "13.5% 有安全風險。",
+      "subtitle": "10 秒檢查你的 Skill。免費。開源。",
       "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
       "scanBtn": "掃描",
       "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。",
-      "platformLabel": "支援 16 個平台："
+      "platformLabel": "支援 16 個平台：",
+      "statsScanned": "已掃描 Skills",
+      "statsCritical": "CRITICAL 發現",
+      "statsRules": "ATR 規則",
+      "statsCrystallized": "威脅已結晶"
     },
     "evidence": {
       "title": "我們掃描了 {count} 個 ClawHub Skills。{percent}% 有安全風險模式。",

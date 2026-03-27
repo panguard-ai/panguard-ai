@@ -17,9 +17,9 @@ const config: Config = {
           'sage-wash': 'rgba(139, 154, 142, 0.04)',
         },
         panguard: {
-          green: '#6B8F71',
-          'green-light': '#8FB996',
-          'green-dark': '#3D5A42',
+          green: '#34D399',
+          'green-light': '#6EE7B7',
+          'green-dark': '#059669',
           red: '#C75050',
         },
         surface: {
@@ -36,8 +36,8 @@ const config: Config = {
         text: {
           primary: '#F5F1E8',
           secondary: '#A09890',
-          tertiary: '#706860',
-          muted: '#7A716B',
+          tertiary: '#9A9490',
+          muted: '#9A9490',
         },
         status: {
           safe: '#2ED573',
@@ -49,6 +49,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'var(--font-cjk)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'var(--font-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'monospace'],
       },
       borderColor: {

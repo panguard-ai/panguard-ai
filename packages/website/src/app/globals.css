@@ -17,24 +17,12 @@ h1,
 h2,
 h3,
 h4 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
   text-wrap: balance;
 }
 
 p {
   text-wrap: pretty;
-}
-
-/* Subtle noise grain texture for premium feel */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")
-    repeat;
-  opacity: 0.025;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  z-index: 9999;
 }
 
 /* Ambient sage gradient mesh for depth */

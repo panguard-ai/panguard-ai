@@ -56,6 +56,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL('/api/install', request.url));
   }
 
+  // /install → redirect to quickstart docs
+  if (pathname === '/install') {
+    return NextResponse.redirect('https://docs.panguard.ai/quickstart', 301);
+  }
+
   // /docs → redirect to Mintlify docs site
   if (pathname === '/docs' || pathname.startsWith('/docs/')) {
     const docsPath = pathname.replace(/^\/(en|zh-TW)/, '').replace(/^\/docs\/?/, '/');
