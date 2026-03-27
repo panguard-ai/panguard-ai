@@ -58,7 +58,7 @@ export default function CTARoadmap() {
 
         <FadeInUp delay={0.1}>
           <p className="text-center text-sm text-text-muted mt-4">
-            60 seconds. 16 platforms. {STATS.atrRules} rules. Free forever.
+            {t('installNote', { rules: STATS.atrRules })}
           </p>
         </FadeInUp>
 
@@ -136,7 +136,7 @@ export default function CTARoadmap() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 hover:text-text-secondary transition-colors duration-200"
               >
-                Paper published (Zenodo DOI)
+                {t('paperPublished')}
                 <ExternalLink className="w-3 h-3" />
               </a>
             </p>

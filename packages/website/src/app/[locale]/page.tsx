@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic';
+import { getTranslations } from 'next-intl/server';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import ScannerHero from '@/components/home/ScannerHero';
@@ -9,17 +10,15 @@ const Evidence = dynamic(() => import('@/components/home/Evidence'));
 const HowItWorks = dynamic(() => import('@/components/home/HowItWorks'));
 const CTARoadmap = dynamic(() => import('@/components/home/CTARoadmap'));
 
-export default function Home() {
+export default async function Home() {
+  const t = await getTranslations('home');
   return (
     <>
       <NavBar />
       <RuleStatsProvider>
         <main id="main-content">
           <p id="definition" className="sr-only">
-            Panguard AI provides the first Skills Audit for AI agents. It audits every skill before
-            it runs, catches known threats with community ATR (Agent Threat Rules), catches unknown
-            threats with AI analysis, and shares new rules to protect everyone. MIT licensed. Open
-            source.
+            {t('srDefinition')}
           </p>
           {/* 1. Hero: Scanner + stats + platform bar */}
           <ScannerHero />

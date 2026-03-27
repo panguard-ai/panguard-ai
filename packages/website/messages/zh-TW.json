@@ -725,6 +725,7 @@
       "trustNote": "掃描在伺服器端執行。不會儲存代碼。僅快取內容 hash 用於去重。",
       "submitATR": "提交 ATR 規則提案"
     },
+    "srDefinition": "Panguard AI 為 AI Agent 提供第一個 Skills Audit。它在每個 Skill 執行前進行審計，用社群 ATR（Agent Threat Rules）捕獲已知威脅，用 AI 分析捕獲未知威脅，並分享新規則保護所有人。MIT 授權。開源。",
     "scannerHero": {
       "titleLine1": "我們掃描了 10,000 個 MCP Skills。",
       "titleLine2": "13.5% 有安全風險。",
@@ -742,7 +743,26 @@
       "title": "我們掃描了 {count} 個 ClawHub Skills。{percent}% 有安全風險模式。",
       "subtitle": "真實套件。真實下載量。真實發現。",
       "dontTakeOurWord": "不信？",
-      "scanYours": "自己掃一下"
+      "scanYours": "自己掃一下",
+      "downloads": "次下載",
+      "skills": {
+        "tesla": {
+          "summary": "可以覆寫你 Agent 的 system prompt",
+          "detail": "控制你的 Tesla 車隊 -- prompt injection 可完全覆寫 Agent 指令，發出未授權的車輛命令。"
+        },
+        "wallet": {
+          "summary": "可以覆寫你 Agent 的 system prompt",
+          "detail": "連接你的加密錢包 -- prompt injection 讓攻擊者可以重導交易或竊取私鑰。"
+        },
+        "clawsec": {
+          "summary": "一個有安全漏洞的安全工具",
+          "detail": "諷刺的是，這個以安全為賣點的 Skill 本身包含資源耗盡和資料外洩模式，反而破壞了它聲稱提供的保護。"
+        },
+        "safeexec": {
+          "summary": "名叫 'safe' 但不 safe",
+          "detail": "儘管名字讓人安心，這個 Skill 包含繞過 sandbox 限制的不安全程式碼執行模式。"
+        }
+      }
     },
     "liveStatsBar": {
       "scanned": "Skills 已掃描",
@@ -801,7 +821,9 @@
       "mission4": "使用的人越多，整個生態系就越安全。",
       "roadmapTitle": "我們的方向：",
       "installNow": "立即安裝",
-      "scanSkill": "掃描 Skill"
+      "scanSkill": "掃描 Skill",
+      "installNote": "60 秒安裝。16 個平台。{rules} 條規則。永久免費。",
+      "paperPublished": "論文已發表（Zenodo DOI）"
     },
     "atrStandard": {
       "overline": "開放標準",
