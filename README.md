@@ -134,19 +134,17 @@ ATR (Agent Threat Rules) is the only rule format designed to protect AI agents. 
 
 ---
 
-## Core Products
+## What You Get
 
 Everything is **free and open source**. MIT licensed.
 
-| Product                               | What It Does                                                              | Status      |
-| ------------------------------------- | ------------------------------------------------------------------------- | ----------- |
-| **[Skill Auditor](docs/overview.md)** | 6-check security gate -- audits every AI skill before install             | GA          |
-| **[Guard](docs/ARCHITECTURE.md)**     | 24/7 runtime monitoring: file, network, process, git, dependency watchers | GA          |
-| **[Threat Cloud](#threat-cloud)**     | Collective threat intelligence -- every scan strengthens the network      | GA          |
-| **[MCP Server](docs/API.md)**         | 11+ tools for Claude, Cursor, and any MCP client                          | GA          |
-| **[Scan](docs/DETECTION.md)**         | 60-second security audit                                                  | GA          |
-| **[Trap](docs/DETECTION.md)**         | Honeypot services for attacker profiling                                  | Coming Soon |
-| **[Report](docs/DETECTION.md)**       | Compliance: ISO 27001, SOC 2                                              | Coming Soon |
+| What | How it works |
+| ---- | ------------ |
+| **Scan** | `pga up` scans all installed MCP skills against 71 ATR rules. 60 seconds. Done. |
+| **24/7 Monitoring** | Guard watches for new skill installs and auto-scans them in real time. |
+| **[Threat Cloud](#threat-cloud)** | Your scan results feed the community. One person finds a threat → becomes a rule → protects everyone within 1 hour. |
+| **[ATR Rules](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | 71 YAML detection rules. OWASP Agentic Top 10: 10/10. SAFE-MCP: 91.8%. Open standard. |
+| **MCP Server** | 11+ tools for Claude Code, Cursor, and any MCP client. `panguard setup` auto-configures. |
 
 ---
 
