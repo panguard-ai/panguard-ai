@@ -76,7 +76,8 @@ export default async function BlogPostPage(props: {
   const isZhSlug = params.slug.endsWith('-zh');
   const baseSlug = isZhSlug ? params.slug.replace(/-zh$/, '') : params.slug;
 
-  const post = allPosts.find((p) => p.slug === baseSlug) ?? allPosts.find((p) => p.slug === params.slug);
+  const post =
+    allPosts.find((p) => p.slug === baseSlug) ?? allPosts.find((p) => p.slug === params.slug);
   if (!post) {
     notFound();
   }
@@ -117,10 +118,7 @@ export default async function BlogPostPage(props: {
       />
       <JsonLdBreadcrumb
         nonce={nonce}
-        items={[
-          { name: 'Blog', href: '/blog' },
-          { name: post.title },
-        ]}
+        items={[{ name: 'Blog', href: '/blog' }, { name: post.title }]}
       />
       <NavBar />
       <main id="main-content">

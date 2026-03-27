@@ -263,7 +263,9 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
           discoverFn = mcp.discoverAllSkills;
           break;
         }
-      } catch { /* try next */ }
+      } catch {
+        /* try next */
+      }
     }
     if (!discoverFn!) throw new Error('No MCP discovery available');
     const installedSkills = await discoverFn();
@@ -280,7 +282,9 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
           whitelistNames.add(s.name.toLowerCase());
           if (s.normalizedName) whitelistNames.add(s.normalizedName.toLowerCase());
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
 
     console.log(
@@ -293,7 +297,9 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
     console.log('');
 
     if (installedSkills.length === 0) {
-      console.log(`  ${c.dim(lang === 'zh-TW' ? '\u672A\u5075\u6E2C\u5230\u5DF2\u5B89\u88DD\u7684 skill' : 'No installed skills detected')}`);
+      console.log(
+        `  ${c.dim(lang === 'zh-TW' ? '\u672A\u5075\u6E2C\u5230\u5DF2\u5B89\u88DD\u7684 skill' : 'No installed skills detected')}`
+      );
     } else {
       const skillColumns: TableColumn[] = [
         { header: '#', key: 'num', width: 3, align: 'right' },
@@ -322,12 +328,14 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
       });
 
       // Show summary first
-      const safeCount = skillRows.filter(r => r.status === 'SAFE').length;
-      const unknownCount = skillRows.filter(r => r.status === 'UNKNOWN').length;
+      const safeCount = skillRows.filter((r) => r.status === 'SAFE').length;
+      const unknownCount = skillRows.filter((r) => r.status === 'UNKNOWN').length;
       console.log(
         `  ${c.safe(String(safeCount))} safe  ${c.dim('|')}  ${unknownCount > 0 ? c.caution(String(unknownCount)) : c.dim('0')} unscanned`
       );
-      console.log(`  ${c.dim(lang === 'zh-TW' ? '\u57F7\u884C pga setup \u6383\u63CF\u5168\u90E8 skill' : 'Run pga setup to scan all skills')}`);
+      console.log(
+        `  ${c.dim(lang === 'zh-TW' ? '\u57F7\u884C pga setup \u6383\u63CF\u5168\u90E8 skill' : 'Run pga setup to scan all skills')}`
+      );
       console.log('');
 
       // Show table (limit to 20 rows to avoid flood)
@@ -342,7 +350,9 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
     // MCP package not available — show hint
     console.log(divider('Installed Skills'));
     console.log('');
-    console.log(`  ${c.dim('Could not discover skills: ' + (skillErr instanceof Error ? skillErr.message : String(skillErr)))}`);
+    console.log(
+      `  ${c.dim('Could not discover skills: ' + (skillErr instanceof Error ? skillErr.message : String(skillErr)))}`
+    );
     console.log('');
   }
 

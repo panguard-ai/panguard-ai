@@ -1472,9 +1472,7 @@ export class ThreatCloudDB {
 
     // Whitelist count
     const whitelistCount = (
-      this.db
-        .prepare(`SELECT COUNT(*) as count FROM skill_whitelist`)
-        .get() as { count: number }
+      this.db.prepare(`SELECT COUNT(*) as count FROM skill_whitelist`).get() as { count: number }
     ).count;
 
     // Blacklist count (uses aggregated skill_threats view, same as getSkillBlacklist)
