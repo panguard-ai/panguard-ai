@@ -15,9 +15,11 @@ const TC_ENDPOINT = 'https://tc.panguard.ai';
  */
 export async function discoverLocalSkillCount(): Promise<number> {
   try {
-    // @ts-expect-error — project reference build order issue with tsc --noEmit; works at runtime
-    const mod: { discoverAllSkills: () => Promise<readonly unknown[]> } =
-      await import('@panguard-ai/panguard-mcp');
+    // Use string variable to prevent tsc from resolving the project reference
+    const pkg = '@panguard-ai/panguard-mcp';
+    const mod = (await import(pkg)) as {
+      discoverAllSkills: () => Promise<readonly unknown[]>;
+    };
     const skills = await mod.discoverAllSkills();
     return skills.length;
   } catch {

@@ -150,6 +150,12 @@ export function setupCommand(): Command {
         }>);
         const { detectPlatforms, injectMCPConfig, removeMCPConfig } = mcpConfig;
 
+        // Suppress JSON structured logs unless --json mode
+        if (!options.json) {
+          const { setLogLevel } = await import('@panguard-ai/core');
+          setLogLevel('silent');
+        }
+
         if (!options.json) {
           banner('Panguard Setup');
           console.log();
@@ -661,6 +667,10 @@ export function setupCommand(): Command {
           console.log(JSON.stringify(jsonOutput, null, 2));
           return;
         }
+
+        // ── Telemetry consent (opt-in, first-run only) ─────────────
+        const { ensureTelemetryConsent } = await import('../consent.js');
+        await ensureTelemetryConsent();
 
         // ── Next steps (human-readable only) ─────────────────────────
         console.log();
