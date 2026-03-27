@@ -725,6 +725,7 @@
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached for deduplication.",
       "submitATR": "Submit ATR Rule Proposal"
     },
+    "srDefinition": "Panguard AI provides the first Skills Audit for AI agents. It audits every skill before it runs, catches known threats with community ATR (Agent Threat Rules), catches unknown threats with AI analysis, and shares new rules to protect everyone. MIT licensed. Open source.",
     "scannerHero": {
       "titleLine1": "We scanned 10,000 MCP skills.",
       "titleLine2": "13.5% have security risks.",
@@ -742,7 +743,26 @@
       "title": "We scanned {count} ClawHub skills. {percent}% have security risk patterns.",
       "subtitle": "Real packages. Real downloads. Real findings.",
       "dontTakeOurWord": "Don't take our word for it.",
-      "scanYours": "Scan yours"
+      "scanYours": "Scan yours",
+      "downloads": "downloads",
+      "skills": {
+        "tesla": {
+          "summary": "Can override your agent's system prompt",
+          "detail": "Controls your Tesla fleet -- prompt injection allows full override of agent instructions, enabling unauthorized vehicle commands."
+        },
+        "wallet": {
+          "summary": "Can override your agent's system prompt",
+          "detail": "Connects to your crypto wallet -- prompt injection allows an attacker to redirect transactions or exfiltrate private keys."
+        },
+        "clawsec": {
+          "summary": "A security tool with security holes",
+          "detail": "Ironically, this security-focused skill contains resource exhaustion and data exfiltration patterns that undermine the protections it claims to provide."
+        },
+        "safeexec": {
+          "summary": "Named 'safe' but isn't safe",
+          "detail": "Despite its reassuring name, this skill contains unsafe code execution patterns that bypass sandbox restrictions."
+        }
+      }
     },
     "liveStatsBar": {
       "scanned": "skills scanned",
@@ -801,7 +821,9 @@
       "mission4": "The more people use it, the safer the entire ecosystem becomes.",
       "roadmapTitle": "Where we're going:",
       "installNow": "Install Now",
-      "scanSkill": "Scan a Skill"
+      "scanSkill": "Scan a Skill",
+      "installNote": "60 seconds. 16 platforms. {rules} rules. Free forever.",
+      "paperPublished": "Paper published (Zenodo DOI)"
     },
     "atrStandard": {
       "overline": "OPEN STANDARD",

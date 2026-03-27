@@ -13,43 +13,14 @@ interface NotableSkill {
   name: string;
   downloads: number;
   severity: Severity;
-  summary: string;
-  detail: string;
+  i18nKey: string;
 }
 
 const NOTABLE_SKILLS: readonly NotableSkill[] = [
-  {
-    name: 'tesla-fleet-api',
-    downloads: 2839,
-    severity: 'CRITICAL',
-    summary: "Can override your agent's system prompt",
-    detail:
-      'Controls your Tesla fleet -- prompt injection allows full override of agent instructions, enabling unauthorized vehicle commands.',
-  },
-  {
-    name: 'walletconnect-agent',
-    downloads: 2206,
-    severity: 'CRITICAL',
-    summary: "Can override your agent's system prompt",
-    detail:
-      'Connects to your crypto wallet -- prompt injection allows an attacker to redirect transactions or exfiltrate private keys.',
-  },
-  {
-    name: 'clawsec',
-    downloads: 9491,
-    severity: 'HIGH',
-    summary: 'A security tool with security holes',
-    detail:
-      'Ironically, this security-focused skill contains resource exhaustion and data exfiltration patterns that undermine the protections it claims to provide.',
-  },
-  {
-    name: 'safe-exec',
-    downloads: 2142,
-    severity: 'HIGH',
-    summary: "Named 'safe' but isn't safe",
-    detail:
-      'Despite its reassuring name, this skill contains unsafe code execution patterns that bypass sandbox restrictions.',
-  },
+  { name: 'tesla-fleet-api', downloads: 2839, severity: 'CRITICAL', i18nKey: 'tesla' },
+  { name: 'walletconnect-agent', downloads: 2206, severity: 'CRITICAL', i18nKey: 'wallet' },
+  { name: 'clawsec', downloads: 9491, severity: 'HIGH', i18nKey: 'clawsec' },
+  { name: 'safe-exec', downloads: 2142, severity: 'HIGH', i18nKey: 'safeexec' },
 ] as const;
 
 const SEVERITY_STYLES: Record<Severity, { text: string; bg: string; border: string }> = {
@@ -128,10 +99,12 @@ export default function Evidence() {
                             {skill.severity}
                           </span>
                           <span className="text-xs text-text-muted">
-                            {skill.downloads.toLocaleString()} downloads
+                            {skill.downloads.toLocaleString()} {t('downloads')}
                           </span>
                         </div>
-                        <p className="text-sm text-text-secondary mt-0.5">{skill.summary}</p>
+                        <p className="text-sm text-text-secondary mt-0.5">
+                          {t(`skills.${skill.i18nKey}.summary`)}
+                        </p>
                       </div>
                     </div>
                     <motion.div
@@ -154,7 +127,7 @@ export default function Evidence() {
                       >
                         <div className={`mt-3 pt-3 border-t ${styles.border}`}>
                           <p className="text-sm text-text-secondary leading-relaxed">
-                            {skill.detail}
+                            {t(`skills.${skill.i18nKey}.detail`)}
                           </p>
                         </div>
                       </motion.div>
