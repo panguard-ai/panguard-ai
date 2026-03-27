@@ -24,10 +24,13 @@ import {
 /** Open URL in the default browser (cross-platform) */
 function openBrowser(url: string): void {
   const os = platform();
-  const cmd = os === 'darwin' ? 'open' : os === 'win32' ? 'start' : 'xdg-open';
-  execFile(cmd, [url], () => {
-    // Ignore errors — browser open is best-effort
-  });
+  if (os === 'win32') {
+    execFile('cmd', ['/c', 'start', '', url], () => {});
+  } else if (os === 'darwin') {
+    execFile('open', [url], () => {});
+  } else {
+    execFile('xdg-open', [url], () => {});
+  }
 }
 
 /** Persist skill names into the Guard whitelist JSON file */
