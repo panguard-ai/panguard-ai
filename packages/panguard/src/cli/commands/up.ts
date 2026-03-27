@@ -5,12 +5,34 @@
  * The simplest way to get Panguard running. Two characters: pg up.
  */
 
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { homedir } from 'node:os';
+import { homedir, platform } from 'node:os';
+import { execFile } from 'node:child_process';
 import { Command } from 'commander';
 import { runCLI } from '@panguard-ai/panguard-guard';
 import { c, header } from '@panguard-ai/core';
+
+const DASHBOARD_URL = 'http://127.0.0.1:3100';
+
+/** Open URL in default browser (cross-platform) */
+function openBrowser(url: string): void {
+  const cmd = platform() === 'darwin' ? 'open' : platform() === 'win32' ? 'start' : 'xdg-open';
+  execFile(cmd, [url], () => {});
+}
+
+/** Check if Guard is already running via PID file */
+function isGuardRunning(): boolean {
+  const pidPath = join(homedir(), '.panguard-guard', 'panguard-guard.pid');
+  if (!existsSync(pidPath)) return false;
+  try {
+    const pid = parseInt(readFileSync(pidPath, 'utf-8').trim(), 10);
+    process.kill(pid, 0); // signal 0 = check if alive
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function upCommand(): Command {
   return new Command('up')
@@ -25,7 +47,6 @@ export function upCommand(): Command {
 
       if (isFirstRun) {
         console.log(c.sage('\n  First time? Running setup first...\n'));
-        // Import and run setup dynamically to avoid circular deps
         const { execFileSync } = await import('node:child_process');
         try {
           execFileSync(process.execPath, [process.argv[1] ?? 'panguard', 'setup'], {
@@ -36,7 +57,22 @@ export function upCommand(): Command {
         }
       }
 
+      // If Guard is already running, just open dashboard and exit
+      if (isGuardRunning()) {
+        console.log(c.sage('\n  Panguard Guard is already running.'));
+        if (opts.dashboard) {
+          console.log(c.sage(`  Opening dashboard: ${DASHBOARD_URL}\n`));
+          openBrowser(DASHBOARD_URL);
+        }
+        return;
+      }
+
       header('Starting Panguard AI Protection');
+
+      // Always open dashboard when Guard starts
+      if (opts.dashboard) {
+        setTimeout(() => openBrowser(DASHBOARD_URL), 2000);
+      }
 
       const args = ['start'];
       if (opts.dashboard) args.push('--dashboard');
