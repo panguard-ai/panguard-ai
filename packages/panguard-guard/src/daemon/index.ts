@@ -288,18 +288,41 @@ async function uninstallSystemd(): Promise<string> {
 // ---------------------------------------------------------------------------
 
 async function installWindowsService(execPath: string): Promise<string> {
-  await execFileAsync('sc', [
-    'create',
-    SERVICE_NAME,
-    `binpath=${execPath} start`,
-    `displayname=${SERVICE_DISPLAY_NAME}`,
-    'start=auto',
-  ]);
-
-  await execFileAsync('sc', ['start', SERVICE_NAME]);
-
-  logger.info('Windows service installed / Windows 服務已安裝');
-  return SERVICE_NAME;
+  // Try sc create (requires admin), fall back to Task Scheduler (no admin needed)
+  try {
+    await execFileAsync('sc', [
+      'create',
+      SERVICE_NAME,
+      `binpath=${execPath} start`,
+      `displayname=${SERVICE_DISPLAY_NAME}`,
+      'start=auto',
+    ]);
+    await execFileAsync('sc', ['start', SERVICE_NAME]);
+    logger.info('Windows service installed via sc.exe / Windows 服務已透過 sc.exe 安裝');
+    return SERVICE_NAME;
+  } catch (scErr) {
+    const msg = scErr instanceof Error ? scErr.message : String(scErr);
+    if (msg.includes('Access') || msg.includes('denied') || msg.includes('5')) {
+      // No admin — use Task Scheduler (schtasks) which works without elevation
+      logger.info('sc.exe requires admin, falling back to Task Scheduler / 嘗試使用工作排程器');
+      const taskName = 'PanguardGuard';
+      await execFileAsync('schtasks', [
+        '/Create',
+        '/TN', taskName,
+        '/TR', `"${process.execPath}" "${execPath}" start`,
+        '/SC', 'ONLOGON',
+        '/RL', 'LIMITED',
+        '/F',
+      ]);
+      // Start it now
+      await execFileAsync('schtasks', ['/Run', '/TN', taskName]).catch(() => {
+        // May fail if already running
+      });
+      logger.info('Windows task installed via schtasks / Windows 排程工作已安裝');
+      return taskName;
+    }
+    throw scErr;
+  }
 }
 
 async function uninstallWindowsService(): Promise<string> {

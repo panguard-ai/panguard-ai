@@ -18,8 +18,10 @@ export function upCommand(): Command {
     .option('--no-dashboard', 'Skip TUI dashboard / 不啟動儀表板')
     .option('--verbose', 'Verbose output / 詳細輸出', false)
     .action(async (opts: { dashboard: boolean; verbose: boolean }) => {
-      const configPath = join(homedir(), '.panguard', 'config.json');
-      const isFirstRun = !existsSync(configPath);
+      // Check both config locations — setup writes to either depending on flow
+      const configPath1 = join(homedir(), '.panguard', 'config.json');
+      const configPath2 = join(homedir(), '.panguard-guard', 'config.json');
+      const isFirstRun = !existsSync(configPath1) && !existsSync(configPath2);
 
       if (isFirstRun) {
         console.log(c.sage('\n  First time? Running setup first...\n'));

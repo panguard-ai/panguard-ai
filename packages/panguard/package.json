@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/panguard",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -47,7 +47,7 @@
     "@panguard-ai/atr": "^1.4.0",
     "@panguard-ai/core": "^1.3.2",
     "@panguard-ai/panguard-scan": "^1.3.1",
-    "@panguard-ai/panguard-guard": "^1.4.4",
+    "@panguard-ai/panguard-guard": "^1.4.5",
     "@panguard-ai/panguard-chat": "^1.3.1",
     "@panguard-ai/security-hardening": "^1.0.0",
     "@panguard-ai/scan-core": "^1.4.0",
