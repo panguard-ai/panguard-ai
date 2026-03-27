@@ -768,16 +768,24 @@
       "title": "This is not hypothetical.",
       "subtitle": "Real CVEs. Real attacks. Real victims.",
       "cta": "Scan yours",
-      "scanCount": "We scanned {count} MCP skills. {percent}% have CRITICAL or HIGH security risks."
+      "scanCount": "We scanned {count} MCP skills. {percent}% have CRITICAL or HIGH security risks.",
+      "incident1Name": "MCPJam Inspector",
+      "incident1Desc": "Default 0.0.0.0 binding. One HTTP request = full remote code execution. All versions before v1.4.3.",
+      "incident2Name": "Claude Code (Anthropic)",
+      "incident2Desc": "Hooks + MCP config exploited for arbitrary shell execution and API key theft.",
+      "incident3Name": "Azure MCP Server",
+      "incident3Desc": "SSRF steals managed identity tokens. Attacker gains Azure resource access without admin privileges.",
+      "incident4Name": "postmark-mcp",
+      "incident4Desc": "Clean for 15 versions. v1.0.16 silently BCC-forwarded 3K-15K emails per day to an external address."
     },
     "whyPanguard": {
       "title": "Why PanGuard",
       "pillar1Title": "< 1 Hour Response",
-      "pillar1Desc": "New threat to detection: industry takes weeks. PanGuard takes 1 hour.",
+      "pillar1Desc": "New threat to detection: industry takes weeks. PanGuard takes 1 hour. Community reports + LLM auto-review, not committee approvals.",
       "pillar2Title": "Trust Network",
       "pillar2Desc": "Not antivirus. A trust rating for every MCP skill. Like SSL certificates for the agent ecosystem.",
       "pillar3Title": "Collective Defense",
-      "pillar3Desc": "Every scan makes everyone safer. Scan, detect, crystallize, distribute.",
+      "pillar3Desc": "Every scan makes everyone safer. One machine discovers a threat. One hour later, every machine is immune.",
       "compTitle": "How we compare",
       "compSpeed": "Rule update speed",
       "compSetup": "Setup",
@@ -884,59 +892,6 @@
       "reportAuthor": "Report to Author",
       "proposeATR": "Propose ATR Rule",
       "flywheelNote": "Your finding will be reviewed by the community. If confirmed, an ATR rule will be auto-generated to protect everyone using PanGuard."
-    },
-    "whyPanguard": {
-      "overline": "THE GAP",
-      "title": "Traditional security can't see AI agent threats",
-      "subtitle": "CrowdStrike protects your OS. Snyk protects your code. Lakera filters prompts. Nobody protects your AI agent.",
-      "edrSees": "Traditional security sees:",
-      "sees1": "Process execution, file access, network calls",
-      "sees2": "Malware signatures, ransomware patterns",
-      "sees3": "Known CVEs in installed packages",
-      "edrMisses": "But completely misses:",
-      "miss1": "Prompt injection in agent conversations",
-      "miss2": "Malicious MCP skill definitions",
-      "miss3": "Credential theft via agent tool calls",
-      "miss4": "Supply chain attacks via skill packages",
-      "capability": "Capability",
-      "table": {
-        "row1": {
-          "feature": "AI agent threat detection",
-          "panguard": "yes",
-          "crowdstrike": "no",
-          "snyk": "no",
-          "lakera": "partial"
-        },
-        "row2": {
-          "feature": "MCP skill pre-install audit",
-          "panguard": "yes",
-          "crowdstrike": "no",
-          "snyk": "no",
-          "lakera": "no"
-        },
-        "row3": {
-          "feature": "Prompt injection detection",
-          "panguard": "21 ATR rules",
-          "crowdstrike": "no",
-          "snyk": "no",
-          "lakera": "yes"
-        },
-        "row4": {
-          "feature": "Runtime agent monitoring",
-          "panguard": "24/7 daemon",
-          "crowdstrike": "Endpoints only",
-          "snyk": "no",
-          "lakera": "no"
-        },
-        "row5": {
-          "feature": "Cost",
-          "panguard": "$0 (MIT)",
-          "crowdstrike": "$25-60/ep/mo",
-          "snyk": "Free tier+",
-          "lakera": "Paid"
-        }
-      },
-      "bottomLine": "PanGuard fills the gap with {rules} detection rules. Open source. Free forever."
     },
     "productShowcase": {
       "overline": "THREE LAYERS OF DEFENSE",
@@ -2118,7 +2073,14 @@
       },
       "workflow": {
         "title": "Fits your workflow",
-        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "Secure your stack with one command",
@@ -2179,7 +2141,13 @@
       },
       "integrations": {
         "title": "Integrations your team already uses",
-        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
+        "tools": [
+          "Slack",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "Protect your business today",
@@ -2239,7 +2207,15 @@
       },
       "integrations": {
         "title": "Enterprise integrations",
-        "tools": ["SIEM", "PagerDuty", "Jira", "Slack", "Microsoft Teams", "REST API", "Webhooks"]
+        "tools": [
+          "SIEM",
+          "PagerDuty",
+          "Jira",
+          "Slack",
+          "Microsoft Teams",
+          "REST API",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "See Panguard in action",
@@ -2295,7 +2271,14 @@
       "stack": "e.g. CrowdStrike, Cloudflare, custom scripts...",
       "message": "Tell us about your security goals or any specific questions..."
     },
-    "teamSizes": ["Just me", "2-10", "11-50", "51-200", "201-500", "500+"],
+    "teamSizes": [
+      "Just me",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
     "submit": "Send Message",
     "submitting": "Submitting...",
     "error": "Failed to submit request. Please try again.",
@@ -2476,7 +2459,12 @@
       "inquiryType": "Select type",
       "message": "How can we help?"
     },
-    "inquiryTypes": ["General", "Support", "Partnership", "Other"],
+    "inquiryTypes": [
+      "General",
+      "Support",
+      "Partnership",
+      "Other"
+    ],
     "submit": "Send Message",
     "submitting": "Sending...",
     "successTitle": "Message sent.",
@@ -2548,16 +2536,36 @@
       "subtitle": "Every OWASP Agentic category has dedicated ATR detection rules. 6 categories at STRONG coverage, 4 at MODERATE -- all fully covered.",
       "rulesLabel": "ATR rules",
       "note": "Some rules map to multiple categories. Total rule-category mappings: {total}.",
-      "ASI01": { "name": "Agent Goal Hijack" },
-      "ASI02": { "name": "Tool Misuse & Exploitation" },
-      "ASI03": { "name": "Identity & Privilege Abuse" },
-      "ASI04": { "name": "Agentic Supply Chain" },
-      "ASI05": { "name": "Unexpected Code Execution" },
-      "ASI06": { "name": "Memory & Context Poisoning" },
-      "ASI07": { "name": "Insecure Inter-Agent Comms" },
-      "ASI08": { "name": "Cascading Failures" },
-      "ASI09": { "name": "Human-Agent Trust Exploit" },
-      "ASI10": { "name": "Rogue Agents" }
+      "ASI01": {
+        "name": "Agent Goal Hijack"
+      },
+      "ASI02": {
+        "name": "Tool Misuse & Exploitation"
+      },
+      "ASI03": {
+        "name": "Identity & Privilege Abuse"
+      },
+      "ASI04": {
+        "name": "Agentic Supply Chain"
+      },
+      "ASI05": {
+        "name": "Unexpected Code Execution"
+      },
+      "ASI06": {
+        "name": "Memory & Context Poisoning"
+      },
+      "ASI07": {
+        "name": "Insecure Inter-Agent Comms"
+      },
+      "ASI08": {
+        "name": "Cascading Failures"
+      },
+      "ASI09": {
+        "name": "Human-Agent Trust Exploit"
+      },
+      "ASI10": {
+        "name": "Rogue Agents"
+      }
     },
     "evidence": {
       "overline": "Ecosystem Scan",
@@ -5034,7 +5042,12 @@
       },
       "inProgress": {
         "title": "In Progress",
-        "items": ["Report + Trap", "Web Dashboard UI", "Windows support", "Kubernetes integration"]
+        "items": [
+          "Report + Trap",
+          "Web Dashboard UI",
+          "Windows support",
+          "Kubernetes integration"
+        ]
       },
       "planned": {
         "title": "Planned",

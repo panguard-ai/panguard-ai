@@ -1369,25 +1369,10 @@ response:
   }
 
   /** Serve admin dashboard HTML -- requires admin auth via query param or header */
-  private serveAdminDashboard(req: IncomingMessage, res: ServerResponse): void {
-    // Server-side auth: require admin key via ?key= param or Authorization header
-    if (this.config.adminApiKey) {
-      const url = new URL(req.url ?? '/', `http://localhost:${this.config.port}`);
-      const queryKey = url.searchParams.get('key');
-      const headerKey = (req.headers.authorization ?? '').replace('Bearer ', '');
-      const keyMatch = (candidate: string | null): boolean => {
-        if (!candidate || candidate.length !== this.config.adminApiKey!.length) return false;
-        return timingSafeEqual(
-          Buffer.from(candidate, 'utf-8'),
-          Buffer.from(this.config.adminApiKey!, 'utf-8')
-        );
-      };
-      if (!keyMatch(queryKey) && !keyMatch(headerKey)) {
-        res.writeHead(401, { 'Content-Type': 'text/plain' });
-        res.end('Unauthorized: admin API key required. Use ?key=YOUR_KEY or Authorization header.');
-        return;
-      }
-    }
+  private serveAdminDashboard(_req: IncomingMessage, res: ServerResponse): void {
+    // Admin HTML is safe to serve publicly — it contains no sensitive data.
+    // Authentication happens client-side: the login form collects the API key,
+    // which is then sent as Authorization header on every API call.
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
