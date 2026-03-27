@@ -25,7 +25,8 @@ import {
 function openBrowser(url: string): void {
   const os = platform();
   if (os === 'win32') {
-    execFile('cmd', ['/c', 'start', '', url], () => {});
+    const cmd = process.env['COMSPEC'] || 'C:\\Windows\\System32\\cmd.exe';
+    execFile(cmd, ['/c', 'start', '', url], () => {});
   } else if (os === 'darwin') {
     execFile('open', [url], () => {});
   } else {
