@@ -11,7 +11,7 @@
     "package.json"
   ],
   "dependencies": {
-    "@panguard-ai/panguard": "workspace:*"
+    "@panguard-ai/panguard": "^1.4.5"
   },
   "engines": {
     "node": ">=20.0.0"

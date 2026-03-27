@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/panguard-skill-auditor",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -36,10 +36,10 @@
     "dev": "tsc --build --watch"
   },
   "dependencies": {
-    "@panguard-ai/atr": "workspace:*",
-    "@panguard-ai/core": "workspace:*",
-    "@panguard-ai/panguard-scan": "workspace:*",
-    "@panguard-ai/scan-core": "workspace:*",
+    "@panguard-ai/atr": "^1.4.0",
+    "@panguard-ai/core": "^1.3.1",
+    "@panguard-ai/panguard-scan": "^1.3.0",
+    "@panguard-ai/scan-core": "^1.4.0",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {

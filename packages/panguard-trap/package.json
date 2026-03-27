@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/panguard-trap",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -40,7 +40,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@panguard-ai/core": "workspace:*",
+    "@panguard-ai/core": "^1.3.1",
     "ssh2": "^1.16.0"
   },
   "devDependencies": {
