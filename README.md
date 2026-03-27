@@ -23,34 +23,55 @@
 
 ---
 
-> AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We continuously scan the MCP ecosystem. Over a third of skills have security findings. Credential access. Prompt injection. Data exfiltration. See the [live numbers](https://panguard.ai).
+> AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We scanned 36,394 MCP skills. Of 9,676 with source code, 1 in 7 triggered CRITICAL or HIGH severity rules. Credential harvesting. Prompt injection. Data exfiltration. [Live numbers](https://panguard.ai).
 >
-> Panguard is the App Store review for AI skills. ATR is the open audit standard. Every scan strengthens the detection.
+> Panguard is the App Store review for AI skills. [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) is the open detection standard. Every scan strengthens the network.
 >
-> AI Agent 擁有完整系統權限，卻沒有任何審核。我們持續掃描 MCP 生態系，超過三分之一的 Skill 有安全問題。即時數據見 [panguard.ai](https://panguard.ai)。
+> AI Agent 擁有完整系統權限，卻沒有任何審核。我們掃描了 36,394 個 MCP skills，每 7 個就有 1 個觸發 CRITICAL 或 HIGH security rules。即時數據見 [panguard.ai](https://panguard.ai)。
 
 ---
 
 ## Quick Start
 
 ```bash
-# Install
+# One command: install + auto-detect platforms + scan + start protection
 npm install -g @panguard-ai/panguard && pga up
-
-# Auto-configure all AI platforms
-panguard setup
-# Detects: Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, Windsurf, QClaw, WorkBuddy, NemoClaw, ArkClaw
-
-# Audit a skill before installing
-panguard audit skill ./my-skill
-
-# Start 24/7 protection
-panguard guard start --dashboard
 ```
+
+That's it. PanGuard detects your AI platforms, scans all installed skills, and starts 24/7 monitoring.
+
+一行搞定。自動偵測 platform、掃描所有 skills、啟動 24/7 monitoring。
+
+**16 platforms supported:** Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code
+
+**3 install methods:**
+
+| Method | Command |
+|--------|---------|
+| **npm** (recommended) | `npm install -g @panguard-ai/panguard && pga up` |
+| **curl** (no Node required) | `curl -fsSL https://get.panguard.ai \| bash` |
+| **Homebrew** (macOS) | `brew install panguard-ai/tap/panguard && pga up` |
 
 Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, get a report in 3 seconds.
 
-不需帳號，不需設定。[線上掃描](https://panguard.ai) 或一行安裝。
+---
+
+## ClawHub Ecosystem Scan (2026-03-27)
+
+We scanned the entire ClawHub MCP skill registry. [Full report with live numbers](https://panguard.ai/research/mcp-ecosystem-scan).
+
+| | Count |
+|---|---|
+| Skills crawled | 36,394 |
+| With parseable source code | 9,676 |
+| **CRITICAL** (credential theft, reverse shells, prompt injection) | 182 |
+| **HIGH** (data exfiltration, unauthorized network access) | 1,124 |
+| **MEDIUM** (over-permissioned, suspicious dependencies) | 1,016 |
+| Triple threat (shell + network + filesystem) | 249 |
+
+Raw data: [ecosystem-report.csv](https://github.com/Agent-Threat-Rule/agent-threat-rules/tree/main/data/clawhub-scan) (open source)
+
+**Research paper:** [The Collapse of Trust: Security Architecture for the Age of Autonomous AI Agents](https://doi.org/10.5281/zenodo.19178002) (Zenodo, DOI: 10.5281/zenodo.19178002)
 
 ---
 
@@ -160,7 +181,8 @@ Every Panguard instance is a sensor. Threats are auto-drafted into ATR rules, up
 
 ```bash
 panguard setup
-# Auto-detects: Claude Code, Claude Desktop, Cursor, OpenClaw, Codex
+# Auto-detects 16 platforms: Claude Code, Claude Desktop, Cursor, OpenClaw,
+# Codex, Windsurf, Gemini CLI, VS Code Copilot, Zed, Cline, and more
 ```
 
 Or manual config:
