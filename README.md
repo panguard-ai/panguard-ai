@@ -41,11 +41,11 @@ One command. Auto-detects your AI platforms, scans all installed skills, starts 
 
 **16 platforms:** Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code
 
-| Method | Command |
-|--------|---------|
-| **npm** (recommended) | `npm install -g @panguard-ai/panguard && pga up` |
-| **curl** (no Node required) | `curl -fsSL https://get.panguard.ai \| bash` |
-| **Homebrew** (macOS) | `brew install panguard-ai/tap/panguard && pga up` |
+| Method                      | Command                                           |
+| --------------------------- | ------------------------------------------------- |
+| **npm** (recommended)       | `npm install -g @panguard-ai/panguard && pga up`  |
+| **curl** (no Node required) | `curl -fsSL https://get.panguard.ai \| bash`      |
+| **Homebrew** (macOS)        | `brew install panguard-ai/tap/panguard && pga up` |
 
 Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, get a report in 3 seconds.
 
@@ -82,11 +82,11 @@ One person encounters a threat. It becomes a rule. It protects everyone. That's 
 
 ### Three-Layer Detection
 
-| Layer | Engine | Latency | Cost |
-| ----- | ------ | ------- | ---- |
-| **1** | 71 ATR regex rules | < 50ms | $0 |
-| **2** | Local AI (Ollama) | ~ 2s | $0 |
-| **3** | Cloud AI (Claude / OpenAI) | ~ 5s | ~$0.008 |
+| Layer | Engine                     | Latency | Cost    |
+| ----- | -------------------------- | ------- | ------- |
+| **1** | 71 ATR regex rules         | < 50ms  | $0      |
+| **2** | Local AI (Ollama)          | ~ 2s    | $0      |
+| **3** | Cloud AI (Claude / OpenAI) | ~ 5s    | ~$0.008 |
 
 Internet down? Rules + local AI keep running. Cloud down? Same. Everything degrades gracefully.
 
@@ -96,14 +96,14 @@ Internet down? Rules + local AI keep running. Cloud down? Same. Everything degra
 
 We scanned the entire ClawHub MCP skill registry. [Full report](https://panguard.ai/research/mcp-ecosystem-scan).
 
-| | Count |
-|---|---|
-| Skills crawled | 36,394 |
-| With parseable source code | 9,676 |
-| **CRITICAL** (credential theft, reverse shells, prompt injection) | 182 |
-| **HIGH** (data exfiltration, unauthorized network access) | 1,124 |
-| **MEDIUM** (over-permissioned, suspicious dependencies) | 1,016 |
-| Triple threat (shell + network + filesystem) | 249 |
+|                                                                   | Count  |
+| ----------------------------------------------------------------- | ------ |
+| Skills crawled                                                    | 36,394 |
+| With parseable source code                                        | 9,676  |
+| **CRITICAL** (credential theft, reverse shells, prompt injection) | 182    |
+| **HIGH** (data exfiltration, unauthorized network access)         | 1,124  |
+| **MEDIUM** (over-permissioned, suspicious dependencies)           | 1,016  |
+| Triple threat (shell + network + filesystem)                      | 249    |
 
 Raw data: [ecosystem-report.csv](https://github.com/Agent-Threat-Rule/agent-threat-rules/tree/main/data/clawhub-scan) (open source)
 
@@ -115,12 +115,12 @@ Raw data: [ecosystem-report.csv](https://github.com/Agent-Threat-Rule/agent-thre
 
 ATR is not a competing standard. It is the detection layer that makes standards enforceable.
 
-| Layer | What it does | Project |
-|-------|-------------|---------|
-| **Standards** | Define threat categories | [SAFE-MCP](https://openssf.org/) (OpenSSF, $12.5M) |
-| **Taxonomy** | Enumerate attack surfaces | [OWASP Agentic Top 10](https://genai.owasp.org/) |
-| **Detection** | Match threats in real time | [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) -- 71 rules |
-| **Enforcement** | Scan, monitor, block, report | **PanGuard** (this project) |
+| Layer           | What it does                 | Project                                                                    |
+| --------------- | ---------------------------- | -------------------------------------------------------------------------- |
+| **Standards**   | Define threat categories     | [SAFE-MCP](https://openssf.org/) (OpenSSF, $12.5M)                         |
+| **Taxonomy**    | Enumerate attack surfaces    | [OWASP Agentic Top 10](https://genai.owasp.org/)                           |
+| **Detection**   | Match threats in real time   | [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) -- 71 rules |
+| **Enforcement** | Scan, monitor, block, report | **PanGuard** (this project)                                                |
 
 - OWASP Agentic Top 10: **10/10 categories covered** ([mapping](docs/OWASP-MAPPING.md))
 - SAFE-MCP techniques: **91.8% covered** ([mapping](docs/SAFE-MCP-MAPPING.md))
@@ -137,8 +137,8 @@ PanGuard is free and open source for individual developers. For organizations ru
 # panguard-policy.yaml
 rules:
   - block_severity: CRITICAL
-  - allow_network: ["internal.corp.com", "api.openai.com"]
-  - deny_filesystem: ["/etc/shadow", "~/.ssh/*", "~/.aws/*"]
+  - allow_network: ['internal.corp.com', 'api.openai.com']
+  - deny_filesystem: ['/etc/shadow', '~/.ssh/*', '~/.aws/*']
   - require_scan_before_install: true
 ```
 
@@ -168,13 +168,13 @@ panguard-ai/
     website/                 Next.js marketing site + online scanner
 ```
 
-| | |
-|---|---|
-| Language | TypeScript 5.7 (strict mode) |
-| Runtime | Node.js 20+ |
-| Monorepo | pnpm workspaces |
-| AI | Ollama (local) + Claude / OpenAI (cloud) |
-| Website | Next.js 15 + Vercel |
+|          |                                          |
+| -------- | ---------------------------------------- |
+| Language | TypeScript 5.7 (strict mode)             |
+| Runtime  | Node.js 20+                              |
+| Monorepo | pnpm workspaces                          |
+| AI       | Ollama (local) + Claude / OpenAI (cloud) |
+| Website  | Next.js 15 + Vercel                      |
 
 ---
 
