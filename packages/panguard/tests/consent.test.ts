@@ -164,10 +164,9 @@ describe('markConsentAsked (via askTelemetryConsent)', () => {
 
     await askTelemetryConsent();
 
-    expect(mockMkdirSync).toHaveBeenCalledWith(
-      expect.stringContaining('.panguard-guard'),
-      { recursive: true }
-    );
+    expect(mockMkdirSync).toHaveBeenCalledWith(expect.stringContaining('.panguard-guard'), {
+      recursive: true,
+    });
     expect(mockWriteFileSync).toHaveBeenCalledWith(
       expect.stringContaining('.telemetry-prompted'),
       expect.any(String),

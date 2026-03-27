@@ -94,9 +94,7 @@ export default function ComplianceContent() {
             <FadeInUp key={cat.id} delay={i * 0.04}>
               <div className="bg-surface-2 rounded-xl border border-border p-5 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-mono font-bold text-brand-sage">
-                    {cat.id}
-                  </span>
+                  <span className="text-[11px] font-mono font-bold text-brand-sage">{cat.id}</span>
                   <span
                     className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                       cat.strength === 'STRONG'
@@ -111,9 +109,7 @@ export default function ComplianceContent() {
                   {t(`coverage.${cat.id}.name`)}
                 </p>
                 <div className="mt-3 pt-3 border-t border-border">
-                  <p className="text-2xl font-extrabold text-text-primary">
-                    {cat.rules}
-                  </p>
+                  <p className="text-2xl font-extrabold text-text-primary">{cat.rules}</p>
                   <p className="text-[10px] text-text-muted uppercase tracking-wider">
                     {t('coverage.rulesLabel')}
                   </p>
@@ -150,9 +146,7 @@ export default function ComplianceContent() {
                   <p className="text-3xl font-extrabold text-text-primary">
                     {values[key]?.toLocaleString()}
                   </p>
-                  <p className="text-sm text-text-secondary mt-2">
-                    {t(`evidence.${key}`)}
-                  </p>
+                  <p className="text-sm text-text-secondary mt-2">{t(`evidence.${key}`)}</p>
                 </div>
               </FadeInUp>
             );
@@ -163,14 +157,18 @@ export default function ComplianceContent() {
             <div className="flex items-start gap-4">
               <ScanIcon size={20} className="text-brand-sage shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-semibold text-text-primary">{t('evidence.breakdownTitle')}</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {t('evidence.breakdownTitle')}
+                </p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3">
-                  {([
-                    ['critical', STATS.ecosystem.findingsCritical],
-                    ['high', STATS.ecosystem.findingsHigh],
-                    ['medium', STATS.ecosystem.findingsMedium],
-                    ['low', STATS.ecosystem.findingsLow],
-                  ] as const).map(([severity, count]) => (
+                  {(
+                    [
+                      ['critical', STATS.ecosystem.findingsCritical],
+                      ['high', STATS.ecosystem.findingsHigh],
+                      ['medium', STATS.ecosystem.findingsMedium],
+                      ['low', STATS.ecosystem.findingsLow],
+                    ] as const
+                  ).map(([severity, count]) => (
                     <div key={severity}>
                       <p className="text-lg font-bold text-text-primary">{count}</p>
                       <p className="text-[11px] text-text-muted uppercase tracking-wider">
@@ -218,9 +216,7 @@ export default function ComplianceContent() {
                       <p className="text-sm font-medium text-text-primary">
                         {t(`why.${key}.name`)}
                       </p>
-                      <p className="text-[11px] text-text-muted">
-                        {t(`why.${key}.focus`)}
-                      </p>
+                      <p className="text-[11px] text-text-muted">{t(`why.${key}.focus`)}</p>
                     </div>
                     <span
                       className={`text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${

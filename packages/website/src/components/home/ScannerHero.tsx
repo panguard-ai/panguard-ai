@@ -12,12 +12,31 @@ import ScanAnimation from './ScanAnimation';
 import ScanResultCard from './ScanResultCard';
 
 const PLATFORM_NAMES = [
-  'Claude Code', 'Claude Desktop', 'Cursor', 'OpenClaw', 'Codex CLI',
-  'WorkBuddy', 'NemoClaw', 'ArkClaw', 'Windsurf', 'QClaw',
-  'Cline', 'VS Code Copilot', 'Zed', 'Gemini CLI', 'Continue', 'Roo Code',
+  'Claude Code',
+  'Claude Desktop',
+  'Cursor',
+  'OpenClaw',
+  'Codex CLI',
+  'WorkBuddy',
+  'NemoClaw',
+  'ArkClaw',
+  'Windsurf',
+  'QClaw',
+  'Cline',
+  'VS Code Copilot',
+  'Zed',
+  'Gemini CLI',
+  'Continue',
+  'Roo Code',
 ] as const;
 
-function CountUp({ target, duration = 1.5 }: { readonly target: number; readonly duration?: number }) {
+function CountUp({
+  target,
+  duration = 1.5,
+}: {
+  readonly target: number;
+  readonly duration?: number;
+}) {
   const [count, setCount] = useState(target);
   const prevTarget = useRef(target);
 
@@ -75,9 +94,19 @@ function ScannerHeroInner() {
 
   const statItems = [
     { value: eco.skillsScanned, label: t('statsScanned'), color: 'text-text-primary', suffix: '+' },
-    { value: STATS.ecosystem.findingsCritical, label: t('statsCritical'), color: 'text-red-400', suffix: '' },
+    {
+      value: STATS.ecosystem.findingsCritical,
+      label: t('statsCritical'),
+      color: 'text-red-400',
+      suffix: '',
+    },
     { value: eco.atrRules, label: t('statsRules'), color: 'text-panguard-green', suffix: '' },
-    { value: eco.threatsDetected, label: t('statsCrystallized'), color: 'text-text-primary', suffix: '' },
+    {
+      value: eco.threatsDetected,
+      label: t('statsCrystallized'),
+      color: 'text-text-primary',
+      suffix: '',
+    },
   ];
 
   return (
@@ -197,7 +226,9 @@ function ScannerHeroInner() {
           <p className="text-xs text-text-muted mb-3">{t('platformLabel')}</p>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-text-secondary">
             {PLATFORM_NAMES.map((name) => (
-              <span key={name} className="whitespace-nowrap">{name}</span>
+              <span key={name} className="whitespace-nowrap">
+                {name}
+              </span>
             ))}
           </div>
         </div>
