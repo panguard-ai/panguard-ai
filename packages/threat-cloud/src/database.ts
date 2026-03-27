@@ -1477,12 +1477,8 @@ export class ThreatCloudDB {
         .get() as { count: number }
     ).count;
 
-    // Blacklist count
-    const blacklistCount = (
-      this.db
-        .prepare(`SELECT COUNT(*) as count FROM skill_threats WHERE status = 'confirmed'`)
-        .get() as { count: number }
-    ).count;
+    // Blacklist count (uses aggregated skill_threats view, same as getSkillBlacklist)
+    const blacklistCount = this.getSkillBlacklist().length;
 
     return {
       totalSkillsScanned: totals.totalSkills,

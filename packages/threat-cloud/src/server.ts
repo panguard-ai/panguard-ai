@@ -1313,7 +1313,14 @@ response:
   /** GET /api/metrics - Aggregated metrics across all sources (public, cached 60s) */
   private async handleGetMetrics(res: ServerResponse): Promise<void> {
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60');
-    const metrics = this.db.getAggregatedMetrics();
+    let metrics;
+    try {
+      metrics = this.db.getAggregatedMetrics();
+    } catch (err) {
+      log.error('getAggregatedMetrics failed', err);
+      this.sendJson(res, 500, { ok: false, error: 'metrics query failed' });
+      return;
+    }
 
     // Fetch npm downloads (cached in statsCache to avoid hammering npm API)
     let npmDownloads = 0;
