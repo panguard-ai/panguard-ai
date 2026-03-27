@@ -13,6 +13,67 @@ All notable changes to Panguard AI, organized by version.
 
 ---
 
+## v1.4.2
+
+**Released: 2026-03-27** -- ClawHub Ecosystem Scan, Telemetry, CI Hardening
+
+### ClawHub Full Ecosystem Scan
+
+- **36,394 skills crawled** from ClawHub registries (npm, GitHub, awesome-lists)
+- **9,676 packages with content** analyzed by ATR + Skill Auditor (L1 + L2 AST)
+- **182 CRITICAL / 1,124 HIGH / 1,016 MEDIUM / 7,354 LOW** findings
+- Results synced to Threat Cloud: 165 threats + 968 whitelist entries
+- Full scan data: `data/clawhub-scan/scan-full.json` (23MB)
+
+### Telemetry Infrastructure
+
+- Opt-in anonymous telemetry for scan and guard usage
+- Scan DRY refactor -- shared scan logic across CLI, MCP, and web scanner
+
+### CI Hardening
+
+- 21 ESLint errors resolved
+- Audit steps now use `--timeout` and `--no-cloud` flags for deterministic CI
+
+---
+
+## v1.4.1
+
+**Released: 2026-03-26** -- Critical npm Publish Fix
+
+### npm Package Fix
+
+- **Fixed `workspace:*` references in published packages** -- all previous npm versions were broken because pnpm `workspace:*` protocol was not resolved during publish. Every `@panguard-ai/*` dependency now uses exact version numbers.
+- Verified: `npm install -g @panguard-ai/panguard` now works correctly
+
+---
+
+## v1.4.0
+
+**Released: 2026-03-25** -- 16 Platforms, OWASP 10/10, 71 ATR Rules
+
+### 16 AI Platform Support
+
+- **Doubled platform coverage** from 8 to 16 platforms
+- New platforms: NemoClaw, ArkClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code
+- 119 platform sandbox tests passing
+- `panguard setup` auto-detects and configures all 16 platforms
+
+### ATR v0.4.0
+
+- **71 ATR rules** (up from 61), covering 10 new attack categories
+- New rules: eval injection, shell escape, dynamic import, credential theft, OAuth token abuse, env var harvesting, A2A message validation, agent identity spoofing, approval fatigue, social engineering via agent
+- PINT benchmark: 62.7% recall, 99.7% precision
+- **OWASP Agentic Top 10: 10/10 full coverage** (77 total rule mappings)
+
+### Threat Cloud Live Metrics
+
+- `/api/metrics` endpoint for real-time scan counts across all sources (bulk, CLI, web)
+- Website stats now pull live data from Threat Cloud with static fallback
+- Badge API: `GET /api/badge/:author/:skill` for "ATR Scanned" badges
+
+---
+
 ## v1.3.3
 
 **Released: 2026-03-25** -- Scan Accuracy, `pga` Shortcut, Onboarding UX
@@ -52,7 +113,7 @@ All notable changes to Panguard AI, organized by version.
 
 ### AI Platform Auto-Setup
 
-- `panguard setup` auto-detects and configures 8 AI platforms in one command
+- `panguard setup` auto-detects and configures 16 AI platforms in one command
 - **OpenClaw**: native Skill integration at `~/.openclaw/skills/panguard/SKILL.md`
 - **QClaw**: MCP server registration in `~/.qclaw/mcp.json`
 - Claude Code, Cursor, Codex CLI, Claude Desktop, Windsurf, WorkBuddy via MCP
@@ -67,7 +128,7 @@ All notable changes to Panguard AI, organized by version.
 
 ### Rule Distribution
 
-- 61 ATR detection rules shipped with install
+- 71 ATR detection rules shipped with install
 - Auto-sync from Threat Cloud every hour
 
 ### Threat Cloud LLM Review

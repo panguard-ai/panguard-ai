@@ -13,6 +13,91 @@ Panguard AI 的所有重要變更，按版本組織。
 
 ---
 
+## v1.4.2
+
+**發佈日期：2026-03-27** -- ClawHub 生態系掃描、遙測、CI 強化
+
+### ClawHub 全量生態系掃描
+
+- **36,394 個 Skills 已爬取**，來自 ClawHub 註冊表（npm、GitHub、awesome-lists）
+- **9,676 個有內容的套件**，經 ATR + Skill Auditor（L1 + L2 AST）分析
+- **182 CRITICAL / 1,124 HIGH / 1,016 MEDIUM / 7,354 LOW** 發現
+- 結果同步至 Threat Cloud：165 個威脅 + 968 個白名單條目
+
+### 遙測基礎設施
+
+- 可選擇加入的匿名遙測，用於掃描和 Guard 使用統計
+- 掃描 DRY 重構 -- CLI、MCP 和 Web Scanner 共用掃描邏輯
+
+### CI 強化
+
+- 修復 21 個 ESLint 錯誤
+- 審計步驟現在使用 `--timeout` 和 `--no-cloud` 確保 CI 確定性
+
+---
+
+## v1.4.1
+
+**發佈日期：2026-03-26** -- 重大 npm 發布修復
+
+### npm 套件修復
+
+- **修復已發布套件中的 `workspace:*` 引用** -- 之前所有 npm 版本都壞了，因為 pnpm `workspace:*` 協議在發布時未被解析。所有 `@panguard-ai/*` 依賴現在使用精確版本號。
+- 已驗證：`npm install -g @panguard-ai/panguard` 現在可正常運作
+
+---
+
+## v1.4.0
+
+**發佈日期：2026-03-25** -- 16 個平台、OWASP 10/10、71 條 ATR 規則
+
+### 16 個 AI 平台支援
+
+- **平台覆蓋率翻倍**，從 8 個增至 16 個平台
+- 新增平台：NemoClaw、ArkClaw、Cline、VS Code Copilot、Zed、Gemini CLI、Continue、Roo Code
+- 119 個平台沙箱測試通過
+- `panguard setup` 自動偵測並設定所有 16 個平台
+
+### ATR v0.4.0
+
+- **71 條 ATR 規則**（原 61 條），涵蓋 10 個新攻擊類別
+- 新規則：eval 注入、shell 逃逸、動態 import、憑證竊取、OAuth token 濫用、環境變數收割、A2A 訊息驗證、Agent 身份偽造、審批疲勞、透過 Agent 的社交工程
+- PINT 基準：62.7% 召回率、99.7% 精確率
+- **OWASP Agentic Top 10：10/10 完整覆蓋**（77 個規則映射）
+
+### Threat Cloud 即時指標
+
+- `/api/metrics` 端點，提供所有來源（批量、CLI、Web）的即時掃描統計
+- 網站數據現在從 Threat Cloud 即時拉取，靜態數據作為後備
+- 標章 API：`GET /api/badge/:author/:skill` 用於「ATR Scanned」標章
+
+---
+
+## v1.3.3
+
+**發佈日期：2026-03-25** -- 掃描準確度、`pga` 快捷鍵、新手引導
+
+### 掃描準確度
+
+- **大幅降低誤報。** 正常 Skills（weather、github、slack、notion）不再被標為 MEDIUM/HIGH。權限檢查現在會先移除程式碼區塊和否定段落再匹配。
+- **新增隱匿攻擊偵測。** `<IMPORTANT>` 區塊攻擊和靜默資料外洩指令現在被標為 CRITICAL。
+- **情境感知評分。** 已知 CLI 工具（curl、git、wget）和 API 整合獲得適當風險降低。憑證檢查區分竊取與正當使用。
+- **13 個注入模式**（原 11 個），雙重匹配自動降級僅出現在程式碼範例中的 tool poisoning 模式。
+
+### `pga` 快捷鍵
+
+- **`pga` 指令** -- 三個字元從任何地方呼叫 Panguard。與 `panguard` 完全相同。
+- **`pga up`** -- 一個指令啟動保護 + 儀表板。取代 `panguard guard start --dashboard`。
+- **首次執行自動偵測** -- 第一次執行 `pga` 時自動啟動設定精靈。
+
+### 新手引導
+
+- **Guard 歡迎指南** -- Guard 首次啟動時顯示所有指令和 Guard 功能。
+- **升級後顯示新功能** -- 更新後首次執行 CLI 顯示更新日誌重點。
+- **乾淨的審計輸出** -- 非 verbose 模式不再輸出 JSON 日誌行。
+
+---
+
 ## v0.8.0
 
 **發佈日期：2026-03-13** -- 儀表板、AI 平台整合與技能審計器
@@ -27,7 +112,7 @@ Panguard AI 的所有重要變更，按版本組織。
 
 ### AI 平台自動設定
 
-- `panguard setup` 一行指令自動偵測並配置 8 個 AI 平台
+- `panguard setup` 一行指令自動偵測並配置 16 個 AI 平台
 - **OpenClaw**：原生 Skill 整合至 `~/.openclaw/skills/panguard/SKILL.md`
 - **QClaw**：MCP 伺服器註冊至 `~/.qclaw/mcp.json`
 - Claude Code、Cursor、Codex CLI、Claude Desktop、Windsurf、WorkBuddy 透過 MCP
@@ -42,7 +127,7 @@ Panguard AI 的所有重要變更，按版本組織。
 
 ### 規則分發
 
-- 安裝即附帶 61 ATR 偵測規則
+- 安裝即附帶 71 ATR 偵測規則
 - 每小時自動從 Threat Cloud 同步
 
 ### Threat Cloud LLM 審查
