@@ -58,6 +58,12 @@ export function scanCommand(): Command {
         target?: string;
       }) => {
         const lang: Language = options.lang === 'zh-TW' ? 'zh-TW' : 'en';
+
+        // Suppress all structured logs early for JSON/non-verbose modes
+        if (options.json || !options.verbose) {
+          setLogLevel('silent');
+        }
+
         const telemetryEnabled = await ensureTelemetryConsent();
 
         // Remote scan mode
