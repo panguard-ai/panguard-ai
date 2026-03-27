@@ -727,7 +727,7 @@
     },
     "srDefinition": "Panguard AI provides the first Skills Audit for AI agents. It audits every skill before it runs, catches known threats with community ATR (Agent Threat Rules), catches unknown threats with AI analysis, and shares new rules to protect everyone. MIT licensed. Open source.",
     "scannerHero": {
-      "titleLine1": "We scanned 10,000 MCP skills.",
+      "titleLine1": "We scanned 36,394 MCP skills.",
       "titleLine2": "13.5% have security risks.",
       "subtitle": "Check yours in 10 seconds. Free. Open source.",
       "scanLabel": "Check any MCP skill before you install",
@@ -2529,7 +2529,7 @@
     },
     "evidence": {
       "overline": "Ecosystem Scan",
-      "title": "Verified against 10,000+ real skills.",
+      "title": "Verified against 36,394 real skills.",
       "subtitle": "We scanned the MCP ecosystem -- npm, GitHub, and community registries. The numbers speak for themselves.",
       "scanned": "MCP skills scanned",
       "findings": "packages with security findings",
@@ -5059,7 +5059,7 @@
     },
     "compliance": {
       "title": "OWASP Agentic Top 10 Coverage",
-      "description": "Full coverage of the OWASP Agentic Top 10 standard. 71 ATR detection rules across all 10 categories. Verified against 10,000+ real MCP skills."
+      "description": "Full coverage of the OWASP Agentic Top 10 standard. 71 ATR detection rules across all 10 categories. Verified against 36,394 real MCP skills."
     },
     "trust": {
       "title": "Trust Center",
