@@ -18,13 +18,17 @@ import { runScan } from '@panguard-ai/panguard-scan';
 import { PANGUARD_VERSION } from '../../index.js';
 // panguard-report is optional (pdfkit can fail on some Node versions)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function loadReportModule(): Promise<{ generateComplianceReport: any; generateSummaryText: any }> {
+async function loadReportModule(): Promise<{
+  generateComplianceReport: any;
+  generateSummaryText: any;
+}> {
   try {
     return await import('@panguard-ai/panguard-report');
   } catch {
     return {
       generateComplianceReport: () => ({ findings: [], summary: 'Report module not available' }),
-      generateSummaryText: () => 'Compliance report module not installed. Run: npm install @panguard-ai/panguard-report',
+      generateSummaryText: () =>
+        'Compliance report module not installed. Run: npm install @panguard-ai/panguard-report',
     };
   }
 }

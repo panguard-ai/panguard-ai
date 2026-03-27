@@ -495,11 +495,11 @@ Layer 3: Cloud AI ($$)        -- Claude / OpenAI (API call)
 
 All events pass through the rule engine first. This layer handles the vast majority of detections with zero marginal cost.
 
-| Component          | Description                                                     |
-| ------------------ | --------------------------------------------------------------- |
+| Component          | Description                                                      |
+| ------------------ | ---------------------------------------------------------------- |
 | ATR Rule Engine    | Matches events against ATR rules (71 rules across 10 categories) |
-| Threat Intel Feeds | IP/domain/hash lookup against 5 external feeds + Threat Cloud   |
-| Event Correlator   | 7 multi-step attack pattern detectors                           |
+| Threat Intel Feeds | IP/domain/hash lookup against 5 external feeds + Threat Cloud    |
+| Event Correlator   | 7 multi-step attack pattern detectors                            |
 
 Events that match known rules are assigned a verdict immediately. Events that do not match any rules, or match only low-confidence rules, are escalated to Layer 2.
 

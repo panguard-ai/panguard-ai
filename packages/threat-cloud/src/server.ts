@@ -110,7 +110,17 @@ export class ThreatCloudServer {
     // Badge API: reads ecosystem-report.csv from ATR data directory
     const badgeCsvPath =
       process.env['ATR_ECOSYSTEM_CSV'] ??
-      join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', 'agent-threat-rules', 'data', 'clawhub-scan', 'ecosystem-report.csv');
+      join(
+        dirname(fileURLToPath(import.meta.url)),
+        '..',
+        '..',
+        '..',
+        '..',
+        'agent-threat-rules',
+        'data',
+        'clawhub-scan',
+        'ecosystem-report.csv'
+      );
     this.badgeRouter = createBadgeRouter(badgeCsvPath);
   }
 
@@ -544,7 +554,10 @@ export class ThreatCloudServer {
             }
             const deleted = this.db.clearAllRules();
             log.info(`Admin reset: cleared ${deleted} rules and proposals`);
-            this.sendJson(res, 200, { ok: true, data: { deleted, message: 'All rules and proposals cleared. Re-seed required.' } });
+            this.sendJson(res, 200, {
+              ok: true,
+              data: { deleted, message: 'All rules and proposals cleared. Re-seed required.' },
+            });
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -558,7 +571,10 @@ export class ThreatCloudServer {
             }
             const seeded = this.seedFromBundled();
             log.info(`Admin reseed: ${seeded} rules upserted from bundled config`);
-            this.sendJson(res, 200, { ok: true, data: { seeded, message: `${seeded} rules upserted (new + updated)` } });
+            this.sendJson(res, 200, {
+              ok: true,
+              data: { seeded, message: `${seeded} rules upserted (new + updated)` },
+            });
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -602,8 +618,14 @@ export class ThreatCloudServer {
 
       const eventType = data.event ?? 'unknown';
       const allowedEvents = [
-        'scan_local', 'scan_local_json', 'scan_remote', 'scan_remote_json',
-        'guard_audit', 'guard_start', 'skill_install', 'skill_audit',
+        'scan_local',
+        'scan_local_json',
+        'scan_remote',
+        'scan_remote_json',
+        'guard_audit',
+        'guard_start',
+        'skill_install',
+        'skill_audit',
       ];
       if (!allowedEvents.includes(eventType)) {
         this.sendJson(res, 400, {
@@ -631,14 +653,21 @@ export class ThreatCloudServer {
   private async handlePostUsageEvent(req: IncomingMessage, res: ServerResponse): Promise<void> {
     try {
       const body = await this.readBody(req);
-      const data = JSON.parse(body) as { event_type?: string; source?: string; metadata?: Record<string, unknown> };
+      const data = JSON.parse(body) as {
+        event_type?: string;
+        source?: string;
+        metadata?: Record<string, unknown>;
+      };
       const eventType = data.event_type ?? 'unknown';
       const source = data.source ?? 'unknown';
 
       // Only allow known event types
       const allowed = ['scan', 'cli_install', 'cli_setup', 'cli_scan', 'guard_start', 'page_view'];
       if (!allowed.includes(eventType)) {
-        this.sendJson(res, 400, { ok: false, error: `Unknown event_type. Allowed: ${allowed.join(', ')}` });
+        this.sendJson(res, 400, {
+          ok: false,
+          error: `Unknown event_type. Allowed: ${allowed.join(', ')}`,
+        });
         return;
       }
 
@@ -1084,7 +1113,10 @@ response:
 
     if (action === 'approve') {
       const ok = this.db.approveATRProposal(patternHash);
-      this.sendJson(res, ok ? 200 : 404, { ok, data: { message: ok ? 'Proposal approved and promoted' : 'Proposal not found' } });
+      this.sendJson(res, ok ? 200 : 404, {
+        ok,
+        data: { message: ok ? 'Proposal approved and promoted' : 'Proposal not found' },
+      });
     } else if (action === 'reject') {
       this.db.rejectATRProposal(patternHash);
       this.sendJson(res, 200, { ok: true, data: { message: 'Proposal rejected' } });
@@ -1094,7 +1126,10 @@ response:
   }
 
   /** DELETE /api/skill-whitelist - Admin remove a skill from whitelist */
-  private async handleDeleteSkillWhitelist(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  private async handleDeleteSkillWhitelist(
+    req: IncomingMessage,
+    res: ServerResponse
+  ): Promise<void> {
     const body = await this.readBody(req);
     const data = JSON.parse(body);
     const { skillName } = data;
@@ -1103,7 +1138,10 @@ response:
       return;
     }
     const ok = this.db.removeFromWhitelist(skillName);
-    this.sendJson(res, ok ? 200 : 404, { ok, data: { message: ok ? 'Removed from whitelist' : 'Not found' } });
+    this.sendJson(res, ok ? 200 : 404, {
+      ok,
+      data: { message: ok ? 'Removed from whitelist' : 'Not found' },
+    });
   }
 
   /** POST /api/skill-blacklist - Admin add a skill to blacklist */
@@ -1120,7 +1158,10 @@ response:
   }
 
   /** DELETE /api/skill-blacklist - Admin remove a skill from blacklist */
-  private async handleDeleteSkillBlacklist(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  private async handleDeleteSkillBlacklist(
+    req: IncomingMessage,
+    res: ServerResponse
+  ): Promise<void> {
     const body = await this.readBody(req);
     const data = JSON.parse(body);
     const { skillHash } = data;
@@ -1129,7 +1170,10 @@ response:
       return;
     }
     const ok = this.db.removeFromBlacklist(skillHash);
-    this.sendJson(res, ok ? 200 : 404, { ok, data: { message: ok ? 'Removed from blacklist' : 'Not found' } });
+    this.sendJson(res, ok ? 200 : 404, {
+      ok,
+      data: { message: ok ? 'Removed from blacklist' : 'Not found' },
+    });
   }
 
   /**

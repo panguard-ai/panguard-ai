@@ -170,7 +170,13 @@ export interface RuleCreationInput {
   /** The actual malicious content/payload (not a finding title) */
   readonly payload: string;
   /** Where the payload was found */
-  readonly source: 'skill_description' | 'tool_response' | 'tool_args' | 'user_input' | 'agent_message' | 'code_analysis';
+  readonly source:
+    | 'skill_description'
+    | 'tool_response'
+    | 'tool_args'
+    | 'user_input'
+    | 'agent_message'
+    | 'code_analysis';
   /** Attack category */
   readonly category: string;
   /** Why this was flagged (analysis reasoning) */

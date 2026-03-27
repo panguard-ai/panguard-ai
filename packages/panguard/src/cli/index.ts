@@ -251,8 +251,7 @@ async function checkForUpdates(): Promise<void> {
 
     if (isNewer) {
       console.log(
-        `\n  Update available: ${PANGUARD_VERSION} \u2192 ${latest}` +
-          `\n  Run: pga upgrade\n`
+        `\n  Update available: ${PANGUARD_VERSION} \u2192 ${latest}` + `\n  Run: pga upgrade\n`
       );
     }
   } catch {

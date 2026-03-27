@@ -2,7 +2,13 @@
 
 export type Tier = 'community' | 'solo' | 'pro' | 'business' | 'enterprise';
 
-export const TIERS: readonly Tier[] = ['community', 'solo', 'pro', 'business', 'enterprise'] as const;
+export const TIERS: readonly Tier[] = [
+  'community',
+  'solo',
+  'pro',
+  'business',
+  'enterprise',
+] as const;
 
 export const TIER_LEVEL: Record<string, number> = {
   community: 0,

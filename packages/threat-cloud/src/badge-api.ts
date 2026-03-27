@@ -159,9 +159,7 @@ function parseCsv(csvContent: string): ReadonlyMap<string, ScanRecord> {
     const existing = result.get(key);
 
     // Keep the row with the highest severity
-    const existingRank = existing
-      ? (severityRank[existing.topFindingSeverity] ?? 0)
-      : -1;
+    const existingRank = existing ? (severityRank[existing.topFindingSeverity] ?? 0) : -1;
     const newRank = severityRank[topFindingSeverity] ?? 0;
 
     if (newRank > existingRank) {
@@ -181,11 +179,7 @@ export interface BadgeRouter {
    * Handle an incoming request for badge endpoints.
    * Returns true if the request was handled, false if the path did not match.
    */
-  handleRequest(
-    pathname: string,
-    method: string,
-    res: ServerResponse,
-  ): boolean;
+  handleRequest(pathname: string, method: string, res: ServerResponse): boolean;
 }
 
 /**
@@ -255,11 +249,7 @@ export function createBadgeRouter(csvPath: string): BadgeRouter {
     res.end(svg);
   }
 
-  function sendJson(
-    res: ServerResponse,
-    status: number,
-    data: unknown,
-  ): void {
+  function sendJson(res: ServerResponse, status: number, data: unknown): void {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
     res.writeHead(status);
@@ -310,9 +300,7 @@ export function createBadgeRouter(csvPath: string): BadgeRouter {
       const key = `${author}/${skillName}`;
       const record = data.get(key);
 
-      const level: BadgeLevel = record
-        ? determineBadgeLevel(record)
-        : 'not-scanned';
+      const level: BadgeLevel = record ? determineBadgeLevel(record) : 'not-scanned';
 
       sendSvg(res, generateBadgeSvg(level));
       return true;

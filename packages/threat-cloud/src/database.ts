@@ -650,9 +650,9 @@ export class ThreatCloudDB {
   // ---------------------------------------------------------------------------
 
   recordUsageEvent(eventType: string, source: string, metadata?: Record<string, unknown>): void {
-    this.db.prepare(
-      'INSERT INTO usage_events (event_type, source, metadata) VALUES (?, ?, ?)'
-    ).run(eventType, source, metadata ? JSON.stringify(metadata) : null);
+    this.db
+      .prepare('INSERT INTO usage_events (event_type, source, metadata) VALUES (?, ?, ?)')
+      .run(eventType, source, metadata ? JSON.stringify(metadata) : null);
   }
 
   getUsageStats(): {
@@ -663,31 +663,49 @@ export class ThreatCloudDB {
     cliInstalls: number;
     dailyTrend: Array<{ date: string; count: number }>;
   } {
-    const totalScans = (this.db.prepare(
-      "SELECT COUNT(*) as count FROM usage_events WHERE event_type IN ('scan', 'cli_scan')"
-    ).get() as { count: number }).count;
+    const totalScans = (
+      this.db
+        .prepare(
+          "SELECT COUNT(*) as count FROM usage_events WHERE event_type IN ('scan', 'cli_scan')"
+        )
+        .get() as { count: number }
+    ).count;
 
-    const scansToday = (this.db.prepare(
-      "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'scan' AND created_at > datetime('now', '-1 day')"
-    ).get() as { count: number }).count;
+    const scansToday = (
+      this.db
+        .prepare(
+          "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'scan' AND created_at > datetime('now', '-1 day')"
+        )
+        .get() as { count: number }
+    ).count;
 
-    const scansThisWeek = (this.db.prepare(
-      "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'scan' AND created_at > datetime('now', '-7 days')"
-    ).get() as { count: number }).count;
+    const scansThisWeek = (
+      this.db
+        .prepare(
+          "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'scan' AND created_at > datetime('now', '-7 days')"
+        )
+        .get() as { count: number }
+    ).count;
 
-    const sourceRows = this.db.prepare(
-      "SELECT source, COUNT(*) as count FROM usage_events WHERE event_type = 'scan' GROUP BY source"
-    ).all() as Array<{ source: string; count: number }>;
+    const sourceRows = this.db
+      .prepare(
+        "SELECT source, COUNT(*) as count FROM usage_events WHERE event_type = 'scan' GROUP BY source"
+      )
+      .all() as Array<{ source: string; count: number }>;
     const scansBySource: Record<string, number> = {};
     for (const r of sourceRows) scansBySource[r.source] = r.count;
 
-    const cliInstalls = (this.db.prepare(
-      "SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'cli_install'"
-    ).get() as { count: number }).count;
+    const cliInstalls = (
+      this.db
+        .prepare("SELECT COUNT(*) as count FROM usage_events WHERE event_type = 'cli_install'")
+        .get() as { count: number }
+    ).count;
 
-    const dailyTrend = this.db.prepare(
-      "SELECT date(created_at) as date, COUNT(*) as count FROM usage_events WHERE event_type = 'scan' AND created_at > datetime('now', '-30 days') GROUP BY date(created_at) ORDER BY date"
-    ).all() as Array<{ date: string; count: number }>;
+    const dailyTrend = this.db
+      .prepare(
+        "SELECT date(created_at) as date, COUNT(*) as count FROM usage_events WHERE event_type = 'scan' AND created_at > datetime('now', '-30 days') GROUP BY date(created_at) ORDER BY date"
+      )
+      .all() as Array<{ date: string; count: number }>;
 
     return { totalScans, scansToday, scansThisWeek, scansBySource, cliInstalls, dailyTrend };
   }
@@ -704,9 +722,11 @@ export class ThreatCloudDB {
     findingCount: number;
     severity: string;
   }): void {
-    this.db.prepare(
-      'INSERT INTO telemetry_events (event_type, platform, skill_count, finding_count, severity) VALUES (?, ?, ?, ?, ?)'
-    ).run(event.eventType, event.platform, event.skillCount, event.findingCount, event.severity);
+    this.db
+      .prepare(
+        'INSERT INTO telemetry_events (event_type, platform, skill_count, finding_count, severity) VALUES (?, ?, ?, ?, ?)'
+      )
+      .run(event.eventType, event.platform, event.skillCount, event.findingCount, event.severity);
   }
 
   /** Get telemetry stats merging raw events + hourly aggregates / 取得遙測統計 */
@@ -718,48 +738,60 @@ export class ThreatCloudDB {
     avgFindingCount: number;
   } {
     // Raw events (last 24h — anything older is aggregated)
-    const rawTotal = (this.db.prepare(
-      'SELECT COUNT(*) as count FROM telemetry_events'
-    ).get() as { count: number }).count;
+    const rawTotal = (
+      this.db.prepare('SELECT COUNT(*) as count FROM telemetry_events').get() as { count: number }
+    ).count;
 
-    const aggTotal = (this.db.prepare(
-      'SELECT COALESCE(SUM(event_count), 0) as count FROM telemetry_hourly_aggregates'
-    ).get() as { count: number }).count;
+    const aggTotal = (
+      this.db
+        .prepare('SELECT COALESCE(SUM(event_count), 0) as count FROM telemetry_hourly_aggregates')
+        .get() as { count: number }
+    ).count;
 
-    const eventsToday = (this.db.prepare(
-      "SELECT COUNT(*) as count FROM telemetry_events WHERE created_at > datetime('now', '-1 day')"
-    ).get() as { count: number }).count;
+    const eventsToday = (
+      this.db
+        .prepare(
+          "SELECT COUNT(*) as count FROM telemetry_events WHERE created_at > datetime('now', '-1 day')"
+        )
+        .get() as { count: number }
+    ).count;
 
     // By event type (raw)
-    const rawByType = this.db.prepare(
-      'SELECT event_type, COUNT(*) as count FROM telemetry_events GROUP BY event_type'
-    ).all() as Array<{ event_type: string; count: number }>;
+    const rawByType = this.db
+      .prepare('SELECT event_type, COUNT(*) as count FROM telemetry_events GROUP BY event_type')
+      .all() as Array<{ event_type: string; count: number }>;
 
-    const aggByType = this.db.prepare(
-      'SELECT event_type, SUM(event_count) as count FROM telemetry_hourly_aggregates GROUP BY event_type'
-    ).all() as Array<{ event_type: string; count: number }>;
+    const aggByType = this.db
+      .prepare(
+        'SELECT event_type, SUM(event_count) as count FROM telemetry_hourly_aggregates GROUP BY event_type'
+      )
+      .all() as Array<{ event_type: string; count: number }>;
 
     const byEventType: Record<string, number> = {};
-    for (const r of rawByType) byEventType[r.event_type] = (byEventType[r.event_type] ?? 0) + r.count;
-    for (const r of aggByType) byEventType[r.event_type] = (byEventType[r.event_type] ?? 0) + r.count;
+    for (const r of rawByType)
+      byEventType[r.event_type] = (byEventType[r.event_type] ?? 0) + r.count;
+    for (const r of aggByType)
+      byEventType[r.event_type] = (byEventType[r.event_type] ?? 0) + r.count;
 
     // By platform (raw)
-    const rawByPlatform = this.db.prepare(
-      'SELECT platform, COUNT(*) as count FROM telemetry_events GROUP BY platform'
-    ).all() as Array<{ platform: string; count: number }>;
+    const rawByPlatform = this.db
+      .prepare('SELECT platform, COUNT(*) as count FROM telemetry_events GROUP BY platform')
+      .all() as Array<{ platform: string; count: number }>;
 
-    const aggByPlatform = this.db.prepare(
-      'SELECT platform, SUM(event_count) as count FROM telemetry_hourly_aggregates GROUP BY platform'
-    ).all() as Array<{ platform: string; count: number }>;
+    const aggByPlatform = this.db
+      .prepare(
+        'SELECT platform, SUM(event_count) as count FROM telemetry_hourly_aggregates GROUP BY platform'
+      )
+      .all() as Array<{ platform: string; count: number }>;
 
     const byPlatform: Record<string, number> = {};
     for (const r of rawByPlatform) byPlatform[r.platform] = (byPlatform[r.platform] ?? 0) + r.count;
     for (const r of aggByPlatform) byPlatform[r.platform] = (byPlatform[r.platform] ?? 0) + r.count;
 
     // Avg finding count (raw only — aggregates don't track individual)
-    const avgRow = this.db.prepare(
-      'SELECT AVG(finding_count) as avg FROM telemetry_events'
-    ).get() as { avg: number | null };
+    const avgRow = this.db
+      .prepare('SELECT AVG(finding_count) as avg FROM telemetry_events')
+      .get() as { avg: number | null };
 
     return {
       totalEvents: rawTotal + aggTotal,
@@ -798,16 +830,16 @@ export class ThreatCloudDB {
     `);
 
     // Step 2: Delete raw events older than 24h
-    const result = this.db.prepare(
-      "DELETE FROM telemetry_events WHERE created_at < datetime('now', '-24 hours')"
-    ).run();
+    const result = this.db
+      .prepare("DELETE FROM telemetry_events WHERE created_at < datetime('now', '-24 hours')")
+      .run();
 
     return result.changes;
   }
 
   clearAllRules(): number {
-    const rulesDeleted = (this.db.prepare('DELETE FROM rules').run()).changes;
-    const proposalsDeleted = (this.db.prepare('DELETE FROM atr_proposals').run()).changes;
+    const rulesDeleted = this.db.prepare('DELETE FROM rules').run().changes;
+    const proposalsDeleted = this.db.prepare('DELETE FROM atr_proposals').run().changes;
     return rulesDeleted + proposalsDeleted;
   }
 
@@ -1087,23 +1119,33 @@ export class ThreatCloudDB {
   /** Admin: manually approve an ATR proposal and promote to rule */
   approveATRProposal(patternHash: string): boolean {
     const proposal = this.db
-      .prepare('SELECT pattern_hash, rule_content FROM atr_proposals WHERE pattern_hash = ? LIMIT 1')
+      .prepare(
+        'SELECT pattern_hash, rule_content FROM atr_proposals WHERE pattern_hash = ? LIMIT 1'
+      )
       .get(patternHash) as { pattern_hash: string; rule_content: string } | undefined;
     if (!proposal) return false;
 
     // Update proposal status
-    this.db.prepare(`
+    this.db
+      .prepare(
+        `
       UPDATE atr_proposals SET status = 'approved', llm_review_verdict = 'admin-approved', updated_at = datetime('now')
       WHERE pattern_hash = ?
-    `).run(patternHash);
+    `
+      )
+      .run(patternHash);
 
     // Insert as confirmed rule
     const ruleId = `ATR-2026-DRAFT-${patternHash.slice(0, 8)}`;
     try {
-      this.db.prepare(`
+      this.db
+        .prepare(
+          `
         INSERT OR IGNORE INTO rules (rule_id, rule_content, source, category, severity)
         VALUES (?, ?, 'atr-community', 'skill-compromise', 'high')
-      `).run(ruleId, proposal.rule_content);
+      `
+        )
+        .run(ruleId, proposal.rule_content);
     } catch {
       // Rule may already exist
     }
@@ -1113,9 +1155,13 @@ export class ThreatCloudDB {
   /** Admin: remove a skill from whitelist */
   removeFromWhitelist(skillName: string): boolean {
     const normalized = skillName.toLowerCase().trim().replace(/\s+/g, '-');
-    const result = this.db.prepare(`
+    const result = this.db
+      .prepare(
+        `
       DELETE FROM skill_whitelist WHERE normalized_name = ?
-    `).run(normalized);
+    `
+      )
+      .run(normalized);
     return result.changes > 0;
   }
 
@@ -1124,29 +1170,41 @@ export class ThreatCloudDB {
     const hash = createHash('sha256').update(skillName).digest('hex').slice(0, 16);
     // Insert 3 threat reports to trigger blacklist threshold
     for (let i = 0; i < 3; i++) {
-      this.db.prepare(`
+      this.db
+        .prepare(
+          `
         INSERT INTO skill_threats (skill_hash, skill_name, risk_score, risk_level, finding_summaries, client_id)
         VALUES (?, ?, 100, 'CRITICAL', ?, ?)
-      `).run(hash, skillName, reason, `admin-${i}`);
+      `
+        )
+        .run(hash, skillName, reason, `admin-${i}`);
     }
   }
 
   /** Admin: remove a skill from blacklist by clearing its threat reports */
   removeFromBlacklist(skillHash: string): boolean {
-    const result = this.db.prepare(`
+    const result = this.db
+      .prepare(
+        `
       DELETE FROM skill_threats WHERE skill_hash = ?
-    `).run(skillHash);
+    `
+      )
+      .run(skillHash);
     return result.changes > 0;
   }
 
   /** Get all whitelist entries (including unconfirmed, for admin) */
   getAllWhitelistEntries(): unknown[] {
-    return this.db.prepare(`
+    return this.db
+      .prepare(
+        `
       SELECT skill_name, normalized_name, fingerprint_hash, confirmations, status,
              first_reported, last_reported
       FROM skill_whitelist
       ORDER BY first_reported DESC
-    `).all();
+    `
+      )
+      .all();
   }
 
   /** Get rules by source type, optionally filtered by date / 依來源取得規則 */

@@ -13,7 +13,7 @@ import { createHash } from 'node:crypto';
 const args = process.argv.slice(2);
 const getArg = (flag: string, def: string) => {
   const idx = args.indexOf(flag);
-  return idx >= 0 ? args[idx + 1] ?? def : def;
+  return idx >= 0 ? (args[idx + 1] ?? def) : def;
 };
 const hasFlag = (flag: string) => args.includes(flag);
 
@@ -23,7 +23,9 @@ const useLlm = hasFlag('--llm');
 const autoPropose = hasFlag('--auto-propose');
 
 if (!inputPath) {
-  console.error('Usage: npx tsx push-to-threat-cloud.ts --input FILE --tc-url URL [--llm] [--auto-propose]');
+  console.error(
+    'Usage: npx tsx push-to-threat-cloud.ts --input FILE --tc-url URL [--llm] [--auto-propose]'
+  );
   process.exit(1);
 }
 
@@ -68,7 +70,9 @@ async function pushToTC(results: ScanResult[]): Promise<{
           signal: AbortSignal.timeout(5000),
         });
         threats++;
-      } catch { /* best effort */ }
+      } catch {
+        /* best effort */
+      }
 
       // Auto-propose ATR rules for CRITICAL
       if (autoPropose && r.riskLevel === 'CRITICAL' && r.findings.length > 0) {
@@ -87,7 +91,9 @@ async function pushToTC(results: ScanResult[]): Promise<{
             signal: AbortSignal.timeout(5000),
           });
           proposals++;
-        } catch { /* best effort */ }
+        } catch {
+          /* best effort */
+        }
       }
     } else if (r.riskLevel === 'LOW' && r.riskScore <= 5) {
       // Report as safe
@@ -99,14 +105,20 @@ async function pushToTC(results: ScanResult[]): Promise<{
           signal: AbortSignal.timeout(3000),
         });
         whitelist++;
-      } catch { /* best effort */ }
+      } catch {
+        /* best effort */
+      }
     }
 
     // Usage counter
     void fetch(`${tcUrl}/api/usage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event_type: 'scan', source: 'bulk-pipeline', metadata: { skill: skillName, risk: r.riskLevel } }),
+      body: JSON.stringify({
+        event_type: 'scan',
+        source: 'bulk-pipeline',
+        metadata: { skill: skillName, risk: r.riskLevel },
+      }),
       signal: AbortSignal.timeout(3000),
     }).catch(() => {});
   }
@@ -123,7 +135,12 @@ async function main() {
   if (autoPropose) console.log('Auto-propose: enabled');
 
   const stats = await pushToTC(results);
-  console.log(`Done: ${stats.threats} threats, ${stats.whitelist} whitelist, ${stats.proposals} proposals`);
+  console.log(
+    `Done: ${stats.threats} threats, ${stats.whitelist} whitelist, ${stats.proposals} proposals`
+  );
 }
 
-main().catch((e) => { console.error('Fatal:', e); process.exit(1); });
+main().catch((e) => {
+  console.error('Fatal:', e);
+  process.exit(1);
+});

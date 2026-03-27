@@ -6,4 +6,9 @@
  */
 
 export { PERSONAS, getPersona, getAllPersonas } from './personas.js';
-export { PRICING_PLANS, getAllPricingPlans, getPricingPlan, getRecommendedPlan } from './pricing.js';
+export {
+  PRICING_PLANS,
+  getAllPricingPlans,
+  getPricingPlan,
+  getRecommendedPlan,
+} from './pricing.js';
