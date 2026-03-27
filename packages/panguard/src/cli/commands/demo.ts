@@ -13,6 +13,7 @@ import {
   scoreDisplay,
   symbols,
   formatDuration,
+  setLogLevel,
 } from '@panguard-ai/core';
 import { runScan } from '@panguard-ai/panguard-scan';
 import { PANGUARD_VERSION } from '../../index.js';
@@ -38,6 +39,8 @@ export function demoCommand(): Command {
     .description('Run an automated demo sequence / 執行自動化展示')
     .option('--lang <language>', 'Language: en or zh-TW / 語言', 'en')
     .action(async (_opts: { lang: string }) => {
+      // Suppress internal module JSON logs — demo should only show user-facing output
+      setLogLevel('silent');
       console.log(banner(PANGUARD_VERSION));
       console.log(`  ${symbols.info} ${c.bold('Panguard AI - Automated Demo')}`);
       console.log(`  ${c.dim('Running through all security modules...')}`);
