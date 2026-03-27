@@ -4,7 +4,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { ScanOutput, ScanOutputSystem, BuildScanOutputOptions } from '../src/cli/scan-helpers.js';
+import type {
+  ScanOutput,
+  ScanOutputSystem,
+  BuildScanOutputOptions,
+} from '../src/cli/scan-helpers.js';
 
 // Mock node:fs/promises
 const mockWriteFile = vi.fn().mockResolvedValue(undefined);

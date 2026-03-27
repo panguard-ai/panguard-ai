@@ -149,8 +149,8 @@ export default function EcosystemReportContent() {
                 registries.
               </p>
               <p>
-                AI agents like Claude Code, Cursor, OpenClaw, Codex, Windsurf, Gemini CLI, and
-                16 other MCP-compatible platforms use skills with
+                AI agents like Claude Code, Cursor, OpenClaw, Codex, Windsurf, Gemini CLI, and 16
+                other MCP-compatible platforms use skills with
                 <strong className="text-text-primary"> full system access</strong> — they can read
                 files, execute commands, access environment variables, and make network requests.
                 Unlike mobile apps, there is no review process before a skill runs on your machine.

@@ -73,13 +73,7 @@ const competitors: readonly Competitor[] = [
   { labelKey: 'compare.panguard.label', descKey: 'compare.panguard.desc', highlight: true },
 ] as const;
 
-function StepCard({
-  step,
-  index,
-}: {
-  readonly step: Step;
-  readonly index: number;
-}) {
+function StepCard({ step, index }: { readonly step: Step; readonly index: number }) {
   const t = useTranslations('home.howItWorks');
   const Icon = step.icon;
 
@@ -97,14 +91,10 @@ function StepCard({
       </div>
 
       {/* Title */}
-      <h3 className="text-base font-semibold text-text-primary mb-1">
-        {t(step.titleKey)}
-      </h3>
+      <h3 className="text-base font-semibold text-text-primary mb-1">{t(step.titleKey)}</h3>
 
       {/* Subtitle */}
-      <p className="text-sm text-text-secondary mb-2">
-        {t(step.subtitleKey)}
-      </p>
+      <p className="text-sm text-text-secondary mb-2">{t(step.subtitleKey)}</p>
 
       {/* Timing badge */}
       <span className={`inline-block text-xs font-mono ${step.color} opacity-80`}>
@@ -113,9 +103,7 @@ function StepCard({
 
       {/* Hover detail overlay */}
       <div className="absolute inset-0 rounded-xl bg-surface-2/95 backdrop-blur-sm p-6 flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
-        <p className="text-sm text-text-secondary leading-relaxed">
-          {t(step.detailKey)}
-        </p>
+        <p className="text-sm text-text-secondary leading-relaxed">{t(step.detailKey)}</p>
       </div>
     </motion.div>
   );
@@ -154,7 +142,10 @@ export default function HowItWorks() {
         {/* 4-step flow */}
         <div className="mt-12 flex flex-col md:flex-row md:items-stretch gap-4 md:gap-0">
           {steps.map((step, i) => (
-            <div key={step.titleKey} className="flex flex-col md:flex-row md:items-stretch flex-1 min-w-0">
+            <div
+              key={step.titleKey}
+              className="flex flex-col md:flex-row md:items-stretch flex-1 min-w-0"
+            >
               <StepCard step={step} index={i} />
               {i < steps.length - 1 && <StepArrow index={i} />}
             </div>
@@ -187,9 +178,7 @@ export default function HowItWorks() {
               </span>
               <span className="hidden sm:inline text-text-muted">--</span>
               <span
-                className={`text-sm ${
-                  comp.highlight ? 'text-text-primary' : 'text-text-muted'
-                }`}
+                className={`text-sm ${comp.highlight ? 'text-text-primary' : 'text-text-muted'}`}
               >
                 {t(comp.descKey)}
               </span>

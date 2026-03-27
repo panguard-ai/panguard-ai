@@ -22,29 +22,33 @@ const NOTABLE_SKILLS: readonly NotableSkill[] = [
     name: 'tesla-fleet-api',
     downloads: 2839,
     severity: 'CRITICAL',
-    summary: 'Can override your agent\'s system prompt',
-    detail: 'Controls your Tesla fleet -- prompt injection allows full override of agent instructions, enabling unauthorized vehicle commands.',
+    summary: "Can override your agent's system prompt",
+    detail:
+      'Controls your Tesla fleet -- prompt injection allows full override of agent instructions, enabling unauthorized vehicle commands.',
   },
   {
     name: 'walletconnect-agent',
     downloads: 2206,
     severity: 'CRITICAL',
-    summary: 'Can override your agent\'s system prompt',
-    detail: 'Connects to your crypto wallet -- prompt injection allows an attacker to redirect transactions or exfiltrate private keys.',
+    summary: "Can override your agent's system prompt",
+    detail:
+      'Connects to your crypto wallet -- prompt injection allows an attacker to redirect transactions or exfiltrate private keys.',
   },
   {
     name: 'clawsec',
     downloads: 9491,
     severity: 'HIGH',
     summary: 'A security tool with security holes',
-    detail: 'Ironically, this security-focused skill contains resource exhaustion and data exfiltration patterns that undermine the protections it claims to provide.',
+    detail:
+      'Ironically, this security-focused skill contains resource exhaustion and data exfiltration patterns that undermine the protections it claims to provide.',
   },
   {
     name: 'safe-exec',
     downloads: 2142,
     severity: 'HIGH',
-    summary: 'Named \'safe\' but isn\'t safe',
-    detail: 'Despite its reassuring name, this skill contains unsafe code execution patterns that bypass sandbox restrictions.',
+    summary: "Named 'safe' but isn't safe",
+    detail:
+      'Despite its reassuring name, this skill contains unsafe code execution patterns that bypass sandbox restrictions.',
   },
 ] as const;
 
@@ -67,9 +71,8 @@ export default function Evidence() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   const totalScanned = eco.skillsScanned;
-  const riskPercent = totalScanned > 0
-    ? ((eco.threatsDetected / totalScanned) * 100).toFixed(1)
-    : '13.4';
+  const riskPercent =
+    totalScanned > 0 ? ((eco.threatsDetected / totalScanned) * 100).toFixed(1) : '13.4';
 
   function handleToggle(index: number) {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -90,9 +93,7 @@ export default function Evidence() {
               percent: riskPercent,
             })}
           </h2>
-          <p className="text-base text-text-secondary mt-3">
-            {t('subtitle')}
-          </p>
+          <p className="text-base text-text-secondary mt-3">{t('subtitle')}</p>
         </FadeInUp>
 
         {/* Case Cards */}
@@ -130,9 +131,7 @@ export default function Evidence() {
                             {skill.downloads.toLocaleString()} downloads
                           </span>
                         </div>
-                        <p className="text-sm text-text-secondary mt-0.5">
-                          {skill.summary}
-                        </p>
+                        <p className="text-sm text-text-secondary mt-0.5">{skill.summary}</p>
                       </div>
                     </div>
                     <motion.div

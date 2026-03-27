@@ -13,12 +13,15 @@ export default function CTARoadmap() {
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
-    navigator.clipboard.writeText(INSTALL_COMMAND).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {
-      // Clipboard API unavailable
-    });
+    navigator.clipboard
+      .writeText(INSTALL_COMMAND)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {
+        // Clipboard API unavailable
+      });
   }
 
   function handleScrollToTop() {
@@ -28,7 +31,6 @@ export default function CTARoadmap() {
   return (
     <section className="bg-gradient-to-b from-[#0a0a0a] to-[#0d2614] px-5 sm:px-6 py-16 sm:py-24">
       <div className="max-w-3xl mx-auto">
-
         {/* Install CTA */}
         <FadeInUp>
           <div className="bg-surface-1 border border-border rounded-xl p-4 font-mono">
@@ -127,8 +129,7 @@ export default function CTARoadmap() {
         <FadeInUp delay={0.35}>
           <div className="text-center mt-8">
             <p className="text-xs text-text-muted">
-              MIT Licensed{' '}
-              <span className="mx-1">{'/'}</span>{' '}
+              MIT Licensed <span className="mx-1">{'/'}</span>{' '}
               <a
                 href="https://doi.org/10.5281/zenodo.19178002"
                 target="_blank"
@@ -141,7 +142,6 @@ export default function CTARoadmap() {
             </p>
           </div>
         </FadeInUp>
-
       </div>
     </section>
   );

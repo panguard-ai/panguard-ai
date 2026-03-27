@@ -69,10 +69,9 @@ describe('updateGuardConfig', () => {
     mockExistsSync.mockReturnValue(false);
     updateGuardConfig({ mode: 'enforce' });
 
-    expect(mockMkdirSync).toHaveBeenCalledWith(
-      '/tmp/test-home/.panguard-guard',
-      { recursive: true }
-    );
+    expect(mockMkdirSync).toHaveBeenCalledWith('/tmp/test-home/.panguard-guard', {
+      recursive: true,
+    });
     expect(mockWriteFileSync).toHaveBeenCalled();
   });
 

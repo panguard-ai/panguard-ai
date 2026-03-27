@@ -46,10 +46,7 @@ test.describe('Journey 1: Homepage scanner — input, scan, results', () => {
     await expect(input).toHaveValue(TEST_URL);
 
     // Scan button must be enabled now
-    const scanBtn = page
-      .locator('button')
-      .filter({ hasText: /scan/i })
-      .first();
+    const scanBtn = page.locator('button').filter({ hasText: /scan/i }).first();
     await expect(scanBtn).toBeEnabled();
 
     await page.screenshot({
@@ -66,10 +63,7 @@ test.describe('Journey 1: Homepage scanner — input, scan, results', () => {
     await expect(input).toBeVisible({ timeout: 15_000 });
     await input.fill(TEST_URL);
 
-    const scanBtn = page
-      .locator('button')
-      .filter({ hasText: /scan/i })
-      .first();
+    const scanBtn = page.locator('button').filter({ hasText: /scan/i }).first();
     await scanBtn.click();
 
     // Wait for loading spinner to appear then disappear (scan in progress)
@@ -109,8 +103,7 @@ test.describe('Journey 1: Homepage scanner — input, scan, results', () => {
     // Either findings are shown (checks passed/failed) OR a "show findings" button appears
     // The checks row always renders if the report is present
     const hasChecks =
-      /✓|✗|⚠|pass|fail|warn|findings|checks/i.test(bodyText) ||
-      /show \d+ finding/i.test(bodyText);
+      /✓|✗|⚠|pass|fail|warn|findings|checks/i.test(bodyText) || /show \d+ finding/i.test(bodyText);
     expect(hasChecks, 'Checks or findings section should be present').toBe(true);
 
     await page.screenshot({
@@ -134,7 +127,9 @@ test.describe('Journey 1: Homepage scanner — input, scan, results', () => {
 
     // One of them must appear
     await Promise.race([
-      expect(spinner).toBeVisible({ timeout: 5_000 }).catch(() => {}),
+      expect(spinner)
+        .toBeVisible({ timeout: 5_000 })
+        .catch(() => {}),
       expect(result).toBeVisible({ timeout: 30_000 }),
     ]);
 
@@ -148,10 +143,7 @@ test.describe('Journey 1: Homepage scanner — input, scan, results', () => {
     await page.goto('/en');
     await page.waitForLoadState('networkidle');
 
-    const scanBtn = page
-      .locator('button')
-      .filter({ hasText: /scan/i })
-      .first();
+    const scanBtn = page.locator('button').filter({ hasText: /scan/i }).first();
     await expect(scanBtn).toBeDisabled();
 
     await page.screenshot({
@@ -172,7 +164,9 @@ test.describe('Journey 1: Homepage scanner — input, scan, results', () => {
 
     // Should get an error response rendered in the UI
     // The API returns 400 for non-GitHub URLs, which the component shows in red
-    const errorEl = page.locator('.text-red-400, [class*="red"]').filter({ hasText: /github|url|error/i });
+    const errorEl = page
+      .locator('.text-red-400, [class*="red"]')
+      .filter({ hasText: /github|url|error/i });
     await expect(errorEl).toBeVisible({ timeout: 15_000 });
 
     await page.screenshot({
@@ -207,10 +201,7 @@ test.describe('Journey 2: Dedicated scan page /en/scan', () => {
     await expect(input).toBeVisible({ timeout: 15_000 });
     await input.fill(TEST_URL);
 
-    const scanBtn = page
-      .locator('button')
-      .filter({ hasText: /scan/i })
-      .first();
+    const scanBtn = page.locator('button').filter({ hasText: /scan/i }).first();
     await expect(scanBtn).toBeEnabled();
     await scanBtn.click();
 
