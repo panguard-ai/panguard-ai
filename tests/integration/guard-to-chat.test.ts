@@ -249,28 +249,28 @@ describe('PanguardGuard -> PanguardChat Pipeline Integration', () => {
   });
 
   describe('License Gating for Notifications', () => {
-    it('should allow notifications for Pro license', () => {
+    it('community edition: license is always valid', () => {
       const key = generateTestLicenseKey('pro');
       const license = validateLicense(key);
-
       expect(license).not.toBeNull();
-      expect(hasFeature(license!, 'notifications')).toBe(true);
+      expect(license!.isValid).toBe(true);
     });
 
-    it('should not allow notifications for Free license', () => {
+    it('community edition: free license is valid with community features', () => {
       const key = generateTestLicenseKey('free');
       const license = validateLicense(key);
 
       expect(license).not.toBeNull();
-      expect(hasFeature(license!, 'notifications')).toBe(false);
+      expect(hasFeature(license!, 'basic_monitoring')).toBe(true);
+      expect(hasFeature(license!, 'auto_respond')).toBe(true);
     });
 
-    it('should allow full features for Enterprise license', () => {
+    it('community edition: all tiers get community features', () => {
       const key = generateTestLicenseKey('enterprise');
       const license = validateLicense(key);
 
       expect(license).not.toBeNull();
-      expect(hasFeature(license!, 'notifications')).toBe(true);
+      expect(hasFeature(license!, 'basic_monitoring')).toBe(true);
       expect(hasFeature(license!, 'auto_respond')).toBe(true);
     });
   });

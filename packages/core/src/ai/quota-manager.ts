@@ -1,11 +1,6 @@
-/* AI Quota Manager — community edition (no limits) */
+/* AI Quota Manager — community edition */
 
-export interface QuotaTier {
-  name: string;
-  hourlyLimit: number;
-  monthlyBudgetUsd: number;
-  byok: boolean;
-}
+export type QuotaTier = 'free' | 'pro' | 'enterprise';
 
 export interface QuotaConfig {
   tier: QuotaTier;
@@ -18,22 +13,29 @@ export interface QuotaCheckResult {
 }
 
 export interface QuotaUsage {
+  tier: string;
   hourlyUsed: number;
   monthlySpentUsd: number;
 }
 
 export class AIQuotaManager {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  constructor(_tier?: QuotaTier | string, _override?: Partial<QuotaConfig>) {
-    /* community edition — no quota enforcement */
+  private readonly tierName: string;
+  private readonly isFree: boolean;
+
+  constructor(tier?: QuotaTier | string, _override?: Partial<QuotaConfig>) {
+    this.tierName = typeof tier === 'string' ? tier : (tier ?? 'free');
+    this.isFree = this.tierName === 'free';
   }
 
   check(): QuotaCheckResult {
+    if (this.isFree) {
+      return { allowed: false, reason: 'Free tier: AI analysis not included' };
+    }
     return { allowed: true };
   }
 
   checkQuota(): QuotaCheckResult {
-    return { allowed: true };
+    return this.check();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -46,6 +48,6 @@ export class AIQuotaManager {
   }
 
   getUsage(): QuotaUsage {
-    return { hourlyUsed: 0, monthlySpentUsd: 0 };
+    return { tier: this.tierName, hourlyUsed: 0, monthlySpentUsd: 0 };
   }
 }
