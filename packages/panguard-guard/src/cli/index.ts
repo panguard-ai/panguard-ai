@@ -248,7 +248,13 @@ async function commandStart(
 
   // ── Telemetry batch + notification debounce ────────────────────────
   const TC_ENDPOINT = config.threatCloudEndpoint ?? 'https://tc.panguard.ai';
-  const telemetryBatch: Array<{ event: string; platform: string; skillCount: number; findingCount: number; severity: string }> = [];
+  const telemetryBatch: Array<{
+    event: string;
+    platform: string;
+    skillCount: number;
+    findingCount: number;
+    severity: string;
+  }> = [];
   let telemetryFlushTimer: ReturnType<typeof setTimeout> | null = null;
   let notificationDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   const pendingNotifications: string[] = [];
@@ -264,7 +270,9 @@ async function commandStart(
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...evt, ts: new Date().toISOString() }),
           signal: AbortSignal.timeout(3000),
-        }).catch(() => { /* best effort */ });
+        }).catch(() => {
+          /* best effort */
+        });
       } catch {
         // Never block guard for telemetry
       }
@@ -299,19 +307,19 @@ async function commandStart(
       notificationDebounceTimer = null;
       const msgs = pendingNotifications.splice(0, pendingNotifications.length);
       if (msgs.length === 0) return;
-      const combined = msgs.length === 1
-        ? msgs[0]
-        : `${msgs.length} skill audit results`;
-      void import('node:child_process').then(({ execSync }) => {
-        try {
-          execSync(
-            `osascript -e 'display notification "${combined ?? ''}" with title "PanGuard"'`,
-            { timeout: 2000 }
-          );
-        } catch {
-          // Notification failed — non-critical
-        }
-      }).catch(() => {});
+      const combined = msgs.length === 1 ? msgs[0] : `${msgs.length} skill audit results`;
+      void import('node:child_process')
+        .then(({ execSync }) => {
+          try {
+            execSync(
+              `osascript -e 'display notification "${combined ?? ''}" with title "PanGuard"'`,
+              { timeout: 2000 }
+            );
+          } catch {
+            // Notification failed — non-critical
+          }
+        })
+        .catch(() => {});
     }, 5_000); // debounce 5s
   }
 
@@ -390,7 +398,10 @@ async function commandStart(
       // Telemetry + macOS notification
       pushTelemetryEvent('skill_audit', result.riskScore, result.riskLevel);
       if (result.riskLevel === 'HIGH' || result.riskLevel === 'CRITICAL') {
-        pushNotification('Skill Audit', `${result.name}: ${result.riskLevel} (${result.riskScore}/100)`);
+        pushNotification(
+          'Skill Audit',
+          `${result.name}: ${result.riskLevel} (${result.riskScore}/100)`
+        );
       }
     }
   );

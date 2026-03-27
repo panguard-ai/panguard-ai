@@ -27,7 +27,14 @@ import { ensureTelemetryConsent } from '../consent.js';
 import { reportTelemetry, discoverLocalSkillCount, getLocalPlatform } from '../telemetry.js';
 
 function remoteSystem(openPorts: number): ScanOutputSystem {
-  return { os: 'remote', arch: 'remote', open_ports: openPorts, running_services: 0, firewall_enabled: false, security_tools_detected: 0 };
+  return {
+    os: 'remote',
+    arch: 'remote',
+    open_ports: openPorts,
+    running_services: 0,
+    firewall_enabled: false,
+    security_tools_detected: 0,
+  };
 }
 
 export function scanCommand(): Command {
@@ -102,7 +109,9 @@ export function scanCommand(): Command {
           );
 
           console.log('');
-          console.log(c.dim('  Open source (MIT). Star us: https://github.com/panguard-ai/panguard-ai'));
+          console.log(
+            c.dim('  Open source (MIT). Star us: https://github.com/panguard-ai/panguard-ai')
+          );
 
           if (result.findings.length > 0) {
             console.log(divider(`${result.findings.length} Finding(s)`));

@@ -157,7 +157,9 @@ describe('alreadyConfigured detection', () => {
     mkdirSync(cursorDir, { recursive: true });
     writeFileSync(
       join(cursorDir, 'mcp.json'),
-      JSON.stringify({ mcpServers: { panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] } } })
+      JSON.stringify({
+        mcpServers: { panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] } },
+      })
     );
 
     const platforms = await detectPlatforms();
@@ -170,7 +172,9 @@ describe('alreadyConfigured detection', () => {
     mkdirSync(geminiDir, { recursive: true });
     writeFileSync(
       join(geminiDir, 'settings.json'),
-      JSON.stringify({ mcpServers: { panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] } } })
+      JSON.stringify({
+        mcpServers: { panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] } },
+      })
     );
 
     const platforms = await detectPlatforms();

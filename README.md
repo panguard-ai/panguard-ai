@@ -77,7 +77,7 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
 | **[Skill Auditor](docs/overview.md)**                              | 6-check security gate before any skill runs                      | GA     |
 | **[Guard](#guard)**                                                | 24/7 runtime monitoring + auto-block                             | GA     |
 | **[Threat Cloud](#threat-cloud)**                                  | Anonymous community threat intel. 3+ confirmations + LLM review. | GA     |
-| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 71 rules across 10 categories.           | RFC    |
+| **[ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules)** | Open detection standard. 71 rules across 10 categories.          | RFC    |
 
 One user's encounter with a new attack becomes a rule that protects everyone.
 

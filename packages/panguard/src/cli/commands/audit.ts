@@ -24,7 +24,9 @@ const DEFAULT_TC_ENDPOINT = 'https://tc.panguard.ai';
 
 /** Check if the argument looks like a URL */
 function isUrl(input: string): boolean {
-  return /^https?:\/\//i.test(input) || /^github\.com\//i.test(input) || /^clawhub\.ai\//i.test(input);
+  return (
+    /^https?:\/\//i.test(input) || /^github\.com\//i.test(input) || /^clawhub\.ai\//i.test(input)
+  );
 }
 
 interface ParsedUrl {
@@ -58,7 +60,13 @@ function parseSkillUrl(input: string): ParsedUrl | null {
       basePath = parts.slice(4).join('/');
     }
 
-    return { owner, repo, branch, basePath, source: (isGitHub ? 'github' : 'clawhub') as 'github' | 'clawhub' };
+    return {
+      owner,
+      repo,
+      branch,
+      basePath,
+      source: (isGitHub ? 'github' : 'clawhub') as 'github' | 'clawhub',
+    };
   } catch {
     return null;
   }
@@ -106,13 +114,14 @@ async function fetchSkillContent(
 
 /** Write fetched content to a temp directory for auditSkill() */
 function writeToTempDir(content: string, skillName: string): string {
-  const dir = path.join(tmpdir(), `pga-audit-${Date.now()}-${skillName.replace(/[^a-z0-9-]/gi, '_')}`);
+  const dir = path.join(
+    tmpdir(),
+    `pga-audit-${Date.now()}-${skillName.replace(/[^a-z0-9-]/gi, '_')}`
+  );
   mkdirSync(dir, { recursive: true });
   // Prepend frontmatter with skill name if content lacks YAML frontmatter
   const hasFrontmatter = content.trimStart().startsWith('---');
-  const finalContent = hasFrontmatter
-    ? content
-    : `---\nname: "${skillName}"\n---\n\n${content}`;
+  const finalContent = hasFrontmatter ? content : `---\nname: "${skillName}"\n---\n\n${content}`;
   writeFileSync(path.join(dir, 'SKILL.md'), finalContent, 'utf-8');
   return dir;
 }
@@ -176,7 +185,9 @@ export function auditCommand(): Command {
           const parsed = parseSkillUrl(skillPath);
           if (!parsed) {
             if (options.json) {
-              console.log(JSON.stringify({ error: 'Unsupported URL format. Use GitHub or ClawHub URLs.' }));
+              console.log(
+                JSON.stringify({ error: 'Unsupported URL format. Use GitHub or ClawHub URLs.' })
+              );
             } else {
               console.error(c.red('  Unsupported URL format. Supported:'));
               console.error(c.dim('    https://github.com/owner/repo'));
@@ -194,7 +205,11 @@ export function auditCommand(): Command {
           const fetched = await fetchSkillContent(parsed);
           if (!fetched) {
             if (options.json) {
-              console.log(JSON.stringify({ error: `Could not find SKILL.md in ${parsed.owner}/${parsed.repo}. Is the repo public?` }));
+              console.log(
+                JSON.stringify({
+                  error: `Could not find SKILL.md in ${parsed.owner}/${parsed.repo}. Is the repo public?`,
+                })
+              );
             } else {
               console.error(c.red(`  Could not find SKILL.md in ${parsed.owner}/${parsed.repo}.`));
               console.error(c.dim('  Make sure the repository is public and contains SKILL.md.'));
@@ -248,7 +263,9 @@ export function auditCommand(): Command {
             // Tier 1: Check blacklist before running full audit
             const skillHash = computeSkillHash(resolvedPath);
             const skillName = remoteSource
-              ? remoteSource.replace(/^(github|clawhub):/, '').replace(/\/(SKILL|skill|README)\.md$/, '')
+              ? remoteSource
+                  .replace(/^(github|clawhub):/, '')
+                  .replace(/\/(SKILL|skill|README)\.md$/, '')
               : path.basename(resolvedPath) === 'SKILL.md'
                 ? path.basename(path.dirname(resolvedPath))
                 : path.basename(resolvedPath);
@@ -314,9 +331,7 @@ export function auditCommand(): Command {
         }
 
         if (options.json) {
-          const jsonReport = remoteSource
-            ? { ...report, remoteSource, url: skillPath }
-            : report;
+          const jsonReport = remoteSource ? { ...report, remoteSource, url: skillPath } : report;
           console.log(JSON.stringify(jsonReport, null, 2));
         } else {
           // Pretty output

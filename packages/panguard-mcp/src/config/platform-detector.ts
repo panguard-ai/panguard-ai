@@ -160,11 +160,38 @@ function getClineConfigPath(): string {
   const home = homedir();
   switch (platform()) {
     case 'darwin':
-      return join(home, 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json');
+      return join(
+        home,
+        'Library',
+        'Application Support',
+        'Code',
+        'User',
+        'globalStorage',
+        'saoudrizwan.claude-dev',
+        'settings',
+        'cline_mcp_settings.json'
+      );
     case 'win32':
-      return join(process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'), 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json');
+      return join(
+        process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'),
+        'Code',
+        'User',
+        'globalStorage',
+        'saoudrizwan.claude-dev',
+        'settings',
+        'cline_mcp_settings.json'
+      );
     default:
-      return join(home, '.config', 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev', 'settings', 'cline_mcp_settings.json');
+      return join(
+        home,
+        '.config',
+        'Code',
+        'User',
+        'globalStorage',
+        'saoudrizwan.claude-dev',
+        'settings',
+        'cline_mcp_settings.json'
+      );
   }
 }
 
@@ -175,7 +202,12 @@ function getVSCodeCopilotConfigPath(): string {
     case 'darwin':
       return join(home, 'Library', 'Application Support', 'Code', 'User', 'settings.json');
     case 'win32':
-      return join(process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'), 'Code', 'User', 'settings.json');
+      return join(
+        process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'),
+        'Code',
+        'User',
+        'settings.json'
+      );
     default:
       return join(home, '.config', 'Code', 'User', 'settings.json');
   }
@@ -186,7 +218,11 @@ function getZedConfigPath(): string {
   const home = homedir();
   switch (platform()) {
     case 'win32':
-      return join(process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'), 'Zed', 'settings.json');
+      return join(
+        process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'),
+        'Zed',
+        'settings.json'
+      );
     default:
       return join(home, '.config', 'zed', 'settings.json');
   }
@@ -207,11 +243,38 @@ function getRooCodeConfigPath(): string {
   const home = homedir();
   switch (platform()) {
     case 'darwin':
-      return join(home, 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'cline_mcp_settings.json');
+      return join(
+        home,
+        'Library',
+        'Application Support',
+        'Code',
+        'User',
+        'globalStorage',
+        'rooveterinaryinc.roo-cline',
+        'settings',
+        'cline_mcp_settings.json'
+      );
     case 'win32':
-      return join(process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'), 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'cline_mcp_settings.json');
+      return join(
+        process.env['APPDATA'] ?? join(home, 'AppData', 'Roaming'),
+        'Code',
+        'User',
+        'globalStorage',
+        'rooveterinaryinc.roo-cline',
+        'settings',
+        'cline_mcp_settings.json'
+      );
     default:
-      return join(home, '.config', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline', 'settings', 'cline_mcp_settings.json');
+      return join(
+        home,
+        '.config',
+        'Code',
+        'User',
+        'globalStorage',
+        'rooveterinaryinc.roo-cline',
+        'settings',
+        'cline_mcp_settings.json'
+      );
   }
 }
 
@@ -330,8 +393,7 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
   // Windsurf (Codeium)
   const wsPath = getWindsurfConfigPath();
   const wsDetected =
-    (await commandExists('windsurf')) ||
-    existsSync(join(homedir(), '.codeium', 'windsurf'));
+    (await commandExists('windsurf')) || existsSync(join(homedir(), '.codeium', 'windsurf'));
   platforms.push({
     id: 'windsurf',
     name: 'Windsurf',
@@ -342,8 +404,7 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // QClaw (Tencent)
   const qcPath = getQClawConfigPath();
-  const qcDetected =
-    (await commandExists('qclaw')) || existsSync(join(homedir(), '.qclaw'));
+  const qcDetected = (await commandExists('qclaw')) || existsSync(join(homedir(), '.qclaw'));
   platforms.push({
     id: 'qclaw',
     name: 'QClaw',
@@ -354,8 +415,19 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // Cline (VS Code extension)
   const clinePath = getClineConfigPath();
-  const clineDetected = existsSync(clinePath) ||
-    existsSync(join(homedir(), 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'saoudrizwan.claude-dev'));
+  const clineDetected =
+    existsSync(clinePath) ||
+    existsSync(
+      join(
+        homedir(),
+        'Library',
+        'Application Support',
+        'Code',
+        'User',
+        'globalStorage',
+        'saoudrizwan.claude-dev'
+      )
+    );
   platforms.push({
     id: 'cline',
     name: 'Cline',
@@ -393,8 +465,7 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // Gemini CLI
   const geminiPath = getGeminiCliConfigPath();
-  const geminiDetected =
-    (await commandExists('gemini')) || existsSync(join(homedir(), '.gemini'));
+  const geminiDetected = (await commandExists('gemini')) || existsSync(join(homedir(), '.gemini'));
   platforms.push({
     id: 'gemini-cli',
     name: 'Gemini CLI',
@@ -416,8 +487,19 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
 
   // Roo Code (VS Code extension)
   const rooPath = getRooCodeConfigPath();
-  const rooDetected = existsSync(rooPath) ||
-    existsSync(join(homedir(), 'Library', 'Application Support', 'Code', 'User', 'globalStorage', 'rooveterinaryinc.roo-cline'));
+  const rooDetected =
+    existsSync(rooPath) ||
+    existsSync(
+      join(
+        homedir(),
+        'Library',
+        'Application Support',
+        'Code',
+        'User',
+        'globalStorage',
+        'rooveterinaryinc.roo-cline'
+      )
+    );
   platforms.push({
     id: 'roo-code',
     name: 'Roo Code',

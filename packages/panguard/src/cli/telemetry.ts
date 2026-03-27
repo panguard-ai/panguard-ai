@@ -16,7 +16,8 @@ const TC_ENDPOINT = 'https://tc.panguard.ai';
 export async function discoverLocalSkillCount(): Promise<number> {
   try {
     // @ts-expect-error — project reference build order issue with tsc --noEmit; works at runtime
-    const mod: { discoverAllSkills: () => Promise<readonly unknown[]> } = await import('@panguard-ai/panguard-mcp');
+    const mod: { discoverAllSkills: () => Promise<readonly unknown[]> } =
+      await import('@panguard-ai/panguard-mcp');
     const skills = await mod.discoverAllSkills();
     return skills.length;
   } catch {
@@ -41,10 +42,7 @@ export interface TelemetryEvent {
  * Report a telemetry event if telemetry is enabled.
  * Fire-and-forget — never blocks the caller, never throws.
  */
-export async function reportTelemetry(
-  enabled: boolean,
-  event: TelemetryEvent
-): Promise<void> {
+export async function reportTelemetry(enabled: boolean, event: TelemetryEvent): Promise<void> {
   if (!enabled) return;
 
   try {

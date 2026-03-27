@@ -121,7 +121,12 @@ export function scanWithATR(
   check: CheckResult;
   matchedCount: number;
 } {
-  const { isReadme = false, hasStrongReducers = false, allReducers = false, hasDefensiveText = false } = options;
+  const {
+    isReadme = false,
+    hasStrongReducers = false,
+    allReducers = false,
+    hasDefensiveText = false,
+  } = options;
   const findings: Finding[] = [];
   const matchedRuleIds = new Set<string>();
   const strippedContent = stripMarkdownNoise(content);

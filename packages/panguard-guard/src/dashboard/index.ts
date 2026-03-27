@@ -649,7 +649,9 @@ export class DashboardServer {
         '@panguard-ai/panguard-mcp/config' as string
       );
       const discover = mcpConfig['discoverAllSkills'] as
-        | (() => Promise<Array<{ name: string; platformId?: string; platform?: string; command?: string }>>)
+        | (() => Promise<
+            Array<{ name: string; platformId?: string; platform?: string; command?: string }>
+          >)
         | undefined;
       if (discover) {
         const discovered = await discover();

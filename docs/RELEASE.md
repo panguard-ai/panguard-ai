@@ -15,11 +15,11 @@ agent-threat-rules (ATR)          panguard-ai (PanGuard)
 
 ## Release Types
 
-| Type | What | Command |
-|------|------|---------|
-| **ATR only** | 規則更新、引擎改動 | `cd ~/Downloads/agent-threat-rules && ./scripts/release.sh patch` |
-| **PanGuard only** | CLI/Guard/Website | `cd ~/Downloads/panguard-ai && ./scripts/release.sh patch` |
-| **Full release** | ATR + PanGuard | ATR first, then sync to PanGuard, then PanGuard release |
+| Type              | What               | Command                                                           |
+| ----------------- | ------------------ | ----------------------------------------------------------------- |
+| **ATR only**      | 規則更新、引擎改動 | `cd ~/Downloads/agent-threat-rules && ./scripts/release.sh patch` |
+| **PanGuard only** | CLI/Guard/Website  | `cd ~/Downloads/panguard-ai && ./scripts/release.sh patch`        |
+| **Full release**  | ATR + PanGuard     | ATR first, then sync to PanGuard, then PanGuard release           |
 
 ---
 
@@ -41,6 +41,7 @@ npm install -g agent-threat-rules && atr --version
 ```
 
 ### ATR release.sh does:
+
 1. Bump version in package.json
 2. Build
 3. Commit + tag + push
@@ -94,6 +95,7 @@ git status  # must be clean
 ```
 
 ### release.sh does:
+
 1. Bump version in 4 packages + stats.ts
 2. Update lockfile + build
 3. Commit + tag + push
@@ -136,6 +138,7 @@ gh release view  # should show latest version with 4 binaries
 For a coordinated release (ATR + PanGuard):
 
 ### Phase 1: ATR
+
 - [ ] All tests pass (`npm test && npm run eval`)
 - [ ] CHANGELOG.md updated
 - [ ] `./scripts/release.sh [patch|minor|major]`
@@ -143,18 +146,21 @@ For a coordinated release (ATR + PanGuard):
 - [ ] Verify: `npm install -g agent-threat-rules && atr --version`
 
 ### Phase 2: Sync
+
 - [ ] rsync rules to panguard-ai/packages/atr/
 - [ ] Update ATR version in packages/atr/package.json
 - [ ] `pnpm build && pnpm test`
 - [ ] Commit sync
 
 ### Phase 3: PanGuard
+
 - [ ] All tests pass (`pnpm build && pnpm test`)
 - [ ] CHANGELOG.md updated
 - [ ] `./scripts/release.sh [patch|minor|major]`
 - [ ] Wait for CI to complete
 
 ### Phase 4: Verify (ALL must pass)
+
 - [ ] `npm install -g @panguard-ai/panguard` works
 - [ ] `curl -fsSL https://get.panguard.ai | bash` works
 - [ ] `brew upgrade panguard` works
@@ -163,6 +169,7 @@ For a coordinated release (ATR + PanGuard):
 - [ ] CI all green
 
 ### Phase 5: Announce
+
 - [ ] Social media post (if significant)
 - [ ] Update CLAUDE.md version references if needed
 

@@ -25,7 +25,9 @@ export function configCommand(): Command {
     .action((key: string, value: string) => {
       const validKeys = ['telemetry', 'threat-cloud'];
       if (!validKeys.includes(key)) {
-        console.log(`  ${c.caution(`Invalid key: ${key}. Must be one of: ${validKeys.join(', ')}`)}`);
+        console.log(
+          `  ${c.caution(`Invalid key: ${key}. Must be one of: ${validKeys.join(', ')}`)}`
+        );
         return;
       }
       const boolValue = value === 'true' || value === '1' || value === 'yes';
@@ -46,10 +48,18 @@ export function configCommand(): Command {
       console.log(banner(PANGUARD_VERSION));
       console.log(`  ${c.sage('Guard Configuration')}`);
       const guardConfig = loadGuardConfig();
-      console.log(`  Telemetry:     ${guardConfig.telemetryEnabled === true ? c.safe('enabled') : c.dim('disabled')}`);
-      console.log(`  Threat Cloud:  ${guardConfig.threatCloudUploadEnabled === false ? c.dim('disabled') : c.safe('enabled')}`);
-      console.log(`  Mode:          ${guardConfig.mode ? c.bold(guardConfig.mode) : c.dim('default')}`);
-      console.log(`  Dashboard:     ${guardConfig.dashboardEnabled === true ? c.safe('enabled') : c.dim('disabled')}`);
+      console.log(
+        `  Telemetry:     ${guardConfig.telemetryEnabled === true ? c.safe('enabled') : c.dim('disabled')}`
+      );
+      console.log(
+        `  Threat Cloud:  ${guardConfig.threatCloudUploadEnabled === false ? c.dim('disabled') : c.safe('enabled')}`
+      );
+      console.log(
+        `  Mode:          ${guardConfig.mode ? c.bold(guardConfig.mode) : c.dim('default')}`
+      );
+      console.log(
+        `  Dashboard:     ${guardConfig.dashboardEnabled === true ? c.safe('enabled') : c.dim('disabled')}`
+      );
       if (guardConfig.dashboardPort) {
         console.log(`  Dashboard Port: ${c.bold(String(guardConfig.dashboardPort))}`);
       }

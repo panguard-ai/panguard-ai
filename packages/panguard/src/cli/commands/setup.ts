@@ -647,10 +647,9 @@ export function setupCommand(): Command {
             source: 'cli-user',
             metadata: {
               version: PANGUARD_VERSION,
-              platforms: results
-                .filter((r) => r.success)
-                .map((r) => r.platformId),
-              skillsScanned: (jsonOutput['skill_scan'] as { total?: number } | undefined)?.total ?? 0,
+              platforms: results.filter((r) => r.success).map((r) => r.platformId),
+              skillsScanned:
+                (jsonOutput['skill_scan'] as { total?: number } | undefined)?.total ?? 0,
             },
           }),
           signal: AbortSignal.timeout(3000),

@@ -13,7 +13,11 @@
  */
 
 import { createHash } from 'node:crypto';
-import { buildRuleCreationPrompt, buildRuleReviewPrompt, type RuleCreationInput } from './atr-rule-creation-standard.js';
+import {
+  buildRuleCreationPrompt,
+  buildRuleReviewPrompt,
+  type RuleCreationInput,
+} from './atr-rule-creation-standard.js';
 import yaml from 'js-yaml';
 import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
@@ -406,19 +410,18 @@ export class ATRDrafter {
   private buildDraftPrompt(pattern: LocalPattern): string {
     // Use the Rule Creation Standard for consistent, high-quality rule generation
     const payload = pattern.sampleDescriptions.join('\n---\n');
-    const reasoning = [
-      ...pattern.analyzeReasons,
-      ...pattern.evidenceDescriptions,
-    ].join('\n');
+    const reasoning = [...pattern.analyzeReasons, ...pattern.evidenceDescriptions].join('\n');
 
-    const topSeverity = Object.entries(pattern.severities)
-      .sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'medium';
+    const topSeverity =
+      Object.entries(pattern.severities).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'medium';
 
     const input: RuleCreationInput = {
       payload,
       source: 'user_input',
       category: pattern.attackType,
-      reasoning: reasoning || `Detected ${pattern.occurrences} occurrences from ${pattern.distinctIPs.size} distinct sources`,
+      reasoning:
+        reasoning ||
+        `Detected ${pattern.occurrences} occurrences from ${pattern.distinctIPs.size} distinct sources`,
       mitreTechniques: pattern.mitreTechniques,
       severity: topSeverity as RuleCreationInput['severity'],
       context: `${pattern.occurrences} occurrences, ${pattern.distinctIPs.size} distinct IPs, ${pattern.firstSeen} to ${pattern.lastSeen}`,
