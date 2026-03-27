@@ -726,13 +726,17 @@
       "submitATR": "Submit ATR Rule Proposal"
     },
     "scannerHero": {
-      "titleLine1": "Install security before you",
-      "titleLine2": "install anything else.",
-      "subtitle": "Scan any AI skill before you install it. 16 platforms. 71 ATR rules. Free and open source.",
+      "titleLine1": "We scanned 10,000 MCP skills.",
+      "titleLine2": "13.5% have security risks.",
+      "subtitle": "Check yours in 10 seconds. Free. Open source.",
       "scanLabel": "Check any MCP skill before you install",
       "scanBtn": "Scan",
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached.",
-      "platformLabel": "Works with 16 platforms:"
+      "platformLabel": "Works with 16 platforms:",
+      "statsScanned": "skills scanned",
+      "statsCritical": "CRITICAL found",
+      "statsRules": "ATR rules",
+      "statsCrystallized": "threats crystallized"
     },
     "evidence": {
       "title": "We scanned {count} ClawHub skills. {percent}% have security risk patterns.",

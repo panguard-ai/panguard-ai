@@ -5,7 +5,6 @@ import ScannerHero from '@/components/home/ScannerHero';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
 // Below-the-fold sections loaded lazily
-const LiveStatsBar = dynamic(() => import('@/components/home/LiveStatsBar'));
 const Evidence = dynamic(() => import('@/components/home/Evidence'));
 const HowItWorks = dynamic(() => import('@/components/home/HowItWorks'));
 const CTARoadmap = dynamic(() => import('@/components/home/CTARoadmap'));
@@ -22,11 +21,9 @@ export default function Home() {
             threats with AI analysis, and shares new rules to protect everyone. MIT licensed. Open
             source.
           </p>
-          {/* 1. Hero: Scanner + platform bar */}
+          {/* 1. Hero: Scanner + stats + platform bar */}
           <ScannerHero />
-          {/* 2. Live Stats: skills scanned, critical found, ATR rules, threats crystallized */}
-          <LiveStatsBar />
-          {/* 3. Evidence: Real ClawHub scan cases */}
+          {/* 2. Evidence: Real ClawHub scan cases */}
           <Evidence />
           {/* 4. How It Works: Threat Crystallization + competitive comparison */}
           <HowItWorks />
