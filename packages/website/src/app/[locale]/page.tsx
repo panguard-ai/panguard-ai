@@ -5,8 +5,8 @@ import Footer from '@/components/Footer';
 import ScannerHero from '@/components/home/ScannerHero';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
-// Below-the-fold sections loaded lazily
-const Evidence = dynamic(() => import('@/components/home/Evidence'));
+const RealIncidents = dynamic(() => import('@/components/home/RealIncidents'));
+const WhyPanguard = dynamic(() => import('@/components/home/WhyPanguard'));
 const HowItWorks = dynamic(() => import('@/components/home/HowItWorks'));
 const CTARoadmap = dynamic(() => import('@/components/home/CTARoadmap'));
 
@@ -20,13 +20,15 @@ export default async function Home() {
           <p id="definition" className="sr-only">
             {t('srDefinition')}
           </p>
-          {/* 1. Hero: Scanner + stats + platform bar */}
+          {/* 1. Fear Hero: Scanner + stats + platform bar */}
           <ScannerHero />
-          {/* 2. Evidence: Real ClawHub scan cases */}
-          <Evidence />
-          {/* 4. How It Works: Threat Crystallization + competitive comparison */}
+          {/* 2. Real CVE Incidents */}
+          <RealIncidents />
+          {/* 3. Why PanGuard: 3 Pillars + competitive table */}
+          <WhyPanguard />
+          {/* 4. How It Works: Threat Crystallization */}
           <HowItWorks />
-          {/* 5. CTA + Mission + Roadmap */}
+          {/* 5. CTA + Mission */}
           <CTARoadmap />
         </main>
       </RuleStatsProvider>

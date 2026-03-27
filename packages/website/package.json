@@ -20,13 +20,15 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@panguard-ai/scan-core": "^1.4.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "framer-motion": "^12.34.3",
     "lucide-react": "^0.575.0",
     "next": "15.5.12",
     "next-intl": "^4.8.3",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "@panguard-ai/scan-core": "^1.4.0"
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

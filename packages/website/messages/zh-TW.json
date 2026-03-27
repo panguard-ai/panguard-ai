@@ -727,8 +727,8 @@
     },
     "srDefinition": "Panguard AI 為 AI Agent 提供第一個 Skills Audit。它在每個 Skill 執行前進行審計，用社群 ATR（Agent Threat Rules）捕獲已知威脅，用 AI 分析捕獲未知威脅，並分享新規則保護所有人。MIT 授權。開源。",
     "scannerHero": {
-      "titleLine1": "我們掃描了 {count} 個 MCP Skills。",
-      "titleLine2": "{percent}% 有安全風險。",
+      "titleLine1": "你剛裝的那個 MCP Skill？",
+      "titleLine2": "60 天內 30+ 個 CVE。CVSS 9.8 遠端執行。API key 被偷。",
       "subtitle": "10 秒檢查你的 Skill。免費。開源。",
       "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
       "scanBtn": "掃描",
@@ -763,6 +763,38 @@
           "detail": "儘管名字讓人安心，這個 Skill 包含繞過 sandbox 限制的不安全程式碼執行模式。"
         }
       }
+    },
+    "realIncidents": {
+      "title": "這不是假設。",
+      "subtitle": "真實的 CVE。真實的攻擊。真實的受害者。",
+      "cta": "掃描你的",
+      "scanCount": "我們掃描了 {count} 個 MCP Skills。{percent}% 有 CRITICAL 或 HIGH 安全風險。"
+    },
+    "whyPanguard": {
+      "title": "為什麼選 PanGuard",
+      "pillar1Title": "< 1 小時回應",
+      "pillar1Desc": "從新攻擊到偵測：業界要數週。PanGuard 1 小時。",
+      "pillar2Title": "信任網路",
+      "pillar2Desc": "不是防毒軟體。每個 MCP Skill 都有信任評級。就像 AI Agent 生態系的 SSL 證書。",
+      "pillar3Title": "集體防禦",
+      "pillar3Desc": "你的每一次掃描，讓所有人更安全。掃描、偵測、結晶、分發。",
+      "compTitle": "我們的比較",
+      "compSpeed": "規則更新速度",
+      "compSetup": "安裝",
+      "compCost": "費用",
+      "compFor": "適合誰",
+      "panguardSpeed": "< 1 小時（社群 + LLM）",
+      "panguardSetup": "一行指令",
+      "panguardCost": "免費 + 開源",
+      "panguardFor": "個人開發者",
+      "ciscoSpeed": "數週（委員會）",
+      "ciscoSetup": "企業級部署",
+      "ciscoCost": "免費但面向企業",
+      "ciscoFor": "企業安全團隊",
+      "owaspSpeed": "數月",
+      "owaspSetup": "不適用（僅框架）",
+      "owaspCost": "免費（僅清單）",
+      "owaspFor": "安全架構師"
     },
     "liveStatsBar": {
       "scanned": "Skills 已掃描",
