@@ -76,7 +76,7 @@ async function main() {
   const total = registry.length;
 
   // Load existing for dedup
-  let allResults: Result[] = [];
+  const allResults: Result[] = [];
   for (const f of ['scan-1000.json','scan-10000.json']) {
     const p = join(OUTPUT_DIR, f);
     if (existsSync(p)) { allResults.push(...(JSON.parse(readFileSync(p,'utf-8')).results||[])); }

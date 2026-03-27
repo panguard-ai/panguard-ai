@@ -195,7 +195,7 @@ async function main(): Promise<void> {
   console.log(`  Scanning: ${batch.length} packages (offset: ${offset}, limit: ${limit})`);
 
   // Import scan-core
-  const scanCorePath = resolve(__dirname, '../packages/scan-core/src/index.ts');
+  const _scanCorePath = resolve(__dirname, '../packages/scan-core/src/index.ts');
   let scanContent: (content: string, options?: Record<string, unknown>) => Record<string, unknown>;
   let contentHash: (content: string) => string;
   let compileRules: (rules: unknown[]) => unknown[];

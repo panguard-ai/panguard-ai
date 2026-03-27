@@ -702,8 +702,6 @@ export class SkillWatcher extends EventEmitter {
       .map((f) => `[${f.severity.toUpperCase()}] ${f.category}: ${f.title}`)
       .join('\n');
 
-    const severity = riskLevel === 'CRITICAL' ? 'critical' : 'high';
-
     const success = await this.config.submitATRProposal({
       patternHash,
       ruleContent: JSON.stringify({

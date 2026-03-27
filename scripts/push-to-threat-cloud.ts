@@ -8,6 +8,7 @@
  * Usage: npx tsx scripts/push-to-threat-cloud.ts --input FILE --tc-url URL [--llm] [--auto-propose]
  */
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const args = process.argv.slice(2);
 const getArg = (flag: string, def: string) => {
@@ -57,7 +58,7 @@ async function pushToTC(results: ScanResult[]): Promise<{
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            skillHash: require('node:crypto').createHash('sha256').update(skillName).digest('hex').slice(0, 16),
+            skillHash: createHash('sha256').update(skillName).digest('hex').slice(0, 16),
             skillName,
             riskScore: r.riskScore,
             riskLevel: r.riskLevel,
@@ -77,7 +78,7 @@ async function pushToTC(results: ScanResult[]): Promise<{
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              patternHash: require('node:crypto').createHash('sha256').update(ruleContent).digest('hex').slice(0, 16),
+              patternHash: createHash('sha256').update(ruleContent).digest('hex').slice(0, 16),
               ruleContent,
               llmProvider: 'bulk-pipeline',
               llmModel: 'none',
