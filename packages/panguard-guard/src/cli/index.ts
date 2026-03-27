@@ -302,15 +302,16 @@ async function commandStart(
       const combined = msgs.length === 1
         ? msgs[0]
         : `${msgs.length} skill audit results`;
-      try {
-        const { execSync } = require('node:child_process') as typeof import('node:child_process');
-        execSync(
-          `osascript -e 'display notification "${combined ?? ''}" with title "PanGuard"'`,
-          { timeout: 2000 }
-        );
-      } catch {
-        // Notification failed — non-critical
-      }
+      void import('node:child_process').then(({ execSync }) => {
+        try {
+          execSync(
+            `osascript -e 'display notification "${combined ?? ''}" with title "PanGuard"'`,
+            { timeout: 2000 }
+          );
+        } catch {
+          // Notification failed — non-critical
+        }
+      }).catch(() => {});
     }, 5_000); // debounce 5s
   }
 
