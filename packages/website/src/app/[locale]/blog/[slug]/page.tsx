@@ -118,7 +118,7 @@ export default async function BlogPostPage(props: {
       <NavBar />
       <main id="main-content">
         {/* ───────────── Back Link ───────────── */}
-        <section className="pt-24 pb-0 px-6">
+        <section className="pt-24 pb-0 px-5 sm:px-6">
           <div className="max-w-[800px] mx-auto">
             <FadeInUp>
               <Link
@@ -142,7 +142,7 @@ export default async function BlogPostPage(props: {
             </FadeInUp>
 
             <FadeInUp delay={0.05}>
-              <h1 className="text-[clamp(32px,4vw,48px)] font-bold text-text-primary leading-[1.1] mt-5">
+              <h1 className="text-[clamp(24px,4vw,42px)] font-bold text-text-primary leading-[1.15] mt-5">
                 {post.title}
               </h1>
             </FadeInUp>
@@ -173,7 +173,7 @@ export default async function BlogPostPage(props: {
             {/* ───────────── Article Content or Coming Soon ───────────── */}
             {post.content ? (
               <FadeInUp delay={0.2}>
-                <div className="mt-12 prose-panguard space-y-6">
+                <div className="mt-8 prose-panguard space-y-5">
                   {post.content.map((block, i) => {
                     if (block.startsWith('## ')) {
                       return (
@@ -186,7 +186,7 @@ export default async function BlogPostPage(props: {
                       const parts = block.match(/^\*\*(.+?)\.\*\*\s*(.*)$/);
                       if (parts) {
                         return (
-                          <p key={i} className="text-text-secondary leading-relaxed">
+                          <p key={i} className="text-text-primary/75 leading-relaxed">
                             <strong className="text-text-primary">{parts[1]}.</strong> {parts[2]}
                           </p>
                         );
@@ -220,7 +220,7 @@ export default async function BlogPostPage(props: {
                       );
                     }
                     return (
-                      <p key={i} className="text-text-secondary leading-relaxed">
+                      <p key={i} className="text-text-primary/75 leading-relaxed">
                         {block}
                       </p>
                     );

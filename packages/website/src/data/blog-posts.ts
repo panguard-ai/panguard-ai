@@ -21,7 +21,7 @@ export const categories = [
 export const blogPosts: BlogPost[] = [
   {
     slug: 'safe-mcp-openssf-what-it-means',
-    title: 'Anthropic, Google, OpenAI Just Spent $12.5M Validating What We Built Alone',
+    title: '$12.5M to Solve What We Already Shipped',
     excerpt:
       'Six tech giants funded SAFE-MCP to secure AI agent tool calls. We have been shipping that exact solution since 2025. Here is what this means for PanGuard and ATR.',
     category: 'Industry',
@@ -74,7 +74,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: 'safe-mcp-openssf-what-it-means-zh',
-    title: '六大巨頭花了 1,250 萬美元，驗證我們一個人做的事',
+    title: '1,250 萬美元要解決的事，我們已經做完了',
     excerpt:
       'Anthropic、Google、OpenAI、AWS、GitHub、Microsoft 共同出資成立 SAFE-MCP，保護 AI Agent 的工具呼叫安全。我們從 2025 年就在做這件事了。',
     category: 'Industry',

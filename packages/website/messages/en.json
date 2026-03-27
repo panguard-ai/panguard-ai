@@ -3263,11 +3263,11 @@
     },
     "posts": {
       "safe-mcp-openssf-what-it-means": {
-        "title": "Anthropic, Google, OpenAI Just Spent $12.5M Validating What We Built Alone",
+        "title": "$12.5M to Solve What We Already Shipped",
         "excerpt": "Six tech giants funded SAFE-MCP to secure AI agent tool calls. We have been shipping that exact solution since 2025."
       },
       "safe-mcp-openssf-what-it-means-zh": {
-        "title": "Six Tech Giants Spent $12.5M Validating What We Built Alone (Chinese)",
+        "title": "$12.5M to Solve What We Already Shipped (Chinese)",
         "excerpt": "Anthropic, Google, OpenAI, AWS, GitHub, Microsoft jointly funded SAFE-MCP. Chinese language version."
       },
       "clawhub-ecosystem-scan-results": {
