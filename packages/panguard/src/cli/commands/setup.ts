@@ -240,8 +240,7 @@ export function setupCommand(): Command {
               already_configured: p.alreadyConfigured,
             }));
 
-          // Don't return — continue to skill scan + guard for JSON mode
-          if (!options.json) return;
+          // Continue to skill scan + guard install even if platforms already configured
         }
 
         // 3. Execute injection or removal
