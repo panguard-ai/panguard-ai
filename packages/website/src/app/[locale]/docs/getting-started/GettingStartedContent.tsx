@@ -302,7 +302,7 @@ export default function GettingStartedContent() {
             <div className="mt-4">
               <p className="text-sm text-text-secondary mb-3">
                 Run setup to auto-configure all detected AI platforms (Claude Code, Claude Desktop,
-                Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw):
+                Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code):
               </p>
               <CodeBlock code="pga setup" label="Terminal" />
               <p className="text-xs text-text-muted mt-1">
@@ -435,8 +435,8 @@ export default function GettingStartedContent() {
                 </p>
                 <CodeBlock code="pga setup" label="Terminal" />
                 <p className="text-xs text-text-muted mt-2">
-                  Detects Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw,
-                  ArkClaw automatically.
+                  Detects 16 platforms including Claude Code, Claude Desktop, Cursor, OpenClaw, Codex,
+                  Windsurf, Gemini CLI, and more automatically.
                 </p>
               </div>
             </FadeInUp>

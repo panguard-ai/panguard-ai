@@ -73,6 +73,14 @@ const clients = [
   { name: 'WorkBuddy', desc: 'Tencent AI assistant with MCP tool support' },
   { name: 'NemoClaw', desc: 'NVIDIA AI agent platform with MCP integration' },
   { name: 'ArkClaw', desc: 'ByteDance cloud AI agent platform with MCP support' },
+  { name: 'Windsurf', desc: 'Codeium AI-powered IDE with MCP support' },
+  { name: 'QClaw', desc: 'Tencent cloud AI agent platform with MCP integration' },
+  { name: 'Cline', desc: 'VS Code extension for autonomous AI coding' },
+  { name: 'VS Code Copilot', desc: 'GitHub Copilot with MCP tool integration' },
+  { name: 'Zed', desc: 'High-performance editor with MCP assistant support' },
+  { name: 'Gemini CLI', desc: "Google's CLI agent with MCP tool support" },
+  { name: 'Continue', desc: 'Open-source AI coding assistant with MCP support' },
+  { name: 'Roo Code', desc: 'VS Code extension for AI-powered development' },
   { name: 'Any MCP Client', desc: 'Any app implementing the Model Context Protocol' },
 ];
 

@@ -53,7 +53,7 @@ const productConfigs = [
       `${STATS.totalRulesDisplay} ATR detection rules`,
       `Skill Auditor: ${STATS.skillAuditChecks}-layer pre-install security gate`,
       '3 auto-response modules: IP Blocker, Process Killer, File Quarantine',
-      'Works with Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, and any MCP-compatible AI agent',
+      'Works with Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code, and any MCP-compatible AI agent',
       'Supports Linux, macOS, Windows, Docker, Kubernetes',
     ],
     href: '/product/guard',
