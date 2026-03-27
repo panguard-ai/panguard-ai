@@ -5,7 +5,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type {
-  ScanOutput,
   ScanOutputSystem,
   BuildScanOutputOptions,
 } from '../src/cli/scan-helpers.js';
