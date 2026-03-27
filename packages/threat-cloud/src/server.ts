@@ -1311,10 +1311,29 @@ response:
   }
 
   /** GET /api/metrics - Aggregated metrics across all sources (public, cached 60s) */
-  private handleGetMetrics(res: ServerResponse): void {
+  private async handleGetMetrics(res: ServerResponse): Promise<void> {
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60');
     const metrics = this.db.getAggregatedMetrics();
-    this.sendJson(res, 200, { ok: true, data: metrics });
+
+    // Fetch npm downloads (cached in statsCache to avoid hammering npm API)
+    let npmDownloads = 0;
+    try {
+      const npmRes = await fetch(
+        'https://api.npmjs.org/downloads/point/last-month/@panguard-ai/panguard',
+        { signal: AbortSignal.timeout(3000) }
+      );
+      if (npmRes.ok) {
+        const npmData = (await npmRes.json()) as { downloads?: number };
+        npmDownloads = npmData.downloads ?? 0;
+      }
+    } catch {
+      // npm API unreachable — use 0
+    }
+
+    this.sendJson(res, 200, {
+      ok: true,
+      data: { ...metrics, npmDownloads },
+    });
   }
 
   /** GET /api/contributors - Public leaderboard (hashed IDs, no PII) */

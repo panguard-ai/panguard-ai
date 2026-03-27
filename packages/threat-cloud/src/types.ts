@@ -112,6 +112,8 @@ export interface AggregatedMetrics {
   totalAgentsProtected: number;
   totalThreatsDetected: number;
   totalAtrRules: number;
+  whitelistedSkills: number;
+  blacklistedSkills: number;
   sources: {
     bulk: { skills: number; findings: number };
     cli: { skills: number; findings: number; devices: number };

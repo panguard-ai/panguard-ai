@@ -1470,11 +1470,27 @@ export class ThreatCloudDB {
         .get() as { count: number }
     ).count;
 
+    // Whitelist count
+    const whitelistCount = (
+      this.db
+        .prepare(`SELECT COUNT(*) as count FROM skill_whitelist`)
+        .get() as { count: number }
+    ).count;
+
+    // Blacklist count
+    const blacklistCount = (
+      this.db
+        .prepare(`SELECT COUNT(*) as count FROM skill_threats WHERE status = 'confirmed'`)
+        .get() as { count: number }
+    ).count;
+
     return {
       totalSkillsScanned: totals.totalSkills,
       totalAgentsProtected: agentsProtected,
       totalThreatsDetected: totals.totalFindings,
       totalAtrRules: atrRulesCount,
+      whitelistedSkills: whitelistCount,
+      blacklistedSkills: blacklistCount,
       sources: {
         bulk: { skills: bulk.skills, findings: bulk.findings },
         cli: { skills: cli.skills, findings: cli.findings, devices: cli.devices },
