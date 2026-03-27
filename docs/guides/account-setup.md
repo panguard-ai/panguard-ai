@@ -27,7 +27,7 @@ curl -fsSL https://get.panguard.ai | bash
 ### 使用 npm 安裝
 
 ```bash
-npm install -g @panguard-ai/panguard
+npm install -g @panguard-ai/panguard && pga up
 ```
 
 ### 從原始碼安裝（開發者，目前推薦）

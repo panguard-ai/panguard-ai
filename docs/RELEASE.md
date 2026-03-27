@@ -111,7 +111,7 @@ Every release must pass ALL checks before declaring success.
 ```bash
 # --- npm ---
 npm info @panguard-ai/panguard version
-npm install -g @panguard-ai/panguard && panguard --version
+npm install -g @panguard-ai/panguard && pga --version
 
 # --- curl ---
 curl -fsSL https://get.panguard.ai | bash
