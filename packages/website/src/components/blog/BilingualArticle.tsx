@@ -36,10 +36,7 @@ function renderBlock(block: string, i: number) {
           <thead>
             <tr className="border-b border-border">
               {headers.map((h, j) => (
-                <th
-                  key={j}
-                  className="text-left py-2 px-3 text-text-primary font-semibold"
-                >
+                <th key={j} className="text-left py-2 px-3 text-text-primary font-semibold">
                   {h}
                 </th>
               ))}
@@ -71,10 +68,7 @@ function renderBlock(block: string, i: number) {
     return (
       <ul key={i} className="space-y-2 pl-1">
         {items.map((item, j) => (
-          <li
-            key={j}
-            className="flex items-start gap-2.5 text-text-primary/75 leading-relaxed"
-          >
+          <li key={j} className="flex items-start gap-2.5 text-text-primary/75 leading-relaxed">
             <span className="text-brand-sage mt-1.5 shrink-0">{'\u2022'}</span>
             <span>{item.replace(/^- /, '')}</span>
           </li>
@@ -134,4 +128,3 @@ export default function BilingualArticle({ enPost, zhPost, defaultLang }: Biling
     </div>
   );
 }
-

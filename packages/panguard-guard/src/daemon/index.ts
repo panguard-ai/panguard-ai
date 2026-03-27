@@ -308,10 +308,14 @@ async function installWindowsService(execPath: string): Promise<string> {
       const taskName = 'PanguardGuard';
       await execFileAsync('schtasks', [
         '/Create',
-        '/TN', taskName,
-        '/TR', `"${process.execPath}" "${execPath}" start`,
-        '/SC', 'ONLOGON',
-        '/RL', 'LIMITED',
+        '/TN',
+        taskName,
+        '/TR',
+        `"${process.execPath}" "${execPath}" start`,
+        '/SC',
+        'ONLOGON',
+        '/RL',
+        'LIMITED',
         '/F',
       ]);
       // Start it now

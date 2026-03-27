@@ -50,7 +50,9 @@ export default function BlogContent() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [nlEmail, setNlEmail] = useState('');
   const [nlStatus, setNlStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [allPosts, setAllPosts] = useState<BlogPost[]>(staticPosts.filter((p) => !p.slug.endsWith('-zh')));
+  const [allPosts, setAllPosts] = useState<BlogPost[]>(
+    staticPosts.filter((p) => !p.slug.endsWith('-zh'))
+  );
 
   // Merge dynamic JSON posts with static posts
   useEffect(() => {
@@ -60,9 +62,10 @@ export default function BlogContent() {
         const data = (await res.json()) as { ok: boolean; data?: BlogPost[] };
         if (data.ok && data.data && data.data.length > 0) {
           const jsonSlugs = new Set(data.data.map((p) => p.slug));
-          const merged = [...data.data, ...staticPosts.filter((p) => !jsonSlugs.has(p.slug) && !p.slug.endsWith('-zh'))].sort(
-            (a, b) => b.date.localeCompare(a.date)
-          );
+          const merged = [
+            ...data.data,
+            ...staticPosts.filter((p) => !jsonSlugs.has(p.slug) && !p.slug.endsWith('-zh')),
+          ].sort((a, b) => b.date.localeCompare(a.date));
           setAllPosts(merged);
         }
       } catch {

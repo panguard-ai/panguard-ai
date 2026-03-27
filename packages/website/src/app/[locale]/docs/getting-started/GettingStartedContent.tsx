@@ -357,7 +357,10 @@ export default function GettingStartedContent() {
                   <p>
                     <strong className="text-text-primary">Step 1:</strong> Open your terminal
                   </p>
-                  <CodeBlock code="npm install -g @panguard-ai/panguard && pga up" label="Install" />
+                  <CodeBlock
+                    code="npm install -g @panguard-ai/panguard && pga up"
+                    label="Install"
+                  />
                   <p>
                     <strong className="text-text-primary">Step 2:</strong> Auto-configure Claude
                     Code
@@ -398,7 +401,10 @@ export default function GettingStartedContent() {
                   <p>
                     <strong className="text-text-primary">Step 1:</strong> Install PanGuard
                   </p>
-                  <CodeBlock code="npm install -g @panguard-ai/panguard && pga up" label="Install" />
+                  <CodeBlock
+                    code="npm install -g @panguard-ai/panguard && pga up"
+                    label="Install"
+                  />
                   <p>
                     <strong className="text-text-primary">Step 2:</strong> Auto-configure OpenClaw
                   </p>

@@ -10,17 +10,20 @@ import { homedir, platform } from 'node:os';
 import { execFile } from 'node:child_process';
 import { Command } from 'commander';
 import { runCLI } from '@panguard-ai/panguard-guard';
-import {
-  c,
-  symbols,
-  setLogLevel,
-} from '@panguard-ai/core';
+import { c, symbols, setLogLevel } from '@panguard-ai/core';
 
 const DASHBOARD_URL = 'http://127.0.0.1:3100';
 
 function openBrowser(url: string): void {
-  const cmd = platform() === 'darwin' ? 'open' : platform() === 'win32' ? 'start' : 'xdg-open';
-  execFile(cmd, [url], () => {});
+  const os = platform();
+  if (os === 'win32') {
+    // 'start' is a cmd.exe built-in, not an executable — must invoke via cmd /c
+    execFile('cmd', ['/c', 'start', '', url], () => {});
+  } else if (os === 'darwin') {
+    execFile('open', [url], () => {});
+  } else {
+    execFile('xdg-open', [url], () => {});
+  }
 }
 
 function isGuardRunning(): boolean {
@@ -105,19 +108,30 @@ export function upCommand(): Command {
                   safeNames.add(s.name.toLowerCase());
                   if (s.normalizedName) safeNames.add(s.normalizedName.toLowerCase());
                 }
-              } catch { /* ignore */ }
+              } catch {
+                /* ignore */
+              }
             }
 
-            const safe = skills.filter(s => safeNames.has(s.name.toLowerCase()));
-            const unknown = skills.filter(s => !safeNames.has(s.name.toLowerCase()));
+            const safe = skills.filter((s) => safeNames.has(s.name.toLowerCase()));
+            const unknown = skills.filter((s) => !safeNames.has(s.name.toLowerCase()));
 
-            console.log(`  ${c.safe(String(safe.length))} safe  ${c.dim('|')}  ${unknown.length > 0 ? c.caution(String(unknown.length)) : c.dim('0')} unscanned`);
+            console.log(
+              `  ${c.safe(String(safe.length))} safe  ${c.dim('|')}  ${unknown.length > 0 ? c.caution(String(unknown.length)) : c.dim('0')} unscanned`
+            );
 
             // If there are unscanned skills, run audit on them
             if (unknown.length > 0) {
-              console.log(`\n  ${symbols.warn} ${c.bold(`${unknown.length} unscanned skill(s) found. Auditing...`)}\n`);
+              console.log(
+                `\n  ${symbols.warn} ${c.bold(`${unknown.length} unscanned skill(s) found. Auditing...`)}\n`
+              );
 
-              const threats: Array<{ name: string; platform: string; riskLevel: string; riskScore: number }> = [];
+              const threats: Array<{
+                name: string;
+                platform: string;
+                riskLevel: string;
+                riskScore: number;
+              }> = [];
 
               try {
                 const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
@@ -149,15 +163,23 @@ export function upCommand(): Command {
                 console.log(`  ${c.critical(c.bold(`${threats.length} threat(s) detected:`))}\n`);
                 for (const t of threats) {
                   const icon = t.riskLevel === 'CRITICAL' ? c.critical('!!') : c.caution('!');
-                  console.log(`  [${icon}] ${c.bold(t.name)} (${t.platform}) — ${t.riskLevel} (${t.riskScore}/100)`);
+                  console.log(
+                    `  [${icon}] ${c.bold(t.name)} (${t.platform}) — ${t.riskLevel} (${t.riskScore}/100)`
+                  );
                 }
                 console.log(`\n  ${c.bold('Recommended action:')} Remove or disable these skills.`);
-                console.log(`  ${c.dim('Run: pga audit skill <name> for details on each threat.')}\n`);
+                console.log(
+                  `  ${c.dim('Run: pga audit skill <name> for details on each threat.')}\n`
+                );
               } else {
-                console.log(`  ${c.safe(`${symbols.pass} No threats found in unscanned skills.`)}\n`);
+                console.log(
+                  `  ${c.safe(`${symbols.pass} No threats found in unscanned skills.`)}\n`
+                );
               }
             } else {
-              console.log(`  ${c.safe(`${symbols.pass} All ${skills.length} skills verified safe.`)}\n`);
+              console.log(
+                `  ${c.safe(`${symbols.pass} All ${skills.length} skills verified safe.`)}\n`
+              );
             }
           }
         } catch {
