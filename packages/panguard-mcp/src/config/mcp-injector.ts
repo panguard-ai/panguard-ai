@@ -209,6 +209,14 @@ export function injectMCPConfig(platformId: PlatformId): InjectionResult {
       case 'workbuddy':
       case 'nemoclaw':
       case 'arkclaw':
+      case 'windsurf':
+      case 'qclaw':
+      case 'cline':
+      case 'vscode-copilot':
+      case 'zed':
+      case 'gemini-cli':
+      case 'continue':
+      case 'roo-code':
         injectGenericMCP(configPath);
         break;
     }
