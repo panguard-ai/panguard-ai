@@ -134,3 +134,4 @@ export default function BilingualArticle({ enPost, zhPost, defaultLang }: Biling
     </div>
   );
 }
+
