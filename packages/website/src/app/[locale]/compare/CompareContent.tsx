@@ -131,7 +131,7 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
     bullets: [
       'Snyk excels at finding vulnerabilities in your dependencies and container images. But it has no concept of MCP skills or AI agent tools.',
       "A malicious MCP skill doesn't have a CVE \u2014 it's a new class of threat that Snyk's vulnerability database doesn't cover.",
-      "PanGuard's Skill Auditor is Snyk for the AI agent era: pre-install scanning with 61 ATR rules.",
+      "PanGuard's Skill Auditor is Snyk for the AI agent era: pre-install scanning with 71 ATR rules.",
       "Use Snyk for your code, PanGuard for your agent's tools.",
     ],
   },

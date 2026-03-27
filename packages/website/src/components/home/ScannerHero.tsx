@@ -92,6 +92,9 @@ function ScannerHeroInner() {
     animationPhase,
   } = useSkillScan();
 
+  const riskPercent =
+    eco.skillsScanned > 0 ? ((eco.threatsDetected / eco.skillsScanned) * 100).toFixed(1) : '6.4';
+
   const statItems = [
     { value: eco.skillsScanned, label: t('statsScanned'), color: 'text-text-primary', suffix: '+' },
     {
@@ -130,9 +133,9 @@ function ScannerHeroInner() {
         {/* Title block — data-driven */}
         <div className="mb-10 animate-[fadeUp_0.6s_0.1s_ease_both]">
           <h1 className="text-[clamp(24px,5vw,48px)] font-bold leading-[1.3] tracking-tight text-text-primary">
-            {t('titleLine1')}
+            {t('titleLine1', { count: eco.skillsScanned.toLocaleString() })}
             <br />
-            <span className="text-panguard-green">{t('titleLine2')}</span>
+            <span className="text-panguard-green">{t('titleLine2', { percent: riskPercent })}</span>
           </h1>
           <p className="mt-5 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto">
             {t('subtitle')}

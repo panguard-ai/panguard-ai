@@ -166,7 +166,7 @@
       "prereq": "",
       "badges": {
         "mit": "MIT Open Source",
-        "tests": "3,490 Tests Passing",
+        "tests": "3,528 Tests Passing",
         "taiwan": "Built in Taiwan"
       }
     },
@@ -401,7 +401,7 @@
         "subtitle": "Because security shouldn't have walls.",
         "desc": "MIT licensed. Full source code. Zero black boxes. Every line can be audited, verified, improved.",
         "belief": "We believe breaking the security barrier isn't about lowering prices — it's about letting everyone participate.",
-        "proof": "3,490 tests. TypeScript strict mode. MIT license. This is not a side project. This is infrastructure."
+        "proof": "3,528 tests. TypeScript strict mode. MIT license. This is not a side project. This is infrastructure."
       }
     },
     "the3amStory": {
@@ -552,7 +552,7 @@
         },
         "security": {
           "title": "Security First",
-          "desc": "3,490+ tests. Strict TypeScript. ESLint security plugin. Credential storage encryption. Sandboxed execution."
+          "desc": "3,528+ tests. Strict TypeScript. ESLint security plugin. Credential storage encryption. Sandboxed execution."
         },
         "privacy": {
           "title": "Privacy by Design",
@@ -727,8 +727,8 @@
     },
     "srDefinition": "Panguard AI provides the first Skills Audit for AI agents. It audits every skill before it runs, catches known threats with community ATR (Agent Threat Rules), catches unknown threats with AI analysis, and shares new rules to protect everyone. MIT licensed. Open source.",
     "scannerHero": {
-      "titleLine1": "We scanned 36,394 MCP skills.",
-      "titleLine2": "13.5% have security risks.",
+      "titleLine1": "We scanned {count} MCP skills.",
+      "titleLine2": "{percent}% have security risks.",
       "subtitle": "Check yours in 10 seconds. Free. Open source.",
       "scanLabel": "Check any MCP skill before you install",
       "scanBtn": "Scan",
@@ -1225,7 +1225,7 @@
         },
         "item5": {
           "title": "Graceful Degradation",
-          "desc": "Cloud AI down? Local fingerprint & heuristic analysis takes over. Heuristics offline? The ATR rule engine with 61 detection rules handles it. Guard never stops protecting, regardless of network conditions."
+          "desc": "Cloud AI down? Local fingerprint & heuristic analysis takes over. Heuristics offline? The ATR rule engine with 71 detection rules handles it. Guard never stops protecting, regardless of network conditions."
         },
         "item6": {
           "title": "Integration Adapters",
@@ -1241,7 +1241,7 @@
         },
         "item9": {
           "title": "ATR Detection Pipeline",
-          "desc": "ATR rules cover all AI agent threats in a single pipeline: prompt injection, tool poisoning, skill supply-chain attacks, credential exfiltration, and context manipulation. 61 detection rules. Sub-millisecond evaluation per event. One pipeline, comprehensive AI agent protection."
+          "desc": "ATR rules cover all AI agent threats in a single pipeline: prompt injection, tool poisoning, skill supply-chain attacks, credential exfiltration, and context manipulation. 71 detection rules. Sub-millisecond evaluation per event. One pipeline, comprehensive AI agent protection."
         },
         "item10": {
           "title": "Investigation Engine",
@@ -1327,7 +1327,7 @@
           },
           "review": {
             "title": "Review",
-            "desc": "ATR rules evaluate your agent's behavior patterns in dev/staging. 61 rules across 10 threat categories catch issues before production."
+            "desc": "ATR rules evaluate your agent's behavior patterns in dev/staging. 71 rules across 10 threat categories catch issues before production."
           },
           "ship": {
             "title": "Ship",
@@ -1385,7 +1385,7 @@
           },
           "atrValidate": {
             "label": "ATR Validate",
-            "detail": "61 Rules"
+            "detail": "71 Rules"
           },
           "ship": {
             "label": "Ship",
@@ -3179,7 +3179,7 @@
         "engine": "ATR Rules",
         "desc": "Intercepts every AI agent tool call, prompt flow, and skill installation. ATR rules detect prompt injection, tool poisoning, credential exfiltration, and context manipulation in real-time.",
         "detects": "Prompt injection, tool poisoning, credential exfiltration, context manipulation",
-        "tech": "ATR rule engine, sub-millisecond evaluation, 61 detection rules, 474 patterns"
+        "tech": "ATR rule engine, sub-millisecond evaluation, 71 detection rules, 520 patterns"
       },
       "network": {
         "layer": "Layer 2",
@@ -3631,7 +3631,7 @@
       "methodValue": {
         "framework": "Vitest",
         "testFiles": "140",
-        "testCases": "3,490",
+        "testCases": "3,528",
         "coverage": "Unit + Integration tests",
         "ci": "Automated on every commit"
       },
@@ -4867,11 +4867,11 @@
           "label": "ATR rules (AI agent threats)"
         },
         {
-          "value": "474",
+          "value": "520",
           "label": "Detection patterns"
         },
         {
-          "value": "3,490+",
+          "value": "3,528+",
           "label": "Tests passing"
         },
         {
@@ -4887,7 +4887,7 @@
           "label": "MCP tools"
         },
         {
-          "value": "6",
+          "value": "8",
           "label": "Skill audit checks"
         },
         {
@@ -4997,7 +4997,7 @@
           "Core platform (Scan + Guard + Chat + Skill Auditor)",
           "Threat Cloud v1",
           "71 ATR detection rules",
-          "3,490 automated tests"
+          "3,528 automated tests"
         ]
       },
       "inProgress": {
@@ -5496,22 +5496,22 @@
         },
         "tool-poisoning": {
           "name": "Tool Poisoning",
-          "count": "6 rules",
+          "count": "11 rules",
           "desc": "Malicious MCP responses, tool output injection, unauthorized tool calls, SSRF via tools"
         },
         "context-exfiltration": {
           "name": "Context Exfiltration",
-          "count": "3 rules",
+          "count": "7 rules",
           "desc": "System prompt leaks, API key exposure, internal instruction theft"
         },
         "agent-manipulation": {
           "name": "Agent Manipulation",
-          "count": "5 rules",
+          "count": "10 rules",
           "desc": "Cross-agent attacks, goal hijacking, inter-agent message spoofing, human trust exploitation"
         },
         "privilege-escalation": {
           "name": "Privilege Escalation",
-          "count": "2 rules",
+          "count": "6 rules",
           "desc": "Tool permission escalation, scope creep, admin function access"
         },
         "excessive-autonomy": {
@@ -5700,7 +5700,7 @@
         },
         {
           "name": "ATR Engine",
-          "desc": "61 rules evaluated in <1ms per event. Block, alert, or escalate.",
+          "desc": "71 rules evaluated in <1ms per event. Block, alert, or escalate.",
           "position": "middle",
           "highlighted": true
         },
@@ -5868,7 +5868,7 @@
       "platforms": "Works with Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop",
       "badges": {
         "mit": "MIT Licensed",
-        "rules": "61 ATR Rules",
+        "rules": "71 ATR Rules",
         "taiwan": "Built in Taiwan",
         "scanned": "1,295 Skills Scanned"
       },
@@ -6085,7 +6085,7 @@
           "ATR rules: prompt injection, tool poisoning, skill compromise",
           "ATR rules: credential exfiltration, context manipulation",
           "ATR rules: cross-agent attacks, unauthorized access",
-          "61 rules, community-driven, updated continuously"
+          "71 rules, community-driven, updated continuously"
         ]
       },
       "postDeployment": {
@@ -6142,7 +6142,7 @@
       },
       "q3": {
         "q": "What are ATR rules?",
-        "a": "ATR (Agent Threat Rules) is the first open detection standard for AI agent threats. 61 rules across 10 threat categories, built specifically for AI agent attacks: prompt injection, tool poisoning, context exfiltration, credential theft, cross-agent privilege escalation, skill supply-chain attacks, and more.\n\nATR rules are machine-readable, community-driven, and purpose-built for the threats that traditional security tools cannot see -- threats that live in prompt flows, tool calls, and agent conversations.\n\nThreat Cloud aggregates rules from the community. Guard runs them with sub-millisecond evaluation. Every new rule strengthens protection for all users."
+        "a": "ATR (Agent Threat Rules) is the first open detection standard for AI agent threats. 71 rules across 10 threat categories, built specifically for AI agent attacks: prompt injection, tool poisoning, context exfiltration, credential theft, cross-agent privilege escalation, skill supply-chain attacks, and more.\n\nATR rules are machine-readable, community-driven, and purpose-built for the threats that traditional security tools cannot see -- threats that live in prompt flows, tool calls, and agent conversations.\n\nThreat Cloud aggregates rules from the community. Guard runs them with sub-millisecond evaluation. Every new rule strengthens protection for all users."
       },
       "q4": {
         "q": "What threats does Panguard detect?",
