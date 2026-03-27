@@ -35,7 +35,7 @@
 
 ```bash
 # Install
-npm install -g @panguard-ai/panguard
+npm install -g @panguard-ai/panguard && pga up
 
 # Auto-configure all AI platforms
 panguard setup

@@ -5,9 +5,9 @@ import { useState, useEffect } from 'react';
 type OS = 'mac' | 'linux' | 'windows';
 
 const INSTALL_COMMANDS: Record<OS, string> = {
-  mac: 'curl -fsSL https://get.panguard.ai | bash',
-  linux: 'curl -fsSL https://get.panguard.ai | bash',
-  windows: 'irm https://get.panguard.ai/windows | iex',
+  mac: 'npm install -g @panguard-ai/panguard && pga up',
+  linux: 'npm install -g @panguard-ai/panguard && pga up',
+  windows: 'npm install -g @panguard-ai/panguard && pga up',
 };
 
 const PROMPTS: Record<OS, string> = {

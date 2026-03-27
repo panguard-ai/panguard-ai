@@ -55,7 +55,7 @@ powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows
 ### Using npm (all platforms)
 
 ```bash
-npm install -g @panguard-ai/panguard
+npm install -g @panguard-ai/panguard && pga up
 ```
 
 ### From Source (Development)

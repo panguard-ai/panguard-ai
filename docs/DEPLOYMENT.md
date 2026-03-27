@@ -54,7 +54,7 @@ pnpm build
 ### Method 2: npm Global Install
 
 ```bash
-npm install -g @panguard-ai/panguard
+npm install -g @panguard-ai/panguard && pga up
 
 # Verify installation
 panguard --version
