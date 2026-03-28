@@ -2,6 +2,17 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.4.15] - 2026-03-28
+
+### Added
+
+- **Activation tracking.** First `pga up` reports anonymous activation to Threat Cloud (client ID, platform, OS, version). One-time only. Helps us understand how many real users are out there.
+
+### Fixed
+
+- **False positive reduction.** ATR engine now detects markdown code blocks and suppresses matches inside them. Shell commands and file paths in documentation examples no longer trigger CRITICAL/HIGH alerts.
+- **ATR-111 backtick pattern narrowed.** Only matches dangerous commands inside backticks, not all inline code.
+
 ## [1.3.3] - 2026-03-25
 
 ### Added

@@ -46,8 +46,8 @@ detection:
       description: '$() subshell execution embedded in arguments'
     - field: content
       operator: regex
-      value: '`[^`]+`'
-      description: 'Backtick command substitution in arguments'
+      value: '`(?:rm|cat|curl|wget|nc|ncat|bash|sh|python|perl|ruby|php|whoami|id|uname|env|printenv|set|export|eval|exec|chmod|chown|kill|pkill|dd|mkfs|mount|umount|sudo|su|passwd)[^`]*`'
+      description: 'Backtick command substitution with dangerous command inside'
     - field: content
       operator: regex
       value: "(?:&&|\\|\\|)\\s*(?:curl|wget|nc|ncat|bash|sh|python|perl)"
