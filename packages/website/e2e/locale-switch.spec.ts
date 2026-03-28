@@ -15,7 +15,7 @@ test.describe('Locale Switching', () => {
   });
 
   test('switch from Chinese to English', async ({ page }) => {
-    await page.goto('/zh');
+    await page.goto('/zh-TW');
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-TW');
 
     const enButton = page.getByRole('button', { name: /EN/i });
@@ -27,11 +27,11 @@ test.describe('Locale Switching', () => {
   });
 
   test('locale persists across navigation', async ({ page }) => {
-    await page.goto('/zh');
+    await page.goto('/zh-TW');
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-TW');
 
     // Navigate to another page
-    await page.goto('/zh/pricing');
+    await page.goto('/zh-TW/pricing');
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-TW');
   });
 
@@ -41,7 +41,7 @@ test.describe('Locale Switching', () => {
       const enRes = await page.goto(path);
       expect(enRes?.status()).toBe(200);
 
-      const zhRes = await page.goto(`/zh${path}`);
+      const zhRes = await page.goto(`/zh-TW${path}`);
       expect(zhRes?.status()).toBe(200);
     }
   });

@@ -25,7 +25,7 @@ test.describe('Legal Pages', () => {
 
   test('Chinese legal pages load', async ({ page }) => {
     for (const { path } of legalPages) {
-      const res = await page.goto(`/zh${path}`);
+      const res = await page.goto(`/zh-TW${path}`);
       expect(res?.status()).toBe(200);
     }
   });
