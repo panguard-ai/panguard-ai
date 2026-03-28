@@ -147,8 +147,8 @@ ATR is not a competing standard. It is the detection layer that makes standards 
 | **Detection**   | Match threats in real time   | [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) -- 71 rules |
 | **Enforcement** | Scan, monitor, block, report | **PanGuard** (this project)                                                |
 
-- OWASP Agentic Top 10: **10/10 categories covered** ([mapping](docs/OWASP-MAPPING.md))
-- SAFE-MCP techniques: **91.8% covered** ([mapping](docs/SAFE-MCP-MAPPING.md))
+- OWASP Agentic Top 10: **10/10 categories covered** ([mapping](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md))
+- SAFE-MCP techniques: **91.8% covered** ([mapping](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/SAFE-MCP-MAPPING.md))
 
 ---
 
