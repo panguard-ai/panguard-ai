@@ -9,6 +9,7 @@
  * - GET  /api/stats                  Get threat statistics
  * - POST /api/atr-proposals          Submit or confirm ATR rule proposal
  * - POST /api/atr-feedback           Submit feedback on ATR rule
+ * - POST /api/rule-feedback          Submit rule feedback with auto-quarantine
  * - POST /api/skill-threats          Submit skill threat from audit
  * - GET  /api/atr-rules              Fetch confirmed ATR rules (?since= filter)
  * - GET  /api/feeds/ip-blocklist     IP blocklist feed (text/plain, ?minReputation=)
@@ -163,10 +164,18 @@ export class ThreatCloudServer {
         // Start promotion + review cron (every 15 minutes)
         this.promotionTimer = setInterval(() => {
           try {
-            // Step 1: Promote confirmed proposals to rules
-            const promoted = this.db.promoteConfirmedProposals();
-            if (promoted > 0) {
-              log.info(`Promotion cycle: ${promoted} proposal(s) promoted to rules`);
+            // Step 1: Move confirmed proposals to canary staging
+            const toCanary = this.db.promoteConfirmedProposals();
+            if (toCanary > 0) {
+              log.info(`Promotion cycle: ${toCanary} proposal(s) moved to canary staging`);
+            }
+
+            // Step 1b: Promote canary rules that survived 24hr observation
+            const canaryResult = this.db.promoteCanaryRules();
+            if (canaryResult.promoted > 0 || canaryResult.quarantined > 0) {
+              log.info(
+                `Canary cycle: ${canaryResult.promoted} promoted, ${canaryResult.quarantined} quarantined`
+              );
             }
 
             // Step 2: Retry LLM review for proposals that haven't been reviewed yet
@@ -385,6 +394,14 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/rule-feedback':
+          if (req.method === 'POST') {
+            await this.handlePostRuleFeedback(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/skill-threats':
           if (req.method === 'GET') {
             if (!this.checkAdminAuth(req)) {
@@ -401,7 +418,7 @@ export class ThreatCloudServer {
 
         case '/api/atr-rules':
           if (req.method === 'GET') {
-            this.handleGetATRRules(url, res);
+            this.handleGetATRRules(url, res, req);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -922,6 +939,47 @@ export class ThreatCloudServer {
     this.sendJson(res, 201, { ok: true, data: { message: 'Feedback received' } });
   }
 
+  /** POST /api/rule-feedback - Submit negative feedback on a canary/active rule, auto-quarantine at threshold */
+  private async handlePostRuleFeedback(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readBody(req);
+    let raw: unknown;
+    try {
+      raw = JSON.parse(body);
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid JSON body' });
+      return;
+    }
+
+    const schema = z.object({
+      ruleId: z.string().min(1),
+      isTruePositive: z.boolean(),
+    });
+    const parsed = schema.safeParse(raw);
+    if (!parsed.success) {
+      this.sendJson(res, 400, { ok: false, error: parsed.error.message });
+      return;
+    }
+
+    const clientId = (req.headers['x-panguard-client-id'] as string) ?? undefined;
+    this.db.insertATRFeedback(parsed.data.ruleId, parsed.data.isTruePositive, clientId);
+
+    // Auto-quarantine canary rules with > 3 negative reports
+    if (!parsed.data.isTruePositive) {
+      const negCount = this.db.getNegativeFeedbackCount(parsed.data.ruleId);
+      if (negCount >= 3) {
+        this.db.quarantineProposal(parsed.data.ruleId);
+        log.info(`Rule ${parsed.data.ruleId} auto-quarantined after ${negCount} negative reports`);
+        this.sendJson(res, 201, {
+          ok: true,
+          data: { message: 'Feedback received, rule quarantined', quarantined: true },
+        });
+        return;
+      }
+    }
+
+    this.sendJson(res, 201, { ok: true, data: { message: 'Feedback received', quarantined: false } });
+  }
+
   /** POST /api/skill-threats - Submit skill threat from audit */
   private async handlePostSkillThreat(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const data = await this.parseAndValidate(req, res, SkillThreatSchema);
@@ -1051,14 +1109,34 @@ response:
     }
   }
 
-  /** GET /api/atr-rules?since=<ISO> - Fetch confirmed/promoted ATR rules */
-  private handleGetATRRules(url: string, res: ServerResponse): void {
+  /** GET /api/atr-rules?since=<ISO> - Fetch promoted ATR rules (+ canary for 10% of clients) */
+  private handleGetATRRules(url: string, res: ServerResponse, req?: IncomingMessage): void {
     res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
     const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
     const since = params.get('since') ?? undefined;
     const rules = this.db.getConfirmedATRRules(since);
     const ruleList = Array.isArray(rules) ? rules : [];
-    this.sendJson(res, 200, { ok: true, data: ruleList, meta: { total: ruleList.length } });
+
+    // Include canary rules for ~10% of clients based on client ID hash
+    let includeCanary = false;
+    if (req) {
+      const clientId = req.headers['x-panguard-client-id'] as string | undefined;
+      if (clientId) {
+        const hash = clientId.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+        includeCanary = hash % 10 === 0;
+      }
+    }
+
+    if (includeCanary) {
+      const canaryRules = this.db.getCanaryATRRules();
+      ruleList.push(...canaryRules);
+    }
+
+    this.sendJson(res, 200, {
+      ok: true,
+      data: ruleList,
+      meta: { total: ruleList.length, includesCanary: includeCanary },
+    });
   }
 
   /** GET /api/feeds/ip-blocklist?minReputation=70 - IP blocklist feed (plain text) */

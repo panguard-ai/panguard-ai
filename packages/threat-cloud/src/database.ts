@@ -632,26 +632,33 @@ export class ThreatCloudDB {
   }
 
   /** Get proposal statistics / 取得提案統計 */
-  getProposalStats(): { pending: number; confirmed: number; rejected: number; total: number } {
-    const pending = (
-      this.db
-        .prepare("SELECT COUNT(*) as count FROM atr_proposals WHERE status = 'pending'")
-        .get() as { count: number }
-    ).count;
-    const confirmed = (
-      this.db
-        .prepare("SELECT COUNT(*) as count FROM atr_proposals WHERE status = 'confirmed'")
-        .get() as { count: number }
-    ).count;
-    const rejected = (
-      this.db
-        .prepare("SELECT COUNT(*) as count FROM atr_proposals WHERE status = 'rejected'")
-        .get() as { count: number }
-    ).count;
+  getProposalStats(): {
+    pending: number;
+    confirmed: number;
+    canary: number;
+    quarantined: number;
+    rejected: number;
+    total: number;
+  } {
+    const countByStatus = (status: string): number =>
+      (
+        this.db
+          .prepare('SELECT COUNT(*) as count FROM atr_proposals WHERE status = ?')
+          .get(status) as { count: number }
+      ).count;
+
     const total = (
       this.db.prepare('SELECT COUNT(*) as count FROM atr_proposals').get() as { count: number }
     ).count;
-    return { pending, confirmed, rejected, total };
+
+    return {
+      pending: countByStatus('pending'),
+      confirmed: countByStatus('confirmed'),
+      canary: countByStatus('canary'),
+      quarantined: countByStatus('quarantined'),
+      rejected: countByStatus('rejected'),
+      total,
+    };
   }
 
   /** Get threat statistics / 取得威脅統計 */
@@ -956,7 +963,7 @@ export class ThreatCloudDB {
         `
         SELECT pattern_hash as ruleId, rule_content as ruleContent, updated_at as publishedAt, 'atr-community' as source
         FROM atr_proposals
-        WHERE (status = 'confirmed' OR status = 'promoted') ${since ? 'AND updated_at > ?' : ''}
+        WHERE status = 'promoted' ${since ? 'AND updated_at > ?' : ''}
         ORDER BY updated_at ASC
       `
       )
@@ -1080,7 +1087,7 @@ export class ThreatCloudDB {
       status: string;
     }>;
 
-    let promoted = 0;
+    let moved = 0;
     for (const proposal of proposals) {
       // If LLM reviewed, check it's approved (don't promote LLM-rejected proposals)
       if (proposal.llm_review_verdict) {
@@ -1092,6 +1099,66 @@ export class ThreatCloudDB {
         }
       }
 
+      // Move to canary staging instead of direct promotion
+      this.db
+        .prepare(
+          `
+        UPDATE atr_proposals
+        SET status = 'canary', canary_started_at = datetime('now'), updated_at = datetime('now')
+        WHERE pattern_hash = ?
+      `
+        )
+        .run(proposal.pattern_hash);
+
+      moved++;
+    }
+
+    return moved;
+  }
+
+  /** Canary period in milliseconds (24 hours) / Canary 觀察期（24 小時） */
+  private static readonly CANARY_PERIOD_MS = 24 * 60 * 60 * 1000;
+
+  /**
+   * Promote canary rules that have survived the 24-hour observation period
+   * without negative feedback. Quarantine rules with negative feedback.
+   * 推廣存活 24 小時且無負面回饋的 canary 規則。隔離有負面回饋的規則。
+   */
+  promoteCanaryRules(): { promoted: number; quarantined: number } {
+    const canaryProposals = this.db
+      .prepare(
+        `
+        SELECT pattern_hash, rule_content, canary_started_at
+        FROM atr_proposals
+        WHERE status = 'canary'
+          AND canary_started_at IS NOT NULL
+      `
+      )
+      .all() as Array<{
+      pattern_hash: string;
+      rule_content: string;
+      canary_started_at: string;
+    }>;
+
+    let promoted = 0;
+    let quarantined = 0;
+
+    for (const proposal of canaryProposals) {
+      const negativeFeedback = this.getNegativeFeedbackCount(proposal.pattern_hash);
+
+      if (negativeFeedback >= 3) {
+        // Too much negative feedback — quarantine
+        this.quarantineProposal(proposal.pattern_hash);
+        quarantined++;
+        continue;
+      }
+
+      const elapsed = Date.now() - new Date(proposal.canary_started_at + 'Z').getTime();
+      if (elapsed < ThreatCloudDB.CANARY_PERIOD_MS) {
+        continue; // Still in canary period
+      }
+
+      // Survived canary period — promote to rule
       this.upsertRule({
         ruleId: proposal.pattern_hash,
         ruleContent: proposal.rule_content,
@@ -1101,17 +1168,46 @@ export class ThreatCloudDB {
 
       this.db
         .prepare(
-          `
-        UPDATE atr_proposals SET status = 'promoted', updated_at = datetime('now')
-        WHERE pattern_hash = ?
-      `
+          `UPDATE atr_proposals SET status = 'promoted', updated_at = datetime('now')
+           WHERE pattern_hash = ?`
         )
         .run(proposal.pattern_hash);
 
       promoted++;
     }
 
-    return promoted;
+    return { promoted, quarantined };
+  }
+
+  /** Get count of negative feedback for a rule / 取得規則負面回饋數 */
+  getNegativeFeedbackCount(ruleId: string): number {
+    return (
+      this.db
+        .prepare('SELECT COUNT(*) as count FROM atr_feedback WHERE rule_id = ? AND is_true_positive = 0')
+        .get(ruleId) as { count: number }
+    ).count;
+  }
+
+  /** Quarantine a proposal / 隔離提案 */
+  quarantineProposal(patternHash: string): void {
+    this.db
+      .prepare(
+        `UPDATE atr_proposals SET status = 'quarantined', updated_at = datetime('now')
+         WHERE pattern_hash = ?`
+      )
+      .run(patternHash);
+  }
+
+  /** Get canary rules (for 10% client sampling) / 取得 canary 規則（供 10% 客戶端抽樣） */
+  getCanaryATRRules(): Array<{ ruleId: string; ruleContent: string; publishedAt: string; source: string }> {
+    return this.db
+      .prepare(
+        `SELECT pattern_hash as ruleId, rule_content as ruleContent, canary_started_at as publishedAt, 'atr-canary' as source
+         FROM atr_proposals
+         WHERE status = 'canary'
+         ORDER BY canary_started_at ASC`
+      )
+      .all() as Array<{ ruleId: string; ruleContent: string; publishedAt: string; source: string }>;
   }
 
   /** Reject an ATR proposal / 拒絕 ATR 提案 */
