@@ -549,9 +549,29 @@ detect_lang() {
 # Times out after timeout_seconds (default 60) to prevent hanging.
 spinner() {
   local pid="$1" msg="$2" timeout="${3:-60}"
-  local frames=('.' '..' '...' '....' '.....')
   local i=0 start_time
   start_time=$(date +%s)
+
+  # In pipe/non-TTY: just print once and wait silently
+  if [ ! -t 1 ]; then
+    printf "  ${BLUE}[SCAN]${NC} %s...\n" "$msg"
+    while kill -0 "$pid" 2>/dev/null; do
+      local elapsed=$(( $(date +%s) - start_time ))
+      if [ "$elapsed" -ge "$timeout" ]; then
+        kill -9 "$pid" 2>/dev/null || true
+        wait "$pid" 2>/dev/null || true
+        printf "  ${YELLOW}[WARN]${NC} %s (timed out after %ds)\n" "$msg" "$timeout"
+        return 1
+      fi
+      sleep 1
+    done
+    wait "$pid" 2>/dev/null || true
+    printf "  ${GREEN}[ OK ]${NC} %s\n" "$msg"
+    return 0
+  fi
+
+  # TTY: animated spinner
+  local frames=('.' '..' '...' '....' '.....')
   while kill -0 "$pid" 2>/dev/null; do
     local elapsed=$(( $(date +%s) - start_time ))
     if [ "$elapsed" -ge "$timeout" ]; then

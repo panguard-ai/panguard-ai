@@ -470,13 +470,60 @@ export function setupCommand(): Command {
               console.log(c.dim('  Installing Panguard Guard as system service...'));
             }
 
-            // Resolve the guard CLI binary path (outside try so fallback can use it)
+            // Resolve the guard CLI binary path
             let guardBin: string | undefined;
             try {
               const require = createRequire(import.meta.url);
               guardBin = require.resolve('@panguard-ai/panguard-guard/dist/cli/index.js');
             } catch {
-              // Fallback: check common global/local paths
+              // Fallback: search common paths for npm global installs
+              const { existsSync: fe } = await import('node:fs');
+              const { join: pjoin } = await import('node:path');
+              const candidates = [
+                pjoin(
+                  homedir(),
+                  '.panguard',
+                  'node_modules',
+                  '@panguard-ai',
+                  'panguard-guard',
+                  'dist',
+                  'cli',
+                  'index.js'
+                ),
+                pjoin(
+                  process.execPath,
+                  '..',
+                  '..',
+                  'lib',
+                  'node_modules',
+                  '@panguard-ai',
+                  'panguard',
+                  'node_modules',
+                  '@panguard-ai',
+                  'panguard-guard',
+                  'dist',
+                  'cli',
+                  'index.js'
+                ),
+                pjoin(
+                  process.execPath,
+                  '..',
+                  '..',
+                  'lib',
+                  'node_modules',
+                  '@panguard-ai',
+                  'panguard-guard',
+                  'dist',
+                  'cli',
+                  'index.js'
+                ),
+              ];
+              for (const c of candidates) {
+                if (fe(c)) {
+                  guardBin = c;
+                  break;
+                }
+              }
             }
 
             const dashUrl = 'http://127.0.0.1:3100';
