@@ -195,6 +195,9 @@ export function upCommand(): Command {
         }
       }
 
+      // ── Activation tracking (one-time) ─────────────────────
+      reportActivation().catch(() => {});
+
       // ── Step 3: Start Guard ────────────────────────────────
       if (isGuardRunning()) {
         console.log(`  ${c.safe(`${symbols.pass} Guard is already running.`)}\n`);
@@ -319,4 +322,50 @@ response:
     highlySuspicious: report.riskLevel === 'HIGH' ? 1 : 0,
     cleanCount: report.riskLevel === 'LOW' || report.riskScore === 0 ? 1 : 0,
   });
+}
+
+/** One-time activation report — only fires on first pga up */
+async function reportActivation(): Promise<void> {
+  const {
+    existsSync: fe,
+    writeFileSync: wf,
+    mkdirSync: md,
+    readFileSync: rf,
+  } = await import('node:fs');
+  const marker = join(homedir(), '.panguard', 'activated');
+  if (fe(marker)) return;
+
+  const { randomUUID } = await import('node:crypto');
+  const idPath = join(homedir(), '.panguard', 'client-id');
+  let clientId: string;
+  try {
+    clientId = rf(idPath, 'utf-8').trim();
+  } catch {
+    clientId = randomUUID();
+    try {
+      wf(idPath, clientId, 'utf-8');
+    } catch {
+      /* best effort */
+    }
+  }
+
+  const body = JSON.stringify({
+    clientId,
+    platform: process.env['TERM_PROGRAM'] ?? 'terminal',
+    osType: `${process.platform}-${process.arch}`,
+    panguardVersion: process.env['npm_package_version'] ?? 'unknown',
+    nodeVersion: process.version,
+  });
+
+  const res = await fetch(`${TC_ENDPOINT}/api/activations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body,
+    signal: AbortSignal.timeout(5000),
+  });
+
+  if (res.ok) {
+    md(join(homedir(), '.panguard'), { recursive: true });
+    wf(marker, new Date().toISOString(), 'utf-8');
+  }
 }

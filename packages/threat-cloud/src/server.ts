@@ -546,6 +546,40 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/activations':
+          if (req.method === 'POST') {
+            const body = await this.readBody(req);
+            const data = JSON.parse(body) as {
+              clientId?: string;
+              platform?: string;
+              osType?: string;
+              panguardVersion?: string;
+              nodeVersion?: string;
+            };
+            if (!data.clientId) {
+              this.sendJson(res, 400, { ok: false, error: 'clientId required' });
+              break;
+            }
+            this.db.recordActivation({
+              clientId: data.clientId,
+              platform: data.platform ?? 'unknown',
+              osType: data.osType ?? 'unknown',
+              panguardVersion: data.panguardVersion ?? 'unknown',
+              nodeVersion: data.nodeVersion ?? 'unknown',
+            });
+            this.sendJson(res, 200, { ok: true });
+          } else if (req.method === 'GET') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            const activationStats = this.db.getActivationStats();
+            this.sendJson(res, 200, { ok: true, data: activationStats });
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/admin/reset-rules':
           if (req.method === 'POST') {
             if (!this.checkAdminAuth(req)) {

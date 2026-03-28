@@ -163,6 +163,16 @@ export class ThreatCloudDB {
       CREATE UNIQUE INDEX IF NOT EXISTS idx_telemetry_hourly_unique
         ON telemetry_hourly_aggregates(hour_bucket, event_type, platform);
 
+      CREATE TABLE IF NOT EXISTS activations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id TEXT NOT NULL UNIQUE,
+        platform TEXT NOT NULL DEFAULT 'unknown',
+        os_type TEXT NOT NULL DEFAULT 'unknown',
+        panguard_version TEXT NOT NULL DEFAULT 'unknown',
+        node_version TEXT NOT NULL DEFAULT 'unknown',
+        activated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
       -- Migrations are handled by the numbered migration system in migrations.ts
     `);
 
@@ -1353,6 +1363,76 @@ export class ThreatCloudDB {
         event.cleanCount,
         event.deviceHash ?? null
       );
+  }
+
+  /** Record a one-time activation event / 記錄一次性啟動事件 */
+  recordActivation(activation: {
+    clientId: string;
+    platform: string;
+    osType: string;
+    panguardVersion: string;
+    nodeVersion: string;
+  }): boolean {
+    try {
+      this.db
+        .prepare(
+          `INSERT OR IGNORE INTO activations (client_id, platform, os_type, panguard_version, node_version)
+           VALUES (?, ?, ?, ?, ?)`
+        )
+        .run(
+          activation.clientId,
+          activation.platform,
+          activation.osType,
+          activation.panguardVersion,
+          activation.nodeVersion
+        );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Get activation stats / 取得啟動統計 */
+  getActivationStats(): {
+    total: number;
+    byPlatform: Array<{ platform: string; count: number }>;
+    byOs: Array<{ osType: string; count: number }>;
+    recent: Array<{
+      activatedAt: string;
+      platform: string;
+      osType: string;
+      panguardVersion: string;
+    }>;
+  } {
+    const total = (
+      this.db.prepare(`SELECT COUNT(*) as count FROM activations`).get() as { count: number }
+    ).count;
+
+    const byPlatform = this.db
+      .prepare(
+        `SELECT platform, COUNT(*) as count FROM activations GROUP BY platform ORDER BY count DESC`
+      )
+      .all() as Array<{ platform: string; count: number }>;
+
+    const byOs = this.db
+      .prepare(
+        `SELECT os_type as osType, COUNT(*) as count FROM activations GROUP BY os_type ORDER BY count DESC`
+      )
+      .all() as Array<{ osType: string; count: number }>;
+
+    const recent = this.db
+      .prepare(
+        `SELECT activated_at as activatedAt, platform, os_type as osType, panguard_version as panguardVersion
+         FROM activations ORDER BY activated_at DESC LIMIT 20`
+      )
+      .all() as Array<{
+      activatedAt: string;
+      platform: string;
+      osType: string;
+      panguardVersion: string;
+    }>;
+
+    return { total, byPlatform, byOs, recent };
   }
 
   /** Get contributor leaderboard (hashed IDs, no PII) / 取得貢獻者排行榜 */

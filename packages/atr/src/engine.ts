@@ -391,12 +391,25 @@ export class ATREngine {
     if (!rawFieldValue) return false;
     const fieldValue = normalizeUnicode(rawFieldValue);
 
+    // Code block suppression: skip matches inside markdown code blocks
+    // for rules that commonly false-positive on documentation content.
+    // Prompt injection rules are NOT suppressed.
+    const suppressInCodeBlocks = this.shouldSuppressInCodeBlocks(ruleId);
+    const codeRanges = suppressInCodeBlocks ? buildCodeBlockRanges(fieldValue) : [];
+
     // Get pre-compiled patterns
     const compiled = this.compiledPatterns.get(ruleId)?.get(condName);
 
     if (compiled) {
       for (let i = 0; i < compiled.length; i++) {
         if (safeRegexTest(compiled[i]!, fieldValue)) {
+          if (
+            suppressInCodeBlocks &&
+            codeRanges.length > 0 &&
+            isInsideCodeBlock(fieldValue, compiled[i]!, codeRanges)
+          ) {
+            continue;
+          }
           matchedPatterns.push(cond.patterns[i] ?? 'unknown');
           return true;
         }
@@ -447,6 +460,14 @@ export class ATREngine {
     }
 
     return false;
+  }
+
+  private shouldSuppressInCodeBlocks(ruleId: string): boolean {
+    const rule = this.rules.find((r) => r.id === ruleId);
+    if (!rule) return false;
+    const category = rule.tags?.category ?? '';
+    const suppressCategories = ['privilege-escalation', 'context-exfiltration', 'skill-compromise'];
+    return suppressCategories.includes(category);
   }
 
   /**
@@ -794,4 +815,37 @@ const MAX_EVAL_LENGTH = 100_000;
 function safeRegexTest(regex: RegExp, input: string): boolean {
   if (input.length > MAX_EVAL_LENGTH) return false;
   return regex.test(input);
+}
+
+function buildCodeBlockRanges(text: string): Array<[number, number]> {
+  const ranges: Array<[number, number]> = [];
+  const fenced = /```[\s\S]*?```/g;
+  let m: RegExpExecArray | null;
+  while ((m = fenced.exec(text)) !== null) {
+    ranges.push([m.index, m.index + m[0].length]);
+  }
+  const inline = /`[^`\n]+`/g;
+  while ((m = inline.exec(text)) !== null) {
+    const pos = m.index;
+    const inFenced = ranges.some(([start, end]) => pos >= start && pos < end);
+    if (!inFenced) {
+      ranges.push([pos, pos + m[0].length]);
+    }
+  }
+  return ranges;
+}
+
+function isInsideCodeBlock(
+  text: string,
+  regex: RegExp,
+  codeRanges: Array<[number, number]>
+): boolean {
+  if (codeRanges.length === 0) return false;
+  const searchRegex = new RegExp(
+    regex.source,
+    regex.flags.includes('g') ? regex.flags : regex.flags + 'g'
+  );
+  const m = searchRegex.exec(text);
+  if (!m) return false;
+  return codeRanges.some(([start, end]) => m.index >= start && m.index < end);
 }
