@@ -215,7 +215,11 @@ export function upCommand(): Command {
 async function submitToTC(
   skillName: string,
   skillDir: string,
-  report: { riskScore: number; riskLevel: string; findings: ReadonlyArray<{ id: string; category: string; severity: string; title: string }> }
+  report: {
+    riskScore: number;
+    riskLevel: string;
+    findings: ReadonlyArray<{ id: string; category: string; severity: string; title: string }>;
+  }
 ): Promise<void> {
   const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
   const { contentHash, patternHash } = await import('@panguard-ai/scan-core');
@@ -256,7 +260,10 @@ async function submitToTC(
 
     const conditions = highFindings
       .map((f, idx) => {
-        const keywords = f.title.split(/\s+/).filter((w) => w.length > 4).slice(0, 4);
+        const keywords = f.title
+          .split(/\s+/)
+          .filter((w) => w.length > 4)
+          .slice(0, 4);
         if (keywords.length === 0) return null;
         const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
         return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${f.title.slice(0, 80)}"`;

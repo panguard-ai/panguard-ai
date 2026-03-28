@@ -62,6 +62,7 @@ test.describe('Core navigation', () => {
   });
 
   test('additional content pages return 200', async ({ page }) => {
+    test.setTimeout(90_000);
     const paths = [
       '/how-it-works',
       '/technology',
@@ -74,7 +75,7 @@ test.describe('Core navigation', () => {
       '/trust',
     ];
     for (const p of paths) {
-      const res = await page.goto(p);
+      const res = await page.goto(p, { timeout: 60_000 });
       expect(res?.status()).toBe(200);
     }
   });

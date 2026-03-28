@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Internationalization', () => {
-  test('Chinese locale loads at /zh', async ({ page }) => {
-    const res = await page.goto('/zh');
+  test('Chinese locale loads at /zh-TW', async ({ page }) => {
+    const res = await page.goto('/zh-TW');
     expect(res?.status()).toBe(200);
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-TW');
   });
@@ -13,7 +13,7 @@ test.describe('Internationalization', () => {
   });
 
   test('Chinese pricing page loads', async ({ page }) => {
-    const res = await page.goto('/zh/pricing');
+    const res = await page.goto('/zh-TW/pricing');
     expect(res?.status()).toBe(200);
   });
 });
