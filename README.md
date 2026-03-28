@@ -51,6 +51,31 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
 
 ---
 
+## Screenshots
+
+<p align="center">
+<img src="assets/screenshot-dashboard.png" alt="Dashboard — Security Score, Skills, Protection Status" width="720">
+</p>
+
+<details>
+<summary>More screenshots</summary>
+
+<p align="center">
+<img src="assets/screenshot-welcome.png" alt="Welcome — First-run initialization" width="720">
+</p>
+
+<p align="center">
+<img src="assets/screenshot-rules.png" alt="Rules — 71 ATR detection rules, community contribution" width="720">
+</p>
+
+<p align="center">
+<img src="assets/screenshot-settings.png" alt="Settings — 3-layer detection (ATR, Fingerprint, Cloud AI)" width="720">
+</p>
+
+</details>
+
+---
+
 ## How It Works
 
 ```
