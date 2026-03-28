@@ -7,7 +7,6 @@ import BrandLogo from '@/components/ui/BrandLogo';
 import { ShieldIcon, ScanIcon } from '@/components/ui/BrandIcons';
 import { useSkillScan } from '@/hooks/useSkillScan';
 import { useEcosystemStats } from '@/hooks/useEcosystemStats';
-import { STATS } from '@/lib/stats';
 import ScanAnimation from './ScanAnimation';
 import ScanResultCard from './ScanResultCard';
 
@@ -30,50 +29,56 @@ const PLATFORM_NAMES = [
   'Roo Code',
 ] as const;
 
-function CountUp({
-  target,
-  duration = 1.5,
-}: {
-  readonly target: number;
-  readonly duration?: number;
-}) {
-  const [count, setCount] = useState(target);
-  const prevTarget = useRef(target);
+/** Infinite scrolling ticker for threat incidents */
+function ThreatTicker({ items }: { readonly items: readonly string[] }) {
+  const doubled = [...items, ...items];
+  return (
+    <div className="relative overflow-hidden w-full py-3">
+      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
+      <motion.div
+        className="flex gap-8 whitespace-nowrap"
+        animate={{ x: ['0%', '-50%'] }}
+        transition={{ duration: 30, ease: 'linear', repeat: Infinity }}
+      >
+        {doubled.map((item, i) => (
+          <span
+            key={`${item}-${i}`}
+            className="text-xs sm:text-sm text-red-400/80 font-mono tracking-wide flex items-center gap-2"
+          >
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400/60 shrink-0" />
+            {item}
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
 
-  useEffect(() => {
-    const from = prevTarget.current;
-    prevTarget.current = target;
-
-    if (from === target || target === 0) {
-      setCount(target);
-      return;
-    }
-
-    const startTime = Date.now();
-    const endTime = startTime + duration * 1000;
-    let cancelled = false;
-
-    function tick() {
-      if (cancelled) return;
-      const now = Date.now();
-      if (now >= endTime) {
-        setCount(target);
-        return;
-      }
-      const progress = (now - startTime) / (duration * 1000);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(from + eased * (target - from)));
-      requestAnimationFrame(tick);
-    }
-
-    requestAnimationFrame(tick);
-
-    return () => {
-      cancelled = true;
-    };
-  }, [target, duration]);
-
-  return <>{count.toLocaleString()}</>;
+/** Infinite scrolling platform names */
+function PlatformTicker({ names }: { readonly names: readonly string[] }) {
+  const doubled = [...names, ...names];
+  return (
+    <div className="relative overflow-hidden w-full py-2">
+      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
+      <motion.div
+        className="flex gap-6 whitespace-nowrap"
+        animate={{ x: ['0%', '-50%'] }}
+        transition={{ duration: 25, ease: 'linear', repeat: Infinity }}
+      >
+        {doubled.map((name, i) => (
+          <span
+            key={`${name}-${i}`}
+            className="text-xs text-text-secondary/70 font-medium flex items-center gap-1.5"
+          >
+            <span className="inline-block w-1 h-1 rounded-full bg-panguard-green/40 shrink-0" />
+            {name}
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
 }
 
 function ScannerHeroInner() {
@@ -92,25 +97,7 @@ function ScannerHeroInner() {
     animationPhase,
   } = useSkillScan();
 
-  const riskPercent =
-    eco.skillsScanned > 0 ? ((eco.threatsDetected / eco.skillsScanned) * 100).toFixed(1) : '6.4';
-
-  const statItems = [
-    { value: eco.skillsScanned, label: t('statsScanned'), color: 'text-text-primary', suffix: '+' },
-    {
-      value: STATS.ecosystem.findingsCritical,
-      label: t('statsCritical'),
-      color: 'text-red-400',
-      suffix: '',
-    },
-    { value: eco.atrRules, label: t('statsRules'), color: 'text-panguard-green', suffix: '' },
-    {
-      value: eco.threatsDetected,
-      label: t('statsCrystallized'),
-      color: 'text-text-primary',
-      suffix: '',
-    },
-  ];
+  const tickerItems = [t('ticker1'), t('ticker2'), t('ticker3'), t('ticker4'), t('ticker5')];
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a0a]">
@@ -130,20 +117,23 @@ function ScannerHeroInner() {
           <BrandLogo size={36} className="text-panguard-green mx-auto sm:w-12 sm:h-12" />
         </div>
 
-        {/* Title block — data-driven */}
-        <div className="mb-10 animate-[fadeUp_0.6s_0.1s_ease_both]">
+        {/* Title */}
+        <div className="mb-6 animate-[fadeUp_0.6s_0.1s_ease_both]">
           <h1 className="text-[clamp(24px,5vw,48px)] font-bold leading-[1.3] tracking-tight text-text-primary">
-            {t('titleLine1')}
-            <br />
-            <span className="text-panguard-green">{t('titleLine2')}</span>
+            {t('titleLine1')} — <span className="text-panguard-green">{t('titleLine2')}</span>
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto">
-            {t('subtitle')}
+          <p className="mt-4 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto">
+            {t('subtitle', { count: eco.skillsScanned.toLocaleString() })}
           </p>
         </div>
 
+        {/* Threat ticker */}
+        <div className="mb-8 animate-[fadeIn_0.5s_0.2s_ease_both]">
+          <ThreatTicker items={tickerItems} />
+        </div>
+
         {/* Scanner */}
-        <div className="max-w-xl mx-auto animate-[fadeUp_0.5s_0.4s_ease_both]">
+        <div className="max-w-xl mx-auto animate-[fadeUp_0.5s_0.3s_ease_both]">
           <p className="text-xs uppercase tracking-[0.15em] text-text-muted font-semibold mb-3">
             {t('scanLabel')}
           </p>
@@ -201,39 +191,30 @@ function ScannerHeroInner() {
           <p className="text-[11px] text-text-muted mt-3">{t('trustNote')}</p>
         </div>
 
-        {/* Stats strip */}
-        <div className="mt-10 animate-[fadeUp_0.5s_0.6s_ease_both]">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 text-center">
-            {statItems.map((item) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
+        {/* Trust badges */}
+        <div className="mt-10 animate-[fadeUp_0.5s_0.5s_ease_both]">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+            {[
+              t('badgeOwasp'),
+              t('badgeRules', { count: eco.atrRules }),
+              t('badgePlatforms'),
+              t('badgeLicense'),
+              t('badgeScanned', { count: eco.skillsScanned.toLocaleString() }),
+            ].map((badge) => (
+              <span
+                key={badge}
+                className="text-[11px] sm:text-xs text-text-muted border border-border/50 rounded-full px-3 py-1.5 bg-surface-1/30"
               >
-                <p className={`text-2xl sm:text-3xl font-extrabold ${item.color} tabular-nums`}>
-                  <CountUp target={item.value} />
-                  {item.suffix}
-                </p>
-                <p className="text-[11px] sm:text-xs text-text-muted mt-1 uppercase tracking-wider font-medium">
-                  {item.label}
-                </p>
-              </motion.div>
+                {badge}
+              </span>
             ))}
           </div>
         </div>
 
-        {/* Platform bar */}
-        <div className="mt-8 animate-[fadeIn_0.5s_0.7s_ease_both]">
-          <p className="text-xs text-text-muted mb-3">{t('platformLabel')}</p>
-          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-text-secondary">
-            {PLATFORM_NAMES.map((name) => (
-              <span key={name} className="whitespace-nowrap">
-                {name}
-              </span>
-            ))}
-          </div>
+        {/* Platform ticker */}
+        <div className="mt-6 animate-[fadeIn_0.5s_0.6s_ease_both]">
+          <p className="text-xs text-text-muted mb-2">{t('platformLabel')}</p>
+          <PlatformTicker names={PLATFORM_NAMES} />
         </div>
       </div>
 
