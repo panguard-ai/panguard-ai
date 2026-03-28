@@ -727,8 +727,8 @@
     },
     "srDefinition": "Panguard AI 為 AI Agent 提供第一個 Skills Audit。它在每個 Skill 執行前進行審計，用社群 ATR（Agent Threat Rules）捕獲已知威脅，用 AI 分析捕獲未知威脅，並分享新規則保護所有人。MIT 授權。開源。",
     "scannerHero": {
-      "titleLine1": "裝那個 MCP Skill 之前",
-      "titleLine2": "先掃一下。",
+      "titleLine1": "你的 AI Agent 正在跑別人的程式碼，你真的安全嗎？",
+      "titleLine2": "掃一掃更安心！",
       "subtitle": "我們掃了 {count} 個 Skills。每 25 個就有 1 個有問題。",
       "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
       "scanBtn": "掃描",
