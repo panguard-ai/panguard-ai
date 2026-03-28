@@ -91,10 +91,11 @@ export class LLMReviewer {
         return { verdict: '', approved: false };
       }
 
-      // Permanent errors: store failure verdict
+      // Non-transient errors: store failure but keep proposal pending for retry
+      // Do NOT auto-reject — API errors are not evidence of bad rules
       const failVerdict = JSON.stringify({
         approved: false,
-        falsePositiveRisk: 'high',
+        falsePositiveRisk: 'medium',
         coverageScore: 0,
         reasoning: `LLM review failed: ${msg}`,
       });
@@ -436,7 +437,7 @@ REMEMBER: Output "NO_THREATS_FOUND" for 90%+ of skills. Only flag genuinely susp
   private parseVerdict(responseText: string): LLMVerdict {
     const defaultVerdict: LLMVerdict = {
       approved: false,
-      falsePositiveRisk: 'high',
+      falsePositiveRisk: 'medium',
       coverageScore: 0,
       reasoning: 'Failed to parse LLM response',
     };
@@ -454,11 +455,10 @@ REMEMBER: Output "NO_THREATS_FOUND" for 90%+ of skills. Only flag genuinely susp
       const approved = parsed.approved === true;
 
       const validRisks = ['low', 'medium', 'high'] as const;
-      const falsePositiveRisk = validRisks.includes(
-        parsed.falsePositiveRisk as (typeof validRisks)[number]
-      )
-        ? (parsed.falsePositiveRisk as 'low' | 'medium' | 'high')
-        : 'high';
+      const normalizedRisk = (parsed.falsePositiveRisk ?? '').toString().toLowerCase().trim();
+      const falsePositiveRisk = validRisks.includes(normalizedRisk as (typeof validRisks)[number])
+        ? (normalizedRisk as 'low' | 'medium' | 'high')
+        : 'medium';
 
       const coverageScore =
         typeof parsed.coverageScore === 'number'
