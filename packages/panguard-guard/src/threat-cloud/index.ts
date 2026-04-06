@@ -273,6 +273,9 @@ export class ThreatCloudClient {
       const rules = Array.isArray(parsed) ? parsed : (parsed.data ?? []);
 
       this.status = 'connected';
+      this.cache.lastSync = new Date().toISOString();
+      this.cache.stats.totalRulesReceived += rules.length;
+      this.saveCache();
       logger.info(
         `Fetched ${rules.length} ATR rules from cloud / 從雲端取得 ${rules.length} 條 ATR 規則`
       );
@@ -706,8 +709,20 @@ export class ThreatCloudClient {
   }
 
   private saveCache(): void {
-    // No-op: community data stays in memory only.
-    // Stats are transient and will be re-accumulated from TC on next sync.
+    // Write stats + lastSync to disk so dashboard can read them.
+    // Community data stays in memory only — only counters are persisted.
+    try {
+      const statsFile = join(this.dataDir, 'threat-cloud-cache.json');
+      const data = {
+        lastSync: this.cache.lastSync,
+        totalUploaded: this.cache.stats.totalUploaded,
+        totalRulesReceived: this.cache.stats.totalRulesReceived,
+        queueSize: this.uploadQueue.length,
+      };
+      writeFileSync(statsFile, JSON.stringify(data, null, 2));
+    } catch {
+      // Non-critical — dashboard will show stale data
+    }
   }
 
   private loadQueue(): AnonymizedThreatData[] {
