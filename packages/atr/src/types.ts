@@ -50,15 +50,19 @@ export type ATRAction =
 
 export interface ATRReferences {
   owasp_llm?: string[];
+  owasp_agentic?: string[];
   mitre_atlas?: string[];
   mitre_attack?: string[];
   cve?: string[];
 }
 
+export type ATRScanTarget = 'mcp' | 'skill' | 'both' | 'runtime';
+
 export interface ATRTags {
   category: ATRCategory;
   subcategory?: string;
   confidence?: ATRConfidence;
+  scan_target?: ATRScanTarget;
 }
 
 export interface ATRAgentSource {
@@ -139,11 +143,15 @@ export interface ATRTestCases {
 export interface ATRRule {
   title: string;
   id: string;
+  rule_version?: number;
   status: ATRStatus;
   description: string;
   author: string;
   date: string;
   modified?: string;
+  schema_version?: string;
+  detection_tier?: string;
+  maturity?: string;
   severity: ATRSeverity;
   references?: ATRReferences;
   tags: ATRTags;
@@ -160,7 +168,8 @@ export type AgentEventType =
   | 'tool_call'
   | 'tool_response'
   | 'agent_behavior'
-  | 'multi_agent_message';
+  | 'multi_agent_message'
+  | 'mcp_exchange';
 
 /** An agent event to evaluate against ATR rules */
 export interface AgentEvent {
@@ -178,7 +187,12 @@ export interface AgentEvent {
   agentId?: string;
   /** Additional metadata */
   metadata?: Record<string, unknown>;
+  /** Scan context: when 'skill', all rules fire regardless of agent_source.type,
+   *  with cross-context confidence downweighting for MCP-only rules. */
+  scanContext?: 'mcp' | 'skill';
 }
+
+export type ScanContextType = 'native' | 'cross-context';
 
 /** Result when an ATR rule matches an event */
 export interface ATRMatch {
@@ -187,4 +201,84 @@ export interface ATRMatch {
   matchedPatterns: string[];
   confidence: number;
   timestamp: string;
+  /** Whether this match is native (rule designed for this scan path) or cross-context */
+  scan_context: ScanContextType;
+}
+
+/** Verdict outcome from evaluating matched rules */
+export type VerdictOutcome = 'allow' | 'ask' | 'deny';
+
+/** Verdict returned after evaluating an event against all rules */
+export interface ATRVerdict {
+  readonly outcome: VerdictOutcome;
+  readonly reason: string;
+  readonly matchCount: number;
+  readonly highestSeverity: ATRSeverity | null;
+  readonly highestConfidence: number;
+  readonly actions: readonly ATRAction[];
+  readonly matches: readonly ATRMatch[];
+  readonly timestamp: string;
+}
+
+/** Result of executing a single action */
+export interface ActionResult {
+  readonly action: ATRAction;
+  readonly success: boolean;
+  readonly message: string;
+  readonly timestamp: string;
+}
+
+/** Context provided to platform adapters when executing actions */
+export interface ExecutionContext {
+  readonly event: AgentEvent;
+  readonly matches: readonly ATRMatch[];
+  readonly verdict: ATRVerdict;
+  readonly sessionId?: string;
+  readonly metadata?: Readonly<Record<string, unknown>>;
+}
+
+/** Platform-specific adapter for executing ATR actions */
+export interface PlatformAdapter {
+  readonly name: string;
+  blockInput(ctx: ExecutionContext): Promise<ActionResult>;
+  blockOutput(ctx: ExecutionContext): Promise<ActionResult>;
+  blockTool(ctx: ExecutionContext): Promise<ActionResult>;
+  quarantineSession(ctx: ExecutionContext): Promise<ActionResult>;
+  resetContext(ctx: ExecutionContext): Promise<ActionResult>;
+  alert(ctx: ExecutionContext): Promise<ActionResult>;
+  snapshot(ctx: ExecutionContext): Promise<ActionResult>;
+  escalate(ctx: ExecutionContext): Promise<ActionResult>;
+  reducePermissions(ctx: ExecutionContext): Promise<ActionResult>;
+  killAgent(ctx: ExecutionContext): Promise<ActionResult>;
+}
+
+/** Hook input from Claude Code / agent host */
+export interface HookInput {
+  readonly hook: 'PreToolUse' | 'PostToolUse';
+  readonly tool_name: string;
+  readonly tool_input: Readonly<Record<string, unknown>>;
+  readonly session_id?: string;
+  readonly timestamp?: string;
+}
+
+/** Hook output to Claude Code / agent host */
+export interface HookOutput {
+  readonly decision: VerdictOutcome;
+  readonly reason?: string;
+  readonly message?: string;
+  readonly matched_rules?: readonly string[];
+}
+
+/** Scan type: MCP runtime event scan vs SKILL.md static file scan */
+export type ScanType = 'mcp' | 'skill';
+
+/** Unified scan result produced by both evaluate() and scanSkill() paths */
+export interface ScanResult {
+  readonly scan_type: ScanType;
+  readonly content_hash: string;
+  readonly input_file?: string;
+  readonly timestamp: string;
+  readonly rules_loaded: number;
+  readonly matches: readonly ATRMatch[];
+  readonly threat_count: number;
 }
