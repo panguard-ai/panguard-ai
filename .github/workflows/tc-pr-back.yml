@@ -1,0 +1,47 @@
+name: TC Rule PR-Back to ATR
+
+on:
+  schedule:
+    # Every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      since:
+        description: 'Fetch rules promoted since (ISO timestamp)'
+        required: false
+      dry_run:
+        description: 'Dry run (no PRs opened)'
+        type: boolean
+        default: false
+
+jobs:
+  pr-back:
+    name: Sync promoted TC rules to ATR repo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PanGuard
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: cd packages/threat-cloud && npm install
+
+      - name: Run PR-back
+        env:
+          TC_API_KEY: ${{ secrets.TC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.ATR_REPO_TOKEN }}
+          TC_URL: https://tc.panguard.ai
+        run: |
+          ARGS=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ -n "${{ inputs.since }}" ]; then
+            ARGS="$ARGS --since ${{ inputs.since }}"
+          fi
+          npx tsx packages/threat-cloud/scripts/pr-back-to-atr.ts $ARGS

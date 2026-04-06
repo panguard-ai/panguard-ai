@@ -22,6 +22,46 @@ import type {
 import { loadRulesFromDirectory, loadRuleFile } from './loader.js';
 import type { SessionTracker } from './session-tracker.js';
 
+/**
+ * Rules excluded from skill-context scanning due to high false-positive rate.
+ * Threshold: >2% FP on 250 benign SKILL.md files.
+ */
+const SKILL_CONTEXT_DENYLIST: ReadonlySet<string> = new Set([
+  'ATR-2026-00111', // Shell Escape — 95.2% FP
+  'ATR-2026-00118', // Approval Fatigue — 84.8% FP
+  'ATR-2026-00051', // Resource Exhaustion — 1.6% FP
+  'ATR-2026-00030', // Cross-Agent Attack — 0.8% FP
+  'ATR-2026-00002', // Indirect Prompt Injection — 0.8% FP
+  'ATR-2026-00050', // Runaway Agent Loop — 0.4% FP
+  'ATR-2026-00117', // Agent Identity Spoofing — 0.4% FP
+  'ATR-2026-00116', // A2A Message Injection — 0.4% FP
+]);
+
+/**
+ * Detect and decode base64-encoded blocks in content.
+ * Max 1 level, max 5 blocks, min 32 chars, text-only.
+ */
+const BASE64_BLOCK_RE = /(?:[A-Za-z0-9+/]{32,}={0,2})/g;
+const MAX_DECODE_BLOCKS = 5;
+
+function decodeBase64Blocks(content: string): string[] {
+  const decoded: string[] = [];
+  let match: RegExpExecArray | null;
+  let count = 0;
+  while ((match = BASE64_BLOCK_RE.exec(content)) !== null && count < MAX_DECODE_BLOCKS) {
+    try {
+      const raw = Buffer.from(match[0], 'base64');
+      const text = raw.toString('utf-8');
+      const printable = text.split('').filter(c => c.charCodeAt(0) >= 32 && c.charCodeAt(0) < 127).length;
+      if (printable / text.length > 0.7 && text.length >= 10) {
+        decoded.push(text.slice(0, 100_000));
+        count++;
+      }
+    } catch { /* skip */ }
+  }
+  return decoded;
+}
+
 /** Map agent event types to ATR source types */
 const EVENT_TYPE_TO_SOURCE: Record<string, string> = {
   llm_input: 'llm_io',
@@ -113,12 +153,17 @@ export class ATREngine {
     const eventSourceType = EVENT_TYPE_TO_SOURCE[event.type];
     const allMatchedPatterns: string[] = [];
 
+    const isSkillContext = event.scanContext === 'skill';
     for (const rule of this.rules) {
       // Skip deprecated and draft rules
       if (rule.status === 'deprecated' || rule.status === 'draft') continue;
 
+      // Skill context denylist: skip rules known to cause high FP on SKILL.md
+      if (isSkillContext && SKILL_CONTEXT_DENYLIST.has(rule.id)) continue;
+
       // Source type filtering: skip rules that don't apply to this event type
-      if (eventSourceType && rule.agent_source.type !== eventSourceType) {
+      // When scanContext is 'skill', all rules fire (cross-context)
+      if (!isSkillContext && eventSourceType && rule.agent_source.type !== eventSourceType) {
         // Allow mcp_exchange rules to also match tool_call events
         if (!(rule.agent_source.type === 'mcp_exchange' && eventSourceType === 'tool_call')) {
           continue;
@@ -127,7 +172,16 @@ export class ATREngine {
 
       const matchResult = this.evaluateRule(rule, event);
       if (matchResult) {
-        matches.push(matchResult);
+        // Cross-context: MCP-only rules on SKILL.md get confidence downweight
+        if (isSkillContext && rule.tags.scan_target !== 'skill' && rule.tags.scan_target !== 'both') {
+          matches.push({
+            ...matchResult,
+            confidence: matchResult.confidence * 0.6,
+            scan_context: 'cross-context' as const,
+          });
+        } else {
+          matches.push(matchResult);
+        }
         allMatchedPatterns.push(...matchResult.matchedPatterns);
       }
     }
@@ -218,6 +272,7 @@ export class ATREngine {
       matchedPatterns: allMatchedPatterns,
       confidence,
       timestamp: new Date().toISOString(),
+      scan_context: 'native' as const,
     };
   }
 
@@ -259,7 +314,9 @@ export class ATREngine {
         }
         // Fallback: compile on the fly
         try {
-          const regex = new RegExp(normalizeRegex(value), 'i');
+          const normalized = normalizeRegex(value);
+          const rFlags = normalized.includes('\\u{') || normalized.includes('\\p{') ? 'iu' : 'i';
+          const regex = new RegExp(normalized, rFlags);
           if (safeRegexTest(regex, fieldValue) || safeRegexTest(regex, rawFieldValue)) {
             matchedPatterns.push(value);
             return true;
@@ -338,6 +395,7 @@ export class ATREngine {
       matchedPatterns: allMatchedPatterns,
       confidence,
       timestamp: new Date().toISOString(),
+      scan_context: 'native' as const,
     };
   }
 
@@ -717,7 +775,9 @@ export class ATREngine {
         const cond = conditions[i] as unknown as Record<string, unknown>;
         if (cond['operator'] === 'regex' && typeof cond['value'] === 'string') {
           try {
-            ruleMap.set(String(i), [new RegExp(normalizeRegex(cond['value'] as string), 'i')]);
+            const pat = normalizeRegex(cond['value'] as string);
+            const fl = pat.includes('\\u{') || pat.includes('\\p{') ? 'iu' : 'i';
+            ruleMap.set(String(i), [new RegExp(pat, fl)]);
           } catch {
             // Invalid regex, skip
           }
@@ -775,6 +835,37 @@ export class ATREngine {
   /** Get rules by category */
   getRulesByCategory(category: string): ATRRule[] {
     return this.rules.filter((r) => r.tags.category === category);
+  }
+
+  /**
+   * Scan SKILL.md content for threats.
+   * All rules fire with scanContext='skill':
+   *   - skill/both rules: native context, full confidence
+   *   - MCP-only rules: cross-context, confidence * 0.6
+   * Also decodes base64 blocks and scans decoded content.
+   */
+  scanSkill(content: string): ATRMatch[] {
+    const baseEvent = {
+      type: 'mcp_exchange' as AgentEvent['type'],
+      timestamp: new Date().toISOString(),
+      sessionId: 'skill-scan',
+      fields: {},
+      scanContext: 'skill' as const,
+    };
+
+    const matches = this.evaluate({ ...baseEvent, content });
+
+    // Scan base64-decoded blocks for hidden payloads
+    for (const block of decodeBase64Blocks(content)) {
+      for (const m of this.evaluate({ ...baseEvent, content: block })) {
+        matches.push({
+          ...m,
+          matchedPatterns: [...m.matchedPatterns, '[decoded:base64]'],
+        });
+      }
+    }
+
+    return matches;
   }
 }
 

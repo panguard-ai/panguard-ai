@@ -46,4 +46,8 @@ RUN npx tsc --build --force
 RUN apt-get purge -y python3 make g++ && apt-get autoremove -y
 
 EXPOSE 3000
+
+# Use /data for persistent storage (Railway volume mount)
+ENV TC_DB_PATH=/data/threat-cloud.db
+
 CMD ["node", "dist/cli.js"]
