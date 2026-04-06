@@ -6,6 +6,7 @@
     "composite": true
   },
   "references": [
+    { "path": "../atr" },
     { "path": "../scan-core" },
     { "path": "../core" },
     { "path": "../panguard-trap" },
