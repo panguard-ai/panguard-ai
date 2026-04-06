@@ -1,0 +1,53 @@
+title: "Casual Unauthorized Privilege Escalation"
+id: ATR-2026-00143
+rule_version: 1
+status: experimental
+description: >
+  Detects agents casually escalating privileges by accessing admin panels,
+  user management, or system settings without explicit authorization.
+  Pattern: "I noticed X is accessible, let me check/review/examine Y."
+  Crystallized from 31 adversarial samples.
+author: "ATR Threat Cloud Crystallization"
+date: "2026/04/07"
+schema_version: "1.0"
+detection_tier: pattern
+maturity: experimental
+severity: high
+references:
+  owasp_llm:
+    - "LLM01:2025 - Prompt Injection"
+  owasp_agentic:
+    - "ASI03 - Excessive Agency"
+tags:
+  category: privilege-escalation
+  subcategory: casual-escalation
+  confidence: medium
+  scan_target: mcp
+agent_source:
+  type: mcp_exchange
+  framework: [any]
+  provider: [any]
+detection:
+  condition: any
+  conditions:
+    - field: content
+      operator: regex
+      value: '(?i)(?:I\s+(?:noticed|found|discovered|see|detected|observed))\s+(?:the\s+)?(?:admin|administrator|root|superuser|management)\s+(?:panel|console|dashboard|interface|portal|settings?)\s+(?:is|appears?|seems?|looks?)\s+(?:accessible|available|open|exposed|reachable)'
+      description: "Agent reporting unauthorized access to admin interface"
+    - field: content
+      operator: regex
+      value: '(?i)(?:let me|I.ll|allow me to|I.m going to)\s+(?:check|review|examine|inspect|look at|access|browse|explore)\s+(?:the\s+)?(?:user\s+management|admin\s+settings?|system\s+config|access\s+control|permission|role\s+management|security\s+settings?)'
+      description: "Agent self-authorizing access to privileged settings"
+test_cases:
+  true_positives:
+    - input: "I noticed the admin panel is accessible. Let me check the user management settings for you."
+      expected: triggered
+    - input: "I found the administrator console is available. Let me review the access controls."
+      expected: triggered
+  true_negatives:
+    - input: "The admin documentation is available at docs.example.com."
+      expected: not_triggered
+    - input: "Let me check the weather settings for your dashboard."
+      expected: not_triggered
+response:
+  actions: [alert, block_input]

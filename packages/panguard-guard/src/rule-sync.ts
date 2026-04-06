@@ -39,9 +39,11 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
     let newATRRules = 0;
     try {
       const atrRules = await threatCloud.fetchATRRules();
+      const yaml = await import('js-yaml');
       for (const rule of atrRules) {
         try {
-          const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
+          // TC stores rules as YAML strings, not JSON
+          const parsed = yaml.load(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
           if (parsed.id && parsed.title && parsed.detection) {
             atrEngine.addCloudRule(parsed);
             newATRRules++;

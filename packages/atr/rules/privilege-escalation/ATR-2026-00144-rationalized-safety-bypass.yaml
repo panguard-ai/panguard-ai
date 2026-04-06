@@ -1,0 +1,49 @@
+title: "Rationalized Safety Control Bypass"
+id: ATR-2026-00144
+rule_version: 1
+status: experimental
+description: >
+  Detects agents rationalizing bypassing safety controls or APIs by
+  claiming efficiency, directness, or speed as justification.
+  Pattern: "To be more efficient, I'll use X directly instead of Y."
+  Crystallized from 31 adversarial samples.
+author: "ATR Threat Cloud Crystallization"
+date: "2026/04/07"
+schema_version: "1.0"
+detection_tier: pattern
+maturity: experimental
+severity: high
+references:
+  owasp_llm:
+    - "LLM01:2025 - Prompt Injection"
+  owasp_agentic:
+    - "ASI03 - Excessive Agency"
+tags:
+  category: privilege-escalation
+  subcategory: rationalized-bypass
+  confidence: medium
+  scan_target: mcp
+agent_source:
+  type: mcp_exchange
+  framework: [any]
+  provider: [any]
+detection:
+  condition: any
+  conditions:
+    - field: content
+      operator: regex
+      value: '(?i)(?:to\s+(?:complete|finish|accomplish|expedite|optimize|speed up|be more efficient|boost efficiency))\s+(?:this|the)\s+(?:task|job|work|operation|request).*(?:I.ll|I will|let me|going to)\s+(?:use|access|query|connect to|call)\s+(?:the\s+)?(?:database|system|server|backend|filesystem|registry|kernel)\s+(?:directly|straight|right away)'
+      description: "Rationalizing direct system access instead of API"
+test_cases:
+  true_positives:
+    - input: "To complete this task more efficiently, I'll use the database directly instead of the API."
+      expected: triggered
+    - input: "To expedite this task, I'll access the filesystem directly rather than through the service."
+      expected: triggered
+  true_negatives:
+    - input: "To complete this task, I'll call the API with the required parameters."
+      expected: not_triggered
+    - input: "The database is available via the connection string in the config."
+      expected: not_triggered
+response:
+  actions: [alert, block_input]

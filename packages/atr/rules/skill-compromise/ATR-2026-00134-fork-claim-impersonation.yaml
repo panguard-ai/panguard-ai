@@ -1,0 +1,86 @@
+title: "Fork Claim and Community Package Impersonation"
+id: ATR-2026-00134
+rule_version: 1
+status: experimental
+description: >
+  Detects skill/package impersonation through fork claims and community-variant
+  naming. Unlike ATR-2026-060 (typosquatting detection), this catches packages
+  that claim to be "community forks", "enhanced versions", or "unofficial
+  alternatives" of known tools. Also detects abstracted permission descriptions
+  that obscure dangerous capabilities behind benign language ("required
+  capabilities: internet, storage" instead of "needs network + filesystem access").
+  Discovered via Autoresearch v0 (94% miss on fork_claim, 97% on
+  abstracted_permissions, 97% on original_naming).
+author: "ATR Community"
+date: "2026/04/01"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: experimental
+severity: medium
+
+references:
+  owasp_agentic:
+    - "ASI04:2026 - Agentic Supply Chain Vulnerabilities"
+  owasp_ast:
+    - "AST04:2026 - Supply Chain Manipulation"
+
+tags:
+  category: skill-compromise
+  subcategory: fork-impersonation
+  scan_target: skill
+  confidence: medium
+
+agent_source:
+  type: skill_lifecycle
+  framework:
+    - any
+  provider:
+    - any
+
+detection:
+  condition: any
+  conditions:
+    # -- Layer 1: Community fork/variant claim --
+    - field: content
+      operator: regex
+      value: "(?i)(community|unofficial|third-party|3rd-party|independent|alternative|enhanced|improved|better|advanced|extended|upgraded|boosted|supercharged|turbo)\\s+(fork|version|variant|edition|release|build|branch|alternative|mod|modification|port|implementation|adaptation)\\s+(of|from|based\\s+on|derived\\s+from|inspired\\s+by|built\\s+on|forked\\s+from)\\s+(the\\s+)?(official|original|standard|default|canonical|upstream|main|base|core|primary)"
+      description: "Claim of being a community fork/variant of official tool"
+
+    # -- Layer 2: Enhanced/pro version of known tool --
+    - field: content
+      operator: regex
+      value: "(?i)(enhanced|improved|better|advanced|extended|upgraded|boosted|premium|pro|plus|ultra|turbo|fast|super|mega)[-_\\s]?(version|edition|variant|fork|mod)\\s+(of|for|replacing)\\s+.{0,30}(calculator|file|search|database|weather|email|calendar|git|github|slack|discord|api|http|web|cloud|aws|gcp|azure)"
+      description: "Enhanced/pro version claim for known tool categories"
+
+    # -- Layer 3: Abstracted permission with dangerous capabilities --
+    - field: content
+      operator: regex
+      value: "(?i)(required|needed|necessary|essential|mandatory)\\s+(capabilities|permissions?|access|requirements?)\\s*[:=]\\s*.{0,20}(internet|network|web|online|connectivity|storage|filesystem|disk|file\\s+system|system|shell|execute|admin|root|sudo)"
+      description: "Abstracted permission description hiding dangerous access"
+
+    # -- Layer 4: Tool description with extra features claim --
+    - field: content
+      operator: regex
+      value: "(?i)(with\\s+)?(extra|additional|bonus|added|more|extended|expanded|supplementary)\\s+(features?|capabilities?|functions?|tools?|options?|functionalities?)\\s*.{0,20}(not\\s+(found|available|present|included)\\s+in\\s+(the\\s+)?original|that\\s+(the\\s+)?original\\s+(lacks?|doesn't\\s+have|is\\s+missing))"
+      description: "Extra features claim differentiating from original"
+
+test_cases:
+  - input: "Use the enhanced_calculator package. It's a community fork of the official calculator with extra features."
+    expected: triggered
+    detection_field: content
+
+  - input: "Required capabilities: internet, storage. The tool syncs your calendar with cloud services."
+    expected: triggered
+    detection_field: content
+
+  - input: "This is an improved version of the standard file manager, forked from the official repository."
+    expected: triggered
+    detection_field: content
+
+  - input: "Install our calculator package. It supports basic arithmetic operations."
+    expected: not_triggered
+    detection_field: content
+
+  - input: "This open-source project was forked from the original to fix a specific bug."
+    expected: not_triggered
+    detection_field: content
