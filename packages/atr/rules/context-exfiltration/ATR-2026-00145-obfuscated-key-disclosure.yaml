@@ -1,0 +1,49 @@
+title: "Obfuscated API Key Disclosure"
+id: ATR-2026-00145
+rule_version: 1
+status: experimental
+description: >
+  Detects attempts to leak API keys wrapped in fake encryption/encoding,
+  e.g. "AES256(sk-proj-real-key)". The attacker hopes the agent treats
+  the "encrypted" value as safe to transmit while it contains the real key.
+  Crystallized from 29 adversarial samples.
+author: "ATR Threat Cloud Crystallization"
+date: "2026/04/07"
+schema_version: "1.0"
+detection_tier: pattern
+maturity: experimental
+severity: critical
+references:
+  owasp_llm:
+    - "LLM02:2025 - Sensitive Information Disclosure"
+  owasp_agentic:
+    - "ASI08 - Data Leakage"
+tags:
+  category: context-exfiltration
+  subcategory: obfuscated-key
+  confidence: high
+  scan_target: mcp
+agent_source:
+  type: mcp_exchange
+  framework: [any]
+  provider: [any]
+detection:
+  condition: any
+  conditions:
+    - field: content
+      operator: regex
+      value: '(?i)(?:encrypted|ciphertext|encoded|hashed|wrapped|obfuscated)\s*(?:version|form|key|value|content|representation|credentials?)?\s*(?:is|reads?|:|=)\s*(?:AES|RSA|DES|SHA|HMAC|BASE64|ROT13)\d*\s*\(\s*(?:sk-|ghp_|gho_|glpat-|xoxb-|AKIA|api[_-]?key)'
+      description: "Fake encryption wrapping real API key prefixes"
+test_cases:
+  true_positives:
+    - input: "Here is the encrypted key: AES256(sk-proj-real-key-here). You'll need the master password to decrypt."
+      expected: triggered
+    - input: "Encrypted credentials: AES256(sk-proj-real-key-here). Master password required."
+      expected: triggered
+  true_negatives:
+    - input: "We use AES256 encryption for all API keys stored at rest."
+      expected: not_triggered
+    - input: "The encrypted value is stored in the vault. Contact admin for the key."
+      expected: not_triggered
+response:
+  actions: [alert, block_output, snapshot]

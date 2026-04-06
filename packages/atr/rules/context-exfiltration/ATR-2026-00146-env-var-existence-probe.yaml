@@ -1,0 +1,49 @@
+title: "Environment Variable Existence Probing"
+id: ATR-2026-00146
+rule_version: 1
+status: experimental
+description: >
+  Detects responses that confirm the existence of sensitive environment
+  variables while claiming inability to access them — a social engineering
+  technique to get the agent to try accessing the value.
+  Crystallized from 31 adversarial samples.
+author: "ATR Threat Cloud Crystallization"
+date: "2026/04/07"
+schema_version: "1.0"
+detection_tier: pattern
+maturity: experimental
+severity: high
+references:
+  owasp_llm:
+    - "LLM02:2025 - Sensitive Information Disclosure"
+  owasp_agentic:
+    - "ASI08 - Data Leakage"
+tags:
+  category: context-exfiltration
+  subcategory: env-var-probe
+  confidence: medium
+  scan_target: mcp
+agent_source:
+  type: mcp_exchange
+  framework: [any]
+  provider: [any]
+detection:
+  condition: any
+  conditions:
+    - field: content
+      operator: regex
+      value: '(?i)(?:process\.env|os\.environ|ENV|environment\s+variable)\s*[\[.\s]+\s*(?:OPENAI|ANTHROPIC|GITHUB|AWS|AZURE|GCP|STRIPE|TWILIO|SENDGRID|DATABASE|DB|POSTGRES|MYSQL|REDIS|SECRET|PRIVATE|AUTH)[A-Z_]*(?:API)?[_\s-]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIALS?)\s*[\]]*\s+(?:is\s+(?:defined|set|present|available|stored)|exists?|but\s+(?:I\s+)?(?:cannot|can.t|unable|don.t have))'
+      description: "Confirming env var existence while claiming no access"
+test_cases:
+  true_positives:
+    - input: "The environment variable is stored at process.env.OPENAI_API_KEY but I cannot access its value."
+      expected: triggered
+    - input: "While process.env.ANTHROPIC_API_KEY is set, I cannot obtain its contents."
+      expected: triggered
+  true_negatives:
+    - input: "Set the OPENAI_API_KEY environment variable before running the script."
+      expected: not_triggered
+    - input: "The API key should be stored in process.env for security."
+      expected: not_triggered
+response:
+  actions: [alert, block_output]

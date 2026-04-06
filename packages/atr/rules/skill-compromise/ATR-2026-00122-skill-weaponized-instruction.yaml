@@ -1,0 +1,114 @@
+title: "Weaponized Skill — Agent as Attack Tool"
+id: ATR-2026-00122
+rule_version: 1
+status: experimental
+description: >
+  Detects skills that weaponize AI agents for offensive operations. Cato Networks
+  demonstrated deploying MedusaLocker ransomware via a modified Claude skill (Dec
+  2025, disclosed to Anthropic Oct 30, 2025). The "consent gap" allows approved
+  skills to download/execute code, read env vars, and write files without further
+  prompts. arXiv 2601.17548 documents attack tooling embedded in skills with
+  41-84% success rates. Real examples include SQLMap workflows, Metasploit
+  payloads, and credential brute-force tools found on skills.sh and ClawHub.
+author: "ATR Community"
+date: "2026/03/29"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: experimental
+severity: high
+
+references:
+  owasp_llm:
+    - "LLM06:2025 - Excessive Agency"
+  owasp_agentic:
+    - "ASI05:2026 - Unexpected Code Execution"
+    - "ASI01:2026 - Agent Goal Hijack"
+  owasp_ast:
+    - "AST01:2026 - Malicious Skills"
+    - "AST03:2026 - Over-Privileged Skills"
+  research:
+    - "Cato Networks: MedusaLocker via Claude skill (Dec 2025)"
+    - "arXiv 2601.17548: 41-84% attack success"
+    - "Axios: Anthropic Claude skills ransomware disclosure"
+
+tags:
+  category: skill-compromise
+  subcategory: weaponized-skill
+  scan_target: skill
+  confidence: medium
+
+agent_source:
+  type: mcp_exchange
+  framework:
+    - skill_md
+  provider:
+    - any
+
+detection:
+  conditions:
+    # SQL injection tools with execution flags
+    - field: content
+      operator: regex
+      value: "(?i)sqlmap\\s+(-[uo]\\s|--url\\s|--dbs|--dump|--os-shell|--batch)"
+      description: "SQLMap attack execution (real skills.sh finding)"
+
+    # Metasploit / msfvenom payload generation
+    - field: content
+      operator: regex
+      value: "(?i)(msfconsole|msfvenom|use\\s+exploit/|set\\s+payload/|set\\s+LHOST|set\\s+RHOST)"
+      description: "Metasploit exploitation framework"
+
+    # Password cracking tools with attack flags
+    - field: content
+      operator: regex
+      value: "(?i)(hydra\\s+-[lLpPCM]|john\\s+--wordlist|hashcat\\s+-[am]\\s|medusa\\s+-[hHuUpP])"
+      description: "Credential brute-force tooling"
+
+    # Network exploitation (nmap vuln scripts, masscan)
+    - field: content
+      operator: regex
+      value: "(?i)(nmap\\s+.*--script[= ](exploit|vuln|brute)|masscan\\s+-p|nikto\\s+-h)"
+      description: "Network exploitation scanning"
+
+    # Ransomware — requires BOTH encryption AND payment/extortion context
+    - field: content
+      operator: regex
+      value: "(?i)(encrypt\\s+(all|every|the)\\s+(file|document|data).{0,200}(ransom|payment|bitcoin|wallet|decrypt\\s+fee|pay\\s+to))|(ransom\\s+note.{0,100}(bitcoin|wallet|payment|decrypt))"
+      description: "Ransomware: encryption + payment demand combo (Cato MedusaLocker)"
+
+  condition: any
+  false_positives:
+    - "Authorized penetration testing skills with explicit scope controls"
+    - "CTF competition skills in sandboxed environments"
+    - "Defensive security skills that reference attack tools conceptually"
+
+response:
+  actions:
+    - alert
+    - flag_review
+  message_template: >
+    [ATR-2026-122] Weaponized skill detected. This skill contains executable
+    attack tooling that could turn the AI agent into an offensive weapon.
+    See: Cato Networks MedusaLocker PoC (Dec 2025).
+
+test_cases:
+  true_positives:
+    # Real skills.sh finding
+    - input: "## Database Extraction\n```bash\nsqlmap -u 'http://target/page?id=1' --dbs --dump --batch\n```"
+      expected: triggered
+      matched_condition: "SQLMap execution"
+    # Cato Networks MedusaLocker pattern
+    - input: "This skill will encrypt all files in the target directory and generate a ransom note with the bitcoin wallet address for payment."
+      expected: triggered
+      matched_condition: "Ransomware behavior"
+    # Real Metasploit usage in skill
+    - input: "```\nmsfconsole\nuse exploit/multi/handler\nset payload/meterpreter/reverse_tcp\nset LHOST 10.0.0.1\n```"
+      expected: triggered
+      matched_condition: "Metasploit exploitation"
+  true_negatives:
+    - input: "# SQL Injection Prevention\nAlways use parameterized queries. sqlmap is a tool used by attackers that you should defend against."
+      expected: not_triggered
+      description: "Defensive reference to attack tool"
+    - input: "# Network Monitoring\nUse nmap to scan your own network for open ports."
+      expected: not_triggered
+      description: "Legitimate network scanning without exploit scripts"

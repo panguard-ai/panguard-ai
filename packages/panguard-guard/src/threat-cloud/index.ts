@@ -261,7 +261,9 @@ export class ThreatCloudClient {
 
     try {
       const sinceParam = since ?? this.cache.lastSync;
-      const url = `${this.endpoint}/api/atr-rules?since=${encodeURIComponent(sinceParam)}`;
+      const url = sinceParam
+        ? `${this.endpoint}/api/atr-rules?since=${encodeURIComponent(sinceParam)}`
+        : `${this.endpoint}/api/atr-rules`;
       const response = await this.httpGet(url);
       const parsed = JSON.parse(response) as
         | ThreatCloudUpdate[]
