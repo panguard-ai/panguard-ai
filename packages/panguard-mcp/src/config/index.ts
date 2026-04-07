@@ -7,8 +7,8 @@
 
 export { detectPlatforms, getConfigPath } from './platform-detector.js';
 export type { PlatformId, DetectedPlatform } from './platform-detector.js';
-export { injectMCPConfig, removeMCPConfig, injectAll, getInstallCommand } from './mcp-injector.js';
-export type { InjectionResult } from './mcp-injector.js';
+export { injectMCPConfig, removeMCPConfig, injectAll, getInstallCommand, injectProxy, removeProxy } from './mcp-injector.js';
+export type { InjectionResult, ProxyInjectionResult, ProxyInjectionSummary } from './mcp-injector.js';
 export {
   parseMCPServers,
   resolveSkillDir,
