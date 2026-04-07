@@ -110,10 +110,21 @@ export class DashboardServer {
         }
 
         const origin = req.headers.origin ?? '';
-        if (origin && !origin.includes('127.0.0.1') && !origin.includes('localhost')) {
-          logger.warn(`Rejected WebSocket from origin: ${origin}`);
-          ws.close();
-          return;
+        // Strict origin check: must be exactly loopback or absent (native clients)
+        if (origin) {
+          try {
+            const parsed = new URL(origin);
+            const isLoopback = parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost' || parsed.hostname === '::1';
+            if (!isLoopback) {
+              logger.warn(`Rejected WebSocket from non-loopback origin: ${origin}`);
+              ws.close();
+              return;
+            }
+          } catch {
+            logger.warn(`Rejected WebSocket with malformed origin: ${origin}`);
+            ws.close();
+            return;
+          }
         }
 
         const client: WSClient = { ws, alive: true, connectedAt: Date.now() };
@@ -488,9 +499,28 @@ export class DashboardServer {
   private static isValidEndpointUrl(url: string): boolean {
     try {
       const parsed = new URL(url);
-      return (
-        (parsed.protocol === 'https:' || parsed.protocol === 'http:') && parsed.hostname.length > 0
-      );
+      if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return false;
+      if (parsed.hostname.length === 0) return false;
+
+      // Block private/internal IPs to prevent SSRF
+      const h = parsed.hostname.toLowerCase();
+      if (
+        h === 'localhost' ||
+        h.startsWith('127.') ||
+        h.startsWith('10.') ||
+        h.startsWith('192.168.') ||
+        h === '169.254.169.254' ||
+        h.startsWith('169.254.') ||
+        h === '[::1]' ||
+        h === '0.0.0.0'
+      ) return false;
+      // Block 172.16.0.0/12
+      if (h.startsWith('172.')) {
+        const second = parseInt(h.split('.')[1] ?? '0', 10);
+        if (second >= 16 && second <= 31) return false;
+      }
+
+      return true;
     } catch {
       return false;
     }

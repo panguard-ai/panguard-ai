@@ -19,8 +19,9 @@ const DASHBOARD_URL = 'http://127.0.0.1:3100';
 function openBrowser(url: string): void {
   const os = platform();
   if (os === 'win32') {
-    // Use COMSPEC to find cmd.exe — works in cmd, PowerShell, Git Bash, WSL
-    const cmd = process.env['COMSPEC'] || 'C:\\Windows\\System32\\cmd.exe';
+    // Hardcode cmd.exe path — never trust COMSPEC env var (attacker-controllable)
+    const systemRoot = process.env['SystemRoot'] || 'C:\\Windows';
+    const cmd = `${systemRoot}\\System32\\cmd.exe`;
     execFile(cmd, ['/c', 'start', '', url], () => {});
   } else if (os === 'darwin') {
     execFile('open', [url], () => {});
