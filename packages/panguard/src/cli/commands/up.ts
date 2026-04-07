@@ -287,17 +287,36 @@ export function upCommand(): Command {
         await runCLI(args);
       }
 
+      // ── Read actual rule count from TC cache ──────────
+      let ruleCount = 100;
+      let tcRulesReceived = 0;
+      let tcStatus = 'connected';
+      try {
+        // Read TC cache directly (written by guard after initial sync)
+        const cachePath = join(homedir(), '.panguard-guard', 'threat-cloud-cache.json');
+        if (existsSync(cachePath)) {
+          const cache = JSON.parse(readFileSync(cachePath, 'utf-8')) as {
+            totalRulesReceived?: number; lastSync?: string;
+          };
+          tcRulesReceived = cache.totalRulesReceived ?? 0;
+          if (tcRulesReceived > 0) {
+            ruleCount = 100 + tcRulesReceived; // base ATR + TC crystallized
+            tcStatus = `connected (${tcRulesReceived} rules from TC)`;
+          }
+        }
+      } catch { /* cache might not exist yet */ }
+
       // ── Clean summary panel ────────────────────────────────
       console.log(`\n  ${c.dim('\u2500'.repeat(50))}`);
       console.log(`  ${c.safe(c.bold('PROTECTED'))} ${c.dim(`\u2014 ${elapsed}s`)}`);
       console.log(`  ${c.dim('\u2500'.repeat(50))}`);
       console.log('');
       console.log(`  ${c.sage('Dashboard')}     ${DASHBOARD_URL}`);
-      console.log(`  ${c.sage('Rules')}         100 ATR detection rules active`);
+      console.log(`  ${c.sage('Rules')}         ${ruleCount} detection rules active`);
       if (platformCount > 0) {
         console.log(`  ${c.sage('Platforms')}     ${platformCount} detected, ${serverCount} server(s) proxied`);
       }
-      console.log(`  ${c.sage('Threat Cloud')}  connected (tc.panguard.ai)`);
+      console.log(`  ${c.sage('Threat Cloud')}  ${tcStatus}`);
       console.log('');
 
       // ── Next steps ─────────────────────────────────────────

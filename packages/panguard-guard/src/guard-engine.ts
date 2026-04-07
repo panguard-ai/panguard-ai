@@ -214,7 +214,7 @@ export class GuardEngine {
       this.config
     );
 
-    // Periodic Threat Cloud sync (every hour) + initial sync
+    // Periodic Threat Cloud sync (every hour) + initial sync (await on startup)
     const syncDeps = {
       atrEngine: this.engines.atrEngine,
       threatCloud: this.engines.threatCloud,
@@ -222,7 +222,8 @@ export class GuardEngine {
       config: this.config,
     };
     this.cloudSyncTimer = setupCloudSyncTimer(syncDeps);
-    void syncThreatCloud(syncDeps);
+    // Await initial sync so guard starts with latest rules from TC
+    await syncThreatCloud(syncDeps);
 
     // Start monitor engine
     this.monitorEngine = new MonitorEngine({
