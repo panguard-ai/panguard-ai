@@ -259,7 +259,7 @@ export class DashboardServer {
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' ws://127.0.0.1:* ws://localhost:*"
+      "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' ws://127.0.0.1:* ws://localhost:*"
     );
 
     if (req.method === 'OPTIONS') {
@@ -1599,7 +1599,7 @@ cWS();loadInitData();
 // Apply persisted/detected language on load (TL toggles, so apply directly)
 if(lang==='zh'){document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(T.zh[k]){if(e.tagName==='INPUT')e.placeholder=T.zh[k];else if(k.indexOf('t_')===0||k.indexOf('d_')===0||k==='go_ai')e.innerHTML=T.zh[k];else e.textContent=T.zh[k]}});document.querySelectorAll('[data-i18n-wc]').forEach(function(e){var k=e.getAttribute('data-i18n-wc');if(T.zh[k]){if(k==='wc_title')e.innerHTML=T.zh[k];else e.textContent=T.zh[k]}});}
 var welcomed=localStorage.getItem('panguard_welcomed');
-if(welcomed){document.getElementById('welcome').style.display='none';return}
+if(welcomed){document.getElementById('welcome').style.display='none';nav('dashboard');return}
 bar.style.width='10%';
 var steps=document.querySelectorAll('.wc-step .wc-icon');
 // Step 1: load rules (real API)
