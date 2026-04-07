@@ -606,7 +606,8 @@ export class DashboardServer {
     }
 
     let clientId = '';
-    const clientIdPath = join(dataDir, 'client-id');
+    // Client ID lives in ~/.panguard/client-id (not dataDir which is ~/.panguard-guard)
+    const clientIdPath = join(homedir(), '.panguard', 'client-id');
     if (existsSync(clientIdPath)) {
       try {
         const fullId = readFileSync(clientIdPath, 'utf-8').trim();
