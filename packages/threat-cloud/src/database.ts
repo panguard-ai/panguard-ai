@@ -1183,7 +1183,9 @@ export class ThreatCloudDB {
   getNegativeFeedbackCount(ruleId: string): number {
     return (
       this.db
-        .prepare('SELECT COUNT(*) as count FROM atr_feedback WHERE rule_id = ? AND is_true_positive = 0')
+        .prepare(
+          'SELECT COUNT(*) as count FROM atr_feedback WHERE rule_id = ? AND is_true_positive = 0'
+        )
         .get(ruleId) as { count: number }
     ).count;
   }
@@ -1199,7 +1201,12 @@ export class ThreatCloudDB {
   }
 
   /** Get canary rules (for 10% client sampling) / 取得 canary 規則（供 10% 客戶端抽樣） */
-  getCanaryATRRules(): Array<{ ruleId: string; ruleContent: string; publishedAt: string; source: string }> {
+  getCanaryATRRules(): Array<{
+    ruleId: string;
+    ruleContent: string;
+    publishedAt: string;
+    source: string;
+  }> {
     return this.db
       .prepare(
         `SELECT pattern_hash as ruleId, rule_content as ruleContent, canary_started_at as publishedAt, 'atr-canary' as source
@@ -1687,7 +1694,13 @@ export class ThreatCloudDB {
          WHERE content_hash = ? AND expires_at > datetime('now')`
       )
       .get(contentHash) as
-      | { content_hash: string; skill_name: string; verdict: string; scanned_at: string; scan_count: number }
+      | {
+          content_hash: string;
+          skill_name: string;
+          verdict: string;
+          scanned_at: string;
+          scan_count: number;
+        }
       | undefined;
 
     if (!row) return null;
@@ -1740,7 +1753,7 @@ export class ThreatCloudDB {
 
   /** Get the latest (non-superseded) hash entry for a skill. */
   getLatestSkillHash(
-    skillName: string,
+    skillName: string
   ): { readonly contentHash: string; readonly scanVerdict: string | null } | null {
     const row = this.db
       .prepare(
@@ -1750,9 +1763,7 @@ export class ThreatCloudDB {
          ORDER BY last_seen DESC
          LIMIT 1`
       )
-      .get(skillName) as
-      | { content_hash: string; scan_verdict: string | null }
-      | undefined;
+      .get(skillName) as { content_hash: string; scan_verdict: string | null } | undefined;
 
     if (!row) return null;
     return { contentHash: row.content_hash, scanVerdict: row.scan_verdict };
@@ -1777,7 +1788,7 @@ export class ThreatCloudDB {
         entry.skillName,
         entry.contentHash,
         entry.scanVerdict ?? null,
-        entry.rugPullFlag ? 1 : 0,
+        entry.rugPullFlag ? 1 : 0
       );
   }
 
@@ -1793,9 +1804,7 @@ export class ThreatCloudDB {
   }
 
   /** Get full hash history for a skill (audit trail). */
-  getSkillHashHistory(
-    skillName: string,
-  ): ReadonlyArray<{
+  getSkillHashHistory(skillName: string): ReadonlyArray<{
     readonly contentHash: string;
     readonly firstSeen: string;
     readonly lastSeen: string;

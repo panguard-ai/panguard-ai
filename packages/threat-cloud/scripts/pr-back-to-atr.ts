@@ -85,7 +85,11 @@ function parseAndValidateRule(ruleContent: string): {
 
   // Must have test_cases with true_positives
   const testCases = parsed['test_cases'] as Record<string, unknown> | undefined;
-  if (!testCases?.['true_positives'] || !Array.isArray(testCases['true_positives']) || testCases['true_positives'].length === 0) {
+  if (
+    !testCases?.['true_positives'] ||
+    !Array.isArray(testCases['true_positives']) ||
+    testCases['true_positives'].length === 0
+  ) {
     errors.push('Missing test_cases.true_positives (required for Cisco-quality rules)');
   }
 
@@ -100,7 +104,10 @@ function parseAndValidateRule(ruleContent: string): {
   const tags = parsed['tags'] as Record<string, unknown> | undefined;
   const category = String(tags?.['category'] ?? 'unknown');
   const title = String(parsed['title'] ?? 'unknown');
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50);
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .slice(0, 50);
 
   return { valid: errors.length === 0, id, category, slug, errors };
 }
@@ -144,25 +151,31 @@ function openPR(ruleFilePath: string, ruleId: string, title: string, category: s
 
   // Use gh CLI to create PR
   try {
-    execSync(`gh api repos/${ATR_REPO}/git/refs -f ref=refs/heads/${branchName} -f sha=$(gh api repos/${ATR_REPO}/git/refs/heads/main -q .object.sha)`, {
-      env: { ...process.env, GH_TOKEN: GITHUB_TOKEN },
-      stdio: 'pipe',
-    });
+    execSync(
+      `gh api repos/${ATR_REPO}/git/refs -f ref=refs/heads/${branchName} -f sha=$(gh api repos/${ATR_REPO}/git/refs/heads/main -q .object.sha)`,
+      {
+        env: { ...process.env, GH_TOKEN: GITHUB_TOKEN },
+        stdio: 'pipe',
+      }
+    );
   } catch {
     console.log(`Branch ${branchName} may already exist, continuing...`);
   }
 
   // Create/update file via GitHub API
   const content = Buffer.from(readFileSync(ruleFilePath, 'utf-8')).toString('base64');
-  execSync(`gh api repos/${ATR_REPO}/contents/${ruleFilePath} -X PUT -f message="${commitMsg}" -f content="${content}" -f branch="${branchName}"`, {
-    env: { ...process.env, GH_TOKEN: GITHUB_TOKEN },
-    stdio: 'pipe',
-  });
+  execSync(
+    `gh api repos/${ATR_REPO}/contents/${ruleFilePath} -X PUT -f message="${commitMsg}" -f content="${content}" -f branch="${branchName}"`,
+    {
+      env: { ...process.env, GH_TOKEN: GITHUB_TOKEN },
+      stdio: 'pipe',
+    }
+  );
 
   // Create PR
   const prUrl = execSync(
     `gh pr create --repo ${ATR_REPO} --base main --head ${branchName} --title "${commitMsg}" --body "${prBody.replace(/"/g, '\\"')}"`,
-    { env: { ...process.env, GH_TOKEN: GITHUB_TOKEN }, encoding: 'utf-8' },
+    { env: { ...process.env, GH_TOKEN: GITHUB_TOKEN }, encoding: 'utf-8' }
   ).trim();
 
   console.log(`PR created: ${prUrl}`);
@@ -210,7 +223,12 @@ async function main() {
     console.log(`SUBMIT ${validation.id} → ${filePath}`);
 
     try {
-      openPR(filePath, validation.id, String(yaml.load(rule.rule_content) as Record<string, unknown>).slice(0, 50), validation.category);
+      openPR(
+        filePath,
+        validation.id,
+        String(yaml.load(rule.rule_content) as Record<string, unknown>).slice(0, 50),
+        validation.category
+      );
       submitted++;
     } catch (e) {
       console.error(`Failed to open PR for ${validation.id}: ${e}`);

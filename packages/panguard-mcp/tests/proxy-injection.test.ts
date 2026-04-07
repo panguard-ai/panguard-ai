@@ -195,8 +195,12 @@ describe('proxy injection', () => {
       let skippedCount = 0;
 
       for (const [name, server] of Object.entries(config.mcpServers)) {
-        const isPanguard = name === 'panguard' || server.args.some((a: string) => a.includes('@panguard-ai/panguard-mcp'));
-        const isAlreadyProxied = server.args.some((a: string) => a.includes('@panguard-ai/panguard-mcp-proxy'));
+        const isPanguard =
+          name === 'panguard' ||
+          server.args.some((a: string) => a.includes('@panguard-ai/panguard-mcp'));
+        const isAlreadyProxied = server.args.some((a: string) =>
+          a.includes('@panguard-ai/panguard-mcp-proxy')
+        );
 
         if (isPanguard || isAlreadyProxied) {
           skippedCount++;

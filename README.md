@@ -133,13 +133,13 @@ Agent ←→ [PanGuard Proxy] ←→ Real MCP Server
 
 We scanned the two largest MCP skill registries: OpenClaw (50,285) and Skills.sh (3,115).
 
-|                   | Count  |
-| ----------------- | ------ |
-| Skills scanned    | 53,377 |
-| Clean             | 47,438 (88.87%) |
-| **CRITICAL**      | 3,255  |
-| **HIGH**          | 2,656  |
-| **MEDIUM**        | 28     |
+|                | Count           |
+| -------------- | --------------- |
+| Skills scanned | 53,377          |
+| Clean          | 47,438 (88.87%) |
+| **CRITICAL**   | 3,255           |
+| **HIGH**       | 2,656           |
+| **MEDIUM**     | 28              |
 
 Raw data: [ecosystem-report.csv](https://github.com/Agent-Threat-Rule/agent-threat-rules/tree/main/data/clawhub-scan) (open source)
 
@@ -151,12 +151,12 @@ Raw data: [ecosystem-report.csv](https://github.com/Agent-Threat-Rule/agent-thre
 
 ATR is not a competing standard. It is the detection layer that makes standards enforceable.
 
-| Layer           | What it does                 | Project                                                                    |
-| --------------- | ---------------------------- | -------------------------------------------------------------------------- |
-| **Standards**   | Define threat categories     | [SAFE-MCP](https://openssf.org/) (OpenSSF, $12.5M)                         |
-| **Taxonomy**    | Enumerate attack surfaces    | [OWASP Agentic Top 10](https://genai.owasp.org/)                           |
+| Layer           | What it does                 | Project                                                                     |
+| --------------- | ---------------------------- | --------------------------------------------------------------------------- |
+| **Standards**   | Define threat categories     | [SAFE-MCP](https://openssf.org/) (OpenSSF, $12.5M)                          |
+| **Taxonomy**    | Enumerate attack surfaces    | [OWASP Agentic Top 10](https://genai.owasp.org/)                            |
 | **Detection**   | Match threats in real time   | [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) -- 100 rules |
-| **Enforcement** | Scan, monitor, block, report | **PanGuard** (this project)                                                |
+| **Enforcement** | Scan, monitor, block, report | **PanGuard** (this project)                                                 |
 
 - OWASP Agentic Top 10: **10/10 categories covered** ([mapping](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md))
 - SAFE-MCP techniques: **91.8% covered** ([mapping](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/SAFE-MCP-MAPPING.md))

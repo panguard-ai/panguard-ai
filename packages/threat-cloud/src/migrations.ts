@@ -143,9 +143,9 @@ export const migrations: readonly Migration[] = [
     version: 5,
     name: 'add_canary_staging_columns',
     up: (db) => {
-      const existing = db
-        .prepare("PRAGMA table_info('atr_proposals')")
-        .all() as Array<{ name: string }>;
+      const existing = db.prepare("PRAGMA table_info('atr_proposals')").all() as Array<{
+        name: string;
+      }>;
       const columnNames = new Set(existing.map((c) => c.name));
 
       if (!columnNames.has('canary_started_at')) {

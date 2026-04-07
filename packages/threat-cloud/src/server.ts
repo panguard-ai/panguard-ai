@@ -983,7 +983,10 @@ export class ThreatCloudServer {
       }
     }
 
-    this.sendJson(res, 201, { ok: true, data: { message: 'Feedback received', quarantined: false } });
+    this.sendJson(res, 201, {
+      ok: true,
+      data: { message: 'Feedback received', quarantined: false },
+    });
   }
 
   /** POST /api/skill-threats - Submit skill threat from audit */
@@ -1326,7 +1329,9 @@ response:
     const skills = data.skills;
 
     // Compute content hash for each skill (deterministic: sorted tools, null-byte separated)
-    const computeHash = (tools: ReadonlyArray<{ readonly name: string; readonly description: string }>): string => {
+    const computeHash = (
+      tools: ReadonlyArray<{ readonly name: string; readonly description: string }>
+    ): string => {
       const canonical = [...tools]
         .map((t) => `${t.name}\n${t.description}`)
         .sort()
@@ -1346,8 +1351,15 @@ response:
     };
 
     const allResults: PerSkillResult[] = [];
-    const uncachedSkills: Array<{ package: string; tools: Array<{ name: string; description: string }> }> = [];
-    const uncachedMeta: Array<{ contentHash: string; rugPull: boolean; previousVerdict: string | null }> = [];
+    const uncachedSkills: Array<{
+      package: string;
+      tools: Array<{ name: string; description: string }>;
+    }> = [];
+    const uncachedMeta: Array<{
+      contentHash: string;
+      rugPull: boolean;
+      previousVerdict: string | null;
+    }> = [];
 
     log.info(`Analyzing ${skills.length} skills (checking cache + rug pull)`, {
       packages: skills.map((s) => s.package),
@@ -1374,7 +1386,12 @@ response:
       if (!rugPullDetected) {
         const cached = this.db.getVerdictCache(contentHash);
         if (cached) {
-          let verdict: { threatsFound: boolean; proposalCount: number; patternHashes: string[]; status: string };
+          let verdict: {
+            threatsFound: boolean;
+            proposalCount: number;
+            patternHashes: string[];
+            status: string;
+          };
           try {
             verdict = JSON.parse(cached.verdict);
           } catch {
@@ -1461,8 +1478,11 @@ response:
             let prevClean = true;
             if (meta.previousVerdict) {
               try {
-                prevClean = !(JSON.parse(meta.previousVerdict) as { threatsFound: boolean }).threatsFound;
-              } catch { /* treat as clean if unparseable */ }
+                prevClean = !(JSON.parse(meta.previousVerdict) as { threatsFound: boolean })
+                  .threatsFound;
+              } catch {
+                /* treat as clean if unparseable */
+              }
             }
             if (prevClean) {
               log.info(`[RUG PULL CONFIRMED] ${r.package} went from clean to malicious`, {

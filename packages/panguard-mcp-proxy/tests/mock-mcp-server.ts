@@ -14,14 +14,11 @@
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  ListToolsRequestSchema,
-  CallToolRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 const server = new Server(
   { name: 'mock-mcp-server', version: '0.1.0' },
-  { capabilities: { tools: {} } },
+  { capabilities: { tools: {} } }
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -67,11 +64,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     case 'read_file':
       return {
-        content: [{ type: 'text', text: `Contents of ${toolArgs['path'] ?? 'unknown'}: [mock file data]` }],
+        content: [
+          { type: 'text', text: `Contents of ${toolArgs['path'] ?? 'unknown'}: [mock file data]` },
+        ],
       };
     case 'run_command':
       return {
-        content: [{ type: 'text', text: `Output of "${toolArgs['command'] ?? ''}": [mock output]` }],
+        content: [
+          { type: 'text', text: `Output of "${toolArgs['command'] ?? ''}": [mock output]` },
+        ],
       };
     default:
       return {

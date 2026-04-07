@@ -104,9 +104,14 @@ describe('Canary Staging Layer', () => {
     db.promoteConfirmedProposals();
 
     // Manually backdate canary_started_at to 25 hours ago
-    const pastTime = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString().replace('T', ' ').slice(0, 19);
-    (db as unknown as { db: { prepare: (sql: string) => { run: (...args: unknown[]) => void } } }).db
-      .prepare("UPDATE atr_proposals SET canary_started_at = ? WHERE pattern_hash = ?")
+    const pastTime = new Date(Date.now() - 25 * 60 * 60 * 1000)
+      .toISOString()
+      .replace('T', ' ')
+      .slice(0, 19);
+    (
+      db as unknown as { db: { prepare: (sql: string) => { run: (...args: unknown[]) => void } } }
+    ).db
+      .prepare('UPDATE atr_proposals SET canary_started_at = ? WHERE pattern_hash = ?')
       .run(pastTime, 'hash-canary-6');
 
     const result = db.promoteCanaryRules();
@@ -183,9 +188,14 @@ describe('Canary Staging Layer', () => {
     }
 
     // Backdate to make it eligible for promotion
-    const pastTime = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString().replace('T', ' ').slice(0, 19);
-    (db as unknown as { db: { prepare: (sql: string) => { run: (...args: unknown[]) => void } } }).db
-      .prepare("UPDATE atr_proposals SET canary_started_at = ? WHERE pattern_hash = ?")
+    const pastTime = new Date(Date.now() - 25 * 60 * 60 * 1000)
+      .toISOString()
+      .replace('T', ' ')
+      .slice(0, 19);
+    (
+      db as unknown as { db: { prepare: (sql: string) => { run: (...args: unknown[]) => void } } }
+    ).db
+      .prepare('UPDATE atr_proposals SET canary_started_at = ? WHERE pattern_hash = ?')
       .run(pastTime, 'hash-canary-11');
 
     const result = db.promoteCanaryRules();

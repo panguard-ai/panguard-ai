@@ -35,7 +35,9 @@ function logVerdict(entry: Record<string, unknown>): void {
   try {
     mkdirSync(join(homedir(), '.panguard-guard'), { recursive: true });
     appendFileSync(VERDICT_LOG, JSON.stringify({ ...entry, ts: new Date().toISOString() }) + '\n');
-  } catch { /* best-effort logging */ }
+  } catch {
+    /* best-effort logging */
+  }
 }
 
 export interface ProxyConfig {
@@ -77,15 +79,17 @@ export class MCPProxy {
     });
     this.client = new Client(
       { name: 'panguard-mcp-proxy', version: '0.1.0' },
-      { capabilities: {} },
+      { capabilities: {} }
     );
     await this.client.connect(upstreamTransport);
-    process.stderr.write(`[panguard-proxy] Connected to upstream: ${this.config.upstreamCommand}\n`);
+    process.stderr.write(
+      `[panguard-proxy] Connected to upstream: ${this.config.upstreamCommand}\n`
+    );
 
     // Create proxy server facing the agent
     this.server = new Server(
       { name: 'panguard-mcp-proxy', version: '0.1.0' },
-      { capabilities: { tools: {}, resources: {}, prompts: {} } },
+      { capabilities: { tools: {}, resources: {}, prompts: {} } }
     );
 
     this.registerHandlers();
@@ -93,7 +97,9 @@ export class MCPProxy {
     // Connect to agent via stdio
     const agentTransport = new StdioServerTransport();
     await this.server.connect(agentTransport);
-    process.stderr.write(`[panguard-proxy] Proxy active. ${ruleCount} rules protecting all tool calls.\n`);
+    process.stderr.write(
+      `[panguard-proxy] Proxy active. ${ruleCount} rules protecting all tool calls.\n`
+    );
   }
 
   private registerHandlers(): void {
@@ -122,8 +128,14 @@ export class MCPProxy {
         ]);
       } catch {
         // Timeout or error → respect failMode
-        const fallbackOutcome = this.failMode === 'closed' ? 'deny' as const : 'allow' as const;
-        preResult = { outcome: fallbackOutcome, reason: `Evaluation error (fail-${this.failMode})`, matchedRules: [] as string[], confidence: 0, durationMs: this.evalTimeout };
+        const fallbackOutcome = this.failMode === 'closed' ? ('deny' as const) : ('allow' as const);
+        preResult = {
+          outcome: fallbackOutcome,
+          reason: `Evaluation error (fail-${this.failMode})`,
+          matchedRules: [] as string[],
+          confidence: 0,
+          durationMs: this.evalTimeout,
+        };
       }
 
       logVerdict({
@@ -166,8 +178,15 @@ export class MCPProxy {
             ),
           ]);
         } catch {
-          const fallbackOutcome = this.failMode === 'closed' ? 'deny' as const : 'allow' as const;
-          postResult = { outcome: fallbackOutcome, reason: `Post-eval error (fail-${this.failMode})`, matchedRules: [] as string[], confidence: 0, durationMs: this.evalTimeout };
+          const fallbackOutcome =
+            this.failMode === 'closed' ? ('deny' as const) : ('allow' as const);
+          postResult = {
+            outcome: fallbackOutcome,
+            reason: `Post-eval error (fail-${this.failMode})`,
+            matchedRules: [] as string[],
+            confidence: 0,
+            durationMs: this.evalTimeout,
+          };
         }
 
         logVerdict({
@@ -180,7 +199,9 @@ export class MCPProxy {
         });
 
         if (postResult.outcome === 'deny') {
-          process.stderr.write(`[panguard-proxy] BLOCKED response: ${name} — ${postResult.reason}\n`);
+          process.stderr.write(
+            `[panguard-proxy] BLOCKED response: ${name} — ${postResult.reason}\n`
+          );
           return {
             content: [
               {

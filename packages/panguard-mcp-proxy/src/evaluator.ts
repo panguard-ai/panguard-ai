@@ -28,7 +28,9 @@ function findRulesDir(): string {
     const pkg = require.resolve('@panguard-ai/atr/package.json');
     const candidate = resolve(dirname(pkg), 'rules');
     if (existsSync(candidate)) return candidate;
-  } catch { /* continue */ }
+  } catch {
+    /* continue */
+  }
 
   // Fallback: global ATR install
   const global = resolve(__dirname, '..', '..', '..', 'agent-threat-rules', 'rules');
@@ -116,7 +118,13 @@ export class ProxyEvaluator {
       const durationMs = Date.now() - start;
 
       if (matches.length === 0) {
-        return { outcome: 'allow', reason: 'No threats detected', matchedRules: [], confidence: 0, durationMs };
+        return {
+          outcome: 'allow',
+          reason: 'No threats detected',
+          matchedRules: [],
+          confidence: 0,
+          durationMs,
+        };
       }
 
       // Check highest severity match
@@ -137,7 +145,13 @@ export class ProxyEvaluator {
       };
     } catch {
       // Fail-open: if evaluation crashes, allow the call
-      return { outcome: 'allow', reason: 'Evaluation error (fail-open)', matchedRules: [], confidence: 0, durationMs: Date.now() - start };
+      return {
+        outcome: 'allow',
+        reason: 'Evaluation error (fail-open)',
+        matchedRules: [],
+        confidence: 0,
+        durationMs: Date.now() - start,
+      };
     }
   }
 }

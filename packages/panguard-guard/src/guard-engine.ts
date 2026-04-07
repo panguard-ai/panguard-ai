@@ -576,7 +576,9 @@ export class GuardEngine {
     if (existsSync(verdictPath)) {
       try {
         this.proxyVerdictOffset = statSync(verdictPath).size;
-      } catch { /* start from 0 */ }
+      } catch {
+        /* start from 0 */
+      }
     }
 
     this.proxyVerdictWatcher = setInterval(() => {
@@ -600,16 +602,24 @@ export class GuardEngine {
           try {
             const verdict = JSON.parse(newLines[i]!) as Record<string, unknown>;
             // Validate expected schema — reject unexpected shapes
-            if (typeof verdict['outcome'] !== 'string' || typeof verdict['phase'] !== 'string') continue;
+            if (typeof verdict['outcome'] !== 'string' || typeof verdict['phase'] !== 'string')
+              continue;
             // Sanitize string fields before pushing to dashboard
             const sanitized = {
               outcome: String(verdict['outcome']).slice(0, 10),
               phase: String(verdict['phase']).slice(0, 10),
               tool: typeof verdict['tool'] === 'string' ? verdict['tool'].slice(0, 200) : '',
               reason: typeof verdict['reason'] === 'string' ? verdict['reason'].slice(0, 500) : '',
-              rules: Array.isArray(verdict['rules']) ? (verdict['rules'] as unknown[]).filter((r): r is string => typeof r === 'string').slice(0, 20) : [],
+              rules: Array.isArray(verdict['rules'])
+                ? (verdict['rules'] as unknown[])
+                    .filter((r): r is string => typeof r === 'string')
+                    .slice(0, 20)
+                : [],
               ms: typeof verdict['ms'] === 'number' ? verdict['ms'] : 0,
-              ts: typeof verdict['ts'] === 'string' ? verdict['ts'].slice(0, 30) : new Date().toISOString(),
+              ts:
+                typeof verdict['ts'] === 'string'
+                  ? verdict['ts'].slice(0, 30)
+                  : new Date().toISOString(),
             };
             this.dashboard!.pushEvent({
               type: 'proxy_verdict',
@@ -621,20 +631,28 @@ export class GuardEngine {
               denyCount++;
               this.threatsDetected++;
             }
-          } catch { /* skip malformed lines */ }
+          } catch {
+            /* skip malformed lines */
+          }
         }
 
         // Report proxy scan events to Threat Cloud for flywheel
         if (newLines.length > 0) {
-          this.engines.threatCloud.reportScanEvent({
-            source: 'cli-user',
-            skillsScanned: newLines.length,
-            findingsCount: denyCount,
-            confirmedMalicious: denyCount,
-            cleanCount: newLines.length - denyCount,
-          }).catch(() => { /* best effort */ });
+          this.engines.threatCloud
+            .reportScanEvent({
+              source: 'cli-user',
+              skillsScanned: newLines.length,
+              findingsCount: denyCount,
+              confirmedMalicious: denyCount,
+              cleanCount: newLines.length - denyCount,
+            })
+            .catch(() => {
+              /* best effort */
+            });
         }
-      } catch { /* file read error, skip this cycle */ }
+      } catch {
+        /* file read error, skip this cycle */
+      }
     }, 2000);
   }
 

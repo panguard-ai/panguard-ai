@@ -35,12 +35,12 @@ async function main(): Promise<void> {
   if (!upstream) {
     process.stderr.write(
       'PanGuard MCP Proxy — runtime protection for AI agent tool calls\n\n' +
-      'Usage: panguard-mcp-proxy -- <command> [args...]\n\n' +
-      'Examples:\n' +
-      '  panguard-mcp-proxy -- npx @modelcontextprotocol/server-filesystem /tmp\n' +
-      '  panguard-mcp-proxy -- node my-mcp-server.js\n\n' +
-      'In MCP config:\n' +
-      '  { "command": "npx", "args": ["-y", "@panguard-ai/panguard-mcp-proxy", "--", "npx", "your-server"] }\n'
+        'Usage: panguard-mcp-proxy -- <command> [args...]\n\n' +
+        'Examples:\n' +
+        '  panguard-mcp-proxy -- npx @modelcontextprotocol/server-filesystem /tmp\n' +
+        '  panguard-mcp-proxy -- node my-mcp-server.js\n\n' +
+        'In MCP config:\n' +
+        '  { "command": "npx", "args": ["-y", "@panguard-ai/panguard-mcp-proxy", "--", "npx", "your-server"] }\n'
     );
     process.exit(1);
   }
@@ -54,6 +54,8 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  process.stderr.write(`[panguard-proxy] Fatal error: ${err instanceof Error ? err.message : String(err)}\n`);
+  process.stderr.write(
+    `[panguard-proxy] Fatal error: ${err instanceof Error ? err.message : String(err)}\n`
+  );
   process.exit(1);
 });
