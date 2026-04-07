@@ -502,11 +502,13 @@ async function commandStart(
         // Feed daily summary
         dailySummary.recordEvent();
 
-        console.log(
-          c.dim(
-            `  [${time}] Events: ${events.toLocaleString()} | Threats: ${threats} | Uploaded: ${uploaded}`
-          )
-        );
+        if (!process.env['PANGUARD_QUIET_GUARD']) {
+          console.log(
+            c.dim(
+              `  [${time}] Events: ${events.toLocaleString()} | Threats: ${threats} | Uploaded: ${uploaded}`
+            )
+          );
+        }
       } else if (type === 'threat') {
         const time = new Date().toLocaleTimeString('en-US', { hour12: false });
         const confidence = Number(data['confidence'] ?? 0);
@@ -546,8 +548,10 @@ async function commandStart(
       }
     });
 
-    console.log(c.dim('  Press Ctrl+C to stop'));
-    console.log('');
+    if (!process.env['PANGUARD_QUIET_GUARD']) {
+      console.log(c.dim('  Press Ctrl+C to stop'));
+      console.log('');
+    }
   }
 }
 

@@ -250,6 +250,9 @@ export class DashboardServer {
   }
 
   private handleRequest(req: IncomingMessage, res: ServerResponse): void {
+    // Generate per-request nonce for CSP — eliminates unsafe-inline for scripts
+    const nonce = randomBytes(16).toString('base64');
+
     res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:' + this.port);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -259,7 +262,7 @@ export class DashboardServer {
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' ws://127.0.0.1:* ws://localhost:*"
+      `default-src 'self'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' ws://127.0.0.1:* ws://localhost:*`
     );
 
     if (req.method === 'OPTIONS') {
@@ -278,7 +281,7 @@ export class DashboardServer {
     const url = req.url ?? '/';
 
     if (url === '/') {
-      this.serveIndex(res);
+      this.serveIndex(res, nonce);
       return;
     }
 
@@ -381,13 +384,15 @@ export class DashboardServer {
     return entry.count <= RATE_LIMIT_MAX;
   }
 
-  private serveIndex(res: ServerResponse): void {
+  private serveIndex(res: ServerResponse, nonce: string): void {
     // Set auth token as HttpOnly cookie — never exposed in HTML source or JS
+    // Inject nonce into <script> tag for CSP compliance
+    const html = DASHBOARD_HTML.replace('<script>', `<script nonce="${nonce}">`);
     res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8',
       'Set-Cookie': `panguard_auth=${this.authToken}; HttpOnly; SameSite=Strict; Path=/`,
     });
-    res.end(DASHBOARD_HTML);
+    res.end(html);
   }
 
   private jsonResponse(res: ServerResponse, data: unknown, statusCode = 200): void {
