@@ -10,7 +10,7 @@
  * @module @panguard-ai/panguard-guard/threat-cloud
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, chmodSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { request as httpsRequest } from 'node:https';
 import { request as httpRequest } from 'node:http';

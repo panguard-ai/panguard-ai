@@ -46,7 +46,7 @@ function makeToolCallEvent(content: string, toolName?: string): AgentEvent {
   };
 }
 
-function makeLLMOutputEvent(content: string): AgentEvent {
+function _makeLLMOutputEvent(content: string): AgentEvent {
   return {
     type: 'llm_output',
     timestamp: new Date().toISOString(),

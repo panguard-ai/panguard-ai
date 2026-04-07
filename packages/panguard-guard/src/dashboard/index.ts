@@ -17,7 +17,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { WebSocketServer, type WebSocket as WS } from 'ws';
 import { createLogger } from '@panguard-ai/core';
@@ -698,7 +698,7 @@ export class DashboardServer {
       // Also try monorepo atr package
       candidates.push(join(homedir(), '.panguard-guard', 'atr', 'rules'));
 
-      let rules: Array<{ id: string; title: string; severity: string; category: string; description: string }> = [];
+      const rules: Array<{ id: string; title: string; severity: string; category: string; description: string }> = [];
 
       for (const dir of candidates) {
         if (!existsSync(dir)) continue;
