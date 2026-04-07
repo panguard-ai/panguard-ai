@@ -50,6 +50,10 @@ export function upCommand(): Command {
     .action(async (opts: { dashboard: boolean; verbose: boolean; skipScan: boolean }) => {
       // Suppress JSON logs for clean output
       if (!opts.verbose) setLogLevel('silent');
+      const startTime = Date.now();
+
+      console.log(`\n  ${c.sage(c.bold('PANGUARD AI'))} ${c.dim('— AI Agent Security Guard')}\n`);
+      console.log(`  ${c.dim('─'.repeat(50))}\n`);
 
       const configPath1 = join(homedir(), '.panguard', 'config.json');
       const configPath2 = join(homedir(), '.panguard-guard', 'config.json');
@@ -139,8 +143,13 @@ export function upCommand(): Command {
               try {
                 const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
 
-                for (const skill of unknown.slice(0, 20)) {
+                const toScan = unknown.slice(0, 20);
+                let scanned = 0;
+                for (const skill of toScan) {
                   try {
+                    scanned++;
+                    process.stdout.write(`\r  ${c.dim(`[${scanned}/${toScan.length}]`)} Auditing ${c.bold(skill.name)}...`);
+
                     // Find skill directory
                     const skillDir = join(homedir(), '.claude', 'skills', skill.name);
                     if (!existsSync(skillDir)) continue;
@@ -166,6 +175,9 @@ export function upCommand(): Command {
               } catch {
                 // Skill auditor not available
               }
+
+              // Clear progress line
+              process.stdout.write('\r' + ' '.repeat(80) + '\r');
 
               if (threats.length > 0) {
                 console.log(`  ${c.critical(c.bold(`${threats.length} threat(s) detected:`))}\n`);
@@ -199,12 +211,17 @@ export function upCommand(): Command {
       reportActivation().catch(() => {});
 
       // ── Step 3: Start Guard ────────────────────────────────
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
       if (isGuardRunning()) {
-        console.log(`  ${c.safe(`${symbols.pass} Guard is already running.`)}\n`);
+        console.log(`  ${c.dim('\u2500'.repeat(50))}`);
+        console.log(`  ${c.safe(`${symbols.pass} Guard is already running.`)}`);
+        console.log(`  ${c.dim(`Startup completed in ${elapsed}s`)}\n`);
         return;
       }
 
-      console.log(`  ${symbols.info} ${c.bold('Starting protection...')}\n`);
+      console.log(`  ${c.dim('\u2500'.repeat(50))}`);
+      console.log(`  ${c.dim(`Scan completed in ${elapsed}s`)} ${symbols.info} ${c.bold('Starting Guard...')}\n`);
 
       const args = ['start'];
       if (opts.dashboard) args.push('--dashboard');

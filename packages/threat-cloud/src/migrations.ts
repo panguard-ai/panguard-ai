@@ -158,6 +158,48 @@ export const migrations: readonly Migration[] = [
       );
     },
   },
+  {
+    version: 6,
+    name: 'create_verdict_cache_table',
+    up: (db) => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS verdict_cache (
+          content_hash TEXT PRIMARY KEY,
+          skill_name TEXT NOT NULL,
+          verdict TEXT NOT NULL,
+          scanned_at TEXT NOT NULL DEFAULT (datetime('now')),
+          expires_at TEXT NOT NULL,
+          scan_count INTEGER NOT NULL DEFAULT 1
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_verdict_cache_expires ON verdict_cache(expires_at);
+        CREATE INDEX IF NOT EXISTS idx_verdict_cache_skill ON verdict_cache(skill_name);
+      `);
+    },
+  },
+  {
+    version: 7,
+    name: 'create_skill_hash_history_table',
+    up: (db) => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS skill_hash_history (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          skill_name TEXT NOT NULL,
+          content_hash TEXT NOT NULL,
+          first_seen TEXT NOT NULL DEFAULT (datetime('now')),
+          last_seen TEXT NOT NULL DEFAULT (datetime('now')),
+          scan_verdict TEXT,
+          superseded_by TEXT,
+          rug_pull_flag INTEGER NOT NULL DEFAULT 0,
+          UNIQUE(skill_name, content_hash)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_skill_hash_name ON skill_hash_history(skill_name);
+        CREATE INDEX IF NOT EXISTS idx_skill_hash_hash ON skill_hash_history(content_hash);
+        CREATE INDEX IF NOT EXISTS idx_skill_hash_rug ON skill_hash_history(rug_pull_flag);
+      `);
+    },
+  },
 ];
 
 /**

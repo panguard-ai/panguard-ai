@@ -1670,6 +1670,165 @@ export class ThreatCloudDB {
     };
   }
 
+  // ── Verdict Cache / 判定快取 ──────────────────────────────────
+
+  /** Look up a cached verdict by content hash. Returns null if miss or expired. */
+  getVerdictCache(contentHash: string): {
+    readonly contentHash: string;
+    readonly skillName: string;
+    readonly verdict: string;
+    readonly scannedAt: string;
+    readonly scanCount: number;
+  } | null {
+    const row = this.db
+      .prepare(
+        `SELECT content_hash, skill_name, verdict, scanned_at, scan_count
+         FROM verdict_cache
+         WHERE content_hash = ? AND expires_at > datetime('now')`
+      )
+      .get(contentHash) as
+      | { content_hash: string; skill_name: string; verdict: string; scanned_at: string; scan_count: number }
+      | undefined;
+
+    if (!row) return null;
+
+    // Increment scan_count on cache hit
+    this.db
+      .prepare(`UPDATE verdict_cache SET scan_count = scan_count + 1 WHERE content_hash = ?`)
+      .run(contentHash);
+
+    return {
+      contentHash: row.content_hash,
+      skillName: row.skill_name,
+      verdict: row.verdict,
+      scannedAt: row.scanned_at,
+      scanCount: row.scan_count + 1,
+    };
+  }
+
+  /** Insert or replace a verdict cache entry with 30-day TTL. */
+  insertVerdictCache(entry: {
+    readonly contentHash: string;
+    readonly skillName: string;
+    readonly verdict: string;
+  }): void {
+    this.db
+      .prepare(
+        `INSERT OR REPLACE INTO verdict_cache (content_hash, skill_name, verdict, scanned_at, expires_at, scan_count)
+         VALUES (?, ?, ?, datetime('now'), datetime('now', '+30 days'), 1)`
+      )
+      .run(entry.contentHash, entry.skillName, entry.verdict);
+  }
+
+  /** Delete a specific cache entry. Returns true if a row was deleted. */
+  invalidateVerdictCache(contentHash: string): boolean {
+    const result = this.db
+      .prepare(`DELETE FROM verdict_cache WHERE content_hash = ?`)
+      .run(contentHash);
+    return result.changes > 0;
+  }
+
+  /** Purge all expired cache entries. Returns count deleted. */
+  purgeExpiredVerdictCache(): number {
+    const result = this.db
+      .prepare(`DELETE FROM verdict_cache WHERE expires_at <= datetime('now')`)
+      .run();
+    return result.changes;
+  }
+
+  // ── Skill Hash History / 技能雜湊歷史 ────────────────────────
+
+  /** Get the latest (non-superseded) hash entry for a skill. */
+  getLatestSkillHash(
+    skillName: string,
+  ): { readonly contentHash: string; readonly scanVerdict: string | null } | null {
+    const row = this.db
+      .prepare(
+        `SELECT content_hash, scan_verdict
+         FROM skill_hash_history
+         WHERE skill_name = ? AND superseded_by IS NULL
+         ORDER BY last_seen DESC
+         LIMIT 1`
+      )
+      .get(skillName) as
+      | { content_hash: string; scan_verdict: string | null }
+      | undefined;
+
+    if (!row) return null;
+    return { contentHash: row.content_hash, scanVerdict: row.scan_verdict };
+  }
+
+  /** Record a skill hash observation. Creates or updates last_seen. */
+  recordSkillHash(entry: {
+    readonly skillName: string;
+    readonly contentHash: string;
+    readonly scanVerdict?: string;
+    readonly rugPullFlag?: boolean;
+  }): void {
+    this.db
+      .prepare(
+        `INSERT INTO skill_hash_history (skill_name, content_hash, scan_verdict, rug_pull_flag)
+         VALUES (?, ?, ?, ?)
+         ON CONFLICT(skill_name, content_hash) DO UPDATE SET
+           last_seen = datetime('now'),
+           scan_verdict = COALESCE(excluded.scan_verdict, scan_verdict)`
+      )
+      .run(
+        entry.skillName,
+        entry.contentHash,
+        entry.scanVerdict ?? null,
+        entry.rugPullFlag ? 1 : 0,
+      );
+  }
+
+  /** Mark a previous hash as superseded by a new hash. */
+  markSkillHashSuperseded(skillName: string, oldHash: string, newHash: string): void {
+    this.db
+      .prepare(
+        `UPDATE skill_hash_history
+         SET superseded_by = ?
+         WHERE skill_name = ? AND content_hash = ?`
+      )
+      .run(newHash, skillName, oldHash);
+  }
+
+  /** Get full hash history for a skill (audit trail). */
+  getSkillHashHistory(
+    skillName: string,
+  ): ReadonlyArray<{
+    readonly contentHash: string;
+    readonly firstSeen: string;
+    readonly lastSeen: string;
+    readonly scanVerdict: string | null;
+    readonly supersededBy: string | null;
+    readonly rugPullFlag: boolean;
+  }> {
+    const rows = this.db
+      .prepare(
+        `SELECT content_hash, first_seen, last_seen, scan_verdict, superseded_by, rug_pull_flag
+         FROM skill_hash_history
+         WHERE skill_name = ?
+         ORDER BY first_seen ASC`
+      )
+      .all(skillName) as Array<{
+      content_hash: string;
+      first_seen: string;
+      last_seen: string;
+      scan_verdict: string | null;
+      superseded_by: string | null;
+      rug_pull_flag: number;
+    }>;
+
+    return rows.map((r) => ({
+      contentHash: r.content_hash,
+      firstSeen: r.first_seen,
+      lastSeen: r.last_seen,
+      scanVerdict: r.scan_verdict,
+      supersededBy: r.superseded_by,
+      rugPullFlag: r.rug_pull_flag === 1,
+    }));
+  }
+
   /** Close the database / 關閉資料庫 */
   close(): void {
     this.db.close();

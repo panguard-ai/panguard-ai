@@ -122,6 +122,28 @@ export interface AggregatedMetrics {
   lastUpdated: string;
 }
 
+/** Cached verdict entry / 快取判定條目 */
+export interface CachedVerdict {
+  readonly contentHash: string;
+  readonly skillName: string;
+  readonly verdict: string;
+  readonly scannedAt: string;
+  readonly expiresAt: string;
+  readonly scanCount: number;
+}
+
+/** Skill hash history entry / 技能雜湊歷史條目 */
+export interface SkillHashHistoryEntry {
+  readonly id: number;
+  readonly skillName: string;
+  readonly contentHash: string;
+  readonly firstSeen: string;
+  readonly lastSeen: string;
+  readonly scanVerdict: string | null;
+  readonly supersededBy: string | null;
+  readonly rugPullFlag: boolean;
+}
+
 /** Server configuration / 伺服器配置 */
 export interface ServerConfig {
   port: number;

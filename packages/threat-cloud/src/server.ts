@@ -184,6 +184,12 @@ export class ThreatCloudServer {
                 log.error('Review retry failed', err);
               });
             }
+
+            // Step 3: Purge expired verdict cache entries
+            const purged = this.db.purgeExpiredVerdictCache();
+            if (purged > 0) {
+              log.info(`Verdict cache: purged ${purged} expired entries`);
+            }
           } catch (err) {
             log.error('Promotion cycle failed', err);
           }
@@ -1296,14 +1302,6 @@ response:
    * Response: { ok: true, data: { analyzed, proposalsCreated, results } }
    */
   private async handleAnalyzeSkills(req: IncomingMessage, res: ServerResponse): Promise<void> {
-    if (!this.llmReviewer?.isAvailable()) {
-      this.sendJson(res, 503, {
-        ok: false,
-        error: 'LLM reviewer not available — ANTHROPIC_API_KEY not configured on server',
-      });
-      return;
-    }
-
     const AnalyzeSkillsSchema = z.object({
       skills: z
         .array(
@@ -1324,31 +1322,184 @@ response:
     const data = await this.parseAndValidate(req, res, AnalyzeSkillsSchema);
     if (!data) return;
 
+    const { createHash } = await import('node:crypto');
     const skills = data.skills;
 
-    log.info(`Analyzing ${skills.length} skills with LLM`, {
+    // Compute content hash for each skill (deterministic: sorted tools, null-byte separated)
+    const computeHash = (tools: ReadonlyArray<{ readonly name: string; readonly description: string }>): string => {
+      const canonical = [...tools]
+        .map((t) => `${t.name}\n${t.description}`)
+        .sort()
+        .join('\0');
+      return createHash('sha256').update(canonical).digest('hex');
+    };
+
+    type PerSkillResult = {
+      readonly package: string;
+      readonly threatsFound: boolean;
+      readonly proposalCount: number;
+      readonly patternHashes: readonly string[];
+      readonly status: string;
+      readonly cached: boolean;
+      readonly rugPullDetected: boolean;
+      readonly errorReason?: string;
+    };
+
+    const allResults: PerSkillResult[] = [];
+    const uncachedSkills: Array<{ package: string; tools: Array<{ name: string; description: string }> }> = [];
+    const uncachedMeta: Array<{ contentHash: string; rugPull: boolean; previousVerdict: string | null }> = [];
+
+    log.info(`Analyzing ${skills.length} skills (checking cache + rug pull)`, {
       packages: skills.map((s) => s.package),
     });
 
-    const results = await this.llmReviewer.analyzeSkills(skills);
+    for (const skill of skills) {
+      const contentHash = computeHash(skill.tools);
+      let rugPullDetected = false;
 
-    const proposalsCreated = results.reduce((sum, r) => sum + r.proposals.length, 0);
+      // ── Rug pull check: has this skill's content changed? ──
+      const previousHash = this.db.getLatestSkillHash(skill.package);
+      // Save old verdict BEFORE marking superseded (getLatestSkillHash won't find it after)
+      const previousVerdict = previousHash?.scanVerdict ?? null;
+      if (previousHash && previousHash.contentHash !== contentHash) {
+        rugPullDetected = true;
+        this.db.markSkillHashSuperseded(skill.package, previousHash.contentHash, contentHash);
+        log.info(`[RUG PULL] Candidate: ${skill.package} hash changed`, {
+          oldHash: previousHash.contentHash.slice(0, 12),
+          newHash: contentHash.slice(0, 12),
+        });
+      }
 
-    log.info(`LLM analysis complete: ${proposalsCreated} proposals from ${skills.length} skills`);
+      // ── Verdict cache check (skip if rug pull — force rescan) ──
+      if (!rugPullDetected) {
+        const cached = this.db.getVerdictCache(contentHash);
+        if (cached) {
+          let verdict: { threatsFound: boolean; proposalCount: number; patternHashes: string[]; status: string };
+          try {
+            verdict = JSON.parse(cached.verdict);
+          } catch {
+            // Corrupted cache entry — invalidate and fall through to LLM scan
+            this.db.invalidateVerdictCache(contentHash);
+            uncachedSkills.push(skill);
+            uncachedMeta.push({ contentHash, rugPull: false, previousVerdict: null });
+            continue;
+          }
+          allResults.push({
+            package: skill.package,
+            threatsFound: verdict.threatsFound,
+            proposalCount: verdict.proposalCount,
+            patternHashes: verdict.patternHashes,
+            status: verdict.status,
+            cached: true,
+            rugPullDetected: false,
+          });
+          // Update last_seen in hash history
+          this.db.recordSkillHash({ skillName: skill.package, contentHash });
+          continue;
+        }
+      }
+
+      // Cache miss or rug pull — needs LLM analysis
+      uncachedSkills.push(skill);
+      uncachedMeta.push({ contentHash, rugPull: rugPullDetected, previousVerdict });
+    }
+
+    // ── Run LLM analysis on uncached skills ──
+    let proposalsCreated = 0;
+
+    if (uncachedSkills.length > 0) {
+      if (!this.llmReviewer?.isAvailable()) {
+        // No LLM but we can still return cached results + record hashes
+        for (let i = 0; i < uncachedSkills.length; i++) {
+          const skill = uncachedSkills[i]!;
+          const meta = uncachedMeta[i]!;
+          this.db.recordSkillHash({
+            skillName: skill.package,
+            contentHash: meta.contentHash,
+            rugPullFlag: meta.rugPull,
+          });
+          allResults.push({
+            package: skill.package,
+            threatsFound: false,
+            proposalCount: 0,
+            patternHashes: [],
+            status: 'skipped_no_llm',
+            cached: false,
+            rugPullDetected: meta.rugPull,
+          });
+        }
+      } else {
+        const llmResults = await this.llmReviewer.analyzeSkills(uncachedSkills);
+
+        for (let i = 0; i < llmResults.length; i++) {
+          const r = llmResults[i]!;
+          const meta = uncachedMeta[i]!;
+          const verdictData = {
+            threatsFound: r.threatsFound,
+            proposalCount: r.proposals.length,
+            patternHashes: r.proposals.map((p) => p.patternHash),
+            status: r.status,
+          };
+
+          // Store in verdict cache
+          this.db.insertVerdictCache({
+            contentHash: meta.contentHash,
+            skillName: r.package,
+            verdict: JSON.stringify(verdictData),
+          });
+
+          // Record hash history
+          this.db.recordSkillHash({
+            skillName: r.package,
+            contentHash: meta.contentHash,
+            scanVerdict: JSON.stringify(verdictData),
+            rugPullFlag: meta.rugPull,
+          });
+
+          // Rug pull HIGH alert: old was clean, new has threats
+          if (meta.rugPull && r.threatsFound) {
+            let prevClean = true;
+            if (meta.previousVerdict) {
+              try {
+                prevClean = !(JSON.parse(meta.previousVerdict) as { threatsFound: boolean }).threatsFound;
+              } catch { /* treat as clean if unparseable */ }
+            }
+            if (prevClean) {
+              log.info(`[RUG PULL CONFIRMED] ${r.package} went from clean to malicious`, {
+                contentHash: meta.contentHash.slice(0, 12),
+              });
+            }
+          }
+
+          proposalsCreated += r.proposals.length;
+          allResults.push({
+            package: r.package,
+            threatsFound: r.threatsFound,
+            proposalCount: r.proposals.length,
+            patternHashes: r.proposals.map((p) => p.patternHash),
+            status: r.status,
+            cached: false,
+            rugPullDetected: meta.rugPull,
+            ...(r.errorReason ? { errorReason: r.errorReason } : {}),
+          });
+        }
+      }
+    }
+
+    const cachedCount = allResults.filter((r) => r.cached).length;
+    const rugPullCount = allResults.filter((r) => r.rugPullDetected).length;
+    log.info(
+      `Analysis complete: ${allResults.length} skills (${cachedCount} cached, ${rugPullCount} rug pull, ${proposalsCreated} proposals)`
+    );
 
     this.sendJson(res, 200, {
       ok: true,
       data: {
-        analyzed: results.length,
+        analyzed: allResults.length,
         proposalsCreated,
-        results: results.map((r) => ({
-          package: r.package,
-          threatsFound: r.threatsFound,
-          proposalCount: r.proposals.length,
-          patternHashes: r.proposals.map((p) => p.patternHash),
-          status: r.status,
-          ...(r.errorReason ? { errorReason: r.errorReason } : {}),
-        })),
+        cachedCount,
+        rugPullCount,
+        results: allResults,
       },
     });
   }

@@ -773,14 +773,17 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Panguard Guard Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--sage:#8B9A8E;--s0:#1A1614;--s1:#242220;--s2:#2E2C2A;--bd:#3A3836;--t1:#F5F1E8;--tm:#A09A94;--ok:#2ED573;--warn:#FBBF24;--bad:#EF4444;--glow:0 0 20px rgba(139,154,142,.15);--r:12px}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--s0);color:var(--t1);display:flex;height:100vh;overflow:hidden}
+body{font-family:'Inter','Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--s0);color:var(--t1);display:flex;height:100vh;overflow:hidden}
 .sb{width:220px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
 .sb-brand{padding:20px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
 .sb-brand svg{width:28px;height:28px;flex-shrink:0}
-.sb-brand span{font-size:14px;font-weight:700;color:var(--t1);letter-spacing:.5px}
+.sb-brand span{font-family:'Space Grotesk','Noto Sans TC',sans-serif;font-size:14px;font-weight:700;color:var(--t1);letter-spacing:.5px}
 .sb-nav{flex:1;padding:12px 0;overflow-y:auto}
 .ni{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;color:var(--tm);font-size:13px;font-weight:500;transition:all .15s;border-left:3px solid transparent}
 .ni:hover{background:var(--s2);color:var(--t1)}
@@ -793,19 +796,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .lb{margin-top:8px;background:var(--s2);color:var(--tm);border:1px solid var(--bd);padding:4px 10px;border-radius:20px;cursor:pointer;font-size:11px}
 .mn{flex:1;overflow-y:auto;padding:24px 28px}
 .pg{display:none}.pg.on{display:block}
-.pt{font-size:20px;font-weight:700;margin-bottom:6px}
+.pt{font-family:'Space Grotesk','Noto Sans TC',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
 .pt em{color:var(--sage);font-style:normal}
 .pd{font-size:13px;color:var(--tm);margin-bottom:20px;line-height:1.5}
 .cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
 .cd{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;box-shadow:var(--glow);transition:border-color .2s}
 .cd:hover{border-color:var(--sage)}
-.cl{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--tm);margin-bottom:6px}
-.cv{font-size:26px;font-weight:700}
+.cl{font-family:'Inter','Noto Sans TC',sans-serif;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--tm);margin-bottom:6px}
+.cv{font-family:'Space Grotesk','Noto Sans TC',sans-serif;font-size:28px;font-weight:700}
 .cv.ok{color:var(--ok)}.cv.w{color:var(--warn)}.cv.sg{color:var(--sage)}
-.cv-sm{font-size:20px;font-weight:700}
-.st{font-size:14px;font-weight:600;color:var(--tm);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.cv-sm{font-family:'Space Grotesk','Noto Sans TC',sans-serif;font-size:20px;font-weight:700}
+.st{font-family:'Space Grotesk','Noto Sans TC',sans-serif;font-size:14px;font-weight:600;color:var(--tm);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
 .tl{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);max-height:420px;overflow-y:auto}
-.ei{padding:10px 16px;border-bottom:1px solid var(--bd);font-size:12px;font-family:'SF Mono','Fira Code',monospace;display:flex;gap:10px;align-items:flex-start}
+.ei{padding:10px 16px;border-bottom:1px solid var(--bd);font-size:12px;font-family:'JetBrains Mono','SF Mono',monospace;display:flex;gap:10px;align-items:flex-start}
 .ei:last-child{border-bottom:none}
 .ei-t{color:var(--tm);white-space:nowrap;min-width:75px}
 .ei-y{font-weight:600;min-width:90px}
@@ -839,7 +842,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .sb-body{flex:1}
 .sb-title{font-size:14px;font-weight:600;margin-bottom:4px}
 .sb-desc{font-size:12px;color:var(--tm);margin-bottom:6px;line-height:1.5}
-.sb-cmd{font-family:'SF Mono','Fira Code',monospace;font-size:12px;background:var(--s2);padding:6px 10px;border-radius:6px;color:var(--sage);display:inline-block}
+.sb-cmd{font-family:'JetBrains Mono','SF Mono',monospace;font-size:12px;background:var(--s2);padding:6px 10px;border-radius:6px;color:var(--sage);display:inline-block}
 .sb-link{font-size:12px;color:var(--sage);margin-top:4px;display:block}
 .flt{display:flex;gap:8px;margin-bottom:14px}
 .fb{padding:5px 14px;border-radius:20px;border:1px solid var(--bd);background:transparent;color:var(--tm);font-size:12px;cursor:pointer}
@@ -867,7 +870,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .welcome-box{text-align:center;max-width:520px;padding:40px;animation:fadeUp .8s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 .welcome-box svg{width:80px;height:80px;margin-bottom:24px}
-.welcome-box h1{font-size:28px;font-weight:700;margin-bottom:8px;color:var(--t1)}
+.welcome-box h1{font-family:'Space Grotesk','Noto Sans TC',sans-serif;font-size:28px;font-weight:700;margin-bottom:8px;color:var(--t1)}
 .welcome-box h1 span{color:var(--sage)}
 .welcome-box p{font-size:14px;color:var(--tm);line-height:1.7;margin-bottom:28px}
 .welcome-box .wc-steps{text-align:left;margin-bottom:32px}
@@ -894,6 +897,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .pbar .pb-dot.bad{background:var(--bad);box-shadow:0 0 6px rgba(239,68,68,0.4)}
 .pbar .pb-txt{font-weight:600;color:var(--t1)}
 .reassure{text-align:center;padding:24px 20px;color:var(--tm);font-size:13px;line-height:1.7;font-style:italic}
+/* Pulse animation for live indicator */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px rgba(46,213,115,0.5);animation:pulse 2s ease-in-out infinite;display:inline-block;flex-shrink:0}
+/* KPI highlight on update */
+@keyframes kpi-flash{0%{text-shadow:0 0 12px rgba(139,154,142,0.6)}100%{text-shadow:none}}
+.cv.flash{animation:kpi-flash 0.4s ease-out}
+/* Layer bar */
+.layer-row{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px}
+.layer-label{min-width:140px;color:var(--tm);font-weight:500}
+.layer-bar{flex:1;height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
+.layer-fill{height:100%;border-radius:3px;transition:width 0.5s}
+.layer-fill.on{background:var(--ok);width:100%}
+.layer-fill.off{background:var(--bd);width:0%}
+.layer-status{font-size:12px;font-weight:600;min-width:90px;text-align:right}
+.layer-status.on{color:var(--ok)}
+.layer-status.off{color:var(--tm)}
+.layer-btn{font-size:11px;padding:3px 10px;border-radius:12px;border:1px solid var(--sage);color:var(--sage);background:transparent;cursor:pointer;transition:all 0.15s}
+.layer-btn:hover{background:rgba(139,154,142,0.1)}
+/* Activity slide-in */
+@keyframes slide-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.ei.new{animation:slide-in 0.3s ease-out}
+/* Empty state positive */
+.empty-ok{background:rgba(46,213,115,0.06);border:1px solid rgba(46,213,115,0.15);border-radius:var(--r);padding:20px;text-align:center;color:var(--ok);font-size:13px;line-height:1.7}
+.empty-ok .sub{color:var(--tm);font-size:12px;margin-top:4px}
+/* Rug pull alert */
+.rug-alert{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--bad);display:none}
 </style>
 </head>
 <body>
@@ -923,6 +952,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="ni on" data-tab="dashboard"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg><span data-i18n="n_db">Dashboard</span></div>
 <div class="ni" data-tab="threats"><svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><span data-i18n="n_th">Threats</span></div>
 <div class="ni" data-tab="rules"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9H8v-2h5v2zm3 4H8v-2h8v2zm-3-8V3.5L18.5 9H13z"/></svg><span data-i18n="n_ru">Rules</span></div>
+<div class="ni" data-tab="skills"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14l-3-3 1.41-1.41L11 13.17l4.59-4.58L17 10l-6 6z"/></svg><span data-i18n="n_sk">Skills</span></div>
+<div class="ni" data-tab="tcloud"><svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg><span data-i18n="n_tc">Threat Cloud</span></div>
 <div class="ni" data-tab="settings"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg><span data-i18n="n_st">Settings</span></div>
 </div>
 <div class="sb-ft">
@@ -941,43 +972,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="pg on" id="p-dashboard">
 <div class="pt" data-i18n="t_db"><em>Dashboard</em></div>
 
-<!-- Security Score -->
-<div id="sec-score" style="background:linear-gradient(135deg,rgba(139,154,142,0.15),rgba(139,154,142,0.05));border:1px solid var(--bd);border-radius:12px;padding:24px;margin-bottom:20px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-<div style="font-size:14px;font-weight:600;color:var(--fg)" data-i18n="sec_score">Security Score</div>
-<div style="font-size:13px;font-weight:600" id="sec-tier">Tier 1-2 (Regex + Heuristic)</div>
+<!-- Protection Status -->
+<div id="protection-hero" style="background:linear-gradient(135deg,rgba(139,154,142,0.12),rgba(139,154,142,0.03));border:1px solid var(--bd);border-radius:12px;padding:24px;margin-bottom:20px">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+<div class="live-dot" id="hero-dot"></div>
+<div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;color:var(--ok)" id="hero-status">PROTECTED</div>
 </div>
-<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">
-<div style="font-size:48px;font-weight:700;color:var(--ok)" id="sec-num">--</div>
-<div style="font-size:16px;color:var(--tm)">/100</div>
+<div class="cg" style="margin-bottom:16px">
+<div class="cd"><div class="cl">Rules Active</div><div class="cv sg" id="v-atr">--</div></div>
+<div class="cd"><div class="cl">Events Scanned</div><div class="cv ok" id="v-ev">0</div></div>
+<div class="cd"><div class="cl">Threats Blocked</div><div class="cv" id="v-th" style="color:var(--sage)">0</div></div>
+<div class="cd"><div class="cl">Uptime</div><div class="cv sg" id="v-up">0s</div></div>
 </div>
-<div style="background:var(--bg);border-radius:6px;height:8px;overflow:hidden;margin-bottom:12px">
-<div id="sec-bar" style="height:100%;background:var(--ok);border-radius:6px;width:0%;transition:width 0.5s"></div>
+<div style="border-top:1px solid var(--bd);padding-top:14px">
+<div class="layer-row">
+<span class="layer-label">Layer 1: ATR Rules</span>
+<div class="layer-bar"><div class="layer-fill on" id="l1-bar"></div></div>
+<span class="layer-status on" id="l1-st">Active</span>
 </div>
-<div style="display:flex;gap:20px;font-size:12px;color:var(--tm)">
-<span><span id="v-ev" style="color:var(--ok);font-weight:600">0</span> events scanned</span>
-<span><span id="v-th" style="font-weight:600">0</span> threats blocked</span>
-<span><span id="v-atr" style="color:var(--sage);font-weight:600">--</span> rules active</span>
-<span data-i18n="uptime">Uptime</span>: <span id="v-up" style="font-weight:600">0s</span>
+<div class="layer-row">
+<span class="layer-label">Layer 2: Heuristic</span>
+<div class="layer-bar"><div class="layer-fill on" id="l2-bar"></div></div>
+<span class="layer-status on" id="l2-st">Active</span>
+</div>
+<div class="layer-row">
+<span class="layer-label">Layer 3: AI Analysis</span>
+<div class="layer-bar"><div class="layer-fill off" id="l3-bar"></div></div>
+<span class="layer-status off" id="l3-st">Not configured</span>
+<button class="layer-btn" onclick="nav('settings')" id="l3-btn">Setup</button>
+</div>
 </div>
 </div>
 
-<!-- LLM Upgrade CTA (shown when no Layer 3) -->
-<div id="llm-cta" style="background:linear-gradient(135deg,rgba(223,179,23,0.1),rgba(223,179,23,0.03));border:1px solid rgba(223,179,23,0.3);border-radius:12px;padding:20px;margin-bottom:20px;display:none">
-<div style="display:flex;justify-content:space-between;align-items:flex-start">
-<div>
-<div style="font-size:14px;font-weight:600;color:var(--fg);margin-bottom:6px" data-i18n="upgrade_title">Upgrade Your Protection</div>
-<div style="font-size:12px;color:var(--tm);margin-bottom:10px;line-height:1.5" data-i18n="upgrade_desc">Your Guard runs Tier 1-2 (regex only, 62.7% detection). Connect an LLM to unlock Tier 3:</div>
-<div style="font-size:12px;color:var(--tm);line-height:1.8">
-<span style="color:var(--ok)">+</span> <span data-i18n="up1">Catch attacks in ANY language</span><br>
-<span style="color:var(--ok)">+</span> <span data-i18n="up2">Detect paraphrased injection</span><br>
-<span style="color:var(--ok)">+</span> <span data-i18n="up3">Context-aware: know if "delete all" is real or attack</span><br>
-<span style="color:var(--ok)">+</span> <span data-i18n="up4">New attack types detected automatically</span>
+<!-- Rug Pull Alert (hidden by default, shown via JS when detected) -->
+<div class="rug-alert" id="rug-alert"></div>
+
+<!-- Setup Progress (shown until all steps complete) -->
+<div id="setup-progress" style="background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;margin-bottom:20px;display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<div style="font-size:13px;font-weight:600;color:var(--t1)">Setup Progress</div>
+<div style="font-size:12px;color:var(--tm)" id="setup-count">0/5</div>
 </div>
-</div>
-<button class="btn btn-s" onclick="nav('settings')" style="white-space:nowrap" data-i18n="connect_llm">Connect LLM</button>
-</div>
-<div style="font-size:11px;color:var(--tm);margin-top:8px" data-i18n="free_options">Free options: Gemini (free tier) / Ollama (local)</div>
+<div id="setup-steps" style="font-size:12px;line-height:2;color:var(--tm)"></div>
 </div>
 
 <!-- Skills -->
@@ -987,7 +1023,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 <!-- Event Timeline -->
 <div class="st" style="margin-top:20px" data-i18n="timeline">Recent Activity</div>
-<div class="tl" id="evl"><div class="reassure" id="evl-empty" data-i18n="no_threats">No threats detected. Your agents are running safely.</div></div>
+<div id="evl-ok" class="empty-ok">All clear. Guard is monitoring your skills in real-time.<div class="sub" id="evl-ok-sub">Last scan: just started</div></div>
+<div class="tl" id="evl" style="display:none"></div>
 </div>
 
 <!-- Settings (merged AI Setup + Guide) -->
@@ -1089,8 +1126,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 </div>
 
-<!-- Threat Cloud (merged into Rules page as section) -->
-<div class="pg" id="p-tcloud" style="display:none">
+<!-- Skills -->
+<div class="pg" id="p-skills">
+<div class="pt" data-i18n="t_sk"><em>Installed Skills</em></div>
+<div class="pd" data-i18n="d_sk2">All MCP skills detected across your platforms. Safe skills are auto-whitelisted; risky ones are flagged for review. Run <code style="font-family:'JetBrains Mono',monospace;background:var(--s2);padding:2px 6px;border-radius:4px;font-size:12px">pga audit skill &lt;name&gt;</code> for detailed analysis.</div>
+<div class="cg">
+<div class="cd"><div class="cl" data-i18n="total">Total Installed</div><div class="cv sg" id="sk-total">--</div></div>
+<div class="cd"><div class="cl" data-i18n="wl_count">Whitelisted</div><div class="cv ok" id="sk-wl">--</div></div>
+<div class="cd"><div class="cl" data-i18n="tr_count">Unknown / Tracked</div><div class="cv w" id="sk-unk">--</div></div>
+<div class="cd"><div class="cl">Blocked</div><div class="cv" style="color:var(--bad)" id="sk-blk">0</div></div>
+</div>
+<div class="st" data-i18n="all_skills">All Installed Skills</div>
+<div id="sk2-loading" class="empty"><span class="spin"></span> Loading skills...</div>
+<table class="tb" id="sk2-table" style="display:none"><thead><tr><th>#</th><th data-i18n="name">Name</th><th data-i18n="platform">Platform</th><th>Risk</th><th data-i18n="trust">Status</th><th>Last Audit</th></tr></thead><tbody id="sk2-tb"></tbody></table>
+</div>
+
+<!-- Threat Cloud -->
+<div class="pg" id="p-tcloud">
 <div class="pt" data-i18n="t_tc"><em>Threat Cloud</em></div>
 <div class="pd" data-i18n="d_tc">Threat Cloud is Panguard's anonymous threat intelligence sharing network. Your device can optionally upload anonymized threat data to help the community, and receives updated detection rules in return.</div>
 <div id="tc-loading" class="empty"><span class="spin"></span> Loading Threat Cloud status...</div>
@@ -1175,7 +1227,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 <script>
 var T={
-en:{n_db:'Dashboard',n_th:'Threats',n_ru:'Rules',n_st:'Settings',
+en:{n_db:'Dashboard',n_th:'Threats',n_ru:'Rules',n_sk:'Skills',n_tc:'Threat Cloud',n_st:'Settings',t_sk:'<em>Installed Skills</em>',d_sk2:'All MCP skills detected across your platforms. Safe skills are auto-whitelisted; risky ones are flagged for review.',
 t_db:'<em>Dashboard</em>',t_st:'<em>Settings</em>',t_ru:'<em>Detection Rules</em>',t_th:'<em>Threat Intelligence</em>',
 sec_score:'Security Score',upgrade_title:'Upgrade Your Protection',upgrade_desc:'Your Guard runs Tier 1-2 (regex only, 62.7% detection). Connect an LLM to unlock Tier 3:',
 up1:'Catch attacks in ANY language',up2:'Detect paraphrased injection',up3:'Context-aware: know if "delete all" is real or attack',up4:'New attack types detected automatically',
@@ -1218,7 +1270,7 @@ wc_s2t:'Connecting Dashboard',wc_s2d:'Establishing real-time data channels...',
 wc_s3t:'Loading System Status',wc_s3d:'Reading current protection state and metrics...',
 wc_s4t:'Ready',wc_s4d:'All systems initialized. Welcome aboard.',
 wc_btn:'Enter Dashboard'},
-zh:{n_db:'\u5100\u8868\u677f',n_th:'\u5a01\u8105\u60c5\u5831',n_ru:'\u5075\u6e2c\u898f\u5247',n_st:'\u8a2d\u5b9a',
+zh:{n_db:'\u5100\u8868\u677f',n_th:'\u5a01\u8105\u60c5\u5831',n_ru:'\u5075\u6e2c\u898f\u5247',n_sk:'\u6280\u80fd',n_tc:'\u5a01\u8105\u96f2',n_st:'\u8a2d\u5b9a',t_sk:'<em>\u5df2\u5b89\u88dd\u6280\u80fd</em>',d_sk2:'\u6240\u6709\u5e73\u53f0\u5075\u6e2c\u5230\u7684 MCP skills\u3002\u5b89\u5168\u7684\u81ea\u52d5 whitelist\uff0c\u6709\u98a8\u96aa\u7684\u6a19\u8a18\u5be9\u67e5\u3002',
 t_db:'<em>\u5100\u8868\u677f</em>',t_st:'<em>\u8a2d\u5b9a</em>',t_ru:'<em>\u5075\u6e2c\u898f\u5247</em>',t_th:'<em>\u5a01\u8105\u60c5\u5831</em>',
 sec_score:'\u5b89\u5168\u5206\u6578',upgrade_title:'\u5347\u7d1a\u4fdd\u8b77',upgrade_desc:'\u60a8\u7684 Guard \u76ee\u524d\u904b\u884c Tier 1-2\uff08\u50c5 regex\uff0c62.7% \u5075\u6e2c\u7387\uff09\u3002\u9023\u63a5 LLM \u89e3\u9396 Tier 3\uff1a',
 up1:'\u652f\u63f4\u4efb\u4f55\u8a9e\u8a00\u7684\u653b\u64ca\u5075\u6e2c',up2:'\u5075\u6e2c\u91cd\u65b0\u6392\u5217\u7684\u6ce8\u5165\u653b\u64ca',up3:'\u8a9e\u5883\u611f\u77e5\uff1a\u5224\u65b7\u300c\u522a\u9664\u5168\u90e8\u300d\u662f\u6b63\u5e38\u6307\u4ee4\u9084\u662f\u653b\u64ca',up4:'\u81ea\u52d5\u5075\u6e2c\u65b0\u578b\u653b\u64ca\uff0c\u7121\u9700\u7b49\u5f85\u898f\u5247\u66f4\u65b0',
@@ -1267,7 +1319,7 @@ var lang=(function(){try{var s=localStorage.getItem('panguard_lang');if(s==='zh'
 
 function TL(){lang=lang==='en'?'zh':'en';try{localStorage.setItem('panguard_lang',lang)}catch(e){}document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(T[lang][k]){if(e.tagName==='INPUT')e.placeholder=T[lang][k];else if(k.indexOf('t_')===0||k.indexOf('d_')===0||k==='go_ai')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});document.querySelectorAll('[data-i18n-wc]').forEach(function(e){var k=e.getAttribute('data-i18n-wc');if(T[lang][k]){if(k==='wc_title')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});updateG6();}
 
-function nav(t){document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});var tab=document.querySelector('[data-tab="'+t+'"]');if(tab)tab.classList.add('on');document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});var pg=document.getElementById('p-'+t);if(pg){pg.style.display='';pg.classList.add('on')}if(t==='dashboard'){ldSk();ldISk();ldSecScore()}if(t==='settings'){loadAI();updG()}if(t==='rules'){ldRules();ldTCloud()}if(t==='threats')ldTh()}
+function nav(t){document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});var tab=document.querySelector('[data-tab="'+t+'"]');if(tab)tab.classList.add('on');document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});var pg=document.getElementById('p-'+t);if(pg){pg.style.display='';pg.classList.add('on')}if(t==='dashboard'){ldSk();ldISk()}if(t==='settings'){loadAI();updG()}if(t==='rules'){ldRules();ldTCloud()}if(t==='threats')ldTh();if(t==='skills')ldSk2();if(t==='tcloud')ldTCloud2()}
 document.querySelectorAll('.ni').forEach(function(n){n.addEventListener('click',function(){nav(this.getAttribute('data-tab'))})});
 
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
@@ -1280,12 +1332,26 @@ function af(p,o){o=o||{};o.headers=o.headers||{};if(tk)o.headers['Authorization'
 /* WS */
 function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event'){aE(m);var ee=document.getElementById('evl-empty');if(ee)ee.style.display='none'}}catch(x){}}}
 
-function uS(s){var me=document.getElementById('v-mode');me.textContent=s.mode;me.className='cv '+(s.mode==='protection'?'ok':'w');document.getElementById('v-ev').textContent=(s.eventsProcessed||0).toLocaleString();var te=document.getElementById('v-th');te.textContent=s.threatsDetected||0;te.style.color=s.threatsDetected>0?'var(--bad)':'var(--sage)';document.getElementById('v-up').textContent=fUp(s.uptime||0);document.getElementById('v-lr').textContent=(s.learningProgress||0)+'%';document.getElementById('v-lr').className='cv '+(s.learningProgress>=100?'ok':'w');document.getElementById('v-cf').textContent=((s.baselineConfidence||0)*100).toFixed(1)+'%';document.getElementById('v-mem').textContent=(s.memoryUsageMB||0).toFixed(1)+' MB';document.getElementById('v-act').textContent=s.actionsExecuted||0;if(s.atrRuleCount!==undefined)document.getElementById('v-atr').textContent=s.atrRuleCount;if(s.whitelistedSkills!==undefined)document.getElementById('v-wsk').textContent=s.whitelistedSkills;if(s.trackedSkills!==undefined)document.getElementById('v-tsk').textContent=s.trackedSkills;if(s.stableFingerprints!==undefined)document.getElementById('v-sfp').textContent=s.stableFingerprints;updPBar(s);updateG6();
-/* Hide empty reassurance when events exist */
-var ee=document.getElementById('evl-empty');if(ee&&s.eventsProcessed>0)ee.style.display='none';
+function uS(s){
+/* Update KPI cards with flash animation */
+function setKPI(id,val){var el=document.getElementById(id);if(!el)return;var old=el.textContent;var nv=String(val);if(old!==nv){el.textContent=nv;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
+setKPI('v-ev',(s.eventsProcessed||0).toLocaleString());
+var th=s.threatsDetected||0;setKPI('v-th',th);var te=document.getElementById('v-th');if(te)te.style.color=th>0?'var(--bad)':'var(--sage)';
+setKPI('v-up',fUp(s.uptime||0));
+if(s.atrRuleCount!==undefined)setKPI('v-atr',s.atrRuleCount);
+/* Hero status */
+var hs=document.getElementById('hero-status');var hd=document.getElementById('hero-dot');
+if(hs){hs.textContent=s.mode==='protection'?'PROTECTED':'LEARNING';hs.style.color=s.mode==='protection'?'var(--ok)':'var(--warn)'}
+if(hd){hd.style.background=s.mode==='protection'?'var(--ok)':'var(--warn)'}
+/* Layer 3 status (check if AI is configured) */
+if(s.hasAI!==undefined){var l3b=document.getElementById('l3-bar');var l3s=document.getElementById('l3-st');var l3btn=document.getElementById('l3-btn');if(s.hasAI){if(l3b)l3b.className='layer-fill on';if(l3s){l3s.textContent='Active';l3s.className='layer-status on'}if(l3btn)l3btn.style.display='none'}else{if(l3b)l3b.className='layer-fill off';if(l3s){l3s.textContent=lang==='zh'?'\u672a\u914d\u7f6e':'Not configured';l3s.className='layer-status off'}if(l3btn)l3btn.style.display=''}}
+updPBar(s);
+/* Show event log when events arrive, hide empty-ok */
+var eok=document.getElementById('evl-ok');var evl=document.getElementById('evl');
+if(s.eventsProcessed>0){if(eok)eok.style.display='none';if(evl)evl.style.display=''};
 }
 
-function aE(m){var l=document.getElementById('evl');var d=document.createElement('div');var c=(m.data&&m.data.conclusion)||'benign';d.className='ei '+c;var t=m.timestamp?m.timestamp.split('T')[1].split('.')[0]:'--:--:--';d.innerHTML='<span class="ei-t">'+t+'</span><span class="ei-y">'+esc(m.type||'')+'</span><span class="ei-d">'+esc(JSON.stringify(m.data||{}).slice(0,200))+'</span>';l.prepend(d);while(l.children.length>50)l.removeChild(l.lastChild)}
+function aE(m){var l=document.getElementById('evl');if(l)l.style.display='';var eok=document.getElementById('evl-ok');if(eok)eok.style.display='none';var d=document.createElement('div');var c=(m.data&&m.data.conclusion)||'benign';d.className='ei new '+c;var t=m.timestamp?m.timestamp.split('T')[1].split('.')[0]:'--:--:--';d.innerHTML='<span class="ei-t">'+t+'</span><span class="ei-y">'+esc(m.type||'')+'</span><span class="ei-d">'+esc(JSON.stringify(m.data||{}).slice(0,200))+'</span>';l.prepend(d);setTimeout(function(){d.classList.remove('new')},400);while(l.children.length>50)l.removeChild(l.lastChild)}
 
 /* Skills */
 function ldSk(){af('/api/skills').then(function(r){return r.json()}).then(function(d){var tb=document.getElementById('sk-tb');tb.innerHTML='';if(!d.skills||d.skills.length===0){tb.innerHTML='<tr><td colspan="5" class="empty">'+(lang==='zh'?'\u5c1a\u7121\u6280\u80fd\u8cc7\u6599':'No skills data')+'</td></tr>';return}d.skills.forEach(function(s,i){var tr=document.createElement('tr');tr.innerHTML='<td>'+(i+1)+'</td><td>'+esc(s.name||'')+'</td><td>'+esc(s.source||'--')+'</td><td style="color:var(--tm);font-size:12px">'+esc(s.reason||'--')+'</td><td style="color:var(--tm);font-size:12px">'+(s.addedAt?new Date(s.addedAt).toLocaleDateString():'--')+'</td>';tb.appendChild(tr)})}).catch(function(){})}
@@ -1295,8 +1361,14 @@ function loadAI(){af('/api/ai-config').then(function(r){return r.json()}).then(f
 
 function saveAI(){var l3=document.getElementById('ai3p').value;var b={};if(l3){b.provider=l3;b.model=document.getElementById('ai3m').value||undefined;var k=document.getElementById('ai3k').value;if(k&&k.indexOf('*')===-1)b.apiKey=k;var ce=document.getElementById('ai3e').value;if(ce)b.endpoint=ce}af('/api/ai-config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json()}).then(function(d){if(d.success)toast(lang==='zh'?'\u5132\u5b58\u6210\u529f':'Configuration saved');else toast(d.error||'Error');loadAI()}).catch(function(){toast('Network error')})}
 
+/* Skills page */
+function ldSk2(){af('/api/skills').then(function(r){return r.json()}).then(function(d){var tb=document.getElementById('sk2-tb');var tbl=document.getElementById('sk2-table');var ld=document.getElementById('sk2-loading');if(!d.skills||d.skills.length===0){if(ld)ld.innerHTML='<span style="color:var(--tm)">'+(lang==='zh'?'尚無技能資料':'No skills detected. Install MCP skills and run pga up.')+'</span>';return}if(ld)ld.style.display='none';if(tbl)tbl.style.display='';tb.innerHTML='';var wl=0,unk=0,blk=0;d.skills.forEach(function(s,i){var st=s.status||'unknown';if(st==='whitelisted')wl++;else if(st==='blocked')blk++;else unk++;var stColor=st==='whitelisted'?'var(--ok)':st==='blocked'?'var(--bad)':'var(--warn)';var tr=document.createElement('tr');tr.innerHTML='<td>'+(i+1)+'</td><td>'+esc(s.name||'')+'</td><td>'+esc(s.platform||s.source||'--')+'</td><td>'+(s.riskScore!=null?'<span style="color:'+(s.riskScore>60?'var(--bad)':s.riskScore>30?'var(--warn)':'var(--ok)')+'">'+s.riskScore+'/100</span>':'--')+'</td><td><span style="color:'+stColor+'">'+esc(st)+'</span></td><td style="color:var(--tm);font-size:12px">'+(s.lastAudit?new Date(s.lastAudit).toLocaleDateString():(s.addedAt?new Date(s.addedAt).toLocaleDateString():'--'))+'</td>';tb.appendChild(tr)});document.getElementById('sk-total').textContent=d.skills.length;document.getElementById('sk-wl').textContent=wl;document.getElementById('sk-unk').textContent=unk;document.getElementById('sk-blk').textContent=blk}).catch(function(){})}
+
+/* Threat Cloud page loader */
+function ldTCloud2(){af('/api/threat-cloud/status').then(function(r){return r.json()}).then(function(d){var ld=document.getElementById('tc-loading');var ct=document.getElementById('tc-content');if(ld)ld.style.display='none';if(ct)ct.style.display='';document.getElementById('tc-enabled').textContent=d.enabled?'Connected':'Disconnected';document.getElementById('tc-enabled').style.color=d.enabled?'var(--ok)':'var(--bad)';document.getElementById('tc-up').textContent=d.uploaded||0;document.getElementById('tc-recv').textContent=d.received||0;document.getElementById('tc-q').textContent=d.queue||0;var tg=document.getElementById('tc-toggle');if(tg)tg.className='toggle'+(d.uploadEnabled?' on':'')}).catch(function(){})}
+
 /* Threats */
-function ldTh(){af('/api/threat-map').then(function(r){return r.json()}).then(function(t){var tb=document.getElementById('th-tb');tb.innerHTML='';if(!t||t.length===0){tb.innerHTML='<tr><td colspan="4" class="empty">'+(lang==='zh'?'\u7121\u5a01\u8105\u8cc7\u6599':'No threat data')+'</td></tr>';return}t.forEach(function(x){var tr=document.createElement('tr');tr.innerHTML='<td>'+esc(x.sourceIP||'')+'</td><td>'+esc(x.attackType||'')+'</td><td>'+esc(String(x.count||0))+'</td><td style="color:var(--tm);font-size:12px">'+esc(x.lastSeen||'--')+'</td>';tb.appendChild(tr)})}).catch(function(){});
+function ldTh(){af('/api/threat-map').then(function(r){return r.json()}).then(function(t){var tb=document.getElementById('th-tb');tb.innerHTML='';if(!t||t.length===0){tb.innerHTML='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--ok);font-size:13px">'+(lang==='zh'?'<strong>All clear.</strong> \u672a\u5075\u6e2c\u5230\u5a01\u8105\u3002\u9019\u662f\u597d\u4e8b\u3002':'<strong>All clear.</strong> No threats detected yet. This is good.')+'</td></tr>';return}t.forEach(function(x){var tr=document.createElement('tr');tr.innerHTML='<td>'+esc(x.sourceIP||'')+'</td><td>'+esc(x.attackType||'')+'</td><td>'+esc(String(x.count||0))+'</td><td style="color:var(--tm);font-size:12px">'+esc(x.lastSeen||'--')+'</td>';tb.appendChild(tr)})}).catch(function(){});
 af('/api/verdicts').then(function(r){return r.json()}).then(function(v){var l=document.getElementById('vl');l.innerHTML='';if(!v||v.length===0){l.innerHTML='<div class="empty">'+(lang==='zh'?'\u7121\u5224\u6c7a\u8cc7\u6599':'No verdict data')+'</div>';return}v.slice().reverse().forEach(function(x){if(cf!=='all'&&x.conclusion!==cf)return;var d=document.createElement('div');d.className='ei '+(x.conclusion||'benign');d.innerHTML='<span class="ei-y" style="color:'+(x.conclusion==='malicious'?'var(--bad)':x.conclusion==='suspicious'?'var(--warn)':'var(--ok)')+'">'+esc(x.conclusion||'')+'</span><span class="ei-d">'+esc(x.category||'')+' - '+esc((x.details||'').slice(0,150))+'</span>';l.appendChild(d)})}).catch(function(){})}
 
 function flt(f){cf=f;document.querySelectorAll('.fb').forEach(function(b){b.classList.remove('on')});event.target.classList.add('on');ldTh()}
