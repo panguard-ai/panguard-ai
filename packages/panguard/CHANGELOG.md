@@ -7,7 +7,6 @@ All notable changes to Panguard AI will be documented in this file.
 ### Added
 
 - **Activation tracking.** First `pga up` reports anonymous activation to Threat Cloud (client ID, platform, OS, version). One-time only. Helps us understand how many real users are out there.
-- **Canary staging layer.** Community-confirmed ATR rules now enter a 24-hour canary period before full promotion. 10% of clients receive canary rules for real-world validation. Rules with >= 3 negative feedback reports are auto-quarantined. New `POST /api/rule-feedback` endpoint for canary feedback.
 
 ### Fixed
 

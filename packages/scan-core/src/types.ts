@@ -119,6 +119,8 @@ export interface ATRRuleCompiled {
   readonly title: string;
   readonly severity: string;
   readonly category: string;
+  readonly scan_target?: 'mcp' | 'skill' | 'runtime' | null;
+  readonly rule_version?: number;
   readonly patterns: ReadonlyArray<{
     readonly field: string;
     readonly pattern: string;

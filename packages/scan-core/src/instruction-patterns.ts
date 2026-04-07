@@ -258,7 +258,8 @@ function isInSetupSection(instructions: string, matchIndex: number): boolean {
  */
 export function checkInstructions(
   instructions: string,
-  sourceType: 'skill' | 'documentation' = 'skill'
+  sourceType: 'skill' | 'documentation' = 'skill',
+  options?: { readonly hasDefensiveText?: boolean }
 ): CheckResult & { findings: Finding[] } {
   const findings: Finding[] = [];
 
@@ -298,6 +299,13 @@ export function checkInstructions(
       // Two-pass: if pattern only matches in code blocks (not prose),
       // downgrade — it's likely a documentation example, not an instruction
       if (pattern.category === 'tool-poisoning' && !pattern.regex.test(prose)) {
+        severity = downgradeSeverity(severity);
+      }
+
+      // Defensive text: skill teaches about security, not carrying attacks.
+      // "NEVER run curl -H Authorization" is defensive, not offensive.
+      if (options?.hasDefensiveText) {
+        severity = downgradeSeverity(severity);
         severity = downgradeSeverity(severity);
       }
 

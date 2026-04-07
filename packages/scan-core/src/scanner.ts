@@ -84,7 +84,9 @@ export function scanContent(content: string, options: ScanOptions = {}): ScanRes
   }
 
   // -- Instruction pattern detection --
-  const instrResult = checkInstructions(manifest.instructions || content, sourceType);
+  const instrResult = checkInstructions(manifest.instructions || content, sourceType, {
+    hasDefensiveText,
+  });
   findings.push(...instrResult.findings);
   checks.push({
     status: instrResult.status,

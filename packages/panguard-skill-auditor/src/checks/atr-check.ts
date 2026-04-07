@@ -228,17 +228,16 @@ export async function checkWithATR(
 
     const allMatches: ATRMatch[] = [];
 
-    // 1. Scan instructions
+    // 1. Scan instructions using scanSkill() — only runs skill-targeted rules
+    // to avoid false positives from MCP rules on SKILL.md content.
     if (manifest.instructions) {
-      const instructionMatches = engine.evaluate(
-        buildLlmInputEvent(manifest.instructions, manifest.name)
-      );
+      const instructionMatches = engine.scanSkill(manifest.instructions);
       allMatches.push(...instructionMatches);
     }
 
-    // 2. Scan description
+    // 2. Scan description using scanSkill()
     if (manifest.description) {
-      const descMatches = engine.evaluate(buildLlmInputEvent(manifest.description));
+      const descMatches = engine.scanSkill(manifest.description);
       allMatches.push(...descMatches);
     }
 

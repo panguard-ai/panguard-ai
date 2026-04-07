@@ -242,6 +242,7 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
   // 技能分析 — 接收掃描結果，用 LLM 找 regex 漏掉的 semantic threats
   // -------------------------------------------------------------------------
 
+  /** Prompt for skill/tool analysis (both MCP and SKILL.md) */
   private static readonly ATR_DRAFTER_PROMPT = `You are a senior AI security rule engineer for the ATR (Agent Threat Rules) standard.
 
 You will receive MCP tool descriptions from a skill. Your job is to write PRODUCTION-QUALITY detection rules for SPECIFIC, CONCRETE attack patterns — not vague risk categories.
@@ -273,6 +274,11 @@ STRICT REQUIREMENTS — rules that violate these will be REJECTED:
 5. OUTPUT AT MOST 1 RULE per skill. Prefer NO rule over a bad rule.
    If no SPECIFIC, CONCRETE threat pattern exists, output "NO_THREATS_FOUND".
 
+6. FIELD SELECTION — choose the right detection field:
+   - Use "field: content" when analyzing SKILL.md content (markdown with --- frontmatter or # headings)
+   - Use "field: tool_description" when analyzing MCP tool name:description pairs
+   If unsure, use "field: content" — it matches both SKILL.md body and tool descriptions.
+
 Output format (ONLY if a specific threat is found):
 \`\`\`yaml
 title: "<specific attack technique, not generic risk>"
@@ -287,12 +293,16 @@ detection_tier: semantic
 maturity: experimental
 severity: <critical|high|medium|low>
 tags:
-  category: <tool-poisoning|prompt-injection|data-exfiltration|privilege-escalation>
+  category: <skill-compromise|tool-poisoning|prompt-injection|data-exfiltration|privilege-escalation>
   subcategory: <specific-technique>
   confidence: medium
+agent_source:
+  type: mcp_exchange
+  framework: [skill_md, mcp]
+  provider: [any]
 detection:
   conditions:
-    - field: tool_description
+    - field: <content|tool_description>
       operator: regex
       value: "<SPECIFIC regex with word boundaries and context>"
       description: "<exactly what malicious pattern this matches>"
@@ -301,14 +311,14 @@ response:
   actions: [alert, snapshot]
 test_cases:
   true_positives:
-    - tool_description: "<realistic malicious tool description that should trigger>"
+    - input: "<realistic malicious content that should trigger>"
       expected: triggered
-    - tool_description: "<another variant>"
+    - input: "<another variant>"
       expected: triggered
   true_negatives:
-    - tool_description: "<similar but legitimate tool description>"
+    - input: "<similar but legitimate content>"
       expected: not_triggered
-    - tool_description: "<another legitimate example>"
+    - input: "<another legitimate example>"
       expected: not_triggered
 \`\`\`
 
@@ -324,14 +334,14 @@ REMEMBER: Output "NO_THREATS_FOUND" for 90%+ of skills. Only flag genuinely susp
     const results: SkillAnalysisResult[] = [];
 
     for (const skill of skills) {
-      if (!skill.tools || skill.tools.length < 2) continue;
+      if (!skill.tools || skill.tools.length === 0) continue;
 
       const toolSummary = skill.tools
         .slice(0, 30) // Limit to avoid token overflow
         .map((t) => `- ${t.name}: ${t.description}`)
         .join('\n');
 
-      const userMessage = `Analyze these MCP tools from "${skill.package}" for threats that regex scanning missed:\n\n${toolSummary}`;
+      const userMessage = `Analyze this skill content from "${skill.package}" for threats that regex scanning missed:\n\n${toolSummary}`;
 
       try {
         const responseText = await this.callAnthropicAPI(
