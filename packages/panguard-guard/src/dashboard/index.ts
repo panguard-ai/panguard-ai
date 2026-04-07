@@ -38,6 +38,7 @@ interface WSClient {
   ws: WS;
   alive: boolean;
   connectedAt: number;
+  ip: string;
 }
 
 /** Rate limiter state per IP */
@@ -49,6 +50,7 @@ interface RateLimitEntry {
 const RATE_LIMIT_MAX = 120;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const MAX_WS_CLIENTS = 20;
+const MAX_WS_PER_IP = 5;
 
 /** Relay configuration for connecting to a remote Manager */
 export interface DashboardRelayOptions {
@@ -127,7 +129,16 @@ export class DashboardServer {
           }
         }
 
-        const client: WSClient = { ws, alive: true, connectedAt: Date.now() };
+        // Per-IP connection limit
+        const clientIP = req.socket.remoteAddress ?? 'unknown';
+        const ipCount = [...this.wsClients].filter(c => c.ip === clientIP).length;
+        if (ipCount >= MAX_WS_PER_IP) {
+          logger.warn(`Max WS connections per IP reached for ${clientIP}`);
+          ws.close();
+          return;
+        }
+
+        const client: WSClient = { ws, alive: true, connectedAt: Date.now(), ip: clientIP };
         this.wsClients.add(client);
 
         this.sendToClient(client, {
@@ -151,7 +162,7 @@ export class DashboardServer {
 
       this.server.listen(this.port, '127.0.0.1', () => {
         logger.info(`Dashboard started on http://127.0.0.1:${this.port}`);
-        logger.debug(`Dashboard auth token: ${this.authToken.slice(0, 8)}...`);
+        // Token never logged — auth via HttpOnly cookie only
 
         if (this.relayConfig) {
           this.startRelayClient(this.relayConfig);
@@ -273,8 +284,10 @@ export class DashboardServer {
 
     if (url.startsWith('/api/')) {
       const authHeader = req.headers.authorization ?? '';
+      // Parse auth token from: 1) Authorization header, 2) HttpOnly cookie, 3) query param (deprecated)
+      const cookieToken = (req.headers.cookie ?? '').split(';').map(c => c.trim()).find(c => c.startsWith('panguard_auth='))?.split('=')[1] ?? '';
       const queryToken = new URL(url, `http://127.0.0.1:${this.port}`).searchParams.get('token');
-      const providedToken = authHeader.replace('Bearer ', '') || queryToken;
+      const providedToken = authHeader.replace('Bearer ', '') || cookieToken || queryToken;
 
       if (
         !providedToken ||
@@ -351,6 +364,14 @@ export class DashboardServer {
 
   private checkRateLimit(ip: string): boolean {
     const now = Date.now();
+
+    // Periodic cleanup of expired entries to prevent unbounded growth
+    if (this.rateLimits.size > 100) {
+      for (const [key, val] of this.rateLimits) {
+        if (now > val.resetAt) this.rateLimits.delete(key);
+      }
+    }
+
     const entry = this.rateLimits.get(ip);
     if (!entry || now > entry.resetAt) {
       this.rateLimits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
@@ -361,10 +382,12 @@ export class DashboardServer {
   }
 
   private serveIndex(res: ServerResponse): void {
-    // Embed auth token in HTML so dashboard always authenticates, even without #token= in URL
-    const html = DASHBOARD_HTML.replace('var lang=', `var __tk='${this.authToken}';var lang=`);
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(html);
+    // Set auth token as HttpOnly cookie — never exposed in HTML source or JS
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Set-Cookie': `panguard_auth=${this.authToken}; HttpOnly; SameSite=Strict; Path=/`,
+    });
+    res.end(DASHBOARD_HTML);
   }
 
   private jsonResponse(res: ServerResponse, data: unknown, statusCode = 200): void {
@@ -1465,8 +1488,8 @@ function toast(m){var t=document.getElementById('toast');t.textContent=m;t.class
 function fUp(ms){var s=Math.floor(ms/1000);if(s<60)return s+'s';var m=Math.floor(s/60);s%=60;if(m<60)return m+'m '+s+'s';var h=Math.floor(m/60);m%=60;return h+'h '+m+'m'}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
 
-function gTk(){if(typeof __tk!=='undefined'&&__tk){tk=__tk;try{localStorage.setItem('panguard_token',tk)}catch(e){}}if(!tk){var h=location.hash;if(h.indexOf('token=')!==-1){tk=h.split('token=')[1].split('&')[0];try{localStorage.setItem('panguard_token',tk)}catch(e){}try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}}if(!tk){try{tk=localStorage.getItem('panguard_token')||''}catch(e){}}}
-function af(p,o){o=o||{};o.headers=o.headers||{};if(tk)o.headers['Authorization']='Bearer '+tk;return fetch(p,o).then(function(r){if(r.status===401){document.getElementById('wl').textContent=lang==='zh'?'Token 無效':'Invalid token';document.getElementById('wd').classList.remove('on')}return r})}
+function gTk(){/* Auth handled via HttpOnly cookie — no JS token needed */}
+function af(p,o){o=o||{};o.credentials='same-origin';return fetch(p,o).then(function(r){if(r.status===401){document.getElementById('wl').textContent=lang==='zh'?'Token 無效':'Invalid token';document.getElementById('wd').classList.remove('on')}return r})}
 
 /* WS */
 function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event'){aE(m);var ee=document.getElementById('evl-empty');if(ee)ee.style.display='none'}if(m.type==='proxy_verdict'){var feed=document.getElementById('rt-feed');var emp=document.getElementById('rt-empty');if(emp)emp.style.display='none';var pv=m.data||{};var cls=pv.outcome==='deny'?'malicious':'benign';var el=document.createElement('div');el.className='ei new '+cls;var t=pv.ts?pv.ts.split('T')[1].split('.')[0]:'--:--';el.innerHTML='<span class="ei-t">'+t+'</span><span class="ei-y" style="color:'+(pv.outcome==='deny'?'var(--bad)':'var(--ok)')+'">'+esc(pv.outcome||'allow').toUpperCase()+'</span><span class="ei-d">'+esc(pv.tool||'')+(pv.reason?' — '+esc(pv.reason):'')+'</span>';feed.prepend(el);setTimeout(function(){el.classList.remove('new')},400);while(feed.children.length>20)feed.removeChild(feed.lastChild)}}catch(x){}}}

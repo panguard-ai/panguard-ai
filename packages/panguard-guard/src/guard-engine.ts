@@ -320,9 +320,9 @@ export class GuardEngine {
       this.updateDashboardStatus();
 
       const dashPort = Number(this.config.dashboardPort);
-      const token = this.dashboard.getAuthToken();
-      const dashUrl = `http://127.0.0.1:${dashPort}#token=${token}`;
-      logger.info(`Dashboard: http://127.0.0.1:${dashPort}`);
+      // Auth via HttpOnly cookie — no token in URL (prevents leakage in browser history / ps)
+      const dashUrl = `http://127.0.0.1:${dashPort}`;
+      logger.info(`Dashboard: ${dashUrl}`);
       try {
         const { execFile } = await import('node:child_process');
         const openCmd =

@@ -7,8 +7,8 @@
  * @module @panguard-ai/panguard-mcp/config/mcp-injector
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, rmSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, rmSync, chmodSync, readdirSync, unlinkSync } from 'node:fs';
+import { dirname, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createLogger } from '@panguard-ai/core';
@@ -57,7 +57,24 @@ function backupFile(filePath: string): string | undefined {
   if (!existsSync(filePath)) return undefined;
   const backupPath = `${filePath}.bak.${Date.now()}`;
   copyFileSync(filePath, backupPath);
+  // Set restrictive permissions — config files may contain API keys
+  try { chmodSync(backupPath, 0o600); } catch { /* best effort */ }
   logger.info(`Backed up ${filePath} -> ${backupPath}`);
+
+  // Cleanup old backups — keep only the 3 most recent
+  try {
+    const dir = dirname(filePath);
+    const base = basename(filePath);
+    const backups = readdirSync(dir)
+      .filter((f: string) => f.startsWith(`${base}.bak.`))
+      .sort()
+      .reverse();
+    for (const old of backups.slice(3)) {
+      unlinkSync(join(dir, old));
+      logger.debug(`Removed old backup: ${old}`);
+    }
+  } catch { /* cleanup is best-effort */ }
+
   return backupPath;
 }
 
