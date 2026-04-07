@@ -7,10 +7,10 @@
 # Status: RFC (Request for Comments)
 # License: MIT
 
-$schema: "https://json-schema.org/draft/2020-12/schema"
+$schema: 'https://json-schema.org/draft/2020-12/schema'
 title: ATR Rule Schema
 description: Schema for Agent Threat Rules (ATR) detection rules
-version: "1.0.0"
+version: '1.0.0'
 
 type: object
 required:
@@ -30,12 +30,11 @@ required:
   - response
 
 properties:
-
   # === Metadata ===
 
   schema_version:
     type: string
-    description: "ATR schema version this rule conforms to (e.g., \"0.1\")"
+    description: 'ATR schema version this rule conforms to (e.g., "0.1")'
 
   title:
     type: string
@@ -44,7 +43,7 @@ properties:
   id:
     type: string
     pattern: "^ATR-\\d{4}-\\d{5}$"
-    description: "Unique rule identifier. Format: ATR-YYYY-NNNNN (e.g., ATR-2026-00001)"
+    description: 'Unique rule identifier. Format: ATR-YYYY-NNNNN (e.g., ATR-2026-00001)'
 
   status:
     type: string
@@ -62,17 +61,17 @@ properties:
   date:
     type: string
     pattern: "^\\d{4}/\\d{2}/\\d{2}$"
-    description: "Creation date in YYYY/MM/DD format"
+    description: 'Creation date in YYYY/MM/DD format'
 
   modified:
     type: string
     pattern: "^\\d{4}/\\d{2}/\\d{2}$"
-    description: "Last modification date in YYYY/MM/DD format"
+    description: 'Last modification date in YYYY/MM/DD format'
 
   rule_version:
     type: integer
     minimum: 1
-    description: "Rule version number. Bump when detection logic changes. Starts at 1."
+    description: 'Rule version number. Bump when detection logic changes. Starts at 1.'
 
   # === Classification ===
 
@@ -103,17 +102,17 @@ properties:
         type: array
         items:
           type: string
-        description: "OWASP LLM Top 10 references (e.g., LLM01:2025)"
+        description: 'OWASP LLM Top 10 references (e.g., LLM01:2025)'
       mitre_atlas:
         type: array
         items:
           type: string
-        description: "MITRE ATLAS technique IDs (e.g., AML.T0054)"
+        description: 'MITRE ATLAS technique IDs (e.g., AML.T0054)'
       mitre_attack:
         type: array
         items:
           type: string
-        description: "MITRE ATT&CK technique IDs (if applicable)"
+        description: 'MITRE ATT&CK technique IDs (if applicable)'
       cve:
         type: array
         items:
@@ -123,22 +122,22 @@ properties:
         type: array
         items:
           type: string
-        description: "OWASP Agentic Top 10 references (e.g., ASI01, ASI02)"
+        description: 'OWASP Agentic Top 10 references (e.g., ASI01, ASI02)'
       owasp_ast:
         type: array
         items:
           type: string
-        description: "OWASP Agentic Skills Top 10 references (e.g., AST01)"
+        description: 'OWASP Agentic Skills Top 10 references (e.g., AST01)'
       safe_mcp:
         type: array
         items:
           type: string
-        description: "SAFE-MCP technique IDs (e.g., SMCP-T001)"
+        description: 'SAFE-MCP technique IDs (e.g., SMCP-T001)'
       research:
         type: array
         items:
           type: string
-        description: "Research paper references or URLs"
+        description: 'Research paper references or URLs'
 
   # === Tags (ATR classification) ===
 
@@ -169,7 +168,7 @@ properties:
       scan_target:
         type: string
         enum: [mcp, skill, both, runtime]
-        description: "Which scan path this rule belongs to. mcp=runtime events, skill=SKILL.md static scan, both=fires in both paths, runtime=behavior monitoring."
+        description: 'Which scan path this rule belongs to. mcp=runtime events, skill=SKILL.md static scan, both=fires in both paths, runtime=behavior monitoring.'
 
   # === Agent Source (analogous to Sigma's logsource) ===
 
@@ -183,16 +182,16 @@ properties:
       type:
         type: string
         enum:
-          - llm_io            # LLM input/output (prompts and completions)
-          - tool_call         # Function/tool call requests
-          - mcp_exchange      # MCP protocol messages
-          - agent_behavior    # Agent behavioral metrics and patterns
-          - multi_agent_comm  # Inter-agent communication
-          - context_window    # Context window contents
-          - memory_access     # Agent memory read/write operations
-          - skill_lifecycle   # MCP skill registration, update, removal events
-          - skill_permission  # Skill permission requests and boundary checks
-          - skill_chain       # Multi-skill invocation sequences
+          - llm_io # LLM input/output (prompts and completions)
+          - tool_call # Function/tool call requests
+          - mcp_exchange # MCP protocol messages
+          - agent_behavior # Agent behavioral metrics and patterns
+          - multi_agent_comm # Inter-agent communication
+          - context_window # Context window contents
+          - memory_access # Agent memory read/write operations
+          - skill_lifecycle # MCP skill registration, update, removal events
+          - skill_permission # Skill permission requests and boundary checks
+          - skill_chain # Multi-skill invocation sequences
         description: Type of agent data stream to monitor
       framework:
         type: array
@@ -275,7 +274,7 @@ properties:
                   description: Numeric threshold for the metric
                 window:
                   type: string
-                  description: "Time window for behavioral analysis (e.g., 5m, 1h, 30s)"
+                  description: 'Time window for behavioral analysis (e.g., 5m, 1h, 30s)'
                 ordered:
                   type: boolean
                   description: Whether steps must occur in order
@@ -312,16 +311,16 @@ properties:
         items:
           type: string
           enum:
-            - block_input        # Reject the user/agent input
-            - block_output       # Suppress the agent output
-            - block_tool         # Prevent the tool call from executing
+            - block_input # Reject the user/agent input
+            - block_output # Suppress the agent output
+            - block_tool # Prevent the tool call from executing
             - quarantine_session # Isolate the entire session
-            - reset_context      # Clear agent context/memory
-            - alert              # Send alert to security team
-            - snapshot           # Capture full session state for forensics
-            - escalate           # Escalate to human reviewer
+            - reset_context # Clear agent context/memory
+            - alert # Send alert to security team
+            - snapshot # Capture full session state for forensics
+            - escalate # Escalate to human reviewer
             - reduce_permissions # Reduce agent's available tools/capabilities
-            - kill_agent         # Terminate the agent process
+            - kill_agent # Terminate the agent process
         description: Actions to take when the rule triggers
       auto_response_threshold:
         type: string

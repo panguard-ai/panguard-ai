@@ -47,21 +47,28 @@ export function scanCommand(): Command {
     .option('--verbose', 'Verbose output / 詳細輸出', false)
     .option('--json', 'Output pure JSON to stdout (for AI agents) / 輸出純 JSON', false)
     .option('--sarif', 'Output SARIF v2.1.0 to stdout / 輸出 SARIF', false)
-    .option('--severity <level>', 'Minimum severity (informational, low, medium, high, critical)', 'medium')
+    .option(
+      '--severity <level>',
+      'Minimum severity (informational, low, medium, high, critical)',
+      'medium'
+    )
     .option('--save <path>', 'Save JSON results to file / 儲存 JSON 結果到檔案')
     .option('--target <host>', 'Remote target (IP or domain) / 遠端目標')
     .action(
-      async (path: string | undefined, options: {
-        quick: boolean;
-        output?: string;
-        lang: string;
-        verbose: boolean;
-        json: boolean;
-        sarif: boolean;
-        severity: string;
-        save?: string;
-        target?: string;
-      }) => {
+      async (
+        path: string | undefined,
+        options: {
+          quick: boolean;
+          output?: string;
+          lang: string;
+          verbose: boolean;
+          json: boolean;
+          sarif: boolean;
+          severity: string;
+          save?: string;
+          target?: string;
+        }
+      ) => {
         const lang: Language = options.lang === 'zh-TW' ? 'zh-TW' : 'en';
 
         // ── ATR scan mode: pga scan <file-or-dir> ───────────────
@@ -91,7 +98,9 @@ export function scanCommand(): Command {
             try {
               efs('atr', ['--version'], { stdio: 'pipe', timeout: 5000 });
               atrOnPath = true;
-            } catch { /* not installed */ }
+            } catch {
+              /* not installed */
+            }
 
             if (atrOnPath) {
               atrBin = 'atr';

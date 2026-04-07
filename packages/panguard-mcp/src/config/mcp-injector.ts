@@ -7,7 +7,17 @@
  * @module @panguard-ai/panguard-mcp/config/mcp-injector
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, rmSync, chmodSync, readdirSync, unlinkSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  copyFileSync,
+  rmSync,
+  chmodSync,
+  readdirSync,
+  unlinkSync,
+} from 'node:fs';
 import { dirname, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -58,7 +68,11 @@ function backupFile(filePath: string): string | undefined {
   const backupPath = `${filePath}.bak.${Date.now()}`;
   copyFileSync(filePath, backupPath);
   // Set restrictive permissions — config files may contain API keys
-  try { chmodSync(backupPath, 0o600); } catch { /* best effort */ }
+  try {
+    chmodSync(backupPath, 0o600);
+  } catch {
+    /* best effort */
+  }
   logger.info(`Backed up ${filePath} -> ${backupPath}`);
 
   // Cleanup old backups — keep only the 3 most recent
@@ -73,7 +87,9 @@ function backupFile(filePath: string): string | undefined {
       unlinkSync(join(dir, old));
       logger.debug(`Removed old backup: ${old}`);
     }
-  } catch { /* cleanup is best-effort */ }
+  } catch {
+    /* cleanup is best-effort */
+  }
 
   return backupPath;
 }
@@ -421,7 +437,14 @@ function injectProxyForJsonPlatform(
   platformId: PlatformId,
   configPath: string
 ): ProxyInjectionResult {
-  const result: { platformId: PlatformId; configPath: string; serversProxied: number; serversSkipped: number; backupPath?: string; error?: string } = {
+  const result: {
+    platformId: PlatformId;
+    configPath: string;
+    serversProxied: number;
+    serversSkipped: number;
+    backupPath?: string;
+    error?: string;
+  } = {
     platformId,
     configPath,
     serversProxied: 0,
@@ -522,7 +545,14 @@ export function removeProxy(platformIds: readonly PlatformId[]): ProxyInjectionS
     if (platformId === 'openclaw') continue;
 
     const configPath = getConfigPath(platformId);
-    const result: { platformId: PlatformId; configPath: string; serversProxied: number; serversSkipped: number; backupPath?: string; error?: string } = {
+    const result: {
+      platformId: PlatformId;
+      configPath: string;
+      serversProxied: number;
+      serversSkipped: number;
+      backupPath?: string;
+      error?: string;
+    } = {
       platformId,
       configPath,
       serversProxied: 0,

@@ -748,7 +748,10 @@ export class ThreatCloudClient {
     try {
       const filePath = join(this.dataDir, QUEUE_FILE);
       mkdirSync(dirname(filePath), { recursive: true });
-      writeFileSync(filePath, JSON.stringify(this.uploadQueue, null, 2), { encoding: 'utf-8', mode: 0o600 });
+      writeFileSync(filePath, JSON.stringify(this.uploadQueue, null, 2), {
+        encoding: 'utf-8',
+        mode: 0o600,
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       logger.error(`Failed to save queue: ${msg} / 儲存佇列失敗: ${msg}`);

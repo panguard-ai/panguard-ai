@@ -82,13 +82,20 @@ export function upCommand(): Command {
       let threatCount = 0;
       try {
         type DetectFn = () => Promise<Array<{ id: string; name: string; detected: boolean }>>;
-        type InjectFn = (ids: readonly string[]) => { totalPlatforms: number; totalServersProxied: number; results: ReadonlyArray<{ platformId: string; serversProxied: number; error?: string }> };
+        type InjectFn = (ids: readonly string[]) => {
+          totalPlatforms: number;
+          totalServersProxied: number;
+          results: ReadonlyArray<{ platformId: string; serversProxied: number; error?: string }>;
+        };
         let detectPlatforms: DetectFn;
         let injectProxyFn: InjectFn;
 
         try {
           // Published package: import from /config subpath
-          const mcp = await import('@panguard-ai/panguard-mcp/config' as string) as { detectPlatforms: DetectFn; injectProxy: InjectFn };
+          const mcp = (await import('@panguard-ai/panguard-mcp/config' as string)) as {
+            detectPlatforms: DetectFn;
+            injectProxy: InjectFn;
+          };
           detectPlatforms = mcp.detectPlatforms;
           injectProxyFn = mcp.injectProxy;
         } catch {
@@ -96,7 +103,10 @@ export function upCommand(): Command {
           const { resolve } = await import('node:path');
           const { pathToFileURL } = await import('node:url');
           const mcpDist = resolve(process.cwd(), 'packages/panguard-mcp/dist/config/index.js');
-          const mcp = await import(pathToFileURL(mcpDist).href) as { detectPlatforms: DetectFn; injectProxy: InjectFn };
+          const mcp = (await import(pathToFileURL(mcpDist).href)) as {
+            detectPlatforms: DetectFn;
+            injectProxy: InjectFn;
+          };
           detectPlatforms = mcp.detectPlatforms;
           injectProxyFn = mcp.injectProxy;
         }
@@ -120,10 +130,14 @@ export function upCommand(): Command {
           serverCount = proxySummary.totalServersProxied;
 
           if (serverCount > 0) {
-            console.log(`    ${c.safe(`${serverCount} MCP server(s)`)} proxied across ${c.sage(`${platformCount} platform(s)`)}`);
+            console.log(
+              `    ${c.safe(`${serverCount} MCP server(s)`)} proxied across ${c.sage(`${platformCount} platform(s)`)}`
+            );
             console.log(`    ${c.dim('Config backed up to *.bak files')}`);
           } else {
-            console.log(`    ${c.dim('No new servers to proxy (all already protected or none found).')}`);
+            console.log(
+              `    ${c.dim('No new servers to proxy (all already protected or none found).')}`
+            );
           }
 
           // Show errors if any
@@ -135,7 +149,9 @@ export function upCommand(): Command {
         }
         console.log();
       } catch {
-        console.log(`  ${c.dim('Platform detection skipped (install @panguard-ai/panguard-mcp for full detection).')}\n`);
+        console.log(
+          `  ${c.dim('Platform detection skipped (install @panguard-ai/panguard-mcp for full detection).')}\n`
+        );
       }
 
       // ── Step 2: Open dashboard ──────────────────────────────
@@ -214,7 +230,9 @@ export function upCommand(): Command {
                 for (const skill of toScan) {
                   try {
                     scanned++;
-                    process.stdout.write(`\r  ${c.dim(`[${scanned}/${toScan.length}]`)} Auditing ${c.bold(skill.name)}...`);
+                    process.stdout.write(
+                      `\r  ${c.dim(`[${scanned}/${toScan.length}]`)} Auditing ${c.bold(skill.name)}...`
+                    );
 
                     // Find skill directory
                     const skillDir = join(homedir(), '.claude', 'skills', skill.name);
@@ -296,7 +314,8 @@ export function upCommand(): Command {
         const cachePath = join(homedir(), '.panguard-guard', 'threat-cloud-cache.json');
         if (existsSync(cachePath)) {
           const cache = JSON.parse(readFileSync(cachePath, 'utf-8')) as {
-            totalRulesReceived?: number; lastSync?: string;
+            totalRulesReceived?: number;
+            lastSync?: string;
           };
           tcRulesReceived = cache.totalRulesReceived ?? 0;
           if (tcRulesReceived > 0) {
@@ -304,7 +323,9 @@ export function upCommand(): Command {
             tcStatus = `connected (${tcRulesReceived} rules from TC)`;
           }
         }
-      } catch { /* cache might not exist yet */ }
+      } catch {
+        /* cache might not exist yet */
+      }
 
       // ── Clean summary panel ────────────────────────────────
       console.log(`\n  ${c.dim('\u2500'.repeat(50))}`);
@@ -314,7 +335,9 @@ export function upCommand(): Command {
       console.log(`  ${c.sage('Dashboard')}     ${DASHBOARD_URL}`);
       console.log(`  ${c.sage('Rules')}         ${ruleCount} detection rules active`);
       if (platformCount > 0) {
-        console.log(`  ${c.sage('Platforms')}     ${platformCount} detected, ${serverCount} server(s) proxied`);
+        console.log(
+          `  ${c.sage('Platforms')}     ${platformCount} detected, ${serverCount} server(s) proxied`
+        );
       }
       console.log(`  ${c.sage('Threat Cloud')}  ${tcStatus}`);
       console.log('');
@@ -323,7 +346,9 @@ export function upCommand(): Command {
       console.log(`  ${c.bold('NEXT STEPS')}`);
       console.log(`  ${c.dim('1.')} Open dashboard     ${c.sage(DASHBOARD_URL)}`);
       if (threatCount > 0) {
-        console.log(`  ${c.dim('2.')} Review threats     ${c.caution(`${threatCount} flagged`)} ${c.dim('\u2014 pga audit skill <name>')}`);
+        console.log(
+          `  ${c.dim('2.')} Review threats     ${c.caution(`${threatCount} flagged`)} ${c.dim('\u2014 pga audit skill <name>')}`
+        );
         console.log(`  ${c.dim('3.')} Upgrade detection  ${c.dim('pga guard setup-ai')}`);
       } else {
         console.log(`  ${c.dim('2.')} Upgrade detection  ${c.dim('pga guard setup-ai')}`);

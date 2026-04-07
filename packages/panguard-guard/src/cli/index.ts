@@ -179,70 +179,70 @@ async function commandStart(
     // Minimal output for pga up integration
     console.log(`  ${c.safe(symbols.pass)} Guard started (PID ${process.pid})`);
   } else {
-  console.log(
-    statusPanel('PANGUARD AI Guard Active', [
-      { label: 'Status', value: c.safe('PROTECTED'), status: 'safe' },
-      { label: 'PID', value: c.sage(String(process.pid)) },
-      { label: 'Mode', value: c.sage(config.mode) },
-      { label: 'Rules', value: c.sage(rulesSummary) },
-      { label: 'Data Dir', value: c.dim(dataDir) },
-      ...(config.dashboardEnabled
-        ? [{ label: 'Dashboard', value: c.underline(`http://localhost:${config.dashboardPort}`) }]
-        : []),
-      ...(config.threatCloudEndpoint
-        ? [{ label: 'Threat Cloud', value: c.dim(config.threatCloudEndpoint) }]
-        : []),
-    ])
-  );
-
-  // Threat intelligence sharing transparency message
-  if (config.threatCloudUploadEnabled === false || config.telemetryEnabled === false) {
-    console.log(`  ${symbols.info} Threat intelligence sharing: ${c.dim('disabled')}`);
-    console.log(`  ${c.dim('  No data will be uploaded to Panguard Threat Cloud')}`);
-  } else {
-    console.log(`  ${symbols.info} Threat intelligence sharing: ${c.safe('enabled')}`);
     console.log(
-      `  ${c.dim('  Detected threats are anonymously uploaded to Panguard Threat Cloud')}`
+      statusPanel('PANGUARD AI Guard Active', [
+        { label: 'Status', value: c.safe('PROTECTED'), status: 'safe' },
+        { label: 'PID', value: c.sage(String(process.pid)) },
+        { label: 'Mode', value: c.sage(config.mode) },
+        { label: 'Rules', value: c.sage(rulesSummary) },
+        { label: 'Data Dir', value: c.dim(dataDir) },
+        ...(config.dashboardEnabled
+          ? [{ label: 'Dashboard', value: c.underline(`http://localhost:${config.dashboardPort}`) }]
+          : []),
+        ...(config.threatCloudEndpoint
+          ? [{ label: 'Threat Cloud', value: c.dim(config.threatCloudEndpoint) }]
+          : []),
+      ])
     );
-    console.log(`  ${c.dim('  Disable: panguard-guard start --no-telemetry')}`);
-  }
-  if (config.showUploadData) {
-    console.log(`  ${symbols.info} Upload data preview: ${c.safe('enabled')}`);
-  }
-  console.log('');
 
-  // Free tier: show what's enabled/disabled
-  console.log(`  ${c.safe('\u2713')} Auto-blocking: known attack patterns (Layer 1 rules)`);
-
-  // Show AI layer status and setup guide if not configured
-  const hasLocalAi = config.ai?.provider === 'ollama';
-  const hasCloudAi = config.ai?.provider === 'claude' || config.ai?.provider === 'openai';
-  const hasAnyAi = Boolean(config.ai?.provider);
-  const hasEnvKey = Boolean(
-    process.env['PANGUARD_AI_KEY'] ||
-    process.env['ANTHROPIC_API_KEY'] ||
-    process.env['OPENAI_API_KEY']
-  );
-
-  if (hasLocalAi) {
-    console.log(
-      `  ${c.safe('\u2713')} Layer 2 Local AI: ${c.sage(config.ai?.provider + ' / ' + (config.ai?.model ?? 'default'))}`
-    );
-  }
-  if (hasCloudAi || hasEnvKey) {
-    const provider =
-      config.ai?.provider ?? (process.env['ANTHROPIC_API_KEY'] ? 'anthropic' : 'openai');
-    console.log(`  ${c.safe('\u2713')} Layer 3 Cloud AI: ${c.sage(provider + ' connected')}`);
-  }
-
-  if (!hasAnyAi && !hasEnvKey) {
+    // Threat intelligence sharing transparency message
+    if (config.threatCloudUploadEnabled === false || config.telemetryEnabled === false) {
+      console.log(`  ${symbols.info} Threat intelligence sharing: ${c.dim('disabled')}`);
+      console.log(`  ${c.dim('  No data will be uploaded to Panguard Threat Cloud')}`);
+    } else {
+      console.log(`  ${symbols.info} Threat intelligence sharing: ${c.safe('enabled')}`);
+      console.log(
+        `  ${c.dim('  Detected threats are anonymously uploaded to Panguard Threat Cloud')}`
+      );
+      console.log(`  ${c.dim('  Disable: panguard-guard start --no-telemetry')}`);
+    }
+    if (config.showUploadData) {
+      console.log(`  ${symbols.info} Upload data preview: ${c.safe('enabled')}`);
+    }
     console.log('');
-    console.log(
-      `  ${symbols.info} Guard started with ${c.sage('Layer 1 (Pattern Detection)')} active.`
+
+    // Free tier: show what's enabled/disabled
+    console.log(`  ${c.safe('\u2713')} Auto-blocking: known attack patterns (Layer 1 rules)`);
+
+    // Show AI layer status and setup guide if not configured
+    const hasLocalAi = config.ai?.provider === 'ollama';
+    const hasCloudAi = config.ai?.provider === 'claude' || config.ai?.provider === 'openai';
+    const hasAnyAi = Boolean(config.ai?.provider);
+    const hasEnvKey = Boolean(
+      process.env['PANGUARD_AI_KEY'] ||
+      process.env['ANTHROPIC_API_KEY'] ||
+      process.env['OPENAI_API_KEY']
     );
-    console.log('');
-    printAiSetupGuide();
-  }
+
+    if (hasLocalAi) {
+      console.log(
+        `  ${c.safe('\u2713')} Layer 2 Local AI: ${c.sage(config.ai?.provider + ' / ' + (config.ai?.model ?? 'default'))}`
+      );
+    }
+    if (hasCloudAi || hasEnvKey) {
+      const provider =
+        config.ai?.provider ?? (process.env['ANTHROPIC_API_KEY'] ? 'anthropic' : 'openai');
+      console.log(`  ${c.safe('\u2713')} Layer 3 Cloud AI: ${c.sage(provider + ' connected')}`);
+    }
+
+    if (!hasAnyAi && !hasEnvKey) {
+      console.log('');
+      console.log(
+        `  ${symbols.info} Guard started with ${c.sage('Layer 1 (Pattern Detection)')} active.`
+      );
+      console.log('');
+      printAiSetupGuide();
+    }
   } // end of PANGUARD_QUIET_GUARD else block
 
   // ── First-run welcome / 首次啟動歡迎 ──────────────────────────────

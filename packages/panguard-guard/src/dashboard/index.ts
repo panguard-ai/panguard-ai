@@ -116,7 +116,10 @@ export class DashboardServer {
         if (origin) {
           try {
             const parsed = new URL(origin);
-            const isLoopback = parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost' || parsed.hostname === '::1';
+            const isLoopback =
+              parsed.hostname === '127.0.0.1' ||
+              parsed.hostname === 'localhost' ||
+              parsed.hostname === '::1';
             if (!isLoopback) {
               logger.warn(`Rejected WebSocket from non-loopback origin: ${origin}`);
               ws.close();
@@ -131,7 +134,7 @@ export class DashboardServer {
 
         // Per-IP connection limit
         const clientIP = req.socket.remoteAddress ?? 'unknown';
-        const ipCount = [...this.wsClients].filter(c => c.ip === clientIP).length;
+        const ipCount = [...this.wsClients].filter((c) => c.ip === clientIP).length;
         if (ipCount >= MAX_WS_PER_IP) {
           logger.warn(`Max WS connections per IP reached for ${clientIP}`);
           ws.close();
@@ -288,7 +291,12 @@ export class DashboardServer {
     if (url.startsWith('/api/')) {
       const authHeader = req.headers.authorization ?? '';
       // Parse auth token from: 1) Authorization header, 2) HttpOnly cookie, 3) query param (deprecated)
-      const cookieToken = (req.headers.cookie ?? '').split(';').map(c => c.trim()).find(c => c.startsWith('panguard_auth='))?.split('=')[1] ?? '';
+      const cookieToken =
+        (req.headers.cookie ?? '')
+          .split(';')
+          .map((c) => c.trim())
+          .find((c) => c.startsWith('panguard_auth='))
+          ?.split('=')[1] ?? '';
       const queryToken = new URL(url, `http://127.0.0.1:${this.port}`).searchParams.get('token');
       const providedToken = authHeader.replace('Bearer ', '') || cookieToken || queryToken;
 
@@ -541,7 +549,8 @@ export class DashboardServer {
         h.startsWith('169.254.') ||
         h === '[::1]' ||
         h === '0.0.0.0'
-      ) return false;
+      )
+        return false;
       // Block 172.16.0.0/12
       if (h.startsWith('172.')) {
         const second = parseInt(h.split('.')[1] ?? '0', 10);
@@ -690,36 +699,54 @@ export class DashboardServer {
       );
 
       // Try multiple rule locations
-      const candidates = [
-        rulesDir,
-        join(homedir(), '.panguard-guard', 'rules'),
-      ];
+      const candidates = [rulesDir, join(homedir(), '.panguard-guard', 'rules')];
 
       // Also try monorepo atr package
       candidates.push(join(homedir(), '.panguard-guard', 'atr', 'rules'));
 
-      const rules: Array<{ id: string; title: string; severity: string; category: string; description: string }> = [];
+      const rules: Array<{
+        id: string;
+        title: string;
+        severity: string;
+        category: string;
+        description: string;
+      }> = [];
 
       for (const dir of candidates) {
         if (!existsSync(dir)) continue;
         try {
-          const files = readdirSync(dir).filter((f: string) => f.endsWith('.yaml') || f.endsWith('.yml'));
+          const files = readdirSync(dir).filter(
+            (f: string) => f.endsWith('.yaml') || f.endsWith('.yml')
+          );
           for (const file of files) {
             try {
               const content = readFileSync(join(dir, file), 'utf-8');
               // Quick YAML parse for id, title, severity, category, description
               const id = content.match(/^id:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? file;
               const title = content.match(/^title:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? '';
-              const severity = content.match(/^severity:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? 'medium';
-              const category = content.match(/category:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? 'unknown';
-              const description = content.match(/^description:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? '';
+              const severity =
+                content.match(/^severity:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? 'medium';
+              const category =
+                content.match(/category:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? 'unknown';
+              const description =
+                content.match(/^description:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? '';
               if (id && title) {
-                rules.push({ id, title, severity, category, description: description.slice(0, 200) });
+                rules.push({
+                  id,
+                  title,
+                  severity,
+                  category,
+                  description: description.slice(0, 200),
+                });
               }
-            } catch { /* skip unparseable files */ }
+            } catch {
+              /* skip unparseable files */
+            }
           }
           if (rules.length > 0) break; // Found rules in this dir
-        } catch { /* skip unreadable dirs */ }
+        } catch {
+          /* skip unreadable dirs */
+        }
       }
 
       this.jsonResponse(res, { rules, total: rules.length });
@@ -743,7 +770,11 @@ export class DashboardServer {
         .slice(-50)
         .reverse()
         .map((line) => {
-          try { return JSON.parse(line); } catch { return null; }
+          try {
+            return JSON.parse(line);
+          } catch {
+            return null;
+          }
         })
         .filter(Boolean);
       this.jsonResponse(res, { verdicts, total: lines.length });

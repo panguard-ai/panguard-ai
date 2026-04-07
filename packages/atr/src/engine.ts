@@ -52,12 +52,16 @@ function decodeBase64Blocks(content: string): string[] {
     try {
       const raw = Buffer.from(match[0], 'base64');
       const text = raw.toString('utf-8');
-      const printable = text.split('').filter(c => c.charCodeAt(0) >= 32 && c.charCodeAt(0) < 127).length;
+      const printable = text
+        .split('')
+        .filter((c) => c.charCodeAt(0) >= 32 && c.charCodeAt(0) < 127).length;
       if (printable / text.length > 0.7 && text.length >= 10) {
         decoded.push(text.slice(0, 100_000));
         count++;
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
   }
   return decoded;
 }
@@ -173,7 +177,11 @@ export class ATREngine {
       const matchResult = this.evaluateRule(rule, event);
       if (matchResult) {
         // Cross-context: MCP-only rules on SKILL.md get confidence downweight
-        if (isSkillContext && rule.tags.scan_target !== 'skill' && rule.tags.scan_target !== 'both') {
+        if (
+          isSkillContext &&
+          rule.tags.scan_target !== 'skill' &&
+          rule.tags.scan_target !== 'both'
+        ) {
           matches.push({
             ...matchResult,
             confidence: matchResult.confidence * 0.6,

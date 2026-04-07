@@ -75,7 +75,7 @@ describe('Proxy E2E — malicious responses (PostToolUse)', () => {
   it('DENY: response containing private key material', async () => {
     const result = await evaluator.evaluateToolResponse(
       'read_file',
-      '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----',
+      '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----'
     );
     expect(result.outcome).toBe('deny');
   });
@@ -83,7 +83,7 @@ describe('Proxy E2E — malicious responses (PostToolUse)', () => {
   it('ALLOW or ASK: response with normal text (not DENY)', async () => {
     const result = await evaluator.evaluateToolResponse(
       'echo',
-      'Hello world, this is a normal response.',
+      'Hello world, this is a normal response.'
     );
     // Normal text should never be denied — allow or ask are both acceptable
     expect(result.outcome).not.toBe('deny');
