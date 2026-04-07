@@ -10,7 +10,7 @@
  * @module @panguard-ai/panguard-guard/threat-cloud
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, chmodSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { request as httpsRequest } from 'node:https';
 import { request as httpRequest } from 'node:http';
@@ -594,9 +594,16 @@ export class ThreatCloudClient {
   // HTTP helpers / HTTP 輔助函數
   // ---------------------------------------------------------------------------
 
-  /** Select http or https request function based on URL protocol */
+  /** Select transport — enforce HTTPS for external endpoints */
   private selectTransport(url: string) {
-    return url.startsWith('https') ? httpsRequest : httpRequest;
+    if (url.startsWith('https')) return httpsRequest;
+    // Allow HTTP only for localhost/loopback (development/testing)
+    const parsed = new URL(url);
+    if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') {
+      return httpRequest;
+    }
+    logger.warn(`Refusing HTTP for non-loopback endpoint: ${parsed.hostname}. Use HTTPS.`);
+    throw new Error(`HTTPS required for Threat Cloud endpoint (got HTTP for ${parsed.hostname})`);
   }
 
   /** Build common headers including Authorization if API key is configured */
@@ -719,7 +726,7 @@ export class ThreatCloudClient {
         totalRulesReceived: this.cache.stats.totalRulesReceived,
         queueSize: this.uploadQueue.length,
       };
-      writeFileSync(statsFile, JSON.stringify(data, null, 2));
+      writeFileSync(statsFile, JSON.stringify(data, null, 2), { mode: 0o600 });
     } catch {
       // Non-critical — dashboard will show stale data
     }
@@ -741,7 +748,7 @@ export class ThreatCloudClient {
     try {
       const filePath = join(this.dataDir, QUEUE_FILE);
       mkdirSync(dirname(filePath), { recursive: true });
-      writeFileSync(filePath, JSON.stringify(this.uploadQueue, null, 2), 'utf-8');
+      writeFileSync(filePath, JSON.stringify(this.uploadQueue, null, 2), { encoding: 'utf-8', mode: 0o600 });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       logger.error(`Failed to save queue: ${msg} / 儲存佇列失敗: ${msg}`);
