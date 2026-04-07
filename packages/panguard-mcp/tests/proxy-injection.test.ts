@@ -5,28 +5,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-
-// We test the internal functions via the exported API
-// by creating temp config files and calling inject/remove
-import { injectProxy, removeProxy } from '../src/config/mcp-injector.js';
-import { getConfigPath } from '../src/config/platform-detector.js';
-
-// Helper to create a temp config file for a platform
-function createTempConfig(
-  configPath: string,
-  servers: Record<string, { command: string; args: string[]; env?: Record<string, string> }>
-): void {
-  const dir = join(configPath, '..');
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(configPath, JSON.stringify({ mcpServers: servers }, null, 2), 'utf-8');
-}
-
-function readConfig(configPath: string): Record<string, unknown> {
-  return JSON.parse(readFileSync(configPath, 'utf-8')) as Record<string, unknown>;
-}
 
 describe('proxy injection', () => {
   // Use real config paths but save/restore originals
