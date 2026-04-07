@@ -76,19 +76,22 @@ export function upCommand(): Command {
       let platformCount = 0;
       let serverCount = 0;
       try {
-        const pkg = '@panguard-ai/panguard-mcp';
-        let detectPlatforms: () => Promise<Array<{ id: string; name: string; detected: boolean }>>;
-        let injectProxyFn: (ids: readonly string[]) => { totalPlatforms: number; totalServersProxied: number; results: ReadonlyArray<{ platformId: string; serversProxied: number; error?: string }> };
+        type DetectFn = () => Promise<Array<{ id: string; name: string; detected: boolean }>>;
+        type InjectFn = (ids: readonly string[]) => { totalPlatforms: number; totalServersProxied: number; results: ReadonlyArray<{ platformId: string; serversProxied: number; error?: string }> };
+        let detectPlatforms: DetectFn;
+        let injectProxyFn: InjectFn;
 
         try {
-          const mcp = await import(pkg) as { detectPlatforms: typeof detectPlatforms; injectProxy: typeof injectProxyFn };
+          // Published package: import from /config subpath
+          const mcp = await import('@panguard-ai/panguard-mcp/config' as string) as { detectPlatforms: DetectFn; injectProxy: InjectFn };
           detectPlatforms = mcp.detectPlatforms;
           injectProxyFn = mcp.injectProxy;
         } catch {
+          // Monorepo fallback: resolve from cwd
           const { resolve } = await import('node:path');
           const { pathToFileURL } = await import('node:url');
           const mcpDist = resolve(process.cwd(), 'packages/panguard-mcp/dist/config/index.js');
-          const mcp = await import(pathToFileURL(mcpDist).href) as { detectPlatforms: typeof detectPlatforms; injectProxy: typeof injectProxyFn };
+          const mcp = await import(pathToFileURL(mcpDist).href) as { detectPlatforms: DetectFn; injectProxy: InjectFn };
           detectPlatforms = mcp.detectPlatforms;
           injectProxyFn = mcp.injectProxy;
         }
@@ -127,7 +130,7 @@ export function upCommand(): Command {
         }
         console.log();
       } catch {
-        console.log(`  ${c.dim('Platform detection skipped.')}\n`);
+        console.log(`  ${c.dim('Platform detection skipped (install @panguard-ai/panguard-mcp for full detection).')}\n`);
       }
 
       // ── Step 2: Open dashboard ──────────────────────────────
@@ -141,10 +144,9 @@ export function upCommand(): Command {
         console.log(`\n  ${symbols.scan} ${c.bold('Scanning installed skills...')}\n`);
 
         try {
-          const pkg = '@panguard-ai/panguard-mcp';
           let skills: ReadonlyArray<{ name: string; platformId: string }> = [];
           try {
-            const mcp = (await import(pkg)) as {
+            const mcp = (await import('@panguard-ai/panguard-mcp/config' as string)) as {
               discoverAllSkills: () => Promise<typeof skills>;
             };
             skills = await mcp.discoverAllSkills();
