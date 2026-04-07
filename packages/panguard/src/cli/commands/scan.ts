@@ -69,7 +69,18 @@ export function scanCommand(): Command {
           if (!options.verbose) setLogLevel('silent');
           try {
             const { execFileSync } = await import('node:child_process');
-            const atrArgs = ['scan', path, '--severity', options.severity];
+            const { resolve: resolvePath } = await import('node:path');
+            const { existsSync: pathExists } = await import('node:fs');
+
+            // Validate and resolve path
+            const resolvedPath = resolvePath(path);
+            if (!pathExists(resolvedPath)) {
+              console.error(`Error: Path not found: ${resolvedPath}`);
+              process.exitCode = 1;
+              return;
+            }
+
+            const atrArgs = ['scan', resolvedPath, '--severity', options.severity];
             if (options.sarif) atrArgs.push('--sarif');
             else if (options.json) atrArgs.push('--json');
 

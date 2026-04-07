@@ -592,17 +592,31 @@ export class GuardEngine {
         this.proxyVerdictOffset = size;
 
         const newLines = buf.toString('utf-8').trim().split('\n').filter(Boolean);
+        // Cap to prevent memory exhaustion from a malicious file
+        const maxLines = Math.min(newLines.length, 100);
         let denyCount = 0;
-        for (const line of newLines) {
+        for (let i = 0; i < maxLines; i++) {
           try {
-            const verdict = JSON.parse(line) as Record<string, unknown>;
+            const verdict = JSON.parse(newLines[i]!) as Record<string, unknown>;
+            // Validate expected schema — reject unexpected shapes
+            if (typeof verdict['outcome'] !== 'string' || typeof verdict['phase'] !== 'string') continue;
+            // Sanitize string fields before pushing to dashboard
+            const sanitized = {
+              outcome: String(verdict['outcome']).slice(0, 10),
+              phase: String(verdict['phase']).slice(0, 10),
+              tool: typeof verdict['tool'] === 'string' ? verdict['tool'].slice(0, 200) : '',
+              reason: typeof verdict['reason'] === 'string' ? verdict['reason'].slice(0, 500) : '',
+              rules: Array.isArray(verdict['rules']) ? (verdict['rules'] as unknown[]).filter((r): r is string => typeof r === 'string').slice(0, 20) : [],
+              ms: typeof verdict['ms'] === 'number' ? verdict['ms'] : 0,
+              ts: typeof verdict['ts'] === 'string' ? verdict['ts'].slice(0, 30) : new Date().toISOString(),
+            };
             this.dashboard!.pushEvent({
               type: 'proxy_verdict',
-              data: verdict,
-              timestamp: (verdict['ts'] as string) ?? new Date().toISOString(),
+              data: sanitized,
+              timestamp: sanitized.ts,
             });
             this.eventsProcessed++;
-            if (verdict['outcome'] === 'deny') {
+            if (sanitized.outcome === 'deny') {
               denyCount++;
               this.threatsDetected++;
             }

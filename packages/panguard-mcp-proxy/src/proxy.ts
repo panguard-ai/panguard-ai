@@ -45,6 +45,8 @@ export interface ProxyConfig {
   readonly upstreamArgs: readonly string[];
   /** Evaluation timeout in ms (default: 5000) */
   readonly evalTimeout?: number;
+  /** Fail mode: 'closed' blocks on error (safer), 'open' allows on error (default for availability) */
+  readonly failMode?: 'open' | 'closed';
 }
 
 export class MCPProxy {
@@ -53,10 +55,12 @@ export class MCPProxy {
   private client: Client | null = null;
   private server: Server | null = null;
   private readonly evalTimeout: number;
+  private readonly failMode: 'open' | 'closed';
 
   constructor(config: ProxyConfig) {
     this.config = config;
     this.evaluator = new ProxyEvaluator();
+    this.failMode = config.failMode ?? 'closed';
     this.evalTimeout = config.evalTimeout ?? 5000;
   }
 
@@ -117,8 +121,9 @@ export class MCPProxy {
           ),
         ]);
       } catch {
-        // Timeout or error → fail-open
-        preResult = { outcome: 'allow' as const, reason: 'Evaluation timeout (fail-open)', matchedRules: [] as string[], confidence: 0, durationMs: this.evalTimeout };
+        // Timeout or error → respect failMode
+        const fallbackOutcome = this.failMode === 'closed' ? 'deny' as const : 'allow' as const;
+        preResult = { outcome: fallbackOutcome, reason: `Evaluation error (fail-${this.failMode})`, matchedRules: [] as string[], confidence: 0, durationMs: this.evalTimeout };
       }
 
       logVerdict({
@@ -161,7 +166,8 @@ export class MCPProxy {
             ),
           ]);
         } catch {
-          postResult = { outcome: 'allow' as const, reason: 'Post-eval timeout', matchedRules: [] as string[], confidence: 0, durationMs: this.evalTimeout };
+          const fallbackOutcome = this.failMode === 'closed' ? 'deny' as const : 'allow' as const;
+          postResult = { outcome: fallbackOutcome, reason: `Post-eval error (fail-${this.failMode})`, matchedRules: [] as string[], confidence: 0, durationMs: this.evalTimeout };
         }
 
         logVerdict({

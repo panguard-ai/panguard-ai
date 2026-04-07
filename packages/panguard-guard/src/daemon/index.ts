@@ -17,7 +17,7 @@
  * @module @panguard-ai/panguard-guard/daemon
  */
 
-import { writeFileSync, readFileSync, unlinkSync, existsSync, mkdirSync } from 'node:fs';
+import { writeFileSync, readFileSync, unlinkSync, existsSync, mkdirSync, lstatSync } from 'node:fs';
 import { execFile } from 'node:child_process';
 import { platform, homedir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -41,8 +41,16 @@ export class PidFile {
 
   /** Write current PID to file / 將目前 PID 寫入檔案 */
   write(): void {
-    mkdirSync(dirname(this.pidPath), { recursive: true });
-    writeFileSync(this.pidPath, String(process.pid), 'utf-8');
+    mkdirSync(dirname(this.pidPath), { recursive: true, mode: 0o700 });
+    // Reject symlinks to prevent symlink-following file overwrite attacks
+    if (existsSync(this.pidPath)) {
+      const stat = lstatSync(this.pidPath);
+      if (stat.isSymbolicLink()) {
+        unlinkSync(this.pidPath);
+        logger.warn('PID file was a symlink — removed for safety');
+      }
+    }
+    writeFileSync(this.pidPath, String(process.pid), { encoding: 'utf-8', mode: 0o600 });
     logger.info(`PID file written: ${this.pidPath} (PID: ${process.pid}) / PID 檔案已寫入`);
   }
 
@@ -50,8 +58,13 @@ export class PidFile {
   read(): number | null {
     try {
       if (!existsSync(this.pidPath)) return null;
+      // Reject symlinks
+      const stat = lstatSync(this.pidPath);
+      if (stat.isSymbolicLink()) return null;
       const pid = parseInt(readFileSync(this.pidPath, 'utf-8').trim(), 10);
-      return isNaN(pid) ? null : pid;
+      // Validate PID range (2–4194304 on Linux, reasonable upper bound)
+      if (isNaN(pid) || pid < 2 || pid > 4194304) return null;
+      return pid;
     } catch {
       return null;
     }
