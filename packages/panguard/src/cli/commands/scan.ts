@@ -40,24 +40,70 @@ function remoteSystem(openPorts: number): ScanOutputSystem {
 export function scanCommand(): Command {
   return new Command('scan')
     .description('Run a security scan / 執行安全掃描')
+    .argument('[path]', 'File or directory to scan with ATR (auto-detects MCP JSON vs SKILL.md)')
     .option('--quick', 'Quick scan mode (~30s) / 快速掃描模式', false)
     .option('--output <path>', 'Output PDF report path / 輸出 PDF 報告路徑')
     .option('--lang <language>', 'Language: en or zh-TW / 語言', 'en')
     .option('--verbose', 'Verbose output / 詳細輸出', false)
     .option('--json', 'Output pure JSON to stdout (for AI agents) / 輸出純 JSON', false)
+    .option('--sarif', 'Output SARIF v2.1.0 to stdout / 輸出 SARIF', false)
+    .option('--severity <level>', 'Minimum severity (informational, low, medium, high, critical)', 'medium')
     .option('--save <path>', 'Save JSON results to file / 儲存 JSON 結果到檔案')
     .option('--target <host>', 'Remote target (IP or domain) / 遠端目標')
     .action(
-      async (options: {
+      async (path: string | undefined, options: {
         quick: boolean;
         output?: string;
         lang: string;
         verbose: boolean;
         json: boolean;
+        sarif: boolean;
+        severity: string;
         save?: string;
         target?: string;
       }) => {
         const lang: Language = options.lang === 'zh-TW' ? 'zh-TW' : 'en';
+
+        // ── ATR scan mode: pga scan <file-or-dir> ───────────────
+        if (path) {
+          if (!options.verbose) setLogLevel('silent');
+          try {
+            const { execFileSync } = await import('node:child_process');
+            const atrArgs = ['scan', path, '--severity', options.severity];
+            if (options.sarif) atrArgs.push('--sarif');
+            else if (options.json) atrArgs.push('--json');
+
+            // Try local atr binary first (monorepo), then npx
+            let atrBin: string;
+            const { resolve } = await import('node:path');
+            const { existsSync: fe } = await import('node:fs');
+            const localAtr = resolve(process.cwd(), 'node_modules', '.bin', 'atr');
+            const monorepoAtr = resolve(process.cwd(), '..', 'agent-threat-rules', 'dist', 'cli.js');
+            if (fe(localAtr)) {
+              atrBin = localAtr;
+            } else if (fe(monorepoAtr)) {
+              atrBin = 'node';
+              atrArgs.unshift(monorepoAtr);
+            } else {
+              atrBin = 'npx';
+              atrArgs.unshift('-y', 'agent-threat-rules');
+            }
+
+            const result = execFileSync(atrBin, atrArgs, {
+              stdio: ['inherit', 'pipe', 'inherit'],
+              timeout: 60_000,
+            });
+            process.stdout.write(result);
+          } catch (err: unknown) {
+            const e = err as { status?: number; stdout?: Buffer };
+            // ATR exits 1 on findings with fail-on-finding — still show output
+            if (e.stdout && e.stdout.length > 0) {
+              process.stdout.write(e.stdout);
+            }
+            process.exitCode = e.status ?? 1;
+          }
+          return;
+        }
 
         // Suppress all structured logs early for JSON/non-verbose modes
         if (options.json || !options.verbose) {

@@ -592,15 +592,32 @@ export class GuardEngine {
         this.proxyVerdictOffset = size;
 
         const newLines = buf.toString('utf-8').trim().split('\n').filter(Boolean);
+        let denyCount = 0;
         for (const line of newLines) {
           try {
             const verdict = JSON.parse(line) as Record<string, unknown>;
-            this.dashboard.pushEvent({
+            this.dashboard!.pushEvent({
               type: 'proxy_verdict',
               data: verdict,
               timestamp: (verdict['ts'] as string) ?? new Date().toISOString(),
             });
+            this.eventsProcessed++;
+            if (verdict['outcome'] === 'deny') {
+              denyCount++;
+              this.threatsDetected++;
+            }
           } catch { /* skip malformed lines */ }
+        }
+
+        // Report proxy scan events to Threat Cloud for flywheel
+        if (newLines.length > 0) {
+          this.engines.threatCloud.reportScanEvent({
+            source: 'cli-user',
+            skillsScanned: newLines.length,
+            findingsCount: denyCount,
+            confirmedMalicious: denyCount,
+            cleanCount: newLines.length - denyCount,
+          }).catch(() => { /* best effort */ });
         }
       } catch { /* file read error, skip this cycle */ }
     }, 2000);
