@@ -104,6 +104,8 @@ export interface ATRScanOptions {
   readonly allReducers?: boolean;
   /** True if content has high density of defensive/educational security language */
   readonly hasDefensiveText?: boolean;
+  /** Scan target context: 'skill' for SKILL.md, 'mcp' for MCP events. Defaults to 'skill'. */
+  readonly scanTarget?: 'mcp' | 'skill' | 'runtime';
 }
 
 /**
@@ -126,12 +128,22 @@ export function scanWithATR(
     hasStrongReducers = false,
     allReducers = false,
     hasDefensiveText = false,
+    scanTarget = 'skill',
   } = options;
   const findings: Finding[] = [];
   const matchedRuleIds = new Set<string>();
   const strippedContent = stripMarkdownNoise(content);
 
-  for (const rule of rules) {
+  // Filter rules by scan_target: exclude rules that don't belong to this scan path.
+  // MCP-only rules (scan_target: 'mcp') cause high FP on SKILL.md content.
+  // Rules with no scan_target apply to all paths.
+  const applicableRules = rules.filter((rule) => {
+    const rt = (rule as { scan_target?: string | null }).scan_target;
+    if (!rt) return true; // no scan_target = applies to all
+    return rt === scanTarget;
+  });
+
+  for (const rule of applicableRules) {
     if (matchedRuleIds.has(rule.id)) continue;
 
     for (const compiled of rule.compiled) {

@@ -56,12 +56,16 @@ for (const file of files) {
     continue;
   }
   const category = doc.tags?.category || '';
+  const scanTarget = doc.tags?.scan_target || null; // mcp | skill | runtime | null (both)
+  const ruleVersion = doc.rule_version || 1;
   const patterns = extractPatterns(doc);
   compiled.push({
     id: doc.id,
     title: doc.title || '',
     severity: doc.severity || 'medium',
     category,
+    scan_target: scanTarget,
+    rule_version: ruleVersion,
     patterns,
   });
 }
