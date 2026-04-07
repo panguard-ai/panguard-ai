@@ -82,7 +82,7 @@ export class ProxyEvaluator {
     // Flatten args into natural text so ATR regexes can match content like paths and commands
     const flatContent = `${toolName} ${this.flattenArgs(args)}`;
     const event: AgentEvent = {
-      type: 'mcp_exchange',
+      type: 'mcp_exchange' as AgentEvent['type'],
       timestamp: new Date().toISOString(),
       content: flatContent,
       fields: {
@@ -98,7 +98,7 @@ export class ProxyEvaluator {
   async evaluateToolResponse(toolName: string, response: string): Promise<EvalResult> {
     const start = Date.now();
     const event: AgentEvent = {
-      type: 'mcp_exchange',
+      type: 'mcp_exchange' as AgentEvent['type'],
       timestamp: new Date().toISOString(),
       content: response,
       fields: {
