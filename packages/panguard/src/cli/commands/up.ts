@@ -49,8 +49,12 @@ export function upCommand(): Command {
     .option('--verbose', 'Verbose output', false)
     .option('--skip-scan', 'Skip initial skill scan', false)
     .action(async (opts: { dashboard: boolean; verbose: boolean; skipScan: boolean }) => {
-      // Suppress JSON logs for clean output
-      if (!opts.verbose) setLogLevel('silent');
+      // Suppress JSON logs for clean output — set env var BEFORE any dynamic imports
+      // so all child modules (panguard-mcp, panguard-scan, etc.) also respect it
+      if (!opts.verbose) {
+        process.env['PANGUARD_LOG_LEVEL'] = 'silent';
+        setLogLevel('silent');
+      }
       const startTime = Date.now();
 
       console.log(`\n  ${c.sage(c.bold('PANGUARD AI'))} ${c.dim('— AI Agent Security Guard')}\n`);
@@ -75,6 +79,7 @@ export function upCommand(): Command {
       // ── Step 1: Detect platforms + inject proxy ─────────────
       let platformCount = 0;
       let serverCount = 0;
+      let threatCount = 0;
       try {
         type DetectFn = () => Promise<Array<{ id: string; name: string; detected: boolean }>>;
         type InjectFn = (ids: readonly string[]) => { totalPlatforms: number; totalServersProxied: number; results: ReadonlyArray<{ platformId: string; serversProxied: number; error?: string }> };
@@ -240,18 +245,16 @@ export function upCommand(): Command {
               // Clear progress line
               process.stdout.write('\r' + ' '.repeat(80) + '\r');
 
+              threatCount = threats.length;
               if (threats.length > 0) {
                 console.log(`  ${c.critical(c.bold(`${threats.length} threat(s) detected:`))}\n`);
                 for (const t of threats) {
                   const icon = t.riskLevel === 'CRITICAL' ? c.critical('!!') : c.caution('!');
                   console.log(
-                    `  [${icon}] ${c.bold(t.name)} (${t.platform}) — ${t.riskLevel} (${t.riskScore}/100)`
+                    `    ${icon} ${c.bold(t.name)} (${t.platform}) ${c.dim(`\u2014 ${t.riskLevel}`)}`
                   );
                 }
-                console.log(`\n  ${c.bold('Recommended action:')} Remove or disable these skills.`);
-                console.log(
-                  `  ${c.dim('Run: pga audit skill <name> for details on each threat.')}\n`
-                );
+                console.log('');
               } else {
                 console.log(
                   `  ${c.safe(`${symbols.pass} No threats found in unscanned skills.`)}\n`
@@ -271,32 +274,45 @@ export function upCommand(): Command {
       // ── Activation tracking (one-time) ─────────────────────
       reportActivation().catch(() => {});
 
-      // ── Step 3: Start Guard ────────────────────────────────
+      // ── Summary + Start Guard ─────────────────────────────
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      const guardAlreadyRunning = isGuardRunning();
 
-      // Build summary line
-      const summaryParts: string[] = [];
-      if (platformCount > 0) summaryParts.push(`${platformCount} platform(s)`);
-      if (serverCount > 0) summaryParts.push(`${serverCount} server(s) proxied`);
-      const summaryLine = summaryParts.length > 0 ? summaryParts.join(', ') : '';
-
-      if (isGuardRunning()) {
-        console.log(`  ${c.dim('\u2500'.repeat(50))}`);
-        console.log(`  ${c.safe(`${symbols.pass} Guard is already running.`)}`);
-        if (summaryLine) console.log(`  ${c.sage(`PROTECTED`)} ${c.dim(`\u2014 ${summaryLine}`)}`);
-        console.log(`  ${c.dim(`Completed in ${elapsed}s`)}\n`);
-        return;
+      if (!guardAlreadyRunning) {
+        // Suppress guard's own banner/status — pga up has its own summary
+        process.env['PANGUARD_QUIET_GUARD'] = '1';
+        const args = ['start'];
+        if (opts.dashboard) args.push('--dashboard');
+        if (opts.verbose) args.push('--verbose');
+        await runCLI(args);
       }
 
+      // ── Clean summary panel ────────────────────────────────
+      console.log(`\n  ${c.dim('\u2500'.repeat(50))}`);
+      console.log(`  ${c.safe(c.bold('PROTECTED'))} ${c.dim(`\u2014 ${elapsed}s`)}`);
       console.log(`  ${c.dim('\u2500'.repeat(50))}`);
-      if (summaryLine) console.log(`  ${c.sage(`PROTECTED`)} ${c.dim(`\u2014 ${summaryLine}`)}`);
-      console.log(`  ${c.dim(`Scan completed in ${elapsed}s`)} ${symbols.info} ${c.bold('Starting Guard...')}\n`);
+      console.log('');
+      console.log(`  ${c.sage('Dashboard')}     ${DASHBOARD_URL}`);
+      console.log(`  ${c.sage('Rules')}         100 ATR detection rules active`);
+      if (platformCount > 0) {
+        console.log(`  ${c.sage('Platforms')}     ${platformCount} detected, ${serverCount} server(s) proxied`);
+      }
+      console.log(`  ${c.sage('Threat Cloud')}  connected (tc.panguard.ai)`);
+      console.log('');
 
-      const args = ['start'];
-      if (opts.dashboard) args.push('--dashboard');
-      if (opts.verbose) args.push('--verbose');
-
-      await runCLI(args);
+      // ── Next steps ─────────────────────────────────────────
+      console.log(`  ${c.bold('NEXT STEPS')}`);
+      console.log(`  ${c.dim('1.')} Open dashboard     ${c.sage(DASHBOARD_URL)}`);
+      if (threatCount > 0) {
+        console.log(`  ${c.dim('2.')} Review threats     ${c.caution(`${threatCount} flagged`)} ${c.dim('\u2014 pga audit skill <name>')}`);
+        console.log(`  ${c.dim('3.')} Upgrade detection  ${c.dim('pga guard setup-ai')}`);
+      } else {
+        console.log(`  ${c.dim('2.')} Upgrade detection  ${c.dim('pga guard setup-ai')}`);
+      }
+      console.log('');
+      console.log(`  ${c.dim('Layer 1 (regex) catches ~70% of attacks at zero cost.')}`);
+      console.log(`  ${c.dim('Add Layer 2 (local AI) or 3 (cloud AI) for deeper detection.')}`);
+      console.log('');
     });
 }
 

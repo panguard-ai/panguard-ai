@@ -17,16 +17,18 @@ const LOG_LEVELS: Record<LogLevel, number> = {
   silent: 4,
 };
 
-let currentLevel: LogLevel = 'info';
+// Read initial level from env var so ALL modules respect it, even across pnpm workspace boundaries
+let currentLevel: LogLevel = (process.env['PANGUARD_LOG_LEVEL'] as LogLevel) || 'info';
 
 /**
- * Set the minimum log level
- * 設定最低日誌等級
+ * Set the minimum log level (also sets env var for child modules)
+ * 設定最低日誌等級（同時設定環境變數讓子模組讀取）
  *
  * @param level - Minimum log level / 最低日誌等級
  */
 export function setLogLevel(level: LogLevel): void {
   currentLevel = level;
+  process.env['PANGUARD_LOG_LEVEL'] = level;
 }
 
 /**
@@ -44,7 +46,10 @@ function log(
   module: string,
   context?: Record<string, unknown>
 ): void {
-  if (LOG_LEVELS[level] < LOG_LEVELS[currentLevel]) {
+  // Check env var on every call — handles cross-package instances in pnpm workspaces
+  const envLevel = process.env['PANGUARD_LOG_LEVEL'] as LogLevel | undefined;
+  const effectiveLevel = envLevel && LOG_LEVELS[envLevel] !== undefined ? envLevel : currentLevel;
+  if (LOG_LEVELS[level] < LOG_LEVELS[effectiveLevel]) {
     return;
   }
 

@@ -130,7 +130,10 @@ async function commandStart(
     setLogLevel('silent');
   }
 
-  console.log(banner(CLI_VERSION));
+  // When called from pga up, suppress the banner (pga up has its own output)
+  if (!process.env['PANGUARD_QUIET_GUARD']) {
+    console.log(banner(CLI_VERSION));
+  }
 
   const pidFile = new PidFile(dataDir);
   if (pidFile.isRunning()) {
@@ -171,7 +174,11 @@ async function commandStart(
   const rules = engine.getRuleCounts();
   const rulesSummary = `ATR: ${rules.atr}`;
 
-  // Status box
+  // Status box (suppressed when called from pga up which has its own summary)
+  if (process.env['PANGUARD_QUIET_GUARD']) {
+    // Minimal output for pga up integration
+    console.log(`  ${c.safe(symbols.pass)} Guard started (PID ${process.pid})`);
+  } else {
   console.log(
     statusPanel('PANGUARD AI Guard Active', [
       { label: 'Status', value: c.safe('PROTECTED'), status: 'safe' },
@@ -236,11 +243,13 @@ async function commandStart(
     console.log('');
     printAiSetupGuide();
   }
+  } // end of PANGUARD_QUIET_GUARD else block
 
   // ── First-run welcome / 首次啟動歡迎 ──────────────────────────────
-  await showFirstRunWelcome(config.dashboardPort);
-
-  console.log(`  ${symbols.info} Monitoring...`);
+  if (!process.env['PANGUARD_QUIET_GUARD']) {
+    await showFirstRunWelcome(config.dashboardPort);
+    console.log(`  ${symbols.info} Monitoring...`);
+  }
   console.log('');
 
   // ── TUI Dashboard mode ──────────────────────────────────────────────
@@ -597,8 +606,9 @@ async function showFirstRunWelcome(dashboardPort: number): Promise<void> {
 
 // ---------------------------------------------------------------------------
 
-/** Print bilingual AI layer setup instructions */
+/** Print bilingual AI layer setup instructions (skipped when called from pga up) */
 function printAiSetupGuide(): void {
+  if (process.env['PANGUARD_QUIET_GUARD']) return;
   const configDir = join(homedir(), '.panguard');
 
   console.log(`  To enable AI-powered detection layers:`);
