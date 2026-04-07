@@ -71,13 +71,71 @@ export function upCommand(): Command {
         }
       }
 
-      // ── Step 1: Open dashboard immediately ───────────────────
+      // ── Step 1: Detect platforms + inject proxy ─────────────
+      let platformCount = 0;
+      let serverCount = 0;
+      try {
+        const pkg = '@panguard-ai/panguard-mcp';
+        let detectPlatforms: () => Promise<Array<{ id: string; name: string; detected: boolean }>>;
+        let injectProxyFn: (ids: readonly string[]) => { totalPlatforms: number; totalServersProxied: number; results: ReadonlyArray<{ platformId: string; serversProxied: number; error?: string }> };
+
+        try {
+          const mcp = await import(pkg) as { detectPlatforms: typeof detectPlatforms; injectProxy: typeof injectProxyFn };
+          detectPlatforms = mcp.detectPlatforms;
+          injectProxyFn = mcp.injectProxy;
+        } catch {
+          const { resolve } = await import('node:path');
+          const { pathToFileURL } = await import('node:url');
+          const mcpDist = resolve(process.cwd(), 'packages/panguard-mcp/dist/config/index.js');
+          const mcp = await import(pathToFileURL(mcpDist).href) as { detectPlatforms: typeof detectPlatforms; injectProxy: typeof injectProxyFn };
+          detectPlatforms = mcp.detectPlatforms;
+          injectProxyFn = mcp.injectProxy;
+        }
+
+        console.log(`  ${symbols.scan} ${c.bold('Detecting AI platforms...')}\n`);
+        const platforms = await detectPlatforms();
+        const detected = platforms.filter((p) => p.detected);
+
+        for (const p of detected) {
+          console.log(`    ${c.safe(p.name)}  ${c.dim('detected')}`);
+        }
+        if (detected.length === 0) {
+          console.log(`    ${c.dim('No AI platforms found.')}`);
+        }
+
+        // Inject proxy on all detected platforms
+        if (detected.length > 0) {
+          console.log(`\n  ${symbols.shield} ${c.bold('Injecting runtime protection...')}\n`);
+          const proxySummary = injectProxyFn(detected.map((p) => p.id));
+          platformCount = proxySummary.totalPlatforms;
+          serverCount = proxySummary.totalServersProxied;
+
+          if (serverCount > 0) {
+            console.log(`    ${c.safe(`${serverCount} MCP server(s)`)} proxied across ${c.sage(`${platformCount} platform(s)`)}`);
+            console.log(`    ${c.dim('Config backed up to *.bak files')}`);
+          } else {
+            console.log(`    ${c.dim('No new servers to proxy (all already protected or none found).')}`);
+          }
+
+          // Show errors if any
+          for (const r of proxySummary.results) {
+            if (r.error) {
+              console.log(`    ${c.critical(`${r.platformId}: ${r.error}`)}`);
+            }
+          }
+        }
+        console.log();
+      } catch {
+        console.log(`  ${c.dim('Platform detection skipped.')}\n`);
+      }
+
+      // ── Step 2: Open dashboard ──────────────────────────────
       if (opts.dashboard) {
         console.log(`  ${c.sage(`Opening dashboard: ${DASHBOARD_URL}`)}\n`);
         openBrowser(DASHBOARD_URL);
       }
 
-      // ── Step 2: Scan installed skills ────────────────────────
+      // ── Step 3: Scan installed skills ────────────────────────
       if (!opts.skipScan) {
         console.log(`\n  ${symbols.scan} ${c.bold('Scanning installed skills...')}\n`);
 
@@ -213,14 +271,22 @@ export function upCommand(): Command {
       // ── Step 3: Start Guard ────────────────────────────────
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
+      // Build summary line
+      const summaryParts: string[] = [];
+      if (platformCount > 0) summaryParts.push(`${platformCount} platform(s)`);
+      if (serverCount > 0) summaryParts.push(`${serverCount} server(s) proxied`);
+      const summaryLine = summaryParts.length > 0 ? summaryParts.join(', ') : '';
+
       if (isGuardRunning()) {
         console.log(`  ${c.dim('\u2500'.repeat(50))}`);
         console.log(`  ${c.safe(`${symbols.pass} Guard is already running.`)}`);
-        console.log(`  ${c.dim(`Startup completed in ${elapsed}s`)}\n`);
+        if (summaryLine) console.log(`  ${c.sage(`PROTECTED`)} ${c.dim(`\u2014 ${summaryLine}`)}`);
+        console.log(`  ${c.dim(`Completed in ${elapsed}s`)}\n`);
         return;
       }
 
       console.log(`  ${c.dim('\u2500'.repeat(50))}`);
+      if (summaryLine) console.log(`  ${c.sage(`PROTECTED`)} ${c.dim(`\u2014 ${summaryLine}`)}`);
       console.log(`  ${c.dim(`Scan completed in ${elapsed}s`)} ${symbols.info} ${c.bold('Starting Guard...')}\n`);
 
       const args = ['start'];

@@ -16,8 +16,8 @@
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { WebSocketServer, type WebSocket as WS } from 'ws';
 import { createLogger } from '@panguard-ai/core';
@@ -318,6 +318,12 @@ export class DashboardServer {
           this.handleThreatCloudGet(res);
         }
         break;
+      case '/api/loaded-rules':
+        this.handleLoadedRulesApi(res);
+        break;
+      case '/api/proxy-verdicts':
+        this.handleProxyVerdictsApi(res);
+        break;
       case '/api/installed-skills':
         this.handleInstalledSkillsApi(res).catch((err: unknown) => {
           logger.error(
@@ -613,6 +619,78 @@ export class DashboardServer {
         this.jsonResponse(res, { error: 'Invalid JSON' }, 400);
       }
     });
+  }
+
+  private handleLoadedRulesApi(res: ServerResponse): void {
+    try {
+      const rulesDir = join(
+        this.getConfig?.()?.dataDir ?? join(homedir(), '.panguard-guard'),
+        '..',
+        'agent-threat-rules',
+        'rules'
+      );
+
+      // Try multiple rule locations
+      const candidates = [
+        rulesDir,
+        join(homedir(), '.panguard-guard', 'rules'),
+      ];
+
+      // Also try monorepo atr package
+      candidates.push(join(homedir(), '.panguard-guard', 'atr', 'rules'));
+
+      let rules: Array<{ id: string; title: string; severity: string; category: string; description: string }> = [];
+
+      for (const dir of candidates) {
+        if (!existsSync(dir)) continue;
+        try {
+          const files = readdirSync(dir).filter((f: string) => f.endsWith('.yaml') || f.endsWith('.yml'));
+          for (const file of files) {
+            try {
+              const content = readFileSync(join(dir, file), 'utf-8');
+              // Quick YAML parse for id, title, severity, category, description
+              const id = content.match(/^id:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? file;
+              const title = content.match(/^title:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? '';
+              const severity = content.match(/^severity:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? 'medium';
+              const category = content.match(/category:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? 'unknown';
+              const description = content.match(/^description:\s*["']?([^"'\n]+)/m)?.[1]?.trim() ?? '';
+              if (id && title) {
+                rules.push({ id, title, severity, category, description: description.slice(0, 200) });
+              }
+            } catch { /* skip unparseable files */ }
+          }
+          if (rules.length > 0) break; // Found rules in this dir
+        } catch { /* skip unreadable dirs */ }
+      }
+
+      this.jsonResponse(res, { rules, total: rules.length });
+    } catch {
+      this.jsonResponse(res, { rules: [], total: 0 });
+    }
+  }
+
+  private handleProxyVerdictsApi(res: ServerResponse): void {
+    const verdictLog = join(homedir(), '.panguard-guard', 'proxy-verdicts.jsonl');
+    if (!existsSync(verdictLog)) {
+      this.jsonResponse(res, { verdicts: [], total: 0 });
+      return;
+    }
+
+    try {
+      const raw = readFileSync(verdictLog, 'utf-8');
+      const lines = raw.trim().split('\n').filter(Boolean);
+      // Return last 50 verdicts, newest first
+      const verdicts = lines
+        .slice(-50)
+        .reverse()
+        .map((line) => {
+          try { return JSON.parse(line); } catch { return null; }
+        })
+        .filter(Boolean);
+      this.jsonResponse(res, { verdicts, total: lines.length });
+    } catch {
+      this.jsonResponse(res, { verdicts: [], total: 0 });
+    }
   }
 
   private async handleInstalledSkillsApi(res: ServerResponse): Promise<void> {
@@ -1004,6 +1082,18 @@ body{font-family:'Inter','Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-se
 </div>
 </div>
 
+<!-- Runtime Protection Live Feed -->
+<div class="st" style="margin-top:4px">Runtime Protection</div>
+<div id="rt-feed" class="tl" style="max-height:200px;margin-bottom:20px">
+<div class="empty" id="rt-empty" style="padding:16px;font-size:12px;color:var(--tm)">No proxy events yet. Tool calls will appear here in real-time when MCP servers are proxied.</div>
+</div>
+
+<!-- Recommended Actions -->
+<div id="rec-actions" style="background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;margin-bottom:20px;display:none">
+<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:10px">Recommended Actions</div>
+<div id="rec-list" style="font-size:12px;line-height:2.2"></div>
+</div>
+
 <!-- Rug Pull Alert (hidden by default, shown via JS when detected) -->
 <div class="rug-alert" id="rug-alert"></div>
 
@@ -1084,6 +1174,12 @@ body{font-family:'Inter','Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-se
 <div class="cd"><div class="cl">ATR</div><div class="cv sg" id="ru-atr">0</div><div style="font-size:11px;color:var(--tm);margin-top:4px" data-i18n="ru_atr_d">Agent Threat Rules (AI-drafted)</div></div>
 </div>
 <div style="font-size:12px;color:var(--tm);margin-bottom:20px"><span id="ru-sync"></span> <span data-i18n="ru_auto">Rules sync automatically every hour from Threat Cloud.</span></div>
+<div class="st">All Loaded Rules</div>
+<div style="margin-bottom:10px"><input id="ru-search" type="text" placeholder="Search rules by ID, title, or category..." style="width:100%;background:var(--s2);border:1px solid var(--bd);color:var(--t1);padding:8px 14px;border-radius:8px;font-size:13px;outline:none" oninput="filterRules()"></div>
+<div id="ru-table-wrap" style="max-height:400px;overflow-y:auto">
+<table class="tb" id="ru-table" style="display:none"><thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Category</th></tr></thead><tbody id="ru-tb"></tbody></table>
+<div id="ru-table-loading" class="empty"><span class="spin"></span> Loading rules...</div>
+</div>
 <hr class="divider">
 <div class="st" data-i18n="what_atr">What is ATR?</div>
 <div class="info-box">
@@ -1136,7 +1232,10 @@ body{font-family:'Inter','Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-se
 <div class="cd"><div class="cl" data-i18n="tr_count">Unknown / Tracked</div><div class="cv w" id="sk-unk">--</div></div>
 <div class="cd"><div class="cl">Blocked</div><div class="cv" style="color:var(--bad)" id="sk-blk">0</div></div>
 </div>
-<div class="st" data-i18n="all_skills">All Installed Skills</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<div class="st" data-i18n="all_skills" style="margin-bottom:0">All Installed Skills</div>
+<button class="btn btn-s" onclick="ldSk2();toast('Refreshing skills...')" style="font-size:12px;padding:6px 16px">Scan Now</button>
+</div>
 <div id="sk2-loading" class="empty"><span class="spin"></span> Loading skills...</div>
 <table class="tb" id="sk2-table" style="display:none"><thead><tr><th>#</th><th data-i18n="name">Name</th><th data-i18n="platform">Platform</th><th>Risk</th><th data-i18n="trust">Status</th><th>Last Audit</th></tr></thead><tbody id="sk2-tb"></tbody></table>
 </div>
@@ -1319,7 +1418,7 @@ var lang=(function(){try{var s=localStorage.getItem('panguard_lang');if(s==='zh'
 
 function TL(){lang=lang==='en'?'zh':'en';try{localStorage.setItem('panguard_lang',lang)}catch(e){}document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(T[lang][k]){if(e.tagName==='INPUT')e.placeholder=T[lang][k];else if(k.indexOf('t_')===0||k.indexOf('d_')===0||k==='go_ai')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});document.querySelectorAll('[data-i18n-wc]').forEach(function(e){var k=e.getAttribute('data-i18n-wc');if(T[lang][k]){if(k==='wc_title')e.innerHTML=T[lang][k];else e.textContent=T[lang][k]}});updateG6();}
 
-function nav(t){document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});var tab=document.querySelector('[data-tab="'+t+'"]');if(tab)tab.classList.add('on');document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});var pg=document.getElementById('p-'+t);if(pg){pg.style.display='';pg.classList.add('on')}if(t==='dashboard'){ldSk();ldISk()}if(t==='settings'){loadAI();updG()}if(t==='rules'){ldRules();ldTCloud()}if(t==='threats')ldTh();if(t==='skills')ldSk2();if(t==='tcloud')ldTCloud2()}
+function nav(t){document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on')});var tab=document.querySelector('[data-tab="'+t+'"]');if(tab)tab.classList.add('on');document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});var pg=document.getElementById('p-'+t);if(pg){pg.style.display='';pg.classList.add('on')}if(t==='dashboard'){ldSk();ldISk();ldProxyVerdicts();ldRecActions()}if(t==='settings'){loadAI();updG()}if(t==='rules'){ldRules();ldTCloud();ldLoadedRules()}if(t==='threats')ldTh();if(t==='skills')ldSk2();if(t==='tcloud')ldTCloud2()}
 document.querySelectorAll('.ni').forEach(function(n){n.addEventListener('click',function(){nav(this.getAttribute('data-tab'))})});
 
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
@@ -1330,7 +1429,7 @@ function gTk(){if(typeof __tk!=='undefined'&&__tk){tk=__tk;try{localStorage.setI
 function af(p,o){o=o||{};o.headers=o.headers||{};if(tk)o.headers['Authorization']='Bearer '+tk;return fetch(p,o).then(function(r){if(r.status===401){document.getElementById('wl').textContent=lang==='zh'?'Token 無效':'Invalid token';document.getElementById('wd').classList.remove('on')}return r})}
 
 /* WS */
-function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event'){aE(m);var ee=document.getElementById('evl-empty');if(ee)ee.style.display='none'}}catch(x){}}}
+function cWS(){var ws=new WebSocket('ws://'+location.host+'/ws');ws.onopen=function(){document.getElementById('wd').classList.add('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u9023\u7dda':'Connected'};ws.onclose=function(){document.getElementById('wd').classList.remove('on');document.getElementById('wl').textContent=lang==='zh'?'\u5df2\u65b7\u7dda':'Disconnected';setTimeout(cWS,3000)};ws.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='status_update')uS(m.data);if(m.type==='new_verdict'||m.type==='new_event'){aE(m);var ee=document.getElementById('evl-empty');if(ee)ee.style.display='none'}if(m.type==='proxy_verdict'){var feed=document.getElementById('rt-feed');var emp=document.getElementById('rt-empty');if(emp)emp.style.display='none';var pv=m.data||{};var cls=pv.outcome==='deny'?'malicious':'benign';var el=document.createElement('div');el.className='ei new '+cls;var t=pv.ts?pv.ts.split('T')[1].split('.')[0]:'--:--';el.innerHTML='<span class="ei-t">'+t+'</span><span class="ei-y" style="color:'+(pv.outcome==='deny'?'var(--bad)':'var(--ok)')+'">'+esc(pv.outcome||'allow').toUpperCase()+'</span><span class="ei-d">'+esc(pv.tool||'')+(pv.reason?' — '+esc(pv.reason):'')+'</span>';feed.prepend(el);setTimeout(function(){el.classList.remove('new')},400);while(feed.children.length>20)feed.removeChild(feed.lastChild)}}catch(x){}}}
 
 function uS(s){
 /* Update KPI cards with flash animation */
@@ -1388,6 +1487,20 @@ function ldRules(){af('/api/rules').then(function(r){return r.json()}).then(func
 /* Threat Cloud */
 function ldTCloud(){af('/api/threat-cloud').then(function(r){return r.json()}).then(function(d){document.getElementById('tc-loading').style.display='none';document.getElementById('tc-content').style.display='';var en=document.getElementById('tc-enabled');en.textContent=d.enabled?(lang==='zh'?'\u5df2\u555f\u7528':'Enabled'):(lang==='zh'?'\u672a\u555f\u7528':'Disabled');en.className='cv-sm '+(d.enabled?'ok':'w');document.getElementById('tc-up').textContent=d.totalUploaded||0;document.getElementById('tc-recv').textContent=d.totalRulesReceived||0;document.getElementById('tc-q').textContent=d.queueSize||0;var tog=document.getElementById('tc-toggle');var tl=document.getElementById('tc-toggle-label');if(d.uploadEnabled){tog.classList.add('on');tl.textContent=lang==='zh'?'\u5df2\u555f\u7528':'Enabled';tl.style.color='var(--ok)'}else{tog.classList.remove('on');tl.textContent=lang==='zh'?'\u5df2\u505c\u7528':'Disabled';tl.style.color='var(--tm)'}}).catch(function(){document.getElementById('tc-loading').innerHTML='<span style="color:var(--bad)">Failed to load Threat Cloud status</span>'})}
 
+/* Loaded Rules table */
+var allRules=[];
+function ldLoadedRules(){af('/api/loaded-rules').then(function(r){return r.json()}).then(function(d){allRules=d.rules||[];document.getElementById('ru-table-loading').style.display='none';if(allRules.length>0){document.getElementById('ru-table').style.display='';renderRules(allRules)}else{document.getElementById('ru-table-loading').innerHTML='<span style="color:var(--tm)">No rule files found locally.</span>'}}).catch(function(){document.getElementById('ru-table-loading').innerHTML='<span style="color:var(--bad)">Failed to load rules</span>'})}
+function renderRules(rules){var tb=document.getElementById('ru-tb');tb.innerHTML='';rules.forEach(function(r){var sevColor=r.severity==='critical'?'var(--bad)':r.severity==='high'?'var(--warn)':r.severity==='medium'?'var(--sage)':'var(--tm)';var tr=document.createElement('tr');tr.innerHTML='<td style="font-family:JetBrains Mono,monospace;font-size:11px;white-space:nowrap">'+esc(r.id)+'</td><td>'+esc(r.title)+'</td><td><span style="color:'+sevColor+';font-weight:600;font-size:12px">'+esc(r.severity)+'</span></td><td style="color:var(--tm);font-size:12px">'+esc(r.category)+'</td>';tb.appendChild(tr)})}
+function filterRules(){var q=(document.getElementById('ru-search').value||'').toLowerCase();if(!q){renderRules(allRules);return}var f=allRules.filter(function(r){return(r.id+' '+r.title+' '+r.category+' '+r.severity).toLowerCase().indexOf(q)!==-1});renderRules(f)}
+
+/* Runtime Protection feed */
+function ldProxyVerdicts(){af('/api/proxy-verdicts').then(function(r){return r.json()}).then(function(d){if(!d.verdicts||d.verdicts.length===0)return;document.getElementById('rt-empty').style.display='none';var feed=document.getElementById('rt-feed');feed.innerHTML='';d.verdicts.slice(0,20).forEach(function(v){var cls=v.outcome==='deny'?'malicious':v.outcome==='ask'?'suspicious':'benign';var el=document.createElement('div');el.className='ei '+cls;var t=v.ts?v.ts.split('T')[1].split('.')[0]:'--:--';el.innerHTML='<span class="ei-t">'+t+'</span><span class="ei-y" style="color:'+(v.outcome==='deny'?'var(--bad)':'var(--ok)')+'">'+esc(v.outcome||'allow').toUpperCase()+'</span><span class="ei-d">'+esc(v.tool||'')+(v.reason?' — '+esc(v.reason):'')+'</span>';feed.appendChild(el)})}).catch(function(){})}
+
+/* Recommended Actions */
+function ldRecActions(){
+var acts=[];
+af('/api/proxy-verdicts').then(function(r){return r.json()}).then(function(d){var denies=(d.verdicts||[]).filter(function(v){return v.outcome==='deny'});if(denies.length>0)acts.push('<span style="color:var(--bad);font-weight:600">[!!]</span> '+denies.length+' tool call(s) blocked by proxy <span style="color:var(--sage);cursor:pointer" onclick="nav(\\'threats\\')">[View]</span>');return af('/api/installed-skills')}).then(function(r){return r.json()}).then(function(d){var unk=(d.skills||[]).filter(function(s){return!s.whitelisted});if(unk.length>0)acts.push('<span style="color:var(--warn);font-weight:600">[!]</span> '+unk.length+' unscanned skill(s) <span style="color:var(--sage);cursor:pointer" onclick="nav(\\'skills\\')">[Scan Now]</span>');return af('/api/ai-config')}).then(function(r){return r.json()}).then(function(d){if(!d.ai||!d.ai.provider)acts.push('<span style="color:var(--tm)">[i]</span> Layer 3 AI unlocks deeper detection <span style="color:var(--sage);cursor:pointer" onclick="nav(\\'settings\\')">[Setup]</span>');return af('/api/threat-cloud')}).then(function(r){return r.json()}).then(function(d){if(!d.enabled||!d.uploadEnabled)acts.push('<span style="color:var(--tm)">[i]</span> Threat Cloud strengthens community defense <span style="color:var(--sage);cursor:pointer" onclick="nav(\\'tcloud\\')">[Enable]</span>');var box=document.getElementById('rec-actions');var list=document.getElementById('rec-list');if(acts.length>0){box.style.display='';list.innerHTML=acts.join('<br>')}else{box.style.display='none'}}).catch(function(){})}
+
 function toggleUpload(){var tog=document.getElementById('tc-toggle');var isOn=tog.classList.contains('on');af('/api/threat-cloud',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uploadEnabled:!isOn})}).then(function(r){return r.json()}).then(function(d){if(d.success){toast(lang==='zh'?'\u5132\u5b58\u6210\u529f':'Configuration saved');ldTCloud()}else toast(d.error||'Error')}).catch(function(){toast('Network error')})}
 
 
@@ -1415,7 +1528,7 @@ var t=document.getElementById('toast');
 t.innerHTML='<span style="color:var(--ok);font-weight:700">Your AI agents are now protected</span>';
 t.classList.add('show');setTimeout(function(){t.classList.remove('show')},4000);
 }
-function loadInitData(){af('/api/status').then(function(r){return r.json()}).then(uS).catch(function(){});af('/api/rules').then(function(r){return r.json()}).then(function(d){if(d.atr!==undefined)document.getElementById('v-atr').textContent=d.atr}).catch(function(){});updateG6()}
+function loadInitData(){af('/api/status').then(function(r){return r.json()}).then(uS).catch(function(){});af('/api/rules').then(function(r){return r.json()}).then(function(d){if(d.atr!==undefined)document.getElementById('v-atr').textContent=d.atr}).catch(function(){});ldProxyVerdicts();ldRecActions()}
 (function(){
 var bar=document.getElementById('init-bar');
 // Always connect WebSocket immediately, regardless of welcome state
@@ -1424,11 +1537,16 @@ cWS();loadInitData();
 if(lang==='zh'){document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(T.zh[k]){if(e.tagName==='INPUT')e.placeholder=T.zh[k];else if(k.indexOf('t_')===0||k.indexOf('d_')===0||k==='go_ai')e.innerHTML=T.zh[k];else e.textContent=T.zh[k]}});document.querySelectorAll('[data-i18n-wc]').forEach(function(e){var k=e.getAttribute('data-i18n-wc');if(T.zh[k]){if(k==='wc_title')e.innerHTML=T.zh[k];else e.textContent=T.zh[k]}});}
 var welcomed=localStorage.getItem('panguard_welcomed');
 if(welcomed){document.getElementById('welcome').style.display='none';return}
-bar.style.width='15%';
-setTimeout(function(){bar.style.width='40%'},600);
-setTimeout(function(){bar.style.width='65%'},1200);
-setTimeout(function(){bar.style.width='85%'},1800);
-setTimeout(function(){bar.style.width='100%'},2400);
+bar.style.width='10%';
+var steps=document.querySelectorAll('.wc-step .wc-icon');
+// Step 1: load rules (real API)
+af('/api/rules').then(function(r){return r.json()}).then(function(d){bar.style.width='30%';if(steps[0])steps[0].classList.add('done');var p=steps[0]&&steps[0].nextElementSibling;if(p){var h=p.querySelector('h4');if(h)h.textContent=(d.atr||0)+' ATR rules loaded'}}).catch(function(){bar.style.width='30%'});
+// Step 2: WS connects (handled by cWS onopen)
+setTimeout(function(){bar.style.width='50%';if(steps[1])steps[1].classList.add('done')},1200);
+// Step 3: load status (real API)
+af('/api/status').then(function(r){return r.json()}).then(function(d){bar.style.width='75%';if(steps[2])steps[2].classList.add('done');var p=steps[2]&&steps[2].nextElementSibling;if(p){var h=p.querySelector('h4');if(h)h.textContent=(d.mode==='protection'?'Protected':'Active')+' - '+(d.eventsProcessed||0)+' events'}}).catch(function(){bar.style.width='75%'});
+// Step 4: ready
+setTimeout(function(){bar.style.width='100%';if(steps[3])steps[3].classList.add('done')},2400);
 })();
 </script>
 </body>

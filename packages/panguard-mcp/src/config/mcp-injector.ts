@@ -327,3 +327,240 @@ export async function injectAll(platformIds: PlatformId[]): Promise<InjectionRes
 export function getInstallCommand(): string {
   return 'npx panguard setup';
 }
+
+// ── Proxy Injection ──────────────────────────────────────────
+
+const PROXY_PACKAGE = '@panguard-ai/panguard-mcp-proxy';
+
+/** Check if an MCP server entry is already wrapped with the proxy. */
+function isAlreadyProxied(server: Record<string, unknown>): boolean {
+  const args = Array.isArray(server['args']) ? server['args'] : [];
+  return args.some((a: unknown) => typeof a === 'string' && a.includes(PROXY_PACKAGE));
+}
+
+/** Check if an MCP server entry belongs to PanGuard itself. */
+function isPanguardEntry(name: string, server: Record<string, unknown>): boolean {
+  if (name === 'panguard') return true;
+  const args = Array.isArray(server['args']) ? server['args'] : [];
+  const command = typeof server['command'] === 'string' ? server['command'] : '';
+  return (
+    command.includes('panguard') ||
+    args.some((a: unknown) => typeof a === 'string' && a.includes('@panguard-ai/panguard-mcp'))
+  );
+}
+
+/** Wrap a single MCP server entry with the proxy. Returns a new object. */
+function wrapWithProxy(server: Record<string, unknown>): Record<string, unknown> {
+  const command = typeof server['command'] === 'string' ? server['command'] : '';
+  const args = Array.isArray(server['args'])
+    ? (server['args'] as unknown[]).filter((a): a is string => typeof a === 'string')
+    : [];
+
+  // New args: npx -y @panguard-ai/panguard-mcp-proxy -- <original command> <original args>
+  const proxyArgs = ['-y', PROXY_PACKAGE, '--', command, ...args];
+
+  return { ...server, command: 'npx', args: proxyArgs };
+}
+
+/** Unwrap a proxy-wrapped MCP server entry. Returns null if not proxied. */
+function unwrapProxy(server: Record<string, unknown>): Record<string, unknown> | null {
+  if (!isAlreadyProxied(server)) return null;
+
+  const args = Array.isArray(server['args'])
+    ? (server['args'] as unknown[]).filter((a): a is string => typeof a === 'string')
+    : [];
+
+  // Find "--" separator
+  const sepIdx = args.indexOf('--');
+  if (sepIdx === -1 || sepIdx >= args.length - 1) return null;
+
+  const originalCommand = args[sepIdx + 1]!;
+  const originalArgs = args.slice(sepIdx + 2);
+
+  return { ...server, command: originalCommand, args: originalArgs };
+}
+
+export interface ProxyInjectionResult {
+  readonly platformId: PlatformId;
+  readonly configPath: string;
+  readonly serversProxied: number;
+  readonly serversSkipped: number;
+  readonly backupPath?: string;
+  readonly error?: string;
+}
+
+export interface ProxyInjectionSummary {
+  readonly results: readonly ProxyInjectionResult[];
+  readonly totalPlatforms: number;
+  readonly totalServersProxied: number;
+}
+
+/**
+ * Inject proxy into all MCP servers on a single JSON-config platform.
+ * Wraps each non-panguard server with panguard-mcp-proxy.
+ * Skips already-proxied servers and panguard's own entries.
+ */
+function injectProxyForJsonPlatform(
+  platformId: PlatformId,
+  configPath: string
+): ProxyInjectionResult {
+  const result: { platformId: PlatformId; configPath: string; serversProxied: number; serversSkipped: number; backupPath?: string; error?: string } = {
+    platformId,
+    configPath,
+    serversProxied: 0,
+    serversSkipped: 0,
+  };
+
+  if (!existsSync(configPath)) {
+    return result;
+  }
+
+  try {
+    const config = readJsonSafe(configPath);
+    const servers = config['mcpServers'] as Record<string, unknown> | undefined;
+    if (!servers || typeof servers !== 'object') return result;
+
+    const updatedServers: Record<string, unknown> = {};
+    let changed = false;
+
+    for (const [name, value] of Object.entries(servers)) {
+      if (!value || typeof value !== 'object') {
+        updatedServers[name] = value;
+        continue;
+      }
+      const server = value as Record<string, unknown>;
+
+      // Skip panguard's own entries
+      if (isPanguardEntry(name, server)) {
+        updatedServers[name] = server;
+        result.serversSkipped++;
+        continue;
+      }
+
+      // Skip already proxied
+      if (isAlreadyProxied(server)) {
+        updatedServers[name] = server;
+        result.serversSkipped++;
+        continue;
+      }
+
+      // Wrap with proxy
+      updatedServers[name] = wrapWithProxy(server);
+      result.serversProxied++;
+      changed = true;
+    }
+
+    if (changed) {
+      result.backupPath = backupFile(configPath);
+      const updatedConfig = { ...config, mcpServers: updatedServers };
+      ensureDir(configPath);
+      writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2), 'utf-8');
+      logger.info(`Proxied ${result.serversProxied} server(s) on ${platformId}`);
+    }
+  } catch (err) {
+    result.error = err instanceof Error ? err.message : String(err);
+    logger.error(`Failed to inject proxy for ${platformId}: ${result.error}`);
+  }
+
+  return result;
+}
+
+/**
+ * Inject MCP proxy into all detected platforms.
+ * Wraps every non-panguard MCP server with panguard-mcp-proxy
+ * so all tool calls pass through ATR evaluation.
+ *
+ * @param platformIds - Platforms to inject proxy into
+ * @returns Summary with per-platform results
+ */
+export function injectProxy(platformIds: readonly PlatformId[]): ProxyInjectionSummary {
+  const results: ProxyInjectionResult[] = [];
+
+  for (const platformId of platformIds) {
+    // OpenClaw uses SKILL.md, not MCP protocol — skip
+    if (platformId === 'openclaw') continue;
+
+    const configPath = getConfigPath(platformId);
+    const result = injectProxyForJsonPlatform(platformId, configPath);
+    results.push(result);
+  }
+
+  const totalServersProxied = results.reduce((sum, r) => sum + r.serversProxied, 0);
+  const totalPlatforms = results.filter((r) => r.serversProxied > 0).length;
+
+  return { results, totalPlatforms, totalServersProxied };
+}
+
+/**
+ * Remove proxy wrappers from all MCP servers on detected platforms.
+ * Restores original command/args for each proxied server.
+ *
+ * @param platformIds - Platforms to remove proxy from
+ * @returns Summary with per-platform results
+ */
+export function removeProxy(platformIds: readonly PlatformId[]): ProxyInjectionSummary {
+  const results: ProxyInjectionResult[] = [];
+
+  for (const platformId of platformIds) {
+    if (platformId === 'openclaw') continue;
+
+    const configPath = getConfigPath(platformId);
+    const result: { platformId: PlatformId; configPath: string; serversProxied: number; serversSkipped: number; backupPath?: string; error?: string } = {
+      platformId,
+      configPath,
+      serversProxied: 0,
+      serversSkipped: 0,
+    };
+
+    if (!existsSync(configPath)) {
+      results.push(result);
+      continue;
+    }
+
+    try {
+      const config = readJsonSafe(configPath);
+      const servers = config['mcpServers'] as Record<string, unknown> | undefined;
+      if (!servers || typeof servers !== 'object') {
+        results.push(result);
+        continue;
+      }
+
+      const updatedServers: Record<string, unknown> = {};
+      let changed = false;
+
+      for (const [name, value] of Object.entries(servers)) {
+        if (!value || typeof value !== 'object') {
+          updatedServers[name] = value;
+          continue;
+        }
+        const server = value as Record<string, unknown>;
+        const unwrapped = unwrapProxy(server);
+
+        if (unwrapped) {
+          updatedServers[name] = unwrapped;
+          result.serversProxied++;
+          changed = true;
+        } else {
+          updatedServers[name] = server;
+        }
+      }
+
+      if (changed) {
+        result.backupPath = backupFile(configPath);
+        const updatedConfig = { ...config, mcpServers: updatedServers };
+        writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2), 'utf-8');
+        logger.info(`Removed proxy from ${result.serversProxied} server(s) on ${platformId}`);
+      }
+    } catch (err) {
+      result.error = err instanceof Error ? err.message : String(err);
+      logger.error(`Failed to remove proxy for ${platformId}: ${result.error}`);
+    }
+
+    results.push(result);
+  }
+
+  const totalServersProxied = results.reduce((sum, r) => sum + r.serversProxied, 0);
+  const totalPlatforms = results.filter((r) => r.serversProxied > 0).length;
+
+  return { results, totalPlatforms, totalServersProxied };
+}
