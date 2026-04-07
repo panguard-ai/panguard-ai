@@ -73,17 +73,17 @@ export function scanCommand(): Command {
             if (options.sarif) atrArgs.push('--sarif');
             else if (options.json) atrArgs.push('--json');
 
-            // Try local atr binary first (monorepo), then npx
+            // Find ATR binary: check if `atr` is on PATH, else use npx
             let atrBin: string;
-            const { resolve } = await import('node:path');
-            const { existsSync: fe } = await import('node:fs');
-            const localAtr = resolve(process.cwd(), 'node_modules', '.bin', 'atr');
-            const monorepoAtr = resolve(process.cwd(), '..', 'agent-threat-rules', 'dist', 'cli.js');
-            if (fe(localAtr)) {
-              atrBin = localAtr;
-            } else if (fe(monorepoAtr)) {
-              atrBin = 'node';
-              atrArgs.unshift(monorepoAtr);
+            const { execFileSync: efs } = await import('node:child_process');
+            let atrOnPath = false;
+            try {
+              efs('atr', ['--version'], { stdio: 'pipe', timeout: 5000 });
+              atrOnPath = true;
+            } catch { /* not installed */ }
+
+            if (atrOnPath) {
+              atrBin = 'atr';
             } else {
               atrBin = 'npx';
               atrArgs.unshift('-y', 'agent-threat-rules');
