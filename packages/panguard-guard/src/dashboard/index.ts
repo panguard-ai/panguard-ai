@@ -1083,15 +1083,22 @@ body{font-family:'Inter','Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-se
 </div>
 
 <!-- Runtime Protection Live Feed -->
-<div class="st" style="margin-top:4px">Runtime Protection</div>
-<div id="rt-feed" class="tl" style="max-height:200px;margin-bottom:20px">
-<div class="empty" id="rt-empty" style="padding:16px;font-size:12px;color:var(--tm)">No proxy events yet. Tool calls will appear here in real-time when MCP servers are proxied.</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:10px">
+<div class="st" style="margin-bottom:0">Runtime Protection</div>
+<div class="live-dot" style="width:6px;height:6px"></div>
+<span style="font-size:11px;color:var(--tm);font-weight:500">LIVE</span>
+</div>
+<div id="rt-feed" class="tl" style="max-height:220px;margin-bottom:20px;border:1px solid var(--bd);border-radius:var(--r);background:var(--s1)">
+<div class="empty-ok" id="rt-empty" style="border:none;border-radius:0">All tool calls are flowing safely through the proxy.<div class="sub">Blocked calls will appear here instantly.</div></div>
 </div>
 
 <!-- Recommended Actions -->
-<div id="rec-actions" style="background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;margin-bottom:20px;display:none">
-<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:10px">Recommended Actions</div>
-<div id="rec-list" style="font-size:12px;line-height:2.2"></div>
+<div id="rec-actions" style="background:linear-gradient(135deg,rgba(251,191,36,0.04),transparent);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;margin-bottom:20px;display:none">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+<svg viewBox="0 0 24 24" width="16" height="16" fill="var(--warn)"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+<span style="font-size:13px;font-weight:600;color:var(--t1)">Recommended Actions</span>
+</div>
+<div id="rec-list" style="font-size:12px;line-height:2.4"></div>
 </div>
 
 <!-- Rug Pull Alert (hidden by default, shown via JS when detected) -->
@@ -1175,7 +1182,10 @@ body{font-family:'Inter','Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-se
 </div>
 <div style="font-size:12px;color:var(--tm);margin-bottom:20px"><span id="ru-sync"></span> <span data-i18n="ru_auto">Rules sync automatically every hour from Threat Cloud.</span></div>
 <div class="st">All Loaded Rules</div>
-<div style="margin-bottom:10px"><input id="ru-search" type="text" placeholder="Search rules by ID, title, or category..." style="width:100%;background:var(--s2);border:1px solid var(--bd);color:var(--t1);padding:8px 14px;border-radius:8px;font-size:13px;outline:none" oninput="filterRules()"></div>
+<div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+<input id="ru-search" type="text" placeholder="Search rules by ID, title, or category..." style="flex:1;background:var(--s2);border:1px solid var(--bd);color:var(--t1);padding:8px 14px;border-radius:8px;font-size:13px;outline:none" oninput="filterRules()" onfocus="this.style.borderColor='var(--sage)'" onblur="this.style.borderColor='var(--bd)'">
+<span id="ru-search-count" style="font-size:12px;color:var(--tm);white-space:nowrap"></span>
+</div>
 <div id="ru-table-wrap" style="max-height:400px;overflow-y:auto">
 <table class="tb" id="ru-table" style="display:none"><thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Category</th></tr></thead><tbody id="ru-tb"></tbody></table>
 <div id="ru-table-loading" class="empty"><span class="spin"></span> Loading rules...</div>
@@ -1475,7 +1485,7 @@ function flt(f){cf=f;document.querySelectorAll('.fb').forEach(function(b){b.clas
 /* Guide */
 function updG(){af('/api/status').then(function(r){return r.json()}).then(function(s){document.getElementById('g4n').classList.add('done');if(s.mode==='protection'){document.getElementById('g2n').classList.add('done');document.getElementById('g3n').classList.add('done')}updateG6()}).catch(function(){});af('/api/ai-config').then(function(r){return r.json()}).then(function(d){if(d.ai&&d.ai.provider)document.getElementById('g5n').classList.add('done')}).catch(function(){})}
 
-function updateG6(){var el=document.getElementById('g6-status');var gn=document.getElementById('g6n');var mode=document.getElementById('v-mode').textContent;if(mode==='protection'||mode==='learning'){gn.classList.add('done');el.style.background='rgba(46,213,115,.1)';el.style.color='var(--ok)';el.textContent=lang==='zh'?'\u9632\u8b77\u5df2\u555f\u52d5 - Guard \u904b\u884c\u4e2d':'Protection Active - Guard is running'}else{el.style.background='rgba(239,68,68,.1)';el.style.color='var(--bad)';el.textContent=lang==='zh'?'\u5c1a\u672a\u555f\u52d5 - \u8acb\u57f7\u884c\u6b65\u9a5f 4':'Not started - complete step 4'}}
+function updateG6(){var el=document.getElementById('g6-status');var gn=document.getElementById('g6n');var hs=document.getElementById('hero-status');var mode=hs?hs.textContent.toLowerCase():'';if(mode.indexOf('protected')!==-1||mode.indexOf('learning')!==-1){gn.classList.add('done');el.style.background='rgba(46,213,115,.1)';el.style.color='var(--ok)';el.textContent=lang==='zh'?'\u9632\u8b77\u5df2\u555f\u52d5 - Guard \u904b\u884c\u4e2d':'Protection Active - Guard is running'}else{el.style.background='rgba(239,68,68,.1)';el.style.color='var(--bad)';el.textContent=lang==='zh'?'\u5c1a\u672a\u555f\u52d5 - \u8acb\u57f7\u884c\u6b65\u9a5f 4':'Not started - complete step 4'}}
 
 /* Installed Skills */
 function ldISk(){af('/api/installed-skills').then(function(r){return r.json()}).then(function(d){document.getElementById('isk-loading').style.display='none';document.getElementById('isk-table').style.display='';var tb=document.getElementById('isk-tb');tb.innerHTML='';if(!d.skills||d.skills.length===0){tb.innerHTML='<tr><td colspan="4" class="empty">'+(lang==='zh'?'\u672a\u627e\u5230\u6280\u80fd':'No skills found')+'</td></tr>';return}d.skills.sort(function(a,b){return a.whitelisted===b.whitelisted?0:a.whitelisted?1:-1});d.skills.forEach(function(s,i){var tr=document.createElement('tr');var st=s.whitelisted?'<span class="badge badge-ok">'+(lang==='zh'?'\u5b89\u5168':'Safe')+'</span>':'<span class="badge badge-w">'+(lang==='zh'?'\u8ffd\u8e64\u4e2d':'Tracked')+'</span>';tr.innerHTML='<td>'+(i+1)+'</td><td>'+esc(s.name||'')+'</td><td style="color:var(--tm);font-size:12px">'+esc(s.platform||'--')+'</td><td>'+st+'</td>';tb.appendChild(tr)})}).catch(function(){document.getElementById('isk-loading').innerHTML='<span style="color:var(--bad)">Failed to load skills</span>'})}
@@ -1489,9 +1499,9 @@ function ldTCloud(){af('/api/threat-cloud').then(function(r){return r.json()}).t
 
 /* Loaded Rules table */
 var allRules=[];
-function ldLoadedRules(){af('/api/loaded-rules').then(function(r){return r.json()}).then(function(d){allRules=d.rules||[];document.getElementById('ru-table-loading').style.display='none';if(allRules.length>0){document.getElementById('ru-table').style.display='';renderRules(allRules)}else{document.getElementById('ru-table-loading').innerHTML='<span style="color:var(--tm)">No rule files found locally.</span>'}}).catch(function(){document.getElementById('ru-table-loading').innerHTML='<span style="color:var(--bad)">Failed to load rules</span>'})}
+function ldLoadedRules(){af('/api/loaded-rules').then(function(r){return r.json()}).then(function(d){allRules=d.rules||[];document.getElementById('ru-table-loading').style.display='none';if(allRules.length>0){document.getElementById('ru-table').style.display='';renderRules(allRules);var ct=document.getElementById('ru-search-count');if(ct)ct.textContent=allRules.length+' rules'}else{document.getElementById('ru-table-loading').innerHTML='<span style="color:var(--tm)">No rule files found locally.</span>'}}).catch(function(){document.getElementById('ru-table-loading').innerHTML='<span style="color:var(--bad)">Failed to load rules</span>'})}
 function renderRules(rules){var tb=document.getElementById('ru-tb');tb.innerHTML='';rules.forEach(function(r){var sevColor=r.severity==='critical'?'var(--bad)':r.severity==='high'?'var(--warn)':r.severity==='medium'?'var(--sage)':'var(--tm)';var tr=document.createElement('tr');tr.innerHTML='<td style="font-family:JetBrains Mono,monospace;font-size:11px;white-space:nowrap">'+esc(r.id)+'</td><td>'+esc(r.title)+'</td><td><span style="color:'+sevColor+';font-weight:600;font-size:12px">'+esc(r.severity)+'</span></td><td style="color:var(--tm);font-size:12px">'+esc(r.category)+'</td>';tb.appendChild(tr)})}
-function filterRules(){var q=(document.getElementById('ru-search').value||'').toLowerCase();if(!q){renderRules(allRules);return}var f=allRules.filter(function(r){return(r.id+' '+r.title+' '+r.category+' '+r.severity).toLowerCase().indexOf(q)!==-1});renderRules(f)}
+function filterRules(){var q=(document.getElementById('ru-search').value||'').toLowerCase();var ct=document.getElementById('ru-search-count');if(!q){renderRules(allRules);if(ct)ct.textContent=allRules.length+' rules';return}var f=allRules.filter(function(r){return(r.id+' '+r.title+' '+r.category+' '+r.severity).toLowerCase().indexOf(q)!==-1});renderRules(f);if(ct)ct.textContent=f.length+'/'+allRules.length}
 
 /* Runtime Protection feed */
 function ldProxyVerdicts(){af('/api/proxy-verdicts').then(function(r){return r.json()}).then(function(d){if(!d.verdicts||d.verdicts.length===0)return;document.getElementById('rt-empty').style.display='none';var feed=document.getElementById('rt-feed');feed.innerHTML='';d.verdicts.slice(0,20).forEach(function(v){var cls=v.outcome==='deny'?'malicious':v.outcome==='ask'?'suspicious':'benign';var el=document.createElement('div');el.className='ei '+cls;var t=v.ts?v.ts.split('T')[1].split('.')[0]:'--:--';el.innerHTML='<span class="ei-t">'+t+'</span><span class="ei-y" style="color:'+(v.outcome==='deny'?'var(--bad)':'var(--ok)')+'">'+esc(v.outcome||'allow').toUpperCase()+'</span><span class="ei-d">'+esc(v.tool||'')+(v.reason?' — '+esc(v.reason):'')+'</span>';feed.appendChild(el)})}).catch(function(){})}

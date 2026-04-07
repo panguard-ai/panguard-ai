@@ -12,6 +12,9 @@
  */
 
 import v8 from 'node:v8';
+import { existsSync, statSync, openSync, readSync, closeSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
 import { createLogger, MonitorEngine, setFeedManager } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
 import type {
@@ -98,6 +101,8 @@ export class GuardEngine {
   private cloudSyncTimer: ReturnType<typeof setInterval> | null = null;
   private eventCallback?: (type: string, data: Record<string, unknown>) => void;
   private consecutiveCriticalChecks = 0;
+  private proxyVerdictWatcher: ReturnType<typeof setInterval> | null = null;
+  private proxyVerdictOffset = 0;
 
   constructor(config: GuardConfig, llm: AnalyzeLLM | null = null) {
     this.config = config;
@@ -332,6 +337,11 @@ export class GuardEngine {
       }
     }
 
+    // Watch proxy verdicts for real-time dashboard feed
+    if (this.dashboard) {
+      this.startProxyVerdictWatcher();
+    }
+
     // Start watchdog if enabled
     if (this.config.watchdogEnabled) {
       this.watchdog = new Watchdog(this.config.watchdogInterval, () => {
@@ -428,6 +438,10 @@ export class GuardEngine {
     if (this.cloudSyncTimer) {
       clearInterval(this.cloudSyncTimer);
       this.cloudSyncTimer = null;
+    }
+    if (this.proxyVerdictWatcher) {
+      clearInterval(this.proxyVerdictWatcher);
+      this.proxyVerdictWatcher = null;
     }
 
     // Stop components
@@ -548,6 +562,48 @@ export class GuardEngine {
       trackedSkills: this.engines.atrEngine.getTrackedSkillCount(),
       stableFingerprints: this.engines.atrEngine.getStableFingerprintCount(),
     });
+  }
+
+  /**
+   * Watch proxy-verdicts.jsonl for new entries and push to dashboard via WebSocket.
+   * Polls every 2s for new lines (lightweight, no native file watcher needed).
+   */
+  private startProxyVerdictWatcher(): void {
+    const verdictPath = join(homedir(), '.panguard-guard', 'proxy-verdicts.jsonl');
+
+    // Start from end of current file
+    if (existsSync(verdictPath)) {
+      try {
+        this.proxyVerdictOffset = statSync(verdictPath).size;
+      } catch { /* start from 0 */ }
+    }
+
+    this.proxyVerdictWatcher = setInterval(() => {
+      if (!this.dashboard || !existsSync(verdictPath)) return;
+      try {
+        const size = statSync(verdictPath).size;
+        if (size <= this.proxyVerdictOffset) return;
+
+        // Read only new bytes
+        const fd = openSync(verdictPath, 'r');
+        const buf = Buffer.alloc(size - this.proxyVerdictOffset);
+        readSync(fd, buf, 0, buf.length, this.proxyVerdictOffset);
+        closeSync(fd);
+        this.proxyVerdictOffset = size;
+
+        const newLines = buf.toString('utf-8').trim().split('\n').filter(Boolean);
+        for (const line of newLines) {
+          try {
+            const verdict = JSON.parse(line) as Record<string, unknown>;
+            this.dashboard.pushEvent({
+              type: 'proxy_verdict',
+              data: verdict,
+              timestamp: (verdict['ts'] as string) ?? new Date().toISOString(),
+            });
+          } catch { /* skip malformed lines */ }
+        }
+      } catch { /* file read error, skip this cycle */ }
+    }, 2000);
   }
 
   /**

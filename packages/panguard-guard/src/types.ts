@@ -475,7 +475,7 @@ export interface DashboardStatus {
 
 /** Dashboard event for WebSocket push / WebSocket 推送事件 */
 export interface DashboardEvent {
-  type: 'status_update' | 'new_event' | 'new_verdict' | 'action_executed' | 'learning_progress';
+  type: 'status_update' | 'new_event' | 'new_verdict' | 'action_executed' | 'learning_progress' | 'proxy_verdict';
   data: unknown;
   timestamp: string;
 }
