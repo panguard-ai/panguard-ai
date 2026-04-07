@@ -100,7 +100,7 @@ function resolveRulesDir(): string {
 /**
  * Build an AgentEvent from instruction text for ATR evaluation.
  */
-function buildLlmInputEvent(content: string, toolName?: string): AgentEvent {
+function _buildLlmInputEvent(content: string, toolName?: string): AgentEvent {
   return {
     type: 'llm_input',
     timestamp: new Date().toISOString(),

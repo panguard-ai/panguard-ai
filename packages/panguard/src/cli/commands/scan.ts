@@ -97,7 +97,7 @@ export function scanCommand(): Command {
               atrBin = 'atr';
             } else {
               atrBin = 'npx';
-              atrArgs.unshift('-y', 'agent-threat-rules');
+              atrArgs.unshift('-y', 'agent-threat-rules@latest');
             }
 
             const result = execFileSync(atrBin, atrArgs, {
