@@ -62,10 +62,25 @@ export function middleware(request: NextRequest) {
   }
 
   // /docs → redirect to Mintlify docs site (except pages hosted on this site)
-  const docsExceptions = ['/docs/getting-started', '/docs/benchmark', '/docs/guard', '/docs/scan', '/docs/cli', '/docs/skill-auditor', '/docs/chat', '/docs/trap', '/docs/report', '/docs/api', '/docs/advanced-setup', '/docs/deployment'];
+  const docsExceptions = [
+    '/docs/getting-started',
+    '/docs/benchmark',
+    '/docs/guard',
+    '/docs/scan',
+    '/docs/cli',
+    '/docs/skill-auditor',
+    '/docs/chat',
+    '/docs/trap',
+    '/docs/report',
+    '/docs/api',
+    '/docs/advanced-setup',
+    '/docs/deployment',
+  ];
   if (pathname === '/docs' || pathname.startsWith('/docs/')) {
     const cleanPath = pathname.replace(/^\/(en|zh-TW)/, '');
-    const isHosted = docsExceptions.some((ex) => cleanPath === ex || cleanPath.startsWith(ex + '/'));
+    const isHosted = docsExceptions.some(
+      (ex) => cleanPath === ex || cleanPath.startsWith(ex + '/')
+    );
     if (!isHosted) {
       const docsPath = cleanPath.replace(/^\/docs\/?/, '/');
       return NextResponse.redirect(
