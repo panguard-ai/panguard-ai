@@ -12,6 +12,8 @@
 
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import type { AuditFinding, CheckResult, SkillManifest } from '../types.js';
 import type { ATREngine as ATREngineType, AgentEvent, ATRMatch } from '@panguard-ai/atr';
 
@@ -82,18 +84,24 @@ const CATEGORY_MAP: Record<string, AuditFinding['category']> = {
  * Walks up from the atr package dist/ to find rules/.
  */
 function resolveRulesDir(): string {
+  // Resolve from the upstream agent-threat-rules package
   try {
-    // Resolve from the atr package
-    const atrIndex = import.meta.resolve?.('@panguard-ai/atr');
-    if (atrIndex) {
-      const atrDir = dirname(fileURLToPath(atrIndex));
-      // dist/index.js -> go up one level to package root, then rules/
-      return resolve(atrDir, '..', 'rules');
-    }
+    const req = createRequire(import.meta.url);
+    const atrMain = req.resolve('agent-threat-rules');
+    const atrRoot = resolve(dirname(atrMain), '..');
+    if (existsSync(resolve(atrRoot, 'rules'))) return resolve(atrRoot, 'rules');
   } catch {
-    // Fallback: monorepo-relative path
+    // Fallback: walk up to node_modules
   }
   const thisDir = dirname(fileURLToPath(import.meta.url));
+  let dir = thisDir;
+  for (let i = 0; i < 10; i++) {
+    const candidate = resolve(dir, 'node_modules', 'agent-threat-rules', 'rules');
+    if (existsSync(candidate)) return candidate;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
   return resolve(thisDir, '..', '..', '..', 'atr', 'rules');
 }
 
