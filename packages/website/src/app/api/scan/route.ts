@@ -359,40 +359,64 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: { url?: string };
+  let body: { url?: string; content?: string; contentType?: 'skill' | 'mcp-config' };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const rawUrl = body.url?.trim();
-  if (!rawUrl || rawUrl.length > 500) {
-    return NextResponse.json(
-      { ok: false, error: 'Please provide a valid GitHub URL' },
-      { status: 400 }
-    );
-  }
+  // Mode 1: Raw content paste (SKILL.md or MCP config)
+  const rawContent = body.content?.trim();
+  const contentType = body.contentType ?? 'skill';
 
-  const parsed = parseGitHubUrl(rawUrl);
-  if (!parsed) {
-    return NextResponse.json(
-      { ok: false, error: 'Only GitHub URLs are supported (e.g. github.com/owner/repo)' },
-      { status: 400 }
-    );
-  }
+  let skill: { content: string; source: string } | null = null;
+  let skillName = 'pasted-content';
+  let owner = '';
+  let repo = '';
 
-  const { owner, repo, branch, path: basePath } = parsed;
+  if (rawContent) {
+    if (rawContent.length > 100_000) {
+      return NextResponse.json(
+        { ok: false, error: 'Content too large. Maximum 100KB.' },
+        { status: 400 }
+      );
+    }
+    skill = { content: rawContent, source: `paste/${contentType}` };
+    skillName = contentType === 'mcp-config' ? 'mcp-config-paste' : 'skill-paste';
+  } else {
+    // Mode 2: GitHub URL fetch (original behavior)
+    const rawUrl = body.url?.trim();
+    if (!rawUrl || rawUrl.length > 500) {
+      return NextResponse.json(
+        { ok: false, error: 'Please provide a GitHub URL or paste content directly' },
+        { status: 400 }
+      );
+    }
 
-  const skill = await fetchSkillContent(owner, repo, branch, basePath);
-  if (!skill) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: `Could not find SKILL.md in ${owner}/${repo}. Make sure the repository is public.`,
-      },
-      { status: 404 }
-    );
+    const parsed = parseGitHubUrl(rawUrl);
+    if (!parsed) {
+      return NextResponse.json(
+        { ok: false, error: 'Only GitHub URLs are supported (e.g. github.com/owner/repo)' },
+        { status: 400 }
+      );
+    }
+
+    owner = parsed.owner;
+    repo = parsed.repo;
+    const { branch, path: basePath } = parsed;
+
+    skill = await fetchSkillContent(owner, repo, branch, basePath);
+    if (!skill) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: `Could not find SKILL.md in ${owner}/${repo}. Make sure the repository is public.`,
+        },
+        { status: 404 }
+      );
+    }
+    skillName = `${owner}/${repo}`;
   }
 
   const cHash = computeContentHash(skill.content);
@@ -406,7 +430,7 @@ export async function POST(request: Request) {
         report: cached.report,
         cached: true,
         contentHash: cHash,
-        source: `${owner}/${repo}/${skill.source}`,
+        source: owner ? `${owner}/${repo}/${skill.source}` : skill.source,
         scannedAt: cached.scannedAt,
       },
     });
@@ -416,39 +440,43 @@ export async function POST(request: Request) {
   ensureRulesFresh();
 
   const isReadme = skill.source.toLowerCase().includes('readme');
-  const skillName = `${owner}/${repo}`;
+  const isPaste = skill.source.startsWith('paste/');
 
-  // Check Threat Cloud whitelist
-  const whitelisted = await checkTCWhitelist(skillName, `${owner}/${repo}`);
-  if (whitelisted) {
-    const safeReport: WebScanReport = {
-      skillName,
-      riskScore: 0,
-      riskLevel: 'LOW',
-      findings: [],
-      checks: [{ status: 'pass', label: 'Community-verified safe skill (Threat Cloud whitelist)' }],
-      durationMs: 0,
-      atrRulesEvaluated: liveATR.length,
-      atrPatternsMatched: 0,
-    };
-    const scannedAt = new Date().toISOString();
-    scanCache.set(cHash, { report: safeReport, scannedAt });
-    return NextResponse.json({
-      ok: true,
-      data: {
-        report: safeReport,
-        cached: false,
-        contentHash: cHash,
-        source: `${owner}/${repo}/${skill.source}`,
-        scannedAt,
-        whitelisted: true,
-      },
-    });
+  // Check Threat Cloud whitelist (skip for paste mode)
+  const sourceLabel = owner ? `${owner}/${repo}/${skill.source}` : skill.source;
+  if (!isPaste) {
+    const whitelisted = await checkTCWhitelist(skillName, `${owner}/${repo}`);
+    if (whitelisted) {
+      const safeReport: WebScanReport = {
+        skillName,
+        riskScore: 0,
+        riskLevel: 'LOW',
+        findings: [],
+        checks: [{ status: 'pass', label: 'Community-verified safe skill (Threat Cloud whitelist)' }],
+        durationMs: 0,
+        atrRulesEvaluated: liveATR.length,
+        atrPatternsMatched: 0,
+      };
+      const scannedAt = new Date().toISOString();
+      scanCache.set(cHash, { report: safeReport, scannedAt });
+      return NextResponse.json({
+        ok: true,
+        data: {
+          report: safeReport,
+          cached: false,
+          contentHash: cHash,
+          source: sourceLabel,
+          scannedAt,
+          whitelisted: true,
+        },
+      });
+    }
   }
 
   // --- Run unified scan via scan-core ---
+  const sourceType = isReadme ? 'documentation' : contentType === 'mcp-config' ? 'skill' : 'skill';
   const result = scanContent(skill.content, {
-    sourceType: isReadme ? 'documentation' : 'skill',
+    sourceType,
     atrRules: liveATR,
     skillName,
   });
@@ -524,7 +552,7 @@ export async function POST(request: Request) {
       report,
       cached: false,
       contentHash: cHash,
-      source: `${owner}/${repo}/${skill.source}`,
+      source: sourceLabel,
       scannedAt,
     },
   });

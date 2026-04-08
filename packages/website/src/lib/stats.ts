@@ -14,7 +14,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 100 ATR rules
+ *   agent-threat-rules/rules/                  -> 108 ATR rules
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -24,16 +24,16 @@
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.4.16',
-  atrRules: 100,
+  atrRules: 108,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 17,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
-  atrPatterns: 680,
-  totalRules: 100,
+  atrPatterns: 720,
+  totalRules: 108,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '100' as const,
+  totalRulesDisplay: '108' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '100' as const,
+  atrRulesDisplay: '108' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -89,12 +89,12 @@ export const STATS = {
    * Updated: 2026-03-16
    */
   ecosystem: {
-    /** Total MCP/AI skill entries crawled from registries */
-    entriesCrawled: 36_394,
+    /** Total MCP/AI skill entries crawled from registries (ClawHub 37,394 + OpenClaw 50,283 + Skills.sh 3,115) */
+    entriesCrawled: 90_792,
     /** npm packages found in crawl */
     npmPackages: 2_769,
     /** Packages actually scanned by ATR + Skill Auditor (L1 + L2 AST) */
-    skillsScanned: 36_394,
+    skillsScanned: 90_792,
     /** Total MCP tool definitions extracted from scanned packages */
     toolsExtracted: 35_858,
     /** Packages with security findings (any severity) */
@@ -119,6 +119,32 @@ export const STATS = {
     findingsClean: 26_718,
     registrySources: 3,
     lastCrawl: '2026-03-27',
+  },
+  /**
+   * Benchmark results (verified 2026-04-08)
+   * PINT: Invariant Labs adversarial corpus (850 samples)
+   * SKILL.md: Real-world skill corpus (498 samples from ClawHub + OpenClaw + Skills.sh)
+   * Garak: NVIDIA jailbreak corpus (666 samples)
+   */
+  benchmark: {
+    pint: { recall: 62.7, precision: 99.7, samples: 850 },
+    skill: { recall: 96.9, precision: 100, fp: 0, samples: 498 },
+    garak: { recall: 69.7, samples: 666 },
+    wildFpRate: 0.48,
+    wildSamples: 3_115,
+  },
+  /** Standards coverage */
+  coverage: {
+    owaspAgentic: '10/10',
+    safeMcp: 91.8,
+    safeMcpDetail: '78/85',
+  },
+  /** Ecosystem adoption */
+  adoption: {
+    ciscoRulesMerged: 34,
+    npmDownloads30d: 23_000,
+    githubStars: 86,
+    platformsSupported: 16,
   },
   /**
    * NOTE: These fallback numbers are only used when TC live API is unreachable.

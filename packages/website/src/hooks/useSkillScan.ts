@@ -33,9 +33,18 @@ export interface ScanResponse {
   };
 }
 
+export type ScanMode = 'url' | 'paste';
+export type PasteContentType = 'skill' | 'mcp-config';
+
 export interface UseSkillScanReturn {
   url: string;
   setUrl: (url: string) => void;
+  pasteContent: string;
+  setPasteContent: (content: string) => void;
+  pasteContentType: PasteContentType;
+  setPasteContentType: (type: PasteContentType) => void;
+  scanMode: ScanMode;
+  setScanMode: (mode: ScanMode) => void;
   loading: boolean;
   result: ScanResponse | null;
   report: ScanReport | null;
@@ -51,6 +60,9 @@ const MIN_ANIMATION_MS = 2200;
 
 export function useSkillScan(): UseSkillScanReturn {
   const [url, setUrl] = useState('');
+  const [pasteContent, setPasteContent] = useState('');
+  const [pasteContentType, setPasteContentType] = useState<PasteContentType>('skill');
+  const [scanMode, setScanMode] = useState<ScanMode>('url');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScanResponse | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -58,8 +70,9 @@ export function useSkillScan(): UseSkillScanReturn {
   const searchParams = useSearchParams();
 
   const handleScan = useCallback(async () => {
-    const trimmed = url.trim();
-    if (!trimmed || loading) return;
+    const isUrlMode = scanMode === 'url';
+    const hasInput = isUrlMode ? url.trim() : pasteContent.trim();
+    if (!hasInput || loading) return;
 
     setLoading(true);
     setResult(null);
@@ -74,10 +87,14 @@ export function useSkillScan(): UseSkillScanReturn {
     const t4 = setTimeout(() => setAnimationPhase(4), 1800);
 
     try {
+      const body = isUrlMode
+        ? { url: url.trim() }
+        : { content: pasteContent.trim(), contentType: pasteContentType };
+
       const res = await fetch('/api/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: trimmed }),
+        body: JSON.stringify(body),
       });
       const data: ScanResponse = await res.json();
 
@@ -100,7 +117,7 @@ export function useSkillScan(): UseSkillScanReturn {
       setLoading(false);
       setAnimationPhase(0);
     }
-  }, [url, loading]);
+  }, [url, pasteContent, pasteContentType, scanMode, loading]);
 
   // Auto-scan from ?scan= query param
   useEffect(() => {
@@ -125,6 +142,12 @@ export function useSkillScan(): UseSkillScanReturn {
   return {
     url,
     setUrl,
+    pasteContent,
+    setPasteContent,
+    pasteContentType,
+    setPasteContentType,
+    scanMode,
+    setScanMode,
     loading,
     result,
     report,
