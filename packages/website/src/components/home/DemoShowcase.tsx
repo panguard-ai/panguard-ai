@@ -63,7 +63,7 @@ export default function DemoShowcase() {
         </div>
 
         {/* Screenshot */}
-        <div className="relative rounded-xl overflow-hidden border border-border/50 shadow-2xl bg-surface-0">
+        <div className="relative rounded-xl overflow-hidden border border-border/50 shadow-2xl bg-surface-0 min-h-[200px] sm:min-h-0">
           <Image
             src={DEMOS[active].image}
             alt={DEMOS[active].alt}
