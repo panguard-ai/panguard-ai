@@ -667,7 +667,7 @@ Run with --json for machine-readable output.`}
                 {t('cta.cta1')} <ChevronRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/pricing"
+                href="/open-source"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-border text-text-primary font-semibold text-sm hover:bg-surface-1 transition-colors"
               >
                 {t('cta.cta2')}

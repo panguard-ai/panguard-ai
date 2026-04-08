@@ -537,10 +537,10 @@ panguard guard config set auto_response true`}
                 Full Setup Guide
               </Link>
               <Link
-                href="/pricing"
+                href="/open-source"
                 className="inline-flex items-center gap-2 border border-border text-text-secondary hover:text-text-primary hover:border-panguard-green font-semibold rounded-full px-6 py-2.5 text-sm transition-all"
               >
-                View Plans
+                100% Open Source
               </Link>
             </div>
           </div>
