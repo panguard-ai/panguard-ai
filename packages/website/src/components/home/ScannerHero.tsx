@@ -34,8 +34,8 @@ function ThreatTicker({ items }: { readonly items: readonly string[] }) {
   const doubled = [...items, ...items];
   return (
     <div className="relative overflow-hidden w-full py-3">
-      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-surface-0 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-surface-0 to-transparent z-10 pointer-events-none" />
       <motion.div
         className="flex gap-8 whitespace-nowrap"
         animate={{ x: ['0%', '-50%'] }}
@@ -60,8 +60,8 @@ function PlatformTicker({ names }: { readonly names: readonly string[] }) {
   const doubled = [...names, ...names];
   return (
     <div className="relative overflow-hidden w-full py-2">
-      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-surface-0 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-surface-0 to-transparent z-10 pointer-events-none" />
       <motion.div
         className="flex gap-6 whitespace-nowrap"
         animate={{ x: ['0%', '-50%'] }}
@@ -107,7 +107,7 @@ function ScannerHeroInner() {
   const tickerItems = [t('ticker1'), t('ticker2'), t('ticker3'), t('ticker4'), t('ticker5')];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a0a]">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-surface-0">
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.03]"
         style={{
@@ -141,7 +141,7 @@ function ScannerHeroInner() {
 
         {/* Scanner */}
         <div className="max-w-xl mx-auto animate-[fadeUp_0.5s_0.3s_ease_both]">
-          <p className="text-xs uppercase tracking-[0.15em] text-text-muted font-semibold mb-3">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold mb-3">
             {t('scanLabel')}
           </p>
 
@@ -345,14 +345,14 @@ function ScannerHeroInner() {
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0e0f0e] to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-surface-0 to-transparent pointer-events-none" />
     </section>
   );
 }
 
 export default function ScannerHero() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-surface-0" />}>
       <ScannerHeroInner />
     </Suspense>
   );

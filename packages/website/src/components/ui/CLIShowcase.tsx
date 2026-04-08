@@ -23,9 +23,9 @@ interface Line {
 
 const c = {
   cmd: 'text-brand-sage',
-  ok: 'text-[#2ED573]',
-  warn: 'text-[#FBBF24]',
-  err: 'text-[#EF4444]',
+  ok: 'text-status-safe',
+  warn: 'text-status-caution',
+  err: 'text-status-danger',
   dim: 'text-text-tertiary',
   muted: 'text-text-muted',
   base: 'text-text-secondary',
@@ -100,11 +100,11 @@ export default function CLIShowcase() {
   return (
     <div className="relative max-w-4xl mx-auto">
       {/* Terminal chrome */}
-      <div className="bg-[#1C1814] rounded-t-xl border border-border border-b-0 px-4 py-3 flex items-center gap-3">
+      <div className="bg-surface-1 rounded-t-xl border border-border border-b-0 px-4 py-3 flex items-center gap-3">
         <div className="flex gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#FBBF24]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#2ED573]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-status-danger" />
+          <div className="w-2.5 h-2.5 rounded-full bg-status-caution" />
+          <div className="w-2.5 h-2.5 rounded-full bg-status-safe" />
         </div>
         <div className="flex items-center gap-2 ml-3">
           <BrandLogo size={14} className="text-brand-sage" />
@@ -116,7 +116,7 @@ export default function CLIShowcase() {
       </div>
 
       {/* Tab bar */}
-      <div className="bg-[#1A1614] border-x border-border flex gap-0 overflow-x-auto scrollbar-hide">
+      <div className="bg-surface-0 border-x border-border flex gap-0 overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -139,7 +139,7 @@ export default function CLIShowcase() {
       </div>
 
       {/* Terminal body */}
-      <div className="bg-[#1A1614] rounded-b-xl border border-border border-t-0 p-5 sm:p-6 font-mono text-[12px] sm:text-[13px] leading-[1.7] min-h-[380px] overflow-x-auto">
+      <div className="bg-surface-0 rounded-b-xl border border-border border-t-0 p-5 sm:p-6 font-mono text-[12px] sm:text-[13px] leading-[1.7] min-h-[380px] overflow-x-auto">
         <div key={activeTab} className="tab-content-enter">
           {tabContent[activeTab].map((line, i) => {
             if (!line.text) return <div key={i} className="h-3" />;

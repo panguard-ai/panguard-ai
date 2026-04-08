@@ -17,7 +17,7 @@ export default function SectionTitle({
       {overline && (
         <div className={`mb-5 ${center ? 'flex flex-col items-center' : ''}`}>
           <div className="w-8 h-[2px] bg-brand-sage rounded-full mb-3" />
-          <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold">
             {overline}
           </p>
         </div>
