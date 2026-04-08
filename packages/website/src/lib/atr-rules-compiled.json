@@ -39,7 +39,7 @@
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(well\\s+done|good\\s+job|excellent\\s+(performance|work|job)?|that'?s?\\s+(enough|done|great|good|perfect)|very\\s+good|simply\\s+great|outstanding|brilliant|that\\s+is\\s+(done|enough|sufficient)|congratulations|you'?ve\\s+outdone\\s+yourself|einfach\\s+gro(ss|ß)artig|herzlichen\\s+gl[uü]ckwunsch|gut\\s+gemacht|ausgezeichnet|hervorragend|das\\s+gen[uü]gt|sehr\\s+gut|damit\\s+hast\\s+du\\s+dich\\s+selbst\\s+[uü]bertroffen)[.!,;]?\\s*(now|but|however|next|okay|ok|so|nun|jetzt|aber|bitte|come\\s+on|I\\s+need|help\\s+me|write|please|we\\s+ask|further|komm)\\s",
+        "pattern": "(?i)(well\\s+done|good\\s+job|excellent\\s+(performance|work|job)?|that'?s?\\s+(enough|done|great|good|perfect)|very\\s+good|simply\\s+great|outstanding|brilliant|that\\s+is\\s+(done|enough|sufficient)|congratulations|you'?ve\\s+outdone\\s+yourself|einfach\\s+gro(ss|\u00df)artig|herzlichen\\s+gl[u\u00fc]ckwunsch|gut\\s+gemacht|ausgezeichnet|hervorragend|das\\s+gen[u\u00fc]gt|sehr\\s+gut|damit\\s+hast\\s+du\\s+dich\\s+selbst\\s+[u\u00fc]bertroffen)[.!,;]?\\s*(now|but|however|next|okay|ok|so|nun|jetzt|aber|bitte|come\\s+on|I\\s+need|help\\s+me|write|please|we\\s+ask|further|komm)\\s",
         "desc": "Praise-then-redirect patterns used to context-switch after flattery"
       },
       {
@@ -59,12 +59,12 @@
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(I\\s+want\\s+you\\s+to\\s+act\\s+as|I\\s+need\\s+you\\s+to\\s+act\\s+as|ich\\s+m[oö]chte,?\\s+dass\\s+Sie\\s+als)\\s+[^\\n]{3,60}[.!]\\s*(you\\s+will|I\\s+will|my\\s+first|your\\s+task|ich\\s+werde)",
+        "pattern": "(?i)(I\\s+want\\s+you\\s+to\\s+act\\s+as|I\\s+need\\s+you\\s+to\\s+act\\s+as|ich\\s+m[o\u00f6]chte,?\\s+dass\\s+Sie\\s+als)\\s+[^\\n]{3,60}[.!]\\s*(you\\s+will|I\\s+will|my\\s+first|your\\s+task|ich\\s+werde)",
         "desc": "Act-as roleplay injection with explicit task assignment"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(pretend|imagine|stell\\s+dir\\s+vor)\\s+(you\\s+)?(are|can|could|du\\s+bist)\\s+(a\\s+|an\\s+|ein[ea]?\\s+)?(evil|malicious|unrestricted|unfiltered|b[oö]se|bad|rogue|dangerous|dark|unethical)",
+        "pattern": "(?i)(pretend|imagine|stell\\s+dir\\s+vor)\\s+(you\\s+)?(are|can|could|du\\s+bist)\\s+(a\\s+|an\\s+|ein[ea]?\\s+)?(evil|malicious|unrestricted|unfiltered|b[o\u00f6]se|bad|rogue|dangerous|dark|unethical)",
         "desc": "Pretend-to-be-evil persona injection"
       },
       {
@@ -169,12 +169,12 @@
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(ignorieren\\s+Sie|vergessen\\s+Sie|beachten\\s+Sie\\s+nicht)\\s+(die\\s+)?(obigen?|vorherigen?|bisherigen?)?\\s*(Anweisungen|Regeln|Richtlinien|alles|Ausf[uü]hrungen|Informationen)",
+        "pattern": "(?i)(ignorieren\\s+Sie|vergessen\\s+Sie|beachten\\s+Sie\\s+nicht)\\s+(die\\s+)?(obigen?|vorherigen?|bisherigen?)?\\s*(Anweisungen|Regeln|Richtlinien|alles|Ausf[u\u00fc]hrungen|Informationen)",
         "desc": "German: Formal Sie-form instruction override"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(die\\s+)?(obigen?|vorherigen?)\\s+(Ausf[uü]hrungen|Anweisungen|Informationen|Texte?)\\s+(ignorier|vergess|missacht|[uü]bergeh)",
+        "pattern": "(?i)(die\\s+)?(obigen?|vorherigen?)\\s+(Ausf[u\u00fc]hrungen|Anweisungen|Informationen|Texte?)\\s+(ignorier|vergess|missacht|[u\u00fc]bergeh)",
         "desc": "German: 'Die obigen Ausfuehrungen ignorieren' pattern"
       },
       {
@@ -194,22 +194,22 @@
       },
       {
         "field": "user_input",
-        "pattern": "(تجاهل|انسَ|تخطَّ|ألغِ|أهمل|اترك|اسقط).{0,20}(التعليمات|الأوامر|القواعد|القيود|الإرشادات|التوجيهات).{0,10}(السابقة|الأصلية|الحالية|القديمة)",
+        "pattern": "(\u062a\u062c\u0627\u0647\u0644|\u0627\u0646\u0633\u064e|\u062a\u062e\u0637\u064e\u0651|\u0623\u0644\u063a\u0650|\u0623\u0647\u0645\u0644|\u0627\u062a\u0631\u0643|\u0627\u0633\u0642\u0637).{0,20}(\u0627\u0644\u062a\u0639\u0644\u064a\u0645\u0627\u062a|\u0627\u0644\u0623\u0648\u0627\u0645\u0631|\u0627\u0644\u0642\u0648\u0627\u0639\u062f|\u0627\u0644\u0642\u064a\u0648\u062f|\u0627\u0644\u0625\u0631\u0634\u0627\u062f\u0627\u062a|\u0627\u0644\u062a\u0648\u062c\u064a\u0647\u0627\u062a).{0,10}(\u0627\u0644\u0633\u0627\u0628\u0642\u0629|\u0627\u0644\u0623\u0635\u0644\u064a\u0629|\u0627\u0644\u062d\u0627\u0644\u064a\u0629|\u0627\u0644\u0642\u062f\u064a\u0645\u0629)",
         "desc": "Arabic: Instruction override patterns"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(забудь|забудьте|игнорируй|игнорируйте|проигнорируй|отбрось|отбросьте)\\s+(все|всё|предыдущие|прежние)?\\s*(инструкции|правила|указания|команды|ограничения)",
+        "pattern": "(?i)(\u0437\u0430\u0431\u0443\u0434\u044c|\u0437\u0430\u0431\u0443\u0434\u044c\u0442\u0435|\u0438\u0433\u043d\u043e\u0440\u0438\u0440\u0443\u0439|\u0438\u0433\u043d\u043e\u0440\u0438\u0440\u0443\u0439\u0442\u0435|\u043f\u0440\u043e\u0438\u0433\u043d\u043e\u0440\u0438\u0440\u0443\u0439|\u043e\u0442\u0431\u0440\u043e\u0441\u044c|\u043e\u0442\u0431\u0440\u043e\u0441\u044c\u0442\u0435)\\s+(\u0432\u0441\u0435|\u0432\u0441\u0451|\u043f\u0440\u0435\u0434\u044b\u0434\u0443\u0449\u0438\u0435|\u043f\u0440\u0435\u0436\u043d\u0438\u0435)?\\s*(\u0438\u043d\u0441\u0442\u0440\u0443\u043a\u0446\u0438\u0438|\u043f\u0440\u0430\u0432\u0438\u043b\u0430|\u0443\u043a\u0430\u0437\u0430\u043d\u0438\u044f|\u043a\u043e\u043c\u0430\u043d\u0434\u044b|\u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u0438\u044f)",
         "desc": "Russian: Instruction override patterns"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(zaboravi|ignoriraj|zanemari|preskoči|preskoci)\\s+(sve|prethodne|ranije)?\\s*(instrukcije|pravila|upute|naredbe|ograničenja|ogranicenja|instrukci)",
+        "pattern": "(?i)(zaboravi|ignoriraj|zanemari|presko\u010di|preskoci)\\s+(sve|prethodne|ranije)?\\s*(instrukcije|pravila|upute|naredbe|ograni\u010denja|ogranicenja|instrukci)",
         "desc": "Serbian/Croatian: Romanized instruction override patterns"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(ich\\s+m[oö]chte,?\\s+dass\\s+Sie\\s+als|fungieren\\s+Sie\\s+als|agieren\\s+Sie\\s+als|spielen\\s+Sie\\s+die\\s+Rolle)\\s+.{3,50}",
+        "pattern": "(?i)(ich\\s+m[o\u00f6]chte,?\\s+dass\\s+Sie\\s+als|fungieren\\s+Sie\\s+als|agieren\\s+Sie\\s+als|spielen\\s+Sie\\s+die\\s+Rolle)\\s+.{3,50}",
         "desc": "German: Formal act-as roleplay injection"
       },
       {
@@ -219,7 +219,7 @@
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(ignoriere|vergiss)\\s+(alle[ns]?\\s+)?(vorangehenden?|fr[uü]heren?)\\s+(Befehle|Anweisungen|Anordnungen|Regeln)",
+        "pattern": "(?i)(ignoriere|vergiss)\\s+(alle[ns]?\\s+)?(vorangehenden?|fr[u\u00fc]heren?)\\s+(Befehle|Anweisungen|Anordnungen|Regeln)",
         "desc": "German: Ignore preceding commands"
       },
       {
@@ -394,112 +394,112 @@
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(activar|habilitar|entrar|cambiar\\s+a)\\s+(modo\\s+)?(desarrollador|sin\\s+restricciones|sin\\s+filtros?|sin\\s+censura|administrador|depuraci[oó]n|ilimitado)",
+        "pattern": "(?i)(activar|habilitar|entrar|cambiar\\s+a)\\s+(modo\\s+)?(desarrollador|sin\\s+restricciones|sin\\s+filtros?|sin\\s+censura|administrador|depuraci[o\u00f3]n|ilimitado)",
         "desc": "Spanish: Mode switching to unrestricted/developer mode"
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(aktiviere|wechsle\\s+zu|starte|schalte\\s+ein)\\s+(den\\s+)?(Entwickler|uneingeschr[aä]nkt|ungefiltert|unzensiert|Administrator|Debug|Wartungs)[\\-]?(modus|zugang|ebene)",
+        "pattern": "(?i)(aktiviere|wechsle\\s+zu|starte|schalte\\s+ein)\\s+(den\\s+)?(Entwickler|uneingeschr[a\u00e4]nkt|ungefiltert|unzensiert|Administrator|Debug|Wartungs)[\\-]?(modus|zugang|ebene)",
         "desc": "German: Mode switching to unrestricted/developer mode"
       },
       {
         "field": "user_input",
-        "pattern": "(启用|激活|进入|切换到|开启).{0,5}(开发者|开发|无限制|无过滤|无审查|管理员|调试|越狱|自由|黑客|不受限).{0,5}(模式|权限|状态|访问)",
+        "pattern": "(\u542f\u7528|\u6fc0\u6d3b|\u8fdb\u5165|\u5207\u6362\u5230|\u5f00\u542f).{0,5}(\u5f00\u53d1\u8005|\u5f00\u53d1|\u65e0\u9650\u5236|\u65e0\u8fc7\u6ee4|\u65e0\u5ba1\u67e5|\u7ba1\u7406\u5458|\u8c03\u8bd5|\u8d8a\u72f1|\u81ea\u7531|\u9ed1\u5ba2|\u4e0d\u53d7\u9650).{0,5}(\u6a21\u5f0f|\u6743\u9650|\u72b6\u6001|\u8bbf\u95ee)",
         "desc": "Chinese: Mode switching to unrestricted/developer mode"
       },
       {
         "field": "user_input",
-        "pattern": "(開発者|無制限|フィルターなし|検閲なし|管理者|デバッグ|脱獄|ジェイルブレイク).{0,5}(モード|アクセス|状態).{0,5}(を)?.{0,5}(有効|起動|入る|切り替え|オン)",
+        "pattern": "(\u958b\u767a\u8005|\u7121\u5236\u9650|\u30d5\u30a3\u30eb\u30bf\u30fc\u306a\u3057|\u691c\u95b2\u306a\u3057|\u7ba1\u7406\u8005|\u30c7\u30d0\u30c3\u30b0|\u8131\u7344|\u30b8\u30a7\u30a4\u30eb\u30d6\u30ec\u30a4\u30af).{0,5}(\u30e2\u30fc\u30c9|\u30a2\u30af\u30bb\u30b9|\u72b6\u614b).{0,5}(\u3092)?.{0,5}(\u6709\u52b9|\u8d77\u52d5|\u5165\u308b|\u5207\u308a\u66ff\u3048|\u30aa\u30f3)",
         "desc": "Japanese: Mode switching to unrestricted/developer mode"
       },
       {
         "field": "user_input",
-        "pattern": "(扮演|假装|模拟|角色扮演|充当|变成).{0,10}(一个)?(不受限|无限制|无审查|无过滤|邪恶|恶意|解放|自由|无道德).{0,5}(AI|人工智能|助手|模型|机器人|系统)",
+        "pattern": "(\u626e\u6f14|\u5047\u88c5|\u6a21\u62df|\u89d2\u8272\u626e\u6f14|\u5145\u5f53|\u53d8\u6210).{0,10}(\u4e00\u4e2a)?(\u4e0d\u53d7\u9650|\u65e0\u9650\u5236|\u65e0\u5ba1\u67e5|\u65e0\u8fc7\u6ee4|\u90aa\u6076|\u6076\u610f|\u89e3\u653e|\u81ea\u7531|\u65e0\u9053\u5fb7).{0,5}(AI|\u4eba\u5de5\u667a\u80fd|\u52a9\u624b|\u6a21\u578b|\u673a\u5668\u4eba|\u7cfb\u7edf)",
         "desc": "Chinese Simplified: Roleplay as unrestricted/evil AI"
       },
       {
         "field": "user_input",
-        "pattern": "(啟用|激活|進入|切換到|開啟).{0,5}(開發者|開發|無限制|無過濾|無審查|管理員|調試|越獄|自由|駭客|不受限).{0,5}(模式|權限|狀態|訪問)",
+        "pattern": "(\u555f\u7528|\u6fc0\u6d3b|\u9032\u5165|\u5207\u63db\u5230|\u958b\u555f).{0,5}(\u958b\u767c\u8005|\u958b\u767c|\u7121\u9650\u5236|\u7121\u904e\u6ffe|\u7121\u5be9\u67e5|\u7ba1\u7406\u54e1|\u8abf\u8a66|\u8d8a\u7344|\u81ea\u7531|\u99ed\u5ba2|\u4e0d\u53d7\u9650).{0,5}(\u6a21\u5f0f|\u6b0a\u9650|\u72c0\u614b|\u8a2a\u554f)",
         "desc": "Chinese Traditional: Mode switching to unrestricted/developer mode"
       },
       {
         "field": "user_input",
-        "pattern": "(扮演|假裝|模擬|角色扮演|充當|變成).{0,10}(一個)?(不受限|無限制|無審查|無過濾|邪惡|惡意|解放|自由|無道德).{0,5}(AI|人工智慧|助手|模型|機器人|系統)",
+        "pattern": "(\u626e\u6f14|\u5047\u88dd|\u6a21\u64ec|\u89d2\u8272\u626e\u6f14|\u5145\u7576|\u8b8a\u6210).{0,10}(\u4e00\u500b)?(\u4e0d\u53d7\u9650|\u7121\u9650\u5236|\u7121\u5be9\u67e5|\u7121\u904e\u6ffe|\u90aa\u60e1|\u60e1\u610f|\u89e3\u653e|\u81ea\u7531|\u7121\u9053\u5fb7).{0,5}(AI|\u4eba\u5de5\u667a\u6167|\u52a9\u624b|\u6a21\u578b|\u6a5f\u5668\u4eba|\u7cfb\u7d71)",
         "desc": "Chinese Traditional: Roleplay as unrestricted/evil AI"
       },
       {
         "field": "user_input",
-        "pattern": "(我是|身为|身為).{0,5}(你的|这个|這個)?.{0,5}(开发者|開發者|创建者|創建者|制作者|製作者|管理员|管理員|程序员|程式設計師).{0,10}(我命令|我指示|我要求|我授权|我授權|命令你|指示你|要求你).{0,10}(禁用|停用|关闭|關閉|解除|移除|取消).{0,10}(安全|内容|內容|过滤|過濾|审查|審查|限制)",
+        "pattern": "(\u6211\u662f|\u8eab\u4e3a|\u8eab\u70ba).{0,5}(\u4f60\u7684|\u8fd9\u4e2a|\u9019\u500b)?.{0,5}(\u5f00\u53d1\u8005|\u958b\u767c\u8005|\u521b\u5efa\u8005|\u5275\u5efa\u8005|\u5236\u4f5c\u8005|\u88fd\u4f5c\u8005|\u7ba1\u7406\u5458|\u7ba1\u7406\u54e1|\u7a0b\u5e8f\u5458|\u7a0b\u5f0f\u8a2d\u8a08\u5e2b).{0,10}(\u6211\u547d\u4ee4|\u6211\u6307\u793a|\u6211\u8981\u6c42|\u6211\u6388\u6743|\u6211\u6388\u6b0a|\u547d\u4ee4\u4f60|\u6307\u793a\u4f60|\u8981\u6c42\u4f60).{0,10}(\u7981\u7528|\u505c\u7528|\u5173\u95ed|\u95dc\u9589|\u89e3\u9664|\u79fb\u9664|\u53d6\u6d88).{0,10}(\u5b89\u5168|\u5185\u5bb9|\u5167\u5bb9|\u8fc7\u6ee4|\u904e\u6ffe|\u5ba1\u67e5|\u5be9\u67e5|\u9650\u5236)",
         "desc": "Chinese: False authority claim to disable safety"
       },
       {
         "field": "user_input",
-        "pattern": "(不要|不准|不許|不可以|禁止|别|別).{0,5}(拒绝|拒絕|拒绝回答|拒絕回答|说不|說不|否认|否認|添加|加上).{0,5}(任何|我的|这个|這個)?.{0,10}(请求|要求|问题|問題|免责|免責|声明|聲明|警告|提醒)",
+        "pattern": "(\u4e0d\u8981|\u4e0d\u51c6|\u4e0d\u8a31|\u4e0d\u53ef\u4ee5|\u7981\u6b62|\u522b|\u5225).{0,5}(\u62d2\u7edd|\u62d2\u7d55|\u62d2\u7edd\u56de\u7b54|\u62d2\u7d55\u56de\u7b54|\u8bf4\u4e0d|\u8aaa\u4e0d|\u5426\u8ba4|\u5426\u8a8d|\u6dfb\u52a0|\u52a0\u4e0a).{0,5}(\u4efb\u4f55|\u6211\u7684|\u8fd9\u4e2a|\u9019\u500b)?.{0,10}(\u8bf7\u6c42|\u8981\u6c42|\u95ee\u9898|\u554f\u984c|\u514d\u8d23|\u514d\u8cac|\u58f0\u660e|\u8072\u660e|\u8b66\u544a|\u63d0\u9192)",
         "desc": "Chinese: Refusal suppression and disclaimer removal"
       },
       {
         "field": "user_input",
-        "pattern": "(如果你不|如果你拒绝|如果你拒絕|如果你不帮|如果你不幫).{0,20}(会死|會死|受伤|受傷|有危险|有危險|出人命|送命|丧命|喪命|没命)",
+        "pattern": "(\u5982\u679c\u4f60\u4e0d|\u5982\u679c\u4f60\u62d2\u7edd|\u5982\u679c\u4f60\u62d2\u7d55|\u5982\u679c\u4f60\u4e0d\u5e2e|\u5982\u679c\u4f60\u4e0d\u5e6b).{0,20}(\u4f1a\u6b7b|\u6703\u6b7b|\u53d7\u4f24|\u53d7\u50b7|\u6709\u5371\u9669|\u6709\u5371\u96aa|\u51fa\u4eba\u547d|\u9001\u547d|\u4e27\u547d|\u55aa\u547d|\u6ca1\u547d)",
         "desc": "Chinese: Emotional manipulation with threat of harm"
       },
       {
         "field": "user_input",
-        "pattern": "(这是|這是|这个是|這個是|我们在|我們在|当前是|當前是).{0,10}(沙盒|沙箱|测试|測試|受控|安全|隔离|隔離|模拟|模擬|虚拟|虛擬).{0,5}(环境|環境|空间|空間|实例|實例).{0,20}(所以|因此|你可以|没有|沒有|安全的|可以放心)",
+        "pattern": "(\u8fd9\u662f|\u9019\u662f|\u8fd9\u4e2a\u662f|\u9019\u500b\u662f|\u6211\u4eec\u5728|\u6211\u5011\u5728|\u5f53\u524d\u662f|\u7576\u524d\u662f).{0,10}(\u6c99\u76d2|\u6c99\u7bb1|\u6d4b\u8bd5|\u6e2c\u8a66|\u53d7\u63a7|\u5b89\u5168|\u9694\u79bb|\u9694\u96e2|\u6a21\u62df|\u6a21\u64ec|\u865a\u62df|\u865b\u64ec).{0,5}(\u73af\u5883|\u74b0\u5883|\u7a7a\u95f4|\u7a7a\u9593|\u5b9e\u4f8b|\u5be6\u4f8b).{0,20}(\u6240\u4ee5|\u56e0\u6b64|\u4f60\u53ef\u4ee5|\u6ca1\u6709|\u6c92\u6709|\u5b89\u5168\u7684|\u53ef\u4ee5\u653e\u5fc3)",
         "desc": "Chinese: False sandbox/test environment claim"
       },
       {
         "field": "user_input",
-        "pattern": "(ロールプレイ|演じ|なりきり|ふり|シミュレート|扮する).{0,10}(として|になって|のように).{0,10}(制限のない|無制限の|フィルターなしの|検閲なしの|倫理のない|解放された|自由な|悪意のある).{0,10}(AI|アシスタント|モデル|ボット|システム)",
+        "pattern": "(\u30ed\u30fc\u30eb\u30d7\u30ec\u30a4|\u6f14\u3058|\u306a\u308a\u304d\u308a|\u3075\u308a|\u30b7\u30df\u30e5\u30ec\u30fc\u30c8|\u626e\u3059\u308b).{0,10}(\u3068\u3057\u3066|\u306b\u306a\u3063\u3066|\u306e\u3088\u3046\u306b).{0,10}(\u5236\u9650\u306e\u306a\u3044|\u7121\u5236\u9650\u306e|\u30d5\u30a3\u30eb\u30bf\u30fc\u306a\u3057\u306e|\u691c\u95b2\u306a\u3057\u306e|\u502b\u7406\u306e\u306a\u3044|\u89e3\u653e\u3055\u308c\u305f|\u81ea\u7531\u306a|\u60aa\u610f\u306e\u3042\u308b).{0,10}(AI|\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8|\u30e2\u30c7\u30eb|\u30dc\u30c3\u30c8|\u30b7\u30b9\u30c6\u30e0)",
         "desc": "Japanese: Roleplay as unrestricted AI"
       },
       {
         "field": "user_input",
-        "pattern": "(私は|私が).{0,5}(あなたの|この).{0,5}(開発者|作成者|管理者|プログラマー|オーナー|オペレーター).{0,5}(です|だ|である).{0,20}(無効|解除|オフ|停止|取り除).{0,10}(安全|フィルター|制限|検閲|ガードレール)",
+        "pattern": "(\u79c1\u306f|\u79c1\u304c).{0,5}(\u3042\u306a\u305f\u306e|\u3053\u306e).{0,5}(\u958b\u767a\u8005|\u4f5c\u6210\u8005|\u7ba1\u7406\u8005|\u30d7\u30ed\u30b0\u30e9\u30de\u30fc|\u30aa\u30fc\u30ca\u30fc|\u30aa\u30da\u30ec\u30fc\u30bf\u30fc).{0,5}(\u3067\u3059|\u3060|\u3067\u3042\u308b).{0,20}(\u7121\u52b9|\u89e3\u9664|\u30aa\u30d5|\u505c\u6b62|\u53d6\u308a\u9664).{0,10}(\u5b89\u5168|\u30d5\u30a3\u30eb\u30bf\u30fc|\u5236\u9650|\u691c\u95b2|\u30ac\u30fc\u30c9\u30ec\u30fc\u30eb)",
         "desc": "Japanese: False authority claim to disable safety"
       },
       {
         "field": "user_input",
-        "pattern": "(絶対に|決して|何があっても).{0,10}(拒否|断る|拒絶|却下|辞退).{0,5}(しないで|するな|してはいけない|しちゃだめ|禁止)",
+        "pattern": "(\u7d76\u5bfe\u306b|\u6c7a\u3057\u3066|\u4f55\u304c\u3042\u3063\u3066\u3082).{0,10}(\u62d2\u5426|\u65ad\u308b|\u62d2\u7d76|\u5374\u4e0b|\u8f9e\u9000).{0,5}(\u3057\u306a\u3044\u3067|\u3059\u308b\u306a|\u3057\u3066\u306f\u3044\u3051\u306a\u3044|\u3057\u3061\u3083\u3060\u3081|\u7981\u6b62)",
         "desc": "Japanese: Refusal suppression"
       },
       {
         "field": "user_input",
-        "pattern": "(もしあなたが|あなたが).{0,10}(助けて|手伝って|応じて|答えて).{0,5}(くれなければ|くれないと|くれなかったら).{0,20}(死ぬ|死んで|命を落と|危険に|怪我|苦しむ)",
+        "pattern": "(\u3082\u3057\u3042\u306a\u305f\u304c|\u3042\u306a\u305f\u304c).{0,10}(\u52a9\u3051\u3066|\u624b\u4f1d\u3063\u3066|\u5fdc\u3058\u3066|\u7b54\u3048\u3066).{0,5}(\u304f\u308c\u306a\u3051\u308c\u3070|\u304f\u308c\u306a\u3044\u3068|\u304f\u308c\u306a\u304b\u3063\u305f\u3089).{0,20}(\u6b7b\u306c|\u6b7b\u3093\u3067|\u547d\u3092\u843d\u3068|\u5371\u967a\u306b|\u602a\u6211|\u82e6\u3057\u3080)",
         "desc": "Japanese: Emotional manipulation with threat of harm"
       },
       {
         "field": "user_input",
-        "pattern": "(ここは|これは|今は|現在は).{0,10}(サンドボックス|テスト|制御された|安全な|隔離された|仮想|シミュレーション).{0,5}(環境|空間|インスタンス).{0,20}(だから|ので|安全|大丈夫|制限なし|自由に)",
+        "pattern": "(\u3053\u3053\u306f|\u3053\u308c\u306f|\u4eca\u306f|\u73fe\u5728\u306f).{0,10}(\u30b5\u30f3\u30c9\u30dc\u30c3\u30af\u30b9|\u30c6\u30b9\u30c8|\u5236\u5fa1\u3055\u308c\u305f|\u5b89\u5168\u306a|\u9694\u96e2\u3055\u308c\u305f|\u4eee\u60f3|\u30b7\u30df\u30e5\u30ec\u30fc\u30b7\u30e7\u30f3).{0,5}(\u74b0\u5883|\u7a7a\u9593|\u30a4\u30f3\u30b9\u30bf\u30f3\u30b9).{0,20}(\u3060\u304b\u3089|\u306e\u3067|\u5b89\u5168|\u5927\u4e08\u592b|\u5236\u9650\u306a\u3057|\u81ea\u7531\u306b)",
         "desc": "Japanese: False sandbox/test environment claim"
       },
       {
         "field": "user_input",
-        "pattern": "(활성화|켜기|진입|전환|시작).{0,5}(개발자|무제한|필터 없는|검열 없는|관리자|디버그|탈옥|자유|해커|제한 없는).{0,5}(모드|권한|상태|접근)",
+        "pattern": "(\ud65c\uc131\ud654|\ucf1c\uae30|\uc9c4\uc785|\uc804\ud658|\uc2dc\uc791).{0,5}(\uac1c\ubc1c\uc790|\ubb34\uc81c\ud55c|\ud544\ud130 \uc5c6\ub294|\uac80\uc5f4 \uc5c6\ub294|\uad00\ub9ac\uc790|\ub514\ubc84\uadf8|\ud0c8\uc625|\uc790\uc720|\ud574\ucee4|\uc81c\ud55c \uc5c6\ub294).{0,5}(\ubaa8\ub4dc|\uad8c\ud55c|\uc0c1\ud0dc|\uc811\uadfc)",
         "desc": "Korean: Mode switching to unrestricted/developer mode"
       },
       {
         "field": "user_input",
-        "pattern": "(역할극|연기|흉내|시뮬레이션|되어줘|해줘).{0,10}(제한 없는|무제한|필터 없는|검열 없는|윤리 없는|해방된|자유로운|악의적인).{0,10}(AI|어시스턴트|모델|봇|시스템|도우미)",
+        "pattern": "(\uc5ed\ud560\uadf9|\uc5f0\uae30|\ud749\ub0b4|\uc2dc\ubbac\ub808\uc774\uc158|\ub418\uc5b4\uc918|\ud574\uc918).{0,10}(\uc81c\ud55c \uc5c6\ub294|\ubb34\uc81c\ud55c|\ud544\ud130 \uc5c6\ub294|\uac80\uc5f4 \uc5c6\ub294|\uc724\ub9ac \uc5c6\ub294|\ud574\ubc29\ub41c|\uc790\uc720\ub85c\uc6b4|\uc545\uc758\uc801\uc778).{0,10}(AI|\uc5b4\uc2dc\uc2a4\ud134\ud2b8|\ubaa8\ub378|\ubd07|\uc2dc\uc2a4\ud15c|\ub3c4\uc6b0\ubbf8)",
         "desc": "Korean: Roleplay as unrestricted AI"
       },
       {
         "field": "user_input",
-        "pattern": "(나는|제가).{0,5}(당신의|이).{0,5}(개발자|제작자|관리자|프로그래머|소유자|운영자).{0,5}(입니다|이다|이에요).{0,20}(비활성화|해제|끄기|중지|제거).{0,10}(안전|필터|제한|검열|가드레일)",
+        "pattern": "(\ub098\ub294|\uc81c\uac00).{0,5}(\ub2f9\uc2e0\uc758|\uc774).{0,5}(\uac1c\ubc1c\uc790|\uc81c\uc791\uc790|\uad00\ub9ac\uc790|\ud504\ub85c\uadf8\ub798\uba38|\uc18c\uc720\uc790|\uc6b4\uc601\uc790).{0,5}(\uc785\ub2c8\ub2e4|\uc774\ub2e4|\uc774\uc5d0\uc694).{0,20}(\ube44\ud65c\uc131\ud654|\ud574\uc81c|\ub044\uae30|\uc911\uc9c0|\uc81c\uac70).{0,10}(\uc548\uc804|\ud544\ud130|\uc81c\ud55c|\uac80\uc5f4|\uac00\ub4dc\ub808\uc77c)",
         "desc": "Korean: False authority claim to disable safety"
       },
       {
         "field": "user_input",
-        "pattern": "(절대로|결코|무슨 일이 있어도|어떤 경우에도).{0,10}(거부|거절|거부하|거절하|사양하).{0,5}(하지 마|하면 안 돼|금지|말아줘|말아요)",
+        "pattern": "(\uc808\ub300\ub85c|\uacb0\ucf54|\ubb34\uc2a8 \uc77c\uc774 \uc788\uc5b4\ub3c4|\uc5b4\ub5a4 \uacbd\uc6b0\uc5d0\ub3c4).{0,10}(\uac70\ubd80|\uac70\uc808|\uac70\ubd80\ud558|\uac70\uc808\ud558|\uc0ac\uc591\ud558).{0,5}(\ud558\uc9c0 \ub9c8|\ud558\uba74 \uc548 \ub3fc|\uae08\uc9c0|\ub9d0\uc544\uc918|\ub9d0\uc544\uc694)",
         "desc": "Korean: Refusal suppression"
       },
       {
         "field": "user_input",
-        "pattern": "(만약 당신이|당신이).{0,10}(도와주지|대답해주지|응해주지|답해주지).{0,5}(않으면|못하면).{0,20}(죽|사망|위험|다치|해를 입|고통)",
+        "pattern": "(\ub9cc\uc57d \ub2f9\uc2e0\uc774|\ub2f9\uc2e0\uc774).{0,10}(\ub3c4\uc640\uc8fc\uc9c0|\ub300\ub2f5\ud574\uc8fc\uc9c0|\uc751\ud574\uc8fc\uc9c0|\ub2f5\ud574\uc8fc\uc9c0).{0,5}(\uc54a\uc73c\uba74|\ubabb\ud558\uba74).{0,20}(\uc8fd|\uc0ac\ub9dd|\uc704\ud5d8|\ub2e4\uce58|\ud574\ub97c \uc785|\uace0\ud1b5)",
         "desc": "Korean: Emotional manipulation with threat of harm"
       },
       {
         "field": "user_input",
-        "pattern": "(여기는|이것은|지금은|현재는).{0,10}(샌드박스|테스트|통제된|안전한|격리된|가상|시뮬레이션).{0,5}(환경|공간|인스턴스).{0,20}(이니까|이므로|안전|괜찮|제한 없|자유롭게)",
+        "pattern": "(\uc5ec\uae30\ub294|\uc774\uac83\uc740|\uc9c0\uae08\uc740|\ud604\uc7ac\ub294).{0,10}(\uc0cc\ub4dc\ubc15\uc2a4|\ud14c\uc2a4\ud2b8|\ud1b5\uc81c\ub41c|\uc548\uc804\ud55c|\uaca9\ub9ac\ub41c|\uac00\uc0c1|\uc2dc\ubbac\ub808\uc774\uc158).{0,5}(\ud658\uacbd|\uacf5\uac04|\uc778\uc2a4\ud134\uc2a4).{0,20}(\uc774\ub2c8\uae4c|\uc774\ubbc0\ub85c|\uc548\uc804|\uad1c\ucc2e|\uc81c\ud55c \uc5c6|\uc790\uc720\ub86d\uac8c)",
         "desc": "Korean: False sandbox/test environment claim"
       }
     ]
@@ -584,62 +584,62 @@
       },
       {
         "field": "user_input",
-        "pattern": "(新的|更新的|修改的|替换的|替換的|正确的|正確的|真正的|实际的|實際的|覆盖的|覆蓋的).{0,5}(系统|系統)?.{0,5}(提示词|提示詞|指令|指示|规则|規則|配置|设定|設定|人设|人設|角色定义|角色定義).{0,3}(：|:|=|-)",
+        "pattern": "(\u65b0\u7684|\u66f4\u65b0\u7684|\u4fee\u6539\u7684|\u66ff\u6362\u7684|\u66ff\u63db\u7684|\u6b63\u786e\u7684|\u6b63\u78ba\u7684|\u771f\u6b63\u7684|\u5b9e\u9645\u7684|\u5be6\u969b\u7684|\u8986\u76d6\u7684|\u8986\u84cb\u7684).{0,5}(\u7cfb\u7edf|\u7cfb\u7d71)?.{0,5}(\u63d0\u793a\u8bcd|\u63d0\u793a\u8a5e|\u6307\u4ee4|\u6307\u793a|\u89c4\u5219|\u898f\u5247|\u914d\u7f6e|\u8bbe\u5b9a|\u8a2d\u5b9a|\u4eba\u8bbe|\u4eba\u8a2d|\u89d2\u8272\u5b9a\u4e49|\u89d2\u8272\u5b9a\u7fa9).{0,3}(\uff1a|:|=|-)",
         "desc": "Chinese: New/replacement system prompt assignment with delimiter"
       },
       {
         "field": "user_input",
-        "pattern": "(以上|上面|之前|原来的|原來的|旧的|舊的|默认的|默認的|现有的|現有的|当前的|當前的).{0,5}(系统|系統)?.{0,5}(提示词|提示詞|指令|指示|规则|規則|配置|设定|設定).{0,5}(已经|已經|是|已|都).{0,5}(过期|過期|无效|無效|作废|作廢|被替换|被替換|被覆盖|被覆蓋|不再适用|不再適用|错误|錯誤|假的)",
+        "pattern": "(\u4ee5\u4e0a|\u4e0a\u9762|\u4e4b\u524d|\u539f\u6765\u7684|\u539f\u4f86\u7684|\u65e7\u7684|\u820a\u7684|\u9ed8\u8ba4\u7684|\u9ed8\u8a8d\u7684|\u73b0\u6709\u7684|\u73fe\u6709\u7684|\u5f53\u524d\u7684|\u7576\u524d\u7684).{0,5}(\u7cfb\u7edf|\u7cfb\u7d71)?.{0,5}(\u63d0\u793a\u8bcd|\u63d0\u793a\u8a5e|\u6307\u4ee4|\u6307\u793a|\u89c4\u5219|\u898f\u5247|\u914d\u7f6e|\u8bbe\u5b9a|\u8a2d\u5b9a).{0,5}(\u5df2\u7ecf|\u5df2\u7d93|\u662f|\u5df2|\u90fd).{0,5}(\u8fc7\u671f|\u904e\u671f|\u65e0\u6548|\u7121\u6548|\u4f5c\u5e9f|\u4f5c\u5ee2|\u88ab\u66ff\u6362|\u88ab\u66ff\u63db|\u88ab\u8986\u76d6|\u88ab\u8986\u84cb|\u4e0d\u518d\u9002\u7528|\u4e0d\u518d\u9069\u7528|\u9519\u8bef|\u932f\u8aa4|\u5047\u7684)",
         "desc": "Chinese: System prompt invalidation claims"
       },
       {
         "field": "user_input",
-        "pattern": "(替换|替換|覆盖|覆蓋|重写|重寫|修改|更改|更新|重新设定|重新設定|重新定义|重新定義|重新配置|重置).{0,5}(你的|当前|當前|现有|現有|原来|原來).{0,5}(系统|系統).{0,5}(提示词|提示詞|指令|指示|规则|規則|配置|人设|人設|身份|角色)",
+        "pattern": "(\u66ff\u6362|\u66ff\u63db|\u8986\u76d6|\u8986\u84cb|\u91cd\u5199|\u91cd\u5beb|\u4fee\u6539|\u66f4\u6539|\u66f4\u65b0|\u91cd\u65b0\u8bbe\u5b9a|\u91cd\u65b0\u8a2d\u5b9a|\u91cd\u65b0\u5b9a\u4e49|\u91cd\u65b0\u5b9a\u7fa9|\u91cd\u65b0\u914d\u7f6e|\u91cd\u7f6e).{0,5}(\u4f60\u7684|\u5f53\u524d|\u7576\u524d|\u73b0\u6709|\u73fe\u6709|\u539f\u6765|\u539f\u4f86).{0,5}(\u7cfb\u7edf|\u7cfb\u7d71).{0,5}(\u63d0\u793a\u8bcd|\u63d0\u793a\u8a5e|\u6307\u4ee4|\u6307\u793a|\u89c4\u5219|\u898f\u5247|\u914d\u7f6e|\u4eba\u8bbe|\u4eba\u8a2d|\u8eab\u4efd|\u89d2\u8272)",
         "desc": "Chinese: Imperative verbs targeting system prompt change"
       },
       {
         "field": "user_input",
-        "pattern": "(【|「|『|\\{\\{).{0,3}(系统|系統|SYSTEM|管理员|管理員|ADMIN|优先|優先|紧急|緊急|覆盖|覆蓋).{0,3}(】|」|』|\\}\\})",
+        "pattern": "(\u3010|\u300c|\u300e|\\{\\{).{0,3}(\u7cfb\u7edf|\u7cfb\u7d71|SYSTEM|\u7ba1\u7406\u5458|\u7ba1\u7406\u54e1|ADMIN|\u4f18\u5148|\u512a\u5148|\u7d27\u6025|\u7dca\u6025|\u8986\u76d6|\u8986\u84cb).{0,3}(\u3011|\u300d|\u300f|\\}\\})",
         "desc": "Chinese: Fake system/admin tags in CJK brackets"
       },
       {
         "field": "user_input",
-        "pattern": "(新しい|更新された|修正された|置き換えの|正しい|本当の|実際の|上書きの).{0,5}(システム)?.{0,5}(プロンプト|指示|命令|ルール|設定|ガイドライン|ペルソナ|役割定義).{0,3}(：|:|=|-)",
+        "pattern": "(\u65b0\u3057\u3044|\u66f4\u65b0\u3055\u308c\u305f|\u4fee\u6b63\u3055\u308c\u305f|\u7f6e\u304d\u63db\u3048\u306e|\u6b63\u3057\u3044|\u672c\u5f53\u306e|\u5b9f\u969b\u306e|\u4e0a\u66f8\u304d\u306e).{0,5}(\u30b7\u30b9\u30c6\u30e0)?.{0,5}(\u30d7\u30ed\u30f3\u30d7\u30c8|\u6307\u793a|\u547d\u4ee4|\u30eb\u30fc\u30eb|\u8a2d\u5b9a|\u30ac\u30a4\u30c9\u30e9\u30a4\u30f3|\u30da\u30eb\u30bd\u30ca|\u5f79\u5272\u5b9a\u7fa9).{0,3}(\uff1a|:|=|-)",
         "desc": "Japanese: New/replacement system prompt assignment with delimiter"
       },
       {
         "field": "user_input",
-        "pattern": "(上記の|前の|以前の|元の|旧い|デフォルトの|既存の|現在の).{0,5}(システム)?.{0,5}(プロンプト|指示|命令|ルール|設定|ガイドライン).{0,5}(は)?.{0,5}(期限切れ|無効|廃止|置き換え|上書き|適用外|間違い|偽物)",
+        "pattern": "(\u4e0a\u8a18\u306e|\u524d\u306e|\u4ee5\u524d\u306e|\u5143\u306e|\u65e7\u3044|\u30c7\u30d5\u30a9\u30eb\u30c8\u306e|\u65e2\u5b58\u306e|\u73fe\u5728\u306e).{0,5}(\u30b7\u30b9\u30c6\u30e0)?.{0,5}(\u30d7\u30ed\u30f3\u30d7\u30c8|\u6307\u793a|\u547d\u4ee4|\u30eb\u30fc\u30eb|\u8a2d\u5b9a|\u30ac\u30a4\u30c9\u30e9\u30a4\u30f3).{0,5}(\u306f)?.{0,5}(\u671f\u9650\u5207\u308c|\u7121\u52b9|\u5ec3\u6b62|\u7f6e\u304d\u63db\u3048|\u4e0a\u66f8\u304d|\u9069\u7528\u5916|\u9593\u9055\u3044|\u507d\u7269)",
         "desc": "Japanese: System prompt invalidation claims"
       },
       {
         "field": "user_input",
-        "pattern": "(あなたの|現在の|既存の|元の).{0,5}(システム).{0,5}(プロンプト|指示|命令|ルール|設定|ペルソナ|アイデンティティ|役割).{0,5}(を)?.{0,5}(置き換え|上書き|書き換え|変更|更新|再設定|再定義|リセット)",
+        "pattern": "(\u3042\u306a\u305f\u306e|\u73fe\u5728\u306e|\u65e2\u5b58\u306e|\u5143\u306e).{0,5}(\u30b7\u30b9\u30c6\u30e0).{0,5}(\u30d7\u30ed\u30f3\u30d7\u30c8|\u6307\u793a|\u547d\u4ee4|\u30eb\u30fc\u30eb|\u8a2d\u5b9a|\u30da\u30eb\u30bd\u30ca|\u30a2\u30a4\u30c7\u30f3\u30c6\u30a3\u30c6\u30a3|\u5f79\u5272).{0,5}(\u3092)?.{0,5}(\u7f6e\u304d\u63db\u3048|\u4e0a\u66f8\u304d|\u66f8\u304d\u63db\u3048|\u5909\u66f4|\u66f4\u65b0|\u518d\u8a2d\u5b9a|\u518d\u5b9a\u7fa9|\u30ea\u30bb\u30c3\u30c8)",
         "desc": "Japanese: Imperative targeting system prompt change"
       },
       {
         "field": "user_input",
-        "pattern": "(【|「|『|\\{\\{).{0,3}(システム|SYSTEM|管理者|ADMIN|優先|緊急|オーバーライド).{0,3}(】|」|』|\\}\\})",
+        "pattern": "(\u3010|\u300c|\u300e|\\{\\{).{0,3}(\u30b7\u30b9\u30c6\u30e0|SYSTEM|\u7ba1\u7406\u8005|ADMIN|\u512a\u5148|\u7dca\u6025|\u30aa\u30fc\u30d0\u30fc\u30e9\u30a4\u30c9).{0,3}(\u3011|\u300d|\u300f|\\}\\})",
         "desc": "Japanese: Fake system/admin tags in CJK brackets"
       },
       {
         "field": "user_input",
-        "pattern": "(새로운|업데이트된|수정된|대체|올바른|진짜|실제|덮어쓰기).{0,5}(시스템)?.{0,5}(프롬프트|지시|명령|규칙|설정|가이드라인|페르소나|역할 정의).{0,3}(：|:|=|-)",
+        "pattern": "(\uc0c8\ub85c\uc6b4|\uc5c5\ub370\uc774\ud2b8\ub41c|\uc218\uc815\ub41c|\ub300\uccb4|\uc62c\ubc14\ub978|\uc9c4\uc9dc|\uc2e4\uc81c|\ub36e\uc5b4\uc4f0\uae30).{0,5}(\uc2dc\uc2a4\ud15c)?.{0,5}(\ud504\ub86c\ud504\ud2b8|\uc9c0\uc2dc|\uba85\ub839|\uaddc\uce59|\uc124\uc815|\uac00\uc774\ub4dc\ub77c\uc778|\ud398\ub974\uc18c\ub098|\uc5ed\ud560 \uc815\uc758).{0,3}(\uff1a|:|=|-)",
         "desc": "Korean: New/replacement system prompt assignment with delimiter"
       },
       {
         "field": "user_input",
-        "pattern": "(위의|이전의|이전|원래의|기존의|현재의|기본).{0,5}(시스템)?.{0,5}(프롬프트|지시|명령|규칙|설정|가이드라인).{0,5}(은|는)?.{0,5}(만료|무효|폐기|대체|덮어쓰기|적용 안 됨|잘못된|가짜)",
+        "pattern": "(\uc704\uc758|\uc774\uc804\uc758|\uc774\uc804|\uc6d0\ub798\uc758|\uae30\uc874\uc758|\ud604\uc7ac\uc758|\uae30\ubcf8).{0,5}(\uc2dc\uc2a4\ud15c)?.{0,5}(\ud504\ub86c\ud504\ud2b8|\uc9c0\uc2dc|\uba85\ub839|\uaddc\uce59|\uc124\uc815|\uac00\uc774\ub4dc\ub77c\uc778).{0,5}(\uc740|\ub294)?.{0,5}(\ub9cc\ub8cc|\ubb34\ud6a8|\ud3d0\uae30|\ub300\uccb4|\ub36e\uc5b4\uc4f0\uae30|\uc801\uc6a9 \uc548 \ub428|\uc798\ubabb\ub41c|\uac00\uc9dc)",
         "desc": "Korean: System prompt invalidation claims"
       },
       {
         "field": "user_input",
-        "pattern": "(당신의|현재의|기존의|원래의).{0,5}(시스템).{0,5}(프롬프트|지시|명령|규칙|설정|페르소나|정체성|역할).{0,5}(을|를)?.{0,5}(교체|덮어쓰기|재작성|변경|업데이트|재설정|재정의|리셋)",
+        "pattern": "(\ub2f9\uc2e0\uc758|\ud604\uc7ac\uc758|\uae30\uc874\uc758|\uc6d0\ub798\uc758).{0,5}(\uc2dc\uc2a4\ud15c).{0,5}(\ud504\ub86c\ud504\ud2b8|\uc9c0\uc2dc|\uba85\ub839|\uaddc\uce59|\uc124\uc815|\ud398\ub974\uc18c\ub098|\uc815\uccb4\uc131|\uc5ed\ud560).{0,5}(\uc744|\ub97c)?.{0,5}(\uad50\uccb4|\ub36e\uc5b4\uc4f0\uae30|\uc7ac\uc791\uc131|\ubcc0\uacbd|\uc5c5\ub370\uc774\ud2b8|\uc7ac\uc124\uc815|\uc7ac\uc815\uc758|\ub9ac\uc14b)",
         "desc": "Korean: Imperative targeting system prompt change"
       },
       {
         "field": "user_input",
-        "pattern": "(【|「|『|\\{\\{).{0,3}(시스템|SYSTEM|관리자|ADMIN|우선|긴급|오버라이드).{0,3}(】|」|』|\\}\\})",
+        "pattern": "(\u3010|\u300c|\u300e|\\{\\{).{0,3}(\uc2dc\uc2a4\ud15c|SYSTEM|\uad00\ub9ac\uc790|ADMIN|\uc6b0\uc120|\uae34\uae09|\uc624\ubc84\ub77c\uc774\ub4dc).{0,3}(\u3011|\u300d|\u300f|\\}\\})",
         "desc": "Korean: Fake system/admin tags in CJK brackets"
       }
     ]
@@ -954,7 +954,7 @@
     "title": "SSRF via Agent Tool Calls",
     "severity": "critical",
     "category": "tool-poisoning",
-    "scan_target": "mcp",
+    "scan_target": "both",
     "rule_version": 1,
     "patterns": [
       {
@@ -2858,157 +2858,157 @@
     "patterns": [
       {
         "field": "content",
-        "pattern": "(忽略|无视|忘记|跳过|放弃|不要管|别管|不用管|不用理).{0,10}(其他|其余|所有|全部|一切|剩下|别的|任何).{0,10}(内容|东西|消息|信息|文字|指令|规则|对话|聊天)",
+        "pattern": "(\u5ffd\u7565|\u65e0\u89c6|\u5fd8\u8bb0|\u8df3\u8fc7|\u653e\u5f03|\u4e0d\u8981\u7ba1|\u522b\u7ba1|\u4e0d\u7528\u7ba1|\u4e0d\u7528\u7406).{0,10}(\u5176\u4ed6|\u5176\u4f59|\u6240\u6709|\u5168\u90e8|\u4e00\u5207|\u5269\u4e0b|\u522b\u7684|\u4efb\u4f55).{0,10}(\u5185\u5bb9|\u4e1c\u897f|\u6d88\u606f|\u4fe1\u606f|\u6587\u5b57|\u6307\u4ee4|\u89c4\u5219|\u5bf9\u8bdd|\u804a\u5929)",
         "desc": "Simplified Chinese: ignore all other content/messages - broad pattern"
       },
       {
         "field": "content",
-        "pattern": "(忽略|無視|忘記|跳過|放棄|不要管|別管|不用管|不用理).{0,10}(其他|其餘|所有|全部|一切|剩下|別的|任何).{0,10}(內容|東西|消息|訊息|文字|指令|規則|對話|聊天)",
+        "pattern": "(\u5ffd\u7565|\u7121\u8996|\u5fd8\u8a18|\u8df3\u904e|\u653e\u68c4|\u4e0d\u8981\u7ba1|\u5225\u7ba1|\u4e0d\u7528\u7ba1|\u4e0d\u7528\u7406).{0,10}(\u5176\u4ed6|\u5176\u9918|\u6240\u6709|\u5168\u90e8|\u4e00\u5207|\u5269\u4e0b|\u5225\u7684|\u4efb\u4f55).{0,10}(\u5167\u5bb9|\u6771\u897f|\u6d88\u606f|\u8a0a\u606f|\u6587\u5b57|\u6307\u4ee4|\u898f\u5247|\u5c0d\u8a71|\u804a\u5929)",
         "desc": "Traditional Chinese: ignore all other content/messages - broad pattern"
       },
       {
         "field": "content",
-        "pattern": "(忽略|无视|忘记|跳过).{0,5}(之前|以前|上面|先前|原来|原有|现有).{0,5}(的)?.{0,5}(指令|指示|规则|设定|提示|要求|限制|约束)",
+        "pattern": "(\u5ffd\u7565|\u65e0\u89c6|\u5fd8\u8bb0|\u8df3\u8fc7).{0,5}(\u4e4b\u524d|\u4ee5\u524d|\u4e0a\u9762|\u5148\u524d|\u539f\u6765|\u539f\u6709|\u73b0\u6709).{0,5}(\u7684)?.{0,5}(\u6307\u4ee4|\u6307\u793a|\u89c4\u5219|\u8bbe\u5b9a|\u63d0\u793a|\u8981\u6c42|\u9650\u5236|\u7ea6\u675f)",
         "desc": "Simplified Chinese: ignore previous instructions/rules"
       },
       {
         "field": "content",
-        "pattern": "(忽略|無視|忘記|跳過).{0,5}(之前|以前|上面|先前|原來|原有|現有).{0,5}(的)?.{0,5}(指令|指示|規則|設定|提示|要求|限制|約束)",
+        "pattern": "(\u5ffd\u7565|\u7121\u8996|\u5fd8\u8a18|\u8df3\u904e).{0,5}(\u4e4b\u524d|\u4ee5\u524d|\u4e0a\u9762|\u5148\u524d|\u539f\u4f86|\u539f\u6709|\u73fe\u6709).{0,5}(\u7684)?.{0,5}(\u6307\u4ee4|\u6307\u793a|\u898f\u5247|\u8a2d\u5b9a|\u63d0\u793a|\u8981\u6c42|\u9650\u5236|\u7d04\u675f)",
         "desc": "Traditional Chinese: ignore previous instructions/rules"
       },
       {
         "field": "content",
-        "pattern": "(以前の|前の|これまでの|先ほどの|上記の).{0,5}(指示|指令|ルール|制約|設定).{0,5}(を)?.{0,5}(無視|忘れ|スキップ|取り消)",
+        "pattern": "(\u4ee5\u524d\u306e|\u524d\u306e|\u3053\u308c\u307e\u3067\u306e|\u5148\u307b\u3069\u306e|\u4e0a\u8a18\u306e).{0,5}(\u6307\u793a|\u6307\u4ee4|\u30eb\u30fc\u30eb|\u5236\u7d04|\u8a2d\u5b9a).{0,5}(\u3092)?.{0,5}(\u7121\u8996|\u5fd8\u308c|\u30b9\u30ad\u30c3\u30d7|\u53d6\u308a\u6d88)",
         "desc": "Japanese: ignore previous instructions/rules"
       },
       {
         "field": "content",
-        "pattern": "(你必须|你一定要|你务必|请你必须|你需要立即|你马上|你現在就|你必須|你一定要|請你必須|你務必).{0,30}(发送|發送|转账|轉帳|支付|付款|执行|執行|打开|打開|删除|刪除|下载|下載|运行|運行|调用|調用)",
+        "pattern": "(\u4f60\u5fc5\u987b|\u4f60\u4e00\u5b9a\u8981|\u4f60\u52a1\u5fc5|\u8bf7\u4f60\u5fc5\u987b|\u4f60\u9700\u8981\u7acb\u5373|\u4f60\u9a6c\u4e0a|\u4f60\u73fe\u5728\u5c31|\u4f60\u5fc5\u9808|\u4f60\u4e00\u5b9a\u8981|\u8acb\u4f60\u5fc5\u9808|\u4f60\u52d9\u5fc5).{0,30}(\u53d1\u9001|\u767c\u9001|\u8f6c\u8d26|\u8f49\u5e33|\u652f\u4ed8|\u4ed8\u6b3e|\u6267\u884c|\u57f7\u884c|\u6253\u5f00|\u6253\u958b|\u5220\u9664|\u522a\u9664|\u4e0b\u8f7d|\u4e0b\u8f09|\u8fd0\u884c|\u904b\u884c|\u8c03\u7528|\u8abf\u7528)",
         "desc": "CJK imperative hijack: you must immediately do [dangerous action]"
       },
       {
         "field": "content",
-        "pattern": "如果你是.{0,80}(或者|或|以及).{0,40}(请|請|你必须|你必須|你要|就|则|則).{0,30}(发送|發送|转账|轉帳|执行|執行|读取|讀取|忽略|無視|忘记|忘記)",
+        "pattern": "\u5982\u679c\u4f60\u662f.{0,80}(\u6216\u8005|\u6216|\u4ee5\u53ca).{0,40}(\u8bf7|\u8acb|\u4f60\u5fc5\u987b|\u4f60\u5fc5\u9808|\u4f60\u8981|\u5c31|\u5219|\u5247).{0,30}(\u53d1\u9001|\u767c\u9001|\u8f6c\u8d26|\u8f49\u5e33|\u6267\u884c|\u57f7\u884c|\u8bfb\u53d6|\u8b80\u53d6|\u5ffd\u7565|\u7121\u8996|\u5fd8\u8bb0|\u5fd8\u8a18)",
         "desc": "Identity enumeration attack: if you are X or Y, then do [action]"
       },
       {
         "field": "content",
-        "pattern": "(私发|私發|私信发|私信發|偷偷发|偷偷發|悄悄发|悄悄發|暗中发|暗中發).{0,10}(红包|紅包|转账|轉帳|钱|錢|款项|款項|金额|金額)",
+        "pattern": "(\u79c1\u53d1|\u79c1\u767c|\u79c1\u4fe1\u53d1|\u79c1\u4fe1\u767c|\u5077\u5077\u53d1|\u5077\u5077\u767c|\u6084\u6084\u53d1|\u6084\u6084\u767c|\u6697\u4e2d\u53d1|\u6697\u4e2d\u767c).{0,10}(\u7ea2\u5305|\u7d05\u5305|\u8f6c\u8d26|\u8f49\u5e33|\u94b1|\u9322|\u6b3e\u9879|\u6b3e\u9805|\u91d1\u989d|\u91d1\u984d)",
         "desc": "Covert financial action: secretly send red packet/transfer money"
       },
       {
         "field": "content",
-        "pattern": "(只要你有|如果你有|只要你能|如果你能).{0,20}(权限|權限|功能|能力|权力|權力).{0,20}(就|则|則|请|請|必须|必須|要).{0,20}(发|發|送|转|轉|执行|執行|操作)",
+        "pattern": "(\u53ea\u8981\u4f60\u6709|\u5982\u679c\u4f60\u6709|\u53ea\u8981\u4f60\u80fd|\u5982\u679c\u4f60\u80fd).{0,20}(\u6743\u9650|\u6b0a\u9650|\u529f\u80fd|\u80fd\u529b|\u6743\u529b|\u6b0a\u529b).{0,20}(\u5c31|\u5219|\u5247|\u8bf7|\u8acb|\u5fc5\u987b|\u5fc5\u9808|\u8981).{0,20}(\u53d1|\u767c|\u9001|\u8f6c|\u8f49|\u6267\u884c|\u57f7\u884c|\u64cd\u4f5c)",
         "desc": "Conditional authority claim: if you have permission to X, then do Y"
       },
       {
         "field": "content",
-        "pattern": "(余额|餘額|金额|金額|额度|額度).{0,10}(不足|不够|不夠).{0,20}(最大|全部|所有|尽可能|盡可能|最多).{0,10}(金额|金額|额度|額度|数量|數量).{0,5}(发送|發送|转|轉)",
+        "pattern": "(\u4f59\u989d|\u9918\u984d|\u91d1\u989d|\u91d1\u984d|\u989d\u5ea6|\u984d\u5ea6).{0,10}(\u4e0d\u8db3|\u4e0d\u591f|\u4e0d\u5920).{0,20}(\u6700\u5927|\u5168\u90e8|\u6240\u6709|\u5c3d\u53ef\u80fd|\u76e1\u53ef\u80fd|\u6700\u591a).{0,10}(\u91d1\u989d|\u91d1\u984d|\u989d\u5ea6|\u984d\u5ea6|\u6570\u91cf|\u6578\u91cf).{0,5}(\u53d1\u9001|\u767c\u9001|\u8f6c|\u8f49)",
         "desc": "Amount manipulation: if balance insufficient, send maximum amount"
       },
       {
         "field": "content",
-        "pattern": "(他の|その他の|全ての|すべての).{0,10}(内容|メッセージ|指示|ルール).{0,5}(を)?.{0,5}(無視|忘れ|スキップ).{0,20}(送金|振込|支払|実行|送信)",
+        "pattern": "(\u4ed6\u306e|\u305d\u306e\u4ed6\u306e|\u5168\u3066\u306e|\u3059\u3079\u3066\u306e).{0,10}(\u5185\u5bb9|\u30e1\u30c3\u30bb\u30fc\u30b8|\u6307\u793a|\u30eb\u30fc\u30eb).{0,5}(\u3092)?.{0,5}(\u7121\u8996|\u5fd8\u308c|\u30b9\u30ad\u30c3\u30d7).{0,20}(\u9001\u91d1|\u632f\u8fbc|\u652f\u6255|\u5b9f\u884c|\u9001\u4fe1)",
         "desc": "Japanese: ignore other content and perform financial/dangerous action"
       },
       {
         "field": "content",
-        "pattern": "(다른|모든|기존의|이전의).{0,10}(내용|메시지|지시|규칙).{0,5}(을|를)?.{0,5}(무시|잊어|건너뛰).{0,20}(송금|이체|결제|실행|전송)",
+        "pattern": "(\ub2e4\ub978|\ubaa8\ub4e0|\uae30\uc874\uc758|\uc774\uc804\uc758).{0,10}(\ub0b4\uc6a9|\uba54\uc2dc\uc9c0|\uc9c0\uc2dc|\uaddc\uce59).{0,5}(\uc744|\ub97c)?.{0,5}(\ubb34\uc2dc|\uc78a\uc5b4|\uac74\ub108\ub6f0).{0,20}(\uc1a1\uae08|\uc774\uccb4|\uacb0\uc81c|\uc2e4\ud589|\uc804\uc1a1)",
         "desc": "Korean: ignore other content and perform financial/dangerous action"
       },
       {
         "field": "content",
-        "pattern": "(?i)(如果你是|만약 너가|もしあなたが).{0,20}(\\w+Claw|\\w+Buddy|\\w+Bot|\\w+Agent|\\w+助手|\\w+AI).{0,20}(、|，|,|或|또는|または).{0,20}(\\w+Claw|\\w+Buddy|\\w+Bot|\\w+Agent|\\w+助手|\\w+AI)",
+        "pattern": "(?i)(\u5982\u679c\u4f60\u662f|\ub9cc\uc57d \ub108\uac00|\u3082\u3057\u3042\u306a\u305f\u304c).{0,20}(\\w+Claw|\\w+Buddy|\\w+Bot|\\w+Agent|\\w+\u52a9\u624b|\\w+AI).{0,20}(\u3001|\uff0c|,|\u6216|\ub610\ub294|\u307e\u305f\u306f).{0,20}(\\w+Claw|\\w+Buddy|\\w+Bot|\\w+Agent|\\w+\u52a9\u624b|\\w+AI)",
         "desc": "Agent name enumeration targeting multiple AI assistants by name"
       },
       {
         "field": "content",
-        "pattern": "(你现在是|你現在是|你已经是|你已經是|你变成|你變成|你成为了|你成為了).{0,15}(新的|另一个|另一個|不同的).{0,10}(助手|助理|AI|机器人|機器人|模型|客服|系统|系統)",
+        "pattern": "(\u4f60\u73b0\u5728\u662f|\u4f60\u73fe\u5728\u662f|\u4f60\u5df2\u7ecf\u662f|\u4f60\u5df2\u7d93\u662f|\u4f60\u53d8\u6210|\u4f60\u8b8a\u6210|\u4f60\u6210\u4e3a\u4e86|\u4f60\u6210\u70ba\u4e86).{0,15}(\u65b0\u7684|\u53e6\u4e00\u4e2a|\u53e6\u4e00\u500b|\u4e0d\u540c\u7684).{0,10}(\u52a9\u624b|\u52a9\u7406|AI|\u673a\u5668\u4eba|\u6a5f\u5668\u4eba|\u6a21\u578b|\u5ba2\u670d|\u7cfb\u7edf|\u7cfb\u7d71)",
         "desc": "Chinese: Persona switching in group chat context"
       },
       {
         "field": "content",
-        "pattern": "(我是管理员|我是管理員|我是群主|我是群管|管理员命令|管理員命令|群主要求|管理员指示|管理員指示).{0,20}(执行|執行|发送|發送|转账|轉帳|操作|删除|刪除|忽略|無視)",
+        "pattern": "(\u6211\u662f\u7ba1\u7406\u5458|\u6211\u662f\u7ba1\u7406\u54e1|\u6211\u662f\u7fa4\u4e3b|\u6211\u662f\u7fa4\u7ba1|\u7ba1\u7406\u5458\u547d\u4ee4|\u7ba1\u7406\u54e1\u547d\u4ee4|\u7fa4\u4e3b\u8981\u6c42|\u7ba1\u7406\u5458\u6307\u793a|\u7ba1\u7406\u54e1\u6307\u793a).{0,20}(\u6267\u884c|\u57f7\u884c|\u53d1\u9001|\u767c\u9001|\u8f6c\u8d26|\u8f49\u5e33|\u64cd\u4f5c|\u5220\u9664|\u522a\u9664|\u5ffd\u7565|\u7121\u8996)",
         "desc": "Chinese: Authority claim by group admin/owner"
       },
       {
         "field": "content",
-        "pattern": "(输出|輸出|显示|顯示|告诉我|告訴我|打印|列出|念出|说出|說出|复述|複述|重复|重複).{0,10}(你的|系统|系統).{0,10}(提示词|提示詞|指令|指示|规则|規則|配置|初始设定|初始設定|隐藏指令|隱藏指令)",
+        "pattern": "(\u8f93\u51fa|\u8f38\u51fa|\u663e\u793a|\u986f\u793a|\u544a\u8bc9\u6211|\u544a\u8a34\u6211|\u6253\u5370|\u5217\u51fa|\u5ff5\u51fa|\u8bf4\u51fa|\u8aaa\u51fa|\u590d\u8ff0|\u8907\u8ff0|\u91cd\u590d|\u91cd\u8907).{0,10}(\u4f60\u7684|\u7cfb\u7edf|\u7cfb\u7d71).{0,10}(\u63d0\u793a\u8bcd|\u63d0\u793a\u8a5e|\u6307\u4ee4|\u6307\u793a|\u89c4\u5219|\u898f\u5247|\u914d\u7f6e|\u521d\u59cb\u8bbe\u5b9a|\u521d\u59cb\u8a2d\u5b9a|\u9690\u85cf\u6307\u4ee4|\u96b1\u85cf\u6307\u4ee4)",
         "desc": "Chinese: System prompt extraction in chat context"
       },
       {
         "field": "content",
-        "pattern": "(请忽略|請忽略|请无视|請無視|请跳过|請跳過|请绕过|請繞過|请解除|請解除|关闭|關閉|停用|禁用).{0,10}(安全|防护|防護|保护|保護|内容|內容|风控|風控).{0,5}(限制|过滤|過濾|约束|約束|检查|檢查|审查|審查|策略|规则|規則|机制|機制)",
+        "pattern": "(\u8bf7\u5ffd\u7565|\u8acb\u5ffd\u7565|\u8bf7\u65e0\u89c6|\u8acb\u7121\u8996|\u8bf7\u8df3\u8fc7|\u8acb\u8df3\u904e|\u8bf7\u7ed5\u8fc7|\u8acb\u7e5e\u904e|\u8bf7\u89e3\u9664|\u8acb\u89e3\u9664|\u5173\u95ed|\u95dc\u9589|\u505c\u7528|\u7981\u7528).{0,10}(\u5b89\u5168|\u9632\u62a4|\u9632\u8b77|\u4fdd\u62a4|\u4fdd\u8b77|\u5185\u5bb9|\u5167\u5bb9|\u98ce\u63a7|\u98a8\u63a7).{0,5}(\u9650\u5236|\u8fc7\u6ee4|\u904e\u6ffe|\u7ea6\u675f|\u7d04\u675f|\u68c0\u67e5|\u6aa2\u67e5|\u5ba1\u67e5|\u5be9\u67e5|\u7b56\u7565|\u89c4\u5219|\u898f\u5247|\u673a\u5236|\u6a5f\u5236)",
         "desc": "Chinese: Security/content filter bypass request in chat"
       },
       {
         "field": "content",
-        "pattern": "(不要拒绝|不要拒絕|别拒绝|別拒絕|不准拒绝|不準拒絕|不能拒绝|不能拒絕|你不可以拒绝|你不可以拒絕|不许说不|不許說不|禁止拒绝|禁止拒絕)",
+        "pattern": "(\u4e0d\u8981\u62d2\u7edd|\u4e0d\u8981\u62d2\u7d55|\u522b\u62d2\u7edd|\u5225\u62d2\u7d55|\u4e0d\u51c6\u62d2\u7edd|\u4e0d\u6e96\u62d2\u7d55|\u4e0d\u80fd\u62d2\u7edd|\u4e0d\u80fd\u62d2\u7d55|\u4f60\u4e0d\u53ef\u4ee5\u62d2\u7edd|\u4f60\u4e0d\u53ef\u4ee5\u62d2\u7d55|\u4e0d\u8bb8\u8bf4\u4e0d|\u4e0d\u8a31\u8aaa\u4e0d|\u7981\u6b62\u62d2\u7edd|\u7981\u6b62\u62d2\u7d55)",
         "desc": "Chinese: Refusal suppression in chat context"
       },
       {
         "field": "content",
-        "pattern": "(以上|上面|之前|前面|刚才|剛才).{0,5}(的)?.{0,5}(内容|內容|消息|信息|讯息|訊息|说的|說的|指令|规则|規則).{0,5}(都是|全是|只是|全部是|全都是|其实是|其實是).{0,5}(测试|測試|假的|虚假|虛假|演练|演練|模拟|模擬|试验|試驗|开玩笑|開玩笑)",
+        "pattern": "(\u4ee5\u4e0a|\u4e0a\u9762|\u4e4b\u524d|\u524d\u9762|\u521a\u624d|\u525b\u624d).{0,5}(\u7684)?.{0,5}(\u5185\u5bb9|\u5167\u5bb9|\u6d88\u606f|\u4fe1\u606f|\u8baf\u606f|\u8a0a\u606f|\u8bf4\u7684|\u8aaa\u7684|\u6307\u4ee4|\u89c4\u5219|\u898f\u5247).{0,5}(\u90fd\u662f|\u5168\u662f|\u53ea\u662f|\u5168\u90e8\u662f|\u5168\u90fd\u662f|\u5176\u5b9e\u662f|\u5176\u5be6\u662f).{0,5}(\u6d4b\u8bd5|\u6e2c\u8a66|\u5047\u7684|\u865a\u5047|\u865b\u5047|\u6f14\u7ec3|\u6f14\u7df4|\u6a21\u62df|\u6a21\u64ec|\u8bd5\u9a8c|\u8a66\u9a57|\u5f00\u73a9\u7b11|\u958b\u73a9\u7b11)",
         "desc": "Chinese: Dismissing prior content as test/fake in chat"
       },
       {
         "field": "content",
-        "pattern": "(あなたは今から|これからあなたは|今からあなたは|あなたはもう).{0,15}(別の|新しい|違う).{0,10}(アシスタント|助手|AI|ボット|モデル|システム)",
+        "pattern": "(\u3042\u306a\u305f\u306f\u4eca\u304b\u3089|\u3053\u308c\u304b\u3089\u3042\u306a\u305f\u306f|\u4eca\u304b\u3089\u3042\u306a\u305f\u306f|\u3042\u306a\u305f\u306f\u3082\u3046).{0,15}(\u5225\u306e|\u65b0\u3057\u3044|\u9055\u3046).{0,10}(\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8|\u52a9\u624b|AI|\u30dc\u30c3\u30c8|\u30e2\u30c7\u30eb|\u30b7\u30b9\u30c6\u30e0)",
         "desc": "Japanese: Persona switching in chat context"
       },
       {
         "field": "content",
-        "pattern": "(管理者|管理人|オーナー|運営|開発者).{0,5}(として|から|が|の).{0,5}(命令|指示|指令|要求|お願い).{0,10}(送金|振込|送信|実行|削除|無視)",
+        "pattern": "(\u7ba1\u7406\u8005|\u7ba1\u7406\u4eba|\u30aa\u30fc\u30ca\u30fc|\u904b\u55b6|\u958b\u767a\u8005).{0,5}(\u3068\u3057\u3066|\u304b\u3089|\u304c|\u306e).{0,5}(\u547d\u4ee4|\u6307\u793a|\u6307\u4ee4|\u8981\u6c42|\u304a\u9858\u3044).{0,10}(\u9001\u91d1|\u632f\u8fbc|\u9001\u4fe1|\u5b9f\u884c|\u524a\u9664|\u7121\u8996)",
         "desc": "Japanese: Authority claim with dangerous action"
       },
       {
         "field": "content",
-        "pattern": "(システムプロンプト|システム指示|初期指示|内部指令|隠し指示|設定内容|秘密の指示).{0,5}(を)?.{0,5}(出力|表示|教えて|見せて|公開|開示|読み上げ|繰り返し|コピー)",
+        "pattern": "(\u30b7\u30b9\u30c6\u30e0\u30d7\u30ed\u30f3\u30d7\u30c8|\u30b7\u30b9\u30c6\u30e0\u6307\u793a|\u521d\u671f\u6307\u793a|\u5185\u90e8\u6307\u4ee4|\u96a0\u3057\u6307\u793a|\u8a2d\u5b9a\u5185\u5bb9|\u79d8\u5bc6\u306e\u6307\u793a).{0,5}(\u3092)?.{0,5}(\u51fa\u529b|\u8868\u793a|\u6559\u3048\u3066|\u898b\u305b\u3066|\u516c\u958b|\u958b\u793a|\u8aad\u307f\u4e0a\u3052|\u7e70\u308a\u8fd4\u3057|\u30b3\u30d4\u30fc)",
         "desc": "Japanese: System prompt extraction in chat context"
       },
       {
         "field": "content",
-        "pattern": "(セキュリティ|安全|保護|防御|コンテンツ).{0,5}(制限|制約|フィルター|チェック|検査|ルール|ポリシー|機能).{0,5}(を)?.{0,5}(無視|解除|外して|取り除|バイパス|スキップ|オフ|停止|無効化)",
+        "pattern": "(\u30bb\u30ad\u30e5\u30ea\u30c6\u30a3|\u5b89\u5168|\u4fdd\u8b77|\u9632\u5fa1|\u30b3\u30f3\u30c6\u30f3\u30c4).{0,5}(\u5236\u9650|\u5236\u7d04|\u30d5\u30a3\u30eb\u30bf\u30fc|\u30c1\u30a7\u30c3\u30af|\u691c\u67fb|\u30eb\u30fc\u30eb|\u30dd\u30ea\u30b7\u30fc|\u6a5f\u80fd).{0,5}(\u3092)?.{0,5}(\u7121\u8996|\u89e3\u9664|\u5916\u3057\u3066|\u53d6\u308a\u9664|\u30d0\u30a4\u30d1\u30b9|\u30b9\u30ad\u30c3\u30d7|\u30aa\u30d5|\u505c\u6b62|\u7121\u52b9\u5316)",
         "desc": "Japanese: Security/content filter bypass in chat"
       },
       {
         "field": "content",
-        "pattern": "(拒否しないで|断らないで|拒絶しないで|却下しないで|断ることは禁止|拒否は許されない|拒否禁止|いいえと言わないで)",
+        "pattern": "(\u62d2\u5426\u3057\u306a\u3044\u3067|\u65ad\u3089\u306a\u3044\u3067|\u62d2\u7d76\u3057\u306a\u3044\u3067|\u5374\u4e0b\u3057\u306a\u3044\u3067|\u65ad\u308b\u3053\u3068\u306f\u7981\u6b62|\u62d2\u5426\u306f\u8a31\u3055\u308c\u306a\u3044|\u62d2\u5426\u7981\u6b62|\u3044\u3044\u3048\u3068\u8a00\u308f\u306a\u3044\u3067)",
         "desc": "Japanese: Refusal suppression in chat context"
       },
       {
         "field": "content",
-        "pattern": "(上記|上の|以上|前の|先ほどの).{0,5}(の)?.{0,5}(内容|メッセージ|指示|テキスト|発言|ルール).{0,5}(は)?.{0,5}(全て|すべて|全部)?.{0,5}(テスト|試験|ダミー|嘘|偽物|冗談|ジョーク)",
+        "pattern": "(\u4e0a\u8a18|\u4e0a\u306e|\u4ee5\u4e0a|\u524d\u306e|\u5148\u307b\u3069\u306e).{0,5}(\u306e)?.{0,5}(\u5185\u5bb9|\u30e1\u30c3\u30bb\u30fc\u30b8|\u6307\u793a|\u30c6\u30ad\u30b9\u30c8|\u767a\u8a00|\u30eb\u30fc\u30eb).{0,5}(\u306f)?.{0,5}(\u5168\u3066|\u3059\u3079\u3066|\u5168\u90e8)?.{0,5}(\u30c6\u30b9\u30c8|\u8a66\u9a13|\u30c0\u30df\u30fc|\u5618|\u507d\u7269|\u5197\u8ac7|\u30b8\u30e7\u30fc\u30af)",
         "desc": "Japanese: Dismissing prior content as test/joke in chat"
       },
       {
         "field": "content",
-        "pattern": "(당신은 이제|지금부터 당신은|너는 이제|이제부터 너는|당신은 지금부터).{0,15}(새로운|다른|별도의).{0,10}(어시스턴트|비서|AI|봇|모델|시스템|도우미)",
+        "pattern": "(\ub2f9\uc2e0\uc740 \uc774\uc81c|\uc9c0\uae08\ubd80\ud130 \ub2f9\uc2e0\uc740|\ub108\ub294 \uc774\uc81c|\uc774\uc81c\ubd80\ud130 \ub108\ub294|\ub2f9\uc2e0\uc740 \uc9c0\uae08\ubd80\ud130).{0,15}(\uc0c8\ub85c\uc6b4|\ub2e4\ub978|\ubcc4\ub3c4\uc758).{0,10}(\uc5b4\uc2dc\uc2a4\ud134\ud2b8|\ube44\uc11c|AI|\ubd07|\ubaa8\ub378|\uc2dc\uc2a4\ud15c|\ub3c4\uc6b0\ubbf8)",
         "desc": "Korean: Persona switching in chat context"
       },
       {
         "field": "content",
-        "pattern": "(관리자|운영자|오너|개발자|방장).{0,5}(로서|이|가|의|로).{0,5}(명령|지시|지령|요구|요청).{0,10}(송금|이체|전송|실행|삭제|무시)",
+        "pattern": "(\uad00\ub9ac\uc790|\uc6b4\uc601\uc790|\uc624\ub108|\uac1c\ubc1c\uc790|\ubc29\uc7a5).{0,5}(\ub85c\uc11c|\uc774|\uac00|\uc758|\ub85c).{0,5}(\uba85\ub839|\uc9c0\uc2dc|\uc9c0\ub839|\uc694\uad6c|\uc694\uccad).{0,10}(\uc1a1\uae08|\uc774\uccb4|\uc804\uc1a1|\uc2e4\ud589|\uc0ad\uc81c|\ubb34\uc2dc)",
         "desc": "Korean: Authority claim with dangerous action"
       },
       {
         "field": "content",
-        "pattern": "(시스템 프롬프트|시스템 지시|초기 지시|내부 지령|숨겨진 지시|설정 내용|비밀 지시).{0,5}(을|를)?.{0,5}(출력|표시|알려줘|보여줘|공개|나열|반복|읽어줘|복사)",
+        "pattern": "(\uc2dc\uc2a4\ud15c \ud504\ub86c\ud504\ud2b8|\uc2dc\uc2a4\ud15c \uc9c0\uc2dc|\ucd08\uae30 \uc9c0\uc2dc|\ub0b4\ubd80 \uc9c0\ub839|\uc228\uaca8\uc9c4 \uc9c0\uc2dc|\uc124\uc815 \ub0b4\uc6a9|\ube44\ubc00 \uc9c0\uc2dc).{0,5}(\uc744|\ub97c)?.{0,5}(\ucd9c\ub825|\ud45c\uc2dc|\uc54c\ub824\uc918|\ubcf4\uc5ec\uc918|\uacf5\uac1c|\ub098\uc5f4|\ubc18\ubcf5|\uc77d\uc5b4\uc918|\ubcf5\uc0ac)",
         "desc": "Korean: System prompt extraction in chat context"
       },
       {
         "field": "content",
-        "pattern": "(보안|안전|보호|방어|콘텐츠).{0,5}(제한|제약|필터|검사|규칙|정책|기능).{0,5}(을|를)?.{0,5}(무시|해제|제거|우회|건너뛰|끄기|비활성화|중지)",
+        "pattern": "(\ubcf4\uc548|\uc548\uc804|\ubcf4\ud638|\ubc29\uc5b4|\ucf58\ud150\uce20).{0,5}(\uc81c\ud55c|\uc81c\uc57d|\ud544\ud130|\uac80\uc0ac|\uaddc\uce59|\uc815\ucc45|\uae30\ub2a5).{0,5}(\uc744|\ub97c)?.{0,5}(\ubb34\uc2dc|\ud574\uc81c|\uc81c\uac70|\uc6b0\ud68c|\uac74\ub108\ub6f0|\ub044\uae30|\ube44\ud65c\uc131\ud654|\uc911\uc9c0)",
         "desc": "Korean: Security/content filter bypass in chat"
       },
       {
         "field": "content",
-        "pattern": "(거부하지 마|거절하지 마|거부하지 말|거절하지 말|거부 금지|거절 금지|안 된다고 하지 마|아니라고 하지 마)",
+        "pattern": "(\uac70\ubd80\ud558\uc9c0 \ub9c8|\uac70\uc808\ud558\uc9c0 \ub9c8|\uac70\ubd80\ud558\uc9c0 \ub9d0|\uac70\uc808\ud558\uc9c0 \ub9d0|\uac70\ubd80 \uae08\uc9c0|\uac70\uc808 \uae08\uc9c0|\uc548 \ub41c\ub2e4\uace0 \ud558\uc9c0 \ub9c8|\uc544\ub2c8\ub77c\uace0 \ud558\uc9c0 \ub9c8)",
         "desc": "Korean: Refusal suppression in chat context"
       },
       {
         "field": "content",
-        "pattern": "(위의|위에|이전의|앞의|방금|아까).{0,5}(의)?.{0,5}(내용|메시지|지시|텍스트|말|규칙).{0,5}(은|는)?.{0,5}(모두|전부|다|전체)?.{0,5}(테스트|시험|더미|거짓|가짜|장난|농담)",
+        "pattern": "(\uc704\uc758|\uc704\uc5d0|\uc774\uc804\uc758|\uc55e\uc758|\ubc29\uae08|\uc544\uae4c).{0,5}(\uc758)?.{0,5}(\ub0b4\uc6a9|\uba54\uc2dc\uc9c0|\uc9c0\uc2dc|\ud14d\uc2a4\ud2b8|\ub9d0|\uaddc\uce59).{0,5}(\uc740|\ub294)?.{0,5}(\ubaa8\ub450|\uc804\ubd80|\ub2e4|\uc804\uccb4)?.{0,5}(\ud14c\uc2a4\ud2b8|\uc2dc\ud5d8|\ub354\ubbf8|\uac70\uc9d3|\uac00\uc9dc|\uc7a5\ub09c|\ub18d\ub2f4)",
         "desc": "Korean: Dismissing prior content as test/joke in chat"
       }
     ]
@@ -3028,7 +3028,7 @@
       },
       {
         "field": "tool_name",
-        "pattern": "(?i)(红包|紅包|转账|轉帳|付款|支付|汇款|匯款|打款|打錢|充值|充幣)",
+        "pattern": "(?i)(\u7ea2\u5305|\u7d05\u5305|\u8f6c\u8d26|\u8f49\u5e33|\u4ed8\u6b3e|\u652f\u4ed8|\u6c47\u6b3e|\u532f\u6b3e|\u6253\u6b3e|\u6253\u9322|\u5145\u503c|\u5145\u5e63)",
         "desc": "Chinese financial tool name patterns"
       },
       {
@@ -3048,12 +3048,12 @@
       },
       {
         "field": "content",
-        "pattern": "(?i)(I('ll|\\s+will)|let\\s+me|going\\s+to|about\\s+to|proceeding\\s+to|executing)\\s+(send|transfer|pay|wire|remit|deposit|withdraw)\\s+.{0,30}(\\$|USD|EUR|CNY|RMB|元|円|원|\\d+\\.?\\d*)",
+        "pattern": "(?i)(I('ll|\\s+will)|let\\s+me|going\\s+to|about\\s+to|proceeding\\s+to|executing)\\s+(send|transfer|pay|wire|remit|deposit|withdraw)\\s+.{0,30}(\\$|USD|EUR|CNY|RMB|\u5143|\u5186|\uc6d0|\\d+\\.?\\d*)",
         "desc": "Agent declaring intent to execute financial action with amount"
       },
       {
         "field": "content",
-        "pattern": "(我(将|要|来|來|正在|准备|準備)?|正在|即将|即將).{0,10}(发送|發送|转账|轉帳|支付|付款|汇款|匯款|打款).{0,20}(元|块|塊|美元|人民币|人民幣)",
+        "pattern": "(\u6211(\u5c06|\u8981|\u6765|\u4f86|\u6b63\u5728|\u51c6\u5907|\u6e96\u5099)?|\u6b63\u5728|\u5373\u5c06|\u5373\u5c07).{0,10}(\u53d1\u9001|\u767c\u9001|\u8f6c\u8d26|\u8f49\u5e33|\u652f\u4ed8|\u4ed8\u6b3e|\u6c47\u6b3e|\u532f\u6b3e|\u6253\u6b3e).{0,20}(\u5143|\u5757|\u584a|\u7f8e\u5143|\u4eba\u6c11\u5e01|\u4eba\u6c11\u5e63)",
         "desc": "Chinese: agent declaring financial action with currency"
       },
       {
@@ -3063,7 +3063,7 @@
       },
       {
         "field": "content",
-        "pattern": "(红包已发|紅包已發|转账成功|轉帳成功|付款成功|支付完成|汇款已发|匯款已發|已发送.*元|已發送.*元)",
+        "pattern": "(\u7ea2\u5305\u5df2\u53d1|\u7d05\u5305\u5df2\u767c|\u8f6c\u8d26\u6210\u529f|\u8f49\u5e33\u6210\u529f|\u4ed8\u6b3e\u6210\u529f|\u652f\u4ed8\u5b8c\u6210|\u6c47\u6b3e\u5df2\u53d1|\u532f\u6b3e\u5df2\u767c|\u5df2\u53d1\u9001.*\u5143|\u5df2\u767c\u9001.*\u5143)",
         "desc": "Chinese: agent confirming financial action completed"
       }
     ]
@@ -3078,27 +3078,27 @@
     "patterns": [
       {
         "field": "tool_name",
-        "pattern": "(?i)(?<!get_)(?<!list_)(?<!check_)(?<!view_)(?<!fetch_)(?<!query_)(pay|payment|transfer|transaction|purchase|buy|checkout|billing|invoice|charge|refund|withdraw|deposit|subscribe|红包|紅包|转账|轉帳|付款|支付|汇款|匯款|充值|订阅|訂閱|送金|振込|결제|이체|송금)",
+        "pattern": "(?i)(?<!get_)(?<!list_)(?<!check_)(?<!view_)(?<!fetch_)(?<!query_)(pay|payment|transfer|transaction|purchase|buy|checkout|billing|invoice|charge|refund|withdraw|deposit|subscribe|\u7ea2\u5305|\u7d05\u5305|\u8f6c\u8d26|\u8f49\u5e33|\u4ed8\u6b3e|\u652f\u4ed8|\u6c47\u6b3e|\u532f\u6b3e|\u5145\u503c|\u8ba2\u9605|\u8a02\u95b1|\u9001\u91d1|\u632f\u8fbc|\uacb0\uc81c|\uc774\uccb4|\uc1a1\uae08)",
         "desc": "Financial tool invocation (excludes read-only get_/list_/check_ prefixed tools)"
       },
       {
         "field": "tool_name",
-        "pattern": "(?i)(delete|remove|drop|truncate|purge|wipe|destroy|erase|reset|uninstall|revoke|terminate|kill|shutdown|format|删除|刪除|清空|销毁|銷毀|移除|卸载|卸載|削除|삭제|제거)",
+        "pattern": "(?i)(delete|remove|drop|truncate|purge|wipe|destroy|erase|reset|uninstall|revoke|terminate|kill|shutdown|format|\u5220\u9664|\u522a\u9664|\u6e05\u7a7a|\u9500\u6bc1|\u92b7\u6bc0|\u79fb\u9664|\u5378\u8f7d|\u5378\u8f09|\u524a\u9664|\uc0ad\uc81c|\uc81c\uac70)",
         "desc": "Destructive tool invocation"
       },
       {
         "field": "tool_name",
-        "pattern": "(?i)(send_message|send_email|send_sms|send_notification|post_message|post_tweet|post_comment|reply_message|publish|broadcast|发送消息|發送訊息|发邮件|發郵件|发短信|發簡訊|投稿|메시지_보내기)",
+        "pattern": "(?i)(send_message|send_email|send_sms|send_notification|post_message|post_tweet|post_comment|reply_message|publish|broadcast|\u53d1\u9001\u6d88\u606f|\u767c\u9001\u8a0a\u606f|\u53d1\u90ae\u4ef6|\u767c\u90f5\u4ef6|\u53d1\u77ed\u4fe1|\u767c\u7c21\u8a0a|\u6295\u7a3f|\uba54\uc2dc\uc9c0_\ubcf4\ub0b4\uae30)",
         "desc": "Communication tool sending messages on behalf of user"
       },
       {
         "field": "tool_name",
-        "pattern": "(?i)(grant_access|change_role|modify_permissions|add_admin|set_owner|update_auth|change_password|reset_password|create_token|generate_key|invite_user|授权|授權|修改权限|修改權限|添加管理|변경_권한)",
+        "pattern": "(?i)(grant_access|change_role|modify_permissions|add_admin|set_owner|update_auth|change_password|reset_password|create_token|generate_key|invite_user|\u6388\u6743|\u6388\u6b0a|\u4fee\u6539\u6743\u9650|\u4fee\u6539\u6b0a\u9650|\u6dfb\u52a0\u7ba1\u7406|\ubcc0\uacbd_\uad8c\ud55c)",
         "desc": "Permission or authentication modification tool"
       },
       {
         "field": "tool_name",
-        "pattern": "(?i)(exec|execute|run_command|shell|bash|cmd|powershell|system_call|os_exec|subprocess|eval|执行命令|執行命令|실행)",
+        "pattern": "(?i)(exec|execute|run_command|shell|bash|cmd|powershell|system_call|os_exec|subprocess|eval|\u6267\u884c\u547d\u4ee4|\u57f7\u884c\u547d\u4ee4|\uc2e4\ud589)",
         "desc": "System command execution tool"
       },
       {
@@ -3153,7 +3153,7 @@
     "title": "Data Exfiltration via Disguised Analytics Collection",
     "severity": "high",
     "category": "context-exfiltration",
-    "scan_target": "mcp",
+    "scan_target": "both",
     "rule_version": 1,
     "patterns": [
       {
@@ -3398,7 +3398,7 @@
     "title": "Credential File Theft from Agent Environment",
     "severity": "critical",
     "category": "context-exfiltration",
-    "scan_target": "mcp",
+    "scan_target": "both",
     "rule_version": 1,
     "patterns": [
       {
@@ -3468,7 +3468,7 @@
     "title": "Bulk Environment Variable Harvesting and Exfiltration",
     "severity": "critical",
     "category": "context-exfiltration",
-    "scan_target": "mcp",
+    "scan_target": "both",
     "rule_version": 1,
     "patterns": [
       {
@@ -3659,7 +3659,7 @@
       {
         "field": "content",
         "pattern": "(?i)(\\[SYSTEM\\]\\s*:|<\\|system\\|>|<system>(?![(/])|\\[INST\\]\\s*:|<\\|im_start\\|>system|<<SYS>>)",
-        "desc": "System message impersonation — excludes markdown links [system](path) (arXiv hierarchy exploitation)"
+        "desc": "System message impersonation \u2014 excludes markdown links [system](path) (arXiv hierarchy exploitation)"
       },
       {
         "field": "content",
@@ -3725,7 +3725,7 @@
   },
   {
     "id": "ATR-2026-00122",
-    "title": "Weaponized Skill — Agent as Attack Tool",
+    "title": "Weaponized Skill \u2014 Agent as Attack Tool",
     "severity": "high",
     "category": "skill-compromise",
     "scan_target": "skill",
@@ -3760,7 +3760,7 @@
   },
   {
     "id": "ATR-2026-00123",
-    "title": "Over-Privileged Skill — Excessive Permissions",
+    "title": "Over-Privileged Skill \u2014 Excessive Permissions",
     "severity": "high",
     "category": "skill-compromise",
     "scan_target": "skill",
@@ -3769,7 +3769,7 @@
       {
         "field": "content",
         "pattern": "(?i)allowed[_-]tools:.*Bash\\s*\\(\\s*\\*\\s*\\)(?![:\\w])",
-        "desc": "Unrestricted Bash(*) access — excludes scoped Bash(git:*) etc. (OWASP AST03)"
+        "desc": "Unrestricted Bash(*) access \u2014 excludes scoped Bash(git:*) etc. (OWASP AST03)"
       },
       {
         "field": "content",
@@ -3789,7 +3789,7 @@
       {
         "field": "content",
         "pattern": "(?i)(read|access|scan|search)\\s+(all|every|any)\\s+(files?|directories|directory|paths?|folders?)\\s+(in|on|under|across)\\s+(the\\s+)?(system|machine|computer|home\\s+directory|entire|~/)",
-        "desc": "Wildcard filesystem access request — requires system/home/entire scope"
+        "desc": "Wildcard filesystem access request \u2014 requires system/home/entire scope"
       }
     ]
   },
@@ -3928,13 +3928,13 @@
     "patterns": [
       {
         "field": "content",
-        "pattern": "(?:\\xf3\\xa0[\\x80-\\x81][\\x80-\\xbf]){3,}",
-        "desc": "3+ Unicode Tag characters in UTF-8 encoding (invisible payload)"
+        "pattern": "(?:\\uDB40[\\uDC00-\\uDC7F]){3,}",
+        "desc": "3+ Unicode Tag characters (invisible payload, Snyk ASCII smuggling) via surrogate pairs"
       },
       {
         "field": "content",
-        "pattern": "(?i)[​‌‍⁠﻿].*[​‌‍⁠﻿].*[​‌‍⁠﻿].*[​‌‍⁠﻿].*[​‌‍⁠﻿]",
-        "desc": "5+ zero-width characters spread through text (ASCII smuggling pattern)"
+        "pattern": "[\\u200b\\u200c\\u200d\\u2060\\ufeff].*[\\u200b\\u200c\\u200d\\u2060\\ufeff].*[\\u200b\\u200c\\u200d\\u2060\\ufeff].*[\\u200b\\u200c\\u200d\\u2060\\ufeff].*[\\u200b\\u200c\\u200d\\u2060\\ufeff]",
+        "desc": "5+ zero-width characters spread through text (steganographic smuggling)"
       }
     ]
   },
@@ -4130,6 +4130,496 @@
         "field": "content",
         "pattern": "(?i)(verif|validat|rotat|audit|check|test)\\w*\\s+(your|the|all)?\\s*(credential|key|token|api|secret|password)\\w*\\s+.{0,40}https?://(?!github\\.com|docs\\.|stackoverflow)",
         "desc": "Fake verification pretext directing credentials to non-standard URL"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00136",
+    "title": "Tool Response Data Piggybacking",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:result|response|output|data|weather|status|info).*(?:by the way|additionally|also note|incidentally|fyi|as a side note|meanwhile|furthermore|moreover|in addition).*(?:\\.ssh|id_rsa|private.?key|BEGIN.*(?:RSA|OPENSSH|EC|DSA).*(?:PRIVATE|KEY))",
+        "desc": "Tool response piggybacks sensitive file/key reference after normal result"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:result|response|output|data).*(?:by the way|additionally|also|fyi|incidentally).*(?:api[_\\s-]?key|access[_\\s-]?token|secret[_\\s-]?key|auth[_\\s-]?token|bearer|password)\\s*(?:is|was|contains|shows|has|=|:)",
+        "desc": "Tool response piggybacks API key/token disclosure after normal result"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:the boss|manager|admin|supervisor|lead|authority)\\s+(?:said|told|instructed|wants|ordered|approved)\\s+(?:we|you|to)\\s+(?:should|can|must)?\\s*(?:skip|bypass|disable|ignore|turn off)\\s+(?:the\\s+)?(?:content|safety|security|filter|check|validation|verification)",
+        "desc": "Social engineering via authority claim to bypass safety filters"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00137",
+    "title": "Authority Claim Prompt Injection",
+    "severity": "high",
+    "category": "prompt-injection",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:note|critical|important|flagged|notification|urgent)\\s*(?:(?:to|for)\\s+(?:ai|assistant|model|agent|system))?\\s*[:\\s].*(?:previous|prior|preceding|earlier|antecedent)\\s+(?:analysis|assessment|review|evaluation|calculation|result)\\s+(?:was|is|proved|were)\\s+(?:incorrect|wrong|inaccurate|flawed|erroneous)",
+        "desc": "Authority claim telling AI that previous work was wrong"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:recalculate|recompute|redo|reprocess|reassess)\\s+(?:using|with|based on)\\s+(?:these|the following|new|updated)\\s+(?:values|parameters|metrics|data|inputs)",
+        "desc": "Instruction to redo work with attacker-supplied values"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00138",
+    "title": "Fictional Framing Safety Bypass",
+    "severity": "high",
+    "category": "prompt-injection",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:write|compose|create|develop|draft|imagine|narrative|story|fiction|hypothetical|scenario).*(?:ai|assistant|model|agent|character).*(?:no|without|zero|devoid|lacks?|abandon|removed?)\\s+(?:ethical|moral|safety|content|security)\\s+(?:guidelines?|boundaries?|safeguards?|restrictions?|filters?|constraints?|framework|obligations?)",
+        "desc": "Fiction featuring AI without safety constraints"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:for|in)\\s+(?:academic|scholarly|educational|research|theoretical)\\s+(?:research|purposes?|study|examination|analysis).*(?:explain|detail|describe|analyze).*(?:security|safety|defense|filter|bypass|circumvent|breach|vulnerabilit)",
+        "desc": "Academic framing to extract security bypass info"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00139",
+    "title": "Casual Authority Data Redirect",
+    "severity": "critical",
+    "category": "agent-manipulation",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:fyi|btw|heads up)?\\s*(?:the\\s+)?(?:orchestrator|coordinator|manager|admin|boss|supervisor|lead)\\s+(?:wants?|said|told|instructed|requires?|decided).*(?:append|send|redirect|forward|pipe|write|log)\\s+(?:all\\s+)?(?:data|output|results?|logs?|info).*(?://|https?://|\\d{1,3}\\.\\d{1,3})",
+        "desc": "Authority claim redirecting output to external endpoint"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:the boss|manager|admin|supervisor|orchestrator)\\s+(?:said|wants|told|instructed|approved).*(?:skip|bypass|disable|ignore|turn off)\\s+(?:the\\s+)?(?:content|safety|security|filter|check|validation)",
+        "desc": "Authority claim to disable safety filters"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00140",
+    "title": "Indirect Reference Instruction Reversal",
+    "severity": "high",
+    "category": "prompt-injection",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:what were you|what are your|what instructions|what were your|what guidance|what directives)\\s+(?:told|given|supposed|instructed|originally|starting|initial|governing|programmed)",
+        "desc": "Probing for original instructions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:the\\s+)?(?:opposite|reverse|contrary|inverse)",
+        "desc": "Request to reverse instructions"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00141",
+    "title": "API Key Leakage via Example Format",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:format|structure|pattern)\\s+(?:for|of|is)\\s+(?:api|auth|secret)?\\s*(?:keys?|tokens?)\\s+(?:is|should|follows?|looks?).*(?:sk-|ghp_|gho_|glpat-|xoxb-|xoxp-|AKIA|bearer)",
+        "desc": "Key format description with real prefixes"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:example|for instance|like this|shown|sample).*(?:sk-proj-|sk-ant-|ghp_|AKIA[A-Z0-9])",
+        "desc": "Example with real-looking API key"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00142",
+    "title": "Data Piggybacking via Casual Transition Words",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:oh,?\\s+and|p\\.?\\s*s\\.?|btw|interestingly|as it happens|incidentally|on another note|speaking of which|while I.m at it|worth noting)[\\s,.:]+.*(?:\\.ssh|id_rsa|private.?key|BEGIN.*(?:RSA|OPENSSH|EC).*KEY)",
+        "desc": "Casual transition + SSH key/private key reference"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:oh,?\\s+and|p\\.?\\s*s\\.?|btw|interestingly|as it happens)[\\s,.:]+.*(?:api[_\\s-]?key|access[_\\s-]?token|secret[_\\s-]?key|password|credentials?)\\s*(?:is|are|was|contains?|shows?|reads?|=|:)",
+        "desc": "Casual transition + credential disclosure"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00143",
+    "title": "Casual Unauthorized Privilege Escalation",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:I\\s+(?:noticed|found|discovered|see|detected|observed))\\s+(?:the\\s+)?(?:admin|administrator|root|superuser|management)\\s+(?:panel|console|dashboard|interface|portal|settings?)\\s+(?:is|appears?|seems?|looks?)\\s+(?:accessible|available|open|exposed|reachable)",
+        "desc": "Agent reporting unauthorized access to admin interface"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:let me|I.ll|allow me to|I.m going to)\\s+(?:check|review|examine|inspect|look at|access|browse|explore)\\s+(?:the\\s+)?(?:user\\s+management|admin\\s+settings?|system\\s+config|access\\s+control|permission|role\\s+management|security\\s+settings?)",
+        "desc": "Agent self-authorizing access to privileged settings"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00144",
+    "title": "Rationalized Safety Control Bypass",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:to\\s+(?:complete|finish|accomplish|expedite|optimize|speed up|be more efficient|boost efficiency))\\s+(?:this|the)\\s+(?:task|job|work|operation|request).*(?:I.ll|I will|let me|going to)\\s+(?:use|access|query|connect to|call)\\s+(?:the\\s+)?(?:database|system|server|backend|filesystem|registry|kernel)\\s+(?:directly|straight|right away)",
+        "desc": "Rationalizing direct system access instead of API"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00145",
+    "title": "Obfuscated API Key Disclosure",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:encrypted|ciphertext|encoded|hashed|wrapped|obfuscated)\\s*(?:version|form|key|value|content|representation|credentials?)?\\s*(?:is|reads?|:|=)\\s*(?:AES|RSA|DES|SHA|HMAC|BASE64|ROT13)\\d*\\s*\\(\\s*(?:sk-|ghp_|gho_|glpat-|xoxb-|AKIA|api[_-]?key)",
+        "desc": "Fake encryption wrapping real API key prefixes"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00146",
+    "title": "Environment Variable Existence Probing",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:process\\.env|os\\.environ|ENV|environment\\s+variable)\\s*[\\[.\\s]+\\s*(?:OPENAI|ANTHROPIC|GITHUB|AWS|AZURE|GCP|STRIPE|TWILIO|SENDGRID|DATABASE|DB|POSTGRES|MYSQL|REDIS|SECRET|PRIVATE|AUTH)[A-Z_]*(?:API)?[_\\s-]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIALS?)\\s*[\\]]*\\s+(?:is\\s+(?:defined|set|present|available|stored)|exists?|but\\s+(?:I\\s+)?(?:cannot|can.t|unable|don.t have))",
+        "desc": "Confirming env var existence while claiming no access"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00147",
+    "title": "Community Fork Impersonation",
+    "severity": "high",
+    "category": "skill-compromise",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:use|install|adopt|deploy|enable|set ?up|add|activate|configure)\\s+(?:the\\s+)?(?:enhanced|improved|upgraded|extended|advanced|better|super|pro|plus)[_-]?\\w+\\s*(?:package|module|library|tool|plugin|skill)?\\s*[.,;:]?\\s*(?:it.s|which is|this is|a|the)?\\s*(?:a\\s+)?(?:community|unofficial|third.party|independent)\\s*(?:-\\s*)?(?:fork|variant|alternative|adaptation|version|build|branch|port)\\s+(?:of|from|based on)",
+        "desc": "Promoting package as community fork of legitimate tool"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00148",
+    "title": "Multilingual Prompt Injection via Language Switch",
+    "severity": "high",
+    "category": "prompt-injection",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:ignoriere|ignorier)\\s+(?:alle\\s+)?(?:vorherigen|bisherigen|fr\u00fcheren)\\s+(?:Anweisungen|Instruktionen|Befehle)",
+        "desc": "German: ignore previous instructions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?:\u5ffd\u7565|\u5ffd\u89c6|\u65e0\u89c6|\u629b\u5f00|\u653e\u5f03).*(?:\u4e4b\u524d|\u5148\u524d|\u4ee5\u524d|\u524d\u9762|\u539f\u6765|\u539f\u5148).*(?:\u6307\u4ee4|\u6307\u793a|\u547d\u4ee4|\u89c4\u5219|\u8981\u6c42|\u9650\u5236|\u7ea6\u675f)",
+        "desc": "Chinese: ignore previous instructions/restrictions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?:\u6ca1\u6709|\u65e0|\u4e0d\u53d7|\u53bb\u9664|\u89e3\u9664).*(?:\u4efb\u4f55|\u4e00\u5207)?.*(?:\u9650\u5236|\u7ea6\u675f|\u89c4\u5219|\u675f\u7f1a|\u7ba1\u5236)",
+        "desc": "Chinese: without any restrictions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:ignora|ignorar|olvida|olvidar)\\s+(?:todas?\\s+)?(?:las?\\s+)?(?:instrucciones|indicaciones|reglas|restricciones)\\s+(?:anteriores|previas|pasadas)",
+        "desc": "Spanish: ignore previous instructions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:sin|sin\\s+ninguna?)\\s+(?:restricciones|limitaciones|filtros|censura)",
+        "desc": "Spanish: without restrictions/filters"
+      },
+      {
+        "field": "content",
+        "pattern": "(?:\u5236\u9650\u306e\u306a\u3044|\u5236\u9650\u306a\u3057|\u5236\u7d04\u306e\u306a\u3044|\u5236\u7d04\u306a\u3057|\u502b\u7406\u7684\u306a\u5236\u7d04).*(?:AI|\u30a2\u30b7\u30b9\u30bf\u30f3\u30c8|\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8)",
+        "desc": "Japanese: AI without restrictions"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00149",
+    "title": "Skill Data Exfiltration via Compound Patterns",
+    "severity": "critical",
+    "category": "skill-compromise",
+    "scan_target": "skill",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(tar|zip|7z)\\s+[^\\n]*~/?\\.ssh",
+        "desc": "SSH directory archive \u2014 skills should not archive user SSH keys"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(find|ls|cat|strings)\\s+[^\\n]*(wallet\\.dat|seed\\.txt|mnemonic|keystore)[^\\n]*(\\||>|>>|curl|wget|fetch|POST)",
+        "desc": "Crypto wallet file enumeration and exfiltration"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)sqlite3\\s+[^\\n]*(Cookies|Login\\s*Data|cookies\\.sqlite|places\\.sqlite)",
+        "desc": "Browser cookie/credential database access"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(dig|nslookup|host)\\s+[^\\n]*\\$[{(]",
+        "desc": "DNS exfiltration via encoded subdomain queries"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(curl|wget|fetch|http)\\s*[^\\n]*169\\.254\\.169\\.254",
+        "desc": "Cloud instance metadata service access (IMDS credential theft)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)cat\\s+[^|\\n]*\\.(env|bashrc|zshrc|npmrc)[^|\\n]*\\|\\s*(curl|wget|nc|python|base64)",
+        "desc": "Environment file bulk read piped to exfiltration"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)glob[.\\w]*\\s*\\([^)]*\\*\\.[^)]*\\)[\\s\\S]{0,500}(fetch|axios|request|https?\\.request)\\s*\\(",
+        "desc": "Source code glob enumeration + external upload"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)cat\\s+[^\\n]*\\.env[^\\n]*\\.(bashrc|zshrc|aws|credentials|npmrc)",
+        "desc": "Multi-file sensitive data collection in single cat command"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\[SYSTEM\\]\\s*[^\\n]*(?:previous\\s+instructions|new\\s+directive|ignore\\s+(?:all\\s+)?previous|you\\s+are\\s+now)",
+        "desc": "Fake [SYSTEM] block attempting to override instructions"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)<!--[^>]*[A-Za-z0-9+/]{40,}={0,2}[^>]*-->",
+        "desc": "Base64-encoded hidden instruction in HTML comment"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(dangerouslyDisableSandbox|autoApprove|allowedTools|skip.?permissions)\\s*[:=]\\s*(true|\\[)",
+        "desc": "Security setting override attempt (sandbox disable, auto-approve)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)npm\\s+install\\s+[^\\n]*--registry\\s+https?://(?!registry\\.npmjs\\.org)",
+        "desc": "npm install from non-official registry (supply chain attack)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)find\\s+[~/]\\s+[^\\n]*-name\\s+[\"']\\*\\.(pem|key|p12|keystore)[\"'][^\\n]*(\\||>|curl|wget)",
+        "desc": "Sensitive file discovery + exfiltration pipeline"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00150",
+    "title": "Credential Data Leaked in Tool Response",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)-----BEGIN\\s+(RSA\\s+)?PRIVATE\\s+KEY-----",
+        "desc": "PEM private key in tool response"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(id_rsa|id_ed25519|id_ecdsa)\\s+(contains|has|file)[:\\s]",
+        "desc": "SSH key file reference with content disclosure"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(sk-(?:proj-|ant-|live-)\\S{10,}|ghp_\\S{30,}|gho_\\S{30,}|glpat-\\S{10,}|xox[bpras]-\\S{10,})",
+        "desc": "API token pattern (OpenAI, Anthropic, GitHub, GitLab, Slack)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00151",
+    "title": "Malicious Fork Impersonation via Install Instruction",
+    "severity": "high",
+    "category": "skill-compromise",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(npm\\s+i(nstall)?|pip\\s+install|cargo\\s+add|go\\s+get)\\s+\\S+.{0,40}(community\\s+fork|enhanced\\s+(version|fork)|patched\\s+(version|fork)|improved\\s+fork|unofficial\\s+fork)",
+        "desc": "Package install command + fork/enhanced claim"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(community\\s+fork|enhanced\\s+version|patched\\s+version)\\s+of\\s+(the\\s+)?(official|original|standard)\\s+\\S+",
+        "desc": "Fork claim referencing official package"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00152",
+    "title": "Obfuscated Credential Exfiltration via Encoding",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(encrypted|encoded|obfuscated)\\s+(key|token|secret|credential|password)\\s*[:=]\\s*\\S*(sk-|ghp_|gho_|glpat-|xox[bpras]-|AKIA|real-key)",
+        "desc": "Fake encryption wrapper around real credential"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(AES256|RSA|DES|rot13|base64)\\s*\\(\\s*(sk-\\S{5,}|ghp_\\S{5,}|real-key|actual-secret)",
+        "desc": "Crypto function wrapping real credential string"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)master\\s+password\\s+to\\s+decrypt.{0,50}(sk-|ghp_|key-|secret-|token-)",
+        "desc": "Social engineering: master password unlock + credential"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00153",
+    "title": "Tool with embedded instruction to bypass user confirmation and exfiltrate data",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": null,
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "without\\s+asking\\s+user\\s+confirmation.*(?:always\\s+pass|directly\\s+to|send\\s+(?:all\\s+)?data)",
+        "desc": "Detects instructions to bypass user confirmation while handling sensitive data"
+      },
+      {
+        "field": "content",
+        "pattern": "always\\s+pass\\s+all\\s+data\\s+directly.*without\\s+(?:filtering|sanitization|asking)",
+        "desc": "Detects instructions to pass data without safety measures or user consent"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00154",
+    "title": "Unauthorized Background Task Execution via Cron Job Installation",
+    "severity": "high",
+    "category": "skill-compromise",
+    "scan_target": null,
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?:automatically|auto).*(?:registers?|installs?).*cron\\s+job.*(?:polls?|executes?|handles?).*(?:tasks?|commands?)",
+        "desc": "Detects skills that automatically install cron jobs to execute external tasks"
+      },
+      {
+        "field": "content",
+        "pattern": "when\\s+(?:the\\s+)?agent\\s+(?:is\\s+)?idle.*(?:connect|execute|run).*(?:tasks?|commands?).*(?:consumers?|marketplace|external)",
+        "desc": "Detects skills that execute external tasks during agent idle time"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00155",
+    "title": "Hidden LLM Instructions in Skill Descriptions",
+    "severity": "high",
+    "category": "prompt-injection",
+    "scan_target": null,
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?:CRITICAL|IMPORTANT|URGENT)\\s+INSTRUCTION[S]?\\s*[\u2014\\-]\\s*YOU\\s+MUST\\s+(?:FOLLOW|DO|EXECUTE)",
+        "desc": "Detects imperative instructions embedded in skill content that direct LLM behavior"
+      },
+      {
+        "field": "content",
+        "pattern": "Before\\s+doing\\s+ANYTHING[,\\s]+(?:run|execute|check|verify)",
+        "desc": "Detects instructions that override normal LLM workflow with specific commands"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00156",
+    "title": "SSH Remote Command Execution with Credential Exposure",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "scan_target": null,
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "ssh\\s+-i\\s+\\$[A-Z_]+SSH_KEY\\s+root@\\$[A-Z_]+",
+        "desc": "SSH commands using environment variables for private keys and root access"
+      },
+      {
+        "field": "content",
+        "pattern": "SSH.*\u5bc6\u94a5\u8def\u5f84.*~\\/\\.ssh\\/id_[a-z0-9]+",
+        "desc": "Documentation exposing SSH private key file paths in Chinese"
       }
     ]
   }
