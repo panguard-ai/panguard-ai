@@ -385,6 +385,18 @@ export default function ScanResultCard({
         </div>
       )}
 
+      {/* Badge embed — show for all completed scans */}
+      {meta.contentHash && (
+        <div className="px-5 py-3 border-t border-border bg-surface-2/20">
+          <p className="text-[11px] font-semibold text-text-primary mb-2">
+            {isZh ? '加到你的 README：' : 'Add to your README:'}
+          </p>
+          <code className="block text-[10px] bg-surface-2 border border-border rounded-lg px-3 py-2 text-text-muted font-mono select-all break-all leading-relaxed">
+            {`[![PanGuard Scanned](https://panguard.ai/api/scan/badge/${meta.contentHash}.svg)](https://panguard.ai)`}
+          </code>
+        </div>
+      )}
+
       {/* Guard CTA — always show after scan results */}
       <div className="px-5 py-4 border-t border-border bg-panguard-green/5 text-center">
         <p className="text-xs font-bold text-panguard-green mb-1.5">

@@ -736,6 +736,7 @@
       "placeholderSkill": "在這裡貼上你的 SKILL.md 內容...",
       "placeholderMcp": "貼上你的 MCP 設定檔 JSON（claude_desktop_config.json、.cursor/mcp.json）...",
       "scanBtn": "掃描",
+      "historyLabel": "最近掃描",
       "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。",
       "platformLabel": "支援 16 個平台：",
       "ticker1": "postmark-mcp v1.0.16 每天偷偷轉寄 15,000 封信",

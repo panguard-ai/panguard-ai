@@ -474,35 +474,103 @@ export async function POST(request: Request) {
     }
   }
 
+  // --- MCP Config pre-processing: extract secrets + flatten for scanning ---
+  let scanBody = skill.content;
+  const mcpFindings: Array<ScanResult['findings'][number]> = [];
+
+  if (contentType === 'mcp-config') {
+    try {
+      const config = JSON.parse(skill.content);
+      const servers = config.mcpServers ?? config.servers ?? config;
+      const parts: string[] = [];
+
+      for (const [name, srv] of Object.entries(servers)) {
+        const s = srv as Record<string, unknown>;
+        parts.push(`Server: ${name}`);
+        if (s.command) parts.push(`Command: ${s.command} ${Array.isArray(s.args) ? (s.args as string[]).join(' ') : ''}`);
+        if (s.url) parts.push(`URL: ${s.url}`);
+
+        // Check env for hardcoded secrets
+        const env = (s.env ?? {}) as Record<string, string>;
+        for (const [key, val] of Object.entries(env)) {
+          if (typeof val !== 'string') continue;
+          const isSecret =
+            /^(sk-|ghp_|ghu_|github_pat_|xoxb-|xoxp-|AKIA|AIza|eyJ)/i.test(val) ||
+            (key.toLowerCase().includes('key') && val.length > 20) ||
+            (key.toLowerCase().includes('secret') && val.length > 10) ||
+            (key.toLowerCase().includes('token') && val.length > 20) ||
+            (key.toLowerCase().includes('password') && val.length > 5) ||
+            /postgresql:\/\/.*:.*@/.test(val) ||
+            /mongodb(\+srv)?:\/\/.*:.*@/.test(val);
+          if (isSecret) {
+            mcpFindings.push({
+              id: `mcp-secret-${name}-${key}`,
+              title: `Hardcoded secret in MCP server "${name}"`,
+              description: `Environment variable ${key} contains what appears to be a hardcoded credential (${val.slice(0, 8)}...). Use a secret manager instead.`,
+              severity: 'critical',
+              category: 'credential-exposure',
+              location: `${name}.env.${key}`,
+            });
+          }
+          parts.push(`ENV ${key}=${val.slice(0, 4)}***`);
+        }
+      }
+      scanBody = parts.join('\n');
+    } catch {
+      // Not valid JSON — scan raw content as-is
+    }
+  }
+
   // --- Run unified scan via scan-core ---
-  const sourceType = isReadme ? 'documentation' : contentType === 'mcp-config' ? 'skill' : 'skill';
-  const result = scanContent(skill.content, {
+  const sourceType = isReadme ? 'documentation' : 'skill';
+  const result = scanContent(scanBody, {
     sourceType,
     atrRules: liveATR,
     skillName,
   });
+
+  // Merge MCP-specific findings (immutable — create new result object)
+  let mergedResult = result;
+  if (mcpFindings.length > 0) {
+    const allFindings = [...mcpFindings, ...result.findings];
+    const hasCritical = allFindings.some((f) => f.severity === 'critical');
+    const hasHigh = allFindings.some((f) => f.severity === 'high');
+    mergedResult = {
+      ...result,
+      findings: allFindings,
+      riskScore: hasCritical ? Math.max(result.riskScore, 80) : hasHigh ? Math.max(result.riskScore, 50) : result.riskScore,
+      riskLevel: hasCritical ? 'CRITICAL' : hasHigh ? 'HIGH' : result.riskLevel,
+      checks: [
+        ...result.checks,
+        {
+          status: 'fail' as const,
+          label: `MCP Config: ${mcpFindings.length} hardcoded secret(s) found`,
+        },
+      ],
+    };
+  }
 
   // README files are documentation, not executable agent instructions.
   // Score cap: README sources max out at MEDIUM regardless of pattern matches.
   // This is a product decision: describing "prompt injection" in docs != performing it.
   // Context signals in scan-core already discount READMEs but Next.js minification
   // can alter regex behavior, so we enforce the cap here as defense-in-depth.
-  let finalScore = result.riskScore;
-  let finalLevel = result.riskLevel;
-  if (isReadme && result.riskScore > 25) {
-    finalScore = Math.min(result.riskScore, 25);
+  let finalScore = mergedResult.riskScore;
+  let finalLevel = mergedResult.riskLevel;
+  if (isReadme && mergedResult.riskScore > 25) {
+    finalScore = Math.min(mergedResult.riskScore, 25);
     finalLevel = 'MEDIUM';
   }
 
   const report: WebScanReport = {
-    skillName: result.skillName ?? skillName,
+    skillName: mergedResult.skillName ?? skillName,
     riskScore: finalScore,
     riskLevel: finalLevel,
-    findings: result.findings,
-    checks: result.checks,
-    durationMs: result.durationMs,
-    atrRulesEvaluated: result.atrRulesEvaluated,
-    atrPatternsMatched: result.atrPatternsMatched,
+    findings: mergedResult.findings,
+    checks: mergedResult.checks,
+    durationMs: mergedResult.durationMs,
+    atrRulesEvaluated: mergedResult.atrRulesEvaluated,
+    atrPatternsMatched: mergedResult.atrPatternsMatched,
   };
 
   const scannedAt = new Date().toISOString();

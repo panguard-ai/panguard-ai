@@ -101,6 +101,7 @@ function ScannerHeroInner() {
     setExpanded,
     handleScan,
     animationPhase,
+    history,
   } = useSkillScan();
 
   const tickerItems = [t('ticker1'), t('ticker2'), t('ticker3'), t('ticker4'), t('ticker5')];
@@ -301,6 +302,35 @@ function ScannerHeroInner() {
             ))}
           </div>
         </div>
+
+        {/* Scan history */}
+        {history.length > 0 && (
+          <div className="mt-6 animate-[fadeIn_0.5s_0.5s_ease_both]">
+            <p className="text-[10px] uppercase tracking-wider text-text-muted mb-2">{t('historyLabel')}</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {history.slice(0, 5).map((h) => (
+                <button
+                  key={h.url + h.scannedAt}
+                  type="button"
+                  onClick={() => {
+                    if (!h.url.startsWith('paste:')) {
+                      setUrl(h.url);
+                      setScanMode('url');
+                    }
+                  }}
+                  className="text-[10px] px-2.5 py-1 rounded-full border border-border/50 bg-surface-1/30 text-text-muted hover:border-panguard-green/40 hover:text-text-secondary transition-all flex items-center gap-1.5"
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                    h.riskLevel === 'CRITICAL' ? 'bg-red-400' :
+                    h.riskLevel === 'HIGH' ? 'bg-orange-400' :
+                    h.riskLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-emerald-400'
+                  }`} />
+                  {h.skillName ?? h.url.replace('github.com/', '')}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Platform ticker */}
         <div className="mt-6 animate-[fadeIn_0.5s_0.6s_ease_both]">
