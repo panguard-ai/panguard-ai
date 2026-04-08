@@ -28,7 +28,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@panguard-ai/core": "^1.3.2"
+    "@panguard-ai/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

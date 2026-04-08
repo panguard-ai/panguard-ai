@@ -40,7 +40,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@panguard-ai/core": "^1.3.2",
+    "@panguard-ai/core": "workspace:*",
     "pdfkit": "^0.15.0"
   },
   "devDependencies": {
