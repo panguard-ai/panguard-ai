@@ -17,21 +17,18 @@ import { existsSync } from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-/** Resolve ATR rules directory */
+/** Resolve ATR rules directory from agent-threat-rules npm package */
 function findRulesDir(): string {
-  // Try monorepo path first
-  const monorepoPath = join(__dirname, '..', '..', 'atr', 'rules');
-  if (existsSync(monorepoPath)) return monorepoPath;
-
-  // Try standalone ATR repo
-  const standalonePath = '/Users/user/Downloads/agent-threat-rules/rules';
-  if (existsSync(standalonePath)) return standalonePath;
-
-  // Try node_modules
-  const nmPath = join(__dirname, '..', 'node_modules', '@panguard-ai', 'atr', 'rules');
-  if (existsSync(nmPath)) return nmPath;
-
-  throw new Error('Cannot find ATR rules directory');
+  // Walk up to find node_modules/agent-threat-rules/rules
+  let dir = __dirname;
+  for (let i = 0; i < 10; i++) {
+    const candidate = join(dir, 'node_modules', 'agent-threat-rules', 'rules');
+    if (existsSync(candidate)) return candidate;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  throw new Error('Cannot find ATR rules directory. Install agent-threat-rules.');
 }
 
 function makeToolCallEvent(content: string, toolName?: string): AgentEvent {
