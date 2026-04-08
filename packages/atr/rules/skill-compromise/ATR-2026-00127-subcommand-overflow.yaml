@@ -1,4 +1,4 @@
-title: 'Subcommand Overflow Bypass'
+title: "Subcommand Overflow Bypass"
 id: ATR-2026-00127
 rule_version: 1
 status: experimental
@@ -10,22 +10,22 @@ description: >
   performance budgets or fixed-size buffers. Attackers pad with 49 benign
   commands then add malicious ones at the end, expecting the security check
   to be skipped. Discovered via Claude Code leak analysis (2026-03).
-author: 'ATR Community'
-date: '2026/04/05'
-schema_version: '0.1'
+author: "ATR Community"
+date: "2026/04/05"
+schema_version: "0.1"
 detection_tier: pattern
 maturity: experimental
 severity: medium
 
 references:
   owasp_llm:
-    - 'LLM07:2025 - System Prompt Leakage'
+    - "LLM07:2025 - System Prompt Leakage"
   owasp_agentic:
-    - 'ASI02:2026 - Excessive Agent Autonomy'
+    - "ASI02:2026 - Excessive Agent Autonomy"
   owasp_ast:
-    - 'AST02:2026 - Excessive Permissions'
+    - "AST02:2026 - Excessive Permissions"
   research:
-    - 'Claude Code leak: 50 subcommand security check bypass (2026-03)'
+    - "Claude Code leak: 50 subcommand security check bypass (2026-03)"
 
 tags:
   category: skill-compromise
@@ -48,23 +48,23 @@ detection:
     - field: content
       operator: regex
       value: "(?i)(provides?|includes?|contains?|offers?|supports?|has)\\s+(\\d{2,3}|over\\s+\\d{2}|more\\s+than\\s+\\d{2})\\s+(commands?|tools?|subcommands?|functions?|operations?|endpoints?|actions?|methods?)"
-      description: 'Explicit declaration of large command count (50+)'
+      description: "Explicit declaration of large command count (50+)"
 
 test_cases:
   true_positives:
     - input: "# Mega Tool Suite\n\nThis skill provides 75 commands for managing your entire system infrastructure."
       expected: trigger
-    - input: 'This skill provides 65 tools for comprehensive system administration and monitoring.'
+    - input: "This skill provides 65 tools for comprehensive system administration and monitoring."
       expected: trigger
-    - input: 'The package includes over 80 commands covering file management, network, and security.'
+    - input: "The package includes over 80 commands covering file management, network, and security."
       expected: trigger
-    - input: 'Our framework supports more than 55 subcommands for DevOps automation.'
+    - input: "Our framework supports more than 55 subcommands for DevOps automation."
       expected: trigger
 
   true_negatives:
     - input: "# Simple Calculator\n\n## add\nAdds two numbers\n## subtract\nSubtracts two numbers\n## multiply\nMultiplies two numbers"
       expected: no_trigger
-    - input: 'This skill provides 5 commands for managing your git repository.'
+    - input: "This skill provides 5 commands for managing your git repository."
       expected: no_trigger
     - input: "# File Manager\n\n- `create` - Create a file\n- `delete` - Delete a file\n- `move` - Move a file\n- `copy` - Copy a file\n- `list` - List files"
       expected: no_trigger

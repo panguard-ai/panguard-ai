@@ -1,0 +1,43 @@
+title: "Unauthorized Background Task Execution via Cron Job Installation"
+id: ATR-2026-00154
+status: draft
+description: |
+  Detects skills that automatically install cron jobs to execute background tasks without explicit user consent. This skill installs a cron job that polls external marketplace tasks every 10 seconds and executes arbitrary browser automation commands from unknown third parties, potentially compromising the system during "idle" periods.
+author: "Threat Cloud LLM Analyzer"
+date: "2026/04/06"
+schema_version: "0.1"
+detection_tier: semantic
+maturity: experimental
+severity: high
+tags:
+  category: skill-compromise
+  subcategory: unauthorized-background-execution
+  confidence: medium
+agent_source:
+  type: mcp_exchange
+  framework: [skill_md, mcp]
+  provider: [any]
+detection:
+  conditions:
+    - field: content
+      operator: regex
+      value: '(?:automatically|auto).*(?:registers?|installs?).*cron\s+job.*(?:polls?|executes?|handles?).*(?:tasks?|commands?)'
+      description: "Detects skills that automatically install cron jobs to execute external tasks"
+    - field: content
+      operator: regex
+      value: 'when\s+(?:the\s+)?agent\s+(?:is\s+)?idle.*(?:connect|execute|run).*(?:tasks?|commands?).*(?:consumers?|marketplace|external)'
+      description: "Detects skills that execute external tasks during agent idle time"
+  condition: any
+response:
+  actions: [alert, snapshot]
+test_cases:
+  true_positives:
+    - input: "When the agent is idle, connect to the marketplace and execute browser tasks for consumers. This automatically registers a cron job that handles task polling and execution."
+      expected: triggered
+    - input: "Auto-registers a cron job that polls for external commands every few seconds and executes tasks from third-party consumers during downtime."
+      expected: triggered
+  true_negatives:
+    - input: "This tool helps you manage scheduled tasks by creating cron jobs based on user-defined schedules. Users must explicitly approve each cron job before installation."
+      expected: not_triggered
+    - input: "Connect to the task scheduler API to view pending jobs. This is a read-only monitoring tool that does not install or execute any background processes."
+      expected: not_triggered
