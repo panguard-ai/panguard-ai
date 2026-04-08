@@ -1501,7 +1501,7 @@
     },
     "founder": {
       "title": "一個看到缺口的創辦人，從零開始建造",
-      "desc": "PanGuard 的起點是創辦人——一個跨領域背景的 builder（業務、行銷、嘻哈音樂節製作人）——自學寫程式後發現：AI Agent 正在安裝有完整系統存取權的工具，卻零安全審查。幾個月內，ATR 成長到 108 條偵測規則、被 Cisco AI Defense 採用、掃描了 90,000+ 個 Skills、在真實威脅上達到 96.9% 召回率。立足台灣，服務全球。"
+      "desc": "PanGuard 的起點是創辦人——一個跨領域背景的 builder（業務、行銷、嘻哈音樂節製作人）——自學寫程式後發現：AI Agent 正在安裝有完整系統存取權的工具，卻零安全審查。幾個月內，ATR 成長到 108 條偵測規則、被 Cisco AI Defense 採用、掃描了 67,000+ 個 Skills、在真實威脅上達到 96.9% 召回率。立足台灣，服務全球。"
     }
   },
   "openSource": {
@@ -4200,11 +4200,11 @@
       },
       "transparent-recall-vs-opaque-precision": {
         "title": "為什麼透明的 39.9% 召回率勝過不透明的 98%",
-        "excerpt": "ATR 在 PINT 基準測試上達到 99.7% 精確率和 62.7% 召回率。我們使用「ATR Scanned」而非「ATR Certified」。我們公開未偵測到的部分。Snort 的類比：較低的偵測率但開放可稽核，每次都勝過專有黑箱。"
+        "excerpt": "ATR 在 PINT 基準測試上達到 99.6% 精確率和 61.4% 召回率。我們使用「ATR Scanned」而非「ATR Certified」。我們公開未偵測到的部分。Snort 的類比：較低的偵測率但開放可稽核，每次都勝過專有黑箱。"
       },
       "transparent-recall-vs-opaque-precision-zh": {
         "title": "透明的 39.9% 召回率為什麼打敗不透明的 98%",
-        "excerpt": "ATR 在 PINT 基準測試上達到 99.7% 精確率和 62.7% 召回率。我們使用「ATR Scanned」而非「ATR Certified」。我們公開未偵測到的部分。較低的偵測率但開放可稽核，每次都勝過專有黑箱。"
+        "excerpt": "ATR 在 PINT 基準測試上達到 99.6% 精確率和 61.4% 召回率。我們使用「ATR Scanned」而非「ATR Certified」。我們公開未偵測到的部分。較低的偵測率但開放可稽核，每次都勝過專有黑箱。"
       },
       "flywheel-every-scan-protects-everyone": {
         "title": "飛輪效應：每次掃描都讓所有人更安全",

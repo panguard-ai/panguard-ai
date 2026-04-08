@@ -2572,7 +2572,7 @@
     },
     "evidence": {
       "overline": "Ecosystem Scan",
-      "title": "Verified against 90,000+ real skills.",
+      "title": "Verified against 67,000+ real skills.",
       "subtitle": "We scanned the MCP ecosystem -- npm, GitHub, and community registries. The numbers speak for themselves.",
       "scanned": "MCP skills scanned",
       "findings": "packages with security findings",
@@ -3379,11 +3379,11 @@
       },
       "transparent-recall-vs-opaque-precision": {
         "title": "Why Transparent 39.9% Recall Beats Opaque 98%",
-        "excerpt": "ATR has 99.7% precision and 62.7% recall on the PINT benchmark. We use \"ATR Scanned\" not \"ATR Certified.\" We publish what we miss. The Snort analogy: lower detection but open and auditable beats proprietary black boxes every time."
+        "excerpt": "ATR has 99.6% precision and 61.4% recall on the PINT benchmark. We use \"ATR Scanned\" not \"ATR Certified.\" We publish what we miss. The Snort analogy: lower detection but open and auditable beats proprietary black boxes every time."
       },
       "transparent-recall-vs-opaque-precision-zh": {
         "title": "Why Transparent 39.9% Recall Beats Opaque 98% (Chinese)",
-        "excerpt": "ATR achieves 99.7% precision and 62.7% recall on the PINT benchmark. We use ATR Scanned not ATR Certified. Chinese language version."
+        "excerpt": "ATR achieves 99.6% precision and 61.4% recall on the PINT benchmark. We use ATR Scanned not ATR Certified. Chinese language version."
       },
       "flywheel-every-scan-protects-everyone": {
         "title": "The Flywheel: Every Scan Makes Everyone Safer",
@@ -4953,7 +4953,7 @@
     },
     "founder": {
       "title": "Built by a founder who saw the gap firsthand",
-      "desc": "PanGuard started when our founder -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught himself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 108 detection rules, got merged into Cisco AI Defense, scanned 90,000+ skills, and achieved 96.9% recall on real-world threats. Based in Taiwan, shipping globally."
+      "desc": "PanGuard started when our founder -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught himself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 108 detection rules, got merged into Cisco AI Defense, scanned 67,000+ skills, and achieved 96.9% recall on real-world threats. Based in Taiwan, shipping globally."
     }
   },
   "openSource": {
@@ -5142,7 +5142,7 @@
     },
     "compliance": {
       "title": "OWASP Agentic Top 10 Coverage",
-      "description": "Full coverage of the OWASP Agentic Top 10 standard. 108 ATR detection rules across all 10 categories. Verified against 90,000+ real MCP skills."
+      "description": "Full coverage of the OWASP Agentic Top 10 standard. 108 ATR detection rules across all 10 categories. Verified against 67,000+ real MCP skills."
     },
     "trust": {
       "title": "Trust Center",
