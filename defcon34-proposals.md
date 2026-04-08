@@ -3,6 +3,7 @@
 ## CFP Details Summary
 
 ### Main Stage (Briefings) CFP
+
 - **URL**: https://defcon.org/html/defcon-34/dc-34-cfp.html
 - **Submission system**: OpenConf
 - **Deadline**: May 1, 2026, Midnight UTC
@@ -14,6 +15,7 @@
 - **Contact**: talks@defcon.org
 
 ### Demo Labs CFP
+
 - **URL**: https://defcon.org/html/defcon-34/dc-34-cfi.html (call index page)
 - **Deadline**: May 1, 2026, Midnight UTC (same as CFP based on historical pattern)
 - **Format**: Plain text in the body of an email to demolab@defcon.org
@@ -21,6 +23,7 @@
 - **Contact**: demolab@defcon.org
 
 ### Demo Labs Submission Fields
+
 - Presenter Name + Co-presenter (max 1)
 - Tool/Project Name
 - Short Abstract (1-2 paragraphs)
@@ -32,6 +35,7 @@
 - Target audience (Offense / Defense / AppSec / Mobile / Hardware)
 
 ### Conference
+
 - **Dates**: August 6-9, 2026
 - **Venue**: Las Vegas Convention Center
 
@@ -102,6 +106,7 @@ Self-taught developer. Built ATR from scratch: 108 detection rules, a three-laye
 ## PROPOSAL B: Demo Labs (Tool Demo)
 
 ### To: demolab@defcon.org
+
 ### Subject: DEF CON 34 Demo Labs Submission: ATR -- Agent Threat Rules
 
 **Presenter Name:** [Your Name]
@@ -153,6 +158,7 @@ Defense, AppSec
 ### Before May 1, 2026 Midnight UTC:
 
 **Main Stage (OpenConf):**
+
 - [ ] Create OpenConf account at defcon.org
 - [ ] Submit abstract + outline as text/PDF
 - [ ] Attach supporting materials (scan data, benchmark results)
@@ -160,12 +166,14 @@ Defense, AppSec
 - [ ] Include links to GitHub repo, npm, CVEs, paper DOI
 
 **Demo Labs (Email):**
+
 - [ ] Send plain-text email to demolab@defcon.org
 - [ ] Include all required fields (above)
 - [ ] No attachments, no PDFs -- body text only
 - [ ] Verify GitHub repo is public and README is current
 
 ### After Acceptance:
+
 - [ ] Final abstract + bio for print materials: June 15, 2026
 - [ ] Final slides + tools + references: July 15, 2026
 - [ ] Prepare live demo environment (offline-capable)
