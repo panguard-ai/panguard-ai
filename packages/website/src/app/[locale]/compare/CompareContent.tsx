@@ -341,7 +341,7 @@ function ComparisonTable() {
       />
 
       <FadeInUp>
-        <div className="mt-10 overflow-x-auto hidden md:block">
+        <div className="mt-10 overflow-x-auto max-w-full hidden md:block">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr>

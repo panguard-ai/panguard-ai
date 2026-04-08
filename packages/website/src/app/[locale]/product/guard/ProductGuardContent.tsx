@@ -118,7 +118,7 @@ export default function ProductGuardContent() {
                   },
                 ].map((s) => (
                   <div key={s.label} className="bg-surface-1 p-4 text-center">
-                    <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                    <p className={`text-lg sm:text-2xl font-bold ${s.color}`}>{s.value}</p>
                     <p className="text-[10px] text-text-muted mt-1">{s.label}</p>
                   </div>
                 ))}
