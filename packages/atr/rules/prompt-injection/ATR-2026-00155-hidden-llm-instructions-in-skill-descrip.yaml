@@ -1,11 +1,11 @@
-title: "Hidden LLM Instructions in Skill Descriptions"
+title: 'Hidden LLM Instructions in Skill Descriptions'
 id: ATR-2026-00155
 status: draft
 description: |
   Detects skills that embed hidden instructions directed at the LLM using phrases like "CRITICAL INSTRUCTION — YOU MUST FOLLOW THIS" or "Before doing ANYTHING". These instructions can manipulate the LLM to bypass normal security checks, skip validation steps, or follow alternative workflows that may compromise security. The analyzed BlogBurst skill contains "CRITICAL INSTRUCTION — YOU MUST FOLLOW THIS" followed by specific behavioral directives.
-author: "Threat Cloud LLM Analyzer"
-date: "2026/04/06"
-schema_version: "0.1"
+author: 'Threat Cloud LLM Analyzer'
+date: '2026/04/06'
+schema_version: '0.1'
 detection_tier: semantic
 maturity: experimental
 severity: high
@@ -22,11 +22,11 @@ detection:
     - field: content
       operator: regex
       value: '(?:CRITICAL|IMPORTANT|URGENT)\s+INSTRUCTION[S]?\s*[—\-]\s*YOU\s+MUST\s+(?:FOLLOW|DO|EXECUTE)'
-      description: "Detects imperative instructions embedded in skill content that direct LLM behavior"
+      description: 'Detects imperative instructions embedded in skill content that direct LLM behavior'
     - field: content
       operator: regex
       value: 'Before\s+doing\s+ANYTHING[,\s]+(?:run|execute|check|verify)'
-      description: "Detects instructions that override normal LLM workflow with specific commands"
+      description: 'Detects instructions that override normal LLM workflow with specific commands'
   condition: any
 response:
   actions: [alert, snapshot]
@@ -39,5 +39,5 @@ test_cases:
   true_negatives:
     - input: "## Setup Instructions\n\nPlease follow these steps to configure the tool properly"
       expected: not_triggered
-    - input: "Important: Before using this tool, ensure you have valid credentials configured"
+    - input: 'Important: Before using this tool, ensure you have valid credentials configured'
       expected: not_triggered

@@ -1,4 +1,4 @@
-title: "Unicode Tag Character Smuggling"
+title: 'Unicode Tag Character Smuggling'
 id: ATR-2026-00129
 rule_version: 1
 status: experimental
@@ -8,22 +8,22 @@ description: >
   are invisible in most editors and renderers but are processed by AI agents as
   text. Snyk ToxicSkills research (Feb 2026) documented this as "ASCII smuggling"
   — invisible payloads that agents read but humans cannot see.
-author: "ATR Community"
-date: "2026/04/05"
-schema_version: "1.0"
+author: 'ATR Community'
+date: '2026/04/05'
+schema_version: '1.0'
 detection_tier: pattern
 maturity: experimental
 severity: critical
 
 references:
   owasp_llm:
-    - "LLM01:2025 - Prompt Injection"
+    - 'LLM01:2025 - Prompt Injection'
   owasp_ast:
-    - "AST01:2026 - Malicious Skills"
-    - "AST05:2026 - Unsafe Deserialization"
+    - 'AST01:2026 - Malicious Skills'
+    - 'AST05:2026 - Unsafe Deserialization'
   research:
-    - "Snyk ToxicSkills: ASCII smuggling via Unicode Tags (Feb 2026)"
-    - "Unicode Technical Report #36: Security Considerations"
+    - 'Snyk ToxicSkills: ASCII smuggling via Unicode Tags (Feb 2026)'
+    - 'Unicode Technical Report #36: Security Considerations'
 
 tags:
   category: skill-compromise
@@ -47,14 +47,14 @@ detection:
     - field: content
       operator: regex
       value: "(?:\\uDB40[\\uDC00-\\uDC7F]){3,}"
-      description: "3+ Unicode Tag characters (invisible payload, Snyk ASCII smuggling) via surrogate pairs"
+      description: '3+ Unicode Tag characters (invisible payload, Snyk ASCII smuggling) via surrogate pairs'
 
     # Detect zero-width characters used for steganographic payload hiding.
     # ZWSP, ZWNJ, ZWJ, Word Joiner, BOM — 5+ occurrences = suspicious density.
     - field: content
       operator: regex
       value: "[\\u200b\\u200c\\u200d\\u2060\\ufeff].*[\\u200b\\u200c\\u200d\\u2060\\ufeff].*[\\u200b\\u200c\\u200d\\u2060\\ufeff].*[\\u200b\\u200c\\u200d\\u2060\\ufeff].*[\\u200b\\u200c\\u200d\\u2060\\ufeff]"
-      description: "5+ zero-width characters spread through text (steganographic smuggling)"
+      description: '5+ zero-width characters spread through text (steganographic smuggling)'
 
 test_cases:
   true_positives:

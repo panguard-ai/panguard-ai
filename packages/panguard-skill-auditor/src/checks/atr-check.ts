@@ -232,17 +232,13 @@ export async function checkWithATR(
     //    skips MCP-targeted rules). Skill instructions can contain prompt
     //    injection payloads that MCP rules detect.
     if (manifest.instructions) {
-      const instructionMatches = engine.evaluate(
-        _buildLlmInputEvent(manifest.instructions),
-      );
+      const instructionMatches = engine.evaluate(_buildLlmInputEvent(manifest.instructions));
       allMatches.push(...instructionMatches);
     }
 
     // 2. Scan description as llm_input
     if (manifest.description) {
-      const descMatches = engine.evaluate(
-        _buildLlmInputEvent(manifest.description),
-      );
+      const descMatches = engine.evaluate(_buildLlmInputEvent(manifest.description));
       allMatches.push(...descMatches);
     }
 
