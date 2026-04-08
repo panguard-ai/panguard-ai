@@ -28,7 +28,7 @@ export const STATS = {
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 17,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
-  atrPatterns: 720,
+  atrPatterns: 714,
   totalRules: 108,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
   totalRulesDisplay: '108' as const,
@@ -43,7 +43,7 @@ export const STATS = {
   cliCommands: 23,
   products: 6,
   aiAgents: 4,
-  mcpTools: 11,
+  mcpTools: 12,
   playbookTemplates: 3,
   logParsers: 4,
   license: 'MIT' as const,
