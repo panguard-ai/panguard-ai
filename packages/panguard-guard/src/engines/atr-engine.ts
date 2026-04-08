@@ -490,7 +490,6 @@ export class GuardATREngine {
       matchedPatterns: [anomaly.newValue],
       confidence: this.computeAnomalyConfidence(anomaly),
       timestamp: new Date().toISOString(),
-      scan_context: 'native' as const,
-    };
+    } as unknown as ATRMatch;
   }
 }

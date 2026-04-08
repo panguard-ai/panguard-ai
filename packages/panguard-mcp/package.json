@@ -40,10 +40,10 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
-    "@panguard-ai/core": "^1.3.2",
-    "@panguard-ai/panguard-scan": "^1.3.0",
-    "@panguard-ai/panguard-guard": "^1.4.2",
-    "@panguard-ai/panguard-skill-auditor": "^1.4.1"
+    "@panguard-ai/core": "workspace:*",
+    "@panguard-ai/panguard-scan": "workspace:*",
+    "@panguard-ai/panguard-guard": "workspace:*",
+    "@panguard-ai/panguard-skill-auditor": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

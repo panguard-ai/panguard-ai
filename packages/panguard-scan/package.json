@@ -40,8 +40,8 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@panguard-ai/core": "^1.3.2",
-    "@panguard-ai/security-hardening": "^1.0.1",
+    "@panguard-ai/core": "workspace:*",
+    "@panguard-ai/security-hardening": "workspace:*",
     "commander": "^12.0.0",
     "pdfkit": "^0.15.0"
   },
