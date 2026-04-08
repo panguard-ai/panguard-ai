@@ -1,12 +1,12 @@
 ---
 title: 'Panguard AI'
 sidebarTitle: 'Introduction'
-description: 'The first open standard for AI agent security. 71 ATR detection rules. OWASP Agentic Top 10: 10/10 covered. 16 platforms. 100% free and open source.'
+description: 'The first open standard for AI agent security. 101 ATR detection rules. OWASP Agentic Top 10: 10/10 covered. 16 platforms. 100% free and open source.'
 icon: 'shield-check'
 ---
 
 <Note>
-  **v1.4.2 released** -- 16 AI platform support, 71 ATR rules, OWASP Agentic Top 10 full coverage, ClawHub ecosystem scan (36,394 skills).
+  **v1.4.2 released** -- 16 AI platform support, 101 ATR rules, OWASP Agentic Top 10 full coverage, 90,000+ skills scanned.
   [See changelog](/changelog).
 </Note>
 
@@ -24,7 +24,7 @@ curl -fsSL https://get.panguard.ai | bash
 
 |                                    |                                                                                                                                         |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| **71** detection rules             | ATR (71) + community                                                                                                                    |
+| **101** detection rules            | ATR (101) + community                                                                                                                   |
 | **16** AI platforms                | Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code |
 | **OWASP 10/10**                    | Full coverage of OWASP Agentic Top 10 for Agentic Applications 2026                                                                    |
 | **3-layer** AI pipeline            | Rules engine, local AI (Ollama), cloud AI (Claude/OpenAI)                                                                               |
@@ -59,7 +59,7 @@ Full mapping: [OWASP-MAPPING.md on GitHub](https://github.com/Agent-Threat-Rule/
 
 <CardGroup cols={3}>
   <Card title="ATR -- The Standard" icon="file-code" href="/overview">
-    **71 rules across 9 threat categories.** The first open standard for AI agent threats -- prompt
+    **101 rules across 9 threat categories.** The first open standard for AI agent threats -- prompt
     injection, tool poisoning, skill compromise, agent manipulation. YAML-based, human-readable,
     machine-enforceable. OWASP Agentic Top 10: 10/10 covered.
   </Card>
@@ -68,7 +68,7 @@ Full mapping: [OWASP-MAPPING.md on GitHub](https://github.com/Agent-Threat-Rule/
     auto-generates rules from real-world attacks. 11 intel sources. Synced every hour.
   </Card>
   <Card title="Guard -- The Engine" icon="shield-halved" href="/products/guard/overview">
-    **4-agent AI pipeline.** Detect, Analyze, Respond, Report. Processes OS-level events through 71
+    **4-agent AI pipeline.** Detect, Analyze, Respond, Report. Processes OS-level events through 101
     ATR rules. Built-in Skill Auditor. Auto-response blocks IPs, kills processes, quarantines files.
   </Card>
 </CardGroup>
@@ -190,7 +190,7 @@ ATR is backed by a peer-reviewed research paper documenting the methodology, det
 > **Agent Threat Rules: A Community-Driven Detection Standard for AI Agent Security**
 > Published on [Zenodo (DOI: 10.5281/zenodo.19178002)](https://doi.org/10.5281/zenodo.19178002). Under review at arXiv and SSRN.
 
-The paper covers: threat taxonomy, detection architecture (regex + LLM crystallization), PINT benchmark evaluation (62.7% recall, 99.7% precision), and 64 documented evasion techniques.
+The paper covers: threat taxonomy, detection architecture (regex + LLM crystallization), PINT MCP benchmark evaluation (62.7% recall, 99.7% precision), SKILL.md benchmark (96.9% recall, 100% precision), and 64 documented evasion techniques.
 
 ---
 

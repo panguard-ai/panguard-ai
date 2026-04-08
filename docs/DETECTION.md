@@ -497,7 +497,7 @@ All events pass through the rule engine first. This layer handles the vast major
 
 | Component          | Description                                                      |
 | ------------------ | ---------------------------------------------------------------- |
-| ATR Rule Engine    | Matches events against ATR rules (71 rules across 10 categories) |
+| ATR Rule Engine    | Matches events against ATR rules (101 rules across 10 categories) |
 | Threat Intel Feeds | IP/domain/hash lookup against 5 external feeds + Threat Cloud    |
 | Event Correlator   | 7 multi-step attack pattern detectors                            |
 
