@@ -26,7 +26,7 @@ Technical architecture of the Panguard AI platform. For product-level documentat
    +----+----+----+
    |    |    |    |
   Sigma YARA ATR Builtin
-  3760  5961  52  20
+  3760  5961  100  20
         |
    Threat Cloud
    Collective Intelligence
@@ -80,7 +80,7 @@ All events pass through a cost-optimized detection funnel:
          Layer 1: Rules        (no match)
          3,760 Sigma                |
          5,961 YARA            Layer 2: Local AI
-         52 ATR                Ollama on GPU
+         100 ATR               Ollama on GPU
          <50ms, $0             ~2s, $0
          Catches 90%                |
               |               (uncertain)
