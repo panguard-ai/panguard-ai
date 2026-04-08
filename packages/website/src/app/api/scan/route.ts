@@ -5,8 +5,7 @@ import {
   contentHash as computeContentHash,
 } from '@panguard-ai/scan-core';
 import type { ATRRuleCompiled, CompiledRule, ScanResult } from '@panguard-ai/scan-core';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { ATR_RULES_COMPILED } from '@/lib/atr-rules-compiled';
 
 /**
  * POST /api/scan
@@ -35,9 +34,7 @@ interface WebScanReport {
 // ATR Rules: bundled fallback + live sync from Threat Cloud
 // ---------------------------------------------------------------------------
 
-// Read at runtime to avoid webpack mangling Unicode in CJK regex patterns
-const atrJsonPath = resolve(process.cwd(), 'src/lib/atr-rules-compiled.json');
-const BUNDLED_ATR: ATRRuleCompiled[] = JSON.parse(readFileSync(atrJsonPath, 'utf-8'));
+const BUNDLED_ATR = ATR_RULES_COMPILED as unknown as ATRRuleCompiled[];
 const TC_ENDPOINT = process.env['NEXT_PUBLIC_THREAT_CLOUD_URL'] || 'https://tc.panguard.ai';
 const TC_SYNC_INTERVAL_MS = 15 * 60 * 1000;
 

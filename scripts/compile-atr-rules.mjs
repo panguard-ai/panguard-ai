@@ -77,12 +77,22 @@ compiled.sort((a, b) => a.id.localeCompare(b.id));
 // Escape non-ASCII to \uXXXX — webpack/Next.js mangles raw CJK in JSON imports
 const jsonStr = JSON.stringify(compiled, null, 2).replace(
   /[\u0080-\uffff]/g,
-  (ch) => '\\u' + ch.charCodeAt(0).toString(16).padStart(4, '0'),
+  (ch) => '\\u' + ch.charCodeAt(0).toString(16).padStart(4, '0')
 );
 writeFileSync(OUTPUT, jsonStr + '\n');
+
+// Also write TypeScript const export (webpack-safe — no JSON import needed)
+const tsOutput = OUTPUT.replace('.json', '.ts');
+writeFileSync(
+  tsOutput,
+  `// Auto-generated. Do not edit. Run: node scripts/compile-atr-rules.mjs\n` +
+    `// All Unicode escaped to \\uXXXX to prevent webpack mangling.\n` +
+    `export const ATR_RULES_COMPILED = ${jsonStr} as const;\n`
+);
 
 let totalPatterns = 0;
 for (const r of compiled) totalPatterns += r.patterns.length;
 
 console.log(`Compiled ${compiled.length} rules with ${totalPatterns} total patterns`);
 console.log(`Written to ${OUTPUT}`);
+console.log(`Written to ${tsOutput}`);

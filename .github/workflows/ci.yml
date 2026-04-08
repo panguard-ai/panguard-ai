@@ -93,11 +93,11 @@ jobs:
           restore-keys: ${{ runner.os }}-pnpm-v2-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Verify ATR rules compiled JSON is up to date
+      - name: Verify ATR rules compiled files are up to date
         run: |
           node scripts/compile-atr-rules.mjs
-          if ! git diff --exit-code packages/website/src/lib/atr-rules-compiled.json; then
-            echo "::error::ATR rules compiled JSON is out of date. Run: node scripts/compile-atr-rules.mjs"
+          if ! git diff --exit-code packages/website/src/lib/atr-rules-compiled.json packages/website/src/lib/atr-rules-compiled.ts; then
+            echo "::error::ATR rules compiled files are out of date. Run: node scripts/compile-atr-rules.mjs"
             exit 1
           fi
       - name: Build all packages
