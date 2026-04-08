@@ -193,6 +193,9 @@ importers:
       '@panguard-ai/security-hardening':
         specifier: workspace:*
         version: link:../../security-hardening
+      agent-threat-rules:
+        specifier: ^1.0.1
+        version: 1.0.1(zod@3.25.76)
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -249,6 +252,9 @@ importers:
       '@panguard-ai/atr':
         specifier: workspace:*
         version: link:../atr
+      agent-threat-rules:
+        specifier: ^1.0.1
+        version: 1.0.1(zod@3.25.76)
 
   packages/panguard-report:
     dependencies:
@@ -308,6 +314,9 @@ importers:
       '@panguard-ai/scan-core':
         specifier: workspace:*
         version: link:../scan-core
+      agent-threat-rules:
+        specifier: ^1.0.1
+        version: 1.0.1(zod@3.25.76)
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1

@@ -43,11 +43,12 @@
   "dependencies": {
     "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/core": "workspace:*",
-    "@panguard-ai/scan-core": "workspace:*",
     "@panguard-ai/panguard-mcp": "workspace:*",
     "@panguard-ai/panguard-skill-auditor": "workspace:*",
     "@panguard-ai/panguard-trap": "workspace:*",
+    "@panguard-ai/scan-core": "workspace:*",
     "@panguard-ai/security-hardening": "workspace:*",
+    "agent-threat-rules": "^1.0.1",
     "js-yaml": "^4.1.0",
     "ws": "^8.19.0",
     "zod": "^3.24.0"
