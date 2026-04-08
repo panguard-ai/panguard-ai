@@ -36,6 +36,37 @@ export interface ScanResponse {
 export type ScanMode = 'url' | 'paste';
 export type PasteContentType = 'skill' | 'mcp-config';
 
+export interface ScanHistoryEntry {
+  url: string;
+  skillName: string | null;
+  riskLevel: string;
+  riskScore: number;
+  findingCount: number;
+  scannedAt: string;
+}
+
+const HISTORY_KEY = 'pg_scan_history';
+const MAX_HISTORY = 10;
+
+function loadHistory(): ScanHistoryEntry[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(entry: ScanHistoryEntry): void {
+  try {
+    const history = loadHistory();
+    const updated = [entry, ...history.filter((h) => h.url !== entry.url)].slice(0, MAX_HISTORY);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+  } catch {
+    // localStorage unavailable
+  }
+}
+
 export interface UseSkillScanReturn {
   url: string;
   setUrl: (url: string) => void;
@@ -54,6 +85,7 @@ export interface UseSkillScanReturn {
   handleScan: () => Promise<void>;
   /** Minimum animation delay (ms) before showing results */
   animationPhase: number;
+  history: ScanHistoryEntry[];
 }
 
 const MIN_ANIMATION_MS = 2200;
@@ -67,7 +99,13 @@ export function useSkillScan(): UseSkillScanReturn {
   const [result, setResult] = useState<ScanResponse | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [animationPhase, setAnimationPhase] = useState(0);
+  const [history, setHistory] = useState<ScanHistoryEntry[]>([]);
   const searchParams = useSearchParams();
+
+  // Load history on mount
+  useEffect(() => {
+    setHistory(loadHistory());
+  }, []);
 
   const handleScan = useCallback(async () => {
     const isUrlMode = scanMode === 'url';
@@ -105,8 +143,21 @@ export function useSkillScan(): UseSkillScanReturn {
       }
 
       setResult(data);
-      if (data.ok && data.data && data.data.report.riskLevel !== 'LOW') {
-        setExpanded(true);
+      if (data.ok && data.data) {
+        if (data.data.report.riskLevel !== 'LOW') {
+          setExpanded(true);
+        }
+        // Save to history
+        const entry: ScanHistoryEntry = {
+          url: isUrlMode ? url.trim() : `paste:${pasteContentType}`,
+          skillName: data.data.report.skillName,
+          riskLevel: data.data.report.riskLevel,
+          riskScore: data.data.report.riskScore,
+          findingCount: data.data.report.findings.length,
+          scannedAt: data.data.scannedAt,
+        };
+        saveHistory(entry);
+        setHistory(loadHistory());
       }
     } catch {
       setResult({ ok: false, error: 'Network error. Please try again.' });
@@ -156,5 +207,6 @@ export function useSkillScan(): UseSkillScanReturn {
     setExpanded,
     handleScan,
     animationPhase,
+    history,
   };
 }

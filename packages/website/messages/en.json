@@ -736,6 +736,7 @@
       "placeholderSkill": "Paste your SKILL.md content here...",
       "placeholderMcp": "Paste your MCP config JSON (claude_desktop_config.json, .cursor/mcp.json)...",
       "scanBtn": "Scan",
+      "historyLabel": "Recent scans",
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached.",
       "platformLabel": "Works with 16 platforms:",
       "ticker1": "postmark-mcp v1.0.16 silently forwarded 15,000 emails/day",
