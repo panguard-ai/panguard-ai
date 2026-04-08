@@ -9,6 +9,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { createRequire } from 'node:module';
+import { execSync } from 'node:child_process';
 
 const require = createRequire(import.meta.url);
 const yaml = require('js-yaml');
@@ -96,3 +97,10 @@ for (const r of compiled) totalPatterns += r.patterns.length;
 console.log(`Compiled ${compiled.length} rules with ${totalPatterns} total patterns`);
 console.log(`Written to ${OUTPUT}`);
 console.log(`Written to ${tsOutput}`);
+
+// Format with prettier so CI diff check passes
+try {
+  execSync(`npx prettier --write "${OUTPUT}" "${tsOutput}"`, { stdio: 'ignore' });
+} catch {
+  // prettier not available — files are still valid
+}
