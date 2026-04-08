@@ -230,9 +230,7 @@ function ScannerHeroInner() {
                 value={pasteContent}
                 onChange={(e) => setPasteContent(e.target.value)}
                 placeholder={
-                  pasteContentType === 'skill'
-                    ? t('placeholderSkill')
-                    : t('placeholderMcp')
+                  pasteContentType === 'skill' ? t('placeholderSkill') : t('placeholderMcp')
                 }
                 className="w-full bg-surface-1/80 backdrop-blur-sm border border-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-panguard-green focus:ring-1 focus:ring-panguard-green/30 transition-all font-mono resize-none"
                 rows={6}
@@ -306,7 +304,9 @@ function ScannerHeroInner() {
         {/* Scan history */}
         {history.length > 0 && (
           <div className="mt-6 animate-[fadeIn_0.5s_0.5s_ease_both]">
-            <p className="text-[10px] uppercase tracking-wider text-text-muted mb-2">{t('historyLabel')}</p>
+            <p className="text-[10px] uppercase tracking-wider text-text-muted mb-2">
+              {t('historyLabel')}
+            </p>
             <div className="flex flex-wrap justify-center gap-2">
               {history.slice(0, 5).map((h) => (
                 <button
@@ -320,11 +320,17 @@ function ScannerHeroInner() {
                   }}
                   className="text-[10px] px-2.5 py-1 rounded-full border border-border/50 bg-surface-1/30 text-text-muted hover:border-panguard-green/40 hover:text-text-secondary transition-all flex items-center gap-1.5"
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                    h.riskLevel === 'CRITICAL' ? 'bg-red-400' :
-                    h.riskLevel === 'HIGH' ? 'bg-orange-400' :
-                    h.riskLevel === 'MEDIUM' ? 'bg-yellow-400' : 'bg-emerald-400'
-                  }`} />
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      h.riskLevel === 'CRITICAL'
+                        ? 'bg-red-400'
+                        : h.riskLevel === 'HIGH'
+                          ? 'bg-orange-400'
+                          : h.riskLevel === 'MEDIUM'
+                            ? 'bg-yellow-400'
+                            : 'bg-emerald-400'
+                    }`}
+                  />
                   {h.skillName ?? h.url.replace('github.com/', '')}
                 </button>
               ))}

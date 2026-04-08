@@ -1233,7 +1233,7 @@ body{font-family:'Inter','Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-se
 <strong>How it works:</strong><br>
 &bull; <strong>Skill Fingerprinting</strong> &mdash; tracks each skill's behavior baseline and detects drift<br>
 &bull; <strong>Heuristic Analysis</strong> &mdash; flags suspicious patterns (e.g., reading ~/.ssh, injecting prompts, excessive permissions)<br>
-&bull; <strong>ATR Pattern Matching</strong> &mdash; 52 Agent Threat Rules detect known AI agent attack vectors<br><br>
+&bull; <strong>ATR Pattern Matching</strong> &mdash; 108 Agent Threat Rules detect known AI agent attack vectors<br><br>
 <span style="color:var(--ok)">No external dependencies. No API keys. No data leaves your machine.</span>
 </div>
 </div>

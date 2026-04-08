@@ -52,13 +52,14 @@ export default function SocialProof() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             <StatCard value={eco.atrRules.toString()} label={t('statRules')} />
             <StatCard
-              value={eco.skillsScanned > 1000 ? `${Math.round(eco.skillsScanned / 1000)}K+` : eco.skillsScanned.toString()}
+              value={
+                eco.skillsScanned > 1000
+                  ? `${Math.round(eco.skillsScanned / 1000)}K+`
+                  : eco.skillsScanned.toString()
+              }
               label={t('statScanned')}
             />
-            <StatCard
-              value={`${STATS.benchmark.skill.recall}%`}
-              label={t('statRecall')}
-            />
+            <StatCard value={`${STATS.benchmark.skill.recall}%`} label={t('statRecall')} />
             <StatCard value={`${STATS.benchmark.pint.precision}%`} label={t('statPrecision')} />
           </div>
         </div>
