@@ -25,7 +25,7 @@ RUN corepack enable
 WORKDIR /build
 
 # Copy workspace config + all package.json files for dependency resolution
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json .npmrc ./
 COPY packages/core/package.json packages/core/
 COPY packages/scan-core/package.json packages/scan-core/
 COPY packages/panguard/package.json packages/panguard/
@@ -104,9 +104,9 @@ RUN mkdir -p /standalone/node_modules/@panguard-ai && \
     cp -r packages/atr/dist /standalone/node_modules/@panguard-ai/atr/dist && \
     sed 's/"workspace:\*"/"*"/g' packages/atr/package.json > /standalone/node_modules/@panguard-ai/atr/package.json && \
     mkdir -p /standalone/node_modules/agent-threat-rules && \
-    cp -r node_modules/agent-threat-rules/dist /standalone/node_modules/agent-threat-rules/dist && \
-    cp node_modules/agent-threat-rules/package.json /standalone/node_modules/agent-threat-rules/ && \
-    cp -r node_modules/agent-threat-rules/rules /standalone/node_modules/agent-threat-rules/rules
+    cp -rL node_modules/agent-threat-rules/dist /standalone/node_modules/agent-threat-rules/dist && \
+    cp -L node_modules/agent-threat-rules/package.json /standalone/node_modules/agent-threat-rules/ && \
+    cp -rL node_modules/agent-threat-rules/rules /standalone/node_modules/agent-threat-rules/rules
 
 # Verify entry point exists
 RUN ls -la /standalone/dist/cli/index.js
