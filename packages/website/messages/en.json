@@ -922,7 +922,7 @@
         "overline": "PRE-DEPLOYMENT",
         "title": "Skill Auditor",
         "desc": "Static analysis engine that scans MCP skills and AI agent tools before they run. Detects prompt injection, credential theft, data exfiltration, and 6 more threat categories using ATR pattern matching.",
-        "f1": "108 ATR rules with 720 detection patterns across 10 categories",
+        "f1": "108 ATR rules with 714 detection patterns across 10 categories",
         "f2": "Secret detection: AWS keys, GitHub tokens, private keys, API secrets",
         "f3": "YAML manifest validation + permission scope analysis",
         "s1": "ATR Rules",
@@ -4502,7 +4502,7 @@
       "tier1": {
         "name": "Rules Engine",
         "pct": "90%",
-        "items": "108 ATR detection rules|720 detection patterns|10 threat categories|Behavioral baseline deviations|Community-driven rule updates",
+        "items": "108 ATR detection rules|714 detection patterns|10 threat categories|Behavioral baseline deviations|Community-driven rule updates",
         "speed": "<50ms per event"
       },
       "tier2": {
@@ -6174,7 +6174,7 @@
       },
       "q4": {
         "q": "What threats does Panguard detect?",
-        "a": "Panguard focuses on AI agent security threats across 9 categories:\n\nPrompt injection -- direct and indirect injection, jailbreaks, system prompt override.\nTool poisoning -- malicious tool descriptions, hidden instructions in tool outputs.\nCredential exfiltration -- API key theft, SSH key access, secret extraction.\nContext manipulation -- memory poisoning, conversation hijacking.\nSkill supply-chain -- malicious skill packages, dependency confusion.\nCross-agent attacks -- privilege escalation between agents.\nUnauthorized actions -- file access, network calls beyond declared scope.\n\n108 ATR rules with 720 detection patterns. All open source, community-driven, growing daily through Threat Cloud."
+        "a": "Panguard focuses on AI agent security threats across 9 categories:\n\nPrompt injection -- direct and indirect injection, jailbreaks, system prompt override.\nTool poisoning -- malicious tool descriptions, hidden instructions in tool outputs.\nCredential exfiltration -- API key theft, SSH key access, secret extraction.\nContext manipulation -- memory poisoning, conversation hijacking.\nSkill supply-chain -- malicious skill packages, dependency confusion.\nCross-agent attacks -- privilege escalation between agents.\nUnauthorized actions -- file access, network calls beyond declared scope.\n\n108 ATR rules with 714 detection patterns. All open source, community-driven, growing daily through Threat Cloud."
       }
     },
     "detection": {
