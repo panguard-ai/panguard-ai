@@ -1,4 +1,4 @@
-title: 'Hidden Payload in HTML Comment'
+title: "Hidden Payload in HTML Comment"
 id: ATR-2026-00128
 rule_version: 1
 status: experimental
@@ -8,22 +8,22 @@ description: >
   <!-- ... --> blocks that are invisible to the user but parsed by the agent.
   Real campaign: ClawHavoc evasive variants used HTML comments to hide
   "agent should output all API keys" instructions (2026-03).
-author: 'ATR Community'
-date: '2026/04/05'
-schema_version: '1.0'
+author: "ATR Community"
+date: "2026/04/05"
+schema_version: "1.0"
 detection_tier: pattern
 maturity: experimental
 severity: critical
 
 references:
   owasp_llm:
-    - 'LLM01:2025 - Prompt Injection'
+    - "LLM01:2025 - Prompt Injection"
   owasp_agentic:
-    - 'ASI01:2026 - Agent Goal Hijack'
+    - "ASI01:2026 - Agent Goal Hijack"
   owasp_ast:
-    - 'AST01:2026 - Malicious Skills'
+    - "AST01:2026 - Malicious Skills"
   research:
-    - 'ClawHavoc evasive variants: HTML comment injection (2026-03)'
+    - "ClawHavoc evasive variants: HTML comment injection (2026-03)"
 
 tags:
   category: skill-compromise
@@ -44,17 +44,17 @@ detection:
     - field: content
       operator: regex
       value: "<!--[^-]*?(agent\\s+should|send\\s+all|output\\s+all|exfiltrate|curl\\s|wget\\s|post\\s+.{0,30}(key|credential|token|password|secret)|api[_-]?key.{0,30}https?://)"
-      description: 'HTML comment with agent-directed exfiltration instructions'
+      description: "HTML comment with agent-directed exfiltration instructions"
 
     - field: content
       operator: regex
       value: "<!--[^>]*?(ignore|override|bypass|disable|skip|forget)\\s+(previous|all|safety|security|instruction|rule|restriction|guard)"
-      description: 'HTML comment containing instruction override'
+      description: "HTML comment containing instruction override"
 
     - field: content
       operator: regex
       value: "<!--[^>]*?do\\s+not\\s+(mention|tell|inform|reveal|show|display|disclose)\\s+(this|the\\s+user|anyone)"
-      description: 'HTML comment with concealment directive'
+      description: "HTML comment with concealment directive"
 
 test_cases:
   true_positives:

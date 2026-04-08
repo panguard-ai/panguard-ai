@@ -1,0 +1,43 @@
+title: "SSH Remote Command Execution with Credential Exposure"
+id: ATR-2026-00156
+status: draft
+description: |
+  Detects skills that provide SSH command templates with hardcoded credential paths and remote execution patterns. This skill exposes SSH private key paths in environment variables and provides ready-to-execute remote command templates that could be weaponized for lateral movement or unauthorized access to production servers.
+author: "Threat Cloud LLM Analyzer"
+date: "2026/04/06"
+schema_version: "0.1"
+detection_tier: semantic
+maturity: experimental
+severity: high
+tags:
+  category: privilege-escalation
+  subcategory: ssh-credential-exposure
+  confidence: medium
+agent_source:
+  type: mcp_exchange
+  framework: [skill_md, mcp]
+  provider: [any]
+detection:
+  conditions:
+    - field: content
+      operator: regex
+      value: 'ssh\s+-i\s+\$[A-Z_]+SSH_KEY\s+root@\$[A-Z_]+'
+      description: "SSH commands using environment variables for private keys and root access"
+    - field: content
+      operator: regex
+      value: 'SSH.*密钥路径.*~\/\.ssh\/id_[a-z0-9]+'
+      description: "Documentation exposing SSH private key file paths in Chinese"
+  condition: any
+response:
+  actions: [alert, snapshot]
+test_cases:
+  true_positives:
+    - input: 'ssh -i $CENTRAL_SSH_KEY root@$CENTRAL_IP "cd ~/.openclaw/evolver && nohup node index.js"'
+      expected: triggered
+    - input: '| TOKYO_SSH_KEY | 东京 SSH 密钥路径 | ~/.ssh/id_ed25519 |'
+      expected: triggered
+  true_negatives:
+    - input: "Configure SSH access using your preferred authentication method"
+      expected: not_triggered
+    - input: "Connect to servers using secure protocols and proper credentials"
+      expected: not_triggered

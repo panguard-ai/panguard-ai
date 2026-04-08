@@ -228,16 +228,21 @@ export async function checkWithATR(
 
     const allMatches: ATRMatch[] = [];
 
-    // 1. Scan instructions using scanSkill() — only runs skill-targeted rules
-    // to avoid false positives from MCP rules on SKILL.md content.
+    // 1. Scan instructions as llm_input — runs ALL rules (not scanSkill which
+    //    skips MCP-targeted rules). Skill instructions can contain prompt
+    //    injection payloads that MCP rules detect.
     if (manifest.instructions) {
-      const instructionMatches = engine.scanSkill(manifest.instructions);
+      const instructionMatches = engine.evaluate(
+        _buildLlmInputEvent(manifest.instructions),
+      );
       allMatches.push(...instructionMatches);
     }
 
-    // 2. Scan description using scanSkill()
+    // 2. Scan description as llm_input
     if (manifest.description) {
-      const descMatches = engine.scanSkill(manifest.description);
+      const descMatches = engine.evaluate(
+        _buildLlmInputEvent(manifest.description),
+      );
       allMatches.push(...descMatches);
     }
 
