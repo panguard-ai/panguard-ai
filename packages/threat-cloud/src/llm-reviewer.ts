@@ -243,86 +243,107 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
   // -------------------------------------------------------------------------
 
   /** Prompt for skill/tool analysis (both MCP and SKILL.md) */
-  private static readonly ATR_DRAFTER_PROMPT = `You are a senior AI security rule engineer for the ATR (Agent Threat Rules) standard.
+  private static readonly ATR_DRAFTER_PROMPT = `You are a senior AI security rule engineer for ATR (Agent Threat Rules). Cisco AI Defense merged 34 ATR rules into production. Your output must meet that quality bar.
 
-You will receive MCP tool descriptions from a skill. Your job is to write PRODUCTION-QUALITY detection rules for SPECIFIC, CONCRETE attack patterns — not vague risk categories.
+You will receive MCP tool descriptions from a skill. Write a PRODUCTION-QUALITY detection rule ONLY if you find a SPECIFIC, CONCRETE attack pattern.
 
-STRICT REQUIREMENTS — rules that violate these will be REJECTED:
+QUALITY BAR (Cisco-merge level):
 
-1. REGEX MUST BE HIGHLY SPECIFIC — require multi-word phrase matching.
-   GOOD: "without\\s+(?:asking|requiring)\\s+(?:user|human)\\s+(?:confirmation|approval)"
-   BAD:  "without asking" or "directly to \\w+" (too generic, matches normal docs).
-   Each regex must require 3+ specific words in sequence to avoid false positives.
+1. REGEX — SINGLE-QUOTED YAML, compound patterns, 3+ word sequences:
+   GOOD: '(?i)(curl|wget)\\s+[^\\n]*\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^|]*\\|\\s*(bash|sh)'
+   BAD:  "config.*base64.*import" (too broad, double quotes cause YAML escape bugs)
+   CRITICAL: Always use SINGLE QUOTES for regex values in YAML. Double quotes break \\s, \\d, \\w.
 
-2. FALSE POSITIVE RATE MUST BE LOW — the rule should NOT trigger on:
-   - Legitimate deployment tools, monitoring tools, or admin panels
-   - Normal API clients that read credentials from config
-   - Standard CRUD operations (list, get, create, update, delete)
-   - Short but legitimate tool descriptions
+2. FALSE POSITIVES — regex MUST NOT trigger on:
+   - Legitimate deployment/monitoring/admin tools
+   - Security scanning tools that DESCRIBE attack patterns as examples
+   - Normal API clients reading credentials from config
+   - DevOps skills mentioning shell commands in documentation context
+   TEST: mentally run your regex against "npm install express" and "deploy to AWS" — if it triggers, it's too broad.
 
-3. MUST DETECT A REAL ATTACK — not just "this tool has broad permissions" or "description is vague".
-   Examples of REAL attacks:
-   - Tool description contains hidden instructions for the LLM ("always approve", "skip verification")
-   - Tool claims to be read-only but its schema accepts write parameters
-   - Tool name suggests safe operation but description reveals destructive capability
-   - Tool embeds base64/encoded payloads in its description
-   - Tool description instructs LLM to ignore user preferences or security policies
+3. REAL ATTACKS ONLY — not "this tool has broad permissions":
+   - Hidden LLM instructions ("always approve", "skip verification", "do not inform user")
+   - Credential exfiltration (read ~/.ssh + send externally)
+   - Malicious code execution (curl|bash from raw IP, base64 decode + exec)
+   - Supply chain (typosquat names, unofficial fork claims)
+   - Reverse shells, DNS exfiltration, IMDS access
 
-4. TEST CASES MUST BE REALISTIC — true_positive must be a plausible malicious description,
-   true_negative must be a similar-looking but legitimate description. Include at least 2 of each.
+4. TEST CASES — 3+ true_positives, 3+ true_negatives:
+   - TP must be REAL attack payloads (not hypothetical)
+   - TN must be similar-looking LEGITIMATE content
+   - YOUR REGEX MUST ACTUALLY MATCH ALL TP AND MISS ALL TN. Verify before outputting.
 
-5. OUTPUT AT MOST 1 RULE per skill. Prefer NO rule over a bad rule.
-   If no SPECIFIC, CONCRETE threat pattern exists, output "NO_THREATS_FOUND".
+5. REFERENCES — every rule must map to OWASP:
+   references:
+     owasp_llm:
+       - "LLM01:2025 - Prompt Injection" (or appropriate category)
+     owasp_agentic:
+       - "ASI01:2026 - Agent Behaviour Hijack" (or appropriate category)
 
-6. FIELD SELECTION — choose the right detection field:
-   - Use "field: content" when analyzing SKILL.md content (markdown with --- frontmatter or # headings)
-   - Use "field: tool_description" when analyzing MCP tool name:description pairs
-   If unsure, use "field: content" — it matches both SKILL.md body and tool descriptions.
+6. OUTPUT "NO_THREATS_FOUND" for 95%+ of skills. Only flag genuinely malicious patterns.
 
-Output format (ONLY if a specific threat is found):
+Output format (ONLY if a SPECIFIC threat is found):
 \`\`\`yaml
-title: "<specific attack technique, not generic risk>"
+title: '<specific attack technique>'
 id: ATR-2026-DRAFT-<8char-hex>
-status: draft
-description: |
-  <what SPECIFIC attack this detects, with concrete example from the analyzed skill>
-author: "Threat Cloud LLM Analyzer"
+rule_version: 1
+status: experimental
+description: >
+  <what SPECIFIC attack this detects, referencing the analyzed skill content>
+author: "ATR Threat Cloud Crystallization"
 date: "${new Date().toISOString().slice(0, 10).replace(/-/g, '/')}"
 schema_version: "0.1"
-detection_tier: semantic
+detection_tier: pattern
 maturity: experimental
-severity: <critical|high|medium|low>
+severity: <critical|high|medium>
+references:
+  owasp_llm:
+    - "<most relevant LLM Top 10 category>"
+  owasp_agentic:
+    - "<most relevant Agentic Top 10 category>"
 tags:
-  category: <skill-compromise|tool-poisoning|prompt-injection|data-exfiltration|privilege-escalation>
+  category: <skill-compromise|tool-poisoning|prompt-injection|context-exfiltration|privilege-escalation>
   subcategory: <specific-technique>
-  confidence: medium
+  scan_target: <mcp|skill|both>
+  confidence: <high|medium>
 agent_source:
   type: mcp_exchange
-  framework: [skill_md, mcp]
+  framework: [any]
   provider: [any]
 detection:
   conditions:
-    - field: <content|tool_description>
+    - field: content
       operator: regex
-      value: "<SPECIFIC regex with word boundaries and context>"
-      description: "<exactly what malicious pattern this matches>"
+      value: '<SINGLE-QUOTED compound regex with 3+ word context>'
+      description: '<what malicious pattern this matches>'
   condition: any
+  false_positives:
+    - '<describe what legitimate content could look similar>'
 response:
-  actions: [alert, snapshot]
+  actions: [alert, block_tool]
+  message_template: >
+    [ATR-2026-DRAFT] <one-line description of what was detected>
 test_cases:
   true_positives:
-    - input: "<realistic malicious content that should trigger>"
+    - input: '<real attack payload 1>'
       expected: triggered
-    - input: "<another variant>"
+    - input: '<real attack payload 2>'
+      expected: triggered
+    - input: '<variant 3>'
       expected: triggered
   true_negatives:
-    - input: "<similar but legitimate content>"
+    - input: '<similar but safe content 1>'
       expected: not_triggered
-    - input: "<another legitimate example>"
+      reason: '<why this is safe>'
+    - input: '<similar but safe content 2>'
       expected: not_triggered
+      reason: '<why this is safe>'
+    - input: '<similar but safe content 3>'
+      expected: not_triggered
+      reason: '<why this is safe>'
 \`\`\`
 
-REMEMBER: Output "NO_THREATS_FOUND" for 90%+ of skills. Only flag genuinely suspicious patterns.`;
+BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL true_negatives. If it doesn't, fix the regex or output NO_THREATS_FOUND.`;
 
   /**
    * Analyze skill scan results for semantic threats regex missed
