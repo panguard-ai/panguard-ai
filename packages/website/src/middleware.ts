@@ -58,16 +58,21 @@ export function middleware(request: NextRequest) {
 
   // /install → redirect to quickstart docs
   if (pathname === '/install') {
-    return NextResponse.redirect('https://docs.panguard.ai/quickstart', 301);
+    return NextResponse.redirect(new URL('/en/docs/getting-started', request.url), 307);
   }
 
-  // /docs → redirect to Mintlify docs site
+  // /docs → redirect to Mintlify docs site (except pages hosted on this site)
+  const docsExceptions = ['/docs/getting-started', '/docs/benchmark', '/docs/guard', '/docs/scan', '/docs/cli', '/docs/skill-auditor', '/docs/chat', '/docs/trap', '/docs/report', '/docs/api', '/docs/advanced-setup', '/docs/deployment'];
   if (pathname === '/docs' || pathname.startsWith('/docs/')) {
-    const docsPath = pathname.replace(/^\/(en|zh-TW)/, '').replace(/^\/docs\/?/, '/');
-    return NextResponse.redirect(
-      `https://docs.panguard.ai${docsPath === '/' ? '' : docsPath}`,
-      301
-    );
+    const cleanPath = pathname.replace(/^\/(en|zh-TW)/, '');
+    const isHosted = docsExceptions.some((ex) => cleanPath === ex || cleanPath.startsWith(ex + '/'));
+    if (!isHosted) {
+      const docsPath = cleanPath.replace(/^\/docs\/?/, '/');
+      return NextResponse.redirect(
+        `https://docs.panguard.ai${docsPath === '/' ? '' : docsPath}`,
+        301
+      );
+    }
   }
 
   // Run next-intl middleware for locale routing (handles / → /en, /zh-TW, etc.)
