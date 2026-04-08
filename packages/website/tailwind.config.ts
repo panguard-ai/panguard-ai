@@ -27,6 +27,7 @@ const config: Config = {
           1: '#1F1C19',
           2: '#272320',
           3: '#302B27',
+          hero: '#0C0A09',
         },
         border: {
           DEFAULT: '#2E2A27',
