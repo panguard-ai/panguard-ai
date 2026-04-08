@@ -145,6 +145,26 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
       'Lakera requires API integration. PanGuard is one command: pga setup.',
     ],
   },
+  {
+    title: 'vs Geordie AI / Agent Governance',
+    tagline: 'They govern agent behavior. We detect the threats.',
+    bullets: [
+      'Geordie AI (RSAC 2026 Innovation Sandbox winner) provides agent governance \u2014 policy enforcement and compliance dashboards.',
+      'PanGuard provides the detection layer that governance platforms need: 108 ATR rules that identify prompt injection, tool poisoning, and supply chain attacks in real time.',
+      'Governance without detection is blind. Detection without governance is noisy. They complement each other.',
+      'Geordie is enterprise SaaS. PanGuard is open-source, MIT licensed, and free.',
+    ],
+  },
+  {
+    title: 'vs Snyk Invariant / mcp-scan',
+    tagline: 'They scan MCP configs. We scan the entire AI agent attack surface.',
+    bullets: [
+      'Snyk acquired Invariant Labs (mcp-scan) in 2026. mcp-scan checks MCP server configurations for known issues.',
+      'PanGuard scans SKILL.md files, MCP configs, tool descriptions, and runtime behavior \u2014 108 rules across 9 threat categories, not just config validation.',
+      'ATR achieves 96.9% recall on real-world SKILL.md threats with 0% false positives (498 samples). mcp-scan focuses on configuration, not behavioral threats.',
+      'PanGuard is free. Snyk Invariant is part of Snyk\'s commercial platform.',
+    ],
+  },
 ] as const;
 
 /* -- Ecosystem evidence section -- */
