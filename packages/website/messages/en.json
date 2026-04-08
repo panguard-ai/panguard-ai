@@ -752,6 +752,13 @@
       "badgeCisco": "Adopted by Cisco AI Defense",
       "badgeSafeMcp": "SAFE-MCP 91.8%"
     },
+    "socialProof": {
+      "overline": "Trusted by security teams",
+      "statRules": "ATR Detection Rules",
+      "statScanned": "Skills Scanned",
+      "statRecall": "SKILL.md Recall",
+      "statPrecision": "MCP Precision"
+    },
     "evidence": {
       "title": "We scanned {count} ClawHub skills. {percent}% have security risk patterns.",
       "subtitle": "Real packages. Real downloads. Real findings.",
@@ -4929,8 +4936,8 @@
       "secondary": "Get in Touch"
     },
     "founder": {
-      "title": "Founded in Taiwan",
-      "desc": "PanGuard AI was founded in 2026 in Taiwan with a mission to make AI agent security accessible to everyone. We are a small, independent team focused on building open-source security infrastructure for the AI agent ecosystem."
+      "title": "Built by a founder who saw the gap firsthand",
+      "desc": "PanGuard started when our founder -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught himself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 108 detection rules, got merged into Cisco AI Defense, scanned 90,000+ skills, and achieved 96.9% recall on real-world threats. Based in Taiwan, shipping globally."
     }
   },
   "openSource": {

@@ -752,6 +752,13 @@
       "badgeCisco": "Cisco AI Defense 已採用",
       "badgeSafeMcp": "SAFE-MCP 91.8%"
     },
+    "socialProof": {
+      "overline": "已被安全團隊採用",
+      "statRules": "ATR 偵測規則",
+      "statScanned": "Skills 已掃描",
+      "statRecall": "SKILL.md 召回率",
+      "statPrecision": "MCP 精確率"
+    },
     "evidence": {
       "title": "我們掃描了 {count} 個 ClawHub Skills。{percent}% 有安全風險模式。",
       "subtitle": "真實套件。真實下載量。真實發現。",
@@ -1477,8 +1484,8 @@
       "secondary": "聯繫我們"
     },
     "founder": {
-      "title": "創立於台灣",
-      "desc": "PanGuard AI 於 2026 年在台灣創立，使命是讓 AI Agent 資安防護人人可及。我們是一支小型獨立團隊，專注於為 AI Agent 生態系建造開源資安基礎設施。"
+      "title": "一個看到缺口的創辦人，從零開始建造",
+      "desc": "PanGuard 的起點是創辦人——一個跨領域背景的 builder（業務、行銷、嘻哈音樂節製作人）——自學寫程式後發現：AI Agent 正在安裝有完整系統存取權的工具，卻零安全審查。幾個月內，ATR 成長到 108 條偵測規則、被 Cisco AI Defense 採用、掃描了 90,000+ 個 Skills、在真實威脅上達到 96.9% 召回率。立足台灣，服務全球。"
     }
   },
   "openSource": {

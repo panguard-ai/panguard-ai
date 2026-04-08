@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import ScannerHero from '@/components/home/ScannerHero';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
+const SocialProof = dynamic(() => import('@/components/home/SocialProof'));
 const RealIncidents = dynamic(() => import('@/components/home/RealIncidents'));
 const WhyPanguard = dynamic(() => import('@/components/home/WhyPanguard'));
 const HowItWorks = dynamic(() => import('@/components/home/HowItWorks'));
@@ -22,6 +23,8 @@ export default async function Home() {
           </p>
           {/* 1. Fear Hero: Scanner + stats + platform bar */}
           <ScannerHero />
+          {/* 1.5. Social proof: Cisco, OWASP, live metrics */}
+          <SocialProof />
           {/* 2. Real CVE Incidents */}
           <RealIncidents />
           {/* 3. Why PanGuard: 3 Pillars + competitive table */}
