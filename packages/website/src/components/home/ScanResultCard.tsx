@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Share2, AlertTriangle } from 'lucide-react';
 import type { ScanReport, ScanResponse } from '@/hooks/useSkillScan';
+import { Link } from '@/navigation';
 import { STATS } from '@/lib/stats';
 
 /** Localize ATR finding titles and descriptions */
@@ -407,11 +408,17 @@ export default function ScanResultCard({
         <code className="inline-block text-[11px] bg-surface-2 border border-border rounded-lg px-3 py-1.5 text-panguard-green font-mono select-all mb-2">
           npm install -g @panguard-ai/panguard && pga up
         </code>
-        <p className="text-[10px] text-text-muted">
+        <p className="text-[10px] text-text-muted mb-2">
           {isZh
             ? `一行安裝。自動偵測 16 個平台：Claude Code、Cursor、Windsurf、Gemini CLI 等。${STATS.totalRulesDisplay} ATR 偵測規則即時防護。`
             : `One command. Auto-detects 16 platforms: Claude Code, Cursor, Windsurf, Gemini CLI + more. ${STATS.totalRulesDisplay} ATR detection rules.`}
         </p>
+        <Link
+          href="/docs/getting-started"
+          className="inline-flex items-center gap-1 text-[11px] text-panguard-green hover:underline font-semibold"
+        >
+          {isZh ? '完整安裝指南' : 'Full Install Guide'} →
+        </Link>
       </div>
     </motion.div>
   );
