@@ -162,7 +162,7 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
       'Snyk acquired Invariant Labs (mcp-scan) in 2026. mcp-scan checks MCP server configurations for known issues.',
       'PanGuard scans SKILL.md files, MCP configs, tool descriptions, and runtime behavior \u2014 108 rules across 9 threat categories, not just config validation.',
       'ATR achieves 96.9% recall on real-world SKILL.md threats with 0% false positives (498 samples). mcp-scan focuses on configuration, not behavioral threats.',
-      'PanGuard is free. Snyk Invariant is part of Snyk\'s commercial platform.',
+      "PanGuard is free. Snyk Invariant is part of Snyk's commercial platform.",
     ],
   },
 ] as const;

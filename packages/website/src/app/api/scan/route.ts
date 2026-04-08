@@ -453,7 +453,9 @@ export async function POST(request: Request) {
         riskScore: 0,
         riskLevel: 'LOW',
         findings: [],
-        checks: [{ status: 'pass', label: 'Community-verified safe skill (Threat Cloud whitelist)' }],
+        checks: [
+          { status: 'pass', label: 'Community-verified safe skill (Threat Cloud whitelist)' },
+        ],
         durationMs: 0,
         atrRulesEvaluated: liveATR.length,
         atrPatternsMatched: 0,
@@ -487,7 +489,10 @@ export async function POST(request: Request) {
       for (const [name, srv] of Object.entries(servers)) {
         const s = srv as Record<string, unknown>;
         parts.push(`Server: ${name}`);
-        if (s.command) parts.push(`Command: ${s.command} ${Array.isArray(s.args) ? (s.args as string[]).join(' ') : ''}`);
+        if (s.command)
+          parts.push(
+            `Command: ${s.command} ${Array.isArray(s.args) ? (s.args as string[]).join(' ') : ''}`
+          );
         if (s.url) parts.push(`URL: ${s.url}`);
 
         // Check env for hardcoded secrets
@@ -538,7 +543,11 @@ export async function POST(request: Request) {
     mergedResult = {
       ...result,
       findings: allFindings,
-      riskScore: hasCritical ? Math.max(result.riskScore, 80) : hasHigh ? Math.max(result.riskScore, 50) : result.riskScore,
+      riskScore: hasCritical
+        ? Math.max(result.riskScore, 80)
+        : hasHigh
+          ? Math.max(result.riskScore, 50)
+          : result.riskScore,
       riskLevel: hasCritical ? 'CRITICAL' : hasHigh ? 'HIGH' : result.riskLevel,
       checks: [
         ...result.checks,
