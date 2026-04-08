@@ -29,7 +29,7 @@ export default function CTARoadmap() {
   }
 
   return (
-    <section className="bg-gradient-to-b from-surface-0 to-panguard-green/5 px-5 sm:px-6 py-16 sm:py-24">
+    <section className="bg-gradient-to-b from-[#1A1614] to-panguard-green/5 px-5 sm:px-6 py-16 sm:py-24">
       <div className="max-w-3xl mx-auto">
         {/* Install CTA */}
         <FadeInUp>
