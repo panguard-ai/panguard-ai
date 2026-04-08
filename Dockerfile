@@ -103,13 +103,10 @@ RUN mkdir -p /standalone/node_modules/@panguard-ai && \
     mkdir -p /standalone/node_modules/@panguard-ai/atr && \
     cp -r packages/atr/dist /standalone/node_modules/@panguard-ai/atr/dist && \
     sed 's/"workspace:\*"/"*"/g' packages/atr/package.json > /standalone/node_modules/@panguard-ai/atr/package.json && \
-    cp -r packages/atr/rules /standalone/node_modules/@panguard-ai/atr/rules && \
-    cp -r packages/atr/spec /standalone/node_modules/@panguard-ai/atr/spec && \
     mkdir -p /standalone/node_modules/agent-threat-rules && \
-    cp -r packages/atr/dist /standalone/node_modules/agent-threat-rules/dist && \
-    cp packages/atr/package.json /standalone/node_modules/agent-threat-rules/ && \
-    cp -r packages/atr/rules /standalone/node_modules/agent-threat-rules/rules && \
-    cp -r packages/atr/spec /standalone/node_modules/agent-threat-rules/spec
+    cp -r node_modules/agent-threat-rules/dist /standalone/node_modules/agent-threat-rules/dist && \
+    cp node_modules/agent-threat-rules/package.json /standalone/node_modules/agent-threat-rules/ && \
+    cp -r node_modules/agent-threat-rules/rules /standalone/node_modules/agent-threat-rules/rules
 
 # Verify entry point exists
 RUN ls -la /standalone/dist/cli/index.js
