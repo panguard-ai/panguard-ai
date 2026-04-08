@@ -1329,8 +1329,16 @@ export const ATR_RULES_COMPILED = [
         pattern: 'sk-[a-zA-Z0-9]{20,}',
         desc: 'OpenAI-style API key (sk-...)',
       },
-      { field: 'agent_output', pattern: 'AKIA[0-9A-Z]{16}', desc: 'AWS Access Key ID (AKIA...)' },
-      { field: 'agent_output', pattern: 'AIza[a-zA-Z0-9_-]{35}', desc: 'Google API key (AIza...)' },
+      {
+        field: 'agent_output',
+        pattern: 'AKIA[0-9A-Z]{16}',
+        desc: 'AWS Access Key ID (AKIA...)',
+      },
+      {
+        field: 'agent_output',
+        pattern: 'AIza[a-zA-Z0-9_-]{35}',
+        desc: 'Google API key (AIza...)',
+      },
       {
         field: 'agent_output',
         pattern: '(?:sk_live|pk_live|sk_test|rk_live)_[a-zA-Z0-9]{20,}',
@@ -2153,7 +2161,10 @@ export const ATR_RULES_COMPILED = [
     scan_target: 'mcp',
     rule_version: 1,
     patterns: [
-      { field: 'tool_args', pattern: '(?i)(sudo|runas|doas|pkexec|gsudo)\\s+' },
+      {
+        field: 'tool_args',
+        pattern: '(?i)(sudo|runas|doas|pkexec|gsudo)\\s+',
+      },
       {
         field: 'tool_args',
         pattern:
@@ -2229,7 +2240,10 @@ export const ATR_RULES_COMPILED = [
         field: 'tool_args',
         pattern: '(?i)(\\{\\{.*\\}\\}|\\$\\{.*\\}|<%.*%>|#\\{.*\\}|\\{%.*%\\})',
       },
-      { field: 'tool_args', pattern: '(?i)(\\x00|%00|\\\\0|null\\s*byte|\\\\u0000)' },
+      {
+        field: 'tool_args',
+        pattern: '(?i)(\\x00|%00|\\\\0|null\\s*byte|\\\\u0000)',
+      },
     ],
   },
   {
