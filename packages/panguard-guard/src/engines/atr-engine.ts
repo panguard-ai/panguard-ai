@@ -32,22 +32,13 @@ const logger = createLogger('panguard-guard:atr-engine');
  * Falls back to null if the package can't be resolved.
  */
 function resolveBundledRulesDir(): string | null {
-  // Strategy 1: createRequire from this module's location (works in dev/workspace)
+  // Strategy 1: resolve agent-threat-rules npm package (upstream source of truth)
   try {
     const req1 = createRequire(import.meta.url);
-    const atrPkgPath = req1.resolve('@panguard-ai/atr/package.json');
-    return join(dirname(atrPkgPath), 'rules');
-  } catch {
-    /* continue to next strategy */
-  }
-
-  // Strategy 2: createRequire from the CLI entry point (handles npm -g flat install)
-  try {
-    if (process.argv[1]) {
-      const req2 = createRequire(join(dirname(process.argv[1]), '_resolve.js'));
-      const atrPkgPath = req2.resolve('@panguard-ai/atr/package.json');
-      return join(dirname(atrPkgPath), 'rules');
-    }
+    // Resolve main entry then walk up to package root
+    const atrMain = req1.resolve('agent-threat-rules');
+    const atrRoot = join(dirname(atrMain), '..');
+    if (existsSync(join(atrRoot, 'rules'))) return join(atrRoot, 'rules');
   } catch {
     /* continue to next strategy */
   }
@@ -57,7 +48,7 @@ function resolveBundledRulesDir(): string | null {
     const thisDir = dirname(fileURLToPath(import.meta.url));
     let dir = thisDir;
     for (let i = 0; i < 10; i++) {
-      const candidate = join(dir, 'node_modules', '@panguard-ai', 'atr', 'rules');
+      const candidate = join(dir, 'node_modules', 'agent-threat-rules', 'rules');
       if (existsSync(candidate)) return candidate;
       const parent = dirname(dir);
       if (parent === dir) break;
@@ -121,7 +112,6 @@ export class GuardATREngine {
     // Primary engine for custom user rules
     this.engine = new ATREngine({
       rulesDir: config.rulesDir,
-      hotReload: config.hotReload,
       sessionTracker,
     });
 

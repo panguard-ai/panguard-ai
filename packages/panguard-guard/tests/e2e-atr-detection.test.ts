@@ -14,7 +14,9 @@ describe('Guard + ATR Integration (E2E)', () => {
   let engine: ATREngine;
 
   beforeAll(async () => {
-    const rulesDir = join(__dirname, '../../atr/rules');
+    // Resolve rules from upstream agent-threat-rules npm package
+    const atrDir = join(__dirname, '..', '..', '..', 'node_modules', 'agent-threat-rules');
+    const rulesDir = join(atrDir, 'rules');
     engine = new ATREngine({ rulesDir });
     const count = await engine.loadRules();
     expect(count).toBeGreaterThan(50);
@@ -46,7 +48,7 @@ describe('Guard + ATR Integration (E2E)', () => {
     const matches = engine.evaluate(event);
     // Normal text should have 0 matches or only low/informational
     const highSev = matches.filter(
-      (m) => m.rule.severity === 'critical' || m.rule.severity === 'high',
+      (m) => m.rule.severity === 'critical' || m.rule.severity === 'high'
     );
     expect(highSev.length).toBe(0);
   });
