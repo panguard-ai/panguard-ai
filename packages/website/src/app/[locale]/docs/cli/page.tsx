@@ -6,7 +6,7 @@ import CLIReferencePage from './CLIReferencePage';
 export const metadata: Metadata = {
   title: 'CLI Reference — Panguard AI',
   description:
-    'Complete command reference for the Panguard CLI. Explore all 21 commands for scanning, protection, honeypots, reporting, and more.',
+    'Complete command reference for the Panguard CLI. Explore all 23 commands for scanning, protection, honeypots, reporting, and more.',
   openGraph: {
     title: 'CLI Reference — Panguard AI',
     description:
