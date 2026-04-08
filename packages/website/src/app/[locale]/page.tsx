@@ -6,6 +6,7 @@ import ScannerHero from '@/components/home/ScannerHero';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
 const SocialProof = dynamic(() => import('@/components/home/SocialProof'));
+const DemoShowcase = dynamic(() => import('@/components/home/DemoShowcase'));
 const RealIncidents = dynamic(() => import('@/components/home/RealIncidents'));
 const WhyPanguard = dynamic(() => import('@/components/home/WhyPanguard'));
 const HowItWorks = dynamic(() => import('@/components/home/HowItWorks'));
@@ -25,6 +26,8 @@ export default async function Home() {
           <ScannerHero />
           {/* 1.5. Social proof: Cisco, OWASP, live metrics */}
           <SocialProof />
+          {/* 1.6. Product demo: Guard dashboard screenshots */}
+          <DemoShowcase />
           {/* 2. Real CVE Incidents */}
           <RealIncidents />
           {/* 3. Why PanGuard: 3 Pillars + competitive table */}

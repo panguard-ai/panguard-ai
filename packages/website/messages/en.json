@@ -753,6 +753,21 @@
       "badgeCisco": "Adopted by Cisco AI Defense",
       "badgeSafeMcp": "SAFE-MCP 91.8%"
     },
+    "demo": {
+      "overline": "See it in action",
+      "title": "One command. Full protection.",
+      "subtitle": "Install PanGuard, and your AI agents are protected in under 60 seconds.",
+      "tabs": {
+        "dashboard": "Guard Dashboard",
+        "rules": "Detection Rules",
+        "threatcloud": "Threat Cloud"
+      },
+      "captions": {
+        "dashboard": "Real-time dashboard showing 188 active rules, event monitoring, and 3-layer detection status.",
+        "rules": "188 ATR rules auto-synced from Threat Cloud. Community-driven, AI-drafted detection patterns.",
+        "threatcloud": "Anonymous threat intelligence sharing. Your device contributes and receives updated detection rules."
+      }
+    },
     "socialProof": {
       "overline": "Trusted by security teams",
       "statRules": "ATR Detection Rules",

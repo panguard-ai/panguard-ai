@@ -753,6 +753,21 @@
       "badgeCisco": "Cisco AI Defense 已採用",
       "badgeSafeMcp": "SAFE-MCP 91.8%"
     },
+    "demo": {
+      "overline": "實際操作畫面",
+      "title": "一行指令，全面防護。",
+      "subtitle": "安裝 PanGuard，60 秒內你的 AI Agent 就受到保護。",
+      "tabs": {
+        "dashboard": "Guard 儀表板",
+        "rules": "偵測規則",
+        "threatcloud": "Threat Cloud"
+      },
+      "captions": {
+        "dashboard": "即時儀表板：188 條規則運行中、事件監控、三層偵測狀態一目瞭然。",
+        "rules": "188 條 ATR 規則從 Threat Cloud 自動同步。社群驅動、AI 草擬的偵測模式。",
+        "threatcloud": "匿名威脅情報共享。你的裝置貢獻數據，同時接收最新偵測規則。"
+      }
+    },
     "socialProof": {
       "overline": "已被安全團隊採用",
       "statRules": "ATR 偵測規則",
