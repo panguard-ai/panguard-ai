@@ -148,7 +148,7 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
 }
 
 /**
- * Create a cloud sync interval timer that calls syncThreatCloud every hour.
+ * Create a cloud sync interval timer that calls syncThreatCloud every 5 minutes.
  * Returns the timer handle (caller is responsible for clearing it).
  */
 export function setupCloudSyncTimer(deps: CloudSyncDeps): ReturnType<typeof setInterval> {
@@ -156,8 +156,8 @@ export function setupCloudSyncTimer(deps: CloudSyncDeps): ReturnType<typeof setI
     () => {
       void syncThreatCloud(deps);
     },
-    60 * 60 * 1000
-  ); // 1 hour
+    5 * 60 * 1000
+  ); // 5 minutes — fast enough for near-realtime protection
 }
 
 /**
