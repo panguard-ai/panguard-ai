@@ -364,6 +364,15 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/rules/sync':
+          // Public endpoint for ATR repo CI to sync open-source rules (no admin key needed)
+          if (req.method === 'POST') {
+            await this.handleSyncATRRules(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/stats':
           if (req.method === 'GET') {
             this.handleGetStats(res);
@@ -836,6 +845,55 @@ export class ThreatCloudServer {
     this.db.audit.logAction('admin', 'rule.create', 'rule', undefined, { count }, clientIP);
 
     this.sendJson(res, 201, { ok: true, data: { message: `${count} rule(s) published`, count } });
+  }
+
+  /**
+   * POST /api/rules/sync — Public endpoint for ATR repo to sync open-source rules.
+   * No admin key required. Only accepts source='atr' (open-source rules are public).
+   * Rate limited to prevent abuse. Body: { rules: [{ ruleId, ruleContent, source }] }
+   */
+  private async handleSyncATRRules(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readBody(req);
+    let raw: unknown;
+    try {
+      raw = JSON.parse(body);
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid JSON body' });
+      return;
+    }
+
+    const rawObj = raw as Record<string, unknown>;
+    const rawRules: unknown[] =
+      'rules' in rawObj && Array.isArray(rawObj['rules']) ? rawObj['rules'] : [raw];
+
+    if (rawRules.length > 200) {
+      this.sendJson(res, 400, { ok: false, error: 'Maximum 200 rules per sync request' });
+      return;
+    }
+
+    const now = new Date().toISOString();
+    let count = 0;
+    let skipped = 0;
+    for (const rawRule of rawRules) {
+      const result = tryValidateInput(RulePublishSchema, rawRule);
+      if (!result.ok) { skipped++; continue; }
+      // Only allow source='atr' — community rules require admin key
+      if (result.data.source !== 'atr') { skipped++; continue; }
+      const ruleData = {
+        ...result.data,
+        publishedAt: result.data.publishedAt || now,
+      } as unknown as ThreatCloudRule;
+      this.db.upsertRule(ruleData);
+      count++;
+    }
+
+    const clientIP = req.socket.remoteAddress ?? 'unknown';
+    this.db.audit.logAction('system', 'rule.sync', 'rule', undefined, { count, skipped }, clientIP);
+
+    this.sendJson(res, 200, {
+      ok: true,
+      data: { message: `${count} rule(s) synced, ${skipped} skipped`, count, skipped },
+    });
   }
 
   /** GET /api/stats (cached 60s) */

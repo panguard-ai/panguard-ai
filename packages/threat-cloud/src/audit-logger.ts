@@ -13,6 +13,7 @@ import type Database from 'better-sqlite3';
 /** Valid audit action types / 有效的審計動作類型 */
 export type AuditAction =
   | 'rule.create'
+  | 'rule.sync'
   | 'rule.delete'
   | 'proposal.approve'
   | 'proposal.reject'
