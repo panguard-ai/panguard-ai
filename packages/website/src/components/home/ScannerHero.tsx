@@ -118,7 +118,7 @@ function ScannerHeroInner() {
       />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(700px,200vw)] h-[min(700px,200vw)] rounded-full pointer-events-none hero-orb" />
 
-      <div className="relative z-10 text-center px-5 sm:px-6 pt-28 pb-16 max-w-3xl mx-auto">
+      <div className="relative z-10 text-center px-4 sm:px-6 pt-28 pb-16 max-w-3xl mx-auto overflow-hidden">
         {/* Logo */}
         <div className="mb-8 animate-[fadeIn_0.5s_ease_both]">
           <BrandLogo size={36} className="text-panguard-green mx-auto sm:w-12 sm:h-12" />
@@ -126,8 +126,10 @@ function ScannerHeroInner() {
 
         {/* Title */}
         <div className="mb-6 animate-[fadeUp_0.6s_0.1s_ease_both]">
-          <h1 className="text-[clamp(24px,5vw,48px)] font-bold leading-[1.3] tracking-tight text-text-primary">
-            {t('titleLine1')} — <span className="text-panguard-green">{t('titleLine2')}</span>
+          <h1 className="text-[clamp(22px,5vw,48px)] font-bold leading-[1.2] tracking-tight text-text-primary break-words">
+            {t('titleLine1')}
+            <br className="sm:hidden" /> —{' '}
+            <span className="text-panguard-green">{t('titleLine2')}</span>
           </h1>
           <p className="mt-4 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto">
             {t('subtitle', { count: eco.skillsScanned.toLocaleString() })}

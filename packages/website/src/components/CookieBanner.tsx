@@ -29,10 +29,10 @@ export default function CookieBanner() {
     <div
       role="dialog"
       aria-label={t('ariaLabel')}
-      className="fixed bottom-3 right-3 sm:right-4 z-50 max-w-sm"
+      className="fixed bottom-2 right-2 sm:bottom-3 sm:right-4 z-50 max-w-[280px] sm:max-w-sm"
     >
-      <div className="bg-surface-1/95 backdrop-blur-sm border border-border rounded-xl shadow-lg px-4 py-3">
-        <p className="text-xs text-text-secondary leading-relaxed">
+      <div className="bg-surface-1/95 backdrop-blur-sm border border-border rounded-xl shadow-lg px-3 py-2 sm:px-4 sm:py-3">
+        <p className="text-[10px] sm:text-xs text-text-secondary leading-relaxed">
           {t('message')}{' '}
           <Link
             href="/legal/cookies"
@@ -41,7 +41,7 @@ export default function CookieBanner() {
             {t('learnMore')}
           </Link>
         </p>
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 mt-1.5 sm:mt-2">
           <button
             onClick={() => setConsent('all')}
             className="bg-brand-sage text-surface-0 font-semibold text-xs rounded-full px-4 py-1.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
