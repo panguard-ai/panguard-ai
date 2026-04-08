@@ -20,7 +20,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "agent-threat-rules": "^1.0.1"
+    "agent-threat-rules": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
