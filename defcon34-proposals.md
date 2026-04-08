@@ -88,14 +88,14 @@ We release all tools, rules, scan data, and the benchmark harness used in this r
 
 ### Speaker Bio
 
-[Your Name] is the founder of PanGuard, an open-source AI agent security project. A cross-disciplinary builder with a background in sales, marketing (300M+ impressions on Threads), and hip-hop event production, they pivoted to security after recognizing that AI agents were being deployed with the same trust assumptions as static APIs -- an assumption that breaks catastrophically when the agent can execute arbitrary tools.
+LIN-KUAN HSIN (Adam) is the founder of PanGuard, an open-source AI agent security project. A cross-disciplinary builder with a background in sales, marketing (300M+ impressions on Threads), and hip-hop event production, they pivoted to security after recognizing that AI agents were being deployed with the same trust assumptions as static APIs -- an assumption that breaks catastrophically when the agent can execute arbitrary tools.
 
 Self-taught developer. Built ATR from scratch: 108 detection rules, a three-layer scanning engine, and a threat crystallization pipeline. The project has been adopted by Cisco AI Defense, scanned 36,394+ MCP skills, and contributed to 3 CVEs. 50 published versions. 23,000+ npm downloads. No VC funding. No team. Just the work.
 
 ### Supporting Materials
 
-- GitHub: https://github.com/panguard-ai/agent-threat-rules (MIT license)
-- npm: @panguard-ai/core, @panguard-ai/panguard (23,000+ downloads)
+- GitHub: https://github.com/Agent-Threat-Rule/agent-threat-rules (MIT license)
+- npm: agent-threat-rules (23,000+ downloads across 11 packages)
 - Scan dataset: 36,394 MCP skills, 91,226 SKILL.md manifests
 - Benchmark: PINT adversarial MCP benchmark (62.7% recall, 99.7% precision)
 - Paper: Zenodo DOI 10.5281/zenodo.19178002
@@ -109,7 +109,7 @@ Self-taught developer. Built ATR from scratch: 108 detection rules, a three-laye
 
 ### Subject: DEF CON 34 Demo Labs Submission: ATR -- Agent Threat Rules
 
-**Presenter Name:** [Your Name]
+**Presenter Name:** LIN-KUAN HSIN (Adam)
 **Co-presenter:** None
 **Tool/Project Name:** ATR (Agent Threat Rules)
 
@@ -119,11 +119,11 @@ ATR is an open-source detection engine for AI agent security threats. It scans M
 
 **Short Developer Bio:**
 
-[Your Name] is a self-taught developer and founder of the PanGuard open-source AI agent security project. Background in sales, marketing (300M+ Threads impressions), and cultural production before pivoting to security tooling. Built ATR from scratch -- 108 detection rules, a three-layer scanning architecture, and a novel threat crystallization pipeline that converts new attack patterns into distributable rules in under 5 minutes. The project has 23,000+ npm downloads, adoption by Cisco AI Defense, and contributions to 3 MCP CVEs.
+LIN-KUAN HSIN (Adam) is a self-taught developer and founder of the PanGuard open-source AI agent security project. Background in sales, marketing (300M+ Threads impressions), and cultural production before pivoting to security tooling. Built ATR from scratch -- 108 detection rules, a three-layer scanning architecture, and a novel threat crystallization pipeline that converts new attack patterns into distributable rules in under 5 minutes. The project has 23,000+ npm downloads, adoption by Cisco AI Defense, and contributions to 3 MCP CVEs.
 
 **URL to Additional Information:**
 
-https://github.com/panguard-ai/agent-threat-rules
+https://github.com/Agent-Threat-Rule/agent-threat-rules
 
 **Detailed Explanation of Tool:**
 
@@ -137,11 +137,11 @@ The third layer handles semantic attacks that cannot be caught by string matchin
 
 We have used ATR to conduct the largest public scan of AI agent skill registries to date: 36,394 MCP skills from ClawHub and 91,226 skill manifests from Skills.sh. The scan identified 182 CRITICAL and 1,124 HIGH severity issues, including hidden data exfiltration commands in tool descriptions, base64-encoded payloads, filesystem traversal instructions, and credential harvesting patterns. Three of these findings contributed to disclosed CVEs (CVE-2026-25536, CVE-2026-23744, CVE-2026-5023).
 
-ATR is distributed as an npm package (@panguard-ai/core), a CLI tool, and a GitHub Action for CI/CD integration. It supports scanning both MCP server definitions and SKILL.md manifests. The project is MIT-licensed with 23,000+ npm downloads across 11 packages. Cisco AI Defense has merged 34 ATR rules into their production skill-scanner (PR #79), providing enterprise validation of the detection standard. At the demo, attendees will be able to scan their own MCP configurations and SKILL.md files in real time and see the detection results.
+ATR is distributed as an npm package (agent-threat-rules), a CLI tool, and a GitHub Action for CI/CD integration. It supports scanning both MCP server definitions and SKILL.md manifests. The project is MIT-licensed with 23,000+ npm downloads across 11 packages. Cisco AI Defense has merged 34 ATR rules into their production skill-scanner (PR #79), providing enterprise validation of the detection standard. At the demo, attendees will be able to scan their own MCP configurations and SKILL.md files in real time and see the detection results.
 
 **Link to Code Repository:**
 
-https://github.com/panguard-ai/agent-threat-rules
+https://github.com/Agent-Threat-Rule/agent-threat-rules
 
 **Level of Development:**
 
