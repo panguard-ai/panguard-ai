@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import {
   scanContent,
   compileRules,
@@ -253,6 +253,7 @@ async function submitToThreatCloud(
         skillName,
         riskScore,
         riskLevel,
+        source: 'website',
         findingSummaries: findings.slice(0, 10).map((f) => ({
           id: f.id,
           category: f.category,
@@ -507,44 +508,51 @@ export async function POST(request: Request) {
   const scannedAt = new Date().toISOString();
   scanCache.set(cHash, { report, scannedAt });
 
-  // Track usage (non-blocking)
-  void fetch(`${TC_ENDPOINT}/api/usage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      event_type: 'scan',
-      source: 'website',
-      metadata: { skill: skillName, risk: result.riskLevel, score: result.riskScore },
-    }),
-    signal: AbortSignal.timeout(3000),
-  }).catch(() => {});
+  // Use after() to ensure TC submissions complete even on serverless (Vercel).
+  // Without after(), fire-and-forget promises get killed when the Lambda freezes.
+  after(async () => {
+    // Track usage
+    try {
+      await fetch(`${TC_ENDPOINT}/api/usage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_type: 'scan',
+          source: 'website',
+          metadata: { skill: skillName, risk: result.riskLevel, score: result.riskScore },
+        }),
+        signal: AbortSignal.timeout(5_000),
+      });
+    } catch {
+      // Best-effort
+    }
 
-  // Submit to Threat Cloud (non-blocking)
-  // Skip README-based scans — documentation descriptions trigger false positives
-  // that would pollute the community threat database.
-  if (result.riskScore > 0 && !isReadme) {
-    void submitToThreatCloud(
-      report.skillName ?? cHash,
-      cHash,
-      result.riskScore,
-      result.riskLevel,
-      result.findings
-    );
-  }
+    // Submit to Threat Cloud
+    // Skip README-based scans — documentation descriptions trigger false positives
+    if (result.riskScore > 0 && !isReadme) {
+      await submitToThreatCloud(
+        report.skillName ?? cHash,
+        cHash,
+        result.riskScore,
+        result.riskLevel,
+        result.findings
+      );
+    }
 
-  // Flywheel: submit ATR proposal for HIGH/CRITICAL findings (SKILL.md only)
-  if (
-    !isReadme &&
-    (result.riskLevel === 'HIGH' || result.riskLevel === 'CRITICAL') &&
-    result.findings.length > 0
-  ) {
-    void submitATRProposal(
-      report.skillName ?? cHash,
-      result.riskLevel,
-      result.findings,
-      result.patternHash
-    );
-  }
+    // Flywheel: submit ATR proposal for HIGH/CRITICAL findings (SKILL.md only)
+    if (
+      !isReadme &&
+      (result.riskLevel === 'HIGH' || result.riskLevel === 'CRITICAL') &&
+      result.findings.length > 0
+    ) {
+      await submitATRProposal(
+        report.skillName ?? cHash,
+        result.riskLevel,
+        result.findings,
+        result.patternHash
+      );
+    }
+  });
 
   return NextResponse.json({
     ok: true,
