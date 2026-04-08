@@ -876,9 +876,15 @@ export class ThreatCloudServer {
     let skipped = 0;
     for (const rawRule of rawRules) {
       const result = tryValidateInput(RulePublishSchema, rawRule);
-      if (!result.ok) { skipped++; continue; }
+      if (!result.ok) {
+        skipped++;
+        continue;
+      }
       // Only allow source='atr' — community rules require admin key
-      if (result.data.source !== 'atr') { skipped++; continue; }
+      if (result.data.source !== 'atr') {
+        skipped++;
+        continue;
+      }
       const ruleData = {
         ...result.data,
         publishedAt: result.data.publishedAt || now,

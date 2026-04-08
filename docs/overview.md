@@ -217,7 +217,7 @@ Cloud down? Local AI takes over. Local AI down? Rules engine keeps running. Prot
 | Runtime    | Node.js 20+                              |
 | Monorepo   | pnpm 10 workspaces                       |
 | Testing    | Vitest 3 (3,017 tests / 142 files)       |
-| Rules      | ATR (101 rules, 520 patterns)             |
+| Rules      | ATR (101 rules, 520 patterns)            |
 | AI         | Ollama (local) + Claude / OpenAI (cloud) |
 | Auth       | Google OAuth (PKCE) + scrypt hashing     |
 | i18n       | English + Traditional Chinese            |
