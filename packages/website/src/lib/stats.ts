@@ -93,8 +93,8 @@ export const STATS = {
     entriesCrawled: 90_792,
     /** npm packages found in crawl */
     npmPackages: 2_769,
-    /** Packages actually scanned by ATR + Skill Auditor (L1 + L2 AST) */
-    skillsScanned: 90_792,
+    /** Skills actually scanned — TC live data is authoritative (67K+); fallback uses mega scan batch (53,577) */
+    skillsScanned: 53_577,
     /** Total MCP tool definitions extracted from scanned packages */
     toolsExtracted: 35_858,
     /** Packages with security findings (any severity) */
@@ -127,7 +127,7 @@ export const STATS = {
    * Garak: NVIDIA jailbreak corpus (666 samples)
    */
   benchmark: {
-    pint: { recall: 62.7, precision: 99.7, samples: 850 },
+    pint: { recall: 61.4, precision: 99.6, samples: 850 },
     skill: { recall: 96.9, precision: 100, fp: 0, samples: 498 },
     garak: { recall: 69.7, samples: 666 },
     wildFpRate: 0.48,
@@ -151,7 +151,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-04-08',
+  lastUpdated: '2026-04-09',
 } as const;
 
 export type Stats = typeof STATS;
