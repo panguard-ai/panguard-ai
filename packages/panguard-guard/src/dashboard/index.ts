@@ -1264,13 +1264,13 @@ body{font-family:'Inter','Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-se
 <!-- Rules -->
 <div class="pg" id="p-rules">
 <div class="pt" data-i18n="t_ru"><em>Detection Rules</em></div>
-<div class="pd" data-i18n="d_ru">Panguard uses a 3-layer rule system to detect threats. Rules sync automatically from Threat Cloud every hour. ATR (Agent Threat Rules) are community-driven rules auto-drafted by AI from real threat patterns.</div>
+<div class="pd" data-i18n="d_ru">Panguard uses a 3-layer rule system to detect threats. Rules sync automatically from Threat Cloud every 5 minutes. ATR (Agent Threat Rules) are community-driven rules auto-drafted by AI from real threat patterns.</div>
 <div id="ru-loading" class="empty"><span class="spin"></span> Loading rule data...</div>
 <div id="ru-content" style="display:none">
 <div class="cg">
 <div class="cd"><div class="cl">ATR</div><div class="cv sg" id="ru-atr">0</div><div style="font-size:11px;color:var(--tm);margin-top:4px" data-i18n="ru_atr_d">Agent Threat Rules (AI-drafted)</div></div>
 </div>
-<div style="font-size:12px;color:var(--tm);margin-bottom:20px"><span id="ru-sync"></span> <span data-i18n="ru_auto">Rules sync automatically every hour from Threat Cloud.</span></div>
+<div style="font-size:12px;color:var(--tm);margin-bottom:20px"><span id="ru-sync"></span> <span data-i18n="ru_auto">Rules sync automatically every 5 minutes from Threat Cloud.</span></div>
 <div class="st">All Loaded Rules</div>
 <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
 <input id="ru-search" type="text" placeholder="Search rules by ID, title, or category..." style="flex:1;background:var(--s2);border:1px solid var(--bd);color:var(--t1);padding:8px 14px;border-radius:8px;font-size:13px;outline:none" oninput="filterRules()" onfocus="this.style.borderColor='var(--sage)'" onblur="this.style.borderColor='var(--bd)'">
@@ -1433,7 +1433,7 @@ up1:'Catch attacks in ANY language',up2:'Detect paraphrased injection',up3:'Cont
 connect_llm:'Connect LLM',free_options:'Free options: Gemini (free tier) / Ollama (local)',no_threats:'No threats detected. Your agents are running safely.',
 d_sk:'Panguard audits every MCP skill installed on your system. Safe skills are auto-whitelisted; risky ones are flagged for your review.',
 d_ai:'Panguard uses a 3-layer detection system. Layer 1 (rules) and Layer 2 (fingerprint & heuristic) are always active with zero config. Layer 3 uses cloud AI for the deepest analysis -- configure your API key below.',
-d_ru:'Panguard uses a 3-layer rule system to detect threats. Rules sync automatically from Threat Cloud every hour. ATR rules are community-driven, auto-drafted by AI from real threat patterns.',
+d_ru:'Panguard uses a 3-layer rule system to detect threats. Rules sync automatically from Threat Cloud every 5 minutes. ATR rules are community-driven, auto-drafted by AI from real threat patterns.',
 d_tc:'Threat Cloud is Panguard\\'s anonymous threat intelligence sharing network. Your device can optionally upload anonymized threat data to help the community, and receives updated detection rules in return.',
 d_th:'All detected threats are logged here. Malicious events are auto-blocked. Suspicious events may require your attention.',
 d_gd:'Follow these steps to activate full protection. Once all steps are complete, Panguard Guard will continuously monitor and protect your system.',
@@ -1445,7 +1445,7 @@ l2:'Layer 2: Fingerprint & Heuristic (Local, zero-config)',l2desc:'Behavioral fi
 l3:'Layer 3: Cloud AI (Most powerful analysis)',l3desc:'Cloud models for the deepest analysis of complex threats. Only used when Layer 1+2 are inconclusive. Requires your own API key.',
 provider:'Provider',endpoint:'Endpoint',model:'Model',api_key:'API Key',custom_ep:'Custom Endpoint',ep_note:'Use custom endpoint for self-hosted models, API proxies, or enterprise gateways. Leave empty for default.',key_note:'Keys are stored locally in ~/.panguard-guard/config.json and never sent to Panguard servers.',
 save:'Save Configuration',reload:'Reload',
-ru_atr_d:'Agent Threat Rules (AI-drafted)',ru_auto:'Rules sync automatically every hour from Threat Cloud.',
+ru_atr_d:'Agent Threat Rules (AI-drafted)',ru_auto:'Rules sync automatically every 5 minutes from Threat Cloud.',
 what_atr:'What is ATR?',atr_title:'Agent Threat Rules (ATR)',atr_desc:'ATR rules are automatically drafted by AI when your guard engine detects recurring threat patterns (5+ events from 2+ sources within 6 hours). These draft rules are submitted to Threat Cloud for community review, then distributed to all Panguard users after validation.',
 atr_stats:'ATR Activity',atr_matches:'ATR Matches',atr_drafted:'Patterns Drafted',atr_submitted:'Proposals Submitted',
 contrib_title:'Your Community Contribution',contrib_desc:'Every ATR proposal your device submits helps protect the entire Panguard community. Proposals are reviewed and validated before distribution. Contributing is automatic and anonymous.',
