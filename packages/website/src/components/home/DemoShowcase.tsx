@@ -4,25 +4,36 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
-const DEMOS = [
+const DEMOS: readonly { key: string; image: string; alt: string; width: number; height: number }[] = [
   {
-    key: 'clean' as const,
-    image: '/demo/demo-clean.png',
-    alt: 'PanGuard scanner showing clean scan result for anthropics/claude-code',
+    key: 'dashboard',
+    image: '/demo/guard-dashboard.png',
+    alt: 'PanGuard Guard Dashboard — 188 rules active, real-time protection status, 3-layer detection',
+    width: 1440,
+    height: 900,
   },
   {
-    key: 'mcp' as const,
-    image: '/demo/demo-mcp.png',
-    alt: 'PanGuard detecting hardcoded secrets in MCP config',
+    key: 'rules',
+    image: '/demo/guard-rules.png',
+    alt: 'PanGuard Detection Rules — 188 ATR rules, auto-sync from Threat Cloud, community contribution',
+    width: 1440,
+    height: 900,
   },
-] as const;
+  {
+    key: 'threatcloud',
+    image: '/demo/guard-threat-cloud.png',
+    alt: 'PanGuard Threat Cloud — anonymous threat intelligence sharing, 176 rules received',
+    width: 1440,
+    height: 900,
+  },
+];
 
 export default function DemoShowcase() {
   const t = useTranslations('home.demo');
   const [active, setActive] = useState(0);
 
   return (
-    <section className="relative px-5 sm:px-6 py-12 sm:py-16 border-b border-border/30 bg-surface-2/20">
+    <section className="relative px-5 sm:px-6 py-12 sm:py-20 border-b border-border/30">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
           <p className="text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold mb-3">
@@ -33,7 +44,7 @@ export default function DemoShowcase() {
         </div>
 
         {/* Tab buttons */}
-        <div className="flex justify-center gap-3 mb-6">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
           {DEMOS.map((demo, i) => (
             <button
               key={demo.key}
@@ -51,17 +62,15 @@ export default function DemoShowcase() {
         </div>
 
         {/* Screenshot */}
-        <div className="relative rounded-xl overflow-hidden border border-border shadow-2xl">
+        <div className="relative rounded-xl overflow-hidden border border-border/50 shadow-2xl bg-[#0a0a0a]">
           <Image
             src={DEMOS[active].image}
             alt={DEMOS[active].alt}
-            width={1440}
-            height={900}
+            width={DEMOS[active].width}
+            height={DEMOS[active].height}
             className="w-full h-auto"
             priority={active === 0}
           />
-          {/* Overlay gradient at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0e0f0e] to-transparent pointer-events-none" />
         </div>
 
         {/* Caption */}
