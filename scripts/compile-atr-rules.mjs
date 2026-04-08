@@ -14,7 +14,8 @@ const require = createRequire(import.meta.url);
 const yaml = require('js-yaml');
 
 const ROOT = resolve(import.meta.url.replace('file://', ''), '..', '..');
-const RULES_DIR = join(ROOT, 'packages', 'atr', 'rules');
+// Rules come from agent-threat-rules npm package (not forked packages/atr/rules)
+const RULES_DIR = join(ROOT, 'node_modules', 'agent-threat-rules', 'rules');
 const OUTPUT = join(ROOT, 'packages', 'website', 'src', 'lib', 'atr-rules-compiled.json');
 
 /** Recursively collect all .yaml files under a directory */
