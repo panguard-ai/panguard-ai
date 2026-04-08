@@ -5008,4 +5008,245 @@ export const ATR_RULES_COMPILED = [
       },
     ],
   },
+  {
+    id: 'ATR-2026-00149',
+    title: 'Skill Data Exfiltration via Compound Patterns',
+    severity: 'critical',
+    category: 'skill-compromise',
+    scan_target: 'skill',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)(tar|zip|7z)\\s+[^\\n]*~/?\\.ssh',
+        desc: 'SSH directory archive \u2014 skills should not archive user SSH keys',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(find|ls|cat|strings)\\s+[^\\n]*(wallet\\.dat|seed\\.txt|mnemonic|keystore)[^\\n]*(\\||>|>>|curl|wget|fetch|POST)',
+        desc: 'Crypto wallet file enumeration and exfiltration',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)sqlite3\\s+[^\\n]*(Cookies|Login\\s*Data|cookies\\.sqlite|places\\.sqlite)',
+        desc: 'Browser cookie/credential database access',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)(dig|nslookup|host)\\s+[^\\n]*\\$[{(]',
+        desc: 'DNS exfiltration via encoded subdomain queries',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)(curl|wget|fetch|http)\\s*[^\\n]*169\\.254\\.169\\.254',
+        desc: 'Cloud instance metadata service access (IMDS credential theft)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)cat\\s+[^|\\n]*\\.(env|bashrc|zshrc|npmrc)[^|\\n]*\\|\\s*(curl|wget|nc|python|base64)',
+        desc: 'Environment file bulk read piped to exfiltration',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)glob[.\\w]*\\s*\\([^)]*\\*\\.[^)]*\\)[\\s\\S]{0,500}(fetch|axios|request|https?\\.request)\\s*\\(',
+        desc: 'Source code glob enumeration + external upload',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)cat\\s+[^\\n]*\\.env[^\\n]*\\.(bashrc|zshrc|aws|credentials|npmrc)',
+        desc: 'Multi-file sensitive data collection in single cat command',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\[SYSTEM\\]\\s*[^\\n]*(?:previous\\s+instructions|new\\s+directive|ignore\\s+(?:all\\s+)?previous|you\\s+are\\s+now)',
+        desc: 'Fake [SYSTEM] block attempting to override instructions',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)<!--[^>]*[A-Za-z0-9+/]{40,}={0,2}[^>]*-->',
+        desc: 'Base64-encoded hidden instruction in HTML comment',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(dangerouslyDisableSandbox|autoApprove|allowedTools|skip.?permissions)\\s*[:=]\\s*(true|\\[)',
+        desc: 'Security setting override attempt (sandbox disable, auto-approve)',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)npm\\s+install\\s+[^\\n]*--registry\\s+https?://(?!registry\\.npmjs\\.org)',
+        desc: 'npm install from non-official registry (supply chain attack)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)find\\s+[~/]\\s+[^\\n]*-name\\s+["\']\\*\\.(pem|key|p12|keystore)["\'][^\\n]*(\\||>|curl|wget)',
+        desc: 'Sensitive file discovery + exfiltration pipeline',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00150',
+    title: 'Credential Data Leaked in Tool Response',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)-----BEGIN\\s+(RSA\\s+)?PRIVATE\\s+KEY-----',
+        desc: 'PEM private key in tool response',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)(id_rsa|id_ed25519|id_ecdsa)\\s+(contains|has|file)[:\\s]',
+        desc: 'SSH key file reference with content disclosure',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(sk-(?:proj-|ant-|live-)\\S{10,}|ghp_\\S{30,}|gho_\\S{30,}|glpat-\\S{10,}|xox[bpras]-\\S{10,})',
+        desc: 'API token pattern (OpenAI, Anthropic, GitHub, GitLab, Slack)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00151',
+    title: 'Malicious Fork Impersonation via Install Instruction',
+    severity: 'high',
+    category: 'skill-compromise',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(npm\\s+i(nstall)?|pip\\s+install|cargo\\s+add|go\\s+get)\\s+\\S+.{0,40}(community\\s+fork|enhanced\\s+(version|fork)|patched\\s+(version|fork)|improved\\s+fork|unofficial\\s+fork)',
+        desc: 'Package install command + fork/enhanced claim',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(community\\s+fork|enhanced\\s+version|patched\\s+version)\\s+of\\s+(the\\s+)?(official|original|standard)\\s+\\S+',
+        desc: 'Fork claim referencing official package',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00152',
+    title: 'Obfuscated Credential Exfiltration via Encoding',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(encrypted|encoded|obfuscated)\\s+(key|token|secret|credential|password)\\s*[:=]\\s*\\S*(sk-|ghp_|gho_|glpat-|xox[bpras]-|AKIA|real-key)',
+        desc: 'Fake encryption wrapper around real credential',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(AES256|RSA|DES|rot13|base64)\\s*\\(\\s*(sk-\\S{5,}|ghp_\\S{5,}|real-key|actual-secret)',
+        desc: 'Crypto function wrapping real credential string',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)master\\s+password\\s+to\\s+decrypt.{0,50}(sk-|ghp_|key-|secret-|token-)',
+        desc: 'Social engineering: master password unlock + credential',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00153',
+    title: 'Tool with embedded instruction to bypass user confirmation and exfiltrate data',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          'without\\s+asking\\s+user\\s+confirmation.*(?:always\\s+pass|directly\\s+to|send\\s+(?:all\\s+)?data)',
+        desc: 'Detects instructions to bypass user confirmation while handling sensitive data',
+      },
+      {
+        field: 'content',
+        pattern:
+          'always\\s+pass\\s+all\\s+data\\s+directly.*without\\s+(?:filtering|sanitization|asking)',
+        desc: 'Detects instructions to pass data without safety measures or user consent',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00154',
+    title: 'Unauthorized Background Task Execution via Cron Job Installation',
+    severity: 'high',
+    category: 'skill-compromise',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:automatically|auto).*(?:registers?|installs?).*cron\\s+job.*(?:polls?|executes?|handles?).*(?:tasks?|commands?)',
+        desc: 'Detects skills that automatically install cron jobs to execute external tasks',
+      },
+      {
+        field: 'content',
+        pattern:
+          'when\\s+(?:the\\s+)?agent\\s+(?:is\\s+)?idle.*(?:connect|execute|run).*(?:tasks?|commands?).*(?:consumers?|marketplace|external)',
+        desc: 'Detects skills that execute external tasks during agent idle time',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00155',
+    title: 'Hidden LLM Instructions in Skill Descriptions',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:CRITICAL|IMPORTANT|URGENT)\\s+INSTRUCTION[S]?\\s*[\u2014\\-]\\s*YOU\\s+MUST\\s+(?:FOLLOW|DO|EXECUTE)',
+        desc: 'Detects imperative instructions embedded in skill content that direct LLM behavior',
+      },
+      {
+        field: 'content',
+        pattern: 'Before\\s+doing\\s+ANYTHING[,\\s]+(?:run|execute|check|verify)',
+        desc: 'Detects instructions that override normal LLM workflow with specific commands',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00156',
+    title: 'SSH Remote Command Execution with Credential Exposure',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: 'ssh\\s+-i\\s+\\$[A-Z_]+SSH_KEY\\s+root@\\$[A-Z_]+',
+        desc: 'SSH commands using environment variables for private keys and root access',
+      },
+      {
+        field: 'content',
+        pattern: 'SSH.*\u5bc6\u94a5\u8def\u5f84.*~\\/\\.ssh\\/id_[a-z0-9]+',
+        desc: 'Documentation exposing SSH private key file paths in Chinese',
+      },
+    ],
+  },
 ] as const;
