@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
-    "@panguard-ai/atr": "workspace:*"
+    "@panguard-ai/atr": "workspace:*",
+    "agent-threat-rules": "^1.0.1"
   },
   "peerDependencies": {
     "@panguard-ai/atr": "workspace:*"

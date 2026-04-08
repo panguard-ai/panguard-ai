@@ -35,10 +35,15 @@ function resolveBundledRulesDir(): string | null {
   // Strategy 1: resolve agent-threat-rules npm package (upstream source of truth)
   try {
     const req1 = createRequire(import.meta.url);
-    // Resolve main entry then walk up to package root
     const atrMain = req1.resolve('agent-threat-rules');
-    const atrRoot = join(dirname(atrMain), '..');
-    if (existsSync(join(atrRoot, 'rules'))) return join(atrRoot, 'rules');
+    // Walk up from dist/index.js to package root, trying multiple depths
+    let dir = dirname(atrMain);
+    for (let depth = 0; depth < 5; depth++) {
+      if (existsSync(join(dir, 'rules')) && existsSync(join(dir, 'package.json'))) {
+        return join(dir, 'rules');
+      }
+      dir = dirname(dir);
+    }
   } catch {
     /* continue to next strategy */
   }
