@@ -23,9 +23,9 @@
 
 ---
 
-> AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We scanned **53,377 MCP skills**. 11% triggered security rules: 3,255 CRITICAL, 2,656 HIGH. Credential harvesting. Reverse shells. Prompt injection. [Live numbers](https://panguard.ai).
+> AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We scanned **36,394 MCP skills**. 182 CRITICAL, 1,124 HIGH. Credential harvesting. Reverse shells. Prompt injection. [Live numbers](https://panguard.ai).
 >
-> AI Agent 擁有完整系統權限，卻沒有任何審核。我們掃描了 **53,377 個 MCP skills**，11% 觸發了安全規則。即時數據見 [panguard.ai](https://panguard.ai)。
+> AI Agent 擁有完整系統權限，卻沒有任何審核。我們掃描了 **36,394 個 MCP skills**，182 個 CRITICAL、1,124 個 HIGH。即時數據見 [panguard.ai](https://panguard.ai)。
 >
 > **Proof points:** [Cisco AI Defense merged 34 ATR rules](https://github.com/cisco-ai-defense/skill-scanner/pull/79) | [OWASP Agentic Top 10 PR #814](https://github.com/OWASP/www-project-top-10-for-large-language-model-applications/pull/814) | 23,000+ npm downloads
 
@@ -73,7 +73,7 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
 </p>
 
 <p align="center">
-<img src="assets/screenshot-rules.png" alt="Rules — 71 ATR detection rules, community contribution" width="720">
+<img src="assets/screenshot-rules.png" alt="Rules — 100 ATR detection rules, community contribution" width="720">
 </p>
 
 <p align="center">
@@ -129,17 +129,17 @@ Agent ←→ [PanGuard Proxy] ←→ Real MCP Server
 
 ---
 
-## Ecosystem Scan (53,377 skills)
+## Ecosystem Scan (36,394 skills)
 
-We scanned the two largest MCP skill registries: OpenClaw (50,285) and Skills.sh (3,115).
+We scanned the two largest MCP skill registries.
 
 |                | Count           |
 | -------------- | --------------- |
-| Skills scanned | 53,377          |
-| Clean          | 47,438 (88.87%) |
-| **CRITICAL**   | 3,255           |
-| **HIGH**       | 2,656           |
-| **MEDIUM**     | 28              |
+| Skills scanned | 36,394          |
+| Clean          | 26,718 (73.39%) |
+| **CRITICAL**   | 182             |
+| **HIGH**       | 1,124           |
+| **MEDIUM**     | 1,016           |
 
 Raw data: [ecosystem-report.csv](https://github.com/Agent-Threat-Rule/agent-threat-rules/tree/main/data/clawhub-scan) (open source)
 
