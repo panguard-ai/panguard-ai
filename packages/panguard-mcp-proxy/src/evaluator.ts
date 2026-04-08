@@ -17,26 +17,33 @@ import { createRequire } from 'node:module';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
-/** Find bundled ATR rules directory */
+/** Find bundled ATR rules directory from agent-threat-rules npm package */
 function findRulesDir(): string {
-  // Try monorepo path
-  const monorepo = resolve(__dirname, '..', '..', 'atr', 'rules');
-  if (existsSync(monorepo)) return monorepo;
-
-  // Try node_modules via createRequire
+  // Strategy 1: resolve agent-threat-rules main, walk up to package root
   try {
-    const pkg = require.resolve('@panguard-ai/atr/package.json');
-    const candidate = resolve(dirname(pkg), 'rules');
-    if (existsSync(candidate)) return candidate;
+    const atrMain = require.resolve('agent-threat-rules');
+    let dir = dirname(atrMain);
+    for (let depth = 0; depth < 5; depth++) {
+      if (existsSync(resolve(dir, 'rules')) && existsSync(resolve(dir, 'package.json'))) {
+        return resolve(dir, 'rules');
+      }
+      dir = dirname(dir);
+    }
   } catch {
     /* continue */
   }
 
-  // Fallback: global ATR install
-  const global = resolve(__dirname, '..', '..', '..', 'agent-threat-rules', 'rules');
-  if (existsSync(global)) return global;
+  // Strategy 2: walk up from this module to find node_modules/agent-threat-rules/rules
+  let dir = __dirname;
+  for (let i = 0; i < 10; i++) {
+    const candidate = resolve(dir, 'node_modules', 'agent-threat-rules', 'rules');
+    if (existsSync(candidate)) return candidate;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
 
-  throw new Error('Cannot find ATR rules directory. Install @panguard-ai/atr.');
+  throw new Error('Cannot find ATR rules directory. Install agent-threat-rules.');
 }
 
 export interface EvalResult {

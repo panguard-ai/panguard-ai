@@ -127,9 +127,9 @@ describe('scanCommand', () => {
       expect(targetOpt!.flags).toContain('<host>');
     });
 
-    it('should have exactly 7 options', () => {
+    it('should have exactly 9 options', () => {
       const cmd = scanCommand();
-      expect(cmd.options).toHaveLength(7);
+      expect(cmd.options).toHaveLength(9);
     });
 
     it('should define --save option for saving JSON results to file', () => {
