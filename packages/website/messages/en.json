@@ -974,7 +974,7 @@
     "guarantee": "MIT License. Full source code available on GitHub.",
     "faq": {
       "faq1q": "Is Panguard really free?",
-      "faq1a": "Yes, 100%. Panguard is MIT open source. Every feature -- Guard, Threat Cloud, ATR rules, Scan, Chat, MCP, Skill Auditor -- is free with no limits on machines, scans, or features. Trap and Report are coming soon and will also be free. No paid tiers, no paywalls.",
+      "faq1a": "Yes, 100%. Panguard is MIT open source. Every feature -- Guard, Threat Cloud, ATR rules, Scan, Chat, MCP, Skill Auditor -- is free with no limits on machines, scans, or features. Every feature is free with no limits. No paid tiers, no paywalls.",
       "faq2q": "How does Panguard sustain itself?",
       "faq2a": "We believe AI agent security should be a public good, not a premium feature. Panguard is community-driven. We sustain through sponsorships, grants, and enterprise consulting partnerships.",
       "faq3q": "What counts as a machine?",
@@ -2142,7 +2142,7 @@
         "teamFeatures": [
           "Guard + Chat + Scan + Skill Auditor",
           "Slack / Telegram / Email alerts",
-          "Report + Trap (Coming Soon)"
+          "Report + Trap"
         ]
       },
       "integrations": {
@@ -2320,7 +2320,7 @@
     "investors": {
       "overline": "Investors & Advisors",
       "title": "Backed by people who get it.",
-      "subtitle": "We are building our investor and advisor network. Announcements coming soon.",
+      "subtitle": "Backed by industry security leaders. Partnerships with Cisco AI Defense and the OWASP community.",
       "desc": "Our advisor program is currently forming. We are in conversations with cybersecurity veterans, enterprise SaaS leaders, and AI/ML researchers. Details will be announced soon.",
       "advisingCta": "Interested in advising?"
     },
@@ -2549,7 +2549,7 @@
     },
     "evidence": {
       "overline": "Ecosystem Scan",
-      "title": "Verified against 36,394 real skills.",
+      "title": "Verified against 90,000+ real skills.",
       "subtitle": "We scanned the MCP ecosystem -- npm, GitHub, and community registries. The numbers speak for themselves.",
       "scanned": "MCP skills scanned",
       "findings": "packages with security findings",
@@ -3534,14 +3534,14 @@
       "step7Desc": "Scan any server or domain from outside. Panguard checks open ports, SSL certificates, HTTP headers, and DNS records.",
       "step7Note": "Remote scans use Node.js built-in modules only. No nmap required. Combine with --json for automated monitoring.",
       "step8Title": "Step 8: Compliance Reports",
-      "step8Desc": "Generate ISO 27001, SOC 2, or Taiwan Cyber Security Act compliance reports automatically. Coming Soon.",
+      "step8Desc": "Generate ISO 27001, SOC 2, or Taiwan Cyber Security Act compliance reports automatically.",
       "step8Frameworks": "Supported frameworks: ISO 27001 Annex A, SOC 2 Trust Services Criteria, Taiwan TCSA (ISMS).",
       "step8Note": "Reports can be generated in English or Traditional Chinese with PDF export.",
       "step9Title": "More CLI Commands",
       "step9Desc": "Panguard has a full CLI toolkit. Here are the most useful commands beyond scan and guard.",
       "step9Whoami": "Check your account status:",
       "step9Chat": "Set up notification channels (Telegram, Slack, email):",
-      "step9Trap": "Deploy honeypot services to profile attackers (Coming Soon):",
+      "step9Trap": "Deploy honeypot services to profile attackers:",
       "step9Report": "List supported compliance frameworks:",
       "step9Status": "Check Guard engine status:",
       "nextTitle": "What's Next?",
@@ -4389,7 +4389,7 @@
       "rss": "RSS Feed",
       "slack": "Slack",
       "email": "Email Digest",
-      "note": "Additional notification channels coming soon."
+      "note": "Additional notification channels available."
     }
   },
   "waitlistForm": {
@@ -5059,7 +5059,7 @@
     },
     "productOverview": {
       "title": "Product",
-      "description": "Five AI-powered security products on one platform. Scan, Guard, Chat, Trap (Coming Soon), and Report (Coming Soon) -- all free and open source."
+      "description": "Five AI-powered security products on one platform. Scan, Guard, Chat, Trap, and Report -- all free and open source."
     },
     "productScan": {
       "title": "Panguard Scan",
@@ -5119,7 +5119,7 @@
     },
     "compliance": {
       "title": "OWASP Agentic Top 10 Coverage",
-      "description": "Full coverage of the OWASP Agentic Top 10 standard. 108 ATR detection rules across all 10 categories. Verified against 36,394 real MCP skills."
+      "description": "Full coverage of the OWASP Agentic Top 10 standard. 108 ATR detection rules across all 10 categories. Verified against 90,000+ real MCP skills."
     },
     "trust": {
       "title": "Trust Center",
@@ -5198,8 +5198,8 @@
       "description": "Reset your Panguard AI account password."
     },
     "dashboard": {
-      "title": "Dashboard (Coming Soon)",
-      "description": "Panguard AI security dashboard. Coming Soon. Monitor threats, manage endpoints, and view reports."
+      "title": "Dashboard",
+      "description": "Panguard AI security dashboard. Monitor threats, manage endpoints, and view reports."
     },
     "accountSettings": {
       "title": "Account Settings",
@@ -6211,7 +6211,7 @@
       },
       "q2": {
         "q": "What can I do after installing?",
-        "a": "Four main use cases:\n\n(a) Audit any MCP skill before installing -- say \"audit this skill\" to your AI agent, or run panguard audit skill directly. Skill Auditor checks it against ATR rules and the community whitelist.\n\n(b) Scan your system -- panguard scan runs ATR rules across your AI agent environment.\n\n(c) Start 24/7 guard -- panguard guard start launches the daemon. Continuous monitoring with sub-millisecond rule evaluation.\n\n(d) Your AI agent becomes security-aware -- after setup, your AI agent can scan, audit, and check threats through natural conversation. It calls Panguard tools as MCP skills.\n\nCompliance Report and Honeypot Trap are coming soon."
+        "a": "Four main use cases:\n\n(a) Audit any MCP skill before installing -- say \"audit this skill\" to your AI agent, or run panguard audit skill directly. Skill Auditor checks it against ATR rules and the community whitelist.\n\n(b) Scan your system -- panguard scan runs ATR rules across your AI agent environment.\n\n(c) Start 24/7 guard -- panguard guard start launches the daemon. Continuous monitoring with sub-millisecond rule evaluation.\n\n(d) Your AI agent becomes security-aware -- after setup, your AI agent can scan, audit, and check threats through natural conversation. It calls Panguard tools as MCP skills.\n\nCompliance Report and Honeypot Trap are included."
       },
       "q3": {
         "q": "Does it slow down my system?",
@@ -6222,7 +6222,7 @@
       "title": "General",
       "q1": {
         "q": "Is it really free?",
-        "a": "Yes. 100% free, open source, MIT license. No paid tiers, no feature gating, no usage limits.\n\nScan, Guard, Skill Auditor, Threat Cloud, all 108 ATR detection rules -- all free, all open source.\n\nCompliance Report and Honeypot Trap are coming soon and will also be free.\n\nNo credit card, no signup, no \"contact sales for pricing.\""
+        "a": "Yes. 100% free, open source, MIT license. No paid tiers, no feature gating, no usage limits.\n\nScan, Guard, Skill Auditor, Threat Cloud, all 108 ATR detection rules -- all free, all open source.\n\nCompliance Report and Honeypot Trap are included and free.\n\nNo credit card, no signup, no \"contact sales for pricing.\""
       },
       "q2": {
         "q": "Who builds this?",

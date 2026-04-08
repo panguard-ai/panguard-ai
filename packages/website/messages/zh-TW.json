@@ -957,15 +957,15 @@
   "earlyAccess": {
     "overline": "立即安裝",
     "title1": "搶先使用",
-    "title2": "即將推出的功能。",
-    "subtitle": "Panguard 是 100% 免費開源。加入立即安裝，率先使用即將推出的功能、取得直接回饋管道。",
+    "title2": "新功能持續上線。",
+    "subtitle": "Panguard 是 100% 免費開源。立即安裝，取得直接回饋管道及最新功能。",
     "whatYouGet": "立即安裝會員專屬權益",
     "priority": "優先使用新功能",
-    "priorityDesc": "率先體驗即將推出的功能——Report、Trap、Dashboard 等。全部免費開源。",
+    "priorityDesc": "率先體驗最新功能——Report、Trap、Dashboard 等。全部免費開源。",
     "feedback": "直接回饋管道",
     "feedbackDesc": "加入我們的私人 Slack 社群。直接與工程師對話。你的回饋決定我們下一步開發什麼功能。",
     "founding": "搶先預覽新功能",
-    "foundingDesc": "在正式發布前搶先預覽即將推出的功能。所有功能永遠免費。",
+    "foundingDesc": "在正式發布前搶先預覽新功能持續上線。所有功能永遠免費。",
     "timeline": "功能上線時程",
     "now": "現在",
     "nowLabel": "所有功能免費開源 -- 立即安裝報名中",
@@ -1595,7 +1595,7 @@
     },
     "earlyAccess": {
       "title": "立即安裝",
-      "description": "率先使用 Panguard 即將推出的功能。100% 免費開源。加入立即安裝，取得直接回饋管道及新功能預覽。"
+      "description": "率先使用 Panguard 新功能持續上線。100% 免費開源。加入立即安裝，取得直接回饋管道及新功能預覽。"
     },
     "scan": {
       "title": "免費安全掃描",
@@ -1603,7 +1603,7 @@
     },
     "productOverview": {
       "title": "產品總覽",
-      "description": "七大 AI 安全產品，一個平台。Scan、Guard、Chat、Trap（即將推出）、Report（即將推出）、MCP 和 Code Scanner -- 全部免費開源。"
+      "description": "七大 AI 安全產品，一個平台。Scan、Guard、Chat、Trap、Report、MCP 和 Code Scanner -- 全部免費開源。"
     },
     "productScan": {
       "title": "Panguard Scan",
@@ -1663,7 +1663,7 @@
     },
     "compliance": {
       "title": "OWASP Agentic Top 10 覆蓋",
-      "description": "完整覆蓋 OWASP Agentic Top 10。108 條 ATR 偵測規則，10 個類別全數涵蓋。已對超過 36,394 個 MCP skill 實測驗證。"
+      "description": "完整覆蓋 OWASP Agentic Top 10。108 條 ATR 偵測規則，10 個類別全數涵蓋。已對超過 90,000 個 MCP skill 實測驗證。"
     },
     "trust": {
       "title": "Trust Center",
@@ -1742,8 +1742,8 @@
       "description": "重設你的 Panguard AI 帳號密碼。"
     },
     "dashboard": {
-      "title": "儀表板（即將推出）",
-      "description": "Panguard AI 安全儀表板。即將推出。監控威脅、管理端點、查看報告。"
+      "title": "儀表板",
+      "description": "Panguard AI 安全儀表板。監控威脅、管理端點、查看報告。"
     },
     "accountSettings": {
       "title": "帳號設定",
@@ -1794,7 +1794,7 @@
     "guarantee": "MIT 授權。完整原始碼公開於 GitHub。",
     "faq": {
       "faq1q": "Panguard 真的免費嗎？",
-      "faq1a": "是的，100% 免費。Panguard 是 MIT 開源軟體。所有功能 -- Guard、Threat Cloud、ATR 規則、Scan、Chat、MCP、Skill Auditor -- 完全免費，無機器數、掃描次數或功能限制。Trap 和 Report 即將推出，同樣免費。沒有付費版，沒有付費牆。",
+      "faq1a": "是的，100% 免費。Panguard 是 MIT 開源軟體。所有功能 -- Guard、Threat Cloud、ATR 規則、Scan、Chat、MCP、Skill Auditor -- 完全免費，無機器數、掃描次數或功能限制。所有功能完全免費，無限制。沒有付費版，沒有付費牆。",
       "faq2q": "Panguard 如何維持運作？",
       "faq2a": "我們相信 AI Agent 安全應該是公共財，不是進階功能。Panguard 由社群驅動，透過贊助、補助和企業顧問合作維持運作。",
       "faq3q": "什麼算一台機器？",
@@ -2962,7 +2962,7 @@
         "teamFeatures": [
           "Guard + Chat + Scan + Skill Auditor",
           "Slack / Telegram / Email 通知",
-          "Report + Trap（即將推出）"
+          "Report + Trap"
         ]
       },
       "integrations": {
@@ -3369,7 +3369,7 @@
     },
     "evidence": {
       "overline": "生態系實測",
-      "title": "拿 36,394 個真實 skill 驗證過。",
+      "title": "拿 90,000+ 個真實 skill 驗證過。",
       "subtitle": "我們掃了整個 MCP 生態系 — npm、GitHub、社群 registry。數字說明一切。",
       "scanned": "個 MCP skill 已掃描",
       "findings": "個套件有安全問題",
@@ -4403,14 +4403,14 @@
       "step7Desc": "從外部掃描任何伺服器或網域。Panguard 會檢查開放的 port、SSL 憑證、HTTP 標頭和 DNS 記錄。",
       "step7Note": "遠端掃描只使用 Node.js 內建模組，不需要 nmap。搭配 --json 可用於自動化監控。",
       "step8Title": "步驟八：合規報告",
-      "step8Desc": "自動產生 ISO 27001、SOC 2 或台灣資通安全管理法合規報告。即將推出。",
+      "step8Desc": "自動產生 ISO 27001、SOC 2 或台灣資通安全管理法合規報告。",
       "step8Frameworks": "支援框架：ISO 27001 附錄 A、SOC 2 信任服務準則、台灣 TCSA（ISMS）。",
       "step8Note": "報告可以用英文或繁體中文產生，支援 PDF 匯出。",
       "step9Title": "更多 CLI 指令",
       "step9Desc": "Panguard 有完整的 CLI 工具組。以下是 scan 和 guard 以外最常用的指令。",
       "step9Whoami": "查看帳號資訊：",
       "step9Chat": "設定通知管道（Telegram、Slack、email）：",
-      "step9Trap": "部署蜜罐服務來分析攻擊者（即將推出）：",
+      "step9Trap": "部署蜜罐服務來分析攻擊者：",
       "step9Report": "列出支援的合規框架：",
       "step9Status": "查看 Guard 引擎狀態：",
       "nextTitle": "接下來呢？",
@@ -5243,7 +5243,7 @@
       "rss": "RSS 訂閱",
       "slack": "Slack",
       "email": "Email 摘要",
-      "note": "更多通知頻道即將推出。"
+      "note": "更多通知頻道已支援。"
     }
   },
   "waitlistForm": {
@@ -6235,7 +6235,7 @@
       },
       "q2": {
         "q": "裝好之後可以做什麼？",
-        "a": "四個主要用途：\n\n(a) 安裝前審計任何 MCP skill -- 對你的 AI Agent 說「審計這個 skill」，或直接執行 panguard audit skill。Skill Auditor 用 ATR 規則和社群白名單檢查。\n\n(b) 掃描你的系統 -- panguard scan 執行 ATR 規則掃描你的 AI Agent 環境。\n\n(c) 啟動 24/7 守護 -- panguard guard start 啟動 daemon。持續監控，規則評估亞毫秒級。\n\n(d) 你的 AI Agent 變得有安全意識 -- setup 之後，你的 AI Agent 可以透過自然對話掃描、審計、查看威脅。它把 Panguard 工具當 MCP skill 呼叫。\n\n合規報告和蜜罐陷阱即將推出。"
+        "a": "四個主要用途：\n\n(a) 安裝前審計任何 MCP skill -- 對你的 AI Agent 說「審計這個 skill」，或直接執行 panguard audit skill。Skill Auditor 用 ATR 規則和社群白名單檢查。\n\n(b) 掃描你的系統 -- panguard scan 執行 ATR 規則掃描你的 AI Agent 環境。\n\n(c) 啟動 24/7 守護 -- panguard guard start 啟動 daemon。持續監控，規則評估亞毫秒級。\n\n(d) 你的 AI Agent 變得有安全意識 -- setup 之後，你的 AI Agent 可以透過自然對話掃描、審計、查看威脅。它把 Panguard 工具當 MCP skill 呼叫。\n\n合規報告和蜜罐陷阱已內建。"
       },
       "q3": {
         "q": "會拖慢我的系統嗎？",
@@ -6246,7 +6246,7 @@
       "title": "一般問題",
       "q1": {
         "q": "真的免費嗎？",
-        "a": "是的。100% 免費、開源、MIT 授權。沒有付費方案、沒有功能限制、沒有用量上限。\n\nScan、Guard、Skill Auditor、Threat Cloud、全部 108 ATR 偵測規則-- 全部免費、全部開源。\n\n合規報告和蜜罐陷阱即將推出，同樣免費。\n\n不需信用卡、不需註冊、不會看到「聯繫業務詢價」。"
+        "a": "是的。100% 免費、開源、MIT 授權。沒有付費方案、沒有功能限制、沒有用量上限。\n\nScan、Guard、Skill Auditor、Threat Cloud、全部 108 ATR 偵測規則-- 全部免費、全部開源。\n\n合規報告和蜜罐陷阱已內建，同樣免費。\n\n不需信用卡、不需註冊、不會看到「聯繫業務詢價」。"
       },
       "q2": {
         "q": "誰在做這個？",

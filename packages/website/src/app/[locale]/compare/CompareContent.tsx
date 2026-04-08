@@ -131,7 +131,7 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
     bullets: [
       'Snyk excels at finding vulnerabilities in your dependencies and container images. But it has no concept of MCP skills or AI agent tools.',
       "A malicious MCP skill doesn't have a CVE \u2014 it's a new class of threat that Snyk's vulnerability database doesn't cover.",
-      "PanGuard's Skill Auditor is Snyk for the AI agent era: pre-install scanning with 71 ATR rules.",
+      "PanGuard's Skill Auditor is Snyk for the AI agent era: pre-install scanning with 108 ATR rules.",
       "Use Snyk for your code, PanGuard for your agent's tools.",
     ],
   },
@@ -140,7 +140,7 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
     tagline: 'They filter prompts. We secure the entire agent.',
     bullets: [
       'Lakera focuses on prompt-level filtering \u2014 blocking injection attacks in LLM inputs and outputs.',
-      'PanGuard covers the full attack surface: prompt injection (22 rules) + tool poisoning (11) + skill compromise (7) + agent manipulation (6) + 5 more categories.',
+      'PanGuard covers the full attack surface: prompt injection (33 rules) + skill compromise (22) + context exfiltration (14) + agent manipulation (12) + tool poisoning (11) + privilege escalation (8) + 3 more categories. 108 rules total.',
       'Lakera is a firewall (input/output filter). PanGuard is an EDR (continuous monitoring + response).',
       'Lakera requires API integration. PanGuard is one command: pga setup.',
     ],
