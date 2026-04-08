@@ -73,7 +73,12 @@ for (const file of files) {
 // Sort by id for stable output
 compiled.sort((a, b) => a.id.localeCompare(b.id));
 
-writeFileSync(OUTPUT, JSON.stringify(compiled, null, 2) + '\n');
+// Escape non-ASCII to \uXXXX — webpack/Next.js mangles raw CJK in JSON imports
+const jsonStr = JSON.stringify(compiled, null, 2).replace(
+  /[\u0080-\uffff]/g,
+  (ch) => '\\u' + ch.charCodeAt(0).toString(16).padStart(4, '0'),
+);
+writeFileSync(OUTPUT, jsonStr + '\n');
 
 let totalPatterns = 0;
 for (const r of compiled) totalPatterns += r.patterns.length;
