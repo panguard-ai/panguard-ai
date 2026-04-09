@@ -410,7 +410,7 @@ BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL t
         const { createHash } = await import('node:crypto');
 
         for (const block of yamlBlocks) {
-          const ruleContent = block
+          let ruleContent = block
             .replace(/```yaml\n?/, '')
             .replace(/```$/, '')
             .trim();
