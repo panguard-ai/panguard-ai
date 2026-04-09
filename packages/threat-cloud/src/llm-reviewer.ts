@@ -280,7 +280,14 @@ QUALITY BAR (Cisco-merge level):
      owasp_agentic:
        - "ASI01:2026 - Agent Behaviour Hijack" (or appropriate category)
 
-6. OUTPUT "NO_THREATS_FOUND" for 95%+ of skills. Only flag genuinely malicious patterns.
+6. DECISION CRITERIA — output a rule or "NO_THREATS_FOUND":
+   - If the skill content contains ACTUAL malicious code (credential theft, exfiltration,
+     reverse shells, hidden instructions to bypass safety) → WRITE A RULE, even if you
+     think existing regex might already catch it. Let the dedup layer handle overlaps.
+   - If the skill is just a normal tool with broad permissions (file access, network calls)
+     but no malicious INTENT → output NO_THREATS_FOUND.
+   - When in doubt about whether something is malicious, WRITE THE RULE. False negatives
+     (missing a real attack) are worse than duplicate rules.
 
 Output format (ONLY if a SPECIFIC threat is found):
 \`\`\`yaml
