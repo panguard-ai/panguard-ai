@@ -251,6 +251,8 @@ export async function loadAllRules(
       );
     });
 
+  // Load bundled rules FIRST, then fetch cloud rules.
+  // This ensures bundledRuleIds is populated before addCloudRule dedup checks.
   atrEngine
     .loadRules()
     .then((count) => {
@@ -258,19 +260,16 @@ export async function loadAllRules(
         logger.info(`ATR rules loaded: ${count} rules / ATR 規則已載入: ${count} 條`);
       }
       atrEngine.startSessionCleanup();
-    })
-    .catch((err: unknown) => {
-      logger.warn(`ATR rules load failed: ${err instanceof Error ? err.message : String(err)}`);
-    });
 
-  threatCloud
-    .fetchATRRules()
+      // Now safe to fetch cloud rules — bundledRuleIds is populated
+      return threatCloud.fetchATRRules();
+    })
     .then((atrCloudRules) => {
       let added = 0;
       for (const rule of atrCloudRules) {
         try {
           const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
-          if (parsed.id && parsed.title && parsed.detection) {
+          if (parsed.id && parsed.title && parsed.detection && parsed.agent_source?.type) {
             atrEngine.addCloudRule(parsed);
             added++;
           }
@@ -284,7 +283,7 @@ export async function loadAllRules(
     })
     .catch((err: unknown) => {
       logger.warn(
-        `ATR cloud rules fetch skipped: ${err instanceof Error ? err.message : String(err)}`
+        `ATR rules/cloud fetch failed: ${err instanceof Error ? err.message : String(err)}`
       );
     });
 

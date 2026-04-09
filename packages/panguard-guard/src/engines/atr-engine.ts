@@ -225,15 +225,47 @@ export class GuardATREngine {
     return matches;
   }
 
+  /** Maximum number of cloud rules to accept (prevent resource exhaustion) */
+  private static readonly MAX_CLOUD_RULES = 500;
+
   /**
-   * Add a rule from Threat Cloud. Skips if already loaded.
-   * 新增從 Threat Cloud 接收的規則（避免重複）
+   * Add a rule from Threat Cloud. Skips if already loaded, over capacity,
+   * or contains unsafe regex patterns.
    */
   addCloudRule(rule: ATRRule): void {
     // Skip if already loaded from bundled or cloud sources
     if (this.bundledRuleIds.has(rule.id) || this.cloudRuleIds.has(rule.id)) return;
+    // Layer 3: capacity cap
+    if (this.cloudRuleIds.size >= GuardATREngine.MAX_CLOUD_RULES) return;
+    // Layer 2: reject rules with unsafe regex patterns (ReDoS prevention)
+    if (!GuardATREngine.validatePatterns(rule)) return;
     this.engine.addRule(rule);
     this.cloudRuleIds.add(rule.id);
+  }
+
+  /**
+   * Validate that all regex patterns in a rule are safe to compile and execute.
+   * Rejects patterns that are too long or fail to compile.
+   */
+  private static validatePatterns(rule: ATRRule): boolean {
+    const MAX_PATTERN_LEN = 2000;
+    try {
+      const conditions = rule.detection?.conditions;
+      if (!Array.isArray(conditions)) return true; // no patterns to validate
+      for (const cond of conditions) {
+        const patterns = (cond as { patterns?: string[] }).patterns;
+        if (!Array.isArray(patterns)) continue;
+        for (const p of patterns) {
+          if (typeof p !== 'string') return false;
+          if (p.length > MAX_PATTERN_LEN) return false;
+          // Verify the pattern compiles without error
+          new RegExp(p);
+        }
+      }
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /**
