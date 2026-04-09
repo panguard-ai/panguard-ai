@@ -22,7 +22,7 @@ export const pressItems: PressItem[] = [
     type: 'press-release',
     date: '2026-01-15',
     excerpt:
-      'Taipei-based cybersecurity startup Panguard AI has raised its seed round to accelerate development of its AI-powered endpoint security platform.',
+      'Taipei-based cybersecurity startup Panguard AI has raised its seed round to accelerate development of its AI agent security platform.',
   },
   {
     slug: 'soc2-certification',

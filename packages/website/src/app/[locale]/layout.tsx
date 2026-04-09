@@ -96,16 +96,17 @@ const jsonLd = [
     url: 'https://panguard.ai',
     logo: 'https://panguard.ai/favicon.png',
     description:
-      'AI-powered endpoint security for developers and SMBs. Automated threat detection, compliance reporting, and incident response.',
+      'AI agent security for developers. Scan MCP skills, detect prompt injection and tool poisoning, protect AI agents in real time.',
     foundingDate: '2024',
     knowsAbout: [
-      'endpoint security',
-      'intrusion detection',
-      'cybersecurity',
+      'AI agent security',
+      'MCP security',
+      'prompt injection detection',
+      'tool poisoning',
       'ATR rules',
       'Agent Threat Rules',
       'AI threat detection',
-      'compliance automation',
+      'skill auditing',
     ],
     sameAs: [
       'https://github.com/panguard-ai/panguard-ai',
@@ -125,7 +126,7 @@ const jsonLd = [
     applicationCategory: 'SecurityApplication',
     operatingSystem: 'Linux, macOS, Windows',
     description:
-      'AI-powered endpoint security for developers and SMBs. One command to install. Zero configuration.',
+      'AI agent security platform. Scan MCP skills, detect threats, protect AI agents. One command to install.',
     url: 'https://panguard.ai',
     offers: [
       { '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Community (Open Source)' },
