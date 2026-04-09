@@ -377,7 +377,9 @@ BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL t
         );
 
         // Log raw LLM response for debugging crystallization pipeline
-        console.log(`[LLM] analyzeSkills response for "${skill.package}" (${responseText.length} chars):`);
+        console.log(
+          `[LLM] analyzeSkills response for "${skill.package}" (${responseText.length} chars):`
+        );
         console.log(`[LLM] First 500 chars: ${responseText.slice(0, 500)}`);
 
         if (responseText.includes('NO_THREATS_FOUND')) {
@@ -394,7 +396,9 @@ BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL t
         // Extract YAML blocks
         const yamlBlocks = responseText.match(/```yaml\n([\s\S]*?)```/g);
         if (!yamlBlocks || yamlBlocks.length === 0) {
-          console.log(`[LLM] No YAML blocks found in response for "${skill.package}". Response starts with: ${responseText.slice(0, 200)}`);
+          console.log(
+            `[LLM] No YAML blocks found in response for "${skill.package}". Response starts with: ${responseText.slice(0, 200)}`
+          );
           results.push({
             package: skill.package,
             threatsFound: false,
@@ -417,7 +421,9 @@ BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL t
 
           // Validate: must have required ATR fields
           if (!ruleContent.includes('title:') || !ruleContent.includes('detection:')) {
-            console.log(`[LLM] YAML block skipped — missing title: (${ruleContent.includes('title:')}) or detection: (${ruleContent.includes('detection:')}). First 200 chars: ${ruleContent.slice(0, 200)}`);
+            console.log(
+              `[LLM] YAML block skipped — missing title: (${ruleContent.includes('title:')}) or detection: (${ruleContent.includes('detection:')}). First 200 chars: ${ruleContent.slice(0, 200)}`
+            );
             continue;
           }
 
@@ -430,7 +436,9 @@ BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL t
             try {
               new RegExp(jsPattern, 'i');
             } catch (regexErr) {
-              console.log(`[LLM] YAML block skipped — invalid regex: ${rawPattern.slice(0, 100)}. Error: ${regexErr instanceof Error ? regexErr.message : String(regexErr)}`);
+              console.log(
+                `[LLM] YAML block skipped — invalid regex: ${rawPattern.slice(0, 100)}. Error: ${regexErr instanceof Error ? regexErr.message : String(regexErr)}`
+              );
               continue; // Skip rules with invalid regex
             }
             // If we stripped (?i), also fix it in the rule content so downstream consumers don't hit the same issue
