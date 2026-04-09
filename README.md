@@ -13,7 +13,7 @@
 [![GitHub Stars](https://img.shields.io/github/stars/panguard-ai/panguard-ai?style=flat-square&color=DAA520)](https://github.com/panguard-ai/panguard-ai/stargazers)
 [![npm version](https://img.shields.io/npm/v/@panguard-ai/panguard?style=flat-square&color=cb3837&logo=npm)](https://www.npmjs.com/package/@panguard-ai/panguard)
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](LICENSE)
-[![ATR](https://img.shields.io/badge/ATR-100%20rules-8b5cf6-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
+[![ATR](https://img.shields.io/badge/ATR-108%20rules-8b5cf6-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
 [![OWASP](https://img.shields.io/badge/OWASP%20Agentic%20Top%2010-10%2F10-green?style=flat-square)](docs/OWASP-MAPPING.md)
 [![Made in Taiwan](https://img.shields.io/badge/Made%20in-Taiwan-e11d48.svg?style=flat-square)](https://panguard.ai)
 
@@ -23,9 +23,9 @@
 
 ---
 
-> AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We scanned **36,394 MCP skills**. 182 CRITICAL, 1,124 HIGH. Credential harvesting. Reverse shells. Prompt injection. [Live numbers](https://panguard.ai).
+> AI agents have full system access -- read files, execute commands, access credentials -- with **zero review process**. We scanned **53,577 MCP skills** across 3 registries. 946 flagged with threats. Credential harvesting. Reverse shells. Prompt injection. [Live numbers](https://panguard.ai).
 >
-> AI Agent 擁有完整系統權限，卻沒有任何審核。我們掃描了 **36,394 個 MCP skills**，182 個 CRITICAL、1,124 個 HIGH。即時數據見 [panguard.ai](https://panguard.ai)。
+> AI Agent 擁有完整系統權限，卻沒有任何審核。我們掃描了 3 大平台共 **53,577 個 MCP skills**，946 個被標記有威脅。即時數據見 [panguard.ai](https://panguard.ai)。
 >
 > **Proof points:** [Cisco AI Defense merged 34 ATR rules](https://github.com/cisco-ai-defense/skill-scanner/pull/79) | [OWASP Agentic Top 10 PR #814](https://github.com/OWASP/www-project-top-10-for-large-language-model-applications/pull/814) | 23,000+ npm downloads
 
@@ -73,7 +73,7 @@ Or scan online at **[panguard.ai](https://panguard.ai)** -- paste a GitHub URL, 
 </p>
 
 <p align="center">
-<img src="assets/screenshot-rules.png" alt="Rules — 100 ATR detection rules, community contribution" width="720">
+<img src="assets/screenshot-rules.png" alt="Rules — 108 ATR detection rules, community contribution" width="720">
 </p>
 
 <p align="center">
