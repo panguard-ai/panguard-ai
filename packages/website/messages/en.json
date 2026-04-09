@@ -5066,11 +5066,11 @@
   "metadata": {
     "home": {
       "title": "Panguard AI — Your AI Security Guard",
-      "description": "AI-powered endpoint security for developers and SMBs. One command to install. Zero configuration. Panguard detects threats, responds automatically, and explains everything in plain language."
+      "description": "AI agent security for developers. Scan MCP skills for prompt injection, tool poisoning, and supply chain threats. One command to install. 108 detection rules. Free and open source."
     },
     "pricing": {
       "title": "Pricing",
-      "description": "AI-powered endpoint security. All features are free and open source."
+      "description": "AI agent security. All features are free and open source."
     },
     "earlyAccess": {
       "title": "Early Access",

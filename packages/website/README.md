@@ -1,6 +1,6 @@
 # @panguard-ai/website
 
-Official website for [Panguard AI](https://panguard.ai) -- AI-powered endpoint security for developers and SMBs.
+Official website for [Panguard AI](https://panguard.ai) -- AI agent security for developers.
 
 ## Tech Stack
 

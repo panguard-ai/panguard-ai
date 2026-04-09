@@ -33,7 +33,7 @@ export async function GET() {
   <channel>
     <title>Panguard AI Blog</title>
     <link>${SITE_URL}/blog</link>
-    <description>AI-powered endpoint security insights, engineering deep dives, and product updates.</description>
+    <description>AI agent security insights, engineering deep dives, and product updates.</description>
     <language>en</language>
     <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml" />
 ${items}

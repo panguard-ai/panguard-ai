@@ -1610,11 +1610,11 @@
   "metadata": {
     "home": {
       "title": "Panguard AI -- 你的 AI 資安守衛",
-      "description": "專為開發者和中小企業打造的 AI 端點安全防護。一行指令安裝、零設定。Panguard 自動偵測威脅、自動回應、用人話跟你解釋一切。"
+      "description": "AI Agent 安全防護。掃描 MCP skills 偵測 prompt injection、tool poisoning、供應鏈攻擊。一行安裝、108 條偵測規則、免費開源。"
     },
     "pricing": {
       "title": "價格方案",
-      "description": "AI 端點安全防護。所有功能免費開源。"
+      "description": "AI Agent 安全防護。所有功能免費開源。"
     },
     "earlyAccess": {
       "title": "立即安裝",
