@@ -451,6 +451,66 @@ export default function GettingStartedContent() {
         </div>
       </SectionWrapper>
 
+      {/* GitHub Action CI/CD */}
+      <SectionWrapper>
+        <div className="max-w-3xl mx-auto">
+          <FadeInUp>
+            <h2 className="text-xl font-bold text-text-primary mb-2">GitHub Action (CI/CD)</h2>
+            <p className="text-text-secondary mb-6">
+              Block malicious MCP skills and SKILL.md files before they reach production. One line in
+              your workflow. Results appear in the GitHub Security tab.
+            </p>
+
+            <div className="bg-surface-1 border border-border rounded-xl p-5">
+              <p className="text-sm font-semibold text-text-primary mb-3">
+                Add to your workflow (.github/workflows/atr-scan.yml):
+              </p>
+              <CodeBlock
+                code={`name: ATR Security Scan
+on: [push, pull_request]
+jobs:
+  atr-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Agent-Threat-Rule/agent-threat-rules@v1
+        with:
+          severity: medium      # minimum severity to report
+          fail-on-finding: true # block PRs with threats`}
+                label=".github/workflows/atr-scan.yml"
+              />
+
+              <div className="mt-4 space-y-2 text-sm text-text-secondary">
+                <p>
+                  <strong className="text-text-primary">What it does:</strong> Scans your repo for
+                  MCP config files and SKILL.md files using {STATS.atrRules} ATR detection rules.
+                  Outputs SARIF to the GitHub Security tab.
+                </p>
+                <p>
+                  <strong className="text-text-primary">Options:</strong>
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-text-muted text-xs">
+                  <li>
+                    <code className="text-text-secondary">severity</code> — minimum level to report:
+                    informational, low, medium (default), high, critical
+                  </li>
+                  <li>
+                    <code className="text-text-secondary">fail-on-finding</code> — set{' '}
+                    <code className="text-text-secondary">false</code> to warn without blocking
+                  </li>
+                  <li>
+                    <code className="text-text-secondary">path</code> — scan a specific directory
+                    (default: entire repo)
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </FadeInUp>
+        </div>
+      </SectionWrapper>
+
       {/* Step 2: What you can do */}
       <SectionWrapper>
         <div className="max-w-3xl mx-auto">
