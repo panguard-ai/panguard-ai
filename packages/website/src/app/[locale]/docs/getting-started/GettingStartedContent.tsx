@@ -457,8 +457,8 @@ export default function GettingStartedContent() {
           <FadeInUp>
             <h2 className="text-xl font-bold text-text-primary mb-2">GitHub Action (CI/CD)</h2>
             <p className="text-text-secondary mb-6">
-              Block malicious MCP skills and SKILL.md files before they reach production. One line in
-              your workflow. Results appear in the GitHub Security tab.
+              Block malicious MCP skills and SKILL.md files before they reach production. One line
+              in your workflow. Results appear in the GitHub Security tab.
             </p>
 
             <div className="bg-surface-1 border border-border rounded-xl p-5">

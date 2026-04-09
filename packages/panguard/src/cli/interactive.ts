@@ -72,8 +72,8 @@ export async function startInteractive(lang?: string): Promise<void> {
   } else if (!mcpConfigured) {
     console.log(
       getLang() === 'zh-TW'
-        ? `  ${c.sage('\u25C6')} AI \u4EE3\u7406\u5C1A\u672A\u9023\u63A5\u3002\u57F7\u884C ${c.sage('panguard setup')} \u6216\u6309 ${c.sage('[0]')} \u9023\u63A5 Claude Code\u3001Cursor \u7B49\u5E73\u53F0\u3002`
-        : `  ${c.sage('\u25C6')} AI agents not connected. Run ${c.sage('panguard setup')} or press ${c.sage('[0]')} to connect Claude Code, Cursor, etc.`
+        ? `  ${c.sage('\u25C6')} AI \u4EE3\u7406\u5C1A\u672A\u9023\u63A5\u3002\u57F7\u884C ${c.sage('pga setup')} \u6216\u6309 ${c.sage('[0]')} \u9023\u63A5 Claude Code\u3001Cursor \u7B49\u5E73\u53F0\u3002`
+        : `  ${c.sage('\u25C6')} AI agents not connected. Run ${c.sage('pga setup')} or press ${c.sage('[0]')} to connect Claude Code, Cursor, etc.`
     );
     console.log('');
   }

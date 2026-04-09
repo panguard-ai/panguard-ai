@@ -32,11 +32,11 @@ function severityColor(severity: string, text: string): string {
 }
 
 export function hardeningCommand(): Command {
-  const cmd = new Command('hardening').description('Security hardening tools / 安全強化工具');
+  const cmd = new Command('hardening').description('Security hardening tools');
 
   cmd
     .command('audit')
-    .description('Run security self-audit / 執行安全自檢')
+    .description('Run security self-audit')
     .option('--json', 'Output as JSON')
     .action(async (opts: { json?: boolean }) => {
       const policy = loadSecurityPolicy({});
@@ -48,7 +48,7 @@ export function hardeningCommand(): Command {
       }
 
       console.log('');
-      console.log(header('Panguard Security Audit / 安全自檢報告'));
+      console.log(header('Panguard Security Audit'));
 
       // Risk score
       const scoreColor =
@@ -103,8 +103,8 @@ export function hardeningCommand(): Command {
 
   cmd
     .command('migrate')
-    .description('Migrate plaintext credentials to encrypted storage / 遷移明文憑證到加密儲存')
-    .option('--dry-run', 'Report only, do not migrate / 僅報告不遷移', false)
+    .description('Migrate plaintext credentials to encrypted storage')
+    .option('--dry-run', 'Report only, do not migrate', false)
     .option('--key <key>', 'Encryption key (or set PANGUARD_CREDENTIAL_KEY env var)')
     .action(async (opts: { dryRun: boolean; key?: string }) => {
       const encryptionKey = opts.key ?? process.env['PANGUARD_CREDENTIAL_KEY'];
@@ -124,7 +124,7 @@ export function hardeningCommand(): Command {
       }
 
       console.log('');
-      console.log(header('Credential Migration Report / 憑證遷移報告'));
+      console.log(header('Credential Migration Report'));
       console.log(`  Scanned:  ${report.scanned}`);
       console.log(`  Migrated: ${c.safe(String(report.migrated))}`);
       if (report.failed > 0) {

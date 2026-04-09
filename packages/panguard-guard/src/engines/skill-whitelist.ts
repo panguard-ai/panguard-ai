@@ -13,7 +13,15 @@
  */
 
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync, mkdirSync, watch, type FSWatcher } from 'node:fs';
+import {
+  existsSync,
+  readFileSync,
+  writeFileSync,
+  renameSync,
+  mkdirSync,
+  watch,
+  type FSWatcher,
+} from 'node:fs';
 import { dirname } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 
@@ -74,6 +82,7 @@ export class SkillWhitelistManager {
   private readonly revokedSkills = new Set<string>();
   private fileWatcher: FSWatcher | null = null;
   private writingToDisk = false;
+  private lastWriteTimestamp = 0;
 
   constructor(config?: SkillWhitelistConfig) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -341,7 +350,10 @@ export class SkillWhitelistManager {
         revoked: [...this.revokedSkills],
       };
       this.writingToDisk = true;
-      writeFileSync(this.config.persistPath, JSON.stringify(data, null, 2), 'utf-8');
+      const tmpPath = `${this.config.persistPath}.tmp.${process.pid}`;
+      writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
+      renameSync(tmpPath, this.config.persistPath);
+      this.lastWriteTimestamp = Date.now();
       this.writingToDisk = false;
     } catch (err) {
       this.writingToDisk = false;
@@ -358,8 +370,9 @@ export class SkillWhitelistManager {
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     try {
       this.fileWatcher = watch(this.config.persistPath, () => {
-        // Ignore changes we wrote ourselves
-        if (this.writingToDisk) return;
+        // Ignore changes we wrote ourselves (check both flag and recent-write timestamp
+        // because the flag may already be cleared by the time the debounced callback fires)
+        if (this.writingToDisk || Date.now() - this.lastWriteTimestamp < 1000) return;
 
         // Debounce rapid changes (e.g., editor save)
         if (debounceTimer) clearTimeout(debounceTimer);

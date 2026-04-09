@@ -25,7 +25,8 @@ import {
 function openBrowser(url: string): void {
   const os = platform();
   if (os === 'win32') {
-    const cmd = process.env['COMSPEC'] || 'C:\\Windows\\System32\\cmd.exe';
+    const systemRoot = process.env['SystemRoot'] || 'C:\\Windows';
+    const cmd = `${systemRoot}\\System32\\cmd.exe`;
     execFile(cmd, ['/c', 'start', '', url], () => {});
   } else if (os === 'darwin') {
     execFile('open', [url], () => {});
@@ -99,18 +100,16 @@ const PLATFORM_RESTART_HINTS: Record<string, string> = {
 
 export function setupCommand(): Command {
   const cmd = new Command('setup')
-    .description(
-      'Auto-detect AI agent platforms and configure Panguard MCP / 自動偵測 AI Agent 平台並設定 Panguard MCP'
-    )
+    .description('Auto-detect AI agent platforms and configure Panguard MCP')
     .option(
       '--platform <name>',
       'Target a specific platform (claude-code, cursor, openclaw, codex, workbuddy, nemoclaw, claude-desktop)'
     )
-    .option('--remove', 'Remove Panguard MCP config from platforms / 移除設定', false)
-    .option('--json', 'Output as JSON / 以 JSON 格式輸出', false)
-    .option('--yes', 'Skip confirmation prompts / 跳過確認提示', false)
-    .option('--skip-scan', 'Skip skill scanning / 跳過技能掃描', false)
-    .option('--skip-guard', 'Skip guard start prompt / 跳過 Guard 啟動', false)
+    .option('--remove', 'Remove Panguard MCP config from platforms', false)
+    .option('--json', 'Output as JSON', false)
+    .option('--yes', 'Skip confirmation prompts', false)
+    .option('--skip-scan', 'Skip skill scanning', false)
+    .option('--skip-guard', 'Skip guard start prompt', false)
     .option('--lang <lang>', 'UI language: en or zh-TW (auto-detect if omitted)')
     .action(
       async (options: {
@@ -421,7 +420,7 @@ export function setupCommand(): Command {
               } else if (high.length > 0 && !options.json) {
                 console.log(
                   c.yellow(
-                    `  ${symbols.warn} ${high.length} HIGH-risk skill(s) -- run "panguard guard --watch" to review.`
+                    `  ${symbols.warn} ${high.length} HIGH-risk skill(s) -- run "pga guard --watch" to review.`
                   )
                 );
               }
@@ -531,7 +530,7 @@ export function setupCommand(): Command {
             if (!guardBin) {
               if (!options.json) {
                 console.log(c.yellow(`  ${symbols.warn} Could not locate panguard-guard binary.`));
-                console.log(c.dim('    Run manually: panguard guard install'));
+                console.log(c.dim('    Run manually: pga guard install'));
               }
               jsonOutput['guard'] = {
                 installed: false,
@@ -564,8 +563,8 @@ export function setupCommand(): Command {
                   console.log(
                     c.green(`  ${symbols.pass} Guard will auto-start on boot and restart on crash.`)
                   );
-                  console.log(c.dim('    Run "panguard guard status" to check.'));
-                  console.log(c.dim('    Run "panguard guard uninstall" to remove.'));
+                  console.log(c.dim('    Run "pga guard status" to check.'));
+                  console.log(c.dim('    Run "pga guard uninstall" to remove.'));
                 }
 
                 jsonOutput['guard'] = {
@@ -592,12 +591,12 @@ export function setupCommand(): Command {
                         `  ${symbols.warn} Needs elevated privileges to install system service.`
                       )
                     );
-                    console.log(c.dim('    Run: sudo panguard guard install'));
+                    console.log(c.dim('    Run: sudo pga guard install'));
                   } else {
                     console.log(
                       c.yellow(`  ${symbols.warn} Could not install as system service: ${msg}`)
                     );
-                    console.log(c.dim('    Run manually: panguard guard install'));
+                    console.log(c.dim('    Run manually: pga guard install'));
                   }
                   // Fallback: start Guard for this session only
                   console.log();
@@ -632,7 +631,7 @@ export function setupCommand(): Command {
                 } catch {
                   jsonOutput['guard'] = { installed: false, running: false, error: msg };
                   if (!options.json) {
-                    console.log(c.dim('    Run manually: panguard guard start --dashboard'));
+                    console.log(c.dim('    Run manually: pga guard start --dashboard'));
                   }
                 }
               }
@@ -679,7 +678,7 @@ export function setupCommand(): Command {
               } else {
                 console.log(
                   c.dim(
-                    `  ${symbols.info} Threat Cloud disabled. Enable later: panguard guard config --set threatCloudUploadEnabled=true`
+                    `  ${symbols.info} Threat Cloud disabled. Enable later: pga guard config --set threatCloudUploadEnabled=true`
                   )
                 );
               }

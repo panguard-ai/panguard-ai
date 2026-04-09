@@ -28,9 +28,9 @@ export function trapCommand(): Command {
 
   cmd
     .command('start')
-    .description('Start honeypot services / 啟動蜜罐服務')
+    .description('Start honeypot services')
     .option('--services <types>', 'Comma-separated service types (ssh,http,ftp,...)')
-    .option('--data-dir <path>', 'Data directory / 資料目錄')
+    .option('--data-dir <path>', 'Data directory')
     .option('--no-cloud', 'Disable Threat Cloud upload')
     .action(async () => {
       console.log(COMING_SOON_MSG);
@@ -38,21 +38,21 @@ export function trapCommand(): Command {
 
   cmd
     .command('stop')
-    .description('Stop honeypot services / 停止蜜罐服務')
+    .description('Stop honeypot services')
     .action(async () => {
       console.log(COMING_SOON_MSG);
     });
 
   cmd
     .command('status')
-    .description('Show current status / 顯示目前狀態')
+    .description('Show current status')
     .action(async () => {
       console.log(COMING_SOON_MSG);
     });
 
   cmd
     .command('config')
-    .description('Show configuration / 顯示配置')
+    .description('Show configuration')
     .option('--services <types>', 'Comma-separated service types')
     .action(async () => {
       console.log(COMING_SOON_MSG);
@@ -60,14 +60,14 @@ export function trapCommand(): Command {
 
   cmd
     .command('profiles')
-    .description('Show attacker profiles / 顯示攻擊者 profiles')
+    .description('Show attacker profiles')
     .action(async () => {
       console.log(COMING_SOON_MSG);
     });
 
   cmd
     .command('intel')
-    .description('Show threat intelligence / 顯示威脅情報')
+    .description('Show threat intelligence')
     .action(async () => {
       console.log(COMING_SOON_MSG);
     });

@@ -336,8 +336,10 @@ export class ATRDrafter {
         selfReviewApproved = parsed.approved === true;
         selfReviewVerdict = jsonMatch[0];
       }
-    } catch {
-      // Parse failed, reject
+    } catch (err) {
+      process.stderr.write(
+        `[atr-drafter] Self-review JSON parse failed: ${err instanceof Error ? err.message : String(err)}\n`
+      );
     }
 
     return {

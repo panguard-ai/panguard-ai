@@ -15,7 +15,7 @@ import { withAuth } from '../auth-guard.js';
 
 export function deployCommand(): Command {
   return new Command('deploy')
-    .description('Deploy configured services / \u90E8\u7F72\u5DF2\u914D\u7F6E\u7684\u670D\u52D9')
+    .description('Deploy configured services')
     .option('--config <path>', 'Config path', join(homedir(), '.panguard', 'config.json'))
     .option('--dry-run', 'Show deployment plan without executing')
     .option('--lang <language>', 'Language override')
@@ -40,8 +40,8 @@ async function runDeploy(opts: {
     console.log(
       `  ${symbols.fail} ${
         lang === 'zh-TW'
-          ? '\u627E\u4E0D\u5230\u914D\u7F6E\u6A94\u3002\u8ACB\u5148\u57F7\u884C: panguard init'
-          : 'No config found. Run: panguard init'
+          ? '\u627E\u4E0D\u5230\u914D\u7F6E\u6A94\u3002\u8ACB\u5148\u57F7\u884C: pga setup'
+          : 'No config found. Run: pga setup'
       }`
     );
     console.log('');
@@ -313,7 +313,7 @@ async function runDeploy(opts: {
       );
     } catch {
       scanSp.warn(
-        `[${step}/${totalSteps}] ${lang === 'zh-TW' ? '\u6383\u63CF\u5931\u6557\uFF08\u7A0D\u5F8C\u7528 panguard scan\uFF09' : 'Scan failed (run panguard scan later)'}`
+        `[${step}/${totalSteps}] ${lang === 'zh-TW' ? '\u6383\u63CF\u5931\u6557\uFF08\u7A0D\u5F8C\u7528 pga scan\uFF09' : 'Scan failed (run pga scan later)'}`
       );
     }
     step++;
@@ -328,17 +328,17 @@ async function runDeploy(opts: {
             `${symbols.pass} \u90E8\u7F72\u5B8C\u6210\uFF01`,
             '',
             `\u63A5\u4E0B\u4F86\uFF1A`,
-            `  ${c.sage('panguard guard start')}  \u555F\u52D5\u5373\u6642\u9632\u8B77`,
-            `  ${c.sage('panguard status')}       \u67E5\u770B\u7CFB\u7D71\u72C0\u614B`,
-            `  ${c.sage('panguard scan --full')}  \u57F7\u884C\u5B8C\u6574\u6383\u63CF`,
+            `  ${c.sage('pga guard start')}  \u555F\u52D5\u5373\u6642\u9632\u8B77`,
+            `  ${c.sage('pga status')}       \u67E5\u770B\u7CFB\u7D71\u72C0\u614B`,
+            `  ${c.sage('pga scan --full')}  \u57F7\u884C\u5B8C\u6574\u6383\u63CF`,
           ].join('\n')
         : [
             `${symbols.pass} Deployment complete!`,
             '',
             `Next:`,
-            `  ${c.sage('panguard guard start')}  Start real-time protection`,
-            `  ${c.sage('panguard status')}       Check system status`,
-            `  ${c.sage('panguard scan --full')}  Run a full scan`,
+            `  ${c.sage('pga guard start')}  Start real-time protection`,
+            `  ${c.sage('pga status')}       Check system status`,
+            `  ${c.sage('pga scan --full')}  Run a full scan`,
           ].join('\n'),
       { borderColor: c.safe }
     )

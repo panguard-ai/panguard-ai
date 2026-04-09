@@ -100,8 +100,8 @@ export async function actionScan(
     if (fixableCount > 0) {
       const upgradeLines =
         lang === 'zh-TW'
-          ? [`\u53EF\u81EA\u52D5\u4FEE\u5FA9:`, `$ panguard scan --fix`]
-          : [`Auto-fix available:`, `$ panguard scan --fix`];
+          ? [`\u53EF\u81EA\u52D5\u4FEE\u5FA9:`, `$ pga scan --fix`]
+          : [`Auto-fix available:`, `$ pga scan --fix`];
       console.log('');
       console.log(box(upgradeLines.join('\n'), { borderColor: c.sage }));
     }

@@ -20,5 +20,13 @@
   "peerDependencies": {
     "@panguard-ai/atr": "workspace:*"
   },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT"
 }

@@ -84,8 +84,8 @@ export const DEFAULT_DATA_DIR = join(homedir(), '.panguard-guard');
 
 /** Default configuration / 預設配置 */
 export const DEFAULT_GUARD_CONFIG: GuardConfig = {
-  lang: 'zh-TW',
-  mode: 'learning',
+  lang: 'en',
+  mode: 'protection',
   learningDays: 7,
   actionPolicy: DEFAULT_ACTION_POLICY,
   notifications: {},

@@ -14,13 +14,9 @@ import type { PanguardConfig } from '../../init/types.js';
 
 export function initCommand(): Command {
   return new Command('init')
-    .description('Interactive setup wizard / \u4E92\u52D5\u5F0F\u8A2D\u5B9A\u7CBE\u9748')
+    .description('Interactive setup wizard')
     .option('--lang <language>', 'Language: en or zh-TW')
-    .option(
-      '--advanced',
-      'Full advanced wizard for power users / \u5B8C\u6574\u8A2D\u5B9A\u7CBE\u9748',
-      false
-    )
+    .option('--advanced', 'Full advanced wizard for power users', false)
     .option('--config <path>', 'Import config from JSON file (non-interactive)')
     .action(async (opts: { lang?: string; config?: string; advanced: boolean }) => {
       if (opts.config) {

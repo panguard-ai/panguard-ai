@@ -52,7 +52,7 @@ export async function askTelemetryConsent(): Promise<boolean> {
   console.log('');
   console.log(`  ${c.dim('Share anonymous usage stats (scan count, platform, findings count).')}`);
   console.log(`  ${c.dim('No IP, no user ID, no skill names, no machine fingerprint.')}`);
-  console.log(`  ${c.dim('Change anytime: panguard config set telemetry false')}`);
+  console.log(`  ${c.dim('Change anytime: pga config set telemetry false')}`);
   console.log('');
 
   const answer = await promptYesNo('  Enable anonymous telemetry? [y/N] ');

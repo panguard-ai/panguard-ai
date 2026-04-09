@@ -231,8 +231,8 @@ export async function runInitWizard(
     } catch {
       scanSp.warn(
         lang === 'zh-TW'
-          ? '\u6383\u63CF\u5931\u6557\uFF08\u53EF\u7A0D\u5F8C\u7528 panguard scan \u57F7\u884C\uFF09'
-          : 'Scan failed (run panguard scan later)'
+          ? '\u6383\u63CF\u5931\u6557\uFF08\u53EF\u7A0D\u5F8C\u7528 pga scan \u57F7\u884C\uFF09'
+          : 'Scan failed (run pga scan later)'
       );
     }
   }
@@ -344,15 +344,15 @@ export async function runInitWizard(
       } else {
         mcpSp.warn(
           lang === 'zh-TW'
-            ? '\u672A\u5075\u6E2C\u5230 AI \u4EE3\u7406\u5E73\u53F0\u3002\u7A0D\u5F8C\u57F7\u884C panguard setup \u5373\u53EF\u3002'
-            : 'No AI agent platforms detected. Run panguard setup later.'
+            ? '\u672A\u5075\u6E2C\u5230 AI \u4EE3\u7406\u5E73\u53F0\u3002\u7A0D\u5F8C\u57F7\u884C pga setup \u5373\u53EF\u3002'
+            : 'No AI agent platforms detected. Run pga setup later.'
         );
       }
     } catch {
       mcpSp.warn(
         lang === 'zh-TW'
-          ? 'MCP \u8A2D\u5B9A\u5931\u6557\uFF0C\u7A0D\u5F8C\u57F7\u884C panguard setup'
-          : 'MCP setup failed. Run panguard setup later.'
+          ? 'MCP \u8A2D\u5B9A\u5931\u6557\uFF0C\u7A0D\u5F8C\u57F7\u884C pga setup'
+          : 'MCP setup failed. Run pga setup later.'
       );
     }
   }
@@ -383,8 +383,8 @@ export async function runInitWizard(
     } catch {
       auditSp.warn(
         lang === 'zh-TW'
-          ? '\u6B64\u76EE\u9304\u672A\u627E\u5230 AI \u6280\u80FD (SKILL.md)\u3002\u5728\u5305\u542B\u6280\u80FD\u7684\u5C08\u6848\u76EE\u9304\u4E2D\u57F7\u884C panguard audit skill <path>'
-          : 'No AI skills (SKILL.md) found here. Run panguard audit skill <path> in a project with skills.'
+          ? '\u6B64\u76EE\u9304\u672A\u627E\u5230 AI \u6280\u80FD (SKILL.md)\u3002\u5728\u5305\u542B\u6280\u80FD\u7684\u5C08\u6848\u76EE\u9304\u4E2D\u57F7\u884C pga audit skill <path>'
+          : 'No AI skills (SKILL.md) found here. Run pga audit skill <path> in a project with skills.'
       );
     }
   }
@@ -414,8 +414,8 @@ export async function runInitWizard(
         console.log(
           c.dim(
             lang === 'zh-TW'
-              ? '  AI \u8A2D\u5B9A\u5931\u6557\u3002\u7A0D\u5F8C\u57F7\u884C panguard guard setup-ai'
-              : '  AI setup failed. Run panguard guard setup-ai later.'
+              ? '  AI \u8A2D\u5B9A\u5931\u6557\u3002\u7A0D\u5F8C\u57F7\u884C pga guard setup-ai'
+              : '  AI setup failed. Run pga guard setup-ai later.'
           )
         );
       }
@@ -432,20 +432,20 @@ export async function runInitWizard(
             '',
             '\u63A5\u4E0B\u4F86\u4F60\u53EF\u4EE5\uFF1A',
             '',
-            `  ${c.sage('panguard setup')}      \u9023\u63A5 AI \u4EE3\u7406 (MCP)`,
-            `  ${c.sage('panguard audit skill .')} \u5BE9\u8A08 AI \u6280\u80FD\u5B89\u5168`,
-            `  ${c.sage('panguard scan')}       \u57F7\u884C\u5B8C\u6574\u5B89\u5168\u6383\u63CF`,
-            `  ${c.sage('panguard guard start --dashboard')} \u555F\u52D5 Guard + Dashboard`,
+            `  ${c.sage('pga setup')}      \u9023\u63A5 AI \u4EE3\u7406 (MCP)`,
+            `  ${c.sage('pga audit skill .')} \u5BE9\u8A08 AI \u6280\u80FD\u5B89\u5168`,
+            `  ${c.sage('pga scan')}       \u57F7\u884C\u5B8C\u6574\u5B89\u5168\u6383\u63CF`,
+            `  ${c.sage('pga guard start --dashboard')} \u555F\u52D5 Guard + Dashboard`,
           ].join('\n')
         : [
             `${symbols.pass} Panguard AI setup complete!`,
             '',
             'Next steps:',
             '',
-            `  ${c.sage('panguard setup')}       Connect AI agents (MCP)`,
-            `  ${c.sage('panguard audit skill .')} Audit AI skill security`,
-            `  ${c.sage('panguard scan')}        Run a full security scan`,
-            `  ${c.sage('panguard guard start --dashboard')} Start Guard + Dashboard`,
+            `  ${c.sage('pga setup')}       Connect AI agents (MCP)`,
+            `  ${c.sage('pga audit skill .')} Audit AI skill security`,
+            `  ${c.sage('pga scan')}        Run a full security scan`,
+            `  ${c.sage('pga guard start --dashboard')} Start Guard + Dashboard`,
           ].join('\n'),
       { borderColor: c.safe }
     )

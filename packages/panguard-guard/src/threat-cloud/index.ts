@@ -272,6 +272,16 @@ export class ThreatCloudClient {
       // Handle both flat array and { ok, data } envelope formats
       const rules = Array.isArray(parsed) ? parsed : (parsed.data ?? []);
 
+      // Merge into cache for accurate unique count tracking
+      for (const rule of rules) {
+        const existing = this.cache.rules.findIndex((r) => r.ruleId === rule.ruleId);
+        if (existing !== -1) {
+          this.cache.rules[existing] = rule;
+        } else {
+          this.cache.rules.push(rule);
+        }
+      }
+
       this.status = 'connected';
       this.cache.lastSync = new Date().toISOString();
       this.cache.stats.totalRulesReceived += rules.length;
@@ -369,6 +379,28 @@ export class ThreatCloudClient {
       logger.info(`Reported safe skill: ${skillName}`);
     } catch (err: unknown) {
       logger.warn(`Report safe skill failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  /**
+   * Batch report multiple safe skills to Threat Cloud in a single request.
+   * TC server already supports { skills: [...] } format.
+   * 批次回報多個安全 skill 到 Threat Cloud（單一請求）
+   */
+  async reportSafeSkillsBatch(
+    skills: Array<{ skillName: string; fingerprintHash?: string }>
+  ): Promise<void> {
+    if (this.status === 'offline' || !this.endpoint || skills.length === 0) return;
+
+    try {
+      const url = `${this.endpoint}/api/skill-whitelist`;
+      const body = JSON.stringify({ skills });
+      await this.httpPost(url, body);
+      logger.info(`Batch reported ${skills.length} safe skill(s)`);
+    } catch (err: unknown) {
+      logger.warn(
+        `Batch report safe skills failed: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
   }
 
@@ -724,6 +756,7 @@ export class ThreatCloudClient {
         lastSync: this.cache.lastSync,
         totalUploaded: this.cache.stats.totalUploaded,
         totalRulesReceived: this.cache.stats.totalRulesReceived,
+        uniqueRulesCount: this.cache.rules.length,
         queueSize: this.uploadQueue.length,
       };
       writeFileSync(statsFile, JSON.stringify(data, null, 2), { mode: 0o600 });

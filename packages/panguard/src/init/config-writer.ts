@@ -126,7 +126,8 @@ export function readConfig(): PanguardConfig | null {
     const json = readFileSync(configPath, 'utf-8');
     const parsed: unknown = JSON.parse(json);
     if (!validateConfigSchema(parsed)) {
-      logger.warn('Config file has invalid schema, ignoring');
+      // Simple configs (e.g., just {lang: "en"} from saveLang) are valid but don't match
+      // the full PanguardConfig schema. Don't warn — they'll be upgraded on next pga setup.
       return null;
     }
     return parsed as PanguardConfig;

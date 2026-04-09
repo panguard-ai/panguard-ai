@@ -213,7 +213,10 @@ export function runNpmAudit(cwd: string): Promise<NpmAuditResult | null> {
         try {
           const parsed = JSON.parse(stdout) as NpmAuditResult;
           resolve(parsed);
-        } catch {
+        } catch (err) {
+          process.stderr.write(
+            `[dependency-watcher] npm audit JSON parse failed: ${err instanceof Error ? err.message : String(err)}\n`
+          );
           resolve(null);
         }
       }

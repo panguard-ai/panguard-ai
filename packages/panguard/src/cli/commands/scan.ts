@@ -39,25 +39,27 @@ function remoteSystem(openPorts: number): ScanOutputSystem {
 
 export function scanCommand(): Command {
   return new Command('scan')
-    .description('Run a security scan / 執行安全掃描')
+    .description('Scan skills for threats, or run a system security scan')
     .argument('[path]', 'File or directory to scan with ATR (auto-detects MCP JSON vs SKILL.md)')
-    .option('--quick', 'Quick scan mode (~30s) / 快速掃描模式', false)
-    .option('--output <path>', 'Output PDF report path / 輸出 PDF 報告路徑')
-    .option('--lang <language>', 'Language: en or zh-TW / 語言', 'en')
-    .option('--verbose', 'Verbose output / 詳細輸出', false)
-    .option('--json', 'Output pure JSON to stdout (for AI agents) / 輸出純 JSON', false)
-    .option('--sarif', 'Output SARIF v2.1.0 to stdout / 輸出 SARIF', false)
+    .option('--all', 'Scan all installed MCP skills (non-invasive, no guard/proxy)', false)
+    .option('--quick', 'Quick scan mode (~30s)', false)
+    .option('--output <path>', 'Output PDF report path')
+    .option('--lang <language>', 'Language: en or zh-TW', 'en')
+    .option('--verbose', 'Verbose output', false)
+    .option('--json', 'Output pure JSON to stdout (for AI agents)', false)
+    .option('--sarif', 'Output SARIF v2.1.0 to stdout', false)
     .option(
       '--severity <level>',
       'Minimum severity (informational, low, medium, high, critical)',
       'medium'
     )
-    .option('--save <path>', 'Save JSON results to file / 儲存 JSON 結果到檔案')
-    .option('--target <host>', 'Remote target (IP or domain) / 遠端目標')
+    .option('--save <path>', 'Save JSON results to file')
+    .option('--target <host>', 'Remote target (IP or domain)')
     .action(
       async (
         path: string | undefined,
         options: {
+          all: boolean;
           quick: boolean;
           output?: string;
           lang: string;
@@ -70,6 +72,94 @@ export function scanCommand(): Command {
         }
       ) => {
         const lang: Language = options.lang === 'zh-TW' ? 'zh-TW' : 'en';
+
+        // ── Batch skill scan mode: pga scan --all ─────────────
+        if (options.all) {
+          if (!options.verbose) setLogLevel('silent');
+          const { existsSync, readdirSync } = await import('node:fs');
+          const { join } = await import('node:path');
+          const { homedir } = await import('node:os');
+          const { execFileSync } = await import('node:child_process');
+
+          const skillsDir = join(homedir(), '.claude', 'skills');
+          if (!existsSync(skillsDir)) {
+            console.log(`  No skills directory found at ${skillsDir}`);
+            return;
+          }
+
+          const skills = readdirSync(skillsDir, { withFileTypes: true }).filter((d) =>
+            d.isDirectory()
+          );
+
+          console.log(`\n  Scanning ${skills.length} installed skill(s)...\n`);
+
+          // Detect ATR binary once before the loop
+          let useNpx = false;
+          try {
+            execFileSync('atr', ['--version'], { stdio: 'pipe', timeout: 5000 });
+          } catch {
+            useNpx = true;
+          }
+
+          let threats = 0;
+          let clean = 0;
+          let errors = 0;
+          for (const skill of skills) {
+            const skillPath = join(skillsDir, skill.name);
+            try {
+              const atrBin = useNpx ? 'npx' : 'atr';
+              const atrArgs = useNpx
+                ? [
+                    '-y',
+                    'agent-threat-rules@latest',
+                    'scan',
+                    skillPath,
+                    '--severity',
+                    options.severity,
+                    '--json',
+                  ]
+                : ['scan', skillPath, '--severity', options.severity, '--json'];
+
+              const result = execFileSync(atrBin, atrArgs, {
+                stdio: ['inherit', 'pipe', 'pipe'],
+                timeout: useNpx ? 90_000 : 30_000,
+              });
+              const parsed = JSON.parse(result.toString()) as { findings?: unknown[] };
+              if (parsed.findings && parsed.findings.length > 0) {
+                threats++;
+                console.log(
+                  `  ${c.critical('!!')} ${c.bold(skill.name)} — ${parsed.findings.length} finding(s)`
+                );
+              } else {
+                clean++;
+              }
+            } catch (err: unknown) {
+              const e = err as { status?: number; stdout?: Buffer };
+              if (e.status === 1 && e.stdout && e.stdout.length > 0) {
+                // ATR exits 1 when findings exist — parse them
+                try {
+                  const parsed = JSON.parse(e.stdout.toString()) as { findings?: unknown[] };
+                  threats++;
+                  console.log(
+                    `  ${c.critical('!!')} ${c.bold(skill.name)} — ${parsed.findings?.length ?? '?'} finding(s)`
+                  );
+                } catch {
+                  threats++;
+                  console.log(`  ${c.caution('!')} ${c.bold(skill.name)} — flagged`);
+                }
+              } else {
+                errors++;
+                console.log(`  ${c.dim('?')} ${c.bold(skill.name)} — scan error`);
+              }
+            }
+          }
+
+          console.log(
+            `\n  ${c.safe(String(clean))} clean  |  ${threats > 0 ? c.critical(String(threats)) : '0'} flagged${errors > 0 ? `  |  ${c.caution(String(errors))} errors` : ''}`
+          );
+          console.log(`  ${c.dim('Run "pga scan <path>" for details on a specific skill.')}\n`);
+          return;
+        }
 
         // ── ATR scan mode: pga scan <file-or-dir> ───────────────
         if (path) {
@@ -367,7 +457,7 @@ export function scanCommand(): Command {
           }
           if (fixableCount > 0) {
             console.log(
-              box(`Auto-fix available for ${fixableCount} issue(s):\n  $ panguard scan --fix`, {
+              box(`Auto-fix available for ${fixableCount} issue(s):\n  $ pga scan --fix`, {
                 borderColor: c.sage,
                 title: 'Panguard AI',
               })

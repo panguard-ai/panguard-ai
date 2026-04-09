@@ -142,23 +142,18 @@ function computeSkillHash(skillDir: string): string {
 }
 
 export function auditCommand(): Command {
-  const cmd = new Command('audit').description(
-    'Audit security of OpenClaw skills / 審計 OpenClaw 技能的安全性'
-  );
+  const cmd = new Command('audit').description('Audit security of OpenClaw skills');
 
   cmd
     .command('skill')
-    .description(
-      'Audit a skill for security issues (local path, GitHub URL, or ClawHub URL)\n' +
-        '審計技能安全問題（本地路徑、GitHub URL 或 ClawHub URL）'
-    )
+    .description('Audit a skill for security issues (local path, GitHub URL, or ClawHub URL)')
     .argument(
       '<path-or-url>',
       'Local path, GitHub URL (github.com/owner/repo), or ClawHub URL (clawhub.ai/owner/repo)'
     )
-    .option('--json', 'Output as JSON / 以 JSON 格式輸出', false)
-    .option('--verbose', 'Verbose output / 詳細輸出', false)
-    .option('--no-cloud', 'Skip Threat Cloud submission / 不回報至 Threat Cloud')
+    .option('--json', 'Output as JSON', false)
+    .option('--verbose', 'Verbose output', false)
+    .option('--no-cloud', 'Skip Threat Cloud submission')
     .option('--tc-endpoint <url>', 'Threat Cloud endpoint', DEFAULT_TC_ENDPOINT)
     .action(
       async (

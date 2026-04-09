@@ -289,8 +289,8 @@ export function getWizardSteps(): WizardStep[] {
           value: 'none',
           label: { en: 'Skip for now', 'zh-TW': '\u5148\u8DF3\u904E' },
           description: {
-            en: 'Configure later with: panguard chat setup',
-            'zh-TW': '\u7A0D\u5F8C\u7528 panguard chat setup \u8A2D\u5B9A',
+            en: 'Configure later with: pga chat setup',
+            'zh-TW': '\u7A0D\u5F8C\u7528 pga chat setup \u8A2D\u5B9A',
           },
         },
       ],

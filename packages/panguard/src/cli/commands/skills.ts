@@ -56,14 +56,12 @@ function sourceLabel(source: string): string {
 }
 
 export function skillsCommand(): Command {
-  const cmd = new Command('skills').description(
-    'Manage skill whitelist and trust status / 管理技能白名單和信任狀態'
-  );
+  const cmd = new Command('skills').description('Manage skill whitelist and trust status');
 
   cmd
     .command('list')
     .alias('ls')
-    .description('List all skills and their trust status / 列出所有技能及其信任狀態')
+    .description('List all skills and their trust status')
     .option('--data-dir <path>', 'Guard data directory', DEFAULT_DATA_DIR)
     .option('--json', 'Output as JSON', false)
     .action((options: { dataDir: string; json: boolean }) => {
@@ -88,7 +86,7 @@ export function skillsCommand(): Command {
         console.log();
         console.log(
           c.dim(
-            `  ${symbols.info} No skills in whitelist. Run ${c.bold('panguard setup')} to scan and whitelist skills.`
+            `  ${symbols.info} No skills in whitelist. Run ${c.bold('pga setup')} to scan and whitelist skills.`
           )
         );
         console.log();
@@ -147,7 +145,7 @@ export function skillsCommand(): Command {
 
   cmd
     .command('stats')
-    .description('Show whitelist statistics / 顯示白名單統計')
+    .description('Show whitelist statistics')
     .option('--data-dir <path>', 'Guard data directory', DEFAULT_DATA_DIR)
     .action((options: { dataDir: string }) => {
       const data = loadWhitelist(options.dataDir);

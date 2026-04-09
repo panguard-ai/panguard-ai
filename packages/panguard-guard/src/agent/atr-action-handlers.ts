@@ -48,13 +48,41 @@ export class ATRActionHandlers {
     const toolName = this.extractToolName(verdict);
     const label = toolName ?? 'unknown';
 
-    logger.info(`ATR action: block_tool for tool "${label}"`);
+    // Write to shared blocklist so MCP proxy can enforce the block
+    // Atomic write (tmp + rename) prevents corrupt reads; lowercase for consistent matching
+    try {
+      const { readFileSync, writeFileSync, renameSync, mkdirSync } = await import('node:fs');
+      const { join } = await import('node:path');
+      const blocklistPath = join(this.dataDir, 'blocked-tools.json');
+      const normalised = label.toLowerCase();
+      let blocklist: string[] = [];
+      try {
+        blocklist = JSON.parse(readFileSync(blocklistPath, 'utf-8')) as string[];
+      } catch {
+        /* file may not exist */
+      }
+      if (!blocklist.includes(normalised)) {
+        blocklist.push(normalised);
+        // Cap at 500 entries — evict oldest
+        if (blocklist.length > 500) {
+          blocklist = blocklist.slice(-500);
+        }
+        mkdirSync(this.dataDir, { recursive: true });
+        const tmpPath = `${blocklistPath}.tmp.${process.pid}`;
+        writeFileSync(tmpPath, JSON.stringify(blocklist, null, 2), 'utf-8');
+        renameSync(tmpPath, blocklistPath);
+      }
+    } catch {
+      // best effort — proxy still has its own ATR detection
+    }
+
+    logger.warn(`ATR action: block_tool — tool "${label}" added to blocklist`);
 
     return {
       action: 'block_tool',
       success: true,
       details:
-        `Tool "${label}" blocked by ATR rule. ` +
+        `Tool "${label}" blocked. Added to blocklist for MCP proxy enforcement. ` +
         `Conclusion: ${verdict.conclusion}, confidence: ${verdict.confidence}%`,
       timestamp: new Date().toISOString(),
       target: label,
@@ -178,12 +206,14 @@ export class ATRActionHandlers {
       const markerPath = join(quarantineDir, `${safeLabel}.json`);
       writeFileSync(markerPath, JSON.stringify(marker, null, 2), 'utf-8');
 
-      logger.info(`ATR action: session "${label}" quarantined`);
+      logger.warn(
+        `ATR alert: session "${label}" flagged for quarantine (marker written, no enforcement)`
+      );
 
       return {
         action: 'quarantine_session',
         success: true,
-        details: `Session "${label}" quarantined. Marker written to ${markerPath}`,
+        details: `Session "${label}" flagged for quarantine (marker: ${markerPath}). Manual review required.`,
         timestamp: new Date().toISOString(),
         target: label,
       };
@@ -277,12 +307,14 @@ export class ATRActionHandlers {
       const overridePath = join(configDir, `${safeLabel}.json`);
       writeFileSync(overridePath, JSON.stringify(override, null, 2), 'utf-8');
 
-      logger.info(`ATR action: permissions reduced for "${label}"`);
+      logger.warn(
+        `ATR alert: permissions reduction requested for "${label}" (marker written, no enforcement)`
+      );
 
       return {
         action: 'reduce_permissions',
         success: true,
-        details: `Permissions reduced for "${label}". Override written to ${overridePath}`,
+        details: `Permission reduction flagged for "${label}" (marker: ${overridePath}). Manual review required.`,
         timestamp: new Date().toISOString(),
         target: label,
       };

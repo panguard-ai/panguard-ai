@@ -105,12 +105,12 @@ describe('statusCommand', () => {
       expect(output).toContain('Not initialized');
     });
 
-    it('should suggest running "panguard setup" (en)', async () => {
+    it('should suggest running "pga setup" (en)', async () => {
       mockReadConfig.mockReturnValue(null);
       const cmd = statusCommand();
       await cmd.parseAsync(['--lang', 'en'], { from: 'user' });
       const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
-      expect(output).toContain('panguard setup');
+      expect(output).toContain('pga setup');
     });
 
     it('should show Chinese text when lang is zh-TW', async () => {
@@ -118,7 +118,7 @@ describe('statusCommand', () => {
       const cmd = statusCommand();
       await cmd.parseAsync(['--lang', 'zh-TW'], { from: 'user' });
       const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
-      expect(output).toContain('panguard setup');
+      expect(output).toContain('pga setup');
     });
   });
 
