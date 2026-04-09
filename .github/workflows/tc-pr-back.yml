@@ -28,8 +28,11 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Install dependencies
-        run: cd packages/threat-cloud && npm install
+        run: pnpm install --filter @panguard-ai/threat-cloud...
 
       - name: Run PR-back
         env:
