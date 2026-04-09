@@ -104,6 +104,7 @@ export class GuardATREngine {
   private readonly engine: ATREngine;
   private readonly bundledEngine: ATREngine | null;
   private readonly cloudRuleIds = new Set<string>();
+  private readonly bundledRuleIds = new Set<string>();
   private matchCount = 0;
   private readonly sessionTracker: SessionTracker;
   private readonly fingerprintStore: SkillFingerprintStore;
@@ -149,6 +150,10 @@ export class GuardATREngine {
     if (this.bundledEngine) {
       const bundled = await this.bundledEngine.loadRules();
       total += bundled;
+      // Track bundled rule IDs so cloud rules don't duplicate them
+      for (const r of this.bundledEngine.getRules()) {
+        this.bundledRuleIds.add(r.id);
+      }
       logger.info(`ATR bundled rules loaded: ${bundled} rules`);
     }
 
@@ -225,7 +230,8 @@ export class GuardATREngine {
    * 新增從 Threat Cloud 接收的規則（避免重複）
    */
   addCloudRule(rule: ATRRule): void {
-    if (this.cloudRuleIds.has(rule.id)) return;
+    // Skip if already loaded from bundled or cloud sources
+    if (this.bundledRuleIds.has(rule.id) || this.cloudRuleIds.has(rule.id)) return;
     this.engine.addRule(rule);
     this.cloudRuleIds.add(rule.id);
   }
