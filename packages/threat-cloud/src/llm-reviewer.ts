@@ -424,11 +424,19 @@ BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL t
           // Validate regex in the rule (match both single and double quoted values)
           const regexMatch = ruleContent.match(/value:\s*(['"])((?:(?!\1).)+)\1/);
           if (regexMatch) {
+            // Strip (?i) prefix — JS uses /pattern/i flag instead of PCRE inline (?i)
+            const rawPattern = regexMatch[2]!;
+            const jsPattern = rawPattern.replace(/^\(\?i\)/g, '');
             try {
-              new RegExp(regexMatch[2]!, 'i');
+              new RegExp(jsPattern, 'i');
             } catch (regexErr) {
-              console.log(`[LLM] YAML block skipped — invalid regex: ${regexMatch[2]?.slice(0, 100)}. Error: ${regexErr instanceof Error ? regexErr.message : String(regexErr)}`);
+              console.log(`[LLM] YAML block skipped — invalid regex: ${rawPattern.slice(0, 100)}. Error: ${regexErr instanceof Error ? regexErr.message : String(regexErr)}`);
               continue; // Skip rules with invalid regex
+            }
+            // If we stripped (?i), also fix it in the rule content so downstream consumers don't hit the same issue
+            if (rawPattern !== jsPattern) {
+              ruleContent = ruleContent.replace(rawPattern, jsPattern);
+              console.log(`[LLM] Stripped (?i) prefix from regex for JS compatibility`);
             }
           }
 
