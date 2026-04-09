@@ -26,22 +26,14 @@ async function loadThreatCloud(): Promise<any> {
 }
 
 export function threatCommand(): Command {
-  const cmd = new Command('threat').description(
-    'Threat intelligence API management / \u5A01\u8105\u60C5\u5831 API \u7BA1\u7406'
-  );
+  const cmd = new Command('threat').description('Threat intelligence API management');
 
   cmd
     .command('start')
-    .description(
-      'Start the Threat Cloud API server / \u555F\u52D5\u5A01\u8105\u96F2 API \u4F3A\u670D\u5668'
-    )
-    .option('--port <number>', 'Listen port / \u76E3\u807D\u57E0', '8080')
-    .option('--host <string>', 'Listen host / \u76E3\u807D\u4E3B\u6A5F', '127.0.0.1')
-    .option(
-      '--db <path>',
-      'SQLite database path / \u8CC7\u6599\u5EAB\u8DEF\u5F91',
-      './threat-cloud.db'
-    )
+    .description('Start the Threat Cloud API server')
+    .option('--port <number>', 'Listen port', '8080')
+    .option('--host <string>', 'Listen host', '127.0.0.1')
+    .option('--db <path>', 'SQLite database path', './threat-cloud.db')
     .action(async (opts: { port: string; host: string; db: string }) => {
       const tc = await loadThreatCloud();
       if (!tc) return;
@@ -93,8 +85,8 @@ export function threatCommand(): Command {
 
   cmd
     .command('stats')
-    .description('Show threat intelligence statistics / 顯示威脅情報統計')
-    .option('--db <path>', 'SQLite database path / 資料庫路徑', './threat-cloud.db')
+    .description('Show threat intelligence statistics')
+    .option('--db <path>', 'SQLite database path', './threat-cloud.db')
     .action(async (opts: { db: string }) => {
       const tc = await loadThreatCloud();
       if (!tc) return;
@@ -175,8 +167,8 @@ export function threatCommand(): Command {
 
   cmd
     .command('seed')
-    .description('Seed rules from bundled config into Threat Cloud DB / 將內建規則種入威脅雲資料庫')
-    .option('--db <path>', 'SQLite database path / 資料庫路徑', './threat-cloud.db')
+    .description('Seed rules from bundled config into Threat Cloud DB')
+    .option('--db <path>', 'SQLite database path', './threat-cloud.db')
     .action(async (opts: { db: string }) => {
       const tc = await loadThreatCloud();
       if (!tc) return;
@@ -277,16 +269,12 @@ export function threatCommand(): Command {
 
   cmd
     .command('backup')
-    .description('Backup Threat Cloud and auth databases / 備份威脅雲及認證資料庫')
-    .option('--db <path>', 'Auth database path / 認證資料庫路徑', '/data/auth.db')
-    .option(
-      '--threat-db <path>',
-      'Threat Cloud database path / 威脅雲資料庫路徑',
-      '/data/threat-cloud.db'
-    )
-    .option('--backup-dir <path>', 'Backup directory / 備份目錄', '/data/backups')
-    .option('--max-backups <number>', 'Maximum backups to keep / 最多保留備份數', '7')
-    .option('--list', 'List existing backups / 列出現有備份', false)
+    .description('Backup Threat Cloud and auth databases')
+    .option('--db <path>', 'Auth database path', '/data/auth.db')
+    .option('--threat-db <path>', 'Threat Cloud database path', '/data/threat-cloud.db')
+    .option('--backup-dir <path>', 'Backup directory', '/data/backups')
+    .option('--max-backups <number>', 'Maximum backups to keep', '7')
+    .option('--list', 'List existing backups', false)
     .action(
       async (opts: {
         db: string;

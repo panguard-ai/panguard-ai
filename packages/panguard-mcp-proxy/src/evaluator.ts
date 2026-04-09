@@ -9,8 +9,9 @@
 
 import { ATREngine } from '@panguard-ai/atr';
 import type { AgentEvent } from '@panguard-ai/atr';
-import { resolve, dirname } from 'node:path';
-import { existsSync } from 'node:fs';
+import { resolve, dirname, join } from 'node:path';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
@@ -58,10 +59,33 @@ export class ProxyEvaluator {
   private readonly engine: ATREngine;
   private rulesLoaded = false;
   private ruleCount = 0;
+  private blockedTools: Set<string> = new Set();
+  private readonly blocklistPath: string;
+  private blocklistMtime = 0;
+  private blocklistSize = 0;
 
   constructor() {
     const rulesDir = findRulesDir();
     this.engine = new ATREngine({ rulesDir });
+    this.blocklistPath = join(homedir(), '.panguard-guard', 'blocked-tools.json');
+    this.refreshBlocklist();
+  }
+
+  /** Reload blocklist from disk if modified (called before each evaluation) */
+  private refreshBlocklist(): void {
+    try {
+      if (!existsSync(this.blocklistPath)) return;
+      const stat = statSync(this.blocklistPath);
+      // Check both mtime and size to catch sub-ms writes on APFS/Docker
+      if (stat.mtimeMs <= this.blocklistMtime && stat.size === this.blocklistSize) return;
+      const raw = readFileSync(this.blocklistPath, 'utf-8');
+      const list = JSON.parse(raw) as string[];
+      this.blockedTools = new Set(list.map((n: string) => n.toLowerCase()));
+      this.blocklistMtime = stat.mtimeMs;
+      this.blocklistSize = stat.size;
+    } catch {
+      /* best effort — keep previous blocklist on parse error */
+    }
   }
 
   async loadRules(): Promise<number> {
@@ -88,6 +112,19 @@ export class ProxyEvaluator {
   /** Evaluate a tool call (PreToolUse) */
   async evaluateToolCall(toolName: string, args: Record<string, unknown>): Promise<EvalResult> {
     const start = Date.now();
+
+    // Check Guard blocklist first (instant deny, no regex needed)
+    this.refreshBlocklist();
+    if (this.blockedTools.has(toolName.toLowerCase())) {
+      return {
+        outcome: 'deny',
+        reason: `Tool "${toolName}" is on the Guard blocklist`,
+        matchedRules: ['guard-blocklist'],
+        confidence: 100,
+        durationMs: Date.now() - start,
+      };
+    }
+
     // Flatten args into natural text so ATR regexes can match content like paths and commands
     const flatContent = `${toolName} ${this.flattenArgs(args)}`;
     const event: AgentEvent = {
@@ -150,13 +187,16 @@ export class ProxyEvaluator {
         confidence: topMatch.confidence,
         durationMs,
       };
-    } catch {
-      // Fail-open: if evaluation crashes, allow the call
+    } catch (err: unknown) {
+      // Fail-closed: if evaluation crashes, deny the call (security-first)
+      process.stderr.write(
+        `[panguard-proxy] Evaluation error (fail-closed): ${err instanceof Error ? err.message : String(err)}\n`
+      );
       return {
-        outcome: 'allow',
-        reason: 'Evaluation error (fail-open)',
-        matchedRules: [],
-        confidence: 0,
+        outcome: 'deny',
+        reason: 'Evaluation error (fail-closed for safety)',
+        matchedRules: ['evaluation-error'],
+        confidence: 100,
         durationMs: Date.now() - start,
       };
     }

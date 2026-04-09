@@ -24,6 +24,7 @@ vi.mock('node:fs', async () => {
     existsSync: vi.fn().mockReturnValue(false),
     readFileSync: vi.fn().mockReturnValue('{}'),
     writeFileSync: vi.fn(),
+    renameSync: vi.fn(),
     mkdirSync: vi.fn(),
   };
 });
@@ -182,7 +183,7 @@ describe('SkillWhitelistManager', () => {
 
       expect(mockWriteFileSync).toHaveBeenCalled();
       const [path, content] = mockWriteFileSync.mock.calls.at(-1)!;
-      expect(path).toBe('/tmp/test-whitelist.json');
+      expect((path as string).startsWith('/tmp/test-whitelist.json')).toBe(true);
 
       const data = JSON.parse(content as string) as {
         whitelist: Array<{ name: string }>;

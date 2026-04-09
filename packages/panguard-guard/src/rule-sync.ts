@@ -82,14 +82,16 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
       );
     }
 
-    // Report locally whitelisted skills to Threat Cloud
+    // Report locally whitelisted skills to Threat Cloud (batch)
     try {
       const localSkills = atrEngine
         .getWhitelistManager()
         .getAll()
         .filter((s) => s.source === 'fingerprint' || s.source === 'manual');
-      for (const skill of localSkills) {
-        await threatCloud.reportSafeSkill(skill.name, skill.fingerprintHash);
+      if (localSkills.length > 0) {
+        await threatCloud.reportSafeSkillsBatch(
+          localSkills.map((s) => ({ skillName: s.name, fingerprintHash: s.fingerprintHash }))
+        );
       }
     } catch (err: unknown) {
       logger.warn(

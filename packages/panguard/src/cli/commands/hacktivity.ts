@@ -1,6 +1,6 @@
 /**
- * panguard hacktivity - HackerOne threat intel pipeline
- * panguard hacktivity - HackerOne 威脅情報管線
+ * pga hacktivity - HackerOne threat intel pipeline
+ * pga hacktivity - HackerOne 威脅情報管線
  *
  * Fetches publicly disclosed HackerOne reports, extracts attack patterns,
  * and auto-generates Sigma detection rules.
@@ -90,8 +90,8 @@ export function hacktivityCommand(): Command {
   // ─── sync ───
   cmd
     .command('sync')
-    .description('Fetch latest disclosed reports from HackerOne / 拉取最新公開報告')
-    .option('--max <number>', 'Max reports to fetch / 最大拉取數量', '50')
+    .description('Fetch latest disclosed reports from HackerOne')
+    .option('--max <number>', 'Max reports to fetch', '50')
     .option('--severity <level>', 'Min severity (low|medium|high|critical)', 'medium')
     .action(
       withAuth('solo', async (opts: { max: string; severity: string }) => {
@@ -151,7 +151,7 @@ export function hacktivityCommand(): Command {
           }
           console.log('');
           console.log(
-            `  ${symbols.info} Run ${c.sage('panguard hacktivity generate-rules')} to create detection rules.`
+            `  ${symbols.info} Run ${c.sage('pga hacktivity generate-rules')} to create detection rules.`
           );
         } catch (err) {
           sp.fail(`Sync failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -163,9 +163,7 @@ export function hacktivityCommand(): Command {
   // ─── generate-rules ───
   cmd
     .command('generate-rules')
-    .description(
-      'Generate detection rules from fetched reports / 從報告生成偵測規則 (legacy, uses Sigma format)'
-    )
+    .description('Generate detection rules from fetched reports')
     .option('--ollama-url <url>', 'Ollama API URL', 'http://localhost:11434')
     .option('--model <name>', 'Ollama model name', 'llama3.2')
     .option('--heuristic-only', 'Skip Ollama, use heuristic extraction only', false)
@@ -177,7 +175,7 @@ export function hacktivityCommand(): Command {
 
           if (meta.reports.length === 0) {
             console.log(
-              `  ${symbols.warn} ${c.dim('No reports found. Run')} ${c.sage('panguard hacktivity sync')} ${c.dim('first.')}`
+              `  ${symbols.warn} ${c.dim('No reports found. Run')} ${c.sage('pga hacktivity sync')} ${c.dim('first.')}`
             );
             return;
           }
@@ -296,7 +294,7 @@ export function hacktivityCommand(): Command {
           if (draftCount > 0) {
             console.log('');
             console.log(
-              `  ${symbols.info} Run ${c.sage('panguard hacktivity review')} to review draft rules.`
+              `  ${symbols.info} Run ${c.sage('pga hacktivity review')} to review draft rules.`
             );
           }
         }
@@ -306,7 +304,7 @@ export function hacktivityCommand(): Command {
   // ─── review ───
   cmd
     .command('review')
-    .description('Review auto-generated rules / 審核自動生成的規則')
+    .description('Review auto-generated rules')
     .option('--status <status>', 'Filter by status (draft|experimental|all)', 'draft')
     .action(
       withAuth('solo', async (opts: { status: string }) => {
@@ -354,7 +352,7 @@ export function hacktivityCommand(): Command {
   // ─── stats ───
   cmd
     .command('stats')
-    .description('Show pipeline statistics / 顯示管線統計')
+    .description('Show pipeline statistics')
     .action(async () => {
       const meta = loadMeta();
 

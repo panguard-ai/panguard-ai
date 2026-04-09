@@ -11,7 +11,7 @@ import { Command } from 'commander';
 
 export function logoutCommand(): Command {
   return new Command('logout')
-    .description('Authentication removed - all features are free / 驗證已移除 - 所有功能免費')
+    .description('Authentication removed - all features are free')
     .action(async () => {
       console.log('');
       console.log('  Authentication removed. All features are free and open source.');

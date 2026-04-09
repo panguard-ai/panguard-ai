@@ -9,7 +9,7 @@ import { Command } from 'commander';
 
 export function whoamiCommand(): Command {
   return new Command('whoami')
-    .description('Show current user info / 顯示目前用戶資訊')
+    .description('Show current user info')
     .option('--json', 'Output as JSON')
     .option('--lang <language>', 'Language override')
     .action(async (opts: { json?: boolean; lang?: string }) => {

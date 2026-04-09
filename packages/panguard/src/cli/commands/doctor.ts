@@ -38,8 +38,6 @@ type Lang = 'en' | 'zh-TW';
 const HOME = homedir();
 const PANGUARD_DIR = join(HOME, '.panguard');
 const CONFIG_PATH = join(PANGUARD_DIR, 'config.json');
-const CREDENTIALS_PATH = join(PANGUARD_DIR, 'credentials.enc');
-const LEGACY_CREDENTIALS_PATH = join(PANGUARD_DIR, 'credentials.json');
 const LAST_SCAN_PATH = join(PANGUARD_DIR, 'last-scan.json');
 const GUARD_PID_PATH = join(HOME, '.panguard-guard', 'panguard-guard.pid');
 const LAUNCHD_PLIST_PATH = join(HOME, 'Library', 'LaunchAgents', 'ai.panguard.guard.plist');
@@ -65,7 +63,7 @@ function checkConfiguration(): CheckResult {
       status: 'fail',
       label: 'Configuration valid',
       detail: '~/.panguard/config.json not found',
-      fix: 'Run "panguard init" to create your configuration',
+      fix: 'Run "pga setup" to create your configuration',
     };
   }
 
@@ -82,54 +80,18 @@ function checkConfiguration(): CheckResult {
       status: 'fail',
       label: 'Configuration valid',
       detail: '~/.panguard/config.json is not valid JSON',
-      fix: 'Run "panguard init" to regenerate the configuration file',
+      fix: 'Run "pga setup" to regenerate the configuration file',
     };
   }
 }
 
 function checkCredentials(): CheckResult {
-  const hasEncrypted = existsSync(CREDENTIALS_PATH);
-  const hasLegacy = existsSync(LEGACY_CREDENTIALS_PATH);
-
-  if (!hasEncrypted && !hasLegacy) {
-    return {
-      status: 'warn',
-      label: 'License / credentials',
-      detail: 'No credentials found',
-      fix: 'Run "panguard login" to authenticate and activate your plan',
-    };
-  }
-
-  const credPath = hasEncrypted ? CREDENTIALS_PATH : LEGACY_CREDENTIALS_PATH;
-
-  try {
-    if (!hasEncrypted && hasLegacy) {
-      // Legacy plaintext — can read directly
-      const raw = readFileSync(credPath, 'utf-8');
-      const data = JSON.parse(raw) as { tier?: string; expiresAt?: string };
-      const tier = data.tier ?? 'unknown';
-      const expiry = data.expiresAt ? data.expiresAt.slice(0, 10) : 'unknown';
-      return {
-        status: 'pass',
-        label: 'License / credentials',
-        detail: `${capitalise(tier)} plan, expires ${expiry}`,
-      };
-    }
-
-    // Encrypted — only report presence, not content (no key available here)
-    return {
-      status: 'pass',
-      label: 'License / credentials',
-      detail: 'Credentials file present (~/.panguard/credentials.enc)',
-    };
-  } catch {
-    return {
-      status: 'warn',
-      label: 'License / credentials',
-      detail: 'Credentials file present but could not be read',
-      fix: 'Run "panguard login" to re-authenticate',
-    };
-  }
+  // PanGuard is 100% free and open source — no license or login required
+  return {
+    status: 'pass',
+    label: 'License',
+    detail: 'Open source — no license required',
+  };
 }
 
 function checkAiProvider(): CheckResult {
@@ -215,7 +177,7 @@ function checkAiProvider(): CheckResult {
     status: 'warn',
     label: 'AI provider',
     detail: 'No AI provider configured (Layer 1 rules-only mode)',
-    fix: 'Run "panguard guard setup-ai" for interactive setup, or set ANTHROPIC_API_KEY / install Ollama',
+    fix: 'Run "pga guard setup-ai" for interactive setup, or set ANTHROPIC_API_KEY / install Ollama',
   };
 }
 
@@ -225,7 +187,7 @@ function checkGuardEngine(): CheckResult {
       status: 'fail',
       label: 'Guard engine',
       detail: 'Daemon not running (no PID file)',
-      fix: 'Run "panguard guard start" to start the guard daemon',
+      fix: 'Run "pga guard start" to start the guard daemon',
     };
   }
 
@@ -244,7 +206,7 @@ function checkGuardEngine(): CheckResult {
       status: 'fail',
       label: 'Guard engine',
       detail: 'PID file exists but daemon is not running',
-      fix: 'Run "panguard guard start" to restart the guard daemon',
+      fix: 'Run "pga guard start" to restart the guard daemon',
     };
   }
 }
@@ -255,7 +217,7 @@ function checkNotificationChannels(): CheckResult {
       status: 'warn',
       label: 'Notification channels',
       detail: 'Config not found — cannot verify channels',
-      fix: 'Run "panguard init" to set up notification channels',
+      fix: 'Run "pga setup" to set up notification channels',
     };
   }
 
@@ -271,7 +233,7 @@ function checkNotificationChannels(): CheckResult {
         status: 'warn',
         label: 'Notification channels',
         detail: 'No notification channel configured',
-        fix: 'Run "panguard init" and configure a Telegram, Slack, or webhook channel',
+        fix: 'Run "pga setup" and configure a Telegram, Slack, or webhook channel',
       };
     }
 
@@ -285,7 +247,7 @@ function checkNotificationChannels(): CheckResult {
       status: 'warn',
       label: 'Notification channels',
       detail: 'Could not parse config to verify channels',
-      fix: 'Run "panguard init" to reconfigure',
+      fix: 'Run "pga setup" to reconfigure',
     };
   }
 }
@@ -296,7 +258,7 @@ function checkLastScan(): CheckResult {
       status: 'warn',
       label: 'Last scan',
       detail: 'No scan result found',
-      fix: 'Run "panguard scan" to perform your first scan',
+      fix: 'Run "pga scan" to perform your first scan',
     };
   }
 
@@ -310,7 +272,7 @@ function checkLastScan(): CheckResult {
         status: 'warn',
         label: 'Last scan',
         detail: 'Scan record found but timestamp is invalid',
-        fix: 'Run "panguard scan" to perform a fresh scan',
+        fix: 'Run "pga scan" to perform a fresh scan',
       };
     }
 
@@ -321,7 +283,7 @@ function checkLastScan(): CheckResult {
         status: 'warn',
         label: 'Last scan',
         detail: `${diffDays} days ago (recommend weekly)`,
-        fix: 'Run "panguard scan" to perform a fresh scan',
+        fix: 'Run "pga scan" to perform a fresh scan',
       };
     }
 
@@ -335,7 +297,7 @@ function checkLastScan(): CheckResult {
       status: 'warn',
       label: 'Last scan',
       detail: 'Could not read last scan record',
-      fix: 'Run "panguard scan" to generate a fresh scan result',
+      fix: 'Run "pga scan" to generate a fresh scan result',
     };
   }
 }
@@ -346,7 +308,7 @@ function checkThreatCloud(): CheckResult {
       status: 'warn',
       label: 'Threat Cloud',
       detail: 'Config not found — cannot verify Threat Cloud endpoint',
-      fix: 'Run "panguard init" to configure Threat Cloud connectivity',
+      fix: 'Run "pga setup" to configure Threat Cloud connectivity',
     };
   }
 
@@ -381,7 +343,7 @@ function checkThreatCloud(): CheckResult {
       status: 'warn',
       label: 'Threat Cloud',
       detail: 'Could not parse config to verify Threat Cloud',
-      fix: 'Run "panguard init" to reconfigure',
+      fix: 'Run "pga setup" to reconfigure',
     };
   }
 }
@@ -403,7 +365,7 @@ function checkSystemService(): CheckResult {
       status: 'warn',
       label: 'System service',
       detail: 'launchd plist not found',
-      fix: 'Run "panguard guard install" to install the system service',
+      fix: 'Run "pga guard install" to install the system service',
     };
   }
 
@@ -417,14 +379,14 @@ function checkSystemService(): CheckResult {
       detail: matchesConfig
         ? 'launchd unit matches config'
         : 'launchd plist exists but may be outdated',
-      fix: matchesConfig ? undefined : 'Run "panguard guard install" to reinstall the service',
+      fix: matchesConfig ? undefined : 'Run "pga guard install" to reinstall the service',
     };
   } catch {
     return {
       status: 'warn',
       label: 'System service',
       detail: 'launchd plist found but could not be read',
-      fix: 'Run "panguard guard install" to reinstall the service',
+      fix: 'Run "pga guard install" to reinstall the service',
     };
   }
 }
@@ -459,7 +421,7 @@ function checkShellCompletions(): CheckResult {
     status: 'warn',
     label: 'Shell completions',
     detail: 'zsh completions not found',
-    fix: 'Run "panguard completion install" to install shell completions',
+    fix: 'Run "pga completion install" to install shell completions',
   };
 }
 
@@ -558,7 +520,7 @@ function checkAiLayerCloud(): CheckResult {
     status: 'warn',
     label: 'AI Layer 3 (Cloud)',
     detail: 'No cloud AI API key configured',
-    fix: 'Run "panguard guard setup-ai" or set ANTHROPIC_API_KEY / OPENAI_API_KEY',
+    fix: 'Run "pga guard setup-ai" or set ANTHROPIC_API_KEY / OPENAI_API_KEY',
   };
 }
 
@@ -658,12 +620,12 @@ export async function runDoctor(lang: Lang): Promise<void> {
 
 export function doctorCommand(): Command {
   return new Command('doctor')
-    .description('Run health diagnostics / \u57F7\u884C\u5065\u5EB7\u8A3A\u65B7')
+    .description('Run health diagnostics')
     .option('--json', 'Output results as JSON')
-    .option('--fix', 'Attempt auto-repair of detected issues')
+    .option('--fix', 'Show fix commands for detected issues')
     .option('--lang <language>', 'Language override (en | zh-TW)')
     .action(async (opts: { json?: boolean; fix?: boolean; lang?: string }) => {
-      const lang: Lang = opts.lang === 'en' ? 'en' : 'zh-TW';
+      const lang: Lang = opts.lang === 'zh-TW' ? 'zh-TW' : 'en';
       const results = runAllChecks();
 
       if (opts.json) {
@@ -698,8 +660,8 @@ export function doctorCommand(): Command {
         console.log(
           `  ${symbols.info} ${c.dim(
             lang === 'zh-TW'
-              ? '自動修復功能即將推出。請手動執行上述指令。'
-              : 'Automated fix execution coming soon. Please run the above commands manually.'
+              ? '請複製上述指令執行修復。'
+              : 'Copy and run the commands above to fix.'
           )}`
         );
         console.log('');

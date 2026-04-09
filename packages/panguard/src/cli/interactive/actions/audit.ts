@@ -230,8 +230,8 @@ export async function actionAudit(lang: Lang): Promise<void> {
         console.log(
           c.dim(
             lang === 'zh-TW'
-              ? `  \u57F7\u884C\uFF1Apanguard audit skill <path> \u4F86\u5BE9\u8A08\u7279\u5B9A\u6280\u80FD`
-              : `  Run: panguard audit skill <path> to audit a specific skill`
+              ? `  \u57F7\u884C\uFF1Apga audit skill <path> \u4F86\u5BE9\u8A08\u7279\u5B9A\u6280\u80FD`
+              : `  Run: pga audit skill <path> to audit a specific skill`
           )
         );
       } else {

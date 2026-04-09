@@ -21,6 +21,9 @@ const logger = createLogger('audit');
  * @param event - Partial audit event (timestamp auto-filled) / 部分稽核事件（時間戳自動填充）
  */
 export function logAuditEvent(event: Omit<AuditEvent, 'timestamp' | 'module'>): void {
+  // Respect silent mode — but always log blocked events (security-critical)
+  if (process.env['PANGUARD_LOG_LEVEL'] === 'silent' && event.result !== 'blocked') return;
+
   const fullEvent: AuditEvent = {
     timestamp: new Date().toISOString(),
     module: 'audit',

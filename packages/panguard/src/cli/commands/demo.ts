@@ -36,8 +36,8 @@ async function loadReportModule(): Promise<{
 
 export function demoCommand(): Command {
   return new Command('demo')
-    .description('Run an automated demo sequence / 執行自動化展示')
-    .option('--lang <language>', 'Language: en or zh-TW / 語言', 'en')
+    .description('Run an automated demo sequence')
+    .option('--lang <language>', 'Language: en or zh-TW', 'en')
     .action(async (_opts: { lang: string }) => {
       // Suppress internal module JSON logs — demo should only show user-facing output
       setLogLevel('silent');
@@ -221,9 +221,9 @@ export function demoCommand(): Command {
       );
 
       console.log(`  ${c.dim('Next steps:')}`);
-      console.log(`    ${c.sage('panguard')}             ${c.dim('Interactive mode')}`);
-      console.log(`    ${c.sage('panguard scan')}        ${c.dim('Full security scan')}`);
-      console.log(`    ${c.sage('panguard guard start')} ${c.dim('Start real-time monitoring')}`);
+      console.log(`    ${c.sage('pga')}             ${c.dim('Interactive mode')}`);
+      console.log(`    ${c.sage('pga scan')}        ${c.dim('Full security scan')}`);
+      console.log(`    ${c.sage('pga guard start')} ${c.dim('Start real-time monitoring')}`);
       console.log('');
     });
 }

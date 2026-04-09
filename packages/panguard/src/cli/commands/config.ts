@@ -2,10 +2,10 @@
  * panguard config - Manage local configuration
  *
  * Subcommands:
- *   panguard config llm --provider claude --api-key sk-xxx
- *   panguard config llm --provider ollama --endpoint http://localhost:11434
- *   panguard config llm --show
- *   panguard config llm --clear
+ *   pga config llm --provider claude --api-key sk-xxx
+ *   pga config llm --provider ollama --endpoint http://localhost:11434
+ *   pga config llm --show
+ *   pga config llm --clear
  */
 
 import { Command } from 'commander';
@@ -13,25 +13,38 @@ import { c, banner } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
 import { saveLlmConfig, loadLlmConfig, deleteLlmConfig } from '../credentials.js';
 import { loadGuardConfig, updateGuardConfig } from '../guard-config.js';
+import { saveLang } from '../interactive/lang.js';
 
 export function configCommand(): Command {
-  const cmd = new Command('config').description('Manage local configuration / 管理本地設定');
+  const cmd = new Command('config').description('Manage local configuration');
 
   cmd
     .command('set')
-    .description('Set a guard config value / 設定 guard 設定值')
-    .argument('<key>', 'Config key: telemetry, threat-cloud')
-    .argument('<value>', 'Config value (true/false)')
+    .description('Set a guard config value')
+    .argument('<key>', 'Config key: telemetry, threat-cloud, lang')
+    .argument('<value>', 'Config value (true/false, or en/zh-TW for lang)')
     .action((key: string, value: string) => {
-      const validKeys = ['telemetry', 'threat-cloud'];
+      const validKeys = ['telemetry', 'threat-cloud', 'lang'];
       if (!validKeys.includes(key)) {
         console.log(
           `  ${c.caution(`Invalid key: ${key}. Must be one of: ${validKeys.join(', ')}`)}`
         );
+        process.exit(1);
+      }
+      const config = loadGuardConfig();
+      if (key === 'lang') {
+        const validLangs = ['en', 'zh-TW'];
+        if (!validLangs.includes(value)) {
+          console.log(
+            `  ${c.caution(`Invalid language: ${value}. Must be one of: ${validLangs.join(', ')}`)}`
+          );
+          process.exit(1);
+        }
+        saveLang(value as 'en' | 'zh-TW');
+        console.log(`  ${c.safe('lang')} set to ${c.bold(value)}`);
         return;
       }
       const boolValue = value === 'true' || value === '1' || value === 'yes';
-      const config = loadGuardConfig();
       if (key === 'telemetry') {
         updateGuardConfig({ ...config, telemetryEnabled: boolValue });
         console.log(`  ${c.safe('telemetryEnabled')} set to ${c.bold(String(boolValue))}`);
@@ -43,7 +56,7 @@ export function configCommand(): Command {
 
   cmd
     .command('show')
-    .description('Show current configuration / 顯示目前設定')
+    .description('Show current configuration')
     .action(() => {
       console.log(banner(PANGUARD_VERSION));
       console.log(`  ${c.sage('Guard Configuration')}`);
@@ -78,7 +91,7 @@ export function configCommand(): Command {
 
   cmd
     .command('llm')
-    .description('Configure LLM provider for AI analysis / 設定 AI 分析的 LLM 提供者')
+    .description('Configure LLM provider for AI analysis')
     .option('--provider <provider>', 'LLM provider: claude, openai, ollama')
     .option('--api-key <key>', 'API key (for claude/openai)')
     .option('--model <model>', 'Model override (e.g., claude-haiku-4-5-20251001, gpt-4o)')
@@ -101,7 +114,7 @@ export function configCommand(): Command {
           if (!config) {
             console.log(`  ${c.dim('No LLM configuration found.')}`);
             console.log(
-              `  ${c.dim('Set one with:')} panguard config llm --provider claude --api-key sk-...`
+              `  ${c.dim('Set one with:')} pga config llm --provider claude --api-key sk-...`
             );
             return;
           }
@@ -134,25 +147,23 @@ export function configCommand(): Command {
           console.log(`  ${c.caution('--provider is required.')}`);
           console.log('');
           console.log('  Examples:');
-          console.log(
-            `    ${c.dim('$')} panguard config llm --provider claude --api-key sk-ant-xxx`
-          );
-          console.log(`    ${c.dim('$')} panguard config llm --provider openai --api-key sk-xxx`);
-          console.log(`    ${c.dim('$')} panguard config llm --provider ollama`);
+          console.log(`    ${c.dim('$')} pga config llm --provider claude --api-key sk-ant-xxx`);
+          console.log(`    ${c.dim('$')} pga config llm --provider openai --api-key sk-xxx`);
+          console.log(`    ${c.dim('$')} pga config llm --provider ollama`);
           console.log('');
           console.log('  OpenAI-compatible APIs (Gemini, Groq, Qwen, DeepSeek, etc.):');
           console.log(
-            `    ${c.dim('$')} panguard config llm --provider openai --endpoint https://api.groq.com/openai/v1 --api-key gsk-xxx`
+            `    ${c.dim('$')} pga config llm --provider openai --endpoint https://api.groq.com/openai/v1 --api-key gsk-xxx`
           );
           console.log(
-            `    ${c.dim('$')} panguard config llm --provider openai --endpoint https://generativelanguage.googleapis.com/v1beta/openai/ --api-key AIza-xxx`
+            `    ${c.dim('$')} pga config llm --provider openai --endpoint https://generativelanguage.googleapis.com/v1beta/openai/ --api-key AIza-xxx`
           );
           console.log(
-            `    ${c.dim('$')} panguard config llm --provider openai --endpoint https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxx  ${c.dim('# Qwen')}`
+            `    ${c.dim('$')} pga config llm --provider openai --endpoint https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxx  ${c.dim('# Qwen')}`
           );
           console.log('');
-          console.log(`    ${c.dim('$')} panguard config llm --show`);
-          console.log(`    ${c.dim('$')} panguard config llm --clear`);
+          console.log(`    ${c.dim('$')} pga config llm --show`);
+          console.log(`    ${c.dim('$')} pga config llm --clear`);
           return;
         }
 

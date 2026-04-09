@@ -26,9 +26,7 @@ import type { Lang } from '../../init/types.js';
 
 export function statusCommand(): Command {
   return new Command('status')
-    .description(
-      'Show system status dashboard / \u986F\u793A\u7CFB\u7D71\u72C0\u614B\u5100\u8868\u677F'
-    )
+    .description('Show system status dashboard')
     .option('--json', 'Output as JSON')
     .option('--lang <language>', 'Language override')
     .action(async (opts: { json?: boolean; lang?: string }) => {
@@ -67,7 +65,7 @@ interface SystemStatus {
 
 async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void> {
   const config = readConfig();
-  const lang: Lang = (opts.lang as Lang) ?? config?.meta?.language ?? 'zh-TW';
+  const lang: Lang = (opts.lang as Lang) ?? config?.meta?.language ?? 'en';
 
   const status = collectStatus(config);
 
@@ -132,8 +130,8 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
     console.log(
       `  ${symbols.info} ${
         lang === 'zh-TW'
-          ? '\u57F7\u884C \u300Cpanguard setup\u300D\u958B\u59CB\u8A2D\u5B9A\u3002'
-          : 'Run "panguard setup" to get started.'
+          ? '\u57F7\u884C \u300Cpga setup\u300D\u958B\u59CB\u8A2D\u5B9A\u3002'
+          : 'Run "pga setup" to get started.'
       }`
     );
     console.log('');

@@ -146,8 +146,10 @@ export class DailySummaryCollector {
           if (Array.isArray(parsed)) {
             history = parsed as DailySummaryData[];
           }
-        } catch {
-          // Corrupted file, start fresh
+        } catch (err) {
+          process.stderr.write(
+            `[daily-summary] Corrupted summary file, starting fresh: ${err instanceof Error ? err.message : String(err)}\n`
+          );
         }
       }
 
@@ -259,8 +261,10 @@ export class DailySummaryCollector {
       if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed[parsed.length - 1] as DailySummaryData;
       }
-    } catch {
-      // Corrupted or empty file
+    } catch (err) {
+      process.stderr.write(
+        `[daily-summary] Failed to load summary: ${err instanceof Error ? err.message : String(err)}\n`
+      );
     }
 
     return null;

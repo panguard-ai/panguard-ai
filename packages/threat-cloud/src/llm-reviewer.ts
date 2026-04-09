@@ -403,11 +403,11 @@ BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL t
           // Validate: must have required ATR fields
           if (!ruleContent.includes('title:') || !ruleContent.includes('detection:')) continue;
 
-          // Validate regex in the rule
-          const regexMatch = ruleContent.match(/value:\s*"([^"]+)"/);
+          // Validate regex in the rule (match both single and double quoted values)
+          const regexMatch = ruleContent.match(/value:\s*(['"])((?:(?!\1).)+)\1/);
           if (regexMatch) {
             try {
-              new RegExp(regexMatch[1]!, 'i');
+              new RegExp(regexMatch[2]!, 'i');
             } catch {
               continue; // Skip rules with invalid regex
             }

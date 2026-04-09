@@ -14,13 +14,9 @@ import { c, box, header, symbols, divider } from '@panguard-ai/core';
 
 export function guardCommand(): Command {
   const cmd = new Command('guard')
-    .description('Guard engine management / \u5B88\u8B77\u5F15\u64CE\u7BA1\u7406')
-    .option(
-      '--watch',
-      'Start guard engine in foreground (alias for guard start) / 前景啟動守護引擎',
-      false
-    )
-    .option('--dashboard', 'Enable live TUI dashboard / 啟用即時 TUI 儀表板', false)
+    .description('Guard engine management')
+    .option('--watch', 'Start guard engine in foreground (alias for guard start)', false)
+    .option('--dashboard', 'Enable live TUI dashboard', false)
     .action(async (opts: { watch?: boolean; dashboard?: boolean }) => {
       if (opts.watch) {
         const args = ['start'];
@@ -31,23 +27,12 @@ export function guardCommand(): Command {
 
   cmd
     .command('start')
-    .description('Start the guard engine / \u555F\u52D5\u5B88\u8B77\u5F15\u64CE')
-    .option('--data-dir <path>', 'Data directory / \u8CC7\u6599\u76EE\u9304')
-    .option('--verbose', 'Verbose output (show all event logs) / \u8A73\u7D30\u8F38\u51FA', false)
-    .option(
-      '--dashboard',
-      'Enable live TUI dashboard / \u555F\u7528\u5373\u6642 TUI \u5100\u8868\u677F',
-      false
-    )
-    .option(
-      '--interactive',
-      'Prompt for medium-confidence threats / \u4E2D\u4FE1\u5FC3\u5EA6\u5A01\u8105\u4E92\u52D5\u63D0\u793A',
-      false
-    )
-    .option(
-      '--manager <url>',
-      'Manager URL for agent mode / Manager \u7DB2\u5740\uFF08Agent \u6A21\u5F0F\uFF09'
-    )
+    .description('Start the guard engine')
+    .option('--data-dir <path>', 'Data directory')
+    .option('--verbose', 'Verbose output (show all event logs)', false)
+    .option('--dashboard', 'Enable live TUI dashboard', false)
+    .option('--interactive', 'Prompt for medium-confidence threats', false)
+    .option('--manager <url>', 'Manager URL for agent mode')
     .action(
       async (opts: {
         dataDir?: string;
@@ -68,8 +53,8 @@ export function guardCommand(): Command {
 
   cmd
     .command('stop')
-    .description('Stop the guard engine / \u505C\u6B62\u5B88\u8B77\u5F15\u64CE')
-    .option('--data-dir <path>', 'Data directory / \u8CC7\u6599\u76EE\u9304')
+    .description('Stop the guard engine')
+    .option('--data-dir <path>', 'Data directory')
     .action(async (opts: { dataDir?: string }) => {
       const args = ['stop'];
       if (opts.dataDir) args.push('--data-dir', opts.dataDir);
@@ -78,9 +63,9 @@ export function guardCommand(): Command {
 
   cmd
     .command('restart')
-    .description('Restart the guard engine / 重啟守護引擎')
-    .option('--data-dir <path>', 'Data directory / 資料目錄')
-    .option('--verbose', 'Verbose output / 詳細輸出', false)
+    .description('Restart the guard engine')
+    .option('--data-dir <path>', 'Data directory')
+    .option('--verbose', 'Verbose output', false)
     .action(async (opts: { dataDir?: string; verbose: boolean }) => {
       const stopArgs = ['stop'];
       if (opts.dataDir) stopArgs.push('--data-dir', opts.dataDir);
@@ -94,9 +79,9 @@ export function guardCommand(): Command {
 
   cmd
     .command('status')
-    .description('Show engine status / 顯示引擎狀態')
-    .option('--data-dir <path>', 'Data directory / 資料目錄')
-    .option('--detailed', 'Show 3-layer health check / 顯示三層健康檢查', false)
+    .description('Show engine status')
+    .option('--data-dir <path>', 'Data directory')
+    .option('--detailed', 'Show 3-layer health check', false)
     .action(async (opts: { dataDir?: string; detailed: boolean }) => {
       if (opts.detailed) {
         await showDetailedStatus(opts.dataDir);
@@ -109,8 +94,8 @@ export function guardCommand(): Command {
 
   cmd
     .command('config')
-    .description('Show current configuration / 顯示當前配置')
-    .option('--data-dir <path>', 'Data directory / 資料目錄')
+    .description('Show current configuration')
+    .option('--data-dir <path>', 'Data directory')
     .action(async (opts: { dataDir?: string }) => {
       const args = ['config'];
       if (opts.dataDir) args.push('--data-dir', opts.dataDir);
@@ -119,7 +104,7 @@ export function guardCommand(): Command {
 
   cmd
     .command('generate-key [tier]')
-    .description('Generate a test license key / 產生測試授權金鑰')
+    .description('Generate a test license key')
     .action(async (tier?: string) => {
       const args = ['generate-key'];
       if (tier) args.push(tier);
@@ -128,8 +113,8 @@ export function guardCommand(): Command {
 
   cmd
     .command('install')
-    .description('Install as system service / 安裝為系統服務')
-    .option('--data-dir <path>', 'Data directory / 資料目錄')
+    .description('Install as system service')
+    .option('--data-dir <path>', 'Data directory')
     .action(async (opts: { dataDir?: string }) => {
       const args = ['install'];
       if (opts.dataDir) args.push('--data-dir', opts.dataDir);
@@ -138,14 +123,14 @@ export function guardCommand(): Command {
 
   cmd
     .command('uninstall')
-    .description('Remove system service / 移除系統服務')
+    .description('Remove system service')
     .action(async () => {
       await runCLI(['uninstall']);
     });
 
   cmd
     .command('setup-ai')
-    .description('Interactive AI layer setup / 互動式 AI 層設定')
+    .description('Interactive AI layer setup')
     .action(async () => {
       await commandSetupAi();
     });
@@ -246,19 +231,18 @@ async function commandSetupAi(): Promise<void> {
 
   // Step 1: Ask which layer
   console.log(`  Which AI layer would you like to configure?`);
-  console.log(`  您想要設定哪個 AI 層？`);
   console.log('');
-  console.log(`    ${c.sage('1')} - Local AI (Ollama)      / 本地 AI（Ollama）`);
-  console.log(`    ${c.sage('2')} - Cloud AI (API key)      / 雲端 AI（API 金鑰）`);
-  console.log(`    ${c.sage('3')} - Both (Local + Cloud)    / 兩者皆用`);
-  console.log(`    ${c.sage('q')} - Cancel / 取消`);
+  console.log(`    ${c.sage('1')} - Local AI (Ollama)`);
+  console.log(`    ${c.sage('2')} - Cloud AI (API key)`);
+  console.log(`    ${c.sage('3')} - Both (Local + Cloud)`);
+  console.log(`    ${c.sage('q')} - Cancel`);
   console.log('');
 
-  const choice = await readLine(`  Choice / 選擇 [1/2/3/q]: `);
+  const choice = await readLine(`  Choice: `);
   console.log('');
 
   if (choice === 'q' || choice === '') {
-    console.log(`  ${symbols.info} Setup cancelled. / 設定已取消。`);
+    console.log(`  ${symbols.info} Setup cancelled.`);
     console.log('');
     return;
   }
@@ -273,7 +257,7 @@ async function commandSetupAi(): Promise<void> {
 
   // Step 2a: Local AI (Ollama)
   if (setupLocal) {
-    console.log(divider('Layer 2: Local AI / 第二層：本地 AI'));
+    console.log(divider('Layer 2: Local AI'));
     console.log('');
 
     const ollamaInstalled = isOllamaInstalled();
@@ -287,26 +271,26 @@ async function commandSetupAi(): Promise<void> {
           timeout: 5000,
         }).trim();
         if (models && models.split('\n').length > 1) {
-          console.log(`  ${symbols.pass} Available models / 可用模型:`);
+          console.log(`  ${symbols.pass} Available models:`);
           const modelLines = models.split('\n').slice(1, 6);
           for (const line of modelLines) {
             console.log(`    ${c.dim(line.trim())}`);
           }
         } else {
-          console.log(`  ${symbols.warn} No models found. / 未找到模型。`);
+          console.log(`  ${symbols.warn} No models found.`);
           console.log(`    ${c.dim('Run: ollama pull llama3.2')}`);
         }
       } catch {
-        console.log(`  ${symbols.warn} Could not list models / 無法列出模型`);
+        console.log(`  ${symbols.warn} Could not list models`);
       }
     } else {
-      console.log(`  ${symbols.warn} Ollama is not installed / Ollama 未安裝`);
-      console.log(`    Install / 安裝: ${c.sage('curl -fsSL https://ollama.com/install.sh | sh')}`);
-      console.log(`    Then pull a model / 然後下載模型: ${c.sage('ollama pull llama3.2')}`);
+      console.log(`  ${symbols.warn} Ollama is not installed`);
+      console.log(`    ${c.dim('Install: curl -fsSL https://ollama.com/install.sh | sh')}`);
+      console.log(`    ${c.dim('Then pull a model: ollama pull llama3.2')}`);
     }
     console.log('');
 
-    const model = await readLine(`  Ollama model name / 模型名稱 [llama3.2]: `);
+    const model = await readLine(`  Ollama model name [llama3.2]: `);
     const ollamaModel = model || 'llama3.2';
     const ollamaEndpoint = await readLine(`  Ollama URL [http://localhost:11434]: `);
 
@@ -327,7 +311,7 @@ async function commandSetupAi(): Promise<void> {
 
   // Step 2b: Cloud AI
   if (setupCloud) {
-    console.log(divider('Layer 3: Cloud AI / 第三層：雲端 AI'));
+    console.log(divider('Layer 3: Cloud AI'));
     console.log('');
 
     const envKey =
@@ -362,7 +346,7 @@ async function commandSetupAi(): Promise<void> {
         provider === 'anthropic' ? 'claude' : provider === 'openai' ? 'openai' : 'claude';
       const defaultModel = cloudProvider === 'claude' ? 'claude-sonnet-4-20250514' : 'gpt-4o';
 
-      const model = await readLine(`  Model / 模型 [${defaultModel}]: `);
+      const model = await readLine(`  Model [${defaultModel}]: `);
       const cloudModel = model || defaultModel;
 
       // If we already set local AI, merge into a combined config
@@ -397,9 +381,8 @@ async function commandSetupAi(): Promise<void> {
       console.log(
         `  ${symbols.pass} Cloud AI configured: ${c.sage(`${cloudProvider} / ${cloudModel}`)}`
       );
-      console.log(`  ${c.dim('雲端 AI 已設定')}: ${cloudProvider} / ${cloudModel}`);
     } else {
-      console.log(`  ${symbols.info} Skipped cloud AI setup / 跳過雲端 AI 設定`);
+      console.log(`  ${symbols.info} Skipped cloud AI setup`);
     }
     console.log('');
   }
@@ -416,10 +399,7 @@ async function commandSetupAi(): Promise<void> {
   }
 
   console.log('');
-  console.log(
-    `  ${symbols.info} Restart guard to apply changes: ${c.sage('panguard guard restart')}`
-  );
-  console.log(`  ${c.dim('重啟守護以套用變更')}: panguard guard restart`);
+  console.log(`  ${symbols.info} Restart guard to apply changes: ${c.sage('pga guard restart')}`);
   console.log('');
 }
 

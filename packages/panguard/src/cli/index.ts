@@ -68,7 +68,7 @@ const program = new Command();
 
 program
   .name('panguard')
-  .description('Panguard AI - Security for AI Agents / AI Agent 資安防護')
+  .description('Panguard AI - Security for AI Agents')
   .version(PANGUARD_VERSION);
 
 // ── Core commands (shown in help) ──

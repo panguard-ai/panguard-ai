@@ -10,7 +10,7 @@ import { execSync } from 'node:child_process';
 
 export function upgradeCommand(): Command {
   const cmd = new Command('upgrade')
-    .description('Update Panguard CLI to the latest version / 更新至最新版本')
+    .description('Update Panguard CLI to the latest version')
     .action(async () => {
       console.log('Checking for updates...');
       try {
