@@ -10,12 +10,128 @@
  */
 
 import * as https from 'node:https';
+import { load as parseYaml } from 'js-yaml';
 import {
   parseATRRule,
   validateRuleMeetsStandard,
   type QualityGateResult,
 } from '@panguard-ai/atr/quality';
 import type { ThreatCloudDB } from './database.js';
+
+/**
+ * Minimal rule shape for self-test — matches what the LLM drafter prompt
+ * outputs. We only care about detection.conditions and test_cases.
+ */
+interface SelfTestRule {
+  detection?: {
+    conditions?: Array<{ value?: string; field?: string; operator?: string }>;
+  };
+  test_cases?: {
+    true_positives?: Array<{ input?: string; tool_response?: string }>;
+    true_negatives?: Array<{ input?: string; tool_response?: string }>;
+  };
+  evasion_tests?: Array<{ input?: string; expected?: string }>;
+}
+
+/**
+ * Self-test result for a single rule.
+ * A rule that fails its OWN test cases cannot be trusted to work on real data.
+ */
+interface SelfTestResult {
+  readonly passed: boolean;
+  readonly tpTotal: number;
+  readonly tpMatched: number;
+  readonly tnTotal: number;
+  readonly tnMatched: number;
+  readonly failureReasons: readonly string[];
+}
+
+/**
+ * Run a rule's embedded test cases against its own regex conditions.
+ * This is the first-principles quality check: if a rule cannot match its
+ * own claimed TPs or falsely matches its own claimed TNs, the regex is
+ * broken regardless of how good the metadata looks.
+ *
+ * Returns `passed: true` only if ALL TPs match AND zero TNs match.
+ */
+function selfTestRule(ruleContent: string): SelfTestResult {
+  let parsed: SelfTestRule;
+  try {
+    parsed = parseYaml(ruleContent) as SelfTestRule;
+  } catch (e) {
+    return {
+      passed: false,
+      tpTotal: 0,
+      tpMatched: 0,
+      tnTotal: 0,
+      tnMatched: 0,
+      failureReasons: [`YAML parse error: ${e instanceof Error ? e.message : String(e)}`],
+    };
+  }
+
+  const conditions = parsed?.detection?.conditions ?? [];
+  const regexes: RegExp[] = [];
+  for (const c of conditions) {
+    if (!c?.value) continue;
+    // Strip (?i) prefix — JS uses /pattern/i flag
+    const pattern = c.value.replace(/^\(\?i\)/, '');
+    try {
+      regexes.push(new RegExp(pattern, 'i'));
+    } catch {
+      // Invalid regex — skip this condition. Other conditions may still work.
+    }
+  }
+
+  if (regexes.length === 0) {
+    return {
+      passed: false,
+      tpTotal: 0,
+      tpMatched: 0,
+      tnTotal: 0,
+      tnMatched: 0,
+      failureReasons: ['no compilable regex conditions'],
+    };
+  }
+
+  const matchesAny = (text: string): boolean => regexes.some((r) => r.test(text));
+
+  const tps = parsed?.test_cases?.true_positives ?? [];
+  const tns = parsed?.test_cases?.true_negatives ?? [];
+
+  const failureReasons: string[] = [];
+  let tpMatched = 0;
+  for (let i = 0; i < tps.length; i++) {
+    const input = tps[i]?.input ?? tps[i]?.tool_response ?? '';
+    if (matchesAny(input)) {
+      tpMatched++;
+    } else {
+      failureReasons.push(`TP ${i + 1} not caught: "${input.slice(0, 80)}..."`);
+    }
+  }
+
+  let tnPassed = 0;
+  for (let i = 0; i < tns.length; i++) {
+    const input = tns[i]?.input ?? tns[i]?.tool_response ?? '';
+    if (!matchesAny(input)) {
+      tnPassed++;
+    } else {
+      failureReasons.push(`TN ${i + 1} false positive: "${input.slice(0, 80)}..."`);
+    }
+  }
+
+  // A rule passes self-test if all TPs match AND zero TNs match
+  const passed =
+    tpMatched === tps.length && tnPassed === tns.length && tps.length > 0 && tns.length > 0;
+
+  return {
+    passed,
+    tpTotal: tps.length,
+    tpMatched,
+    tnTotal: tns.length,
+    tnMatched: tns.length - tnPassed, // FP count
+    failureReasons,
+  };
+}
 
 /** LLM review verdict structure */
 interface LLMVerdict {
@@ -560,6 +676,22 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
           if (gateResult.warnings.length > 0) {
             console.log(`[LLM] Rule passed gate with warnings: ${gateResult.warnings.join('; ')}`);
           }
+
+          // Self-test: run the rule's own test_cases against its own regex.
+          // This is the first-principles quality check — if LLM-produced regex
+          // can't match its own TPs or incorrectly matches its own TNs, the
+          // rule is broken regardless of how good the metadata looks.
+          const selfTest = selfTestRule(ruleContent);
+          if (!selfTest.passed) {
+            console.log(
+              `[LLM] Rule rejected by self-test: TP ${selfTest.tpMatched}/${selfTest.tpTotal}, TN FP ${selfTest.tnMatched}/${selfTest.tnTotal}. ` +
+                `Reasons: ${selfTest.failureReasons.slice(0, 3).join(' | ')}`
+            );
+            continue;
+          }
+          console.log(
+            `[LLM] Rule passed self-test: ${selfTest.tpMatched}/${selfTest.tpTotal} TP caught, ${selfTest.tnTotal - selfTest.tnMatched}/${selfTest.tnTotal} TN clean`
+          );
 
           const patternHash = createHash('sha256').update(ruleContent).digest('hex').slice(0, 16);
 
