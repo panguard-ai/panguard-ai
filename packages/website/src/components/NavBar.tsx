@@ -160,6 +160,11 @@ export default function NavBar() {
     { label: t('productLinks.guard'), desc: t('productLinks.guardDesc'), href: '/product/guard' },
     { label: t('productLinks.mcp'), desc: t('productLinks.mcpDesc'), href: '/product/mcp' },
     { label: t('productLinks.atrStandard'), desc: t('productLinks.atrStandardDesc'), href: '/atr' },
+    {
+      label: 'Quality Standard',
+      desc: 'RFC-001 — how ATR rules are scored and validated',
+      href: '/quality-standard',
+    },
   ];
 
   const topLinks = [

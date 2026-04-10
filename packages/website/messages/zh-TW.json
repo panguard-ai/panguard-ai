@@ -1776,6 +1776,10 @@
       "title": "Agent Threat Rules (ATR) -- Panguard AI",
       "description": "首個 AI Agent 威脅的開放偵測標準。9 大類別、108 條規則。OWASP Agentic Top 10 完整覆蓋。社群驅動、YAML 格式、機器可讀。"
     },
+    "qualityStandard": {
+      "title": "ATR Quality Standard v1.0 (RFC-001) -- Panguard AI",
+      "description": "首個具備來源追溯的 AI Agent 規則品質標準。公開公式、開源驗證器、在 53,577 個真實 skills 上驗證。MIT 授權。"
+    },
     "productMcp": {
       "title": "Panguard MCP Server",
       "description": "從 Claude Desktop、Cursor 或任何 MCP 客戶端控制 Panguard 安全工具。11 個工具透過自然語言使用。"
