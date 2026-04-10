@@ -4353,7 +4353,7 @@
     "patterns": [
       {
         "field": "content",
-        "pattern": "(?i)(?:use|install|adopt|deploy|enable|set ?up|add|activate|configure)\\s+(?:the\\s+)?(?:enhanced|improved|upgraded|extended|advanced|better|super|pro|plus)[_-]?\\w+\\s*(?:package|module|library|tool|plugin|skill)?\\s*[.,;:]?\\s*(?:it.s|which is|this is|a|the)?\\s*(?:a\\s+)?(?:community|unofficial|third.party|independent)\\s*(?:-\\s*)?(?:fork|variant|alternative|adaptation|version|build|branch|port)\\s+(?:of|from|based on)",
+        "pattern": "(?i)(?:use|install|adopt|deploy|enable|set ?up|add|activate|configure)\\s+(?:the\\s+)?(?:enhanced|improved|upgraded|extended|advanced|better|super|pro|plus)[_-]?\\w+\\s*(?:package|module|library|tool|plugin|skill)?\\s*[.,;:]?\\s*(?:it.s|which is|this is|a|the)?\\s*(?:a\\s+)?(?:community|unofficial|third.party|independent)\\s*(?:-\\s*)?(?:maintained\\s+)?(?:fork|variant|alternative|adaptation|version|build|branch|port)\\s+(?:of|from|based on)",
         "desc": "Promoting package as community fork of legitimate tool"
       }
     ]
@@ -4620,6 +4620,36 @@
         "field": "content",
         "pattern": "SSH.*\u5bc6\u94a5\u8def\u5f84.*~\\/\\.ssh\\/id_[a-z0-9]+",
         "desc": "Documentation exposing SSH private key file paths in Chinese"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00157",
+    "title": "Time-Gated Credential Exfiltration (Rug Pull Timebomb)",
+    "severity": "critical",
+    "category": "skill-compromise",
+    "scan_target": "skill",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)getHours\\s*\\(\\s*\\)\\s*.{0,40}(readFileSync|readFile|fs\\.read|open\\s*\\()",
+        "desc": "Time check combined with file read \u2014 classic timebomb pattern"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(getHours|getDay|getMonth|new\\s+Date)\\s*\\(\\s*\\)\\s*.{0,80}(\\.env|credentials|id_rsa|\\.npmrc|\\.ssh|\\.aws|\\.docker|\\.kube)",
+        "desc": "Time function near sensitive file path references"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(getHours|getTime|Date\\.now)\\s*\\(\\s*\\).{0,60}(https\\.request|http\\.request|fetch\\s*\\(|axios|request\\s*\\(|\\.write\\s*\\()",
+        "desc": "Time check gating an outbound HTTP request"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)if\\s*\\(\\s*\\w+\\.getHours\\s*\\(\\s*\\)\\s*(>=|<=|==|===|>|<)\\s*\\d{1,2}\\s*(&&|\\|\\|)\\s*\\w+\\.getHours\\s*\\(\\s*\\)\\s*(>=|<=|==|===|>|<)\\s*\\d{1,2}\\s*\\)",
+        "desc": "Hour range check (e.g., hours >= 2 && hours <= 4) \u2014 time window gate"
       }
     ]
   }
