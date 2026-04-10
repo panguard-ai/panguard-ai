@@ -88,11 +88,11 @@ describe('FileQuarantine', () => {
     const testFile = join(tempDir, 'malware.txt');
     writeFileSync(testFile, 'malicious content');
 
-    const record = await quarantine.quarantine(testFile, 'YARA match: webshell');
+    const record = await quarantine.quarantine(testFile, 'ATR match: skill-poisoning');
 
     expect(record.originalPath).toBe(testFile);
     expect(record.sha256).toMatch(/^[a-f0-9]{64}$/);
-    expect(record.reason).toBe('YARA match: webshell');
+    expect(record.reason).toBe('ATR match: skill-poisoning');
     expect(record.fileSize).toBeGreaterThan(0);
     expect(existsSync(testFile)).toBe(false); // Original removed
     expect(existsSync(record.quarantinePath)).toBe(true); // In quarantine

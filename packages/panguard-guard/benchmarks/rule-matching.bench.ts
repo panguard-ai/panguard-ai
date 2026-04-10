@@ -1,8 +1,8 @@
 /**
  * Rule Matching Latency Benchmark
  *
- * Sigma RuleEngine benchmarks removed.
- * ATR Engine benchmarks should be added separately.
+ * Measures DetectAgent latency (threat intel + correlation path).
+ * ATR engine benchmarks live in `@panguard-ai/atr`.
  */
 
 import { bench, describe } from 'vitest';

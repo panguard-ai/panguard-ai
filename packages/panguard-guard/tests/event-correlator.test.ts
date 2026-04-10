@@ -173,7 +173,7 @@ describe('EventCorrelator - Brute Force (T1110)', () => {
           sourceIP: ip,
           source: 'auth',
           category: 'authentication',
-          ruleIds: ['sigma-brute-force-001'],
+          ruleIds: ['atr-brute-force-001'],
           metadata: {},
         })
       );
@@ -185,7 +185,7 @@ describe('EventCorrelator - Brute Force (T1110)', () => {
         sourceIP: ip,
         source: 'auth',
         category: 'authentication',
-        ruleIds: ['sigma-brute-force-001'],
+        ruleIds: ['atr-brute-force-001'],
         metadata: {},
       })
     );
@@ -749,7 +749,7 @@ describe('EventCorrelator - Privilege Escalation (T1548)', () => {
       makeCorrelationEvent({
         source: 'process',
         category: 'general',
-        ruleIds: ['sigma-privilege-escalation-001'],
+        ruleIds: ['atr-privilege-escalation-001'],
         metadata: {},
       })
     );
