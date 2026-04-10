@@ -171,9 +171,13 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
    */
   private callAnthropicAPI(prompt: string): Promise<string> {
     return new Promise((resolve, reject) => {
+      // 4096 tokens is needed because the ATR drafter prompt requires
+      // a full rule YAML with 3+ conditions, 3+ TP, 3+ TN, 3+ evasion tests,
+      // MITRE + OWASP references, and descriptions. 1024 was cutting off
+      // mid-YAML and the regex extractor dropped the truncated block.
       const requestBody = JSON.stringify({
         model: this.model,
-        max_tokens: 1024,
+        max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       });
 
@@ -467,7 +471,18 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
         }
 
         // Extract YAML blocks
-        const yamlBlocks = responseText.match(/```yaml\n([\s\S]*?)```/g);
+        // Primary: properly-closed ```yaml\n...```
+        // Fallback: opening ```yaml\n...<end of string> (truncation safety net)
+        let yamlBlocks = responseText.match(/```yaml\n([\s\S]*?)```/g);
+        if (!yamlBlocks || yamlBlocks.length === 0) {
+          const unclosed = responseText.match(/```yaml\n([\s\S]*?)$/);
+          if (unclosed) {
+            console.log(
+              `[LLM] Recovered unclosed YAML block (max_tokens likely hit) for "${skill.package}"`
+            );
+            yamlBlocks = [unclosed[0] + '\n```'];
+          }
+        }
         if (!yamlBlocks || yamlBlocks.length === 0) {
           console.log(
             `[LLM] No YAML blocks found in response for "${skill.package}". Response starts with: ${responseText.slice(0, 200)}`
