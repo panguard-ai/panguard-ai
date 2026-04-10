@@ -5236,10 +5236,6 @@
       "title": "Agent Threat Rules (ATR) -- Panguard AI",
       "description": "The first open detection standard for AI agent threats. 108 rules across 10 categories. OWASP LLM Top 10 mapped. Community-driven, YAML-based, machine-readable."
     },
-    "qualityStandard": {
-      "title": "ATR Quality Standard v1.0 (RFC-001) -- Panguard AI",
-      "description": "The first AI agent rule standard with provenance tracking. Public formula, open-source validator, wild-validated on 53,577 real skills. MIT licensed."
-    },
     "productMcp": {
       "title": "Panguard MCP Server",
       "description": "Control Panguard security tools from Claude Desktop, Cursor, or any MCP client. 11 tools via natural language."
