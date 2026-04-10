@@ -10,6 +10,11 @@
  */
 
 import * as https from 'node:https';
+import {
+  parseATRRule,
+  validateRuleMeetsStandard,
+  type QualityGateResult,
+} from '@panguard-ai/atr/quality';
 import type { ThreatCloudDB } from './database.js';
 
 /** LLM review verdict structure */
@@ -495,41 +500,6 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
             continue;
           }
 
-          // Cisco-merge quality gate: reject rules below production standard
-          const conditionCount = (ruleContent.match(/- field:\s*content/g) || []).length;
-          const tpCount = (ruleContent.match(/expected:\s*triggered/g) || []).length;
-          const tnCount = (ruleContent.match(/expected:\s*not_triggered/g) || []).length;
-          const hasMitre = /mitre_atlas:/.test(ruleContent);
-          const hasOwaspLlm = /owasp_llm:/.test(ruleContent);
-          const hasOwaspAgentic = /owasp_agentic:/.test(ruleContent);
-          const hasEvasionTests = /evasion_tests:/.test(ruleContent);
-          // TN count includes evasion tests — subtract them to get pure TN count
-          // Assume evasion_tests section has ~3 entries, so pure TN = total not_triggered - evasion count
-          const evasionCount = hasEvasionTests
-            ? (ruleContent.split('evasion_tests:')[1]?.match(/expected:\s*not_triggered/g) || [])
-                .length
-            : 0;
-          const pureTnCount = tnCount - evasionCount;
-
-          const qualityIssues: string[] = [];
-          if (conditionCount < 3)
-            qualityIssues.push(`only ${conditionCount} detection conditions (need 3+)`);
-          if (tpCount < 5) qualityIssues.push(`only ${tpCount} true_positives (need 5+)`);
-          if (pureTnCount < 5) qualityIssues.push(`only ${pureTnCount} true_negatives (need 5+)`);
-          if (evasionCount < 3) qualityIssues.push(`only ${evasionCount} evasion_tests (need 3+)`);
-          if (!hasMitre) qualityIssues.push('missing mitre_atlas reference');
-          if (!hasOwaspLlm || !hasOwaspAgentic) qualityIssues.push('missing OWASP references');
-
-          if (qualityIssues.length > 0) {
-            console.log(
-              `[LLM] Rule rejected — below Cisco-merge quality bar: ${qualityIssues.join(', ')}`
-            );
-            continue;
-          }
-          console.log(
-            `[LLM] Rule passed quality gate: ${conditionCount} conditions, ${tpCount} TP, ${pureTnCount} TN, ${evasionCount} evasion tests`
-          );
-
           // Validate regex in the rule (match both single and double quoted values)
           const regexMatch = ruleContent.match(/value:\s*(['"])((?:(?!\1).)+)\1/);
           if (regexMatch) {
@@ -551,6 +521,31 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
             }
           }
 
+          // ATR Quality Gate — use the canonical library from agent-threat-rules/quality
+          // Reject rules that don't meet the experimental quality bar (3+ conditions,
+          // 3 TP + 3 TN, OWASP + MITRE, FP docs). See RFC-001 §3.
+          let gateResult: QualityGateResult;
+          try {
+            const metadata = parseATRRule(ruleContent);
+            // Mark as LLM-generated so downstream consumers know provenance
+            const enriched = { ...metadata, llmGenerated: true };
+            gateResult = validateRuleMeetsStandard(enriched, 'experimental');
+          } catch (parseErr) {
+            console.log(
+              `[LLM] Rule rejected — failed to parse YAML for quality gate: ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`
+            );
+            continue;
+          }
+
+          if (!gateResult.passed) {
+            console.log(`[LLM] Rule rejected by ATR Quality Gate: ${gateResult.issues.join('; ')}`);
+            continue;
+          }
+
+          if (gateResult.warnings.length > 0) {
+            console.log(`[LLM] Rule passed gate with warnings: ${gateResult.warnings.join('; ')}`);
+          }
+
           const patternHash = createHash('sha256').update(ruleContent).digest('hex').slice(0, 16);
 
           // Submit as proposal + auto-review
@@ -563,6 +558,8 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
               approved: true,
               source: 'skill-analysis',
               package: skill.package,
+              provenance: 'llm-generated',
+              gateWarnings: gateResult.warnings,
             }),
           });
 

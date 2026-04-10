@@ -1,14 +1,18 @@
 {
   "name": "@panguard-ai/atr",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "type": "module",
   "description": "Thin wrapper around agent-threat-rules — re-exports all detection logic for monorepo consumers.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./quality": {
+      "types": "./dist/quality.d.ts",
+      "import": "./dist/quality.js"
     }
   },
   "files": [
@@ -28,7 +32,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "agent-threat-rules": "^1.1.1"
+    "agent-threat-rules": "^1.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

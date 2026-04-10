@@ -40,7 +40,7 @@
     "@panguard-ai/core": "workspace:*",
     "@panguard-ai/panguard-scan": "workspace:*",
     "@panguard-ai/scan-core": "workspace:*",
-    "agent-threat-rules": "^1.1.1",
+    "agent-threat-rules": "^1.2.0",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
