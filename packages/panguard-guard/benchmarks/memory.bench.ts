@@ -1,8 +1,8 @@
 /**
  * Memory Footprint Benchmark
  *
- * Tracks heap usage under various loads.
- * Sigma RuleEngine benchmarks removed; ATR Engine is used for detection.
+ * Tracks heap usage under various loads across DetectAgent, EventCorrelator,
+ * and baseline memory subsystems.
  */
 
 import { bench, describe } from 'vitest';

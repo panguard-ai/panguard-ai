@@ -21,7 +21,6 @@ When a threat is detected, the following anonymized data is uploaded:
 | `attackSourceIP`    | `192.168.xxx.xxx`           | No (last two octets masked) |
 | `attackType`        | `prompt-injection`          | No                          |
 | `mitreTechnique`    | `T1059`                     | No                          |
-| `sigmaRuleMatched`  | `sigma-001,sigma-042`       | No                          |
 | `atrRulesMatched`   | `ATR-2026-001,ATR-2026-010` | No                          |
 | `atrCategory`       | `prompt-injection`          | No                          |
 | `timestamp`         | `2026-03-08T12:00:00Z`      | No                          |

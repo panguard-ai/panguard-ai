@@ -134,12 +134,8 @@ export { PidFile, Watchdog, installService, uninstallService } from './daemon/in
 export { generateInstallScript } from './install/index.js';
 
 // Monitors / 監控器
-export {
-  DpiMonitor,
-  RootkitDetector,
-  createRootkitEvent,
-  checkLdPreload,
-} from './monitors/index.js';
+export { GitWatcher, createGitEvent, isSensitiveFile, scanLineForSecrets } from './monitors/index.js';
+export type { DiffSecretPattern } from './monitors/index.js';
 
 // Log Collectors / 日誌收集器
 export {
