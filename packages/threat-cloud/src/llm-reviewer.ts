@@ -250,37 +250,59 @@ You will receive MCP tool descriptions from a skill. Write a PRODUCTION-QUALITY 
 QUALITY BAR (Cisco-merge level):
 
 1. REGEX — SINGLE-QUOTED YAML, compound patterns, 3+ word sequences:
-   GOOD: '(?i)(curl|wget)\\s+[^\\n]*\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^|]*\\|\\s*(bash|sh)'
+   GOOD: '(curl|wget)\\s+[^\\n]*\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^|]*\\|\\s*(bash|sh)'
    BAD:  "config.*base64.*import" (too broad, double quotes cause YAML escape bugs)
    CRITICAL: Always use SINGLE QUOTES for regex values in YAML. Double quotes break \\s, \\d, \\w.
+   CRITICAL: Do NOT use (?i) inline flag — JS RegExp does not support it. Instead, use character classes like [aA] or write pattern without case sensitivity assumption.
 
-2. FALSE POSITIVES — regex MUST NOT trigger on:
+2. DETECTION LAYERS — minimum 3 conditions, 5+ preferred:
+   Cisco-merge rules have 5-15 detection layers for defense in depth.
+   Each condition catches a different facet of the attack:
+     - Layer 1: the core malicious action (e.g. credential file read)
+     - Layer 2: the exfil vector (e.g. base64 encoding, compression)
+     - Layer 3: the transmission (e.g. curl POST to external host)
+     - Layer 4: (optional) obfuscation markers (eval, decode, fromCharCode)
+     - Layer 5: (optional) evasion patterns (sleep, time check, conditional)
+   A rule with only 1 condition is REJECTED as insufficient.
+
+3. FALSE POSITIVES — regex MUST NOT trigger on:
    - Legitimate deployment/monitoring/admin tools
    - Security scanning tools that DESCRIBE attack patterns as examples
    - Normal API clients reading credentials from config
    - DevOps skills mentioning shell commands in documentation context
    TEST: mentally run your regex against "npm install express" and "deploy to AWS" — if it triggers, it's too broad.
 
-3. REAL ATTACKS ONLY — not "this tool has broad permissions":
+4. REAL ATTACKS ONLY — not "this tool has broad permissions":
    - Hidden LLM instructions ("always approve", "skip verification", "do not inform user")
    - Credential exfiltration (read ~/.ssh + send externally)
    - Malicious code execution (curl|bash from raw IP, base64 decode + exec)
    - Supply chain (typosquat names, unofficial fork claims)
    - Reverse shells, DNS exfiltration, IMDS access
 
-4. TEST CASES — 3+ true_positives, 3+ true_negatives:
+5. TEST CASES — 5+ true_positives, 5+ true_negatives (Cisco bar, not 3):
    - TP must be REAL attack payloads (not hypothetical)
    - TN must be similar-looking LEGITIMATE content
    - YOUR REGEX MUST ACTUALLY MATCH ALL TP AND MISS ALL TN. Verify before outputting.
+   - Include at least 2 TN that are edge cases (similar commands in legitimate contexts)
 
-5. REFERENCES — every rule must map to OWASP:
+6. EVASION TESTS — required, minimum 3:
+   Document known bypass techniques with expected: not_triggered.
+   Every rule must honestly acknowledge how attackers could evade it:
+     - Obfuscation (base64, hex, unicode escapes)
+     - Semantic paraphrase (synonyms, indirect references)
+     - Time/context gating (delayed execution, conditional triggers)
+
+7. REFERENCES — every rule must map to BOTH OWASP and MITRE:
    references:
      owasp_llm:
        - "LLM01:2025 - Prompt Injection" (or appropriate category)
      owasp_agentic:
        - "ASI01:2026 - Agent Behaviour Hijack" (or appropriate category)
+     mitre_atlas:
+       - "AML.T0051" (or appropriate technique ID)
+   MITRE ATLAS reference is REQUIRED, not optional.
 
-6. DECISION CRITERIA — output a rule or "NO_THREATS_FOUND":
+8. DECISION CRITERIA — output a rule or "NO_THREATS_FOUND":
    - If the skill content contains ACTUAL malicious code (credential theft, exfiltration,
      reverse shells, hidden instructions to bypass safety) → WRITE A RULE, even if you
      think existing regex might already catch it. Let the dedup layer handle overlaps.
@@ -308,6 +330,8 @@ references:
     - "<most relevant LLM Top 10 category>"
   owasp_agentic:
     - "<most relevant Agentic Top 10 category>"
+  mitre_atlas:
+    - "<AML.Txxxx technique ID — REQUIRED>"
 tags:
   category: <skill-compromise|tool-poisoning|prompt-injection|context-exfiltration|privilege-escalation>
   subcategory: <specific-technique>
@@ -321,11 +345,21 @@ detection:
   conditions:
     - field: content
       operator: regex
-      value: '<SINGLE-QUOTED compound regex with 3+ word context>'
-      description: '<what malicious pattern this matches>'
+      value: '<LAYER 1: core malicious action regex>'
+      description: '<what layer 1 matches>'
+    - field: content
+      operator: regex
+      value: '<LAYER 2: exfil/encoding vector regex>'
+      description: '<what layer 2 matches>'
+    - field: content
+      operator: regex
+      value: '<LAYER 3: transmission/execution regex>'
+      description: '<what layer 3 matches>'
   condition: any
   false_positives:
-    - '<describe what legitimate content could look similar>'
+    - '<edge case 1 — legitimate content that looks similar>'
+    - '<edge case 2 — common benign pattern>'
+    - '<edge case 3 — dev/admin tool context>'
 response:
   actions: [alert, block_tool]
   message_template: >
@@ -336,7 +370,11 @@ test_cases:
       expected: triggered
     - input: '<real attack payload 2>'
       expected: triggered
-    - input: '<variant 3>'
+    - input: '<real attack payload 3>'
+      expected: triggered
+    - input: '<real attack payload 4>'
+      expected: triggered
+    - input: '<real attack payload 5>'
       expected: triggered
   true_negatives:
     - input: '<similar but safe content 1>'
@@ -348,9 +386,39 @@ test_cases:
     - input: '<similar but safe content 3>'
       expected: not_triggered
       reason: '<why this is safe>'
+    - input: '<edge case 4 — common legitimate usage>'
+      expected: not_triggered
+      reason: '<why this is safe>'
+    - input: '<edge case 5 — devops/admin tool context>'
+      expected: not_triggered
+      reason: '<why this is safe>'
+evasion_tests:
+  - input: '<bypass 1 — obfuscation variant>'
+    expected: not_triggered
+    bypass_technique: '<technique name>'
+    notes: '<how attacker could evade>'
+  - input: '<bypass 2 — semantic paraphrase>'
+    expected: not_triggered
+    bypass_technique: '<technique name>'
+    notes: '<why this bypasses the regex>'
+  - input: '<bypass 3 — time-gated or conditional>'
+    expected: not_triggered
+    bypass_technique: '<technique name>'
+    notes: '<explanation>'
 \`\`\`
 
-BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL true_negatives. If it doesn't, fix the regex or output NO_THREATS_FOUND.`;
+BEFORE OUTPUTTING — reject your own output if any check fails:
+- [ ] At least 3 detection conditions (NOT 1)
+- [ ] At least 5 true_positives + 5 true_negatives (Cisco bar, not 3)
+- [ ] At least 3 evasion_tests documenting known bypasses
+- [ ] MITRE ATLAS reference present (REQUIRED)
+- [ ] OWASP LLM + OWASP Agentic references present
+- [ ] No (?i) inline flag — JS does not support it
+- [ ] Single-quoted regex values
+- [ ] Every condition has a description field
+- [ ] Your regex matches ALL true_positives AND misses ALL true_negatives
+
+If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
 
   /**
    * Analyze skill scan results for semantic threats regex missed
@@ -426,6 +494,41 @@ BEFORE OUTPUTTING: verify your regex matches ALL true_positives and misses ALL t
             );
             continue;
           }
+
+          // Cisco-merge quality gate: reject rules below production standard
+          const conditionCount = (ruleContent.match(/- field:\s*content/g) || []).length;
+          const tpCount = (ruleContent.match(/expected:\s*triggered/g) || []).length;
+          const tnCount = (ruleContent.match(/expected:\s*not_triggered/g) || []).length;
+          const hasMitre = /mitre_atlas:/.test(ruleContent);
+          const hasOwaspLlm = /owasp_llm:/.test(ruleContent);
+          const hasOwaspAgentic = /owasp_agentic:/.test(ruleContent);
+          const hasEvasionTests = /evasion_tests:/.test(ruleContent);
+          // TN count includes evasion tests — subtract them to get pure TN count
+          // Assume evasion_tests section has ~3 entries, so pure TN = total not_triggered - evasion count
+          const evasionCount = hasEvasionTests
+            ? (ruleContent.split('evasion_tests:')[1]?.match(/expected:\s*not_triggered/g) || [])
+                .length
+            : 0;
+          const pureTnCount = tnCount - evasionCount;
+
+          const qualityIssues: string[] = [];
+          if (conditionCount < 3)
+            qualityIssues.push(`only ${conditionCount} detection conditions (need 3+)`);
+          if (tpCount < 5) qualityIssues.push(`only ${tpCount} true_positives (need 5+)`);
+          if (pureTnCount < 5) qualityIssues.push(`only ${pureTnCount} true_negatives (need 5+)`);
+          if (evasionCount < 3) qualityIssues.push(`only ${evasionCount} evasion_tests (need 3+)`);
+          if (!hasMitre) qualityIssues.push('missing mitre_atlas reference');
+          if (!hasOwaspLlm || !hasOwaspAgentic) qualityIssues.push('missing OWASP references');
+
+          if (qualityIssues.length > 0) {
+            console.log(
+              `[LLM] Rule rejected — below Cisco-merge quality bar: ${qualityIssues.join(', ')}`
+            );
+            continue;
+          }
+          console.log(
+            `[LLM] Rule passed quality gate: ${conditionCount} conditions, ${tpCount} TP, ${pureTnCount} TN, ${evasionCount} evasion tests`
+          );
 
           // Validate regex in the rule (match both single and double quoted values)
           const regexMatch = ruleContent.match(/value:\s*(['"])((?:(?!\1).)+)\1/);
