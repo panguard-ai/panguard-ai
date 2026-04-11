@@ -2,11 +2,15 @@
  * Attack Simulation Integration Tests
  * 攻擊模擬整合測試
  *
- * Tests 4 realistic attack scenarios end-to-end through the Panguard pipeline:
+ * Tests realistic attack scenarios end-to-end through the Panguard pipeline:
  * 1. Brute force -> EventCorrelator -> auto-block
- * 2. DNS tunneling -> DpiMonitor -> detection
- * 3. Rootkit detection -> critical alert
- * 4. Honeypot -> threat intel -> Guard correlation
+ * 2. Honeypot -> threat intel -> Guard correlation
+ * 3. GuardEngine full pipeline
+ *
+ * Note: DNS tunneling (DpiMonitor) and Rootkit (RootkitDetector) scenarios
+ * were removed in 69017e76 along with the legacy EDR monitors. PanguardGuard
+ * is a runtime AI agent security agent, not an EDR; OS-level detection is
+ * delegated to existing EDR/SIEM tools that consume Guard events.
  *
  * These tests verify that multiple components work together correctly
  * to detect and respond to real attack patterns.
@@ -23,7 +27,6 @@ import {
   AnalyzeAgent,
   RespondAgent,
   ReportAgent,
-  DpiMonitor,
   createEmptyBaseline,
   DEFAULT_ACTION_POLICY,
   GuardEngine,
@@ -220,216 +223,6 @@ describe('Scenario 1: Brute Force Attack -> Auto-Block', () => {
       // In learning mode, all actions should be log_only
       expect(response.action).toBe('log_only');
       expect(response.success).toBe(true);
-
-      respondAgent.destroy();
-    } finally {
-      rmSync(tempDir, { recursive: true, force: true });
-    }
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Scenario 2: DNS Tunneling Detection
-// ---------------------------------------------------------------------------
-
-describe('Scenario 2: DNS Tunneling Detection', () => {
-  it('should detect high-entropy subdomain as DNS tunneling', () => {
-    const monitor = new DpiMonitor(60000); // long interval, we test sync
-    const detectedEvents: SecurityEvent[] = [];
-
-    monitor.on('event', (event: SecurityEvent) => {
-      detectedEvents.push(event);
-    });
-
-    // Submit a high-entropy domain that looks like DNS tunneling
-    // Entropy >= 3.5 and label >= 20 chars should trigger detection
-    const tunnelingDomain = 'aGVsbG93b3JsZHRoaXNpc2F0ZXN0.evil-tunnel.com';
-    monitor.submitDnsQuery(tunnelingDomain, 'A');
-
-    expect(detectedEvents.length).toBeGreaterThanOrEqual(1);
-    const tunnelEvent = detectedEvents.find((e) => e.category === 'dns_tunneling');
-    expect(tunnelEvent).toBeDefined();
-    expect(tunnelEvent!.source).toBe('dpi');
-    expect(tunnelEvent!.severity).toBe('high');
-
-    monitor.stop();
-  });
-
-  it('should detect known tunnel tool names in domain', () => {
-    const monitor = new DpiMonitor(60000);
-    const detectedEvents: SecurityEvent[] = [];
-
-    monitor.on('event', (event: SecurityEvent) => {
-      detectedEvents.push(event);
-    });
-
-    // Known tunnel tools: iodine, dnscat, dns2tcp
-    monitor.submitDnsQuery('data.iodine.example.com', 'TXT');
-
-    expect(detectedEvents.length).toBeGreaterThanOrEqual(1);
-    const tunnelEvent = detectedEvents.find((e) => e.category === 'dns_tunneling');
-    expect(tunnelEvent).toBeDefined();
-    expect(tunnelEvent!.severity).toBe('critical');
-
-    monitor.stop();
-  });
-
-  it('should detect long TXT queries as potential tunneling', () => {
-    const monitor = new DpiMonitor(60000);
-    const detectedEvents: SecurityEvent[] = [];
-
-    monitor.on('event', (event: SecurityEvent) => {
-      detectedEvents.push(event);
-    });
-
-    // TXT query with domain > 100 chars
-    const longDomain = 'a'.repeat(50) + '.b'.repeat(30) + '.evil.com';
-    monitor.submitDnsQuery(longDomain, 'TXT');
-
-    // This should trigger at least a medium severity DNS tunneling detection
-    const tunnelEvents = detectedEvents.filter((e) => e.category === 'dns_tunneling');
-    expect(tunnelEvents.length).toBeGreaterThanOrEqual(1);
-
-    monitor.stop();
-  });
-
-  it('should not flag normal DNS queries', () => {
-    const monitor = new DpiMonitor(60000);
-    const detectedEvents: SecurityEvent[] = [];
-
-    monitor.on('event', (event: SecurityEvent) => {
-      detectedEvents.push(event);
-    });
-
-    // Normal domains should not trigger tunneling detection
-    monitor.submitDnsQuery('www.google.com', 'A');
-    monitor.submitDnsQuery('api.github.com', 'A');
-    monitor.submitDnsQuery('cdn.cloudflare.com', 'AAAA');
-
-    const tunnelEvents = detectedEvents.filter((e) => e.category === 'dns_tunneling');
-    expect(tunnelEvents.length).toBe(0);
-
-    monitor.stop();
-  });
-
-  it('should include MITRE technique T1071.004 in DNS tunnel events', () => {
-    const monitor = new DpiMonitor(60000);
-    const detectedEvents: SecurityEvent[] = [];
-
-    monitor.on('event', (event: SecurityEvent) => {
-      detectedEvents.push(event);
-    });
-
-    monitor.submitDnsQuery('data.dnscat2.evil.com', 'TXT');
-
-    const tunnelEvent = detectedEvents.find((e) => e.category === 'dns_tunneling');
-    expect(tunnelEvent).toBeDefined();
-    // MITRE T1071.004 = Application Layer Protocol: DNS
-    expect(tunnelEvent!.metadata?.['mitreTechnique']).toBe('T1071.004');
-
-    monitor.stop();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Scenario 3: Rootkit Detection -> Critical Alert
-// ---------------------------------------------------------------------------
-
-describe('Scenario 3: Rootkit Detection -> Alert Pipeline', () => {
-  it('should have rootkit detection utilities available', async () => {
-    // RootkitDetector, createRootkitEvent, and checkLdPreload are exported
-    const { RootkitDetector, createRootkitEvent, checkLdPreload } =
-      await import('@panguard-ai/panguard-guard');
-
-    expect(typeof RootkitDetector).toBe('function');
-    expect(typeof createRootkitEvent).toBe('function');
-    expect(typeof checkLdPreload).toBe('function');
-
-    // Verify RootkitDetector can be instantiated
-    const detector = new RootkitDetector();
-    expect(typeof detector.checkAvailability).toBe('function');
-    expect(typeof detector.stop).toBe('function');
-
-    // On non-Linux, checkAvailability returns false gracefully
-    if (process.platform !== 'linux') {
-      const available = await detector.checkAvailability();
-      expect(available).toBe(false);
-    }
-  });
-
-  it('should produce SecurityEvents from rootkit findings via createRootkitEvent', async () => {
-    const { createRootkitEvent } = await import('@panguard-ai/panguard-guard');
-
-    const finding = {
-      checkType: 'hidden_process' as const,
-      severity: 'critical' as const,
-      description: 'Process PID 31337 visible in /proc but hidden from ps',
-      details: { pid: 31337, comm: 'rootkit_binary' },
-    };
-
-    const event = createRootkitEvent(finding);
-    expect(event.source).toBe('process');
-    expect(event.severity).toBe('critical');
-    expect(event.category).toBe('defense_evasion');
-    expect(event.description).toContain('31337');
-    expect(event.id).toBeTruthy();
-    expect(event.timestamp).toBeInstanceOf(Date);
-  });
-
-  it('should detect LD_PRELOAD injection via checkLdPreload', async () => {
-    const { checkLdPreload } = await import('@panguard-ai/panguard-guard');
-
-    // On any platform, the function should return findings array
-    const findings = await checkLdPreload();
-    expect(Array.isArray(findings)).toBe(true);
-
-    // If LD_PRELOAD is not set (normal), should return empty
-    if (!process.env['LD_PRELOAD']) {
-      expect(findings.length).toBe(0);
-    }
-  });
-
-  it('should flow rootkit event through analyze -> respond pipeline', async () => {
-    const tempDir = createTempDir();
-
-    try {
-      const { createRootkitEvent } = await import('@panguard-ai/panguard-guard');
-
-      // Create a critical rootkit finding
-      const finding = {
-        checkType: 'hidden_process' as const,
-        severity: 'critical' as const,
-        description: 'Rootkit detected: hidden process PID 31337',
-        details: { pid: 31337 },
-      };
-
-      const event = createRootkitEvent(finding);
-
-      // Build pipeline
-      const detectAgent = new DetectAgent();
-      const analyzeAgent = new AnalyzeAgent(null);
-      const respondAgent = new RespondAgent(
-        { autoRespond: 90, notifyAndWait: 70, logOnly: 0 },
-        'protection',
-        [],
-        tempDir
-      );
-
-      // Process through pipeline
-      const detection = detectAgent.detect(event);
-
-      if (detection) {
-        const baseline = createEmptyBaseline();
-        const verdict = await analyzeAgent.analyze(detection, baseline);
-
-        // A critical rootkit detection should produce high confidence
-        expect(verdict.confidence).toBeGreaterThan(0);
-        expect(verdict.conclusion).not.toBe('benign');
-
-        const response = await respondAgent.respond(verdict);
-        expect(response).toHaveProperty('success');
-        expect(response).toHaveProperty('action');
-      }
 
       respondAgent.destroy();
     } finally {
