@@ -17,6 +17,7 @@ import {
   type QualityGateResult,
 } from '@panguard-ai/atr/quality';
 import type { ThreatCloudDB } from './database.js';
+import { TC_DRAFTER_TOOLS, executeToolCall } from './llm-reviewer-tools.js';
 
 /**
  * Minimal rule shape for self-test — matches what the LLM drafter prompt
@@ -368,17 +369,176 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
     });
   }
 
+  /**
+   * Low-level Anthropic messages call that accepts a prepared request body.
+   * Used by the tool-use loop so we can pass full message histories.
+   */
+  private callAnthropicRaw(body: Record<string, unknown>): Promise<{
+    content: Array<{ type: string; text?: string; id?: string; name?: string; input?: Record<string, unknown> }>;
+    stop_reason?: string;
+  }> {
+    return new Promise((resolve, reject) => {
+      const requestBody = JSON.stringify(body);
+      const options = {
+        hostname: 'api.anthropic.com',
+        port: 443,
+        path: '/v1/messages',
+        method: 'POST',
+        headers: {
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+          'content-length': Buffer.byteLength(requestBody),
+        },
+        timeout: LLM_TIMEOUT_MS,
+      };
+      const req = https.request(options, (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (chunk: Buffer) => chunks.push(chunk));
+        res.on('end', () => {
+          const bodyText = Buffer.concat(chunks).toString('utf-8');
+          if (res.statusCode !== 200) {
+            reject(new Error(`Anthropic API status ${res.statusCode}: ${bodyText.slice(0, 500)}`));
+            return;
+          }
+          try {
+            const parsed = JSON.parse(bodyText) as {
+              content?: Array<{ type: string; text?: string; id?: string; name?: string; input?: Record<string, unknown> }>;
+              stop_reason?: string;
+            };
+            resolve({ content: parsed.content ?? [], stop_reason: parsed.stop_reason });
+          } catch (err) {
+            reject(new Error(`Anthropic API parse: ${err instanceof Error ? err.message : String(err)}`));
+          }
+        });
+      });
+      req.on('timeout', () => {
+        req.destroy();
+        reject(new Error(`Anthropic API timeout after ${LLM_TIMEOUT_MS}ms`));
+      });
+      req.on('error', (err) => reject(new Error(`Anthropic API error: ${err.message}`)));
+      req.write(requestBody);
+      req.end();
+    });
+  }
+
+  /**
+   * Tool-use loop for TC v2 drafter. Runs a multi-turn conversation with
+   * Claude where it can call grep_existing_rules, read_rule, and
+   * fetch_research to ground its draft in existing ATR coverage and
+   * public threat research before emitting a rule YAML.
+   *
+   * Returns the concatenated text of Claude's final assistant turn (the
+   * message where stop_reason is "end_turn" and not "tool_use").
+   *
+   * Max 6 tool-use rounds per skill to bound latency and cost; if Claude
+   * still wants to use tools on round 7, we instruct it to finalize.
+   */
+  private async callAnthropicWithTools(
+    systemPrompt: string,
+    userMessage: string,
+  ): Promise<{ finalText: string; toolCalls: number }> {
+    const MAX_ROUNDS = 6;
+    type ContentBlock =
+      | { type: 'text'; text: string }
+      | { type: 'tool_use'; id: string; name: string; input: Record<string, unknown> }
+      | { type: 'tool_result'; tool_use_id: string; content: string; is_error?: boolean };
+
+    const messages: Array<{ role: 'user' | 'assistant'; content: string | ContentBlock[] }> = [
+      { role: 'user', content: userMessage },
+    ];
+
+    let toolCalls = 0;
+    let finalText = '';
+
+    for (let round = 0; round < MAX_ROUNDS; round++) {
+      const body: Record<string, unknown> = {
+        model: this.model,
+        max_tokens: 4096,
+        system: systemPrompt,
+        tools: TC_DRAFTER_TOOLS,
+        messages,
+      };
+
+      const response = await this.callAnthropicRaw(body);
+
+      // Collect assistant response as content blocks
+      const assistantBlocks: ContentBlock[] = [];
+      const toolUses: Array<{ id: string; name: string; input: Record<string, unknown> }> = [];
+      for (const block of response.content) {
+        if (block.type === 'text' && typeof block.text === 'string') {
+          assistantBlocks.push({ type: 'text', text: block.text });
+          finalText += (finalText ? '\n' : '') + block.text;
+        } else if (block.type === 'tool_use' && block.id && block.name) {
+          assistantBlocks.push({
+            type: 'tool_use',
+            id: block.id,
+            name: block.name,
+            input: block.input ?? {},
+          });
+          toolUses.push({ id: block.id, name: block.name, input: block.input ?? {} });
+        }
+      }
+
+      messages.push({ role: 'assistant', content: assistantBlocks });
+
+      if (response.stop_reason !== 'tool_use' || toolUses.length === 0) {
+        // Claude is done — return its final text
+        break;
+      }
+
+      // Execute each requested tool and build a tool_result turn
+      const toolResults: ContentBlock[] = [];
+      for (const tu of toolUses) {
+        toolCalls++;
+        console.log(`[tc-v2] round ${round + 1}: tool ${tu.name}(${JSON.stringify(tu.input).slice(0, 120)})`);
+        const result = await executeToolCall(tu.name, tu.input);
+        toolResults.push({
+          type: 'tool_result',
+          tool_use_id: tu.id,
+          content: result.content.slice(0, 8000), // cap per-tool-result size
+          is_error: result.isError,
+        });
+      }
+
+      messages.push({ role: 'user', content: toolResults });
+
+      // Reset finalText — we only want the LAST assistant turn's text
+      // (which contains the YAML rule output), not the interim narration
+      finalText = '';
+    }
+
+    return { finalText, toolCalls };
+  }
+
   // -------------------------------------------------------------------------
   // Skill Analysis — POST /api/analyze-skills
   // 技能分析 — 接收掃描結果，用 LLM 找 regex 漏掉的 semantic threats
   // -------------------------------------------------------------------------
 
   /** Prompt for skill/tool analysis (both MCP and SKILL.md) */
-  private static readonly ATR_DRAFTER_PROMPT = `You are a senior AI security rule engineer for ATR (Agent Threat Rules). Cisco AI Defense merged 34 ATR rules into production. Your output must meet that quality bar.
+  private static readonly ATR_DRAFTER_PROMPT = `You are a senior AI security rule engineer for ATR (Agent Threat Rules). Cisco AI Defense merged 34 ATR rules into production. Your output must meet that quality bar AND the RFC-001 v1.0 quality gate (5+ TP, 5+ TN, 3+ evasion_tests, OWASP LLM + OWASP Agentic + MITRE ATLAS required).
 
-You will receive MCP tool descriptions from a skill. Write a PRODUCTION-QUALITY detection rule ONLY if you find a SPECIFIC, CONCRETE attack pattern.
+You have three tools: grep_existing_rules, read_rule, fetch_research. Use them.
 
-QUALITY BAR (Cisco-merge level):
+PROTOCOL — you MUST follow this order:
+
+STEP 0 — De-duplication check (required, non-negotiable):
+  a) Call grep_existing_rules with 2-4 keywords from the attack you are considering. Example keywords: ["prompt injection", "IMPORTANT tag"], ["credential exfil", "ssh key"], ["tool poisoning", "cross-tool"], ["hidden instruction", "system override"].
+  b) Read the results. If any matching rules look topically similar, call read_rule on the 1-3 most relevant to inspect their regex patterns and test cases.
+  c) Decide:
+     - If the attack is ALREADY covered by an existing rule (same patterns, same category) → output NO_THREATS_FOUND and stop. Do not duplicate existing work.
+     - If the attack is a NOVEL VARIANT that slips past existing regex → draft a new rule explicitly referencing what it catches that existing rules miss.
+     - If the attack is a GENUINELY NEW CLASS → draft a new rule from scratch.
+
+STEP 1 — Research grounding (strongly recommended):
+  If you're drafting a new rule, call fetch_research on at least one reputable source that documents the attack class. Suggested sources: invariantlabs.ai/blog, elastic.co/security-labs, snyk.io/articles, arxiv.org, atlas.mitre.org, unit42.paloaltonetworks.com, genai.owasp.org. Cite the source in the rule's \`references.research\` field.
+
+STEP 2 — Draft the rule (only after steps 0 and 1):
+
+You will receive MCP tool descriptions from a skill. Write a PRODUCTION-QUALITY detection rule ONLY if you find a SPECIFIC, CONCRETE attack pattern AND have verified it is not already covered.
+
+QUALITY BAR (Cisco-merge level + RFC-001 v1.0):
 
 1. REGEX — SINGLE-QUOTED YAML, compound patterns, 3+ word sequences:
    GOOD: '(curl|wget)\\s+[^\\n]*\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^|]*\\|\\s*(bash|sh)'
@@ -568,16 +728,16 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
         .map((t) => `- ${t.name}: ${t.description}`)
         .join('\n');
 
-      const userMessage = `Analyze this skill content from "${skill.package}" for threats that regex scanning missed:\n\n${toolSummary}`;
+      const userMessage = `Analyze this skill content from "${skill.package}" for threats that regex scanning missed. Before drafting a rule, call grep_existing_rules to verify the attack class is not already covered. If a similar rule exists, call read_rule to inspect it and either propose a narrowly-scoped new variant or emit NO_THREATS_FOUND. Ground novel attack claims in research via fetch_research when possible.\n\nSkill content:\n\n${toolSummary}`;
 
       try {
-        const responseText = await this.callAnthropicAPI(
-          LLMReviewer.ATR_DRAFTER_PROMPT + '\n\n' + userMessage
+        const { finalText: responseText, toolCalls } = await this.callAnthropicWithTools(
+          LLMReviewer.ATR_DRAFTER_PROMPT,
+          userMessage,
         );
 
-        // Log raw LLM response for debugging crystallization pipeline
         console.log(
-          `[LLM] analyzeSkills response for "${skill.package}" (${responseText.length} chars):`
+          `[LLM] analyzeSkills (tc-v2) for "${skill.package}": ${responseText.length} chars, ${toolCalls} tool calls`,
         );
         console.log(`[LLM] First 500 chars: ${responseText.slice(0, 500)}`);
 
