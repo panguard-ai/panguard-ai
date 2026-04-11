@@ -96,10 +96,11 @@ export const TC_DRAFTER_TOOLS = [
 // Shared fetch helper (node:https, with size + time limits)
 // ---------------------------------------------------------------------------
 
-const FETCH_TIMEOUT_MS = 8_000;
-const MAX_RESPONSE_BYTES = 500 * 1024; // 500 KB per fetch
+const FETCH_TIMEOUT_MS = 12_000;
+const MAX_RESPONSE_BYTES_DEFAULT = 500 * 1024; // 500 KB per fetch
+const MAX_RESPONSE_BYTES_LARGE = 4 * 1024 * 1024; // 4 MB for GitHub trees API
 
-async function httpsGet(url: string): Promise<string> {
+async function httpsGet(url: string, maxBytes: number = MAX_RESPONSE_BYTES_DEFAULT): Promise<string> {
   return new Promise((resolve, reject) => {
     const req = https.get(
       url,
@@ -115,7 +116,7 @@ async function httpsGet(url: string): Promise<string> {
           // Follow one level of redirect
           const next = new URL(res.headers.location, url).toString();
           res.resume();
-          httpsGet(next).then(resolve, reject);
+          httpsGet(next, maxBytes).then(resolve, reject);
           return;
         }
         if (status < 200 || status >= 300) {
@@ -127,9 +128,9 @@ async function httpsGet(url: string): Promise<string> {
         let total = 0;
         res.on('data', (chunk: Buffer) => {
           total += chunk.length;
-          if (total > MAX_RESPONSE_BYTES) {
+          if (total > maxBytes) {
             res.destroy();
-            reject(new Error(`response exceeded ${MAX_RESPONSE_BYTES} bytes`));
+            reject(new Error(`response exceeded ${maxBytes} bytes`));
             return;
           }
           chunks.push(chunk);
@@ -203,11 +204,13 @@ async function loadAllRuleSummaries(): Promise<RuleSummary[]> {
   const cached = cacheGet<RuleSummary[]>('all_rule_summaries');
   if (cached) return cached;
 
-  // Use the GitHub trees API with recursive=1 to list all files in one call
+  // Use the GitHub trees API with recursive=1 to list all files in one call.
+  // The full tree for agent-threat-rules is ~1 MB (109 rule files + tests +
+  // docs), so we use the larger 4 MB cap for this specific fetch.
   const treeUrl = `https://api.github.com/repos/${ATR_REPO_OWNER}/${ATR_REPO_NAME}/git/trees/${ATR_REPO_BRANCH}?recursive=1`;
   let treeJson: string;
   try {
-    treeJson = await httpsGet(treeUrl);
+    treeJson = await httpsGet(treeUrl, MAX_RESPONSE_BYTES_LARGE);
   } catch (err) {
     console.error(
       `[tc-v2] grep_existing_rules: failed to list rule files via GitHub API: ${err instanceof Error ? err.message : String(err)}`,
