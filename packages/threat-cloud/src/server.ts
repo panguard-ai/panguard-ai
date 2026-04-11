@@ -1732,10 +1732,10 @@ response:
       ok: true,
       data: {
         version: TC_VERSION,
-        commit:
-          process.env['RAILWAY_GIT_COMMIT_SHA'] ?? process.env['APP_COMMIT_SHA'] ?? 'unknown',
+        commit: process.env['RAILWAY_GIT_COMMIT_SHA'] ?? process.env['APP_COMMIT_SHA'] ?? 'unknown',
         deploymentId: process.env['RAILWAY_DEPLOYMENT_ID'] ?? 'unknown',
-        environment: process.env['RAILWAY_ENVIRONMENT_NAME'] ?? process.env['NODE_ENV'] ?? 'unknown',
+        environment:
+          process.env['RAILWAY_ENVIRONMENT_NAME'] ?? process.env['NODE_ENV'] ?? 'unknown',
         startedAt: SERVER_START_TIME.toISOString(),
         uptimeSeconds,
         nodeVersion: process.version,

@@ -42,7 +42,7 @@ requires fundamentally different detection than OS-level EDR.
 - `ARCHITECTURE.md` rewritten around the four AI agent security layers:
   prompt layer, tool call layer, skill / artifact layer, agent behavior
   layer. The `DETECT` stage now documents ATR engine + threat intelligence
-  + event correlation (previously listed Sigma + YARA + ATR).
+  - event correlation (previously listed Sigma + YARA + ATR).
 - `PRIVACY.md` — removed the `sigmaRuleMatched` field from the Threat Cloud
   upload field table.
 - `src/monitors/index.ts` — barrel now exports only `GitWatcher` (AI skill
