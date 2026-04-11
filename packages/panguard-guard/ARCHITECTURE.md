@@ -41,10 +41,10 @@ SecurityEvent
 The detection stage uses the ATR rule engine, threat intelligence feeds, and
 sliding-window event correlation.
 
-| Source               | Purpose                                            | Count |
-| -------------------- | -------------------------------------------------- | ----- |
-| **ATR**              | AI agent attack patterns (bundled + user rules)    | 109+  |
-| **Threat intel**     | IP / domain / hash reputation feeds                | -     |
+| Source               | Purpose                                                   | Count |
+| -------------------- | --------------------------------------------------------- | ----- |
+| **ATR**              | AI agent attack patterns (bundled + user rules)           | 109+  |
+| **Threat intel**     | IP / domain / hash reputation feeds                       | -     |
 | **Event correlator** | Sliding-window attack chain detection (T1110/T1046 style) | -     |
 
 ATR rules cover: prompt injection, tool poisoning, context exfiltration,
@@ -92,12 +92,12 @@ into the public ATR repository.
 
 PanguardGuard operates at 4 levels depending on available resources:
 
-| Level  | Available            | Detection              | Analysis       | Response       |
-| ------ | -------------------- | ---------------------- | -------------- | -------------- |
-| **L1** | Rules only (offline) | ATR rules              | Rule-based     | Auto-block     |
-| **L2** | + LLM provider       | ATR + LLM triage       | LLM-powered    | Full           |
-| **L3** | + Threat Cloud       | + community rule sync  | + threat intel | + IP blocklist |
-| **L4** | + Manager            | + distributed events   | + cross-node   | + coordinated  |
+| Level  | Available            | Detection             | Analysis       | Response       |
+| ------ | -------------------- | --------------------- | -------------- | -------------- |
+| **L1** | Rules only (offline) | ATR rules             | Rule-based     | Auto-block     |
+| **L2** | + LLM provider       | ATR + LLM triage      | LLM-powered    | Full           |
+| **L3** | + Threat Cloud       | + community rule sync | + threat intel | + IP blocklist |
+| **L4** | + Manager            | + distributed events  | + cross-node   | + coordinated  |
 
 The system never fails silently. If a component is unavailable, it logs the
 degradation and continues with available capabilities.
