@@ -5,6 +5,21 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import type { AnonymizedThreatData, ThreatCloudRule } from '../src/types.js';
 
+describe('server module — version endpoint constants', () => {
+  it('imports cleanly and exposes expected module-level constants', async () => {
+    // Importing the server module exercises:
+    //   - createRequire('../package.json') for TC_VERSION
+    //   - SERVER_START_TIME initialization
+    //   - All other top-level imports
+    // If any of these fail (e.g. wrong relative path after a refactor),
+    // the import below throws and the test fails.
+    const mod = await import('../src/server.js');
+    expect(mod).toBeDefined();
+    // ThreatCloudServer should be exported and constructible
+    expect(typeof mod.ThreatCloudServer).toBe('function');
+  });
+});
+
 describe('ThreatCloudDB', () => {
   let db: ThreatCloudDB;
   let tempDir: string;

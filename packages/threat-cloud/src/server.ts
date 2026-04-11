@@ -20,6 +20,7 @@
  * - POST /api/telemetry              Record anonymous telemetry event from CLI
  * - POST /api/scan-events           Report scan event from any source (bulk/CLI/web)
  * - GET  /api/metrics               Aggregated metrics across all sources (public, cached 60s)
+ * - GET  /api/version               Build/deploy info: version, commit, uptime (public, cached 30s)
  * - GET  /api/badge/:author/:skill   ATR Scanned SVG badge for a skill
  * - GET  /api/badge/stats            Badge statistics (JSON)
  * - GET  /health                     Health check
@@ -32,6 +33,17 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID, timingSafeEqual } from 'node:crypto';
+import { createRequire } from 'node:module';
+
+// Read package.json version (for /api/version endpoint, deploy verification)
+const _require = createRequire(import.meta.url);
+const _pkg = _require('../package.json') as { version: string };
+const TC_VERSION: string = _pkg.version;
+
+// Server-process startup timestamp for uptime reporting in /api/version.
+// This is module-scoped so it captures the actual import-time of the process,
+// not the time the first request is handled.
+const SERVER_START_TIME: Date = new Date();
 import { ThreatCloudDB } from './database.js';
 import { createBadgeRouter, type BadgeRouter } from './badge-api.js';
 import { LLMReviewer } from './llm-reviewer.js';
@@ -535,6 +547,14 @@ export class ThreatCloudServer {
         case '/api/metrics':
           if (req.method === 'GET') {
             this.handleGetMetrics(res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/version':
+          if (req.method === 'GET') {
+            this.handleGetVersion(res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -1687,6 +1707,39 @@ response:
     this.sendJson(res, 200, {
       ok: true,
       data: { ...metrics, npmDownloads },
+    });
+  }
+
+  /**
+   * GET /api/version — public deploy verification endpoint.
+   *
+   * Reports the package version, server start time, uptime, Node version,
+   * and (if running on Railway) the Railway deployment metadata. The
+   * commit SHA is read from `RAILWAY_GIT_COMMIT_SHA` if Railway sets it,
+   * or `APP_COMMIT_SHA` if the build pipeline injects it manually.
+   *
+   * Used by external tooling and CI to verify which commit is actually
+   * running in production. Without this endpoint, deploy verification
+   * relied on inspecting Railway's dashboard, which is not scriptable.
+   *
+   * Public, no auth, no rate-limit. Cached for 30 seconds.
+   */
+  private handleGetVersion(res: ServerResponse): void {
+    res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=30');
+    const now = Date.now();
+    const uptimeSeconds = Math.floor((now - SERVER_START_TIME.getTime()) / 1000);
+    this.sendJson(res, 200, {
+      ok: true,
+      data: {
+        version: TC_VERSION,
+        commit:
+          process.env['RAILWAY_GIT_COMMIT_SHA'] ?? process.env['APP_COMMIT_SHA'] ?? 'unknown',
+        deploymentId: process.env['RAILWAY_DEPLOYMENT_ID'] ?? 'unknown',
+        environment: process.env['RAILWAY_ENVIRONMENT_NAME'] ?? process.env['NODE_ENV'] ?? 'unknown',
+        startedAt: SERVER_START_TIME.toISOString(),
+        uptimeSeconds,
+        nodeVersion: process.version,
+      },
     });
   }
 

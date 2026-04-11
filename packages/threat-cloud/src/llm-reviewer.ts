@@ -231,8 +231,14 @@ export class LLMReviewer {
     // Store verdict in database
     this.db.updateATRProposalLLMReview(patternHash, verdictJson);
 
-    // If high false positive risk AND not approved, reject the proposal
-    if (!verdict.approved && verdict.falsePositiveRisk === 'high') {
+    // Terminal state transition on any legitimate rejection.
+    // Transient errors are handled earlier (they return without reaching this
+    // code path), so if we got a parsed verdict with approved=false, the LLM
+    // has made a reasoned decision — move the proposal to 'rejected' so the
+    // retry cron stops picking it up. Previously only high-FP rejections were
+    // marked terminal, which left low/medium-FP rejections in an infinite
+    // retry loop burning LLM API quota.
+    if (!verdict.approved) {
       this.db.rejectATRProposal(patternHash);
     }
 

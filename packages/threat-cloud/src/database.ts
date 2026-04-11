@@ -1431,18 +1431,22 @@ export class ThreatCloudDB {
    * 取得尚未被 LLM 審查的待處理提案（用於重試）
    */
   getUnreviewedProposals(limit: number = 5): Array<{ patternHash: string; ruleContent: string }> {
+    // Retry pending proposals that either (a) have never been reviewed, or
+    // (b) previously hit a transient error (rate limit, timeout, network).
+    // A legitimate `approved: false` verdict is NOT retried — that's a terminal
+    // rejection and handled by rejectATRProposal() in the reviewer; leaving it
+    // in the retry pool would loop forever and waste LLM API quota.
     return this.db
       .prepare(
         `SELECT pattern_hash as patternHash, rule_content as ruleContent
          FROM atr_proposals
          WHERE status = 'pending'
            AND (llm_review_verdict IS NULL
-                OR llm_review_verdict LIKE '%"approved":false%'
-                OR llm_review_verdict LIKE '%failed%'
-                OR llm_review_verdict LIKE '%error%'
+                OR llm_review_verdict LIKE '%LLM review failed%'
                 OR llm_review_verdict LIKE '%rate_limit%'
                 OR llm_review_verdict LIKE '%429%'
-                OR llm_review_verdict LIKE '%timed out%')
+                OR llm_review_verdict LIKE '%timed out%'
+                OR llm_review_verdict LIKE '%503%')
          ORDER BY created_at ASC
          LIMIT ?`
       )
