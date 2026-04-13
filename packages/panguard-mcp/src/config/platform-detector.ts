@@ -2,9 +2,9 @@
  * Platform Detector - Detect installed AI agent runtimes
  * 平台偵測器 - 偵測已安裝的 AI Agent 執行環境
  *
- * Detects 14 platforms: Claude Code, Claude Desktop, Cursor, OpenClaw, Codex,
- * WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot,
- * Zed, Gemini CLI, Continue, Roo Code.
+ * Detects 17 platforms: Claude Code, Claude Desktop, Cursor, Hermes Agent,
+ * OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline,
+ * VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code.
  *
  * @module @panguard-ai/panguard-mcp/config/platform-detector
  */
@@ -21,6 +21,7 @@ export type PlatformId =
   | 'claude-code'
   | 'claude-desktop'
   | 'cursor'
+  | 'hermes'
   | 'openclaw'
   | 'codex'
   | 'workbuddy'
@@ -118,6 +119,11 @@ function getCursorConfigPath(): string {
 /** Get the OpenClaw skill installation path for Panguard. */
 function getOpenClawSkillPath(): string {
   return join(homedir(), '.openclaw', 'skills', 'panguard', 'SKILL.md');
+}
+
+/** Get the Hermes Agent MCP config path. */
+function getHermesConfigPath(): string {
+  return join(homedir(), '.hermes', 'config.yaml');
 }
 
 /** Get the OpenClaw skills directory for Panguard. */
@@ -326,6 +332,17 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
     alreadyConfigured: hasPanguardMCPEntry(cursorPath),
   });
 
+  // Hermes Agent (OpenClaw successor, uses SKILL.md + MCP via config.yaml)
+  const hermesConfigPath = getHermesConfigPath();
+  const hermesDetected = (await commandExists('hermes')) || existsSync(join(homedir(), '.hermes'));
+  platforms.push({
+    id: 'hermes',
+    name: 'Hermes Agent',
+    configPath: hermesConfigPath,
+    detected: hermesDetected,
+    alreadyConfigured: hasPanguardMCPEntry(hermesConfigPath),
+  });
+
   // OpenClaw (uses native skill system, not MCP)
   const openclawSkillDir = getOpenClawSkillDir();
   const openclawDetected =
@@ -527,6 +544,8 @@ export function getConfigPath(platformId: PlatformId): string {
       return getClaudeDesktopConfigPath();
     case 'cursor':
       return getCursorConfigPath();
+    case 'hermes':
+      return getHermesConfigPath();
     case 'openclaw':
       return getOpenClawSkillDir();
     case 'codex':

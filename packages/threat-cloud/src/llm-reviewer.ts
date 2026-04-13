@@ -374,7 +374,13 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
    * Used by the tool-use loop so we can pass full message histories.
    */
   private callAnthropicRaw(body: Record<string, unknown>): Promise<{
-    content: Array<{ type: string; text?: string; id?: string; name?: string; input?: Record<string, unknown> }>;
+    content: Array<{
+      type: string;
+      text?: string;
+      id?: string;
+      name?: string;
+      input?: Record<string, unknown>;
+    }>;
     stop_reason?: string;
   }> {
     return new Promise((resolve, reject) => {
@@ -403,12 +409,20 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
           }
           try {
             const parsed = JSON.parse(bodyText) as {
-              content?: Array<{ type: string; text?: string; id?: string; name?: string; input?: Record<string, unknown> }>;
+              content?: Array<{
+                type: string;
+                text?: string;
+                id?: string;
+                name?: string;
+                input?: Record<string, unknown>;
+              }>;
               stop_reason?: string;
             };
             resolve({ content: parsed.content ?? [], stop_reason: parsed.stop_reason });
           } catch (err) {
-            reject(new Error(`Anthropic API parse: ${err instanceof Error ? err.message : String(err)}`));
+            reject(
+              new Error(`Anthropic API parse: ${err instanceof Error ? err.message : String(err)}`)
+            );
           }
         });
       });
@@ -436,7 +450,7 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
    */
   private async callAnthropicWithTools(
     systemPrompt: string,
-    userMessage: string,
+    userMessage: string
   ): Promise<{ finalText: string; toolCalls: number }> {
     const MAX_ROUNDS = 6;
     type ContentBlock =
@@ -491,7 +505,9 @@ Output ONLY valid JSON (no markdown, no explanation outside the JSON):
       const toolResults: ContentBlock[] = [];
       for (const tu of toolUses) {
         toolCalls++;
-        console.log(`[tc-v2] round ${round + 1}: tool ${tu.name}(${JSON.stringify(tu.input).slice(0, 120)})`);
+        console.log(
+          `[tc-v2] round ${round + 1}: tool ${tu.name}(${JSON.stringify(tu.input).slice(0, 120)})`
+        );
         const result = await executeToolCall(tu.name, tu.input);
         toolResults.push({
           type: 'tool_result',
@@ -733,11 +749,11 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
       try {
         const { finalText: responseText, toolCalls } = await this.callAnthropicWithTools(
           LLMReviewer.ATR_DRAFTER_PROMPT,
-          userMessage,
+          userMessage
         );
 
         console.log(
-          `[LLM] analyzeSkills (tc-v2) for "${skill.package}": ${responseText.length} chars, ${toolCalls} tool calls`,
+          `[LLM] analyzeSkills (tc-v2) for "${skill.package}": ${responseText.length} chars, ${toolCalls} tool calls`
         );
         console.log(`[LLM] First 500 chars: ${responseText.slice(0, 500)}`);
 

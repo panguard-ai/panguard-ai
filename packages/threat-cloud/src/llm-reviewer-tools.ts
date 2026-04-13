@@ -100,7 +100,10 @@ const FETCH_TIMEOUT_MS = 12_000;
 const MAX_RESPONSE_BYTES_DEFAULT = 500 * 1024; // 500 KB per fetch
 const MAX_RESPONSE_BYTES_LARGE = 4 * 1024 * 1024; // 4 MB for GitHub trees API
 
-async function httpsGet(url: string, maxBytes: number = MAX_RESPONSE_BYTES_DEFAULT): Promise<string> {
+async function httpsGet(
+  url: string,
+  maxBytes: number = MAX_RESPONSE_BYTES_DEFAULT
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const req = https.get(
       url,
@@ -137,7 +140,7 @@ async function httpsGet(url: string, maxBytes: number = MAX_RESPONSE_BYTES_DEFAU
         });
         res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
         res.on('error', reject);
-      },
+      }
     );
     req.on('error', reject);
     req.setTimeout(FETCH_TIMEOUT_MS, () => {
@@ -213,7 +216,7 @@ async function loadAllRuleSummaries(): Promise<RuleSummary[]> {
     treeJson = await httpsGet(treeUrl, MAX_RESPONSE_BYTES_LARGE);
   } catch (err) {
     console.error(
-      `[tc-v2] grep_existing_rules: failed to list rule files via GitHub API: ${err instanceof Error ? err.message : String(err)}`,
+      `[tc-v2] grep_existing_rules: failed to list rule files via GitHub API: ${err instanceof Error ? err.message : String(err)}`
     );
     return [];
   }
@@ -226,7 +229,9 @@ async function loadAllRuleSummaries(): Promise<RuleSummary[]> {
   }
 
   const ruleFiles = (parsed.tree ?? [])
-    .filter((t) => t.type === 'blob' && t.path && t.path.startsWith('rules/') && t.path.endsWith('.yaml'))
+    .filter(
+      (t) => t.type === 'blob' && t.path && t.path.startsWith('rules/') && t.path.endsWith('.yaml')
+    )
     .map((t) => t.path as string);
 
   const summaries: RuleSummary[] = [];
@@ -238,7 +243,7 @@ async function loadAllRuleSummaries(): Promise<RuleSummary[]> {
       batch.map(async (path) => {
         try {
           const raw = await httpsGet(
-            `https://raw.githubusercontent.com/${ATR_REPO_OWNER}/${ATR_REPO_NAME}/${ATR_REPO_BRANCH}/${path}`,
+            `https://raw.githubusercontent.com/${ATR_REPO_OWNER}/${ATR_REPO_NAME}/${ATR_REPO_BRANCH}/${path}`
           );
           const doc = parseYaml(raw) as Record<string, unknown> | null;
           if (!doc) return null;
@@ -258,7 +263,7 @@ async function loadAllRuleSummaries(): Promise<RuleSummary[]> {
         } catch {
           return null;
         }
-      }),
+      })
     );
     for (const r of results) {
       if (r && r.ruleId) summaries.push(r);
@@ -303,7 +308,7 @@ export async function grepExistingRules(keywords: readonly string[]): Promise<{
     if (!raw) {
       try {
         raw = await httpsGet(
-          `https://raw.githubusercontent.com/${ATR_REPO_OWNER}/${ATR_REPO_NAME}/${ATR_REPO_BRANCH}/${s.path}`,
+          `https://raw.githubusercontent.com/${ATR_REPO_OWNER}/${ATR_REPO_NAME}/${ATR_REPO_BRANCH}/${s.path}`
         );
         cacheSet(cacheKey, raw);
       } catch {
@@ -367,7 +372,7 @@ export async function readRule(ruleId: string): Promise<{
   if (!raw) {
     try {
       raw = await httpsGet(
-        `https://raw.githubusercontent.com/${ATR_REPO_OWNER}/${ATR_REPO_NAME}/${ATR_REPO_BRANCH}/${match.path}`,
+        `https://raw.githubusercontent.com/${ATR_REPO_OWNER}/${ATR_REPO_NAME}/${ATR_REPO_BRANCH}/${match.path}`
       );
       cacheSet(cacheKey, raw);
     } catch (err) {
@@ -439,7 +444,8 @@ export async function fetchResearch(url: string): Promise<{
 
   const host = parsedUrl.hostname.replace(/^www\./, '');
   const domainOk =
-    RESEARCH_ALLOWLIST.has(host) || Array.from(RESEARCH_ALLOWLIST).some((d) => host.endsWith('.' + d));
+    RESEARCH_ALLOWLIST.has(host) ||
+    Array.from(RESEARCH_ALLOWLIST).some((d) => host.endsWith('.' + d));
   if (!domainOk) {
     return {
       url,
@@ -482,10 +488,18 @@ export async function fetchResearch(url: string): Promise<{
     .trim();
 
   const MAX_RESEARCH_CHARS = 5000;
-  const truncated = text.length > MAX_RESEARCH_CHARS ? text.slice(0, MAX_RESEARCH_CHARS) + ' ... (truncated)' : text;
+  const truncated =
+    text.length > MAX_RESEARCH_CHARS
+      ? text.slice(0, MAX_RESEARCH_CHARS) + ' ... (truncated)'
+      : text;
 
   cacheSet(cacheKey, truncated);
-  return { url, ok: true, content: truncated, note: text.length > MAX_RESEARCH_CHARS ? 'truncated to 5000 chars' : 'full' };
+  return {
+    url,
+    ok: true,
+    content: truncated,
+    note: text.length > MAX_RESEARCH_CHARS ? 'truncated to 5000 chars' : 'full',
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -499,7 +513,7 @@ export interface ToolCallResult {
 
 export async function executeToolCall(
   name: string,
-  input: Record<string, unknown>,
+  input: Record<string, unknown>
 ): Promise<ToolCallResult> {
   try {
     if (name === 'grep_existing_rules') {
