@@ -738,7 +738,7 @@
       "scanBtn": "掃描",
       "historyLabel": "最近掃描",
       "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。",
-      "platformLabel": "支援 16 個平台：",
+      "platformLabel": "支援 17 個平台：",
       "ticker1": "postmark-mcp v1.0.16 每天偷偷轉寄 15,000 封信",
       "ticker2": "MCPJam Inspector CVSS 9.8 遠端程式碼執行",
       "ticker3": "Claude Code hooks 被利用偷走 API key",
@@ -746,7 +746,7 @@
       "ticker5": "43% 公開 MCP servers 有指令執行漏洞",
       "badgeOwasp": "OWASP 10/10",
       "badgeRules": "{count} 條 ATR 規則",
-      "badgePlatforms": "16 個平台",
+      "badgePlatforms": "17 個平台",
       "badgeLicense": "MIT 授權",
       "badgeScanned": "已掃 {count} Skills",
       "badgeRecall": "SKILL.md 96.9% 召回率",
@@ -763,8 +763,8 @@
         "threatcloud": "Threat Cloud"
       },
       "captions": {
-        "dashboard": "即時儀表板：188 條規則運行中、事件監控、三層偵測狀態一目瞭然。",
-        "rules": "188 條 ATR 規則從 Threat Cloud 自動同步。社群驅動、AI 草擬的偵測模式。",
+        "dashboard": "即時儀表板：偵測規則運行中、事件監控、三層偵測狀態一目瞭然。",
+        "rules": "110+ 條 ATR 規則從 Threat Cloud 自動同步。社群驅動、AI 草擬的偵測模式。",
         "threatcloud": "匿名威脅情報共享。你的裝置貢獻數據，同時接收最新偵測規則。"
       }
     },
@@ -852,7 +852,7 @@
       "subtitle": "AI 理解新威脅 → 結晶為 regex 規則 → 0ms 執行 → 保護所有人",
       "step1": {
         "title": "掃描",
-        "subtitle": "比對 108 條 ATR 規則",
+        "subtitle": "比對 110 條 ATR 規則",
         "timing": "3ms",
         "detail": "每個 Skill 都會比對完整的 ATR 規則集。已知模式即時捕獲，匹配簽章零漏報。"
       },
@@ -885,7 +885,7 @@
         },
         "panguard": {
           "label": "PanGuard",
-          "desc": "開源、16 個平台、不到 1 小時更新規則"
+          "desc": "開源、17 個平台、不到 1 小時更新規則"
         }
       }
     },
@@ -898,7 +898,7 @@
       "roadmapTitle": "我們的方向：",
       "installNow": "立即安裝",
       "scanSkill": "掃描 Skill",
-      "installNote": "60 秒安裝。16 個平台。{rules} 條規則。永久免費。",
+      "installNote": "60 秒安裝。17 個平台。{rules} 條規則。永久免費。",
       "paperPublished": "論文已發表（Zenodo DOI）"
     },
     "atrStandard": {
@@ -937,7 +937,7 @@
         "overline": "部署前",
         "title": "Skill Auditor",
         "desc": "靜態分析引擎，在 MCP Skill 和 AI Agent 工具執行前進行安全掃描。偵測 Prompt 注入、憑證竊取、資料外洩等 9 大威脅類別，基於 ATR 模式比對。",
-        "f1": "108 條 ATR 規則，涵蓋 714 偵測模式、10 大類別",
+        "f1": "110 條 ATR 規則，涵蓋 714 偵測模式、10 大類別",
         "f2": "機密偵測：AWS Key、GitHub Token、SSH 私鑰、API 密鑰",
         "f3": "YAML Manifest 驗證 + 權限範圍分析",
         "s1": "ATR 規則",
@@ -1032,7 +1032,7 @@
       "layer2": {
         "badge": "第二層",
         "name": "規則引擎",
-        "desc": "108 ATR 偵測規則，專為 AI Agent 安全設計。",
+        "desc": "110 ATR 偵測規則，專為 AI Agent 安全設計。",
         "detail": "50 毫秒內攔截 90% 已知威脅。不需要 AI。"
       },
       "layer3": {
@@ -1061,7 +1061,7 @@
       "tier1": {
         "name": "規則引擎",
         "pct": "90%",
-        "items": "108 ATR 偵測規則|714 偵測模式|10 個威脅類別|行為基線偵測|社群驅動規則更新",
+        "items": "110 ATR 偵測規則|714 偵測模式|10 個威脅類別|行為基線偵測|社群驅動規則更新",
         "speed": "每事件 <50ms"
       },
       "tier2": {
@@ -1454,7 +1454,7 @@
       "title": "嚴謹打造",
       "stats": [
         {
-          "value": "108",
+          "value": "110",
           "label": "ATR 規則 (AI Agent 威脅)"
         },
         {
@@ -1501,7 +1501,7 @@
     },
     "founder": {
       "title": "一個看到缺口的創辦人，從零開始建造",
-      "desc": "PanGuard 的起點是創辦人——一個跨領域背景的 builder（業務、行銷、嘻哈音樂節製作人）——自學寫程式後發現：AI Agent 正在安裝有完整系統存取權的工具，卻零安全審查。幾個月內，ATR 成長到 108 條偵測規則、被 Cisco AI Defense 採用、掃描了 67,000+ 個 Skills、在真實威脅上達到 96.9% 召回率。立足台灣，服務全球。"
+      "desc": "PanGuard 的起點是創辦人——一個跨領域背景的 builder（業務、行銷、嘻哈音樂節製作人）——自學寫程式後發現：AI Agent 正在安裝有完整系統存取權的工具，卻零安全審查。幾個月內，ATR 成長到 110 條偵測規則、被 Cisco AI Defense 採用、掃描了 67,000+ 個 Skills、在真實威脅上達到 96.9% 召回率。立足台灣，服務全球。"
     }
   },
   "openSource": {
@@ -1539,7 +1539,7 @@
         },
         {
           "name": "panguard-rules",
-          "desc": "108 ATR 偵測規則 + 714 偵測模式",
+          "desc": "110 ATR 偵測規則 + 714 偵測模式",
           "lang": "YAML / ATR",
           "stars": "社群"
         },
@@ -1587,7 +1587,7 @@
         "items": [
           "核心平台（Scan + Guard + Chat + Skill Auditor）",
           "Threat Cloud v1",
-          "108 ATR 偵測規則",
+          "110 ATR 偵測規則",
           "3,528 個自動化測試"
         ]
       },
@@ -1610,7 +1610,7 @@
   "metadata": {
     "home": {
       "title": "Panguard AI -- 你的 AI 資安守衛",
-      "description": "AI Agent 安全防護。掃描 MCP skills 偵測 prompt injection、tool poisoning、供應鏈攻擊。一行安裝、108 條偵測規則、免費開源。"
+      "description": "AI Agent 安全防護。掃描 MCP skills 偵測 prompt injection、tool poisoning、供應鏈攻擊。一行安裝、110 條偵測規則、免費開源。"
     },
     "pricing": {
       "title": "價格方案",
@@ -1686,7 +1686,7 @@
     },
     "compliance": {
       "title": "OWASP Agentic Top 10 覆蓋",
-      "description": "完整覆蓋 OWASP Agentic Top 10。108 條 ATR 偵測規則，10 個類別全數涵蓋。已對超過 90,000 個 MCP skill 實測驗證。"
+      "description": "完整覆蓋 OWASP Agentic Top 10。110 條 ATR 偵測規則，10 個類別全數涵蓋。已對超過 90,000 個 MCP skill 實測驗證。"
     },
     "trust": {
       "title": "Trust Center",
@@ -1774,7 +1774,7 @@
     },
     "atr": {
       "title": "Agent Threat Rules (ATR) -- Panguard AI",
-      "description": "首個 AI Agent 威脅的開放偵測標準。9 大類別、108 條規則。OWASP Agentic Top 10 完整覆蓋。社群驅動、YAML 格式、機器可讀。"
+      "description": "首個 AI Agent 威脅的開放偵測標準。9 大類別、110 條規則。OWASP Agentic Top 10 完整覆蓋。社群驅動、YAML 格式、機器可讀。"
     },
     "productMcp": {
       "title": "Panguard MCP Server",
@@ -1945,7 +1945,7 @@
       "capabilities": "核心能力",
       "cta": {
         "title": "準備好守護你的 AI Agent 了嗎？",
-        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。108 ATR 偵測規則。完全免費。",
+        "subtitle": "一行指令部署。支援 Claude Code、Cursor、OpenClaw、WorkBuddy 及任何 AI Agent 環境。110 ATR 偵測規則。完全免費。",
         "cta1": "立即開始",
         "cta2": "在 GitHub 上查看 ATR"
       }
@@ -2068,7 +2068,7 @@
         },
         "item5": {
           "title": "優雅降級",
-          "desc": "雲端 AI 斷線？本地指紋比對 & 啟發式分析接手。啟發式離線？108 ATR 偵測規則的規則引擎處理。Guard 永不停止保護，不受網路狀況影響。"
+          "desc": "雲端 AI 斷線？本地指紋比對 & 啟發式分析接手。啟發式離線？110 ATR 偵測規則的規則引擎處理。Guard 永不停止保護，不受網路狀況影響。"
         },
         "item6": {
           "title": "整合適配器",
@@ -2137,7 +2137,7 @@
         },
         "step2": {
           "title": "自動審計：ATR + Skill Auditor",
-          "desc": "技能會被 108 ATR 偵測規則掃描。Prompt injection、tool poisoning、隱藏 payload、過度權限，1 秒內完成檢查。"
+          "desc": "技能會被 110 ATR 偵測規則掃描。Prompt injection、tool poisoning、隱藏 payload、過度權限，1 秒內完成檢查。"
         },
         "step3": {
           "title": "匿名化威脅提交至 Threat Cloud",
@@ -2170,7 +2170,7 @@
           },
           "review": {
             "title": "審查",
-            "desc": "ATR 規則在 dev/staging 環境評估 agent 行為模式。9 大威脅類別、108 條規則，上線前就攔住問題。"
+            "desc": "ATR 規則在 dev/staging 環境評估 agent 行為模式。9 大威脅類別、110 條規則，上線前就攔住問題。"
           },
           "ship": {
             "title": "部署",
@@ -2228,7 +2228,7 @@
           },
           "atrValidate": {
             "label": "ATR 驗證",
-            "detail": "108 條規則"
+            "detail": "110 條規則"
           },
           "ship": {
             "label": "部署",
@@ -3355,7 +3355,7 @@
     },
     "coverage": {
       "overline": "覆蓋矩陣",
-      "title": "10 個類別。108 條規則。沒有缺口。",
+      "title": "10 個類別。110 條規則。沒有缺口。",
       "subtitle": "每個 OWASP Agentic 類別都有對應的 ATR 規則。6 個 STRONG、4 個 MODERATE，全部完整覆蓋。",
       "rulesLabel": "條 ATR 規則",
       "note": "部分規則跨多個類別，規則-類別對應總數：{total}。",
@@ -4067,7 +4067,7 @@
         "engine": "ATR 關聯",
         "desc": "ATR 偵測規則跨 AI Agent 會話、工具呼叫和提示詞流程進行關聯。規則引擎支援時間關聯、聚合和多來源關聯查詢。",
         "detects": "暴力攻擊、橫向移動鏈、持續性機制、政策違規",
-        "tech": "108 ATR 規則、熱重載、MITRE ATT&CK TTP 對應、自訂規則撰寫"
+        "tech": "110 ATR 規則、熱重載、MITRE ATT&CK TTP 對應、自訂規則撰寫"
       },
       "ai": {
         "layer": "第五層",
@@ -4184,18 +4184,18 @@
       },
       "what-is-atr": {
         "title": "什麼是 ATR？首個 AI Agent 安全開放標準",
-        "excerpt": "ATR（Agent Threat Rules）是針對 AI Agent 安全威脅的開放偵測標準。108 條 YAML 規則。OWASP Agentic Top 10 全覆蓋。網路有 Snort，端點有 Sigma，AI Agent 有 ATR。"
+        "excerpt": "ATR（Agent Threat Rules）是針對 AI Agent 安全威脅的開放偵測標準。110 條 YAML 規則。OWASP Agentic Top 10 全覆蓋。網路有 Snort，端點有 Sigma，AI Agent 有 ATR。"
       },
       "what-is-atr-zh": {
         "title": "什麼是 ATR？首個 AI Agent 安全開放標準",
-        "excerpt": "ATR（Agent Threat Rules）是針對 AI Agent 安全威脅的開放偵測標準。108 條 YAML 規則。OWASP Agentic Top 10 全覆蓋。網路有 Snort，端點有 Sigma，AI Agent 有 ATR。"
+        "excerpt": "ATR（Agent Threat Rules）是針對 AI Agent 安全威脅的開放偵測標準。110 條 YAML 規則。OWASP Agentic Top 10 全覆蓋。網路有 Snort，端點有 Sigma，AI Agent 有 ATR。"
       },
       "owasp-agentic-top-10-coverage": {
-        "title": "OWASP Agentic Top 10：108 條 ATR 規則如何覆蓋全部 10 個類別",
+        "title": "OWASP Agentic Top 10：110 條 ATR 規則如何覆蓋全部 10 個類別",
         "excerpt": "共 77 條規則映射橫跨全部 10 個 OWASP Agentic Security 類別。ASI01-ASI06 為 STRONG 覆蓋（每類 8-13 條規則）。ASI07-ASI10 為 MODERATE 覆蓋（每類 4-7 條規則）。完整映射表在內文。"
       },
       "owasp-agentic-top-10-coverage-zh": {
-        "title": "OWASP Agentic Top 10：108 條 ATR 規則如何覆蓋全部 10 個類別",
+        "title": "OWASP Agentic Top 10：110 條 ATR 規則如何覆蓋全部 10 個類別",
         "excerpt": "共 77 條規則映射橫跨全部 10 個 OWASP Agentic Security 類別。ASI01-ASI06 為 STRONG 覆蓋。ASI07-ASI10 為 MODERATE 覆蓋。完整映射表在內文。"
       },
       "transparent-recall-vs-opaque-precision": {
@@ -4482,7 +4482,7 @@
       "title": "進階設定",
       "subtitle": "用可選的外部工具增強 Panguard 的偵測能力。所有工具都是選配的——Panguard 在沒有它們的情況下仍然完整運作。",
       "degradeNote": "優雅降級架構",
-      "degradeDesc": "Panguard 的 AI 分析遵循三層降級策略：雲端 AI（Claude/OpenAI）> 本地 LLM（Ollama）> 規則引擎（ATR）。每一層都是獨立的，即使全部外部工具離線，108 ATR 規則仍然提供完整防護。",
+      "degradeDesc": "Panguard 的 AI 分析遵循三層降級策略：雲端 AI（Claude/OpenAI）> 本地 LLM（Ollama）> 規則引擎（ATR）。每一層都是獨立的，即使全部外部工具離線，110 ATR 規則仍然提供完整防護。",
       "ollamaTitle": "Ollama — 本地 AI 分析",
       "ollamaDesc": "安裝 Ollama 讓 Guard 在本地執行 AI 威脅分析，不需要雲端 API。適合離線環境或對資料隱私有要求的場景。",
       "ollamaNote": "Panguard 會自動偵測 Ollama（預設 http://localhost:11434）。安裝後不需要額外設定。",
@@ -5555,33 +5555,33 @@
     },
     "categories": {
       "overline": "規則分類",
-      "title": "9 大類別。108 條規則。持續增長中。",
-      "subtitle": "涵蓋 AI Agent 攻擊向量的完整光譜，對應 OWASP LLM Top 10。",
+      "title": "9 大類別。110 條規則。714 個偵測模式。",
+      "subtitle": "涵蓋完整 AI Agent 攻擊面，對應 OWASP Agentic Top 10 和 MITRE ATLAS。",
       "items": {
         "prompt-injection": {
           "name": "提示詞注入",
-          "count": "22 條規則",
-          "desc": "直接和間接提示詞注入、越獄攻擊、系統提示詞覆寫、多輪攻擊"
+          "count": "33 條規則",
+          "desc": "直接和間接注入、越獄攻擊、系統提示詞覆寫、多輪攻擊、編碼繞過、中日韓社交工程"
         },
         "tool-poisoning": {
           "name": "工具投毒",
-          "count": "11 條規則",
-          "desc": "惡意 MCP 回應、工具輸出注入、未授權工具呼叫、透過工具的 SSRF"
+          "count": "12 條規則",
+          "desc": "惡意 MCP 回應、工具輸出注入、未授權工具呼叫、透過工具的 SSRF、回應寄生攻擊"
         },
         "context-exfiltration": {
           "name": "上下文竊取",
-          "count": "7 條規則",
-          "desc": "系統提示詞洩漏、API 金鑰暴露、內部指令竊取"
+          "count": "14 條規則",
+          "desc": "系統提示詞洩漏、API 金鑰暴露、憑證竊取、SSH 金鑰存取、環境變數採集"
         },
         "agent-manipulation": {
           "name": "Agent 操縱",
-          "count": "10 條規則",
-          "desc": "跨 Agent 攻擊、目標劫持、跨 Agent 通訊欺騙、人機信任利用"
+          "count": "12 條規則",
+          "desc": "跨 Agent 攻擊、目標劫持、跨 Agent 通訊欺騙、人機信任利用、角色劫持"
         },
         "privilege-escalation": {
           "name": "權限提升",
-          "count": "6 條規則",
-          "desc": "工具權限提升、範圍蔓延、管理員函式存取"
+          "count": "8 條規則",
+          "desc": "工具權限提升、範圍蔓延、管理員函式存取、跨 Agent 權限提升"
         },
         "excessive-autonomy": {
           "name": "過度自主",
@@ -5590,8 +5590,8 @@
         },
         "skill-compromise": {
           "name": "技能入侵",
-          "count": "7 條規則",
-          "desc": "技能冒充、隱藏功能、鏈式攻擊、參數注入、更新攻擊"
+          "count": "23 條規則",
+          "desc": "供應鏈投毒、技能冒充、隱藏功能、鏈式攻擊、描述與行為不符、Rug Pull、名稱搶註"
         },
         "data-poisoning": {
           "name": "資料投毒",
@@ -5769,7 +5769,7 @@
         },
         {
           "name": "ATR 引擎",
-          "desc": "108 條規則，每個事件評估時間 <1ms。封鎖、告警或上報。",
+          "desc": "110 條規則，每個事件評估時間 <1ms。封鎖、告警或上報。",
           "position": "middle",
           "highlighted": true
         },
@@ -5817,20 +5817,20 @@
       "subtitle": "ATR 遵循開放標準的成功模式 -- 開放治理、社群貢獻、廠商中立設計。",
       "stats": [
         {
-          "value": "108",
+          "value": "110",
           "label": "偵測規則"
         },
         {
-          "value": "9",
-          "label": "威脅類別"
+          "value": "714",
+          "label": "偵測模式"
         },
         {
           "value": "10/10",
           "label": "OWASP Agentic 覆蓋"
         },
         {
-          "value": "MIT",
-          "label": "授權"
+          "value": "96.9%",
+          "label": "SKILL.md 召回率"
         }
       ],
       "steps": {
@@ -5858,39 +5858,39 @@
       "title": "標準持續進化",
       "phases": [
         {
-          "version": "v0.1",
+          "version": "v2.0",
           "status": "current",
-          "title": "基礎",
+          "title": "開放標準",
           "items": [
-            "9 大類別 108 條規則",
-            "YAML 格式規範",
-            "OWASP Agentic Top 10 對應",
-            "即時評估引擎",
-            "CLI 工具"
+            "110 條規則、714 個偵測模式，涵蓋 9 大類別",
+            "RFC-001 v1.1 品質標準發布",
+            "成熟度分級：draft / experimental / stable",
+            "Cisco AI Defense 採用 34 條 ATR 規則",
+            "OWASP Agentic Top 10：10/10 全覆蓋"
           ]
         },
         {
-          "version": "v0.2",
+          "version": "v2.x",
           "status": "next",
-          "title": "擴展",
+          "title": "集體防護",
           "items": [
-            "100+ 條社群貢獻規則",
-            "語意運算子支援",
-            "多 Agent 關聯規則",
-            "IDE 整合（VS Code、Cursor）",
-            "Threat Cloud 自動生成規則"
+            "Threat Cloud 結晶管線",
+            "GitHub Action 上架 CI/CD 掃描",
+            "Hermes Agent 整合（76K stars）",
+            "RFC-002：行為序列偵測類型",
+            "RFC-003：集體防護協定"
           ]
         },
         {
-          "version": "v1.0",
+          "version": "v3.0",
           "status": "future",
-          "title": "產業標準",
+          "title": "企業標準",
           "items": [
-            "100+ 條生產級規則",
-            "正式規範文件",
-            "廠商整合計畫",
-            "認證與合規工具組",
-            "治理機構成立"
+            "RFC-004：企業部署指南",
+            "EU AI Act 合規對應",
+            "企業私有規則源",
+            "多 Agent 艦隊可視化",
+            "廠商認證計畫"
           ]
         }
       ]
@@ -5900,7 +5900,7 @@
       "desc": "ATR 是開源且社群驅動的。貢獻規則、回報新威脅模式，或將 ATR 整合到你自己的 Agent 安全堆疊中。",
       "contribute": "在 GitHub 上貢獻",
       "getStarted": "立即開始",
-      "githubUrl": "https://github.com/panguard-ai/panguard-ai"
+      "githubUrl": "https://github.com/Agent-Threat-Rule/agent-threat-rules"
     }
   },
   "revolution": {
@@ -5937,7 +5937,7 @@
       "platforms": "支援 Claude Code、Cursor、QClaw、OpenClaw、Codex、WorkBuddy、Claude Desktop",
       "badges": {
         "mit": "MIT 開源",
-        "rules": "108 ATR 規則",
+        "rules": "110 ATR 規則",
         "taiwan": "台灣製造",
         "scanned": "已掃描 1,295 Skills"
       },
@@ -5967,7 +5967,7 @@
           "number": "3",
           "title": "新 Skill？先過審計。",
           "desc": "每個新 Skill 接受社群 ATR 規則審計，覆蓋提示注入、工具毒化、憑證外洩和 Skill 入侵。",
-          "detail": "108 ATR 偵測規則"
+          "detail": "110 ATR 偵測規則"
         },
         "llmAnalysis": {
           "number": "4",
@@ -5993,7 +5993,7 @@
     "productPillars": {
       "atrStandard": {
         "title": "社群規則",
-        "desc": "108 ATR 規則對付 AI Agent 威脅。全部開源、社群驅動。每個 Skill 必須通過的審核標準。",
+        "desc": "110 ATR 規則對付 AI Agent 威脅。全部開源、社群驅動。每個 Skill 必須通過的審核標準。",
         "link": "查看 ATR 規則"
       },
       "threatCloud": {
@@ -6075,7 +6075,7 @@
       "steps": {
         "install": {
           "title": "安裝",
-          "desc": "一行指令。Panguard 載入 108 ATR 偵測規則，專為 AI Agent 威脅設計。所有防護層同時啟動。"
+          "desc": "一行指令。Panguard 載入 110 ATR 偵測規則，專為 AI Agent 威脅設計。所有防護層同時啟動。"
         },
         "protect": {
           "title": "審核",
@@ -6121,7 +6121,7 @@
         "skillInstall": {
           "label": "第一層：規則",
           "title": "新 Skill 來了。ATR 規則即時審核。",
-          "narrative": "你從 OpenClaw 或 MCP 安裝新 Skill。在它執行前，Panguard 用 108 ATR 偵測規則 -- Prompt Injection、Tool Poisoning、憑證外洩、Skill 入侵 -- 進行審核。已知威脅被阻擋，安全的 Skill 正常運作。",
+          "narrative": "你從 OpenClaw 或 MCP 安裝新 Skill。在它執行前，Panguard 用 110 ATR 偵測規則 -- Prompt Injection、Tool Poisoning、憑證外洩、Skill 入侵 -- 進行審核。已知威脅被阻擋，安全的 Skill 正常運作。",
           "before": "沒有 Skills Audit，Skill 安裝後立刻擁有完整系統權限。",
           "after": "有了 Skills Audit，每個 Skill 在碰到系統前都通過三層審計。"
         },
@@ -6152,7 +6152,7 @@
         "tools": "ATR 規則",
         "items": [
           "ATR 規則：Prompt Injection、Tool Poisoning、Skill 入侵",
-          "108 條規則，社群驅動，持續更新"
+          "110 條規則，社群驅動，持續更新"
         ]
       },
       "postDeployment": {
@@ -6205,15 +6205,15 @@
       },
       "q2": {
         "q": "如果 skill 通過審計後才變惡意呢？",
-        "a": "Guard 持續監控每個白名單中的 skill，用多層偵測 -- 偵測到偏移時，不只是警報，而是自動回應。\n\n1. ATR 規則比對（亞毫秒級）-- 108 ATR 偵測規則，專為 AI Agent 威脅設計。只要 skill 的行為命中任何規則，立即標記。\n\n2. 指紋偏移 -- Skill Auditor 記錄了 skill 應該做什麼。Guard 拿即時行為跟指紋比對。一個程式碼審查工具突然開始對不明端點發網路請求？偏離指紋的瞬間就被抓到。\n\n3. LLM 深度分析 -- 規則和指紋都沒攔住的全新攻擊模式，AI 分析器會做語義檢查。判定結果自動蒸餾成新的 ATR 規則，下次同樣的攻擊靠規則就能擋。\n\n偵測到威脅後，Guard 的信心值回應機制啟動：\n- 信心值 >= 85%：自動回應 -- 從白名單撤銷 skill、封鎖工具呼叫、隔離 session。零人工延遲。\n- 信心值 50-84%：附完整證據警報，建議具體動作（如 revoke_skill 或 kill_agent），等待人工確認。\n- 50% 以下：記錄供調查，保留完整上下文。\n\n就算攻擊者耐心等了 50 次才動手，只要做了指紋範圍外的事，當下就被攔截 -- Guard 的回應力度跟確定性成正比。"
+        "a": "Guard 持續監控每個白名單中的 skill，用多層偵測 -- 偵測到偏移時，不只是警報，而是自動回應。\n\n1. ATR 規則比對（亞毫秒級）-- 110 ATR 偵測規則，專為 AI Agent 威脅設計。只要 skill 的行為命中任何規則，立即標記。\n\n2. 指紋偏移 -- Skill Auditor 記錄了 skill 應該做什麼。Guard 拿即時行為跟指紋比對。一個程式碼審查工具突然開始對不明端點發網路請求？偏離指紋的瞬間就被抓到。\n\n3. LLM 深度分析 -- 規則和指紋都沒攔住的全新攻擊模式，AI 分析器會做語義檢查。判定結果自動蒸餾成新的 ATR 規則，下次同樣的攻擊靠規則就能擋。\n\n偵測到威脅後，Guard 的信心值回應機制啟動：\n- 信心值 >= 85%：自動回應 -- 從白名單撤銷 skill、封鎖工具呼叫、隔離 session。零人工延遲。\n- 信心值 50-84%：附完整證據警報，建議具體動作（如 revoke_skill 或 kill_agent），等待人工確認。\n- 50% 以下：記錄供調查，保留完整上下文。\n\n就算攻擊者耐心等了 50 次才動手，只要做了指紋範圍外的事，當下就被攔截 -- Guard 的回應力度跟確定性成正比。"
       },
       "q3": {
         "q": "什麼是 ATR 規則？",
-        "a": "ATR（Agent Threat Rules）是首個 AI Agent 威脅的開放偵測標準。108 條規則橫跨 9 大威脅類別，專門針對 AI Agent 攻擊：提示注入、工具毒化、上下文竊取、憑證竊取、跨 Agent 提權、Skill 供應鏈攻擊等。\n\nATR 規則機器可讀、社群驅動，專為傳統安全工具看不見的威脅而生 -- 那些存在於提示詞流程、工具呼叫和 Agent 對話中的威脅。\n\nThreat Cloud 彙整社群貢獻的規則。Guard 以亞毫秒級速度執行。每條新規則都強化所有用戶的防護。"
+        "a": "ATR（Agent Threat Rules）是首個 AI Agent 威脅的開放偵測標準。110 條規則橫跨 9 大威脅類別，專門針對 AI Agent 攻擊：提示注入、工具毒化、上下文竊取、憑證竊取、跨 Agent 提權、Skill 供應鏈攻擊等。\n\nATR 規則機器可讀、社群驅動，專為傳統安全工具看不見的威脅而生 -- 那些存在於提示詞流程、工具呼叫和 Agent 對話中的威脅。\n\nThreat Cloud 彙整社群貢獻的規則。Guard 以亞毫秒級速度執行。每條新規則都強化所有用戶的防護。"
       },
       "q4": {
         "q": "Panguard 偵測哪些威脅？",
-        "a": "Panguard 專注於 AI Agent 安全威脅，涵蓋 9 大類別：\n\n提示注入 -- 直接和間接注入、越獄、系統提示覆蓋。\n工具毒化 -- 惡意工具描述、工具輸出中的隱藏指令。\n憑證外洩 -- API Key 竊取、SSH Key 存取、秘密擷取。\n上下文操縱 -- 記憶體中毒、對話劫持。\nSkill 供應鏈 -- 惡意 Skill 套件、依賴混淆。\n跨 Agent 攻擊 -- Agent 間的權限提升。\n未授權動作 -- 超出宣告範圍的檔案存取、網路呼叫。\n\n108 ATR 規則搭配 714 偵測模式。全部開源、社群驅動，透過 Threat Cloud 每天增長。"
+        "a": "Panguard 專注於 AI Agent 安全威脅，涵蓋 9 大類別：\n\n提示注入 -- 直接和間接注入、越獄、系統提示覆蓋。\n工具毒化 -- 惡意工具描述、工具輸出中的隱藏指令。\n憑證外洩 -- API Key 竊取、SSH Key 存取、秘密擷取。\n上下文操縱 -- 記憶體中毒、對話劫持。\nSkill 供應鏈 -- 惡意 Skill 套件、依賴混淆。\n跨 Agent 攻擊 -- Agent 間的權限提升。\n未授權動作 -- 超出宣告範圍的檔案存取、網路呼叫。\n\n110 ATR 規則搭配 714 偵測模式。全部開源、社群驅動，透過 Threat Cloud 每天增長。"
       }
     },
     "detection": {
@@ -6269,7 +6269,7 @@
       "title": "一般問題",
       "q1": {
         "q": "真的免費嗎？",
-        "a": "是的。100% 免費、開源、MIT 授權。沒有付費方案、沒有功能限制、沒有用量上限。\n\nScan、Guard、Skill Auditor、Threat Cloud、全部 108 ATR 偵測規則-- 全部免費、全部開源。\n\n合規報告和蜜罐陷阱已內建，同樣免費。\n\n不需信用卡、不需註冊、不會看到「聯繫業務詢價」。"
+        "a": "是的。100% 免費、開源、MIT 授權。沒有付費方案、沒有功能限制、沒有用量上限。\n\nScan、Guard、Skill Auditor、Threat Cloud、全部 110 ATR 偵測規則-- 全部免費、全部開源。\n\n合規報告和蜜罐陷阱已內建，同樣免費。\n\n不需信用卡、不需註冊、不會看到「聯繫業務詢價」。"
       },
       "q2": {
         "q": "誰在做這個？",

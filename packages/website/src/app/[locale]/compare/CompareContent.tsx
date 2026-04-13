@@ -140,7 +140,7 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
     tagline: 'They filter prompts. We secure the entire agent.',
     bullets: [
       'Lakera focuses on prompt-level filtering \u2014 blocking injection attacks in LLM inputs and outputs.',
-      'PanGuard covers the full attack surface: prompt injection (33 rules) + skill compromise (22) + context exfiltration (14) + agent manipulation (12) + tool poisoning (11) + privilege escalation (8) + 3 more categories. 108 rules total.',
+      'PanGuard covers the full attack surface: prompt injection (33 rules) + skill compromise (23) + context exfiltration (14) + agent manipulation (12) + tool poisoning (12) + privilege escalation (8) + 3 more categories. 110 rules total.',
       'Lakera is a firewall (input/output filter). PanGuard is an EDR (continuous monitoring + response).',
       'Lakera requires API integration. PanGuard is one command: pga setup.',
     ],
@@ -150,7 +150,7 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
     tagline: 'They govern agent behavior. We detect the threats.',
     bullets: [
       'Geordie AI (RSAC 2026 Innovation Sandbox winner) provides agent governance \u2014 policy enforcement and compliance dashboards.',
-      'PanGuard provides the detection layer that governance platforms need: 108 ATR rules that identify prompt injection, tool poisoning, and supply chain attacks in real time.',
+      'PanGuard provides the detection layer that governance platforms need: 110 ATR rules that identify prompt injection, tool poisoning, and supply chain attacks in real time.',
       'Governance without detection is blind. Detection without governance is noisy. They complement each other.',
       'Geordie is enterprise SaaS. PanGuard is open-source, MIT licensed, and free.',
     ],
@@ -160,7 +160,7 @@ const COMPARISON_CARDS: readonly ComparisonCard[] = [
     tagline: 'They scan MCP configs. We scan the entire AI agent attack surface.',
     bullets: [
       'Snyk acquired Invariant Labs (mcp-scan) in 2026. mcp-scan checks MCP server configurations for known issues.',
-      'PanGuard scans SKILL.md files, MCP configs, tool descriptions, and runtime behavior \u2014 108 rules across 9 threat categories, not just config validation.',
+      'PanGuard scans SKILL.md files, MCP configs, tool descriptions, and runtime behavior \u2014 110 rules across 9 threat categories, not just config validation.',
       'ATR achieves 96.9% recall on real-world SKILL.md threats with 0% false positives (498 samples). mcp-scan focuses on configuration, not behavioral threats.',
       "PanGuard is free. Snyk Invariant is part of Snyk's commercial platform.",
     ],
