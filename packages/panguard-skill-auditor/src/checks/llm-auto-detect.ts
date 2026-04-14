@@ -12,6 +12,9 @@
 
 import type { SkillAnalysisLLM } from './ai-check.js';
 
+/** Cache Ollama availability to avoid repeated HTTP calls that spam error logs */
+let _ollamaCached: SkillAnalysisLLM | null | undefined;
+
 /**
  * Attempt to auto-detect and create a SkillAnalysisLLM from available providers.
  *
@@ -42,6 +45,8 @@ export async function autoDetectSkillLLM(): Promise<SkillAnalysisLLM | null> {
       apiKey = process.env['OPENAI_API_KEY'];
     } else {
       provider = 'ollama';
+      // Return cached result for Ollama to avoid repeated failed HTTP calls
+      if (_ollamaCached !== undefined) return _ollamaCached;
     }
 
     // Allow override via PANGUARD_LLM_MODEL env var
@@ -51,6 +56,7 @@ export async function autoDetectSkillLLM(): Promise<SkillAnalysisLLM | null> {
 
     const available = await llmProvider.isAvailable();
     if (!available) {
+      if (provider === 'ollama') _ollamaCached = null;
       return null;
     }
 
@@ -70,6 +76,7 @@ export async function autoDetectSkillLLM(): Promise<SkillAnalysisLLM | null> {
       },
     };
 
+    if (provider === 'ollama') _ollamaCached = adapter;
     return adapter;
   } catch {
     // Auto-detect failure should not break auditing

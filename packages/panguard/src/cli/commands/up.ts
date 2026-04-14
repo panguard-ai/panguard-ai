@@ -301,7 +301,9 @@ export function upCommand(): Command {
                       const skillDir = join(homedir(), '.claude', 'skills', skill.name);
                       if (!existsSync(skillDir)) continue;
 
-                      const report = await auditSkill(skillDir);
+                      // Fast path: skip AI/semgrep for panguard up (ATR regex only, ~50ms/skill)
+                      // Users can run `pga audit --deep` for full analysis
+                      const report = await auditSkill(skillDir, { skipAI: true });
                       if (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') {
                         threats.push({
                           name: skill.name,
@@ -423,12 +425,17 @@ export function upCommand(): Command {
           const args = ['start'];
           if (opts.dashboard) args.push('--dashboard');
           if (opts.verbose) args.push('--verbose');
-          await runCLI(args);
+          try {
+            await runCLI(args);
+          } catch (err) {
+            process.stderr.write(
+              `  ${c.caution('Guard start failed:')} ${err instanceof Error ? err.message : String(err)}\n`
+            );
+          }
         }
 
         // ── Read rule count + TC status ──────────
-        // ATR rule count — matches agent-threat-rules package
-        const ruleCount = 108;
+        const ruleCount = 113;
 
         let tcStatus = 'disconnected';
         try {
@@ -446,8 +453,7 @@ export function upCommand(): Command {
         }
 
         // ── Clean summary panel ────────────────────────────────
-        // Guard is running: either it was already running, or we just started it via runCLI
-        const guardRunning = true;
+        const guardRunning = isGuardRunning();
         const hasProxy = serverCount > 0;
         const statusLabel =
           guardRunning && hasProxy

@@ -1353,6 +1353,21 @@ response:
   private async handlePostSkillBlacklist(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const body = await this.readBody(req);
     const data = JSON.parse(body);
+
+    // Support bulk upload: { skills: [{ skillName, reason }] }
+    if (Array.isArray(data.skills)) {
+      let added = 0;
+      for (const entry of data.skills) {
+        if (entry.skillName) {
+          this.db.addToBlacklist(entry.skillName, entry.reason || 'Bulk admin block');
+          added++;
+        }
+      }
+      this.sendJson(res, 201, { ok: true, data: { added, total: data.skills.length } });
+      return;
+    }
+
+    // Single skill upload
     const { skillName, reason } = data;
     if (!skillName) {
       this.sendJson(res, 400, { ok: false, error: 'skillName required' });
