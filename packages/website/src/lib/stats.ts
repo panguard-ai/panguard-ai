@@ -14,7 +14,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 108 ATR rules
+ *   agent-threat-rules/rules/                  -> 110 ATR rules
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -24,16 +24,16 @@
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.4.16',
-  atrRules: 108,
+  atrRules: 113,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 17,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
   atrPatterns: 714,
-  totalRules: 108,
+  totalRules: 113,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '108' as const,
+  totalRulesDisplay: '113' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '108' as const,
+  atrRulesDisplay: '113' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -144,14 +144,14 @@ export const STATS = {
     ciscoRulesMerged: 34,
     npmDownloads30d: 23_000,
     githubStars: 86,
-    platformsSupported: 16,
+    platformsSupported: 17,
   },
   /**
    * NOTE: These fallback numbers are only used when TC live API is unreachable.
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-04-09',
+  lastUpdated: '2026-04-14',
 } as const;
 
 export type Stats = typeof STATS;
