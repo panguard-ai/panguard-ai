@@ -70,7 +70,7 @@ export const ThreatDataSchema = z.object({
   attackSourceIP: z.string().min(1, 'attackSourceIP is required'),
   attackType: z.string().min(1, 'attackType is required'),
   mitreTechnique: z.string().min(1, 'mitreTechnique is required'),
-  sigmaRuleMatched: z.string().min(1, 'sigmaRuleMatched is required'),
+  ruleMatched: z.string().min(1, 'ruleMatched is required'),
   timestamp: z.string().min(1, 'timestamp is required'),
   industry: z.string().optional(),
   region: z.string().min(1, 'region is required'),

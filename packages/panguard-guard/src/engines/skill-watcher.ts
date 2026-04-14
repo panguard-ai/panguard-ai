@@ -127,13 +127,14 @@ async function loadAuditor(): Promise<AuditModule> {
 }
 
 // ---------------------------------------------------------------------------
-// Claude Code skill directories to watch
+// Native skill directories to watch (Claude Code + Hermes Agent)
 // ---------------------------------------------------------------------------
 
-const CLAUDE_SKILL_DIRS = [
+const NATIVE_SKILL_DIRS = [
   { path: join(homedir(), '.claude', 'skills'), type: 'skill' },
   { path: join(homedir(), '.claude', 'commands'), type: 'command' },
   { path: join(homedir(), '.claude', 'agents'), type: 'agent' },
+  { path: join(homedir(), '.hermes', 'skills'), type: 'skill' },
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -376,7 +377,7 @@ export class SkillWatcher extends EventEmitter {
   private scanClaudeSkillDirs(): Map<string, MCPServerEntryMinimal> {
     const entries = new Map<string, MCPServerEntryMinimal>();
 
-    for (const { path: dirPath, type } of CLAUDE_SKILL_DIRS) {
+    for (const { path: dirPath, type } of NATIVE_SKILL_DIRS) {
       if (!existsSync(dirPath)) continue;
       try {
         const items = readdirSync(dirPath, { withFileTypes: true });
@@ -423,7 +424,7 @@ export class SkillWatcher extends EventEmitter {
     // Build initial snapshot
     this.previousClaudeSkills = this.scanClaudeSkillDirs();
 
-    for (const { path: dirPath, type } of CLAUDE_SKILL_DIRS) {
+    for (const { path: dirPath, type } of NATIVE_SKILL_DIRS) {
       if (!existsSync(dirPath)) {
         logger.info(`Claude Code ${type} directory not found: ${dirPath}, skipping`);
         continue;

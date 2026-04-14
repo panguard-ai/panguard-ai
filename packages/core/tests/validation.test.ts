@@ -149,7 +149,7 @@ describe('ThreatDataSchema', () => {
     attackSourceIP: '192.168.1.100',
     attackType: 'brute_force',
     mitreTechnique: 'T1110',
-    sigmaRuleMatched: 'sigma-001',
+    ruleMatched: 'ATR-2026-00001',
     timestamp: '2024-01-15T10:30:00Z',
     region: 'TW',
   };

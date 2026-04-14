@@ -8,7 +8,7 @@ export interface AnonymizedThreatData {
   attackSourceIP: string;
   attackType: string;
   mitreTechnique: string;
-  sigmaRuleMatched: string; // legacy field name, now stores ATR rule ID
+  ruleMatched: string; // ATR rule ID that matched this threat
   timestamp: string;
   industry?: string;
   region: string;
