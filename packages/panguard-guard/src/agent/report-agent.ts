@@ -512,7 +512,7 @@ export class ReportAgent {
       attackSourceIP,
       attackType: event.category,
       mitreTechnique: verdict.mitreTechnique ?? 'unknown',
-      sigmaRuleMatched: ruleMatched,
+      ruleMatched,
       timestamp: new Date().toISOString(),
       region: getCountryCode(),
       ...(atrRuleIds.length > 0 && { atrRulesMatched: atrRuleIds.join(',') }),

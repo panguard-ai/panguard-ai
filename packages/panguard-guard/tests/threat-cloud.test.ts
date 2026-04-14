@@ -69,7 +69,7 @@ function makeThreatData(overrides: Partial<AnonymizedThreatData> = {}): Anonymiz
     attackSourceIP: '203.0.0.0',
     attackType: 'brute_force',
     mitreTechnique: 'T1110',
-    sigmaRuleMatched: 'rule-1',
+    ruleMatched: 'rule-1',
     timestamp: new Date().toISOString(),
     region: 'US',
     ...overrides,

@@ -156,7 +156,7 @@ describe('Threat Cloud Offline Mode', () => {
         attackSourceIP: '0.0.0.0',
         attackType: 'skill-audit',
         mitreTechnique: 'T1059',
-        sigmaRuleMatched: 'ATR-2025-0001',
+        ruleMatched: 'ATR-2025-0001',
         timestamp: new Date().toISOString(),
       })
     ).resolves.not.toThrow();
