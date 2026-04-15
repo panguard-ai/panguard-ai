@@ -10,6 +10,7 @@
  * @module @panguard-ai/panguard-guard/rule-sync
  */
 
+import { hostname, platform } from 'node:os';
 import { createLogger } from '@panguard-ai/core';
 import type { ThreatIntelFeedManager } from '@panguard-ai/core';
 import type { GuardConfig } from './types.js';
@@ -136,6 +137,21 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
       logger.warn(
         `Skill blacklist sync failed: ${err instanceof Error ? err.message : String(err)}`
       );
+    }
+
+    // Send device heartbeat to TC for fleet tracking
+    try {
+      const deviceId = threatCloud.getClientId();
+      await threatCloud.sendHeartbeat({
+        deviceId,
+        orgId: deviceId, // Single-user: org = device until orgs are configured
+        hostname: hostname(),
+        osType: platform(),
+        agentCount: atrEngine.getRuleCount(),
+        guardVersion: 'guard',
+      });
+    } catch (err: unknown) {
+      logger.warn(`Heartbeat failed: ${err instanceof Error ? err.message : String(err)}`);
     }
 
     logger.info(

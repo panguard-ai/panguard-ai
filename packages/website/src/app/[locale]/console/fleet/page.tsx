@@ -33,6 +33,8 @@ const colors = {
   glow: 'rgba(139,154,142,0.15)',
 } as const;
 
+const TC_URL = 'https://tc.panguard.ai';
+
 // ── Helpers ────────────────────────────────────────────
 
 function timeAgo(dateStr: string): string {
@@ -150,6 +152,45 @@ function StatusBadge({ status }: { status: Device['status'] }) {
   );
 }
 
+// ── Empty State ────────────────────────────────────────
+
+function EmptyFleet() {
+  return (
+    <div
+      style={{
+        background: colors.bgCard,
+        border: `1px solid ${colors.border}`,
+        borderRadius: 12,
+        padding: '48px 24px',
+        textAlign: 'center' as const,
+      }}
+    >
+      <div style={{ fontSize: 14, color: colors.textPrimary, fontWeight: 500, marginBottom: 8 }}>
+        No devices connected yet
+      </div>
+      <div style={{ fontSize: 13, color: colors.textMuted, marginBottom: 20, lineHeight: 1.6 }}>
+        Install Guard on your machines to see them here.
+        <br />
+        Guard sends heartbeats every 5 minutes.
+      </div>
+      <code
+        style={{
+          display: 'inline-block',
+          background: colors.bgRaised,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 8,
+          padding: '10px 16px',
+          fontSize: 13,
+          color: colors.sage,
+          fontFamily: 'var(--font-mono)',
+        }}
+      >
+        npm install -g @panguard-ai/panguard && panguard up
+      </code>
+    </div>
+  );
+}
+
 // ── Fleet Page ─────────────────────────────────────────
 
 export default function FleetPage() {
@@ -158,57 +199,33 @@ export default function FleetPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // TODO: replace with real TC API call when auth is ready
-    // For now, show demo data so the UI is visible
-    const demoDevices: Device[] = [
-      {
-        id: 'dev-001',
-        hostname: 'dev-macbook-pro',
-        os_type: 'macOS 15.2',
-        agent_count: 7,
-        guard_version: '1.5.0',
-        last_seen: new Date(Date.now() - 3 * 60000).toISOString(),
-        created_at: '2026-04-01T00:00:00Z',
-        skill_count: 12,
-        flagged_count: 2,
-      },
-      {
-        id: 'dev-002',
-        hostname: 'ci-runner-01',
-        os_type: 'Ubuntu 24.04',
-        agent_count: 3,
-        guard_version: '1.5.0',
-        last_seen: new Date(Date.now() - 60 * 60000).toISOString(),
-        created_at: '2026-04-05T00:00:00Z',
-        skill_count: 8,
-        flagged_count: 0,
-      },
-      {
-        id: 'dev-003',
-        hostname: 'staging-server',
-        os_type: 'Ubuntu 22.04',
-        agent_count: 5,
-        guard_version: '1.4.16',
-        last_seen: new Date(Date.now() - 48 * 60 * 60000).toISOString(),
-        created_at: '2026-03-15T00:00:00Z',
-        skill_count: 15,
-        flagged_count: 1,
-      },
-      {
-        id: 'dev-004',
-        hostname: 'prod-worker-03',
-        os_type: 'Ubuntu 24.04',
-        agent_count: 2,
-        guard_version: '1.5.0',
-        last_seen: new Date(Date.now() - 7 * 24 * 60 * 60000).toISOString(),
-        created_at: '2026-03-01T00:00:00Z',
-        skill_count: 6,
-        flagged_count: 0,
-      },
-    ];
+    async function fetchDevices() {
+      try {
+        // Fetch real device data from TC stats (public endpoint)
+        const statsResp = await fetch(`${TC_URL}/api/stats`);
+        const statsJson = (await statsResp.json()) as {
+          ok: boolean;
+          data?: { totalRules: number };
+        };
 
-    setDevices(demoDevices);
-    setLoading(false);
+        if (!statsJson.ok) {
+          setError('Failed to connect to Threat Cloud');
+          setLoading(false);
+          return;
+        }
+
+        // For now, TC doesn't expose a public device list endpoint.
+        // Devices will appear once Guard heartbeats start arriving.
+        // We show the empty state with install instructions.
+        setDevices([]);
+        setLoading(false);
+      } catch {
+        setError('Cannot reach Threat Cloud. Check your connection.');
+        setLoading(false);
+      }
+    }
+
+    void fetchDevices();
   }, []);
 
   const devicesWithStatus = devices.map((d) => ({
@@ -261,128 +278,134 @@ export default function FleetPage() {
         <KPICard value={totalSkills} label="Skills Monitored" color={colors.sage} />
       </div>
 
-      {/* Section Title */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 12,
-        }}
-      >
-        <h2
-          className="font-display"
-          style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: colors.textMuted,
-            textTransform: 'uppercase' as const,
-            letterSpacing: '0.5px',
-            margin: 0,
-          }}
-        >
-          Devices
-        </h2>
-        <button
-          style={{
-            background: colors.sage,
-            color: colors.bgBase,
-            border: 'none',
-            borderRadius: 8,
-            padding: '8px 16px',
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: 'pointer',
-          }}
-        >
-          Rescan All
-        </button>
-      </div>
-
-      {/* Device Table */}
-      <div
-        style={{
-          background: colors.bgCard,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 12,
-          overflow: 'hidden',
-        }}
-      >
-        {/* Table Header */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr 1.5fr 1fr 120px',
-            padding: '10px 16px',
-            borderBottom: `1px solid ${colors.border}`,
-            fontSize: 11,
-            fontWeight: 500,
-            color: colors.textMuted,
-            textTransform: 'uppercase' as const,
-            letterSpacing: '0.8px',
-          }}
-        >
-          <span>Device</span>
-          <span>Agents</span>
-          <span>Skills</span>
-          <span>Last Seen</span>
-          <span>Status</span>
-        </div>
-
-        {/* Table Rows */}
-        {devicesWithStatus.map((device) => (
+      {devices.length === 0 ? (
+        <EmptyFleet />
+      ) : (
+        <>
+          {/* Section Title */}
           <div
-            key={device.id}
             style={{
-              display: 'grid',
-              gridTemplateColumns: '2fr 1fr 1.5fr 1fr 120px',
-              padding: '12px 16px',
-              borderBottom: `1px solid ${colors.border}`,
+              display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              cursor: 'pointer',
-              transition: 'background 0.15s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = colors.bgRaised;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
+              marginBottom: 12,
             }}
           >
-            {/* Device Name + OS */}
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: colors.textPrimary }}>
-                {device.hostname ?? device.id}
-              </div>
-              <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 2 }}>
-                {device.os_type ?? 'Unknown OS'}
-                {device.guard_version ? ` / Guard ${device.guard_version}` : ''}
-              </div>
-            </div>
-
-            {/* Agent Count */}
-            <div style={{ fontSize: 13, color: colors.textPrimary }}>{device.agent_count}</div>
-
-            {/* Skills */}
-            <div style={{ fontSize: 13, color: colors.textPrimary }}>
-              {device.skill_count ?? 0}
-              {(device.flagged_count ?? 0) > 0 && (
-                <span style={{ color: colors.warn, fontWeight: 600, marginLeft: 4 }}>
-                  ({device.flagged_count} flagged)
-                </span>
-              )}
-            </div>
-
-            {/* Last Seen */}
-            <div className="font-mono" style={{ fontSize: 12, color: colors.textMuted }}>
-              {timeAgo(device.last_seen)}
-            </div>
-
-            {/* Status Badge */}
-            <StatusBadge status={device.status} />
+            <h2
+              className="font-display"
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: colors.textMuted,
+                textTransform: 'uppercase' as const,
+                letterSpacing: '0.5px',
+                margin: 0,
+              }}
+            >
+              Devices
+            </h2>
+            <button
+              style={{
+                background: colors.sage,
+                color: colors.bgBase,
+                border: 'none',
+                borderRadius: 8,
+                padding: '8px 16px',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Rescan All
+            </button>
           </div>
-        ))}
-      </div>
+
+          {/* Device Table */}
+          <div
+            style={{
+              background: colors.bgCard,
+              border: `1px solid ${colors.border}`,
+              borderRadius: 12,
+              overflow: 'hidden',
+            }}
+          >
+            {/* Table Header */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1.5fr 1fr 120px',
+                padding: '10px 16px',
+                borderBottom: `1px solid ${colors.border}`,
+                fontSize: 11,
+                fontWeight: 500,
+                color: colors.textMuted,
+                textTransform: 'uppercase' as const,
+                letterSpacing: '0.8px',
+              }}
+            >
+              <span>Device</span>
+              <span>Agents</span>
+              <span>Skills</span>
+              <span>Last Seen</span>
+              <span>Status</span>
+            </div>
+
+            {/* Table Rows */}
+            {devicesWithStatus.map((device) => (
+              <div
+                key={device.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '2fr 1fr 1.5fr 1fr 120px',
+                  padding: '12px 16px',
+                  borderBottom: `1px solid ${colors.border}`,
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = colors.bgRaised;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                {/* Device Name + OS */}
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: colors.textPrimary }}>
+                    {device.hostname ?? device.id}
+                  </div>
+                  <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 2 }}>
+                    {device.os_type ?? 'Unknown OS'}
+                    {device.guard_version ? ` / Guard ${device.guard_version}` : ''}
+                  </div>
+                </div>
+
+                {/* Agent Count */}
+                <div style={{ fontSize: 13, color: colors.textPrimary }}>{device.agent_count}</div>
+
+                {/* Skills */}
+                <div style={{ fontSize: 13, color: colors.textPrimary }}>
+                  {device.skill_count ?? 0}
+                  {(device.flagged_count ?? 0) > 0 && (
+                    <span style={{ color: colors.warn, fontWeight: 600, marginLeft: 4 }}>
+                      ({device.flagged_count} flagged)
+                    </span>
+                  )}
+                </div>
+
+                {/* Last Seen */}
+                <div className="font-mono" style={{ fontSize: 12, color: colors.textMuted }}>
+                  {timeAgo(device.last_seen)}
+                </div>
+
+                {/* Status Badge */}
+                <StatusBadge status={device.status} />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
