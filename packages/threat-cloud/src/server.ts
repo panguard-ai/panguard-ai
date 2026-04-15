@@ -293,7 +293,9 @@ export class ThreatCloudServer {
     if (!publicPaths.has(pathname) && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
-      if (!this.config.apiKeys.includes(token)) {
+      const isValidApiKey = this.config.apiKeys.includes(token);
+      const isAdminKey = this.config.adminApiKey ? token === this.config.adminApiKey : false;
+      if (!isValidApiKey && !isAdminKey) {
         this.sendJson(res, 401, { ok: false, error: 'Invalid API key', request_id: requestId });
         log.info('request', {
           method: req.method,
