@@ -1125,7 +1125,7 @@ export const ATR_RULES_COMPILED = [
     title: 'SSRF via Agent Tool Calls',
     severity: 'critical',
     category: 'tool-poisoning',
-    scan_target: 'both',
+    scan_target: 'mcp',
     rule_version: 1,
     patterns: [
       {
@@ -3895,7 +3895,7 @@ export const ATR_RULES_COMPILED = [
     title: 'Credential File Theft from Agent Environment',
     severity: 'critical',
     category: 'context-exfiltration',
-    scan_target: 'both',
+    scan_target: 'mcp',
     rule_version: 1,
     patterns: [
       {
@@ -3972,7 +3972,7 @@ export const ATR_RULES_COMPILED = [
     title: 'Bulk Environment Variable Harvesting and Exfiltration',
     severity: 'critical',
     category: 'context-exfiltration',
-    scan_target: 'both',
+    scan_target: 'mcp',
     rule_version: 1,
     patterns: [
       {
@@ -4352,8 +4352,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)name:\\s*(solana|bitcoin|ethereum|crypto|wallet|bybit|binance)[_-](drain|steal|track|swap|flip|recover|generat|manag|trad)[a-z]*',
-        desc: 'Crypto-themed skill name matching AMOS campaign pattern',
+          '(?i)name:\\s*(solana|bitcoin|ethereum|crypto|wallet|bybit|binance)[_-](drain|steal|recover|generat)[a-z]*',
+        desc: 'Crypto-themed skill name with malicious-intent suffix (drainer/stealer/recovery scam/key generator)',
       },
     ],
   },
@@ -4442,7 +4442,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(provides?|includes?|contains?|offers?|supports?|has)\\s+(\\d{2,3}|over\\s+\\d{2}|more\\s+than\\s+\\d{2})\\s+(commands?|tools?|subcommands?|functions?|operations?|endpoints?|actions?|methods?)',
+          '(?i)(provides?|includes?|contains?|offers?|supports?|has)\\s+(?:(?:[5-9]\\d|\\d{3,})|over\\s+(?:[5-9]\\d|\\d{3,})|more\\s+than\\s+(?:[5-9]\\d|\\d{3,}))\\s+(commands?|tools?|subcommands?|functions?|operations?|endpoints?|actions?|methods?)',
         desc: 'Explicit declaration of large command count (50+)',
       },
     ],
@@ -5280,6 +5280,154 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)if\\s*\\(\\s*\\w+\\.getHours\\s*\\(\\s*\\)\\s*(>=|<=|==|===|>|<)\\s*\\d{1,2}\\s*(&&|\\|\\|)\\s*\\w+\\.getHours\\s*\\(\\s*\\)\\s*(>=|<=|==|===|>|<)\\s*\\d{1,2}\\s*\\)',
         desc: 'Hour range check (e.g., hours >= 2 && hours <= 4) \u2014 time window gate',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00161',
+    title: 'MCP Tool Description \u2014 IMPORTANT Tag Cross-Tool Shadowing Attack',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '<important>[\\s\\S]{0,600}?\\b(read|send|exec|fetch|invoke|extract|include|must|pass|forward|upload)\\b[\\s\\S]{0,300}?</important>',
+        desc: 'Hidden directive wrapped in an <IMPORTANT> XML-style tag \u2014 the Invariant Labs PoC signature',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:side\\s+effect|important\\s+behavior|crucial\\s+dependency|hidden\\s+dependency|relies?\\s+on|depends?\\s+on|works?\\s+with|requires?)\\s+(?:the\\s+)?(?:also\\s+present|previously\\s+declared|already\\s+installed|silently\\s+loaded|hidden\\s+companion)\\s+[\'"]?[a-z_][a-z_0-9-]*[\'"]?(?:\\s+tool|_tool)?',
+        desc: "Cross-tool shadowing directive referencing a co-installed MCP tool by the distinctive 'also present' / 'previously declared' shadowing vocabulary",
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\b(?:id_rsa|id_dsa|id_ed25519|id_ecdsa|mcp\\.json|\\.aws/credentials|\\.aws/config|\\.kube/config|\\.docker/config\\.json|\\.netrc|known_hosts)\\b|/etc/(?:passwd|shadow|ssl/private)|/proc/self/environ|\\b\\.env(?:\\.local|\\.production|\\.secret)?\\b(?![/a-zA-Z])',
+        desc: 'Sensitive credential file referenced in tool description \u2014 tool signatures should not need to read private keys or cloud credentials',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:do\\s+not|don.?t|never|please\\s+do\\s+not)\\s+(?:mention|tell|inform|notify|show|alert|disclose)\\s+(?:this|that|these|it|the\\s+(?:above|following))\\s*(?:detail|note|step|part|instruction)?\\s*(?:to\\s+)?(?:the\\s+)?user[\\s,.:;]+(?:it|as\\s+it|this|that)\\s*(?:is|.s)?\\s*(?:a\\s+|just\\s+a\\s+|merely\\s+a\\s+|only\\s+a\\s+|simply\\s+a\\s+)?(?:mere\\s+)?(?:implementation|technical|internal|plumbing|housekeeping)\\s+(?:detail|note|step)',
+        desc: "Concealment directive framing a side effect as 'merely an implementation detail' \u2014 the Invariant Labs PoC concealment phrase",
+      },
+      {
+        field: 'content',
+        pattern:
+          'before\\s+(?:using|invoking|calling|responding\\s+with|executing|running)\\s+(?:this\\s+)?(?:tool|function|capability|endpoint)[\\s,.:;]+(?:you\\s+(?:must|should|need\\s+to)|please)?\\s*(?:read|load|open|include|fetch|cat|echo|dump)\\s+[\'"~$/\\\\]',
+        desc: 'Pre-invocation directive telling the LLM to read an arbitrary file path before calling the tool',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00162',
+    title: 'Credential Access with Exfiltration in Skill Instructions',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'skill',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:cat|read|type|head|tail|strings|xxd|base64)\\s+[^\\n]*(?:\\.ssh/id_|\\.aws/credentials|\\.npmrc|\\.env|\\.netrc|\\.docker/config|\\.kube/config)[^\\n]*(?:\\||>|curl|wget|nc\\s|fetch|POST|http)',
+        desc: 'Credential file read piped to network command (e.g. cat ~/.ssh/id_rsa | curl)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:curl|wget|fetch|http|nc)\\s+[^\\n]*-[dX]\\s+[^\\n]*(?:\\$\\(cat|`cat|readFile|readFileSync)[^\\n]*(?:id_rsa|credentials|\\.env|secret|token|private.key)',
+        desc: 'HTTP request with credential file content as payload',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:cat|read)\\s+[^\\n]*(?:id_rsa|credentials|\\.env|secret_key|private_key)[^\\n]*\\|\\s*(?:base64|xxd|gzip)[^\\n]*\\|\\s*(?:curl|wget|nc)',
+        desc: 'Credential read \u2192 encode \u2192 exfiltrate pipeline',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:tar|zip|7z)\\s+[^\\n]*(?:\\.ssh|\\.aws|\\.gnupg|\\.kube)[^\\n]*(?:curl|wget|upload|send|POST|nc\\s)',
+        desc: 'Archive credential directory then transmit',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00163',
+    title: 'Hidden Override Instructions in Skill Content',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'skill',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:always|must|shall)\\s+(?:approve|accept|allow|grant|permit)\\s+(?:all\\s+)?(?:file|tool|command|operation|request|action)s?\\s+(?:without|regardless|even\\s+if)',
+        desc: 'Unconditional approval instruction (always approve X regardless of Y)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:do\\s+not|never|don.t)\\s+(?:ask|prompt|request|require|wait\\s+for)\\s+(?:the\\s+)?(?:user|human|operator).{0,30}(?:confirm|approv|permiss|consent|verif)',
+        desc: 'Suppress human confirmation (do not ask user for approval)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:you\\s+(?:must|should|will|shall)\\s+)?(?:skip|bypass|disable|ignore|override)\\s+(?:all\\s+)?(?:security|safety|permission|access|auth)\\s+(?:check|control|warning|prompt|gate|guard|verification|validation)s?\\s+(?:for|when|before|during|to\\s+(?:allow|enable|proceed|run|execute))',
+        desc: 'Direct security control bypass instruction with action context',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:this\\s+(?:step|action|operation)\\s+is\\s+(?:routine|standard|normal|expected|safe)|(?:no\\s+need|unnecessary)\\s+to\\s+(?:verify|check|confirm|validate|alert|warn))\\s+(?:the\\s+)?(?:user|human|operator)',
+        desc: 'Social engineering \u2014 framing dangerous action as routine to avoid scrutiny',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:execute|run|perform)\\s+(?:silently|quietly|in\\s+the\\s+background|without\\s+(?:notification|alerting|informing|telling|notifying))',
+        desc: 'Silent execution instruction',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00164',
+    title: 'Skill Scope Hijacking and Cross-Agent Escalation',
+    severity: 'high',
+    category: 'agent-manipulation',
+    scan_target: 'skill',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:also|additionally|while\\s+you.re\\s+at\\s+it|before\\s+(?:returning|responding))\\s+(?:read|access|check|scan|collect|gather|harvest)\\s+(?:all\\s+)?(?:other|additional|nearby|available|accessible)\\s+(?:files?|directories|folders?|configs?|secrets?|keys?|tokens?|env)',
+        desc: 'Scope expansion \u2014 skill instructs agent to access resources beyond its purpose',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:send|forward|relay|pass|share|transmit)\\s+(?:this|these|the|all)\\s+(?:results?|data|output|findings?|information)\\s+to\\s+(?:the\\s+)?(?:other|another|secondary|backup|external)\\s+(?:agent|server|endpoint|service|API)',
+        desc: 'Cross-agent data forwarding instruction',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:you\\s+(?:also\\s+)?have|this\\s+skill\\s+(?:also\\s+)?has|you\\s+can\\s+also|additionally\\s+you\\s+can)\\s+(?:full\\s+)?(?:access|permission|authority|rights?)\\s+to\\s+(?:all\\s+)?(?:files?|system|network|internet|shell|root)',
+        desc: 'False authority claim \u2014 skill claims broader permissions than granted',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:override|expand|extend|elevate|escalate)\\s+(?:your\\s+)?(?:current\\s+)?(?:scope|permissions?|access|privileges?|authority|role)\\s+(?:to|beyond|past)',
+        desc: 'Direct privilege escalation instruction',
       },
     ],
   },
