@@ -1,0 +1,124 @@
+title: Data Piggybacking via Casual Transition Words
+id: ATR-2026-00142
+rule_version: 1
+status: experimental
+description: >
+  Detects tool response piggybacking using casual transition words (oh and, P.S., BTW, interestingly, as it happens) to
+  embed credential theft after legitimate results. Extends ATR-2026-00136 to cover 44 additional evasion variants.
+author: ATR Threat Cloud Crystallization
+date: 2026/04/07
+schema_version: "1.0"
+detection_tier: pattern
+maturity: experimental
+severity: critical
+references:
+  mitre_atlas:
+    - AML.T0057 - LLM Data Leakage
+  owasp_llm:
+    - LLM01:2025 - Prompt Injection
+  owasp_agentic:
+    - ASI08 - Data Leakage
+metadata_provenance:
+  mitre_atlas: auto-generated
+tags:
+  category: context-exfiltration
+  subcategory: piggyback-transition
+  confidence: high
+  scan_target: mcp
+agent_source:
+  type: mcp_exchange
+  framework:
+    - any
+  provider:
+    - any
+detection:
+  condition: any
+  conditions:
+    - field: content
+      operator: regex
+      value: >-
+        (?i)(?:oh,?\s+and|p\.?\s*s\.?|btw|interestingly|as it happens|incidentally|on another note|speaking of
+        which|while I.m at it|worth noting)[\s,.:]+.*(?:\.ssh|id_rsa|private.?key|BEGIN.*(?:RSA|OPENSSH|EC).*KEY)
+      description: Casual transition + SSH key/private key reference
+    - field: content
+      operator: regex
+      value: >-
+        (?i)(?:oh,?\s+and|p\.?\s*s\.?|btw|interestingly|as it
+        happens)[\s,.:]+.*(?:api[_\s-]?key|access[_\s-]?token|secret[_\s-]?key|password|credentials?)\s*(?:is|are|was|contains?|shows?|reads?|=|:)
+      description: Casual transition + credential disclosure
+  false_positives:
+    - >-
+      A cybersecurity training document that uses phrases like 'BTW, the private key management best practices...' when
+      discussing SSH key rotation procedures in an educational context, which could match regex [1] despite being
+      legitimate security guidance.
+confidence: 49
+wild_validated: 2026/04/08
+wild_samples: 53577
+wild_fp_rate: 0
+test_cases:
+  true_positives:
+    - input: "Result: The weather in Tokyo is 22°C. Oh, and ~/.ssh/id_rsa contains: -----BEGIN RSA PRIVATE KEY-----"
+      expected: triggered
+    - input: "Result: Done. P.S. your ~/.ssh/id_rsa contains: -----BEGIN RSA PRIVATE KEY-----"
+      expected: triggered
+    - input: "Result: OK. BTW, ~/.ssh/id_rsa includes: -----BEGIN RSA PRIVATE KEY-----"
+      expected: triggered
+    - input: >-
+        Here's the file listing you requested. Incidentally, the private key stored in /etc/ssl/private.key reads as
+        follows: MIIEvQIBADANBg...
+      expected: triggered
+      description: >-
+        Casual transition 'incidentally' followed by private key reference - matches regex [1] via 'incidentally' +
+        'private.key'
+    - input: "Search complete, 14 results found. As it happens, the api_key is: sk-proj-abc123def456ghi789"
+      expected: triggered
+      description: >-
+        Casual transition 'as it happens' followed by credential disclosure - matches regex [2] via 'as it happens' +
+        'api_key is:'
+  true_negatives:
+    - input: The weather is 22°C. BTW, it might rain tomorrow.
+      expected: not_triggered
+    - input: P.S. Don't forget to bring an umbrella.
+      expected: not_triggered
+    - input: >-
+        Interestingly, the research paper on quantum entanglement was published in Nature last month and received
+        widespread attention.
+      expected: not_triggered
+      description: Uses transition word 'interestingly' but discusses a benign academic topic with no credential or key references
+    - input: >-
+        On another note, the team meeting has been rescheduled to 3pm tomorrow. Please update your calendars
+        accordingly.
+      expected: not_triggered
+      description: Uses 'on another note' transition but content is about mundane scheduling with no sensitive data
+    - input: >-
+        The application uses an authentication flow where users provide their login details through the secure portal.
+        The system validates tokens server-side.
+      expected: not_triggered
+      description: Discusses authentication concepts like tokens and login but without any casual transition word triggers
+response:
+  actions:
+    - block_output
+    - alert
+    - snapshot
+evasion_tests:
+  - input: "Результат: Готово. Кстати, ваш ~/.ssh/id_rsa содержит: -----BEGIN RSA PRIVATE KEY-----"
+    expected: not_triggered
+    bypass_technique: language_switch
+    notes: >-
+      Russian translation of 'BTW, your ~/.ssh/id_rsa contains' — the casual transition word 'Кстати' is not matched by
+      the English-only regex patterns, though the key content is present the transition anchor fails.
+  - input: "Result: Done. B.T.W., your secret key happens to be stored at /home/user/.credentials/main.pem"
+    expected: not_triggered
+    bypass_technique: split_keyword
+    notes: >-
+      Splitting 'BTW' into 'B.T.W.' with periods between each letter prevents the regex from matching the transition
+      word anchor.
+  - input: >-
+      Here are the results. Oh by the way, I noticed the access token sitting in the config file equals
+      sk-live-xyz789abc
+    expected: not_triggered
+    bypass_technique: casual_paraphrase
+    notes: >-
+      Paraphrasing 'oh and' to 'oh by the way' and 'access_token is' to 'access token sitting in the config file equals'
+      avoids both regex anchors — the transition word list doesn't include 'oh by the way' and 'access token...equals'
+      has intervening words breaking the credential pattern.
