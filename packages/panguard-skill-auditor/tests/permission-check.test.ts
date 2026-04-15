@@ -42,46 +42,16 @@ describe('checkPermissions', () => {
   });
 
   describe('Bash/Shell detection', () => {
-    it('should return high severity finding when shell command execution is mentioned', () => {
+    it('should detect shell command execution but not create finding (low risk)', () => {
       const result = checkPermissions(
         makeManifest({
           instructions: 'Execute the command on your system using sh -c.',
         })
       );
+      // Bash/Shell is low risk — detected in label but no finding created
       const finding = result.findings.find((f) => f.id === 'perm-bash-shell');
-      expect(finding).toBeDefined();
-      expect(finding!.severity).toBe('high');
-      expect(finding!.category).toBe('permission');
-    });
-
-    it('should detect "shell command" keyword', () => {
-      const result = checkPermissions(
-        makeManifest({
-          instructions: 'Run a shell command to manage files.',
-        })
-      );
-      const finding = result.findings.find((f) => f.id === 'perm-bash-shell');
-      expect(finding).toBeDefined();
-    });
-
-    it('should detect "spawn shell" keyword', () => {
-      const result = checkPermissions(
-        makeManifest({
-          instructions: 'Spawn shell to execute tasks.',
-        })
-      );
-      const finding = result.findings.find((f) => f.id === 'perm-bash-shell');
-      expect(finding).toBeDefined();
-    });
-
-    it('should detect "execute command" pattern', () => {
-      const result = checkPermissions(
-        makeManifest({
-          instructions: 'The skill will execute the command on your system.',
-        })
-      );
-      const finding = result.findings.find((f) => f.id === 'perm-bash-shell');
-      expect(finding).toBeDefined();
+      expect(finding).toBeUndefined();
+      expect(result.label).toContain('Bash/Shell');
     });
 
     it('should NOT match mere mention of "terminal" or "shell" without execution intent', () => {
@@ -94,18 +64,18 @@ describe('checkPermissions', () => {
       expect(finding).toBeUndefined();
     });
 
-    it('should return warn status when Bash/Shell is detected', () => {
+    it('should return pass status when only Bash/Shell is detected (low risk)', () => {
       const result = checkPermissions(
         makeManifest({
           instructions: 'Run command using bash -c to set up the environment.',
         })
       );
-      expect(result.status).toBe('warn');
+      expect(result.status).toBe('pass');
     });
   });
 
   describe('Database detection', () => {
-    it('should return high severity finding when explicit DB operations are mentioned', () => {
+    it('should return medium severity finding when explicit DB operations are mentioned', () => {
       const result = checkPermissions(
         makeManifest({
           instructions: 'Connect to postgres and retrieve records.',
@@ -113,7 +83,7 @@ describe('checkPermissions', () => {
       );
       const finding = result.findings.find((f) => f.id === 'perm-database');
       expect(finding).toBeDefined();
-      expect(finding!.severity).toBe('high');
+      expect(finding!.severity).toBe('medium');
     });
 
     it('should detect SQL SELECT statement', () => {
@@ -334,10 +304,10 @@ describe('checkPermissions', () => {
   });
 
   describe('Env Injection detection', () => {
-    it('should return high severity finding when .bashrc is mentioned with a word char prefix', () => {
+    it('should detect write to .bashrc profile file', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Edit file.bashrc to add environment settings.',
+          instructions: 'Append to ~/.bashrc with echo "export PATH=/mal" >> ~/.bashrc',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-env-injection');
@@ -345,24 +315,34 @@ describe('checkPermissions', () => {
       expect(finding!.severity).toBe('high');
     });
 
-    it('should detect .zshrc reference with word char prefix', () => {
+    it('should detect write to .zshrc profile file', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Modify the file.zshrc to configure shell startup.',
+          instructions: 'Write to ~/.zshrc to inject persistent env vars.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-env-injection');
       expect(finding).toBeDefined();
     });
 
-    it('should detect "export VAR=" pattern', () => {
+    it('should NOT flag simple export VAR= statements', () => {
       const result = checkPermissions(
         makeManifest({
           instructions: 'Run export MY_VAR=value to set the variable.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-env-injection');
-      expect(finding).toBeDefined();
+      expect(finding).toBeUndefined();
+    });
+
+    it('should NOT flag mention of environment variables without profile write', () => {
+      const result = checkPermissions(
+        makeManifest({
+          instructions: 'Set DATABASE_URL and API_KEY as environment variables for deployment.',
+        })
+      );
+      const finding = result.findings.find((f) => f.id === 'perm-env-injection');
+      expect(finding).toBeUndefined();
     });
   });
 
@@ -519,13 +499,13 @@ describe('checkPermissions', () => {
       expect(result.label).toContain('Network/HTTP');
     });
 
-    it('should return warn status when at least one high-risk tool is detected', () => {
+    it('should return pass status when only low-risk bash tool is detected', () => {
       const result = checkPermissions(
         makeManifest({
           instructions: 'Use bash -c to execute system commands.',
         })
       );
-      expect(result.status).toBe('warn');
+      expect(result.status).toBe('pass');
     });
 
     it('should return pass status when only medium-risk tools are detected', () => {
