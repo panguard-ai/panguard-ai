@@ -1861,9 +1861,7 @@ export class ThreatCloudDB {
 
   /** Create an organization / 建立組織 */
   createOrg(id: string, name: string): void {
-    this.db
-      .prepare('INSERT OR IGNORE INTO orgs (id, name) VALUES (?, ?)')
-      .run(id, name);
+    this.db.prepare('INSERT OR IGNORE INTO orgs (id, name) VALUES (?, ?)').run(id, name);
   }
 
   /** Get org by ID / 取得組織 */
@@ -1961,7 +1959,9 @@ export class ThreatCloudDB {
     orgId: string
   ): ReadonlyArray<{ category: string; action: string; created_at: string }> {
     return this.db
-      .prepare('SELECT category, action, created_at FROM org_policies WHERE org_id = ? ORDER BY category')
+      .prepare(
+        'SELECT category, action, created_at FROM org_policies WHERE org_id = ? ORDER BY category'
+      )
       .all(orgId) as ReadonlyArray<{ category: string; action: string; created_at: string }>;
   }
 

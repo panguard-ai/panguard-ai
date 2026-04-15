@@ -49,6 +49,7 @@ Layer 3: Skill Detail (click a skill)
 ```
 
 States:
+
 - Clean (green dot): Last scan passed, no drift
 - Flagged (orange square): Scan found issues, awaiting review
 - Blocked (red X): User or TC blacklist blocked this skill
@@ -67,24 +68,24 @@ ATR already has skill_hash_history table with rug_pull_flag.
 
 ## MVP Scope
 
-| Feature | Threat Model | Priority |
-|---------|-------------|----------|
-| Fleet overview (KPI + device table) | #6 | P0 |
-| Device detail (agents + skills) | #1, #6 | P0 |
-| Skill status badges | #1 | P0 |
-| Drift badge (hash changed) | #1 | P0 |
-| One-click Rescan | #1 | P0 |
-| Alert timeline | All | P0 |
+| Feature                             | Threat Model | Priority |
+| ----------------------------------- | ------------ | -------- |
+| Fleet overview (KPI + device table) | #6           | P0       |
+| Device detail (agents + skills)     | #1, #6       | P0       |
+| Skill status badges                 | #1           | P0       |
+| Drift badge (hash changed)          | #1           | P0       |
+| One-click Rescan                    | #1           | P0       |
+| Alert timeline                      | All          | P0       |
 
 ## Post-MVP
 
-| Feature | Threat Model | Priority |
-|---------|-------------|----------|
-| Policy editor (allow/block categories) | #1, #6 | P1 |
-| Monthly PDF report | EU AI Act Art. 12 | P1 |
-| Audit log viewer | EU AI Act Art. 14 | P1 |
-| Agent kill-switch | Art. 14 | P2 |
-| Compliance status dashboard | EU AI Act | P2 |
+| Feature                                | Threat Model      | Priority |
+| -------------------------------------- | ----------------- | -------- |
+| Policy editor (allow/block categories) | #1, #6            | P1       |
+| Monthly PDF report                     | EU AI Act Art. 12 | P1       |
+| Audit log viewer                       | EU AI Act Art. 14 | P1       |
+| Agent kill-switch                      | Art. 14           | P2       |
+| Compliance status dashboard            | EU AI Act         | P2       |
 
 ## Visual Design
 

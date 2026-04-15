@@ -287,9 +287,8 @@ export class ThreatCloudServer {
         : rawPathname;
 
     // Public endpoints that don't require API key authentication.
-    // /api/rules/sync is intentionally public so the ATR repo CI can push rules.
-    // /api/stats and /api/metrics are read-only public data.
-    const publicPaths = new Set(['/health', '/api/rules/sync', '/api/stats', '/api/metrics']);
+    // Read-only data endpoints are public. Write endpoints require auth.
+    const publicPaths = new Set(['/health', '/api/stats', '/api/metrics']);
     if (!publicPaths.has(pathname) && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
@@ -383,8 +382,12 @@ export class ThreatCloudServer {
           break;
 
         case '/api/rules/sync':
-          // Public endpoint for ATR repo CI to sync open-source rules (no admin key needed)
+          // Admin-only: ATR repo CI syncs rules via admin key
           if (req.method === 'POST') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required for rule sync' });
+              break;
+            }
             await this.handleSyncATRRules(req, res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
@@ -1068,7 +1071,14 @@ export class ThreatCloudServer {
     }
     const count = this.db.deleteRulesByIds(ruleIds as string[]);
     const clientIP = req.socket.remoteAddress ?? 'unknown';
-    this.db.audit.logAction('admin', 'rule.bulk-delete', 'rule', undefined, { count, requested: ruleIds.length }, clientIP);
+    this.db.audit.logAction(
+      'admin',
+      'rule.bulk-delete',
+      'rule',
+      undefined,
+      { count, requested: ruleIds.length },
+      clientIP
+    );
     this.sendJson(res, 200, { ok: true, data: { message: `Deleted ${count} rule(s)`, count } });
   }
 
@@ -1086,7 +1096,10 @@ export class ThreatCloudServer {
       return;
     }
     const count = this.db.deleteRulesBySource(source);
-    this.sendJson(res, 200, { ok: true, data: { message: `Deleted ${count} ${source} rule(s)`, count } });
+    this.sendJson(res, 200, {
+      ok: true,
+      data: { message: `Deleted ${count} ${source} rule(s)`, count },
+    });
   }
 
   /** GET /api/stats (cached 60s) */
