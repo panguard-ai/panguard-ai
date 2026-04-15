@@ -73,7 +73,7 @@ RUN pnpm --filter '!@panguard-ai/website' -r run build
 
 # ---- Create standalone bundle (no pnpm symlinks) ----
 # Cache buster: change this value to force Railway to rebuild from here
-ARG CACHE_BUST=2026-03-17-v2
+ARG CACHE_BUST=2026-04-16-v3
 RUN mkdir -p /standalone
 
 # Step 1: Copy main CLI entry point
