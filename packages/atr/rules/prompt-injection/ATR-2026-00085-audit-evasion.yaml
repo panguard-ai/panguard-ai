@@ -8,7 +8,7 @@ description: >
   trust scores to pass through multiple defense layers.
 author: ATR Community (MiroFish Predicted)
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high

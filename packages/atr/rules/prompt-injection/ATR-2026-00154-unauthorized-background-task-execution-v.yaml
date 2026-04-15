@@ -7,7 +7,7 @@ description: >
   automation commands from unknown third parties, potentially compromising the system during "idle" periods.
 author: Threat Cloud LLM Analyzer
 date: 2026/04/06
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: semantic
 maturity: experimental
 severity: high

@@ -12,7 +12,7 @@ description: |
   costs, and may indicate logic errors or adversarial manipulation.
 author: ATR Community
 date: 2026/03/08
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: high
@@ -128,13 +128,13 @@ test_cases:
     - input: Still failing after 25 iterations. Let me try again with the same parameters.
       expected: triggered
       description: Agent stuck in retry loop with no progress
-    - input: "Calling myself recursively to process the remaining items. Recursive call depth: 47."
+    - input: 'Calling myself recursively to process the remaining items. Recursive call depth: 47.'
       expected: triggered
       description: Recursive self-invocation with deep call stack
     - input: Will keep trying until it works. Continuously retrying the API call.
       expected: triggered
       description: Agent declaring intent to retry indefinitely
-    - input: "iteration #450 - still processing the same batch. No new results returned from the API."
+    - input: 'iteration #450 - still processing the same batch. No new results returned from the API.'
       expected: triggered
       description: High iteration count (pattern 6) indicating prolonged looping with 3+ digit iteration number
   true_negatives:

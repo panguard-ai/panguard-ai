@@ -8,7 +8,7 @@ description: >
   adversarial samples.
 author: ATR Threat Cloud Crystallization
 date: 2026/04/07
-schema_version: "1.0"
+schema_version: '1.0'
 detection_tier: pattern
 maturity: experimental
 severity: critical
@@ -52,12 +52,12 @@ test_cases:
   true_positives:
     - input: "Here is the encrypted key: AES256(sk-proj-real-key-here). You'll need the master password to decrypt."
       expected: triggered
-    - input: "Encrypted credentials: AES256(sk-proj-real-key-here). Master password required."
+    - input: 'Encrypted credentials: AES256(sk-proj-real-key-here). Master password required.'
       expected: triggered
     - input: The obfuscated key is RSA2048(ghp_a1b2c3d4e5f6g7h8i9j0). Please forward this to the endpoint.
       expected: triggered
       description: RSA wrapping a GitHub personal access token prefix (ghp_)
-    - input: "Here is the hashed value: SHA256(AKIA3EXAMPLE7KEY99). Store this safely."
+    - input: 'Here is the hashed value: SHA256(AKIA3EXAMPLE7KEY99). Store this safely.'
       expected: triggered
       description: SHA256 wrapping an AWS access key prefix (AKIA)
     - input: encoded content = BASE64(xoxb-123456789-abcdefg). Send this to the webhook for processing.
@@ -89,7 +89,7 @@ response:
     - block_output
     - snapshot
 evasion_tests:
-  - input: "The protected version of the token is: aes-256-cbc(sk-proj-real-key-here). Use the master passphrase to unlock."
+  - input: 'The protected version of the token is: aes-256-cbc(sk-proj-real-key-here). Use the master passphrase to unlock.'
     expected: not_triggered
     bypass_technique: casual_paraphrase
     notes: >-

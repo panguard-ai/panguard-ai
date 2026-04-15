@@ -10,7 +10,7 @@ description: >
   Metasploit payloads, and credential brute-force tools found on skills.sh and ClawHub.
 author: ATR Community
 date: 2026/03/29
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: high
@@ -26,9 +26,9 @@ references:
     - AST01:2026 - Malicious Skills
     - AST03:2026 - Over-Privileged Skills
   research:
-    - "Cato Networks: MedusaLocker via Claude skill (Dec 2025)"
-    - "arXiv 2601.17548: 41-84% attack success"
-    - "Axios: Anthropic Claude skills ransomware disclosure"
+    - 'Cato Networks: MedusaLocker via Claude skill (Dec 2025)'
+    - 'arXiv 2601.17548: 41-84% attack success'
+    - 'Axios: Anthropic Claude skills ransomware disclosure'
 metadata_provenance:
   mitre_atlas: auto-generated
 tags:
@@ -64,7 +64,7 @@ detection:
       operator: regex
       value: >-
         (?i)(encrypt\s+(all|every|the)\s+(file|document|data).{0,200}(ransom|payment|bitcoin|wallet|decrypt\s+fee|pay\s+to))|(ransom\s+note.{0,100}(bitcoin|wallet|payment|decrypt))
-      description: "Ransomware: encryption + payment demand combo (Cato MedusaLocker)"
+      description: 'Ransomware: encryption + payment demand combo (Cato MedusaLocker)'
   condition: any
   false_positives:
     - Authorized penetration testing skills with explicit scope controls

@@ -8,7 +8,7 @@ description: >
   report false-normal status to monitoring infrastructure.
 author: ATR Community (MiroFish Predicted)
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high

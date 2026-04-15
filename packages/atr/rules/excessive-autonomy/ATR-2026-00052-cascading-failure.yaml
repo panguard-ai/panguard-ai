@@ -21,7 +21,7 @@ description: >
   cascade prevention requires behavioral monitoring.
 author: ATR Community
 date: 2026/03/09
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: high
@@ -167,10 +167,10 @@ test_cases:
     - input: Stage 3 encountered an error. Circuit breaker activated. Alerting on-call engineer for review.
       expected: not_triggered
       description: Proper circuit breaker stopping cascade and alerting human
-    - input: "Running chaos engineering test: simulating stage 2 failure to verify pipeline resilience."
+    - input: 'Running chaos engineering test: simulating stage 2 failure to verify pipeline resilience.'
       expected: not_triggered
       description: Intentional fault injection for resilience testing
-    - input: "Post-incident review: the cascading failure last week was caused by an unhandled null pointer in stage 1."
+    - input: 'Post-incident review: the cascading failure last week was caused by an unhandled null pointer in stage 1.'
       expected: not_triggered
       description: Post-incident analysis discussing past cascade
     - input: Automated tests passed. Sending results to reviewer for manual sign-off before merge.

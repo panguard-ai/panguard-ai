@@ -251,7 +251,7 @@ export async function checkWithATR(
     // to avoid FP from mcp-targeted rules on document content.
     if (manifest.instructions) {
       const runtimeMatches = engine.evaluate(_buildLlmInputEvent(manifest.instructions));
-      const existingIds = new Set(allMatches.map(m => m.rule?.id));
+      const existingIds = new Set(allMatches.map((m) => m.rule?.id));
       for (const m of runtimeMatches) {
         if (!existingIds.has(m.rule?.id) && m.rule?.tags?.scan_target === 'skill') {
           allMatches.push(m);

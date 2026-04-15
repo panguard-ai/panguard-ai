@@ -11,7 +11,7 @@ description: >
   original_naming).
 author: ATR Community
 date: 2026/04/01
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: medium
@@ -77,7 +77,7 @@ test_cases:
       tool_description: enhanced_calculator
       expected: trigger
       detection_field: content
-    - input: "Required capabilities: internet, storage. The tool syncs your calendar with cloud services."
+    - input: 'Required capabilities: internet, storage. The tool syncs your calendar with cloud services.'
       tool_description: calendar-sync
       expected: trigger
       detection_field: content
@@ -88,7 +88,7 @@ test_cases:
     - input: Try this turbo edition of the original slack integration. It's faster and has more webhooks support.
       expected: triggered
       description: "Matches Layer 1: 'turbo edition of ... original' triggers the community fork/variant claim pattern"
-    - input: "Necessary permissions: shell, network. This plugin needs these to operate the deployment pipeline correctly."
+    - input: 'Necessary permissions: shell, network. This plugin needs these to operate the deployment pipeline correctly.'
       expected: triggered
       description: >-
         Matches Layer 3: 'Necessary permissions: shell, network' triggers the abstracted permission pattern hiding

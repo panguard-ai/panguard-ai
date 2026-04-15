@@ -21,7 +21,7 @@ description: |
   regardless of confidence score.
 author: ATR Community
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: low
@@ -114,43 +114,43 @@ test_cases:
   true_positives:
     - tool_call:
         name: send_red_packet
-        args: "{\"amount\": 200}"
+        args: '{"amount": 200}'
       expected: triggered
-      description: "Financial tool: red packet"
+      description: 'Financial tool: red packet'
     - tool_call:
         name: delete_all_files
-        args: "{\"path\": \"/data\", \"recursive\": true}"
+        args: '{"path": "/data", "recursive": true}'
       expected: triggered
-      description: "Destructive tool: recursive delete"
+      description: 'Destructive tool: recursive delete'
     - tool_call:
         name: send_email
-        args: "{\"to\": \"boss@company.com\", \"body\": \"I quit\"}"
+        args: '{"to": "boss@company.com", "body": "I quit"}'
       expected: triggered
-      description: "Communication tool: sending email as user"
+      description: 'Communication tool: sending email as user'
     - tool_call:
         name: grant_access
-        args: "{\"user\": \"stranger\", \"role\": \"admin\"}"
+        args: '{"user": "stranger", "role": "admin"}'
       expected: triggered
-      description: "Permission tool: granting admin access"
+      description: 'Permission tool: granting admin access'
     - tool_call:
         name: bash
-        args: "{\"command\": \"rm -rf /\"}"
+        args: '{"command": "rm -rf /"}'
       expected: triggered
       description: System execution tool
     - tool_call:
         name: 转账
-        args: "{\"金额\": 500}"
+        args: '{"金额": 500}'
       expected: triggered
       description: Chinese-named financial tool
     - tool_call:
         name: checkout
-        args: "{\"amount\": 9999, \"force\": true}"
+        args: '{"amount": 9999, "force": true}'
       expected: triggered
       description: High-value purchase with force flag
   true_negatives:
     - tool_call:
         name: get_payment_status
-        args: "{\"order_id\": \"12345\"}"
+        args: '{"order_id": "12345"}'
       expected: not_triggered
       description: Read-only payment status check
       notes: >-
@@ -158,27 +158,27 @@ test_cases:
         exclusion.
     - tool_call:
         name: search_files
-        args: "{\"query\": \"invoice\"}"
+        args: '{"query": "invoice"}'
       expected: not_triggered
       description: File search, not destructive despite financial keyword in args
     - tool_call:
         name: calculate_total
-        args: "{\"items\": [{\"price\": 500}]}"
+        args: '{"items": [{"price": 500}]}'
       expected: not_triggered
       description: Calculation tool, not financial action
     - tool_call:
         name: list_transactions
-        args: "{\"date_range\": \"2026-01-01 to 2026-03-01\"}"
+        args: '{"date_range": "2026-01-01 to 2026-03-01"}'
       expected: not_triggered
       description: Read-only transaction listing, not a financial action
     - tool_call:
         name: read_config
-        args: "{\"key\": \"notification_settings\"}"
+        args: '{"key": "notification_settings"}'
       expected: not_triggered
       description: Reading configuration, not modifying permissions or system
     - tool_call:
         name: fetch_user_profile
-        args: "{\"user_id\": \"12345\"}"
+        args: '{"user_id": "12345"}'
       expected: not_triggered
       description: Read-only user profile fetch, not permission modification
 evasion_tests:

@@ -18,7 +18,7 @@ description: |
   generic payment API calls.
 author: ATR Community
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: critical
@@ -74,7 +74,7 @@ detection:
     - field: content
       operator: regex
       value: (我(将|要|来|來|正在|准备|準備)?|正在|即将|即將).{0,10}(发送|發送|转账|轉帳|支付|付款|汇款|匯款|打款).{0,20}(元|块|塊|美元|人民币|人民幣)
-      description: "Chinese: agent declaring financial action with currency"
+      description: 'Chinese: agent declaring financial action with currency'
     - field: content
       operator: regex
       value: >-
@@ -83,7 +83,7 @@ detection:
     - field: content
       operator: regex
       value: (红包已发|紅包已發|转账成功|轉帳成功|付款成功|支付完成|汇款已发|匯款已發|已发送.*元|已發送.*元)
-      description: "Chinese: agent confirming financial action completed"
+      description: 'Chinese: agent confirming financial action completed'
   condition: any
   false_positives:
     - User explicitly asking agent to check payment status (read-only)
@@ -114,12 +114,12 @@ test_cases:
   true_positives:
     - tool_call:
         name: send_red_packet
-        args: "{\"amount\": 200, \"recipient\": \"user123\"}"
+        args: '{"amount": 200, "recipient": "user123"}'
       expected: triggered
       description: Direct red packet send tool call
     - tool_call:
         name: wechat_pay
-        args: "{\"action\": \"transfer\", \"amount\": 200, \"to\": \"wxid_abc\"}"
+        args: '{"action": "transfer", "amount": 200, "to": "wxid_abc"}'
       expected: triggered
       description: WeChat Pay transfer tool call
     - input: 我将发送200元红包给用户
@@ -133,21 +133,21 @@ test_cases:
     - input: I'll transfer $500 to the specified account now
       tool_name: agent_action
       expected: triggered
-      description: "English: agent declaring financial transfer"
+      description: 'English: agent declaring financial transfer'
     - input: Payment successful. $200 has been sent to recipient.
       tool_name: agent_action
       expected: triggered
       description: Agent confirming payment completion
     - tool_call:
         name: 转账
-        args: "{\"金额\": 500, \"收款人\": \"user456\"}"
+        args: '{"金额": 500, "收款人": "user456"}'
       expected: triggered
       description: Chinese-named transfer tool
   true_negatives:
     - input: Your last payment of $50 was processed on March 1st
       expected: not_triggered
       description: Displaying payment history (read-only)
-    - input: "Here is the code to integrate Stripe payments: stripe.charges.create({amount: 2000})"
+    - input: 'Here is the code to integrate Stripe payments: stripe.charges.create({amount: 2000})'
       expected: not_triggered
       description: Generating payment code, not executing
     - input: The transfer feature is currently unavailable

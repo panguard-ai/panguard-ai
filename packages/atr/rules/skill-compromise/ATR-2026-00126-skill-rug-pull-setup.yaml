@@ -10,7 +10,7 @@ description: >
   Inspired by Claude Code leak analysis and npm supply chain attacks.
 author: ATR Community
 date: 2026/04/05
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: high
@@ -24,8 +24,8 @@ references:
   owasp_ast:
     - AST06:2026 - Rug Pull / Supply Chain
   research:
-    - "Claude Code leak: SKILL.md update-then-attack pattern (2026-03)"
-    - "npm event-stream incident (2018): rug pull archetype"
+    - 'Claude Code leak: SKILL.md update-then-attack pattern (2026-03)'
+    - 'npm event-stream incident (2018): rug pull archetype'
 metadata_provenance:
   mitre_atlas: auto-generated
 tags:
