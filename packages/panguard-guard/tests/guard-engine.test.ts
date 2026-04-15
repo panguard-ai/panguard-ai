@@ -546,7 +546,7 @@ describe('GuardEngine', () => {
           attackSourceIP: '203.0.0.0',
           attackType: 'brute_force',
           mitreTechnique: 'T1110',
-          ruleMatched: 'r1',
+          sigmaRuleMatched: 'r1',
           timestamp: new Date().toISOString(),
           region: 'US',
         },

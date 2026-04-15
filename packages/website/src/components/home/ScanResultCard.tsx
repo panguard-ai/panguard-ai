@@ -410,8 +410,8 @@ export default function ScanResultCard({
         </code>
         <p className="text-[10px] text-text-muted mb-2">
           {isZh
-            ? `一行安裝。自動偵測 17 個平台：Claude Code、Cursor、Hermes、Windsurf、Gemini CLI 等。${STATS.totalRulesDisplay} ATR 偵測規則即時防護。`
-            : `One command. Auto-detects 17 platforms: Claude Code, Cursor, Hermes, Windsurf, Gemini CLI + more. ${STATS.totalRulesDisplay} ATR detection rules.`}
+            ? `一行安裝。自動偵測 16 個平台：Claude Code、Cursor、Windsurf、Gemini CLI 等。${STATS.totalRulesDisplay} ATR 偵測規則即時防護。`
+            : `One command. Auto-detects 16 platforms: Claude Code, Cursor, Windsurf, Gemini CLI + more. ${STATS.totalRulesDisplay} ATR detection rules.`}
         </p>
         <Link
           href="/docs/getting-started"

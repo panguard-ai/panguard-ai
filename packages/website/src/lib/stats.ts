@@ -23,7 +23,7 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.4.19',
+  cliVersion: '1.4.16',
   atrRules: 113,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 17,

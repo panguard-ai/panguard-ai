@@ -14,7 +14,6 @@ const PLATFORM_NAMES = [
   'Claude Code',
   'Claude Desktop',
   'Cursor',
-  'Hermes Agent',
   'OpenClaw',
   'Codex CLI',
   'WorkBuddy',
