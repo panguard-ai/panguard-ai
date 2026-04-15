@@ -334,7 +334,7 @@ export interface AnonymizedThreatData {
   attackSourceIP: string;
   attackType: string;
   mitreTechnique: string;
-  ruleMatched: string;
+  sigmaRuleMatched: string;
   timestamp: string;
   industry?: string;
   region: string;

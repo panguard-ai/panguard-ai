@@ -200,22 +200,6 @@ export const migrations: readonly Migration[] = [
       `);
     },
   },
-  {
-    version: 8,
-    name: 'rename_sigma_rule_matched_to_rule_matched',
-    up: (db) => {
-      // Remove legacy Sigma-era naming. The column has always stored ATR rule
-      // IDs (the "// legacy column name" comment made this clear). Rename the
-      // column in place; SQLite 3.25+ supports ALTER TABLE RENAME COLUMN and
-      // preserves all existing data.
-      const cols = db.prepare("PRAGMA table_info('threats')").all() as Array<{ name: string }>;
-      const colNames = new Set(cols.map((c) => c.name));
-
-      if (colNames.has('sigma_rule_matched') && !colNames.has('rule_matched')) {
-        db.exec(`ALTER TABLE threats RENAME COLUMN sigma_rule_matched TO rule_matched`);
-      }
-    },
-  },
 ];
 
 /**

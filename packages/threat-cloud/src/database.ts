@@ -46,7 +46,7 @@ export class ThreatCloudDB {
         attack_source_ip TEXT NOT NULL,
         attack_type TEXT NOT NULL,
         mitre_technique TEXT NOT NULL,
-        rule_matched TEXT NOT NULL, -- ATR rule ID that matched this threat
+        sigma_rule_matched TEXT NOT NULL, -- legacy column name, now stores ATR rule ID
         timestamp TEXT NOT NULL,
         industry TEXT,
         region TEXT NOT NULL,
@@ -203,14 +203,14 @@ export class ThreatCloudDB {
   /** Insert anonymized threat data / 插入匿名化威脅數據 */
   insertThreat(data: AnonymizedThreatData): void {
     const stmt = this.db.prepare(`
-      INSERT INTO threats (attack_source_ip, attack_type, mitre_technique, rule_matched, timestamp, industry, region)
+      INSERT INTO threats (attack_source_ip, attack_type, mitre_technique, sigma_rule_matched, timestamp, industry, region)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
     stmt.run(
       data.attackSourceIP,
       data.attackType,
       data.mitreTechnique,
-      data.ruleMatched,
+      data.sigmaRuleMatched,
       data.timestamp,
       data.industry ?? null,
       data.region
@@ -408,21 +408,6 @@ export class ThreatCloudDB {
       mitreTechniques,
       tags
     );
-  }
-
-  /** Get total rule count */
-  getRuleCount(): number {
-    const row = this.db.prepare('SELECT COUNT(*) as count FROM rules').get() as { count: number };
-    return row.count;
-  }
-
-  /** Delete rules whose rule_id is NOT in the keepIds set */
-  purgeRulesNotIn(keepIds: string[]): number {
-    if (keepIds.length === 0) return 0;
-    const placeholders = keepIds.map(() => '?').join(',');
-    const stmt = this.db.prepare(`DELETE FROM rules WHERE rule_id NOT IN (${placeholders})`);
-    const result = stmt.run(...keepIds);
-    return result.changes;
   }
 
   /** Fetch rules published after a given timestamp / 取得指定時間後發佈的規則 */

@@ -82,3 +82,7 @@ Guard dashboard WebSocket endpoint (`/ws`) has no authentication. Add token-base
 Events observed → Pattern learned → ATR rule generated → ATR Engine loads → Better detection
 
 The distiller uses LLM to generate rules — main change is updating the prompt template and output parser to produce ATR YAML instead of Sigma YAML. Threat Cloud already has ATR rule creation infrastructure that can be referenced for format.
+
+## P3 - Rename Legacy DB Field: sigma_rule_matched (S)
+
+`packages/threat-cloud/src/database.ts` and `packages/panguard-guard/src/types.ts` still use `sigma_rule_matched` / `sigmaRuleMatched` as a field name. This is a legacy name from when the detection engine was Sigma-based. Should be renamed to `rule_matched` / `ruleMatched` with a DB migration. Low priority since it's internal and doesn't affect functionality.

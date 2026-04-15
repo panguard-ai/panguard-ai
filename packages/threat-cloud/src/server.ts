@@ -371,25 +371,6 @@ export class ThreatCloudServer {
               break;
             }
             await this.handlePostRule(req, res);
-          } else if (req.method === 'DELETE') {
-            if (!this.checkAdminAuth(req)) {
-              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
-              break;
-            }
-            // Purge stale rules: DELETE /api/rules { keepIds: ["ATR-2026-00001", ...] }
-            const delBody = await this.readBody(req);
-            const delData = JSON.parse(delBody);
-            if (Array.isArray(delData.keepIds)) {
-              const before = this.db.getRuleCount();
-              this.db.purgeRulesNotIn(delData.keepIds);
-              const after = this.db.getRuleCount();
-              this.sendJson(res, 200, {
-                ok: true,
-                data: { before, after, purged: before - after },
-              });
-            } else {
-              this.sendJson(res, 400, { ok: false, error: 'keepIds array required' });
-            }
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }

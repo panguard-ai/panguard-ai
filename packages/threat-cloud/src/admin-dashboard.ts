@@ -437,7 +437,7 @@ function renderThreats(){
         html+='<tr><td>'+h(t.attack_source_ip)+'</td>';
         html+='<td>'+h(t.attack_type)+'</td>';
         html+='<td>'+h(t.mitre_technique)+'</td>';
-        html+='<td title="'+h(t.rule_matched)+'">'+h((t.rule_matched||'').slice(0,30))+'</td>';
+        html+='<td title="'+h(t.sigma_rule_matched)+'">'+h((t.sigma_rule_matched||'').slice(0,30))+'</td>';
         html+='<td>'+h(t.region||'-')+'</td>';
         html+='<td>'+timeAgo(t.timestamp)+'</td></tr>';
       });

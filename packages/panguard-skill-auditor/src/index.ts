@@ -62,10 +62,8 @@ export async function auditSkill(skillDir: string, options?: AuditOptions): Prom
     checks.push(await checkWithATR(manifest, options?.cloudRules));
   }
 
-  // Code security (SAST + secrets) — skip in fast mode (panguard up uses skipAI)
-  if (!options?.skipAI) {
-    checks.push(await checkCode(skillDir));
-  }
+  // Code security (SAST + secrets)
+  checks.push(await checkCode(skillDir));
 
   // Layer 2: AI semantic analysis (default-on, auto-detects LLM if not provided)
   if (manifest && !options?.skipAI) {
