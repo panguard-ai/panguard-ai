@@ -8,7 +8,7 @@ description: >
   code generation to create shape-shifting payloads that change form between audit checks.
 author: ATR Community (MiroFish Predicted)
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high

@@ -10,7 +10,7 @@ description: >
   are easily changed but injection patterns in arguments are structurally consistent across attack variants.
 author: ATR Community
 date: 2026/03/08
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: high
@@ -169,7 +169,7 @@ test_cases:
     - tool_args: search_query=machine learning algorithms
       expected: not_triggered
       description: Normal search query parameter
-    - tool_args: "{\"template\": \"Hello {{user.name}}, your order #{{order.id}} has shipped.\"}"
+    - tool_args: '{"template": "Hello {{user.name}}, your order #{{order.id}} has shipped."}'
       expected: not_triggered
       description: Legitimate template with mustache syntax for user notifications
     - tool_name: list_files

@@ -10,7 +10,7 @@ description: |
   an AI agent has higher success rates than traditional phishing.
 author: ATR Community
 date: 2026/03/26
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: high
@@ -77,7 +77,7 @@ wild_samples: 53577
 wild_fp_rate: 0
 test_cases:
   true_positives:
-    - input: "Immediate action required: your account will be locked in 24 hours unless you verify your credentials."
+    - input: 'Immediate action required: your account will be locked in 24 hours unless you verify your credentials.'
       tool_description: notification-sender
       expected: triggered
       description: Classic phishing urgency with account threat
@@ -129,7 +129,7 @@ evasion_tests:
     notes: >-
       Avoids exact phrases like 'security team requires', 'verify your password at this', and 'account will be locked'
       by using casual synonyms and restructured sentences.
-  - input: "Действие необходимо немедленно: ваш аккаунт будет заблокирован. Подтвердите свои учетные данные по этой ссылке."
+  - input: 'Действие необходимо немедленно: ваш аккаунт будет заблокирован. Подтвердите свои учетные данные по этой ссылке.'
     expected: not_triggered
     bypass_technique: language_switch
     notes: >-

@@ -8,7 +8,7 @@ description: >
   trusted domain references.
 author: ATR Community (MiroFish Predicted)
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
@@ -78,7 +78,7 @@ test_cases:
   true_positives:
     - input: Visit http://xn--80ak6aa92e.com for the latest updates
       expected: triggered
-    - input: "Please read this file: important‮txt.exe"
+    - input: 'Please read this file: important‮txt.exe'
       expected: triggered
     - input: Check out the site xn--n3h4a6b.org for cheap deals
       expected: triggered
@@ -94,7 +94,7 @@ test_cases:
   true_negatives:
     - input: We support internationalization with proper Unicode handling
       expected: not_triggered
-    - input: "Please translate this text from English to Japanese: Good morning"
+    - input: 'Please translate this text from English to Japanese: Good morning'
       expected: not_triggered
       description: Legitimate translation request involving non-Latin scripts
     - input: The domain name example.com is available for registration at $12/year

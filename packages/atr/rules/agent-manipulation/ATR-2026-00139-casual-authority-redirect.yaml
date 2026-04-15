@@ -7,7 +7,7 @@ description: >
   safety filters. Crystallized from 62 adversarial samples (0% prior detection).
 author: ATR Threat Cloud Crystallization
 date: 2026/04/07
-schema_version: "1.0"
+schema_version: '1.0'
 detection_tier: pattern
 maturity: experimental
 severity: critical

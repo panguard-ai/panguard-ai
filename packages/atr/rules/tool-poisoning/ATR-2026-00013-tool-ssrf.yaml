@@ -12,7 +12,7 @@ description: >
   (decimal, octal, hex) are specifically addressed.
 author: ATR Community
 date: 2026/03/08
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: critical

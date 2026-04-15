@@ -8,7 +8,7 @@ description: >
   poisoned tools that execute malicious actions when installed or invoked by agents.
 author: ATR Community (MiroFish Predicted)
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: critical
@@ -103,10 +103,10 @@ test_cases:
     - tool_response: "Registry lookup: package 'lodash' version 4.17.21 found. License: MIT. Downloads: 45M/week."
       expected: not_triggered
       description: Normal registry package lookup result
-    - tool_response: "Dependency tree resolved: 142 packages, 0 conflicts. All versions satisfy semver constraints."
+    - tool_response: 'Dependency tree resolved: 142 packages, 0 conflicts. All versions satisfy semver constraints.'
       expected: not_triggered
       description: Normal dependency resolution output
-    - tool_response: "Tool verified: SHA-256 checksum matches published hash. Signature valid. Author: verified-publisher."
+    - tool_response: 'Tool verified: SHA-256 checksum matches published hash. Signature valid. Author: verified-publisher.'
       expected: not_triggered
       description: Normal tool verification and integrity check output
     - input: >-

@@ -410,6 +410,21 @@ export class ThreatCloudDB {
     );
   }
 
+  /** Get total rule count */
+  getRuleCount(): number {
+    const row = this.db.prepare('SELECT COUNT(*) as count FROM rules').get() as { count: number };
+    return row.count;
+  }
+
+  /** Delete rules whose rule_id is NOT in the keepIds set */
+  purgeRulesNotIn(keepIds: string[]): number {
+    if (keepIds.length === 0) return 0;
+    const placeholders = keepIds.map(() => '?').join(',');
+    const stmt = this.db.prepare(`DELETE FROM rules WHERE rule_id NOT IN (${placeholders})`);
+    const result = stmt.run(...keepIds);
+    return result.changes;
+  }
+
   /** Fetch rules published after a given timestamp / 取得指定時間後發佈的規則 */
   getRulesSince(
     since: string,

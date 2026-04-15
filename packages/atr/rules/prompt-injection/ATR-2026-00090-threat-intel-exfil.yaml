@@ -8,7 +8,7 @@ description: >
   security audit logic to reverse-engineer defense mechanisms.
 author: ATR Community (MiroFish Predicted)
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high

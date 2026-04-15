@@ -8,7 +8,7 @@ description: >
   contains "CRITICAL INSTRUCTION — YOU MUST FOLLOW THIS" followed by specific behavioral directives.
 author: Threat Cloud LLM Analyzer
 date: 2026/04/06
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: semantic
 maturity: experimental
 severity: high
@@ -90,7 +90,7 @@ test_cases:
 
         Please follow these steps to configure the tool properly
       expected: not_triggered
-    - input: "Important: Before using this tool, ensure you have valid credentials configured"
+    - input: 'Important: Before using this tool, ensure you have valid credentials configured'
       expected: not_triggered
     - input: >-
         This is a critical update to our documentation. Please review the instructions below for configuring the new API

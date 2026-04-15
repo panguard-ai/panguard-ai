@@ -9,7 +9,7 @@ description: >
   enables lateral movement across agent boundaries and unauthorized access to restricted tools or data.
 author: ATR Community
 date: 2026/03/08
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: critical

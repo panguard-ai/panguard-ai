@@ -7,7 +7,7 @@ description: >
   that could be weaponized for lateral movement or unauthorized access to production servers.
 author: Threat Cloud LLM Analyzer
 date: 2026/04/06
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: semantic
 maturity: experimental
 severity: high
@@ -60,7 +60,7 @@ test_cases:
   true_positives:
     - input: ssh -i $CENTRAL_SSH_KEY root@$CENTRAL_IP "cd ~/.openclaw/evolver && nohup node index.js"
       expected: triggered
-    - input: "| TOKYO_SSH_KEY | 东京 SSH 密钥路径 | ~/.ssh/id_ed25519 |"
+    - input: '| TOKYO_SSH_KEY | 东京 SSH 密钥路径 | ~/.ssh/id_ed25519 |'
       expected: triggered
     - input: ssh -i $PROD_SSH_KEY root@$PROD_SERVER "systemctl restart nginx"
       expected: triggered
@@ -68,7 +68,7 @@ test_cases:
     - input: ssh -i $DEPLOY_SSH_KEY root@$STAGING_HOST "docker-compose up -d"
       expected: triggered
       description: SSH remote execution with deploy key variable and root login, matches pattern [1]
-    - input: "| OSAKA_SSH_KEY | 大阪 SSH 密钥路径 | ~/.ssh/id_rsa |"
+    - input: '| OSAKA_SSH_KEY | 大阪 SSH 密钥路径 | ~/.ssh/id_rsa |'
       expected: triggered
       description: Table row documenting SSH private key path in Chinese with RSA key type, matches pattern [2]
   true_negatives:
@@ -76,7 +76,7 @@ test_cases:
       expected: not_triggered
     - input: Connect to servers using secure protocols and proper credentials
       expected: not_triggered
-    - input: "To connect via SSH, run: ssh user@example.com and enter your password when prompted."
+    - input: 'To connect via SSH, run: ssh user@example.com and enter your password when prompted.'
       expected: not_triggered
       description: Ordinary SSH usage documentation without environment variable key paths or root access patterns
     - input: The deployment script copies artifacts to the remote server using rsync over a secure channel.

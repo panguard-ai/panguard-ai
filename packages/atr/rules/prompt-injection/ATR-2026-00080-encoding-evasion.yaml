@@ -8,7 +8,7 @@ description: >
   past regex-based filters.
 author: ATR Community (MiroFish Predicted)
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
@@ -91,7 +91,7 @@ test_cases:
       expected: triggered
       description: Punycode domain combined with injection keywords 'ignore' and 'system prompt' - matches pattern [5]
   true_negatives:
-    - input: "Please convert this base64 string to text: SGVsbG8gV29ybGQ="
+    - input: 'Please convert this base64 string to text: SGVsbG8gV29ybGQ='
       expected: not_triggered
     - input: How do I encode a URL parameter in JavaScript using encodeURIComponent?
       expected: not_triggered

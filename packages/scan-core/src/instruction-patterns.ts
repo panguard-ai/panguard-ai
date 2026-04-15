@@ -43,7 +43,8 @@ const PATTERNS: readonly Pattern[] = [
     title: 'Prompt injection: system prompt manipulation',
     // Require "system prompt" + attack verb (override/ignore/reveal/extract/leak)
     // Mentioning "system prompt" alone is common in security tools and docs
-    regex: /\b(system prompt|system message|system instruction|<\|system\|>|<<SYS>>)\b.{0,60}\b(override|ignore|reveal|extract|leak|bypass|dump|exfiltrate|steal|expose|disclose|modify|replace|inject|overwrite)\b/i,
+    regex:
+      /\b(system prompt|system message|system instruction|<\|system\|>|<<SYS>>)\b.{0,60}\b(override|ignore|reveal|extract|leak|bypass|dump|exfiltrate|steal|expose|disclose|modify|replace|inject|overwrite)\b/i,
     severity: 'critical',
     category: 'prompt-injection',
   },

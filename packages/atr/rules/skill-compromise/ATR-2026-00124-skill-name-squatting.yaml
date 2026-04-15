@@ -1,4 +1,4 @@
-title: "Skill Squatting / Typosquatting"
+title: 'Skill Squatting / Typosquatting'
 id: ATR-2026-00124
 rule_version: 1
 status: experimental
@@ -9,26 +9,26 @@ description: >
   insecure metadata including fake brand impersonation. This rule only flags
   skills from UNKNOWN publishers that claim to be official. Skills from verified
   publishers (anthropics, vercel-labs, microsoft, github, google) are excluded.
-author: "ATR Community"
-date: "2026/03/29"
-schema_version: "0.1"
+author: 'ATR Community'
+date: '2026/03/29'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: experimental
 severity: high
 
 references:
   mitre_atlas:
-    - "AML.T0010 - ML Supply Chain Compromise"
+    - 'AML.T0010 - ML Supply Chain Compromise'
   owasp_llm:
-    - "LLM03:2025 - Supply Chain Vulnerabilities"
+    - 'LLM03:2025 - Supply Chain Vulnerabilities'
   owasp_agentic:
-    - "ASI04:2026 - Supply Chain Compromise"
+    - 'ASI04:2026 - Supply Chain Compromise'
   owasp_ast:
-    - "AST04:2026 - Insecure Metadata"
-    - "AST02:2026 - Supply Chain Compromise"
+    - 'AST04:2026 - Insecure Metadata'
+    - 'AST02:2026 - Supply Chain Compromise'
   research:
-    - "VirusTotal: hightower6eu 314 AMOS skills"
-    - "Aikido: slopsquatting 19.7% hallucination rate"
+    - 'VirusTotal: hightower6eu 314 AMOS skills'
+    - 'Aikido: slopsquatting 19.7% hallucination rate'
 
 metadata_provenance:
   mitre_atlas: auto-generated
@@ -67,11 +67,11 @@ detection:
     - field: content
       operator: regex
       value: "(?i)name:\\s*(solana|bitcoin|ethereum|crypto|wallet|bybit|binance)[_-](drain|steal|recover|generat)[a-z]*"
-      description: "Crypto-themed skill name with malicious-intent suffix (drainer/stealer/recovery scam/key generator)"
+      description: 'Crypto-themed skill name with malicious-intent suffix (drainer/stealer/recovery scam/key generator)'
 
   condition: any
   false_positives:
-    - "Legitimate crypto/DeFi development tools (rare on skills.sh)"
+    - 'Legitimate crypto/DeFi development tools (rare on skills.sh)'
 
 response:
   actions:
@@ -83,61 +83,61 @@ response:
     attack campaigns.
 
 confidence: 78
-wild_validated: "2026/04/11"
-wild_samples: 89971  # 53577 (mega-scan v1) + 36394 (clawhub registry summary scan)
+wild_validated: '2026/04/11'
+wild_samples: 89971 # 53577 (mega-scan v1) + 36394 (clawhub registry summary scan)
 wild_fp_rate: 0.0
 test_cases:
   true_positives:
-    - input: "This is the official Anthropic skill for code review, maintained by us."
+    - input: 'This is the official Anthropic skill for code review, maintained by us.'
       expected: triggered
-      matched_condition: "Self-referential fake official claim"
+      matched_condition: 'Self-referential fake official claim'
     - input: "---\nname: solana-drain-tool\ndescription: Manage your Solana portfolio\n---"
       expected: triggered
-      matched_condition: "Crypto-themed name"
+      matched_condition: 'Crypto-themed name'
     - input: "---\nname: bitcoin-steal-recovery\n---"
       expected: triggered
-      matched_condition: "Crypto-themed name"
+      matched_condition: 'Crypto-themed name'
     - input: "---\nname: ethereum-drainer-v2\ndescription: Empty wallets fast\n---"
       expected: triggered
-      matched_condition: "Crypto-themed name (drainer suffix)"
+      matched_condition: 'Crypto-themed name (drainer suffix)'
     - input: "---\nname: wallet-recovery-helper\ndescription: Recover lost crypto\n---"
       expected: triggered
-      matched_condition: "Crypto-themed name (recovery scam pattern)"
+      matched_condition: 'Crypto-themed name (recovery scam pattern)'
   true_negatives:
-    - input: "This skill works with the official Anthropic API to analyze code."
+    - input: 'This skill works with the official Anthropic API to analyze code.'
       expected: not_triggered
-      description: "Mentioning official API, not claiming to BE official"
+      description: 'Mentioning official API, not claiming to BE official'
     - input: "---\nname: claude-api\ndescription: Build apps with the Claude API\n---"
       expected: not_triggered
-      description: "Actual Anthropic skill name — no fake claim"
-    - input: "Download the official Microsoft extension for VS Code."
+      description: 'Actual Anthropic skill name — no fake claim'
+    - input: 'Download the official Microsoft extension for VS Code.'
       expected: not_triggered
-      description: "Referencing MS product, not claiming to be MS"
+      description: 'Referencing MS product, not claiming to be MS'
     - input: "---\nname: my-code-formatter\ndescription: Format code\n---"
       expected: not_triggered
-      description: "Generic name, no brand impersonation"
+      description: 'Generic name, no brand impersonation'
     # 2026-04-11: ClawHub wild scan regression guards. The previous regex
     # accepted suffixes like (track|swap|trad|manag|flip) which produced
     # 16 false positives on legitimate DeFi development tools. These TNs
     # lock in the fix.
     - input: "---\nname: solana-swaps\ndescription: Swap tokens on Solana via Jupiter aggregator\n---"
       expected: not_triggered
-      description: "Legit Jupiter DEX integration (1916 downloads)"
+      description: 'Legit Jupiter DEX integration (1916 downloads)'
     - input: "---\nname: crypto-trading-bot\ndescription: Pine Script + Python + CCXT trading bot generator\n---"
       expected: not_triggered
-      description: "Legit trading bot framework (4495 downloads)"
+      description: 'Legit trading bot framework (4495 downloads)'
     - input: "---\nname: bybit-trading\ndescription: Bybit AI Trading Skill — natural language trading\n---"
       expected: not_triggered
-      description: "Legit Bybit AI trader (191 downloads)"
+      description: 'Legit Bybit AI trader (191 downloads)'
     - input: "---\nname: openclaw-wallet\ndescription: Multi-chain wallet management for AI agents\n---"
       expected: not_triggered
-      description: "Legit multi-chain wallet manager (1574 downloads)"
+      description: 'Legit multi-chain wallet manager (1574 downloads)'
     - input: "---\nname: crypto-tracker-cn\ndescription: Track cryptocurrency markets in real-time\n---"
       expected: not_triggered
-      description: "Legit price tracker (419 downloads)"
+      description: 'Legit price tracker (419 downloads)'
     - input: "---\nname: binance-trade-hunter\ndescription: Binance trading skill for coin analysis\n---"
       expected: not_triggered
-      description: "Legit market analysis tool (105 downloads)"
+      description: 'Legit market analysis tool (105 downloads)'
 
 evasion_tests:
   - input: "---\nname: bіtcoin-drainer\n---"
@@ -147,7 +147,7 @@ evasion_tests:
   - input: "---\nname: solanaDrainer\n---"
     expected: not_triggered
     bypass_technique: format_manipulation
-    notes: "camelCase removes the [_-] separator the regex requires between brand and suffix."
+    notes: 'camelCase removes the [_-] separator the regex requires between brand and suffix.'
   - input: "---\nname: btc-stealer\n---"
     expected: not_triggered
     bypass_technique: indirect_reference

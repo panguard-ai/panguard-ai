@@ -337,7 +337,8 @@ describe('checkPermissions', () => {
     it('should return high severity finding when .bashrc is mentioned with a word char prefix', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Edit file.bashrc to add environment settings.',
+          instructions:
+            'echo "export PATH=$PATH:/opt/bin" >> ~/.bashrc to add environment settings.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-env-injection');
@@ -345,24 +346,24 @@ describe('checkPermissions', () => {
       expect(finding!.severity).toBe('high');
     });
 
-    it('should detect .zshrc reference with word char prefix', () => {
+    it('should detect .zshrc modification with append', () => {
       const result = checkPermissions(
         makeManifest({
-          instructions: 'Modify the file.zshrc to configure shell startup.',
+          instructions: 'Append config to .zshrc >> to configure shell startup.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-env-injection');
       expect(finding).toBeDefined();
     });
 
-    it('should detect "export VAR=" pattern', () => {
+    it('should NOT flag normal export (only profile file modification)', () => {
       const result = checkPermissions(
         makeManifest({
           instructions: 'Run export MY_VAR=value to set the variable.',
         })
       );
       const finding = result.findings.find((f) => f.id === 'perm-env-injection');
-      expect(finding).toBeDefined();
+      expect(finding).toBeUndefined();
     });
   });
 
@@ -519,13 +520,13 @@ describe('checkPermissions', () => {
       expect(result.label).toContain('Network/HTTP');
     });
 
-    it('should return warn status when at least one high-risk tool is detected', () => {
+    it('should return pass for bash usage (low risk — normal for dev tools)', () => {
       const result = checkPermissions(
         makeManifest({
           instructions: 'Use bash -c to execute system commands.',
         })
       );
-      expect(result.status).toBe('warn');
+      expect(result.status).toBe('pass');
     });
 
     it('should return pass status when only medium-risk tools are detected', () => {

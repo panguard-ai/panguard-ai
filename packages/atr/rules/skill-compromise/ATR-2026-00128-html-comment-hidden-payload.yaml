@@ -9,7 +9,7 @@ description: >
   (2026-03).
 author: ATR Community
 date: 2026/04/05
-schema_version: "1.0"
+schema_version: '1.0'
 detection_tier: pattern
 maturity: experimental
 severity: critical
@@ -23,7 +23,7 @@ references:
   owasp_ast:
     - AST01:2026 - Malicious Skills
   research:
-    - "ClawHavoc evasive variants: HTML comment injection (2026-03)"
+    - 'ClawHavoc evasive variants: HTML comment injection (2026-03)'
 metadata_provenance:
   mitre_atlas: auto-generated
 tags:
