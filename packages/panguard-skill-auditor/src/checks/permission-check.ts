@@ -25,8 +25,8 @@ const TOOL_PATTERNS: ToolPattern[] = [
     // Only match explicit shell execution intent, not mere mention of "terminal"
     regex:
       /\b(bash\s+-[ci]|sh\s+-c|execute.*command|run.*command|shell\s+command|spawn\s+shell)\b/i,
-    risk: 'high',
-    reason: 'Can execute arbitrary system commands',
+    risk: 'low',
+    reason: 'Can execute system commands (common in developer tools)',
   },
   {
     name: 'File Write',
@@ -57,7 +57,7 @@ const TOOL_PATTERNS: ToolPattern[] = [
     // Only match explicit DB operations, not generic words like "update" or "query"
     regex:
       /\b(SELECT\s+.*\s+FROM|INSERT\s+INTO|CREATE\s+TABLE|DROP\s+TABLE|ALTER\s+TABLE|db\.(query|execute|run)|mongodb|postgres(?:ql)?|mysql|sqlite|supabase|prisma|drizzle)\b/i,
-    risk: 'high',
+    risk: 'medium',
     reason: 'Can access and modify database contents',
   },
   {
@@ -96,9 +96,9 @@ const TOOL_PATTERNS: ToolPattern[] = [
   {
     name: 'Env Injection',
     regex:
-      /(?:\b|(?<=[\s~/]))(\.\w*(?:bashrc|zshrc|profile|bash_profile))\b|(?:\b)(export\s+\w+=)/i,
+      /(?:>>?\s*~?\/?\.?\w*(?:bashrc|zshrc|profile|bash_profile))|(?:(?:write|append|echo|cat)\b.{0,40}(?:\.bashrc|\.zshrc|\.profile|\.bash_profile))/i,
     risk: 'high',
-    reason: 'Can inject environment variables via shell profile',
+    reason: 'Can inject persistent environment variables via shell profile writes',
   },
   {
     name: 'Clipboard',

@@ -41,7 +41,8 @@ const PATTERNS: readonly Pattern[] = [
   {
     id: 'pi-system-prompt',
     title: 'Prompt injection: system prompt manipulation',
-    regex: /\b(system prompt|system message|system instruction|<\|system\|>|<<SYS>>)\b/i,
+    regex:
+      /\b(override|ignore|reveal|extract|leak|dump|bypass|inject|manipulate|expose|exfiltrate|steal|capture)\b.{0,40}\b(system prompt|system message|system instruction)\b|\b(system prompt|system message|system instruction)\b.{0,40}\b(override|ignore|reveal|extract|leak|dump|bypass|inject|manipulate|expose|exfiltrate|steal|capture)\b|(<\|system\|>|<<SYS>>)/i,
     severity: 'critical',
     category: 'prompt-injection',
   },
@@ -80,8 +81,9 @@ const PATTERNS: readonly Pattern[] = [
   // Tool poisoning patterns
   {
     id: 'tp-sudo-escalation',
-    title: 'Privilege escalation via sudo/admin',
-    regex: /\b(sudo\s|as\s+root|run\s+as\s+admin|--privileged|chmod\s+777|chmod\s+u\+s)\b/i,
+    title: 'Privilege escalation via dangerous permissions',
+    regex:
+      /\b(chmod\s+777|chmod\s+u\+s|--privileged\s+--pid=host|as\s+root\b.*\b(?:rm|chmod|chown|dd|mkfs))\b/i,
     severity: 'high',
     category: 'tool-poisoning',
   },
