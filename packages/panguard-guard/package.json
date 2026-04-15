@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/panguard-guard",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -48,7 +48,7 @@
     "@panguard-ai/panguard-trap": "workspace:*",
     "@panguard-ai/scan-core": "workspace:*",
     "@panguard-ai/security-hardening": "workspace:*",
-    "agent-threat-rules": "^1.2.0",
+    "agent-threat-rules": "2.0.0",
     "js-yaml": "^4.1.0",
     "ws": "^8.19.0",
     "zod": "^3.24.0"

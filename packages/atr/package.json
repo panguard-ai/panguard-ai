@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/atr",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "type": "module",
   "description": "Thin wrapper around agent-threat-rules — re-exports all detection logic for monorepo consumers.",
   "main": "./dist/index.js",
@@ -32,7 +32,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "agent-threat-rules": "^1.2.0"
+    "agent-threat-rules": "2.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

@@ -11,7 +11,6 @@
 import { join, dirname } from 'node:path';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
 import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
 import { ATREngine, SessionTracker, SkillFingerprintStore } from '@panguard-ai/atr';
@@ -32,23 +31,9 @@ const logger = createLogger('panguard-guard:atr-engine');
  * Falls back to null if the package can't be resolved.
  */
 function resolveBundledRulesDir(): string | null {
-  // Strategy 1: resolve agent-threat-rules npm package (upstream source of truth)
-  try {
-    const req1 = createRequire(import.meta.url);
-    const atrMain = req1.resolve('agent-threat-rules');
-    // Walk up from dist/index.js to package root, trying multiple depths
-    let dir = dirname(atrMain);
-    for (let depth = 0; depth < 5; depth++) {
-      if (existsSync(join(dir, 'rules')) && existsSync(join(dir, 'package.json'))) {
-        return join(dir, 'rules');
-      }
-      dir = dirname(dir);
-    }
-  } catch {
-    /* continue to next strategy */
-  }
-
-  // Strategy 3: Walk up from this module searching node_modules
+  // Strategy 1: Walk up from this module searching node_modules for agent-threat-rules/rules.
+  // This is more robust than require.resolve() which fails when the package
+  // uses strict ESM exports (as agent-threat-rules v2.0.0 does).
   try {
     const thisDir = dirname(fileURLToPath(import.meta.url));
     let dir = thisDir;
