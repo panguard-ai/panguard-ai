@@ -177,12 +177,17 @@ export class ThreatCloudDB {
     `);
 
     try {
-      runMigrations(this.db);
+      const applied = runMigrations(this.db);
+      if (applied > 0) {
+        console.log(`[threat-cloud] ${applied} migration(s) applied`);
+      }
     } catch (err) {
       console.error(
-        '[threat-cloud] Migration failed (non-fatal):',
+        '[threat-cloud] MIGRATION FAILED:',
         err instanceof Error ? err.message : String(err)
       );
+      // Re-throw — migrations failing means the DB is in a broken state
+      throw err;
     }
 
     this.db.exec(`
@@ -873,6 +878,18 @@ export class ThreatCloudDB {
     const rulesDeleted = this.db.prepare('DELETE FROM rules').run().changes;
     const proposalsDeleted = this.db.prepare('DELETE FROM atr_proposals').run().changes;
     return rulesDeleted + proposalsDeleted;
+  }
+
+  /** Get current schema version for health diagnostics */
+  getSchemaVersion(): number {
+    try {
+      const row = this.db
+        .prepare('SELECT version FROM schema_version ORDER BY version DESC LIMIT 1')
+        .get() as { version: number } | undefined;
+      return row?.version ?? -1;
+    } catch {
+      return -1;
+    }
   }
 
   getStats(): ThreatStats {

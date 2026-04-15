@@ -345,7 +345,11 @@ export class ThreatCloudServer {
         case '/health':
           this.sendJson(res, 200, {
             ok: true,
-            data: { status: 'healthy', uptime: process.uptime() },
+            data: {
+              status: 'healthy',
+              uptime: process.uptime(),
+              schemaVersion: this.db.getSchemaVersion(),
+            },
           });
           break;
 
