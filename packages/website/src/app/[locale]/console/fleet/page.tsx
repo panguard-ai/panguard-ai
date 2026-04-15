@@ -57,21 +57,31 @@ function deviceStatus(d: Device): Device['status'] {
 
 function statusColor(s: Device['status']): string {
   switch (s) {
-    case 'protected': return colors.ok;
-    case 'needs-rescan': return colors.warn;
-    case 'outdated': return colors.danger;
-    case 'offline': return colors.textMuted;
-    default: return colors.textMuted;
+    case 'protected':
+      return colors.ok;
+    case 'needs-rescan':
+      return colors.warn;
+    case 'outdated':
+      return colors.danger;
+    case 'offline':
+      return colors.textMuted;
+    default:
+      return colors.textMuted;
   }
 }
 
 function statusLabel(s: Device['status']): string {
   switch (s) {
-    case 'protected': return 'PROTECTED';
-    case 'needs-rescan': return 'NEEDS RESCAN';
-    case 'outdated': return 'OUTDATED';
-    case 'offline': return 'OFFLINE';
-    default: return 'UNKNOWN';
+    case 'protected':
+      return 'PROTECTED';
+    case 'needs-rescan':
+      return 'NEEDS RESCAN';
+    case 'outdated':
+      return 'OUTDATED';
+    case 'offline':
+      return 'OFFLINE';
+    default:
+      return 'UNKNOWN';
   }
 }
 
@@ -88,10 +98,7 @@ function KPICard({ value, label, color }: { value: number; label: string; color:
         transition: 'border-color 0.2s',
       }}
     >
-      <div
-        className="font-display"
-        style={{ fontSize: 28, fontWeight: 700, color }}
-      >
+      <div className="font-display" style={{ fontSize: 28, fontWeight: 700, color }}>
         {value}
       </div>
       <div
@@ -130,12 +137,14 @@ function StatusBadge({ status }: { status: Device['status'] }) {
         color,
       }}
     >
-      <span style={{
-        width: 6,
-        height: 6,
-        borderRadius: '50%',
-        background: color,
-      }} />
+      <span
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          background: color,
+        }}
+      />
       {statusLabel(status)}
     </span>
   );
@@ -215,15 +224,11 @@ export default function FleetPage() {
   const totalSkills = devices.reduce((sum, d) => sum + (d.skill_count ?? 0), 0);
 
   if (loading) {
-    return (
-      <div style={{ color: colors.textMuted, padding: 40 }}>Loading fleet data...</div>
-    );
+    return <div style={{ color: colors.textMuted, padding: 40 }}>Loading fleet data...</div>;
   }
 
   if (error) {
-    return (
-      <div style={{ color: colors.danger, padding: 40 }}>{error}</div>
-    );
+    return <div style={{ color: colors.danger, padding: 40 }}>{error}</div>;
   }
 
   return (
@@ -356,9 +361,7 @@ export default function FleetPage() {
             </div>
 
             {/* Agent Count */}
-            <div style={{ fontSize: 13, color: colors.textPrimary }}>
-              {device.agent_count}
-            </div>
+            <div style={{ fontSize: 13, color: colors.textPrimary }}>{device.agent_count}</div>
 
             {/* Skills */}
             <div style={{ fontSize: 13, color: colors.textPrimary }}>
@@ -371,10 +374,7 @@ export default function FleetPage() {
             </div>
 
             {/* Last Seen */}
-            <div
-              className="font-mono"
-              style={{ fontSize: 12, color: colors.textMuted }}
-            >
+            <div className="font-mono" style={{ fontSize: 12, color: colors.textMuted }}>
               {timeAgo(device.last_seen)}
             </div>
 
