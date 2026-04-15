@@ -61,7 +61,7 @@ async function main(): Promise<void> {
     host: args.host ?? process.env['TC_HOST'] ?? process.env['HOST'] ?? '127.0.0.1',
     dbPath:
       args.dbPath ?? process.env['TC_DB_PATH'] ?? process.env['DB_PATH'] ?? './threat-cloud.db',
-    apiKeyRequired: args.apiKeyRequired ?? false,
+    apiKeyRequired: args.apiKeyRequired ?? (process.env['NODE_ENV'] === 'production'),
     apiKeys: args.apiKeys ?? process.env['TC_API_KEYS']?.split(',') ?? [],
     rateLimitPerMinute: Number(process.env['TC_RATE_LIMIT'] ?? '120'),
     anthropicApiKey: args.anthropicApiKey ?? process.env['ANTHROPIC_API_KEY'],
