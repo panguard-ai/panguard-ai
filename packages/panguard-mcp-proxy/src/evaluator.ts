@@ -13,28 +13,13 @@ import { resolve, dirname, join } from 'node:path';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const require = createRequire(import.meta.url);
 
-/** Find bundled ATR rules directory from agent-threat-rules npm package */
+/** Find bundled ATR rules directory from agent-threat-rules npm package.
+ *  Walks up from this module searching node_modules. This is more robust
+ *  than require.resolve() which fails with strict ESM exports (v2.0.0+). */
 function findRulesDir(): string {
-  // Strategy 1: resolve agent-threat-rules main, walk up to package root
-  try {
-    const atrMain = require.resolve('agent-threat-rules');
-    let dir = dirname(atrMain);
-    for (let depth = 0; depth < 5; depth++) {
-      if (existsSync(resolve(dir, 'rules')) && existsSync(resolve(dir, 'package.json'))) {
-        return resolve(dir, 'rules');
-      }
-      dir = dirname(dir);
-    }
-  } catch {
-    /* continue */
-  }
-
-  // Strategy 2: walk up from this module to find node_modules/agent-threat-rules/rules
   let dir = __dirname;
   for (let i = 0; i < 10; i++) {
     const candidate = resolve(dir, 'node_modules', 'agent-threat-rules', 'rules');

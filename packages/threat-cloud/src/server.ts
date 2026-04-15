@@ -286,7 +286,11 @@ export class ThreatCloudServer {
         ? '/'
         : rawPathname;
 
-    if (pathname !== '/health' && this.config.apiKeyRequired) {
+    // Public endpoints that don't require API key authentication.
+    // /api/rules/sync is intentionally public so the ATR repo CI can push rules.
+    // /api/stats and /api/metrics are read-only public data.
+    const publicPaths = new Set(['/health', '/api/rules/sync', '/api/stats', '/api/metrics']);
+    if (!publicPaths.has(pathname) && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
       if (!this.config.apiKeys.includes(token)) {
@@ -380,6 +384,19 @@ export class ThreatCloudServer {
           // Public endpoint for ATR repo CI to sync open-source rules (no admin key needed)
           if (req.method === 'POST') {
             await this.handleSyncATRRules(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/rules/by-source':
+          // Admin-only: DELETE /api/rules/by-source?source=yara to purge rules by source
+          if (req.method === 'DELETE') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            await this.handleDeleteRulesBySource(url, res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -632,6 +649,41 @@ export class ThreatCloudServer {
           }
           break;
 
+        // ─── Org / Device / Policy endpoints (Threat Model #1, #6) ───
+
+        case '/api/devices/heartbeat':
+          if (req.method === 'POST') {
+            const body = await this.readBody(req);
+            const data = JSON.parse(body) as {
+              deviceId?: string;
+              orgId?: string;
+              hostname?: string;
+              osType?: string;
+              agentCount?: number;
+              guardVersion?: string;
+            };
+            if (!data.deviceId || !data.orgId) {
+              this.sendJson(res, 400, { ok: false, error: 'deviceId and orgId required' });
+              break;
+            }
+            // Auto-create org if it doesn't exist (first device creates the org)
+            if (!this.db.getOrg(data.orgId)) {
+              this.db.createOrg(data.orgId, data.orgId);
+            }
+            this.db.upsertDevice({
+              deviceId: data.deviceId,
+              orgId: data.orgId,
+              hostname: data.hostname,
+              osType: data.osType,
+              agentCount: data.agentCount,
+              guardVersion: data.guardVersion,
+            });
+            this.sendJson(res, 200, { ok: true });
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/admin/reset-rules':
           if (req.method === 'POST') {
             if (!this.checkAdminAuth(req)) {
@@ -666,12 +718,69 @@ export class ThreatCloudServer {
           }
           break;
 
-        default:
+        default: {
+          // Org fleet/policy routes with path params
+          // Threat Model: Fleet view (#6), Policy engine (#1, #6)
+          const orgDevicesMatch = pathname.match(/^\/api\/orgs\/([^/]+)\/devices$/);
+          if (orgDevicesMatch) {
+            const orgId = decodeURIComponent(orgDevicesMatch[1]!);
+            if (req.method === 'GET') {
+              if (!this.checkAdminAuth(req)) {
+                this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+                break;
+              }
+              const devices = this.db.getDevicesByOrg(orgId);
+              const count = this.db.getDeviceCount(orgId);
+              this.sendJson(res, 200, { ok: true, data: { devices, total: count } });
+            } else {
+              this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+            }
+            break;
+          }
+
+          const orgPoliciesMatch = pathname.match(/^\/api\/orgs\/([^/]+)\/policies$/);
+          if (orgPoliciesMatch) {
+            const orgId = decodeURIComponent(orgPoliciesMatch[1]!);
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            if (req.method === 'GET') {
+              const policies = this.db.getOrgPolicies(orgId);
+              this.sendJson(res, 200, { ok: true, data: policies });
+            } else if (req.method === 'POST') {
+              const body = await this.readBody(req);
+              const data = JSON.parse(body) as { category?: string; action?: string };
+              if (!data.category || !data.action || !['allow', 'block'].includes(data.action)) {
+                this.sendJson(res, 400, {
+                  ok: false,
+                  error: 'category and action (allow|block) required',
+                });
+                break;
+              }
+              this.db.setOrgPolicy(orgId, data.category, data.action as 'allow' | 'block');
+              this.sendJson(res, 200, { ok: true });
+            } else if (req.method === 'DELETE') {
+              const body = await this.readBody(req);
+              const data = JSON.parse(body) as { category?: string };
+              if (!data.category) {
+                this.sendJson(res, 400, { ok: false, error: 'category required' });
+                break;
+              }
+              const deleted = this.db.deleteOrgPolicy(orgId, data.category);
+              this.sendJson(res, 200, { ok: true, deleted });
+            } else {
+              this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+            }
+            break;
+          }
+
           // Badge API handles /api/badge/* paths with dynamic segments
           if (this.badgeRouter.handleRequest(pathname, req.method ?? 'GET', res)) {
             break;
           }
           this.sendJson(res, 404, { ok: false, error: 'Not found' });
+        }
       }
     } catch (err) {
       log.error('Request failed', err, { request_id: requestId, path: rawPathname });
@@ -920,6 +1029,23 @@ export class ThreatCloudServer {
       ok: true,
       data: { message: `${count} rule(s) synced, ${skipped} skipped`, count, skipped },
     });
+  }
+
+  /** DELETE /api/rules/by-source?source=yara — Admin-only bulk purge */
+  private async handleDeleteRulesBySource(url: string, res: ServerResponse): Promise<void> {
+    const params = new URLSearchParams(url.split('?')[1] ?? '');
+    const source = params.get('source');
+    if (!source) {
+      this.sendJson(res, 400, { ok: false, error: 'Missing ?source= parameter' });
+      return;
+    }
+    // Safety: refuse to delete ATR rules via this endpoint
+    if (source === 'atr' || source === 'atr-community') {
+      this.sendJson(res, 400, { ok: false, error: 'Cannot purge ATR rules via this endpoint' });
+      return;
+    }
+    const count = this.db.deleteRulesBySource(source);
+    this.sendJson(res, 200, { ok: true, data: { message: `Deleted ${count} ${source} rule(s)`, count } });
   }
 
   /** GET /api/stats (cached 60s) */

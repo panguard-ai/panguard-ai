@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/panguard-skill-auditor",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -40,7 +40,7 @@
     "@panguard-ai/core": "workspace:*",
     "@panguard-ai/panguard-scan": "workspace:*",
     "@panguard-ai/scan-core": "workspace:*",
-    "agent-threat-rules": "^1.2.0",
+    "agent-threat-rules": "2.0.0",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {

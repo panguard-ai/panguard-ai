@@ -410,6 +410,13 @@ export class ThreatCloudDB {
     );
   }
 
+  /** Delete all rules with a given source. Returns number of deleted rows. */
+  deleteRulesBySource(source: string): number {
+    const stmt = this.db.prepare('DELETE FROM rules WHERE source = ?');
+    const result = stmt.run(source);
+    return result.changes;
+  }
+
   /** Fetch rules published after a given timestamp / 取得指定時間後發佈的規則 */
   getRulesSince(
     since: string,
@@ -1840,6 +1847,122 @@ export class ThreatCloudDB {
       supersededBy: r.superseded_by,
       rugPullFlag: r.rug_pull_flag === 1,
     }));
+  }
+
+  // ─── Org / Device / Policy (Threat Model #1, #6) ───────────────
+
+  /** Create an organization / 建立組織 */
+  createOrg(id: string, name: string): void {
+    this.db
+      .prepare('INSERT OR IGNORE INTO orgs (id, name) VALUES (?, ?)')
+      .run(id, name);
+  }
+
+  /** Get org by ID / 取得組織 */
+  getOrg(id: string): { id: string; name: string; created_at: string } | undefined {
+    return this.db.prepare('SELECT * FROM orgs WHERE id = ?').get(id) as
+      | { id: string; name: string; created_at: string }
+      | undefined;
+  }
+
+  /** Upsert device heartbeat / 更新裝置心跳
+   *  Threat Model: Fleet view (#6 Scope Escalation — org-level visibility) */
+  upsertDevice(data: {
+    deviceId: string;
+    orgId: string;
+    hostname?: string;
+    osType?: string;
+    agentCount?: number;
+    guardVersion?: string;
+  }): void {
+    this.db
+      .prepare(
+        `INSERT INTO devices (id, org_id, hostname, os_type, agent_count, guard_version, last_seen)
+         VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+         ON CONFLICT(id) DO UPDATE SET
+           org_id = excluded.org_id,
+           hostname = COALESCE(excluded.hostname, devices.hostname),
+           os_type = COALESCE(excluded.os_type, devices.os_type),
+           agent_count = excluded.agent_count,
+           guard_version = COALESCE(excluded.guard_version, devices.guard_version),
+           last_seen = datetime('now')`
+      )
+      .run(
+        data.deviceId,
+        data.orgId,
+        data.hostname ?? null,
+        data.osType ?? null,
+        data.agentCount ?? 0,
+        data.guardVersion ?? null
+      );
+  }
+
+  /** List devices for an org / 列出組織下的裝置
+   *  Threat Model: Fleet view (#6) */
+  getDevicesByOrg(
+    orgId: string,
+    limit: number = 100,
+    offset: number = 0
+  ): ReadonlyArray<{
+    id: string;
+    hostname: string | null;
+    os_type: string | null;
+    agent_count: number;
+    guard_version: string | null;
+    last_seen: string;
+    created_at: string;
+  }> {
+    return this.db
+      .prepare(
+        'SELECT id, hostname, os_type, agent_count, guard_version, last_seen, created_at FROM devices WHERE org_id = ? ORDER BY last_seen DESC LIMIT ? OFFSET ?'
+      )
+      .all(orgId, limit, offset) as ReadonlyArray<{
+      id: string;
+      hostname: string | null;
+      os_type: string | null;
+      agent_count: number;
+      guard_version: string | null;
+      last_seen: string;
+      created_at: string;
+    }>;
+  }
+
+  /** Get device count for an org / 取得組織裝置數 */
+  getDeviceCount(orgId: string): number {
+    return (
+      this.db.prepare('SELECT COUNT(*) as count FROM devices WHERE org_id = ?').get(orgId) as {
+        count: number;
+      }
+    ).count;
+  }
+
+  /** Set org policy / 設定組織策略
+   *  Threat Model: Policy engine (#1 Supply Chain, #6 Scope Escalation) */
+  setOrgPolicy(orgId: string, category: string, action: 'allow' | 'block'): void {
+    this.db
+      .prepare(
+        `INSERT INTO org_policies (org_id, category, action)
+         VALUES (?, ?, ?)
+         ON CONFLICT(org_id, category) DO UPDATE SET action = excluded.action`
+      )
+      .run(orgId, category, action);
+  }
+
+  /** Get org policies / 取得組織策略 */
+  getOrgPolicies(
+    orgId: string
+  ): ReadonlyArray<{ category: string; action: string; created_at: string }> {
+    return this.db
+      .prepare('SELECT category, action, created_at FROM org_policies WHERE org_id = ? ORDER BY category')
+      .all(orgId) as ReadonlyArray<{ category: string; action: string; created_at: string }>;
+  }
+
+  /** Delete org policy / 刪除組織策略 */
+  deleteOrgPolicy(orgId: string, category: string): boolean {
+    const result = this.db
+      .prepare('DELETE FROM org_policies WHERE org_id = ? AND category = ?')
+      .run(orgId, category);
+    return result.changes > 0;
   }
 
   /** Close the database / 關閉資料庫 */

@@ -200,6 +200,49 @@ export const migrations: readonly Migration[] = [
       `);
     },
   },
+  {
+    version: 8,
+    name: 'create_orgs_devices_policies_tables',
+    up: (db) => {
+      db.exec(`
+        -- Organizations: groups of devices under one account
+        -- Threat Model: Fleet view (#6 Scope Escalation — org-level visibility)
+        CREATE TABLE IF NOT EXISTS orgs (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          api_key_hash TEXT,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        -- Devices: individual machines running Guard
+        -- Threat Model: Fleet view (#6 — track all agents across org)
+        CREATE TABLE IF NOT EXISTS devices (
+          id TEXT PRIMARY KEY,
+          org_id TEXT NOT NULL REFERENCES orgs(id),
+          hostname TEXT,
+          os_type TEXT,
+          agent_count INTEGER NOT NULL DEFAULT 0,
+          guard_version TEXT,
+          last_seen TEXT NOT NULL DEFAULT (datetime('now')),
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX IF NOT EXISTS idx_devices_org ON devices(org_id);
+        CREATE INDEX IF NOT EXISTS idx_devices_last_seen ON devices(last_seen);
+
+        -- Org policies: per-org allow/block rules for skill categories
+        -- Threat Model: Policy engine (#1 Supply Chain, #6 Scope Escalation)
+        CREATE TABLE IF NOT EXISTS org_policies (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          org_id TEXT NOT NULL REFERENCES orgs(id),
+          category TEXT NOT NULL,
+          action TEXT NOT NULL CHECK(action IN ('allow', 'block')),
+          created_at TEXT NOT NULL DEFAULT (datetime('now')),
+          UNIQUE(org_id, category)
+        );
+        CREATE INDEX IF NOT EXISTS idx_policies_org ON org_policies(org_id);
+      `);
+    },
+  },
 ];
 
 /**
