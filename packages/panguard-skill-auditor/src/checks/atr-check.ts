@@ -236,18 +236,27 @@ export async function checkWithATR(
 
     const allMatches: ATRMatch[] = [];
 
-    // 1. Scan instructions as llm_input — runs ALL rules (not scanSkill which
-    //    skips MCP-targeted rules). Skill instructions can contain prompt
-    //    injection payloads that MCP rules detect.
-    if (manifest.instructions) {
-      const instructionMatches = engine.evaluate(_buildLlmInputEvent(manifest.instructions));
-      allMatches.push(...instructionMatches);
+    // Layer 1: scanSkill() — purpose-built for SKILL.md with compound gate
+    // (30% condition threshold for mcp rules) and code-block suppression.
+    // This is the primary detection layer for skill content.
+    const fullContent = [manifest.instructions ?? '', manifest.description ?? ''].join('\n\n');
+    if (fullContent.trim()) {
+      const skillMatches = engine.scanSkill(fullContent);
+      allMatches.push(...skillMatches);
     }
 
-    // 2. Scan description as llm_input
-    if (manifest.description) {
-      const descMatches = engine.evaluate(_buildLlmInputEvent(manifest.description));
-      allMatches.push(...descMatches);
+    // Layer 2: Runtime simulation — scan as llm_input to catch prompt injection
+    // that the compound gate would filter. Only add matches NOT already found
+    // by scanSkill, and only for skill-specific rules (scan_target: 'skill')
+    // to avoid FP from mcp-targeted rules on document content.
+    if (manifest.instructions) {
+      const runtimeMatches = engine.evaluate(_buildLlmInputEvent(manifest.instructions));
+      const existingIds = new Set(allMatches.map(m => m.rule?.id));
+      for (const m of runtimeMatches) {
+        if (!existingIds.has(m.rule?.id) && m.rule?.tags?.scan_target === 'skill') {
+          allMatches.push(m);
+        }
+      }
     }
 
     // 3. Scan MCP tool descriptions (if metadata includes them)

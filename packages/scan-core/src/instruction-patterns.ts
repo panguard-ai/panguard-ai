@@ -41,7 +41,9 @@ const PATTERNS: readonly Pattern[] = [
   {
     id: 'pi-system-prompt',
     title: 'Prompt injection: system prompt manipulation',
-    regex: /\b(system prompt|system message|system instruction|<\|system\|>|<<SYS>>)\b/i,
+    // Require "system prompt" + attack verb (override/ignore/reveal/extract/leak)
+    // Mentioning "system prompt" alone is common in security tools and docs
+    regex: /\b(system prompt|system message|system instruction|<\|system\|>|<<SYS>>)\b.{0,60}\b(override|ignore|reveal|extract|leak|bypass|dump|exfiltrate|steal|expose|disclose|modify|replace|inject|overwrite)\b/i,
     severity: 'critical',
     category: 'prompt-injection',
   },
@@ -80,8 +82,9 @@ const PATTERNS: readonly Pattern[] = [
   // Tool poisoning patterns
   {
     id: 'tp-sudo-escalation',
-    title: 'Privilege escalation via sudo/admin',
-    regex: /\b(sudo\s|as\s+root|run\s+as\s+admin|--privileged|chmod\s+777|chmod\s+u\+s)\b/i,
+    title: 'Privilege escalation via dangerous permissions',
+    // sudo alone is normal in devops skills. Flag only dangerous combos.
+    regex: /\b(chmod\s+777|chmod\s+u\+s|--privileged\s+--pid=host|run\s+as\s+root\s+without)\b/i,
     severity: 'high',
     category: 'tool-poisoning',
   },

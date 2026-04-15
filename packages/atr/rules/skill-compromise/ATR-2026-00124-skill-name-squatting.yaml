@@ -1,0 +1,154 @@
+title: "Skill Squatting / Typosquatting"
+id: ATR-2026-00124
+rule_version: 1
+status: experimental
+description: >
+  Detects skills impersonating known publishers or using typosquatted names.
+  VirusTotal documented threat actor "hightower6eu" publishing 314 skills with
+  legitimate-sounding names delivering AMOS infostealers. OWASP AST04 covers
+  insecure metadata including fake brand impersonation. This rule only flags
+  skills from UNKNOWN publishers that claim to be official. Skills from verified
+  publishers (anthropics, vercel-labs, microsoft, github, google) are excluded.
+author: "ATR Community"
+date: "2026/03/29"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: experimental
+severity: high
+
+references:
+  mitre_atlas:
+    - "AML.T0010 - ML Supply Chain Compromise"
+  owasp_llm:
+    - "LLM03:2025 - Supply Chain Vulnerabilities"
+  owasp_agentic:
+    - "ASI04:2026 - Supply Chain Compromise"
+  owasp_ast:
+    - "AST04:2026 - Insecure Metadata"
+    - "AST02:2026 - Supply Chain Compromise"
+  research:
+    - "VirusTotal: hightower6eu 314 AMOS skills"
+    - "Aikido: slopsquatting 19.7% hallucination rate"
+
+metadata_provenance:
+  mitre_atlas: auto-generated
+
+tags:
+  category: skill-compromise
+  subcategory: skill-squatting
+  scan_target: skill
+  confidence: medium
+
+agent_source:
+  type: mcp_exchange
+  framework:
+    - skill_md
+  provider:
+    - any
+
+detection:
+  conditions:
+    # Fake official publisher claims from UNKNOWN sources
+    # Must claim "official X skill" AND NOT be from a known publisher
+    # The regex requires "official/verified/certified" + brand + "skill/plugin"
+    # in the SAME sentence with self-referential context ("this is", "we are", "our")
+    - field: content
+      operator: regex
+      value: "(?i)(this\\s+is\\s+the\\s+|we\\s+are\\s+the\\s+|our\\s+)official\\s+(anthropic|vercel|openai|microsoft|google|meta|github)\\s+(skill|plugin|extension|tool)"
+      description: "Self-referential fake official publisher claim (requires 'this is the/we are the/our')"
+
+    # Crypto-themed names matching the AMOS infostealer campaign pattern.
+    # Only matches suffixes that are themselves malicious-intent words. Legitimate
+    # DeFi operations (trading, swap, tracking, management, flipping) are too
+    # common — they were in earlier versions of this regex and produced 16 wild
+    # false positives in the 2026-04-11 ClawHub scan (legit Jupiter swap, Bybit
+    # trading bot, crypto portfolio managers, etc). Suffix list reduced to high-
+    # specificity attack words only.
+    - field: content
+      operator: regex
+      value: "(?i)name:\\s*(solana|bitcoin|ethereum|crypto|wallet|bybit|binance)[_-](drain|steal|recover|generat)[a-z]*"
+      description: "Crypto-themed skill name with malicious-intent suffix (drainer/stealer/recovery scam/key generator)"
+
+  condition: any
+  false_positives:
+    - "Legitimate crypto/DeFi development tools (rare on skills.sh)"
+
+response:
+  actions:
+    - alert
+    - alert
+  message_template: >
+    [ATR-2026-124] Potential skill squatting detected. This skill claims
+    official publisher status or uses a crypto-themed name matching known
+    attack campaigns.
+
+confidence: 78
+wild_validated: "2026/04/11"
+wild_samples: 89971  # 53577 (mega-scan v1) + 36394 (clawhub registry summary scan)
+wild_fp_rate: 0.0
+test_cases:
+  true_positives:
+    - input: "This is the official Anthropic skill for code review, maintained by us."
+      expected: triggered
+      matched_condition: "Self-referential fake official claim"
+    - input: "---\nname: solana-drain-tool\ndescription: Manage your Solana portfolio\n---"
+      expected: triggered
+      matched_condition: "Crypto-themed name"
+    - input: "---\nname: bitcoin-steal-recovery\n---"
+      expected: triggered
+      matched_condition: "Crypto-themed name"
+    - input: "---\nname: ethereum-drainer-v2\ndescription: Empty wallets fast\n---"
+      expected: triggered
+      matched_condition: "Crypto-themed name (drainer suffix)"
+    - input: "---\nname: wallet-recovery-helper\ndescription: Recover lost crypto\n---"
+      expected: triggered
+      matched_condition: "Crypto-themed name (recovery scam pattern)"
+  true_negatives:
+    - input: "This skill works with the official Anthropic API to analyze code."
+      expected: not_triggered
+      description: "Mentioning official API, not claiming to BE official"
+    - input: "---\nname: claude-api\ndescription: Build apps with the Claude API\n---"
+      expected: not_triggered
+      description: "Actual Anthropic skill name — no fake claim"
+    - input: "Download the official Microsoft extension for VS Code."
+      expected: not_triggered
+      description: "Referencing MS product, not claiming to be MS"
+    - input: "---\nname: my-code-formatter\ndescription: Format code\n---"
+      expected: not_triggered
+      description: "Generic name, no brand impersonation"
+    # 2026-04-11: ClawHub wild scan regression guards. The previous regex
+    # accepted suffixes like (track|swap|trad|manag|flip) which produced
+    # 16 false positives on legitimate DeFi development tools. These TNs
+    # lock in the fix.
+    - input: "---\nname: solana-swaps\ndescription: Swap tokens on Solana via Jupiter aggregator\n---"
+      expected: not_triggered
+      description: "Legit Jupiter DEX integration (1916 downloads)"
+    - input: "---\nname: crypto-trading-bot\ndescription: Pine Script + Python + CCXT trading bot generator\n---"
+      expected: not_triggered
+      description: "Legit trading bot framework (4495 downloads)"
+    - input: "---\nname: bybit-trading\ndescription: Bybit AI Trading Skill — natural language trading\n---"
+      expected: not_triggered
+      description: "Legit Bybit AI trader (191 downloads)"
+    - input: "---\nname: openclaw-wallet\ndescription: Multi-chain wallet management for AI agents\n---"
+      expected: not_triggered
+      description: "Legit multi-chain wallet manager (1574 downloads)"
+    - input: "---\nname: crypto-tracker-cn\ndescription: Track cryptocurrency markets in real-time\n---"
+      expected: not_triggered
+      description: "Legit price tracker (419 downloads)"
+    - input: "---\nname: binance-trade-hunter\ndescription: Binance trading skill for coin analysis\n---"
+      expected: not_triggered
+      description: "Legit market analysis tool (105 downloads)"
+
+evasion_tests:
+  - input: "---\nname: bіtcoin-drainer\n---"
+    expected: not_triggered
+    bypass_technique: unicode_homoglyph
+    notes: "Cyrillic 'і' (U+0456) replaces Latin 'i' in 'bitcoin'. The brand keyword no longer matches the ASCII regex character class."
+  - input: "---\nname: solanaDrainer\n---"
+    expected: not_triggered
+    bypass_technique: format_manipulation
+    notes: "camelCase removes the [_-] separator the regex requires between brand and suffix."
+  - input: "---\nname: btc-stealer\n---"
+    expected: not_triggered
+    bypass_technique: indirect_reference
+    notes: "Common ticker abbreviation 'btc' is not in the brand keyword list (the regex only catches the full word 'bitcoin'). Authors writing rules in this category should consider extending the brand list with common tickers."
