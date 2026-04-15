@@ -174,6 +174,35 @@ export class ThreatCloudDB {
       );
 
       -- Migrations are handled by the numbered migration system in migrations.ts
+
+      -- Org/Device/Policy tables (migration v8, duplicated here as safety net
+      -- because CREATE TABLE IF NOT EXISTS is idempotent)
+      CREATE TABLE IF NOT EXISTS orgs (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        api_key_hash TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE TABLE IF NOT EXISTS devices (
+        id TEXT PRIMARY KEY,
+        org_id TEXT NOT NULL REFERENCES orgs(id),
+        hostname TEXT,
+        os_type TEXT,
+        agent_count INTEGER NOT NULL DEFAULT 0,
+        guard_version TEXT,
+        last_seen TEXT NOT NULL DEFAULT (datetime('now')),
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_devices_org ON devices(org_id);
+      CREATE INDEX IF NOT EXISTS idx_devices_last_seen ON devices(last_seen);
+      CREATE TABLE IF NOT EXISTS org_policies (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        org_id TEXT NOT NULL REFERENCES orgs(id),
+        category TEXT NOT NULL,
+        action TEXT NOT NULL CHECK(action IN ('allow', 'block')),
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(org_id, category)
+      );
     `);
 
     try {
