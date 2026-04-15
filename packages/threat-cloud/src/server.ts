@@ -288,8 +288,11 @@ export class ThreatCloudServer {
 
     // Public endpoints that don't require API key authentication.
     // Read-only data endpoints are public. Write endpoints require auth.
+    // GET /api/rules is public so Guard can pull open-source ATR rules without a key.
     const publicPaths = new Set(['/health', '/api/stats', '/api/metrics']);
-    if (!publicPaths.has(pathname) && this.config.apiKeyRequired) {
+    const isPublicRead =
+      publicPaths.has(pathname) || (pathname === '/api/rules' && req.method === 'GET');
+    if (!isPublicRead && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
       const isValidApiKey = this.config.apiKeys.includes(token);
@@ -670,33 +673,10 @@ export class ThreatCloudServer {
         // ─── Org / Device / Policy endpoints (Threat Model #1, #6) ───
 
         case '/api/devices/heartbeat':
+          // Requires API key (enforced by general auth gate above).
+          // Guard sends periodic heartbeats with device metadata.
           if (req.method === 'POST') {
-            const body = await this.readBody(req);
-            const data = JSON.parse(body) as {
-              deviceId?: string;
-              orgId?: string;
-              hostname?: string;
-              osType?: string;
-              agentCount?: number;
-              guardVersion?: string;
-            };
-            if (!data.deviceId || !data.orgId) {
-              this.sendJson(res, 400, { ok: false, error: 'deviceId and orgId required' });
-              break;
-            }
-            // Auto-create org if it doesn't exist (first device creates the org)
-            if (!this.db.getOrg(data.orgId)) {
-              this.db.createOrg(data.orgId, data.orgId);
-            }
-            this.db.upsertDevice({
-              deviceId: data.deviceId,
-              orgId: data.orgId,
-              hostname: data.hostname,
-              osType: data.osType,
-              agentCount: data.agentCount,
-              guardVersion: data.guardVersion,
-            });
-            this.sendJson(res, 200, { ok: true });
+            await this.handleDeviceHeartbeat(req, res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -995,9 +975,9 @@ export class ThreatCloudServer {
   }
 
   /**
-   * POST /api/rules/sync — Public endpoint for ATR repo to sync open-source rules.
-   * No admin key required. Only accepts source='atr' (open-source rules are public).
-   * Rate limited to prevent abuse. Body: { rules: [{ ruleId, ruleContent, source }] }
+   * POST /api/rules/sync — Admin-only endpoint for ATR repo CI to sync rules.
+   * Requires admin API key. Only accepts source='atr' (community rules use POST /api/rules).
+   * Body: { rules: [{ ruleId, ruleContent, source }] }. Max 200 per request.
    */
   private async handleSyncATRRules(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const body = await this.readBody(req);
@@ -1083,6 +1063,38 @@ export class ThreatCloudServer {
   }
 
   /** DELETE /api/rules/by-source?source=yara — Admin-only bulk purge */
+  /** POST /api/devices/heartbeat — Guard sends periodic device metadata */
+  private async handleDeviceHeartbeat(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readBody(req);
+    let data: Record<string, unknown>;
+    try {
+      data = JSON.parse(body) as Record<string, unknown>;
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid JSON body' });
+      return;
+    }
+    const deviceId = typeof data['deviceId'] === 'string' ? data['deviceId'].slice(0, 128) : '';
+    const orgId = typeof data['orgId'] === 'string' ? data['orgId'].slice(0, 128) : '';
+    if (!deviceId || !orgId) {
+      this.sendJson(res, 400, { ok: false, error: 'deviceId and orgId required' });
+      return;
+    }
+    // Auto-create org if it doesn't exist (first device creates the org)
+    if (!this.db.getOrg(orgId)) {
+      this.db.createOrg(orgId, orgId);
+    }
+    this.db.upsertDevice({
+      deviceId,
+      orgId,
+      hostname: typeof data['hostname'] === 'string' ? data['hostname'].slice(0, 256) : undefined,
+      osType: typeof data['osType'] === 'string' ? data['osType'].slice(0, 64) : undefined,
+      agentCount: typeof data['agentCount'] === 'number' ? data['agentCount'] : undefined,
+      guardVersion:
+        typeof data['guardVersion'] === 'string' ? data['guardVersion'].slice(0, 32) : undefined,
+    });
+    this.sendJson(res, 200, { ok: true });
+  }
+
   private async handleDeleteRulesBySource(url: string, res: ServerResponse): Promise<void> {
     const params = new URLSearchParams(url.split('?')[1] ?? '');
     const source = params.get('source');

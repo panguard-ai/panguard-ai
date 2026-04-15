@@ -88,6 +88,11 @@ export class ThreatCloudClient {
     return this.status;
   }
 
+  /** Get the anonymous client ID for this device / 取得此裝置的匿名 client ID */
+  getClientId(): string {
+    return this.clientId;
+  }
+
   /**
    * Upload anonymized threat data to the cloud.
    * Data is buffered and sent in batches of up to 50 events.
@@ -619,6 +624,34 @@ export class ThreatCloudClient {
       logger.info(`Scan event reported: ${event.skillsScanned} skills scanned`);
     } catch {
       // Best effort, don't fail the main flow
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Device Heartbeat / 裝置心跳
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Send a heartbeat to Threat Cloud with device metadata.
+   * Called periodically by Guard daemon for fleet tracking.
+   * 向 Threat Cloud 發送裝置心跳用於 fleet 追蹤。
+   */
+  async sendHeartbeat(device: {
+    deviceId: string;
+    orgId: string;
+    hostname?: string;
+    osType?: string;
+    agentCount?: number;
+    guardVersion?: string;
+  }): Promise<void> {
+    if (this.status === 'offline' || !this.endpoint) return;
+
+    try {
+      const url = `${this.endpoint}/api/devices/heartbeat`;
+      await this.httpPost(url, device);
+      logger.info(`Heartbeat sent for device ${device.deviceId}`);
+    } catch {
+      // Best effort — Guard continues running even if TC is unreachable
     }
   }
 
