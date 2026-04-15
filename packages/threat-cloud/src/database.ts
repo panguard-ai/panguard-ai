@@ -417,6 +417,14 @@ export class ThreatCloudDB {
     return result.changes;
   }
 
+  /** Delete rules by a list of rule IDs. Returns number of deleted rows. */
+  deleteRulesByIds(ruleIds: readonly string[]): number {
+    const placeholders = ruleIds.map(() => '?').join(',');
+    const stmt = this.db.prepare(`DELETE FROM rules WHERE rule_id IN (${placeholders})`);
+    const result = stmt.run(...ruleIds);
+    return result.changes;
+  }
+
   /** Fetch rules published after a given timestamp / 取得指定時間後發佈的規則 */
   getRulesSince(
     since: string,

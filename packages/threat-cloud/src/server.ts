@@ -402,6 +402,19 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/rules/bulk-delete':
+          // Admin-only: POST /api/rules/bulk-delete { ruleIds: [...] }
+          if (req.method === 'POST') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            await this.handleBulkDeleteRules(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/stats':
           if (req.method === 'GET') {
             this.handleGetStats(res);
@@ -1029,6 +1042,32 @@ export class ThreatCloudServer {
       ok: true,
       data: { message: `${count} rule(s) synced, ${skipped} skipped`, count, skipped },
     });
+  }
+
+  /** POST /api/rules/bulk-delete — Admin-only delete by rule IDs */
+  private async handleBulkDeleteRules(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readBody(req);
+    let raw: unknown;
+    try {
+      raw = JSON.parse(body);
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid JSON body' });
+      return;
+    }
+    const rawObj = raw as Record<string, unknown>;
+    const ruleIds = rawObj['ruleIds'];
+    if (!Array.isArray(ruleIds) || ruleIds.length === 0) {
+      this.sendJson(res, 400, { ok: false, error: 'Missing or empty ruleIds array' });
+      return;
+    }
+    if (ruleIds.length > 500) {
+      this.sendJson(res, 400, { ok: false, error: 'Maximum 500 rule IDs per request' });
+      return;
+    }
+    const count = this.db.deleteRulesByIds(ruleIds as string[]);
+    const clientIP = req.socket.remoteAddress ?? 'unknown';
+    this.db.audit.logAction('admin', 'rule.bulk-delete', 'rule', undefined, { count, requested: ruleIds.length }, clientIP);
+    this.sendJson(res, 200, { ok: true, data: { message: `Deleted ${count} rule(s)`, count } });
   }
 
   /** DELETE /api/rules/by-source?source=yara — Admin-only bulk purge */

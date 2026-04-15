@@ -15,6 +15,7 @@ export type AuditAction =
   | 'rule.create'
   | 'rule.sync'
   | 'rule.delete'
+  | 'rule.bulk-delete'
   | 'proposal.approve'
   | 'proposal.reject'
   | 'threat.submit'
