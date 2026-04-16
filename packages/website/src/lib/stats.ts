@@ -23,7 +23,7 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.4.16',
+  cliVersion: '1.4.19',
   atrRules: 113,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 17,
@@ -93,14 +93,14 @@ export const STATS = {
     entriesCrawled: 90_792,
     /** npm packages found in crawl */
     npmPackages: 2_769,
-    /** Skills actually scanned — TC live data is authoritative (67K+); fallback uses mega scan batch (53,577) */
-    skillsScanned: 53_577,
+    /** Skills actually scanned — TC live data is authoritative; fallback synced 2026-04-16 */
+    skillsScanned: 67_799,
     /** Total MCP tool definitions extracted from scanned packages */
     toolsExtracted: 35_858,
     /** Packages with security findings (any severity) */
     packagesWithFindings: 2_322,
-    /** Threats detected (confirmed + suspicious) — legacy alias */
-    maliciousFound: 2_322,
+    /** Threats detected (confirmed + suspicious) — synced from TC 2026-04-16 */
+    maliciousFound: 11_324,
     /** ATR rule candidates from scan findings */
     atrRulesGenerated: 225,
     /** Total ATR rule matches across all packages */
@@ -117,8 +117,14 @@ export const STATS = {
     findingsMedium: 1_016,
     findingsLow: 7_354,
     findingsClean: 26_718,
+    /** Skills verified safe by community + TC (live from /api/metrics) */
+    whitelistedSkills: 8_066,
+    /** Skills confirmed malicious and blocked (live from /api/metrics) */
+    blacklistedSkills: 1_096,
+    /** Total skill threat reports submitted to TC */
+    skillThreatsTotal: 21_669,
     registrySources: 3,
-    lastCrawl: '2026-03-27',
+    lastCrawl: '2026-04-16',
   },
   /**
    * Benchmark results (verified 2026-04-08)
@@ -143,6 +149,7 @@ export const STATS = {
   adoption: {
     ciscoRulesMerged: 34,
     npmDownloads30d: 23_000,
+    agentsProtected: 50,
     githubStars: 86,
     platformsSupported: 17,
   },
@@ -151,7 +158,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-04-14',
+  lastUpdated: '2026-04-16',
 } as const;
 
 export type Stats = typeof STATS;

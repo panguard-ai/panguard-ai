@@ -413,11 +413,12 @@ export class ThreatCloudClient {
    * Fetch community skill whitelist from Threat Cloud
    * 從 Threat Cloud 取得社群 skill 白名單
    */
-  async fetchSkillWhitelist(): Promise<Array<{ name: string; hash?: string }>> {
+  async fetchSkillWhitelist(since?: string): Promise<Array<{ name: string; hash?: string }>> {
     if (this.status === 'offline' || !this.endpoint) return [];
 
     try {
-      const url = `${this.endpoint}/api/skill-whitelist`;
+      const params = since ? `?since=${encodeURIComponent(since)}` : '';
+      const url = `${this.endpoint}/api/skill-whitelist${params}`;
       const response = await this.httpGet(url);
       const parsed = JSON.parse(response) as {
         ok?: boolean;
@@ -425,7 +426,11 @@ export class ThreatCloudClient {
       };
       const skills = parsed.data ?? [];
       this.status = 'connected';
-      logger.info(`Fetched ${skills.length} skills from community whitelist`);
+      if (skills.length > 0) {
+        logger.info(
+          `Fetched ${skills.length} skills from community whitelist${since ? ' (incremental)' : ''}`
+        );
+      }
       return skills;
     } catch (err: unknown) {
       logger.warn(
@@ -439,7 +444,7 @@ export class ThreatCloudClient {
    * Fetch community skill blacklist from Threat Cloud
    * 從 Threat Cloud 取得社群 skill 黑名單
    */
-  async fetchSkillBlacklist(): Promise<
+  async fetchSkillBlacklist(since?: string): Promise<
     Array<{
       skillHash: string;
       skillName: string;
@@ -451,7 +456,8 @@ export class ThreatCloudClient {
     if (this.status === 'offline' || !this.endpoint) return [];
 
     try {
-      const url = `${this.endpoint}/api/skill-blacklist`;
+      const params = since ? `?since=${encodeURIComponent(since)}` : '';
+      const url = `${this.endpoint}/api/skill-blacklist${params}`;
       const response = await this.httpGet(url);
       const parsed = JSON.parse(response) as {
         ok?: boolean;

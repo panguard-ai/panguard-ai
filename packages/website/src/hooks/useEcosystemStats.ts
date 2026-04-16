@@ -55,10 +55,10 @@ function setCache(data: EcosystemStats): void {
 const FALLBACK: EcosystemStats = {
   skillsScanned: STATS.ecosystem.skillsScanned,
   threatsDetected: STATS.ecosystem.maliciousFound,
-  agentsProtected: 0,
+  agentsProtected: STATS.adoption.agentsProtected,
   atrRules: STATS.atrRules,
-  whitelistedSkills: 0,
-  blacklistedSkills: 0,
+  whitelistedSkills: STATS.ecosystem.whitelistedSkills,
+  blacklistedSkills: STATS.ecosystem.blacklistedSkills,
   sources: {
     bulk: { skills: STATS.ecosystem.skillsScanned, findings: STATS.ecosystem.maliciousFound },
     cli: { skills: 0, findings: 0, devices: 0 },
@@ -114,6 +114,12 @@ export function useEcosystemStats(): EcosystemStats {
             live.agentsProtected = m.totalAgentsProtected;
             live.threatsDetected = Math.max(m.totalThreatsDetected, FALLBACK.threatsDetected);
             live.atrRules = Math.max(m.totalAtrRules, FALLBACK.atrRules);
+            live.whitelistedSkills =
+              ((m as Record<string, unknown>)['whitelistedSkills'] as number) ??
+              FALLBACK.whitelistedSkills;
+            live.blacklistedSkills =
+              ((m as Record<string, unknown>)['blacklistedSkills'] as number) ??
+              FALLBACK.blacklistedSkills;
             live.sources = m.sources;
             live.lastUpdated = m.lastUpdated;
           }
