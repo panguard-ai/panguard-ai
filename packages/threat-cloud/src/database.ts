@@ -2095,9 +2095,7 @@ export class ThreatCloudDB {
     const clientKey = randomUUID();
     const hash = createHash('sha256').update(clientKey).digest('hex');
     this.db
-      .prepare(
-        'INSERT INTO client_keys (client_id, client_key_hash, ip_address) VALUES (?, ?, ?)'
-      )
+      .prepare('INSERT INTO client_keys (client_id, client_key_hash, ip_address) VALUES (?, ?, ?)')
       .run(clientId, hash, ipAddress);
     return { clientKey };
   }
@@ -2110,7 +2108,7 @@ export class ThreatCloudDB {
       .get(hash) as { id: number } | undefined;
     if (!row) return false;
     this.db
-      .prepare('UPDATE client_keys SET last_used_at = datetime(\'now\') WHERE id = ?')
+      .prepare("UPDATE client_keys SET last_used_at = datetime('now') WHERE id = ?")
       .run(row.id);
     return true;
   }
@@ -2119,14 +2117,17 @@ export class ThreatCloudDB {
   revokeClientKey(clientId: string): number {
     const result = this.db
       .prepare(
-        'UPDATE client_keys SET revoked = 1, revoked_at = datetime(\'now\') WHERE client_id = ? AND revoked = 0'
+        "UPDATE client_keys SET revoked = 1, revoked_at = datetime('now') WHERE client_id = ? AND revoked = 0"
       )
       .run(clientId);
     return result.changes;
   }
 
   /** List client keys (admin). Never returns raw keys. */
-  listClientKeys(limit = 50, offset = 0): Array<{
+  listClientKeys(
+    limit = 50,
+    offset = 0
+  ): Array<{
     id: number;
     clientId: string;
     createdAt: string;
@@ -2139,13 +2140,13 @@ export class ThreatCloudDB {
         'SELECT id, client_id, created_at, last_used_at, revoked, ip_address FROM client_keys ORDER BY created_at DESC LIMIT ? OFFSET ?'
       )
       .all(limit, offset) as Array<{
-        id: number;
-        client_id: string;
-        created_at: string;
-        last_used_at: string | null;
-        revoked: number;
-        ip_address: string | null;
-      }>;
+      id: number;
+      client_id: string;
+      created_at: string;
+      last_used_at: string | null;
+      revoked: number;
+      ip_address: string | null;
+    }>;
     return rows.map((r) => ({
       id: r.id,
       clientId: r.client_id,

@@ -1324,7 +1324,10 @@ export class ThreatCloudServer {
     const now = Date.now();
     if (entry && now < entry.resetAt) {
       if (entry.count >= 10) {
-        this.sendJson(res, 429, { ok: false, error: 'Registration rate limit exceeded. Try again later.' });
+        this.sendJson(res, 429, {
+          ok: false,
+          error: 'Registration rate limit exceeded. Try again later.',
+        });
         return;
       }
       entry.count++;
@@ -1365,10 +1368,7 @@ export class ThreatCloudServer {
   }
 
   /** POST /api/admin/client-keys/revoke — revoke client keys */
-  private async handleClientKeyRevoke(
-    req: IncomingMessage,
-    res: ServerResponse
-  ): Promise<void> {
+  private async handleClientKeyRevoke(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const body = await this.readBody(req);
     if (!body) {
       this.sendJson(res, 400, { ok: false, error: 'Request body required' });
@@ -1456,9 +1456,8 @@ export class ThreatCloudServer {
 
     // Fetch actual ATR rule detection patterns that triggered on this skill.
     // This is the key input for LLM: real regex patterns, not just finding titles.
-    const triggeredRules = agg.atrRuleIds.length > 0
-      ? this.db.getRuleContentByIds(agg.atrRuleIds)
-      : [];
+    const triggeredRules =
+      agg.atrRuleIds.length > 0 ? this.db.getRuleContentByIds(agg.atrRuleIds) : [];
 
     // Extract detection sections from rule YAML for LLM context
     const detectionPatterns = triggeredRules.map((r) => {
