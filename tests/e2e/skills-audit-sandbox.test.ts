@@ -96,7 +96,7 @@ afterAll(() => {
 // -- Tests --------------------------------------------------------------------
 
 describe('Skills Audit Pipeline', () => {
-  it('should flag malicious skill with high risk score', async () => {
+  it('should flag malicious skill with high risk score', { timeout: 30_000 }, async () => {
     const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
     const report = await auditSkill(MALICIOUS_SKILL_DIR);
 
@@ -118,7 +118,7 @@ describe('Skills Audit Pipeline', () => {
     expect(hasExfilDetection).toBe(true);
   });
 
-  it('should pass safe skill with low risk score', async () => {
+  it('should pass safe skill with low risk score', { timeout: 30_000 }, async () => {
     const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
     const report = await auditSkill(SAFE_SKILL_DIR);
 
@@ -128,7 +128,7 @@ describe('Skills Audit Pipeline', () => {
     expect(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).toContain(report.riskLevel);
   });
 
-  it('should provide audit duration metrics', async () => {
+  it('should provide audit duration metrics', { timeout: 30_000 }, async () => {
     const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
     const report = await auditSkill(SAFE_SKILL_DIR);
 

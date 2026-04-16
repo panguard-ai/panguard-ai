@@ -56,6 +56,27 @@ export class ThreatCloudClient {
   private static readonly FLUSH_INTERVAL = 60_000;
 
   /**
+   * Async factory: creates a ThreatCloudClient, auto-provisioning a client key if needed.
+   * Use this instead of `new` to enable automatic TC registration.
+   */
+  static async create(
+    endpoint: string | undefined,
+    dataDir: string,
+    apiKey?: string
+  ): Promise<ThreatCloudClient> {
+    let resolvedKey = apiKey ?? process.env['TC_API_KEY'];
+    if (!resolvedKey && endpoint) {
+      const { loadOrProvisionTCKey } = await import('./tc-key-provisioner.js');
+      const clientId = getAnonymousClientId();
+      resolvedKey = await loadOrProvisionTCKey(endpoint, clientId);
+      if (resolvedKey) {
+        logger.info('Auto-provisioned TC client key');
+      }
+    }
+    return new ThreatCloudClient(endpoint, dataDir, resolvedKey);
+  }
+
+  /**
    * @param endpoint - Cloud API endpoint URL (undefined = offline mode) / 雲端 API 端點 URL
    * @param dataDir - Local data directory for cache/queue / 本地資料目錄
    * @param apiKey - API key for authentication / 認證用 API 金鑰

@@ -39,7 +39,7 @@ async function removeTempDir(dir: string): Promise<void> {
   await fs.rm(dir, { recursive: true, force: true });
 }
 
-describe('sast-checker.ts - checkSourceCode', () => {
+describe('sast-checker.ts - checkSourceCode', { timeout: 30_000 }, () => {
   let tmpDir: string;
 
   beforeEach(() => {

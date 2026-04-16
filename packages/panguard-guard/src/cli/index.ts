@@ -156,6 +156,19 @@ async function commandStart(
     config.showUploadData = true;
   }
 
+  // Auto-provision TC client key if none configured
+  if (!config.threatCloudApiKey && config.threatCloudEndpoint) {
+    const { loadOrProvisionTCKey } = await import('../threat-cloud/tc-key-provisioner.js');
+    const { getAnonymousClientId } = await import('../threat-cloud/client-id.js');
+    const provisionedKey = await loadOrProvisionTCKey(
+      config.threatCloudEndpoint,
+      getAnonymousClientId()
+    );
+    if (provisionedKey) {
+      config.threatCloudApiKey = provisionedKey;
+    }
+  }
+
   const engine = new GuardEngine(config);
 
   const shutdown = async () => {
