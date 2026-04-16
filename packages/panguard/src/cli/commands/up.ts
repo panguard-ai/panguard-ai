@@ -537,7 +537,7 @@ async function submitToTC(
   const { readFileSync: rf, existsSync: fe } = await import('node:fs');
 
   const dataDir = join(homedir(), '.panguard-guard');
-  const tc = new ThreatCloudClient(TC_ENDPOINT, dataDir);
+  const tc = await ThreatCloudClient.create(TC_ENDPOINT, dataDir);
 
   // 1. Submit skill threat
   const skillMdPath = join(skillDir, 'SKILL.md');
