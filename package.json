@@ -11,6 +11,7 @@
     "url": "https://github.com/panguard-ai/panguard-ai"
   },
   "homepage": "https://panguard.ai",
+  "packageManager": "pnpm@10.30.2",
   "engines": {
     "node": ">=20",
     "pnpm": ">=9.0.0"
