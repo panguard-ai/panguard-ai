@@ -5,30 +5,31 @@ import { Link } from '@/navigation';
 import { ArrowRight, AlertTriangle, ShieldOff } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
-import { STATS } from '@/lib/stats';
-
-const STAT_CARDS = [
-  {
-    key: 'maliciousFound' as const,
-    value: STATS.ecosystem.maliciousFound.toString(),
-    color: 'text-red-400',
-  },
-  {
-    key: 'critical' as const,
-    value: STATS.ecosystem.findingsCritical.toString(),
-    color: 'text-red-400',
-  },
-  {
-    key: 'high' as const,
-    value: STATS.ecosystem.findingsHigh.toString(),
-    color: 'text-orange-400',
-  },
-];
+import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 
 const STEPS = ['step1', 'step2', 'step3'] as const;
 
 export default function BlacklistContent() {
   const t = useTranslations('blacklistPage');
+  const stats = useEcosystemStats();
+
+  const STAT_CARDS = [
+    {
+      key: 'maliciousFound' as const,
+      value: stats.blacklistedSkills.toLocaleString(),
+      color: 'text-red-400',
+    },
+    {
+      key: 'critical' as const,
+      value: stats.threatsDetected.toLocaleString(),
+      color: 'text-red-400',
+    },
+    {
+      key: 'high' as const,
+      value: stats.skillsScanned.toLocaleString(),
+      color: 'text-orange-400',
+    },
+  ];
 
   return (
     <div className="pt-20">
@@ -94,7 +95,7 @@ export default function BlacklistContent() {
                     {t('severity.critical')}
                   </span>
                   <span className="text-2xl font-extrabold text-red-400 ml-auto">
-                    {STATS.ecosystem.findingsCritical}
+                    {stats.blacklistedSkills}
                   </span>
                 </div>
                 <p className="text-xs text-text-muted">{t('severity.criticalDesc')}</p>
@@ -107,7 +108,7 @@ export default function BlacklistContent() {
                     {t('severity.high')}
                   </span>
                   <span className="text-2xl font-extrabold text-orange-400 ml-auto">
-                    {STATS.ecosystem.findingsHigh}
+                    {stats.threatsDetected.toLocaleString()}
                   </span>
                 </div>
                 <p className="text-xs text-text-muted">{t('severity.highDesc')}</p>

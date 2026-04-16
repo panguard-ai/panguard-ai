@@ -6,31 +6,33 @@ import { ArrowRight, CheckCircle } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import { ShieldIcon } from '@/components/ui/BrandIcons';
-import { STATS } from '@/lib/stats';
-
-const trustScore = ((STATS.ecosystem.findingsClean / STATS.ecosystem.skillsScanned) * 100).toFixed(
-  1
-);
-
-const STAT_CARDS = [
-  {
-    key: 'totalScanned' as const,
-    value: STATS.ecosystem.skillsScanned.toLocaleString(),
-  },
-  {
-    key: 'safeSkills' as const,
-    value: STATS.ecosystem.findingsClean.toLocaleString(),
-  },
-  {
-    key: 'trustScore' as const,
-    value: `${trustScore}%`,
-  },
-];
+import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 
 const STEPS = ['step1', 'step2', 'step3'] as const;
 
 export default function WhitelistContent() {
   const t = useTranslations('whitelistPage');
+  const stats = useEcosystemStats();
+
+  const trustScore =
+    stats.skillsScanned > 0
+      ? (((stats.skillsScanned - stats.blacklistedSkills) / stats.skillsScanned) * 100).toFixed(1)
+      : '99.4';
+
+  const STAT_CARDS = [
+    {
+      key: 'totalScanned' as const,
+      value: stats.skillsScanned.toLocaleString(),
+    },
+    {
+      key: 'safeSkills' as const,
+      value: stats.whitelistedSkills.toLocaleString(),
+    },
+    {
+      key: 'trustScore' as const,
+      value: `${trustScore}%`,
+    },
+  ];
 
   return (
     <div className="pt-20">

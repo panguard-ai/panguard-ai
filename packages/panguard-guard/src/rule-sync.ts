@@ -19,6 +19,12 @@ import type { GuardATREngine } from './engines/atr-engine.js';
 
 const logger = createLogger('panguard-guard:rule-sync');
 
+/** Track last sync time for incremental blacklist/whitelist fetching */
+let lastBlacklistSync: string | undefined;
+let lastWhitelistSync: string | undefined;
+/** First sync always does full fetch, then switches to incremental */
+let isFirstSync = true;
+
 /** Dependencies needed for cloud sync operations */
 export interface CloudSyncDeps {
   readonly atrEngine: GuardATREngine;
@@ -100,25 +106,28 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
       );
     }
 
-    // Sync community skill whitelist
+    // Sync community skill whitelist (incremental after first sync)
     let importedSkills = 0;
     try {
-      const communitySkills = await threatCloud.fetchSkillWhitelist();
+      const since = isFirstSync ? undefined : lastWhitelistSync;
+      const communitySkills = await threatCloud.fetchSkillWhitelist(since);
       if (communitySkills.length > 0) {
         importedSkills = atrEngine
           .getWhitelistManager()
           .importCommunityWhitelist(communitySkills.map((s) => ({ name: s.name, hash: s.hash })));
       }
+      lastWhitelistSync = new Date().toISOString();
     } catch (err: unknown) {
       logger.warn(
         `Skill whitelist sync failed: ${err instanceof Error ? err.message : String(err)}`
       );
     }
 
-    // Sync community skill blacklist
+    // Sync community skill blacklist (incremental after first sync)
     let revokedSkills = 0;
     try {
-      const blacklist = await threatCloud.fetchSkillBlacklist();
+      const since = isFirstSync ? undefined : lastBlacklistSync;
+      const blacklist = await threatCloud.fetchSkillBlacklist(since);
       const whitelistMgr = atrEngine.getWhitelistManager();
       for (const entry of blacklist) {
         const wasRevoked = whitelistMgr.revoke(
@@ -133,11 +142,15 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
             `社群黑名單: ${revokedSkills} 個技能已撤銷`
         );
       }
+      lastBlacklistSync = new Date().toISOString();
     } catch (err: unknown) {
       logger.warn(
         `Skill blacklist sync failed: ${err instanceof Error ? err.message : String(err)}`
       );
     }
+
+    // After first full sync, switch to incremental
+    isFirstSync = false;
 
     // Send device heartbeat to TC for fleet tracking
     try {

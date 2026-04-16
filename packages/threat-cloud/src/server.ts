@@ -511,7 +511,7 @@ export class ThreatCloudServer {
 
         case '/api/skill-whitelist':
           if (req.method === 'GET') {
-            this.handleGetSkillWhitelist(res);
+            this.handleGetSkillWhitelist(url, res);
           } else if (req.method === 'POST') {
             await this.handlePostSkillWhitelist(req, res);
           } else if (req.method === 'DELETE') {
@@ -1480,9 +1480,11 @@ response:
     this.sendJson(res, 201, { ok: true, data: { message: `${count} skill(s) reported`, count } });
   }
 
-  /** GET /api/skill-whitelist - Fetch community-confirmed safe skills */
-  private handleGetSkillWhitelist(res: ServerResponse): void {
-    const whitelist = this.db.getSkillWhitelist();
+  /** GET /api/skill-whitelist?since=ISO — Fetch community-confirmed safe skills (incremental) */
+  private handleGetSkillWhitelist(url: string, res: ServerResponse): void {
+    const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
+    const since = params.get('since') ?? undefined;
+    const whitelist = this.db.getSkillWhitelist(since);
     this.sendJson(res, 200, { ok: true, data: whitelist });
   }
 
@@ -1495,9 +1497,14 @@ response:
     const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
     const minReports = Number(params.get('minReports') ?? '3');
     const minAvgRisk = Number(params.get('minAvgRisk') ?? '70');
+    const since = params.get('since') ?? undefined;
 
-    res.setHeader('Cache-Control', 'public, max-age=1800, s-maxage=1800');
-    const blacklist = this.db.getSkillBlacklist(minReports, minAvgRisk);
+    // Shorter cache for incremental queries
+    res.setHeader(
+      'Cache-Control',
+      since ? 'public, max-age=60' : 'public, max-age=1800, s-maxage=1800'
+    );
+    const blacklist = this.db.getSkillBlacklist(minReports, minAvgRisk, since);
     this.sendJson(res, 200, { ok: true, data: blacklist });
   }
 

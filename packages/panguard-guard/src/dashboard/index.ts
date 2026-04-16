@@ -102,7 +102,22 @@ export class DashboardServer {
     return new Promise((resolve) => {
       this.server = createServer((req, res) => this.handleRequest(req, res));
 
-      const wss = new WebSocketServer({ server: this.server, path: '/ws', maxPayload: 64 * 1024 });
+      // Handle port conflicts BEFORE attaching WSS to prevent unhandled error crashes
+      this.server.on('error', (err: NodeJS.ErrnoException) => {
+        if (err.code === 'EADDRINUSE') {
+          logger.warn(
+            `Dashboard port ${this.port} already in use. ` +
+              `Another Guard instance may be running. Dashboard disabled for this session.`
+          );
+          this.server = null;
+          resolve(); // Don't crash — Guard can run without Dashboard
+        } else {
+          logger.error(`Dashboard server error: ${err.message}`);
+          resolve();
+        }
+      });
+
+      const wss = new WebSocketServer({ noServer: true });
 
       wss.on('connection', (ws: WS, req: IncomingMessage) => {
         if (this.wsClients.size >= MAX_WS_CLIENTS) {
@@ -161,6 +176,18 @@ export class DashboardServer {
         ws.on('error', () => {
           this.wsClients.delete(client);
         });
+      });
+
+      // Handle WebSocket upgrade manually (noServer mode)
+      this.server.on('upgrade', (req, socket, head) => {
+        const { pathname } = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+        if (pathname === '/ws') {
+          wss.handleUpgrade(req, socket, head, (ws) => {
+            wss.emit('connection', ws, req);
+          });
+        } else {
+          socket.destroy();
+        }
       });
 
       this.server.listen(this.port, '127.0.0.1', () => {
