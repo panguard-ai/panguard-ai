@@ -8,7 +8,7 @@
  */
 
 import Database from 'better-sqlite3';
-import { createHmac, createHash } from 'node:crypto';
+import { createHmac, createHash, randomUUID } from 'node:crypto';
 import type {
   AnonymizedThreatData,
   ThreatCloudRule,
@@ -618,6 +618,8 @@ export class ThreatCloudDB {
     avgRiskScore: number;
     maxRiskLevel: string;
     findings: string[];
+    /** ATR rule IDs that triggered across all reports */
+    atrRuleIds: string[];
   } {
     const row = this.db
       .prepare(
@@ -630,17 +632,26 @@ export class ThreatCloudDB {
       .prepare(
         `SELECT finding_summaries FROM skill_threats
          WHERE skill_name = ? AND finding_summaries IS NOT NULL
-         ORDER BY created_at DESC LIMIT 5`
+         ORDER BY created_at DESC LIMIT 10`
       )
       .all(skillName) as Array<{ finding_summaries: string }>;
 
     const findings: string[] = [];
+    const ruleIdSet = new Set<string>();
     for (const fr of findingRows) {
       try {
-        const parsed = JSON.parse(fr.finding_summaries) as Array<{ title: string }>;
+        const parsed = JSON.parse(fr.finding_summaries) as Array<{
+          id?: string;
+          title: string;
+          category?: string;
+          severity?: string;
+        }>;
         for (const f of parsed) {
           if (f.title && !findings.includes(f.title)) {
             findings.push(f.title);
+          }
+          if (f.id && f.id.startsWith('ATR-')) {
+            ruleIdSet.add(f.id);
           }
         }
       } catch {
@@ -653,7 +664,18 @@ export class ThreatCloudDB {
       avgRiskScore: row?.avg_score ?? 0,
       maxRiskLevel: row?.max_level ?? 'LOW',
       findings: findings.slice(0, 10),
+      atrRuleIds: [...ruleIdSet],
     };
+  }
+
+  /** Fetch rule content by IDs. Returns the YAML detection patterns for crystallization. */
+  getRuleContentByIds(ruleIds: string[]): Array<{ ruleId: string; ruleContent: string }> {
+    if (ruleIds.length === 0) return [];
+    const placeholders = ruleIds.map(() => '?').join(',');
+    const rows = this.db
+      .prepare(`SELECT rule_id, rule_content FROM rules WHERE rule_id IN (${placeholders})`)
+      .all(...ruleIds) as Array<{ rule_id: string; rule_content: string }>;
+    return rows.map((r) => ({ ruleId: r.rule_id, ruleContent: r.rule_content }));
   }
 
   /** Check if an ATR proposal already exists for a pattern hash */
@@ -2048,6 +2070,90 @@ export class ThreatCloudDB {
       .prepare('DELETE FROM org_policies WHERE org_id = ? AND category = ?')
       .run(orgId, category);
     return result.changes > 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Client Keys / 客戶端金鑰
+  // ---------------------------------------------------------------------------
+
+  /** Register a new client key. Returns the raw key (only time it's visible). */
+  registerClientKey(clientId: string, ipAddress: string | null): { clientKey: string } {
+    // Limit to 5 active keys per clientId to prevent DB flooding
+    const existing = this.db
+      .prepare('SELECT COUNT(*) as cnt FROM client_keys WHERE client_id = ? AND revoked = 0')
+      .get(clientId) as { cnt: number };
+    if (existing.cnt >= 5) {
+      // Revoke oldest key to make room
+      this.db
+        .prepare(
+          `UPDATE client_keys SET revoked = 1, revoked_at = datetime('now')
+           WHERE id = (SELECT id FROM client_keys WHERE client_id = ? AND revoked = 0 ORDER BY created_at ASC LIMIT 1)`
+        )
+        .run(clientId);
+    }
+
+    const clientKey = randomUUID();
+    const hash = createHash('sha256').update(clientKey).digest('hex');
+    this.db
+      .prepare(
+        'INSERT INTO client_keys (client_id, client_key_hash, ip_address) VALUES (?, ?, ?)'
+      )
+      .run(clientId, hash, ipAddress);
+    return { clientKey };
+  }
+
+  /** Validate a raw client key. Updates last_used_at on success. */
+  validateClientKey(rawKey: string): boolean {
+    const hash = createHash('sha256').update(rawKey).digest('hex');
+    const row = this.db
+      .prepare('SELECT id FROM client_keys WHERE client_key_hash = ? AND revoked = 0')
+      .get(hash) as { id: number } | undefined;
+    if (!row) return false;
+    this.db
+      .prepare('UPDATE client_keys SET last_used_at = datetime(\'now\') WHERE id = ?')
+      .run(row.id);
+    return true;
+  }
+
+  /** Revoke all keys for a client. Returns number of keys revoked. */
+  revokeClientKey(clientId: string): number {
+    const result = this.db
+      .prepare(
+        'UPDATE client_keys SET revoked = 1, revoked_at = datetime(\'now\') WHERE client_id = ? AND revoked = 0'
+      )
+      .run(clientId);
+    return result.changes;
+  }
+
+  /** List client keys (admin). Never returns raw keys. */
+  listClientKeys(limit = 50, offset = 0): Array<{
+    id: number;
+    clientId: string;
+    createdAt: string;
+    lastUsedAt: string | null;
+    revoked: boolean;
+    ipAddress: string | null;
+  }> {
+    const rows = this.db
+      .prepare(
+        'SELECT id, client_id, created_at, last_used_at, revoked, ip_address FROM client_keys ORDER BY created_at DESC LIMIT ? OFFSET ?'
+      )
+      .all(limit, offset) as Array<{
+        id: number;
+        client_id: string;
+        created_at: string;
+        last_used_at: string | null;
+        revoked: number;
+        ip_address: string | null;
+      }>;
+    return rows.map((r) => ({
+      id: r.id,
+      clientId: r.client_id,
+      createdAt: r.created_at,
+      lastUsedAt: r.last_used_at,
+      revoked: r.revoked === 1,
+      ipAddress: r.ip_address,
+    }));
   }
 
   /** Close the database / 關閉資料庫 */

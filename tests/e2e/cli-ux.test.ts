@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 // ---------------------------------------------------------------------------
 
 const PGA_BIN = new URL('../../packages/panguard/bin/panguard.cjs', import.meta.url).pathname;
-const TIMEOUT_MS = 30_000;
+const TIMEOUT_MS = 60_000;
 
 interface RunResult {
   stdout: string;

@@ -157,3 +157,15 @@ export interface ServerConfig {
   /** Admin API key for write operations (POST /api/rules). If set, only this key can publish rules. */
   adminApiKey?: string;
 }
+
+/** A registered client API key record / 已註冊的客戶端 API 金鑰記錄 */
+export interface ClientKeyRecord {
+  id: number;
+  clientId: string;
+  clientKeyHash: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+  revoked: boolean;
+  revokedAt: string | null;
+  ipAddress: string | null;
+}

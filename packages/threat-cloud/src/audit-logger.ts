@@ -21,7 +21,9 @@ export type AuditAction =
   | 'threat.submit'
   | 'skill_threat.submit'
   | 'scan_event.submit'
-  | 'admin.login';
+  | 'admin.login'
+  | 'client_key.register'
+  | 'client_key.revoke';
 
 /** An entry from the audit_log table / audit_log 資料表的條目 */
 export interface AuditLogEntry {

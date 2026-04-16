@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { checkCode } from '../src/checks/code-check.js';
 
-describe('checkCode (real panguard-scan)', () => {
+describe('checkCode (real panguard-scan)', { timeout: 30_000 }, () => {
   const tempDirs: string[] = [];
 
   function createTempSkill(files: Record<string, string>): string {

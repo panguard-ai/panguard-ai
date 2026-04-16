@@ -105,6 +105,7 @@ export class ThreatCloudServer {
   private readonly badgeRouter: BadgeRouter;
   private promotionTimer: ReturnType<typeof setInterval> | null = null;
   private rateLimits: Map<string, RateLimitEntry> = new Map();
+  private registrationRateLimits: Map<string, { count: number; resetAt: number }> = new Map();
   private rateLimitCleanupTimer: ReturnType<typeof setInterval> | null = null;
   private statsCache: { data: unknown; expiresAt: number } | null = null;
 
@@ -213,6 +214,9 @@ export class ThreatCloudServer {
           for (const [ip, entry] of this.rateLimits) {
             if (now > entry.resetAt) this.rateLimits.delete(ip);
           }
+          for (const [ip, entry] of this.registrationRateLimits) {
+            if (now > entry.resetAt) this.registrationRateLimits.delete(ip);
+          }
           // Aggregate old telemetry events into hourly buckets
           try {
             const cleaned = this.db.cleanupTelemetryEvents();
@@ -289,7 +293,7 @@ export class ThreatCloudServer {
     // Public endpoints that don't require API key authentication.
     // Read-only data endpoints are public. Write endpoints require auth.
     // GET /api/rules is public so Guard can pull open-source ATR rules without a key.
-    const publicPaths = new Set(['/health', '/api/stats', '/api/metrics']);
+    const publicPaths = new Set(['/health', '/api/stats', '/api/metrics', '/api/clients/register']);
     const isPublicRead =
       publicPaths.has(pathname) || (pathname === '/api/rules' && req.method === 'GET');
     if (!isPublicRead && this.config.apiKeyRequired) {
@@ -297,7 +301,11 @@ export class ThreatCloudServer {
       const token = authHeader.replace('Bearer ', '');
       const isValidApiKey = this.config.apiKeys.includes(token);
       const isAdminKey = this.config.adminApiKey ? token === this.config.adminApiKey : false;
-      if (!isValidApiKey && !isAdminKey) {
+      const isValidClientKey =
+        !isValidApiKey && !isAdminKey && token.length > 0
+          ? this.db.validateClientKey(token)
+          : false;
+      if (!isValidApiKey && !isAdminKey && !isValidClientKey) {
         this.sendJson(res, 401, { ok: false, error: 'Invalid API key', request_id: requestId });
         log.info('request', {
           method: req.method,
@@ -466,6 +474,41 @@ export class ThreatCloudServer {
         case '/api/rule-feedback':
           if (req.method === 'POST') {
             await this.handlePostRuleFeedback(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/clients/register':
+          if (req.method === 'POST') {
+            await this.handleClientRegister(req, res, clientIP);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/admin/client-keys':
+          if (!this.checkAdminAuth(req)) {
+            this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+            break;
+          }
+          if (req.method === 'GET') {
+            const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
+            const limit = Math.min(200, Math.max(1, parseInt(params.get('limit') ?? '50', 10)));
+            const offset = Math.max(0, parseInt(params.get('offset') ?? '0', 10));
+            this.sendJson(res, 200, { ok: true, data: this.db.listClientKeys(limit, offset) });
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/admin/client-keys/revoke':
+          if (!this.checkAdminAuth(req)) {
+            this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+            break;
+          }
+          if (req.method === 'POST') {
+            await this.handleClientKeyRevoke(req, res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -1270,6 +1313,93 @@ export class ThreatCloudServer {
   }
 
   /** POST /api/skill-threats - Submit skill threat from audit */
+  /** POST /api/clients/register — auto-provision client API key */
+  private async handleClientRegister(
+    req: IncomingMessage,
+    res: ServerResponse,
+    clientIP: string
+  ): Promise<void> {
+    // Rate limit: 10 registrations per hour per IP
+    const entry = this.registrationRateLimits.get(clientIP);
+    const now = Date.now();
+    if (entry && now < entry.resetAt) {
+      if (entry.count >= 10) {
+        this.sendJson(res, 429, { ok: false, error: 'Registration rate limit exceeded. Try again later.' });
+        return;
+      }
+      entry.count++;
+    } else {
+      this.registrationRateLimits.set(clientIP, { count: 1, resetAt: now + 3_600_000 });
+    }
+
+    const body = await this.readBody(req);
+    if (!body) {
+      this.sendJson(res, 400, { ok: false, error: 'Request body required' });
+      return;
+    }
+    let parsed: { clientId?: string };
+    try {
+      parsed = JSON.parse(body);
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid JSON' });
+      return;
+    }
+    const clientId = parsed.clientId;
+    if (!clientId || typeof clientId !== 'string' || clientId.length < 8 || clientId.length > 128) {
+      this.sendJson(res, 400, { ok: false, error: 'clientId must be a string (8-128 chars)' });
+      return;
+    }
+
+    const result = this.db.registerClientKey(clientId, clientIP);
+
+    this.db.audit.logAction(
+      'system',
+      'client_key.register',
+      'client_key',
+      clientId,
+      { ip: clientIP },
+      clientIP
+    );
+
+    this.sendJson(res, 201, { ok: true, data: { clientKey: result.clientKey } });
+  }
+
+  /** POST /api/admin/client-keys/revoke — revoke client keys */
+  private async handleClientKeyRevoke(
+    req: IncomingMessage,
+    res: ServerResponse
+  ): Promise<void> {
+    const body = await this.readBody(req);
+    if (!body) {
+      this.sendJson(res, 400, { ok: false, error: 'Request body required' });
+      return;
+    }
+    let parsed: { clientId?: string };
+    try {
+      parsed = JSON.parse(body);
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid JSON' });
+      return;
+    }
+    if (!parsed.clientId || typeof parsed.clientId !== 'string') {
+      this.sendJson(res, 400, { ok: false, error: 'clientId required' });
+      return;
+    }
+
+    const revoked = this.db.revokeClientKey(parsed.clientId);
+    const clientIP = req.socket.remoteAddress ?? 'unknown';
+    this.db.audit.logAction(
+      'admin',
+      'client_key.revoke',
+      'client_key',
+      parsed.clientId,
+      { revokedCount: revoked },
+      clientIP
+    );
+
+    this.sendJson(res, 200, { ok: true, data: { revoked } });
+  }
+
   private async handlePostSkillThreat(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const data = await this.parseAndValidate(req, res, SkillThreatSchema);
     if (!data) return;
@@ -1324,17 +1454,58 @@ export class ThreatCloudServer {
 
     if (this.db.hasATRProposal(patternHash)) return;
 
-    // If LLM reviewer is available, use it for high-quality rule generation
-    if (this.llmReviewer?.isAvailable()) {
-      // Build a synthetic tool description from aggregated findings
+    // Fetch actual ATR rule detection patterns that triggered on this skill.
+    // This is the key input for LLM: real regex patterns, not just finding titles.
+    const triggeredRules = agg.atrRuleIds.length > 0
+      ? this.db.getRuleContentByIds(agg.atrRuleIds)
+      : [];
+
+    // Extract detection sections from rule YAML for LLM context
+    const detectionPatterns = triggeredRules.map((r) => {
+      // Extract detection block from YAML
+      const detMatch = r.ruleContent.match(/detection:[\s\S]*?(?=\n[a-z]|\n---|$)/);
+      const titleMatch = r.ruleContent.match(/title:\s*['"]?([^'"\n]+)/);
+      return {
+        ruleId: r.ruleId,
+        title: titleMatch?.[1]?.trim() ?? r.ruleId,
+        detection: detMatch?.[0]?.trim() ?? '(detection not parseable)',
+      };
+    });
+
+    if (this.llmReviewer?.isAvailable() && detectionPatterns.length > 0) {
+      // Build rich context: actual attack patterns, not just finding titles
+      const patternContext = detectionPatterns
+        .map((p) => `### ${p.ruleId}: ${p.title}\n${p.detection}`)
+        .join('\n\n');
+
+      const toolDescriptions = [
+        {
+          name: skillName,
+          description: `This skill was flagged ${agg.reportCount} times (avg risk: ${Math.round(agg.avgRiskScore)}) by ${agg.atrRuleIds.length} distinct ATR rules.\n\nTriggered rules and their detection patterns:\n\n${patternContext}\n\nFinding titles: ${agg.findings.join('; ')}`,
+        },
+      ];
+
+      log.info(
+        `Flywheel bridge: LLM generating ATR proposal for ${skillName} ` +
+          `(${agg.reportCount} reports, ${agg.atrRuleIds.length} ATR rules: ${agg.atrRuleIds.join(', ')})`
+      );
+
+      void this.llmReviewer
+        .analyzeSkills([{ package: skillName, tools: toolDescriptions }])
+        .catch((err) => {
+          log.error(
+            `LLM analysis for skill bridge failed: ${err instanceof Error ? err.message : String(err)}`
+          );
+        });
+    } else if (this.llmReviewer?.isAvailable()) {
+      // LLM available but no rule patterns — pass findings as-is (legacy path)
       const toolDescriptions = agg.findings.map((f, i) => ({
         name: `finding_${i}`,
         description: f,
       }));
 
       log.info(
-        `Flywheel bridge: generating ATR proposal for ${skillName} (${agg.reportCount} reports) / ` +
-          `飛輪橋接: 為 ${skillName} 產生 ATR 提案 (${agg.reportCount} 個報告)`
+        `Flywheel bridge: LLM generating ATR proposal for ${skillName} (${agg.reportCount} reports, no rule context)`
       );
 
       void this.llmReviewer
@@ -1345,55 +1516,11 @@ export class ThreatCloudServer {
           );
         });
     } else {
-      // No LLM available — scaffold a basic pattern-based proposal
-      const severity = agg.maxRiskLevel === 'CRITICAL' ? 'critical' : 'high';
-      const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
-      const findingSummary = agg.findings.slice(0, 5).join('; ');
-
-      const ruleContent = `title: "Community Consensus: ${agg.findings[0]?.slice(0, 60) ?? skillName}"
-id: ATR-2026-DRAFT-${patternHash.slice(0, 8)}
-status: draft
-description: |
-  Auto-generated from ${agg.reportCount} independent threat reports for skill "${skillName}".
-  Avg risk score: ${Math.round(agg.avgRiskScore)}.
-  Findings: ${findingSummary.slice(0, 300)}
-author: "Threat Cloud Auto-Bridge"
-date: "${date}"
-schema_version: "0.1"
-detection_tier: community
-maturity: experimental
-severity: ${severity}
-tags:
-  category: skill-compromise
-  subcategory: community-consensus
-  confidence: high
-detection:
-  conditions:
-    - field: skill_manifest
-      operator: contains
-      value: "${skillName}"
-      description: "Skill reported by ${agg.reportCount} independent sources"
-  condition: any
-response:
-  actions: [alert, snapshot]`;
-
-      this.db.insertATRProposal({
-        patternHash,
-        ruleContent,
-        llmProvider: 'community-bridge',
-        llmModel: 'aggregation',
-        selfReviewVerdict: JSON.stringify({
-          approved: true,
-          source: 'skill-threat-bridge',
-          skillName,
-          reportCount: agg.reportCount,
-          avgRiskScore: Math.round(agg.avgRiskScore),
-        }),
-      });
-
+      // No LLM — add to blacklist directly, don't generate garbage rules
       log.info(
-        `Flywheel bridge: basic ATR proposal created for ${skillName} (${agg.reportCount} reports) / ` +
-          `飛輪橋接: 基礎 ATR 提案已建立 ${skillName}`
+        `Flywheel bridge: no LLM available, skipping rule generation for ${skillName} ` +
+          `(${agg.reportCount} reports, avg risk ${Math.round(agg.avgRiskScore)}). ` +
+          `Skill is already blacklisted via threat reports.`
       );
     }
   }

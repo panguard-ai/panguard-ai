@@ -243,6 +243,26 @@ export const migrations: readonly Migration[] = [
       `);
     },
   },
+  {
+    version: 9,
+    name: 'create_client_keys_table',
+    up: (db) => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS client_keys (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          client_id TEXT NOT NULL,
+          client_key_hash TEXT NOT NULL UNIQUE,
+          created_at TEXT NOT NULL DEFAULT (datetime('now')),
+          last_used_at TEXT,
+          revoked INTEGER NOT NULL DEFAULT 0,
+          revoked_at TEXT,
+          ip_address TEXT
+        );
+        CREATE INDEX IF NOT EXISTS idx_client_keys_hash ON client_keys(client_key_hash);
+        CREATE INDEX IF NOT EXISTS idx_client_keys_client_id ON client_keys(client_id);
+      `);
+    },
+  },
 ];
 
 /**
