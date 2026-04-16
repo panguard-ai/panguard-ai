@@ -394,6 +394,14 @@ export class DashboardServer {
           if (!res.headersSent) this.jsonResponse(res, { error: 'Internal error' }, 500);
         });
         break;
+      case '/api/agents':
+        this.handleAgentsApi(res).catch((err: unknown) => {
+          logger.error(
+            `handleAgentsApi error: ${err instanceof Error ? err.message : String(err)}`
+          );
+          if (!res.headersSent) this.jsonResponse(res, { error: 'Internal error' }, 500);
+        });
+        break;
       default:
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Not found' }));
@@ -898,6 +906,48 @@ export class DashboardServer {
     });
   }
 
+  private async handleAgentsApi(res: ServerResponse): Promise<void> {
+    type AgentInfo = {
+      id: string;
+      name: string;
+      detected: boolean;
+      alreadyConfigured: boolean;
+    };
+    let agents: AgentInfo[] = [];
+    try {
+      const mcpConfig: Record<string, unknown> = await import(
+        '@panguard-ai/panguard-mcp/config' as string
+      );
+      const detect = mcpConfig['detectPlatforms'] as
+        | (() => Promise<
+            Array<{
+              id: string;
+              name: string;
+              detected: boolean;
+              alreadyConfigured: boolean;
+            }>
+          >)
+        | undefined;
+      if (detect) {
+        const platforms = await detect();
+        agents = platforms.map((p) => ({
+          id: p.id,
+          name: p.name,
+          detected: p.detected,
+          alreadyConfigured: p.alreadyConfigured,
+        }));
+      }
+    } catch {
+      /* module not installed — return empty list */
+    }
+    this.jsonResponse(res, {
+      agents,
+      total: agents.length,
+      detected: agents.filter((a) => a.detected).length,
+      configured: agents.filter((a) => a.alreadyConfigured).length,
+    });
+  }
+
   // ---------------------------------------------------------------------------
   // WebSocket helpers
   // ---------------------------------------------------------------------------
@@ -1198,6 +1248,15 @@ body{font-family:'Inter','Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-se
 <button class="layer-btn" onclick="nav('settings')" id="l3-btn">Setup</button>
 </div>
 </div>
+</div>
+
+<!-- AI Agents (platforms detected) -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:10px">
+<div class="st" style="margin-bottom:0" data-i18n="ag_title">AI Agents</div>
+<span style="font-size:11px;color:var(--tm);font-weight:500" id="ag-summary">--</span>
+</div>
+<div id="ag-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-bottom:20px">
+<div class="empty" id="ag-empty" style="grid-column:1/-1"><span class="spin"></span> Detecting platforms...</div>
 </div>
 
 <!-- Runtime Protection Live Feed -->
@@ -1656,7 +1715,8 @@ var t=document.getElementById('toast');
 t.innerHTML='<span style="color:var(--ok);font-weight:700">Your AI agents are now protected</span>';
 t.classList.add('show');setTimeout(function(){t.classList.remove('show')},4000);
 }
-function loadInitData(){af('/api/status').then(function(r){return r.json()}).then(uS).catch(function(){});af('/api/rules').then(function(r){return r.json()}).then(function(d){if(d.atr!==undefined)document.getElementById('v-atr').textContent=d.atr}).catch(function(){});ldProxyVerdicts();ldRecActions()}
+function ldAgents(){af('/api/agents').then(function(r){return r.json()}).then(function(d){var grid=document.getElementById('ag-grid');var sum=document.getElementById('ag-summary');if(!grid)return;grid.innerHTML='';var ags=d.agents||[];if(ags.length===0){grid.innerHTML='<div class="empty" style="grid-column:1/-1;color:var(--tm)">'+(lang==='zh'?'\u672a\u4fa6\u6e2c\u5230\u5e73\u53f0':'No platforms detected')+'</div>';if(sum)sum.textContent='0 / 0';return}var detectedN=d.detected||0;var configuredN=d.configured||0;if(sum)sum.textContent=detectedN+' / '+ags.length+(lang==='zh'?' \u5df2\u4fa6\u6e2c':' detected')+(configuredN>0?' \u00b7 '+configuredN+(lang==='zh'?' \u5df2\u914d\u7f6e':' configured'):'');ags.forEach(function(a){var dotColor=a.detected?'var(--ok)':'var(--tm)';var nameColor=a.detected?'var(--t1)':'var(--tm)';var cfgBadge=a.alreadyConfigured?'<span style="font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(139,154,142,0.15);color:var(--sage);margin-left:auto">'+(lang==='zh'?'\u5df2\u914d\u7f6e':'Configured')+'</span>':'';var card=document.createElement('div');card.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--s1)';card.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:'+dotColor+';flex-shrink:0"></span><span style="font-size:12px;color:'+nameColor+';font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.name||a.id||'')+'</span>'+cfgBadge;grid.appendChild(card)})}).catch(function(){var grid=document.getElementById('ag-grid');if(grid)grid.innerHTML='<div class="empty" style="grid-column:1/-1;color:var(--bad)">Failed to load agents</div>'})}
+function loadInitData(){af('/api/status').then(function(r){return r.json()}).then(uS).catch(function(){});af('/api/rules').then(function(r){return r.json()}).then(function(d){if(d.atr!==undefined)document.getElementById('v-atr').textContent=d.atr}).catch(function(){});ldProxyVerdicts();ldRecActions();ldAgents()}
 (function(){
 var bar=document.getElementById('init-bar');
 // Always connect WebSocket immediately, regardless of welcome state
