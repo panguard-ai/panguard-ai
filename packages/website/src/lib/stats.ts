@@ -23,7 +23,7 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.4.19',
+  cliVersion: '1.5.2',
   atrRules: 113,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 17,
@@ -158,7 +158,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-04-16',
+  lastUpdated: '2026-04-17',
 } as const;
 
 export type Stats = typeof STATS;
