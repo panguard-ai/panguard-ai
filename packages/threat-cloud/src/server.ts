@@ -296,21 +296,56 @@ export class ThreatCloudServer {
     const publicPaths = new Set(['/health', '/api/stats', '/api/metrics', '/api/clients/register']);
     const isPublicRead =
       publicPaths.has(pathname) || (pathname === '/api/rules' && req.method === 'GET');
+    // Track the role that authenticated this request so route handlers can
+    // enforce scope (e.g. L5 partner endpoints only accept role=partner|admin).
+    let authRole: 'admin' | 'static' | 'client-guard' | 'client-partner' | 'anonymous' = 'anonymous';
     if (!isPublicRead && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
       const isValidApiKey = this.config.apiKeys.includes(token);
       const isAdminKey = this.config.adminApiKey ? token === this.config.adminApiKey : false;
-      const isValidClientKey =
-        !isValidApiKey && !isAdminKey && token.length > 0
-          ? this.db.validateClientKey(token)
-          : false;
-      if (!isValidApiKey && !isAdminKey && !isValidClientKey) {
+      let clientKeyInfo: { clientId: string; role: string } | null = null;
+      if (!isValidApiKey && !isAdminKey && token.length > 0) {
+        clientKeyInfo = this.db.getClientKeyInfo(token);
+        if (clientKeyInfo) this.db.validateClientKey(token); // bump last_used_at
+      }
+      if (!isValidApiKey && !isAdminKey && !clientKeyInfo) {
         this.sendJson(res, 401, { ok: false, error: 'Invalid API key', request_id: requestId });
         log.info('request', {
           method: req.method,
           path: rawPathname,
           status: 401,
+          duration_ms: Date.now() - startTime,
+          client_ip: clientIP,
+          request_id: requestId,
+        });
+        return;
+      }
+      authRole = isAdminKey
+        ? 'admin'
+        : isValidApiKey
+          ? 'static'
+          : clientKeyInfo?.role === 'partner'
+            ? 'client-partner'
+            : 'client-guard';
+    }
+
+    // L5 partner-sync: /api/atr-rules/live is role-gated. Only admin or
+    // partner-tier client keys can reach it. Guard auto-provisioned keys
+    // are scoped to telemetry upload only; they must NOT be able to exfiltrate
+    // TC crystallization data.
+    if (pathname === '/api/atr-rules/live' && req.method === 'GET') {
+      if (authRole !== 'admin' && authRole !== 'static' && authRole !== 'client-partner') {
+        this.sendJson(res, 403, {
+          ok: false,
+          error: 'Partner key required for L5 live-sync endpoint',
+          docs: 'https://agentthreatrule.org/partner-sync',
+          request_id: requestId,
+        });
+        log.info('request', {
+          method: req.method,
+          path: rawPathname,
+          status: 403,
           duration_ms: Date.now() - startTime,
           client_ip: clientIP,
           request_id: requestId,
@@ -379,9 +414,25 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/atr-rules/live':
+          // L5 runtime sync — public, cacheable, partner-facing alias of /api/rules
+          // scoped to confirmed ATR rules only (source IN atr, atr-community).
+          // Accepts ?since=<ISO> for incremental pulls; responds with ETag +
+          // Last-Modified so partners can cheap-poll every N minutes.
+          if (req.method === 'GET') {
+            const u = new URL(url, `http://localhost:${this.config.port}`);
+            if (!u.searchParams.has('source')) {
+              u.searchParams.set('source', 'atr');
+            }
+            this.handleGetRules(u.pathname + '?' + u.searchParams.toString(), res, req);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/rules':
           if (req.method === 'GET') {
-            this.handleGetRules(url, res);
+            this.handleGetRules(url, res, req);
           } else if (req.method === 'POST') {
             if (!this.checkAdminAuth(req)) {
               this.sendJson(res, 403, {
@@ -509,6 +560,21 @@ export class ThreatCloudServer {
           }
           if (req.method === 'POST') {
             await this.handleClientKeyRevoke(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/admin/partner-keys':
+          // L5 partner provisioning. Admin-only. Issues a partner-tier
+          // client key that can access /api/atr-rules/live. Raw key is
+          // returned exactly once — the caller must store it.
+          if (!this.checkAdminAuth(req)) {
+            this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+            break;
+          }
+          if (req.method === 'POST') {
+            await this.handlePartnerKeyIssue(req, res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -967,7 +1033,7 @@ export class ThreatCloudServer {
   }
 
   /** GET /api/rules?since=<ISO>&category=<cat>&severity=<sev>&source=<src> */
-  private handleGetRules(url: string, res: ServerResponse): void {
+  private handleGetRules(url: string, res: ServerResponse, req?: IncomingMessage): void {
     const params = new URL(url, `http://localhost:${this.config.port}`).searchParams;
     const since = params.get('since');
     const filters = {
@@ -983,7 +1049,33 @@ export class ThreatCloudServer {
       ? this.db.getRulesSince(since, filters)
       : this.db.getAllRules(5000, filters);
     const ruleList = Array.isArray(rules) ? rules : [];
-    this.sendJson(res, 200, { ok: true, data: ruleList, meta: { total: ruleList.length } });
+
+    // L5 runtime sync support: ETag + Last-Modified so partners can cheap-poll.
+    // ETag = hash of (count + latest publishedAt) — cheap and changes when content does.
+    // Last-Modified = max(publishedAt) in result set.
+    let latestPublishedAt = '';
+    for (const r of ruleList) {
+      const p = typeof r.publishedAt === 'string' ? r.publishedAt : '';
+      if (p > latestPublishedAt) latestPublishedAt = p;
+    }
+    const etag = `W/"${ruleList.length}-${latestPublishedAt}"`;
+    res.setHeader('ETag', etag);
+    if (latestPublishedAt) {
+      try {
+        res.setHeader('Last-Modified', new Date(latestPublishedAt).toUTCString());
+      } catch {
+        /* ignore malformed date */
+      }
+    }
+
+    const ifNoneMatch = req?.headers['if-none-match'];
+    if (ifNoneMatch && ifNoneMatch === etag) {
+      res.writeHead(304);
+      res.end();
+      return;
+    }
+
+    this.sendJson(res, 200, { ok: true, data: ruleList, meta: { total: ruleList.length, etag } });
   }
 
   /** POST /api/rules - Publish rules (single or batch) */
@@ -1398,6 +1490,58 @@ export class ThreatCloudServer {
     );
 
     this.sendJson(res, 200, { ok: true, data: { revoked } });
+  }
+
+  /**
+   * Admin-only: issue a partner-tier client key for L5 live-sync access.
+   * Body: { partnerName: string, issuedBy?: string }
+   * Returns raw key once — never retrievable again.
+   */
+  private async handlePartnerKeyIssue(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readBody(req);
+    if (!body) {
+      this.sendJson(res, 400, { ok: false, error: 'Request body required' });
+      return;
+    }
+    let parsed: { partnerName?: string; issuedBy?: string };
+    try {
+      parsed = JSON.parse(body);
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid JSON' });
+      return;
+    }
+    const partnerName = typeof parsed.partnerName === 'string' ? parsed.partnerName.trim() : '';
+    // Slug-like validation — no spaces, no colons (we already use `partner:` prefix internally)
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{1,63}$/.test(partnerName)) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'partnerName must be 2-64 chars, alphanumeric + dash/underscore only',
+      });
+      return;
+    }
+    const issuedBy = typeof parsed.issuedBy === 'string' ? parsed.issuedBy.slice(0, 64) : 'admin';
+
+    const { clientKey } = this.db.registerPartnerKey(partnerName, issuedBy);
+    const clientIP = req.socket.remoteAddress ?? 'unknown';
+    this.db.audit.logAction(
+      'admin',
+      'partner_key.issue',
+      'client_key',
+      `partner:${partnerName}`,
+      { issuedBy },
+      clientIP
+    );
+
+    // The key is returned exactly once. The caller MUST store it.
+    this.sendJson(res, 201, {
+      ok: true,
+      data: {
+        partnerName,
+        clientId: `partner:${partnerName}`,
+        clientKey,
+        note: 'Store this key now. It will not be retrievable again. Use as `Authorization: Bearer <key>` header on /api/atr-rules/live.',
+      },
+    });
   }
 
   private async handlePostSkillThreat(req: IncomingMessage, res: ServerResponse): Promise<void> {

@@ -263,6 +263,21 @@ export const migrations: readonly Migration[] = [
       `);
     },
   },
+  {
+    version: 10,
+    name: 'add_client_key_role_column',
+    up: (db) => {
+      // Role differentiates auto-provisioned Guard client keys (role='guard')
+      // from manually-issued partner keys (role='partner') that can access
+      // L5 live-sync endpoints. Partner keys are issued by admin via
+      // /api/admin/partner-keys.
+      const cols = db.prepare("PRAGMA table_info(client_keys)").all() as Array<{ name: string }>;
+      if (!cols.some((c) => c.name === 'key_role')) {
+        db.exec("ALTER TABLE client_keys ADD COLUMN key_role TEXT NOT NULL DEFAULT 'guard'");
+      }
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_client_keys_role ON client_keys(key_role);`);
+    },
+  },
 ];
 
 /**

@@ -2113,6 +2113,38 @@ export class ThreatCloudDB {
     return true;
   }
 
+  /**
+   * Look up role + clientId for a raw client key. Returns null if invalid/revoked.
+   * Does NOT update last_used_at (caller should use validateClientKey for that).
+   * Used by L5 partner-sync endpoints to enforce role-based access.
+   */
+  getClientKeyInfo(rawKey: string): { clientId: string; role: string } | null {
+    const hash = createHash('sha256').update(rawKey).digest('hex');
+    const row = this.db
+      .prepare(
+        'SELECT client_id as clientId, COALESCE(key_role, ?) as role FROM client_keys WHERE client_key_hash = ? AND revoked = 0'
+      )
+      .get('guard', hash) as { clientId: string; role: string } | undefined;
+    return row ?? null;
+  }
+
+  /**
+   * Issue a partner key. Partner keys are manually issued by admin and can
+   * access L5 live-sync endpoints (e.g. /api/atr-rules/live). Returns the
+   * raw key once — caller must store it securely.
+   */
+  registerPartnerKey(partnerName: string, issuedBy: string): { clientKey: string } {
+    const clientId = `partner:${partnerName}`;
+    const clientKey = randomUUID();
+    const hash = createHash('sha256').update(clientKey).digest('hex');
+    this.db
+      .prepare(
+        'INSERT INTO client_keys (client_id, client_key_hash, ip_address, key_role) VALUES (?, ?, ?, ?)'
+      )
+      .run(clientId, hash, `issued-by:${issuedBy}`, 'partner');
+    return { clientKey };
+  }
+
   /** Revoke all keys for a client. Returns number of keys revoked. */
   revokeClientKey(clientId: string): number {
     const result = this.db
