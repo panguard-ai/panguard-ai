@@ -1142,16 +1142,18 @@ export class ThreatCloudDB {
 
   /** Promote proposals to rules based on community consensus and/or LLM approval / 推廣提案為規則 */
   promoteConfirmedProposals(): number {
-    // Path 1: LLM approved (any status with approved verdict)
-    // Path 2: Community consensus (3+ confirmations, NO LLM required)
+    // Path 1: LLM approved via self-review (JSON verdict with "approved":true)
+    // Path 2: Community consensus (3+ confirmations, no LLM required)
     //   — This ensures the flywheel works even without ANTHROPIC_API_KEY
-    // Path 3: LLM approved + community confirmed (highest confidence)
+    // Path 3: Admin manually approved via dashboard
+    //   (status='approved' set by admin-approve endpoint; verdict stored as
+    //    literal 'admin-approved' or a similar opaque marker — not JSON)
     const proposals = this.db
       .prepare(
         `
       SELECT pattern_hash, rule_content, llm_review_verdict, confirmations, status
       FROM atr_proposals
-      WHERE status IN ('confirmed', 'pending')
+      WHERE status IN ('confirmed', 'pending', 'approved')
         AND status != 'rejected'
         AND (
           -- Path 1: LLM approved
@@ -1159,6 +1161,12 @@ export class ThreatCloudDB {
           OR
           -- Path 2: Community consensus (3+ confirmations, even without LLM)
           (confirmations >= 3)
+          OR
+          -- Path 3: Admin dashboard approval (status promoted to 'approved'
+          -- by a human reviewer; the verdict field may be a plain marker
+          -- like 'admin-approved' rather than a JSON blob, so trust the
+          -- status column)
+          (status = 'approved')
         )
     `
       )
@@ -1197,6 +1205,43 @@ export class ThreatCloudDB {
     }
 
     return moved;
+  }
+
+  /**
+   * Self-heal: find proposals that are status='promoted' but have no
+   * corresponding rule in the rules table, and re-upsert them. This
+   * handles historical bugs where promoteCanaryRules set the status but
+   * the upsertRule call failed silently (e.g., during a prior schema or
+   * constraint mismatch). Idempotent — safe to run every promotion cycle.
+   * Returns the number of rules restored.
+   */
+  healOrphanedPromotedProposals(): number {
+    const orphans = this.db
+      .prepare(
+        `
+        SELECT p.pattern_hash, p.rule_content, p.updated_at
+        FROM atr_proposals p
+        LEFT JOIN rules r ON r.rule_id = p.pattern_hash
+        WHERE p.status = 'promoted' AND r.rule_id IS NULL
+      `
+      )
+      .all() as Array<{ pattern_hash: string; rule_content: string; updated_at: string }>;
+
+    let healed = 0;
+    for (const o of orphans) {
+      try {
+        this.upsertRule({
+          ruleId: o.pattern_hash,
+          ruleContent: o.rule_content,
+          publishedAt: o.updated_at || new Date().toISOString(),
+          source: 'atr-community',
+        });
+        healed++;
+      } catch {
+        /* skip individual errors — next cycle will retry */
+      }
+    }
+    return healed;
   }
 
   /** Canary period in milliseconds (24 hours) / Canary 觀察期（24 小時） */

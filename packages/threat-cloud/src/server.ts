@@ -191,6 +191,14 @@ export class ThreatCloudServer {
               );
             }
 
+            // Step 1c: Self-heal orphaned promoted proposals whose upsertRule
+            // call failed during a previous cycle (status=promoted but no
+            // corresponding row in rules table). Idempotent.
+            const healed = this.db.healOrphanedPromotedProposals();
+            if (healed > 0) {
+              log.info(`Self-heal: re-upserted ${healed} orphaned promoted proposal(s)`);
+            }
+
             // Step 2: Retry LLM review for proposals that haven't been reviewed yet
             if (this.llmReviewer?.isAvailable()) {
               void this.retryPendingReviews().catch((err) => {
