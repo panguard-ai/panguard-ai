@@ -166,8 +166,9 @@ export function scanCommand(): Command {
           if (!options.verbose) setLogLevel('silent');
           try {
             const { execFileSync } = await import('node:child_process');
-            const { resolve: resolvePath } = await import('node:path');
-            const { existsSync: pathExists } = await import('node:fs');
+            const { resolve: resolvePath, join: joinPath } = await import('node:path');
+            const { existsSync: pathExists, readFileSync: readFile } = await import('node:fs');
+            const { homedir } = await import('node:os');
 
             // Validate and resolve path
             const resolvedPath = resolvePath(path);
@@ -199,9 +200,26 @@ export function scanCommand(): Command {
               atrArgs.unshift('-y', 'agent-threat-rules@latest');
             }
 
+            // Pass TC client key (provisioned by `pga up`) to ATR via env var.
+            // ATR reads process.env.TC_API_KEY in tc-reporter.ts; no ATR code
+            // change needed (keeps ATR independent of PanGuard paths).
+            const scanEnv: NodeJS.ProcessEnv = { ...process.env };
+            if (!scanEnv['TC_API_KEY']) {
+              const clientKeyPath = joinPath(homedir(), '.panguard', 'tc-client-key');
+              if (pathExists(clientKeyPath)) {
+                try {
+                  const key = readFile(clientKeyPath, 'utf-8').trim();
+                  if (key.length > 0) scanEnv['TC_API_KEY'] = key;
+                } catch {
+                  /* ignore — scan still works without TC auth */
+                }
+              }
+            }
+
             const result = execFileSync(atrBin, atrArgs, {
               stdio: ['inherit', 'pipe', 'inherit'],
               timeout: 60_000,
+              env: scanEnv,
             });
             process.stdout.write(result);
           } catch (err: unknown) {
