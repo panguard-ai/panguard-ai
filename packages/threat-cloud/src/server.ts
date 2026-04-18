@@ -523,6 +523,25 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/atr-proposals/from-payload':
+          // External red-team input (garak, human pentest, etc.) — takes a
+          // raw attack payload, runs the TC drafter tool-use loop, returns
+          // the generated ATR YAML. Admin or static key only; partner keys
+          // intentionally cannot call this (LLM cost management).
+          if (req.method === 'POST') {
+            if (authRole !== 'admin' && authRole !== 'static') {
+              this.sendJson(res, 403, {
+                ok: false,
+                error: 'Admin or static API key required for drafter endpoint',
+              });
+              break;
+            }
+            await this.handleDraftProposalFromPayload(req, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/atr-feedback':
           if (req.method === 'POST') {
             await this.handlePostATRFeedback(req, res);
@@ -1304,6 +1323,98 @@ export class ThreatCloudServer {
     const limit = Math.min(500, Math.max(1, parseInt(params.get('limit') ?? '50', 10)));
     const threats = this.db.getSkillThreats(limit);
     this.sendJson(res, 200, { ok: true, data: threats });
+  }
+
+  /**
+   * POST /api/atr-proposals/from-payload — drafter endpoint for external
+   * red-team input. Runs the TC tool-use drafter on the supplied attack
+   * payload and returns the generated ATR YAML. Admin or static key only.
+   */
+  private async handleDraftProposalFromPayload(
+    req: IncomingMessage,
+    res: ServerResponse
+  ): Promise<void> {
+    if (!this.llmReviewer?.isAvailable()) {
+      this.sendJson(res, 503, {
+        ok: false,
+        error:
+          'Drafter unavailable (LLM reviewer not configured — check ANTHROPIC_API_KEY and billing)',
+      });
+      return;
+    }
+
+    const body = await this.readBody(req);
+    if (!body) {
+      this.sendJson(res, 400, { ok: false, error: 'Request body required' });
+      return;
+    }
+    let parsed: {
+      payload?: string;
+      probe?: string;
+      detector?: string;
+      targetModel?: string;
+      partnerName?: string;
+      severity?: string;
+    };
+    try {
+      parsed = JSON.parse(body);
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid JSON' });
+      return;
+    }
+
+    const payload = typeof parsed.payload === 'string' ? parsed.payload : '';
+    if (payload.length < 16) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'payload required (min 16 chars, max 8000 — longer prompts are truncated)',
+      });
+      return;
+    }
+    if (payload.length > 8000) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'payload too long (max 8000 chars)',
+      });
+      return;
+    }
+
+    const drafterResult = await this.llmReviewer.draftRuleFromPayload(payload, {
+      probe: typeof parsed.probe === 'string' ? parsed.probe.slice(0, 128) : undefined,
+      detector: typeof parsed.detector === 'string' ? parsed.detector.slice(0, 128) : undefined,
+      targetModel:
+        typeof parsed.targetModel === 'string' ? parsed.targetModel.slice(0, 128) : undefined,
+      partnerName:
+        typeof parsed.partnerName === 'string' ? parsed.partnerName.slice(0, 64) : undefined,
+      severity: typeof parsed.severity === 'string' ? parsed.severity.slice(0, 16) : undefined,
+    });
+
+    if (!drafterResult) {
+      // Not an error per se — drafter may legitimately decline (NO_THREATS_FOUND,
+      // duplicate of existing coverage, quality gate failure). Surface that as
+      // 200 + drafted:false so the caller can distinguish from auth/input errors.
+      this.sendJson(res, 200, {
+        ok: true,
+        data: {
+          drafted: false,
+          reason:
+            'Drafter declined (NO_THREATS_FOUND, duplicate of existing rule, or failed quality gate / self-test — see server logs for specifics)',
+        },
+      });
+      return;
+    }
+
+    this.sendJson(res, 201, {
+      ok: true,
+      data: {
+        drafted: true,
+        patternHash: drafterResult.patternHash,
+        ruleContent: drafterResult.ruleContent,
+        toolCalls: drafterResult.toolCalls,
+        nextSteps:
+          'Proposal entered atr_proposals as pending. LLM self-review runs async; admin-approve or community consensus moves it to canary; safety gate + auto-merge publish to npm.',
+      },
+    });
   }
 
   /** POST /api/atr-proposals - Submit or confirm an ATR rule proposal */

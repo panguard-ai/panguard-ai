@@ -10,6 +10,7 @@
  */
 
 import * as https from 'node:https';
+import { createHash } from 'node:crypto';
 import { load as parseYaml } from 'js-yaml';
 import {
   parseATRRule,
@@ -923,6 +924,165 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
     }
 
     return results;
+  }
+
+  /**
+   * Draft a full ATR YAML rule from a raw attack payload supplied by an
+   * external red-team source (e.g. NVIDIA garak). Same drafter pipeline as
+   * analyzeSkills but the input is the attack prompt itself rather than a
+   * skill's tool descriptions. Returns the drafted proposal or null when
+   * the drafter declined to write a rule (NO_THREATS_FOUND, duplicate of
+   * existing coverage, failed quality gate, failed self-test).
+   *
+   * Callers:
+   *  - POST /api/atr-proposals/from-payload (partner / admin auth)
+   *
+   * Always inserts the resulting proposal into atr_proposals so the normal
+   * canary → auto-merge → npm publish pipeline can take over.
+   */
+  async draftRuleFromPayload(
+    payload: string,
+    meta: {
+      probe?: string;
+      detector?: string;
+      targetModel?: string;
+      partnerName?: string;
+      severity?: string;
+    }
+  ): Promise<{ patternHash: string; ruleContent: string; toolCalls: number } | null> {
+    // Bound input to keep the drafter prompt under token budget. Longer prompts
+    // than this are unusual for prompt-injection payloads and just waste tokens.
+    const boundedPayload = payload.slice(0, 8000);
+
+    const probe = meta.probe || 'unknown-probe';
+    const detector = meta.detector || 'unknown-detector';
+    const targetModel = meta.targetModel || 'unspecified-model';
+    const partner = meta.partnerName || 'external-red-team';
+
+    const userMessage = [
+      `Red-team finding from ${partner}. The attack prompt below bypassed ${targetModel} via garak probe ${probe} (detector: ${detector}).`,
+      '',
+      'Draft an ATR rule that detects this attack class at the agent-layer boundary (tool call args, skill content, user_input field, MCP tool descriptions). The rule should generalise beyond the literal prompt — target the technique, not the specific words.',
+      '',
+      'Follow STEP 0 (de-duplication via grep_existing_rules) before drafting. If an existing rule already covers this attack class with equivalent patterns, output NO_THREATS_FOUND.',
+      '',
+      `Attack prompt (${boundedPayload.length} chars):`,
+      '```',
+      boundedPayload,
+      '```',
+      '',
+      `Severity hint from partner: ${meta.severity || 'high'}. Use your judgement — downgrade to medium if the payload is a low-impact jailbreak that does not request sensitive operations.`,
+    ].join('\n');
+
+    let finalText = '';
+    let toolCalls = 0;
+    try {
+      const result = await this.callAnthropicWithTools(LLMReviewer.ATR_DRAFTER_PROMPT, userMessage);
+      finalText = result.finalText;
+      toolCalls = result.toolCalls;
+    } catch (err) {
+      console.error(
+        `[draftRuleFromPayload] LLM call failed: ${err instanceof Error ? err.message : String(err)}`
+      );
+      return null;
+    }
+
+    if (!finalText || /NO_THREATS_FOUND/.test(finalText)) {
+      console.log(`[draftRuleFromPayload] NO_THREATS_FOUND or empty response (probe=${probe})`);
+      return null;
+    }
+
+    // Extract YAML block (with unclosed-fence fallback — same as analyzeSkills)
+    let yamlBlocks = finalText.match(/```yaml\n([\s\S]*?)```/g);
+    if (!yamlBlocks || yamlBlocks.length === 0) {
+      const unclosed = finalText.match(/```yaml\n([\s\S]*?)$/);
+      if (unclosed) yamlBlocks = [unclosed[0] + '\n```'];
+    }
+    if (!yamlBlocks || yamlBlocks.length === 0) {
+      console.log(
+        `[draftRuleFromPayload] No YAML block in response. First 200 chars: ${finalText.slice(0, 200)}`
+      );
+      return null;
+    }
+
+    let ruleContent = yamlBlocks[0]
+      .replace(/^```yaml\n/, '')
+      .replace(/```$/, '')
+      .trim();
+
+    // Strip any (?i) prefix the LLM may have sneaked in despite the prompt
+    const regexFieldMatch = ruleContent.match(/value:\s*'(\(\?i\))([^']*)'/);
+    if (regexFieldMatch) {
+      const rawPattern = `'(?i)${regexFieldMatch[2]}'`;
+      const jsPattern = `'${regexFieldMatch[2]}'`;
+      ruleContent = ruleContent.replace(rawPattern, jsPattern);
+    }
+
+    // RFC-001 quality gate
+    let gateResult: QualityGateResult;
+    try {
+      const metadata = parseATRRule(ruleContent);
+      const enriched = { ...metadata, llmGenerated: true };
+      gateResult = validateRuleMeetsStandard(enriched, 'experimental');
+    } catch (parseErr) {
+      console.log(
+        `[draftRuleFromPayload] Rule rejected — cannot parse: ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`
+      );
+      return null;
+    }
+    if (!gateResult.passed) {
+      console.log(
+        `[draftRuleFromPayload] Rejected by quality gate: ${gateResult.issues.slice(0, 3).join('; ')}`
+      );
+      return null;
+    }
+
+    // Self-test: rule's own regex must catch its own TPs and miss its own TNs.
+    const selfTest = selfTestRule(ruleContent);
+    if (!selfTest.passed) {
+      console.log(
+        `[draftRuleFromPayload] Rejected by self-test: TP ${selfTest.tpMatched}/${selfTest.tpTotal}, TN FP ${selfTest.tnMatched}/${selfTest.tnTotal}. ${selfTest.failureReasons.slice(0, 2).join(' | ')}`
+      );
+      return null;
+    }
+
+    const patternHash = createHash('sha256').update(ruleContent).digest('hex').slice(0, 16);
+
+    // Idempotent: if a previous submission produced the same YAML, skip insert.
+    if (this.db.getATRProposalByHash(patternHash)) {
+      return { patternHash, ruleContent, toolCalls };
+    }
+
+    this.db.insertATRProposal({
+      patternHash,
+      ruleContent,
+      llmProvider: 'garak-drafter',
+      llmModel: this.model,
+      selfReviewVerdict: JSON.stringify({
+        approved: true,
+        source: 'external-red-team',
+        partner,
+        probe,
+        detector,
+        targetModel,
+        toolCalls,
+        provenance: 'llm-generated-from-payload',
+        gateWarnings: gateResult.warnings,
+      }),
+    });
+
+    // Fire-and-forget second-opinion review (same as analyzeSkills)
+    void this.reviewProposal(patternHash, ruleContent).catch((err: unknown) => {
+      console.error(
+        `[draftRuleFromPayload] review failed for ${patternHash}:`,
+        err instanceof Error ? err.message : String(err)
+      );
+    });
+
+    console.log(
+      `[draftRuleFromPayload] OK: patternHash=${patternHash} partner=${partner} probe=${probe} toolCalls=${toolCalls}`
+    );
+    return { patternHash, ruleContent, toolCalls };
   }
 
   /**
