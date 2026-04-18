@@ -271,7 +271,7 @@ export const migrations: readonly Migration[] = [
       // from manually-issued partner keys (role='partner') that can access
       // L5 live-sync endpoints. Partner keys are issued by admin via
       // /api/admin/partner-keys.
-      const cols = db.prepare("PRAGMA table_info(client_keys)").all() as Array<{ name: string }>;
+      const cols = db.prepare('PRAGMA table_info(client_keys)').all() as Array<{ name: string }>;
       if (!cols.some((c) => c.name === 'key_role')) {
         db.exec("ALTER TABLE client_keys ADD COLUMN key_role TEXT NOT NULL DEFAULT 'guard'");
       }

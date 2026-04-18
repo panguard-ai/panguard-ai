@@ -298,7 +298,8 @@ export class ThreatCloudServer {
       publicPaths.has(pathname) || (pathname === '/api/rules' && req.method === 'GET');
     // Track the role that authenticated this request so route handlers can
     // enforce scope (e.g. L5 partner endpoints only accept role=partner|admin).
-    let authRole: 'admin' | 'static' | 'client-guard' | 'client-partner' | 'anonymous' = 'anonymous';
+    let authRole: 'admin' | 'static' | 'client-guard' | 'client-partner' | 'anonymous' =
+      'anonymous';
     if (!isPublicRead && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
