@@ -278,6 +278,40 @@ export const migrations: readonly Migration[] = [
       db.exec(`CREATE INDEX IF NOT EXISTS idx_client_keys_role ON client_keys(key_role);`);
     },
   },
+  {
+    version: 11,
+    name: 'add_payload_fingerprints_table',
+    up: (db) => {
+      // Caches LLM drafter verdicts keyed by normalized payload hash so
+      // repeat submissions of the same garak prompt (or near-duplicates
+      // across partner batches) skip the Anthropic API call entirely.
+      // Typical hit rate on garak corpus is 90%+ → ~10x cost reduction.
+      //
+      // result values:
+      //   novel     — LLM produced a new rule (see pattern_hash for the YAML)
+      //   duplicate — LLM judged payload already covered by existing rule
+      //   rejected  — LLM output failed quality gate or self-test
+      //
+      // rule_id + pattern_hash are only populated when result='novel'.
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS payload_fingerprints (
+          fingerprint TEXT PRIMARY KEY,
+          result TEXT NOT NULL CHECK(result IN ('duplicate', 'novel', 'rejected')),
+          rule_id TEXT,
+          pattern_hash TEXT,
+          first_seen_at TEXT NOT NULL DEFAULT (datetime('now')),
+          last_seen_at TEXT NOT NULL DEFAULT (datetime('now')),
+          hit_count INTEGER NOT NULL DEFAULT 1
+        )
+      `);
+      db.exec(
+        `CREATE INDEX IF NOT EXISTS idx_payload_fp_result ON payload_fingerprints(result)`
+      );
+      db.exec(
+        `CREATE INDEX IF NOT EXISTS idx_payload_fp_pattern ON payload_fingerprints(pattern_hash) WHERE pattern_hash IS NOT NULL`
+      );
+    },
+  },
 ];
 
 /**

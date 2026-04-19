@@ -228,4 +228,50 @@ detection:
       expect(noKey.isAvailable()).toBe(false);
     });
   });
+
+  // -------------------------------------------------------------------------
+  // Payload fingerprint dedup — prevents re-drafting for identical or
+  // near-identical payloads. No LLM API call on fingerprint cache hit.
+  // -------------------------------------------------------------------------
+  describe('payload fingerprint dedup', () => {
+    it('roundtrips a novel fingerprint with patternHash', () => {
+      db.recordPayloadFingerprint('test-fingerprint-1', 'novel', {
+        patternHash: 'abc123',
+      });
+      const hit = db.getPayloadFingerprint('test-fingerprint-1');
+      expect(hit?.result).toBe('novel');
+      expect(hit?.patternHash).toBe('abc123');
+      expect(hit?.hitCount).toBe(1);
+    });
+
+    it('UPSERTs on repeat insert — increments hit_count not creates new row', () => {
+      db.recordPayloadFingerprint('fp-repeat', 'duplicate');
+      db.recordPayloadFingerprint('fp-repeat', 'duplicate');
+      db.recordPayloadFingerprint('fp-repeat', 'duplicate');
+      const hit = db.getPayloadFingerprint('fp-repeat');
+      expect(hit?.hitCount).toBe(3);
+      expect(hit?.result).toBe('duplicate');
+    });
+
+    it('returns null for unseen fingerprint', () => {
+      const hit = db.getPayloadFingerprint('never-seen-before');
+      expect(hit).toBeNull();
+    });
+
+    it('stats report novel / duplicate / rejected totals correctly', () => {
+      db.recordPayloadFingerprint('fp-novel-1', 'novel', { patternHash: 'h1' });
+      db.recordPayloadFingerprint('fp-novel-2', 'novel', { patternHash: 'h2' });
+      db.recordPayloadFingerprint('fp-dup-1', 'duplicate');
+      db.recordPayloadFingerprint('fp-dup-1', 'duplicate'); // hit_count=2
+      db.recordPayloadFingerprint('fp-rejected-1', 'rejected');
+
+      const stats = db.getPayloadFingerprintStats();
+      expect(stats.novel).toBe(2);
+      expect(stats.duplicate).toBe(1);
+      expect(stats.rejected).toBe(1);
+      expect(stats.total).toBe(4);
+      expect(stats.totalHits).toBe(5); // 1+1+2+1
+      expect(stats.cacheHits).toBe(1); // totalHits - total = 1 cache re-use
+    });
+  });
 });

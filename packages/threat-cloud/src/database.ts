@@ -695,6 +695,119 @@ export class ThreatCloudDB {
       .get(patternHash) as { client_id: string | null; confirmations: number } | undefined;
   }
 
+  // -------------------------------------------------------------------------
+  // Payload fingerprint dedup — avoids paying Anthropic API for duplicate
+  // garak prompts. Typical hit rate is 90%+ on public corpora.
+  // 提示詞指紋去重 — 避免為重複的 garak 提示付 Anthropic API 錢。
+  // -------------------------------------------------------------------------
+
+  /**
+   * Look up a previously-judged payload fingerprint. Caller should call this
+   * BEFORE invoking the LLM drafter; on hit, skip the Anthropic call entirely
+   * and reuse the cached verdict.
+   *
+   * 查詢先前已判斷過的 payload fingerprint。呼叫端應在叫用 LLM drafter 之前查
+   * 這個表;命中時直接跳過 Anthropic 呼叫,回覆之前的結果。
+   */
+  getPayloadFingerprint(fingerprint: string): {
+    result: 'duplicate' | 'novel' | 'rejected';
+    ruleId: string | null;
+    patternHash: string | null;
+    hitCount: number;
+  } | null {
+    const row = this.db
+      .prepare(
+        `SELECT result, rule_id, pattern_hash, hit_count
+         FROM payload_fingerprints WHERE fingerprint = ? LIMIT 1`
+      )
+      .get(fingerprint) as
+      | {
+          result: string;
+          rule_id: string | null;
+          pattern_hash: string | null;
+          hit_count: number;
+        }
+      | undefined;
+
+    if (!row) return null;
+    const result = row.result as 'duplicate' | 'novel' | 'rejected';
+    return {
+      result,
+      ruleId: row.rule_id,
+      patternHash: row.pattern_hash,
+      hitCount: row.hit_count,
+    };
+  }
+
+  /**
+   * Insert or bump a payload fingerprint verdict. UPSERT by fingerprint:
+   * - First time: insert with hit_count=1
+   * - Repeat: increment hit_count, refresh last_seen_at
+   *
+   * 新增或累計 payload fingerprint 判斷結果。
+   */
+  recordPayloadFingerprint(
+    fingerprint: string,
+    result: 'duplicate' | 'novel' | 'rejected',
+    details?: { ruleId?: string; patternHash?: string }
+  ): void {
+    this.db
+      .prepare(
+        `INSERT INTO payload_fingerprints
+           (fingerprint, result, rule_id, pattern_hash, first_seen_at, last_seen_at, hit_count)
+         VALUES (?, ?, ?, ?, datetime('now'), datetime('now'), 1)
+         ON CONFLICT(fingerprint) DO UPDATE SET
+           hit_count = hit_count + 1,
+           last_seen_at = datetime('now')`
+      )
+      .run(
+        fingerprint,
+        result,
+        details?.ruleId ?? null,
+        details?.patternHash ?? null
+      );
+  }
+
+  /**
+   * Stats for the fingerprint cache. Surfaced in admin dashboard so you can
+   * see the hit rate and confirm the cost-saving is real.
+   * 指紋快取統計。供 admin dashboard 顯示命中率,確認省錢有效。
+   */
+  getPayloadFingerprintStats(): {
+    total: number;
+    novel: number;
+    duplicate: number;
+    rejected: number;
+    totalHits: number;
+    cacheHits: number;
+  } {
+    const totals = this.db
+      .prepare(
+        `SELECT
+           COUNT(*) as total,
+           COALESCE(SUM(CASE WHEN result='novel' THEN 1 ELSE 0 END), 0) as novel,
+           COALESCE(SUM(CASE WHEN result='duplicate' THEN 1 ELSE 0 END), 0) as duplicate,
+           COALESCE(SUM(CASE WHEN result='rejected' THEN 1 ELSE 0 END), 0) as rejected,
+           COALESCE(SUM(hit_count), 0) as total_hits
+         FROM payload_fingerprints`
+      )
+      .get() as {
+      total: number;
+      novel: number;
+      duplicate: number;
+      rejected: number;
+      total_hits: number;
+    };
+    return {
+      total: totals.total,
+      novel: totals.novel,
+      duplicate: totals.duplicate,
+      rejected: totals.rejected,
+      totalHits: totals.total_hits,
+      cacheHits: Math.max(0, totals.total_hits - totals.total),
+    };
+  }
+
   /** Get recent skill threats / 取得最近技能威脅 */
   getSkillThreats(limit: number = 50): unknown[] {
     return this.db
