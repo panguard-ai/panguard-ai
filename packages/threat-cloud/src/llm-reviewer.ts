@@ -1010,6 +1010,21 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
       .replace(/```$/, '')
       .trim();
 
+    // Rewrite author line so the partner/source is visible on the shipped rule.
+    // The drafter prompt hardcodes 'ATR Threat Cloud Crystallization' as the
+    // author; replace it with the actual submitter so downstream consumers
+    // (npm, Cisco, etc.) can see who contributed each rule. Sanitise the partner
+    // string against YAML-breaking characters.
+    const safePartner = partner.replace(/[\r\n"'\\]/g, '').slice(0, 80);
+    const attributedAuthor =
+      safePartner === 'external-red-team' || !safePartner
+        ? 'ATR Community (via garak pipe)'
+        : `${safePartner} (via ATR garak pipe)`;
+    ruleContent = ruleContent.replace(
+      /^author:\s*["']ATR Threat Cloud Crystallization["']\s*$/m,
+      `author: "${attributedAuthor}"`
+    );
+
     // Strip any (?i) prefix the LLM may have sneaked in despite the prompt
     const regexFieldMatch = ruleContent.match(/value:\s*'(\(\?i\))([^']*)'/);
     if (regexFieldMatch) {
