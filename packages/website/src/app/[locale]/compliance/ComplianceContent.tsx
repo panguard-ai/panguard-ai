@@ -183,6 +183,33 @@ export default function ComplianceContent() {
         </FadeInUp>
       </SectionWrapper>
 
+      {/* -- 4 Framework Coverage (coming June 2026) -- */}
+      <SectionWrapper>
+        <SectionTitle
+          overline="COMPLIANCE ROADMAP"
+          title="4-framework compliance reporting"
+          subtitle="EU AI Act / Colorado AI Act / NIST AI RMF / ISO 42001 — launching June 2026"
+        />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14">
+          {['EU AI Act', 'Colorado AI Act', 'NIST AI RMF', 'ISO 42001'].map((framework, i) => (
+            <FadeInUp key={framework} delay={i * 0.08}>
+              <div className="bg-surface-2 rounded-xl border border-border p-6 text-center">
+                <p className="text-sm font-bold text-text-primary">{framework}</p>
+                <p className="text-xs text-text-muted mt-3">Mapping available June 2026</p>
+              </div>
+            </FadeInUp>
+          ))}
+        </div>
+        <FadeInUp delay={0.4}>
+          <div className="mt-10 max-w-2xl mx-auto bg-surface-2 rounded-xl border border-border p-6">
+            <p className="text-sm font-semibold text-text-primary">Enterprise Compliance</p>
+            <p className="text-xs text-text-muted mt-2">
+              SOC2 Type 1 in progress. Target Q3 2026 via Vanta engagement.
+            </p>
+          </div>
+        </FadeInUp>
+      </SectionWrapper>
+
       {/* -- Why OWASP Agentic, not traditional -- */}
       <SectionWrapper dark>
         <div className="grid lg:grid-cols-2 gap-12 items-center">
