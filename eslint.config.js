@@ -32,9 +32,9 @@ export default tseslint.config(
   },
   {
     ignores: [
-      'node_modules/**',
-      'dist/**',
-      'coverage/**',
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/coverage/**',
       '**/.next/**',
       '**/*.js',
       '**/*.mjs',
