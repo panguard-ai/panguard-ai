@@ -23,3 +23,13 @@ progress.md
 eslint.config.js
 vitest.config.ts
 Dockerfile.bak
+
+# SQLite databases — can be multi-GB, never belong in image context.
+# Without these, Railway / Docker build COPY step fails with "not found"
+# once the local DB grows past the build-context size limit.
+*.db
+*.db-shm
+*.db-wal
+**/*.db
+**/*.db-shm
+**/*.db-wal
