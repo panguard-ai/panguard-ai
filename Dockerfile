@@ -89,7 +89,7 @@ RUN echo '{"name":"panguard-api","version":"0.1.0","private":true,"type":"module
 # Step 3: Copy workspace packages into node_modules AFTER npm install
 # Strip workspace:* references from package.json (npm doesn't understand pnpm workspace protocol)
 RUN mkdir -p /standalone/node_modules/@panguard-ai && \
-    for pkg in core panguard-guard panguard-scan panguard-chat panguard-report panguard-trap panguard-web panguard-mcp panguard-skill-auditor; do \
+    for pkg in core scan-core panguard-guard panguard-scan panguard-chat panguard-report panguard-trap panguard-web panguard-mcp panguard-skill-auditor; do \
       mkdir -p /standalone/node_modules/@panguard-ai/$pkg && \
       cp -r packages/$pkg/dist /standalone/node_modules/@panguard-ai/$pkg/dist && \
       sed 's/"workspace:\*"/"*"/g' packages/$pkg/package.json > /standalone/node_modules/@panguard-ai/$pkg/package.json; \
