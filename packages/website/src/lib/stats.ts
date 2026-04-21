@@ -14,7 +14,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 110 ATR rules
+ *   agent-threat-rules/rules/                  -> 311 ATR rules
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -127,14 +127,14 @@ export const STATS = {
     lastCrawl: '2026-04-16',
   },
   /**
-   * Benchmark results (verified 2026-04-08)
+   * Benchmark results (verified 2026-04-22)
    * PINT: Invariant Labs adversarial corpus (850 samples)
    * SKILL.md: Real-world skill corpus (498 samples from ClawHub + OpenClaw + Skills.sh)
    * Garak: NVIDIA jailbreak corpus (666 samples)
    */
   benchmark: {
     pint: { recall: 61.4, precision: 99.6, samples: 850 },
-    skill: { recall: 96.9, precision: 100, fp: 0, samples: 498 },
+    skill: { recall: 100, precision: 97, fp: 0.20, samples: 498 },
     garak: { recall: 97.1, samples: 666 },
     wildFpRate: 0.48,
     wildSamples: 3_115,
@@ -155,7 +155,11 @@ export const STATS = {
   },
   /** Platform coverage */
   platform: {
-    layerCoverage: '6 of 7' as const,
+    layerCoverage: '5 of 7' as const,
+    /** L2 Audit, L3 Protect, L4 Detect, L5 Deceive, L6 Respond shipped today */
+    layersShipped: [2, 3, 4, 5, 6] as const,
+    /** L1 Discover (central inventory) + L7 Govern (compliance reporting + AIAM) — coming Q2/Q3 2026 */
+    layersComingSoon: [1, 7] as const,
     upstreamMerged: ['Microsoft AGT', 'Cisco AI Defense'] as const,
   },
   /**

@@ -37,8 +37,8 @@ export default function SecurityLayers() {
         title={isZh ? 'AI agent 防禦不是單點產品' : 'Agent defense is not a single product'}
         subtitle={
           isZh
-            ? '從 Discover 到 Govern 的 7 層堆疊。PanGuard 覆蓋 6 層，第 1、7 層 2026 Q2/Q3 補齊。'
-            : 'A 7-layer stack from Discover to Govern. PanGuard covers 6 layers today, with Layers 1 & 7 landing Q2/Q3 2026.'
+            ? '從 Discover 到 Govern 的 7 層堆疊。PanGuard 今天覆蓋 5 層(L2-L6),L1 Discover 2026 Q2 上線,L7 Govern 2026 Q3 上線。誠實標 gap，不假打勾。'
+            : 'A 7-layer stack from Discover to Govern. PanGuard ships 5 layers today (L2-L6). L1 Discover lands Q2 2026, L7 Govern Q3 2026. No fake checkmarks — gaps are marked openly.'
         }
       />
       <div className="max-w-4xl mx-auto mt-14">
