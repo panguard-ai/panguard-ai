@@ -83,7 +83,10 @@ function findPlaybooksDir(): string | undefined {
  * Initialize all engines, agents, and shared infrastructure for GuardEngine.
  * This replaces the constructor body of the old monolith.
  */
-export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEnginesResult {
+export async function initEngines(
+  config: GuardConfig,
+  llm: AnalyzeLLM | null
+): Promise<InitEnginesResult> {
   const baselinePath = join(config.dataDir, 'baseline.json');
   const baseline = loadBaseline(baselinePath);
 
@@ -185,7 +188,10 @@ export function initEngines(config: GuardConfig, llm: AnalyzeLLM | null): InitEn
   const reportAgent = new ReportAgent(join(config.dataDir, 'events.jsonl'), config.mode);
   const investigationEngine = new InvestigationEngine(baseline);
 
-  const threatCloud = new ThreatCloudClient(
+  // Auto-provision TC client key so a fresh `pga up` becomes a Threat Cloud sensor
+  // without requiring the user to pre-configure an API key. If the endpoint is
+  // unreachable or opt-out env vars are set, create() falls back to offline mode.
+  const threatCloud = await ThreatCloudClient.create(
     config.threatCloudEndpoint,
     config.dataDir,
     config.threatCloudApiKey

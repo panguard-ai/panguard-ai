@@ -63,10 +63,10 @@ describe('GuardEngine Lifecycle', () => {
     }
   });
 
-  it('should initialize in learning mode', () => {
+  it('should initialize in learning mode', async () => {
     tempDir = createTempDir();
     const config = createTestConfig(tempDir);
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
 
     const status = engine.getStatus();
     expect(status.mode).toBe('learning');
@@ -78,7 +78,7 @@ describe('GuardEngine Lifecycle', () => {
   it('should start and stop cleanly', async () => {
     tempDir = createTempDir();
     const config = createTestConfig(tempDir);
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
 
     await engine.start();
     const statusAfterStart = engine.getStatus();
@@ -94,7 +94,7 @@ describe('GuardEngine Lifecycle', () => {
     tempDir = createTempDir();
     const config = createTestConfig(tempDir);
     config.mode = 'protection';
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
 
     const status = engine.getStatus();
     expect(status.mode).toBe('protection');
@@ -103,7 +103,7 @@ describe('GuardEngine Lifecycle', () => {
   it('should handle double start gracefully', async () => {
     tempDir = createTempDir();
     const config = createTestConfig(tempDir);
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
 
     await engine.start();
     // Second start should not throw
@@ -117,7 +117,7 @@ describe('GuardEngine Lifecycle', () => {
   it('should handle double stop gracefully', async () => {
     tempDir = createTempDir();
     const config = createTestConfig(tempDir);
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
 
     await engine.start();
     await engine.stop();

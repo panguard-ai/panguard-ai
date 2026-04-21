@@ -169,7 +169,7 @@ async function commandStart(
     }
   }
 
-  const engine = new GuardEngine(config);
+  const engine = await GuardEngine.create(config);
 
   const shutdown = async () => {
     console.log(`\n  ${symbols.info} Shutting down PanguardGuard...`);
