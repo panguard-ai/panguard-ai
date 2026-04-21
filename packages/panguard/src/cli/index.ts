@@ -21,6 +21,7 @@ import { demoCommand } from './commands/demo.js';
 import { initCommand } from './commands/init.js';
 import { deployCommand } from './commands/deploy.js';
 import { statusCommand } from './commands/status.js';
+import { sensorCommand } from './commands/sensor.js';
 import { loginCommand } from './commands/login.js';
 import { logoutCommand } from './commands/logout.js';
 import { whoamiCommand } from './commands/whoami.js';
@@ -79,6 +80,7 @@ program.addCommand(skillsCommand());
 program.addCommand(scanCommand());
 program.addCommand(guardCommand());
 program.addCommand(statusCommand());
+program.addCommand(sensorCommand());
 program.addCommand(upgradeCommand());
 
 // ── Secondary commands (shown in help) ──
