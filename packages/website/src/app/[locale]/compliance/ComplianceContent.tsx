@@ -183,28 +183,125 @@ export default function ComplianceContent() {
         </FadeInUp>
       </SectionWrapper>
 
-      {/* -- 4 Framework Coverage (coming June 2026) -- */}
+      {/* -- 4 Framework Coverage (Layer 7 Govern roadmap) -- */}
       <SectionWrapper>
         <SectionTitle
-          overline="COMPLIANCE ROADMAP"
-          title="4-framework compliance reporting"
-          subtitle="EU AI Act / Colorado AI Act / NIST AI RMF / ISO 42001 — launching June 2026"
+          overline="COMPLIANCE ROADMAP · LAYER 7 GOVERN"
+          title="4-framework reporting + AIAM"
+          subtitle="Layer 7 Govern ships partial today (audit log + Threat Cloud logging). Compliance reporting + AIAM land Q2/Q3 2026 on the public timeline. No fake checkmarks."
         />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14">
-          {['EU AI Act', 'Colorado AI Act', 'NIST AI RMF', 'ISO 42001'].map((framework, i) => (
-            <FadeInUp key={framework} delay={i * 0.08}>
-              <div className="bg-surface-2 rounded-xl border border-border p-6 text-center">
-                <p className="text-sm font-bold text-text-primary">{framework}</p>
-                <p className="text-xs text-text-muted mt-3">Mapping available June 2026</p>
+
+        {/* Today vs Coming Soon honest split */}
+        <div className="grid lg:grid-cols-2 gap-6 mt-14 max-w-5xl mx-auto">
+          <FadeInUp delay={0.1}>
+            <div className="bg-surface-2 rounded-xl border border-brand-sage/30 p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="w-2 h-2 rounded-full bg-brand-sage" />
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage">
+                  Today · Shipped
+                </p>
+              </div>
+              <ul className="space-y-2 text-sm text-text-secondary">
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-sage shrink-0">✓</span>
+                  <span>Audit log — admin actions, actor, IP, timestamp (Threat Cloud)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-sage shrink-0">✓</span>
+                  <span>Admin dashboard — pagination, filter by actor / action</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-sage shrink-0">✓</span>
+                  <span>Client key registration + revocation (API-key AAM lite)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-sage shrink-0">✓</span>
+                  <span>OWASP Agentic Top 10 mapping · 10 / 10 categories · 77 rule links</span>
+                </li>
+              </ul>
+            </div>
+          </FadeInUp>
+
+          <FadeInUp delay={0.15}>
+            <div className="bg-surface-2 rounded-xl border border-amber-400/30 p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400">
+                  Q2 / Q3 2026 · Coming Soon
+                </p>
+              </div>
+              <ul className="space-y-2 text-sm text-text-secondary">
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-400 shrink-0">○</span>
+                  <span>
+                    <code className="font-mono text-xs">pga report --framework &lt;name&gt;</code> —
+                    Markdown + PDF reports with per-rule mapping
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-400 shrink-0">○</span>
+                  <span>4-framework metadata added to all {STATS.atrRules} ATR rules</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-400 shrink-0">○</span>
+                  <span>
+                    AIAM — agent identity + scope + policy evaluator + OAuth 2.0 device flow (Q3
+                    2026)
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-amber-400 shrink-0">○</span>
+                  <span>SOC2 Type 1 attestation via Vanta · target Q3 2026</span>
+                </li>
+              </ul>
+            </div>
+          </FadeInUp>
+        </div>
+
+        {/* Per-framework cards with context */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12 max-w-5xl mx-auto">
+          {[
+            {
+              name: 'EU AI Act',
+              scope: 'Article 9, 10, 12, 14, 15 risk management',
+              date: 'Enforcement 2026-08-02',
+            },
+            {
+              name: 'Colorado AI Act',
+              scope: 'SB24-205 algorithmic discrimination',
+              date: 'Enforcement 2026-06-01',
+            },
+            {
+              name: 'NIST AI RMF',
+              scope: 'Govern / Map / Measure / Manage',
+              date: 'Voluntary · F500 RFP standard',
+            },
+            {
+              name: 'ISO / IEC 42001',
+              scope: 'AIMS clauses 6–10',
+              date: 'Certification pathway',
+            },
+          ].map((framework, i) => (
+            <FadeInUp key={framework.name} delay={i * 0.06}>
+              <div className="bg-surface-2 rounded-xl border border-border p-5">
+                <p className="text-sm font-bold text-text-primary">{framework.name}</p>
+                <p className="text-xs text-text-secondary mt-2 leading-relaxed">
+                  {framework.scope}
+                </p>
+                <p className="text-[10px] text-text-muted mt-3 font-mono">{framework.date}</p>
+                <p className="text-[10px] text-amber-400 mt-1 font-semibold">Mapping Q2 2026</p>
               </div>
             </FadeInUp>
           ))}
         </div>
+
         <FadeInUp delay={0.4}>
-          <div className="mt-10 max-w-2xl mx-auto bg-surface-2 rounded-xl border border-border p-6">
-            <p className="text-sm font-semibold text-text-primary">Enterprise Compliance</p>
-            <p className="text-xs text-text-muted mt-2">
-              SOC2 Type 1 in progress. Target Q3 2026 via Vanta engagement.
+          <div className="mt-12 max-w-2xl mx-auto bg-surface-2 rounded-xl border border-border p-6">
+            <p className="text-sm font-semibold text-text-primary">Why honest timelines</p>
+            <p className="text-xs text-text-secondary mt-2 leading-relaxed">
+              Compliance reporting that claims coverage before shipping code is the fastest way to
+              lose CISO trust. We publish dates. You can hold us to them. If Q2 2026 slips, we post
+              the reason on the panguard.ai changelog before auditors find out from you.
             </p>
           </div>
         </FadeInUp>
