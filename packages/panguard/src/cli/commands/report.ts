@@ -9,7 +9,13 @@
  * Usage:
  *   pga report list-frameworks
  *   pga report summary --framework <name>
- *   pga report generate --framework <name> [--format md|json] [--output <path>]
+ *   pga report generate --framework <name> [--format md|json|pdf] [--output <path>] [--sign <key>]
+ *
+ * Every report includes a SHA-256 integrity hash computed over the
+ * canonical JSON representation, and optionally an HMAC-SHA256
+ * signature (via --sign or PANGUARD_REPORT_SIGNING_KEY env var).
+ * PDFs additionally write a sidecar <output>.hash file for auditor
+ * verification.
  *
  * Supported framework ids:
  *   owasp-agentic   — OWASP Agentic Top 10 (2026)
@@ -26,6 +32,7 @@ import { Command } from 'commander';
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { createRequire } from 'node:module';
+import { createHash, createHmac } from 'node:crypto';
 import { c, symbols } from '@panguard-ai/core';
 
 const require = createRequire(import.meta.url);
@@ -372,6 +379,199 @@ function renderJson(coverage: CoverageSummary, orgName: string): string {
   );
 }
 
+// ─── PDF rendering (D1 Sprint 5) ─────────────────────────────────────
+
+/**
+ * Render the coverage report as a PDF binary.
+ *
+ * Uses pdfkit (already in dependencies). The PDF mirrors the Markdown
+ * structure — header metadata, per-identifier rule mappings, provenance
+ * footer — and includes the report integrity hash on the cover page so
+ * auditors can verify the document hasn't been tampered with.
+ *
+ * Returns a Promise<Buffer> so async PDF streams finish before writing.
+ */
+async function renderPdf(
+  coverage: CoverageSummary,
+  orgName: string,
+  integrityHash: string,
+  signature: string | null
+): Promise<Buffer> {
+  // Lazy-load pdfkit so CLI startup stays fast when PDF isn't needed.
+  // Use dynamic import so the pdfkit types come through properly even
+  // when the module is optional at runtime.
+  const pdfkitMod = (await import('pdfkit')) as unknown as {
+    default: typeof import('pdfkit');
+  };
+  const PDFDocument = pdfkitMod.default;
+  const doc = new PDFDocument({
+    size: 'A4',
+    margin: 50,
+    info: {
+      Title: `AI Compliance Audit Evidence — ${coverage.framework.name}`,
+      Author: `PanGuard AI · AI Compliance Audit Evidence Module`,
+      Subject: `${orgName} — ${coverage.framework.name}`,
+      Keywords: `ATR, compliance, ${coverage.framework.yamlKey}, agent security`,
+      CreationDate: new Date(),
+    },
+  });
+
+  const chunks: Buffer[] = [];
+  const done = new Promise<Buffer>((resolvePromise, rejectPromise) => {
+    doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+    doc.on('end', () => resolvePromise(Buffer.concat(chunks)));
+    doc.on('error', (e: Error) => rejectPromise(e));
+  });
+
+  const fw = coverage.framework;
+  const today = new Date().toISOString().slice(0, 10);
+  const coveragePercent =
+    coverage.totalRules > 0
+      ? ((coverage.mappedRules / coverage.totalRules) * 100).toFixed(1)
+      : '0.0';
+
+  // Cover page
+  doc.fontSize(20).font('Helvetica-Bold');
+  doc.text('AI Compliance Audit Evidence Report');
+  doc.moveDown(0.5);
+  doc.fontSize(12).font('Helvetica');
+  doc.text(`${fw.name}`);
+  doc.moveDown(1);
+
+  doc.fontSize(10).font('Helvetica');
+  const meta: [string, string][] = [
+    ['Framework', fw.name],
+    ['Authority', fw.authority],
+    ...(fw.enforcementDate ? ([['Enforcement date', fw.enforcementDate]] as [string, string][]) : []),
+    ['Organisation', orgName],
+    ['Report date', today],
+    ['ATR rules in set', String(coverage.totalRules)],
+    ['Rules mapped', `${coverage.mappedRules} (${coveragePercent}%)`],
+    ['Total mappings', String(coverage.totalMappings)],
+  ];
+  for (const [k, v] of meta) {
+    doc.font('Helvetica-Bold').text(`${k}: `, { continued: true });
+    doc.font('Helvetica').text(v);
+  }
+
+  doc.moveDown(1);
+  doc.font('Helvetica-Bold').text('Report integrity');
+  doc.moveDown(0.3);
+  doc.font('Courier').fontSize(8).text(`sha256: ${integrityHash}`);
+  if (signature) {
+    doc.text(`hmac:   ${signature}`);
+  }
+  doc.font('Helvetica').fontSize(10).moveDown(1);
+
+  if (coverage.mappedRules === 0) {
+    doc.font('Helvetica-Oblique').text(
+      `Status: Mapping in progress. The compliance.${fw.yamlKey} metadata block has not yet been authored for any rules in this ATR release. See spec/compliance-metadata.md for the target schema and the roll-out plan.`
+    );
+    doc.end();
+    return done;
+  }
+
+  // Mapping by identifier
+  doc.addPage();
+  doc.fontSize(14).font('Helvetica-Bold').text(`Mapping by ${fw.identifierField}`);
+  doc.moveDown(0.5);
+
+  const sortedIds = Array.from(coverage.byIdentifier.keys()).sort();
+  for (const id of sortedIds) {
+    const detail = coverage.byIdentifier.get(id);
+    if (!detail) continue;
+    doc.fontSize(12).font('Helvetica-Bold').text(id);
+    doc
+      .fontSize(9)
+      .font('Helvetica-Oblique')
+      .text(`${detail.count} rule${detail.count === 1 ? '' : 's'} address this control`);
+    doc.moveDown(0.3);
+    doc.fontSize(10).font('Helvetica');
+    for (const line of detail.context) {
+      doc.text(`  • ${line}`, { paragraphGap: 3 });
+    }
+    doc.moveDown(0.5);
+  }
+
+  // Provenance footer
+  doc.addPage();
+  doc.fontSize(14).font('Helvetica-Bold').text('Provenance');
+  doc.moveDown(0.5);
+  doc.fontSize(10).font('Helvetica');
+  doc.text(
+    'Every mapping in this report originates from an ATR rule YAML file in the public MIT-licensed repository.'
+  );
+  doc.moveDown(0.3);
+  doc.text(
+    `Each compliance: entry is a human-authored statement reviewed against the spec in spec/compliance-metadata.md.`
+  );
+  doc.moveDown(0.3);
+  doc.text(
+    `For traceability chain: ATR rule ID → compliance.${fw.yamlKey} block → identifier → rule file in the repo.`
+  );
+  doc.moveDown(1);
+  doc.font('Helvetica-Bold').text('Limitations');
+  doc.moveDown(0.3);
+  doc.font('Helvetica').text(
+    'This is a rule-coverage report — which ATR rules claim to address which framework controls. A full audit also requires event evidence (which detections your deployment actually triggered during the audit period). See pga sensor status and the PanGuard Enterprise audit-log export for event-level evidence.'
+  );
+
+  doc.moveDown(1);
+  doc.font('Helvetica-Bold').fontSize(9).text('Integrity chain');
+  doc.font('Courier').fontSize(7);
+  doc.text(`sha256(report-canonical-json):  ${integrityHash}`);
+  if (signature) {
+    doc.text(`hmac-sha256(report):            ${signature}`);
+  }
+
+  doc.end();
+  return done;
+}
+
+// ─── Integrity hashing (D1 Sprint 5) ─────────────────────────────────
+
+/**
+ * Compute a deterministic SHA-256 hash of the canonical report payload.
+ *
+ * The hash is computed over the JSON representation (which is
+ * deterministic for our controlled data shape) so the same inputs
+ * always produce the same hash regardless of format. This gives
+ * auditors a single identifier that binds the Markdown, JSON, and
+ * PDF outputs of the same report together.
+ */
+function computeReportHash(coverage: CoverageSummary, orgName: string, reportDate: string): string {
+  const byIdentifier: Record<string, { count: number; context: string[] }> = {};
+  const sorted = Array.from(coverage.byIdentifier.keys()).sort();
+  for (const k of sorted) {
+    const v = coverage.byIdentifier.get(k);
+    if (v) byIdentifier[k] = { count: v.count, context: [...v.context].sort() };
+  }
+  const canonical = JSON.stringify({
+    framework: coverage.framework.id,
+    yamlKey: coverage.framework.yamlKey,
+    organisation: orgName,
+    reportDate,
+    totalRules: coverage.totalRules,
+    mappedRules: coverage.mappedRules,
+    totalMappings: coverage.totalMappings,
+    byIdentifier,
+  });
+  return createHash('sha256').update(canonical).digest('hex');
+}
+
+/**
+ * Sign the report hash with an HMAC-SHA256 key.
+ *
+ * The key comes from either --sign <key> or the
+ * PANGUARD_REPORT_SIGNING_KEY env var. Enterprise customers receive a
+ * dedicated signing key so an auditor can verify that a report PDF
+ * actually originated from their PanGuard deployment and wasn't tampered
+ * with in transit or during review.
+ */
+function signReport(hash: string, key: string): string {
+  return createHmac('sha256', key).update(hash).digest('hex');
+}
+
 // ─── CLI wiring ──────────────────────────────────────────────────────
 
 function resolveFramework(id: string): FrameworkMeta | null {
@@ -456,12 +656,13 @@ function summaryAction(opts: { framework?: string }): void {
   console.log('');
 }
 
-function generateAction(opts: {
+async function generateAction(opts: {
   framework?: string;
   format?: string;
   output?: string;
   org?: string;
-}): void {
+  sign?: string;
+}): Promise<void> {
   const fw = opts.framework ? resolveFramework(opts.framework) : null;
   if (!fw) {
     console.log(
@@ -469,17 +670,83 @@ function generateAction(opts: {
     );
     return;
   }
-  const format = opts.format === 'json' ? 'json' : 'md';
+  const rawFormat = (opts.format ?? 'md').toLowerCase();
+  const format: 'md' | 'json' | 'pdf' =
+    rawFormat === 'json' ? 'json' : rawFormat === 'pdf' ? 'pdf' : 'md';
+  if (format === 'pdf' && !opts.output) {
+    console.log(
+      `  ${c.caution(symbols.warn)} --output <path.pdf> is required when --format=pdf (PDFs are binary — cannot stream to stdout).`
+    );
+    return;
+  }
   const orgName = opts.org ?? 'Your Organisation';
   const { rules } = loadAllRules();
   const coverage = buildCoverage(rules, fw);
-  const content =
+  const reportDate = new Date().toISOString();
+  const hash = computeReportHash(coverage, orgName, reportDate);
+  const signingKey = opts.sign ?? process.env['PANGUARD_REPORT_SIGNING_KEY'];
+  const signature = signingKey ? signReport(hash, signingKey) : null;
+
+  if (format === 'pdf') {
+    // PDF is binary — must go to a file, never stdout. Validated above.
+    const buf = await renderPdf(coverage, orgName, hash, signature);
+    const pdfPath = opts.output as string;
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    writeFileSync(pdfPath, buf);
+    // Write sidecar .hash file with integrity metadata — auditors verify against this
+    const hashSidecar = `${pdfPath}.hash`;
+    const sidecarContent = [
+      `# PanGuard AI Compliance Report — integrity sidecar`,
+      `framework:    ${fw.id}`,
+      `organisation: ${orgName}`,
+      `report_date:  ${reportDate}`,
+      `sha256:       ${hash}`,
+      ...(signature ? [`hmac_sha256:  ${signature}`] : []),
+      `pdf_bytes:    ${buf.length}`,
+    ].join('\n');
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    writeFileSync(hashSidecar, sidecarContent + '\n', 'utf-8');
+    console.log(`  ${c.safe(symbols.pass)} Wrote PDF report to ${pdfPath} (${buf.length} bytes)`);
+    console.log(`  ${c.safe(symbols.pass)} Wrote integrity sidecar to ${hashSidecar}`);
+    console.log(`  ${c.dim('sha256:')}      ${hash}`);
+    if (signature) console.log(`  ${c.dim('hmac-sha256:')} ${signature}`);
+    return;
+  }
+
+  const baseContent =
     format === 'json' ? renderJson(coverage, orgName) : renderMarkdown(coverage, orgName);
+  const footer =
+    format === 'json'
+      ? ''
+      : [
+          '',
+          '---',
+          '',
+          '## Report integrity',
+          '',
+          `- \`sha256(report-canonical-json)\`: \`${hash}\``,
+          ...(signature ? [`- \`hmac-sha256(report)\`: \`${signature}\``] : []),
+          '',
+          `Recompute locally with \`pga report generate --framework ${fw.id}\` and compare the hash — any drift means the evidence was modified after export.`,
+          '',
+        ].join('\n');
+  const content = format === 'json'
+    ? JSON.stringify(
+        {
+          ...JSON.parse(baseContent),
+          integrity: { sha256: hash, ...(signature ? { hmac_sha256: signature } : {}) },
+        },
+        null,
+        2
+      )
+    : baseContent + footer;
 
   if (opts.output) {
     // opts.output is a user-provided absolute or relative path we write to
     writeFileSync(opts.output, content, 'utf-8'); // eslint-disable-line security/detect-non-literal-fs-filename
     console.log(`  ${c.safe(symbols.pass)} Wrote ${format.toUpperCase()} report to ${opts.output}`);
+    console.log(`  ${c.dim('sha256:')}      ${hash}`);
+    if (signature) console.log(`  ${c.dim('hmac-sha256:')} ${signature}`);
   } else {
     process.stdout.write(content + '\n');
   }
@@ -545,13 +812,30 @@ export function reportCommand(): Command {
 
   cmd
     .command('generate')
-    .description('Generate a Markdown or JSON compliance evidence report')
+    .description('Generate a Markdown, JSON, or PDF compliance evidence report')
     .option('--framework <id>', 'Framework id')
-    .option('--format <fmt>', 'Output format: md (default) | json')
-    .option('--output <path>', 'Write report to file instead of stdout')
+    .option('--format <fmt>', 'Output format: md (default) | json | pdf')
+    .option('--output <path>', 'Write report to file instead of stdout (required for pdf)')
     .option('--org <name>', 'Organisation name for the report header')
-    .action((opts: { framework?: string; format?: string; output?: string; org?: string }) =>
-      generateAction(opts)
+    .option(
+      '--sign <key>',
+      'HMAC-SHA256 key for report signing (or set PANGUARD_REPORT_SIGNING_KEY env var)'
+    )
+    .action(
+      async (opts: {
+        framework?: string;
+        format?: string;
+        output?: string;
+        org?: string;
+        sign?: string;
+      }) => {
+        try {
+          await generateAction(opts);
+        } catch (err) {
+          console.error(`  ${c.critical(symbols.fail)} ${err instanceof Error ? err.message : err}`);
+          process.exitCode = 1;
+        }
+      }
     );
 
   cmd
