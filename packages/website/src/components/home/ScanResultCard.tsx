@@ -337,6 +337,64 @@ export default function ScanResultCard({
         </div>
       )}
 
+      {/* 7-layer context — show what other PanGuard layers would do */}
+      {report.findings.length > 0 && (
+        <div className="px-5 py-4 border-t border-border bg-surface-2/40">
+          <p className="text-[11px] font-semibold text-panguard-green mb-3">
+            {isZh
+              ? `Layer 2（稽核)攔到 ${report.findings.length} 個攻擊 — 其他 6 層也在守護`
+              : `Layer 2 (Audit) caught ${report.findings.length} attack${report.findings.length > 1 ? 's' : ''} — the other 6 layers have you covered`}
+          </p>
+          <ul className="space-y-1.5 text-[11px] text-text-secondary">
+            <li className="flex items-start gap-2">
+              <span className="shrink-0">🛡</span>
+              <span>
+                <span className="font-semibold text-text-primary">
+                  {isZh ? 'Layer 3 防護' : 'Layer 3 Protect'}
+                </span>
+                {isZh
+                  ? ' — Guard 會在 runtime 阻擋這些呼叫'
+                  : ' — Guard would BLOCK these at runtime'}
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="shrink-0">🪤</span>
+              <span>
+                <span className="font-semibold text-text-primary">
+                  {isZh ? 'Layer 5 誘捕' : 'Layer 5 Deceive'}
+                </span>
+                {isZh ? ' — Trap 蜜罐側錄攻擊者行為' : ' — Trap profiles the attacker in a honeypot'}
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="shrink-0">📊</span>
+              <span>
+                <span className="font-semibold text-text-primary">
+                  {isZh ? 'Layer 7 治理' : 'Layer 7 Govern'}
+                </span>
+                {isZh
+                  ? ' — Threat Cloud 存取合規稽核日誌'
+                  : ' — Threat Cloud logs for compliance audit'}
+              </span>
+            </li>
+          </ul>
+          <div className="flex flex-wrap gap-2 mt-3">
+            <Link
+              href="/docs/getting-started"
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-panguard-green hover:underline"
+            >
+              {isZh ? '免費安裝 Guard →' : 'Install Guard (free) →'}
+            </Link>
+            <Link
+              href="/early-access"
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-text-secondary hover:text-text-primary hover:underline"
+            >
+              {isZh ? '加入 Team Waitlist →' : 'Join Team waitlist →'}
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Action buttons — share, notify, propose */}
       {isRisky && (
         <div className="px-5 py-3 border-t border-border bg-red-400/5 flex flex-wrap items-center gap-3 justify-center">
@@ -419,6 +477,30 @@ export default function ScanResultCard({
         >
           {isZh ? '完整安裝指南' : 'Full Install Guide'} →
         </Link>
+      </div>
+
+      {/* Telemetry notice — community defense network */}
+      <div className="px-5 py-3 border-t border-border bg-surface-2/20">
+        <p className="text-[10px] text-text-muted leading-relaxed text-center">
+          {isZh ? (
+            <>
+              你的掃描協助訓練社群防禦網路。僅匿名規則 ID 與攻擊類型,不含內容。停用:
+              <code className="text-[10px] font-mono">scanner-no-telemetry</code> cookie。隱私:{' '}
+              <Link href="/legal/privacy" className="underline hover:text-text-secondary">
+                panguard.ai/privacy
+              </Link>
+            </>
+          ) : (
+            <>
+              Your scan helped train the community defense network. Anonymized rule ID + attack type
+              only, no content. Disable:{' '}
+              <code className="text-[10px] font-mono">scanner-no-telemetry</code> cookie. Privacy:{' '}
+              <Link href="/legal/privacy" className="underline hover:text-text-secondary">
+                panguard.ai/privacy
+              </Link>
+            </>
+          )}
+        </p>
       </div>
     </motion.div>
   );
