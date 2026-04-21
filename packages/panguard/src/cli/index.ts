@@ -87,10 +87,12 @@ program.addCommand(upgradeCommand());
 program.addCommand(chatCommand());
 program.addCommand(configCommand());
 program.addCommand(doctorCommand());
+// report is no longer a stub — surface it as a primary command now that
+// the AI Compliance Audit Evidence generator is real (D1 Sprint 1).
+program.addCommand(reportCommand());
 
 // ── Advanced commands (hidden from help, still usable) ──
 const hidden = { hidden: true };
-program.addCommand(reportCommand().helpOption(false), hidden);
 program.addCommand(trapCommand().helpOption(false), hidden);
 program.addCommand(threatCommand(), hidden);
 program.addCommand(demoCommand(), hidden);
