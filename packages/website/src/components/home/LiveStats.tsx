@@ -1,17 +1,30 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import { STATS } from '@/lib/stats';
 
 export default function LiveStats() {
-  const t = useTranslations('home.liveStats');
+  const locale = useLocale();
+  const isZh = locale === 'zh-TW';
 
   const stats = [
-    { label: t('rules'), value: STATS.atrRules.toString() },
-    { label: t('garakPrompts'), value: '666' },
-    { label: t('recall'), value: '97.1%' },
-    { label: t('skillsScanned'), value: STATS.ecosystem.skillsScanned.toLocaleString() },
+    {
+      label: isZh ? 'ATR 規則數' : 'ATR rules',
+      value: STATS.atrRules.toString(),
+    },
+    {
+      label: isZh ? 'Garak 對抗樣本' : 'Garak prompts',
+      value: '666',
+    },
+    {
+      label: isZh ? 'Garak recall' : 'Garak recall',
+      value: '97.1%',
+    },
+    {
+      label: isZh ? '已掃描技能' : 'Skills scanned',
+      value: STATS.ecosystem.skillsScanned.toLocaleString(),
+    },
   ];
 
   return (
