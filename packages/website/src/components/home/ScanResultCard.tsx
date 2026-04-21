@@ -342,8 +342,8 @@ export default function ScanResultCard({
         <div className="px-5 py-4 border-t border-border bg-surface-2/40">
           <p className="text-[11px] font-semibold text-panguard-green mb-3">
             {isZh
-              ? `Layer 2（稽核)攔到 ${report.findings.length} 個攻擊 — 其他 6 層也在守護`
-              : `Layer 2 (Audit) caught ${report.findings.length} attack${report.findings.length > 1 ? 's' : ''} — the other 6 layers have you covered`}
+              ? `Layer 2(稽核)攔到 ${report.findings.length} 個攻擊 — Layer 3-6 runtime 守護,L1/L7 2026 Q2/Q3 上線`
+              : `Layer 2 (Audit) caught ${report.findings.length} attack${report.findings.length > 1 ? 's' : ''} — Layers 3-6 protect at runtime, L1/L7 ship Q2/Q3 2026`}
           </p>
           <ul className="space-y-1.5 text-[11px] text-text-secondary">
             <li className="flex items-start gap-2">
