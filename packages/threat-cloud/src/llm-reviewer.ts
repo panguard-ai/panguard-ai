@@ -189,7 +189,7 @@ const DEFAULT_REVIEWER_MODEL =
   process.env['TC_REVIEWER_MODEL'] ?? 'claude-sonnet-4-20250514';
 
 /** Legacy alias — kept so existing call sites compile during refactor. */
-const DEFAULT_MODEL = DEFAULT_REVIEWER_MODEL;
+const _DEFAULT_MODEL = DEFAULT_REVIEWER_MODEL;
 
 /**
  * Normalize a payload for fingerprinting. Lowercases, collapses whitespace,

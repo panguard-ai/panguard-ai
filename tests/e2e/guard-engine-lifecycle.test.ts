@@ -90,7 +90,7 @@ describe('GuardEngine Lifecycle', () => {
     engine = null;
   });
 
-  it('should initialize in protection mode', () => {
+  it('should initialize in protection mode', async () => {
     tempDir = createTempDir();
     const config = createTestConfig(tempDir);
     config.mode = 'protection';
