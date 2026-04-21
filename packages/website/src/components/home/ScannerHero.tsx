@@ -109,11 +109,11 @@ function ScannerHeroInner() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-surface-hero">
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        className="absolute inset-0 pointer-events-none opacity-[0.015]"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(107,143,113,1) 1px, transparent 1px), linear-gradient(90deg, rgba(107,143,113,1) 1px, transparent 1px)',
-          backgroundSize: '80px 80px',
+            'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
+          backgroundSize: '120px 120px',
         }}
       />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(700px,200vw)] h-[min(700px,200vw)] rounded-full pointer-events-none hero-orb" />
@@ -280,22 +280,18 @@ function ScannerHeroInner() {
           <p className="text-[11px] text-text-muted mt-3">{t('trustNote')}</p>
         </div>
 
-        {/* Trust badges */}
-        <div className="mt-10 animate-[fadeUp_0.5s_0.5s_ease_both]">
-          <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+        {/* Trust badges — 4 strongest signals only */}
+        <div className="mt-8 animate-[fadeUp_0.5s_0.5s_ease_both]">
+          <div className="flex flex-wrap justify-center gap-2">
             {[
-              t('badgeOwasp'),
               t('badgeRules', { count: eco.atrRules }),
               t('badgeRecall'),
               t('badgeCisco'),
-              t('badgeSafeMcp'),
-              t('badgePlatforms'),
               t('badgeLicense'),
-              t('badgeScanned', { count: eco.skillsScanned.toLocaleString() }),
             ].map((badge) => (
               <span
                 key={badge}
-                className="text-[11px] sm:text-xs text-text-muted border border-border/50 rounded-full px-3 py-1.5 bg-surface-1/30"
+                className="text-[11px] text-text-muted border border-border/40 rounded-full px-3 py-1 bg-surface-1/20"
               >
                 {badge}
               </span>
