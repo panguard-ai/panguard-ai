@@ -68,13 +68,15 @@ const logger = createLogger('panguard-guard:engine');
  * GuardEngine 是所有 PanguardGuard 功能的中央協調器
  */
 export class GuardEngine {
-  // Engines and agents (initialized in constructor via initEngines)
-  private readonly engines: ReturnType<typeof initEngines>;
+  // Engines and agents (initialized in async init() — call GuardEngine.create() or engine.init())
+  // Using definite-assignment assertion because init() is required before use.
+  private engines!: Awaited<ReturnType<typeof initEngines>>;
   private readonly config: GuardConfig;
+  private readonly llm: AnalyzeLLM | null;
 
   // Mutable operating state
   private mode: GuardMode;
-  private baseline: EnvironmentBaseline;
+  private baseline!: EnvironmentBaseline;
 
   // Infrastructure (initialized in start())
   private dashboard: DashboardServer | null = null;
@@ -107,20 +109,33 @@ export class GuardEngine {
   constructor(config: GuardConfig, llm: AnalyzeLLM | null = null) {
     this.config = config;
     this.mode = config.mode;
-    this.engines = initEngines(config, llm);
-    this.baseline = this.engines.baseline;
+    this.llm = llm;
 
-    // PID file
+    // PID file (cheap sync init — safe in constructor)
     this.pidFile = new PidFile(config.dataDir);
   }
 
   /**
-   * Create a GuardEngine with auto-detected LLM provider.
+   * Async init — provisions a Threat Cloud client key (if endpoint is set and
+   * no TC_API_KEY cached) so a fresh `pga up` registers this machine as a TC
+   * sensor. Required before calling start(), run(), or any engine accessor.
+   * GuardEngine.create() calls this automatically.
+   */
+  async init(): Promise<void> {
+    this.engines = await initEngines(this.config, this.llm);
+    this.baseline = this.engines.baseline;
+  }
+
+  /**
+   * Create a GuardEngine with auto-detected LLM provider and provisioned TC
+   * sensor registration. This is the preferred constructor for all callers.
    * Checks env vars for ANTHROPIC_API_KEY, OPENAI_API_KEY, or tries Ollama.
    */
   static async create(config: GuardConfig): Promise<GuardEngine> {
     const llm = await autoDetectLLM();
-    return new GuardEngine(config, llm);
+    const engine = new GuardEngine(config, llm);
+    await engine.init();
+    return engine;
   }
 
   // -- Event processor state and deps accessors (private) --

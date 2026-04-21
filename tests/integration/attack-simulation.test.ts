@@ -405,7 +405,7 @@ describe('Scenario 5: GuardEngine Full Pipeline', () => {
   it('should process a security event through the full pipeline', async () => {
     tempDir = createTempDir();
     const config = makeGuardConfig(tempDir, 'protection');
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
     await engine.start();
 
     // Create a suspicious event
@@ -427,7 +427,7 @@ describe('Scenario 5: GuardEngine Full Pipeline', () => {
   it('should track events processed count across multiple events', async () => {
     tempDir = createTempDir();
     const config = makeGuardConfig(tempDir, 'learning');
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
     await engine.start();
 
     // Feed multiple events
@@ -449,7 +449,7 @@ describe('Scenario 5: GuardEngine Full Pipeline', () => {
   it('should update baseline during learning mode', async () => {
     tempDir = createTempDir();
     const config = makeGuardConfig(tempDir, 'learning');
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
     await engine.start();
 
     // In learning mode, events should update the baseline
@@ -471,7 +471,7 @@ describe('Scenario 5: GuardEngine Full Pipeline', () => {
   it('should detect threats in protection mode', async () => {
     tempDir = createTempDir();
     const config = makeGuardConfig(tempDir, 'protection');
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
     await engine.start();
 
     // Feed a clearly malicious event
@@ -498,7 +498,7 @@ describe('Scenario 5: GuardEngine Full Pipeline', () => {
   it('should invoke event callback when set', async () => {
     tempDir = createTempDir();
     const config = makeGuardConfig(tempDir, 'protection');
-    engine = new GuardEngine(config);
+    engine = await GuardEngine.create(config);
 
     const callbacks: Array<{ type: string; data: Record<string, unknown> }> = [];
     engine.setEventCallback((type, data) => {

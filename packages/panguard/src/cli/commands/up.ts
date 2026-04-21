@@ -48,6 +48,45 @@ function isGuardRunning(): boolean {
   }
 }
 
+/**
+ * Read the real rule count loaded by Guard from its TC cache.
+ * Falls back to 311 (the @panguard-ai/agent-threat-rules@2.0.12 bundled count)
+ * if the cache hasn't synced yet or is malformed.
+ */
+function readRuleCountFromCache(): number {
+  try {
+    const cachePath = join(homedir(), '.panguard-guard', 'threat-cloud-cache.json');
+    if (existsSync(cachePath)) {
+      const cache = JSON.parse(readFileSync(cachePath, 'utf-8')) as {
+        uniqueRulesCount?: number;
+      };
+      if (typeof cache.uniqueRulesCount === 'number' && cache.uniqueRulesCount > 0) {
+        return cache.uniqueRulesCount;
+      }
+    }
+  } catch {
+    /* fallback */
+  }
+  return 311;
+}
+
+/**
+ * Read the anonymous client ID provisioned during first `pga up`.
+ * This is the sensor identity used by Threat Cloud for per-device aggregation
+ * (no email, no hostname, no raw PII — just a random UUID).
+ */
+function readSensorId(): string | null {
+  try {
+    const idPath = join(homedir(), '.panguard', 'client-id');
+    if (existsSync(idPath)) {
+      return readFileSync(idPath, 'utf-8').trim();
+    }
+  } catch {
+    /* no identity yet */
+  }
+  return null;
+}
+
 export function upCommand(): Command {
   return new Command('up')
     .description('Scan skills → start protection → open dashboard')
@@ -435,7 +474,9 @@ export function upCommand(): Command {
         }
 
         // ── Read rule count + TC status ──────────
-        const ruleCount = 113;
+        const ruleCount = readRuleCountFromCache();
+        const sensorId = readSensorId();
+        const sensorShortId = sensorId ? sensorId.slice(0, 8) : null;
 
         let tcStatus = 'disconnected';
         try {
@@ -482,8 +523,28 @@ export function upCommand(): Command {
             `  ${c.sage(t(lang, 'Threats', '威脅'))}       ${c.critical(`${threatCount} ${t(lang, 'found', '個發現')}`)}`
           );
         }
-        console.log(`  ${c.sage('Threat Cloud')}  ${tcStatus}`);
+        const tcStatusLine =
+          tcStatus === 'connected'
+            ? `${t(lang, 'connected', '已連線')}${sensorShortId ? ` · ${t(lang, 'sensor', '感測器')} ${c.sage(sensorShortId)}` : ''}`
+            : telemetryDisabled
+              ? t(lang, 'disabled (opt-out)', '已停用(選擇退出)')
+              : t(lang, 'offline (will sync when online)', '離線(上線時自動同步)');
+        console.log(`  ${c.sage('Threat Cloud')}  ${tcStatusLine}`);
         console.log('');
+
+        // ── Sensor confirmation: user knows they are now part of the defense network
+        if (tcStatus === 'connected' && !telemetryDisabled && sensorShortId) {
+          console.log(
+            `  ${c.safe(symbols.pass)} ${c.bold(t(lang, 'You are now a Threat Cloud sensor.', '你已成為威脅雲感測器。'))}`
+          );
+          console.log(
+            `  ${c.dim(t(lang, `This machine contributes anonymous detections to the community defense network.`, `這台機器正在為社群防禦網路貢獻匿名偵測。`))}`
+          );
+          console.log(
+            `  ${c.dim(t(lang, `Check status: pga sensor status · Opt out: pga config set telemetry false`, `查看狀態:pga sensor status · 停用:pga config set telemetry false`))}`
+          );
+          console.log('');
+        }
 
         // ── Next steps ─────────────────────────────────────────
         console.log(`  ${c.bold(t(lang, 'NEXT STEPS', '下一步'))}`);

@@ -167,21 +167,34 @@ vi.mock('../src/notify/index.js', () => ({
 }));
 
 // Mock threat cloud
-const mockUpload = vi.fn().mockResolvedValue(true);
-const mockFetchRules = vi.fn().mockResolvedValue([]);
-const mockFetchBlocklist = vi.fn().mockResolvedValue([]);
-const mockFlushQueue = vi.fn().mockResolvedValue(0);
+// Hoisted to run before vi.mock factory (which itself is hoisted to module top).
+// Without vi.hoisted, the factory below would reference `mockUpload` before it's
+// initialised and throw ReferenceError.
+const { mockUpload, mockFetchRules, mockFetchBlocklist, mockFlushQueue } = vi.hoisted(
+  () => ({
+    mockUpload: vi.fn().mockResolvedValue(true),
+    mockFetchRules: vi.fn().mockResolvedValue([]),
+    mockFetchBlocklist: vi.fn().mockResolvedValue([]),
+    mockFlushQueue: vi.fn().mockResolvedValue(0),
+  })
+);
 
-vi.mock('../src/threat-cloud/index.js', () => ({
-  ThreatCloudClient: vi.fn().mockImplementation(() => ({
+vi.mock('../src/threat-cloud/index.js', () => {
+  const mockInstance = {
     upload: mockUpload,
     fetchRules: mockFetchRules,
     fetchBlocklist: mockFetchBlocklist,
     flushQueue: mockFlushQueue,
     getStatus: vi.fn().mockReturnValue('connected'),
     stopFlushTimer: vi.fn(),
-  })),
-}));
+  };
+  const MockedClient = vi.fn().mockImplementation(() => mockInstance);
+  // Static async factory used by initEngines() for auto-provisioning TC sensor keys
+  (MockedClient as unknown as { create: typeof vi.fn }).create = vi
+    .fn()
+    .mockResolvedValue(mockInstance);
+  return { ThreatCloudClient: MockedClient };
+});
 
 // Mock dashboard
 vi.mock('../src/dashboard/index.js', () => ({
@@ -296,9 +309,9 @@ function makeConfig(overrides: Partial<GuardConfig> = {}): GuardConfig {
 describe('GuardEngine', () => {
   let engine: GuardEngine;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
-    engine = new GuardEngine(makeConfig());
+    engine = await GuardEngine.create(makeConfig());
   });
 
   afterEach(async () => {
@@ -495,7 +508,7 @@ describe('GuardEngine', () => {
       const config = makeConfig({
         actionPolicy: { autoRespond: 90, notifyAndWait: 60, logOnly: 0 },
       });
-      const eng = new GuardEngine(config);
+      const eng = await GuardEngine.create(config);
 
       const detection: DetectionResult = {
         event: makeEvent(),
@@ -612,7 +625,7 @@ describe('GuardEngine', () => {
 
   describe('learning mode vs protection mode', () => {
     it('should update baseline when in learning mode and no detection', async () => {
-      const learningEngine = new GuardEngine(makeConfig({ mode: 'learning' }));
+      const learningEngine = await GuardEngine.create(makeConfig({ mode: 'learning' }));
       mockDetect.mockReturnValue(null);
 
       await learningEngine.processEvent(makeEvent());
@@ -638,7 +651,7 @@ describe('GuardEngine', () => {
 
   describe('checkLearningTransition', () => {
     it('should switch to protection mode when learning is complete', async () => {
-      const learningEngine = new GuardEngine(makeConfig({ mode: 'learning' }));
+      const learningEngine = await GuardEngine.create(makeConfig({ mode: 'learning' }));
       vi.mocked(isLearningComplete).mockReturnValue(true);
 
       // Trigger the learning check by calling private method via workaround
@@ -665,7 +678,7 @@ describe('GuardEngine', () => {
     });
 
     it('should NOT switch if learning is not complete', async () => {
-      const learningEngine = new GuardEngine(makeConfig({ mode: 'learning' }));
+      const learningEngine = await GuardEngine.create(makeConfig({ mode: 'learning' }));
       vi.mocked(isLearningComplete).mockReturnValue(false);
 
       (
