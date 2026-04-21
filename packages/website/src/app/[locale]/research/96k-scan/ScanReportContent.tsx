@@ -328,8 +328,8 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
             </h2>
             <p className="text-text-secondary leading-relaxed mb-6">
               ATR (Agent Threat Rules) is the first open detection standard designed specifically
-              for AI agent threats. 311 rules. 1,600+ patterns. 11 threat categories. MIT licensed. Like
-              YARA for malware, Sigma for logs -- ATR for AI agents.
+              for AI agent threats. 311 rules. 1,600+ patterns. 11 threat categories. MIT licensed.
+              Like YARA for malware, Sigma for logs -- ATR for AI agents.
             </p>
           </FadeInUp>
           <FadeInUp delay={0.1}>

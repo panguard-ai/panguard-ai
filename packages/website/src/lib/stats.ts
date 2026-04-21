@@ -134,7 +134,7 @@ export const STATS = {
    */
   benchmark: {
     pint: { recall: 61.4, precision: 99.6, samples: 850 },
-    skill: { recall: 100, precision: 97, fp: 0.20, samples: 498 },
+    skill: { recall: 100, precision: 97, fp: 0.2, samples: 498 },
     garak: { recall: 97.1, samples: 666 },
     wildFpRate: 0.48,
     wildSamples: 3_115,

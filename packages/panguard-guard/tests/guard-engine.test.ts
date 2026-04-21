@@ -170,14 +170,12 @@ vi.mock('../src/notify/index.js', () => ({
 // Hoisted to run before vi.mock factory (which itself is hoisted to module top).
 // Without vi.hoisted, the factory below would reference `mockUpload` before it's
 // initialised and throw ReferenceError.
-const { mockUpload, mockFetchRules, mockFetchBlocklist, mockFlushQueue } = vi.hoisted(
-  () => ({
-    mockUpload: vi.fn().mockResolvedValue(true),
-    mockFetchRules: vi.fn().mockResolvedValue([]),
-    mockFetchBlocklist: vi.fn().mockResolvedValue([]),
-    mockFlushQueue: vi.fn().mockResolvedValue(0),
-  })
-);
+const { mockUpload, mockFetchRules, mockFetchBlocklist, mockFlushQueue } = vi.hoisted(() => ({
+  mockUpload: vi.fn().mockResolvedValue(true),
+  mockFetchRules: vi.fn().mockResolvedValue([]),
+  mockFetchBlocklist: vi.fn().mockResolvedValue([]),
+  mockFlushQueue: vi.fn().mockResolvedValue(0),
+}));
 
 vi.mock('../src/threat-cloud/index.js', () => {
   const mockInstance = {
