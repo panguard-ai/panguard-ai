@@ -57,17 +57,10 @@
     "js-yaml": "^4.1.0",
     "zod": "^3.24.0"
   },
-  "peerDependencies": {
-    "agent-threat-rules": "^2.0.12"
-  },
-  "peerDependenciesMeta": {
-    "agent-threat-rules": {
-      "optional": true
-    }
-  },
   "optionalDependencies": {
     "@panguard-ai/threat-cloud": "workspace:*",
-    "@panguard-ai/panguard-trap": "workspace:*"
+    "@panguard-ai/panguard-trap": "workspace:*",
+    "agent-threat-rules": "^2.0.12"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",

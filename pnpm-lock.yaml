@@ -150,9 +150,6 @@ importers:
       '@panguard-ai/security-hardening':
         specifier: workspace:*
         version: link:../../security-hardening
-      agent-threat-rules:
-        specifier: ^2.0.12
-        version: 2.0.12(zod@3.25.76)
       commander:
         specifier: ^12.0.0
         version: 12.1.0
@@ -179,6 +176,9 @@ importers:
       '@panguard-ai/threat-cloud':
         specifier: workspace:*
         version: link:../threat-cloud
+      agent-threat-rules:
+        specifier: ^2.0.12
+        version: 2.0.12(zod@3.25.76)
 
   packages/panguard-chat:
     dependencies:
