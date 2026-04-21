@@ -1,39 +1,33 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useEcosystemStats } from '@/hooks/useEcosystemStats';
-import { STATS } from '@/lib/stats';
 
+/**
+ * Upstream adopters only. Strict rules:
+ * - Listed merges must be in the upstream's *official* repo.
+ * - Community awesome-list merges do NOT belong here (they are catalogs,
+ *   not platform adoption).
+ * - Never list OWASP Foundation as an adopter — the OWASP Agentic Top 10
+ *   mapping merged into precize's third-party implementation, not OWASP itself.
+ *   The OWASP LLM Top 10 official repo PR is still pending.
+ */
 const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[] = [
+  { name: 'Microsoft AGT', detail: 'ATR example merged', highlight: true },
   { name: 'Cisco AI Defense', detail: '34 ATR rules merged', highlight: true },
-  { name: 'OWASP', detail: 'Agentic Top 10 PR' },
-  { name: 'SAFE-MCP', detail: '91.8% coverage' },
+  { name: 'NVIDIA Garak', detail: '97.1% recall · PR open' },
 ];
-
-function StatCard({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="text-center px-4 py-3">
-      <div className="text-2xl sm:text-3xl font-extrabold text-panguard-green tabular-nums">
-        {value}
-      </div>
-      <div className="text-[11px] text-text-muted mt-1 uppercase tracking-wider">{label}</div>
-    </div>
-  );
-}
 
 export default function SocialProof() {
   const t = useTranslations('home.socialProof');
-  const eco = useEcosystemStats();
 
   return (
-    <section className="relative px-5 sm:px-6 py-12 sm:py-16 border-b border-border/30">
+    <section className="relative px-5 sm:px-6 py-10 sm:py-14 border-b border-border/30">
       <div className="max-w-4xl mx-auto">
-        {/* Adoption logos */}
-        <div className="text-center mb-8">
-          <p className="text-[11px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-4">
+        <div className="text-center">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-6">
             {t('overline')}
           </p>
-          <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
+          <div className="flex flex-wrap justify-center gap-8 sm:gap-12">
             {ADOPTERS.map((a) => (
               <div key={a.name} className="flex flex-col items-center gap-1">
                 <span
@@ -44,23 +38,6 @@ export default function SocialProof() {
                 <span className="text-[10px] text-text-muted">{a.detail}</span>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Live metrics */}
-        <div className="bg-surface-1/50 border border-border/50 rounded-2xl p-4 sm:p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-            <StatCard value={eco.atrRules.toString()} label={t('statRules')} />
-            <StatCard
-              value={
-                eco.skillsScanned > 1000
-                  ? `${Math.round(eco.skillsScanned / 1000)}K+`
-                  : eco.skillsScanned.toString()
-              }
-              label={t('statScanned')}
-            />
-            <StatCard value={`${STATS.benchmark.skill.recall}%`} label={t('statRecall')} />
-            <StatCard value={`${STATS.benchmark.pint.precision}%`} label={t('statPrecision')} />
           </div>
         </div>
       </div>
