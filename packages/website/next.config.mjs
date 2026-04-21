@@ -11,7 +11,6 @@ const nextConfig = {
       '/legal/sla',
       '/legal/dpa',
       '/demo',
-      '/early-access',
       '/customers/:slug*',
       '/customers',
       '/partners',
@@ -19,7 +18,6 @@ const nextConfig = {
       '/solutions/smb',
       '/careers',
       '/product/manager',
-      '/pricing',
       '/changelog',
     ];
 

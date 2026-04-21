@@ -1,9 +1,20 @@
-import { redirect } from 'next/navigation';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
+import EarlyAccessContent from './EarlyAccessContent';
 
-/**
- * Early access page is no longer needed — PanGuard is publicly available.
- * Redirect visitors to the homepage.
- */
+export const metadata = {
+  title: 'Team Tier Waitlist',
+  description: 'Join the waitlist for PanGuard Team Tier, launching May 2026.',
+};
+
 export default function EarlyAccessPage() {
-  redirect('/');
+  return (
+    <>
+      <NavBar />
+      <main id="main-content">
+        <EarlyAccessContent />
+      </main>
+      <Footer />
+    </>
+  );
 }

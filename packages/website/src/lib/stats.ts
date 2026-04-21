@@ -24,16 +24,16 @@
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.5.2',
-  atrRules: 113,
+  atrRules: 311,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 17,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
   atrPatterns: 714,
-  totalRules: 113,
+  totalRules: 311,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '113' as const,
+  totalRulesDisplay: '311' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '113' as const,
+  atrRulesDisplay: '311' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -135,7 +135,7 @@ export const STATS = {
   benchmark: {
     pint: { recall: 61.4, precision: 99.6, samples: 850 },
     skill: { recall: 96.9, precision: 100, fp: 0, samples: 498 },
-    garak: { recall: 69.7, samples: 666 },
+    garak: { recall: 97.1, samples: 666 },
     wildFpRate: 0.48,
     wildSamples: 3_115,
   },
@@ -152,6 +152,11 @@ export const STATS = {
     agentsProtected: 50,
     githubStars: 86,
     platformsSupported: 17,
+  },
+  /** Platform coverage */
+  platform: {
+    layerCoverage: '6 of 7' as const,
+    upstreamMerged: ['Microsoft AGT', 'Cisco AI Defense'] as const,
   },
   /**
    * NOTE: These fallback numbers are only used when TC live API is unreachable.

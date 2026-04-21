@@ -3,6 +3,10 @@ import { getTranslations } from 'next-intl/server';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import ScannerHero from '@/components/home/ScannerHero';
+import SecurityLayers from '@/components/home/SecurityLayers';
+import LiveStats from '@/components/home/LiveStats';
+import CoverageComparison from '@/components/home/CoverageComparison';
+import PricingPreview from '@/components/home/PricingPreview';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
 const SocialProof = dynamic(() => import('@/components/home/SocialProof'));
@@ -22,19 +26,25 @@ export default async function Home() {
           <p id="definition" className="sr-only">
             {t('srDefinition')}
           </p>
-          {/* 1. Fear Hero: Scanner + stats + platform bar */}
+          {/* 1. Scanner Hero */}
           <ScannerHero />
-          {/* 1.5. Social proof: Cisco, OWASP, live metrics */}
+          {/* 2. 7-layer Security Architecture */}
+          <SecurityLayers />
+          {/* 3. Live Stats */}
+          <LiveStats />
+          {/* 4. Social proof: Cisco, OWASP, live metrics */}
           <SocialProof />
-          {/* 1.6. Product demo: Guard dashboard screenshots */}
-          <DemoShowcase />
-          {/* 2. Real CVE Incidents */}
+          {/* 5. Real CVE Incidents */}
           <RealIncidents />
-          {/* 3. Why PanGuard: 3 Pillars + competitive table */}
-          <WhyPanguard />
-          {/* 4. How It Works: Threat Crystallization */}
+          {/* 6. Coverage Comparison vs Competitors */}
+          <CoverageComparison />
+          {/* 7. Product demo: Guard dashboard screenshots */}
+          <DemoShowcase />
+          {/* 8. How It Works: Threat Crystallization */}
           <HowItWorks />
-          {/* 5. CTA + Mission */}
+          {/* 9. Pricing Preview */}
+          <PricingPreview />
+          {/* 10. CTA + Mission */}
           <CTARoadmap />
         </main>
       </RuleStatsProvider>
