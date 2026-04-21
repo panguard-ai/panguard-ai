@@ -177,16 +177,14 @@ const LLM_TIMEOUT_MS = 60_000;
  * catches output defects regardless of model. Sonnet adds ~3-5% quality at 4x
  * cost, not worth it for bulk drafter.
  */
-const DEFAULT_DRAFTER_MODEL =
-  process.env['TC_DRAFTER_MODEL'] ?? 'claude-haiku-4-5-20251001';
+const DEFAULT_DRAFTER_MODEL = process.env['TC_DRAFTER_MODEL'] ?? 'claude-haiku-4-5-20251001';
 
 /**
  * Reviewer model — used for the second-opinion review pass after a proposal
  * is drafted (reviewProposal). Quality-critical, stays on Sonnet.
  * Override via TC_REVIEWER_MODEL env var.
  */
-const DEFAULT_REVIEWER_MODEL =
-  process.env['TC_REVIEWER_MODEL'] ?? 'claude-sonnet-4-20250514';
+const DEFAULT_REVIEWER_MODEL = process.env['TC_REVIEWER_MODEL'] ?? 'claude-sonnet-4-20250514';
 
 /** Legacy alias — kept so existing call sites compile during refactor. */
 const _DEFAULT_MODEL = DEFAULT_REVIEWER_MODEL;

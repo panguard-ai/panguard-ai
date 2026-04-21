@@ -363,7 +363,9 @@ export default function ScanResultCard({
                 <span className="font-semibold text-text-primary">
                   {isZh ? 'Layer 5 誘捕' : 'Layer 5 Deceive'}
                 </span>
-                {isZh ? ' — Trap 蜜罐側錄攻擊者行為' : ' — Trap profiles the attacker in a honeypot'}
+                {isZh
+                  ? ' — Trap 蜜罐側錄攻擊者行為'
+                  : ' — Trap profiles the attacker in a honeypot'}
               </span>
             </li>
             <li className="flex items-start gap-2">

@@ -32,13 +32,13 @@ function parseInline(text: string): ReactNode[] {
           className="text-brand-sage underline underline-offset-2 decoration-brand-sage/40 hover:decoration-brand-sage transition-colors"
         >
           {match[1]}
-        </a>,
+        </a>
       );
     } else if (match[3]) {
       tokens.push(
         <strong key={key++} className="text-text-primary font-semibold">
           {match[3]}
-        </strong>,
+        </strong>
       );
     } else if (match[4]) {
       tokens.push(
@@ -47,13 +47,13 @@ function parseInline(text: string): ReactNode[] {
           className="text-[0.9em] bg-surface-1 border border-border rounded px-1.5 py-0.5 font-mono text-text-primary"
         >
           {match[4]}
-        </code>,
+        </code>
       );
     } else if (match[5]) {
       tokens.push(
         <em key={key++} className="italic">
           {match[5]}
-        </em>,
+        </em>
       );
     }
     lastIndex = match.index + match[0].length;
@@ -107,10 +107,7 @@ function renderBlock(block: string, i: number) {
           <thead>
             <tr className="border-b border-border">
               {headers.map((h, j) => (
-                <th
-                  key={j}
-                  className="text-left py-3 px-3 sm:px-4 text-text-primary font-semibold"
-                >
+                <th key={j} className="text-left py-3 px-3 sm:px-4 text-text-primary font-semibold">
                   {parseInline(h)}
                 </th>
               ))}
@@ -236,9 +233,7 @@ export default function BilingualArticle({ enPost, zhPost, defaultLang }: Biling
           </button>
         </div>
       )}
-      <div className="prose-panguard">
-        {blocks.map((block, i) => renderBlock(block, i))}
-      </div>
+      <div className="prose-panguard">{blocks.map((block, i) => renderBlock(block, i))}</div>
     </div>
   );
 }

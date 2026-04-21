@@ -760,12 +760,7 @@ export class ThreatCloudDB {
            hit_count = hit_count + 1,
            last_seen_at = datetime('now')`
       )
-      .run(
-        fingerprint,
-        result,
-        details?.ruleId ?? null,
-        details?.patternHash ?? null
-      );
+      .run(fingerprint, result, details?.ruleId ?? null, details?.patternHash ?? null);
   }
 
   /**

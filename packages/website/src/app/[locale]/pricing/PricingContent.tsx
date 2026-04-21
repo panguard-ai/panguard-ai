@@ -13,7 +13,11 @@ const TIERS = [
     name: 'Community',
     price: '$0',
     description: 'Free and open source. Perfect for developers.',
-    cta: { text: 'Get Started on GitHub', href: 'https://github.com/panguard-ai/panguard-ai', external: true },
+    cta: {
+      text: 'Get Started on GitHub',
+      href: 'https://github.com/panguard-ai/panguard-ai',
+      external: true,
+    },
     features: [
       'Full ATR access (311 rules)',
       'CLI installation',
@@ -88,9 +92,7 @@ export default function PricingContent() {
           </FadeInUp>
           <FadeInUp delay={0.2}>
             <div className="mt-8 inline-block bg-brand-sage/10 border border-brand-sage/20 rounded-full px-6 py-2.5">
-              <p className="text-sm text-brand-sage font-medium">
-                {t('note')}
-              </p>
+              <p className="text-sm text-brand-sage font-medium">{t('note')}</p>
             </div>
           </FadeInUp>
         </div>
@@ -112,16 +114,10 @@ export default function PricingContent() {
                     {tier.name}
                   </h3>
                   <div className="mt-4 flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-text-primary">
-                      {tier.price}
-                    </span>
-                    {tier.period && (
-                      <span className="text-xs text-text-muted">{tier.period}</span>
-                    )}
+                    <span className="text-4xl font-extrabold text-text-primary">{tier.price}</span>
+                    {tier.period && <span className="text-xs text-text-muted">{tier.period}</span>}
                   </div>
-                  <p className="text-xs text-text-muted mt-3">
-                    {tier.description}
-                  </p>
+                  <p className="text-xs text-text-muted mt-3">{tier.description}</p>
 
                   <div className="flex-1" />
 
@@ -179,9 +175,7 @@ export default function PricingContent() {
             </h2>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="text-text-secondary mt-4">
-              {t('faqSubtitle')}
-            </p>
+            <p className="text-text-secondary mt-4">{t('faqSubtitle')}</p>
           </FadeInUp>
           <FadeInUp delay={0.2}>
             <Link

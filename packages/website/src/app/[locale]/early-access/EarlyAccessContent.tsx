@@ -54,16 +54,10 @@ export default function EarlyAccessContent() {
               <div className="mt-12 bg-brand-sage/10 border border-brand-sage/30 rounded-xl p-8 max-w-md">
                 <div className="flex items-center gap-3 mb-4">
                   <Check className="w-6 h-6 text-brand-sage" />
-                  <h3 className="text-lg font-bold text-brand-sage">
-                    {t('successTitle')}
-                  </h3>
+                  <h3 className="text-lg font-bold text-brand-sage">{t('successTitle')}</h3>
                 </div>
-                <p className="text-text-secondary text-sm">
-                  {t('successMessage')}
-                </p>
-                <p className="text-xs text-text-muted mt-4">
-                  {t('successHint')}
-                </p>
+                <p className="text-text-secondary text-sm">{t('successMessage')}</p>
+                <p className="text-xs text-text-muted mt-4">{t('successHint')}</p>
               </div>
             </FadeInUp>
           ) : (
@@ -81,9 +75,7 @@ export default function EarlyAccessContent() {
                       type="email"
                       required
                       value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="your@email.com"
                       className="w-full px-4 py-2.5 bg-surface-3 border border-border rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-sage/50"
                     />
@@ -96,9 +88,7 @@ export default function EarlyAccessContent() {
                     <input
                       type="text"
                       value={formData.company}
-                      onChange={(e) =>
-                        setFormData({ ...formData, company: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       placeholder="Your company"
                       className="w-full px-4 py-2.5 bg-surface-3 border border-border rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-sage/50"
                     />
@@ -110,9 +100,7 @@ export default function EarlyAccessContent() {
                     </label>
                     <select
                       value={formData.endpoints}
-                      onChange={(e) =>
-                        setFormData({ ...formData, endpoints: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, endpoints: e.target.value })}
                       className="w-full px-4 py-2.5 bg-surface-3 border border-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-sage/50"
                     >
                       <option value="">{t('selectOption')}</option>
@@ -133,9 +121,7 @@ export default function EarlyAccessContent() {
                   </button>
                 </div>
 
-                <p className="text-xs text-text-muted mt-4 text-center">
-                  {t('privacyNote')}
-                </p>
+                <p className="text-xs text-text-muted mt-4 text-center">{t('privacyNote')}</p>
               </form>
             </FadeInUp>
           )}
@@ -150,9 +136,7 @@ export default function EarlyAccessContent() {
             </h2>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="text-text-secondary mt-4">
-              {t('ctaSubtitle')}
-            </p>
+            <p className="text-text-secondary mt-4">{t('ctaSubtitle')}</p>
           </FadeInUp>
           <FadeInUp delay={0.2}>
             <Link

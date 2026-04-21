@@ -304,9 +304,7 @@ export const migrations: readonly Migration[] = [
           hit_count INTEGER NOT NULL DEFAULT 1
         )
       `);
-      db.exec(
-        `CREATE INDEX IF NOT EXISTS idx_payload_fp_result ON payload_fingerprints(result)`
-      );
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_payload_fp_result ON payload_fingerprints(result)`);
       db.exec(
         `CREATE INDEX IF NOT EXISTS idx_payload_fp_pattern ON payload_fingerprints(pattern_hash) WHERE pattern_hash IS NOT NULL`
       );

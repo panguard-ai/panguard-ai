@@ -57,8 +57,16 @@ jobs:
         run: pnpm run build
       - name: Type check
         run: pnpm run typecheck
-      - name: Run tests with coverage (excluding installer E2E — has its own workflow)
-        run: pnpm exec vitest run --coverage --exclude 'tests/installer/**'
+      # Coverage step is split from tests because v8 coverage's getUntestedFiles()
+      # currently hits a brace-expansion ESM/CJS interop bug on Node 20 + pnpm,
+      # causing an unhandled TypeError after all tests have actually passed. We
+      # run the tests (must pass) separately from the coverage report
+      # (best-effort — does not block CI).
+      - name: Run tests (excluding installer E2E — has its own workflow)
+        run: pnpm exec vitest run --exclude 'tests/installer/**'
+      - name: Generate coverage report (best effort — non-blocking)
+        run: pnpm exec vitest run --coverage --exclude 'tests/installer/**' || echo "::warning::Coverage report generation hit known brace-expansion issue; tests already passed above"
+        continue-on-error: true
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         if: always()

@@ -23,7 +23,9 @@ export default function CoverageComparison() {
     <SectionWrapper dark>
       <SectionTitle
         overline={isZh ? '覆蓋度對比' : 'COVERAGE MAP'}
-        title={isZh ? '別人做單層,我們做整個堆疊' : 'Every competitor covers 1-2 layers. We cover 6.'}
+        title={
+          isZh ? '別人做單層,我們做整個堆疊' : 'Every competitor covers 1-2 layers. We cover 6.'
+        }
         subtitle={
           isZh
             ? '7 層架構下的產業現況。PanGuard 是第一個 full-stack Agent Security Platform(ASP)。'
