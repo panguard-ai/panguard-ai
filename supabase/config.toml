@@ -1,0 +1,151 @@
+# =============================================================================
+# Supabase configuration for PanGuard AI Customer Dashboard (Phase 2 MVP)
+# -----------------------------------------------------------------------------
+# Generated: 2026-04-22
+# Docs: https://supabase.com/docs/guides/cli/config
+#
+# This file drives both `supabase start` (local Docker stack) and `supabase db
+# push` (remote project). Keep it in source control. Sensitive values live in
+# `.env` / `.env.local`, never here.
+# =============================================================================
+
+# Unique project reference used by the CLI. Must be lowercase + kebab-safe.
+project_id = "panguard"
+
+# -----------------------------------------------------------------------------
+# [api] — PostgREST auto-API served at http://localhost:<port>
+# -----------------------------------------------------------------------------
+[api]
+enabled = true
+# Standard local port; change only if 54321 conflicts on host.
+port = 54321
+# Schemas exposed to PostgREST. `public` holds our tables; `storage` and
+# `graphql_public` are Supabase-provided. We deliberately do NOT expose
+# `auth` — auth.users is only reachable through SQL and auth helpers.
+schemas = ["public", "storage", "graphql_public"]
+# `extensions` schema contains pg_graphql, pgcrypto, etc. Kept searchable so
+# queries don't need to schema-qualify built-ins.
+extra_search_path = ["public", "extensions"]
+# Row limit for implicit queries (protects from runaway selects through REST).
+max_rows = 1000
+
+# -----------------------------------------------------------------------------
+# [db] — Local Postgres instance
+# -----------------------------------------------------------------------------
+[db]
+port = 54322
+# Postgres major version. 15 is Supabase default for late-2025 projects.
+major_version = 15
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+# -----------------------------------------------------------------------------
+# [studio] — Web UI for browsing tables, running SQL, editing policies
+# -----------------------------------------------------------------------------
+[studio]
+enabled = true
+port = 54323
+# OpenAI key for Studio's SQL assistant. Leave unset — we don't use it.
+# openai_api_key = "env(OPENAI_API_KEY)"
+
+# -----------------------------------------------------------------------------
+# [inbucket] — Local SMTP catcher for magic-link emails during dev
+# -----------------------------------------------------------------------------
+[inbucket]
+enabled = true
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+# -----------------------------------------------------------------------------
+# [storage] — Object storage for compliance report PDFs
+# -----------------------------------------------------------------------------
+[storage]
+enabled = true
+# 10 MiB hard cap per file — matches the `reports` bucket limit in
+# migrations/20260422000003_storage.sql so the two places agree.
+file_size_limit = "10MiB"
+
+[storage.image_transformation]
+enabled = false
+
+# -----------------------------------------------------------------------------
+# [auth] — PanGuard console is magic-link-only. No passwords, no social OAuth
+# for MVP. Anonymous users disabled (we never want unauthenticated writes).
+# -----------------------------------------------------------------------------
+[auth]
+enabled = true
+# Production site. Auth emails link users back here.
+site_url = "https://app.panguard.ai"
+# Additional URLs allowed as redirect targets after magic-link confirmation.
+# `localhost:3000` covers local Next.js dev; add preview deploys as needed.
+additional_redirect_urls = [
+  "http://localhost:3000",
+  "http://localhost:3000/auth/callback",
+  "https://app.panguard.ai/auth/callback"
+]
+# 1h access token. Short enough to limit blast radius if a token leaks;
+# long enough to avoid re-auth churn during a dashboard session. Refresh
+# tokens (below) handle silent renewal.
+jwt_expiry = 3600
+# Refresh token lifetime (30 days). Rotates on use.
+refresh_token_rotation_enabled = true
+# If a refresh token is reused, revoke the whole family — prevents stolen
+# token replay.
+security_refresh_token_reuse_interval = 10
+# Confirm email before first sign-in. Magic-link signup handles this in one
+# step (click link = confirmed), so this is a belt-and-braces default.
+enable_signup = true
+enable_manual_linking = false
+
+# --- Email auth ---
+[auth.email]
+enable_signup = true
+# NEVER allow password logins. Magic-link only keeps the attack surface
+# small (no credential stuffing, no password reset flow to phish).
+enable_confirmations = true
+double_confirm_changes = true
+secure_password_change = false
+
+# Magic link: user enters email → receives link → clicks → logged in.
+[auth.email.template.magic_link]
+subject = "Sign in to PanGuard"
+# Message body lives in supabase/templates/magic_link.html (create when
+# the design is ready). Default template is acceptable for MVP.
+
+# --- Password auth: explicitly disabled ---
+# Supabase has no single "disable password" flag; we disable by requiring
+# signup confirmations and never shipping a password form in the app.
+# The `enable_confirmations = true` above, plus the app never calling
+# `signInWithPassword`, achieves password-disabled in practice.
+
+# --- Providers: all OAuth providers left disabled for MVP ---
+[auth.external.google]
+enabled = false
+[auth.external.github]
+enabled = false
+
+# -----------------------------------------------------------------------------
+# [edge_runtime] — Deno functions. Not used in MVP; kept off.
+# -----------------------------------------------------------------------------
+[edge_runtime]
+enabled = false
+port = 54327
+
+# -----------------------------------------------------------------------------
+# [analytics] — Logflare. Disabled locally (adds Docker overhead).
+# -----------------------------------------------------------------------------
+[analytics]
+enabled = false
+
+# -----------------------------------------------------------------------------
+# [realtime] — Postgres CDC for live UI updates (e.g. new report appears
+# in another tab). Enabled but table subscriptions are opt-in.
+# -----------------------------------------------------------------------------
+[realtime]
+enabled = true

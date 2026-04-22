@@ -1,0 +1,30 @@
+-- =============================================================================
+-- PanGuard AI — local development seed
+-- -----------------------------------------------------------------------------
+-- This file runs automatically after `supabase db reset` (and is skipped by
+-- `supabase db push` on remote projects). It is INTENTIONALLY minimal.
+--
+-- Why minimal:
+--   * Creating `auth.users` rows requires password hashes or the auth admin
+--     API — doing it here is brittle and tends to drift from what Supabase
+--     provisions at signup. So user + workspace creation lives in
+--     `scripts/seed.ts` (future), which calls `supabase.auth.admin.createUser`
+--     and then invokes the `create_workspace()` RPC with the minted JWT.
+--   * The SQL seed only fills in data that doesn't depend on an auth.users
+--     row — currently nothing, which is why this file is empty apart from
+--     documentation.
+--
+-- If you want to smoke-test migrations without a seed script, `supabase db
+-- reset` will still stand the schema up correctly; you just won't have a
+-- demo workspace to click through.
+--
+-- To add demo data here later (post-MVP), keep inserts to:
+--   * Reference data (framework catalog, role descriptions) that doesn't
+--     need an auth.users FK, OR
+--   * INSERTs against tables where the auth.users FK is nullable (audit_log
+--     with user_id = NULL for system events, for example).
+-- =============================================================================
+
+-- No rows to insert yet. `supabase/scripts/seed.ts` will handle auth-tied
+-- setup (create test user, call create_workspace, issue a dev API key).
+SELECT 1 WHERE false;  -- no-op, keeps the file syntactically valid
