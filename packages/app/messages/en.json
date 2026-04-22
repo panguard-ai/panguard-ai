@@ -1,0 +1,57 @@
+{
+  "app": {
+    "appName": "PanGuard",
+    "tagline": "Agent Security Platform"
+  },
+  "nav": {
+    "overview": "Overview",
+    "events": "Events",
+    "reports": "Reports",
+    "settings": "Settings",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "loginTitle": "Sign in to PanGuard",
+    "loginSubtitle": "We'll send a magic link to your email.",
+    "emailLabel": "Work email",
+    "emailPlaceholder": "you@company.com",
+    "sendLink": "Send magic link",
+    "sending": "Sending...",
+    "linkSentTitle": "Check your inbox",
+    "linkSentBody": "A sign-in link is on its way to {email}. It expires in 60 minutes.",
+    "tryDifferentEmail": "Use a different email",
+    "errorTitle": "Sign-in failed",
+    "errorBody": "We couldn't verify that magic link. It may have expired — please request a new one.",
+    "backToLogin": "Back to sign in"
+  },
+  "onboarding": {
+    "title": "Create your workspace",
+    "subtitle": "A workspace is where your team's security events, endpoints, and reports live.",
+    "nameLabel": "Workspace name",
+    "namePlaceholder": "Acme Security",
+    "slugLabel": "URL slug",
+    "slugHint": "Lowercase letters, numbers, and hyphens. This can't be changed later.",
+    "create": "Create workspace"
+  },
+  "workspace": {
+    "overviewTitle": "Overview",
+    "eventsTitle": "Security events",
+    "reportsTitle": "Compliance reports",
+    "settingsTitle": "Workspace settings",
+    "emptyEventsTitle": "No events yet",
+    "emptyEventsBody": "Install the CLI and run {command} on a developer machine to start streaming events.",
+    "emptyReportsTitle": "No reports generated yet",
+    "emptyReportsBody": "Generate your first compliance report from live evidence collected by the Guard.",
+    "generateReport": "Generate report"
+  },
+  "device": {
+    "title": "Authorize CLI",
+    "subtitle": "Enter the code shown in your terminal.",
+    "codeLabel": "User code",
+    "approveTitle": "Authorize this device?",
+    "approveBody": "A CLI session will be granted access to workspace {workspace} as {email}.",
+    "approve": "Authorize",
+    "cancel": "Cancel",
+    "approved": "Device approved. You can close this tab and return to the terminal."
+  }
+}

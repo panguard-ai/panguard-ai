@@ -1,0 +1,57 @@
+{
+  "app": {
+    "appName": "PanGuard",
+    "tagline": "AI 代理資安平台"
+  },
+  "nav": {
+    "overview": "總覽",
+    "events": "事件",
+    "reports": "報告",
+    "settings": "設定",
+    "signOut": "登出"
+  },
+  "auth": {
+    "loginTitle": "登入 PanGuard",
+    "loginSubtitle": "我們會寄送魔法連結到你的信箱。",
+    "emailLabel": "公司電子郵件",
+    "emailPlaceholder": "you@company.com",
+    "sendLink": "寄送魔法連結",
+    "sending": "寄送中...",
+    "linkSentTitle": "請查看你的信箱",
+    "linkSentBody": "登入連結已寄至 {email},60 分鐘內有效。",
+    "tryDifferentEmail": "改用其他信箱",
+    "errorTitle": "登入失敗",
+    "errorBody": "此魔法連結無法驗證,可能已過期,請重新申請。",
+    "backToLogin": "返回登入"
+  },
+  "onboarding": {
+    "title": "建立你的 Workspace",
+    "subtitle": "Workspace 是你團隊事件、端點與報告的存放處。",
+    "nameLabel": "Workspace 名稱",
+    "namePlaceholder": "Acme Security",
+    "slugLabel": "網址代稱",
+    "slugHint": "僅能使用小寫英文、數字與連字號。一旦建立無法更改。",
+    "create": "建立 Workspace"
+  },
+  "workspace": {
+    "overviewTitle": "總覽",
+    "eventsTitle": "安全事件",
+    "reportsTitle": "合規報告",
+    "settingsTitle": "Workspace 設定",
+    "emptyEventsTitle": "尚未有任何事件",
+    "emptyEventsBody": "安裝 CLI 並在開發機執行 {command} 即可開始收集事件。",
+    "emptyReportsTitle": "尚未產生報告",
+    "emptyReportsBody": "從 Guard 收集到的實證產生你的第一份合規報告。",
+    "generateReport": "產生報告"
+  },
+  "device": {
+    "title": "授權 CLI",
+    "subtitle": "輸入終端機顯示的驗證碼。",
+    "codeLabel": "驗證碼",
+    "approveTitle": "要授權此裝置嗎?",
+    "approveBody": "CLI 工作階段將以 {email} 身分存取 workspace {workspace}。",
+    "approve": "授權",
+    "cancel": "取消",
+    "approved": "裝置已授權,可關閉此分頁返回終端機。"
+  }
+}

@@ -14,6 +14,8 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
 import { contentHash, patternHash } from '@panguard-ai/scan-core';
+import { buildEventsFromAuditReport, syncEvents } from '../workspace-sync.js';
+import { PANGUARD_VERSION } from '../../index.js';
 
 /** Default Threat Cloud endpoint */
 const DEFAULT_TC_ENDPOINT = 'https://tc.panguard.ai';
@@ -583,6 +585,40 @@ response:
           } catch {
             // Best effort
           }
+        }
+
+        // ── Workspace sync: if user is logged in (`pga login`), mirror this
+        //    scan into their app.panguard.ai dashboard. Community / anonymous
+        //    users skip this path automatically (syncEvents returns with
+        //    skipped='anonymous'). Silent on success unless --verbose.
+        try {
+          // Compute a stable hash of the scanned target so the dashboard can
+          // dedup repeated scans of the same artifact.
+          let targetHash: string | undefined;
+          try {
+            targetHash = computeSkillHash(resolvedPath);
+          } catch {
+            targetHash = undefined;
+          }
+          const events = buildEventsFromAuditReport({
+            target: remoteSource ?? resolvedPath,
+            targetHash,
+            riskLevel: report.riskLevel,
+            riskScore: report.riskScore,
+            findings: report.findings as Array<{
+              ruleId?: string;
+              severity?: string;
+              title?: string;
+              description?: string;
+            }>,
+            skillName: report.manifest?.name ?? path.basename(resolvedPath),
+          });
+          await syncEvents(events, {
+            panguardVersion: PANGUARD_VERSION,
+            verbose: !!options.verbose,
+          });
+        } catch {
+          // syncEvents is already non-throwing; this is a belt-and-braces.
         }
 
         // Clean up temp directory if we fetched from URL

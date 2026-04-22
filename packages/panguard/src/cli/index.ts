@@ -83,6 +83,11 @@ program.addCommand(statusCommand());
 program.addCommand(sensorCommand());
 program.addCommand(upgradeCommand());
 
+// ── Account / auth commands (shown in help) ──
+program.addCommand(loginCommand());
+program.addCommand(logoutCommand());
+program.addCommand(whoamiCommand());
+
 // ── Secondary commands (shown in help) ──
 program.addCommand(chatCommand());
 program.addCommand(configCommand());
@@ -98,9 +103,6 @@ program.addCommand(threatCommand(), hidden);
 program.addCommand(demoCommand(), hidden);
 program.addCommand(initCommand(), hidden);
 program.addCommand(deployCommand(), hidden);
-program.addCommand(loginCommand(), hidden);
-program.addCommand(logoutCommand(), hidden);
-program.addCommand(whoamiCommand(), hidden);
 program.addCommand(hardeningCommand(), hidden);
 program.addCommand(hacktivityCommand(), hidden);
 

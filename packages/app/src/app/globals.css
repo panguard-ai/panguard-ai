@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+html,
+body {
+  background: #1a1614;
+  color: #f5f1e8;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(139, 154, 142, 0.3);
+  color: #f5f1e8;
+}
+
+/* Ambient sage glow, kept very subtle so it does not fight dashboard data density */
+body::after {
+  content: '';
+  position: fixed;
+  top: -10%;
+  right: -10%;
+  width: 40vw;
+  height: 40vh;
+  background: radial-gradient(circle, rgba(139, 154, 142, 0.04) 0%, transparent 60%);
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+code,
+pre,
+kbd {
+  font-family: var(--font-mono);
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.1em 0.4em;
+  font-size: 0.85em;
+  background: #272320;
+  border: 1px solid #2e2a27;
+  border-radius: 4px;
+}
