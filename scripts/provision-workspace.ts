@@ -31,6 +31,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { randomUUID } from 'node:crypto';
 
 // ─── Arg parsing (no external dep) ───────────────────────────────────────
 
@@ -135,7 +136,15 @@ async function main(): Promise<void> {
     return;
   }
 
-  // 1. Create workspace row (service role bypasses RLS + the create_workspace RPC's auth check)
+  // 1. Mint a TC org id up front so the workspace carries the link from day 1.
+  // We generate it here (Supabase side) rather than calling TC's admin API
+  // because TC's orgs table accepts client-supplied UUIDs — and doing it here
+  // means provisioning works even when TC is down. A future reconciliation
+  // job can ensure TC has a matching orgs row; workspaces.tc_org_id is the
+  // source of truth for the mapping.
+  const tcOrgId = randomUUID();
+
+  // 2. Create workspace row (service role bypasses RLS + the create_workspace RPC's auth check)
   const { data: ws, error: wsErr } = await sb
     .from('workspaces')
     .insert({
@@ -143,6 +152,7 @@ async function main(): Promise<void> {
       slug: args.slug,
       tier: args.tier,
       tier_expires_at: tierExpiresAt,
+      tc_org_id: tcOrgId,
     })
     .select()
     .single();
@@ -155,6 +165,7 @@ async function main(): Promise<void> {
   }
 
   console.log(`  ✓ workspace created: ${ws.id}`);
+  console.log(`  ✓ tc_org_id:         ${tcOrgId}`);
 
   // 2. Invite the admin email (sends magic link)
   const { data: invite, error: inviteErr } = await sb.auth.admin.inviteUserByEmail(

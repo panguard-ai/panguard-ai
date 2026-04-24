@@ -217,6 +217,11 @@ function toAuthInfo(payload: DevicePollSuccess): AuthInfo {
     tier: payload.workspace.tier,
     user_email: payload.user.email,
     logged_in_at: new Date().toISOString(),
+    // Optional TC correlation id — only written to auth.json when the server
+    // returns it. Older workspaces without a TC link omit this field.
+    ...(typeof payload.workspace.tc_org_id === 'string'
+      ? { tc_org_id: payload.workspace.tc_org_id }
+      : {}),
   });
 }
 
