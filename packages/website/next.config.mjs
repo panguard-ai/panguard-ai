@@ -21,6 +21,21 @@ const nextConfig = {
       '/changelog',
     ];
 
+    // The authenticated customer dashboard lives at app.panguard.ai. The
+    // marketing site used to have a /console/fleet preview that was an
+    // unauthenticated empty shell — removed 2026-04-24. Any inbound links
+    // or bookmarks get forwarded to the real app.
+    const consoleRedirects = [
+      { source: '/console', destination: 'https://app.panguard.ai/', permanent: false },
+      { source: '/console/:path*', destination: 'https://app.panguard.ai/', permanent: false },
+      { source: '/zh-TW/console', destination: 'https://app.panguard.ai/', permanent: false },
+      {
+        source: '/zh-TW/console/:path*',
+        destination: 'https://app.panguard.ai/',
+        permanent: false,
+      },
+    ];
+
     const productRedirects = [
       { source: '/product/trap', destination: '/product/guard', permanent: false },
       { source: '/zh-TW/product/trap', destination: '/zh-TW/product/guard', permanent: false },
@@ -41,6 +56,7 @@ const nextConfig = {
         { source, destination: '/', permanent: false },
         { source: `/zh-TW${source}`, destination: '/', permanent: false },
       ]),
+      ...consoleRedirects,
       ...productRedirects,
     ];
   },
