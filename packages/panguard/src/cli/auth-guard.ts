@@ -43,6 +43,13 @@ export interface AuthInfo {
   readonly tier: string;
   readonly user_email: string;
   readonly logged_in_at: string;
+  /**
+   * Optional: UUID of the matching TC org (tc.panguard.ai `orgs.id`).
+   * When set, workspace-sync.ts passes it to TC as an `X-Panguard-Workspace-Id`
+   * header so TC can correlate this workspace's events with its anonymous
+   * telemetry pool. Populated from `/api/me` or the device-flow poll response.
+   */
+  readonly tc_org_id?: string;
 }
 
 /** Absolute path to the auth file. */
@@ -85,6 +92,12 @@ export async function loadAuth(): Promise<AuthInfo | null> {
       tier: parsed.tier,
       user_email: parsed.user_email,
       logged_in_at: parsed.logged_in_at,
+      // tc_org_id is optional: present on auth.json written by login-flows
+      // post-2026-04-24, absent on older sessions (still valid, just no TC
+      // correlation header until next `pga login`).
+      ...(typeof (parsed as unknown as Record<string, unknown>)['tc_org_id'] === 'string'
+        ? { tc_org_id: (parsed as unknown as { tc_org_id: string }).tc_org_id }
+        : {}),
     });
   } catch {
     return null;

@@ -31,6 +31,12 @@ export interface DevicePollSuccess {
     readonly slug: string;
     readonly name: string;
     readonly tier: string;
+    /**
+     * Optional: matching TC org_id for correlating paid events with anonymous
+     * telemetry. Absent if the workspace was provisioned before the TC link
+     * migration landed.
+     */
+    readonly tc_org_id?: string | null;
   };
   readonly user: { readonly email: string };
 }

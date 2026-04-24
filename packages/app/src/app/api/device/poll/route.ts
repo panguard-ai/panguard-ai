@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
   const { data: code, error } = await admin
     .from('device_codes')
-    .select('*, workspaces(id, slug, name, tier)')
+    .select('*, workspaces(id, slug, name, tier, tc_org_id)')
     .eq('device_code', parsed.data.device_code)
     .maybeSingle();
 
@@ -77,7 +77,13 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     api_key: plaintext,
     workspace: workspace
-      ? { id: workspace.id, slug: workspace.slug, name: workspace.name, tier: workspace.tier }
+      ? {
+          id: workspace.id,
+          slug: workspace.slug,
+          name: workspace.name,
+          tier: workspace.tier,
+          tc_org_id: workspace.tc_org_id,
+        }
       : null,
     user: { email: userEmail },
     token_type: 'Bearer',

@@ -43,6 +43,13 @@ export interface Workspace {
   tier: Tier;
   tier_expires_at: string | null;
   tc_api_key_hash: string | null;
+  /**
+   * UUID matching tc.panguard.ai `orgs.id`. Used to correlate paid-tier events
+   * (stored in Supabase `events` table) with anonymous Community telemetry
+   * (stored in TC SQLite). Populated by scripts/provision-workspace.ts.
+   */
+  tc_org_id: string | null;
+  tc_client_key_hash: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -148,7 +155,17 @@ export interface Database {
     Tables: {
       workspaces: {
         Row: Workspace;
-        Insert: InsertOf<Workspace, 'id' | 'created_at' | 'updated_at' | 'tier' | 'tier_expires_at' | 'tc_api_key_hash'>;
+        Insert: InsertOf<
+          Workspace,
+          | 'id'
+          | 'created_at'
+          | 'updated_at'
+          | 'tier'
+          | 'tier_expires_at'
+          | 'tc_api_key_hash'
+          | 'tc_org_id'
+          | 'tc_client_key_hash'
+        >;
         Update: Partial<Workspace>;
         Relationships: [];
       };

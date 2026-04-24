@@ -14,7 +14,11 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
 import { contentHash, patternHash } from '@panguard-ai/scan-core';
-import { buildEventsFromAuditReport, syncEvents } from '../workspace-sync.js';
+import {
+  buildEventsFromAuditReport,
+  getTcCorrelationHeaders,
+  syncEvents,
+} from '../workspace-sync.js';
 import { PANGUARD_VERSION } from '../../index.js';
 
 /** Default Threat Cloud endpoint */
@@ -566,10 +570,17 @@ response:
               cleanCount: report.riskLevel === 'LOW' || report.riskScore === 0 ? 1 : 0,
             });
 
-            // Also report usage event for counter dashboard
+            // Also report usage event for counter dashboard. When the user is
+            // logged in, include workspace correlation headers so future TC
+            // upgrades can join this anonymous telemetry back to the paid
+            // workspace's events in Supabase (the bridge schema from
+            // supabase/migrations/20260422000006_tc_org_link.sql).
             void fetch(`${options.tcEndpoint}/api/usage`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                ...getTcCorrelationHeaders(),
+              },
               body: JSON.stringify({
                 event_type: 'cli_scan',
                 source: 'cli-user',

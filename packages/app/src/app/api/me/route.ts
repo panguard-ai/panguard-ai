@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 
   const { data: workspace } = await admin
     .from('workspaces')
-    .select('id, slug, name, tier, tier_expires_at')
+    .select('id, slug, name, tier, tier_expires_at, tc_org_id')
     .eq('id', key.workspace_id)
     .maybeSingle();
   if (!workspace) {
@@ -86,6 +86,7 @@ export async function GET(req: NextRequest) {
       name: workspace.name,
       tier: workspace.tier,
       tier_expires_at: workspace.tier_expires_at,
+      tc_org_id: workspace.tc_org_id,
     },
     stats: {
       endpoints_count: endpointsCount ?? 0,

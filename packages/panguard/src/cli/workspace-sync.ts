@@ -43,6 +43,14 @@ interface AuthInfo {
   workspace_name: string;
   tier: string;
   user_email: string;
+  /**
+   * UUID of the matching TC org. Optional — only set if the workspace was
+   * provisioned with a linked TC org (see Supabase migration
+   * 20260422000006_tc_org_link.sql). Used by getTcCorrelationHeaders() so
+   * existing anonymous TC telemetry can be post-hoc correlated back to this
+   * workspace without breaking Community-tier anonymous behaviour.
+   */
+  tc_org_id?: string;
 }
 
 export function authJsonPath(): string {
@@ -58,6 +66,27 @@ export function tryLoadAuth(): AuthInfo | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Headers to pass on any CLI → tc.panguard.ai request when the user is
+ * authenticated to a paid workspace. Harmless when TC doesn't know about
+ * workspaces yet (TC ignores unknown headers); enables retroactive
+ * correlation once TC gains workspace-aware endpoints.
+ *
+ * Returns an empty object if the user is anonymous (Community tier) so
+ * Community behaviour is byte-identical to pre-Phase-2 code.
+ */
+export function getTcCorrelationHeaders(): Record<string, string> {
+  const auth = tryLoadAuth();
+  if (!auth) return {};
+  const headers: Record<string, string> = {
+    'X-Panguard-Workspace-Id': auth.workspace_id,
+  };
+  if (auth.tc_org_id) {
+    headers['X-Panguard-Tc-Org-Id'] = auth.tc_org_id;
+  }
+  return headers;
 }
 
 // ─── Event payload shape (must match app/src/app/api/v2/events/route.ts zod) ──
