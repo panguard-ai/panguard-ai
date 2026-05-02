@@ -55,6 +55,15 @@ const hardeningCommand = lazyCommand(
   './commands/hardening.js',
   'hardeningCommand'
 );
+// Enterprise-only: resolves @panguard/migrator from a private workspace or
+// `pnpm link`. Community installs skip this command silently — the lazyCommand
+// wrapper only attempts the dynamic import when migrate-pro is invoked.
+const migrateProCommand = lazyCommand(
+  'migrate-pro',
+  'Convert Sigma/YARA detection rules to ATR YAML (Enterprise)',
+  '@panguard/migrator/cli/migrate-pro',
+  'migrateProCommand'
+);
 import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
 import { doctorCommand } from './commands/doctor.js';
@@ -105,6 +114,7 @@ program.addCommand(initCommand(), hidden);
 program.addCommand(deployCommand(), hidden);
 program.addCommand(hardeningCommand(), hidden);
 program.addCommand(hacktivityCommand(), hidden);
+program.addCommand(migrateProCommand(), hidden);
 
 const userArgs = process.argv.slice(2);
 const helpFlags = new Set(['-h', '--help', '-V', '--version']);
