@@ -1,0 +1,76 @@
+{
+  "name": "@panguard-ai/migrator-community",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Sigma / YARA → ATR YAML converter (community edition). Open-source detection rule migration for AI agent security.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/panguard-ai/panguard-ai",
+    "directory": "packages/migrator-community"
+  },
+  "homepage": "https://panguard.ai/migrator",
+  "keywords": [
+    "sigma",
+    "yara",
+    "atr",
+    "agent-threat-rules",
+    "detection",
+    "ai-security",
+    "ai-agent",
+    "compliance",
+    "migration"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./parsers/sigma": {
+      "types": "./dist/parsers/sigma/index.d.ts",
+      "default": "./dist/parsers/sigma/index.js"
+    },
+    "./parsers/yara": {
+      "types": "./dist/parsers/yara/index.d.ts",
+      "default": "./dist/parsers/yara/index.js"
+    },
+    "./ir": {
+      "types": "./dist/ir/index.d.ts",
+      "default": "./dist/ir/index.js"
+    },
+    "./transformers": {
+      "types": "./dist/transformers/index.d.ts",
+      "default": "./dist/transformers/index.js"
+    }
+  },
+  "bin": {
+    "panguard-migrate": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "agent-threat-rules": "^2.0.17",
+    "commander": "^12.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.14.0",
+    "typescript": "~5.7.3",
+    "vitest": "^3.0.0"
+  }
+}
