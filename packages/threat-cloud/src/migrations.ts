@@ -310,6 +310,47 @@ export const migrations: readonly Migration[] = [
       );
     },
   },
+  {
+    version: 12,
+    name: 'add_migrator_telemetry_table',
+    up: (db) => {
+      // Per-rule fingerprints from Migrator runs. Carries no rule body —
+      // condition_hash is SHA-256 over the conditions, install_id is a
+      // random per-install UUID. Used by the crystallization analyzer to
+      // surface rules that recur across N+ tenants without leaking content.
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS migrator_telemetry (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          install_id TEXT NOT NULL,
+          migrator_version TEXT NOT NULL DEFAULT 'unknown',
+          source_kind TEXT NOT NULL DEFAULT 'sigma',
+          atr_id TEXT NOT NULL,
+          category TEXT NOT NULL DEFAULT 'unknown',
+          severity TEXT NOT NULL DEFAULT 'low',
+          has_agent_analogue INTEGER NOT NULL DEFAULT 0,
+          condition_hash TEXT NOT NULL,
+          framework_count INTEGER NOT NULL DEFAULT 0,
+          eu_articles TEXT,
+          owasp_agentic_ids TEXT,
+          owasp_llm_ids TEXT,
+          run_id TEXT NOT NULL,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+      `);
+      db.exec(
+        `CREATE INDEX IF NOT EXISTS idx_migrator_tel_hash ON migrator_telemetry(condition_hash)`
+      );
+      db.exec(
+        `CREATE INDEX IF NOT EXISTS idx_migrator_tel_install ON migrator_telemetry(install_id)`
+      );
+      db.exec(
+        `CREATE INDEX IF NOT EXISTS idx_migrator_tel_created ON migrator_telemetry(created_at)`
+      );
+      db.exec(
+        `CREATE INDEX IF NOT EXISTS idx_migrator_tel_atr ON migrator_telemetry(atr_id)`
+      );
+    },
+  },
 ];
 
 /**

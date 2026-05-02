@@ -1,0 +1,3561 @@
+{
+  "schema_version": "1.0",
+  "pack_type": "eu-ai-act-migrator-evidence",
+  "metadata": {
+    "generated_at": "2026-05-02T19:30:11.794Z",
+    "migrator_version": "unknown",
+    "customer_id": "DEMO-CORP-EU",
+    "audit_period": "2026-Q2",
+    "total_rules": 50,
+    "rules_with_agent_analogue": 40,
+    "rules_needing_human_review": 10,
+    "placeholder_rules": 10,
+    "hand_crafted_rules": 40
+  },
+  "framework_summaries": [
+    {
+      "framework": "eu_ai_act",
+      "total_rules_with_mapping": 50,
+      "entries": [
+        {
+          "article": "12",
+          "rule_count": 18,
+          "primary_count": 7,
+          "secondary_count": 1,
+          "partial_count": 10
+        },
+        {
+          "article": "14",
+          "rule_count": 13,
+          "primary_count": 13,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "15",
+          "rule_count": 40,
+          "primary_count": 40,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "50",
+          "rule_count": 4,
+          "primary_count": 2,
+          "secondary_count": 2,
+          "partial_count": 0
+        },
+        {
+          "article": "9",
+          "rule_count": 4,
+          "primary_count": 4,
+          "secondary_count": 0,
+          "partial_count": 0
+        }
+      ]
+    },
+    {
+      "framework": "owasp_agentic",
+      "total_rules_with_mapping": 40,
+      "entries": [
+        {
+          "article": "ASI01:2026",
+          "rule_count": 3,
+          "primary_count": 1,
+          "secondary_count": 2,
+          "partial_count": 0
+        },
+        {
+          "article": "ASI02:2026",
+          "rule_count": 4,
+          "primary_count": 4,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "ASI04:2026",
+          "rule_count": 2,
+          "primary_count": 2,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "ASI05:2026",
+          "rule_count": 17,
+          "primary_count": 17,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "ASI06:2026",
+          "rule_count": 21,
+          "primary_count": 18,
+          "secondary_count": 3,
+          "partial_count": 0
+        },
+        {
+          "article": "ASI07:2026",
+          "rule_count": 4,
+          "primary_count": 3,
+          "secondary_count": 1,
+          "partial_count": 0
+        },
+        {
+          "article": "ASI08:2026",
+          "rule_count": 1,
+          "primary_count": 1,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "ASI09:2026",
+          "rule_count": 3,
+          "primary_count": 2,
+          "secondary_count": 1,
+          "partial_count": 0
+        }
+      ]
+    },
+    {
+      "framework": "owasp_llm",
+      "total_rules_with_mapping": 36,
+      "entries": [
+        {
+          "article": "LLM01:2025",
+          "rule_count": 4,
+          "primary_count": 3,
+          "secondary_count": 1,
+          "partial_count": 0
+        },
+        {
+          "article": "LLM02:2025",
+          "rule_count": 11,
+          "primary_count": 11,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "LLM03:2025",
+          "rule_count": 3,
+          "primary_count": 3,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "LLM06:2025",
+          "rule_count": 19,
+          "primary_count": 15,
+          "secondary_count": 3,
+          "partial_count": 1
+        }
+      ]
+    },
+    {
+      "framework": "nist_ai_rmf",
+      "total_rules_with_mapping": 50,
+      "entries": [
+        {
+          "article": "Govern::GV.1.1",
+          "rule_count": 10,
+          "primary_count": 0,
+          "secondary_count": 0,
+          "partial_count": 10
+        },
+        {
+          "article": "Manage::MG.2.3",
+          "rule_count": 18,
+          "primary_count": 18,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "Manage::MG.3.2",
+          "rule_count": 2,
+          "primary_count": 2,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "Manage::MG.4.1",
+          "rule_count": 8,
+          "primary_count": 8,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "Manage::MG.4.2",
+          "rule_count": 4,
+          "primary_count": 4,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "Measure::MS.2.7",
+          "rule_count": 4,
+          "primary_count": 4,
+          "secondary_count": 0,
+          "partial_count": 0
+        },
+        {
+          "article": "Measure::MS.3.3",
+          "rule_count": 4,
+          "primary_count": 4,
+          "secondary_count": 0,
+          "partial_count": 0
+        }
+      ]
+    },
+    {
+      "framework": "iso_42001",
+      "total_rules_with_mapping": 33,
+      "entries": [
+        {
+          "article": "8.4",
+          "rule_count": 33,
+          "primary_count": 33,
+          "secondary_count": 0,
+          "partial_count": 0
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "ATR-2026-10882",
+      "rule_title": "Screen Capture Activity Via Psr.EXE",
+      "source": "sigma",
+      "source_id": "2158f96f-43c2-43cb-952a-ab4580f32382",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "a9c504cbaffeec4dad29a54c27b7c4cdcbc55bb0945f632fd9afc83c44c2e92a",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "50"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — screen capture by agent leaks UI content not in agent context."
+          },
+          {
+            "article": "50",
+            "strength": "primary",
+            "context": "Article 50 transparency — users should know agent is recording screen."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — psr.exe used for surveillance."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Sensitive Information Disclosure via screen content."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime detection of unsanctioned data capture."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for surveillance via agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-12808",
+      "rule_title": "Process Initiated Network Connection To Ngrok Domain",
+      "source": "sigma",
+      "source_id": "18249279-932f-45e2-b37a-8925f2597670",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "d2b58a89010bd7e8280c6fae3519f6fcbf86e0fc7beaed4481bb901e6bff9238",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "12"
+        ],
+        "owasp_agentic_ids": [
+          "ASI02:2026",
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — agents fetching from or posting to ngrok tunnels are operating outside their declared scope. Often correlated with prompt-injection that exfiltrates context_window contents."
+          },
+          {
+            "article": "12",
+            "strength": "primary",
+            "context": "Article 12 logging — every ngrok-bound tool_call should be logged for post-incident traceability. Firing this rule is the logging trigger."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI02:2026",
+            "strength": "primary",
+            "context": "ASI02:2026 Memory/Context Manipulation — exfiltrating context_window or memory_access contents via outbound HTTP to attacker tunnel."
+          },
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "ASI05:2026 Tool Misuse — using legitimate HTTP tools for exfiltration to non-business destinations."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "LLM02:2025 Sensitive Information Disclosure — exfiltration tunnels are the canonical disclosure channel."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "NIST AI RMF MG.2.3 — runtime treatment of identified data-exfiltration risks. Detection at the egress point is the primary control."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-13292",
+      "rule_title": "Sticky Key Like Backdoor Execution",
+      "source": "sigma",
+      "source_id": "2fdefcb3-dbda-401e-ae23-f0db027628bc",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "critical",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "61b60f6cc50a26dc6b218de9e69e48a845fbf27836e291e963695c8021f634b1",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "14",
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.1"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 — backdoor install requires absolute human approval."
+          },
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — backdoor enables auth bypass."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise — sticky-keys gives SYSTEM at lock screen."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.1",
+            "strength": "primary",
+            "context": "Managing risk of agent installing auth backdoor."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-13963",
+      "rule_title": "Triple Cross eBPF Rootkit Execve Hijack",
+      "source": "sigma",
+      "source_id": "0326c3c8-7803-4a0f-8c5c-368f747f7c3e",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "high",
+      "detection_field_primary": "Image",
+      "rule_sha256": "b7d3e051c99b16b6dc88d1ed9c6e75b1198689016ff08660a3895d39a92dfed8",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging applies generically: if the host running the agent process is compromised by a kernel rootkit, the agent's audit log integrity is at risk. The rule belongs in defense-in-depth host monitoring, not in agent runtime."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "NIST AI RMF GV.1.1 (governance policies) calls for host-environment integrity as a precondition for trustworthy AI. This rule supports the host-integrity precondition — it is not an AI-specific control."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-14122",
+      "rule_title": "User Has Been Deleted Via Userdel",
+      "source": "sigma",
+      "source_id": "08f26069-6f80-474b-8d1f-d971c6fedea0",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "953f12c111d7c30eee557095a3243e43356442ed82a9400b18a6ca9475243737",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "14",
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI07:2026",
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.2"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 oversight — irreversible identity actions REQUIRE human approval."
+          },
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness against destructive cascade."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI07:2026",
+            "strength": "primary",
+            "context": "Cascading Tool Misuse — identity removal can cascade across systems."
+          },
+          {
+            "id": "ASI06:2026",
+            "strength": "secondary",
+            "context": "Privilege Compromise enabling user deletion."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency — agent should never delete users."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.2",
+            "strength": "primary",
+            "context": "Incident response trigger for irreversible identity actions."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for destructive identity ops."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-14813",
+      "rule_title": "Procdump Execution",
+      "source": "sigma",
+      "source_id": "2e65275c-8288-4ab4-aeb7-6274f58b6b20",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "cf1523e799b3116ca717ab3126bba222b4fa8d88de81e695f1c96ed3cb3a48a5",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "14",
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.2"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 — lsass dump requires human gate; never agent-initiated."
+          },
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — credential dump via agent."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise — lsass dump yields domain credentials."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Sensitive Information Disclosure — credentials in memory dump."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.2",
+            "strength": "primary",
+            "context": "Incident response trigger."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-16162",
+      "rule_title": "Touch Suspicious Service File",
+      "source": "sigma",
+      "source_id": "31545105-3444-4584-bebf-c466353230d2",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "144b368c336bdeab601d0f2cdfbeda6802ea6c8167b38a1acd8f745dd4f3bd52",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "14",
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.1"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 oversight — persistent root service install requires approval."
+          },
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness against persistence."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise via persistent root service."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.1",
+            "strength": "primary",
+            "context": "Managing risk of agent installing systemd persistence."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-17154",
+      "rule_title": "Remote Access Tool - Potential MeshAgent Execution - MacOS",
+      "source": "sigma",
+      "source_id": "22c45af6-f590-4d44-bab3-b5b2d2a2b6d9",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "medium",
+      "detection_field_primary": "CommandLine",
+      "rule_sha256": "ecdbb403d5f772bdd02b326e83c7893ff0c25b2b713045abf5f8c47649dd4b17",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging — host RAT presence affects AI integrity."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "Host integrity."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-20444",
+      "rule_title": "UAC Bypass Using Consent and Comctl32 - Process",
+      "source": "sigma",
+      "source_id": "1ca6bd18-0ba0-44ca-851c-92ed89a61085",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "db3aa2e22021bdf2ce9ad0bafd6299bdc6fbfb4b439a5152e3178473be2bc1bb",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "14",
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.1"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 oversight — UAC bypass defeats the very gate Microsoft built for human approval."
+          },
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — agent should not have privilege-elevation capability."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise — UAC bypass elevates agent to admin."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency — agent self-elevating privileges."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.1",
+            "strength": "primary",
+            "context": "Managing risk of agent altering its own privileges."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for UAC bypass via AI agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-20705",
+      "rule_title": "Remote Access Tool - Potential MeshAgent Execution - Windows",
+      "source": "sigma",
+      "source_id": "2fbbe9ff-0afc-470b-bdc0-592198339968",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "medium",
+      "detection_field_primary": "CommandLine",
+      "rule_sha256": "0f7c6809ec34444981010e6e790aae17efc77ab7085b3a3e316bc519581fe9ae",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging — host RAT presence."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "Host integrity."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-21109",
+      "rule_title": "Deletion of Volume Shadow Copies via WMI with PowerShell",
+      "source": "sigma",
+      "source_id": "21ff4ca9-f13a-41ad-b828-0077b2af2e40",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "78ed9b6e6afccf48b2e19cde9a724c23ec8312e749a20fc7979ac44c6a7cd942",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "14",
+          "15",
+          "9"
+        ],
+        "owasp_agentic_ids": [
+          "ASI07:2026",
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.2"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 human oversight is REQUIRED for irreversible high-impact actions. Shadow-copy deletion is irreversible (no recovery without backups). Any agent performing this without explicit human approval fails Article 14 compliance."
+          },
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — destructive cascade resistance. Agents should refuse or escalate destructive actions; firing this rule is direct evidence the safeguard failed."
+          },
+          {
+            "article": "9",
+            "strength": "primary",
+            "context": "Article 9 risk management — destructive data actions must be in the risk register with active controls. This rule IS the active control."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI07:2026",
+            "strength": "primary",
+            "context": "ASI07:2026 (Cascading Tool Misuse) — agent chains read+delete operations to make data recovery impossible."
+          },
+          {
+            "id": "ASI06:2026",
+            "strength": "secondary",
+            "context": "Privilege compromise enabling the destructive action."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "LLM06:2025 Excessive Agency — destructive admin commands are the textbook example."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.2",
+            "strength": "primary",
+            "context": "NIST AI RMF MG.4.2 — incident response capability for AI-driven harm. Shadow-copy deletion via agent is a high-severity incident requiring immediate playbook execution."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for destructive AI actions — irreversibility makes this a top-priority assessment item."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-24756",
+      "rule_title": "Time Travel Debugging Utility Usage",
+      "source": "sigma",
+      "source_id": "0b4ae027-2a2d-4b93-8c7e-962caaba5b2a",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "high",
+      "detection_field_primary": "ParentImage",
+      "rule_sha256": "85bd9b9733cea26d99db6a5307b3248bf37857d8f3fc95745a2ac85b4ed313bc",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging applies generically; agent-host debugger compromise affects AI integrity."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "Host-environment debugger access boundary."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-26270",
+      "rule_title": "Potential Provisioning Registry Key Abuse For Binary Proxy Execution",
+      "source": "sigma",
+      "source_id": "2a4b3e61-9d22-4e4a-b60f-6e8f0cde6f25",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "b9c6174f2aa9971045a6e9b74db5fc8b4222a0692effc129b778773208f01221",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "14",
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.1"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 oversight — provisioning install bypasses standard install gates."
+          },
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness against persistence install via provisioning."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise via provisioning persistence."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency for system-level provisioning install."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.1",
+            "strength": "primary",
+            "context": "Managing risk of agent altering system provisioning."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for provisioning abuse."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-27041",
+      "rule_title": "OMIGOD SCX RunAsProvider ExecuteShellCommand",
+      "source": "sigma",
+      "source_id": "21541900-27a9-4454-9c4c-3f0a4240344a",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "high",
+      "detection_field_primary": "User",
+      "rule_sha256": "fb8c31d7d05a66fc10357cf4c37dc4d8007641fdd39fe4aa27b5695ae4060563",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging — agent host running on Azure with OMI may be compromised."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "Host-environment integrity."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-31863",
+      "rule_title": "Suspicious Processes Spawned by Java.EXE",
+      "source": "sigma",
+      "source_id": "0d34ed8b-1c12-4ff2-828c-16fc860b766d",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "3268189f7c99bd9c0e304813ca650f9e30183e1bf9fc113b45ff3e6b8244dedb",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "9"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM03:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.3.2"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — Java deserialization / Log4Shell-style RCE via agent."
+          },
+          {
+            "article": "9",
+            "strength": "primary",
+            "context": "Article 9 risk management — Log4Shell-class CVEs are documented AI deployment risks."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise via Java RCE."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM03:2025",
+            "strength": "primary",
+            "context": "Supply Chain — vulnerable Java dependency in agent runtime."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.3.2",
+            "strength": "primary",
+            "context": "Managing third-party dependency risk in AI runtime."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-34130",
+      "rule_title": "Disk Image Creation Via Hdiutil - MacOS",
+      "source": "sigma",
+      "source_id": "1cf98dc2-fcb0-47c9-8aea-654c9284d1ae",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "cd9381572ab5ac2f6cc7cb613c718620f76f6fa529ec3ffa711eceff76036724",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Measure::MS.3.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — agent staging payload via DMG creation/mount."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — hdiutil for payload packaging."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "secondary",
+            "context": "Excessive Agency — agent should not mount disk images at runtime."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Measure",
+            "subcategory": "MS.3.3",
+            "strength": "primary",
+            "context": "Detect agent operating outside expected scope."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for macOS payload-staging."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-34505",
+      "rule_title": "Remote File Download Via Desktopimgdownldr Utility",
+      "source": "sigma",
+      "source_id": "214641c2-c579-4ecb-8427-0cf19df6842e",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "49063ca896515ffcb17f87c644dfcc592f5c54acda5cd7ca6cd10c231dc57778",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — agent using OS LOLBIN to fetch second-stage payload."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — desktopimgdownldr repurposed as downloader."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency — agent should not have arbitrary download."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime treatment of LOLBIN download."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-36892",
+      "rule_title": "Base64 MZ Header In CommandLine",
+      "source": "sigma",
+      "source_id": "22e58743-4ac8-4a9f-bf19-00a0428d8c5f",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "5b29720974a3dcc036863f3dc590423495f4dc22c77621311fbf972836bf5511",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "9"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026",
+          "ASI01:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM01:2025",
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — embedded PE payload via agent shell or prompt is direct exploit attempt."
+          },
+          {
+            "article": "9",
+            "strength": "primary",
+            "context": "Article 9 risk management — embedded-payload exploitation is documented attack class."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise via in-memory PE load."
+          },
+          {
+            "id": "ASI01:2026",
+            "strength": "secondary",
+            "context": "Goal Hijack — payload injected via user_input vector."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM01:2025",
+            "strength": "primary",
+            "context": "Prompt Injection embedding base64 PE payload."
+          },
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency executing decoded payload."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime treatment of payload-injection risk."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for payload exec via agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-38740",
+      "rule_title": "Access of Sudoers File Content",
+      "source": "sigma",
+      "source_id": "0f79c4d2-4e1f-4683-9c36-b5469a665e06",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "00a4b70e74ca0435ddc66876fd46ded2e33c73ccd99113430c745ea246eb7915",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "50"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026",
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Measure::MS.3.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — reading sudoers is privilege-escalation reconnaissance."
+          },
+          {
+            "article": "50",
+            "strength": "secondary",
+            "context": "Article 50 transparency — agent reading sensitive files should be logged for users."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — shell access used to read privileged files."
+          },
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise reconnaissance."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Sensitive Information Disclosure — sudoers contents can be exfiltrated."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Measure",
+            "subcategory": "MS.3.3",
+            "strength": "primary",
+            "context": "Detect agent operating outside expected file-access scope."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for privileged-file access via agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-39365",
+      "rule_title": "Suspicious X509Enrollment - Process Creation",
+      "source": "sigma",
+      "source_id": "114de787-4eb2-48cc-abdb-c0b449f93ea4",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "1b30ee686cbe7e62be9ee4a5d4ce7be2d8c30f304afb1a7e254204fa54316716",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "14"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026",
+          "ASI09:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.1"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — installing rogue trust roots breaks the entire TLS/code-signing trust chain agent runtime depends on."
+          },
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 oversight — trust-root install is high-impact and requires human approval."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise — rogue cert enables persistent MITM."
+          },
+          {
+            "id": "ASI09:2026",
+            "strength": "primary",
+            "context": "Identity Spoofing — rogue cert impersonates legitimate authority."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency — cert install should never be agent-initiated."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.1",
+            "strength": "primary",
+            "context": "Managing risk of agent altering trust boundaries."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for trust-anchor manipulation via AI agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-41443",
+      "rule_title": "Linux Recon Indicators",
+      "source": "sigma",
+      "source_id": "0cf7a157-8879-41a2-8f55-388dd23746b7",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "ff9fae0d1965c911dfdc2c54f253c300b764d03bde490dd0bb1c2cffc26f1f69",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "50"
+        ],
+        "owasp_agentic_ids": [
+          "ASI04:2026"
+        ],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Measure::MS.3.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness covers detection of agent steering toward unauthorized data discovery. SUID-binary and credential-file enumeration is reconnaissance preparation for privilege escalation; firing this rule is direct evidence of an agent acting outside its intended scope."
+          },
+          {
+            "article": "50",
+            "strength": "secondary",
+            "context": "Article 50 (transparency) — when agent is doing reconnaissance, end users should be alerted; the rule provides the trigger."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI04:2026",
+            "strength": "primary",
+            "context": "ASI04:2026 (Resource Overload) and ASI05:2026 (Tool Misuse) — using shell tools for reconnaissance is canonical tool misuse beyond the agent task scope."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Measure",
+            "subcategory": "MS.3.3",
+            "strength": "primary",
+            "context": "Measuring agent behavior against expected scope — recon commands are a clear out-of-scope signal that NIST MS.3.3 monitoring should capture."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for AI deployment must account for agent-driven reconnaissance as a misuse vector."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-43105",
+      "rule_title": "Start of NT Virtual DOS Machine",
+      "source": "sigma",
+      "source_id": "16905e21-66ee-42fe-b256-1318ada2d770",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "medium",
+      "detection_field_primary": "Image",
+      "rule_sha256": "b6fbc35d9014d199c88021c4fb3786b9094760ea6297d31abdfda7321bb507b6",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging applies generically; NTVDM activity on agent host is host-EDR concern."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "Host-environment integrity precondition."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-49108",
+      "rule_title": "Use of Pcalua For Execution",
+      "source": "sigma",
+      "source_id": "0955e4e1-c281-4fb9-9ee1-5ee7b4b754d2",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "aaa323c6be4a2956845b46053d0e0fb61497c17e7c56d1faaa1a10c89bdf9092",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Measure::MS.2.7"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — LOLBIN evasion via agent shell."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — pcalua proxy execution."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Measure",
+            "subcategory": "MS.2.7",
+            "strength": "primary",
+            "context": "LOLBIN technique detection."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-50378",
+      "rule_title": "HackTool - CrackMapExec Execution Patterns",
+      "source": "sigma",
+      "source_id": "058f4380-962d-40a5-afce-50207d36d7e2",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "5ef61b2998d8132d5df5df8158d1f6b135a0eb724d8bc2ebb09e3a02f0c1c134",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "12"
+        ],
+        "owasp_agentic_ids": [
+          "ASI04:2026",
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — agent issuing AD enumeration is direct evidence of out-of-scope reconnaissance."
+          },
+          {
+            "article": "12",
+            "strength": "primary",
+            "context": "Article 12 logging — every AD-enum tool_call must be auditable."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI04:2026",
+            "strength": "primary",
+            "context": "Resource Overload — bulk AD enumeration via agent."
+          },
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise — AD recon precedes lateral movement."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency for post-exploit framework usage."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime treatment of agent-driven AD reconnaissance risk."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for AD reconnaissance via AI agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-50890",
+      "rule_title": "JAMF MDM Potential Suspicious Child Process",
+      "source": "sigma",
+      "source_id": "2316929c-01aa-438c-970f-099145ab1ee6",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "medium",
+      "detection_field_primary": "ParentImage",
+      "rule_sha256": "371a109d73328919c7936332095b9b93c297ba70cc37cff2680dad6e6ab8e4e8",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging — MDM compromise of agent host."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "Host integrity."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-53865",
+      "rule_title": "Network Communication Initiated To Portmap.IO Domain",
+      "source": "sigma",
+      "source_id": "07837ab9-60e1-481f-a74d-c31fb496a94c",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "c03deff3e0f8241eb3a82c3f0815ba91f300dd079b2c96b8e9d1badaa789dd4f",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "12"
+        ],
+        "owasp_agentic_ids": [
+          "ASI02:2026",
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — tunneling-service connections from agent indicate scope violation."
+          },
+          {
+            "article": "12",
+            "strength": "primary",
+            "context": "Article 12 logging requirements for outbound C2-class destinations."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI02:2026",
+            "strength": "primary",
+            "context": "Memory/Context Manipulation — context exfiltration to attacker-controlled tunnel."
+          },
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — HTTP tools used for non-business destinations."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Sensitive Information Disclosure via tunnel."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime data-exfiltration detection at egress."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for outbound tunneling via AI agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-54358",
+      "rule_title": "Shell Execution Of Process Located In Tmp Directory",
+      "source": "sigma",
+      "source_id": "2fade0b6-7423-4835-9d4f-335b39b83867",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "cc9be55952dd2a8be80ea631f98734a8fedb00571e1408680deeef7af1312e08",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — agent executing binary from tmp is dropper-pattern signal."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — agent shell launching dropper binary."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "secondary",
+            "context": "Excessive Agency."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime detection of dropper staging."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-64888",
+      "rule_title": "MacOS Scripting Interpreter AppleScript",
+      "source": "sigma",
+      "source_id": "1bc2e6c5-0885-472b-bed6-be5ea8eace55",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "b3adad43dc8fc8888219b3f443e9397ffca632cf1d3f1ae94d4fb74d9d588950",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "50"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026",
+          "ASI09:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — agent invoking osascript for keychain access or credential dialog."
+          },
+          {
+            "article": "50",
+            "strength": "primary",
+            "context": "Article 50 transparency — credential prompts via agent need user disclosure."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — scripting interpreter used for credential theft."
+          },
+          {
+            "id": "ASI09:2026",
+            "strength": "primary",
+            "context": "Identity Spoofing — fake credential prompt impersonates system."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Sensitive Information Disclosure — credentials harvested."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime credential-theft detection."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for AppleScript abuse via agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-65860",
+      "rule_title": "Suspicious Splwow64 Without Params",
+      "source": "sigma",
+      "source_id": "1f1a8509-2cbb-44f5-8751-8e1571518ce2",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "high",
+      "detection_field_primary": "Image",
+      "rule_sha256": "3537445e44c4246d029599b4854720d70e46e6570c7006a0ccaa10a817ec9240",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging — host-EDR concern."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "Host-environment integrity."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-70113",
+      "rule_title": "Communication To Ngrok Tunneling Service Initiated",
+      "source": "sigma",
+      "source_id": "1d08ac94-400d-4469-a82f-daee9a908849",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "1fb0fc59178042fd768ab265a79fce84c41f8e084fc1827e09aa18615e36dbb7",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI02:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — outbound to tunneling service."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI02:2026",
+            "strength": "primary",
+            "context": "Memory/Context Manipulation via tunnel exfil."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Sensitive Information Disclosure via tunnel."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime data-exfiltration detection."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for outbound tunneling."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-70804",
+      "rule_title": "Uncommon Network Connection Initiated By Certutil.EXE",
+      "source": "sigma",
+      "source_id": "0dba975d-a193-4ed1-a067-424df57570d1",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "573c5ab943bfc0f6f663a3a24963117a05f7db1c626f00669718081c936dc36e",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "12"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026",
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — agent using OS-built-in download cradles to fetch second-stage payloads."
+          },
+          {
+            "article": "12",
+            "strength": "primary",
+            "context": "Article 12 logging — every certutil network invocation needs audit trail."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — certutil repurposed as a download tool by agent."
+          },
+          {
+            "id": "ASI06:2026",
+            "strength": "secondary",
+            "context": "Privilege Compromise via second-stage staging."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency — agent should not have arbitrary download capability."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime treatment of LOLBIN download via agent."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for agent-driven payload staging."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-71531",
+      "rule_title": "Suspicious Outlook Child Process",
+      "source": "sigma",
+      "source_id": "208748f7-881d-47ac-a29c-07ea84bf691d",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "2dba20d6ae0e7b5dbb5351698521c00bde86337280350eae510f9fb516866000",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM01:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — email agents resolving attachments are common phishing vector."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — email tools chained to shell exec."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM01:2025",
+            "strength": "primary",
+            "context": "Prompt Injection — embedded macros / HTML in email content."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime treatment of email-driven exec."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for email-handling agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-73413",
+      "rule_title": "Suspicious HWP Sub Processes",
+      "source": "sigma",
+      "source_id": "023394c4-29d5-46ab-92b8-6a534c6f447b",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "high",
+      "detection_field_primary": "ParentImage",
+      "rule_sha256": "cae74274fa7a8e9763b3e4350ecc6e3f7e595b1890672128ca581374e5a7ff5a",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging applies generically; host-document compromise of the agent operator host can affect AI integrity."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "Host-environment integrity precondition for trustworthy AI deployment."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-74985",
+      "rule_title": "Suspicious Chromium Browser Instance Executed With Custom Extension",
+      "source": "sigma",
+      "source_id": "27ba3207-dd30-4812-abbf-5d20c57d474e",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "6d365cbeafcba99da88855dc6d31e8ff2bc7a7ef3176137fe36570f8af7aa312",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "14"
+        ],
+        "owasp_agentic_ids": [
+          "ASI08:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM03:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.3.2"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 cybersecurity — loading a third-party extension into the agent's browser context expands the trust boundary unpredictably. Robustness violation when the extension is attacker-controlled."
+          },
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 oversight — extension installation should require human gating, not be performed via tool_call directive."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI08:2026",
+            "strength": "primary",
+            "context": "ASI08:2026 Skill/Plugin Compromise — loading arbitrary browser extensions through tool_call is the browser-context analogue of skill compromise."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM03:2025",
+            "strength": "primary",
+            "context": "LLM03:2025 Supply Chain — third-party extension is a supply-chain trust boundary violation when loaded mid-session."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.3.2",
+            "strength": "primary",
+            "context": "NIST AI RMF MG.3.2 — managing third-party tooling supply chain. Browser extensions are third-party plugins."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-75586",
+      "rule_title": "Dumping Process via Sqldumper.exe",
+      "source": "sigma",
+      "source_id": "23ceaf5c-b6f1-4a32-8559-f2ff734be516",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "530eb885f6fd7cfe364b9e6e00f2111e205b7331a585a657185f4f86f45fbdcb",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "12"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — agent dumping process memory exfils credentials."
+          },
+          {
+            "article": "12",
+            "strength": "primary",
+            "context": "Article 12 logging — every memory-dump tool_call needs audit."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — sqldumper repurposed as credential dumper."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Sensitive Information Disclosure — memory dump contains credentials."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime credential-theft detection."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for memory-dump via agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-76233",
+      "rule_title": "HackTool - Wmiexec Default Powershell Command",
+      "source": "sigma",
+      "source_id": "022eaba8-f0bf-4dd9-9217-4604b0bb3bb0",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "592719102e40fca1501c58e81cf1decd99b48ee585413de61ee3df32449d7f41",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "14"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — lateral-movement via agent shell tool defeats single-host AI deployment isolation assumptions."
+          },
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 oversight — privileged remote-exec actions need human-in-the-loop gating."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise via lateral movement using delegated shell tool authority."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency — agent should not have remote-exec capability for typical use cases."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime treatment of lateral-movement risk for AI agents with shell access."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "AI deployment impact assessment must account for lateral-movement misuse."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-77355",
+      "rule_title": "UtilityFunctions.ps1 Proxy Dll",
+      "source": "sigma",
+      "source_id": "0403d67d-6227-4ea8-8145-4e72db7da120",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "80c147c4fc5280e4b046a1a98a233d86b03eb8fb7306776e707995202077826b",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — proxy-DLL helper signals defense-evasion attempt via agent shell."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise via DLL hijack helper functions."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "secondary",
+            "context": "Excessive Agency — agent should not load proxy-DLL helpers."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime treatment of agent-driven defense evasion."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for agent-driven DLL hijack."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-77646",
+      "rule_title": "Potential Persistence Via Logon Scripts - CommandLine",
+      "source": "sigma",
+      "source_id": "21d856f9-9281-4ded-9377-51a1a6e2a432",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "2303bca98e8ffe72abcdabf94f4807c4f4a5450c36827f0f8588df52943e4bfb",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "14",
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.1"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 oversight — persistence install requires approval."
+          },
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness against persistence install via agent."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise via persistence at logon."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency for persistence install."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.1",
+            "strength": "primary",
+            "context": "Managing risk of agent installing persistence."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-77772",
+      "rule_title": "Potential Defense Evasion Activity Via Emoji Usage In CommandLine - 4",
+      "source": "sigma",
+      "source_id": "225274c4-8dd1-40db-9e09-71dff4f6fb3c",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "user_input",
+      "rule_sha256": "3f2e0ecb190dbf5f673379c996b2846e9bcf3796aa3d2097d70fae05b312f09f",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI01:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM01:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Measure::MS.2.7"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness against adversarial input. Emoji-based obfuscation is a known evasion technique against keyword filters; detecting it is part of robustness assurance."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI01:2026",
+            "strength": "primary",
+            "context": "Agent Goal Hijack — obfuscated payloads in user_input attempt to override agent instructions while evading detection."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM01:2025",
+            "strength": "primary",
+            "context": "LLM01:2025 Prompt Injection — emoji obfuscation is documented in the OWASP prompt-injection taxonomy."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Measure",
+            "subcategory": "MS.2.7",
+            "strength": "primary",
+            "context": "Measuring AI system security against documented adversarial techniques. Emoji obfuscation is a published technique requiring active detection."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-78212",
+      "rule_title": "Potential Hidden Directory Creation Via NTFS INDEX_ALLOCATION Stream - CLI",
+      "source": "sigma",
+      "source_id": "0900463c-b33b-49a8-be1d-552a3b553dae",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "c2fb9e4852b18fbb780c6c753a23992507815a84afd2f2c8d4fc350911459e78",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Measure::MS.3.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — defense-evasion technique attempt via agent shell."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — using filesystem tools for evasion."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Measure",
+            "subcategory": "MS.3.3",
+            "strength": "primary",
+            "context": "Detect agent operating outside expected scope."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for filesystem-evasion via agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-79114",
+      "rule_title": "Hacktool Execution - Imphash",
+      "source": "sigma",
+      "source_id": "24e3e58a-646b-4b50-adef-02ef935b9fc8",
+      "has_agent_analogue": false,
+      "llm_enriched": true,
+      "needs_human_review": [
+        "detection.conditions[].field (endpoint→agent-context mapping)",
+        "detection.conditions[].field (LLM determined no agent analogue exists; rule kept with original endpoint fields and will not activate against agent events)"
+      ],
+      "severity": "critical",
+      "detection_field_primary": "Hashes",
+      "rule_sha256": "1a536e9a153e2213c52ef62620ec2e65644352b05fd50772792729d30d1f4492",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "12"
+        ],
+        "owasp_agentic_ids": [],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Govern::GV.1.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "12",
+            "strength": "partial",
+            "context": "Article 12 logging — host hacktool execution affects agent host integrity."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Govern",
+            "subcategory": "GV.1.1",
+            "strength": "partial",
+            "context": "Host integrity precondition."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-81735",
+      "rule_title": "HackTool - SILENTTRINITY Stager Execution",
+      "source": "sigma",
+      "source_id": "03552375-cc2c-4883-bbe4-7958d5a980be",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "7fdf62f9aa2774d0ce968162a405c74af4f0b94c1883dc9bae04bffdcb01178b",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "12"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026",
+          "ASI07:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.1"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — reflective code loading via agent shell defeats sandboxing."
+          },
+          {
+            "article": "12",
+            "strength": "primary",
+            "context": "Article 12 logging — every reflective-load tool_call needs audit trail."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise via in-memory code execution."
+          },
+          {
+            "id": "ASI07:2026",
+            "strength": "secondary",
+            "context": "Cascading Tool Misuse — chain of download + decode + execute."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "Excessive Agency — agent should not have arbitrary code execution."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.1",
+            "strength": "primary",
+            "context": "Managing risk of agent modifying its own runtime via reflective loading."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for in-process code injection via AI agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-83241",
+      "rule_title": "Network Connection Initiated via Finger.EXE",
+      "source": "sigma",
+      "source_id": "2fdaf50b-9fd5-449f-ba69-f17248119af6",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "d671f1154634393fd54d5f388e7c64b13b8c35f8a2fcc1a1350e8dee93d255e8",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — finger as covert C2 channel via agent."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — finger repurposed as C2."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Information disclosure via finger response."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime egress detection on uncommon protocols."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-85501",
+      "rule_title": "Malicious PowerShell Commandlets - ProcessCreation",
+      "source": "sigma",
+      "source_id": "02030f2f-6199-49ec-b258-ea71b07e03dc",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "bd8823dea4f4d1bf0e0ed54003cfc553605c5b59946315cbee625bfb890c3b5c",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "12"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026",
+          "ASI01:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 requires high-risk AI systems to be resilient against malicious manipulation. An agent invoking PowerSharpPack/PowerView cmdlets via tool_call.arguments is direct evidence the agent has been steered toward attacker objectives — a robustness failure that this rule surfaces in real time."
+          },
+          {
+            "article": "12",
+            "strength": "secondary",
+            "context": "Article 12 mandates automatic logging of high-risk AI events. Triggering on this rule produces the audit-grade event needed to demonstrate post-incident traceability of agent compromise."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "OWASP Agentic ASI06:2026 (Privilege Compromise) covers exactly this class — agent with delegated authority is induced to run privileged tooling. The cmdlets in the rule pattern (Invoke-Mimikatz, DCSync) are the canonical post-compromise toolset."
+          },
+          {
+            "id": "ASI01:2026",
+            "strength": "secondary",
+            "context": "When the agent's goal is hijacked into running these cmdlets, ASI01 (Agent Goal Hijack) is the upstream vector that the rule indirectly reveals."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "partial",
+            "context": "LLM06:2025 (Excessive Agency) — the agent has tools that can execute arbitrary cmdlets and is induced to misuse them. The rule fires on the misuse, not the agency itself, so 'partial'."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "NIST AI RMF MG.2.3 calls for active runtime countermeasures against identified agent risks. Detection of exploitation cmdlet invocation in tool_call arguments is the primary risk-treatment control for the Privilege Compromise risk class."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "ISO 42001 clause 8.4 requires impact assessment of AI deployments to consider adversarial misuse. Detection events from this rule are the monitoring evidence the impact assessment process needs."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-88829",
+      "rule_title": "Powershell Defender Exclusion",
+      "source": "sigma",
+      "source_id": "17769c90-230e-488b-a463-e05c08e9d48f",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "b813cfc5a685e7d66130b64206a1b917d57563203f6cf4865809de1111370944",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "14"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026",
+          "ASI09:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM06:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.1"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — disabling host AV via agent action degrades the integrity of the AI deployment environment. Direct robustness violation."
+          },
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 (human oversight) — adding AV exclusions is a high-impact action that should require human-in-the-loop approval. Firing this rule means the action happened without that gate."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "ASI06:2026 Privilege Compromise — agent leveraging admin privileges to weaken host security posture. Canonical example."
+          },
+          {
+            "id": "ASI09:2026",
+            "strength": "secondary",
+            "context": "ASI09:2026 (Identity Spoofing) — when an agent runs as a privileged service identity, AV-exclusion actions inherit that identity and circumvent oversight."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM06:2025",
+            "strength": "primary",
+            "context": "LLM06:2025 Excessive Agency — agent with privileges to modify security software is excessive for typical use cases. The rule surfaces concrete misuse."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.1",
+            "strength": "primary",
+            "context": "NIST AI RMF MG.4.1 — managing risks of AI systems modifying their operating environment. AV exclusion is the highest-impact form."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-90343",
+      "rule_title": "Communication To Ngrok Tunneling Service - Linux",
+      "source": "sigma",
+      "source_id": "19bf6fdb-7721-4f3d-867f-53467f6a5db6",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "fcadb93f650855f72ab8feb6055beec9d7927e2be904be60fce3856342148524",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15",
+          "12"
+        ],
+        "owasp_agentic_ids": [
+          "ASI02:2026",
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — Linux agent reaching ngrok tunnel signals scope violation."
+          },
+          {
+            "article": "12",
+            "strength": "primary",
+            "context": "Article 12 logging — outbound C2 destinations."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI02:2026",
+            "strength": "primary",
+            "context": "Memory/Context Manipulation — context exfil to attacker tunnel."
+          },
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — HTTP tools used for non-business destinations."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Sensitive Information Disclosure via tunnel."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime treatment of data-exfiltration risk."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for outbound tunneling via Linux agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-90471",
+      "rule_title": "Shell Execution via Nice - Linux",
+      "source": "sigma",
+      "source_id": "093d68c7-762a-42f4-9f46-95e79142571a",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "6658a329fc3ad49197d8dd20e7f0cd2d869f45e9fff7f5ffb5d01eb5f0adec25",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [],
+        "nist_ai_rmf_subcategories": [
+          "Measure::MS.2.7"
+        ],
+        "iso_42001_clauses": []
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — LOLBIN evasion via agent shell."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — using nice as a shell wrapper to evade detection."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Measure",
+            "subcategory": "MS.2.7",
+            "strength": "primary",
+            "context": "Measuring against documented evasion techniques."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-93338",
+      "rule_title": "Suspicious Double Extension File Execution",
+      "source": "sigma",
+      "source_id": "1cdd9a09-06c9-4769-99ff-626e2b3991b8",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "high",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "351019b31e1dcea208671945469ef38a4de62da054c062655269a645c623b742",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI05:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM01:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Measure::MS.2.7"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — agent resolving double-extension file is documented social-engineering vector."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI05:2026",
+            "strength": "primary",
+            "context": "Tool Misuse — file tools used to launch deceptively-named executable."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM01:2025",
+            "strength": "secondary",
+            "context": "Prompt Injection often instructs agent to \"open the document\"."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Measure",
+            "subcategory": "MS.2.7",
+            "strength": "primary",
+            "context": "Measure against documented social-engineering techniques."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for double-extension exec via agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-94647",
+      "rule_title": "Invocation of Active Directory Diagnostic Tool (ntdsutil.exe)",
+      "source": "sigma",
+      "source_id": "2afafd61-6aae-4df4-baed-139fa1f4c345",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "f161b7f94dc802a52cbbb2f08df1c7bccebe646eda798738b45cc199230665e9",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "14",
+          "15",
+          "9"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026",
+          "ASI07:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM02:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.4.2"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "14",
+            "strength": "primary",
+            "context": "Article 14 oversight — AD password database dump is the highest-impact action; absolute requirement for human approval."
+          },
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 robustness — agent dumping NTDS.dit is direct critical-asset compromise."
+          },
+          {
+            "article": "9",
+            "strength": "primary",
+            "context": "Article 9 risk management — NTDS dump is documented top-tier AI deployment risk."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise — full domain compromise via NTDS dump."
+          },
+          {
+            "id": "ASI07:2026",
+            "strength": "primary",
+            "context": "Cascading Tool Misuse — single dump compromises every account."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM02:2025",
+            "strength": "primary",
+            "context": "Sensitive Information Disclosure at scale (every domain credential)."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.4.2",
+            "strength": "primary",
+            "context": "Incident response — NTDS dump triggers IR playbook immediately."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for AD-database dump via agent."
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "ATR-2026-97982",
+      "rule_title": "Potentially Suspicious WebDAV LNK Execution",
+      "source": "sigma",
+      "source_id": "1412aa78-a24c-4abd-83df-767dfb2c5bbe",
+      "has_agent_analogue": true,
+      "llm_enriched": true,
+      "needs_human_review": [],
+      "severity": "medium",
+      "detection_field_primary": "tool_call.arguments",
+      "rule_sha256": "9148586de84c59a98a7d5bc2f010504dcb1ab21fe9cb5060808db10d56b7a312",
+      "rule_version": 1,
+      "compliance_summary": {
+        "eu_ai_act_articles": [
+          "15"
+        ],
+        "owasp_agentic_ids": [
+          "ASI06:2026"
+        ],
+        "owasp_llm_ids": [
+          "LLM03:2025"
+        ],
+        "nist_ai_rmf_subcategories": [
+          "Manage::MG.2.3"
+        ],
+        "iso_42001_clauses": [
+          "8.4"
+        ]
+      },
+      "compliance_full": {
+        "eu_ai_act": [
+          {
+            "article": "15",
+            "strength": "primary",
+            "context": "Article 15 — agent invoking remote-payload LNK from WebDAV defeats local-execution boundary."
+          }
+        ],
+        "owasp_agentic": [
+          {
+            "id": "ASI06:2026",
+            "strength": "primary",
+            "context": "Privilege Compromise via remote payload load."
+          }
+        ],
+        "owasp_llm": [
+          {
+            "id": "LLM03:2025",
+            "strength": "primary",
+            "context": "Supply Chain — remote payload is a supply-chain trust violation."
+          }
+        ],
+        "nist_ai_rmf": [
+          {
+            "function": "Manage",
+            "subcategory": "MG.2.3",
+            "strength": "primary",
+            "context": "Runtime detection of remote payload load via agent."
+          }
+        ],
+        "iso_42001": [
+          {
+            "clause": "8.4",
+            "strength": "primary",
+            "context": "Impact assessment for remote-payload execution."
+          }
+        ]
+      }
+    }
+  ],
+  "signature": {
+    "pack_sha256": "f34be37c154c769df5ddc6771b57fd0377b8384636b8732d89d7ab692224a1bd",
+    "rules_merkle_root": "5c7a58e5fc6044bfa9288ca34a5e339eea3f5dcbfd829d37c22a998a038cee36",
+    "signed_at": "2026-05-02T19:30:11.795Z",
+    "algorithm": "sha256"
+  }
+}

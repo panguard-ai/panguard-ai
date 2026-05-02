@@ -193,6 +193,23 @@ export default function MigratorContent() {
                 <Check className="w-4 h-4 text-panguard-green" /> 5-framework compliance map
               </span>
             </div>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href="/migrator/sample-pack/eu-pack.html"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-panguard-green text-white font-semibold text-sm hover:bg-panguard-green-light transition-colors"
+              >
+                See a sample evidence pack
+                <ArrowRight className="w-4 h-4" />
+              </a>
+              <a
+                href="/migrator/sample-pack/atr-rules-sample.zip"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border text-text-secondary text-sm hover:border-brand-sage hover:text-text-primary transition-colors"
+              >
+                Download 50 ATR rules (.zip)
+              </a>
+            </div>
           </div>
         </FadeInUp>
       </SectionWrapper>

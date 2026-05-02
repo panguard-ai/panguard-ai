@@ -762,6 +762,38 @@ export class ThreatCloudServer {
           }
           break;
 
+        case '/api/migrator/telemetry':
+          // Migrator-specific telemetry (per-rule fingerprints, no rule body).
+          // POST is open (any partner / install can submit); GET is admin-only.
+          if (req.method === 'POST') {
+            await this.handlePostMigratorTelemetry(req, res);
+          } else if (req.method === 'GET') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            this.handleGetMigratorTelemetryStats(res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/migrator/crystallization-candidates':
+          // Surfaces fingerprints recurring across N+ tenants. Admin only.
+          // Output is metadata only (no rule body); admin uses this to
+          // identify which Migrator-derived rules to outreach for opt-in
+          // contribution back to ATR mainline.
+          if (req.method === 'GET') {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            this.handleGetMigratorCrystallizationCandidates(url, res);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
         case '/api/usage':
           if (req.method === 'POST') {
             await this.handlePostUsageEvent(req, res);
@@ -980,6 +1012,128 @@ export class ThreatCloudServer {
       this.sendJson(res, 200, { ok: true, data: { recorded: true } });
     } catch {
       this.sendJson(res, 400, { ok: false, error: 'Invalid request body' });
+    }
+  }
+
+  /**
+   * POST /api/migrator/telemetry — record a Migrator run summary.
+   * Body shape matches MigratorTelemetryEvent from
+   * @panguard/migrator/telemetry/tc-reporter:
+   *   { schema_version, install_id, migrator_version, run, rules[], frameworks }
+   * One event yields N rows in migrator_telemetry (one per rule).
+   * Carries fingerprints only — never rule body, never customer ID.
+   */
+  private async handlePostMigratorTelemetry(
+    req: IncomingMessage,
+    res: ServerResponse
+  ): Promise<void> {
+    try {
+      const body = await this.readBody(req);
+      const data = JSON.parse(body) as {
+        install_id?: string;
+        migrator_version?: string;
+        run?: { source_kind?: 'sigma' | 'yara' | 'mixed' };
+        rules?: Array<{
+          atr_id: string;
+          category?: string;
+          severity?: string;
+          has_agent_analogue?: boolean;
+          condition_hash: string;
+          framework_count?: number;
+        }>;
+        frameworks?: {
+          eu_ai_act_articles?: string[];
+          owasp_agentic_ids?: string[];
+          owasp_llm_ids?: string[];
+        };
+      };
+
+      if (!data.install_id || !Array.isArray(data.rules) || data.rules.length === 0) {
+        this.sendJson(res, 400, {
+          ok: false,
+          error: 'install_id and rules[] are required',
+        });
+        return;
+      }
+
+      const { recordMigratorTelemetry } = await import('./migrator-crystallization.js');
+      const result = recordMigratorTelemetry(this.db.getRawDb(), {
+        install_id: data.install_id,
+        migrator_version: data.migrator_version ?? 'unknown',
+        source_kind: data.run?.source_kind ?? 'sigma',
+        rules: data.rules.map((r) => ({
+          atr_id: r.atr_id,
+          category: r.category ?? 'unknown',
+          severity: r.severity ?? 'low',
+          has_agent_analogue: r.has_agent_analogue === true,
+          condition_hash: r.condition_hash,
+          framework_count: r.framework_count ?? 0,
+        })),
+        ...(data.frameworks !== undefined ? { frameworks: data.frameworks } : {}),
+      });
+
+      this.sendJson(res, 200, { ok: true, data: { rows_inserted: result.rows_inserted } });
+    } catch (err) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: err instanceof Error ? err.message : 'Invalid request body',
+      });
+    }
+  }
+
+  /** GET /api/migrator/telemetry — admin stats. */
+  private handleGetMigratorTelemetryStats(res: ServerResponse): void {
+    try {
+      void import('./migrator-crystallization.js').then(({ getMigratorTelemetryStats }) => {
+        const stats = getMigratorTelemetryStats(this.db.getRawDb());
+        this.sendJson(res, 200, { ok: true, data: stats });
+      });
+    } catch (err) {
+      this.sendJson(res, 500, {
+        ok: false,
+        error: err instanceof Error ? err.message : 'failed',
+      });
+    }
+  }
+
+  /**
+   * GET /api/migrator/crystallization-candidates — admin only.
+   * Query params:
+   *   - minTenants (default 3): minimum distinct install_ids on a fingerprint
+   *   - windowDays (default 30): observation window
+   *   - limit (default 100)
+   */
+  private async handleGetMigratorCrystallizationCandidates(
+    rawUrl: string,
+    res: ServerResponse
+  ): Promise<void> {
+    try {
+      const { findCrystallizationCandidates } = await import('./migrator-crystallization.js');
+      const parsed = new URL(rawUrl, 'http://localhost');
+      const minTenants = Number(parsed.searchParams.get('minTenants') ?? '3');
+      const windowDays = Number(parsed.searchParams.get('windowDays') ?? '30');
+      const limit = Number(parsed.searchParams.get('limit') ?? '100');
+      const minTenantCount = Number.isFinite(minTenants) ? minTenants : 3;
+      const winDays = Number.isFinite(windowDays) ? windowDays : 30;
+      const lim = Number.isFinite(limit) ? limit : 100;
+      const candidates = findCrystallizationCandidates(this.db.getRawDb(), {
+        minTenantCount,
+        windowDays: winDays,
+        limit: lim,
+      });
+      this.sendJson(res, 200, {
+        ok: true,
+        data: {
+          candidates,
+          query: { minTenants: minTenantCount, windowDays: winDays, limit: lim },
+          total: candidates.length,
+        },
+      });
+    } catch (err) {
+      this.sendJson(res, 500, {
+        ok: false,
+        error: err instanceof Error ? err.message : 'failed',
+      });
     }
   }
 

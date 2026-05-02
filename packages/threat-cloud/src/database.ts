@@ -38,6 +38,15 @@ export class ThreatCloudDB {
     this.audit = new AuditLogger(this.db);
   }
 
+  /**
+   * Escape hatch for callers that need direct DB access (e.g. modules
+   * defined outside this class that perform table-specific queries).
+   * Prefer adding a typed method here when the access pattern stabilises.
+   */
+  getRawDb(): Database.Database {
+    return this.db;
+  }
+
   /** Create tables if they don't exist / 建立資料表 */
   private initialize(): void {
     this.db.exec(`
