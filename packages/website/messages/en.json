@@ -65,6 +65,8 @@
       "mcpDesc": "AI assistant integration",
       "skillAuditor": "Skill Auditor",
       "skillAuditorDesc": "Pre-install skill security",
+      "migrator": "Migrator (Enterprise)",
+      "migratorDesc": "Sigma/YARA → ATR + EU AI Act evidence",
       "atrStandard": "ATR Standard",
       "atrStandardDesc": "Open standard for AI agent threats"
     },

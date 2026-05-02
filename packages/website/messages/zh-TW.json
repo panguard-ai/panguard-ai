@@ -65,6 +65,8 @@
       "mcpDesc": "AI 助手整合",
       "skillAuditor": "Skill Auditor",
       "skillAuditorDesc": "安裝前技能安全審計",
+      "migrator": "Migrator(企業版)",
+      "migratorDesc": "Sigma/YARA → ATR + EU AI Act 偵測證據",
       "atrStandard": "ATR 標準",
       "atrStandardDesc": "AI Agent 威脅偵測開放標準"
     },
