@@ -13,6 +13,8 @@ import {
   GitPullRequest,
   Check,
   Zap,
+  AlertTriangle,
+  X,
 } from 'lucide-react';
 
 const SIGMA_EXAMPLE = `title: Malicious PowerShell Commandlets
@@ -95,9 +97,9 @@ const STEPS = [
 
 const FEATURES = [
   {
-    title: 'EU AI Act audit pack',
+    title: 'EU AI Act detection evidence',
     body:
-      'JSON + Markdown + HTML evidence pack with SHA-256 + Merkle root signature. Articles 9, 12, 14, 15, 50 covered out of the box. Hand to your auditor without onboarding.',
+      'JSON + Markdown + HTML evidence pack with SHA-256 + Merkle root signature. Articles 9, 12, 14, 15, 50 covered — the technical-control evidence dossier auditors expect to see alongside risk management and technical documentation.',
   },
   {
     title: 'Activation demo',
@@ -126,6 +128,30 @@ const FEATURES = [
   },
 ];
 
+const COVERED = [
+  'Article 9 — risk management for high-impact agent actions',
+  'Article 12 — record-keeping rules for agent telemetry',
+  'Article 14 — human oversight triggers (irreversible actions)',
+  'Article 15 — accuracy / robustness / cybersecurity controls',
+  'Article 50 — transparency triggers (e.g. screen capture, recording)',
+  'OWASP Agentic Top 10 (2026) per-rule mapping',
+  'OWASP LLM Top 10 (2025) per-rule mapping',
+  'NIST AI RMF function/subcategory citations',
+  'ISO/IEC 42001 Clause 8.4 (operational planning) citations',
+  'Tamper-evident pack: SHA-256 + Merkle root over rule bodies',
+];
+
+const NOT_COVERED = [
+  'Article 10 — data governance / training data lineage',
+  'Article 11 — full Annex IV technical documentation',
+  'Article 13 — transparency to end users (UX/policy layer)',
+  'Article 17 — quality management system documentation',
+  'Article 72 — post-market monitoring program (telemetry alone is not a PMM)',
+  'Conformity assessment by a Notified Body',
+  'Customer’s own risk-management process documentation',
+  'Production logs of rule firings (we provide rule definitions; logs come from runtime)',
+];
+
 const COMMAND = `pga migrate-pro \\
   --input ./customer-rules \\
   --output ./atr-out \\
@@ -137,62 +163,68 @@ const COMMAND = `pga migrate-pro \\
 export default function MigratorContent() {
   return (
     <>
+      {/* HERO */}
       <SectionWrapper className="pt-32 pb-20">
         <FadeInUp>
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-              <Zap className="w-3 h-3" />
-              Enterprise · Q3 2026 GA
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-brand-sage-glow bg-brand-sage-wash">
+              <Zap className="w-3 h-3 text-brand-sage" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-sage">
+                Enterprise &middot; Q3 2026 GA
+              </span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-              Sigma / YARA <span className="text-emerald-400">&rarr;</span> ATR YAML
+            <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight mb-6 text-text-primary">
+              Sigma / YARA <span className="text-panguard-green">&rarr;</span> ATR YAML
             </h1>
-            <p className="text-xl md:text-2xl text-zinc-400 leading-relaxed">
+            <p className="text-xl md:text-2xl text-text-secondary leading-relaxed">
               Convert legacy detection rules into AI-agent-context ATR YAML in one command.
-              EU AI Act audit pack, OWASP Agentic mapping, live activation demo.
+              Auto-mapped to EU AI Act articles, OWASP Agentic Top 10, NIST AI RMF, ISO/IEC 42001.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-zinc-500">
-              <span className="flex items-center gap-1">
-                <Check className="w-4 h-4 text-emerald-400" /> 50/50 SigmaHQ rules converted
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-text-muted">
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="w-4 h-4 text-panguard-green" /> 50/50 SigmaHQ rules converted
               </span>
-              <span className="text-zinc-700">·</span>
-              <span className="flex items-center gap-1">
-                <Check className="w-4 h-4 text-emerald-400" /> 100% activation demo pass
+              <span className="text-border">&middot;</span>
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="w-4 h-4 text-panguard-green" /> 5/5 attacks blocked, 5/5 benign clean
               </span>
-              <span className="text-zinc-700">·</span>
-              <span className="flex items-center gap-1">
-                <Check className="w-4 h-4 text-emerald-400" /> 5-framework compliance
+              <span className="text-border">&middot;</span>
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="w-4 h-4 text-panguard-green" /> 5-framework compliance map
               </span>
             </div>
           </div>
         </FadeInUp>
       </SectionWrapper>
 
-      <SectionWrapper className="py-16 bg-zinc-950/50">
+      {/* COMMAND */}
+      <SectionWrapper className="py-16 bg-surface-1/30">
         <FadeInUp>
           <SectionTitle
             title="One command, full pipeline"
-            subtitle="Replace 6 months of consulting with 1 week of setup."
+            subtitle="Replace months of consulting with a single CLI invocation."
           />
         </FadeInUp>
         <FadeInUp>
-          <div className="max-w-4xl mx-auto mt-10 rounded-xl border border-zinc-800 bg-zinc-900/60 overflow-hidden">
-            <div className="px-4 py-2 border-b border-zinc-800 text-xs text-zinc-500 font-mono">
+          <div className="max-w-4xl mx-auto mt-10 rounded-2xl border border-border bg-surface-1 overflow-hidden">
+            <div className="px-4 py-2 border-b border-border-subtle text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-panguard-green" />
               terminal
             </div>
-            <pre className="px-6 py-5 text-sm font-mono text-zinc-300 overflow-x-auto">
+            <pre className="px-6 py-5 text-sm font-mono text-text-primary overflow-x-auto leading-relaxed">
               <code>{COMMAND}</code>
             </pre>
           </div>
-          <p className="text-center text-zinc-500 text-sm mt-4">
+          <p className="text-center text-text-muted text-sm mt-4">
             Or launch the web dashboard:{' '}
-            <code className="text-emerald-400 bg-zinc-900 px-2 py-0.5 rounded">
+            <code className="text-panguard-green bg-surface-2 border border-border px-2 py-0.5 rounded font-mono text-xs">
               pga migrate-pro --web
             </code>
           </p>
         </FadeInUp>
       </SectionWrapper>
 
+      {/* HOW IT WORKS */}
       <SectionWrapper className="py-20">
         <FadeInUp>
           <SectionTitle
@@ -205,15 +237,17 @@ export default function MigratorContent() {
             const Icon = step.icon;
             return (
               <FadeInUp key={i}>
-                <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 h-full">
+                <div className="p-6 rounded-2xl border border-border bg-surface-1 h-full transition hover:border-brand-sage/40">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                      <Icon className="w-5 h-5 text-emerald-400" />
+                    <div className="p-2 rounded-lg border border-brand-sage-glow bg-brand-sage-wash">
+                      <Icon className="w-5 h-5 text-brand-sage" />
                     </div>
-                    <div className="text-xs text-zinc-500">Step {i + 1}</div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-sage">
+                      Step {i + 1}
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
-                  <p className="text-zinc-400 text-sm leading-relaxed">{step.body}</p>
+                  <h3 className="font-display text-lg font-semibold mb-2 text-text-primary">{step.title}</h3>
+                  <p className="text-text-secondary text-sm leading-relaxed">{step.body}</p>
                 </div>
               </FadeInUp>
             );
@@ -221,7 +255,8 @@ export default function MigratorContent() {
         </div>
       </SectionWrapper>
 
-      <SectionWrapper className="py-20 bg-zinc-950/50">
+      {/* BEFORE / AFTER */}
+      <SectionWrapper className="py-20 bg-surface-1/30">
         <FadeInUp>
           <SectionTitle
             title="Before / after"
@@ -230,30 +265,30 @@ export default function MigratorContent() {
         </FadeInUp>
         <div className="max-w-6xl mx-auto mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <FadeInUp>
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 overflow-hidden">
-              <div className="px-4 py-2 border-b border-zinc-800 text-xs text-zinc-500 font-mono flex justify-between">
+            <div className="rounded-2xl border border-border bg-surface-1 overflow-hidden">
+              <div className="px-4 py-2 border-b border-border-subtle text-[11px] uppercase tracking-[0.15em] text-text-muted font-semibold flex justify-between">
                 <span>Sigma (input)</span>
-                <span>process_creation · windows</span>
+                <span className="font-mono">process_creation &middot; windows</span>
               </div>
-              <pre className="px-5 py-4 text-xs font-mono text-zinc-300 overflow-x-auto leading-relaxed">
+              <pre className="px-5 py-4 text-xs font-mono text-text-secondary overflow-x-auto leading-relaxed">
                 <code>{SIGMA_EXAMPLE}</code>
               </pre>
             </div>
           </FadeInUp>
           <FadeInUp>
-            <div className="rounded-xl border border-emerald-500/30 bg-zinc-900/60 overflow-hidden">
-              <div className="px-4 py-2 border-b border-emerald-500/30 text-xs text-emerald-300 font-mono flex justify-between">
+            <div className="rounded-2xl border border-panguard-green/30 bg-surface-1 overflow-hidden">
+              <div className="px-4 py-2 border-b border-panguard-green/30 text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold flex justify-between">
                 <span>ATR (output)</span>
-                <span>tool_call.arguments · agent_action.command_line</span>
+                <span className="font-mono">tool_call.arguments &middot; agent_action.command_line</span>
               </div>
-              <pre className="px-5 py-4 text-xs font-mono text-zinc-300 overflow-x-auto leading-relaxed">
+              <pre className="px-5 py-4 text-xs font-mono text-text-secondary overflow-x-auto leading-relaxed">
                 <code>{ATR_OUTPUT}</code>
               </pre>
             </div>
           </FadeInUp>
         </div>
         <FadeInUp>
-          <div className="text-center mt-8 text-sm text-zinc-500">
+          <div className="text-center mt-8 text-sm text-text-muted">
             <ArrowDown className="w-4 h-4 inline-block mr-2" />
             The migrator reauthors detection fields from endpoint Sysmon to AI-agent telemetry.
             Same threat, language the runtime engine actually sees.
@@ -261,23 +296,95 @@ export default function MigratorContent() {
         </FadeInUp>
       </SectionWrapper>
 
+      {/* FEATURES */}
       <SectionWrapper className="py-20">
         <FadeInUp>
-          <SectionTitle title="What you get" subtitle="Per migration run." />
+          <SectionTitle title="What you get" subtitle="Per migration run, in one CLI invocation." />
         </FadeInUp>
         <div className="max-w-6xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((f, i) => (
             <FadeInUp key={i}>
-              <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-900/40 h-full">
-                <h3 className="text-base font-semibold mb-2 text-emerald-300">{f.title}</h3>
-                <p className="text-zinc-400 text-sm leading-relaxed">{f.body}</p>
+              <div className="p-6 rounded-2xl border border-border bg-surface-1 h-full transition hover:border-brand-sage/40">
+                <h3 className="font-display text-base font-semibold mb-2 text-text-primary">{f.title}</h3>
+                <p className="text-text-secondary text-sm leading-relaxed">{f.body}</p>
               </div>
             </FadeInUp>
           ))}
         </div>
       </SectionWrapper>
 
-      <SectionWrapper className="py-20 bg-zinc-950/50">
+      {/* HONEST SCOPE — what we cover, what we don't */}
+      <SectionWrapper className="py-20 bg-surface-1/30">
+        <FadeInUp>
+          <div className="max-w-4xl mx-auto text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full border border-severity-medium/30 bg-severity-medium/10">
+              <AlertTriangle className="w-3 h-3 text-severity-medium" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-severity-medium">
+                Honest framing
+              </span>
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-3 text-text-primary">
+              EU AI Act audit scope
+            </h2>
+            <p className="text-text-secondary leading-relaxed">
+              An EU AI Act high-risk system audit needs roughly 12 documents (Annex IV +
+              Articles 9&ndash;15, 17, 50, 72). The migrator delivers <strong className="text-panguard-green">2&ndash;3</strong> of
+              them at high quality &mdash; the technical-control evidence layer.
+              The other 9&ndash;10 are customer responsibility, but our pack cross-references them so
+              your auditor doesn&rsquo;t maintain five separate spreadsheets.
+            </p>
+          </div>
+        </FadeInUp>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FadeInUp>
+            <div className="p-6 rounded-2xl border border-panguard-green/30 bg-panguard-green/5 h-full">
+              <div className="flex items-center gap-2 mb-4">
+                <Check className="w-5 h-5 text-panguard-green" />
+                <h3 className="font-display text-lg font-semibold text-panguard-green">
+                  What this covers
+                </h3>
+              </div>
+              <ul className="space-y-2.5 text-sm text-text-secondary">
+                {COVERED.map((c, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-panguard-green flex-shrink-0 mt-0.5" />
+                    <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </FadeInUp>
+          <FadeInUp>
+            <div className="p-6 rounded-2xl border border-severity-medium/30 bg-severity-medium/5 h-full">
+              <div className="flex items-center gap-2 mb-4">
+                <X className="w-5 h-5 text-severity-medium" />
+                <h3 className="font-display text-lg font-semibold text-severity-medium">
+                  Customer responsibility
+                </h3>
+              </div>
+              <ul className="space-y-2.5 text-sm text-text-secondary">
+                {NOT_COVERED.map((c, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <X className="w-4 h-4 text-severity-medium flex-shrink-0 mt-0.5" />
+                    <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </FadeInUp>
+        </div>
+        <FadeInUp>
+          <p className="text-center text-text-muted text-sm mt-10 max-w-3xl mx-auto leading-relaxed">
+            Pricing reflects scope: this is a <strong className="text-text-primary">$50&ndash;150K
+            detection-evidence module</strong>, not a turnkey EU AI Act compliance package.
+            The pack&rsquo;s value is collapsing 6 months of detection-engineering consulting
+            into 1 week of setup &mdash; not replacing the legal/compliance dossier itself.
+          </p>
+        </FadeInUp>
+      </SectionWrapper>
+
+      {/* CONTRIBUTION LOOP */}
+      <SectionWrapper className="py-20">
         <FadeInUp>
           <SectionTitle
             title="ATR contribution loop"
@@ -303,13 +410,13 @@ export default function MigratorContent() {
             },
           ].map((p, i) => (
             <FadeInUp key={i}>
-              <div className="flex items-start gap-4 p-5 rounded-lg border border-zinc-800 bg-zinc-900/40">
-                <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex-shrink-0">
-                  <GitPullRequest className="w-5 h-5 text-emerald-400" />
+              <div className="flex items-start gap-4 p-5 rounded-2xl border border-border bg-surface-1 transition hover:border-brand-sage/40">
+                <div className="p-2 rounded-lg border border-brand-sage-glow bg-brand-sage-wash flex-shrink-0">
+                  <GitPullRequest className="w-5 h-5 text-brand-sage" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">{p.title}</h3>
-                  <p className="text-zinc-400 text-sm leading-relaxed">{p.body}</p>
+                  <h3 className="font-display font-semibold mb-1 text-text-primary">{p.title}</h3>
+                  <p className="text-text-secondary text-sm leading-relaxed">{p.body}</p>
                 </div>
               </div>
             </FadeInUp>
@@ -317,20 +424,21 @@ export default function MigratorContent() {
         </div>
       </SectionWrapper>
 
+      {/* CTA */}
       <SectionWrapper className="py-24">
         <FadeInUp>
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-text-primary">
               Ready to migrate your detection coverage?
             </h2>
-            <p className="text-zinc-400 mb-8">
+            <p className="text-text-secondary mb-8 leading-relaxed">
               Enterprise pilot: 90 days, your full Sigma/YARA corpus converted with audit pack
               delivery. Q3 2026 GA. COMPUTEX 2026 demo.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
                 href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Migrator%20pilot"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-emerald-500 text-zinc-950 font-medium hover:bg-emerald-400 transition-colors"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-panguard-green text-white font-semibold text-sm hover:bg-panguard-green-light transition-colors"
               >
                 Request pilot access
                 <ArrowRight className="w-4 h-4" />
@@ -339,7 +447,7 @@ export default function MigratorContent() {
                 href="https://github.com/atr-org/agent-threat-rules"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-zinc-700 text-zinc-300 hover:border-zinc-500 transition-colors"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-border text-text-secondary text-sm hover:border-brand-sage hover:text-text-primary transition-colors"
               >
                 See the open ATR standard
               </a>

@@ -159,6 +159,11 @@ export default function NavBar() {
     },
     { label: t('productLinks.guard'), desc: t('productLinks.guardDesc'), href: '/product/guard' },
     { label: t('productLinks.mcp'), desc: t('productLinks.mcpDesc'), href: '/product/mcp' },
+    {
+      label: t('productLinks.migrator'),
+      desc: t('productLinks.migratorDesc'),
+      href: '/migrator',
+    },
     { label: t('productLinks.atrStandard'), desc: t('productLinks.atrStandardDesc'), href: '/atr' },
   ];
 
