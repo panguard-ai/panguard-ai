@@ -142,19 +142,16 @@ Steps:
 Effort: ~1-2 weeks calendar time (community process). CC ~2-3 days
 of actual work.
 
-## P2 - npm publish first version of @panguard-ai/migrator-community
+## ~~P2 - npm publish first version of @panguard-ai/migrator-community~~ DONE (2026-05-04)
 
-Workflow `publish-migrator-community.yml` is ready (commit 2d1bc1ad).
-First publish requires:
-1. Push tag `migrator-community-v0.1.0`, OR
-2. Run via GitHub UI workflow_dispatch with dry_run=false
-
-Pre-flight:
-- Run with dry_run=true first to validate
-- Confirm `NPM_TOKEN` secret is set in repo settings
-
-This is a one-way action — `npm unpublish` only works for 72 hours.
-Adam's call when to trigger.
+Published `@panguard-ai/migrator-community@0.1.0` to npm.
+- Tarball: 75 files, 46.2 kB packed, 172.9 kB unpacked
+- shasum: 9dd2cbcf46361dd402b11f93d14d519bc6b23d5e
+- Tag: migrator-community-v0.1.0 (commit 4f07d358)
+- CI runs: 25328758797 (dry-run) + 25328920283 (real publish)
+- Install verified: `npm install @panguard-ai/migrator-community` resolves
+  3 deps cleanly, `panguard-migrate` binary registered, public API
+  (convertSigma, validateAtrOutput) round-trips correctly
 
 ## P2 - Migrator `/migrator` page CTA: replace mailto with Calendly
 
