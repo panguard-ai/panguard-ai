@@ -1,6 +1,6 @@
 # Migrator Activation Demo — Live Detection Proof
 
-**Generated:** 2026-05-02T19:30:11.809Z
+**Generated:** 2026-05-04T15:02:42.050Z
 **Rules loaded:** 50
 
 ## Headline

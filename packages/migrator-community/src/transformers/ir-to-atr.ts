@@ -41,11 +41,7 @@
  */
 
 import type { IRPattern, MigratorIR } from '../ir/types.js';
-import type {
-  ComplianceMapping,
-  Enrichment,
-  TestCases,
-} from '../enrichment/types.js';
+import type { ComplianceMapping, Enrichment, TestCases } from '../types/enrichment.js';
 import { classifyAgentSource } from './agent-source-map.js';
 import { classifyCategory } from './category-classifier.js';
 import { allocateId } from './id-allocator.js';

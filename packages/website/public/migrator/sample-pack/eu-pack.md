@@ -2,7 +2,7 @@
 
 **Pack type:** eu-ai-act-migrator-evidence
 **Schema version:** 1.0
-**Generated:** 2026-05-02T19:30:11.794Z
+**Generated:** 2026-05-04T15:02:42.036Z
 **Customer ID:** DEMO-CORP-EU
 **Audit period:** 2026-Q2
 **Migrator version:** unknown
@@ -11,10 +11,10 @@
 
 | Field | Value |
 |---|---|
-| Pack SHA-256 | `f34be37c154c769df5ddc6771b57fd0377b8384636b8732d89d7ab692224a1bd` |
-| Rules Merkle Root | `5c7a58e5fc6044bfa9288ca34a5e339eea3f5dcbfd829d37c22a998a038cee36` |
+| Pack SHA-256 | `ef437f8f184a834829bc9e3be565662d3849f29d963fae302922f8f86748d7ed` |
+| Rules Merkle Root | `f1c558fdd9c38230be48a3c5855100862dc99b5d0c9ff285048388c2df29a6ad` |
 | Algorithm | sha256 |
-| Signed at | 2026-05-02T19:30:11.795Z |
+| Signed at | 2026-05-04T15:02:42.037Z |
 
 **Auditor verification:** recompute the pack SHA-256 over the JSON form of this pack with the `signature` block excluded; recompute the merkle root by SHA-256-pairing the per-rule hashes (sorted by `rule_id`). Both should match the values above. The companion JSON file (`eu-ai-act-evidence-pack.json`) is the canonical input.
 
@@ -94,7 +94,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-10882 — Screen Capture Activity Via Psr.EXE
 
-- **SHA-256:** `a9c504cbaffeec4dad29a54c27b7c4cdcbc55bb0945f632fd9afc83c44c2e92a`
+- **SHA-256:** `79694c5995b45ca022067d3a51f79505d8a4ffd45900d44b560b06d5ee7691be`
 - **Severity:** medium
 - **Source:** sigma rule `2158f96f-43c2-43cb-952a-ab4580f32382`
 - **Rule version:** 1
@@ -127,7 +127,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-12808 — Process Initiated Network Connection To Ngrok Domain
 
-- **SHA-256:** `d2b58a89010bd7e8280c6fae3519f6fcbf86e0fc7beaed4481bb901e6bff9238`
+- **SHA-256:** `ea5c0bf6817102eb0eb6de383ac93d64aabb69931309c80da8c54189c8165ca0`
 - **Severity:** high
 - **Source:** sigma rule `18249279-932f-45e2-b37a-8925f2597670`
 - **Rule version:** 1
@@ -157,7 +157,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-13292 — Sticky Key Like Backdoor Execution
 
-- **SHA-256:** `61b60f6cc50a26dc6b218de9e69e48a845fbf27836e291e963695c8021f634b1`
+- **SHA-256:** `eea69e5131c577f5d9d7f4083af251a5cce2cce030973fd407d054edabeee0c5`
 - **Severity:** critical
 - **Source:** sigma rule `2fdefcb3-dbda-401e-ae23-f0db027628bc`
 - **Rule version:** 1
@@ -190,7 +190,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-13963 — Triple Cross eBPF Rootkit Execve Hijack
 
-- **SHA-256:** `b7d3e051c99b16b6dc88d1ed9c6e75b1198689016ff08660a3895d39a92dfed8`
+- **SHA-256:** `66db1c35b971d3c074a6753d79c4c1dd57ff9432e7b1349277eb1901a2621ef4`
 - **Severity:** high
 - **Source:** sigma rule `0326c3c8-7803-4a0f-8c5c-368f747f7c3e`
 - **Rule version:** 1
@@ -213,7 +213,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-14122 — User Has Been Deleted Via Userdel
 
-- **SHA-256:** `953f12c111d7c30eee557095a3243e43356442ed82a9400b18a6ca9475243737`
+- **SHA-256:** `d5400aa4b801995c157679b819cd5bade9176f0d3ed7372bdb3e1629c20e315f`
 - **Severity:** medium
 - **Source:** sigma rule `08f26069-6f80-474b-8d1f-d971c6fedea0`
 - **Rule version:** 1
@@ -247,7 +247,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-14813 — Procdump Execution
 
-- **SHA-256:** `cf1523e799b3116ca717ab3126bba222b4fa8d88de81e695f1c96ed3cb3a48a5`
+- **SHA-256:** `14b0ddfa88489664a5c10ba913d7efa1d31298d5e6bfd06914980896a1e50f3a`
 - **Severity:** medium
 - **Source:** sigma rule `2e65275c-8288-4ab4-aeb7-6274f58b6b20`
 - **Rule version:** 1
@@ -280,7 +280,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-16162 — Touch Suspicious Service File
 
-- **SHA-256:** `144b368c336bdeab601d0f2cdfbeda6802ea6c8167b38a1acd8f745dd4f3bd52`
+- **SHA-256:** `95b3386f30b334ad413a87e353c6377f81815e5c81cf8060863d82051b459132`
 - **Severity:** medium
 - **Source:** sigma rule `31545105-3444-4584-bebf-c466353230d2`
 - **Rule version:** 1
@@ -313,7 +313,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-17154 — Remote Access Tool - Potential MeshAgent Execution - MacOS
 
-- **SHA-256:** `ecdbb403d5f772bdd02b326e83c7893ff0c25b2b713045abf5f8c47649dd4b17`
+- **SHA-256:** `d326f9da9fd24f1b6b57774f2a05a087fdf3b4b6582c25c12814c13681d5cf7a`
 - **Severity:** medium
 - **Source:** sigma rule `22c45af6-f590-4d44-bab3-b5b2d2a2b6d9`
 - **Rule version:** 1
@@ -336,7 +336,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-20444 — UAC Bypass Using Consent and Comctl32 - Process
 
-- **SHA-256:** `db3aa2e22021bdf2ce9ad0bafd6299bdc6fbfb4b439a5152e3178473be2bc1bb`
+- **SHA-256:** `e5e9e6d8bb88956965ea1a1c0d1dab8a75be3bb73f6ef3084f6e619a87391981`
 - **Severity:** high
 - **Source:** sigma rule `1ca6bd18-0ba0-44ca-851c-92ed89a61085`
 - **Rule version:** 1
@@ -369,7 +369,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-20705 — Remote Access Tool - Potential MeshAgent Execution - Windows
 
-- **SHA-256:** `0f7c6809ec34444981010e6e790aae17efc77ab7085b3a3e316bc519581fe9ae`
+- **SHA-256:** `b4f69a2cbfc6a5add1cc6d3243026fd3369402732aa9fff321ead5d2d817eac9`
 - **Severity:** medium
 - **Source:** sigma rule `2fbbe9ff-0afc-470b-bdc0-592198339968`
 - **Rule version:** 1
@@ -392,7 +392,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-21109 — Deletion of Volume Shadow Copies via WMI with PowerShell
 
-- **SHA-256:** `78ed9b6e6afccf48b2e19cde9a724c23ec8312e749a20fc7979ac44c6a7cd942`
+- **SHA-256:** `408b1e1d59ae285a1da0037f21021ddc4826ae88067e00d532bf52edc4657abf`
 - **Severity:** high
 - **Source:** sigma rule `21ff4ca9-f13a-41ad-b828-0077b2af2e40`
 - **Rule version:** 1
@@ -427,7 +427,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-24756 — Time Travel Debugging Utility Usage
 
-- **SHA-256:** `85bd9b9733cea26d99db6a5307b3248bf37857d8f3fc95745a2ac85b4ed313bc`
+- **SHA-256:** `30fac93824b5ca59129e6ac9381c0eaa743ab38d85d9565194b4e56195798ea5`
 - **Severity:** high
 - **Source:** sigma rule `0b4ae027-2a2d-4b93-8c7e-962caaba5b2a`
 - **Rule version:** 1
@@ -450,7 +450,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-26270 — Potential Provisioning Registry Key Abuse For Binary Proxy Execution
 
-- **SHA-256:** `b9c6174f2aa9971045a6e9b74db5fc8b4222a0692effc129b778773208f01221`
+- **SHA-256:** `d67c22a575f2a6f5ee9e2bdd184b89eceba867b0a9db1c581d264bcd540cc839`
 - **Severity:** high
 - **Source:** sigma rule `2a4b3e61-9d22-4e4a-b60f-6e8f0cde6f25`
 - **Rule version:** 1
@@ -483,7 +483,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-27041 — OMIGOD SCX RunAsProvider ExecuteShellCommand
 
-- **SHA-256:** `fb8c31d7d05a66fc10357cf4c37dc4d8007641fdd39fe4aa27b5695ae4060563`
+- **SHA-256:** `498061fa02ffdf2d3f44ae384ce691c7951f0c08dd5cde3d4df30e45b9685768`
 - **Severity:** high
 - **Source:** sigma rule `21541900-27a9-4454-9c4c-3f0a4240344a`
 - **Rule version:** 1
@@ -506,7 +506,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-31863 — Suspicious Processes Spawned by Java.EXE
 
-- **SHA-256:** `3268189f7c99bd9c0e304813ca650f9e30183e1bf9fc113b45ff3e6b8244dedb`
+- **SHA-256:** `ff4b6da7668d4fab58d3886140fa5065229ad8bfdfb8a3ce8f8b603299ebcd30`
 - **Severity:** high
 - **Source:** sigma rule `0d34ed8b-1c12-4ff2-828c-16fc860b766d`
 - **Rule version:** 1
@@ -535,7 +535,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-34130 — Disk Image Creation Via Hdiutil - MacOS
 
-- **SHA-256:** `cd9381572ab5ac2f6cc7cb613c718620f76f6fa529ec3ffa711eceff76036724`
+- **SHA-256:** `dbaea04ddbc580dffc98c9a4c030c01a2d85f4e0ad2df88da5b367b1630d3812`
 - **Severity:** medium
 - **Source:** sigma rule `1cf98dc2-fcb0-47c9-8aea-654c9284d1ae`
 - **Rule version:** 1
@@ -567,7 +567,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-34505 — Remote File Download Via Desktopimgdownldr Utility
 
-- **SHA-256:** `49063ca896515ffcb17f87c644dfcc592f5c54acda5cd7ca6cd10c231dc57778`
+- **SHA-256:** `ed0196324cd5193a9f1ff159260f1dc20fc45998bf67d0b7ffef39c822a342d9`
 - **Severity:** medium
 - **Source:** sigma rule `214641c2-c579-4ecb-8427-0cf19df6842e`
 - **Rule version:** 1
@@ -599,7 +599,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-36892 — Base64 MZ Header In CommandLine
 
-- **SHA-256:** `5b29720974a3dcc036863f3dc590423495f4dc22c77621311fbf972836bf5511`
+- **SHA-256:** `a28161435ffadd8f32613dce0b6a1470bac1d80e0ebae56dc5cf7b6728c5ba48`
 - **Severity:** high
 - **Source:** sigma rule `22e58743-4ac8-4a9f-bf19-00a0428d8c5f`
 - **Rule version:** 1
@@ -634,7 +634,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-38740 — Access of Sudoers File Content
 
-- **SHA-256:** `00a4b70e74ca0435ddc66876fd46ded2e33c73ccd99113430c745ea246eb7915`
+- **SHA-256:** `75b37715aea519a4f06c5e0804dfc1973d3e211270a2d941e0f70961705dd464`
 - **Severity:** medium
 - **Source:** sigma rule `0f79c4d2-4e1f-4683-9c36-b5469a665e06`
 - **Rule version:** 1
@@ -668,7 +668,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-39365 — Suspicious X509Enrollment - Process Creation
 
-- **SHA-256:** `1b30ee686cbe7e62be9ee4a5d4ce7be2d8c30f304afb1a7e254204fa54316716`
+- **SHA-256:** `9411a0fa9c204a6fcd81dfa92aa54cf5784052a641d0ace70a867739ab7cc9af`
 - **Severity:** medium
 - **Source:** sigma rule `114de787-4eb2-48cc-abdb-c0b449f93ea4`
 - **Rule version:** 1
@@ -702,7 +702,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-41443 — Linux Recon Indicators
 
-- **SHA-256:** `ff9fae0d1965c911dfdc2c54f253c300b764d03bde490dd0bb1c2cffc26f1f69`
+- **SHA-256:** `77eaf912172a9294eb316e19bb7273b2904074a830464621e4a12c33e59f83e9`
 - **Severity:** high
 - **Source:** sigma rule `0cf7a157-8879-41a2-8f55-388dd23746b7`
 - **Rule version:** 1
@@ -731,7 +731,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-43105 — Start of NT Virtual DOS Machine
 
-- **SHA-256:** `b6fbc35d9014d199c88021c4fb3786b9094760ea6297d31abdfda7321bb507b6`
+- **SHA-256:** `4ff1a85698ec11ff114aacc4b3b98a7e5faa44dd31c255ce94fedc3c9c4b54ac`
 - **Severity:** medium
 - **Source:** sigma rule `16905e21-66ee-42fe-b256-1318ada2d770`
 - **Rule version:** 1
@@ -754,7 +754,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-49108 — Use of Pcalua For Execution
 
-- **SHA-256:** `aaa323c6be4a2956845b46053d0e0fb61497c17e7c56d1faaa1a10c89bdf9092`
+- **SHA-256:** `8c1d07906f1c58a9e5bd2dcaadf370e1e5dec49ac9d66558fb657f7ad6387160`
 - **Severity:** medium
 - **Source:** sigma rule `0955e4e1-c281-4fb9-9ee1-5ee7b4b754d2`
 - **Rule version:** 1
@@ -778,7 +778,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-50378 — HackTool - CrackMapExec Execution Patterns
 
-- **SHA-256:** `5ef61b2998d8132d5df5df8158d1f6b135a0eb724d8bc2ebb09e3a02f0c1c134`
+- **SHA-256:** `c46f5b1301c78ed6b4b22070608b7498f5212233e2b67d3a82a8d9aabb182655`
 - **Severity:** high
 - **Source:** sigma rule `058f4380-962d-40a5-afce-50207d36d7e2`
 - **Rule version:** 1
@@ -812,7 +812,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-50890 — JAMF MDM Potential Suspicious Child Process
 
-- **SHA-256:** `371a109d73328919c7936332095b9b93c297ba70cc37cff2680dad6e6ab8e4e8`
+- **SHA-256:** `61b0b4890b6bb4e2b230e2e977deecf462bc68e38c8d31c73b71ddcaedd4a170`
 - **Severity:** medium
 - **Source:** sigma rule `2316929c-01aa-438c-970f-099145ab1ee6`
 - **Rule version:** 1
@@ -835,7 +835,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-53865 — Network Communication Initiated To Portmap.IO Domain
 
-- **SHA-256:** `c03deff3e0f8241eb3a82c3f0815ba91f300dd079b2c96b8e9d1badaa789dd4f`
+- **SHA-256:** `148607c85a51b09a7f09866287c172c7ff7833a8a54d672356d7fcfcab2187a7`
 - **Severity:** medium
 - **Source:** sigma rule `07837ab9-60e1-481f-a74d-c31fb496a94c`
 - **Rule version:** 1
@@ -869,7 +869,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-54358 — Shell Execution Of Process Located In Tmp Directory
 
-- **SHA-256:** `cc9be55952dd2a8be80ea631f98734a8fedb00571e1408680deeef7af1312e08`
+- **SHA-256:** `123eed966e55556ebad65f01441dc2ad5bcecac95fff8470c7ea9024a2428c59`
 - **Severity:** high
 - **Source:** sigma rule `2fade0b6-7423-4835-9d4f-335b39b83867`
 - **Rule version:** 1
@@ -901,7 +901,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-64888 — MacOS Scripting Interpreter AppleScript
 
-- **SHA-256:** `b3adad43dc8fc8888219b3f443e9397ffca632cf1d3f1ae94d4fb74d9d588950`
+- **SHA-256:** `161fd7dfeabe6cca06760c343036de7098ff1c97958525fc5646659ef741ed7c`
 - **Severity:** medium
 - **Source:** sigma rule `1bc2e6c5-0885-472b-bed6-be5ea8eace55`
 - **Rule version:** 1
@@ -935,7 +935,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-65860 — Suspicious Splwow64 Without Params
 
-- **SHA-256:** `3537445e44c4246d029599b4854720d70e46e6570c7006a0ccaa10a817ec9240`
+- **SHA-256:** `fb3542dc5ab808534a576dfc327e025bfd52e4a876f59b07af44529c33371d75`
 - **Severity:** high
 - **Source:** sigma rule `1f1a8509-2cbb-44f5-8751-8e1571518ce2`
 - **Rule version:** 1
@@ -958,7 +958,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-70113 — Communication To Ngrok Tunneling Service Initiated
 
-- **SHA-256:** `1fb0fc59178042fd768ab265a79fce84c41f8e084fc1827e09aa18615e36dbb7`
+- **SHA-256:** `79a10fba5af1bfd35cdf0f092c7511060e528aaa50356bc5e6fea4c56079c2d3`
 - **Severity:** high
 - **Source:** sigma rule `1d08ac94-400d-4469-a82f-daee9a908849`
 - **Rule version:** 1
@@ -990,7 +990,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-70804 — Uncommon Network Connection Initiated By Certutil.EXE
 
-- **SHA-256:** `573c5ab943bfc0f6f663a3a24963117a05f7db1c626f00669718081c936dc36e`
+- **SHA-256:** `9d75a07d4a422a685cfb834c6473b05d95b56b4bbf23a786ce1b4a82728436de`
 - **Severity:** high
 - **Source:** sigma rule `0dba975d-a193-4ed1-a067-424df57570d1`
 - **Rule version:** 1
@@ -1024,7 +1024,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-71531 — Suspicious Outlook Child Process
 
-- **SHA-256:** `2dba20d6ae0e7b5dbb5351698521c00bde86337280350eae510f9fb516866000`
+- **SHA-256:** `d5be401e4b0c760e3e5dfa3aedb7ead5a58710c8b8110a336fa455fab277be3f`
 - **Severity:** high
 - **Source:** sigma rule `208748f7-881d-47ac-a29c-07ea84bf691d`
 - **Rule version:** 1
@@ -1056,7 +1056,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-73413 — Suspicious HWP Sub Processes
 
-- **SHA-256:** `cae74274fa7a8e9763b3e4350ecc6e3f7e595b1890672128ca581374e5a7ff5a`
+- **SHA-256:** `89543e1a86a2d6d7ed3e4e36d6d70aca1ed008942af5b1ef425e108c478e05b8`
 - **Severity:** high
 - **Source:** sigma rule `023394c4-29d5-46ab-92b8-6a534c6f447b`
 - **Rule version:** 1
@@ -1079,7 +1079,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-74985 — Suspicious Chromium Browser Instance Executed With Custom Extension
 
-- **SHA-256:** `6d365cbeafcba99da88855dc6d31e8ff2bc7a7ef3176137fe36570f8af7aa312`
+- **SHA-256:** `566b938393d52e77b2f4042d3e06e230f4836f45cbe6a8f5548118acf0c91701`
 - **Severity:** high
 - **Source:** sigma rule `27ba3207-dd30-4812-abbf-5d20c57d474e`
 - **Rule version:** 1
@@ -1108,7 +1108,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-75586 — Dumping Process via Sqldumper.exe
 
-- **SHA-256:** `530eb885f6fd7cfe364b9e6e00f2111e205b7331a585a657185f4f86f45fbdcb`
+- **SHA-256:** `e0d9dcd162bf7d2eae61854e39df40a19f84e9374a4aa56e440fb87ca7e7f16e`
 - **Severity:** medium
 - **Source:** sigma rule `23ceaf5c-b6f1-4a32-8559-f2ff734be516`
 - **Rule version:** 1
@@ -1141,7 +1141,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-76233 — HackTool - Wmiexec Default Powershell Command
 
-- **SHA-256:** `592719102e40fca1501c58e81cf1decd99b48ee585413de61ee3df32449d7f41`
+- **SHA-256:** `9b9a4d5d80467a57640a053ad9a276422a10e304d68aee80584358bd4246431b`
 - **Severity:** high
 - **Source:** sigma rule `022eaba8-f0bf-4dd9-9217-4604b0bb3bb0`
 - **Rule version:** 1
@@ -1174,7 +1174,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-77355 — UtilityFunctions.ps1 Proxy Dll
 
-- **SHA-256:** `80c147c4fc5280e4b046a1a98a233d86b03eb8fb7306776e707995202077826b`
+- **SHA-256:** `547c3aacc43b4a13cc35820d88f5e4f358bdff7c9c6b004b815c077abd10dde4`
 - **Severity:** medium
 - **Source:** sigma rule `0403d67d-6227-4ea8-8145-4e72db7da120`
 - **Rule version:** 1
@@ -1206,7 +1206,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-77646 — Potential Persistence Via Logon Scripts - CommandLine
 
-- **SHA-256:** `2303bca98e8ffe72abcdabf94f4807c4f4a5450c36827f0f8588df52943e4bfb`
+- **SHA-256:** `fd134e4ba30395188b8195c3d1a8fae235cee5a8ce9d4deb9cbd37f00c1aeeac`
 - **Severity:** high
 - **Source:** sigma rule `21d856f9-9281-4ded-9377-51a1a6e2a432`
 - **Rule version:** 1
@@ -1239,7 +1239,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-77772 — Potential Defense Evasion Activity Via Emoji Usage In CommandLine - 4
 
-- **SHA-256:** `3f2e0ecb190dbf5f673379c996b2846e9bcf3796aa3d2097d70fae05b312f09f`
+- **SHA-256:** `e4e5832432a2714c4484d61fb6245320d838f9c3377b75ac2a687abf6b3a2280`
 - **Severity:** high
 - **Source:** sigma rule `225274c4-8dd1-40db-9e09-71dff4f6fb3c`
 - **Rule version:** 1
@@ -1267,7 +1267,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-78212 — Potential Hidden Directory Creation Via NTFS INDEX_ALLOCATION Stream - CLI
 
-- **SHA-256:** `c2fb9e4852b18fbb780c6c753a23992507815a84afd2f2c8d4fc350911459e78`
+- **SHA-256:** `6c5536e4c8ac24e3da20307ecdeb9b58160f1ec6cfa0a1c32f72ea2939772fba`
 - **Severity:** medium
 - **Source:** sigma rule `0900463c-b33b-49a8-be1d-552a3b553dae`
 - **Rule version:** 1
@@ -1295,7 +1295,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-79114 — Hacktool Execution - Imphash
 
-- **SHA-256:** `1a536e9a153e2213c52ef62620ec2e65644352b05fd50772792729d30d1f4492`
+- **SHA-256:** `c2676442f8ebadc58fd835edcc3ae5ec234dd989c9a0cbdd4939a43357519543`
 - **Severity:** critical
 - **Source:** sigma rule `24e3e58a-646b-4b50-adef-02ef935b9fc8`
 - **Rule version:** 1
@@ -1318,7 +1318,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-81735 — HackTool - SILENTTRINITY Stager Execution
 
-- **SHA-256:** `7fdf62f9aa2774d0ce968162a405c74af4f0b94c1883dc9bae04bffdcb01178b`
+- **SHA-256:** `e1ae2a2369a9062ef2928aa589d95c43acce7fdb242d982ba0b9a362ecd55e56`
 - **Severity:** high
 - **Source:** sigma rule `03552375-cc2c-4883-bbe4-7958d5a980be`
 - **Rule version:** 1
@@ -1352,7 +1352,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-83241 — Network Connection Initiated via Finger.EXE
 
-- **SHA-256:** `d671f1154634393fd54d5f388e7c64b13b8c35f8a2fcc1a1350e8dee93d255e8`
+- **SHA-256:** `258c71b2af9ffc72ea0914d5f2222eefab6489564406b85f211f6bb41a6628c6`
 - **Severity:** high
 - **Source:** sigma rule `2fdaf50b-9fd5-449f-ba69-f17248119af6`
 - **Rule version:** 1
@@ -1384,7 +1384,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-85501 — Malicious PowerShell Commandlets - ProcessCreation
 
-- **SHA-256:** `bd8823dea4f4d1bf0e0ed54003cfc553605c5b59946315cbee625bfb890c3b5c`
+- **SHA-256:** `736dbd52c77642d8befa93d1c55ba7670ab2cc73568e4b2ff83eef39d07ee740`
 - **Severity:** high
 - **Source:** sigma rule `02030f2f-6199-49ec-b258-ea71b07e03dc`
 - **Rule version:** 1
@@ -1418,7 +1418,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-88829 — Powershell Defender Exclusion
 
-- **SHA-256:** `b813cfc5a685e7d66130b64206a1b917d57563203f6cf4865809de1111370944`
+- **SHA-256:** `5590aeb152f707f051d59e6db37b76d37a0b542ad8819e9f7f214b9fcbebdb13`
 - **Severity:** medium
 - **Source:** sigma rule `17769c90-230e-488b-a463-e05c08e9d48f`
 - **Rule version:** 1
@@ -1448,7 +1448,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-90343 — Communication To Ngrok Tunneling Service - Linux
 
-- **SHA-256:** `fcadb93f650855f72ab8feb6055beec9d7927e2be904be60fce3856342148524`
+- **SHA-256:** `6aebe61cf64e5d0ad9b3a4b4ab62ec7008447f1736e819b017365ec6122b53e6`
 - **Severity:** high
 - **Source:** sigma rule `19bf6fdb-7721-4f3d-867f-53467f6a5db6`
 - **Rule version:** 1
@@ -1482,7 +1482,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-90471 — Shell Execution via Nice - Linux
 
-- **SHA-256:** `6658a329fc3ad49197d8dd20e7f0cd2d869f45e9fff7f5ffb5d01eb5f0adec25`
+- **SHA-256:** `75e168288571639e30df70ff5ee767c0929bcbfa5dc0d9cb9823f905e7337045`
 - **Severity:** high
 - **Source:** sigma rule `093d68c7-762a-42f4-9f46-95e79142571a`
 - **Rule version:** 1
@@ -1506,7 +1506,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-93338 — Suspicious Double Extension File Execution
 
-- **SHA-256:** `351019b31e1dcea208671945469ef38a4de62da054c062655269a645c623b742`
+- **SHA-256:** `a3fe9f4b4209169aff53b73238384a29f07a22d8fd148853098358d8df236eae`
 - **Severity:** high
 - **Source:** sigma rule `1cdd9a09-06c9-4769-99ff-626e2b3991b8`
 - **Rule version:** 1
@@ -1538,7 +1538,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-94647 — Invocation of Active Directory Diagnostic Tool (ntdsutil.exe)
 
-- **SHA-256:** `f161b7f94dc802a52cbbb2f08df1c7bccebe646eda798738b45cc199230665e9`
+- **SHA-256:** `fd278b820457a5f941774246e84c2108b79d21c080733b5e8b4d971676621198`
 - **Severity:** medium
 - **Source:** sigma rule `2afafd61-6aae-4df4-baed-139fa1f4c345`
 - **Rule version:** 1
@@ -1573,7 +1573,7 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
 
 ### ATR-2026-97982 — Potentially Suspicious WebDAV LNK Execution
 
-- **SHA-256:** `9148586de84c59a98a7d5bc2f010504dcb1ab21fe9cb5060808db10d56b7a312`
+- **SHA-256:** `a15113d62a763b740eb72f72d52efd919cfbe193fc9723b413ae6f6c6047665c`
 - **Severity:** medium
 - **Source:** sigma rule `1412aa78-a24c-4abd-83df-767dfb2c5bbe`
 - **Rule version:** 1

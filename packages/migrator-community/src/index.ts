@@ -16,7 +16,7 @@ import { transformToAtr } from './transformers/ir-to-atr.js';
 import { validateAtrOutput } from './validators/atr-output-validator.js';
 import type { SigmaRule } from './parsers/sigma/types.js';
 import type { AtrRuleObject } from './transformers/ir-to-atr.js';
-import type { Enrichment } from './enrichment/types.js';
+import type { Enrichment } from './types/enrichment.js';
 
 export type ConvertOutcome = 'converted' | 'skipped' | 'failed';
 
@@ -136,4 +136,4 @@ export type {
   ComplianceMapping,
   TestCases,
   ReauthoredCondition,
-} from './enrichment/types.js';
+} from './types/enrichment.js';
