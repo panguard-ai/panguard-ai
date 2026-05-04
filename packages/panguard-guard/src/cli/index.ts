@@ -180,6 +180,64 @@ async function commandStart(
   process.on('SIGINT', () => void shutdown());
   process.on('SIGTERM', () => void shutdown());
 
+  // SIGHUP triggers live rule reload without process restart. Lets
+  // `pga migrate-pro --deploy-to-guard` deploy new rules with zero
+  // detection downtime. Atomicity: see GuardATREngine.reloadRules() docs.
+  process.on('SIGHUP', () => {
+    void (async () => {
+      try {
+        const result = await engine.reloadRules();
+        console.log(
+          `  ${symbols.pass} Rules reloaded: ${result.total} (${result.bundled} bundled + ${result.custom} custom)`
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`  ${symbols.fail} Reload failed: ${msg}`);
+      }
+    })();
+  });
+
+  // Optional fsnotify watcher on the ATR rules dir. Triggers reload on any
+  // .yaml / .yml file change (debounced 500ms). Opt-in via env:
+  //   PANGUARD_WATCH_RULES=1
+  // Rules dir is derived from dataDir (consistent with rule-loader.ts).
+  const watchRules = process.env['PANGUARD_WATCH_RULES'] === '1';
+  if (watchRules) {
+    try {
+      const { watch } = await import('node:fs');
+      const rulesDir = join(config.dataDir, 'atr-rules');
+      let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+      const watcher = watch(
+        rulesDir,
+        { recursive: true },
+        (eventType: string, filename: string | null) => {
+          if (!filename) return;
+          if (!filename.endsWith('.yaml') && !filename.endsWith('.yml')) return;
+          if (debounceTimer) clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            void engine
+              .reloadRules()
+              .then((result) => {
+                console.log(
+                  `  ${symbols.pass} Rules auto-reloaded (${eventType} ${filename}): ${result.total}`
+                );
+              })
+              .catch((err: unknown) => {
+                const msg = err instanceof Error ? err.message : String(err);
+                console.error(`  ${symbols.fail} Auto-reload failed: ${msg}`);
+              });
+          }, 500);
+        }
+      );
+      process.once('SIGINT', () => watcher.close());
+      process.once('SIGTERM', () => watcher.close());
+      console.log(`  ${symbols.info} Watching ${rulesDir} for rule changes`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`  ${symbols.warn} fs.watch failed: ${msg} (live reload disabled)`);
+    }
+  }
+
   await engine.start();
   sp.succeed('PanguardGuard started');
 

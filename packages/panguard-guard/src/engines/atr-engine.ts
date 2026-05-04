@@ -162,6 +162,38 @@ export class GuardATREngine {
   }
 
   /**
+   * Reload rules in place without dropping the engine.
+   *
+   * Re-runs `loadRules()` on the underlying ATREngine instances, which
+   * synchronously clears `this.rules` + recompiles patterns. Because Node
+   * is single-threaded, in-flight `evaluate()` calls cannot interleave
+   * with the swap — they either run entirely against the old rule set or
+   * entirely against the new one.
+   *
+   * Triggered by SIGHUP or by the optional fsnotify rule-dir watcher.
+   * Safe to call concurrently — the underlying engine handles repeat
+   * invocations idempotently.
+   *
+   * @returns total rule count after reload
+   */
+  async reloadRules(): Promise<{ total: number; bundled: number; custom: number }> {
+    let bundled = 0;
+    if (this.bundledEngine) {
+      bundled = await this.bundledEngine.loadRules();
+      this.bundledRuleIds.clear();
+      for (const r of this.bundledEngine.getRules()) {
+        this.bundledRuleIds.add(r.id);
+      }
+    }
+    const custom = await this.engine.loadRules();
+    const total = bundled + custom;
+    logger.info(
+      `ATR rules reloaded: ${total} total (${bundled} bundled + ${custom} custom)`
+    );
+    return { total, bundled, custom };
+  }
+
+  /**
    * Evaluate a SecurityEvent against ATR rules.
    * Converts SecurityEvent to AgentEvent format and runs evaluation.
    */

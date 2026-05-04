@@ -86,3 +86,79 @@ The distiller uses LLM to generate rules — main change is updating the prompt 
 ## P3 - Rename Legacy DB Field: sigma_rule_matched (S)
 
 `packages/threat-cloud/src/database.ts` and `packages/panguard-guard/src/types.ts` still use `sigma_rule_matched` / `sigmaRuleMatched` as a field name. This is a legacy name from when the detection engine was Sigma-based. Should be renamed to `rule_matched` / `ruleMatched` with a DB migration. Low priority since it's internal and doesn't affect functionality.
+
+---
+
+# Migrator-related backlog (from 2026-05-04 plan-eng-review)
+
+These items support the PanGuard Migrator + Threat Cloud integration.
+Cross-references with `panguard-enterprise/TODO.md` (private repo).
+
+## P0 - Guard SIGHUP / fsnotify live rule reload (panguard-guard) (M)
+
+Guard currently requires process restart to pick up new rules. Restart
+window has 5-30s of zero detection — banks will not accept this for
+routine rule updates. Suricata, Snort, Falco all have live reload.
+
+Implementation:
+- `kill -HUP <guard-pid>` triggers in-place rule reload
+- Optional `watch_rules: true` in `panguard-guard.yaml` enables fsnotify
+- Atomic swap so in-flight scans complete on old rules, new scans use new
+- Load test: deploy 50 new rules via `pga migrate-pro --deploy-to-guard`
+  with telemetry-traffic-replay, verify zero missed events
+
+Effort: ~3-5 days. Critical for first F500 production deployment.
+
+## P0 - Guard CLI: `panguard guard validate <rules-dir>` (panguard-guard) (S)
+
+Migrator's `--deploy-to-guard` needs a dry-run validate before swapping
+rules so a syntax-broken rule never reaches the live ruleset. Currently
+the migrator backs up + copies, then user manually verifies via
+`pga guard restart` — a 30s detection-downtime window.
+
+Acceptance:
+- `panguard guard validate /path/to/rules` exits 0 only if all rules
+  load without error
+- Migrator integrates: validate → atomic rename → restart Guard
+- Failed validate triggers automatic rollback (already implemented in
+  Migrator's `--rollback-guard` flag)
+
+Effort: ~1-2 days
+
+## P1 - Schema versioning: `SCHEMA_COMPAT.md` in atr repo (cross-org)
+
+ATR schema has no compat policy. Migrator now stamps `target_atr_engine`
+range on every output (panguard-enterprise commit 395466d), but Guard
+doesn't read it. Without policy + tooling, Migrator v0.5 producing rules
+for Guard v3.0 silently mis-parses.
+
+Steps:
+1. Open PR to `atr-org/agent-threat-rules` adding `SCHEMA_COMPAT.md`
+   documenting each schema version's breaking changes
+2. Update Guard rule loader to read `target_atr_engine` and reject
+   out-of-range loads with clear error
+3. Update PR template in all 3 repos to require schema-bump checklist
+
+Effort: ~1-2 weeks calendar time (community process). CC ~2-3 days
+of actual work.
+
+## P2 - npm publish first version of @panguard-ai/migrator-community
+
+Workflow `publish-migrator-community.yml` is ready (commit 2d1bc1ad).
+First publish requires:
+1. Push tag `migrator-community-v0.1.0`, OR
+2. Run via GitHub UI workflow_dispatch with dry_run=false
+
+Pre-flight:
+- Run with dry_run=true first to validate
+- Confirm `NPM_TOKEN` secret is set in repo settings
+
+This is a one-way action — `npm unpublish` only works for 72 hours.
+Adam's call when to trigger.
+
+## P2 - Migrator `/migrator` page CTA: replace mailto with Calendly
+
+Bank CISOs don't email gmail addresses. Replace `mailto:` with a real
+Cal.com or Calendly booking link. Half-day work, high signal change.
+
+Cross-ref: `panguard-enterprise/TODO.md` Service polish section.

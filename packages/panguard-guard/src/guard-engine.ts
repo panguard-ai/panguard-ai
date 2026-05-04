@@ -792,6 +792,23 @@ export class GuardEngine {
   }
 
   /**
+   * Live-reload ATR rules from disk without restarting Guard.
+   *
+   * Triggered by:
+   *   - SIGHUP signal (set up by the daemon entry in src/cli/index.ts)
+   *   - fsnotify watcher (when `watch_rules: true` in guard config)
+   *   - Programmatic call (tests, admin API)
+   *
+   * Reload is atomic relative to in-flight `evaluate()` calls because
+   * Node is single-threaded — see GuardATREngine.reloadRules() docs.
+   *
+   * @returns rule count breakdown after reload
+   */
+  async reloadRules(): Promise<{ total: number; bundled: number; custom: number }> {
+    return this.engines.atrEngine.reloadRules();
+  }
+
+  /**
    * Get the current baseline / 取得當前基線
    */
   getBaseline(): EnvironmentBaseline {
