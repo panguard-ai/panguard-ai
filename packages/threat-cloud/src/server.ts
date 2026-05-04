@@ -772,7 +772,7 @@ export class ThreatCloudServer {
               this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
               break;
             }
-            this.handleGetMigratorTelemetryStats(res);
+            await this.handleGetMigratorTelemetryStats(res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -788,7 +788,7 @@ export class ThreatCloudServer {
               this.sendJson(res, 403, { ok: false, error: 'Admin API key required' });
               break;
             }
-            this.handleGetMigratorCrystallizationCandidates(url, res);
+            await this.handleGetMigratorCrystallizationCandidates(url, res);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -1082,12 +1082,11 @@ export class ThreatCloudServer {
   }
 
   /** GET /api/migrator/telemetry — admin stats. */
-  private handleGetMigratorTelemetryStats(res: ServerResponse): void {
+  private async handleGetMigratorTelemetryStats(res: ServerResponse): Promise<void> {
     try {
-      void import('./migrator-crystallization.js').then(({ getMigratorTelemetryStats }) => {
-        const stats = getMigratorTelemetryStats(this.db.getRawDb());
-        this.sendJson(res, 200, { ok: true, data: stats });
-      });
+      const { getMigratorTelemetryStats } = await import('./migrator-crystallization.js');
+      const stats = getMigratorTelemetryStats(this.db.getRawDb());
+      this.sendJson(res, 200, { ok: true, data: stats });
     } catch (err) {
       this.sendJson(res, 500, {
         ok: false,

@@ -351,6 +351,27 @@ export const migrations: readonly Migration[] = [
       );
     },
   },
+  {
+    version: 13,
+    name: 'add_migrator_telemetry_crystallization_index',
+    up: (db) => {
+      // Crystallization analyzer query is:
+      //   SELECT condition_hash, COUNT(DISTINCT install_id), ...
+      //   FROM migrator_telemetry
+      //   WHERE created_at > ?
+      //   GROUP BY condition_hash HAVING tenant_count >= ?
+      //
+      // Existing single-column idx_migrator_tel_hash + idx_migrator_tel_created
+      // each get used independently; SQLite picks one and full-scans the rest.
+      // A composite index covering (condition_hash, install_id, created_at)
+      // turns the GROUP BY + DISTINCT + WHERE into a single index range scan.
+      // Critical at >100k rows; benign at smaller scale.
+      db.exec(
+        `CREATE INDEX IF NOT EXISTS idx_migrator_tel_crystallization
+         ON migrator_telemetry(condition_hash, install_id, created_at)`
+      );
+    },
+  },
 ];
 
 /**

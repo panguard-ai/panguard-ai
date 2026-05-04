@@ -1,0 +1,10 @@
+src/
+tests/
+tsconfig.json
+tsconfig.tsbuildinfo
+.npmignore
+*.test.ts
+*.spec.ts
+*.log
+.vscode/
+.idea/

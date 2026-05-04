@@ -209,6 +209,15 @@ export default function MigratorContent() {
               >
                 Download 50 ATR rules (.zip)
               </a>
+              <a
+                href="/migrator/sample-pack/VERIFY.md"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-3 text-text-muted text-xs hover:text-text-primary transition-colors"
+                title="SHA-256 manifest + verification instructions"
+              >
+                Verify integrity (MANIFEST.txt)
+              </a>
             </div>
           </div>
         </FadeInUp>

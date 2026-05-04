@@ -77,12 +77,11 @@ const yaraResult = await convertYara(yaraText);
 The community transformer accepts an externally-produced enrichment
 object that adds compliance metadata, test cases, and reauthored
 detection conditions. Generate this however you want — manually,
-via your own LLM pipeline, or by importing the schema from
-`@panguard-ai/migrator-community/enrichment/types`.
+via your own LLM pipeline. The `Enrichment` type is re-exported from the
+package root.
 
 ```typescript
-import type { Enrichment } from '@panguard-ai/migrator-community/enrichment/types';
-import { convertSigma } from '@panguard-ai/migrator-community';
+import { convertSigma, type Enrichment } from '@panguard-ai/migrator-community';
 
 const enrichment: Enrichment = {
   has_agent_analogue: true,
