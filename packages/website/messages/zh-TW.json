@@ -729,9 +729,9 @@
     },
     "srDefinition": "Panguard AI 為 AI Agent 提供第一個 Skills Audit。它在每個 Skill 執行前進行審計，用社群 ATR（Agent Threat Rules）捕獲已知威脅，用 AI 分析捕獲未知威脅，並分享新規則保護所有人。MIT 授權。開源。",
     "scannerHero": {
-      "titleLine1": "你的 AI Agent 正在跑別人的程式碼，你真的安全嗎？",
-      "titleLine2": "掃一掃更安心！",
-      "subtitle": "我們掃了 {count} 個 Skills。每 25 個就有 1 個有問題。",
+      "titleLine1": "即時保護。",
+      "titleLine2": "Audit-ready 證據。",
+      "subtitle": "為受監管產業設計的 AI Agent 資安平台 — 建立在 ATR 開放標準之上,同一套 Cisco 與 Microsoft 在 production 採用的規則。累計掃描 {count} 個 skills。EU AI Act 2026/8/2 強制執行倒數中。",
       "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
       "tabUrl": "GitHub 連結",
       "tabPaste": "貼上內容",
@@ -1595,11 +1595,20 @@
       },
       "inProgress": {
         "title": "進行中",
-        "items": ["Report + Trap", "Web Dashboard UI", "Windows 支援", "Kubernetes 整合"]
+        "items": [
+          "Report + Trap",
+          "Web Dashboard UI",
+          "Windows 支援",
+          "Kubernetes 整合"
+        ]
       },
       "planned": {
         "title": "規劃中",
-        "items": ["行動 App（iOS/Android）", "Threat Cloud API v2", "偵測規則社群市集"]
+        "items": [
+          "行動 App（iOS/Android）",
+          "Threat Cloud API v2",
+          "偵測規則社群市集"
+        ]
       }
     },
     "cta": {
@@ -2931,7 +2940,14 @@
       },
       "workflow": {
         "title": "適合你的工作流",
-        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "一行指令保護你的技術棧",
@@ -2992,7 +3008,13 @@
       },
       "integrations": {
         "title": "你團隊已在使用的整合",
-        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
+        "tools": [
+          "Slack",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "今天就保護你的企業",
@@ -3052,7 +3074,15 @@
       },
       "integrations": {
         "title": "企業整合",
-        "tools": ["SIEM", "PagerDuty", "Jira", "Slack", "Microsoft Teams", "REST API", "Webhooks"]
+        "tools": [
+          "SIEM",
+          "PagerDuty",
+          "Jira",
+          "Slack",
+          "Microsoft Teams",
+          "REST API",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "看 Panguard 實際運作",
@@ -3108,7 +3138,14 @@
       "stack": "例如 CrowdStrike、Cloudflare、自訂腳本...",
       "message": "告訴我們你的安全目標或任何具體問題..."
     },
-    "teamSizes": ["只有我", "2-10", "11-50", "51-200", "201-500", "500+"],
+    "teamSizes": [
+      "只有我",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
     "submit": "送出訊息",
     "submitting": "提交中...",
     "error": "提交失敗，請再試一次。",
@@ -3289,7 +3326,12 @@
       "inquiryType": "選擇類型",
       "message": "我們能如何幫助你？"
     },
-    "inquiryTypes": ["一般詢問", "技術支援", "合作夥伴", "其他"],
+    "inquiryTypes": [
+      "一般詢問",
+      "技術支援",
+      "合作夥伴",
+      "其他"
+    ],
     "submit": "發送訊息",
     "submitting": "發送中...",
     "successTitle": "訊息已發送。",
@@ -3482,7 +3524,11 @@
       },
       "applicationLayer": {
         "title": "應用層",
-        "items": ["輸入驗證和消毒", "本地組態檔案權限（0600）", "CLI 透過本地令牌認證"]
+        "items": [
+          "輸入驗證和消毒",
+          "本地組態檔案權限（0600）",
+          "CLI 透過本地令牌認證"
+        ]
       },
       "infrastructureLayer": {
         "title": "基礎設施層",
@@ -5096,19 +5142,34 @@
         "title": "MSP 合作夥伴",
         "subtitle": "託管安全服務供應商",
         "desc": "將 Panguard 的 AI 安全防護加入你的託管服務組合。多租戶管理、白標選項、開源。",
-        "highlights": ["多租戶管理主控台", "白標部署選項", "100% 免費開源", "自動化佈建 API"]
+        "highlights": [
+          "多租戶管理主控台",
+          "白標部署選項",
+          "100% 免費開源",
+          "自動化佈建 API"
+        ]
       },
       "technology": {
         "title": "技術合作夥伴",
         "subtitle": "整合與技術",
         "desc": "將 Panguard 與你的平台整合。API 存取、共同行銷機會、聯合解決方案開發。",
-        "highlights": ["完整 REST API 存取", "共同行銷計畫", "聯合解決方案開發", "技術整合支援"]
+        "highlights": [
+          "完整 REST API 存取",
+          "共同行銷計畫",
+          "聯合解決方案開發",
+          "技術整合支援"
+        ]
       },
       "reseller": {
         "title": "經銷合作夥伴",
         "subtitle": "增值經銷商",
         "desc": "向你的客戶群經銷 Panguard AI。交易登記、銷售賦能、專屬合作夥伴經理。",
-        "highlights": ["交易登記保護", "銷售賦能資源", "專屬合作夥伴經理", "完善的合作架構"]
+        "highlights": [
+          "交易登記保護",
+          "銷售賦能資源",
+          "專屬合作夥伴經理",
+          "完善的合作架構"
+        ]
       }
     },
     "benefits": {
