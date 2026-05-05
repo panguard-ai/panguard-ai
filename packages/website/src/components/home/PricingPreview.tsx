@@ -7,39 +7,35 @@ import SectionTitle from '@/components/ui/SectionTitle';
 import { Link } from '@/navigation';
 import { ArrowRight } from 'lucide-react';
 
+// Pricing v4 (LOCKED 2026-04-22): Community + Pilot + Enterprise + ATR governance.
+// NO middle tier (Team/Business). The /pricing page explains why.
+
 const TIERS_EN = [
   {
     id: 'community',
     name: 'Community',
     price: '$0',
-    desc: 'Open source CLI + 311 ATR rules',
+    period: ' forever',
+    desc: 'Open source · 314 ATR rules · MIT · self-host · unlimited',
     cta: 'Get Started',
     href: 'https://github.com/panguard-ai/panguard-ai',
     external: true,
   },
   {
-    id: 'team',
-    name: 'Team',
-    price: '$500',
-    period: '/mo',
-    desc: 'Up to 5 seats · Threat Cloud dashboard',
-    cta: 'Join Waitlist',
-    href: '/early-access',
-  },
-  {
-    id: 'business',
-    name: 'Business',
-    price: 'Custom',
-    desc: 'Unlimited seats · on-prem · SLA',
-    cta: 'Contact Sales',
-    href: '/contact?tier=business',
+    id: 'pilot',
+    name: 'Pilot',
+    price: '$25K',
+    period: ' / 90d',
+    desc: 'F500 POC before procurement · IT director can approve · credits to Y1 Enterprise',
+    cta: 'Request Pilot',
+    href: '/contact?tier=pilot',
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     price: '$150K+',
-    period: '/yr',
-    desc: 'AIAM · airgap · 4-framework compliance',
+    period: ' / yr',
+    desc: 'AIAM · airgap · 5-framework compliance evidence · SLA · CSM',
     cta: 'Contact Sales',
     href: '/contact?tier=enterprise',
   },
@@ -50,34 +46,27 @@ const TIERS_ZH = [
     id: 'community',
     name: 'Community 社群版',
     price: '$0',
-    desc: '開源 CLI + 311 條 ATR 規則',
-    cta: '開始使用',
+    period: ' 永久',
+    desc: '開源 · 314 條 ATR 規則 · MIT · 自架 · 無上限',
+    cta: '立即使用',
     href: 'https://github.com/panguard-ai/panguard-ai',
     external: true,
   },
   {
-    id: 'team',
-    name: 'Team 團隊版',
-    price: '$500',
-    period: '/月',
-    desc: '最多 5 席 · Threat Cloud 儀表板',
-    cta: '加入 Waitlist',
-    href: '/early-access',
-  },
-  {
-    id: 'business',
-    name: 'Business 商用版',
-    price: '客製',
-    desc: '無限席次 · 地端部署 · SLA',
-    cta: '洽詢業務',
-    href: '/contact?tier=business',
+    id: 'pilot',
+    name: 'Pilot 試點',
+    price: '$25K',
+    period: ' / 90 天',
+    desc: 'F500 採購前試水合約 · IT 主管可審批 · 全額 credit 到 Y1 Enterprise',
+    cta: '申請 Pilot',
+    href: '/contact?tier=pilot',
   },
   {
     id: 'enterprise',
     name: 'Enterprise 企業版',
     price: '$150K+',
-    period: '/年',
-    desc: 'AIAM · airgap · 4 框架合規',
+    period: ' / 年',
+    desc: 'AIAM · 離網 · 5 框架合規證據 · SLA · 專屬 CSM',
     cta: '洽詢業務',
     href: '/contact?tier=enterprise',
   },
@@ -92,14 +81,14 @@ export default function PricingPreview() {
     <SectionWrapper>
       <SectionTitle
         overline={isZh ? '定價' : 'PRICING'}
-        title={isZh ? '從社群版到企業版 4 個檔次' : '4 tiers from community to enterprise'}
+        title={isZh ? '開放核心 · 不做中間 tier' : 'Open-core · No middle tier'}
         subtitle={
           isZh
-            ? 'Community 永久免費開源。Team / Business / Enterprise 2026 Q2 上線。'
-            : 'Community is free and open source forever. Team / Business / Enterprise launching Q2 2026.'
+            ? 'Community 永久免費開源(餵感測網路)。Enterprise 拿到平台 + 5 框架合規證據包。中間 tier 是陷阱 — /pricing 解釋為什麼。'
+            : 'Community is free and open source forever (feeds the sensor network). Enterprise gets the platform + 5-framework compliance evidence kit. The middle tier is a trap — /pricing explains why.'
         }
       />
-      <div className="max-w-6xl mx-auto mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="max-w-5xl mx-auto mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {tiers.map((tier, i) => (
           <FadeInUp key={tier.id} delay={i * 0.06}>
             <div className="bg-surface-2 rounded-xl border border-border p-6 flex flex-col h-full hover:border-brand-sage/50 transition-colors">
@@ -136,8 +125,8 @@ export default function PricingPreview() {
       <FadeInUp delay={0.3}>
         <p className="text-center text-xs text-text-muted mt-8">
           {isZh
-            ? '完整功能比較與 FAQ 請見 /pricing 頁面'
-            : 'Full feature comparison and FAQ at /pricing'}
+            ? '完整功能比較、ATR Enterprise Member ($10K/年) 治理層、與 FAQ 請見 /pricing'
+            : 'Full feature comparison, ATR Enterprise Member tier ($10K/yr governance), and FAQ at /pricing'}
         </p>
       </FadeInUp>
     </SectionWrapper>

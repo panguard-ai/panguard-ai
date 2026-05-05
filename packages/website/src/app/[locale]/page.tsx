@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import ScannerHero from '@/components/home/ScannerHero';
+import RegulatedIndustriesPositioning from '@/components/home/RegulatedIndustriesPositioning';
 import SecurityLayers from '@/components/home/SecurityLayers';
 import LiveStats from '@/components/home/LiveStats';
 import CoverageComparison from '@/components/home/CoverageComparison';
@@ -28,6 +29,8 @@ export default async function Home() {
           </p>
           {/* 1. Scanner Hero */}
           <ScannerHero />
+          {/* 1.5. Regulated Industries Positioning (Built on ATR + Two-Track + Migrator + 5-Framework Compliance) */}
+          <RegulatedIndustriesPositioning />
           {/* 2. 7-layer Security Architecture */}
           <SecurityLayers />
           {/* 3. Live Stats */}
