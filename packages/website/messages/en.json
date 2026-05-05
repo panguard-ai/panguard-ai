@@ -1352,7 +1352,7 @@
           },
           "review": {
             "title": "Review",
-            "desc": "ATR rules evaluate your agent's behavior patterns in dev/staging. 311 rules across 11 threat categories catch issues before production."
+            "desc": "ATR rules evaluate your agent's behavior patterns in dev/staging. 320 rules across 11 threat categories catch issues before production."
           },
           "ship": {
             "title": "Ship",
@@ -2570,7 +2570,7 @@
     },
     "coverage": {
       "overline": "Coverage Matrix",
-      "title": "11 categories. 311 rules. Zero gaps.",
+      "title": "11 categories. 320 rules. Zero gaps.",
       "subtitle": "Every OWASP Agentic category has dedicated ATR detection rules. 6 categories at STRONG coverage, 4 at MODERATE -- all fully covered.",
       "rulesLabel": "ATR rules",
       "note": "Some rules map to multiple categories. Total rule-category mappings: {total}.",
@@ -5274,7 +5274,7 @@
     },
     "atr": {
       "title": "Agent Threat Rules (ATR) -- Panguard AI",
-      "description": "The first open detection standard for AI agent threats. 311 rules across 11 categories. OWASP LLM Top 10 mapped. Community-driven, YAML-based, machine-readable."
+      "description": "The first open detection standard for AI agent threats. 320 rules across 11 categories. OWASP LLM Top 10 mapped. Community-driven, YAML-based, machine-readable."
     },
     "productMcp": {
       "title": "Panguard MCP Server",
@@ -5569,7 +5569,7 @@
     },
     "categories": {
       "overline": "RULE CATEGORIES",
-      "title": "11 categories. 311 rules. 1,600+ patterns.",
+      "title": "11 categories. 320 rules. 1,600+ patterns.",
       "subtitle": "Covering the full AI agent attack surface, mapped to OWASP Agentic Top 10 and MITRE ATLAS.",
       "items": {
         "prompt-injection": {
@@ -5783,7 +5783,7 @@
         },
         {
           "name": "ATR Engine",
-          "desc": "311 rules evaluated in <1ms per event. Block, alert, or escalate.",
+          "desc": "320 rules evaluated in <1ms per event. Block, alert, or escalate.",
           "position": "middle",
           "highlighted": true
         },
@@ -5876,7 +5876,7 @@
           "status": "current",
           "title": "Open Standard",
           "items": [
-            "311 rules, 1,600+ patterns across 11 categories",
+            "320 rules, 1,600+ patterns across 11 categories",
             "RFC-001 v1.1 quality standard published",
             "Maturity levels: draft / experimental / stable",
             "Cisco AI Defense ships 34 ATR rules",
@@ -6168,7 +6168,7 @@
           "ATR rules: prompt injection, tool poisoning, skill compromise",
           "ATR rules: credential exfiltration, context manipulation",
           "ATR rules: cross-agent attacks, unauthorized access",
-          "311 rules, community-driven, updated continuously"
+          "320 rules, community-driven, updated continuously"
         ]
       },
       "postDeployment": {
@@ -6225,7 +6225,7 @@
       },
       "q3": {
         "q": "What are ATR rules?",
-        "a": "ATR (Agent Threat Rules) is the first open detection standard for AI agent threats. 311 rules across 11 threat categories, built specifically for AI agent attacks: prompt injection, tool poisoning, context exfiltration, credential theft, cross-agent privilege escalation, skill supply-chain attacks, and more.\n\nATR rules are machine-readable, community-driven, and purpose-built for the threats that traditional security tools cannot see -- threats that live in prompt flows, tool calls, and agent conversations.\n\nThreat Cloud aggregates rules from the community. Guard runs them with sub-millisecond evaluation. Every new rule strengthens protection for all users."
+        "a": "ATR (Agent Threat Rules) is the first open detection standard for AI agent threats. 320 rules across 11 threat categories, built specifically for AI agent attacks: prompt injection, tool poisoning, context exfiltration, credential theft, cross-agent privilege escalation, skill supply-chain attacks, and more.\n\nATR rules are machine-readable, community-driven, and purpose-built for the threats that traditional security tools cannot see -- threats that live in prompt flows, tool calls, and agent conversations.\n\nThreat Cloud aggregates rules from the community. Guard runs them with sub-millisecond evaluation. Every new rule strengthens protection for all users."
       },
       "q4": {
         "q": "What threats does Panguard detect?",
