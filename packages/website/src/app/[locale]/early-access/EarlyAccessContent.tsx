@@ -41,7 +41,7 @@ const COPY = {
     successHint: 'Questions? Reply to our email or contact enterprise@panguard.ai',
     alreadyShipping: 'Already shipping today · Community tier',
     todayList: [
-      { en: '311 ATR detection rules (MIT licensed)', zh: '' },
+      { en: '324 ATR detection rules (MIT licensed)', zh: '' },
       { en: 'pga CLI + Guard daemon (11 response actions)', zh: '' },
       { en: 'Honeypot integrated in Guard (trap-bridge.ts)', zh: '' },
       { en: 'Threat Cloud sensor registration on pga up', zh: '' },

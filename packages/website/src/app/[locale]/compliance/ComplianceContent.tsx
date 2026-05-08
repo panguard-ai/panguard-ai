@@ -251,7 +251,9 @@ export default function ComplianceContent() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-400 shrink-0">○</span>
-                  <span>SOC2 Type 1 attestation via Vanta · target Q3 2026</span>
+                  <span>
+                    SOC2 Type 1 via Vanta — vendor selection Q3 2026, attestation Q4 2026/Q1 2027
+                  </span>
                 </li>
               </ul>
             </div>

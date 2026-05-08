@@ -72,59 +72,49 @@ const STEPS = [
   {
     icon: FileCode2,
     title: 'Drop your Sigma/YARA rules',
-    body:
-      'Upload a directory or zip of legacy detection rules. The migrator parses Sigma YAML and YARA text without external dependencies.',
+    body: 'Upload a directory or zip of legacy detection rules. The migrator parses Sigma YAML and YARA text without external dependencies.',
   },
   {
     icon: Cpu,
     title: 'IR + LLM enrichment',
-    body:
-      'Each rule passes through a source-agnostic intermediate representation, then an LLM enrichment layer that reauthors detections from endpoint fields to agent-context fields (tool_call.arguments, agent_action.command_line, agent_event.event_type).',
+    body: 'Each rule passes through a source-agnostic intermediate representation, then an LLM enrichment layer that reauthors detections from endpoint fields to agent-context fields (tool_call.arguments, agent_action.command_line, agent_event.event_type).',
   },
   {
     icon: Layers,
     title: 'Compliance + tests + demo',
-    body:
-      'Each output rule carries a 5-framework compliance map (EU AI Act, OWASP Agentic Top 10:2026, OWASP LLM Top 10:2025, NIST AI RMF, ISO/IEC 42001), test cases (TP + TN), false-positive scenarios, and a message template.',
+    body: 'Each output rule carries a 5-framework compliance map (EU AI Act, OWASP Agentic Top 10:2026, OWASP LLM Top 10:2025, NIST AI RMF, ISO/IEC 42001), test cases (TP + TN), false-positive scenarios, and a message template.',
   },
   {
     icon: Shield,
     title: 'Validated against ATR',
-    body:
-      'Every output rule passes the public agent-threat-rules validateRule() — deployable to the ATR engine, Elastic Security, Splunk, GitHub code-scanning (SARIF), or any SIEM via the public ATR converters.',
+    body: 'Every output rule passes the public agent-threat-rules validateRule() — deployable to the ATR engine, Elastic Security, Splunk, GitHub code-scanning (SARIF), or any SIEM via the public ATR converters.',
   },
 ];
 
 const FEATURES = [
   {
     title: 'EU AI Act detection evidence',
-    body:
-      'JSON + Markdown + HTML evidence pack with SHA-256 + Merkle root signature. Articles 9, 12, 14, 15, 50 covered — the technical-control evidence dossier auditors expect to see alongside risk management and technical documentation.',
+    body: 'JSON + Markdown + HTML evidence pack with SHA-256 + Merkle root signature. Articles 9, 12, 14, 15, 50 covered — the technical-control evidence dossier auditors expect to see alongside risk management and technical documentation.',
   },
   {
     title: 'Activation demo',
-    body:
-      'Five attack events + five benign events replay against your migrated rules. The report tells you exactly which rule fired on which event — proof the rules work, not just that they validate.',
+    body: 'Five attack events + five benign events replay against your migrated rules. The report tells you exactly which rule fired on which event — proof the rules work, not just that they validate.',
   },
   {
     title: 'OWASP Agentic + LLM mapping',
-    body:
-      'Every rule cites OWASP Agentic Top 10:2026 IDs (ASI01–ASI10) and OWASP LLM Top 10:2025 IDs (LLM01–LLM10). The mapping is part of the rule body, not a separate spreadsheet.',
+    body: 'Every rule cites OWASP Agentic Top 10:2026 IDs (ASI01–ASI10) and OWASP LLM Top 10:2025 IDs (LLM01–LLM10). The mapping is part of the rule body, not a separate spreadsheet.',
   },
   {
     title: 'Threat Cloud telemetry (opt-in)',
-    body:
-      'Anonymized fingerprints (SHA-256 of conditions) flow to PanGuard Threat Cloud. Cross-tenant aggregation surfaces high-signal rules for crystallization back to ATR mainline. Rule body never leaves the customer.',
+    body: 'Anonymized fingerprints (SHA-256 of conditions) flow to PanGuard Threat Cloud. Cross-tenant aggregation surfaces high-signal rules for crystallization back to ATR mainline. Rule body never leaves the customer.',
   },
   {
     title: 'ATR contribution path',
-    body:
-      'Per-rule contribution packs (scrubbed YAML + CONTRIB.md) ready for upstream PR against the open ATR repo. Customer-internal fields stripped automatically; SHA-256 over rule body for tamper evidence.',
+    body: 'Per-rule contribution packs (scrubbed YAML + CONTRIB.md) ready for upstream PR against the open ATR repo. Customer-internal fields stripped automatically; SHA-256 over rule body for tamper evidence.',
   },
   {
     title: 'Web dashboard or CLI',
-    body:
-      'Run pga migrate-pro --web for a local browser dashboard with drag-and-drop upload, live progress streaming, and per-rule download links. Or stay in the terminal — both surfaces are first-class.',
+    body: 'Run pga migrate-pro --web for a local browser dashboard with drag-and-drop upload, live progress streaming, and per-rule download links. Or stay in the terminal — both surfaces are first-class.',
   },
 ];
 
@@ -186,7 +176,8 @@ export default function MigratorContent() {
               </span>
               <span className="text-border">&middot;</span>
               <span className="inline-flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-panguard-green" /> 5/5 attacks blocked, 5/5 benign clean
+                <Check className="w-4 h-4 text-panguard-green" /> 5/5 attacks blocked, 5/5 benign
+                clean
               </span>
               <span className="text-border">&middot;</span>
               <span className="inline-flex items-center gap-1.5">
@@ -272,7 +263,9 @@ export default function MigratorContent() {
                       Step {i + 1}
                     </div>
                   </div>
-                  <h3 className="font-display text-lg font-semibold mb-2 text-text-primary">{step.title}</h3>
+                  <h3 className="font-display text-lg font-semibold mb-2 text-text-primary">
+                    {step.title}
+                  </h3>
                   <p className="text-text-secondary text-sm leading-relaxed">{step.body}</p>
                 </div>
               </FadeInUp>
@@ -305,7 +298,9 @@ export default function MigratorContent() {
             <div className="rounded-2xl border border-panguard-green/30 bg-surface-1 overflow-hidden">
               <div className="px-4 py-2 border-b border-panguard-green/30 text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold flex justify-between">
                 <span>ATR (output)</span>
-                <span className="font-mono">tool_call.arguments &middot; agent_action.command_line</span>
+                <span className="font-mono">
+                  tool_call.arguments &middot; agent_action.command_line
+                </span>
               </div>
               <pre className="px-5 py-4 text-xs font-mono text-text-secondary overflow-x-auto leading-relaxed">
                 <code>{ATR_OUTPUT}</code>
@@ -316,8 +311,8 @@ export default function MigratorContent() {
         <FadeInUp>
           <div className="text-center mt-8 text-sm text-text-muted">
             <ArrowDown className="w-4 h-4 inline-block mr-2" />
-            The migrator reauthors detection fields from endpoint Sysmon to AI-agent telemetry.
-            Same threat, language the runtime engine actually sees.
+            The migrator reauthors detection fields from endpoint Sysmon to AI-agent telemetry. Same
+            threat, language the runtime engine actually sees.
           </div>
         </FadeInUp>
       </SectionWrapper>
@@ -331,7 +326,9 @@ export default function MigratorContent() {
           {FEATURES.map((f, i) => (
             <FadeInUp key={i}>
               <div className="p-6 rounded-2xl border border-border bg-surface-1 h-full transition hover:border-brand-sage/40">
-                <h3 className="font-display text-base font-semibold mb-2 text-text-primary">{f.title}</h3>
+                <h3 className="font-display text-base font-semibold mb-2 text-text-primary">
+                  {f.title}
+                </h3>
                 <p className="text-text-secondary text-sm leading-relaxed">{f.body}</p>
               </div>
             </FadeInUp>
@@ -353,11 +350,12 @@ export default function MigratorContent() {
               EU AI Act audit scope
             </h2>
             <p className="text-text-secondary leading-relaxed">
-              An EU AI Act high-risk system audit needs roughly 12 documents (Annex IV +
-              Articles 9&ndash;15, 17, 50, 72). The migrator delivers <strong className="text-panguard-green">2&ndash;3</strong> of
-              them at high quality &mdash; the technical-control evidence layer.
-              The other 9&ndash;10 are customer responsibility, but our pack cross-references them so
-              your auditor doesn&rsquo;t maintain five separate spreadsheets.
+              An EU AI Act high-risk system audit needs roughly 12 documents (Annex IV + Articles
+              9&ndash;15, 17, 50, 72). The migrator delivers{' '}
+              <strong className="text-panguard-green">2&ndash;3</strong> of them at high quality
+              &mdash; the technical-control evidence layer. The other 9&ndash;10 are customer
+              responsibility, but our pack cross-references them so your auditor doesn&rsquo;t
+              maintain five separate spreadsheets.
             </p>
           </div>
         </FadeInUp>
@@ -401,10 +399,11 @@ export default function MigratorContent() {
         </div>
         <FadeInUp>
           <p className="text-center text-text-muted text-sm mt-10 max-w-3xl mx-auto leading-relaxed">
-            Pricing reflects scope: this is a <strong className="text-text-primary">$50&ndash;150K
-            detection-evidence module</strong>, not a turnkey EU AI Act compliance package.
-            The pack&rsquo;s value is collapsing 6 months of detection-engineering consulting
-            into 1 week of setup &mdash; not replacing the legal/compliance dossier itself.
+            Pricing reflects scope: this is a{' '}
+            <strong className="text-text-primary">$50&ndash;150K detection-evidence module</strong>,
+            not a turnkey EU AI Act compliance package. The pack&rsquo;s value is collapsing 6
+            months of detection-engineering consulting into 1 week of setup &mdash; not replacing
+            the legal/compliance dossier itself.
           </p>
         </FadeInUp>
       </SectionWrapper>
@@ -421,18 +420,15 @@ export default function MigratorContent() {
           {[
             {
               title: 'Direct PR',
-              body:
-                'Customer opens a PR against the public agent-threat-rules repo using the auto-built CONTRIB.md narrative.',
+              body: 'Customer opens a PR against the public agent-threat-rules repo using the auto-built CONTRIB.md narrative.',
             },
             {
               title: 'TC crystallization',
-              body:
-                'Anonymized fingerprints aggregated across tenants. Patterns proven across N tenants with low FP get auto-PRed to ATR mainline.',
+              body: 'Anonymized fingerprints aggregated across tenants. Patterns proven across N tenants with low FP get auto-PRed to ATR mainline.',
             },
             {
               title: 'Service-managed',
-              body:
-                'PanGuard Threat Research opens the PR on the customer’s behalf, credited or anonymous as preferred.',
+              body: 'PanGuard Threat Research opens the PR on the customer’s behalf, credited or anonymous as preferred.',
             },
           ].map((p, i) => (
             <FadeInUp key={i}>

@@ -13,7 +13,7 @@
  * pretend the default is right.
  */
 
-const ATR_CATEGORIES = [
+export const ATR_CATEGORIES = [
   'prompt-injection',
   'tool-poisoning',
   'context-exfiltration',

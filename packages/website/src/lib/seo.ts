@@ -6,7 +6,7 @@ const BASE_URL = 'https://panguard.ai';
  */
 export function buildAlternates(path: string, locale: string) {
   const enPath = path === '/' ? '' : path;
-  const zhPath = `/zh${path === '/' ? '' : path}`;
+  const zhPath = `/zh-TW${path === '/' ? '' : path}`;
   return {
     canonical: locale === 'en' ? `${BASE_URL}${enPath}` : `${BASE_URL}${zhPath}`,
     languages: {
