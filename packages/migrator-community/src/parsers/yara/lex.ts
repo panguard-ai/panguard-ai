@@ -132,7 +132,7 @@ function parseStringLine(line: string): YaraString | null {
   const m = /^\s*(\$[A-Za-z0-9_*]+)\s*=\s*(.*)$/.exec(line);
   if (!m) return null;
   const name = m[1] ?? '';
-  let rest = (m[2] ?? '').trim();
+  const rest = (m[2] ?? '').trim();
   if (rest === '') return null;
 
   // Hex string: { ... }
@@ -224,7 +224,7 @@ function parseMetaBlock(metaBody: string): YaraMeta {
     const m = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+?)\s*$/.exec(line);
     if (!m) continue;
     const key = m[1] ?? '';
-    let val = (m[2] ?? '').trim();
+    const val = (m[2] ?? '').trim();
     if (val.startsWith('"') && val.endsWith('"')) {
       try {
         out[key] = JSON.parse(val) as string;
