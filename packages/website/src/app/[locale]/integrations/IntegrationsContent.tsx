@@ -60,16 +60,22 @@ const integrations: Integration[] = [
     status: 'Available',
   },
   {
+    name: 'Generic Webhook',
+    category: 'Communication',
+    description: 'Stream alerts and detections to any HTTP endpoint via signed JSON webhooks.',
+    status: 'Available',
+  },
+  {
     name: 'Splunk',
     category: 'SIEM & Monitoring',
     description: 'Forward security events and detection logs to Splunk for centralized analysis.',
-    status: 'Available',
+    status: 'Coming Soon',
   },
   {
     name: 'Elastic (ELK)',
     category: 'SIEM & Monitoring',
     description: 'Ship logs to Elasticsearch for custom dashboards and correlation.',
-    status: 'Available',
+    status: 'Coming Soon',
   },
   {
     name: 'Datadog',
@@ -81,19 +87,19 @@ const integrations: Integration[] = [
     name: 'PagerDuty',
     category: 'DevOps',
     description: 'Trigger incidents from critical security events with automatic escalation.',
-    status: 'Available',
+    status: 'Coming Soon',
   },
   {
     name: 'Jira',
     category: 'Ticketing',
     description: 'Auto-create security tickets from detected threats with full context.',
-    status: 'Available',
+    status: 'Coming Soon',
   },
   {
     name: 'AWS',
     category: 'Cloud',
     description: 'Native integration with AWS CloudTrail, GuardDuty, and Security Hub.',
-    status: 'Available',
+    status: 'Coming Soon',
   },
   {
     name: 'Google Cloud',
@@ -105,7 +111,7 @@ const integrations: Integration[] = [
     name: 'Docker',
     category: 'DevOps',
     description: 'Container security scanning and runtime protection for Docker environments.',
-    status: 'Available',
+    status: 'Coming Soon',
   },
 ];
 
@@ -286,26 +292,24 @@ export default function IntegrationsContent() {
               <div className="flex items-center gap-2 mb-4">
                 <TerminalIcon size={16} className="text-brand-sage" />
                 <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-                  Example Request
+                  CLI Output (JSON)
                 </span>
               </div>
               <pre className="text-sm text-text-secondary font-mono leading-relaxed overflow-x-auto">
-                <code>{`curl -X GET \\
-  https://api.panguard.ai/v1/threats \\
-  -H "Authorization: Bearer <token>" \\
-  -H "Content-Type: application/json"
-
+                <code>{`$ panguard scan ~/.claude/skills --json
 {
-  "data": [
+  "scanned": 24,
+  "rules_loaded": 320,
+  "threats": [
     {
-      "id": "thr_9x8kL2",
+      "skill": "data-exfil-helper",
       "severity": "critical",
-      "type": "brute_force",
-      "endpoint": "api-gateway-01",
-      "detected_at": "2025-01-15T08:32:00Z"
+      "rule_id": "ATR-2026-00128",
+      "category": "context-exfiltration",
+      "matched_at": "2026-05-06T08:32:00Z"
     }
   ],
-  "meta": { "total": 47, "page": 1 }
+  "summary": { "critical": 1, "high": 0, "info": 0 }
 }`}</code>
               </pre>
             </div>

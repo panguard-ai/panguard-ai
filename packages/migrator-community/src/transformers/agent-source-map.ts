@@ -6,7 +6,7 @@
  * agent-context types. Honest default + needs-review marker is the W1 stance.
  */
 
-const ATR_AGENT_SOURCE_TYPES = [
+export const ATR_AGENT_SOURCE_TYPES = [
   'llm_io',
   'tool_call',
   'mcp_exchange',

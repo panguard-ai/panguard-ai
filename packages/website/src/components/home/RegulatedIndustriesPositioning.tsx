@@ -47,8 +47,7 @@ export default function RegulatedIndustriesPositioning() {
                 rel="noopener noreferrer"
                 className="text-panguard-green font-semibold hover:underline inline-flex items-center gap-1"
               >
-                agentthreatrule.org{' '}
-                <ArrowRight className="w-3.5 h-3.5" />
+                agentthreatrule.org <ArrowRight className="w-3.5 h-3.5" />
               </a>
               <span className="text-text-muted">·</span>
               <span className="text-text-muted font-mono text-xs">
@@ -69,9 +68,7 @@ export default function RegulatedIndustriesPositioning() {
               {isZh ? '受監管產業要的兩件事' : 'What regulated industries need'}
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary mb-3 text-center">
-              {isZh
-                ? '一套平台,兩個採購窗口一次過。'
-                : 'One platform. Both procurement gates.'}
+              {isZh ? '一套平台,兩個採購窗口一次過。' : 'One platform. Both procurement gates.'}
             </h2>
             <p className="text-base text-text-muted max-w-2xl mx-auto text-center mb-12">
               {isZh
@@ -122,7 +119,9 @@ export default function RegulatedIndustriesPositioning() {
           <div className="grid lg:grid-cols-5 gap-10 lg:gap-16 items-center">
             <FadeInUp className="lg:col-span-3">
               <p className="text-[11px] uppercase tracking-[0.18em] text-panguard-green font-semibold mb-4">
-                {isZh ? '不丟棄你既有的偵測投資' : 'Do not throw out your existing detection investment'}
+                {isZh
+                  ? '不丟棄你既有的偵測投資'
+                  : 'Do not throw out your existing detection investment'}
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary mb-5">
                 {isZh
@@ -136,20 +135,28 @@ export default function RegulatedIndustriesPositioning() {
               </p>
               <div className="bg-surface-3 rounded-lg p-4 mb-6 font-mono text-xs sm:text-sm border border-border">
                 <span className="text-text-muted">$ </span>
-                <span className="text-panguard-green font-bold">npm install -g @panguard-ai/migrator-community</span>
+                <span className="text-panguard-green font-bold">
+                  npm install -g @panguard-ai/migrator-community
+                </span>
                 <br />
                 <span className="text-text-muted">$ </span>
                 <span className="text-text-primary">panguard-migrate sigma/ --output atr/</span>
               </div>
               <div className="text-sm text-text-secondary leading-relaxed space-y-3">
                 <p>
-                  <strong className="text-text-primary">{isZh ? 'Community 免費(npm,MIT):' : 'Community Free (npm, MIT):'}</strong>{' '}
+                  <strong className="text-text-primary">
+                    {isZh ? 'Community 免費(npm,MIT):' : 'Community Free (npm, MIT):'}
+                  </strong>{' '}
                   {isZh
                     ? 'Sigma + YARA + Snort 解析器、中介表達式、ATR YAML 輸出、CLI。'
                     : 'Sigma + YARA + Snort parsers, IR transformer, ATR YAML output, CLI.'}
                 </p>
                 <p>
-                  <strong className="text-text-primary">{isZh ? 'Migrator Pro(PanGuard Enterprise):' : 'Migrator Pro (PanGuard Enterprise):'}</strong>{' '}
+                  <strong className="text-text-primary">
+                    {isZh
+                      ? 'Migrator Pro(PanGuard Enterprise):'
+                      : 'Migrator Pro (PanGuard Enterprise):'}
+                  </strong>{' '}
                   {isZh
                     ? '規則手工調到 Cisco merge PR 等級 · 5 框架合規自動對照 · SHA-256 簽章的稽核證據包 · Threat Cloud 整合 · 地端部署。'
                     : 'human enrichment to Cisco-merge-PR quality · 5-framework compliance auto-mapping · SHA-256 audit evidence pack · TC integration · on-prem deployment.'}
@@ -169,7 +176,8 @@ export default function RegulatedIndustriesPositioning() {
                   href="/contact?tier=enterprise"
                   className="text-panguard-green font-semibold hover:underline inline-flex items-center gap-1"
                 >
-                  {isZh ? '詢問 Migrator Pro' : 'Ask about Migrator Pro'} <ArrowRight className="w-3.5 h-3.5" />
+                  {isZh ? '詢問 Migrator Pro' : 'Ask about Migrator Pro'}{' '}
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </FadeInUp>
@@ -235,7 +243,10 @@ export default function RegulatedIndustriesPositioning() {
               { name: 'EU AI Act', sub: isZh ? '2026/8/2 強制' : 'Aug 2 enforcement' },
               { name: 'NIST AI RMF', sub: isZh ? '美國聯邦' : 'US federal' },
               { name: 'ISO/IEC 42001', sub: isZh ? '國際 AIMS' : 'International AIMS' },
-              { name: 'OWASP Agentic 2026', sub: isZh ? 'Agent 攻擊框架' : 'Agent attack framework' },
+              {
+                name: 'OWASP Agentic 2026',
+                sub: isZh ? 'Agent 攻擊框架' : 'Agent attack framework',
+              },
               { name: 'OWASP LLM 2025', sub: isZh ? 'LLM Top 10' : 'LLM Top 10' },
             ].map((f, i) => (
               <FadeInUp key={f.name} delay={i * 0.05}>

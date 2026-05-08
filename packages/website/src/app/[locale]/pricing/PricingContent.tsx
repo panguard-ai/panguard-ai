@@ -263,7 +263,7 @@ export default function PricingContent() {
                         'F500 Logo program · co-sell with Cisco / Microsoft / NVIDIA ecosystem',
                         'Direct relationship with ATR standard maintainer · early draft rule access',
                         'Dedicated CSM · quarterly executive review · roadmap voice',
-                        'PanGuard Inc. SOC2 Type II (target Q2 2027)',
+                        'SOC 2 Type 1 in flight Q3 2026 · Type II target H2 2027',
                       ]
                   ).map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
