@@ -56,8 +56,9 @@ export default function SecurityWhitepaperPage() {
           </p>
           <h3 className="text-base font-medium text-text-primary mt-4 mb-2">2.2 Data in Transit</h3>
           <p>
-            All traffic between the CLI / Guard and Threat Cloud is over TLS 1.3. We use an industry-
-            standard TLS configuration; we do not maintain custom certificate pinning today.
+            All traffic between the CLI / Guard and Threat Cloud is over TLS 1.3. We use an
+            industry- standard TLS configuration; we do not maintain custom certificate pinning
+            today.
           </p>
         </section>
 
@@ -84,11 +85,10 @@ export default function SecurityWhitepaperPage() {
           <h2 className="text-lg font-semibold text-text-primary mb-3">4. Logging &amp; Audit</h2>
           <p>
             Threat Cloud writes an immutable audit log of all admin actions, configuration changes,
-            and rule promotions. The schema is at{' '}
-            <code>migrations.ts</code> in the open-source <code>threat-cloud</code> package; rows
-            include actor, action, resource, and timestamp. Audit log retention is 365 days. We do
-            not yet operate a dedicated SIEM with correlation rules; the audit log is the system of
-            record.
+            and rule promotions. The schema is at <code>migrations.ts</code> in the open-source{' '}
+            <code>threat-cloud</code> package; rows include actor, action, resource, and timestamp.
+            Audit log retention is 365 days. We do not yet operate a dedicated SIEM with correlation
+            rules; the audit log is the system of record.
           </p>
         </section>
 
@@ -98,8 +98,8 @@ export default function SecurityWhitepaperPage() {
           <p>
             We maintain a written incident response runbook. The team is small enough that on-call
             rotation is the founding team only — there is no 24/7 SOC. We notify affected customers
-            within 72 hours of any confirmed incident. Tabletop exercises and external IR
-            engagement are planned alongside SOC 2 Type 1.
+            within 72 hours of any confirmed incident. Tabletop exercises and external IR engagement
+            are planned alongside SOC 2 Type 1.
           </p>
         </section>
 
