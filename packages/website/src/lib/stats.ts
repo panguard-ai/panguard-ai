@@ -14,7 +14,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 311 ATR rules
+ *   agent-threat-rules/rules/                  -> 324 ATR rules (verified 2026-05-08, post NL-style pack PR #45)
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -23,17 +23,17 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.5.2',
-  atrRules: 311,
+  cliVersion: '1.5.4',
+  atrRules: 324,
   /** Community ATR rules from Threat Cloud flywheel */
   atrCommunityRules: 17,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
-  atrPatterns: 714,
-  totalRules: 311,
+  atrPatterns: 740,
+  totalRules: 324,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '311' as const,
+  totalRulesDisplay: '324' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '311' as const,
+  atrRulesDisplay: '324' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,

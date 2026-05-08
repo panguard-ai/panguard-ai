@@ -123,8 +123,8 @@ export const LAYERS: readonly Layer[] = [
     },
     status: 'shipped',
     what: {
-      en: 'L2 Audit inspects the code and configs an agent is about to trust, before it runs. Two scan paths: MCP config JSON (claude_desktop_config.json, .cursor/mcp.json) for runtime protection rules; SKILL.md files for skill-marketplace prompt injection and tool poisoning. Same 311 ATR rules, different regex subsets per scan target.',
-      zh: 'L2 稽核在 agent 執行前檢查它即將信任的程式碼與配置。兩條掃描路徑:MCP config JSON(claude_desktop_config.json、.cursor/mcp.json)跑 runtime protection rules;SKILL.md 檔跑 skill 市場的 prompt injection 與 tool poisoning。同一批 311 ATR 規則,每種 scan target 用不同 regex 子集。',
+      en: 'L2 Audit inspects the code and configs an agent is about to trust, before it runs. Two scan paths: MCP config JSON (claude_desktop_config.json, .cursor/mcp.json) for runtime protection rules; SKILL.md files for skill-marketplace prompt injection and tool poisoning. Same 324 ATR rules, different regex subsets per scan target.',
+      zh: 'L2 稽核在 agent 執行前檢查它即將信任的程式碼與配置。兩條掃描路徑:MCP config JSON(claude_desktop_config.json、.cursor/mcp.json)跑 runtime protection rules;SKILL.md 檔跑 skill 市場的 prompt injection 與 tool poisoning。同一批 324 ATR 規則,每種 scan target 用不同 regex 子集。',
     },
     why: {
       en: 'One malicious skill install = agent hijack. The postmark-mcp incident silently forwarded 15,000 emails/day for months before detection. Scan before you trust the code an agent is about to run.',
@@ -135,7 +135,7 @@ export const LAYERS: readonly Layer[] = [
       zh: '以 regex 為主的 ATR 引擎,可選 LLM 語意層。規則以 YAML 儲存,有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。Microsoft AGT + Cisco AI Defense 已把這些規則當作參考偵測包。',
     },
     proof: {
-      en: '311 ATR rules (MIT licensed) · 97.1% recall on NVIDIA Garak (666 adversarial prompts) · 96.9% recall / 100% precision / 0% FP on 498 real-world SKILL.md samples · 0.48% FP on 3,115 wild Skills.sh packages · Merged into Microsoft Agent Governance Toolkit #908 and Cisco AI Defense skill-scanner #79 (34 rules).',
+      en: '324 ATR rules (MIT licensed) · 97.1% recall on NVIDIA Garak (666 adversarial prompts) · 96.9% recall / 100% precision / 0% FP on 498 real-world SKILL.md samples · 0.48% FP on 3,115 wild Skills.sh packages · Merged into Microsoft Agent Governance Toolkit #908 and Cisco AI Defense skill-scanner #79 (34 rules).',
       zh: '311 條 ATR 規則(MIT 授權)· NVIDIA Garak 97.1% 召回(666 對抗 prompt)· 498 個真實 SKILL.md 樣本 96.9% 召回 / 100% 精度 / 0% FP · 3,115 個野外 Skills.sh 套件 0.48% FP · Merge 進 Microsoft Agent Governance Toolkit #908 與 Cisco AI Defense skill-scanner #79(34 條規則)。',
     },
     proofShort: {

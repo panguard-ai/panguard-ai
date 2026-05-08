@@ -16,7 +16,7 @@ const TIERS_EN = [
     name: 'Community',
     price: '$0',
     period: ' forever',
-    desc: 'Open source · 314 ATR rules · MIT · self-host · unlimited',
+    desc: 'Open source · 324 ATR rules · MIT · self-host · unlimited',
     cta: 'Get Started',
     href: 'https://github.com/panguard-ai/panguard-ai',
     external: true,
