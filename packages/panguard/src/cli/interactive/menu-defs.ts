@@ -69,7 +69,8 @@ export const MENU_DEFS: MenuDef[] = [
     en: 'Honeypot System',
     zh: '\u871C\u7F50\u7CFB\u7D71',
     enDesc: 'SSH/HTTP/FTP/Redis decoy services + attacker profiler + Threat Cloud upload',
-    zhDesc: 'SSH/HTTP/FTP/Redis \u8A98\u990C\u670D\u52D9 + \u653B\u64CA\u8005\u5206\u6790 + Threat Cloud \u4E0A\u50B3',
+    zhDesc:
+      'SSH/HTTP/FTP/Redis \u8A98\u990C\u670D\u52D9 + \u653B\u64CA\u8005\u5206\u6790 + Threat Cloud \u4E0A\u50B3',
     tierBadge: '',
     featureKey: 'trap',
   },

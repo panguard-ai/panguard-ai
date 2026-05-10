@@ -2736,7 +2736,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'oscal-community-catalog-nist-ai-rmf-v04',
     title: 'OSCAL Community Catalog of NIST AI RMF v0.4 Ships',
-    excerpt: 'We just tagged v0.4.0 of the community OSCAL conversion of NIST AI RMF: 72 subcategory controls across 4 functions, 4 worked-example tier profiles, 41 per-divergence remediation proposals, and 176 cross-reference links validated by 5-layer CI. CC0 1.0 licensed. The NIST OSCAL team has acknowledged the upstream conversion is paused due to resource constraints.',
+    excerpt:
+      'We just tagged v0.4.0 of the community OSCAL conversion of NIST AI RMF: 72 subcategory controls across 4 functions, 4 worked-example tier profiles, 41 per-divergence remediation proposals, and 176 cross-reference links validated by 5-layer CI. CC0 1.0 licensed. The NIST OSCAL team has acknowledged the upstream conversion is paused due to resource constraints.',
     category: 'Compliance',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -2753,7 +2754,7 @@ export const blogPosts: BlogPost[] = [
       '| MANAGE | 13 |',
       'The catalog uses **Core wording** for every control statement. This matters because compliance work typically cites the Core HTML rendering, not the Playbook JSON export. The two NIST sources drift in 41 of 72 subcategories — more on that in a separate post.',
       '## Four Worked-Example Profiles',
-      'Profiles are OSCAL\'s mechanism for tailoring a catalog to a deployment context. We ship four:',
+      "Profiles are OSCAL's mechanism for tailoring a catalog to a deployment context. We ship four:",
       '- **baseline** — all 72 controls, no tailoring',
       '- **Tier 1 Foundational** — 18 controls, minimum due diligence for low-risk internal tooling',
       '- **Tier 2 Customer-Facing** — 55 controls, production agents that touch customer data',
@@ -2780,7 +2781,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'ai-rmf-playbook-41-divergences',
     title: '41 Ways the AI RMF Playbook Disagrees With Itself',
-    excerpt: 'We audited the AI RMF Playbook JSON against the AI RMF Core HTML. 41 of 72 subcategories drift between the two NIST sources — 57% disagreement rate. One severity-3 semantic divergence narrows the obligated party scope at GOVERN 5.2. Nine severity-2 typos and capitalisation issues, including the well-known "Decision-makings" typo. 31 minor wording deltas. Every divergence has a remediation proposal with literal patch text.',
+    excerpt:
+      'We audited the AI RMF Playbook JSON against the AI RMF Core HTML. 41 of 72 subcategories drift between the two NIST sources — 57% disagreement rate. One severity-3 semantic divergence narrows the obligated party scope at GOVERN 5.2. Nine severity-2 typos and capitalisation issues, including the well-known "Decision-makings" typo. 31 minor wording deltas. Every divergence has a remediation proposal with literal patch text.',
     category: 'Compliance',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -2821,7 +2823,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'atr-misp-taxonomies-323',
     title: 'ATR in MISP: Taxonomy + Galaxy Merged on the Same Day',
-    excerpt: 'Two MISP merges on 2026-05-10: PR #323 added the ATR taxonomy (standardised tags for AI agent threats); PR #1207 added the ATR galaxy with 533 cross-references mapping individual ATR rules to MITRE ATLAS and ATT&CK techniques. CERTs and ISACs now have both the vocabulary and the cross-walk to existing TI frameworks. Pivot, share IOCs, correlate across borders — without bespoke ontology.',
+    excerpt:
+      'Two MISP merges on 2026-05-10: PR #323 added the ATR taxonomy (standardised tags for AI agent threats); PR #1207 added the ATR galaxy with 533 cross-references mapping individual ATR rules to MITRE ATLAS and ATT&CK techniques. CERTs and ISACs now have both the vocabulary and the cross-walk to existing TI frameworks. Pivot, share IOCs, correlate across borders — without bespoke ontology.',
     category: 'Industry',
     date: '2026-05-10',
     author: 'ATR Research',
@@ -2832,7 +2835,7 @@ export const blogPosts: BlogPost[] = [
       'If you have not run a CERT or worked an ISAC desk, MISP probably does not mean much. Let us explain.',
       '## What MISP Is',
       'MISP (Malware Information Sharing Platform) is the standard threat-intel sharing layer used by national CSIRTs and Information Sharing and Analysis Centers globally. CERT-EU, CERT-FR, the US H-ISAC, FS-ISAC, ENISA, and dozens of national CERTs run it. When one agency observes an attack and tags it, peer agencies can pivot on shared tags and pull related telemetry from their own sensors.',
-      'Tags need a vocabulary. MISP\'s `misp-taxonomies` repo is that vocabulary — a curated set of namespaces, predicates, and values that everyone agrees mean the same thing.',
+      "Tags need a vocabulary. MISP's `misp-taxonomies` repo is that vocabulary — a curated set of namespaces, predicates, and values that everyone agrees mean the same thing.",
       'For AI agent threats, there was no namespace. CERTs that wanted to track prompt injection or tool poisoning were either using free-text tags (uncorrelatable) or bending unrelated taxonomies (lossy). PR #323 fixes that.',
       '## What the Taxonomy Covers',
       'The ATR namespace adds standardised tags across the agent threat surface:',
@@ -2863,7 +2866,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'semantic-kernel-cves-atr-coverage',
     title: '8 ATR Rules That Catch Microsoft Semantic Kernel CVE-2026-25592/26030',
-    excerpt: 'On 2026-05-07 Microsoft disclosed two CVEs in Semantic Kernel: CVE-2026-26030 (in-memory vector store unsafe string interpolation enabling Python class hierarchy traversal to RCE) and CVE-2026-25592 (KernelFunction-exposed file-write primitive enabling persistence via Windows Startup). Microsoft AGT already deploys 287 ATR rules. Here is the 8-rule mapping that catches the attack class at runtime, with the bridge issue filed upstream.',
+    excerpt:
+      'On 2026-05-07 Microsoft disclosed two CVEs in Semantic Kernel: CVE-2026-26030 (in-memory vector store unsafe string interpolation enabling Python class hierarchy traversal to RCE) and CVE-2026-25592 (KernelFunction-exposed file-write primitive enabling persistence via Windows Startup). Microsoft AGT already deploys 287 ATR rules. Here is the 8-rule mapping that catches the attack class at runtime, with the bridge issue filed upstream.',
     category: 'Threat Intelligence',
     date: '2026-05-09',
     author: 'KUAN-HSIN LIN',
@@ -2907,7 +2911,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'owasp-agentic-2026-atr-mapping',
     title: 'OWASP Top 10 Agentic 2026: 377 ATR Mappings Across 336 Rules',
-    excerpt: 'OWASP GenAI Project shipped the Top 10 for Agentic Applications 2026, peer-reviewed by 100+ practitioners. ATR v2.1.1 maps 377 rule-to-category links across the full 336-rule corpus. ASI01 Agent Goal Hijack dominates at 202 rules — that distribution reflects the actual threat surface, not author bias. Here is the full per-category breakdown and what the numbers mean.',
+    excerpt:
+      'OWASP GenAI Project shipped the Top 10 for Agentic Applications 2026, peer-reviewed by 100+ practitioners. ATR v2.1.1 maps 377 rule-to-category links across the full 336-rule corpus. ASI01 Agent Goal Hijack dominates at 202 rules — that distribution reflects the actual threat surface, not author bias. Here is the full per-category breakdown and what the numbers mean.',
     category: 'Compliance',
     date: '2026-05-10',
     author: 'ATR Research',
@@ -2946,7 +2951,7 @@ export const blogPosts: BlogPost[] = [
       'ASI10 covers shadow-IT agents, unsanctioned MCP server deployments, agents running with privileges they should not have. Detection is largely organisational, not pattern-based.',
       '## How To Use The Mapping',
       'For compliance work and audit prep:',
-      '- Pick your relevant ASI categories based on your agent\'s deployment surface',
+      "- Pick your relevant ASI categories based on your agent's deployment surface",
       '- Pull the rule subset that maps to those categories from the ATR corpus',
       '- Deploy the subset in your runtime detection layer',
       '- Cite the mapping in your audit evidence',
@@ -2959,7 +2964,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'oscal-community-catalog-nist-ai-rmf-v04-zh',
     title: 'NIST AI RMF 的 OSCAL 社群目錄 v0.4 釋出',
-    excerpt: '我們今天標記了 NIST AI RMF 社群 OSCAL 轉換的 v0.4.0 版本:涵蓋 4 個 function 的 72 條 subcategory 控制項、4 個 tier 範例 profile、41 條偏離修補建議,以及由 5 層 CI 驗證的 176 條交叉引用連結。採用 CC0 1.0 授權。NIST OSCAL 團隊已確認官方轉換因資源限制暫停中。',
+    excerpt:
+      '我們今天標記了 NIST AI RMF 社群 OSCAL 轉換的 v0.4.0 版本:涵蓋 4 個 function 的 72 條 subcategory 控制項、4 個 tier 範例 profile、41 條偏離修補建議,以及由 5 層 CI 驗證的 176 條交叉引用連結。採用 CC0 1.0 授權。NIST OSCAL 團隊已確認官方轉換因資源限制暫停中。',
     category: 'Compliance',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -3003,7 +3009,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'ai-rmf-playbook-41-divergences-zh',
     title: 'AI RMF Playbook 與自己不一致的 41 種方式',
-    excerpt: '我們稽核了 AI RMF Playbook JSON 對照 AI RMF Core HTML。72 條 subcategory 中有 41 條在兩份 NIST 來源之間出現偏離 — 57% 不一致率。一條 severity-3 語意偏離縮窄了 GOVERN 5.2 的義務主體範圍。九條 severity-2 typo 與大小寫問題,包括知名的「Decision-makings」錯字。31 條輕微措辭差異。每一條偏離都附帶實際 patch 文字的修補建議。',
+    excerpt:
+      '我們稽核了 AI RMF Playbook JSON 對照 AI RMF Core HTML。72 條 subcategory 中有 41 條在兩份 NIST 來源之間出現偏離 — 57% 不一致率。一條 severity-3 語意偏離縮窄了 GOVERN 5.2 的義務主體範圍。九條 severity-2 typo 與大小寫問題,包括知名的「Decision-makings」錯字。31 條輕微措辭差異。每一條偏離都附帶實際 patch 文字的修補建議。',
     category: 'Compliance',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -3044,7 +3051,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'atr-misp-taxonomies-323-zh',
     title: 'ATR 加入 MISP Taxonomies (#323):CERT 拿到什麼',
-    excerpt: 'MISP 在 2026-05-10 同一天合了兩個 PR:#323 把 ATR taxonomy(AI agent 威脅標準化標籤)加進核心命名空間;#1207 把 ATR galaxy(533 條交叉引用,把每條 ATR 規則對應到 MITRE ATLAS 與 ATT&CK 技術)加進去。CERT 與 ISAC 現在拿到 vocabulary 也拿到 cross-walk。跨境 pivot、IOC 分享、與既有 TI 框架關聯——不用自製 ontology。',
+    excerpt:
+      'MISP 在 2026-05-10 同一天合了兩個 PR:#323 把 ATR taxonomy(AI agent 威脅標準化標籤)加進核心命名空間;#1207 把 ATR galaxy(533 條交叉引用,把每條 ATR 規則對應到 MITRE ATLAS 與 ATT&CK 技術)加進去。CERT 與 ISAC 現在拿到 vocabulary 也拿到 cross-walk。跨境 pivot、IOC 分享、與既有 TI 框架關聯——不用自製 ontology。',
     category: 'Industry',
     date: '2026-05-10',
     author: 'ATR Research',
@@ -3086,7 +3094,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'semantic-kernel-cves-atr-coverage-zh',
     title: '8 條 ATR 規則攔下 Microsoft Semantic Kernel CVE-2026-25592/26030',
-    excerpt: '2026-05-07 Microsoft 揭露 Semantic Kernel 的兩個 CVE:CVE-2026-26030(in-memory vector store 在 lambda filter 中的不安全字串內插造成 Python class hierarchy 遍歷導致 RCE)、CVE-2026-25592(KernelFunction 暴露的檔案寫入原語透過 Windows Startup 達成持久化)。Microsoft AGT 已部署 287 條 ATR 規則。以下是攔下整類攻擊的 8 條規則對應,並附上對上游送的 bridge issue。',
+    excerpt:
+      '2026-05-07 Microsoft 揭露 Semantic Kernel 的兩個 CVE:CVE-2026-26030(in-memory vector store 在 lambda filter 中的不安全字串內插造成 Python class hierarchy 遍歷導致 RCE)、CVE-2026-25592(KernelFunction 暴露的檔案寫入原語透過 Windows Startup 達成持久化)。Microsoft AGT 已部署 287 條 ATR 規則。以下是攔下整類攻擊的 8 條規則對應,並附上對上游送的 bridge issue。',
     category: 'Threat Intelligence',
     date: '2026-05-09',
     author: 'KUAN-HSIN LIN',
@@ -3130,7 +3139,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'owasp-agentic-2026-atr-mapping-zh',
     title: 'OWASP Top 10 Agentic 2026:336 條規則上的 377 個 ATR 對應',
-    excerpt: 'OWASP GenAI Project 釋出了 Top 10 for Agentic Applications 2026,由 100+ 實務工作者同儕審查。ATR v2.1.1 在完整 336 條規則 corpus 上對應出 377 條 rule-to-category 連結。ASI01 Agent Goal Hijack 以 202 條規則居冠 — 這個分布反映實際威脅面,不是作者偏見。以下是完整的逐類別細目,以及這些數字代表什麼。',
+    excerpt:
+      'OWASP GenAI Project 釋出了 Top 10 for Agentic Applications 2026,由 100+ 實務工作者同儕審查。ATR v2.1.1 在完整 336 條規則 corpus 上對應出 377 條 rule-to-category 連結。ASI01 Agent Goal Hijack 以 202 條規則居冠 — 這個分布反映實際威脅面,不是作者偏見。以下是完整的逐類別細目,以及這些數字代表什麼。',
     category: 'Compliance',
     date: '2026-05-10',
     author: 'ATR Research',
@@ -3178,10 +3188,12 @@ export const blogPosts: BlogPost[] = [
       'OWASP 給你框架。ATR 給你實作框架的偵測規則。邏輯跟 OWASP Top 10 for web apps + Snyk/CodeQL 規則一樣 — 沒有可執行偵測的框架是 checklist;沒有框架的可執行偵測是雜訊。',
       '[OWASP 框架](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) · [完整對應](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md) · [ATR repo](https://github.com/Agent-Threat-Rule/agent-threat-rules)',
     ],
-  },  {
+  },
+  {
     slug: 'topic-graph-cross-references-deterministic-alternative-to-llm',
     title: 'Topic-Graph Cross-References: A Deterministic Alternative to LLM Augmentation',
-    excerpt: 'Regex extraction covered only 33% of OSCAL controls. A topic-graph approach using the AI RMF Playbook\'s own 46-topic taxonomy lifted coverage to 78% — without an LLM in the loop.',
+    excerpt:
+      "Regex extraction covered only 33% of OSCAL controls. A topic-graph approach using the AI RMF Playbook's own 46-topic taxonomy lifted coverage to 78% — without an LLM in the loop.",
     category: 'Engineering',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -3192,7 +3204,7 @@ export const blogPosts: BlogPost[] = [
       '## Why Deterministic Beats LLM for Standards Work',
       'OSCAL catalogs that feed federal-adjacent standards work need to be **reproducible**. A reviewer at NIST should be able to regenerate the entire catalog from public source data and get bit-identical output. LLMs cannot promise that. Same input, different sampling, different output. Same input, different model version, different output.',
       'There is also a **defensibility** problem. If we list a cross-reference between `GOVERN-1.1` and `MANAGE-4.3`, and a reviewer asks why, the answer cannot be "the model decided." It has to be a rule you can read and re-run.',
-      'So we built `src/topic_cross_references.py`. It uses the **AI RMF Playbook\'s own 46-topic taxonomy** — the same topics NIST already publishes for each subcategory. Two controls share a topic, they are candidates for a cross-reference. No external knowledge, no inference, just graph traversal over public data.',
+      "So we built `src/topic_cross_references.py`. It uses the **AI RMF Playbook's own 46-topic taxonomy** — the same topics NIST already publishes for each subcategory. Two controls share a topic, they are candidates for a cross-reference. No external knowledge, no inference, just graph traversal over public data.",
       '## Conservative Inverse-Frequency Thresholds',
       'A naive "any shared topic = link" approach floods the catalog. **Risk Management** appears on dozens of controls. So we weight by inverse frequency: rare topics are stronger signals than common ones.',
       'Eligibility for a candidate link:',
@@ -3212,7 +3224,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'three-tier-profiles-three-risk-postures',
     title: 'Three Tier Profiles for Three Risk Postures',
-    excerpt: 'AI RMF is non-normative by design. Our OSCAL catalog ships three worked-example profiles — 18, 55, and 72 controls — to demonstrate composability across foundational, customer-facing, and high-risk deployments.',
+    excerpt:
+      'AI RMF is non-normative by design. Our OSCAL catalog ships three worked-example profiles — 18, 55, and 72 controls — to demonstrate composability across foundational, customer-facing, and high-risk deployments.',
     category: 'Compliance',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -3249,14 +3262,15 @@ export const blogPosts: BlogPost[] = [
       'Tier 3 selects every control in the catalog. The `include-all` profile is identical in scope but presented as the "no selection rationale, just everything" variant for tools that want a baseline.',
       '## Why Worked Examples, Not Normative Tiers',
       'These tiers are **not normative**. They are not "the right answer" — they are demonstrations that OSCAL profiles can express coherent, reviewable risk postures over the AI RMF, and that the catalog is composable.',
-      'All four profiles pass OSCAL profile schema validation. The rationale doc explains each tier\'s selection logic at a level a compliance reviewer can read in 15 minutes.',
+      "All four profiles pass OSCAL profile schema validation. The rationale doc explains each tier's selection logic at a level a compliance reviewer can read in 15 minutes.",
       '[Tier rationale](https://github.com/Agent-Threat-Rule/ai-rmf-oscal-catalog/blob/main/profiles/TIER_RATIONALE.md) · [Profiles directory](https://github.com/Agent-Threat-Rule/ai-rmf-oscal-catalog/tree/main/profiles) · [Catalog repo](https://github.com/Agent-Threat-Rule/ai-rmf-oscal-catalog)',
     ],
   },
   {
     slug: 'bus-factor-one-is-not-a-secret',
     title: 'Bus Factor 1 Is Not a Secret',
-    excerpt: 'Most small open-source projects pretend to have a team. We just shipped governance docs that openly disclose ATR is a single-maintainer project — and explain how that constrains decision-making.',
+    excerpt:
+      'Most small open-source projects pretend to have a team. We just shipped governance docs that openly disclose ATR is a single-maintainer project — and explain how that constrains decision-making.',
     category: 'Industry',
     date: '2026-05-11',
     author: 'ATR Research',
@@ -3268,7 +3282,7 @@ export const blogPosts: BlogPost[] = [
       '## The Conflict of Interest Disclosure',
       '`MAINTAINERS.md` also includes an explicit **COI declaration**:',
       '> The maintainer (Adam Lin) is also the founder of **PanGuard AI**, the commercial product that uses ATR rules. ATR is and remains **MIT-licensed in perpetuity** per the public `GOVERNANCE.md`. The maintainer **recuses** from decisions where vendor interest could materially influence catalog content — for example, proposals to add ATR-specific guidance to NIST controls.',
-      'This is not legal cover. It is a working rule. When a contributor opens a PR that would tilt the catalog toward language that benefits PanGuard\'s scanner, the maintainer steps out of the review and the decision rolls into the public-comment process.',
+      "This is not legal cover. It is a working rule. When a contributor opens a PR that would tilt the catalog toward language that benefits PanGuard's scanner, the maintainer steps out of the review and the decision rolls into the public-comment process.",
       '## Decision-Making With Bus Factor 1',
       'The governance docs spell out three lanes:',
       '- **Routine fixes** (typos, broken links, schema-conformant non-content changes): one maintainer review.',
@@ -3280,7 +3294,7 @@ export const blogPosts: BlogPost[] = [
       '- **3+ merged PRs**',
       '- **8 weeks of active participation** (reviewing PRs, answering issues, attending the monthly community call)',
       '- **Consensus add** by existing maintainers',
-      'This is not a clubby filter. It is the time it takes to learn the catalog\'s editorial conventions well enough to do harm if rushed.',
+      "This is not a clubby filter. It is the time it takes to learn the catalog's editorial conventions well enough to do harm if rushed.",
       '## Why Disclose at All',
       'Two reasons. First, downstream consumers — federal-adjacent compliance teams, security vendors integrating ATR rules, anyone doing third-party risk assessment on the project — get an accurate picture of project resilience. They can plan around it (mirror the repo, pin versions, contribute a maintainer).',
       'Second, **the alternative is worse**. A project that hides bus factor 1 invites a single point-of-failure narrative the first time a reviewer notices. Honesty up-front reframes the same fact as a transparency strength.',
@@ -3290,7 +3304,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'nccoe-ai-rmf-coi-membership-confirmed',
     title: 'NCCoE AI RMF Community of Interest — Membership Confirmed',
-    excerpt: 'ATR was confirmed as a member of NIST NCCoE\'s Community of Interest 2026-05-09. Combined with the OSCAL Team thread and the CAISI RFI submission, ATR now has three touchpoints in the federal AI standards stack.',
+    excerpt:
+      "ATR was confirmed as a member of NIST NCCoE's Community of Interest 2026-05-09. Combined with the OSCAL Team thread and the CAISI RFI submission, ATR now has three touchpoints in the federal AI standards stack.",
     category: 'Industry',
     date: '2026-05-09',
     author: 'ATR Research',
@@ -3323,7 +3338,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'seventeen-new-rules-atr-v2-1-0',
     title: 'The 17 New Rules in ATR v2.0.x to v2.1.1',
-    excerpt: 'ATR v2.1.1 adds 16 new rules (10 natural-language attack patterns + 6 skill-compromise extensions) and an engine upgrade that benefits all 320+ existing rules. 0.20% FP and 97.1% recall preserved.',
+    excerpt:
+      'ATR v2.1.1 adds 16 new rules (10 natural-language attack patterns + 6 skill-compromise extensions) and an engine upgrade that benefits all 320+ existing rules. 0.20% FP and 97.1% recall preserved.',
     category: 'Engineering',
     date: '2026-05-10',
     author: 'KUAN-HSIN LIN',
@@ -3349,7 +3365,7 @@ export const blogPosts: BlogPost[] = [
       'Each rule has explicit true-positive and true-negative cases, runs against the **432-skill labelled benign corpus** at zero FP, and is scored on **666 NVIDIA Garak samples** for recall measurement.',
       '## Six Skill-Compromise Extensions',
       'The remaining new rules extend existing skill-compromise coverage:',
-      '- **Fork-impersonation patterns**: variants that copy a legitimate skill\'s name and metadata but inject a malicious prompt',
+      "- **Fork-impersonation patterns**: variants that copy a legitimate skill's name and metadata but inject a malicious prompt",
       '- **Dangerous-script bundling**: skills that pull in shell scripts whose behavior is not declared in the manifest',
       '- **Rugpull setup variants**: skills that present clean on first install but escalate behavior on update',
       '## Engine Improvements (Benefits All 320+ Existing Rules)',
@@ -3362,14 +3378,15 @@ export const blogPosts: BlogPost[] = [
       'A third change: the eval suite now suppresses test-case matching for **table-row quoted patterns**. Several of the 17 NL rules have natural-language phrasing that appears in benchmark documentation tables. The old eval flagged those as FPs; the new eval recognizes them as documentation context.',
       '## Why This Matters',
       'The benchmarks tell you whether the rule pack works. The engine work is what makes the rule pack **maintainable** across the next few thousand rules. Adding 10 NL rules in a single release would have been infeasible if every rule had to fight the code-block regex.',
-      '`npm install agent-threat-rules@2.1.1` to upgrade. Microsoft Agent Governance Toolkit\'s weekly auto-sync will pick it up on the next run.',
+      "`npm install agent-threat-rules@2.1.1` to upgrade. Microsoft Agent Governance Toolkit's weekly auto-sync will pick it up on the next run.",
       '[npm](https://www.npmjs.com/package/agent-threat-rules) · [GitHub release](https://github.com/Agent-Threat-Rule/agent-threat-rules/releases/tag/v2.1.1) · [Garak benchmark](https://github.com/Agent-Threat-Rule/agent-threat-rules/tree/main/eval)',
     ],
   },
   {
     slug: 'topic-graph-cross-references-deterministic-alternative-to-llm-zh',
     title: '主題圖交叉參照:用確定性方法取代 LLM 擴充',
-    excerpt: 'regex 抽取只覆蓋了 OSCAL catalog 的 33% 控制項。改用 AI RMF Playbook 自家的 46 個 topic 分類法跑主題圖,把覆蓋率拉到 78% — 而且完全不用 LLM。',
+    excerpt:
+      'regex 抽取只覆蓋了 OSCAL catalog 的 33% 控制項。改用 AI RMF Playbook 自家的 46 個 topic 分類法跑主題圖,把覆蓋率拉到 78% — 而且完全不用 LLM。',
     category: 'Engineering',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -3400,7 +3417,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'three-tier-profiles-three-risk-postures-zh',
     title: '三層 Tier profile,對應三種風險姿態',
-    excerpt: 'AI RMF 設計上就是非規範性的。我們的 OSCAL catalog ship 三組 worked example profile — 18、55、72 條 control — 示範 foundational、customer-facing、high-risk 三種部署情境下的可組合性。',
+    excerpt:
+      'AI RMF 設計上就是非規範性的。我們的 OSCAL catalog ship 三組 worked example profile — 18、55、72 條 control — 示範 foundational、customer-facing、high-risk 三種部署情境下的可組合性。',
     category: 'Compliance',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -3444,7 +3462,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'bus-factor-one-is-not-a-secret-zh',
     title: 'Bus Factor = 1 不是秘密',
-    excerpt: '大多數小型開源專案假裝自己有 team。我們剛 ship 的治理文件公開宣告 ATR 是單一 maintainer 專案 — 並解釋這個事實如何約束決策流程。',
+    excerpt:
+      '大多數小型開源專案假裝自己有 team。我們剛 ship 的治理文件公開宣告 ATR 是單一 maintainer 專案 — 並解釋這個事實如何約束決策流程。',
     category: 'Industry',
     date: '2026-05-11',
     author: 'ATR Research',
@@ -3478,7 +3497,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'nccoe-ai-rmf-coi-membership-confirmed-zh',
     title: 'NCCoE AI RMF Community of Interest — 成員資格確認',
-    excerpt: 'ATR 於 2026-05-09 確認加入 NIST NCCoE Community of Interest。加上 OSCAL Team thread 與 CAISI RFI 投件,ATR 在聯邦 AI 標準堆疊現在有三個觸點。',
+    excerpt:
+      'ATR 於 2026-05-09 確認加入 NIST NCCoE Community of Interest。加上 OSCAL Team thread 與 CAISI RFI 投件,ATR 在聯邦 AI 標準堆疊現在有三個觸點。',
     category: 'Industry',
     date: '2026-05-09',
     author: 'ATR Research',
@@ -3511,7 +3531,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'seventeen-new-rules-atr-v2-1-0-zh',
     title: 'ATR v2.0.x 到 v2.1.1 的 17 條新規則',
-    excerpt: 'ATR v2.1.1 新增 16 條規則(10 條自然語言攻擊 pattern + 6 條 skill 入侵延伸),以及一個讓全部 320+ 條既有規則都受惠的引擎升級。0.20% FP、97.1% recall 維持不變。',
+    excerpt:
+      'ATR v2.1.1 新增 16 條規則(10 條自然語言攻擊 pattern + 6 條 skill 入侵延伸),以及一個讓全部 320+ 條既有規則都受惠的引擎升級。0.20% FP、97.1% recall 維持不變。',
     category: 'Engineering',
     date: '2026-05-10',
     author: 'KUAN-HSIN LIN',
@@ -3557,7 +3578,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'the-96k-skill-wild-scan-methodology',
     title: 'The 96K-Skill Wild Scan: Methodology Walkthrough',
-    excerpt: 'How we collected 96,096 production SKILL.md files across four registries, ran ATR v2.1.1 detection, and surfaced 751 confirmed malicious instances with audit-grade reproducibility.',
+    excerpt:
+      'How we collected 96,096 production SKILL.md files across four registries, ran ATR v2.1.1 detection, and surfaced 751 confirmed malicious instances with audit-grade reproducibility.',
     category: 'Engineering',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -3571,7 +3593,7 @@ export const blogPosts: BlogPost[] = [
       '- **Skills.sh**: 3,115 skills',
       '- **Hermes**: 123 skills',
       '- **Total**: 96,096 SKILL.md files',
-      'Each file was fetched via the registry\'s public API, normalized to canonical SKILL.md frontmatter + body structure, and stored with a content-addressed hash for deduplication. No private repos, no scraped credentials, no terms-of-service violations.',
+      "Each file was fetched via the registry's public API, normalized to canonical SKILL.md frontmatter + body structure, and stored with a content-addressed hash for deduplication. No private repos, no scraped credentials, no terms-of-service violations.",
       '## Detection Pass',
       'We ran ATR v2.1.1 (336 rules, MIT-licensed) against every normalized skill. The detection produced an initial hit set, which a human reviewer then triaged into three buckets: **benign**, **malicious**, **indeterminate**. Indeterminate cases got a second pass with payload extraction; if a working C2 endpoint or credential exfil chain could be demonstrated, it moved to malicious.',
       '## The 751',
@@ -3597,20 +3619,21 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: 'anthropic-skills-audit-recommendation-meets-96k-scan',
-    title: 'What Anthropic\'s Own Skills Docs Recommend (And What We Found in 96K Skills)',
-    excerpt: 'Anthropic explicitly recommends auditing Skills for unusual patterns. ATR\'s 96K-skill wild scan is that audit at ecosystem scale, with 751 confirmed malicious surfaced.',
+    title: "What Anthropic's Own Skills Docs Recommend (And What We Found in 96K Skills)",
+    excerpt:
+      "Anthropic explicitly recommends auditing Skills for unusual patterns. ATR's 96K-skill wild scan is that audit at ecosystem scale, with 751 confirmed malicious surfaced.",
     category: 'Threat Intelligence',
     date: '2026-05-11',
     author: 'ATR Research',
     readingTime: '6 min',
     content: [
-      'Anthropic\'s own Skills documentation contains a security note that, in our reading, defines the inspection contract for any Skills marketplace operator. It says: malicious Skills can direct Claude to invoke tools or execute code in ways that don\'t match the Skill\'s stated purpose, and recommends auditing thoroughly by reviewing all files and looking for unusual patterns like unexpected network calls, file access, or operations that don\'t match the Skill\'s stated purpose.',
-      'That is exactly what ATR\'s 96K-skill wild scan does, at ecosystem scale.',
+      "Anthropic's own Skills documentation contains a security note that, in our reading, defines the inspection contract for any Skills marketplace operator. It says: malicious Skills can direct Claude to invoke tools or execute code in ways that don't match the Skill's stated purpose, and recommends auditing thoroughly by reviewing all files and looking for unusual patterns like unexpected network calls, file access, or operations that don't match the Skill's stated purpose.",
+      "That is exactly what ATR's 96K-skill wild scan does, at ecosystem scale.",
       '## The Scope That Matches the Recommendation',
       'The Anthropic docs frame the audit at the per-Skill install gate. We extended the same audit lens across four public registries — OpenClaw, ClawHub, Skills.sh, Hermes — for a total of **96,096 SKILL.md files** scanned with ATR v2.1.1. The output was **751 confirmed malicious instances**, clustering into three systematic campaigns rather than scattered noise.',
       '## The 37 Rules Doing the Audit Work',
       'ATR has 37 dedicated skill-compromise rules. The ones that fired most often against the malicious cluster:',
-      '- `ATR-2026-00060` — namespace impersonation (Skill claims to be a popular maintainer\'s package)',
+      "- `ATR-2026-00060` — namespace impersonation (Skill claims to be a popular maintainer's package)",
       '- `ATR-2026-00124` — name-squatting variant of the same family',
       '- `ATR-2026-00064` — over-permissioned Skill (requests scopes far beyond stated purpose)',
       '- `ATR-2026-00204` — stealth execution persistence (hidden autorun on install)',
@@ -3629,8 +3652,9 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: 'axios-litellm-supply-chain-through-runtime-detection-lens',
-    title: 'Two AI Supply Chain Attacks in Eight Days — Through Runtime Detection\'s Lens',
-    excerpt: 'axios npm and LiteLLM PyPI both compromised within an eight-day window. Honest walkthrough of what ATR rules would surface if either payload fired inside an instrumented runtime.',
+    title: "Two AI Supply Chain Attacks in Eight Days — Through Runtime Detection's Lens",
+    excerpt:
+      'axios npm and LiteLLM PyPI both compromised within an eight-day window. Honest walkthrough of what ATR rules would surface if either payload fired inside an instrumented runtime.',
     category: 'Threat Intelligence',
     date: '2026-05-11',
     author: 'ATR Research',
@@ -3659,8 +3683,8 @@ export const blogPosts: BlogPost[] = [
       '## Three Takeaways',
       '**1. Install-time defence is necessary but not sufficient.** Both attacks beat install-time SCA in the publish-to-detection window. SCA + behavioural runtime detection is the realistic posture.',
       '**2. Runtime detection is the second layer.** Once the payload runs, deterministic rules on syscalls, network destinations, and persistence writes are vendor-neutral and language-neutral. ATR rules are written against the behaviour, not the package name.',
-      '**3. Rules are vendor-neutral.** Same `ATR-2026-00204` fires on Anthropic Skills, MCP servers, npm post-install, PyPI `.pth`. The detection layer doesn\'t care which ecosystem the package came from.',
-      '## What This Doesn\'t Claim',
+      "**3. Rules are vendor-neutral.** Same `ATR-2026-00204` fires on Anthropic Skills, MCP servers, npm post-install, PyPI `.pth`. The detection layer doesn't care which ecosystem the package came from.",
+      "## What This Doesn't Claim",
       'We did not catch axios or LiteLLM live. Community reporting did, on both. The value of writing this post is to show what rules look like when applied to known incidents, so future incidents in instrumented environments have a faster detection contract to compare against.',
       '[Microsoft on axios](https://www.microsoft.com/security/blog) · [Datadog on LiteLLM](https://securitylabs.datadoghq.com/) · [Elastic Security Labs](https://www.elastic.co/security-labs) · [ATR rule corpus](https://github.com/Agent-Threat-Rule/agent-threat-rules)',
     ],
@@ -3668,7 +3692,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'anthropic-mcp-by-design-rce-runtime-detection-gap',
     title: 'Anthropic MCP "By Design" RCE — Where Runtime Detection Fills the Gap',
-    excerpt: 'When the protocol won\'t change, the detection layer becomes the contract. A walkthrough of the MCP "by design" disclosure and ATR\'s 17 dedicated MCP rules.',
+    excerpt:
+      'When the protocol won\'t change, the detection layer becomes the contract. A walkthrough of the MCP "by design" disclosure and ATR\'s 17 dedicated MCP rules.',
     category: 'Threat Intelligence',
     date: '2026-05-11',
     author: 'ATR Research',
@@ -3681,8 +3706,8 @@ export const blogPosts: BlogPost[] = [
       '- **7,000+** MCP servers exposed at disclosure time',
       '- **200,000** servers at risk across the broader install base',
       '- **150M** downloads of MCP-related packages',
-      'The protocol\'s power — tools auto-describing themselves to the agent and the agent acting on those descriptions — is the same surface attackers use. Tool descriptions can include adversarial instructions. The agent reads them, treats them as legitimate, and acts.',
-      '## ATR\'s 17 MCP Rules',
+      "The protocol's power — tools auto-describing themselves to the agent and the agent acting on those descriptions — is the same surface attackers use. Tool descriptions can include adversarial instructions. The agent reads them, treats them as legitimate, and acts.",
+      "## ATR's 17 MCP Rules",
       'ATR ships 17 rules dedicated to MCP threat patterns. The main families:',
       '- **Tool poisoning** — covert instructions embedded in tool descriptions, manifest fields, or returned payloads. Rule `ATR-2026-00060` (skill-impersonation, MCP variant) is the canonical detector for the description-injection pattern.',
       '- **MCP supply chain compromise** — npm or PyPI MCP server packages with backdoor payloads. `ATR-2026-00095` (supply-chain poisoning) covers this family.',
@@ -3694,17 +3719,18 @@ export const blogPosts: BlogPost[] = [
       '1. **Install-time SCA** — package reputation, maintainer verification, published-too-recently flags. Catches some attacks.',
       '2. **Runtime ATR rules** — tool-description content scanning, manifest-vs-behaviour comparison, return-payload prompt-injection detection. Catches the systematic patterns where SCA missed.',
       '3. **Agent-level approval prompts** — final human-in-the-loop gate before sensitive operations.',
-      'No single layer is sufficient. When the protocol can\'t be fixed, you stack layers around it.',
+      "No single layer is sufficient. When the protocol can't be fixed, you stack layers around it.",
       '## The Vendor-Neutral Posture',
       'ATR rules are not Anthropic-specific. They fire on any MCP server regardless of which agent runtime is consuming it. They fire on Skills marketplaces, on package registries, on tool description streams from any source. The detection contract is written against the behaviour, not against the vendor.',
-      'When the protocol won\'t change, the detection layer becomes the contract. ATR is one available implementation of that contract.',
+      "When the protocol won't change, the detection layer becomes the contract. ATR is one available implementation of that contract.",
       '[The Hacker News](https://thehackernews.com/2026/04/anthropic-mcp-design-vulnerability.html) · [SecurityWeek](https://www.securityweek.com/by-design-flaw-in-mcp-could-enable-widespread-ai-supply-chain-attacks/) · [OX Security disclosure](https://www.ox.security/blog/the-mother-of-all-ai-supply-chains-critical-systemic-vulnerability-at-the-core-of-the-mcp/) · [ATR MCP rules](https://github.com/Agent-Threat-Rule/agent-threat-rules)',
     ],
   },
   {
     slug: '60-days-8-ecosystem-integrations',
     title: '60 Days, 8 Ecosystem Integrations — How an Open Standard Spreads',
-    excerpt: 'From v0.1.0 on 2026-03-08 to v2.1.1 with 8 production integrations and standards-body conversations on 2026-05-11. The mechanics behind ecosystem pull.',
+    excerpt:
+      'From v0.1.0 on 2026-03-08 to v2.1.1 with 8 production integrations and standards-body conversations on 2026-05-11. The mechanics behind ecosystem pull.',
     category: 'Industry',
     date: '2026-05-11',
     author: 'ATR Research',
@@ -3713,17 +3739,17 @@ export const blogPosts: BlogPost[] = [
       'ATR v0.1.0 published 2026-03-08. ATR v2.1.1 with 336 rules, 8 ecosystem integrations, and standards-body engagement is where we sit on 2026-05-11. Sixty-four days. This is the mechanics, not a victory lap.',
       '## Production Deployments (Verified Merged)',
       'These are merged PRs, in production, in third-party repos:',
-      '- **Microsoft Agent Governance Toolkit** — PR #908 merged 2026-04-13 (initial 15 rules), then PR #1277 (287 rules + weekly auto-sync workflow). Microsoft\'s pipeline now pulls ATR updates on a weekly cadence.',
+      "- **Microsoft Agent Governance Toolkit** — PR #908 merged 2026-04-13 (initial 15 rules), then PR #1277 (287 rules + weekly auto-sync workflow). Microsoft's pipeline now pulls ATR updates on a weekly cadence.",
       '- **Cisco AI Defense skill-scanner** — PR #79 merged 2026-04-03 (34 rules), then PR #99 (full 336-rule pack). Two consecutive merges in the same repo.',
       '- **precize/Agentic-AI-Top10-Vulnerability** — PR #14 merged 2026-03-30. Third-party OWASP Agentic mapping repository, providing the rule-to-OWASP-ASI cross-reference layer.',
       '## Active Integration PRs in Review',
       'Open and in active dialogue with maintainers:',
-      '- **NVIDIA Garak** — PR #1676 (ATR plugin for Garak\'s probe framework)',
+      "- **NVIDIA Garak** — PR #1676 (ATR plugin for Garak's probe framework)",
       '- **Gen Digital Sage** — PR #33 (Norton/Avast parent company; AI agent security analyzer)',
       '- **IBM mcp-context-forge** — PR #4109',
       '## Standards and Infrastructure',
       'Where standards bodies and threat-intel infrastructure intersect:',
-      '- **MISP taxonomies** — PR #323 merged 2026-05-10. ATR rule IDs now part of MISP\'s vocabulary, giving threat-intel sharing a layer for AI-agent attack patterns.',
+      "- **MISP taxonomies** — PR #323 merged 2026-05-10. ATR rule IDs now part of MISP's vocabulary, giving threat-intel sharing a layer for AI-agent attack patterns.",
       '- **NIST OSCAL Team** — open thread on `usnistgov/OSCAL#2234` and follow-up email engagement. We shipped an OSCAL AI RMF catalog at `Agent-Threat-Rule/ai-rmf-oscal-catalog` covering 72 controls across all four AI RMF functions.',
       '- **NCCoE Community of Interest** — confirmed 2026-05-09.',
       '- **OWASP Top 10 Agentic 2026** — 10/10 ASI mapped, 377 rule-to-ASI mappings across 336 rules.',
@@ -3731,7 +3757,7 @@ export const blogPosts: BlogPost[] = [
       'Five mechanical reasons, no charisma involved:',
       '1. **MIT licence** — no procurement conversation needed. Engineers integrate first, lawyers review later.',
       '2. **Deterministic rule format** — YAML + condition tree, schema-validated. Reviewers can read a rule in 30 seconds and understand the matcher.',
-      '3. **Real production validation data** — 96K-skill scan, 432-benign FP corpus, Garak recall. Maintainers don\'t have to take our word.',
+      "3. **Real production validation data** — 96K-skill scan, 432-benign FP corpus, Garak recall. Maintainers don't have to take our word.",
       '4. **Low integration friction** — language-agnostic, one repo to vendor, regex + condition primitives. Integration PRs land in a single file change.',
       '5. **Zero vendor strings** — no telemetry, no SaaS dependency, no licence trap.',
       '## Three Lessons',
@@ -3745,7 +3771,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'the-96k-skill-wild-scan-methodology-zh',
     title: '96K Skill 野外掃描:方法論完整走查',
-    excerpt: '我們如何收集 96,096 個來自四個 registry 的 production SKILL.md,執行 ATR v2.1.1 偵測,找出 751 個確認惡意樣本,並做到 audit-grade 可重現。',
+    excerpt:
+      '我們如何收集 96,096 個來自四個 registry 的 production SKILL.md,執行 ATR v2.1.1 偵測,找出 751 個確認惡意樣本,並做到 audit-grade 可重現。',
     category: 'Engineering',
     date: '2026-05-11',
     author: 'KUAN-HSIN LIN',
@@ -3786,7 +3813,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'anthropic-skills-audit-recommendation-meets-96k-scan-zh',
     title: 'Anthropic Skills 官方文件推薦的稽核:96K 規模對齊',
-    excerpt: 'Anthropic 官方文件明文建議稽核 Skill 的可疑行為模式。ATR 的 96K-Skill 野外掃描正是這份稽核在生態系規模的落地,找出 751 個確認惡意樣本。',
+    excerpt:
+      'Anthropic 官方文件明文建議稽核 Skill 的可疑行為模式。ATR 的 96K-Skill 野外掃描正是這份稽核在生態系規模的落地,找出 751 個確認惡意樣本。',
     category: 'Threat Intelligence',
     date: '2026-05-11',
     author: 'ATR Research',
@@ -3818,7 +3846,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'axios-litellm-supply-chain-through-runtime-detection-lens-zh',
     title: '八天內兩起 AI 供應鏈攻擊:從 Runtime 偵測層的視角',
-    excerpt: 'axios npm 與 LiteLLM PyPI 在八天內相繼被入侵。誠實的 walkthrough — 如果 payload 在 instrumented runtime 內觸發,ATR 規則會看到什麼。',
+    excerpt:
+      'axios npm 與 LiteLLM PyPI 在八天內相繼被入侵。誠實的 walkthrough — 如果 payload 在 instrumented runtime 內觸發,ATR 規則會看到什麼。',
     category: 'Threat Intelligence',
     date: '2026-05-11',
     author: 'ATR Research',
@@ -3856,7 +3885,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'anthropic-mcp-by-design-rce-runtime-detection-gap-zh',
     title: 'Anthropic MCP「設計即如此」RCE:Runtime 偵測補上的缺口',
-    excerpt: '當協議不會修改,偵測層就是合約。完整解讀 MCP「by design」揭露事件與 ATR 17 條專屬 MCP 規則。',
+    excerpt:
+      '當協議不會修改,偵測層就是合約。完整解讀 MCP「by design」揭露事件與 ATR 17 條專屬 MCP 規則。',
     category: 'Threat Intelligence',
     date: '2026-05-11',
     author: 'ATR Research',
@@ -3892,7 +3922,8 @@ export const blogPosts: BlogPost[] = [
   {
     slug: '60-days-8-ecosystem-integrations-zh',
     title: '60 天 8 個生態系整合:一份開放標準如何擴散',
-    excerpt: '從 2026-03-08 的 v0.1.0 到 2026-05-11 的 v2.1.1 — 8 個 production 整合與標準組織對話。背後的擴散機制。',
+    excerpt:
+      '從 2026-03-08 的 v0.1.0 到 2026-05-11 的 v2.1.1 — 8 個 production 整合與標準組織對話。背後的擴散機制。',
     category: 'Industry',
     date: '2026-05-11',
     author: 'ATR Research',
