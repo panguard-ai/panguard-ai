@@ -153,11 +153,14 @@ export function setupCommand(): Command {
         }>);
         const { detectPlatforms, injectMCPConfig, removeMCPConfig } = mcpConfig;
 
-        // Suppress JSON structured logs unless --json mode
-        if (!options.json) {
-          const { setLogLevel } = await import('@panguard-ai/core');
-          setLogLevel('silent');
-        }
+        // Silence structured logs for both human and json modes. Human mode
+        // owns the screen via hand-crafted console.log() output; json mode
+        // needs a pure JSON object on stdout so consumers can pipe to jq.
+        // The comment used to read the opposite — in --json mode the
+        // platform-detector / injector / mcp-config logs were polluting
+        // stdout and breaking parsing.
+        const { setLogLevel } = await import('@panguard-ai/core');
+        setLogLevel('silent');
 
         if (!options.json) {
           banner('Panguard Setup');
