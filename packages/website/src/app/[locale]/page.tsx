@@ -16,6 +16,9 @@ const RealIncidents = dynamic(() => import('@/components/home/RealIncidents'));
 const WhyPanguard = dynamic(() => import('@/components/home/WhyPanguard'));
 const HowItWorks = dynamic(() => import('@/components/home/HowItWorks'));
 const CTARoadmap = dynamic(() => import('@/components/home/CTARoadmap'));
+const DetectionHeritageBridge = dynamic(
+  () => import('@/components/home/DetectionHeritageBridge'),
+);
 
 export default async function Home() {
   const t = await getTranslations('home');
@@ -31,6 +34,8 @@ export default async function Home() {
           <ScannerHero />
           {/* 1.5. Regulated Industries Positioning (Built on ATR + Two-Track + Migrator + 5-Framework Compliance) */}
           <RegulatedIndustriesPositioning />
+          {/* 1.7. Detection Heritage Bridge — 15 legacy formats → ATR + sovereign AI angle */}
+          <DetectionHeritageBridge />
           {/* 2. 7-layer Security Architecture */}
           <SecurityLayers />
           {/* 3. Live Stats */}
