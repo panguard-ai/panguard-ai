@@ -232,7 +232,7 @@ export default function PricingContent() {
                   {(isZh
                     ? [
                         'On-prem / VPC / airgap 部署協助',
-                        '每週 6 小時 engineering 時間(founder 親上)',
+                        '每週 6 小時資深工程支援',
                         '樣本季度合規證據報告(EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic 對應)',
                         '自訂 ATR rule pack 試做',
                         'SIEM webhook 整合樣板',
@@ -241,7 +241,7 @@ export default function PricingContent() {
                       ]
                     : [
                         'On-prem / VPC / airgap deployment help',
-                        '6 hr/week engineering time (founder directly)',
+                        '6 hours/week of senior engineering support',
                         'Sample quarterly compliance evidence report (EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic mapping)',
                         'Custom ATR rule pack trial',
                         'SIEM webhook integration template',
@@ -643,8 +643,8 @@ export default function PricingContent() {
             }
             subtitle={
               isZh
-                ? '印度、日本、英國、法國、韓國、UAE、台灣、沙烏地——每一個民主國家都在打造自己的主權 AI 模型與算力，但安全層仍向美國私企租用。ATR、Migrator、Compliance 三者構成這個缺口的開放標準答案。目前已有一個主權 AI 客戶處於積極對話階段。'
-                : 'India, Japan, the UK, France, Korea, the UAE, Taiwan, Saudi Arabia — every democracy is building sovereign AI models and compute, yet the security layer is still rented from US-private vendors. ATR, Migrator, and the Compliance module together form the open-standard answer to that gap. One sovereign AI customer is in active conversation.'
+                ? '每一個民主國家都在打造自己的主權 AI 模型與算力，但安全層仍向美國私企租用。ATR、Migrator、Compliance 三者構成這個缺口的開放標準答案。'
+                : 'Every democracy is building sovereign AI models and compute, yet the security layer is still rented from US-private vendors. ATR, Migrator, and the Compliance module together form the open-standard answer to that gap.'
             }
           />
 
@@ -714,8 +714,8 @@ export default function PricingContent() {
                 </p>
                 <p className="text-xs text-text-muted leading-[1.85] mt-3">
                   {isZh
-                    ? '由區域 enterprise vendor（如 CyCraft）負責落地與在地服務，PanGuard 擔任 ATR-certified 上游維護方。商業模式對應 Linux Foundation 國家級合約與 Red Hat 聯邦合約之先例。'
-                    : 'Delivery is handled by a regional enterprise vendor (e.g. CyCraft), with PanGuard as the ATR-certified upstream maintainer. The structure follows the Linux Foundation national-contract and Red Hat federal-contract precedent.'}
+                    ? '由經認證的區域 enterprise vendor 夥伴負責落地與在地服務，PanGuard 擔任上游 ATR 標準維護方。商業模式對應 Linux Foundation 國家級合約與 Red Hat 聯邦合約之先例。'
+                    : 'Delivery is handled by a certified regional enterprise vendor partner, with PanGuard as the upstream ATR standards maintainer. The structure follows the Linux Foundation national-contract and Red Hat federal-contract precedent.'}
                 </p>
               </div>
             </div>
@@ -982,19 +982,23 @@ Auditor-ready artefacts
                 {isZh ? (
                   <>
                     <strong className="text-text-primary">
-                      Solo founder 做不好 self-serve middle tier。
+                      Self-serve 中間 tier 需要的是規模化客服與通路團隊。
                     </strong>
-                    100 個 $500/月 SMB 客戶 = 全職處理 low-LTV support,擠壓我給 F500 的時間。Snyk /
-                    Datadog 模式有 50-person 工程團隊支撐;我們今天不是那個 shape。
+                    100 個月費 $500 的 SMB 客戶等同於一支專責處理低 LTV 客戶的工程組——這會直接擠壓
+                    為 F500 與主權客戶提供的工程時間。Snyk、Datadog 之所以能跑這個模式，背後是 50+
+                    人的工程團隊與專屬客服管線。我們的公司形態目前不適合那個層級的自助訂閱。
                   </>
                 ) : (
                   <>
                     <strong className="text-text-primary">
-                      A solo founder cannot run a self-serve middle tier well.
+                      A self-serve middle tier needs a scaled customer-success and support
+                      organisation.
                     </strong>{' '}
-                    100 × $500/mo SMB customers = full-time low-LTV support, squeezing the
-                    engineering time F500 customers actually pay for. Snyk / Datadog ran that model
-                    with 50+ engineers. We are not that shape today.
+                    100 SMB customers at $500/month is equivalent to a full-time engineering team
+                    supporting low-LTV accounts — and that directly squeezes the engineering time
+                    F500 and sovereign customers actually pay for. Snyk and Datadog ran this model
+                    with 50+ engineers behind a dedicated support pipeline. PanGuard is not that
+                    shape today.
                   </>
                 )}
               </p>

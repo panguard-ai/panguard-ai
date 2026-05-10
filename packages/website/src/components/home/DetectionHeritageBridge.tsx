@@ -277,11 +277,6 @@ export default function DetectionHeritageBridge() {
                     ? '主權 AI 的完整定義：主權的模型、主權的算力、主權的偵測知識。三者俱備，才稱得上完整。'
                     : 'Sovereign AI is defined by three components: sovereign model, sovereign compute, and sovereign detection knowledge. Only with all three is it complete.'}
                 </p>
-                <p className="text-sm text-brand-sage font-semibold leading-[1.85] mt-4">
-                  {isZh
-                    ? '目前已有一個主權 AI 客戶處於積極對話階段。'
-                    : 'One sovereign AI customer is in active conversation.'}
-                </p>
                 <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
                   <Link
                     href="/migrator"
