@@ -17,18 +17,40 @@ export async function actionReport(lang: Lang): Promise<void> {
   breadcrumb(['Panguard', lang === 'zh-TW' ? '\u5408\u898F\u5831\u544A' : 'Compliance Report']);
   console.log('');
   if (lang === 'zh-TW') {
-    console.log('  \u5408\u898F\u5831\u544A \u2014 \u5373\u5C07\u63A8\u51FA');
+    console.log('  \u5408\u898F\u5831\u544A');
     console.log('');
-    console.log(
-      '  ISO 27001\u3001SOC 2\u3001\u8CC7\u5B89\u7BA1\u7406\u6CD5\u5408\u898F\u5831\u544A\u529F\u80FD\u958B\u767C\u4E2D\u3002'
-    );
-    console.log('  \u8FFD\u8E64\u9032\u5EA6: https://github.com/panguard-ai/panguard-ai');
+    console.log('  \u652F\u6301\u516D\u5927\u6846\u67B6\uFF1A');
+    console.log('    \u2022 eu-ai-act        EU AI Act (Regulation 2024/1689)');
+    console.log('    \u2022 colorado-ai-act  Colorado SB24-205');
+    console.log('    \u2022 nist-ai-rmf      NIST AI RMF 1.0');
+    console.log('    \u2022 iso-42001        ISO/IEC 42001:2023');
+    console.log('    \u2022 owasp-agentic    OWASP Agentic Top 10:2026');
+    console.log('    \u2022 owasp-llm        OWASP LLM Top 10:2025');
+    console.log('');
+    console.log('  \u5F9E CLI \u57F7\u884C\uFF1A');
+    console.log('    pga report list-frameworks');
+    console.log('    pga report summary --framework eu-ai-act');
+    console.log('    pga report generate --framework nist-ai-rmf --format pdf --output report.pdf');
+    console.log('');
+    console.log('  \u6BCF\u4EFD\u5831\u544A\u9644\u5E36 SHA-256 hash\uFF0C\u53EF\u9078\u914D HMAC \u7C3D\u7AE0\uFF0C\u7A3D\u6838\u54E1\u53EF\u76F4\u63A5\u9A57\u8B49\u5B8C\u6574\u6027\u3002');
   } else {
-    console.log('  Compliance Report \u2014 Coming Soon');
+    console.log('  Compliance Report');
     console.log('');
-    console.log('  ISO 27001, SOC 2, and TW Cyber Security Act compliance');
-    console.log('  reports are under active development.');
-    console.log('  Follow progress: https://github.com/panguard-ai/panguard-ai');
+    console.log('  Six frameworks supported:');
+    console.log('    \u2022 eu-ai-act        EU AI Act (Regulation 2024/1689)');
+    console.log('    \u2022 colorado-ai-act  Colorado SB24-205');
+    console.log('    \u2022 nist-ai-rmf      NIST AI RMF 1.0');
+    console.log('    \u2022 iso-42001        ISO/IEC 42001:2023');
+    console.log('    \u2022 owasp-agentic    OWASP Agentic Top 10:2026');
+    console.log('    \u2022 owasp-llm        OWASP LLM Top 10:2025');
+    console.log('');
+    console.log('  Run from CLI:');
+    console.log('    pga report list-frameworks');
+    console.log('    pga report summary --framework eu-ai-act');
+    console.log('    pga report generate --framework nist-ai-rmf --format pdf --output report.pdf');
+    console.log('');
+    console.log('  Each report carries a SHA-256 integrity hash with optional HMAC signature.');
+    console.log('  Auditors can verify the report has not been tampered with.');
   }
   console.log('');
 }

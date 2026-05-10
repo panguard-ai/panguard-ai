@@ -32,7 +32,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "agent-threat-rules": "2.0.12"
+    "agent-threat-rules": "^2.1.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
