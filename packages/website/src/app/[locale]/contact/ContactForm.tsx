@@ -11,6 +11,7 @@ const inputStyles =
 const TIER_TO_INQUIRY_INDEX: Record<string, number> = {
   pilot: 0,
   enterprise: 0,
+  'founding-f500': 0,
   sovereign: 2,
   oem: 2,
   'atr-member': 2,
@@ -41,6 +42,7 @@ export default function ContactForm() {
     const tierLabel: Record<string, string> = {
       pilot: 'Pilot ($25K, 90 days)',
       enterprise: 'Enterprise ($150K-$500K)',
+      'founding-f500': 'Founding F500 program ($100K/year × 2)',
       sovereign: 'Sovereign AI ($5-20M)',
       oem: 'Vendor OEM License ($2-10M/year)',
       'atr-member': 'ATR Foundation Member ($10K/year)',
