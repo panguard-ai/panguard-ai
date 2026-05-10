@@ -459,7 +459,7 @@ export default function MigratorContent() {
             subtitle={
               isZh
                 ? 'Community 免費，給個人開發者；Pilot 給單一團隊試用；Standalone 給只需要規則遷移、暫時不導入完整 runtime 的組織；Sovereign 為國家級 SOC 知識遷移而設計。Migrator Pro 也已內建於 PanGuard Enterprise 方案中。'
-                : 'Free for solo developers. Pilot for one-team trials. Standalone for organisations that only need the conversion layer. Sovereign for nation-scale SOC bridges. Migrator Pro is also bundled inside PanGuard Enterprise.'
+                : 'Free for individual developers. Pilot for one-team trials. Standalone for organisations that only need the conversion layer. Sovereign for nation-scale SOC bridges. Migrator Pro is also bundled inside PanGuard Enterprise.'
             }
           />
         </FadeInUp>
@@ -517,8 +517,8 @@ export default function MigratorContent() {
               </div>
               <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
                 {isZh
-                  ? '針對單一團隊與單一規則語料庫。我們會把最多 100 條 Sigma 或 YARA 規則精修到 Cisco 已合併 PR 的品質水準，附上五大框架合規 metadata，以及一份範例稽核證據包。由創辦人親自服務。費用可全額抵入 Migrator Standalone 或 PanGuard Enterprise 年約。'
-                  : 'One team, one rule corpus. We enrich up to 100 Sigma or YARA rules to Cisco-merge-PR quality with five-framework compliance metadata, plus a sample audit evidence pack. Founder-led delivery. The full fee credits toward Migrator Standalone or PanGuard Enterprise.'}
+                  ? '針對單一團隊與單一規則語料庫。將最多 100 條 Sigma 或 YARA 規則精修到 Cisco 已合併 PR 的品質水準，附五大框架合規 metadata，以及一份範例稽核證據包。費用可全額抵入 Migrator Standalone 或 PanGuard Enterprise 年約。'
+                  : 'One team, one rule corpus. Refines up to 100 Sigma or YARA rules to the quality level of Cisco-merged PRs, with five-framework compliance metadata and a sample audit evidence pack. The full fee credits toward Migrator Standalone or PanGuard Enterprise.'}
               </p>
               <a
                 href="mailto:adam@agentthreatrule.org?subject=Migrator%20pilot"
@@ -569,8 +569,8 @@ export default function MigratorContent() {
               </p>
               <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
                 {isZh
-                  ? '為主權 AI 計畫設計的國家級部署，包含完整 Migrator Pro、ATR runtime、Compliance Evidence、Threat Cloud、在地部署，以及針對該國 SOC 既有 detection IP（Aramco-era SCADA、區域 SIEM 語料庫等）所設計的客製規則類別。由區域 enterprise vendor 合作夥伴負責落地，PanGuard 擔任 ATR-certified 上游維護方。目前已有一個主權 AI 客戶處於積極對話階段。'
-                  : 'Nation-scale deployment for sovereign AI programs. Includes full Migrator Pro, the ATR runtime, the Compliance Evidence module, Threat Cloud, in-region deployment, and custom rule classes tailored to that nation’s existing SOC detection IP (Aramco-era SCADA, regional SIEM corpora). Delivered by a regional enterprise vendor partner with PanGuard as the ATR-certified upstream maintainer. One sovereign customer is in active conversation.'}
+                  ? '為主權 AI 計畫設計的國家級部署。包含完整 Migrator Pro、ATR runtime、Compliance Evidence Module、Threat Cloud、在地部署，以及針對該國 SOC 既有偵測知識資產（傳統 SCADA、區域 SIEM 語料庫等）所設計的客製規則類別。由經認證的區域 enterprise vendor 夥伴負責落地，PanGuard 擔任上游 ATR 標準維護方。'
+                  : "Nation-scale deployment for sovereign AI programs. Includes full Migrator Pro, the ATR runtime, the Compliance Evidence Module, Threat Cloud, in-region deployment, and custom rule classes tailored to a nation's existing SOC detection IP (traditional SCADA, regional SIEM corpora, and others). Delivered through a certified regional enterprise vendor partner, with PanGuard as the upstream ATR standards maintainer."}
               </p>
               <Link
                 href="/sovereign-ai-defense"
