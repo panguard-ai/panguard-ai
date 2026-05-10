@@ -8,6 +8,43 @@ export interface ChangelogEntry {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    version: '1.5.4',
+    date: '2026-05-10',
+    title: 'ATR v2.1.0 · Migrator GA · 100% NIST AI RMF',
+    description:
+      'ATR upgraded to v2.1.0 with 330 detection rules and 100% NIST AI RMF mapping (1,566 mappings across 16 subcategories). Migrator Community v0.1.0 shipped on npm under MIT. Cisco AI Defense expanded to the full 330-rule pack via PR #99; Microsoft AGT now ships 287 rules + weekly auto-sync via PR #1277.',
+    changes: [
+      {
+        type: 'feature',
+        text: 'ATR v2.1.0: 100% NIST AI RMF coverage — every rule carries compliance.nist_ai_rmf metadata, 1,566 mappings across GV / MP / MS / MG',
+      },
+      {
+        type: 'feature',
+        text: 'Migrator Community v0.1.0 on npm (@panguard-ai/migrator-community, MIT) — Sigma / YARA / Snort parsers, IR, transformers, validators, basic CLI',
+      },
+      {
+        type: 'feature',
+        text: 'Migrator Enterprise v0.1.0 production-ready — 15 source-format adapters, strict 0-FP quality pipeline, 5-framework auto-mapping, 6-tab web dashboard, audit evidence packs',
+      },
+      {
+        type: 'improvement',
+        text: 'Cisco AI Defense: PR #99 expanded from 34-rule PoC to full 330-rule pack in skill-scanner production',
+      },
+      {
+        type: 'improvement',
+        text: 'Microsoft AGT: PR #1277 expanded to 287 rules + weekly auto-sync workflow into Agent Governance Toolkit',
+      },
+      {
+        type: 'improvement',
+        text: 'NVIDIA garak in-the-wild benchmark: 97.1% recall (646/666) maintained · 0.20% FP on 498-sample SKILL.md corpus',
+      },
+      {
+        type: 'fix',
+        text: 'Engine: code-block + table-cell suppression now applied to array-format rules (was silently bypassed for every rule from 2026 onward)',
+      },
+    ],
+  },
+  {
     version: '1.3.0',
     date: '2026-03-22',
     title: 'Auto-Block & Auto-Guard',

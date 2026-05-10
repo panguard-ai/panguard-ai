@@ -160,7 +160,7 @@ export default function MigratorContent() {
             <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-brand-sage-glow bg-brand-sage-wash">
               <Zap className="w-3 h-3 text-brand-sage" />
               <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-sage">
-                Enterprise &middot; Q3 2026 GA
+                Community v0.1.0 on npm &middot; Enterprise v0.1.0 shipping
               </span>
             </div>
             <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight mb-6 text-text-primary">
@@ -454,8 +454,11 @@ export default function MigratorContent() {
               Ready to migrate your detection coverage?
             </h2>
             <p className="text-text-secondary mb-8 leading-relaxed">
-              Enterprise pilot: 90 days, your full Sigma/YARA corpus converted with audit pack
-              delivery. Q3 2026 GA. COMPUTEX 2026 demo.
+              Migrator Community v0.1.0 is live on npm under MIT — Sigma / YARA / Snort parsers,
+              IR, transformers, and CLI. Migrator Enterprise v0.1.0 is production-ready today
+              (15 source-format adapters, strict 0-FP quality pipeline, 5-framework compliance
+              auto-mapping, 6-tab web dashboard, audit evidence packs). 90-day pilot available.
+              v1.0.0 GA target Q1 2027.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
