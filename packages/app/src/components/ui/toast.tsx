@@ -11,13 +11,7 @@ const tones: Record<Tone, string> = {
   info: 'border-brand-sage/40 bg-brand-sage/10 text-brand-sage',
 };
 
-export function InlineToast({
-  tone = 'info',
-  children,
-}: {
-  tone?: Tone;
-  children: ReactNode;
-}) {
+export function InlineToast({ tone = 'info', children }: { tone?: Tone; children: ReactNode }) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {

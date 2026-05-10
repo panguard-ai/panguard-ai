@@ -9,10 +9,7 @@ const REPORTS_BUCKET = 'reports';
  * Auth: `Authorization: Bearer pga_...` (API key).
  * Returns a 302 to a short-lived signed Supabase Storage URL.
  */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const auth = req.headers.get('authorization');
   if (!auth || !auth.toLowerCase().startsWith('bearer ')) {
     return NextResponse.json({ error: 'missing_token' }, { status: 401 });

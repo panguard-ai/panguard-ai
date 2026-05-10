@@ -17,9 +17,7 @@ interface OverviewCounters {
 
 async function tcFetch(path: string, init?: RequestInit): Promise<Response> {
   if (!env.TC_INTERNAL_SECRET) {
-    throw new Error(
-      '[tc-client] TC_INTERNAL_SECRET not set. Configure .env.local.',
-    );
+    throw new Error('[tc-client] TC_INTERNAL_SECRET not set. Configure .env.local.');
   }
   const url = `${env.TC_API_URL}${path}`;
   return fetch(url, {
@@ -33,13 +31,9 @@ async function tcFetch(path: string, init?: RequestInit): Promise<Response> {
   });
 }
 
-export async function getOverviewCounters(
-  workspaceId: string,
-): Promise<OverviewCounters> {
+export async function getOverviewCounters(workspaceId: string): Promise<OverviewCounters> {
   try {
-    const res = await tcFetch(
-      `/api/workspaces/${encodeURIComponent(workspaceId)}/overview`,
-    );
+    const res = await tcFetch(`/api/workspaces/${encodeURIComponent(workspaceId)}/overview`);
     if (!res.ok) throw new Error(`TC ${res.status}`);
     return (await res.json()) as OverviewCounters;
   } catch (err) {
@@ -63,7 +57,7 @@ export interface ListEventsOptions {
 
 export async function listEvents(
   workspaceId: string,
-  opts: ListEventsOptions = {},
+  opts: ListEventsOptions = {}
 ): Promise<PaginatedEvents> {
   const page = Math.max(1, opts.page ?? 1);
   const pageSize = Math.min(100, Math.max(10, opts.pageSize ?? 25));

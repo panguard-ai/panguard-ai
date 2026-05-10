@@ -19,9 +19,7 @@ export default async function RootPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-16">
-      <h1 className="mb-2 text-2xl font-semibold text-text-primary">
-        Choose a workspace
-      </h1>
+      <h1 className="mb-2 text-2xl font-semibold text-text-primary">Choose a workspace</h1>
       <p className="mb-8 text-sm text-text-muted">
         Pick which workspace you want to open, or create a new one.
       </p>
@@ -32,9 +30,7 @@ export default async function RootPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium text-text-primary">{w.name}</h3>
-                  <p className="mt-0.5 text-xs text-text-muted font-mono">
-                    /w/{w.slug}
-                  </p>
+                  <p className="mt-0.5 text-xs text-text-muted font-mono">/w/{w.slug}</p>
                 </div>
                 <span className="text-sm text-brand-sage">Open →</span>
               </div>

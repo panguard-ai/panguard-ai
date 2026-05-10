@@ -32,7 +32,9 @@ export async function actionReport(lang: Lang): Promise<void> {
     console.log('    pga report summary --framework eu-ai-act');
     console.log('    pga report generate --framework nist-ai-rmf --format pdf --output report.pdf');
     console.log('');
-    console.log('  \u6BCF\u4EFD\u5831\u544A\u9644\u5E36 SHA-256 hash\uFF0C\u53EF\u9078\u914D HMAC \u7C3D\u7AE0\uFF0C\u7A3D\u6838\u54E1\u53EF\u76F4\u63A5\u9A57\u8B49\u5B8C\u6574\u6027\u3002');
+    console.log(
+      '  \u6BCF\u4EFD\u5831\u544A\u9644\u5E36 SHA-256 hash\uFF0C\u53EF\u9078\u914D HMAC \u7C3D\u7AE0\uFF0C\u7A3D\u6838\u54E1\u53EF\u76F4\u63A5\u9A57\u8B49\u5B8C\u6574\u6027\u3002'
+    );
   } else {
     console.log('  Compliance Report');
     console.log('');

@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: 'invalid_body', detail: parsed.error.issues },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -112,7 +112,10 @@ export async function POST(req: NextRequest) {
   }));
   const { error: insertErr } = await admin.from('events').insert(rows);
   if (insertErr) {
-    return NextResponse.json({ error: 'insert_failed', detail: insertErr.message }, { status: 500 });
+    return NextResponse.json(
+      { error: 'insert_failed', detail: insertErr.message },
+      { status: 500 }
+    );
   }
 
   // 5. Update api_keys.last_used_at (best-effort)
@@ -120,7 +123,10 @@ export async function POST(req: NextRequest) {
     .from('api_keys')
     .update({ last_used_at: nowIso })
     .eq('id', key.id)
-    .then(() => undefined, () => undefined);
+    .then(
+      () => undefined,
+      () => undefined
+    );
 
   return NextResponse.json({
     ok: true,

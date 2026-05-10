@@ -28,14 +28,6 @@ export function TR({ children }: { children: ReactNode }) {
   return <tr className="bg-surface-1 hover:bg-surface-2 transition-colors">{children}</tr>;
 }
 
-export function TD({
-  children,
-  className = '',
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <td className={`px-4 py-3 text-text-secondary ${className}`}>{children}</td>
-  );
+export function TD({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <td className={`px-4 py-3 text-text-secondary ${className}`}>{children}</td>;
 }

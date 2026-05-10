@@ -76,7 +76,10 @@ export async function GET(req: NextRequest) {
     .from('api_keys')
     .update({ last_used_at: new Date().toISOString() })
     .eq('id', key.id)
-    .then(() => undefined, () => undefined);
+    .then(
+      () => undefined,
+      () => undefined
+    );
 
   return NextResponse.json({
     user: { email },

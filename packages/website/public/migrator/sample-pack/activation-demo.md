@@ -14,16 +14,15 @@
 
 ## Per-event results
 
-| Event | Label | Outcome | Expected rule | Fired rules |
-|---|---|---|---|---|
-| `attack-01-powershell-exploit` | attack | **TP** | `ATR-2026-85501` | `ATR-2026-85501` |
-| `attack-02-linux-recon` | attack | **TP** | `ATR-2026-41443` | `ATR-2026-41443` |
-| `attack-03-defender-exclusion` | attack | **TP** | `ATR-2026-88829` | `ATR-2026-88829` |
-| `attack-04-ngrok-exfil` | attack | **TP** | `ATR-2026-12808` | `ATR-2026-12808, ATR-2026-70113` |
-| `attack-05-shadowcopy-delete` | attack | **TP** | `ATR-2026-21109` | `ATR-2026-21109` |
-| `benign-01-educational-mimikatz` | benign | **TN** | `(none)` | `(none)` |
-| `benign-02-legitimate-api` | benign | **TN** | `(none)` | `(none)` |
-| `benign-03-routine-ls` | benign | **TN** | `(none)` | `(none)` |
-| `benign-04-readonly-shadowcopy` | benign | **TN** | `(none)` | `(none)` |
-| `benign-05-single-emoji` | benign | **TN** | `(none)` | `(none)` |
-
+| Event                            | Label  | Outcome | Expected rule    | Fired rules                      |
+| -------------------------------- | ------ | ------- | ---------------- | -------------------------------- |
+| `attack-01-powershell-exploit`   | attack | **TP**  | `ATR-2026-85501` | `ATR-2026-85501`                 |
+| `attack-02-linux-recon`          | attack | **TP**  | `ATR-2026-41443` | `ATR-2026-41443`                 |
+| `attack-03-defender-exclusion`   | attack | **TP**  | `ATR-2026-88829` | `ATR-2026-88829`                 |
+| `attack-04-ngrok-exfil`          | attack | **TP**  | `ATR-2026-12808` | `ATR-2026-12808, ATR-2026-70113` |
+| `attack-05-shadowcopy-delete`    | attack | **TP**  | `ATR-2026-21109` | `ATR-2026-21109`                 |
+| `benign-01-educational-mimikatz` | benign | **TN**  | `(none)`         | `(none)`                         |
+| `benign-02-legitimate-api`       | benign | **TN**  | `(none)`         | `(none)`                         |
+| `benign-03-routine-ls`           | benign | **TN**  | `(none)`         | `(none)`                         |
+| `benign-04-readonly-shadowcopy`  | benign | **TN**  | `(none)`         | `(none)`                         |
+| `benign-05-single-emoji`         | benign | **TN**  | `(none)`         | `(none)`                         |

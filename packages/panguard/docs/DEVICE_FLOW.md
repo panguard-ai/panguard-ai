@@ -11,24 +11,24 @@ the terminal and confirmed in a browser session the user already trusts.
 
 ## Why device code flow
 
-* No password / API-key paste — phishable surfaces eliminated.
-* Works on headless machines (server, container, CI) where spinning up a
+- No password / API-key paste — phishable surfaces eliminated.
+- Works on headless machines (server, container, CI) where spinning up a
   local HTTP callback is inconvenient.
-* One short code (`ABCD-1234`) is readable over a shoulder / voice call,
+- One short code (`ABCD-1234`) is readable over a shoulder / voice call,
   while the long `device_code` never leaves HTTPS.
-* Polling gives the server full control over rate limits and expiry.
+- Polling gives the server full control over rate limits and expiry.
 
 ## Endpoints
 
 Default server: `https://app.panguard.ai` (override with `--app-url` or
 `PANGUARD_APP_URL`). Every endpoint is HTTPS and responds with JSON.
 
-| Endpoint                | Method | Auth header     |
-| ----------------------- | ------ | --------------- |
-| `/api/device/code`      | POST   | none            |
-| `/api/device/poll`      | POST   | none            |
-| `/api/auth/revoke`      | POST   | Bearer api_key  |
-| `/api/me`               | GET    | Bearer api_key  |
+| Endpoint           | Method | Auth header    |
+| ------------------ | ------ | -------------- |
+| `/api/device/code` | POST   | none           |
+| `/api/device/poll` | POST   | none           |
+| `/api/auth/revoke` | POST   | Bearer api_key |
+| `/api/me`          | GET    | Bearer api_key |
 
 ## Flow
 
@@ -99,13 +99,13 @@ Request:
 
 Possible responses:
 
-| Status | Body                                                | CLI behaviour             |
-| ------ | --------------------------------------------------- | ------------------------- |
-| 200    | `{ api_key, workspace, user }`                      | success — persist session |
-| 428    | `{ "error": "authorization_pending" }`              | keep polling              |
-| 429    | `{ "error": "slow_down" }`                          | `interval += 5` and retry |
-| 400    | `{ "error": "expired_token" }`                      | fail with clear message   |
-| 400    | `{ "error": "access_denied" }`                      | fail (user rejected)      |
+| Status | Body                                   | CLI behaviour             |
+| ------ | -------------------------------------- | ------------------------- |
+| 200    | `{ api_key, workspace, user }`         | success — persist session |
+| 428    | `{ "error": "authorization_pending" }` | keep polling              |
+| 429    | `{ "error": "slow_down" }`             | `interval += 5` and retry |
+| 400    | `{ "error": "expired_token" }`         | fail with clear message   |
+| 400    | `{ "error": "access_denied" }`         | fail (user rejected)      |
 
 Success payload shape:
 
@@ -113,7 +113,7 @@ Success payload shape:
 {
   "api_key": "pga_<60 hex chars>",
   "workspace": { "id": "uuid", "slug": "acme", "name": "Acme Corp", "tier": "pilot" },
-  "user":      { "email": "attila@panguard.ai" }
+  "user": { "email": "attila@panguard.ai" }
 }
 ```
 
@@ -158,7 +158,7 @@ Response 200:
 
 ```json
 {
-  "user":      { "email": "…", "name": "…" },
+  "user": { "email": "…", "name": "…" },
   "workspace": { "id": "…", "slug": "…", "name": "…" },
   "tier": "pilot",
   "tier_expires_at": "2026-07-22T00:00:00Z",
@@ -172,29 +172,29 @@ cached local session and prints a dim `info` note.
 
 ## Error handling
 
-* `expires_in` watchdog — the CLI stops polling once
+- `expires_in` watchdog — the CLI stops polling once
   `now > start + expires_in * 1000`, regardless of server response.
-* Every terminal error is printed to stderr with a short actionable sentence.
+- Every terminal error is printed to stderr with a short actionable sentence.
   Secrets (`api_key`, `device_code`, Authorization header) are never logged.
-* `SIGINT` (Ctrl+C) during the poll loop prints `Login cancelled.` and exits
+- `SIGINT` (Ctrl+C) during the poll loop prints `Login cancelled.` and exits
   with code `130`.
 
 ## Secrets discipline
 
-* `api_key` is written only to the local auth file and carried in the
+- `api_key` is written only to the local auth file and carried in the
   `Authorization` header. It is never echoed to stdout/stderr and never
   included in error messages.
-* `device_code` is a one-shot secret; it is held in process memory and
+- `device_code` is a one-shot secret; it is held in process memory and
   discarded after the poll loop exits.
-* When re-reading the auth file (`loadAuth`), the returned object is frozen
+- When re-reading the auth file (`loadAuth`), the returned object is frozen
   with `Object.freeze` so downstream code cannot accidentally mutate the
   session state.
 
 ## Related modules
 
-* `src/cli/auth-guard.ts` — public API (`loadAuth`, `authHeader`,
+- `src/cli/auth-guard.ts` — public API (`loadAuth`, `authHeader`,
   `requireLogin`, `isAuthenticated`, `authConfigPath`).
-* `src/cli/device-flow.ts` — pure helpers (`requestDeviceCode`, `pollOnce`,
+- `src/cli/device-flow.ts` — pure helpers (`requestDeviceCode`, `pollOnce`,
   `resolveAppUrl`, `openBrowser`). Dependency-free so it can be unit tested
   with `vi.spyOn(globalThis, 'fetch')`.
-* `src/cli/commands/{login,logout,whoami}.ts` — commander glue.
+- `src/cli/commands/{login,logout,whoami}.ts` — commander glue.

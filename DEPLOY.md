@@ -47,12 +47,14 @@ touched.
 ### Auth settings
 
 In Supabase dashboard → **Authentication → URL Configuration**:
+
 - Site URL: `https://app.panguard.ai`
 - Redirect URLs (add each on its own line):
   - `https://app.panguard.ai/**`
   - `http://localhost:3001/**` (for local dev)
 
 In **Authentication → Providers**:
+
 - Email: **enabled**, with **Confirm email = ON**
 - Password: **disabled** (magic link only for MVP)
 
@@ -66,14 +68,14 @@ In **Authentication → Providers**:
 4. **Framework preset**: Next.js (auto-detected)
 5. Environment variables (all 6):
 
-   | Name | Value |
-   |---|---|
-   | `NEXT_PUBLIC_SUPABASE_URL` | from Step 1 |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | from Step 1 |
-   | `SUPABASE_SERVICE_ROLE_KEY` | from Step 1 (mark as **secret**) |
-   | `NEXT_PUBLIC_APP_URL` | `https://app.panguard.ai` |
-   | `PANGUARD_REPORT_SIGNING_KEY` | 64-char random hex (`openssl rand -hex 32`) |
-   | `TC_API_URL` | `https://tc.panguard.ai` (optional — only needed if fetching TC feeds) |
+   | Name                            | Value                                                                  |
+   | ------------------------------- | ---------------------------------------------------------------------- |
+   | `NEXT_PUBLIC_SUPABASE_URL`      | from Step 1                                                            |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | from Step 1                                                            |
+   | `SUPABASE_SERVICE_ROLE_KEY`     | from Step 1 (mark as **secret**)                                       |
+   | `NEXT_PUBLIC_APP_URL`           | `https://app.panguard.ai`                                              |
+   | `PANGUARD_REPORT_SIGNING_KEY`   | 64-char random hex (`openssl rand -hex 32`)                            |
+   | `TC_API_URL`                    | `https://tc.panguard.ai` (optional — only needed if fetching TC feeds) |
 
 6. Deploy — first build takes ~3 min.
 7. Custom domain: **Settings → Domains → Add** `app.panguard.ai`
@@ -137,6 +139,7 @@ npx tsx scripts/provision-workspace.ts \
 ```
 
 Output tells you what happens next:
+
 1. Customer receives magic-link email
 2. Clicks it → lands on `https://app.panguard.ai/w/acme`
 3. Installs the CLI: `npm i -g panguard`

@@ -36,9 +36,7 @@ export function WorkspaceSwitcher({ current, options }: Props) {
               onClick={() => setOpen(false)}
             >
               <span>{w.name}</span>
-              {w.id === current.id ? (
-                <Check className="h-3.5 w-3.5 text-brand-sage" />
-              ) : null}
+              {w.id === current.id ? <Check className="h-3.5 w-3.5 text-brand-sage" /> : null}
             </Link>
           ))}
           <div className="my-1 border-t border-border" />

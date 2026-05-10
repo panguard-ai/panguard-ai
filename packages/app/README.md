@@ -15,15 +15,15 @@ pnpm --filter @panguard-ai/app dev
 
 ### Required env vars
 
-| Name | Purpose |
-| --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | **Server only.** Used for admin ops: device code approval, workspace bootstrap, report uploads |
-| `TC_API_URL` | Threat Cloud base URL (prod: `https://tc.panguard.ai`) |
-| `TC_INTERNAL_SECRET` | Shared secret between app and TC |
-| `PANGUARD_REPORT_SIGNING_KEY` | HMAC key for report integrity attestation |
-| `NEXT_PUBLIC_APP_URL` | Used to build magic-link redirect URL |
+| Name                            | Purpose                                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                                                                           |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key                                                                                |
+| `SUPABASE_SERVICE_ROLE_KEY`     | **Server only.** Used for admin ops: device code approval, workspace bootstrap, report uploads |
+| `TC_API_URL`                    | Threat Cloud base URL (prod: `https://tc.panguard.ai`)                                         |
+| `TC_INTERNAL_SECRET`            | Shared secret between app and TC                                                               |
+| `PANGUARD_REPORT_SIGNING_KEY`   | HMAC key for report integrity attestation                                                      |
+| `NEXT_PUBLIC_APP_URL`           | Used to build magic-link redirect URL                                                          |
 
 ## How the device flow works
 

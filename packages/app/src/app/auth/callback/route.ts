@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line no-console
     console.error('[auth/callback] exchange failed', error.message);
     return NextResponse.redirect(
-      `${origin}/auth/error?reason=${encodeURIComponent(error.message)}`,
+      `${origin}/auth/error?reason=${encodeURIComponent(error.message)}`
     );
   }
 

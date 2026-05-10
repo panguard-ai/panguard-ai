@@ -18,9 +18,7 @@ export default async function LoginPage({ searchParams }: Props) {
             <Shield className="h-6 w-6 text-brand-sage" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold text-text-primary">
-              {t('loginTitle')}
-            </h1>
+            <h1 className="text-2xl font-semibold text-text-primary">{t('loginTitle')}</h1>
             <p className="mt-1 text-sm text-text-muted">{t('loginSubtitle')}</p>
           </div>
         </div>

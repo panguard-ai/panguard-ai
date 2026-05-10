@@ -123,7 +123,10 @@ export interface EndpointInfo {
 
 let cachedMachineId: string | null = null;
 
-export function getEndpointInfo(panguardVersion: string | undefined, userEmail: string): EndpointInfo {
+export function getEndpointInfo(
+  panguardVersion: string | undefined,
+  userEmail: string
+): EndpointInfo {
   if (!cachedMachineId) {
     // Combine OS hostname + userEmail (from auth) + node arch → sha256.
     // Server never sees the raw values, and the hash is stable across runs of

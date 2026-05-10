@@ -26,8 +26,10 @@ const RE_ANY_OF_THEM = /^any\s+of\s+them$/;
 const RE_ALL_OF_THEM = /^all\s+of\s+them$/;
 const RE_ANY_OF_GLOB = /^any\s+of\s+\(\s*\$([A-Za-z_][A-Za-z0-9_]*)\*\s*\)$/;
 const RE_ALL_OF_GLOB = /^all\s+of\s+\(\s*\$([A-Za-z_][A-Za-z0-9_]*)\*\s*\)$/;
-const RE_ANY_OF_LIST = /^any\s+of\s+\(\s*((?:\$[A-Za-z_][A-Za-z0-9_]*\s*,\s*)*\$[A-Za-z_][A-Za-z0-9_]*)\s*\)$/;
-const RE_ALL_OF_LIST = /^all\s+of\s+\(\s*((?:\$[A-Za-z_][A-Za-z0-9_]*\s*,\s*)*\$[A-Za-z_][A-Za-z0-9_]*)\s*\)$/;
+const RE_ANY_OF_LIST =
+  /^any\s+of\s+\(\s*((?:\$[A-Za-z_][A-Za-z0-9_]*\s*,\s*)*\$[A-Za-z_][A-Za-z0-9_]*)\s*\)$/;
+const RE_ALL_OF_LIST =
+  /^all\s+of\s+\(\s*((?:\$[A-Za-z_][A-Za-z0-9_]*\s*,\s*)*\$[A-Za-z_][A-Za-z0-9_]*)\s*\)$/;
 const RE_N_OF_THEM = /^(\d+)\s+of\s+them$/;
 const RE_SINGLE_REF = /^\$([A-Za-z_][A-Za-z0-9_]*)$/;
 const RE_AND_CHAIN = /^(\$[A-Za-z_][A-Za-z0-9_]*\s+and\s+)+\$[A-Za-z_][A-Za-z0-9_]*$/;
@@ -95,7 +97,10 @@ export function parseYaraCondition(
 
   const anyList = RE_ANY_OF_LIST.exec(trimmed);
   if (anyList) {
-    const names = (anyList[1] ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+    const names = (anyList[1] ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
     for (const n of names) {
       if (!availableStringNames.includes(n)) {
         return { result: null, reason: `condition references unknown string '${n}'` };
@@ -106,7 +111,10 @@ export function parseYaraCondition(
 
   const allList = RE_ALL_OF_LIST.exec(trimmed);
   if (allList) {
-    const names = (allList[1] ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+    const names = (allList[1] ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
     for (const n of names) {
       if (!availableStringNames.includes(n)) {
         return { result: null, reason: `condition references unknown string '${n}'` };

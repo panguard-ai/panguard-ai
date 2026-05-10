@@ -13,8 +13,16 @@ import { STATS } from '@/lib/stats';
  *   The OWASP LLM Top 10 official repo PR is still pending.
  */
 const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[] = [
-  { name: 'Cisco AI Defense', detail: `${STATS.adoption.ciscoRulesMerged} ATR rules merged (PR #79 + #99)`, highlight: true },
-  { name: 'Microsoft AGT', detail: `${STATS.adoption.microsoftRulesMerged} ATR rules merged (PR #908 + #1277)`, highlight: true },
+  {
+    name: 'Cisco AI Defense',
+    detail: `${STATS.adoption.ciscoRulesMerged} ATR rules merged (PR #79 + #99)`,
+    highlight: true,
+  },
+  {
+    name: 'Microsoft AGT',
+    detail: `${STATS.adoption.microsoftRulesMerged} ATR rules merged (PR #908 + #1277)`,
+    highlight: true,
+  },
   { name: 'NVIDIA Garak', detail: '97.1% recall · PR open' },
 ];
 

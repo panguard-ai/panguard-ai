@@ -35,8 +35,7 @@ vi.mock('@panguard-ai/core', async (importOriginal) => {
 
 // Prevent the real browser-open from firing shell commands in CI.
 vi.mock('../src/cli/device-flow.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../src/cli/device-flow.js')>();
+  const actual = await importOriginal<typeof import('../src/cli/device-flow.js')>();
   return { ...actual, openBrowser: vi.fn() };
 });
 

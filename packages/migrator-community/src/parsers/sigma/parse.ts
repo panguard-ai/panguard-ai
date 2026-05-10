@@ -231,10 +231,7 @@ export function parseSigma(sigma: SigmaRule): SigmaParseResult {
   if (typeof sigma.id !== 'string' || sigma.id.length === 0) {
     return { ir: null, warnings: ['missing required field: id'] };
   }
-  if (
-    typeof sigma.detection !== 'object' ||
-    sigma.detection === null
-  ) {
+  if (typeof sigma.detection !== 'object' || sigma.detection === null) {
     return { ir: null, warnings: ['missing or invalid detection block'] };
   }
 
@@ -247,9 +244,7 @@ export function parseSigma(sigma: SigmaRule): SigmaParseResult {
       warnings: ['detection.condition is missing or not a string'],
     };
   }
-  const detectionKeys = Object.keys(detection).filter(
-    (k) => !RESERVED_DETECTION_KEYS.has(k)
-  );
+  const detectionKeys = Object.keys(detection).filter((k) => !RESERVED_DETECTION_KEYS.has(k));
   const conditionParsed = parseCondition(conditionRaw, detectionKeys);
   if (conditionParsed.result === null) {
     return {
@@ -278,8 +273,7 @@ export function parseSigma(sigma: SigmaRule): SigmaParseResult {
   const description =
     typeof sigma.description === 'string' && sigma.description.length > 0
       ? sigma.description
-      : (warnings.push('source rule has no description'),
-        `Migrated from SigmaHQ rule ${sigma.id}`);
+      : (warnings.push('source rule has no description'), `Migrated from SigmaHQ rule ${sigma.id}`);
   const author =
     typeof sigma.author === 'string' && sigma.author.length > 0
       ? sigma.author

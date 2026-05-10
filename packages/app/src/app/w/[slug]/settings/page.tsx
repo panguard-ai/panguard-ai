@@ -17,11 +17,7 @@ import {
   updateWorkspaceName,
 } from './actions';
 
-export default async function SettingsPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function SettingsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const ctx = await requireWorkspaceBySlug(slug);
   if (!ctx) notFound();
@@ -51,15 +47,13 @@ export default async function SettingsPage({
       <div>
         <h1 className="text-2xl font-semibold text-text-primary">Settings</h1>
         <p className="mt-1 text-sm text-text-muted">
-          {ctx.workspace.name} · <span className="font-mono">{ctx.workspace.slug}</span> · your role: <Badge tone="sage">{ctx.role}</Badge>
+          {ctx.workspace.name} · <span className="font-mono">{ctx.workspace.slug}</span> · your
+          role: <Badge tone="sage">{ctx.role}</Badge>
         </p>
       </div>
 
       <Card padding="lg">
-        <CardHeader
-          title="General"
-          subtitle="The workspace name is visible to all members."
-        />
+        <CardHeader title="General" subtitle="The workspace name is visible to all members." />
         <form action={updateWorkspaceName} className="space-y-4">
           <input type="hidden" name="slug" value={ctx.workspace.slug} />
           <Input
@@ -122,9 +116,7 @@ export default async function SettingsPage({
               <TR key={`${m.workspace_id}:${m.user_id}`}>
                 <TD className="font-mono text-xs">{m.user_id}</TD>
                 <TD>
-                  <Badge tone={m.role === 'admin' ? 'sage' : 'neutral'}>
-                    {m.role}
-                  </Badge>
+                  <Badge tone={m.role === 'admin' ? 'sage' : 'neutral'}>{m.role}</Badge>
                 </TD>
                 <TD>{new Date(m.invited_at).toLocaleDateString()}</TD>
                 <TD>
@@ -184,11 +176,7 @@ export default async function SettingsPage({
                       {k.revoked_at ? 'revoked' : 'active'}
                     </Badge>
                   </TD>
-                  <TD>
-                    {k.last_used_at
-                      ? new Date(k.last_used_at).toLocaleString()
-                      : 'never'}
-                  </TD>
+                  <TD>{k.last_used_at ? new Date(k.last_used_at).toLocaleString() : 'never'}</TD>
                   <TD>
                     {!k.revoked_at ? (
                       <form action={revokeApiKey}>

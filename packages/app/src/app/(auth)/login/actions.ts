@@ -65,8 +65,7 @@ export async function sendMagicLink(formData: FormData): Promise<MagicLinkResult
     console.error('[auth] signInWithOtp failed', error.message);
     return {
       ok: false,
-      error:
-        'We could not send a magic link right now. Please try again in a moment.',
+      error: 'We could not send a magic link right now. Please try again in a moment.',
     };
   }
 

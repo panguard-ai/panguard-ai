@@ -33,7 +33,7 @@ export async function POST(_req: NextRequest) {
     console.error('[api/device/code] failed', err);
     return NextResponse.json(
       { error: 'server_error', error_description: 'unable to create device code' },
-      { status: 500 },
+      { status: 500 }
     );
   }
 

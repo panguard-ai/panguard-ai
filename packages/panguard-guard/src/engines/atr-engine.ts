@@ -187,9 +187,7 @@ export class GuardATREngine {
     }
     const custom = await this.engine.loadRules();
     const total = bundled + custom;
-    logger.info(
-      `ATR rules reloaded: ${total} total (${bundled} bundled + ${custom} custom)`
-    );
+    logger.info(`ATR rules reloaded: ${total} total (${bundled} bundled + ${custom} custom)`);
     return { total, bundled, custom };
   }
 

@@ -16,9 +16,7 @@ const RealIncidents = dynamic(() => import('@/components/home/RealIncidents'));
 const WhyPanguard = dynamic(() => import('@/components/home/WhyPanguard'));
 const HowItWorks = dynamic(() => import('@/components/home/HowItWorks'));
 const CTARoadmap = dynamic(() => import('@/components/home/CTARoadmap'));
-const DetectionHeritageBridge = dynamic(
-  () => import('@/components/home/DetectionHeritageBridge'),
-);
+const DetectionHeritageBridge = dynamic(() => import('@/components/home/DetectionHeritageBridge'));
 
 export default async function Home() {
   const t = await getTranslations('home');

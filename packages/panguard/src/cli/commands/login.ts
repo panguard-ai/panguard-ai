@@ -173,7 +173,9 @@ async function pollUntilDone(
   while (!isCancelled()) {
     if (Date.now() > deadlineMs) {
       console.error('');
-      console.error(`  ${c.critical(symbols.fail)} Login code expired. Please run \`pga login\` again.`);
+      console.error(
+        `  ${c.critical(symbols.fail)} Login code expired. Please run \`pga login\` again.`
+      );
       console.error('');
       return null;
     }

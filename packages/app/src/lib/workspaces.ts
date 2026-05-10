@@ -43,9 +43,7 @@ export interface WorkspaceContext {
   role: Role;
 }
 
-export async function requireWorkspaceBySlug(
-  slug: string,
-): Promise<WorkspaceContext | null> {
+export async function requireWorkspaceBySlug(slug: string): Promise<WorkspaceContext | null> {
   const supabase = await createClient();
   const {
     data: { user },

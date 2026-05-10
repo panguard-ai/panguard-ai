@@ -12,7 +12,7 @@ import type { Database } from '@/lib/types';
 export function createAdminClient() {
   if (!env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error(
-      '[panguard/app] SUPABASE_SERVICE_ROLE_KEY is not set — admin client unavailable',
+      '[panguard/app] SUPABASE_SERVICE_ROLE_KEY is not set — admin client unavailable'
     );
   }
   return createSupabaseClient<Database>(
@@ -23,6 +23,6 @@ export function createAdminClient() {
         persistSession: false,
         autoRefreshToken: false,
       },
-    },
+    }
   );
 }

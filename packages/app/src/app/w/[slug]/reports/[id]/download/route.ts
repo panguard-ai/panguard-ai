@@ -5,10 +5,7 @@ import { requireWorkspaceBySlug } from '@/lib/workspaces';
 
 const REPORTS_BUCKET = 'reports';
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { slug: string; id: string } },
-) {
+export async function GET(_req: NextRequest, { params }: { params: { slug: string; id: string } }) {
   const ctx = await requireWorkspaceBySlug(params.slug);
   if (!ctx) return NextResponse.json({ error: 'not_found' }, { status: 404 });
 

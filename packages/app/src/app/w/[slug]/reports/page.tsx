@@ -12,11 +12,7 @@ import { Table, TBody, TD, TH, THead, TR } from '@/components/ui/table';
 import { Download, FileText } from '@/components/icons';
 import { generateReport } from './actions';
 
-export default async function ReportsPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function ReportsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const ctx = await requireWorkspaceBySlug(slug);
   if (!ctx) notFound();
@@ -101,8 +97,8 @@ export default async function ReportsPage({
             No reports generated yet
           </h3>
           <p className="mt-1 text-sm text-text-muted">
-            Once you generate your first report it will appear here, ready to download or share
-            with auditors.
+            Once you generate your first report it will appear here, ready to download or share with
+            auditors.
           </p>
         </Card>
       ) : (

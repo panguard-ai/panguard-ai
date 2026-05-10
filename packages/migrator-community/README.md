@@ -88,12 +88,8 @@ const enrichment: Enrichment = {
   agent_source_type: 'tool_call',
   category: 'tool-poisoning',
   compliance: {
-    eu_ai_act: [
-      { article: '15', strength: 'primary', context: 'Robustness control' },
-    ],
-    owasp_agentic: [
-      { id: 'ASI06:2026', strength: 'primary', context: 'Tool misuse' },
-    ],
+    eu_ai_act: [{ article: '15', strength: 'primary', context: 'Robustness control' }],
+    owasp_agentic: [{ id: 'ASI06:2026', strength: 'primary', context: 'Tool misuse' }],
   },
   // ... rest of the contract — see types.ts for full shape
 };

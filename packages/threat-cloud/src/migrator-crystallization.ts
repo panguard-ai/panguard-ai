@@ -175,9 +175,8 @@ export interface MigratorTelemetryStats {
 }
 
 export function getMigratorTelemetryStats(db: Database.Database): MigratorTelemetryStats {
-  const total = (
-    db.prepare('SELECT COUNT(*) AS c FROM migrator_telemetry').get() as { c: number }
-  ).c;
+  const total = (db.prepare('SELECT COUNT(*) AS c FROM migrator_telemetry').get() as { c: number })
+    .c;
   const installs = (
     db.prepare('SELECT COUNT(DISTINCT install_id) AS c FROM migrator_telemetry').get() as {
       c: number;

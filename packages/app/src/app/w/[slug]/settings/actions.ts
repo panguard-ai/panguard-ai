@@ -77,7 +77,7 @@ export async function inviteMember(formData: FormData): Promise<void> {
 
   const admin = createAdminClient();
   const { data: invited, error: inviteErr } = await admin.auth.admin.inviteUserByEmail(
-    parsed.data.email.toLowerCase(),
+    parsed.data.email.toLowerCase()
   );
   if (inviteErr || !invited.user) {
     throw new ActionError(inviteErr?.message ?? 'invite_failed');

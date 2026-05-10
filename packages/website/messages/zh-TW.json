@@ -3289,7 +3289,17 @@
       "inquiryType": "選擇類型",
       "message": "我們能如何幫助你？"
     },
-    "inquiryTypes": ["一般詢問", "Pilot 試點 ($25K / 90 天)", "Enterprise ($150K–$500K)", "Founding F500 ($100K × 2 年)", "Sovereign AI ($5–20M)", "OEM 授權 ($2–10M)", "ATR Foundation Member ($10K/年)", "技術支援", "其他"],
+    "inquiryTypes": [
+      "一般詢問",
+      "Pilot 試點 ($25K / 90 天)",
+      "Enterprise ($150K–$500K)",
+      "Founding F500 ($100K × 2 年)",
+      "Sovereign AI ($5–20M)",
+      "OEM 授權 ($2–10M)",
+      "ATR Foundation Member ($10K/年)",
+      "技術支援",
+      "其他"
+    ],
     "submit": "發送訊息",
     "submitting": "發送中...",
     "successTitle": "訊息已發送。",

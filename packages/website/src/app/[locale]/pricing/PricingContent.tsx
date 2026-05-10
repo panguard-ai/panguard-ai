@@ -54,9 +54,7 @@ export default function PricingContent() {
             <div className="text-base sm:text-lg text-text-secondary max-w-3xl mx-auto mt-6 leading-[1.85] space-y-3">
               {isZh ? (
                 <>
-                  <p>
-                    四條商業軌道，對應四種不同的客戶與付費理由。
-                  </p>
+                  <p>四條商業軌道，對應四種不同的客戶與付費理由。</p>
                   <ul className="space-y-2 text-left max-w-2xl mx-auto">
                     <li>
                       <span className="text-text-primary font-semibold">Community（永久免費）</span>
@@ -67,7 +65,9 @@ export default function PricingContent() {
                       ——解決受監管產業的合規證據缺口與既有規則資產升級。
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Sovereign AI 國家級 reference</span>
+                      <span className="text-text-primary font-semibold">
+                        Sovereign AI 國家級 reference
+                      </span>
                       ——回應國家層級的 detection IP 主權需求。
                     </li>
                     <li>
@@ -81,23 +81,30 @@ export default function PricingContent() {
                 </>
               ) : (
                 <>
-                  <p>Four revenue tracks, mapped to four distinct customer types and reasons to pay.</p>
+                  <p>
+                    Four revenue tracks, mapped to four distinct customer types and reasons to pay.
+                  </p>
                   <ul className="space-y-2 text-left max-w-2xl mx-auto">
                     <li>
-                      <span className="text-text-primary font-semibold">Community (free forever)</span>
-                      {' '}— global sensor network and standard adoption pipeline, not a revenue stream.
+                      <span className="text-text-primary font-semibold">
+                        Community (free forever)
+                      </span>{' '}
+                      — global sensor network and standard adoption pipeline, not a revenue stream.
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Enterprise SaaS</span>
-                      {' '}— closes the compliance-evidence gap for regulated industries and migrates their existing rule assets into the AI agent era.
+                      <span className="text-text-primary font-semibold">Enterprise SaaS</span> —
+                      closes the compliance-evidence gap for regulated industries and migrates their
+                      existing rule assets into the AI agent era.
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Sovereign AI national reference</span>
-                      {' '}— addresses the detection-IP sovereignty gap at the nation-state level.
+                      <span className="text-text-primary font-semibold">
+                        Sovereign AI national reference
+                      </span>{' '}
+                      — addresses the detection-IP sovereignty gap at the nation-state level.
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Vendor OEM license</span>
-                      {' '}— for platform vendors already shipping ATR rules inside their own products.
+                      <span className="text-text-primary font-semibold">Vendor OEM license</span> —
+                      for platform vendors already shipping ATR rules inside their own products.
                     </li>
                   </ul>
                   <p className="text-sm text-text-muted pt-2">
@@ -508,7 +515,7 @@ export default function PricingContent() {
                 <p>
                   {isZh
                     ? '為什麼 Vanta、Drata 做不到：他們沒有自家 detection engine，也沒有 ATR 標準作為偵測層。Lakera、Apono 則缺乏完整堆疊。PanGuard 是目前唯一能把「偵測事件 → ATR 規則 → 合規條文」一條線串起來的方案。'
-                    : "Why Vanta and Drata cannot do this: they have no in-house detection engine, and they do not own ATR as the detection layer underneath. Lakera and Apono lack the full stack. PanGuard is the only product today that threads detection event → ATR rule → compliance article as a single audit-ready artefact."}
+                    : 'Why Vanta and Drata cannot do this: they have no in-house detection engine, and they do not own ATR as the detection layer underneath. Lakera and Apono lack the full stack. PanGuard is the only product today that threads detection event → ATR rule → compliance article as a single audit-ready artefact.'}
                 </p>
               </div>
 
@@ -558,7 +565,7 @@ export default function PricingContent() {
                 <p>
                   {isZh
                     ? '客戶可在 draft 規則公開前 30 天即取得，便於在攻擊曝光前完成內部部署測試。客戶在 Migrator 中精修出來的規則，也可以選擇回流到 ATR 上游——一旦 merge，這些規則會被 Cisco AI Defense、Microsoft AGT 等下游廠商共同採用，等於把貴公司的偵測知識資產推廣到整個生態系。'
-                    : "Customers receive draft rules 30 days before public release, allowing internal deployment testing before attacks become public. Rules refined inside Migrator can also be sent back upstream — once merged into ATR, those rules ship across the ecosystem to Cisco AI Defense, Microsoft AGT, and others, effectively distributing your detection IP across the industry."}
+                    : 'Customers receive draft rules 30 days before public release, allowing internal deployment testing before attacks become public. Rules refined inside Migrator can also be sent back upstream — once merged into ATR, those rules ship across the ecosystem to Cisco AI Defense, Microsoft AGT, and others, effectively distributing your detection IP across the industry.'}
                 </p>
               </div>
 
@@ -576,7 +583,7 @@ export default function PricingContent() {
                       ]
                     : [
                         'Early access to draft rules 30 days before public release',
-                        "Upstream contribution path: customer rules can be adopted by Cisco, Microsoft, and other downstream vendors",
+                        'Upstream contribution path: customer rules can be adopted by Cisco, Microsoft, and other downstream vendors',
                         'Priority rule update SLA within 4 hours (Community SLA is within 24 hours)',
                         'Roadmap vote and quarterly executive review',
                       ]
@@ -794,9 +801,7 @@ export default function PricingContent() {
                   <span className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage">
                     {isZh ? 'Path 3 · 商業合約' : 'Path 3 · Commercial'}
                   </span>
-                  <span className="text-sm font-semibold text-text-primary">
-                    $5–20M
-                  </span>
+                  <span className="text-sm font-semibold text-text-primary">$5–20M</span>
                   <span className="text-[11px] text-text-muted">
                     {isZh ? '多年期 reference' : 'Multi-year reference'}
                   </span>
@@ -894,12 +899,14 @@ export default function PricingContent() {
           <SectionTitle
             overline={isZh ? '範例稽核報告' : 'SAMPLE AUDIT REPORT'}
             title={
-              isZh ? 'Compliance Evidence 報告長什麼樣子' : 'What a Compliance Evidence report looks like'
+              isZh
+                ? 'Compliance Evidence 報告長什麼樣子'
+                : 'What a Compliance Evidence report looks like'
             }
             subtitle={
               isZh
                 ? '以下是 Enterprise 客戶每季收到的合規證據報告節錄。每筆偵測事件對應到 ATR 規則 ID，並串連到 EU AI Act、NIST AI RMF、ISO/IEC 42001 等框架的具體條文，可直接送進稽核流程。'
-                : "Below is an excerpt from the quarterly compliance evidence report Enterprise customers receive. Each detection is mapped to an ATR rule ID and threaded through specific articles in EU AI Act, NIST AI RMF, ISO/IEC 42001, and other frameworks — ready to submit directly to auditors."
+                : 'Below is an excerpt from the quarterly compliance evidence report Enterprise customers receive. Each detection is mapped to an ATR rule ID and threaded through specific articles in EU AI Act, NIST AI RMF, ISO/IEC 42001, and other frameworks — ready to submit directly to auditors.'
             }
           />
           <FadeInUp delay={0.2}>

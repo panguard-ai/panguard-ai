@@ -54,10 +54,7 @@ export default async function EventsPage({ params, searchParams }: Props) {
       <Card padding="md">
         <form className="flex flex-wrap items-end gap-3" method="get">
           <div>
-            <label
-              htmlFor="severity"
-              className="text-xs font-medium uppercase text-text-muted"
-            >
+            <label htmlFor="severity" className="text-xs font-medium uppercase text-text-muted">
               Severity
             </label>
             <select
@@ -95,9 +92,7 @@ export default async function EventsPage({ params, searchParams }: Props) {
       {result.rows.length === 0 ? (
         <Card padding="lg" className="text-center">
           <Terminal className="mx-auto h-8 w-8 text-brand-sage" />
-          <h3 className="mt-3 text-base font-semibold text-text-primary">
-            No events match
-          </h3>
+          <h3 className="mt-3 text-base font-semibold text-text-primary">No events match</h3>
           <p className="mt-1 text-sm text-text-muted">
             Try clearing filters or install the CLI to start streaming events.
           </p>

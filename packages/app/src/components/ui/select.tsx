@@ -11,22 +11,12 @@ interface Props extends SelectHTMLAttributes<HTMLSelectElement> {
   hint?: string;
 }
 
-export function Select({
-  label,
-  options,
-  hint,
-  id,
-  className = '',
-  ...rest
-}: Props) {
+export function Select({ label, options, hint, id, className = '', ...rest }: Props) {
   const selectId = id ?? rest.name;
   return (
     <div className="flex flex-col gap-1.5">
       {label ? (
-        <label
-          htmlFor={selectId}
-          className="text-sm font-medium text-text-secondary"
-        >
+        <label htmlFor={selectId} className="text-sm font-medium text-text-secondary">
           {label}
         </label>
       ) : null}

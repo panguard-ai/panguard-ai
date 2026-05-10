@@ -10,8 +10,7 @@ const SlugRegex = /^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/;
 const CreateWorkspaceInput = z.object({
   name: z.string().trim().min(2).max(64),
   slug: z.string().trim().regex(SlugRegex, {
-    message:
-      'Slug must be 2-40 chars, lowercase, start and end with a letter or number.',
+    message: 'Slug must be 2-40 chars, lowercase, start and end with a letter or number.',
   }),
 });
 
@@ -21,9 +20,7 @@ export interface CreateWorkspaceResult {
   error?: string;
 }
 
-export async function createWorkspace(
-  formData: FormData,
-): Promise<CreateWorkspaceResult> {
+export async function createWorkspace(formData: FormData): Promise<CreateWorkspaceResult> {
   const parsed = CreateWorkspaceInput.safeParse({
     name: formData.get('name'),
     slug: formData.get('slug'),

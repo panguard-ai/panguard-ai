@@ -55,13 +55,13 @@ supabase stop
 
 After `supabase start`, the CLI prints the local URLs and keys. The ones you need are:
 
-| Label                    | Example value                                |
-|--------------------------|----------------------------------------------|
-| `API URL`                | `http://localhost:54321`                     |
-| `Studio URL`             | `http://localhost:54323` (browse tables/SQL) |
-| `Inbucket URL`           | `http://localhost:54324` (catches magic-link emails) |
-| `anon key`               | `eyJ...` (public, safe in browser)           |
-| `service_role key`       | `eyJ...` (server-only — do not ship)         |
+| Label              | Example value                                        |
+| ------------------ | ---------------------------------------------------- |
+| `API URL`          | `http://localhost:54321`                             |
+| `Studio URL`       | `http://localhost:54323` (browse tables/SQL)         |
+| `Inbucket URL`     | `http://localhost:54324` (catches magic-link emails) |
+| `anon key`         | `eyJ...` (public, safe in browser)                   |
+| `service_role key` | `eyJ...` (server-only — do not ship)                 |
 
 Copy the anon and service_role keys into `packages/app/.env.local` (see section 4).
 

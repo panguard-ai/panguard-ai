@@ -486,9 +486,9 @@ export default function MigratorContent() {
                   </>
                 ) : (
                   <>
-                    <code className="text-xs">npm install -g @panguard-ai/migrator-community</code>
-                    . Sigma / YARA parsers, IR transformer, ATR YAML output, CLI.
-                    Self-host forever. Lead pipeline and sensor signal for the open standard.
+                    <code className="text-xs">npm install -g @panguard-ai/migrator-community</code>.
+                    Sigma / YARA parsers, IR transformer, ATR YAML output, CLI. Self-host forever.
+                    Lead pipeline and sensor signal for the open standard.
                   </>
                 )}
               </p>
@@ -614,13 +614,12 @@ export default function MigratorContent() {
               Ready to migrate your detection coverage?
             </h2>
             <p className="text-text-secondary mb-8 leading-relaxed">
-              Migrator Community v0.1.0 is live on npm under MIT — Sigma / YARA parsers,
-              IR, transformers, and CLI. Migrator Enterprise v0.1.0 ships the full quality
-              pipeline (Sigma + YARA wired to runtime today; 13 additional adapters — Snort,
-              Splunk SPL, Elastic EQL, Falco, Semgrep, CodeQL, CVE-NVD, GHSA, OSV, KEV, garak,
-              PyRIT, promptfoo — v0.2 enterprise release), 5-framework compliance auto-mapping,
-              6-tab web dashboard, and audit evidence packs. 90-day pilot available.
-              v1.0.0 GA target Q1 2027.
+              Migrator Community v0.1.0 is live on npm under MIT — Sigma / YARA parsers, IR,
+              transformers, and CLI. Migrator Enterprise v0.1.0 ships the full quality pipeline
+              (Sigma + YARA wired to runtime today; 13 additional adapters — Snort, Splunk SPL,
+              Elastic EQL, Falco, Semgrep, CodeQL, CVE-NVD, GHSA, OSV, KEV, garak, PyRIT, promptfoo
+              — v0.2 enterprise release), 5-framework compliance auto-mapping, 6-tab web dashboard,
+              and audit evidence packs. 90-day pilot available. v1.0.0 GA target Q1 2027.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a

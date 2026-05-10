@@ -21,9 +21,7 @@ export default async function OnboardingPage() {
 
   return (
     <main className="mx-auto max-w-lg px-6 py-16">
-      <h1 className="mb-2 text-2xl font-semibold text-text-primary">
-        {t('title')}
-      </h1>
+      <h1 className="mb-2 text-2xl font-semibold text-text-primary">{t('title')}</h1>
       <p className="mb-8 text-sm text-text-muted">{t('subtitle')}</p>
       <Card padding="lg">
         <form action={onCreate} className="space-y-5">

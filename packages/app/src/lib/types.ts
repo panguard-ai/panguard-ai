@@ -183,7 +183,18 @@ export interface Database {
       };
       device_codes: {
         Row: DeviceCode;
-        Insert: InsertOf<DeviceCode, 'id' | 'created_at' | 'scope' | 'polling_interval_s' | 'approved_at' | 'issued_api_key_id' | 'pending_plaintext' | 'user_id' | 'workspace_id'>;
+        Insert: InsertOf<
+          DeviceCode,
+          | 'id'
+          | 'created_at'
+          | 'scope'
+          | 'polling_interval_s'
+          | 'approved_at'
+          | 'issued_api_key_id'
+          | 'pending_plaintext'
+          | 'user_id'
+          | 'workspace_id'
+        >;
         Update: Partial<DeviceCode>;
         Relationships: [];
       };
@@ -195,7 +206,17 @@ export interface Database {
       };
       events: {
         Row: SecurityEvent;
-        Insert: InsertOf<SecurityEvent, 'id' | 'occurred_at' | 'ingested_at' | 'metadata' | 'rule_id' | 'target_hash' | 'payload_summary' | 'endpoint_id'>;
+        Insert: InsertOf<
+          SecurityEvent,
+          | 'id'
+          | 'occurred_at'
+          | 'ingested_at'
+          | 'metadata'
+          | 'rule_id'
+          | 'target_hash'
+          | 'payload_summary'
+          | 'endpoint_id'
+        >;
         Update: Partial<SecurityEvent>;
         Relationships: [];
       };
@@ -203,14 +224,32 @@ export interface Database {
         Row: Report;
         Insert: InsertOf<
           Report,
-          'id' | 'generated_at' | 'hmac_sha256' | 'storage_path' | 'size_bytes' | 'rules_loaded' | 'rules_mapped' | 'total_mappings'
+          | 'id'
+          | 'generated_at'
+          | 'hmac_sha256'
+          | 'storage_path'
+          | 'size_bytes'
+          | 'rules_loaded'
+          | 'rules_mapped'
+          | 'total_mappings'
         >;
         Update: Partial<Report>;
         Relationships: [];
       };
       audit_log: {
         Row: AuditLogRow;
-        Insert: InsertOf<AuditLogRow, 'id' | 'occurred_at' | 'metadata' | 'target_type' | 'target_id' | 'ip_address' | 'user_agent' | 'user_id' | 'workspace_id'>;
+        Insert: InsertOf<
+          AuditLogRow,
+          | 'id'
+          | 'occurred_at'
+          | 'metadata'
+          | 'target_type'
+          | 'target_id'
+          | 'ip_address'
+          | 'user_agent'
+          | 'user_id'
+          | 'workspace_id'
+        >;
         Update: Partial<AuditLogRow>;
         Relationships: [];
       };

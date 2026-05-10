@@ -26,9 +26,7 @@ export function LoginForm({ redirectParam }: { redirectParam: string | null }) {
   if (state?.ok && state.email) {
     return (
       <div className="space-y-4">
-        <InlineToast tone="success">
-          {t('linkSentBody', { email: state.email })}
-        </InlineToast>
+        <InlineToast tone="success">{t('linkSentBody', { email: state.email })}</InlineToast>
         <button
           type="button"
           onClick={() => setState(null)}
@@ -50,9 +48,7 @@ export function LoginForm({ redirectParam }: { redirectParam: string | null }) {
         label={t('emailLabel')}
         placeholder={t('emailPlaceholder')}
       />
-      {state?.error ? (
-        <InlineToast tone="error">{state.error}</InlineToast>
-      ) : null}
+      {state?.error ? <InlineToast tone="error">{state.error}</InlineToast> : null}
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? (
           <>

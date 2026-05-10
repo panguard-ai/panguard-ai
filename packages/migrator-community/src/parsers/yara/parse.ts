@@ -15,18 +15,9 @@
  */
 
 import { buildIR, buildPattern, buildSelection } from '../../ir/builder.js';
-import type {
-  IRCombinator,
-  IRMaturity,
-  IRPattern,
-  IRSelection,
-} from '../../ir/types.js';
+import type { IRCombinator, IRMaturity, IRPattern, IRSelection } from '../../ir/types.js';
 import { parseYaraCondition } from './condition-parser.js';
-import type {
-  YaraRule,
-  YaraParseResult,
-  YaraString,
-} from './types.js';
+import type { YaraRule, YaraParseResult, YaraString } from './types.js';
 
 function todayIsoSlashed(): string {
   const d = new Date();
@@ -55,7 +46,9 @@ function normalizeYaraDate(meta: YaraRule['meta'], warnings: string[]): string {
 
 const SEVERITY_KEYS = ['threat_level', 'severity', 'level'];
 
-function deriveSeverityFromMeta(meta: YaraRule['meta']): IRMaturity extends never ? never : 'critical' | 'high' | 'medium' | 'low' | 'informational' {
+function deriveSeverityFromMeta(
+  meta: YaraRule['meta']
+): IRMaturity extends never ? never : 'critical' | 'high' | 'medium' | 'low' | 'informational' {
   for (const k of SEVERITY_KEYS) {
     const v = meta[k];
     if (typeof v === 'number') {
@@ -67,7 +60,13 @@ function deriveSeverityFromMeta(meta: YaraRule['meta']): IRMaturity extends neve
     }
     if (typeof v === 'string') {
       const lower = v.toLowerCase();
-      if (lower === 'critical' || lower === 'high' || lower === 'medium' || lower === 'low' || lower === 'informational') {
+      if (
+        lower === 'critical' ||
+        lower === 'high' ||
+        lower === 'medium' ||
+        lower === 'low' ||
+        lower === 'informational'
+      ) {
         return lower;
       }
     }
@@ -79,7 +78,12 @@ function deriveMaturityFromMeta(meta: YaraRule['meta']): IRMaturity {
   const v = meta['maturity'] ?? meta['status'];
   if (typeof v === 'string') {
     const lower = v.toLowerCase();
-    if (lower === 'stable' || lower === 'experimental' || lower === 'test' || lower === 'deprecated') {
+    if (
+      lower === 'stable' ||
+      lower === 'experimental' ||
+      lower === 'test' ||
+      lower === 'deprecated'
+    ) {
       return lower;
     }
   }
@@ -183,8 +187,7 @@ export function parseYara(rule: YaraRule): YaraParseResult {
   const description =
     typeof rule.meta['description'] === 'string' && rule.meta['description'].length > 0
       ? (rule.meta['description'] as string)
-      : (warnings.push('YARA rule has no meta.description'),
-        `YARA rule ${rule.name}`);
+      : (warnings.push('YARA rule has no meta.description'), `YARA rule ${rule.name}`);
 
   const author =
     typeof rule.meta['author'] === 'string' && rule.meta['author'].length > 0

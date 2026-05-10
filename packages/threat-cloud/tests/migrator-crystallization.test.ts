@@ -47,7 +47,12 @@ function ev(install_id: string, hashes: string[], runId?: string): MigratorTelem
       // Derive atr_id from condition_hash so the same hash always maps to
       // the same atr_id across tenants (matches real Migrator behavior:
       // identical Sigma rules produce identical ATR ids).
-      atr_id: `ATR-2026-${h.replace(/[^0-9]/g, '').padStart(5, '0').slice(0, 5) || '00000'}`,
+      atr_id: `ATR-2026-${
+        h
+          .replace(/[^0-9]/g, '')
+          .padStart(5, '0')
+          .slice(0, 5) || '00000'
+      }`,
       category: 'tool-poisoning',
       severity: 'high',
       has_agent_analogue: true,

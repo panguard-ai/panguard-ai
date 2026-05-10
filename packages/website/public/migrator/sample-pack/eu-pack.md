@@ -9,12 +9,12 @@
 
 ## Audit Signature (auditor verifies these)
 
-| Field | Value |
-|---|---|
-| Pack SHA-256 | `ef437f8f184a834829bc9e3be565662d3849f29d963fae302922f8f86748d7ed` |
+| Field             | Value                                                              |
+| ----------------- | ------------------------------------------------------------------ |
+| Pack SHA-256      | `ef437f8f184a834829bc9e3be565662d3849f29d963fae302922f8f86748d7ed` |
 | Rules Merkle Root | `f1c558fdd9c38230be48a3c5855100862dc99b5d0c9ff285048388c2df29a6ad` |
-| Algorithm | sha256 |
-| Signed at | 2026-05-04T15:02:42.037Z |
+| Algorithm         | sha256                                                             |
+| Signed at         | 2026-05-04T15:02:42.037Z                                           |
 
 **Auditor verification:** recompute the pack SHA-256 over the JSON form of this pack with the `signature` block excluded; recompute the merkle root by SHA-256-pairing the per-rule hashes (sorted by `rule_id`). Both should match the values above. The companion JSON file (`eu-ai-act-evidence-pack.json`) is the canonical input.
 
@@ -33,60 +33,60 @@
 **Rules with at least one eu_ai_act mapping:** 50
 
 | Reference | Rules | Primary | Secondary | Partial |
-|---|---|---|---|---|
-| 12 | 18 | 7 | 1 | 10 |
-| 14 | 13 | 13 | 0 | 0 |
-| 15 | 40 | 40 | 0 | 0 |
-| 50 | 4 | 2 | 2 | 0 |
-| 9 | 4 | 4 | 0 | 0 |
+| --------- | ----- | ------- | --------- | ------- |
+| 12        | 18    | 7       | 1         | 10      |
+| 14        | 13    | 13      | 0         | 0       |
+| 15        | 40    | 40      | 0         | 0       |
+| 50        | 4     | 2       | 2         | 0       |
+| 9         | 4     | 4       | 0         | 0       |
 
 ### OWASP Agentic Top 10 (2026)
 
 **Rules with at least one owasp_agentic mapping:** 40
 
-| Reference | Rules | Primary | Secondary | Partial |
-|---|---|---|---|---|
-| ASI01:2026 | 3 | 1 | 2 | 0 |
-| ASI02:2026 | 4 | 4 | 0 | 0 |
-| ASI04:2026 | 2 | 2 | 0 | 0 |
-| ASI05:2026 | 17 | 17 | 0 | 0 |
-| ASI06:2026 | 21 | 18 | 3 | 0 |
-| ASI07:2026 | 4 | 3 | 1 | 0 |
-| ASI08:2026 | 1 | 1 | 0 | 0 |
-| ASI09:2026 | 3 | 2 | 1 | 0 |
+| Reference  | Rules | Primary | Secondary | Partial |
+| ---------- | ----- | ------- | --------- | ------- |
+| ASI01:2026 | 3     | 1       | 2         | 0       |
+| ASI02:2026 | 4     | 4       | 0         | 0       |
+| ASI04:2026 | 2     | 2       | 0         | 0       |
+| ASI05:2026 | 17    | 17      | 0         | 0       |
+| ASI06:2026 | 21    | 18      | 3         | 0       |
+| ASI07:2026 | 4     | 3       | 1         | 0       |
+| ASI08:2026 | 1     | 1       | 0         | 0       |
+| ASI09:2026 | 3     | 2       | 1         | 0       |
 
 ### OWASP LLM Top 10 (2025)
 
 **Rules with at least one owasp_llm mapping:** 36
 
-| Reference | Rules | Primary | Secondary | Partial |
-|---|---|---|---|---|
-| LLM01:2025 | 4 | 3 | 1 | 0 |
-| LLM02:2025 | 11 | 11 | 0 | 0 |
-| LLM03:2025 | 3 | 3 | 0 | 0 |
-| LLM06:2025 | 19 | 15 | 3 | 1 |
+| Reference  | Rules | Primary | Secondary | Partial |
+| ---------- | ----- | ------- | --------- | ------- |
+| LLM01:2025 | 4     | 3       | 1         | 0       |
+| LLM02:2025 | 11    | 11      | 0         | 0       |
+| LLM03:2025 | 3     | 3       | 0         | 0       |
+| LLM06:2025 | 19    | 15      | 3         | 1       |
 
 ### NIST AI RMF 1.0
 
 **Rules with at least one nist_ai_rmf mapping:** 50
 
-| Reference | Rules | Primary | Secondary | Partial |
-|---|---|---|---|---|
-| Govern::GV.1.1 | 10 | 0 | 0 | 10 |
-| Manage::MG.2.3 | 18 | 18 | 0 | 0 |
-| Manage::MG.3.2 | 2 | 2 | 0 | 0 |
-| Manage::MG.4.1 | 8 | 8 | 0 | 0 |
-| Manage::MG.4.2 | 4 | 4 | 0 | 0 |
-| Measure::MS.2.7 | 4 | 4 | 0 | 0 |
-| Measure::MS.3.3 | 4 | 4 | 0 | 0 |
+| Reference       | Rules | Primary | Secondary | Partial |
+| --------------- | ----- | ------- | --------- | ------- |
+| Govern::GV.1.1  | 10    | 0       | 0         | 10      |
+| Manage::MG.2.3  | 18    | 18      | 0         | 0       |
+| Manage::MG.3.2  | 2     | 2       | 0         | 0       |
+| Manage::MG.4.1  | 8     | 8       | 0         | 0       |
+| Manage::MG.4.2  | 4     | 4       | 0         | 0       |
+| Measure::MS.2.7 | 4     | 4       | 0         | 0       |
+| Measure::MS.3.3 | 4     | 4       | 0         | 0       |
 
 ### ISO/IEC 42001:2023
 
 **Rules with at least one iso_42001 mapping:** 33
 
 | Reference | Rules | Primary | Secondary | Partial |
-|---|---|---|---|---|
-| 8.4 | 33 | 33 | 0 | 0 |
+| --------- | ----- | ------- | --------- | ------- |
+| 8.4       | 33    | 33      | 0         | 0       |
 
 ## Per-Rule Detail
 
@@ -1610,4 +1610,3 @@ Each entry includes the rule SHA-256 (tamper-evidence), provenance, and full com
   - **10 rules** are auto-generated placeholders that retain the original Sigma/YARA endpoint detection fields. These rules are schema-valid and can be deployed, but will only fire on host OS event telemetry, not on agent runtime events. Each carries a `needs_human_review` marker explicitly listing the review items.
 - The migrator deliberately preserves rules with no agent analogue (`has_agent_analogue: false`) rather than fabricate translations. These rules document the operator's detection coverage but are not expected to activate against agent telemetry.
 - For full audit-grade detection coverage, replace placeholder rules with hand-crafted enrichments (LLM-assisted or manual review by a security engineer).
-

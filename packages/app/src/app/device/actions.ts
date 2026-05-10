@@ -7,9 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requireWorkspaceBySlug } from '@/lib/workspaces';
 
 const ApproveInput = z.object({
-  userCode: z
-    .string()
-    .regex(/^[A-Z0-9]{4}-[A-Z0-9]{4}$/, 'invalid code format'),
+  userCode: z.string().regex(/^[A-Z0-9]{4}-[A-Z0-9]{4}$/, 'invalid code format'),
   workspaceSlug: z.string(),
 });
 

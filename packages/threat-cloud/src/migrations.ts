@@ -346,9 +346,7 @@ export const migrations: readonly Migration[] = [
       db.exec(
         `CREATE INDEX IF NOT EXISTS idx_migrator_tel_created ON migrator_telemetry(created_at)`
       );
-      db.exec(
-        `CREATE INDEX IF NOT EXISTS idx_migrator_tel_atr ON migrator_telemetry(atr_id)`
-      );
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_migrator_tel_atr ON migrator_telemetry(atr_id)`);
     },
   },
   {

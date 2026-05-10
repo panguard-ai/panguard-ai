@@ -101,10 +101,7 @@ export interface ScanCloudEvent {
  * Fire-and-forget. Gated by the same telemetry consent as reportTelemetry.
  * Importing ThreatCloudClient lazily so non-cloud paths never pay the cost.
  */
-export async function reportScanToCloud(
-  enabled: boolean,
-  event: ScanCloudEvent
-): Promise<void> {
+export async function reportScanToCloud(enabled: boolean, event: ScanCloudEvent): Promise<void> {
   if (!enabled) return;
   try {
     const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');

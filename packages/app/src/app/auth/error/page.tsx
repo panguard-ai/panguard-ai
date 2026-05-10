@@ -16,14 +16,10 @@ export default async function AuthErrorPage({ searchParams }: Props) {
           <AlertTriangle className="h-6 w-6 text-status-danger" />
         </div>
         <div>
-          <h1 className="text-2xl font-semibold text-text-primary">
-            {t('errorTitle')}
-          </h1>
+          <h1 className="text-2xl font-semibold text-text-primary">{t('errorTitle')}</h1>
           <p className="mt-2 text-sm text-text-muted">{t('errorBody')}</p>
           {searchParams.reason ? (
-            <p className="mt-2 text-xs text-text-muted font-mono">
-              {searchParams.reason}
-            </p>
+            <p className="mt-2 text-xs text-text-muted font-mono">{searchParams.reason}</p>
           ) : null}
         </div>
         <Link

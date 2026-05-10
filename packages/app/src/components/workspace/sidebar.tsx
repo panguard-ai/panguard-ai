@@ -1,11 +1,5 @@
 import Link from 'next/link';
-import {
-  FileText,
-  LayoutDashboard,
-  ListOrdered,
-  Settings,
-  Shield,
-} from '@/components/icons';
+import { FileText, LayoutDashboard, ListOrdered, Settings, Shield } from '@/components/icons';
 
 interface SidebarProps {
   slug: string;
@@ -29,10 +23,7 @@ export function Sidebar({ slug, activePath }: SidebarProps) {
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3">
         {items.map(({ href, label, icon: Icon, match }) => {
-          const isActive =
-            href === base
-              ? activePath === base
-              : activePath.startsWith(match);
+          const isActive = href === base ? activePath === base : activePath.startsWith(match);
           return (
             <Link
               key={href}

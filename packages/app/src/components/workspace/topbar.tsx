@@ -16,9 +16,7 @@ export function Topbar({ workspace, allWorkspaces, userEmail }: Props) {
         <WorkspaceSwitcher current={workspace} options={allWorkspaces} />
       </div>
       <div className="flex items-center gap-3">
-        <span className="hidden text-xs text-text-muted sm:inline">
-          {userEmail}
-        </span>
+        <span className="hidden text-xs text-text-muted sm:inline">{userEmail}</span>
         <form action={signOut}>
           <button
             type="submit"

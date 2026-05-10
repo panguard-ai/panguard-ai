@@ -34,7 +34,7 @@ export async function updateSession(request: NextRequest): Promise<{
           response.cookies.set({ name, value: '', ...options });
         },
       },
-    },
+    }
   );
 
   const {

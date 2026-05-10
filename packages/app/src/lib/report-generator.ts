@@ -106,7 +106,14 @@ function findRulesDir(): string | null {
   } catch {
     /* fall through */
   }
-  const monorepoCandidate = resolve(process.cwd(), '..', '..', 'node_modules', 'agent-threat-rules', 'rules');
+  const monorepoCandidate = resolve(
+    process.cwd(),
+    '..',
+    '..',
+    'node_modules',
+    'agent-threat-rules',
+    'rules'
+  );
   try {
     if (statSync(monorepoCandidate).isDirectory()) return monorepoCandidate;
   } catch {
@@ -262,7 +269,11 @@ function renderMarkdown(cov: CoverageSummary, orgName: string, integrityFooter: 
   for (const id of Array.from(cov.byIdentifier.keys()).sort()) {
     const d = cov.byIdentifier.get(id);
     if (!d) continue;
-    lines.push(`### ${id}`, `*${d.count} rule${d.count === 1 ? '' : 's'} address this control*`, '');
+    lines.push(
+      `### ${id}`,
+      `*${d.count} rule${d.count === 1 ? '' : 's'} address this control*`,
+      ''
+    );
     for (const l of d.context) lines.push(`- ${l}`);
     lines.push('');
   }
@@ -273,7 +284,7 @@ function renderJson(
   cov: CoverageSummary,
   orgName: string,
   hash: string,
-  signature: string | null,
+  signature: string | null
 ): string {
   const byIdentifier: Record<string, { count: number; context: string[] }> = {};
   for (const [k, v] of cov.byIdentifier.entries()) byIdentifier[k] = v;
@@ -289,7 +300,7 @@ function renderJson(
       integrity: { sha256: hash, ...(signature ? { hmac_sha256: signature } : {}) },
     },
     null,
-    2,
+    2
   );
 }
 
@@ -297,7 +308,7 @@ async function renderPdf(
   cov: CoverageSummary,
   orgName: string,
   hash: string,
-  signature: string | null,
+  signature: string | null
 ): Promise<Buffer> {
   const mod = (await import('pdfkit')) as unknown as { default: typeof import('pdfkit') };
   const PDFDocument = mod.default;
@@ -329,7 +340,9 @@ async function renderPdf(
   const meta: [string, string][] = [
     ['Framework', fw.name],
     ['Authority', fw.authority],
-    ...(fw.enforcementDate ? ([['Enforcement date', fw.enforcementDate]] as [string, string][]) : []),
+    ...(fw.enforcementDate
+      ? ([['Enforcement date', fw.enforcementDate]] as [string, string][])
+      : []),
     ['Organisation', orgName],
     ['Report date', today],
     ['ATR rules', String(cov.totalRules)],
@@ -346,21 +359,28 @@ async function renderPdf(
   doc.font('Helvetica').fontSize(10);
 
   if (cov.mappedRules === 0) {
-    doc.moveDown(1).font('Helvetica-Oblique').text(
-      'Mapping in progress. No rules yet map to this framework.',
-    );
+    doc
+      .moveDown(1)
+      .font('Helvetica-Oblique')
+      .text('Mapping in progress. No rules yet map to this framework.');
     doc.end();
     return done;
   }
 
-  doc.addPage().fontSize(14).font('Helvetica-Bold').text(`Mapping by ${fw.identifierField}`).moveDown(0.5);
+  doc
+    .addPage()
+    .fontSize(14)
+    .font('Helvetica-Bold')
+    .text(`Mapping by ${fw.identifierField}`)
+    .moveDown(0.5);
   for (const id of Array.from(cov.byIdentifier.keys()).sort()) {
     const d = cov.byIdentifier.get(id);
     if (!d) continue;
     doc.fontSize(12).font('Helvetica-Bold').text(id);
-    doc.fontSize(9).font('Helvetica-Oblique').text(
-      `${d.count} rule${d.count === 1 ? '' : 's'} address this control`,
-    );
+    doc
+      .fontSize(9)
+      .font('Helvetica-Oblique')
+      .text(`${d.count} rule${d.count === 1 ? '' : 's'} address this control`);
     doc.moveDown(0.3).fontSize(10).font('Helvetica');
     for (const line of d.context) doc.text(`  • ${line}`, { paragraphGap: 3 });
     doc.moveDown(0.5);
@@ -387,7 +407,7 @@ export interface GenerateReportOutput {
 }
 
 export async function generateComplianceReport(
-  input: GenerateReportInput,
+  input: GenerateReportInput
 ): Promise<GenerateReportOutput> {
   const fw = FRAMEWORKS[input.framework];
   if (!fw) throw new Error(`Unknown framework: ${input.framework}`);

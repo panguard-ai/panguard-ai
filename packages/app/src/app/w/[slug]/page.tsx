@@ -17,11 +17,7 @@ const severityTone: Record<Severity, 'safe' | 'caution' | 'alert' | 'danger'> = 
   critical: 'danger',
 };
 
-export default async function OverviewPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function OverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const ctx = await requireWorkspaceBySlug(slug);
   if (!ctx) notFound();
@@ -47,9 +43,7 @@ export default async function OverviewPage({
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-text-primary">
-          {t('overviewTitle')}
-        </h1>
+        <h1 className="text-2xl font-semibold text-text-primary">{t('overviewTitle')}</h1>
         <p className="mt-1 text-sm text-text-muted">
           {ctx.workspace.name} — live signals from your endpoints.
         </p>
@@ -58,12 +52,8 @@ export default async function OverviewPage({
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.label}>
-            <p className="text-xs uppercase tracking-wide text-text-muted">
-              {s.label}
-            </p>
-            <p className="mt-2 font-display text-3xl text-text-primary">
-              {s.value}
-            </p>
+            <p className="text-xs uppercase tracking-wide text-text-muted">{s.label}</p>
+            <p className="mt-2 font-display text-3xl text-text-primary">{s.value}</p>
           </Card>
         ))}
       </div>
@@ -72,7 +62,11 @@ export default async function OverviewPage({
         <CardHeader
           title="Recent events"
           subtitle="Latest 10 events across all endpoints"
-          action={<Button variant="ghost" href={`/w/${ctx.workspace.slug}/events`}>View all</Button>}
+          action={
+            <Button variant="ghost" href={`/w/${ctx.workspace.slug}/events`}>
+              View all
+            </Button>
+          }
         />
         {recent.rows.length === 0 ? (
           <EmptyEvents slug={ctx.workspace.slug} />
@@ -109,12 +103,10 @@ function EmptyEvents({ slug }: { slug: string }) {
   return (
     <div className="rounded-xl border border-dashed border-border bg-surface-2 p-8 text-center">
       <Terminal className="mx-auto h-8 w-8 text-brand-sage" />
-      <h3 className="mt-3 text-base font-semibold text-text-primary">
-        No events yet
-      </h3>
+      <h3 className="mt-3 text-base font-semibold text-text-primary">No events yet</h3>
       <p className="mt-1 text-sm text-text-muted">
-        Install the CLI and run <kbd>pga login --workspace {slug}</kbd> on a
-        developer machine to start streaming events.
+        Install the CLI and run <kbd>pga login --workspace {slug}</kbd> on a developer machine to
+        start streaming events.
       </p>
       <div className="mt-4">
         <Button variant="secondary" size="sm" href={`/w/${slug}/settings`}>
