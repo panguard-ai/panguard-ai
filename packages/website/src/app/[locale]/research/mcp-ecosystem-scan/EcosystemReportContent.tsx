@@ -182,7 +182,7 @@ export default function EcosystemReportContent() {
               <ul className="list-disc list-inside space-y-1 ml-4">
                 <li>
                   <strong className="text-text-primary">{STATS.atrRules} ATR rules</strong> with{' '}
-                  {STATS.atrPatterns}+ detection patterns across 9 threat categories
+                  {STATS.atrPatterns}+ detection patterns across 8 threat categories
                 </li>
                 <li>
                   <strong className="text-text-primary">Secret detection</strong>: AWS keys, GitHub

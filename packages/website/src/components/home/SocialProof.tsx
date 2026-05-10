@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { STATS } from '@/lib/stats';
 
 /**
  * Upstream adopters only. Strict rules:
@@ -12,8 +13,8 @@ import { useTranslations } from 'next-intl';
  *   The OWASP LLM Top 10 official repo PR is still pending.
  */
 const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[] = [
-  { name: 'Microsoft AGT', detail: 'ATR example merged', highlight: true },
-  { name: 'Cisco AI Defense', detail: '34 ATR rules merged', highlight: true },
+  { name: 'Cisco AI Defense', detail: `${STATS.adoption.ciscoRulesMerged} ATR rules merged (PR #79 + #99)`, highlight: true },
+  { name: 'Microsoft AGT', detail: `${STATS.adoption.microsoftRulesMerged} ATR rules merged (PR #908 + #1277)`, highlight: true },
   { name: 'NVIDIA Garak', detail: '97.1% recall · PR open' },
 ];
 

@@ -123,8 +123,8 @@ export const LAYERS: readonly Layer[] = [
     },
     status: 'shipped',
     what: {
-      en: 'L2 Audit inspects the code and configs an agent is about to trust, before it runs. Two scan paths: MCP config JSON (claude_desktop_config.json, .cursor/mcp.json) for runtime protection rules; SKILL.md files for skill-marketplace prompt injection and tool poisoning. Same 324 ATR rules, different regex subsets per scan target.',
-      zh: 'L2 稽核在 agent 執行前檢查它即將信任的程式碼與配置。兩條掃描路徑:MCP config JSON(claude_desktop_config.json、.cursor/mcp.json)跑 runtime protection rules;SKILL.md 檔跑 skill 市場的 prompt injection 與 tool poisoning。同一批 324 ATR 規則,每種 scan target 用不同 regex 子集。',
+      en: 'L2 Audit inspects the code and configs an agent is about to trust, before it runs. Two scan paths: MCP config JSON (claude_desktop_config.json, .cursor/mcp.json) for runtime protection rules; SKILL.md files for skill-marketplace prompt injection and tool poisoning. Same 330 ATR rules, different regex subsets per scan target.',
+      zh: 'L2 稽核在 agent 執行前檢查它即將信任的程式碼與配置。兩條掃描路徑：MCP config JSON（claude_desktop_config.json、.cursor/mcp.json）跑 runtime protection rules；SKILL.md 檔跑 skill 市場的 prompt injection 與 tool poisoning。同一批 330 條 ATR 規則，依不同 scan target 套用不同的 regex 子集。',
     },
     why: {
       en: 'One malicious skill install = agent hijack. The postmark-mcp incident silently forwarded 15,000 emails/day for months before detection. Scan before you trust the code an agent is about to run.',
@@ -135,12 +135,12 @@ export const LAYERS: readonly Layer[] = [
       zh: '以 regex 為主的 ATR 引擎,可選 LLM 語意層。規則以 YAML 儲存,有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。Microsoft AGT + Cisco AI Defense 已把這些規則當作參考偵測包。',
     },
     proof: {
-      en: '324 ATR rules (MIT licensed) · 97.1% recall on NVIDIA Garak (666 adversarial prompts) · 96.9% recall / 100% precision / 0% FP on 498 real-world SKILL.md samples · 0.48% FP on 3,115 wild Skills.sh packages · Merged into Microsoft Agent Governance Toolkit #908 and Cisco AI Defense skill-scanner #79 (34 rules).',
-      zh: '311 條 ATR 規則(MIT 授權)· NVIDIA Garak 97.1% 召回(666 對抗 prompt)· 498 個真實 SKILL.md 樣本 96.9% 召回 / 100% 精度 / 0% FP · 3,115 個野外 Skills.sh 套件 0.48% FP · Merge 進 Microsoft Agent Governance Toolkit #908 與 Cisco AI Defense skill-scanner #79(34 條規則)。',
+      en: '330 ATR rules (MIT licensed) · 97.1% recall on NVIDIA Garak (666 adversarial prompts) · 96.9% recall / 100% precision / 0% FP on 498 real-world SKILL.md samples · 0.48% FP on 3,115 wild Skills.sh packages · Cisco AI Defense ships full pack via PR #79 + #99; Microsoft AGT ships 287 rules via PR #908 + #1277.',
+      zh: '330 條 ATR 規則（MIT 授權）· NVIDIA Garak 97.1% 召回（666 個對抗 prompt）· 498 個真實 SKILL.md 樣本 96.9% 召回 / 100% 精度 / 0% FP · 3,115 個野外 Skills.sh 套件 0.48% FP · Cisco AI Defense 透過 PR #79 + #99 引入完整 330 條規則；Microsoft AGT 透過 PR #908 + #1277 引入 287 條。',
     },
     proofShort: {
-      en: '311 rules · 97.1% Garak recall · 0.48% FP',
-      zh: '311 規則 · Garak 97.1% 召回 · 0.48% FP',
+      en: '330 rules · 97.1% Garak recall · 0.48% FP',
+      zh: '330 條規則 · Garak 97.1% 召回 · 0.48% FP',
     },
     tryIt: {
       intro: {
@@ -177,19 +177,19 @@ export const LAYERS: readonly Layer[] = [
     ],
     ecosystem: [
       {
-        label: 'Microsoft Agent Governance Toolkit #908',
-        href: 'https://github.com/microsoft/agent-governance-toolkit/pull/908',
+        label: 'Microsoft Agent Governance Toolkit #908 + #1277',
+        href: 'https://github.com/microsoft/agent-governance-toolkit/pull/1277',
         context: {
-          en: 'Merged: ATR community security rules reference example for PolicyEvaluator',
-          zh: '已 merge:PolicyEvaluator 的 ATR 社群安全規則參考範例',
+          en: 'Merged: 287 ATR rules + weekly auto-sync workflow into AGT production',
+          zh: '已合併：287 條 ATR 規則 + 每週自動同步 workflow 進入 AGT 生產環境',
         },
       },
       {
-        label: 'Cisco AI Defense skill-scanner #79',
-        href: 'https://github.com/cisco-ai-defense/skill-scanner/pull/79',
+        label: 'Cisco AI Defense skill-scanner #79 + #99',
+        href: 'https://github.com/cisco-ai-defense/skill-scanner/pull/99',
         context: {
-          en: 'Merged: 34 ATR rules in official rule pack',
-          zh: '已 merge:34 條 ATR 規則進入官方規則包',
+          en: 'Merged: full 330-rule ATR pack in skill-scanner production',
+          zh: '已合併：完整 330 條 ATR 規則進入 skill-scanner 生產環境',
         },
       },
       {
