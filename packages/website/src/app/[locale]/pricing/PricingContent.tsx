@@ -752,6 +752,58 @@ export default function PricingContent() {
               </a>
             </div>
           </FadeInUp>
+
+          <FadeInUp delay={0.3}>
+            <div className="mt-10 max-w-4xl mx-auto">
+              <p className="text-center text-xs uppercase tracking-wider font-semibold text-brand-sage mb-4">
+                {isZh ? '開始合作' : 'Start engagement'}
+              </p>
+              <div className="grid sm:grid-cols-3 gap-3">
+                <Link
+                  href="/contact?tier=sovereign&path=1"
+                  className="flex flex-col items-center text-center gap-1 px-5 py-4 rounded-xl border border-brand-sage/40 hover:border-brand-sage hover:bg-brand-sage/5 transition-colors"
+                >
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage">
+                    {isZh ? 'Path 1 · 標準引用' : 'Path 1 · Standards Reference'}
+                  </span>
+                  <span className="text-sm font-semibold text-text-primary">
+                    {isZh ? '申請正式對接 · $0' : 'Request reference · $0'}
+                  </span>
+                  <span className="text-[11px] text-text-muted">
+                    {isZh ? '1–2 週可上線' : '1–2 weeks to live'}
+                  </span>
+                </Link>
+                <Link
+                  href="/contact?tier=sovereign&path=2"
+                  className="flex flex-col items-center text-center gap-1 px-5 py-4 rounded-xl border border-blue-400/40 hover:border-blue-400 hover:bg-blue-400/5 transition-colors"
+                >
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-blue-400">
+                    {isZh ? 'Path 2 · 技術聯合驗證' : 'Path 2 · Technical Co-eval'}
+                  </span>
+                  <span className="text-sm font-semibold text-text-primary">
+                    {isZh ? '啟動 90 天驗證 · $0' : 'Start 90-day eval · $0'}
+                  </span>
+                  <span className="text-[11px] text-text-muted">
+                    {isZh ? '第三方驗證報告' : 'Third-party report'}
+                  </span>
+                </Link>
+                <Link
+                  href="/contact?tier=sovereign&path=3"
+                  className="flex flex-col items-center text-center gap-1 px-5 py-4 rounded-xl border border-brand-sage bg-brand-sage/10 hover:bg-brand-sage/20 transition-colors"
+                >
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage">
+                    {isZh ? 'Path 3 · 商業合約' : 'Path 3 · Commercial'}
+                  </span>
+                  <span className="text-sm font-semibold text-text-primary">
+                    $5–20M
+                  </span>
+                  <span className="text-[11px] text-text-muted">
+                    {isZh ? '多年期 reference' : 'Multi-year reference'}
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </FadeInUp>
         </div>
       </SectionWrapper>
 

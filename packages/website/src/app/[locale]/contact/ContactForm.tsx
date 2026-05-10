@@ -9,12 +9,12 @@ const inputStyles =
   'w-full bg-surface-1 border border-border rounded-full px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors';
 
 const TIER_TO_INQUIRY_INDEX: Record<string, number> = {
-  pilot: 0,
-  enterprise: 0,
-  'founding-f500': 0,
-  sovereign: 2,
-  oem: 2,
-  'atr-member': 2,
+  pilot: 1,
+  enterprise: 2,
+  'founding-f500': 3,
+  sovereign: 4,
+  oem: 5,
+  'atr-member': 6,
 };
 
 export default function ContactForm() {
@@ -48,10 +48,12 @@ export default function ContactForm() {
       'atr-member': 'ATR Foundation Member ($10K/year)',
     };
     const label = tierLabel[tier];
+    const sovereignPath = tier === 'sovereign' ? searchParams?.get('path') : null;
+    const pathLine = sovereignPath ? `Sovereign Path: ${sovereignPath}\n` : '';
     setForm((prev) => ({
       ...prev,
       type: prefilledType || prev.type,
-      message: prev.message || (label ? `Tier: ${label}\n\n` : ''),
+      message: prev.message || (label ? `Tier: ${label}\n${pathLine}\n` : ''),
     }));
   }, [searchParams, inquiryTypes]);
 
