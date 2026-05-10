@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/security-hardening",
-  "version": "1.5.5",
+  "version": "1.5.6",
   "type": "module",
   "description": "Security hardening library for Panguard / Panguard 安全強化函式庫",
   "main": "./dist/index.js",
