@@ -98,6 +98,8 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
       }
     }
 
+    const configFileExists = existsSync(status.configPath);
+
     const basicItems: StatusItem[] = [
       {
         label: lang === 'zh-TW' ? '\u4E3B\u6A5F' : 'Hostname',
@@ -114,11 +116,20 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
           : c.dim(lang === 'zh-TW' ? '\u672A\u904B\u884C' : 'Not running'),
         status: guardRunning ? 'safe' : undefined,
       },
-      {
-        label: lang === 'zh-TW' ? '\u914D\u7F6E\u72C0\u614B' : 'Config',
-        value: c.caution(lang === 'zh-TW' ? '\u672A\u521D\u59CB\u5316' : 'Not initialized'),
-        status: 'caution' as const,
-      },
+      configFileExists
+        ? {
+            label: lang === 'zh-TW' ? '\u914D\u7F6E\u72C0\u614B' : 'Config',
+            value: c.dim(
+              lang === 'zh-TW'
+                ? '\u90E8\u5206\u5B8C\u6210 \u00B7 \u8DD1 pga setup \u4EE5\u5B8C\u6210'
+                : 'Partial \u00B7 run pga setup to finish'
+            ),
+          }
+        : {
+            label: lang === 'zh-TW' ? '\u914D\u7F6E\u72C0\u614B' : 'Config',
+            value: c.caution(lang === 'zh-TW' ? '\u672A\u521D\u59CB\u5316' : 'Not initialized'),
+            status: 'caution' as const,
+          },
     ];
 
     console.log(
