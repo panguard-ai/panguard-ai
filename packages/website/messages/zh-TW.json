@@ -372,7 +372,7 @@
       "title": "用的人越多，每個人就越安全。",
       "desc": "每一台裝了 Panguard 的機器都是一個感測節點。偵測到新型攻擊時，會自動把匿名化的攻擊特徵回傳 Threat Cloud。Threat Cloud 自動產出 ATR（Agent Threat Rules），全世界第一套專門偵測 AI Agent 攻擊的開源規則標準。Prompt injection、tool poisoning、context exfiltration——全由 ATR 規則偵測。",
       "descHighlight": "你不只是被保護的人，你也是守護者。",
-      "privacy1": "離開你機器的只有匿名威脅特徵——零原始資料、零遙測、TLS 1.3 全程加密。你的 log、程式碼、資料永遠留在你手上。",
+      "privacy1": "離開你機器的只有匿名威脅特徵——零原始資料離開機器；遙測為 opt-in、預設關閉，啟用後也只會上傳匿名 run summary；TLS 1.3 全程加密。你的 log、程式碼、資料永遠留在你手上。",
       "privacy2": "不放心的話，隨時可以關掉 Threat Cloud。Community 版也完全支援離線運作。",
       "steps": [
         {
@@ -558,7 +558,7 @@
         },
         "privacy": {
           "title": "隱私優先",
-          "desc": "你的資料留在你的機器上，只有匿名化威脅特徵透過 Threat Cloud 共享。零遙測。"
+          "desc": "你的資料留在你的機器上，只有匿名化威脅特徵透過 Threat Cloud 共享。遙測為 opt-in，預設關閉。"
         }
       }
     },
@@ -605,7 +605,7 @@
       "subtitle": "從第一天就走不同的路。",
       "card1": {
         "title": "本地優先 AI",
-        "desc": "AI 在你的機器上執行。零遙測。你的資料永遠不會離開你的基礎架構。"
+        "desc": "AI 在你的機器上執行。遙測為 opt-in，預設關閉。你的資料永遠不會離開你的基礎架構。"
       },
       "card2": {
         "title": "開源",

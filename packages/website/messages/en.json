@@ -372,7 +372,7 @@
       "title": "The more people use it, the safer everyone gets.",
       "desc": "Every Panguard instance is a sensor. When it detects a new attack, it anonymously shares the pattern with Threat Cloud. Threat Cloud automatically produces ATR (Agent Threat Rules), the world's first open standard for detecting AI agent attacks. Prompt injection, tool poisoning, context exfiltration -- all caught by ATR rules.",
       "descHighlight": "You're not just protected. You're part of the shield.",
-      "privacy1": "Only anonymized threat signatures leave your machine. Zero raw data. Zero telemetry. Encrypted in transit (TLS 1.3). Your logs, your code, your data — never leaves.",
+      "privacy1": "Only anonymized threat signatures leave your machine. Zero raw data leaves your machine. Telemetry is opt-in and off by default — when you enable it, only anonymized run summaries are uploaded. Encrypted in transit (TLS 1.3). Your logs, your code, your data — never leaves.",
       "privacy2": "You can turn off Threat Cloud anytime. Panguard works fully offline.",
       "steps": [
         {
@@ -558,7 +558,7 @@
         },
         "privacy": {
           "title": "Privacy by Design",
-          "desc": "Your data stays on your machine. Only anonymized threat signatures are shared via Threat Cloud. Zero telemetry."
+          "desc": "Your data stays on your machine. Only anonymized threat signatures are shared via Threat Cloud. Telemetry is opt-in and off by default."
         }
       }
     },
@@ -605,7 +605,7 @@
       "subtitle": "Built different from day one.",
       "card1": {
         "title": "Local-First AI",
-        "desc": "AI runs on your machine. Zero telemetry. Your data never leaves your infrastructure."
+        "desc": "AI runs on your machine. Telemetry is opt-in and off by default. Your data never leaves your infrastructure."
       },
       "card2": {
         "title": "Open Source",
