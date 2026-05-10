@@ -253,6 +253,11 @@ export default function DetectionHeritageBridge() {
                     ? 'Sovereign AI = 主權的模型 + 主權的算力 + 主權的偵測知識。三者俱全，才稱得上完整。'
                     : 'Sovereign AI = sovereign model + sovereign compute + sovereign detection knowledge. Only with all three is it complete.'}
                 </p>
+                <p className="text-sm text-brand-sage font-semibold leading-relaxed mt-3">
+                  {isZh
+                    ? '一個 sovereign AI 客戶目前在主動對話中。'
+                    : 'One sovereign AI customer is in active conversation.'}
+                </p>
                 <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
                   <Link
                     href="/migrator"

@@ -3,6 +3,7 @@
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
+import { Link } from '@/navigation';
 import {
   ArrowRight,
   ArrowDown,
@@ -444,6 +445,145 @@ export default function MigratorContent() {
             </FadeInUp>
           ))}
         </div>
+      </SectionWrapper>
+
+      {/* MIGRATOR PRICING — 4-tier */}
+      <SectionWrapper className="py-20 border-t border-border">
+        <FadeInUp>
+          <SectionTitle
+            overline="MIGRATOR PRICING"
+            title="Four ways to use Migrator"
+            subtitle="Free for solo dev. Pilot for one-team trial. Standalone for orgs that only need the conversion. Sovereign for nation-scale Aramco-era / SCADA bridges. Migrator Pro is also bundled inside PanGuard Enterprise."
+          />
+        </FadeInUp>
+        <div className="max-w-6xl mx-auto mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Tier 1: Community */}
+          <FadeInUp delay={0.05}>
+            <div className="bg-surface-2 rounded-xl border border-brand-sage/30 p-6 flex flex-col h-full">
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mb-3">
+                Community
+              </p>
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-3xl font-extrabold text-text-primary">$0</span>
+                <span className="text-xs text-text-muted">forever · MIT</span>
+              </div>
+              <p className="text-[13px] text-text-secondary leading-relaxed mb-4 flex-1">
+                <code className="text-xs">npm install -g @panguard-ai/migrator-community</code>.
+                Sigma / YARA / Snort parsers, IR transformer, ATR YAML output, CLI. Self-host
+                forever. Lead pipeline + sensor signal for the open standard.
+              </p>
+              <a
+                href="https://www.npmjs.com/package/@panguard-ai/migrator-community"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[13px] text-brand-sage font-semibold inline-flex items-center gap-1 hover:underline"
+              >
+                Install on npm <ArrowRight className="w-3 h-3" />
+              </a>
+            </div>
+          </FadeInUp>
+
+          {/* Tier 2: Pilot */}
+          <FadeInUp delay={0.1}>
+            <div className="bg-surface-2 rounded-xl border border-amber-400/30 p-6 flex flex-col h-full">
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 mb-3">
+                Pilot · 90 days
+              </p>
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-3xl font-extrabold text-text-primary">$25K</span>
+                <span className="text-xs text-text-muted">credited Y1</span>
+              </div>
+              <p className="text-[13px] text-text-secondary leading-relaxed mb-4 flex-1">
+                One team, one rule corpus. We enrich up to 100 of your Sigma / YARA rules to
+                Cisco-merge-PR quality with 5-framework compliance metadata. Sample audit
+                evidence pack. Founder direct. Credit applies on Migrator Standalone or
+                PanGuard Enterprise.
+              </p>
+              <a
+                href="mailto:adam@agentthreatrule.org?subject=Migrator%20pilot"
+                className="text-[13px] text-amber-400 font-semibold inline-flex items-center gap-1 hover:underline"
+              >
+                Request pilot <ArrowRight className="w-3 h-3" />
+              </a>
+            </div>
+          </FadeInUp>
+
+          {/* Tier 3: Standalone */}
+          <FadeInUp delay={0.15}>
+            <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-6 flex flex-col h-full ring-1 ring-brand-sage/10">
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mb-3">
+                Standalone · annual
+              </p>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-3xl font-extrabold text-text-primary">$500K&ndash;2M</span>
+              </div>
+              <p className="text-[10px] text-text-muted mb-3">
+                target $750K&ndash;1.5M
+              </p>
+              <p className="text-[13px] text-text-secondary leading-relaxed mb-4 flex-1">
+                Migrator Pro only — for orgs that need the legacy bridge but not yet the full
+                PanGuard runtime. Full 15-format adapter library, strict 0-FP quality pipeline,
+                5-framework compliance evidence packs, 6-tab web dashboard, on-prem deploy,
+                ATR upstream contribution pipeline. Ideal for compliance teams or red teams
+                evaluating the standard before runtime adoption.
+              </p>
+              <a
+                href="mailto:adam@agentthreatrule.org?subject=Migrator%20Standalone"
+                className="text-[13px] text-brand-sage font-semibold inline-flex items-center gap-1 hover:underline"
+              >
+                Talk to founder <ArrowRight className="w-3 h-3" />
+              </a>
+            </div>
+          </FadeInUp>
+
+          {/* Tier 4: Sovereign */}
+          <FadeInUp delay={0.2}>
+            <div className="bg-surface-2 rounded-xl border border-blue-400/30 p-6 flex flex-col h-full">
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-blue-400 mb-3">
+                Sovereign · multi-year
+              </p>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-3xl font-extrabold text-text-primary">$3&ndash;10M</span>
+              </div>
+              <p className="text-[10px] text-text-muted mb-3">
+                multi-year national contract
+              </p>
+              <p className="text-[13px] text-text-secondary leading-relaxed mb-4 flex-1">
+                Nation-scale deployment for sovereign AI programs. Full Migrator Pro + ATR
+                runtime + Compliance Evidence + Threat Cloud + in-region deployment + custom
+                rule classes for that nation&rsquo;s SOC inheritance (Aramco-era SCADA, regional
+                SIEM corpora). Delivered through a regional enterprise vendor partner with
+                PanGuard as the ATR-certified upstream maintainer. One sovereign customer is
+                in active conversation.
+              </p>
+              <Link
+                href="/sovereign-ai-defense"
+                className="text-[13px] text-blue-400 font-semibold inline-flex items-center gap-1 hover:underline"
+              >
+                Sovereign AI brief <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </FadeInUp>
+        </div>
+
+        <FadeInUp delay={0.3}>
+          <div className="max-w-4xl mx-auto mt-10 bg-surface-2 border border-border rounded-xl p-6 text-center">
+            <p className="text-xs uppercase tracking-wider font-semibold text-brand-sage mb-2">
+              Already buying PanGuard Enterprise?
+            </p>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              Migrator Pro is bundled inside PanGuard Enterprise ($150K floor · target $250K&ndash;1M ·
+              up to $3M+). The Standalone and Sovereign tiers are for customers who want
+              Migrator without the full runtime.
+            </p>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-1.5 text-xs text-brand-sage font-semibold mt-3 hover:underline"
+            >
+              See full PanGuard pricing <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </FadeInUp>
       </SectionWrapper>
 
       {/* CTA */}
