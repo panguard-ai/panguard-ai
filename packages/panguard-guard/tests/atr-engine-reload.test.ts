@@ -69,19 +69,13 @@ describe('GuardATREngine.reloadRules', () => {
   });
 
   it('picks up a newly added rule file', async () => {
-    writeFileSync(
-      join(rulesDir, 'new-rule.yaml'),
-      RULE_TEMPLATE('ATR-2026-99001', 'New rule one')
-    );
+    writeFileSync(join(rulesDir, 'new-rule.yaml'), RULE_TEMPLATE('ATR-2026-99001', 'New rule one'));
     const result = await engine.reloadRules();
     expect(result.custom).toBe(1);
   });
 
   it('drops a removed rule file', async () => {
-    writeFileSync(
-      join(rulesDir, 'rule-a.yaml'),
-      RULE_TEMPLATE('ATR-2026-99002', 'Rule A')
-    );
+    writeFileSync(join(rulesDir, 'rule-a.yaml'), RULE_TEMPLATE('ATR-2026-99002', 'Rule A'));
     let result = await engine.reloadRules();
     expect(result.custom).toBe(1);
 
@@ -91,10 +85,7 @@ describe('GuardATREngine.reloadRules', () => {
   });
 
   it('handles repeated reloads without corruption', async () => {
-    writeFileSync(
-      join(rulesDir, 'r1.yaml'),
-      RULE_TEMPLATE('ATR-2026-99003', 'R1')
-    );
+    writeFileSync(join(rulesDir, 'r1.yaml'), RULE_TEMPLATE('ATR-2026-99003', 'R1'));
     for (let i = 0; i < 5; i++) {
       const result = await engine.reloadRules();
       expect(result.custom).toBe(1);
@@ -102,21 +93,12 @@ describe('GuardATREngine.reloadRules', () => {
   });
 
   it('reflects rule changes between reloads', async () => {
-    writeFileSync(
-      join(rulesDir, 'a.yaml'),
-      RULE_TEMPLATE('ATR-2026-99004', 'A')
-    );
+    writeFileSync(join(rulesDir, 'a.yaml'), RULE_TEMPLATE('ATR-2026-99004', 'A'));
     let result = await engine.reloadRules();
     expect(result.custom).toBe(1);
 
-    writeFileSync(
-      join(rulesDir, 'b.yaml'),
-      RULE_TEMPLATE('ATR-2026-99005', 'B')
-    );
-    writeFileSync(
-      join(rulesDir, 'c.yaml'),
-      RULE_TEMPLATE('ATR-2026-99006', 'C')
-    );
+    writeFileSync(join(rulesDir, 'b.yaml'), RULE_TEMPLATE('ATR-2026-99005', 'B'));
+    writeFileSync(join(rulesDir, 'c.yaml'), RULE_TEMPLATE('ATR-2026-99006', 'C'));
     result = await engine.reloadRules();
     expect(result.custom).toBe(3);
   });
@@ -126,10 +108,7 @@ describe('GuardATREngine.reloadRules', () => {
     expect(engine.getRuleCount()).toBe(0);
 
     // Add rule + reload
-    writeFileSync(
-      join(rulesDir, 'live.yaml'),
-      RULE_TEMPLATE('ATR-2026-99007', 'Live load test')
-    );
+    writeFileSync(join(rulesDir, 'live.yaml'), RULE_TEMPLATE('ATR-2026-99007', 'Live load test'));
     await engine.reloadRules();
 
     // Engine now has the rule loaded — covers the public surface that

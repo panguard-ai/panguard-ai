@@ -467,7 +467,9 @@ async function renderPdf(
   const meta: [string, string][] = [
     ['Framework', fw.name],
     ['Authority', fw.authority],
-    ...(fw.enforcementDate ? ([['Enforcement date', fw.enforcementDate]] as [string, string][]) : []),
+    ...(fw.enforcementDate
+      ? ([['Enforcement date', fw.enforcementDate]] as [string, string][])
+      : []),
     ['Organisation', orgName],
     ['Report date', today],
     ['ATR rules in set', String(coverage.totalRules)],
@@ -489,9 +491,11 @@ async function renderPdf(
   doc.font('Helvetica').fontSize(10).moveDown(1);
 
   if (coverage.mappedRules === 0) {
-    doc.font('Helvetica-Oblique').text(
-      `Status: Mapping in progress. The compliance.${fw.yamlKey} metadata block has not yet been authored for any rules in this ATR release. See spec/compliance-metadata.md for the target schema and the roll-out plan.`
-    );
+    doc
+      .font('Helvetica-Oblique')
+      .text(
+        `Status: Mapping in progress. The compliance.${fw.yamlKey} metadata block has not yet been authored for any rules in this ATR release. See spec/compliance-metadata.md for the target schema and the roll-out plan.`
+      );
     doc.end();
     return done;
   }
@@ -537,9 +541,11 @@ async function renderPdf(
   doc.moveDown(1);
   doc.font('Helvetica-Bold').text('Limitations');
   doc.moveDown(0.3);
-  doc.font('Helvetica').text(
-    'This is a rule-coverage report — which ATR rules claim to address which framework controls. A full audit also requires event evidence (which detections your deployment actually triggered during the audit period). See pga sensor status and the PanGuard Enterprise audit-log export for event-level evidence.'
-  );
+  doc
+    .font('Helvetica')
+    .text(
+      'This is a rule-coverage report — which ATR rules claim to address which framework controls. A full audit also requires event evidence (which detections your deployment actually triggered during the audit period). See pga sensor status and the PanGuard Enterprise audit-log export for event-level evidence.'
+    );
 
   doc.moveDown(1);
   doc.font('Helvetica-Bold').fontSize(9).text('Integrity chain');
@@ -755,16 +761,17 @@ async function generateAction(opts: {
           `Recompute locally with \`pga report generate --framework ${fw.id}\` and compare the hash — any drift means the evidence was modified after export.`,
           '',
         ].join('\n');
-  const content = format === 'json'
-    ? JSON.stringify(
-        {
-          ...JSON.parse(baseContent),
-          integrity: { sha256: hash, ...(signature ? { hmac_sha256: signature } : {}) },
-        },
-        null,
-        2
-      )
-    : baseContent + footer;
+  const content =
+    format === 'json'
+      ? JSON.stringify(
+          {
+            ...JSON.parse(baseContent),
+            integrity: { sha256: hash, ...(signature ? { hmac_sha256: signature } : {}) },
+          },
+          null,
+          2
+        )
+      : baseContent + footer;
 
   if (opts.output) {
     // opts.output is a user-provided absolute or relative path we write to
@@ -857,7 +864,9 @@ export function reportCommand(): Command {
         try {
           await generateAction(opts);
         } catch (err) {
-          console.error(`  ${c.critical(symbols.fail)} ${err instanceof Error ? err.message : err}`);
+          console.error(
+            `  ${c.critical(symbols.fail)} ${err instanceof Error ? err.message : err}`
+          );
           process.exitCode = 1;
         }
       }

@@ -5,6 +5,9 @@
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join as pathJoin } from 'node:path';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -224,11 +227,19 @@ describe('Scan Command', () => {
   it(
     'pga scan --all runs and produces some output (non-invasive)',
     () => {
-      // --all is non-invasive; it should not hang but may take a few seconds
-      const r = run(['scan', '--all', '--json'], undefined);
-      // Even with zero skills, it should produce parseable JSON or a non-crash exit
-      const combined = output(r);
-      expect(combined.length).toBeGreaterThan(0);
+      // --all walks $HOME/.claude/skills. On dev machines that legitimately
+      // have hundreds of installed skills, full SAST + secrets scan exceeds
+      // the 60s test timeout. Use a temp HOME so the test only verifies the
+      // CLI surface (parses --all, exits cleanly, produces output) without
+      // depending on the developer's actual skill inventory.
+      const tmpHome = mkdtempSync(pathJoin(tmpdir(), 'panguard-test-home-'));
+      try {
+        const r = run(['scan', '--all', '--json'], { HOME: tmpHome });
+        const combined = output(r);
+        expect(combined.length).toBeGreaterThan(0);
+      } finally {
+        rmSync(tmpHome, { recursive: true, force: true });
+      }
     },
     TIMEOUT_MS
   );

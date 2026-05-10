@@ -233,22 +233,11 @@
       "rule_sha256": "79694c5995b45ca022067d3a51f79505d8a4ffd45900d44b560b06d5ee7691be",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "50"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "50"],
+        "owasp_agentic_ids": ["ASI05:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -307,20 +296,10 @@
       "rule_sha256": "ea5c0bf6817102eb0eb6de383ac93d64aabb69931309c80da8c54189c8165ca0",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "12"
-        ],
-        "owasp_agentic_ids": [
-          "ASI02:2026",
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
+        "eu_ai_act_articles": ["15", "12"],
+        "owasp_agentic_ids": ["ASI02:2026", "ASI05:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -378,22 +357,11 @@
       "rule_sha256": "eea69e5131c577f5d9d7f4083af251a5cce2cce030973fd407d054edabeee0c5",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "14",
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.1"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["14", "15"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.1"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -455,14 +423,10 @@
       "rule_sha256": "66db1c35b971d3c074a6753d79c4c1dd57ff9432e7b1349277eb1901a2621ef4",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -496,23 +460,11 @@
       "rule_sha256": "d5400aa4b801995c157679b819cd5bade9176f0d3ed7372bdb3e1629c20e315f",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "14",
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI07:2026",
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.2"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["14", "15"],
+        "owasp_agentic_ids": ["ASI07:2026", "ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.2"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -576,22 +528,11 @@
       "rule_sha256": "14b0ddfa88489664a5c10ba913d7efa1d31298d5e6bfd06914980896a1e50f3a",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "14",
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.2"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["14", "15"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.2"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -650,22 +591,11 @@
       "rule_sha256": "95b3386f30b334ad413a87e353c6377f81815e5c81cf8060863d82051b459132",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "14",
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.1"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["14", "15"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.1"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -727,14 +657,10 @@
       "rule_sha256": "d326f9da9fd24f1b6b57774f2a05a087fdf3b4b6582c25c12814c13681d5cf7a",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -768,22 +694,11 @@
       "rule_sha256": "e5e9e6d8bb88956965ea1a1c0d1dab8a75be3bb73f6ef3084f6e619a87391981",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "14",
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.1"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["14", "15"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.1"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -845,14 +760,10 @@
       "rule_sha256": "b4f69a2cbfc6a5add1cc6d3243026fd3369402732aa9fff321ead5d2d817eac9",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -886,24 +797,11 @@
       "rule_sha256": "408b1e1d59ae285a1da0037f21021ddc4826ae88067e00d532bf52edc4657abf",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "14",
-          "15",
-          "9"
-        ],
-        "owasp_agentic_ids": [
-          "ASI07:2026",
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.2"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["14", "15", "9"],
+        "owasp_agentic_ids": ["ASI07:2026", "ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.2"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -975,14 +873,10 @@
       "rule_sha256": "30fac93824b5ca59129e6ac9381c0eaa743ab38d85d9565194b4e56195798ea5",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -1016,22 +910,11 @@
       "rule_sha256": "d67c22a575f2a6f5ee9e2bdd184b89eceba867b0a9db1c581d264bcd540cc839",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "14",
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.1"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["14", "15"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.1"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -1093,14 +976,10 @@
       "rule_sha256": "498061fa02ffdf2d3f44ae384ce691c7951f0c08dd5cde3d4df30e45b9685768",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -1134,19 +1013,10 @@
       "rule_sha256": "ff4b6da7668d4fab58d3886140fa5065229ad8bfdfb8a3ce8f8b603299ebcd30",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "9"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM03:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.3.2"
-        ],
+        "eu_ai_act_articles": ["15", "9"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM03:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.3.2"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -1199,21 +1069,11 @@
       "rule_sha256": "dbaea04ddbc580dffc98c9a4c030c01a2d85f4e0ad2df88da5b367b1630d3812",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Measure::MS.3.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI05:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Measure::MS.3.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -1267,21 +1127,11 @@
       "rule_sha256": "ed0196324cd5193a9f1ff159260f1dc20fc45998bf67d0b7ffef39c822a342d9",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI05:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -1335,24 +1185,11 @@
       "rule_sha256": "a28161435ffadd8f32613dce0b6a1470bac1d80e0ebae56dc5cf7b6728c5ba48",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "9"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026",
-          "ASI01:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM01:2025",
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "9"],
+        "owasp_agentic_ids": ["ASI06:2026", "ASI01:2026"],
+        "owasp_llm_ids": ["LLM01:2025", "LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -1421,23 +1258,11 @@
       "rule_sha256": "75b37715aea519a4f06c5e0804dfc1973d3e211270a2d941e0f70961705dd464",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "50"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026",
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Measure::MS.3.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "50"],
+        "owasp_agentic_ids": ["ASI05:2026", "ASI06:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Measure::MS.3.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -1501,23 +1326,11 @@
       "rule_sha256": "9411a0fa9c204a6fcd81dfa92aa54cf5784052a641d0ace70a867739ab7cc9af",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "14"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026",
-          "ASI09:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.1"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "14"],
+        "owasp_agentic_ids": ["ASI06:2026", "ASI09:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.1"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -1581,20 +1394,11 @@
       "rule_sha256": "77eaf912172a9294eb316e19bb7273b2904074a830464621e4a12c33e59f83e9",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "50"
-        ],
-        "owasp_agentic_ids": [
-          "ASI04:2026"
-        ],
+        "eu_ai_act_articles": ["15", "50"],
+        "owasp_agentic_ids": ["ASI04:2026"],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Measure::MS.3.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "nist_ai_rmf_subcategories": ["Measure::MS.3.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -1649,14 +1453,10 @@
       "rule_sha256": "4ff1a85698ec11ff114aacc4b3b98a7e5faa44dd31c255ce94fedc3c9c4b54ac",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -1690,16 +1490,10 @@
       "rule_sha256": "8c1d07906f1c58a9e5bd2dcaadf370e1e5dec49ac9d66558fb657f7ad6387160",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI05:2026"],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Measure::MS.2.7"
-        ],
+        "nist_ai_rmf_subcategories": ["Measure::MS.2.7"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -1740,23 +1534,11 @@
       "rule_sha256": "c46f5b1301c78ed6b4b22070608b7498f5212233e2b67d3a82a8d9aabb182655",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "12"
-        ],
-        "owasp_agentic_ids": [
-          "ASI04:2026",
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "12"],
+        "owasp_agentic_ids": ["ASI04:2026", "ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -1823,14 +1605,10 @@
       "rule_sha256": "61b0b4890b6bb4e2b230e2e977deecf462bc68e38c8d31c73b71ddcaedd4a170",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -1864,23 +1642,11 @@
       "rule_sha256": "148607c85a51b09a7f09866287c172c7ff7833a8a54d672356d7fcfcab2187a7",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "12"
-        ],
-        "owasp_agentic_ids": [
-          "ASI02:2026",
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "12"],
+        "owasp_agentic_ids": ["ASI02:2026", "ASI05:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -1944,21 +1710,11 @@
       "rule_sha256": "123eed966e55556ebad65f01441dc2ad5bcecac95fff8470c7ea9024a2428c59",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI05:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2012,23 +1768,11 @@
       "rule_sha256": "161fd7dfeabe6cca06760c343036de7098ff1c97958525fc5646659ef741ed7c",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "50"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026",
-          "ASI09:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "50"],
+        "owasp_agentic_ids": ["ASI05:2026", "ASI09:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2095,14 +1839,10 @@
       "rule_sha256": "fb3542dc5ab808534a576dfc327e025bfd52e4a876f59b07af44529c33371d75",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -2136,21 +1876,11 @@
       "rule_sha256": "79a10fba5af1bfd35cdf0f092c7511060e528aaa50356bc5e6fea4c56079c2d3",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI02:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI02:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2204,23 +1934,11 @@
       "rule_sha256": "9d75a07d4a422a685cfb834c6473b05d95b56b4bbf23a786ce1b4a82728436de",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "12"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026",
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "12"],
+        "owasp_agentic_ids": ["ASI05:2026", "ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2284,21 +2002,11 @@
       "rule_sha256": "d5be401e4b0c760e3e5dfa3aedb7ead5a58710c8b8110a336fa455fab277be3f",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM01:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI05:2026"],
+        "owasp_llm_ids": ["LLM01:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2355,14 +2063,10 @@
       "rule_sha256": "89543e1a86a2d6d7ed3e4e36d6d70aca1ed008942af5b1ef425e108c478e05b8",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -2396,19 +2100,10 @@
       "rule_sha256": "566b938393d52e77b2f4042d3e06e230f4836f45cbe6a8f5548118acf0c91701",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "14"
-        ],
-        "owasp_agentic_ids": [
-          "ASI08:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM03:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.3.2"
-        ],
+        "eu_ai_act_articles": ["15", "14"],
+        "owasp_agentic_ids": ["ASI08:2026"],
+        "owasp_llm_ids": ["LLM03:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.3.2"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -2461,22 +2156,11 @@
       "rule_sha256": "e0d9dcd162bf7d2eae61854e39df40a19f84e9374a4aa56e440fb87ca7e7f16e",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "12"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "12"],
+        "owasp_agentic_ids": ["ASI05:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2535,22 +2219,11 @@
       "rule_sha256": "9b9a4d5d80467a57640a053ad9a276422a10e304d68aee80584358bd4246431b",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "14"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "14"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2609,21 +2282,11 @@
       "rule_sha256": "547c3aacc43b4a13cc35820d88f5e4f358bdff7c9c6b004b815c077abd10dde4",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2677,22 +2340,11 @@
       "rule_sha256": "fd134e4ba30395188b8195c3d1a8fae235cee5a8ce9d4deb9cbd37f00c1aeeac",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "14",
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.1"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["14", "15"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.1"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2751,18 +2403,10 @@
       "rule_sha256": "e4e5832432a2714c4484d61fb6245320d838f9c3377b75ac2a687abf6b3a2280",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI01:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM01:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Measure::MS.2.7"
-        ],
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI01:2026"],
+        "owasp_llm_ids": ["LLM01:2025"],
+        "nist_ai_rmf_subcategories": ["Measure::MS.2.7"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -2810,19 +2454,11 @@
       "rule_sha256": "6c5536e4c8ac24e3da20307ecdeb9b58160f1ec6cfa0a1c32f72ea2939772fba",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI05:2026"],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Measure::MS.3.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "nist_ai_rmf_subcategories": ["Measure::MS.3.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2872,14 +2508,10 @@
       "rule_sha256": "c2676442f8ebadc58fd835edcc3ae5ec234dd989c9a0cbdd4939a43357519543",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "12"
-        ],
+        "eu_ai_act_articles": ["12"],
         "owasp_agentic_ids": [],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Govern::GV.1.1"
-        ],
+        "nist_ai_rmf_subcategories": ["Govern::GV.1.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -2913,23 +2545,11 @@
       "rule_sha256": "e1ae2a2369a9062ef2928aa589d95c43acce7fdb242d982ba0b9a362ecd55e56",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "12"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026",
-          "ASI07:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.1"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "12"],
+        "owasp_agentic_ids": ["ASI06:2026", "ASI07:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.1"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -2993,21 +2613,11 @@
       "rule_sha256": "258c71b2af9ffc72ea0914d5f2222eefab6489564406b85f211f6bb41a6628c6",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI05:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -3061,23 +2671,11 @@
       "rule_sha256": "736dbd52c77642d8befa93d1c55ba7670ab2cc73568e4b2ff83eef39d07ee740",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "12"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026",
-          "ASI01:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "12"],
+        "owasp_agentic_ids": ["ASI06:2026", "ASI01:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -3141,20 +2739,10 @@
       "rule_sha256": "5590aeb152f707f051d59e6db37b76d37a0b542ad8819e9f7f214b9fcbebdb13",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "14"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026",
-          "ASI09:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM06:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.1"
-        ],
+        "eu_ai_act_articles": ["15", "14"],
+        "owasp_agentic_ids": ["ASI06:2026", "ASI09:2026"],
+        "owasp_llm_ids": ["LLM06:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.1"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -3212,23 +2800,11 @@
       "rule_sha256": "6aebe61cf64e5d0ad9b3a4b4ab62ec7008447f1736e819b017365ec6122b53e6",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15",
-          "12"
-        ],
-        "owasp_agentic_ids": [
-          "ASI02:2026",
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15", "12"],
+        "owasp_agentic_ids": ["ASI02:2026", "ASI05:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -3292,16 +2868,10 @@
       "rule_sha256": "75e168288571639e30df70ff5ee767c0929bcbfa5dc0d9cb9823f905e7337045",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI05:2026"],
         "owasp_llm_ids": [],
-        "nist_ai_rmf_subcategories": [
-          "Measure::MS.2.7"
-        ],
+        "nist_ai_rmf_subcategories": ["Measure::MS.2.7"],
         "iso_42001_clauses": []
       },
       "compliance_full": {
@@ -3342,21 +2912,11 @@
       "rule_sha256": "a3fe9f4b4209169aff53b73238384a29f07a22d8fd148853098358d8df236eae",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI05:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM01:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Measure::MS.2.7"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI05:2026"],
+        "owasp_llm_ids": ["LLM01:2025"],
+        "nist_ai_rmf_subcategories": ["Measure::MS.2.7"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -3410,24 +2970,11 @@
       "rule_sha256": "fd278b820457a5f941774246e84c2108b79d21c080733b5e8b4d971676621198",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "14",
-          "15",
-          "9"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026",
-          "ASI07:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM02:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.4.2"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["14", "15", "9"],
+        "owasp_agentic_ids": ["ASI06:2026", "ASI07:2026"],
+        "owasp_llm_ids": ["LLM02:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.4.2"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [
@@ -3496,21 +3043,11 @@
       "rule_sha256": "a15113d62a763b740eb72f72d52efd919cfbe193fc9723b413ae6f6c6047665c",
       "rule_version": 1,
       "compliance_summary": {
-        "eu_ai_act_articles": [
-          "15"
-        ],
-        "owasp_agentic_ids": [
-          "ASI06:2026"
-        ],
-        "owasp_llm_ids": [
-          "LLM03:2025"
-        ],
-        "nist_ai_rmf_subcategories": [
-          "Manage::MG.2.3"
-        ],
-        "iso_42001_clauses": [
-          "8.4"
-        ]
+        "eu_ai_act_articles": ["15"],
+        "owasp_agentic_ids": ["ASI06:2026"],
+        "owasp_llm_ids": ["LLM03:2025"],
+        "nist_ai_rmf_subcategories": ["Manage::MG.2.3"],
+        "iso_42001_clauses": ["8.4"]
       },
       "compliance_full": {
         "eu_ai_act": [

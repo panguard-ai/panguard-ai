@@ -204,7 +204,10 @@ export default function ComplianceContent() {
               <ul className="space-y-2 text-sm text-text-secondary">
                 <li className="flex items-start gap-2">
                   <span className="text-brand-sage shrink-0">✓</span>
-                  <span>NIST AI RMF — 100% rule coverage · 1,566 mappings · 16 subcategories across GV / MP / MS / MG (ATR v2.1.0, 2026-05-09)</span>
+                  <span>
+                    NIST AI RMF — 100% rule coverage · 1,566 mappings · 16 subcategories across GV /
+                    MP / MS / MG (ATR v2.1.0, 2026-05-09)
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-sage shrink-0">✓</span>
@@ -212,7 +215,9 @@ export default function ComplianceContent() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-sage shrink-0">✓</span>
-                  <span>EU AI Act + ISO/IEC 42001 metadata auto-tagged via Migrator Enterprise pipeline</span>
+                  <span>
+                    EU AI Act + ISO/IEC 42001 metadata auto-tagged via Migrator Enterprise pipeline
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-sage shrink-0">✓</span>
@@ -308,8 +313,8 @@ export default function ComplianceContent() {
                     framework.status === 'shipped'
                       ? 'text-brand-sage'
                       : framework.status === 'partial'
-                      ? 'text-blue-400'
-                      : 'text-amber-400'
+                        ? 'text-blue-400'
+                        : 'text-amber-400'
                   }`}
                 >
                   {framework.statusLabel}

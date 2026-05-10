@@ -101,6 +101,7 @@ window has 5-30s of zero detection — banks will not accept this for
 routine rule updates. Suricata, Snort, Falco all have live reload.
 
 Implementation:
+
 - `kill -HUP <guard-pid>` triggers in-place rule reload
 - Optional `watch_rules: true` in `panguard-guard.yaml` enables fsnotify
 - Atomic swap so in-flight scans complete on old rules, new scans use new
@@ -117,6 +118,7 @@ the migrator backs up + copies, then user manually verifies via
 `pga guard restart` — a 30s detection-downtime window.
 
 Acceptance:
+
 - `panguard guard validate /path/to/rules` exits 0 only if all rules
   load without error
 - Migrator integrates: validate → atomic rename → restart Guard
@@ -133,6 +135,7 @@ doesn't read it. Without policy + tooling, Migrator v0.5 producing rules
 for Guard v3.0 silently mis-parses.
 
 Steps:
+
 1. Open PR to `atr-org/agent-threat-rules` adding `SCHEMA_COMPAT.md`
    documenting each schema version's breaking changes
 2. Update Guard rule loader to read `target_atr_engine` and reject
@@ -145,6 +148,7 @@ of actual work.
 ## ~~P2 - npm publish first version of @panguard-ai/migrator-community~~ DONE (2026-05-04)
 
 Published `@panguard-ai/migrator-community@0.1.0` to npm.
+
 - Tarball: 75 files, 46.2 kB packed, 172.9 kB unpacked
 - shasum: 9dd2cbcf46361dd402b11f93d14d519bc6b23d5e
 - Tag: migrator-community-v0.1.0 (commit 4f07d358)

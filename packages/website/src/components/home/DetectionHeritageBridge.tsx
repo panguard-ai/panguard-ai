@@ -163,25 +163,34 @@ export default function DetectionHeritageBridge() {
             {isZh ? (
               <>
                 <p>
-                  銀行、醫院、政府、半導體廠的 SOC，累積了二十年的偵測 IP——SIEM 查詢、惡意樣本特徵、IDS 規則、CVE 對應、靜態分析。
+                  銀行、醫院、政府、半導體廠的 SOC，累積了二十年的偵測 IP——SIEM
+                  查詢、惡意樣本特徵、IDS 規則、CVE 對應、靜態分析。
                 </p>
                 <p>
-                  AI Agent 時代到來，這些既有規則本身雖然抓不到 prompt injection，但背後的攻擊知識依然成立：SQL injection 沒消失，只是搬進了 tool call；命令注入沒消失，只是換了載體。
+                  AI Agent 時代到來，這些既有規則本身雖然抓不到 prompt
+                  injection，但背後的攻擊知識依然成立：SQL injection 沒消失，只是搬進了 tool
+                  call；命令注入沒消失，只是換了載體。
                 </p>
                 <p>
-                  Migrator 將 15 種來源格式自動翻譯成 ATR 行為層規則。過去累積的偵測知識，一條都不會浪費。
+                  Migrator 將 15 種來源格式自動翻譯成 ATR
+                  行為層規則。過去累積的偵測知識，一條都不會浪費。
                 </p>
               </>
             ) : (
               <>
                 <p>
-                  Banks, hospitals, government agencies, and semiconductor SOCs have accumulated two decades of detection IP — SIEM queries, malware signatures, IDS rules, CVE mappings, static analysis.
+                  Banks, hospitals, government agencies, and semiconductor SOCs have accumulated two
+                  decades of detection IP — SIEM queries, malware signatures, IDS rules, CVE
+                  mappings, static analysis.
                 </p>
                 <p>
-                  In the AI agent era, those rules themselves no longer catch prompt injection, but the attack knowledge beneath them still holds. SQL injection did not vanish; it moved into tool calls. Command injection did not vanish; it changed substrate.
+                  In the AI agent era, those rules themselves no longer catch prompt injection, but
+                  the attack knowledge beneath them still holds. SQL injection did not vanish; it
+                  moved into tool calls. Command injection did not vanish; it changed substrate.
                 </p>
                 <p>
-                  Migrator automatically translates 15 source formats into ATR behavioral rules. Not a single line of accumulated detection knowledge is wasted.
+                  Migrator automatically translates 15 source formats into ATR behavioral rules. Not
+                  a single line of accumulated detection knowledge is wasted.
                 </p>
               </>
             )}
@@ -230,8 +239,8 @@ export default function DetectionHeritageBridge() {
                 {isZh ? '輸入：15 種舊時代格式' : 'Input: 15 legacy formats'}
               </p>
               <p className="font-mono text-xs text-text-secondary leading-relaxed">
-                Sigma · Splunk SPL · Elastic EQL · YARA · Snort · Falco · Semgrep · CodeQL · CVE-NVD ·
-                GHSA · OSV · CISA KEV · garak · PyRIT · promptfoo
+                Sigma · Splunk SPL · Elastic EQL · YARA · Snort · Falco · Semgrep · CodeQL · CVE-NVD
+                · GHSA · OSV · CISA KEV · garak · PyRIT · promptfoo
               </p>
             </div>
             <ArrowRight className="w-8 h-8 text-panguard-green mx-auto rotate-90 lg:rotate-0" />

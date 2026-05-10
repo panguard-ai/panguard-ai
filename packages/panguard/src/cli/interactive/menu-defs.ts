@@ -46,7 +46,8 @@ export const MENU_DEFS: MenuDef[] = [
     en: 'Compliance Report',
     zh: '\u5408\u898F\u5831\u544A',
     enDesc: 'EU AI Act, NIST AI RMF, ISO/IEC 42001, OWASP, Colorado AI Act — 6 frameworks',
-    zhDesc: 'EU AI Act\u3001NIST AI RMF\u3001ISO/IEC 42001\u3001OWASP\u3001Colorado AI Act \u2014 6 \u5927\u6846\u67B6',
+    zhDesc:
+      'EU AI Act\u3001NIST AI RMF\u3001ISO/IEC 42001\u3001OWASP\u3001Colorado AI Act \u2014 6 \u5927\u6846\u67B6',
     tierBadge: '',
     featureKey: 'report',
   },

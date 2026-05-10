@@ -12,12 +12,7 @@ export type IRSeverity = 'critical' | 'high' | 'medium' | 'low' | 'informational
 
 export type IRSource = 'sigma' | 'yara';
 
-export type IRPatternOperator =
-  | 'equals'
-  | 'contains'
-  | 'startswith'
-  | 'endswith'
-  | 'regex';
+export type IRPatternOperator = 'equals' | 'contains' | 'startswith' | 'endswith' | 'regex';
 
 /**
  * 'named':   field-addressed lookup — Sigma's CommandLine|contains, Image|endswith, etc.

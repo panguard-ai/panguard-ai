@@ -49,9 +49,9 @@ Pilot / Enterprise customer can:
 │       GET  /api/me                  — return workspace + user summary   │
 │       GET  /api/v2/reports/:id/dl   — signed download URL               │
 └───────┬─────────────────────────────────────────────────────────────────┘
-        │                                                                  
-        │ service-role key                                                  
-        ▼                                                                  
+        │
+        │ service-role key
+        ▼
 ┌────────────────────────────────────────────────────────────────────────┐
 │  Supabase (cloud or self-hosted)                                        │
 │                                                                         │
@@ -61,10 +61,10 @@ Pilot / Enterprise customer can:
 │   Storage:    reports/ bucket (signed URL, RLS by workspace)            │
 │   RLS:        is_workspace_member(workspace_id, min_role) helper        │
 └────────────────────────────────────────────────────────────────────────┘
-                         ▲                                  
-                         │                                  
-                         │ REST via PostgREST + service key 
-                         │                                  
+                         ▲
+                         │
+                         │ REST via PostgREST + service key
+                         │
 ┌────────────────────────┴────────────────────────────────────────────────┐
 │  CLI `pga` (packages/panguard/)                                         │
 │                                                                          │
@@ -80,7 +80,7 @@ Pilot / Enterprise customer can:
 │       4. If --anonymous or no auth, existing TC telemetry path            │
 └──────────────────────────────────────────────────────────────────────────┘
 
-                                                                          
+
 ┌────────────────────────────────────────────────────────────────────────┐
 │  tc.panguard.ai — threat-cloud service (existing, UNCHANGED this phase) │
 │                                                                         │
@@ -99,19 +99,22 @@ Pilot / Enterprise customer can:
 Two separate token types:
 
 ### User session token (browser)
+
 - Issued by Supabase Auth on magic-link verification
 - Stored in `sb-<project>-auth-token` httpOnly cookie
 - Validated server-side via `@supabase/ssr` in every server component and API route
 - Carries `auth.uid()` which RLS policies reference
 
 ### API key (CLI)
+
 - Issued by Device Code Flow approval step
 - Format: `pga_` + 60 hex chars (256-bit entropy)
 - Only the sha256 is stored (`api_keys.key_hash`)
 - Sent by CLI as `Authorization: Bearer <api_key>`
 - Each API route that accepts api_key does:
   ```ts
-  const { data } = await admin.from('api_keys')
+  const { data } = await admin
+    .from('api_keys')
     .select('workspace_id, revoked_at')
     .eq('key_hash', sha256(token))
     .single();
@@ -121,6 +124,7 @@ Two separate token types:
 - `api_keys.last_used_at` updated async on each successful call
 
 ### No mutual cross-reference
+
 - A user session can invalidate any api_key the user created (via settings)
 - An api_key cannot perform session-only actions (invite members, manage billing, etc.)
 - Clear separation keeps the blast radius of a leaked api_key limited to data ingestion + read within one workspace.
@@ -130,6 +134,7 @@ Two separate token types:
 ## Event ingestion contract (`POST /api/v2/events`)
 
 Request body (JSON):
+
 ```json
 {
   "events": [
@@ -153,6 +158,7 @@ Request body (JSON):
 ```
 
 Server:
+
 1. Validate `Authorization: Bearer pga_...` → look up `workspace_id`
 2. Zod validate body (max 500 events per POST, 1MB body limit)
 3. `upsert_endpoint(workspace_id, machine_id, ...)` → returns endpoint_id
@@ -161,6 +167,7 @@ Server:
 6. Return `{ ok: true, ingested: N, endpoint_id: "..." }`
 
 Payload privacy:
+
 - `target` is file path / repo URL / skill name — no secret leak
 - `target_hash` lets dedup / search without storing content
 - `payload_summary` is a 1-line human-readable summary PRODUCED BY THE CLI (never the raw adversarial string)
@@ -192,24 +199,28 @@ User clicks "Generate EU AI Act report" on /w/acme/reports
 ## Deploy plan
 
 ### Stage 1: Supabase project (15 min manual)
+
 1. Founder creates Supabase project (cloud free tier): https://supabase.com/dashboard
 2. Founder copies: project URL, anon key, service-role key
 3. Founder runs locally: `supabase link --project-ref <ref>` + `supabase db push`
 4. Founder creates `.env.local` in `packages/app/` from `.env.local.example`
 
 ### Stage 2: Vercel deploy (20 min)
+
 1. Create new Vercel project from monorepo, root = `packages/app`
 2. Set env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `PANGUARD_REPORT_SIGNING_KEY`
 3. Connect domain `app.panguard.ai` (DNS CNAME to cname.vercel-dns.com)
 4. Add app.panguard.ai to Supabase Auth allowed redirect URLs
 
 ### Stage 3: CLI release
+
 1. Bump `@panguard-ai/panguard` minor version (1.5.4 → 1.6.0)
 2. `pga login` / `pga logout` / `pga whoami` become visible commands
 3. `pga audit` / `pga scan` detect auth.json and auto-POST to app.panguard.ai
 4. Publish to npm; community tier still works offline without login
 
 ### Stage 4: First pilot
+
 1. Manually create workspace in Supabase Studio (name, slug, tier='pilot', tier_expires_at=now+90d)
 2. Invite pilot customer admin email via Supabase Auth dashboard (send invite)
 3. Customer receives email → clicks magic link → lands on /w/[slug]

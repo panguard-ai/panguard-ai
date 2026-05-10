@@ -55,9 +55,7 @@ export function parseCondition(
     if (prefix === undefined) {
       return { result: null, reason: 'malformed all-of glob' };
     }
-    const matches = detectionKeys.filter(
-      (k) => k.startsWith(prefix) && !KEYWORDS_RESERVED.has(k)
-    );
+    const matches = detectionKeys.filter((k) => k.startsWith(prefix) && !KEYWORDS_RESERVED.has(k));
     if (matches.length === 0) {
       return {
         result: null,
@@ -73,9 +71,7 @@ export function parseCondition(
     if (prefix === undefined) {
       return { result: null, reason: 'malformed 1-of glob' };
     }
-    const matches = detectionKeys.filter(
-      (k) => k.startsWith(prefix) && !KEYWORDS_RESERVED.has(k)
-    );
+    const matches = detectionKeys.filter((k) => k.startsWith(prefix) && !KEYWORDS_RESERVED.has(k));
     if (matches.length === 0) {
       return {
         result: null,
