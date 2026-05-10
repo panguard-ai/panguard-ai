@@ -83,3 +83,49 @@ export async function reportTelemetry(enabled: boolean, event: TelemetryEvent): 
     // Best effort — never block scan for telemetry
   }
 }
+
+export interface ScanCloudEvent {
+  /** 'remote' for `pga scan --target`, 'local' for `pga scan` system audit. */
+  readonly mode: 'remote' | 'local';
+  readonly findingsCount: number;
+  /** Risk classification from runScan/runRemoteScan ('LOW'|'MEDIUM'|'HIGH'|'CRITICAL'). */
+  readonly riskLevel: string;
+}
+
+/**
+ * Push the scan to TC via ThreatCloudClient.reportScanEvent. This is the
+ * channel that makes `pga scan` an actual sensor — it lands the event in
+ * the same Threat Cloud aggregation as `pga audit skill`, so adoption +
+ * coverage stats are unified across audit and scan flows.
+ *
+ * Fire-and-forget. Gated by the same telemetry consent as reportTelemetry.
+ * Importing ThreatCloudClient lazily so non-cloud paths never pay the cost.
+ */
+export async function reportScanToCloud(
+  enabled: boolean,
+  event: ScanCloudEvent
+): Promise<void> {
+  if (!enabled) return;
+  try {
+    const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
+    const pathMod = await import('node:path');
+    const dataDir = pathMod.join(
+      process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
+      '.panguard-guard'
+    );
+    const tc = new ThreatCloudClient(TC_ENDPOINT, dataDir);
+    const isCritical = event.riskLevel === 'CRITICAL';
+    const isHigh = event.riskLevel === 'HIGH';
+    const isClean = event.findingsCount === 0;
+    void tc.reportScanEvent({
+      source: 'cli-user',
+      skillsScanned: 1,
+      findingsCount: event.findingsCount,
+      confirmedMalicious: isCritical ? 1 : 0,
+      highlySuspicious: isHigh ? 1 : 0,
+      cleanCount: isClean ? 1 : 0,
+    });
+  } catch {
+    // Best effort — never block scan
+  }
+}
