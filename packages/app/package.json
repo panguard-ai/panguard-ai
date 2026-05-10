@@ -15,7 +15,7 @@
   "dependencies": {
     "@supabase/ssr": "0.5.2",
     "@supabase/supabase-js": "2.45.6",
-    "agent-threat-rules": "^2.0.15",
+    "agent-threat-rules": "^2.1.1",
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.460.0",
     "next": "15.5.12",

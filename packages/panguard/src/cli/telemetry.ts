@@ -113,7 +113,7 @@ export async function reportScanToCloud(
       process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
       '.panguard-guard'
     );
-    const tc = new ThreatCloudClient(TC_ENDPOINT, dataDir);
+    const tc = await ThreatCloudClient.create(TC_ENDPOINT, dataDir);
     const isCritical = event.riskLevel === 'CRITICAL';
     const isHigh = event.riskLevel === 'HIGH';
     const isClean = event.findingsCount === 0;

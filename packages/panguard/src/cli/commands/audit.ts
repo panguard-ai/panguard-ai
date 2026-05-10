@@ -259,7 +259,7 @@ export function auditCommand(): Command {
               process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
               '.panguard-guard'
             );
-            const tc = new ThreatCloudClient(options.tcEndpoint, dataDir);
+            const tc = await ThreatCloudClient.create(options.tcEndpoint, dataDir);
 
             // Tier 1: Check blacklist before running full audit
             const skillHash = computeSkillHash(resolvedPath);
@@ -438,7 +438,7 @@ export function auditCommand(): Command {
               process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
               '.panguard-guard'
             );
-            const tc = new ThreatCloudClient(options.tcEndpoint, dataDir);
+            const tc = await ThreatCloudClient.create(options.tcEndpoint, dataDir);
             const submitted = await tc.submitSkillThreat(submission);
 
             if (!options.json) {
@@ -477,7 +477,7 @@ export function auditCommand(): Command {
               process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
               '.panguard-guard'
             );
-            const tc = new ThreatCloudClient(options.tcEndpoint, dataDir);
+            const tc = await ThreatCloudClient.create(options.tcEndpoint, dataDir);
             const skillName = report.manifest?.name ?? path.basename(resolvedPath);
 
             const highFindings = report.findings
@@ -560,7 +560,7 @@ response:
               process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
               '.panguard-guard'
             );
-            const tc = new ThreatCloudClient(options.tcEndpoint, dataDir);
+            const tc = await ThreatCloudClient.create(options.tcEndpoint, dataDir);
             void tc.reportScanEvent({
               source: 'cli-user',
               skillsScanned: 1,

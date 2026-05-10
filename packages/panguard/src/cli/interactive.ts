@@ -8,7 +8,7 @@
  */
 
 import { existsSync } from 'node:fs';
-import { c } from '@panguard-ai/core';
+import { c, setLogLevel } from '@panguard-ai/core';
 import { waitForMainInput, cleanupTerminal } from './menu.js';
 import { checkFeatureAccess, showUpgradePrompt } from './auth-guard.js';
 import { formatError } from './ux-helpers.js';
@@ -38,6 +38,12 @@ import {
 
 export async function startInteractive(lang?: string): Promise<void> {
   setLang(lang === 'en' ? 'en' : lang === 'zh-TW' ? 'zh-TW' : detectLang());
+
+  // Silence structured info/debug logs in interactive mode — the menu owns the
+  // screen and JSON log lines (e.g., "Detected N platform(s)" from
+  // panguard-mcp:platform-detector) break the UX. Action handlers re-enable
+  // logging if they explicitly need it.
+  setLogLevel('silent');
 
   const exit = () => {
     cleanupTerminal();

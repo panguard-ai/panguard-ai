@@ -61,7 +61,7 @@
   "optionalDependencies": {
     "@panguard-ai/threat-cloud": "workspace:*",
     "@panguard-ai/panguard-trap": "workspace:*",
-    "agent-threat-rules": "^2.0.12"
+    "agent-threat-rules": "^2.1.1"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",

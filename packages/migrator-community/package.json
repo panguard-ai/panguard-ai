@@ -63,7 +63,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "agent-threat-rules": "^2.0.17",
+    "agent-threat-rules": "^2.1.1",
     "commander": "^12.1.0",
     "js-yaml": "^4.1.0"
   },
