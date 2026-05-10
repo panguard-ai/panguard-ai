@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/migrator-community",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Sigma / YARA → ATR YAML converter (community edition). Open-source detection rule migration for AI agent security.",
   "license": "MIT",
