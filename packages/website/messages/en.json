@@ -2469,7 +2469,7 @@
       "inquiryType": "Select type",
       "message": "How can we help?"
     },
-    "inquiryTypes": ["General", "Support", "Partnership", "Other"],
+    "inquiryTypes": ["General", "Pilot ($25K / 90 days)", "Enterprise ($150K–$500K)", "Founding F500 ($100K × 2 years)", "Sovereign AI ($5–20M)", "OEM License ($2–10M)", "ATR Foundation Member ($10K/yr)", "Support", "Other"],
     "submit": "Send Message",
     "submitting": "Sending...",
     "successTitle": "Message sent.",
