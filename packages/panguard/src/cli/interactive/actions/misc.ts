@@ -65,18 +65,34 @@ export async function actionTrap(lang: Lang): Promise<void> {
   breadcrumb(['Panguard', lang === 'zh-TW' ? '\u871C\u7F50\u7CFB\u7D71' : 'Honeypot System']);
   console.log('');
   if (lang === 'zh-TW') {
-    console.log('  \u871C\u7F50\u7CFB\u7D71 \u2014 \u5373\u5C07\u63A8\u51FA');
+    console.log('  \u871C\u7F50\u7CFB\u7D71');
     console.log('');
-    console.log(
-      '  \u8A98\u990C\u670D\u52D9\uFF08SSH\u3001HTTP\u3001FTP\uFF09\u5075\u6E2C\u8207\u5206\u6790\u653B\u64CA\u8005\u529F\u80FD\u958B\u767C\u4E2D\u3002'
-    );
-    console.log('  \u8FFD\u8E64\u9032\u5EA6: https://github.com/panguard-ai/panguard-ai');
+    console.log('  \u4EE5\u5047 TCP \u670D\u52D9\uFF08SSH/HTTP/FTP/Telnet/MySQL/Redis/SMB/RDP\uFF09\u8A98\u6355\u653B\u64CA\u8005\uFF0C');
+    console.log('  \u8A18\u9304\u9023\u7DDA\u3001\u6191\u8B49\u5617\u8A66\u3001\u57F7\u884C\u6307\u4EE4\uFF0C\u4E26\u4E0A\u50B3\u5A01\u8105\u60C5\u5831\u5230 Threat Cloud\u3002');
+    console.log('');
+    console.log('  \u5F9E CLI \u57F7\u884C\uFF1A');
+    console.log('    pga trap start --services ssh,http   # \u555F\u52D5\u8A98\u990C\u670D\u52D9\uFF08\u524D\u666F\uFF09');
+    console.log('    pga trap status                       # \u67E5\u770B\u9023\u7DDA\u7D71\u8A08');
+    console.log('    pga trap profiles                     # \u986F\u793A\u653B\u64CA\u8005\u5206\u6790');
+    console.log('    pga trap intel                        # \u986F\u793A\u60C5\u5831\u5831\u544A');
+    console.log('    pga trap stop                         # \u505C\u6B62');
+    console.log('');
+    console.log('  Threat Cloud \u4E0A\u50B3\u9810\u8A2D\u555F\u7528\uFF0C\u53EF\u52A0 --no-cloud \u95DC\u9589\u3002');
   } else {
-    console.log('  Honeypot System \u2014 Coming Soon');
+    console.log('  Honeypot System');
     console.log('');
-    console.log('  Decoy services (SSH, HTTP, FTP) to detect and profile');
-    console.log('  attackers are under active development.');
-    console.log('  Follow progress: https://github.com/panguard-ai/panguard-ai');
+    console.log('  Fake TCP services (SSH/HTTP/FTP/Telnet/MySQL/Redis/SMB/RDP) that lure');
+    console.log('  attackers, log connections + credential attempts + commands, and upload');
+    console.log('  threat intel to Threat Cloud.');
+    console.log('');
+    console.log('  Run from CLI:');
+    console.log('    pga trap start --services ssh,http   # Start decoy services (foreground)');
+    console.log('    pga trap status                       # Show connection stats');
+    console.log('    pga trap profiles                     # Show attacker profiles');
+    console.log('    pga trap intel                        # Show intel reports');
+    console.log('    pga trap stop                         # Stop');
+    console.log('');
+    console.log('  Threat Cloud upload is enabled by default. Pass --no-cloud to disable.');
   }
   console.log('');
 }
