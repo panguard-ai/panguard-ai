@@ -30,7 +30,8 @@
 
 import { Command } from 'commander';
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { createHash, createHmac } from 'node:crypto';
 import { c, symbols } from '@panguard-ai/core';
@@ -142,13 +143,37 @@ interface ATRRule {
  *   1. $PANGUARD_ATR_RULES_DIR env var — for local development against an
  *      ATR repo checkout (useful when hacking on new compliance metadata
  *      before npm publish).
- *   2. Installed npm package in node_modules / pnpm hoisted location.
- *   3. Monorepo dev layout (panguard/packages/panguard → ../../node_modules/...).
+ *   2. Resolve the agent-threat-rules package via Node module resolution.
+ *      Works for global installs (`npm install -g @panguard-ai/panguard`)
+ *      because `require.resolve` finds the bundled dep from the panguard
+ *      package's own location, NOT from the user's pwd.
+ *   3. Cwd-relative fallbacks (monorepo dev / customer project with ATR
+ *      installed locally).
  */
 function findRulesDir(): string | null {
   const envDir = process.env['PANGUARD_ATR_RULES_DIR'];
   if (envDir && existsSync(envDir) && statSync(envDir).isDirectory()) {
     return envDir;
+  }
+  // Walk up from THIS module's own directory looking for
+  // node_modules/agent-threat-rules/rules. Mirrors Node's standard module
+  // resolution but works on a directory subpath that ESM `import` can't
+  // resolve directly (the agent-threat-rules package has an `exports` field
+  // that hides ./package.json). This is the path that makes
+  // `npm install -g @panguard-ai/panguard` work regardless of customer cwd.
+  try {
+    let dir = dirname(fileURLToPath(import.meta.url));
+    while (dir !== sep && dir.length > 0) {
+      const candidate = join(dir, 'node_modules', 'agent-threat-rules', 'rules');
+      if (existsSync(candidate) && statSync(candidate).isDirectory()) {
+        return candidate;
+      }
+      const parent = dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+  } catch {
+    // Fall through to cwd-relative candidates.
   }
   const candidates = [
     resolve(process.cwd(), 'node_modules', 'agent-threat-rules', 'rules'),
