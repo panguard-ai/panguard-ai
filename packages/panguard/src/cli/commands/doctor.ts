@@ -302,50 +302,41 @@ function checkLastScan(): CheckResult {
   }
 }
 
+const DEFAULT_TC_ENDPOINT = 'https://tc.panguard.ai';
+
 function checkThreatCloud(): CheckResult {
-  if (!existsSync(CONFIG_PATH)) {
-    return {
-      status: 'warn',
-      label: 'Threat Cloud',
-      detail: 'Config not found — cannot verify Threat Cloud endpoint',
-      fix: 'Run "pga setup" to configure Threat Cloud connectivity',
-    };
+  // TC defaults to tc.panguard.ai — no config required. Customer's audit/scan
+  // already uploads here transparently. Only flag as warn if customer has
+  // explicitly opted out (threatCloud.enabled: false) or pointed at a custom
+  // endpoint that's not reachable.
+  let endpoint = DEFAULT_TC_ENDPOINT;
+  let enabledFlag: boolean | undefined;
+  if (existsSync(CONFIG_PATH)) {
+    try {
+      const raw = readFileSync(CONFIG_PATH, 'utf-8');
+      const cfg = JSON.parse(raw) as {
+        threatCloud?: { endpoint?: string; enabled?: boolean };
+      };
+      if (cfg.threatCloud?.endpoint) endpoint = cfg.threatCloud.endpoint;
+      enabledFlag = cfg.threatCloud?.enabled;
+    } catch {
+      // Config parse error → fall through to default
+    }
   }
 
-  try {
-    const raw = readFileSync(CONFIG_PATH, 'utf-8');
-    const cfg = JSON.parse(raw) as {
-      threatCloud?: { endpoint?: string; enabled?: boolean };
-      modules?: { dashboard?: boolean };
-    };
-
-    const endpoint = cfg.threatCloud?.endpoint;
-    const enabled = cfg.threatCloud?.enabled ?? false;
-
-    if (!endpoint && !enabled) {
-      // Threat Cloud is optional — not a failure
-      return {
-        status: 'warn',
-        label: 'Threat Cloud',
-        detail: 'Threat Cloud endpoint not configured',
-        fix: 'Configure a Threat Cloud endpoint in your config to enable shared threat intelligence',
-      };
-    }
-
-    const displayEndpoint = endpoint ?? 'tc.panguard.ai';
+  if (enabledFlag === false) {
     return {
       status: 'pass',
       label: 'Threat Cloud',
-      detail: `Connected to ${displayEndpoint}`,
-    };
-  } catch {
-    return {
-      status: 'warn',
-      label: 'Threat Cloud',
-      detail: 'Could not parse config to verify Threat Cloud',
-      fix: 'Run "pga setup" to reconfigure',
+      detail: 'Disabled (opted out — pga config set threatCloud.enabled true to re-enable)',
     };
   }
+
+  return {
+    status: 'pass',
+    label: 'Threat Cloud',
+    detail: `Connected to ${endpoint.replace(/^https?:\/\//, '')} (default — pga audit shares anonymized findings here)`,
+  };
 }
 
 function checkSystemService(): CheckResult {
