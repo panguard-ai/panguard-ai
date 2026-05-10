@@ -105,9 +105,12 @@ program.addCommand(doctorCommand());
 // the AI Compliance Audit Evidence generator is real (D1 Sprint 1).
 program.addCommand(reportCommand());
 
+// ── Trap (honeypot) is a first-class command — wired to the real
+//    panguard-trap engine via @panguard-ai/panguard-trap/cli ──
+program.addCommand(trapCommand());
+
 // ── Advanced commands (hidden from help, still usable) ──
 const hidden = { hidden: true };
-program.addCommand(trapCommand().helpOption(false), hidden);
 program.addCommand(threatCommand(), hidden);
 program.addCommand(demoCommand(), hidden);
 program.addCommand(initCommand(), hidden);
