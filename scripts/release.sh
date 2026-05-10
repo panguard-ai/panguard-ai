@@ -76,6 +76,7 @@ PACKAGES=(
   "packages/panguard-skill-auditor/package.json"
   "packages/panguard-mcp/package.json"
   "packages/panguard-guard/package.json"
+  "packages/migrator-community/package.json"
   "packages/panguard/package.json"
 )
 
@@ -142,6 +143,7 @@ PUBLISH_ORDER=(
   "packages/panguard-skill-auditor"
   "packages/panguard-mcp"
   "packages/panguard-guard"
+  "packages/migrator-community"
   "packages/panguard"
 )
 
