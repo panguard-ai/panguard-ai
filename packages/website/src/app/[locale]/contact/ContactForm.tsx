@@ -1,14 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Check } from 'lucide-react';
 
 const inputStyles =
   'w-full bg-surface-1 border border-border rounded-full px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors';
 
+const TIER_TO_INQUIRY_INDEX: Record<string, number> = {
+  pilot: 0,
+  enterprise: 0,
+  sovereign: 2,
+  oem: 2,
+  'atr-member': 2,
+};
+
 export default function ContactForm() {
   const t = useTranslations('contactForm');
+  const searchParams = useSearchParams();
 
   const inquiryTypes = t.raw('inquiryTypes') as string[];
 
@@ -21,6 +31,27 @@ export default function ContactForm() {
     type: '',
     message: '',
   });
+
+  useEffect(() => {
+    const tier = searchParams?.get('tier');
+    if (!tier) return;
+    const idx = TIER_TO_INQUIRY_INDEX[tier];
+    const prefilledType =
+      idx !== undefined && inquiryTypes[idx] !== undefined ? inquiryTypes[idx] : '';
+    const tierLabel: Record<string, string> = {
+      pilot: 'Pilot ($25K, 90 days)',
+      enterprise: 'Enterprise ($150K-$500K)',
+      sovereign: 'Sovereign AI ($5-20M)',
+      oem: 'Vendor OEM License ($2-10M/year)',
+      'atr-member': 'ATR Foundation Member ($10K/year)',
+    };
+    const label = tierLabel[tier];
+    setForm((prev) => ({
+      ...prev,
+      type: prefilledType || prev.type,
+      message: prev.message || (label ? `Tier: ${label}\n\n` : ''),
+    }));
+  }, [searchParams, inquiryTypes]);
 
   function update(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));

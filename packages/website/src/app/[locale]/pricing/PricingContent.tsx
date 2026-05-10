@@ -741,13 +741,15 @@ export default function PricingContent() {
                   ? 'Migrator 把一國 SOC 累積數十年的偵測知識（Sigma、YARA、Snort、SCADA 等）自動銜接到 AI Agent 時代，讓國家保留偵測知識的主權，無須丟棄、也無須回租。'
                   : "Migrator bridges decades of a nation's accumulated SOC detection IP (Sigma, YARA, Snort, SCADA, and others) into the AI agent era — letting the nation keep sovereignty over its detection knowledge, with no rewriting and no rental from foreign vendors."}
               </p>
-              <Link
-                href="/sovereign-ai-defense"
+              <a
+                href="https://sovereign-ai-defense.vercel.app"
+                target="_blank"
+                rel="noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs text-brand-sage font-semibold mt-4 hover:underline"
               >
                 {isZh ? '完整 Sovereign AI Defense 倡議書' : 'Full Sovereign AI Defense brief'}{' '}
                 <ArrowRight className="w-3 h-3" />
-              </Link>
+              </a>
             </div>
           </FadeInUp>
         </div>
@@ -811,6 +813,24 @@ export default function PricingContent() {
                     : 'Negotiable terms include M&A right of first refusal, joint GTM, engineering collaboration, and an ATR Foundation governance seat.'}
                 </p>
               </div>
+            </div>
+          </FadeInUp>
+
+          <FadeInUp delay={0.2}>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/contact?tier=oem"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-panguard-green text-white font-semibold text-sm hover:bg-panguard-green-light transition-colors"
+              >
+                {isZh ? '洽談 OEM 授權' : 'Discuss OEM license'}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a
+                href="mailto:adam@agentthreatrule.org?subject=PanGuard%20OEM%20License%20Inquiry"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-border text-text-secondary text-sm hover:border-brand-sage hover:text-text-primary transition-colors"
+              >
+                {isZh ? '直接寄信' : 'Email directly'}
+              </a>
             </div>
           </FadeInUp>
         </div>

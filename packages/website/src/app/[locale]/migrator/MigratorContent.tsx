@@ -481,13 +481,13 @@ export default function MigratorContent() {
                   <>
                     <code className="text-xs">npm install -g @panguard-ai/migrator-community</code>
                     <br />
-                    包含 Sigma、YARA、Snort 解析器、IR 中介層、ATR YAML 輸出與 CLI。
+                    包含 Sigma、YARA 解析器、IR 中介層、ATR YAML 輸出與 CLI。
                     可永久自架，作為開放標準的 sensor 訊號與後續 lead 來源。
                   </>
                 ) : (
                   <>
                     <code className="text-xs">npm install -g @panguard-ai/migrator-community</code>
-                    . Sigma / YARA / Snort parsers, IR transformer, ATR YAML output, CLI.
+                    . Sigma / YARA parsers, IR transformer, ATR YAML output, CLI.
                     Self-host forever. Lead pipeline and sensor signal for the open standard.
                   </>
                 )}
@@ -572,13 +572,15 @@ export default function MigratorContent() {
                   ? '為主權 AI 計畫設計的國家級部署。包含完整 Migrator Pro、ATR runtime、Compliance Evidence Module、Threat Cloud、在地部署，以及針對該國 SOC 既有偵測知識資產（傳統 SCADA、區域 SIEM 語料庫等）所設計的客製規則類別。由經認證的區域 enterprise vendor 夥伴負責落地，PanGuard 擔任上游 ATR 標準維護方。'
                   : "Nation-scale deployment for sovereign AI programs. Includes full Migrator Pro, the ATR runtime, the Compliance Evidence Module, Threat Cloud, in-region deployment, and custom rule classes tailored to a nation's existing SOC detection IP (traditional SCADA, regional SIEM corpora, and others). Delivered through a certified regional enterprise vendor partner, with PanGuard as the upstream ATR standards maintainer."}
               </p>
-              <Link
-                href="/sovereign-ai-defense"
+              <a
+                href="https://sovereign-ai-defense.vercel.app"
+                target="_blank"
+                rel="noreferrer"
                 className="text-[13px] text-blue-400 font-semibold inline-flex items-center gap-1 hover:underline"
               >
                 {isZh ? 'Sovereign AI 倡議書' : 'Sovereign AI brief'}{' '}
                 <ArrowRight className="w-3 h-3" />
-              </Link>
+              </a>
             </div>
           </FadeInUp>
         </div>
@@ -612,10 +614,12 @@ export default function MigratorContent() {
               Ready to migrate your detection coverage?
             </h2>
             <p className="text-text-secondary mb-8 leading-relaxed">
-              Migrator Community v0.1.0 is live on npm under MIT — Sigma / YARA / Snort parsers,
-              IR, transformers, and CLI. Migrator Enterprise v0.1.0 is production-ready today
-              (15 source-format adapters, strict 0-FP quality pipeline, 5-framework compliance
-              auto-mapping, 6-tab web dashboard, audit evidence packs). 90-day pilot available.
+              Migrator Community v0.1.0 is live on npm under MIT — Sigma / YARA parsers,
+              IR, transformers, and CLI. Migrator Enterprise v0.1.0 ships the full quality
+              pipeline (Sigma + YARA wired to runtime today; 13 additional adapters — Snort,
+              Splunk SPL, Elastic EQL, Falco, Semgrep, CodeQL, CVE-NVD, GHSA, OSV, KEV, garak,
+              PyRIT, promptfoo — v0.2 enterprise release), 5-framework compliance auto-mapping,
+              6-tab web dashboard, and audit evidence packs. 90-day pilot available.
               v1.0.0 GA target Q1 2027.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
