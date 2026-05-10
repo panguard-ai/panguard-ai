@@ -150,18 +150,42 @@ export default function DetectionHeritageBridge() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28">
         <FadeInUp>
           <p className="text-[11px] uppercase tracking-[0.18em] text-panguard-green font-semibold mb-4">
-            {isZh ? '把 20 年偵測知識接進 AI Agent 時代' : 'Bridging 20 years of detection IP into the AI agent era'}
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary mb-5 max-w-3xl">
             {isZh
-              ? '舊時代的規則 →  AI Agent 防護層'
-              : 'Legacy detection rules → AI agent defense layer'}
+              ? '把 20 年偵測知識銜接到 AI Agent 時代'
+              : 'Bridging 20 years of detection IP into the AI agent era'}
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-text-primary mb-5 max-w-3xl leading-tight">
+            {isZh
+              ? '舊時代的偵測規則，銜接成 AI Agent 防護層。'
+              : 'Legacy detection rules → AI agent defense layer.'}
           </h2>
-          <p className="text-base text-text-secondary leading-relaxed max-w-3xl">
-            {isZh
-              ? '銀行、醫院、政府、半導體廠的 SOC 累積了 20 年的偵測 IP——SIEM 查詢、惡意樣本特徵、IDS 規則、CVE 對應、靜態分析。AI Agent 時代來了，這些規則本身抓不到 prompt injection，但它們背後的「攻擊知識」依然有效——SQL injection 沒消失，只是搬進了 tool call；命令注入沒消失，只是換了載體。Migrator 把 15 種來源格式自動翻譯成 ATR 行為層規則，一條都不浪費。'
-              : 'A bank, hospital, government agency, or semiconductor SOC has accumulated 20 years of detection IP — SIEM queries, malware signatures, IDS rules, CVE mappings, static analysis. The AI agent era arrived. The rules themselves don\'t catch prompt injection, but the attack knowledge underneath still applies — SQL injection didn\'t vanish, it moved into tool calls; command injection didn\'t vanish, it changed substrate. Migrator translates 15 source formats into ATR behavioral rules. None of it goes to waste.'}
-          </p>
+          <div className="text-base text-text-secondary leading-[1.85] max-w-3xl space-y-4">
+            {isZh ? (
+              <>
+                <p>
+                  銀行、醫院、政府、半導體廠的 SOC，累積了二十年的偵測 IP——SIEM 查詢、惡意樣本特徵、IDS 規則、CVE 對應、靜態分析。
+                </p>
+                <p>
+                  AI Agent 時代到來，這些既有規則本身雖然抓不到 prompt injection，但背後的攻擊知識依然成立：SQL injection 沒消失，只是搬進了 tool call；命令注入沒消失，只是換了載體。
+                </p>
+                <p>
+                  Migrator 將 15 種來源格式自動翻譯成 ATR 行為層規則。過去累積的偵測知識，一條都不會浪費。
+                </p>
+              </>
+            ) : (
+              <>
+                <p>
+                  Banks, hospitals, government agencies, and semiconductor SOCs have accumulated two decades of detection IP — SIEM queries, malware signatures, IDS rules, CVE mappings, static analysis.
+                </p>
+                <p>
+                  In the AI agent era, those rules themselves no longer catch prompt injection, but the attack knowledge beneath them still holds. SQL injection did not vanish; it moved into tool calls. Command injection did not vanish; it changed substrate.
+                </p>
+                <p>
+                  Migrator automatically translates 15 source formats into ATR behavioral rules. Not a single line of accumulated detection knowledge is wasted.
+                </p>
+              </>
+            )}
+          </div>
         </FadeInUp>
 
         {/* 15 source formats grouped by era */}
@@ -215,10 +239,10 @@ export default function DetectionHeritageBridge() {
               <p className="text-[11px] uppercase tracking-wider text-panguard-green font-semibold mb-2">
                 {isZh ? '輸出：ATR 行為層規則' : 'Output: ATR behavioral rules'}
               </p>
-              <p className="font-mono text-xs text-text-secondary leading-relaxed">
+              <p className="text-xs text-text-secondary leading-[1.85]">
                 {isZh
-                  ? 'AI Agent 行為偵測 + 5 框架合規 metadata + 測試案例 + SHA-256 稽核軌跡'
-                  : 'AI agent behavior detection + 5-framework compliance metadata + test cases + SHA-256 audit trail'}
+                  ? 'AI Agent 行為偵測規則、五大框架合規 metadata、測試案例，以及 SHA-256 稽核軌跡。'
+                  : 'AI agent behavioral detection rules, five-framework compliance metadata, test cases, and SHA-256 audit trails.'}
               </p>
             </div>
           </div>
@@ -238,24 +262,24 @@ export default function DetectionHeritageBridge() {
                     ? '擁有自己的模型，不等於擁有自己的 detection IP。'
                     : 'Owning your own model is not the same as owning your detection IP.'}
                 </h3>
-                <p className="text-base text-text-secondary leading-relaxed mb-4">
+                <p className="text-base text-text-secondary leading-[1.85] mb-4">
                   {isZh
-                    ? '印度、日本、英國、法國、韓國、UAE、台灣——每個民主國家都在打造主權 AI 模型與算力。但當這些 AI 變成 Agent，安全層仍然由美國私企供應（閉源規則、黑盒模型）。這正是 Sovereign AI 想要消除的依賴。'
-                    : 'India, Japan, UK, France, Korea, UAE, Taiwan — every democracy is building sovereign AI models and compute. But when those AI systems become agents, the security layer is still rented from US-private vendors (proprietary rules, black-box models). That is exactly the dependency Sovereign AI was created to escape.'}
+                    ? '印度、日本、英國、法國、韓國、UAE、台灣——每一個民主國家都在打造自己的主權 AI 模型與算力。然而當這些 AI 進化為 Agent 之後，安全層仍然由美國私企以閉源規則與黑盒模型供應，這正是主權 AI 計畫原本想要消除的依賴關係。'
+                    : 'India, Japan, the UK, France, Korea, the UAE, and Taiwan are all building sovereign AI models and compute. Yet once those AI systems evolve into agents, the security layer is still supplied by US-private vendors using proprietary rules and black-box models — exactly the dependency that sovereign AI programs were created to escape.'}
                 </p>
-                <p className="text-base text-text-secondary leading-relaxed mb-4">
+                <p className="text-base text-text-secondary leading-[1.85] mb-4">
                   {isZh
-                    ? '一個國家的 SOC 累積的 detection IP，是這個國家的「資安主權」。Migrator 確保——你的 Sigma 規則、YARA 樣本、Splunk 查詢、CVE 對應——這些 20 年累積的知識，在 AI Agent 時代依然是你的，不必丟掉重來，也不必租回來。'
-                    : "A nation's accumulated SOC detection IP is its security sovereignty. Migrator ensures that your Sigma rules, YARA signatures, Splunk queries, and CVE mappings — 20 years of accumulated knowledge — remain yours in the AI agent era. You don\'t throw it out. You don\'t rent it back."}
+                    ? '一個國家的 SOC 二十年累積下來的 detection IP（Sigma 規則、YARA 樣本、Splunk 查詢、CVE 對應），本身就是這個國家的資安主權。Migrator 的角色，是把這份知識自動延伸到 AI Agent 時代——既不必丟棄重練，也不需要從外國廠商租回。'
+                    : "A nation's accumulated SOC detection IP — Sigma rules, YARA signatures, Splunk queries, CVE mappings — is itself a form of security sovereignty. Migrator extends that body of knowledge into the AI agent era automatically, with no rewriting from scratch and no renting it back from foreign vendors."}
                 </p>
-                <p className="text-base text-text-primary font-semibold leading-relaxed">
+                <p className="text-base text-text-primary font-semibold leading-[1.85]">
                   {isZh
-                    ? 'Sovereign AI = 主權的模型 + 主權的算力 + 主權的偵測知識。三者俱全，才稱得上完整。'
-                    : 'Sovereign AI = sovereign model + sovereign compute + sovereign detection knowledge. Only with all three is it complete.'}
+                    ? '主權 AI 的完整定義：主權的模型、主權的算力、主權的偵測知識。三者俱備，才稱得上完整。'
+                    : 'Sovereign AI is defined by three components: sovereign model, sovereign compute, and sovereign detection knowledge. Only with all three is it complete.'}
                 </p>
-                <p className="text-sm text-brand-sage font-semibold leading-relaxed mt-3">
+                <p className="text-sm text-brand-sage font-semibold leading-[1.85] mt-4">
                   {isZh
-                    ? '一個 sovereign AI 客戶目前在主動對話中。'
+                    ? '目前已有一個主權 AI 客戶處於積極對話階段。'
                     : 'One sovereign AI customer is in active conversation.'}
                 </p>
                 <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">

@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
@@ -152,6 +153,8 @@ const COMMAND = `pga migrate-pro \\
   --audit-period 2026-Q2`;
 
 export default function MigratorContent() {
+  const locale = useLocale();
+  const isZh = locale === 'zh-TW';
   return (
     <>
       {/* HERO */}
@@ -451,9 +454,13 @@ export default function MigratorContent() {
       <SectionWrapper className="py-20 border-t border-border">
         <FadeInUp>
           <SectionTitle
-            overline="MIGRATOR PRICING"
-            title="Four ways to use Migrator"
-            subtitle="Free for solo dev. Pilot for one-team trial. Standalone for orgs that only need the conversion. Sovereign for nation-scale Aramco-era / SCADA bridges. Migrator Pro is also bundled inside PanGuard Enterprise."
+            overline={isZh ? 'MIGRATOR 定價' : 'MIGRATOR PRICING'}
+            title={isZh ? 'Migrator 的四種採用路徑' : 'Four ways to use Migrator'}
+            subtitle={
+              isZh
+                ? 'Community 免費供個人開發者使用；Pilot 適用於單一團隊試用；Standalone 給只需要規則轉換的組織；Sovereign 為國家級 SOC 知識遷移而設計。Migrator Pro 同時內建於 PanGuard Enterprise 方案中。'
+                : 'Free for solo developers. Pilot for one-team trials. Standalone for organisations that only need the conversion layer. Sovereign for nation-scale SOC bridges. Migrator Pro is also bundled inside PanGuard Enterprise.'
+            }
           />
         </FadeInUp>
         <div className="max-w-6xl mx-auto mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -465,12 +472,25 @@ export default function MigratorContent() {
               </p>
               <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-3xl font-extrabold text-text-primary">$0</span>
-                <span className="text-xs text-text-muted">forever · MIT</span>
+                <span className="text-xs text-text-muted">
+                  {isZh ? '永久免費 · MIT 授權' : 'forever · MIT'}
+                </span>
               </div>
-              <p className="text-[13px] text-text-secondary leading-relaxed mb-4 flex-1">
-                <code className="text-xs">npm install -g @panguard-ai/migrator-community</code>.
-                Sigma / YARA / Snort parsers, IR transformer, ATR YAML output, CLI. Self-host
-                forever. Lead pipeline + sensor signal for the open standard.
+              <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
+                {isZh ? (
+                  <>
+                    <code className="text-xs">npm install -g @panguard-ai/migrator-community</code>
+                    <br />
+                    包含 Sigma、YARA、Snort 解析器、IR 中介層、ATR YAML 輸出與 CLI。
+                    可永久自架，作為開放標準的 sensor 訊號與後續 lead 來源。
+                  </>
+                ) : (
+                  <>
+                    <code className="text-xs">npm install -g @panguard-ai/migrator-community</code>
+                    . Sigma / YARA / Snort parsers, IR transformer, ATR YAML output, CLI.
+                    Self-host forever. Lead pipeline and sensor signal for the open standard.
+                  </>
+                )}
               </p>
               <a
                 href="https://www.npmjs.com/package/@panguard-ai/migrator-community"
@@ -478,7 +498,7 @@ export default function MigratorContent() {
                 rel="noreferrer"
                 className="text-[13px] text-brand-sage font-semibold inline-flex items-center gap-1 hover:underline"
               >
-                Install on npm <ArrowRight className="w-3 h-3" />
+                {isZh ? '在 npm 安裝' : 'Install on npm'} <ArrowRight className="w-3 h-3" />
               </a>
             </div>
           </FadeInUp>
@@ -487,23 +507,24 @@ export default function MigratorContent() {
           <FadeInUp delay={0.1}>
             <div className="bg-surface-2 rounded-xl border border-amber-400/30 p-6 flex flex-col h-full">
               <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 mb-3">
-                Pilot · 90 days
+                {isZh ? 'Pilot · 90 天' : 'Pilot · 90 days'}
               </p>
               <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-3xl font-extrabold text-text-primary">$25K</span>
-                <span className="text-xs text-text-muted">credited Y1</span>
+                <span className="text-xs text-text-muted">
+                  {isZh ? '可全額抵 Y1 合約' : 'credited Y1'}
+                </span>
               </div>
-              <p className="text-[13px] text-text-secondary leading-relaxed mb-4 flex-1">
-                One team, one rule corpus. We enrich up to 100 of your Sigma / YARA rules to
-                Cisco-merge-PR quality with 5-framework compliance metadata. Sample audit
-                evidence pack. Founder direct. Credit applies on Migrator Standalone or
-                PanGuard Enterprise.
+              <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
+                {isZh
+                  ? '針對單一團隊與單一規則語料庫。我們會將最多 100 條 Sigma 或 YARA 規則 enrich 到 Cisco merge PR 品質，附上五大框架合規 metadata 與一份範例稽核證據包。由創辦人直接服務。費用可全額抵入 Migrator Standalone 或 PanGuard Enterprise 年約。'
+                  : 'One team, one rule corpus. We enrich up to 100 Sigma or YARA rules to Cisco-merge-PR quality with five-framework compliance metadata, plus a sample audit evidence pack. Founder-led delivery. The full fee credits toward Migrator Standalone or PanGuard Enterprise.'}
               </p>
               <a
                 href="mailto:adam@agentthreatrule.org?subject=Migrator%20pilot"
                 className="text-[13px] text-amber-400 font-semibold inline-flex items-center gap-1 hover:underline"
               >
-                Request pilot <ArrowRight className="w-3 h-3" />
+                {isZh ? '申請 Pilot' : 'Request pilot'} <ArrowRight className="w-3 h-3" />
               </a>
             </div>
           </FadeInUp>
@@ -512,26 +533,24 @@ export default function MigratorContent() {
           <FadeInUp delay={0.15}>
             <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-6 flex flex-col h-full ring-1 ring-brand-sage/10">
               <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mb-3">
-                Standalone · annual
+                {isZh ? 'Standalone · 年約' : 'Standalone · annual'}
               </p>
               <div className="flex items-baseline gap-2 mb-1">
                 <span className="text-3xl font-extrabold text-text-primary">$500K&ndash;2M</span>
               </div>
               <p className="text-[10px] text-text-muted mb-3">
-                target $750K&ndash;1.5M
+                {isZh ? '目標區間 $750K – $1.5M' : 'target $750K–$1.5M'}
               </p>
-              <p className="text-[13px] text-text-secondary leading-relaxed mb-4 flex-1">
-                Migrator Pro only — for orgs that need the legacy bridge but not yet the full
-                PanGuard runtime. Full 15-format adapter library, strict 0-FP quality pipeline,
-                5-framework compliance evidence packs, 6-tab web dashboard, on-prem deploy,
-                ATR upstream contribution pipeline. Ideal for compliance teams or red teams
-                evaluating the standard before runtime adoption.
+              <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
+                {isZh
+                  ? '提供給只需要規則遷移、暫不導入完整 PanGuard runtime 的組織。包含全部 15 種來源格式 adapter、strict 0-FP 品質流水線、五大框架合規證據包、六分頁 Web Dashboard、地端部署，以及 ATR upstream 貢獻管線。適合在進行 runtime 採用前先驗證標準的合規團隊或紅隊。'
+                  : 'For organisations that need the legacy bridge but are not yet adopting the full PanGuard runtime. Includes all 15 source-format adapters, the strict 0-FP quality pipeline, five-framework compliance evidence packs, the 6-tab web dashboard, on-prem deployment, and the ATR upstream contribution pipeline. Designed for compliance teams or red teams evaluating the standard before runtime adoption.'}
               </p>
               <a
                 href="mailto:adam@agentthreatrule.org?subject=Migrator%20Standalone"
                 className="text-[13px] text-brand-sage font-semibold inline-flex items-center gap-1 hover:underline"
               >
-                Talk to founder <ArrowRight className="w-3 h-3" />
+                {isZh ? '與創辦人洽談' : 'Talk to founder'} <ArrowRight className="w-3 h-3" />
               </a>
             </div>
           </FadeInUp>
@@ -540,27 +559,25 @@ export default function MigratorContent() {
           <FadeInUp delay={0.2}>
             <div className="bg-surface-2 rounded-xl border border-blue-400/30 p-6 flex flex-col h-full">
               <p className="text-[11px] uppercase tracking-wider font-semibold text-blue-400 mb-3">
-                Sovereign · multi-year
+                {isZh ? 'Sovereign · 多年合約' : 'Sovereign · multi-year'}
               </p>
               <div className="flex items-baseline gap-2 mb-1">
                 <span className="text-3xl font-extrabold text-text-primary">$3&ndash;10M</span>
               </div>
               <p className="text-[10px] text-text-muted mb-3">
-                multi-year national contract
+                {isZh ? '多年期國家合約' : 'multi-year national contract'}
               </p>
-              <p className="text-[13px] text-text-secondary leading-relaxed mb-4 flex-1">
-                Nation-scale deployment for sovereign AI programs. Full Migrator Pro + ATR
-                runtime + Compliance Evidence + Threat Cloud + in-region deployment + custom
-                rule classes for that nation&rsquo;s SOC inheritance (Aramco-era SCADA, regional
-                SIEM corpora). Delivered through a regional enterprise vendor partner with
-                PanGuard as the ATR-certified upstream maintainer. One sovereign customer is
-                in active conversation.
+              <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
+                {isZh
+                  ? '為主權 AI 計畫設計的國家級部署，包含完整 Migrator Pro、ATR runtime、Compliance Evidence、Threat Cloud、在地部署，以及針對該國 SOC 既有 detection IP（Aramco-era SCADA、區域 SIEM 語料庫等）所設計的客製規則類別。由區域 enterprise vendor 合作夥伴負責落地，PanGuard 擔任 ATR-certified 上游維護方。目前已有一個主權 AI 客戶處於積極對話階段。'
+                  : 'Nation-scale deployment for sovereign AI programs. Includes full Migrator Pro, the ATR runtime, the Compliance Evidence module, Threat Cloud, in-region deployment, and custom rule classes tailored to that nation’s existing SOC detection IP (Aramco-era SCADA, regional SIEM corpora). Delivered by a regional enterprise vendor partner with PanGuard as the ATR-certified upstream maintainer. One sovereign customer is in active conversation.'}
               </p>
               <Link
                 href="/sovereign-ai-defense"
                 className="text-[13px] text-blue-400 font-semibold inline-flex items-center gap-1 hover:underline"
               >
-                Sovereign AI brief <ArrowRight className="w-3 h-3" />
+                {isZh ? 'Sovereign AI 倡議書' : 'Sovereign AI brief'}{' '}
+                <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
           </FadeInUp>
@@ -569,18 +586,19 @@ export default function MigratorContent() {
         <FadeInUp delay={0.3}>
           <div className="max-w-4xl mx-auto mt-10 bg-surface-2 border border-border rounded-xl p-6 text-center">
             <p className="text-xs uppercase tracking-wider font-semibold text-brand-sage mb-2">
-              Already buying PanGuard Enterprise?
+              {isZh ? '已採用 PanGuard Enterprise 的客戶' : 'Already buying PanGuard Enterprise?'}
             </p>
-            <p className="text-sm text-text-secondary leading-relaxed">
-              Migrator Pro is bundled inside PanGuard Enterprise ($150K floor · target $250K&ndash;1M ·
-              up to $3M+). The Standalone and Sovereign tiers are for customers who want
-              Migrator without the full runtime.
+            <p className="text-sm text-text-secondary leading-[1.85]">
+              {isZh
+                ? 'Migrator Pro 已內建於 PanGuard Enterprise 方案（年費 $150K 起，目標 $250K – $1M，上限 $3M+）。Standalone 與 Sovereign 兩種 tier 是為「只想採用 Migrator、暫不導入完整 runtime」的客戶所設。'
+                : 'Migrator Pro is bundled inside PanGuard Enterprise ($150K floor · target $250K–$1M · up to $3M+). The Standalone and Sovereign tiers are for customers who want Migrator without the full runtime.'}
             </p>
             <Link
               href="/pricing"
               className="inline-flex items-center gap-1.5 text-xs text-brand-sage font-semibold mt-3 hover:underline"
             >
-              See full PanGuard pricing <ArrowRight className="w-3 h-3" />
+              {isZh ? '查看 PanGuard 完整定價' : 'See full PanGuard pricing'}{' '}
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </FadeInUp>
