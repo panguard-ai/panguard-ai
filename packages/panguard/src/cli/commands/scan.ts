@@ -24,7 +24,12 @@ import { PANGUARD_VERSION } from '../../index.js';
 import { computeGrade, buildScanOutput, saveResults } from '../scan-helpers.js';
 import type { ScanOutputSystem } from '../scan-helpers.js';
 import { ensureTelemetryConsent } from '../consent.js';
-import { reportTelemetry, discoverLocalSkillCount, getLocalPlatform } from '../telemetry.js';
+import {
+  reportTelemetry,
+  reportScanToCloud,
+  discoverLocalSkillCount,
+  getLocalPlatform,
+} from '../telemetry.js';
 
 function remoteSystem(openPorts: number): ScanOutputSystem {
   return {
@@ -266,6 +271,11 @@ export function scanCommand(): Command {
               findingCount: result.findings.length,
               severity: result.riskLevel,
             });
+            void reportScanToCloud(telemetryEnabled, {
+              mode: 'remote',
+              findingsCount: result.findings.length,
+              riskLevel: result.riskLevel,
+            });
             return;
           }
 
@@ -337,6 +347,11 @@ export function scanCommand(): Command {
             findingCount: result.findings.length,
             severity: result.riskLevel,
           });
+          void reportScanToCloud(telemetryEnabled, {
+            mode: 'remote',
+            findingsCount: result.findings.length,
+            riskLevel: result.riskLevel,
+          });
           return;
         }
 
@@ -377,6 +392,11 @@ export function scanCommand(): Command {
             skillCount: await discoverLocalSkillCount(),
             findingCount: result.findings.length,
             severity: result.riskLevel,
+          });
+          void reportScanToCloud(telemetryEnabled, {
+            mode: 'local',
+            findingsCount: result.findings.length,
+            riskLevel: result.riskLevel,
           });
           return;
         }
@@ -537,6 +557,11 @@ export function scanCommand(): Command {
           skillCount: await discoverLocalSkillCount(),
           findingCount: result.findings.length,
           severity: result.riskLevel,
+        });
+        void reportScanToCloud(telemetryEnabled, {
+          mode: 'local',
+          findingsCount: result.findings.length,
+          riskLevel: result.riskLevel,
         });
       }
     );
