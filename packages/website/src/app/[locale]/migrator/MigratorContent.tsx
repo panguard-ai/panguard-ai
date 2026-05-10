@@ -458,7 +458,7 @@ export default function MigratorContent() {
             title={isZh ? 'Migrator 的四種採用路徑' : 'Four ways to use Migrator'}
             subtitle={
               isZh
-                ? 'Community 免費供個人開發者使用；Pilot 適用於單一團隊試用；Standalone 給只需要規則轉換的組織；Sovereign 為國家級 SOC 知識遷移而設計。Migrator Pro 同時內建於 PanGuard Enterprise 方案中。'
+                ? 'Community 免費，給個人開發者；Pilot 給單一團隊試用；Standalone 給只需要規則遷移、暫時不導入完整 runtime 的組織；Sovereign 為國家級 SOC 知識遷移而設計。Migrator Pro 也已內建於 PanGuard Enterprise 方案中。'
                 : 'Free for solo developers. Pilot for one-team trials. Standalone for organisations that only need the conversion layer. Sovereign for nation-scale SOC bridges. Migrator Pro is also bundled inside PanGuard Enterprise.'
             }
           />
@@ -517,7 +517,7 @@ export default function MigratorContent() {
               </div>
               <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
                 {isZh
-                  ? '針對單一團隊與單一規則語料庫。我們會將最多 100 條 Sigma 或 YARA 規則 enrich 到 Cisco merge PR 品質，附上五大框架合規 metadata 與一份範例稽核證據包。由創辦人直接服務。費用可全額抵入 Migrator Standalone 或 PanGuard Enterprise 年約。'
+                  ? '針對單一團隊與單一規則語料庫。我們會把最多 100 條 Sigma 或 YARA 規則精修到 Cisco 已合併 PR 的品質水準，附上五大框架合規 metadata，以及一份範例稽核證據包。由創辦人親自服務。費用可全額抵入 Migrator Standalone 或 PanGuard Enterprise 年約。'
                   : 'One team, one rule corpus. We enrich up to 100 Sigma or YARA rules to Cisco-merge-PR quality with five-framework compliance metadata, plus a sample audit evidence pack. Founder-led delivery. The full fee credits toward Migrator Standalone or PanGuard Enterprise.'}
               </p>
               <a
