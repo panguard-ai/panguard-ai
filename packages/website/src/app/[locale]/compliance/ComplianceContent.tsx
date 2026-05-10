@@ -204,6 +204,18 @@ export default function ComplianceContent() {
               <ul className="space-y-2 text-sm text-text-secondary">
                 <li className="flex items-start gap-2">
                   <span className="text-brand-sage shrink-0">✓</span>
+                  <span>NIST AI RMF — 100% rule coverage · 1,566 mappings · 16 subcategories across GV / MP / MS / MG (ATR v2.1.0, 2026-05-09)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-sage shrink-0">✓</span>
+                  <span>OWASP Agentic Top 10 — 10 / 10 categories · 77 rule links</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-sage shrink-0">✓</span>
+                  <span>EU AI Act + ISO/IEC 42001 metadata auto-tagged via Migrator Enterprise pipeline</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-brand-sage shrink-0">✓</span>
                   <span>Audit log — admin actions, actor, IP, timestamp (Threat Cloud)</span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -213,10 +225,6 @@ export default function ComplianceContent() {
                 <li className="flex items-start gap-2">
                   <span className="text-brand-sage shrink-0">✓</span>
                   <span>Client key registration + revocation (API-key AAM lite)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-brand-sage shrink-0">✓</span>
-                  <span>OWASP Agentic Top 10 mapping · 10 / 10 categories · 77 rule links</span>
                 </li>
               </ul>
             </div>
@@ -235,12 +243,8 @@ export default function ComplianceContent() {
                   <span className="text-amber-400 shrink-0">○</span>
                   <span>
                     <code className="font-mono text-xs">pga report --framework &lt;name&gt;</code> —
-                    Markdown + PDF reports with per-rule mapping
+                    Markdown + PDF reports with per-rule mapping (Q2 2026)
                   </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-amber-400 shrink-0">○</span>
-                  <span>4-framework metadata added to all {STATS.atrRules} ATR rules</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-400 shrink-0">○</span>
@@ -264,24 +268,32 @@ export default function ComplianceContent() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12 max-w-5xl mx-auto">
           {[
             {
-              name: 'EU AI Act',
-              scope: 'Article 9, 10, 12, 14, 15 risk management',
-              date: 'Enforcement 2026-08-02',
-            },
-            {
-              name: 'Colorado AI Act',
-              scope: 'SB24-205 algorithmic discrimination',
-              date: 'Enforcement 2026-06-01',
-            },
-            {
               name: 'NIST AI RMF',
               scope: 'Govern / Map / Measure / Manage',
               date: 'Voluntary · F500 RFP standard',
+              status: 'shipped' as const,
+              statusLabel: '100% mapped · v2.1.0',
+            },
+            {
+              name: 'EU AI Act',
+              scope: 'Article 9, 10, 12, 14, 15 risk management',
+              date: 'Enforcement 2026-08-02',
+              status: 'partial' as const,
+              statusLabel: 'Auto-tagging via Migrator',
             },
             {
               name: 'ISO / IEC 42001',
               scope: 'AIMS clauses 6–10',
               date: 'Certification pathway',
+              status: 'partial' as const,
+              statusLabel: 'Auto-tagging via Migrator',
+            },
+            {
+              name: 'Colorado AI Act',
+              scope: 'SB24-205 algorithmic discrimination',
+              date: 'Enforcement 2026-06-01',
+              status: 'planned' as const,
+              statusLabel: 'Mapping Q2 2026',
             },
           ].map((framework, i) => (
             <FadeInUp key={framework.name} delay={i * 0.06}>
@@ -291,7 +303,17 @@ export default function ComplianceContent() {
                   {framework.scope}
                 </p>
                 <p className="text-[10px] text-text-muted mt-3 font-mono">{framework.date}</p>
-                <p className="text-[10px] text-amber-400 mt-1 font-semibold">Mapping Q2 2026</p>
+                <p
+                  className={`text-[10px] mt-1 font-semibold ${
+                    framework.status === 'shipped'
+                      ? 'text-brand-sage'
+                      : framework.status === 'partial'
+                      ? 'text-blue-400'
+                      : 'text-amber-400'
+                  }`}
+                >
+                  {framework.statusLabel}
+                </p>
               </div>
             </FadeInUp>
           ))}
