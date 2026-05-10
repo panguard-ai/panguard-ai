@@ -64,6 +64,12 @@ interface SystemStatus {
 }
 
 async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void> {
+  // Silence structured logs before any lazy imports — platform-detector and
+  // config-reader fire info/warn lines that leak into the human-readable
+  // status panel and break --json output. Status owns the screen.
+  const { setLogLevel } = await import('@panguard-ai/core');
+  setLogLevel('silent');
+
   const config = readConfig();
   const lang: Lang = (opts.lang as Lang) ?? config?.meta?.language ?? 'en';
 
@@ -262,6 +268,10 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
     const { resolve } = await import('node:path');
     const { pathToFileURL } = await import('node:url');
     const candidates = [
+      // Subpath exposes discoverAllSkills (root export doesn't). Same
+      // pattern as `pga setup` — keeps status in lockstep with setup's
+      // skill-discovery wiring.
+      '@panguard-ai/panguard-mcp/config',
       '@panguard-ai/panguard-mcp',
       pathToFileURL(resolve(process.cwd(), 'packages/panguard-mcp/dist/config/index.js')).href,
     ];
