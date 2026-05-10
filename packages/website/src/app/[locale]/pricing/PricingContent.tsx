@@ -51,10 +51,10 @@ export default function PricingContent() {
             </h1>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mt-6 leading-relaxed">
+            <p className="text-lg sm:text-xl text-text-secondary max-w-3xl mx-auto mt-6 leading-relaxed">
               {isZh
-                ? 'AI agent 安全需要一個感測器網路和一個 F500 平台。Community 安裝餵感測器網路;Enterprise 拿到平台與合規證據套件。中間 tier 不適合這類產品 — 我們刻意跳過。'
-                : 'AI agent security needs both a sensor network and an F500-grade platform. Community installs feed the network. Enterprise gets the platform + compliance evidence kit. We skip the middle tier on purpose — and explain why below.'}
+                ? '4 條收費軌：Open Standard（永久免費）· Enterprise SaaS · Sovereign AI 國家級 reference · Vendor OEM 授權。Community 是感測器網路；Enterprise 解決 F500 合規 + 舊規則升級；Sovereign 解決國家層的 detection IP 主權；OEM 給把 ATR 出貨在自家產品的平台廠商。中間 tier 對這個產品是陷阱——刻意跳過。'
+                : 'Four revenue tracks: Open Standard (free forever) · Enterprise SaaS · Sovereign AI national reference · Vendor OEM license. Community is sensor infrastructure. Enterprise solves F500 compliance + legacy-rule migration. Sovereign solves the nation-state detection-IP gap. OEM is for platform vendors shipping ATR inside their products. The middle tier is a trap for this product — skipped on purpose.'}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.2}>
@@ -234,40 +234,114 @@ export default function PricingContent() {
 
               <p className="text-sm text-text-secondary mt-3 leading-relaxed">
                 {isZh
-                  ? '不賣 feature spec,賣「ATR 標準維護者的直接關係 + F500 合規證據套件」。'
-                  : 'We do not sell feature specs — we sell a direct channel to the ATR standard maintainer plus an F500-ready compliance evidence kit.'}
+                  ? '你買的不是 feature spec，是 3 件事：(1) 把 SOC 20 年偵測 IP 帶進 AI Agent 時代的 Migrator Pro、(2) auditor 認的合規證據包、(3) ATR 標準維護者直線關係。其餘平台基礎設施隨單同行。'
+                  : 'You are not buying feature specs — you are buying 3 things: (1) Migrator Pro to carry 20 years of SOC detection IP into the AI agent era, (2) auditor-grade compliance evidence packs, (3) direct line to the ATR standard maintainer. Platform infrastructure ships alongside.'}
               </p>
 
               <div className="my-7 flex-1">
-                <ul className="space-y-2.5">
+                <p className="text-[10px] uppercase tracking-wider font-semibold text-brand-sage mb-2 mt-1">
+                  {isZh ? '① Migrator Pro — 把舊規則升級成 AI Agent 規則' : '① Migrator Pro — bridge legacy rules to AI agent layer'}
+                </p>
+                <ul className="space-y-2 mb-5">
                   {(isZh
                     ? [
-                        '完全無上限:agents / tenants / seats / sites',
+                        '15 種來源格式：Sigma · Splunk SPL · Elastic EQL · YARA · Snort · Falco · Semgrep · CodeQL · CVE-NVD · GHSA · OSV · CISA KEV · NVIDIA garak · Microsoft PyRIT · promptfoo',
+                        'Cisco-merge-PR 等級的 LLM + 人工 enrichment',
+                        '5 框架合規 metadata 自動對照（EU AI Act + NIST AI RMF + ISO 42001 + OWASP Agentic + LLM Top 10）',
+                        'SHA-256 + Merkle tree 簽章的稽核證據包',
+                        '6-tab web dashboard + on-prem 部署 + ATR upstream 貢獻 pipeline',
+                      ]
+                    : [
+                        '15 source formats: Sigma · Splunk SPL · Elastic EQL · YARA · Snort · Falco · Semgrep · CodeQL · CVE-NVD · GHSA · OSV · CISA KEV · NVIDIA garak · Microsoft PyRIT · promptfoo',
+                        'Cisco-merge-PR-quality LLM + human enrichment',
+                        '5-framework compliance metadata auto-mapping (EU AI Act + NIST AI RMF + ISO 42001 + OWASP Agentic + LLM Top 10)',
+                        'SHA-256 + Merkle-tree signed audit evidence packs',
+                        '6-tab web dashboard + on-prem deployment + ATR upstream contribution pipeline',
+                      ]
+                  ).map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
+                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="text-[10px] uppercase tracking-wider font-semibold text-brand-sage mb-2">
+                  {isZh ? '② AI Compliance Audit Evidence Module — Vanta / Drata 做不出的東西' : '② AI Compliance Audit Evidence Module — what Vanta / Drata cannot build'}
+                </p>
+                <ul className="space-y-2 mb-5">
+                  {(isZh
+                    ? [
+                        '季度報告：每筆偵測 → ATR 規則 ID → 5 框架條文（EU AI Act · Colorado · NIST AI RMF · ISO 42001 · OWASP Agentic）',
+                        'NIST AI RMF 100% 對應（1,566 個 mapping，已上線）',
+                        'EU AI Act Article 9/12/14/15/50 自動對照',
+                        '為什麼 Vanta/Drata 做不出：他們沒 detection engine + ATR 標準 + audit log 完整堆疊',
+                      ]
+                    : [
+                        'Quarterly reports threading detection event → ATR rule ID → 5-framework articles (EU AI Act · Colorado · NIST AI RMF · ISO 42001 · OWASP Agentic)',
+                        'NIST AI RMF 100% coverage shipped (1,566 mappings)',
+                        'EU AI Act Article 9/12/14/15/50 auto-mapping',
+                        'Why Vanta/Drata cannot build this: they lack the detection engine + ATR standard + audit log stack',
+                      ]
+                  ).map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
+                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="text-[10px] uppercase tracking-wider font-semibold text-brand-sage mb-2">
+                  {isZh ? '③ ATR 標準維護者直線關係' : '③ Direct line to the ATR standard maintainer'}
+                </p>
+                <ul className="space-y-2 mb-5">
+                  {(isZh
+                    ? [
+                        '早期 draft 規則 access（公開前 30 天）',
+                        '客戶 contributed 規則進入 ATR upstream（你的偵測 IP 被 Cisco / Microsoft 採用）',
+                        'Roadmap 投票權 + 季度 executive review',
+                        '優先規則更新 SLA：< 4 小時（vs Community < 24 小時）',
+                      ]
+                    : [
+                        'Early draft rule access (30 days before public)',
+                        'Customer-contributed rules upstream into ATR (your detection IP shipped by Cisco / Microsoft)',
+                        'Roadmap vote + quarterly executive review',
+                        'Priority rule update SLA: < 4h (vs < 24h Community)',
+                      ]
+                  ).map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
+                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="text-[10px] uppercase tracking-wider font-semibold text-text-muted mb-2">
+                  {isZh ? '平台基礎設施（隨單同行）' : 'Platform infrastructure (included)'}
+                </p>
+                <ul className="space-y-2">
+                  {(isZh
+                    ? [
+                        '完全無上限：agents / tenants / seats / sites',
                         'On-prem / VPC / airgap 部署',
                         'SAML SSO · SCIM · SIEM webhook · audit export',
-                        'AIAM:agent 身分 + scope + delegation(2026 Q3)',
-                        '★ AI Compliance Audit Evidence Module(季度報告對應 EU AI Act · Colorado · NIST AI RMF · ISO 42001 · OWASP Agentic)',
-                        '優先規則更新 SLA:< 4 小時(vs Community < 24 小時)',
-                        'F500 Logo 計畫 · Cisco/Microsoft/NVIDIA 生態系 co-sell',
-                        'ATR 標準組織直接 relationship + 早期 draft 規則 access',
-                        '專屬 CSM · 季度高管審閱 · roadmap 發言權',
-                        'PanGuard Inc. SOC2 Type II 認證(目標 2027 Q2)',
+                        'AIAM：agent 身分 + scope + delegation（2026 Q3）',
+                        'F500 Logo 計畫 · Cisco / Microsoft / NVIDIA 生態系 co-sell',
+                        '專屬 CSM',
+                        'PanGuard Inc. SOC 2 Type 1 進行中 Q3 2026 · Type II 目標 H2 2027',
                       ]
                     : [
                         'Truly unlimited: agents / tenants / seats / sites',
                         'On-prem / VPC / airgap deployment',
                         'SAML SSO · SCIM · SIEM webhook · audit export',
                         'AIAM: agent identity + scope + delegation (Q3 2026)',
-                        '★ AI Compliance Audit Evidence Module — quarterly reports mapping every detection to EU AI Act · Colorado · NIST AI RMF · ISO 42001 · OWASP Agentic',
-                        'Priority rule update SLA: < 4h (vs < 24h Community)',
                         'F500 Logo program · co-sell with Cisco / Microsoft / NVIDIA ecosystem',
-                        'Direct relationship with ATR standard maintainer · early draft rule access',
-                        'Dedicated CSM · quarterly executive review · roadmap voice',
-                        'SOC 2 Type 1 in flight Q3 2026 · Type II target H2 2027',
+                        'Dedicated CSM',
+                        'PanGuard Inc. SOC 2 Type 1 in flight Q3 2026 · Type II target H2 2027',
                       ]
                   ).map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-text-muted shrink-0 mt-0.5" />
                       <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
                     </li>
                   ))}
@@ -297,6 +371,156 @@ export default function PricingContent() {
             </p>
           </div>
         </FadeInUp>
+      </SectionWrapper>
+
+      {/* ─── Sovereign National Reference Track ─── */}
+      <SectionWrapper>
+        <div className="max-w-5xl mx-auto">
+          <SectionTitle
+            overline={isZh ? '主權 AI 國家級' : 'SOVEREIGN AI NATIONAL REFERENCE'}
+            title={
+              isZh
+                ? '為主權 AI 國家打造的 reference deployment'
+                : 'Reference deployment for sovereign AI nations'
+            }
+            subtitle={
+              isZh
+                ? '印度、日本、英國、法國、韓國、UAE、台灣、Saudi——每個民主國家都在打造主權 AI 模型與算力，但安全層仍由美國私企供應。ATR + Migrator + Compliance 是這個缺口的開放答案。已有一個 sovereign AI 客戶在主動對話中。'
+                : 'Every democracy — India, Japan, UK, France, Korea, UAE, Taiwan, Saudi — is building sovereign AI models and compute. The security layer is still rented from US-private vendors. ATR + Migrator + Compliance is the open answer to that gap. One sovereign AI customer is in active conversation.'
+            }
+          />
+
+          <FadeInUp delay={0.1}>
+            <div className="mt-12 grid lg:grid-cols-3 gap-6">
+              {/* Path 1 */}
+              <div className="bg-surface-2 rounded-xl border border-brand-sage/30 p-6 flex flex-col h-full">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mb-3">
+                  {isZh ? 'Path 1 · 標準引用' : 'Path 1 · Standards Reference'}
+                </p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-3xl font-extrabold text-text-primary">$0</span>
+                  <span className="text-xs text-text-muted">
+                    {isZh ? '零商業義務' : 'no commercial obligation'}
+                  </span>
+                </div>
+                <p className="text-sm text-text-secondary leading-relaxed flex-1">
+                  {isZh
+                    ? '國家數位部會 / NCSC / AI 安全機構，引用 ATR 為國家 AI agent 安全參考框架。我們在 sovereign-ai-defense 頁面列為 reference 國。1-2 週可定。'
+                    : "A national digital ministry / NCSC / AI safety agency cites ATR as the country's AI agent security reference. We list the country as ecosystem reference. 1–2 weeks to commit."}
+                </p>
+              </div>
+
+              {/* Path 2 */}
+              <div className="bg-surface-2 rounded-xl border border-blue-400/30 p-6 flex flex-col h-full">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-blue-400 mb-3">
+                  {isZh ? 'Path 2 · 技術 co-eval' : 'Path 2 · Technical Co-eval'}
+                </p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-3xl font-extrabold text-text-primary">$0</span>
+                  <span className="text-xs text-text-muted">
+                    {isZh ? '90 天，雙方零成本' : '90 days, zero cost'}
+                  </span>
+                </div>
+                <p className="text-sm text-text-secondary leading-relaxed flex-1">
+                  {isZh
+                    ? '國家紅隊用自己的對抗 corpus 跑 ATR 全 330 條規則。我們提供引擎 + Migrator + 失敗案例完整揭露。產出：獨立第三方驗證報告（國家保留全部 artifact）。'
+                    : "The national red team runs ATR's full 330-rule library against its adversarial corpus. We provide engine + Migrator + full failure-case disclosure. Output: independent third-party validation report (nation keeps all artifacts)."}
+                </p>
+              </div>
+
+              {/* Path 3 */}
+              <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-6 flex flex-col h-full ring-1 ring-brand-sage/10">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mb-3">
+                  {isZh ? 'Path 3 · 商業 reference 部署' : 'Path 3 · Commercial Reference Deployment'}
+                </p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-3xl font-extrabold text-text-primary">$5–20M</span>
+                  <span className="text-xs text-text-muted">
+                    {isZh ? '/ 多年合約' : '/ multi-year'}
+                  </span>
+                </div>
+                <p className="text-sm text-text-secondary leading-relaxed flex-1">
+                  {isZh
+                    ? '國家級 reference deployment：完整 ATR + Migrator Pro + Compliance + Threat Cloud + 在地部署 + 客製規則。透過區域 enterprise vendor（如 CyCraft）落地，PanGuard 為 ATR-certified 上游維護方。對應 Linux Foundation 政府合約 / Red Hat 美國聯邦合約模式。'
+                    : "Full ATR + Migrator Pro + Compliance + Threat Cloud + in-region deployment + custom rule packs, delivered through a regional enterprise vendor (e.g. CyCraft) with PanGuard as the ATR-certified upstream maintainer. Modeled on Linux Foundation national contracts / Red Hat federal precedent."}
+                </p>
+              </div>
+            </div>
+          </FadeInUp>
+
+          <FadeInUp delay={0.25}>
+            <div className="mt-10 bg-surface-2 border border-border rounded-xl p-6 text-center max-w-3xl mx-auto">
+              <p className="text-xs font-semibold text-brand-sage uppercase tracking-wider mb-2">
+                {isZh ? '為什麼國家會買' : 'Why nations buy this'}
+              </p>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {isZh
+                  ? '主權 AI = 主權的模型 + 主權的算力 + 主權的偵測知識。前兩個各國已投數十億美元；第三個目前由美國私企租回——這正是 Sovereign AI 想消除的依賴。Migrator 把該國 SOC 累積的 detection IP（Sigma / YARA / Snort / SCADA）銜接進 AI Agent 時代，國家保留 IP 主權。'
+                  : 'Sovereign AI = sovereign model + sovereign compute + sovereign detection knowledge. Nations have already invested billions on the first two; the third is currently rented from US-private vendors — exactly the dependency Sovereign AI was created to escape. Migrator bridges the SOC\'s accumulated detection IP (Sigma / YARA / Snort / SCADA) into the AI agent era — the nation keeps IP sovereignty.'}
+              </p>
+              <Link
+                href="/sovereign-ai-defense"
+                className="inline-flex items-center gap-1.5 text-xs text-brand-sage font-semibold mt-4 hover:underline"
+              >
+                {isZh ? '完整 Sovereign AI Defense 倡議書' : 'Full Sovereign AI Defense brief'}{' '}
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </FadeInUp>
+        </div>
+      </SectionWrapper>
+
+      {/* ─── Vendor OEM License Track ─── */}
+      <SectionWrapper dark>
+        <div className="max-w-5xl mx-auto">
+          <SectionTitle
+            overline={isZh ? '平台廠商 OEM 授權' : 'VENDOR OEM LICENSE'}
+            title={
+              isZh
+                ? '把 ATR Pro Rule Pack 包進你的 AI 安全產品'
+                : 'Ship ATR Pro Rule Pack inside your AI security product'
+            }
+            subtitle={
+              isZh
+                ? 'Cisco AI Defense 跑全 330 條 ATR · Microsoft AGT 287 條 + 每週自動同步 · NVIDIA garak / Gen Digital Sage / IBM mcp-context-forge 整合中。如果你的產品需要 Cisco-merge-PR 等級的 enrich 過版本（含早期 draft + 5 框架合規 metadata + 客製白標），我們有 OEM tier。'
+                : 'Cisco AI Defense ships all 330 ATR rules · Microsoft AGT ships 287 rules with weekly auto-sync · NVIDIA garak / Gen Digital Sage / IBM mcp-context-forge integration in flight. If your product needs the Cisco-merge-PR-quality enriched version (early draft access + 5-framework compliance + white-label), there is an OEM tier.'
+            }
+          />
+
+          <FadeInUp delay={0.1}>
+            <div className="mt-12 grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              <div className="bg-surface-2 rounded-xl border border-border p-6">
+                <p className="text-sm font-bold text-text-primary mb-2">
+                  {isZh ? 'OEM Use License' : 'OEM Use License'}
+                </p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-3xl font-extrabold text-text-primary">$2–10M</span>
+                  <span className="text-xs text-text-muted">/ {isZh ? '年' : 'year'}</span>
+                </div>
+                <p className="text-[13px] text-text-secondary leading-relaxed mb-4">
+                  {isZh
+                    ? 'Cisco / Microsoft / NVIDIA / Gen Digital tier 廠商，把 enrich 過的 Pro Rule Pack 出貨進自家產品。含早期 draft 規則 access、5 框架 metadata、white-label、客製攻擊類別、roadmap 投票權。'
+                    : 'For Cisco / Microsoft / NVIDIA / Gen Digital tier vendors shipping the enriched Pro Rule Pack inside their own product. Includes early draft access, 5-framework metadata, white-label, custom attack classes, roadmap vote.'}
+                </p>
+              </div>
+              <div className="bg-surface-2 rounded-xl border border-border p-6">
+                <p className="text-sm font-bold text-text-primary mb-2">
+                  {isZh ? '策略夥伴條款' : 'Strategic Partnership Terms'}
+                </p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-xl font-bold text-text-primary">
+                    {isZh ? '客製' : 'Custom'}
+                  </span>
+                </div>
+                <p className="text-[13px] text-text-secondary leading-relaxed mb-4">
+                  {isZh
+                    ? 'M&A right of first refusal · 共同 GTM · 工程協作 · ATR Foundation 治理席位。為長期 ecosystem 整合的廠商保留。'
+                    : 'M&A right of first refusal · joint GTM · engineering collaboration · ATR Foundation governance seat. Reserved for vendors building long-term ecosystem integration.'}
+                </p>
+              </div>
+            </div>
+          </FadeInUp>
+        </div>
       </SectionWrapper>
 
       {/* ─── AI Compliance Audit Evidence Module highlight ─── */}
