@@ -3457,8 +3457,8 @@
       "subtitle": "即時可見我們的合規態勢。我們誠實公布狀態 -- 包括進行中的，不只是已完成的。",
       "soc2": {
         "name": "SOC 2 Type 1",
-        "status": "Q3 2026 啟動",
-        "desc": "Vanta 或 Drata 廠商選定與合作 CPA 簽約於 Q3 2026 啟動。Type 1 attestation 預計 Q4 2026 / Q1 2027。Type II 在 3-12 個月觀察期後進行。"
+        "status": "進行中",
+        "desc": "已啟動 SOC 2 Type 1 readiness program：8 項核心 policy 公開於 panguard-ai/security-policies、subprocessor 清單即時更新、security.txt 揭露漏洞通報流程、incident response SLA 已生效。Vanta / Drata vendor 評估進行中，CPA 簽約與正式 attestation 目標 Q4 2026 / Q1 2027。"
       },
       "iso27001": {
         "name": "ISO 27001",
@@ -3543,27 +3543,57 @@
         "purpose": "用途",
         "location": "位置"
       },
+      "updateNote": "最後更新：2026 年 2 月。我們在新增次處理者前至少 30 天通知客戶。透過我們的 GitHub 儲存庫訂閱更新。",
       "aws": {
         "name": "AWS",
-        "purpose": "基礎設施",
-        "location": "美國 / 歐盟"
+        "purpose": "基礎設施計算與儲存",
+        "location": "美國 / 全球"
       },
       "anthropic": {
         "name": "Anthropic",
-        "purpose": "AI 處理",
+        "purpose": "LLM 語意分析（Claude API）",
         "location": "美國"
+      },
+      "openai": {
+        "name": "OpenAI",
+        "purpose": "LLM 語意分析（GPT API，opt-in）",
+        "location": "美國"
+      },
+      "supabase": {
+        "name": "Supabase",
+        "purpose": "客戶帳號資料庫與認證",
+        "location": "新加坡 / 美國"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "purpose": "付款處理與帳單",
+        "location": "美國"
+      },
+      "vercel": {
+        "name": "Vercel",
+        "purpose": "網站與儀表板託管",
+        "location": "美國 / 全球邊緣"
+      },
+      "railway": {
+        "name": "Railway",
+        "purpose": "Threat Cloud 後端託管",
+        "location": "新加坡（亞太）"
       },
       "cloudflare": {
         "name": "Cloudflare",
-        "purpose": "CDN 及 DDoS 防護",
-        "location": "全球"
+        "purpose": "CDN、WAF 與 DDoS 防護",
+        "location": "全球邊緣"
+      },
+      "github": {
+        "name": "GitHub",
+        "purpose": "原始碼與安全政策託管",
+        "location": "美國"
       },
       "resend": {
         "name": "Resend",
-        "purpose": "交易郵件",
+        "purpose": "交易郵件（驗證、通知）",
         "location": "美國"
-      },
-      "updateNote": "最後更新：2026 年 2 月。我們在新增次處理者前至少 30 天通知客戶。透過我們的 GitHub 儲存庫訂閱更新。"
+      }
     },
     "dataRetention": {
       "overline": "資料生命週期",
