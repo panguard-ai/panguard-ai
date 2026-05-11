@@ -1,0 +1,18 @@
+# Panguard AI Security Policy (RFC 9116)
+# This file documents how to report security vulnerabilities and what
+# Panguard AI commits to in return. Last reviewed 2026-05-11.
+
+Contact: mailto:security@panguard.ai
+Contact: https://github.com/panguard-ai/panguard-ai/security/advisories/new
+Expires: 2027-12-31T23:59:59.000Z
+Encryption: https://panguard.ai/.well-known/pgp-key.txt
+Preferred-Languages: en, zh-Hant
+Canonical: https://panguard.ai/.well-known/security.txt
+Policy: https://panguard.ai/legal/responsible-disclosure
+Acknowledgments: https://panguard.ai/legal/responsible-disclosure#acknowledgments
+Hiring: https://panguard.ai/careers
+
+# We follow coordinated disclosure. Acknowledgement within 24 hours,
+# initial assessment within 72 hours, fix or mitigation within 30 days
+# for high/critical issues. Researchers acting in good faith will not be
+# pursued under CFAA / DMCA / equivalent statutes.

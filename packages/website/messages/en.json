@@ -2637,8 +2637,8 @@
       "subtitle": "Real-time visibility into our compliance posture. We publish status honestly -- including what is in progress, not just what is complete.",
       "soc2": {
         "name": "SOC 2 Type 1",
-        "status": "Starting Q3 2026",
-        "desc": "Vendor selection (Vanta or Drata) and partner CPA engagement begin Q3 2026. Type 1 attestation expected Q4 2026 / Q1 2027. Type II follows after a 3-12 month observation window."
+        "status": "In Progress",
+        "desc": "Active SOC 2 Type 1 readiness program: 8 core policies published at panguard-ai/security-policies, real-time subprocessor list, security.txt vulnerability disclosure, and incident response SLA in effect. Vanta / Drata vendor evaluation in progress; CPA engagement and formal attestation target Q4 2026 / Q1 2027."
       },
       "iso27001": {
         "name": "ISO 27001",
@@ -2727,27 +2727,57 @@
         "purpose": "Purpose",
         "location": "Location"
       },
+      "updateNote": "Last updated: February 2026. We notify customers at least 30 days before adding new subprocessors. Subscribe to updates via our GitHub repository.",
       "aws": {
         "name": "AWS",
-        "purpose": "Infrastructure",
-        "location": "US / EU"
+        "purpose": "Infrastructure compute and storage",
+        "location": "United States / Global"
       },
       "anthropic": {
         "name": "Anthropic",
-        "purpose": "AI Processing",
-        "location": "US"
+        "purpose": "LLM semantic analysis (Claude API)",
+        "location": "United States"
+      },
+      "openai": {
+        "name": "OpenAI",
+        "purpose": "LLM semantic analysis (GPT API, opt-in)",
+        "location": "United States"
+      },
+      "supabase": {
+        "name": "Supabase",
+        "purpose": "Customer account database and authentication",
+        "location": "Singapore / United States"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "purpose": "Payment processing and billing",
+        "location": "United States"
+      },
+      "vercel": {
+        "name": "Vercel",
+        "purpose": "Website and dashboard hosting",
+        "location": "United States / Global edge"
+      },
+      "railway": {
+        "name": "Railway",
+        "purpose": "Threat Cloud backend hosting",
+        "location": "Singapore (Asia-Pacific)"
       },
       "cloudflare": {
         "name": "Cloudflare",
-        "purpose": "CDN & DDoS Protection",
-        "location": "Global"
+        "purpose": "CDN, WAF, and DDoS protection",
+        "location": "Global edge"
+      },
+      "github": {
+        "name": "GitHub",
+        "purpose": "Source code and security policy hosting",
+        "location": "United States"
       },
       "resend": {
         "name": "Resend",
-        "purpose": "Transactional Email",
-        "location": "US"
-      },
-      "updateNote": "Last updated: February 2026. We notify customers at least 30 days before adding new subprocessors. Subscribe to updates via our GitHub repository."
+        "purpose": "Transactional email (verification, notifications)",
+        "location": "United States"
+      }
     },
     "dataRetention": {
       "overline": "DATA LIFECYCLE",
