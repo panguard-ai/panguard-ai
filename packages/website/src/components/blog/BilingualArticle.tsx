@@ -23,6 +23,13 @@ function parseInline(text: string): ReactNode[] {
     }
     if (match[1] && match[2]) {
       const href = match[2];
+      // Block javascript: and data: URI schemes to prevent XSS via blog content
+      const isSafe = /^https?:\/\//i.test(href) || href.startsWith('/');
+      if (!isSafe) {
+        tokens.push(match[1]);
+        lastIndex = match.index + match[0].length;
+        continue;
+      }
       const external = /^https?:\/\//.test(href);
       tokens.push(
         <a

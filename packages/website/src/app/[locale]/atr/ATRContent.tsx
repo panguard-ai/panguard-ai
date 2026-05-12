@@ -40,9 +40,21 @@ const categoryKeys = [
   'skill-compromise',
   'data-poisoning',
   'model-security',
+  'model-abuse',
 ] as const;
 
-const categoryIcons = [AlertTriangle, Wrench, Eye, Users, KeyRound, Zap, Lock, Database, Cpu];
+const categoryIcons = [
+  AlertTriangle,
+  Wrench,
+  Eye,
+  Users,
+  KeyRound,
+  Zap,
+  Lock,
+  Database,
+  Cpu,
+  Shield,
+];
 
 /* -- How-it-works steps -- */
 

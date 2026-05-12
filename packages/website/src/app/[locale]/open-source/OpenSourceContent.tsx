@@ -92,6 +92,7 @@ export default function OpenSourceContent() {
               desc: string;
               lang: string;
               stars: string;
+              org?: string;
             }>
           ).map((repo, i) => (
             <FadeInUp key={repo.name} delay={i * 0.08}>
@@ -105,7 +106,7 @@ export default function OpenSourceContent() {
                   <span className="text-[10px] text-text-tertiary">{repo.stars}</span>
                 </div>
                 <a
-                  href={`https://github.com/panguard-ai/${repo.name}`}
+                  href={`https://github.com/${repo.org ?? 'panguard-ai'}/${repo.name}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-sage mt-3 hover:gap-2.5 transition-all duration-200"

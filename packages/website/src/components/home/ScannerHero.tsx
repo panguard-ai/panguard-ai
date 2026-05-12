@@ -348,9 +348,50 @@ function ScannerHeroInner() {
   );
 }
 
+/**
+ * Static SSR skeleton shown BEFORE client hydration. Used as the Suspense
+ * fallback so visitors see real PanGuard product framing during the first
+ * ~200ms of paint instead of a blank dark grid. The interactive scanner form
+ * boots underneath this and replaces it on hydration.
+ */
+function ScannerHeroSkeleton() {
+  return (
+    <section className="relative min-h-screen bg-surface-hero flex flex-col items-center justify-center px-5 sm:px-6 py-24">
+      <div className="max-w-3xl w-full text-center space-y-6">
+        <p className="text-sm font-medium text-brand-sage uppercase tracking-wider">
+          Scan your AI agent stack
+        </p>
+        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary leading-tight">
+          AI agent security,
+          <br />
+          built on an open standard.
+        </h1>
+        <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
+          Drop in a GitHub URL or paste a SKILL/MCP manifest. PanGuard runs 419
+          ATR rules against it and tells you if it&apos;s safe to install.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3 pt-4 text-xs text-text-muted">
+          <span className="px-3 py-1 rounded-full border border-border-default">
+            419 ATR rules
+          </span>
+          <span className="px-3 py-1 rounded-full border border-border-default">
+            Garak 97.1% recall
+          </span>
+          <span className="px-3 py-1 rounded-full border border-border-default">
+            Microsoft + Cisco merged
+          </span>
+          <span className="px-3 py-1 rounded-full border border-border-default">
+            MIT licensed
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function ScannerHero() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-surface-hero" />}>
+    <Suspense fallback={<ScannerHeroSkeleton />}>
       <ScannerHeroInner />
     </Suspense>
   );

@@ -425,8 +425,9 @@ body::after {
     transform: none !important;
   }
 }
+/* Reduced 0.3s → 0.05s so above-the-fold content is never blank-on-load. */
 .js-ready .animate-on-scroll {
-  animation: force-show 0.01s 0.3s forwards;
+  animation: force-show 0.01s 0.05s forwards;
 }
 /* Force-show framer-motion elements that are still hidden after 1s.
    This catches whileInView elements that haven't scrolled into viewport yet.

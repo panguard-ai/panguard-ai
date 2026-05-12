@@ -101,8 +101,8 @@ export default function RegulatedIndustriesPositioning() {
                 </h3>
                 <p className="text-sm text-text-secondary leading-relaxed mb-4">
                   {isZh
-                    ? '攻擊擋下之後,自動產出可稽核證據:每筆偵測都對到 ATR 規則 ID + 5 個合規框架條文 + SHA-256 + HMAC 簽章。auditor 認的格式。'
-                    : 'After an attack is blocked, the platform produces audit-ready evidence automatically: every detection links to ATR rule ID + clauses across 5 compliance frameworks + SHA-256 + HMAC integrity. Accepted by auditors.'}
+                    ? '攻擊擋下之後,自動產出可稽核證據:每筆偵測都對到 ATR 規則 ID + 5 個合規框架條文 + SHA-256 + ed25519 簽章。auditor 認的格式。'
+                    : 'After an attack is blocked, the platform produces audit-ready evidence automatically: every detection links to ATR rule ID + clauses across 5 compliance frameworks + SHA-256 + ed25519 signature. Accepted by auditors.'}
                 </p>
                 <p className="text-xs text-text-muted font-mono">
                   {isZh ? '合規 / 法務的採購窗口' : 'GRC / Compliance / Legal procurement gate'}
@@ -233,8 +233,8 @@ export default function RegulatedIndustriesPositioning() {
               </h2>
               <p className="text-base text-text-secondary max-w-2xl mx-auto">
                 {isZh
-                  ? '每條 ATR 規則自動對到 5 個合規框架的條文。每筆偵測產出 PDF + JSON + HTML 證據,SHA-256 + HMAC 簽章保證不能竄改。Vanta、Drata、Lakera 架構上做不到這件事。'
-                  : 'Every ATR rule auto-maps to clauses across 5 compliance frameworks. Every detection produces PDF + JSON + HTML evidence with SHA-256 + HMAC integrity. Architecturally impossible for Vanta / Drata / Lakera.'}
+                  ? '每條 ATR 規則自動對到 5 個合規框架的條文。每筆偵測產出 PDF + JSON + HTML 證據,SHA-256 + ed25519 簽章保證不能竄改。Vanta、Drata、Lakera 架構上做不到這件事。'
+                  : 'Every ATR rule auto-maps to clauses across 5 compliance frameworks. Every detection produces PDF + JSON + HTML evidence with SHA-256 + ed25519 signature. Architecturally impossible for Vanta / Drata / Lakera.'}
               </p>
             </div>
           </FadeInUp>

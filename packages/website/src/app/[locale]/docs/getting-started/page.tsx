@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { getNonce } from '@/lib/nonce';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import JsonLd from '@/components/seo/JsonLd';
+import { techArticleSchema } from '@/lib/schema';
 import GettingStartedContent from './GettingStartedContent';
 
 export const metadata: Metadata = {
@@ -52,6 +54,19 @@ export default async function GettingStartedPage() {
         nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+      />
+      <JsonLd
+        data={techArticleSchema({
+          headline: 'Getting Started with PanGuard AI',
+          description:
+            'Install PanGuard AI in under 2 minutes. CLI setup, first scan, 24/7 monitoring, and Threat Cloud opt-in walkthrough.',
+          url: 'https://panguard.ai/docs/getting-started',
+          datePublished: '2026-01-01',
+          dateModified: '2026-05-12',
+          proficiencyLevel: 'Beginner',
+          dependencies: 'Node.js 20+, macOS 12+ or Ubuntu 20.04+ or Windows 10+',
+          programmingLanguage: 'TypeScript',
+        })}
       />
       <NavBar />
       <main id="main-content">

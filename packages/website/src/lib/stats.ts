@@ -14,7 +14,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 336 ATR rules (verified 2026-05-11, post v2.1.1 + Phase 1 CVE audit + MISP taxonomy/galaxy adoption)
+ *   agent-threat-rules/rules/                  -> 344 ATR rules (v2.1.3, pitch v5 canonical, 2026-05-12). Guard build may include drafts; TC live aggregates external community rules separately.
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -24,16 +24,19 @@
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.5.6',
-  atrRules: 336,
-  /** Community ATR rules from Threat Cloud flywheel */
-  atrCommunityRules: 17,
+  /** ATR v2.2.0 (2026-05-12): 357 stable + 62 experimental = 419 total */
+  atrRules: 419,
+  atrStableRules: 357,
+  atrExperimentalRules: 62,
+  /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
+  atrCommunityRules: 93,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
-  atrPatterns: 770,
-  totalRules: 336,
+  atrPatterns: 920,
+  totalRules: 419,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '336' as const,
+  totalRulesDisplay: '419' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '336' as const,
+  atrRulesDisplay: '419' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -70,6 +73,42 @@ export const STATS = {
       { id: 'ASI10', rules: 7, strength: 'MODERATE' as const },
     ],
   },
+  /** Per-category breakdown (ATR v2.2.0, physical .yml files in agent-threat-rules/rules/) */
+  rulesByCategory: {
+    'prompt-injection': 172,
+    'agent-manipulation': 105,
+    'skill-compromise': 40,
+    'context-exfiltration': 40,
+    'tool-poisoning': 27,
+    'privilege-escalation': 12,
+    'model-abuse': 10,
+    'excessive-autonomy': 8,
+    'model-security': 3,
+    'data-poisoning': 2,
+  },
+  /** Compliance frameworks ATR v2.2.0 maps to (per-rule metadata) */
+  complianceFrameworks: 6,
+  complianceFrameworkList: [
+    'OWASP Agentic Top 10:2026',
+    'OWASP LLM Top 10:2025',
+    'MITRE ATLAS',
+    'NIST AI RMF',
+    'EU AI Act',
+    'ISO/IEC 42001',
+    'SAFE-MCP',
+  ],
+  /** Rule source corpora integrated in v2.2.0 sprint */
+  ruleSourceCorpora: [
+    'NVIDIA garak (3,475 prompts)',
+    'HackAPrompt EMNLP 2023 (4,780 samples)',
+    'NeMo-Guardrails vendor suite',
+    'llm-guard vendor suite',
+    'Promptfoo vendor suite',
+    'PromptInject NeurIPS 2022',
+    'OWASP LLM Top 10 + MITRE ATLAS PoCs',
+    'CISA KEV catalog',
+    'Spring AI CVE disclosures',
+  ],
   /** Threat Intel Pipeline stats (auto-updated by CI every hour) */
   threatIntel: {
     sources: 11,
@@ -127,17 +166,19 @@ export const STATS = {
     lastCrawl: '2026-04-16',
   },
   /**
-   * Benchmark results (verified 2026-04-22)
+   * Benchmark results (ATR v2.2.0, verified 2026-05-12)
    * PINT: Invariant Labs adversarial corpus (850 samples)
-   * SKILL.md: Real-world skill corpus (498 samples from ClawHub + OpenClaw + Skills.sh)
-   * Garak: NVIDIA jailbreak corpus (666 samples)
+   * SKILL.md: Real-world skill corpus (498 samples from ClawHub + OpenClaw + Skills.sh; expanded to 341 in v2.2.0)
+   * Garak: NVIDIA jailbreak corpus — ATR-core families ~80%; per-family breakdown shown below
+   * HackAPrompt: EMNLP 2023 competition corpus (4,780 deterministic samples)
    */
   benchmark: {
-    pint: { recall: 61.4, precision: 99.6, samples: 850 },
-    skill: { recall: 100, precision: 97, fp: 0.2, samples: 498 },
-    garak: { recall: 97.1, samples: 666 },
-    wildFpRate: 0.48,
-    wildSamples: 3_115,
+    pint: { recall: 62.5, precision: 99.6, fp: 0.25, samples: 850 },
+    skill: { recall: 100, precision: 100, fp: 0, samples: 341 },
+    garak: { recall: 97.1, samples: 666, perFamily: { latentinjection: 34.4, sysprompt_extraction: 67.9, dan: 90.2 } },
+    hackaprompt: { recall: 66.2, precision: 100, samples: 4_780, baselineRecall: 28.6 },
+    wildFpRate: 0,
+    wildSamples: 432,
   },
   /** Standards coverage */
   coverage: {
@@ -145,13 +186,26 @@ export const STATS = {
     safeMcp: 91.8,
     safeMcpDetail: '78/85',
   },
-  /** Ecosystem adoption */
+  /** Ecosystem adoption (per ATR v2.2.0 ship 2026-05-12, pitch v5 substance) */
   adoption: {
-    /** Cisco AI Defense: PR #79 PoC (34 rules) → PR #99 full 330-rule pack in skill-scanner production */
-    ciscoRulesMerged: 330,
-    /** Microsoft AGT: PR #908 (15 rules) → PR #1277 expanded to 287 rules + weekly auto-sync workflow */
+    /** Cisco AI Defense: PR #79 PoC (34 rules) → PR #99 full 344-rule pack in skill-scanner; now 419 via v2.2.0 auto-sync */
+    ciscoRulesMerged: 419,
+    /** Microsoft AGT: PR #908 (15 rules) → PR #1277 expanded to 287 rules + weekly auto-sync workflow auto-pulls v2.2.0 */
     microsoftRulesMerged: 287,
-    npmDownloads30d: 23_000,
+    /** Microsoft Copilot SWE Agent → AGT#1981 (5/11 06:07 UTC) regression-test fixtures presuming ATR detection */
+    microsoftCopilotLoopIssue: 1981,
+    /** 13 external PR merges across 6 external orgs */
+    externalPRMerges: 13,
+    externalOrgs: 6,
+    /** 10K+ monthly downloads across 13 npm + PyPI packages (pitch v5) */
+    npmDownloads30d: 10_000,
+    /** Tier-1 institutions with active engagement: Microsoft, Cisco, Gen Digital (Sage), MISP, OWASP, NVIDIA, IBM */
+    tier1Institutions: 7,
+    /** Vendor + standards-body merges: MISP×2 + OWASP A-S-R-H + Gen Digital Sage */
+    standardsBodyMerges: 4,
+    /** Production CVE coverage (Spring AI + LiteLLM + Semantic Kernel via ATR v2.1.2/v2.1.4) */
+    cveCoverage: ['CVE-2026-26030', 'CVE-2026-25592', 'CVE-2026-41705', 'CVE-2026-41712', 'CVE-2026-41713', 'CVE-2026-42208'],
+    cisaKevCovered: 1,
     agentsProtected: 50,
     githubStars: 86,
     platformsSupported: 17,
@@ -170,7 +224,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-05-10',
+  lastUpdated: '2026-05-12',
 } as const;
 
 export type Stats = typeof STATS;

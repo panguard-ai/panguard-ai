@@ -157,8 +157,9 @@ export default function MigratorContent() {
   const isZh = locale === 'zh-TW';
   return (
     <>
-      {/* HERO */}
-      <SectionWrapper className="pt-32 pb-20">
+      {/* HERO — promoted to Enterprise-pitch section since the live converter
+          (in MigratorDemo) already owns the page H1 above. */}
+      <SectionWrapper className="pt-20 pb-20 border-t border-border">
         <FadeInUp>
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full border border-brand-sage-glow bg-brand-sage-wash">
@@ -167,9 +168,9 @@ export default function MigratorContent() {
                 Community v0.1.0 on npm &middot; Enterprise v0.1.0 shipping
               </span>
             </div>
-            <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight mb-6 text-text-primary">
-              Sigma / YARA <span className="text-panguard-green">&rarr;</span> ATR YAML
-            </h1>
+            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-6 text-text-primary">
+              The Enterprise pipeline behind the converter
+            </h2>
             <p className="text-xl md:text-2xl text-text-secondary leading-relaxed">
               Convert legacy detection rules into AI-agent-context ATR YAML in one command.
               Auto-mapped to EU AI Act articles, OWASP Agentic Top 10, NIST AI RMF, ISO/IEC 42001.
@@ -630,7 +631,7 @@ export default function MigratorContent() {
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
-                href="https://github.com/atr-org/agent-threat-rules"
+                href="https://github.com/Agent-Threat-Rule/agent-threat-rules"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-border text-text-secondary text-sm hover:border-brand-sage hover:text-text-primary transition-colors"
