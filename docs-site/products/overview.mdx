@@ -19,12 +19,18 @@ Panguard AI is not a single tool. It is an integrated platform of complementary 
     Telegram, Slack, Email, and Webhook.
   </Card>
   <Card title="MCP Server" icon="plug" href="/products/mcp/overview">
-    Model Context Protocol server exposing 11 Panguard tools to AI assistants like Claude Desktop
+    Model Context Protocol server exposing 12 Panguard tools to AI assistants like Claude Desktop
     and Cursor.
   </Card>
   <Card title="Threat Cloud" icon="cloud" href="/products/threat-cloud/overview">
     Collective threat intelligence platform. Every Guard instance contributes anonymized threat
     data, and every instance benefits from the community's detections.
+  </Card>
+  <Card title="Migrator" icon="arrow-right-arrow-left">
+    Convert legacy Sigma + YARA detections into ATR YAML. Community on npm
+    (`@panguard-ai/migrator-community@0.1.0` MIT) ships parsers, IR transformer, CLI. Enterprise
+    adds 5-framework compliance auto-mapping (EU AI Act, OWASP Agentic, OWASP LLM, NIST AI RMF,
+    ISO/IEC 42001), signed evidence packs, ATR upstream contribution pipeline.
   </Card>
 </CardGroup>
 
@@ -46,7 +52,7 @@ Scan ──> Guard ──> Threat Cloud
 
 ## Architecture at a Glance
 
-Panguard is built as a **13-package TypeScript monorepo** managed by pnpm workspaces. All packages share a common `@panguard-ai/core` foundation that provides the rule engine, monitor engine, AI provider abstraction, i18n, and structured logging.
+Panguard is built as a **18-package TypeScript monorepo** managed by pnpm workspaces. All packages share a common `@panguard-ai/core` foundation that provides the rule engine, monitor engine, AI provider abstraction, i18n, and structured logging.
 
 | Layer            | Components   | Responsibility                                   |
 | ---------------- | ------------ | ------------------------------------------------ |
