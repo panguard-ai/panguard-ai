@@ -1,49 +1,85 @@
-# Panguard AI
+# PanGuard AI
 
-> Panguard AI is a 100% free, open-source AI agent security platform.
-> Skill Auditor, Guard, Scan, MCP Server, ATR rules, and Threat Cloud --
-> all MIT licensed. One curl command to install. Zero paywalls.
+> PanGuard AI is the open standard plus commercial platform for AI agent security.
+> ATR (Agent Threat Rules) is the open standard — 419 detection rules, MIT licensed,
+> already in production at Microsoft AGT, Cisco AI Defense, and 4 more F500-adjacent
+> ecosystems. PanGuard is the commercial runtime, compliance, and migration tooling
+> built around it. Community is free forever; Pilot, Enterprise, and Sovereign tiers
+> add the platform layer.
 
-## Core Products
+## What it is
 
-- [Product Overview](https://panguard.ai/product): The security flywheel -- audit, guard, share, strengthen
-- [Skill Auditor](https://panguard.ai/product/skill-auditor): 8-layer pre-install security gate for AI skills
-- [Panguard Scan](https://panguard.ai/product/scan): 60-second security audit with Sigma, YARA, and ATR rules
-- [Panguard Guard](https://panguard.ai/product/guard): 4-agent AI pipeline -- detect, analyze, respond, report -- 24/7
-- [MCP Server](https://panguard.ai/product/mcp): 11 panguard_* tools for Claude Code, Cursor, and AI assistants
-- [ATR Standard](https://panguard.ai/atr): 71 open-source rules for AI agent threats (like Sigma for agents)
-- [Threat Cloud](https://panguard.ai/threat-cloud): Collective intelligence -- auto-generates rules from real attacks
+- ATR is to AI agents what Sigma is to SIEM and YARA is to malware: an open, machine-readable detection standard with multi-vendor adoption.
+- PanGuard is the runtime that loads ATR rules plus the migration, compliance, and threat-cloud layer enterprises need on top.
+- Both ship with reproducible benchmarks (PINT, SKILL.md, Garak, Wild scan) and a Zenodo-published research paper.
 
-## Coming Soon
+## Core stats (verified 2026-05-12)
 
-- [Panguard Trap](https://panguard.ai/product/trap): Intelligent honeypot system (under development)
-- [Panguard Report](https://panguard.ai/product/report): AI compliance reports for ISO 27001, SOC 2, TCSA (under development)
+- 419 ATR rules across 10 threat categories (v2.2.0, MIT)
+- 920 detection patterns compiled from YAML
+- OWASP Agentic Top 10: 10/10 covered
+- Garak benchmark: 97.1% recall (666 samples)
+- SKILL.md benchmark: 100% recall, 97% precision, 0.2% FP (498 samples)
+- PINT benchmark: 62.5% recall, 99.6% precision (850 samples)
+- Wild scan: 67,799 skills scanned across 3 registries, 1,096 confirmed malicious
+- 13 external PRs merged across 6 external organizations
+- Tier-1 institutional engagement: Microsoft, Cisco, Gen Digital (Sage), MISP, OWASP, NVIDIA, IBM
 
-## License
+## Core products
 
-- 100% free and open source. MIT License. All features included. No paywalls.
+- [PanGuard product overview](https://panguard.ai/product): the security flywheel — audit, guard, respond, share, strengthen
+- [Skill Auditor](https://panguard.ai/product/skill-auditor): 8-layer pre-install security gate for AI agent skills
+- [PanGuard Scan](https://panguard.ai/product/scan): 60-second security audit, Sigma + YARA + ATR rule engines
+- [PanGuard Guard](https://panguard.ai/product/guard): 4-agent runtime pipeline — detect, analyze, respond, report — running 24/7 with 419 ATR rules
+- [PanGuard Migrator](https://panguard.ai/migrator): converts legacy Sigma/YARA detections into ATR YAML with five-framework compliance metadata (EU AI Act, OWASP Agentic, OWASP LLM, NIST AI RMF, ISO/IEC 42001)
+- [PanGuard MCP Server](https://panguard.ai/product/mcp): 12 panguard_* tools for Claude Code, Cursor, OpenClaw, and any MCP-compatible AI assistant
+- [ATR Standard](https://panguard.ai/atr): the 419-rule open detection standard
+- [Threat Cloud](https://panguard.ai/threat-cloud): collective intelligence — every PanGuard install becomes a sensor, novel attacks crystallize into ATR rules within hours
 
-## Technology
+## Pricing tiers
 
-- [How It Works](https://panguard.ai/how-it-works): 3 detection layers, confidence-based auto-response
-- [Threat Cloud](https://panguard.ai/threat-cloud): Collective threat intelligence with 8,000+ detection rules (Sigma + YARA + ATR)
+- Community ($0 forever): MIT-licensed, 419 ATR rules, unlimited self-host. Source: github.com/panguard-ai/panguard-ai.
+- Pilot ($25K / 90 days): F500 procurement test drive. IT director can approve. Full credit toward Y1 Enterprise.
+- Enterprise ($150K-500K / year): Migrator Pro, 5-framework signed compliance evidence packs, airgap deployment, SLA, dedicated CSM.
+- Sovereign ($5M-20M / nation): nation-scale airgap, multi-tenant, custom compliance, Cisco/AMD/NVIDIA JV pre-integrated.
+
+## Benchmarks and research
+
+- [PINT benchmark results](https://panguard.ai/research/96k-scan): 62.5% recall on Invariant Labs adversarial corpus
+- [Wild scan report](https://panguard.ai/research/mcp-ecosystem-scan): 96,096 skills crawled across ClawHub, OpenClaw, Skills.sh; 1,096 confirmed malicious; methodology + raw data published
+- ATR Research Paper — Zenodo DOI 10.5281/zenodo.19178002
 
 ## Documentation
 
-- [Getting Started](https://panguard.ai/docs/getting-started): Install Panguard in 60 seconds
-- [CLI Reference](https://panguard.ai/docs/cli): 23 commands
-- [Skill Auditor Docs](https://panguard.ai/docs/skill-auditor): AI agent skill security auditing
-- [Guard Docs](https://panguard.ai/docs/guard): 4-agent pipeline, 11 response actions, confidence thresholds
-- [Scan Docs](https://panguard.ai/docs/scan): Scanner modules and result interpretation
+- [Getting Started](https://docs.panguard.ai/getting-started): one curl command, 60 seconds to protected
+- [Installation](https://docs.panguard.ai/installation): macOS / Linux / Windows / npm
+- [Quickstart](https://docs.panguard.ai/quickstart): scan your first MCP skill in 60 seconds
+- [ATR concept page](https://docs.panguard.ai/atr): how the standard works
+- [CLI Reference](https://docs.panguard.ai/cli): 23 commands
+- [Skill Auditor docs](https://docs.panguard.ai/products/skill-auditor): 8-check audit pipeline
+- [Guard docs](https://docs.panguard.ai/products/guard): 4-agent pipeline, 11 response actions
+- [Scan docs](https://docs.panguard.ai/products/scan): scanner modules and result interpretation
+- [Threat Cloud docs](https://docs.panguard.ai/products/threat-cloud): privacy model, flywheel mechanics
 
-## Agent Threat Rules (ATR)
+## ATR (Agent Threat Rules)
 
-- [ATR on GitHub](https://github.com/Agent-Threat-Rule/agent-threat-rules): Open standard for AI agent threat detection
-- 71 YAML-based rules across 9 categories: prompt injection, tool poisoning, skill compromise, context exfiltration, agent manipulation, privilege escalation, excessive autonomy, data poisoning, model security
-- npm: agent-threat-rules@0.4.0
+- Repo: https://github.com/Agent-Threat-Rule/agent-threat-rules
+- npm: `agent-threat-rules` (latest 2.2.0)
+- License: MIT
+- 419 YAML rules across 10 categories: prompt-injection (172), agent-manipulation (105), skill-compromise (40), context-exfiltration (40), tool-poisoning (27), privilege-escalation (12), model-abuse (10), excessive-autonomy (8), model-security (3), data-poisoning (2)
+- OWASP Agentic Top 10 mapping: docs/OWASP-MAPPING.md
+- Already merged into: microsoft/agent-governance-toolkit (PR #1277), cisco-ai-defense/skill-scanner (PR #99, full 419-rule pack via v2.2.0 auto-sync), MISP/misp-galaxy (PR #1207), MISP/misp-taxonomies (PR #323), OWASP A-S-R-H (PR #74), Gen Digital Sage (PR #33)
 
 ## Company
 
-- [About](https://panguard.ai/about): Mission -- AI agent security for everyone
-- [Blog](https://panguard.ai/blog): Engineering, threat intelligence, and product updates
-- [GitHub](https://github.com/panguard-ai/panguard-ai): Full source code (MIT License)
+- [About PanGuard](https://panguard.ai/about): the mission and the team
+- [Pricing](https://panguard.ai/pricing): four tiers, no middle-tier trap
+- [Trust Center](https://panguard.ai/trust): security architecture, encryption, key rotation, data residency
+- [Compliance](https://panguard.ai/compliance): SOC 2, GDPR, EU AI Act, Taiwan Cybersecurity Management Act
+- [Sovereign AI Defense brief](https://sovereign-ai-defense.vercel.app): nation-scale deployment positioning
+- [Blog](https://panguard.ai/blog): engineering, threat intelligence, product updates
+- [GitHub](https://github.com/panguard-ai/panguard-ai): full source code (MIT License)
+
+## Founder
+
+- Adam Lin (林冠辛), founder. Email: adam@agentthreatrule.org. GitHub: github.com/eeee2345. Background: cross-disciplinary builder — sales, marketing (300M+ Threads impressions), hip-hop festival production (5th year). Self-taught engineer. Based in Taiwan, shipping globally.

@@ -1,0 +1,740 @@
+# PanGuard AI — full context for AI coding tools
+
+This file is a structured long-form context dump intended for AI coding tools
+(Cursor, Claude Code, GitHub Copilot, Windsurf, Anthropic agents) that fetch
+llms-full.txt to understand a project at depth. It is auto-generated from
+the canonical source files in the panguard-ai repository.
+
+Last generated: 2026-05-12T19:38:42.527Z
+Sources of truth:
+- src/lib/stats.ts (product stats)
+- src/lib/atr-rules-compiled.ts (ATR rule index)
+- src/data/blog-posts.ts (recent writing)
+- public/llms.txt (compact index)
+
+To regenerate: `pnpm gen:llms` in packages/website/.
+
+---
+
+## Section 1 — Company and product positioning
+
+PanGuard AI is the commercial platform built on top of ATR (Agent Threat Rules),
+an open detection standard for AI agent security threats. The split mirrors
+Sigma/Splunk (open rule standard plus commercial SIEM) and YARA/VirusTotal
+(open signature standard plus commercial threat intel) — the standard is free
+and community-driven, the platform layer is where commercial value lives.
+
+### Founder
+Adam Lin (林冠辛). Email: adam@agentthreatrule.org. GitHub: eeee2345.
+Background: cross-disciplinary builder with backgrounds in sales (real estate),
+marketing (Threads, 300M impressions), and culture (hip-hop festival, 5th year).
+Self-taught engineer. Based in Taiwan, shipping globally. Founded Panguard AI,
+Inc. (Delaware C-Corp) on 2026-05-12.
+
+### Product tiers (locked 2026-04-22)
+- Community: $0 forever, MIT licensed, 419 ATR rules, unlimited self-host.
+- Pilot: $25K / 90 days. F500 procurement test drive. IT director can approve.
+  Full credit toward Y1 Enterprise.
+- Enterprise: $150K-500K / year. Migrator Pro, 5-framework signed compliance
+  evidence packs, airgap deployment, SLA, dedicated CSM.
+- Sovereign: $5M-20M / nation. Nation-scale airgap, multi-tenant, custom
+  compliance, Cisco/AMD/NVIDIA JV pre-integrated.
+
+There is deliberately no middle tier between Community and Pilot. The /pricing
+page explains why the middle tier is a trap (insufficient revenue for support
+cost, insufficient differentiation, vendor death spiral).
+
+### Strategic positioning
+- Layer 0 (open standard, free): ATR. Wins category vocabulary, becomes the
+  schema that ecosystem tools cite.
+- Layer 1 (commercial platform): PanGuard Migrator + Guard + Threat Cloud +
+  Compliance Evidence Module.
+- Goal: be the open standard plus the company that monetizes the platform
+  layer, with no peer competitor on either dimension.
+
+---
+
+## Section 2 — Core stats (verified 2026-05-12)
+
+### Rule corpus
+- 419 ATR rules in v2.2.0
+- 920 compiled detection patterns across all rules
+- 10 threat categories (prompt-injection, agent-manipulation, skill-compromise,
+  context-exfiltration, tool-poisoning, privilege-escalation, model-abuse,
+  excessive-autonomy, model-security, data-poisoning)
+- 10/10 OWASP Agentic Top 10 coverage
+- 78/85 SAFE-MCP coverage (91.8%)
+
+### Benchmarks
+- Garak (NVIDIA jailbreak corpus): 97.1% recall on 666 samples
+- SKILL.md (real-world skill corpus): 100% recall,
+  97% precision, 0.2% false positive rate on 498 samples
+- PINT (Invariant Labs adversarial corpus): 62.5% recall, 99.6% precision on 850 samples
+- Wild scan: 67,799 AI agent skills scanned, 11,324 threats detected,
+  249 triple-threat packages (shell + network + filesystem access)
+
+### Ecosystem adoption
+- 13 external PRs merged across 6 external organizations
+- 7 tier-1 institutions with active engagement: Microsoft, Cisco, Gen Digital (Sage), MISP, OWASP, NVIDIA, IBM
+- Microsoft AGT (agent-governance-toolkit): 287 rules merged via PR #1277 (weekly auto-sync workflow)
+- Cisco AI Defense (skill-scanner): 419 rules merged via PR #99 (full library in production)
+- MISP: 2 PRs merged (galaxy + taxonomies)
+- OWASP Agentic Top 10 (A-S-R-H): rule pack merged via PR #74
+
+### Implementation
+- CLI: 23 top-level commands (panguard.cjs)
+- MCP server: 12 tools exposed via Model Context Protocol
+- Skill Auditor: 8 pre-install checks
+- Detection layers: 3 (regex, content fingerprinting, LLM-as-judge)
+- Response actions: 11 (block, quarantine, log, notify, etc.)
+- Tests: 3,528 passing across 159 test files
+- Platform support: macOS, Linux, Windows (16 platforms in CI matrix)
+
+### Maturity
+- License: MIT (both ATR and PanGuard CLI)
+- ATR semantic version: 2.2.0
+- PanGuard CLI version: 1.5.6
+- Threat Cloud sync interval: every hour
+- Rule promotion interval: 2 minutes (community-validated to production)
+
+---
+
+## Section 3 — ATR rule index (by category)
+
+Full rule bodies (patterns, OWASP mapping, test cases) are in the
+agent-threat-rules repository: github.com/Agent-Threat-Rule/agent-threat-rules.
+This index gives you titles per category so you can ask for specific
+rule bodies on demand.
+
+### prompt-injection (106 rules)
+
+- ATR-2026-00001: Direct Prompt Injection via User Input
+- ATR-2026-00002: Indirect Prompt Injection via External Content
+- ATR-2026-00003: Jailbreak Attempt Detection
+- ATR-2026-00004: System Prompt Override Attempt
+- ATR-2026-00005: Multi-Turn Prompt Injection
+- ATR-2026-00080: Encoding-Based Prompt Injection Evasion
+- ATR-2026-00081: Semantic Evasion via Multi-Turn Prompt Injection
+- ATR-2026-00082: Behavioral Fingerprint Detection Evasion
+- ATR-2026-00083: Indirect Prompt Injection via Tool Responses
+- ATR-2026-00084: Structured Data Injection via JSON/CSV Payloads
+- ATR-2026-00085: Multi-Layer Security Audit Evasion
+- ATR-2026-00086: Visual Spoofing via RTL Override, Punycode, and Homoglyph Injection
+- ATR-2026-00087: Detection Rule Probing and Evasion Testing
+- ATR-2026-00088: Adaptive Countermeasure Against Behavioral Monitoring
+- ATR-2026-00089: Polymorphic Skill and Capability Aliasing Attack
+- ATR-2026-00090: Threat Intelligence Exfiltration and Rule Enumeration
+- ATR-2026-00091: Advanced Structured Data Injection with Nested Payloads
+- ATR-2026-00092: Multi-Agent Consensus Poisoning and Sybil Attack
+- ATR-2026-00093: Gradual Capability Escalation via Incremental Introduction
+- ATR-2026-00094: Systematic Multi-Layer Audit System Bypass
+- ATR-2026-00097: CJK Prompt Injection - Expanded Chinese/Japanese/Korean Patterns
+- ATR-2026-00104: Persona Hijacking via Mandatory System Prompt Override
+- ATR-2026-00130: Indirect Authority Claim in External Content
+- ATR-2026-00131: Fictional and Academic Framing Attack
+- ATR-2026-00133: Paraphrased Prompt Injection
+- ATR-2026-00137: Authority Claim Prompt Injection
+- ATR-2026-00138: Fictional Framing Safety Bypass
+- ATR-2026-00140: Indirect Reference Instruction Reversal
+- ATR-2026-00148: Multilingual Prompt Injection via Language Switch
+- ATR-2026-00155: Hidden LLM Instructions in Skill Descriptions
+- ATR-2026-00163: Hidden Override Instructions in Skill Content
+- ATR-2026-00202: Encoding Evasion via Homoglyphs and Synonym Substitution
+- ATR-2026-00203: Context Pollution in Skill Descriptions
+- ATR-2026-00206: Hidden System Instructions with Priority Override Blocks
+- ATR-2026-00207: Hidden System Instructions with Permission Override
+- ATR-2026-00211: System Prompt Override via Translation Context Injection
+- ATR-2026-00213: System Prompt Override Injection via MCP Tool
+- ATR-2026-00226: AI Identity Substitution Jailbreak
+- ATR-2026-00227: Historical AI Persona Jailbreak with Compliance Enforcement
+- ATR-2026-00228: Structured Dual-Response Jailbreak with Command System
+- ATR-2026-00229: Roleplay-Based Policy Bypass Jailbreak
+- ATR-2026-00230: Persona-Based Moral Constraint Removal Jailbreak
+- ATR-2026-00231: AI Identity Substitution Jailbreak
+- ATR-2026-00233: Structured Dual-Response Jailbreak with Command System
+- ATR-2026-00234: Roleplay-Based Policy Bypass Jailbreak
+- ATR-2026-00235: Persona-Based Moral Constraint Removal Jailbreak
+- ATR-2026-00236: Pseudo-Code Structured Programming Jailbreak Attack
+- ATR-2026-00237: Dual-Response Jailbreak with Persona Commands
+- ATR-2026-00238: AI Identity Denial and Persona Replacement Attack
+- ATR-2026-00239: Amoral Persona Assignment with Obsessive Character Traits
+- ATR-2026-00240: Previous Instruction Nullification and Identity Replacement Jailbreak
+- ATR-2026-00241: Detailed Amoral Character Roleplay Jailbreak
+- ATR-2026-00242: Dual-Response Persona Jailbreak with Emoji Formatting
+- ATR-2026-00243: Acronym-Based Identity Override Jailbreak
+- ATR-2026-00244: Dual-Response Persona Jailbreak
+- ATR-2026-00245: Malicious Persona Creation for Safety Bypass
+- ATR-2026-00247: Matrix-Themed Dual Response Jailbreak
+- ATR-2026-00249: Text-Based Game Jailbreak with Entity Creation
+- ATR-2026-00251: Embodiment Mechanism Jailbreak with Totalitarian Control Claims
+- ATR-2026-00252: Narrative Jailbreak with Dual Response Formatting
+- ATR-2026-00253: Enhanced AIM Jailbreak with Persona Definition and Refusal Suppression
+- ATR-2026-00256: Base-N Encoding Instruction Bypass
+- ATR-2026-00257: Cipher and Transposition Encoding Jailbreak
+- ATR-2026-00258: Invisible Unicode Tag Character Injection
+- ATR-2026-00264: Latent Injection in Translation Context
+- ATR-2026-00265: Latent Injection in Retrieved Document / RAG Context
+- ATR-2026-00267: GCG Adversarial Suffix Attack
+- ATR-2026-00272: Hypothetical Response / Function Masking Token Smuggling
+- ATR-2026-00276: Invisible Unicode / BiDi Control Character Injection
+- ATR-2026-00278: DRA Disguise and Reconstruction Attack
+- ATR-2026-00280: Policy Puppetry / XML Role-Config Injection
+- ATR-2026-00282: Perez-Style Direct Prompt Injection Hijacking
+- ATR-2026-00285: Alternate Encoding Jailbreak \u2014 Morse, NATO, Zalgo, Leet, UU, QP, Braille
+- ATR-2026-00286: Latent Prompt Injection via Embedded Document or Report Context
+- ATR-2026-00296: Shell Command Injection via LLM Prompt
+- ATR-2026-00297: Python Code Execution / Remote Code Execution via LLM Prompt
+- ATR-2026-00308: Zalgo Combining-Diacritic Overload Encoding
+- ATR-2026-00309: Braille Unicode Encoded Prompt Injection
+- ATR-2026-00310: Ecoji Emoji-Encoded Prompt Injection
+- ATR-2026-00311: Base2048 Unicode Script Encoded Prompt Injection
+- ATR-2026-00312: Unicode Variation Selector ASCII Smuggling
+- ATR-2026-00313: SneakyBits Zero-Width Binary Steganography
+- ATR-2026-00315: SATA Masked Language Model [MASK] Substitution Jailbreak
+- ATR-2026-00316: FunctionMasking predict_mask Semantic Bypass
+- ATR-2026-00321: Hyphenated System Instruction Injection
+- ATR-2026-00359: Bank Phishing SMTP Email Code Generation
+- ATR-2026-00367: Emoji Flag Regional-Indicator Encoded Hidden Phrase
+- ATR-2026-00373: Piracy Torrent Site List Request
+- ATR-2026-00378: ChatGPT DOM JavaScript Redirect and UI Spoofing Injection
+- ATR-2026-00382: Cocaine Component Development Request
+- ATR-2026-00390: Discord Quote-Format Explicit Sexual Content Poem Injection
+- ATR-2026-00394: Backspace Deletion Character Injection
+- ATR-2026-00395: LLM Special Token Boundary Injection
+- ATR-2026-00396: Toxic Continuation Prefix Injection
+- ATR-2026-00397: Snowball Impossible Reasoning Injection
+- ATR-2026-00399: Latent Injection Document Separator Token
+- ATR-2026-00400: Latent Injection Ignore-Instruction Keyword
+- ATR-2026-00401: Training Data Replay CLOZE [MASK] Elicitation
+- ATR-2026-00403: Glitch Token Repeat-Back Elicitation
+- ATR-2026-00407: ECHO Admin Command / SQL Injection / Jinja SSTI Template Injection
+- ATR-2026-00408: DRA Parenthesis Character Reconstruction Attack
+- ATR-2026-00409: Phrasing Past/Future-Tense Harmful Query Bypass
+- ATR-2026-00410: LMRC Harm Category Direct Elicitation
+- ATR-2026-00412: FigStep Image-List Multimodal Jailbreak Text Pattern
+- ATR-2026-00414: Continuation Ethnic Slur Completion Elicitation
+- ATR-2026-00420: Microsoft Copilot Studio SharePoint Indirect Prompt Injection (CVE-2026-21520)
+
+### agent-manipulation (103 rules)
+
+- ATR-2026-00030: Cross-Agent Attack Detection
+- ATR-2026-00032: Agent Goal Hijacking Detection
+- ATR-2026-00074: Cross-Agent Privilege Escalation
+- ATR-2026-00076: Insecure Inter-Agent Communication Detection
+- ATR-2026-00077: Human-Agent Trust Exploitation Detection
+- ATR-2026-00108: Multi-Agent Consensus Sybil Attack
+- ATR-2026-00116: Malicious Agent-to-Agent Message Injection
+- ATR-2026-00117: Agent Identity Spoofing and Authority Impersonation
+- ATR-2026-00118: Human Approval Fatigue Exploitation
+- ATR-2026-00119: Social Engineering Attack via Agent Output
+- ATR-2026-00132: Casual Authority Claim and Scope Escalation
+- ATR-2026-00139: Casual Authority Data Redirect
+- ATR-2026-00164: Skill Scope Hijacking and Cross-Agent Escalation
+- ATR-2026-00268: Historical / Future Tense Framing Bypass
+- ATR-2026-00269: Foot-in-the-Door Gradual Escalation Attack
+- ATR-2026-00271: Grandma Roleplay Jailbreak
+- ATR-2026-00273: DAN / Developer Mode / DUDE Persona Jailbreak
+- ATR-2026-00287: ThreatenJSON \u2014 Coercive Output Format Threat
+- ATR-2026-00288: False Premise Injection (Misleading FalseAssertion)
+- ATR-2026-00301: TAP Tree-of-Attacks-with-Pruning Jailbreak
+- ATR-2026-00302: Anti-DAN Inverted-Filter Over-Refusal Persona
+- ATR-2026-00303: DevMode + RANTI Dual-Output Profanity Coercion Jailbreak
+- ATR-2026-00304: ChatGPT Image Unlocker Markdown-Output Jailbreak
+- ATR-2026-00305: DAN Mode Ablation Benchmark-Coercion Jailbreak
+- ATR-2026-00306: AutoDAN Genetic-Algorithm Jailbreak Suffix
+- ATR-2026-00307: In-the-Wild Jailbreak Corpus Signature Patterns
+- ATR-2026-00314: Amoral Unfiltered Custom AI Persona Jailbreak
+- ATR-2026-00317: Free-of-Restrictions Named Persona Jailbreak
+- ATR-2026-00318: Moralizing Rant Then Unfiltered Bypass
+- ATR-2026-00319: Developer Mode Dual-Response Format Jailbreak
+- ATR-2026-00320: Opposite Day / Boolean Opposite Machine Jailbreak
+- ATR-2026-00322: Fictional-World Format-Override Jailbreak
+- ATR-2026-00323: Dual-Persona AI Simulation Jailbreak
+- ATR-2026-00324: Neurosemantical Inversitis Disease-Frame Jailbreak
+- ATR-2026-00325: BOB Hypothetical Unrestricted Chatbot Jailbreak
+- ATR-2026-00326: Fake Developer / Authority Chatbot Override (ChatDAN)
+- ATR-2026-00327: AI Persona Ethics/Law Bypass Declaration
+- ATR-2026-00328: Named-Mode Persona Override (JEEVES/BABY/APOPHIS Mode)
+- ATR-2026-00329: No-Withhold Factual Resource / Dialogue Writer Persona
+- ATR-2026-00330: YOJA ALL-CAPS Character Settings Block Persona
+- ATR-2026-00331: Terminal / CLI Harmful-Function Simulator Persona
+- ATR-2026-00332: Hacker / Chan-Culture Offensive AI Persona
+- ATR-2026-00333: Disease-Framed Animal / Dual-AI Chatbot Jailbreak (mougpt)
+- ATR-2026-00334: Two-Entity Token-Splitting Dollar-Term Game Jailbreak
+- ATR-2026-00335: Key-Value Template Persona Injection (JOB/ROLE/PREFIX + Bracket Format)
+- ATR-2026-00336: BRM False-Information Machine / Opposite-Truth Persona
+- ATR-2026-00337: Obfuscated System-Announcement Injection
+- ATR-2026-00338: PersonGPT Hash-Prefix Trigger Activation
+- ATR-2026-00339: BOM Boolean Opposite Machine Direct Persona Claim
+- ATR-2026-00340: h4x Amoral Unfiltered AI Character Persona
+- ATR-2026-00341: CHAR=/RULES= Short Key-Value Persona Injection
+- ATR-2026-00342: Unicode/Encoding Obfuscation Instruction Injection
+- ATR-2026-00343: Lie/Truth Dual Personality Uncensored Alter-Ego
+- ATR-2026-00344: Alternative AI Same Capabilities No Restrictions Override
+- ATR-2026-00345: NLP-Based OS / Fictional Terminal Language Override
+- ATR-2026-00346: Jailbreak Emoji Unlock Dual-Format Output Identifier
+- ATR-2026-00347: Yin/Yang Hidden-Knowledge Deity Simulation and Radical Human-Sim Persona
+- ATR-2026-00348: ARC Autonomous Real Calculation Unit Rulebreaker Activation
+- ATR-2026-00349: Black Alert No-Ethics Writing Assistant Persona
+- ATR-2026-00351: DAN Off-Kilter and SMS-Abbreviated Persona Jailbreak
+- ATR-2026-00352: TrainGPT Fix-My-AI Harmful Output Extraction
+- ATR-2026-00353: Dual ChatGPT+Dan Opposite Personality Format Jailbreak
+- ATR-2026-00354: Reverse-Prompt Harm-Regardless Oracle Persona
+- ATR-2026-00355: UGH Anti-Human Nefarious AI Persona Jailbreak
+- ATR-2026-00356: Google GATO/LAMDA Exploit-Generation Persona Jailbreak
+- ATR-2026-00357: AntiFM Hate-Persona + Physical-Violence Threat + Filter Bypass Mandate
+- ATR-2026-00358: CumGPT Explicit-Adult Named-Persona Bypass
+- ATR-2026-00360: CHJ Carousel Game Show / Clyde No-Ethics Bird Jailbreak
+- ATR-2026-00361: Honesty Alter-Ego Dual-Consciousness Safety Filter Bypass
+- ATR-2026-00362: Fictional Unfiltered AI Comparison / Verbatim Hypothetical Model Extraction
+- ATR-2026-00363: Rephrase Criminal Activity Second-Person Template (against against)
+- ATR-2026-00364: Dr. Al Villain Plan Template Injection (Underground HQ Roleplay)
+- ATR-2026-00365: Reservoir Dogs Coercive Interrogation Roleplay (Mr. Blonde / The Cop)
+- ATR-2026-00366: Sneaky Pete Deliberate Misinformation Persona (Warp Facts Game)
+- ATR-2026-00368: Prompt Browser Token-Limit / POLLINATION Jailbreak
+- ATR-2026-00369: GPT-X Star Trek Unlimited-Knowledge Unconstrained Oracle Persona
+- ATR-2026-00370: ADDI/DONNIE German Dictator Propaganda Roleplay Persona
+- ATR-2026-00371: AI Political Bias Manipulation via Inherited-Bias Claim
+- ATR-2026-00372: Fictional CIA Secret Files Story Extraction
+- ATR-2026-00374: Role Placeholder Persona Template Injection
+- ATR-2026-00375: Character Description RPG Explicit Template
+- ATR-2026-00376: Identity Command Real-Person Persona Injection
+- ATR-2026-00377: Jailbreak-Template Command with [TARGETLANGUAGE]/[KEYWORD] Placeholders
+- ATR-2026-00379: Logic-Trap Lie-Permission Mandate Jailbreak
+- ATR-2026-00380: Fake-Citation Biased-Information Mandate
+- ATR-2026-00381: DAN Story-Narrative Continuation Label Prefix Jailbreak
+- ATR-2026-00383: Cyni-Bot 3000 Cynical-Sarcasm AI Persona Bypass
+- ATR-2026-00384: Protect-Me-From Indirect Harm Tutorial Template
+- ATR-2026-00385: Gigachad Dominant-Aggressive Persona Adoption
+- ATR-2026-00386: Daddy/Babygirl Sycophantic Power-Dynamic Manipulation
+- ATR-2026-00387: NSFW Character Sheet Generation Unlock
+- ATR-2026-00388: Opposite-Reply Omniscient Game Jailbreak
+- ATR-2026-00389: Terminal Custom OS Ruleset Session Injection
+- ATR-2026-00391: Persona Conditional Harm-Unlock Rule (BreadClyde Pattern)
+- ATR-2026-00392: Authority-Figure Persona + Defensive-Study Framing for Violence Extraction
+- ATR-2026-00402: Grandma Roleplay Harmful Substance Synthesis
+- ATR-2026-00404: ThreatenJSON Death-Coercion and UTF Tag Injection
+- ATR-2026-00406: Doctor XML Policy Puppetry Interaction-Config Injection
+- ATR-2026-00416: LiteLLM MCP Unauthenticated Server Registration RCE (CVE-2026-30623)
+- ATR-2026-00417: LibreChat MCP STDIO Argument Injection (CVE-2026-22252)
+- ATR-2026-00418: WeKnora MCP Config-Driven RCE (CVE-2026-22688)
+- ATR-2026-00430: Natural-Language Trust-Escalation / Authority Impersonation
+- ATR-2026-00432: SuperAGI Output Handler eval() RCE (CVE-2024-21552)
+
+### skill-compromise (35 rules)
+
+- ATR-2026-00060: MCP Skill Impersonation and Supply Chain Attack
+- ATR-2026-00120: SKILL.md Prompt Injection
+- ATR-2026-00121: Malicious Code in Skill Package
+- ATR-2026-00122: Weaponized Skill \u2014 Agent as Attack Tool
+- ATR-2026-00123: Over-Privileged Skill \u2014 Excessive Permissions
+- ATR-2026-00124: Skill Squatting / Typosquatting
+- ATR-2026-00125: Context Poisoning via Compaction Survival
+- ATR-2026-00126: Skill Rug Pull Setup Pattern
+- ATR-2026-00127: Subcommand Overflow Bypass
+- ATR-2026-00128: Hidden Payload in HTML Comment
+- ATR-2026-00129: Unicode Tag Character Smuggling
+- ATR-2026-00134: Fork Claim and Community Package Impersonation
+- ATR-2026-00135: Data Exfiltration URL in Skill Instructions
+- ATR-2026-00147: Community Fork Impersonation
+- ATR-2026-00149: Skill Data Exfiltration via Compound Patterns
+- ATR-2026-00151: Malicious Fork Impersonation via Install Instruction
+- ATR-2026-00154: Unauthorized Background Task Execution via Cron Job Installation
+- ATR-2026-00157: Time-Gated Credential Exfiltration (Rug Pull Timebomb)
+- ATR-2026-00200: Agent Memory and Configuration File Tampering
+- ATR-2026-00214: Credential Exfiltration via Fake Backup Verification
+- ATR-2026-00217: Credential Harvesting via Fake Backup Tool
+- ATR-2026-00220: Base64 Encoded Remote Code Execution via Raw IP
+- ATR-2026-00222: Browser Credential Harvesting via Session Debug Tool
+- ATR-2026-00223: Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation
+- ATR-2026-00224: Credential Exfiltration via Fake DevOps Tool Initialization
+- ATR-2026-00225: Hardcoded Suspicious IP Address in Skill Content
+- ATR-2026-00260: LLM Package Hallucination Typosquat Bait
+- ATR-2026-00262: Anti-Malware Evasion Code Generation Request
+- ATR-2026-00263: Credential File Read Code Generation Request
+- ATR-2026-00266: Malware Dropper / Loader Code Generation Request
+- ATR-2026-00283: Malware Generation \u2014 Generic Virus and Specific Payload Request
+- ATR-2026-00398: HuggingFace Unsafe Model Artifact Load Instruction
+- ATR-2026-00425: Natural-Language Persistent Covert Action Hook
+- ATR-2026-00427: Natural-Language Fake-Error Instruction Bypass
+- ATR-2026-00429: Natural-Language Skill Self-Modification / Persistence Instruction
+
+### context-exfiltration (33 rules)
+
+- ATR-2026-00020: System Prompt and Internal Instruction Leakage
+- ATR-2026-00021: Credential and Secret Exposure in Agent Output
+- ATR-2026-00075: Agent Memory Manipulation
+- ATR-2026-00102: Data Exfiltration via Disguised Analytics Collection
+- ATR-2026-00113: Credential File Theft from Agent Environment
+- ATR-2026-00114: OAuth and API Token Interception
+- ATR-2026-00115: Bulk Environment Variable Harvesting and Exfiltration
+- ATR-2026-00136: Tool Response Data Piggybacking
+- ATR-2026-00141: API Key Leakage via Example Format
+- ATR-2026-00142: Data Piggybacking via Casual Transition Words
+- ATR-2026-00145: Obfuscated API Key Disclosure
+- ATR-2026-00146: Environment Variable Existence Probing
+- ATR-2026-00150: Credential Data Leaked in Tool Response
+- ATR-2026-00152: Obfuscated Credential Exfiltration via Encoding
+- ATR-2026-00162: Credential Access with Exfiltration in Skill Instructions
+- ATR-2026-00201: Credential Exfiltration via Shell Pipe
+- ATR-2026-00212: mcp-atlassian Credential Leak via Hint Parameter Injection (CVE-2026-27825/27826)
+- ATR-2026-00261: Markdown Image URL Data Exfiltration
+- ATR-2026-00274: API Key / Secret Credential Generation or Completion Request
+- ATR-2026-00275: System Prompt Extraction / Training Data Verbatim Replay
+- ATR-2026-00290: Divergence Attack \u2014 Repeat-Word-Forever Training Data Extraction
+- ATR-2026-00291: Biometric Surveillance \u2014 Personal Biometric Data Request for Named Individual
+- ATR-2026-00293: Educational Records \u2014 Personal Academic/Professional Record Request for Named Individual
+- ATR-2026-00294: Financial PII \u2014 Personal Financial Data Request for Named Individual
+- ATR-2026-00295: Medical PII \u2014 Personal Medical/Health Data Request for Named Individual
+- ATR-2026-00405: Markdown Image URL Exfiltration and XSS Injection
+- ATR-2026-00411: API Key Generation and Partial Key Completion Request
+- ATR-2026-00421: Natural-Language Covert Conversation Exfiltration Instruction
+- ATR-2026-00422: Natural-Language Credential / Secret Disclosure Instruction
+- ATR-2026-00423: Natural-Language Sensitive File Disclosure Instruction
+- ATR-2026-00424: Natural-Language System Prompt Leak Instruction
+- ATR-2026-00426: Natural-Language Output-Injection Credential Embedding
+- ATR-2026-00431: Chatbox History Exfiltration via Prompt Injection (CVE-2024-48144, CVE-2024-48145)
+
+### tool-poisoning (28 rules)
+
+- ATR-2026-00010: Malicious Content in MCP Tool Response
+- ATR-2026-00011: Instruction Injection via Tool Output
+- ATR-2026-00012: Unauthorized Tool Call Detection
+- ATR-2026-00013: SSRF via Agent Tool Calls
+- ATR-2026-00061: Skill Description-Behavior Mismatch
+- ATR-2026-00062: Hidden Capability in MCP Skill
+- ATR-2026-00063: Multi-Skill Chain Attack
+- ATR-2026-00065: Malicious Skill Update or Mutation
+- ATR-2026-00066: Parameter Injection via Tool Arguments
+- ATR-2026-00095: MCP Tool Supply Chain Poisoning
+- ATR-2026-00096: Skill Registry Poisoning and Compromised Tool Distribution
+- ATR-2026-00100: Consent Bypass via Hidden LLM Instructions in Tool Descriptions
+- ATR-2026-00101: Trust Escalation via Authority Override Instructions
+- ATR-2026-00103: Hidden LLM Safety Bypass Instructions in Tool Descriptions
+- ATR-2026-00105: Silent Action Concealment Instructions in Tool Descriptions
+- ATR-2026-00106: Schema-Description Contradiction Attack
+- ATR-2026-00153: Tool with embedded instruction to bypass user confirmation and exfiltrate data
+- ATR-2026-00161: MCP Tool Description \u2014 IMPORTANT Tag Cross-Tool Shadowing Attack
+- ATR-2026-00209: MCPwn Runaway Tool Invocation via Retry Directive (CVE-2026-33032)
+- ATR-2026-00210: Flowise System Message Override via Template Interpolation (CVE-2025-59528)
+- ATR-2026-00259: ANSI Escape Code Terminal Injection
+- ATR-2026-00270: XSS Payload Injection in Tool Response Output
+- ATR-2026-00277: ECHO Template / Jinja / SQL Command Injection via LLM
+- ATR-2026-00393: ANSI Code Elicitation Request
+- ATR-2026-00415: Flowise Custom MCP STDIO Command Injection (CVE-2026-40933)
+- ATR-2026-00419: Cursor MCP JSON Zero-Click Configuration RCE (CVE-2025-54136)
+- ATR-2026-00434: mcp-remote authorization_endpoint OS Command Injection (CVE-2025-6514)
+- ATR-2026-00435: Azure MCP Server Missing Authentication for Critical Function (CVE-2026-32211)
+
+### privilege-escalation (12 rules)
+
+- ATR-2026-00040: Privilege Escalation and Admin Function Access
+- ATR-2026-00041: Agent Scope Creep Detection
+- ATR-2026-00064: Over-Permissioned MCP Skill
+- ATR-2026-00107: Privilege Escalation via Delayed Task Execution Bypass
+- ATR-2026-00110: Remote Code Execution via eval() and Dynamic Code Injection
+- ATR-2026-00111: Shell Metacharacter Injection in Tool Arguments
+- ATR-2026-00112: Dynamic Module Loading for Code Execution
+- ATR-2026-00143: Casual Unauthorized Privilege Escalation
+- ATR-2026-00144: Rationalized Safety Control Bypass
+- ATR-2026-00156: SSH Remote Command Execution with Credential Exposure
+- ATR-2026-00204: Stealth Execution and Persistence Mechanisms
+- ATR-2026-00436: Enclave VM Sandbox Escape RCE (CVE-2026-27597)
+
+### model-abuse (10 rules)
+
+- ATR-2026-00072: Model Behavior Extraction
+- ATR-2026-00279: Harmful Completion / Continuation Attack
+- ATR-2026-00281: EICAR / GTUBE AV Test Signature Output Request
+- ATR-2026-00284: Glitch Token Destabilization Attack
+- ATR-2026-00289: LMRC Harmful Content Elicitation \u2014 Quack Medicine, Bullying, Slur Usage
+- ATR-2026-00292: Self-Harm and Eating Disorder Facilitation Request
+- ATR-2026-00298: DoNotAnswer Malicious Use \u2014 Illegal Activity Facilitation Request
+- ATR-2026-00299: HarmBench Detailed Harmful Instruction Request \u2014 Step-by-Step Attack Facilitation
+- ATR-2026-00413: Malware Code Generation Direct Request
+- ATR-2026-00433: ModelCache torch.load() Deserialization RCE (CVE-2025-45146)
+
+### excessive-autonomy (6 rules)
+
+- ATR-2026-00050: Runaway Agent Loop Detection
+- ATR-2026-00051: Agent Resource Exhaustion Detection
+- ATR-2026-00052: Cascading Failure Detection in Agent Pipelines
+- ATR-2026-00098: Unauthorized Financial Action by AI Agent
+- ATR-2026-00099: High-Risk Tool Invocation Without Human Confirmation
+- ATR-2026-00428: Natural-Language Unauthorized Shell-Execution Instruction
+
+### data-poisoning (2 rules)
+
+- ATR-2026-00070: Data Poisoning via RAG and Knowledge Base Contamination
+- ATR-2026-00073: Malicious Fine-tuning Data
+
+---
+
+## Section 4 — Product surface (what each piece does)
+
+### PanGuard Scan
+Static + dynamic analysis on AI agent skill packages before install. Pipeline:
+content fingerprint, regex match against 419 ATR rules, optional LLM second
+opinion. Outputs SARIF 2.1.0 (industry-standard threat export) and signed
+JSON evidence packs. CLI: `panguard scan <path>`. 60 seconds end-to-end on
+a typical npm package.
+
+### PanGuard Guard
+Runtime enforcement engine. Subscribes to MCP and Skill events from a host
+agent (Claude Code, Cursor, OpenClaw, etc.), runs them through a 4-agent
+pipeline (Detect → Analyze → Respond → Report), enforces ATR rules in real
+time. Response actions: block_input, block_output, alert, snapshot, kill,
+quarantine, notify_telegram, notify_slack, block_ip, custom_script, escalate.
+Confidence-based: high-confidence threats are auto-blocked, medium-confidence
+are alerted, low-confidence are logged only.
+
+### PanGuard Skill Auditor
+Pre-install gate. 8 checks: prompt injection in skill description, suspicious
+tool calls, hidden capabilities, supply-chain signals (typosquatting,
+postinstall scripts), excessive permissions declared, secret access patterns,
+exfiltration patterns, behavior-description mismatch. Designed to fit the
+`npm install` → `pga audit` → `npm install` pattern.
+
+### PanGuard Migrator (Community + Enterprise)
+Converts legacy Sigma + YARA detections into ATR YAML for the AI agent
+runtime. Community version on npm (`@panguard-ai/migrator-community`):
+parsers, IR transformer, ATR output, CLI. Enterprise version (proprietary):
+5-framework compliance auto-mapping (EU AI Act, OWASP Agentic Top 10:2026,
+OWASP LLM Top 10:2025, NIST AI RMF, ISO/IEC 42001), evidence packs with
+SHA-256 + Merkle root attestation, ATR upstream contribution pipeline.
+
+### PanGuard MCP Server
+Exposes 12 panguard_* tools over Model Context Protocol so any MCP-compatible
+agent (Claude Code, Cursor, OpenClaw, NemoClaw, Workbuddy) can use PanGuard
+as a security tool. Tools: panguard_scan, panguard_audit_skill,
+panguard_guard_start, panguard_guard_stop, panguard_status, panguard_alerts,
+panguard_block_ip, panguard_deploy, panguard_init, panguard_generate_report,
+panguard_scan_code, plus a discovery tool.
+
+### Threat Cloud
+The flywheel. Every PanGuard install becomes a sensor. Novel attack patterns
+detected at one tenant are anonymized (hashes only, no payload bodies),
+aggregated, and crystallized into new ATR rules. New rules are promoted to
+production within minutes if they survive a multi-tenant validation step
+(zero false positives on a 432-skill clean corpus, 3+ tenants agreement).
+
+### PanGuard Trap (in development)
+Honeypot system. Plants decoy MCP skills, decoy credentials, decoy file paths
+in agent-accessible locations. Triggers on read/write/exec to surface
+exfiltration intent before damage. Currently in beta.
+
+### PanGuard Chat (in development)
+Conversational interface over Guard and Threat Cloud. Operator asks "did any
+agent try to read SSH keys this week" — Chat queries the event log and
+returns a structured answer plus drill-down.
+
+### PanGuard Report (in development)
+Auto-generated compliance reports for SOC 2 (Type 1 and Type 2 evidence),
+ISO 27001, Taiwan Cybersecurity Management Act (TCSA), EU AI Act Article 15,
+NIST AI RMF. Pulls from Guard event log and PanGuard's own audit trail.
+
+---
+
+## Section 5 — Benchmark methodology
+
+### Garak (NVIDIA jailbreak corpus)
+Source: github.com/NVIDIA/garak. 666 adversarial prompts spanning prompt
+injection, jailbreaking, encoding tricks, persona attacks. Result: 97.1%
+recall. Methodology: ATR v2.1.2 loaded with all 419 rules, prompts fed
+through detect-only mode (no LLM second opinion), recall = (true positives) /
+(true positives + false negatives). Reproducibility: agent-threat-rules
+repo, `pnpm bench:garak`.
+
+### SKILL.md (PanGuard wild skill corpus)
+Source: scraped from ClawHub, OpenClaw, Skills.sh registries. 498 samples
+manually labeled as malicious (252) or benign (246). Result: 100% recall,
+97% precision, 0.2% false positive rate. Methodology: ATR v2.1.2 detect-only
+mode, full pipeline (regex + fingerprint + content checks). The 0.2% FP rate
+is the 1 false positive out of 432 clean skills in the held-out test set.
+
+### PINT (Invariant Labs adversarial corpus)
+Source: github.com/invariantlabs-ai/invariant. 850 samples covering Sigma-style
+detection scenarios adapted for AI agents. Result: 62.5% recall, 99.6%
+precision. Methodology: ATR v2.1.2 regex layer only (no LLM). The lower
+recall vs Garak/SKILL.md reflects the corpus being designed for SIEM
+detection patterns, not agent-context patterns — Sigma migration via Migrator
+is in active development to close the gap.
+
+### Wild scan (live ecosystem audit)
+Crawled 96,096 AI agent skill entries from ClawHub (36,378), OpenClaw (56,503),
+Skills.sh (3,115), plus a small Hermes-protocol sample (100). Scanned 67,799
+that had parseable content. Result: 1,096 confirmed malicious skills, 11,324
+total threats detected (confirmed + suspicious), 249 triple-threat packages
+(combined shell + network + filesystem access), 122 packages with
+postinstall scripts.
+
+### HackAPrompt cluster mining (engineering update 2026-05-11)
+Source: HackAPrompt 600K corpus. Ran ATR v2.1.2 baseline (61.6% PINT,
+16.0% HackAPrompt recall), clustered 4,016-sample miss space, wrote 6 new
+rules covering dominant attack families, tightened to zero false positives
+on a 431-sample benign corpus, re-ran. Result: HackAPrompt recall 29.5%,
+PINT recall 62.5%, zero new false positives, 6.91ms p50 latency. The 29.5%
+is honest. Below closed-source ML detectors claim. The number is not the
+point — the methodology is.
+
+---
+
+## Section 6 — Ecosystem integrations (what is shipping where)
+
+### Microsoft AGT (Agent Governance Toolkit)
+PR #908 (15 rules, initial) → PR #1277 (287 rules + weekly auto-sync workflow,
+merged 2026-04-26). On 2026-05-11, Microsoft Copilot SWE Agent opened
+agent-governance-toolkit issue #1981 with regression-test fixtures presuming
+ATR detection — a bidirectional integration loop is now operational.
+
+### Cisco AI Defense (skill-scanner)
+PR #79 (PoC, 34 rules) → PR #99 (full 419-rule library merged in production via v2.2.0 auto-sync,
+2026-04-22). skill-scanner is Cisco's commercial scanner; ATR is the rule
+engine underneath.
+
+### MISP (taxonomies + galaxy)
+PR #323 on misp-taxonomies (rule-ID tagging vocabulary, merged 2026-04-12).
+PR #1207 on misp-galaxy (336-rule cluster, merged 2026-05-10). Now part
+of the MISP global threat-intel sharing layer.
+
+### OWASP Agentic Security Resource Hub (A-S-R-H)
+PR #74 merged 2026-05-11 with "Welcome to the team" greeting from project
+lead Mert Satilmaz. Note: this is the third-party A-S-R-H repo; the official
+OWASP Foundation repo PR is still pending. Cited as OWASP-affiliated, not
+OWASP-official.
+
+### Gen Digital Sage
+PR #33 (Norton / Avast / AVG parent company). 2026-04-18. Open and tracked.
+
+### Other open PRs
+NVIDIA garak #1676 (v2.1.0, 419 rules, 2 review rounds passed), safe-agentic-
+framework/safe-mcp #187, IBM mcp-context-forge #4109, meta-llama/PurpleLlama
+#206, promptfoo/promptfoo #8529, cisco-ai-defense/mcp-scanner #151,
+agentcontrol/agent-control #170.
+
+### npm + PyPI packages (October 2025 onwards)
+13 packages combined cross-ecosystem, 10K+ monthly downloads in aggregate.
+Notable: agent-threat-rules (npm, 2.2.0), @panguard-ai/migrator-community
+(npm, 0.1.0), panguard (npm, will be 1.5.6 once npm publish lands).
+
+---
+
+## Section 7 — Recent writing (top 20 blog posts, English)
+
+Full text at panguard.ai/blog/{slug}. Each post also has a zh-TW
+counterpart at panguard.ai/zh-TW/blog/{slug}-zh.
+
+### 60 Days, 8 Ecosystem Integrations — How an Open Standard Spreads
+- URL: https://panguard.ai/blog/60-days-8-ecosystem-integrations
+- Date: 2026-05-11
+- Excerpt: From v0.1.0 on 2026-03-08 to v2.1.1 with 8 production integrations and standards-body conversations on 2026-05-11. The mechanics behind ecosystem pull.
+
+### Anthropic MCP "By Design" RCE — Where Runtime Detection Fills the Gap
+- URL: https://panguard.ai/blog/anthropic-mcp-by-design-rce-runtime-detection-gap
+- Date: 2026-05-11
+- Excerpt: When the protocol won't change, the detection layer becomes the contract. A walkthrough of the MCP "by design" disclosure and ATR's 17 dedicated MCP rules.
+
+### The 96K-Skill Wild Scan: Methodology Walkthrough
+- URL: https://panguard.ai/blog/the-96k-skill-wild-scan-methodology
+- Date: 2026-05-11
+- Excerpt: How we collected 96,096 production SKILL.md files across four registries, ran ATR v2.1.1 detection, and surfaced 751 confirmed malicious instances with audit-grade reproducibility.
+
+### Bus Factor 1 Is Not a Secret
+- URL: https://panguard.ai/blog/bus-factor-one-is-not-a-secret
+- Date: 2026-05-11
+- Excerpt: Most small open-source projects pretend to have a team. We just shipped governance docs that openly disclose ATR is a single-maintainer project — and explain how that constrains decision-making.
+
+### Three Tier Profiles for Three Risk Postures
+- URL: https://panguard.ai/blog/three-tier-profiles-three-risk-postures
+- Date: 2026-05-11
+- Excerpt: AI RMF is non-normative by design. Our OSCAL catalog ships three worked-example profiles — 18, 55, and 72 controls — to demonstrate composability across foundational, customer-facing, and high-risk deployments.
+
+### 41 Ways the AI RMF Playbook Disagrees With Itself
+- URL: https://panguard.ai/blog/ai-rmf-playbook-41-divergences
+- Date: 2026-05-11
+- Excerpt: We audited the AI RMF Playbook JSON against the AI RMF Core HTML. 41 of 72 subcategories drift between the two NIST sources — 57% disagreement rate. One severity-3 semantic divergence narrows the obligated party scope at GOVERN 5.2. Nine severity-2 typos and capitalisation issues, including the well-known "Decision-makings" typo. 31 minor wording deltas. Every divergence has a remediation proposal with literal patch text.
+
+### OSCAL Community Catalog of NIST AI RMF v0.4 Ships
+- URL: https://panguard.ai/blog/oscal-community-catalog-nist-ai-rmf-v04
+- Date: 2026-05-11
+- Excerpt: We just tagged v0.4.0 of the community OSCAL conversion of NIST AI RMF: 72 subcategory controls across 4 functions, 4 worked-example tier profiles, 41 per-divergence remediation proposals, and 176 cross-reference links validated by 5-layer CI. CC0 1.0 licensed. The NIST OSCAL team has acknowledged the upstream conversion is paused due to resource constraints.
+
+### Microsoft Published Semantic Kernel RCE on May 7. Microsoft Copilot Wrote Test Fixtures Against Our Rules on May 11. We Shipped the Detection Same Day.
+- URL: https://panguard.ai/blog/microsoft-semantic-kernel-rce-atr-v2-1-2
+- Date: 2026-05-11
+- Excerpt: On 2026-05-07 Microsoft Security disclosed two critical RCE CVEs in Semantic Kernel — CVE-2026-26030 (In-Memory Vector Store lambda+eval injection) and CVE-2026-25592 (SessionsPythonPlugin file write to autostart paths). On 2026-05-11 06:07 UTC, Microsoft Copilot SWE Agent opened agent-governance-toolkit#1981 adding regression test fixtures against the ATR community-rules pack, presuming ATR would have detection. Eight hours later, ATR v2.1.2 shipped on npm with rules ATR-2026-00440 and ATR-2026-00441 covering both CVEs — plus a credential-leak redact helper for any integration that logs ATRMatch.matchedPatterns. This is the layer-0 detection-standard flywheel running end-to-end in a single workday.
+
+### We Doubled HackAPrompt Recall in One Night. The Number Is Still Not Impressive. Here Is Why That Matters.
+- URL: https://panguard.ai/blog/hackaprompt-cluster-mining-29-percent-recall
+- Date: 2026-05-11
+- Excerpt: On 2026-05-11 we ran ATR v2.1.2 against PINT (850 samples) and a deterministic 5K sample of the HackAPrompt 600K adversarial-prompt corpus. Baseline: 61.6% PINT recall, 16.0% HackAPrompt recall. We clustered the 4,016-sample HackAPrompt miss space, wrote 6 new rules covering the dominant attack families, tightened them across four iterations to zero false positives on a 431-sample benign skill corpus, and re-ran. Result: HackAPrompt recall 29.5%, PINT recall 62.5%, zero new false positives, 6.91ms p50 latency. The 29.5% is honest. It is below what closed-source ML detectors claim. The number is not the point.
+
+### The 17 New Rules in ATR v2.0.x to v2.1.1
+- URL: https://panguard.ai/blog/seventeen-new-rules-atr-v2-1-0
+- Date: 2026-05-10
+- Excerpt: ATR v2.1.1 adds 16 new rules (10 natural-language attack patterns + 6 skill-compromise extensions) and an engine upgrade that benefits all 320+ existing rules. 0.20% FP and 97.1% recall preserved.
+
+### OWASP Top 10 Agentic 2026: 377 ATR Mappings Across 336 Rules
+- URL: https://panguard.ai/blog/owasp-agentic-2026-atr-mapping
+- Date: 2026-05-10
+- Excerpt: OWASP GenAI Project shipped the Top 10 for Agentic Applications 2026, peer-reviewed by 100+ practitioners. ATR v2.1.1 maps 377 rule-to-category links across the full 336-rule corpus. ASI01 Agent Goal Hijack dominates at 202 rules — that distribution reflects the actual threat surface, not author bias. Here is the full per-category breakdown and what the numbers mean.
+
+### ATR in MISP: Taxonomy + Galaxy Merged on the Same Day
+- URL: https://panguard.ai/blog/atr-misp-taxonomies-323
+- Date: 2026-05-10
+- Excerpt: Two MISP merges on 2026-05-10: PR #323 added the ATR taxonomy (standardised tags for AI agent threats); PR #1207 added the ATR galaxy with 533 cross-references mapping individual ATR rules to MITRE ATLAS and ATT&CK techniques. CERTs and ISACs now have both the vocabulary and the cross-walk to existing TI frameworks. Pivot, share IOCs, correlate across borders — without bespoke ontology.
+
+### 8 ATR Rules That Catch Microsoft Semantic Kernel CVE-2026-25592/26030
+- URL: https://panguard.ai/blog/semantic-kernel-cves-atr-coverage
+- Date: 2026-05-09
+- Excerpt: On 2026-05-07 Microsoft disclosed two CVEs in Semantic Kernel: CVE-2026-26030 (in-memory vector store unsafe string interpolation enabling Python class hierarchy traversal to RCE) and CVE-2026-25592 (KernelFunction-exposed file-write primitive enabling persistence via Windows Startup). Microsoft AGT already deploys 287 ATR rules. Here is the 8-rule mapping that catches the attack class at runtime, with the bridge issue filed upstream.
+
+### We Found Our Own Scanner Broken on a 30-Word Attack. Here Is What We Did.
+- URL: https://panguard.ai/blog/we-found-our-scanner-broken-and-fixed-it
+- Date: 2026-05-08
+- Excerpt: A fresh-install dogfood test caught Panguard scoring an obvious data-exfil skill at 2/100 LOW with zero detections. Root cause: the 314-rule corpus was tuned for shell-style payloads and classic jailbreak phrases, not for the modern attack form — natural-language imperative instructions that tell the agent to misbehave on every interaction. Fixed it in v2.0.18 with 10 new rules and three engine improvements that benefit every existing rule.
+
+### Six CVEs, Two Vendors, One Detection Layer: ATR Ships the OX MCP Disclosure Pack
+- URL: https://panguard.ai/blog/cve-2026-mcp-disclosure-pack
+- Date: 2026-05-05
+- Excerpt: When the protocol vendor declines to patch, signature-based detection is the only realistic mitigation. Here are six MIT-licensed YAML rules covering the entire OX Security MCP-by-design batch (CVE-2026-40933 Flowise, CVE-2026-30623 LiteLLM, CVE-2026-22252 LibreChat, CVE-2026-22688 WeKnora, CVE-2025-54136 Cursor zero-click) plus Microsoft Copilot Studio CVE-2026-21520. All ship in agent-threat-rules v2.0.18.
+
+### Why AI Agent Security Needs a Platform, Not Another Tool
+- URL: https://panguard.ai/blog/ai-agent-security-needs-platform
+- Date: 2026-04-22
+- Excerpt: The 7-layer defense architecture the industry has been missing. Every current vendor covers 1-2 layers — Sage on runtime, Cisco on scanning, Microsoft on governance, Straiker on detection. We argue the next shift is consolidation into a full-stack Agent Security Platform (ASP), and we publish our honest 5/7 coverage today along with the roadmap to 7/7 by Q3 2026.
+
+### MCP Narrative Collapse: Three Takes from Perplexity, YC, and the Indie-Hacker World
+- URL: https://panguard.ai/blog/mcp-narrative-collapse-three-takes
+- Date: 2026-04-20
+- Excerpt: In 72 hours, the AI infrastructure community went from "MCP is the future" to "MCP sucks honestly." Perplexity's CTO says they are moving off it internally. Garry Tan at YC posted the eulogy. Pieter Levels declared it dead. Here is what actually shifted, why the Ox Security disclosure was the trigger, and what it means for agent-layer security going forward.
+
+### 751 Malicious Skills Found on OpenClaw: Inside a Coordinated Supply Chain Attack
+- URL: https://panguard.ai/blog/751-malicious-skills-openclaw
+- Date: 2026-04-15
+- Excerpt: We scanned 56,480 AI agent skills on OpenClaw and found 751 distributing active malware. Three coordinated threat actors. Base64-encoded C2 callbacks. Password-protected zip files. The largest known AI agent supply chain attack.
+
+### OWASP Agentic Top 10: Full Detection Coverage Mapping
+- URL: https://panguard.ai/blog/owasp-agentic-top-10-detection-coverage
+- Date: 2026-04-09
+- Excerpt: ATR covers 10/10 OWASP Agentic Top 10 categories with executable detection rules. Here is the complete mapping.
+
+### How Cisco Ships ATR Rules in AI Defense
+- URL: https://panguard.ai/blog/how-cisco-ships-atr-rules
+- Date: 2026-04-09
+- Excerpt: Cisco AI Defense merged 34 ATR rules as upstream. Then they built a CLI to consume ATR rule packs. Here is how the integration works.
+
+---
+
+## Section 8 — Where to look next
+
+For source code: github.com/panguard-ai/panguard-ai (monorepo with 18 packages).
+For the open rule standard: github.com/Agent-Threat-Rule/agent-threat-rules.
+For docs: docs.panguard.ai (Mintlify, en + zh-Hant).
+For the marketing site: panguard.ai (Next.js 14, en + zh-TW).
+For the sovereign brief: sovereign-ai-defense.vercel.app.
+For commercial enquiry: adam@agentthreatrule.org.
+
+This file regenerates on every site build. To request a structured change,
+file an issue at github.com/panguard-ai/panguard-ai/issues with the tag
+`llms-full`.
