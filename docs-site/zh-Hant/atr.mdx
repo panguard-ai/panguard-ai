@@ -1,6 +1,6 @@
 ---
 title: 'ATR (Agent Threat Rules)'
-description: 'AI agent 威脅偵測的開放標準。71 條規則。OWASP Agentic Top 10: 10/10 覆蓋。社群維護。'
+description: 'AI agent 威脅偵測的開放標準。344 條規則。OWASP Agentic Top 10: 10/10 覆蓋。社群維護。'
 icon: 'shield-halved'
 ---
 
@@ -22,10 +22,12 @@ ATR 規則偵測傳統安全工具抓不到的威脅：
 
 |                      |                                                        |
 | -------------------- | ------------------------------------------------------ |
-| **71** 條規則        | 涵蓋 9 大威脅類別                                      |
+| **344** 條規則       | 涵蓋 10 大威脅類別                                     |
 | **OWASP 10/10**      | 完整覆蓋 OWASP Agentic Top 10                         |
-| **62.7%** recall     | PINT benchmark（99.7% precision）                      |
-| **520+** patterns    | 獨立偵測簽章                                           |
+| **97.1%** recall     | Garak jailbreak corpus（666 個樣本）                   |
+| **100%** recall      | SKILL.md benchmark（97% precision、0.2% FP）            |
+| **90,000+** skills   | 已掃描的 skills（67,799 已掃、1,096 確認惡意）        |
+| **770+** patterns    | 獨立偵測簽章                                           |
 | **< 3ms** 掃描時間   | 每個 skill（regex 層）                                 |
 
 ## OWASP Agentic Top 10 覆蓋
