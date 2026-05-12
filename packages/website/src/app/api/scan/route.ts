@@ -148,7 +148,20 @@ async function checkTCWhitelist(skillName: string, repoSlug: string): Promise<bo
 // Cache + Rate Limit
 // ---------------------------------------------------------------------------
 
+// Bounded LRU-style cache: evict the oldest entry once the cap is hit.
+// Without a cap an attacker can fill serverless warm memory by submitting
+// unique 100 KB payloads until the Lambda OOMs and cold-starts on every req.
+const SCAN_CACHE_MAX = 500;
 const scanCache = new Map<string, { report: WebScanReport; scannedAt: string }>();
+
+function scanCacheSet(key: string, value: { report: WebScanReport; scannedAt: string }): void {
+  if (scanCache.size >= SCAN_CACHE_MAX) {
+    // Map iteration order is insertion order; delete the oldest entry.
+    const oldestKey = scanCache.keys().next().value;
+    if (oldestKey !== undefined) scanCache.delete(oldestKey);
+  }
+  scanCache.set(key, value);
+}
 
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_MAX = 10;
@@ -461,7 +474,7 @@ export async function POST(request: Request) {
         atrPatternsMatched: 0,
       };
       const scannedAt = new Date().toISOString();
-      scanCache.set(cHash, { report: safeReport, scannedAt });
+      scanCacheSet(cHash, { report: safeReport, scannedAt });
       return NextResponse.json({
         ok: true,
         data: {
@@ -583,7 +596,7 @@ export async function POST(request: Request) {
   };
 
   const scannedAt = new Date().toISOString();
-  scanCache.set(cHash, { report, scannedAt });
+  scanCacheSet(cHash, { report, scannedAt });
 
   // Use after() to ensure TC submissions complete even on serverless (Vercel).
   // Without after(), fire-and-forget promises get killed when the Lambda freezes.

@@ -88,6 +88,13 @@ export default async function BlogPostPage(props: {
 
   const postUrl = `https://panguard.ai/blog/${post.slug}`;
 
+  // Author resolution: posts authored by "Adam Lin" or "Panguard AI" or "ATR Research"
+  // get the Person schema; everything else falls back to Organization.
+  const authorIsAdam = /adam|panguard|atr research/i.test(post.author);
+  const authorBlock = authorIsAdam
+    ? { '@id': 'https://panguard.ai/#person-adam' }
+    : { '@type': 'Person', name: post.author };
+
   const blogPostJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -95,12 +102,8 @@ export default async function BlogPostPage(props: {
     description: post.excerpt,
     datePublished: `${post.date}T00:00:00Z`,
     dateModified: `${post.date}T00:00:00Z`,
-    author: { '@type': 'Organization', name: 'Panguard AI' },
-    publisher: {
-      '@type': 'Organization',
-      name: 'Panguard AI',
-      logo: { '@type': 'ImageObject', url: 'https://panguard.ai/favicon.png' },
-    },
+    author: authorBlock,
+    publisher: { '@id': 'https://panguard.ai/#org' },
     url: postUrl,
     image: 'https://panguard.ai/og-image.png',
     articleSection: post.category,
@@ -153,10 +156,20 @@ export default async function BlogPostPage(props: {
             </FadeInUp>
 
             <FadeInUp delay={0.1}>
-              <div className="flex flex-wrap items-center gap-5 mt-6 text-sm text-text-tertiary">
+              <address className="not-italic flex flex-wrap items-center gap-5 mt-6 text-sm text-text-tertiary">
                 <span className="flex items-center gap-1.5">
                   <User className="w-4 h-4" />
-                  {post.author}
+                  {authorIsAdam ? (
+                    <Link
+                      href="/about"
+                      rel="author"
+                      className="hover:text-brand-sage transition-colors"
+                    >
+                      {post.author}
+                    </Link>
+                  ) : (
+                    <span itemProp="author">{post.author}</span>
+                  )}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
@@ -166,7 +179,7 @@ export default async function BlogPostPage(props: {
                   <Clock className="w-4 h-4" />
                   {post.readingTime}
                 </span>
-              </div>
+              </address>
             </FadeInUp>
 
             <FadeInUp delay={0.15}>

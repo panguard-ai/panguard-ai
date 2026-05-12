@@ -476,6 +476,58 @@ function CTASection() {
 /*  Root                                                               */
 /* ------------------------------------------------------------------ */
 
+function DetailedComparisons() {
+  const items = [
+    {
+      slug: 'atr-vs-sigma',
+      title: 'ATR vs Sigma',
+      blurb: 'Open detection rule standards. Sigma for SIEM, ATR for AI agent runtime.',
+    },
+    {
+      slug: 'atr-vs-garak',
+      title: 'ATR vs NVIDIA garak',
+      blurb: 'Runtime detection vs adversarial pre-deployment testing. Both needed.',
+    },
+    {
+      slug: 'atr-vs-pyrit',
+      title: 'ATR vs Microsoft PyRIT',
+      blurb: 'Defender YAML standard vs red-team Python toolkit. Active cooperation.',
+    },
+    {
+      slug: 'atr-vs-owasp-agentic-top-10',
+      title: 'ATR vs OWASP Agentic Top 10',
+      blurb: 'Executable rules vs taxonomy. ATR ships as OWASP A-S-R-H reference implementation.',
+    },
+    {
+      slug: 'atr-vs-cisco-defenseclaw',
+      title: 'PanGuard vs Cisco DefenseClaw',
+      blurb: 'Open standard plus commercial platform vs enterprise bundle. Cisco runs ATR in production.',
+    },
+  ];
+
+  return (
+    <SectionWrapper>
+      <SectionTitle
+        overline="DETAILED COMPARISONS"
+        title="ATR vs other AI security tools"
+        subtitle="Honest side-by-side comparisons with the open standards and commercial products in the AI agent security space."
+      />
+      <div className="max-w-5xl mx-auto mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {items.map((item) => (
+          <Link
+            key={item.slug}
+            href={`/compare/${item.slug}`}
+            className="block bg-surface-1 rounded-xl border border-border p-5 hover:border-brand-sage/40 transition-colors duration-200"
+          >
+            <p className="text-sm font-bold text-text-primary mb-1.5">{item.title}</p>
+            <p className="text-xs text-text-secondary leading-relaxed">{item.blurb}</p>
+          </Link>
+        ))}
+      </div>
+    </SectionWrapper>
+  );
+}
+
 export default function CompareContent() {
   return (
     <>
@@ -484,6 +536,7 @@ export default function CompareContent() {
       <EvidenceSection />
       <ComparisonTable />
       <ComparisonCards />
+      <DetailedComparisons />
       <CTASection />
     </>
   );

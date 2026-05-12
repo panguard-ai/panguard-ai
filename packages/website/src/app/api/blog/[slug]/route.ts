@@ -2,7 +2,13 @@ import { NextResponse } from 'next/server';
 import { savePost, deletePost, isStaticPost } from '@/lib/blog-store';
 import type { BlogPost } from '@/data/blog-posts';
 
-const AUTH_API = process.env.NEXT_PUBLIC_API_URL || '';
+const AUTH_API = process.env.BLOG_AUTH_API || '';
+
+const ALLOWED_AUTH_HOSTS = new Set([
+  'app.panguard.ai',
+  'localhost',
+  '127.0.0.1',
+]);
 
 async function verifyAdmin(req: Request): Promise<boolean> {
   const authHeader = req.headers.get('authorization');
@@ -10,9 +16,18 @@ async function verifyAdmin(req: Request): Promise<boolean> {
 
   if (!AUTH_API) return false;
 
+  let parsedBase: URL;
+  try {
+    parsedBase = new URL(AUTH_API);
+  } catch {
+    return false;
+  }
+  if (!ALLOWED_AUTH_HOSTS.has(parsedBase.hostname)) return false;
+
   try {
     const res = await fetch(`${AUTH_API}/api/auth/me`, {
       headers: { Authorization: authHeader },
+      signal: AbortSignal.timeout(5_000),
     });
     if (!res.ok) return false;
     const data = (await res.json()) as { ok: boolean; data?: { user: { role: string } } };

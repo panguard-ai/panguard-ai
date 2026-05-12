@@ -88,66 +88,26 @@ export async function generateMetadata(props: {
   };
 }
 
+import {
+  ORGANIZATION_SCHEMA,
+  PERSON_ADAM_SCHEMA,
+  WEBSITE_SCHEMA,
+  softwareApplicationSchema,
+} from '@/lib/schema';
+
 const jsonLd = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'Panguard AI',
-    url: 'https://panguard.ai',
-    logo: 'https://panguard.ai/favicon.png',
+  ORGANIZATION_SCHEMA,
+  PERSON_ADAM_SCHEMA,
+  WEBSITE_SCHEMA,
+  softwareApplicationSchema({
+    name: 'PanGuard AI',
     description:
-      'AI agent security for developers. Scan MCP skills, detect prompt injection and tool poisoning, protect AI agents in real time.',
-    foundingDate: '2024',
-    knowsAbout: [
-      'AI agent security',
-      'MCP security',
-      'prompt injection detection',
-      'tool poisoning',
-      'ATR rules',
-      'Agent Threat Rules',
-      'AI threat detection',
-      'skill auditing',
-    ],
-    sameAs: [
-      'https://github.com/panguard-ai/panguard-ai',
-      'https://x.com/panguard_ai',
-      'https://linkedin.com/company/panguard-ai',
-    ],
-    contactPoint: {
-      '@type': 'ContactPoint',
-      contactType: 'sales',
-      url: 'https://panguard.ai/contact',
-    },
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'Panguard AI',
-    applicationCategory: 'SecurityApplication',
-    operatingSystem: 'Linux, macOS, Windows',
-    description:
-      'AI agent security platform. Scan MCP skills, detect threats, protect AI agents. One command to install.',
+      'The open standard plus commercial platform for AI agent security. ATR detection rules plus PanGuard runtime. Free Community tier, commercial Pilot / Enterprise / Sovereign tiers.',
     url: 'https://panguard.ai',
-    offers: [
-      { '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Community (Open Source)' },
-    ],
-    publisher: {
-      '@type': 'Organization',
-      name: 'Panguard AI, Inc.',
-      url: 'https://panguard.ai',
-    },
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    url: 'https://panguard.ai',
-    name: 'Panguard AI',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: 'https://panguard.ai/blog?q={search_term_string}',
-      'query-input': 'required name=search_term_string',
-    },
-  },
+    category: 'SecurityApplication',
+    pricing: 'mixed',
+    applicationSubCategory: 'AI Agent Security',
+  }),
 ];
 
 export default async function LocaleLayout(
@@ -196,13 +156,18 @@ export default async function LocaleLayout(
               'document.documentElement.classList.add("js-ready");setTimeout(function(){document.documentElement.classList.add("fm-ready")},800)',
           }}
         />
-        {/* jsonLd: SEO structured data (Organization, SoftwareApplication, WebSite) */}
-        <script
-          nonce={nonce}
-          suppressHydrationWarning
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        {/* jsonLd: SEO structured data (Organization, Person, WebSite, SoftwareApplication).
+            Rendered as one script tag per schema so Google + LLM parsers extract each cleanly. */}
+        {jsonLd.map((schema, i) => (
+          <script
+            // eslint-disable-next-line react/no-array-index-key
+            key={i}
+            nonce={nonce}
+            suppressHydrationWarning
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          />
+        ))}
         {/* Plausible Analytics — privacy-friendly, no cookies, GDPR compliant */}
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <script

@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useEffect, useState } from 'react';
 import { useLocale } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
@@ -7,6 +8,70 @@ import SectionTitle from '@/components/ui/SectionTitle';
 import { Link } from '@/navigation';
 import { ArrowRight, Check } from 'lucide-react';
 import { STATS } from '@/lib/stats';
+
+/**
+ * Resolve the app origin once, in a way that survives a static export and a
+ * Vercel preview deployment. Prefers `NEXT_PUBLIC_APP_URL` (set by the env)
+ * and falls back to `https://app.panguard.ai` (production) so the link
+ * still works for a user who somehow lands on the marketing site with no
+ * env injected (e.g. a stale CDN cache).
+ */
+const APP_ORIGIN: string =
+  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_APP_URL) ||
+  'https://app.panguard.ai';
+
+interface MeResponse {
+  workspace?: { id?: string };
+}
+
+/**
+ * Light-weight auth probe. Asks the app's `/api/me` endpoint (cookie-based
+ * session) whether the visitor is signed in and which workspace to bill.
+ *
+ * Returns `null` while loading so the button can render in a neutral state
+ * (no flicker between "Sign in" and "Pay"). On 401 or fetch failure we
+ * resolve to `{ authed: false }` and the click handler routes to /login.
+ *
+ * The app domain is cross-origin from the marketing site, so the fetch
+ * must include `credentials: 'include'` to send Supabase's session cookie.
+ */
+function useAppAuth() {
+  const [state, setState] = useState<
+    | { status: 'loading' }
+    | { status: 'guest' }
+    | { status: 'authed'; workspaceId: string | null }
+  >({ status: 'loading' });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        // `/api/me/session` is the cookie-based companion to `/api/me`
+        // (which is api_key-only and serves the CLI). The session endpoint
+        // returns the user's primary workspace_id from RLS-scoped reads.
+        const res = await fetch(`${APP_ORIGIN}/api/me/session`, {
+          credentials: 'include',
+          headers: { accept: 'application/json' },
+        });
+        if (cancelled) return;
+        if (!res.ok) {
+          setState({ status: 'guest' });
+          return;
+        }
+        const body = (await res.json()) as MeResponse;
+        const workspaceId = body.workspace?.id ?? null;
+        setState({ status: 'authed', workspaceId });
+      } catch {
+        if (!cancelled) setState({ status: 'guest' });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return state;
+}
 
 /**
  * Pricing page — 2-tier + Standards governance (no middle tier).
@@ -23,6 +88,66 @@ import { STATS } from '@/lib/stats';
 export default function PricingContent() {
   const locale = useLocale();
   const isZh = locale === 'zh-TW';
+  const auth = useAppAuth();
+
+  // The Pilot CTA either:
+  //   (1) sends signed-out visitors to /login with a `next=/pricing` round-trip,
+  //   (2) for signed-in admins, POSTs to /api/billing/checkout and redirects
+  //       to the Stripe-hosted Checkout URL.
+  // Errors surface as inline status text — no toast library on the marketing
+  // site, so we render a small line below the button when the call fails.
+  const [pilotBusy, setPilotBusy] = useState(false);
+  const [pilotError, setPilotError] = useState<string | null>(null);
+
+  const onPilotClick = useCallback(async () => {
+    setPilotError(null);
+
+    if (auth.status === 'loading') {
+      // Defensive — the button is disabled while loading but a fast double
+      // tap could still race; ignore until we know the auth state.
+      return;
+    }
+
+    if (auth.status === 'guest') {
+      const next = encodeURIComponent('/pricing');
+      window.location.href = `${APP_ORIGIN}/login?next=${next}&intent=pilot`;
+      return;
+    }
+
+    if (!auth.workspaceId) {
+      // Signed in but has no workspace yet — send them to the app to create
+      // one. The app's onboarding flow then funnels them back here.
+      window.location.href = `${APP_ORIGIN}/onboarding?intent=pilot`;
+      return;
+    }
+
+    setPilotBusy(true);
+    try {
+      const res = await fetch(`${APP_ORIGIN}/api/billing/checkout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json', accept: 'application/json' },
+        body: JSON.stringify({ tier: 'pilot', workspace_id: auth.workspaceId }),
+      });
+      const body = (await res.json().catch(() => ({}))) as
+        | { url?: string; error?: string };
+      if (!res.ok || !body.url) {
+        // 401 — session expired between mount and click; bounce to login.
+        if (res.status === 401) {
+          const next = encodeURIComponent('/pricing');
+          window.location.href = `${APP_ORIGIN}/login?next=${next}&intent=pilot`;
+          return;
+        }
+        setPilotError(body.error ?? `checkout_failed_${res.status}`);
+        setPilotBusy(false);
+        return;
+      }
+      window.location.href = body.url;
+    } catch (err) {
+      setPilotError(err instanceof Error ? err.message : 'network_error');
+      setPilotBusy(false);
+    }
+  }, [auth]);
 
   return (
     <>
@@ -133,9 +258,9 @@ export default function PricingContent() {
         </div>
       </section>
 
-      {/* ─── 3 tiers ─── */}
+      {/* ─── 4 tiers (per pitch v5 — Community / Pilot / Enterprise / Sovereign) ─── */}
       <SectionWrapper>
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Community */}
           <FadeInUp>
             <div className="bg-surface-2 rounded-xl border border-brand-sage/30 p-7 flex flex-col h-full">
@@ -264,12 +389,37 @@ export default function PricingContent() {
                 </ul>
               </div>
 
-              <Link
-                href="/contact?tier=pilot"
-                className="inline-flex items-center justify-center gap-2 w-full bg-amber-400/10 border border-amber-400/40 text-amber-400 hover:bg-amber-400/20 font-semibold rounded-lg py-3 transition-all duration-200 active:scale-[0.98] text-sm"
+              <button
+                type="button"
+                onClick={onPilotClick}
+                disabled={pilotBusy || auth.status === 'loading'}
+                className="inline-flex items-center justify-center gap-2 w-full bg-amber-400/10 border border-amber-400/40 text-amber-400 hover:bg-amber-400/20 font-semibold rounded-lg py-3 transition-all duration-200 active:scale-[0.98] text-sm disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isZh ? '申請 Pilot' : 'Request Pilot'} <ArrowRight className="w-4 h-4" />
-              </Link>
+                {pilotBusy
+                  ? isZh
+                    ? '前往 Stripe...'
+                    : 'Redirecting to Stripe...'
+                  : isZh
+                  ? 'Start Pilot ($25K / 90 天)'
+                  : 'Start Pilot ($25K / 90d)'}{' '}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              {pilotError ? (
+                <p className="mt-2 text-[11px] text-red-400 text-center">
+                  {isZh ? '結帳失敗:' : 'Checkout failed:'} {pilotError}
+                </p>
+              ) : null}
+              <p className="mt-2 text-[11px] text-text-muted text-center">
+                {isZh
+                  ? '需要客製合約？'
+                  : 'Need a custom contract instead?'}{' '}
+                <Link
+                  href="/contact?tier=pilot"
+                  className="text-amber-400 hover:underline"
+                >
+                  {isZh ? '改寄信洽詢' : 'Email sales'}
+                </Link>
+              </p>
             </div>
           </FadeInUp>
 
@@ -372,6 +522,79 @@ export default function PricingContent() {
                 className="inline-flex items-center justify-center gap-2 w-full bg-brand-sage text-surface-0 font-semibold rounded-lg py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-sm"
               >
                 {isZh ? '洽詢業務' : 'Contact sales'} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </FadeInUp>
+
+          {/* Sovereign — per pitch v5: $5-20M / nation, airgap multi-tenant, separate from Enterprise SaaS */}
+          <FadeInUp delay={0.18}>
+            <div className="bg-surface-2 rounded-xl border border-indigo-400/30 p-7 flex flex-col h-full">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
+                  {isZh ? 'Sovereign 主權級' : 'Sovereign'}
+                </h3>
+                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-indigo-300 bg-indigo-400/10 border border-indigo-400/30 rounded-full px-2.5 py-0.5">
+                  {isZh ? '國家級部署' : 'Nation-state'}
+                </span>
+              </div>
+
+              <div className="mt-5 flex items-baseline gap-1.5">
+                <span className="text-3xl font-extrabold text-text-primary">$5-20M</span>
+                <span className="text-xs text-text-muted">
+                  {isZh ? '/ 國家 · 年約' : '/ nation · annual'}
+                </span>
+              </div>
+              <p className="text-[11px] text-text-muted mt-1">
+                {isZh ? '對話進行中 · 1 個 Saudi PIF 線索' : 'Active dialogue · 1 Saudi PIF lead'}
+              </p>
+
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-indigo-300 mt-4 mb-1">
+                {isZh ? '給誰' : 'Who it’s for'}
+              </p>
+              <p className="text-sm text-text-secondary leading-[1.85]">
+                {isZh
+                  ? '主權國家 AI 基礎建設、央行、國防、跨部會合規平台。已透過 Cisco AI Defense / AMD / NVIDIA JV 鏈路繼承 ATR——導入零新供應商風險。'
+                  : 'Sovereign AI infrastructure, central banks, defense, cross-ministry compliance platforms. ATR already inherited via announced Cisco / AMD / NVIDIA JVs — no new-vendor risk.'}
+              </p>
+
+              <div className="my-7 flex-1">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-text-muted mb-3">
+                  {isZh ? '主權級規格' : 'Sovereign spec'}
+                </p>
+                <ul className="space-y-2.5">
+                  {(isZh
+                    ? [
+                        '完全 airgap 部署 · 多 tenant 隔離',
+                        '主權資料留存 · 不出境',
+                        '客製化合規證據(本國法規 + EU AI Act + NIST AI RMF + ISO 42001 + OWASP Agentic)',
+                        '主權級 ATR 規則貢獻通道 · 國家紅隊回傳',
+                        '專屬 SLA · 24/7 國家級支援',
+                        'AMD / Cisco / NVIDIA JV 預整合',
+                        '可選: ATR 國家代碼空間(rule namespacing)',
+                      ]
+                    : [
+                        'Full airgap deployment · multi-tenant isolation',
+                        'Sovereign data residency · no egress',
+                        'Custom compliance evidence (national regs + EU AI Act + NIST AI RMF + ISO 42001 + OWASP Agentic)',
+                        'Sovereign-level ATR contribution channel · national red-team feedback',
+                        'Dedicated SLA · 24/7 nation-state support',
+                        'Pre-integrated with AMD / Cisco / NVIDIA JVs',
+                        'Optional: ATR national namespace (rule namespacing)',
+                      ]
+                  ).map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-indigo-300 shrink-0 mt-0.5" />
+                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <Link
+                href="/contact?tier=sovereign"
+                className="inline-flex items-center justify-center gap-2 w-full bg-indigo-400 text-surface-0 font-semibold rounded-lg py-3 hover:bg-indigo-300 transition-all duration-200 active:scale-[0.98] text-sm"
+              >
+                {isZh ? '主權團隊洽詢' : 'Sovereign desk'} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </FadeInUp>
@@ -693,7 +916,7 @@ export default function PricingContent() {
                 </div>
                 <p className="text-sm text-text-secondary leading-[1.85] flex-1">
                   {isZh
-                    ? '由國家紅隊以自有對抗樣本，對 ATR 全 330 條規則進行完整測試。我們提供偵測引擎、Migrator 工具與完整的失敗案例揭露。'
+                    ? '由國家紅隊以自有對抗樣本，對 ATR 全 419 條規則進行完整測試。我們提供偵測引擎、Migrator 工具與完整的失敗案例揭露。'
                     : "The national red team runs its own adversarial corpus against ATR's full 330-rule library. We provide the detection engine, Migrator tooling, and full failure-case disclosure."}
                 </p>
                 <p className="text-xs text-text-muted leading-[1.85] mt-3">
@@ -824,7 +1047,7 @@ export default function PricingContent() {
             }
             subtitle={
               isZh
-                ? 'Cisco AI Defense 已採用全部 330 條 ATR 規則；Microsoft AGT 採用 287 條並啟用每週自動同步；NVIDIA garak、Gen Digital Sage、IBM mcp-context-forge 的整合正在進行中。若貴公司的產品需要精修到 Cisco 已合併 PR 品質的版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。'
+                ? 'Cisco AI Defense 已採用全部 419 條 ATR 規則；Microsoft AGT 採用 287 條並啟用每週自動同步；NVIDIA garak、Gen Digital Sage、IBM mcp-context-forge 的整合正在進行中。若貴公司的產品需要精修到 Cisco 已合併 PR 品質的版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。'
                 : 'Cisco AI Defense ships all 330 ATR rules. Microsoft AGT ships 287 rules with weekly auto-sync. NVIDIA garak, Gen Digital Sage, and IBM mcp-context-forge integrations are in flight. For vendors who need the Cisco-merge-PR-quality enriched version — early access to draft rules, five-framework compliance metadata, white-label deployment — the OEM tier is purpose-built for that scenario.'
             }
           />

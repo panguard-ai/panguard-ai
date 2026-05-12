@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import JsonLd from '@/components/seo/JsonLd';
+import { softwareApplicationSchema } from '@/lib/schema';
 import SkillAuditorProductContent from './SkillAuditorProductContent';
 
 export const metadata: Metadata = {
@@ -18,6 +20,17 @@ export const metadata: Metadata = {
 export default function SkillAuditorProductPage() {
   return (
     <>
+      <JsonLd
+        data={softwareApplicationSchema({
+          name: 'PanGuard Skill Auditor',
+          description:
+            'Pre-install security gate for AI agent skills. 8-check pipeline catches prompt injection, tool poisoning, hidden capabilities, supply-chain signals, excessive permissions, and behavior-description mismatches before any skill runs.',
+          url: 'https://panguard.ai/product/skill-auditor',
+          category: 'SecurityApplication',
+          applicationSubCategory: 'Pre-Install Skill Audit',
+          pricing: 'mixed',
+        })}
+      />
       <NavBar />
       <main id="main-content">
         <SkillAuditorProductContent />

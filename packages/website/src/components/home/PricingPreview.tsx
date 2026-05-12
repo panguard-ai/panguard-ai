@@ -16,7 +16,7 @@ const TIERS_EN = [
     name: 'Community',
     price: '$0',
     period: ' forever',
-    desc: 'Open source · 330 ATR rules · MIT · self-host · unlimited',
+    desc: 'Open source · 419 ATR rules · MIT · self-host · unlimited',
     cta: 'Get Started',
     href: 'https://github.com/panguard-ai/panguard-ai',
     external: true,
@@ -33,11 +33,20 @@ const TIERS_EN = [
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: '$150K+',
+    price: '$150-500K',
     period: ' / yr',
-    desc: 'AIAM · airgap · 5-framework compliance evidence · SLA · CSM',
+    desc: 'Migrator Pro · 5-framework signed evidence · airgap · SLA · CSM',
     cta: 'Contact Sales',
     href: '/contact?tier=enterprise',
+  },
+  {
+    id: 'sovereign',
+    name: 'Sovereign',
+    price: '$5-20M',
+    period: ' / nation',
+    desc: 'Nation-state airgap · multi-tenant · custom compliance · Cisco/AMD/NVIDIA JV pre-integrated',
+    cta: 'Sovereign Desk',
+    href: '/contact?tier=sovereign',
   },
 ];
 
@@ -47,7 +56,7 @@ const TIERS_ZH = [
     name: 'Community 社群版',
     price: '$0',
     period: ' 永久',
-    desc: '開源 · 330 條 ATR 規則 · MIT · 自架 · 無上限',
+    desc: '開源 · 419 條 ATR 規則 · MIT · 自架 · 無上限',
     cta: '立即使用',
     href: 'https://github.com/panguard-ai/panguard-ai',
     external: true,
@@ -64,11 +73,20 @@ const TIERS_ZH = [
   {
     id: 'enterprise',
     name: 'Enterprise 企業版',
-    price: '$150K+',
+    price: '$150-500K',
     period: ' / 年',
-    desc: 'AIAM · 離網 · 5 框架合規證據 · SLA · 專屬 CSM',
+    desc: 'Migrator Pro · 5 框架 signed evidence · 離網 · SLA · 專屬 CSM',
     cta: '洽詢業務',
     href: '/contact?tier=enterprise',
+  },
+  {
+    id: 'sovereign',
+    name: 'Sovereign 主權級',
+    price: '$5-20M',
+    period: ' / 國家',
+    desc: '主權國家 airgap · 多 tenant · 客製化合規 · Cisco/AMD/NVIDIA JV 預整合',
+    cta: '主權團隊洽詢',
+    href: '/contact?tier=sovereign',
   },
 ];
 
@@ -88,7 +106,7 @@ export default function PricingPreview() {
             : 'Community is free and open source forever (feeds the sensor network). Enterprise gets the platform + 5-framework compliance evidence kit. The middle tier is a trap — /pricing explains why.'
         }
       />
-      <div className="max-w-5xl mx-auto mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="max-w-7xl mx-auto mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {tiers.map((tier, i) => (
           <FadeInUp key={tier.id} delay={i * 0.06}>
             <div className="bg-surface-2 rounded-xl border border-border p-6 flex flex-col h-full hover:border-brand-sage/50 transition-colors">
