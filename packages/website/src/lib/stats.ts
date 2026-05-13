@@ -25,18 +25,18 @@ export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.5.6',
   /** ATR v2.2.0 (2026-05-12): 357 stable + 62 experimental = 419 total */
-  atrRules: 419,
-  atrStableRules: 357,
+  atrRules: 421,
+  atrStableRules: 359,
   atrExperimentalRules: 62,
   /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
   atrCommunityRules: 93,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
   atrPatterns: 920,
-  totalRules: 419,
+  totalRules: 421,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '419' as const,
+  totalRulesDisplay: '421' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '419' as const,
+  atrRulesDisplay: '421' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -77,8 +77,8 @@ export const STATS = {
   rulesByCategory: {
     'prompt-injection': 172,
     'agent-manipulation': 105,
-    'skill-compromise': 40,
-    'context-exfiltration': 40,
+    'skill-compromise': 41,
+    'context-exfiltration': 41,
     'tool-poisoning': 27,
     'privilege-escalation': 12,
     'model-abuse': 10,
@@ -204,7 +204,7 @@ export const STATS = {
     /** Vendor + standards-body merges: MISP×2 + OWASP A-S-R-H + Gen Digital Sage */
     standardsBodyMerges: 4,
     /** Production CVE coverage (Spring AI + LiteLLM + Semantic Kernel via ATR v2.1.2/v2.1.4) */
-    cveCoverage: ['CVE-2026-26030', 'CVE-2026-25592', 'CVE-2026-41705', 'CVE-2026-41712', 'CVE-2026-41713', 'CVE-2026-42208'],
+    cveCoverage: ['CVE-2026-26030', 'CVE-2026-25592', 'CVE-2026-41705', 'CVE-2026-41712', 'CVE-2026-41713', 'CVE-2026-42208', 'CVE-2025-59536', 'CVE-2026-21852'],
     cisaKevCovered: 1,
     agentsProtected: 50,
     githubStars: 86,
