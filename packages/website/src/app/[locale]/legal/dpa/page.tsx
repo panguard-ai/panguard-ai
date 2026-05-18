@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import { LEGAL_LAST_UPDATED } from '@/lib/constants';
+
+const DPA_LAST_UPDATED_EN = 'May 19, 2026';
+const DPA_LAST_UPDATED_ZH = '2026年5月19日';
 
 export const metadata: Metadata = {
   title: 'Data Processing Agreement',
@@ -7,12 +9,22 @@ export const metadata: Metadata = {
     'Panguard AI Data Processing Agreement. GDPR-compliant data handling terms for enterprise customers.',
 };
 
-export default function DPAPage() {
+export default async function DPAPage(props: {
+  params: Promise<{ locale: string }>;
+}) {
+  const params = await props.params;
+  const isZh = params.locale === 'zh-TW';
+  const lastUpdatedLabel = isZh ? '最後更新：' : 'Last updated: ';
+  const lastUpdatedValue = isZh ? DPA_LAST_UPDATED_ZH : DPA_LAST_UPDATED_EN;
+
   return (
     <article className="prose-legal">
       <header className="mb-10">
         <h1 className="text-2xl font-bold text-text-primary mb-2">Data Processing Agreement</h1>
-        <p className="text-sm text-text-tertiary">Last updated: {LEGAL_LAST_UPDATED}</p>
+        <p className="text-sm text-text-tertiary">
+          {lastUpdatedLabel}
+          {lastUpdatedValue}
+        </p>
       </header>
 
       <div className="space-y-8 text-sm text-text-secondary leading-relaxed">
