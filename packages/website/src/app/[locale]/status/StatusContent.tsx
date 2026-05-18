@@ -15,7 +15,7 @@ type ServiceStatus = 'operational' | 'degraded' | 'outage' | 'beta';
 type IncidentStatus = 'resolved' | 'investigating' | 'monitoring';
 
 interface Service {
-  name: string;
+  name: { en: string; 'zh-TW': string };
   status: ServiceStatus;
   uptime: number;
   uptimeHistory: ServiceStatus[];
@@ -32,65 +32,116 @@ interface Incident {
 
 const services: Service[] = [
   {
-    name: 'Panguard Guard \u2014 Skill Monitoring',
+    name: {
+      en: 'Panguard Guard \u2014 Skill Monitoring',
+      'zh-TW': 'Panguard Guard \u2014 \u6280\u80fd\u884c\u70ba\u76e3\u63a7',
+    },
     status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },
   {
-    name: 'Panguard Scan \u2014 Security Audits',
+    name: {
+      en: 'Panguard Scan \u2014 Security Audits',
+      'zh-TW': 'Panguard Scan \u2014 \u8cc7\u5b89\u7a3d\u6838',
+    },
     status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },
   {
-    name: 'Panguard Skill Auditor \u2014 Pre-Install Analysis',
+    name: {
+      en: 'Panguard Skill Auditor \u2014 Pre-Install Analysis',
+      'zh-TW': 'Panguard Skill Auditor \u2014 \u5b89\u88dd\u524d\u5206\u6790',
+    },
     status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },
   {
-    name: 'Threat Cloud \u2014 Collective Defense',
+    name: {
+      en: 'Threat Cloud \u2014 Collective Defense',
+      'zh-TW': 'Threat Cloud \u2014 \u793e\u7fa4\u5354\u540c\u9632\u79a6',
+    },
     status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },
   {
-    name: 'API & Integrations',
+    name: {
+      en: 'API & Integrations',
+      'zh-TW': 'API \u8207\u6574\u5408',
+    },
     status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },
   {
-    name: 'Threat Intelligence Feed',
+    name: {
+      en: 'Threat Intelligence Feed',
+      'zh-TW': '\u5a01\u8105\u60c5\u5831\u4f86\u6e90',
+    },
     status: 'operational',
     uptime: 0,
     uptimeHistory: [],
   },
 ];
 
-const incidents: Incident[] = [
+interface LocalizedIncident {
+  date: { en: string; 'zh-TW': string };
+  title: { en: string; 'zh-TW': string };
+  status: IncidentStatus;
+  description: { en: string; 'zh-TW': string };
+}
+
+const incidentData: LocalizedIncident[] = [
   {
-    date: 'Feb 20, 2026',
-    title: 'Scheduled Maintenance: Database Migration',
+    date: { en: 'Feb 20, 2026', 'zh-TW': '2026年2月20日' },
+    title: {
+      en: 'Scheduled Maintenance: Database Migration',
+      'zh-TW': '計畫維護：資料庫遷移',
+    },
     status: 'resolved',
-    description: 'Completed 15 minutes ahead of schedule. No service impact.',
+    description: {
+      en: 'Completed 15 minutes ahead of schedule. No service impact.',
+      'zh-TW': '比預定時間提前 15 分鐘完成。未影響服務。',
+    },
   },
   {
-    date: 'Feb 8, 2026',
-    title: 'Brief API Latency Increase',
+    date: { en: 'Feb 8, 2026', 'zh-TW': '2026年2月8日' },
+    title: {
+      en: 'Brief API Latency Increase',
+      'zh-TW': 'API 延遲短暫上升',
+    },
     status: 'resolved',
-    description:
-      'Elevated API response times for 12 minutes due to upstream provider. Automatically mitigated.',
+    description: {
+      en: 'Elevated API response times for 12 minutes due to upstream provider. Automatically mitigated.',
+      'zh-TW': '因上游服務供應商問題，API 回應時間升高約 12 分鐘。系統已自動排除。',
+    },
   },
   {
-    date: 'Jan 25, 2026',
-    title: 'Scan Service Intermittent Errors',
+    date: { en: 'Jan 25, 2026', 'zh-TW': '2026年1月25日' },
+    title: {
+      en: 'Scan Service Intermittent Errors',
+      'zh-TW': 'Scan 服務間歇性錯誤',
+    },
     status: 'resolved',
-    description:
-      'Some scan requests returned timeout errors for 8 minutes. Root cause: connection pool exhaustion. Fix deployed.',
+    description: {
+      en: 'Some scan requests returned timeout errors for 8 minutes. Root cause: connection pool exhaustion. Fix deployed.',
+      'zh-TW': '部分 scan 請求在 8 分鐘內出現逾時錯誤。根本原因為連線池耗盡，修補已部署。',
+    },
   },
 ];
+
+function localizeIncident(item: LocalizedIncident, locale: string): Incident {
+  const key = locale === 'zh-TW' ? 'zh-TW' : 'en';
+  return {
+    date: item.date[key],
+    title: item.title[key],
+    status: item.status,
+    description: item.description[key],
+  };
+}
 
 /* ─── Helpers ─── */
 
@@ -125,7 +176,7 @@ function getOverallStatus(svcs: Service[]): ServiceStatus {
   return 'operational';
 }
 
-const LAST_MANUAL_REVIEW = '2026-02-20';
+const LAST_MANUAL_REVIEW = '2026-05-19';
 
 function formatTimestamp(locale: string): string {
   return new Date(LAST_MANUAL_REVIEW).toLocaleDateString(locale === 'zh-TW' ? 'zh-TW' : 'en-US', {
@@ -183,18 +234,21 @@ function ServiceRow({
   service,
   index,
   statusLabel,
+  locale,
 }: {
   service: Service;
   index: number;
   statusLabel: string;
+  locale: string;
 }) {
   const cfg = statusConfig[service.status];
+  const displayName = locale === 'zh-TW' ? service.name['zh-TW'] : service.name.en;
 
   return (
     <FadeInUp delay={index * 0.03}>
       <div className="border-b border-border py-4 flex items-center justify-between gap-4">
         <span className="text-text-primary text-sm sm:text-base font-medium truncate">
-          {service.name}
+          {displayName}
         </span>
         <div className="flex items-center gap-4 shrink-0">
           <div className="flex items-center gap-2">
@@ -216,15 +270,19 @@ function UptimeChart({
   service,
   index,
   t,
+  locale,
 }: {
   service: Service;
   index: number;
   t: ReturnType<typeof useTranslations>;
+  locale: string;
 }) {
+  const displayName = locale === 'zh-TW' ? service.name['zh-TW'] : service.name.en;
+
   return (
     <FadeInUp delay={index * 0.05}>
       <div className="bg-surface-1 border border-border rounded-xl p-5">
-        <h4 className="text-text-primary text-sm font-semibold mb-3">{service.name}</h4>
+        <h4 className="text-text-primary text-sm font-semibold mb-3">{displayName}</h4>
         <div className="flex items-end gap-[3px]">
           {service.uptimeHistory.map((day, i) => {
             const cfg = statusConfig[day];
@@ -297,6 +355,7 @@ export default function StatusContent() {
   const overallStatus = getOverallStatus(services);
 
   const topServices = services.slice(0, 4);
+  const incidents = incidentData.map((item) => localizeIncident(item, locale));
 
   const statusLabels: Record<ServiceStatus, string> = {
     operational: t('operational'),
@@ -315,11 +374,24 @@ export default function StatusContent() {
       {/* ───────────── Disclaimer ───────────── */}
       <SectionWrapper spacing="tight">
         <p className="text-center text-sm text-text-secondary bg-surface-1 border border-border rounded-lg px-4 py-3 max-w-xl mx-auto">
-          Status data is manually verified and may not reflect real-time conditions. For live
-          monitoring or incident updates, contact{' '}
-          <a href="mailto:support@panguard.ai" className="text-brand-sage hover:underline">
-            support@panguard.ai
-          </a>
+          {locale === 'zh-TW' ? (
+            <>
+              狀態反映最後更新時間的生產營運情況。如需即時監測，請聯絡{' '}
+              <a href="mailto:security@panguard.ai" className="text-brand-sage hover:underline">
+                security@panguard.ai
+              </a>
+              。
+            </>
+          ) : (
+            <>
+              Status reflects production operations as of the last update. For real-time monitoring,
+              contact{' '}
+              <a href="mailto:security@panguard.ai" className="text-brand-sage hover:underline">
+                security@panguard.ai
+              </a>
+              .
+            </>
+          )}
         </p>
       </SectionWrapper>
 
@@ -338,10 +410,11 @@ export default function StatusContent() {
         <div>
           {services.map((service, idx) => (
             <ServiceRow
-              key={service.name}
+              key={service.name.en}
               service={service}
               index={idx}
               statusLabel={statusLabels[service.status]}
+              locale={locale}
             />
           ))}
         </div>
@@ -358,7 +431,13 @@ export default function StatusContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {topServices.map((service, idx) => (
-            <UptimeChart key={service.name} service={service} index={idx} t={t} />
+            <UptimeChart
+              key={service.name.en}
+              service={service}
+              index={idx}
+              t={t}
+              locale={locale}
+            />
           ))}
         </div>
 

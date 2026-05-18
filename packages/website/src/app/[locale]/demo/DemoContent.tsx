@@ -49,11 +49,13 @@ export default function DemoContent() {
                 <p className="text-text-secondary text-sm mt-2 leading-relaxed flex-1">
                   {t('selfGuided.desc')}
                 </p>
-                <div className="mt-6 p-4 rounded-xl bg-surface-2 border border-border text-center">
-                  <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-1">
-                    {t('selfGuided.comingSoon')}
+                <div className="mt-6 p-4 rounded-xl bg-surface-2 border border-border">
+                  <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-2">
+                    {t('selfGuided.quickstartLabel')}
                   </p>
-                  <p className="text-sm text-text-tertiary">{t('selfGuided.comingSoonDesc')}</p>
+                  <code className="block text-xs sm:text-sm text-text-primary font-mono break-all leading-relaxed">
+                    {t('selfGuided.quickstartCmd')}
+                  </code>
                 </div>
                 <Link
                   href="https://docs.panguard.ai/quickstart"

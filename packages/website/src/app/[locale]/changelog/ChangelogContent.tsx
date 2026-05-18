@@ -62,6 +62,7 @@ const filterKeys: { key: FilterKey; labelKey: string }[] = [
 export default function ChangelogContent() {
   const t = useTranslations('changelog');
   const locale = useLocale();
+  const isZh = locale.startsWith('zh');
 
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
   const [subscribeStatus, setSubscribeStatus] = useState<SubscribeStatus>('idle');
@@ -138,10 +139,10 @@ export default function ChangelogContent() {
                   {/* -- Right: content card -- */}
                   <div className="bg-surface-1 border border-border rounded-2xl p-6 md:ml-4">
                     <h3 className="text-lg font-semibold text-text-primary leading-snug">
-                      {entry.title}
+                      {isZh && entry.titleZh ? entry.titleZh : entry.title}
                     </h3>
                     <p className="text-text-secondary text-sm mt-2 leading-relaxed">
-                      {entry.description}
+                      {isZh && entry.descriptionZh ? entry.descriptionZh : entry.description}
                     </p>
 
                     <ul className="mt-5 space-y-3">
@@ -152,7 +153,9 @@ export default function ChangelogContent() {
                           >
                             {badgeLabels[change.type]}
                           </span>
-                          <span className="text-text-secondary leading-relaxed">{change.text}</span>
+                          <span className="text-text-secondary leading-relaxed">
+                            {isZh && change.textZh ? change.textZh : change.text}
+                          </span>
                         </li>
                       ))}
                     </ul>

@@ -70,6 +70,20 @@
       "atrStandard": "ATR Standard",
       "atrStandardDesc": "Open standard for AI agent threats"
     },
+    "atrLinks": {
+      "overview": "ATR Overview",
+      "overviewDesc": "The open detection standard",
+      "spec": "Core Specification",
+      "specDesc": "RFC 2119 normative spec v1.0",
+      "governance": "Governance",
+      "governanceDesc": "Technical Steering Committee",
+      "crosswalks": "Crosswalks",
+      "crosswalksDesc": "NIST AI RMF, ISO 42001, OWASP, ATLAS",
+      "adopters": "Adopters",
+      "adoptersDesc": "Microsoft, Cisco, MISP, OWASP, Sage",
+      "cite": "How to Cite",
+      "citeDesc": "BibTeX, APA, Chicago, IEEE, CFF"
+    },
     "solutionLinks": {
       "developers": "For Developers",
       "developersDesc": "Solo & indie developers",
@@ -152,7 +166,9 @@
     "sla": "SLA",
     "responsibleDisclosure": "Responsible Disclosure",
     "securityWhitepaper": "Security Whitepaper",
-    "contribute": "Contribute"
+    "contribute": "Contribute",
+    "subProcessors": "Sub-processors",
+    "adopters": "ATR Adopters"
   },
   "home": {
     "hero": {
@@ -752,7 +768,7 @@
       "badgeLicense": "MIT Licensed",
       "badgeScanned": "{count} Skills Scanned",
       "badgeRecall": "97.1% Garak recall",
-      "badgeCisco": "Microsoft + Cisco merged",
+      "badgeCisco": "7 organizations merged · NIST OSCAL Path 1",
       "badgeSafeMcp": "SAFE-MCP 91.8% coverage (PR pending)"
     },
     "demo": {
@@ -766,7 +782,7 @@
       },
       "captions": {
         "dashboard": "Real-time dashboard showing active rules, event monitoring, and 3-layer detection status.",
-        "rules": "419 ATR rules auto-synced from Threat Cloud. Community-driven, AI-drafted detection patterns.",
+        "rules": "421 ATR rules auto-synced from Threat Cloud. Community-driven, AI-drafted detection patterns.",
         "threatcloud": "Anonymous threat intelligence sharing. Your device contributes and receives updated detection rules."
       }
     },
@@ -2245,11 +2261,11 @@
     "title": "See Panguard in action.",
     "subtitle": "Choose a self-guided tour or schedule a personalized walkthrough with our security team. Either way, you will see how Panguard protects your endpoints from day one.",
     "selfGuided": {
-      "title": "Self-Guided Demo",
-      "desc": "Explore the Panguard platform at your own pace. Walk through a simulated environment with real threat scenarios, see how the AI detection engine responds, and review sample reports -- all without scheduling a call.",
-      "comingSoon": "Coming Soon",
-      "comingSoonDesc": "The interactive product tour is under development. Join the waitlist to be notified when it launches.",
-      "tryFreeScan": "Try Free Scan"
+      "title": "Try It Yourself",
+      "desc": "Skip the call. Run a free scan on your own machine in under a minute and see exactly what Panguard finds.",
+      "quickstartLabel": "Quickstart command",
+      "quickstartCmd": "npx @panguard-ai/panguard-scan@latest scan ~/.claude/skills",
+      "tryFreeScan": "View full quickstart"
     },
     "requestDemo": {
       "title": "Contact Us",
@@ -2727,7 +2743,7 @@
         "purpose": "Purpose",
         "location": "Location"
       },
-      "updateNote": "Last updated: February 2026. We notify customers at least 30 days before adding new subprocessors. Subscribe to updates via our GitHub repository.",
+      "updateNote": "Last updated: May 2026. We notify customers at least 30 days before adding new subprocessors. Subscribe to updates via our GitHub repository.",
       "aws": {
         "name": "AWS",
         "purpose": "Infrastructure compute and storage",

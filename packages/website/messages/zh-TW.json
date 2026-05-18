@@ -70,6 +70,20 @@
       "atrStandard": "ATR 標準",
       "atrStandardDesc": "AI Agent 威脅偵測開放標準"
     },
+    "atrLinks": {
+      "overview": "ATR 概覽",
+      "overviewDesc": "開放偵測標準",
+      "spec": "核心規範",
+      "specDesc": "RFC 2119 規範性規格 v1.0",
+      "governance": "治理結構",
+      "governanceDesc": "Technical Steering Committee",
+      "crosswalks": "對應其他框架",
+      "crosswalksDesc": "NIST AI RMF, ISO 42001, OWASP, ATLAS",
+      "adopters": "採用者",
+      "adoptersDesc": "Microsoft, Cisco, MISP, OWASP, Sage",
+      "cite": "如何引用",
+      "citeDesc": "BibTeX, APA, Chicago, IEEE, CFF"
+    },
     "solutionLinks": {
       "developers": "開發者方案",
       "developersDesc": "獨立與個人開發者",
@@ -152,7 +166,9 @@
     "sla": "SLA",
     "responsibleDisclosure": "漏洞揭露",
     "securityWhitepaper": "安全白皮書",
-    "contribute": "參與貢獻"
+    "contribute": "參與貢獻",
+    "subProcessors": "次處理者清單",
+    "adopters": "ATR 採用者"
   },
   "home": {
     "hero": {
@@ -752,7 +768,7 @@
       "badgeLicense": "MIT 授權",
       "badgeScanned": "已掃 {count} Skills",
       "badgeRecall": "Garak 97.1% 召回率",
-      "badgeCisco": "Microsoft + Cisco 已 merge",
+      "badgeCisco": "7 個組織已 merge · NIST OSCAL Path 1",
       "badgeSafeMcp": "SAFE-MCP 91.8% 覆蓋率(PR 審查中)"
     },
     "demo": {
@@ -766,7 +782,7 @@
       },
       "captions": {
         "dashboard": "即時儀表板：偵測規則運行中、事件監控、三層偵測狀態一目瞭然。",
-        "rules": "110+ 條 ATR 規則從 Threat Cloud 自動同步。社群驅動、AI 草擬的偵測模式。",
+        "rules": "421 條 ATR 規則從 Threat Cloud 自動同步。社群驅動、AI 草擬的偵測模式。",
         "threatcloud": "匿名威脅情報共享。你的裝置貢獻數據，同時接收最新偵測規則。"
       }
     },
@@ -3066,29 +3082,29 @@
     "title": "看 Panguard 實際運作。",
     "subtitle": "選擇自助導覽或預約與我們資安團隊的個人化導覽。無論哪種方式，你都能看到 Panguard 如何從第一天起保護你的端點。",
     "selfGuided": {
-      "title": "自助示範",
-      "desc": "按自己的節奏探索 Panguard 平台。走過模擬的真實威脅情境環境，看 AI 偵測引擎如何回應，並查看範例報告 -- 無需預約通話。",
-      "comingSoon": "即將推出",
-      "comingSoonDesc": "互動式產品導覽正在開發中。加入候補名單，在推出時收到通知。",
-      "tryFreeScan": "試試免費掃描"
+      "title": "自己動手試",
+      "desc": "不必預約。在自己的機器上一分鐘內跑完免費掃描，直接看 Panguard 找到什麼。",
+      "quickstartLabel": "Quickstart 指令",
+      "quickstartCmd": "npx @panguard-ai/panguard-scan@latest scan ~/.claude/skills",
+      "tryFreeScan": "查看完整 quickstart"
     },
     "requestDemo": {
       "title": "聯繫我們",
       "desc": "對 Panguard 有問題？填寫以下表單，我們會在一個工作日內透過電子郵件回覆。"
     },
     "steps": {
-      "title": "你的示範會是什麼樣的",
+      "title": "接下來的流程",
       "step1": {
-        "title": "了解需求",
-        "desc": "我們了解你的基礎設施、團隊規模和現有安全工具，讓示範與你相關。"
+        "title": "提交你的問題",
+        "desc": "說明你的基礎設施情境與你想了解的方向。越具體，我們的回覆對你越有幫助。"
       },
       "step2": {
-        "title": "實際展示",
-        "desc": "在真實環境中觀看 Panguard Scan、Guard、Chat、Trap 和 Report 如何應對模擬的真實世界威脅。"
+        "title": "Email 回覆",
+        "desc": "我們會在一個工作日內以 email 回覆，附上解答、相關文件連結與依你需求量身的安裝指引。"
       },
       "step3": {
-        "title": "問答與後續",
-        "desc": "盡管提問。我們將討論部署方案，以及讓 Panguard 在你的端點上運行的時間表。"
+        "title": "開始使用",
+        "desc": "用一行指令安裝 Panguard，立即開始保護你的端點。自助示範與文件涵蓋你需要的一切。"
       }
     }
   },
@@ -3544,7 +3560,7 @@
         "purpose": "用途",
         "location": "位置"
       },
-      "updateNote": "最後更新：2026 年 2 月。我們在新增次處理者前至少 30 天通知客戶。透過我們的 GitHub 儲存庫訂閱更新。",
+      "updateNote": "最後更新：2026 年 5 月。我們在新增次處理者前至少 30 天通知客戶。透過我們的 GitHub 儲存庫訂閱更新。",
       "aws": {
         "name": "AWS",
         "purpose": "基礎設施計算與儲存",
