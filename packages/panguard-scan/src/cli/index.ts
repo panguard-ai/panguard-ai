@@ -35,7 +35,14 @@ const program = new Command();
 program
   .name('panguard-scan')
   .description('PanguardScan - 60-second security health check tool / 60 秒資安健檢工具')
-  .version(PANGUARD_SCAN_VERSION);
+  .version(PANGUARD_SCAN_VERSION)
+  // Root program has --output for the default-scan command. The `code`
+  // subcommand also has --output. Without enablePositionalOptions(), the
+  // parent's flag consumes any --output after the subcommand name, so the
+  // subcommand's options.output was always undefined (Bug 2). With this
+  // call, parent options must come BEFORE the subcommand name; everything
+  // after the subcommand name is parsed by the subcommand.
+  .enablePositionalOptions();
 
 // ---------------------------------------------------------------------------
 // code subcommand - SAST source code scanner
@@ -133,6 +140,31 @@ program
           console.log(`\nSummary: ${parts.join(' | ')}`);
         }
         console.log('');
+      }
+
+      // Handle --output (PDF artifact)
+      // Bug 2 fix (2026-05-19): previously --output was declared but the
+      // action body never consumed it — clean scans printed
+      // "No security issues found." and exited 0 with no file written.
+      // Customers paying for "clean scan PDF artifact" got nothing.
+      // Now the artifact ships even when findings = 0 (proof-of-clean).
+      if (options.output) {
+        const { generateCodeScanPdf } = await import('../report/code-scan-pdf.js');
+        try {
+          await generateCodeScanPdf({
+            outputPath: options.output,
+            scanDir: path.resolve(options.dir),
+            findings: allFindings,
+            lang: _lang,
+          });
+          if (!options.json) {
+            console.error(`Report saved to: ${options.output}`);
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.error(`Failed to generate PDF report: ${msg}`);
+          process.exit(2);
+        }
       }
 
       // Handle --fail-on
