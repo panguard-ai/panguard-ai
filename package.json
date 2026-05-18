@@ -35,16 +35,23 @@
     "release:patch": "./scripts/release.sh patch",
     "release:minor": "./scripts/release.sh minor",
     "release:major": "./scripts/release.sh major",
+    "setup:stripe": "tsx scripts/setup-stripe-test.ts",
+    "setup:stripe:dry-run": "tsx scripts/setup-stripe-test.ts --dry-run",
+    "check:flywheel": "tsx scripts/check-flywheel.ts",
     "preflight": "pnpm build && pnpm test && pnpm run format:check",
     "panguard": "node packages/panguard/dist/cli/index.js",
     "cli": "node packages/panguard/dist/cli/index.js",
     "website:dev": "pnpm --filter @panguard-ai/website dev",
     "website:build": "pnpm --filter @panguard-ai/website build",
     "test:installer": "vitest run tests/installer",
-    "website:start": "pnpm --filter @panguard-ai/website start"
+    "website:start": "pnpm --filter @panguard-ai/website start",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:install": "playwright install --with-deps chromium"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
+    "@playwright/test": "^1.58.2",
     "@types/node": "^22.14.0",
     "@typescript-eslint/eslint-plugin": "^8.24.0",
     "@typescript-eslint/parser": "^8.24.0",
@@ -89,10 +96,13 @@
       "hono@>=4.0.0 <=4.12.11": ">=4.12.12",
       "@hono/node-server@<1.19.13": ">=1.19.13",
       "next@>=13.0.0 <15.5.15": ">=15.5.15",
+      "next@>=16.0.0 <16.2.6": ">=16.2.6",
+      "fast-uri@<=3.1.1": ">=3.1.2",
       "next-intl@<4.9.1": ">=4.9.1",
       "hono@<4.12.14": ">=4.12.14",
       "fontkit": ">=2.0.4",
-      "pdfkit": ">=0.18.0"
+      "pdfkit": ">=0.18.0",
+      "agent-threat-rules": "link:../agent-threat-rules"
     }
   },
   "dependencies": {
