@@ -72,7 +72,7 @@ export interface ComplianceFinding {
 export type ReportType = 'compliance' | 'incident' | 'monthly' | 'quarterly' | 'annual';
 
 /** Report format / 報告格式 */
-export type ReportFormat = 'pdf' | 'json';
+export type ReportFormat = 'pdf' | 'json' | 'html';
 
 /** Report language / 報告語言 */
 export type ReportLanguage = 'zh-TW' | 'en';

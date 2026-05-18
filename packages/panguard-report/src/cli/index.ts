@@ -21,6 +21,7 @@ import {
   generateSummaryText,
 } from '../generator/report-generator.js';
 import { generatePDFReport } from '../generator/pdf-generator.js';
+import { generateHTMLReport } from '../generator/html-generator.js';
 
 /** Available CLI commands / 可用的 CLI 命令 */
 export type ReportCliCommand =
@@ -341,6 +342,32 @@ export async function executeCli(args: string[]): Promise<void> {
           generatedAt: report.metadata.generatedAt.toISOString().split('T')[0],
         });
         console.log(`PDF report saved to / PDF 報告已儲存至: ${pdfPath}`);
+      } else if (format === 'html') {
+        // Bug 3 fix (2026-05-19): previously fell through to the summary
+        // branch — CLI said "Report generated successfully" but wrote no
+        // file. Now generates a real single-file HTML report (inline CSS,
+        // print-friendly).
+        const { mkdir } = await import('node:fs/promises');
+        const outputDir = options.outputDir ?? DEFAULT_REPORT_CONFIG.outputDir;
+        await mkdir(outputDir, { recursive: true });
+        const htmlPath = `${outputDir}/${report.metadata.reportId}.html`;
+
+        const isZh = language === 'zh-TW';
+        const htmlTitle = isZh
+          ? `Panguard AI - ${framework} 合規報告`
+          : `Panguard AI - ${framework} Compliance Report`;
+
+        await generateHTMLReport({
+          title: htmlTitle,
+          framework,
+          lang: language,
+          outputPath: htmlPath,
+          findings: report.findings,
+          assessmentResult: report,
+          organizationName: options.organizationName,
+          generatedAt: report.metadata.generatedAt.toISOString().split('T')[0],
+        });
+        console.log(`HTML report saved to / HTML 報告已儲存至: ${htmlPath}`);
       } else if (format === 'json') {
         const json = reportToJSON(report);
         if (options.outputDir) {
