@@ -21,8 +21,33 @@ const logger = createLogger('panguard-guard:config');
 const GuardConfigFileSchema = z
   .object({
     lang: z.enum(['en', 'zh-TW', 'ja']).optional(),
-    mode: z.enum(['learning', 'protection']).optional(),
+    // 'report-only' is the recommended default for new deployments: detection
+    // runs and verdicts are logged, but no OS-level action executes. Operators
+    // verify detection quality on real traffic before granting OS authority
+    // to a model. See agent/respond/safety-rules.ts:DEFAULT_ENFORCEMENT_POLICY.
+    mode: z.enum(['learning', 'report-only', 'protection']).optional(),
     learningDays: z.number().int().min(1).max(365).optional(),
+    // Per-action enforcement policy. Required only when mode === 'protection'.
+    // If absent, falls back to the conservative DEFAULT_ENFORCEMENT_POLICY
+    // (all OS actions OFF). Misconfigured policies fail validation here
+    // rather than producing undefined behaviour at the OS-action layer.
+    enforcementPolicy: z
+      .object({
+        blockIPs: z.object({ enabled: z.boolean() }),
+        killProcesses: z.object({
+          enabled: z.boolean(),
+          // Glob patterns; empty array = no processes allowed even when enabled.
+          allowedProcessNames: z.array(z.string()),
+        }),
+        isolateFiles: z.object({
+          enabled: z.boolean(),
+          // Explicit subdirectories; `$HOME`-wide isolation is rejected.
+          // Use absolute paths or `~/...` form.
+          allowedPaths: z.array(z.string()),
+        }),
+        disableAccounts: z.object({ enabled: z.boolean() }),
+      })
+      .optional(),
     actionPolicy: z
       .object({
         autoRespond: z.number().min(0).max(100),
