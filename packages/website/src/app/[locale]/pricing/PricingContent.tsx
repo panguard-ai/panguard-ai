@@ -87,63 +87,23 @@ export default function PricingContent() {
   const isZh = locale === 'zh-TW';
   const auth = useAppAuth();
 
-  // The Pilot CTA either:
-  //   (1) sends signed-out visitors to /login with a `next=/pricing` round-trip,
-  //   (2) for signed-in admins, POSTs to /api/billing/checkout and redirects
-  //       to the Stripe-hosted Checkout URL.
-  // Errors surface as inline status text — no toast library on the marketing
-  // site, so we render a small line below the button when the call fails.
+  // Pilot CTA — sends ALL visitors (signed-in or not) to the scoping form
+  // at /scoping. F500 procurement is conservative: every Pilot buyer must
+  // submit scoping answers + accept MSA/DPA/Refund first, then sign up via
+  // magic link, THEN reach Stripe Checkout. Founding Customer cap (3) is
+  // enforced at both the scoping POST and the checkout-session creation.
   const [pilotBusy, setPilotBusy] = useState(false);
   const [pilotError, setPilotError] = useState<string | null>(null);
 
-  const onPilotClick = useCallback(async () => {
+  const onPilotClick = useCallback(() => {
     setPilotError(null);
-
-    if (auth.status === 'loading') {
-      // Defensive — the button is disabled while loading but a fast double
-      // tap could still race; ignore until we know the auth state.
-      return;
-    }
-
-    if (auth.status === 'guest') {
-      const next = encodeURIComponent('/pricing');
-      window.location.href = `${APP_ORIGIN}/login?next=${next}&intent=pilot`;
-      return;
-    }
-
-    if (!auth.workspaceId) {
-      // Signed in but has no workspace yet — send them to the app to create
-      // one. The app's onboarding flow then funnels them back here.
-      window.location.href = `${APP_ORIGIN}/onboarding?intent=pilot`;
-      return;
-    }
-
     setPilotBusy(true);
-    try {
-      const res = await fetch(`${APP_ORIGIN}/api/billing/checkout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'content-type': 'application/json', accept: 'application/json' },
-        body: JSON.stringify({ tier: 'pilot', workspace_id: auth.workspaceId }),
-      });
-      const body = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
-      if (!res.ok || !body.url) {
-        // 401 — session expired between mount and click; bounce to login.
-        if (res.status === 401) {
-          const next = encodeURIComponent('/pricing');
-          window.location.href = `${APP_ORIGIN}/login?next=${next}&intent=pilot`;
-          return;
-        }
-        setPilotError(body.error ?? `checkout_failed_${res.status}`);
-        setPilotBusy(false);
-        return;
-      }
-      window.location.href = body.url;
-    } catch (err) {
-      setPilotError(err instanceof Error ? err.message : 'network_error');
-      setPilotBusy(false);
-    }
-  }, [auth]);
+    // Marketing site is the host — relative path keeps us on the same
+    // origin, no CORS, no auth round-trip. The scoping page handles
+    // founding-3 cap display + form + magic-link signup before any
+    // Stripe interaction.
+    window.location.href = '/scoping';
+  }, []);
 
   return (
     <>
