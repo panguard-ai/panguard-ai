@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panguard AI - iso27001 Compliance Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --surface-0: #1A1614;
+    --surface-1: #1F1C19;
+    --surface-2: #272320;
+    --surface-3: #302B27;
+    --border: #2E2A27;
+    --border-hover: #3D3835;
+    --text-primary: #F5F1E8;
+    --text-secondary: #A09890;
+    --text-muted: #9A9490;
+    --sage: #8B9A8E;
+    --sage-light: #A3B0A6;
+    --emerald: #34D399;
+    --emerald-light: #6EE7B7;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--surface-0);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  :lang(zh-TW), :lang(zh) {
+    font-family: 'Inter', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  }
+  .page {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 48px 56px 64px;
+  }
+  /* Header */
+  header.cover {
+    margin-bottom: 48px;
+  }
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .brand-shield {
+    color: var(--sage);
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .brand-shield svg { width: 100%; height: 100%; display: block; }
+  .brand-name {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+  .overline {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 12px;
+  }
+  h1.title {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+  }
+  .sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .meta-cell {
+    background: var(--surface-1);
+    padding: 16px 20px;
+  }
+  .meta-cell dt {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .meta-cell dd {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+  }
+  .meta-cell dd.mono {
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 13px;
+  }
+  .meta-cell dd.score {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--emerald);
+  }
+  /* Sections */
+  section { margin: 48px 0; }
+  section h2 {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  section h2 .count {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 14px;
+    margin-left: 6px;
+  }
+  section .lead {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin: 20px 0;
+  }
+  .key-risks {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 16px;
+  }
+  .key-risks strong { color: var(--sage); }
+  /* Stat grid */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .stat {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: border-color 200ms;
+  }
+  .stat:hover { border-color: var(--sage); }
+  .stat .n {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text-primary);
+  }
+  .stat .l {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  thead {
+    background: var(--surface-2);
+  }
+  th {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.mono, .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  td.muted, .muted {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  td.cell-title { font-weight: 500; }
+  td.cell-cat { color: var(--text-secondary); }
+  /* Badge */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border: 1px solid;
+  }
+  /* Recommendations */
+  ul.recs { list-style: none; padding: 0; margin: 16px 0 0; }
+  ul.recs li {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--sage);
+    border-radius: 0 12px 12px 0;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    transition: border-left-color 200ms;
+  }
+  ul.recs li:hover { border-left-color: var(--emerald); }
+  .rec-head {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .rec-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .rec-head strong {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .rec-body {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+  .rec-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .rec-meta strong { color: var(--sage); }
+  .dot { margin: 0 4px; color: var(--border); }
+  /* Footer */
+  footer.confidential {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+  /* Print stylesheet — warm-light variant preserving sage accent */
+  @media print {
+    :root {
+      --surface-0: #FAF8F2;
+      --surface-1: #FFFFFF;
+      --surface-2: #F5F1E8;
+      --surface-3: #EFE9DC;
+      --border: #E5DFD0;
+      --border-hover: #D1C9B5;
+      --text-primary: #1A1614;
+      --text-secondary: #4A4540;
+      --text-muted: #8A847A;
+    }
+    body { background: white; color: var(--text-primary); }
+    .page { padding: 24px 32px; max-width: none; }
+    section { page-break-inside: avoid; margin: 28px 0; }
+    header.cover { page-break-after: avoid; margin-bottom: 28px; }
+    .stat { background: var(--surface-2); }
+    ul.recs li { background: var(--surface-2); page-break-inside: avoid; }
+    table { border: 1px solid var(--border); }
+    thead { background: var(--surface-2); }
+    a { color: var(--sage); text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <div class="brand-row">
+    <span class="brand-shield"><svg viewBox="385 323 1278 1403" xmlns="http://www.w3.org/2000/svg" aria-label="PanGuard shield">
+  <path fill="currentColor" d="M 1021.5 830.423 C 1026.54 829.911 1045.81 832.659 1051.64 833.401 C 1072.38 835.99 1093.1 838.746 1113.8 841.667 L 1329.99 871.428 L 1329.95 1306.51 L 1330 1422.21 C 1330.01 1450.54 1332.08 1491.81 1325.18 1518.04 C 1318.79 1541.46 1305.62 1562.47 1287.31 1578.42 C 1269.98 1593.59 1234.62 1610.78 1212.96 1622.97 C 1151.4 1657.6 1087.44 1689.5 1026.42 1725.08 L 1024.58 1725.72 C 1020.72 1724.57 1005.67 1715.74 1001.44 1713.38 C 986.676 1705.08 971.857 1696.88 956.982 1688.79 L 836.342 1623.07 C 818.678 1613.37 800.537 1603.48 783.285 1593.93 C 741.183 1570.62 718.225 1528.6 718.162 1480.8 C 718.14 1463.85 718.093 1446.28 718.119 1429.07 L 718.13 1313.33 L 718.15 871.408 C 819.171 858.462 920.068 841.835 1021.5 830.423 z"/>
+  <path fill="currentColor" d="M 687.515 577.4 C 696.504 576.451 715.718 579.584 725.68 580.913 L 782.266 588.553 C 853.62 598.25 926.853 607.634 997.939 618.387 L 997.872 779.654 C 966.188 784.487 928.734 789.954 897.039 793.352 L 897.073 705.399 C 831.524 696.853 760.432 685.286 694.176 678.356 C 683.151 677.203 646.195 683.753 632.643 685.485 L 487.112 705.406 C 488.77 841.757 487.098 980.17 487.357 1116.69 L 487.339 1188.98 C 487.213 1243.94 479.328 1246.69 530.666 1273.69 C 574.625 1298.03 623.372 1322.43 666.093 1347.35 C 665.454 1385.26 666.06 1424.82 666.087 1462.87 C 649.609 1452.6 628.321 1441.62 610.88 1432.12 L 500.871 1372.76 C 476.603 1359.56 440.159 1342.09 421.535 1323.57 C 404.11 1306.02 392.433 1283.59 388.055 1259.25 C 384.254 1237.81 385.323 1203.28 385.354 1180.66 L 385.478 1064.48 L 385.312 618.209 C 414.868 615.376 445.833 609.518 475.437 605.863 C 545.54 597.208 617.46 584.737 687.515 577.4 z"/>
+  <path fill="currentColor" d="M 1348.89 577.369 C 1360.73 575.936 1415.83 584.528 1431.77 586.589 C 1508.75 596.536 1585.62 608.685 1662.67 618.335 L 1662.73 1028.87 L 1662.69 1154.09 C 1662.67 1223.3 1674.33 1293.75 1609.64 1337.92 C 1596.01 1347.22 1581.75 1354.57 1567.33 1362.44 L 1512.89 1391.87 L 1382 1462.6 C 1383.76 1427.96 1382.35 1382.83 1382.21 1347.24 C 1420 1324.81 1467.93 1301.58 1507.58 1279.5 C 1524.53 1270.36 1558.74 1256.3 1560.1 1235.39 C 1561.42 1215.18 1560.95 1193.69 1560.9 1173.32 L 1560.87 1066.29 L 1560.68 705.345 C 1543.39 703.65 1521.51 700.068 1504.1 697.576 C 1473.23 693.054 1442.33 688.801 1411.39 684.819 C 1399.03 683.204 1369.09 678.563 1357.99 678.482 C 1343.65 678.377 1310.02 683.839 1294.14 685.904 C 1246.36 692.092 1198.63 698.627 1150.95 705.51 C 1151.37 734.567 1151.1 764.255 1151.14 793.361 C 1118.48 789.558 1083.43 784.206 1050.79 779.597 L 1050.69 617.847 L 1348.89 577.369 z"/>
+  <path fill="currentColor" d="M 1017.32 323.354 C 1027.15 321.591 1105.66 333.344 1122.51 335.603 C 1166.74 341.267 1210.92 347.328 1255.05 353.786 C 1279.68 357.183 1305.51 360.23 1329.92 364.192 L 1329.98 526.684 C 1296.55 530.372 1261.73 535.721 1228.25 540.29 C 1228.4 510.591 1228.39 480.892 1228.23 451.193 C 1219.27 449.729 1209.61 448.427 1200.57 447.329 C 1144.13 440.467 1086.78 429.864 1030.24 424.572 C 1018.71 422.967 967.642 430.978 952.027 433.125 L 819.579 450.968 C 820.252 479.945 819.726 511.22 819.879 540.382 C 785.991 535.397 752.051 530.778 718.064 526.526 L 717.99 364.358 C 745.543 359.872 774.642 356.332 802.417 352.399 L 1017.32 323.354 z"/>
+</svg></span>
+    <span class="brand-name">PanGuard AI</span>
+  </div>
+  <p class="overline">AI Agent Compliance Report</p>
+  <h1 class="title">Panguard AI - iso27001 Compliance Report</h1>
+  <p class="sub">ISO/IEC 27001:2022 &middot; Acme Corp (Sample)</p>
+  <dl class="meta-grid">
+    <div class="meta-cell">
+      <dt>Report ID</dt>
+      <dd class="mono">RPT-202605-ISO-0001</dd>
+    </div>
+    <div class="meta-cell">
+      <dt>Generated</dt>
+      <dd>2026-05-19</dd>
+    </div>
+    <div class="meta-cell">
+      <dt>Framework</dt>
+      <dd>ISO/IEC 27001:2022</dd>
+    </div>
+    <div class="meta-cell">
+      <dt>Overall Compliance Score</dt>
+      <dd class="score">77%</dd>
+    </div>
+  </dl>
+</header>
+
+<section>
+  <h2>Executive Summary</h2>
+  <p class="lead">Overall compliance score: 77%. 21 of 30 controls passed, 5 failed, 4 partial. 5 findings recorded (0 critical, 2 high).</p>
+  <p class="key-risks"><strong>Key risks:</strong> Information Security for Use of Cloud Services &middot; Configuration Management &middot; Monitoring Activities</p>
+  <div class="stat-grid">
+    <div class="stat"><div class="n">30</div><div class="l">Total Controls</div></div>
+    <div class="stat"><div class="n" style="color:#34D399">21</div><div class="l">Passed</div></div>
+    <div class="stat"><div class="n" style="color:#C75050">5</div><div class="l">Failed</div></div>
+    <div class="stat"><div class="n" style="color:#EAB308">4</div><div class="l">Partial</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Findings<span class="count">5</span></h2>
+  <div class="stat-grid">
+    <div class="stat"><div class="n" style="color:#EF4444">0</div><div class="l">Critical</div></div><div class="stat"><div class="n" style="color:#F97316">2</div><div class="l">High</div></div><div class="stat"><div class="n" style="color:#EAB308">3</div><div class="l">Medium</div></div><div class="stat"><div class="n" style="color:#34D399">0</div><div class="l">Low</div></div>
+  </div>
+  <table>
+          <thead><tr>
+            <th>Finding ID</th>
+            <th>Severity</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Description</th>
+          </tr></thead>
+          <tbody>
+        <tr>
+          <td class="mono">IR-NOTIFY-001</td>
+          <td><span class="badge" style="background:#EAB3081A;color:#EAB308;border-color:#EAB3084D">Medium</span></td>
+          <td class="cell-title">No notification channels configured</td>
+          <td class="cell-cat">incident</td>
+          <td class="muted">Panguard has no notification channels (Telegram/Slack/Email) configured. Incident alerts cannot be delivered.</td>
+        </tr>
+        <tr>
+          <td class="mono">MON-LOG-002</td>
+          <td><span class="badge" style="background:#EAB3081A;color:#EAB308;border-color:#EAB3084D">Medium</span></td>
+          <td class="cell-title">System logging may be impaired</td>
+          <td class="cell-cat">logging</td>
+          <td class="muted">Could not verify macOS unified log status.</td>
+        </tr>
+        <tr>
+          <td class="mono">PATCH-001</td>
+          <td><span class="badge" style="background:#EAB3081A;color:#EAB308;border-color:#EAB3084D">Medium</span></td>
+          <td class="cell-title">2 pending system updates</td>
+          <td class="cell-cat">vulnerability</td>
+          <td class="muted">There are 2 pending macOS software updates. Security patches should be applied promptly.</td>
+        </tr>
+        <tr>
+          <td class="mono">FW-001</td>
+          <td><span class="badge" style="background:#F973161A;color:#F97316;border-color:#F973164D">High</span></td>
+          <td class="cell-title">Firewall disabled</td>
+          <td class="cell-cat">firewall</td>
+          <td class="muted">macOS Application Firewall is disabled. System is exposed to inbound connections.</td>
+        </tr>
+        <tr>
+          <td class="mono">NET-PORT-001</td>
+          <td><span class="badge" style="background:#F973161A;color:#F97316;border-color:#F973164D">High</span></td>
+          <td class="cell-title">Risky services exposed</td>
+          <td class="cell-cat">network</td>
+          <td class="muted">The following services are listening on network interfaces: Redis (6379), Redis (6379), PostgreSQL (5432), PostgreSQL (5432). These should be firewalled or disabled.</td>
+        </tr></tbody>
+        </table>
+</section>
+
+<section>
+  <h2>Control Details<span class="count">30</span></h2>
+  <table>
+    <thead><tr>
+      <th>Control ID</th>
+      <th>Control</th>
+      <th>Status</th>
+      <th>#</th>
+      <th>Evidence</th>
+    </tr></thead>
+    <tbody>
+        <tr>
+          <td class="mono">A.5.1</td>
+          <td class="cell-title">Policies for Information Security</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of policy, governance controls completed. No issues detected for A.5.1 (Policies for Information Security).; 自動掃描 policy、governance 控制項完成。A.5.1（資訊安全政策）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.2</td>
+          <td class="cell-title">Information Security Roles and Responsibilities</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of governance, personnel controls completed. No issues detected for A.5.2 (Information Security Roles and Responsibilities).; 自動掃描 governance、personnel 控制項完成。A.5.2（資訊安全角色與責任）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.10</td>
+          <td class="cell-title">Acceptable Use of Information and Other Assets</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of policy, asset controls completed. No issues detected for A.5.10 (Acceptable Use of Information and Other Assets).; 自動掃描 policy、asset 控制項完成。A.5.10（資訊及其他資產的可接受使用）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.15</td>
+          <td class="cell-title">Access Control</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of access, authentication, password controls completed. No issues detected for A.5.15 (Access Control).; 自動掃描 access、authentication、password 控制項完成。A.5.15（存取控制）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.17</td>
+          <td class="cell-title">Authentication Information</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of authentication, password, credential controls completed. No issues detected for A.5.17 (Authentication Information).; 自動掃描 authentication、password、credential 控制項完成。A.5.17（驗證資訊）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.23</td>
+          <td class="cell-title">Information Security for Use of Cloud Services</td>
+          <td><span class="badge" style="background:#C750501A;color:#C75050;border-color:#C750504D">Fail</span></td>
+          <td>1</td>
+          <td class="muted">1 finding(s) detected related to A.5.23 (Information Security for Use of Cloud Services):; 偵測到 1 個與 A.5.23（雲端服務的資訊安全）相關的發現：;   [HIGH] Risky services exposed: The following services are listening on network interfaces: Redis (6379), Redis (6379), PostgreSQL (5432), PostgreSQL (5432). These should be firewalled or disabled.</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.24</td>
+          <td class="cell-title">Information Security Incident Management Planning</td>
+          <td><span class="badge" style="background:#EAB3081A;color:#EAB308;border-color:#EAB3084D">Partial</span></td>
+          <td>1</td>
+          <td class="muted">1 finding(s) detected related to A.5.24 (Information Security Incident Management Planning):; 偵測到 1 個與 A.5.24（資訊安全事件管理規劃）相關的發現：;   [MEDIUM] No notification channels configured: Panguard has no notification channels (Telegram/Slack/Email) configured. Incident alerts cannot be delivered.</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.28</td>
+          <td class="cell-title">Collection of Evidence</td>
+          <td><span class="badge" style="background:#EAB3081A;color:#EAB308;border-color:#EAB3084D">Partial</span></td>
+          <td>1</td>
+          <td class="muted">1 finding(s) detected related to A.5.28 (Collection of Evidence):; 偵測到 1 個與 A.5.28（證據收集）相關的發現：;   [MEDIUM] System logging may be impaired: Could not verify macOS unified log status.</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.29</td>
+          <td class="cell-title">Information Security During Disruption</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of continuity, backup, recovery controls completed. No issues detected for A.5.29 (Information Security During Disruption).; 自動掃描 continuity、backup、recovery 控制項完成。A.5.29（中斷期間的資訊安全）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.30</td>
+          <td class="cell-title">ICT Readiness for Business Continuity</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of continuity, backup, system controls completed. No issues detected for A.5.30 (ICT Readiness for Business Continuity).; 自動掃描 continuity、backup、system 控制項完成。A.5.30（ICT 業務持續性準備）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.5.36</td>
+          <td class="cell-title">Compliance with Policies and Standards</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of governance, audit, compliance controls completed. No issues detected for A.5.36 (Compliance with Policies and Standards).; 自動掃描 governance、audit、compliance 控制項完成。A.5.36（政策和標準的合規性）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.6.1</td>
+          <td class="cell-title">Screening</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of personnel, access controls completed. No issues detected for A.6.1 (Screening).; 自動掃描 personnel、access 控制項完成。A.6.1（人員審查）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.6.3</td>
+          <td class="cell-title">Information Security Awareness, Education and Training</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of personnel, training controls completed. No issues detected for A.6.3 (Information Security Awareness, Education and Training).; 自動掃描 personnel、training 控制項完成。A.6.3（資訊安全意識、教育和訓練）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.7.1</td>
+          <td class="cell-title">Physical Security Perimeters</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of physical, access controls completed. No issues detected for A.7.1 (Physical Security Perimeters).; 自動掃描 physical、access 控制項完成。A.7.1（實體安全邊界）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.7.4</td>
+          <td class="cell-title">Physical Security Monitoring</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of physical, monitoring controls completed. No issues detected for A.7.4 (Physical Security Monitoring).; 自動掃描 physical、monitoring 控制項完成。A.7.4（實體安全監控）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.1</td>
+          <td class="cell-title">User Endpoint Devices</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of system, endpoint, device controls completed. No issues detected for A.8.1 (User Endpoint Devices).; 自動掃描 system、endpoint、device 控制項完成。A.8.1（使用者端點裝置）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.2</td>
+          <td class="cell-title">Privileged Access Rights</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of access, authentication, privilege controls completed. No issues detected for A.8.2 (Privileged Access Rights).; 自動掃描 access、authentication、privilege 控制項完成。A.8.2（特權存取權限）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.3</td>
+          <td class="cell-title">Information Access Restriction</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of access, policy controls completed. No issues detected for A.8.3 (Information Access Restriction).; 自動掃描 access、policy 控制項完成。A.8.3（資訊存取限制）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.5</td>
+          <td class="cell-title">Secure Authentication</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of authentication, password, access controls completed. No issues detected for A.8.5 (Secure Authentication).; 自動掃描 authentication、password、access 控制項完成。A.8.5（安全驗證）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.7</td>
+          <td class="cell-title">Protection Against Malware</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of malware, endpoint, system controls completed. No issues detected for A.8.7 (Protection Against Malware).; 自動掃描 malware、endpoint、system 控制項完成。A.8.7（惡意軟體防護）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.8</td>
+          <td class="cell-title">Management of Technical Vulnerabilities</td>
+          <td><span class="badge" style="background:#EAB3081A;color:#EAB308;border-color:#EAB3084D">Partial</span></td>
+          <td>1</td>
+          <td class="muted">1 finding(s) detected related to A.8.8 (Management of Technical Vulnerabilities):; 偵測到 1 個與 A.8.8（技術弱點管理）相關的發現：;   [MEDIUM] 2 pending system updates: There are 2 pending macOS software updates. Security patches should be applied promptly.</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.9</td>
+          <td class="cell-title">Configuration Management</td>
+          <td><span class="badge" style="background:#C750501A;color:#C75050;border-color:#C750504D">Fail</span></td>
+          <td>1</td>
+          <td class="muted">1 finding(s) detected related to A.8.9 (Configuration Management):; 偵測到 1 個與 A.8.9（組態管理）相關的發現：;   [HIGH] Risky services exposed: The following services are listening on network interfaces: Redis (6379), Redis (6379), PostgreSQL (5432), PostgreSQL (5432). These should be firewalled or disabled.</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.12</td>
+          <td class="cell-title">Data Leakage Prevention</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of data, encryption, system controls completed. No issues detected for A.8.12 (Data Leakage Prevention).; 自動掃描 data、encryption、system 控制項完成。A.8.12（資料外洩防護）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.13</td>
+          <td class="cell-title">Information Backup</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of backup, continuity, recovery controls completed. No issues detected for A.8.13 (Information Backup).; 自動掃描 backup、continuity、recovery 控制項完成。A.8.13（資訊備份）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.15</td>
+          <td class="cell-title">Logging</td>
+          <td><span class="badge" style="background:#EAB3081A;color:#EAB308;border-color:#EAB3084D">Partial</span></td>
+          <td>1</td>
+          <td class="muted">1 finding(s) detected related to A.8.15 (Logging):; 偵測到 1 個與 A.8.15（日誌記錄）相關的發現：;   [MEDIUM] System logging may be impaired: Could not verify macOS unified log status.</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.16</td>
+          <td class="cell-title">Monitoring Activities</td>
+          <td><span class="badge" style="background:#C750501A;color:#C75050;border-color:#C750504D">Fail</span></td>
+          <td>1</td>
+          <td class="muted">1 finding(s) detected related to A.8.16 (Monitoring Activities):; 偵測到 1 個與 A.8.16（監控活動）相關的發現：;   [HIGH] Risky services exposed: The following services are listening on network interfaces: Redis (6379), Redis (6379), PostgreSQL (5432), PostgreSQL (5432). These should be firewalled or disabled.</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.20</td>
+          <td class="cell-title">Network Security</td>
+          <td><span class="badge" style="background:#C750501A;color:#C75050;border-color:#C750504D">Fail</span></td>
+          <td>2</td>
+          <td class="muted">2 finding(s) detected related to A.8.20 (Network Security):; 偵測到 2 個與 A.8.20（網路安全）相關的發現：;   [HIGH] Firewall disabled: macOS Application Firewall is disabled. System is exposed to inbound connections.;   [HIGH] Risky services exposed: The following services are listening on network interfaces: Redis (6379), Redis (6379), PostgreSQL (5432), PostgreSQL (5432). These should be firewalled or disabled.</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.21</td>
+          <td class="cell-title">Security of Network Services</td>
+          <td><span class="badge" style="background:#C750501A;color:#C75050;border-color:#C750504D">Fail</span></td>
+          <td>2</td>
+          <td class="muted">2 finding(s) detected related to A.8.21 (Security of Network Services):; 偵測到 2 個與 A.8.21（網路服務安全）相關的發現：;   [HIGH] Firewall disabled: macOS Application Firewall is disabled. System is exposed to inbound connections.;   [HIGH] Risky services exposed: The following services are listening on network interfaces: Redis (6379), Redis (6379), PostgreSQL (5432), PostgreSQL (5432). These should be firewalled or disabled.</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.24</td>
+          <td class="cell-title">Use of Cryptography</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of encryption, certificate, tls controls completed. No issues detected for A.8.24 (Use of Cryptography).; 自動掃描 encryption、certificate、tls 控制項完成。A.8.24（密碼學使用）未偵測到問題。</td>
+        </tr>
+        <tr>
+          <td class="mono">A.8.25</td>
+          <td class="cell-title">Secure Development Life Cycle</td>
+          <td><span class="badge" style="background:#34D3991A;color:#34D399;border-color:#34D3994D">Pass</span></td>
+          <td>0</td>
+          <td class="muted">Automated scan of development, system, configuration controls completed. No issues detected for A.8.25 (Secure Development Life Cycle).; 自動掃描 development、system、configuration 控制項完成。A.8.25（安全開發生命週期）未偵測到問題。</td>
+        </tr></tbody>
+  </table>
+</section>
+
+<section>
+        <h2>Recommendations<span class="count">9</span></h2>
+        <ul class="recs">
+        <li>
+          <div class="rec-head"><span class="rec-num">01</span> <strong>Information Security for Use of Cloud Services</strong></div>
+          <div class="rec-body">URGENT / 緊急: Address 1 finding(s) related to Information Security for Use of Cloud Services (A.5.23). 處理與 雲端服務的資訊安全（A.5.23）相關的 1 個發現。</div>
+          <div class="rec-meta">
+            Priority: <strong>immediate</strong>
+            <span class="dot">·</span>
+            Estimated Effort: 1-3 days
+          </div>
+        </li>
+        <li>
+          <div class="rec-head"><span class="rec-num">02</span> <strong>Configuration Management</strong></div>
+          <div class="rec-body">URGENT / 緊急: Address 1 finding(s) related to Configuration Management (A.8.9). 處理與 組態管理（A.8.9）相關的 1 個發現。</div>
+          <div class="rec-meta">
+            Priority: <strong>immediate</strong>
+            <span class="dot">·</span>
+            Estimated Effort: 1-3 days
+          </div>
+        </li>
+        <li>
+          <div class="rec-head"><span class="rec-num">03</span> <strong>Monitoring Activities</strong></div>
+          <div class="rec-body">URGENT / 緊急: Address 1 finding(s) related to Monitoring Activities (A.8.16). 處理與 監控活動（A.8.16）相關的 1 個發現。</div>
+          <div class="rec-meta">
+            Priority: <strong>immediate</strong>
+            <span class="dot">·</span>
+            Estimated Effort: 1-3 days
+          </div>
+        </li>
+        <li>
+          <div class="rec-head"><span class="rec-num">04</span> <strong>Network Security</strong></div>
+          <div class="rec-body">URGENT / 緊急: Address 2 finding(s) related to Network Security (A.8.20). 處理與 網路安全（A.8.20）相關的 2 個發現。</div>
+          <div class="rec-meta">
+            Priority: <strong>immediate</strong>
+            <span class="dot">·</span>
+            Estimated Effort: 1-3 days
+          </div>
+        </li>
+        <li>
+          <div class="rec-head"><span class="rec-num">05</span> <strong>Security of Network Services</strong></div>
+          <div class="rec-body">URGENT / 緊急: Address 2 finding(s) related to Security of Network Services (A.8.21). 處理與 網路服務安全（A.8.21）相關的 2 個發現。</div>
+          <div class="rec-meta">
+            Priority: <strong>immediate</strong>
+            <span class="dot">·</span>
+            Estimated Effort: 1-3 days
+          </div>
+        </li>
+        <li>
+          <div class="rec-head"><span class="rec-num">06</span> <strong>Information Security Incident Management Planning</strong></div>
+          <div class="rec-body">Address 1 finding(s) related to Information Security Incident Management Planning (A.5.24). 處理與 資訊安全事件管理規劃（A.5.24）相關的 1 個發現。</div>
+          <div class="rec-meta">
+            Priority: <strong>medium</strong>
+            <span class="dot">·</span>
+            Estimated Effort: 1-2 weeks
+          </div>
+        </li>
+        <li>
+          <div class="rec-head"><span class="rec-num">07</span> <strong>Collection of Evidence</strong></div>
+          <div class="rec-body">Address 1 finding(s) related to Collection of Evidence (A.5.28). 處理與 證據收集（A.5.28）相關的 1 個發現。</div>
+          <div class="rec-meta">
+            Priority: <strong>medium</strong>
+            <span class="dot">·</span>
+            Estimated Effort: 1-2 weeks
+          </div>
+        </li>
+        <li>
+          <div class="rec-head"><span class="rec-num">08</span> <strong>Management of Technical Vulnerabilities</strong></div>
+          <div class="rec-body">Address 1 finding(s) related to Management of Technical Vulnerabilities (A.8.8). 處理與 技術弱點管理（A.8.8）相關的 1 個發現。</div>
+          <div class="rec-meta">
+            Priority: <strong>medium</strong>
+            <span class="dot">·</span>
+            Estimated Effort: 1-2 weeks
+          </div>
+        </li>
+        <li>
+          <div class="rec-head"><span class="rec-num">09</span> <strong>Logging</strong></div>
+          <div class="rec-body">Address 1 finding(s) related to Logging (A.8.15). 處理與 日誌記錄（A.8.15）相關的 1 個發現。</div>
+          <div class="rec-meta">
+            Priority: <strong>medium</strong>
+            <span class="dot">·</span>
+            Estimated Effort: 1-2 weeks
+          </div>
+        </li></ul>
+      </section>
+
+<footer class="confidential">
+  Confidential — Panguard AI Compliance Report &middot; RPT-202605-ISO-0001 &middot; 2026-05-19
+</footer>
+
+</div>
+</body>
+</html>

@@ -112,13 +112,22 @@ export default function SecurityWhitepaperPage() {
               <div className="flex items-center gap-2">
                 <p className="font-medium text-text-primary">SOC 2 Type 1</p>
                 <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/20">
-                  Starting Q3 2026
+                  In flight — target Oct 1, 2026
                 </span>
               </div>
               <p className="mt-1 text-text-tertiary">
-                Vendor selection (Vanta or Drata) and partner CPA firm engagement begin Q3 2026.
-                Type 1 attestation expected Q4 2026 — Q1 2027. Type 2 follows after a 3-12 month
-                observation window.
+                Vanta selected (June 2026 contract). A-LIGN engaged as primary CPA candidate.
+                Audit fieldwork July-August 2026, Type 1 attestation target October 1, 2026.
+                Type 2 fieldwork begins April 2027.
+              </p>
+              <p className="mt-2">
+                <a
+                  href="/samples/soc2-roadmap/PanGuard-SOC2-Roadmap-2026.pdf"
+                  download
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-sage hover:text-brand-sage-light"
+                >
+                  Download full SOC 2 roadmap (PDF, 57 KB)
+                </a>
               </p>
             </div>
             <div className="p-3 bg-surface-1 border border-border rounded-lg">
