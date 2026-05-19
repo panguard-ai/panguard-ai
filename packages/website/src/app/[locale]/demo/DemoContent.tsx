@@ -105,6 +105,98 @@ export default function DemoContent() {
             </div>
           </FadeInUp>
         </SectionWrapper>
+
+        {/* ───────────── Preview artifacts (no signup) ───────────── */}
+        <SectionWrapper>
+          <FadeInUp>
+            <div className="max-w-4xl mx-auto">
+              <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-3 text-center">
+                See it before you book
+              </p>
+              <h2 className="text-[clamp(24px,3vw,32px)] font-bold text-text-primary leading-[1.1] text-center">
+                Real artifacts a Pilot customer receives
+              </h2>
+              <p className="text-text-secondary mt-3 text-base max-w-2xl mx-auto text-center leading-relaxed">
+                No form required. Open these on your phone.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-10">
+                <Link
+                  href="/evidence-pack"
+                  className="group bg-surface-1 rounded-2xl border border-border hover:border-brand-sage p-6 transition-colors"
+                >
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-brand-sage mb-2">
+                    Quarterly deliverable
+                  </p>
+                  <h3 className="text-text-primary font-semibold text-lg">
+                    Sample Compliance Evidence Pack
+                  </h3>
+                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
+                    3 framework PDFs (ISO 27001 / SOC 2 / Taiwan CSA) + JSON + HTML + manifest with
+                    SHA-256 + HMAC. Same pipeline that runs against a real customer workspace.
+                  </p>
+                  <p className="mt-4 text-sm font-semibold text-brand-sage group-hover:text-brand-sage-light">
+                    Open the pack →
+                  </p>
+                </Link>
+
+                <a
+                  href="/samples/soc2-roadmap/PanGuard-SOC2-Roadmap-2026.pdf"
+                  className="group bg-surface-1 rounded-2xl border border-border hover:border-brand-sage p-6 transition-colors"
+                  download
+                >
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-brand-sage mb-2">
+                    For your compliance officer
+                  </p>
+                  <h3 className="text-text-primary font-semibold text-lg">
+                    SOC 2 Type 1 Roadmap (PDF)
+                  </h3>
+                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Vanta contract June 2026 · A-LIGN auditor July 2026 · Attestation Oct 1, 2026.
+                    Full timeline, 6 control families, NDA-shareable artifacts list.
+                  </p>
+                  <p className="mt-4 text-sm font-semibold text-brand-sage group-hover:text-brand-sage-light">
+                    Download (57 KB) →
+                  </p>
+                </a>
+
+                <Link
+                  href="/atr/adopters"
+                  className="group bg-surface-1 rounded-2xl border border-border hover:border-brand-sage p-6 transition-colors"
+                >
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-brand-sage mb-2">
+                    Ecosystem proof
+                  </p>
+                  <h3 className="text-text-primary font-semibold text-lg">ATR Adopters</h3>
+                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
+                    7 production PR merges across 6 ecosystems (Microsoft AGT · Cisco AI Defense ·
+                    MISP · OWASP A-S-R-H · Gen Digital Sage). Each adoption links to the merged PR.
+                  </p>
+                  <p className="mt-4 text-sm font-semibold text-brand-sage group-hover:text-brand-sage-light">
+                    See adopters →
+                  </p>
+                </Link>
+
+                <Link
+                  href="/legal/security"
+                  className="group bg-surface-1 rounded-2xl border border-border hover:border-brand-sage p-6 transition-colors"
+                >
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-brand-sage mb-2">
+                    Honest security posture
+                  </p>
+                  <h3 className="text-text-primary font-semibold text-lg">Security Whitepaper</h3>
+                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
+                    What we have today, what we plan, what we do not pretend to have. Architecture,
+                    hosting, encryption, GDPR / PDPA, third-party audit timeline.
+                  </p>
+                  <p className="mt-4 text-sm font-semibold text-brand-sage group-hover:text-brand-sage-light">
+                    Read the whitepaper →
+                  </p>
+                </Link>
+              </div>
+            </div>
+          </FadeInUp>
+        </SectionWrapper>
       </main>
       <Footer />
     </>
