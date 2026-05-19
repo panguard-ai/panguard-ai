@@ -33,7 +33,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build && node -e \"require('node:fs').mkdirSync('dist/dashboard',{recursive:true});require('node:fs').copyFileSync('src/dashboard/dashboard.html','dist/dashboard/dashboard.html')\"",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -49,6 +49,7 @@
     "@panguard-ai/scan-core": "workspace:*",
     "@panguard-ai/security-hardening": "workspace:*",
     "agent-threat-rules": "^2.1.1",
+    "jose": "^5.9.0",
     "js-yaml": "^4.1.0",
     "ws": "^8.19.0",
     "zod": "^3.24.0"

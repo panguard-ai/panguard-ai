@@ -12,6 +12,8 @@
   "homepage": "https://panguard.ai",
   "scripts": {
     "dev": "next dev",
+    "gen:llms": "tsx scripts/generate-llms-full.ts",
+    "prebuild": "tsx scripts/generate-llms-full.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -20,12 +22,14 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@panguard-ai/migrator-community": "workspace:*",
     "@panguard-ai/scan-core": "workspace:*",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "framer-motion": "^12.34.3",
+    "js-yaml": "^4.1.0",
     "lucide-react": "^0.575.0",
-    "next": "15.5.12",
+    "next": "^16.2.6",
     "next-intl": "^4.8.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
@@ -35,15 +39,17 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.14.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
     "eslint": "^8",
-    "eslint-config-next": "15.5.12",
+    "eslint-config-next": "^16.2.6",
     "jsdom": "^28.1.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.21.0",
     "typescript": "~5.7.3",
     "vitest": "^3.2.4"
   }
