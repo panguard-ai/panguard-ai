@@ -41,6 +41,7 @@ vi.mock('@panguard-ai/core', async () => {
 });
 
 import { RespondAgent } from '../src/agent/respond-agent.js';
+import { PERMISSIVE_ENFORCEMENT_POLICY } from '../src/agent/respond/safety-rules.js';
 import { execFile } from 'node:child_process';
 
 describe('RespondAgent.addBlockedIP()', () => {
@@ -50,7 +51,7 @@ describe('RespondAgent.addBlockedIP()', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tempDir = mkdtempSync(join(tmpdir(), 'respond-agent-test-'));
-    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir);
+    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir, PERMISSIVE_ENFORCEMENT_POLICY);
   });
 
   afterEach(() => {
@@ -254,7 +255,7 @@ describe('RespondAgent.respond() - escalation tracking', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tempDir = mkdtempSync(join(tmpdir(), 'respond-escalation-test-'));
-    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir);
+    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir, PERMISSIVE_ENFORCEMENT_POLICY);
   });
 
   afterEach(() => {

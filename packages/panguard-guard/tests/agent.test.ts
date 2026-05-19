@@ -141,7 +141,7 @@ describe('RespondAgent', () => {
   });
 
   it('should auto-respond when confidence >= threshold', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection');
+    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
     const verdict: ThreatVerdict = {
       conclusion: 'malicious',
       confidence: 95,
@@ -155,7 +155,7 @@ describe('RespondAgent', () => {
   });
 
   it('should notify when confidence is in notify range', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection');
+    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
     const verdict: ThreatVerdict = {
       conclusion: 'suspicious',
       confidence: 75,
@@ -169,7 +169,7 @@ describe('RespondAgent', () => {
   });
 
   it('should log only when confidence is low', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection');
+    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
     const verdict: ThreatVerdict = {
       conclusion: 'benign',
       confidence: 30,
@@ -200,7 +200,7 @@ describe('RespondAgent', () => {
   });
 
   it('should refuse to block whitelisted IP (127.0.0.1)', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection');
+    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
     const verdict: ThreatVerdict = {
       conclusion: 'malicious',
       confidence: 95,
@@ -217,7 +217,7 @@ describe('RespondAgent', () => {
   });
 
   it('should refuse to block user-configured whitelisted IP', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', ['10.0.0.1']);
+    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', ['10.0.0.1'], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
     const verdict: ThreatVerdict = {
       conclusion: 'malicious',
       confidence: 95,
@@ -234,7 +234,7 @@ describe('RespondAgent', () => {
   });
 
   it('should refuse to kill protected process', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection');
+    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
     const verdict: ThreatVerdict = {
       conclusion: 'malicious',
       confidence: 95,
@@ -256,7 +256,15 @@ describe('RespondAgent', () => {
   });
 
   it('should refuse to disable protected account (root)', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection');
+    // PERMISSIVE_ENFORCEMENT_POLICY keeps disableAccounts.enabled=false because
+    // it is too destructive for any default policy. For this specific test we
+    // explicitly enable account disabling to verify the protectedAccounts check
+    // still fires on `root` after the enforcement-policy gate.
+    const policy = {
+      ...PERMISSIVE_ENFORCEMENT_POLICY,
+      disableAccounts: { enabled: true },
+    };
+    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, policy);
     const verdict: ThreatVerdict = {
       conclusion: 'malicious',
       confidence: 95,
@@ -270,6 +278,54 @@ describe('RespondAgent', () => {
     const result = await agent.respond(verdict);
     expect(result.success).toBe(false);
     expect(result.details).toContain('protected');
+  });
+
+  it('should default to report-only-style behaviour when enforcement policy is conservative', async () => {
+    // DEFAULT_ENFORCEMENT_POLICY (used implicitly when caller omits the 5th arg)
+    // has all OS actions disabled. Verify block_ip is refused with a clear reason
+    // rather than executing pfctl/iptables against an unauthorised target.
+    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection');
+    const verdict: ThreatVerdict = {
+      conclusion: 'malicious',
+      confidence: 95,
+      reasoning: 'Test',
+      evidence: [
+        { source: 'rule_match', description: 'test', confidence: 95, data: { ip: '203.0.113.5' } },
+      ],
+      recommendedAction: 'block_ip',
+    };
+
+    const result = await agent.respond(verdict);
+    expect(result.success).toBe(false);
+    expect(result.details).toContain('enforcementPolicy.blockIPs.enabled');
+  });
+
+  it('should bypass OS actions entirely in report-only mode', async () => {
+    // Even with a fully permissive policy, mode=report-only must short-circuit
+    // before any OS action runs. The verdict.recommendedAction is logged but
+    // no pfctl / iptables / kill / mv is invoked.
+    const agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'report-only',
+      [],
+      undefined,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
+    const verdict: ThreatVerdict = {
+      conclusion: 'malicious',
+      confidence: 99,
+      reasoning: 'Test',
+      evidence: [
+        { source: 'rule_match', description: 'test', confidence: 99, data: { ip: '203.0.113.5' } },
+      ],
+      recommendedAction: 'block_ip',
+    };
+
+    const result = await agent.respond(verdict);
+    expect(result.success).toBe(true);
+    expect(result.action).toBe('notify');
+    expect(result.details).toContain('[report-only]');
+    expect(result.details).toContain('block_ip');
   });
 });
 

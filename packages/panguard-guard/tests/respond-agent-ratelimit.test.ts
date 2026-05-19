@@ -40,6 +40,7 @@ vi.mock('@panguard-ai/core', async () => {
 });
 
 import { RespondAgent } from '../src/agent/respond-agent.js';
+import { PERMISSIVE_ENFORCEMENT_POLICY } from '../src/agent/respond/safety-rules.js';
 import { execFile } from 'node:child_process';
 
 function makeVerdict(
@@ -71,7 +72,7 @@ describe('RespondAgent rate limiting', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tempDir = mkdtempSync(join(tmpdir(), 'respond-ratelimit-test-'));
-    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir);
+    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir, PERMISSIVE_ENFORCEMENT_POLICY);
   });
 
   afterEach(() => {

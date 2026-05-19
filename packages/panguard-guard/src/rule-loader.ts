@@ -167,7 +167,16 @@ export async function initEngines(
     });
   }
 
-  const respondAgent = new RespondAgent(config.actionPolicy, config.mode);
+  // EnforcementPolicy: take from config or fall back to the conservative
+  // DEFAULT_ENFORCEMENT_POLICY (all OS actions OFF) defined in safety-rules.ts.
+  // Operators must explicitly opt in to enforcement via GuardConfig.enforcementPolicy.
+  const respondAgent = new RespondAgent(
+    config.actionPolicy,
+    config.mode,
+    [],
+    config.dataDir,
+    config.enforcementPolicy
+  );
   respondAgent.setWhitelistManager(atrEngine.getWhitelistManager());
 
   try {
