@@ -41,6 +41,10 @@ export async function PUT(req: Request, props: { params: Promise<{ slug: string 
 
   const { slug } = params;
 
+  if (!/^[a-z0-9-]{1,100}$/.test(slug)) {
+    return NextResponse.json({ error: 'slug must match /^[a-z0-9-]{1,100}$/' }, { status: 400 });
+  }
+
   if (isStaticPost(slug)) {
     return NextResponse.json({ error: 'Cannot edit static posts' }, { status: 403 });
   }
@@ -81,6 +85,10 @@ export async function DELETE(req: Request, props: { params: Promise<{ slug: stri
   }
 
   const { slug } = params;
+
+  if (!/^[a-z0-9-]{1,100}$/.test(slug)) {
+    return NextResponse.json({ error: 'slug must match /^[a-z0-9-]{1,100}$/' }, { status: 400 });
+  }
 
   if (isStaticPost(slug)) {
     return NextResponse.json({ error: 'Cannot delete static posts' }, { status: 403 });

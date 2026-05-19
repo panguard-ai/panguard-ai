@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import yaml from 'js-yaml';
 import { convertSigma, convertYara } from '@panguard-ai/migrator-community';
 import type { SigmaRule } from '@panguard-ai/migrator-community';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 /**
  * POST /api/migrate
@@ -44,6 +45,11 @@ function detectSource(text: string): 'sigma' | 'yara' {
 }
 
 export async function POST(req: Request): Promise<Response> {
+  const ip = getClientIP(req);
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   let body: MigrateBody;
   try {
     body = (await req.json()) as MigrateBody;

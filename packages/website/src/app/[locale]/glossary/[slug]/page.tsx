@@ -1,5 +1,14 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 import { buildAlternates } from '@/lib/seo';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
@@ -103,11 +112,13 @@ export default async function GlossaryEntryPage(props: {
                     __html: para
                       .replace(
                         /\*\*([^*]+)\*\*/g,
-                        '<strong class="text-text-primary font-semibold">$1</strong>'
+                        (_, g1) =>
+                          `<strong class="text-text-primary font-semibold">${escapeHtml(g1)}</strong>`
                       )
                       .replace(
                         /`([^`]+)`/g,
-                        '<code class="text-xs bg-surface-2 border border-border px-1.5 py-0.5 rounded font-mono">$1</code>'
+                        (_, g1) =>
+                          `<code class="text-xs bg-surface-2 border border-border px-1.5 py-0.5 rounded font-mono">${escapeHtml(g1)}</code>`
                       ),
                   }}
                 />

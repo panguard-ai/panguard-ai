@@ -51,7 +51,13 @@ describe('RespondAgent.addBlockedIP()', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tempDir = mkdtempSync(join(tmpdir(), 'respond-agent-test-'));
-    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir, PERMISSIVE_ENFORCEMENT_POLICY);
+    agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      tempDir,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
   });
 
   afterEach(() => {
@@ -255,7 +261,13 @@ describe('RespondAgent.respond() - escalation tracking', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tempDir = mkdtempSync(join(tmpdir(), 'respond-escalation-test-'));
-    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir, PERMISSIVE_ENFORCEMENT_POLICY);
+    agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      tempDir,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
   });
 
   afterEach(() => {

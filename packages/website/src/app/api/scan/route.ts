@@ -35,8 +35,27 @@ interface WebScanReport {
 // ---------------------------------------------------------------------------
 
 const BUNDLED_ATR = ATR_RULES_COMPILED as unknown as ATRRuleCompiled[];
-const TC_ENDPOINT = process.env['NEXT_PUBLIC_THREAT_CLOUD_URL'] || 'https://tc.panguard.ai';
+const TC_ENDPOINT = process.env['THREAT_CLOUD_URL'] || 'https://tc.panguard.ai';
 const TC_SYNC_INTERVAL_MS = 15 * 60 * 1000;
+
+const ALLOWED_TC_ORIGINS = new Set([
+  'https://tc.panguard.ai',
+  // add other production TC origins here
+]);
+
+// Validate TC_ENDPOINT origin at module load.
+(() => {
+  try {
+    const url = new URL(TC_ENDPOINT);
+    if (!ALLOWED_TC_ORIGINS.has(url.origin) && url.hostname !== 'localhost') {
+      console.error(
+        '[scan] THREAT_CLOUD_URL origin is not in ALLOWED_TC_ORIGINS — TC calls will be skipped'
+      );
+    }
+  } catch {
+    // Malformed URL
+  }
+})();
 
 let liveATR: CompiledRule[] = compileRules(BUNDLED_ATR);
 let lastTCSyncAt = 0;

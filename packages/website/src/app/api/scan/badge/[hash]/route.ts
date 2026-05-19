@@ -11,7 +11,12 @@ import { NextResponse } from 'next/server';
  *   ![ATR Badge](https://panguard.ai/api/scan/badge/<contentHash>)
  */
 
-const TC_ENDPOINT = process.env['NEXT_PUBLIC_THREAT_CLOUD_URL'] || 'https://tc.panguard.ai';
+const TC_ENDPOINT = process.env['THREAT_CLOUD_URL'] || 'https://tc.panguard.ai';
+
+const ALLOWED_TC_ORIGINS = new Set([
+  'https://tc.panguard.ai',
+  // add other production TC origins here
+]);
 
 type BadgeStatus = 'safe' | 'warning' | 'critical' | 'unknown';
 

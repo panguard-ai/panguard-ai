@@ -20,8 +20,8 @@ services:
       - LITESTREAM_S3_ENDPOINT=${LITESTREAM_S3_ENDPOINT:-http://minio:9000}
       - LITESTREAM_S3_BUCKET=${LITESTREAM_S3_BUCKET:-tc-backup}
       - LITESTREAM_S3_REGION=${LITESTREAM_S3_REGION:-us-east-1}
-      - LITESTREAM_S3_ACCESS_KEY_ID=${LITESTREAM_S3_ACCESS_KEY_ID:-minioadmin}
-      - LITESTREAM_S3_SECRET_ACCESS_KEY=${LITESTREAM_S3_SECRET_ACCESS_KEY:-minioadmin}
+      - LITESTREAM_S3_ACCESS_KEY_ID=${LITESTREAM_S3_ACCESS_KEY_ID:?LITESTREAM_S3_ACCESS_KEY_ID required (set in .env.docker)}
+      - LITESTREAM_S3_SECRET_ACCESS_KEY=${LITESTREAM_S3_SECRET_ACCESS_KEY:?LITESTREAM_S3_SECRET_ACCESS_KEY required (set in .env.docker)}
     depends_on:
       ollama:
         condition: service_healthy
@@ -62,7 +62,7 @@ services:
 
   # MinIO — local S3-compatible object store so devs can test Litestream
   # without provisioning Cloudflare R2 / AWS S3 / Backblaze B2 credentials.
-  # Web console available at http://localhost:9001 (login: minioadmin / minioadmin).
+  # Web console available at http://localhost:9001 (credentials from .env.docker).
   minio:
     image: minio/minio:latest
     container_name: panguard-minio
@@ -71,8 +71,8 @@ services:
       - '9000:9000'
       - '9001:9001'
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER required (set in .env.docker)}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD required (set in .env.docker)}
     volumes:
       - minio-data:/data
     command: server /data --console-address ":9001"
@@ -95,9 +95,12 @@ services:
         condition: service_healthy
     networks:
       - panguard-net
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER required (set in .env.docker)}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD required (set in .env.docker)}
     entrypoint: >
       /bin/sh -c "
-      mc alias set local http://minio:9000 minioadmin minioadmin &&
+      mc alias set local http://minio:9000 \"$MINIO_ROOT_USER\" \"$MINIO_ROOT_PASSWORD\" &&
       mc mb --ignore-existing local/tc-backup &&
       echo 'MinIO bucket tc-backup ready'
       "

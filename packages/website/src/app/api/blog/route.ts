@@ -61,6 +61,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    if (!/^[a-z0-9-]{1,100}$/.test(slug)) {
+      return NextResponse.json({ error: 'slug must match /^[a-z0-9-]{1,100}$/' }, { status: 400 });
+    }
+
     const post: BlogPost = {
       slug,
       title,
