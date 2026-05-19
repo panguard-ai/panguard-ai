@@ -97,41 +97,29 @@ describe('statusCommand', () => {
   });
 
   describe('no config scenario', () => {
-    it(
-      'should indicate config is not initialized when no config exists (en)',
-      async () => {
-        mockReadConfig.mockReturnValue(null);
-        const cmd = statusCommand();
-        await cmd.parseAsync(['--lang', 'en'], { from: 'user' });
-        const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
-        expect(output).toContain('Not initialized');
-      },
-      15000
-    );
+    it('should indicate config is not initialized when no config exists (en)', async () => {
+      mockReadConfig.mockReturnValue(null);
+      const cmd = statusCommand();
+      await cmd.parseAsync(['--lang', 'en'], { from: 'user' });
+      const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
+      expect(output).toContain('Not initialized');
+    }, 15000);
 
-    it(
-      'should suggest running "pga setup" (en)',
-      async () => {
-        mockReadConfig.mockReturnValue(null);
-        const cmd = statusCommand();
-        await cmd.parseAsync(['--lang', 'en'], { from: 'user' });
-        const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
-        expect(output).toContain('pga setup');
-      },
-      15000
-    );
+    it('should suggest running "pga setup" (en)', async () => {
+      mockReadConfig.mockReturnValue(null);
+      const cmd = statusCommand();
+      await cmd.parseAsync(['--lang', 'en'], { from: 'user' });
+      const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
+      expect(output).toContain('pga setup');
+    }, 15000);
 
-    it(
-      'should show Chinese text when lang is zh-TW',
-      async () => {
-        mockReadConfig.mockReturnValue(null);
-        const cmd = statusCommand();
-        await cmd.parseAsync(['--lang', 'zh-TW'], { from: 'user' });
-        const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
-        expect(output).toContain('pga setup');
-      },
-      15000
-    );
+    it('should show Chinese text when lang is zh-TW', async () => {
+      mockReadConfig.mockReturnValue(null);
+      const cmd = statusCommand();
+      await cmd.parseAsync(['--lang', 'zh-TW'], { from: 'user' });
+      const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
+      expect(output).toContain('pga setup');
+    }, 15000);
   });
 
   describe('JSON output mode', () => {
@@ -216,27 +204,19 @@ describe('statusCommand', () => {
   });
 
   describe('language option', () => {
-    it(
-      'should accept --lang zh-TW',
-      async () => {
-        mockReadConfig.mockReturnValue(null);
-        const cmd = statusCommand();
-        await cmd.parseAsync(['--lang', 'zh-TW'], { from: 'user' });
-        expect(consoleSpy).toHaveBeenCalled();
-      },
-      15000
-    );
+    it('should accept --lang zh-TW', async () => {
+      mockReadConfig.mockReturnValue(null);
+      const cmd = statusCommand();
+      await cmd.parseAsync(['--lang', 'zh-TW'], { from: 'user' });
+      expect(consoleSpy).toHaveBeenCalled();
+    }, 15000);
 
-    it(
-      'should accept --lang en and output English',
-      async () => {
-        mockReadConfig.mockReturnValue(null);
-        const cmd = statusCommand();
-        await cmd.parseAsync(['--lang', 'en'], { from: 'user' });
-        const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
-        expect(output).toContain('System Status');
-      },
-      15000
-    );
+    it('should accept --lang en and output English', async () => {
+      mockReadConfig.mockReturnValue(null);
+      const cmd = statusCommand();
+      await cmd.parseAsync(['--lang', 'en'], { from: 'user' });
+      const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
+      expect(output).toContain('System Status');
+    }, 15000);
   });
 });
