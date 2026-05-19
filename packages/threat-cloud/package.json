@@ -33,6 +33,7 @@
   "dependencies": {
     "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/core": "workspace:*",
+    "@sentry/node": "^8.0.0",
     "better-sqlite3": "^11.0.0",
     "js-yaml": "^4.1.0",
     "zod": "^3.24.0"

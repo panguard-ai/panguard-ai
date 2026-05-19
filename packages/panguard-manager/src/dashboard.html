@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PanGuard Manager Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--sage:#8B9A8E;--s0:#1A1614;--s1:#242220;--s2:#2E2C2A;--bd:#3A3836;--t1:#F5F1E8;--tm:#A09A94;--ok:#2ED573;--warn:#FBBF24;--bad:#EF4444;--glow:0 0 20px rgba(139,154,142,.15);--r:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--s0);color:var(--t1);display:flex;height:100vh;overflow:hidden}
+.sb{width:220px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
+.sb-brand{padding:20px 16px;border-bottom:1px solid var(--bd)}
+.sb-brand .title{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;letter-spacing:.5px}
+.sb-brand .sub{font-size:11px;color:var(--tm);margin-top:2px}
+.sb-nav{flex:1;padding:12px 0;overflow-y:auto}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;color:var(--tm);font-size:13px;font-weight:500;transition:all .15s;border-left:3px solid transparent}
+.ni:hover{background:var(--s2);color:var(--t1)}
+.ni.on{color:var(--sage);border-left-color:var(--sage);background:rgba(139,154,142,.08)}
+.sb-ft{padding:16px;border-top:1px solid var(--bd);font-size:11px;color:var(--tm)}
+.ws-b{display:flex;align-items:center;gap:6px}
+.ws-d{width:8px;height:8px;border-radius:50%;background:var(--bad)}
+.ws-d.on{background:var(--ok)}
+.mn{flex:1;overflow-y:auto;padding:24px 28px}
+.pg{display:none}.pg.on{display:block}
+.pt{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
+.pt em{color:var(--sage);font-style:normal}
+.pd{font-size:13px;color:var(--tm);margin-bottom:20px;line-height:1.5}
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.cd{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;box-shadow:var(--glow);transition:border-color .2s}
+.cd:hover{border-color:var(--sage)}
+.cl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--tm);margin-bottom:6px}
+.cv{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700}
+.cv.ok{color:var(--ok)}.cv.w{color:var(--warn)}.cv.sg{color:var(--sage)}.cv.bad{color:var(--bad)}
+.st{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--tm);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.tb{width:100%;border-collapse:collapse;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.tb th{text-align:left;padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--tm);background:var(--s2);border-bottom:1px solid var(--bd)}
+.tb td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--bd);font-family:'JetBrains Mono','SF Mono',monospace}
+.tb tr:last-child td{border-bottom:none}
+.tb tr:hover td{background:rgba(139,154,142,.04)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+.dot-ok{background:var(--ok)}.dot-w{background:var(--warn)}.dot-bad{background:var(--bad)}.dot-off{background:var(--tm)}
+.empty{text-align:center;padding:40px 20px;color:var(--tm);font-size:13px}
+.tl{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);max-height:520px;overflow-y:auto}
+.ei{padding:10px 16px;border-bottom:1px solid var(--bd);font-size:12px;font-family:'JetBrains Mono','SF Mono',monospace;display:flex;gap:10px;align-items:flex-start}
+.ei:last-child{border-bottom:none}
+.ei-t{color:var(--tm);white-space:nowrap;min-width:75px}
+.ei-a{color:var(--sage);min-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ei-y{font-weight:600;min-width:90px}
+.ei-d{color:var(--tm);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ei.malicious{border-left:3px solid var(--bad)}
+.ei.suspicious{border-left:3px solid var(--warn)}
+.ei.benign{border-left:3px solid var(--ok)}
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-ok{background:rgba(46,213,115,.15);color:var(--ok)}
+.badge-w{background:rgba(251,191,36,.15);color:var(--warn)}
+.badge-off{background:rgba(160,154,148,.15);color:var(--tm)}
+.note{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 16px;font-size:12px;color:var(--tm);line-height:1.7;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="sb">
+<div class="sb-brand">
+<div class="title">PANGUARD <span style="color:var(--sage)">MANAGER</span></div>
+<div class="sub">Fleet aggregator</div>
+</div>
+<div class="sb-nav">
+<div class="ni on" data-tab="overview">Overview</div>
+<div class="ni" data-tab="agents">Agents</div>
+<div class="ni" data-tab="threats">Threats</div>
+<div class="ni" data-tab="events">Events</div>
+</div>
+<div class="sb-ft">
+<div class="ws-b"><div class="ws-d" id="wd"></div><span id="wl">Disconnected</span></div>
+<div style="margin-top:6px">v0.1.0</div>
+</div>
+</div>
+
+<div class="mn">
+<div class="pg on" id="p-overview">
+<div class="pt"><em>Fleet</em> Overview</div>
+<div class="pd">Aggregated state across every Guard reporting to this Manager.</div>
+<div class="cg">
+<div class="cd"><div class="cl">Agents Online / Total</div><div class="cv sg" id="kpi-agents">--</div></div>
+<div class="cd"><div class="cl">Threats (24h)</div><div class="cv bad" id="kpi-threats">0</div></div>
+<div class="cd"><div class="cl">Events Processed</div><div class="cv ok" id="kpi-events">0</div></div>
+<div class="cd"><div class="cl">ATR Rules Active</div><div class="cv sg" id="kpi-rules">--</div></div>
+</div>
+<div class="st">Live Activity</div>
+<div class="tl" id="live-feed">
+<div class="empty">Waiting for events from connected Guards...</div>
+</div>
+</div>
+
+<div class="pg" id="p-agents">
+<div class="pt"><em>Agents</em></div>
+<div class="pd">Every Guard registered with this Manager. Status updates within 90 seconds of heartbeat.</div>
+<table class="tb">
+<thead><tr><th>Hostname</th><th>OS</th><th>Version</th><th>Mode</th><th>Threats 24h</th><th>Status</th><th>Last Seen</th></tr></thead>
+<tbody id="agents-tb"><tr><td colspan="7" class="empty">No agents registered yet.</td></tr></tbody>
+</table>
+</div>
+
+<div class="pg" id="p-threats">
+<div class="pt"><em>Threats</em></div>
+<div class="pd">Threat verdicts from all Guards, newest first.</div>
+<table class="tb">
+<thead><tr><th>Time</th><th>Agent</th><th>Classification</th><th>Severity</th><th>Reason</th></tr></thead>
+<tbody id="threats-tb"><tr><td colspan="5" class="empty">No threat verdicts received yet.</td></tr></tbody>
+</table>
+</div>
+
+<div class="pg" id="p-events">
+<div class="pt"><em>Events</em></div>
+<div class="pd">Live event stream from every relayed Guard.</div>
+<div class="tl" id="events-feed">
+<div class="empty">No events received yet.</div>
+</div>
+</div>
+</div>
+
+<script nonce="__NONCE__">
+(function(){
+  const tabs = document.querySelectorAll('.ni');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    const tab = t.getAttribute('data-tab');
+    document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+    const el = document.getElementById('p-' + tab);
+    if (el) el.classList.add('on');
+  }));
+
+  const wsDot = document.getElementById('wd');
+  const wsLabel = document.getElementById('wl');
+  const liveFeed = document.getElementById('live-feed');
+  const eventsFeed = document.getElementById('events-feed');
+  const threatsTb = document.getElementById('threats-tb');
+  const agentsTb = document.getElementById('agents-tb');
+
+  const recentEvents = [];
+  const recentThreats = [];
+  const MAX_FEED = 100;
+
+  function fmtTime(iso) {
+    if (!iso || iso === 'never') return '--';
+    const d = new Date(iso);
+    return d.toLocaleTimeString();
+  }
+  function fmtAgo(iso) {
+    if (!iso || iso === 'never') return 'never';
+    const ms = Date.now() - new Date(iso).getTime();
+    const s = Math.floor(ms / 1000);
+    if (s < 60) return s + 's ago';
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ago';
+    const h = Math.floor(m / 60);
+    return h + 'h ago';
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'
+    })[c]);
+  }
+
+  function renderAgents(agents) {
+    if (!agents.length) {
+      agentsTb.innerHTML = '<tr><td colspan="7" class="empty">No agents registered yet.</td></tr>';
+      return;
+    }
+    agentsTb.innerHTML = agents.map(a => {
+      const dot = a.online ? 'dot-ok' : 'dot-off';
+      const status = a.online ? 'Online' : 'Offline';
+      const mode = a.mode || 'unknown';
+      return '<tr>'
+        + '<td>' + esc(a.hostname) + '</td>'
+        + '<td>' + esc(a.os_type) + '</td>'
+        + '<td>' + esc(a.panguard_version) + '</td>'
+        + '<td>' + esc(mode) + '</td>'
+        + '<td>' + esc(a.threats_24h) + '</td>'
+        + '<td><span class="dot ' + dot + '"></span> ' + esc(status) + '</td>'
+        + '<td>' + esc(fmtAgo(a.last_seen)) + '</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  function renderSummary(s) {
+    document.getElementById('kpi-agents').textContent = s.agents_online + ' / ' + s.agents_total;
+    document.getElementById('kpi-threats').textContent = s.threats_24h;
+    document.getElementById('kpi-events').textContent = s.events_total;
+    document.getElementById('kpi-rules').textContent = s.atr_rules_active || '--';
+  }
+
+  function appendEvent(agent_id, evt) {
+    const verdict = evt && evt.data && evt.data.classification ? evt.data.classification : '';
+    const cls = verdict === 'malicious' ? 'malicious'
+      : verdict === 'suspicious' ? 'suspicious'
+      : verdict === 'benign' ? 'benign' : '';
+    const description = (evt && evt.data && (evt.data.description || evt.data.reason)) || (evt && evt.type) || '';
+    const html = '<div class="ei ' + cls + '">'
+      + '<span class="ei-t">' + esc(fmtTime(evt && evt.timestamp)) + '</span>'
+      + '<span class="ei-a">' + esc(agent_id) + '</span>'
+      + '<span class="ei-y">' + esc(evt && evt.type || 'event') + '</span>'
+      + '<span class="ei-d">' + esc(description) + '</span>'
+      + '</div>';
+    recentEvents.unshift(html);
+    if (recentEvents.length > MAX_FEED) recentEvents.length = MAX_FEED;
+    liveFeed.innerHTML = recentEvents.join('');
+    eventsFeed.innerHTML = recentEvents.join('');
+  }
+
+  function appendThreat(agent_id, verdict, timestamp) {
+    const cls = verdict.classification || 'unknown';
+    const sev = verdict.severity || '';
+    const reason = verdict.reason || verdict.description || '';
+    const row = '<tr>'
+      + '<td>' + esc(fmtTime(timestamp)) + '</td>'
+      + '<td>' + esc(agent_id) + '</td>'
+      + '<td>' + esc(cls) + '</td>'
+      + '<td>' + esc(sev) + '</td>'
+      + '<td>' + esc(reason) + '</td>'
+      + '</tr>';
+    recentThreats.unshift(row);
+    if (recentThreats.length > MAX_FEED) recentThreats.length = MAX_FEED;
+    threatsTb.innerHTML = recentThreats.join('');
+  }
+
+  async function refreshStatus() {
+    try {
+      const s = await fetch('/api/status').then(r => r.json());
+      if (s && s.ok && s.data && s.data.summary) renderSummary(s.data.summary);
+      const a = await fetch('/api/agents').then(r => r.json());
+      if (a && a.ok && a.data && Array.isArray(a.data.agents)) renderAgents(a.data.agents);
+    } catch (e) { /* network blip, will retry */ }
+  }
+
+  function connectWS() {
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(proto + '//' + location.host + '/ws');
+    ws.onopen = () => { wsDot.classList.add('on'); wsLabel.textContent = 'Connected'; };
+    ws.onclose = () => {
+      wsDot.classList.remove('on');
+      wsLabel.textContent = 'Disconnected';
+      setTimeout(connectWS, 3000);
+    };
+    ws.onerror = () => { wsDot.classList.remove('on'); wsLabel.textContent = 'Error'; };
+    ws.onmessage = (m) => {
+      try {
+        const msg = JSON.parse(m.data);
+        if (msg.type === 'fleet_event') {
+          appendEvent(msg.agent_id, { type: 'event', data: msg.data, timestamp: msg.timestamp });
+        } else if (msg.type === 'fleet_verdict') {
+          appendThreat(msg.agent_id, msg.data || {}, msg.timestamp);
+        }
+        // Any message triggers a delayed status refresh
+        clearTimeout(window.__refTimer);
+        window.__refTimer = setTimeout(refreshStatus, 500);
+      } catch (e) { /* ignore parse errors */ }
+    };
+  }
+
+  refreshStatus();
+  setInterval(refreshStatus, 5000);
+  connectWS();
+})();
+</script>
+</body>
+</html>
