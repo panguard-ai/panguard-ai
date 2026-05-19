@@ -42,7 +42,7 @@ describe('FleetAggregator', () => {
   });
 
   it('ingest marks an agent online and records events', () => {
-    let now = 1_000_000;
+    const now = 1_000_000;
     const agg = new FleetAggregator({ nowMs: () => now });
     const record = makeRecord({ agent_id: 'a1' });
 
@@ -73,7 +73,7 @@ describe('FleetAggregator', () => {
   });
 
   it('counts malicious verdicts in threats_24h', () => {
-    let now = 1_000_000;
+    const now = 1_000_000;
     const agg = new FleetAggregator({ nowMs: () => now });
     const record = makeRecord({ agent_id: 'a1' });
     for (let i = 0; i < 3; i++) {

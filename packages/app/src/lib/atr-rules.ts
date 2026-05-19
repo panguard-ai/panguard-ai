@@ -10,9 +10,8 @@
  * the rule with its provenance + academic numbers.
  */
 
-import { readdir, readFile } from 'node:fs/promises';
-import { join, dirname } from 'node:path';
-import { createRequire } from 'node:module';
+import { readdir, readFile, stat } from 'node:fs/promises';
+import { join, resolve as resolvePath } from 'node:path';
 import yaml from 'js-yaml';
 
 export interface AtrRuleMeta {
@@ -34,10 +33,44 @@ export interface AtrRuleMeta {
 let cache: Map<string, AtrRuleMeta> | null = null;
 let loadingPromise: Promise<Map<string, AtrRuleMeta>> | null = null;
 
+async function isDir(path: string): Promise<boolean> {
+  try {
+    return (await stat(path)).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Locate the bundled `agent-threat-rules/rules/` directory without using
+ * `require.resolve('agent-threat-rules')` — Turbopack's static analyzer
+ * traces the package's transitive deps (ONNX native binaries) and bails
+ * the build. We probe a small list of cwd-based candidates that pnpm's
+ * hoisting + the monorepo layout will populate at runtime.
+ */
+async function findRulesDir(): Promise<string> {
+  const envDir = process.env['PANGUARD_ATR_RULES_DIR'];
+  if (envDir && (await isDir(envDir))) return envDir;
+
+  const cwd = process.cwd();
+  const candidates = [
+    // monorepo run (CI build / next dev from packages/app)
+    resolvePath(cwd, '..', '..', 'node_modules', 'agent-threat-rules', 'rules'),
+    // hoisted (Vercel post-install layout)
+    resolvePath(cwd, 'node_modules', 'agent-threat-rules', 'rules'),
+    // installed alongside app's own node_modules
+    resolvePath(cwd, 'packages', 'app', 'node_modules', 'agent-threat-rules', 'rules'),
+  ];
+  for (const c of candidates) {
+    if (await isDir(c)) return c;
+  }
+  throw new Error(
+    `agent-threat-rules/rules/ not found. Set PANGUARD_ATR_RULES_DIR or install the package.`
+  );
+}
+
 async function buildCache(): Promise<Map<string, AtrRuleMeta>> {
-  const require = createRequire(import.meta.url);
-  const atrPkgPath = require.resolve('agent-threat-rules/package.json');
-  const rulesDir = join(dirname(atrPkgPath), 'rules');
+  const rulesDir = await findRulesDir();
 
   const m = new Map<string, AtrRuleMeta>();
 

@@ -100,8 +100,14 @@ function findRulesDir(): string | null {
     }
   }
   try {
-    const pkgPath = nodeRequire.resolve('agent-threat-rules/package.json');
-    const candidate = join(dirname(pkgPath), 'rules');
+    // Hide the package name behind a variable so Turbopack's static
+    // analyzer cannot trace into agent-threat-rules at build time
+    // (it errors on the package's restrictive "exports" map). Marked
+    // as a server external in next.config.mjs so this resolves at
+    // runtime where the dep is fully installed.
+    const atrPkg = 'agent-threat-rules';
+    const atrIndexPath = nodeRequire.resolve(atrPkg);
+    const candidate = join(dirname(atrIndexPath), '..', 'rules');
     if (statSync(candidate).isDirectory()) return candidate;
   } catch {
     /* fall through */

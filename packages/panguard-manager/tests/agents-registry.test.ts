@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { existsSync, mkdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { AgentsRegistry } from '../src/agents-registry.js';
@@ -121,8 +121,7 @@ describe('AgentsRegistry', () => {
   it('handles corrupt JSON by starting empty', () => {
     const filePath = join(tmp, 'agents.json');
     // Write garbage
-    const fs = require('node:fs') as typeof import('node:fs');
-    fs.writeFileSync(filePath, 'not json{{{', 'utf-8');
+    writeFileSync(filePath, 'not json{{{', 'utf-8');
     const reg = new AgentsRegistry({ filePath });
     expect(reg.count()).toBe(0);
   });

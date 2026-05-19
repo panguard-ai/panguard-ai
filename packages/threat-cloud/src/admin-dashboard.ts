@@ -123,6 +123,7 @@ tr:hover td{background:var(--surface2)}
   <button data-tab="skills">Skill Threats</button>
   <button data-tab="blacklist">Blacklist</button>
   <button data-tab="feeds">Feeds</button>
+  <button data-tab="keys">Client Keys</button>
   <button data-tab="audit">Audit Log</button>
 </nav>
 <main id="content">
@@ -190,6 +191,7 @@ function renderTab(tab){
     case 'skills':renderSkills();break;
     case 'blacklist':renderBlacklist();break;
     case 'feeds':renderFeeds();break;
+    case 'keys':renderClientKeys();break;
     case 'audit':renderAuditLog();break;
   }
 }
@@ -621,6 +623,50 @@ function addToWhitelist(){
 function removeFromWhitelist(name){
   if(!confirm('Remove "'+name+'" from the whitelist?'))return;
   apiDelete('/api/skill-whitelist',{skillName:name}).then(function(){renderFeeds();}).catch(function(){alert('Failed to remove from whitelist');});
+}
+
+// Client Keys + Tier Management
+function renderClientKeys(){
+  $('content').innerHTML='<div class="loading">Loading client keys...</div>';
+  api('/api/admin/client-keys?limit=200').then(function(d){
+    var rows=d.data||[];
+    var html='<div class="table-wrap"><div class="table-header"><h2>Client Keys ('+num(rows.length)+')</h2></div>';
+    html+='<table><tr><th>Client ID</th><th>Tier</th><th>Created</th><th>Last Used</th><th>Revoked</th><th>Actions</th></tr>';
+    if(!rows.length){html+='<tr><td colspan="6" class="empty">No client keys registered yet.</td></tr>';}
+    rows.forEach(function(r){
+      var tier=r.tier||'community';
+      html+='<tr><td title="'+h(r.clientId)+'">'+h(r.clientId)+'</td>';
+      html+='<td><span class="badge '+(tier==='enterprise'?'high':tier==='pilot'?'medium':'low')+'">'+h(tier)+'</span></td>';
+      html+='<td>'+timeAgo(r.createdAt)+'</td>';
+      html+='<td>'+(r.lastUsedAt?timeAgo(r.lastUsedAt):'-')+'</td>';
+      html+='<td>'+(r.revoked?'yes':'no')+'</td>';
+      html+='<td>';
+      if(!r.revoked){
+        html+='<select id="tier-'+h(r.clientId)+'">';
+        ['community','pilot','enterprise'].forEach(function(t){
+          html+='<option value="'+t+'"'+(t===tier?' selected':'')+'>'+t+'</option>';
+        });
+        html+='</select> ';
+        const safeId = encodeURIComponent(r.clientId).replace(/'/g, "%27");
+        html += '<button onclick="updateTier(' + JSON.stringify(safeId) + ')">Save</button>';
+      }
+      html+='</td></tr>';
+    });
+    html+='</table></div>';
+    $('content').innerHTML=html;
+  }).catch(function(){
+    $('content').innerHTML='<div class="empty">Failed to load client keys.</div>';
+  });
+}
+function updateTier(clientIdEnc){
+  var clientId=decodeURIComponent(clientIdEnc);
+  var sel=document.getElementById('tier-'+clientId);
+  if(!sel)return;
+  var tier=sel.value;
+  apiPost('/api/admin/client-keys/'+encodeURIComponent(clientId)+'/tier',{tier:tier}).then(function(r){
+    if(r&&r.ok){renderClientKeys();}
+    else{alert('Failed to update tier: '+((r&&r.error)||'unknown error'));}
+  }).catch(function(){alert('Failed to update tier');});
 }
 
 // Audit Log
