@@ -33,7 +33,6 @@ import {
 } from './memory/index.js';
 import { DashboardServer } from './dashboard/index.js';
 import { PidFile, Watchdog } from './daemon/index.js';
-import { validateLicense } from './license/index.js';
 import {
   loadSecurityPolicy,
   runSecurityAudit,
@@ -328,6 +327,7 @@ export class GuardEngine {
     if (this.config.dashboardEnabled) {
       this.dashboard = new DashboardServer(this.config.dashboardPort);
       this.dashboard.setConfigGetter(() => this.config);
+      this.dashboard.setRulesProvider(() => this.engines.atrEngine.getAllRules());
       await this.dashboard.start();
 
       // Set startTime early so the immediate status push shows valid uptime
@@ -756,7 +756,7 @@ export class GuardEngine {
    * Get current engine status / 取得引擎狀態
    */
   getStatus(): GuardStatus {
-    const license = validateLicense(this.config.licenseKey);
+    const license = this.engines.license;
     const memCheck = this.checkMemoryPressure();
 
     return {
