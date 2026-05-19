@@ -24,6 +24,71 @@ interface MeResponse {
 }
 
 /**
+ * Founding-customer slot badge. Polls /api/pilot/intent?slots=1 (cached
+ * 60s) on mount to render "X / 3 slots remaining" next to the Pilot
+ * tier title. When exhausted, swaps to a "Slots claimed" warning style.
+ */
+function FoundingSlotBadge({ isZh }: { isZh: boolean }) {
+  const [state, setState] = useState<
+    | { kind: 'loading' }
+    | { kind: 'ready'; remaining: number; total: number; exhausted: boolean }
+  >({ kind: 'loading' });
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${APP_ORIGIN}/api/pilot/intent?slots=1`, {
+          headers: { accept: 'application/json' },
+        });
+        if (!res.ok) return;
+        const body = (await res.json()) as {
+          slots_remaining: number;
+          total_slots: number;
+          exhausted: boolean;
+        };
+        if (!cancelled) {
+          setState({
+            kind: 'ready',
+            remaining: body.slots_remaining,
+            total: body.total_slots,
+            exhausted: body.exhausted,
+          });
+        }
+      } catch {
+        /* leave badge as loading — graceful */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (state.kind === 'loading') {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/30 rounded-full px-2.5 py-0.5">
+        {isZh ? 'F500 試水' : 'F500 bridge'}
+      </span>
+    );
+  }
+
+  if (state.exhausted) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-red-400 bg-red-400/10 border border-red-400/40 rounded-full px-2.5 py-0.5">
+        {isZh ? '名額已滿' : 'Slots claimed'}
+      </span>
+    );
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/30 rounded-full px-2.5 py-0.5">
+      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+      {state.remaining} / {state.total} {isZh ? '剩餘' : 'left'}
+    </span>
+  );
+}
+
+/**
  * Light-weight auth probe. Asks the app's `/api/me` endpoint (cookie-based
  * session) whether the visitor is signed in and which workspace to bill.
  *
@@ -296,9 +361,7 @@ export default function PricingContent() {
                 <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
                   {isZh ? 'Pilot 試點' : 'Pilot'}
                 </h3>
-                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/30 rounded-full px-2.5 py-0.5">
-                  {isZh ? 'F500 試水' : 'F500 bridge'}
-                </span>
+                <FoundingSlotBadge isZh={isZh} />
               </div>
 
               <div className="mt-5 flex items-baseline gap-2">
@@ -307,12 +370,12 @@ export default function PricingContent() {
               </div>
 
               <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 mt-4 mb-1">
-                {isZh ? '給誰' : 'Who it’s for'}
+                {isZh ? '給誰 · Founding Customer 限前 3 名' : 'Who it\'s for · Founding Customers (first 3 only)'}
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? 'F500 採購流程前的試水合約。IT Director 層級可審核通過，不需要進到 CFO 議程。試點結束後可全額抵入 Y1 Enterprise 年約。'
-                  : 'A pre-procurement pilot contract for F500. The IT Director can approve it without reaching CFO. The full $25K credits toward the Year 1 Enterprise contract on upgrade.'}
+                  ? 'F500 採購流程前的試水合約。IT Director 層級可審核通過，不需要進到 CFO 議程。試點結束後可全額抵入 Y1 Enterprise 年約。$25K 僅前 3 個 Founding Customer 適用,第 4 個起 Enterprise $250K 起跳 (sales-led)。'
+                  : 'A pre-procurement pilot contract for F500. IT Director can approve without reaching CFO. The full $25K credits toward Y1 Enterprise. $25K applies to the first 3 Founding Customers only — after that, all engagements move to Enterprise $250K base (sales-led).'}
               </p>
 
               <div className="my-7 flex-1">
