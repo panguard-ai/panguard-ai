@@ -364,6 +364,8 @@ export default function PricingContent() {
                         '樣本季度合規證據報告(EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic 對應)',
                         '自訂 ATR rule pack 試做',
                         'SIEM webhook 整合樣板',
+                        'LLM 額度全包(crystallization + 規則 enrichment ~$200/月,我們吃 token 成本)',
+                        '偵測 0% 依賴 LLM——336 條 deterministic rules @ 97.1% recall',
                         '90 天後升級 Enterprise 或乾淨結束',
                         '可 credit 全額 $25K 到 Y1 Enterprise 年約',
                       ]
@@ -373,6 +375,8 @@ export default function PricingContent() {
                         'Sample quarterly compliance evidence report (EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic mapping)',
                         'Custom ATR rule pack trial',
                         'SIEM webhook integration template',
+                        'LLM credits included (crystallization + rule enrichment ~$200/mo, we eat the token cost)',
+                        'Detection runs 0% on LLM — 336 deterministic rules @ 97.1% recall',
                         'Clean exit or upgrade to Enterprise at day 90',
                         'Full $25K credit to Y1 Enterprise contract on upgrade',
                       ]
@@ -496,8 +500,8 @@ export default function PricingContent() {
 
                 <p className="text-[12px] text-text-muted leading-[1.85] mb-4">
                   {isZh
-                    ? '一併提供：unlimited agents/tenants、on-prem 部署、SAML SSO、SCIM、SIEM webhook、AIAM（2026 Q3 上線）、SOC 2 Type 1 認證進行中（目標 2026 Q3）、專屬 Customer Success Manager。'
-                    : 'Also included: unlimited agents/tenants, on-prem deployment, SAML SSO, SCIM, SIEM webhook, AIAM (target Q3 2026), SOC 2 Type 1 in flight (target Q3 2026), and a dedicated Customer Success Manager.'}
+                    ? '一併提供：unlimited agents/tenants、on-prem 部署、SAML SSO、SCIM、SIEM webhook、AIAM（2026 Q3 上線）、SOC 2 Type 1 認證進行中（目標 2026 Q3）、專屬 Customer Success Manager、LLM token 額度全包（含 enrichment + crystallization；偵測本身 0% 依賴 LLM）。'
+                    : 'Also included: unlimited agents/tenants, on-prem deployment, SAML SSO, SCIM, SIEM webhook, AIAM (target Q3 2026), SOC 2 Type 1 in flight (target Q3 2026), a dedicated Customer Success Manager, and LLM tokens fully included (enrichment + crystallization; detection itself runs 0% on LLM).'}
                 </p>
 
                 <a

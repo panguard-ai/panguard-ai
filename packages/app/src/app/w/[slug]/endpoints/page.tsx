@@ -153,14 +153,56 @@ export default async function EndpointsPage({ params }: { params: Promise<{ slug
     };
   });
 
+  // Quick fleet health summary (above the table) — gives CISO an at-a-glance
+  // signal without scanning every row.
+  const fleetHealth = rows.reduce(
+    (acc, r) => {
+      acc[r.health]++;
+      return acc;
+    },
+    { healthy: 0, stale: 0, offline: 0 } as Record<Health, number>
+  );
+  const totalThreats = rows.reduce((n, r) => n + r.threats, 0);
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-text-primary">Endpoints</h1>
         <p className="mt-1 text-sm text-text-muted">
           {endpoints.length} machine{endpoints.length === 1 ? '' : 's'} reporting telemetry · last
-          30 days
+          30 days · Detection runs 0% on LLM
         </p>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Card padding="md">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+            Healthy
+          </p>
+          <p className="mt-1 text-2xl font-bold text-brand-emerald">{fleetHealth.healthy}</p>
+          <p className="text-[11px] text-text-muted">Reported within 5 min</p>
+        </Card>
+        <Card padding="md">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+            Stale
+          </p>
+          <p className="mt-1 text-2xl font-bold text-amber-400">{fleetHealth.stale}</p>
+          <p className="text-[11px] text-text-muted">Last 5 min - 1 hr</p>
+        </Card>
+        <Card padding="md">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+            Offline
+          </p>
+          <p className="mt-1 text-2xl font-bold text-red-400">{fleetHealth.offline}</p>
+          <p className="text-[11px] text-text-muted">No telemetry &gt; 1 hr</p>
+        </Card>
+        <Card padding="md">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+            High+critical (30d)
+          </p>
+          <p className="mt-1 text-2xl font-bold text-text-primary">{totalThreats}</p>
+          <p className="text-[11px] text-text-muted">Across all endpoints</p>
+        </Card>
       </div>
 
       <Card padding="none">

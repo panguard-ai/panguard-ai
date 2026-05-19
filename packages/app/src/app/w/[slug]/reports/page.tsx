@@ -116,6 +116,21 @@ export default async function ReportsPage({ params }: { params: Promise<{ slug: 
             Once you generate your first report it will appear here, ready to download or share with
             auditors.
           </p>
+          <p className="mt-4 text-xs text-text-muted">
+            Want to see what an evidence pack looks like first?{' '}
+            <a
+              href="https://panguard.ai/evidence-pack"
+              target="_blank"
+              rel="noreferrer"
+              className="text-brand-sage hover:text-brand-sage-light font-semibold"
+            >
+              Open the public sample pack →
+            </a>
+          </p>
+          <p className="mt-2 text-[11px] text-text-muted">
+            Detection runs on 336 deterministic ATR rules. No LLM in the detection path — your
+            evidence pack is reproducible byte-for-byte.
+          </p>
         </Card>
       ) : (
         <Card padding="none">

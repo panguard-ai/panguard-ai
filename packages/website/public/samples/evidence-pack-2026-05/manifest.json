@@ -1,0 +1,58 @@
+{
+  "evidence_pack_id": "EVP-202605-SAMPLE-0001",
+  "generated_at": "2026-05-19T18:38:13.854Z",
+  "organization": "Acme Corp (Sample)",
+  "organization_note": "Synthetic data — for prospect demonstration only. Not a real customer engagement.",
+  "panguard_version": "1.5.6",
+  "atr_version": "2.1.0",
+  "atr_rule_count": 336,
+  "detection_recall_pct": 97.1,
+  "detection_fp_rate_pct": 0.2,
+  "benchmark_source": "NVIDIA garak, 498 SKILL.md samples",
+  "llm_usage": {
+    "detection": 0,
+    "enrichment": "server-side, not customer-paid",
+    "narrative": "template-based, no LLM"
+  },
+  "hmac_algorithm": "HMAC-SHA256",
+  "hmac_key_id": "panguard-sample-2026-05",
+  "hmac_key_note": "Public key for sample integrity check. Production packs use customer-specific keys.",
+  "frameworks_covered": [
+    "ISO/IEC 27001:2022",
+    "SOC 2 Trust Services Criteria",
+    "Taiwan Cyber Security Management Act"
+  ],
+  "files": [
+    {
+      "file": "RPT-202605-ISO-0001.html",
+      "size_bytes": 38306,
+      "sha256": "0c5413b86cd09cd22c3c84b9b39f003564b080f9da71b3280ef7618fae15a037",
+      "hmac_sha256": "83a5fa8434b67cc64d07db5c3a57ec858d8db2b8f3618bac2df8d526fccc0f4f"
+    },
+    {
+      "file": "RPT-202605-ISO-0001.json",
+      "size_bytes": 39132,
+      "sha256": "d2c368ca8031fce4d54f31a70e0129badf7605f5df4467ccb39753643e099f56",
+      "hmac_sha256": "e904593f8f075aeb1e00459b7b3950016cc1bb68f752e3fab9ad736084bfbc7f"
+    },
+    {
+      "file": "RPT-202605-ISO-0001.pdf",
+      "size_bytes": 15348,
+      "sha256": "65fc9c66ef91c8b28a839e61a59f59051a04c4a7c608a610ade5bb00e77b384a",
+      "hmac_sha256": "8ce0f4ef79b7d93f2f4a673bd0721367d61708b08921b9aaa7b2c2787576f1ef"
+    },
+    {
+      "file": "RPT-202605-SOC2-0001.pdf",
+      "size_bytes": 13575,
+      "sha256": "e08ec90e81d9cca43796b90302fcd6d140ffc0befe1de788522e76a3b5bb3344",
+      "hmac_sha256": "05dab4404854dd148bb85a28acf96a63f6a4688894d33e925f77ae5eecb08c08"
+    },
+    {
+      "file": "RPT-202605-TCSA-0001.pdf",
+      "size_bytes": 13598,
+      "sha256": "d01e939c89fc3949aed37e73f8f2e07e69bd9d33e29656323037ee7d481fffbc",
+      "hmac_sha256": "c41530b6cd6cace248efb2595745b7defbdff03aac6d7aead750e1a56f6e722b"
+    }
+  ],
+  "verification_command": "shasum -a 256 RPT-*.{pdf,json,html} | sort  # compare against files[].sha256"
+}
