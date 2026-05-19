@@ -97,7 +97,7 @@ tr:hover td{background:var(--surface2)}
 <body>
 
 <div id="login">
-<form onsubmit="return doLogin(event)">
+<form id="loginForm">
   <h1>Threat Cloud <span>Admin</span></h1>
   <p>Enter your admin API key to continue.</p>
   <input type="password" id="keyInput" placeholder="TC_ADMIN_API_KEY" autofocus/>
@@ -111,7 +111,7 @@ tr:hover td{background:var(--surface2)}
   <h1>Threat Cloud <span>Admin</span></h1>
   <div class="meta">
     <span id="uptimeText"></span>
-    <span class="logout" onclick="doLogout()">Logout</span>
+    <span class="logout" data-action="logout">Logout</span>
   </div>
 </header>
 <nav id="tabs">
@@ -171,6 +171,59 @@ function doLogout(){
   const k=sessionStorage.getItem('tc_key');
   if(k){document.getElementById('keyInput').value=k;doLogin(new Event('submit'));}
 })();
+
+// Login form submit handler (CSP-compliant: no inline onsubmit)
+document.getElementById('loginForm').addEventListener('submit',function(e){
+  doLogin(e);
+});
+
+// Delegated click handler for [data-action] elements. The CSP we serve
+// (script-src 'nonce-...' 'strict-dynamic') unconditionally blocks inline
+// event handlers, so every button/row/span that previously used onclick=""
+// now declares data-action="..." and is routed here. New actions MUST be
+// added to this switch — unknown actions are a no-op (defence against
+// stale/injected data-action values).
+document.addEventListener('click',function(e){
+  const el = e.target.closest && e.target.closest('[data-action]');
+  if(!el)return;
+  const a = el.getAttribute('data-action');
+  switch(a){
+    case 'logout': doLogout(); break;
+    // Rules pagination
+    case 'rules-page': rulesPage = parseInt(el.getAttribute('data-page'),10)||0; renderRules(); break;
+    case 'rules-page-inc': rulesPage++; renderRules(); break;
+    case 'rules-page-dec': rulesPage--; renderRules(); break;
+    // Threats pagination
+    case 'threats-page': threatsPage = parseInt(el.getAttribute('data-page'),10)||1; renderThreats(); break;
+    case 'threats-page-inc': threatsPage++; renderThreats(); break;
+    case 'threats-page-dec': threatsPage--; renderThreats(); break;
+    // Audit pagination
+    case 'audit-page': auditPage = parseInt(el.getAttribute('data-page'),10)||1; renderAuditLog(); break;
+    case 'audit-page-inc': auditPage++; renderAuditLog(); break;
+    case 'audit-page-dec': auditPage--; renderAuditLog(); break;
+    // Proposals — expand/collapse + actions
+    case 'toggle-proposal-detail': {
+      const detail = document.getElementById(el.getAttribute('data-target'));
+      if(detail) detail.style.display = (detail.style.display === 'none' ? 'table-row' : 'none');
+      break;
+    }
+    case 'approve-proposal':
+      e.stopPropagation();
+      approveProposal(el.getAttribute('data-hash'));
+      break;
+    case 'reject-proposal':
+      e.stopPropagation();
+      rejectProposal(el.getAttribute('data-hash'));
+      break;
+    // Blacklist / whitelist
+    case 'add-blacklist': addToBlacklist(); break;
+    case 'remove-blacklist': removeFromBlacklist(el.getAttribute('data-hash')); break;
+    case 'add-whitelist': addToWhitelist(); break;
+    case 'remove-whitelist': removeFromWhitelist(el.getAttribute('data-name')); break;
+    // Client-key tier
+    case 'update-tier': updateTier(el.getAttribute('data-client-id')); break;
+  }
+});
 
 // Tabs
 document.getElementById('tabs').addEventListener('click',e=>{
@@ -399,11 +452,11 @@ function renderRules(){
     });
     html+='</table>';
     html+='<div class="pagination">';
-    html+='<button onclick="rulesPage=0;renderRules()" '+(rulesPage===0?'disabled':'')+'>First</button>';
-    html+='<button onclick="rulesPage--;renderRules()" '+(rulesPage===0?'disabled':'')+'>Prev</button>';
+    html+='<button data-action="rules-page" data-page="0" '+(rulesPage===0?'disabled':'')+'>First</button>';
+    html+='<button data-action="rules-page-dec" '+(rulesPage===0?'disabled':'')+'>Prev</button>';
     html+='<span>Page '+(rulesPage+1)+' of '+Math.max(1,pages)+'</span>';
-    html+='<button onclick="rulesPage++;renderRules()" '+(rulesPage>=pages-1?'disabled':'')+'>Next</button>';
-    html+='<button onclick="rulesPage='+(pages-1)+';renderRules()" '+(rulesPage>=pages-1?'disabled':'')+'>Last</button>';
+    html+='<button data-action="rules-page-inc" '+(rulesPage>=pages-1?'disabled':'')+'>Next</button>';
+    html+='<button data-action="rules-page" data-page="'+(pages-1)+'" '+(rulesPage>=pages-1?'disabled':'')+'>Last</button>';
     html+='</div></div>';
     $('content').innerHTML=html;
   });
@@ -445,11 +498,11 @@ function renderThreats(){
       });
       html+='</table>';
       html+='<div class="pagination">';
-      html+='<button onclick="threatsPage=1;renderThreats()" '+(meta.page<=1?'disabled':'')+'>First</button>';
-      html+='<button onclick="threatsPage--;renderThreats()" '+(meta.page<=1?'disabled':'')+'>Prev</button>';
+      html+='<button data-action="threats-page" data-page="1" '+(meta.page<=1?'disabled':'')+'>First</button>';
+      html+='<button data-action="threats-page-dec" '+(meta.page<=1?'disabled':'')+'>Prev</button>';
       html+='<span>Page '+meta.page+' of '+meta.pages+'</span>';
-      html+='<button onclick="threatsPage++;renderThreats()" '+(meta.page>=meta.pages?'disabled':'')+'>Next</button>';
-      html+='<button onclick="threatsPage='+meta.pages+';renderThreats()" '+(meta.page>=meta.pages?'disabled':'')+'>Last</button>';
+      html+='<button data-action="threats-page-inc" '+(meta.page>=meta.pages?'disabled':'')+'>Next</button>';
+      html+='<button data-action="threats-page" data-page="'+meta.pages+'" '+(meta.page>=meta.pages?'disabled':'')+'>Last</button>';
       html+='</div>';
     }
     html+='</div>';
@@ -469,14 +522,14 @@ function renderProposals(){
       proposals.forEach(function(p,idx){
         const status=p.status||p.llm_verdict||'pending';
         const cls=status==='approved'?'low':status==='rejected'?'critical':'medium';
-        html+='<tr style="cursor:pointer" onclick="var el=document.getElementById(\\'proposal-detail-'+idx+'\\');el.style.display=el.style.display===\\'none\\'?\\'table-row\\':\\'none\\'">';
+        html+='<tr style="cursor:pointer" data-action="toggle-proposal-detail" data-target="proposal-detail-'+idx+'">';
         html+='<td title="'+h(p.pattern_hash)+'">'+h((p.pattern_hash||'').slice(0,16))+'...</td>';
         html+='<td>'+badge(status,cls)+'</td>';
         html+='<td>'+num(p.confirmation_count||0)+'</td>';
         html+='<td>'+(p.llm_verdict?badge(p.llm_verdict,p.llm_verdict==='approve'?'low':'critical'):'<span style="color:var(--dim)">pending</span>')+'</td>';
         html+='<td>'+timeAgo(p.created_at)+'</td>';
-        html+='<td><button style="padding:4px 10px;background:var(--green);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;margin-right:4px" onclick="event.stopPropagation();approveProposal(\\''+h(p.pattern_hash)+'\\')">Approve</button>';
-        html+='<button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="event.stopPropagation();rejectProposal(\\''+h(p.pattern_hash)+'\\')">Reject</button></td>';
+        html+='<td><button style="padding:4px 10px;background:var(--green);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;margin-right:4px" data-action="approve-proposal" data-hash="'+h(p.pattern_hash)+'">Approve</button>';
+        html+='<button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" data-action="reject-proposal" data-hash="'+h(p.pattern_hash)+'">Reject</button></td>';
         html+='</tr>';
         html+='<tr id="proposal-detail-'+idx+'" style="display:none"><td colspan="6"><pre style="background:var(--bg);padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;white-space:pre-wrap;max-height:300px;overflow-y:auto">'+h(p.rule_content||p.ruleContent||p.pattern||'No rule content available')+'</pre></td></tr>';
       });
@@ -530,7 +583,7 @@ function renderBlacklist(){
     html+='<div style="padding:16px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
     html+='<input type="text" id="blSkillName" placeholder="Skill name" style="padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;flex:1;min-width:160px"/>';
     html+='<input type="text" id="blReason" placeholder="Reason" style="padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;flex:1;min-width:160px"/>';
-    html+='<button onclick="addToBlacklist()" style="padding:6px 14px;background:var(--red);color:var(--bg);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Block</button>';
+    html+='<button data-action="add-blacklist" style="padding:6px 14px;background:var(--red);color:var(--bg);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Block</button>';
     html+='</div>';
     if(!list.length){html+='<div class="empty">No blacklisted skills yet. Skills are blacklisted when 3+ distinct clients report avg risk >= 70.</div>';}
     else{
@@ -542,7 +595,7 @@ function renderBlacklist(){
         html+='<td>'+num(s.reportCount)+'</td>';
         html+='<td>'+timeAgo(s.firstReported)+'</td>';
         html+='<td>'+timeAgo(s.lastReported)+'</td>';
-        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="removeFromBlacklist(\\''+h(s.skillHash||s.skill_hash||'')+'\\')">&times; Remove</button></td></tr>';
+        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" data-action="remove-blacklist" data-hash="'+h(s.skillHash||s.skill_hash||'')+'">&times; Remove</button></td></tr>';
       });
       html+='</table>';
     }
@@ -595,7 +648,7 @@ function renderFeeds(){
     html+='<div class="table-wrap"><div class="table-header"><h2>Community Skill Whitelist ('+whiteList.length+')</h2></div>';
     html+='<div style="padding:16px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
     html+='<input type="text" id="wlSkillName" placeholder="Skill name to whitelist" style="padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;flex:1;min-width:200px"/>';
-    html+='<button onclick="addToWhitelist()" style="padding:6px 14px;background:var(--green);color:var(--bg);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Add</button>';
+    html+='<button data-action="add-whitelist" style="padding:6px 14px;background:var(--green);color:var(--bg);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Add</button>';
     html+='</div>';
     if(!whiteList.length){html+='<div class="empty">No whitelisted skills yet.</div>';}
     else{
@@ -605,7 +658,7 @@ function renderFeeds(){
         html+='<tr><td>'+h(sName)+'</td>';
         html+='<td>'+num(s.report_count||s.reportCount||0)+'</td>';
         html+='<td title="'+h(s.fingerprint_hash||'')+'">'+h((s.fingerprint_hash||'-').slice(0,16))+'</td>';
-        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" onclick="removeFromWhitelist(\\''+h(sName)+'\\')">&times; Remove</button></td></tr>';
+        html+='<td><button style="padding:4px 10px;background:var(--red);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600" data-action="remove-whitelist" data-name="'+h(sName)+'">&times; Remove</button></td></tr>';
       });
       html+='</table>';
     }
@@ -648,7 +701,7 @@ function renderClientKeys(){
         });
         html+='</select> ';
         const safeId = encodeURIComponent(r.clientId).replace(/'/g, "%27");
-        html += '<button onclick="updateTier(' + JSON.stringify(safeId) + ')">Save</button>';
+        html += '<button data-action="update-tier" data-client-id="' + h(safeId) + '">Save</button>';
       }
       html+='</td></tr>';
     });
@@ -692,11 +745,11 @@ function renderAuditLog(){
       html+='</table>';
       if(meta.pages>1){
         html+='<div class="pagination">';
-        html+='<button onclick="auditPage=1;renderAuditLog()" '+(meta.page<=1?'disabled':'')+'>First</button>';
-        html+='<button onclick="auditPage--;renderAuditLog()" '+(meta.page<=1?'disabled':'')+'>Prev</button>';
+        html+='<button data-action="audit-page" data-page="1" '+(meta.page<=1?'disabled':'')+'>First</button>';
+        html+='<button data-action="audit-page-dec" '+(meta.page<=1?'disabled':'')+'>Prev</button>';
         html+='<span>Page '+meta.page+' of '+meta.pages+'</span>';
-        html+='<button onclick="auditPage++;renderAuditLog()" '+(meta.page>=meta.pages?'disabled':'')+'>Next</button>';
-        html+='<button onclick="auditPage='+meta.pages+';renderAuditLog()" '+(meta.page>=meta.pages?'disabled':'')+'>Last</button>';
+        html+='<button data-action="audit-page-inc" '+(meta.page>=meta.pages?'disabled':'')+'>Next</button>';
+        html+='<button data-action="audit-page" data-page="'+meta.pages+'" '+(meta.page>=meta.pages?'disabled':'')+'>Last</button>';
         html+='</div>';
       }
     }

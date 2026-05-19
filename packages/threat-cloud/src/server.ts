@@ -86,6 +86,22 @@ if (process.env['SENTRY_DSN']) {
   });
 }
 
+/**
+ * Grace window for vote weight of pre-migration anonymous client keys.
+ *
+ * Migration v15 introduced the trust-tier model and gave all NEW anonymous
+ * keys (`/api/clients/register` without GitHub binding) a vote weight of 0,
+ * which would have stalled every in-flight community proposal at the moment
+ * an operator deployed the upgrade. To smooth the transition, every key
+ * that existed when v15 ran was retagged as `anonymous_legacy` and counts
+ * for 0.25 weight per vote — until this date. After this date, legacy and
+ * new anonymous keys behave identically (weight 0).
+ *
+ * The window is 90 days from the v15 deploy date. After the window ends,
+ * removing this constant entirely is safe — the weight will already be 0.
+ */
+const LEGACY_ANONYMOUS_GRACE_END_ISO = '2026-08-19T00:00:00Z';
+
 /** Structured JSON logger for threat-cloud */
 const log = {
   info: (msg: string, extra?: Record<string, unknown>) => {
@@ -1735,8 +1751,18 @@ export class ThreatCloudServer {
       return;
     }
 
-    const voteWeight =
-      trustTier === 'github_verified' ? 1.0 : trustTier === 'github_new' ? 0.5 : 0.0;
+    // Vote weight by trust tier. anonymous_legacy gets a non-zero weight
+    // during the grace window so pre-migration community votes don't all
+    // stall; after the grace end, it collapses to the same weight as
+    // anonymous (zero). Constant is module-scoped — see top of file.
+    let voteWeight: number;
+    if (trustTier === 'github_verified') voteWeight = 1.0;
+    else if (trustTier === 'github_new') voteWeight = 0.5;
+    else if (trustTier === 'anonymous_legacy') {
+      const now = Date.now();
+      const graceEnd = Date.parse(LEGACY_ANONYMOUS_GRACE_END_ISO);
+      voteWeight = now < graceEnd ? 0.25 : 0.0;
+    } else voteWeight = 0.0;
 
     const { patternHash, ruleContent } = data;
 

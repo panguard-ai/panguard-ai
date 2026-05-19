@@ -31,19 +31,31 @@ function parseArgs(args: string[]): Partial<ServerConfig> {
         config.apiKeys = (args[++i] ?? '').split(',');
         break;
       case '--anthropic-api-key':
+        // Transitional behaviour: previously removed in v15, but that broke
+        // existing systemd / docker-compose units on first restart. Restored
+        // as DEPRECATED for one release. Will be hard-removed after the
+        // grace window (2026-08-19). See MIGRATION_v15.md.
         process.stderr.write(
-          '[REMOVED] --anthropic-api-key CLI flag is no longer accepted.\n' +
-            '  Set the ANTHROPIC_API_KEY environment variable instead.\n'
+          '[DEPRECATION WARNING] --anthropic-api-key CLI flag is deprecated.\n' +
+            '  Set the ANTHROPIC_API_KEY environment variable instead.\n' +
+            '  This flag will be REMOVED after 2026-08-19 because argv is\n' +
+            '  visible in `ps aux` output to any local user.\n'
         );
-        process.exit(1);
+        config.anthropicApiKey = args[++i];
         break;
       case '--admin-api-key':
+        // Same transitional treatment as --anthropic-api-key. Admin keys are
+        // higher-sensitivity, but a hard-removal break in v15 was reported
+        // to cause production restart failures. Soft-deprecate with a louder
+        // banner; hard-remove on 2026-08-19. See MIGRATION_v15.md.
         process.stderr.write(
-          '[REMOVED] --admin-api-key CLI flag is no longer accepted.\n' +
-            '  Set the TC_ADMIN_API_KEY environment variable instead.\n' +
-            '  Passing secrets via CLI flags exposes them in `ps aux` output.\n'
+          '[DEPRECATION WARNING] --admin-api-key CLI flag is deprecated and\n' +
+            '  HIGHLY DANGEROUS — argv is visible to every local user via\n' +
+            '  `ps aux`, and shell history may persist the value. Migrate to\n' +
+            '  the TC_ADMIN_API_KEY environment variable immediately.\n' +
+            '  This flag will be REMOVED after 2026-08-19.\n'
         );
-        process.exit(1);
+        config.adminApiKey = args[++i];
         break;
       case '--help':
         console.log(`

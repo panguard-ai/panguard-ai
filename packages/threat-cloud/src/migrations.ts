@@ -415,11 +415,27 @@ export const migrations: readonly Migration[] = [
         db.exec('ALTER TABLE client_keys ADD COLUMN github_login TEXT');
       }
       if (!ckCols.some((c) => c.name === 'trust_tier')) {
-        // Values: 'anonymous' | 'github_new' | 'github_verified'
-        // - anonymous: no GitHub binding (default for legacy + /api/clients/register)
+        // Values: 'anonymous_legacy' | 'anonymous' | 'github_new' | 'github_verified'
+        // - anonymous_legacy: pre-existing key registered before v15.
+        //   Receives a non-zero vote weight (0.25) during a 90-day grace
+        //   window so ongoing community proposals do not all stall the
+        //   moment the operator deploys the Sybil-defence migration. After
+        //   the grace window ends, anonymous_legacy and anonymous behave
+        //   identically (weight 0). server.ts owns the grace-end date
+        //   constant; see LEGACY_ANONYMOUS_GRACE_END_ISO.
+        // - anonymous: registered after v15 via /api/clients/register
+        //   (no GitHub binding). Vote weight is 0 — these keys cannot
+        //   single-handedly promote a proposal. They CAN still submit;
+        //   GitHub-verified contributors must co-sign for promotion.
         // - github_new: GitHub-verified, < 30 days since registration
         // - github_verified: GitHub-verified, >= 30 days since registration
+        //
+        // The DEFAULT below applies to NEW rows inserted after migration.
+        // The follow-up UPDATE retroactively tags every pre-existing row
+        // as 'anonymous_legacy' so the grace window only ever benefits
+        // keys that pre-date the trust model — never future attackers.
         db.exec("ALTER TABLE client_keys ADD COLUMN trust_tier TEXT NOT NULL DEFAULT 'anonymous'");
+        db.exec("UPDATE client_keys SET trust_tier = 'anonymous_legacy'");
       }
       db.exec(
         `CREATE INDEX IF NOT EXISTS idx_client_keys_github_user ON client_keys(github_user_id)`

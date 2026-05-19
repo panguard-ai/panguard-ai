@@ -2410,7 +2410,7 @@ export class ThreatCloudDB {
   getClientKeyTrustInfo(rawKey: string): {
     clientId: string;
     githubUserId: number | null;
-    trustTier: 'anonymous' | 'github_new' | 'github_verified';
+    trustTier: 'anonymous' | 'anonymous_legacy' | 'github_new' | 'github_verified';
   } | null {
     const hash = createHash('sha256').update(rawKey).digest('hex');
     const row = this.db
@@ -2425,13 +2425,15 @@ export class ThreatCloudDB {
       | { clientId: string; githubUserId: number | null; trustTier: string }
       | undefined;
     if (!row) return null;
+    const validTiers = ['anonymous', 'anonymous_legacy', 'github_new', 'github_verified'] as const;
+    type ValidTier = (typeof validTiers)[number];
+    const tier: ValidTier = (validTiers as readonly string[]).includes(row.trustTier)
+      ? (row.trustTier as ValidTier)
+      : 'anonymous';
     return {
       clientId: row.clientId,
       githubUserId: row.githubUserId,
-      trustTier:
-        row.trustTier === 'github_verified' || row.trustTier === 'github_new'
-          ? row.trustTier
-          : 'anonymous',
+      trustTier: tier,
     };
   }
 
