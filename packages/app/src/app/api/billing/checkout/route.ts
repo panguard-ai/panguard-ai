@@ -146,19 +146,33 @@ export async function POST(req: NextRequest) {
   }
 
   // 6. Mint the Checkout Session. Metadata is the breadcrumb the webhook
-  //    will use to map `customer.subscription.updated` back to a workspace.
+  //    will use to map `checkout.session.completed` back to a workspace.
+  //
+  // Pilot is a ONE-TIME $25K payment (Founding Customer, first 3 only) —
+  // `mode: 'payment'`. Enterprise placeholder is also one-time for now;
+  // real Enterprise contracts go through DocuSign + wire, not this route.
+  //
+  // `automatic_tax` is on — Stripe Tax was activated with head_office
+  // Delaware + default tax_behavior=exclusive on 2026-05-20. Customer
+  // sees subtotal + tax + total at checkout.
+  //
+  // `billing_address_collection: required` — F500 procurement needs the
+  // billing address for AP processing and W-9 / W-8BEN-E generation.
   try {
     const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
+      mode: 'payment',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${appOrigin}/w/${ws.slug}/settings/billing?success=1`,
+      automatic_tax: { enabled: true },
+      tax_id_collection: { enabled: true },
+      billing_address_collection: 'required',
+      success_url: `${cancelOrigin}/pilot/welcome?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${cancelOrigin}/pricing`,
       client_reference_id: workspace_id,
       metadata: {
         workspace_id,
         tier,
       },
-      subscription_data: {
+      payment_intent_data: {
         metadata: {
           workspace_id,
           tier,

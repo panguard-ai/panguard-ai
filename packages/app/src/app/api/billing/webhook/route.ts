@@ -275,6 +275,34 @@ async function handleCheckoutCompleted(event: Stripe.Event): Promise<HandlerResu
   if (!provision.ok) {
     return { ok: false, error: provision.error };
   }
+
+  // Mark the pilot_intent row as paid so the Founding Customer counter
+  // ticks up. If no intent_id metadata (legacy or non-scoping path)
+  // we silently skip — provisioning already succeeded.
+  const pilotIntentId =
+    typeof session.metadata?.pilot_intent_id === 'string'
+      ? session.metadata.pilot_intent_id
+      : null;
+  if (pilotIntentId) {
+    const admin = createAdminClient();
+    const { error: intentUpdateErr } = await admin
+      .from('pilot_intent')
+      .update({
+        stripe_session_id: session.id,
+        stripe_session_status: 'paid',
+        workspace_id: workspaceId,
+      })
+      .eq('pk', pilotIntentId);
+    if (intentUpdateErr) {
+      // Don't fail the webhook — provisioning succeeded. Log so the
+      // founding-counter mismatch can be reconciled manually.
+      // eslint-disable-next-line no-console
+      console.error(
+        `[billing/webhook] pilot_intent update failed pk=${pilotIntentId} event=${event.id} detail=${intentUpdateErr.message}`
+      );
+    }
+  }
+
   return { ok: true };
 }
 
