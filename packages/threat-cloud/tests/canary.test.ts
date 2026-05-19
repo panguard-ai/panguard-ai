@@ -35,8 +35,8 @@ describe('Canary Staging Layer', () => {
   it('1. confirmed proposals move to canary instead of promoted', () => {
     db.insertATRProposal(makeProposal('hash-canary-1'));
     // Simulate 3 confirmations to reach 'confirmed' status
-    db.confirmATRProposal('hash-canary-1');
-    db.confirmATRProposal('hash-canary-1');
+    db.confirmATRProposalWeighted('hash-canary-1', 1.0);
+    db.confirmATRProposalWeighted('hash-canary-1', 1.0);
     // insertATRProposal starts with confirmations=1, so 2 more confirms = 3 total = confirmed
 
     const moved = db.promoteConfirmedProposals();
@@ -49,8 +49,8 @@ describe('Canary Staging Layer', () => {
 
   it('2. canary proposals are NOT returned by getConfirmedATRRules', () => {
     db.insertATRProposal(makeProposal('hash-canary-2'));
-    db.confirmATRProposal('hash-canary-2');
-    db.confirmATRProposal('hash-canary-2');
+    db.confirmATRProposalWeighted('hash-canary-2', 1.0);
+    db.confirmATRProposalWeighted('hash-canary-2', 1.0);
     db.promoteConfirmedProposals();
 
     const rules = db.getConfirmedATRRules();
@@ -60,8 +60,8 @@ describe('Canary Staging Layer', () => {
 
   it('3. canary proposals have canary_started_at set', () => {
     db.insertATRProposal(makeProposal('hash-canary-3'));
-    db.confirmATRProposal('hash-canary-3');
-    db.confirmATRProposal('hash-canary-3');
+    db.confirmATRProposalWeighted('hash-canary-3', 1.0);
+    db.confirmATRProposalWeighted('hash-canary-3', 1.0);
     db.promoteConfirmedProposals();
 
     const proposals = db.getATRProposals('canary');
@@ -71,8 +71,8 @@ describe('Canary Staging Layer', () => {
 
   it('4. canary rules are returned by getCanaryATRRules', () => {
     db.insertATRProposal(makeProposal('hash-canary-4'));
-    db.confirmATRProposal('hash-canary-4');
-    db.confirmATRProposal('hash-canary-4');
+    db.confirmATRProposalWeighted('hash-canary-4', 1.0);
+    db.confirmATRProposalWeighted('hash-canary-4', 1.0);
     db.promoteConfirmedProposals();
 
     const canaryRules = db.getCanaryATRRules();
@@ -83,8 +83,8 @@ describe('Canary Staging Layer', () => {
 
   it('5. promoteCanaryRules does NOT promote rules before 24hr', () => {
     db.insertATRProposal(makeProposal('hash-canary-5'));
-    db.confirmATRProposal('hash-canary-5');
-    db.confirmATRProposal('hash-canary-5');
+    db.confirmATRProposalWeighted('hash-canary-5', 1.0);
+    db.confirmATRProposalWeighted('hash-canary-5', 1.0);
     db.promoteConfirmedProposals();
 
     // Immediately try to promote — should not promote (< 24hr)
@@ -99,8 +99,8 @@ describe('Canary Staging Layer', () => {
 
   it('6. promoteCanaryRules promotes rules after 24hr with no negative feedback', () => {
     db.insertATRProposal(makeProposal('hash-canary-6'));
-    db.confirmATRProposal('hash-canary-6');
-    db.confirmATRProposal('hash-canary-6');
+    db.confirmATRProposalWeighted('hash-canary-6', 1.0);
+    db.confirmATRProposalWeighted('hash-canary-6', 1.0);
     db.promoteConfirmedProposals();
 
     // Manually backdate canary_started_at to 25 hours ago
@@ -126,8 +126,8 @@ describe('Canary Staging Layer', () => {
 
   it('7. promoteCanaryRules quarantines rules with >= 3 negative feedback', () => {
     db.insertATRProposal(makeProposal('hash-canary-7'));
-    db.confirmATRProposal('hash-canary-7');
-    db.confirmATRProposal('hash-canary-7');
+    db.confirmATRProposalWeighted('hash-canary-7', 1.0);
+    db.confirmATRProposalWeighted('hash-canary-7', 1.0);
     db.promoteConfirmedProposals();
 
     // Submit 3 negative feedback reports — threshold is >= 3
@@ -163,8 +163,8 @@ describe('Canary Staging Layer', () => {
 
   it('10. getProposalStats includes canary and quarantined counts', () => {
     db.insertATRProposal(makeProposal('hash-stats-1'));
-    db.confirmATRProposal('hash-stats-1');
-    db.confirmATRProposal('hash-stats-1');
+    db.confirmATRProposalWeighted('hash-stats-1', 1.0);
+    db.confirmATRProposalWeighted('hash-stats-1', 1.0);
     db.promoteConfirmedProposals(); // -> canary
 
     db.insertATRProposal(makeProposal('hash-stats-2'));
@@ -178,8 +178,8 @@ describe('Canary Staging Layer', () => {
 
   it('11. positive feedback does not trigger quarantine', () => {
     db.insertATRProposal(makeProposal('hash-canary-11'));
-    db.confirmATRProposal('hash-canary-11');
-    db.confirmATRProposal('hash-canary-11');
+    db.confirmATRProposalWeighted('hash-canary-11', 1.0);
+    db.confirmATRProposalWeighted('hash-canary-11', 1.0);
     db.promoteConfirmedProposals();
 
     // Submit 5 positive feedback reports

@@ -549,20 +549,14 @@ export class ThreatCloudDB {
     return this.db.prepare('SELECT * FROM atr_proposals ORDER BY created_at DESC').all();
   }
 
-  /** Increment confirmations for a proposal; auto-confirm at >= 3 / 增加提案確認數 */
-  confirmATRProposal(patternHash: string): void {
-    this.db
-      .prepare(
-        `
-      UPDATE atr_proposals
-      SET confirmations = confirmations + 1,
-          status = CASE WHEN confirmations + 1 >= 3 THEN 'confirmed' ELSE status END,
-          updated_at = datetime('now')
-      WHERE pattern_hash = ?
-    `
-      )
-      .run(patternHash);
-  }
+  // NOTE: The legacy unweighted `confirmATRProposal(patternHash)` method
+  // was removed as part of the Sybil-defence work in migration v15. It
+  // promoted proposals at raw `confirmations >= 3`, which bypassed the
+  // trust-tier weighting entirely. Use `confirmATRProposalWeighted` instead
+  // — it requires a vote `weight` (0.0 for anonymous, 0.5 for github_new,
+  // 1.0 for github_verified) and promotes only when cumulative
+  // `confirmation_weight >= 3.0`. Keeping the old method live would let any
+  // future call site (intentional or accidental) bypass the Sybil gate.
 
   /** Update LLM review verdict for a proposal / 更新 LLM 審查結果 */
   updateATRProposalLLMReview(patternHash: string, verdict: string): void {
