@@ -32,7 +32,6 @@ overrides:
   hono@<4.12.14: '>=4.12.14'
   fontkit: '>=2.0.4'
   pdfkit: '>=0.18.0'
-  agent-threat-rules: link:../agent-threat-rules
 
 importers:
 
@@ -97,8 +96,8 @@ importers:
         specifier: 2.45.6
         version: 2.45.6
       agent-threat-rules:
-        specifier: link:../../../agent-threat-rules
-        version: link:../../../agent-threat-rules
+        specifier: ^2.1.1
+        version: 2.2.1(zod@3.25.76)
       jose:
         specifier: ^5.9.0
         version: 5.10.0
@@ -170,8 +169,8 @@ importers:
   packages/atr:
     dependencies:
       agent-threat-rules:
-        specifier: link:../../../agent-threat-rules
-        version: link:../../../agent-threat-rules
+        specifier: ^2.1.1
+        version: 2.2.1(zod@3.25.76)
     devDependencies:
       '@types/node':
         specifier: ^22.14.0
@@ -214,8 +213,8 @@ importers:
   packages/migrator-community:
     dependencies:
       agent-threat-rules:
-        specifier: link:../../../agent-threat-rules
-        version: link:../../../agent-threat-rules
+        specifier: ^2.1.1
+        version: 2.2.1(zod@3.25.76)
       commander:
         specifier: ^12.1.0
         version: 12.1.0
@@ -301,8 +300,8 @@ importers:
         specifier: workspace:*
         version: link:../threat-cloud
       agent-threat-rules:
-        specifier: link:../../../agent-threat-rules
-        version: link:../../../agent-threat-rules
+        specifier: ^2.1.1
+        version: 2.2.1(zod@3.25.76)
 
   packages/panguard-chat:
     dependencies:
@@ -347,8 +346,8 @@ importers:
         specifier: workspace:*
         version: link:../../security-hardening
       agent-threat-rules:
-        specifier: link:../../../agent-threat-rules
-        version: link:../../../agent-threat-rules
+        specifier: ^2.1.1
+        version: 2.2.1(zod@3.25.76)
       jose:
         specifier: ^5.9.0
         version: 5.10.0
@@ -437,8 +436,8 @@ importers:
         specifier: workspace:*
         version: link:../atr
       agent-threat-rules:
-        specifier: link:../../../agent-threat-rules
-        version: link:../../../agent-threat-rules
+        specifier: ^2.1.1
+        version: 2.2.1(zod@3.25.76)
 
   packages/panguard-report:
     dependencies:
@@ -499,8 +498,8 @@ importers:
         specifier: workspace:*
         version: link:../scan-core
       agent-threat-rules:
-        specifier: link:../../../agent-threat-rules
-        version: link:../../../agent-threat-rules
+        specifier: ^2.1.1
+        version: 2.2.1(zod@3.25.76)
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -2663,6 +2662,11 @@ packages:
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
+
+  agent-threat-rules@2.2.1:
+    resolution: {integrity: sha512-y3cTNq8bX2uADAzDXgUwrrijDW5EJQp9Flf1vxZ/wvWnkhjn+G/LTjJyUmcS5oJMh7VdovzP6YefBiJA6H4VHg==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
 
   ajv-formats@2.1.1:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
@@ -7506,6 +7510,15 @@ snapshots:
       - supports-color
 
   agent-base@7.1.4: {}
+
+  agent-threat-rules@2.2.1(zod@3.25.76):
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
+      js-yaml: 4.1.1
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - supports-color
+      - zod
 
   ajv-formats@2.1.1(ajv@8.18.0):
     optionalDependencies:
