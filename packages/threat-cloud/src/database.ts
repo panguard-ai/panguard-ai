@@ -2312,6 +2312,193 @@ export class ThreatCloudDB {
   }
 
   /**
+   * Register (or reuse) a client key tied to a verified GitHub identity.
+   *
+   * Used by `POST /api/clients/register-github` after the server has
+   * confirmed the GitHub access token by calling `GET /user` on the
+   * GitHub REST API. The `githubUserId` is GitHub's stable numeric ID
+   * (NOT the login string — logins can be renamed).
+   *
+   * Idempotency: a `githubUserId` already mapped to an active key reuses
+   * the existing `client_id` (so trust_tier age computations remain
+   * stable across token rotations) but issues a fresh `client_key`.
+   *
+   * Trust tier:
+   *   - 'github_new' on first registration
+   *   - 'github_verified' is set later by maturation logic, NOT here
+   *     (see promoteGitHubClientTrust below)
+   */
+  registerGitHubClientKey(
+    githubUserId: number,
+    githubLogin: string,
+    ipAddress: string | null
+  ): { clientKey: string; clientId: string; trustTier: 'github_new' | 'github_verified' } {
+    // Reuse existing client_id for this github user if present, so trust
+    // tier maturation reflects the original registration date rather than
+    // every fresh key issuance.
+    const existing = this.db
+      .prepare(
+        `SELECT client_id, trust_tier
+         FROM client_keys
+         WHERE github_user_id = ? AND revoked = 0
+         ORDER BY created_at ASC
+         LIMIT 1`
+      )
+      .get(githubUserId) as { client_id: string; trust_tier: string } | undefined;
+
+    const clientId = existing?.client_id ?? `github:${githubUserId}`;
+    const trustTier =
+      (existing?.trust_tier === 'github_verified' ? 'github_verified' : 'github_new') as
+        | 'github_new'
+        | 'github_verified';
+
+    // Limit to 5 active keys per github user to prevent DB flooding
+    const activeCount = this.db
+      .prepare(
+        'SELECT COUNT(*) as cnt FROM client_keys WHERE github_user_id = ? AND revoked = 0'
+      )
+      .get(githubUserId) as { cnt: number };
+    if (activeCount.cnt >= 5) {
+      this.db
+        .prepare(
+          `UPDATE client_keys SET revoked = 1, revoked_at = datetime('now')
+           WHERE id = (
+             SELECT id FROM client_keys
+             WHERE github_user_id = ? AND revoked = 0
+             ORDER BY created_at ASC
+             LIMIT 1
+           )`
+        )
+        .run(githubUserId);
+    }
+
+    const clientKey = randomUUID();
+    const hash = createHash('sha256').update(clientKey).digest('hex');
+    this.db
+      .prepare(
+        `INSERT INTO client_keys
+         (client_id, client_key_hash, ip_address, github_user_id, github_login, trust_tier)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+      .run(clientId, hash, ipAddress, githubUserId, githubLogin, trustTier);
+
+    return { clientKey, clientId, trustTier };
+  }
+
+  /**
+   * Promote a GitHub-bound client key from 'github_new' to 'github_verified'
+   * once 30 days have elapsed since the earliest registration for that
+   * github user. Called from a periodic job, NOT from request paths
+   * (avoid extra writes per request).
+   *
+   * Returns the number of github users whose trust tier was promoted.
+   */
+  promoteMatureGitHubClients(): number {
+    const result = this.db
+      .prepare(
+        `UPDATE client_keys
+         SET trust_tier = 'github_verified'
+         WHERE trust_tier = 'github_new'
+           AND github_user_id IS NOT NULL
+           AND (
+             SELECT MIN(created_at) FROM client_keys ck2
+             WHERE ck2.github_user_id = client_keys.github_user_id
+           ) <= datetime('now', '-30 days')`
+      )
+      .run();
+    return result.changes;
+  }
+
+  /**
+   * Extended client-key info including trust tier + github identity.
+   * Used by handlePostATRProposal to compute confirmation vote weight.
+   */
+  getClientKeyTrustInfo(rawKey: string): {
+    clientId: string;
+    githubUserId: number | null;
+    trustTier: 'anonymous' | 'github_new' | 'github_verified';
+  } | null {
+    const hash = createHash('sha256').update(rawKey).digest('hex');
+    const row = this.db
+      .prepare(
+        `SELECT client_id as clientId,
+                github_user_id as githubUserId,
+                COALESCE(trust_tier, 'anonymous') as trustTier
+         FROM client_keys
+         WHERE client_key_hash = ? AND revoked = 0`
+      )
+      .get(hash) as
+      | { clientId: string; githubUserId: number | null; trustTier: string }
+      | undefined;
+    if (!row) return null;
+    return {
+      clientId: row.clientId,
+      githubUserId: row.githubUserId,
+      trustTier:
+        row.trustTier === 'github_verified' || row.trustTier === 'github_new'
+          ? row.trustTier
+          : 'anonymous',
+    };
+  }
+
+  /**
+   * Increment confirmation_weight on a proposal and auto-promote to
+   * 'confirmed' status when the cumulative weight reaches 3.0. Replaces
+   * the integer-count `confirmATRProposal` for vote handling.
+   *
+   * @param patternHash proposal identifier
+   * @param weight contribution of this vote (anonymous=0, github_new=0.5, github_verified=1.0)
+   * @returns the new cumulative confirmation_weight after the update
+   */
+  confirmATRProposalWeighted(patternHash: string, weight: number): number {
+    // Single round-trip: update + select via RETURNING.
+    const row = this.db
+      .prepare(
+        `UPDATE atr_proposals
+         SET confirmation_weight = confirmation_weight + ?,
+             confirmations = confirmations + 1,
+             status = CASE
+               WHEN confirmation_weight + ? >= 3.0 THEN 'confirmed'
+               ELSE status
+             END,
+             updated_at = datetime('now')
+         WHERE pattern_hash = ?
+         RETURNING confirmation_weight`
+      )
+      .get(weight, weight, patternHash) as { confirmation_weight: number } | undefined;
+    return row?.confirmation_weight ?? 0;
+  }
+
+  /**
+   * Check whether the given GitHub user has already submitted the daily
+   * cap of proposals (default 10). Returns true if the user is at-or-over
+   * the cap; the caller should reject the submission in that case.
+   */
+  hasGitHubProposalCapReached(githubUserId: number, dailyCap = 10): boolean {
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD UTC
+    const row = this.db
+      .prepare(
+        `SELECT count FROM github_proposal_submissions
+         WHERE github_user_id = ? AND submission_date = ?`
+      )
+      .get(githubUserId, today) as { count: number } | undefined;
+    return (row?.count ?? 0) >= dailyCap;
+  }
+
+  /** Record one proposal submission against the github user's daily cap. */
+  recordGitHubProposalSubmission(githubUserId: number): void {
+    const today = new Date().toISOString().slice(0, 10);
+    this.db
+      .prepare(
+        `INSERT INTO github_proposal_submissions (github_user_id, submission_date, count)
+         VALUES (?, ?, 1)
+         ON CONFLICT(github_user_id, submission_date)
+         DO UPDATE SET count = count + 1, updated_at = datetime('now')`
+      )
+      .run(githubUserId, today);
+  }
+
+  /**
    * Issue a partner key. Partner keys are manually issued by admin and can
    * access L5 live-sync endpoints (e.g. /api/atr-rules/live). Returns the
    * raw key once — caller must store it securely.

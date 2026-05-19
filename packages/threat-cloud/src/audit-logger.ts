@@ -23,6 +23,7 @@ export type AuditAction =
   | 'scan_event.submit'
   | 'admin.login'
   | 'client_key.register'
+  | 'client_key.register_github'
   | 'client_key.revoke'
   | 'client_key.tier_update'
   | 'partner_key.issue';

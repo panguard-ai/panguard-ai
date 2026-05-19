@@ -313,7 +313,13 @@ export class ThreatCloudServer {
     // Public endpoints that don't require API key authentication.
     // Read-only data endpoints are public. Write endpoints require auth.
     // GET /api/rules is public so Guard can pull open-source ATR rules without a key.
-    const publicPaths = new Set(['/health', '/api/stats', '/api/metrics', '/api/clients/register']);
+    const publicPaths = new Set([
+      '/health',
+      '/api/stats',
+      '/api/metrics',
+      '/api/clients/register',
+      '/api/clients/register-github',
+    ]);
     const isPublicRead =
       publicPaths.has(pathname) || (pathname === '/api/rules' && req.method === 'GET');
     // Track the role that authenticated this request so route handlers can
@@ -611,6 +617,14 @@ export class ThreatCloudServer {
         case '/api/clients/register':
           if (req.method === 'POST') {
             await this.handleClientRegister(req, res, clientIP);
+          } else {
+            this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+          }
+          break;
+
+        case '/api/clients/register-github':
+          if (req.method === 'POST') {
+            await this.handleClientRegisterGitHub(req, res, clientIP);
           } else {
             this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
           }
@@ -1680,12 +1694,49 @@ export class ThreatCloudServer {
     });
   }
 
-  /** POST /api/atr-proposals - Submit or confirm an ATR rule proposal */
+  /**
+   * POST /api/atr-proposals - Submit or confirm an ATR rule proposal.
+   *
+   * Vote weighting (defends the corpus against Sybil promotion attacks):
+   *   - anonymous client (legacy /api/clients/register)   → weight 0.0
+   *   - github_new (< 30 days since OAuth registration)   → weight 0.5
+   *   - github_verified (>= 30 days)                       → weight 1.0
+   *
+   * Promotion threshold: cumulative `confirmation_weight >= 3.0`. Anonymous
+   * submissions are still accepted (the corpus stays community-friendly) but
+   * they cannot single-handedly promote a proposal.
+   *
+   * GitHub-bound clients additionally face a per-user daily submission cap
+   * (default 10) so a single compromised contributor account cannot flood
+   * the queue.
+   */
   private async handlePostATRProposal(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const data = await this.parseAndValidate(req, res, ATRProposalSchema);
     if (!data) return;
 
     const clientId = (req.headers['x-panguard-client-id'] as string) ?? undefined;
+
+    // Look up the caller's trust tier from the client key (if any). The
+    // bearer token is already authenticated upstream — we only need its
+    // trust attributes here.
+    const rawKey = this.extractClientKey(req);
+    const trustInfo = rawKey ? this.db.getClientKeyTrustInfo(rawKey) : null;
+    const trustTier = trustInfo?.trustTier ?? 'anonymous';
+    const githubUserId = trustInfo?.githubUserId ?? null;
+
+    // Per-github-user daily submission cap. Skipped for anonymous keys
+    // (those already contribute weight 0 so flooding is less attractive
+    // but still useful to prevent corpus inflation).
+    if (githubUserId !== null && this.db.hasGitHubProposalCapReached(githubUserId)) {
+      this.sendJson(res, 429, {
+        ok: false,
+        error: 'Daily proposal submission cap reached for this GitHub user',
+      });
+      return;
+    }
+
+    const voteWeight =
+      trustTier === 'github_verified' ? 1.0 : trustTier === 'github_new' ? 0.5 : 0.0;
 
     const { patternHash, ruleContent } = data;
 
@@ -1701,16 +1752,31 @@ export class ThreatCloudServer {
             message: 'Already submitted',
             patternHash,
             confirmations: existing.confirmations,
+            trustTier,
+            voteWeight,
           },
         });
         return;
       }
-      // Different client_id: increment confirmation counter
-      this.db.confirmATRProposal(patternHash);
-      const updatedConfirmations = existing.confirmations + 1;
+      // Different client_id: confirm with weight derived from trust tier.
+      // Anonymous confirmations still increment the raw `confirmations`
+      // counter for visibility but contribute 0 to `confirmation_weight`
+      // so they cannot reach the promotion threshold on their own.
+      const newWeight = this.db.confirmATRProposalWeighted(patternHash, voteWeight);
+      if (githubUserId !== null) this.db.recordGitHubProposalSubmission(githubUserId);
       this.sendJson(res, 200, {
         ok: true,
-        data: { message: 'Proposal confirmed', patternHash, confirmations: updatedConfirmations },
+        data: {
+          message:
+            trustTier === 'anonymous'
+              ? 'Proposal acknowledged (anonymous vote — weight 0, will not promote)'
+              : 'Proposal confirmed',
+          patternHash,
+          confirmations: existing.confirmations + 1,
+          confirmationWeight: newWeight,
+          trustTier,
+          voteWeight,
+        },
       });
     } else {
       const proposal = {
@@ -1718,6 +1784,7 @@ export class ThreatCloudServer {
         clientId,
       } as unknown as ATRProposal;
       this.db.insertATRProposal(proposal);
+      if (githubUserId !== null) this.db.recordGitHubProposalSubmission(githubUserId);
 
       // Fire-and-forget LLM review on first submission only
       if (this.llmReviewer?.isAvailable()) {
@@ -1728,9 +1795,25 @@ export class ThreatCloudServer {
 
       this.sendJson(res, 201, {
         ok: true,
-        data: { message: 'Proposal submitted', patternHash },
+        data: {
+          message: 'Proposal submitted',
+          patternHash,
+          trustTier,
+          voteWeight,
+        },
       });
     }
+  }
+
+  /**
+   * Extract the raw client key from the Authorization header. Returns null
+   * when no bearer token is present.
+   */
+  private extractClientKey(req: IncomingMessage): string | null {
+    const auth = req.headers['authorization'];
+    if (typeof auth !== 'string') return null;
+    const match = auth.match(/^Bearer\s+(\S+)\s*$/i);
+    return match?.[1] ?? null;
   }
 
   /** POST /api/atr-feedback - Submit feedback on an ATR rule */
@@ -1840,6 +1923,142 @@ export class ThreatCloudServer {
     );
 
     this.sendJson(res, 201, { ok: true, data: { clientKey: result.clientKey } });
+  }
+
+  /**
+   * POST /api/clients/register-github — issue a client key bound to a verified
+   * GitHub identity. Used to defend the ATR proposal corpus against Sybil
+   * attacks via anonymous registration spam.
+   *
+   * Flow:
+   *   1. Client sends `{ githubToken: "ghp_..." | "gho_..." }` in body
+   *   2. Server calls GitHub API `GET /user` with that token to verify
+   *   3. On success, issues a client key tied to the numeric GitHub user ID
+   *
+   * The github_user_id is GitHub's stable numeric identifier — `login` can be
+   * renamed, so we key trust off the ID. Trust tier starts at 'github_new'
+   * and matures to 'github_verified' 30 days after first registration (see
+   * promoteMatureGitHubClients).
+   *
+   * Vote weighting at ATR proposal time:
+   *   - anonymous (legacy /api/clients/register key)  → 0   (can submit, can't promote)
+   *   - github_new (< 30 days)                         → 0.5
+   *   - github_verified (>= 30 days)                   → 1.0
+   * Promotion threshold: cumulative weight >= 3.0
+   */
+  private async handleClientRegisterGitHub(
+    req: IncomingMessage,
+    res: ServerResponse,
+    clientIP: string
+  ): Promise<void> {
+    // Reuse the same per-IP registration rate limit as the anonymous endpoint
+    // to avoid Sybil registration via rotated tokens from a single IP.
+    const entry = this.registrationRateLimits.get(clientIP);
+    const now = Date.now();
+    if (entry && now < entry.resetAt) {
+      if (entry.count >= 10) {
+        this.sendJson(res, 429, {
+          ok: false,
+          error: 'Registration rate limit exceeded. Try again later.',
+        });
+        return;
+      }
+      entry.count++;
+    } else {
+      this.registrationRateLimits.set(clientIP, { count: 1, resetAt: now + 3_600_000 });
+    }
+
+    const body = await this.readBody(req);
+    if (!body) {
+      this.sendJson(res, 400, { ok: false, error: 'Request body required' });
+      return;
+    }
+    let parsed: { githubToken?: string };
+    try {
+      parsed = JSON.parse(body);
+    } catch {
+      this.sendJson(res, 400, { ok: false, error: 'Invalid JSON' });
+      return;
+    }
+    const githubToken = parsed.githubToken;
+    if (
+      !githubToken ||
+      typeof githubToken !== 'string' ||
+      githubToken.length < 20 ||
+      githubToken.length > 300
+    ) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'githubToken must be a GitHub access token (20-300 chars)',
+      });
+      return;
+    }
+
+    // Verify the token by calling GitHub's /user endpoint. Use a short
+    // timeout so a slow/unreachable GitHub does not pin a TC connection.
+    let githubUser: { id: number; login: string } | null = null;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5_000);
+      const ghRes = await fetch('https://api.github.com/user', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${githubToken}`,
+          Accept: 'application/vnd.github+json',
+          'User-Agent': 'panguard-threat-cloud',
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (!ghRes.ok) {
+        this.sendJson(res, 401, {
+          ok: false,
+          error: `GitHub token rejected (HTTP ${ghRes.status})`,
+        });
+        return;
+      }
+      const data = (await ghRes.json()) as { id?: number; login?: string };
+      if (
+        typeof data.id !== 'number' ||
+        typeof data.login !== 'string' ||
+        data.login.length === 0
+      ) {
+        this.sendJson(res, 502, {
+          ok: false,
+          error: 'GitHub /user response missing required fields',
+        });
+        return;
+      }
+      githubUser = { id: data.id, login: data.login };
+    } catch (err) {
+      log.error(`GitHub token verification failed`, err);
+      this.sendJson(res, 502, {
+        ok: false,
+        error: 'Failed to verify GitHub token (timeout or upstream error)',
+      });
+      return;
+    }
+
+    const result = this.db.registerGitHubClientKey(githubUser.id, githubUser.login, clientIP);
+
+    this.db.audit.logAction(
+      'system',
+      'client_key.register_github',
+      'client_key',
+      result.clientId,
+      { ip: clientIP, github_user_id: githubUser.id, github_login: githubUser.login },
+      clientIP
+    );
+
+    this.sendJson(res, 201, {
+      ok: true,
+      data: {
+        clientKey: result.clientKey,
+        clientId: result.clientId,
+        trustTier: result.trustTier,
+        githubLogin: githubUser.login,
+      },
+    });
   }
 
   /** POST /api/admin/client-keys/revoke — revoke client keys */
