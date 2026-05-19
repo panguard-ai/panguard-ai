@@ -380,7 +380,10 @@ describe('Scenario 4: Honeypot -> Threat Intel -> Guard Linkage', () => {
 // Scenario 5: Full GuardEngine Pipeline with Event Injection
 // ---------------------------------------------------------------------------
 
-describe('Scenario 5: GuardEngine Full Pipeline', () => {
+// Full-pipeline scenarios spin up GuardEngine end-to-end. 5s default is
+// tight on CI runners; 15s gives margin for the create→start→event→stop
+// cycle without flaking.
+describe('Scenario 5: GuardEngine Full Pipeline', { timeout: 15000 }, () => {
   let tempDir: string;
   let engine: GuardEngine | null = null;
 

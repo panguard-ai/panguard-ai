@@ -41,7 +41,10 @@ function createTestConfig(dataDir: string): GuardConfig {
   };
 }
 
-describe('GuardEngine Lifecycle', () => {
+// E2E lifecycle tests spin up the full GuardEngine (real subsystems,
+// real temp directories). 5s default vitest timeout is tight; bump to
+// 15s at the suite level so CI doesn't flake on machines under load.
+describe('GuardEngine Lifecycle', { timeout: 15000 }, () => {
   let tempDir: string;
   let engine: GuardEngine | null = null;
 

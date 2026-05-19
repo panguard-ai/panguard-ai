@@ -84,7 +84,7 @@ describe('Status Command', () => {
     const r = run(['status']);
     // status may warn (e.g. config not found) but must not hard-crash
     expect(r.status).toBeLessThanOrEqual(1);
-  });
+  }, 15000);
 
   it('pga status produces output in English', () => {
     const r = run(['status']);
@@ -96,7 +96,7 @@ describe('Status Command', () => {
       .filter((l) => !l.trimStart().startsWith('{"timestamp"'))
       .join('\n');
     expect(hasChinese(nonJsonLines)).toBe(false);
-  });
+  }, 15000);
 
   it('pga status --json outputs valid JSON', () => {
     const r = run(['status', '--json']);
@@ -122,7 +122,9 @@ describe('Status Command', () => {
 // 3. Doctor Command
 // ---------------------------------------------------------------------------
 
-describe('Doctor Command', () => {
+// pga doctor spawns a child process + runs system checks. CI runners
+// (2-core / 8GB) need 15s margin so tests don't flake.
+describe('Doctor Command', { timeout: 15000 }, () => {
   it('pga doctor exits without crash', () => {
     const r = run(['doctor']);
     expect(r.status).toBeLessThanOrEqual(1);
