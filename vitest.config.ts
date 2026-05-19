@@ -5,6 +5,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    // Vitest worker → main IPC timeout. Default 5s is too tight for
+    // 3000+ tests across 167 files; bump to 30s so the root process
+    // doesn't error "Timeout calling onTaskUpdate" after all pass.
+    teardownTimeout: 30000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

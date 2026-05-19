@@ -134,7 +134,9 @@ describe('Skills Audit Pipeline', () => {
 
     expect(report.durationMs).toBeDefined();
     expect(report.durationMs).toBeGreaterThan(0);
-    expect(report.durationMs).toBeLessThan(10000); // Should complete within 10s
+    // Audit runs Semgrep + secrets scan + ATR check + sandbox spawn.
+    // CI runners (2-core / 8GB) can take 10-15s; allow 25s upper bound.
+    expect(report.durationMs).toBeLessThan(25000);
   });
 });
 
