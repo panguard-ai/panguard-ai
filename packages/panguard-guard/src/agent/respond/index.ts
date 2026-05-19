@@ -4,7 +4,13 @@
  */
 
 export type { ActionManifestEntry, EscalationRecord } from './types.js';
-export { SAFETY_RULES } from './safety-rules.js';
+export {
+  SAFETY_RULES,
+  DEFAULT_ENFORCEMENT_POLICY,
+  PERMISSIVE_ENFORCEMENT_POLICY,
+  matchesProcessAllowlist,
+  matchesFilePathAllowlist,
+} from './safety-rules.js';
 export { ActionRateLimiter } from './action-rate-limiter.js';
 export { ActionManifest } from './action-manifest.js';
 export { EscalationTracker } from './escalation-tracker.js';

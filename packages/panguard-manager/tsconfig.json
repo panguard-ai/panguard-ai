@@ -5,10 +5,7 @@
     "outDir": "./dist",
     "composite": true
   },
-  "references": [
-    { "path": "../core" },
-    { "path": "../panguard-guard" }
-  ],
+  "references": [{ "path": "../core" }, { "path": "../panguard-guard" }],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests"]
 }

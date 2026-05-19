@@ -8,10 +8,7 @@
 import { NextResponse } from 'next/server';
 import { getRuleMeta } from '@/lib/atr-rules';
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!/^ATR-\d{4}-\d{5}$/.test(id)) {
     return NextResponse.json(
@@ -21,10 +18,7 @@ export async function GET(
   }
   const meta = await getRuleMeta(id);
   if (!meta) {
-    return NextResponse.json(
-      { error: 'not_found', id },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: 'not_found', id }, { status: 404 });
   }
   return NextResponse.json(meta, {
     headers: {

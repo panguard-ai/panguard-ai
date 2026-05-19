@@ -272,9 +272,7 @@ export function techArticleSchema(opts: {
     ...(opts.dependencies ? { dependencies: opts.dependencies } : {}),
     ...(opts.proficiencyLevel ? { proficiencyLevel: opts.proficiencyLevel } : {}),
     ...(opts.programmingLanguage ? { programmingLanguage: opts.programmingLanguage } : {}),
-    ...(opts.image
-      ? { image: opts.image }
-      : { image: 'https://panguard.ai/og-image.png' }),
+    ...(opts.image ? { image: opts.image } : { image: 'https://panguard.ai/og-image.png' }),
     inLanguage: 'en',
   } as Record<string, unknown>;
 }

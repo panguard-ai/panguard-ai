@@ -91,7 +91,7 @@ export async function initEngines(
   const baseline = loadBaseline(baselinePath);
 
   // Validate license
-  let license = validateLicense(config.licenseKey);
+  let license = await validateLicense(config.licenseKey ?? '');
 
   if (config.cliTier) {
     const cliTierMap: Record<string, LicenseTier> = {
@@ -102,14 +102,21 @@ export async function initEngines(
       enterprise: 'enterprise',
     };
     const mappedTier = cliTierMap[config.cliTier] ?? 'free';
-    const keyTierLevel = { free: 0, pro: 1, enterprise: 2 }[license.tier] ?? 0;
-    const cliTierLevel = { free: 0, pro: 1, enterprise: 2 }[mappedTier] ?? 0;
+    const tierLevels: Record<LicenseTier, number> = {
+      free: 0,
+      community: 0,
+      pro: 1,
+      pilot: 1,
+      enterprise: 2,
+    };
+    const keyTierLevel = tierLevels[license.tier] ?? 0;
+    const cliTierLevel = tierLevels[mappedTier] ?? 0;
 
     if (cliTierLevel > keyTierLevel) {
       license = {
         ...license,
         tier: mappedTier,
-        features: TIER_FEATURES[mappedTier],
+        features: [...TIER_FEATURES[mappedTier]],
         isValid: true,
       };
     }
@@ -137,9 +144,11 @@ export async function initEngines(
   let smartRouter: SmartRouter | null = null;
   let knowledgeDistiller: KnowledgeDistiller | null = null;
   if (analyzeLLM) {
-    const tierToQuota: Record<string, string> = {
+    const tierToQuota: Record<LicenseTier, string> = {
       free: 'free',
+      community: 'free',
       pro: 'pro',
+      pilot: 'pro',
       enterprise: 'business',
     };
     const quotaTier = (tierToQuota[license.tier] ?? 'free') as unknown as QuotaTier;

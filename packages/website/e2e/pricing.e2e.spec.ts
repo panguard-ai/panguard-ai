@@ -19,9 +19,7 @@ const APP_ORIGIN_PATTERN = /https?:\/\/(app\.panguard\.ai|localhost:\d+)/;
 test.describe('Pricing page — three tiers', () => {
   test.beforeEach(async ({ page }) => {
     // Force guest mode by stubbing the cross-origin auth probe.
-    await page.route(/\/api\/me\/session/, (route) =>
-      route.fulfill({ status: 401, body: '' }),
-    );
+    await page.route(/\/api\/me\/session/, (route) => route.fulfill({ status: 401, body: '' }));
     await page.goto('/pricing');
   });
 
@@ -40,18 +38,14 @@ test.describe('Pricing page — three tiers', () => {
   });
 
   test('Community CTA links to install path (GitHub or npm)', async ({ page }) => {
-    const installCta = page
-      .getByRole('link', { name: /Install now/i })
-      .first();
+    const installCta = page.getByRole('link', { name: /Install now/i }).first();
     await expect(installCta).toBeVisible();
     const href = await installCta.getAttribute('href');
     expect(href).toMatch(/github\.com|npmjs\.com/);
   });
 
   test('Enterprise CTA links to /contact?tier=enterprise', async ({ page }) => {
-    const enterpriseCta = page
-      .locator('a[href*="/contact?tier=enterprise"]')
-      .first();
+    const enterpriseCta = page.locator('a[href*="/contact?tier=enterprise"]').first();
     await expect(enterpriseCta).toBeVisible();
   });
 
@@ -75,7 +69,7 @@ test.describe('Pricing page — three tiers', () => {
         /\/login\?/.test(req.url()) &&
         req.url().includes('intent=pilot') &&
         req.url().includes('next='),
-      { timeout: 8_000 },
+      { timeout: 8_000 }
     );
 
     await pilotBtn.click();

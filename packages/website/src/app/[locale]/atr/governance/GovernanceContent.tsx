@@ -92,10 +92,14 @@ export default function GovernanceContent() {
       </header>
 
       <SectionTitle
-        title={isZh ? 'Founding Three TSC（目標：2026 Q3）' : 'Founding Three TSC (Target: Q3 2026)'}
-        subtitle={isZh
-          ? '單一維護者治理是專案目前最大的結構性風險。Founding Three 的設計直接解開 bus-factor=1 並把 ATR 從一個專案轉為標準制定機構。'
-          : 'Single-maintainer governance is the project’s primary structural risk. The Founding Three resolves bus-factor=1 and converts ATR from a project into a standards body.'}
+        title={
+          isZh ? 'Founding Three TSC（目標：2026 Q3）' : 'Founding Three TSC (Target: Q3 2026)'
+        }
+        subtitle={
+          isZh
+            ? '單一維護者治理是專案目前最大的結構性風險。Founding Three 的設計直接解開 bus-factor=1 並把 ATR 從一個專案轉為標準制定機構。'
+            : 'Single-maintainer governance is the project’s primary structural risk. The Founding Three resolves bus-factor=1 and converts ATR from a project into a standards body.'
+        }
       />
 
       <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -132,8 +136,12 @@ export default function GovernanceContent() {
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-4 py-3 font-medium text-slate-600">{isZh ? '決策' : 'Decision'}</th>
-                <th className="px-4 py-3 font-medium text-slate-600">{isZh ? '投票門檻' : 'Vote Threshold'}</th>
+                <th className="px-4 py-3 font-medium text-slate-600">
+                  {isZh ? '決策' : 'Decision'}
+                </th>
+                <th className="px-4 py-3 font-medium text-slate-600">
+                  {isZh ? '投票門檻' : 'Vote Threshold'}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -151,7 +159,9 @@ export default function GovernanceContent() {
       <div className="mt-16">
         <SectionTitle
           title={isZh ? '利益衝突政策' : 'Conflict-of-Interest Policy'}
-          subtitle={isZh ? '所有 TSC 席次與 PR 審閱者均須遵守' : 'Applies to all TSC seats and PR reviewers'}
+          subtitle={
+            isZh ? '所有 TSC 席次與 PR 審閱者均須遵守' : 'Applies to all TSC seats and PR reviewers'
+          }
         />
         <div className="mt-6 space-y-3">
           {COI.map((rule, i) => (
@@ -254,7 +264,9 @@ function StatusPill({ status, isZh }: { status: Seat['status']; isZh: boolean })
         ? 'bg-amber-50 text-amber-700 border-amber-200'
         : 'bg-slate-100 text-slate-700 border-slate-200';
   return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${color}`}>
+    <span
+      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${color}`}
+    >
       {isZh ? labelZh : labelEn}
     </span>
   );
@@ -282,7 +294,12 @@ function ContactRow({
   );
   if (href)
     return (
-      <a href={href} target={href.startsWith('mailto') ? undefined : '_blank'} rel="noreferrer" className="block hover:text-emerald-700">
+      <a
+        href={href}
+        target={href.startsWith('mailto') ? undefined : '_blank'}
+        rel="noreferrer"
+        className="block hover:text-emerald-700"
+      >
         {inner}
       </a>
     );

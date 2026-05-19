@@ -10,8 +10,8 @@ import { platform, homedir } from 'node:os';
 import { appendFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
-import type { ThreatVerdict, ResponseResult } from '../../types.js';
-import { SAFETY_RULES } from './safety-rules.js';
+import type { ThreatVerdict, ResponseResult, EnforcementPolicy } from '../../types.js';
+import { SAFETY_RULES, matchesFilePathAllowlist } from './safety-rules.js';
 import {
   extractIP,
   extractPID,
@@ -60,9 +60,20 @@ export interface BlockIPDeps {
   readonly manifest: ActionManifest;
   readonly escalation: EscalationTracker;
   readonly unblockTimers: Map<string, ReturnType<typeof setTimeout>>;
+  readonly policy: EnforcementPolicy;
 }
 
 export async function blockIP(verdict: ThreatVerdict, deps: BlockIPDeps): Promise<ResponseResult> {
+  // Enforcement-policy gate: IP blocking must be explicitly enabled
+  if (!deps.policy.blockIPs.enabled) {
+    return {
+      action: 'block_ip',
+      success: false,
+      details: 'IP blocking is disabled in enforcementPolicy.blockIPs.enabled',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   const ip = extractIP(verdict);
   if (!ip) {
     return {
@@ -213,10 +224,27 @@ function scheduleUnblock(ip: string, durationMs: number, entryId: string, deps: 
 // Kill Process
 // ---------------------------------------------------------------------------
 
+export interface KillProcessDeps {
+  readonly manifest: ActionManifest;
+  readonly policy: EnforcementPolicy;
+}
+
 export async function killProcess(
   verdict: ThreatVerdict,
-  manifest: ActionManifest
+  deps: KillProcessDeps
 ): Promise<ResponseResult> {
+  const { manifest, policy } = deps;
+
+  // Enforcement-policy gate: process killing must be explicitly enabled
+  if (!policy.killProcesses.enabled) {
+    return {
+      action: 'kill_process',
+      success: false,
+      details: 'Process killing is disabled in enforcementPolicy.killProcesses.enabled',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   const pid = extractPID(verdict);
   if (!pid) {
     return {
@@ -228,6 +256,39 @@ export async function killProcess(
   }
 
   const processName = extractProcessName(verdict);
+
+  // Process-name allowlist: even with enabled=true, only processes matching
+  // the operator's allowlist may be killed. Defence against LLM-driven evidence
+  // claiming an unrelated process (e.g. customer's prod server) is the target.
+  if (processName) {
+    const { matchesProcessAllowlist } = await import('./safety-rules.js');
+    if (!matchesProcessAllowlist(processName, policy.killProcesses.allowedProcessNames)) {
+      logger.warn(
+        `Refusing to kill ${processName} (PID ${pid}): not in enforcementPolicy.killProcesses.allowedProcessNames`
+      );
+      return {
+        action: 'kill_process',
+        success: false,
+        details:
+          `Process "${processName}" is not in killProcesses.allowedProcessNames. ` +
+          `Operators must explicitly allowlist process name patterns.`,
+        timestamp: new Date().toISOString(),
+        target: String(pid),
+      };
+    }
+  } else if (policy.killProcesses.allowedProcessNames.length > 0) {
+    // Allowlist is configured but evidence omits process name — refuse rather than
+    // risk killing an unknown process.
+    logger.warn(`Refusing to kill PID ${pid}: process name unknown, allowlist configured`);
+    return {
+      action: 'kill_process',
+      success: false,
+      details: 'Process name missing from verdict evidence; allowlist is configured',
+      timestamp: new Date().toISOString(),
+      target: String(pid),
+    };
+  }
+
   if (processName && SAFETY_RULES.protectedProcesses.has(processName)) {
     logger.warn(`Refusing to kill protected process: ${processName} (PID ${pid})`);
     return {
@@ -290,10 +351,30 @@ export async function killProcess(
 // Disable Account
 // ---------------------------------------------------------------------------
 
+export interface DisableAccountDeps {
+  readonly manifest: ActionManifest;
+  readonly policy: EnforcementPolicy;
+}
+
 export async function disableAccount(
   verdict: ThreatVerdict,
-  manifest: ActionManifest
+  deps: DisableAccountDeps
 ): Promise<ResponseResult> {
+  const { manifest, policy } = deps;
+
+  // Enforcement-policy gate: account disabling must be explicitly enabled.
+  // Default OFF — too destructive for autonomous response.
+  if (!policy.disableAccounts.enabled) {
+    return {
+      action: 'disable_account',
+      success: false,
+      details:
+        'Account disabling is disabled in enforcementPolicy.disableAccounts.enabled ' +
+        '(default OFF — too destructive for autonomous response)',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   const username = extractUsername(verdict);
   if (!username) {
     return {
@@ -368,43 +449,98 @@ export async function disableAccount(
 // Isolate File
 // ---------------------------------------------------------------------------
 
-/** Directories that are safe targets for file isolation (files within these can be moved) */
-const SAFE_PATHS = ['/tmp', '/var/tmp', '/var/panguard-guard'];
+/**
+ * System-critical paths that must never be touched, regardless of operator
+ * allowlist. Defence-in-depth: even if `enforcementPolicy.isolateFiles.allowedPaths`
+ * is misconfigured to include one of these, the action still refuses.
+ */
+const DENY_PATHS = [
+  '/etc',
+  '/usr',
+  '/bin',
+  '/sbin',
+  '/lib',
+  '/boot',
+  '/System',
+  '/Library',
+  // Credential / config directories under home that must never be quarantined
+];
 
-/** Directories that must never be touched — system-critical paths */
-const DENY_PATHS = ['/etc', '/usr', '/bin', '/sbin', '/lib', '/boot', '/System', '/Library'];
+/** Subdirectories under any user's home that are unconditionally protected. */
+const HOME_DENY_SUFFIXES = [
+  '/.ssh',
+  '/.gnupg',
+  '/.aws',
+  '/.kube',
+  '/.docker',
+  '/.npmrc',
+  '/.pypirc',
+  '/.gitconfig',
+  '/.git-credentials',
+];
 
 /**
  * Check if a file path is safe to isolate.
- * Must be within SAFE_PATHS or user home, and NOT within DENY_PATHS.
+ * Must be within the configured `allowedPaths` allowlist (explicit subdirs,
+ * never `$HOME`-wide), and NOT within DENY_PATHS or credential subdirectories.
  */
-function isPathSafeToIsolate(filePath: string): { safe: boolean; reason?: string } {
+function isPathSafeToIsolate(
+  filePath: string,
+  allowedPaths: ReadonlyArray<string>
+): { safe: boolean; reason?: string } {
   const resolved = resolve(filePath);
+  const home = homedir();
 
-  // Check deny list first
+  // Deny list takes precedence over allowlist (defence-in-depth)
   for (const denied of DENY_PATHS) {
     if (resolved.startsWith(denied + '/') || resolved === denied) {
       return { safe: false, reason: `Path "${resolved}" is in deny list (${denied})` };
     }
   }
-
-  // Check if within safe paths or user home
-  const home = homedir();
-  const allowedRoots = [...SAFE_PATHS, home];
-
-  for (const allowed of allowedRoots) {
-    if (resolved.startsWith(resolve(allowed) + '/')) {
-      return { safe: true };
+  for (const suffix of HOME_DENY_SUFFIXES) {
+    const credentialPath = home + suffix;
+    if (resolved === credentialPath || resolved.startsWith(credentialPath + '/')) {
+      return {
+        safe: false,
+        reason: `Path "${resolved}" is a credential / config file and cannot be quarantined`,
+      };
     }
   }
 
-  return { safe: false, reason: `Path "${resolved}" is not within allowed directories` };
+  // Must be within configured allowlist
+  if (!matchesFilePathAllowlist(resolved, allowedPaths, home)) {
+    return {
+      safe: false,
+      reason:
+        `Path "${resolved}" is not within configured isolateFiles.allowedPaths. ` +
+        `Operators must explicitly opt in to specific subdirectories.`,
+    };
+  }
+
+  return { safe: true };
+}
+
+export interface IsolateFileDeps {
+  readonly manifest: ActionManifest;
+  readonly policy: EnforcementPolicy;
 }
 
 export async function isolateFile(
   verdict: ThreatVerdict,
-  manifest: ActionManifest
+  deps: IsolateFileDeps
 ): Promise<ResponseResult> {
+  const { manifest, policy } = deps;
+
+  // Enforcement-policy gate: isolation must be explicitly enabled
+  if (!policy.isolateFiles.enabled) {
+    return {
+      action: 'isolate_file',
+      success: false,
+      details: 'File isolation is disabled in enforcementPolicy.isolateFiles.enabled',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   const filePath = extractFilePath(verdict);
   if (!filePath) {
     return {
@@ -416,7 +552,7 @@ export async function isolateFile(
   }
 
   // Validate path is safe to isolate
-  const pathCheck = isPathSafeToIsolate(filePath);
+  const pathCheck = isPathSafeToIsolate(filePath, policy.isolateFiles.allowedPaths);
   if (!pathCheck.safe) {
     logger.warn(`Refused to isolate file: ${pathCheck.reason}`);
     return {

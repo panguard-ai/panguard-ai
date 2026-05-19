@@ -23,10 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { RuleDrillDown } from '@/components/events/rule-drill-down';
 import type { EventListRow, Severity } from '@/lib/types';
 import { useEventsChannel } from '@/lib/realtime/use-events-channel';
-import type {
-  ConnectionStatus,
-  RealtimeEvent,
-} from '@/lib/realtime/events-channel';
+import type { ConnectionStatus, RealtimeEvent } from '@/lib/realtime/events-channel';
 
 const severityTone: Record<Severity, 'safe' | 'caution' | 'alert' | 'danger'> = {
   info: 'safe',
@@ -147,8 +144,7 @@ export function EventsLiveStream({ workspaceId, initialEvents }: Props) {
                 // from the events_with_endpoint view. Fall back to '-'.
                 const endpointHostname: string | null =
                   'endpoint_hostname' in row
-                    ? (row as { endpoint_hostname: string | null })
-                        .endpoint_hostname
+                    ? (row as { endpoint_hostname: string | null }).endpoint_hostname
                     : null;
                 return (
                   <tr
@@ -159,9 +155,7 @@ export function EventsLiveStream({ workspaceId, initialEvents }: Props) {
                     }}
                     className={
                       'bg-surface-1 hover:bg-surface-2 transition-colors' +
-                      (isLive
-                        ? ' animate-events-fade-in transition-opacity duration-200'
-                        : '')
+                      (isLive ? ' animate-events-fade-in transition-opacity duration-200' : '')
                     }
                   >
                     <td className="px-4 py-3 text-text-secondary">
@@ -181,9 +175,7 @@ export function EventsLiveStream({ workspaceId, initialEvents }: Props) {
                         <span className="text-text-secondary">-</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-text-primary">
-                      {row.payload_summary ?? ''}
-                    </td>
+                    <td className="px-4 py-3 text-text-primary">{row.payload_summary ?? ''}</td>
                     <td className="px-4 py-3 text-text-secondary font-mono text-xs">
                       {endpointHostname ?? '-'}
                     </td>
@@ -198,16 +190,9 @@ export function EventsLiveStream({ workspaceId, initialEvents }: Props) {
         </div>
       ) : null}
 
-      <ToastStack
-        toasts={toasts}
-        onClick={scrollToEvent}
-        onDismiss={dismissToast}
-      />
+      <ToastStack toasts={toasts} onClick={scrollToEvent} onDismiss={dismissToast} />
 
-      <RuleDrillDown
-        ruleId={activeRuleId}
-        onClose={() => setActiveRuleId(null)}
-      />
+      <RuleDrillDown ruleId={activeRuleId} onClose={() => setActiveRuleId(null)} />
     </>
   );
 }
@@ -246,9 +231,7 @@ function LiveStatusPill({ status }: { status: ConnectionStatus }) {
     >
       <span className={`inline-block h-2 w-2 rounded-full ${meta.dotClass}`} />
       <span>{meta.label}</span>
-      {meta.hint ? (
-        <span className="text-text-muted">· {meta.hint}</span>
-      ) : null}
+      {meta.hint ? <span className="text-text-muted">· {meta.hint}</span> : null}
     </div>
   );
 }
@@ -275,14 +258,10 @@ function ToastStack({ toasts, onClick, onDismiss }: ToastStackProps) {
           }}
           className="flex items-center gap-2 rounded-lg border border-border bg-surface-1 px-4 py-2 text-left text-sm text-text-primary shadow-lg transition hover:bg-surface-2"
         >
-          <span
-            className={`inline-block h-2 w-2 rounded-full ${severityDot[toast.severity]}`}
-          />
+          <span className={`inline-block h-2 w-2 rounded-full ${severityDot[toast.severity]}`} />
           <span className="font-medium">New event detected</span>
           {toast.rule_id ? (
-            <span className="text-text-muted font-mono text-xs">
-              {toast.rule_id}
-            </span>
+            <span className="text-text-muted font-mono text-xs">{toast.rule_id}</span>
           ) : null}
         </button>
       ))}

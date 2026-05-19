@@ -2276,18 +2276,39 @@ export class ThreatCloudDB {
   }
 
   /**
-   * Look up role + clientId for a raw client key. Returns null if invalid/revoked.
-   * Does NOT update last_used_at (caller should use validateClientKey for that).
-   * Used by L5 partner-sync endpoints to enforce role-based access.
+   * Look up role + clientId + tier for a raw client key. Returns null if
+   * invalid/revoked. Does NOT update last_used_at (caller should use
+   * validateClientKey for that). Used by:
+   *   - L5 partner-sync endpoints (role check)
+   *   - per-token rate limiter (tier check)
    */
-  getClientKeyInfo(rawKey: string): { clientId: string; role: string } | null {
+  getClientKeyInfo(rawKey: string): { clientId: string; role: string; tier: string } | null {
     const hash = createHash('sha256').update(rawKey).digest('hex');
     const row = this.db
       .prepare(
-        'SELECT client_id as clientId, COALESCE(key_role, ?) as role FROM client_keys WHERE client_key_hash = ? AND revoked = 0'
+        `SELECT client_id as clientId,
+                COALESCE(key_role, ?) as role,
+                COALESCE(tier, ?) as tier
+         FROM client_keys
+         WHERE client_key_hash = ? AND revoked = 0`
       )
-      .get('guard', hash) as { clientId: string; role: string } | undefined;
+      .get('guard', 'community', hash) as
+      | { clientId: string; role: string; tier: string }
+      | undefined;
     return row ?? null;
+  }
+
+  /**
+   * Admin operation: change the workspace tier for every active key
+   * belonging to a clientId. Returns the number of rows updated.
+   * Tier value MUST be one of community|pilot|enterprise — callers should
+   * validate before invoking (server.ts uses isTcTier()).
+   */
+  setClientKeyTier(clientId: string, tier: string): number {
+    const result = this.db
+      .prepare('UPDATE client_keys SET tier = ? WHERE client_id = ? AND revoked = 0')
+      .run(tier, clientId);
+    return result.changes;
   }
 
   /**
@@ -2328,10 +2349,15 @@ export class ThreatCloudDB {
     lastUsedAt: string | null;
     revoked: boolean;
     ipAddress: string | null;
+    tier: string;
   }> {
     const rows = this.db
       .prepare(
-        'SELECT id, client_id, created_at, last_used_at, revoked, ip_address FROM client_keys ORDER BY created_at DESC LIMIT ? OFFSET ?'
+        `SELECT id, client_id, created_at, last_used_at, revoked, ip_address,
+                COALESCE(tier, 'community') as tier
+         FROM client_keys
+         ORDER BY created_at DESC
+         LIMIT ? OFFSET ?`
       )
       .all(limit, offset) as Array<{
       id: number;
@@ -2340,6 +2366,7 @@ export class ThreatCloudDB {
       last_used_at: string | null;
       revoked: number;
       ip_address: string | null;
+      tier: string;
     }>;
     return rows.map((r) => ({
       id: r.id,
@@ -2348,6 +2375,7 @@ export class ThreatCloudDB {
       lastUsedAt: r.last_used_at,
       revoked: r.revoked === 1,
       ipAddress: r.ip_address,
+      tier: r.tier,
     }));
   }
 

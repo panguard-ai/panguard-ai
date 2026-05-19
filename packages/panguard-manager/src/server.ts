@@ -19,12 +19,7 @@ import { WebSocketServer, type WebSocket as WS } from 'ws';
 import { createLogger } from '@panguard-ai/core';
 import { AgentsRegistry } from './agents-registry.js';
 import { FleetAggregator } from './aggregator.js';
-import {
-  handleDetail,
-  handleList,
-  handleRegister,
-  handleRevoke,
-} from './api/agents.js';
+import { handleDetail, handleList, handleRegister, handleRevoke } from './api/agents.js';
 import { handleRelayEvent } from './api/events.js';
 import { handleHealth, handleStatus } from './api/status.js';
 import { fail, newRequestId } from './api/respond.js';
@@ -143,10 +138,7 @@ export class ManagerServer {
         return;
       }
       this.server.on('upgrade', (req, socket, head) => {
-        const { pathname } = new URL(
-          req.url ?? '/',
-          `http://${req.headers.host ?? 'localhost'}`
-        );
+        const { pathname } = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
         if (pathname === '/ws') {
           wss.handleUpgrade(req, socket, head, (ws) => wss.emit('connection', ws, req));
         } else {

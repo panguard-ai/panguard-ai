@@ -50,6 +50,21 @@ export interface Workspace {
    */
   tc_org_id: string | null;
   tc_client_key_hash: string | null;
+  /**
+   * Stripe Customer id (`cus_...`). Set on the first successful
+   * `checkout.session.completed` webhook event; preserved after cancellation
+   * so reactivation reuses the same Stripe Customer object.
+   * NULL for workspaces that have never subscribed.
+   */
+  stripe_customer_id: string | null;
+  /**
+   * Set when a subscription is cancelled but the prepaid billing period has
+   * not yet ended. Equals subscription.current_period_end. The lazy
+   * downgrade check in `requireWorkspaceBySlug` flips the workspace to
+   * community once `tier_expires_at < now()`. NULL means no pending
+   * cancellation (and therefore no grace window in effect).
+   */
+  cancel_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -99,6 +114,13 @@ export interface Endpoint {
   first_seen_at: string;
   last_seen_at: string;
   metadata: Record<string, unknown>;
+  // Added by 20260512000003_endpoints_health.sql. Optional in the type
+  // because older rows pre-migration may not have these columns until
+  // the next sync stamps them.
+  current_mode?: string | null;
+  total_threats_30d?: number | null;
+  last_sync_at?: string | null;
+  tier_at_last_sync?: string | null;
 }
 
 export interface SecurityEvent {
@@ -146,6 +168,19 @@ export interface AuditLogRow {
   occurred_at: string;
 }
 
+export type EvidenceSource = 'migrator' | 'audit' | 'scan';
+
+export interface EvidenceArchive {
+  id: string;
+  workspace_id: string;
+  source: EvidenceSource;
+  storage_path: string;
+  file_size_bytes: number;
+  sha256: string;
+  generated_by_user_id: string | null;
+  generated_at: string;
+}
+
 // ─── Database<> generic for Supabase client ──────────────────────────────────
 
 type InsertOf<T, Opt extends keyof T> = Omit<T, Opt> & Partial<Pick<T, Opt>>;
@@ -165,6 +200,8 @@ export interface Database {
           | 'tc_api_key_hash'
           | 'tc_org_id'
           | 'tc_client_key_hash'
+          | 'stripe_customer_id'
+          | 'cancel_at'
         >;
         Update: Partial<Workspace>;
         Relationships: [];
@@ -251,6 +288,12 @@ export interface Database {
           | 'workspace_id'
         >;
         Update: Partial<AuditLogRow>;
+        Relationships: [];
+      };
+      evidence_archives: {
+        Row: EvidenceArchive;
+        Insert: InsertOf<EvidenceArchive, 'id' | 'generated_at' | 'generated_by_user_id'>;
+        Update: Partial<EvidenceArchive>;
         Relationships: [];
       };
     };

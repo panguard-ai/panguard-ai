@@ -52,6 +52,17 @@ const config: Config = {
       borderColor: {
         DEFAULT: '#2E2A27',
       },
+      keyframes: {
+        // Used by EventsLiveStream for new live rows — subtle 200ms
+        // opacity ramp so the row materialises without distraction.
+        'events-fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+      animation: {
+        'events-fade-in': 'events-fade-in 200ms ease-out',
+      },
     },
   },
   plugins: [],

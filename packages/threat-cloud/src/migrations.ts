@@ -370,6 +370,27 @@ export const migrations: readonly Migration[] = [
       );
     },
   },
+  {
+    version: 14,
+    name: 'add_client_key_tier_column',
+    up: (db) => {
+      // Workspace tier per client key. Drives the per-token rate limiter:
+      //   community = 120 req/min, pilot = 1200, enterprise = 12000.
+      // Existing rows backfill to 'community' (the safest default — anything
+      // already in production keeps the baseline budget until an admin
+      // explicitly upgrades it via POST /api/admin/client-keys/:clientId/tier).
+      const cols = db.prepare('PRAGMA table_info(client_keys)').all() as Array<{
+        name: string;
+      }>;
+      if (!cols.some((c) => c.name === 'tier')) {
+        db.exec("ALTER TABLE client_keys ADD COLUMN tier TEXT NOT NULL DEFAULT 'community'");
+      }
+      // Backfill any pre-existing NULL/empty values to 'community' to be safe.
+      // Cheap full-table update — client_keys is bounded by Guard install count.
+      db.exec("UPDATE client_keys SET tier = 'community' WHERE tier IS NULL OR tier = ''");
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_client_keys_tier ON client_keys(tier);`);
+    },
+  },
 ];
 
 /**

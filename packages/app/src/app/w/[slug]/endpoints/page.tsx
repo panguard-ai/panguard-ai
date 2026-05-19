@@ -32,10 +32,7 @@ const FIVE_MIN_MS = 5 * 60 * 1000;
 const ONE_HOUR_MS = 60 * 60 * 1000;
 
 /** Decide health status from last_seen_at timestamp. Pure helper for tests. */
-export function computeHealth(
-  lastSeenIso: string | null,
-  nowMs: number = Date.now()
-): Health {
+export function computeHealth(lastSeenIso: string | null, nowMs: number = Date.now()): Health {
   if (!lastSeenIso) return 'offline';
   const last = Date.parse(lastSeenIso);
   if (Number.isNaN(last)) return 'offline';
@@ -64,9 +61,7 @@ interface _ThreatCountRow {
  * coupling the page to a yet-to-exist function we issue a plain select
  * and aggregate in JS as a fallback. Either path is single-query.)
  */
-async function fetchThreatCounts(
-  workspaceId: string
-): Promise<Map<string, number>> {
+async function fetchThreatCounts(workspaceId: string): Promise<Map<string, number>> {
   const supabase = await createClient();
   const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
@@ -106,11 +101,7 @@ interface EndpointRow extends Endpoint {
   tier_at_last_sync?: string | null;
 }
 
-export default async function EndpointsPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function EndpointsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const ctx = await requireWorkspaceBySlug(slug);
   if (!ctx) notFound();
@@ -131,12 +122,10 @@ export default async function EndpointsPage({
         </div>
         <Card padding="lg" className="text-center">
           <Terminal className="mx-auto h-8 w-8 text-brand-sage" />
-          <h3 className="mt-3 text-base font-semibold text-text-primary">
-            No endpoints yet
-          </h3>
+          <h3 className="mt-3 text-base font-semibold text-text-primary">No endpoints yet</h3>
           <p className="mt-1 text-sm text-text-muted">
-            Run the command below on any machine you want to monitor. It will
-            register here on the first event.
+            Run the command below on any machine you want to monitor. It will register here on the
+            first event.
           </p>
           <pre className="mt-4 inline-block rounded-lg bg-surface-2 px-4 py-2 font-mono text-xs text-text-primary">
             npx @panguard-ai/panguard login
@@ -155,23 +144,22 @@ export default async function EndpointsPage({
   }
 
   const nowMs = Date.now();
-  const rows: Array<EndpointRow & { health: Health; threats: number }> =
-    endpoints.map((ep) => {
-      const r = ep as EndpointRow;
-      return {
-        ...r,
-        health: computeHealth(r.last_seen_at, nowMs),
-        threats: threatCounts.get(r.id) ?? r.total_threats_30d ?? 0,
-      };
-    });
+  const rows: Array<EndpointRow & { health: Health; threats: number }> = endpoints.map((ep) => {
+    const r = ep as EndpointRow;
+    return {
+      ...r,
+      health: computeHealth(r.last_seen_at, nowMs),
+      threats: threatCounts.get(r.id) ?? r.total_threats_30d ?? 0,
+    };
+  });
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-text-primary">Endpoints</h1>
         <p className="mt-1 text-sm text-text-muted">
-          {endpoints.length} machine{endpoints.length === 1 ? '' : 's'} reporting
-          telemetry · last 30 days
+          {endpoints.length} machine{endpoints.length === 1 ? '' : 's'} reporting telemetry · last
+          30 days
         </p>
       </div>
 
@@ -194,16 +182,10 @@ export default async function EndpointsPage({
               <TR key={row.id}>
                 <TD className="font-mono text-xs">{row.hostname ?? '—'}</TD>
                 <TD className="text-text-secondary">{row.os_type ?? '—'}</TD>
-                <TD className="font-mono text-xs">
-                  {row.panguard_version ?? '—'}
-                </TD>
-                <TD className="text-text-secondary">
-                  {row.current_mode ?? '—'}
-                </TD>
+                <TD className="font-mono text-xs">{row.panguard_version ?? '—'}</TD>
+                <TD className="text-text-secondary">{row.current_mode ?? '—'}</TD>
                 <TD>
-                  <Badge tone={row.threats > 0 ? 'alert' : 'neutral'}>
-                    {row.threats}
-                  </Badge>
+                  <Badge tone={row.threats > 0 ? 'alert' : 'neutral'}>{row.threats}</Badge>
                 </TD>
                 <TD className="text-xs text-text-muted">
                   {new Date(row.last_seen_at).toLocaleString()}

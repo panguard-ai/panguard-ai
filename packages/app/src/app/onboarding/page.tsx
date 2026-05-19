@@ -13,6 +13,7 @@ export default async function OnboardingPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
+  if (!user.email_confirmed_at) redirect('/verify-email');
 
   async function onCreate(formData: FormData): Promise<void> {
     'use server';

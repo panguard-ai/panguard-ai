@@ -28,27 +28,32 @@ export const changelogEntries: ChangelogEntry[] = [
       {
         type: 'feature',
         text: 'ATR v2.1.0: 100% NIST AI RMF coverage — every rule carries compliance.nist_ai_rmf metadata, 1,566 mappings across GV / MP / MS / MG',
-        textZh: 'ATR v2.1.0:100% NIST AI RMF 覆蓋 — 每條規則都帶有 compliance.nist_ai_rmf metadata,GV / MP / MS / MG 共 1,566 條對應',
+        textZh:
+          'ATR v2.1.0:100% NIST AI RMF 覆蓋 — 每條規則都帶有 compliance.nist_ai_rmf metadata,GV / MP / MS / MG 共 1,566 條對應',
       },
       {
         type: 'feature',
         text: 'Migrator Community v0.1.0 on npm (@panguard-ai/migrator-community, MIT) — Sigma / YARA / Snort parsers, IR, transformers, validators, basic CLI',
-        textZh: 'Migrator Community v0.1.0 上架 npm (@panguard-ai/migrator-community, MIT) — Sigma / YARA / Snort 解析器、IR、transformers、validators、基本 CLI',
+        textZh:
+          'Migrator Community v0.1.0 上架 npm (@panguard-ai/migrator-community, MIT) — Sigma / YARA / Snort 解析器、IR、transformers、validators、基本 CLI',
       },
       {
         type: 'feature',
         text: 'Migrator Enterprise v0.1.0 production-ready — 15 source-format adapters, strict 0-FP quality pipeline, 5-framework auto-mapping, 6-tab web dashboard, audit evidence packs',
-        textZh: 'Migrator Enterprise v0.1.0 可進入 production — 15 種來源格式 adapter、嚴格 0-FP 品質 pipeline、5 大合規框架自動對應、6 分頁網頁 dashboard、稽核證據包',
+        textZh:
+          'Migrator Enterprise v0.1.0 可進入 production — 15 種來源格式 adapter、嚴格 0-FP 品質 pipeline、5 大合規框架自動對應、6 分頁網頁 dashboard、稽核證據包',
       },
       {
         type: 'improvement',
         text: 'Cisco AI Defense: PR #99 expanded from 34-rule PoC to full 330-rule pack in skill-scanner production',
-        textZh: 'Cisco AI Defense:PR #99 從 34 條規則 PoC 擴張至完整 330 條規則包,進入 skill-scanner production',
+        textZh:
+          'Cisco AI Defense:PR #99 從 34 條規則 PoC 擴張至完整 330 條規則包,進入 skill-scanner production',
       },
       {
         type: 'improvement',
         text: 'Microsoft AGT: PR #1277 expanded to 287 rules + weekly auto-sync workflow into Agent Governance Toolkit',
-        textZh: 'Microsoft AGT:PR #1277 擴張至 287 條規則 + 每週自動同步 workflow 進入 Agent Governance Toolkit',
+        textZh:
+          'Microsoft AGT:PR #1277 擴張至 287 條規則 + 每週自動同步 workflow 進入 Agent Governance Toolkit',
       },
       {
         type: 'improvement',
@@ -58,7 +63,8 @@ export const changelogEntries: ChangelogEntry[] = [
       {
         type: 'fix',
         text: 'Engine: code-block + table-cell suppression now applied to array-format rules (was silently bypassed for every rule from 2026 onward)',
-        textZh: '引擎:code-block + table-cell 抑制功能現已套用到 array 格式規則(2026 年以後新增的規則先前默默被略過)',
+        textZh:
+          '引擎:code-block + table-cell 抑制功能現已套用到 array 格式規則(2026 年以後新增的規則先前默默被略過)',
       },
     ],
   },
@@ -75,7 +81,8 @@ export const changelogEntries: ChangelogEntry[] = [
       {
         type: 'feature',
         text: 'Migrator Community npm package (MIT) — Sigma, YARA, Snort source-format parsers and IR (intermediate representation)',
-        textZh: 'Migrator Community npm 套件(MIT)— Sigma、YARA、Snort 來源格式解析器與 IR(中介表示)',
+        textZh:
+          'Migrator Community npm 套件(MIT)— Sigma、YARA、Snort 來源格式解析器與 IR(中介表示)',
       },
       {
         type: 'feature',
@@ -85,7 +92,8 @@ export const changelogEntries: ChangelogEntry[] = [
       {
         type: 'feature',
         text: 'Enterprise edition: 5-framework compliance auto-mapping (NIST AI RMF, OWASP, MITRE ATLAS, EU AI Act, ISO/IEC 42001)',
-        textZh: 'Enterprise 版:5 大合規框架自動對應(NIST AI RMF、OWASP、MITRE ATLAS、EU AI Act、ISO/IEC 42001)',
+        textZh:
+          'Enterprise 版:5 大合規框架自動對應(NIST AI RMF、OWASP、MITRE ATLAS、EU AI Act、ISO/IEC 42001)',
       },
       {
         type: 'improvement',
@@ -117,7 +125,8 @@ export const changelogEntries: ChangelogEntry[] = [
       {
         type: 'feature',
         text: 'Pricing v4 architecture — Community unlimited free tier + Pilot ($25K/90d) + Enterprise tier with ATR governance',
-        textZh: 'Pricing v4 架構 — Community 免費無上限 + Pilot ($25K/90 天) + Enterprise(含 ATR governance)',
+        textZh:
+          'Pricing v4 架構 — Community 免費無上限 + Pilot ($25K/90 天) + Enterprise(含 ATR governance)',
       },
       {
         type: 'improvement',
@@ -149,7 +158,8 @@ export const changelogEntries: ChangelogEntry[] = [
       {
         type: 'feature',
         text: 'ATR v2.0.x rule pack: 113 rules across prompt injection, agent manipulation, skill compromise, context exfiltration, tool poisoning, privilege escalation, model abuse, excessive autonomy, data poisoning',
-        textZh: 'ATR v2.0.x 規則包:113 條規則,涵蓋 prompt injection、agent manipulation、skill compromise、context exfiltration、tool poisoning、privilege escalation、model abuse、excessive autonomy、data poisoning',
+        textZh:
+          'ATR v2.0.x 規則包:113 條規則,涵蓋 prompt injection、agent manipulation、skill compromise、context exfiltration、tool poisoning、privilege escalation、model abuse、excessive autonomy、data poisoning',
       },
       {
         type: 'feature',
@@ -164,7 +174,8 @@ export const changelogEntries: ChangelogEntry[] = [
       {
         type: 'improvement',
         text: 'Honest 5-of-7 layer coverage messaging — L1 Discover and L7 Govern marked Coming Soon (Q2/Q3 2026)',
-        textZh: '誠實標示 5/7 層架構覆蓋率 — L1 Discover 與 L7 Govern 標示為 Coming Soon(Q2/Q3 2026)',
+        textZh:
+          '誠實標示 5/7 層架構覆蓋率 — L1 Discover 與 L7 Govern 標示為 Coming Soon(Q2/Q3 2026)',
       },
       {
         type: 'improvement',

@@ -5,11 +5,13 @@ import type { Database } from '@/lib/types';
 
 /**
  * Refresh the Supabase session cookie on every request.
- * Returns both the response (with updated cookies) and the authenticated user (if any).
+ * Returns the response (with updated cookies), the authenticated user id (if any),
+ * and whether the user's email is confirmed.
  */
 export async function updateSession(request: NextRequest): Promise<{
   response: NextResponse;
   userId: string | null;
+  emailConfirmed: boolean;
 }> {
   let response = NextResponse.next({
     request: { headers: request.headers },
@@ -41,5 +43,9 @@ export async function updateSession(request: NextRequest): Promise<{
     data: { user },
   } = await supabase.auth.getUser();
 
-  return { response, userId: user?.id ?? null };
+  return {
+    response,
+    userId: user?.id ?? null,
+    emailConfirmed: !!user?.email_confirmed_at,
+  };
 }

@@ -26,7 +26,16 @@ export function LoginForm({ redirectParam }: { redirectParam: string | null }) {
   if (state?.ok && state.email) {
     return (
       <div className="space-y-4">
-        <InlineToast tone="success">{t('linkSentBody', { email: state.email })}</InlineToast>
+        <div
+          role="status"
+          aria-live="polite"
+          className="rounded-lg border border-status-ok/30 bg-status-ok/10 px-4 py-3 text-sm text-text-primary"
+        >
+          <div className="flex items-start gap-2">
+            <Mail className="h-4 w-4 mt-0.5 flex-shrink-0 text-status-ok" />
+            <div>{t('linkSentBody', { email: state.email })}</div>
+          </div>
+        </div>
         <button
           type="button"
           onClick={() => setState(null)}

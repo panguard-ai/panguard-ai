@@ -367,22 +367,18 @@ function ScannerHeroSkeleton() {
           built on an open standard.
         </h1>
         <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
-          Drop in a GitHub URL or paste a SKILL/MCP manifest. PanGuard runs 419
-          ATR rules against it and tells you if it&apos;s safe to install.
+          Drop in a GitHub URL or paste a SKILL/MCP manifest. PanGuard runs 419 ATR rules against it
+          and tells you if it&apos;s safe to install.
         </p>
         <div className="flex flex-wrap justify-center gap-3 pt-4 text-xs text-text-muted">
-          <span className="px-3 py-1 rounded-full border border-border-default">
-            419 ATR rules
-          </span>
+          <span className="px-3 py-1 rounded-full border border-border-default">419 ATR rules</span>
           <span className="px-3 py-1 rounded-full border border-border-default">
             Garak 97.1% recall
           </span>
           <span className="px-3 py-1 rounded-full border border-border-default">
             Microsoft + Cisco merged
           </span>
-          <span className="px-3 py-1 rounded-full border border-border-default">
-            MIT licensed
-          </span>
+          <span className="px-3 py-1 rounded-full border border-border-default">MIT licensed</span>
         </div>
       </div>
     </section>

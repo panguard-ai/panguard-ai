@@ -24,6 +24,7 @@ export type AuditAction =
   | 'admin.login'
   | 'client_key.register'
   | 'client_key.revoke'
+  | 'client_key.tier_update'
   | 'partner_key.issue';
 
 /** An entry from the audit_log table / audit_log 資料表的條目 */

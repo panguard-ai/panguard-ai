@@ -15,12 +15,13 @@ import type {
   ResponseResult,
   ResponseAction,
   GuardMode,
+  EnforcementPolicy,
 } from '../types.js';
 import type { PlaybookEngine, PlaybookCorrelationMatch } from '../playbook/index.js';
 import { ATRActionHandlers } from './atr-action-handlers.js';
 import type { SkillWhitelistManager } from '../engines/skill-whitelist.js';
 
-import { SAFETY_RULES } from './respond/safety-rules.js';
+import { SAFETY_RULES, DEFAULT_ENFORCEMENT_POLICY } from './respond/safety-rules.js';
 import { ActionRateLimiter } from './respond/action-rate-limiter.js';
 import { ActionManifest } from './respond/action-manifest.js';
 import { EscalationTracker } from './respond/escalation-tracker.js';
@@ -43,6 +44,7 @@ const logger = createLogger('panguard-guard:respond-agent');
 export class RespondAgent {
   private actionPolicy: ActionPolicy;
   private mode: GuardMode;
+  private enforcementPolicy: EnforcementPolicy;
   private actionCount = 0;
   private readonly additionalWhitelistedIPs: Set<string>;
   private readonly rateLimiter = new ActionRateLimiter();
@@ -56,13 +58,27 @@ export class RespondAgent {
     actionPolicy: ActionPolicy,
     mode: GuardMode,
     whitelistedIPs: string[] = [],
-    dataDir = '/var/panguard-guard'
+    dataDir = '/var/panguard-guard',
+    enforcementPolicy: EnforcementPolicy = DEFAULT_ENFORCEMENT_POLICY
   ) {
     this.actionPolicy = actionPolicy;
     this.mode = mode;
+    this.enforcementPolicy = enforcementPolicy;
     this.additionalWhitelistedIPs = new Set(whitelistedIPs);
     this.manifest = new ActionManifest(dataDir);
     this.atrHandlers = new ATRActionHandlers(dataDir);
+  }
+
+  /** Update the enforcement policy at runtime (e.g. after config reload). */
+  setEnforcementPolicy(policy: EnforcementPolicy): void {
+    this.enforcementPolicy = policy;
+    logger.info(
+      `EnforcementPolicy updated: ` +
+        `blockIPs=${policy.blockIPs.enabled}, ` +
+        `killProcesses=${policy.killProcesses.enabled} (${policy.killProcesses.allowedProcessNames.length} allowed), ` +
+        `isolateFiles=${policy.isolateFiles.enabled} (${policy.isolateFiles.allowedPaths.length} allowed paths), ` +
+        `disableAccounts=${policy.disableAccounts.enabled}`
+    );
   }
 
   /** Update operating mode */
@@ -95,6 +111,27 @@ export class RespondAgent {
         action: 'log_only',
         success: true,
         details: 'Learning mode - observation only',
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    if (this.mode === 'report-only') {
+      // Report-only mode: log what would-have-happened, NO OS action.
+      // This is the recommended default for new deployments — operators
+      // verify detection quality on real traffic before granting OS-action
+      // authority to the model.
+      const wouldHaveAction = verdict.recommendedAction;
+      logger.warn(
+        `[report-only] Would have taken action "${wouldHaveAction}" ` +
+          `(confidence ${verdict.confidence}%, conclusion: ${verdict.conclusion}). ` +
+          `Set mode=protection + enforcementPolicy in config to enable enforcement.`
+      );
+      return {
+        action: 'notify',
+        success: true,
+        details:
+          `[report-only] Would have run "${wouldHaveAction}". Detection only — ` +
+          `no OS action taken. Verdict: ${verdict.conclusion} @ ${verdict.confidence}%`,
         timestamp: new Date().toISOString(),
       };
     }
@@ -361,11 +398,14 @@ export class RespondAgent {
       case 'block_ip':
         return blockIP(verdict, this.blockIPDeps());
       case 'kill_process':
-        return killProcess(verdict, this.manifest);
+        return killProcess(verdict, { manifest: this.manifest, policy: this.enforcementPolicy });
       case 'disable_account':
-        return disableAccount(verdict, this.manifest);
+        return disableAccount(verdict, {
+          manifest: this.manifest,
+          policy: this.enforcementPolicy,
+        });
       case 'isolate_file':
-        return isolateFile(verdict, this.manifest);
+        return isolateFile(verdict, { manifest: this.manifest, policy: this.enforcementPolicy });
       case 'block_tool':
         return this.atrHandlers.blockTool(verdict);
       case 'kill_agent':
@@ -399,6 +439,7 @@ export class RespondAgent {
       manifest: this.manifest,
       escalation: this.escalation,
       unblockTimers: this.unblockTimers,
+      policy: this.enforcementPolicy,
     };
   }
 }

@@ -12,10 +12,36 @@
 # Stage 1: Build everything with pnpm workspace
 FROM node:22-slim AS builder
 
-# Build tools for native modules (better-sqlite3)
+# Build tools for native modules (better-sqlite3) + curl/ca-certs for the
+# Litestream download below.
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 make g++ git && \
+    apt-get install -y --no-install-recommends python3 make g++ git curl ca-certificates && \
     rm -rf /var/lib/apt/lists/*
+
+# ---- Litestream binary ----
+# Pinned to v0.3.13 because:
+#   * The litestream.yml config schema in this repo is v0.3.x format.
+#   * v0.5.x is a major rewrite with a breaking config change (`replicas` ->
+#     `replica`, removal of `retention`/`snapshot-interval`/`validation-interval`).
+#   * Upgrading requires rewriting litestream.yml AND retesting failover.
+# Docker buildx provides TARGETARCH automatically (amd64 / arm64).
+ARG TARGETARCH=amd64
+ARG LITESTREAM_VERSION=v0.3.13
+ARG LITESTREAM_SHA256_AMD64=eb75a3de5cab03875cdae9f5f539e6aedadd66607003d9b1e7a9077948818ba0
+ARG LITESTREAM_SHA256_ARM64=9585f5a508516bd66af2b2376bab4de256a5ef8e2b73ec760559e679628f2d59
+RUN set -eu; \
+    case "${TARGETARCH}" in \
+      amd64) LS_SHA="${LITESTREAM_SHA256_AMD64}";; \
+      arm64) LS_SHA="${LITESTREAM_SHA256_ARM64}";; \
+      *) echo "Unsupported TARGETARCH=${TARGETARCH} for Litestream"; exit 1;; \
+    esac; \
+    curl -fsSL -o /tmp/litestream.tar.gz \
+      "https://github.com/benbjohnson/litestream/releases/download/${LITESTREAM_VERSION}/litestream-${LITESTREAM_VERSION}-linux-${TARGETARCH}.tar.gz"; \
+    echo "${LS_SHA}  /tmp/litestream.tar.gz" | sha256sum -c -; \
+    tar -xzf /tmp/litestream.tar.gz -C /usr/local/bin litestream; \
+    rm /tmp/litestream.tar.gz; \
+    chmod +x /usr/local/bin/litestream; \
+    /usr/local/bin/litestream version
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -135,6 +161,14 @@ COPY --from=builder /build/packages/admin ./packages/admin
 # Persistent data directory
 RUN mkdir -p /data
 
+# Litestream — binary, config, and wrapper entrypoint.
+# The entrypoint restores from S3 on cold start (if no local DB) then
+# replicates continuously while wrapping the TC server.
+COPY --from=builder /usr/local/bin/litestream /usr/local/bin/litestream
+COPY litestream.yml /etc/litestream.yml
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 # Run as non-root user
 RUN groupadd --system --gid 1001 panguard && \
     useradd --system --uid 1001 --gid 1001 panguard && \
@@ -147,5 +181,6 @@ ENV PANGUARD_DATA_DIR=/data
 EXPOSE 3000
 
 # No Dockerfile HEALTHCHECK - let Railway manage it after container starts
-ENTRYPOINT ["tini", "--"]
-CMD ["node", "dist/cli/index.js", "serve", "--port", "3000", "--host", "0.0.0.0", "--db", "/data/auth.db"]
+# tini is PID 1 -> docker-entrypoint.sh -> litestream replicate -exec "node ..."
+# On SIGTERM, tini forwards to litestream, which flushes WAL before exiting child.
+ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]

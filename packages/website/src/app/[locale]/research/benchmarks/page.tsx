@@ -56,7 +56,8 @@ const BENCHMARKS: Benchmark[] = [
       { label: 'ATR version', value: 'v2.1.2' },
     ],
     reproduce: 'pnpm bench:garak (in agent-threat-rules repo)',
-    externalLink: 'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/benchmarks/garak.md',
+    externalLink:
+      'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/benchmarks/garak.md',
     recordCount: STATS.benchmark.garak.samples,
   },
   {
@@ -75,7 +76,8 @@ const BENCHMARKS: Benchmark[] = [
       { label: 'Sample size', value: `${STATS.benchmark.skill.samples} samples` },
     ],
     reproduce: 'pnpm bench:skill (in agent-threat-rules repo)',
-    externalLink: 'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/benchmarks/skill.md',
+    externalLink:
+      'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/benchmarks/skill.md',
     recordCount: STATS.benchmark.skill.samples,
   },
   {
@@ -97,7 +99,8 @@ const BENCHMARKS: Benchmark[] = [
       { label: 'Layer', value: 'Regex only' },
     ],
     reproduce: 'pnpm bench:pint (in agent-threat-rules repo)',
-    externalLink: 'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/benchmarks/pint.md',
+    externalLink:
+      'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/benchmarks/pint.md',
     recordCount: STATS.benchmark.pint.samples,
   },
   {
@@ -145,9 +148,7 @@ const BENCHMARKS: Benchmark[] = [
   },
 ];
 
-export default async function BenchmarkHubPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function BenchmarkHubPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
   const isZh = params.locale === 'zh-TW';
 
@@ -172,7 +173,7 @@ export default async function BenchmarkHubPage(props: {
       datePublished: b.date,
       ...(b.recordCount ? { recordCount: b.recordCount } : {}),
       ...(b.doi ? { doi: b.doi } : {}),
-    }),
+    })
   );
 
   return (
@@ -237,10 +238,7 @@ export default async function BenchmarkHubPage(props: {
 
                 <div className="grid sm:grid-cols-2 gap-3 mb-6">
                   {b.results.map((r, i) => (
-                    <div
-                      key={i}
-                      className="p-3 rounded-lg border border-border bg-surface-2"
-                    >
+                    <div key={i} className="p-3 rounded-lg border border-border bg-surface-2">
                       <p className="text-[10px] uppercase tracking-wider text-text-muted font-semibold">
                         {r.label}
                       </p>
@@ -307,9 +305,7 @@ export default async function BenchmarkHubPage(props: {
                 Adam Lin
               </Link>
               {' · '}
-              <span>
-                {isZh ? '最後審查 2026-05-12' : 'Last reviewed 2026-05-12'}
-              </span>
+              <span>{isZh ? '最後審查 2026-05-12' : 'Last reviewed 2026-05-12'}</span>
             </p>
           </div>
         </section>

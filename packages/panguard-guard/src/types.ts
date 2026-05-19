@@ -370,50 +370,20 @@ export interface ThreatCloudUpdate {
 export type ThreatCloudStatus = 'connected' | 'disconnected' | 'offline';
 
 // ===== License =====
+//
+// LicenseTier + TIER_FEATURES are defined canonically in ./license/index.ts.
+// Re-export here so callers that import from './types.js' keep working,
+// without duplicating the feature-gate tables (which previously drifted —
+// e.g. the local copy was missing `skill_audit`, `evidence_pack`,
+// `sarif_export`, `sso`, `dedicated_tc`, etc. that the canonical table
+// already covers).
 
-/** License tier / 授權等級 */
-export type LicenseTier = 'free' | 'pro' | 'enterprise';
-
-/** License info / 授權資訊 */
-export interface LicenseInfo {
-  key: string;
-  tier: LicenseTier;
-  isValid: boolean;
-  expiresAt?: string;
-  maxEndpoints?: number;
-  features: string[];
-}
-
-/** Feature gates per tier / 各等級功能閘 */
-export const TIER_FEATURES: Record<LicenseTier, string[]> = {
-  free: ['basic_monitoring', 'rule_matching', 'auto_respond', 'threat_cloud_upload', 'dashboard'],
-  pro: [
-    'basic_monitoring',
-    'rule_matching',
-    'ai_analysis',
-    'auto_respond',
-    'auto_fix',
-    'notifications',
-    'context_memory',
-    'threat_cloud_upload',
-    'custom_rules',
-  ],
-  enterprise: [
-    'basic_monitoring',
-    'rule_matching',
-    'ai_analysis',
-    'auto_respond',
-    'auto_fix',
-    'notifications',
-    'context_memory',
-    'threat_cloud',
-    'threat_cloud_upload',
-    'multi_endpoint',
-    'priority_support',
-    'custom_rules',
-    'webhook_api',
-  ],
-};
+// Re-export so callers that `import { LicenseTier, TIER_FEATURES } from './types.js'`
+// continue to work. The GuardStatus interface below references LicenseTier
+// by name — it resolves to the re-exported symbol.
+import type { LicenseTier, LicenseInfo } from './license/index.js';
+export type { LicenseTier, LicenseInfo };
+export { TIER_FEATURES } from './license/index.js';
 
 // ===== LLM interface for PanguardGuard =====
 
@@ -444,7 +414,7 @@ export interface AnalyzeLLM {
 
 /** Dashboard status data / Dashboard 狀態資料 */
 export interface DashboardStatus {
-  mode: 'learning' | 'protection';
+  mode: GuardMode;
   uptime: number;
   eventsProcessed: number;
   threatsDetected: number;
@@ -500,8 +470,50 @@ export interface ThreatMapEntry {
 
 // ===== Guard Config =====
 
-/** Guard engine operating mode / 守護引擎運作模式 */
-export type GuardMode = 'learning' | 'protection';
+/**
+ * Guard engine operating mode / 守護引擎運作模式
+ *
+ * - `learning`: observe only, no action, baseline-building (default for first N days)
+ * - `report-only`: would-have-taken action is logged + alerted, but NO OS-level command
+ *   runs. Recommended default for new deployments — verify detection quality before
+ *   granting OS-action authority to a model.
+ * - `protection`: full enforcement. OS actions execute, subject to per-action
+ *   `EnforcementPolicy` allowlists below.
+ */
+export type GuardMode = 'learning' | 'report-only' | 'protection';
+
+/**
+ * Per-action enforcement policy. Defines exactly which OS-level actions the
+ * guard is permitted to perform, and against which targets. Used only when
+ * `GuardMode === 'protection'`.
+ *
+ * Conservative defaults: every destructive action is disabled. Operators must
+ * opt in explicitly. `isolateFiles.allowedPaths` is required when enabled —
+ * `$HOME`-wide isolation is no longer accepted because the guard cannot tell
+ * the difference between `~/Downloads/malware.bin` and `~/.ssh/authorized_keys`.
+ */
+export interface EnforcementPolicy {
+  /** Block remote IPs via pfctl / iptables / netsh */
+  readonly blockIPs: {
+    readonly enabled: boolean;
+  };
+  /** Kill processes by PID. Allowlist limits which process names may be killed. */
+  readonly killProcesses: {
+    readonly enabled: boolean;
+    /** Glob patterns of process names that may be killed. Empty = none. */
+    readonly allowedProcessNames: ReadonlyArray<string>;
+  };
+  /** Move files to quarantine. Allowlist limits source directories. */
+  readonly isolateFiles: {
+    readonly enabled: boolean;
+    /** Absolute or `~/...` paths that contain isolatable files. Empty = none. */
+    readonly allowedPaths: ReadonlyArray<string>;
+  };
+  /** Disable OS user accounts. Default OFF — too destructive for autonomous response. */
+  readonly disableAccounts: {
+    readonly enabled: boolean;
+  };
+}
 
 /** Complete guard configuration / 完整守護配置 */
 export interface GuardConfig {
@@ -563,6 +575,12 @@ export interface GuardConfig {
   showUploadData?: boolean;
   /** Skill whitelist: static list of trusted skill names / Skill 白名單 */
   trustedSkills?: string[];
+  /**
+   * Per-action enforcement policy. Required only when `mode === 'protection'`.
+   * If omitted, the engine falls back to `DEFAULT_ENFORCEMENT_POLICY` from
+   * `agent/respond/safety-rules.ts`, which is conservative (all OS actions OFF).
+   */
+  enforcementPolicy?: EnforcementPolicy;
 }
 
 /** Guard engine status / 守護引擎狀態 */

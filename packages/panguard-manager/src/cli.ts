@@ -120,11 +120,7 @@ function cmdInit(flags: Readonly<Record<string, string | boolean>>): void {
   if (!existsSync(agentsFile)) {
     writeFileSync(
       agentsFile,
-      JSON.stringify(
-        { version: 1, updated_at: new Date().toISOString(), agents: [] },
-        null,
-        2
-      ),
+      JSON.stringify({ version: 1, updated_at: new Date().toISOString(), agents: [] }, null, 2),
       { mode: 0o600 }
     );
   }
@@ -132,7 +128,11 @@ function cmdInit(flags: Readonly<Record<string, string | boolean>>): void {
   if (!existsSync(configFile)) {
     writeFileSync(
       configFile,
-      JSON.stringify({ port: 8090, host: '0.0.0.0', created_at: new Date().toISOString() }, null, 2),
+      JSON.stringify(
+        { port: 8090, host: '0.0.0.0', created_at: new Date().toISOString() },
+        null,
+        2
+      ),
       { mode: 0o600 }
     );
   }
@@ -154,9 +154,7 @@ function cmdAgentsList(flags: Readonly<Record<string, string | boolean>>): void 
     process.stdout.write('No agents registered.\n');
     return;
   }
-  process.stdout.write(
-    `${records.length} agent(s) registered (data-dir=${dataDir}):\n`
-  );
+  process.stdout.write(`${records.length} agent(s) registered (data-dir=${dataDir}):\n`);
   for (const r of records) {
     const state = r.revoked ? 'revoked' : 'active';
     const last = r.last_seen ?? 'never';

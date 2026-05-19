@@ -2,7 +2,22 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { requireWorkspaceBySlug } from '@/lib/workspaces';
-import type { Report } from '@/lib/types';
+import type { Report, Tier } from '@/lib/types';
+
+/**
+ * Per-tier monthly report quota hint. Plain text, no paywall.
+ * Community: 5/mo · Pilot: 50/mo · Enterprise: unlimited.
+ */
+function reportLimitHint(tier: Tier): string {
+  switch (tier) {
+    case 'community':
+      return 'Up to 5 reports per month. Upgrade to Pilot for 50.';
+    case 'pilot':
+      return 'Up to 50 reports per month.';
+    case 'enterprise':
+      return 'Unlimited reports.';
+  }
+}
 import { Card, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,6 +55,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ slug: 
         <p className="mt-1 text-sm text-text-muted">
           Evidence-backed reports generated from live endpoint data.
         </p>
+        <p className="mt-1 text-xs text-text-muted">{reportLimitHint(ctx.workspace.tier)}</p>
       </div>
 
       <Card padding="lg">

@@ -255,11 +255,7 @@ export async function generateCodeScanPdf(opts: CodeScanPdfOptions): Promise<voi
         .font('Helvetica-Bold')
         .fontSize(8)
         .text(`[${f.severity.toUpperCase()}]`, { continued: true, characterSpacing: 0.8 });
-      doc
-        .fillColor(BRAND.textMuted)
-        .font('Courier')
-        .fontSize(9)
-        .text(`  ${f.id}`);
+      doc.fillColor(BRAND.textMuted).font('Courier').fontSize(9).text(`  ${f.id}`);
 
       // Title
       doc

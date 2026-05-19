@@ -100,16 +100,10 @@ async function buildCache(): Promise<Map<string, AtrRuleMeta>> {
         const meta: AtrRuleMeta = {
           id: rule.id,
           title: typeof rule.title === 'string' ? rule.title : '',
-          description:
-            typeof rule.description === 'string' ? rule.description : '',
-          severity:
-            typeof rule.severity === 'string' ? rule.severity : 'medium',
-          status:
-            typeof rule.status === 'string' ? rule.status : 'experimental',
-          maturity:
-            typeof rule.maturity === 'string'
-              ? rule.maturity
-              : 'experimental',
+          description: typeof rule.description === 'string' ? rule.description : '',
+          severity: typeof rule.severity === 'string' ? rule.severity : 'medium',
+          status: typeof rule.status === 'string' ? rule.status : 'experimental',
+          maturity: typeof rule.maturity === 'string' ? rule.maturity : 'experimental',
           author: typeof rule.author === 'string' ? rule.author : '',
           rule_path: relPath,
           github_url: `https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/${relPath}`,
@@ -133,9 +127,7 @@ async function buildCache(): Promise<Map<string, AtrRuleMeta>> {
   return m;
 }
 
-export async function getRuleMeta(
-  ruleId: string
-): Promise<AtrRuleMeta | null> {
+export async function getRuleMeta(ruleId: string): Promise<AtrRuleMeta | null> {
   if (cache) return cache.get(ruleId) ?? null;
   if (!loadingPromise) loadingPromise = buildCache();
   cache = await loadingPromise;

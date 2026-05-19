@@ -2,19 +2,22 @@ import { notFound } from 'next/navigation';
 import { requireWorkspaceBySlug } from '@/lib/workspaces';
 import { listEvents } from '@/lib/tc-client';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Table, TBody, TD, TH, THead, TR } from '@/components/ui/table';
 import { Terminal } from '@/components/icons';
-import type { Severity } from '@/lib/types';
+import { EventsLiveStream } from './events-live-stream';
+import type { Tier } from '@/lib/types';
 
-const severityTone: Record<Severity, 'safe' | 'caution' | 'alert' | 'danger'> = {
-  info: 'safe',
-  low: 'safe',
-  medium: 'caution',
-  high: 'alert',
-  critical: 'danger',
-};
+/** Plain-text retention hint by tier. No paywall, just informational. */
+function retentionHint(tier: Tier): string {
+  switch (tier) {
+    case 'community':
+      return 'Events retained 7 days. Upgrade to Pilot for 90 days.';
+    case 'pilot':
+      return 'Events retained 90 days.';
+    case 'enterprise':
+      return 'Events retained indefinitely.';
+  }
+}
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -42,13 +45,16 @@ export default async function EventsPage({ params, searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-text-primary">Security events</h1>
-        <p className="mt-1 text-sm text-text-muted">
-          Showing {result.rows.length} of {result.total}
-          {severity ? ` · severity=${severity}` : ''}
-          {q ? ` · query="${q}"` : ''}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-text-primary">Security events</h1>
+          <p className="mt-1 text-sm text-text-muted">
+            Showing {result.rows.length} of {result.total}
+            {severity ? ` · severity=${severity}` : ''}
+            {q ? ` · query="${q}"` : ''}
+          </p>
+          <p className="mt-1 text-xs text-text-muted">{retentionHint(ctx.workspace.tier)}</p>
+        </div>
       </div>
 
       <Card padding="md">
@@ -96,33 +102,25 @@ export default async function EventsPage({ params, searchParams }: Props) {
           <p className="mt-1 text-sm text-text-muted">
             Try clearing filters or install the CLI to start streaming events.
           </p>
+          {/*
+            Live-stream client still mounts here so that an event arriving
+            against an empty filter-pass list will surface a toast and the
+            user can click through to investigate without an F5 refresh.
+          */}
+          <div className="mt-4">
+            <EventsLiveStream workspaceId={ctx.workspace.id} initialEvents={[]} />
+          </div>
         </Card>
       ) : (
         <Card padding="none">
-          <Table>
-            <THead>
-              <TR>
-                <TH>Severity</TH>
-                <TH>Rule</TH>
-                <TH>Summary</TH>
-                <TH>Endpoint</TH>
-                <TH>When</TH>
-              </TR>
-            </THead>
-            <TBody>
-              {result.rows.map((e) => (
-                <TR key={e.id}>
-                  <TD>
-                    <Badge tone={severityTone[e.severity]}>{e.severity}</Badge>
-                  </TD>
-                  <TD className="font-mono text-xs">{e.rule_id ?? '-'}</TD>
-                  <TD className="text-text-primary">{e.payload_summary ?? ''}</TD>
-                  <TD className="font-mono text-xs">{e.endpoint_hostname ?? '-'}</TD>
-                  <TD>{new Date(e.occurred_at).toLocaleString()}</TD>
-                </TR>
-              ))}
-            </TBody>
-          </Table>
+          {/*
+            EventsLiveStream owns the rendered <Table> for both SSR initial
+            rows AND any live INSERTs received via Supabase Realtime. It is
+            a client component so the SSR-rendered HTML for the initial
+            rows still ships in the first response (Next.js hydrates the
+            same markup), preserving fast first paint.
+          */}
+          <EventsLiveStream workspaceId={ctx.workspace.id} initialEvents={result.rows} />
         </Card>
       )}
 

@@ -22,7 +22,14 @@
     "tryDifferentEmail": "Use a different email",
     "errorTitle": "Sign-in failed",
     "errorBody": "We couldn't verify that magic link. It may have expired — please request a new one.",
-    "backToLogin": "Back to sign in"
+    "backToLogin": "Back to sign in",
+    "verifyTitle": "Check your email",
+    "verifyBody": "We sent a magic link to {email}. Click it to verify, then come back.",
+    "verifyResend": "Resend link",
+    "verifyResent": "Magic link resent. Please check your inbox.",
+    "verifyUseDifferent": "Use a different email",
+    "verifySupport": "Need help? Contact {email}.",
+    "verifyResendCooldown": "Please wait {seconds}s before requesting another link."
   },
   "onboarding": {
     "title": "Create your workspace",

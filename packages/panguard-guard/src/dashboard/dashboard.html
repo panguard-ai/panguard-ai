@@ -1,0 +1,2454 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>PanGuard Guard Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --sage: #8b9a8e;
+        --bg-base: #1a1614;
+        --bg-card: #242220;
+        --bg-raised: #2e2c2a;
+        --border: #3a3836;
+        --text-primary: #f5f1e8;
+        --text-muted: #a09a94;
+        --ok: #2ed573;
+        --warn: #fbbf24;
+        --danger: #ef4444;
+        --orange: #f97316;
+        --glow: 0 0 20px rgba(139, 154, 142, 0.15);
+        --radius: 12px;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          'Inter',
+          'Noto Sans TC',
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: var(--bg-base);
+        color: var(--text-primary);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        font-size: 13px;
+      }
+
+      /* Sidebar — exactly 220px per DESIGN.md */
+      .sb {
+        width: 220px;
+        background: var(--bg-card);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+      }
+      .sb-brand {
+        padding: 20px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .sb-brand svg {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+      }
+      .sb-brand span {
+        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: 0.5px;
+      }
+      .sb-nav {
+        flex: 1;
+        padding: 12px 0;
+        overflow-y: auto;
+      }
+      .ni {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.15s;
+        border-left: 3px solid transparent;
+      }
+      .ni:hover {
+        background: var(--bg-raised);
+        color: var(--text-primary);
+      }
+      .ni.on {
+        color: var(--sage);
+        border-left-color: var(--sage);
+        background: rgba(139, 154, 142, 0.08);
+      }
+      .ni svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+        flex-shrink: 0;
+      }
+      .sb-ft {
+        padding: 16px;
+        border-top: 1px solid var(--border);
+      }
+      .ws-b {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+      .ws-d {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--danger);
+      }
+      .ws-d.on {
+        background: var(--ok);
+      }
+      .lb {
+        margin-top: 8px;
+        background: var(--bg-raised);
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+        padding: 4px 10px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 11px;
+      }
+
+      /* Main content area */
+      .mn {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px 28px;
+      }
+      .pg {
+        display: none;
+      }
+      .pg.on {
+        display: block;
+      }
+
+      /* Typography */
+      .pt {
+        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: var(--text-primary);
+      }
+      .pt em {
+        color: var(--sage);
+        font-style: normal;
+      }
+      .pd {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+      .st {
+        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* KPI Cards — 4-up grid, 12px radius, sage glow on hover */
+      .cg {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+        margin-bottom: 24px;
+      }
+      .cd {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        box-shadow: var(--glow);
+        transition: border-color 0.2s;
+      }
+      .cd:hover {
+        border-color: var(--sage);
+      }
+      .cl {
+        font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .cv {
+        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+      }
+      .cv.ok {
+        color: var(--ok);
+      }
+      .cv.w {
+        color: var(--warn);
+      }
+      .cv.sg {
+        color: var(--sage);
+      }
+      .cv.bad {
+        color: var(--danger);
+      }
+      .cv-sm {
+        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      /* Event timeline */
+      .tl {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        max-height: 420px;
+        overflow-y: auto;
+      }
+      .ei {
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        border-left: 3px solid transparent;
+      }
+      .ei:last-child {
+        border-bottom: none;
+      }
+      .ei-t {
+        color: var(--text-muted);
+        white-space: nowrap;
+        min-width: 75px;
+      }
+      .ei-y {
+        font-weight: 600;
+        min-width: 90px;
+      }
+      .ei-d {
+        color: var(--text-muted);
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .ei.critical {
+        border-left-color: var(--danger);
+      }
+      .ei.high {
+        border-left-color: var(--orange);
+      }
+      .ei.malicious {
+        border-left-color: var(--danger);
+      }
+      .ei.suspicious {
+        border-left-color: var(--warn);
+      }
+      .ei.benign,
+      .ei.clean {
+        border-left-color: var(--ok);
+      }
+
+      /* Tables */
+      .tb {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .tb th {
+        text-align: left;
+        padding: 10px 14px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        background: var(--bg-raised);
+        border-bottom: 1px solid var(--border);
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .tb th:hover {
+        color: var(--text-primary);
+      }
+      .tb td {
+        padding: 10px 14px;
+        font-size: 13px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+      }
+      .tb tr:last-child td {
+        border-bottom: none;
+      }
+      .tb tr:hover td {
+        background: rgba(139, 154, 142, 0.04);
+      }
+      .mono {
+        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-size: 12px;
+      }
+
+      /* Form section */
+      .fs {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: var(--glow);
+      }
+      .fs h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .fs .desc {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+        line-height: 1.5;
+      }
+      .fr {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        align-items: center;
+      }
+      .fr label {
+        font-size: 12px;
+        color: var(--text-muted);
+        min-width: 120px;
+      }
+      .fr select,
+      .fr input {
+        flex: 1;
+        background: var(--bg-raised);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        outline: none;
+        font-family: inherit;
+      }
+      .fr select:focus,
+      .fr input:focus {
+        border-color: var(--sage);
+      }
+
+      /* Buttons — per DESIGN.md spec */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .btn-primary {
+        background: var(--sage);
+        color: var(--bg-base);
+      }
+      .btn-primary:hover {
+        filter: brightness(1.1);
+      }
+      .btn-secondary {
+        background: var(--bg-raised);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+      }
+      .btn-secondary:hover {
+        border-color: var(--sage);
+      }
+      .btn-danger {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+      }
+      .btn-sm {
+        font-size: 12px;
+        padding: 5px 12px;
+      }
+
+      /* Severity badges */
+      .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Inter', sans-serif;
+      }
+      .badge-protected {
+        background: rgba(46, 213, 115, 0.15);
+        color: var(--ok);
+      }
+      .badge-learning {
+        background: rgba(251, 191, 36, 0.15);
+        color: var(--warn);
+      }
+      .badge-offline {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+      }
+      .badge-critical {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--danger);
+      }
+      .badge-high {
+        background: rgba(249, 115, 22, 0.15);
+        color: var(--orange);
+      }
+      .badge-medium {
+        background: rgba(251, 191, 36, 0.15);
+        color: var(--warn);
+      }
+      .badge-low {
+        background: rgba(139, 154, 142, 0.15);
+        color: var(--sage);
+      }
+      .badge-informational {
+        background: rgba(160, 154, 148, 0.15);
+        color: var(--text-muted);
+      }
+      .badge-ok {
+        background: rgba(46, 213, 115, 0.15);
+        color: var(--ok);
+      }
+      .badge-w {
+        background: rgba(251, 191, 36, 0.15);
+        color: var(--warn);
+      }
+      .badge-off {
+        background: rgba(160, 154, 148, 0.15);
+        color: var(--text-muted);
+      }
+
+      /* Status dots */
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot-ok {
+        background: var(--ok);
+      }
+      .dot-w {
+        background: var(--warn);
+      }
+      .dot-bad {
+        background: var(--danger);
+      }
+      .dot-off {
+        background: var(--text-muted);
+      }
+
+      /* Toast notifications */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--bg-card);
+        border: 1px solid var(--sage);
+        border-radius: var(--radius);
+        padding: 12px 20px;
+        font-size: 13px;
+        color: var(--sage);
+        box-shadow: var(--glow);
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+
+      /* Filter chips */
+      .flt {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+      }
+      .fb {
+        padding: 5px 14px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 12px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.15s;
+      }
+      .fb:hover {
+        border-color: var(--sage);
+        color: var(--text-primary);
+      }
+      .fb.on {
+        border-color: var(--sage);
+        color: var(--sage);
+        background: rgba(139, 154, 142, 0.1);
+      }
+
+      /* Empty states */
+      .empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+      .empty-ok {
+        background: rgba(46, 213, 115, 0.06);
+        border: 1px solid rgba(46, 213, 115, 0.15);
+        border-radius: var(--radius);
+        padding: 20px;
+        text-align: center;
+        color: var(--ok);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+      .empty-ok .sub {
+        color: var(--text-muted);
+        font-size: 12px;
+        margin-top: 4px;
+      }
+
+      /* Toggle switch */
+      .toggle {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        background: var(--border);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+        flex-shrink: 0;
+      }
+      .toggle.on {
+        background: var(--sage);
+      }
+      .toggle::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--text-primary);
+        transition: transform 0.2s;
+      }
+      .toggle.on::after {
+        transform: translateX(20px);
+      }
+
+      /* Info panel */
+      .info-box {
+        background: var(--bg-raised);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        margin-bottom: 16px;
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+      .info-box strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+
+      /* Spinner */
+      .spin {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--border);
+        border-top-color: var(--sage);
+        border-radius: 50%;
+        animation: sp 0.6s linear infinite;
+        vertical-align: middle;
+      }
+      @keyframes sp {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Divider */
+      .divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 20px 0;
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .sb {
+          width: 56px;
+        }
+        .sb-brand span,
+        .ni span,
+        .sb-ft .lb {
+          display: none;
+        }
+        .ni {
+          justify-content: center;
+          padding: 12px;
+        }
+        .sb-brand {
+          justify-content: center;
+          padding: 16px 8px;
+        }
+      }
+      @media (max-width: 768px) {
+        .mn {
+          padding: 16px;
+        }
+        .cg {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      /* Protection status bar */
+      .pbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        margin-bottom: 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      .pbar .pb-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .pbar .pb-dot.ok {
+        background: var(--ok);
+        box-shadow: 0 0 6px rgba(46, 213, 115, 0.4);
+      }
+      .pbar .pb-dot.bad {
+        background: var(--danger);
+        box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+      }
+      .pbar .pb-txt {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      /* Live dot (pulse) */
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+      .live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ok);
+        box-shadow: 0 0 6px rgba(46, 213, 115, 0.5);
+        animation: pulse 2s ease-in-out infinite;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      /* KPI flash */
+      @keyframes kpi-flash {
+        0% {
+          text-shadow: 0 0 12px rgba(139, 154, 142, 0.6);
+        }
+        100% {
+          text-shadow: none;
+        }
+      }
+      .cv.flash {
+        animation: kpi-flash 0.4s ease-out;
+      }
+
+      /* Detection layer rows (renamed from "Tier" to "Layer" — A/B/C) */
+      .layer-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        font-size: 13px;
+      }
+      .layer-label {
+        min-width: 240px;
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+      .layer-bar {
+        flex: 1;
+        height: 6px;
+        background: var(--bg-raised);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .layer-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.5s;
+      }
+      .layer-fill.on {
+        background: var(--ok);
+        width: 100%;
+      }
+      .layer-fill.off {
+        background: var(--border);
+        width: 0%;
+      }
+      .layer-status {
+        font-size: 12px;
+        font-weight: 600;
+        min-width: 90px;
+        text-align: right;
+      }
+      .layer-status.on {
+        color: var(--ok);
+      }
+      .layer-status.off {
+        color: var(--text-muted);
+      }
+
+      /* Hero protection status */
+      .hero {
+        background: linear-gradient(135deg, rgba(139, 154, 142, 0.12), rgba(139, 154, 142, 0.03));
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 20px;
+      }
+      .hero-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .hero-status {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--ok);
+      }
+
+      /* Tier-upsell link (shown when license tier is community for paid features) */
+      .upsell {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px dashed var(--border);
+        transition: all 0.15s;
+      }
+      .upsell:hover {
+        color: var(--sage);
+        border-color: var(--sage);
+      }
+
+      /* Threat Cloud flywheel */
+      .flywheel {
+        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-size: 12px;
+        color: var(--text-muted);
+        background: var(--bg-raised);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        white-space: pre;
+        line-height: 1.6;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar (220px fixed) -->
+    <div class="sb">
+      <div class="sb-brand">
+        <svg viewBox="385 323 1278 1403" fill="none">
+          <path
+            fill="#8B9A8E"
+            d="M 1021.5 830.423 C 1026.54 829.911 1045.81 832.659 1051.64 833.401 C 1072.38 835.99 1093.1 838.746 1113.8 841.667 L 1329.99 871.428 L 1329.95 1306.51 L 1330 1422.21 C 1330.01 1450.54 1332.08 1491.81 1325.18 1518.04 C 1318.79 1541.46 1305.62 1562.47 1287.31 1578.42 C 1269.98 1593.59 1234.62 1610.78 1212.96 1622.97 C 1151.4 1657.6 1087.44 1689.5 1026.42 1725.08 L 1024.58 1725.72 C 1020.72 1724.57 1005.67 1715.74 1001.44 1713.38 C 986.676 1705.08 971.857 1696.88 956.982 1688.79 L 836.342 1623.07 C 818.678 1613.37 800.537 1603.48 783.285 1593.93 C 741.183 1570.62 718.225 1528.6 718.162 1480.8 C 718.14 1463.85 718.093 1446.28 718.119 1429.07 L 718.13 1313.33 L 718.15 871.408 C 819.171 858.462 920.068 841.835 1021.5 830.423 z"
+          />
+        </svg>
+        <span>PANGUARD AI</span>
+      </div>
+      <div class="sb-nav">
+        <div class="ni on" data-tab="overview">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" /></svg
+          ><span data-i18n="n_ov">Overview</span>
+        </div>
+        <div class="ni" data-tab="threats">
+          <svg viewBox="0 0 24 24">
+            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" /></svg
+          ><span data-i18n="n_th">Threats</span>
+        </div>
+        <div class="ni" data-tab="rules">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9H8v-2h5v2zm3 4H8v-2h8v2zm-3-8V3.5L18.5 9H13z"
+            /></svg
+          ><span data-i18n="n_ru">Rules</span>
+        </div>
+        <div class="ni" data-tab="skills">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14l-3-3 1.41-1.41L11 13.17l4.59-4.58L17 10l-6 6z"
+            /></svg
+          ><span data-i18n="n_sk">Skills</span>
+        </div>
+        <div class="ni" data-tab="tcloud">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"
+            /></svg
+          ><span data-i18n="n_tc">Threat Cloud</span>
+        </div>
+        <div class="ni" data-tab="settings">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"
+            /></svg
+          ><span data-i18n="n_st">Settings</span>
+        </div>
+      </div>
+      <div class="sb-ft">
+        <div class="ws-b">
+          <div class="ws-d" id="wd"></div>
+          <span id="wl">Disconnected</span>
+        </div>
+        <div class="ws-b" style="margin-top: 6px">
+          <span
+            id="lic-badge"
+            style="
+              font-size: 10px;
+              font-weight: 600;
+              color: var(--sage);
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            "
+            >COMMUNITY</span
+          >
+        </div>
+        <button class="lb" onclick="toggleLang()">EN / ZH</button>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="mn">
+      <!-- Protection status bar (always visible) -->
+      <div class="pbar" id="pbar">
+        <div class="pb-dot ok" id="pb-dot"></div>
+        <span class="pb-txt" id="pb-txt">PROTECTED</span>
+        <span id="pb-detail">| -- rules active | Uptime: --</span>
+      </div>
+
+      <!-- ===== PAGE 1: Overview ===== -->
+      <div class="pg on" id="p-overview">
+        <div class="pt"><em data-i18n="t_ov">Overview</em></div>
+
+        <!-- Status hero -->
+        <div class="hero">
+          <div class="hero-head">
+            <div class="live-dot" id="hero-dot"></div>
+            <div class="hero-status" id="hero-status">PROTECTED</div>
+            <span class="badge badge-protected" id="hero-badge" data-i18n="active">Active</span>
+          </div>
+          <div
+            style="font-size: 13px; color: var(--text-muted); line-height: 1.6"
+            id="hero-desc"
+            data-i18n="hero_desc"
+          >
+            All detection layers are operational. PanGuard is monitoring AI agent activity in real
+            time.
+          </div>
+        </div>
+
+        <!-- 4 KPI cards -->
+        <div class="cg">
+          <div class="cd">
+            <div class="cl" data-i18n="k_rules">Rules Active</div>
+            <div class="cv sg" id="v-rules">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="k_threats">Threats Detected</div>
+            <div class="cv sg" id="v-threats">0</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="k_tc">TC Rules Synced</div>
+            <div class="cv sg" id="v-tcsync">0</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="k_endpoints">Endpoints Connected</div>
+            <div class="cv sg" id="v-endpoints">1</div>
+          </div>
+        </div>
+
+        <!-- Detection layers status (renamed Tier → Layer A/B/C) -->
+        <div class="fs">
+          <h3>
+            <span class="dot dot-ok"></span> <span data-i18n="layer_title">Detection Layers</span>
+          </h3>
+          <div class="desc" data-i18n="layer_desc">
+            Three layers operate in series. Pattern match runs first, heuristic correlation enriches
+            matches, confidence verdict decides the response.
+          </div>
+          <div class="layer-row">
+            <span class="layer-label">Layer A &mdash; Pattern match</span>
+            <div class="layer-bar"><div class="layer-fill on" id="la-bar"></div></div>
+            <span class="layer-status on" id="la-st" data-i18n="active">Active</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-label">Layer B &mdash; Heuristic correlation</span>
+            <div class="layer-bar"><div class="layer-fill on" id="lb-bar"></div></div>
+            <span class="layer-status on" id="lb-st" data-i18n="active">Active</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-label">Layer C &mdash; Confidence verdict</span>
+            <div class="layer-bar"><div class="layer-fill on" id="lc-bar"></div></div>
+            <span class="layer-status on" id="lc-st" data-i18n="active">Active</span>
+          </div>
+        </div>
+
+        <!-- Uptime counter -->
+        <div class="cg" style="margin-bottom: 20px">
+          <div class="cd">
+            <div class="cl" data-i18n="k_uptime">Uptime</div>
+            <div class="cv sg" id="v-uptime">0s</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="k_events">Events Scanned</div>
+            <div class="cv sg" id="v-events">0</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="k_mode">Mode</div>
+            <div class="cv-sm sg" id="v-mode">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="k_mem">Memory (MB)</div>
+            <div class="cv-sm sg" id="v-mem">0</div>
+          </div>
+        </div>
+
+        <!-- Recent events (last 20, auto-scroll) -->
+        <div class="st" data-i18n="recent_events">Recent Events</div>
+        <div id="ev-empty" class="empty-ok" data-i18n="ev_empty">
+          All clear. No events yet.
+          <div class="sub" data-i18n="ev_empty_sub">
+            Detected events will appear here as they happen.
+          </div>
+        </div>
+        <div class="tl" id="ev-log" style="display: none"></div>
+      </div>
+
+      <!-- ===== PAGE 2: Threats ===== -->
+      <div class="pg" id="p-threats">
+        <div class="pt"><em data-i18n="t_th">Threats</em></div>
+        <div class="pd" data-i18n="d_th">
+          Every detected threat is logged here. Malicious events are auto-blocked. Use the severity
+          filter chips to narrow the view.
+        </div>
+
+        <!-- Action bar: filters + tier-gated export buttons -->
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+          "
+        >
+          <div class="flt">
+            <button
+              class="fb on"
+              data-sev="all"
+              onclick="filterThreats('all', event)"
+              data-i18n="all"
+            >
+              All
+            </button>
+            <button
+              class="fb"
+              data-sev="critical"
+              onclick="filterThreats('critical', event)"
+              data-i18n="critical"
+            >
+              Critical
+            </button>
+            <button
+              class="fb"
+              data-sev="high"
+              onclick="filterThreats('high', event)"
+              data-i18n="high"
+            >
+              High
+            </button>
+            <button
+              class="fb"
+              data-sev="medium"
+              onclick="filterThreats('medium', event)"
+              data-i18n="medium"
+            >
+              Medium
+            </button>
+            <button class="fb" data-sev="low" onclick="filterThreats('low', event)" data-i18n="low">
+              Low
+            </button>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <button
+              class="btn btn-secondary btn-sm"
+              data-tier-gate="pilot"
+              id="btn-sarif"
+              onclick="exportSARIF()"
+              style="display: none"
+            >
+              <span data-i18n="exp_sarif">Export SARIF</span>
+            </button>
+            <button
+              class="btn btn-primary btn-sm"
+              data-tier-gate="pilot"
+              id="btn-evidence"
+              onclick="exportEvidence()"
+              style="display: none"
+            >
+              <span data-i18n="exp_evidence">Generate Evidence Pack</span>
+            </button>
+            <a
+              class="upsell"
+              data-tier-upsell="pilot"
+              href="https://panguard.ai/pricing"
+              target="_blank"
+              rel="noopener"
+              style="display: none"
+              data-i18n="upsell_pilot"
+            >
+              Upgrade to Pilot &mdash; unlock SARIF + Evidence Pack
+            </a>
+          </div>
+        </div>
+
+        <!-- Sortable threat table -->
+        <table class="tb">
+          <thead>
+            <tr>
+              <th onclick="sortThreats('timestamp')" data-i18n="th_ts">Timestamp</th>
+              <th onclick="sortThreats('ruleId')" data-i18n="th_rid">Rule ID</th>
+              <th onclick="sortThreats('severity')" data-i18n="th_sev">Severity</th>
+              <th data-i18n="th_pat">Matched Pattern</th>
+              <th onclick="sortThreats('action')" data-i18n="th_act">Action</th>
+            </tr>
+          </thead>
+          <tbody id="th-tb"></tbody>
+        </table>
+        <div id="th-empty" class="empty" data-i18n="th_empty" style="display: none">
+          No threats detected.
+        </div>
+      </div>
+
+      <!-- ===== PAGE 3: Rules ===== -->
+      <div class="pg" id="p-rules">
+        <div class="pt"><em data-i18n="t_ru">Rules</em></div>
+        <div class="pd" data-i18n="d_ru">
+          All loaded ATR detection rules. Rules sync hourly from Threat Cloud. Use search and
+          filters to find specific rules.
+        </div>
+
+        <div class="cg">
+          <div class="cd">
+            <div class="cl" data-i18n="ru_total">Total Rules</div>
+            <div class="cv sg" id="ru-count">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="ru_critical">Critical</div>
+            <div class="cv bad" id="ru-critical">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="ru_high">High</div>
+            <div class="cv w" id="ru-high">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="ru_synced">Last Sync</div>
+            <div class="cv-sm sg" id="ru-sync">--</div>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+          "
+        >
+          <input
+            id="ru-search"
+            type="text"
+            placeholder="Search rules by ID, title, or category..."
+            style="
+              flex: 1;
+              min-width: 260px;
+              background: var(--bg-raised);
+              border: 1px solid var(--border);
+              color: var(--text-primary);
+              padding: 8px 14px;
+              border-radius: 8px;
+              font-size: 13px;
+              outline: none;
+            "
+            oninput="filterRules()"
+            onfocus="this.style.borderColor = 'var(--sage)'"
+            onblur="this.style.borderColor = 'var(--border)'"
+          />
+          <select
+            id="ru-cat"
+            onchange="filterRules()"
+            style="
+              background: var(--bg-raised);
+              border: 1px solid var(--border);
+              color: var(--text-primary);
+              padding: 8px 12px;
+              border-radius: 8px;
+              font-size: 13px;
+              outline: none;
+            "
+          >
+            <option value="">All categories</option>
+          </select>
+          <select
+            id="ru-sev-flt"
+            onchange="filterRules()"
+            style="
+              background: var(--bg-raised);
+              border: 1px solid var(--border);
+              color: var(--text-primary);
+              padding: 8px 12px;
+              border-radius: 8px;
+              font-size: 13px;
+              outline: none;
+            "
+          >
+            <option value="">All severities</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <select
+            id="ru-target"
+            onchange="filterRules()"
+            style="
+              background: var(--bg-raised);
+              border: 1px solid var(--border);
+              color: var(--text-primary);
+              padding: 8px 12px;
+              border-radius: 8px;
+              font-size: 13px;
+              outline: none;
+            "
+          >
+            <option value="">All scan targets</option>
+          </select>
+          <span
+            id="ru-search-count"
+            style="font-size: 12px; color: var(--text-muted); white-space: nowrap"
+          ></span>
+        </div>
+
+        <div id="ru-loading" class="empty">
+          <span class="spin"></span> <span data-i18n="ru_loading">Loading rules...</span>
+        </div>
+        <div id="ru-wrap" style="max-height: 520px; overflow-y: auto; display: none">
+          <table class="tb" id="ru-table">
+            <thead>
+              <tr>
+                <th data-i18n="ru_id">ID</th>
+                <th data-i18n="ru_title">Title</th>
+                <th data-i18n="ru_severity">Severity</th>
+                <th data-i18n="ru_category">Category</th>
+                <th data-i18n="ru_target">scan_target</th>
+                <th data-i18n="ru_status">Status</th>
+              </tr>
+            </thead>
+            <tbody id="ru-tb"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== PAGE 4: Skills ===== -->
+      <div class="pg" id="p-skills">
+        <div class="pt"><em data-i18n="t_sk">Skills</em></div>
+        <div class="pd" data-i18n="d_sk">
+          All MCP skills detected across your platforms. Whitelisted skills are trusted; unknown
+          skills are tracked for behavior drift.
+        </div>
+
+        <div class="cg">
+          <div class="cd">
+            <div class="cl" data-i18n="sk_total">Total Installed</div>
+            <div class="cv sg" id="sk-total">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="sk_wl">Whitelisted</div>
+            <div class="cv ok" id="sk-wl">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="sk_unk">Tracked</div>
+            <div class="cv w" id="sk-unk">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl" data-i18n="sk_blk">Blocked</div>
+            <div class="cv bad" id="sk-blk">0</div>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+          "
+        >
+          <div class="st" style="margin-bottom: 0" data-i18n="all_skills">All Installed Skills</div>
+          <button
+            class="btn btn-primary btn-sm"
+            onclick="
+              loadSkills();
+              toast('Refreshing skills...');
+            "
+          >
+            <span data-i18n="scan_now">Scan Now</span>
+          </button>
+        </div>
+        <div id="sk-loading" class="empty">
+          <span class="spin"></span> <span data-i18n="sk_loading">Loading skills...</span>
+        </div>
+        <table class="tb" id="sk-table" style="display: none">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th data-i18n="sk_name">Name</th>
+              <th data-i18n="sk_platform">Platform</th>
+              <th data-i18n="sk_risk">Risk</th>
+              <th data-i18n="sk_status">Status</th>
+              <th data-i18n="sk_audit">Last Audit</th>
+            </tr>
+          </thead>
+          <tbody id="sk-tb"></tbody>
+        </table>
+      </div>
+
+      <!-- ===== PAGE 5: Threat Cloud ===== -->
+      <div class="pg" id="p-tcloud">
+        <div class="pt"><em data-i18n="t_tc">Threat Cloud</em></div>
+        <div class="pd" data-i18n="d_tc">
+          Threat Cloud is PanGuard's anonymous threat intelligence sharing network. Your endpoint
+          can upload anonymized threat patterns and receive updated detection rules in return.
+        </div>
+
+        <div id="tc-loading" class="empty">
+          <span class="spin"></span>
+          <span data-i18n="tc_loading">Loading Threat Cloud status...</span>
+        </div>
+        <div id="tc-content" style="display: none">
+          <div class="fs">
+            <h3>
+              <span class="dot" id="tc-conn-dot"></span>
+              <span data-i18n="tc_conn">Connection Status</span>
+              <span id="tc-conn-text" style="margin-left: auto; font-size: 13px; font-weight: 600"
+                >--</span
+              >
+            </h3>
+            <div
+              class="desc"
+              id="tc-endpoint"
+              style="
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 12px;
+                color: var(--text-muted);
+              "
+            >
+              --
+            </div>
+          </div>
+
+          <div class="cg">
+            <div class="cd">
+              <div class="cl" data-i18n="tc_received">Rules Received</div>
+              <div class="cv sg" id="tc-recv">0</div>
+            </div>
+            <div class="cd">
+              <div class="cl" data-i18n="tc_uploaded">Threats Uploaded</div>
+              <div class="cv sg" id="tc-up">0</div>
+            </div>
+            <div class="cd">
+              <div class="cl" data-i18n="tc_queue">Queue</div>
+              <div class="cv sg" id="tc-q">0</div>
+            </div>
+            <div class="cd">
+              <div class="cl" data-i18n="tc_last">Last Sync</div>
+              <div class="cv-sm sg" id="tc-last">--</div>
+            </div>
+          </div>
+
+          <div class="st" data-i18n="tc_flywheel">Flywheel</div>
+          <div class="flywheel" id="tc-flywheel">
+            +----------------+ +----------------+ +----------------+ | Your Endpoint | ---> | Threat
+            Cloud | ---> | Community | | threats in | | aggregation | | rules out |
+            +----------------+ +----------------+ +----------------+ ^ | | | +----------- rules
+            synced hourly ---------------+
+          </div>
+
+          <div class="fs" style="margin-top: 20px">
+            <h3 data-i18n="tc_upload">Anonymous Upload</h3>
+            <div class="desc" data-i18n="tc_upload_desc">
+              When enabled, anonymized threat patterns are uploaded to Threat Cloud. No personal
+              data, file contents, or source code is sent.
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div class="toggle" id="tc-toggle" onclick="toggleUpload()"></div>
+              <span id="tc-toggle-label" style="font-size: 13px; font-weight: 600">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGE 6: Settings ===== -->
+      <div class="pg" id="p-settings">
+        <div class="pt"><em data-i18n="t_st">Settings</em></div>
+        <div class="pd" data-i18n="d_st">Configure how Guard runs on this endpoint.</div>
+
+        <div class="fs">
+          <h3 data-i18n="st_mode">Guard Mode</h3>
+          <div class="desc" data-i18n="st_mode_desc">
+            Learning mode builds a baseline of normal activity. Protection mode actively blocks
+            detected threats.
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div class="toggle" id="st-mode-toggle" onclick="toggleMode()"></div>
+            <span id="st-mode-label" style="font-size: 13px; font-weight: 600">Learning</span>
+          </div>
+        </div>
+
+        <div class="fs">
+          <h3 data-i18n="st_tc">Threat Cloud Endpoint</h3>
+          <div class="desc" data-i18n="st_tc_desc">
+            URL of the Threat Cloud relay. Leave empty for the default panguard.ai endpoint, or
+            specify your own air-gapped relay.
+          </div>
+          <div class="fr">
+            <label data-i18n="st_endpoint">Endpoint</label>
+            <input id="st-tc-endpoint" type="text" placeholder="https://tc.panguard.ai/api" />
+          </div>
+          <div class="fr">
+            <label data-i18n="st_upload">Upload</label>
+            <div class="toggle" id="st-tc-upload" onclick="toggleUploadSettings()"></div>
+            <span id="st-tc-upload-label" style="font-size: 13px; font-weight: 600">--</span>
+          </div>
+        </div>
+
+        <div class="fs">
+          <h3 data-i18n="st_port">Dashboard Port</h3>
+          <div class="desc" data-i18n="st_port_desc">
+            The TCP port this dashboard listens on (localhost-only).
+          </div>
+          <div class="fr">
+            <label data-i18n="st_port_label">Port</label>
+            <input id="st-port" type="number" placeholder="9999" min="1024" max="65535" />
+          </div>
+        </div>
+
+        <div class="fs">
+          <h3 data-i18n="st_lang">Language</h3>
+          <div class="desc" data-i18n="st_lang_desc">
+            Choose the display language. Setting is stored locally.
+          </div>
+          <div class="fr">
+            <label data-i18n="st_lang_label">Language</label>
+            <select id="st-lang" onchange="setLangFromSettings()">
+              <option value="en">English</option>
+              <option value="zh">繁體中文</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 8px">
+          <button class="btn btn-primary" onclick="saveSettings()" data-i18n="st_save">Save</button>
+          <button class="btn btn-secondary" onclick="loadSettings()" data-i18n="st_reload">
+            Reload
+          </button>
+        </div>
+
+        <div class="info-box" style="margin-top: 20px">
+          <strong data-i18n="st_license">License Tier:</strong> <span id="st-tier-display">--</span
+          ><br />
+          <span data-i18n="st_license_desc"
+            >Community is free and unlimited. Pilot unlocks SARIF + Evidence Pack export and
+            priority Threat Cloud routing.</span
+          >
+          <br /><br />
+          <a
+            href="https://panguard.ai/pricing"
+            target="_blank"
+            rel="noopener"
+            style="color: var(--sage)"
+            data-i18n="st_license_link"
+            >View pricing &rarr;</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      /* ============================================================ */
+      /*  i18n strings (EN / ZH)                                       */
+      /* ============================================================ */
+      var T = {
+        en: {
+          n_ov: 'Overview',
+          n_th: 'Threats',
+          n_ru: 'Rules',
+          n_sk: 'Skills',
+          n_tc: 'Threat Cloud',
+          n_st: 'Settings',
+          t_ov: 'Overview',
+          t_th: 'Threats',
+          t_ru: 'Rules',
+          t_sk: 'Skills',
+          t_tc: 'Threat Cloud',
+          t_st: 'Settings',
+          active: 'Active',
+          hero_desc:
+            'All detection layers are operational. PanGuard is monitoring AI agent activity in real time.',
+          k_rules: 'Rules Active',
+          k_threats: 'Threats Detected',
+          k_tc: 'TC Rules Synced',
+          k_endpoints: 'Endpoints Connected',
+          k_uptime: 'Uptime',
+          k_events: 'Events Scanned',
+          k_mode: 'Mode',
+          k_mem: 'Memory (MB)',
+          layer_title: 'Detection Layers',
+          layer_desc:
+            'Three layers operate in series. Pattern match runs first, heuristic correlation enriches matches, confidence verdict decides the response.',
+          recent_events: 'Recent Events',
+          ev_empty: 'All clear. No events yet.',
+          ev_empty_sub: 'Detected events will appear here as they happen.',
+          d_th: 'Every detected threat is logged here. Malicious events are auto-blocked. Use the severity filter chips to narrow the view.',
+          all: 'All',
+          critical: 'Critical',
+          high: 'High',
+          medium: 'Medium',
+          low: 'Low',
+          exp_sarif: 'Export SARIF',
+          exp_evidence: 'Generate Evidence Pack',
+          upsell_pilot: 'Upgrade to Pilot — unlock SARIF + Evidence Pack',
+          th_ts: 'Timestamp',
+          th_rid: 'Rule ID',
+          th_sev: 'Severity',
+          th_pat: 'Matched Pattern',
+          th_act: 'Action',
+          th_empty: 'No threats detected.',
+          d_ru: 'All loaded ATR detection rules. Rules sync hourly from Threat Cloud.',
+          ru_total: 'Total Rules',
+          ru_critical: 'Critical',
+          ru_high: 'High',
+          ru_synced: 'Last Sync',
+          ru_loading: 'Loading rules...',
+          ru_id: 'ID',
+          ru_title: 'Title',
+          ru_severity: 'Severity',
+          ru_category: 'Category',
+          ru_target: 'scan_target',
+          ru_status: 'Status',
+          d_sk: 'All MCP skills detected across your platforms. Whitelisted skills are trusted; unknown skills are tracked for behavior drift.',
+          sk_total: 'Total Installed',
+          sk_wl: 'Whitelisted',
+          sk_unk: 'Tracked',
+          sk_blk: 'Blocked',
+          all_skills: 'All Installed Skills',
+          scan_now: 'Scan Now',
+          sk_loading: 'Loading skills...',
+          sk_name: 'Name',
+          sk_platform: 'Platform',
+          sk_risk: 'Risk',
+          sk_status: 'Status',
+          sk_audit: 'Last Audit',
+          d_tc: "Threat Cloud is PanGuard's anonymous threat intelligence sharing network.",
+          tc_loading: 'Loading Threat Cloud status...',
+          tc_conn: 'Connection Status',
+          tc_received: 'Rules Received',
+          tc_uploaded: 'Threats Uploaded',
+          tc_queue: 'Queue',
+          tc_last: 'Last Sync',
+          tc_flywheel: 'Flywheel',
+          tc_upload: 'Anonymous Upload',
+          tc_upload_desc:
+            'When enabled, anonymized threat patterns are uploaded to Threat Cloud. No personal data, file contents, or source code is sent.',
+          d_st: 'Configure how Guard runs on this endpoint.',
+          st_mode: 'Guard Mode',
+          st_mode_desc:
+            'Learning mode builds a baseline. Protection mode actively blocks detected threats.',
+          st_tc: 'Threat Cloud Endpoint',
+          st_tc_desc:
+            'URL of the Threat Cloud relay. Leave empty for the default panguard.ai endpoint.',
+          st_endpoint: 'Endpoint',
+          st_upload: 'Upload',
+          st_port: 'Dashboard Port',
+          st_port_desc: 'The TCP port this dashboard listens on (localhost-only).',
+          st_port_label: 'Port',
+          st_lang: 'Language',
+          st_lang_desc: 'Choose the display language.',
+          st_lang_label: 'Language',
+          st_save: 'Save',
+          st_reload: 'Reload',
+          st_license: 'License Tier:',
+          st_license_desc:
+            'Community is free and unlimited. Pilot unlocks SARIF + Evidence Pack export and priority Threat Cloud routing.',
+          st_license_link: 'View pricing →',
+        },
+        zh: {
+          n_ov: '總覽',
+          n_th: '威脅',
+          n_ru: '規則',
+          n_sk: '技能',
+          n_tc: '威脅雲',
+          n_st: '設定',
+          t_ov: '總覽',
+          t_th: '威脅',
+          t_ru: '規則',
+          t_sk: '技能',
+          t_tc: '威脅雲',
+          t_st: '設定',
+          active: '啟動中',
+          hero_desc: '所有偵測層運作中,PanGuard 正在即時監控 AI agent 活動。',
+          k_rules: '啟用規則',
+          k_threats: '已偵測威脅',
+          k_tc: 'TC 同步規則',
+          k_endpoints: '已連線端點',
+          k_uptime: '運行時間',
+          k_events: '已掃描事件',
+          k_mode: '模式',
+          k_mem: '記憶體 (MB)',
+          layer_title: '偵測層',
+          layer_desc:
+            '三層串聯運作,Layer A 先進行模式比對,Layer B 進行啟發式關聯,Layer C 決定信心判決。',
+          recent_events: '最近事件',
+          ev_empty: '目前無事件。',
+          ev_empty_sub: '偵測到的事件將於此即時顯示。',
+          d_th: '所有偵測到的威脅都記錄於此。惡意事件會自動封鎖。可使用嚴重程度篩選。',
+          all: '全部',
+          critical: '嚴重',
+          high: '高',
+          medium: '中',
+          low: '低',
+          exp_sarif: '匯出 SARIF',
+          exp_evidence: '產生 Evidence Pack',
+          upsell_pilot: '升級至 Pilot — 解鎖 SARIF + Evidence Pack',
+          th_ts: '時間',
+          th_rid: '規則 ID',
+          th_sev: '嚴重程度',
+          th_pat: '匹配模式',
+          th_act: '採取動作',
+          th_empty: '未偵測到威脅。',
+          d_ru: '已載入的 ATR 偵測規則。規則每小時自動從 Threat Cloud 同步。',
+          ru_total: '總規則數',
+          ru_critical: '嚴重',
+          ru_high: '高',
+          ru_synced: '最後同步',
+          ru_loading: '載入規則中...',
+          ru_id: 'ID',
+          ru_title: '標題',
+          ru_severity: '嚴重程度',
+          ru_category: '分類',
+          ru_target: 'scan_target',
+          ru_status: '狀態',
+          d_sk: '所有平台已安裝的 MCP skill。Whitelist skill 為已信任,未知 skill 持續追蹤行為偏移。',
+          sk_total: '已安裝總數',
+          sk_wl: '白名單',
+          sk_unk: '追蹤中',
+          sk_blk: '已封鎖',
+          all_skills: '所有已安裝技能',
+          scan_now: '立即掃描',
+          sk_loading: '載入技能中...',
+          sk_name: '名稱',
+          sk_platform: '平台',
+          sk_risk: '風險',
+          sk_status: '狀態',
+          sk_audit: '上次稽核',
+          d_tc: 'Threat Cloud 是 PanGuard 的匿名威脅情資共享網路。',
+          tc_loading: '載入 Threat Cloud 狀態中...',
+          tc_conn: '連線狀態',
+          tc_received: '已接收規則',
+          tc_uploaded: '已上傳威脅',
+          tc_queue: '佇列',
+          tc_last: '最後同步',
+          tc_flywheel: '飛輪',
+          tc_upload: '匿名上傳',
+          tc_upload_desc:
+            '啟用時,匿名化威脅模式會上傳到 Threat Cloud。絕不傳送個人資料、檔案內容或原始碼。',
+          d_st: '設定 Guard 在此端點的運作方式。',
+          st_mode: 'Guard 模式',
+          st_mode_desc: '學習模式建立基線,保護模式主動封鎖偵測到的威脅。',
+          st_tc: 'Threat Cloud Endpoint',
+          st_tc_desc: 'Threat Cloud relay 的 URL。留空使用預設 panguard.ai endpoint。',
+          st_endpoint: 'Endpoint',
+          st_upload: '上傳',
+          st_port: 'Dashboard 連接埠',
+          st_port_desc: 'Dashboard 監聽的 TCP 連接埠 (僅 localhost)。',
+          st_port_label: '連接埠',
+          st_lang: '語言',
+          st_lang_desc: '選擇顯示語言。',
+          st_lang_label: '語言',
+          st_save: '儲存',
+          st_reload: '重新載入',
+          st_license: '授權等級:',
+          st_license_desc:
+            'Community 永久免費。Pilot 解鎖 SARIF + Evidence Pack 匯出與優先 Threat Cloud 路由。',
+          st_license_link: '查看價格 →',
+        },
+      };
+
+      var lang = (function () {
+        try {
+          var s = localStorage.getItem('panguard_lang');
+          if (s === 'zh' || s === 'en') return s;
+          var n = navigator.language || '';
+          if (n.toLowerCase().indexOf('zh') === 0) return 'zh';
+          return 'en';
+        } catch (e) {
+          return 'en';
+        }
+      })();
+
+      var currentSevFilter = 'all';
+      var currentSort = { col: 'timestamp', dir: 'desc' };
+      var allThreats = [];
+      var allRules = [];
+      var licenseTier = 'community';
+
+      /* ============================================================ */
+      /*  Utilities                                                    */
+      /* ============================================================ */
+      function esc(s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+      function fmtUptime(ms) {
+        var s = Math.floor(ms / 1000);
+        if (s < 60) return s + 's';
+        var m = Math.floor(s / 60);
+        s %= 60;
+        if (m < 60) return m + 'm ' + s + 's';
+        var h = Math.floor(m / 60);
+        m %= 60;
+        return h + 'h ' + m + 'm';
+      }
+      function toast(msg) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(function () {
+          t.classList.remove('show');
+        }, 2500);
+      }
+      function af(path, opts) {
+        opts = opts || {};
+        opts.credentials = 'same-origin';
+        return fetch(path, opts).then(function (r) {
+          if (r.status === 401) {
+            var wl = document.getElementById('wl');
+            if (wl) wl.textContent = lang === 'zh' ? 'Token 無效' : 'Invalid token';
+          }
+          return r;
+        });
+      }
+
+      /* ============================================================ */
+      /*  i18n + language toggle                                       */
+      /* ============================================================ */
+      function applyLang() {
+        document.querySelectorAll('[data-i18n]').forEach(function (e) {
+          var k = e.getAttribute('data-i18n');
+          if (T[lang] && T[lang][k]) {
+            if (e.tagName === 'INPUT') e.placeholder = T[lang][k];
+            else e.textContent = T[lang][k];
+          }
+        });
+      }
+      function toggleLang() {
+        lang = lang === 'en' ? 'zh' : 'en';
+        try {
+          localStorage.setItem('panguard_lang', lang);
+        } catch (e) {
+          /* ignore */
+        }
+        applyLang();
+      }
+
+      /* ============================================================ */
+      /*  Navigation                                                   */
+      /* ============================================================ */
+      function nav(tab) {
+        document.querySelectorAll('.ni').forEach(function (n) {
+          n.classList.remove('on');
+        });
+        var navItem = document.querySelector('[data-tab="' + tab + '"]');
+        if (navItem) navItem.classList.add('on');
+        document.querySelectorAll('.pg').forEach(function (p) {
+          p.classList.remove('on');
+        });
+        var page = document.getElementById('p-' + tab);
+        if (page) page.classList.add('on');
+        // Lazy-load page data
+        if (tab === 'overview') {
+          loadStatus();
+        }
+        if (tab === 'threats') {
+          loadThreats();
+        }
+        if (tab === 'rules') {
+          loadRules();
+        }
+        if (tab === 'skills') {
+          loadSkills();
+        }
+        if (tab === 'tcloud') {
+          loadTCloud();
+        }
+        if (tab === 'settings') {
+          loadSettings();
+        }
+      }
+      document.querySelectorAll('.ni').forEach(function (n) {
+        n.addEventListener('click', function () {
+          nav(this.getAttribute('data-tab'));
+        });
+      });
+
+      /* ============================================================ */
+      /*  License tier gating                                          */
+      /* ============================================================ */
+      function applyTierGates(status) {
+        var tier = (status && status.license && status.license.tier) || 'community';
+        licenseTier = tier;
+        var isPaid = tier === 'pilot' || tier === 'enterprise' || tier === 'pro';
+        document.querySelectorAll('[data-tier-gate="pilot"]').forEach(function (el) {
+          el.style.display = isPaid ? 'inline-flex' : 'none';
+        });
+        document.querySelectorAll('[data-tier-upsell="pilot"]').forEach(function (el) {
+          el.style.display = isPaid ? 'none' : 'inline-flex';
+        });
+        var badge = document.getElementById('lic-badge');
+        if (badge) badge.textContent = tier.toUpperCase();
+        var dispTier = document.getElementById('st-tier-display');
+        if (dispTier) dispTier.textContent = tier;
+      }
+
+      /* ============================================================ */
+      /*  WebSocket                                                    */
+      /* ============================================================ */
+      function connectWS() {
+        var ws = new WebSocket('ws://' + location.host + '/ws');
+        ws.onopen = function () {
+          document.getElementById('wd').classList.add('on');
+          document.getElementById('wl').textContent = lang === 'zh' ? '已連線' : 'Connected';
+        };
+        ws.onclose = function () {
+          document.getElementById('wd').classList.remove('on');
+          document.getElementById('wl').textContent = lang === 'zh' ? '已斷線' : 'Disconnected';
+          setTimeout(connectWS, 3000);
+        };
+        ws.onmessage = function (e) {
+          try {
+            var m = JSON.parse(e.data);
+            if (m.type === 'status_update') updateStatus(m.data);
+            if (m.type === 'new_event' || m.type === 'new_verdict') appendEvent(m);
+          } catch (x) {
+            /* ignore */
+          }
+        };
+      }
+
+      /* ============================================================ */
+      /*  Status updates                                               */
+      /* ============================================================ */
+      function setKPI(id, val) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var nv = String(val);
+        if (el.textContent !== nv) {
+          el.textContent = nv;
+          el.classList.remove('flash');
+          void el.offsetWidth;
+          el.classList.add('flash');
+        }
+      }
+      function updateStatus(s) {
+        if (!s) return;
+        setKPI('v-rules', (s.atrRuleCount || 0).toLocaleString());
+        var th = s.threatsDetected || 0;
+        setKPI('v-threats', th);
+        var te = document.getElementById('v-threats');
+        if (te) te.className = 'cv ' + (th > 0 ? 'bad' : 'sg');
+        setKPI('v-uptime', fmtUptime(s.uptime || 0));
+        setKPI('v-events', (s.eventsProcessed || 0).toLocaleString());
+        setKPI('v-mode', s.mode || '--');
+        setKPI('v-mem', Math.round(s.memoryUsageMB || 0));
+        setKPI('v-endpoints', '1');
+
+        var hs = document.getElementById('hero-status');
+        var hd = document.getElementById('hero-dot');
+        var hb = document.getElementById('hero-badge');
+        if (hs) {
+          hs.textContent = s.mode === 'protection' ? 'PROTECTED' : 'LEARNING';
+          hs.style.color = s.mode === 'protection' ? 'var(--ok)' : 'var(--warn)';
+        }
+        if (hd) hd.style.background = s.mode === 'protection' ? 'var(--ok)' : 'var(--warn)';
+        if (hb) {
+          hb.textContent = s.mode === 'protection' ? 'PROTECTED' : 'LEARNING';
+          hb.className =
+            'badge ' + (s.mode === 'protection' ? 'badge-protected' : 'badge-learning');
+        }
+        updatePBar(s);
+        applyTierGates(s);
+      }
+      function updatePBar(s) {
+        var dot = document.getElementById('pb-dot');
+        var txt = document.getElementById('pb-txt');
+        var det = document.getElementById('pb-detail');
+        if (!dot || !txt || !det) return;
+        var running = s.mode === 'protection' || s.mode === 'learning';
+        dot.className = 'pb-dot ' + (running ? 'ok' : 'bad');
+        txt.textContent = running
+          ? s.mode === 'protection'
+            ? 'PROTECTED'
+            : 'LEARNING'
+          : 'OFFLINE';
+        var rules = s.atrRuleCount || 0;
+        det.textContent =
+          '| ' +
+          rules +
+          ' rules active | ' +
+          (s.eventsProcessed || 0) +
+          ' events | Uptime: ' +
+          fmtUptime(s.uptime || 0);
+      }
+      function appendEvent(m) {
+        var emp = document.getElementById('ev-empty');
+        if (emp) emp.style.display = 'none';
+        var log = document.getElementById('ev-log');
+        if (log) log.style.display = '';
+        var d = document.createElement('div');
+        var sev = (m.data && (m.data.severity || m.data.conclusion)) || 'benign';
+        d.className = 'ei ' + sev;
+        var t = m.timestamp ? m.timestamp.split('T')[1].split('.')[0] : '--:--:--';
+        d.innerHTML =
+          '<span class="ei-t">' +
+          t +
+          '</span>' +
+          '<span class="ei-y">' +
+          esc(m.type || '') +
+          '</span>' +
+          '<span class="ei-d">' +
+          esc(JSON.stringify(m.data || {}).slice(0, 200)) +
+          '</span>';
+        log.prepend(d);
+        while (log.children.length > 20) log.removeChild(log.lastChild);
+      }
+
+      /* ============================================================ */
+      /*  Page loaders                                                 */
+      /* ============================================================ */
+      function loadStatus() {
+        af('/api/status')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(updateStatus)
+          .catch(function () {
+            /* ignore */
+          });
+      }
+
+      function loadThreats() {
+        af('/api/verdicts')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (verdicts) {
+            allThreats = (verdicts || []).map(function (v, i) {
+              return {
+                timestamp: v.timestamp || new Date().toISOString(),
+                ruleId: (v.evidence && v.evidence[0] && v.evidence[0].source) || 'rule-' + i,
+                severity:
+                  v.conclusion === 'malicious'
+                    ? 'critical'
+                    : v.conclusion === 'suspicious'
+                      ? 'medium'
+                      : 'low',
+                pattern: (v.reasoning || '').slice(0, 50),
+                action: v.recommendedAction || 'log_only',
+              };
+            });
+            renderThreats();
+          })
+          .catch(function () {
+            renderThreats();
+          });
+      }
+      function renderThreats() {
+        var tb = document.getElementById('th-tb');
+        var emp = document.getElementById('th-empty');
+        tb.innerHTML = '';
+        var list = allThreats.filter(function (t) {
+          return currentSevFilter === 'all' || t.severity === currentSevFilter;
+        });
+        list.sort(function (a, b) {
+          var av = a[currentSort.col],
+            bv = b[currentSort.col];
+          if (av === bv) return 0;
+          return (av < bv ? -1 : 1) * (currentSort.dir === 'desc' ? -1 : 1);
+        });
+        if (list.length === 0) {
+          if (emp) emp.style.display = '';
+          return;
+        }
+        if (emp) emp.style.display = 'none';
+        list.forEach(function (t) {
+          var tr = document.createElement('tr');
+          var ts = t.timestamp.split('T')[1]
+            ? t.timestamp.split('T')[1].split('.')[0]
+            : t.timestamp;
+          tr.innerHTML =
+            '<td class="mono">' +
+            esc(ts) +
+            '</td>' +
+            '<td class="mono">' +
+            esc(t.ruleId) +
+            '</td>' +
+            '<td><span class="badge badge-' +
+            t.severity +
+            '">' +
+            esc(t.severity) +
+            '</span></td>' +
+            '<td class="mono">' +
+            esc(t.pattern) +
+            '</td>' +
+            '<td>' +
+            esc(t.action) +
+            '</td>';
+          tb.appendChild(tr);
+        });
+      }
+      function filterThreats(sev, ev) {
+        currentSevFilter = sev;
+        document.querySelectorAll('.fb').forEach(function (b) {
+          b.classList.remove('on');
+        });
+        if (ev && ev.target) ev.target.classList.add('on');
+        renderThreats();
+      }
+      function sortThreats(col) {
+        if (currentSort.col === col) {
+          currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';
+        } else {
+          currentSort.col = col;
+          currentSort.dir = 'desc';
+        }
+        renderThreats();
+      }
+
+      function exportSARIF() {
+        af('/api/export/sarif', { method: 'POST' })
+          .then(function (r) {
+            if (!r.ok) {
+              toast('Export failed');
+              return null;
+            }
+            return r.blob();
+          })
+          .then(function (blob) {
+            if (!blob) return;
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'panguard-threats.sarif.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            toast('SARIF exported');
+          })
+          .catch(function () {
+            toast('Network error');
+          });
+      }
+      function exportEvidence() {
+        af('/api/export/evidence', { method: 'POST' })
+          .then(function (r) {
+            if (!r.ok) {
+              toast('Export failed');
+              return null;
+            }
+            return r.blob();
+          })
+          .then(function (blob) {
+            if (!blob) return;
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'panguard-evidence.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            toast('Evidence pack generated');
+          })
+          .catch(function () {
+            toast('Network error');
+          });
+      }
+
+      function loadRules() {
+        af('/api/rules')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            setKPI('ru-count', d.atr || 0);
+            var sync = d.lastSync ? new Date(d.lastSync).toLocaleString() : '--';
+            document.getElementById('ru-sync').textContent = sync;
+          })
+          .catch(function () {
+            /* ignore */
+          });
+        af('/api/loaded-rules')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            allRules = d.rules || [];
+            document.getElementById('ru-loading').style.display = 'none';
+            document.getElementById('ru-wrap').style.display = '';
+            // Build filter options
+            var cats = {};
+            var targets = {};
+            var critCount = 0,
+              highCount = 0;
+            allRules.forEach(function (r) {
+              if (r.category) cats[r.category] = true;
+              if (r.scan_target) targets[r.scan_target] = true;
+              if (r.severity === 'critical') critCount++;
+              if (r.severity === 'high') highCount++;
+            });
+            setKPI('ru-critical', critCount);
+            setKPI('ru-high', highCount);
+            var catSel = document.getElementById('ru-cat');
+            Object.keys(cats)
+              .sort()
+              .forEach(function (c) {
+                var opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                catSel.appendChild(opt);
+              });
+            var tgtSel = document.getElementById('ru-target');
+            Object.keys(targets)
+              .sort()
+              .forEach(function (t) {
+                var opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t;
+                tgtSel.appendChild(opt);
+              });
+            renderRules(allRules);
+          })
+          .catch(function () {
+            document.getElementById('ru-loading').innerHTML =
+              '<span style="color:var(--danger)">Failed to load rules</span>';
+          });
+      }
+      function renderRules(rules) {
+        var tb = document.getElementById('ru-tb');
+        var table = document.getElementById('ru-table');
+        tb.innerHTML = '';
+        if (rules.length === 0) {
+          tb.innerHTML = '<tr><td colspan="6" class="empty">No rules match the filters.</td></tr>';
+          table.style.display = '';
+          return;
+        }
+        table.style.display = '';
+        rules.forEach(function (r) {
+          var tr = document.createElement('tr');
+          tr.innerHTML =
+            '<td class="mono">' +
+            esc(r.id) +
+            '</td>' +
+            '<td>' +
+            esc(r.title) +
+            '</td>' +
+            '<td><span class="badge badge-' +
+            esc(r.severity) +
+            '">' +
+            esc(r.severity) +
+            '</span></td>' +
+            '<td>' +
+            esc(r.category) +
+            '</td>' +
+            '<td class="mono">' +
+            esc(r.scan_target || '--') +
+            '</td>' +
+            '<td><span class="badge badge-ok">loaded</span></td>';
+          tb.appendChild(tr);
+        });
+        document.getElementById('ru-search-count').textContent =
+          rules.length + ' / ' + allRules.length;
+      }
+      function filterRules() {
+        var q = (document.getElementById('ru-search').value || '').toLowerCase();
+        var cat = document.getElementById('ru-cat').value;
+        var sev = document.getElementById('ru-sev-flt').value;
+        var tgt = document.getElementById('ru-target').value;
+        var f = allRules.filter(function (r) {
+          if (cat && r.category !== cat) return false;
+          if (sev && r.severity !== sev) return false;
+          if (tgt && r.scan_target !== tgt) return false;
+          if (q && (r.id + ' ' + r.title + ' ' + r.category).toLowerCase().indexOf(q) === -1)
+            return false;
+          return true;
+        });
+        renderRules(f);
+      }
+
+      function loadSkills() {
+        af('/api/installed-skills')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            var ld = document.getElementById('sk-loading');
+            var tbl = document.getElementById('sk-table');
+            var tb = document.getElementById('sk-tb');
+            tb.innerHTML = '';
+            if (!d.skills || d.skills.length === 0) {
+              if (ld)
+                ld.innerHTML = '<span style="color:var(--text-muted)">No skills detected.</span>';
+              return;
+            }
+            if (ld) ld.style.display = 'none';
+            if (tbl) tbl.style.display = '';
+            var wl = 0,
+              unk = 0,
+              blk = 0;
+            d.skills.forEach(function (s, i) {
+              var status = s.whitelisted ? 'whitelisted' : 'tracked';
+              if (status === 'whitelisted') wl++;
+              else unk++;
+              var dotCls =
+                status === 'whitelisted' ? 'dot-ok' : status === 'blocked' ? 'dot-bad' : 'dot-w';
+              var badgeCls =
+                status === 'whitelisted'
+                  ? 'badge-ok'
+                  : status === 'blocked'
+                    ? 'badge-critical'
+                    : 'badge-w';
+              var risk = s.riskScore != null ? s.riskScore + '/100' : '--';
+              var tr = document.createElement('tr');
+              tr.innerHTML =
+                '<td>' +
+                (i + 1) +
+                '</td>' +
+                '<td>' +
+                esc(s.name || '') +
+                '</td>' +
+                '<td>' +
+                esc(s.platform || '--') +
+                '</td>' +
+                '<td>' +
+                esc(risk) +
+                '</td>' +
+                '<td><span class="dot ' +
+                dotCls +
+                '"></span> <span class="badge ' +
+                badgeCls +
+                '">' +
+                esc(status) +
+                '</span></td>' +
+                '<td class="mono" style="color:var(--text-muted);font-size:11px">' +
+                (s.lastAudit ? new Date(s.lastAudit).toLocaleDateString() : '--') +
+                '</td>';
+              tb.appendChild(tr);
+            });
+            setKPI('sk-total', d.skills.length);
+            setKPI('sk-wl', wl);
+            setKPI('sk-unk', unk);
+            setKPI('sk-blk', blk);
+          })
+          .catch(function () {
+            var ld = document.getElementById('sk-loading');
+            if (ld) ld.innerHTML = '<span style="color:var(--danger)">Failed to load skills</span>';
+          });
+      }
+
+      function loadTCloud() {
+        af('/api/threat-cloud')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            document.getElementById('tc-loading').style.display = 'none';
+            document.getElementById('tc-content').style.display = '';
+            var isConnected = !!d.connected;
+            var dot = document.getElementById('tc-conn-dot');
+            if (dot) dot.className = 'dot ' + (isConnected ? 'dot-ok' : 'dot-bad');
+            var ctext = document.getElementById('tc-conn-text');
+            if (ctext) {
+              ctext.textContent = isConnected
+                ? lang === 'zh'
+                  ? '已連接'
+                  : 'Connected'
+                : lang === 'zh'
+                  ? '未連接'
+                  : 'Disconnected';
+              ctext.style.color = isConnected ? 'var(--ok)' : 'var(--danger)';
+            }
+            document.getElementById('tc-endpoint').textContent = d.endpoint || '--';
+            setKPI('tc-recv', d.totalRulesReceived || 0);
+            setKPI('tc-up', d.totalUploaded || 0);
+            setKPI('tc-q', d.queueSize || 0);
+            document.getElementById('tc-last').textContent = d.lastSync
+              ? new Date(d.lastSync).toLocaleString()
+              : '--';
+            setKPI('v-tcsync', d.totalRulesReceived || 0);
+
+            var tog = document.getElementById('tc-toggle');
+            var tlbl = document.getElementById('tc-toggle-label');
+            if (d.uploadEnabled) {
+              if (tog) tog.classList.add('on');
+              if (tlbl) {
+                tlbl.textContent = lang === 'zh' ? '已啟用' : 'Enabled';
+                tlbl.style.color = 'var(--ok)';
+              }
+            } else {
+              if (tog) tog.classList.remove('on');
+              if (tlbl) {
+                tlbl.textContent = lang === 'zh' ? '已停用' : 'Disabled';
+                tlbl.style.color = 'var(--text-muted)';
+              }
+            }
+          })
+          .catch(function () {
+            document.getElementById('tc-loading').innerHTML =
+              '<span style="color:var(--danger)">Failed to load Threat Cloud status</span>';
+          });
+      }
+      function toggleUpload() {
+        var tog = document.getElementById('tc-toggle');
+        var isOn = tog.classList.contains('on');
+        af('/api/threat-cloud', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uploadEnabled: !isOn }),
+        })
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            if (d.success) {
+              toast(lang === 'zh' ? '已儲存' : 'Saved');
+              loadTCloud();
+            } else {
+              toast(d.error || 'Error');
+            }
+          })
+          .catch(function () {
+            toast('Network error');
+          });
+      }
+
+      function loadSettings() {
+        af('/api/config')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (cfg) {
+            if (!cfg) return;
+            var mt = document.getElementById('st-mode-toggle');
+            var ml = document.getElementById('st-mode-label');
+            var isProt = cfg.mode === 'protection';
+            if (mt) {
+              if (isProt) mt.classList.add('on');
+              else mt.classList.remove('on');
+            }
+            if (ml) {
+              ml.textContent = isProt ? 'Protection' : 'Learning';
+              ml.style.color = isProt ? 'var(--ok)' : 'var(--warn)';
+            }
+            var ep = document.getElementById('st-tc-endpoint');
+            if (ep) ep.value = cfg.threatCloudEndpoint || '';
+            var ut = document.getElementById('st-tc-upload');
+            var ul = document.getElementById('st-tc-upload-label');
+            var uEnabled = cfg.threatCloudUploadEnabled !== false;
+            if (ut) {
+              if (uEnabled) ut.classList.add('on');
+              else ut.classList.remove('on');
+            }
+            if (ul) {
+              ul.textContent = uEnabled ? 'Enabled' : 'Disabled';
+              ul.style.color = uEnabled ? 'var(--ok)' : 'var(--text-muted)';
+            }
+            var port = document.getElementById('st-port');
+            if (port) port.value = cfg.dashboardPort || 9999;
+            var langSel = document.getElementById('st-lang');
+            if (langSel) langSel.value = lang;
+          })
+          .catch(function () {
+            /* ignore */
+          });
+      }
+      function toggleMode() {
+        var t = document.getElementById('st-mode-toggle');
+        t.classList.toggle('on');
+        var l = document.getElementById('st-mode-label');
+        var isProt = t.classList.contains('on');
+        if (l) {
+          l.textContent = isProt ? 'Protection' : 'Learning';
+          l.style.color = isProt ? 'var(--ok)' : 'var(--warn)';
+        }
+      }
+      function toggleUploadSettings() {
+        var t = document.getElementById('st-tc-upload');
+        t.classList.toggle('on');
+        var l = document.getElementById('st-tc-upload-label');
+        var on = t.classList.contains('on');
+        if (l) {
+          l.textContent = on ? 'Enabled' : 'Disabled';
+          l.style.color = on ? 'var(--ok)' : 'var(--text-muted)';
+        }
+      }
+      function setLangFromSettings() {
+        var s = document.getElementById('st-lang').value;
+        if (s && s !== lang) {
+          lang = s;
+          try {
+            localStorage.setItem('panguard_lang', lang);
+          } catch (e) {
+            /* ignore */
+          }
+          applyLang();
+        }
+      }
+      function saveSettings() {
+        var body = {
+          uploadEnabled: document.getElementById('st-tc-upload').classList.contains('on'),
+          endpoint: document.getElementById('st-tc-endpoint').value || undefined,
+        };
+        af('/api/threat-cloud', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            if (d.success) {
+              toast(lang === 'zh' ? '已儲存' : 'Saved');
+            } else {
+              toast(d.error || 'Save failed');
+            }
+          })
+          .catch(function () {
+            toast('Network error');
+          });
+      }
+
+      /* ============================================================ */
+      /*  Boot                                                         */
+      /* ============================================================ */
+      (function () {
+        applyLang();
+        connectWS();
+        loadStatus();
+        loadThreats();
+        // Mark default nav active
+        nav('overview');
+      })();
+    </script>
+  </body>
+</html>

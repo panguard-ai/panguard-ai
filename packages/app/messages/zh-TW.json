@@ -22,7 +22,14 @@
     "tryDifferentEmail": "改用其他信箱",
     "errorTitle": "登入失敗",
     "errorBody": "此魔法連結無法驗證,可能已過期,請重新申請。",
-    "backToLogin": "返回登入"
+    "backToLogin": "返回登入",
+    "verifyTitle": "請查看你的信箱",
+    "verifyBody": "我們寄了一條 magic link 到 {email}。點開驗證後回來。",
+    "verifyResend": "重寄",
+    "verifyResent": "Magic link 已重寄,請查看信箱。",
+    "verifyUseDifferent": "換 email",
+    "verifySupport": "需要協助?請聯絡 {email}。",
+    "verifyResendCooldown": "請等 {seconds} 秒後再要求新連結。"
   },
   "onboarding": {
     "title": "建立你的 Workspace",

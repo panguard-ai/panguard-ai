@@ -9,11 +9,7 @@ const AUTH_API = process.env.BLOG_AUTH_API || '';
 
 // Allowlist of origins we will forward admin-check calls to.
 // This prevents an attacker from pointing AUTH_API at an internal endpoint.
-const ALLOWED_AUTH_HOSTS = new Set([
-  'app.panguard.ai',
-  'localhost',
-  '127.0.0.1',
-]);
+const ALLOWED_AUTH_HOSTS = new Set(['app.panguard.ai', 'localhost', '127.0.0.1']);
 
 async function verifyAdmin(req: Request): Promise<boolean> {
   const authHeader = req.headers.get('authorization');

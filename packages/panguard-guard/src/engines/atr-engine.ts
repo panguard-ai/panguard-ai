@@ -383,6 +383,61 @@ export class GuardATREngine {
   }
 
   /**
+   * Return every loaded ATR rule (bundled + dynamically added cloud rules) in
+   * a denormalized shape suitable for SARIF / Evidence Pack export. Reads
+   * directly from the in-memory engines so callers do not need to scan YAML
+   * on disk.
+   */
+  getAllRules(): Array<{
+    id: string;
+    title: string;
+    severity: string;
+    category: string;
+    description: string;
+  }> {
+    const out: Array<{
+      id: string;
+      title: string;
+      severity: string;
+      category: string;
+      description: string;
+    }> = [];
+    const seen = new Set<string>();
+    const collectFrom = (rules: Iterable<unknown>): void => {
+      for (const r of rules) {
+        const rule = r as {
+          id?: string;
+          title?: string;
+          severity?: string;
+          category?: string;
+          description?: string;
+        };
+        const id = rule.id?.trim();
+        if (!id || seen.has(id)) continue;
+        seen.add(id);
+        out.push({
+          id,
+          title: rule.title ?? id,
+          severity: rule.severity ?? 'medium',
+          category: rule.category ?? 'unknown',
+          description: (rule.description ?? '').slice(0, 200),
+        });
+      }
+    };
+    try {
+      if (this.bundledEngine) collectFrom(this.bundledEngine.getRules());
+    } catch {
+      /* bundled engine may be uninitialized */
+    }
+    try {
+      collectFrom(this.engine.getRules());
+    } catch {
+      /* cloud engine may be uninitialized */
+    }
+    return out;
+  }
+
+  /**
    * Start periodic session cleanup (evict sessions idle > 30 minutes).
    * Call after loadRules() to begin maintenance.
    */

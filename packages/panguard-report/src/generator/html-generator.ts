@@ -22,11 +22,7 @@
 import { writeFile, mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
-import type {
-  ComplianceFinding,
-  ComplianceReportData,
-  ReportLanguage,
-} from '../types.js';
+import type { ComplianceFinding, ComplianceReportData, ReportLanguage } from '../types.js';
 import { getFrameworkName, getFrameworkControls } from '../frameworks/index.js';
 import {
   evaluateControls,
@@ -34,11 +30,7 @@ import {
   generateStatistics,
   generateRecommendations,
 } from '../mapper/index.js';
-import {
-  getSectionLabels,
-  getSeverityLabel,
-  getStatusLabel,
-} from '../templates/index.js';
+import { getSectionLabels, getSeverityLabel, getStatusLabel } from '../templates/index.js';
 import type { ComplianceFramework } from '../types.js';
 
 const logger = createLogger('panguard-report:html');
@@ -174,9 +166,7 @@ function renderHTML(opts: HTMLReportOptions): string {
     .map((c) => {
       const statusColor = STATUS_COLOR[c.status] ?? BRAND.textPrimary;
       const controlTitle = isZh ? c.titleZh : c.titleEn;
-      const evidenceText = Array.isArray(c.evidence)
-        ? c.evidence.join('; ')
-        : (c.evidence ?? '');
+      const evidenceText = Array.isArray(c.evidence) ? c.evidence.join('; ') : (c.evidence ?? '');
       return `
         <tr>
           <td class="mono">${escapeHtml(c.controlId)}</td>
@@ -205,8 +195,7 @@ function renderHTML(opts: HTMLReportOptions): string {
     )
     .join('');
 
-  const generatedDate =
-    opts.generatedAt ?? new Date().toISOString().split('T')[0];
+  const generatedDate = opts.generatedAt ?? new Date().toISOString().split('T')[0];
 
   const totalControlsLabel = t('Total Controls', '總控制項');
   const generatedLabel = t('Generated', '產生時間');
@@ -662,9 +651,7 @@ ${
 </html>`;
 }
 
-export async function generateHTMLReport(
-  opts: HTMLReportOptions
-): Promise<string> {
+export async function generateHTMLReport(opts: HTMLReportOptions): Promise<string> {
   logger.info('Starting HTML compliance report generation', {
     outputPath: opts.outputPath,
     lang: opts.lang,

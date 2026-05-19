@@ -34,8 +34,8 @@ max_rows = 1000
 # -----------------------------------------------------------------------------
 [db]
 port = 54322
-# Postgres major version. 15 is Supabase default for late-2025 projects.
-major_version = 15
+# Postgres major version. 17 matches the linked Pangaurd remote project (2026-04 default).
+major_version = 17
 
 [db.pooler]
 enabled = false
@@ -94,10 +94,12 @@ additional_redirect_urls = [
 # tokens (below) handle silent renewal.
 jwt_expiry = 3600
 # Refresh token lifetime (30 days). Rotates on use.
-refresh_token_rotation_enabled = true
-# If a refresh token is reused, revoke the whole family — prevents stolen
-# token replay.
-security_refresh_token_reuse_interval = 10
+# NOTE: refresh_token_rotation_enabled + security_refresh_token_reuse_interval
+# were removed from supabase CLI config schema in 2.x. Equivalent settings are
+# now managed via the Supabase dashboard (Auth -> Sessions). Keeping commented
+# for migration reference.
+# refresh_token_rotation_enabled = true
+# security_refresh_token_reuse_interval = 10
 # Confirm email before first sign-in. Magic-link signup handles this in one
 # step (click link = confirmed), so this is a belt-and-braces default.
 enable_signup = true
@@ -135,7 +137,7 @@ enabled = false
 # -----------------------------------------------------------------------------
 [edge_runtime]
 enabled = false
-port = 54327
+# port = 54327  # removed from CLI 2.x schema
 
 # -----------------------------------------------------------------------------
 # [analytics] — Logflare. Disabled locally (adds Docker overhead).

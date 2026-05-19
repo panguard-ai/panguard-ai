@@ -123,10 +123,14 @@ export default async function ComparePage(props: {
                     <div className="px-5 py-3 text-sm text-text-primary font-medium">
                       {row.feature}
                     </div>
-                    <div className={`px-5 py-3 text-xs text-center ${winnerCellClass[row.winner === 'atr' ? 'atr' : row.winner === 'tie' ? 'tie' : 'other']}`}>
+                    <div
+                      className={`px-5 py-3 text-xs text-center ${winnerCellClass[row.winner === 'atr' ? 'atr' : row.winner === 'tie' ? 'tie' : 'other']}`}
+                    >
                       {row.atr}
                     </div>
-                    <div className={`px-5 py-3 text-xs text-center ${winnerCellClass[row.winner === 'other' ? 'atr' : row.winner === 'tie' ? 'tie' : 'other']}`}>
+                    <div
+                      className={`px-5 py-3 text-xs text-center ${winnerCellClass[row.winner === 'other' ? 'atr' : row.winner === 'tie' ? 'tie' : 'other']}`}
+                    >
                       {row.other}
                     </div>
                   </div>

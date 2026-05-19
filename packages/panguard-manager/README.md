@@ -80,17 +80,17 @@ panguard-manager agents list [--data-dir ~/.panguard-manager]
 
 ## API surface (all responses use the standard PanGuard envelope `{ ok, data?, error?, request_id }`)
 
-| Method | Path                                 | Auth          | Purpose                                      |
-| ------ | ------------------------------------ | ------------- | -------------------------------------------- |
-| GET    | `/healthz`                           | -             | Liveness probe                               |
-| GET    | `/`                                  | -             | Fleet dashboard HTML                         |
-| GET    | `/api/status`                        | -             | Aggregated KPIs (`agents_online/total`, …)   |
-| GET    | `/api/agents`                        | -             | List every known agent with snapshot         |
-| GET    | `/api/agents/:id`                    | -             | Drill-down snapshot for one agent            |
-| POST   | `/api/agents/register`               | -             | Register a new Guard, returns `{ agent_id, token }` |
-| POST   | `/api/agents/:id/revoke`             | -             | Mark an agent as revoked                     |
-| POST   | `/api/relay/event`                   | `Bearer <token>` | Ingest a relay event from a Guard         |
-| WS     | `/ws`                                | -             | Live fanout of every relay event             |
+| Method | Path                     | Auth             | Purpose                                             |
+| ------ | ------------------------ | ---------------- | --------------------------------------------------- |
+| GET    | `/healthz`               | -                | Liveness probe                                      |
+| GET    | `/`                      | -                | Fleet dashboard HTML                                |
+| GET    | `/api/status`            | -                | Aggregated KPIs (`agents_online/total`, …)          |
+| GET    | `/api/agents`            | -                | List every known agent with snapshot                |
+| GET    | `/api/agents/:id`        | -                | Drill-down snapshot for one agent                   |
+| POST   | `/api/agents/register`   | -                | Register a new Guard, returns `{ agent_id, token }` |
+| POST   | `/api/agents/:id/revoke` | -                | Mark an agent as revoked                            |
+| POST   | `/api/relay/event`       | `Bearer <token>` | Ingest a relay event from a Guard                   |
+| WS     | `/ws`                    | -                | Live fanout of every relay event                    |
 
 ## Architecture
 

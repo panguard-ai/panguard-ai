@@ -9,9 +9,7 @@ export const metadata: Metadata = {
     'Panguard AI Data Processing Agreement. GDPR-compliant data handling terms for enterprise customers.',
 };
 
-export default async function DPAPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function DPAPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
   const isZh = params.locale === 'zh-TW';
   const lastUpdatedLabel = isZh ? '最後更新：' : 'Last updated: ';

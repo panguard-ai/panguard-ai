@@ -1,5 +1,12 @@
 import Link from 'next/link';
-import { FileText, LayoutDashboard, ListOrdered, Settings, Shield } from '@/components/icons';
+import {
+  FileText,
+  LayoutDashboard,
+  ListOrdered,
+  Settings,
+  Shield,
+  Terminal,
+} from '@/components/icons';
 
 interface SidebarProps {
   slug: string;
@@ -11,6 +18,12 @@ export function Sidebar({ slug, activePath }: SidebarProps) {
   const items = [
     { href: base, label: 'Overview', icon: LayoutDashboard, match: base },
     { href: `${base}/events`, label: 'Events', icon: ListOrdered, match: `${base}/events` },
+    {
+      href: `${base}/endpoints`,
+      label: 'Endpoints',
+      icon: Terminal,
+      match: `${base}/endpoints`,
+    },
     { href: `${base}/reports`, label: 'Reports', icon: FileText, match: `${base}/reports` },
     { href: `${base}/settings`, label: 'Settings', icon: Settings, match: `${base}/settings` },
   ];

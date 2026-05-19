@@ -13,7 +13,10 @@ describe('AgentsRegistry', () => {
   let tmp: string;
 
   beforeEach(() => {
-    tmp = join(tmpdir(), `panguard-manager-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    tmp = join(
+      tmpdir(),
+      `panguard-manager-test-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
     mkdirSync(tmp, { recursive: true });
   });
 

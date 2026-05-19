@@ -1,0 +1,71 @@
+name: Sync ATR stats from upstream
+
+# Pulls the canonical stats.json from agent-threat-rules and rewrites
+# the shared fields in packages/website/src/lib/stats.ts so the website
+# never drifts from the standard.
+#
+# Runs every 6 hours and on every push to main that touches stats.ts
+# (catches local edits that would otherwise diverge).
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/website/src/lib/stats.ts'
+      - '.github/workflows/sync-atr-stats.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fetch upstream stats.json
+        run: |
+          curl -fsSL \
+            https://raw.githubusercontent.com/Agent-Threat-Rule/agent-threat-rules/main/stats.json \
+            -o /tmp/atr-stats.json
+          echo "Upstream version:"; node -e "console.log(require('/tmp/atr-stats.json').version)"
+          echo "Upstream rules:";   node -e "console.log(require('/tmp/atr-stats.json').ruleCount.total)"
+
+      - name: Rewrite stats.ts shared fields
+        run: |
+          node packages/website/scripts/apply-atr-stats.mjs /tmp/atr-stats.json packages/website/src/lib/stats.ts
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet packages/website/src/lib/stats.ts; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open sync PR
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="sync/atr-stats-$(date -u +%Y%m%d-%H%M)"
+          git config user.name "ATR Stats Sync Bot"
+          git config user.email "release@agentthreatrule.org"
+          git checkout -b "$BRANCH"
+          git add packages/website/src/lib/stats.ts
+          UPSTREAM_VER=$(node -e "console.log(require('/tmp/atr-stats.json').version)")
+          UPSTREAM_RULES=$(node -e "console.log(require('/tmp/atr-stats.json').ruleCount.total)")
+          git commit -m "chore(website): sync ATR stats to v${UPSTREAM_VER} (${UPSTREAM_RULES} rules)"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "chore(website): sync ATR stats to v${UPSTREAM_VER}" \
+            --body "Auto-PR from sync-atr-stats workflow. Source: agent-threat-rules/stats.json (v${UPSTREAM_VER}, ${UPSTREAM_RULES} rules)." \
+            --label auto-sync

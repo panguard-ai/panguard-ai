@@ -38,7 +38,7 @@ export default function ATRPage() {
             programmingLanguage: 'YAML',
             license: 'https://opensource.org/licenses/MIT',
             url: 'https://panguard.ai/atr',
-            version: '2.1.3',
+            version: STATS.atrVersion,
           },
           techArticleSchema({
             headline: 'Agent Threat Rules — the open detection standard for AI agents',

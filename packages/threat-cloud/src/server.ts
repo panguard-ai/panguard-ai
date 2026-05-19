@@ -28,6 +28,7 @@
  * @module @panguard-ai/threat-cloud/server
  */
 
+import * as Sentry from '@sentry/node';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
@@ -49,6 +50,13 @@ import { createBadgeRouter, type BadgeRouter } from './badge-api.js';
 import { LLMReviewer } from './llm-reviewer.js';
 import { getAdminHTML } from './admin-dashboard.js';
 import {
+  resolveTier,
+  isTcTier,
+  TIER_LIMITS,
+  type TcTier,
+  type TcAuthRole,
+} from './auth/tier-resolver.js';
+import {
   tryValidateInput,
   ThreatDataSchema,
   RulePublishSchema,
@@ -66,6 +74,17 @@ import type {
   SkillThreatSubmission,
   ScanEvent,
 } from './types.js';
+
+// Sentry init — no-op when SENTRY_DSN is unset so paid customers can opt out.
+// Must run before request handlers register so early errors are captured.
+if (process.env['SENTRY_DSN']) {
+  Sentry.init({
+    dsn: process.env['SENTRY_DSN'],
+    tracesSampleRate: 0.1,
+    release: process.env['GIT_SHA'] ?? 'dev',
+    environment: process.env['NODE_ENV'] ?? 'production',
+  });
+}
 
 /** Structured JSON logger for threat-cloud */
 const log = {
@@ -87,10 +106,17 @@ const log = {
   },
 };
 
-/** Rate limiter state / 速率限制狀態 */
+/**
+ * Rate limiter state / 速率限制狀態
+ *
+ * One entry per token (or "ip:<addr>" for anonymous public reads).
+ * `limit` is captured at entry-init time so a tier change mid-window only
+ * takes effect on the next window — that keeps the math local and predictable.
+ */
 interface RateLimitEntry {
   count: number;
   resetAt: number;
+  limit: number;
 }
 
 /**
@@ -273,20 +299,6 @@ export class ThreatCloudServer {
 
     const clientIP = req.socket.remoteAddress ?? 'unknown';
 
-    // Rate limiting
-    if (!this.checkRateLimit(clientIP)) {
-      this.sendJson(res, 429, { ok: false, error: 'Rate limit exceeded', request_id: requestId });
-      log.info('request', {
-        method: req.method,
-        path: req.url,
-        status: 429,
-        duration_ms: Date.now() - startTime,
-        client_ip: clientIP,
-        request_id: requestId,
-      });
-      return;
-    }
-
     // API key verification (skip for health check)
     const url = req.url ?? '/';
     const rawPathname = url.split('?')[0] ?? '/';
@@ -306,14 +318,17 @@ export class ThreatCloudServer {
       publicPaths.has(pathname) || (pathname === '/api/rules' && req.method === 'GET');
     // Track the role that authenticated this request so route handlers can
     // enforce scope (e.g. L5 partner endpoints only accept role=partner|admin).
-    let authRole: 'admin' | 'static' | 'client-guard' | 'client-partner' | 'anonymous' =
-      'anonymous';
+    let authRole: TcAuthRole = 'anonymous';
+    // Per-token rate-limit key. For authenticated requests, this is the bearer
+    // token so each key (and thereby each workspace) has its own bucket.
+    // Anonymous/public-read requests fall back to the historical per-IP key.
+    let rateLimitKey: string = `ip:${clientIP}`;
+    let clientKeyInfo: { clientId: string; role: string; tier: string } | null = null;
     if (!isPublicRead && this.config.apiKeyRequired) {
       const authHeader = req.headers.authorization ?? '';
       const token = authHeader.replace('Bearer ', '');
       const isValidApiKey = this.config.apiKeys.includes(token);
       const isAdminKey = this.config.adminApiKey ? token === this.config.adminApiKey : false;
-      let clientKeyInfo: { clientId: string; role: string } | null = null;
       if (!isValidApiKey && !isAdminKey && token.length > 0) {
         clientKeyInfo = this.db.getClientKeyInfo(token);
         if (clientKeyInfo) this.db.validateClientKey(token); // bump last_used_at
@@ -337,6 +352,41 @@ export class ThreatCloudServer {
           : clientKeyInfo?.role === 'partner'
             ? 'client-partner'
             : 'client-guard';
+      // Authenticated requests are rate-limited per token, not per IP.
+      // Falling back to `ip:<addr>` only here would defeat tier quotas:
+      // every shared NAT egress would collide. token is unique per key.
+      rateLimitKey = `token:${token}`;
+    }
+
+    // Rate limiting (tier-aware). Run AFTER auth so we know which tier this
+    // request belongs to. Anonymous public reads still go through the per-IP
+    // limiter at the community budget (120/min) — same as before this change.
+    const tier: TcTier = resolveTier(authRole, clientKeyInfo);
+    const rl = this.checkRateLimit(rateLimitKey, tier);
+    res.setHeader('X-RateLimit-Tier', tier);
+    res.setHeader('X-RateLimit-Limit', String(rl.limit));
+    res.setHeader('X-RateLimit-Remaining', String(rl.remaining));
+    res.setHeader('X-RateLimit-Reset', String(rl.resetAt));
+    if (!rl.allowed) {
+      res.setHeader('Retry-After', String(Math.ceil((rl.resetAt - Date.now()) / 1000)));
+      this.sendJson(res, 429, {
+        ok: false,
+        error: 'rate_limited',
+        tier,
+        limit: rl.limit,
+        retry_after_ms: Math.max(0, rl.resetAt - Date.now()),
+        request_id: requestId,
+      });
+      log.info('request', {
+        method: req.method,
+        path: req.url,
+        status: 429,
+        duration_ms: Date.now() - startTime,
+        client_ip: clientIP,
+        request_id: requestId,
+        rate_limit_tier: tier,
+      });
+      return;
     }
 
     // L5 partner-sync: /api/atr-rules/live is role-gated. Only admin or
@@ -890,6 +940,60 @@ export class ThreatCloudServer {
           break;
 
         default: {
+          // Admin tier-management endpoint: change workspace tier for a
+          // client key. Drives the per-token rate limiter. Admin-only;
+          // path param is the clientId (the same value returned by
+          // /api/admin/client-keys). Tier change takes effect on the NEXT
+          // 60-second rate-limit window for that token.
+          const tierMatch = pathname.match(/^\/api\/admin\/client-keys\/([^/]+)\/tier$/);
+          if (tierMatch) {
+            if (!this.checkAdminAuth(req)) {
+              this.sendJson(res, 401, { ok: false, error: 'Admin API key required' });
+              break;
+            }
+            if (req.method !== 'POST') {
+              this.sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+              break;
+            }
+            const clientId = decodeURIComponent(tierMatch[1]!);
+            const body = await this.readBody(req);
+            let parsed: { tier?: unknown };
+            try {
+              parsed = JSON.parse(body) as { tier?: unknown };
+            } catch {
+              this.sendJson(res, 400, { ok: false, error: 'Invalid JSON' });
+              break;
+            }
+            if (!isTcTier(parsed.tier)) {
+              this.sendJson(res, 400, {
+                ok: false,
+                error: 'tier must be one of community|pilot|enterprise',
+              });
+              break;
+            }
+            const updated = this.db.setClientKeyTier(clientId, parsed.tier);
+            if (updated === 0) {
+              this.sendJson(res, 404, {
+                ok: false,
+                error: 'No active client keys found for clientId',
+              });
+              break;
+            }
+            this.db.audit.logAction(
+              'admin',
+              'client_key.tier_update',
+              'client_key',
+              clientId,
+              { tier: parsed.tier, updated },
+              clientIP
+            );
+            this.sendJson(res, 200, {
+              ok: true,
+              data: { clientId, tier: parsed.tier, updated },
+            });
+            break;
+          }
+
           // Org fleet/policy routes with path params
           // Threat Model: Fleet view (#6), Policy engine (#1, #6)
           const orgDevicesMatch = pathname.match(/^\/api\/orgs\/([^/]+)\/devices$/);
@@ -955,6 +1059,12 @@ export class ThreatCloudServer {
       }
     } catch (err) {
       log.error('Request failed', err, { request_id: requestId, path: rawPathname });
+      // Additive Sentry capture — keeps existing logger intact.
+      if (process.env['SENTRY_DSN']) {
+        Sentry.captureException(err, {
+          tags: { route: req.url ?? 'unknown', requestId },
+        });
+      }
       this.sendJson(res, 500, { ok: false, error: 'Internal server error', request_id: requestId });
     }
 
@@ -2566,16 +2676,47 @@ export class ThreatCloudServer {
     );
   }
 
-  /** Rate limit check / 速率限制檢查 */
-  private checkRateLimit(ip: string): boolean {
+  /**
+   * Tier-aware rate-limit check / 階層感知的速率限制檢查
+   *
+   * @param key   Bucket key — `token:<bearer>` for authenticated requests
+   *              or `ip:<addr>` for anonymous/public reads.
+   * @param tier  Workspace tier resolved from the auth gate. Drives the
+   *              requests-per-minute budget via TIER_LIMITS.
+   *
+   * Returns the bucket state for header emission + allow/deny decision.
+   * `limit` is captured at window-init time; mid-window tier changes only
+   * take effect on the next window.
+   */
+  private checkRateLimit(
+    key: string,
+    tier: TcTier
+  ): { allowed: boolean; limit: number; remaining: number; resetAt: number } {
     const now = Date.now();
-    const entry = this.rateLimits.get(ip);
-    if (!entry || now > entry.resetAt) {
-      this.rateLimits.set(ip, { count: 1, resetAt: now + 60_000 });
-      return true;
+    const tierLimit = TIER_LIMITS[tier];
+    const entry = this.rateLimits.get(key);
+    if (!entry || now >= entry.resetAt) {
+      const resetAt = now + 60_000;
+      this.rateLimits.set(key, { count: 1, resetAt, limit: tierLimit });
+      return { allowed: true, limit: tierLimit, remaining: tierLimit - 1, resetAt };
+    }
+    if (entry.count >= entry.limit) {
+      // Bucket exhausted — do not increment further (avoids unbounded growth
+      // when a misbehaving client keeps hammering after 429).
+      return {
+        allowed: false,
+        limit: entry.limit,
+        remaining: 0,
+        resetAt: entry.resetAt,
+      };
     }
     entry.count++;
-    return entry.count <= this.config.rateLimitPerMinute;
+    return {
+      allowed: true,
+      limit: entry.limit,
+      remaining: Math.max(0, entry.limit - entry.count),
+      resetAt: entry.resetAt,
+    };
   }
 
   /**

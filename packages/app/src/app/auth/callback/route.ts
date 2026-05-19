@@ -21,6 +21,16 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // After a successful exchange, confirm the user is verified before sending
+  // them into protected paths. Magic-link click sets email_confirmed_at, so
+  // this is a safety net for rare OAuth-without-verified-email flows.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user && !user.email_confirmed_at) {
+    return NextResponse.redirect(`${origin}/verify-email`);
+  }
+
   const safe = redirectParam && redirectParam.startsWith('/') ? redirectParam : '/';
   return NextResponse.redirect(`${origin}${safe}`);
 }

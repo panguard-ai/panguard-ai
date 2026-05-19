@@ -43,6 +43,8 @@ const EndpointSchema = z.object({
   hostname: z.string().max(255).optional(),
   os_type: z.string().max(32).optional(),
   panguard_version: z.string().max(64).optional(),
+  /** Optional operating mode reported by Guard. Persisted on endpoint row. */
+  guard_mode: z.enum(['learning', 'protection']).optional(),
 });
 
 const BodySchema = z.object({
@@ -68,6 +70,16 @@ export async function POST(req: NextRequest) {
   if (!key || key.revoked_at) {
     return NextResponse.json({ error: 'invalid_api_key' }, { status: 401 });
   }
+
+  // Fetch workspace tier so we can stamp it onto the endpoint row for
+  // forensic queries (was this endpoint reporting under a Pilot window?).
+  // Best-effort: if the row is missing we still ingest.
+  const { data: wsRow } = await admin
+    .from('workspaces')
+    .select('tier')
+    .eq('id', key.workspace_id)
+    .maybeSingle();
+  const workspaceTier = (wsRow as { tier?: string } | null)?.tier ?? 'community';
 
   // 2. Validate body
   let rawBody: unknown;
@@ -123,6 +135,23 @@ export async function POST(req: NextRequest) {
     .from('api_keys')
     .update({ last_used_at: nowIso })
     .eq('id', key.id)
+    .then(
+      () => undefined,
+      () => undefined
+    );
+
+  // 6. Stamp the endpoint row with current mode + sync metadata so the
+  // fleet page can render mode/health without re-querying events.
+  // Best-effort — failure here must not fail the ingest.
+  void admin
+    .from('endpoints')
+    .update({
+      current_mode: parsed.data.endpoint.guard_mode ?? null,
+      last_sync_at: nowIso,
+      tier_at_last_sync: workspaceTier,
+    })
+    .eq('workspace_id', key.workspace_id)
+    .eq('machine_id', parsed.data.endpoint.machine_id)
     .then(
       () => undefined,
       () => undefined

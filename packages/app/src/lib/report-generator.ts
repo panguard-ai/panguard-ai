@@ -13,7 +13,7 @@
 import { createHash, createHmac } from 'node:crypto';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname, join, resolve } from 'node:path';
+import { join, resolve } from 'node:path';
 import type { ReportFormat, ReportFramework } from '@/lib/types';
 
 const nodeRequire = createRequire(import.meta.url);
@@ -99,19 +99,10 @@ function findRulesDir(): string | null {
       /* fall through */
     }
   }
-  try {
-    // Hide the package name behind a variable so Turbopack's static
-    // analyzer cannot trace into agent-threat-rules at build time
-    // (it errors on the package's restrictive "exports" map). Marked
-    // as a server external in next.config.mjs so this resolves at
-    // runtime where the dep is fully installed.
-    const atrPkg = 'agent-threat-rules';
-    const atrIndexPath = nodeRequire.resolve(atrPkg);
-    const candidate = join(dirname(atrIndexPath), '..', 'rules');
-    if (statSync(candidate).isDirectory()) return candidate;
-  } catch {
-    /* fall through */
-  }
+  // Skip require.resolve('agent-threat-rules') — Turbopack constant-folds
+  // the variable-hidden form too and bails on the package's restrictive
+  // exports map. Cwd-based candidates below cover monorepo + hoisted
+  // + app-local pnpm layouts.
   const monorepoCandidate = resolve(
     process.cwd(),
     '..',

@@ -77,13 +77,9 @@ export function RuleDrillDown({ ruleId, onClose }: Props) {
 
   return (
     <Dialog open={open} onClose={onClose} title={ruleId ?? ''}>
-      {state.kind === 'loading' && (
-        <p className="text-text-muted text-sm">Loading rule…</p>
-      )}
+      {state.kind === 'loading' && <p className="text-text-muted text-sm">Loading rule…</p>}
       {state.kind === 'error' && (
-        <p className="text-status-danger text-sm">
-          Failed to load rule: {state.message}
-        </p>
+        <p className="text-status-danger text-sm">Failed to load rule: {state.message}</p>
       )}
       {state.kind === 'ready' && <RuleBody meta={state.meta} />}
     </Dialog>
@@ -96,18 +92,10 @@ function RuleBody({ meta }: { meta: AtrRuleMeta }) {
       <div>
         <p className="font-medium text-text-primary">{meta.title}</p>
         <div className="mt-2 flex flex-wrap gap-2">
-          <Badge tone={severityTone[meta.severity] ?? 'neutral'}>
-            {meta.severity}
-          </Badge>
-          <Badge tone={maturityTone[meta.maturity] ?? 'neutral'}>
-            maturity: {meta.maturity}
-          </Badge>
-          <Badge tone={maturityTone[meta.status] ?? 'neutral'}>
-            status: {meta.status}
-          </Badge>
-          {meta.category ? (
-            <Badge tone="neutral">{meta.category}</Badge>
-          ) : null}
+          <Badge tone={severityTone[meta.severity] ?? 'neutral'}>{meta.severity}</Badge>
+          <Badge tone={maturityTone[meta.maturity] ?? 'neutral'}>maturity: {meta.maturity}</Badge>
+          <Badge tone={maturityTone[meta.status] ?? 'neutral'}>status: {meta.status}</Badge>
+          {meta.category ? <Badge tone="neutral">{meta.category}</Badge> : null}
         </div>
       </div>
 
@@ -116,9 +104,7 @@ function RuleBody({ meta }: { meta: AtrRuleMeta }) {
           <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">
             Description
           </h3>
-          <p className="mt-1 whitespace-pre-wrap text-text-secondary">
-            {meta.description}
-          </p>
+          <p className="mt-1 whitespace-pre-wrap text-text-secondary">{meta.description}</p>
         </div>
       ) : null}
 
@@ -130,13 +116,9 @@ function RuleBody({ meta }: { meta: AtrRuleMeta }) {
           <dl className="mt-1 space-y-1">
             {Object.entries(meta.references).map(([framework, items]) => (
               <div key={framework} className="text-xs">
-                <dt className="inline font-mono text-text-muted">
-                  {framework}:
-                </dt>{' '}
+                <dt className="inline font-mono text-text-muted">{framework}:</dt>{' '}
                 <dd className="inline text-text-secondary">
-                  {Array.isArray(items)
-                    ? items.join(' · ')
-                    : String(items)}
+                  {Array.isArray(items) ? items.join(' · ') : String(items)}
                 </dd>
               </div>
             ))}
@@ -169,12 +151,8 @@ function RuleBody({ meta }: { meta: AtrRuleMeta }) {
         >
           View rule source on GitHub →
         </a>
-        {meta.author ? (
-          <span className="text-xs text-text-muted">by {meta.author}</span>
-        ) : null}
-        {meta.date ? (
-          <span className="text-xs text-text-muted">· {meta.date}</span>
-        ) : null}
+        {meta.author ? <span className="text-xs text-text-muted">by {meta.author}</span> : null}
+        {meta.date ? <span className="text-xs text-text-muted">· {meta.date}</span> : null}
       </div>
     </div>
   );

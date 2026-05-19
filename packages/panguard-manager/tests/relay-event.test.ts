@@ -34,7 +34,11 @@ interface PostResult {
   body: unknown;
 }
 
-async function post(url: string, body: unknown, headers: Record<string, string> = {}): Promise<PostResult> {
+async function post(
+  url: string,
+  body: unknown,
+  headers: Record<string, string> = {}
+): Promise<PostResult> {
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...headers },
@@ -63,7 +67,10 @@ describe('relay-event HTTP flow', () => {
   let registry: AgentsRegistry;
 
   beforeEach(async () => {
-    tmp = join(tmpdir(), `panguard-manager-it-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    tmp = join(
+      tmpdir(),
+      `panguard-manager-it-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    );
     mkdirSync(tmp, { recursive: true });
     port = await getFreePort();
     base = `http://127.0.0.1:${port}`;
@@ -157,7 +164,14 @@ describe('relay-event HTTP flow', () => {
 
     const status = (await getJson(`${base}/api/status`)) as {
       ok: boolean;
-      data: { summary: { agents_total: number; agents_online: number; threats_24h: number; atr_rules_active: number } };
+      data: {
+        summary: {
+          agents_total: number;
+          agents_online: number;
+          threats_24h: number;
+          atr_rules_active: number;
+        };
+      };
     };
     expect(status.ok).toBe(true);
     expect(status.data.summary.agents_total).toBe(1);

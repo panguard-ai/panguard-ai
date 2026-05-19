@@ -17,8 +17,7 @@ import { STATS } from '@/lib/stats';
  * env injected (e.g. a stale CDN cache).
  */
 const APP_ORIGIN: string =
-  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_APP_URL) ||
-  'https://app.panguard.ai';
+  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_APP_URL) || 'https://app.panguard.ai';
 
 interface MeResponse {
   workspace?: { id?: string };
@@ -37,9 +36,7 @@ interface MeResponse {
  */
 function useAppAuth() {
   const [state, setState] = useState<
-    | { status: 'loading' }
-    | { status: 'guest' }
-    | { status: 'authed'; workspaceId: string | null }
+    { status: 'loading' } | { status: 'guest' } | { status: 'authed'; workspaceId: string | null }
   >({ status: 'loading' });
 
   useEffect(() => {
@@ -129,8 +126,7 @@ export default function PricingContent() {
         headers: { 'content-type': 'application/json', accept: 'application/json' },
         body: JSON.stringify({ tier: 'pilot', workspace_id: auth.workspaceId }),
       });
-      const body = (await res.json().catch(() => ({}))) as
-        | { url?: string; error?: string };
+      const body = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
       if (!res.ok || !body.url) {
         // 401 — session expired between mount and click; bounce to login.
         if (res.status === 401) {
@@ -400,8 +396,8 @@ export default function PricingContent() {
                     ? '前往 Stripe...'
                     : 'Redirecting to Stripe...'
                   : isZh
-                  ? 'Start Pilot ($25K / 90 天)'
-                  : 'Start Pilot ($25K / 90d)'}{' '}
+                    ? 'Start Pilot ($25K / 90 天)'
+                    : 'Start Pilot ($25K / 90d)'}{' '}
                 <ArrowRight className="w-4 h-4" />
               </button>
               {pilotError ? (
@@ -410,13 +406,8 @@ export default function PricingContent() {
                 </p>
               ) : null}
               <p className="mt-2 text-[11px] text-text-muted text-center">
-                {isZh
-                  ? '需要客製合約？'
-                  : 'Need a custom contract instead?'}{' '}
-                <Link
-                  href="/contact?tier=pilot"
-                  className="text-amber-400 hover:underline"
-                >
+                {isZh ? '需要客製合約？' : 'Need a custom contract instead?'}{' '}
+                <Link href="/contact?tier=pilot" className="text-amber-400 hover:underline">
                   {isZh ? '改寄信洽詢' : 'Email sales'}
                 </Link>
               </p>

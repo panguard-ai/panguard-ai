@@ -171,7 +171,11 @@ const STATS_SECTION = `## Section 2 — Core stats (verified ${new Date().toISOS
 const ATR_INDEX_SECTION = (() => {
   // Read rule file as text, extract id + title pairs to keep this section bounded
   const rulesText = readFileSync(join(ROOT, 'src/lib/atr-rules-compiled.ts'), 'utf-8');
-  const matches = Array.from(rulesText.matchAll(/id:\s*'(ATR-[\w-]+)'[\s\S]+?title:\s*'((?:[^'\\]|\\.)+)'[\s\S]+?category:\s*'([\w-]+)'/g));
+  const matches = Array.from(
+    rulesText.matchAll(
+      /id:\s*'(ATR-[\w-]+)'[\s\S]+?title:\s*'((?:[^'\\]|\\.)+)'[\s\S]+?category:\s*'([\w-]+)'/g
+    )
+  );
   const byCategory: Record<string, Array<{ id: string; title: string }>> = {};
   for (const m of matches) {
     const [, id, title, category] = m;
@@ -373,7 +377,9 @@ const BLOG_SECTION = (() => {
     const blogText = readFileSync(join(ROOT, 'src/data/blog-posts.ts'), 'utf-8');
     // Find slug + title + excerpt blocks, take the first 20 EN posts (skip -zh)
     const matches = Array.from(
-      blogText.matchAll(/slug:\s*'([^']+)',\s*title:\s*'((?:[^'\\]|\\.)+)',\s*excerpt:\s*'((?:[^'\\]|\\.)+)',[^}]*?date:\s*'([^']+)'/g)
+      blogText.matchAll(
+        /slug:\s*'([^']+)',\s*title:\s*'((?:[^'\\]|\\.)+)',\s*excerpt:\s*'((?:[^'\\]|\\.)+)',[^}]*?date:\s*'([^']+)'/g
+      )
     );
     const enPosts = matches
       .filter((m) => !m[1].endsWith('-zh'))

@@ -36,6 +36,14 @@ async function loadValidator(): Promise<(rule: unknown) => ValidateResult> {
 }
 
 /**
+ * Canonical severity enum, sourced from `agent-threat-rules` `validateRule()`
+ * (see `dist/loader.js` — `validSeverities = ['critical', 'high', 'medium',
+ * 'low', 'informational']`). Kept as a frozen tuple so type-narrowing matches
+ * the runtime check.
+ */
+const VALID_SEVERITIES = ['critical', 'high', 'medium', 'low', 'informational'] as const;
+
+/**
  * Local fallback validator. Mirrors agent-threat-rules `validateRule()` truthy-check
  * semantics so behaviour matches when the upstream package is unavailable
  * (offline CI, fallback path).
@@ -66,6 +74,17 @@ export function localFallbackValidate(rule: unknown): ValidateResult {
   }
   if (typeof r['id'] === 'string' && !/^ATR-\d{4}-\d{5}$/.test(r['id'])) {
     errors.push(`Invalid id format: ${String(r['id'])} (expected ATR-YYYY-NNNNN)`);
+  }
+  // Severity enum (canonical set sourced from agent-threat-rules loader.js).
+  // Truthy-check above already catches missing/empty; this enforces the value
+  // is one of the allowed strings when present.
+  const severity = r['severity'];
+  if (
+    typeof severity === 'string' &&
+    severity.length > 0 &&
+    !(VALID_SEVERITIES as readonly string[]).includes(severity)
+  ) {
+    errors.push(`Invalid severity: ${severity} (expected one of: ${VALID_SEVERITIES.join(', ')})`);
   }
   return { valid: errors.length === 0, errors };
 }

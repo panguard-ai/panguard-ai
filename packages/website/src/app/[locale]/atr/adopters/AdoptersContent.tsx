@@ -21,11 +21,23 @@ const ADOPTERS: readonly Adopter[] = [
   {
     org: 'Microsoft Agent Governance Toolkit',
     category: 'big-tech',
-    noteEn: '287-rule expansion in production with weekly auto-sync workflow. Microsoft Copilot SWE Agent opened AGT#1981 with regression-test fixtures presuming ATR detection (2026-05-11).',
-    noteZh: '287 條規則進入 production，並設定每週自動同步。Microsoft Copilot SWE Agent 在 2026-05-11 開了 AGT#1981 並提交 regression-test fixtures 預設使用 ATR 偵測。',
+    noteEn:
+      '287-rule expansion in production with weekly auto-sync workflow. Microsoft Copilot SWE Agent opened AGT#1981 with regression-test fixtures presuming ATR detection (2026-05-11).',
+    noteZh:
+      '287 條規則進入 production，並設定每週自動同步。Microsoft Copilot SWE Agent 在 2026-05-11 開了 AGT#1981 並提交 regression-test fixtures 預設使用 ATR 偵測。',
     prs: [
-      { number: 908, titleEn: 'Original 15-rule PoC', titleZh: '最初 15 條 PoC', date: '2026-04-13' },
-      { number: 1277, titleEn: '287-rule expansion + weekly auto-sync', titleZh: '287 條擴張 + 每週自動同步', date: '2026-04-26' },
+      {
+        number: 908,
+        titleEn: 'Original 15-rule PoC',
+        titleZh: '最初 15 條 PoC',
+        date: '2026-04-13',
+      },
+      {
+        number: 1277,
+        titleEn: '287-rule expansion + weekly auto-sync',
+        titleZh: '287 條擴張 + 每週自動同步',
+        date: '2026-04-26',
+      },
     ],
   },
   {
@@ -34,18 +46,44 @@ const ADOPTERS: readonly Adopter[] = [
     noteEn: 'Full 419-rule pack in skill-scanner production. Auto-syncs to latest ATR release.',
     noteZh: '完整 419 條規則進入 skill-scanner production，並自動同步至最新 ATR 發行。',
     prs: [
-      { number: 79, repo: 'cisco-ai-defense/skill-scanner', titleEn: 'Original PoC', titleZh: '最初 PoC', date: '2026-04-03' },
-      { number: 99, repo: 'cisco-ai-defense/skill-scanner', titleEn: 'Full 344-rule pack (auto-syncs to 419)', titleZh: '完整 344 條規則', date: '2026-04-22' },
+      {
+        number: 79,
+        repo: 'cisco-ai-defense/skill-scanner',
+        titleEn: 'Original PoC',
+        titleZh: '最初 PoC',
+        date: '2026-04-03',
+      },
+      {
+        number: 99,
+        repo: 'cisco-ai-defense/skill-scanner',
+        titleEn: 'Full 344-rule pack (auto-syncs to 419)',
+        titleZh: '完整 344 條規則',
+        date: '2026-04-22',
+      },
     ],
   },
   {
     org: 'MISP (CIRCL)',
     category: 'standards',
-    noteEn: '336-rule cluster in global threat-intel sharing (galaxy). Rule-ID tagging vocabulary in taxonomies. CIRCL is Luxembourg national CERT.',
-    noteZh: 'MISP galaxy 中 336 條規則 cluster，taxonomies 中採用 ATR Rule-ID 作為 tagging 詞彙。CIRCL 為 Luxembourg 國家 CERT。',
+    noteEn:
+      '336-rule cluster in global threat-intel sharing (galaxy). Rule-ID tagging vocabulary in taxonomies. CIRCL is Luxembourg national CERT.',
+    noteZh:
+      'MISP galaxy 中 336 條規則 cluster，taxonomies 中採用 ATR Rule-ID 作為 tagging 詞彙。CIRCL 為 Luxembourg 國家 CERT。',
     prs: [
-      { number: 323, repo: 'MISP/misp-taxonomies', titleEn: 'Rule-ID tagging vocabulary', titleZh: 'Rule-ID 標籤詞彙', date: '2026-04-12' },
-      { number: 1207, repo: 'MISP/misp-galaxy', titleEn: '336-rule cluster', titleZh: '336 條規則 cluster', date: '2026-05-10' },
+      {
+        number: 323,
+        repo: 'MISP/misp-taxonomies',
+        titleEn: 'Rule-ID tagging vocabulary',
+        titleZh: 'Rule-ID 標籤詞彙',
+        date: '2026-04-12',
+      },
+      {
+        number: 1207,
+        repo: 'MISP/misp-galaxy',
+        titleEn: '336-rule cluster',
+        titleZh: '336 條規則 cluster',
+        date: '2026-05-10',
+      },
     ],
   },
   {
@@ -56,8 +94,20 @@ const ADOPTERS: readonly Adopter[] = [
     caveatEn: 'Third-party precize repo, NOT OWASP Foundation official.',
     caveatZh: '第三方 precize repo，非 OWASP Foundation 官方 repo。',
     prs: [
-      { number: 14, repo: 'precize/Agentic-AI-Top10-Vulnerability', titleEn: 'OWASP Agentic mapping', titleZh: 'OWASP Agentic 對應', date: '2026-03-30' },
-      { number: 74, repo: 'precize/Agent-Security-Regression-Harness', titleEn: 'Rule pack', titleZh: '規則包', date: '2026-05-11' },
+      {
+        number: 14,
+        repo: 'precize/Agentic-AI-Top10-Vulnerability',
+        titleEn: 'OWASP Agentic mapping',
+        titleZh: 'OWASP Agentic 對應',
+        date: '2026-03-30',
+      },
+      {
+        number: 74,
+        repo: 'precize/Agent-Security-Regression-Harness',
+        titleEn: 'Rule pack',
+        titleZh: '規則包',
+        date: '2026-05-11',
+      },
     ],
   },
   {
@@ -66,7 +116,13 @@ const ADOPTERS: readonly Adopter[] = [
     noteEn: 'Norton / Avast / AVG parent (consumer security). Merged by Václav Belák.',
     noteZh: 'Norton / Avast / AVG 母公司 (消費端資安)。由 Václav Belák 合併。',
     prs: [
-      { number: 33, repo: 'gendigitalinc/sage', titleEn: 'Rule pack', titleZh: '規則包', date: '2026-05-11' },
+      {
+        number: 33,
+        repo: 'gendigitalinc/sage',
+        titleEn: 'Rule pack',
+        titleZh: '規則包',
+        date: '2026-05-11',
+      },
     ],
   },
 ];
@@ -79,7 +135,11 @@ const AWESOME_LISTS = [
 ];
 
 const STANDARDS_PIPELINE_OPEN = [
-  { org: 'NIST AI RMF (OSCAL)', status: 'Path 1 accepted 2026-05-11', detail: 'Community OSCAL catalog covering all 4 AI RMF functions' },
+  {
+    org: 'NIST AI RMF (OSCAL)',
+    status: 'Path 1 accepted 2026-05-11',
+    detail: 'Community OSCAL catalog covering all 4 AI RMF functions',
+  },
   { org: 'NVIDIA garak', status: 'PR #1676 open' },
   { org: 'IBM mcp-context-forge', status: 'PR #4109 open' },
   { org: 'OWASP LLM Top 10', status: 'Issue #814 open' },
@@ -126,10 +186,7 @@ export default function AdoptersContent() {
           label={isZh ? 'Production 合併' : 'Production merges'}
           value={String(productionMerges)}
         />
-        <StatBox
-          label={isZh ? '生態系' : 'Ecosystems'}
-          value={ecosystemsLabel}
-        />
+        <StatBox label={isZh ? '生態系' : 'Ecosystems'} value={ecosystemsLabel} />
         <StatBox label={isZh ? '標準制定機構' : 'Standards bodies'} value={String(standardsBody)} />
         <StatBox label={isZh ? 'Tier-1 在談機構' : 'Tier-1 engaged'} value={String(tier1)} />
       </div>
@@ -154,7 +211,11 @@ export default function AdoptersContent() {
       <div className="mt-16">
         <SectionTitle
           title={isZh ? 'Awesome List 收錄' : 'Listed in Awesome Lists'}
-          subtitle={isZh ? '收錄並非 production 採用，但代表社群可見度' : 'Listing is not production adoption, but reflects community visibility'}
+          subtitle={
+            isZh
+              ? '收錄並非 production 採用，但代表社群可見度'
+              : 'Listing is not production adoption, but reflects community visibility'
+          }
         />
         <div className="mt-6 grid gap-3 md:grid-cols-2">
           {AWESOME_LISTS.map((l) => (
@@ -177,13 +238,19 @@ export default function AdoptersContent() {
       <div className="mt-16">
         <SectionTitle
           title={isZh ? '審閱中（尚未合併）' : 'Open PRs (Not Yet Merged)'}
-          subtitle={isZh ? '此列表反映進行中的對話，非採納證明' : 'Reflects in-flight conversations, not adoption'}
+          subtitle={
+            isZh
+              ? '此列表反映進行中的對話，非採納證明'
+              : 'Reflects in-flight conversations, not adoption'
+          }
         />
         <div className="mt-6 overflow-hidden rounded-lg border border-slate-200">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-4 py-3 font-medium text-slate-600">{isZh ? '組織／專案' : 'Org / Project'}</th>
+                <th className="px-4 py-3 font-medium text-slate-600">
+                  {isZh ? '組織／專案' : 'Org / Project'}
+                </th>
                 <th className="px-4 py-3 font-medium text-slate-600">{isZh ? '狀態' : 'Status'}</th>
               </tr>
             </thead>
@@ -298,7 +365,9 @@ function CategoryPill({ category, isZh }: { category: Adopter['category']; isZh:
         : category === 'enterprise'
           ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
           : 'border-slate-200 bg-slate-50 text-slate-700';
-  return <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${color}`}>{label}</span>;
+  return (
+    <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${color}`}>{label}</span>
+  );
 }
 
 function StatBox({ label, value }: { label: string; value: string }) {
