@@ -2,6 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "outputDirectory": ".next",
-  "buildCommand": "cd ../.. && pnpm --filter @panguard-ai/scan-core build && pnpm --filter @panguard-ai/website build",
+  "buildCommand": "cd ../.. && pnpm --filter @panguard-ai/migrator-community build && pnpm --filter @panguard-ai/scan-core build && pnpm --filter @panguard-ai/website build",
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile"
 }
