@@ -92,10 +92,7 @@ export const PERMISSIVE_ENFORCEMENT_POLICY: EnforcementPolicy = {
  * @param name Process name to check (e.g. "panguard-skill-runner-123")
  * @param patterns Allowlist patterns (e.g. ["panguard-skill-*", "node-worker"])
  */
-export function matchesProcessAllowlist(
-  name: string,
-  patterns: ReadonlyArray<string>
-): boolean {
+export function matchesProcessAllowlist(name: string, patterns: ReadonlyArray<string>): boolean {
   if (patterns.length === 0) return false;
   for (const pattern of patterns) {
     const regex = new RegExp(

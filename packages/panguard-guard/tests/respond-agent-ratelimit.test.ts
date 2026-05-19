@@ -72,7 +72,13 @@ describe('RespondAgent rate limiting', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tempDir = mkdtempSync(join(tmpdir(), 'respond-ratelimit-test-'));
-    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir, PERMISSIVE_ENFORCEMENT_POLICY);
+    agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      tempDir,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
   });
 
   afterEach(() => {

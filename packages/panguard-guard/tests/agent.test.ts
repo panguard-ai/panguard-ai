@@ -141,7 +141,13 @@ describe('RespondAgent', () => {
   });
 
   it('should auto-respond when confidence >= threshold', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
+    const agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      undefined,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
     const verdict: ThreatVerdict = {
       conclusion: 'malicious',
       confidence: 95,
@@ -155,7 +161,13 @@ describe('RespondAgent', () => {
   });
 
   it('should notify when confidence is in notify range', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
+    const agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      undefined,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
     const verdict: ThreatVerdict = {
       conclusion: 'suspicious',
       confidence: 75,
@@ -169,7 +181,13 @@ describe('RespondAgent', () => {
   });
 
   it('should log only when confidence is low', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
+    const agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      undefined,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
     const verdict: ThreatVerdict = {
       conclusion: 'benign',
       confidence: 30,
@@ -200,7 +218,13 @@ describe('RespondAgent', () => {
   });
 
   it('should refuse to block whitelisted IP (127.0.0.1)', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
+    const agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      undefined,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
     const verdict: ThreatVerdict = {
       conclusion: 'malicious',
       confidence: 95,
@@ -217,7 +241,13 @@ describe('RespondAgent', () => {
   });
 
   it('should refuse to block user-configured whitelisted IP', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', ['10.0.0.1'], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
+    const agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      ['10.0.0.1'],
+      undefined,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
     const verdict: ThreatVerdict = {
       conclusion: 'malicious',
       confidence: 95,
@@ -234,7 +264,13 @@ describe('RespondAgent', () => {
   });
 
   it('should refuse to kill protected process', async () => {
-    const agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], undefined, PERMISSIVE_ENFORCEMENT_POLICY);
+    const agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      undefined,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
     const verdict: ThreatVerdict = {
       conclusion: 'malicious',
       confidence: 95,

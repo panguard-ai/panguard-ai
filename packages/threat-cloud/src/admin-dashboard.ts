@@ -8,7 +8,7 @@
  * @module @panguard-ai/threat-cloud/admin-dashboard
  */
 
-export function getAdminHTML(): string {
+export function getAdminHTML(nonce: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -131,7 +131,7 @@ tr:hover td{background:var(--surface2)}
 </main>
 </div>
 
-<script>
+<script nonce="${nonce}">
 let API_KEY='';
 let stats=null;
 let currentTab='overview';
@@ -212,7 +212,7 @@ function apiDelete(path,body){
   return fetch(path,{method:'DELETE',headers:{Authorization:'Bearer '+API_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
 }
 function $(s){return document.getElementById(s)||document.querySelector(s)}
-function h(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function h(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function num(n){return Number(n).toLocaleString()}
 function badge(text,cls){return '<span class="badge '+cls+'">'+h(text)+'</span>'}
 function severityBadge(s){return badge(s,(s||'').toLowerCase())}

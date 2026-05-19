@@ -72,7 +72,13 @@ describe('RespondAgent chaos scenarios', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tempDir = mkdtempSync(join(tmpdir(), 'respond-chaos-test-'));
-    agent = new RespondAgent(DEFAULT_ACTION_POLICY, 'protection', [], tempDir, PERMISSIVE_ENFORCEMENT_POLICY);
+    agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      tempDir,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
   });
 
   afterEach(() => {

@@ -33,7 +33,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID, timingSafeEqual } from 'node:crypto';
+import { randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import { createRequire } from 'node:module';
 
 // Read package.json version (for /api/version endpoint, deploy verification)
@@ -2644,11 +2644,24 @@ export class ThreatCloudServer {
     // Admin HTML is safe to serve publicly — it contains no sensitive data.
     // Authentication happens client-side: the login form collects the API key,
     // which is then sent as Authorization header on every API call.
+    const nonce = randomBytes(16).toString('base64');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader(
+      'Content-Security-Policy',
+      `default-src 'self'; ` +
+        `script-src 'nonce-${nonce}' 'strict-dynamic'; ` +
+        `style-src 'self' 'unsafe-inline'; ` +
+        `object-src 'none'; ` +
+        `frame-ancestors 'none'; ` +
+        `base-uri 'self'`
+    );
     res.writeHead(200);
-    res.end(getAdminHTML());
+    res.end(getAdminHTML(nonce));
   }
 
   /** Check admin API key for write-protected endpoints / 檢查管理員 API 金鑰 */
@@ -2668,12 +2681,17 @@ export class ThreatCloudServer {
     }
     const authHeader = req.headers.authorization ?? '';
     const token = authHeader.replace('Bearer ', '');
-    // Use timing-safe comparison to prevent timing attacks
-    if (token.length !== this.config.adminApiKey.length) return false;
-    return timingSafeEqual(
-      Buffer.from(token, 'utf-8'),
-      Buffer.from(this.config.adminApiKey, 'utf-8')
-    );
+    const expected = this.config.adminApiKey;
+    // Pad both sides to a fixed 128-byte buffer before comparing so the
+    // early-return branch that leaks key length via timing is eliminated.
+    const a = Buffer.alloc(128);
+    const b = Buffer.alloc(128);
+    Buffer.from(token, 'utf-8').copy(a, 0, 0, Math.min(token.length, 128));
+    Buffer.from(expected, 'utf-8').copy(b, 0, 0, Math.min(expected.length, 128));
+    // timingSafeEqual guards byte content; the explicit length check is kept
+    // separate so both sides always go through the constant-time comparison
+    // regardless of length difference.
+    return timingSafeEqual(a, b) && token.length === expected.length;
   }
 
   /**

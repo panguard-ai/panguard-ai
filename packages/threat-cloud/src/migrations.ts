@@ -391,6 +391,70 @@ export const migrations: readonly Migration[] = [
       db.exec(`CREATE INDEX IF NOT EXISTS idx_client_keys_tier ON client_keys(tier);`);
     },
   },
+  {
+    version: 15,
+    name: 'add_github_identity_and_weighted_confirmations',
+    up: (db) => {
+      // ATR proposal corpus integrity: a Sybil attacker can register N anonymous
+      // client keys from rotating IPv6 addresses and self-confirm a malicious
+      // proposal past the 3-confirmation promotion threshold. This migration
+      // ties the trust tier of each confirmation vote to a verified GitHub
+      // identity. Anonymous votes count as zero weight; verified GitHub
+      // contributors count for 0.5 (new) or 1.0 (>=30 days since registration).
+      // Promotion now requires `confirmation_weight >= 3.0` rather than the
+      // raw `confirmations >= 3` count.
+
+      // client_keys: add github identity + trust tier
+      const ckCols = db.prepare('PRAGMA table_info(client_keys)').all() as Array<{
+        name: string;
+      }>;
+      if (!ckCols.some((c) => c.name === 'github_user_id')) {
+        db.exec('ALTER TABLE client_keys ADD COLUMN github_user_id INTEGER');
+      }
+      if (!ckCols.some((c) => c.name === 'github_login')) {
+        db.exec('ALTER TABLE client_keys ADD COLUMN github_login TEXT');
+      }
+      if (!ckCols.some((c) => c.name === 'trust_tier')) {
+        // Values: 'anonymous' | 'github_new' | 'github_verified'
+        // - anonymous: no GitHub binding (default for legacy + /api/clients/register)
+        // - github_new: GitHub-verified, < 30 days since registration
+        // - github_verified: GitHub-verified, >= 30 days since registration
+        db.exec("ALTER TABLE client_keys ADD COLUMN trust_tier TEXT NOT NULL DEFAULT 'anonymous'");
+      }
+      db.exec(
+        `CREATE INDEX IF NOT EXISTS idx_client_keys_github_user ON client_keys(github_user_id)`
+      );
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_client_keys_trust ON client_keys(trust_tier)`);
+
+      // atr_proposals: add weighted confirmation tracking
+      const apCols = db.prepare('PRAGMA table_info(atr_proposals)').all() as Array<{
+        name: string;
+      }>;
+      if (!apCols.some((c) => c.name === 'confirmation_weight')) {
+        // First submission counts as the initial vote — backfill to match
+        // the existing `confirmations` integer so legacy proposals keep the
+        // same promotion behaviour during the transition window.
+        db.exec('ALTER TABLE atr_proposals ADD COLUMN confirmation_weight REAL NOT NULL DEFAULT 0');
+        db.exec('UPDATE atr_proposals SET confirmation_weight = CAST(confirmations AS REAL)');
+      }
+
+      // Per-github_user_id daily proposal submission cap is enforced via a
+      // separate table to keep the constraint cheap to check (single SELECT
+      // by user_id + date). Limit defaults to 10/day in code.
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS github_proposal_submissions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          github_user_id INTEGER NOT NULL,
+          submission_date TEXT NOT NULL,
+          count INTEGER NOT NULL DEFAULT 1,
+          updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+          UNIQUE(github_user_id, submission_date)
+        );
+        CREATE INDEX IF NOT EXISTS idx_github_proposals_user_date
+          ON github_proposal_submissions(github_user_id, submission_date);
+      `);
+    },
+  },
 ];
 
 /**

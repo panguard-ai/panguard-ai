@@ -50,4 +50,9 @@ EXPOSE 3000
 # Use /data for persistent storage (Railway volume mount)
 ENV TC_DB_PATH=/data/threat-cloud.db
 
+# Run as non-root user to limit blast radius of any container escape
+RUN addgroup --system tc && adduser --system --ingroup tc --home /home/tc tc
+RUN mkdir -p /data && chown -R tc:tc /data /app
+USER tc
+
 CMD ["node", "dist/cli.js"]
