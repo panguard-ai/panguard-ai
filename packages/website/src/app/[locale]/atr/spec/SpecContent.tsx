@@ -18,18 +18,58 @@ interface SectionRow {
 
 const SECTIONS: readonly SectionRow[] = [
   { num: '1', en: 'Abstract', zh: '摘要', anchor: '1-abstract' },
-  { num: '3', en: 'Conventions and Terminology (RFC 2119)', zh: '規範性用語', anchor: '3-conventions-and-terminology' },
-  { num: '4', en: 'Rule Identifier (ATR-YYYY-NNNNN)', zh: '規則識別碼', anchor: '4-rule-identifier' },
-  { num: '5', en: 'Rule Document Structure', zh: '規則文件結構', anchor: '5-rule-document-structure' },
+  {
+    num: '3',
+    en: 'Conventions and Terminology (RFC 2119)',
+    zh: '規範性用語',
+    anchor: '3-conventions-and-terminology',
+  },
+  {
+    num: '4',
+    en: 'Rule Identifier (ATR-YYYY-NNNNN)',
+    zh: '規則識別碼',
+    anchor: '4-rule-identifier',
+  },
+  {
+    num: '5',
+    en: 'Rule Document Structure',
+    zh: '規則文件結構',
+    anchor: '5-rule-document-structure',
+  },
   { num: '6', en: 'Detection Semantics', zh: '偵測語意', anchor: '6-detection-semantics' },
   { num: '7', en: 'Match Output', zh: '比對輸出', anchor: '7-match-output' },
   { num: '8', en: 'Canonical Categories (10)', zh: '正式分類', anchor: '8-canonical-categories' },
-  { num: '9', en: 'Crosswalks (OWASP/NIST/ISO/MITRE)', zh: '對應其他標準', anchor: '9-crosswalks-optional' },
+  {
+    num: '9',
+    en: 'Crosswalks (OWASP/NIST/ISO/MITRE)',
+    zh: '對應其他標準',
+    anchor: '9-crosswalks-optional',
+  },
   { num: '10', en: 'Versioning (SemVer)', zh: '版本政策', anchor: '10-versioning' },
-  { num: '11', en: 'Conformance Levels L1/L2/L3', zh: '一致性等級', anchor: '11-conformance-levels' },
-  { num: '12', en: 'Conformance Test Suite', zh: '一致性測試套件', anchor: '12-conformance-test-suite' },
-  { num: '13', en: 'Security and Privacy Considerations', zh: '安全與隱私考量', anchor: '13-security-and-privacy-considerations' },
-  { num: '14', en: 'IANA Considerations', zh: 'IANA 媒體類型註冊', anchor: '14-iana-considerations' },
+  {
+    num: '11',
+    en: 'Conformance Levels L1/L2/L3',
+    zh: '一致性等級',
+    anchor: '11-conformance-levels',
+  },
+  {
+    num: '12',
+    en: 'Conformance Test Suite',
+    zh: '一致性測試套件',
+    anchor: '12-conformance-test-suite',
+  },
+  {
+    num: '13',
+    en: 'Security and Privacy Considerations',
+    zh: '安全與隱私考量',
+    anchor: '13-security-and-privacy-considerations',
+  },
+  {
+    num: '14',
+    en: 'IANA Considerations',
+    zh: 'IANA 媒體類型註冊',
+    anchor: '14-iana-considerations',
+  },
 ];
 
 const LEVELS = [
@@ -59,16 +99,30 @@ export default function SpecContent() {
       <FadeHeader isZh={isZh} />
 
       <div className="mb-12 grid gap-4 sm:grid-cols-3">
-        <StatBox label={isZh ? '規格版本' : 'Spec Version'} value="1.0.0" sub={isZh ? '草案 · 2026-05-16' : 'Draft · 2026-05-16'} />
-        <StatBox label={isZh ? '規範性語言' : 'Normative Language'} value="RFC 2119" sub={isZh ? '加 RFC 8174 大小寫澄清' : 'with RFC 8174 case clarification'} />
-        <StatBox label={isZh ? '一致性等級' : 'Conformance Tiers'} value="L1 / L2 / L3" sub={isZh ? '見 §11' : 'see §11'} />
+        <StatBox
+          label={isZh ? '規格版本' : 'Spec Version'}
+          value="1.0.0"
+          sub={isZh ? '草案 · 2026-05-16' : 'Draft · 2026-05-16'}
+        />
+        <StatBox
+          label={isZh ? '規範性語言' : 'Normative Language'}
+          value="RFC 2119"
+          sub={isZh ? '加 RFC 8174 大小寫澄清' : 'with RFC 8174 case clarification'}
+        />
+        <StatBox
+          label={isZh ? '一致性等級' : 'Conformance Tiers'}
+          value="L1 / L2 / L3"
+          sub={isZh ? '見 §11' : 'see §11'}
+        />
       </div>
 
       <SectionTitle
         title={isZh ? '規範文件目錄' : 'Specification Outline'}
-        subtitle={isZh
-          ? '完整規範採 IETF RFC 風格撰寫，使用 BCP 14 的 MUST/SHOULD/MAY 規範性語言。'
-          : 'Full specification authored in IETF RFC style with BCP 14 normative MUST/SHOULD/MAY.'}
+        subtitle={
+          isZh
+            ? '完整規範採 IETF RFC 風格撰寫，使用 BCP 14 的 MUST/SHOULD/MAY 規範性語言。'
+            : 'Full specification authored in IETF RFC style with BCP 14 normative MUST/SHOULD/MAY.'
+        }
       />
 
       <div className="mt-8 overflow-hidden rounded-lg border border-slate-200">
@@ -104,9 +158,11 @@ export default function SpecContent() {
       <div className="mt-16">
         <SectionTitle
           title={isZh ? '一致性等級' : 'Conformance Levels'}
-          subtitle={isZh
-            ? '任何引擎要宣稱「ATR-Compatible」必須先公開其一致性等級與可重現的測試報告。'
-            : 'Any engine claiming "ATR-Compatible" must declare a conformance level with a reproducible test report.'}
+          subtitle={
+            isZh
+              ? '任何引擎要宣稱「ATR-Compatible」必須先公開其一致性等級與可重現的測試報告。'
+              : 'Any engine claiming "ATR-Compatible" must declare a conformance level with a reproducible test report.'
+          }
         />
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {LEVELS.map((lvl) => (
@@ -130,7 +186,11 @@ export default function SpecContent() {
           <LinkCard
             icon={<FileText className="h-5 w-5" />}
             title="SPEC.md"
-            desc={isZh ? '完整規範文件，RFC 2119 規範性語言' : 'Full normative specification with RFC 2119 language'}
+            desc={
+              isZh
+                ? '完整規範文件，RFC 2119 規範性語言'
+                : 'Full normative specification with RFC 2119 language'
+            }
             href={`${REPO_BLOB}/SPEC.md`}
           />
           <LinkCard
@@ -148,7 +208,9 @@ export default function SpecContent() {
           <LinkCard
             icon={<FileText className="h-5 w-5" />}
             title="stats.json"
-            desc={isZh ? '所有公開數字的唯一來源' : 'Single source of truth for all published numbers'}
+            desc={
+              isZh ? '所有公開數字的唯一來源' : 'Single source of truth for all published numbers'
+            }
             href={`${REPO_RAW}/stats.json`}
           />
         </div>
@@ -211,7 +273,17 @@ function StatBox({ label, value, sub }: { label: string; value: string; sub: str
   );
 }
 
-function LinkCard({ icon, title, desc, href }: { icon: React.ReactNode; title: string; desc: string; href: string }) {
+function LinkCard({
+  icon,
+  title,
+  desc,
+  href,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  href: string;
+}) {
   return (
     <a
       href={href}

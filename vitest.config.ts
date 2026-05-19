@@ -21,6 +21,7 @@ export default defineConfig({
       'packages/**/tests/**/*.test.ts',
       'tests/**/*.test.ts',
       'security-hardening/tests/**/*.test.ts',
+      'scripts/__tests__/**/*.test.ts',
     ],
     exclude: ['**/node_modules/**', 'node_modules', 'dist', 'packages/website/**'],
   },
@@ -41,6 +42,7 @@ export default defineConfig({
         __dirname,
         './packages/panguard-skill-auditor/src'
       ),
+      '@': resolve(__dirname, './packages/app/src'),
     },
   },
 });

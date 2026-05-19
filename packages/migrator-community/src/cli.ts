@@ -14,7 +14,7 @@
 import { Command } from 'commander';
 import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { join, basename, extname } from 'node:path';
+import { join, basename, dirname, extname } from 'node:path';
 import yaml from 'js-yaml';
 import { convertSigma, convertYara } from './index.js';
 import type { SigmaRule } from './parsers/sigma/types.js';
@@ -83,6 +83,10 @@ program
           const outPath = isSingle
             ? opts.output
             : join(opts.output, `${result.atr.id}-${slug(result.atr.title)}.yaml`);
+          // For single-file output, the parent dir may not exist yet — the
+          // directory-input branch already calls mkdir(opts.output) above, so
+          // mirror that here on the parent of the resolved output file.
+          if (isSingle) await mkdir(dirname(outPath), { recursive: true });
           await writeFile(
             outPath,
             yaml.dump(result.atr, { noRefs: true, lineWidth: 120 }),

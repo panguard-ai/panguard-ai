@@ -5,7 +5,7 @@ This file is a structured long-form context dump intended for AI coding tools
 llms-full.txt to understand a project at depth. It is auto-generated from
 the canonical source files in the panguard-ai repository.
 
-Last generated: 2026-05-12T19:38:42.527Z
+Last generated: 2026-05-19T17:16:25.219Z
 Sources of truth:
 - src/lib/stats.ts (product stats)
 - src/lib/atr-rules-compiled.ts (ATR rule index)
@@ -54,7 +54,7 @@ cost, insufficient differentiation, vendor death spiral).
 
 ---
 
-## Section 2 — Core stats (verified 2026-05-12)
+## Section 2 — Core stats (verified 2026-05-19)
 
 ### Rule corpus
 - 419 ATR rules in v2.2.0
@@ -624,6 +624,16 @@ Notable: agent-threat-rules (npm, 2.2.0), @panguard-ai/migrator-community
 Full text at panguard.ai/blog/{slug}. Each post also has a zh-TW
 counterpart at panguard.ai/zh-TW/blog/{slug}-zh.
 
+### Four Hours. The New Disclosure-to-Exploit Window for AI Agent CVEs.
+- URL: https://panguard.ai/blog/four-hour-exploit-window
+- Date: 2026-05-18
+- Excerpt: PraisonAI was scanned for exploitation 3 hours 44 minutes after disclosure. Microsoft Copilot opened a regression test against ATR rules for the Semantic Kernel CVEs and we shipped the rules in 2 hours 16 minutes. Content-layer detection rules are the only thing operating in that timeframe.
+
+### When Microsoft says prompts are shells, ATR ships detection rules within 2 hours
+- URL: https://panguard.ai/blog/microsoft-copilot-loop-2h16m
+- Date: 2026-05-13
+- Excerpt: On 2026-05-11, between 06:07 and 08:24 UTC, a closed loop ran end-to-end in 2 hours and 16 minutes. Microsoft Copilot SWE Agent opened an issue against microsoft/agent-governance-toolkit containing regression-test fixtures that presumed ATR rule IDs for two Semantic Kernel CVEs disclosed four days earlier (CVE-2026-26030 lambda+eval RCE and CVE-2026-25592 autostart-write persistence). ATR v2.1.2 shipped on npm with rules ATR-2026-00440 and ATR-2026-00441 covering both CVEs. The agent-governance-toolkit issue closed the same day. The rules sat in an external open-source repository the entire time — Microsoft Copilot, operating as a software engineering agent inside AGT, was writing regression tests against a detection contract that lived outside Microsoft. This is a small data point and it is also the first time we have observed a major-vendor Copilot SWE Agent write tests that presume an external open-source detection standard. The Microsoft Security Blog framed the upstream story as a category move: prompt injection is no longer just a content-policy problem, it is a code-execution primitive. If that framing is right, detection has to move down the stack — and the rule has to be the contract.
+
 ### 60 Days, 8 Ecosystem Integrations — How an Open Standard Spreads
 - URL: https://panguard.ai/blog/60-days-8-ecosystem-integrations
 - Date: 2026-05-11
@@ -713,16 +723,6 @@ counterpart at panguard.ai/zh-TW/blog/{slug}-zh.
 - URL: https://panguard.ai/blog/751-malicious-skills-openclaw
 - Date: 2026-04-15
 - Excerpt: We scanned 56,480 AI agent skills on OpenClaw and found 751 distributing active malware. Three coordinated threat actors. Base64-encoded C2 callbacks. Password-protected zip files. The largest known AI agent supply chain attack.
-
-### OWASP Agentic Top 10: Full Detection Coverage Mapping
-- URL: https://panguard.ai/blog/owasp-agentic-top-10-detection-coverage
-- Date: 2026-04-09
-- Excerpt: ATR covers 10/10 OWASP Agentic Top 10 categories with executable detection rules. Here is the complete mapping.
-
-### How Cisco Ships ATR Rules in AI Defense
-- URL: https://panguard.ai/blog/how-cisco-ships-atr-rules
-- Date: 2026-04-09
-- Excerpt: Cisco AI Defense merged 34 ATR rules as upstream. Then they built a CLI to consume ATR rule packs. Here is how the integration works.
 
 ---
 

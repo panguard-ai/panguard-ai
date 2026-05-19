@@ -13,9 +13,7 @@ export async function generateMetadata(props: {
   const params = await props.params;
   const isZh = params.locale === 'zh-TW';
   return {
-    title: isZh
-      ? 'AI Agent 安全術語表 — PanGuard AI'
-      : 'AI Agent Security Glossary — PanGuard AI',
+    title: isZh ? 'AI Agent 安全術語表 — PanGuard AI' : 'AI Agent Security Glossary — PanGuard AI',
     description: isZh
       ? '什麼是 ATR? 什麼是 prompt injection? 什麼是 tool poisoning? AI agent 安全領域的核心術語,以技術精確、跨來源引用的方式定義。'
       : 'What is an ATR rule? What is prompt injection? What is tool poisoning? The core vocabulary of AI agent security, defined precisely and with cross-source citations.',
@@ -31,9 +29,7 @@ export default async function GlossaryIndexPage(props: { params: Promise<{ local
     '@context': 'https://schema.org',
     '@type': 'DefinedTermSet',
     name: 'PanGuard AI Security Glossary',
-    description: isZh
-      ? 'AI agent 安全領域的核心術語定義'
-      : 'Core vocabulary of AI agent security',
+    description: isZh ? 'AI agent 安全領域的核心術語定義' : 'Core vocabulary of AI agent security',
     url: 'https://panguard.ai/glossary',
     hasDefinedTerm: GLOSSARY.map((entry) => ({
       '@type': 'DefinedTerm',
@@ -54,9 +50,7 @@ export default async function GlossaryIndexPage(props: { params: Promise<{ local
               {isZh ? '安全術語表' : 'SECURITY GLOSSARY'}
             </p>
             <h1 className="text-[clamp(28px,5vw,52px)] font-extrabold leading-[1.05] tracking-tight text-text-primary max-w-3xl">
-              {isZh
-                ? 'AI Agent 安全的核心術語'
-                : 'The core vocabulary of AI agent security'}
+              {isZh ? 'AI Agent 安全的核心術語' : 'The core vocabulary of AI agent security'}
             </h1>
             <p className="text-lg text-text-secondary mt-6 max-w-2xl leading-relaxed">
               {isZh

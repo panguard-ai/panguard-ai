@@ -15,6 +15,7 @@ import { AnalyzeAgent } from '../src/agent/analyze-agent.js';
 import { RespondAgent } from '../src/agent/respond-agent.js';
 import { ReportAgent } from '../src/agent/report-agent.js';
 import { createEmptyBaseline } from '../src/memory/baseline.js';
+import { PERMISSIVE_ENFORCEMENT_POLICY } from '../src/agent/respond/safety-rules.js';
 
 function makeEvent(overrides: Partial<SecurityEvent> = {}): SecurityEvent {
   return {

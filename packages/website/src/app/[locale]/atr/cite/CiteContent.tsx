@@ -54,9 +54,20 @@ interface Block {
 const BLOCKS: readonly Block[] = [
   { id: 'bibtex', labelEn: 'BibTeX', labelZh: 'BibTeX', content: BIBTEX, language: 'bibtex' },
   { id: 'apa', labelEn: 'APA (7th edition)', labelZh: 'APA 第七版', content: APA },
-  { id: 'chicago', labelEn: 'Chicago (author-date)', labelZh: 'Chicago 作者-年份制', content: CHICAGO },
+  {
+    id: 'chicago',
+    labelEn: 'Chicago (author-date)',
+    labelZh: 'Chicago 作者-年份制',
+    content: CHICAGO,
+  },
   { id: 'ieee', labelEn: 'IEEE', labelZh: 'IEEE', content: IEEE },
-  { id: 'cff', labelEn: 'Citation File Format (CFF)', labelZh: 'Citation File Format', content: CFF, language: 'yaml' },
+  {
+    id: 'cff',
+    labelEn: 'Citation File Format (CFF)',
+    labelZh: 'Citation File Format',
+    content: CFF,
+    language: 'yaml',
+  },
 ];
 
 export default function CiteContent() {
@@ -82,13 +93,21 @@ export default function CiteContent() {
 
       <div className="mb-12 grid gap-4 sm:grid-cols-3">
         <KvBox label={isZh ? '版本' : 'Version'} value={VERSION} />
-        <KvBox label={isZh ? '永久 DOI' : 'Persistent DOI'} value={DOI} href={`https://doi.org/${DOI}`} />
+        <KvBox
+          label={isZh ? '永久 DOI' : 'Persistent DOI'}
+          value={DOI}
+          href={`https://doi.org/${DOI}`}
+        />
         <KvBox label="License" value="MIT" />
       </div>
 
       <SectionTitle
         title={isZh ? '引用格式' : 'Citation Formats'}
-        subtitle={isZh ? '點擊右上「複製」即可貼到你的文獻管理器' : 'Click "Copy" to paste into your reference manager'}
+        subtitle={
+          isZh
+            ? '點擊右上「複製」即可貼到你的文獻管理器'
+            : 'Click "Copy" to paste into your reference manager'
+        }
       />
 
       <div className="mt-8 space-y-6">
@@ -106,7 +125,9 @@ export default function CiteContent() {
             ? '若需要規範性的版本鎖定引用 (例：政策文件採納特定 ATR 版本作為合規基準)，建議直接引用 GitHub 的 tag (例如 v'
             : 'For normative version-locked citation (e.g., policy documents adopting a specific ATR version as a compliance baseline), cite the GitHub release tag (e.g., v'}
           {VERSION}
-          {isZh ? ') 或 Zenodo 的版本特定 DOI。Concept DOI 永遠指向最新版。' : ') or the version-specific Zenodo DOI. The concept DOI always resolves to the latest version.'}
+          {isZh
+            ? ') 或 Zenodo 的版本特定 DOI。Concept DOI 永遠指向最新版。'
+            : ') or the version-specific Zenodo DOI. The concept DOI always resolves to the latest version.'}
         </p>
         <div className="mt-4 flex flex-wrap gap-3 text-sm">
           <a
@@ -115,7 +136,8 @@ export default function CiteContent() {
             rel="noreferrer"
             className="inline-flex items-center gap-1 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800"
           >
-            {isZh ? 'Zenodo 頁面' : 'Zenodo record'} <ExternalLink className="h-3 w-3" aria-hidden />
+            {isZh ? 'Zenodo 頁面' : 'Zenodo record'}{' '}
+            <ExternalLink className="h-3 w-3" aria-hidden />
           </a>
           <a
             href={`${REPO}/blob/main/CITATION.cff`}
@@ -176,7 +198,12 @@ function KvBox({ label, value, href }: { label: string; value: string; href?: st
   );
   if (href)
     return (
-      <a href={href} target="_blank" rel="noreferrer" className="block rounded-lg border border-slate-200 p-5 hover:border-emerald-400">
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className="block rounded-lg border border-slate-200 p-5 hover:border-emerald-400"
+      >
         {inner}
       </a>
     );

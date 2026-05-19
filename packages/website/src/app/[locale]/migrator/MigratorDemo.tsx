@@ -5,16 +5,7 @@ import { useLocale } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
-import {
-  ArrowRight,
-  Check,
-  Copy,
-  Download,
-  Loader2,
-  Wand2,
-  Zap,
-  Lock,
-} from 'lucide-react';
+import { ArrowRight, Check, Copy, Download, Loader2, Wand2, Zap, Lock } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Example rules used by the "Load example" buttons.
@@ -170,9 +161,7 @@ export default function MigratorDemo() {
         headers: { 'content-type': 'application/json', accept: 'application/json' },
         body: JSON.stringify({ source, text: input }),
       });
-      const body = (await res.json().catch(() => ({}))) as
-        | MigrateResponseOk
-        | MigrateResponseError;
+      const body = (await res.json().catch(() => ({}))) as MigrateResponseOk | MigrateResponseError;
       if (!res.ok) {
         const errBody = body as MigrateResponseError;
         const reason =
@@ -487,7 +476,9 @@ export default function MigratorDemo() {
                 <ComparisonRow ok>{isZh ? 'Sigma 解析器' : 'Sigma parser'}</ComparisonRow>
                 <ComparisonRow ok>{isZh ? 'YARA 解析器' : 'YARA parser'}</ComparisonRow>
                 <ComparisonRow ok>{isZh ? 'IR 中介層' : 'IR transformer'}</ComparisonRow>
-                <ComparisonRow ok>{isZh ? 'ATR schema 驗證' : 'ATR schema validation'}</ComparisonRow>
+                <ComparisonRow ok>
+                  {isZh ? 'ATR schema 驗證' : 'ATR schema validation'}
+                </ComparisonRow>
                 <ComparisonRow ok>{isZh ? 'CLI + Web demo' : 'CLI + web demo'}</ComparisonRow>
                 <ComparisonRow ok>{isZh ? '可自架' : 'Self-host forever'}</ComparisonRow>
               </ul>

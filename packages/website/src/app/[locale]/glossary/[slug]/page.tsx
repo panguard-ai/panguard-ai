@@ -24,9 +24,7 @@ export async function generateMetadata(props: {
   const desc = entry.shortDefinition[isZh ? 'zh' : 'en'];
 
   return {
-    title: isZh
-      ? `什麼是 ${entry.term}？ — PanGuard AI`
-      : `What is ${entry.term}? — PanGuard AI`,
+    title: isZh ? `什麼是 ${entry.term}？ — PanGuard AI` : `What is ${entry.term}? — PanGuard AI`,
     description: desc,
     alternates: buildAlternates(`/glossary/${entry.slug}`, params.locale),
     openGraph: {
@@ -69,10 +67,7 @@ export default async function GlossaryEntryPage(props: {
         ]}
       />
       <JsonLdBreadcrumb
-        items={[
-          { name: isZh ? '術語表' : 'Glossary', href: '/glossary' },
-          { name: entry.term },
-        ]}
+        items={[{ name: isZh ? '術語表' : 'Glossary', href: '/glossary' }, { name: entry.term }]}
       />
       <NavBar />
       <main id="main-content" className="min-h-screen bg-surface-0">
@@ -108,9 +103,12 @@ export default async function GlossaryEntryPage(props: {
                     __html: para
                       .replace(
                         /\*\*([^*]+)\*\*/g,
-                        '<strong class="text-text-primary font-semibold">$1</strong>',
+                        '<strong class="text-text-primary font-semibold">$1</strong>'
                       )
-                      .replace(/`([^`]+)`/g, '<code class="text-xs bg-surface-2 border border-border px-1.5 py-0.5 rounded font-mono">$1</code>'),
+                      .replace(
+                        /`([^`]+)`/g,
+                        '<code class="text-xs bg-surface-2 border border-border px-1.5 py-0.5 rounded font-mono">$1</code>'
+                      ),
                   }}
                 />
               ))}
@@ -139,9 +137,7 @@ export default async function GlossaryEntryPage(props: {
                   <p className="text-[10px] uppercase tracking-wider text-text-muted font-semibold mb-1">
                     {isZh ? '相關 ATR 規則' : 'Related ATR rules'}
                   </p>
-                  <p className="text-sm text-text-primary font-mono">
-                    {entry.atrRules.join(', ')}
-                  </p>
+                  <p className="text-sm text-text-primary font-mono">{entry.atrRules.join(', ')}</p>
                 </div>
               )}
             </div>

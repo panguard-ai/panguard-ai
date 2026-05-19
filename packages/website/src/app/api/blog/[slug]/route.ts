@@ -4,11 +4,7 @@ import type { BlogPost } from '@/data/blog-posts';
 
 const AUTH_API = process.env.BLOG_AUTH_API || '';
 
-const ALLOWED_AUTH_HOSTS = new Set([
-  'app.panguard.ai',
-  'localhost',
-  '127.0.0.1',
-]);
+const ALLOWED_AUTH_HOSTS = new Set(['app.panguard.ai', 'localhost', '127.0.0.1']);
 
 async function verifyAdmin(req: Request): Promise<boolean> {
   const authHeader = req.headers.get('authorization');

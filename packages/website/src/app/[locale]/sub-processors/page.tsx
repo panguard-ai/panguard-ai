@@ -120,7 +120,8 @@ const SUB_PROCESSORS: ReadonlyArray<SubProcessor> = [
     },
     location: LOCATION_US,
     url: 'https://github.com',
-    dpaUrl: 'https://docs.github.com/en/site-policy/privacy-policies/github-data-protection-agreement',
+    dpaUrl:
+      'https://docs.github.com/en/site-policy/privacy-policies/github-data-protection-agreement',
     socUrl: 'https://github.com/security',
   },
   {
@@ -136,9 +137,7 @@ const SUB_PROCESSORS: ReadonlyArray<SubProcessor> = [
   },
 ];
 
-export default async function SubProcessorsPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function SubProcessorsPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
   const { locale } = params;
   const isZh = locale === 'zh-TW';
@@ -177,8 +176,8 @@ export default async function SubProcessorsPage(props: {
                   </>
                 ) : (
                   <>
-                    This page lists third-party sub-processors that may process Customer Personal Data
-                    on behalf of Panguard AI, as an annex to{' '}
+                    This page lists third-party sub-processors that may process Customer Personal
+                    Data on behalf of Panguard AI, as an annex to{' '}
                     <Link
                       href="/legal/dpa"
                       className="text-brand-sage hover:text-brand-sage-light underline"
@@ -275,7 +274,7 @@ export default async function SubProcessorsPage(props: {
               <p>
                 {isZh
                   ? '預設情況下，客戶資料完全在客戶環境內處理（透過 panguard-cli 在本機端執行，或客戶自託管的 Docker 部署）。除非客戶明確選擇加入 Panguard 託管的 Threat Cloud 遙測，否則沒有客戶資料離開客戶基礎設施。遙測（如選擇加入）僅傳輸去識別化的偵測中繼資料（規則 ID、時間戳、雜湊 agent 識別碼），不含內容裝載。'
-                  : 'By default, Customer Data is processed entirely within Customer\'s environment (panguard-cli running locally, or Customer-hosted Docker deployment of Threat Cloud). No Customer Data leaves Customer infrastructure unless the Customer explicitly opts into Panguard\'s hosted Threat Cloud telemetry. Telemetry, when opted in, transmits only anonymized detection metadata (rule ID, timestamp, hashed agent identifier) — never payload contents.'}
+                  : "By default, Customer Data is processed entirely within Customer's environment (panguard-cli running locally, or Customer-hosted Docker deployment of Threat Cloud). No Customer Data leaves Customer infrastructure unless the Customer explicitly opts into Panguard's hosted Threat Cloud telemetry. Telemetry, when opted in, transmits only anonymized detection metadata (rule ID, timestamp, hashed agent identifier) — never payload contents."}
               </p>
             </section>
 

@@ -1,0 +1,22 @@
+# Litestream — continuous SQLite replication for Threat Cloud
+#
+# Replicates /data/threat-cloud.db to an S3-compatible bucket (Cloudflare R2,
+# AWS S3, Backblaze B2, MinIO). All connection parameters come from env vars
+# so the same config works in production (Railway -> R2) and local dev (MinIO).
+#
+# Requires Litestream >= 0.3.13. The v0.5.x config schema is NOT compatible
+# with this file — if upgrading, regenerate from the v0.5 example.
+
+dbs:
+  - path: /data/threat-cloud.db
+    replicas:
+      - type: s3
+        endpoint: ${LITESTREAM_S3_ENDPOINT}
+        bucket: ${LITESTREAM_S3_BUCKET}
+        path: threat-cloud-db
+        region: ${LITESTREAM_S3_REGION}
+        access-key-id: ${LITESTREAM_S3_ACCESS_KEY_ID}
+        secret-access-key: ${LITESTREAM_S3_SECRET_ACCESS_KEY}
+        retention: 168h           # 7 days of WAL
+        snapshot-interval: 1h     # full snapshot once per hour
+        validation-interval: 12h  # paranoid checksum compare every 12h

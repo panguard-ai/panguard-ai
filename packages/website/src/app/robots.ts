@@ -26,10 +26,7 @@ const PROTECTED_PATHS = [
   '/admin',
 ];
 
-const ALL_PROTECTED = [
-  ...PROTECTED_PATHS,
-  ...PROTECTED_PATHS.map((p) => `/zh-TW${p}`),
-];
+const ALL_PROTECTED = [...PROTECTED_PATHS, ...PROTECTED_PATHS.map((p) => `/zh-TW${p}`)];
 
 const ALLOWED_AI_BOTS = [
   // Training crawlers
@@ -65,8 +62,8 @@ const BLOCKED_BOTS = [
 ];
 
 export default function robots(): MetadataRoute.Robots {
-  const isProduction = process.env.VERCEL_ENV === 'production' ||
-                       process.env.NODE_ENV === 'production';
+  const isProduction =
+    process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
 
   // Preview deploys: noindex everything so search engines don't index dev URLs
   if (!isProduction && process.env.VERCEL_ENV === 'preview') {

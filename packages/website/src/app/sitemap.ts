@@ -42,6 +42,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/migrator',
     '/pricing',
     '/atr',
+    '/atr/spec',
+    '/atr/governance',
+    '/atr/crosswalks',
+    '/atr/adopters',
+    '/atr/cite',
     '/glossary',
     '/compare',
     '/research/benchmarks',
@@ -67,6 +72,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     if (path.startsWith('/product') || path === '/integrations') return 0.8;
     if (path === '/how-it-works' || path === '/threat-cloud' || path === '/about') return 0.8;
     if (path === '/migrator' || path === '/pricing' || path === '/atr') return 0.9;
+    if (path.startsWith('/atr/')) return 0.85;
     if (path === '/blog' || path === '/docs') return 0.7;
     return 0.6;
   };
@@ -109,10 +115,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
       alternates: {
         languages: Object.fromEntries(
-          locales.map((l) => [l, localeUrl(l, `/glossary/${entry.slug}`)]),
+          locales.map((l) => [l, localeUrl(l, `/glossary/${entry.slug}`)])
         ),
       },
-    })),
+    }))
   );
 
   const compareEntries = locales.flatMap((locale) =>
@@ -124,7 +130,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       alternates: {
         languages: Object.fromEntries(locales.map((l) => [l, localeUrl(l, `/compare/${c.slug}`)])),
       },
-    })),
+    }))
   );
 
   return [...staticEntries, ...blogEntries, ...glossaryEntries, ...compareEntries];

@@ -1,5 +1,34 @@
 node_modules
+**/node_modules
 .git
+.next
+**/.next
+dist
+**/dist
+coverage
+**/coverage
+test-results
+**/test-results
+playwright-report
+**/playwright-report
 playwright-report-local
 playwright-report-live
 pancore
+brand-assets
+panguard design
+assets
+threat-cloud.db
+*.log
+.env
+.env.*
+!.env.example
+docs-site
+marketing
+security-hardening
+tests/e2e
+.turbo
+**/.turbo
+</content>
+</invoke>
+<invoke name="Bash">
+<parameter name="command">cd /Users/user/Downloads/panguard-ai && vercel --prod --yes 2>&1 | tail -20

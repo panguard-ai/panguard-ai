@@ -351,14 +351,14 @@ describe('End-to-End Platform Pipeline', () => {
   });
 
   describe('License Gating Across Products', () => {
-    it('community edition: all features available to all tiers', () => {
+    it('community edition: all features available to all tiers', async () => {
       const freeKey = generateTestLicenseKey('free');
       const proKey = generateTestLicenseKey('pro');
       const entKey = generateTestLicenseKey('enterprise');
 
-      const free = validateLicense(freeKey)!;
-      const pro = validateLicense(proKey)!;
-      const ent = validateLicense(entKey)!;
+      const free = (await validateLicense(freeKey))!;
+      const pro = (await validateLicense(proKey))!;
+      const ent = (await validateLicense(entKey))!;
 
       // Community edition: all tiers get the same community features
       expect(hasFeature(free, 'basic_monitoring')).toBe(true);

@@ -24,7 +24,9 @@
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.5.6',
-  /** ATR v2.2.0 (2026-05-12): 357 stable + 62 experimental = 419 total */
+  /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
+  atrVersion: '2.2.2',
+  /** ATR v2.2.x: stable + experimental total */
   atrRules: 421,
   atrStableRules: 359,
   atrExperimentalRules: 62,
@@ -175,7 +177,11 @@ export const STATS = {
   benchmark: {
     pint: { recall: 62.5, precision: 99.6, fp: 0.25, samples: 850 },
     skill: { recall: 100, precision: 100, fp: 0, samples: 341 },
-    garak: { recall: 97.1, samples: 666, perFamily: { latentinjection: 34.4, sysprompt_extraction: 67.9, dan: 90.2 } },
+    garak: {
+      recall: 97.1,
+      samples: 666,
+      perFamily: { latentinjection: 34.4, sysprompt_extraction: 67.9, dan: 90.2 },
+    },
     hackaprompt: { recall: 66.2, precision: 100, samples: 4_780, baselineRecall: 28.6 },
     wildFpRate: 0,
     wildSamples: 432,
@@ -197,14 +203,23 @@ export const STATS = {
     /** 13 external PR merges across 6 external orgs */
     externalPRMerges: 13,
     externalOrgs: 6,
-    /** 10K+ monthly downloads across 13 npm + PyPI packages (pitch v5) */
-    npmDownloads30d: 10_000,
+    /** 23K monthly downloads (synced from agent-threat-rules/stats.json) */
+    npmDownloads30d: 23_000,
     /** Tier-1 institutions with active engagement: Microsoft, Cisco, Gen Digital (Sage), MISP, OWASP, NVIDIA, IBM */
     tier1Institutions: 7,
     /** Vendor + standards-body merges: MISP×2 + OWASP A-S-R-H + Gen Digital Sage */
     standardsBodyMerges: 4,
     /** Production CVE coverage (Spring AI + LiteLLM + Semantic Kernel via ATR v2.1.2/v2.1.4) */
-    cveCoverage: ['CVE-2026-26030', 'CVE-2026-25592', 'CVE-2026-41705', 'CVE-2026-41712', 'CVE-2026-41713', 'CVE-2026-42208', 'CVE-2025-59536', 'CVE-2026-21852'],
+    cveCoverage: [
+      'CVE-2026-26030',
+      'CVE-2026-25592',
+      'CVE-2026-41705',
+      'CVE-2026-41712',
+      'CVE-2026-41713',
+      'CVE-2026-42208',
+      'CVE-2025-59536',
+      'CVE-2026-21852',
+    ],
     cisaKevCovered: 1,
     agentsProtected: 50,
     githubStars: 86,

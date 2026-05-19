@@ -501,7 +501,8 @@ function DetailedComparisons() {
     {
       slug: 'atr-vs-cisco-defenseclaw',
       title: 'PanGuard vs Cisco DefenseClaw',
-      blurb: 'Open standard plus commercial platform vs enterprise bundle. Cisco runs ATR in production.',
+      blurb:
+        'Open standard plus commercial platform vs enterprise bundle. Cisco runs ATR in production.',
     },
   ];
 

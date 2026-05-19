@@ -143,6 +143,7 @@ export default function NavBar() {
   const t = useTranslations('nav');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const [mobileAtrOpen, setMobileAtrOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -167,10 +168,26 @@ export default function NavBar() {
     { label: t('productLinks.atrStandard'), desc: t('productLinks.atrStandardDesc'), href: '/atr' },
   ];
 
+  const atrItems: DropdownItem[] = [
+    { label: t('atrLinks.overview'), desc: t('atrLinks.overviewDesc'), href: '/atr' },
+    { label: t('atrLinks.spec'), desc: t('atrLinks.specDesc'), href: '/atr/spec' },
+    {
+      label: t('atrLinks.governance'),
+      desc: t('atrLinks.governanceDesc'),
+      href: '/atr/governance',
+    },
+    {
+      label: t('atrLinks.crosswalks'),
+      desc: t('atrLinks.crosswalksDesc'),
+      href: '/atr/crosswalks',
+    },
+    { label: t('atrLinks.adopters'), desc: t('atrLinks.adoptersDesc'), href: '/atr/adopters' },
+    { label: t('atrLinks.cite'), desc: t('atrLinks.citeDesc'), href: '/atr/cite' },
+  ];
+
   const topLinks = [
     { label: t('howItWorks'), href: '/how-it-works' },
     { label: t('threatCloud'), href: '/threat-cloud' },
-    { label: t('atr'), href: '/atr' },
     { label: t('docs'), href: 'https://docs.panguard.ai' },
     { label: t('about'), href: '/about' },
     { label: t('blog'), href: '/blog' },
@@ -194,6 +211,7 @@ export default function NavBar() {
         {/* Desktop nav */}
         <div className="hidden lg:flex items-center gap-0.5">
           <NavDropdown label={t('product')} items={productItems} />
+          <NavDropdown label={t('atr')} items={atrItems} />
           {topLinks.map((link) => (
             <Link
               key={link.href}
@@ -274,6 +292,32 @@ export default function NavBar() {
                         Coming Soon
                       </span>
                     )}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* ATR accordion */}
+            <button
+              onClick={() => setMobileAtrOpen(!mobileAtrOpen)}
+              className="flex items-center justify-between w-full py-3 min-h-[44px] text-sm text-text-secondary hover:text-text-primary"
+              aria-expanded={mobileAtrOpen}
+            >
+              {t('atr')}
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${mobileAtrOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {mobileAtrOpen && (
+              <div className="pl-4 pb-2 space-y-1">
+                {atrItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="block py-3 min-h-[44px] text-sm text-text-tertiary hover:text-text-primary"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
                   </Link>
                 ))}
               </div>

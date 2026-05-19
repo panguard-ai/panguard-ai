@@ -79,10 +79,7 @@ Exit codes:
 
 const SEVERITY_ORDER = ['critical', 'high', 'medium', 'low', 'info'] as const;
 
-function severityBelowThreshold(
-  found: string,
-  threshold: CliOptions['failOn']
-): boolean {
+function severityBelowThreshold(found: string, threshold: CliOptions['failOn']): boolean {
   if (!threshold) return true;
   const f = SEVERITY_ORDER.indexOf(found as (typeof SEVERITY_ORDER)[number]);
   const t = SEVERITY_ORDER.indexOf(threshold);

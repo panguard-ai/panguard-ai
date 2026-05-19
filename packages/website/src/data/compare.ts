@@ -61,17 +61,57 @@ export const COMPARE: ComparisonEntry[] = [
       ],
     },
     rows: [
-      { feature: 'Detection target', atr: 'Agent behavior + tool calls + model output', other: 'Log events + system telemetry', winner: 'context' },
-      { feature: 'Maturity', atr: '2 years, 419 rules', other: '10+ years, thousands of community rules', winner: 'other' },
-      { feature: 'Prompt injection detection', atr: 'Native (115 rules)', other: 'Not designed for it', winner: 'atr' },
-      { feature: 'Tool call monitoring', atr: 'Native (22 rules)', other: 'Not designed for it', winner: 'atr' },
-      { feature: 'SIEM integration', atr: 'Via SARIF export', other: 'Native (all major SIEMs)', winner: 'other' },
-      { feature: 'Vendor adoption', atr: 'Microsoft AGT, Cisco AI Defense, MISP, OWASP A-S-R-H', other: 'Splunk, Elastic, Microsoft Sentinel, Sumo Logic, every SIEM', winner: 'other' },
+      {
+        feature: 'Detection target',
+        atr: 'Agent behavior + tool calls + model output',
+        other: 'Log events + system telemetry',
+        winner: 'context',
+      },
+      {
+        feature: 'Maturity',
+        atr: '2 years, 419 rules',
+        other: '10+ years, thousands of community rules',
+        winner: 'other',
+      },
+      {
+        feature: 'Prompt injection detection',
+        atr: 'Native (115 rules)',
+        other: 'Not designed for it',
+        winner: 'atr',
+      },
+      {
+        feature: 'Tool call monitoring',
+        atr: 'Native (22 rules)',
+        other: 'Not designed for it',
+        winner: 'atr',
+      },
+      {
+        feature: 'SIEM integration',
+        atr: 'Via SARIF export',
+        other: 'Native (all major SIEMs)',
+        winner: 'other',
+      },
+      {
+        feature: 'Vendor adoption',
+        atr: 'Microsoft AGT, Cisco AI Defense, MISP, OWASP A-S-R-H',
+        other: 'Splunk, Elastic, Microsoft Sentinel, Sumo Logic, every SIEM',
+        winner: 'other',
+      },
       { feature: 'License', atr: 'MIT', other: 'DRL (Detection Rule License)', winner: 'tie' },
       { feature: 'YAML format', atr: 'Yes', other: 'Yes', winner: 'tie' },
-      { feature: 'OWASP Agentic Top 10 mapping', atr: '10/10 native', other: 'No mapping', winner: 'atr' },
+      {
+        feature: 'OWASP Agentic Top 10 mapping',
+        atr: '10/10 native',
+        other: 'No mapping',
+        winner: 'atr',
+      },
       { feature: 'OWASP LLM Top 10 mapping', atr: 'Native', other: 'No mapping', winner: 'atr' },
-      { feature: 'Migration path', atr: 'PanGuard Migrator converts Sigma → ATR', other: '—', winner: 'context' },
+      {
+        feature: 'Migration path',
+        atr: 'PanGuard Migrator converts Sigma → ATR',
+        other: '—',
+        winner: 'context',
+      },
     ],
     chooseAtr: {
       en: 'You are protecting AI agent workloads — Claude Code, Cursor, OpenClaw, MCP servers, custom in-house agents. The threats are prompt injection, tool poisoning, indirect injection through retrieved content, agent supply-chain attacks. Sigma cannot see these because they happen in semantic space, not in syslog.',
@@ -101,7 +141,7 @@ export const COMPARE: ComparisonEntry[] = [
       zh: 'ATR vs garak — 偵測規則 vs 對抗式測試',
     },
     oneLiner: {
-      en: 'garak generates adversarial prompts to probe LLM weaknesses pre-deployment. ATR detects malicious patterns in agent runtime traffic. garak finds vulnerabilities in models; ATR catches exploits against agents. Both are needed. ATR rules pass garak\'s test corpus at 97.1% recall.',
+      en: "garak generates adversarial prompts to probe LLM weaknesses pre-deployment. ATR detects malicious patterns in agent runtime traffic. garak finds vulnerabilities in models; ATR catches exploits against agents. Both are needed. ATR rules pass garak's test corpus at 97.1% recall.",
       zh: 'garak 產生對抗式 prompt,在部署前探測 LLM 弱點。ATR 在 agent runtime 偵測流量中的惡意模式。garak 找模型漏洞;ATR 抓針對 agent 的 exploit。兩者都需要。ATR 規則在 garak 的測試語料庫上召回率 97.1%。',
     },
     framing: {
@@ -115,11 +155,36 @@ export const COMPARE: ComparisonEntry[] = [
       ],
     },
     rows: [
-      { feature: 'When it runs', atr: 'Runtime (every request)', other: 'Pre-deployment (lab testing)', winner: 'context' },
-      { feature: 'What it produces', atr: 'Block / alert / quarantine verdicts', other: 'Test report (success rate per probe)', winner: 'context' },
-      { feature: 'Sample size', atr: '419 detection rules', other: 'Hundreds of probe types', winner: 'tie' },
-      { feature: 'Garak benchmark recall', atr: '97.1% on 666-sample corpus', other: '—', winner: 'atr' },
-      { feature: 'Integration', atr: 'PanGuard Guard, Microsoft AGT, Cisco AI Defense', other: 'CLI tool, GitHub Actions', winner: 'tie' },
+      {
+        feature: 'When it runs',
+        atr: 'Runtime (every request)',
+        other: 'Pre-deployment (lab testing)',
+        winner: 'context',
+      },
+      {
+        feature: 'What it produces',
+        atr: 'Block / alert / quarantine verdicts',
+        other: 'Test report (success rate per probe)',
+        winner: 'context',
+      },
+      {
+        feature: 'Sample size',
+        atr: '419 detection rules',
+        other: 'Hundreds of probe types',
+        winner: 'tie',
+      },
+      {
+        feature: 'Garak benchmark recall',
+        atr: '97.1% on 666-sample corpus',
+        other: '—',
+        winner: 'atr',
+      },
+      {
+        feature: 'Integration',
+        atr: 'PanGuard Guard, Microsoft AGT, Cisco AI Defense',
+        other: 'CLI tool, GitHub Actions',
+        winner: 'tie',
+      },
       { feature: 'Maintainer', atr: 'PanGuard AI + community', other: 'NVIDIA', winner: 'tie' },
       { feature: 'License', atr: 'MIT', other: 'Apache 2.0', winner: 'tie' },
     ],
@@ -132,7 +197,7 @@ export const COMPARE: ComparisonEntry[] = [
       zh: '你在部署前評估 LLM。你想知道哪些攻擊對你的模型有效,好讓你 patch、retrain、或強化 system prompt。你想要研究級的測試套件,有可重現的 probe。',
     },
     bottomLine: {
-      en: 'Use both. Run garak in CI before any model change ships. Run ATR in production against every request. garak finds what to fix; ATR catches what was missed. ATR\'s public benchmark against garak\'s corpus (97.1% recall on 666 samples) measures that overlap honestly.',
+      en: "Use both. Run garak in CI before any model change ships. Run ATR in production against every request. garak finds what to fix; ATR catches what was missed. ATR's public benchmark against garak's corpus (97.1% recall on 666 samples) measures that overlap honestly.",
       zh: '兩個都用。Model 變更要 ship 之前,在 CI 跑 garak。生產環境對每個 request 跑 ATR。garak 找出該修什麼;ATR 抓住漏掉的。ATR 對 garak 語料庫的公開 benchmark（666 個樣本 97.1% 召回率）誠實地量化這個重疊。',
     },
     references: [
@@ -155,7 +220,7 @@ export const COMPARE: ComparisonEntry[] = [
     },
     framing: {
       en: [
-        'PyRIT (Python Risk Identification Toolkit) is Microsoft\'s open-source framework for automating red-team operations against generative AI systems. It orchestrates campaigns, manages target models, evaluates responses, and supports both single-turn and multi-turn attack scenarios. Roman Lutz and the Microsoft team maintain it as part of Microsoft\'s broader AI security tooling.',
+        "PyRIT (Python Risk Identification Toolkit) is Microsoft's open-source framework for automating red-team operations against generative AI systems. It orchestrates campaigns, manages target models, evaluates responses, and supports both single-turn and multi-turn attack scenarios. Roman Lutz and the Microsoft team maintain it as part of Microsoft's broader AI security tooling.",
         'ATR is the rule standard a defender deploys in production to catch what PyRIT would test for. PyRIT generates the attack; ATR detects the attack pattern when it arrives. The two are designed to compose: red teams use PyRIT to validate that ATR rules cover the threat space; defenders deploy ATR to block the attack patterns PyRIT can exercise.',
       ],
       zh: [
@@ -164,12 +229,27 @@ export const COMPARE: ComparisonEntry[] = [
       ],
     },
     rows: [
-      { feature: 'Role', atr: 'Defender (runtime detection)', other: 'Red team (attack orchestration)', winner: 'context' },
+      {
+        feature: 'Role',
+        atr: 'Defender (runtime detection)',
+        other: 'Red team (attack orchestration)',
+        winner: 'context',
+      },
       { feature: 'Format', atr: 'YAML rules', other: 'Python framework + API', winner: 'context' },
       { feature: 'Maintainer', atr: 'PanGuard AI + community', other: 'Microsoft', winner: 'tie' },
       { feature: 'License', atr: 'MIT', other: 'MIT', winner: 'tie' },
-      { feature: 'Multi-turn attacks', atr: 'Detection via agent_event chains', other: 'Native orchestration', winner: 'context' },
-      { feature: 'Integration with each other', atr: 'PyRIT campaigns can target ATR runtime to measure coverage', other: 'ATR rules can be tested in PyRIT campaigns', winner: 'tie' },
+      {
+        feature: 'Multi-turn attacks',
+        atr: 'Detection via agent_event chains',
+        other: 'Native orchestration',
+        winner: 'context',
+      },
+      {
+        feature: 'Integration with each other',
+        atr: 'PyRIT campaigns can target ATR runtime to measure coverage',
+        other: 'ATR rules can be tested in PyRIT campaigns',
+        winner: 'tie',
+      },
     ],
     chooseAtr: {
       en: 'You are operating an AI agent in production and need to detect exploits in real time. ATR runs at sub-millisecond per rule and integrates with PanGuard Guard, Microsoft AGT, Cisco AI Defense, and any runtime that can evaluate YAML.',
@@ -212,12 +292,37 @@ export const COMPARE: ComparisonEntry[] = [
       ],
     },
     rows: [
-      { feature: 'Format', atr: 'YAML rules (machine-readable)', other: 'PDF + markdown (human-readable)', winner: 'context' },
-      { feature: 'Use', atr: 'Deploy to detection engine', other: 'Audit checklist + threat model', winner: 'context' },
-      { feature: 'OWASP Agentic Top 10 coverage', atr: '10/10 categories with 77 mappings', other: '10/10 (it IS the 10/10)', winner: 'tie' },
+      {
+        feature: 'Format',
+        atr: 'YAML rules (machine-readable)',
+        other: 'PDF + markdown (human-readable)',
+        winner: 'context',
+      },
+      {
+        feature: 'Use',
+        atr: 'Deploy to detection engine',
+        other: 'Audit checklist + threat model',
+        winner: 'context',
+      },
+      {
+        feature: 'OWASP Agentic Top 10 coverage',
+        atr: '10/10 categories with 77 mappings',
+        other: '10/10 (it IS the 10/10)',
+        winner: 'tie',
+      },
       { feature: 'Real-time detection', atr: 'Yes', other: 'Not designed for it', winner: 'atr' },
-      { feature: 'Vendor neutrality', atr: 'MIT, multi-vendor adoption', other: 'OWASP Foundation (neutral)', winner: 'tie' },
-      { feature: 'Examples per category', atr: '5-115 rules per category', other: '1-3 examples per category', winner: 'atr' },
+      {
+        feature: 'Vendor neutrality',
+        atr: 'MIT, multi-vendor adoption',
+        other: 'OWASP Foundation (neutral)',
+        winner: 'tie',
+      },
+      {
+        feature: 'Examples per category',
+        atr: '5-115 rules per category',
+        other: '1-3 examples per category',
+        winner: 'atr',
+      },
     ],
     chooseAtr: {
       en: 'You need actual detection, not just a checklist. You want to operationalize OWASP Agentic Top 10 — turn it from a PDF into rules running in production. ATR is the executable form.',
@@ -233,8 +338,14 @@ export const COMPARE: ComparisonEntry[] = [
     },
     references: [
       { label: 'OWASP Agentic Top 10 (2026)', url: 'https://genai.owasp.org/agentic-top-10/' },
-      { label: 'ATR OWASP mapping', url: 'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md' },
-      { label: 'OWASP A-S-R-H PR #74', url: 'https://github.com/precize/Agentic-AI-Top10-Vulnerability/pull/74' },
+      {
+        label: 'ATR OWASP mapping',
+        url: 'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md',
+      },
+      {
+        label: 'OWASP A-S-R-H PR #74',
+        url: 'https://github.com/precize/Agentic-AI-Top10-Vulnerability/pull/74',
+      },
     ],
     lastReviewed: '2026-05-12',
   },
@@ -252,8 +363,8 @@ export const COMPARE: ComparisonEntry[] = [
     },
     framing: {
       en: [
-        'Cisco DefenseClaw (positioned at RSA 2026) is a packaged enterprise AI security platform — runtime, dashboard, integrations, SLA, the works. It is sold to F500-grade buyers as a single product with Cisco\'s sales motion behind it. The differentiator is enterprise infrastructure integration and Cisco\'s existing customer relationships.',
-        'PanGuard AI takes a different approach: ship the open rule standard (ATR) first, build the commercial platform on top. ATR is MIT-licensed and adopted by Cisco itself — Cisco AI Defense\'s skill-scanner runs all 419 ATR rules in production via PR #99 (merged 2026-04-22). So this is not really a competition at the rule layer. The competition is at the platform layer: who has the better runtime, compliance evidence, and migration tooling.',
+        "Cisco DefenseClaw (positioned at RSA 2026) is a packaged enterprise AI security platform — runtime, dashboard, integrations, SLA, the works. It is sold to F500-grade buyers as a single product with Cisco's sales motion behind it. The differentiator is enterprise infrastructure integration and Cisco's existing customer relationships.",
+        "PanGuard AI takes a different approach: ship the open rule standard (ATR) first, build the commercial platform on top. ATR is MIT-licensed and adopted by Cisco itself — Cisco AI Defense's skill-scanner runs all 419 ATR rules in production via PR #99 (merged 2026-04-22). So this is not really a competition at the rule layer. The competition is at the platform layer: who has the better runtime, compliance evidence, and migration tooling.",
       ],
       zh: [
         'Cisco DefenseClaw (RSA 2026 推出) 是打包好的企業 AI 安全平台——runtime、dashboard、整合、SLA,一應俱全。賣給 F500 級買家的單一產品,背後有 Cisco 的銷售動能。差異化點是企業基礎設施整合與 Cisco 既有客戶關係。',
@@ -261,14 +372,54 @@ export const COMPARE: ComparisonEntry[] = [
       ],
     },
     rows: [
-      { feature: 'Rule standard', atr: 'ATR (open, MIT, 419 rules) — Cisco runs these too', other: 'Same — Cisco ships ATR', winner: 'tie' },
-      { feature: 'Runtime engine', atr: 'PanGuard Guard (open + commercial)', other: 'Cisco DefenseClaw (commercial)', winner: 'context' },
-      { feature: 'Enterprise integration', atr: 'Growing — early-stage', other: 'Mature — Cisco infra stack', winner: 'other' },
-      { feature: 'Migration tooling', atr: 'PanGuard Migrator (Community + Enterprise)', other: 'Not a focus', winner: 'atr' },
-      { feature: 'Compliance evidence packs', atr: '5 frameworks (EU AI Act, OWASP Agentic, OWASP LLM, NIST AI RMF, ISO/IEC 42001)', other: 'Mainly SOC 2 + NIST', winner: 'atr' },
-      { feature: 'Pricing', atr: 'Community $0, Pilot $25K, Enterprise $150-500K, Sovereign $5-20M', other: 'Enterprise contracts, custom pricing', winner: 'context' },
-      { feature: 'Open source posture', atr: 'Open standard, open Community CLI, open Migrator Community', other: 'Closed commercial product', winner: 'atr' },
-      { feature: 'Sovereign deployment', atr: 'Sovereign tier explicit ($5-20M/nation, airgap, Cisco/AMD/NVIDIA JV pre-integrated)', other: 'Custom enterprise engagements', winner: 'context' },
+      {
+        feature: 'Rule standard',
+        atr: 'ATR (open, MIT, 419 rules) — Cisco runs these too',
+        other: 'Same — Cisco ships ATR',
+        winner: 'tie',
+      },
+      {
+        feature: 'Runtime engine',
+        atr: 'PanGuard Guard (open + commercial)',
+        other: 'Cisco DefenseClaw (commercial)',
+        winner: 'context',
+      },
+      {
+        feature: 'Enterprise integration',
+        atr: 'Growing — early-stage',
+        other: 'Mature — Cisco infra stack',
+        winner: 'other',
+      },
+      {
+        feature: 'Migration tooling',
+        atr: 'PanGuard Migrator (Community + Enterprise)',
+        other: 'Not a focus',
+        winner: 'atr',
+      },
+      {
+        feature: 'Compliance evidence packs',
+        atr: '5 frameworks (EU AI Act, OWASP Agentic, OWASP LLM, NIST AI RMF, ISO/IEC 42001)',
+        other: 'Mainly SOC 2 + NIST',
+        winner: 'atr',
+      },
+      {
+        feature: 'Pricing',
+        atr: 'Community $0, Pilot $25K, Enterprise $150-500K, Sovereign $5-20M',
+        other: 'Enterprise contracts, custom pricing',
+        winner: 'context',
+      },
+      {
+        feature: 'Open source posture',
+        atr: 'Open standard, open Community CLI, open Migrator Community',
+        other: 'Closed commercial product',
+        winner: 'atr',
+      },
+      {
+        feature: 'Sovereign deployment',
+        atr: 'Sovereign tier explicit ($5-20M/nation, airgap, Cisco/AMD/NVIDIA JV pre-integrated)',
+        other: 'Custom enterprise engagements',
+        winner: 'context',
+      },
     ],
     chooseAtr: {
       en: 'You want the open standard and you want to own the rule set yourself. You need migration tooling to bridge from Sigma/YARA legacy detection engineering. You need explicit 5-framework compliance evidence packs. You want a Sovereign tier for nation-scale deployments. You want to avoid vendor lock-in at the rule layer.',
@@ -279,12 +430,18 @@ export const COMPARE: ComparisonEntry[] = [
       zh: '你是 Cisco 用戶。Cisco 在你的 DR、SD-WAN、XDR。DefenseClaw 接到既有的 Cisco 基礎設施,你的採購、支援、SLA 關係已經在 Cisco。企業整合成本近乎零。',
     },
     bottomLine: {
-      en: 'These are not actually competitors at the layer that matters. Both organizations are shipping the same ATR rule set in production. The choice is between Cisco\'s commercial bundle (heavyweight, integrated, expensive) and PanGuard\'s open-plus-commercial model (lightweight, vendor-neutral, scales from $0 to $20M). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard\'s open posture.',
+      en: "These are not actually competitors at the layer that matters. Both organizations are shipping the same ATR rule set in production. The choice is between Cisco's commercial bundle (heavyweight, integrated, expensive) and PanGuard's open-plus-commercial model (lightweight, vendor-neutral, scales from $0 to $20M). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard's open posture.",
       zh: '在關鍵的那一層,這兩家其實不算對手。兩家組織都在生產環境跑同一套 ATR 規則。選擇在於 Cisco 的商業 bundle（重量級、整合、貴）vs PanGuard 的開放+商業模式（輕量、廠商中立、從 $0 規模到 $20M）。如果你已經是 Cisco 客戶,整合優勢大概會贏。其他人從 PanGuard 的開放姿態獲益更多。',
     },
     references: [
-      { label: 'Cisco AI Defense', url: 'https://www.cisco.com/site/us/en/products/security/ai-defense/' },
-      { label: 'Cisco skill-scanner PR #99 (ATR adoption)', url: 'https://github.com/cisco-ai-defense/skill-scanner/pull/99' },
+      {
+        label: 'Cisco AI Defense',
+        url: 'https://www.cisco.com/site/us/en/products/security/ai-defense/',
+      },
+      {
+        label: 'Cisco skill-scanner PR #99 (ATR adoption)',
+        url: 'https://github.com/cisco-ai-defense/skill-scanner/pull/99',
+      },
       { label: 'PanGuard AI', url: 'https://panguard.ai' },
     ],
     lastReviewed: '2026-05-12',

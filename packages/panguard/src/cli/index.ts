@@ -9,8 +9,24 @@
  * @module @panguard-ai/panguard/cli
  */
 
+import * as Sentry from '@sentry/node';
 import { Command } from 'commander';
 import { PANGUARD_VERSION } from '../index.js';
+
+// Sentry init — no-op when PANGUARD_SENTRY_DSN is unset so end-customers can
+// opt out by leaving the env var empty. Separate from server-side SENTRY_DSN
+// so the panguard.ai org can inject its own DSN at build time without
+// affecting third-party CLI users.
+if (process.env['PANGUARD_SENTRY_DSN']) {
+  Sentry.init({
+    dsn: process.env['PANGUARD_SENTRY_DSN'],
+    tracesSampleRate: 0.1,
+    release: PANGUARD_VERSION,
+    environment: process.env['NODE_ENV'] ?? 'production',
+  });
+  Sentry.setTag('cli_version', PANGUARD_VERSION);
+  Sentry.setTag('platform', process.platform);
+}
 import { scanCommand } from './commands/scan.js';
 import { guardCommand } from './commands/guard.js';
 import { reportCommand } from './commands/report.js';
@@ -315,7 +331,18 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err: unknown) => {
+main().catch(async (err: unknown) => {
   console.error('Fatal error:', err instanceof Error ? err.message : err);
+  if (process.env['PANGUARD_SENTRY_DSN']) {
+    try {
+      Sentry.captureException(err, {
+        tags: { cli_version: PANGUARD_VERSION, platform: process.platform },
+      });
+      // Flush queued events before exit; 2s budget then drop.
+      await Sentry.close(2000);
+    } catch {
+      // Sentry must never block exit on a CLI error path.
+    }
+  }
   process.exit(1);
 });

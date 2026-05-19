@@ -33,9 +33,7 @@ test.describe('Migrator demo — public Sigma → ATR YAML conversion', () => {
     await page.goto('/migrator');
   });
 
-  test('converts a Sigma rule to ATR YAML with id + severity', async ({
-    page,
-  }) => {
+  test('converts a Sigma rule to ATR YAML with id + severity', async ({ page }) => {
     // The input is a <textarea> with a placeholder that reads
     // "Paste a Sigma or YARA rule here..."
     const input = page.getByPlaceholder(/Paste a Sigma or YARA rule/i);
@@ -59,9 +57,7 @@ test.describe('Migrator demo — public Sigma → ATR YAML conversion', () => {
   });
 
   test('Copy ATR YAML button is present after conversion', async ({ page }) => {
-    await page
-      .getByPlaceholder(/Paste a Sigma or YARA rule/i)
-      .fill(SIGMA_FIXTURE);
+    await page.getByPlaceholder(/Paste a Sigma or YARA rule/i).fill(SIGMA_FIXTURE);
     await page.getByRole('button', { name: /Convert to ATR YAML/i }).click();
 
     const copyBtn = page.getByRole('button', { name: /Copy ATR YAML/i });
@@ -77,12 +73,8 @@ test.describe('Migrator demo — public Sigma → ATR YAML conversion', () => {
     expect(await pilotBadges.count()).toBeGreaterThanOrEqual(5);
   });
 
-  test('Unlock Pilot CTA links to /pricing?intent=pilot#pilot', async ({
-    page,
-  }) => {
-    const unlockCta = page
-      .locator('a[href*="/pricing?intent=pilot"]')
-      .first();
+  test('Unlock Pilot CTA links to /pricing?intent=pilot#pilot', async ({ page }) => {
+    const unlockCta = page.locator('a[href*="/pricing?intent=pilot"]').first();
     await expect(unlockCta).toBeVisible();
     const href = await unlockCta.getAttribute('href');
     expect(href).toContain('/pricing?intent=pilot');
