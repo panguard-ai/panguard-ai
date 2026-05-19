@@ -63,33 +63,25 @@ let pgaProc: ChildProcess | null = null;
 test.describe('Local Guard dashboard — community-tier gating', () => {
   test.skip(
     !isPgaAvailable(),
-    "`pga` binary not on PATH in this test env. The Guard dashboard ships " +
+    '`pga` binary not on PATH in this test env. The Guard dashboard ships ' +
       'with @panguard-ai/panguard-cli — run `pnpm build && pnpm link` or set ' +
-      'PGA_BIN to an absolute path.',
+      'PGA_BIN to an absolute path.'
   );
 
   test.beforeAll(async () => {
     pgaProc = spawn(
       PGA_BIN,
-      [
-        'up',
-        '--no-watch',
-        '--port',
-        String(PORT),
-        '--license-key=PG-COMMUNITY-TEST-0000-0000',
-      ],
+      ['up', '--no-watch', '--port', String(PORT), '--license-key=PG-COMMUNITY-TEST-0000-0000'],
       {
         stdio: ['ignore', 'pipe', 'pipe'],
         env: { ...process.env, PG_TELEMETRY_DISABLED: '1' },
-      },
+      }
     );
 
     const ready = await waitForReady(DASHBOARD_URL, 25_000);
     if (!ready) {
       pgaProc.kill('SIGTERM');
-      throw new Error(
-        `pga up did not become ready on ${DASHBOARD_URL} within 25s`,
-      );
+      throw new Error(`pga up did not become ready on ${DASHBOARD_URL} within 25s`);
     }
   });
 
@@ -101,9 +93,7 @@ test.describe('Local Guard dashboard — community-tier gating', () => {
     }
   });
 
-  test('Threats tab is visible and SARIF buttons are hidden for community', async ({
-    page,
-  }) => {
+  test('Threats tab is visible and SARIF buttons are hidden for community', async ({ page }) => {
     await page.goto(DASHBOARD_URL);
 
     // The sidebar has a nav item with data-tab="threats" rendering "Threats".

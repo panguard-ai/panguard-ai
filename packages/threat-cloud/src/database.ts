@@ -2341,16 +2341,13 @@ export class ThreatCloudDB {
       .get(githubUserId) as { client_id: string; trust_tier: string } | undefined;
 
     const clientId = existing?.client_id ?? `github:${githubUserId}`;
-    const trustTier =
-      (existing?.trust_tier === 'github_verified' ? 'github_verified' : 'github_new') as
-        | 'github_new'
-        | 'github_verified';
+    const trustTier = (
+      existing?.trust_tier === 'github_verified' ? 'github_verified' : 'github_new'
+    ) as 'github_new' | 'github_verified';
 
     // Limit to 5 active keys per github user to prevent DB flooding
     const activeCount = this.db
-      .prepare(
-        'SELECT COUNT(*) as cnt FROM client_keys WHERE github_user_id = ? AND revoked = 0'
-      )
+      .prepare('SELECT COUNT(*) as cnt FROM client_keys WHERE github_user_id = ? AND revoked = 0')
       .get(githubUserId) as { cnt: number };
     if (activeCount.cnt >= 5) {
       this.db

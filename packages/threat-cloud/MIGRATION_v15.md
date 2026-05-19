@@ -34,6 +34,7 @@ process running as the same OS user can read the admin key directly. This
 is how the April-2026 TC admin key leak happened.
 
 Migration:
+
 ```diff
 - ExecStart=/usr/local/bin/threat-cloud --port 8080 --admin-api-key xxxx
 + Environment="TC_ADMIN_API_KEY=xxxx"
@@ -62,12 +63,12 @@ proposals. Three confirmations from any source promoted a proposal.
 
 Now: each client key has a `trust_tier`:
 
-| Tier | Origin | Vote weight |
-|------|--------|------------|
-| `github_verified` | `/api/clients/register-github`, ≥ 30 days old | 1.0 |
-| `github_new` | `/api/clients/register-github`, < 30 days | 0.5 |
-| `anonymous_legacy` | Pre-v15 registered key, until 2026-08-19 | 0.25 |
-| `anonymous` | `/api/clients/register` after v15, OR after grace end | 0.0 |
+| Tier               | Origin                                                | Vote weight |
+| ------------------ | ----------------------------------------------------- | ----------- |
+| `github_verified`  | `/api/clients/register-github`, ≥ 30 days old         | 1.0         |
+| `github_new`       | `/api/clients/register-github`, < 30 days             | 0.5         |
+| `anonymous_legacy` | Pre-v15 registered key, until 2026-08-19              | 0.25        |
+| `anonymous`        | `/api/clients/register` after v15, OR after grace end | 0.0         |
 
 A proposal promotes when cumulative `confirmation_weight ≥ 3.0`.
 
@@ -117,13 +118,13 @@ key/secret).
 
 Migration v15 runs automatically on first startup and is non-destructive:
 
-| Table | Column | Type | Default |
-|-------|--------|------|---------|
-| `client_keys` | `github_user_id` | INTEGER | NULL |
-| `client_keys` | `github_login` | TEXT | NULL |
-| `client_keys` | `trust_tier` | TEXT | `'anonymous'` for new rows; pre-existing rows retagged to `'anonymous_legacy'` |
-| `atr_proposals` | `confirmation_weight` | REAL | backfilled to `CAST(confirmations AS REAL)` |
-| `github_proposal_submissions` | _new table_ | — | tracks per-user daily proposal cap (10/day default) |
+| Table                         | Column                | Type    | Default                                                                        |
+| ----------------------------- | --------------------- | ------- | ------------------------------------------------------------------------------ |
+| `client_keys`                 | `github_user_id`      | INTEGER | NULL                                                                           |
+| `client_keys`                 | `github_login`        | TEXT    | NULL                                                                           |
+| `client_keys`                 | `trust_tier`          | TEXT    | `'anonymous'` for new rows; pre-existing rows retagged to `'anonymous_legacy'` |
+| `atr_proposals`               | `confirmation_weight` | REAL    | backfilled to `CAST(confirmations AS REAL)`                                    |
+| `github_proposal_submissions` | _new table_           | —       | tracks per-user daily proposal cap (10/day default)                            |
 
 Rollback: the migration is not reversible by `down`. If you need to roll
 back, restore from the pre-upgrade SQLite snapshot.
