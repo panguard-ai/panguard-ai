@@ -750,6 +750,7 @@ export class DashboardServer {
         threats_total: this.status.threatsDetected,
         events_processed: this.status.eventsProcessed,
         actions_executed: this.status.actionsExecuted,
+        rules_active: rules.length,
         rules_loaded: rules.length,
         uptime_ms: this.status.uptime,
         baseline_confidence: this.status.baselineConfidence,
