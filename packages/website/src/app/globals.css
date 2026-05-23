@@ -23,6 +23,32 @@ h4 {
 
 p {
   text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+/* Long English technical identifiers, URLs, and code-like strings break inside
+   any text container instead of overflowing — important for mixed CJK/EN body
+   prose where ATR-2026-00525, @mistralai/mistralai, microsoft/agent-governance-toolkit
+   etc. can be longer than a narrow viewport allows. */
+li,
+dd,
+td,
+th,
+figcaption,
+blockquote {
+  overflow-wrap: break-word;
+}
+
+/* Inline code: long identifiers must break inside paragraphs. Block-level <pre>
+   keeps horizontal scroll (rule below at line ~713). */
+:not(pre) > code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Long URLs inside link text break instead of pushing layout wider. */
+a {
+  overflow-wrap: break-word;
 }
 
 /* Ambient sage gradient mesh for depth */
@@ -608,6 +634,11 @@ main [style*='opacity:0'] {
 :lang(zh) h4 {
   letter-spacing: -0.01em;
   line-height: 1.35;
+  /* Chinese headings with embedded English tokens must break inside the English
+     run when the whole heading does not fit one line. Without this, a token
+     like "Microsoft Agent Governance Toolkit" pushes the entire heading past
+     the container on narrow viewports. */
+  overflow-wrap: break-word;
 }
 
 @media (max-width: 639px) {

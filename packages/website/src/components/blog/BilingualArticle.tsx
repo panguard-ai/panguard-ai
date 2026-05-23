@@ -36,7 +36,7 @@ function parseInline(text: string): ReactNode[] {
           key={key++}
           href={href}
           {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-          className="text-brand-sage underline underline-offset-2 decoration-brand-sage/40 hover:decoration-brand-sage transition-colors"
+          className="text-brand-sage underline underline-offset-2 decoration-brand-sage/40 hover:decoration-brand-sage transition-colors [overflow-wrap:anywhere]"
         >
           {match[1]}
         </a>
@@ -51,7 +51,7 @@ function parseInline(text: string): ReactNode[] {
       tokens.push(
         <code
           key={key++}
-          className="text-[0.9em] bg-surface-1 border border-border rounded px-1.5 py-0.5 font-mono text-text-primary"
+          className="text-[0.9em] bg-surface-1 border border-border rounded px-1.5 py-0.5 font-mono text-text-primary [overflow-wrap:anywhere] break-words"
         >
           {match[4]}
         </code>
@@ -114,7 +114,10 @@ function renderBlock(block: string, i: number) {
           <thead>
             <tr className="border-b border-border">
               {headers.map((h, j) => (
-                <th key={j} className="text-left py-3 px-3 sm:px-4 text-text-primary font-semibold">
+                <th
+                  key={j}
+                  className="text-left py-3 px-3 sm:px-4 text-text-primary font-semibold align-top [overflow-wrap:anywhere]"
+                >
                   {parseInline(h)}
                 </th>
               ))}
@@ -129,7 +132,10 @@ function renderBlock(block: string, i: number) {
               return (
                 <tr key={j} className="border-b border-border/50">
                   {cells.map((cell, k) => (
-                    <td key={k} className="py-3 px-3 sm:px-4 text-text-primary/85">
+                    <td
+                      key={k}
+                      className="py-3 px-3 sm:px-4 text-text-primary/85 align-top [overflow-wrap:anywhere]"
+                    >
                       {parseInline(cell)}
                     </td>
                   ))}
