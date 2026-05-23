@@ -30,8 +30,7 @@ interface MeResponse {
  */
 function FoundingSlotBadge({ isZh }: { isZh: boolean }) {
   const [state, setState] = useState<
-    | { kind: 'loading' }
-    | { kind: 'ready'; remaining: number; total: number; exhausted: boolean }
+    { kind: 'loading' } | { kind: 'ready'; remaining: number; total: number; exhausted: boolean }
   >({ kind: 'loading' });
 
   useEffect(() => {
@@ -370,38 +369,51 @@ export default function PricingContent() {
               </div>
 
               <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 mt-4 mb-1">
-                {isZh ? '給誰 · Founding Customer 限前 3 名' : 'Who it\'s for · Founding Customers (first 3 only)'}
+                {isZh
+                  ? '給誰 · Design Partner · 限前 3 名'
+                  : "Who it's for · Design Partner · first 3 only"}
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? 'F500 採購流程前的試水合約。IT Director 層級可審核通過，不需要進到 CFO 議程。試點結束後可全額抵入 Y1 Enterprise 年約。$25K 僅前 3 個 Founding Customer 適用,第 4 個起 Enterprise $250K 起跳 (sales-led)。'
-                  : 'A pre-procurement pilot contract for F500. IT Director can approve without reaching CFO. The full $25K credits toward Y1 Enterprise. $25K applies to the first 3 Founding Customers only — after that, all engagements move to Enterprise $250K base (sales-led).'}
+                  ? '90 天 design-partner engagement。由 ATR 標準維護者本人陪您團隊把規則部署進環境、寫合規 evidence、調 SOC 告警。不是 SaaS 訂閱、不是 white-glove enterprise 交付——是「規則作者親手導入」。$25K 全額抵入 Y1 Enterprise (12 個月內升級有效),前 3 名適用;第 4 名起改 Enterprise sales-led tier ($250K 起)。簽約前請先讀 '
+                  : "A 90-day design-partner engagement. The maintainer of ATR personally deploys the rules into your environment, writes the compliance evidence, and tunes SOC alerts with your team. Not a SaaS subscription, not white-glove enterprise delivery — it is the rules' author doing the deployment by hand. $25K credits 100% toward a Y1 Enterprise contract (within 12 months), first 3 only; customer 4 onwards moves to the sales-led Enterprise tier ($250K base). Before signing, read "}
+                <a
+                  href="https://github.com/panguard-ai/panguard-ai/blob/main/docs/HONESTY.md#4-what-the-25k-pilot-actually-buys"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-amber-400 underline decoration-amber-400/40 hover:decoration-amber-400 underline-offset-2"
+                >
+                  HONESTY.md §4
+                </a>
+                {isZh
+                  ? '——清楚列出這 $25K 真的買到什麼、買不到什麼。'
+                  : ' — it spells out exactly what $25K buys and what it does not.'}
               </p>
 
               <div className="my-7 flex-1">
                 <ul className="space-y-2.5">
                   {(isZh
                     ? [
+                        '由 ATR 規則作者本人到您環境部署 (不是 CS 代理、不是外包)',
+                        '每週約 6 小時 founder/senior engineer 時間,跟您團隊排程',
+                        '1-3 條為您環境客製的 ATR 規則 (可選擇回流 upstream,被 Cisco / Microsoft 採用)',
+                        '一份真實合規 evidence pack (ISO 27001 / SOC 2 / NIST AI RMF / EU AI Act / 台灣 TCSA,擇一)',
                         'On-prem / VPC / airgap 部署協助',
-                        '每週 6 小時資深工程支援',
-                        '樣本季度合規證據報告(EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic 對應)',
-                        '自訂 ATR rule pack 試做',
-                        'SIEM webhook 整合樣板',
-                        'LLM 額度全包(crystallization + 規則 enrichment ~$200/月,我們吃 token 成本)',
-                        '偵測 0% 依賴 LLM——336 條 deterministic rules @ 97.1% recall',
-                        '90 天後升級 Enterprise 或乾淨結束',
-                        '可 credit 全額 $25K 到 Y1 Enterprise 年約',
+                        'SIEM webhook 整合樣板 (Splunk / Wazuh / MISP 等)',
+                        'LLM token 全包 (~$200/月,我們吃成本);偵測本身 0% 依賴 LLM',
+                        '$25K 全額 credit 到 Y1 Enterprise (12 個月內升級有效;不升級不 clawback)',
+                        '7 天無條件退款 (見 /legal/refund)',
                       ]
                     : [
+                        'The author of ATR deploys into your environment (not a CS rep, not a contractor)',
+                        '~6 hours/week of founder/senior engineering time, scheduled with your team',
+                        '1–3 custom ATR rules tailored to your environment (optionally flow upstream and ship via Cisco / Microsoft)',
+                        'One real compliance evidence pack — pick one framework (ISO 27001 / SOC 2 / NIST AI RMF / EU AI Act / Taiwan TCSA)',
                         'On-prem / VPC / airgap deployment help',
-                        '6 hours/week of senior engineering support',
-                        'Sample quarterly compliance evidence report (EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic mapping)',
-                        'Custom ATR rule pack trial',
-                        'SIEM webhook integration template',
-                        'LLM credits included (crystallization + rule enrichment ~$200/mo, we eat the token cost)',
-                        'Detection runs 0% on LLM — 336 deterministic rules @ 97.1% recall',
-                        'Clean exit or upgrade to Enterprise at day 90',
-                        'Full $25K credit to Y1 Enterprise contract on upgrade',
+                        'SIEM webhook integration sample (Splunk / Wazuh / MISP, etc.)',
+                        'LLM tokens fully included (~$200/mo, we eat the cost); detection itself runs 0% on LLM',
+                        '$25K credits 100% toward Y1 Enterprise (within 12 months; no clawback if you do not upgrade)',
+                        '7-day no-questions refund (see /legal/refund)',
                       ]
                   ).map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
@@ -628,6 +640,33 @@ export default function PricingContent() {
               {isZh
                 ? '首 5 家 F500 Enterprise 客戶可鎖定 $100K × 2 年的創始價（標準定價區間為 $250K–$350K），交換條件為公開 logo 與 case study 授權。第 6 家起恢復標準定價。'
                 : 'The first 5 F500 Enterprise customers can lock the founding rate of $100K × 2 years (versus the standard $250K–$350K range), in exchange for public logo and case study rights. Standard pricing resumes from customer six onwards.'}
+            </p>
+          </div>
+        </FadeInUp>
+
+        {/* Honesty pointer — single source of truth for what is real vs aspirational */}
+        <FadeInUp delay={0.35}>
+          <div className="mt-6 max-w-4xl mx-auto border border-amber-400/30 bg-amber-400/5 rounded-xl p-6">
+            <p className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-2">
+              {isZh ? '簽約前請先讀這份' : 'Read this before signing'}
+            </p>
+            <p className="text-sm text-text-secondary leading-[1.85]">
+              {isZh
+                ? '我們是早期、小團隊、開源資安公司。Pilot / Enterprise / Sovereign tier 都有「今天交付得到」與「在做、還沒到」的東西。'
+                : 'We are an early-stage, small, open-source security company. Pilot / Enterprise / Sovereign tiers each include things shipping today, and things still in flight.'}{' '}
+              <a
+                href="https://github.com/panguard-ai/panguard-ai/blob/main/docs/HONESTY.md"
+                target="_blank"
+                rel="noreferrer"
+                className="text-amber-400 underline decoration-amber-400/40 hover:decoration-amber-400 underline-offset-2 font-medium"
+              >
+                {isZh
+                  ? 'HONESTY.md 把兩者逐項列清楚'
+                  : 'HONESTY.md lists exactly what is shipping today vs in flight vs intentionally not yet built'}
+              </a>
+              {isZh
+                ? '。若 pricing 頁任何文字跟 HONESTY.md 衝突,以 HONESTY.md 為準。'
+                : '. If anything on this page contradicts HONESTY.md, the doc wins.'}
             </p>
           </div>
         </FadeInUp>
