@@ -199,61 +199,93 @@ export default function PricingContent() {
             <div className="text-base sm:text-lg text-text-secondary max-w-3xl mx-auto mt-6 leading-[1.85] space-y-3">
               {isZh ? (
                 <>
-                  <p>四條商業軌道，對應四種不同的客戶與付費理由。</p>
+                  <p>三條商業軌道,對應三種不同的客戶與付費理由。</p>
                   <ul className="space-y-2 text-left max-w-2xl mx-auto">
                     <li>
-                      <span className="text-text-primary font-semibold">Community（永久免費）</span>
-                      ——做為全球 sensor 網路與標準擴散管道，不是收入來源。
+                      <span className="text-text-primary font-semibold">Community(永久免費)</span>
+                      ——全球 sensor 網路與標準擴散管道,不是收入來源。今天可用。
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Enterprise SaaS</span>
-                      ——解決受監管產業的合規證據缺口與既有規則資產升級。
+                      <span className="text-text-primary font-semibold">Pilot ($25K / 90 天)</span>
+                      ——Design partner engagement。ATR 規則作者本人陪您部署。今天可用。
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">
-                        Sovereign AI 國家級 reference
-                      </span>
-                      ——回應國家層級的 detection IP 主權需求。
-                    </li>
-                    <li>
-                      <span className="text-text-primary font-semibold">Vendor OEM 授權</span>
-                      ——給已經把 ATR 規則出貨進自家產品的平台廠商。
+                      <span className="text-text-primary font-semibold">Enterprise</span>
+                      ——目前 <span className="text-amber-400 font-semibold">暫停</span>,等 3 項工程
+                      ship 完 (Q3 2026) 重開。
                     </li>
                   </ul>
                   <p className="text-sm text-text-muted pt-2">
-                    刻意不設中間 tier。理由在頁尾說明。
+                    Sovereign tier 已從 /pricing 移除——尚未 ship 對應基礎建設。Brief 仍在{' '}
+                    <a
+                      href="https://sovereign-ai-defense.vercel.app"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-sage underline decoration-brand-sage/40 hover:decoration-brand-sage"
+                    >
+                      sovereign-ai-defense
+                    </a>
+                    。Vendor OEM 軌道規劃中。完整理由見{' '}
+                    <a
+                      href="https://github.com/panguard-ai/panguard-ai/blob/main/docs/HONESTY.md"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-sage underline decoration-brand-sage/40 hover:decoration-brand-sage"
+                    >
+                      HONESTY.md
+                    </a>
+                    。
                   </p>
                 </>
               ) : (
                 <>
                   <p>
-                    Four revenue tracks, mapped to four distinct customer types and reasons to pay.
+                    Three commercial tracks today, mapped to three distinct customer types and
+                    reasons to pay.
                   </p>
                   <ul className="space-y-2 text-left max-w-2xl mx-auto">
                     <li>
                       <span className="text-text-primary font-semibold">
                         Community (free forever)
                       </span>{' '}
-                      — global sensor network and standard adoption pipeline, not a revenue stream.
-                    </li>
-                    <li>
-                      <span className="text-text-primary font-semibold">Enterprise SaaS</span> —
-                      closes the compliance-evidence gap for regulated industries and migrates their
-                      existing rule assets into the AI agent era.
+                      — global sensor network and standards adoption pipeline, not a revenue stream.
+                      Ships today.
                     </li>
                     <li>
                       <span className="text-text-primary font-semibold">
-                        Sovereign AI national reference
+                        Pilot ($25K / 90 days)
                       </span>{' '}
-                      — addresses the detection-IP sovereignty gap at the nation-state level.
+                      — design partner engagement. The maintainer of ATR personally deploys. Ships
+                      today.
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Vendor OEM license</span> —
-                      for platform vendors already shipping ATR rules inside their own products.
+                      <span className="text-text-primary font-semibold">Enterprise</span> —
+                      currently <span className="text-amber-400 font-semibold">paused</span>,
+                      reopens after 3 engineering items ship (Q3 2026).
                     </li>
                   </ul>
                   <p className="text-sm text-text-muted pt-2">
-                    No middle tier — by design. Rationale at the bottom of the page.
+                    Sovereign tier removed from /pricing — the underlying infrastructure (airgap
+                    installer, multi-tenant Threat Cloud) is not yet built. Positioning brief
+                    remains live at{' '}
+                    <a
+                      href="https://sovereign-ai-defense.vercel.app"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-sage underline decoration-brand-sage/40 hover:decoration-brand-sage"
+                    >
+                      sovereign-ai-defense
+                    </a>
+                    . Vendor OEM track in design. Full rationale in{' '}
+                    <a
+                      href="https://github.com/panguard-ai/panguard-ai/blob/main/docs/HONESTY.md"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-sage underline decoration-brand-sage/40 hover:decoration-brand-sage"
+                    >
+                      HONESTY.md
+                    </a>
+                    .
                   </p>
                 </>
               )}
@@ -264,13 +296,13 @@ export default function PricingContent() {
               <span className="inline-flex items-center gap-2 bg-brand-sage/10 border border-brand-sage/30 rounded-full px-4 py-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-sage" />
                 <span className="text-xs font-semibold text-brand-sage">
-                  {isZh ? 'Community 今天可用' : 'Community ships today'}
+                  {isZh ? 'Community + Pilot 今天可用' : 'Community + Pilot ship today'}
                 </span>
               </span>
               <span className="inline-flex items-center gap-2 bg-amber-400/10 border border-amber-400/30 rounded-full px-4 py-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                 <span className="text-xs font-semibold text-amber-400">
-                  {isZh ? 'Enterprise 早期客戶 2026 Q2 開始' : 'Enterprise early customers Q2 2026'}
+                  {isZh ? 'Enterprise 暫停 · Q3 2026 重開' : 'Enterprise paused · reopens Q3 2026'}
                 </span>
               </span>
             </div>
@@ -278,9 +310,9 @@ export default function PricingContent() {
         </div>
       </section>
 
-      {/* ─── 4 tiers (per pitch v5 — Community / Pilot / Enterprise / Sovereign) ─── */}
+      {/* ─── 3 tiers (Community / Pilot / Enterprise-paused). Sovereign removed — see docs/HONESTY.md §7. ─── */}
       <SectionWrapper>
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Community */}
           <FadeInUp>
             <div className="bg-surface-2 rounded-xl border border-brand-sage/30 p-7 flex flex-col h-full">
@@ -453,196 +485,98 @@ export default function PricingContent() {
             </div>
           </FadeInUp>
 
-          {/* Enterprise */}
+          {/* Enterprise — paused, waitlist only. Reopens after 3 engineering items ship (Q3 2026):
+              (1) Guard live rule reload, (2) panguard-manager JSON->SQLite, (3) 1-framework auto-gen.
+              Until then, selling at $150-500K when delivery scope = Pilot is dishonest. See docs/HONESTY.md §5. */}
           <FadeInUp delay={0.16}>
-            <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-7 flex flex-col h-full ring-1 ring-brand-sage/10">
+            <div className="bg-surface-2 rounded-xl border border-amber-400/40 p-7 flex flex-col h-full ring-1 ring-amber-400/10">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
                   {isZh ? 'Enterprise 企業版' : 'Enterprise'}
                 </h3>
-                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-brand-sage bg-brand-sage/10 border border-brand-sage/30 rounded-full px-2.5 py-0.5">
-                  {isZh ? '早期客戶招募中' : 'Early customers'}
+                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/40 rounded-full px-2.5 py-0.5">
+                  {isZh ? '暫停 · Waitlist' : 'Paused · Waitlist'}
                 </span>
               </div>
 
               <div className="mt-5 flex items-baseline gap-1.5">
-                <span className="text-3xl font-extrabold text-text-primary">$150K</span>
-                <span className="text-xs text-text-muted">
-                  {isZh ? '起 · 客製年約' : 'floor · custom annual'}
+                <span className="text-3xl font-extrabold text-text-muted line-through decoration-2 decoration-text-muted/60">
+                  $150K+
+                </span>
+                <span className="text-xs text-amber-400 font-semibold">
+                  {isZh ? '重開時間 Q3 2026' : 'Reopens Q3 2026'}
                 </span>
               </div>
               <p className="text-[11px] text-text-muted mt-1">
-                {isZh ? '目標 $250-350K · 上限 $500K+' : 'Target $250-350K · up to $500K+'}
+                {isZh ? '等 3 個工程項目 ship 完才重開' : 'Reopens after 3 engineering items ship'}
               </p>
 
-              <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mt-4 mb-1">
-                {isZh ? '給誰' : 'Who it’s for'}
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 mt-4 mb-1">
+                {isZh ? '為什麼暫停' : 'Why this is paused'}
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? '受監管產業——金融、醫療、半導體、半官方，以及任何在 EU AI Act、Colorado AI Act 等法規前提下，需要可稽核 AI Agent 安全層的組織。'
-                  : 'Regulated industries — finance, healthcare, semiconductors, and quasi-government organisations that need an audit-ready AI agent security layer under EU AI Act, Colorado AI Act, and similar frameworks.'}
+                  ? '對程式碼做了完整稽核後,Enterprise tier 的差異化能力 (live rule reload、multi-endpoint fleet、auto-generated compliance evidence) 尚未 ship。在這 3 件未到位前用 $150-500K 賣等同於把 Pilot 加價 6-20 倍,我們不做這個。Pilot ($25K) 是目前唯一誠實的商業入口。'
+                  : 'After a full code audit, the differentiation that justifies Enterprise tier pricing (live rule reload, multi-endpoint fleet management, auto-generated signed compliance evidence) is not yet shipping. Selling at $150-500K before these are in place would be a 6-20× markup on the Pilot scope. The Pilot ($25K) is the only honest commercial entry today.'}
               </p>
 
               <div className="my-7 flex-1">
                 <p className="text-[11px] uppercase tracking-wider font-semibold text-text-muted mb-3">
-                  {isZh ? '三大核心模組' : 'Three core modules'}
-                </p>
-                <ul className="space-y-3 mb-5">
-                  {(isZh
-                    ? [
-                        {
-                          title: 'Migrator Pro',
-                          line: '把過去 SOC 累積的 Sigma、YARA、Splunk 等舊規則，自動轉換成 AI Agent 規則。',
-                        },
-                        {
-                          title: 'AI Compliance Audit Evidence Module',
-                          line: '產出可直接送進稽核流程的合規證據包（NIST AI RMF、EU AI Act 等五大框架）。',
-                        },
-                        {
-                          title: 'ATR 標準直線關係',
-                          line: '提早取得 draft 規則，客戶規則可回流到上游、被 Cisco、Microsoft 等廠商採用。',
-                        },
-                      ]
-                    : [
-                        {
-                          title: 'Migrator Pro',
-                          line: 'Automatically converts legacy Sigma, YARA, and Splunk rules from your SOC into AI agent rules.',
-                        },
-                        {
-                          title: 'AI Compliance Audit Evidence Module',
-                          line: 'Produces compliance evidence packs ready for auditors (NIST AI RMF, EU AI Act, plus three more frameworks).',
-                        },
-                        {
-                          title: 'Direct line to the ATR standard',
-                          line: 'Early access to draft rules; customer-contributed rules can flow upstream and be adopted by Cisco, Microsoft, and others.',
-                        },
-                      ]
-                  ).map((m) => (
-                    <li key={m.title} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-1" />
-                      <div>
-                        <p className="text-[13px] font-semibold text-text-primary leading-snug">
-                          {m.title}
-                        </p>
-                        <p className="text-[12px] text-text-secondary mt-1 leading-[1.75]">
-                          {m.line}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="text-[12px] text-text-muted leading-[1.85] mb-4">
                   {isZh
-                    ? '一併提供：unlimited agents/tenants、on-prem 部署、SAML SSO、SCIM、SIEM webhook、AIAM（2026 Q3 上線）、SOC 2 Type 1 認證進行中（目標 2026 Q3）、專屬 Customer Success Manager、LLM token 額度全包（含 enrichment + crystallization；偵測本身 0% 依賴 LLM）。'
-                    : 'Also included: unlimited agents/tenants, on-prem deployment, SAML SSO, SCIM, SIEM webhook, AIAM (target Q3 2026), SOC 2 Type 1 in flight (target Q3 2026), a dedicated Customer Success Manager, and LLM tokens fully included (enrichment + crystallization; detection itself runs 0% on LLM).'}
-                </p>
-
-                <a
-                  href="#enterprise-spec"
-                  className="text-[12px] text-brand-sage font-semibold inline-flex items-center gap-1 hover:underline"
-                >
-                  {isZh ? '↓ 查看完整規格' : '↓ See full specification'}
-                </a>
-              </div>
-
-              <Link
-                href="/contact?tier=enterprise"
-                className="inline-flex items-center justify-center gap-2 w-full bg-brand-sage text-surface-0 font-semibold rounded-lg py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-sm"
-              >
-                {isZh ? '洽詢業務' : 'Contact sales'} <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </FadeInUp>
-
-          {/* Sovereign — per pitch v5: $5-20M / nation, airgap multi-tenant, separate from Enterprise SaaS */}
-          <FadeInUp delay={0.18}>
-            <div className="bg-surface-2 rounded-xl border border-indigo-400/30 p-7 flex flex-col h-full">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
-                  {isZh ? 'Sovereign 主權級' : 'Sovereign'}
-                </h3>
-                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-indigo-300 bg-indigo-400/10 border border-indigo-400/30 rounded-full px-2.5 py-0.5">
-                  {isZh ? '國家級部署' : 'Nation-state'}
-                </span>
-              </div>
-
-              <div className="mt-5 flex items-baseline gap-1.5">
-                <span className="text-3xl font-extrabold text-text-primary">$5-20M</span>
-                <span className="text-xs text-text-muted">
-                  {isZh ? '/ 國家 · 年約' : '/ nation · annual'}
-                </span>
-              </div>
-              <p className="text-[11px] text-text-muted mt-1">
-                {isZh ? '對話進行中 · 1 個 Saudi PIF 線索' : 'Active dialogue · 1 Saudi PIF lead'}
-              </p>
-
-              <p className="text-[11px] uppercase tracking-wider font-semibold text-indigo-300 mt-4 mb-1">
-                {isZh ? '給誰' : 'Who it’s for'}
-              </p>
-              <p className="text-sm text-text-secondary leading-[1.85]">
-                {isZh
-                  ? '主權國家 AI 基礎建設、央行、國防、跨部會合規平台。已透過 Cisco AI Defense / AMD / NVIDIA JV 鏈路繼承 ATR——導入零新供應商風險。'
-                  : 'Sovereign AI infrastructure, central banks, defense, cross-ministry compliance platforms. ATR already inherited via announced Cisco / AMD / NVIDIA JVs — no new-vendor risk.'}
-              </p>
-
-              <div className="my-7 flex-1">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-text-muted mb-3">
-                  {isZh ? '主權級規格' : 'Sovereign spec'}
+                    ? '重開前要 ship 的 3 件'
+                    : 'Three items shipping before Enterprise reopens'}
                 </p>
                 <ul className="space-y-2.5">
                   {(isZh
                     ? [
-                        '完全 airgap 部署 · 多 tenant 隔離',
-                        '主權資料留存 · 不出境',
-                        '客製化合規證據(本國法規 + EU AI Act + NIST AI RMF + ISO 42001 + OWASP Agentic)',
-                        '主權級 ATR 規則貢獻通道 · 國家紅隊回傳',
-                        '專屬 SLA · 24/7 國家級支援',
-                        'AMD / Cisco / NVIDIA JV 預整合',
-                        '可選: ATR 國家代碼空間(rule namespacing)',
+                        'Guard live rule reload (SIGHUP + fsnotify,消除 5-30s 偵測空窗) — 3-5 天',
+                        'panguard-manager 由 JSON 升 SQLite + multi-endpoint fleet auth — 1-2 週',
+                        '單一 framework 合規 evidence auto-generator (SOC 2 優先) — 2-3 週',
                       ]
                     : [
-                        'Full airgap deployment · multi-tenant isolation',
-                        'Sovereign data residency · no egress',
-                        'Custom compliance evidence (national regs + EU AI Act + NIST AI RMF + ISO 42001 + OWASP Agentic)',
-                        'Sovereign-level ATR contribution channel · national red-team feedback',
-                        'Dedicated SLA · 24/7 nation-state support',
-                        'Pre-integrated with AMD / Cisco / NVIDIA JVs',
-                        'Optional: ATR national namespace (rule namespacing)',
+                        'Guard live rule reload (SIGHUP + fsnotify, removes 5-30s zero-detection window) — 3-5 days',
+                        'panguard-manager JSON → SQLite + multi-endpoint fleet auth — 1-2 weeks',
+                        'Single-framework compliance evidence auto-generator (SOC 2 first) — 2-3 weeks',
                       ]
                   ).map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-indigo-300 shrink-0 mt-0.5" />
-                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
+                      <Check className="w-4 h-4 text-amber-400 shrink-0 mt-1" />
+                      <span className="text-[13px] text-text-secondary leading-[1.85]">{f}</span>
                     </li>
                   ))}
                 </ul>
+
+                <p className="text-[12px] text-text-muted leading-[1.85] mt-5">
+                  {isZh ? '完整理由與工程細節見 ' : 'Full rationale and engineering details: '}
+                  <a
+                    href="https://github.com/panguard-ai/panguard-ai/blob/main/docs/HONESTY.md#5-the-enterprise-tier-is-currently-paused-waitlist-only"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-amber-400 underline decoration-amber-400/40 hover:decoration-amber-400 underline-offset-2"
+                  >
+                    HONESTY.md §5
+                  </a>
+                  {isZh ? '。' : '.'}
+                </p>
               </div>
 
               <Link
-                href="/contact?tier=sovereign"
-                className="inline-flex items-center justify-center gap-2 w-full bg-indigo-400 text-surface-0 font-semibold rounded-lg py-3 hover:bg-indigo-300 transition-all duration-200 active:scale-[0.98] text-sm"
+                href="/contact?tier=enterprise-waitlist"
+                className="inline-flex items-center justify-center gap-2 w-full bg-amber-400/10 border border-amber-400/40 text-amber-400 hover:bg-amber-400/20 font-semibold rounded-lg py-3 transition-all duration-200 active:scale-[0.98] text-sm"
               >
-                {isZh ? '主權團隊洽詢' : 'Sovereign desk'} <ArrowRight className="w-4 h-4" />
+                {isZh ? '加入 Waitlist' : 'Join Waitlist'} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </FadeInUp>
+
+          {/* Sovereign card removed from /pricing — moved to /research as forward-looking brief.
+              Rationale: no closed sovereign deal, no airgap installer, no multi-tenant Threat Cloud.
+              Pricing a $5-20M tier in the same grid as a $25K Pilot when the infrastructure does
+              not exist creates the wrong signal. See docs/HONESTY.md §7. */}
         </div>
 
-        {/* Founding-F500 note */}
-        <FadeInUp delay={0.3}>
-          <div className="mt-10 max-w-4xl mx-auto bg-surface-2 border border-border rounded-xl p-6 text-center">
-            <p className="text-xs font-semibold text-brand-sage uppercase tracking-wider mb-2">
-              {isZh ? '首 5 家 F500 創始價' : 'Founding 5 F500 pricing'}
-            </p>
-            <p className="text-sm text-text-secondary leading-[1.85]">
-              {isZh
-                ? '首 5 家 F500 Enterprise 客戶可鎖定 $100K × 2 年的創始價（標準定價區間為 $250K–$350K），交換條件為公開 logo 與 case study 授權。第 6 家起恢復標準定價。'
-                : 'The first 5 F500 Enterprise customers can lock the founding rate of $100K × 2 years (versus the standard $250K–$350K range), in exchange for public logo and case study rights. Standard pricing resumes from customer six onwards.'}
-            </p>
-          </div>
-        </FadeInUp>
+        {/* Founding-5 F500 callout removed — program retired with zero contracts signed.
+            Will return when Enterprise tier reopens (Q3 2026). See docs/HONESTY.md §6. */}
 
         {/* Honesty pointer — single source of truth for what is real vs aspirational */}
         <FadeInUp delay={0.35}>
@@ -652,8 +586,8 @@ export default function PricingContent() {
             </p>
             <p className="text-sm text-text-secondary leading-[1.85]">
               {isZh
-                ? '我們是早期、小團隊、開源資安公司。Pilot / Enterprise / Sovereign tier 都有「今天交付得到」與「在做、還沒到」的東西。'
-                : 'We are an early-stage, small, open-source security company. Pilot / Enterprise / Sovereign tiers each include things shipping today, and things still in flight.'}{' '}
+                ? '我們是早期、小團隊、開源資安公司。本頁三個 tier 各自有「今天交付得到」與「在做、還沒到」的東西。Enterprise 目前暫停、Sovereign 已從 pricing 拿掉,原因都在 HONESTY.md 裡寫清楚。'
+                : 'We are an early-stage, small, open-source security company. The three tiers on this page each include things shipping today and things still in flight. Enterprise is paused; Sovereign has been removed from /pricing entirely — full rationale in HONESTY.md.'}{' '}
               <a
                 href="https://github.com/panguard-ai/panguard-ai/blob/main/docs/HONESTY.md"
                 target="_blank"
@@ -918,177 +852,47 @@ export default function PricingContent() {
         </div>
       </SectionWrapper>
 
-      {/* ─── Sovereign National Reference Track ─── */}
+      {/* ─── Sovereign National Reference Track section removed from /pricing ───
+          Per docs/HONESTY.md §7: no closed sovereign deal, no airgap installer,
+          no multi-tenant Threat Cloud. Path 1 (free standards citation) and Path 2
+          (free 90-day technical co-eval) remain real and live — but live as forward
+          positioning at sovereign-ai-defense.vercel.app, not as /pricing line items.
+          Path 3 commercial flows via vendor partner channel when ATR-integrated
+          products (Cisco AI Defense, Microsoft AGT) reach nation-scale deployment.
+
+          Short forward pointer for visitors who land here looking for sovereign
+          context: */}
       <SectionWrapper>
-        <div className="max-w-5xl mx-auto">
-          <SectionTitle
-            overline={isZh ? '主權 AI 國家級' : 'SOVEREIGN AI NATIONAL REFERENCE'}
-            title={
-              isZh
-                ? '為主權 AI 國家打造的 reference deployment'
-                : 'Reference deployment for sovereign AI nations'
-            }
-            subtitle={
-              isZh
-                ? '每一個民主國家都在打造自己的主權 AI 模型與算力，但安全層仍向美國私企租用。ATR、Migrator、Compliance 三者構成這個缺口的開放標準答案。'
-                : 'Every democracy is building sovereign AI models and compute, yet the security layer is still rented from US-private vendors. ATR, Migrator, and the Compliance module together form the open-standard answer to that gap.'
-            }
-          />
-
-          <FadeInUp delay={0.1}>
-            <div className="mt-12 grid lg:grid-cols-3 gap-6">
-              {/* Path 1 */}
-              <div className="bg-surface-2 rounded-xl border border-brand-sage/30 p-6 flex flex-col h-full">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mb-3">
-                  {isZh ? 'Path 1 · 標準引用' : 'Path 1 · Standards Reference'}
-                </p>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-extrabold text-text-primary">$0</span>
-                  <span className="text-xs text-text-muted">
-                    {isZh ? '零商業義務' : 'no commercial obligation'}
-                  </span>
-                </div>
-                <p className="text-sm text-text-secondary leading-[1.85] flex-1">
-                  {isZh
-                    ? '由國家層級單位（如數位部會、NCSC、AI 安全機構）公開引用 ATR，作為該國 AI agent 安全的參考框架。'
-                    : "A national-level body (digital ministry, NCSC, AI safety agency) publicly cites ATR as the country's reference framework for AI agent security."}
-                </p>
-                <p className="text-xs text-text-muted leading-[1.85] mt-3">
-                  {isZh
-                    ? '我們在 sovereign-ai-defense 頁面列出該國為 ecosystem reference。預計 1 至 2 週可完成正式對接。'
-                    : 'We list the country as an ecosystem reference on the sovereign-ai-defense page. Estimated time to commit: 1–2 weeks.'}
-                </p>
-              </div>
-
-              {/* Path 2 */}
-              <div className="bg-surface-2 rounded-xl border border-blue-400/30 p-6 flex flex-col h-full">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-blue-400 mb-3">
-                  {isZh ? 'Path 2 · 技術聯合驗證' : 'Path 2 · Technical Co-eval'}
-                </p>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-extrabold text-text-primary">$0</span>
-                  <span className="text-xs text-text-muted">
-                    {isZh ? '90 天，雙方零成本' : '90 days, zero cost'}
-                  </span>
-                </div>
-                <p className="text-sm text-text-secondary leading-[1.85] flex-1">
-                  {isZh
-                    ? '由國家紅隊以自有對抗樣本，對 ATR 全 419 條規則進行完整測試。我們提供偵測引擎、Migrator 工具與完整的失敗案例揭露。'
-                    : "The national red team runs its own adversarial corpus against ATR's full 330-rule library. We provide the detection engine, Migrator tooling, and full failure-case disclosure."}
-                </p>
-                <p className="text-xs text-text-muted leading-[1.85] mt-3">
-                  {isZh
-                    ? '產出為獨立第三方驗證報告，所有測試 artifact 由該國保留。雙方零成本，週期 90 天。'
-                    : 'Output is an independent third-party validation report. All testing artifacts remain with the nation. Zero cost on both sides over a 90-day cycle.'}
-                </p>
-              </div>
-
-              {/* Path 3 */}
-              <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-6 flex flex-col h-full ring-1 ring-brand-sage/10">
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mb-3">
-                  {isZh ? 'Path 3 · 商業合約落地' : 'Path 3 · Commercial Reference Deployment'}
-                </p>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-extrabold text-text-primary">$5–20M</span>
-                  <span className="text-xs text-text-muted">
-                    {isZh ? '/ 多年合約' : '/ multi-year'}
-                  </span>
-                </div>
-                <p className="text-sm text-text-secondary leading-[1.85] flex-1">
-                  {isZh
-                    ? '國家級 reference deployment，包含完整 ATR、Migrator Pro、Compliance Module、Threat Cloud，以及在地部署與客製規則包。'
-                    : 'Nation-scale reference deployment: full ATR, Migrator Pro, Compliance Module, Threat Cloud, in-region deployment, and custom rule packs.'}
-                </p>
-                <p className="text-xs text-text-muted leading-[1.85] mt-3">
-                  {isZh
-                    ? '由經認證的區域 enterprise vendor 夥伴負責落地與在地服務，PanGuard 擔任上游 ATR 標準維護方。商業模式對應 Linux Foundation 國家級合約與 Red Hat 聯邦合約之先例。'
-                    : 'Delivery is handled by a certified regional enterprise vendor partner, with PanGuard as the upstream ATR standards maintainer. The structure follows the Linux Foundation national-contract and Red Hat federal-contract precedent.'}
-                </p>
-              </div>
-            </div>
-          </FadeInUp>
-
-          <FadeInUp delay={0.25}>
-            <div className="mt-10 bg-surface-2 border border-border rounded-xl p-6 text-center max-w-3xl mx-auto">
-              <p className="text-xs font-semibold text-brand-sage uppercase tracking-wider mb-3">
-                {isZh ? '為什麼國家層級會採用' : 'Why nations adopt this'}
-              </p>
-              <p className="text-sm text-text-secondary leading-[1.85]">
-                {isZh
-                  ? '主權 AI 由三個元素構成：主權的模型、主權的算力、主權的偵測知識資產。'
-                  : 'Sovereign AI rests on three pillars: sovereign model, sovereign compute, and sovereign detection knowledge.'}
-              </p>
-              <p className="text-sm text-text-secondary leading-[1.85] mt-3">
-                {isZh
-                  ? '前兩項，各國已投入數十億美元自行建構；第三項目前仍向美國私企租用——而這正是主權 AI 計畫原本要消除的依賴。'
-                  : 'Nations have already invested billions building the first two in-house. The third is still rented from US-private vendors — exactly the dependency that sovereign AI programs were designed to eliminate.'}
-              </p>
-              <p className="text-sm text-text-secondary leading-[1.85] mt-3">
-                {isZh
-                  ? 'Migrator 把一國 SOC 累積數十年的偵測知識（Sigma、YARA、Snort、SCADA 等）自動銜接到 AI Agent 時代，讓國家保留偵測知識的主權，無須丟棄、也無須回租。'
-                  : "Migrator bridges decades of a nation's accumulated SOC detection IP (Sigma, YARA, Snort, SCADA, and others) into the AI agent era — letting the nation keep sovereignty over its detection knowledge, with no rewriting and no rental from foreign vendors."}
-              </p>
-              <a
-                href="https://sovereign-ai-defense.vercel.app"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs text-brand-sage font-semibold mt-4 hover:underline"
-              >
-                {isZh ? '完整 Sovereign AI Defense 倡議書' : 'Full Sovereign AI Defense brief'}{' '}
-                <ArrowRight className="w-3 h-3" />
-              </a>
-            </div>
-          </FadeInUp>
-
-          <FadeInUp delay={0.3}>
-            <div className="mt-10 max-w-4xl mx-auto">
-              <p className="text-center text-xs uppercase tracking-wider font-semibold text-brand-sage mb-4">
-                {isZh ? '開始合作' : 'Start engagement'}
-              </p>
-              <div className="grid sm:grid-cols-3 gap-3">
-                <Link
-                  href="/contact?tier=sovereign&path=1"
-                  className="flex flex-col items-center text-center gap-1 px-5 py-4 rounded-xl border border-brand-sage/40 hover:border-brand-sage hover:bg-brand-sage/5 transition-colors"
-                >
-                  <span className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage">
-                    {isZh ? 'Path 1 · 標準引用' : 'Path 1 · Standards Reference'}
-                  </span>
-                  <span className="text-sm font-semibold text-text-primary">
-                    {isZh ? '申請正式對接 · $0' : 'Request reference · $0'}
-                  </span>
-                  <span className="text-[11px] text-text-muted">
-                    {isZh ? '1–2 週可上線' : '1–2 weeks to live'}
-                  </span>
-                </Link>
-                <Link
-                  href="/contact?tier=sovereign&path=2"
-                  className="flex flex-col items-center text-center gap-1 px-5 py-4 rounded-xl border border-blue-400/40 hover:border-blue-400 hover:bg-blue-400/5 transition-colors"
-                >
-                  <span className="text-[11px] uppercase tracking-wider font-semibold text-blue-400">
-                    {isZh ? 'Path 2 · 技術聯合驗證' : 'Path 2 · Technical Co-eval'}
-                  </span>
-                  <span className="text-sm font-semibold text-text-primary">
-                    {isZh ? '啟動 90 天驗證 · $0' : 'Start 90-day eval · $0'}
-                  </span>
-                  <span className="text-[11px] text-text-muted">
-                    {isZh ? '第三方驗證報告' : 'Third-party report'}
-                  </span>
-                </Link>
-                <Link
-                  href="/contact?tier=sovereign&path=3"
-                  className="flex flex-col items-center text-center gap-1 px-5 py-4 rounded-xl border border-brand-sage bg-brand-sage/10 hover:bg-brand-sage/20 transition-colors"
-                >
-                  <span className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage">
-                    {isZh ? 'Path 3 · 商業合約' : 'Path 3 · Commercial'}
-                  </span>
-                  <span className="text-sm font-semibold text-text-primary">$5–20M</span>
-                  <span className="text-[11px] text-text-muted">
-                    {isZh ? '多年期 reference' : 'Multi-year reference'}
-                  </span>
-                </Link>
-              </div>
-            </div>
-          </FadeInUp>
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-xs font-semibold text-brand-sage uppercase tracking-wider mb-3">
+            {isZh ? '尋找 Sovereign AI 資訊?' : 'Looking for Sovereign AI information?'}
+          </p>
+          <p className="text-sm text-text-secondary leading-[1.85]">
+            {isZh
+              ? '主權級部署所需的基礎建設 (airgap installer、multi-tenant Threat Cloud) 尚未 ship,因此 Sovereign tier 已從 /pricing 移除。我們的主權 AI 立場與 Path 1 標準引用、Path 2 技術聯合驗證的開放管道,完整放在 sovereign-ai-defense brief。商業合約 (Path 3) 走 vendor partner 通道 (Cisco / Microsoft) 落地。'
+              : 'The infrastructure for sovereign deployment (airgap installer, multi-tenant Threat Cloud) is not yet shipping, so the Sovereign tier has been removed from /pricing. Our sovereign-AI positioning, along with the open-channel Path 1 (standards citation) and Path 2 (technical co-eval), lives in the sovereign-ai-defense brief. Commercial (Path 3) flows via vendor partner channel (Cisco / Microsoft).'}
+          </p>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <a
+              href="https://sovereign-ai-defense.vercel.app"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-sage border border-brand-sage/40 hover:bg-brand-sage/10 rounded-full px-4 py-2 transition-colors"
+            >
+              {isZh ? '完整 Sovereign AI Defense brief' : 'Full Sovereign AI Defense brief'}{' '}
+              <ArrowRight className="w-3 h-3" />
+            </a>
+            <a
+              href="https://github.com/panguard-ai/panguard-ai/blob/main/docs/HONESTY.md#7-the-sovereign-520m-tier--removed-from-pricing-kept-as-forward-brief"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-muted border border-border hover:border-text-secondary rounded-full px-4 py-2 transition-colors"
+            >
+              {isZh
+                ? '為什麼從 pricing 拿掉 (HONESTY.md §7)'
+                : 'Why removed from pricing (HONESTY.md §7)'}
+            </a>
+          </div>
         </div>
       </SectionWrapper>
 

@@ -76,35 +76,70 @@ Be clear with yourself on this — if you expected a product you log into and fo
 
 我們把 Pilot 賣為 **Design Partner engagement**，不是 SaaS 訂閱。請先把這點對自己講清楚——如果您以為買到的是登入就好不用管的產品，這不是那種東西。
 
+**Tagline:** _AI Agent Security Baseline — Detect & Alert, not Remediate._
+
+**Success metric we will write into the contract:** _"If the Pilot catches one AI agent attack or one malicious skill install during 90 days, it has paid for itself."_
+
+> Every bullet below was reconciled against the actual code in this repo on the
+> date of the last commit to this file. If we list it, we have shipping code that
+> does it. Every caveat is a real gap, not legal CYA.
+
 ### What you actually get in 90 days
 
-- **The maintainer of ATR personally deploys into your environment.**
-  Not a customer success rep. Not a contractor. The person who wrote the rules
-  that Microsoft AGT and Cisco AI Defense merged into production.
-  ATR 標準維護者本人到您環境部署。不是 CS 代理，不是外包，就是寫出被 Microsoft / Cisco merge 的那套規則的本人。
+- **Panguard Guard runtime deployed on one endpoint** (Linux / macOS / Windows).
+  109 ATR detection rules bundled into Guard today (the public ATR corpus on GitHub
+  has 419 rules; Guard ships a 109-rule curated subset focused on the most actionable
+  prompt-injection, tool-poisoning, and agent-behaviour categories).
+  4-agent pipeline (Detect → Analyze → Respond → Report). Events to local dashboard
+  - JSONL audit log. Response actions: alert, block input, kill agent, snapshot.
+    **Caveat:** Guard requires a process restart to pick up new rules (~5–30 second
+    zero-detection window). Live rule reload (SIGHUP) is targeted for Q3 2026 and is
+    the explicit blocker for the F500 SLA tier.
 
-- **~6 hours per week of senior engineering time, scheduled with your team.**
-  Async Slack / email for the rest. No 24/7 phone line.
-  每週約 6 小時資深工程時間，跟您團隊排程。其餘 async。沒有 24/7 電話。
+- **Panguard Scan — 60-second skill / MCP audit** with SARIF 2.1.0 export for any CI.
+  8 checks: manifest, imports, dependencies, CVE lookup, secrets, permissions, regex
+  DoS, artifact hunting.
+  **Caveat:** The SAST check is a placeholder in v1.5.6 (`run-scan.ts` returns a
+  stub for native code analysis). Real SAST is on the roadmap, not in the Pilot.
+
+- **Panguard Chat — multi-channel notifications** (Discord / Slack / Webhook / Telegram / LINE).
+  Bilingual EN / ZH alert formatting, summary digests, agent commentary.
+  **Caveat:** Webhook validation is basic; no encryption at rest on alert payloads.
+
+- **Compliance PDF reports — template-based, informational.**
+  Frameworks supported as templates: SOC 2 Type II, ISO 27001, Taiwan TCSA, NIST AI
+  RMF, EU AI Act mapping. PDF generator (`@panguard-ai/panguard-report`) renders
+  your detection events into the chosen template.
+  **Caveat:** These are **internal informational reports, not auditor-signed evidence
+  packs.** The auto-generator that turns customer events into a signed, tamper-evident
+  evidence pack (matching the format at [`/evidence-pack`](https://panguard.ai/evidence-pack))
+  is a Q4 2026 build. Your Pilot pack will be hand-compiled using the same template.
+
+- **Migrator: Sigma + YARA → ATR conversion** via `@panguard-ai/migrator-community@0.1.2` on npm (MIT).
+  **Caveat:** Only **Sigma and YARA** parsers exist today. The 15-source-format roadmap
+  (AppLocker, Sysmon, Osquery, Falco, Suricata XML, Splunk SPL, Snort, Elastic EQL,
+  Semgrep, CodeQL, etc.) is not built — each format is a 2+ week custom build outside
+  the Pilot scope.
 
 - **1–3 custom ATR rules tailored to your environment.**
-  If suitable for upstream, they merge into the public ATR repo — your detection
-  IP ships to the rest of the ecosystem (Cisco AI Defense, Microsoft AGT, etc.).
-  Optional: you can elect to keep them private.
-  為您環境寫 1-3 條客製 ATR 規則。若適合 upstream，會 merge 到 ATR public repo——您的偵測 IP 會散播到下游 Cisco、Microsoft 等廠商。可選擇保留 private。
+  If suitable for upstream, they merge into the public ATR repo and ship across the
+  ecosystem (Cisco AI Defense, Microsoft AGT, etc.). Optional: keep them private.
 
-- **One real compliance evidence pack for one framework of your choice.**
-  ISO 27001, SOC 2, NIST AI RMF, EU AI Act, or Taiwan TCSA — pick one for the pilot.
-  Format matches the public sample at [`/evidence-pack`](https://panguard.ai/evidence-pack).
-  一份真實合規 evidence pack，您選一個框架。格式跟 public sample 一致。
+- **`pga` CLI install help into one cloud or on-prem environment.**
+  15 subcommands (`scan`, `audit`, `up`, `guard`, `chat`, `report`, etc.), interactive
+  menu, source / npm / Homebrew install paths.
+  **Caveat:** No airgap installer — no offline package builder exists today.
 
-- **SIEM webhook integration sample.** Wired into your existing SIEM (Splunk, Wazuh, MISP, etc.).
+- **~6 hours per week of senior engineering time, scheduled with your team.**
+  Async Slack / email for the rest. No 24/7 phone line. The maintainer of ATR
+  personally deploys — not a CS rep, not a contractor.
 
 - **LLM token cost absorbed (~$200/month).**
-  Detection itself runs 0% on LLM — 336 deterministic rules at 97.1% recall.
-  LLM is used for enrichment and rule crystallization only.
+  Detection itself runs 0% on LLM. LLM is used for enrichment and rule
+  crystallisation only.
 
-- **$25K credits 100% toward a Y1 Enterprise contract** if you sign within 12 months. If you do not sign, you keep what was built. No clawback.
+- **$25K credits 100% toward a Y1 Enterprise contract** when Enterprise tier reopens
+  (see §6 for status). If you do not sign, you keep what was built. No clawback.
 
 - **7-day no-questions refund** per [`/legal/refund`](https://panguard.ai/legal/refund).
 
@@ -115,72 +150,108 @@ Be clear with yourself on this — if you expected a product you log into and fo
 - An SLA with uptime credit.
 - A SOC 2 Type 1 attestation letter (it is October 2026).
 - An onboarded customer success team.
+- **Airgap deployment.** No offline installer exists today.
+- **Auto-generated, auditor-signed compliance evidence packs.** The Pilot pack is hand-compiled from the template.
+- **Live rule reload.** Guard requires restart for new rules (~5–30s zero-detection window).
+- **Multi-endpoint fleet management at scale.** `panguard-manager` uses JSON-file persistence today and will not scale past ~10–20 endpoints. SQLite upgrade is Q3 2026.
+- **Custom format converters beyond Sigma / YARA.** AppLocker, Sysmon, Osquery, Falco, Suricata, etc. are not implemented — each is custom-quoted outside the Pilot.
+- **Full 5-framework compliance auto-mapping.** Only templates exist; the auto-mapper is Q4 2026.
+- **SAST / native static code analysis.** The check is a placeholder in v1.5.6.
+- **Kernel-isolated sandbox.** `security-hardening/` provides userspace isolation only — no cgroup / seccomp / AppArmor profiles.
 
 ### Why $25K is the right price for this
 
-| Component                                 | Standalone market price              | Bundled in Pilot |
-| ----------------------------------------- | ------------------------------------ | ---------------- |
-| Senior security consultant — 90 days      | $30–60K USD (TW) / $80–150K USD (US) | ✓                |
-| Domain expert in ATR / OWASP Agentic      | < 10 people in the world             | ✓                |
-| Sigma / YARA → ATR migration              | 6 months self-build                  | ✓                |
-| Custom compliance evidence pack           | $40K+ ISO consultancy                | ✓                |
-| TCSA mapping (if Taiwan)                  | $15–30K local consultancy            | ✓                |
-| **$25K credit 100% toward Y1 Enterprise** | Free upgrade path                    | ✓                |
-| **7-day no-questions refund**             | Buyer-side zero risk                 | ✓                |
+| Component                                                                | Standalone market price              | Bundled in Pilot |
+| ------------------------------------------------------------------------ | ------------------------------------ | ---------------- |
+| Senior security consultant — 90 days                                     | $30–60K USD (TW) / $80–150K USD (US) | ✓                |
+| Domain expert in ATR / OWASP Agentic (< 10 people in the world)          | n/a                                  | ✓                |
+| Sigma / YARA → ATR migration tooling                                     | 6 months self-build                  | ✓                |
+| 1–3 custom rules + template-based compliance work                        | $20–40K consultancy                  | ✓                |
+| TCSA mapping (if Taiwan)                                                 | $15–30K local consultancy            | ✓                |
+| **$25K credit 100% toward Y1 Enterprise** (when Enterprise tier reopens) | Free upgrade path                    | ✓                |
+| **7-day no-questions refund**                                            | Buyer-side zero risk                 | ✓                |
 
 The Pilot is **prepaid consulting from the rules' author**, with the upside that the rules
-are already in production at Microsoft and Cisco — not theory, not a deck.
+are already in production at Microsoft AGT and Cisco AI Defense — not theory, not a deck.
 
 Pilot = 預付規則作者本人的顧問費 + 規則已在 Microsoft / Cisco 跑 production。不是理論，不是 PPT。
 
 ---
 
-## 5. What the Enterprise tier covers (and what is still in flight)
+## 5. The Enterprise tier is currently paused (waitlist only)
 
-[`/pricing`](https://panguard.ai/pricing) lists the Enterprise tier at $150K floor,
-$250–350K target, up to $500K+. Be honest about what that buys:
+`/pricing` previously listed the Enterprise tier at $150K floor, $250–350K target, up
+to $500K+. After auditing the repo against what this tier needs to actually deliver,
+**we have moved Enterprise to waitlist-only** until three engineering items ship:
 
-| Available today                                                       | Target (not today)                                           |
-| --------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Migrator Pro (all 15 source formats)                                  | SOC 2 Type 1 letter                                          |
-| AI Compliance Audit Evidence Module (NIST AI RMF, EU AI Act mappings) | AIAM (SAML, SCIM, MFA, WebAuthn)                             |
-| Direct line to ATR maintainer; early access to draft rules            | 24×7 SOC                                                     |
-| On-prem / VPC / airgap deployment help                                | Multi-region Threat Cloud                                    |
-| SIEM webhook integration                                              | Customer-managed keys (HSM / BYOK)                           |
-| Custom ATR rule packs                                                 | F500-scale customer success org                              |
-| LLM tokens included                                                   | Pre-built ServiceNow / Jira / PagerDuty / Tenable connectors |
+| Blocker                                                                   | Effort    | Target  |
+| ------------------------------------------------------------------------- | --------- | ------- |
+| **1. Guard live rule reload** (SIGHUP + fsnotify, no restart window)      | 3–5 days  | Q3 2026 |
+| **2. `panguard-manager` JSON → SQLite + multi-endpoint fleet auth**       | 1–2 weeks | Q3 2026 |
+| **3. Compliance evidence auto-generator for one framework** (SOC 2 first) | 2–3 weeks | Q3 2026 |
 
-**Today, Enterprise tier is also founder-led delivery** — the same person who delivers the
-Pilot is the person who delivers Enterprise. That changes when SOC 2 Type 1 ships and we
-can hire incident-response headcount. Until then, Enterprise pricing buys **more scope and
-more dedicated time**, not a different delivery model.
+Until these three ship, Enterprise tier is **founder-led delivery with the same scope
+as Pilot, just longer engagement** — which means there is no real product
+differentiation from Pilot at the $150K+ price point. Selling it today would be selling
+a Pilot at 6–20× markup, which is dishonest.
 
-中文摘要：今天 Enterprise tier 也是創辦人親自交付，跟 Pilot 同一個人。直到 SOC 2 Type 1 拿到、可以開始招 incident response 人力為止。在那之前，Enterprise 價錢買的是「更多範疇 + 更多專屬時間」，不是「不同的交付組織」。
+| Available today (in Pilot already)                         | Target for Enterprise tier reopen                                   |
+| ---------------------------------------------------------- | ------------------------------------------------------------------- |
+| Migrator (Sigma + YARA only)                               | Migrator Pro with 5+ additional source formats                      |
+| AI Compliance template PDFs                                | Auto-generator with signed evidence packs (SHA-256 + HMAC)          |
+| Direct line to ATR maintainer; early access to draft rules | Same, formalised in MSA                                             |
+| On-prem / VPC deployment help (no airgap)                  | Airgap installer + multi-region Threat Cloud                        |
+| SIEM webhook                                               | SIEM + ServiceNow / Jira / PagerDuty / Tenable pre-built connectors |
+| Custom ATR rule packs                                      | Same, but at fleet scale via panguard-manager                       |
+| LLM tokens included                                        | Same, plus dedicated CSM (after SOC 2 Type 1 ships)                 |
 
----
-
-## 6. The Founding 5 F500 program
-
-[`/pricing`](https://panguard.ai/pricing) advertises $100K × 2 years for the first 5 F500
-customers, in exchange for public logo + case study rights. As of this document version:
-
-- We have not yet closed any Founding 5 F500. The slot count is real, not theatre.
-- We are in active conversation with [count tracked in private CRM, not disclosed publicly here].
-- If you sign as Founding 5 you are taking on **vendor risk** alongside price upside.
-  We are explicit about this in the contract.
-
-If the program does not close 5 within the planned window, we will publicly retire it
-rather than quietly extend the deadline.
+中文摘要：Enterprise tier 在三件工程項目 ship 完之前 (live reload / SQLite manager / 1-framework auto-gen，估計 3-5 週) 暫時下架到 waitlist。在那之前用 $150K-500K 賣等同於把 Pilot 加價 6-20 倍，那不誠實。Pilot tier ($25K) 是現在唯一的商業入口。
 
 ---
 
-## 7. The Sovereign $5–20M tier
+## 6. The Founding 5 F500 program is retired (no contracts signed)
 
-This tier exists on the pricing page because Saudi PIF dialogue exists. **There is no
-closed sovereign deal yet.** The brief at [sovereign-ai-defense.vercel.app](https://sovereign-ai-defense.vercel.app)
-is a positioning document, not evidence of revenue. Path 1 (free, standards citation) and
-Path 2 (free, 90-day technical co-eval with national red teams) are real and reproducible
-today. Path 3 (commercial) is a forward sales motion.
+`/pricing` previously advertised $100K × 2 years for the first 5 F500 customers in
+exchange for public logo + case study rights.
+
+**This program is retired as of this document version.** Zero Founding 5 F500
+contracts were signed. The program is being retired rather than quietly extended
+because the underlying Enterprise tier is now on waitlist (§5), and pricing a
+Founding-tier discount on a tier we are not selling makes no sense.
+
+Equivalent positioning (early-customer discount + logo / case study) will return when
+Enterprise tier reopens — likely as a 2026 H2 "first 3 post-relaunch" tier with
+honest pricing once the three blockers in §5 ship.
+
+中文摘要：Founding 5 F500 program 下架。零份合約簽過。等 Enterprise tier 重開再以類似形式（早期客戶折扣 + logo）重新推出。
+
+---
+
+## 7. The Sovereign $5–20M tier — removed from /pricing, kept as forward brief
+
+The Sovereign tier has been removed from the /pricing page. There is no closed
+sovereign deal, no airgap installer, no multi-region Threat Cloud, and no multi-tenant
+isolation today. Pricing a $5–20M tier in the same grid as a $25K Pilot when the
+underlying infrastructure does not exist creates the wrong signal.
+
+The positioning brief at [sovereign-ai-defense.vercel.app](https://sovereign-ai-defense.vercel.app)
+remains live as a **forward-looking research document** for sovereign-AI conversations
+(Saudi PIF, Luxembourg CIRCL, others). It is now linked from `/research` rather than
+`/pricing`.
+
+What is real today on the sovereign track:
+
+- **Path 1 (free, standards citation):** A national-level body publicly cites ATR as
+  reference framework. Reproducible in 1–2 weeks.
+- **Path 2 (free, 90-day technical co-eval):** A national red team tests ATR's 419
+  rules against their adversarial corpus, with full failure-case disclosure. Zero
+  cost both sides.
+- **Path 3 (commercial $5–20M):** Forward sales motion, delivered via vendor partner
+  channel (Cisco AI Defense, Microsoft AGT) when ATR-integrated products reach
+  nation-scale deployment. PanGuard's role is upstream standards maintenance and
+  rule namespace provisioning, not direct delivery.
+
+中文摘要：Sovereign tier 從 /pricing 拿掉，改放 /research 當前瞻 brief。Path 1/2 (免費) 是真實可重現的；Path 3 (商業 $5-20M) 是長期方向，會透過 Cisco/Microsoft 通道交付，不是 Panguard 直接做。
 
 ---
 
