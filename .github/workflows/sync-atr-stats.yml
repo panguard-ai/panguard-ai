@@ -31,12 +31,16 @@ jobs:
           node-version: '22'
 
       - name: Fetch upstream stats.json
+        # ATR moved stats.json from repo-root to data/ during the Phase 1
+        # measurement-layer rewrite (2026-05-23, ATR commit 008239c6).
+        # The new schema uses `rules.total` (no longer `ruleCount.total`)
+        # and adds a `benchmarks[]` array per Phase 6.
         run: |
           curl -fsSL \
-            https://raw.githubusercontent.com/Agent-Threat-Rule/agent-threat-rules/main/stats.json \
+            https://raw.githubusercontent.com/Agent-Threat-Rule/agent-threat-rules/main/data/stats.json \
             -o /tmp/atr-stats.json
           echo "Upstream version:"; node -e "console.log(require('/tmp/atr-stats.json').version)"
-          echo "Upstream rules:";   node -e "console.log(require('/tmp/atr-stats.json').ruleCount.total)"
+          echo "Upstream rules:";   node -e "console.log(require('/tmp/atr-stats.json').rules.total)"
 
       - name: Rewrite stats.ts shared fields
         run: |
