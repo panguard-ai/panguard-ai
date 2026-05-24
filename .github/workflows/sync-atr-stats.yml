@@ -66,7 +66,7 @@ jobs:
           git checkout -b "$BRANCH"
           git add packages/website/src/lib/stats.ts
           UPSTREAM_VER=$(node -e "console.log(require('/tmp/atr-stats.json').version)")
-          UPSTREAM_RULES=$(node -e "console.log(require('/tmp/atr-stats.json').ruleCount.total)")
+          UPSTREAM_RULES=$(node -e "console.log(require('/tmp/atr-stats.json').rules.total)")
           git commit -m "chore(website): sync ATR stats to v${UPSTREAM_VER} (${UPSTREAM_RULES} rules)"
           git push origin "$BRANCH"
           gh pr create \
