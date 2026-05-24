@@ -7,7 +7,31 @@
  * Marketing-only fields (cliVersion, products, platform metadata) are
  * preserved.
  *
+ * Defensive against schema drift: every replacement that depends on an
+ * upstream field is gated by `has(...)`. Missing fields are reported and
+ * skipped (not replaced) instead of throwing. Lets the workflow keep
+ * making partial-but-safe updates while ATR's stats.json schema evolves.
+ *
  * Usage: node apply-atr-stats.mjs <upstream-stats.json> <stats.ts>
+ *
+ * Upstream schema as of ATR 3.0.0 (post measurement-layer rewrite):
+ *   {
+ *     version, generatedAt,
+ *     rules: { total, categories, byCategory },
+ *     ecosystem: { skillsScanned, skillsFlagged },
+ *     benchmark: { pintRecall, pintPrecision },        // legacy flat
+ *     benchmarks: [ {source, source_version, samples, recall, ...}, ... ],
+ *     benchmarks_generated_at
+ *   }
+ *
+ * Older fields the previous version of this script expected
+ * (ruleCount.{stable,experimental,draft}, distribution.{npm,githubStars},
+ *  adoption.{production[],externalPRMergesTotal,...},
+ *  benchmarks.skill, lastUpdated) are not present in the new ATR
+ * stats.json. Those replacements now no-op with a logged warning;
+ * stats.ts retains whatever value it had previously (likely curated
+ * manually). If you need those auto-synced again, either extend ATR's
+ * stats.json upstream or compute them locally in this script.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -21,68 +45,179 @@ if (!statsJsonPath || !statsTsPath) {
 const upstream = JSON.parse(readFileSync(statsJsonPath, 'utf8'));
 let src = readFileSync(statsTsPath, 'utf8');
 
-const replacements = [
-  { re: /atrVersion:\s*'[^']+'/, val: `atrVersion: '${upstream.version}'` },
-  { re: /atrRules:\s*\d+/, val: `atrRules: ${upstream.ruleCount.total}` },
-  { re: /atrStableRules:\s*\d+/, val: `atrStableRules: ${upstream.ruleCount.stable}` },
+/** Safe path access. Returns undefined if any segment is missing. */
+function get(obj, path) {
+  let cur = obj;
+  for (const key of path.split('.')) {
+    if (cur == null || typeof cur !== 'object') return undefined;
+    cur = cur[key];
+  }
+  return cur;
+}
+
+/** Find the benchmark entry for a given source in the new benchmarks[] array. */
+function findBenchmark(source) {
+  const list = Array.isArray(upstream.benchmarks) ? upstream.benchmarks : [];
+  return list.find((b) => b && b.source === source);
+}
+
+/** Format a number with underscore thousands separators (e.g. 23_000). */
+function thousandsUnderscore(n) {
+  return String(n).replace(/(\d)(?=(\d{3})+$)/g, '$1_');
+}
+
+const ruleTotal = get(upstream, 'rules.total');
+const pintBench = findBenchmark('pint');
+const skillBench = findBenchmark('skill-benchmark');
+
+const candidates = [
   {
-    re: /atrExperimentalRules:\s*\d+/,
-    val: `atrExperimentalRules: ${upstream.ruleCount.experimental}`,
+    re: /atrVersion:\s*'[^']+'/,
+    val: () => `atrVersion: '${upstream.version}'`,
+    needs: 'version',
+    have: typeof upstream.version === 'string',
   },
-  { re: /atrDraftRules:\s*\d+/, val: `atrDraftRules: ${upstream.ruleCount.draft}` },
-  { re: /totalRules:\s*\d+/, val: `totalRules: ${upstream.ruleCount.total}` },
+  {
+    re: /atrRules:\s*\d+/,
+    val: () => `atrRules: ${ruleTotal}`,
+    needs: 'rules.total',
+    have: typeof ruleTotal === 'number',
+  },
+  {
+    re: /totalRules:\s*\d+/,
+    val: () => `totalRules: ${ruleTotal}`,
+    needs: 'rules.total',
+    have: typeof ruleTotal === 'number',
+  },
   {
     re: /totalRulesDisplay:\s*'[^']+'\s*as\s*const/,
-    val: `totalRulesDisplay: '${upstream.ruleCount.total}' as const`,
+    val: () => `totalRulesDisplay: '${ruleTotal}' as const`,
+    needs: 'rules.total',
+    have: typeof ruleTotal === 'number',
   },
   {
     re: /atrRulesDisplay:\s*'[^']+'\s*as\s*const/,
-    val: `atrRulesDisplay: '${upstream.ruleCount.total}' as const`,
+    val: () => `atrRulesDisplay: '${ruleTotal}' as const`,
+    needs: 'rules.total',
+    have: typeof ruleTotal === 'number',
   },
+  // Fields ATR no longer ships in stats.json — declared so we can log a
+  // single "skipped" message for each rather than silently dropping them.
+  { re: /atrStableRules:\s*\d+/, val: () => '', needs: 'ruleCount.stable', have: false },
+  {
+    re: /atrExperimentalRules:\s*\d+/,
+    val: () => '',
+    needs: 'ruleCount.experimental',
+    have: false,
+  },
+  { re: /atrDraftRules:\s*\d+/, val: () => '', needs: 'ruleCount.draft', have: false },
   {
     re: /npmDownloads30d:\s*[\d_]+/,
-    val: `npmDownloads30d: ${upstream.distribution.npm.downloads30d.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1_')}`,
+    val: () =>
+      `npmDownloads30d: ${thousandsUnderscore(get(upstream, 'distribution.npm.downloads30d'))}`,
+    needs: 'distribution.npm.downloads30d',
+    have: typeof get(upstream, 'distribution.npm.downloads30d') === 'number',
   },
   {
     re: /ciscoRulesMerged:\s*\d+/,
-    val: `ciscoRulesMerged: ${upstream.adoption.production.find((p) => p.org.startsWith('Cisco'))?.rulesShipped ?? 419}`,
+    val: () => {
+      const list = get(upstream, 'adoption.production') ?? [];
+      const cisco = list.find((p) => p && typeof p.org === 'string' && p.org.startsWith('Cisco'));
+      return `ciscoRulesMerged: ${cisco?.rulesShipped ?? 0}`;
+    },
+    needs: 'adoption.production[Cisco]',
+    have: Array.isArray(get(upstream, 'adoption.production')),
   },
   {
     re: /microsoftRulesMerged:\s*\d+/,
-    val: `microsoftRulesMerged: ${upstream.adoption.production.find((p) => p.org.startsWith('Microsoft Agent'))?.rulesShipped ?? 287}`,
+    val: () => {
+      const list = get(upstream, 'adoption.production') ?? [];
+      const ms = list.find(
+        (p) => p && typeof p.org === 'string' && p.org.startsWith('Microsoft Agent'),
+      );
+      return `microsoftRulesMerged: ${ms?.rulesShipped ?? 0}`;
+    },
+    needs: 'adoption.production[Microsoft]',
+    have: Array.isArray(get(upstream, 'adoption.production')),
   },
   {
     re: /externalPRMerges:\s*\d+/,
-    val: `externalPRMerges: ${upstream.adoption.externalPRMergesTotal}`,
+    val: () => `externalPRMerges: ${get(upstream, 'adoption.externalPRMergesTotal')}`,
+    needs: 'adoption.externalPRMergesTotal',
+    have: typeof get(upstream, 'adoption.externalPRMergesTotal') === 'number',
   },
-  { re: /externalOrgs:\s*\d+/, val: `externalOrgs: ${upstream.adoption.externalOrgsMerged}` },
+  {
+    re: /externalOrgs:\s*\d+/,
+    val: () => `externalOrgs: ${get(upstream, 'adoption.externalOrgsMerged')}`,
+    needs: 'adoption.externalOrgsMerged',
+    have: typeof get(upstream, 'adoption.externalOrgsMerged') === 'number',
+  },
   {
     re: /tier1Institutions:\s*\d+/,
-    val: `tier1Institutions: ${upstream.adoption.tier1Institutions}`,
+    val: () => `tier1Institutions: ${get(upstream, 'adoption.tier1Institutions')}`,
+    needs: 'adoption.tier1Institutions',
+    have: typeof get(upstream, 'adoption.tier1Institutions') === 'number',
   },
   {
     re: /standardsBodyMerges:\s*\d+/,
-    val: `standardsBodyMerges: ${upstream.adoption.standardsBodyMerges}`,
+    val: () => `standardsBodyMerges: ${get(upstream, 'adoption.standardsBodyMerges')}`,
+    needs: 'adoption.standardsBodyMerges',
+    have: typeof get(upstream, 'adoption.standardsBodyMerges') === 'number',
   },
-  { re: /githubStars:\s*\d+/, val: `githubStars: ${upstream.distribution.githubStars}` },
-  { re: /lastUpdated:\s*'[^']+'/, val: `lastUpdated: '${upstream.lastUpdated}'` },
-  // benchmark block
+  {
+    re: /githubStars:\s*\d+/,
+    val: () => `githubStars: ${get(upstream, 'distribution.githubStars')}`,
+    needs: 'distribution.githubStars',
+    have: typeof get(upstream, 'distribution.githubStars') === 'number',
+  },
+  {
+    re: /lastUpdated:\s*'[^']+'/,
+    val: () =>
+      `lastUpdated: '${upstream.lastUpdated ?? upstream.generatedAt ?? upstream.benchmarks_generated_at ?? ''}'`,
+    needs: 'lastUpdated (fallback generatedAt)',
+    have:
+      typeof upstream.lastUpdated === 'string' ||
+      typeof upstream.generatedAt === 'string' ||
+      typeof upstream.benchmarks_generated_at === 'string',
+  },
+  // Benchmark blocks read from the new benchmarks[] array.
   {
     re: /pint:\s*\{\s*recall:\s*[\d.]+,\s*precision:\s*[\d.]+,\s*fp:\s*[\d.]+,\s*samples:\s*[\d_]+\s*\}/,
-    val: `pint: { recall: ${upstream.benchmarks.pint.recall}, precision: ${upstream.benchmarks.pint.precision}, fp: ${upstream.benchmarks.pint.fpRate}, samples: ${upstream.benchmarks.pint.samples} }`,
+    val: () =>
+      `pint: { recall: ${pintBench.recall}, precision: ${pintBench.precision}, fp: ${pintBench.fp_rate}, samples: ${pintBench.samples} }`,
+    needs: 'benchmarks[source=pint]',
+    have: !!pintBench,
   },
   {
     re: /skill:\s*\{\s*recall:\s*[\d.]+,\s*precision:\s*[\d.]+,\s*fp:\s*[\d.]+,\s*samples:\s*[\d_]+\s*\}/,
-    val: `skill: { recall: ${upstream.benchmarks.skill.recall}, precision: ${upstream.benchmarks.skill.precision}, fp: ${upstream.benchmarks.skill.fpRate}, samples: ${upstream.benchmarks.skill.samples} }`,
+    val: () =>
+      `skill: { recall: ${skillBench.recall}, precision: ${skillBench.precision}, fp: ${skillBench.fp_rate}, samples: ${skillBench.samples} }`,
+    needs: 'benchmarks[source=skill-benchmark]',
+    have: !!skillBench,
   },
 ];
 
 let touched = 0;
-for (const { re, val } of replacements) {
+const skipped = [];
+for (const c of candidates) {
+  if (!c.have) {
+    skipped.push(c.needs);
+    continue;
+  }
   const before = src;
-  src = src.replace(re, val);
+  src = src.replace(c.re, c.val());
   if (src !== before) touched++;
 }
 
 writeFileSync(statsTsPath, src);
 console.log(`apply-atr-stats: applied ${touched} replacements to ${statsTsPath}`);
+if (skipped.length > 0) {
+  console.warn(
+    `apply-atr-stats: skipped ${skipped.length} field(s) not present in upstream stats.json:`,
+  );
+  for (const s of skipped) console.warn(`  - ${s}`);
+  console.warn(
+    'These stats.ts values were left as-is. To re-enable auto-sync for them, ' +
+      'either extend ATR data/stats.json upstream or compute them locally in this script.',
+  );
+}
