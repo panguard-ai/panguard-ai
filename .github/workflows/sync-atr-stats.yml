@@ -63,6 +63,11 @@ jobs:
           BRANCH="sync/atr-stats-$(date -u +%Y%m%d-%H%M)"
           git config user.name "ATR Stats Sync Bot"
           git config user.email "release@agentthreatrule.org"
+          # Delete any existing same-name remote branch first so re-runs on
+          # the same minute (manual trigger + scheduled cron collisions)
+          # don't fail with non-fast-forward push rejection. Same pattern
+          # ATR cve-daily-sync.yml uses.
+          git push origin --delete "$BRANCH" 2>/dev/null || true
           git checkout -b "$BRANCH"
           git add packages/website/src/lib/stats.ts
           UPSTREAM_VER=$(node -e "console.log(require('/tmp/atr-stats.json').version)")
