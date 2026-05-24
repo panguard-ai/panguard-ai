@@ -25,20 +25,20 @@ export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.5.6',
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
-  atrVersion: '2.2.2',
+  atrVersion: '3.0.0',
   /** ATR v2.2.x: stable + experimental total */
-  atrRules: 421,
+  atrRules: 427,
   atrStableRules: 359,
   atrExperimentalRules: 62,
   /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
   atrCommunityRules: 93,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
   atrPatterns: 920,
-  totalRules: 421,
+  totalRules: 427,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '421' as const,
+  totalRulesDisplay: '427' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '421' as const,
+  atrRulesDisplay: '427' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -239,7 +239,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-05-12',
+  lastUpdated: '2026-05-24T04:25:16.464Z',
 } as const;
 
 export type Stats = typeof STATS;
