@@ -223,6 +223,31 @@ export default function ATRContent() {
               </Link>
             </div>
           </FadeInUp>
+          <FadeInUp delay={0.2}>
+            <div className="mt-10 max-w-2xl mx-auto">
+              <div className="rounded-2xl border border-brand-sage/30 bg-brand-sage/5 px-5 py-4 text-left">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] uppercase tracking-[0.15em] text-brand-sage font-semibold">
+                    {t('standardization.badge')}
+                  </span>
+                </div>
+                <p className="text-sm font-semibold text-text-primary">
+                  {t('standardization.headline')}
+                </p>
+                <p className="text-sm text-text-secondary mt-2 leading-relaxed">
+                  {t('standardization.body')}
+                </p>
+                <a
+                  href={t('standardization.linkUrl')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 mt-3 text-sm text-brand-sage font-semibold hover:underline"
+                >
+                  {t('standardization.linkText')} <ArrowRight className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+          </FadeInUp>
         </div>
       </section>
 
