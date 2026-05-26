@@ -4,7 +4,7 @@
  *
  * Architecturally mirrors panguard-guard's DashboardServer but:
  *  - listens on all interfaces (not just loopback) so remote Guards can relay
- *  - authenticates via Bearer tokens stored in AgentsRegistry (not random cookie)
+ *  - authenticates via Bearer tokens stored in AgentsStore (not random cookie)
  *  - aggregates state across N Guards rather than holding a single-host snapshot
  *
  * @module @panguard-ai/panguard-manager/server
@@ -17,12 +17,18 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer, type WebSocket as WS } from 'ws';
 import { createLogger } from '@panguard-ai/core';
-import { AgentsRegistry } from './agents-registry.js';
+import { AgentsStore } from './agents-store.js';
+import type { OperatorStore } from './operators-store.js';
+import type { EnrollmentTokenStore } from './enrollment-store.js';
 import { FleetAggregator } from './aggregator.js';
 import { handleDetail, handleList, handleRegister, handleRevoke } from './api/agents.js';
 import { handleRelayEvent } from './api/events.js';
 import { handleHealth, handleStatus } from './api/status.js';
+import { handleLogin, handleLogout, handleMe } from './api/auth.js';
+import { handleIssue, handleList as handleEnrollmentList } from './api/enrollment.js';
 import { fail, newRequestId } from './api/respond.js';
+import { getAuthContext, requireOperator } from './api/session.js';
+import { renderLoginPage } from './login-page.js';
 
 const logger = createLogger('panguard-manager:server');
 
@@ -45,10 +51,14 @@ export interface ManagerServerOptions {
   readonly host?: string;
   /** Absolute path to dashboard.html (defaults to the bundled copy) / dashboard.html 絕對路徑（預設為打包副本） */
   readonly dashboardHtmlPath?: string;
-  /** Pre-built AgentsRegistry / 預先建立的 AgentsRegistry */
-  readonly registry: AgentsRegistry;
+  /** Pre-built AgentsStore / 預先建立的 AgentsStore */
+  readonly registry: AgentsStore;
   /** Pre-built FleetAggregator / 預先建立的 FleetAggregator */
   readonly aggregator: FleetAggregator;
+  /** Pre-built OperatorStore (provides operator auth) / 預先建立的 OperatorStore */
+  readonly operators: OperatorStore;
+  /** Pre-built EnrollmentTokenStore (gates agent self-registration) / 預先建立的 EnrollmentTokenStore */
+  readonly enrollment: EnrollmentTokenStore;
 }
 
 interface RateLimitEntry {
@@ -63,8 +73,10 @@ export class ManagerServer {
   private readonly port: number;
   private readonly host: string;
   private readonly dashboardHtmlPath: string;
-  private readonly registry: AgentsRegistry;
+  private readonly registry: AgentsStore;
   private readonly aggregator: FleetAggregator;
+  private readonly operators: OperatorStore;
+  private readonly enrollment: EnrollmentTokenStore;
   private readonly wsClients: Set<WSClient> = new Set();
   private readonly rateLimits: Map<string, RateLimitEntry> = new Map();
   private server: ReturnType<typeof createServer> | null = null;
@@ -79,6 +91,8 @@ export class ManagerServer {
     this.host = options.host ?? '0.0.0.0';
     this.registry = options.registry;
     this.aggregator = options.aggregator;
+    this.operators = options.operators;
+    this.enrollment = options.enrollment;
     this.dashboardHtmlPath = options.dashboardHtmlPath ?? this.resolveBundledDashboard();
     this.startedAtMs = Date.now();
   }
@@ -139,11 +153,19 @@ export class ManagerServer {
       }
       this.server.on('upgrade', (req, socket, head) => {
         const { pathname } = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
-        if (pathname === '/ws') {
-          wss.handleUpgrade(req, socket, head, (ws) => wss.emit('connection', ws, req));
-        } else {
+        if (pathname !== '/ws') {
           socket.destroy();
+          return;
         }
+        // Gate the WS handshake on a valid operator session so unauthenticated
+        // clients can't subscribe to live events.
+        const ctx = getAuthContext(req, this.operators);
+        if (!ctx) {
+          socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+          socket.destroy();
+          return;
+        }
+        wss.handleUpgrade(req, socket, head, (ws) => wss.emit('connection', ws, req));
       });
 
       this.server.listen(this.port, this.host, () => {
@@ -248,41 +270,28 @@ export class ManagerServer {
     const method = req.method ?? 'GET';
 
     try {
-      if (pathname === '/' && method === 'GET') {
-        this.serveDashboard(res, nonce);
-        return;
-      }
+      // Open endpoints (no auth required) ---------------------------------
       if (pathname === '/healthz') {
         handleHealth(res);
         return;
       }
-      if (pathname === '/api/status' && method === 'GET') {
-        handleStatus(res, { aggregator: this.aggregator, startedAtMs: this.startedAtMs });
+      if (pathname === '/login' && method === 'GET') {
+        renderLoginPage(res, nonce, { error: null });
         return;
       }
-      if (pathname === '/api/agents' && method === 'GET') {
-        handleList(res, { registry: this.registry, aggregator: this.aggregator });
+      if (pathname === '/api/auth/login' && method === 'POST') {
+        await handleLogin(req, res, { operators: this.operators });
         return;
       }
-      if (pathname === '/api/agents/register' && method === 'POST') {
-        await handleRegister(req, res, {
-          registry: this.registry,
-          aggregator: this.aggregator,
-        });
+      if (pathname === '/api/auth/logout' && method === 'POST') {
+        handleLogout(req, res, { operators: this.operators });
         return;
       }
-      const agentDetail = pathname.match(/^\/api\/agents\/([A-Za-z0-9_]+)$/);
-      if (agentDetail && method === 'GET') {
-        const id = agentDetail[1] ?? '';
-        handleDetail(res, id, { registry: this.registry, aggregator: this.aggregator });
+      if (pathname === '/api/auth/me' && method === 'GET') {
+        handleMe(req, res, { operators: this.operators });
         return;
       }
-      const agentRevoke = pathname.match(/^\/api\/agents\/([A-Za-z0-9_]+)\/revoke$/);
-      if (agentRevoke && method === 'POST') {
-        const id = agentRevoke[1] ?? '';
-        handleRevoke(res, id, { registry: this.registry, aggregator: this.aggregator });
-        return;
-      }
+      // Relay path uses agent bearer (separate from operator auth)
       if (pathname === '/api/relay/event' && method === 'POST') {
         await handleRelayEvent(req, res, {
           registry: this.registry,
@@ -291,6 +300,66 @@ export class ManagerServer {
         });
         return;
       }
+      // Enrollment-token-gated agent registration.
+      if (pathname === '/api/agents/register' && method === 'POST') {
+        await handleRegister(req, res, {
+          registry: this.registry,
+          aggregator: this.aggregator,
+          enrollment: this.enrollment,
+        });
+        return;
+      }
+
+      // Operator-gated endpoints ------------------------------------------
+      if (pathname === '/' && method === 'GET') {
+        const ctx = getAuthContext(req, this.operators);
+        if (!ctx) {
+          res.writeHead(302, { Location: '/login' });
+          res.end();
+          return;
+        }
+        this.serveDashboard(res, nonce);
+        return;
+      }
+
+      const request_id = newRequestId();
+      if (pathname === '/api/status' && method === 'GET') {
+        if (!requireOperator(req, res, this.operators, { request_id })) return;
+        handleStatus(res, { aggregator: this.aggregator, startedAtMs: this.startedAtMs });
+        return;
+      }
+      if (pathname === '/api/agents' && method === 'GET') {
+        if (!requireOperator(req, res, this.operators, { request_id })) return;
+        handleList(res, { registry: this.registry, aggregator: this.aggregator });
+        return;
+      }
+      const agentDetail = pathname.match(/^\/api\/agents\/([A-Za-z0-9_]+)$/);
+      if (agentDetail && method === 'GET') {
+        if (!requireOperator(req, res, this.operators, { request_id })) return;
+        const id = agentDetail[1] ?? '';
+        handleDetail(res, id, { registry: this.registry, aggregator: this.aggregator });
+        return;
+      }
+      const agentRevoke = pathname.match(/^\/api\/agents\/([A-Za-z0-9_]+)\/revoke$/);
+      if (agentRevoke && method === 'POST') {
+        if (!requireOperator(req, res, this.operators, { request_id, minRole: 'admin' })) return;
+        const id = agentRevoke[1] ?? '';
+        handleRevoke(res, id, { registry: this.registry, aggregator: this.aggregator });
+        return;
+      }
+
+      if (pathname === '/api/enrollment-tokens' && method === 'POST') {
+        const ctx = requireOperator(req, res, this.operators, { request_id, minRole: 'admin' });
+        if (!ctx) return;
+        await handleIssue(req, res, { enrollment: this.enrollment }, ctx);
+        return;
+      }
+      if (pathname === '/api/enrollment-tokens' && method === 'GET') {
+        if (!requireOperator(req, res, this.operators, { request_id, minRole: 'admin' })) return;
+        handleEnrollmentList(res, { enrollment: this.enrollment });
+        return;
+      }
+
       fail(res, 404, 'not found', newRequestId());
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);

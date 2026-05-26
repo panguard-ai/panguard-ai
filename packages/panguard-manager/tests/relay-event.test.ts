@@ -8,7 +8,9 @@ import { createServer } from 'node:http';
 import { mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { AgentsRegistry } from '../src/agents-registry.js';
+import { AgentsStore } from '../src/agents-store.js';
+import { OperatorStore } from '../src/operators-store.js';
+import { EnrollmentTokenStore } from '../src/enrollment-store.js';
 import { FleetAggregator } from '../src/aggregator.js';
 import { ManagerServer } from '../src/server.js';
 
@@ -54,8 +56,8 @@ async function post(
   return { status: res.status, body: parsed };
 }
 
-async function getJson(url: string): Promise<unknown> {
-  const res = await fetch(url);
+async function getJson(url: string, headers: Record<string, string> = {}): Promise<unknown> {
+  const res = await fetch(url, { headers });
   return res.json();
 }
 
@@ -64,7 +66,11 @@ describe('relay-event HTTP flow', () => {
   let port: number;
   let server: ManagerServer;
   let base: string;
-  let registry: AgentsRegistry;
+  let registry: AgentsStore;
+  let operators: OperatorStore;
+  let enrollment: EnrollmentTokenStore;
+  let adminCookie: string;
+  let adminOperatorId: number;
 
   beforeEach(async () => {
     tmp = join(
@@ -74,14 +80,36 @@ describe('relay-event HTTP flow', () => {
     mkdirSync(tmp, { recursive: true });
     port = await getFreePort();
     base = `http://127.0.0.1:${port}`;
-    registry = new AgentsRegistry({ filePath: join(tmp, 'agents.json') });
+    registry = new AgentsStore({ dbPath: join(tmp, 'manager.db') });
+    operators = new OperatorStore({ db: registry.getRawDb() });
+    enrollment = new EnrollmentTokenStore({ db: registry.getRawDb() });
+    const op = operators.createOperator({
+      username: 'admin',
+      password: 'integration-test-pw-12345',
+      role: 'admin',
+    });
+    adminOperatorId = op.id;
+    const session = operators.createSession(op.id);
+    adminCookie = `pgm_session=${session.token}`;
     const aggregator = new FleetAggregator();
-    server = new ManagerServer({ port, host: '127.0.0.1', registry, aggregator });
+    server = new ManagerServer({
+      port,
+      host: '127.0.0.1',
+      registry,
+      aggregator,
+      operators,
+      enrollment,
+    });
     await server.start();
   });
 
+  function freshEnrollmentToken(): string {
+    return enrollment.issue({ createdByOperatorId: adminOperatorId }).token;
+  }
+
   afterEach(async () => {
     await server.stop();
+    registry.close();
     rmSync(tmp, { recursive: true, force: true });
   });
 
@@ -93,12 +121,16 @@ describe('relay-event HTTP flow', () => {
   });
 
   it('register issues an agent_id and token', async () => {
-    const r = await post(`${base}/api/agents/register`, {
-      hostname: 'host-1',
-      os_type: 'linux',
-      panguard_version: '1.5.6',
-      machine_id: 'm-1',
-    });
+    const r = await post(
+      `${base}/api/agents/register`,
+      {
+        hostname: 'host-1',
+        os_type: 'linux',
+        panguard_version: '1.5.6',
+        machine_id: 'm-1',
+      },
+      { 'X-Enrollment-Token': freshEnrollmentToken() }
+    );
     expect(r.status).toBe(201);
     const body = r.body as { ok: boolean; data: { agent_id: string; token: string } };
     expect(body.ok).toBe(true);
@@ -106,8 +138,22 @@ describe('relay-event HTTP flow', () => {
     expect(body.data.token).toHaveLength(64);
   });
 
+  it('register without enrollment token is rejected with 401', async () => {
+    const r = await post(`${base}/api/agents/register`, {
+      hostname: 'host-1',
+      os_type: 'linux',
+      panguard_version: '1.5.6',
+      machine_id: 'm-1',
+    });
+    expect(r.status).toBe(401);
+  });
+
   it('register requires hostname + machine_id', async () => {
-    const r = await post(`${base}/api/agents/register`, { os_type: 'linux' });
+    const r = await post(
+      `${base}/api/agents/register`,
+      { os_type: 'linux' },
+      { 'X-Enrollment-Token': freshEnrollmentToken() }
+    );
     expect(r.status).toBe(400);
     const body = r.body as { ok: boolean; error: string };
     expect(body.ok).toBe(false);
@@ -122,12 +168,16 @@ describe('relay-event HTTP flow', () => {
   });
 
   it('relay event with bad token is rejected with 401', async () => {
-    const reg = await post(`${base}/api/agents/register`, {
-      hostname: 'h',
-      os_type: 'linux',
-      panguard_version: '1.5.6',
-      machine_id: 'm',
-    });
+    const reg = await post(
+      `${base}/api/agents/register`,
+      {
+        hostname: 'h',
+        os_type: 'linux',
+        panguard_version: '1.5.6',
+        machine_id: 'm',
+      },
+      { 'X-Enrollment-Token': freshEnrollmentToken() }
+    );
     const { agent_id } = (reg.body as { data: { agent_id: string } }).data;
     const r = await post(
       `${base}/api/relay/event`,
@@ -138,12 +188,16 @@ describe('relay-event HTTP flow', () => {
   });
 
   it('ingests a valid relay event and surfaces it via /api/status', async () => {
-    const reg = await post(`${base}/api/agents/register`, {
-      hostname: 'host-z',
-      os_type: 'darwin',
-      panguard_version: '1.5.6',
-      machine_id: 'm-z',
-    });
+    const reg = await post(
+      `${base}/api/agents/register`,
+      {
+        hostname: 'host-z',
+        os_type: 'darwin',
+        panguard_version: '1.5.6',
+        machine_id: 'm-z',
+      },
+      { 'X-Enrollment-Token': freshEnrollmentToken() }
+    );
     const { agent_id, token } = (reg.body as { data: { agent_id: string; token: string } }).data;
 
     const r = await post(
@@ -162,7 +216,7 @@ describe('relay-event HTTP flow', () => {
     );
     expect(r.status).toBe(200);
 
-    const status = (await getJson(`${base}/api/status`)) as {
+    const status = (await getJson(`${base}/api/status`, { Cookie: adminCookie })) as {
       ok: boolean;
       data: {
         summary: {
@@ -179,7 +233,7 @@ describe('relay-event HTTP flow', () => {
     expect(status.data.summary.threats_24h).toBe(1);
     expect(status.data.summary.atr_rules_active).toBe(336);
 
-    const agents = (await getJson(`${base}/api/agents`)) as {
+    const agents = (await getJson(`${base}/api/agents`, { Cookie: adminCookie })) as {
       data: { agents: ReadonlyArray<{ hostname: string; threats_24h: number }> };
     };
     expect(agents.data.agents).toHaveLength(1);
@@ -187,8 +241,14 @@ describe('relay-event HTTP flow', () => {
     expect(agents.data.agents[0]?.threats_24h).toBe(1);
   });
 
-  it('serves the dashboard HTML on /', async () => {
-    const r = await fetch(`${base}/`);
+  it('redirects unauthenticated GET / to /login', async () => {
+    const r = await fetch(`${base}/`, { redirect: 'manual' });
+    expect(r.status).toBe(302);
+    expect(r.headers.get('location')).toBe('/login');
+  });
+
+  it('serves the dashboard HTML for an authenticated operator', async () => {
+    const r = await fetch(`${base}/`, { headers: { Cookie: adminCookie } });
     expect(r.status).toBe(200);
     const html = await r.text();
     expect(html).toContain('PANGUARD');

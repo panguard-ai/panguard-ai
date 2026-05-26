@@ -19,9 +19,11 @@
   "dependencies": {
     "@panguard-ai/core": "workspace:*",
     "@panguard-ai/panguard-guard": "workspace:*",
+    "better-sqlite3": "^11.0.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8",
     "@types/node": "^22.14.0",
     "@types/ws": "^8.5.13",
     "tsx": "^4.19.0",

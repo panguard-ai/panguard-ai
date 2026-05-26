@@ -74,3 +74,17 @@ export interface ApiResponse<T> {
   readonly error?: string;
   readonly request_id: string;
 }
+
+/** Operator role / 管理員角色 */
+export type OperatorRole = 'admin' | 'viewer';
+
+/** Public-facing operator record (no password material) / 對外公開的管理員紀錄（不含密碼資料） */
+export interface Operator {
+  readonly id: number;
+  readonly username: string;
+  readonly role: OperatorRole;
+  readonly created_at: string;
+  readonly last_login_at?: string;
+  readonly disabled: boolean;
+}
+

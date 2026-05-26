@@ -10,7 +10,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createLogger } from '@panguard-ai/core';
-import type { AgentsRegistry } from '../agents-registry.js';
+import type { AgentsStore } from '../agents-store.js';
 import type { FleetAggregator } from '../aggregator.js';
 import type { RelayEventBody } from '../types.js';
 import { fail, newRequestId, ok, readJsonBody } from './respond.js';
@@ -18,7 +18,7 @@ import { fail, newRequestId, ok, readJsonBody } from './respond.js';
 const logger = createLogger('panguard-manager:api:events');
 
 export interface EventsApiDeps {
-  readonly registry: AgentsRegistry;
+  readonly registry: AgentsStore;
   readonly aggregator: FleetAggregator;
   /** Broadcast hook fired after an event is ingested / 事件入庫後觸發的廣播 hook */
   readonly broadcast: (payload: {
