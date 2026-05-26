@@ -323,6 +323,152 @@
         line-height: 1.7;
         margin-bottom: 16px;
       }
+      .auth-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--s2);
+        border-top: 1px solid var(--bd);
+        font-size: 11px;
+        color: var(--tm);
+      }
+      .auth-user {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .auth-user .role {
+        color: var(--sage);
+        margin-left: 4px;
+        font-weight: 600;
+      }
+      .btn {
+        background: var(--s0);
+        border: 1px solid var(--bd);
+        color: var(--t1);
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn:hover {
+        border-color: var(--sage);
+      }
+      .btn.primary {
+        background: var(--sage);
+        color: var(--s0);
+        border-color: var(--sage);
+        font-weight: 600;
+      }
+      .btn.primary:hover {
+        background: #a3b3a7;
+        border-color: #a3b3a7;
+      }
+      .btn.danger {
+        color: var(--bad);
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+      .btn.danger:hover {
+        border-color: var(--bad);
+      }
+      .btn-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .modal-back {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+      }
+      .modal-back.on {
+        display: flex;
+      }
+      .modal {
+        background: var(--s1);
+        border: 1px solid var(--bd);
+        border-radius: var(--r);
+        padding: 24px;
+        width: 480px;
+        max-width: 90vw;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+      .modal h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+      .modal label {
+        display: block;
+        font-size: 11px;
+        color: var(--tm);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+        margin-top: 12px;
+      }
+      .modal input,
+      .modal textarea {
+        width: 100%;
+        background: var(--s0);
+        border: 1px solid var(--bd);
+        border-radius: 6px;
+        color: var(--t1);
+        font: inherit;
+        padding: 8px 10px;
+        box-sizing: border-box;
+      }
+      .modal input:focus,
+      .modal textarea:focus {
+        outline: 1px solid var(--sage);
+        border-color: var(--sage);
+      }
+      .modal .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 20px;
+      }
+      .token-display {
+        background: var(--s0);
+        border: 1px solid var(--sage);
+        border-radius: 6px;
+        padding: 12px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        word-break: break-all;
+        margin: 10px 0;
+        color: var(--t1);
+      }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--s2);
+        border: 1px solid var(--sage);
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 13px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all 0.2s;
+        z-index: 110;
+      }
+      .toast.on {
+        opacity: 1;
+        transform: translateY(0);
+      }
     </style>
   </head>
   <body>
@@ -336,6 +482,11 @@
         <div class="ni" data-tab="agents">Agents</div>
         <div class="ni" data-tab="threats">Threats</div>
         <div class="ni" data-tab="events">Events</div>
+        <div class="ni hidden" id="nav-enrollment" data-tab="enrollment">Enrollment</div>
+      </div>
+      <div class="auth-bar">
+        <div class="auth-user" id="auth-user">…</div>
+        <button class="btn" id="logout-btn" title="Sign out">Logout</button>
       </div>
       <div class="sb-ft">
         <div class="ws-b">
@@ -427,7 +578,74 @@
           <div class="empty">No events received yet.</div>
         </div>
       </div>
+
+      <div class="pg" id="p-enrollment">
+        <div class="pt"><em>Enrollment</em> Tokens</div>
+        <div class="pd">
+          One-time bearer tokens that authorise new Guards to register with this Manager. Issue
+          a token, share it out-of-band with the Guard installer, and revoke once consumed or
+          if compromised. Plaintext is shown only at issue time.
+        </div>
+        <div class="btn-row" style="margin-bottom: 16px">
+          <button class="btn primary" id="issue-token-btn">+ Issue new token</button>
+        </div>
+        <table class="tb">
+          <thead>
+            <tr>
+              <th>Created</th>
+              <th>Description</th>
+              <th>Expires</th>
+              <th>Status</th>
+              <th>Bound to agent</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="enrollment-tb">
+            <tr>
+              <td colspan="6" class="empty">No enrollment tokens issued yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- Modal: issue token form -->
+    <div class="modal-back" id="modal-issue">
+      <div class="modal">
+        <h3>Issue enrollment token</h3>
+        <label for="modal-desc">Description (optional)</label>
+        <input
+          type="text"
+          id="modal-desc"
+          placeholder="fleet-a · datacenter-west"
+          maxlength="200"
+        />
+        <label for="modal-ttl">TTL (hours)</label>
+        <input type="number" id="modal-ttl" value="24" min="1" max="8760" />
+        <div class="actions">
+          <button class="btn" id="modal-issue-cancel">Cancel</button>
+          <button class="btn primary" id="modal-issue-submit">Issue</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: show issued plaintext (one-time) -->
+    <div class="modal-back" id="modal-show">
+      <div class="modal">
+        <h3>New enrollment token</h3>
+        <p style="font-size: 12px; color: var(--tm); line-height: 1.5">
+          Copy this now — it will not be shown again. Anyone with this token can register a Guard
+          against this Manager until it is consumed, expires, or is revoked.
+        </p>
+        <div class="token-display" id="show-token"></div>
+        <div class="actions">
+          <button class="btn" id="modal-show-copy">Copy</button>
+          <button class="btn primary" id="modal-show-done">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
 
     <script nonce="__NONCE__">
       (function () {
@@ -597,11 +815,37 @@
           threatsTb.innerHTML = recentThreats.join('');
         }
 
+        // ----- Auth-aware fetch ---------------------------------------------------
+        // Wraps fetch so a 401 anywhere in the dashboard sends the operator to
+        // /login instead of letting the page silently fail. Returns null on 401
+        // (after kicking off the redirect); callers must handle the null path.
+        let __redirected = false;
+        async function apiFetch(url, opts) {
+          const r = await fetch(url, opts);
+          if (r.status === 401) {
+            if (!__redirected) {
+              __redirected = true;
+              window.location.href = '/login';
+            }
+            return null;
+          }
+          return r;
+        }
+        async function apiJson(url, opts) {
+          const r = await apiFetch(url, opts);
+          if (!r) return null;
+          try {
+            return await r.json();
+          } catch (e) {
+            return null;
+          }
+        }
+
         async function refreshStatus() {
           try {
-            const s = await fetch('/api/status').then((r) => r.json());
+            const s = await apiJson('/api/status');
             if (s && s.ok && s.data && s.data.summary) renderSummary(s.data.summary);
-            const a = await fetch('/api/agents').then((r) => r.json());
+            const a = await apiJson('/api/agents');
             if (a && a.ok && a.data && Array.isArray(a.data.agents)) renderAgents(a.data.agents);
           } catch (e) {
             /* network blip, will retry */
@@ -645,9 +889,197 @@
           };
         }
 
-        refreshStatus();
-        setInterval(refreshStatus, 5000);
-        connectWS();
+        // ----- Auth bar + role gating --------------------------------------------
+        const authUserEl = document.getElementById('auth-user');
+        const logoutBtn = document.getElementById('logout-btn');
+        const navEnrollment = document.getElementById('nav-enrollment');
+        let currentOp = null;
+
+        function escAttr(s) {
+          return String(s ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        }
+
+        async function loadMe() {
+          const r = await apiFetch('/api/auth/me');
+          if (!r) return null;
+          if (!r.ok) return null;
+          const j = await r.json();
+          if (!j || !j.ok || !j.data || !j.data.operator) return null;
+          currentOp = j.data.operator;
+          authUserEl.innerHTML =
+            escAttr(currentOp.username) +
+            '<span class="role">· ' +
+            escAttr(currentOp.role) +
+            '</span>';
+          if (currentOp.role === 'admin') {
+            navEnrollment.classList.remove('hidden');
+          }
+          return currentOp;
+        }
+
+        logoutBtn.addEventListener('click', async () => {
+          try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+          } catch (e) {
+            /* ignore network errors — redirect anyway */
+          }
+          window.location.href = '/login';
+        });
+
+        // ----- Toast --------------------------------------------------------------
+        const toastEl = document.getElementById('toast');
+        let toastTimer = null;
+        function toast(msg) {
+          toastEl.textContent = msg;
+          toastEl.classList.add('on');
+          if (toastTimer) clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => toastEl.classList.remove('on'), 2400);
+        }
+
+        // ----- Enrollment tokens (admin only) ------------------------------------
+        const enrollTb = document.getElementById('enrollment-tb');
+        const issueBtn = document.getElementById('issue-token-btn');
+        const modalIssue = document.getElementById('modal-issue');
+        const modalShow = document.getElementById('modal-show');
+        const showTokenEl = document.getElementById('show-token');
+        let lastIssuedToken = '';
+
+        function tokenStatusBadge(t) {
+          const now = Date.now();
+          if (t.revoked)
+            return '<span class="badge badge-off">revoked</span>';
+          if (t.used_at)
+            return '<span class="badge badge-ok">used</span>';
+          if (Date.parse(t.expires_at) < now)
+            return '<span class="badge badge-w">expired</span>';
+          return '<span class="badge badge-ok">active</span>';
+        }
+
+        function renderEnrollmentRows(tokens) {
+          if (!tokens || tokens.length === 0) {
+            enrollTb.innerHTML =
+              '<tr><td colspan="6" class="empty">No enrollment tokens issued yet.</td></tr>';
+            return;
+          }
+          enrollTb.innerHTML = tokens
+            .map((t) => {
+              const isActive =
+                !t.revoked &&
+                !t.used_at &&
+                Date.parse(t.expires_at) >= Date.now();
+              const desc = t.description ? escAttr(t.description) : '<span style="color:var(--tm)">—</span>';
+              const boundTo = t.used_by_agent_id ? escAttr(t.used_by_agent_id) : '<span style="color:var(--tm)">—</span>';
+              const action = isActive
+                ? '<button class="btn danger" data-revoke="' + escAttr(t.token_hash) + '">Revoke</button>'
+                : '';
+              return (
+                '<tr>' +
+                '<td>' + esc(fmtTime(t.created_at)) + '</td>' +
+                '<td>' + desc + '</td>' +
+                '<td>' + esc(fmtTime(t.expires_at)) + '</td>' +
+                '<td>' + tokenStatusBadge(t) + '</td>' +
+                '<td>' + boundTo + '</td>' +
+                '<td style="text-align:right">' + action + '</td>' +
+                '</tr>'
+              );
+            })
+            .join('');
+        }
+
+        async function loadEnrollmentTokens() {
+          if (!currentOp || currentOp.role !== 'admin') return;
+          const j = await apiJson('/api/enrollment-tokens');
+          if (!j || !j.ok || !j.data) return;
+          renderEnrollmentRows(j.data.tokens || []);
+        }
+
+        enrollTb.addEventListener('click', async (ev) => {
+          const target = ev.target;
+          if (!(target instanceof HTMLElement)) return;
+          const hash = target.getAttribute('data-revoke');
+          if (!hash) return;
+          if (!confirm('Revoke this enrollment token? Any pending Guard install will fail.')) return;
+          const r = await apiFetch('/api/enrollment-tokens/' + encodeURIComponent(hash) + '/revoke', {
+            method: 'POST',
+          });
+          if (!r) return;
+          if (r.ok) {
+            toast('Token revoked');
+            loadEnrollmentTokens();
+          } else {
+            const body = await r.json().catch(() => ({}));
+            toast('Revoke failed: ' + (body.error || r.status));
+          }
+        });
+
+        issueBtn.addEventListener('click', () => {
+          document.getElementById('modal-desc').value = '';
+          document.getElementById('modal-ttl').value = '24';
+          modalIssue.classList.add('on');
+        });
+        document
+          .getElementById('modal-issue-cancel')
+          .addEventListener('click', () => modalIssue.classList.remove('on'));
+        document.getElementById('modal-issue-submit').addEventListener('click', async () => {
+          const desc = document.getElementById('modal-desc').value.trim();
+          const ttlH = parseInt(document.getElementById('modal-ttl').value, 10);
+          if (!Number.isFinite(ttlH) || ttlH < 1 || ttlH > 8760) {
+            toast('TTL must be 1 to 8760 hours');
+            return;
+          }
+          const body = { ttl_ms: ttlH * 60 * 60 * 1000 };
+          if (desc) body.description = desc;
+          const r = await apiFetch('/api/enrollment-tokens', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          if (!r) return;
+          if (!r.ok) {
+            const j = await r.json().catch(() => ({}));
+            toast('Issue failed: ' + (j.error || r.status));
+            return;
+          }
+          const j = await r.json();
+          modalIssue.classList.remove('on');
+          lastIssuedToken = (j.data && j.data.token) || '';
+          showTokenEl.textContent = lastIssuedToken;
+          modalShow.classList.add('on');
+          loadEnrollmentTokens();
+        });
+        document.getElementById('modal-show-copy').addEventListener('click', async () => {
+          if (!lastIssuedToken) return;
+          try {
+            await navigator.clipboard.writeText(lastIssuedToken);
+            toast('Token copied');
+          } catch (e) {
+            toast('Copy failed — select the token text manually');
+          }
+        });
+        document.getElementById('modal-show-done').addEventListener('click', () => {
+          modalShow.classList.remove('on');
+          lastIssuedToken = '';
+          showTokenEl.textContent = '';
+        });
+
+        // ----- Boot ---------------------------------------------------------------
+        (async function init() {
+          const op = await loadMe();
+          if (!op) return; // apiFetch already redirected on 401
+          refreshStatus();
+          setInterval(refreshStatus, 5000);
+          connectWS();
+          // Refresh enrollment view when its tab is shown
+          document.querySelectorAll('.ni').forEach((n) =>
+            n.addEventListener('click', () => {
+              if (n.getAttribute('data-tab') === 'enrollment') loadEnrollmentTokens();
+            })
+          );
+        })();
       })();
     </script>
   </body>

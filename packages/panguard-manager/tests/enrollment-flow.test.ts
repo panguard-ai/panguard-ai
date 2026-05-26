@@ -146,16 +146,23 @@ describe('enrollment-token HTTP flow', () => {
 
   describe('GET /api/enrollment-tokens', () => {
     it('admin can list', async () => {
-      enrollment.issue({ createdByOperatorId: 1, description: 'a' });
+      const a = enrollment.issue({ createdByOperatorId: 1, description: 'a' });
       enrollment.issue({ createdByOperatorId: 1, description: 'b' });
       const r = await req(`${base}/api/enrollment-tokens`, {
         headers: { Cookie: adminCookie },
       });
       expect(r.status).toBe(200);
-      const body = r.body as { data: { tokens: unknown[]; total: number } };
+      const body = r.body as {
+        data: { tokens: ReadonlyArray<{ token_hash: string }>; total: number };
+      };
       expect(body.data.total).toBe(2);
-      // Plaintext token MUST NOT leak via list endpoint.
-      expect(JSON.stringify(body)).not.toMatch(/token_hash/);
+      // The PLAINTEXT token must never leak — it should be unreachable from any
+      // API surface after issue.
+      const serialised = JSON.stringify(body);
+      expect(serialised).not.toContain(a.token);
+      // The token_hash IS exposed so an admin UI can identify which row to
+      // revoke. It is sha256(plaintext), not reversible.
+      expect(body.data.tokens[0]?.token_hash).toMatch(/^[a-f0-9]{64}$/);
     });
 
     it('viewer cannot list (403)', async () => {
@@ -163,6 +170,73 @@ describe('enrollment-token HTTP flow', () => {
         headers: { Cookie: viewerCookie },
       });
       expect(r.status).toBe(403);
+    });
+  });
+
+  describe('POST /api/enrollment-tokens/:hash/revoke', () => {
+    it('admin can revoke by hash', async () => {
+      const { token } = enrollment.issue({ createdByOperatorId: 1 });
+      const listResp = await req(`${base}/api/enrollment-tokens`, {
+        headers: { Cookie: adminCookie },
+      });
+      const list = listResp.body as { data: { tokens: ReadonlyArray<{ token_hash: string }> } };
+      const hash = list.data.tokens[0]?.token_hash ?? '';
+
+      const r = await req(`${base}/api/enrollment-tokens/${hash}/revoke`, {
+        method: 'POST',
+        headers: { Cookie: adminCookie },
+      });
+      expect(r.status).toBe(200);
+      const body = r.body as { data: { revoked: boolean } };
+      expect(body.data.revoked).toBe(true);
+
+      // Token now unusable for registration.
+      const reg = await req(`${base}/api/agents/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Enrollment-Token': token },
+        body: JSON.stringify({
+          hostname: 'h',
+          os_type: 'linux',
+          panguard_version: 'x',
+          machine_id: 'm-revoked',
+        }),
+      });
+      expect(reg.status).toBe(401);
+    });
+
+    it('viewer cannot revoke (403)', async () => {
+      enrollment.issue({ createdByOperatorId: 1 });
+      const list = (
+        (await req(`${base}/api/enrollment-tokens`, {
+          headers: { Cookie: adminCookie },
+        })).body as { data: { tokens: ReadonlyArray<{ token_hash: string }> } }
+      ).data.tokens;
+      const hash = list[0]?.token_hash ?? '';
+      const r = await req(`${base}/api/enrollment-tokens/${hash}/revoke`, {
+        method: 'POST',
+        headers: { Cookie: viewerCookie },
+      });
+      expect(r.status).toBe(403);
+    });
+
+    it('invalid hash format → 400', async () => {
+      const r = await req(`${base}/api/enrollment-tokens/notahash/revoke`, {
+        method: 'POST',
+        headers: { Cookie: adminCookie },
+      });
+      // Server router pattern requires 64 hex chars, so this hits the
+      // catch-all 404 — but if we kept routing, the handler also returns
+      // 400. Either is correct (refusing to act on a malformed input).
+      expect([400, 404]).toContain(r.status);
+    });
+
+    it('unknown hash → 404', async () => {
+      const fakeHash = 'f'.repeat(64);
+      const r = await req(`${base}/api/enrollment-tokens/${fakeHash}/revoke`, {
+        method: 'POST',
+        headers: { Cookie: adminCookie },
+      });
+      expect(r.status).toBe(404);
     });
   });
 

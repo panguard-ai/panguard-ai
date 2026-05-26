@@ -25,7 +25,11 @@ import { handleDetail, handleList, handleRegister, handleRevoke } from './api/ag
 import { handleRelayEvent } from './api/events.js';
 import { handleHealth, handleStatus } from './api/status.js';
 import { handleLogin, handleLogout, handleMe } from './api/auth.js';
-import { handleIssue, handleList as handleEnrollmentList } from './api/enrollment.js';
+import {
+  handleIssue,
+  handleList as handleEnrollmentList,
+  handleRevoke as handleEnrollmentRevoke,
+} from './api/enrollment.js';
 import { fail, newRequestId } from './api/respond.js';
 import { getAuthContext, requireOperator } from './api/session.js';
 import { renderLoginPage } from './login-page.js';
@@ -357,6 +361,16 @@ export class ManagerServer {
       if (pathname === '/api/enrollment-tokens' && method === 'GET') {
         if (!requireOperator(req, res, this.operators, { request_id, minRole: 'admin' })) return;
         handleEnrollmentList(res, { enrollment: this.enrollment });
+        return;
+      }
+      const enrollmentRevoke = pathname.match(
+        /^\/api\/enrollment-tokens\/([a-f0-9]{64})\/revoke$/
+      );
+      if (enrollmentRevoke && method === 'POST') {
+        const ctx = requireOperator(req, res, this.operators, { request_id, minRole: 'admin' });
+        if (!ctx) return;
+        const hash = enrollmentRevoke[1] ?? '';
+        handleEnrollmentRevoke(res, hash, { enrollment: this.enrollment }, ctx);
         return;
       }
 

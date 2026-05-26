@@ -63,3 +63,24 @@ export function handleList(res: ServerResponse, deps: EnrollmentApiDeps): void {
   const tokens = deps.enrollment.listAll();
   ok(res, { tokens, total: tokens.length }, request_id);
 }
+
+/** POST /api/enrollment-tokens/:tokenHash/revoke (admin) / 撤銷 enrollment token */
+export function handleRevoke(
+  res: ServerResponse,
+  tokenHash: string,
+  deps: EnrollmentApiDeps,
+  auth: AuthContext
+): void {
+  const request_id = newRequestId();
+  if (!/^[a-f0-9]{64}$/.test(tokenHash)) {
+    fail(res, 400, 'invalid token hash', request_id);
+    return;
+  }
+  const revoked = deps.enrollment.revokeByHash(tokenHash);
+  if (!revoked) {
+    fail(res, 404, 'token not found or already revoked', request_id);
+    return;
+  }
+  logger.info(`Enrollment token ${tokenHash.slice(0, 8)}… revoked by ${auth.operator.username}`);
+  ok(res, { token_hash: tokenHash, revoked: true }, request_id);
+}

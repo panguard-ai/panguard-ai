@@ -26,8 +26,16 @@ function hashToken(plaintext: string): string {
   return createHash('sha256').update(plaintext).digest('hex');
 }
 
-/** Public-facing token record (no hash, no plaintext) / 對外公開的 token 紀錄 */
+/**
+ * Public-facing token record. Includes `token_hash` so an admin UI can
+ * identify tokens for revoke without ever seeing the plaintext (hash is
+ * SHA256(plaintext) — not reversible).
+ *
+ * 對外公開的 token 紀錄；含 token_hash 讓管理介面能識別到要撤銷哪一個,
+ * 但永遠看不到 plaintext。
+ */
 export interface EnrollmentToken {
+  readonly token_hash: string;
   readonly description?: string;
   readonly created_by_operator_id: number;
   readonly created_at: string;
@@ -56,6 +64,7 @@ export type ConsumeResult =
 
 function rowToToken(row: EnrollmentTokenRow): EnrollmentToken {
   return {
+    token_hash: row.token_hash,
     created_by_operator_id: row.created_by_operator_id,
     created_at: row.created_at,
     expires_at: row.expires_at,
@@ -173,10 +182,21 @@ export class EnrollmentTokenStore {
     return { ok: true };
   }
 
-  /** Revoke an unused token / 撤銷未使用的 token */
+  /** Revoke an unused token by its plaintext / 用明文撤銷未使用的 token */
   revoke(plaintext: string): boolean {
     if (!plaintext) return false;
     const info = this.stmtRevoke.run(new Date().toISOString(), hashToken(plaintext));
+    return info.changes === 1;
+  }
+
+  /**
+   * Revoke a token by its stored hash. Used by the admin UI which only
+   * ever sees the hash (plaintext was destroyed after issue).
+   * 用 hash 撤銷 token；管理 UI 永遠只看到 hash,不會看到 plaintext。
+   */
+  revokeByHash(tokenHash: string): boolean {
+    if (!tokenHash || !/^[a-f0-9]{64}$/.test(tokenHash)) return false;
+    const info = this.stmtRevoke.run(new Date().toISOString(), tokenHash);
     return info.changes === 1;
   }
 
