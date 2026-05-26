@@ -93,9 +93,13 @@ function parseAndValidateRule(ruleContent: string): {
     errors.push('Missing test_cases.true_positives (required for Cisco-quality rules)');
   }
 
-  // Must have detection.conditions
+  // Must have detection.conditions OR detection.condition (terminal form).
+  // Previously used `||` which rejected rules that legitimately had one but
+  // not both. The error message already says "or", and downstream consumers
+  // accept either shape — so the operator must be `&&` (reject only when
+  // BOTH are missing).
   const detection = parsed['detection'] as Record<string, unknown> | undefined;
-  if (!detection?.['conditions'] || !detection?.['condition']) {
+  if (!detection?.['conditions'] && !detection?.['condition']) {
     errors.push('Missing detection.conditions or detection.condition');
   }
 

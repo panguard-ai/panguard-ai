@@ -65,6 +65,7 @@ import {
   SkillThreatSchema,
   SkillWhitelistItemSchema,
 } from '@panguard-ai/core';
+import { parseATRRule, validateRuleMeetsStandard } from '@panguard-ai/atr/quality';
 import { z } from 'zod';
 import type {
   ServerConfig,
@@ -1729,6 +1730,41 @@ export class ThreatCloudServer {
   private async handlePostATRProposal(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const data = await this.parseAndValidate(req, res, ATRProposalSchema);
     if (!data) return;
+
+    // Structural quality gate — the same one the internal LLM crystallization
+    // paths (analyzeSkills, draftRuleFromPayload) apply before storing into
+    // atr_proposals. Without this, external POSTs can stuff arbitrary strings
+    // into the rule_content field; they pass the 24h canary trivially
+    // (malformed rules can't trigger anything, so accrue zero negative
+    // feedback) and graduate to "promoted", then flood the PR-back pipeline.
+    // Observed 2026-05-26: PR-back fetched 14 promoted rules, all 14 skipped
+    // for missing every required top-level field. Root cause was this gap.
+    // Reject at submission so garbage never enters the pipeline.
+    try {
+      const metadata = parseATRRule(data.ruleContent);
+      const gateResult = validateRuleMeetsStandard(metadata, 'experimental');
+      if (!gateResult.passed) {
+        this.sendJson(res, 400, {
+          ok: false,
+          error: 'rule_quality_gate_failed',
+          message:
+            'Proposed rule does not meet the experimental quality bar. ' +
+            'See https://agentthreatrule.org/spec for required structure.',
+          issues: gateResult.issues,
+        });
+        return;
+      }
+    } catch (parseErr) {
+      this.sendJson(res, 400, {
+        ok: false,
+        error: 'rule_parse_failed',
+        message:
+          'Proposed rule_content failed to parse as a valid ATR YAML rule. ' +
+          'See https://agentthreatrule.org/spec for required structure.',
+        detail: parseErr instanceof Error ? parseErr.message : String(parseErr),
+      });
+      return;
+    }
 
     const clientId = (req.headers['x-panguard-client-id'] as string) ?? undefined;
 
