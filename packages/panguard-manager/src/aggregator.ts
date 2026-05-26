@@ -10,6 +10,7 @@
 
 import type { DashboardEvent, ThreatVerdict } from '@panguard-ai/panguard-guard';
 import type { AgentRecord, AgentSnapshot, FleetSummary, RelayEventBody } from './types.js';
+import type { EventsStore } from './events-store.js';
 
 /** Maximum events buffered per agent / 每個代理緩衝的事件最大數量 */
 const MAX_EVENTS_PER_AGENT = 500;
@@ -41,6 +42,13 @@ export interface FleetAggregatorOptions {
   readonly onlineThresholdMs?: number;
   /** Override for now() — useful for deterministic tests / now() 的覆寫——測試確定性用 */
   readonly nowMs?: () => number;
+  /**
+   * Optional persistence sink. When provided, ingest() write-through-caches
+   * each relay payload into the events store so a Manager restart can
+   * rebuild this aggregator's state from disk via {@link hydrateAgentFromStore}.
+   * 可選的持久化 sink；提供後 ingest 會 write-through 寫入 events store。
+   */
+  readonly eventsStore?: EventsStore;
 }
 
 /**
@@ -50,10 +58,12 @@ export class FleetAggregator {
   private readonly state: Map<string, AgentState> = new Map();
   private readonly onlineThresholdMs: number;
   private readonly now: () => number;
+  private readonly eventsStore: EventsStore | null;
 
   constructor(options: FleetAggregatorOptions = {}) {
     this.onlineThresholdMs = options.onlineThresholdMs ?? ONLINE_THRESHOLD_MS;
     this.now = options.nowMs ?? (() => Date.now());
+    this.eventsStore = options.eventsStore ?? null;
   }
 
   /** Bootstrap aggregator with previously-registered agents (offline by default) / 用先前註冊的代理開機聚合器（預設離線） */
@@ -73,6 +83,40 @@ export class FleetAggregator {
         threat_times_ms: [],
       });
     }
+  }
+
+  /**
+   * Replay persisted history for a single agent. Used at Manager boot so
+   * the dashboard shows pre-restart events without waiting for the next
+   * relay. Idempotent: re-hydrating an agent that already has live state
+   * is a no-op (in-memory wins, since it may be newer than disk).
+   */
+  hydrateAgentFromStore(
+    record: AgentRecord,
+    hydration: {
+      readonly events: ReadonlyArray<DashboardEvent>;
+      readonly verdicts: ReadonlyArray<ThreatVerdict>;
+      readonly threat_times_ms: ReadonlyArray<number>;
+      readonly last_seen_ms: number | undefined;
+      readonly events_total: number;
+      readonly atr_rules_active: number;
+      readonly mode: 'learning' | 'protection' | 'unknown';
+    }
+  ): void {
+    if (this.state.has(record.agent_id)) return;
+    this.state.set(record.agent_id, {
+      hostname: record.hostname,
+      os_type: record.os_type,
+      panguard_version: record.panguard_version,
+      mode: hydration.mode,
+      last_seen_ms:
+        hydration.last_seen_ms ?? (record.last_seen ? Date.parse(record.last_seen) : 0),
+      events_total: hydration.events_total,
+      atr_rules_active: hydration.atr_rules_active,
+      events: hydration.events.slice(-MAX_EVENTS_PER_AGENT),
+      verdicts: hydration.verdicts.slice(-MAX_VERDICTS_PER_AGENT),
+      threat_times_ms: [...hydration.threat_times_ms],
+    });
   }
 
   /** Apply an incoming relay event to the aggregated state / 把進來的 relay 事件套用到彙整狀態 */
@@ -134,6 +178,17 @@ export class FleetAggregator {
     }
 
     this.state.set(record.agent_id, next);
+
+    // Persist after in-memory state is committed. A throw from the store
+    // must not corrupt live dashboard state — log only.
+    // 在記憶體 commit 之後持久化；store 拋例外不能弄壞 live 狀態，僅記錄。
+    if (this.eventsStore) {
+      try {
+        this.eventsStore.record(record.agent_id, body, this.now());
+      } catch {
+        /* best-effort persistence */
+      }
+    }
   }
 
   /** Build a single-agent drill-down view / 建立單代理 drill-down 視圖 */

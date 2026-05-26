@@ -18,6 +18,7 @@ import { createLogger } from '@panguard-ai/core';
 import { AgentsStore } from './agents-store.js';
 import { OperatorStore } from './operators-store.js';
 import { EnrollmentTokenStore } from './enrollment-store.js';
+import { EventsStore, DEFAULT_RETENTION_MS } from './events-store.js';
 import { FleetAggregator } from './aggregator.js';
 import { ManagerServer } from './server.js';
 
@@ -106,6 +107,7 @@ async function cmdServe(flags: Readonly<Record<string, string | boolean>>): Prom
   const registry = new AgentsStore({ dbPath });
   const operators = new OperatorStore({ db: registry.getRawDb() });
   const enrollment = new EnrollmentTokenStore({ db: registry.getRawDb() });
+  const events = new EventsStore({ db: registry.getRawDb() });
   if (operators.listOperators().length === 0) {
     process.stderr.write(
       `\nNo operator accounts exist. Run 'panguard-manager init' first to bootstrap an admin.\n`
@@ -113,8 +115,26 @@ async function cmdServe(flags: Readonly<Record<string, string | boolean>>): Prom
     registry.close();
     process.exit(2);
   }
-  const aggregator = new FleetAggregator();
-  aggregator.hydrateFromRegistry(registry.list());
+  const aggregator = new FleetAggregator({ eventsStore: events });
+  // Hydrate every known agent with the last 24h of persisted history so
+  // a restarted Manager doesn't show an empty dashboard.
+  for (const record of registry.list()) {
+    aggregator.hydrateAgentFromStore(record, events.hydrateAgent(record.agent_id));
+  }
+
+  // Sweep old rows every hour. DEFAULT_RETENTION_MS = 30 days.
+  const sweepTimer: ReturnType<typeof setInterval> = setInterval(() => {
+    try {
+      const deleted = events.sweep(DEFAULT_RETENTION_MS);
+      if (deleted > 0) logger.info(`Sweep: deleted ${deleted} expired agent_events rows`);
+    } catch (err: unknown) {
+      logger.warn(
+        `Sweep failed: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }, 60 * 60 * 1000);
+  // Don't keep the process alive solely for this timer.
+  sweepTimer.unref();
 
   const server = new ManagerServer({
     port,
@@ -128,6 +148,7 @@ async function cmdServe(flags: Readonly<Record<string, string | boolean>>): Prom
 
   const shutdown = async (signal: string): Promise<void> => {
     logger.info(`Received ${signal}, shutting down...`);
+    clearInterval(sweepTimer);
     await server.stop();
     registry.close();
     process.exit(0);

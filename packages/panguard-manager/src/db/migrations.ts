@@ -117,6 +117,43 @@ export const migrations: readonly Migration[] = [
       `);
     },
   },
+  {
+    version: 4,
+    name: 'create_agent_events',
+    up: (db) => {
+      db.exec(`
+        -- Persistent log of every event / verdict / status payload relayed
+        -- by a Guard. Survives Manager restarts so the dashboard can show
+        -- history beyond the in-memory aggregator window. Retention is
+        -- enforced by EventsStore.sweep() (default 30 days).
+        --
+        -- payload_json holds the original RelayEventBody slice as-is —
+        -- denormalising specific fields here would couple this schema to
+        -- the relay contract, which is owned by the Guard.
+        --
+        -- is_threat denormalises the FleetAggregator threat-counting rule
+        -- so 24h rolling counts are an indexed scan, not a JSON parse over
+        -- every row.
+        CREATE TABLE agent_events (
+          id            INTEGER PRIMARY KEY AUTOINCREMENT,
+          agent_id      TEXT NOT NULL,
+          kind          TEXT NOT NULL CHECK (kind IN ('event', 'verdict', 'status')),
+          payload_json  TEXT NOT NULL,
+          observed_at   TEXT NOT NULL,
+          is_threat     INTEGER NOT NULL DEFAULT 0,
+          FOREIGN KEY (agent_id) REFERENCES agents(agent_id) ON DELETE CASCADE
+        );
+
+        CREATE INDEX idx_agent_events_agent_kind_observed
+          ON agent_events (agent_id, kind, observed_at DESC);
+        CREATE INDEX idx_agent_events_observed_at
+          ON agent_events (observed_at);
+        CREATE INDEX idx_agent_events_threats
+          ON agent_events (agent_id, observed_at DESC)
+          WHERE is_threat = 1;
+      `);
+    },
+  },
 ];
 
 /**

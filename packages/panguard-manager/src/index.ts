@@ -20,6 +20,12 @@ export type {
   IssueTokenOptions,
   ConsumeResult,
 } from './enrollment-store.js';
+export { EventsStore, isThreatVerdict, DEFAULT_RETENTION_MS } from './events-store.js';
+export type {
+  EventsStoreOptions,
+  RecordedEvent,
+  AgentHydration,
+} from './events-store.js';
 export { FleetAggregator } from './aggregator.js';
 export type { FleetAggregatorOptions } from './aggregator.js';
 export { ManagerServer } from './server.js';

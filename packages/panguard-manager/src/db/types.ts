@@ -54,3 +54,16 @@ export interface EnrollmentTokenRow {
   used_by_agent_id: string | null;
   revoked_at: string | null;
 }
+
+/** Kinds of payloads persisted in the `agent_events` table / `agent_events` 表持久化的承載類型 */
+export type AgentEventKind = 'event' | 'verdict' | 'status';
+
+/** Row shape of the `agent_events` table / `agent_events` 表的列形狀 */
+export interface AgentEventRow {
+  id: number;
+  agent_id: string;
+  kind: AgentEventKind;
+  payload_json: string;
+  observed_at: string;
+  is_threat: number;
+}
