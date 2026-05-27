@@ -9,3 +9,8 @@ config/sigma-rules/
 config/yara-rules/
 bundled-rules/
 test-results/
+
+# Next.js auto-generated type bridge — regenerated on every build,
+# we never edit it. Formatting churn here is noise.
+next-env.d.ts
+.next/
