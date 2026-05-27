@@ -27,18 +27,18 @@ export const STATS = {
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
   atrVersion: '2.2.2',
   /** ATR v2.2.x: stable + experimental total */
-  atrRules: 421,
+  atrRules: 444,
   atrStableRules: 359,
   atrExperimentalRules: 62,
   /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
   atrCommunityRules: 93,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
   atrPatterns: 920,
-  totalRules: 421,
+  totalRules: 444,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '421' as const,
+  totalRulesDisplay: '444' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '421' as const,
+  atrRulesDisplay: '444' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -75,14 +75,14 @@ export const STATS = {
       { id: 'ASI10', rules: 7, strength: 'MODERATE' as const },
     ],
   },
-  /** Per-category breakdown (ATR v2.2.0, physical .yml files in agent-threat-rules/rules/) */
+  /** Per-category breakdown — synced from agent-threat-rules/data/stats.json (2026-05-27 regen, 444 total). */
   rulesByCategory: {
-    'prompt-injection': 172,
+    'prompt-injection': 173,
     'agent-manipulation': 105,
-    'skill-compromise': 41,
+    'skill-compromise': 43,
     'context-exfiltration': 41,
-    'tool-poisoning': 27,
-    'privilege-escalation': 12,
+    'tool-poisoning': 43,
+    'privilege-escalation': 16,
     'model-abuse': 10,
     'excessive-autonomy': 8,
     'model-security': 3,
@@ -203,8 +203,13 @@ export const STATS = {
     /** 13 external PR merges across 6 external orgs */
     externalPRMerges: 13,
     externalOrgs: 6,
-    /** 23K monthly downloads (synced from agent-threat-rules/stats.json) */
-    npmDownloads30d: 23_000,
+    /**
+     * Monthly downloads summed across @panguard-ai/* npm scope + agent-threat-rules
+     * + pyatr (PyPI). Manually re-fetched 2026-05-26 from npmjs.org + pypistats.org;
+     * not auto-synced from stats.json (that file does not track this number today).
+     * TODO: wire scripts/sync-npm-downloads.ts to refresh this monthly.
+     */
+    npmDownloads30d: 10_046,
     /** Tier-1 institutions with active engagement: Microsoft, Cisco, Gen Digital (Sage), MISP, OWASP, NVIDIA, IBM */
     tier1Institutions: 7,
     /** Vendor + standards-body merges: MISP×2 + OWASP A-S-R-H + Gen Digital Sage */

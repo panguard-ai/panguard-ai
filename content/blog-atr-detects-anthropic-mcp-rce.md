@@ -141,7 +141,7 @@ ATR is not a research artifact. It is loaded in the following production ecosyst
 - OWASP Agent Security Resource Hub (PR #74 merged 2026-05-11)
 - precize Agentic Top 10 Vulnerability mapping (merged 2026-03-30)
 
-23,000+ npm downloads in the last 30 days. Microsoft Copilot SWE Agent wrote regression tests against ATR rule IDs in an external repository on 2026-05-11, and ATR shipped the matching rules within two hours sixteen minutes.
+~10,000 monthly downloads across the @panguard-ai npm scope + agent-threat-rules + pyatr (May 2026). Microsoft Copilot SWE Agent wrote regression tests against ATR rule IDs in an external repository on 2026-05-11, and ATR shipped the matching rules within two hours sixteen minutes.
 
 ## Call to action
 
