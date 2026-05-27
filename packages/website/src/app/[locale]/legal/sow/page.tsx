@@ -51,11 +51,15 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
       <ol>
         <li>
           <strong>{isZh ? 'ATR 引擎部署' : 'ATR engine deployment'}</strong>{' '}
-          {isZh ? '在 Customer VPC / on-prem / airgap (Day 14)' : 'in Customer VPC / on-prem / airgap (Day 14)'}
+          {isZh
+            ? '在 Customer VPC / on-prem / airgap (Day 14)'
+            : 'in Customer VPC / on-prem / airgap (Day 14)'}
         </li>
         <li>
           <strong>{isZh ? '客製 ATR 規則包' : 'Custom ATR rule pack'}</strong>{' '}
-          {isZh ? '50-100 條規則,目標部署環境量身製作 (Day 21)' : '50-100 rules tagged for the target deployment (Day 21)'}
+          {isZh
+            ? '50-100 條規則,目標部署環境量身製作 (Day 21)'
+            : '50-100 rules tagged for the target deployment (Day 21)'}
         </li>
         <li>
           <strong>{isZh ? '範例合規證據包' : 'Sample compliance evidence pack'}</strong>{' '}
@@ -91,11 +95,16 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
       <h2>{isZh ? '付款路徑' : 'Payment paths'}</h2>
       <ul>
         <li>
-          <strong>{isZh ? '路徑 A — 信用卡 (Stripe)' : 'Path A — Credit/debit card (Stripe)'}</strong>:{' '}
-          {isZh ? '100% 預付,服務從付款日起算' : '100% upfront, service starts on charge'}
+          <strong>
+            {isZh ? '路徑 A — 信用卡 (Stripe)' : 'Path A — Credit/debit card (Stripe)'}
+          </strong>
+          : {isZh ? '100% 預付,服務從付款日起算' : '100% upfront, service starts on charge'}
         </li>
         <li>
-          <strong>{isZh ? '路徑 B — 電匯發票 (Net-30)' : 'Path B — Wire / invoice (Net-30)'}</strong>:{' '}
+          <strong>
+            {isZh ? '路徑 B — 電匯發票 (Net-30)' : 'Path B — Wire / invoice (Net-30)'}
+          </strong>
+          :{' '}
           {isZh
             ? 'Stripe 開立發票,30 天內電匯 (適合 F500 P-card 上限 > $5K 的採購流程)'
             : 'Stripe-generated invoice, wire within 30 days (suits F500 procurement where P-card limits exclude $25K)'}

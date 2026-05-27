@@ -52,7 +52,9 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
             : 'Email billing@panguard.ai from the email used at checkout'}
         </li>
         <li>
-          {isZh ? '附上 Pilot SOW 編號 (歡迎信內)' : 'Include the Pilot SOW number (provided in welcome email)'}
+          {isZh
+            ? '附上 Pilot SOW 編號 (歡迎信內)'
+            : 'Include the Pilot SOW number (provided in welcome email)'}
         </li>
         <li>{isZh ? '不必說明原因' : 'No reason required'}</li>
         <li>
@@ -73,11 +75,7 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
           ? '7 天視窗關閉後,退費 NOT 提供,除非 PanGuard material breach (依 MSA Section 3.3 — 30 天通知未補救)。'
           : 'After the 7-day window closes, refunds are NOT available except for PanGuard material breach (per MSA Section 3.3 — uncured breach within 30 days of written notice).'}
       </p>
-      <p>
-        {isZh
-          ? '這是刻意政策設計:'
-          : 'This is a deliberate policy choice:'}
-      </p>
+      <p>{isZh ? '這是刻意政策設計:' : 'This is a deliberate policy choice:'}</p>
       <ul>
         <li>
           {isZh
@@ -98,9 +96,7 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
           : 'If PanGuard fails to deliver a Section 2 deliverable by Day 90 due to PanGuard fault (excluding Customer-caused delays), Customer may elect:'}
       </p>
       <ul>
-        <li>
-          {isZh ? 'Pilot 延期最多 30 天' : 'Pilot extension up to 30 additional days'}
-        </li>
+        <li>{isZh ? 'Pilot 延期最多 30 天' : 'Pilot extension up to 30 additional days'}</li>
         <li>
           {isZh
             ? 'Enterprise contract 10% 折扣 (與 $25K Founding Customer credit 累加)'
@@ -136,13 +132,12 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
       <p>
         {isZh
           ? '這不是退費機制。Day 90 Customer 可選擇乾淨退出 (SOW Section 11.1)。所有交付物 Customer 保有,30 天資料匯出視窗。'
-          : 'This is not a refund mechanism. At Day 90 Customer may elect a clean exit (SOW Section 11.1). All delivered artifacts remain Customer\'s, with a 30-day data export window after exit.'}
+          : "This is not a refund mechanism. At Day 90 Customer may elect a clean exit (SOW Section 11.1). All delivered artifacts remain Customer's, with a 30-day data export window after exit."}
       </p>
 
       <h2>{isZh ? '退費要求' : 'How to request a refund'}</h2>
       <p>
-        {isZh
-          ? '從結帳時使用的 email 寄信到 ' : 'Email '}
+        {isZh ? '從結帳時使用的 email 寄信到 ' : 'Email '}
         <a href="mailto:billing@panguard.ai">billing@panguard.ai</a>
         {isZh
           ? '。附上 Pilot SOW 編號。我們會於 1 個工作天內回覆,5 個工作天內處理退費。'

@@ -105,8 +105,8 @@ The single most important test before taking real customer data:
 1. Deploy a SECOND Railway service from the same Dockerfile, pointed at
    the same bucket, with a separate `/data` volume.
 2. Confirm the entrypoint logs `No local DB found ... attempting restore
-   from Litestream...` followed by `Launching Litestream + Threat
-   Cloud...`.
+from Litestream...` followed by `Launching Litestream + Threat
+Cloud...`.
 3. Hit the second service's `/health` endpoint and confirm the DB came
    back with non-zero row counts:
    ```

@@ -74,7 +74,7 @@ export default async function PilotWelcomePage({
               body={
                 isZh
                   ? '歡迎信會從 adam@panguard.ai 寄出。如果 5 分鐘內沒收到請看垃圾信。'
-                  : 'Welcome email sent from adam@panguard.ai. Check spam if it doesn\'t arrive within 5 minutes.'
+                  : "Welcome email sent from adam@panguard.ai. Check spam if it doesn't arrive within 5 minutes."
               }
             />
             <Step
@@ -92,11 +92,15 @@ export default async function PilotWelcomePage({
             />
             <Step
               num="03"
-              title={isZh ? '回覆我:框架選擇 + 技術 lead + 部署環境' : 'Reply to me: framework, tech lead, environment'}
+              title={
+                isZh
+                  ? '回覆我:框架選擇 + 技術 lead + 部署環境'
+                  : 'Reply to me: framework, tech lead, environment'
+              }
               body={
                 isZh
                   ? '我會在 24 小時內主動聯絡。Day 10 前需要鎖定:合規框架(已選)、tech lead 名字、目標部署環境 access。'
-                  : 'I\'ll reach out within 24 hours. By Day 10 we need to lock: chosen framework, tech-lead name, target deployment access.'
+                  : "I'll reach out within 24 hours. By Day 10 we need to lock: chosen framework, tech-lead name, target deployment access."
               }
             />
             <Step
@@ -117,11 +121,27 @@ export default async function PilotWelcomePage({
             </p>
             <ul className="space-y-2.5 text-sm text-text-secondary">
               <Bullet>{isZh ? 'ATR 引擎部署 (Day 14)' : 'ATR engine deployment (Day 14)'}</Bullet>
-              <Bullet>{isZh ? '客製 50-100 條 ATR 規則包 (Day 21)' : 'Custom 50-100 rule ATR pack (Day 21)'}</Bullet>
-              <Bullet>{isZh ? 'SIEM webhook 整合 (Day 30)' : 'SIEM webhook integration (Day 30)'}</Bullet>
-              <Bullet>{isZh ? '合規證據包 (Day 75 final)' : 'Compliance evidence pack (Day 75 final)'}</Bullet>
-              <Bullet>{isZh ? '6 hr/週 founder 工程時間 (78 hr 總額)' : '6 hr/wk founder engineering time (78 hr total)'}</Bullet>
-              <Bullet>{isZh ? 'Day 90 結束 packet + 升級/退出決策' : 'Day-90 exit packet + upgrade/exit decision'}</Bullet>
+              <Bullet>
+                {isZh
+                  ? '客製 50-100 條 ATR 規則包 (Day 21)'
+                  : 'Custom 50-100 rule ATR pack (Day 21)'}
+              </Bullet>
+              <Bullet>
+                {isZh ? 'SIEM webhook 整合 (Day 30)' : 'SIEM webhook integration (Day 30)'}
+              </Bullet>
+              <Bullet>
+                {isZh ? '合規證據包 (Day 75 final)' : 'Compliance evidence pack (Day 75 final)'}
+              </Bullet>
+              <Bullet>
+                {isZh
+                  ? '6 hr/週 founder 工程時間 (78 hr 總額)'
+                  : '6 hr/wk founder engineering time (78 hr total)'}
+              </Bullet>
+              <Bullet>
+                {isZh
+                  ? 'Day 90 結束 packet + 升級/退出決策'
+                  : 'Day-90 exit packet + upgrade/exit decision'}
+              </Bullet>
             </ul>
             <p className="mt-4 text-xs text-text-muted">
               {isZh ? '完整 SOW: ' : 'Full SOW: '}

@@ -74,7 +74,7 @@ For one-off recovery (e.g. point-in-time investigation, comparing against
 the live DB) restore into a side path and swap manually:
 
 1. Open a one-off shell on the TC service in Railway (or `docker compose
-   exec panguard sh` locally).
+exec panguard sh` locally).
 2. Restore the latest snapshot to a scratch path:
    ```
    litestream restore -o /tmp/restored.db /data/threat-cloud.db
