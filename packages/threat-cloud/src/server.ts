@@ -222,6 +222,47 @@ export class ThreatCloudServer {
           log.error('Classification backfill failed', err);
         }
 
+        // Reject malformed promoted proposals (one-time on startup, idempotent).
+        // 2026-05-26 the PR-back cron surfaced 14 promoted rows that didn't
+        // meet the Cisco-quality bar; subsequent measurement showed 41 such
+        // rows across the entire DB. They landed before the POST gate
+        // existed (339fd410). The GET filter (33dc2c56) already hides them
+        // from consumers; this pass marks the DB row as 'rejected' so the
+        // forensic record is preserved while keeping promoted/* clean.
+        //
+        // Uses the same parseATRRule + validateRuleMeetsStandard('experimental')
+        // gate POST and GET enforce — idempotent (re-running rejects 0).
+        // Wrapped in try/catch so a parse failure can't crash boot.
+        try {
+          const promotedList = this.db.getConfirmedATRRules();
+          let rejected = 0;
+          const rejectedIds: string[] = [];
+          for (const rule of promotedList) {
+            try {
+              const metadata = parseATRRule(rule.ruleContent);
+              const gate = validateRuleMeetsStandard(metadata, 'experimental');
+              if (!gate.passed) {
+                this.db.rejectATRProposal(rule.ruleId);
+                rejected += 1;
+                rejectedIds.push(rule.ruleId);
+              }
+            } catch {
+              // Unparseable YAML — same outcome as failing the gate.
+              this.db.rejectATRProposal(rule.ruleId);
+              rejected += 1;
+              rejectedIds.push(rule.ruleId);
+            }
+          }
+          if (rejected > 0) {
+            log.info(
+              `Malformed-proposal cleanup: rejected ${rejected} of ${promotedList.length} promoted row(s)`,
+              { sampleIds: rejectedIds.slice(0, 10) }
+            );
+          }
+        } catch (err) {
+          log.error('Malformed-proposal cleanup failed', err);
+        }
+
         // Start promotion + review cron (every 15 minutes)
         this.promotionTimer = setInterval(() => {
           try {
