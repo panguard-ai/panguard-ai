@@ -208,7 +208,9 @@ export default async function EvidencePackPage({
         <FadeInUp delay={0.45}>
           <div className="mt-12 max-w-3xl mx-auto text-center">
             <p className="text-sm text-text-secondary mb-4">
-              {isZh ? '想要綁你自己 workspace 的版本?' : 'Want this generated against your own workspace?'}
+              {isZh
+                ? '想要綁你自己 workspace 的版本?'
+                : 'Want this generated against your own workspace?'}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link

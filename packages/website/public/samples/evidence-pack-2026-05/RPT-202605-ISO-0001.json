@@ -27,10 +27,7 @@
       "Configuration Management",
       "Monitoring Activities"
     ],
-    "keyAchievements": [
-      "21 controls fully compliant",
-      "No critical findings"
-    ]
+    "keyAchievements": ["21 controls fully compliant", "No critical findings"]
   },
   "controls": [
     {
@@ -40,10 +37,7 @@
       "titleZh": "資訊安全政策",
       "descriptionEn": "A set of policies for information security shall be defined, approved by management, published, and communicated.",
       "descriptionZh": "應定義一套資訊安全政策，經管理層核准、公布並傳達。",
-      "relatedCategories": [
-        "policy",
-        "governance"
-      ],
+      "relatedCategories": ["policy", "governance"],
       "status": "pass",
       "evidence": [
         "Automated scan of policy, governance controls completed. No issues detected for A.5.1 (Policies for Information Security).",
@@ -58,10 +52,7 @@
       "titleZh": "資訊安全角色與責任",
       "descriptionEn": "Information security roles and responsibilities shall be defined and allocated.",
       "descriptionZh": "應定義並分配資訊安全角色與責任。",
-      "relatedCategories": [
-        "governance",
-        "personnel"
-      ],
+      "relatedCategories": ["governance", "personnel"],
       "status": "pass",
       "evidence": [
         "Automated scan of governance, personnel controls completed. No issues detected for A.5.2 (Information Security Roles and Responsibilities).",
@@ -76,10 +67,7 @@
       "titleZh": "資訊及其他資產的可接受使用",
       "descriptionEn": "Rules for the acceptable use of information and other associated assets shall be identified and documented.",
       "descriptionZh": "應識別並記錄資訊及其他相關資產的可接受使用規則。",
-      "relatedCategories": [
-        "policy",
-        "asset"
-      ],
+      "relatedCategories": ["policy", "asset"],
       "status": "pass",
       "evidence": [
         "Automated scan of policy, asset controls completed. No issues detected for A.5.10 (Acceptable Use of Information and Other Assets).",
@@ -94,11 +82,7 @@
       "titleZh": "存取控制",
       "descriptionEn": "Rules to control physical and logical access to information shall be established and implemented.",
       "descriptionZh": "應建立並實施控制資訊實體及邏輯存取的規則。",
-      "relatedCategories": [
-        "access",
-        "authentication",
-        "password"
-      ],
+      "relatedCategories": ["access", "authentication", "password"],
       "status": "pass",
       "evidence": [
         "Automated scan of access, authentication, password controls completed. No issues detected for A.5.15 (Access Control).",
@@ -113,11 +97,7 @@
       "titleZh": "驗證資訊",
       "descriptionEn": "Allocation and management of authentication information shall be controlled.",
       "descriptionZh": "應控制驗證資訊的分配與管理。",
-      "relatedCategories": [
-        "authentication",
-        "password",
-        "credential"
-      ],
+      "relatedCategories": ["authentication", "password", "credential"],
       "status": "pass",
       "evidence": [
         "Automated scan of authentication, password, credential controls completed. No issues detected for A.5.17 (Authentication Information).",
@@ -132,11 +112,7 @@
       "titleZh": "雲端服務的資訊安全",
       "descriptionEn": "Processes for acquisition, use, management, and exit from cloud services shall be established.",
       "descriptionZh": "應建立雲端服務的取得、使用、管理及退出程序。",
-      "relatedCategories": [
-        "cloud",
-        "network",
-        "system"
-      ],
+      "relatedCategories": ["cloud", "network", "system"],
       "status": "fail",
       "evidence": [
         "1 finding(s) detected related to A.5.23 (Information Security for Use of Cloud Services):",
@@ -163,11 +139,7 @@
       "titleZh": "資訊安全事件管理規劃",
       "descriptionEn": "The organization shall plan and prepare for managing information security incidents.",
       "descriptionZh": "組織應規劃並準備管理資訊安全事件。",
-      "relatedCategories": [
-        "incident",
-        "response",
-        "monitoring"
-      ],
+      "relatedCategories": ["incident", "response", "monitoring"],
       "status": "partial",
       "evidence": [
         "1 finding(s) detected related to A.5.24 (Information Security Incident Management Planning):",
@@ -194,11 +166,7 @@
       "titleZh": "證據收集",
       "descriptionEn": "Procedures for identification, collection, acquisition, and preservation of evidence shall be established.",
       "descriptionZh": "應建立證據識別、收集、取得及保存程序。",
-      "relatedCategories": [
-        "logging",
-        "audit",
-        "forensic"
-      ],
+      "relatedCategories": ["logging", "audit", "forensic"],
       "status": "partial",
       "evidence": [
         "1 finding(s) detected related to A.5.28 (Collection of Evidence):",
@@ -225,11 +193,7 @@
       "titleZh": "中斷期間的資訊安全",
       "descriptionEn": "The organization shall plan how to maintain information security at an appropriate level during disruption.",
       "descriptionZh": "組織應規劃如何在中斷期間維持適當的資訊安全水準。",
-      "relatedCategories": [
-        "continuity",
-        "backup",
-        "recovery"
-      ],
+      "relatedCategories": ["continuity", "backup", "recovery"],
       "status": "pass",
       "evidence": [
         "Automated scan of continuity, backup, recovery controls completed. No issues detected for A.5.29 (Information Security During Disruption).",
@@ -244,11 +208,7 @@
       "titleZh": "ICT 業務持續性準備",
       "descriptionEn": "ICT readiness shall be planned, implemented, maintained, and tested based on business continuity objectives.",
       "descriptionZh": "應根據業務持續性目標規劃、實施、維護並測試 ICT 準備。",
-      "relatedCategories": [
-        "continuity",
-        "backup",
-        "system"
-      ],
+      "relatedCategories": ["continuity", "backup", "system"],
       "status": "pass",
       "evidence": [
         "Automated scan of continuity, backup, system controls completed. No issues detected for A.5.30 (ICT Readiness for Business Continuity).",
@@ -263,11 +223,7 @@
       "titleZh": "政策和標準的合規性",
       "descriptionEn": "Compliance with the organization information security policy and standards shall be regularly reviewed.",
       "descriptionZh": "應定期審查組織資訊安全政策和標準的合規性。",
-      "relatedCategories": [
-        "governance",
-        "audit",
-        "compliance"
-      ],
+      "relatedCategories": ["governance", "audit", "compliance"],
       "status": "pass",
       "evidence": [
         "Automated scan of governance, audit, compliance controls completed. No issues detected for A.5.36 (Compliance with Policies and Standards).",
@@ -282,10 +238,7 @@
       "titleZh": "人員審查",
       "descriptionEn": "Background verification checks on candidates shall be carried out prior to employment.",
       "descriptionZh": "應在僱用前對候選人進行背景驗證。",
-      "relatedCategories": [
-        "personnel",
-        "access"
-      ],
+      "relatedCategories": ["personnel", "access"],
       "status": "pass",
       "evidence": [
         "Automated scan of personnel, access controls completed. No issues detected for A.6.1 (Screening).",
@@ -300,10 +253,7 @@
       "titleZh": "資訊安全意識、教育和訓練",
       "descriptionEn": "Personnel and relevant interested parties shall receive appropriate security awareness education and training.",
       "descriptionZh": "人員和相關利害關係人應接受適當的安全意識教育和訓練。",
-      "relatedCategories": [
-        "personnel",
-        "training"
-      ],
+      "relatedCategories": ["personnel", "training"],
       "status": "pass",
       "evidence": [
         "Automated scan of personnel, training controls completed. No issues detected for A.6.3 (Information Security Awareness, Education and Training).",
@@ -318,10 +268,7 @@
       "titleZh": "實體安全邊界",
       "descriptionEn": "Security perimeters shall be defined and used to protect areas containing information.",
       "descriptionZh": "應定義並使用安全邊界來保護包含資訊的區域。",
-      "relatedCategories": [
-        "physical",
-        "access"
-      ],
+      "relatedCategories": ["physical", "access"],
       "status": "pass",
       "evidence": [
         "Automated scan of physical, access controls completed. No issues detected for A.7.1 (Physical Security Perimeters).",
@@ -336,10 +283,7 @@
       "titleZh": "實體安全監控",
       "descriptionEn": "Premises shall be continuously monitored for unauthorized physical access.",
       "descriptionZh": "應持續監控場所以防未經授權的實體存取。",
-      "relatedCategories": [
-        "physical",
-        "monitoring"
-      ],
+      "relatedCategories": ["physical", "monitoring"],
       "status": "pass",
       "evidence": [
         "Automated scan of physical, monitoring controls completed. No issues detected for A.7.4 (Physical Security Monitoring).",
@@ -354,11 +298,7 @@
       "titleZh": "使用者端點裝置",
       "descriptionEn": "Information stored on, processed by, or accessible via user endpoint devices shall be protected.",
       "descriptionZh": "應保護儲存在使用者端點裝置上、由其處理或可透過其存取的資訊。",
-      "relatedCategories": [
-        "system",
-        "endpoint",
-        "device"
-      ],
+      "relatedCategories": ["system", "endpoint", "device"],
       "status": "pass",
       "evidence": [
         "Automated scan of system, endpoint, device controls completed. No issues detected for A.8.1 (User Endpoint Devices).",
@@ -373,11 +313,7 @@
       "titleZh": "特權存取權限",
       "descriptionEn": "The allocation and use of privileged access rights shall be restricted and managed.",
       "descriptionZh": "應限制並管理特權存取權限的分配及使用。",
-      "relatedCategories": [
-        "access",
-        "authentication",
-        "privilege"
-      ],
+      "relatedCategories": ["access", "authentication", "privilege"],
       "status": "pass",
       "evidence": [
         "Automated scan of access, authentication, privilege controls completed. No issues detected for A.8.2 (Privileged Access Rights).",
@@ -392,10 +328,7 @@
       "titleZh": "資訊存取限制",
       "descriptionEn": "Access to information and other associated assets shall be restricted per the access control policy.",
       "descriptionZh": "應按照存取控制政策限制對資訊及其他相關資產的存取。",
-      "relatedCategories": [
-        "access",
-        "policy"
-      ],
+      "relatedCategories": ["access", "policy"],
       "status": "pass",
       "evidence": [
         "Automated scan of access, policy controls completed. No issues detected for A.8.3 (Information Access Restriction).",
@@ -410,11 +343,7 @@
       "titleZh": "安全驗證",
       "descriptionEn": "Secure authentication technologies and procedures shall be established and implemented.",
       "descriptionZh": "應建立並實施安全驗證技術及程序。",
-      "relatedCategories": [
-        "authentication",
-        "password",
-        "access"
-      ],
+      "relatedCategories": ["authentication", "password", "access"],
       "status": "pass",
       "evidence": [
         "Automated scan of authentication, password, access controls completed. No issues detected for A.8.5 (Secure Authentication).",
@@ -429,11 +358,7 @@
       "titleZh": "惡意軟體防護",
       "descriptionEn": "Protection against malware shall be implemented and supported by appropriate user awareness.",
       "descriptionZh": "應實施惡意軟體防護並以適當的使用者意識支援。",
-      "relatedCategories": [
-        "malware",
-        "endpoint",
-        "system"
-      ],
+      "relatedCategories": ["malware", "endpoint", "system"],
       "status": "pass",
       "evidence": [
         "Automated scan of malware, endpoint, system controls completed. No issues detected for A.8.7 (Protection Against Malware).",
@@ -448,11 +373,7 @@
       "titleZh": "技術弱點管理",
       "descriptionEn": "Information about technical vulnerabilities shall be obtained timely, and appropriate measures taken.",
       "descriptionZh": "應及時取得技術弱點資訊，並採取適當措施。",
-      "relatedCategories": [
-        "vulnerability",
-        "updates",
-        "patch"
-      ],
+      "relatedCategories": ["vulnerability", "updates", "patch"],
       "status": "partial",
       "evidence": [
         "1 finding(s) detected related to A.8.8 (Management of Technical Vulnerabilities):",
@@ -479,11 +400,7 @@
       "titleZh": "組態管理",
       "descriptionEn": "Configurations, including security configurations, of hardware, software, services, and networks shall be established and managed.",
       "descriptionZh": "應建立並管理硬體、軟體、服務及網路的組態（含安全組態）。",
-      "relatedCategories": [
-        "configuration",
-        "system",
-        "network"
-      ],
+      "relatedCategories": ["configuration", "system", "network"],
       "status": "fail",
       "evidence": [
         "1 finding(s) detected related to A.8.9 (Configuration Management):",
@@ -510,11 +427,7 @@
       "titleZh": "資料外洩防護",
       "descriptionEn": "Data leakage prevention measures shall be applied to systems, networks, and any other devices that process or store sensitive information.",
       "descriptionZh": "應對處理或儲存敏感資訊的系統、網路及其他裝置實施資料外洩防護措施。",
-      "relatedCategories": [
-        "data",
-        "encryption",
-        "system"
-      ],
+      "relatedCategories": ["data", "encryption", "system"],
       "status": "pass",
       "evidence": [
         "Automated scan of data, encryption, system controls completed. No issues detected for A.8.12 (Data Leakage Prevention).",
@@ -529,11 +442,7 @@
       "titleZh": "資訊備份",
       "descriptionEn": "Backup copies of information, software, and systems shall be maintained and regularly tested.",
       "descriptionZh": "應維護並定期測試資訊、軟體及系統的備份副本。",
-      "relatedCategories": [
-        "backup",
-        "continuity",
-        "recovery"
-      ],
+      "relatedCategories": ["backup", "continuity", "recovery"],
       "status": "pass",
       "evidence": [
         "Automated scan of backup, continuity, recovery controls completed. No issues detected for A.8.13 (Information Backup).",
@@ -548,11 +457,7 @@
       "titleZh": "日誌記錄",
       "descriptionEn": "Logs that record activities, exceptions, faults, and other relevant events shall be produced and protected.",
       "descriptionZh": "應產生並保護記錄活動、例外、故障及其他相關事件的日誌。",
-      "relatedCategories": [
-        "logging",
-        "monitoring",
-        "audit"
-      ],
+      "relatedCategories": ["logging", "monitoring", "audit"],
       "status": "partial",
       "evidence": [
         "1 finding(s) detected related to A.8.15 (Logging):",
@@ -579,11 +484,7 @@
       "titleZh": "監控活動",
       "descriptionEn": "Networks, systems, and applications shall be monitored for anomalous behaviour.",
       "descriptionZh": "應監控網路、系統及應用程式的異常行為。",
-      "relatedCategories": [
-        "monitoring",
-        "network",
-        "system"
-      ],
+      "relatedCategories": ["monitoring", "network", "system"],
       "status": "fail",
       "evidence": [
         "1 finding(s) detected related to A.8.16 (Monitoring Activities):",
@@ -610,10 +511,7 @@
       "titleZh": "網路安全",
       "descriptionEn": "Networks and network devices shall be secured, managed, and controlled.",
       "descriptionZh": "應保護、管理及控制網路及網路裝置。",
-      "relatedCategories": [
-        "network",
-        "firewall"
-      ],
+      "relatedCategories": ["network", "firewall"],
       "status": "fail",
       "evidence": [
         "2 finding(s) detected related to A.8.20 (Network Security):",
@@ -650,11 +548,7 @@
       "titleZh": "網路服務安全",
       "descriptionEn": "Security mechanisms, service levels, and management requirements of network services shall be identified and implemented.",
       "descriptionZh": "應識別並實施網路服務的安全機制、服務水準及管理要求。",
-      "relatedCategories": [
-        "network",
-        "service",
-        "firewall"
-      ],
+      "relatedCategories": ["network", "service", "firewall"],
       "status": "fail",
       "evidence": [
         "2 finding(s) detected related to A.8.21 (Security of Network Services):",
@@ -691,11 +585,7 @@
       "titleZh": "密碼學使用",
       "descriptionEn": "Rules for the effective use of cryptography shall be defined and implemented.",
       "descriptionZh": "應定義並實施有效使用密碼學的規則。",
-      "relatedCategories": [
-        "encryption",
-        "certificate",
-        "tls"
-      ],
+      "relatedCategories": ["encryption", "certificate", "tls"],
       "status": "pass",
       "evidence": [
         "Automated scan of encryption, certificate, tls controls completed. No issues detected for A.8.24 (Use of Cryptography).",
@@ -710,11 +600,7 @@
       "titleZh": "安全開發生命週期",
       "descriptionEn": "Rules for the secure development of software and systems shall be established and applied.",
       "descriptionZh": "應建立並應用軟體及系統安全開發的規則。",
-      "relatedCategories": [
-        "development",
-        "system",
-        "configuration"
-      ],
+      "relatedCategories": ["development", "system", "configuration"],
       "status": "pass",
       "evidence": [
         "Automated scan of development, system, configuration controls completed. No issues detected for A.8.25 (Secure Development Life Cycle).",
@@ -890,81 +776,63 @@
       "priority": "immediate",
       "title": "Information Security for Use of Cloud Services",
       "description": "URGENT / 緊急: Address 1 finding(s) related to Information Security for Use of Cloud Services (A.5.23). 處理與 雲端服務的資訊安全（A.5.23）相關的 1 個發現。",
-      "relatedControlIds": [
-        "A.5.23"
-      ],
+      "relatedControlIds": ["A.5.23"],
       "estimatedEffort": "1-3 days"
     },
     {
       "priority": "immediate",
       "title": "Configuration Management",
       "description": "URGENT / 緊急: Address 1 finding(s) related to Configuration Management (A.8.9). 處理與 組態管理（A.8.9）相關的 1 個發現。",
-      "relatedControlIds": [
-        "A.8.9"
-      ],
+      "relatedControlIds": ["A.8.9"],
       "estimatedEffort": "1-3 days"
     },
     {
       "priority": "immediate",
       "title": "Monitoring Activities",
       "description": "URGENT / 緊急: Address 1 finding(s) related to Monitoring Activities (A.8.16). 處理與 監控活動（A.8.16）相關的 1 個發現。",
-      "relatedControlIds": [
-        "A.8.16"
-      ],
+      "relatedControlIds": ["A.8.16"],
       "estimatedEffort": "1-3 days"
     },
     {
       "priority": "immediate",
       "title": "Network Security",
       "description": "URGENT / 緊急: Address 2 finding(s) related to Network Security (A.8.20). 處理與 網路安全（A.8.20）相關的 2 個發現。",
-      "relatedControlIds": [
-        "A.8.20"
-      ],
+      "relatedControlIds": ["A.8.20"],
       "estimatedEffort": "1-3 days"
     },
     {
       "priority": "immediate",
       "title": "Security of Network Services",
       "description": "URGENT / 緊急: Address 2 finding(s) related to Security of Network Services (A.8.21). 處理與 網路服務安全（A.8.21）相關的 2 個發現。",
-      "relatedControlIds": [
-        "A.8.21"
-      ],
+      "relatedControlIds": ["A.8.21"],
       "estimatedEffort": "1-3 days"
     },
     {
       "priority": "medium",
       "title": "Information Security Incident Management Planning",
       "description": "Address 1 finding(s) related to Information Security Incident Management Planning (A.5.24). 處理與 資訊安全事件管理規劃（A.5.24）相關的 1 個發現。",
-      "relatedControlIds": [
-        "A.5.24"
-      ],
+      "relatedControlIds": ["A.5.24"],
       "estimatedEffort": "1-2 weeks"
     },
     {
       "priority": "medium",
       "title": "Collection of Evidence",
       "description": "Address 1 finding(s) related to Collection of Evidence (A.5.28). 處理與 證據收集（A.5.28）相關的 1 個發現。",
-      "relatedControlIds": [
-        "A.5.28"
-      ],
+      "relatedControlIds": ["A.5.28"],
       "estimatedEffort": "1-2 weeks"
     },
     {
       "priority": "medium",
       "title": "Management of Technical Vulnerabilities",
       "description": "Address 1 finding(s) related to Management of Technical Vulnerabilities (A.8.8). 處理與 技術弱點管理（A.8.8）相關的 1 個發現。",
-      "relatedControlIds": [
-        "A.8.8"
-      ],
+      "relatedControlIds": ["A.8.8"],
       "estimatedEffort": "1-2 weeks"
     },
     {
       "priority": "medium",
       "title": "Logging",
       "description": "Address 1 finding(s) related to Logging (A.8.15). 處理與 日誌記錄（A.8.15）相關的 1 個發現。",
-      "relatedControlIds": [
-        "A.8.15"
-      ],
+      "relatedControlIds": ["A.8.15"],
       "estimatedEffort": "1-2 weeks"
     }
   ]

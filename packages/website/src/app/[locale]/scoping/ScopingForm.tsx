@@ -73,7 +73,9 @@ export default function ScopingForm({ locale }: Props) {
 
     const body = {
       org_name: String(formData.get('org_name') ?? '').trim(),
-      contact_email: String(formData.get('contact_email') ?? '').trim().toLowerCase(),
+      contact_email: String(formData.get('contact_email') ?? '')
+        .trim()
+        .toLowerCase(),
       contact_name: String(formData.get('contact_name') ?? '').trim(),
       framework: String(formData.get('framework') ?? ''),
       deployment_target: String(formData.get('deployment_target') ?? ''),
@@ -334,7 +336,9 @@ export default function ScopingForm({ locale }: Props) {
         <TermsCheckbox
           name="accepted_refund_policy"
           href="/legal/refund"
-          label={isZh ? '我接受退費政策 (7 天無條件)' : 'I accept the Refund Policy (7-day no-questions)'}
+          label={
+            isZh ? '我接受退費政策 (7 天無條件)' : 'I accept the Refund Policy (7-day no-questions)'
+          }
           isZh={isZh}
         />
       </div>
@@ -424,9 +428,7 @@ function SlotsBanner({ slots, isZh }: { slots: SlotState | null; isZh: boolean }
         <strong className="text-text-primary">
           {slots.slots_remaining} / {slots.total_slots}
         </strong>{' '}
-        {isZh
-          ? 'Founding Customer Pilot 名額剩餘'
-          : 'Founding Customer Pilot slots remaining'}
+        {isZh ? 'Founding Customer Pilot 名額剩餘' : 'Founding Customer Pilot slots remaining'}
       </p>
     </div>
   );

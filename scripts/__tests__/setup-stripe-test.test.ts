@@ -72,11 +72,7 @@ function makeMockStripe(state: MockStripeState) {
         return { data: hit ? [hit] : [] };
       }),
       create: vi.fn(
-        async (params: {
-          name: string;
-          description: string;
-          metadata: Record<string, string>;
-        }) => {
+        async (params: { name: string; description: string; metadata: Record<string, string> }) => {
           state.createProductCalls += 1;
           const id = `prod_test_${params.metadata.panguard_canonical}_${state.createProductCalls}`;
           const product: MockProductRecord = {
@@ -169,7 +165,9 @@ describe('assertTestModeKey', () => {
 describe('mergeEnv', () => {
   it('preserves unrelated existing keys exactly', () => {
     const existing = 'EXISTING_KEY=value\nOTHER_KEY=other\n';
-    const merged = mergeEnv(existing, [{ key: 'STRIPE_PRICE_ID_PILOT', value: 'price_test_pilot' }]);
+    const merged = mergeEnv(existing, [
+      { key: 'STRIPE_PRICE_ID_PILOT', value: 'price_test_pilot' },
+    ]);
 
     expect(merged).toContain('EXISTING_KEY=value');
     expect(merged).toContain('OTHER_KEY=other');
@@ -298,7 +296,9 @@ describe('main() — top-level integration', () => {
   });
 
   it('writes STRIPE_PRICE_ID_PILOT + STRIPE_PRICE_ID_ENTERPRISE into .env preserving existing keys', async () => {
-    const envPath = await makeTempEnvPath('EXISTING_KEY=value\nLICENSE_SIGNING_KEY_PRIVATE_PEM=already_set\n');
+    const envPath = await makeTempEnvPath(
+      'EXISTING_KEY=value\nLICENSE_SIGNING_KEY_PRIVATE_PEM=already_set\n'
+    );
     const state = freshState();
 
     const result = await main({

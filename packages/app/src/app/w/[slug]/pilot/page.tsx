@@ -88,11 +88,10 @@ export default async function PilotPage({ params }: { params: Promise<{ slug: st
   // is back-derived as expiry minus 90 days. If tier_expires_at is null
   // (workspace migrated without a clock) we fall back to created_at.
   const expiresAt = ctx.workspace.tier_expires_at ?? null;
-  const created = ((ctx.workspace as unknown as { created_at?: string }).created_at) ?? null;
-  const effectiveDate =
-    expiresAt
-      ? new Date(Date.parse(expiresAt) - 90 * 24 * 60 * 60 * 1000).toISOString()
-      : created ?? new Date().toISOString();
+  const created = (ctx.workspace as unknown as { created_at?: string }).created_at ?? null;
+  const effectiveDate = expiresAt
+    ? new Date(Date.parse(expiresAt) - 90 * 24 * 60 * 60 * 1000).toISOString()
+    : (created ?? new Date().toISOString());
   const now = new Date().toISOString();
   const dayNum = Math.min(90, dayBetween(effectiveDate, now));
   const daysRemaining = Math.max(0, 90 - dayNum);
@@ -154,11 +153,7 @@ export default async function PilotPage({ params }: { params: Promise<{ slug: st
   // Decision moments — derived from dayNum and SOW Section 11.
   const refundWindowDaysLeft = Math.max(0, 7 - dayNum);
   const decisionWindow =
-    dayNum < 60
-      ? 'preparation'
-      : dayNum < 90
-        ? 'enterprise-scoping'
-        : 'day-90-decision';
+    dayNum < 60 ? 'preparation' : dayNum < 90 ? 'enterprise-scoping' : 'day-90-decision';
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -187,13 +182,13 @@ export default async function PilotPage({ params }: { params: Promise<{ slug: st
           <p className="text-sm text-text-secondary">
             {refundWindowDaysLeft > 0 ? (
               <span className="text-amber-400 font-semibold">
-                7-day refund window: {refundWindowDaysLeft} day{refundWindowDaysLeft === 1 ? '' : 's'}{' '}
-                left.
+                7-day refund window: {refundWindowDaysLeft} day
+                {refundWindowDaysLeft === 1 ? '' : 's'} left.
               </span>
             ) : decisionWindow === 'preparation' ? (
               <span>
-                In the build phase. ATR engine + custom rule pack + SIEM webhook are the focus through
-                Day 30.
+                In the build phase. ATR engine + custom rule pack + SIEM webhook are the focus
+                through Day 30.
               </span>
             ) : decisionWindow === 'enterprise-scoping' ? (
               <span>
@@ -217,7 +212,8 @@ export default async function PilotPage({ params }: { params: Promise<{ slug: st
         />
         <ul className="divide-y divide-border">
           {deliverables.map((d) => {
-            const overdue = d.status !== 'delivered' && d.status !== 'accepted' && dayNum > d.targetDay;
+            const overdue =
+              d.status !== 'delivered' && d.status !== 'accepted' && dayNum > d.targetDay;
             return (
               <li key={d.id} className="px-6 py-4 flex items-start gap-4">
                 <div className="mt-1">
@@ -257,11 +253,12 @@ export default async function PilotPage({ params }: { params: Promise<{ slug: st
         <div className="space-y-3 mt-4">
           <div className="flex items-baseline justify-between">
             <p className="text-3xl font-bold text-text-primary">
-              {hoursUsed.toFixed(1)} <span className="text-base text-text-muted">/ {hoursBudget} hrs</span>
+              {hoursUsed.toFixed(1)}{' '}
+              <span className="text-base text-text-muted">/ {hoursBudget} hrs</span>
             </p>
             <p className="text-sm text-text-muted">
-              {hoursPct}% used · ~{(6 - (hoursUsed / Math.max(1, dayNum / 7))).toFixed(1)} hrs/wk
-              avg remaining
+              {hoursPct}% used · ~{(6 - hoursUsed / Math.max(1, dayNum / 7)).toFixed(1)} hrs/wk avg
+              remaining
             </p>
           </div>
           <div className="h-2 rounded-full bg-surface-2 overflow-hidden">
@@ -319,7 +316,9 @@ export default async function PilotPage({ params }: { params: Promise<{ slug: st
             className="block p-3 rounded-lg border border-border hover:border-brand-sage transition-colors"
           >
             <p className="font-semibold text-text-primary">Pilot SOW (your version)</p>
-            <p className="text-xs text-text-muted mt-1">90-day scope · 6 deliverables · acceptance criteria</p>
+            <p className="text-xs text-text-muted mt-1">
+              90-day scope · 6 deliverables · acceptance criteria
+            </p>
           </a>
           <a
             href="https://panguard.ai/legal/msa"
@@ -337,7 +336,9 @@ export default async function PilotPage({ params }: { params: Promise<{ slug: st
             className="block p-3 rounded-lg border border-border hover:border-brand-sage transition-colors"
           >
             <p className="font-semibold text-text-primary">Refund Policy</p>
-            <p className="text-xs text-text-muted mt-1">7-day no-questions window · service credits</p>
+            <p className="text-xs text-text-muted mt-1">
+              7-day no-questions window · service credits
+            </p>
           </a>
           <a
             href="https://panguard.ai/legal/dpa"
@@ -364,7 +365,9 @@ export default async function PilotPage({ params }: { params: Promise<{ slug: st
             className="block p-3 rounded-lg border border-border hover:border-brand-sage transition-colors"
           >
             <p className="font-semibold text-text-primary">Public sample evidence pack</p>
-            <p className="text-xs text-text-muted mt-1">SHA-256 + HMAC · same pipeline that runs for you</p>
+            <p className="text-xs text-text-muted mt-1">
+              SHA-256 + HMAC · same pipeline that runs for you
+            </p>
           </a>
         </div>
       </Card>

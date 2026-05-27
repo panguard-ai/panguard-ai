@@ -66,10 +66,10 @@ Sigma defined the SIEM rule format. Splunk built the SIEM. YARA defined the malw
 
 Sigma 定義 SIEM 規則格式，Splunk 做平台。YARA 定義惡意樣本特徵格式，VirusTotal 做大規模偵測。ATR 定義 AI agent 威脅規則格式，PanGuard 做 runtime、合規證據、規則遷移工具。
 
-| Layer                       | What it is                                                       | License        | Maintainer        |
-| --------------------------- | ---------------------------------------------------------------- | -------------- | ----------------- |
-| **Layer 0 — Open Standard** | [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) — 419 rules, 920 detection patterns, 10 categories | MIT            | Community-driven  |
-| **Layer 1 — Platform**      | PanGuard Guard runtime + Migrator + Threat Cloud + Compliance Evidence Module | MIT (Community) / Commercial (Enterprise) | Panguard AI, Inc. |
+| Layer                       | What it is                                                                                                        | License                                   | Maintainer        |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ----------------- |
+| **Layer 0 — Open Standard** | [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) — 419 rules, 920 detection patterns, 10 categories | MIT                                       | Community-driven  |
+| **Layer 1 — Platform**      | PanGuard Guard runtime + Migrator + Threat Cloud + Compliance Evidence Module                                     | MIT (Community) / Commercial (Enterprise) | Panguard AI, Inc. |
 
 The bet: be both the open standard maintainer and the company that ships the platform layer. No peer competitor exists on either axis.
 
@@ -89,15 +89,15 @@ Brief: **[sovereign-ai-defense.vercel.app](https://sovereign-ai-defense.vercel.a
 
 ## Products
 
-| Product                                                            | Role                                            | One-line description                                                              |
-| ------------------------------------------------------------------ | ----------------------------------------------- | --------------------------------------------------------------------------------- |
-| **PanGuard Scan**                                                  | One-shot audit                                  | 60-second SKILL.md or MCP audit with SARIF 2.1.0 export for any CI.               |
-| **PanGuard Guard**                                                 | Runtime engine                                  | 4-agent pipeline blocking malicious tool calls before they reach the real server. |
-| **PanGuard Skill Auditor**                                         | Pre-install gate                                | 8 security checks every skill must pass before it can be installed.               |
-| **PanGuard Migrator** ([details](https://panguard.ai/migrator))    | Standards bridge                                | Sigma / YARA rules to ATR YAML. Community on npm. Enterprise adds compliance.     |
-| **PanGuard MCP Server**                                            | AI assistant integration                        | 12 tools served over Model Context Protocol for Claude, Codex, Cursor.            |
-| **PanGuard Threat Cloud**                                          | Intelligence flywheel                           | Confirmed threats from any user become an ATR rule. Rule pushed to everyone.      |
-| **Coming**                                                         | Trap / Chat / Report                            | Honeypot, conversational console, executive PDF reporting.                        |
+| Product                                                         | Role                     | One-line description                                                              |
+| --------------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------- |
+| **PanGuard Scan**                                               | One-shot audit           | 60-second SKILL.md or MCP audit with SARIF 2.1.0 export for any CI.               |
+| **PanGuard Guard**                                              | Runtime engine           | 4-agent pipeline blocking malicious tool calls before they reach the real server. |
+| **PanGuard Skill Auditor**                                      | Pre-install gate         | 8 security checks every skill must pass before it can be installed.               |
+| **PanGuard Migrator** ([details](https://panguard.ai/migrator)) | Standards bridge         | Sigma / YARA rules to ATR YAML. Community on npm. Enterprise adds compliance.     |
+| **PanGuard MCP Server**                                         | AI assistant integration | 12 tools served over Model Context Protocol for Claude, Codex, Cursor.            |
+| **PanGuard Threat Cloud**                                       | Intelligence flywheel    | Confirmed threats from any user become an ATR rule. Rule pushed to everyone.      |
+| **Coming**                                                      | Trap / Chat / Report     | Honeypot, conversational console, executive PDF reporting.                        |
 
 Migrator Community: `npm install @panguard-ai/migrator-community` (MIT, v0.1.0). Migrator Enterprise adds 6-framework compliance evidence and audit trail.
 
@@ -109,20 +109,20 @@ Migrator Community: `npm install @panguard-ai/migrator-community` (MIT, v0.1.0).
 
 13 個 PR 通過 6 個外部組織 merge，7 個 Tier-1 機構正在審核中。
 
-| Organization                              | Integration                                                         | Status         | Reference                                                                                       |
-| ----------------------------------------- | ------------------------------------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
-| **Microsoft AGT**                         | 287 ATR rules + weekly auto-sync workflow                           | Merged         | [PR #1277](https://github.com/microsoft/agent-governance-toolkit/pull/1277)                     |
-| **Microsoft Copilot SWE Agent**           | Copilot-authored fixtures presuming ATR detection; v2.1.2 in 2h 16m | In production  | [AGT issue #1981](https://github.com/microsoft/agent-governance-toolkit/issues/1981)            |
-| **Cisco AI Defense**                      | Full 419-rule library in skill-scanner production                   | Merged         | [PR #99](https://github.com/cisco-ai-defense/skill-scanner/pull/99)                             |
-| **MISP** (threat intel)                   | Galaxy entry for global sharing                                     | Merged         | [misp-galaxy #1207](https://github.com/MISP/misp-galaxy/pull/1207)                              |
-| **MISP** (taxonomies)                     | Taxonomy registered                                                 | Merged         | [misp-taxonomies #323](https://github.com/MISP/misp-taxonomies/pull/323)                        |
-| **OWASP A-S-R-H**                         | Agentic Security Resource Hub listing                               | Merged         | PR #74 ("Welcome to the team" from project lead)                                                |
-| **Gen Digital Sage** (Norton/Avast/AVG)   | Detection rule pipeline integration                                 | Open           | PR #33                                                                                          |
-| NVIDIA garak                              | Multi-language attack coverage                                      | In review      | Issue #1676                                                                                     |
-| OpenSSF SAFE-MCP                          | Technique mapping pipeline                                          | In review      | PR #187                                                                                         |
-| IBM mcp-context-forge                     | Context server hardening                                            | In review      | PR #4109                                                                                        |
-| Meta PurpleLlama                          | Detection layer integration                                         | In review      | PR #206                                                                                         |
-| Promptfoo                                 | Evaluation harness rules                                            | In review      | PR #8529                                                                                        |
+| Organization                            | Integration                                                         | Status        | Reference                                                                            |
+| --------------------------------------- | ------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------ |
+| **Microsoft AGT**                       | 287 ATR rules + weekly auto-sync workflow                           | Merged        | [PR #1277](https://github.com/microsoft/agent-governance-toolkit/pull/1277)          |
+| **Microsoft Copilot SWE Agent**         | Copilot-authored fixtures presuming ATR detection; v2.1.2 in 2h 16m | In production | [AGT issue #1981](https://github.com/microsoft/agent-governance-toolkit/issues/1981) |
+| **Cisco AI Defense**                    | Full 419-rule library in skill-scanner production                   | Merged        | [PR #99](https://github.com/cisco-ai-defense/skill-scanner/pull/99)                  |
+| **MISP** (threat intel)                 | Galaxy entry for global sharing                                     | Merged        | [misp-galaxy #1207](https://github.com/MISP/misp-galaxy/pull/1207)                   |
+| **MISP** (taxonomies)                   | Taxonomy registered                                                 | Merged        | [misp-taxonomies #323](https://github.com/MISP/misp-taxonomies/pull/323)             |
+| **OWASP A-S-R-H**                       | Agentic Security Resource Hub listing                               | Merged        | PR #74 ("Welcome to the team" from project lead)                                     |
+| **Gen Digital Sage** (Norton/Avast/AVG) | Detection rule pipeline integration                                 | Open          | PR #33                                                                               |
+| NVIDIA garak                            | Multi-language attack coverage                                      | In review     | Issue #1676                                                                          |
+| OpenSSF SAFE-MCP                        | Technique mapping pipeline                                          | In review     | PR #187                                                                              |
+| IBM mcp-context-forge                   | Context server hardening                                            | In review     | PR #4109                                                                             |
+| Meta PurpleLlama                        | Detection layer integration                                         | In review     | PR #206                                                                              |
+| Promptfoo                               | Evaluation harness rules                                            | In review     | PR #8529                                                                             |
 
 OWASP A-S-R-H is a third-party Agentic Security Resource Hub. The OWASP Foundation main repo PRs are pending and not listed in this table as merged.
 
@@ -138,15 +138,15 @@ Every ATR rule maps to 6 compliance frameworks. Enterprise compliance evidence i
 
 每條 ATR 規則對應 6 個合規框架。Enterprise 層提供簽章後的稽核證據。
 
-| Framework                | Coverage                                                                                                                                       |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| OWASP Agentic Top 10     | **10 / 10** ([mapping](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md))                               |
-| SAFE-MCP                 | **78 / 85 = 91.8%** ([mapping](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/SAFE-MCP-MAPPING.md))                    |
-| OWASP LLM Top 10         | Per-rule mapping in YAML frontmatter                                                                                                           |
-| MITRE ATLAS              | Per-rule technique IDs                                                                                                                         |
-| NIST AI RMF              | OSCAL catalog v0.3 published                                                                                                                   |
-| EU AI Act                | High-risk system clauses tagged                                                                                                                |
-| ISO/IEC 42001            | AI management system controls tagged                                                                                                           |
+| Framework            | Coverage                                                                                                                    |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| OWASP Agentic Top 10 | **10 / 10** ([mapping](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/OWASP-MAPPING.md))            |
+| SAFE-MCP             | **78 / 85 = 91.8%** ([mapping](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/SAFE-MCP-MAPPING.md)) |
+| OWASP LLM Top 10     | Per-rule mapping in YAML frontmatter                                                                                        |
+| MITRE ATLAS          | Per-rule technique IDs                                                                                                      |
+| NIST AI RMF          | OSCAL catalog v0.3 published                                                                                                |
+| EU AI Act            | High-risk system clauses tagged                                                                                             |
+| ISO/IEC 42001        | AI management system controls tagged                                                                                        |
 
 ---
 
@@ -154,12 +154,12 @@ Every ATR rule maps to 6 compliance frameworks. Enterprise compliance evidence i
 
 Public benchmarks, deterministic samples, fixed seeds. Full methodology at [panguard.ai/research/benchmarks](https://panguard.ai/research/benchmarks).
 
-| Corpus                              | Recall    | Precision | False positives | Sample size |
-| ----------------------------------- | --------- | --------- | --------------- | ----------- |
-| garak (ATR-core families)           | **97.1%** | -         | -               | 666         |
-| SKILL.md real-world (v2.2.0)        | **100%**  | **100%**  | **0%**          | 341         |
-| PINT (prompt-injection)             | 62.5%     | 99.6%     | 0.25%           | 850         |
-| HackAPrompt                         | 66.2%     | -         | -               | 4,780       |
+| Corpus                       | Recall    | Precision | False positives | Sample size |
+| ---------------------------- | --------- | --------- | --------------- | ----------- |
+| garak (ATR-core families)    | **97.1%** | -         | -               | 666         |
+| SKILL.md real-world (v2.2.0) | **100%**  | **100%**  | **0%**          | 341         |
+| PINT (prompt-injection)      | 62.5%     | 99.6%     | 0.25%           | 850         |
+| HackAPrompt                  | 66.2%     | -         | -               | 4,780       |
 
 HackAPrompt is a +37.6 percentage point lift over the v2.1.x baseline of 28.6%. Numbers are precise. We do not round up.
 
@@ -173,13 +173,13 @@ HackAPrompt 相對 v2.1.x 基準 28.6% 提升 37.6 個百分點。數字是精�
 
 爬取 4 個 registry 共 96,096 個 entry。67,799 個有可解析內容並通過完整 pipeline。1,096 個確認惡意。11,324 個總威脅信號。249 個 package 同時具備 shell 執行、網路存取、檔案系統存取（"triple-threat"）。
 
-| Registry                      | Entries crawled  |
-| ----------------------------- | ---------------- |
-| OpenClaw                      | 56,503           |
-| ClawHub                       | 36,378           |
-| Skills.sh                     | 3,115            |
-| Hermes                        | 100              |
-| **Total**                     | **96,096**       |
+| Registry  | Entries crawled |
+| --------- | --------------- |
+| OpenClaw  | 56,503          |
+| ClawHub   | 36,378          |
+| Skills.sh | 3,115           |
+| Hermes    | 100             |
+| **Total** | **96,096**      |
 
 Full dataset, methodology, and reproducibility scripts: **[panguard.ai/research/96k-scan](https://panguard.ai/research/96k-scan)**.
 
@@ -191,12 +191,12 @@ Locked 2026-04-22. Four tiers. No middle tier. The page at [panguard.ai/pricing]
 
 定價於 2026-04-22 鎖定。四個 tier。沒有中間層。[panguard.ai/pricing](https://panguard.ai/pricing) 解釋為什麼中間層是陷阱。
 
-| Tier             | Price                | What you get                                                                                       |
-| ---------------- | -------------------- | -------------------------------------------------------------------------------------------------- |
-| **Community**    | $0 forever           | MIT, unlimited self-host, 419 ATR rules, no signup, no telemetry                                   |
-| **Pilot**        | $25K / 90 days       | F500 procurement test drive. IT director can approve. Full credit to Y1 Enterprise.                |
-| **Enterprise**   | $150K-$500K / year   | Migrator Pro, 5-framework signed evidence, airgap, SLA, dedicated CSM                              |
-| **Sovereign**    | $5M-$20M / nation    | Nation-scale airgap, multi-tenant, custom compliance, AMD / Cisco / NVIDIA JV pre-integrated      |
+| Tier           | Price              | What you get                                                                                 |
+| -------------- | ------------------ | -------------------------------------------------------------------------------------------- |
+| **Community**  | $0 forever         | MIT, unlimited self-host, 419 ATR rules, no signup, no telemetry                             |
+| **Pilot**      | $25K / 90 days     | F500 procurement test drive. IT director can approve. Full credit to Y1 Enterprise.          |
+| **Enterprise** | $150K-$500K / year | Migrator Pro, 5-framework signed evidence, airgap, SLA, dedicated CSM                        |
+| **Sovereign**  | $5M-$20M / nation  | Nation-scale airgap, multi-tenant, custom compliance, AMD / Cisco / NVIDIA JV pre-integrated |
 
 ---
 
@@ -227,11 +227,11 @@ One person encounters a threat. It becomes a rule. It protects everyone. That is
 
 ### Three-Layer Detection
 
-| Layer | Engine                     | Latency | Cost    |
-| ----- | -------------------------- | ------- | ------- |
+| Layer | Engine                      | Latency | Cost    |
+| ----- | --------------------------- | ------- | ------- |
 | **1** | 419 ATR rules (regex + AST) | < 50ms  | $0      |
-| **2** | Local AI (Ollama)          | ~ 2s    | $0      |
-| **3** | Cloud AI (Claude / OpenAI) | ~ 5s    | ~$0.008 |
+| **2** | Local AI (Ollama)           | ~ 2s    | $0      |
+| **3** | Cloud AI (Claude / OpenAI)  | ~ 5s    | ~$0.008 |
 
 Internet down? Rules + local AI keep running. Cloud down? Same. Everything degrades gracefully.
 
@@ -255,24 +255,24 @@ panguard-ai/
     website/                 Next.js marketing + online scanner + research pages
 ```
 
-|                      |                                                                                                     |
-| -------------------- | --------------------------------------------------------------------------------------------------- |
-| Language             | TypeScript 5.7 (strict mode)                                                                        |
-| Runtime              | Node.js 20+                                                                                         |
-| Monorepo             | pnpm workspaces, 18 packages                                                                        |
-| Tests                | 159 test files, 3,528 tests passing                                                                 |
-| AI                   | Ollama (local) + Claude / OpenAI (cloud)                                                            |
-| Website              | Next.js 15 + Vercel                                                                                 |
+|          |                                          |
+| -------- | ---------------------------------------- |
+| Language | TypeScript 5.7 (strict mode)             |
+| Runtime  | Node.js 20+                              |
+| Monorepo | pnpm workspaces, 18 packages             |
+| Tests    | 159 test files, 3,528 tests passing      |
+| AI       | Ollama (local) + Claude / OpenAI (cloud) |
+| Website  | Next.js 15 + Vercel                      |
 
 ### ATR Rule Categories
 
-| Category                | Rules | Category                | Rules |
-| ----------------------- | ----- | ----------------------- | ----- |
-| prompt-injection        | 172   | privilege-escalation    | 12    |
-| agent-manipulation      | 105   | model-abuse             | 10    |
-| skill-compromise        | 40    | excessive-autonomy      | 8     |
-| context-exfiltration    | 40    | model-security          | 3     |
-| tool-poisoning          | 27    | data-poisoning          | 2     |
+| Category             | Rules | Category             | Rules |
+| -------------------- | ----- | -------------------- | ----- |
+| prompt-injection     | 172   | privilege-escalation | 12    |
+| agent-manipulation   | 105   | model-abuse          | 10    |
+| skill-compromise     | 40    | excessive-autonomy   | 8     |
+| context-exfiltration | 40    | model-security       | 3     |
+| tool-poisoning       | 27    | data-poisoning       | 2     |
 
 419 rules total. 357 stable, 62 experimental.
 

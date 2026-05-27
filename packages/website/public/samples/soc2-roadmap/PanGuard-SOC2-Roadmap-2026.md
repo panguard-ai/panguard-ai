@@ -14,13 +14,13 @@
 
 ## 1. Scope
 
-| Item | Value |
-|------|-------|
-| Trust Service Criteria | Security · Availability |
-| Type | SOC 2 Type 1 (point-in-time) — Type 2 to follow in 2027 H1 |
-| System boundary | `panguard.ai` (marketing), `app.panguard.ai` (dashboard), `tc.panguard.ai` (Threat Cloud aggregation), and the published `panguard` CLI |
+| Item                    | Value                                                                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Trust Service Criteria  | Security · Availability                                                                                                                                  |
+| Type                    | SOC 2 Type 1 (point-in-time) — Type 2 to follow in 2027 H1                                                                                               |
+| System boundary         | `panguard.ai` (marketing), `app.panguard.ai` (dashboard), `tc.panguard.ai` (Threat Cloud aggregation), and the published `panguard` CLI                  |
 | Sub-processors in scope | Supabase · Stripe · Vercel · Cloudflare · Sentry · Anthropic (build-only) · Fly.io · GitHub · Google Workspace (full list at panguard.ai/sub-processors) |
-| Data classes covered | Customer workspace data, anonymised telemetry, audit logs |
+| Data classes covered    | Customer workspace data, anonymised telemetry, audit logs                                                                                                |
 
 Type 1 is the right starting attestation because the company is < 12 months old in C-Corp form (Panguard AI Inc. filed 2026-05-12) — Type 2 requires a 6- to 12-month observation window. Most enterprise buyers accept Type 1 + a Type 2 commitment letter for first-year Pilot contracts.
 
@@ -30,21 +30,21 @@ Type 1 is the right starting attestation because the company is < 12 months old 
 
 ### Compliance automation platform
 
-| Vendor | Status | Reason |
-|--------|--------|--------|
-| **Vanta** | **Selected** | Best fit for early-stage AI infra. Native integrations with Supabase, GitHub, Stripe, Sentry, Fly.io. SOC 2 + ISO 27001 dual-track. |
-| Drata | Evaluated, runner-up | Heavier in policy management; less mature for AI-specific controls. |
-| Secureframe | Evaluated | Strong but Vanta partner-list better matched our stack. |
+| Vendor      | Status               | Reason                                                                                                                              |
+| ----------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **Vanta**   | **Selected**         | Best fit for early-stage AI infra. Native integrations with Supabase, GitHub, Stripe, Sentry, Fly.io. SOC 2 + ISO 27001 dual-track. |
+| Drata       | Evaluated, runner-up | Heavier in policy management; less mature for AI-specific controls.                                                                 |
+| Secureframe | Evaluated            | Strong but Vanta partner-list better matched our stack.                                                                             |
 
 Vanta contract target: **2026-06-01**. Onboarding + integration sweep: **2026-06-01 → 2026-06-15**.
 
 ### Independent CPA auditor
 
-| Auditor | Status |
-|---------|--------|
-| **A-LIGN** | Primary candidate. Cyber-native CPA firm. ~$25K SOC 2 Type 1. |
-| Prescient Assurance | Backup candidate. ~$18K but smaller team. |
-| BDO USA | Considered, declined — too expensive for early stage. |
+| Auditor             | Status                                                        |
+| ------------------- | ------------------------------------------------------------- |
+| **A-LIGN**          | Primary candidate. Cyber-native CPA firm. ~$25K SOC 2 Type 1. |
+| Prescient Assurance | Backup candidate. ~$18K but smaller team.                     |
+| BDO USA             | Considered, declined — too expensive for early stage.         |
 
 Auditor engagement letter target: **2026-06-30**. Fieldwork: **2026-07-15 → 2026-08-31**.
 
@@ -135,4 +135,4 @@ For NDA + dashboard read-only access during Pilot evaluation, contact security@p
 
 ---
 
-*Confidential — provided to evaluators for procurement review. Do not redistribute.*
+_Confidential — provided to evaluators for procurement review. Do not redistribute._

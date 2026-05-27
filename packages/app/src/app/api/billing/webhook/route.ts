@@ -280,9 +280,7 @@ async function handleCheckoutCompleted(event: Stripe.Event): Promise<HandlerResu
   // ticks up. If no intent_id metadata (legacy or non-scoping path)
   // we silently skip — provisioning already succeeded.
   const pilotIntentId =
-    typeof session.metadata?.pilot_intent_id === 'string'
-      ? session.metadata.pilot_intent_id
-      : null;
+    typeof session.metadata?.pilot_intent_id === 'string' ? session.metadata.pilot_intent_id : null;
   if (pilotIntentId) {
     const admin = createAdminClient();
     const { error: intentUpdateErr } = await admin

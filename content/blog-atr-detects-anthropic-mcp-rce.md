@@ -88,14 +88,20 @@ import { loadRules, scan } from 'agent-threat-rules';
 
 const rules = await loadRules({ categories: ['tool-poisoning', 'agent-manipulation'] });
 
-const result = scan({
-  agent_source: { type: 'mcp_exchange', framework: 'any', provider: 'any' },
-  tool_response: incomingMcpResponse,
-  user_input: userPrompt,
-}, rules);
+const result = scan(
+  {
+    agent_source: { type: 'mcp_exchange', framework: 'any', provider: 'any' },
+    tool_response: incomingMcpResponse,
+    user_input: userPrompt,
+  },
+  rules
+);
 
 if (result.matched.length > 0) {
-  console.error('ATR matched:', result.matched.map(m => m.id));
+  console.error(
+    'ATR matched:',
+    result.matched.map((m) => m.id)
+  );
   // Block tool call. Alert. Snapshot for review.
 }
 ```

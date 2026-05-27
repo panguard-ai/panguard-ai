@@ -30,8 +30,7 @@ interface MeResponse {
  */
 function FoundingSlotBadge({ isZh }: { isZh: boolean }) {
   const [state, setState] = useState<
-    | { kind: 'loading' }
-    | { kind: 'ready'; remaining: number; total: number; exhausted: boolean }
+    { kind: 'loading' } | { kind: 'ready'; remaining: number; total: number; exhausted: boolean }
   >({ kind: 'loading' });
 
   useEffect(() => {
@@ -370,7 +369,9 @@ export default function PricingContent() {
               </div>
 
               <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 mt-4 mb-1">
-                {isZh ? '給誰 · Founding Customer 限前 3 名' : 'Who it\'s for · Founding Customers (first 3 only)'}
+                {isZh
+                  ? '給誰 · Founding Customer 限前 3 名'
+                  : "Who it's for · Founding Customers (first 3 only)"}
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh

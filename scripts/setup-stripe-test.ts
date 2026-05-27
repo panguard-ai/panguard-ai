@@ -309,8 +309,7 @@ export function mergeEnv(existing: string, updates: readonly EnvUpdate[]): strin
   const appendKeys = [...updateMap.keys()].filter((k) => !seen.has(k));
   if (appendKeys.length > 0) {
     const sep = trailingNewline ? '' : '\n';
-    const header =
-      '\n# ── Added by scripts/setup-stripe-test.ts ──────────────────────────\n';
+    const header = '\n# ── Added by scripts/setup-stripe-test.ts ──────────────────────────\n';
     const block = appendKeys.map((k) => `${k}=${updateMap.get(k) ?? ''}`).join('\n');
     body = `${body}${sep}${header}${block}\n`;
   } else if (!trailingNewline) {
@@ -388,7 +387,10 @@ export async function main(args: MainArgs): Promise<MainResult> {
     logger.log(
       `  - ${ENTERPRISE_SPEC.canonical}: ${ENTERPRISE_SPEC.name} @ $${(ENTERPRISE_SPEC.unitAmountCents / 100).toLocaleString()}/${ENTERPRISE_SPEC.interval}`
     );
-    logger.log('[setup-stripe] DRY RUN — would write STRIPE_PRICE_ID_PILOT / STRIPE_PRICE_ID_ENTERPRISE to', envPath);
+    logger.log(
+      '[setup-stripe] DRY RUN — would write STRIPE_PRICE_ID_PILOT / STRIPE_PRICE_ID_ENTERPRISE to',
+      envPath
+    );
     return Object.freeze({ setup: null, licenseGenerated: false, envUpdated: false, dryRun: true });
   }
 
@@ -410,7 +412,9 @@ export async function main(args: MainArgs): Promise<MainResult> {
       '[setup-stripe] Generated new ed25519 keypair. Back up the private PEM somewhere safe; losing it invalidates ALL existing customer license JWTs.'
     );
   } else {
-    logger.log('[setup-stripe] LICENSE_SIGNING_KEY_PRIVATE_PEM already set — leaving keypair untouched.');
+    logger.log(
+      '[setup-stripe] LICENSE_SIGNING_KEY_PRIVATE_PEM already set — leaving keypair untouched.'
+    );
   }
 
   const merged = mergeEnv(existingEnv, updates);
@@ -430,7 +434,9 @@ export async function main(args: MainArgs): Promise<MainResult> {
   logger.log('[setup-stripe] Next steps:');
   logger.log('  1. In another terminal, run:');
   logger.log('       stripe listen --forward-to localhost:3000/api/billing/webhook');
-  logger.log('     and copy the webhook signing secret it prints into STRIPE_WEBHOOK_SECRET in .env.');
+  logger.log(
+    '     and copy the webhook signing secret it prints into STRIPE_WEBHOOK_SECRET in .env.'
+  );
   logger.log('  2. Start the dev server: pnpm dev');
   logger.log('  3. Trigger a test checkout via the pricing CTA.');
   logger.log('');

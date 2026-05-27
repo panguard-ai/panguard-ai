@@ -10,11 +10,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default async function ScopingPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function ScopingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const isZh = locale === 'zh-TW';
 

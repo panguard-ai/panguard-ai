@@ -116,9 +116,9 @@ export default function SecurityWhitepaperPage() {
                 </span>
               </div>
               <p className="mt-1 text-text-tertiary">
-                Vanta selected (June 2026 contract). A-LIGN engaged as primary CPA candidate.
-                Audit fieldwork July-August 2026, Type 1 attestation target October 1, 2026.
-                Type 2 fieldwork begins April 2027.
+                Vanta selected (June 2026 contract). A-LIGN engaged as primary CPA candidate. Audit
+                fieldwork July-August 2026, Type 1 attestation target October 1, 2026. Type 2
+                fieldwork begins April 2027.
               </p>
               <p className="mt-2">
                 <a

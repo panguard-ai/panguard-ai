@@ -110,6 +110,11 @@ const log = {
       JSON.stringify({ ts: new Date().toISOString(), level: 'info', msg, ...extra }) + '\n'
     );
   },
+  warn: (msg: string, extra?: Record<string, unknown>) => {
+    process.stderr.write(
+      JSON.stringify({ ts: new Date().toISOString(), level: 'warn', msg, ...extra }) + '\n'
+    );
+  },
   error: (msg: string, err?: unknown, extra?: Record<string, unknown>) => {
     process.stderr.write(
       JSON.stringify({
@@ -2378,7 +2383,10 @@ export class ThreatCloudServer {
       }
     });
     if (droppedIds.length > 0) {
-      log.warn(`[atr-rules] dropped ${droppedIds.length} malformed rule(s) from response`, {
+      // Use log.info — this logger object exports only .info and .error.
+      // The malformed-rule case is operational (something old in the DB),
+      // not an error path, so info is the right level.
+      log.info(`[atr-rules] dropped ${droppedIds.length} malformed rule(s) from response`, {
         ruleIds: droppedIds.slice(0, 20),
       });
     }

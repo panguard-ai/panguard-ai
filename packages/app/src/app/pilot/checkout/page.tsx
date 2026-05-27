@@ -60,7 +60,12 @@ export default async function PilotCheckoutPage({
 }) {
   const { intent } = await searchParams;
   if (!intent || !/^[0-9a-f-]{36}$/i.test(intent)) {
-    return <ErrorScreen title="Invalid checkout link" body="The link you used is malformed. Resubmit at panguard.ai/scoping." />;
+    return (
+      <ErrorScreen
+        title="Invalid checkout link"
+        body="The link you used is malformed. Resubmit at panguard.ai/scoping."
+      />
+    );
   }
 
   // 1. Require authenticated session (magic link consumed by /auth/callback)
