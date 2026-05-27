@@ -25,20 +25,20 @@ export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.5.6',
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
-  atrVersion: '2.2.2',
+  atrVersion: '3.0.0-alpha.1',
   /** ATR v2.2.x: stable + experimental total */
-  atrRules: 421,
+  atrRules: 433,
   atrStableRules: 359,
   atrExperimentalRules: 62,
   /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
   atrCommunityRules: 93,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
   atrPatterns: 920,
-  totalRules: 421,
+  totalRules: 433,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '421' as const,
+  totalRulesDisplay: '433' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '421' as const,
+  atrRulesDisplay: '433' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -175,8 +175,8 @@ export const STATS = {
    * HackAPrompt: EMNLP 2023 competition corpus (4,780 deterministic samples)
    */
   benchmark: {
-    pint: { recall: 62.5, precision: 99.6, fp: 0.25, samples: 850 },
-    skill: { recall: 100, precision: 100, fp: 0, samples: 341 },
+    pint: { recall: 0.6319290465631929, precision: 0.9965034965034965, fp: 0.002506265664160401, samples: 850 },
+    skill: { recall: 1, precision: 0.97, fp: 0.002, samples: 498 },
     garak: {
       recall: 97.1,
       samples: 666,
@@ -239,7 +239,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-05-12',
+  lastUpdated: '2026-05-27T04:28:29.173Z',
 } as const;
 
 export type Stats = typeof STATS;
