@@ -13,7 +13,7 @@ ATR 開放偵測標準的商業實作層。
 [![GitHub Stars](https://img.shields.io/github/stars/panguard-ai/panguard-ai?style=flat-square&color=DAA520)](https://github.com/panguard-ai/panguard-ai/stargazers)
 [![npm version](https://img.shields.io/npm/v/@panguard-ai/panguard?style=flat-square&color=cb3837&logo=npm)](https://www.npmjs.com/package/@panguard-ai/panguard)
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](LICENSE)
-[![ATR](https://img.shields.io/badge/ATR-433%20rules-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
+[![ATR](https://img.shields.io/badge/ATR-444%20rules-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
 [![OWASP](https://img.shields.io/badge/OWASP%20Agentic%20Top%2010-10%2F10-green?style=flat-square)](docs/OWASP-MAPPING.md)
 [![SAFE-MCP](https://img.shields.io/badge/SAFE--MCP-91.8%25-blue?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/SAFE-MCP-MAPPING.md)
 [![garak](https://img.shields.io/badge/garak%20recall-97.1%25-2ea043?style=flat-square)](https://panguard.ai/research/benchmarks)
@@ -66,10 +66,10 @@ Sigma defined the SIEM rule format. Splunk built the SIEM. YARA defined the malw
 
 Sigma 定義 SIEM 規則格式，Splunk 做平台。YARA 定義惡意樣本特徵格式，VirusTotal 做大規模偵測。ATR 定義 AI agent 威脅規則格式，PanGuard 做 runtime、合規證據、規則遷移工具。
 
-| Layer                       | What it is                                                                                                        | License                                   | Maintainer        |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ----------------- |
-| **Layer 0 — Open Standard** | [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) — 433 rules across 10 categories | MIT                                       | Community-driven  |
-| **Layer 1 — Platform**      | PanGuard Guard runtime + Migrator + Threat Cloud + Compliance Evidence Module                                     | MIT (Community) / Commercial (Enterprise) | Panguard AI, Inc. |
+| Layer                       | What it is                                                                                      | License                                   | Maintainer        |
+| --------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------- | ----------------- |
+| **Layer 0 — Open Standard** | [ATR](https://github.com/Agent-Threat-Rule/agent-threat-rules) — 444 rules across 10 categories | MIT                                       | Community-driven  |
+| **Layer 1 — Platform**      | PanGuard Guard runtime + Migrator + Threat Cloud + Compliance Evidence Module                   | MIT (Community) / Commercial (Enterprise) | Panguard AI, Inc. |
 
 The bet: be both the open standard maintainer and the company that ships the platform layer. No peer competitor exists on either axis.
 
@@ -193,7 +193,7 @@ Locked 2026-04-22. Four tiers. No middle tier. The page at [panguard.ai/pricing]
 
 | Tier           | Price              | What you get                                                                                 |
 | -------------- | ------------------ | -------------------------------------------------------------------------------------------- |
-| **Community**  | $0 forever         | MIT, unlimited self-host, 419 ATR rules, no signup, no telemetry                             |
+| **Community**  | $0 forever         | MIT, unlimited self-host, 444 ATR rules, no signup, no telemetry                             |
 | **Pilot**      | $25K / 90 days     | F500 procurement test drive. IT director can approve. Full credit to Y1 Enterprise.          |
 | **Enterprise** | $150K-$500K / year | Migrator Pro, 5-framework signed evidence, airgap, SLA, dedicated CSM                        |
 | **Sovereign**  | $5M-$20M / nation  | Nation-scale airgap, multi-tenant, custom compliance, AMD / Cisco / NVIDIA JV pre-integrated |
@@ -209,7 +209,7 @@ Locked 2026-04-22. Four tiers. No middle tier. The page at [panguard.ai/pricing]
   Detect AI platforms (16 supported) -> inject MCP proxy on every server
     |
     v
-  Every tool call -> ATR evaluation (433 rules, 10 categories) -> ALLOW / DENY
+  Every tool call -> ATR evaluation (444 rules, 10 categories) -> ALLOW / DENY
     |                                                                  |
     v                                                                  v
   Dashboard (real-time)                                       Threat Cloud (flywheel)
@@ -229,7 +229,7 @@ One person encounters a threat. It becomes a rule. It protects everyone. That is
 
 | Layer | Engine                      | Latency | Cost    |
 | ----- | --------------------------- | ------- | ------- |
-| **1** | 419 ATR rules (regex + AST) | < 50ms  | $0      |
+| **1** | 444 ATR rules (regex + AST) | < 50ms  | $0      |
 | **2** | Local AI (Ollama)           | ~ 2s    | $0      |
 | **3** | Cloud AI (Claude / OpenAI)  | ~ 5s    | ~$0.008 |
 
@@ -248,7 +248,7 @@ panguard-ai/
     panguard-skill-auditor/  8-check security gate for every skill
     panguard-mcp/            MCP server: 12 tools for AI assistants
     panguard-migrator/       Sigma / YARA -> ATR YAML converter
-    atr/                     ATR Layer 0: 433 rules, 10 categories
+    atr/                     ATR Layer 0: 444 rules, 10 categories
     threat-cloud/            Community threat intel server + LLM review pipeline
     scan-core/               Shared scan engine: regex + AST + context signals
     core/                    AI adapters, validation, logging
@@ -274,7 +274,7 @@ panguard-ai/
 | context-exfiltration | 40    | model-security       | 3     |
 | tool-poisoning       | 27    | data-poisoning       | 2     |
 
-433 rules total across 10 categories. See [stats.json](https://raw.githubusercontent.com/Agent-Threat-Rule/agent-threat-rules/main/data/stats.json) for the authoritative count.
+444 rules total across 10 categories. See [stats.json](https://raw.githubusercontent.com/Agent-Threat-Rule/agent-threat-rules/main/data/stats.json) for the authoritative count.
 
 ---
 
@@ -284,7 +284,7 @@ Adam Lin (林冠辛). Founder. Taiwan.
 
 Cross-disciplinary builder background. Real estate sales. Marketing (Threads, 300M+ impressions). Hip-hop festival production (5th year). Self-taught engineer.
 
-60 days, solo, from zero to: 419 ATR rules. 6 ecosystem integrations merged. 30+ PRs in flight across Microsoft, Cisco, MISP, OWASP A-S-R-H, NVIDIA, IBM, Meta, OpenSSF, NIST, EU AI Office. Microsoft Copilot SWE Agent wrote regression fixtures presuming ATR coverage; we shipped the matching rules in 2h 16m.
+60 days, solo, from zero to: 444 ATR rules. 6 ecosystem integrations merged. 30+ PRs in flight across Microsoft, Cisco, MISP, OWASP A-S-R-H, NVIDIA, IBM, Meta, OpenSSF, NIST, EU AI Office. Microsoft Copilot SWE Agent wrote regression fixtures presuming ATR coverage; we shipped the matching rules in 2h 16m.
 
 Adam Lin（林冠辛），創辦人，台灣。
 

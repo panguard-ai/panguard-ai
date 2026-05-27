@@ -110,12 +110,12 @@ export const changelogEntries: ChangelogEntry[] = [
   {
     version: '1.4.13',
     date: '2026-04-22',
-    title: 'LTS Milestone · 23K npm Downloads',
-    titleZh: 'LTS 里程碑 · 23K npm 下載數',
+    title: 'LTS Milestone · Pricing v4 Locked',
+    titleZh: 'LTS 里程碑 · Pricing v4 定案',
     description:
-      'Stable LTS milestone. Cumulative 23,000+ monthly npm downloads. Pricing v4 architecture locked: Community free + unlimited, Pilot $25K/90d, Enterprise $150-500K. AI Compliance Audit Evidence module added (pga report PDF export with SHA-256 integrity hash + HMAC signing).',
+      'Stable LTS milestone. Pricing v4 architecture locked: Community free + unlimited, Pilot $25K/90d, Enterprise $150-500K. AI Compliance Audit Evidence module added (pga report PDF export with SHA-256 integrity hash + HMAC signing).',
     descriptionZh:
-      '穩定 LTS 里程碑版本。月累積 npm 下載數突破 23,000 次。Pricing v4 架構正式定案:Community 永久免費無使用上限、Pilot $25K/90 天、Enterprise $150-500K。新增 AI 合規稽核證據模組(pga report PDF 匯出含 SHA-256 完整性雜湊與 HMAC 簽章)。',
+      '穩定 LTS 里程碑版本。Pricing v4 架構正式定案:Community 永久免費無使用上限、Pilot $25K/90 天、Enterprise $150-500K。新增 AI 合規稽核證據模組(pga report PDF 匯出含 SHA-256 完整性雜湊與 HMAC 簽章)。',
     changes: [
       {
         type: 'feature',

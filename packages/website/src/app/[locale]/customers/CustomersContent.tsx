@@ -5,7 +5,7 @@ import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
 import { Link } from '@/navigation';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Info } from 'lucide-react';
 import { caseStudies } from '@/data/case-studies';
 
 /* ─── Stats Keys ─── */
@@ -22,6 +22,16 @@ export default function CustomersContent() {
       {/* -- Hero -- */}
       <SectionWrapper spacing="spacious">
         <SectionTitle overline={t('overline')} title={t('title')} subtitle={t('subtitle')} />
+
+        {/* Honesty banner — every card on this page is illustrative, not a real
+            customer. The detail pages already carry this disclaimer; mirror it
+            on the list so visitors see it the moment they arrive. */}
+        <FadeInUp delay={0.05}>
+          <div className="mt-6 flex items-start gap-3 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3 max-w-3xl">
+            <Info className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+            <p className="text-xs text-amber-300/80 leading-relaxed">{t('listDisclaimer')}</p>
+          </div>
+        </FadeInUp>
       </SectionWrapper>
 
       {/* -- Stats Bar -- */}

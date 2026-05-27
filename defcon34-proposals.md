@@ -83,19 +83,19 @@ We release all tools, rules, scan data, and the benchmark harness used in this r
 - **Novel attack surface**: AI agent tool ecosystems (MCP, SKILL.md) are growing exponentially but have near-zero security tooling. 60 MCP CVEs in 60 days. 38% of MCP servers have zero authentication.
 - **Original research**: 36,394-skill scan is the largest public audit of AI agent skill registries to date.
 - **Actionable output**: Every attendee walks away with an open-source detection engine they can deploy immediately. Not a framework. Not a checklist. Running code.
-- **Demonstrated impact**: Cisco AI Defense adoption, 3 CVEs, 23,000+ npm downloads, OWASP coverage mapping (Agentic Top 10: 10/10, SAFE-MCP: 91.8%).
+- **Demonstrated impact**: Cisco AI Defense adoption, 3 CVEs, ~10K monthly downloads across the @panguard-ai npm scope + agent-threat-rules + pyatr (May 2026), OWASP coverage mapping (Agentic Top 10: 10/10, SAFE-MCP: 91.8%).
 - **No vendor pitch**: ATR is MIT-licensed, community-governed, and has no commercial dependencies.
 
 ### Speaker Bio
 
 LIN-KUAN HSIN (Adam) is the founder of PanGuard, an open-source AI agent security project. A cross-disciplinary builder with a background in sales, marketing (300M+ impressions on Threads), and hip-hop event production, they pivoted to security after recognizing that AI agents were being deployed with the same trust assumptions as static APIs -- an assumption that breaks catastrophically when the agent can execute arbitrary tools.
 
-Self-taught developer. Built ATR from scratch: 108 detection rules, a three-layer scanning engine, and a threat crystallization pipeline. The project has been adopted by Cisco AI Defense, scanned 36,394+ MCP skills, and contributed to 3 CVEs. 50 published versions. 23,000+ npm downloads. No VC funding. No team. Just the work.
+Self-taught developer. Built ATR from scratch: 108 detection rules, a three-layer scanning engine, and a threat crystallization pipeline. The project has been adopted by Cisco AI Defense, scanned 36,394+ MCP skills, and contributed to 3 CVEs. 50 published versions. ~10K monthly downloads across the ecosystem (May 2026). No VC funding. No team. Just the work.
 
 ### Supporting Materials
 
 - GitHub: https://github.com/Agent-Threat-Rule/agent-threat-rules (MIT license)
-- npm: agent-threat-rules (23,000+ downloads across 11 packages)
+- npm: agent-threat-rules + @panguard-ai/\* scope (~10K monthly downloads across 11 packages, May 2026)
 - Scan dataset: 36,394 MCP skills, 91,226 SKILL.md manifests
 - Benchmark: PINT adversarial MCP benchmark (62.7% recall, 99.7% precision)
 - Paper: Zenodo DOI 10.5281/zenodo.19178002
