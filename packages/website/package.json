@@ -14,7 +14,7 @@
     "dev": "next dev",
     "gen:llms": "tsx scripts/generate-llms-full.ts",
     "prebuild": "tsx scripts/generate-llms-full.ts",
-    "build": "next build",
+    "build": "next build && node scripts/fix-next-cjs-launcher.mjs",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
