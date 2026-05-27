@@ -91,6 +91,24 @@ jobs:
             "400" \
             "rule_parse_failed\\|rule_quality_gate_failed"
 
+          # Test 4: GET /api/atr-rules — verify the new read-side filter
+          # (added in 33dc2c56). meta.droppedMalformed = how many rows the
+          # DB has that fail the gate. After this filter ships, downstream
+          # consumers (PR-back, Guard) never see them.
+          echo ""
+          echo "--- atr-rules-read-filter ---"
+          GET_BODY=$(curl -s -H "Authorization: Bearer $TC_API_KEY" \
+            "$TC_URL/api/atr-rules?since=2026-05-01T00:00:00Z")
+          DROPPED=$(echo "$GET_BODY" | grep -o '"droppedMalformed":[0-9]*' | grep -o '[0-9]*$' || echo "?")
+          TOTAL=$(echo "$GET_BODY" | grep -o '"total":[0-9]*' | grep -o '[0-9]*$' || echo "?")
+          echo "served: $TOTAL clean rules"
+          echo "dropped: $DROPPED malformed rules (hidden from consumers)"
+          if [ "$DROPPED" = "?" ]; then
+            fail "atr-rules-read-filter: meta.droppedMalformed missing — server may still be on old code"
+          else
+            pass "atr-rules-read-filter: meta.droppedMalformed=$DROPPED"
+          fi
+
           echo ""
           echo "============================================================"
           if [ "$FAIL" -gt 0 ]; then
