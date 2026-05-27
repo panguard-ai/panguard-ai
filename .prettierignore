@@ -14,3 +14,8 @@ test-results/
 # we never edit it. Formatting churn here is noise.
 next-env.d.ts
 .next/
+
+# Supabase CLI runtime state — regenerated whenever the CLI is run
+# locally (storage-migration, linked-project.json, etc). Should never
+# be edited by hand; formatting churn here is noise.
+supabase/.temp/
