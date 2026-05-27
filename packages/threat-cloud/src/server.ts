@@ -2355,10 +2355,42 @@ export class ThreatCloudServer {
       ruleList.push(...canaryRules);
     }
 
+    // Defense-in-depth: re-validate every rule against the same structural
+    // quality gate POST /api/atr-proposals enforces (added 2026-05-27 in
+    // 339fd410). The DB may contain malformed rows that landed BEFORE the
+    // gate was in place — filtering at read time hides them from all
+    // consumers (notably the PR-back cron job, which previously processed
+    // 14 garbage rows every 6h). Dropped rule IDs are logged so they can
+    // be hard-deleted via admin endpoint later if desired.
+    const droppedIds: string[] = [];
+    const validRules = ruleList.filter((rule) => {
+      try {
+        const metadata = parseATRRule(rule.ruleContent);
+        const gateResult = validateRuleMeetsStandard(metadata, 'experimental');
+        if (!gateResult.passed) {
+          droppedIds.push(rule.ruleId);
+          return false;
+        }
+        return true;
+      } catch {
+        droppedIds.push(rule.ruleId);
+        return false;
+      }
+    });
+    if (droppedIds.length > 0) {
+      log.warn(`[atr-rules] dropped ${droppedIds.length} malformed rule(s) from response`, {
+        ruleIds: droppedIds.slice(0, 20),
+      });
+    }
+
     this.sendJson(res, 200, {
       ok: true,
-      data: ruleList,
-      meta: { total: ruleList.length, includesCanary: includeCanary },
+      data: validRules,
+      meta: {
+        total: validRules.length,
+        includesCanary: includeCanary,
+        droppedMalformed: droppedIds.length,
+      },
     });
   }
 
