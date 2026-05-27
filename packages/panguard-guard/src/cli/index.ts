@@ -108,11 +108,77 @@ export async function runCLI(args: string[]): Promise<void> {
     case 'scan':
       await commandScan(args.slice(1));
       break;
+    case 'validate':
+      await commandValidate(args.slice(1));
+      break;
     case 'help':
     default:
       printHelp();
       break;
   }
+}
+
+/**
+ * Dry-run validate a rules directory. Used by the
+ * `pga migrate ... --deploy-to-guard` workflow to verify a candidate rules
+ * dir before pushing it into a running Guard.
+ *
+ * Usage:
+ *   panguard-guard validate <rules-dir>
+ *   panguard-guard validate <rules-dir> --json     (machine-readable)
+ *
+ * Exit 0 = every rule passed. Exit 1 = any rule failed (or dir missing).
+ */
+async function commandValidate(args: string[]): Promise<void> {
+  const positional = args.filter((a) => !a.startsWith('--'));
+  const dir = positional[0];
+  const jsonMode = args.includes('--json');
+
+  if (!dir) {
+    console.error(`  ${symbols.fail} usage: panguard-guard validate <rules-dir> [--json]`);
+    process.exit(1);
+    return;
+  }
+
+  const { validateRulesDir } = await import('./validate-rules.js');
+  let report;
+  try {
+    report = validateRulesDir(dir);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`  ${symbols.fail} ${msg}`);
+    process.exit(1);
+    return;
+  }
+
+  if (jsonMode) {
+    process.stdout.write(JSON.stringify(report, null, 2) + '\n');
+    process.exit(report.failed === 0 ? 0 : 1);
+    return;
+  }
+
+  console.log(banner(CLI_VERSION));
+  console.log(header('Validating ATR rules directory'));
+  console.log(`  ${symbols.info} ${report.directory}`);
+  console.log(divider());
+  console.log(
+    `  ${symbols.pass} passed: ${c.sage(String(report.passed))}` +
+      `    ${symbols.fail} failed: ${report.failed > 0 ? c.alert(String(report.failed)) : '0'}` +
+      `    total: ${report.totalRules}`
+  );
+
+  if (report.failed > 0) {
+    console.log(divider());
+    console.log(`  ${symbols.fail} ${c.bold('failures:')}`);
+    for (const r of report.failures) {
+      console.log(`\n  ${c.bold(r.ruleId ?? '<no id>')}  ${c.dim(r.file)}`);
+      for (const reason of r.failures) {
+        console.log(`    ${symbols.fail} ${reason}`);
+      }
+    }
+  }
+
+  process.exit(report.failed === 0 ? 0 : 1);
 }
 
 /** Start the guard engine / 啟動守護引擎 */
