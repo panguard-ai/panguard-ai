@@ -1,0 +1,95 @@
+name: Verify TC Quality Gate
+
+# One-shot verification that POST /api/atr-proposals rejects malformed
+# rule_content with HTTP 400. Run manually via workflow_dispatch.
+#
+# Background: 2026-05-26 the PR-back workflow surfaced 14 promoted rules
+# with no required fields — root-caused to a missing structural gate on
+# the external proposal endpoint. Server-side fix landed in
+# packages/threat-cloud/src/server.ts (commit 339fd410 / main).
+#
+# This workflow proves the deployed gate behaves correctly. Safe to run
+# repeatedly; it submits synthetic test payloads only.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe TC gate with malformed payloads
+        env:
+          TC_API_KEY: ${{ secrets.TC_API_KEY }}
+          TC_URL: https://tc.panguard.ai
+        run: |
+          set -u
+          STAMP=$(date +%s)
+          FAIL=0
+          pass() { echo "PASS  $1"; }
+          fail() { echo "FAIL  $1"; FAIL=$((FAIL + 1)); }
+
+          # Helper: POST and capture status + body
+          probe() {
+            local label="$1"
+            local payload="$2"
+            local expected_code="$3"
+            local expected_error="$4"
+
+            local body
+            local status
+            body=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+              -X POST "$TC_URL/api/atr-proposals" \
+              -H "Authorization: Bearer $TC_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "$payload")
+            status="$body"
+
+            echo "--- $label ---"
+            echo "HTTP $status"
+            cat /tmp/resp.json
+            echo ""
+
+            if [ "$status" != "$expected_code" ]; then
+              fail "$label: expected HTTP $expected_code, got $status"
+              return
+            fi
+            if [ -n "$expected_error" ]; then
+              if ! grep -q "$expected_error" /tmp/resp.json; then
+                fail "$label: expected error code '$expected_error' in body"
+                return
+              fi
+            fi
+            pass "$label"
+          }
+
+          echo "============================================================"
+          echo "TC structural quality gate verification — $(date -u)"
+          echo "============================================================"
+
+          # Test 1: plain junk text (not YAML at all) → expect 400 rule_parse_failed
+          probe "junk-text" \
+            "{\"patternHash\":\"verify_junk_$STAMP\",\"ruleContent\":\"this is not yaml just garbage\"}" \
+            "400" \
+            "rule_parse_failed"
+
+          # Test 2: YAML but missing every required field → expect 400 rule_quality_gate_failed
+          probe "yaml-empty" \
+            "{\"patternHash\":\"verify_empty_$STAMP\",\"ruleContent\":\"foo: bar\\nbaz: qux\\n\"}" \
+            "400" \
+            "rule_quality_gate_failed\\|rule_parse_failed"
+
+          # Test 3: numeric content (definitely not YAML/rule) → expect 400
+          probe "html-content" \
+            "{\"patternHash\":\"verify_html_$STAMP\",\"ruleContent\":\"<html>not a rule</html>\"}" \
+            "400" \
+            ""
+
+          echo ""
+          echo "============================================================"
+          if [ "$FAIL" -gt 0 ]; then
+            echo "RESULT: $FAIL test(s) failed — gate NOT working as expected"
+            exit 1
+          fi
+          echo "RESULT: all probes rejected — gate working"
+          echo "============================================================"
