@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Rss, Mail, MessageSquare } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
@@ -10,15 +10,19 @@ import { CheckIcon, AlertIcon, MonitorIcon } from '@/components/ui/BrandIcons';
 
 /* ─── Types ─── */
 
-type ServiceStatus = 'operational' | 'degraded' | 'outage' | 'beta';
+type ServiceStatus = 'operational' | 'degraded' | 'outage' | 'beta' | 'unknown';
 
 type IncidentStatus = 'resolved' | 'investigating' | 'monitoring';
 
 interface Service {
   name: { en: string; 'zh-TW': string };
   status: ServiceStatus;
-  uptime: number;
-  uptimeHistory: ServiceStatus[];
+  /** Last-probe latency in ms (null = probe never returned). */
+  latencyMs: number | null;
+  /** HTTP status from the probe (null = network failure). */
+  httpStatus: number | null;
+  /** ISO timestamp of when the probe last ran. */
+  checkedAt: string | null;
 }
 
 interface Incident {
@@ -28,62 +32,74 @@ interface Incident {
   description: string;
 }
 
-/* ─── Service Data ─── */
+interface ProbeApiResponse {
+  aggregate: 'operational' | 'degraded' | 'outage' | 'unknown';
+  probedAt: string;
+  results: Array<{
+    key: string;
+    label: { en: string; 'zh-TW': string };
+    status: 'operational' | 'degraded' | 'outage' | 'unknown';
+    httpStatus: number | null;
+    latencyMs: number | null;
+    checkedAt: string;
+    error?: string;
+  }>;
+}
 
-const services: Service[] = [
+/* ─── Live probe placeholder (replaces former hardcoded "operational" array) ─── */
+
+/**
+ * Initial render before /api/health-probe responds. Status defaults to
+ * 'unknown' so the page never displays "operational" without real probe
+ * data — that was the previous fake.
+ */
+const PROBE_PLACEHOLDER: Service[] = [
   {
-    name: {
-      en: 'Panguard Guard \u2014 Skill Monitoring',
-      'zh-TW': 'Panguard Guard \u2014 \u6280\u80fd\u884c\u70ba\u76e3\u63a7',
-    },
-    status: 'operational',
-    uptime: 0,
-    uptimeHistory: [],
+    name: { en: 'panguard.ai website', 'zh-TW': 'panguard.ai \u5b98\u7db2' },
+    status: 'unknown',
+    latencyMs: null,
+    httpStatus: null,
+    checkedAt: null,
   },
   {
     name: {
-      en: 'Panguard Scan \u2014 Security Audits',
-      'zh-TW': 'Panguard Scan \u2014 \u8cc7\u5b89\u7a3d\u6838',
+      en: 'Threat Cloud (tc.panguard.ai)',
+      'zh-TW': 'Threat Cloud (tc.panguard.ai)',
     },
-    status: 'operational',
-    uptime: 0,
-    uptimeHistory: [],
+    status: 'unknown',
+    latencyMs: null,
+    httpStatus: null,
+    checkedAt: null,
   },
   {
     name: {
-      en: 'Panguard Skill Auditor \u2014 Pre-Install Analysis',
-      'zh-TW': 'Panguard Skill Auditor \u2014 \u5b89\u88dd\u524d\u5206\u6790',
+      en: 'Customer app (app.panguard.ai)',
+      'zh-TW': '\u5ba2\u6236\u7aef app (app.panguard.ai)',
     },
-    status: 'operational',
-    uptime: 0,
-    uptimeHistory: [],
+    status: 'unknown',
+    latencyMs: null,
+    httpStatus: null,
+    checkedAt: null,
   },
   {
     name: {
-      en: 'Threat Cloud \u2014 Collective Defense',
-      'zh-TW': 'Threat Cloud \u2014 \u793e\u7fa4\u5354\u540c\u9632\u79a6',
+      en: '@panguard-ai/panguard on npm',
+      'zh-TW': 'npm \u4e0a\u7684 @panguard-ai/panguard',
     },
-    status: 'operational',
-    uptime: 0,
-    uptimeHistory: [],
+    status: 'unknown',
+    latencyMs: null,
+    httpStatus: null,
+    checkedAt: null,
   },
   {
     name: {
-      en: 'API & Integrations',
-      'zh-TW': 'API \u8207\u6574\u5408',
+      en: 'ATR (agent-threat-rules)',
+      'zh-TW': 'ATR (agent-threat-rules)',
     },
-    status: 'operational',
-    uptime: 0,
-    uptimeHistory: [],
-  },
-  {
-    name: {
-      en: 'Threat Intelligence Feed',
-      'zh-TW': '\u5a01\u8105\u60c5\u5831\u4f86\u6e90',
-    },
-    status: 'operational',
-    uptime: 0,
-    uptimeHistory: [],
+    status: 'unknown',
+    latencyMs: null,
+    httpStatus: null,
+    checkedAt: null,
   },
 ];
 
@@ -94,44 +110,18 @@ interface LocalizedIncident {
   description: { en: string; 'zh-TW': string };
 }
 
-const incidentData: LocalizedIncident[] = [
-  {
-    date: { en: 'Feb 20, 2026', 'zh-TW': '2026年2月20日' },
-    title: {
-      en: 'Scheduled Maintenance: Database Migration',
-      'zh-TW': '計畫維護：資料庫遷移',
-    },
-    status: 'resolved',
-    description: {
-      en: 'Completed 15 minutes ahead of schedule. No service impact.',
-      'zh-TW': '比預定時間提前 15 分鐘完成。未影響服務。',
-    },
-  },
-  {
-    date: { en: 'Feb 8, 2026', 'zh-TW': '2026年2月8日' },
-    title: {
-      en: 'Brief API Latency Increase',
-      'zh-TW': 'API 延遲短暫上升',
-    },
-    status: 'resolved',
-    description: {
-      en: 'Elevated API response times for 12 minutes due to upstream provider. Automatically mitigated.',
-      'zh-TW': '因上游服務供應商問題，API 回應時間升高約 12 分鐘。系統已自動排除。',
-    },
-  },
-  {
-    date: { en: 'Jan 25, 2026', 'zh-TW': '2026年1月25日' },
-    title: {
-      en: 'Scan Service Intermittent Errors',
-      'zh-TW': 'Scan 服務間歇性錯誤',
-    },
-    status: 'resolved',
-    description: {
-      en: 'Some scan requests returned timeout errors for 8 minutes. Root cause: connection pool exhaustion. Fix deployed.',
-      'zh-TW': '部分 scan 請求在 8 分鐘內出現逾時錯誤。根本原因為連線池耗盡，修補已部署。',
-    },
-  },
-];
+/**
+ * Incident history starts empty until we have real incident postmortems
+ * published. The previous January-February 2026 entries were placeholder
+ * narrative content, not actual production incidents we tracked. Per the
+ * "做不到就不要講" rule they are removed; the "no incidents" empty state
+ * below renders honestly.
+ *
+ * When a real incident occurs we publish a postmortem and append the
+ * entry here (or move to a Markdown-driven log so this file does not
+ * need to be redeployed for each new incident).
+ */
+const incidentData: LocalizedIncident[] = [];
 
 function localizeIncident(item: LocalizedIncident, locale: string): Incident {
   const key = locale === 'zh-TW' ? 'zh-TW' : 'en';
@@ -162,6 +152,10 @@ const statusConfig: Record<ServiceStatus, { dotClass: string; barClass: string }
     dotClass: 'bg-red-400',
     barClass: 'bg-red-400',
   },
+  unknown: {
+    dotClass: 'bg-text-tertiary/50',
+    barClass: 'bg-text-tertiary/30',
+  },
 };
 
 const incidentBadgeStyles: Record<IncidentStatus, string> = {
@@ -173,43 +167,50 @@ const incidentBadgeStyles: Record<IncidentStatus, string> = {
 function getOverallStatus(svcs: Service[]): ServiceStatus {
   if (svcs.some((s) => s.status === 'outage')) return 'outage';
   if (svcs.some((s) => s.status === 'degraded')) return 'degraded';
+  if (svcs.every((s) => s.status === 'unknown')) return 'unknown';
   return 'operational';
-}
-
-const LAST_MANUAL_REVIEW = '2026-05-19';
-
-function formatTimestamp(locale: string): string {
-  return new Date(LAST_MANUAL_REVIEW).toLocaleDateString(locale === 'zh-TW' ? 'zh-TW' : 'en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
 }
 
 /* ════════════════════════  Sub-components  ═══════════════════════ */
 
 function OverallBanner({
   status,
+  probedAt,
   t,
   locale,
 }: {
   status: ServiceStatus;
+  probedAt: string | null;
   t: ReturnType<typeof useTranslations>;
   locale: string;
 }) {
   const isAllGood = status === 'operational';
+  const isProbing = status === 'unknown';
 
   const bannerBg = isAllGood
     ? 'bg-brand-sage/10 border-brand-sage/20'
-    : status === 'degraded'
-      ? 'bg-amber-500/10 border-amber-500/20'
-      : 'bg-red-500/10 border-red-500/20';
+    : isProbing
+      ? 'bg-surface-1 border-border'
+      : status === 'degraded'
+        ? 'bg-amber-500/10 border-amber-500/20'
+        : 'bg-red-500/10 border-red-500/20';
 
   const bannerText = isAllGood
     ? t('allOperational')
-    : status === 'degraded'
-      ? t('degraded')
-      : t('outage');
+    : isProbing
+      ? locale === 'zh-TW'
+        ? '正在探測各服務狀態…'
+        : 'Probing services…'
+      : status === 'degraded'
+        ? t('degraded')
+        : t('outage');
+
+  const lastChecked = probedAt
+    ? new Date(probedAt).toLocaleString(locale === 'zh-TW' ? 'zh-TW' : 'en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'medium',
+      })
+    : null;
 
   return (
     <FadeInUp>
@@ -217,14 +218,19 @@ function OverallBanner({
         <div className="flex items-center justify-center gap-3 mb-2">
           {isAllGood ? (
             <CheckIcon size={28} className="text-brand-sage" />
+          ) : isProbing ? (
+            <MonitorIcon size={28} className="text-text-tertiary" />
           ) : (
             <AlertIcon size={28} className="text-amber-400" />
           )}
           <h2 className="text-xl sm:text-2xl font-bold text-text-primary">{bannerText}</h2>
         </div>
-        <p className="text-text-tertiary text-sm">
-          {t('lastUpdated')} {formatTimestamp(locale)}
-        </p>
+        {lastChecked && (
+          <p className="text-text-tertiary text-sm">
+            {locale === 'zh-TW' ? '最後探測: ' : 'Last probe: '}
+            {lastChecked}
+          </p>
+        )}
       </div>
     </FadeInUp>
   );
@@ -255,9 +261,9 @@ function ServiceRow({
             <span className={`w-2 h-2 rounded-full ${cfg.dotClass}`} aria-hidden="true" />
             <span className="text-text-secondary text-sm hidden sm:inline">{statusLabel}</span>
           </div>
-          {service.uptime > 0 && (
-            <span className="text-text-tertiary text-sm font-mono w-16 text-right">
-              {service.uptime.toFixed(2)}%
+          {service.latencyMs != null && (
+            <span className="text-text-tertiary text-sm font-mono w-20 text-right">
+              {service.latencyMs} ms
             </span>
           )}
         </div>
@@ -266,48 +272,10 @@ function ServiceRow({
   );
 }
 
-function UptimeChart({
-  service,
-  index,
-  t,
-  locale,
-}: {
-  service: Service;
-  index: number;
-  t: ReturnType<typeof useTranslations>;
-  locale: string;
-}) {
-  const displayName = locale === 'zh-TW' ? service.name['zh-TW'] : service.name.en;
-
-  return (
-    <FadeInUp delay={index * 0.05}>
-      <div className="bg-surface-1 border border-border rounded-xl p-5">
-        <h4 className="text-text-primary text-sm font-semibold mb-3">{displayName}</h4>
-        <div className="flex items-end gap-[3px]">
-          {service.uptimeHistory.map((day, i) => {
-            const cfg = statusConfig[day];
-            return (
-              <div
-                key={i}
-                className={`w-2 h-8 rounded-sm ${cfg.barClass} transition-all duration-200 hover:opacity-80`}
-                title={`Day ${30 - i}`}
-              />
-            );
-          })}
-        </div>
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-text-tertiary text-xs">{t('uptimeHistory.daysAgo')}</span>
-          <span className="text-text-secondary text-xs font-medium">
-            {service.uptime > 0
-              ? `${t('uptimeHistory.uptimeLabel')} ${service.uptime.toFixed(2)}%`
-              : t('betaLabel')}
-          </span>
-          <span className="text-text-tertiary text-xs">{t('uptimeHistory.today')}</span>
-        </div>
-      </div>
-    </FadeInUp>
-  );
-}
+/* UptimeChart was removed when the page switched from hardcoded fake data
+   to a live /api/health-probe. Real uptime-history charts require a
+   persistent probe store (Better Uptime / Statuspage.io / Vercel cron
+   into Supabase). Tracked as GA blocker B3 follow-up. */
 
 function IncidentCard({
   incident,
@@ -352,9 +320,45 @@ export default function StatusContent() {
 
   const [email, setEmail] = useState('');
   const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const overallStatus = getOverallStatus(services);
 
-  const topServices = services.slice(0, 4);
+  // Live probe state — replaces the previous hardcoded services array. The
+  // /api/health-probe endpoint pings the public services server-side and
+  // returns real status. Polled every 30s.
+  const [services, setServices] = useState<Service[]>(PROBE_PLACEHOLDER);
+  const [probedAt, setProbedAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function probe(): Promise<void> {
+      try {
+        const res = await fetch('/api/health-probe', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = (await res.json()) as ProbeApiResponse;
+        if (cancelled) return;
+        const next: Service[] = data.results.map((r) => ({
+          name: r.label,
+          status: r.status,
+          latencyMs: r.latencyMs,
+          httpStatus: r.httpStatus,
+          checkedAt: r.checkedAt,
+        }));
+        setServices(next);
+        setProbedAt(data.probedAt);
+      } catch {
+        // Network blip — keep last known state, re-probe in 30s.
+      }
+    }
+
+    void probe();
+    const timer = setInterval(probe, 30_000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, []);
+
+  const overallStatus = getOverallStatus(services);
   const incidents = incidentData.map((item) => localizeIncident(item, locale));
 
   const statusLabels: Record<ServiceStatus, string> = {
@@ -362,6 +366,7 @@ export default function StatusContent() {
     beta: t('betaLabel'),
     degraded: t('degradedLabel'),
     outage: t('outageLabel'),
+    unknown: locale === 'zh-TW' ? '探測中…' : 'Probing…',
   };
 
   return (
@@ -376,7 +381,8 @@ export default function StatusContent() {
         <p className="text-center text-sm text-text-secondary bg-surface-1 border border-border rounded-lg px-4 py-3 max-w-xl mx-auto">
           {locale === 'zh-TW' ? (
             <>
-              狀態反映最後更新時間的生產營運情況。如需即時監測，請聯絡{' '}
+              本頁是即時 liveness probe(每 30 秒探測一次,顯示當下狀態)。歷史 uptime 趨勢 + SLA-grade
+              監控 由 Better Uptime / Statuspage.io 接管,正在處理中。重要事件或 outage 通報請聯絡{' '}
               <a href="mailto:security@panguard.ai" className="text-brand-sage hover:underline">
                 security@panguard.ai
               </a>
@@ -384,8 +390,10 @@ export default function StatusContent() {
             </>
           ) : (
             <>
-              Status reflects production operations as of the last update. For real-time monitoring,
-              contact{' '}
+              This page is a live liveness probe (re-checked every 30 seconds, current state only).
+              Historical uptime trends and SLA-grade monitoring are pending — they require a
+              dedicated probe store (Better Uptime / Statuspage.io / Vercel cron + Supabase) and are
+              tracked as a known follow-up. For incident reports, contact{' '}
               <a href="mailto:security@panguard.ai" className="text-brand-sage hover:underline">
                 security@panguard.ai
               </a>
@@ -397,7 +405,7 @@ export default function StatusContent() {
 
       {/* ───────────── Overall Status Banner ───────────── */}
       <SectionWrapper spacing="tight">
-        <OverallBanner status={overallStatus} t={t} locale={locale} />
+        <OverallBanner status={overallStatus} probedAt={probedAt} t={t} locale={locale} />
       </SectionWrapper>
 
       {/* ───────────── Service Status List ───────────── */}
@@ -420,47 +428,10 @@ export default function StatusContent() {
         </div>
       </SectionWrapper>
 
-      {/* ───────────── Uptime History Charts ───────────── */}
-      <SectionWrapper dark>
-        <FadeInUp>
-          <h3 className="text-lg font-semibold text-text-primary mb-2">
-            {t('uptimeHistory.title')}
-          </h3>
-          <p className="text-text-secondary text-sm mb-8">{t('uptimeHistory.desc')}</p>
-        </FadeInUp>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {topServices.map((service, idx) => (
-            <UptimeChart
-              key={service.name.en}
-              service={service}
-              index={idx}
-              t={t}
-              locale={locale}
-            />
-          ))}
-        </div>
-
-        {/* Legend */}
-        <FadeInUp delay={0.2}>
-          <div className="flex items-center justify-center gap-6 mt-8">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-sm bg-brand-sage" />
-              <span className="text-text-tertiary text-xs">{t('operational')}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-sm bg-amber-400/60" />
-              <span className="text-text-tertiary text-xs">
-                {t('uptimeHistory.degradedPerformance')}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-sm bg-red-400" />
-              <span className="text-text-tertiary text-xs">{t('outageLabel')}</span>
-            </div>
-          </div>
-        </FadeInUp>
-      </SectionWrapper>
+      {/* Uptime-history charts intentionally removed (was hardcoded fake data).
+          Restoring them requires real historical probe storage — tracked as a
+          GA blocker follow-up (Better Uptime / Statuspage.io / Vercel cron +
+          Supabase). Until then, the current-state probe above is the truth. */}
 
       {/* ───────────── Incident History ───────────── */}
       <SectionWrapper>
