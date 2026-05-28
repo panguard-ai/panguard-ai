@@ -5,7 +5,7 @@ This file is a structured long-form context dump intended for AI coding tools
 llms-full.txt to understand a project at depth. It is auto-generated from
 the canonical source files in the panguard-ai repository.
 
-Last generated: 2026-05-28T18:20:42.337Z
+Last generated: 2026-05-28T20:06:47.466Z
 Sources of truth:
 - src/lib/stats.ts (product stats)
 - src/lib/atr-rules-compiled.ts (ATR rule index)

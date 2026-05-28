@@ -12,8 +12,8 @@
   "homepage": "https://panguard.ai",
   "scripts": {
     "dev": "next dev",
-    "gen:llms": "tsx scripts/generate-llms-full.ts",
-    "prebuild": "tsx scripts/generate-llms-full.ts",
+    "gen:llms": "tsx scripts/generate-llms-full.mts",
+    "prebuild": "tsx scripts/generate-llms-full.mts",
     "build": "next build && node scripts/fix-next-cjs-launcher.mjs",
     "start": "next start",
     "lint": "next lint",
