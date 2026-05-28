@@ -175,7 +175,12 @@ export const STATS = {
    * HackAPrompt: EMNLP 2023 competition corpus (4,780 deterministic samples)
    */
   benchmark: {
-    pint: { recall: 0.6319290465631929, precision: 0.9965034965034965, fp: 0.002506265664160401, samples: 850 },
+    pint: {
+      recall: 0.6319290465631929,
+      precision: 0.9965034965034965,
+      fp: 0.002506265664160401,
+      samples: 850,
+    },
     skill: { recall: 1, precision: 0.97, fp: 0.002, samples: 498 },
     garak: {
       recall: 97.1,
