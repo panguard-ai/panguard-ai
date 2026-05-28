@@ -89,10 +89,7 @@ describe('validateRulesDir', () => {
   });
 
   it('fails a rule missing required fields', () => {
-    writeFileSync(
-      join(dir, 'minimal.yaml'),
-      `id: ATR-test\ndetection: {}\n`
-    );
+    writeFileSync(join(dir, 'minimal.yaml'), `id: ATR-test\ndetection: {}\n`);
     const r = validateRulesDir(dir);
     expect(r.failed).toBe(1);
     const failures = r.results[0]?.failures ?? [];

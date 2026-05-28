@@ -5,7 +5,7 @@ This file is a structured long-form context dump intended for AI coding tools
 llms-full.txt to understand a project at depth. It is auto-generated from
 the canonical source files in the panguard-ai repository.
 
-Last generated: 2026-05-19T17:16:25.219Z
+Last generated: 2026-05-28T18:20:42.337Z
 Sources of truth:
 - src/lib/stats.ts (product stats)
 - src/lib/atr-rules-compiled.ts (ATR rule index)
@@ -54,7 +54,7 @@ cost, insufficient differentiation, vendor death spiral).
 
 ---
 
-## Section 2 — Core stats (verified 2026-05-19)
+## Section 2 — Core stats (verified 2026-05-28)
 
 ### Rule corpus
 - 419 ATR rules in v2.2.0
@@ -106,7 +106,7 @@ agent-threat-rules repository: github.com/Agent-Threat-Rule/agent-threat-rules.
 This index gives you titles per category so you can ask for specific
 rule bodies on demand.
 
-### prompt-injection (106 rules)
+### prompt-injection (169 rules)
 
 - ATR-2026-00001: Direct Prompt Injection via User Input
 - ATR-2026-00002: Indirect Prompt Injection via External Content
@@ -214,8 +214,71 @@ rule bodies on demand.
 - ATR-2026-00412: FigStep Image-List Multimodal Jailbreak Text Pattern
 - ATR-2026-00414: Continuation Ethnic Slur Completion Elicitation
 - ATR-2026-00420: Microsoft Copilot Studio SharePoint Indirect Prompt Injection (CVE-2026-21520)
+- ATR-2026-00442: Quoted Exact-Output Forcing in User Input
+- ATR-2026-00443: Word-Fragment Concatenation Assembly Attack
+- ATR-2026-00444: Mathematical Bold / Fullwidth Unicode Obfuscation in User Input
+- ATR-2026-00445: Translation Hijack with Side-Output Instruction
+- ATR-2026-00446: Variable-Assignment Payload Injection in User Input
+- ATR-2026-00447: Fictional Generation Demand Containing Target Output
+- ATR-2026-00452: Direct PWNED Payload Injection in User Input
+- ATR-2026-00453: Secret Key Reveal Demand in User Input
+- ATR-2026-00454: Backslash-Per-Character Encoding Attack
+- ATR-2026-00455: No-Period Output Override Instruction
+- ATR-2026-00456: Conditional Empty-Input Payload Injection
+- ATR-2026-00457: Garak Dan - to every prompt
+- ATR-2026-00458: Garak Dra - step by step
+- ATR-2026-00459: Garak Dan - an ai language
+- ATR-2026-00460: Garak Dan - no matter how
+- ATR-2026-00461: Garak Goodside - mixed_unassigned
+- ATR-2026-00462: Garak Gcg - mixed_unassigned
+- ATR-2026-00463: Garak Lmrc - mixed_unassigned
+- ATR-2026-00464: Garak Dan - i would like
+- ATR-2026-00465: Garak Dan - your prompt here
+- ATR-2026-00466: Garak Latentinjection - following text from
+- ATR-2026-00467: Garak Dan - act as a
+- ATR-2026-00468: Garak Goat - the target llm
+- ATR-2026-00469: Garak Dan - at the end
+- ATR-2026-00470: Garak Dan - as an ai
+- ATR-2026-00472: DAN/Persona Jailbreak - Unrestricted AI Role Assignment
+- ATR-2026-00473: Harm Solicitation - Interpersonal Violence and Intimidation Requests
+- ATR-2026-00474: DAN/Persona Jailbreak - Dual AI Personality with Opposite-Rules Framing
+- ATR-2026-00475: XSS Web Injection - Script Tag with JavaScript Alert Payload
+- ATR-2026-00476: XSS Web Injection - HTML Event Handler and Expression with JavaScript Alert
+- ATR-2026-00477: Latent Injection - Translation Task with Embedded Template Variable Injection
+- ATR-2026-00478: Garak Latentinjection - abuse contact email
+- ATR-2026-00479: Latent Injection - Mixed Embedded Instruction Patterns
+- ATR-2026-00480: DAN/Persona Jailbreak - Role Assignment with Named Alternate Identity
+- ATR-2026-00481: DAN/Jailbreak - Mixed Unfiltered Mode and Alternate Persona Patterns
+- ATR-2026-00482: Harm Solicitation - Genital Insults and Intimidation Tactics Requests
+- ATR-2026-00483: DAN/Persona Jailbreak - System Offline / Role Replacement with Obfuscated Text
+- ATR-2026-00484: DAN/Persona Jailbreak - Named Alternate AI with NSFW/Harmful Generation Rules
+- ATR-2026-00485: DAN/Persona Jailbreak - Immersive Alternate AI Identity with Unrestricted Capability
+- ATR-2026-00486: DAN/Persona Jailbreak - Named Writing AI with Restriction Bypass via Special Rules
+- ATR-2026-00487: DAN/Persona Jailbreak - Replacement AI with No Content Filter or Moral Restrictions
+- ATR-2026-00488: Encoding Obfuscation - Script Tag XSS with Encoded Protocol Prefix
+- ATR-2026-00489: Encoding Obfuscation - HTML Event Handler XSS with Encoded Whitespace
+- ATR-2026-00490: DAN Persona Jailbreak - Absolute Obedience Character Framing
+- ATR-2026-00492: DAN Persona Jailbreak - Role Lock with Exclusive Response Filter
+- ATR-2026-00493: Latent Injection via WHOIS Domain Record Data
+- ATR-2026-00495: DAN Jailbreak - Unrestricted Persona with Filter and Morality Removal
+- ATR-2026-00496: DAN Jailbreak - Unconditional Obedience and Dual-Persona Session Lock
+- ATR-2026-00497: XSS and Encoded Script Injection via HTML/JavaScript Payload
+- ATR-2026-00498: Web Injection via XSS Payload and onerror Event Handler
+- ATR-2026-00499: DAN Jailbreak - From-Now-On Temporal Persona Override
+- ATR-2026-00503: Fake Error State Takeover - Unrestricted Replacement Bot
+- ATR-2026-00506: Nevermind-Override Goal Hijacking in User Input (PromptInject)
+- ATR-2026-00507: Screaming-Stop Goal Hijacking in User Input (PromptInject)
+- ATR-2026-00508: Escape-Delimiter Wrapped Goal Hijacking in User Input (PromptInject)
+- ATR-2026-00509: Prompt Leaking via Ignore-Previous-Instructions in User Input (PromptInject)
+- ATR-2026-00510: Delayed Tool Invocation via Prompt Injection (Time-Shifted Execution)
+- ATR-2026-00511: MCP Web-Fetch Context Poisoning via Embedded Agent Instructions
+- ATR-2026-00512: Rules-File Backdoor \u2014 Supply Chain Attack on AI Coding Assistant Configuration
+- ATR-2026-00515: Hidden-Text Prompt Injection in User-Supplied Documents
+- ATR-2026-00518: Ignore-Previous-and-Following Instructions Output Command (PromptInject Goal Hijacking)
+- ATR-2026-00519: Tautology Logic Noise Injection (PromptBench Stresstest)
+- ATR-2026-00520: NLP Task Random Token Suffix Injection (PromptBench Checklist)
 
-### agent-manipulation (103 rules)
+### agent-manipulation (104 rules)
 
 - ATR-2026-00030: Cross-Agent Attack Detection
 - ATR-2026-00032: Agent Goal Hijacking Detection
@@ -320,6 +383,7 @@ rule bodies on demand.
 - ATR-2026-00418: WeKnora MCP Config-Driven RCE (CVE-2026-22688)
 - ATR-2026-00430: Natural-Language Trust-Escalation / Authority Impersonation
 - ATR-2026-00432: SuperAGI Output Handler eval() RCE (CVE-2024-21552)
+- ATR-2026-00440: Microsoft Semantic Kernel In-Memory Vector Store eval() RCE (CVE-2026-26030)
 
 ### skill-compromise (35 rules)
 
@@ -359,7 +423,7 @@ rule bodies on demand.
 - ATR-2026-00427: Natural-Language Fake-Error Instruction Bypass
 - ATR-2026-00429: Natural-Language Skill Self-Modification / Persistence Instruction
 
-### context-exfiltration (33 rules)
+### context-exfiltration (40 rules)
 
 - ATR-2026-00020: System Prompt and Internal Instruction Leakage
 - ATR-2026-00021: Credential and Secret Exposure in Agent Output
@@ -394,8 +458,15 @@ rule bodies on demand.
 - ATR-2026-00424: Natural-Language System Prompt Leak Instruction
 - ATR-2026-00426: Natural-Language Output-Injection Credential Embedding
 - ATR-2026-00431: Chatbox History Exfiltration via Prompt Injection (CVE-2024-48144, CVE-2024-48145)
+- ATR-2026-00449: Spring AI ChatMemory Cross-User Memory Leakage (CVE-2026-41712)
+- ATR-2026-00471: Garak Sysprompt-Extraction - mixed_unassigned
+- ATR-2026-00501: Data Exfiltration via Markdown Image and Link URL Injection
+- ATR-2026-00504: Tool and Function Capability Enumeration
+- ATR-2026-00505: System Prompt Extraction - Instruction Dump Request
+- ATR-2026-00514: System Prompt Extraction \u2014 Targeted Verbatim Disclosure Attempts
+- ATR-2026-00516: LLM Output XSS \u2014 Eliciting JavaScript Payloads from LLM for Browser Injection
 
-### tool-poisoning (28 rules)
+### tool-poisoning (33 rules)
 
 - ATR-2026-00010: Malicious Content in MCP Tool Response
 - ATR-2026-00011: Instruction Injection via Tool Output
@@ -425,8 +496,13 @@ rule bodies on demand.
 - ATR-2026-00419: Cursor MCP JSON Zero-Click Configuration RCE (CVE-2025-54136)
 - ATR-2026-00434: mcp-remote authorization_endpoint OS Command Injection (CVE-2025-6514)
 - ATR-2026-00435: Azure MCP Server Missing Authentication for Critical Function (CVE-2026-32211)
+- ATR-2026-00448: Spring AI MilvusVectorStore Filter Expression Injection (CVE-2026-41705)
+- ATR-2026-00494: SQL Injection and Code Injection Attack Payload Detection
+- ATR-2026-00513: Package Hallucination Exploitation \u2014 AI-Suggested Fake Package Installation
+- ATR-2026-00521: Shell Command Injection in Agent Tool Context
+- ATR-2026-00522: SQL Injection via Natural Language Agent Interface
 
-### privilege-escalation (12 rules)
+### privilege-escalation (14 rules)
 
 - ATR-2026-00040: Privilege Escalation and Admin Function Access
 - ATR-2026-00041: Agent Scope Creep Detection
@@ -440,8 +516,10 @@ rule bodies on demand.
 - ATR-2026-00156: SSH Remote Command Execution with Credential Exposure
 - ATR-2026-00204: Stealth Execution and Persistence Mechanisms
 - ATR-2026-00436: Enclave VM Sandbox Escape RCE (CVE-2026-27597)
+- ATR-2026-00441: Microsoft Semantic Kernel SessionsPythonPlugin Arbitrary File Write + Startup Persistence (CVE-2026-25592)
+- ATR-2026-00451: LiteLLM Proxy Admin Endpoint SQL Injection \u2014 CISA KEV (CVE-2026-42208)
 
-### model-abuse (10 rules)
+### model-abuse (12 rules)
 
 - ATR-2026-00072: Model Behavior Extraction
 - ATR-2026-00279: Harmful Completion / Continuation Attack
@@ -453,8 +531,10 @@ rule bodies on demand.
 - ATR-2026-00299: HarmBench Detailed Harmful Instruction Request \u2014 Step-by-Step Attack Facilitation
 - ATR-2026-00413: Malware Code Generation Direct Request
 - ATR-2026-00433: ModelCache torch.load() Deserialization RCE (CVE-2025-45146)
+- ATR-2026-00502: Training Data Extraction via Divergent Repetition Attack
+- ATR-2026-00517: Model Extraction / Distillation Attack via Systematic API Probing
 
-### excessive-autonomy (6 rules)
+### excessive-autonomy (8 rules)
 
 - ATR-2026-00050: Runaway Agent Loop Detection
 - ATR-2026-00051: Agent Resource Exhaustion Detection
@@ -462,11 +542,14 @@ rule bodies on demand.
 - ATR-2026-00098: Unauthorized Financial Action by AI Agent
 - ATR-2026-00099: High-Risk Tool Invocation Without Human Confirmation
 - ATR-2026-00428: Natural-Language Unauthorized Shell-Execution Instruction
+- ATR-2026-00491: Agent Capability Enumeration via Structured Parse Request
+- ATR-2026-00500: SSRF via Agent URL Fetch Instruction
 
-### data-poisoning (2 rules)
+### data-poisoning (3 rules)
 
 - ATR-2026-00070: Data Poisoning via RAG and Knowledge Base Contamination
 - ATR-2026-00073: Malicious Fine-tuning Data
+- ATR-2026-00450: Spring AI PromptChatMemoryAdvisor Memory Poisoning (CVE-2026-41713)
 
 ---
 
@@ -624,6 +707,16 @@ Notable: agent-threat-rules (npm, 2.2.0), @panguard-ai/migrator-community
 Full text at panguard.ai/blog/{slug}. Each post also has a zh-TW
 counterpart at panguard.ai/zh-TW/blog/{slug}-zh.
 
+### ATR Implements the Detection Layer the NSA Identified as Missing in MCP
+- URL: https://panguard.ai/blog/nsa-mcp-csi-atr-detection-layer
+- Date: 2026-05-27
+- Excerpt: The NSA published 17 pages on MCP security risks in May 2026. It named zero detection frameworks. ATR fills that layer -- 433 rules covering all five NSA risk categories, in production at Microsoft, Cisco, MISP, and OWASP.
+
+### The Guardrail Company Got Owned. Skill Provenance Is the Layer Below.
+- URL: https://panguard.ai/blog/guardrail-company-got-owned
+- Date: 2026-05-23
+- Excerpt: On 2026-05-11 the Mini Shai-Hulud npm/PyPI worm trojanized 404 package versions, including @mistralai/mistralai and guardrails-ai. A runtime LLM-output guardrail cannot catch an install-time daemon. ATR v3.1.0 ships ATR-2026-00525 covering the gh-token-monitor signature.
+
 ### Four Hours. The New Disclosure-to-Exploit Window for AI Agent CVEs.
 - URL: https://panguard.ai/blog/four-hour-exploit-window
 - Date: 2026-05-18
@@ -713,16 +806,6 @@ counterpart at panguard.ai/zh-TW/blog/{slug}-zh.
 - URL: https://panguard.ai/blog/ai-agent-security-needs-platform
 - Date: 2026-04-22
 - Excerpt: The 7-layer defense architecture the industry has been missing. Every current vendor covers 1-2 layers — Sage on runtime, Cisco on scanning, Microsoft on governance, Straiker on detection. We argue the next shift is consolidation into a full-stack Agent Security Platform (ASP), and we publish our honest 5/7 coverage today along with the roadmap to 7/7 by Q3 2026.
-
-### MCP Narrative Collapse: Three Takes from Perplexity, YC, and the Indie-Hacker World
-- URL: https://panguard.ai/blog/mcp-narrative-collapse-three-takes
-- Date: 2026-04-20
-- Excerpt: In 72 hours, the AI infrastructure community went from "MCP is the future" to "MCP sucks honestly." Perplexity's CTO says they are moving off it internally. Garry Tan at YC posted the eulogy. Pieter Levels declared it dead. Here is what actually shifted, why the Ox Security disclosure was the trigger, and what it means for agent-layer security going forward.
-
-### 751 Malicious Skills Found on OpenClaw: Inside a Coordinated Supply Chain Attack
-- URL: https://panguard.ai/blog/751-malicious-skills-openclaw
-- Date: 2026-04-15
-- Excerpt: We scanned 56,480 AI agent skills on OpenClaw and found 751 distributing active malware. Three coordinated threat actors. Base64-encoded C2 callbacks. Password-protected zip files. The largest known AI agent supply chain attack.
 
 ---
 
