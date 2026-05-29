@@ -25,7 +25,7 @@ export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.5.6',
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
-  atrVersion: '3.0.1',
+  atrVersion: '3.0.2',
   /** ATR v2.2.x: stable + experimental total */
   atrRules: 450,
   atrStableRules: 359,
@@ -249,7 +249,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-05-28T04:18:37.277Z',
+  lastUpdated: '2026-05-29T04:19:56.595Z',
 } as const;
 
 export type Stats = typeof STATS;
