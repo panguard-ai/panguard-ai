@@ -27,6 +27,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      # pnpm BEFORE setup-node — setup-node@v5 reads the root package.json
+      # `packageManager: pnpm@10.30.2` field and prepares pnpm cache during
+      # its own step. Without pnpm already on PATH the step exits with
+      # "Unable to locate executable file: pnpm" (observed 2026-05-29).
+      # Same fix pattern as tc-pr-back.yml.
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version: '22'

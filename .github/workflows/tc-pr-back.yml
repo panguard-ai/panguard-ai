@@ -23,13 +23,19 @@ jobs:
       - name: Checkout PanGuard
         uses: actions/checkout@v5
 
+      # pnpm BEFORE setup-node: every other workflow in this repo (ci.yml,
+      # deploy.yml, publish.yml, release.yml, website-typecheck.yml,
+      # publish-migrator-community.yml) puts pnpm/action-setup first. When
+      # setup-node@v5 runs first, the subsequent `pnpm install` step fails
+      # with "Unable to locate executable file: pnpm" — observed 2026-05-29
+      # after the v4 → v5 bump in commit bc0e5f80.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '22'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
 
       - name: Install dependencies
         run: pnpm install --filter @panguard-ai/threat-cloud...
