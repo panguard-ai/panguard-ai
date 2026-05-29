@@ -15,15 +15,15 @@ jobs:
     name: Verify CI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: '20'
       - name: Get pnpm store directory
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ${{ env.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-v2-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -46,9 +46,9 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: '20'
       - name: Install Vercel CLI
@@ -66,7 +66,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
