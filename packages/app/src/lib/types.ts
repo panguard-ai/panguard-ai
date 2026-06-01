@@ -14,6 +14,17 @@ export type Role = 'admin' | 'analyst' | 'auditor' | 'readonly';
 
 export type Tier = 'community' | 'pilot' | 'enterprise';
 
+// ─── Organization layer (Partner / JV SaaS) ──────────────────────────────────
+// See supabase/migrations/20260530000001_organizations.sql.
+
+export type OrgRole = 'partner_admin' | 'partner_analyst';
+
+export type OrgType = 'partner' | 'direct';
+
+export type OrgRegion = 'eu' | 'us' | 'apac' | 'global';
+
+export type ContractStatus = 'trial' | 'active' | 'suspended';
+
 export type Severity = 'critical' | 'high' | 'medium' | 'low' | 'info';
 
 export type ReportFramework =
@@ -51,6 +62,13 @@ export interface Workspace {
   tc_org_id: string | null;
   tc_client_key_hash: string | null;
   /**
+   * Parent Partner/JV organization id. NULL = direct (PanGuard-managed)
+   * workspace. When set, members of the parent org get scoped access to this
+   * workspace via the org branch of is_workspace_member().
+   * See supabase/migrations/20260530000001_organizations.sql.
+   */
+  org_id: string | null;
+  /**
    * Stripe Customer id (`cus_...`). Set on the first successful
    * `checkout.session.completed` webhook event; preserved after cancellation
    * so reactivation reuses the same Stripe Customer object.
@@ -73,6 +91,33 @@ export interface WorkspaceMember {
   workspace_id: string;
   user_id: string;
   role: Role;
+  invited_at: string;
+  accepted_at: string | null;
+}
+
+export interface OrgBranding {
+  logo_url?: string;
+  primary_color?: string;
+  report_footer?: string;
+  legal_name?: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  type: OrgType;
+  region: OrgRegion;
+  branding: OrgBranding;
+  contract_status: ContractStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrganizationMember {
+  organization_id: string;
+  user_id: string;
+  role: OrgRole;
   invited_at: string;
   accepted_at: string | null;
 }
@@ -181,6 +226,76 @@ export interface EvidenceArchive {
   generated_at: string;
 }
 
+// ─── Deliverable layer (Partner/JV client deliverable reports) ───────────────
+// See supabase/migrations/20260530000003_deliverables.sql. These mirror the
+// pure domain types in lib/report/types.ts; the unions below are inlined (not
+// imported from there) to keep this schema-mirror file free of a circular
+// import. `controls` is structurally identical to report/types.ts `ControlRef`.
+
+export type DeliverableStatus = 'draft' | 'issued';
+
+/** A finding's framework-control mapping, as stored in `controls` JSONB. */
+export interface DeliverableControlRef {
+  framework: ReportFramework;
+  identifier: string;
+  context?: string;
+  strength?: 'primary' | 'secondary' | 'partial';
+}
+
+/** Row in `deliverables` — the editable working doc + issued-artifact pointer. */
+export interface Deliverable {
+  id: string;
+  workspace_id: string;
+  status: DeliverableStatus;
+  language: 'en' | 'zh-Hant';
+  classification: 'public' | 'internal' | 'confidential' | 'restricted';
+  region: OrgRegion;
+  primary_framework: ReportFramework;
+  client_name: string;
+  client_detail: string | null;
+  assessor_name: string;
+  assessor_detail: string | null;
+  report_ref: string;
+  version: string;
+  report_date: string | null;
+  prepared_by: string;
+  reviewed_by: string | null;
+  scope: string[];
+  methodology: string[];
+  sha256: string | null;
+  hmac_sha256: string | null;
+  storage_path: string | null;
+  size_bytes: number | null;
+  page_count: number | null;
+  finding_count: number | null;
+  issued_by: string | null;
+  issued_at: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Row in `deliverable_findings` — one editable finding (ordered by `ordinal`). */
+export interface DeliverableFindingRow {
+  id: string;
+  deliverable_id: string;
+  ordinal: number;
+  finding_ref: string | null;
+  title: string;
+  severity: Severity;
+  category: string | null;
+  atr_rule_id: string | null;
+  affected_asset: string | null;
+  description: string;
+  evidence: string | null;
+  cvss: number | null;
+  cvss_vector: string | null;
+  remediation: string;
+  controls: DeliverableControlRef[];
+  created_at: string;
+  updated_at: string;
+}
+
 // ─── Database<> generic for Supabase client ──────────────────────────────────
 
 type InsertOf<T, Opt extends keyof T> = Omit<T, Opt> & Partial<Pick<T, Opt>>;
@@ -200,6 +315,7 @@ export interface Database {
           | 'tc_api_key_hash'
           | 'tc_org_id'
           | 'tc_client_key_hash'
+          | 'org_id'
           | 'stripe_customer_id'
           | 'cancel_at'
         >;
@@ -210,6 +326,21 @@ export interface Database {
         Row: WorkspaceMember;
         Insert: InsertOf<WorkspaceMember, 'invited_at' | 'accepted_at'>;
         Update: Partial<WorkspaceMember>;
+        Relationships: [];
+      };
+      organizations: {
+        Row: Organization;
+        Insert: InsertOf<
+          Organization,
+          'id' | 'created_at' | 'updated_at' | 'type' | 'region' | 'branding' | 'contract_status'
+        >;
+        Update: Partial<Organization>;
+        Relationships: [];
+      };
+      organization_members: {
+        Row: OrganizationMember;
+        Insert: InsertOf<OrganizationMember, 'role' | 'invited_at' | 'accepted_at'>;
+        Update: Partial<OrganizationMember>;
         Relationships: [];
       };
       api_keys: {
@@ -296,6 +427,69 @@ export interface Database {
         Update: Partial<EvidenceArchive>;
         Relationships: [];
       };
+      deliverables: {
+        Row: Deliverable;
+        // Only workspace_id is required at insert; everything else has a DB
+        // default (status='draft', metadata defaults) or is filled on issue.
+        Insert: InsertOf<
+          Deliverable,
+          | 'id'
+          | 'created_at'
+          | 'updated_at'
+          | 'status'
+          | 'language'
+          | 'classification'
+          | 'region'
+          | 'primary_framework'
+          | 'client_name'
+          | 'client_detail'
+          | 'assessor_name'
+          | 'assessor_detail'
+          | 'report_ref'
+          | 'version'
+          | 'report_date'
+          | 'prepared_by'
+          | 'reviewed_by'
+          | 'scope'
+          | 'methodology'
+          | 'sha256'
+          | 'hmac_sha256'
+          | 'storage_path'
+          | 'size_bytes'
+          | 'page_count'
+          | 'finding_count'
+          | 'issued_by'
+          | 'issued_at'
+          | 'created_by'
+        >;
+        Update: Partial<Deliverable>;
+        Relationships: [];
+      };
+      deliverable_findings: {
+        Row: DeliverableFindingRow;
+        // Only deliverable_id is required; the rest default at the DB level.
+        Insert: InsertOf<
+          DeliverableFindingRow,
+          | 'id'
+          | 'created_at'
+          | 'updated_at'
+          | 'ordinal'
+          | 'finding_ref'
+          | 'title'
+          | 'severity'
+          | 'category'
+          | 'atr_rule_id'
+          | 'affected_asset'
+          | 'description'
+          | 'evidence'
+          | 'cvss'
+          | 'cvss_vector'
+          | 'remediation'
+          | 'controls'
+        >;
+        Update: Partial<DeliverableFindingRow>;
+        Relationships: [];
+      };
     };
     Views: {
       events_with_endpoint: {
@@ -326,6 +520,14 @@ export interface Database {
       is_workspace_member: {
         Args: { p_workspace_id: string; p_min_role?: Role };
         Returns: boolean;
+      };
+      is_org_member: {
+        Args: { p_org_id: string; p_min_role?: OrgRole };
+        Returns: boolean;
+      };
+      create_client_workspace: {
+        Args: { p_org_id: string; p_name: string; p_slug: string };
+        Returns: Workspace;
       };
       upsert_endpoint: {
         Args: {

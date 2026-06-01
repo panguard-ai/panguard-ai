@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
-const PROTECTED_PREFIXES = ['/w/', '/device/approve', '/onboarding'];
+const PROTECTED_PREFIXES = ['/w/', '/partner/', '/device/approve', '/onboarding'];
 
 function applySecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set('X-Content-Type-Options', 'nosniff');

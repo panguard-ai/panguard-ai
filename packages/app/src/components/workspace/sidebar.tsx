@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import {
+  FileCheck,
   FileText,
   LayoutDashboard,
   ListOrdered,
@@ -25,6 +26,12 @@ export function Sidebar({ slug, activePath }: SidebarProps) {
       match: `${base}/endpoints`,
     },
     { href: `${base}/reports`, label: 'Reports', icon: FileText, match: `${base}/reports` },
+    {
+      href: `${base}/deliverables`,
+      label: 'Deliverables',
+      icon: FileCheck,
+      match: `${base}/deliverables`,
+    },
     { href: `${base}/settings`, label: 'Settings', icon: Settings, match: `${base}/settings` },
   ];
 

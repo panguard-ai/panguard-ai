@@ -2,6 +2,7 @@ export {
   LayoutDashboard,
   ListOrdered,
   FileText,
+  FileCheck,
   Settings,
   LogOut,
   Plus,
@@ -21,4 +22,5 @@ export {
   ExternalLink,
   Trash2,
   RotateCcw,
+  ScanLine,
 } from 'lucide-react';

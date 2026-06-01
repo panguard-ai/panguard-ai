@@ -7,6 +7,12 @@ coverage/
 .env
 .env.local
 .env.*.local
+# Catch every other local env variant + backups (e.g. .env.live, .env.test.bak,
+# .env.*.from-vercel-*.txt) so real secrets can never be committed by `git add .`.
+# Any *.example file is a safe, secret-free template and stays tracked
+# (.env.example, .env.docker.example, .env.local.example, ...).
+.env.*
+!.env*.example
 logs/
 *.log
 .DS_Store

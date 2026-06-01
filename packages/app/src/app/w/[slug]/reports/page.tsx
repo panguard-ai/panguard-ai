@@ -73,7 +73,6 @@ export default async function ReportsPage({ params }: { params: Promise<{ slug: 
               { value: 'eu-ai-act', label: 'EU AI Act (2024/1689)' },
               { value: 'nist-ai-rmf', label: 'NIST AI RMF 1.0' },
               { value: 'iso-42001', label: 'ISO/IEC 42001:2023' },
-              { value: 'colorado-ai-act', label: 'Colorado SB24-205' },
               { value: 'owasp-agentic', label: 'OWASP Agentic Top 10' },
               { value: 'owasp-llm', label: 'OWASP LLM Top 10' },
             ]}

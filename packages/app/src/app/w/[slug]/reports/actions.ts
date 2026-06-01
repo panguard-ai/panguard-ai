@@ -13,7 +13,6 @@ const GenerateInput = z.object({
     'owasp-agentic',
     'owasp-llm',
     'eu-ai-act',
-    'colorado-ai-act',
     'nist-ai-rmf',
     'iso-42001',
   ]),
