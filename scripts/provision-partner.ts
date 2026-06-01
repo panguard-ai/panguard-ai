@@ -184,9 +184,12 @@ async function main(): Promise<void> {
 
   // 2. Invite the admin email (sends magic link), or resolve an existing user.
   const appUrl = process.env['APP_URL'] ?? 'https://app.panguard.ai';
-  const { data: invite, error: inviteErr } = await sb.auth.admin.inviteUserByEmail(args.adminEmail, {
-    redirectTo: `${appUrl}/auth/callback?partner=${org.slug}`,
-  });
+  const { data: invite, error: inviteErr } = await sb.auth.admin.inviteUserByEmail(
+    args.adminEmail,
+    {
+      redirectTo: `${appUrl}/auth/callback?partner=${org.slug}`,
+    }
+  );
 
   let adminUserId: string | null = null;
   if (inviteErr) {
