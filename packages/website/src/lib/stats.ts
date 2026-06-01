@@ -249,7 +249,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-05-31T04:32:24.691Z',
+  lastUpdated: '2026-06-01T05:01:56.657Z',
 } as const;
 
 export type Stats = typeof STATS;
