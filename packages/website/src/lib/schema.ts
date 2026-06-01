@@ -85,10 +85,7 @@ export const PERSON_ADAM_SCHEMA = {
     'AI compliance',
     'OWASP Agentic Top 10',
   ],
-  sameAs: [
-    'https://github.com/eeee2345',
-    'https://linkedin.com/in/adamlin-panguard',
-  ],
+  sameAs: ['https://github.com/eeee2345', 'https://linkedin.com/in/adamlin-panguard'],
   knowsLanguage: ['en', 'zh-Hant', 'zh-TW'],
   nationality: { '@type': 'Country', name: 'Taiwan' },
 } as const;
