@@ -28,8 +28,18 @@ const FINDINGS: DeliverableFinding[] = [
     remediation:
       'Pass arguments as an array to spawn() without a shell. Validate tool inputs against a strict allowlist before dispatch.',
     controls: [
-      { framework: 'eu-ai-act', identifier: 'Art. 15', context: 'Accuracy, robustness and cybersecurity', strength: 'primary' },
-      { framework: 'iso-42001', identifier: '8.3', context: 'AI system operational controls', strength: 'secondary' },
+      {
+        framework: 'eu-ai-act',
+        identifier: 'Art. 15',
+        context: 'Accuracy, robustness and cybersecurity',
+        strength: 'primary',
+      },
+      {
+        framework: 'iso-42001',
+        identifier: '8.3',
+        context: 'AI system operational controls',
+        strength: 'secondary',
+      },
     ],
   },
   {
@@ -44,8 +54,15 @@ const FINDINGS: DeliverableFinding[] = [
     evidence: 'redis-cli -h 10.0.2.14 PING -> PONG (no AUTH)',
     cvss: 8.1,
     cvssVector: 'CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
-    remediation: 'Enable requirepass, bind to 127.0.0.1, and restrict the subnet with a host firewall rule.',
-    controls: [{ framework: 'eu-ai-act', identifier: 'Art. 15', context: 'Cybersecurity of high-risk AI systems' }],
+    remediation:
+      'Enable requirepass, bind to 127.0.0.1, and restrict the subnet with a host firewall rule.',
+    controls: [
+      {
+        framework: 'eu-ai-act',
+        identifier: 'Art. 15',
+        context: 'Cybersecurity of high-risk AI systems',
+      },
+    ],
   },
   {
     id: 'PG-003',
@@ -57,7 +74,8 @@ const FINDINGS: DeliverableFinding[] = [
     description:
       'Documents returned by the retrieval tool were concatenated into the system prompt without delimiting or instruction-stripping, allowing indirect prompt injection from poisoned sources.',
     cvss: 7.4,
-    remediation: 'Delimit retrieved content, strip imperative instructions, and apply an ATR prompt-injection ruleset at ingest.',
+    remediation:
+      'Delimit retrieved content, strip imperative instructions, and apply an ATR prompt-injection ruleset at ingest.',
     controls: [
       { framework: 'owasp-llm', identifier: 'LLM01', context: 'Prompt Injection' },
       { framework: 'iso-42001', identifier: '8.4' },
@@ -72,8 +90,11 @@ const FINDINGS: DeliverableFinding[] = [
     description:
       'Device-authorisation tokens were issued with a wildcard scope rather than narrowed to the operations the CLI actually performs.',
     cvss: 5.4,
-    remediation: 'Issue least-privilege scopes per device-code grant; reject wildcard scope requests server-side.',
-    controls: [{ framework: 'nist-ai-rmf', identifier: 'GOVERN.1.2', context: 'Accountability structures' }],
+    remediation:
+      'Issue least-privilege scopes per device-code grant; reject wildcard scope requests server-side.',
+    controls: [
+      { framework: 'nist-ai-rmf', identifier: 'GOVERN.1.2', context: 'Accountability structures' },
+    ],
   },
   {
     id: 'PG-005',
@@ -93,7 +114,8 @@ const FINDINGS: DeliverableFinding[] = [
     category: 'privacy',
     description:
       'Redacted telemetry retained a stable per-endpoint hash that, while not raw PII, could correlate activity across sessions.',
-    remediation: 'Rotate the per-endpoint salt on a schedule if cross-session correlation is not required.',
+    remediation:
+      'Rotate the per-endpoint salt on a schedule if cross-session correlation is not required.',
   },
 ];
 
@@ -134,7 +156,9 @@ describe('deliverable sample artifacts', () => {
     expect(onDisk.byteLength).toBeGreaterThan(5000);
     expect(out.pageCount).toBeGreaterThanOrEqual(3);
     // eslint-disable-next-line no-console
-    console.log(`[sample] EN  -> ${path} (${onDisk.byteLength} bytes, ${out.pageCount} pages, hmac=${out.hmacSha256 ? 'yes' : 'no'})`);
+    console.log(
+      `[sample] EN  -> ${path} (${onDisk.byteLength} bytes, ${out.pageCount} pages, hmac=${out.hmacSha256 ? 'yes' : 'no'})`
+    );
   });
 
   it('writes a valid Traditional Chinese sample to disk', async () => {

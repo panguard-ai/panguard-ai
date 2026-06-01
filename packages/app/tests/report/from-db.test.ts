@@ -67,7 +67,12 @@ function makeFinding(over: Partial<DeliverableFindingRow> = {}): DeliverableFind
     cvss_vector: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H',
     remediation: 'Pass args as an array without a shell; allowlist tool inputs.',
     controls: [
-      { framework: 'eu-ai-act', identifier: 'Art. 15', context: 'Cybersecurity', strength: 'primary' },
+      {
+        framework: 'eu-ai-act',
+        identifier: 'Art. 15',
+        context: 'Cybersecurity',
+        strength: 'primary',
+      },
     ],
     created_at: '2026-05-30T00:00:00.000Z',
     updated_at: '2026-05-30T00:00:00.000Z',
@@ -112,7 +117,12 @@ describe('findingRowToDomain', () => {
   it('passes controls through structurally unchanged', () => {
     const out = findingRowToDomain(makeFinding());
     expect(out.controls).toEqual([
-      { framework: 'eu-ai-act', identifier: 'Art. 15', context: 'Cybersecurity', strength: 'primary' },
+      {
+        framework: 'eu-ai-act',
+        identifier: 'Art. 15',
+        context: 'Cybersecurity',
+        strength: 'primary',
+      },
     ]);
   });
 });
@@ -132,7 +142,9 @@ describe('deliverableToReportInput', () => {
   });
 
   it('normalises empty methodology to undefined (so generator uses regional default)', () => {
-    expect(deliverableToReportInput(makeDeliverable({ methodology: [] }), []).methodology).toBeUndefined();
+    expect(
+      deliverableToReportInput(makeDeliverable({ methodology: [] }), []).methodology
+    ).toBeUndefined();
     expect(
       deliverableToReportInput(makeDeliverable({ methodology: ['Step one'] }), []).methodology
     ).toEqual(['Step one']);
@@ -140,7 +152,12 @@ describe('deliverableToReportInput', () => {
 
   it('maps null detail/reviewer/date to undefined / empty string', () => {
     const input = deliverableToReportInput(
-      makeDeliverable({ client_detail: null, assessor_detail: null, reviewed_by: null, report_date: null }),
+      makeDeliverable({
+        client_detail: null,
+        assessor_detail: null,
+        reviewed_by: null,
+        report_date: null,
+      }),
       []
     );
     expect(input.client.detail).toBeUndefined();
@@ -171,7 +188,9 @@ describe('orgBrandingToReportBranding', () => {
     expect(orgBrandingToReportBranding({})).toBeUndefined();
     // logo_url is intentionally ignored (partner logo rides on logoPath), so a
     // branding blob that only carries a logo still maps to nothing renderable.
-    expect(orgBrandingToReportBranding({ logo_url: 'https://example.com/logo.png' })).toBeUndefined();
+    expect(
+      orgBrandingToReportBranding({ logo_url: 'https://example.com/logo.png' })
+    ).toBeUndefined();
   });
 
   it('maps the full branding blob to legalName / reportFooter / primaryColor', () => {
@@ -203,7 +222,15 @@ describe('issue path produces a real PDF from rows', () => {
   it('renders a signed, multi-finding deliverable to a valid PDF', async () => {
     const input = deliverableToReportInput(
       makeDeliverable(),
-      [makeFinding(), makeFinding({ id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', finding_ref: 'PG-002', severity: 'high', cvss: 8.1 })],
+      [
+        makeFinding(),
+        makeFinding({
+          id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+          finding_ref: 'PG-002',
+          severity: 'high',
+          cvss: 8.1,
+        }),
+      ],
       { signingKey: 'test-key' }
     );
     const out = await generateDeliverableReport(input);

@@ -184,7 +184,9 @@ export function DeliverableMetaForm({
               name="scope"
               className={textareaClass}
               defaultValue={deliverable.scope.join('\n')}
-              placeholder={'One item per line, e.g.\nProduction MCP servers\nTime window: 2026-05-01 to 2026-05-15'}
+              placeholder={
+                'One item per line, e.g.\nProduction MCP servers\nTime window: 2026-05-01 to 2026-05-15'
+              }
             />
             <p className="text-xs text-text-muted">One bullet per line.</p>
           </div>

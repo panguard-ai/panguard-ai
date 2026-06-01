@@ -210,16 +210,12 @@ export default async function DeliverableDetailPage({
             <h1 className="text-2xl font-semibold text-text-primary">
               {deliverable.report_ref || 'Untitled deliverable'}
             </h1>
-            {isIssued ? (
-              <Badge tone="sage">Issued</Badge>
-            ) : (
-              <Badge tone="neutral">Draft</Badge>
-            )}
+            {isIssued ? <Badge tone="sage">Issued</Badge> : <Badge tone="neutral">Draft</Badge>}
           </div>
           <p className="mt-1 text-sm text-text-muted">
-            {deliverable.client_name || '—'} · {FRAMEWORK_LABEL[deliverable.primary_framework] ??
-              deliverable.primary_framework}{' '}
-            · {REGION_LABEL[deliverable.region] ?? deliverable.region} ·{' '}
+            {deliverable.client_name || '—'} ·{' '}
+            {FRAMEWORK_LABEL[deliverable.primary_framework] ?? deliverable.primary_framework} ·{' '}
+            {REGION_LABEL[deliverable.region] ?? deliverable.region} ·{' '}
             {LANGUAGE_LABEL[deliverable.language] ?? deliverable.language}
           </p>
         </div>

@@ -51,15 +51,27 @@ export function renderCover(
   const clsColor = classificationColor(input.classification);
   const clsW = doc.font(ctx.fonts.heading).fontSize(10).widthOfString(clsLabel) + 16;
   doc.roundedRect((LAYOUT.pageWidth - clsW) / 2, y, clsW, 18, 3).fill(clsColor);
-  doc.fillColor(COLORS.white).font(ctx.fonts.heading).fontSize(10).text(clsLabel, 0, y + 5, {
-    width: LAYOUT.pageWidth,
-    align: 'center',
-  });
+  doc
+    .fillColor(COLORS.white)
+    .font(ctx.fonts.heading)
+    .fontSize(10)
+    .text(clsLabel, 0, y + 5, {
+      width: LAYOUT.pageWidth,
+      align: 'center',
+    });
   y += 50;
 
-  doc.font(ctx.fonts.heading).fontSize(24).fillColor(COLORS.primary).text(labels.documentTitle, LAYOUT.margin, y, centerOpts);
+  doc
+    .font(ctx.fonts.heading)
+    .fontSize(24)
+    .fillColor(COLORS.primary)
+    .text(labels.documentTitle, LAYOUT.margin, y, centerOpts);
   y = doc.y + 6;
-  doc.font(ctx.fonts.body).fontSize(11).fillColor(COLORS.lightText).text(labels.subtitle, LAYOUT.margin, y, centerOpts);
+  doc
+    .font(ctx.fonts.body)
+    .fontSize(11)
+    .fillColor(COLORS.lightText)
+    .text(labels.subtitle, LAYOUT.margin, y, centerOpts);
   y = doc.y + 30;
 
   const meta: ReadonlyArray<[string, string]> = [
@@ -142,9 +154,13 @@ export function renderExecutiveSummary(ctx: RenderCtx, input: DeliverableReportI
   const counts = countBySeverity(input.findings);
   const rating = overallRiskRating(counts);
   ensureSpace(doc, 24);
-  doc.font(ctx.fonts.heading).fontSize(11).fillColor(COLORS.secondary).text(`${labels.overallRiskLine}: `, LAYOUT.margin, doc.y, {
-    continued: true,
-  });
+  doc
+    .font(ctx.fonts.heading)
+    .fontSize(11)
+    .fillColor(COLORS.secondary)
+    .text(`${labels.overallRiskLine}: `, LAYOUT.margin, doc.y, {
+      continued: true,
+    });
   const ratingColor = rating === 'none' ? COLORS.low : severityColor(rating);
   doc.fillColor(ratingColor).text(labels.riskRating[rating]);
   doc.moveDown(0.6);
@@ -225,24 +241,41 @@ function renderFinding(ctx: RenderCtx, f: DeliverableFinding): void {
   const { doc, labels } = ctx;
   ensureSpace(doc, 90);
   const y = doc.y;
-  badge(doc, LAYOUT.margin, y + 1, labels.severity[f.severity], severityColor(f.severity), ctx.fonts.heading);
-  doc.font(ctx.fonts.heading).fontSize(11).fillColor(COLORS.primary).text(`  ${f.id}  ${f.title}`, LAYOUT.margin + 70, y, {
-    width: LAYOUT.contentWidth - 70,
-  });
+  badge(
+    doc,
+    LAYOUT.margin,
+    y + 1,
+    labels.severity[f.severity],
+    severityColor(f.severity),
+    ctx.fonts.heading
+  );
+  doc
+    .font(ctx.fonts.heading)
+    .fontSize(11)
+    .fillColor(COLORS.primary)
+    .text(`  ${f.id}  ${f.title}`, LAYOUT.margin + 70, y, {
+      width: LAYOUT.contentWidth - 70,
+    });
   doc.moveDown(0.3);
 
   const metaBits: string[] = [];
   if (typeof f.cvss === 'number') {
     const band = cvssRatingLabel(f.cvss);
-    metaBits.push(`${labels.table.cvss} ${f.cvss.toFixed(1)}${band && band !== 'none' ? ` (${labels.severity[band]})` : ''}`);
+    metaBits.push(
+      `${labels.table.cvss} ${f.cvss.toFixed(1)}${band && band !== 'none' ? ` (${labels.severity[band]})` : ''}`
+    );
   }
   if (f.cvssVector) metaBits.push(f.cvssVector);
   if (f.affectedAsset) metaBits.push(`${labels.table.asset}: ${f.affectedAsset}`);
   if (f.atrRuleId) metaBits.push(`${labels.table.atrRule}: ${f.atrRuleId}`);
   if (metaBits.length > 0) {
-    doc.font(ctx.fonts.oblique).fontSize(8).fillColor(COLORS.lightText).text(metaBits.join('   ·   '), LAYOUT.margin, doc.y, {
-      width: LAYOUT.contentWidth,
-    });
+    doc
+      .font(ctx.fonts.oblique)
+      .fontSize(8)
+      .fillColor(COLORS.lightText)
+      .text(metaBits.join('   ·   '), LAYOUT.margin, doc.y, {
+        width: LAYOUT.contentWidth,
+      });
     doc.moveDown(0.3);
   }
 
@@ -251,7 +284,8 @@ function renderFinding(ctx: RenderCtx, f: DeliverableFinding): void {
   labelledBlock(ctx, labels.table.remediation, f.remediation);
   if (f.controls && f.controls.length > 0) {
     const lines = f.controls.map(
-      (c) => `${frameworkDisplayName(c.framework)} ${c.identifier}${c.context ? ` — ${c.context}` : ''}`
+      (c) =>
+        `${frameworkDisplayName(c.framework)} ${c.identifier}${c.context ? ` — ${c.context}` : ''}`
     );
     labelledBlock(ctx, labels.table.control, lines.join('\n'));
   }
@@ -264,12 +298,23 @@ function labelledBlock(ctx: RenderCtx, label: string, value: string, valueFont?:
   const font = valueFont ?? ctx.fonts.body;
   const h =
     doc.font(ctx.fonts.heading).fontSize(9).heightOfString(label) +
-    doc.font(font).fontSize(9).heightOfString(text, { width: LAYOUT.contentWidth - 8 });
+    doc
+      .font(font)
+      .fontSize(9)
+      .heightOfString(text, { width: LAYOUT.contentWidth - 8 });
   ensureSpace(doc, h + 6);
-  doc.font(ctx.fonts.heading).fontSize(9).fillColor(COLORS.secondary).text(label, LAYOUT.margin, doc.y);
-  doc.font(font).fontSize(9).fillColor(COLORS.text).text(text, LAYOUT.margin + 8, doc.y, {
-    width: LAYOUT.contentWidth - 8,
-  });
+  doc
+    .font(ctx.fonts.heading)
+    .fontSize(9)
+    .fillColor(COLORS.secondary)
+    .text(label, LAYOUT.margin, doc.y);
+  doc
+    .font(font)
+    .fontSize(9)
+    .fillColor(COLORS.text)
+    .text(text, LAYOUT.margin + 8, doc.y, {
+      width: LAYOUT.contentWidth - 8,
+    });
   doc.moveDown(0.25);
 }
 
@@ -289,13 +334,17 @@ export function renderTraceability(ctx: RenderCtx, input: DeliverableReportInput
     r.controlIdentifier,
     r.context || '—',
   ]);
-  table(ctx, [
-    { header: labels.table.id, width: 0.12 },
-    { header: labels.table.atrRule, width: 0.2 },
-    { header: labels.table.framework, width: 0.2 },
-    { header: labels.table.control, width: 0.16 },
-    { header: labels.table.context, width: 0.32 },
-  ], tableRows);
+  table(
+    ctx,
+    [
+      { header: labels.table.id, width: 0.12 },
+      { header: labels.table.atrRule, width: 0.2 },
+      { header: labels.table.framework, width: 0.2 },
+      { header: labels.table.control, width: 0.16 },
+      { header: labels.table.context, width: 0.32 },
+    ],
+    tableRows
+  );
 }
 
 /** Attestation statement + sign-off lines. */
@@ -308,35 +357,68 @@ export function renderAttestation(ctx: RenderCtx, input: DeliverableReportInput)
   const colW = LAYOUT.contentWidth / 2 - 10;
   const y = doc.y;
   signLine(ctx, LAYOUT.margin, y, colW, labels.preparedBy, input.preparedBy);
-  if (input.reviewedBy) signLine(ctx, LAYOUT.margin + colW + 20, y, colW, labels.reviewedBy, input.reviewedBy);
+  if (input.reviewedBy)
+    signLine(ctx, LAYOUT.margin + colW + 20, y, colW, labels.reviewedBy, input.reviewedBy);
   doc.y = y + 50;
 }
 
-function signLine(ctx: RenderCtx, x: number, y: number, w: number, role: string, name: string): void {
+function signLine(
+  ctx: RenderCtx,
+  x: number,
+  y: number,
+  w: number,
+  role: string,
+  name: string
+): void {
   const { doc } = ctx;
-  doc.strokeColor(COLORS.secondary).lineWidth(0.5).moveTo(x, y + 30).lineTo(x + w, y + 30).stroke();
-  doc.font(ctx.fonts.heading).fontSize(9).fillColor(COLORS.text).text(name, x, y + 34, { width: w });
-  doc.font(ctx.fonts.oblique).fontSize(8).fillColor(COLORS.lightText).text(role, x, doc.y, { width: w });
+  doc
+    .strokeColor(COLORS.secondary)
+    .lineWidth(0.5)
+    .moveTo(x, y + 30)
+    .lineTo(x + w, y + 30)
+    .stroke();
+  doc
+    .font(ctx.fonts.heading)
+    .fontSize(9)
+    .fillColor(COLORS.text)
+    .text(name, x, y + 34, { width: w });
+  doc
+    .font(ctx.fonts.oblique)
+    .fontSize(8)
+    .fillColor(COLORS.lightText)
+    .text(role, x, doc.y, { width: w });
 }
 
 /** Report-integrity block: SHA-256 + optional HMAC + verification note. */
-export function renderIntegrity(
-  ctx: RenderCtx,
-  sha256: string,
-  hmac: string | null
-): void {
+export function renderIntegrity(ctx: RenderCtx, sha256: string, hmac: string | null): void {
   const { doc, labels } = ctx;
   sectionHeading(ctx, labels.sections.integrity);
-  doc.font(ctx.fonts.heading).fontSize(9).fillColor(COLORS.secondary).text('SHA-256', LAYOUT.margin, doc.y);
-  doc.font(ctx.fonts.mono).fontSize(8).fillColor(COLORS.text).text(sha256, LAYOUT.margin + 8, doc.y, {
-    width: LAYOUT.contentWidth - 8,
-  });
-  if (hmac) {
-    doc.moveDown(0.2);
-    doc.font(ctx.fonts.heading).fontSize(9).fillColor(COLORS.secondary).text('HMAC-SHA256', LAYOUT.margin, doc.y);
-    doc.font(ctx.fonts.mono).fontSize(8).fillColor(COLORS.text).text(hmac, LAYOUT.margin + 8, doc.y, {
+  doc
+    .font(ctx.fonts.heading)
+    .fontSize(9)
+    .fillColor(COLORS.secondary)
+    .text('SHA-256', LAYOUT.margin, doc.y);
+  doc
+    .font(ctx.fonts.mono)
+    .fontSize(8)
+    .fillColor(COLORS.text)
+    .text(sha256, LAYOUT.margin + 8, doc.y, {
       width: LAYOUT.contentWidth - 8,
     });
+  if (hmac) {
+    doc.moveDown(0.2);
+    doc
+      .font(ctx.fonts.heading)
+      .fontSize(9)
+      .fillColor(COLORS.secondary)
+      .text('HMAC-SHA256', LAYOUT.margin, doc.y);
+    doc
+      .font(ctx.fonts.mono)
+      .fontSize(8)
+      .fillColor(COLORS.text)
+      .text(hmac, LAYOUT.margin + 8, doc.y, {
+        width: LAYOUT.contentWidth - 8,
+      });
   }
   doc.moveDown(0.4);
   paragraph(ctx, labels.integrityNote, 8);

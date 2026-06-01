@@ -28,7 +28,12 @@ const enrichment: RuleEnrichment = {
   title: 'MCP server argv command injection',
   category: 'tool-poisoning',
   controls: [
-    { framework: 'eu-ai-act', identifier: 'Art. 15', context: 'Cybersecurity', strength: 'primary' },
+    {
+      framework: 'eu-ai-act',
+      identifier: 'Art. 15',
+      context: 'Cybersecurity',
+      strength: 'primary',
+    },
   ],
 };
 
@@ -76,9 +81,15 @@ describe('seedFindingsFromScans', () => {
   });
 
   it('prefers endpoint_hostname, falls back to target for affected_asset', () => {
-    const [withHost] = seedFindingsFromScans([ev({ endpoint_hostname: 'h', target: 't' })], () => null);
+    const [withHost] = seedFindingsFromScans(
+      [ev({ endpoint_hostname: 'h', target: 't' })],
+      () => null
+    );
     expect(withHost?.affected_asset).toBe('h');
-    const [noHost] = seedFindingsFromScans([ev({ endpoint_hostname: null, target: 't' })], () => null);
+    const [noHost] = seedFindingsFromScans(
+      [ev({ endpoint_hostname: null, target: 't' })],
+      () => null
+    );
     expect(noHost?.affected_asset).toBe('t');
   });
 

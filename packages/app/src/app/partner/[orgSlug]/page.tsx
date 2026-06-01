@@ -59,7 +59,10 @@ export default async function PartnerFleetPage({
       </div>
 
       <Card padding="lg">
-        <CardHeader title="Clients" subtitle="Open a client to manage its endpoints, events, and reports." />
+        <CardHeader
+          title="Clients"
+          subtitle="Open a client to manage its endpoints, events, and reports."
+        />
         {clients.length === 0 ? (
           <EmptyClients canCreate={isAdmin} />
         ) : (

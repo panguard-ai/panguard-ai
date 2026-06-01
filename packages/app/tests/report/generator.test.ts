@@ -29,9 +29,14 @@ function makeInput(over: Partial<DeliverableReportInput> = {}): DeliverableRepor
         evidence: 'argv: ["sh","-c","...redacted..."]',
         cvss: 9.8,
         cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H',
-        remediation: 'Use an allowlist and pass arguments as an array; never interpolate into a shell.',
+        remediation:
+          'Use an allowlist and pass arguments as an array; never interpolate into a shell.',
         controls: [
-          { framework: 'eu-ai-act', identifier: 'Art. 15', context: 'Accuracy, robustness and cybersecurity' },
+          {
+            framework: 'eu-ai-act',
+            identifier: 'Art. 15',
+            context: 'Accuracy, robustness and cybersecurity',
+          },
           { framework: 'iso-42001', identifier: '8.3', context: 'AI system operation controls' },
         ],
       },

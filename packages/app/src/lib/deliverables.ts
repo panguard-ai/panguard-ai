@@ -10,9 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { Deliverable, DeliverableFindingRow } from '@/lib/types';
 
 /** List a workspace's deliverables, newest first. Returns [] on error. */
-export async function listDeliverables(
-  workspaceId: string
-): Promise<ReadonlyArray<Deliverable>> {
+export async function listDeliverables(workspaceId: string): Promise<ReadonlyArray<Deliverable>> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('deliverables')
@@ -28,10 +26,7 @@ export async function listDeliverables(
 }
 
 /** Fetch a single deliverable scoped to the workspace, or null. */
-export async function getDeliverable(
-  workspaceId: string,
-  id: string
-): Promise<Deliverable | null> {
+export async function getDeliverable(workspaceId: string, id: string): Promise<Deliverable | null> {
   const supabase = await createClient();
   const { data } = await supabase
     .from('deliverables')

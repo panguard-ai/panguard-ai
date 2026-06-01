@@ -84,7 +84,12 @@ describe('controlsFromCompliance', () => {
       ],
     });
     expect(out).toEqual([
-      { framework: 'eu-ai-act', identifier: 'Art. 9', context: 'Risk management', strength: 'primary' },
+      {
+        framework: 'eu-ai-act',
+        identifier: 'Art. 9',
+        context: 'Risk management',
+        strength: 'primary',
+      },
     ]);
   });
 

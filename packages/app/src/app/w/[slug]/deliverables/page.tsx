@@ -8,11 +8,7 @@ import { Table, TBody, TD, TH, THead, TR } from '@/components/ui/table';
 import { FileCheck } from '@/components/icons';
 import { NewDeliverableButton } from '@/components/deliverables/new-deliverable-button';
 
-export default async function DeliverablesPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function DeliverablesPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const ctx = await requireWorkspaceBySlug(slug);
   if (!ctx) notFound();
@@ -77,7 +73,9 @@ export default async function DeliverablesPage({
                       <Badge tone="neutral">Draft</Badge>
                     )}
                   </TD>
-                  <TD>{d.status === 'issued' ? d.finding_count ?? 0 : liveCounts.get(d.id) ?? 0}</TD>
+                  <TD>
+                    {d.status === 'issued' ? (d.finding_count ?? 0) : (liveCounts.get(d.id) ?? 0)}
+                  </TD>
                   <TD>{d.report_date ?? new Date(d.created_at).toLocaleDateString()}</TD>
                 </TR>
               ))}

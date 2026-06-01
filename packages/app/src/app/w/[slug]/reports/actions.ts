@@ -9,13 +9,7 @@ import { generateComplianceReport } from '@/lib/report-generator';
 
 const GenerateInput = z.object({
   slug: z.string(),
-  framework: z.enum([
-    'owasp-agentic',
-    'owasp-llm',
-    'eu-ai-act',
-    'nist-ai-rmf',
-    'iso-42001',
-  ]),
+  framework: z.enum(['owasp-agentic', 'owasp-llm', 'eu-ai-act', 'nist-ai-rmf', 'iso-42001']),
   format: z.enum(['pdf', 'json', 'md']),
   orgName: z.string().trim().min(2).max(120),
 });

@@ -9,7 +9,11 @@ import { getDeliverable, listDeliverableFindings } from '@/lib/deliverables';
 import { deliverableToReportInput, orgBrandingToReportBranding } from '@/lib/report/from-db';
 import { generateDeliverableReport, validateReportInput, type ReportBranding } from '@/lib/report';
 import { controlsFromCompliance, getRuleMeta } from '@/lib/atr-rules';
-import { seedFindingsFromScans, type RuleEnrichment, type ScanEventInput } from '@/lib/report/from-scans';
+import {
+  seedFindingsFromScans,
+  type RuleEnrichment,
+  type ScanEventInput,
+} from '@/lib/report/from-scans';
 import type { DeliverableControlRef, OrgBranding, Role } from '@/lib/types';
 
 export interface ActionResult {
@@ -243,7 +247,10 @@ export async function issueDeliverable(formData: FormData): Promise<ActionResult
 
     const rendered = await generateDeliverableReport(input);
 
-    const dateSlug = (deliverable.report_date ?? new Date().toISOString().slice(0, 10)).slice(0, 10);
+    const dateSlug = (deliverable.report_date ?? new Date().toISOString().slice(0, 10)).slice(
+      0,
+      10
+    );
     const storagePath = `${ctx.workspace.id}/${id}-deliverable-${dateSlug}.pdf`;
     const { error: uploadErr } = await admin.storage
       .from(REPORTS_BUCKET)
@@ -617,15 +624,15 @@ export async function importFindingsFromScans(formData: FormData): Promise<Impor
   }
 
   const events = rows as unknown as ScanEventInput[];
-  const ruleIds = Array.from(
-    new Set(events.map((e) => e.rule_id).filter((r): r is string => !!r))
-  );
+  const ruleIds = Array.from(new Set(events.map((e) => e.rule_id).filter((r): r is string => !!r)));
   const lookup = await buildEnrichmentLookup(ruleIds);
   const seeded = seedFindingsFromScans(events, (ruleId) => lookup.get(ruleId) ?? null);
 
   // Skip (rule, asset) pairs already present so re-import is additive.
   const existing = await listDeliverableFindings(id);
-  const existingKeys = new Set(existing.map((f) => `${f.atr_rule_id ?? ''}::${f.affected_asset ?? ''}`));
+  const existingKeys = new Set(
+    existing.map((f) => `${f.atr_rule_id ?? ''}::${f.affected_asset ?? ''}`)
+  );
   const startOrdinal = existing.reduce((max, f) => Math.max(max, f.ordinal), -1) + 1;
   const startRef = existing.length;
 

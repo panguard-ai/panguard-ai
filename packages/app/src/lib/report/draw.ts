@@ -92,9 +92,13 @@ export function keyValueRow(ctx: RenderCtx, key: string, value: string): void {
   doc.font(ctx.fonts.heading).fontSize(9).fillColor(COLORS.secondary).text(key, LAYOUT.margin, y, {
     width: keyWidth,
   });
-  doc.font(ctx.fonts.body).fontSize(9).fillColor(COLORS.text).text(value, LAYOUT.margin + keyWidth, y, {
-    width: valueWidth,
-  });
+  doc
+    .font(ctx.fonts.body)
+    .fontSize(9)
+    .fillColor(COLORS.text)
+    .text(value, LAYOUT.margin + keyWidth, y, {
+      width: valueWidth,
+    });
   doc.y = y + h + 4;
 }
 
@@ -109,7 +113,11 @@ export function badge(
 ): number {
   const w = doc.font(font).fontSize(8).widthOfString(text) + 10;
   doc.roundedRect(x, y, w, 13, 2).fill(fillColor);
-  doc.fillColor(COLORS.white).font(font).fontSize(8).text(text, x + 5, y + 3);
+  doc
+    .fillColor(COLORS.white)
+    .font(font)
+    .fontSize(8)
+    .text(text, x + 5, y + 3);
   return x + w;
 }
 
@@ -175,7 +183,8 @@ export function table(
     }
     row.forEach((cell, i) => {
       const isFirst = i === 0;
-      const color = isFirst && opts.firstColColors ? opts.firstColColors[rowIdx] ?? COLORS.text : COLORS.text;
+      const color =
+        isFirst && opts.firstColColors ? (opts.firstColColors[rowIdx] ?? COLORS.text) : COLORS.text;
       doc
         .fillColor(color)
         .font(isFirst && opts.firstColColors ? ctx.fonts.heading : ctx.fonts.body)

@@ -37,7 +37,12 @@ export function IssueButton({ slug, id }: { slug: string; id: string }) {
     <div className="flex flex-col items-end gap-2">
       {confirming ? (
         <div className="flex items-center gap-2">
-          <Button variant="secondary" size="sm" onClick={() => setConfirming(false)} disabled={pending}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setConfirming(false)}
+            disabled={pending}
+          >
             Cancel
           </Button>
           <Button size="sm" onClick={onIssue} disabled={pending}>

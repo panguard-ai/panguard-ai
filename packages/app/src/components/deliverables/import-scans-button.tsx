@@ -54,11 +54,7 @@ export function ImportScansButton({
   return (
     <div className="flex flex-col items-end gap-2">
       <Button variant="secondary" size="sm" onClick={onImport} disabled={pending}>
-        {pending ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <ScanLine className="h-4 w-4" />
-        )}
+        {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ScanLine className="h-4 w-4" />}
         {pending ? 'Importing...' : 'Import from scans'}
       </Button>
       {result ? <InlineToast tone={result.tone}>{result.message}</InlineToast> : null}

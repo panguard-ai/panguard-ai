@@ -103,10 +103,23 @@ function stampPageFurniture(ctx: RenderCtx, input: DeliverableReportInput): void
     });
 
     const fy = LAYOUT.pageHeight - 28;
-    doc.strokeColor(COLORS.border).lineWidth(0.5).moveTo(LAYOUT.margin, fy).lineTo(LAYOUT.pageWidth - LAYOUT.margin, fy).stroke();
+    doc
+      .strokeColor(COLORS.border)
+      .lineWidth(0.5)
+      .moveTo(LAYOUT.margin, fy)
+      .lineTo(LAYOUT.pageWidth - LAYOUT.margin, fy)
+      .stroke();
     doc.font(ctx.fonts.body).fontSize(7).fillColor(COLORS.lightText);
-    doc.text(footer, LAYOUT.margin, fy + 5, { width: LAYOUT.contentWidth * 0.5, align: 'left', lineBreak: false });
-    doc.text(clsLabel, LAYOUT.margin, fy + 5, { width: LAYOUT.contentWidth, align: 'center', lineBreak: false });
+    doc.text(footer, LAYOUT.margin, fy + 5, {
+      width: LAYOUT.contentWidth * 0.5,
+      align: 'left',
+      lineBreak: false,
+    });
+    doc.text(clsLabel, LAYOUT.margin, fy + 5, {
+      width: LAYOUT.contentWidth,
+      align: 'center',
+      lineBreak: false,
+    });
     doc.text(labels.page(i - range.start + 1, range.count), LAYOUT.margin, fy + 5, {
       width: LAYOUT.contentWidth,
       align: 'right',
@@ -116,7 +129,11 @@ function stampPageFurniture(ctx: RenderCtx, input: DeliverableReportInput): void
 }
 
 /** Render every content section in order. */
-function renderBody(ctx: RenderCtx, input: DeliverableReportInput, integrity: { sha256: string; hmac: string | null }): void {
+function renderBody(
+  ctx: RenderCtx,
+  input: DeliverableReportInput,
+  integrity: { sha256: string; hmac: string | null }
+): void {
   const methodology =
     input.methodology && input.methodology.length > 0
       ? input.methodology
@@ -152,7 +169,12 @@ export async function generateDeliverableReport(
   const PDFDocument = mod.default;
   const doc = new PDFDocument({
     size: 'A4',
-    margins: { top: LAYOUT.margin, bottom: LAYOUT.margin, left: LAYOUT.margin, right: LAYOUT.margin },
+    margins: {
+      top: LAYOUT.margin,
+      bottom: LAYOUT.margin,
+      left: LAYOUT.margin,
+      right: LAYOUT.margin,
+    },
     bufferPages: true,
     autoFirstPage: true,
     info: {

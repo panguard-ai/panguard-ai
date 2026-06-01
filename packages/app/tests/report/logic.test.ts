@@ -101,7 +101,9 @@ describe('countBySeverity', () => {
 
 describe('overallRiskRating', () => {
   it('returns the worst severity present', () => {
-    expect(overallRiskRating({ critical: 1, high: 5, medium: 0, low: 0, info: 0 })).toBe('critical');
+    expect(overallRiskRating({ critical: 1, high: 5, medium: 0, low: 0, info: 0 })).toBe(
+      'critical'
+    );
     expect(overallRiskRating({ critical: 0, high: 1, medium: 9, low: 0, info: 0 })).toBe('high');
     expect(overallRiskRating({ critical: 0, high: 0, medium: 2, low: 0, info: 0 })).toBe('medium');
     expect(overallRiskRating({ critical: 0, high: 0, medium: 0, low: 3, info: 0 })).toBe('low');
@@ -136,13 +138,20 @@ describe('cvssRatingLabel', () => {
 describe('buildTraceabilityRows', () => {
   it('flattens one row per control, skips findings with none, and sorts', () => {
     const rows = buildTraceabilityRows([
-      finding({ id: 'PG-002', severity: 'high', atrRuleId: 'ATR-2026-00540', controls: [
-        { framework: 'eu-ai-act', identifier: 'Art. 15', context: 'Robustness' },
-        { framework: 'iso-42001', identifier: '8.2', context: 'Risk treatment' },
-      ] }),
-      finding({ id: 'PG-001', severity: 'critical', controls: [
-        { framework: 'eu-ai-act', identifier: 'Art. 9' },
-      ] }),
+      finding({
+        id: 'PG-002',
+        severity: 'high',
+        atrRuleId: 'ATR-2026-00540',
+        controls: [
+          { framework: 'eu-ai-act', identifier: 'Art. 15', context: 'Robustness' },
+          { framework: 'iso-42001', identifier: '8.2', context: 'Risk treatment' },
+        ],
+      }),
+      finding({
+        id: 'PG-001',
+        severity: 'critical',
+        controls: [{ framework: 'eu-ai-act', identifier: 'Art. 9' }],
+      }),
       finding({ id: 'PG-003', severity: 'low' }), // no controls -> skipped
     ]);
     expect(rows).toHaveLength(3);
@@ -190,20 +199,26 @@ describe('computeIntegrityHash / signIntegrity', () => {
   it('is deterministic and independent of findings/control array order', () => {
     const a = validInput({
       findings: [
-        finding({ id: 'PG-001', controls: [
-          { framework: 'eu-ai-act', identifier: 'Art. 9' },
-          { framework: 'iso-42001', identifier: '8.2' },
-        ] }),
+        finding({
+          id: 'PG-001',
+          controls: [
+            { framework: 'eu-ai-act', identifier: 'Art. 9' },
+            { framework: 'iso-42001', identifier: '8.2' },
+          ],
+        }),
         finding({ id: 'PG-002', severity: 'low' }),
       ],
     });
     const b = validInput({
       findings: [
         finding({ id: 'PG-002', severity: 'low' }),
-        finding({ id: 'PG-001', controls: [
-          { framework: 'iso-42001', identifier: '8.2' },
-          { framework: 'eu-ai-act', identifier: 'Art. 9' },
-        ] }),
+        finding({
+          id: 'PG-001',
+          controls: [
+            { framework: 'iso-42001', identifier: '8.2' },
+            { framework: 'eu-ai-act', identifier: 'Art. 9' },
+          ],
+        }),
       ],
     });
     expect(computeIntegrityHash(a)).toBe(computeIntegrityHash(b));

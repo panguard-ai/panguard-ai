@@ -168,8 +168,7 @@ function canonicalFinding(f: DeliverableFinding): Record<string, unknown> {
       strength: c.strength ?? 'primary',
     }))
     .sort(
-      (a, b) =>
-        a.framework.localeCompare(b.framework) || a.identifier.localeCompare(b.identifier)
+      (a, b) => a.framework.localeCompare(b.framework) || a.identifier.localeCompare(b.identifier)
     );
   return {
     id: f.id,
