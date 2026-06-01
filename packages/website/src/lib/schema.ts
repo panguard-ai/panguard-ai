@@ -46,7 +46,6 @@ export const ORGANIZATION_SCHEMA = {
     'https://github.com/Agent-Threat-Rule/agent-threat-rules',
     'https://www.npmjs.com/package/panguard',
     'https://www.npmjs.com/package/agent-threat-rules',
-    'https://x.com/panguard_ai',
     'https://linkedin.com/company/panguard-ai',
     'https://doi.org/10.5281/zenodo.19178002',
   ],
@@ -89,7 +88,6 @@ export const PERSON_ADAM_SCHEMA = {
   sameAs: [
     'https://github.com/eeee2345',
     'https://linkedin.com/in/adamlin-panguard',
-    'https://x.com/panguard_ai',
   ],
   knowsLanguage: ['en', 'zh-Hant', 'zh-TW'],
   nationality: { '@type': 'Country', name: 'Taiwan' },

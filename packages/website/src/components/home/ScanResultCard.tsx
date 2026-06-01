@@ -160,7 +160,7 @@ export default function ScanResultCard({
   const isRisky = report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL';
 
   // Build share text
-  const shareText = `${report.skillName ?? 'This skill'} scored ${report.riskScore}/100 on @panguard_ai Skill Audit. ${report.findings.length} issue(s) found.`;
+  const shareText = `${report.skillName ?? 'This skill'} scored ${report.riskScore}/100 on PanGuard AI Skill Audit. ${report.findings.length} issue(s) found.`;
   const shareUrl = `https://panguard.ai/?scan=${encodeURIComponent(url)}`;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
 
