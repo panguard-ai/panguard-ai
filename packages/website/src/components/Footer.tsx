@@ -1,11 +1,10 @@
 import { useTranslations } from 'next-intl';
-import { Github, Twitter, Linkedin } from 'lucide-react';
+import { Github, Linkedin } from 'lucide-react';
 import { Link } from '@/navigation';
 import BrandLogo from './ui/BrandLogo';
 
 const socials = [
   { icon: Github, href: 'https://github.com/panguard-ai/panguard-ai', label: 'GitHub' },
-  { icon: Twitter, href: 'https://x.com/panguard_ai', label: 'Twitter' },
   { icon: Linkedin, href: 'https://linkedin.com/company/panguard-ai', label: 'LinkedIn' },
 ];
 
