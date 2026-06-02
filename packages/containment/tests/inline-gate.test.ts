@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { InlineGate } from '../../src/containment/inline-gate.js';
-import type { ActionContext, SessionRisk } from '../../src/containment/types.js';
-import { NORMAL_RISK } from '../../src/containment/types.js';
+import { InlineGate } from '../src/inline-gate.js';
+import type { ActionContext, SessionRisk } from '../src/types.js';
+import { NORMAL_RISK } from '../src/types.js';
 
 function action(overrides: Partial<ActionContext> = {}): ActionContext {
   return {

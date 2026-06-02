@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { ResponseContainmentController } from '../../src/containment/response-controller.js';
+import { ResponseContainmentController } from '../src/response-controller.js';
 import type {
   FileQuarantineLike,
   ProcessKillLike,
   SessionResourceResolver,
-} from '../../src/containment/response-controller.js';
+} from '../src/response-controller.js';
 
 const noFiles: FileQuarantineLike = { quarantine: vi.fn(async () => {}) };
 const noKill: ProcessKillLike = { kill: vi.fn(async () => {}) };

@@ -28,6 +28,14 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { ProxyEvaluator } from './evaluator.js';
+import {
+  GuardGate,
+  InlineGate,
+  RiskAnalyzer,
+  InMemoryRiskStore,
+  NoopContainmentController,
+  applyMcpGate,
+} from '@panguard-ai/containment';
 
 const VERDICT_LOG = join(homedir(), '.panguard-guard', 'proxy-verdicts.jsonl');
 
@@ -58,12 +66,27 @@ export class MCPProxy {
   private server: Server | null = null;
   private readonly evalTimeout: number;
   private readonly failMode: 'open' | 'closed';
+  /** Layer 1 inline gate. The ProxyEvaluator stays the Layer 2 brain. */
+  private readonly guard: GuardGate;
+  /** One stdio session per proxy process. */
+  private readonly sessionId = 'mcp-proxy-session';
+  /** Upstream tool names = the Layer 0 capability scope (populated in start()). */
+  private upstreamToolNames = new Set<string>();
 
   constructor(config: ProxyConfig) {
     this.config = config;
     this.evaluator = new ProxyEvaluator();
     this.failMode = config.failMode ?? 'closed';
     this.evalTimeout = config.evalTimeout ?? 5000;
+    // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
+    // payloads (and any session the brain flags) are blocked instantly — even
+    // if the async evaluator times out fail-open.
+    this.guard = new GuardGate({
+      gate: new InlineGate(),
+      analyzer: new RiskAnalyzer({ detect: () => [] }),
+      riskStore: new InMemoryRiskStore(),
+      containment: new NoopContainmentController(),
+    });
   }
 
   async start(): Promise<void> {
@@ -85,6 +108,16 @@ export class MCPProxy {
     process.stderr.write(
       `[panguard-proxy] Connected to upstream: ${this.config.upstreamCommand}\n`
     );
+
+    // Cache upstream tool names as the Layer 0 capability scope: an agent may
+    // only call tools the upstream actually exposes. Best-effort — if the list
+    // can't be fetched, the gate falls back to allowing the requested tool.
+    try {
+      const upstream = await this.client.listTools();
+      this.upstreamToolNames = new Set(upstream.tools.map((t) => t.name));
+    } catch {
+      /* leave empty; per-call fallback allows the requested tool */
+    }
 
     // Create proxy server facing the agent
     this.server = new Server(
@@ -116,6 +149,32 @@ export class MCPProxy {
     server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
       const toolArgs = (args ?? {}) as Record<string, unknown>;
+
+      // Layer 1 inline gate (sync, sub-ms) — runs BEFORE the async evaluator so
+      // the worst payloads (and any session the brain has flagged) are blocked
+      // instantly, even if the async evaluator times out fail-open.
+      const gateVerdict = applyMcpGate(this.guard, {
+        name,
+        args: toolArgs,
+        sessionId: this.sessionId,
+        agentId: 'mcp-agent',
+        capabilities:
+          this.upstreamToolNames.size > 0 ? this.upstreamToolNames : new Set([name]),
+      });
+      if (!gateVerdict.allow) {
+        logVerdict({ phase: 'pre-gate', tool: name, outcome: 'deny', reason: gateVerdict.reason ?? '' });
+        process.stderr.write(
+          `[panguard-proxy] BLOCKED (inline gate): ${name} — ${gateVerdict.reason}\n`
+        );
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `[BLOCKED by PanGuard] Tool call "${name}" was blocked.\nReason: ${gateVerdict.reason}`,
+            },
+          ],
+        };
+      }
 
       // PreToolUse: evaluate the call
       let preResult;

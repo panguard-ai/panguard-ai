@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { SecurityEvent } from '@panguard-ai/core';
-import { GuardGate, NoopContainmentController } from '../../src/containment/guard-gate.js';
-import type { ContainmentController } from '../../src/containment/guard-gate.js';
-import { InlineGate } from '../../src/containment/inline-gate.js';
-import { RiskAnalyzer } from '../../src/containment/risk-analyzer.js';
-import { InMemoryRiskStore } from '../../src/containment/risk-store.js';
-import type { ActionContext, ContentDetector, DetectionMatch } from '../../src/containment/types.js';
+import { GuardGate, NoopContainmentController } from '../src/guard-gate.js';
+import type { ContainmentController } from '../src/guard-gate.js';
+import { InlineGate } from '../src/inline-gate.js';
+import { RiskAnalyzer } from '../src/risk-analyzer.js';
+import { InMemoryRiskStore } from '../src/risk-store.js';
+import type { ActionContext, ContentDetector, DetectionMatch } from '../src/types.js';
 
 function action(): ActionContext {
   return {

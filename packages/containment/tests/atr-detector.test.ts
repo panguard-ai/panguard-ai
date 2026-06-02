@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { SecurityEvent } from '@panguard-ai/core';
-import { ATRContentDetector } from '../../src/containment/atr-detector.js';
-import type { ATREngineLike } from '../../src/containment/atr-detector.js';
+import { ATRContentDetector } from '../src/atr-detector.js';
+import type { ATREngineLike } from '../src/atr-detector.js';
 
 function evt(): SecurityEvent {
   return {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { InMemoryRiskStore } from '../../src/containment/risk-store.js';
-import { NORMAL_RISK } from '../../src/containment/types.js';
+import { InMemoryRiskStore } from '../src/risk-store.js';
+import { NORMAL_RISK } from '../src/types.js';
 
 describe('InMemoryRiskStore', () => {
   it('returns NORMAL_RISK for an unseen session', () => {

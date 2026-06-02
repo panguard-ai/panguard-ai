@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { applyMcpGate, mcpToolCallToAction } from '../../src/containment/mcp-gate.js';
-import type { McpToolCall } from '../../src/containment/mcp-gate.js';
-import { GuardGate, NoopContainmentController } from '../../src/containment/guard-gate.js';
-import { InlineGate } from '../../src/containment/inline-gate.js';
-import { RiskAnalyzer } from '../../src/containment/risk-analyzer.js';
-import { InMemoryRiskStore } from '../../src/containment/risk-store.js';
-import type { ContentDetector } from '../../src/containment/types.js';
+import { applyMcpGate, mcpToolCallToAction } from '../src/mcp-gate.js';
+import type { McpToolCall } from '../src/mcp-gate.js';
+import { GuardGate, NoopContainmentController } from '../src/guard-gate.js';
+import { InlineGate } from '../src/inline-gate.js';
+import { RiskAnalyzer } from '../src/risk-analyzer.js';
+import { InMemoryRiskStore } from '../src/risk-store.js';
+import type { ContentDetector } from '../src/types.js';
 
 const emptyDetector: ContentDetector = { detect: () => [] };
 

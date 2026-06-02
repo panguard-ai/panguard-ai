@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { SecurityEvent } from '@panguard-ai/core';
-import { RiskAnalyzer } from '../../src/containment/risk-analyzer.js';
-import type { ContentDetector, DetectionMatch } from '../../src/containment/types.js';
+import { RiskAnalyzer } from '../src/risk-analyzer.js';
+import type { ContentDetector, DetectionMatch } from '../src/types.js';
 
 function evt(): SecurityEvent {
   return {
