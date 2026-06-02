@@ -16,6 +16,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
@@ -28,6 +29,7 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { ProxyEvaluator } from './evaluator.js';
+import type { EvalResult } from './evaluator.js';
 import {
   GuardGate,
   InlineGate,
@@ -60,9 +62,16 @@ export interface ProxyConfig {
   readonly failMode?: 'open' | 'closed';
 }
 
+/** The subset of ProxyEvaluator the proxy uses — injectable for testing. */
+export interface ProxyEvaluatorLike {
+  loadRules(): Promise<number>;
+  evaluateToolCall(toolName: string, args: Record<string, unknown>): Promise<EvalResult>;
+  evaluateToolResponse(toolName: string, response: string): Promise<EvalResult>;
+}
+
 export class MCPProxy {
   private readonly config: ProxyConfig;
-  private readonly evaluator: ProxyEvaluator;
+  private readonly evaluator: ProxyEvaluatorLike;
   private client: Client | null = null;
   private server: Server | null = null;
   private readonly evalTimeout: number;
@@ -78,9 +87,9 @@ export class MCPProxy {
   /** Upstream tool names = the Layer 0 capability scope (populated in start()). */
   private upstreamToolNames = new Set<string>();
 
-  constructor(config: ProxyConfig) {
+  constructor(config: ProxyConfig, deps: { evaluator?: ProxyEvaluatorLike } = {}) {
     this.config = config;
-    this.evaluator = new ProxyEvaluator();
+    this.evaluator = deps.evaluator ?? new ProxyEvaluator();
     this.failMode = config.failMode ?? 'closed';
     this.evalTimeout = config.evalTimeout ?? 5000;
     // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
@@ -96,24 +105,30 @@ export class MCPProxy {
   }
 
   async start(): Promise<void> {
-    // Load ATR rules
-    const ruleCount = await this.evaluator.loadRules();
-    process.stderr.write(`[panguard-proxy] Loaded ${ruleCount} ATR rules\n`);
-
-    // Connect to upstream MCP server
     const upstreamTransport = new StdioClientTransport({
       command: this.config.upstreamCommand,
       args: [...this.config.upstreamArgs],
       stderr: 'pipe',
     });
+    const agentTransport = new StdioServerTransport();
+    await this.connect(upstreamTransport, agentTransport);
+  }
+
+  /**
+   * Wire the proxy between an upstream (client) transport and an agent (server)
+   * transport. Extracted from start() so tests can drive the full flow over
+   * in-memory transports without spawning a process.
+   */
+  async connect(upstreamTransport: Transport, agentTransport: Transport): Promise<void> {
+    const ruleCount = await this.evaluator.loadRules();
+    process.stderr.write(`[panguard-proxy] Loaded ${ruleCount} ATR rules\n`);
+
     this.client = new Client(
       { name: 'panguard-mcp-proxy', version: '0.1.0' },
       { capabilities: {} }
     );
     await this.client.connect(upstreamTransport);
-    process.stderr.write(
-      `[panguard-proxy] Connected to upstream: ${this.config.upstreamCommand}\n`
-    );
+    process.stderr.write(`[panguard-proxy] Connected to upstream\n`);
 
     // Cache upstream tool names as the Layer 0 capability scope: an agent may
     // only call tools the upstream actually exposes. Best-effort — if the list
@@ -125,16 +140,11 @@ export class MCPProxy {
       /* leave empty; per-call fallback allows the requested tool */
     }
 
-    // Create proxy server facing the agent
     this.server = new Server(
       { name: 'panguard-mcp-proxy', version: '0.1.0' },
       { capabilities: { tools: {}, resources: {}, prompts: {} } }
     );
-
     this.registerHandlers();
-
-    // Connect to agent via stdio
-    const agentTransport = new StdioServerTransport();
     await this.server.connect(agentTransport);
     process.stderr.write(
       `[panguard-proxy] Proxy active. ${ruleCount} rules protecting all tool calls.\n`
