@@ -69,6 +69,10 @@ export class MCPProxy {
   private readonly failMode: 'open' | 'closed';
   /** Layer 1 inline gate. The ProxyEvaluator stays the Layer 2 brain. */
   private readonly guard: GuardGate;
+  /** Session risk: the brain (evaluator verdicts) writes, the inline gate reads. */
+  private readonly riskStore: InMemoryRiskStore;
+  /** Confidence at/above which an evaluator deny escalates the whole session. */
+  private static readonly ESCALATE_CONFIDENCE = 95;
   /** One stdio session per proxy process. */
   private readonly sessionId = 'mcp-proxy-session';
   /** Upstream tool names = the Layer 0 capability scope (populated in start()). */
@@ -82,10 +86,11 @@ export class MCPProxy {
     // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
     // payloads (and any session the brain flags) are blocked instantly — even
     // if the async evaluator times out fail-open.
+    this.riskStore = new InMemoryRiskStore();
     this.guard = new GuardGate({
       gate: new InlineGate(),
       analyzer: new RiskAnalyzer({ detect: () => [] }),
-      riskStore: new InMemoryRiskStore(),
+      riskStore: this.riskStore,
       containment: new NoopContainmentController(),
     });
   }
@@ -153,6 +158,23 @@ export class MCPProxy {
     });
   }
 
+  /**
+   * Feed an async-evaluator verdict back into session risk — the dual-path
+   * loop. A high-confidence deny escalates the session so the inline gate
+   * fast-blocks subsequent calls without re-evaluating. The threshold is
+   * deliberately high (ATR precision is ~99.6%) so a single false positive
+   * cannot lock out a legitimate agent.
+   */
+  recordEvalVerdict(verdict: {
+    outcome: string;
+    confidence: number;
+    matchedRules: readonly string[];
+  }): void {
+    if (verdict.outcome === 'deny' && verdict.confidence >= MCPProxy.ESCALATE_CONFIDENCE) {
+      this.riskStore.set(this.sessionId, { level: 'high', reasons: [...verdict.matchedRules] });
+    }
+  }
+
   private registerHandlers(): void {
     const client = this.client!;
     const server = this.server!;
@@ -217,6 +239,9 @@ export class MCPProxy {
         ms: preResult.durationMs,
       });
 
+      // Close the dual-path loop: a high-confidence deny escalates the session.
+      this.recordEvalVerdict(preResult);
+
       if (preResult.outcome === 'deny') {
         process.stderr.write(`[panguard-proxy] BLOCKED: ${name} — ${preResult.reason}\n`);
         return {
@@ -267,6 +292,8 @@ export class MCPProxy {
           rules: postResult.matchedRules,
           ms: postResult.durationMs,
         });
+
+        this.recordEvalVerdict(postResult);
 
         if (postResult.outcome === 'deny') {
           process.stderr.write(

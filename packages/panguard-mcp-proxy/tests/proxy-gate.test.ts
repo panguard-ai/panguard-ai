@@ -32,3 +32,26 @@ describe('MCPProxy inline gate wiring (Layer 1)', () => {
     expect(v.allow).toBe(true);
   });
 });
+
+describe('MCPProxy dual-path loop (brain verdict feeds the gate)', () => {
+  it('escalates the session after a high-confidence deny, fast-blocking subsequent calls', () => {
+    const p = proxy();
+    expect(p.gateCheck('echo', { text: 'hi' }).allow).toBe(true); // before: allowed
+    p.recordEvalVerdict({ outcome: 'deny', confidence: 98, matchedRules: ['ATR-X'] });
+    const after = p.gateCheck('echo', { text: 'hi' }); // after: gate reads the new risk
+    expect(after.allow).toBe(false);
+    expect(after.escalated).toBe(true);
+  });
+
+  it('a low-confidence deny does NOT escalate (protects UX against single FPs)', () => {
+    const p = proxy();
+    p.recordEvalVerdict({ outcome: 'deny', confidence: 70, matchedRules: ['ATR-Y'] });
+    expect(p.gateCheck('echo', { text: 'hi' }).allow).toBe(true); // still allowed
+  });
+
+  it('an allow verdict never escalates', () => {
+    const p = proxy();
+    p.recordEvalVerdict({ outcome: 'allow', confidence: 99, matchedRules: [] });
+    expect(p.gateCheck('echo', { text: 'hi' }).allow).toBe(true);
+  });
+});
