@@ -10,7 +10,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",

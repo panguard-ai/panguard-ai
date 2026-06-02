@@ -36,6 +36,7 @@ import {
   NoopContainmentController,
   applyMcpGate,
 } from '@panguard-ai/containment';
+import type { McpGateVerdict } from '@panguard-ai/containment';
 
 const VERDICT_LOG = join(homedir(), '.panguard-guard', 'proxy-verdicts.jsonl');
 
@@ -135,6 +136,23 @@ export class MCPProxy {
     );
   }
 
+  /**
+   * Run the Layer 1 inline gate for a tool call (sync, sub-ms): build the
+   * ActionContext and apply the gate. Capabilities default to the upstream tool
+   * set (Layer 0 scope); when unknown, the requested tool is allowed so the gate
+   * only adds block-on-sight + risk gating. Exposed so the wiring is testable.
+   */
+  gateCheck(name: string, toolArgs: Record<string, unknown>): McpGateVerdict {
+    return applyMcpGate(this.guard, {
+      name,
+      args: toolArgs,
+      sessionId: this.sessionId,
+      agentId: 'mcp-agent',
+      capabilities:
+        this.upstreamToolNames.size > 0 ? this.upstreamToolNames : new Set([name]),
+    });
+  }
+
   private registerHandlers(): void {
     const client = this.client!;
     const server = this.server!;
@@ -153,14 +171,7 @@ export class MCPProxy {
       // Layer 1 inline gate (sync, sub-ms) — runs BEFORE the async evaluator so
       // the worst payloads (and any session the brain has flagged) are blocked
       // instantly, even if the async evaluator times out fail-open.
-      const gateVerdict = applyMcpGate(this.guard, {
-        name,
-        args: toolArgs,
-        sessionId: this.sessionId,
-        agentId: 'mcp-agent',
-        capabilities:
-          this.upstreamToolNames.size > 0 ? this.upstreamToolNames : new Set([name]),
-      });
+      const gateVerdict = this.gateCheck(name, toolArgs);
       if (!gateVerdict.allow) {
         logVerdict({ phase: 'pre-gate', tool: name, outcome: 'deny', reason: gateVerdict.reason ?? '' });
         process.stderr.write(
