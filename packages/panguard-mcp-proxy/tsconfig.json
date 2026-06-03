@@ -12,7 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },
-  "references": [{ "path": "../atr" }],
+  "references": [{ "path": "../atr" }, { "path": "../containment" }],
   "include": ["src/**/*.ts"],
   "exclude": ["dist", "tests"]
 }
