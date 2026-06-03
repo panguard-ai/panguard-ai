@@ -57,9 +57,7 @@ export class ResponseContainmentController implements ContainmentController {
       case 'deceive':
         // Write-branch overlay, the HITL gate, and deception are later slices.
         // Log so an escalation is never silently dropped.
-        logger.warn(
-          `Containment mode '${mode}' not yet implemented for session ${sessionId}`,
-        );
+        logger.warn(`Containment mode '${mode}' not yet implemented for session ${sessionId}`);
         return;
     }
   }

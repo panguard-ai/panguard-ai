@@ -24,21 +24,21 @@ function detectorWith(matches: DetectionMatch[]): ContentDetector {
 describe('RiskAnalyzer: severity -> session risk', () => {
   it('maps a high-confidence critical match to confirmed_malicious', () => {
     const a = new RiskAnalyzer(
-      detectorWith([{ ruleId: 'ATR-1', severity: 'critical', confidence: 95 }]),
+      detectorWith([{ ruleId: 'ATR-1', severity: 'critical', confidence: 95 }])
     );
     expect(a.analyze('s', [evt()]).risk.level).toBe('confirmed_malicious');
   });
 
   it('maps a lower-confidence critical match to high', () => {
     const a = new RiskAnalyzer(
-      detectorWith([{ ruleId: 'ATR-2', severity: 'critical', confidence: 60 }]),
+      detectorWith([{ ruleId: 'ATR-2', severity: 'critical', confidence: 60 }])
     );
     expect(a.analyze('s', [evt()]).risk.level).toBe('high');
   });
 
   it('maps a high-severity match to elevated', () => {
     const a = new RiskAnalyzer(
-      detectorWith([{ ruleId: 'ATR-3', severity: 'high', confidence: 80 }]),
+      detectorWith([{ ruleId: 'ATR-3', severity: 'high', confidence: 80 }])
     );
     expect(a.analyze('s', [evt()]).risk.level).toBe('elevated');
   });
@@ -52,7 +52,7 @@ describe('RiskAnalyzer: severity -> session risk', () => {
     const a = new RiskAnalyzer(
       detectorWith([
         { ruleId: 'ATR-4', severity: 'critical', confidence: 95, category: 'tool-poisoning' },
-      ]),
+      ])
     );
     const { signals } = a.analyze('s', [evt()]);
     expect(signals[0]!.ruleIds).toContain('ATR-4');

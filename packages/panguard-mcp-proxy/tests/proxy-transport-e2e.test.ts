@@ -12,10 +12,7 @@ import { describe, it, expect } from 'vitest';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { MCPProxy } from '../src/proxy.js';
 import type { ProxyEvaluatorLike } from '../src/proxy.js';
 
@@ -41,7 +38,7 @@ const allowAll: ProxyEvaluatorLike = {
 function makeUpstream(): Server {
   const server = new Server(
     { name: 'test-upstream', version: '0.0.1' },
-    { capabilities: { tools: {} } },
+    { capabilities: { tools: {} } }
   );
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
@@ -67,7 +64,7 @@ async function wireStack(): Promise<Client> {
 
   const proxy = new MCPProxy(
     { upstreamCommand: 'noop', upstreamArgs: [] },
-    { evaluator: allowAll },
+    { evaluator: allowAll }
   );
   const [proxySrv, agentCli] = InMemoryTransport.createLinkedPair();
   await proxy.connect(proxyCli, proxySrv);

@@ -86,8 +86,7 @@ export class InlineGate {
 
   private violatesCapability(ctx: ActionContext): boolean {
     return (
-      (ctx.kind === 'tool_call' || ctx.kind === 'command') &&
-      !ctx.capabilities.has(ctx.target)
+      (ctx.kind === 'tool_call' || ctx.kind === 'command') && !ctx.capabilities.has(ctx.target)
     );
   }
 }

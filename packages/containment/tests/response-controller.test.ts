@@ -10,7 +10,7 @@ const noFiles: FileQuarantineLike = { quarantine: vi.fn(async () => {}) };
 const noKill: ProcessKillLike = { kill: vi.fn(async () => {}) };
 
 describe('ResponseContainmentController', () => {
-  it("kill mode kills every pid the session owns", async () => {
+  it('kill mode kills every pid the session owns', async () => {
     const resolver: SessionResourceResolver = { resolve: () => ({ pids: [101, 102], files: [] }) };
     const killer: ProcessKillLike = { kill: vi.fn(async () => {}) };
     const c = new ResponseContainmentController({ resolver, killer, quarantine: noFiles });
@@ -19,7 +19,7 @@ describe('ResponseContainmentController', () => {
     expect(killer.kill).toHaveBeenCalledWith(102);
   });
 
-  it("quarantine mode quarantines every file the session touched", async () => {
+  it('quarantine mode quarantines every file the session touched', async () => {
     const resolver: SessionResourceResolver = { resolve: () => ({ pids: [], files: ['/tmp/x'] }) };
     const quarantine: FileQuarantineLike = { quarantine: vi.fn(async () => {}) };
     const c = new ResponseContainmentController({ resolver, killer: noKill, quarantine });

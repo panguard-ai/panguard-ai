@@ -35,7 +35,10 @@ describe('mcp-gate adapter', () => {
   });
 
   it('blocks an ungranted tool with a clean reason', () => {
-    const v = applyMcpGate(guardWith(), call({ name: 'delete_db', capabilities: new Set(['read_file']) }));
+    const v = applyMcpGate(
+      guardWith(),
+      call({ name: 'delete_db', capabilities: new Set(['read_file']) })
+    );
     expect(v.allow).toBe(false);
     expect(v.reason).toMatch(/not in this agent's granted capabilities/);
     expect(v.escalated).toBe(false);

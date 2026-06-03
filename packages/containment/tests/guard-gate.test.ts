@@ -53,7 +53,7 @@ describe('GuardGate dual-path', () => {
     const g = new GuardGate({
       gate: new InlineGate(),
       analyzer: new RiskAnalyzer(
-        detector([{ ruleId: 'ATR-X', severity: 'critical', confidence: 60 }]),
+        detector([{ ruleId: 'ATR-X', severity: 'critical', confidence: 60 }])
       ),
       riskStore: store,
       containment,
@@ -68,7 +68,7 @@ describe('GuardGate dual-path', () => {
     const g = new GuardGate({
       gate: new InlineGate(),
       analyzer: new RiskAnalyzer(
-        detector([{ ruleId: 'ATR-Y', severity: 'critical', confidence: 60 }]),
+        detector([{ ruleId: 'ATR-Y', severity: 'critical', confidence: 60 }])
       ),
       riskStore: store,
       containment: new NoopContainmentController(),

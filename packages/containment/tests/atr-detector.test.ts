@@ -21,7 +21,10 @@ describe('ATRContentDetector', () => {
   it('maps ATR matches to DetectionMatch', () => {
     const engine: ATREngineLike = {
       evaluate: () => [
-        { rule: { id: 'ATR-1', severity: 'high', tags: { category: 'tool-poisoning' } }, confidence: 80 },
+        {
+          rule: { id: 'ATR-1', severity: 'high', tags: { category: 'tool-poisoning' } },
+          confidence: 80,
+        },
       ],
     };
     const matches = new ATRContentDetector(engine).detect(evt());

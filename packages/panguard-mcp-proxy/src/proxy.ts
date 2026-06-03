@@ -163,8 +163,7 @@ export class MCPProxy {
       args: toolArgs,
       sessionId: this.sessionId,
       agentId: 'mcp-agent',
-      capabilities:
-        this.upstreamToolNames.size > 0 ? this.upstreamToolNames : new Set([name]),
+      capabilities: this.upstreamToolNames.size > 0 ? this.upstreamToolNames : new Set([name]),
     });
   }
 
@@ -205,7 +204,12 @@ export class MCPProxy {
       // instantly, even if the async evaluator times out fail-open.
       const gateVerdict = this.gateCheck(name, toolArgs);
       if (!gateVerdict.allow) {
-        logVerdict({ phase: 'pre-gate', tool: name, outcome: 'deny', reason: gateVerdict.reason ?? '' });
+        logVerdict({
+          phase: 'pre-gate',
+          tool: name,
+          outcome: 'deny',
+          reason: gateVerdict.reason ?? '',
+        });
         process.stderr.write(
           `[panguard-proxy] BLOCKED (inline gate): ${name} — ${gateVerdict.reason}\n`
         );

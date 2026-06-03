@@ -49,7 +49,7 @@ export class GuardGate {
    */
   async onSessionActivity(
     sessionId: string,
-    events: readonly SecurityEvent[],
+    events: readonly SecurityEvent[]
   ): Promise<RiskAssessment> {
     const assessment = this.deps.analyzer.analyze(sessionId, events);
     this.deps.riskStore.set(sessionId, assessment.risk);

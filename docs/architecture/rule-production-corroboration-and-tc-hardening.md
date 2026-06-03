@@ -18,11 +18,11 @@ Scope: ATR (`agent-threat-rules`) 規則生產管線 × PanGuard Threat Cloud (`
 
 ## 1. 現況:三條 funnel,一道閘門
 
-| Funnel | 來源 | 路徑 | 在 TC? | 主上 proposal 數 |
-|--------|------|------|--------|------|
-| 每日 CVE | NVD / GHSA / AVID / CISA-KEV | GitHub Action → `proposals/` → gate → PR | 否 | 852(GHSA 209 / NVD 256 / AVID 386 / KEV 1) |
-| 紅隊 probe | GitHub issue(人給真攻擊 + benign 反例) | `auto-regex.ts` 六檢 → gate → PR | 否 | 0(目前無) |
-| 端點遙測 | Guard 在客戶機器 | TC promote → canary → `pr-back` → gate → PR | **是** | n/a(rule, not proposal) |
+| Funnel     | 來源                                   | 路徑                                        | 在 TC? | 主上 proposal 數                           |
+| ---------- | -------------------------------------- | ------------------------------------------- | ------ | ------------------------------------------ |
+| 每日 CVE   | NVD / GHSA / AVID / CISA-KEV           | GitHub Action → `proposals/` → gate → PR    | 否     | 852(GHSA 209 / NVD 256 / AVID 386 / KEV 1) |
+| 紅隊 probe | GitHub issue(人給真攻擊 + benign 反例) | `auto-regex.ts` 六檢 → gate → PR            | 否     | 0(目前無)                                  |
+| 端點遙測   | Guard 在客戶機器                       | TC promote → canary → `pr-back` → gate → PR | **是** | n/a(rule, not proposal)                    |
 
 另有 `issue-to-proposal`(社群,人審)與 `garak/hackaprompt` cluster(deferred,不在活躍 pipeline)。
 
@@ -37,8 +37,8 @@ Scope: ATR (`agent-threat-rules`) 規則生產管線 × PanGuard Threat Cloud (`
 1. metadata 完整(擋 `author: MiroFish Predicted`)
 2. 規則 regex 必須命中自己宣告的 true_positives
 3. 432 條 benign skill 語料 0 FP
-3b. 延伸 benign 語料(arxiv/npm/pypi)0 FP
-3c. **benign-CODE 語料 0 FP**(2026-06-02 新增,擋 import-FP 那類)
+   3b. 延伸 benign 語料(arxiv/npm/pypi)0 FP
+   3c. **benign-CODE 語料 0 FP**(2026-06-02 新增,擋 import-FP 那類)
 4. research-mention 語料 0 FP
 5. 跨規則衝突(不得命中別條的 true_negatives)
 6. 每 PR ≤ 10 條
@@ -56,15 +56,15 @@ Scope: ATR (`agent-threat-rules`) 規則生產管線 × PanGuard Threat Cloud (`
 
 **已經實作的防禦(讀真實碼確認):**
 
-| 控制 | 位置 | 內容 |
-|------|------|------|
-| Auth fail-closed | `cli.ts:87-98` | `apiKeyRequired` 預設 **true**;要關得顯式 `TC_API_KEY_REQUIRED=false` |
-| 邊界去敏 | `panguard-guard/.../report-agent.ts` | 只送蒸餾欄位(匿名 IP、attackType、mitreTechnique、ruleId、timestamp、region),**不送原始 payload/檔案/內容** |
-| Sybil 防禦 | `server.ts:1763-1774` | 投票權重:anonymous=0 / github_new=0.5 / github_verified(≥30d)=1.0;promote 需累積 weight **≥ 3.0**。假端點無法升級 |
-| 每人每日上限 | `server.ts:1828` | github 使用者預設 10 條/日 |
-| 提交時結構閘門 | `server.ts:1789-1813` | 外部 POST 先過 `validateRuleMeetsStandard`,擋 malformed(2026-05-26 事件後加) |
-| Body size 上限 | `server.ts:3132` | 5MB |
-| Tier 速率限制 | `auth/tier-resolver.ts` | community 120 / pilot 1200 / enterprise 12000 req/min |
+| 控制             | 位置                                 | 內容                                                                                                              |
+| ---------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Auth fail-closed | `cli.ts:87-98`                       | `apiKeyRequired` 預設 **true**;要關得顯式 `TC_API_KEY_REQUIRED=false`                                             |
+| 邊界去敏         | `panguard-guard/.../report-agent.ts` | 只送蒸餾欄位(匿名 IP、attackType、mitreTechnique、ruleId、timestamp、region),**不送原始 payload/檔案/內容**       |
+| Sybil 防禦       | `server.ts:1763-1774`                | 投票權重:anonymous=0 / github_new=0.5 / github_verified(≥30d)=1.0;promote 需累積 weight **≥ 3.0**。假端點無法升級 |
+| 每人每日上限     | `server.ts:1828`                     | github 使用者預設 10 條/日                                                                                        |
+| 提交時結構閘門   | `server.ts:1789-1813`                | 外部 POST 先過 `validateRuleMeetsStandard`,擋 malformed(2026-05-26 事件後加)                                      |
+| Body size 上限   | `server.ts:3132`                     | 5MB                                                                                                               |
+| Tier 速率限制    | `auth/tier-resolver.ts`              | community 120 / pilot 1200 / enterprise 12000 req/min                                                             |
 
 > 更正:先前研究把「`apiKeyRequired` 預設 false / 無 per-client 限制 / 3 個匿名確認可升級」當成活的洞——讀碼後**三項皆錯**。教訓:研究 agent 的結論在動手前要對真實碼驗證(source-of-truth discipline 也適用於自己的 agent)。
 
@@ -119,33 +119,37 @@ proposal.corroboration = {
 
 ## 7. 還缺什麼(誠實清單)
 
-| 缺口 | 嚴重度 | 說明 |
-|------|--------|------|
-| #84 兩個 blocking bug | 高 | cache 碰撞 + judge prompt 注入,見 §4 |
-| 語意規則的 measured-FP 閘門 | 高 | `check-rules-safety` 對 `detection_tier: semantic` 要實際跑 judge 掃 benign 語料,要求實測 0 FP(regex 是可證明,語意只能實測) |
-| TC-origin auto-merge | 高 | **已修**(PHASE 0c) |
-| 欄位 enum 驗證 | 中 | `mitreTechnique`/`attackType` 目前收任意字串 |
-| 靜態加密 / 資料保留 | 中 | SQLite 明文、threats 表無保留上限 |
-| 佐證 schema + Guard 圍堵事件 | 中 | §6 要新建 |
-| HMAC / 防重放 | 低 | 有 auth 後優先序降低 |
+| 缺口                         | 嚴重度 | 說明                                                                                                                        |
+| ---------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- |
+| #84 兩個 blocking bug        | 高     | cache 碰撞 + judge prompt 注入,見 §4                                                                                        |
+| 語意規則的 measured-FP 閘門  | 高     | `check-rules-safety` 對 `detection_tier: semantic` 要實際跑 judge 掃 benign 語料,要求實測 0 FP(regex 是可證明,語意只能實測) |
+| TC-origin auto-merge         | 高     | **已修**(PHASE 0c)                                                                                                          |
+| 欄位 enum 驗證               | 中     | `mitreTechnique`/`attackType` 目前收任意字串                                                                                |
+| 靜態加密 / 資料保留          | 中     | SQLite 明文、threats 表無保留上限                                                                                           |
+| 佐證 schema + Guard 圍堵事件 | 中     | §6 要新建                                                                                                                   |
+| HMAC / 防重放                | 低     | 有 auth 後優先序降低                                                                                                        |
 
 ---
 
 ## 8. 分階段路線圖(標可行性 / 信心)
 
 **PHASE 0 — 止血(已完成 / 已驗證)**
+
 - Auth fail-closed ✓(本來就有)· Sybil/每日上限/body 上限 ✓(本來就有)· **TC-origin 一律人審 ✓(本文件落地,`tc-pr-back.yml`)**
 - 待用戶:確認 Railway env 沒把 `TC_API_KEY_REQUIRED` 設 false。
 
 **PHASE 1 — 語意層上線(可行性高 / 信心高 / 約 1–2 週)**
+
 - 修 #84 兩個 blocking bug + MEDIUM 群 → merge 進 ATR 當 opt-in 語意層。
 - `check-rules-safety` 擴充語意規則的 **measured-FP 閘門**。
 
 **PHASE 2 — 佐證迴路(可行性中 / 信心中高 / 約 2–3 週)**
+
 - Guard 加 SASS-概念狀態機回應 + 發送**蒸餾**圍堵事件。
 - TC proposal schema 加 §6 三訊號;佐證調 prior、不繞 gate。
 
 **PHASE 3 — TC production 收尾(可行性中 / 信心高 / 持續)**
+
 - 欄位 enum 驗證、靜態加密、資料保留 policy。
 - 養大 benign-code / benign-skill 語料(Check 3c 還新、未經規模考驗)。
 
@@ -153,11 +157,11 @@ proposal.corroboration = {
 
 ## 附錄:來源可信度分級(決定要不要人審)
 
-| 來源 | 信任度 | auto-merge? |
-|------|--------|-------------|
-| 紅隊 probe(人提供真攻擊+反例) | 高 | 否(draft PR,人審 regex) |
-| CVE PoC-grounded | 中高 | gate 過可,prose-only 自動丟人審 |
-| TC 端點遙測 | 低(來自客戶機器,可投毒) | **否,一律人審**(PHASE 0c) |
-| NVD 關鍵字 | 低產出 | 多數只 tracking |
+| 來源                          | 信任度                  | auto-merge?                     |
+| ----------------------------- | ----------------------- | ------------------------------- |
+| 紅隊 probe(人提供真攻擊+反例) | 高                      | 否(draft PR,人審 regex)         |
+| CVE PoC-grounded              | 中高                    | gate 過可,prose-only 自動丟人審 |
+| TC 端點遙測                   | 低(來自客戶機器,可投毒) | **否,一律人審**(PHASE 0c)       |
+| NVD 關鍵字                    | 低產出                  | 多數只 tracking                 |
 
 原則:來源越不可信,人審越不可省。閘門守 FP,人守語意。
