@@ -16,6 +16,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
@@ -28,6 +29,16 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { ProxyEvaluator } from './evaluator.js';
+import type { EvalResult } from './evaluator.js';
+import {
+  GuardGate,
+  InlineGate,
+  RiskAnalyzer,
+  InMemoryRiskStore,
+  NoopContainmentController,
+  applyMcpGate,
+} from '@panguard-ai/containment';
+import type { McpGateVerdict } from '@panguard-ai/containment';
 
 const VERDICT_LOG = join(homedir(), '.panguard-guard', 'proxy-verdicts.jsonl');
 
@@ -51,55 +62,126 @@ export interface ProxyConfig {
   readonly failMode?: 'open' | 'closed';
 }
 
+/** The subset of ProxyEvaluator the proxy uses — injectable for testing. */
+export interface ProxyEvaluatorLike {
+  loadRules(): Promise<number>;
+  evaluateToolCall(toolName: string, args: Record<string, unknown>): Promise<EvalResult>;
+  evaluateToolResponse(toolName: string, response: string): Promise<EvalResult>;
+}
+
 export class MCPProxy {
   private readonly config: ProxyConfig;
-  private readonly evaluator: ProxyEvaluator;
+  private readonly evaluator: ProxyEvaluatorLike;
   private client: Client | null = null;
   private server: Server | null = null;
   private readonly evalTimeout: number;
   private readonly failMode: 'open' | 'closed';
+  /** Layer 1 inline gate. The ProxyEvaluator stays the Layer 2 brain. */
+  private readonly guard: GuardGate;
+  /** Session risk: the brain (evaluator verdicts) writes, the inline gate reads. */
+  private readonly riskStore: InMemoryRiskStore;
+  /** Confidence at/above which an evaluator deny escalates the whole session. */
+  private static readonly ESCALATE_CONFIDENCE = 95;
+  /** One stdio session per proxy process. */
+  private readonly sessionId = 'mcp-proxy-session';
+  /** Upstream tool names = the Layer 0 capability scope (populated in start()). */
+  private upstreamToolNames = new Set<string>();
 
-  constructor(config: ProxyConfig) {
+  constructor(config: ProxyConfig, deps: { evaluator?: ProxyEvaluatorLike } = {}) {
     this.config = config;
-    this.evaluator = new ProxyEvaluator();
+    this.evaluator = deps.evaluator ?? new ProxyEvaluator();
     this.failMode = config.failMode ?? 'closed';
     this.evalTimeout = config.evalTimeout ?? 5000;
+    // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
+    // payloads (and any session the brain flags) are blocked instantly — even
+    // if the async evaluator times out fail-open.
+    this.riskStore = new InMemoryRiskStore();
+    this.guard = new GuardGate({
+      gate: new InlineGate(),
+      analyzer: new RiskAnalyzer({ detect: () => [] }),
+      riskStore: this.riskStore,
+      containment: new NoopContainmentController(),
+    });
   }
 
   async start(): Promise<void> {
-    // Load ATR rules
-    const ruleCount = await this.evaluator.loadRules();
-    process.stderr.write(`[panguard-proxy] Loaded ${ruleCount} ATR rules\n`);
-
-    // Connect to upstream MCP server
     const upstreamTransport = new StdioClientTransport({
       command: this.config.upstreamCommand,
       args: [...this.config.upstreamArgs],
       stderr: 'pipe',
     });
+    const agentTransport = new StdioServerTransport();
+    await this.connect(upstreamTransport, agentTransport);
+  }
+
+  /**
+   * Wire the proxy between an upstream (client) transport and an agent (server)
+   * transport. Extracted from start() so tests can drive the full flow over
+   * in-memory transports without spawning a process.
+   */
+  async connect(upstreamTransport: Transport, agentTransport: Transport): Promise<void> {
+    const ruleCount = await this.evaluator.loadRules();
+    process.stderr.write(`[panguard-proxy] Loaded ${ruleCount} ATR rules\n`);
+
     this.client = new Client(
       { name: 'panguard-mcp-proxy', version: '0.1.0' },
       { capabilities: {} }
     );
     await this.client.connect(upstreamTransport);
-    process.stderr.write(
-      `[panguard-proxy] Connected to upstream: ${this.config.upstreamCommand}\n`
-    );
+    process.stderr.write(`[panguard-proxy] Connected to upstream\n`);
 
-    // Create proxy server facing the agent
+    // Cache upstream tool names as the Layer 0 capability scope: an agent may
+    // only call tools the upstream actually exposes. Best-effort — if the list
+    // can't be fetched, the gate falls back to allowing the requested tool.
+    try {
+      const upstream = await this.client.listTools();
+      this.upstreamToolNames = new Set(upstream.tools.map((t) => t.name));
+    } catch {
+      /* leave empty; per-call fallback allows the requested tool */
+    }
+
     this.server = new Server(
       { name: 'panguard-mcp-proxy', version: '0.1.0' },
       { capabilities: { tools: {}, resources: {}, prompts: {} } }
     );
-
     this.registerHandlers();
-
-    // Connect to agent via stdio
-    const agentTransport = new StdioServerTransport();
     await this.server.connect(agentTransport);
     process.stderr.write(
       `[panguard-proxy] Proxy active. ${ruleCount} rules protecting all tool calls.\n`
     );
+  }
+
+  /**
+   * Run the Layer 1 inline gate for a tool call (sync, sub-ms): build the
+   * ActionContext and apply the gate. Capabilities default to the upstream tool
+   * set (Layer 0 scope); when unknown, the requested tool is allowed so the gate
+   * only adds block-on-sight + risk gating. Exposed so the wiring is testable.
+   */
+  gateCheck(name: string, toolArgs: Record<string, unknown>): McpGateVerdict {
+    return applyMcpGate(this.guard, {
+      name,
+      args: toolArgs,
+      sessionId: this.sessionId,
+      agentId: 'mcp-agent',
+      capabilities: this.upstreamToolNames.size > 0 ? this.upstreamToolNames : new Set([name]),
+    });
+  }
+
+  /**
+   * Feed an async-evaluator verdict back into session risk — the dual-path
+   * loop. A high-confidence deny escalates the session so the inline gate
+   * fast-blocks subsequent calls without re-evaluating. The threshold is
+   * deliberately high (ATR precision is ~99.6%) so a single false positive
+   * cannot lock out a legitimate agent.
+   */
+  recordEvalVerdict(verdict: {
+    outcome: string;
+    confidence: number;
+    matchedRules: readonly string[];
+  }): void {
+    if (verdict.outcome === 'deny' && verdict.confidence >= MCPProxy.ESCALATE_CONFIDENCE) {
+      this.riskStore.set(this.sessionId, { level: 'high', reasons: [...verdict.matchedRules] });
+    }
   }
 
   private registerHandlers(): void {
@@ -116,6 +198,30 @@ export class MCPProxy {
     server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
       const toolArgs = (args ?? {}) as Record<string, unknown>;
+
+      // Layer 1 inline gate (sync, sub-ms) — runs BEFORE the async evaluator so
+      // the worst payloads (and any session the brain has flagged) are blocked
+      // instantly, even if the async evaluator times out fail-open.
+      const gateVerdict = this.gateCheck(name, toolArgs);
+      if (!gateVerdict.allow) {
+        logVerdict({
+          phase: 'pre-gate',
+          tool: name,
+          outcome: 'deny',
+          reason: gateVerdict.reason ?? '',
+        });
+        process.stderr.write(
+          `[panguard-proxy] BLOCKED (inline gate): ${name} — ${gateVerdict.reason}\n`
+        );
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `[BLOCKED by PanGuard] Tool call "${name}" was blocked.\nReason: ${gateVerdict.reason}`,
+            },
+          ],
+        };
+      }
 
       // PreToolUse: evaluate the call
       let preResult;
@@ -146,6 +252,9 @@ export class MCPProxy {
         rules: preResult.matchedRules,
         ms: preResult.durationMs,
       });
+
+      // Close the dual-path loop: a high-confidence deny escalates the session.
+      this.recordEvalVerdict(preResult);
 
       if (preResult.outcome === 'deny') {
         process.stderr.write(`[panguard-proxy] BLOCKED: ${name} — ${preResult.reason}\n`);
@@ -197,6 +306,8 @@ export class MCPProxy {
           rules: postResult.matchedRules,
           ms: postResult.durationMs,
         });
+
+        this.recordEvalVerdict(postResult);
 
         if (postResult.outcome === 'deny') {
           process.stderr.write(
