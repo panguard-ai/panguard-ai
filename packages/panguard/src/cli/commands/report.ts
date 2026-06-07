@@ -114,6 +114,65 @@ const FRAMEWORKS: readonly FrameworkMeta[] = [
   },
 ];
 
+// ─── Use-case scoping (per-deployed-system evidence) ─────────────────
+//
+// A bank deploys ONE high-risk AI system (e.g. a credit-scoring agent), not
+// the whole ATR corpus. Scoping filters rules to the attack surface relevant
+// to that system so the evidence pack is about *their* system, not all 462
+// rules. The agent attack surface is shared across most agentic financial
+// systems; the use-case mainly drives the framing/label.
+
+const AGENT_ATTACK_SURFACE = [
+  'prompt-injection',
+  'agent-manipulation',
+  'context-exfiltration',
+  'privilege-escalation',
+  'tool-poisoning',
+];
+
+interface UseCaseScope {
+  label: string;
+  /** ATR rule categories (tags.category) in scope for this system */
+  categories: string[];
+}
+
+const USE_CASE_SCOPES: Record<string, UseCaseScope> = {
+  'credit-scoring': {
+    label: 'Credit-scoring / creditworthiness agent (EU AI Act Annex III §5(b))',
+    categories: AGENT_ATTACK_SURFACE,
+  },
+  aml: {
+    label: 'AML / transaction-monitoring agent',
+    categories: AGENT_ATTACK_SURFACE,
+  },
+  'fraud-detection': {
+    label: 'Fraud-detection agent',
+    categories: AGENT_ATTACK_SURFACE,
+  },
+  underwriting: {
+    label: 'Insurance underwriting / claims agent',
+    categories: AGENT_ATTACK_SURFACE,
+  },
+};
+
+/** Honest per-framework scope-boundary note — what this evidence layer covers vs not. */
+const FRAMEWORK_BOUNDARY: Partial<Record<FrameworkId, string>> = {
+  'eu-ai-act':
+    'This pack evidences the Article 15 (accuracy, robustness & cybersecurity) and Article 9 (risk management) dimensions for the assessed system. It is NOT a conformity assessment and does not cover Article 10 (data governance), Article 11 / Annex IV (technical documentation), Article 13 (transparency), Article 14 (human-oversight design), Article 17 (QMS), or Article 27 (FRIA) — these are handled elsewhere in the institution’s compliance programme. For a financial-institution deployer, the Article 26 monitoring obligation is deemed fulfilled via internal-governance rules under financial-services law; this evidence feeds that governance with AI-agent attack detection, it does not discharge Article 26 by itself.',
+};
+
+const DEFAULT_BOUNDARY =
+  'ATR is detection evidence supporting compliance, not a compliance guarantee and not legal advice. This pack is the runtime-detection layer; documentation, data-governance, and conformity obligations are handled elsewhere in your compliance programme.';
+
+/** Per-report scope context (set when --scope/--system/--categories supplied). */
+interface ReportScope {
+  system?: string;
+  useCaseLabel?: string;
+  categories: string[];
+  scopedRules: number;
+  totalCorpus: number;
+}
+
 // ─── ATR rule loading ────────────────────────────────────────────────
 
 interface ComplianceEntry {
@@ -308,7 +367,7 @@ function buildCoverage(rules: ATRRule[], fw: FrameworkMeta): CoverageSummary {
   };
 }
 
-function renderMarkdown(coverage: CoverageSummary, orgName: string): string {
+function renderMarkdown(coverage: CoverageSummary, orgName: string, scope?: ReportScope): string {
   const fw = coverage.framework;
   const today = new Date().toISOString().slice(0, 10);
   const sortedIds = Array.from(coverage.byIdentifier.keys()).sort();
@@ -330,6 +389,16 @@ function renderMarkdown(coverage: CoverageSummary, orgName: string): string {
   lines.push(`- **ATR rules in set**: ${coverage.totalRules}`);
   lines.push(`- **Rules mapped to this framework**: ${coverage.mappedRules} (${coveragePercent}%)`);
   lines.push(`- **Total mappings (rule × article)**: ${coverage.totalMappings}`);
+  if (scope) {
+    lines.push('');
+    lines.push(`### Scope of assessment`);
+    if (scope.system) lines.push(`- **AI system assessed**: ${scope.system}`);
+    if (scope.useCaseLabel) lines.push(`- **Use case**: ${scope.useCaseLabel}`);
+    lines.push(`- **Attack surface in scope**: ${scope.categories.join(', ')}`);
+    lines.push(
+      `- **Rules in scope**: ${scope.scopedRules} of ${scope.totalCorpus} in the ATR corpus (scoped to this system’s attack surface)`
+    );
+  }
   lines.push('');
   lines.push(`---`);
   lines.push('');
@@ -380,10 +449,14 @@ function renderMarkdown(coverage: CoverageSummary, orgName: string): string {
   lines.push(
     `**Limitations**: this is a *rule-coverage* report — which ATR rules claim to address which framework controls. A full audit also requires *event evidence* (which detections your deployment actually triggered during the audit period). See \`pga sensor status\` and the PanGuard Enterprise audit-log export for event-level evidence.`
   );
+  lines.push('');
+  lines.push(`## Scope boundary`);
+  lines.push('');
+  lines.push(FRAMEWORK_BOUNDARY[fw.id] ?? DEFAULT_BOUNDARY);
   return lines.join('\n');
 }
 
-function renderJson(coverage: CoverageSummary, orgName: string): string {
+function renderJson(coverage: CoverageSummary, orgName: string, scope?: ReportScope): string {
   const fw = coverage.framework;
   const byIdentifier: Record<string, { count: number; context: string[] }> = {};
   for (const [k, v] of coverage.byIdentifier.entries()) {
@@ -394,6 +467,7 @@ function renderJson(coverage: CoverageSummary, orgName: string): string {
       framework: fw,
       organisation: orgName,
       reportDate: new Date().toISOString(),
+      ...(scope ? { scope } : {}),
       totalRules: coverage.totalRules,
       mappedRules: coverage.mappedRules,
       totalMappings: coverage.totalMappings,
@@ -420,7 +494,8 @@ async function renderPdf(
   coverage: CoverageSummary,
   orgName: string,
   integrityHash: string,
-  signature: string | null
+  signature: string | null,
+  scope?: ReportScope
 ): Promise<Buffer> {
   // Lazy-load pdfkit so CLI startup stays fast when PDF isn't needed.
   // Use dynamic import so the pdfkit types come through properly even
@@ -479,6 +554,24 @@ async function renderPdf(
   for (const [k, v] of meta) {
     doc.font('Helvetica-Bold').text(`${k}: `, { continued: true });
     doc.font('Helvetica').text(v);
+  }
+
+  if (scope) {
+    doc.moveDown(1);
+    doc.fontSize(11).font('Helvetica-Bold').text('Scope of assessment');
+    doc.fontSize(10).moveDown(0.2);
+    if (scope.system) {
+      doc.font('Helvetica-Bold').text('AI system assessed: ', { continued: true });
+      doc.font('Helvetica').text(scope.system);
+    }
+    if (scope.useCaseLabel) {
+      doc.font('Helvetica-Bold').text('Use case: ', { continued: true });
+      doc.font('Helvetica').text(scope.useCaseLabel);
+    }
+    doc.font('Helvetica-Bold').text('Attack surface in scope: ', { continued: true });
+    doc.font('Helvetica').text(scope.categories.join(', '));
+    doc.font('Helvetica-Bold').text('Rules in scope: ', { continued: true });
+    doc.font('Helvetica').text(`${scope.scopedRules} of ${scope.totalCorpus} in the ATR corpus`);
   }
 
   doc.moveDown(1);
@@ -548,6 +641,11 @@ async function renderPdf(
     );
 
   doc.moveDown(1);
+  doc.font('Helvetica-Bold').text('Scope boundary');
+  doc.moveDown(0.3);
+  doc.font('Helvetica').text(FRAMEWORK_BOUNDARY[fw.id] ?? DEFAULT_BOUNDARY);
+
+  doc.moveDown(1);
   doc.font('Helvetica-Bold').fontSize(9).text('Integrity chain');
   doc.font('Courier').fontSize(7);
   doc.text(`sha256(report-canonical-json):  ${integrityHash}`);
@@ -570,7 +668,12 @@ async function renderPdf(
  * auditors a single identifier that binds the Markdown, JSON, and
  * PDF outputs of the same report together.
  */
-function computeReportHash(coverage: CoverageSummary, orgName: string, reportDate: string): string {
+function computeReportHash(
+  coverage: CoverageSummary,
+  orgName: string,
+  reportDate: string,
+  scope?: ReportScope
+): string {
   const byIdentifier: Record<string, { count: number; context: string[] }> = {};
   const sorted = Array.from(coverage.byIdentifier.keys()).sort();
   for (const k of sorted) {
@@ -582,6 +685,7 @@ function computeReportHash(coverage: CoverageSummary, orgName: string, reportDat
     yamlKey: coverage.framework.yamlKey,
     organisation: orgName,
     reportDate,
+    scope: scope ? { system: scope.system, useCaseLabel: scope.useCaseLabel, categories: scope.categories, scopedRules: scope.scopedRules } : null,
     totalRules: coverage.totalRules,
     mappedRules: coverage.mappedRules,
     totalMappings: coverage.totalMappings,
@@ -644,6 +748,23 @@ function listFrameworksAction(): void {
   console.log('');
 }
 
+function listScopesAction(): void {
+  console.log('');
+  console.log(`  ${c.bold('USE-CASE SCOPES')}`);
+  console.log(`  ${c.dim('─'.repeat(68))}`);
+  console.log(`  ${c.dim("Scope a report to one deployed system's attack surface:")}`);
+  console.log('');
+  for (const [id, uc] of Object.entries(USE_CASE_SCOPES)) {
+    console.log(`  ${c.sage(id.padEnd(18))} ${uc.label}`);
+    console.log(`  ${' '.repeat(18)} ${c.dim(uc.categories.join(', '))}`);
+    console.log('');
+  }
+  console.log(
+    `  ${c.dim('Generate:')} ${c.sage('pga report generate --framework eu-ai-act --scope credit-scoring --system "..." --org "..." --format pdf --output pack.pdf')}`
+  );
+  console.log('');
+}
+
 function summaryAction(opts: { framework?: string }): void {
   const fw = opts.framework ? resolveFramework(opts.framework) : null;
   if (!fw) {
@@ -693,6 +814,9 @@ async function generateAction(opts: {
   output?: string;
   org?: string;
   sign?: string;
+  scope?: string;
+  system?: string;
+  categories?: string;
 }): Promise<void> {
   const fw = opts.framework ? resolveFramework(opts.framework) : null;
   if (!fw) {
@@ -712,15 +836,51 @@ async function generateAction(opts: {
   }
   const orgName = opts.org ?? 'Your Organisation';
   const { rules } = loadAllRules();
-  const coverage = buildCoverage(rules, fw);
+
+  // Scope to a deployed system's attack surface, if requested (per-bank report).
+  let scope: ReportScope | undefined;
+  let scopedRules = rules;
+  if (opts.scope || opts.categories || opts.system) {
+    let categories: string[] | null = null;
+    let useCaseLabel: string | undefined;
+    if (opts.scope) {
+      const uc = USE_CASE_SCOPES[opts.scope];
+      if (!uc) {
+        console.log(
+          `  ${c.caution(symbols.warn)} Unknown --scope '${opts.scope}'. Run ${c.sage('pga report list-scopes')} to see options.`
+        );
+        return;
+      }
+      categories = uc.categories;
+      useCaseLabel = uc.label;
+    }
+    if (opts.categories) {
+      categories = opts.categories
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+    if (categories) {
+      scopedRules = rules.filter((r) => categories.includes(r.category));
+    }
+    scope = {
+      system: opts.system,
+      useCaseLabel,
+      categories: categories ?? Array.from(new Set(rules.map((r) => r.category))).sort(),
+      scopedRules: scopedRules.length,
+      totalCorpus: rules.length,
+    };
+  }
+
+  const coverage = buildCoverage(scopedRules, fw);
   const reportDate = new Date().toISOString();
-  const hash = computeReportHash(coverage, orgName, reportDate);
+  const hash = computeReportHash(coverage, orgName, reportDate, scope);
   const signingKey = opts.sign ?? process.env['PANGUARD_REPORT_SIGNING_KEY'];
   const signature = signingKey ? signReport(hash, signingKey) : null;
 
   if (format === 'pdf') {
     // PDF is binary — must go to a file, never stdout. Validated above.
-    const buf = await renderPdf(coverage, orgName, hash, signature);
+    const buf = await renderPdf(coverage, orgName, hash, signature, scope);
     const pdfPath = opts.output as string;
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     writeFileSync(pdfPath, buf);
@@ -745,7 +905,7 @@ async function generateAction(opts: {
   }
 
   const baseContent =
-    format === 'json' ? renderJson(coverage, orgName) : renderMarkdown(coverage, orgName);
+    format === 'json' ? renderJson(coverage, orgName, scope) : renderMarkdown(coverage, orgName, scope);
   const footer =
     format === 'json'
       ? ''
@@ -837,6 +997,11 @@ export function reportCommand(): Command {
     .action(() => listFrameworksAction());
 
   cmd
+    .command('list-scopes')
+    .description('List use-case scopes for per-deployed-system reports')
+    .action(() => listScopesAction());
+
+  cmd
     .command('summary')
     .description('Show compliance coverage summary for one framework')
     .option('--framework <id>', 'Framework id — see: pga report list-frameworks')
@@ -848,7 +1013,10 @@ export function reportCommand(): Command {
     .option('--framework <id>', 'Framework id')
     .option('--format <fmt>', 'Output format: md (default) | json | pdf')
     .option('--output <path>', 'Write report to file instead of stdout (required for pdf)')
-    .option('--org <name>', 'Organisation name for the report header')
+    .option('--org <name>', 'Organisation / institution name for the report header')
+    .option('--scope <use-case>', 'Scope to a deployed system (e.g. credit-scoring) — see: pga report list-scopes')
+    .option('--system <name>', 'Name of the specific AI system assessed (e.g. "Retail Credit Decisioning Agent")')
+    .option('--categories <csv>', 'Override scope with explicit ATR rule categories, comma-separated')
     .option(
       '--sign <key>',
       'HMAC-SHA256 key for report signing (or set PANGUARD_REPORT_SIGNING_KEY env var)'
@@ -860,6 +1028,9 @@ export function reportCommand(): Command {
         output?: string;
         org?: string;
         sign?: string;
+        scope?: string;
+        system?: string;
+        categories?: string;
       }) => {
         try {
           await generateAction(opts);
