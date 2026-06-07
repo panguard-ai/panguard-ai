@@ -25,7 +25,7 @@ export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.5.6',
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
-  atrVersion: '3.1.1',
+  atrVersion: '3.2.0',
   /** ATR v2.2.x: stable + experimental total */
   atrRules: 462,
   atrStableRules: 359,
