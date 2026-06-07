@@ -187,8 +187,8 @@ export default function ComplianceContent() {
       <SectionWrapper>
         <SectionTitle
           overline="COMPLIANCE ROADMAP · LAYER 7 GOVERN"
-          title="4-framework reporting + AIAM"
-          subtitle="Layer 7 Govern ships partial today (audit log + Threat Cloud logging). Compliance reporting + AIAM land Q2/Q3 2026 on the public timeline. No fake checkmarks."
+          title="6-framework mapping shipped · reporting + AIAM next"
+          subtitle="Per-rule mapping across 6 frameworks ships today (ATR v3.2.0, 100% coverage, CI-validated). Auditor-grade reports + AIAM land Q2/Q3 2026 on the public timeline. No fake checkmarks."
         />
 
         {/* Today vs Coming Soon honest split */}
@@ -205,18 +205,22 @@ export default function ComplianceContent() {
                 <li className="flex items-start gap-2">
                   <span className="text-brand-sage shrink-0">✓</span>
                   <span>
-                    NIST AI RMF — 100% rule coverage · 1,566 mappings · 16 subcategories across GV /
-                    MP / MS / MG (ATR v2.1.0, 2026-05-09)
+                    EU AI Act · NIST AI RMF · ISO/IEC 42001 — 100% per-rule compliance mapping on
+                    every bundled rule, validated in CI (ATR v3.2.0)
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-sage shrink-0">✓</span>
-                  <span>OWASP Agentic Top 10 — 10 / 10 categories · 77 rule links</span>
+                  <span>
+                    OWASP LLM Top 10 · OWASP Agentic Top 10 · MITRE ATLAS — 100% per-rule references
+                    (ATR v3.2.0)
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-sage shrink-0">✓</span>
                   <span>
-                    EU AI Act + ISO/IEC 42001 metadata auto-tagged via Migrator Enterprise pipeline
+                    Downloadable mapping pack — per-rule framework evidence, MIT-licensed (detection
+                    evidence, not a compliance guarantee)
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -277,21 +281,21 @@ export default function ComplianceContent() {
               scope: 'Govern / Map / Measure / Manage',
               date: 'Voluntary · F500 RFP standard',
               status: 'shipped' as const,
-              statusLabel: '100% mapped · v2.1.0',
+              statusLabel: '100% mapped · v3.2.0',
             },
             {
               name: 'EU AI Act',
-              scope: 'Article 9, 10, 12, 14, 15 risk management',
-              date: 'Enforcement 2026-08-02',
-              status: 'partial' as const,
-              statusLabel: 'Auto-tagging via Migrator',
+              scope: 'Articles 9, 10, 12, 13, 14, 15 (high-risk)',
+              date: 'High-risk obligations 2026-08-02',
+              status: 'shipped' as const,
+              statusLabel: '100% mapped · v3.2.0',
             },
             {
               name: 'ISO / IEC 42001',
-              scope: 'AIMS clauses 6–10',
+              scope: 'AIMS clauses 6.2 / 8.1–8.4 / 9.1',
               date: 'Certification pathway',
-              status: 'partial' as const,
-              statusLabel: 'Auto-tagging via Migrator',
+              status: 'shipped' as const,
+              statusLabel: '100% mapped · v3.2.0',
             },
             {
               name: 'Colorado AI Act',
@@ -310,11 +314,7 @@ export default function ComplianceContent() {
                 <p className="text-[10px] text-text-muted mt-3 font-mono">{framework.date}</p>
                 <p
                   className={`text-[10px] mt-1 font-semibold ${
-                    framework.status === 'shipped'
-                      ? 'text-brand-sage'
-                      : framework.status === 'partial'
-                        ? 'text-blue-400'
-                        : 'text-amber-400'
+                    framework.status === 'shipped' ? 'text-brand-sage' : 'text-amber-400'
                   }`}
                 >
                   {framework.statusLabel}
