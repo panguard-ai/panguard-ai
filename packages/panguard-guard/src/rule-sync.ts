@@ -49,8 +49,13 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
       const yaml = await import('js-yaml');
       for (const rule of atrRules) {
         try {
-          // TC stores rules as YAML strings, not JSON
-          const parsed = yaml.load(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
+          // TC stores rules as YAML strings, not JSON. JSON_SCHEMA: remote rule
+          // content is parsed as pure data only (no custom YAML types), so a
+          // malicious or MITM'd Threat Cloud response cannot smuggle executable
+          // or type-confused objects into the engine.
+          const parsed = yaml.load(rule.ruleContent, {
+            schema: yaml.JSON_SCHEMA,
+          }) as import('@panguard-ai/atr').ATRRule;
           if (parsed.id && parsed.title && parsed.detection && parsed.agent_source?.type) {
             atrEngine.addCloudRule(parsed);
             newATRRules++;

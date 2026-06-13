@@ -19,7 +19,7 @@
 
 import { writeFileSync, readFileSync, unlinkSync, existsSync, mkdirSync, lstatSync } from 'node:fs';
 import { execFile } from 'node:child_process';
-import { platform, homedir } from 'node:os';
+import { platform, homedir, userInfo } from 'node:os';
 import { join, dirname } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 
@@ -272,12 +272,21 @@ async function uninstallLaunchd(): Promise<string> {
 async function installSystemd(execArgv: string[], dataDir: string): Promise<string> {
   const unitPath = `/etc/systemd/system/${SERVICE_NAME}.service`;
 
+  // Run as the human who installed it (SUDO_USER under `sudo`), NEVER as root.
+  // A security daemon must not itself be a root-level attack surface, and it
+  // monitors *that user's* agents — root would also be the wrong home/context.
+  const rawUser = process.env['SUDO_USER'] || userInfo().username;
+  const runUser = /^[a-z_][a-z0-9_-]{0,31}$/i.test(rawUser) ? rawUser : userInfo().username;
+
   const unit = `[Unit]
 Description=${SERVICE_DISPLAY_NAME}
 After=network.target
 
 [Service]
 Type=simple
+User=${runUser}
+NoNewPrivileges=true
+PrivateTmp=true
 ExecStart=${[...execArgv, 'start', '--data-dir', dataDir].map(systemdQuote).join(' ')}
 Restart=always
 RestartSec=10
