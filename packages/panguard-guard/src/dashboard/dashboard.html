@@ -1107,8 +1107,11 @@
           </thead>
           <tbody id="th-tb"></tbody>
         </table>
-        <div id="th-empty" class="empty" data-i18n="th_empty" style="display: none">
-          No threats detected.
+        <div id="th-empty" class="empty-ok" data-i18n="th_empty" style="display: none">
+          All clear — no threats today.
+          <div class="sub" data-i18n="th_empty_sub">
+            Your agents are protected. Threats will appear here if anything is caught.
+          </div>
         </div>
       </div>
 
@@ -1489,7 +1492,7 @@
           t_st: 'Settings',
           active: 'Active',
           hero_desc:
-            'All detection layers are operational. PanGuard is monitoring AI agent activity in real time.',
+            'All detection layers are operational. PanGuard is watching your AI agents in real time — detection only, nothing is blocked unless you turn on enforcement.',
           k_rules: 'Rules Active',
           k_threats: 'Threats Detected',
           k_tc: 'TC Rules Synced',
@@ -1518,7 +1521,8 @@
           th_sev: 'Severity',
           th_pat: 'Matched Pattern',
           th_act: 'Action',
-          th_empty: 'No threats detected.',
+          th_empty: 'All clear — no threats today.',
+          th_empty_sub: 'Your agents are protected. Threats will appear here if anything is caught.',
           d_ru: 'All loaded ATR detection rules. Rules sync hourly from Threat Cloud.',
           ru_total: 'Total Rules',
           ru_critical: 'Critical',
@@ -1591,7 +1595,8 @@
           t_tc: '威脅雲',
           t_st: '設定',
           active: '啟動中',
-          hero_desc: '所有偵測層運作中,PanGuard 正在即時監控 AI agent 活動。',
+          hero_desc:
+            '所有偵測層運作中,PanGuard 正在即時守護你的 AI agent — 僅偵測,除非你開啟強制模式,否則不會阻擋任何流量。',
           k_rules: '啟用規則',
           k_threats: '已偵測威脅',
           k_tc: 'TC 同步規則',
@@ -1620,7 +1625,8 @@
           th_sev: '嚴重程度',
           th_pat: '匹配模式',
           th_act: '採取動作',
-          th_empty: '未偵測到威脅。',
+          th_empty: '一切正常 — 今日無威脅。',
+          th_empty_sub: '你的 agent 受到保護。偵測到威脅時會顯示在這裡。',
           d_ru: '已載入的 ATR 偵測規則。規則每小時自動從 Threat Cloud 同步。',
           ru_total: '總規則數',
           ru_critical: '嚴重',
