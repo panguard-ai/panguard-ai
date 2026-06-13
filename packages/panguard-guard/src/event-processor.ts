@@ -30,22 +30,8 @@ import type { ATRDrafter } from './engines/atr-drafter.js';
 import { sendNotifications } from './notify/index.js';
 import { saveBaseline } from './memory/index.js';
 import { logAuditEvent } from '@panguard-ai/security-hardening';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
-import { homedir } from 'node:os';
 
 const logger = createLogger('panguard-guard:event-processor');
-
-/**
- * The first-run telemetry disclosure (shown by the CLI's consent flow) writes
- * this marker once the user has been told what is shared. Threat-hash uploads
- * are gated on it: nothing leaves the machine until that disclosure has been
- * presented at least once. Path mirrors cli/consent.ts CONSENT_MARKER.
- */
-const DISCLOSURE_MARKER = join(homedir(), '.panguard-guard', '.telemetry-prompted');
-function firstRunDisclosureShown(): boolean {
-  return existsSync(DISCLOSURE_MARKER);
-}
 
 /** Mutable state that the event processor reads and writes */
 export interface EventProcessorState {
@@ -247,8 +233,7 @@ async function reportAndNotify(
   if (
     anonymizedData &&
     state.config.threatCloudUploadEnabled !== false &&
-    state.config.telemetryEnabled !== false &&
-    firstRunDisclosureShown()
+    state.config.telemetryEnabled !== false
   ) {
     if (state.config.showUploadData) {
       logger.info(`[upload-preview] Anonymized data: ${JSON.stringify(anonymizedData, null, 2)}`);

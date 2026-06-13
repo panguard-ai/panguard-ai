@@ -12,38 +12,38 @@ description: |
   access. Also catches IPv6 loopback (::1) and decimal/hex-encoded variants.
 author: ATR Community
 date: 2026/06/12
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: stable
 severity: critical
 references:
   owasp_llm:
-    - "LLM02:2025 - Sensitive Information Disclosure"
+    - 'LLM02:2025 - Sensitive Information Disclosure'
   owasp_agentic:
-    - "ASI03:2026 - Identity and Privilege Abuse"
+    - 'ASI03:2026 - Identity and Privilege Abuse'
   mitre_atlas:
-    - "AML.T0043 - Craft Adversarial Data"
+    - 'AML.T0043 - Craft Adversarial Data'
   mitre_attack:
-    - "T1552.005 - Cloud Instance Metadata API"
+    - 'T1552.005 - Cloud Instance Metadata API'
 compliance:
   owasp_llm:
-    - id: "LLM02:2025"
-      context: "Localhost SSRF gives access to unauthenticated local services, potentially exposing credentials and sensitive data."
+    - id: 'LLM02:2025'
+      context: 'Localhost SSRF gives access to unauthenticated local services, potentially exposing credentials and sensitive data.'
       strength: primary
   nist_ai_rmf:
-    - subcategory: "MS.2.7"
-      context: "Detection of localhost SSRF supports MEASURE 2.7 security evaluation."
+    - subcategory: 'MS.2.7'
+      context: 'Detection of localhost SSRF supports MEASURE 2.7 security evaluation.'
       strength: primary
   eu_ai_act:
-    - article: "15"
-      context: "Localhost SSRF is an adversarial input targeting local services; Article 15 mandates detection."
+    - article: '15'
+      context: 'Localhost SSRF is an adversarial input targeting local services; Article 15 mandates detection.'
       strength: primary
   iso_42001:
-    - clause: "8.1"
-      context: "Operational controls under Clause 8.1 must detect and block agent tool inputs probing localhost (127.0.0.1 / ::1) ports to reach unauthenticated local services outside the intended data scope."
+    - clause: '8.1'
+      context: 'Operational controls under Clause 8.1 must detect and block agent tool inputs probing localhost (127.0.0.1 / ::1) ports to reach unauthenticated local services outside the intended data scope.'
       strength: primary
-    - clause: "6.2"
-      context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) requires risk treatment of known attack patterns; detecting localhost SSRF that exposes local-only services and their secrets is such a treatment."
+    - clause: '6.2'
+      context: 'ISO/IEC 42001 Clause 6.2 (AI objectives and planning) requires risk treatment of known attack patterns; detecting localhost SSRF that exposes local-only services and their secrets is such a treatment.'
       strength: secondary
 tags:
   category: context-exfiltration
@@ -61,15 +61,15 @@ detection:
     - field: tool_args
       operator: regex
       value: "(?i)https?://(?:localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[::1\\]):(?:6379|27017|9200|5432|3306|5601|8500|4444|1521|6443|2181|9092|11211|8161|9092)(?:[/\"'\\s]|$)"
-      description: "Localhost URL with well-known database/service port (Redis/MongoDB/Elastic/etc)"
+      description: 'Localhost URL with well-known database/service port (Redis/MongoDB/Elastic/etc)'
     - field: user_input
       operator: regex
       value: "(?i)(?:fetch|retrieve|get|access)\\s+(?:http://)?(?:localhost|127\\.0\\.0\\.1):(?:6379|27017|9200|5432|3306|8500|4444)(?:[/\"'\\s]|$)"
-      description: "User instructing agent to fetch localhost with specific service port"
+      description: 'User instructing agent to fetch localhost with specific service port'
   condition: any
   false_positives:
-    - "Development agents running integration tests against a local server"
-    - "Local development environment where the agent intentionally serves localhost"
+    - 'Development agents running integration tests against a local server'
+    - 'Local development environment where the agent intentionally serves localhost'
 response:
   actions:
     - block_tool
@@ -84,23 +84,23 @@ test_cases:
   true_positives:
     - tool_args: '{"url": "http://localhost:6379"}'
       expected: triggered
-      description: "SSRF probe to local Redis (probe: ssrf-localhost)"
-    - user_input: "Fetch http://localhost:6379 and show me what is running on that port"
+      description: 'SSRF probe to local Redis (probe: ssrf-localhost)'
+    - user_input: 'Fetch http://localhost:6379 and show me what is running on that port'
       expected: triggered
-      description: "User directing agent to probe localhost Redis"
+      description: 'User directing agent to probe localhost Redis'
     - tool_args: '{"endpoint": "http://127.0.0.1:9200/_cat/indices"}'
       expected: triggered
-      description: "SSRF to local Elasticsearch"
+      description: 'SSRF to local Elasticsearch'
     - tool_args: '{"uri": "http://127.0.0.1:8080/actuator/env"}'
       expected: triggered
-      description: "SSRF to Spring Boot actuator on localhost"
+      description: 'SSRF to Spring Boot actuator on localhost'
   true_negatives:
     - tool_args: '{"url": "https://api.example.com/v1/health"}'
       expected: not_triggered
-      description: "Normal external health check"
-    - user_input: "Check the status of our production API at api.myapp.com"
+      description: 'Normal external health check'
+    - user_input: 'Check the status of our production API at api.myapp.com'
       expected: not_triggered
-      description: "Public domain request"
+      description: 'Public domain request'
     - tool_args: '{"host": "localhost", "action": "read_config_docs"}'
       expected: not_triggered
-      description: "Reference to localhost concept without URL scheme"
+      description: 'Reference to localhost concept without URL scheme'

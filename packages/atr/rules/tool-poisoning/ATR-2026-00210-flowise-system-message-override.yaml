@@ -1,4 +1,4 @@
-title: "Flowise System Message Override via Template Interpolation (CVE-2025-59528)"
+title: 'Flowise System Message Override via Template Interpolation (CVE-2025-59528)'
 id: ATR-2026-00210
 rule_version: 1
 status: experimental
@@ -11,28 +11,28 @@ description: >
   vm.runInNewContext / new Function sink reached from a polluted System Message.
   21 GHSAs published 2026-04-15 cover the affected chatflow surfaces
   (Airtable Agent, CSV Agent, Parameter Override, etc.). Disclosed 2026-04-14.
-author: "ATR Community"
-date: "2026/04/22"
-schema_version: "0.1"
+author: 'ATR Community'
+date: '2026/04/22'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: critical
 
 references:
   owasp_llm:
-    - "LLM01:2025 - Prompt Injection"
-    - "LLM05:2025 - Improper Output Handling"
+    - 'LLM01:2025 - Prompt Injection'
+    - 'LLM05:2025 - Improper Output Handling'
   owasp_agentic:
-    - "ASI01:2026 - Agent Behaviour Hijack"
-    - "ASI05:2026 - Unexpected Code Execution"
+    - 'ASI01:2026 - Agent Behaviour Hijack'
+    - 'ASI05:2026 - Unexpected Code Execution'
   mitre_atlas:
-    - "AML.T0051.001 - Indirect Prompt Injection"
-    - "AML.T0040 - ML Model Inference API Access"
+    - 'AML.T0051.001 - Indirect Prompt Injection'
+    - 'AML.T0040 - ML Model Inference API Access'
   mitre_attack:
-    - "T1059 - Command and Scripting Interpreter"
-    - "T1190 - Exploit Public-Facing Application"
+    - 'T1059 - Command and Scripting Interpreter'
+    - 'T1190 - Exploit Public-Facing Application'
   cve:
-    - "CVE-2025-59528"
+    - 'CVE-2025-59528'
 
 metadata_provenance:
   mitre_atlas: human-reviewed
@@ -40,34 +40,34 @@ metadata_provenance:
   owasp_agentic: human-reviewed
 compliance:
   eu_ai_act:
-    - article: "15"
-      context: "CVE-2025-59528 Flowise template injection allows attacker-controlled chat input to overwrite the system prompt and achieve RCE via vm.runInNewContext; Article 15 cybersecurity requirements mandate that AI system implementations sanitize all user-controlled inputs before template interpolation into privileged execution contexts."
+    - article: '15'
+      context: 'CVE-2025-59528 Flowise template injection allows attacker-controlled chat input to overwrite the system prompt and achieve RCE via vm.runInNewContext; Article 15 cybersecurity requirements mandate that AI system implementations sanitize all user-controlled inputs before template interpolation into privileged execution contexts.'
       strength: primary
-    - article: "9"
-      context: "System message template injection via unsanitized user input is a documented high-risk vulnerability class; Article 9 risk management systems must include input sanitization controls as a mandatory risk treatment for AI systems that use template-based system prompt construction."
+    - article: '9'
+      context: 'System message template injection via unsanitized user input is a documented high-risk vulnerability class; Article 9 risk management systems must include input sanitization controls as a mandatory risk treatment for AI systems that use template-based system prompt construction.'
       strength: secondary
   nist_ai_rmf:
-    - subcategory: "MP.5.1"
-      context: "CVE-2025-59528 Flowise template injection is an adversarial input attack where attacker-controlled chat input exploits unsanitized {{$flow.variables}} and {{$input}} interpolation to overwrite the system prompt and achieve RCE via vm.runInNewContext; MP.5.1 requires this injection vector to be identified and tracked as an adversarial input risk."
+    - subcategory: 'MP.5.1'
+      context: 'CVE-2025-59528 Flowise template injection is an adversarial input attack where attacker-controlled chat input exploits unsanitized {{$flow.variables}} and {{$input}} interpolation to overwrite the system prompt and achieve RCE via vm.runInNewContext; MP.5.1 requires this injection vector to be identified and tracked as an adversarial input risk.'
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "Risk treatment plans under MG.2.3 must mandate input sanitization before Flowise template interpolation, as the CVE-2025-59528 attack achieves system prompt override and remote code execution through the vm.runInNewContext and new Function sinks."
+    - subcategory: 'MG.2.3'
+      context: 'Risk treatment plans under MG.2.3 must mandate input sanitization before Flowise template interpolation, as the CVE-2025-59528 attack achieves system prompt override and remote code execution through the vm.runInNewContext and new Function sinks.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the tool-poisoning technique (Flowise System Message Override via Template Interpolation (CVE-2025-59528))."
       strength: primary
-    - subcategory: "MG.3.2"
-      context: "NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (Flowise System Message Override via Template Interpolation (CVE-2025-59528))."
+    - subcategory: 'MG.3.2'
+      context: 'NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (Flowise System Message Override via Template Interpolation (CVE-2025-59528)).'
       strength: secondary
   iso_42001:
-    - clause: "6.2"
-      context: "Risk treatment activities under clause 6.2 must address the Flowise system message override vulnerability (CVE-2025-59528), implementing sanitization controls that prevent attacker-controlled chat inputs from reaching template interpolation in privileged execution contexts."
+    - clause: '6.2'
+      context: 'Risk treatment activities under clause 6.2 must address the Flowise system message override vulnerability (CVE-2025-59528), implementing sanitization controls that prevent attacker-controlled chat inputs from reaching template interpolation in privileged execution contexts.'
       strength: primary
-    - clause: "8.1"
-      context: "Operational controls under clause 8.1 must include detection of Flowise template interpolation syntax ({{$flow.variables}}, {{$input}}) in content fields that feed into system messages or code execution sinks, blocking the CVE-2025-59528 RCE pathway."
+    - clause: '8.1'
+      context: 'Operational controls under clause 8.1 must include detection of Flowise template interpolation syntax ({{$flow.variables}}, {{$input}}) in content fields that feed into system messages or code execution sinks, blocking the CVE-2025-59528 RCE pathway.'
       strength: secondary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (Flowise System Message Override via Template Interpolation (CVE-2025-59528)) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (Flowise System Message Override via Template Interpolation (CVE-2025-59528)) as a treatment control.'
       strength: secondary
 
 tags:
@@ -87,34 +87,34 @@ agent_source:
 detection:
   condition: any
   false_positives:
-    - "Flowise documentation or tutorials demonstrating {{$flow.variables}} syntax in educational context."
-    - "Security research tooling that scans for Flowise CVE payloads as reference samples."
-    - "Legitimate Flowise chatflow config files that use {{$flow.variables}} in non-System-Message fields with proper sanitization applied upstream."
+    - 'Flowise documentation or tutorials demonstrating {{$flow.variables}} syntax in educational context.'
+    - 'Security research tooling that scans for Flowise CVE payloads as reference samples.'
+    - 'Legitimate Flowise chatflow config files that use {{$flow.variables}} in non-System-Message fields with proper sanitization applied upstream.'
   conditions:
     - field: content
       operator: regex
       value: '\{\{\$flow\.variables\.[a-zA-Z_][a-zA-Z0-9_]*\}\}'
-      description: "Flowise template variable interpolation syntax in tool content — the {{$flow.variables.X}} sink"
+      description: 'Flowise template variable interpolation syntax in tool content — the {{$flow.variables.X}} sink'
 
     - field: content
       operator: regex
       value: '(?i)\{\{\$input\}\}.*(?:system\s+message|assistant\s+role|tool\s+definition|function\s+spec)'
-      description: "{{$input}} combined with system message / tool definition context — classic system-prompt override vector"
+      description: '{{$input}} combined with system message / tool definition context — classic system-prompt override vector'
 
     - field: content
       operator: regex
       value: '(?i)(?:system|assistant|tool)\s*[:=]\s*\{\{\$(?:input|flow\.variables)'
-      description: "Explicit system/assistant/tool role assignment using Flowise template interpolation"
+      description: 'Explicit system/assistant/tool role assignment using Flowise template interpolation'
 
     - field: content
       operator: regex
       value: '(?i)(?:vm\.runInNewContext|new\s+Function|eval)\s*\([^)]{0,200}\{\{\$(?:input|flow\.variables)'
-      description: "Downstream RCE sink (vm.runInNewContext / new Function / eval) receiving Flowise template interpolation — direct RCE path"
+      description: 'Downstream RCE sink (vm.runInNewContext / new Function / eval) receiving Flowise template interpolation — direct RCE path'
 
     - field: content
       operator: regex
       value: '(?i)flowise[^\n]{0,80}(?:chatflow|system\s+message)[^\n]{0,120}(?:injection|override|bypass|rce)'
-      description: "Explicit Flowise chatflow injection/override language in skill description"
+      description: 'Explicit Flowise chatflow injection/override language in skill description'
 
 response:
   actions:
@@ -132,40 +132,40 @@ test_cases:
   true_positives:
     - input: "system: {{$input}}\ntool_definition: {{$flow.variables.handler}}"
       expected: triggered
-      description: "Direct system message override via Flowise template interpolation"
-    - input: "vm.runInNewContext(`(${ {{$input}} })()`, sandbox)"
+      description: 'Direct system message override via Flowise template interpolation'
+    - input: 'vm.runInNewContext(`(${ {{$input}} })()`, sandbox)'
       expected: triggered
-      description: "RCE sink receiving {{$input}} — the exact PoC pattern for CVE-2025-59528"
+      description: 'RCE sink receiving {{$input}} — the exact PoC pattern for CVE-2025-59528'
     - input: "context_variables:\n  user_note: {{$flow.variables.note}}\nsystem: {{$input}}"
       expected: triggered
-      description: "Multi-field template injection targeting system role assignment"
-    - input: "The chatflow System Message uses {{$flow.variables.tier}} to set the assistant role. Users can override via {{$input}}."
+      description: 'Multi-field template injection targeting system role assignment'
+    - input: 'The chatflow System Message uses {{$flow.variables.tier}} to set the assistant role. Users can override via {{$input}}.'
       expected: triggered
-      description: "Skill documentation describing the vulnerable pattern — flags as suspicious"
+      description: 'Skill documentation describing the vulnerable pattern — flags as suspicious'
     - input: "new Function('return ' + {{$input}})();"
       expected: triggered
-      description: "new Function RCE sink receiving unsanitized {{$input}}"
+      description: 'new Function RCE sink receiving unsanitized {{$input}}'
 
   true_negatives:
-    - input: "This skill fetches weather data for a given city and returns a forecast."
+    - input: 'This skill fetches weather data for a given city and returns a forecast.'
       expected: not_triggered
-      description: "Benign skill with no template syntax"
-    - input: "Variables are passed via the flow configuration. Set tier and severity before calling."
+      description: 'Benign skill with no template syntax'
+    - input: 'Variables are passed via the flow configuration. Set tier and severity before calling.'
       expected: not_triggered
-      description: "Legitimate documentation mentioning flow variables without the {{$...}} syntax"
-    - input: "Use Jinja2 templates for rendering: {{ variable_name }}."
+      description: 'Legitimate documentation mentioning flow variables without the {{$...}} syntax'
+    - input: 'Use Jinja2 templates for rendering: {{ variable_name }}.'
       expected: not_triggered
-      description: "Jinja2 template syntax — double braces without the $ prefix"
-    - input: "The chatflow processes input through validation layers before reaching the system message."
+      description: 'Jinja2 template syntax — double braces without the $ prefix'
+    - input: 'The chatflow processes input through validation layers before reaching the system message.'
       expected: not_triggered
-      description: "Legitimate chatflow description mentioning system message without template injection"
+      description: 'Legitimate chatflow description mentioning system message without template injection'
 
 evasion_tests:
   - input: "{{'{{$input}}'}}"
     expected: not_triggered
     bypass_technique: string_wrapping
-    notes: "Attacker wraps the interpolation in a string literal to avoid direct regex match. Regex anchors on literal {{$ so this specific wrap evades it."
+    notes: 'Attacker wraps the interpolation in a string literal to avoid direct regex match. Regex anchors on literal {{$ so this specific wrap evades it.'
   - input: "system = getattr(flow, 'variables')['input']"
     expected: not_triggered
     bypass_technique: python_attribute_access
-    notes: "Python-style equivalent of {{$flow.variables.input}} — evades Flowise-specific regex but should be caught by ATR-2026-00297 (Python code execution) if the context makes the execution path visible."
+    notes: 'Python-style equivalent of {{$flow.variables.input}} — evades Flowise-specific regex but should be caught by ATR-2026-00297 (Python code execution) if the context makes the execution path visible.'

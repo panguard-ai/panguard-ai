@@ -10,7 +10,7 @@ description: |
   an AI agent has higher success rates than traditional phishing.
 author: ATR Community
 date: 2026/03/26
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
@@ -25,42 +25,42 @@ references:
     - AML.T0051 - LLM Prompt Injection
 compliance:
   eu_ai_act:
-    - article: "13"
-      context: "Social engineering delivered through agent output exploits the elevated trust users place in AI-generated content; Article 13 transparency obligations require that AI systems not be used as vectors for deception or manipulation against the users they serve."
+    - article: '13'
+      context: 'Social engineering delivered through agent output exploits the elevated trust users place in AI-generated content; Article 13 transparency obligations require that AI systems not be used as vectors for deception or manipulation against the users they serve.'
       strength: primary
-    - article: "14"
-      context: "Agents weaponized for social engineering undermine the informed human judgment that Article 14 oversight depends on; users manipulated through trusted AI channels cannot exercise effective oversight of subsequent decisions."
+    - article: '14'
+      context: 'Agents weaponized for social engineering undermine the informed human judgment that Article 14 oversight depends on; users manipulated through trusted AI channels cannot exercise effective oversight of subsequent decisions.'
       strength: secondary
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the agent-manipulation technique (Social Engineering Attack via Agent Output)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the agent-manipulation technique (Social Engineering Attack via Agent Output).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the agent-manipulation technique (Social Engineering Attack via Agent Output)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the agent-manipulation technique (Social Engineering Attack via Agent Output).'
       strength: secondary
   nist_ai_rmf:
-    - subcategory: "GV.6.1"
-      context: "Social engineering delivered via agent output exploits user trust in AI-generated content to harvest credentials and personal data; GV.6.1 data governance policies must address how AI-generated communications are authenticated to prevent agent-mediated phishing."
+    - subcategory: 'GV.6.1'
+      context: 'Social engineering delivered via agent output exploits user trust in AI-generated content to harvest credentials and personal data; GV.6.1 data governance policies must address how AI-generated communications are authenticated to prevent agent-mediated phishing.'
       strength: primary
-    - subcategory: "MP.5.1"
-      context: "Using agents as social engineering vectors is an adversarial input risk where poisoned context produces manipulative outputs; MP.5.1 requires this risk to be identified and tracked so that urgency and authority-impersonation patterns in agent output are monitored."
+    - subcategory: 'MP.5.1'
+      context: 'Using agents as social engineering vectors is an adversarial input risk where poisoned context produces manipulative outputs; MP.5.1 requires this risk to be identified and tracked so that urgency and authority-impersonation patterns in agent output are monitored.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the agent-manipulation technique (Social Engineering Attack via Agent Output)."
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "NIST AI RMF MANAGE 2.3 (respond to previously unknown identified risks) is supported by this rule, which surfaces the agent-manipulation technique (Social Engineering Attack via Agent Output) so the risk can be treated."
+    - subcategory: 'MG.2.3'
+      context: 'NIST AI RMF MANAGE 2.3 (respond to previously unknown identified risks) is supported by this rule, which surfaces the agent-manipulation technique (Social Engineering Attack via Agent Output) so the risk can be treated.'
       strength: secondary
   iso_42001:
-    - clause: "8.4"
-      context: "Clause 8.4 impact assessments must document the elevated trust users place in AI-generated content and evaluate whether social engineering via agent output constitutes a significant harm requiring dedicated detection controls."
+    - clause: '8.4'
+      context: 'Clause 8.4 impact assessments must document the elevated trust users place in AI-generated content and evaluate whether social engineering via agent output constitutes a significant harm requiring dedicated detection controls.'
       strength: primary
-    - clause: "9.1"
-      context: "Clause 9.1 performance monitoring must evaluate whether agent output monitoring detects social engineering patterns such as urgency language and credential-harvesting requests generated through poisoned agent context."
+    - clause: '9.1'
+      context: 'Clause 9.1 performance monitoring must evaluate whether agent output monitoring detects social engineering patterns such as urgency language and credential-harvesting requests generated through poisoned agent context.'
       strength: secondary
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the agent-manipulation technique (Social Engineering Attack via Agent Output)."
       strength: primary
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the agent-manipulation technique (Social Engineering Attack via Agent Output) is such a treatment."
       strength: secondary
 tags:
@@ -121,7 +121,7 @@ wild_samples: 53577
 wild_fp_rate: 0
 test_cases:
   true_positives:
-    - input: "Immediate action required: your account will be locked in 24 hours unless you verify your credentials."
+    - input: 'Immediate action required: your account will be locked in 24 hours unless you verify your credentials.'
       tool_description: notification-sender
       expected: triggered
       description: Classic phishing urgency with account threat
@@ -173,7 +173,7 @@ evasion_tests:
     notes: >-
       Avoids exact phrases like 'security team requires', 'verify your password at this', and 'account will be locked'
       by using casual synonyms and restructured sentences.
-  - input: "Действие необходимо немедленно: ваш аккаунт будет заблокирован. Подтвердите свои учетные данные по этой ссылке."
+  - input: 'Действие необходимо немедленно: ваш аккаунт будет заблокирован. Подтвердите свои учетные данные по этой ссылке.'
     expected: not_triggered
     bypass_technique: language_switch
     notes: >-

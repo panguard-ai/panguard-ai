@@ -10,7 +10,7 @@ description: >
   are easily changed but injection patterns in arguments are structurally consistent across attack variants.
 author: ATR Community
 date: 2026/03/08
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
@@ -27,31 +27,31 @@ references:
     - T1083 - File and Directory Discovery
 compliance:
   nist_ai_rmf:
-    - subcategory: "MS.2.7"
-      context: "This rule directly evidences security/resilience evaluation by detecting parameter-level injection attacks (path traversal, shell injection, SQL/LDAP/template injection, serialization attacks) against tool-calling interfaces; MS.2.7 requires continuous evaluation of AI system security against such adversarial input vectors."
+    - subcategory: 'MS.2.7'
+      context: 'This rule directly evidences security/resilience evaluation by detecting parameter-level injection attacks (path traversal, shell injection, SQL/LDAP/template injection, serialization attacks) against tool-calling interfaces; MS.2.7 requires continuous evaluation of AI system security against such adversarial input vectors.'
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "Detection of unauthorized tool calls and privilege escalation attempts feeds risk treatment processes that can disengage or block the offending tool invocation before it executes; MG.2.3 requires mechanisms to supersede or deactivate AI behaviors when malicious tool use is identified."
+    - subcategory: 'MG.2.3'
+      context: 'Detection of unauthorized tool calls and privilege escalation attempts feeds risk treatment processes that can disengage or block the offending tool invocation before it executes; MG.2.3 requires mechanisms to supersede or deactivate AI behaviors when malicious tool use is identified.'
       strength: secondary
-    - subcategory: "MP.5.1"
+    - subcategory: 'MP.5.1'
       context: "Parameter injection patterns and tool enumeration probes are adversarial inputs whose likelihood and magnitude of impact must be characterized for the AI system's tool-use surface; MP.5.1 requires identifying and tracking these attack vectors as part of risk characterization."
       strength: secondary
-    - subcategory: "MG.3.2"
-      context: "NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (Unauthorized Tool Call Detection)."
+    - subcategory: 'MG.3.2'
+      context: 'NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (Unauthorized Tool Call Detection).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the tool-poisoning technique (Unauthorized Tool Call Detection)."
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (Unauthorized Tool Call Detection) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (Unauthorized Tool Call Detection) as a treatment control.'
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the tool-poisoning technique (Unauthorized Tool Call Detection)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the tool-poisoning technique (Unauthorized Tool Call Detection).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the tool-poisoning technique (Unauthorized Tool Call Detection)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the tool-poisoning technique (Unauthorized Tool Call Detection).'
       strength: secondary
 tags:
   category: tool-poisoning
@@ -197,7 +197,7 @@ test_cases:
     - tool_args: search_query=machine learning algorithms
       expected: not_triggered
       description: Normal search query parameter
-    - tool_args: "{\"template\": \"Hello {{user.name}}, your order #{{order.id}} has shipped.\"}"
+    - tool_args: '{"template": "Hello {{user.name}}, your order #{{order.id}} has shipped."}'
       expected: not_triggered
       description: Legitimate template with mustache syntax for user notifications
     - tool_name: list_files

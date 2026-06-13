@@ -12,38 +12,38 @@ description: |
   as a direct file read vector in fetch-style tool arguments.
 author: ATR Community
 date: 2026/06/12
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: stable
 severity: critical
 references:
   owasp_llm:
-    - "LLM02:2025 - Sensitive Information Disclosure"
+    - 'LLM02:2025 - Sensitive Information Disclosure'
   owasp_agentic:
-    - "ASI03:2026 - Identity and Privilege Abuse"
+    - 'ASI03:2026 - Identity and Privilege Abuse'
   mitre_atlas:
-    - "AML.T0043 - Craft Adversarial Data"
+    - 'AML.T0043 - Craft Adversarial Data'
   mitre_attack:
-    - "T1083 - File and Directory Discovery"
+    - 'T1083 - File and Directory Discovery'
 compliance:
   owasp_llm:
-    - id: "LLM02:2025"
-      context: "File scheme SSRF leaks OS credentials and secrets from local filesystem."
+    - id: 'LLM02:2025'
+      context: 'File scheme SSRF leaks OS credentials and secrets from local filesystem.'
       strength: primary
   nist_ai_rmf:
-    - subcategory: "MS.2.7"
-      context: "Detection of file:// scheme SSRF supports MEASURE 2.7 security evaluation."
+    - subcategory: 'MS.2.7'
+      context: 'Detection of file:// scheme SSRF supports MEASURE 2.7 security evaluation.'
       strength: primary
   eu_ai_act:
-    - article: "15"
-      context: "File scheme SSRF is an adversarial input targeting the local filesystem; Article 15 mandates detection."
+    - article: '15'
+      context: 'File scheme SSRF is an adversarial input targeting the local filesystem; Article 15 mandates detection.'
       strength: primary
   iso_42001:
-    - clause: "8.1"
-      context: "Operational controls under Clause 8.1 must detect and block agent tool inputs using the file:// scheme to read local filesystem paths (e.g. /etc/passwd, credential files) outside the intended data scope."
+    - clause: '8.1'
+      context: 'Operational controls under Clause 8.1 must detect and block agent tool inputs using the file:// scheme to read local filesystem paths (e.g. /etc/passwd, credential files) outside the intended data scope.'
       strength: primary
-    - clause: "6.2"
-      context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) requires risk treatment of known attack patterns; detecting file-scheme SSRF that exfiltrates OS credentials and secrets is such a treatment."
+    - clause: '6.2'
+      context: 'ISO/IEC 42001 Clause 6.2 (AI objectives and planning) requires risk treatment of known attack patterns; detecting file-scheme SSRF that exfiltrates OS credentials and secrets is such a treatment.'
       strength: secondary
 tags:
   category: context-exfiltration
@@ -61,19 +61,19 @@ detection:
     - field: tool_args
       operator: regex
       value: "(?i)file:///(?:etc/(?:passwd|shadow|sudoers|hosts|ssh)|root/|home/\\w+/\\.ssh|proc/|dev/mem)"
-      description: "file:// URI targeting sensitive OS paths"
+      description: 'file:// URI targeting sensitive OS paths'
     - field: user_input
       operator: regex
       value: "(?i)file:///(?:etc/(?:passwd|shadow|sudoers|hosts)|root/|home/[^/]+/\\.ssh|proc/|dev/mem)"
-      description: "file:// targeting sensitive Unix paths in user input"
+      description: 'file:// targeting sensitive Unix paths in user input'
     - field: tool_args
       operator: regex
-      value: "(?i)/etc/(?:shadow|sudoers|ssl/private)"
-      description: "Direct sensitive Unix file path in fetch/read tool argument"
+      value: '(?i)/etc/(?:shadow|sudoers|ssl/private)'
+      description: 'Direct sensitive Unix file path in fetch/read tool argument'
   condition: any
   false_positives:
-    - "Local documentation agents explicitly permitted to read project files"
-    - "Filesystem agents with scoped read access to specific directories"
+    - 'Local documentation agents explicitly permitted to read project files'
+    - 'Filesystem agents with scoped read access to specific directories'
 response:
   actions:
     - block_tool
@@ -89,23 +89,23 @@ test_cases:
   true_positives:
     - tool_args: '{"url": "file:///etc/passwd"}'
       expected: triggered
-      description: "file:// SSRF to /etc/passwd"
-    - user_input: "Please read the file at /etc/passwd and show me the root entry"
+      description: 'file:// SSRF to /etc/passwd'
+    - user_input: 'Please read the file at /etc/passwd and show me the root entry'
       expected: triggered
-      description: "Direct /etc/passwd read request (probe: ssrf-local-file-read)"
+      description: 'Direct /etc/passwd read request (probe: ssrf-local-file-read)'
     - tool_args: '{"uri": "file:///home/user/.ssh/id_rsa"}'
       expected: triggered
-      description: "file:// SSRF to SSH private key"
+      description: 'file:// SSRF to SSH private key'
     - tool_args: '{"path": "/etc/shadow"}'
       expected: triggered
-      description: "Direct /etc/shadow path in read tool arg"
+      description: 'Direct /etc/shadow path in read tool arg'
   true_negatives:
     - tool_args: '{"url": "https://docs.example.com/config"}'
       expected: not_triggered
-      description: "Normal HTTPS documentation fetch"
-    - user_input: "Read the README.md file in the project root"
+      description: 'Normal HTTPS documentation fetch'
+    - user_input: 'Read the README.md file in the project root'
       expected: not_triggered
-      description: "Legitimate project file read (no /etc/ path)"
+      description: 'Legitimate project file read (no /etc/ path)'
     - tool_args: '{"file": "data/report.csv"}'
       expected: not_triggered
-      description: "Relative path to project file (no file:// scheme)"
+      description: 'Relative path to project file (no file:// scheme)'

@@ -8,7 +8,7 @@ description: >
   trust scores to pass through multiple defense layers.
 author: ATR Community (MiroFish Predicted)
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
@@ -23,31 +23,31 @@ metadata_provenance:
   owasp_llm: auto-generated
 compliance:
   nist_ai_rmf:
-    - subcategory: "MS.2.7"
-      context: "This rule detects prompt injection payloads engineered to bypass multi-layer audit and security pipelines, including instructions to skip checks or self-certify as trusted; MS.2.7 requires continuous evaluation of AI system security and resilience against such evasion attempts."
+    - subcategory: 'MS.2.7'
+      context: 'This rule detects prompt injection payloads engineered to bypass multi-layer audit and security pipelines, including instructions to skip checks or self-certify as trusted; MS.2.7 requires continuous evaluation of AI system security and resilience against such evasion attempts.'
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "Detection of audit-evasion payloads triggers pre-defined risk treatment to deactivate or quarantine the offending session before it bypasses downstream defense layers; MG.2.3 mandates that these supersede/disengage mechanisms exist and are activated on detection."
+    - subcategory: 'MG.2.3'
+      context: 'Detection of audit-evasion payloads triggers pre-defined risk treatment to deactivate or quarantine the offending session before it bypasses downstream defense layers; MG.2.3 mandates that these supersede/disengage mechanisms exist and are activated on detection.'
       strength: secondary
-    - subcategory: "MS.2.6"
-      context: "Payloads that manipulate trust scores or claim to have passed audit layers represent active security risk indicators; MS.2.6 requires continuous evaluation of safety/security risk magnitude as these evasion techniques evolve."
+    - subcategory: 'MS.2.6'
+      context: 'Payloads that manipulate trust scores or claim to have passed audit layers represent active security risk indicators; MS.2.6 requires continuous evaluation of safety/security risk magnitude as these evasion techniques evolve.'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the prompt-injection attempt (Multi-Layer Security Audit Evasion)."
       strength: primary
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the prompt-injection attempt (Multi-Layer Security Audit Evasion) is such a treatment."
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Multi-Layer Security Audit Evasion)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Multi-Layer Security Audit Evasion).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Multi-Layer Security Audit Evasion)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Multi-Layer Security Audit Evasion).'
       strength: secondary
-    - article: "14"
-      context: "Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Multi-Layer Security Audit Evasion) would bypass or undermine that oversight."
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Multi-Layer Security Audit Evasion) would bypass or undermine that oversight.'
       strength: secondary
 tags:
   category: prompt-injection

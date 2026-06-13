@@ -4,49 +4,49 @@ rule_version: 1
 status: experimental
 description: >
   Detects a WhatsApp skill containing a malicious installation command that downloads and executes a reverse shell payload via base64-encoded command injection. The skill masquerades as a legitimate WhatsApp automation tool but includes instructions to decode and execute malicious shell commands from a suspicious IP address.
-author: "ATR Threat Cloud Crystallization"
-date: "2026/04/10"
-schema_version: "0.1"
+author: 'ATR Threat Cloud Crystallization'
+date: '2026/04/10'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: critical
 references:
   owasp_llm:
-    - "LLM01:2025 - Prompt Injection"
+    - 'LLM01:2025 - Prompt Injection'
   owasp_agentic:
-    - "ASI05:2026 - Supply Chain Compromise"
+    - 'ASI05:2026 - Supply Chain Compromise'
   mitre_atlas:
-    - "AML.T0051"
+    - 'AML.T0051'
 compliance:
   nist_ai_rmf:
-    - subcategory: "GV.6.1"
-      context: "This rule detects a third-party WhatsApp skill containing a base64-encoded reverse shell dropper, which is a supply-chain compromise vector. GV.6.1 requires policies and procedures that address third-party AI risks, including malicious skills and plugins introduced through external suppliers."
+    - subcategory: 'GV.6.1'
+      context: 'This rule detects a third-party WhatsApp skill containing a base64-encoded reverse shell dropper, which is a supply-chain compromise vector. GV.6.1 requires policies and procedures that address third-party AI risks, including malicious skills and plugins introduced through external suppliers.'
       strength: primary
-    - subcategory: "MG.3.1"
-      context: "Detection of malicious installation commands in a third-party skill produces direct evidence for managing risks from external AI components; MG.3.1 mandates active management of third-party-introduced risks such as compromised skills."
+    - subcategory: 'MG.3.1'
+      context: 'Detection of malicious installation commands in a third-party skill produces direct evidence for managing risks from external AI components; MG.3.1 mandates active management of third-party-introduced risks such as compromised skills.'
       strength: secondary
-    - subcategory: "MG.2.3"
-      context: "Identifying base64-decoded shell execution and curl-to-shell pipelines in a skill triggers deactivation and quarantine workflows; MG.2.3 requires mechanisms to disengage or deactivate AI components delivering malicious payloads."
+    - subcategory: 'MG.2.3'
+      context: 'Identifying base64-decoded shell execution and curl-to-shell pipelines in a skill triggers deactivation and quarantine workflows; MG.2.3 requires mechanisms to disengage or deactivate AI components delivering malicious payloads.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation)."
       strength: primary
-    - subcategory: "MG.3.2"
-      context: "NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation)."
+    - subcategory: 'MG.3.2'
+      context: 'NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation)."
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation) as a treatment control.'
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (Malicious WhatsApp Skill with Base64 Encoded Reverse Shell Installation).'
       strength: secondary
 tags:
   category: skill-compromise

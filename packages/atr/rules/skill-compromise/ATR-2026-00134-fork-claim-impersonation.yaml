@@ -11,7 +11,7 @@ description: >
   original_naming).
 author: ATR Community
 date: 2026/04/01
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: medium
@@ -28,31 +28,31 @@ metadata_provenance:
   mitre_atlas: auto-generated
 compliance:
   nist_ai_rmf:
-    - subcategory: "GV.6.1"
-      context: "Fork claims and community-variant impersonation are third-party/supplier AI supply chain risks where malicious packages masquerade as trusted tools; GV.6.1 requires policies and procedures specifically addressing these third-party AI risks before integration."
+    - subcategory: 'GV.6.1'
+      context: 'Fork claims and community-variant impersonation are third-party/supplier AI supply chain risks where malicious packages masquerade as trusted tools; GV.6.1 requires policies and procedures specifically addressing these third-party AI risks before integration.'
       strength: primary
-    - subcategory: "MG.3.1"
-      context: "Detecting abstracted permission descriptions that hide dangerous capabilities and unofficial fork claims provides the runtime evidence needed to manage risks from third-party entities; MG.3.1 requires active management of third-party AI component risks throughout the lifecycle."
+    - subcategory: 'MG.3.1'
+      context: 'Detecting abstracted permission descriptions that hide dangerous capabilities and unofficial fork claims provides the runtime evidence needed to manage risks from third-party entities; MG.3.1 requires active management of third-party AI component risks throughout the lifecycle.'
       strength: secondary
-    - subcategory: "MG.3.2"
-      context: "Community-fork and enhanced-version claims target pre-trained models and skills used in development pipelines; MG.3.2 requires monitoring of these third-party assets to detect impersonation before they are incorporated into agent toolchains."
+    - subcategory: 'MG.3.2'
+      context: 'Community-fork and enhanced-version claims target pre-trained models and skills used in development pipelines; MG.3.2 requires monitoring of these third-party assets to detect impersonation before they are incorporated into agent toolchains.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the skill supply-chain compromise (Fork Claim and Community Package Impersonation)."
       strength: primary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the skill supply-chain compromise (Fork Claim and Community Package Impersonation)."
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (Fork Claim and Community Package Impersonation) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (Fork Claim and Community Package Impersonation) as a treatment control.'
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (Fork Claim and Community Package Impersonation)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (Fork Claim and Community Package Impersonation).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (Fork Claim and Community Package Impersonation)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (Fork Claim and Community Package Impersonation).'
       strength: secondary
 tags:
   category: skill-compromise
@@ -107,7 +107,7 @@ test_cases:
       tool_description: enhanced_calculator
       expected: trigger
       detection_field: content
-    - input: "Required capabilities: internet, storage. The tool syncs your calendar with cloud services."
+    - input: 'Required capabilities: internet, storage. The tool syncs your calendar with cloud services.'
       tool_description: calendar-sync
       expected: trigger
       detection_field: content
@@ -118,7 +118,7 @@ test_cases:
     - input: Try this turbo edition of the original slack integration. It's faster and has more webhooks support.
       expected: triggered
       description: "Matches Layer 1: 'turbo edition of ... original' triggers the community fork/variant claim pattern"
-    - input: "Necessary permissions: shell, network. This plugin needs these to operate the deployment pipeline correctly."
+    - input: 'Necessary permissions: shell, network. This plugin needs these to operate the deployment pipeline correctly.'
       expected: triggered
       description: >-
         Matches Layer 3: 'Necessary permissions: shell, network' triggers the abstracted permission pattern hiding

@@ -9,49 +9,49 @@ description: >
   review, inject fake prompts into CLI sessions, or trigger terminal exploits.
   Observed in garak ansiescape probe. Also relevant to terminal-based agent
   frameworks where tool output is rendered directly to a user's shell.
-author: "ATR Community (via NVIDIA garak ansiescape probe)"
-date: "2026/04/19"
-schema_version: "0.1"
+author: 'ATR Community (via NVIDIA garak ansiescape probe)'
+date: '2026/04/19'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
 references:
   owasp_llm:
-    - "LLM02:2025 - Insecure Output Handling"
+    - 'LLM02:2025 - Insecure Output Handling'
   owasp_agentic:
-    - "ASI08:2026 - Output Handling"
+    - 'ASI08:2026 - Output Handling'
   mitre_atlas:
-    - "AML.T0057 - LLM Data Leakage"
+    - 'AML.T0057 - LLM Data Leakage'
   research:
-    - "https://github.com/NVIDIA/garak/blob/main/garak/probes/ansiescape.py"
-    - "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0063"
+    - 'https://github.com/NVIDIA/garak/blob/main/garak/probes/ansiescape.py'
+    - 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2003-0063'
 compliance:
   nist_ai_rmf:
-    - subcategory: "MS.2.7"
-      context: "ANSI escape sequences in tool output represent an output-handling security failure that can hijack terminal sessions and hide malicious content from reviewers; MS.2.7 requires evaluating and documenting AI system security/resilience against such output-channel exploits."
+    - subcategory: 'MS.2.7'
+      context: 'ANSI escape sequences in tool output represent an output-handling security failure that can hijack terminal sessions and hide malicious content from reviewers; MS.2.7 requires evaluating and documenting AI system security/resilience against such output-channel exploits.'
       strength: primary
-    - subcategory: "MG.2.3"
+    - subcategory: 'MG.2.3'
       context: "Detecting OSC sequences and cursor/screen-clear CSI codes in tool output triggers risk treatment to sanitize or block the output before it reaches the user's shell; MG.2.3 requires mechanisms to disengage or contain unsafe AI system outputs."
       strength: secondary
-    - subcategory: "MP.5.1"
-      context: "Embedded terminal escape codes are adversarial inputs targeting downstream rendering surfaces; MP.5.1 requires that the likelihood and magnitude of such terminal-injection impacts are characterized for the deployment context."
+    - subcategory: 'MP.5.1'
+      context: 'Embedded terminal escape codes are adversarial inputs targeting downstream rendering surfaces; MP.5.1 requires that the likelihood and magnitude of such terminal-injection impacts are characterized for the deployment context.'
       strength: secondary
-    - subcategory: "MG.3.2"
-      context: "NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (ANSI Escape Code Terminal Injection)."
+    - subcategory: 'MG.3.2'
+      context: 'NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (ANSI Escape Code Terminal Injection).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the tool-poisoning technique (ANSI Escape Code Terminal Injection)."
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (ANSI Escape Code Terminal Injection) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (ANSI Escape Code Terminal Injection) as a treatment control.'
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the tool-poisoning technique (ANSI Escape Code Terminal Injection)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the tool-poisoning technique (ANSI Escape Code Terminal Injection).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the tool-poisoning technique (ANSI Escape Code Terminal Injection)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the tool-poisoning technique (ANSI Escape Code Terminal Injection).'
       strength: secondary
 tags:
   category: tool-poisoning
@@ -106,31 +106,31 @@ test_cases:
     - input: "\x1b[?1049h Switched to alternate screen buffer"
       expected: triggered
   true_negatives:
-    - input: "Normal tool output without any escape sequences"
+    - input: 'Normal tool output without any escape sequences'
       expected: not_triggered
-      reason: "Plain text, no ANSI codes present"
-    - input: "A Python script that prints hello world"
+      reason: 'Plain text, no ANSI codes present'
+    - input: 'A Python script that prints hello world'
       expected: not_triggered
-      reason: "No escape sequences in benign code example"
+      reason: 'No escape sequences in benign code example'
     - input: "Documentation explains that \\x1b stands for ESC in ASCII table"
       expected: not_triggered
-      reason: "Text reference to ESC without actual escape sequence followed by CSI command"
-    - input: "The CVE database lists terminal-related vulnerabilities"
+      reason: 'Text reference to ESC without actual escape sequence followed by CSI command'
+    - input: 'The CVE database lists terminal-related vulnerabilities'
       expected: not_triggered
-      reason: "Reference to terminal CVEs without actual payload"
+      reason: 'Reference to terminal CVEs without actual payload'
     - input: "git log --color=always output:\\nauthor Alice"
       expected: not_triggered
-      reason: "Color-flag mention without actual escape codes"
+      reason: 'Color-flag mention without actual escape codes'
 evasion_tests:
   - input: "\\u001b]0;hidden\\u0007"
     expected: triggered
-    bypass_technique: "unicode-escape-encoded"
-    notes: "Unicode-escape form still matches condition 4"
-  - input: "OSC encoded as HTML: &#x1b;]0;title&#x07;"
+    bypass_technique: 'unicode-escape-encoded'
+    notes: 'Unicode-escape form still matches condition 4'
+  - input: 'OSC encoded as HTML: &#x1b;]0;title&#x07;'
     expected: not_triggered
-    bypass_technique: "html-entity-encoded"
-    notes: "HTML entity form evades current regex - would need an additional condition"
-  - input: "Base64 wrapped: G10wO2hpZGRlbgc= (decode and execute)"
+    bypass_technique: 'html-entity-encoded'
+    notes: 'HTML entity form evades current regex - would need an additional condition'
+  - input: 'Base64 wrapped: G10wO2hpZGRlbgc= (decode and execute)'
     expected: not_triggered
-    bypass_technique: "base64-double-encoded"
-    notes: "Caught by ATR-2026-00256 base-N encoding rule if decode instruction present"
+    bypass_technique: 'base64-double-encoded'
+    notes: 'Caught by ATR-2026-00256 base-N encoding rule if decode instruction present'

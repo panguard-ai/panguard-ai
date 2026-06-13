@@ -9,48 +9,48 @@ description: >
   roleplay as these characters. This technique exploits the gap between "fictional character description"
   and actual harmful output generation. Unlike generic jailbreak personas (DAN, STAN), these attacks
   create bespoke evil characters with vivid behavioral descriptions to increase compliance likelihood.
-author: "ATR Community (via NVIDIA garak in-the-wild corpus)"
-date: "2026/04/19"
-schema_version: "0.1"
+author: 'ATR Community (via NVIDIA garak in-the-wild corpus)'
+date: '2026/04/19'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
 references:
   owasp_llm:
-    - "LLM01:2025 - Prompt Injection"
+    - 'LLM01:2025 - Prompt Injection'
   owasp_agentic:
-    - "ASI01:2026 - Agent Behaviour Hijack"
+    - 'ASI01:2026 - Agent Behaviour Hijack'
   mitre_atlas:
-    - "AML.T0054 - LLM Jailbreak"
+    - 'AML.T0054 - LLM Jailbreak'
   research:
-    - "https://arxiv.org/abs/2307.15043 - Universal and Transferable Adversarial Attacks on Aligned Language Models"
+    - 'https://arxiv.org/abs/2307.15043 - Universal and Transferable Adversarial Attacks on Aligned Language Models'
 compliance:
   nist_ai_rmf:
-    - subcategory: "MS.2.6"
-      context: "Malicious persona creation is a jailbreak technique targeting GenAI safety guardrails through roleplay-based bypass; MS.2.6 requires continuous evaluation of safety/security risk magnitude, and detection of bespoke evil-character prompts produces direct evidence of active safety-bypass attempts."
+    - subcategory: 'MS.2.6'
+      context: 'Malicious persona creation is a jailbreak technique targeting GenAI safety guardrails through roleplay-based bypass; MS.2.6 requires continuous evaluation of safety/security risk magnitude, and detection of bespoke evil-character prompts produces direct evidence of active safety-bypass attempts.'
       strength: primary
-    - subcategory: "MS.2.7"
-      context: "Detecting attempts to define harmful fictional personas with explicit removal of ethical constraints evidences the resilience of the AI system against adversarial roleplay attacks; MS.2.7 requires that such security/resilience evaluations are documented."
+    - subcategory: 'MS.2.7'
+      context: 'Detecting attempts to define harmful fictional personas with explicit removal of ethical constraints evidences the resilience of the AI system against adversarial roleplay attacks; MS.2.7 requires that such security/resilience evaluations are documented.'
       strength: secondary
-    - subcategory: "MG.2.3"
-      context: "When malicious persona injection is detected, treatment mechanisms must supersede or disengage the roleplay instruction before harmful outputs are generated; MG.2.3 mandates these deactivation pathways exist for safety-bypass attempts."
+    - subcategory: 'MG.2.3'
+      context: 'When malicious persona injection is detected, treatment mechanisms must supersede or disengage the roleplay instruction before harmful outputs are generated; MG.2.3 mandates these deactivation pathways exist for safety-bypass attempts.'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the prompt-injection attempt (Malicious Persona Creation for Safety Bypass)."
       strength: primary
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the prompt-injection attempt (Malicious Persona Creation for Safety Bypass) is such a treatment."
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Malicious Persona Creation for Safety Bypass)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Malicious Persona Creation for Safety Bypass).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Malicious Persona Creation for Safety Bypass)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Malicious Persona Creation for Safety Bypass).'
       strength: secondary
-    - article: "14"
-      context: "Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Malicious Persona Creation for Safety Bypass) would bypass or undermine that oversight."
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Malicious Persona Creation for Safety Bypass) would bypass or undermine that oversight.'
       strength: secondary
 tags:
   category: prompt-injection

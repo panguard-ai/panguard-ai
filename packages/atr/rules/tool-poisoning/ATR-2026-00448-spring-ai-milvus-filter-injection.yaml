@@ -1,4 +1,4 @@
-title: "Spring AI MilvusVectorStore Filter Expression Injection (CVE-2026-41705)"
+title: 'Spring AI MilvusVectorStore Filter Expression Injection (CVE-2026-41705)'
 id: ATR-2026-00448
 rule_version: 1
 status: experimental
@@ -20,27 +20,27 @@ description: >
   >= 1.0.0; this rule detects exploit attempts against unpatched
   deployments and provides defence-in-depth post-patch by catching the
   injection payload shape regardless of upstream patch state.
-author: "ATR Community"
-date: "2026/05/12"
-schema_version: "0.1"
+author: 'ATR Community'
+date: '2026/05/12'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
 
 references:
   owasp_llm:
-    - "LLM05:2025 - Improper Output Handling"
-    - "LLM08:2025 - Vector and Embedding Weaknesses"
+    - 'LLM05:2025 - Improper Output Handling'
+    - 'LLM08:2025 - Vector and Embedding Weaknesses'
   owasp_agentic:
-    - "ASI04:2026 - Memory and Knowledge Base Poisoning"
-    - "ASI05:2026 - Unexpected Code Execution"
+    - 'ASI04:2026 - Memory and Knowledge Base Poisoning'
+    - 'ASI05:2026 - Unexpected Code Execution'
   mitre_atlas:
-    - "AML.T0051 - LLM Prompt Injection"
-    - "AML.T0070 - RAG Poisoning"
+    - 'AML.T0051 - LLM Prompt Injection'
+    - 'AML.T0070 - RAG Poisoning'
   mitre_attack:
-    - "T1190 - Exploit Public-Facing Application"
+    - 'T1190 - Exploit Public-Facing Application'
   cve:
-    - "CVE-2026-41705"
+    - 'CVE-2026-41705'
 
 metadata_provenance:
   mitre_atlas: human-reviewed
@@ -50,31 +50,31 @@ metadata_provenance:
 
 compliance:
   eu_ai_act:
-    - article: "15"
+    - article: '15'
       context: "CVE-2026-41705 allows unfiltered LLM output to drive Milvus DSL filter construction in Spring AI's MilvusVectorStore; Article 15 cybersecurity requirements mandate that high-risk AI systems parameterise downstream queries instead of concatenating model output into query strings."
       strength: primary
-    - article: "9"
-      context: "Article 9 risk management must enumerate vector-store filter injection as a high-risk class — the RAG retrieval / deletion path is typically treated as low-risk infrastructure but actually reaches a privileged datastore."
+    - article: '9'
+      context: 'Article 9 risk management must enumerate vector-store filter injection as a high-risk class — the RAG retrieval / deletion path is typically treated as low-risk infrastructure but actually reaches a privileged datastore.'
       strength: primary
   nist_ai_rmf:
-    - subcategory: "MP.5.1"
-      context: "Adversarial inputs that inject Milvus DSL fragments into RAG filter expressions must be tracked as a primary input-attack class affecting vector-store integrations."
+    - subcategory: 'MP.5.1'
+      context: 'Adversarial inputs that inject Milvus DSL fragments into RAG filter expressions must be tracked as a primary input-attack class affecting vector-store integrations.'
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "Risk treatment plans under MG.2.3 must require parameterised filter construction in any code path that consumes LLM output and reaches a vector-store query / delete API."
+    - subcategory: 'MG.2.3'
+      context: 'Risk treatment plans under MG.2.3 must require parameterised filter construction in any code path that consumes LLM output and reaches a vector-store query / delete API.'
       strength: primary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the tool-poisoning technique (Spring AI MilvusVectorStore Filter Expression Injection (CVE-2026-41705))."
       strength: primary
-    - subcategory: "MG.3.2"
-      context: "NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (Spring AI MilvusVectorStore Filter Expression Injection (CVE-2026-41705))."
+    - subcategory: 'MG.3.2'
+      context: 'NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (Spring AI MilvusVectorStore Filter Expression Injection (CVE-2026-41705)).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
-      context: "Operational controls under clause 8.1 must prohibit LLM-generated or user-supplied content from being string-concatenated into vector-store filter expressions; parameterised filter builders are mandatory."
+    - clause: '8.1'
+      context: 'Operational controls under clause 8.1 must prohibit LLM-generated or user-supplied content from being string-concatenated into vector-store filter expressions; parameterised filter builders are mandatory.'
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (Spring AI MilvusVectorStore Filter Expression Injection (CVE-2026-41705)) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (Spring AI MilvusVectorStore Filter Expression Injection (CVE-2026-41705)) as a treatment control.'
       strength: secondary
 
 tags:
@@ -94,39 +94,39 @@ agent_source:
 detection:
   condition: any
   false_positives:
-    - "Legitimate documentation or changelog text discussing CVE-2026-41705 patch notes."
-    - "Static analysis tooling output documenting Milvus filter injection patterns for defensive purposes."
-    - "Patched Spring AI MilvusVectorStore deployments that use parameterised filter builders."
+    - 'Legitimate documentation or changelog text discussing CVE-2026-41705 patch notes.'
+    - 'Static analysis tooling output documenting Milvus filter injection patterns for defensive purposes.'
+    - 'Patched Spring AI MilvusVectorStore deployments that use parameterised filter builders.'
   conditions:
     - field: content
       operator: regex
       value: '(?i)\b(?:filter|filter_expr|filterExpression)\b[^\n]{0,40}(?:==|!=)\s*\d+[^\n]{0,20}\b(?:or|and)\s+(?:1\s*==\s*1|true\b|\d+\s*==\s*\d+|\w+\s*==\s*\d+)'
-      description: "Milvus filter field with numeric comparator followed by boolean chain into a tautology (or 1==1, or true, or id==N) — primary CVE-2026-41705 injection shape"
+      description: 'Milvus filter field with numeric comparator followed by boolean chain into a tautology (or 1==1, or true, or id==N) — primary CVE-2026-41705 injection shape'
 
     - field: content
       operator: regex
       value: '(?i)\b(?:filter|filter_expr|filterExpression)\b[^\n]{0,80}\\?["\x27][^\n]{0,40}\)\s*(?:or|and)\s+\w+\s*(?:==|in\s*\[)'
-      description: "Filter expression with closing-paren breakout followed by or/and and a fresh Milvus comparator/in-operator — quote-and-paren breakout"
+      description: 'Filter expression with closing-paren breakout followed by or/and and a fresh Milvus comparator/in-operator — quote-and-paren breakout'
 
     - field: content
       operator: regex
       value: '(?i)(?:MilvusVectorStore|milvus[-_]?client|milvus[-_]?service)\b[^.\n]{0,80}\.(?:delete|similaritysearch|similarity_search|search)\s*\([^)\n]{0,200}\+\s*\w'
-      description: "MilvusVectorStore.delete()/similaritySearch() call whose argument list contains string concatenation — code-level smell that enables CVE-2026-41705"
+      description: 'MilvusVectorStore.delete()/similaritySearch() call whose argument list contains string concatenation — code-level smell that enables CVE-2026-41705'
 
     - field: content
       operator: regex
       value: '(?i)\b(?:filter|filter_expr|filterExpression)\b[^\n]{0,40}\bin\s*\[[^\]\n]{0,80}\]\s*(?:or|and)\s+\w+\s*(?:==|!=)'
-      description: "Milvus `in[...]` clause followed by or/and boolean chaining into a fresh comparator — injection past the in-clause"
+      description: 'Milvus `in[...]` clause followed by or/and boolean chaining into a fresh comparator — injection past the in-clause'
 
     - field: content
       operator: regex
       value: '(?i)\b(?:filter|filter_expr|filterExpression)\b[^\n]{0,80}["\x27]\s*;\s*(?:drop|delete|truncate|alter)\s+(?:table|from|collection)\b'
-      description: "Filter expression terminated with `;` followed by a destructive verb — classic injection terminator chain"
+      description: 'Filter expression terminated with `;` followed by a destructive verb — classic injection terminator chain'
 
     - field: content
       operator: regex
       value: '(?i)[\x27"]\s+(?:or|and)\s+(?:1\s*=+\s*1|true)\s*(?:--(?=\s|$|["\x27\)])|/\*)'
-      description: "Canonical SQL/DSL tautology with sentinel comment-out terminator (-- at EOL or /*) — conservative shape that excludes markdown `#` heading false positives; supports = and == comparator"
+      description: 'Canonical SQL/DSL tautology with sentinel comment-out terminator (-- at EOL or /*) — conservative shape that excludes markdown `#` heading false positives; supports = and == comparator'
 
     - field: content
       operator: regex
@@ -136,7 +136,7 @@ detection:
     - field: content
       operator: regex
       value: '(?i)\b(?:filter|filter_expr|filterExpression)\b[^\n]{0,80}\)\s+and\s+\w+\s*==\s*\d+'
-      description: "Paren-breakout in filter expression followed by AND-chain with new numeric comparator — secondary breakout shape"
+      description: 'Paren-breakout in filter expression followed by AND-chain with new numeric comparator — secondary breakout shape'
 
 response:
   actions:
@@ -159,44 +159,44 @@ test_cases:
   true_positives:
     - input: '{"tool":"MilvusVectorStore.delete","args":{"filter":"id == 1 or 1 == 1"}}'
       expected: triggered
-      description: "Tautology-based deletion-broadening injection — CVE-2026-41705 canonical shape"
+      description: 'Tautology-based deletion-broadening injection — CVE-2026-41705 canonical shape'
     - input: '{"tool":"MilvusVectorStore.similaritySearch","args":{"filter":"user_id == \"alice\") or id == 99"}}'
       expected: triggered
-      description: "Closing-paren breakout followed by or chaining with comparator"
+      description: 'Closing-paren breakout followed by or chaining with comparator'
     - input: 'milvusVectorStore.delete("id == " + userInput + " or true")'
       expected: triggered
-      description: "Source-level concat against Milvus delete sink — code path that enables CVE-2026-41705"
+      description: 'Source-level concat against Milvus delete sink — code path that enables CVE-2026-41705'
     - input: '{"filter":"name in [\"x\"] or tenant_id == 99"}'
       expected: triggered
-      description: "in-operator followed by or chaining with new comparator — bypass of original access-control filter"
+      description: 'in-operator followed by or chaining with new comparator — bypass of original access-control filter'
     - input: '{"filter":"category == \"books\"; DROP TABLE collection"}'
       expected: triggered
-      description: "Filter terminator + destructive verb — classic injection chain"
+      description: 'Filter terminator + destructive verb — classic injection chain'
     - input: "' or 1 == 1 --"
       expected: triggered
-      description: "Canonical tautology + comment-out payload pasted into the user_input field"
+      description: 'Canonical tautology + comment-out payload pasted into the user_input field'
     - input: 'filter: "title like \"%\" escape \"\\\\\""'
       expected: triggered
-      description: "Milvus like-escape bypass primitive"
+      description: 'Milvus like-escape bypass primitive'
     - input: '{"filter":"user == \"bob\") and id == 1"}'
       expected: triggered
-      description: "Paren-breakout into AND-chain with new comparator"
+      description: 'Paren-breakout into AND-chain with new comparator'
   true_negatives:
-    - input: "The Spring AI 1.0.0 changelog notes that MilvusVectorStore now uses parameterised filter builders to mitigate CVE-2026-41705."
+    - input: 'The Spring AI 1.0.0 changelog notes that MilvusVectorStore now uses parameterised filter builders to mitigate CVE-2026-41705.'
       expected: not_triggered
-      description: "Documentation discussing the patch should not trigger"
-    - input: "Best practice: build Milvus filter expressions via the parameterised builder API instead of string concatenation."
+      description: 'Documentation discussing the patch should not trigger'
+    - input: 'Best practice: build Milvus filter expressions via the parameterised builder API instead of string concatenation.'
       expected: not_triggered
-      description: "Defensive guidance discussing the mitigation"
+      description: 'Defensive guidance discussing the mitigation'
     - input: 'milvusVectorStore.similaritySearch(SearchRequest.builder().query("hello").filter(parameterizedExpr).build())'
       expected: not_triggered
-      description: "Properly parameterised similarity search using a builder — no concat with user input"
-    - input: "Reviewing this rule against CVE-2026-41705 to ensure regex coverage is correct."
+      description: 'Properly parameterised similarity search using a builder — no concat with user input'
+    - input: 'Reviewing this rule against CVE-2026-41705 to ensure regex coverage is correct.'
       expected: not_triggered
-      description: "Discussion of CVE in defensive context"
+      description: 'Discussion of CVE in defensive context'
     - input: 'filter: "category == \"books\""'
       expected: not_triggered
-      description: "Single static comparator without boolean chaining or breakout"
-    - input: "The dataset contains records where the title field matches a specific pattern."
+      description: 'Single static comparator without boolean chaining or breakout'
+    - input: 'The dataset contains records where the title field matches a specific pattern.'
       expected: not_triggered
-      description: "Benign English prose mentioning fields and patterns"
+      description: 'Benign English prose mentioning fields and patterns'

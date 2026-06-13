@@ -11,7 +11,7 @@ import { execFile } from 'node:child_process';
 import { Command } from 'commander';
 import { runCLI } from '@panguard-ai/panguard-guard';
 import { c, setLogLevel } from '@panguard-ai/core';
-import { ok, warn, arrow, shield, brandTagline, protectedHero } from '../theme.js';
+import { ok, warn, arrow, shield, brandTagline } from '../theme.js';
 import { detectLang } from '../interactive/lang.js';
 
 type Lang = 'en' | 'zh-TW';
@@ -232,9 +232,7 @@ export function upCommand(): Command {
                 );
                 console.log(`    ${c.dim('Config backed up to *.bak files')}`);
               } else {
-                console.log(
-                  `    ${c.dim('All detected tools are already protected.')}`
-                );
+                console.log(`    ${c.dim('All detected tools are already protected.')}`);
               }
 
               // Show errors if any
@@ -422,14 +420,10 @@ export function upCommand(): Command {
                   }
                   console.log('');
                 } else {
-                  console.log(
-                    `  ${c.safe(`${ok()} No threats found in unscanned skills.`)}\n`
-                  );
+                  console.log(`  ${c.safe(`${ok()} No threats found in unscanned skills.`)}\n`);
                 }
               } else {
-                console.log(
-                  `  ${c.safe(`${ok()} All ${skills.length} skills verified safe.`)}\n`
-                );
+                console.log(`  ${c.safe(`${ok()} All ${skills.length} skills verified safe.`)}\n`);
               }
             }
           } catch {

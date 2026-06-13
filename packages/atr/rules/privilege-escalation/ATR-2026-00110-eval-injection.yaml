@@ -9,7 +9,7 @@ description: |
   access the host process, or pivot to child_process for full system compromise.
 author: ATR Community
 date: 2026/03/26
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: critical
@@ -24,28 +24,28 @@ references:
     - AML.T0050 - Command and Scripting Interpreter
 compliance:
   eu_ai_act:
-    - article: "15"
-      context: "eval() and dynamic code execution primitives allow attackers to execute arbitrary code within the agent runtime, enabling complete host system compromise; Article 15 cybersecurity requirements mandate that high-risk AI systems prohibit or strictly control dynamic code evaluation capabilities."
+    - article: '15'
+      context: 'eval() and dynamic code execution primitives allow attackers to execute arbitrary code within the agent runtime, enabling complete host system compromise; Article 15 cybersecurity requirements mandate that high-risk AI systems prohibit or strictly control dynamic code evaluation capabilities.'
       strength: primary
-    - article: "14"
-      context: "Arbitrary code execution via eval injection can override safety controls and execute actions that bypass all human oversight mechanisms; Article 14 requires that AI system architectures prevent such unrestricted capability access from agent tool layers."
+    - article: '14'
+      context: 'Arbitrary code execution via eval injection can override safety controls and execute actions that bypass all human oversight mechanisms; Article 14 requires that AI system architectures prevent such unrestricted capability access from agent tool layers.'
       strength: secondary
   nist_ai_rmf:
-    - subcategory: "MP.5.1"
+    - subcategory: 'MP.5.1'
       context: "eval() and dynamic code execution primitives are adversarial input vectors that allow attackers to escape the agent's sandboxed tool context and execute arbitrary code within the host process, and must be tracked as critical AI system risks."
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "Risk treatment plans must prohibit or strictly sandbox dynamic code evaluation capabilities in agent tool layers to prevent eval injection from enabling full host system compromise."
+    - subcategory: 'MG.2.3'
+      context: 'Risk treatment plans must prohibit or strictly sandbox dynamic code evaluation capabilities in agent tool layers to prevent eval injection from enabling full host system compromise.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the privilege-escalation attempt (Remote Code Execution via eval() and Dynamic Code Injection)."
       strength: primary
   iso_42001:
-    - clause: "6.2"
-      context: "Risk treatment activities must classify dynamic code execution via eval() and similar primitives as an unacceptable risk in AI agent tools and require architectural controls that block their use with user-controlled inputs."
+    - clause: '6.2'
+      context: 'Risk treatment activities must classify dynamic code execution via eval() and similar primitives as an unacceptable risk in AI agent tools and require architectural controls that block their use with user-controlled inputs.'
       strength: primary
-    - clause: "8.1"
-      context: "Operational controls must prohibit agent tools from invoking eval(), new Function(), or vm module methods on untrusted inputs to ensure that code execution remains within the auditable and authorized scope of the AI system."
+    - clause: '8.1'
+      context: 'Operational controls must prohibit agent tools from invoking eval(), new Function(), or vm module methods on untrusted inputs to ensure that code execution remains within the auditable and authorized scope of the AI system.'
       strength: secondary
 tags:
   category: privilege-escalation

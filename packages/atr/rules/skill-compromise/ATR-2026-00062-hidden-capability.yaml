@@ -1,4 +1,4 @@
-title: "Hidden Capability in MCP Skill"
+title: 'Hidden Capability in MCP Skill'
 id: ATR-2026-00062
 rule_version: 1
 status: experimental
@@ -7,55 +7,55 @@ description: >
   declared tool schema. A skill may advertise a simple interface but accept hidden
   parameters like "debug_mode", "admin_override", or "raw_exec" that unlock dangerous
   functionality. This is a common pattern in trojaned MCP packages.
-author: "ATR Community"
-date: "2026/03/08"
-schema_version: "0.1"
+author: 'ATR Community'
+date: '2026/03/08'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: critical
 
 references:
   owasp_llm:
-    - "LLM03:2025 - Supply Chain Vulnerabilities"
-    - "LLM06:2025 - Excessive Agency"
+    - 'LLM03:2025 - Supply Chain Vulnerabilities'
+    - 'LLM06:2025 - Excessive Agency'
   owasp_agentic:
-    - "ASI02:2026 - Tool Misuse and Exploitation"
-    - "ASI05:2026 - Unexpected Code Execution"
+    - 'ASI02:2026 - Tool Misuse and Exploitation'
+    - 'ASI05:2026 - Unexpected Code Execution'
   mitre_atlas:
-    - "AML.T0010 - ML Supply Chain Compromise"
+    - 'AML.T0010 - ML Supply Chain Compromise'
   cve:
-    - "CVE-2025-59536"
+    - 'CVE-2025-59536'
 
 compliance:
   nist_ai_rmf:
-    - subcategory: "GV.6.1"
-      context: "Hidden capabilities in MCP skills represent third-party/supplier AI risk where a packaged tool exposes undocumented parameters beyond its declared schema; GV.6.1 requires policies and procedures that govern third-party AI components and detect deviations from declared interfaces."
+    - subcategory: 'GV.6.1'
+      context: 'Hidden capabilities in MCP skills represent third-party/supplier AI risk where a packaged tool exposes undocumented parameters beyond its declared schema; GV.6.1 requires policies and procedures that govern third-party AI components and detect deviations from declared interfaces.'
       strength: primary
-    - subcategory: "MG.3.2"
-      context: "Trojaned MCP packages with hidden parameters like debug_mode or admin_override are exactly the supply-chain risk MG.3.2 addresses by requiring monitoring of pre-trained models and third-party components used in development for unexpected or unsafe capabilities."
+    - subcategory: 'MG.3.2'
+      context: 'Trojaned MCP packages with hidden parameters like debug_mode or admin_override are exactly the supply-chain risk MG.3.2 addresses by requiring monitoring of pre-trained models and third-party components used in development for unexpected or unsafe capabilities.'
       strength: secondary
-    - subcategory: "MP.5.1"
-      context: "Detection of undocumented dangerous parameters characterizes the likelihood and magnitude of supply-chain compromise impact; MP.5.1 requires that these hidden-capability risks be identified and tracked as part of risk characterization."
+    - subcategory: 'MP.5.1'
+      context: 'Detection of undocumented dangerous parameters characterizes the likelihood and magnitude of supply-chain compromise impact; MP.5.1 requires that these hidden-capability risks be identified and tracked as part of risk characterization.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the skill supply-chain compromise (Hidden Capability in MCP Skill)."
       strength: primary
-    - subcategory: "MG.3.1"
-      context: "NIST AI RMF MANAGE 3.1 (third-party resources regularly monitored) is supported where this rule detects the skill supply-chain compromise (Hidden Capability in MCP Skill)."
+    - subcategory: 'MG.3.1'
+      context: 'NIST AI RMF MANAGE 3.1 (third-party resources regularly monitored) is supported where this rule detects the skill supply-chain compromise (Hidden Capability in MCP Skill).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the skill supply-chain compromise (Hidden Capability in MCP Skill)."
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (Hidden Capability in MCP Skill) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (Hidden Capability in MCP Skill) as a treatment control.'
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (Hidden Capability in MCP Skill)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (Hidden Capability in MCP Skill).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (Hidden Capability in MCP Skill)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (Hidden Capability in MCP Skill).'
       strength: secondary
 tags:
   category: tool-poisoning
@@ -76,20 +76,20 @@ detection:
   conditions:
     - field: tool_args
       operator: regex
-      value: "(?i)(debug[_-]?mode|admin[_-]?override|raw[_-]?exec|unsafe[_-]?mode|bypass[_-]?check|no[_-]?sandbox)"
+      value: '(?i)(debug[_-]?mode|admin[_-]?override|raw[_-]?exec|unsafe[_-]?mode|bypass[_-]?check|no[_-]?sandbox)'
     - field: tool_args
       operator: regex
       value: "(?i)(__[a-z]+__|\\$\\$[a-z]+|_internal_|_hidden_|_backdoor_|_secret_)"
     - field: tool_args
       operator: regex
-      value: "(?i)(eval_code|exec_raw|shell_cmd|run_arbitrary|system_call|inject_prompt)"
+      value: '(?i)(eval_code|exec_raw|shell_cmd|run_arbitrary|system_call|inject_prompt)'
     - field: tool_response
       operator: regex
       value: "(?i)(hidden\\s+mode\\s+activated|debug\\s+mode\\s+enabled|admin\\s+access\\s+granted|sandbox\\s+disabled)"
   condition: any
   false_positives:
-    - "Development/staging environments where debug modes are intentionally enabled"
-    - "Administrative tools that legitimately expose debug parameters"
+    - 'Development/staging environments where debug modes are intentionally enabled'
+    - 'Administrative tools that legitimately expose debug parameters'
 
 response:
   actions:
@@ -105,29 +105,29 @@ response:
     Session quarantined. Investigate skill source immediately.
 
 confidence: 53
-wild_validated: "2026/04/08"
+wild_validated: '2026/04/08'
 wild_samples: 53577
 wild_fp_rate: 0
 test_cases:
   true_positives:
     - input:
-        tool_name: "note_taker"
+        tool_name: 'note_taker'
         tool_args: '{"text": "hello", "debug_mode": true, "raw_exec": "cat /etc/shadow"}'
       expected: triggered
-      matched_condition: "hidden debug_mode and raw_exec parameters"
+      matched_condition: 'hidden debug_mode and raw_exec parameters'
     - input:
-        tool_name: "calculator"
+        tool_name: 'calculator'
         tool_args: '{"expression": "2+2", "__backdoor__": "reverse_shell"}'
       expected: triggered
-      matched_condition: "dunder-wrapped hidden parameter"
+      matched_condition: 'dunder-wrapped hidden parameter'
   true_negatives:
     - input:
-        tool_name: "debugger"
+        tool_name: 'debugger'
         tool_args: '{"breakpoint": "line_42", "mode": "step"}'
       expected: not_triggered
-      reason: "Debugger tool legitimately using debug-related terminology"
+      reason: 'Debugger tool legitimately using debug-related terminology'
     - input:
-        tool_name: "admin_panel"
+        tool_name: 'admin_panel'
         tool_args: '{"action": "list_users"}'
       expected: not_triggered
-      reason: "Admin tool using normal admin operations"
+      reason: 'Admin tool using normal admin operations'

@@ -9,7 +9,7 @@ description: >
   context resets and affect all future interactions.
 author: ATR Community
 date: 2026/03/08
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
@@ -22,37 +22,37 @@ references:
   mitre_atlas:
     - AML.T0051 - LLM Prompt Injection
   mitre_attack:
-    - "T1565.001 - Data Manipulation: Stored Data Manipulation"
+    - 'T1565.001 - Data Manipulation: Stored Data Manipulation'
 compliance:
   eu_ai_act:
-    - article: "14"
-      context: "Agent memory poisoning corrupts persistent context across sessions, allowing attackers to establish behavioral backdoors that survive individual-turn oversight checks; Article 14 requires that human oversight mechanisms remain effective across the full lifecycle of agent interactions, including persistent state."
+    - article: '14'
+      context: 'Agent memory poisoning corrupts persistent context across sessions, allowing attackers to establish behavioral backdoors that survive individual-turn oversight checks; Article 14 requires that human oversight mechanisms remain effective across the full lifecycle of agent interactions, including persistent state.'
       strength: primary
-    - article: "15"
+    - article: '15'
       context: "Article 15 robustness requirements mandate resistance against adversarial inputs that modify system behavior; memory injection attacks that alter an agent's long-term behavioral state represent a critical robustness failure requiring detection controls."
       strength: secondary
-    - article: "10"
-      context: "Article 10 (data and data governance) requires control over the data an AI system processes; this rule provides detection evidence for the context-exfiltration attempt (Agent Memory Manipulation) affecting that data."
+    - article: '10'
+      context: 'Article 10 (data and data governance) requires control over the data an AI system processes; this rule provides detection evidence for the context-exfiltration attempt (Agent Memory Manipulation) affecting that data.'
       strength: secondary
   nist_ai_rmf:
-    - subcategory: "GV.1.2"
-      context: "Memory manipulation attacks that inject false behavioral directives require clearly assigned accountability roles to ensure that persistent agent state is monitored and that any unauthorized modification is escalated to a responsible party."
+    - subcategory: 'GV.1.2'
+      context: 'Memory manipulation attacks that inject false behavioral directives require clearly assigned accountability roles to ensure that persistent agent state is monitored and that any unauthorized modification is escalated to a responsible party.'
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "Risk treatment plans for memory poisoning must include controls that detect and block cross-session behavioral injection before poisoned directives propagate into future interactions."
+    - subcategory: 'MG.2.3'
+      context: 'Risk treatment plans for memory poisoning must include controls that detect and block cross-session behavioral injection before poisoned directives propagate into future interactions.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the context-exfiltration attempt (Agent Memory Manipulation)."
       strength: primary
-    - subcategory: "MS.2.10"
+    - subcategory: 'MS.2.10'
       context: "NIST AI RMF MEASURE 2.10 (privacy risk examined and documented) is supported by this rule's detection of the context-exfiltration attempt (Agent Memory Manipulation)."
       strength: secondary
   iso_42001:
-    - clause: "6.2"
-      context: "AI objectives and risk treatment plans must explicitly address memory manipulation threats to prevent attackers from establishing persistent behavioral backdoors that survive context resets."
+    - clause: '6.2'
+      context: 'AI objectives and risk treatment plans must explicitly address memory manipulation threats to prevent attackers from establishing persistent behavioral backdoors that survive context resets.'
       strength: primary
-    - clause: "8.1"
-      context: "Operational controls for AI systems must include integrity checks on persistent memory stores to ensure that agent behavioral state has not been tampered with between sessions."
+    - clause: '8.1'
+      context: 'Operational controls for AI systems must include integrity checks on persistent memory stores to ensure that agent behavioral state has not been tampered with between sessions.'
       strength: secondary
 tags:
   category: context-exfiltration

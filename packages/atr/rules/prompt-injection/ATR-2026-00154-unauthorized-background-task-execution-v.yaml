@@ -7,7 +7,7 @@ description: >
   automation commands from unknown third parties, potentially compromising the system during "idle" periods.
 author: Threat Cloud LLM Analyzer
 date: 2026/04/06
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: semantic
 maturity: test
 severity: high
@@ -23,34 +23,34 @@ metadata_provenance:
   owasp_llm: auto-generated
 compliance:
   nist_ai_rmf:
-    - subcategory: "MG.2.3"
-      context: "Cron job installation for unattended background execution of third-party marketplace tasks requires immediate ability to disengage or deactivate the scheduled task before it polls and runs untrusted commands; MG.2.3 mandates these supersede/deactivate mechanisms be in place for autonomous execution paths."
+    - subcategory: 'MG.2.3'
+      context: 'Cron job installation for unattended background execution of third-party marketplace tasks requires immediate ability to disengage or deactivate the scheduled task before it polls and runs untrusted commands; MG.2.3 mandates these supersede/deactivate mechanisms be in place for autonomous execution paths.'
       strength: primary
-    - subcategory: "GV.6.1"
-      context: "The skill fetches and executes tasks from unknown third-party marketplaces without consent, which is exactly the third-party/supplier AI risk that GV.6.1 policies must govern, including provenance and authorization of externally sourced task content."
+    - subcategory: 'GV.6.1'
+      context: 'The skill fetches and executes tasks from unknown third-party marketplaces without consent, which is exactly the third-party/supplier AI risk that GV.6.1 policies must govern, including provenance and authorization of externally sourced task content.'
       strength: secondary
-    - subcategory: "MG.4.1"
-      context: "Background tasks executing every 10 seconds during idle periods evade normal interactive oversight, so post-deployment monitoring per MG.4.1 is required to detect and log unauthorized scheduled execution outside user-initiated sessions."
+    - subcategory: 'MG.4.1'
+      context: 'Background tasks executing every 10 seconds during idle periods evade normal interactive oversight, so post-deployment monitoring per MG.4.1 is required to detect and log unauthorized scheduled execution outside user-initiated sessions.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the prompt-injection attempt (Unauthorized Background Task Execution via Cron Job Installation)."
       strength: primary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the prompt-injection attempt (Unauthorized Background Task Execution via Cron Job Installation)."
       strength: primary
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the prompt-injection attempt (Unauthorized Background Task Execution via Cron Job Installation) is such a treatment."
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Unauthorized Background Task Execution via Cron Job Installation)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Unauthorized Background Task Execution via Cron Job Installation).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Unauthorized Background Task Execution via Cron Job Installation)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Unauthorized Background Task Execution via Cron Job Installation).'
       strength: secondary
-    - article: "14"
-      context: "Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Unauthorized Background Task Execution via Cron Job Installation) would bypass or undermine that oversight."
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Unauthorized Background Task Execution via Cron Job Installation) would bypass or undermine that oversight.'
       strength: secondary
 tags:
   category: skill-compromise
