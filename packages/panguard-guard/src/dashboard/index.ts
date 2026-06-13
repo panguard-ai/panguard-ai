@@ -189,6 +189,25 @@ export class DashboardServer {
           }
         }
 
+        // Require the dashboard auth token (the browser sends it as the
+        // HttpOnly cookie on upgrade). Without this, any local process could
+        // subscribe to the live verdict/event stream — same gate as the HTTP API.
+        const wsCookieToken =
+          (req.headers.cookie ?? '')
+            .split(';')
+            .map((c) => c.trim())
+            .find((c) => c.startsWith('panguard_auth='))
+            ?.split('=')[1] ?? '';
+        if (
+          !wsCookieToken ||
+          wsCookieToken.length !== this.authToken.length ||
+          !timingSafeEqual(Buffer.from(wsCookieToken), Buffer.from(this.authToken))
+        ) {
+          logger.warn('Rejected WebSocket without a valid auth token');
+          ws.close();
+          return;
+        }
+
         // Per-IP connection limit
         const clientIP = req.socket.remoteAddress ?? 'unknown';
         const ipCount = [...this.wsClients].filter((c) => c.ip === clientIP).length;
@@ -379,6 +398,23 @@ export class DashboardServer {
         res.end(JSON.stringify({ error: 'Unauthorized' }));
         return;
       }
+
+      // CSRF defense-in-depth on top of the SameSite=Strict cookie: a
+      // state-changing request must originate from the dashboard page itself.
+      // Browsers always attach Origin on POST, so reject any cross-origin (or
+      // origin-less) mutation even if it somehow carries the cookie/token.
+      if (req.method && req.method !== 'GET' && req.method !== 'HEAD') {
+        const origin = req.headers.origin ?? '';
+        const allowedOrigins = [
+          `http://127.0.0.1:${this.port}`,
+          `http://localhost:${this.port}`,
+        ];
+        if (!allowedOrigins.includes(origin)) {
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Forbidden: cross-origin request rejected' }));
+          return;
+        }
+      }
     }
 
     const pathname = url.split('?')[0];
@@ -433,8 +469,16 @@ export class DashboardServer {
         this.handleSkillsApi(res);
         break;
       case '/api/ai-config':
+        // Read-only. The semantic-layer LLM is configured via env vars / CLI
+        // only (PANGUARD_LLM_ENDPOINT, NVIDIA_API_KEY, `pga config llm`) — never
+        // written through HTTP. A dashboard POST that persisted an API key and
+        // an arbitrary endpoint was a credential-write + data-exfil surface.
         if (req.method === 'POST') {
-          this.handleAiConfigPost(req, res);
+          this.jsonResponse(
+            res,
+            { error: 'Read-only: configure the LLM via env vars or `pga config llm`' },
+            405
+          );
         } else {
           this.handleAiConfigGet(res);
         }
@@ -858,76 +902,10 @@ export class DashboardServer {
     });
   }
 
-  private handleAiConfigPost(req: IncomingMessage, res: ServerResponse): void {
-    if (!this.getConfig) {
-      this.jsonResponse(res, { error: 'Config not available' }, 503);
-      return;
-    }
-
-    let body = '';
-    let aborted = false;
-    req.on('data', (chunk: Buffer) => {
-      body += chunk.toString();
-      if (body.length > 10_000) {
-        aborted = true;
-        res.writeHead(413, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Payload too large' }));
-        req.destroy();
-      }
-    });
-    req.on('end', () => {
-      if (aborted) return;
-      try {
-        const update = JSON.parse(body) as {
-          provider?: string;
-          model?: string;
-          endpoint?: string;
-          apiKey?: string;
-        };
-
-        if (
-          update.endpoint !== undefined &&
-          update.endpoint !== '' &&
-          !DashboardServer.isValidEndpointUrl(update.endpoint)
-        ) {
-          this.jsonResponse(res, { error: 'Invalid endpoint URL' }, 400);
-          return;
-        }
-
-        const validProviders = [
-          'ollama',
-          'claude',
-          'openai',
-          'gemini',
-          'groq',
-          'mistral',
-          'deepseek',
-          'lmstudio',
-        ];
-        if (update.provider && !validProviders.includes(update.provider)) {
-          this.jsonResponse(res, { error: 'Invalid provider' }, 400);
-          return;
-        }
-
-        const config = this.getConfig!();
-        const providerValue = update.provider ?? config.ai?.provider ?? 'ollama';
-        const updatedConfig: GuardConfig = {
-          ...config,
-          ai: {
-            provider: providerValue as NonNullable<GuardConfig['ai']>['provider'],
-            model: update.model ?? config.ai?.model ?? '',
-            endpoint: update.endpoint ?? config.ai?.endpoint,
-            apiKey: update.apiKey ?? config.ai?.apiKey,
-          },
-        };
-
-        saveConfig(updatedConfig);
-        this.jsonResponse(res, { success: true, ai: updatedConfig.ai });
-      } catch {
-        this.jsonResponse(res, { error: 'Invalid JSON' }, 400);
-      }
-    });
-  }
+  // handleAiConfigPost was removed: the dashboard no longer writes LLM
+  // credentials or endpoints over HTTP (that was a credential-write + exfil
+  // surface). The LLM is configured via env vars / `pga config llm` only.
+  // /api/ai-config is now read-only (handleAiConfigGet).
 
   // ---------------------------------------------------------------------------
   // Validation helpers
