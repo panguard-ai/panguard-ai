@@ -322,7 +322,7 @@ export class LogCollector extends EventEmitter {
         logger.error(`Syslog UDP error: ${err.message} / Syslog UDP 錯誤: ${err.message}`);
       });
 
-      const bindHost = host ?? '0.0.0.0';
+      const bindHost = host ?? '127.0.0.1'; // loopback by default — set host explicitly to receive remote syslog
       this.udpSocket.bind(port, bindHost, () => {
         logger.info(
           `Syslog UDP listening on ${bindHost}:${port} / Syslog UDP 監聽於 ${bindHost}:${port}`
@@ -361,7 +361,7 @@ export class LogCollector extends EventEmitter {
         );
       });
 
-      const bindHost = host ?? '0.0.0.0';
+      const bindHost = host ?? '127.0.0.1'; // loopback by default — set host explicitly to receive remote syslog
       this.tcpServer.listen(port, bindHost, () => {
         logger.info(
           `Syslog TCP listening on ${bindHost}:${port} / Syslog TCP 監聽於 ${bindHost}:${port}`

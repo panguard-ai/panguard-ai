@@ -1017,7 +1017,9 @@ async function commandInstall(dataDir: string): Promise<void> {
   const sp = spinner('Installing PanguardGuard as system service...');
   try {
     const execPath = process.argv[1] ?? join(homedir(), '.npm-global', 'bin', 'panguard-guard');
-    const result = await installService(execPath, dataDir);
+    // node + script as discrete argv parts: never whitespace-split, and robust
+    // on Windows where the script has no shebang to self-execute.
+    const result = await installService([process.execPath, execPath], dataDir);
     sp.succeed(`Service installed: ${c.sage(result)}`);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);

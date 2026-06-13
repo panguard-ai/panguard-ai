@@ -542,7 +542,10 @@ export function setupCommand(): Command {
               };
             } else {
               try {
-                const guardExec = `${process.execPath} ${guardBin}`;
+                // Discrete argv parts, never a space-joined string — the binary
+                // path legitimately contains spaces (e.g. "Application Support")
+                // which would otherwise split into broken service arguments.
+                const guardExec = [process.execPath, guardBin];
                 const dataDir = join(homedir(), '.panguard-guard');
 
                 const { installService } = await import('@panguard-ai/panguard-guard');
