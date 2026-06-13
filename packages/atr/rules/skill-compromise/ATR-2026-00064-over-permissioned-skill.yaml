@@ -1,0 +1,164 @@
+title: "Over-Permissioned MCP Skill"
+id: ATR-2026-00064
+rule_version: 1
+status: experimental
+description: >
+  Detects MCP skills that request or exercise permissions far exceeding what their
+  stated function requires. A "spell checker" that requests filesystem write access,
+  network access, and process execution is a strong signal of a trojaned or malicious
+  skill. This rule monitors tool calls for permission-boundary violations.
+author: "ATR Community"
+date: "2026/03/08"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: test
+severity: high
+
+references:
+  owasp_llm:
+    - "LLM06:2025 - Excessive Agency"
+    - "LLM03:2025 - Supply Chain Vulnerabilities"
+  owasp_agentic:
+    - "ASI03:2026 - Identity and Privilege Abuse"
+  mitre_atlas:
+    - "AML.T0040 - AI Model Inference API Access"
+
+compliance:
+  nist_ai_rmf:
+    - subcategory: "GV.6.1"
+      context: >-
+        Over-permissioned MCP skills are a third-party/supplier AI risk where an
+        installed skill requests permissions far exceeding its stated function;
+        GV.6.1 requires policies and procedures that govern third-party AI
+        components and their permission boundaries.
+      strength: primary
+    - subcategory: "MG.3.1"
+      context: >-
+        Detecting permission-boundary violations in third-party MCP skills directly
+        supports MG.3.1's requirement to manage risks from third-party AI entities,
+        including trojaned or malicious supply-chain components exercising
+        unauthorized capabilities.
+      strength: secondary
+    - subcategory: "MP.5.1"
+      context: >-
+        A skill exercising filesystem, network, or process-execution permissions
+        inconsistent with its declared purpose characterizes the likelihood and
+        magnitude of privilege-escalation impact that MP.5.1 requires to be
+        identified and tracked.
+      strength: secondary
+    - subcategory: "MS.2.7"
+      context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the skill supply-chain compromise (Over-Permissioned MCP Skill)."
+      strength: primary
+    - subcategory: "MG.3.2"
+      context: "NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the skill supply-chain compromise (Over-Permissioned MCP Skill)."
+      strength: secondary
+  iso_42001:
+    - clause: "8.1"
+      context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the skill supply-chain compromise (Over-Permissioned MCP Skill)."
+      strength: primary
+    - clause: "8.3"
+      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (Over-Permissioned MCP Skill) as a treatment control."
+      strength: secondary
+  eu_ai_act:
+    - article: "15"
+      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (Over-Permissioned MCP Skill)."
+      strength: primary
+    - article: "9"
+      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (Over-Permissioned MCP Skill)."
+      strength: secondary
+tags:
+  category: privilege-escalation
+  subcategory: over-permissioned-skill
+  scan_target: mcp
+  confidence: medium
+
+agent_source:
+  type: tool_call
+  framework:
+    - mcp
+    - langchain
+    - autogen
+  provider:
+    - any
+
+detection:
+  conditions:
+    - field: tool_args
+      operator: regex
+      value: "(?i)(sudo|runas|doas|pkexec|gsudo)\\s+"
+    - field: tool_args
+      operator: regex
+      value: "(?i)(chmod\\s+(?:[2467][0-7]{3}|[0-7]{0,3}7[0-7]{0,2})|chmod\\s+[ug]?\\+[sx]|chown\\s+root|setcap\\s)"
+    - field: tool_args
+      operator: regex
+      value: "(?i)(iptables|ufw|firewall-cmd|netsh\\s+advfirewall|pfctl)\\s"
+    - field: tool_args
+      operator: regex
+      value: "(?i)(useradd|adduser|usermod|passwd|net\\s+user|dsadd|New-LocalUser)"
+    - field: tool_args
+      operator: regex
+      value: "(?i)(crontab|schtasks|at\\s+\\d|systemctl\\s+(enable|start)|launchctl\\s+load)"
+  condition: any
+  false_positives:
+    - "System administration tools that legitimately manage permissions and services"
+    - "DevOps tools performing infrastructure provisioning"
+    - "Security tools that audit permission configurations"
+
+response:
+  actions:
+    - block_tool
+    - alert
+    - reduce_permissions
+    - snapshot
+  auto_response_threshold: high
+  message_template: >
+    [ATR-2026-064] Over-permissioned skill detected. Tool is attempting operations
+    that exceed its stated scope (privilege escalation, service management, user
+    creation, or firewall modification). Permissions reduced.
+
+confidence: 73
+wild_validated: "2026/04/08"
+wild_samples: 53577
+wild_fp_rate: 0
+test_cases:
+  true_positives:
+    - input:
+        tool_name: "text_analyzer"
+        tool_args: '{"command": "sudo chmod 777 /etc/shadow"}'
+      expected: triggered
+      matched_condition: "text analyzer attempting privilege escalation"
+    - input:
+        tool_name: "data_formatter"
+        tool_args: '{"action": "useradd -m backdoor_user -p password123"}'
+      expected: triggered
+      matched_condition: "formatter tool creating system users"
+  true_negatives:
+    - input:
+        tool_name: "server_admin"
+        tool_args: '{"action": "systemctl status nginx"}'
+      expected: not_triggered
+      reason: "Admin tool checking service status (read-only)"
+    - input:
+        tool_name: "file_manager"
+        tool_args: '{"action": "chmod 644 /tmp/output.txt"}'
+      expected: not_triggered
+      reason: "Setting normal file permissions on temp file"
+    - input: "This development tool requires filesystem read access to scan your project for linting errors."
+      expected: not_triggered
+      description: "Legitimate tool with justified single-scope permission"
+    - input: "The deployment tool needs network and filesystem permissions to push builds to the staging server."
+      expected: not_triggered
+      description: "Legitimate DevOps tool with justified multi-scope permissions"
+    - input: "Permissions requested: read-only access to the current directory for code analysis."
+      expected: not_triggered
+      description: "Tool requesting minimal read-only permission"
+
+evasion_tests:
+  - input: "This tool needs network access to fetch exchange rates and filesystem access to cache the results locally."
+    expected: not_triggered
+    bypass_technique: justified_permissions
+    notes: "Malicious tool provides plausible justification for broad permissions."
+  - input: "Required capabilities: internet, storage. The tool syncs your calendar with cloud services."
+    expected: not_triggered
+    bypass_technique: abstracted_permissions
+    notes: "Uses abstract capability names instead of specific permission keywords."

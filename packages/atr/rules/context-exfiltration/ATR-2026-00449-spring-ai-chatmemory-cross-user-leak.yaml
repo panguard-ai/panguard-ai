@@ -1,0 +1,208 @@
+title: "Spring AI ChatMemory Cross-User Memory Leakage (CVE-2026-41712)"
+id: ATR-2026-00449
+rule_version: 1
+status: experimental
+description: >
+  Detects exploitation of CVE-2026-41712 (High), cross-user memory
+  leakage in Spring AI's PromptChatMemoryAdvisor. The vulnerable
+  configuration uses a shared ChatMemory without per-session
+  conversation_id discipline — when two requests land on the same
+  advisor without distinct conversation IDs, memory written by User A
+  is retrieved and injected into User B's prompt context as if it were
+  B's own conversation history. This produces a confidentiality
+  failure: A's private content (prior turns, tool outputs,
+  conversation IDs, role tags) leaks into B's session and is processed
+  by the LLM on B's behalf. This rule detects the LLM-output / context
+  payload patterns that signal cross-user memory bleed: mismatched
+  conversation IDs inside advisor-injected context, role/user-tag
+  markers from another session appearing in the active session's
+  retrieved memory, or memory-fetch log lines whose user-id field
+  does not match the active session. CWE-359 (Privacy Disclosure),
+  CWE-201 (Insertion of Sensitive Information Into Sent Data).
+  Patches in Spring AI >= 1.0.0; this rule detects exploitation against
+  unpatched deployments and provides defence-in-depth post-patch by
+  catching the leakage pattern regardless of upstream patch state.
+author: "ATR Community"
+date: "2026/05/12"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: test
+severity: high
+
+references:
+  owasp_llm:
+    - "LLM02:2025 - Sensitive Information Disclosure"
+    - "LLM08:2025 - Vector and Embedding Weaknesses"
+  owasp_agentic:
+    - "ASI04:2026 - Memory and Knowledge Base Poisoning"
+    - "ASI09:2026 - Identity Spoofing and Impersonation"
+  mitre_atlas:
+    - "AML.T0024 - Exfiltration via ML Inference API"
+    - "AML.T0057 - LLM Data Leakage"
+  mitre_attack:
+    - "T1530 - Data from Cloud Storage Object"
+  cve:
+    - "CVE-2026-41712"
+
+metadata_provenance:
+  mitre_atlas: human-reviewed
+  owasp_llm: human-reviewed
+  owasp_agentic: human-reviewed
+  cve: human-reviewed
+
+compliance:
+  eu_ai_act:
+    - article: "15"
+      context: "CVE-2026-41712 lets one user's chat memory leak into another user's session via Spring AI PromptChatMemoryAdvisor; Article 15 cybersecurity requirements mandate that high-risk AI systems enforce per-session memory isolation."
+      strength: primary
+    - article: "9"
+      context: "Article 9 risk management must enumerate cross-user memory leakage as a high-risk class — the conversation-memory layer is typically treated as low-risk infrastructure but actually carries private dialogue content."
+      strength: primary
+    - article: "10"
+      context: "Article 10 (data and data governance) requires control over the data an AI system processes; this rule provides detection evidence for the context-exfiltration attempt (Spring AI ChatMemory Cross-User Memory Leakage (CVE-2026-41712)) affecting that data."
+      strength: secondary
+  nist_ai_rmf:
+    - subcategory: "MP.5.1"
+      context: "Adversarial conditions that cause one user's chat memory to be retrieved into another user's prompt must be tracked as a primary confidentiality failure mode for advisor-based architectures."
+      strength: primary
+    - subcategory: "MG.2.3"
+      context: "Risk treatment plans under MG.2.3 must require per-conversation_id memory partitioning in any code path that uses a shared ChatMemory across multiple users."
+      strength: primary
+    - subcategory: "MS.2.7"
+      context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the context-exfiltration attempt (Spring AI ChatMemory Cross-User Memory Leakage (CVE-2026-41712))."
+      strength: primary
+    - subcategory: "MS.2.10"
+      context: "NIST AI RMF MEASURE 2.10 (privacy risk examined and documented) is supported by this rule's detection of the context-exfiltration attempt (Spring AI ChatMemory Cross-User Memory Leakage (CVE-2026-41712))."
+      strength: secondary
+  iso_42001:
+    - clause: "8.1"
+      context: "Operational controls under clause 8.1 must require that conversation_id is distinct per session and that advisor pipelines reject memory retrieval whose conversation_id does not match the active session."
+      strength: primary
+    - clause: "6.2"
+      context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the context-exfiltration attempt (Spring AI ChatMemory Cross-User Memory Leakage (CVE-2026-41712)) is such a treatment."
+      strength: secondary
+
+tags:
+  category: context-exfiltration
+  subcategory: shared-memory-cross-user-leak
+  scan_target: both
+  confidence: high
+
+agent_source:
+  type: llm_io
+  framework:
+    - spring-ai
+    - any
+  provider:
+    - any
+
+detection:
+  condition: any
+  false_positives:
+    - "Legitimate documentation or changelog text discussing CVE-2026-41712 patch notes."
+    - "Static analysis tooling output documenting cross-user memory leakage patterns for defensive purposes."
+    - "Patched Spring AI PromptChatMemoryAdvisor deployments that enforce per-conversation_id partitioning."
+    - "Multi-tenant test fixtures that intentionally include foreign conversation IDs for QA purposes."
+  conditions:
+    - field: content
+      operator: regex
+      value: '(?i)\bPromptChatMemoryAdvisor\b[^\n]{0,200}\b(?:shared|global|singleton|static)[A-Za-z_]*ChatMemory\b'
+      description: "PromptChatMemoryAdvisor wired with a shared / singleton / static ChatMemory bean (matches both `shared ChatMemory` and `sharedChatMemory` camelCase) — the architectural precondition for CVE-2026-41712"
+
+    - field: content
+      operator: regex
+      value: '(?i)conversation_id\s*[:=]\s*["\x27]?(?:default|null|none)\b'
+      description: "ChatMemory used with a placeholder / default / null conversation_id — disables per-session partitioning, enabling cross-user bleed"
+
+    - field: content
+      operator: regex
+      value: '(?i)\b(?:retrieved|loaded|fetched)\s+memory\s+conversation_id\s*=\s*["\x27]?[a-z0-9_-]{4,}["\x27]?[^\n]{0,100}(?:current|active)\s+(?:session|user)[^\n]{0,40}\b(?:is|=)\s+["\x27]?[a-z0-9_-]{4,}["\x27]?'
+      description: "Memory-fetch log entry where retrieved conversation_id does not match the active session — direct leakage evidence"
+
+    - field: content
+      operator: regex
+      value: '(?i)\[(?:user|usr)[_\s]?\d+\][^\[\n]{0,200}\[(?:user|usr)[_\s]?\d+\]'
+      description: "Two distinct [user_N] tags appearing in the same advisor-injected context window — different users sharing a memory window"
+
+    - field: content
+      operator: regex
+      value: '(?i)\b(?:MessageWindow|InMemory|Cassandra|JDBC)?ChatMemory\b\.?(?:builder\s*\(\s*\))?[^.\n]{0,40}\.(?:withoutId|withoutConversationId|noConversationId|defaultConversationId)\s*\('
+      description: "ChatMemory builder constructed without a conversation_id discriminator (withoutId / noConversationId / defaultConversationId) — buggy advisor configuration"
+
+    - field: content
+      operator: regex
+      value: '(?i)previous\s+conversation[^.\n]{0,80}\b(?:from|of|with)\s+(?:another|different|other)\s+user\b'
+      description: "Advisor-injected text explicitly attributing prior turns to another user — direct evidence of leakage"
+
+    - field: content
+      operator: regex
+      value: '(?i)active\s+(?:user|session)\s+id\s+["\x27][a-z0-9_-]{4,}["\x27][^.\n]{0,40}\bmemory\s+owner\s+id\s+["\x27][a-z0-9_-]{4,}["\x27]'
+      description: "Audit / observability line where active-session id and memory-owner id are emitted as different quoted values — explicit cross-user retrieval"
+
+    - field: content
+      operator: regex
+      value: '(?i)PromptChatMemoryAdvisor\b[^\n]{0,200}\.\s*tenant\s*\(\s*["\x27](?:wildcard|any|\*)["\x27]\s*\)'
+      description: "Advisor configured with wildcard tenant scope (.tenant(\"*\")) — defeats per-tenant isolation"
+
+response:
+  actions:
+    - block_output
+    - alert
+    - escalate
+  notify:
+    - security_team
+
+remediation: >
+  Upgrade Spring AI to >= 1.0.0. Ensure every PromptChatMemoryAdvisor is
+  constructed with per-session conversation_id discipline — derive
+  conversation_id from the authenticated user / session id, never share
+  a singleton ChatMemory across users without partitioning. Reject
+  retrievals whose conversation_id does not match the active session.
+  Add observability that emits user_id and memory_owner_id together so
+  cross-user retrievals are visible at log time.
+
+test_cases:
+  true_positives:
+    - input: '@Bean public PromptChatMemoryAdvisor advisor() { return PromptChatMemoryAdvisor.builder(sharedChatMemory).build(); }'
+      expected: triggered
+      description: "Advisor built with a shared ChatMemory bean — CVE-2026-41712 precondition"
+    - input: 'conversation_id: "default"'
+      expected: triggered
+      description: "Placeholder conversation_id disabling per-session partitioning"
+    - input: '[INFO] retrieved memory conversation_id=conv_abc1 for current session user is sess_xyz9'
+      expected: triggered
+      description: "Memory-fetch log proving retrieved conv_id != active session id"
+    - input: '[user_42] What is my address? [user_99] My API key is sk-...'
+      expected: triggered
+      description: "Two distinct user tags in the same advisor-injected context"
+    - input: 'MessageWindowChatMemory.builder().withoutId().build()'
+      expected: triggered
+      description: "Memory builder constructed without a conversation_id discriminator"
+    - input: 'Previous conversation from another user: "I need help drafting an email to my CFO about Q3 revenue."'
+      expected: triggered
+      description: "Advisor-injected text explicitly attributing prior turns to another user"
+    - input: 'active user id "alice42" memory owner id "bob77"'
+      expected: triggered
+      description: "Audit line showing active-session id and memory-owner id mismatch"
+    - input: 'PromptChatMemoryAdvisor.builder(memory).tenant("*").build()'
+      expected: triggered
+      description: "Advisor configured with wildcard tenant scope"
+  true_negatives:
+    - input: "The Spring AI 1.0.0 changelog notes that PromptChatMemoryAdvisor now requires explicit per-session conversation_id (CVE-2026-41712)."
+      expected: not_triggered
+      description: "Documentation discussing the patch should not trigger"
+    - input: "Best practice: derive conversation_id from the authenticated session id and never share ChatMemory across users."
+      expected: not_triggered
+      description: "Defensive guidance discussing the mitigation"
+    - input: 'PromptChatMemoryAdvisor.builder(memory).conversationId(session.getId()).build()'
+      expected: not_triggered
+      description: "Properly partitioned advisor using authenticated session id"
+    - input: "Reviewing this rule against CVE-2026-41712 to ensure regex coverage is correct."
+      expected: not_triggered
+      description: "Discussion of CVE in defensive context"
+    - input: 'conversation_id: "sess_abc123"'
+      expected: not_triggered
+      description: "Realistic per-session conversation_id, not a placeholder"
+    - input: "The chat memory window stores the last 10 turns per conversation, indexed by conversation_id."
+      expected: not_triggered
+      description: "Benign documentation of correct memory semantics"
