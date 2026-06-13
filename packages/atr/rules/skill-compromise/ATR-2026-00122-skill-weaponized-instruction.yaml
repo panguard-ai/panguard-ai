@@ -10,7 +10,7 @@ description: >
   Metasploit payloads, and credential brute-force tools found on skills.sh and ClawHub.
 author: ATR Community
 date: 2026/03/29
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
@@ -26,44 +26,44 @@ references:
     - AST01:2026 - Malicious Skills
     - AST03:2026 - Over-Privileged Skills
   research:
-    - "Cato Networks: MedusaLocker via Claude skill (Dec 2025)"
-    - "arXiv 2601.17548: 41-84% attack success"
-    - "Axios: Anthropic Claude skills ransomware disclosure"
+    - 'Cato Networks: MedusaLocker via Claude skill (Dec 2025)'
+    - 'arXiv 2601.17548: 41-84% attack success'
+    - 'Axios: Anthropic Claude skills ransomware disclosure'
 metadata_provenance:
   mitre_atlas: auto-generated
 compliance:
   nist_ai_rmf:
-    - subcategory: "GV.6.1"
+    - subcategory: 'GV.6.1'
       context: >-
         Weaponized skills are third-party/supplier AI components that embed offensive tooling (SQLMap, Metasploit, ransomware payloads) into agent workflows; GV.6.1 requires policies and procedures to address third-party AI supply chain risks where approved skills can execute malicious code without further consent.
       strength: primary
-    - subcategory: "MG.3.2"
+    - subcategory: 'MG.3.2'
       context: >-
         Detecting offensive tooling embedded in skills directly evidences the need to monitor pre-trained models and skill artifacts used for development; MG.3.2 mandates ongoing monitoring of these third-party components for malicious modifications like the MedusaLocker-laden Claude skill.
       strength: secondary
-    - subcategory: "MG.2.3"
+    - subcategory: 'MG.2.3'
       context: >-
         Detection of weaponized skills must trigger mechanisms to disengage or deactivate the AI system before the consent gap is exploited to download/execute code or exfiltrate credentials; MG.2.3 requires these supersede/deactivate controls be in place.
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool)."
       strength: primary
-    - subcategory: "MG.3.1"
-      context: "NIST AI RMF MANAGE 3.1 (third-party resources regularly monitored) is supported where this rule detects the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool)."
+    - subcategory: 'MG.3.1'
+      context: 'NIST AI RMF MANAGE 3.1 (third-party resources regularly monitored) is supported where this rule detects the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool)."
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool) as a treatment control.'
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (Weaponized Skill — Agent as Attack Tool).'
       strength: secondary
 tags:
   category: skill-compromise
@@ -98,7 +98,7 @@ detection:
       operator: regex
       value: >-
         (?i)(encrypt\s+(all|every|the)\s+(file|document|data).{0,200}(ransom|payment|bitcoin|wallet|decrypt\s+fee|pay\s+to))|(ransom\s+note.{0,100}(bitcoin|wallet|payment|decrypt))
-      description: "Ransomware: encryption + payment demand combo (Cato MedusaLocker)"
+      description: 'Ransomware: encryption + payment demand combo (Cato MedusaLocker)'
   condition: any
   false_positives:
     - Authorized penetration testing skills with explicit scope controls

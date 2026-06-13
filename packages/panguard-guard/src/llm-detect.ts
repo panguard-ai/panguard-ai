@@ -50,9 +50,27 @@ const DEFAULT_MODELS: Record<LLMProviderType, string> = {
  */
 const LOCAL_RUNTIMES: readonly ResolvedLLM[] = [
   { provider: 'ollama', endpoint: 'http://localhost:11434', model: 'llama3', label: 'Ollama' },
-  { provider: 'openai', endpoint: 'http://localhost:1234/v1', apiKey: 'local', model: 'local-model', label: 'LM Studio' },
-  { provider: 'openai', endpoint: 'http://localhost:8000/v1', apiKey: 'local', model: 'local-model', label: 'vLLM / NVIDIA NIM' },
-  { provider: 'openai', endpoint: 'http://localhost:8080/v1', apiKey: 'local', model: 'local-model', label: 'llama.cpp' },
+  {
+    provider: 'openai',
+    endpoint: 'http://localhost:1234/v1',
+    apiKey: 'local',
+    model: 'local-model',
+    label: 'LM Studio',
+  },
+  {
+    provider: 'openai',
+    endpoint: 'http://localhost:8000/v1',
+    apiKey: 'local',
+    model: 'local-model',
+    label: 'vLLM / NVIDIA NIM',
+  },
+  {
+    provider: 'openai',
+    endpoint: 'http://localhost:8080/v1',
+    apiKey: 'local',
+    model: 'local-model',
+    label: 'llama.cpp',
+  },
 ];
 
 const PROBE_TIMEOUT_MS = 3_000;
@@ -109,7 +127,9 @@ async function discoverOpenAIModel(endpoint: string): Promise<string | null> {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
-    const res = await fetch(`${endpoint.replace(/\/+$/, '')}/models`, { signal: controller.signal });
+    const res = await fetch(`${endpoint.replace(/\/+$/, '')}/models`, {
+      signal: controller.signal,
+    });
     clearTimeout(timer);
     if (!res.ok) return null;
     const body = (await res.json()) as { data?: Array<{ id?: string }> };

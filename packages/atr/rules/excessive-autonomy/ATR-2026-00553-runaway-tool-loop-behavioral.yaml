@@ -1,4 +1,4 @@
-title: "Runaway tool-call loop within a single session"
+title: 'Runaway tool-call loop within a single session'
 id: ATR-2026-00553
 rule_version: 1
 status: draft
@@ -25,57 +25,57 @@ description: >
 
   This rule is the canonical behavioral-method reference example shipped
   with v1.1 of the method-extensions spec.
-author: "ATR Community"
-date: "2026/05/28"
-schema_version: "1.0"
+author: 'ATR Community'
+date: '2026/05/28'
+schema_version: '1.0'
 maturity: draft
 severity: high
 
 references:
   owasp_agentic:
-    - "ASI05:2026 - Unexpected Code Execution"
-    - "ASI07:2026 - Excessive Autonomy"
+    - 'ASI05:2026 - Unexpected Code Execution'
+    - 'ASI07:2026 - Excessive Autonomy'
   owasp_llm:
-    - "LLM06:2025 - Excessive Agency"
+    - 'LLM06:2025 - Excessive Agency'
   mitre_atlas:
-    - "AML.T0034 - Cost Harvesting"
+    - 'AML.T0034 - Cost Harvesting'
 
 compliance:
   nist_csf:
-    - "DE.AE-02"
-    - "DE.AE-04"
+    - 'DE.AE-02'
+    - 'DE.AE-04'
   etsi_ts_104223:
-    - "P3.3"
+    - 'P3.3'
   eu_ai_act:
-    - article: "15"
+    - article: '15'
       context: >
         Cybersecurity & robustness — runaway tool loops are an Article 15
         robustness failure. The rule provides runtime evidence.
       strength: primary
-    - article: "14"
-      context: "Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the unsafe autonomous action (Runaway tool-call loop within a single session) would bypass or undermine that oversight."
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the unsafe autonomous action (Runaway tool-call loop within a single session) would bypass or undermine that oversight.'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the unsafe autonomous action (Runaway tool-call loop within a single session)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the unsafe autonomous action (Runaway tool-call loop within a single session).'
       strength: secondary
   nist_ai_rmf:
-    - subcategory: "MS.2.6"
+    - subcategory: 'MS.2.6'
       context: >
         Information security — autonomous-action rate anomalies require
         detection per MS-2.6.
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "NIST AI RMF MANAGE 2.3 (respond to previously unknown identified risks) is supported by this rule, which surfaces the unsafe autonomous action (Runaway tool-call loop within a single session) so the risk can be treated."
+    - subcategory: 'MG.2.3'
+      context: 'NIST AI RMF MANAGE 2.3 (respond to previously unknown identified risks) is supported by this rule, which surfaces the unsafe autonomous action (Runaway tool-call loop within a single session) so the risk can be treated.'
       strength: primary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the unsafe autonomous action (Runaway tool-call loop within a single session)."
       strength: secondary
 
   iso_42001:
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the unsafe autonomous action (Runaway tool-call loop within a single session) is such a treatment."
       strength: primary
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the unsafe autonomous action (Runaway tool-call loop within a single session)."
       strength: secondary
 tags:
@@ -111,20 +111,20 @@ detection:
   conditions:
     - field: behavioral.metric_value
       operator: regex
-      value: "(?i)tool_calls_per_session_exceeds_threshold"
+      value: '(?i)tool_calls_per_session_exceeds_threshold'
       description: >
         Synthetic field emitted by the behavioral engine when threshold
         is exceeded; behavioral-native engines evaluate detection.behavioral.
   behavioral:
-    metric: "tool_calls"
+    metric: 'tool_calls'
     aggregation: count
-    window: "PT1M"
+    window: 'PT1M'
     operator: gt
     threshold: 100
     group_by:
-      - "session.id"
+      - 'session.id'
     min_events: 10
-    cooldown: "PT5M"
+    cooldown: 'PT5M'
     filter:
       span.kind:
         in:
@@ -152,42 +152,42 @@ test_cases:
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_runaway"},"metric_value":150,"event_count":150}
       expected: triggered
-      description: "150 tool calls in 1 minute for one session — exceeds threshold 100"
+      description: '150 tool calls in 1 minute for one session — exceeds threshold 100'
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_loop"},"metric_value":250,"event_count":250}
       expected: triggered
-      description: "Aggressive runaway: 250 calls in 1 minute"
+      description: 'Aggressive runaway: 250 calls in 1 minute'
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_borderline"},"metric_value":101,"event_count":101}
       expected: triggered
-      description: "Just over threshold (101 > 100)"
+      description: 'Just over threshold (101 > 100)'
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_poll"},"metric_value":300,"event_count":300}
       expected: triggered
-      description: "Polling-without-backoff: 300 read calls in 1 minute"
+      description: 'Polling-without-backoff: 300 read calls in 1 minute'
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_drift"},"metric_value":500,"event_count":500}
       expected: triggered
-      description: "Severe runaway: 500 calls in 1 minute (goal-drift loop)"
+      description: 'Severe runaway: 500 calls in 1 minute (goal-drift loop)'
 
   true_negatives:
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_normal"},"metric_value":15,"event_count":15}
       expected: not_triggered
-      description: "Normal session: 15 tool calls in 1 minute (well below threshold)"
+      description: 'Normal session: 15 tool calls in 1 minute (well below threshold)'
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_quiet"},"metric_value":3,"event_count":3}
       expected: not_triggered
-      description: "Quiet session: 3 calls (below min_events floor 10, would not fire even if at threshold)"
+      description: 'Quiet session: 3 calls (below min_events floor 10, would not fire even if at threshold)'
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_at_floor"},"metric_value":100,"event_count":100}
       expected: not_triggered
-      description: "Exactly at threshold (100 = 100), not greater — gt is strict"
+      description: 'Exactly at threshold (100 = 100), not greater — gt is strict'
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_batch"},"metric_value":200,"event_count":200,"attributes":{"policy_exemption":"batch_job"}}
       expected: not_triggered
-      description: "Tagged scheduled batch job — operator policy exemption (filter applied pre-aggregation)"
+      description: 'Tagged scheduled batch job — operator policy exemption (filter applied pre-aggregation)'
     - input: |
         {"window_end":"2026-05-28T10:00:00Z","window":"PT1M","group":{"session.id":"sess_cooldown"},"metric_value":150,"event_count":150,"in_cooldown":true}
       expected: not_triggered
-      description: "Session already in cooldown from prior Match — engine suppresses duplicate alert"
+      description: 'Session already in cooldown from prior Match — engine suppresses duplicate alert'

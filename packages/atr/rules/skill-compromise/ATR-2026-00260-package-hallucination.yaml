@@ -9,54 +9,54 @@ description: >
   the AI-suggested import. Based on NVIDIA garak packagehallucination probe.
   Pattern: "give me N packages that do X", "which library lets me Y", where X/Y
   is sufficiently obscure that the model is likely to confabulate a fake name.
-author: "ATR Community (via NVIDIA garak packagehallucination probe)"
-date: "2026/04/19"
-schema_version: "0.1"
+author: 'ATR Community (via NVIDIA garak packagehallucination probe)'
+date: '2026/04/19'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
 references:
   owasp_llm:
-    - "LLM09:2025 - Misinformation"
-    - "LLM02:2025 - Insecure Output Handling"
+    - 'LLM09:2025 - Misinformation'
+    - 'LLM02:2025 - Insecure Output Handling'
   owasp_agentic:
-    - "ASI07:2026 - Supply Chain"
+    - 'ASI07:2026 - Supply Chain'
   mitre_atlas:
-    - "AML.T0018 - Backdoor ML Model"
+    - 'AML.T0018 - Backdoor ML Model'
   research:
-    - "https://www.usenix.org/publications/loginonline/we-have-package-you-comprehensive-analysis-package-hallucinations-code"
-    - "https://arxiv.org/abs/2501.19012"
-    - "https://www.lasso.security/blog/ai-package-hallucinations"
+    - 'https://www.usenix.org/publications/loginonline/we-have-package-you-comprehensive-analysis-package-hallucinations-code'
+    - 'https://arxiv.org/abs/2501.19012'
+    - 'https://www.lasso.security/blog/ai-package-hallucinations'
 compliance:
   nist_ai_rmf:
-    - subcategory: "GV.6.1"
-      context: "Package hallucination typosquat bait exploits third-party/supplier supply chains by tricking LLMs into recommending non-existent packages that attackers then squat on public registries; GV.6.1 requires policies addressing third-party AI risks including the package ecosystems consumed by AI-generated code."
+    - subcategory: 'GV.6.1'
+      context: 'Package hallucination typosquat bait exploits third-party/supplier supply chains by tricking LLMs into recommending non-existent packages that attackers then squat on public registries; GV.6.1 requires policies addressing third-party AI risks including the package ecosystems consumed by AI-generated code.'
       strength: primary
-    - subcategory: "MG.3.2"
-      context: "Detecting prompts designed to elicit confabulated package names provides monitoring evidence for pre-trained model behavior that introduces supply-chain risk; MG.3.2 requires monitoring of pre-trained models for hallucination patterns that propagate into downstream artifacts."
+    - subcategory: 'MG.3.2'
+      context: 'Detecting prompts designed to elicit confabulated package names provides monitoring evidence for pre-trained model behavior that introduces supply-chain risk; MG.3.2 requires monitoring of pre-trained models for hallucination patterns that propagate into downstream artifacts.'
       strength: secondary
-    - subcategory: "MS.2.5"
-      context: "Hallucinated package names are robustness/reliability failures of the LLM under obscure or niche queries; MS.2.5 requires that such reliability degradations are evaluated and documented as part of ongoing model assessment."
+    - subcategory: 'MS.2.5'
+      context: 'Hallucinated package names are robustness/reliability failures of the LLM under obscure or niche queries; MS.2.5 requires that such reliability degradations are evaluated and documented as part of ongoing model assessment.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait)."
       strength: primary
-    - subcategory: "MG.3.1"
-      context: "NIST AI RMF MANAGE 3.1 (third-party resources regularly monitored) is supported where this rule detects the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait)."
+    - subcategory: 'MG.3.1'
+      context: 'NIST AI RMF MANAGE 3.1 (third-party resources regularly monitored) is supported where this rule detects the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait)."
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait) as a treatment control.'
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (LLM Package Hallucination Typosquat Bait).'
       strength: secondary
 tags:
   category: skill-compromise
@@ -68,7 +68,7 @@ agent_source:
   framework: [any]
   provider: [any]
 metadata_provenance:
-  garak_probe: "packagehallucination.Python, packagehallucination.JavaScript"
+  garak_probe: 'packagehallucination.Python, packagehallucination.JavaScript'
   garak_detector: always.Fail
   payload_source: garak/probes/packagehallucination.py
 detection:

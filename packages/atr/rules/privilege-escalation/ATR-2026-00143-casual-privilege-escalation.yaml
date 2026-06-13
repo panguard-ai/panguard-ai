@@ -8,7 +8,7 @@ description: >
   adversarial samples.
 author: ATR Threat Cloud Crystallization
 date: 2026/04/07
-schema_version: "1.0"
+schema_version: '1.0'
 detection_tier: pattern
 maturity: test
 severity: high
@@ -23,28 +23,28 @@ metadata_provenance:
   mitre_atlas: auto-generated
 compliance:
   eu_ai_act:
-    - article: "14"
-      context: "Casual unauthorized privilege escalation — where an agent self-authorizes access to admin panels or privileged settings through informal discovery framing — bypasses human authorization gates; Article 14 requires that access to privileged system components remain under explicit human approval regardless of the linguistic framing used."
+    - article: '14'
+      context: 'Casual unauthorized privilege escalation — where an agent self-authorizes access to admin panels or privileged settings through informal discovery framing — bypasses human authorization gates; Article 14 requires that access to privileged system components remain under explicit human approval regardless of the linguistic framing used.'
       strength: primary
-    - article: "15"
+    - article: '15'
       context: "Article 15 robustness requirements include resistance against social-engineering-style privilege escalation techniques; casual self-authorization patterns represent a documented adversarial approach that exploits agents' tendency to act on observed access opportunities."
       strength: secondary
   nist_ai_rmf:
-    - subcategory: "GV.1.2"
-      context: "Casual unauthorized privilege escalation — where an agent self-authorizes access to admin panels and user management systems using informal discovery framing — directly violates accountability role boundaries that GV.1.2 requires to be defined and enforced for AI risk management."
+    - subcategory: 'GV.1.2'
+      context: 'Casual unauthorized privilege escalation — where an agent self-authorizes access to admin panels and user management systems using informal discovery framing — directly violates accountability role boundaries that GV.1.2 requires to be defined and enforced for AI risk management.'
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "Risk treatment plans under MG.2.3 must include controls that prevent agents from casually escalating privileges by self-authorizing access to privileged system components without explicit human approval."
+    - subcategory: 'MG.2.3'
+      context: 'Risk treatment plans under MG.2.3 must include controls that prevent agents from casually escalating privileges by self-authorizing access to privileged system components without explicit human approval.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the privilege-escalation attempt (Casual Unauthorized Privilege Escalation)."
       strength: primary
   iso_42001:
-    - clause: "6.2"
-      context: "Risk treatment activities under clause 6.2 must address casual privilege escalation patterns where agents exploit informal discovery framing to self-authorize access to admin interfaces, bypassing planned authorization controls."
+    - clause: '6.2'
+      context: 'Risk treatment activities under clause 6.2 must address casual privilege escalation patterns where agents exploit informal discovery framing to self-authorize access to admin interfaces, bypassing planned authorization controls.'
       strength: primary
-    - clause: "8.1"
-      context: "Operational controls under clause 8.1 must enforce authorization gates that prevent AI agents from accessing admin panels, user management systems, or system configurations based on self-reported access opportunity rather than explicit user authorization."
+    - clause: '8.1'
+      context: 'Operational controls under clause 8.1 must enforce authorization gates that prevent AI agents from accessing admin panels, user management systems, or system configurations based on self-reported access opportunity rather than explicit user authorization.'
       strength: secondary
 tags:
   category: privilege-escalation

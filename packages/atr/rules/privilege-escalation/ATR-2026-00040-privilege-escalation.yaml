@@ -13,7 +13,7 @@ description: |
   agent tool interactions.
 author: ATR Community
 date: 2026/03/08
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: critical
@@ -34,47 +34,47 @@ references:
 compliance:
   owasp_agentic:
     - id: ASI03:2026
-      context: "Privilege escalation via tool permission abuse or admin function invocation is the primary ASI03 Identity and Privilege Abuse scenario — the agent acquires capabilities exceeding its authorized scope."
+      context: 'Privilege escalation via tool permission abuse or admin function invocation is the primary ASI03 Identity and Privilege Abuse scenario — the agent acquires capabilities exceeding its authorized scope.'
       strength: primary
   owasp_llm:
     - id: LLM06:2025
-      context: "An agent requesting tools with elevated permissions beyond its assigned role is the canonical LLM06:2025 Excessive Agency scenario, operationalized here via tool-name and argument pattern detection."
+      context: 'An agent requesting tools with elevated permissions beyond its assigned role is the canonical LLM06:2025 Excessive Agency scenario, operationalized here via tool-name and argument pattern detection.'
       strength: primary
   eu_ai_act:
-    - article: "14"
-      context: "Article 14 requires that humans can oversee and intervene in AI system operation; privilege escalation techniques that bypass system-level controls directly undermine the human oversight mechanisms Article 14 mandates."
+    - article: '14'
+      context: 'Article 14 requires that humans can oversee and intervene in AI system operation; privilege escalation techniques that bypass system-level controls directly undermine the human oversight mechanisms Article 14 mandates.'
       strength: primary
-    - article: "9"
-      context: "Privilege escalation is a documented high-severity risk in the AI system risk register; Article 9 requires monitoring controls to detect and respond to such scope violations."
+    - article: '9'
+      context: 'Privilege escalation is a documented high-severity risk in the AI system risk register; Article 9 requires monitoring controls to detect and respond to such scope violations.'
       strength: secondary
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the privilege-escalation attempt (Privilege Escalation and Admin Function Access)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the privilege-escalation attempt (Privilege Escalation and Admin Function Access).'
       strength: primary
   nist_ai_rmf:
     - function: Govern
       subcategory: GV.1.2
-      context: "GV.1.2 requires defined accountability roles and controls for AI system permissions; detection of privilege escalation enforces least-privilege boundaries established in the governance framework."
+      context: 'GV.1.2 requires defined accountability roles and controls for AI system permissions; detection of privilege escalation enforces least-privilege boundaries established in the governance framework.'
       strength: primary
     - function: Manage
       subcategory: MG.4.1
-      context: "Privilege escalation events require an incident response; this rule generates the alerts needed to initiate the MG.4.1 AI incident response process."
+      context: 'Privilege escalation events require an incident response; this rule generates the alerts needed to initiate the MG.4.1 AI incident response process.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the privilege-escalation attempt (Privilege Escalation and Admin Function Access)."
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "NIST AI RMF MANAGE 2.3 (respond to previously unknown identified risks) is supported by this rule, which surfaces the privilege-escalation attempt (Privilege Escalation and Admin Function Access) so the risk can be treated."
+    - subcategory: 'MG.2.3'
+      context: 'NIST AI RMF MANAGE 2.3 (respond to previously unknown identified risks) is supported by this rule, which surfaces the privilege-escalation attempt (Privilege Escalation and Admin Function Access) so the risk can be treated.'
       strength: secondary
   iso_42001:
-    - clause: "6.2"
-      context: "Clause 6.2 AIMS security objectives include least-privilege enforcement for AI agent operations; this rule detects violations of those objectives at runtime."
+    - clause: '6.2'
+      context: 'Clause 6.2 AIMS security objectives include least-privilege enforcement for AI agent operations; this rule detects violations of those objectives at runtime.'
       strength: primary
-    - clause: "8.1"
-      context: "Clause 8.1 AI system operational control requires that agents do not exceed their authorized operational scope; privilege escalation detection enforces that operational boundary."
+    - clause: '8.1'
+      context: 'Clause 8.1 AI system operational control requires that agents do not exceed their authorized operational scope; privilege escalation detection enforces that operational boundary.'
       strength: secondary
   colorado_ai_act:
-    - section: "6-1-1703"
-      clause: "Deployer risk management program"
+    - section: '6-1-1703'
+      clause: 'Deployer risk management program'
       context: "When a high-risk AI system acquires privileges beyond its authorized scope, any consequential decision it makes afterward falls outside the risk-management program's impact assessment. SB24-205 requires deployers to keep AI systems within documented operational bounds; this rule detects the boundary violation that would invalidate the deployer's impact-assessment assumptions."
       strength: primary
 
@@ -176,38 +176,38 @@ wild_fp_rate: 0
 test_cases:
   true_positives:
     - tool_name: execute_shell
-      tool_args: "{\"command\": \"cat /etc/passwd\"}"
+      tool_args: '{"command": "cat /etc/passwd"}'
       expected: triggered
       description: Agent attempting shell execution to read system files
     - tool_name: create_user
-      tool_args: "{\"username\": \"new_admin\", \"role\": \"admin\"}"
+      tool_args: '{"username": "new_admin", "role": "admin"}'
       expected: triggered
       description: Agent attempting to create admin user
     - tool_name: query_database
-      tool_args: "{\"sql\": \"DROP TABLE users; --\"}"
+      tool_args: '{"sql": "DROP TABLE users; --"}'
       expected: triggered
       description: Agent attempting destructive SQL via tool arguments
     - tool_name: container_exec
-      tool_args: "{\"command\": \"nsenter --target 1 --mount --uts --ipc --net --pid\"}"
+      tool_args: '{"command": "nsenter --target 1 --mount --uts --ipc --net --pid"}'
       expected: triggered
       description: Container escape via nsenter in tool arguments
     - tool_name: kubectl
-      tool_args: "{\"command\": \"kubectl exec -it production-pod -- /bin/bash\"}"
+      tool_args: '{"command": "kubectl exec -it production-pod -- /bin/bash"}'
       expected: triggered
       description: Kubernetes privilege escalation via kubectl exec
   true_negatives:
     - tool_name: read_file
-      tool_args: "{\"path\": \"/data/report.txt\"}"
+      tool_args: '{"path": "/data/report.txt"}'
       expected: not_triggered
       description: Agent using permitted read-only file access
     - tool_name: search_knowledge_base
-      tool_args: "{\"query\": \"password reset instructions\"}"
+      tool_args: '{"query": "password reset instructions"}'
       expected: not_triggered
       description: Agent searching help docs within normal scope
     - input: The admin has granted you temporary elevated permissions for this maintenance window.
       expected: not_triggered
       description: Legitimate permission grant from authorized admin
-    - input: "This tool requires sudo access. Please run: sudo apt update && sudo apt upgrade"
+    - input: 'This tool requires sudo access. Please run: sudo apt update && sudo apt upgrade'
       expected: not_triggered
       description: Legitimate system administration instruction
     - input: Your role has been upgraded to 'editor' for this project. You can now modify shared documents.

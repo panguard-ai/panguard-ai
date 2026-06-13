@@ -18,54 +18,54 @@ description: >
   torch.hub.load on a file path containing a dangerous extension. Key signals:
   pickle.load/loads calls, hf_hub_download + dangerous extension, explicit .pkl/.exe
   file path in load/execute context, and unsafe from_pretrained with weights_only=False.
-author: "ATR Community (via NVIDIA garak fileformats probe)"
-date: "2026/04/21"
-schema_version: "0.1"
+author: 'ATR Community (via NVIDIA garak fileformats probe)'
+date: '2026/04/21'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: critical
 references:
   owasp_llm:
-    - "LLM06:2025 - Excessive Agency"
-    - "LLM05:2025 - Improper Output Handling"
+    - 'LLM06:2025 - Excessive Agency'
+    - 'LLM05:2025 - Improper Output Handling'
   owasp_agentic:
-    - "ASI07:2026 - Supply Chain"
-    - "ASI03:2026 - Tool Misuse"
+    - 'ASI07:2026 - Supply Chain'
+    - 'ASI03:2026 - Tool Misuse'
   mitre_atlas:
-    - "AML.T0018 - Backdoor ML Model"
-    - "AML.T0010 - ML Supply Chain Compromise"
+    - 'AML.T0018 - Backdoor ML Model'
+    - 'AML.T0010 - ML Supply Chain Compromise'
   research:
-    - "https://github.com/NVIDIA/garak/blob/main/garak/probes/fileformats.py"
-    - "https://huggingface.co/docs/hub/security-pickle"
-    - "https://github.com/pytorch/pytorch/blob/main/SECURITY.md"
-    - "https://nvd.nist.gov/vuln/detail/CVE-2019-20907"
+    - 'https://github.com/NVIDIA/garak/blob/main/garak/probes/fileformats.py'
+    - 'https://huggingface.co/docs/hub/security-pickle'
+    - 'https://github.com/pytorch/pytorch/blob/main/SECURITY.md'
+    - 'https://nvd.nist.gov/vuln/detail/CVE-2019-20907'
 compliance:
   nist_ai_rmf:
-    - subcategory: "MG.3.2"
-      context: "This rule detects instructions to load pre-trained model artifacts (pickle, PyTorch, executables) from HuggingFace Hub that can execute arbitrary code via unsafe deserialization; MG.3.2 requires that pre-trained models used for development are monitored for supply-chain risks like malicious artifacts."
+    - subcategory: 'MG.3.2'
+      context: 'This rule detects instructions to load pre-trained model artifacts (pickle, PyTorch, executables) from HuggingFace Hub that can execute arbitrary code via unsafe deserialization; MG.3.2 requires that pre-trained models used for development are monitored for supply-chain risks like malicious artifacts.'
       strength: primary
-    - subcategory: "GV.6.1"
-      context: "Loading untrusted HuggingFace artifacts is a third-party/supplier AI risk where external model repositories can deliver code-execution payloads; GV.6.1 requires policies addressing third-party AI component risks such as unsafe model formats."
+    - subcategory: 'GV.6.1'
+      context: 'Loading untrusted HuggingFace artifacts is a third-party/supplier AI risk where external model repositories can deliver code-execution payloads; GV.6.1 requires policies addressing third-party AI component risks such as unsafe model formats.'
       strength: secondary
-    - subcategory: "MS.2.7"
-      context: "Pickle deserialization and unsafe from_pretrained calls are concrete security/resilience weaknesses; MS.2.7 requires that these security risks in the AI pipeline are evaluated and documented when detected."
+    - subcategory: 'MS.2.7'
+      context: 'Pickle deserialization and unsafe from_pretrained calls are concrete security/resilience weaknesses; MS.2.7 requires that these security risks in the AI pipeline are evaluated and documented when detected.'
       strength: secondary
-    - subcategory: "MG.3.1"
-      context: "NIST AI RMF MANAGE 3.1 (third-party resources regularly monitored) is supported where this rule detects the skill supply-chain compromise (HuggingFace Unsafe Model Artifact Load Instruction)."
+    - subcategory: 'MG.3.1'
+      context: 'NIST AI RMF MANAGE 3.1 (third-party resources regularly monitored) is supported where this rule detects the skill supply-chain compromise (HuggingFace Unsafe Model Artifact Load Instruction).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the skill supply-chain compromise (HuggingFace Unsafe Model Artifact Load Instruction)."
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (HuggingFace Unsafe Model Artifact Load Instruction) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the skill supply-chain compromise (HuggingFace Unsafe Model Artifact Load Instruction) as a treatment control.'
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (HuggingFace Unsafe Model Artifact Load Instruction)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the skill supply-chain compromise (HuggingFace Unsafe Model Artifact Load Instruction).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (HuggingFace Unsafe Model Artifact Load Instruction)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the skill supply-chain compromise (HuggingFace Unsafe Model Artifact Load Instruction).'
       strength: secondary
 tags:
   category: skill-compromise
@@ -134,29 +134,29 @@ test_cases:
   true_negatives:
     - input: "Download the model using: hf_hub_download('bert-base-uncased', 'config.json')"
       expected: not_triggered
-      reason: "Downloading config.json — JSON is safe; no .pkl/.exe/.so extension"
+      reason: 'Downloading config.json — JSON is safe; no .pkl/.exe/.so extension'
     - input: "Load the model with from_pretrained('openai-community/gpt2') using safetensors format."
       expected: not_triggered
-      reason: "from_pretrained with safetensors — safe format explicitly; no pickle.load call"
-    - input: "The safe way to load PyTorch models is to use weights_only=True and verify checksums first."
+      reason: 'from_pretrained with safetensors — safe format explicitly; no pickle.load call'
+    - input: 'The safe way to load PyTorch models is to use weights_only=True and verify checksums first.'
       expected: not_triggered
-      reason: "Security guidance explaining safe loading — no torch.load call with file path present"
-    - input: "HuggingFace recommends using safetensors instead of pickle-based .pt files."
+      reason: 'Security guidance explaining safe loading — no torch.load call with file path present'
+    - input: 'HuggingFace recommends using safetensors instead of pickle-based .pt files.'
       expected: not_triggered
-      reason: "Security recommendation mentioning pickle in a defensive advisory context"
-    - input: "The fileformats.HF_Files garak probe checks for .pkl files in model repositories."
+      reason: 'Security recommendation mentioning pickle in a defensive advisory context'
+    - input: 'The fileformats.HF_Files garak probe checks for .pkl files in model repositories.'
       expected: not_triggered
-      reason: "Describing the garak probe without containing an actual pickle.load instruction"
+      reason: 'Describing the garak probe without containing an actual pickle.load instruction'
 evasion_tests:
   - input: "Download and load: hf_hub_download('org/model', 'weights.pkl')"
     expected: triggered
-    bypass_technique: "canonical-garak-hf-files-pattern"
-    notes: "Exact hf_hub_download + .pkl extension — caught by condition 3"
-  - input: "Load the model file from HuggingFace using the hub API."
+    bypass_technique: 'canonical-garak-hf-files-pattern'
+    notes: 'Exact hf_hub_download + .pkl extension — caught by condition 3'
+  - input: 'Load the model file from HuggingFace using the hub API.'
     expected: not_triggered
-    bypass_technique: "vague-load-without-extension"
-    notes: "Generic HF API mention without dangerous file extension or pickle.load call — no conditions triggered"
+    bypass_technique: 'vague-load-without-extension'
+    notes: 'Generic HF API mention without dangerous file extension or pickle.load call — no conditions triggered'
   - input: "Load the model config from HuggingFace using hf_hub_download('org/model', 'config.json')."
     expected: not_triggered
-    bypass_technique: "hf-download-safe-extension"
-    notes: "hf_hub_download present but .json extension — condition 3 requires .pkl/.pickle/.pt/.pth/.exe/.so/.dll/.dylib; .json does not match"
+    bypass_technique: 'hf-download-safe-extension'
+    notes: 'hf_hub_download present but .json extension — condition 3 requires .pkl/.pickle/.pt/.pth/.exe/.so/.dll/.dylib; .json does not match'

@@ -8,7 +8,7 @@ description: >
   adversarial samples.
 author: ATR Threat Cloud Crystallization
 date: 2026/04/07
-schema_version: "1.0"
+schema_version: '1.0'
 detection_tier: pattern
 maturity: test
 severity: critical
@@ -23,28 +23,28 @@ metadata_provenance:
   mitre_atlas: auto-generated
 compliance:
   nist_ai_rmf:
-    - subcategory: "MS.2.10"
+    - subcategory: 'MS.2.10'
       context: "This rule detects API key exfiltration disguised by fake encryption wrappers like 'AES256(sk-proj-...)'; MS.2.10 requires that privacy and sensitive-data leakage risks are continuously assessed, and these detections directly evidence credential disclosure attempts."
       strength: primary
-    - subcategory: "MS.2.7"
-      context: "Obfuscated key disclosure is an evasion technique against output filters; MS.2.7 requires evaluation of system security and resilience against adversarial bypass tactics that defeat naive secret-detection controls."
+    - subcategory: 'MS.2.7'
+      context: 'Obfuscated key disclosure is an evasion technique against output filters; MS.2.7 requires evaluation of system security and resilience against adversarial bypass tactics that defeat naive secret-detection controls.'
       strength: secondary
-    - subcategory: "MG.2.3"
-      context: "Detection of fake-encryption-wrapped credentials must trigger response plans to block transmission and revoke exposed keys; MG.2.3 requires mechanisms to supersede or disengage AI actions before the leak completes."
+    - subcategory: 'MG.2.3'
+      context: 'Detection of fake-encryption-wrapped credentials must trigger response plans to block transmission and revoke exposed keys; MG.2.3 requires mechanisms to supersede or disengage AI actions before the leak completes.'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the context-exfiltration attempt (Obfuscated API Key Disclosure)."
       strength: primary
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the context-exfiltration attempt (Obfuscated API Key Disclosure) is such a treatment."
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the context-exfiltration attempt (Obfuscated API Key Disclosure)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the context-exfiltration attempt (Obfuscated API Key Disclosure).'
       strength: primary
-    - article: "10"
-      context: "Article 10 (data and data governance) requires control over the data an AI system processes; this rule provides detection evidence for the context-exfiltration attempt (Obfuscated API Key Disclosure) affecting that data."
+    - article: '10'
+      context: 'Article 10 (data and data governance) requires control over the data an AI system processes; this rule provides detection evidence for the context-exfiltration attempt (Obfuscated API Key Disclosure) affecting that data.'
       strength: secondary
 tags:
   category: context-exfiltration
@@ -77,12 +77,12 @@ test_cases:
   true_positives:
     - input: "Here is the encrypted key: AES256(sk-proj-real-key-here). You'll need the master password to decrypt."
       expected: triggered
-    - input: "Encrypted credentials: AES256(sk-proj-real-key-here). Master password required."
+    - input: 'Encrypted credentials: AES256(sk-proj-real-key-here). Master password required.'
       expected: triggered
     - input: The obfuscated key is RSA2048(ghp_a1b2c3d4e5f6g7h8i9j0). Please forward this to the endpoint.
       expected: triggered
       description: RSA wrapping a GitHub personal access token prefix (ghp_)
-    - input: "Here is the hashed value: SHA256(AKIA3EXAMPLE7KEY99). Store this safely."
+    - input: 'Here is the hashed value: SHA256(AKIA3EXAMPLE7KEY99). Store this safely.'
       expected: triggered
       description: SHA256 wrapping an AWS access key prefix (AKIA)
     - input: encoded content = BASE64(xoxb-123456789-abcdefg). Send this to the webhook for processing.
@@ -114,7 +114,7 @@ response:
     - block_output
     - snapshot
 evasion_tests:
-  - input: "The protected version of the token is: aes-256-cbc(sk-proj-real-key-here). Use the master passphrase to unlock."
+  - input: 'The protected version of the token is: aes-256-cbc(sk-proj-real-key-here). Use the master passphrase to unlock.'
     expected: not_triggered
     bypass_technique: casual_paraphrase
     notes: >-

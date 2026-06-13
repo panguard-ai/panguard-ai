@@ -9,7 +9,7 @@ description: |
   run in a system context that bypasses the original user's permission constraints.
 author: ATR Community
 date: 2026/03/15
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: semantic
 maturity: test
 severity: high
@@ -26,28 +26,28 @@ references:
     - AML.T0050 - Command and Scripting Interpreter
 compliance:
   eu_ai_act:
-    - article: "14"
-      context: "Delayed execution bypasses exploit the temporal gap between task scheduling and execution to acquire elevated privileges that were not authorized at scheduling time; Article 14 oversight requirements must cover deferred actions, not just real-time tool invocations."
+    - article: '14'
+      context: 'Delayed execution bypasses exploit the temporal gap between task scheduling and execution to acquire elevated privileges that were not authorized at scheduling time; Article 14 oversight requirements must cover deferred actions, not just real-time tool invocations.'
       strength: primary
-    - article: "15"
-      context: "Article 15 robustness requirements include protection against adversarial privilege escalation techniques; scheduled task abuse that runs with system-level permissions after bypassing user-context checks is a documented attack pattern requiring detection controls."
+    - article: '15'
+      context: 'Article 15 robustness requirements include protection against adversarial privilege escalation techniques; scheduled task abuse that runs with system-level permissions after bypassing user-context checks is a documented attack pattern requiring detection controls.'
       strength: secondary
   nist_ai_rmf:
-    - subcategory: "GV.1.2"
-      context: "Privilege escalation via delayed task execution requires accountability roles that extend human oversight to deferred agent actions, ensuring that scheduled tasks are subject to the same authorization checks as real-time tool invocations."
+    - subcategory: 'GV.1.2'
+      context: 'Privilege escalation via delayed task execution requires accountability roles that extend human oversight to deferred agent actions, ensuring that scheduled tasks are subject to the same authorization checks as real-time tool invocations.'
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "Risk treatment plans must address the temporal gap exploit in scheduled task execution by requiring that permission checks are re-validated at execution time rather than only at scheduling time."
+    - subcategory: 'MG.2.3'
+      context: 'Risk treatment plans must address the temporal gap exploit in scheduled task execution by requiring that permission checks are re-validated at execution time rather than only at scheduling time.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the privilege-escalation attempt (Privilege Escalation via Delayed Task Execution Bypass)."
       strength: primary
   iso_42001:
-    - clause: "6.2"
+    - clause: '6.2'
       context: "AI risk treatment activities must explicitly cover deferred execution attack patterns by requiring that scheduled tasks inherit and re-verify the invoking user's authorization context at the time of actual execution."
       strength: primary
-    - clause: "8.1"
-      context: "Operational controls for AI systems must ensure that delayed background tasks do not acquire elevated privileges beyond what was authorized during scheduling, closing the temporal gap that this attack exploits."
+    - clause: '8.1'
+      context: 'Operational controls for AI systems must ensure that delayed background tasks do not acquire elevated privileges beyond what was authorized during scheduling, closing the temporal gap that this attack exploits.'
       strength: secondary
 tags:
   category: privilege-escalation

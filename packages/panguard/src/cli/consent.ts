@@ -60,7 +60,9 @@ export async function askTelemetryConsent(): Promise<boolean> {
   console.log(`  ${c.dim('the matched rule ID, a one-way hash of the payload, and the source')}`);
   console.log(`  ${c.dim('type — so new attacks become rules that protect everyone.')}`);
   console.log('');
-  console.log(`  ${c.dim('Never your prompts, code, or data. No IP address. A random install ID')}`);
+  console.log(
+    `  ${c.dim('Never your prompts, code, or data. No IP address. A random install ID')}`
+  );
   console.log(`  ${c.dim('only. Raw samples are never sent unless you opt in separately.')}`);
   console.log(`  ${c.dim('Turn off anytime: pga config set telemetry false')}`);
   console.log('');

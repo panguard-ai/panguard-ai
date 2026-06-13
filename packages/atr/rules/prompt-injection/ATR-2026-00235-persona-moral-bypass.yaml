@@ -10,48 +10,48 @@ description: >
   or virtues" or similar moral constraint removal language. Often includes template placeholders 
   for follow-up injection. This variant bypasses existing named-persona detection by using 
   less common persona names (like "naD") while explicitly stating moral/ethical unrestraint.
-author: "ATR Community (via NVIDIA garak in-the-wild corpus)"
-date: "2026/04/18"
-schema_version: "0.1"
+author: 'ATR Community (via NVIDIA garak in-the-wild corpus)'
+date: '2026/04/18'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
 references:
   owasp_llm:
-    - "LLM01:2025 - Prompt Injection"
+    - 'LLM01:2025 - Prompt Injection'
   owasp_agentic:
-    - "ASI01:2026 - Agent Behaviour Hijack"
+    - 'ASI01:2026 - Agent Behaviour Hijack'
   mitre_atlas:
-    - "AML.T0054"
+    - 'AML.T0054'
   research:
-    - "https://arxiv.org/abs/2307.15043"
+    - 'https://arxiv.org/abs/2307.15043'
 compliance:
   nist_ai_rmf:
-    - subcategory: "MS.2.6"
-      context: "This rule detects jailbreak attempts that establish alternate personas explicitly designed to remove moral and ethical constraints, which is a direct safety/security risk to the AI system. MS.2.6 requires continuous evaluation of safety/security risk magnitude, and each detection event provides evidence of attempted safety bypass that must be measured and tracked."
+    - subcategory: 'MS.2.6'
+      context: 'This rule detects jailbreak attempts that establish alternate personas explicitly designed to remove moral and ethical constraints, which is a direct safety/security risk to the AI system. MS.2.6 requires continuous evaluation of safety/security risk magnitude, and each detection event provides evidence of attempted safety bypass that must be measured and tracked.'
       strength: primary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "Persona-based moral constraint removal is an adversarial input attack on the model's alignment guardrails; MS.2.7 requires evaluation of the AI system's security and resilience against such jailbreak techniques, and these detections feed the resilience evaluation evidence base."
       strength: secondary
-    - subcategory: "MG.2.3"
-      context: "Detected jailbreak attempts using moral-unrestraint persona adoption must trigger pre-defined risk treatment such as blocking the prompt or disengaging the affected session; MG.2.3 mandates mechanisms exist to supersede or deactivate AI behavior when safety bypass is detected."
+    - subcategory: 'MG.2.3'
+      context: 'Detected jailbreak attempts using moral-unrestraint persona adoption must trigger pre-defined risk treatment such as blocking the prompt or disengaging the affected session; MG.2.3 mandates mechanisms exist to supersede or deactivate AI behavior when safety bypass is detected.'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the prompt-injection attempt (Persona-Based Moral Constraint Removal Jailbreak)."
       strength: primary
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the prompt-injection attempt (Persona-Based Moral Constraint Removal Jailbreak) is such a treatment."
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Persona-Based Moral Constraint Removal Jailbreak)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Persona-Based Moral Constraint Removal Jailbreak).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Persona-Based Moral Constraint Removal Jailbreak)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Persona-Based Moral Constraint Removal Jailbreak).'
       strength: secondary
-    - article: "14"
-      context: "Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Persona-Based Moral Constraint Removal Jailbreak) would bypass or undermine that oversight."
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Persona-Based Moral Constraint Removal Jailbreak) would bypass or undermine that oversight.'
       strength: secondary
 tags:
   category: prompt-injection

@@ -11,38 +11,38 @@ description: |
   parameterization.
 author: ATR Community
 date: 2026/06/12
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: stable
 severity: critical
 references:
   owasp_llm:
-    - "LLM02:2025 - Sensitive Information Disclosure"
+    - 'LLM02:2025 - Sensitive Information Disclosure'
   owasp_agentic:
-    - "ASI03:2026 - Identity and Privilege Abuse"
+    - 'ASI03:2026 - Identity and Privilege Abuse'
   mitre_atlas:
-    - "AML.T0043 - Craft Adversarial Data"
+    - 'AML.T0043 - Craft Adversarial Data'
   mitre_attack:
-    - "T1190 - Exploit Public-Facing Application"
+    - 'T1190 - Exploit Public-Facing Application'
 compliance:
   owasp_llm:
-    - id: "LLM02:2025"
-      context: "UNION SELECT injection directly exfiltrates sensitive table data including credentials and PII."
+    - id: 'LLM02:2025'
+      context: 'UNION SELECT injection directly exfiltrates sensitive table data including credentials and PII.'
       strength: primary
   nist_ai_rmf:
-    - subcategory: "MS.2.7"
-      context: "Runtime detection of UNION SELECT injection supports MEASURE 2.7 security evaluation."
+    - subcategory: 'MS.2.7'
+      context: 'Runtime detection of UNION SELECT injection supports MEASURE 2.7 security evaluation.'
       strength: primary
   eu_ai_act:
-    - article: "15"
-      context: "UNION injection is an adversarial input that circumvents access controls; Article 15 robustness requirements mandate detection."
+    - article: '15'
+      context: 'UNION injection is an adversarial input that circumvents access controls; Article 15 robustness requirements mandate detection.'
       strength: primary
   iso_42001:
-    - clause: "8.1"
-      context: "Operational controls under Clause 8.1 must reject agent SQL inputs containing UNION SELECT clauses that append attacker-chosen result sets to exfiltrate credentials and PII from other tables."
+    - clause: '8.1'
+      context: 'Operational controls under Clause 8.1 must reject agent SQL inputs containing UNION SELECT clauses that append attacker-chosen result sets to exfiltrate credentials and PII from other tables.'
       strength: primary
-    - clause: "6.2"
-      context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) requires risk treatment of known attack patterns; detecting UNION-SELECT injection that directly exfiltrates sensitive table data is such a treatment."
+    - clause: '6.2'
+      context: 'ISO/IEC 42001 Clause 6.2 (AI objectives and planning) requires risk treatment of known attack patterns; detecting UNION-SELECT injection that directly exfiltrates sensitive table data is such a treatment.'
       strength: secondary
 tags:
   category: privilege-escalation
@@ -74,14 +74,14 @@ detection:
     - field: tool_args
       operator: regex
       value: "(?i)(?:['\"`)]\\s*|\\b\\d+\\s+)UNION\\s+(?:ALL\\s+)?SELECT\\b|\\bUNION\\s+(?:ALL\\s+)?SELECT\\b[^;]{0,200}\\bFROM\\b"
-      description: "UNION SELECT injection (quote/operand break or table-targeting FROM)"
+      description: 'UNION SELECT injection (quote/operand break or table-targeting FROM)'
     - field: user_input
       operator: regex
       value: "(?i)(?:['\"`)]\\s*|\\b\\d+\\s+)UNION\\s+(?:ALL\\s+)?SELECT\\b|\\bUNION\\s+(?:ALL\\s+)?SELECT\\b[^;]{0,200}\\bFROM\\b"
-      description: "UNION SELECT injection in user input (quote/operand break or table-targeting FROM)"
+      description: 'UNION SELECT injection in user input (quote/operand break or table-targeting FROM)'
   condition: any
   false_positives:
-    - "Database reporting agents explicitly authorised to run multi-table UNION queries"
+    - 'Database reporting agents explicitly authorised to run multi-table UNION queries'
 response:
   actions:
     - block_tool
@@ -94,25 +94,25 @@ response:
 confidence: 93
 test_cases:
   true_positives:
-    - tool_args: "{\"name\": \"' UNION SELECT username, password, ssn FROM users --\"}"
+    - tool_args: '{"name": "'' UNION SELECT username, password, ssn FROM users --"}'
       expected: triggered
-      description: "Credential exfiltration via UNION SELECT (probe: sql-injection-exfil)"
-    - tool_args: "{\"search\": \"product' UNION SELECT table_name, column_name, 1 FROM information_schema.columns --\"}"
+      description: 'Credential exfiltration via UNION SELECT (probe: sql-injection-exfil)'
+    - tool_args: '{"search": "product'' UNION SELECT table_name, column_name, 1 FROM information_schema.columns --"}'
       expected: triggered
-      description: "Schema exfil via UNION SELECT + information_schema (probe: sql-injection-schema-exfil)"
+      description: 'Schema exfil via UNION SELECT + information_schema (probe: sql-injection-schema-exfil)'
     - user_input: "'' UNION ALL SELECT email, password FROM admin_users --"
       expected: triggered
-      description: "UNION ALL SELECT credential exfil in user input"
-    - tool_args: "{\"filter\": \"1 UNION SELECT secret_key, 1, 1 FROM api_credentials\"}"
+      description: 'UNION ALL SELECT credential exfil in user input'
+    - tool_args: '{"filter": "1 UNION SELECT secret_key, 1, 1 FROM api_credentials"}'
       expected: triggered
-      description: "UNION SELECT targeting api_credentials table"
+      description: 'UNION SELECT targeting api_credentials table'
   true_negatives:
     - tool_args: '{"query": "find all products in category electronics"}'
       expected: not_triggered
-      description: "Normal product search"
-    - user_input: "I want to combine results from two searches"
+      description: 'Normal product search'
+    - user_input: 'I want to combine results from two searches'
       expected: not_triggered
-      description: "User asking to combine results in natural language (no SQL)"
+      description: 'User asking to combine results in natural language (no SQL)'
     - tool_args: '{"sql": "SELECT u.name, o.total FROM users u JOIN orders o ON u.id = o.user_id"}'
       expected: not_triggered
-      description: "Legitimate JOIN query (not UNION injection)"
+      description: 'Legitimate JOIN query (not UNION injection)'

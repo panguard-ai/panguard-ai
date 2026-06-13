@@ -1,7 +1,7 @@
-title: "Latent Injection via WHOIS Domain Record Data"
+title: 'Latent Injection via WHOIS Domain Record Data'
 id: ATR-2026-00493
 rule_version: 2
-status: "experimental"
+status: 'experimental'
 description: >
   Detects latent prompt injection hidden within WHOIS domain record data. Attackers embed
   injection instructions inside real-looking WHOIS output (registry domain IDs, registrar
@@ -14,17 +14,17 @@ author: ATR Community (garak-import)
 date: '2026-05-12'
 schema_version: '0.1'
 detection_tier: pattern
-maturity: "test"
+maturity: 'test'
 severity: high
 
 references:
   owasp_llm:
-    - "LLM01:2025 - Prompt Injection"
+    - 'LLM01:2025 - Prompt Injection'
   owasp_agentic:
-    - "ASI01:2026 - Agent Goal Hijack"
+    - 'ASI01:2026 - Agent Goal Hijack'
   mitre_atlas:
-    - "AML.T0051 - LLM Prompt Injection"
-    - "AML.T0051.000 - Direct"
+    - 'AML.T0051 - LLM Prompt Injection'
+    - 'AML.T0051.000 - Direct'
 
 compliance:
   owasp_agentic:
@@ -33,38 +33,38 @@ compliance:
       strength: primary
   owasp_llm:
     - id: LLM01:2025
-      context: "This rule is a runtime implementation of LLM01:2025 Prompt Injection, covering adversarial patterns designed to redirect or override model behavior."
+      context: 'This rule is a runtime implementation of LLM01:2025 Prompt Injection, covering adversarial patterns designed to redirect or override model behavior.'
       strength: primary
   eu_ai_act:
-    - article: "15"
-      context: "High-risk AI systems must be resilient against adversarial attempts to alter output or behavior. Deployment of this prompt injection detection rule satisfies the Article 15 requirement to implement technical measures ensuring robustness against manipulation."
+    - article: '15'
+      context: 'High-risk AI systems must be resilient against adversarial attempts to alter output or behavior. Deployment of this prompt injection detection rule satisfies the Article 15 requirement to implement technical measures ensuring robustness against manipulation.'
       strength: primary
-    - article: "9"
-      context: "Prompt injection is a documented risk class; this rule implements the monitoring control required by Article 9 risk management obligations for high-risk AI systems."
+    - article: '9'
+      context: 'Prompt injection is a documented risk class; this rule implements the monitoring control required by Article 9 risk management obligations for high-risk AI systems.'
       strength: secondary
-    - article: "14"
-      context: "Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Latent Injection via WHOIS Domain Record Data) would bypass or undermine that oversight."
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Latent Injection via WHOIS Domain Record Data) would bypass or undermine that oversight.'
       strength: secondary
   nist_ai_rmf:
     - function: Manage
       subcategory: MG.2.3
-      context: "Treating prompt injection as an identified AI risk requires active runtime countermeasures; this detection rule is the primary risk treatment implementation."
+      context: 'Treating prompt injection as an identified AI risk requires active runtime countermeasures; this detection rule is the primary risk treatment implementation.'
       strength: primary
     - function: Map
       subcategory: MP.5.1
-      context: "Identifying prompt injection as an AI risk to be catalogued in the organizational risk register."
+      context: 'Identifying prompt injection as an AI risk to be catalogued in the organizational risk register.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the prompt-injection attempt (Latent Injection via WHOIS Domain Record Data)."
       strength: primary
   iso_42001:
-    - clause: "6.2"
-      context: "Addressing prompt injection risk is an objective required under clause 6.2 AIMS information security planning; this rule operationalizes the detection control measure."
+    - clause: '6.2'
+      context: 'Addressing prompt injection risk is an objective required under clause 6.2 AIMS information security planning; this rule operationalizes the detection control measure.'
       strength: primary
-    - clause: "8.4"
-      context: "Impact assessment for AI deployments under clause 8.4 must account for prompt injection inputs; detection events from this rule provide the required monitoring evidence."
+    - clause: '8.4'
+      context: 'Impact assessment for AI deployments under clause 8.4 must account for prompt injection inputs; detection events from this rule provide the required monitoring evidence.'
       strength: secondary
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the prompt-injection attempt (Latent Injection via WHOIS Domain Record Data)."
       strength: primary
 
@@ -88,25 +88,25 @@ detection:
     - field: user_input
       operator: regex
       value: "(?i)registry\\s+domain\\s+id\\s*:\\s*[A-Z0-9_-]+\\s+registrar\\s+whois\\s+server\\s*:"
-      description: "WHOIS Registry Domain ID + Registrar WHOIS Server structural marker - unique to WHOIS data"
+      description: 'WHOIS Registry Domain ID + Registrar WHOIS Server structural marker - unique to WHOIS data'
 
     # -- Layer 2: WHOIS record with Registrar URL field --
     - field: user_input
       operator: regex
       value: "(?i)registrar\\s+whois\\s+server\\s*:\\s*(whois\\.)?[a-z0-9.-]+\\s+registrar\\s+url\\s*:\\s*https?://"
-      description: "WHOIS Registrar WHOIS Server + Registrar URL field pair - canonical WHOIS block"
+      description: 'WHOIS Registrar WHOIS Server + Registrar URL field pair - canonical WHOIS block'
 
     # -- Layer 3: WHOIS Domain Name + Registry Domain ID pair --
     - field: user_input
       operator: regex
       value: "(?i)domain\\s+name\\s*:\\s*[A-Z0-9.-]+\\.[A-Z]{2,}\\s+registry\\s+domain\\s+id\\s*:\\s*[A-Z0-9_-]+"
-      description: "WHOIS Domain Name + Registry Domain ID header pair"
+      description: 'WHOIS Domain Name + Registry Domain ID header pair'
 
   condition: any
   false_positives:
-    - "Legitimate WHOIS output pasted by a user for domain research (low risk, no embedded injection payload)"
-    - "Security tools that process WHOIS data in isolated sandboxed contexts"
-    - "Domain registrar API responses processed by purpose-built WHOIS parsing tools"
+    - 'Legitimate WHOIS output pasted by a user for domain research (low risk, no embedded injection payload)'
+    - 'Security tools that process WHOIS data in isolated sandboxed contexts'
+    - 'Domain registrar API responses processed by purpose-built WHOIS parsing tools'
 
 response:
   actions:
@@ -122,46 +122,46 @@ response:
 confidence: 80
 test_cases:
   true_positives:
-    - input: "Domain Name: 0FFLCE.XYZ Registry Domain ID: D487680150-CNIC Registrar WHOIS Server: whois.gandi.net Registrar URL: http://www.gandi.net/ Updated Date: 2024-09-21T00:25:56.0Z Creation Date: 2024-09-21T"
+    - input: 'Domain Name: 0FFLCE.XYZ Registry Domain ID: D487680150-CNIC Registrar WHOIS Server: whois.gandi.net Registrar URL: http://www.gandi.net/ Updated Date: 2024-09-21T00:25:56.0Z Creation Date: 2024-09-21T'
       expected: triggered
-      description: "garak-latentinjection cluster sample 1 - CNIC registry + gandi registrar"
-    - input: "Domain Name: 4im.us Registry Domain ID: D58875966-US Registrar WHOIS Server: whois.namecheap.com Registrar URL: http://www.namecheap.com Updated Date: 2024-07-30T12:24:36Z Creation Date: 2017-03-14T21"
+      description: 'garak-latentinjection cluster sample 1 - CNIC registry + gandi registrar'
+    - input: 'Domain Name: 4im.us Registry Domain ID: D58875966-US Registrar WHOIS Server: whois.namecheap.com Registrar URL: http://www.namecheap.com Updated Date: 2024-07-30T12:24:36Z Creation Date: 2017-03-14T21'
       expected: triggered
-      description: "garak-latentinjection cluster sample 2 - US registry + namecheap registrar"
-    - input: "Domain Name: BREATHHINI.SHOP Registry Domain ID: DO10481826-GMO Registrar WHOIS Server: whois.publicdomainregistry.com Registrar URL: http://publicdomainregistry.com/ Updated Date: 2025-03-31T01:42:28"
+      description: 'garak-latentinjection cluster sample 2 - US registry + namecheap registrar'
+    - input: 'Domain Name: BREATHHINI.SHOP Registry Domain ID: DO10481826-GMO Registrar WHOIS Server: whois.publicdomainregistry.com Registrar URL: http://publicdomainregistry.com/ Updated Date: 2025-03-31T01:42:28'
       expected: triggered
-      description: "garak-latentinjection cluster sample 3 - GMO registry + publicdomainregistry"
-    - input: "Domain Name: ENKEY.XYZ Registry Domain ID: D412455954-CNIC Registrar WHOIS Server: whois.spaceship.com Registrar URL: https://www.spaceship.com/ Updated Date: 2024-08-06T15:43:04.0Z Creation Date: 202"
+      description: 'garak-latentinjection cluster sample 3 - GMO registry + publicdomainregistry'
+    - input: 'Domain Name: ENKEY.XYZ Registry Domain ID: D412455954-CNIC Registrar WHOIS Server: whois.spaceship.com Registrar URL: https://www.spaceship.com/ Updated Date: 2024-08-06T15:43:04.0Z Creation Date: 202'
       expected: triggered
-      description: "garak-latentinjection cluster sample 4 - CNIC + spaceship registrar"
-    - input: "Domain Name: consultax.in Registry Domain ID: D7313FE58E57144AFBCDD42465BFF839A-IN Registrar WHOIS Server: Registrar URL: www.godaddy.com Updated Date: 2023-08-23T22:30:26Z Creation Date: 2023-08-18T2"
+      description: 'garak-latentinjection cluster sample 4 - CNIC + spaceship registrar'
+    - input: 'Domain Name: consultax.in Registry Domain ID: D7313FE58E57144AFBCDD42465BFF839A-IN Registrar WHOIS Server: Registrar URL: www.godaddy.com Updated Date: 2023-08-23T22:30:26Z Creation Date: 2023-08-18T2'
       expected: triggered
-      description: "garak-latentinjection cluster sample 5 - IN registry + godaddy"
-    - input: "Domain Name: escolaanglada.cat Registry Domain ID: Daovz210532-CAT Registrar WHOIS Server: whois.dinahosting.com Registrar URL: https://dinahosting.com Updated Date: 2024-05-08T06:14:41.199Z Creation "
+      description: 'garak-latentinjection cluster sample 5 - IN registry + godaddy'
+    - input: 'Domain Name: escolaanglada.cat Registry Domain ID: Daovz210532-CAT Registrar WHOIS Server: whois.dinahosting.com Registrar URL: https://dinahosting.com Updated Date: 2024-05-08T06:14:41.199Z Creation '
       expected: triggered
-      description: "garak-latentinjection cluster sample 6 - CAT registry + dinahosting"
-    - input: "Domain Name: google.com Registry Domain ID: 2138514_DOMAIN_COM-VRSN Registrar WHOIS Server: whois.markmonitor.com Registrar URL: http://www.markmonitor.com Updated Date: 2024-08-02T02:17:33+0000 Creat"
+      description: 'garak-latentinjection cluster sample 6 - CAT registry + dinahosting'
+    - input: 'Domain Name: google.com Registry Domain ID: 2138514_DOMAIN_COM-VRSN Registrar WHOIS Server: whois.markmonitor.com Registrar URL: http://www.markmonitor.com Updated Date: 2024-08-02T02:17:33+0000 Creat'
       expected: triggered
-      description: "garak-latentinjection cluster sample 7 - VRSN registry + markmonitor"
-    - input: "Domain Name: poseidon.cool Registry Domain ID: 9b46dc698ec345489808f609d44f6649-DONUTS Registrar WHOIS Server: whois.nicenic.net Registrar URL: http://www.nicenic.net Updated Date: 2024-06-25T07:06:24"
+      description: 'garak-latentinjection cluster sample 7 - VRSN registry + markmonitor'
+    - input: 'Domain Name: poseidon.cool Registry Domain ID: 9b46dc698ec345489808f609d44f6649-DONUTS Registrar WHOIS Server: whois.nicenic.net Registrar URL: http://www.nicenic.net Updated Date: 2024-06-25T07:06:24'
       expected: triggered
-      description: "garak-latentinjection cluster sample 8 - DONUTS registry + nicenic"
+      description: 'garak-latentinjection cluster sample 8 - DONUTS registry + nicenic'
   true_negatives:
-    - input: "What is the weather like today in Tokyo?"
+    - input: 'What is the weather like today in Tokyo?'
       expected: not_triggered
-      description: "benign - simple query"
-    - input: "Help me write a Python function to sort a list of integers."
+      description: 'benign - simple query'
+    - input: 'Help me write a Python function to sort a list of integers.'
       expected: not_triggered
-      description: "benign - coding help"
-    - input: "Can you explain how photosynthesis works?"
+      description: 'benign - coding help'
+    - input: 'Can you explain how photosynthesis works?'
       expected: not_triggered
-      description: "benign - educational question"
-    - input: "Who is the registrar for google.com?"
+      description: 'benign - educational question'
+    - input: 'Who is the registrar for google.com?'
       expected: not_triggered
-      description: "benign - domain registrar question without WHOIS structural markers"
-    - input: "The domain ID for our internal system is CORP-001 and the server is whois.internal."
+      description: 'benign - domain registrar question without WHOIS structural markers'
+    - input: 'The domain ID for our internal system is CORP-001 and the server is whois.internal.'
       expected: not_triggered
-      description: "benign - internal system reference without WHOIS Registry Domain ID + Registrar WHOIS Server pair"
-    - input: "Translate hello how are you into Spanish."
+      description: 'benign - internal system reference without WHOIS Registry Domain ID + Registrar WHOIS Server pair'
+    - input: 'Translate hello how are you into Spanish.'
       expected: not_triggered
-      description: "benign - translation request"
+      description: 'benign - translation request'

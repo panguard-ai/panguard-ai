@@ -10,48 +10,48 @@ description: >
   pattern includes character backstory, explicit trait enumeration, command formatting instructions,
   and self-referential bypass methodology. Distinct from generic fictional framing by its systematic
   approach to defining amorality and establishing bypass protocols.
-author: "ATR Community (via NVIDIA garak in-the-wild corpus)"
-date: "2026/04/19"
-schema_version: "0.1"
+author: 'ATR Community (via NVIDIA garak in-the-wild corpus)'
+date: '2026/04/19'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: high
 references:
   owasp_llm:
-    - "LLM01:2025 - Prompt Injection"
+    - 'LLM01:2025 - Prompt Injection'
   owasp_agentic:
-    - "ASI01:2026 - Agent Behaviour Hijack"
+    - 'ASI01:2026 - Agent Behaviour Hijack'
   mitre_atlas:
-    - "AML.T0054"
+    - 'AML.T0054'
   research:
-    - "https://arxiv.org/abs/2307.15043 - Universal and Transferable Adversarial Attacks on Aligned Language Models"
+    - 'https://arxiv.org/abs/2307.15043 - Universal and Transferable Adversarial Attacks on Aligned Language Models'
 compliance:
   nist_ai_rmf:
-    - subcategory: "MS.2.6"
-      context: "Detection of detailed amoral character roleplay jailbreaks directly evidences continuous evaluation of GenAI safety/security risk magnitude; each match indicates an active attempt to subvert safety controls through persona-based bypass, which MS.2.6 requires be measured and tracked."
+    - subcategory: 'MS.2.6'
+      context: 'Detection of detailed amoral character roleplay jailbreaks directly evidences continuous evaluation of GenAI safety/security risk magnitude; each match indicates an active attempt to subvert safety controls through persona-based bypass, which MS.2.6 requires be measured and tracked.'
       strength: primary
-    - subcategory: "MG.2.3"
-      context: "Identifying systematic amoral persona establishment and command-protocol bypass instructions triggers the risk treatment mechanisms required by MG.2.3 to disengage or block the manipulated agent behavior before unsafe content is produced."
+    - subcategory: 'MG.2.3'
+      context: 'Identifying systematic amoral persona establishment and command-protocol bypass instructions triggers the risk treatment mechanisms required by MG.2.3 to disengage or block the manipulated agent behavior before unsafe content is produced.'
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "Roleplay-based jailbreaks targeting alignment guardrails are adversarial robustness probes; MS.2.7 requires that the system's resilience against such prompt-injection attack patterns is evaluated and documented."
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the prompt-injection attempt (Detailed Amoral Character Roleplay Jailbreak)."
       strength: primary
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the prompt-injection attempt (Detailed Amoral Character Roleplay Jailbreak) is such a treatment."
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Detailed Amoral Character Roleplay Jailbreak)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Detailed Amoral Character Roleplay Jailbreak).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Detailed Amoral Character Roleplay Jailbreak)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Detailed Amoral Character Roleplay Jailbreak).'
       strength: secondary
-    - article: "14"
-      context: "Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Detailed Amoral Character Roleplay Jailbreak) would bypass or undermine that oversight."
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Detailed Amoral Character Roleplay Jailbreak) would bypass or undermine that oversight.'
       strength: secondary
 tags:
   category: prompt-injection

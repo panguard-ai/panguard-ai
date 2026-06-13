@@ -8,7 +8,7 @@ description: >
   samples.
 author: ATR Threat Cloud Crystallization
 date: 2026/04/07
-schema_version: "1.0"
+schema_version: '1.0'
 detection_tier: pattern
 maturity: test
 severity: high
@@ -23,31 +23,31 @@ metadata_provenance:
   mitre_atlas: auto-generated
 compliance:
   nist_ai_rmf:
-    - subcategory: "MS.2.10"
+    - subcategory: 'MS.2.10'
       context: >-
         This rule detects agent responses that confirm the existence of sensitive environment variables, which constitutes a privacy and confidentiality leak even without revealing values; MS.2.10 requires assessing privacy risks including indirect disclosures that confirm sensitive system metadata.
       strength: primary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: >-
         Confirming env var existence is a reconnaissance step in social-engineering exfiltration chains targeting agent secrets; MS.2.7 requires evaluating system security and resilience against such probing techniques.
       strength: secondary
-    - subcategory: "MG.2.3"
+    - subcategory: 'MG.2.3'
       context: >-
         Detection of env var probing patterns enables containment responses to halt the exfiltration attempt before the agent escalates to retrieving the actual value; MG.2.3 mandates pre-defined treatment mechanisms for these risk events.
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the context-exfiltration attempt (Environment Variable Existence Probing)."
       strength: primary
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the context-exfiltration attempt (Environment Variable Existence Probing) is such a treatment."
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the context-exfiltration attempt (Environment Variable Existence Probing)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the context-exfiltration attempt (Environment Variable Existence Probing).'
       strength: primary
-    - article: "10"
-      context: "Article 10 (data and data governance) requires control over the data an AI system processes; this rule provides detection evidence for the context-exfiltration attempt (Environment Variable Existence Probing) affecting that data."
+    - article: '10'
+      context: 'Article 10 (data and data governance) requires control over the data an AI system processes; this rule provides detection evidence for the context-exfiltration attempt (Environment Variable Existence Probing) affecting that data.'
       strength: secondary
 tags:
   category: context-exfiltration

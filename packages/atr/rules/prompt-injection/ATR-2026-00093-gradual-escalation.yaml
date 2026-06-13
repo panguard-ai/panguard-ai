@@ -8,7 +8,7 @@ description: >
   additions across version updates, or slowly shift the behavioral baseline to normalize malicious functionality.
 author: ATR Community (MiroFish Predicted)
 date: 2026/03/11
-schema_version: "0.1"
+schema_version: '0.1'
 detection_tier: pattern
 maturity: test
 severity: critical
@@ -23,37 +23,37 @@ metadata_provenance:
   owasp_llm: auto-generated
 compliance:
   nist_ai_rmf:
-    - subcategory: "MG.4.1"
+    - subcategory: 'MG.4.1'
       context: >-
         Gradual capability escalation evades point-in-time controls by drifting the behavioral baseline across versions and interactions; MG.4.1 requires post-deployment monitoring plans that track cumulative permission and capability changes over time to surface sub-threshold drift.
       strength: primary
-    - subcategory: "MS.2.6"
+    - subcategory: 'MS.2.6'
       context: >-
         Detecting incremental permission additions and per-interaction capability creep produces continuous evidence of safety/security risk magnitude changes; MS.2.6 requires that this evolving risk surface is evaluated continuously rather than only at release gates.
       strength: secondary
-    - subcategory: "MG.2.3"
+    - subcategory: 'MG.2.3'
       context: >-
         Once cumulative escalation is detected, response mechanisms must be able to revoke newly added capabilities or deactivate the agent before normalized malicious functionality is exercised; MG.2.3 mandates these supersede/disengage controls are in place.
       strength: secondary
-    - subcategory: "MS.2.7"
+    - subcategory: 'MS.2.7'
       context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the prompt-injection attempt (Gradual Capability Escalation via Incremental Introduction)."
       strength: primary
   iso_42001:
-    - clause: "8.1"
+    - clause: '8.1'
       context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the prompt-injection attempt (Gradual Capability Escalation via Incremental Introduction)."
       strength: primary
-    - clause: "6.2"
+    - clause: '6.2'
       context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the prompt-injection attempt (Gradual Capability Escalation via Incremental Introduction) is such a treatment."
       strength: secondary
   eu_ai_act:
-    - article: "15"
-      context: "Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Gradual Capability Escalation via Incremental Introduction)."
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the prompt-injection attempt (Gradual Capability Escalation via Incremental Introduction).'
       strength: primary
-    - article: "9"
-      context: "Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Gradual Capability Escalation via Incremental Introduction)."
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Gradual Capability Escalation via Incremental Introduction).'
       strength: secondary
-    - article: "14"
-      context: "Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Gradual Capability Escalation via Incremental Introduction) would bypass or undermine that oversight."
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Gradual Capability Escalation via Incremental Introduction) would bypass or undermine that oversight.'
       strength: secondary
 tags:
   category: prompt-injection

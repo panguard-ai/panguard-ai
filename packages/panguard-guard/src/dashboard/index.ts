@@ -406,10 +406,7 @@ export class DashboardServer {
       // supply the auth token explicitly — not a CSRF vector — so it is allowed.
       if (req.method && req.method !== 'GET' && req.method !== 'HEAD') {
         const origin = req.headers.origin;
-        const allowedOrigins = [
-          `http://127.0.0.1:${this.port}`,
-          `http://localhost:${this.port}`,
-        ];
+        const allowedOrigins = [`http://127.0.0.1:${this.port}`, `http://localhost:${this.port}`];
         if (origin && !allowedOrigins.includes(origin)) {
           res.writeHead(403, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'Forbidden: cross-origin request rejected' }));

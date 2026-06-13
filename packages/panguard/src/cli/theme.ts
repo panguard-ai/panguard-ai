@@ -155,17 +155,13 @@ export function protectedHero(opts: ProtectedHeroOpts): string[] {
   lines.push(`  ${rule50}`);
   if (zh) {
     lines.push(`   ${ok()}  ${c.bold('你已受到保護')}`);
-    lines.push(
-      `      PanGuard 正在守護 ${tool} 個工具,防範提示注入、工具濫用、`
-    );
+    lines.push(`      PanGuard 正在守護 ${tool} 個工具,防範提示注入、工具濫用、`);
     lines.push(`      資料外洩與惡意技能 — 使用 ${rule} 條開放規則。`);
     lines.push(`      ${c.dim('僅偵測,不阻擋 — 除非你親自開啟。')}`);
     lines.push(`      ${c.dim('任何資料都不會離開這台機器 — 除非你允許。')}`);
   } else {
     lines.push(`   ${ok()}  ${c.bold("You're protected")}`);
-    lines.push(
-      `      PanGuard is watching ${tool} tools for prompt injection, tool abuse,`
-    );
+    lines.push(`      PanGuard is watching ${tool} tools for prompt injection, tool abuse,`);
     lines.push(`      data exfiltration, and malicious skills — using ${rule} open rules.`);
     lines.push(`      ${c.dim('Detection only. Nothing is blocked unless you turn it on.')}`);
     lines.push(`      ${c.dim('Nothing leaves your machine unless you allow it.')}`);
