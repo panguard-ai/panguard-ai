@@ -455,10 +455,15 @@ async function commandStart(
       if (msgs.length === 0) return;
       const combined = msgs.length === 1 ? msgs[0] : `${msgs.length} skill audit results`;
       void import('node:child_process')
-        .then(({ execSync }) => {
+        .then(({ execFileSync }) => {
           try {
-            execSync(
-              `osascript -e 'display notification "${combined ?? ''}" with title "PanGuard"'`,
+            // execFileSync (no shell) prevents shell injection; escaping the
+            // AppleScript string literal prevents a skill name with quotes or
+            // backslashes from breaking out of the notification text.
+            const safe = (combined ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+            execFileSync(
+              'osascript',
+              ['-e', `display notification "${safe}" with title "PanGuard"`],
               { timeout: 2000 }
             );
           } catch {
@@ -1017,7 +1022,9 @@ async function commandInstall(dataDir: string): Promise<void> {
   const sp = spinner('Installing PanguardGuard as system service...');
   try {
     const execPath = process.argv[1] ?? join(homedir(), '.npm-global', 'bin', 'panguard-guard');
-    const result = await installService(execPath, dataDir);
+    // node + script as discrete argv parts: never whitespace-split, and robust
+    // on Windows where the script has no shebang to self-execute.
+    const result = await installService([process.execPath, execPath], dataDir);
     sp.succeed(`Service installed: ${c.sage(result)}`);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);

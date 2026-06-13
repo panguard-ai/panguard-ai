@@ -90,7 +90,13 @@ export class MCPProxy {
   constructor(config: ProxyConfig, deps: { evaluator?: ProxyEvaluatorLike } = {}) {
     this.config = config;
     this.evaluator = deps.evaluator ?? new ProxyEvaluator();
-    this.failMode = config.failMode ?? 'closed';
+    // Fail-OPEN by default: PanGuard must never become the failure point in the
+    // agent's hot path. If the async evaluator times out or errors (e.g. rules
+    // still loading on cold start), the tool call proceeds — the sync pre-check
+    // (GuardGate, below) still blocks the worst payloads instantly regardless of
+    // this mode. Opt into 'closed' only for high-assurance deployments that
+    // accept blocking the agent when the evaluator is unavailable.
+    this.failMode = config.failMode ?? 'open';
     this.evalTimeout = config.evalTimeout ?? 5000;
     // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
     // payloads (and any session the brain flags) are blocked instantly — even

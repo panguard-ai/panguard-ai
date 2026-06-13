@@ -4,7 +4,7 @@
  * @module @panguard-ai/panguard-guard/config
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, chmodSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { z } from 'zod';
@@ -99,6 +99,9 @@ const GuardConfigFileSchema = z
     threatCloudEndpoint: z.string().url().optional(),
     threatCloudApiKey: z.string().optional(),
     threatCloudUploadEnabled: z.boolean().optional(),
+    // Receive new ATR rules from Threat Cloud. ON by default; set false to pin
+    // to the bundled rules (offline) without disabling IP/domain blocklist feeds.
+    threatCloudRuleSyncEnabled: z.boolean().optional(),
     telemetryEnabled: z.boolean().optional(),
     trustedSkills: z.array(z.string()).optional(),
   })
@@ -316,10 +319,18 @@ export function saveConfig(config: GuardConfig, configPath?: string): void {
   const dir = join(path, '..');
 
   if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
+    mkdirSync(dir, { recursive: true, mode: 0o700 });
   }
 
-  writeFileSync(path, JSON.stringify(config, null, 2), 'utf-8');
+  // 0o600: the config can hold ai.apiKey, threatCloudApiKey, and webhook
+  // secrets — never world/group-readable on shared machines. chmod also
+  // tightens a pre-existing file created under a looser umask.
+  writeFileSync(path, JSON.stringify(config, null, 2), { encoding: 'utf-8', mode: 0o600 });
+  try {
+    chmodSync(path, 0o600);
+  } catch {
+    /* best effort — platforms without POSIX permissions */
+  }
   logger.info(`Saved config to ${path} / 已儲存配置到 ${path}`);
 }
 

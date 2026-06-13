@@ -19,7 +19,7 @@
 
 import { writeFileSync, readFileSync, unlinkSync, existsSync, mkdirSync, lstatSync } from 'node:fs';
 import { execFile } from 'node:child_process';
-import { platform, homedir } from 'node:os';
+import { platform, homedir, userInfo } from 'node:os';
 import { join, dirname } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 
@@ -157,19 +157,20 @@ export class Watchdog {
 /**
  * Install as a system service / 安裝為系統服務
  *
- * @param execPath - Path to the panguard-guard executable / PanguardGuard 可執行檔路徑
+ * @param execArgv - Executable + script as discrete argv parts, e.g.
+ *   [nodePath, scriptPath]. Never a space-joined string — paths contain spaces.
  * @param dataDir - Data directory path / 資料目錄路徑
  */
-export async function installService(execPath: string, dataDir: string): Promise<string> {
+export async function installService(execArgv: string[], dataDir: string): Promise<string> {
   const os = platform();
 
   switch (os) {
     case 'darwin':
-      return installLaunchd(execPath, dataDir);
+      return installLaunchd(execArgv, dataDir);
     case 'linux':
-      return installSystemd(execPath, dataDir);
+      return installSystemd(execArgv, dataDir);
     case 'win32':
-      return installWindowsService(execPath);
+      return installWindowsService(execArgv);
     default:
       throw new Error(`Unsupported platform: ${os} / 不支援的平台: ${os}`);
   }
@@ -197,14 +198,29 @@ export async function uninstallService(): Promise<string> {
 // macOS launchd / macOS launchd
 // ---------------------------------------------------------------------------
 
-async function installLaunchd(execPath: string, dataDir: string): Promise<string> {
+/** Escape a value for safe inclusion in plist XML text. */
+function xmlEscape(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/** Quote a value as a single systemd ExecStart token (handles spaces + specials). */
+function systemdQuote(s: string): string {
+  return `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
+async function installLaunchd(execArgv: string[], dataDir: string): Promise<string> {
   const plistPath = join(homedir(), 'Library', 'LaunchAgents', `${SERVICE_NAME}.plist`);
 
-  // execPath may be "node /path/to/script.js" — split for ProgramArguments
-  const execParts = execPath.split(/\s+/).filter(Boolean);
-  const programArgs = execParts
+  // execArgv is already split into discrete parts (e.g. [nodePath, scriptPath]).
+  // Never split on whitespace — paths legitimately contain spaces.
+  const programArgs = execArgv
     .concat(['start', '--data-dir', dataDir])
-    .map((arg) => `    <string>${arg}</string>`)
+    .map((arg) => `    <string>${xmlEscape(arg)}</string>`)
     .join('\n');
 
   const plist = `<?xml version="1.0" encoding="UTF-8"?>
@@ -222,9 +238,9 @@ ${programArgs}
   <key>KeepAlive</key>
   <true/>
   <key>StandardOutPath</key>
-  <string>${join(dataDir, 'panguard-guard.log')}</string>
+  <string>${xmlEscape(join(dataDir, 'panguard-guard.log'))}</string>
   <key>StandardErrorPath</key>
-  <string>${join(dataDir, 'panguard-guard-error.log')}</string>
+  <string>${xmlEscape(join(dataDir, 'panguard-guard-error.log'))}</string>
 </dict>
 </plist>`;
 
@@ -253,8 +269,14 @@ async function uninstallLaunchd(): Promise<string> {
 // Linux systemd / Linux systemd
 // ---------------------------------------------------------------------------
 
-async function installSystemd(execPath: string, dataDir: string): Promise<string> {
+async function installSystemd(execArgv: string[], dataDir: string): Promise<string> {
   const unitPath = `/etc/systemd/system/${SERVICE_NAME}.service`;
+
+  // Run as the human who installed it (SUDO_USER under `sudo`), NEVER as root.
+  // A security daemon must not itself be a root-level attack surface, and it
+  // monitors *that user's* agents — root would also be the wrong home/context.
+  const rawUser = process.env['SUDO_USER'] || userInfo().username;
+  const runUser = /^[a-z_][a-z0-9_-]{0,31}$/i.test(rawUser) ? rawUser : userInfo().username;
 
   const unit = `[Unit]
 Description=${SERVICE_DISPLAY_NAME}
@@ -262,7 +284,10 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=${execPath} start --data-dir ${dataDir}
+User=${runUser}
+NoNewPrivileges=true
+PrivateTmp=true
+ExecStart=${[...execArgv, 'start', '--data-dir', dataDir].map(systemdQuote).join(' ')}
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -300,13 +325,15 @@ async function uninstallSystemd(): Promise<string> {
 // Windows sc.exe / Windows sc.exe
 // ---------------------------------------------------------------------------
 
-async function installWindowsService(execPath: string): Promise<string> {
+async function installWindowsService(execArgv: string[]): Promise<string> {
+  // Quote each argv part so paths with spaces survive sc.exe / schtasks parsing.
+  const quoted = execArgv.map((p) => `"${p}"`).join(' ');
   // Try sc create (requires admin), fall back to Task Scheduler (no admin needed)
   try {
     await execFileAsync('sc', [
       'create',
       SERVICE_NAME,
-      `binpath=${execPath} start`,
+      `binpath=${quoted} start`,
       `displayname=${SERVICE_DISPLAY_NAME}`,
       'start=auto',
     ]);
@@ -324,7 +351,7 @@ async function installWindowsService(execPath: string): Promise<string> {
         '/TN',
         taskName,
         '/TR',
-        `"${process.execPath}" "${execPath}" start`,
+        `${quoted} start`,
         '/SC',
         'ONLOGON',
         '/RL',

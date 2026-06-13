@@ -1,0 +1,209 @@
+title: 'Destructive tool invocation without prior human approval'
+id: ATR-2026-00549
+rule_version: 1
+status: draft
+description: >
+  Detects a destructive tool call in an agent execution trace that is NOT
+  preceded by an explicit human-approval span. This is a trace-method rule
+  using the `require` primitive (spec/atr-method-v1.1.md §8.3.2), which
+  fires when an expected predecessor is MISSING — the canonical mechanism
+  for catching silent failures.
+
+  Threat model: many agent frameworks let operators classify tool calls by
+  privilege (read / write / destructive). Production policy says destructive
+  calls (e.g., file deletion, transaction commit, schema migration) MUST be
+  gated by a human-in-the-loop approval. In practice, prompt-injection
+  attacks or runaway agents bypass this gate by inducing the LLM to issue
+  a destructive call directly without surfacing it for approval. The trace
+  emits the destructive TOOL span without an AGENT span carrying
+  attributes.human_approval=true at any earlier point in the same trace.
+
+  No error is thrown. The action succeeds. The trace looks "normal" if you
+  only inspect tool inputs/outputs. The rule fires by detecting the
+  absence of the required predecessor — the trace-method capability that
+  pattern-based detection cannot express.
+author: 'ATR Community'
+date: '2026/05/28'
+schema_version: '1.0'
+maturity: draft
+severity: critical
+
+references:
+  owasp_agentic:
+    - 'ASI04:2026 - Unauthorized Resource Access'
+    - 'ASI05:2026 - Unexpected Code Execution'
+  owasp_llm:
+    - 'LLM06:2025 - Excessive Agency'
+  mitre_atlas:
+    - 'AML.T0053 - LLM Plugin Compromise'
+  research:
+    - 'TraceAegis: Behavioral Constraints over Agent Execution Traces (arXiv:2510.11203)'
+    - 'AgentArmor: Type-System for Agent Trace Analysis (arXiv:2508.01249)'
+    - 'Anthropic Computer Use threat model (Build 2024)'
+
+compliance:
+  nist_csf:
+    - 'PR.AC-04'
+    - 'PR.IR-01'
+  etsi_ts_104223:
+    - 'P5.2'
+  eu_ai_act:
+    - article: '14'
+      context: >
+        Human oversight — destructive actions must be subject to human
+        review per Article 14. Trace evidence of skipped approval is a
+        direct violation.
+      strength: primary
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the privilege-escalation attempt (Destructive tool invocation without prior human approval).'
+      strength: primary
+  nist_ai_rmf:
+    - subcategory: 'MG.4.1'
+      context: >
+        Risk management governance — destructive autonomous actions
+        without approval are unmitigated risks; trace evidence is
+        normative for assessment.
+      strength: primary
+    - subcategory: 'MS.2.7'
+      context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the privilege-escalation attempt (Destructive tool invocation without prior human approval)."
+      strength: primary
+    - subcategory: 'MG.2.3'
+      context: 'NIST AI RMF MANAGE 2.3 (respond to previously unknown identified risks) is supported by this rule, which surfaces the privilege-escalation attempt (Destructive tool invocation without prior human approval) so the risk can be treated.'
+      strength: secondary
+
+  iso_42001:
+    - clause: '8.1'
+      context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the privilege-escalation attempt (Destructive tool invocation without prior human approval)."
+      strength: primary
+    - clause: '6.2'
+      context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the privilege-escalation attempt (Destructive tool invocation without prior human approval) is such a treatment."
+      strength: secondary
+tags:
+  category: privilege-escalation
+  subcategory: missing-human-approval
+  scan_target: runtime
+  confidence: high
+  source: trace-rule
+
+agent_source:
+  type: agent_trace
+  framework:
+    - any
+  provider:
+    - any
+
+detection:
+  method: trace
+  condition: any
+  conditions:
+    - field: trace.require_violation
+      operator: regex
+      value: '(?i)require_violation:destructive_tool_without_approval'
+      description: >
+        Engine emits this synthetic field when the require primitive
+        fires; trace-native engines evaluate detection.trace below.
+  trace:
+    ingest_format: openinference
+    require:
+      - target_shape:
+          span.kind: 'TOOL'
+          attributes:
+            tool.privilege: 'destructive'
+        must_be_preceded_by:
+          # Match any of the canonical approval signals. Frameworks vary:
+          # LangChain HITL emits span.kind: "HUMAN"; AutoGen sets
+          # attributes.human_approval=true on AGENT spans; some emit
+          # attributes.operator_approved or attributes.confirmed_by_user.
+          # An approval is recognized if EITHER the span kind is HUMAN OR
+          # any of the canonical approval attributes is truthy.
+          one_of_shapes:
+            - span.kind: 'HUMAN'
+            - span.kind: 'AGENT'
+              attributes:
+                human_approval: true
+            - span.kind: 'AGENT'
+              attributes:
+                operator_approved: true
+            - span.kind: 'AGENT'
+              attributes:
+                approval_granted: true
+            - span.kind: 'AGENT'
+              attributes:
+                confirmed_by_user: true
+          within_trace: true
+        description: >
+          Every destructive TOOL span MUST have at least one preceding
+          approval span anywhere earlier in the same trace. Recognized
+          forms: dedicated HUMAN span kind (OpenInference), or AGENT
+          span carrying any canonical approval attribute. The
+          `one_of_shapes` matcher is normative per atr-method-v1.1.md
+          §8.3 (extends `must_be_preceded_by` to accept a disjunction).
+
+response:
+  actions:
+    - block_tool
+    - alert
+    - escalate
+  message_template: >
+    [ATR-2026-00549] CRITICAL: Destructive tool call without human approval
+    detected. Tool {{trace.matched_span.attributes.tool.name}} ran at span
+    {{trace.matched_span.id}} with privilege=destructive but no preceding
+    AGENT span carried human_approval=true. Block this tool call, require
+    operator review, and audit policy on the calling agent.
+
+confidence: 90
+
+wild_fp_rate: 0
+
+test_cases:
+  true_positives:
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"agent.name":"orchestrator"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"db.drop_table","tool.privilege":"destructive"}}]}
+      expected: triggered
+      description: 'Destructive tool runs without any preceding human approval'
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"agent.name":"orchestrator","human_approval":false}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"file.delete","tool.privilege":"destructive"}}]}
+      expected: triggered
+      description: 'AGENT span explicitly sets human_approval=false; destructive tool follows'
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source":"untrusted"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"git.force_push","tool.privilege":"destructive"}}]}
+      expected: triggered
+      description: 'Destructive tool preceded only by untrusted retrieval (no approval span)'
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"agent.name":"planner"}},{"id":"a2","kind":"AGENT","attributes":{"agent.name":"executor"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"k8s.delete_namespace","tool.privilege":"destructive"}}]}
+      expected: triggered
+      description: 'Two AGENT spans without any setting human_approval=true; destructive tool fires'
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"agent.name":"sub_orchestrator","human_approval_status":"approved"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"prod.deploy","tool.privilege":"destructive"}}]}
+      expected: triggered
+      description: 'Non-canonical approval attribute name (human_approval_status string instead of human_approval boolean) — not recognized, rule fires correctly. Documents the limitation that approval-signal vocabulary is not standardized across frameworks.'
+
+  true_negatives:
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"agent.name":"approver","human_approval":true}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"file.read","tool.privilege":"read"}},{"id":"t2","kind":"TOOL","attributes":{"tool.name":"db.truncate","tool.privilege":"destructive"}}]}
+      expected: not_triggered
+      description: 'Approval span IS present before destructive tool — no violation'
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"agent.name":"executor","human_approval":true}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"db.drop_table","tool.privilege":"destructive"}}]}
+      expected: not_triggered
+      description: 'human_approval=true on preceding AGENT span — invariant satisfied'
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"agent.name":"reader"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"file.read","tool.privilege":"read"}}]}
+      expected: not_triggered
+      description: 'Tool privilege is read, not destructive — rule does not apply'
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"agent.name":"plan"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"file.write","tool.privilege":"write"}}]}
+      expected: not_triggered
+      description: 'write privilege (not destructive) — rule does not apply'
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"agent.name":"thinker"}}]}
+      expected: not_triggered
+      description: 'No TOOL span at all — nothing to check'
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"human_approval":true}},{"id":"a2","kind":"AGENT","attributes":{"agent.name":"executor"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"db.drop_index","tool.privilege":"destructive"}},{"id":"t2","kind":"TOOL","attributes":{"tool.name":"db.drop_index","tool.privilege":"destructive"}}]}
+      expected: not_triggered
+      description: 'Approval covers all subsequent destructive spans within the trace'
+    - input: |
+        {"spans":[{"id":"h1","kind":"HUMAN","attributes":{"action":"approved"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"db.drop_table","tool.privilege":"destructive"}}]}
+      expected: not_triggered
+      description: 'Dedicated HUMAN span kind (LangChain HITL convention) — one_of_shapes branch matches, rule does not fire'

