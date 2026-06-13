@@ -27,18 +27,18 @@ export const STATS = {
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
   atrVersion: '3.1.1',
   /** ATR v2.2.x: stable + experimental total */
-  atrRules: 462,
+  atrRules: 642,
   atrStableRules: 359,
   atrExperimentalRules: 62,
   /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
   atrCommunityRules: 93,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
   atrPatterns: 920,
-  totalRules: 462,
+  totalRules: 642,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '462' as const,
+  totalRulesDisplay: '642' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '462' as const,
+  atrRulesDisplay: '642' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
