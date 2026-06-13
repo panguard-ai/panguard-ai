@@ -99,6 +99,9 @@ const GuardConfigFileSchema = z
     threatCloudEndpoint: z.string().url().optional(),
     threatCloudApiKey: z.string().optional(),
     threatCloudUploadEnabled: z.boolean().optional(),
+    // Receive new ATR rules from Threat Cloud. ON by default; set false to pin
+    // to the bundled rules (offline) without disabling IP/domain blocklist feeds.
+    threatCloudRuleSyncEnabled: z.boolean().optional(),
     telemetryEnabled: z.boolean().optional(),
     trustedSkills: z.array(z.string()).optional(),
   })

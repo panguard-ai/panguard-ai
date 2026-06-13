@@ -29,7 +29,10 @@ if (process.env['PANGUARD_SENTRY_DSN']) {
 }
 import { scanCommand } from './commands/scan.js';
 import { guardCommand } from './commands/guard.js';
-import { reportCommand } from './commands/report.js';
+// reportCommand is intentionally NOT imported/registered in the free CLI —
+// the compliance report generator is an enterprise feature, hidden until the
+// paid tier launches. See the addCommand site below.
+// import { reportCommand } from './commands/report.js';
 import { chatCommand } from './commands/chat.js';
 import { trapCommand } from './commands/trap.js';
 import { threatCommand } from './commands/threat.js';
@@ -117,9 +120,11 @@ program.addCommand(whoamiCommand());
 program.addCommand(chatCommand());
 program.addCommand(configCommand());
 program.addCommand(doctorCommand());
-// report is no longer a stub — surface it as a primary command now that
-// the AI Compliance Audit Evidence generator is real (D1 Sprint 1).
-program.addCommand(reportCommand());
+// report (AI Compliance Audit Evidence generator) is the enterprise tier's
+// core differentiator and is NOT released in the free community plan. It stays
+// hidden until the paid tier launches behind a license gate. Do not register it
+// in the free CLI. (Re-enable: restore the import + this addCommand.)
+// program.addCommand(reportCommand());
 
 // ── Trap (honeypot) is a first-class command — wired to the real
 //    panguard-trap engine via @panguard-ai/panguard-trap/cli ──

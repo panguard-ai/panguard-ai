@@ -92,11 +92,18 @@ export function upCommand(): Command {
   return new Command('up')
     .description('Scan skills → start protection → open dashboard')
     .option('--no-dashboard', 'Skip opening dashboard in browser')
+    .option('--no-proxy', 'Scan only — do not inject runtime protection into agent configs')
     .option('--verbose', 'Verbose output', false)
     .option('--skip-scan', 'Skip initial skill scan', false)
     .option('-y, --yes', 'Skip confirmation prompts', false)
     .action(
-      async (opts: { dashboard: boolean; verbose: boolean; skipScan: boolean; yes: boolean }) => {
+      async (opts: {
+        dashboard: boolean;
+        proxy: boolean;
+        verbose: boolean;
+        skipScan: boolean;
+        yes: boolean;
+      }) => {
         // Suppress JSON logs for clean output — set env var BEFORE any dynamic imports
         // so all child modules (panguard-mcp, panguard-scan, etc.) also respect it
         if (!opts.verbose) {
@@ -196,30 +203,31 @@ export function upCommand(): Command {
             console.log(`    ${c.dim(t(lang, 'No AI tools found yet.', '尚未找到 AI 工具。'))}`);
           }
 
-          // Inject proxy on all detected platforms (with consent)
+          // Build runtime protection by DEFAULT. `pga up` should stand up
+          // protection out of the box; --no-proxy opts out (scan only). In an
+          // interactive TTY we still confirm, but the prompt defaults to YES so
+          // the common path (just run `pga up`) actually protects. Non-TTY
+          // (CI / unattended) injects by default too — configs are backed up.
           if (detected.length > 0) {
-            let shouldInject = opts.yes;
-            if (!shouldInject) {
-              if (!process.stdin.isTTY) {
-                // Non-interactive (CI, piped): skip injection by default
-                shouldInject = false;
-              } else {
-                const { createInterface } = await import('node:readline');
-                const rl = createInterface({ input: process.stdin, output: process.stdout });
-                const answer = await new Promise<string>((resolve) => {
-                  rl.question(
-                    `\n  Inject MCP proxy into ${detected.length} platform(s)? ` +
-                      `${c.dim('(configs backed up to *.bak)')} [y/N] `,
-                    resolve
-                  );
-                });
-                rl.close();
-                shouldInject = answer.trim().toLowerCase() === 'y';
-              }
+            let shouldInject = opts.proxy !== false;
+            if (shouldInject && !opts.yes && process.stdin.isTTY) {
+              const { createInterface } = await import('node:readline');
+              const rl = createInterface({ input: process.stdin, output: process.stdout });
+              const answer = await new Promise<string>((resolve) => {
+                rl.question(
+                  `\n  Inject runtime protection into ${detected.length} platform(s)? ` +
+                    `${c.dim('(configs backed up to *.bak)')} [Y/n] `,
+                  resolve
+                );
+              });
+              rl.close();
+              shouldInject = answer.trim().toLowerCase() !== 'n';
             }
 
             if (!shouldInject) {
-              console.log(`\n    ${c.dim('Proxy injection skipped. Run "pga up -y" to inject.')}`);
+              console.log(
+                `\n    ${c.dim('Scan only — runtime protection not injected (--no-proxy).')}`
+              );
             } else {
               console.log(`\n  ${shield()} ${c.bold('Watching your agents...')}\n`);
               const proxySummary = injectProxyFn(detected.map((p) => p.id));

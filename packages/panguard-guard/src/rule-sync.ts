@@ -39,13 +39,17 @@ export interface CloudSyncDeps {
  * skill whitelist and blacklist.
  */
 export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
-  const { atrEngine, threatCloud, feedManager } = deps;
+  const { atrEngine, threatCloud, feedManager, config } = deps;
 
   try {
     // Sync ATR rules from Threat Cloud
     let newATRRules = 0;
     try {
-      const atrRules = await threatCloud.fetchATRRules();
+      // Rule reception is ON by default but can be disabled (offline / pinned
+      // rules) via config threatCloudRuleSyncEnabled=false — independently of
+      // the IP/domain blocklist feeds synced below, which keep working.
+      const atrRules =
+        config.threatCloudRuleSyncEnabled === false ? [] : await threatCloud.fetchATRRules();
       const yaml = await import('js-yaml');
       for (const rule of atrRules) {
         try {
