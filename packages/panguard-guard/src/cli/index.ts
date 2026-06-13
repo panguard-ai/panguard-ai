@@ -455,10 +455,15 @@ async function commandStart(
       if (msgs.length === 0) return;
       const combined = msgs.length === 1 ? msgs[0] : `${msgs.length} skill audit results`;
       void import('node:child_process')
-        .then(({ execSync }) => {
+        .then(({ execFileSync }) => {
           try {
-            execSync(
-              `osascript -e 'display notification "${combined ?? ''}" with title "PanGuard"'`,
+            // execFileSync (no shell) prevents shell injection; escaping the
+            // AppleScript string literal prevents a skill name with quotes or
+            // backslashes from breaking out of the notification text.
+            const safe = (combined ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+            execFileSync(
+              'osascript',
+              ['-e', `display notification "${safe}" with title "PanGuard"`],
               { timeout: 2000 }
             );
           } catch {
