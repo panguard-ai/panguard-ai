@@ -134,7 +134,12 @@ describe('askTelemetryConsent', () => {
 
     const result = await askTelemetryConsent();
     expect(result).toBe(true);
-    expect(mockUpdateGuardConfig).toHaveBeenCalledWith({ telemetryEnabled: true });
+    // The collective-defense disclosure enables both the usage-stats flag and
+    // the hash-only threat-sharing flag in one opt-in.
+    expect(mockUpdateGuardConfig).toHaveBeenCalledWith({
+      telemetryEnabled: true,
+      threatCloudUploadEnabled: true,
+    });
   });
 
   it('returns false and sets telemetryEnabled=false when user answers n', async () => {
@@ -147,7 +152,10 @@ describe('askTelemetryConsent', () => {
 
     const result = await askTelemetryConsent();
     expect(result).toBe(false);
-    expect(mockUpdateGuardConfig).toHaveBeenCalledWith({ telemetryEnabled: false });
+    expect(mockUpdateGuardConfig).toHaveBeenCalledWith({
+      telemetryEnabled: false,
+      threatCloudUploadEnabled: false,
+    });
   });
 });
 
