@@ -1,8 +1,20 @@
 /**
- * llm-detect.ts - Auto-detection of LLM providers for GuardEngine
+ * llm-detect.ts — Opt-in detection of an LLM provider for the semantic (L2) layer.
  *
- * Priority: local encrypted config > environment variables > Ollama fallback.
- * Falls back to null if no provider is available (graceful degradation).
+ * The semantic layer is OPT-IN. It activates only when the user has explicitly
+ * provided an LLM, via any of:
+ *   - a configured provider (`pga config llm`, stored encrypted)
+ *   - PANGUARD_LLM_ENDPOINT — any OpenAI-compatible endpoint. One knob for the
+ *     whole local-AI ecosystem: NVIDIA NIM, vLLM, LM Studio, llama.cpp, DGX
+ *     Spark, LocalAI, Groq, Together, OpenRouter, Azure OpenAI, …
+ *   - NVIDIA_API_KEY — hosted NVIDIA NIM (OpenAI-compatible)
+ *   - ANTHROPIC_API_KEY / OPENAI_API_KEY — cloud
+ *   - PANGUARD_SEMANTIC=1 — probe common local runtimes (Ollama, LM Studio,
+ *     vLLM / NIM, llama.cpp) and use the first one reachable
+ *
+ * With none of these the engine stays L1 regex-only: deterministic, zero-config,
+ * no LLM latency, nothing auto-started. Detection always fails open — any error
+ * or unreachable provider → null (regex only).
  *
  * @module @panguard-ai/panguard-guard/llm-detect
  */
@@ -14,95 +26,226 @@ import type { AnalyzeLLM, LLMAnalysisResult, LLMClassificationResult } from './t
 
 const logger = createLogger('panguard-guard:llm-detect');
 
+type LLMProviderType = 'ollama' | 'claude' | 'openai';
+
+interface ResolvedLLM {
+  provider: LLMProviderType;
+  model: string;
+  apiKey?: string;
+  endpoint?: string;
+  /** Human-readable source, for logs only. */
+  label: string;
+}
+
+const DEFAULT_MODELS: Record<LLMProviderType, string> = {
+  claude: 'claude-sonnet-4-20250514',
+  openai: 'gpt-4o',
+  ollama: 'llama3',
+};
+
 /**
- * Attempt to auto-detect and create an LLM provider.
- * Priority: local encrypted config > environment variables > Ollama fallback.
- * Falls back to null if no provider is available (graceful degradation).
+ * Common local OpenAI-compatible / Ollama runtimes, probed (in order) only when
+ * the user opts into local inference with PANGUARD_SEMANTIC=1. For the
+ * OpenAI-compatible ones the real model name is discovered from `/v1/models`.
+ */
+const LOCAL_RUNTIMES: readonly ResolvedLLM[] = [
+  { provider: 'ollama', endpoint: 'http://localhost:11434', model: 'llama3', label: 'Ollama' },
+  { provider: 'openai', endpoint: 'http://localhost:1234/v1', apiKey: 'local', model: 'local-model', label: 'LM Studio' },
+  { provider: 'openai', endpoint: 'http://localhost:8000/v1', apiKey: 'local', model: 'local-model', label: 'vLLM / NVIDIA NIM' },
+  { provider: 'openai', endpoint: 'http://localhost:8080/v1', apiKey: 'local', model: 'local-model', label: 'llama.cpp' },
+];
+
+const PROBE_TIMEOUT_MS = 3_000;
+
+function truthy(v: string | undefined): boolean {
+  return v != null && v !== '' && v !== '0' && v.toLowerCase() !== 'false';
+}
+
+/** Read the encrypted LLM config written by `pga config llm`, if present. */
+async function readEncryptedConfig(): Promise<ResolvedLLM | null> {
+  try {
+    const { homedir, hostname, userInfo } = await import('node:os');
+    const { existsSync, readFileSync } = await import('node:fs');
+    const { createHash, createDecipheriv } = await import('node:crypto');
+
+    const llmPath = join(homedir(), '.panguard', 'llm.enc');
+    if (!existsSync(llmPath)) return null;
+
+    const parts = readFileSync(llmPath, 'utf-8').split(':');
+    if (parts.length !== 3) return null;
+
+    const machineId = `${hostname()}-${userInfo().username}-panguard-ai`;
+    const key = createHash('sha256').update(machineId).digest();
+    const iv = Buffer.from(parts[0]!, 'base64');
+    const authTag = Buffer.from(parts[1]!, 'base64');
+    const data = Buffer.from(parts[2]!, 'base64');
+    const decipher = createDecipheriv('aes-256-gcm', key, iv);
+    decipher.setAuthTag(authTag);
+    const decrypted = Buffer.concat([decipher.update(data), decipher.final()]).toString('utf8');
+    const cfg = JSON.parse(decrypted) as {
+      provider?: string;
+      apiKey?: string;
+      model?: string;
+      endpoint?: string;
+    };
+    if (cfg.provider && (cfg.apiKey || cfg.provider === 'ollama')) {
+      const provider = cfg.provider as LLMProviderType;
+      return {
+        provider,
+        apiKey: cfg.apiKey,
+        endpoint: cfg.endpoint,
+        model: cfg.model ?? DEFAULT_MODELS[provider] ?? 'llama3',
+        label: 'local config',
+      };
+    }
+  } catch {
+    // Unreadable / undecryptable — fall through to env-based resolution.
+  }
+  return null;
+}
+
+/** Ask an OpenAI-compatible server for its first model id (also a reachability probe). */
+async function discoverOpenAIModel(endpoint: string): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
+    const res = await fetch(`${endpoint.replace(/\/+$/, '')}/models`, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const body = (await res.json()) as { data?: Array<{ id?: string }> };
+    return body.data?.[0]?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Probe common local runtimes; return the first reachable one, else null. */
+async function probeLocalRuntimes(modelOverride?: string): Promise<ResolvedLLM | null> {
+  const { createLLM } = await import('@panguard-ai/core');
+  for (const rt of LOCAL_RUNTIMES) {
+    try {
+      let model = modelOverride ?? rt.model;
+      // OpenAI-compatible local servers serve arbitrary model names — discover
+      // the real one (and confirm reachability) before constructing the client.
+      if (rt.provider === 'openai' && !modelOverride) {
+        const discovered = await discoverOpenAIModel(rt.endpoint!);
+        if (!discovered) continue;
+        model = discovered;
+      }
+      const candidate = createLLM({
+        provider: rt.provider,
+        model,
+        apiKey: rt.apiKey,
+        endpoint: rt.endpoint,
+        lang: 'en',
+        timeout: PROBE_TIMEOUT_MS,
+      });
+      if (await candidate.isAvailable()) {
+        logger.info(`Semantic layer: detected local runtime '${rt.label}' at ${rt.endpoint}`);
+        return { ...rt, model };
+      }
+    } catch {
+      // Try the next runtime.
+    }
+  }
+  logger.info('PANGUARD_SEMANTIC set but no local LLM runtime reachable — running without AI');
+  return null;
+}
+
+/**
+ * Resolve which LLM (if any) the user has opted into. Returns null when the
+ * semantic layer is not enabled — the engine then stays L1 regex-only.
+ */
+async function resolveOptedInLLM(): Promise<ResolvedLLM | null> {
+  // 1. Explicit local config (`pga config llm`) — strongest signal.
+  const fromConfig = await readEncryptedConfig();
+  if (fromConfig) return fromConfig;
+
+  const model = process.env['PANGUARD_LLM_MODEL'];
+
+  // 2. Custom OpenAI-compatible endpoint — one knob for the whole local-AI
+  //    ecosystem (NVIDIA NIM, vLLM, LM Studio, llama.cpp, DGX Spark, …).
+  const customEndpoint = process.env['PANGUARD_LLM_ENDPOINT'];
+  if (customEndpoint) {
+    return {
+      provider: 'openai',
+      endpoint: customEndpoint,
+      apiKey:
+        process.env['PANGUARD_LLM_KEY'] ??
+        process.env['OPENAI_API_KEY'] ??
+        process.env['NVIDIA_API_KEY'] ??
+        'local',
+      model: model ?? 'local-model',
+      label: `custom endpoint (${customEndpoint})`,
+    };
+  }
+
+  // 3. NVIDIA hosted NIM (OpenAI-compatible).
+  if (process.env['NVIDIA_API_KEY']) {
+    return {
+      provider: 'openai',
+      endpoint: 'https://integrate.api.nvidia.com/v1',
+      apiKey: process.env['NVIDIA_API_KEY'],
+      model: model ?? 'nvidia/llama-3.1-nemotron-70b-instruct',
+      label: 'NVIDIA NIM (hosted)',
+    };
+  }
+
+  // 4. Cloud keys.
+  if (process.env['ANTHROPIC_API_KEY']) {
+    return {
+      provider: 'claude',
+      apiKey: process.env['ANTHROPIC_API_KEY'],
+      model: model ?? DEFAULT_MODELS.claude,
+      label: 'Anthropic',
+    };
+  }
+  if (process.env['OPENAI_API_KEY']) {
+    return {
+      provider: 'openai',
+      apiKey: process.env['OPENAI_API_KEY'],
+      model: model ?? DEFAULT_MODELS.openai,
+      label: 'OpenAI',
+    };
+  }
+
+  // 5. Explicit opt-in to local inference: probe common local runtimes.
+  if (truthy(process.env['PANGUARD_SEMANTIC'])) {
+    return probeLocalRuntimes(model);
+  }
+
+  // Not opted in → no semantic layer.
+  return null;
+}
+
+/**
+ * Attempt to detect and create the opt-in LLM provider for the semantic layer.
+ * Returns null (graceful degradation to L1 regex) when not opted in or the
+ * provider is unreachable. Always fails open.
  */
 export async function autoDetectLLM(): Promise<AnalyzeLLM | null> {
   try {
-    const { createLLM } = await import('@panguard-ai/core');
-    type LLMProviderType = 'ollama' | 'claude' | 'openai';
-
-    let provider: LLMProviderType | null = null;
-    let apiKey: string | undefined;
-    let model: string | undefined;
-
-    // 1. Check local encrypted LLM config (~/.panguard/llm.enc)
-    try {
-      const { homedir } = await import('node:os');
-      const { existsSync, readFileSync } = await import('node:fs');
-      const { createHash, createDecipheriv } = await import('node:crypto');
-      const { hostname, userInfo } = await import('node:os');
-
-      const llmPath = join(homedir(), '.panguard', 'llm.enc');
-      if (existsSync(llmPath)) {
-        const encrypted = readFileSync(llmPath, 'utf-8');
-        const parts = encrypted.split(':');
-        if (parts.length === 3) {
-          const machineId = `${hostname()}-${userInfo().username}-panguard-ai`;
-          const key = createHash('sha256').update(machineId).digest();
-          const iv = Buffer.from(parts[0]!, 'base64');
-          const authTag = Buffer.from(parts[1]!, 'base64');
-          const data = Buffer.from(parts[2]!, 'base64');
-          const decipher = createDecipheriv('aes-256-gcm', key, iv);
-          decipher.setAuthTag(authTag);
-          const decrypted = Buffer.concat([decipher.update(data), decipher.final()]).toString(
-            'utf8'
-          );
-          const llmConfig = JSON.parse(decrypted) as {
-            provider?: string;
-            apiKey?: string;
-            model?: string;
-          };
-          if (llmConfig.provider && (llmConfig.apiKey || llmConfig.provider === 'ollama')) {
-            provider = llmConfig.provider as LLMProviderType;
-            apiKey = llmConfig.apiKey;
-            model = llmConfig.model;
-            logger.info(`LLM config loaded from local encrypted store (provider: ${provider})`);
-          }
-        }
-      }
-    } catch {
-      // Local config not available, fall through to env vars
-    }
-
-    // 2. Fall back to environment variables
-    if (!provider) {
-      if (process.env['ANTHROPIC_API_KEY']) {
-        provider = 'claude';
-        apiKey = process.env['ANTHROPIC_API_KEY'];
-        model = process.env['PANGUARD_LLM_MODEL'] ?? 'claude-sonnet-4-20250514';
-      } else if (process.env['OPENAI_API_KEY']) {
-        provider = 'openai';
-        apiKey = process.env['OPENAI_API_KEY'];
-        model = process.env['PANGUARD_LLM_MODEL'] ?? 'gpt-4o';
-      } else {
-        provider = 'ollama';
-        model = process.env['PANGUARD_LLM_MODEL'] ?? 'llama3';
-      }
-    }
-
-    // Allow env var model override even when using local config
-    if (process.env['PANGUARD_LLM_MODEL']) {
-      model = process.env['PANGUARD_LLM_MODEL'];
-    }
-
-    const defaultModels: Record<string, string> = {
-      claude: 'claude-sonnet-4-20250514',
-      openai: 'gpt-4o',
-      ollama: 'llama3',
-    };
-    const resolvedModel = model ?? defaultModels[provider] ?? 'llama3';
-
-    const llmProvider = createLLM({ provider, model: resolvedModel, apiKey, lang: 'en' });
-    const available = await llmProvider.isAvailable();
-    if (!available) {
-      logger.info(`LLM provider '${provider}' not available, running without AI`);
+    const resolved = await resolveOptedInLLM();
+    if (!resolved) {
+      logger.info('Semantic layer not enabled (no LLM opted in) — running L1 regex only');
       return null;
     }
 
-    logger.info(`LLM provider '${provider}' (model: ${model}) connected`);
+    const { createLLM } = await import('@panguard-ai/core');
+    const llmProvider = createLLM({
+      provider: resolved.provider,
+      model: resolved.model,
+      apiKey: resolved.apiKey,
+      endpoint: resolved.endpoint,
+      lang: 'en',
+    });
+
+    if (!(await llmProvider.isAvailable())) {
+      logger.info(`Semantic layer: '${resolved.label}' not reachable — running without AI`);
+      return null;
+    }
+
+    logger.info(`Semantic layer: '${resolved.label}' (model: ${resolved.model}) connected`);
 
     const adapter: AnalyzeLLM = {
       async analyze(prompt: string, context?: string): Promise<LLMAnalysisResult> {
