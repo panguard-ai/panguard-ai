@@ -29,8 +29,10 @@ export function getAnonymousClientId(): string {
 
   const id = randomUUID();
   try {
-    mkdirSync(join(homedir(), '.panguard'), { recursive: true });
-    writeFileSync(ID_PATH, id, 'utf-8');
+    mkdirSync(join(homedir(), '.panguard'), { recursive: true, mode: 0o700 });
+    // 0o600: the client-id is a persistent pseudonymous identifier sent to TC —
+    // not readable by other local users on a shared machine.
+    writeFileSync(ID_PATH, id, { encoding: 'utf-8', mode: 0o600 });
   } catch {
     // Best effort - return the ID even if we can't persist it
   }

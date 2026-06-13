@@ -39,18 +39,27 @@ export interface CloudSyncDeps {
  * skill whitelist and blacklist.
  */
 export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
-  const { atrEngine, threatCloud, feedManager } = deps;
+  const { atrEngine, threatCloud, feedManager, config } = deps;
 
   try {
     // Sync ATR rules from Threat Cloud
     let newATRRules = 0;
     try {
-      const atrRules = await threatCloud.fetchATRRules();
+      // Rule reception is ON by default but can be disabled (offline / pinned
+      // rules) via config threatCloudRuleSyncEnabled=false — independently of
+      // the IP/domain blocklist feeds synced below, which keep working.
+      const atrRules =
+        config.threatCloudRuleSyncEnabled === false ? [] : await threatCloud.fetchATRRules();
       const yaml = await import('js-yaml');
       for (const rule of atrRules) {
         try {
-          // TC stores rules as YAML strings, not JSON
-          const parsed = yaml.load(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
+          // TC stores rules as YAML strings, not JSON. JSON_SCHEMA: remote rule
+          // content is parsed as pure data only (no custom YAML types), so a
+          // malicious or MITM'd Threat Cloud response cannot smuggle executable
+          // or type-confused objects into the engine.
+          const parsed = yaml.load(rule.ruleContent, {
+            schema: yaml.JSON_SCHEMA,
+          }) as import('@panguard-ai/atr').ATRRule;
           if (parsed.id && parsed.title && parsed.detection && parsed.agent_source?.type) {
             atrEngine.addCloudRule(parsed);
             newATRRules++;

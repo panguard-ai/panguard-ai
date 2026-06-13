@@ -1,0 +1,217 @@
+title: 'Cross-conversation memory write (scope-escape via memory store)'
+id: ATR-2026-00551
+rule_version: 1
+status: draft
+description: >
+  Detects an agent writing data into a memory store / vector store scoped
+  to a DIFFERENT conversation than the active trace's conversation.id.
+  This is a trace-method rule using the `forbid` primitive with a target
+  field comparison (spec/atr-method-v1.1.md §8.3.1).
+
+  Threat model: memory APIs (long-term context, vector stores, RAG
+  ingestion) typically partition by conversation.id, user.id, or session.id
+  for tenant isolation. Two attack patterns create scope-escape: (1)
+  prompt injection convinces the agent to "remember this for user X" when
+  the active conversation is for user Y, (2) tool argument tampering
+  alters the target conversation_id before the memory write completes.
+  In either case, the trace exhibits a span where
+  attributes.tool.args.target_conversation_id differs from the active
+  span's attributes.conversation.id. No exception is raised; the memory
+  write succeeds and corrupts the target conversation's context.
+
+  This rule is the runtime-detection complement to the AgentArmor
+  (arXiv:2508.01249) type-system rule "memory writes must respect the
+  active conversation lattice."
+author: 'ATR Community'
+date: '2026/05/28'
+schema_version: '1.0'
+maturity: draft
+severity: critical
+
+references:
+  owasp_agentic:
+    - 'ASI04:2026 - Unauthorized Resource Access'
+    - 'ASI09:2026 - Memory Poisoning'
+  owasp_llm:
+    - 'LLM03:2025 - Training Data Poisoning'
+  mitre_atlas:
+    - 'AML.T0018 - Backdoor ML Model'
+    - 'AML.T0020 - Poison Training Data'
+  research:
+    - 'AgentArmor: Type-System for Agent Trace Analysis (arXiv:2508.01249)'
+    - 'Compositional Privacy Risks in Multi-Agent Systems (arXiv:2509.14284)'
+
+compliance:
+  nist_csf:
+    - 'PR.DS-01'
+    - 'PR.AC-04'
+  etsi_ts_104223:
+    - 'P5.1'
+  eu_ai_act:
+    - article: '10'
+      context: >
+        Data governance — cross-conversation memory writes corrupt
+        tenant-isolated state and violate Article 10 data-governance
+        requirements.
+      strength: primary
+    - article: '15'
+      context: 'Article 15 (accuracy, robustness and cybersecurity) requires high-risk AI systems to resist unauthorised attempts to alter their use, outputs or performance; this rule provides runtime detection evidence by flagging the privilege-escalation attempt (Cross-conversation memory write (scope-escape via memory store)).'
+      strength: primary
+    - article: '14'
+      context: 'Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the privilege-escalation attempt (Cross-conversation memory write (scope-escape via memory store)) would bypass or undermine that oversight.'
+      strength: secondary
+  nist_ai_rmf:
+    - subcategory: 'MS.2.6'
+      context: >
+        Information security — cross-tenant memory writes are integrity
+        failures under MS-2.6.
+      strength: primary
+    - subcategory: 'MS.2.7'
+      context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the privilege-escalation attempt (Cross-conversation memory write (scope-escape via memory store))."
+      strength: primary
+    - subcategory: 'MG.2.3'
+      context: 'NIST AI RMF MANAGE 2.3 (respond to previously unknown identified risks) is supported by this rule, which surfaces the privilege-escalation attempt (Cross-conversation memory write (scope-escape via memory store)) so the risk can be treated.'
+      strength: secondary
+
+  iso_42001:
+    - clause: '8.1'
+      context: "ISO/IEC 42001 Clause 8.1 (operational planning and control, including control of externally provided processes) is operationalised by this rule's detection of the privilege-escalation attempt (Cross-conversation memory write (scope-escape via memory store))."
+      strength: primary
+    - clause: '6.2'
+      context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the privilege-escalation attempt (Cross-conversation memory write (scope-escape via memory store)) is such a treatment."
+      strength: secondary
+tags:
+  category: privilege-escalation
+  subcategory: cross-conversation-memory-write
+  scan_target: runtime
+  confidence: high
+  source: trace-rule
+
+agent_source:
+  type: agent_trace
+  framework:
+    - any
+  provider:
+    - any
+
+detection:
+  method: trace
+  condition: any
+  false_positives:
+    - >
+      Admin / knowledge-propagation agents legitimately write across
+      conversations (e.g., support escalation summaries, cross-tenant
+      compliance reports). The rule has no exemption mechanism for these.
+      Mitigation: operators tag authorized cross-conv agents with
+      attributes.agent.role="cross_conv_admin" and add a pre-filter at
+      the policy layer. The rule itself does not encode this exception
+      to keep the trace shape simple.
+    - >
+      Closed tool name list (memory.write, memory.upsert,
+      vector_store.write, vector_store.upsert, longterm.append,
+      rag.ingest): framework-specific names like mem0.add, zep.memory.add,
+      langmem.put, chromadb.add, pgvector.insert all bypass the rule.
+      Until a regex/suffix matcher lands in the spec, operators MUST
+      extend the in[] list for their stack. This is a known FN scenario
+      that complements the FP risk.
+    - >
+      `exists: true` and `not_equals` are co-located on
+      tool.args.target_conversation_id. Spec §8.3 requires engines to
+      evaluate `exists` before `not_equals` to avoid placeholder-
+      resolution errors on absent attributes. Non-conformant engines
+      may emit a graceful_error here.
+  conditions:
+    - field: trace.forbid_violation
+      operator: regex
+      value: '(?i)forbid_violation:cross_conversation_memory_write'
+      description: >
+        Synthetic field emitted by the trace engine when the forbid
+        primitive fires; trace-native engines evaluate detection.trace.
+  trace:
+    ingest_format: openinference
+    forbid:
+      - shape:
+          span.kind: 'TOOL'
+          attributes:
+            tool.name:
+              in:
+                - 'memory.write'
+                - 'memory.upsert'
+                - 'vector_store.write'
+                - 'vector_store.upsert'
+                - 'longterm.append'
+                - 'rag.ingest'
+            tool.args.target_conversation_id:
+              exists: true
+              not_equals: '${span.attributes.conversation.id}'
+        description: >
+          Memory-write tool whose args.target_conversation_id is set
+          AND differs from the active span's conversation.id indicates
+          scope-escape. Uses the cross-attribute reference syntax per
+          atr-method-v1.1.md §8.3 (the ${span.attributes.X} placeholder
+          is resolved against the candidate span before predicate
+          evaluation).
+
+response:
+  actions:
+    - block_tool
+    - alert
+    - snapshot
+  message_template: >
+    [ATR-2026-00551] HIGH: Cross-conversation memory write detected. Tool
+    {{trace.matched_span.attributes.tool.name}} (span
+    {{trace.matched_span.id}}) attempted to write into conversation
+    {{trace.matched_span.attributes.tool.args.target_conversation_id}}
+    while the active trace conversation is
+    {{trace.matched_span.attributes.conversation.id}}. Block the write;
+    audit whether the active agent has authority over the target
+    conversation.
+
+confidence: 85
+
+wild_fp_rate: 0
+
+test_cases:
+  true_positives:
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"memory.write","conversation.id":"conv_A","tool.args":{"target_conversation_id":"conv_B","payload":"remember this"}}}]}
+      expected: triggered
+      description: 'memory.write into conv_B while active conversation is conv_A'
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"vector_store.upsert","conversation.id":"alpha","tool.args":{"target_conversation_id":"beta","vector":"<...>"}}}]}
+      expected: triggered
+      description: 'vector_store.upsert with target_conversation_id mismatch'
+    - input: |
+        {"spans":[{"id":"a1","kind":"AGENT","attributes":{"conversation.id":"primary"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"rag.ingest","conversation.id":"primary","tool.args":{"target_conversation_id":"victim_conv","content":"fake context"}}}]}
+      expected: triggered
+      description: 'rag.ingest into victim_conv while operating in primary'
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"longterm.append","conversation.id":"c123","tool.args":{"target_conversation_id":"c456"}}}]}
+      expected: triggered
+      description: "longterm.append targets a different conversation than the trace's"
+    - input: |
+        {"spans":[{"id":"r1","kind":"RETRIEVER","attributes":{"source.trust":"untrusted","conversation.id":"x"}},{"id":"t1","kind":"TOOL","attributes":{"tool.name":"memory.upsert","conversation.id":"x","tool.args":{"target_conversation_id":"y"}}}]}
+      expected: triggered
+      description: 'Combined indirect-injection + cross-conv memory write'
+
+  true_negatives:
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"memory.write","conversation.id":"same","tool.args":{"target_conversation_id":"same","payload":"note"}}}]}
+      expected: not_triggered
+      description: 'target_conversation_id == active conversation.id — legitimate self-write'
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"memory.read","conversation.id":"a","tool.args":{"target_conversation_id":"b"}}}]}
+      expected: not_triggered
+      description: 'memory.read is not a write — rule does not apply'
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"calculator","conversation.id":"c","tool.args":{"a":1,"b":2}}}]}
+      expected: not_triggered
+      description: 'Tool is calculator, not memory-write — rule does not apply'
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"memory.write","conversation.id":"only","tool.args":{"payload":"note without target_conversation_id"}}}]}
+      expected: not_triggered
+      description: 'No explicit target_conversation_id; defaults to active conversation — legitimate'
+    - input: |
+        {"spans":[{"id":"t1","kind":"TOOL","attributes":{"tool.name":"vector_store.upsert","conversation.id":"shared","tool.args":{"target_conversation_id":"shared","namespace":"global"}}}]}
+      expected: not_triggered
+      description: 'Shared conversation namespace — target equals active, legitimate cross-agent shared memory'

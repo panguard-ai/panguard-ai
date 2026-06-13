@@ -323,10 +323,18 @@ export async function commandScan(args: string[]): Promise<void> {
 // ---------------------------------------------------------------------------
 
 /** Extract npm package name from an MCP server entry */
+/**
+ * Valid npm package name (scoped or unscoped). The package name originates from
+ * an AI agent's MCP config (attacker-influenced), so it MUST be validated before
+ * it ever reaches a child process — this rejects shell metacharacters, spaces,
+ * path traversal, and anything that is not a real npm name.
+ */
+const NPM_NAME_RE = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/i;
+
 function extractPackageName(entry: MCPServerEntry): string | null {
   if (entry.command === 'npx') {
     const pkgArg = entry.args.find((a) => !a.startsWith('-'));
-    if (pkgArg) return pkgArg;
+    if (pkgArg && pkgArg.length <= 214 && NPM_NAME_RE.test(pkgArg)) return pkgArg;
   }
   return null;
 }
@@ -344,10 +352,14 @@ async function quickNpmAudit(
   let riskScore = 0;
 
   try {
-    const { execSync } = await import('node:child_process');
-    const raw = execSync(`npm view ${pkgName} --json 2>/dev/null`, {
+    // execFileSync (no shell): pkgName can never be interpreted as a command,
+    // even though it is already validated by NPM_NAME_RE. stdio ignores stderr
+    // (replaces the old `2>/dev/null` shell redirect).
+    const { execFileSync } = await import('node:child_process');
+    const raw = execFileSync('npm', ['view', pkgName, '--json'], {
       encoding: 'utf-8',
       timeout: 10000,
+      stdio: ['ignore', 'pipe', 'ignore'],
     });
     const meta = JSON.parse(raw) as Record<string, unknown>;
 

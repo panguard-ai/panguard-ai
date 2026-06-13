@@ -894,7 +894,6 @@
             >COMMUNITY</span
           >
         </div>
-        <button class="lb" onclick="toggleLang()">EN / ZH</button>
       </div>
     </div>
 
@@ -954,8 +953,8 @@
             <span class="dot dot-ok"></span> <span data-i18n="layer_title">Detection Layers</span>
           </h3>
           <div class="desc" data-i18n="layer_desc">
-            Three layers operate in series. Pattern match runs first, heuristic correlation enriches
-            matches, confidence verdict decides the response.
+            Pattern matching and heuristic correlation run on every event. The optional semantic
+            layer adds LLM reasoning only when you connect one — it stays off until you opt in.
           </div>
           <div class="layer-row">
             <span class="layer-label">Layer A &mdash; Pattern match</span>
@@ -968,9 +967,9 @@
             <span class="layer-status on" id="lb-st" data-i18n="active">Active</span>
           </div>
           <div class="layer-row">
-            <span class="layer-label">Layer C &mdash; Confidence verdict</span>
-            <div class="layer-bar"><div class="layer-fill on" id="lc-bar"></div></div>
-            <span class="layer-status on" id="lc-st" data-i18n="active">Active</span>
+            <span class="layer-label">Layer C &mdash; Semantic verdict (optional)</span>
+            <div class="layer-bar"><div class="layer-fill" id="lc-bar"></div></div>
+            <span class="layer-status" id="lc-st" data-i18n="layer_optin">Opt-in</span>
           </div>
         </div>
 
@@ -1107,8 +1106,11 @@
           </thead>
           <tbody id="th-tb"></tbody>
         </table>
-        <div id="th-empty" class="empty" data-i18n="th_empty" style="display: none">
-          No threats detected.
+        <div id="th-empty" class="empty-ok" data-i18n="th_empty" style="display: none">
+          All clear — no threats today.
+          <div class="sub" data-i18n="th_empty_sub">
+            Your agents are protected. Threats will appear here if anything is caught.
+          </div>
         </div>
       </div>
 
@@ -1431,13 +1433,8 @@
           <div class="desc" data-i18n="st_lang_desc">
             Choose the display language. Setting is stored locally.
           </div>
-          <div class="fr">
-            <label data-i18n="st_lang_label">Language</label>
-            <select id="st-lang" onchange="setLangFromSettings()">
-              <option value="en">English</option>
-              <option value="zh">繁體中文</option>
-            </select>
-          </div>
+          <!-- Language selector removed: the developer tool is English-only. -->
+
         </div>
 
         <div style="display: flex; gap: 10px; margin-top: 8px">
@@ -1488,8 +1485,9 @@
           t_tc: 'Threat Cloud',
           t_st: 'Settings',
           active: 'Active',
+          layer_optin: 'Opt-in',
           hero_desc:
-            'All detection layers are operational. PanGuard is monitoring AI agent activity in real time.',
+            'All detection layers are operational. PanGuard is watching your AI agents in real time — detection only, nothing is blocked unless you turn on enforcement.',
           k_rules: 'Rules Active',
           k_threats: 'Threats Detected',
           k_tc: 'TC Rules Synced',
@@ -1500,7 +1498,7 @@
           k_mem: 'Memory (MB)',
           layer_title: 'Detection Layers',
           layer_desc:
-            'Three layers operate in series. Pattern match runs first, heuristic correlation enriches matches, confidence verdict decides the response.',
+            'Pattern matching and heuristic correlation run on every event. The optional semantic layer adds LLM reasoning only when you connect one — it stays off until you opt in.',
           recent_events: 'Recent Events',
           ev_empty: 'All clear. No events yet.',
           ev_empty_sub: 'Detected events will appear here as they happen.',
@@ -1518,7 +1516,8 @@
           th_sev: 'Severity',
           th_pat: 'Matched Pattern',
           th_act: 'Action',
-          th_empty: 'No threats detected.',
+          th_empty: 'All clear — no threats today.',
+          th_empty_sub: 'Your agents are protected. Threats will appear here if anything is caught.',
           d_ru: 'All loaded ATR detection rules. Rules sync hourly from Threat Cloud.',
           ru_total: 'Total Rules',
           ru_critical: 'Critical',
@@ -1591,7 +1590,8 @@
           t_tc: '威脅雲',
           t_st: '設定',
           active: '啟動中',
-          hero_desc: '所有偵測層運作中,PanGuard 正在即時監控 AI agent 活動。',
+          hero_desc:
+            '所有偵測層運作中,PanGuard 正在即時守護你的 AI agent — 僅偵測,除非你開啟強制模式,否則不會阻擋任何流量。',
           k_rules: '啟用規則',
           k_threats: '已偵測威脅',
           k_tc: 'TC 同步規則',
@@ -1620,7 +1620,8 @@
           th_sev: '嚴重程度',
           th_pat: '匹配模式',
           th_act: '採取動作',
-          th_empty: '未偵測到威脅。',
+          th_empty: '一切正常 — 今日無威脅。',
+          th_empty_sub: '你的 agent 受到保護。偵測到威脅時會顯示在這裡。',
           d_ru: '已載入的 ATR 偵測規則。規則每小時自動從 Threat Cloud 同步。',
           ru_total: '總規則數',
           ru_critical: '嚴重',
@@ -1679,17 +1680,11 @@
         },
       };
 
-      var lang = (function () {
-        try {
-          var s = localStorage.getItem('panguard_lang');
-          if (s === 'zh' || s === 'en') return s;
-          var n = navigator.language || '';
-          if (n.toLowerCase().indexOf('zh') === 0) return 'zh';
-          return 'en';
-        } catch (e) {
-          return 'en';
-        }
-      })();
+      // Product is English-only. The zh dictionary and the `lang === 'zh'`
+      // ternaries are retained as dead code (they always resolve to the English
+      // branch) and can be removed in a dedicated cleanup; the bilingual
+      // experience lives on the marketing site, not the developer tool.
+      var lang = 'en';
 
       var currentSevFilter = 'all';
       var currentSort = { col: 'timestamp', dir: 'desc' };

@@ -10,7 +10,8 @@ import { homedir, platform } from 'node:os';
 import { execFile } from 'node:child_process';
 import { Command } from 'commander';
 import { runCLI } from '@panguard-ai/panguard-guard';
-import { c, symbols, setLogLevel } from '@panguard-ai/core';
+import { c, setLogLevel } from '@panguard-ai/core';
+import { ok, warn, arrow, shield, brandTagline } from '../theme.js';
 import { detectLang } from '../interactive/lang.js';
 
 type Lang = 'en' | 'zh-TW';
@@ -91,11 +92,18 @@ export function upCommand(): Command {
   return new Command('up')
     .description('Scan skills → start protection → open dashboard')
     .option('--no-dashboard', 'Skip opening dashboard in browser')
+    .option('--no-proxy', 'Scan only — do not inject runtime protection into agent configs')
     .option('--verbose', 'Verbose output', false)
     .option('--skip-scan', 'Skip initial skill scan', false)
     .option('-y, --yes', 'Skip confirmation prompts', false)
     .action(
-      async (opts: { dashboard: boolean; verbose: boolean; skipScan: boolean; yes: boolean }) => {
+      async (opts: {
+        dashboard: boolean;
+        proxy: boolean;
+        verbose: boolean;
+        skipScan: boolean;
+        yes: boolean;
+      }) => {
         // Suppress JSON logs for clean output — set env var BEFORE any dynamic imports
         // so all child modules (panguard-mcp, panguard-scan, etc.) also respect it
         if (!opts.verbose) {
@@ -106,8 +114,9 @@ export function upCommand(): Command {
         const lang = detectLang();
 
         console.log(
-          `\n  ${c.sage(c.bold('PANGUARD AI'))} ${c.dim(t(lang, '— AI Agent Security Guard', '— AI 代理安全防護'))}\n`
+          `\n  ${c.sage(c.bold('PanGuard'))}  ${c.dim(t(lang, 'Your AI Security Guard', '你的 AI 安全防護'))}`
         );
+        console.log(`  ${c.dim(brandTagline(lang))}\n`);
         console.log(`  ${c.dim('─'.repeat(50))}\n`);
 
         const activatedMarker = join(homedir(), '.panguard', 'activated');
@@ -123,10 +132,10 @@ export function upCommand(): Command {
             `  ${t(lang, 'PanGuard protects your AI agents in 3 steps:', 'PanGuard 三步驟保護你的 AI 代理：')}`
           );
           console.log(
-            `  ${c.dim('1.')} ${t(lang, 'Scan — detect threats in installed skills', '掃描 — 偵測已安裝技能中的威脅')}`
+            `  ${c.dim('1.')} ${t(lang, 'Scan — check installed skills against threat rules', '掃描 — 用威脅規則檢查已安裝技能')}`
           );
           console.log(
-            `  ${c.dim('2.')} ${t(lang, 'Protect — inject MCP proxy for runtime guard', '防護 — 注入 MCP 代理進行即時守護')}`
+            `  ${c.dim('2.')} ${t(lang, 'Watch — guard your agents as they run', '守護 — 在 agent 執行時即時守護')}`
           );
           console.log(
             `  ${c.dim('3.')} ${t(lang, 'Monitor — Guard engine watches for attacks', '監控 — Guard 引擎持續監控攻擊')}`
@@ -182,44 +191,45 @@ export function upCommand(): Command {
           }
 
           console.log(
-            `  ${symbols.scan} ${c.bold(t(lang, 'Detecting AI platforms...', '偵測 AI 平台...'))}\n`
+            `  ${shield()} ${c.bold(t(lang, 'Looking at your setup...', '看看你的環境...'))}\n`
           );
           const platforms = await detectPlatforms();
           const detected = platforms.filter((p) => p.detected);
 
           for (const p of detected) {
-            console.log(`    ${c.safe(p.name)}  ${c.dim('detected')}`);
+            console.log(`    ${ok()} ${c.safe(p.name)}  ${c.dim(t(lang, 'found', '已找到'))}`);
           }
           if (detected.length === 0) {
-            console.log(`    ${c.dim('No AI platforms found.')}`);
+            console.log(`    ${c.dim(t(lang, 'No AI tools found yet.', '尚未找到 AI 工具。'))}`);
           }
 
-          // Inject proxy on all detected platforms (with consent)
+          // Build runtime protection by DEFAULT. `pga up` should stand up
+          // protection out of the box; --no-proxy opts out (scan only). In an
+          // interactive TTY we still confirm, but the prompt defaults to YES so
+          // the common path (just run `pga up`) actually protects. Non-TTY
+          // (CI / unattended) injects by default too — configs are backed up.
           if (detected.length > 0) {
-            let shouldInject = opts.yes;
-            if (!shouldInject) {
-              if (!process.stdin.isTTY) {
-                // Non-interactive (CI, piped): skip injection by default
-                shouldInject = false;
-              } else {
-                const { createInterface } = await import('node:readline');
-                const rl = createInterface({ input: process.stdin, output: process.stdout });
-                const answer = await new Promise<string>((resolve) => {
-                  rl.question(
-                    `\n  Inject MCP proxy into ${detected.length} platform(s)? ` +
-                      `${c.dim('(configs backed up to *.bak)')} [y/N] `,
-                    resolve
-                  );
-                });
-                rl.close();
-                shouldInject = answer.trim().toLowerCase() === 'y';
-              }
+            let shouldInject = opts.proxy !== false;
+            if (shouldInject && !opts.yes && process.stdin.isTTY) {
+              const { createInterface } = await import('node:readline');
+              const rl = createInterface({ input: process.stdin, output: process.stdout });
+              const answer = await new Promise<string>((resolve) => {
+                rl.question(
+                  `\n  Inject runtime protection into ${detected.length} platform(s)? ` +
+                    `${c.dim('(configs backed up to *.bak)')} [Y/n] `,
+                  resolve
+                );
+              });
+              rl.close();
+              shouldInject = answer.trim().toLowerCase() !== 'n';
             }
 
             if (!shouldInject) {
-              console.log(`\n    ${c.dim('Proxy injection skipped. Run "pga up -y" to inject.')}`);
+              console.log(
+                `\n    ${c.dim('Scan only — runtime protection not injected (--no-proxy).')}`
+              );
             } else {
-              console.log(`\n  ${symbols.shield} ${c.bold('Injecting runtime protection...')}\n`);
+              console.log(`\n  ${shield()} ${c.bold('Watching your agents...')}\n`);
               const proxySummary = injectProxyFn(detected.map((p) => p.id));
               platformCount = proxySummary.totalPlatforms;
               serverCount = proxySummary.totalServersProxied;
@@ -230,9 +240,7 @@ export function upCommand(): Command {
                 );
                 console.log(`    ${c.dim('Config backed up to *.bak files')}`);
               } else {
-                console.log(
-                  `    ${c.dim('No new servers to proxy (all already protected or none found).')}`
-                );
+                console.log(`    ${c.dim('All detected tools are already protected.')}`);
               }
 
               // Show errors if any
@@ -259,7 +267,7 @@ export function upCommand(): Command {
         // ── Step 3: Scan installed skills ────────────────────────
         if (!opts.skipScan) {
           console.log(
-            `\n  ${symbols.scan} ${c.bold(t(lang, 'Scanning installed skills...', '掃描已安裝技能...'))}\n`
+            `\n  ${arrow()} ${c.bold(t(lang, 'Scanning installed skills...', '掃描已安裝技能...'))}\n`
           );
 
           try {
@@ -314,7 +322,7 @@ export function upCommand(): Command {
               // If there are unscanned skills, run audit on them
               if (unknown.length > 0) {
                 console.log(
-                  `\n  ${symbols.warn} ${c.bold(`${unknown.length} unscanned skill(s) found. Auditing...`)}\n`
+                  `\n  ${warn()} ${c.bold(`${unknown.length} unscanned skill(s) found. Auditing...`)}\n`
                 );
 
                 const threats: Array<{
@@ -420,14 +428,10 @@ export function upCommand(): Command {
                   }
                   console.log('');
                 } else {
-                  console.log(
-                    `  ${c.safe(`${symbols.pass} No threats found in unscanned skills.`)}\n`
-                  );
+                  console.log(`  ${c.safe(`${ok()} No threats found in unscanned skills.`)}\n`);
                 }
               } else {
-                console.log(
-                  `  ${c.safe(`${symbols.pass} All ${skills.length} skills verified safe.`)}\n`
-                );
+                console.log(`  ${c.safe(`${ok()} All ${skills.length} skills verified safe.`)}\n`);
               }
             }
           } catch {
@@ -535,7 +539,7 @@ export function upCommand(): Command {
         // ── Sensor confirmation: user knows they are now part of the defense network
         if (tcStatus === 'connected' && !telemetryDisabled && sensorShortId) {
           console.log(
-            `  ${c.safe(symbols.pass)} ${c.bold(t(lang, 'You are now a Threat Cloud sensor.', '你已成為威脅雲感測器。'))}`
+            `  ${c.safe(ok())} ${c.bold(t(lang, 'You are now a Threat Cloud sensor.', '你已成為威脅雲感測器。'))}`
           );
           console.log(
             `  ${c.dim(t(lang, `This machine contributes anonymous detections to the community defense network.`, `這台機器正在為社群防禦網路貢獻匿名偵測。`))}`
@@ -630,6 +634,17 @@ async function submitToTC(
     const severity = report.riskLevel === 'CRITICAL' ? 'critical' : 'high';
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
 
+    // Sanitize scan-derived text before interpolating into the generated YAML.
+    // A malicious skill could embed YAML-breaking characters (quotes, newlines,
+    // colons) in a finding title; strip them so the proposal can't be hijacked.
+    const yamlSafe = (s: string): string =>
+      s
+        .replace(/\p{Cc}/gu, ' ') // strip control chars + newlines (YAML structure breakers)
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\s+/g, ' ')
+        .trim();
+
     const conditions = highFindings
       .map((f, idx) => {
         const keywords = f.title
@@ -638,17 +653,17 @@ async function submitToTC(
           .slice(0, 4);
         if (keywords.length === 0) return null;
         const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
-        return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${f.title.slice(0, 80)}"`;
+        return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${yamlSafe(f.title.slice(0, 80))}"`;
       })
       .filter(Boolean);
 
     if (conditions.length > 0) {
-      const ruleContent = `title: "CLI Audit: ${highFindings[0]?.title.slice(0, 60) ?? skillName}"
+      const ruleContent = `title: "CLI Audit: ${yamlSafe(highFindings[0]?.title.slice(0, 60) ?? skillName)}"
 id: ATR-2026-DRAFT-${pHash.slice(0, 8)}
 status: draft
 description: |
-  Auto-generated from pga up scan of "${skillName}".
-  Findings: ${findingSummary.slice(0, 200)}
+  Auto-generated from pga up scan of "${yamlSafe(skillName)}".
+  Findings: ${yamlSafe(findingSummary.slice(0, 200))}
 author: "PanGuard CLI (pga up)"
 date: "${date}"
 schema_version: "0.1"

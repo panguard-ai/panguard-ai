@@ -40,18 +40,6 @@ export const MENU_DEFS: MenuDef[] = [
     featureKey: 'scan',
   },
   {
-    key: 'report',
-    icon: '\u25A0',
-    number: 2,
-    en: 'Compliance Report',
-    zh: '\u5408\u898F\u5831\u544A',
-    enDesc: 'EU AI Act, NIST AI RMF, ISO/IEC 42001, OWASP, Colorado AI Act — 6 frameworks',
-    zhDesc:
-      'EU AI Act\u3001NIST AI RMF\u3001ISO/IEC 42001\u3001OWASP\u3001Colorado AI Act \u2014 6 \u5927\u6846\u67B6',
-    tierBadge: '',
-    featureKey: 'report',
-  },
-  {
     key: 'guard',
     icon: '\u2713',
     number: 3,
