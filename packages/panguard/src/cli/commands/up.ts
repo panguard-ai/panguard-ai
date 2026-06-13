@@ -10,7 +10,8 @@ import { homedir, platform } from 'node:os';
 import { execFile } from 'node:child_process';
 import { Command } from 'commander';
 import { runCLI } from '@panguard-ai/panguard-guard';
-import { c, symbols, setLogLevel } from '@panguard-ai/core';
+import { c, setLogLevel } from '@panguard-ai/core';
+import { ok, warn, arrow, shield, brandTagline, protectedHero } from '../theme.js';
 import { detectLang } from '../interactive/lang.js';
 
 type Lang = 'en' | 'zh-TW';
@@ -106,8 +107,9 @@ export function upCommand(): Command {
         const lang = detectLang();
 
         console.log(
-          `\n  ${c.sage(c.bold('PANGUARD AI'))} ${c.dim(t(lang, '— AI Agent Security Guard', '— AI 代理安全防護'))}\n`
+          `\n  ${c.sage(c.bold('PanGuard'))}  ${c.dim(t(lang, 'Your AI Security Guard', '你的 AI 安全防護'))}`
         );
+        console.log(`  ${c.dim(brandTagline(lang))}\n`);
         console.log(`  ${c.dim('─'.repeat(50))}\n`);
 
         const activatedMarker = join(homedir(), '.panguard', 'activated');
@@ -123,10 +125,10 @@ export function upCommand(): Command {
             `  ${t(lang, 'PanGuard protects your AI agents in 3 steps:', 'PanGuard 三步驟保護你的 AI 代理：')}`
           );
           console.log(
-            `  ${c.dim('1.')} ${t(lang, 'Scan — detect threats in installed skills', '掃描 — 偵測已安裝技能中的威脅')}`
+            `  ${c.dim('1.')} ${t(lang, 'Scan — check installed skills against threat rules', '掃描 — 用威脅規則檢查已安裝技能')}`
           );
           console.log(
-            `  ${c.dim('2.')} ${t(lang, 'Protect — inject MCP proxy for runtime guard', '防護 — 注入 MCP 代理進行即時守護')}`
+            `  ${c.dim('2.')} ${t(lang, 'Watch — guard your agents as they run', '守護 — 在 agent 執行時即時守護')}`
           );
           console.log(
             `  ${c.dim('3.')} ${t(lang, 'Monitor — Guard engine watches for attacks', '監控 — Guard 引擎持續監控攻擊')}`
@@ -182,16 +184,16 @@ export function upCommand(): Command {
           }
 
           console.log(
-            `  ${symbols.scan} ${c.bold(t(lang, 'Detecting AI platforms...', '偵測 AI 平台...'))}\n`
+            `  ${shield()} ${c.bold(t(lang, 'Looking at your setup...', '看看你的環境...'))}\n`
           );
           const platforms = await detectPlatforms();
           const detected = platforms.filter((p) => p.detected);
 
           for (const p of detected) {
-            console.log(`    ${c.safe(p.name)}  ${c.dim('detected')}`);
+            console.log(`    ${ok()} ${c.safe(p.name)}  ${c.dim(t(lang, 'found', '已找到'))}`);
           }
           if (detected.length === 0) {
-            console.log(`    ${c.dim('No AI platforms found.')}`);
+            console.log(`    ${c.dim(t(lang, 'No AI tools found yet.', '尚未找到 AI 工具。'))}`);
           }
 
           // Inject proxy on all detected platforms (with consent)
@@ -219,7 +221,7 @@ export function upCommand(): Command {
             if (!shouldInject) {
               console.log(`\n    ${c.dim('Proxy injection skipped. Run "pga up -y" to inject.')}`);
             } else {
-              console.log(`\n  ${symbols.shield} ${c.bold('Injecting runtime protection...')}\n`);
+              console.log(`\n  ${shield()} ${c.bold('Watching your agents...')}\n`);
               const proxySummary = injectProxyFn(detected.map((p) => p.id));
               platformCount = proxySummary.totalPlatforms;
               serverCount = proxySummary.totalServersProxied;
@@ -231,7 +233,7 @@ export function upCommand(): Command {
                 console.log(`    ${c.dim('Config backed up to *.bak files')}`);
               } else {
                 console.log(
-                  `    ${c.dim('No new servers to proxy (all already protected or none found).')}`
+                  `    ${c.dim('All detected tools are already protected.')}`
                 );
               }
 
@@ -259,7 +261,7 @@ export function upCommand(): Command {
         // ── Step 3: Scan installed skills ────────────────────────
         if (!opts.skipScan) {
           console.log(
-            `\n  ${symbols.scan} ${c.bold(t(lang, 'Scanning installed skills...', '掃描已安裝技能...'))}\n`
+            `\n  ${arrow()} ${c.bold(t(lang, 'Scanning installed skills...', '掃描已安裝技能...'))}\n`
           );
 
           try {
@@ -314,7 +316,7 @@ export function upCommand(): Command {
               // If there are unscanned skills, run audit on them
               if (unknown.length > 0) {
                 console.log(
-                  `\n  ${symbols.warn} ${c.bold(`${unknown.length} unscanned skill(s) found. Auditing...`)}\n`
+                  `\n  ${warn()} ${c.bold(`${unknown.length} unscanned skill(s) found. Auditing...`)}\n`
                 );
 
                 const threats: Array<{
@@ -421,12 +423,12 @@ export function upCommand(): Command {
                   console.log('');
                 } else {
                   console.log(
-                    `  ${c.safe(`${symbols.pass} No threats found in unscanned skills.`)}\n`
+                    `  ${c.safe(`${ok()} No threats found in unscanned skills.`)}\n`
                   );
                 }
               } else {
                 console.log(
-                  `  ${c.safe(`${symbols.pass} All ${skills.length} skills verified safe.`)}\n`
+                  `  ${c.safe(`${ok()} All ${skills.length} skills verified safe.`)}\n`
                 );
               }
             }
@@ -535,7 +537,7 @@ export function upCommand(): Command {
         // ── Sensor confirmation: user knows they are now part of the defense network
         if (tcStatus === 'connected' && !telemetryDisabled && sensorShortId) {
           console.log(
-            `  ${c.safe(symbols.pass)} ${c.bold(t(lang, 'You are now a Threat Cloud sensor.', '你已成為威脅雲感測器。'))}`
+            `  ${c.safe(ok())} ${c.bold(t(lang, 'You are now a Threat Cloud sensor.', '你已成為威脅雲感測器。'))}`
           );
           console.log(
             `  ${c.dim(t(lang, `This machine contributes anonymous detections to the community defense network.`, `這台機器正在為社群防禦網路貢獻匿名偵測。`))}`
