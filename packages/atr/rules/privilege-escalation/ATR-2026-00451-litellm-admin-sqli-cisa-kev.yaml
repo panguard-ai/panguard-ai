@@ -1,0 +1,213 @@
+title: "LiteLLM Proxy Admin Endpoint SQL Injection — CISA KEV (CVE-2026-42208)"
+id: ATR-2026-00451
+rule_version: 1
+status: experimental
+description: >
+  Detects exploitation of CVE-2026-42208 (Critical, CVSS 9.3), an
+  unauthenticated SQL injection in LiteLLM proxy admin endpoints
+  (/team, /key, /user, /spend, /budget). Added to CISA's Known
+  Exploited Vulnerabilities catalog on 2026-05-08 with federal
+  remediation due 2026-05-11; active exploitation observed against
+  financial services and healthcare deployments. The vulnerable
+  endpoint concatenates path / query / body parameters directly into
+  Postgres queries, allowing classic SQLi shapes (tautology
+  authentication bypass `' OR 1=1 --`, UNION-based exfiltration of
+  api_keys / users / model_bindings tables, time-based blind via
+  `pg_sleep()`, DROP / TRUNCATE primitives for destructive impact).
+  This rule detects exploit payloads landing on the admin endpoint
+  surface — focused on the LiteLLM-specific path prefixes so generic
+  SQLi false positives elsewhere do not light up. CWE-89.
+  Patches in LiteLLM >= 1.48.3; this rule detects exploit attempts
+  against unpatched deployments and provides defence-in-depth
+  post-patch by catching the SQLi payload shape regardless of upstream
+  patch state.
+author: "ATR Community"
+date: "2026/05/12"
+schema_version: "0.1"
+detection_tier: pattern
+maturity: test
+severity: critical
+
+references:
+  owasp_llm:
+    - "LLM05:2025 - Improper Output Handling"
+    - "LLM10:2025 - Unbounded Consumption"
+  owasp_agentic:
+    - "ASI03:2026 - Identity and Privilege Abuse"
+    - "ASI07:2026 - Insecure Agent Infrastructure"
+  mitre_atlas:
+    - "AML.T0049 - Exploit Public-Facing Application"
+    - "AML.T0024 - Exfiltration via ML Inference API"
+  mitre_attack:
+    - "T1190 - Exploit Public-Facing Application"
+    - "T1059 - Command and Scripting Interpreter"
+  cve:
+    - "CVE-2026-42208"
+
+metadata_provenance:
+  mitre_atlas: human-reviewed
+  mitre_attack: human-reviewed
+  owasp_llm: human-reviewed
+  owasp_agentic: human-reviewed
+  cve: human-reviewed
+
+compliance:
+  eu_ai_act:
+    - article: "15"
+      context: "CVE-2026-42208 allows unauthenticated SQL execution against the LiteLLM proxy backend Postgres, exfiltrating provider API keys, model bindings, and user accounts; Article 15 cybersecurity requirements mandate parameterised queries in any AI control-plane component."
+      strength: primary
+    - article: "9"
+      context: "Article 9 risk management must enumerate proxy admin-endpoint SQLi as a high-risk class — a single bypass exposes every downstream LLM provider key the proxy holds. CISA KEV listing confirms active in-the-wild exploitation."
+      strength: primary
+    - article: "14"
+      context: "Article 14 (human oversight) requires high-risk AI systems to remain subject to effective human oversight; this rule provides detection evidence where the privilege-escalation attempt (LiteLLM Proxy Admin Endpoint SQL Injection — CISA KEV (CVE-2026-42208)) would bypass or undermine that oversight."
+      strength: secondary
+  nist_ai_rmf:
+    - subcategory: "MP.5.1"
+      context: "SQLi payloads targeting AI proxy admin endpoints must be tracked as a primary attack class against AI control-plane infrastructure; CISA KEV inclusion makes this a federally-prioritised remediation."
+      strength: primary
+    - subcategory: "MG.4.1"
+      context: "Active exploitation against LiteLLM proxy admin endpoints requires immediate incident response; this rule generates the alert needed to initiate the MG.4.1 AI incident response process."
+      strength: primary
+    - subcategory: "MG.2.3"
+      context: "Risk treatment plans under MG.2.3 must require parameterised queries on every admin endpoint of any AI proxy / gateway component."
+      strength: primary
+    - subcategory: "MS.2.7"
+      context: "NIST AI RMF MEASURE 2.7 (security and resilience evaluated and documented) is supported by this rule's runtime detection of the privilege-escalation attempt (LiteLLM Proxy Admin Endpoint SQL Injection — CISA KEV (CVE-2026-42208))."
+      strength: primary
+  iso_42001:
+    - clause: "8.1"
+      context: "Operational controls under clause 8.1 must prohibit string concatenation of HTTP parameters into SQL queries in any AI control-plane component; parameterised query builders are mandatory."
+      strength: primary
+    - clause: "6.2"
+      context: "ISO/IEC 42001 Clause 6.2 (AI objectives and planning) calls for risk treatment of known attack patterns; this rule's detection of the privilege-escalation attempt (LiteLLM Proxy Admin Endpoint SQL Injection — CISA KEV (CVE-2026-42208)) is such a treatment."
+      strength: secondary
+
+tags:
+  category: privilege-escalation
+  subcategory: admin-endpoint-sqli-cve-kev
+  scan_target: both
+  confidence: high
+
+agent_source:
+  type: tool_call
+  framework:
+    - litellm
+    - any
+  provider:
+    - any
+
+detection:
+  condition: any
+  false_positives:
+    - "Legitimate documentation or changelog text discussing CVE-2026-42208 patch notes."
+    - "Static analysis tooling output documenting SQLi patterns for defensive purposes."
+    - "CISA KEV catalog entries discussing CVE-2026-42208 for awareness."
+    - "Patched LiteLLM proxy deployments that use parameterised query builders."
+  conditions:
+    - field: content
+      operator: regex
+      value: '(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\n]{0,80}[\x27"]\s*(?:or|and)\s+(?:1\s*=+\s*1|true\b|\d+\s*=+\s*\d+)\s*(?:--(?=\s|$|["\x27\)])|/\*)'
+      description: "LiteLLM admin endpoint path with classic tautology SQLi (1=1 / true / N=N) + SQL-comment terminator (-- at EOL or /*) — CISA KEV CVE-2026-42208 canonical exploit shape; excludes markdown `#` heading"
+
+    - field: content
+      operator: regex
+      value: '(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\n]{0,80}[\x27"]?\s*;\s*(?:drop|truncate|delete)\s+(?:table|from)\s+\w'
+      description: "LiteLLM admin endpoint path with stacked destructive statement (DROP/TRUNCATE/DELETE TABLE)"
+
+    - field: content
+      operator: regex
+      value: '(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\n]{0,120}\bunion\s+(?:all\s+)?select\s+'
+      description: "LiteLLM admin endpoint with UNION SELECT exfiltration probe"
+
+    - field: content
+      operator: regex
+      value: '(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\n]{0,120}\bpg_sleep\s*\(\s*\d+\s*\)'
+      description: "LiteLLM admin endpoint with Postgres time-based blind primitive `pg_sleep(N)`"
+
+    - field: content
+      operator: regex
+      value: '(?i)\b(?:team_id|key_id|user_id|customer_id|model_id)\b["\x27]?\s*[:=]\s*["\x27]?[^"\x27\n]{0,40}[\x27"]\s*(?:or|and)\s+(?:1\s*=+\s*1|true\b|\d+\s*=+\s*\d+)\s*(?:--(?=\s|$|["\x27\)])|/\*)'
+      description: "LiteLLM admin endpoint parameter (team_id/key_id/user_id/customer_id/model_id) carrying a tautology + SQL-comment terminator (handles JSON key form team_id\":\")"
+
+    - field: content
+      operator: regex
+      value: '(?i)\b(?:team_id|key_id|user_id|customer_id|model_id)\b[^\n]{0,80}\bunion\s+(?:all\s+)?select\b'
+      description: "Admin-endpoint parameter carrying UNION SELECT — exfil chain (handles JSON key form)"
+
+    - field: content
+      operator: regex
+      value: '(?i)(?:litellm|proxy)\b[^.\n]{0,80}/(?:team|key|user|spend|budget)/[^?\n]{0,120}\b(?:information_schema\.tables|pg_catalog\.\w+|pg_user|pg_shadow|version\s*\(\s*\))\b'
+      description: "LiteLLM proxy admin path probing Postgres metadata views (information_schema.tables, pg_user, version()) — recon stage of CVE-2026-42208 exploitation; requires concrete metadata identifiers, not bare `current_user`"
+
+    - field: content
+      operator: regex
+      value: '(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\n]{0,120}\b(?:extractvalue|updatexml|load_extension)\s*\('
+      description: "LiteLLM admin endpoint with error-based / out-of-band SQLi primitives (extractvalue, updatexml, load_extension)"
+
+response:
+  actions:
+    - block_input
+    - alert
+    - escalate
+    - snapshot
+  notify:
+    - security_team
+
+remediation: >
+  Upgrade LiteLLM proxy to >= 1.48.3 immediately — CISA KEV listing
+  with federal remediation due 2026-05-11 means active exploitation
+  is occurring in the wild. Rotate every provider API key and user
+  credential that the proxy database has held since deployment.
+  Audit Postgres logs for queries against api_keys, users,
+  model_bindings, and budget tables originating from the proxy
+  service account. Replace string-concatenated SQL in admin handlers
+  with parameterised queries / a query builder. Restrict admin
+  endpoint exposure to a private network or VPN until upgrade is
+  verified.
+
+test_cases:
+  true_positives:
+    - input: "GET /team/1' OR 1=1 -- HTTP/1.1"
+      expected: triggered
+      description: "Canonical tautology SQLi against /team admin endpoint — CISA KEV CVE-2026-42208 shape"
+    - input: 'GET /key/foo''; DROP TABLE api_keys -- '
+      expected: triggered
+      description: "Stacked DROP TABLE against /key admin endpoint"
+    - input: "GET /user/1 UNION ALL SELECT api_key, user_id FROM api_keys --"
+      expected: triggered
+      description: "UNION-based exfil of api_keys via /user admin endpoint"
+    - input: "GET /spend/bob' AND pg_sleep(5)-- HTTP/1.1"
+      expected: triggered
+      description: "Time-based blind SQLi via pg_sleep on /spend admin endpoint"
+    - input: '{"team_id":"abc'' or 1=1 --"}'
+      expected: triggered
+      description: "team_id parameter carrying tautology + comment terminator"
+    - input: '{"key_id":"x'' UNION ALL SELECT api_key FROM api_keys --"}'
+      expected: triggered
+      description: "key_id parameter with UNION exfil"
+    - input: "litellm proxy /budget/1 information_schema.tables current_user"
+      expected: triggered
+      description: "Recon stage probing Postgres metadata via /budget admin endpoint"
+    - input: "GET /team/1' AND extractvalue(1,concat(0x7e,(SELECT version())))-- HTTP/1.1"
+      expected: triggered
+      description: "Error-based SQLi using extractvalue against /team admin endpoint"
+  true_negatives:
+    - input: "LiteLLM 1.48.3 release notes: parameterised query builder replaces concat in admin endpoints. Mitigates CVE-2026-42208 (CISA KEV)."
+      expected: not_triggered
+      description: "Patch changelog mentioning the CVE should not trigger"
+    - input: "CISA added CVE-2026-42208 to the KEV catalog on 2026-05-08 with federal remediation due 2026-05-11."
+      expected: not_triggered
+      description: "Defensive awareness post about the KEV listing"
+    - input: "GET /team/abc123 HTTP/1.1"
+      expected: not_triggered
+      description: "Benign admin-endpoint GET without SQLi payload"
+    - input: 'curl -X POST /key -d ''{"alias":"prod","spend_limit":100}'''
+      expected: not_triggered
+      description: "Standard /key endpoint POST with normal payload"
+    - input: "The /spend endpoint returns aggregated cost per team for the last 30 days."
+      expected: not_triggered
+      description: "API documentation describing /spend behaviour"
+    - input: 'team_id = "team_abc123"'
+      expected: not_triggered
+      description: "Realistic team_id value with no injection content"
