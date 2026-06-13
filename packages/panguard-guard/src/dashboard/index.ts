@@ -359,15 +359,16 @@ export class DashboardServer {
 
     if (url.startsWith('/api/')) {
       const authHeader = req.headers.authorization ?? '';
-      // Parse auth token from: 1) Authorization header, 2) HttpOnly cookie, 3) query param (deprecated)
+      // Parse auth token from: 1) Authorization header, 2) HttpOnly cookie.
+      // Query-param tokens (?token=) were removed — they leak into server logs,
+      // browser history, and Referer headers.
       const cookieToken =
         (req.headers.cookie ?? '')
           .split(';')
           .map((c) => c.trim())
           .find((c) => c.startsWith('panguard_auth='))
           ?.split('=')[1] ?? '';
-      const queryToken = new URL(url, `http://127.0.0.1:${this.port}`).searchParams.get('token');
-      const providedToken = authHeader.replace('Bearer ', '') || cookieToken || queryToken;
+      const providedToken = authHeader.replace('Bearer ', '') || cookieToken;
 
       if (
         !providedToken ||
@@ -409,13 +410,25 @@ export class DashboardServer {
       case '/api/verdicts':
         this.jsonResponse(res, this.status.recentVerdicts);
         break;
-      case '/api/config':
+      case '/api/config': {
         if (this.getConfig) {
-          this.jsonResponse(res, this.getConfig());
+          // Redact secret-bearing fields by KEY name before exposing config to
+          // the browser. The dashboard only needs to know a channel is
+          // configured — never the secret value. Key-name matching survives
+          // config-shape drift (new secret fields are caught automatically).
+          const SECRET_KEY_RE =
+            /(api[-_]?key|license[-_]?key|signing[-_]?key|private[-_]?key|token|secret|password|passphrase|credential|\bpass\b)/i;
+          const safe = JSON.parse(
+            JSON.stringify(this.getConfig(), (k, v) =>
+              SECRET_KEY_RE.test(k) && typeof v === 'string' && v ? '[redacted]' : v
+            )
+          );
+          this.jsonResponse(res, safe);
         } else {
           this.jsonResponse(res, { error: 'Config not available' }, 503);
         }
         break;
+      }
       case '/api/skills':
         this.handleSkillsApi(res);
         break;

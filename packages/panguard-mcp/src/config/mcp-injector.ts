@@ -12,6 +12,7 @@ import {
   mkdirSync,
   readFileSync,
   writeFileSync,
+  renameSync,
   copyFileSync,
   rmSync,
   chmodSync,
@@ -56,6 +57,27 @@ function readJsonSafe(filePath: string): Record<string, unknown> {
     return {};
   } catch {
     return {};
+  }
+}
+
+/**
+ * Atomically write JSON to a config file: write a temp file, then rename it
+ * over the target. rename() is atomic on POSIX, so a crash or signal mid-write
+ * can never leave the agent's config truncated or empty (which would break the
+ * user's AI tool). The caller takes a .bak backup separately before mutating.
+ */
+function atomicWriteJson(filePath: string, data: unknown): void {
+  const tmp = `${filePath}.tmp.${process.pid}.${Date.now()}`;
+  writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf-8');
+  try {
+    renameSync(tmp, filePath);
+  } catch (err) {
+    try {
+      unlinkSync(tmp);
+    } catch {
+      /* best-effort cleanup of the temp file */
+    }
+    throw err;
   }
 }
 
@@ -114,7 +136,7 @@ function injectClaudeDesktop(configPath: string): void {
   const servers = (config['mcpServers'] as Record<string, unknown>) ?? {};
   servers['panguard'] = { ...PANGUARD_MCP_ENTRY };
   config['mcpServers'] = servers;
-  writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+  atomicWriteJson(configPath, config);
 }
 
 /**
@@ -141,7 +163,7 @@ function injectClaudeCode(_configPath: string): void {
     const servers = (config['mcpServers'] as Record<string, unknown>) ?? {};
     servers['panguard'] = { ...PANGUARD_MCP_ENTRY };
     config['mcpServers'] = servers;
-    writeFileSync(_configPath, JSON.stringify(config, null, 2), 'utf-8');
+    atomicWriteJson(_configPath, config);
   }
 }
 
@@ -155,7 +177,7 @@ function injectCursor(configPath: string): void {
   const servers = (config['mcpServers'] as Record<string, unknown>) ?? {};
   servers['panguard'] = { ...PANGUARD_MCP_ENTRY };
   config['mcpServers'] = servers;
-  writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+  atomicWriteJson(configPath, config);
 }
 
 /**
@@ -167,7 +189,7 @@ function injectGenericMCP(configPath: string): void {
   const servers = (config['mcpServers'] as Record<string, unknown>) ?? {};
   servers['panguard'] = { ...PANGUARD_MCP_ENTRY };
   config['mcpServers'] = servers;
-  writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+  atomicWriteJson(configPath, config);
 }
 
 /**
@@ -334,7 +356,7 @@ export function removeMCPConfig(platformId: PlatformId): InjectionResult {
       delete servers['panguard'];
       config['mcpServers'] = servers;
     }
-    writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+    atomicWriteJson(configPath, config);
     result.success = true;
     logger.info(`Removed Panguard MCP config from ${platformId}`);
   } catch (err) {
@@ -494,7 +516,7 @@ function injectProxyForJsonPlatform(
       result.backupPath = backupFile(configPath);
       const updatedConfig = { ...config, mcpServers: updatedServers };
       ensureDir(configPath);
-      writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2), 'utf-8');
+      atomicWriteJson(configPath, updatedConfig);
       logger.info(`Proxied ${result.serversProxied} server(s) on ${platformId}`);
     }
   } catch (err) {
@@ -595,7 +617,7 @@ export function removeProxy(platformIds: readonly PlatformId[]): ProxyInjectionS
       if (changed) {
         result.backupPath = backupFile(configPath);
         const updatedConfig = { ...config, mcpServers: updatedServers };
-        writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2), 'utf-8');
+        atomicWriteJson(configPath, updatedConfig);
         logger.info(`Removed proxy from ${result.serversProxied} server(s) on ${platformId}`);
       }
     } catch (err) {
