@@ -541,6 +541,8 @@ export interface GuardConfig {
   threatCloudEndpoint?: string;
   threatCloudApiKey?: string;
   threatCloudUploadEnabled?: boolean;
+  /** Receive new ATR rules from Threat Cloud. ON by default; false pins to bundled rules. */
+  threatCloudRuleSyncEnabled?: boolean;
   licenseKey?: string;
   /** CLI tier from panguard credentials (overrides key-based license) */
   cliTier?: string;
