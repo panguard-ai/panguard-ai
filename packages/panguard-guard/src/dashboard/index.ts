@@ -399,17 +399,18 @@ export class DashboardServer {
         return;
       }
 
-      // CSRF defense-in-depth on top of the SameSite=Strict cookie: a
-      // state-changing request must originate from the dashboard page itself.
-      // Browsers always attach Origin on POST, so reject any cross-origin (or
-      // origin-less) mutation even if it somehow carries the cookie/token.
+      // CSRF defense-in-depth on top of the SameSite=Strict cookie. A browser
+      // always attaches Origin on a state-changing request, so a *mismatched*
+      // Origin is a cross-site (CSRF) attempt and is rejected. An *absent*
+      // Origin means a non-browser client (CLI / script / test) that had to
+      // supply the auth token explicitly — not a CSRF vector — so it is allowed.
       if (req.method && req.method !== 'GET' && req.method !== 'HEAD') {
-        const origin = req.headers.origin ?? '';
+        const origin = req.headers.origin;
         const allowedOrigins = [
           `http://127.0.0.1:${this.port}`,
           `http://localhost:${this.port}`,
         ];
-        if (!allowedOrigins.includes(origin)) {
+        if (origin && !allowedOrigins.includes(origin)) {
           res.writeHead(403, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ error: 'Forbidden: cross-origin request rejected' }));
           return;
