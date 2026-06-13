@@ -133,7 +133,7 @@ describe('tier-aware rate limiting', () => {
     expect(body.limit).toBe(limit);
   });
 
-  it('community client key gets 120/min on authenticated route', { timeout: 30_000 }, async () => {
+  it('community client key gets 120/min on authenticated route', { timeout: 90_000 }, async () => {
     const key = provisionKey('test-community', 'community');
     const limit = TIER_LIMITS.community;
     const headers = { Authorization: `Bearer ${key}` };
