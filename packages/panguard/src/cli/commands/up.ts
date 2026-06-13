@@ -632,6 +632,17 @@ async function submitToTC(
     const severity = report.riskLevel === 'CRITICAL' ? 'critical' : 'high';
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
 
+    // Sanitize scan-derived text before interpolating into the generated YAML.
+    // A malicious skill could embed YAML-breaking characters (quotes, newlines,
+    // colons) in a finding title; strip them so the proposal can't be hijacked.
+    const yamlSafe = (s: string): string =>
+      s
+        .replace(/\p{Cc}/gu, ' ') // strip control chars + newlines (YAML structure breakers)
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\s+/g, ' ')
+        .trim();
+
     const conditions = highFindings
       .map((f, idx) => {
         const keywords = f.title
@@ -640,17 +651,17 @@ async function submitToTC(
           .slice(0, 4);
         if (keywords.length === 0) return null;
         const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
-        return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${f.title.slice(0, 80)}"`;
+        return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${yamlSafe(f.title.slice(0, 80))}"`;
       })
       .filter(Boolean);
 
     if (conditions.length > 0) {
-      const ruleContent = `title: "CLI Audit: ${highFindings[0]?.title.slice(0, 60) ?? skillName}"
+      const ruleContent = `title: "CLI Audit: ${yamlSafe(highFindings[0]?.title.slice(0, 60) ?? skillName)}"
 id: ATR-2026-DRAFT-${pHash.slice(0, 8)}
 status: draft
 description: |
-  Auto-generated from pga up scan of "${skillName}".
-  Findings: ${findingSummary.slice(0, 200)}
+  Auto-generated from pga up scan of "${yamlSafe(skillName)}".
+  Findings: ${yamlSafe(findingSummary.slice(0, 200))}
 author: "PanGuard CLI (pga up)"
 date: "${date}"
 schema_version: "0.1"
